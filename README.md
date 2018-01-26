@@ -3,6 +3,7 @@ This is multiplayer Action RPG which controlling as third person Action RPG
 
 ## Character Stats
 ** Stats **
+
 	* LV (Character Level)
 	* HP (Health point)
 	* MP (Mana point)
@@ -13,6 +14,7 @@ This is multiplayer Action RPG which controlling as third person Action RPG
 	* CRIDMG (Critical Damage Rate)
 
 ** Elemental Atttack **
+
 	* Cold Attack
 	* Fire Attack
 	* Lightning Attack
@@ -20,6 +22,7 @@ This is multiplayer Action RPG which controlling as third person Action RPG
 	* Magic Attack
 
 ** Elemental Resistance **
+
 	* Cold Resistance
 	* Fire Resistance
 	* Lightning Resistance
@@ -27,10 +30,12 @@ This is multiplayer Action RPG which controlling as third person Action RPG
 	* Magic Resistance
 
 ** Future Plan **
+
 	* ASPD (Attack Speed)
 	* MSPD (Move Speed)
 
 ** Damage Calculation **
+
 	* Is Crit = Random.value <= CRIHIT
 	* Hit Chance = 100 x A.ATKR / (A.ATKR + B.DEF) x 2 x A.LV / (A.LVL + B.LVL)
 	* Element Damage = A.EDMG * B.ERES / 100
@@ -38,6 +43,7 @@ This is multiplayer Action RPG which controlling as third person Action RPG
 	* Total Damage = ATK * (isCrit ? CRITDMG : 1)
 
 ** Attributes **
+
 	* STR +Weapon's Effectiveness% ATK
 	* DEX +0.25 DEF, +5 ATKR
 	* VIT +2 HP
