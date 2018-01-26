@@ -8,4 +8,6 @@ public class BaseGameData : ScriptableObject
     [TextArea]
     public string description;
     public Sprite icon;
+
+    public string Id { get { return name; } }
 }
