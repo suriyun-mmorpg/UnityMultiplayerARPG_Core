@@ -1,0 +1,19 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+[CreateAssetMenu(fileName = "EquipmentItem", menuName = "Create GameData/EquipmentItem")]
+public class EquipmentItem : Item
+{
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        // Equipment max stack always equals to 1
+        maxStack = 1;
+        EditorUtility.SetDirty(this);
+    }
+#endif
+}
