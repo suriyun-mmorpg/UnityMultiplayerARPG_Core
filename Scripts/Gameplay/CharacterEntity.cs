@@ -6,6 +6,53 @@ using UnityEngine.Networking;
 [RequireComponent(typeof(CharacterMovement))]
 public class CharacterEntity : NetworkBehaviour
 {
+    [SyncVar]
+    public string characterName;
+    [SyncVar]
+    public string characterClassId;
+    [SyncVar]
+    public int level;
+    [SyncVar]
+    public int exp;
+    [SyncVar]
+    public int currentHp;
+    [SyncVar]
+    public int currentMp;
+    [SyncVar]
+    public int statPoint;
+    [SyncVar]
+    public int skillPoint;
+    [SyncVar]
+    public int gold;
+
+    public CharacterClass Class
+    {
+        get { return GameInstance.CharacterClasses[characterClassId]; }
+    }
+
+    public int NextLevelExp
+    {
+        get
+        {
+            var expTree = GameInstance.Singleton.expTree;
+            if (level > expTree.Length)
+                return 0;
+            return expTree[level - 1];
+        }
+    }
+
+    public int MaxHp
+    {
+        // TODO: Bring data from game instance, equipments
+        get { return 0; }
+    }
+
+    public int MaxMp
+    {
+        // TODO: Bring data from game instance, equipments
+        get { return 0; }
+    }
+
     private Rigidbody tempRigidbody;
     public Rigidbody TempRigidbody
     {
