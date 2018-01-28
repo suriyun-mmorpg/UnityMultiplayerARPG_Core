@@ -7,7 +7,6 @@ public class CharacterStats
 {
     public float hp;
     public float mp;
-    public float atk;
     public float atkRate;
     public float def;
     public float criHitRate;
@@ -18,7 +17,6 @@ public class CharacterStats
         var result = new CharacterStats();
         result.hp = a.hp + b.hp;
         result.mp = a.mp + b.mp;
-        result.atk = a.atk + b.atk;
         result.atkRate = a.atkRate + b.atkRate;
         result.def = a.def + b.def;
         result.criHitRate = a.criHitRate + b.criHitRate;
@@ -31,7 +29,6 @@ public class CharacterStats
         var result = new CharacterStats();
         result.hp = a.hp * level;
         result.mp = a.mp * level;
-        result.atk = a.atk * level;
         result.atkRate = a.atkRate * level;
         result.def = a.def * level;
         result.criHitRate = a.criHitRate * level;
@@ -45,7 +42,6 @@ public class CharacterStatsPercentage
 {
     public float hp;
     public float mp;
-    public float atk;
     public float atkRate;
     public float def;
     public float criHitRate;
@@ -57,7 +53,6 @@ public class CharacterStatsPercentage
         // [Optimize] * Faster than /
         result.hp = a.hp + (a.hp * b.hp * 0.01f);
         result.mp = a.mp + (a.hp * b.mp * 0.01f);
-        result.atk = a.atk + (a.hp * b.atk * 0.01f);
         result.atkRate = a.atkRate + (a.atkRate * b.atkRate * 0.01f);
         result.def = a.def + (a.def * b.def * 0.01f);
         result.criHitRate = a.criHitRate + (a.criHitRate * b.criHitRate * 0.01f);
@@ -70,7 +65,6 @@ public class CharacterStatsPercentage
         var result = new CharacterStatsPercentage();
         result.hp = a.hp + b.hp;
         result.mp = a.mp + b.mp;
-        result.atk = a.atk + b.atk;
         result.atkRate = a.atkRate + b.atkRate;
         result.def = a.def + b.def;
         result.criHitRate = a.criHitRate + b.criHitRate;
@@ -83,7 +77,6 @@ public class CharacterStatsPercentage
         var result = new CharacterStatsPercentage();
         result.hp = a.hp * level;
         result.mp = a.mp * level;
-        result.atk = a.atk * level;
         result.atkRate = a.atkRate * level;
         result.def = a.def * level;
         result.criHitRate = a.criHitRate * level;
