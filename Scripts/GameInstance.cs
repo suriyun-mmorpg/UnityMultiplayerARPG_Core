@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GameInstance : MonoBehaviour {
-    public GameInstance Singleton { get; protected set; }
+    public static GameInstance Singleton { get; protected set; }
     public CharacterClass[] characterClasses;
     public CharacterAttribute[] characterAttributes;
     public int[] expTree;
