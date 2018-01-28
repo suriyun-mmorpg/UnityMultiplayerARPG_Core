@@ -8,6 +8,11 @@ using UnityEditor;
 [CreateAssetMenu(fileName = "EquipmentItem", menuName = "Create GameData/EquipmentItem")]
 public class EquipmentItem : Item
 {
+    public CharacterAttributeAmount[] requireAttributes;
+    public CharacterStats baseStats;
+    public CharacterStats statsIncreaseEachLevel;
+    public CharacterStatsPercentage statsPercentageIncreaseEachLevel;
+
 #if UNITY_EDITOR
     private void OnValidate()
     {
