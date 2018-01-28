@@ -1,17 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class GameInstance : MonoBehaviour {
+public class GameInstance : MonoBehaviour
+{
     public static GameInstance Singleton { get; protected set; }
+    public CharacterEntity characterEntityPrefab;
     public CharacterClass[] characterClasses;
     public CharacterAttribute[] characterAttributes;
+    public Item[] items;
     public int[] expTree;
     public int increaseStatPointEachLevel = 5;
     public int increaseSkillPointEachLevel = 1;
     public int startGold = 0;
     public static readonly Dictionary<string, CharacterClass> CharacterClasses = new Dictionary<string, CharacterClass>();
     public static readonly Dictionary<string, CharacterAttribute> CharacterAttributes = new Dictionary<string, CharacterAttribute>();
+    public static readonly Dictionary<string, Item> Items = new Dictionary<string, Item>();
 
     protected virtual void Awake()
     {
@@ -22,6 +27,11 @@ public class GameInstance : MonoBehaviour {
         }
         DontDestroyOnLoad(gameObject);
         Singleton = this;
+        
+        ClientScene.RegisterPrefab(characterEntityPrefab.gameObject);
+        AddCharacterClasses(characterClasses);
+        AddCharacterAttributes(characterAttributes);
+        AddItems(items);
     }
 
     public static void AddCharacterClasses(CharacterClass[] characterClasses)
@@ -50,6 +60,16 @@ public class GameInstance : MonoBehaviour {
             if (characterAttribute == null)
                 continue;
             CharacterAttributes[characterAttribute.Id] = characterAttribute;
+        }
+    }
+
+    public static void AddItems(Item[] items)
+    {
+        foreach (var item in items)
+        {
+            if (item == null)
+                continue;
+            Items[item.Id] = item;
         }
     }
 }
