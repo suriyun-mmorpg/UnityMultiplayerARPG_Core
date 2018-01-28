@@ -2,21 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum WeaponItemEquipType : byte
+{
+    OneHand,
+    OneHandCanDual,
+    TwoHand,
+}
+
 public class WeaponItem : EquipmentItem
 {
     public DamageAmount damage;
     public DamageEffectivenessAttribute[] effectivenessAttributes;
-    public bool requireTwoHand;
-    public bool canWieldDual;
+    public WeaponItemEquipType equipType;
 
 #if UNITY_EDITOR
     protected override void OnValidate()
     {
-        if (requireTwoHand && canWieldDual)
-        {
-            Debug.LogWarning("Weapon which require two hand cannot wield dual");
-            canWieldDual = false;
-        }
+        // Weapon equipment cannot set custom equip position
+        equipPosition = string.Empty;
         base.OnValidate();
     }
 #endif
