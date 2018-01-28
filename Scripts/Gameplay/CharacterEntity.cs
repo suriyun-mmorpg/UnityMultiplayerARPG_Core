@@ -208,4 +208,9 @@ public class CharacterEntity : NetworkBehaviour
         character.currentMp = character.MaxMp;
         return character;
     }
+
+    public void SaveToPlayerPrefs()
+    {
+
+    }
 }
