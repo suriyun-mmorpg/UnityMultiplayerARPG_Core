@@ -11,7 +11,7 @@ public enum WeaponItemEquipType : byte
 
 public class WeaponItem : EquipmentItem
 {
-    public DamageAmount damage;
+    public DamageAmount[] damages;
     public DamageEffectivenessAttribute[] effectivenessAttributes;
     public WeaponItemEquipType equipType;
 
