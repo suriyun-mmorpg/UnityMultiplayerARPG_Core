@@ -14,7 +14,7 @@ public class EquipmentItem : Item
     public CharacterStatsPercentage statsPercentageIncreaseEachLevel;
 
 #if UNITY_EDITOR
-    private void OnValidate()
+    protected virtual void OnValidate()
     {
         // Equipment max stack always equals to 1
         maxStack = 1;
