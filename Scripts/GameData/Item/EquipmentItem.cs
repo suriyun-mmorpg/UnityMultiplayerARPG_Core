@@ -11,6 +11,7 @@ public class EquipmentItem : Item
     public const string EQUIP_POSITION_RIGHT_HAND = "RIGHT_HAND";
     public const string EQUIP_POSITION_LEFT_HAND = "LEFT_HAND";
     public string equipPosition;
+    public CharacterClass requireClass;
     public CharacterAttributeAmount[] requireAttributes;
     public CharacterStats baseStats;
     public CharacterStats statsIncreaseEachLevel;
