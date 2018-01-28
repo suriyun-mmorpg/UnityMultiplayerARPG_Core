@@ -25,6 +25,19 @@ public class CharacterStats
         result.criDmgRate = a.criDmgRate + b.criDmgRate;
         return result;
     }
+
+    public static CharacterStats operator *(CharacterStats a, int level)
+    {
+        var result = new CharacterStats();
+        result.hp = a.hp * level;
+        result.mp = a.mp * level;
+        result.atk = a.atk * level;
+        result.atkRate = a.atkRate * level;
+        result.def = a.def * level;
+        result.criHitRate = a.criHitRate * level;
+        result.criDmgRate = a.criDmgRate * level;
+        return result;
+    }
 }
 
 [System.Serializable]
@@ -41,13 +54,40 @@ public class CharacterStatsPercentage
     public static CharacterStats operator +(CharacterStats a, CharacterStatsPercentage b)
     {
         var result = new CharacterStats();
-        result.hp = a.hp + (a.hp * b.hp / 100);
-        result.mp = a.mp + (a.hp * b.mp / 100);
-        result.atk = a.atk + (a.hp * b.atk / 100);
-        result.atkRate = a.atkRate + (a.atkRate * b.atkRate / 100);
-        result.def = a.def + (a.def * b.def / 100);
-        result.criHitRate = a.criHitRate + (a.criHitRate * b.criHitRate / 100);
-        result.criDmgRate = a.criDmgRate + (a.criDmgRate * b.criDmgRate / 100);
+        // [Optimize] * Faster than /
+        result.hp = a.hp + (a.hp * b.hp * 0.01f);
+        result.mp = a.mp + (a.hp * b.mp * 0.01f);
+        result.atk = a.atk + (a.hp * b.atk * 0.01f);
+        result.atkRate = a.atkRate + (a.atkRate * b.atkRate * 0.01f);
+        result.def = a.def + (a.def * b.def * 0.01f);
+        result.criHitRate = a.criHitRate + (a.criHitRate * b.criHitRate * 0.01f);
+        result.criDmgRate = a.criDmgRate + (a.criDmgRate * b.criDmgRate * 0.01f);
+        return result;
+    }
+
+    public static CharacterStatsPercentage operator +(CharacterStatsPercentage a, CharacterStatsPercentage b)
+    {
+        var result = new CharacterStatsPercentage();
+        result.hp = a.hp + b.hp;
+        result.mp = a.mp + b.mp;
+        result.atk = a.atk + b.atk;
+        result.atkRate = a.atkRate + b.atkRate;
+        result.def = a.def + b.def;
+        result.criHitRate = a.criHitRate + b.criHitRate;
+        result.criDmgRate = a.criDmgRate + b.criDmgRate;
+        return result;
+    }
+
+    public static CharacterStatsPercentage operator *(CharacterStatsPercentage a, int level)
+    {
+        var result = new CharacterStatsPercentage();
+        result.hp = a.hp * level;
+        result.mp = a.mp * level;
+        result.atk = a.atk * level;
+        result.atkRate = a.atkRate * level;
+        result.def = a.def * level;
+        result.criHitRate = a.criHitRate * level;
+        result.criDmgRate = a.criDmgRate * level;
         return result;
     }
 }
