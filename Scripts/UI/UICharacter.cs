@@ -19,9 +19,14 @@ public class UICharacter : UIBase
     public Image imageClassIcon;
     [Header("Save data")]
     public CharacterEntity characterEntity;
+    protected CharacterEntity dirtyCharacterEntity;
 
     protected virtual void Update()
     {
+        if (dirtyCharacterEntity != null && characterEntity != dirtyCharacterEntity)
+            Destroy(dirtyCharacterEntity.gameObject);
+        dirtyCharacterEntity = characterEntity;
+
         if (textName != null)
             textName.text = characterEntity == null ? "" : characterEntity.characterName;
 
@@ -61,5 +66,11 @@ public class UICharacter : UIBase
 
         if (imageClassIcon != null)
             imageClassIcon.sprite = characterEntity == null ? null : characterEntity.Class.icon;
+    }
+
+    protected virtual void OnDestroy()
+    {
+        if (dirtyCharacterEntity != null)
+            Destroy(dirtyCharacterEntity.gameObject);
     }
 }
