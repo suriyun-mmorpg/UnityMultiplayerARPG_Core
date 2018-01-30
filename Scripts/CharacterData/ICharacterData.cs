@@ -1,0 +1,19 @@
+﻿using System.Collections.Generic;
+
+public interface ICharacterData
+{
+    string Id { get; set; }
+    string CharacterName { get; set; }
+    string ClassId { get; set; }
+    int Level { get; set; }
+    int Exp { get; set; }
+    int CurrentHp { get; set; }
+    int CurrentMp { get; set; }
+    int StatPoint { get; set; }
+    int SkillPoint { get; set; }
+    int Gold { get; set; }
+    IList<CharacterAttributeLevel> AttributeLevels { get; set; }
+    IList<CharacterSkillLevel> SkillLevels { get; set; }
+    IList<CharacterItem> EquipItems { get; set; }
+    IList<CharacterItem> NonEquipItems { get; set; }
+}

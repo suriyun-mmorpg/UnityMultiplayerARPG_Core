@@ -1,10 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class UICharacter : UIBase
 {
+
     public Text textName;
     public Text textLevel;
     public Text textExp;
@@ -17,60 +19,60 @@ public class UICharacter : UIBase
     public Text textClassTitle;
     public Text textClassDescription;
     public Image imageClassIcon;
+    [Header("Events")]
+    public UICharacterEvent eventOnSelect;
     [Header("Save data")]
-    public CharacterEntity characterEntity;
-    protected CharacterEntity dirtyCharacterEntity;
+    public ICharacterData characterData;
 
     protected virtual void Update()
     {
-        if (dirtyCharacterEntity != null && characterEntity != dirtyCharacterEntity)
-            Destroy(dirtyCharacterEntity.gameObject);
-        dirtyCharacterEntity = characterEntity;
-
         if (textName != null)
-            textName.text = characterEntity == null ? "" : characterEntity.characterName;
+            textName.text = characterData == null ? "" : characterData.CharacterName;
 
         if (textLevel != null)
-            textLevel.text = characterEntity == null ? "N/A" : characterEntity.level.ToString("N0");
+            textLevel.text = characterData == null ? "N/A" : characterData.Level.ToString("N0");
 
         if (textExp != null)
         {
-            if (characterEntity == null)
+            if (characterData == null)
                 textExp.text = "N/A";
-            else if (characterEntity.NextLevelExp > 0)
-                textExp.text = characterEntity.exp.ToString("N0") + "/" + characterEntity.NextLevelExp.ToString("N0");
+            else if (characterData.GetNextLevelExp() > 0)
+                textExp.text = characterData.Exp.ToString("N0") + "/" + characterData.GetNextLevelExp().ToString("N0");
             else
                 textExp.text = "Max";
         }
 
         if (textHp != null)
-            textHp.text = characterEntity == null ? "N/A" : characterEntity.currentHp.ToString("N0") + "/" + characterEntity.MaxHp.ToString("N0");
+            textHp.text = characterData == null ? "N/A" : characterData.CurrentHp.ToString("N0") + "/" + characterData.GetMaxHp().ToString("N0");
 
         if (textMp != null)
-            textMp.text = characterEntity == null ? "N/A" : characterEntity.currentMp.ToString("N0") + "/" + characterEntity.MaxMp.ToString("N0");
+            textMp.text = characterData == null ? "N/A" : characterData.CurrentMp.ToString("N0") + "/" + characterData.GetMaxMp().ToString("N0");
 
         if (textStatPoint != null)
-            textStatPoint.text = characterEntity == null ? "N/A" : characterEntity.statPoint.ToString("N0");
+            textStatPoint.text = characterData == null ? "N/A" : characterData.StatPoint.ToString("N0");
 
         if (textSkillPoint != null)
-            textSkillPoint.text = characterEntity == null ? "N/A" : characterEntity.skillPoint.ToString("N0");
+            textSkillPoint.text = characterData == null ? "N/A" : characterData.SkillPoint.ToString("N0");
 
         if (textGold != null)
-            textGold.text = characterEntity == null ? "N/A" : characterEntity.gold.ToString("N0");
+            textGold.text = characterData == null ? "N/A" : characterData.Gold.ToString("N0");
 
         if (textClassTitle != null)
-            textClassTitle.text = characterEntity == null ? "N/A" : characterEntity.Class.title;
+            textClassTitle.text = characterData == null ? "N/A" : characterData.GetClass().title;
 
         if (textClassDescription != null)
-            textClassDescription.text = characterEntity == null ? "N/A" : characterEntity.Class.description;
+            textClassDescription.text = characterData == null ? "N/A" : characterData.GetClass().description;
 
         if (imageClassIcon != null)
-            imageClassIcon.sprite = characterEntity == null ? null : characterEntity.Class.icon;
+            imageClassIcon.sprite = characterData == null ? null : characterData.GetClass().icon;
     }
 
-    protected virtual void OnDestroy()
+    public void OnClickSelect()
     {
-        if (dirtyCharacterEntity != null)
-            Destroy(dirtyCharacterEntity.gameObject);
+        if (eventOnSelect != null)
+            eventOnSelect.Invoke(this);
     }
 }
+
+[System.Serializable]
+public class UICharacterEvent : UnityEvent<UICharacter> { }

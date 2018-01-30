@@ -1,10 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
 [RequireComponent(typeof(CharacterMovement))]
-public class CharacterEntity : NetworkBehaviour
+public class CharacterEntity : NetworkBehaviour, ICharacterData
 {
     // Use id as primary key
     [SyncVar]
@@ -30,95 +31,58 @@ public class CharacterEntity : NetworkBehaviour
     [Header("Sync Lists")]
     public SyncListCharacterAttributeLevel attributeLevels = new SyncListCharacterAttributeLevel();
     public SyncListCharacterSkillLevel skillLevels = new SyncListCharacterSkillLevel();
-    public SyncListCharacterItem equipments = new SyncListCharacterItem();
-    public SyncListCharacterItem inventory = new SyncListCharacterItem();
+    public SyncListCharacterItem equipItems = new SyncListCharacterItem();
+    public SyncListCharacterItem nonEquipItems = new SyncListCharacterItem();
 
-    public CharacterClass Class
+    public string Id { get { return id; } set { id = value; } }
+    public string CharacterName { get { return characterName; } set { id = characterName; } }
+    public string ClassId { get { return classId; } set { classId = value; } }
+    public int Level { get { return level; } set { level = value; } }
+    public int Exp { get { return exp; } set { exp = value; } }
+    public int CurrentHp { get { return currentHp; } set { currentHp = value; } }
+    public int CurrentMp { get { return currentMp; } set { currentMp = value; } }
+    public int StatPoint { get { return statPoint; } set { statPoint = value; } }
+    public int SkillPoint { get { return skillPoint; } set { skillPoint = value; } }
+    public int Gold { get { return gold; } set { gold = value; } }
+    public IList<CharacterAttributeLevel> AttributeLevels
     {
-        get { return GameInstance.CharacterClasses[classId]; }
-    }
-
-    public int NextLevelExp
-    {
-        get
+        get { return attributeLevels; }
+        set
         {
-            var expTree = GameInstance.Singleton.expTree;
-            if (level > expTree.Length)
-                return 0;
-            return expTree[level - 1];
+            attributeLevels.Clear();
+            foreach (var entry in value)
+                attributeLevels.Add(entry);
         }
     }
-
-    #region Stats calculation, make saperate stats for buffs calculation
-    public CharacterStats Stats
+    public IList<CharacterSkillLevel> SkillLevels
     {
-        get
+        get { return skillLevels; }
+        set
         {
-            var result = Class.baseStats;
-            result += Class.statsIncreaseEachLevel * level;
-            foreach (var attributeLevel in attributeLevels)
-            {
-                if (attributeLevel.Attribute == null)
-                {
-                    Debug.LogError("Attribute: " + attributeLevel.attributeId + " owned by " + id + " is invalid data");
-                    continue;
-                }
-                result += attributeLevel.Attribute.statsIncreaseEachLevel * attributeLevel.amount;
-            }
-            foreach (var equipment in equipments)
-            {
-                if (equipment.EquipmentItem == null) {
-                    Debug.LogError("Item: " + equipment.id + " owned by "+ id + " is not equipment");
-                    continue;
-                }
-                result += equipment.EquipmentItem.baseStats;
-                result += equipment.EquipmentItem.statsIncreaseEachLevel * equipment.level;
-            }
-            return result;
+            skillLevels.Clear();
+            foreach (var entry in value)
+                skillLevels.Add(entry);
         }
     }
-
-    public CharacterStatsPercentage StatsPercentage
+    public IList<CharacterItem> EquipItems
     {
-        get
+        get { return equipItems; }
+        set
         {
-            var result = Class.statsPercentageIncreaseEachLevel * level;
-            foreach (var attributeLevel in attributeLevels)
-            {
-                if (attributeLevel.Attribute == null)
-                {
-                    Debug.LogError("Attribute: " + attributeLevel.attributeId + " owned by " + id + " is invalid data");
-                    continue;
-                }
-                result += attributeLevel.Attribute.statsPercentageIncreaseEachLevel * attributeLevel.amount;
-            }
-            foreach (var equipment in equipments)
-            {
-                if (equipment.EquipmentItem == null)
-                {
-                    Debug.LogError("Item: " + equipment.id + " owned by " + id + " is not equipment");
-                    continue;
-                }
-                result += equipment.EquipmentItem.statsPercentageIncreaseEachLevel * equipment.level;
-            }
-            return result;
+            equipItems.Clear();
+            foreach (var entry in value)
+                equipItems.Add(entry);
         }
     }
-
-    public CharacterStats StatsWithoutBuffs
+    public IList<CharacterItem> NonEquipItems
     {
-        get { return Stats + StatsPercentage; }
-    }
-    #endregion
-
-    public int MaxHp
-    {
-        get { return (int)StatsWithoutBuffs.hp; }
-    }
-
-    public int MaxMp
-    {
-        get { return (int)StatsWithoutBuffs.mp; }
+        get { return nonEquipItems; }
+        set
+        {
+            nonEquipItems.Clear();
+            foreach (var entry in value)
+                nonEquipItems.Add(entry);
+        }
     }
 
     private Rigidbody tempRigidbody;
@@ -186,33 +150,4 @@ public class CharacterEntity : NetworkBehaviour
         TempRigidbody.WakeUp();
     }
     #endregion
-
-    /// <summary>
-    /// Use this function to make an character entity, useful to make temporary data in character create/selection UIs
-    /// </summary>
-    /// <param name="classId"></param>
-    /// <returns></returns>
-    public static CharacterEntity CreateNewCharacter(string characterName, string classId)
-    {
-        var character = Instantiate(GameInstance.Singleton.characterEntityPrefab);
-        character.characterName = characterName;
-        character.classId = classId;
-        character.level = 1;
-        foreach (var baseAttribute in character.Class.baseAttributes)
-        {
-            var attributeLevel = new CharacterAttributeLevel();
-            attributeLevel.attributeId = baseAttribute.attribute.Id;
-            attributeLevel.amount = baseAttribute.amount;
-            character.attributeLevels.Add(attributeLevel);
-        }
-        character.currentHp = character.MaxHp;
-        character.currentMp = character.MaxMp;
-        character.gold = GameInstance.Singleton.startGold;
-        return character;
-    }
-
-    public void SaveToPlayerPrefs()
-    {
-
-    }
 }
