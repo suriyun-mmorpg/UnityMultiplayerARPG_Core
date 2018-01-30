@@ -63,7 +63,7 @@ public class CharacterEntity : NetworkBehaviour
                     Debug.LogError("Attribute: " + attributeLevel.attributeId + " owned by " + id + " is invalid data");
                     continue;
                 }
-                result += attributeLevel.Attribute.statsIncreaseEachLevel * level;
+                result += attributeLevel.Attribute.statsIncreaseEachLevel * attributeLevel.amount;
             }
             foreach (var equipment in equipments)
             {
@@ -72,7 +72,7 @@ public class CharacterEntity : NetworkBehaviour
                     continue;
                 }
                 result += equipment.EquipmentItem.baseStats;
-                result += equipment.EquipmentItem.statsIncreaseEachLevel * level;
+                result += equipment.EquipmentItem.statsIncreaseEachLevel * equipment.level;
             }
             return result;
         }
@@ -90,7 +90,7 @@ public class CharacterEntity : NetworkBehaviour
                     Debug.LogError("Attribute: " + attributeLevel.attributeId + " owned by " + id + " is invalid data");
                     continue;
                 }
-                result += attributeLevel.Attribute.statsPercentageIncreaseEachLevel * level;
+                result += attributeLevel.Attribute.statsPercentageIncreaseEachLevel * attributeLevel.amount;
             }
             foreach (var equipment in equipments)
             {
@@ -99,7 +99,7 @@ public class CharacterEntity : NetworkBehaviour
                     Debug.LogError("Item: " + equipment.id + " owned by " + id + " is not equipment");
                     continue;
                 }
-                result += equipment.EquipmentItem.statsPercentageIncreaseEachLevel * level;
+                result += equipment.EquipmentItem.statsPercentageIncreaseEachLevel * equipment.level;
             }
             return result;
         }
@@ -197,6 +197,7 @@ public class CharacterEntity : NetworkBehaviour
         var character = Instantiate(GameInstance.Singleton.characterEntityPrefab);
         character.characterName = characterName;
         character.classId = classId;
+        character.level = 1;
         foreach (var baseAttribute in character.Class.baseAttributes)
         {
             var attributeLevel = new CharacterAttributeLevel();
@@ -206,6 +207,7 @@ public class CharacterEntity : NetworkBehaviour
         }
         character.currentHp = character.MaxHp;
         character.currentMp = character.MaxMp;
+        character.gold = GameInstance.Singleton.startGold;
         return character;
     }
 
