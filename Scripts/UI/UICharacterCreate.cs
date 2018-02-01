@@ -8,6 +8,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(UIList))]
 public class UICharacterCreate : UIBase
 {
+    public Transform characterModelContainer;
     [Header("Input")]
     public InputField inputCharacterName;
     [Header("Event")]
@@ -28,8 +29,15 @@ public class UICharacterCreate : UIBase
     public override void Show()
     {
         base.Show();
+        LoadCharacters();
+    }
+
+    protected void LoadCharacters()
+    {
+        selectedUI = null;
         // Show list of characters that can be create
         var creatableClasses = GameInstance.CharacterClasses.Values.Where(a => a.canCreateByPlayer).ToList();
+        UICharacter firstUI = null;
         TempList.Generate(creatableClasses, (creatableClass, ui) =>
         {
             var characterData = new CharacterData();
@@ -37,13 +45,36 @@ public class UICharacterCreate : UIBase
             var uiCharacter = ui.GetComponent<UICharacter>();
             uiCharacter.characterData = characterData;
             uiCharacter.eventOnSelect.RemoveAllListeners();
-            uiCharacter.eventOnSelect.AddListener(OnSelectCharacterClass);
+            uiCharacter.eventOnSelect.AddListener(OnSelectCharacter);
+            if (firstUI == null)
+                firstUI = uiCharacter;
+            // TODO: Instantiate character model to show in screen
         });
+        characterModelContainer.SetChildrenActive(false);
+        // Show first character
+        OnSelectCharacter(firstUI);
     }
 
-    protected void OnSelectCharacterClass(UICharacter ui)
+    public override void Hide()
     {
+        base.Hide();
+        characterModelContainer.RemoveChildren();
+    }
+
+    protected void OnSelectCharacter(UICharacter ui)
+    {
+        if (ui == null)
+            return;
         selectedUI = ui;
+        characterModelContainer.SetChildrenActive(false);
+        ShowCharacter(ui.characterData.Id);
+    }
+
+    protected void ShowCharacter(string id)
+    {
+        if (string.IsNullOrEmpty(id))
+            return;
+        // TODO: Show select character model
     }
 
     public virtual void OnClickCreate()
