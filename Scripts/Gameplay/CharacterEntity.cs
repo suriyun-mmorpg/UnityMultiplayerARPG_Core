@@ -35,7 +35,7 @@ public class CharacterEntity : NetworkBehaviour, ICharacterData
     public SyncListCharacterItem nonEquipItems = new SyncListCharacterItem();
 
     public string Id { get { return id; } set { id = value; } }
-    public string CharacterName { get { return characterName; } set { id = characterName; } }
+    public string CharacterName { get { return characterName; } set { characterName = value; } }
     public string ClassId { get { return classId; } set { classId = value; } }
     public int Level { get { return level; } set { level = value; } }
     public int Exp { get { return exp; } set { exp = value; } }
