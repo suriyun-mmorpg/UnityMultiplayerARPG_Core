@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TestLoadAllCharacter : MonoBehaviour {
 	void Start () {
-        var characters = CharacterDataExtension.LoadAllCharacterData();
+        var characters = CharacterDataExtension.LoadAllPersistentCharacterData();
         foreach (var character in characters)
         {
             var entity = Instantiate(GameInstance.Singleton.characterEntityPrefab);
