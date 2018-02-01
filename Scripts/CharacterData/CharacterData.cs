@@ -23,7 +23,7 @@ public class CharacterData : ICharacterData
     public List<CharacterItem> nonEquipItems = new List<CharacterItem>();
 
     public string Id { get { return id; } set { id = value; } }
-    public string CharacterName { get { return characterName; } set { id = characterName; } }
+    public string CharacterName { get { return characterName; } set { characterName = value; } }
     public string ClassId { get { return classId; } set { classId = value; } }
     public int Level { get { return level; } set { level = value; } }
     public int Exp { get { return exp; } set { exp = value; } }
@@ -205,9 +205,10 @@ public static class CharacterDataExtension
         var savingData = new CharacterData();
         characterData.CloneTo(savingData);
         var binaryFormatter = new BinaryFormatter();
-        var path = Application.persistentDataPath + "/" + characterData.Id + ".sav";
+        var path = Application.persistentDataPath + "/" + savingData.Id + ".sav";
         var file = File.Open(path, FileMode.OpenOrCreate);
         binaryFormatter.Serialize(file, savingData);
+        file.Close();
         Debug.Log("Character Saved: " + path);
     }
 
@@ -224,12 +225,13 @@ public static class CharacterDataExtension
             var binaryFormatter = new BinaryFormatter();
             var file = File.Open(path, FileMode.Open);
             CharacterData loadedData = (CharacterData)binaryFormatter.Deserialize(file);
+            file.Close();
             loadedData.CloneTo(characterData);
         }
         return characterData;
     }
 
-    public static List<CharacterData> LoadAllCharacterData()
+    public static List<CharacterData> LoadAllPersistentCharacterData()
     {
         var result = new List<CharacterData>();
         var files = Directory.GetFiles(Application.persistentDataPath, "*.sav");
@@ -239,5 +241,25 @@ public static class CharacterDataExtension
             result.Add(characterData.LoadPersistentCharacterData(file));
         }
         return result;
+    }
+
+    public static void DeletePersistentCharacterData(string id)
+    {
+        if (string.IsNullOrEmpty(id))
+        {
+            Debug.LogWarning("Cannot delete character: character id is empty");
+            return;
+        }
+        File.Delete(Application.persistentDataPath + "/" + id + ".sav");
+    }
+
+    public static void DeletePersistentCharacterData<T>(this T characterData) where T:ICharacterData
+    {
+        if (characterData == null)
+        {
+            Debug.LogWarning("Cannot delete character: character data is empty");
+            return;
+        }
+        DeletePersistentCharacterData(characterData.Id);
     }
 }
