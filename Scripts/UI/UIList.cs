@@ -20,6 +20,8 @@ public class UIList : MonoBehaviour
             {
                 ui = Instantiate(uiPrefab);
                 ui.transform.SetParent(uiContainer);
+                ui.transform.localScale = Vector3.one;
+                uis.Add(ui);
             }
             ui.SetActive(true);
             if (onGenerateEntry != null)
@@ -28,7 +30,7 @@ public class UIList : MonoBehaviour
         for (; i < uis.Count; ++i)
         {
             var ui = uis[i];
-            ui.gameObject.SetActive(false);
+            ui.SetActive(false);
         }
     }
 }
