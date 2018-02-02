@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(UIList))]
+[RequireComponent(typeof(UIList)), RequireComponent(typeof(UICharacterSelectionManager))]
 public class UICharacterCreate : UIBase
 {
     public Transform characterModelContainer;
@@ -24,50 +24,56 @@ public class UICharacterCreate : UIBase
         }
     }
 
-    protected UICharacter selectedUI;
+    private UICharacterSelectionManager selectionManager;
+    public UICharacterSelectionManager SelectionManager
+    {
+        get
+        {
+            if (selectionManager == null)
+                selectionManager = GetComponent<UICharacterSelectionManager>();
+            return selectionManager;
+        }
+    }
 
     public override void Show()
     {
         base.Show();
+        SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
+        SelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
         LoadCharacters();
     }
 
     protected void LoadCharacters()
     {
-        selectedUI = null;
+        SelectionManager.Clear();
         // Show list of characters that can be create
         var creatableClasses = GameInstance.CharacterClasses.Values.Where(a => a.canCreateByPlayer).ToList();
-        UICharacter firstUI = null;
         TempList.Generate(creatableClasses, (creatableClass, ui) =>
         {
             var characterData = new CharacterData();
             characterData.SetNewCharacterData("", creatableClass.Id);
             var uiCharacter = ui.GetComponent<UICharacter>();
-            uiCharacter.characterData = characterData;
-            uiCharacter.eventOnSelect.RemoveAllListeners();
-            uiCharacter.eventOnSelect.AddListener(OnSelectCharacter);
-            if (firstUI == null)
-                firstUI = uiCharacter;
+            uiCharacter.data = characterData;
+            SelectionManager.Add(uiCharacter);
             // TODO: Instantiate character model to show in screen
         });
         characterModelContainer.SetChildrenActive(false);
-        // Show first character
-        OnSelectCharacter(firstUI);
     }
 
     public override void Hide()
     {
         base.Hide();
         characterModelContainer.RemoveChildren();
+        inputCharacterName.text = "";
     }
 
     protected void OnSelectCharacter(UICharacter ui)
     {
         if (ui == null)
             return;
-        selectedUI = ui;
+
         characterModelContainer.SetChildrenActive(false);
-        ShowCharacter(ui.characterData.Id);
+        ShowCharacter(ui.data.Id);
     }
 
     protected void ShowCharacter(string id)
@@ -79,13 +85,14 @@ public class UICharacterCreate : UIBase
 
     public virtual void OnClickCreate()
     {
+        var selectedUI = SelectionManager.SelectedUI;
         if (selectedUI == null)
         {
             // TODO: Error dialog
             Debug.LogWarning("Cannot create character, did not selected character class");
             return;
         }
-        var classId = selectedUI.characterData.ClassId;
+        var classId = selectedUI.data.ClassId;
         // TODO: May validate name
         var characterName = inputCharacterName.text;
         if (string.IsNullOrEmpty(characterName.Trim()))

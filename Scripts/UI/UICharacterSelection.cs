@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(UIList))]
+[RequireComponent(typeof(UIList)), RequireComponent(typeof(UICharacterSelectionManager))]
 public class UICharacterSelection : UIBase
 {
     public Transform characterModelContainer;
@@ -21,7 +21,16 @@ public class UICharacterSelection : UIBase
         }
     }
 
-    protected UICharacter selectedUI;
+    private UICharacterSelectionManager selectionManager;
+    public UICharacterSelectionManager SelectionManager
+    {
+        get
+        {
+            if (selectionManager == null)
+                selectionManager = GetComponent<UICharacterSelectionManager>();
+            return selectionManager;
+        }
+    }
 
     public override void Show()
     {
@@ -30,12 +39,14 @@ public class UICharacterSelection : UIBase
         buttonStart.onClick.AddListener(OnClickStart);
         buttonDelete.onClick.RemoveListener(OnClickDelete);
         buttonDelete.onClick.AddListener(OnClickDelete);
+        SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
+        SelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
         LoadCharacters();
     }
 
     protected void LoadCharacters()
     {
-        selectedUI = null;
+        SelectionManager.Clear();
         // Unenabled buttons
         buttonStart.gameObject.SetActive(false);
         buttonDelete.gameObject.SetActive(false);
@@ -43,20 +54,14 @@ public class UICharacterSelection : UIBase
         characterModelContainer.RemoveChildren();
         // Show list of created characters
         var selectableCharacters = CharacterDataExtension.LoadAllPersistentCharacterData();
-        UICharacter firstUI = null;
         TempList.Generate(selectableCharacters, (character, ui) =>
         {
             var uiCharacter = ui.GetComponent<UICharacter>();
-            uiCharacter.characterData = character;
-            uiCharacter.eventOnSelect.RemoveAllListeners();
-            uiCharacter.eventOnSelect.AddListener(OnSelectCharacter);
-            if (firstUI == null)
-                firstUI = uiCharacter;
+            uiCharacter.data = character;
+            SelectionManager.Add(uiCharacter);
             // TODO: Instantiate character model to show in screen
         });
         characterModelContainer.SetChildrenActive(false);
-        // Show first character
-        OnSelectCharacter(firstUI);
     }
 
     public override void Hide()
@@ -69,11 +74,11 @@ public class UICharacterSelection : UIBase
     {
         if (ui == null)
             return;
+
         buttonStart.gameObject.SetActive(true);
         buttonDelete.gameObject.SetActive(true);
-        selectedUI = ui;
         characterModelContainer.SetChildrenActive(false);
-        ShowCharacter(ui.characterData.Id);
+        ShowCharacter(ui.data.Id);
     }
 
     protected void ShowCharacter(string id)
@@ -85,16 +90,16 @@ public class UICharacterSelection : UIBase
 
     public virtual void OnClickStart()
     {
-        if (selectedUI == null)
+        if (SelectionManager.SelectedUI == null)
             return;
     }
 
     public virtual void OnClickDelete()
     {
-        if (selectedUI == null)
+        if (SelectionManager.SelectedUI == null)
             return;
 
-        selectedUI.characterData.DeletePersistentCharacterData();
+        SelectionManager.SelectedUI.data.DeletePersistentCharacterData();
         // Reload characters
         LoadCharacters();
     }
