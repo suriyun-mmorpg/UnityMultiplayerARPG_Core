@@ -7,7 +7,7 @@ public class GameInstance : MonoBehaviour
 {
     public static GameInstance Singleton { get; protected set; }
     public CharacterEntity characterEntityPrefab;
-    public CharacterClass[] characterClasses;
+    public CharacterPrototype[] characterPrototypes;
     public Item[] items;
     public Skill[] skills;
     public int[] expTree;
@@ -16,6 +16,7 @@ public class GameInstance : MonoBehaviour
     public int startGold = 0;
     public static readonly Dictionary<string, CharacterAttribute> CharacterAttributes = new Dictionary<string, CharacterAttribute>();
     public static readonly Dictionary<string, CharacterClass> CharacterClasses = new Dictionary<string, CharacterClass>();
+    public static readonly Dictionary<string, CharacterPrototype> CharacterPrototypes = new Dictionary<string, CharacterPrototype>();
     public static readonly Dictionary<string, Damage> Damages = new Dictionary<string, Damage>();
     public static readonly Dictionary<string, Item> Items = new Dictionary<string, Item>();
     public static readonly Dictionary<string, Skill> Skills = new Dictionary<string, Skill>();
@@ -31,7 +32,7 @@ public class GameInstance : MonoBehaviour
         Singleton = this;
         
         ClientScene.RegisterPrefab(characterEntityPrefab.gameObject);
-        AddCharacterClasses(characterClasses);
+        AddCharacterPrototypes(characterPrototypes);
         AddItems(items);
         AddSkills(skills);
     }
@@ -61,6 +62,17 @@ public class GameInstance : MonoBehaviour
                 attributes.Add(baseAttribute.attribute);
             }
             AddCharacterAttributes(attributes.ToArray());
+        }
+    }
+
+    public static void AddCharacterPrototypes(CharacterPrototype[] characterPrototypes)
+    {
+        foreach (var characterPrototype in characterPrototypes)
+        {
+            if (characterPrototype == null || CharacterPrototypes.ContainsKey(characterPrototype.Id))
+                continue;
+            CharacterPrototypes[characterPrototype.Id] = characterPrototype;
+            AddCharacterClasses(new CharacterClass[] { characterPrototype.characterClass });
         }
     }
 

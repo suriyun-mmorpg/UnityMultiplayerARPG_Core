@@ -47,11 +47,12 @@ public class UICharacterCreate : UIBase
     {
         SelectionManager.Clear();
         // Show list of characters that can be create
-        var creatableClasses = GameInstance.CharacterClasses.Values.Where(a => a.canCreateByPlayer).ToList();
-        TempList.Generate(creatableClasses, (creatableClass, ui) =>
+        var selectableCharacters = GameInstance.CharacterPrototypes.Values.Where(a => a.canCreateByPlayer).ToList();
+        TempList.Generate(selectableCharacters, (characterPrototype, ui) =>
         {
             var characterData = new CharacterData();
-            characterData.SetNewCharacterData("", creatableClass.Id);
+            characterData.SetNewCharacterData(characterPrototype.title, characterPrototype.characterClass.Id);
+
             var uiCharacter = ui.GetComponent<UICharacter>();
             uiCharacter.data = characterData;
             SelectionManager.Add(uiCharacter);
