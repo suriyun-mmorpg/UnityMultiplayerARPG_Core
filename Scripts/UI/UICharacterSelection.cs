@@ -32,6 +32,8 @@ public class UICharacterSelection : UIBase
         }
     }
 
+    protected readonly Dictionary<string, CharacterModel> CharacterModels = new Dictionary<string, CharacterModel>();
+
     public override void Show()
     {
         base.Show();
@@ -52,16 +54,20 @@ public class UICharacterSelection : UIBase
         buttonDelete.gameObject.SetActive(false);
         // Remove all models
         characterModelContainer.RemoveChildren();
+        CharacterModels.Clear();
         // Show list of created characters
         var selectableCharacters = CharacterDataExtension.LoadAllPersistentCharacterData();
+        selectableCharacters.Sort(new CharacterDataLastUpdateComparer().Desc());
         TempList.Generate(selectableCharacters, (character, ui) =>
         {
             var uiCharacter = ui.GetComponent<UICharacter>();
             uiCharacter.data = character;
+            // Select trigger when add first entry so deactive all models is okay beacause first model will active
+            var characterModel = character.InstantiateModel(characterModelContainer);
+            CharacterModels[character.Id] = characterModel;
+            characterModel.gameObject.SetActive(false);
             SelectionManager.Add(uiCharacter);
-            // TODO: Instantiate character model to show in screen
         });
-        characterModelContainer.SetChildrenActive(false);
     }
 
     public override void Hide()
@@ -83,9 +89,9 @@ public class UICharacterSelection : UIBase
 
     protected void ShowCharacter(string id)
     {
-        if (string.IsNullOrEmpty(id))
+        if (string.IsNullOrEmpty(id) || !CharacterModels.ContainsKey(id))
             return;
-        // TODO: Show select character model
+        CharacterModels[id].gameObject.SetActive(true);
     }
 
     public virtual void OnClickStart()

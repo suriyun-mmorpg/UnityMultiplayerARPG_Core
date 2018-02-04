@@ -35,6 +35,8 @@ public class UICharacterCreate : UIBase
         }
     }
 
+    protected readonly Dictionary<string, CharacterModel> CharacterModels = new Dictionary<string, CharacterModel>();
+
     public override void Show()
     {
         base.Show();
@@ -50,15 +52,17 @@ public class UICharacterCreate : UIBase
         var selectableCharacters = GameInstance.CharacterPrototypes.Values.Where(a => a.canCreateByPlayer).ToList();
         TempList.Generate(selectableCharacters, (characterPrototype, ui) =>
         {
-            var characterData = new CharacterData();
-            characterData.SetNewCharacterData(characterPrototype.title, characterPrototype.characterClass.Id);
-
+            var character = new CharacterData();
+            character.Id = characterPrototype.Id;
+            character.SetNewCharacterData(characterPrototype.title, characterPrototype.Id);
             var uiCharacter = ui.GetComponent<UICharacter>();
-            uiCharacter.data = characterData;
+            uiCharacter.data = character;
+            // Select trigger when add first entry so deactive all models is okay beacause first model will active
+            var characterModel = character.InstantiateModel(characterModelContainer);
+            CharacterModels[character.Id] = characterModel;
+            characterModel.gameObject.SetActive(false);
             SelectionManager.Add(uiCharacter);
-            // TODO: Instantiate character model to show in screen
         });
-        characterModelContainer.SetChildrenActive(false);
     }
 
     public override void Hide()
@@ -79,9 +83,9 @@ public class UICharacterCreate : UIBase
 
     protected void ShowCharacter(string id)
     {
-        if (string.IsNullOrEmpty(id))
+        if (string.IsNullOrEmpty(id) || !CharacterModels.ContainsKey(id))
             return;
-        // TODO: Show select character model
+        CharacterModels[id].gameObject.SetActive(true);
     }
 
     public virtual void OnClickCreate()
@@ -93,7 +97,7 @@ public class UICharacterCreate : UIBase
             Debug.LogWarning("Cannot create character, did not selected character class");
             return;
         }
-        var classId = selectedUI.data.ClassId;
+        var prototypeId = selectedUI.data.PrototypeId;
         // TODO: May validate name
         var characterName = inputCharacterName.text;
         if (string.IsNullOrEmpty(characterName.Trim()))
@@ -105,7 +109,7 @@ public class UICharacterCreate : UIBase
 
         var characterId = System.Guid.NewGuid().ToString();
         var characterData = new CharacterData();
-        characterData.SetNewCharacterData(characterName, classId);
+        characterData.SetNewCharacterData(characterName, prototypeId);
         characterData.Id = characterId;
         characterData.SavePersistentCharacterData();
 
