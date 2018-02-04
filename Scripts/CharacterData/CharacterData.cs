@@ -9,7 +9,7 @@ public class CharacterData : ICharacterData
 {
     public string id;
     public string characterName;
-    public string classId;
+    public string prototypeId;
     public int level;
     public int exp;
     public int currentHp;
@@ -17,6 +17,7 @@ public class CharacterData : ICharacterData
     public int statPoint;
     public int skillPoint;
     public int gold;
+    public int lastUpdate;
     public List<CharacterAttributeLevel> attributeLevels = new List<CharacterAttributeLevel>();
     public List<CharacterSkillLevel> skillLevels = new List<CharacterSkillLevel>();
     public List<CharacterItem> equipItems = new List<CharacterItem>();
@@ -24,7 +25,7 @@ public class CharacterData : ICharacterData
 
     public string Id { get { return id; } set { id = value; } }
     public string CharacterName { get { return characterName; } set { characterName = value; } }
-    public string ClassId { get { return classId; } set { classId = value; } }
+    public string PrototypeId { get { return prototypeId; } set { prototypeId = value; } }
     public int Level { get { return level; } set { level = value; } }
     public int Exp { get { return exp; } set { exp = value; } }
     public int CurrentHp { get { return currentHp; } set { currentHp = value; } }
@@ -32,6 +33,7 @@ public class CharacterData : ICharacterData
     public int StatPoint { get { return statPoint; } set { statPoint = value; } }
     public int SkillPoint { get { return skillPoint; } set { skillPoint = value; } }
     public int Gold { get { return gold; } set { gold = value; } }
+    public int LastUpdate { get { return lastUpdate; } set { lastUpdate = value; } }
     public IList<CharacterAttributeLevel> AttributeLevels
     {
         get { return attributeLevels; }
@@ -70,13 +72,34 @@ public class CharacterData : ICharacterData
     }
 }
 
+public class CharacterDataLastUpdateComparer : IComparer<CharacterData>
+{
+    private int sortMultiplier = 1;
+    public CharacterDataLastUpdateComparer Asc()
+    {
+        sortMultiplier = 1;
+        return this;
+    }
+
+    public CharacterDataLastUpdateComparer Desc()
+    {
+        sortMultiplier = -1;
+        return this;
+    }
+
+    public int Compare(CharacterData x, CharacterData y)
+    {
+        return x.LastUpdate.CompareTo(y.LastUpdate) * sortMultiplier;
+    }
+}
+
 public static class CharacterDataExtension
 {
     public static T CloneTo<T>(this ICharacterData from, T to) where T : ICharacterData
     {
         to.Id = from.Id;
         to.CharacterName = from.CharacterName;
-        to.ClassId = from.ClassId;
+        to.PrototypeId = from.PrototypeId;
         to.Level = from.Level;
         to.Exp = from.Exp;
         to.CurrentHp = from.CurrentHp;
@@ -84,6 +107,7 @@ public static class CharacterDataExtension
         to.StatPoint = from.StatPoint;
         to.SkillPoint = from.SkillPoint;
         to.Gold = from.Gold;
+        to.LastUpdate = from.LastUpdate;
         to.AttributeLevels = from.AttributeLevels;
         to.SkillLevels = from.SkillLevels;
         to.EquipItems = from.EquipItems;
@@ -91,10 +115,10 @@ public static class CharacterDataExtension
         return to;
     }
 
-    public static T SetNewCharacterData<T>(this T character, string characterName, string classId) where T : ICharacterData
+    public static T SetNewCharacterData<T>(this T character, string characterName, string prototypeId) where T : ICharacterData
     {
         character.CharacterName = characterName;
-        character.ClassId = classId;
+        character.PrototypeId = prototypeId;
         character.Level = 1;
         foreach (var baseAttribute in character.GetClass().baseAttributes)
         {
@@ -109,9 +133,23 @@ public static class CharacterDataExtension
         return character;
     }
 
+    public static CharacterPrototype GetPrototype(this ICharacterData data)
+    {
+        return GameInstance.CharacterPrototypes[data.PrototypeId];
+    }
+
     public static CharacterClass GetClass(this ICharacterData data)
     {
-        return GameInstance.CharacterClasses[data.ClassId];
+        return data.GetPrototype().characterClass;
+    }
+
+    public static CharacterModel InstantiateModel(this ICharacterData data, Transform parent)
+    {
+        var prototype = data.GetPrototype();
+        var result = Object.Instantiate(prototype.characterModel, parent);
+        result.gameObject.SetActive(true);
+        result.transform.localPosition = Vector3.zero;
+        return result;
     }
 
     public static int GetNextLevelExp(this ICharacterData data)
@@ -204,6 +242,7 @@ public static class CharacterDataExtension
     {
         var savingData = new CharacterData();
         characterData.CloneTo(savingData);
+        savingData.LastUpdate = (int)(System.DateTime.Now.Ticks / System.TimeSpan.TicksPerMillisecond);
         var binaryFormatter = new BinaryFormatter();
         var path = Application.persistentDataPath + "/" + savingData.Id + ".sav";
         var file = File.Open(path, FileMode.OpenOrCreate);

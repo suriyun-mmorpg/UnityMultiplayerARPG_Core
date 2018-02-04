@@ -8,12 +8,13 @@ using UnityEngine.Networking;
 public class CharacterEntity : NetworkBehaviour, ICharacterData
 {
     // Use id as primary key
+    [Header("SyncVars")]
     [SyncVar]
     public string id;
     [SyncVar]
     public string characterName;
-    [SyncVar(hook = "OnCharacterClassIdChange")]
-    public string classId;
+    [SyncVar(hook = "OnPrototypeIdChange")]
+    public string prototypeId;
     [SyncVar]
     public int level;
     [SyncVar]
@@ -28,15 +29,32 @@ public class CharacterEntity : NetworkBehaviour, ICharacterData
     public int skillPoint;
     [SyncVar]
     public int gold;
+    protected int lastUpdate;
+
     [Header("Sync Lists")]
     public SyncListCharacterAttributeLevel attributeLevels = new SyncListCharacterAttributeLevel();
     public SyncListCharacterSkillLevel skillLevels = new SyncListCharacterSkillLevel();
     public SyncListCharacterItem equipItems = new SyncListCharacterItem();
     public SyncListCharacterItem nonEquipItems = new SyncListCharacterItem();
 
+    protected CharacterModel model;
+
     public string Id { get { return id; } set { id = value; } }
     public string CharacterName { get { return characterName; } set { characterName = value; } }
-    public string ClassId { get { return classId; } set { classId = value; } }
+    public string PrototypeId
+    {
+        get { return prototypeId; }
+        set
+        {
+            prototypeId = value;
+            // Setup model
+            if (model != null)
+                Destroy(model.gameObject);
+            model = this.InstantiateModel(transform);
+            // Wake up rigidbody
+            TempRigidbody.WakeUp();
+        }
+    }
     public int Level { get { return level; } set { level = value; } }
     public int Exp { get { return exp; } set { exp = value; } }
     public int CurrentHp { get { return currentHp; } set { currentHp = value; } }
@@ -44,6 +62,7 @@ public class CharacterEntity : NetworkBehaviour, ICharacterData
     public int StatPoint { get { return statPoint; } set { statPoint = value; } }
     public int SkillPoint { get { return skillPoint; } set { skillPoint = value; } }
     public int Gold { get { return gold; } set { gold = value; } }
+    public int LastUpdate { get { return lastUpdate; } set { lastUpdate = value; } }
     public IList<CharacterAttributeLevel> AttributeLevels
     {
         get { return attributeLevels; }
@@ -85,6 +104,17 @@ public class CharacterEntity : NetworkBehaviour, ICharacterData
         }
     }
 
+    private Transform tempTransform;
+    public Transform TempTransform
+    {
+        get
+        {
+            if (tempTransform == null)
+                tempTransform = GetComponent<Transform>();
+            return tempTransform;
+        }
+    }
+
     private Rigidbody tempRigidbody;
     public Rigidbody TempRigidbody
     {
@@ -123,13 +153,13 @@ public class CharacterEntity : NetworkBehaviour, ICharacterData
     {
         base.OnStartClient();
         if (!isServer)
-            OnCharacterClassIdChange(classId);
+            OnPrototypeIdChange(prototypeId);
     }
 
     public override void OnStartServer()
     {
         base.OnStartServer();
-        OnCharacterClassIdChange(classId);
+        OnPrototypeIdChange(prototypeId);
     }
 
     public override void OnStartLocalPlayer()
@@ -143,11 +173,9 @@ public class CharacterEntity : NetworkBehaviour, ICharacterData
     }
 
     #region SyncVar Hooks
-    protected virtual void OnCharacterClassIdChange(string classId)
-    { 
-        // TODO: I will use this hook to change character model
-        // Setup model then wake up rigidbody
-        TempRigidbody.WakeUp();
+    protected virtual void OnPrototypeIdChange(string prototypeId)
+    {
+        PrototypeId = prototypeId;
     }
     #endregion
 }
