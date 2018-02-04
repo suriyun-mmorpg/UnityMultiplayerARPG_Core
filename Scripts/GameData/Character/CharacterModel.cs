@@ -28,14 +28,14 @@ public class CharacterModel : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.magenta;
-        var topCorner = (Vector3.up * height * 0.5f) - (Vector3.up * radius);
-        var bottomCorner = -(Vector3.up * height * 0.5f) + (Vector3.up * radius);
-        Gizmos.DrawWireSphere(center + topCorner, radius);
-        Gizmos.DrawWireSphere(center + bottomCorner, radius);
-        Gizmos.DrawLine(center + topCorner + Vector3.left * radius, center + bottomCorner + Vector3.left * radius);
-        Gizmos.DrawLine(center + topCorner + Vector3.right * radius, center + bottomCorner + Vector3.right * radius);
-        Gizmos.DrawLine(center + topCorner + Vector3.forward * radius, center + bottomCorner + Vector3.forward * radius);
-        Gizmos.DrawLine(center + topCorner + Vector3.back * radius, center + bottomCorner + Vector3.back * radius);
+        var topCorner = center + (Vector3.up * height * 0.5f) - (Vector3.up * radius);
+        var bottomCorner = center - (Vector3.up * height * 0.5f) + (Vector3.up * radius);
+        Gizmos.DrawWireSphere(topCorner, radius);
+        Gizmos.DrawWireSphere(bottomCorner, radius);
+        Gizmos.DrawLine(topCorner + Vector3.left * radius, bottomCorner + Vector3.left * radius);
+        Gizmos.DrawLine(topCorner + Vector3.right * radius, bottomCorner + Vector3.right * radius);
+        Gizmos.DrawLine(topCorner + Vector3.forward * radius, bottomCorner + Vector3.forward * radius);
+        Gizmos.DrawLine(topCorner + Vector3.back * radius, bottomCorner + Vector3.back * radius);
     }
 }
 
