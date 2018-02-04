@@ -6,9 +6,9 @@ public static class GenericExtension
 {
     public static void RemoveChildren(this Transform transform)
     {
-        while (transform.childCount > 0)
+        for (var i = transform.childCount - 1; i >= 0; --i)
         {
-            var lastChild = transform.GetChild(transform.childCount - 1);
+            var lastChild = transform.GetChild(i);
             Object.Destroy(lastChild.gameObject);
         }
     }
