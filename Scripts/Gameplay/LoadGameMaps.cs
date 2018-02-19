@@ -33,7 +33,7 @@ public class LoadGameMaps : MonoBehaviour
 
     private void Awake()
     {
-        TempNavMeshSurface.collectObjects = CollectObjects.All;
+        TempNavMeshSurface.collectObjects = CollectObjects.Children;
         TempNavMeshSurface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
     }
 
@@ -54,7 +54,7 @@ public class LoadGameMaps : MonoBehaviour
                 continue;
 
             var mapBoundsExtents = loadingGameMap.mapBounds.extents;
-            var physicPrefab = Instantiate(gameMap.physicPrefab);
+            var physicPrefab = Instantiate(gameMap.physicPrefab, transform);
             var mapEntity = physicPrefab.GetComponent<GameMapEntity>();
             var defaultMapEntityPosition = mapEntity.transform.position;
             if (loadedMapCount == 0)
