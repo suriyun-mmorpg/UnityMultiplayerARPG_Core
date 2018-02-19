@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.AI;
 
-public class LoadGameMaps : MonoBehaviour {
+[RequireComponent(typeof(NavMeshSurface))]
+public class LoadGameMaps : MonoBehaviour
+{
     // I think only x axis is enough for simulate map on server, if not I will make map simulate on z axis later
     public const float MIN_MAP_X = -90000;
     public GameMap[] gameMaps;
@@ -12,11 +14,27 @@ public class LoadGameMaps : MonoBehaviour {
     private GameMap loadingGameMap = null;
     private float loadOffsetX = 0f;
 
+    private NavMeshSurface tempNavMeshSurface;
+    public NavMeshSurface TempNavMeshSurface
+    {
+        get
+        {
+            if (tempNavMeshSurface == null)
+                tempNavMeshSurface = GetComponent<NavMeshSurface>();
+            return tempNavMeshSurface;
+        }
+    }
     public readonly Dictionary<string, GameMapEntity> LoadedMap = new Dictionary<string, GameMapEntity>();
 
     public float LoadedPercentage
     {
         get { return (float)loadedMapCount / (float)gameMaps.Length * 100f; }
+    }
+
+    private void Awake()
+    {
+        TempNavMeshSurface.collectObjects = CollectObjects.All;
+        TempNavMeshSurface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
     }
 
     private void Start()
@@ -57,5 +75,6 @@ public class LoadGameMaps : MonoBehaviour {
             loadingGameMap = null;
             loadedMapCount++;
         }
+        TempNavMeshSurface.BuildNavMesh();
     }
 }
