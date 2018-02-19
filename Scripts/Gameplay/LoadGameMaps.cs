@@ -58,8 +58,10 @@ public class LoadGameMaps : MonoBehaviour
             var mapEntity = physicPrefab.GetComponent<GameMapEntity>();
             var defaultMapEntityPosition = mapEntity.transform.position;
             if (loadedMapCount == 0)
+            {
                 mapEntity.transform.position =
                     (Vector3.right * (MIN_MAP_X + mapBoundsExtents.x));
+            }
             else
             {
                 mapEntity.transform.position =
