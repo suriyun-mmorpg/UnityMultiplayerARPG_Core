@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
@@ -17,6 +18,8 @@ public class CharacterData : ICharacterData
     public int statPoint;
     public int skillPoint;
     public int gold;
+    public Vector3 currentPosition;
+    public Vector3 respawnPosition;
     public int lastUpdate;
     public List<CharacterAttributeLevel> attributeLevels = new List<CharacterAttributeLevel>();
     public List<CharacterSkillLevel> skillLevels = new List<CharacterSkillLevel>();
@@ -244,6 +247,9 @@ public static class CharacterDataExtension
         characterData.CloneTo(savingData);
         savingData.LastUpdate = (int)(System.DateTime.Now.Ticks / System.TimeSpan.TicksPerMillisecond);
         var binaryFormatter = new BinaryFormatter();
+        var surrogateSelector = new SurrogateSelector();
+        surrogateSelector.AddAllUnitySurrogate();
+        binaryFormatter.SurrogateSelector = surrogateSelector;
         var path = Application.persistentDataPath + "/" + savingData.Id + ".sav";
         var file = File.Open(path, FileMode.OpenOrCreate);
         binaryFormatter.Serialize(file, savingData);
@@ -262,6 +268,9 @@ public static class CharacterDataExtension
         if (File.Exists(path))
         {
             var binaryFormatter = new BinaryFormatter();
+            var surrogateSelector = new SurrogateSelector();
+            surrogateSelector.AddAllUnitySurrogate();
+            binaryFormatter.SurrogateSelector = surrogateSelector;
             var file = File.Open(path, FileMode.Open);
             CharacterData loadedData = (CharacterData)binaryFormatter.Deserialize(file);
             file.Close();
