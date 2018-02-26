@@ -10,6 +10,7 @@ public class LoadGameMaps : MonoBehaviour
     public const float MIN_MAP_X = -90000;
     public GameMap[] gameMaps;
     public float offsetBetweenBounds = 10f;
+    public bool loadMapsOnStart;
     private int loadedMapCount = 0;
     private GameMap loadingGameMap = null;
     private float loadOffsetX = 0f;
@@ -39,10 +40,16 @@ public class LoadGameMaps : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(LoadGameMapsRoutine());
+        if (loadMapsOnStart)
+            LoadMaps();
     }
 
-    private IEnumerator LoadGameMapsRoutine()
+    public void LoadMaps()
+    {
+        StartCoroutine(LoadMapsRoutine());
+    }
+
+    private IEnumerator LoadMapsRoutine()
     {
         yield return 0;
         foreach (var gameMap in gameMaps)
