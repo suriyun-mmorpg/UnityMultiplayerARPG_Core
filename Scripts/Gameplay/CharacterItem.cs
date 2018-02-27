@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.Networking;
+using LiteNetLib.Utils;
+using LiteNetLibHighLevel;
 
 [System.Serializable]
 public struct CharacterItem
@@ -23,4 +24,31 @@ public struct CharacterItem
     }
 }
 
-public class SyncListCharacterItem : SyncListStruct<CharacterItem> { }
+public class NetFieldCharacterItem : LiteNetLibNetField<CharacterItem>
+{
+    public override void Deserialize(NetDataReader reader)
+    {
+        var newValue = new CharacterItem();
+        newValue.id = reader.GetString();
+        newValue.itemId = reader.GetString();
+        newValue.level = reader.GetInt();
+        newValue.amount = reader.GetInt();
+        Value = newValue;
+    }
+
+    public override void Serialize(NetDataWriter writer)
+    {
+        writer.Put(Value.id);
+        writer.Put(Value.itemId);
+        writer.Put(Value.level);
+        writer.Put(Value.amount);
+    }
+
+    public override bool IsValueChanged(CharacterItem newValue)
+    {
+        return !newValue.Equals(Value);
+    }
+}
+
+[System.Serializable]
+public class SyncListCharacterItem : LiteNetLibSyncList<NetFieldCharacterItem, CharacterItem> { }
