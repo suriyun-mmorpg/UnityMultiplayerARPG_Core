@@ -15,6 +15,7 @@ public class GameInstance : MonoBehaviour
     public int increaseStatPointEachLevel = 5;
     public int increaseSkillPointEachLevel = 1;
     public int startGold = 0;
+    public static readonly Dictionary<string, GameMap> GameMaps = new Dictionary<string, GameMap>();
     public static readonly Dictionary<string, CharacterAttribute> CharacterAttributes = new Dictionary<string, CharacterAttribute>();
     public static readonly Dictionary<string, CharacterClass> CharacterClasses = new Dictionary<string, CharacterClass>();
     public static readonly Dictionary<string, CharacterPrototype> CharacterPrototypes = new Dictionary<string, CharacterPrototype>();
@@ -33,9 +34,20 @@ public class GameInstance : MonoBehaviour
         Singleton = this;
         
         ClientScene.RegisterPrefab(characterEntityPrefab.gameObject);
+        AddGameMaps(gameMaps);
         AddCharacterPrototypes(characterPrototypes);
         AddItems(items);
         AddSkills(skills);
+    }
+
+    public static void AddGameMaps(List<GameMap> gameMaps)
+    {
+        foreach (var gameMap in gameMaps)
+        {
+            if (gameMap == null || GameMaps.ContainsKey(gameMap.Id))
+                continue;
+            GameMaps[gameMap.Id] = gameMap;
+        }
     }
 
     public static void AddCharacterAttributes(List<CharacterAttribute> characterAttributes)
