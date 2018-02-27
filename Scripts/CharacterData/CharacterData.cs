@@ -161,7 +161,7 @@ public static class CharacterDataExtension
     {
         var level = data.Level;
         var expTree = GameInstance.Singleton.expTree;
-        if (level > expTree.Length)
+        if (level > expTree.Count)
             return 0;
         return expTree[level - 1];
     }

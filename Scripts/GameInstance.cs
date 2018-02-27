@@ -7,10 +7,11 @@ public class GameInstance : MonoBehaviour
 {
     public static GameInstance Singleton { get; protected set; }
     public CharacterEntity characterEntityPrefab;
-    public CharacterPrototype[] characterPrototypes;
-    public Item[] items;
-    public Skill[] skills;
-    public int[] expTree;
+    public List<GameMap> gameMaps;
+    public List<CharacterPrototype> characterPrototypes;
+    public List<Item> items;
+    public List<Skill> skills;
+    public List<int> expTree;
     public int increaseStatPointEachLevel = 5;
     public int increaseSkillPointEachLevel = 1;
     public int startGold = 0;
@@ -37,7 +38,7 @@ public class GameInstance : MonoBehaviour
         AddSkills(skills);
     }
 
-    public static void AddCharacterAttributes(CharacterAttribute[] characterAttributes)
+    public static void AddCharacterAttributes(List<CharacterAttribute> characterAttributes)
     {
         foreach (var characterAttribute in characterAttributes)
         {
@@ -47,7 +48,7 @@ public class GameInstance : MonoBehaviour
         }
     }
 
-    public static void AddCharacterClasses(CharacterClass[] characterClasses)
+    public static void AddCharacterClasses(List<CharacterClass> characterClasses)
     {
         foreach (var characterClass in characterClasses)
         {
@@ -61,22 +62,22 @@ public class GameInstance : MonoBehaviour
                     continue;
                 attributes.Add(baseAttribute.attribute);
             }
-            AddCharacterAttributes(attributes.ToArray());
+            AddCharacterAttributes(attributes);
         }
     }
 
-    public static void AddCharacterPrototypes(CharacterPrototype[] characterPrototypes)
+    public static void AddCharacterPrototypes(List<CharacterPrototype> characterPrototypes)
     {
         foreach (var characterPrototype in characterPrototypes)
         {
             if (characterPrototype == null || CharacterPrototypes.ContainsKey(characterPrototype.Id))
                 continue;
             CharacterPrototypes[characterPrototype.Id] = characterPrototype;
-            AddCharacterClasses(new CharacterClass[] { characterPrototype.characterClass });
+            AddCharacterClasses(new List<CharacterClass>() { characterPrototype.characterClass });
         }
     }
 
-    public static void AddDamages(Damage[] damages)
+    public static void AddDamages(List<Damage> damages)
     {
         foreach (var damage in damages)
         {
@@ -86,7 +87,7 @@ public class GameInstance : MonoBehaviour
         }
     }
 
-    public static void AddItems(Item[] items)
+    public static void AddItems(List<Item> items)
     {
         foreach (var item in items)
         {
@@ -103,7 +104,7 @@ public class GameInstance : MonoBehaviour
                         continue;
                     attributes.Add(requireAttribute.attribute);
                 }
-                AddCharacterAttributes(attributes.ToArray());
+                AddCharacterAttributes(attributes);
             }
             if (item is WeaponItem)
             {
@@ -115,7 +116,7 @@ public class GameInstance : MonoBehaviour
                         continue;
                     attributes.Add(effectivenessAttribute.attribute);
                 }
-                AddCharacterAttributes(attributes.ToArray());
+                AddCharacterAttributes(attributes);
                 var damages = new List<Damage>();
                 foreach (var damage in weaponItem.damages)
                 {
@@ -123,12 +124,12 @@ public class GameInstance : MonoBehaviour
                         continue;
                     damages.Add(damage.damage);
                 }
-                AddDamages(damages.ToArray());
+                AddDamages(damages);
             }
         }
     }
 
-    public static void AddSkills(Skill[] skills)
+    public static void AddSkills(List<Skill> skills)
     {
         foreach (var skill in skills)
         {
@@ -142,7 +143,7 @@ public class GameInstance : MonoBehaviour
                     continue;
                 damages.Add(damage.damage);
             }
-            AddDamages(damages.ToArray());
+            AddDamages(damages);
         }
     }
 }
