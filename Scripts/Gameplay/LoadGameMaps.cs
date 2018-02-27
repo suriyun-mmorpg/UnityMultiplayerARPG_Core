@@ -8,12 +8,15 @@ public class LoadGameMaps : MonoBehaviour
 {
     // I think only x axis is enough for simulate map on server, if not I will make map simulate on z axis later
     public const float MIN_MAP_X = -90000;
-    public GameMap[] gameMaps;
+    public List<GameMap> gameMaps;
     public float offsetBetweenBounds = 10f;
     public bool loadMapsOnStart;
+    public bool IsDone { get; private set; }
     private int loadedMapCount = 0;
     private GameMap loadingGameMap = null;
     private float loadOffsetX = 0f;
+
+    public System.Action onLoadedMaps;
 
     private NavMeshSurface tempNavMeshSurface;
     public NavMeshSurface TempNavMeshSurface
@@ -27,9 +30,9 @@ public class LoadGameMaps : MonoBehaviour
     }
     public readonly Dictionary<string, GameMapEntity> LoadedMap = new Dictionary<string, GameMapEntity>();
 
-    public float LoadedPercentage
+    public float Progress
     {
-        get { return (float)loadedMapCount / (float)gameMaps.Length * 100f; }
+        get { return (float)loadedMapCount / (float)gameMaps.Count; }
     }
 
     private void Awake()
@@ -44,18 +47,19 @@ public class LoadGameMaps : MonoBehaviour
             LoadMaps();
     }
 
-    public void LoadMaps()
+    public Coroutine LoadMaps()
     {
-        StartCoroutine(LoadMapsRoutine());
+        return StartCoroutine(LoadMapsRoutine());
     }
 
     private IEnumerator LoadMapsRoutine()
     {
-        yield return 0;
+        IsDone = false;
+        yield return null;
         foreach (var gameMap in gameMaps)
         {
             loadingGameMap = gameMap;
-            yield return 0;
+            yield return null;
 
             if (gameMap.physicPrefab == null || LoadedMap.ContainsKey(gameMap.sceneName))
                 continue;
@@ -85,5 +89,8 @@ public class LoadGameMaps : MonoBehaviour
             loadedMapCount++;
         }
         TempNavMeshSurface.BuildNavMesh();
+        IsDone = true;
+        if (onLoadedMaps != null)
+            onLoadedMaps.Invoke();
     }
 }
