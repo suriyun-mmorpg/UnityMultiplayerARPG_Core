@@ -18,7 +18,9 @@ public class CharacterData : ICharacterData
     public int statPoint;
     public int skillPoint;
     public int gold;
+    public string currentMapName;
     public Vector3 currentPosition;
+    public string respawnMapName;
     public Vector3 respawnPosition;
     public int lastUpdate;
     public List<CharacterAttributeLevel> attributeLevels = new List<CharacterAttributeLevel>();
@@ -36,7 +38,9 @@ public class CharacterData : ICharacterData
     public int StatPoint { get { return statPoint; } set { statPoint = value; } }
     public int SkillPoint { get { return skillPoint; } set { skillPoint = value; } }
     public int Gold { get { return gold; } set { gold = value; } }
+    public string CurrentMapName { get { return currentMapName; } set { currentMapName = value; } }
     public Vector3 CurrentPosition { get { return currentPosition; } set { currentPosition = value; } }
+    public string RespawnMapName { get { return respawnMapName; } set { respawnMapName = value; } }
     public Vector3 RespawnPosition { get { return respawnPosition; } set { respawnPosition = value; } }
     public int LastUpdate { get { return lastUpdate; } set { lastUpdate = value; } }
     public IList<CharacterAttributeLevel> AttributeLevels
@@ -112,6 +116,10 @@ public static class CharacterDataExtension
         to.StatPoint = from.StatPoint;
         to.SkillPoint = from.SkillPoint;
         to.Gold = from.Gold;
+        to.CurrentMapName = from.CurrentMapName;
+        to.CurrentPosition = from.CurrentPosition;
+        to.RespawnMapName = from.RespawnMapName;
+        to.RespawnPosition = from.RespawnPosition;
         to.LastUpdate = from.LastUpdate;
         to.AttributeLevels = from.AttributeLevels;
         to.SkillLevels = from.SkillLevels;

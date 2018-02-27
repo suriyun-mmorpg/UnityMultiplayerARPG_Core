@@ -18,12 +18,14 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
     public SyncFieldString prototypeId = new SyncFieldString();
     public SyncFieldInt level = new SyncFieldInt();
     public SyncFieldInt exp = new SyncFieldInt();
-    public SyncFieldInt currentHp = new SyncFieldInt();
-    public SyncFieldInt currentMp = new SyncFieldInt();
+    public SyncFieldFloat currentHp = new SyncFieldFloat();
+    public SyncFieldFloat currentMp = new SyncFieldFloat();
     public SyncFieldInt statPoint = new SyncFieldInt();
     public SyncFieldInt skillPoint = new SyncFieldInt();
     public SyncFieldInt gold = new SyncFieldInt();
+    private string currentMapName;
     private Vector3 currentPosition;
+    private string respawnMapName;
     private Vector3 respawnPosition;
     private int lastUpdate;
 
@@ -51,14 +53,16 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
             TempRigidbody.WakeUp();
         }
     }
-    public int Level { get { return level; } set { level.Value = value; } }
-    public int Exp { get { return exp; } set { exp.Value = value; } }
-    public int CurrentHp { get { return currentHp; } set { currentHp.Value = value; } }
-    public int CurrentMp { get { return currentMp; } set { currentMp.Value = value; } }
-    public int StatPoint { get { return statPoint; } set { statPoint.Value = value; } }
-    public int SkillPoint { get { return skillPoint; } set { skillPoint.Value = value; } }
-    public int Gold { get { return gold; } set { gold.Value = value; } }
+    public int Level { get { return level.Value; } set { level.Value = value; } }
+    public int Exp { get { return exp.Value; } set { exp.Value = value; } }
+    public int CurrentHp { get { return (int)currentHp.Value; } set { currentHp.Value = value; } }
+    public int CurrentMp { get { return (int)currentMp.Value; } set { currentMp.Value = value; } }
+    public int StatPoint { get { return statPoint.Value; } set { statPoint.Value = value; } }
+    public int SkillPoint { get { return skillPoint.Value; } set { skillPoint.Value = value; } }
+    public int Gold { get { return gold.Value; } set { gold.Value = value; } }
+    public string CurrentMapName { get { return currentMapName; } set { currentMapName = value; } }
     public Vector3 CurrentPosition { get { return currentPosition; } set { currentPosition = value; } }
+    public string RespawnMapName { get { return respawnMapName; } set { respawnMapName = value; } }
     public Vector3 RespawnPosition { get { return respawnPosition; } set { respawnPosition = value; } }
     public int LastUpdate { get { return lastUpdate; } set { lastUpdate = value; } }
 
