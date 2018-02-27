@@ -2,34 +2,30 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
+using LiteNetLib;
+using LiteNetLibHighLevel;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 [RequireComponent(typeof(CharacterMovement))]
-public class CharacterEntity : NetworkBehaviour, ICharacterData
+public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
 {
     // Use id as primary key
-    [Header("SyncVars")]
-    [SyncVar]
-    public string id;
-    [SyncVar]
-    public string characterName;
-    [SyncVar(hook = "OnPrototypeIdChange")]
-    public string prototypeId;
-    [SyncVar]
-    public int level;
-    [SyncVar]
-    public int exp;
-    [SyncVar]
-    public int currentHp;
-    [SyncVar]
-    public int currentMp;
-    [SyncVar]
-    public int statPoint;
-    [SyncVar]
-    public int skillPoint;
-    [SyncVar]
-    public int gold;
-    protected int lastUpdate;
+    [Header("Sync Fields")]
+    public SyncFieldString id = new SyncFieldString();
+    public SyncFieldString characterName = new SyncFieldString();
+    public SyncFieldString prototypeId = new SyncFieldString();
+    public SyncFieldInt level = new SyncFieldInt();
+    public SyncFieldInt exp = new SyncFieldInt();
+    public SyncFieldInt currentHp = new SyncFieldInt();
+    public SyncFieldInt currentMp = new SyncFieldInt();
+    public SyncFieldInt statPoint = new SyncFieldInt();
+    public SyncFieldInt skillPoint = new SyncFieldInt();
+    public SyncFieldInt gold = new SyncFieldInt();
+    private Vector3 currentPosition;
+    private Vector3 respawnPosition;
+    private int lastUpdate;
 
     [Header("Sync Lists")]
     public SyncListCharacterAttributeLevel attributeLevels = new SyncListCharacterAttributeLevel();
@@ -39,14 +35,14 @@ public class CharacterEntity : NetworkBehaviour, ICharacterData
 
     protected CharacterModel model;
 
-    public string Id { get { return id; } set { id = value; } }
-    public string CharacterName { get { return characterName; } set { characterName = value; } }
+    public string Id { get { return id; } set { id.Value = value; } }
+    public string CharacterName { get { return characterName; } set { characterName.Value = value; } }
     public string PrototypeId
     {
         get { return prototypeId; }
         set
         {
-            prototypeId = value;
+            prototypeId.Value = value;
             // Setup model
             if (model != null)
                 Destroy(model.gameObject);
@@ -55,14 +51,17 @@ public class CharacterEntity : NetworkBehaviour, ICharacterData
             TempRigidbody.WakeUp();
         }
     }
-    public int Level { get { return level; } set { level = value; } }
-    public int Exp { get { return exp; } set { exp = value; } }
-    public int CurrentHp { get { return currentHp; } set { currentHp = value; } }
-    public int CurrentMp { get { return currentMp; } set { currentMp = value; } }
-    public int StatPoint { get { return statPoint; } set { statPoint = value; } }
-    public int SkillPoint { get { return skillPoint; } set { skillPoint = value; } }
-    public int Gold { get { return gold; } set { gold = value; } }
+    public int Level { get { return level; } set { level.Value = value; } }
+    public int Exp { get { return exp; } set { exp.Value = value; } }
+    public int CurrentHp { get { return currentHp; } set { currentHp.Value = value; } }
+    public int CurrentMp { get { return currentMp; } set { currentMp.Value = value; } }
+    public int StatPoint { get { return statPoint; } set { statPoint.Value = value; } }
+    public int SkillPoint { get { return skillPoint; } set { skillPoint.Value = value; } }
+    public int Gold { get { return gold; } set { gold.Value = value; } }
+    public Vector3 CurrentPosition { get { return currentPosition; } set { currentPosition = value; } }
+    public Vector3 RespawnPosition { get { return respawnPosition; } set { respawnPosition = value; } }
     public int LastUpdate { get { return lastUpdate; } set { lastUpdate = value; } }
+
     public IList<CharacterAttributeLevel> AttributeLevels
     {
         get { return attributeLevels; }
@@ -147,29 +146,52 @@ public class CharacterEntity : NetworkBehaviour, ICharacterData
 
         TempCharacterMovement.enabled = false;
         TempRigidbody.Sleep();
+
+        prototypeId.onChange += OnPrototypeIdChange;
     }
 
-    public override void OnStartClient()
+    protected virtual void OnDestroy()
     {
-        base.OnStartClient();
-        if (!isServer)
-            OnPrototypeIdChange(prototypeId);
+        prototypeId.onChange -= OnPrototypeIdChange;
     }
 
-    public override void OnStartServer()
+    public override void OnBehaviourValidate()
     {
-        base.OnStartServer();
-        OnPrototypeIdChange(prototypeId);
+#if UNITY_EDITOR
+        SetupNetElements();
+        EditorUtility.SetDirty(this);
+#endif
     }
 
-    public override void OnStartLocalPlayer()
+    public override void OnSetup()
     {
-        base.OnStartLocalPlayer();
-        // Local player must have movement input
-        if (TempCharacterMovementInput == null)
-            TempCharacterMovementInput = gameObject.AddComponent<CharacterMovementInput>();
-        TempCharacterMovementInput.enabled = true;
-        TempCharacterMovement.enabled = true;
+        SetupNetElements();
+        if (IsLocalClient)
+        {
+            // Local player must have movement input
+            if (TempCharacterMovementInput == null)
+                TempCharacterMovementInput = gameObject.AddComponent<CharacterMovementInput>();
+            TempCharacterMovementInput.enabled = true;
+            TempCharacterMovement.enabled = true;
+        }
+    }
+
+    private void SetupNetElements()
+    {
+        id.sendOptions = SendOptions.ReliableOrdered;
+        characterName.sendOptions = SendOptions.ReliableOrdered;
+        prototypeId.sendOptions = SendOptions.ReliableOrdered;
+        level.sendOptions = SendOptions.ReliableOrdered;
+        exp.sendOptions = SendOptions.ReliableOrdered;
+        currentHp.sendOptions = SendOptions.ReliableOrdered;
+        currentMp.sendOptions = SendOptions.ReliableOrdered;
+        statPoint.sendOptions = SendOptions.ReliableOrdered;
+        statPoint.forOwnerOnly = true;
+        skillPoint.sendOptions = SendOptions.ReliableOrdered;
+        skillPoint.forOwnerOnly = true;
+        gold.sendOptions = SendOptions.ReliableOrdered;
+        skillLevels.forOwnerOnly = true;
+        nonEquipItems.forOwnerOnly = true;
     }
 
     #region SyncVar Hooks
