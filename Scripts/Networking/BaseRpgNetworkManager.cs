@@ -205,12 +205,11 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
         {
             var position = rootObject.transform.position;
             rootObject.transform.position = position + offset;
-            // Remove all colliders, we're going to use map data colliders
-            var colliders = rootObject.GetComponentsInChildren<Collider>();
-            foreach (var collider in colliders)
-            {
-                DestroyImmediate(collider);
-            }
+            // Remove all colliders/cameras/audio listeners
+            rootObject.RemoveComponentsInChildren<Collider>(true);
+            rootObject.RemoveComponentsInChildren<AudioListener>(true);
+            rootObject.RemoveComponentsInChildren<FlareLayer>(true);
+            rootObject.RemoveComponentsInChildren<Camera>(true);
         }
         // Load collider data for clients
         if (!IsServer)
