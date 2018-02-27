@@ -36,6 +36,8 @@ public class CharacterData : ICharacterData
     public int StatPoint { get { return statPoint; } set { statPoint = value; } }
     public int SkillPoint { get { return skillPoint; } set { skillPoint = value; } }
     public int Gold { get { return gold; } set { gold = value; } }
+    public Vector3 CurrentPosition { get { return currentPosition; } set { currentPosition = value; } }
+    public Vector3 RespawnPosition { get { return respawnPosition; } set { respawnPosition = value; } }
     public int LastUpdate { get { return lastUpdate; } set { lastUpdate = value; } }
     public IList<CharacterAttributeLevel> AttributeLevels
     {
