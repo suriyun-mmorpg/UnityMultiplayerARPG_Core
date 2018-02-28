@@ -15,6 +15,7 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
         Client,
         Server,
         Host,
+        SinglePlayer,
     }
 
     public class RpgGameMsgTypes
@@ -27,6 +28,7 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
     public static string ConnectingNetworkAddress;
     public static int ConnectingNetworkPort;
 
+    [Header("Rpg game UIs")]
     public GameObject mapLoadingObject;
     public Image imageMapLoadingGage;
     public Text textMapLoadingPercent;
@@ -67,6 +69,7 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
         {
             case GameStartType.Server:
             case GameStartType.Host:
+            case GameStartType.SinglePlayer:
                 TempLoadGameMaps.gameMaps.Clear();
                 TempLoadGameMaps.gameMaps.AddRange(GameInstance.GameMaps.Values);
                 TempLoadGameMaps.onLoadedMaps += OnLoadedMaps;
@@ -107,6 +110,7 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
         {
             case GameStartType.Server:
             case GameStartType.Host:
+            case GameStartType.SinglePlayer:
                 TempLoadGameMaps.onLoadedMaps -= OnLoadedMaps;
                 break;
         }
@@ -117,8 +121,7 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
     private void OnValidate()
     {
         clientReadyOnConnect = false;
-        Assets.registeringPlayerPrefab = null;
-        Assets.spawnPlayerOnReady = false;
+        Assets.playerPrefab = null;
     }
 #endif
 
@@ -130,6 +133,10 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
                 StartServer();
                 break;
             case GameStartType.Host:
+                StartHost();
+                break;
+            case GameStartType.SinglePlayer:
+                maxConnections = 1;
                 StartHost();
                 break;
         }
@@ -157,6 +164,21 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
     public override void OnClientConnected(NetPeer peer)
     {
         SendPacket(SendOptions.ReliableUnordered, peer, RpgGameMsgTypes.ClientRequestCharacter, SerializeCharacterRequest);
+    }
+
+    protected override void HandleClientReady(LiteNetLibMessageHandler messageHandler)
+    {
+        base.HandleClientReady(messageHandler);
+        var gameInstance = GameInstance.Singleton;
+        var peer = messageHandler.peer;
+        var reader = messageHandler.reader;
+        if (pendingCharacters.ContainsKey(peer.ConnectId))
+        {
+            var characterData = pendingCharacters[peer.ConnectId];
+            var playerIdentity = SpawnPlayer(peer, gameInstance.characterEntityPrefab.Identity);
+            var characterEntity = playerIdentity.GetComponent<CharacterEntity>();
+            characterData.CloneTo(characterEntity);
+        }
     }
 
     protected void HandleClientRequestCharacter(LiteNetLibMessageHandler messageHandler)
