@@ -11,6 +11,7 @@ using UnityEditor;
 [RequireComponent(typeof(CharacterMovement))]
 public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
 {
+    public const float UPDATE_CURRENT_MAP_INTERVAL = 1f;
     // Use id as primary key
     [Header("Sync Fields")]
     public SyncFieldString id = new SyncFieldString();
@@ -23,20 +24,22 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
     public SyncFieldInt statPoint = new SyncFieldInt();
     public SyncFieldInt skillPoint = new SyncFieldInt();
     public SyncFieldInt gold = new SyncFieldInt();
-    private string currentMapName;
-    private Vector3 currentPosition;
-    private string respawnMapName;
-    private Vector3 respawnPosition;
-    private int lastUpdate;
-    private bool isSetup;
 
     [Header("Sync Lists")]
     public SyncListCharacterAttributeLevel attributeLevels = new SyncListCharacterAttributeLevel();
     public SyncListCharacterSkillLevel skillLevels = new SyncListCharacterSkillLevel();
     public SyncListCharacterItem equipItems = new SyncListCharacterItem();
     public SyncListCharacterItem nonEquipItems = new SyncListCharacterItem();
-
+    
+    #region Protected data
+    // Entity data
     protected CharacterModel model;
+    protected bool isSetup;
+    protected float lastUpdateCurrentMapTime;
+    protected GameMapEntity currentMapEntity;
+    // Save data
+    protected string currentMapName;
+    #endregion
 
     public string Id { get { return id; } set { id.Value = value; } }
     public string CharacterName { get { return characterName; } set { characterName.Value = value; } }
@@ -66,15 +69,15 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
         get { return currentMapName; }
         set
         {
-            if (isSetup && !currentMapName.Equals(value))
+            if (isSetup && IsServer && !currentMapName.Equals(value))
                 Identity.RebuildSubscribers(false);
             currentMapName = value;
         }
     }
-    public Vector3 CurrentPosition { get { return currentPosition; } set { currentPosition = value; } }
-    public string RespawnMapName { get { return respawnMapName; } set { respawnMapName = value; } }
-    public Vector3 RespawnPosition { get { return respawnPosition; } set { respawnPosition = value; } }
-    public int LastUpdate { get { return lastUpdate; } set { lastUpdate = value; } }
+    public Vector3 CurrentPosition { get; set; }
+    public string RespawnMapName { get; set; }
+    public Vector3 RespawnPosition { get; set; }
+    public int LastUpdate { get; set; }
 
     public IList<CharacterAttributeLevel> AttributeLevels
     {
@@ -150,18 +153,44 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
         }
     }
 
-    public CharacterMovementInput TempCharacterMovementInput { get; private set; }
+    private BaseRpgNetworkManager tempManager;
+    public BaseRpgNetworkManager TempManager
+    {
+        get
+        {
+            if (tempManager == null)
+                tempManager = Manager as BaseRpgNetworkManager;
+            return tempManager;
+        }
+    }
+
+    public virtual Vector3 WorldPosition
+    {
+        get { return TempTransform.position; }
+        set { TempTransform.position = value; }
+    }
 
     protected virtual void Awake()
     {
-        TempCharacterMovementInput = GetComponent<CharacterMovementInput>();
-        if (TempCharacterMovementInput != null)
-            TempCharacterMovementInput.enabled = false;
-
         TempCharacterMovement.enabled = false;
         TempRigidbody.Sleep();
 
         prototypeId.onChange += OnPrototypeIdChange;
+    }
+
+    protected virtual void Update()
+    {
+        if (!isSetup)
+            return;
+
+        if (IsServer)
+        {
+            if (Time.realtimeSinceStartup - lastUpdateCurrentMapTime >= UPDATE_CURRENT_MAP_INTERVAL)
+            {
+                ConvertWorldToSavePosition();
+                lastUpdateCurrentMapTime = Time.realtimeSinceStartup;
+            }
+        }
     }
 
     protected virtual void OnDestroy()
@@ -181,14 +210,47 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
     {
         SetupNetElements();
         if (IsLocalClient)
-        {
-            // Local player must have movement input
-            if (TempCharacterMovementInput == null)
-                TempCharacterMovementInput = gameObject.AddComponent<CharacterMovementInput>();
-            TempCharacterMovementInput.enabled = true;
             TempCharacterMovement.enabled = true;
+
+        if (IsServer)
+        {
+            ConvertSaveToWorldPosition();
+            lastUpdateCurrentMapTime = Time.realtimeSinceStartup;
         }
         isSetup = true;
+    }
+
+    protected void ConvertWorldToSavePosition()
+    {
+        // Convert world position to save position
+        if (!currentMapEntity.IsInMap(WorldPosition))
+        {
+            currentMapEntity = TempManager.TempLoadGameMaps.GetMapByWorldPosition(WorldPosition);
+            CurrentMapName = currentMapEntity.SceneName;
+        }
+        CurrentPosition = WorldPosition - currentMapEntity.MapOffsets;
+    }
+
+    protected void ConvertSaveToWorldPosition()
+    {
+        // Convert save position to world position
+        if (TempManager.TempLoadGameMaps.LoadedMap.ContainsKey(CurrentMapName))
+        {
+            currentMapEntity = TempManager.TempLoadGameMaps.LoadedMap[CurrentMapName];
+            WorldPosition = CurrentPosition + currentMapEntity.MapOffsets;
+        }
+        else
+        {
+            Debug.LogWarning("Cannot find character's map [" + CurrentMapName + "]");
+            CurrentMapName = TempManager.TempLoadGameMaps.gameMaps[0].sceneName;
+            currentMapEntity = TempManager.TempLoadGameMaps.LoadedMap[CurrentMapName];
+            RaycastHit rayHit;
+            if (Physics.Raycast(currentMapEntity.MapOffsets + (Vector3.up * currentMapEntity.MapBounds.size.y / 2), Vector3.down, out rayHit, currentMapEntity.MapBounds.size.y))
+            {
+                WorldPosition = rayHit.point;
+                CurrentPosition = WorldPosition - currentMapEntity.MapOffsets;
+            }
+        }
     }
 
     public override bool ShouldAddSubscriber(LiteNetLibPlayer subscriber)
@@ -197,8 +259,10 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
         foreach (var spawnedObject in spawnedObjects)
         {
             var characterEntity = spawnedObject.GetComponent<CharacterEntity>();
+            if (characterEntity == null)
+                continue;
             // There are some characters that have same map?, if yes return true
-            if (characterEntity != null && characterEntity.CurrentMapName.Equals(CurrentMapName))
+            if (characterEntity.CurrentMapName.Equals(CurrentMapName))
                 return true;
         }
         return false;
@@ -213,9 +277,14 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
             foreach (var spawnedObject in spawnedObjects)
             {
                 var characterEntity = spawnedObject.GetComponent<CharacterEntity>();
-                // There are some characters that have same map?, if yes return true
+                if (characterEntity == null)
+                    continue;
+                // There are some characters that have same map?, if yes add to new subscribers list
                 if (characterEntity != null && characterEntity.CurrentMapName.Equals(CurrentMapName))
+                {
                     subscribers.Add(subscriber);
+                    break;
+                }
             }
         }
         return true;

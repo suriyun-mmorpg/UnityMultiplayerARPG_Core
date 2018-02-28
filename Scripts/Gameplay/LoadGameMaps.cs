@@ -85,6 +85,7 @@ public class LoadGameMaps : MonoBehaviour
             // Now we keep loaded map offsets that will be uses at client side
             // To spawn map at (defaultMapEntityPosition + loadedMapOffset)
             // Saving character position as (spawnMapPosition - loadedMapOffset)
+            mapEntity.SceneName = gameMap.sceneName;
             mapEntity.MapOffsets = loadedMapOffset;
             LoadedMap[gameMap.sceneName] = mapEntity;
             if (loadScene)
@@ -111,5 +112,16 @@ public class LoadGameMaps : MonoBehaviour
         IsDone = true;
         if (onLoadedMaps != null)
             onLoadedMaps.Invoke();
+    }
+
+    public GameMapEntity GetMapByWorldPosition(Vector3 position)
+    {
+        var loadedMaps = LoadedMap.Values;
+        foreach (var loadedMap in loadedMaps)
+        {
+            if (loadedMap.IsInMap(position))
+                return loadedMap;
+        }
+        return null;
     }
 }
