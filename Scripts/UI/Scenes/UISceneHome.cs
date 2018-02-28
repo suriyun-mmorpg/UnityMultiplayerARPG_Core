@@ -9,6 +9,7 @@ public class UISceneHome : UIHistory
 
     public void OnClickSinglePlayer()
     {
+        BaseRpgNetworkManager.StartType = BaseRpgNetworkManager.GameStartType.SinglePlayer;
         Next(uiCharacterSelection);
     }
 
