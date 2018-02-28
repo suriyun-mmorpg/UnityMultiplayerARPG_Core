@@ -2,10 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class GameInstance : MonoBehaviour
 {
     public static GameInstance Singleton { get; protected set; }
+    public string homeSceneName = "Home";
+    public string gameplaySceneName = "Gameplay";
     public CharacterEntity characterEntityPrefab;
     public List<GameMap> gameMaps;
     public List<CharacterPrototype> characterPrototypes;
@@ -15,6 +20,10 @@ public class GameInstance : MonoBehaviour
     public int increaseStatPointEachLevel = 5;
     public int increaseSkillPointEachLevel = 1;
     public int startGold = 0;
+    public GameMap startMap;
+    public Vector3 startPosition;
+    public int minCharacterNameLength = 2;
+    public int maxCharacterNameLength = 16;
     public static readonly Dictionary<string, GameMap> GameMaps = new Dictionary<string, GameMap>();
     public static readonly Dictionary<string, CharacterAttribute> CharacterAttributes = new Dictionary<string, CharacterAttribute>();
     public static readonly Dictionary<string, CharacterClass> CharacterClasses = new Dictionary<string, CharacterClass>();
@@ -39,6 +48,16 @@ public class GameInstance : MonoBehaviour
         AddItems(items);
         AddSkills(skills);
     }
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (startMap != null && !gameMaps.Contains(startMap))
+            gameMaps.Add(startMap);
+
+        EditorUtility.SetDirty(this);
+    }
+#endif
 
     public static void AddGameMaps(List<GameMap> gameMaps)
     {
