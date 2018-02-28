@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(UIList)), RequireComponent(typeof(UICharacterSelectionManager))]
 public class UICharacterSelection : UIBase
@@ -97,13 +98,24 @@ public class UICharacterSelection : UIBase
     public virtual void OnClickStart()
     {
         if (SelectionManager.SelectedUI == null)
+        {
+            UISceneGlobal.Singleton.ShowMessageDialog("Cannot start game", "Please choose character to start game");
+            Debug.LogWarning("Cannot start game, No chosen character");
             return;
+        }
+        // Load gameplay scene, we're going to manage maps in gameplay scene later
+        // So we can add gameplay UI just once in gameplay scene
+        SceneManager.LoadScene(GameInstance.Singleton.gameplaySceneName, LoadSceneMode.Single);
     }
 
     public virtual void OnClickDelete()
     {
         if (SelectionManager.SelectedUI == null)
+        {
+            UISceneGlobal.Singleton.ShowMessageDialog("Cannot delete character", "Please choose character to delete");
+            Debug.LogWarning("Cannot delete character, No chosen character");
             return;
+        }
 
         SelectionManager.SelectedUI.data.DeletePersistentCharacterData();
         // Reload characters

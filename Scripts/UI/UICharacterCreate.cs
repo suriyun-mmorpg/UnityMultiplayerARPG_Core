@@ -90,20 +90,28 @@ public class UICharacterCreate : UIBase
 
     public virtual void OnClickCreate()
     {
+        var gameInstance = GameInstance.Singleton;
         var selectedUI = SelectionManager.SelectedUI;
         if (selectedUI == null)
         {
-            // TODO: Error dialog
+            UISceneGlobal.Singleton.ShowMessageDialog("Cannot create character", "Please select character class");
             Debug.LogWarning("Cannot create character, did not selected character class");
             return;
         }
         var prototypeId = selectedUI.data.PrototypeId;
-        // TODO: May validate name
-        var characterName = inputCharacterName.text;
-        if (string.IsNullOrEmpty(characterName.Trim()))
+        var characterName = inputCharacterName.text.Trim();
+        var minCharacterNameLength = gameInstance.minCharacterNameLength;
+        var maxCharacterNameLength = gameInstance.maxCharacterNameLength;
+        if (characterName.Length < minCharacterNameLength)
         {
-            // TODO: Error dialog
-            Debug.LogWarning("Cannot create character, character name is empty");
+            UISceneGlobal.Singleton.ShowMessageDialog("Cannot create character", "Character name is too short");
+            Debug.LogWarning("Cannot create character, character name is too short");
+            return;
+        }
+        if (characterName.Length > maxCharacterNameLength)
+        {
+            UISceneGlobal.Singleton.ShowMessageDialog("Cannot create character", "Character name is too long");
+            Debug.LogWarning("Cannot create character, character name is too long");
             return;
         }
 
