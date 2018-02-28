@@ -130,6 +130,7 @@ public static class CharacterDataExtension
 
     public static T SetNewCharacterData<T>(this T character, string characterName, string prototypeId) where T : ICharacterData
     {
+        var gameInstance = GameInstance.Singleton;
         character.CharacterName = characterName;
         character.PrototypeId = prototypeId;
         character.Level = 1;
@@ -142,7 +143,15 @@ public static class CharacterDataExtension
         }
         character.CurrentHp = character.GetMaxHp();
         character.CurrentMp = character.GetMaxMp();
-        character.Gold = GameInstance.Singleton.startGold;
+        character.Gold = gameInstance.startGold;
+
+        if (gameInstance.startMap != null)
+        {
+            character.CurrentMapName = gameInstance.startMap.sceneName;
+            character.RespawnMapName = gameInstance.startMap.sceneName;
+            character.CurrentPosition = gameInstance.startPosition;
+            character.RespawnPosition = gameInstance.startPosition;
+        }
         return character;
     }
 
