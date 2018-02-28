@@ -29,21 +29,11 @@ public class LoadGameMaps : MonoBehaviour
             return tempNavMeshSurface;
         }
     }
-    private List<GameMap> loadingMaps;
-    public List<GameMap> LoadingMaps
-    {
-        get
-        {
-            if (loadingMaps == null)
-                loadingMaps = new List<GameMap>(GameInstance.GameMaps.Values);
-            return loadingMaps;
-        }
-    }
     public readonly Dictionary<string, GameMapEntity> LoadedMaps = new Dictionary<string, GameMapEntity>();
 
     public float Progress
     {
-        get { return (float)loadedMapCount / (float)LoadingMaps.Count; }
+        get { return (float)loadedMapCount / (float)GameInstance.GameMaps.Count; }
     }
 
     private void Awake()
@@ -67,7 +57,8 @@ public class LoadGameMaps : MonoBehaviour
     {
         IsDone = false;
         yield return null;
-        foreach (var gameMap in LoadingMaps)
+        var gameMaps = GameInstance.GameMaps.Values;
+        foreach (var gameMap in gameMaps)
         {
             loadingGameMap = gameMap;
             yield return null;

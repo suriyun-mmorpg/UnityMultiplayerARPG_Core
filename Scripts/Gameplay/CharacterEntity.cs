@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLib;
@@ -242,7 +241,9 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
         else
         {
             Debug.LogWarning("Cannot find character's map [" + CurrentMapName + "]");
-            CurrentMapName = TempManager.TempLoadGameMaps.LoadingMaps[0].sceneName;
+            // If no map found try to spawn character at any maps
+            var gameMapValues = new List<GameMapEntity>(TempManager.TempLoadGameMaps.LoadedMaps.Values);
+            CurrentMapName = gameMapValues[Random.Range(0, gameMapValues.Count - 1)].SceneName;
             currentMapEntity = TempManager.TempLoadGameMaps.LoadedMaps[CurrentMapName];
             RaycastHit rayHit;
             if (Physics.Raycast(currentMapEntity.MapOffsets + (Vector3.up * currentMapEntity.MapBounds.size.y / 2), Vector3.down, out rayHit, currentMapEntity.MapBounds.size.y))
