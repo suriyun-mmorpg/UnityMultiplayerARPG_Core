@@ -28,6 +28,7 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
     private string respawnMapName;
     private Vector3 respawnPosition;
     private int lastUpdate;
+    private bool isSetup;
 
     [Header("Sync Lists")]
     public SyncListCharacterAttributeLevel attributeLevels = new SyncListCharacterAttributeLevel();
@@ -60,7 +61,16 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
     public int StatPoint { get { return statPoint.Value; } set { statPoint.Value = value; } }
     public int SkillPoint { get { return skillPoint.Value; } set { skillPoint.Value = value; } }
     public int Gold { get { return gold.Value; } set { gold.Value = value; } }
-    public string CurrentMapName { get { return currentMapName; } set { currentMapName = value; } }
+    public string CurrentMapName
+    {
+        get { return currentMapName; }
+        set
+        {
+            if (isSetup && !currentMapName.Equals(value))
+                Identity.RebuildSubscribers(false);
+            currentMapName = value;
+        }
+    }
     public Vector3 CurrentPosition { get { return currentPosition; } set { currentPosition = value; } }
     public string RespawnMapName { get { return respawnMapName; } set { respawnMapName = value; } }
     public Vector3 RespawnPosition { get { return respawnPosition; } set { respawnPosition = value; } }
@@ -178,6 +188,37 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
             TempCharacterMovementInput.enabled = true;
             TempCharacterMovement.enabled = true;
         }
+        isSetup = true;
+    }
+
+    public override bool ShouldAddSubscriber(LiteNetLibPlayer subscriber)
+    {
+        var spawnedObjects = subscriber.SpawnedObjects.Values;
+        foreach (var spawnedObject in spawnedObjects)
+        {
+            var characterEntity = spawnedObject.GetComponent<CharacterEntity>();
+            // There are some characters that have same map?, if yes return true
+            if (characterEntity != null && characterEntity.CurrentMapName.Equals(CurrentMapName))
+                return true;
+        }
+        return false;
+    }
+
+    public override bool OnRebuildSubscribers(HashSet<LiteNetLibPlayer> subscribers, bool initialize)
+    {
+        var players = Manager.Players.Values;
+        foreach (var subscriber in players)
+        {
+            var spawnedObjects = subscriber.SpawnedObjects.Values;
+            foreach (var spawnedObject in spawnedObjects)
+            {
+                var characterEntity = spawnedObject.GetComponent<CharacterEntity>();
+                // There are some characters that have same map?, if yes return true
+                if (characterEntity != null && characterEntity.CurrentMapName.Equals(CurrentMapName))
+                    subscribers.Add(subscriber);
+            }
+        }
+        return true;
     }
 
     private void SetupNetElements()
