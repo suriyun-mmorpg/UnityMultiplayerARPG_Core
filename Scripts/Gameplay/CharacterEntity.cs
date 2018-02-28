@@ -234,16 +234,16 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
     protected void ConvertSaveToWorldPosition()
     {
         // Convert save position to world position
-        if (TempManager.TempLoadGameMaps.LoadedMap.ContainsKey(CurrentMapName))
+        if (TempManager.TempLoadGameMaps.LoadedMaps.ContainsKey(CurrentMapName))
         {
-            currentMapEntity = TempManager.TempLoadGameMaps.LoadedMap[CurrentMapName];
+            currentMapEntity = TempManager.TempLoadGameMaps.LoadedMaps[CurrentMapName];
             WorldPosition = CurrentPosition + currentMapEntity.MapOffsets;
         }
         else
         {
             Debug.LogWarning("Cannot find character's map [" + CurrentMapName + "]");
-            CurrentMapName = TempManager.TempLoadGameMaps.gameMaps[0].sceneName;
-            currentMapEntity = TempManager.TempLoadGameMaps.LoadedMap[CurrentMapName];
+            CurrentMapName = TempManager.TempLoadGameMaps.LoadingMaps[0].sceneName;
+            currentMapEntity = TempManager.TempLoadGameMaps.LoadedMaps[CurrentMapName];
             RaycastHit rayHit;
             if (Physics.Raycast(currentMapEntity.MapOffsets + (Vector3.up * currentMapEntity.MapBounds.size.y / 2), Vector3.down, out rayHit, currentMapEntity.MapBounds.size.y))
             {

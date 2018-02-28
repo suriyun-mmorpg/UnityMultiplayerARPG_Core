@@ -70,8 +70,6 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
             case GameStartType.Server:
             case GameStartType.Host:
             case GameStartType.SinglePlayer:
-                TempLoadGameMaps.gameMaps.Clear();
-                TempLoadGameMaps.gameMaps.AddRange(GameInstance.GameMaps.Values);
                 TempLoadGameMaps.onLoadedMaps += OnLoadedMaps;
                 TempLoadGameMaps.LoadMaps();
                 StartCoroutine(LoadMapRoutine());
@@ -189,7 +187,7 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
         pendingCharacters[peer.ConnectId] = character;
         SendPacket(SendOptions.ReliableUnordered, peer, RpgGameMsgTypes.ServerMapResult, (writer) =>
         {
-            var map = TempLoadGameMaps.LoadedMap[character.CurrentMapName];
+            var map = TempLoadGameMaps.LoadedMaps[character.CurrentMapName];
             writer.Put(character.CurrentMapName);
             writer.Put(map.MapOffsets.x);
             writer.Put(map.MapOffsets.y);

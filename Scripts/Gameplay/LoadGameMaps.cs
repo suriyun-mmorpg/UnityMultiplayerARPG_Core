@@ -9,7 +9,6 @@ public class LoadGameMaps : MonoBehaviour
 {
     // I think only x axis is enough for simulate map on server, if not I will make map simulate on z axis later
     public const float MIN_MAP_X = -90000;
-    public List<GameMap> gameMaps;
     public float offsetBetweenBounds = 10f;
     public bool loadMapsOnStart;
     public bool loadScene;
@@ -30,11 +29,21 @@ public class LoadGameMaps : MonoBehaviour
             return tempNavMeshSurface;
         }
     }
-    public readonly Dictionary<string, GameMapEntity> LoadedMap = new Dictionary<string, GameMapEntity>();
+    private List<GameMap> loadingMaps;
+    public List<GameMap> LoadingMaps
+    {
+        get
+        {
+            if (loadingMaps == null)
+                loadingMaps = new List<GameMap>(GameInstance.GameMaps.Values);
+            return loadingMaps;
+        }
+    }
+    public readonly Dictionary<string, GameMapEntity> LoadedMaps = new Dictionary<string, GameMapEntity>();
 
     public float Progress
     {
-        get { return (float)loadedMapCount / (float)gameMaps.Count; }
+        get { return (float)loadedMapCount / (float)LoadingMaps.Count; }
     }
 
     private void Awake()
@@ -58,12 +67,12 @@ public class LoadGameMaps : MonoBehaviour
     {
         IsDone = false;
         yield return null;
-        foreach (var gameMap in gameMaps)
+        foreach (var gameMap in LoadingMaps)
         {
             loadingGameMap = gameMap;
             yield return null;
 
-            if (gameMap.physicPrefab == null || LoadedMap.ContainsKey(gameMap.sceneName))
+            if (gameMap.physicPrefab == null || LoadedMaps.ContainsKey(gameMap.sceneName))
                 continue;
 
             var mapBoundsExtents = loadingGameMap.mapBounds.extents;
@@ -87,7 +96,7 @@ public class LoadGameMaps : MonoBehaviour
             // Saving character position as (spawnMapPosition - loadedMapOffset)
             mapEntity.SceneName = gameMap.sceneName;
             mapEntity.MapOffsets = loadedMapOffset;
-            LoadedMap[gameMap.sceneName] = mapEntity;
+            LoadedMaps[gameMap.sceneName] = mapEntity;
             if (loadScene)
             {
                 SceneManager.LoadScene(gameMap.sceneName, LoadSceneMode.Additive);
@@ -116,7 +125,7 @@ public class LoadGameMaps : MonoBehaviour
 
     public GameMapEntity GetMapByWorldPosition(Vector3 position)
     {
-        var loadedMaps = LoadedMap.Values;
+        var loadedMaps = LoadedMaps.Values;
         foreach (var loadedMap in loadedMaps)
         {
             if (loadedMap.IsInMap(position))
