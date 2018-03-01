@@ -155,8 +155,7 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
     public override void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
     {
         base.OnPeerDisconnected(peer, disconnectInfo);
-        if (pendingCharacters.ContainsKey(peer.ConnectId))
-            pendingCharacters.Remove(peer.ConnectId);
+        RemovePendingCharacter(peer);
     }
 
     public override void OnClientConnected(NetPeer peer)
@@ -185,14 +184,7 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
         var reader = messageHandler.reader;
         var character = DeserializeCharacterRequest(peer, reader);
         pendingCharacters[peer.ConnectId] = character;
-        SendPacket(SendOptions.ReliableUnordered, peer, RpgGameMsgTypes.ServerMapResult, (writer) =>
-        {
-            var map = TempLoadGameMaps.LoadedMaps[character.CurrentMapName];
-            writer.Put(character.CurrentMapName);
-            writer.Put(map.MapOffsets.x);
-            writer.Put(map.MapOffsets.y);
-            writer.Put(map.MapOffsets.z);
-        });
+        SendMapResultToPeer(peer, character.CurrentMapName);
     }
 
     protected void HandleServerMapResult(LiteNetLibMessageHandler messageHandler)
@@ -201,6 +193,30 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
         var mapName = reader.GetString();
         var offset = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
         StartCoroutine(LoadMap(mapName, offset));
+    }
+
+    public void AddPendingCharacter(NetPeer peer, ICharacterData character)
+    {
+        var characterData = new CharacterData();
+        character.CloneTo(characterData);
+        pendingCharacters[peer.ConnectId] = characterData;
+    }
+
+    public bool RemovePendingCharacter(NetPeer peer)
+    {
+        return pendingCharacters.Remove(peer.ConnectId);
+    }
+
+    public void SendMapResultToPeer(NetPeer peer, string mapName)
+    {
+        SendPacket(SendOptions.ReliableUnordered, peer, RpgGameMsgTypes.ServerMapResult, (writer) =>
+        {
+            var map = TempLoadGameMaps.LoadedMaps[mapName];
+            writer.Put(mapName);
+            writer.Put(map.MapOffsets.x);
+            writer.Put(map.MapOffsets.y);
+            writer.Put(map.MapOffsets.z);
+        });
     }
 
     IEnumerator LoadMap(string mapName, Vector3 offset)
