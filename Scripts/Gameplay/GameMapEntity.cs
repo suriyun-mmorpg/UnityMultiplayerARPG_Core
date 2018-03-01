@@ -9,69 +9,56 @@ using UnityEditor;
 
 public class GameMapEntity : MonoBehaviour
 {
-    public string SceneName { get; set; }
+    public string MapName { get; set; }
+    public Vector3 MapExtents { get; set; }
     public Vector3 MapOffsets { get; set; }
-    public Bounds MapBounds { get; private set; }
-    public GameObject PhysicsPrefab { get; private set; }
+    private GameObject physicsPrefab;
 
-    public bool IsInMap(Vector3 position)
+    private Transform tempTransform;
+    public Transform TempTransform
     {
-        return position.x >= MapBounds.min.x &&
-            position.x <= MapBounds.max.x &&
-            position.z >= MapBounds.min.z &&
-            position.z <= MapBounds.max.z;
+        get
+        {
+            if (tempTransform == null)
+                tempTransform = GetComponent<Transform>();
+            return tempTransform;
+        }
+    }
+
+    public bool IsWorldPositionInMap(Vector3 position)
+    {
+        var minX = TempTransform.position.x - MapExtents.x;
+        var minZ = TempTransform.position.z - MapExtents.z;
+        var maxX = TempTransform.position.x + MapExtents.x;
+        var maxZ = TempTransform.position.z + MapExtents.z;
+        return position.x >= minX &&
+            position.x <= maxX &&
+            position.z >= minZ &&
+            position.z <= maxZ;
+    }
+
+    public bool IsLocalPositionInMap(Vector3 position)
+    {
+        return IsWorldPositionInMap(ConvertLocalPositionToWorld(position));
+    }
+
+    public Vector3 ConvertWorldPositionToLocal(Vector3 worldPosition)
+    {
+        var localPosition = worldPosition - MapOffsets;
+        return localPosition;
+    }
+
+    public Vector3 ConvertLocalPositionToWorld(Vector3 localPosition)
+    {
+        var worldPosition = localPosition + MapOffsets;
+        return worldPosition;
     }
 
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(MapBounds.center, MapBounds.size);
-    }
-
-    private void OnValidate()
-    {
-        GenerateMapBounds();
-    }
-
-    [ContextMenu("Generate Map Bounds")]
-    public void GenerateMapBounds()
-    {
-        var children = GetComponentsInChildren<Collider>();
-        if (children.Length > 0)
-        {
-            Bounds bounds = children[0].bounds;
-            for (var i = 1; i < children.Length; ++i)
-            {
-                var child = children[i];
-                if (child == null)
-                    continue;
-                bounds.Encapsulate(child.bounds);
-            }
-            MapBounds = bounds;
-        }
-    }
-
-    [ContextMenu("Generate Physics Prefab")]
-    public void GeneratePhysicsPrefab()
-    {
-        if (PhysicsPrefab != null)
-            DestroyImmediate(PhysicsPrefab);
-
-        PhysicsPrefab = Instantiate(gameObject);
-        PhysicsPrefab.transform.parent = null;
-        PhysicsPrefab.transform.position = transform.position;
-        PhysicsPrefab.transform.rotation = transform.rotation;
-        PhysicsPrefab.transform.localScale = transform.localScale;
-
-        var components = PhysicsPrefab.GetComponentsInChildren<Component>();
-        foreach (var component in components)
-        {
-            if (component is Transform || component is GameMapEntity || component is Collider)
-                continue;
-
-            DestroyImmediate(component);
-        }
+        Gizmos.DrawWireCube(transform.position, MapExtents * 2);
     }
 
     [ContextMenu("Make Game Map")]
@@ -83,25 +70,55 @@ public class GameMapEntity : MonoBehaviour
         var path = EditorUtility.SaveFilePanelInProject("Make Game Map...", fileName, fileExt, "Please enter a file name to save game map");
         if (path.Length > 0)
         {
-            GenerateMapBounds();
-            GeneratePhysicsPrefab();
+            Bounds mapBounds = new Bounds();
+            var children = GetComponentsInChildren<Collider>();
+            if (children.Length > 0)
+            {
+                Bounds bounds = children[0].bounds;
+                for (var i = 1; i < children.Length; ++i)
+                {
+                    var child = children[i];
+                    if (child == null)
+                        continue;
+                    bounds.Encapsulate(child.bounds);
+                }
+                mapBounds = bounds;
+            }
+
+            if (physicsPrefab != null)
+                DestroyImmediate(physicsPrefab);
+
+            physicsPrefab = Instantiate(gameObject);
+            physicsPrefab.transform.parent = null;
+            physicsPrefab.transform.position = transform.position;
+            physicsPrefab.transform.rotation = transform.rotation;
+            physicsPrefab.transform.localScale = transform.localScale;
+
+            var components = physicsPrefab.GetComponentsInChildren<Component>();
+            foreach (var component in components)
+            {
+                if (component is Transform || component is GameMapEntity || component is Collider)
+                    continue;
+
+                DestroyImmediate(component);
+            }
 
             var gameMap = ScriptableObject.CreateInstance<GameMap>();
-            gameMap.sceneName = sceneName;
-            gameMap.mapBounds = MapBounds;
+            gameMap.mapName = sceneName;
+            gameMap.mapExtents = mapBounds.extents;
 
             var savingDirectory = Path.GetDirectoryName(path);
             var savingFileName = path.Substring(savingDirectory.Length);
             var physicsPrefabFileName = savingFileName.Substring(0, savingFileName.Length - fileExt.Length - 1) + "_Physics.prefab";
             var physicsPrefabPath = savingDirectory + physicsPrefabFileName;
             AssetDatabase.DeleteAsset(physicsPrefabPath);
-            var resultPhysicPrefab = PrefabUtility.CreatePrefab(physicsPrefabPath, PhysicsPrefab);
+            var resultPhysicPrefab = PrefabUtility.CreatePrefab(physicsPrefabPath, physicsPrefab);
 
             gameMap.physicPrefab = resultPhysicPrefab;
             AssetDatabase.DeleteAsset(path);
             AssetDatabase.CreateAsset(gameMap, path);
 
-            DestroyImmediate(PhysicsPrefab);
+            DestroyImmediate(physicsPrefab);
         }
         else
             Debug.LogWarning("Invalid game map save path");

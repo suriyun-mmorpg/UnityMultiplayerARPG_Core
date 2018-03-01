@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GameMap : BaseGameData
 {
-    public string sceneName;
-    public Bounds mapBounds;
+    public string mapName;
+    public Vector3 mapExtents;
     public GameObject physicPrefab;
 }

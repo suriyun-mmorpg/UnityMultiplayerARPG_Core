@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 public class LoadGameMaps : MonoBehaviour
 {
     // I think only x axis is enough for simulate map on server, if not I will make map simulate on z axis later
-    public const float MIN_MAP_X = -90000;
+    public float minMapX = 0;
     public float offsetBetweenBounds = 10f;
     public bool loadMapsOnStart;
     public bool loadScene;
@@ -63,35 +63,36 @@ public class LoadGameMaps : MonoBehaviour
             loadingGameMap = gameMap;
             yield return null;
 
-            if (gameMap.physicPrefab == null || LoadedMaps.ContainsKey(gameMap.sceneName))
+            if (gameMap.physicPrefab == null || LoadedMaps.ContainsKey(gameMap.mapName))
                 continue;
 
-            var mapBoundsExtents = loadingGameMap.mapBounds.extents;
+            var mapExtents = loadingGameMap.mapExtents;
             var physicPrefab = Instantiate(gameMap.physicPrefab, transform);
             var mapEntity = physicPrefab.GetComponent<GameMapEntity>();
             var defaultMapEntityPosition = mapEntity.transform.position;
             if (loadedMapCount == 0)
             {
                 mapEntity.transform.position =
-                    (Vector3.right * (MIN_MAP_X + mapBoundsExtents.x));
+                    (Vector3.right * (minMapX + mapExtents.x));
             }
             else
             {
                 mapEntity.transform.position =
-                    (Vector3.right * (loadOffsetX + mapBoundsExtents.x + offsetBetweenBounds));
+                    (Vector3.right * (loadOffsetX + mapExtents.x + offsetBetweenBounds));
             }
-            loadOffsetX = mapEntity.transform.position.x + mapBoundsExtents.x;
+            loadOffsetX = mapEntity.transform.position.x + mapExtents.x;
             var loadedMapOffset = mapEntity.transform.position - defaultMapEntityPosition;
             // Now we keep loaded map offsets that will be uses at client side
             // To spawn map at (defaultMapEntityPosition + loadedMapOffset)
             // Saving character position as (spawnMapPosition - loadedMapOffset)
-            mapEntity.SceneName = gameMap.sceneName;
+            mapEntity.MapName = gameMap.mapName;
+            mapEntity.MapExtents = gameMap.mapExtents;
             mapEntity.MapOffsets = loadedMapOffset;
-            LoadedMaps[gameMap.sceneName] = mapEntity;
+            LoadedMaps[gameMap.mapName] = mapEntity;
             if (loadScene)
             {
-                SceneManager.LoadScene(gameMap.sceneName, LoadSceneMode.Additive);
-                var scene = SceneManager.GetSceneByName(gameMap.sceneName);
+                SceneManager.LoadScene(gameMap.mapName, LoadSceneMode.Additive);
+                var scene = SceneManager.GetSceneByName(gameMap.mapName);
                 yield return null;
                 var rootObjects = scene.GetRootGameObjects();
                 foreach (var rootObject in rootObjects)
@@ -119,7 +120,7 @@ public class LoadGameMaps : MonoBehaviour
         var loadedMaps = LoadedMaps.Values;
         foreach (var loadedMap in loadedMaps)
         {
-            if (loadedMap.IsInMap(position))
+            if (loadedMap.IsWorldPositionInMap(position))
                 return loadedMap;
         }
         return null;

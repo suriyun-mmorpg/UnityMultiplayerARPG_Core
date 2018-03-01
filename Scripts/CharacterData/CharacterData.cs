@@ -147,8 +147,8 @@ public static class CharacterDataExtension
 
         if (gameInstance.startMap != null)
         {
-            character.CurrentMapName = gameInstance.startMap.sceneName;
-            character.RespawnMapName = gameInstance.startMap.sceneName;
+            character.CurrentMapName = gameInstance.startMap.mapName;
+            character.RespawnMapName = gameInstance.startMap.mapName;
             character.CurrentPosition = gameInstance.startPosition;
             character.RespawnPosition = gameInstance.startPosition;
         }
