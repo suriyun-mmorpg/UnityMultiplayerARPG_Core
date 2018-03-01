@@ -21,6 +21,24 @@ public static class GenericExtension
         }
     }
 
+    public static void RemoveObjectsByComponentInChildren<T>(this GameObject gameObject, bool includeInactive) where T: Component
+    {
+        var components = gameObject.GetComponentsInChildren<T>(includeInactive);
+        foreach (var component in components)
+        {
+            Object.DestroyImmediate(component.gameObject);
+        }
+    }
+
+    public static void RemoveObjectsByComponentInParent<T>(this GameObject gameObject, bool includeInactive) where T : Component
+    {
+        var components = gameObject.GetComponentsInParent<T>(includeInactive);
+        foreach (var component in components)
+        {
+            Object.DestroyImmediate(component.gameObject);
+        }
+    }
+
     public static void RemoveComponents<T>(this GameObject gameObject) where T : Component
     {
         var components = gameObject.GetComponents<T>();
