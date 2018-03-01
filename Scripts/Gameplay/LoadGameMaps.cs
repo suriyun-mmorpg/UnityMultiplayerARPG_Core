@@ -11,7 +11,6 @@ public class LoadGameMaps : MonoBehaviour
     public float minMapX = 0;
     public float offsetBetweenBounds = 10f;
     public bool loadMapsOnStart;
-    public bool loadScene;
     public bool IsDone { get; private set; }
     private int loadedMapCount = 0;
     private GameMap loadingGameMap = null;
@@ -89,23 +88,6 @@ public class LoadGameMaps : MonoBehaviour
             mapEntity.MapExtents = gameMap.mapExtents;
             mapEntity.MapOffsets = loadedMapOffset;
             LoadedMaps[gameMap.mapName] = mapEntity;
-            if (loadScene)
-            {
-                SceneManager.LoadScene(gameMap.mapName, LoadSceneMode.Additive);
-                var scene = SceneManager.GetSceneByName(gameMap.mapName);
-                yield return null;
-                var rootObjects = scene.GetRootGameObjects();
-                foreach (var rootObject in rootObjects)
-                {
-                    var position = rootObject.transform.position;
-                    rootObject.transform.position = position + loadedMapOffset;
-                    // Remove all colliders/cameras/audio listeners
-                    rootObject.RemoveComponentsInChildren<Collider>(true);
-                    rootObject.RemoveComponentsInChildren<AudioListener>(true);
-                    rootObject.RemoveComponentsInChildren<FlareLayer>(true);
-                    rootObject.RemoveComponentsInChildren<Camera>(true);
-                }
-            }
             loadingGameMap = null;
             loadedMapCount++;
         }
