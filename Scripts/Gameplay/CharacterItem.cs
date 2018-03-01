@@ -22,6 +22,29 @@ public struct CharacterItem
     {
         get { return Item != null ? Item as EquipmentItem : null; }
     }
+
+    public int MaxStack
+    {
+        get { return Item.maxStack; }
+    }
+
+    public bool IsValid
+    {
+        get { return !string.IsNullOrEmpty(id) && Item != null && amount > 0; }
+    }
+
+    public bool IsFull
+    {
+        get { return amount == MaxStack; }
+    }
+
+    public void Empty()
+    {
+        id = "";
+        itemId = "";
+        level = 0;
+        amount = 0;
+    }
 }
 
 public class NetFieldCharacterItem : LiteNetLibNetField<CharacterItem>
