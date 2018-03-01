@@ -14,6 +14,17 @@ public class CharacterModel : MonoBehaviour
     public Transform leftHandContainer;
     public CharacterModelContainer[] equipmentContainers;
 
+    private Transform tempTransform;
+    public Transform TempTransform
+    {
+        get
+        {
+            if (tempTransform == null)
+                tempTransform = GetComponent<Transform>();
+            return tempTransform;
+        }
+    }
+
     private Animator tempAnimator;
     public Animator TempAnimator
     {
@@ -28,8 +39,8 @@ public class CharacterModel : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.magenta;
-        var topCorner = center + (Vector3.up * height * 0.5f) - (Vector3.up * radius);
-        var bottomCorner = center - (Vector3.up * height * 0.5f) + (Vector3.up * radius);
+        var topCorner = TempTransform.position + center + (Vector3.up * height * 0.5f) - (Vector3.up * radius);
+        var bottomCorner = TempTransform.position + center - (Vector3.up * height * 0.5f) + (Vector3.up * radius);
         Gizmos.DrawWireSphere(topCorner, radius);
         Gizmos.DrawWireSphere(bottomCorner, radius);
         Gizmos.DrawLine(topCorner + Vector3.left * radius, bottomCorner + Vector3.left * radius);
