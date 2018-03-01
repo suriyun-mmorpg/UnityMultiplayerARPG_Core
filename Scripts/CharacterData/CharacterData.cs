@@ -145,13 +145,11 @@ public static class CharacterDataExtension
         character.CurrentMp = character.GetMaxMp();
         character.Gold = gameInstance.startGold;
 
-        if (gameInstance.startMap != null)
-        {
-            character.CurrentMapName = gameInstance.startMap.mapName;
-            character.RespawnMapName = gameInstance.startMap.mapName;
-            character.CurrentPosition = gameInstance.startPosition;
-            character.RespawnPosition = gameInstance.startPosition;
-        }
+        character.CurrentMapName = gameInstance.startSceneName;
+        character.RespawnMapName = gameInstance.startSceneName;
+        character.CurrentPosition = gameInstance.startPosition;
+        character.RespawnPosition = gameInstance.startPosition;
+
         return character;
     }
 

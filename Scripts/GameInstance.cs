@@ -9,22 +9,29 @@ using UnityEditor;
 public class GameInstance : MonoBehaviour
 {
     public static GameInstance Singleton { get; protected set; }
-    public string homeSceneName = "Home";
-    public string gameplaySceneName = "Gameplay";
+    [Header("Gameplay Objects")]
     public CharacterEntity characterEntityPrefab;
-    public List<GameMap> gameMaps;
+    public ItemDropEntity itemDropEntityPrefab;
+    public FollowCameraControls gameplayCameraPrefab;
+    [Header("Gameplay Database")]
     public List<CharacterPrototype> characterPrototypes;
     public List<Item> items;
     public List<Skill> skills;
     public List<int> expTree;
+    [Header("Gameplay Configs")]
     public int increaseStatPointEachLevel = 5;
     public int increaseSkillPointEachLevel = 1;
     public int startGold = 0;
-    public GameMap startMap;
+    public int inventorySize = 30;
+    public float pickUpItemDistance = 2f;
+    public float dropDistance = 2f;
+    [Header("Scene")]
+    public string homeSceneName = "Home";
+    public string startSceneName;
     public Vector3 startPosition;
+    [Header("Player Configs")]
     public int minCharacterNameLength = 2;
     public int maxCharacterNameLength = 16;
-    public static readonly Dictionary<string, GameMap> GameMaps = new Dictionary<string, GameMap>();
     public static readonly Dictionary<string, CharacterAttribute> CharacterAttributes = new Dictionary<string, CharacterAttribute>();
     public static readonly Dictionary<string, CharacterClass> CharacterClasses = new Dictionary<string, CharacterClass>();
     public static readonly Dictionary<string, CharacterPrototype> CharacterPrototypes = new Dictionary<string, CharacterPrototype>();
@@ -42,30 +49,9 @@ public class GameInstance : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         Singleton = this;
         
-        AddGameMaps(gameMaps);
         AddCharacterPrototypes(characterPrototypes);
         AddItems(items);
         AddSkills(skills);
-    }
-
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-        if (startMap != null && !gameMaps.Contains(startMap))
-            gameMaps.Add(startMap);
-
-        EditorUtility.SetDirty(this);
-    }
-#endif
-
-    public static void AddGameMaps(List<GameMap> gameMaps)
-    {
-        foreach (var gameMap in gameMaps)
-        {
-            if (gameMap == null || GameMaps.ContainsKey(gameMap.Id))
-                continue;
-            GameMaps[gameMap.Id] = gameMap;
-        }
     }
 
     public static void AddCharacterAttributes(List<CharacterAttribute> characterAttributes)

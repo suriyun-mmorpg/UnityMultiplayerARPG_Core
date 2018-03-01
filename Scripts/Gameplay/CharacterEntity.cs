@@ -34,28 +34,15 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     #region Protected data
     // Entity data
     protected CharacterModel model;
-    protected GameMapEntity currentMapEntity;
-    // Save data
-    protected string currentMapName;
+    // Net Functions
+    protected LiteNetLibFunction<NetFieldUInt> netFuncPickupItem;
+    protected LiteNetLibFunction<NetFieldInt, NetFieldInt> netFuncDropItem;
+    protected LiteNetLibFunction<NetFieldInt, NetFieldInt> netFuncSwapOrMergeItem;
     #endregion
 
     public string Id { get { return id; } set { id.Value = value; } }
     public string CharacterName { get { return characterName; } set { characterName.Value = value; } }
-    public string PrototypeId
-    {
-        get { return prototypeId; }
-        set
-        {
-            prototypeId.Value = value;
-            // Setup model
-            if (model != null)
-                Destroy(model.gameObject);
-            model = this.InstantiateModel(transform);
-            TempCapsuleCollider.center = model.center;
-            TempCapsuleCollider.radius = model.radius;
-            TempCapsuleCollider.height = model.height;
-        }
-    }
+    public string PrototypeId { get { return prototypeId; } set { prototypeId.Value = value; } }
     public int Level { get { return level.Value; } set { level.Value = value; } }
     public int Exp { get { return exp.Value; } set { exp.Value = value; } }
     public int CurrentHp { get { return (int)currentHp.Value; } set { currentHp.Value = value; } }
@@ -63,17 +50,8 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     public int StatPoint { get { return statPoint.Value; } set { statPoint.Value = value; } }
     public int SkillPoint { get { return skillPoint.Value; } set { skillPoint.Value = value; } }
     public int Gold { get { return gold.Value; } set { gold.Value = value; } }
-    public string CurrentMapName
-    {
-        get { return currentMapName; }
-        set
-        {
-            if (IsServer && (string.IsNullOrEmpty(currentMapName) || !currentMapName.Equals(value)))
-                Identity.RebuildSubscribers(false);
-            currentMapName = value;
-        }
-    }
-    public Vector3 CurrentPosition { get; set; }
+    public string CurrentMapName { get; set; }
+    public Vector3 CurrentPosition { get { return TempTransform.position; } set { TempTransform.position = value; } }
     public string RespawnMapName { get; set; }
     public Vector3 RespawnPosition { get; set; }
     public int LastUpdate { get; set; }
@@ -113,12 +91,23 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         get { return nonEquipItems; }
         set
         {
+            var gameInstance = GameInstance.Singleton;
             nonEquipItems.Clear();
+            var countItem = 0;
             foreach (var entry in value)
-                nonEquipItems.Add(entry);
+            {
+                if (countItem < gameInstance.inventorySize)
+                    nonEquipItems.Add(entry);
+                ++countItem;
+            }
+            for (var i = countItem; i < gameInstance.inventorySize; ++i)
+            {
+                nonEquipItems.Add(new CharacterItem());
+            }
         }
     }
 
+    #region Temp components
     private CapsuleCollider tempCapsuleCollider;
     public CapsuleCollider TempCapsuleCollider
     {
@@ -152,11 +141,8 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
 
-    public virtual Vector3 WorldPosition
-    {
-        get { return TempTransform.position; }
-        set { TempTransform.position = value; }
-    }
+    public FollowCameraControls TempFollowCameraControls { get; protected set; }
+    #endregion
 
     protected virtual void Awake()
     {
@@ -165,48 +151,18 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected virtual void Start()
     {
-        if (IsServer)
-        {
-            var loadedMaps = TempManager.TempLoadGameMaps.LoadedMaps;
-            // Setup current map and position
-            if (loadedMaps.ContainsKey(CurrentMapName))
-            {
-                currentMapEntity = loadedMaps[CurrentMapName];
-                WorldPosition = currentMapEntity.ConvertLocalPositionToWorld(CurrentPosition);
-            }
-            else
-            {
-                Debug.LogWarning("Cannot find character's map [" + CurrentMapName + "]");
-                // If no map found try to spawn character at any maps
-                var gameMapValues = new List<GameMapEntity>(loadedMaps.Values);
-                CurrentMapName = gameMapValues[Random.Range(0, gameMapValues.Count - 1)].MapName;
-                currentMapEntity = loadedMaps[CurrentMapName];
-                RaycastHit rayHit;
-                if (Physics.Raycast(currentMapEntity.MapOffsets + (Vector3.up * currentMapEntity.MapExtents.y), Vector3.down, out rayHit, currentMapEntity.MapExtents.y * 2))
-                {
-                    WorldPosition = rayHit.point;
-                    CurrentPosition = currentMapEntity.ConvertWorldPositionToLocal(WorldPosition);
-                }
-            }
-        }
-
+        var gameInstance = GameInstance.Singleton;
         if (IsLocalClient)
+        {
             TempCharacterMovement.enabled = true;
+            TempFollowCameraControls = Instantiate(gameInstance.gameplayCameraPrefab);
+            TempFollowCameraControls.target = TempTransform;
+        }
     }
 
     protected virtual void Update()
     {
         // Use this to update animations
-    }
-
-    protected virtual void FixedUpdate()
-    {
-        if (IsServer)
-            CurrentPosition = currentMapEntity.ConvertWorldPositionToLocal(WorldPosition);
-    }
-
-    protected virtual void OnDestroy()
-    {
     }
 
     public override void OnBehaviourValidate()
@@ -220,94 +176,202 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     public override void OnSetup()
     {
         SetupNetElements();
+        netFuncPickupItem = new LiteNetLibFunction<NetFieldUInt>(NetFuncPickupItemCallback);
+        netFuncDropItem = new LiteNetLibFunction<NetFieldInt, NetFieldInt>(NetFuncDropItemCallback);
+        netFuncSwapOrMergeItem = new LiteNetLibFunction<NetFieldInt, NetFieldInt>(NetFuncSwapOrMergeItemCallback);
+        RegisterNetFunction("PickupItem", netFuncPickupItem);
+        RegisterNetFunction("DropItem", netFuncDropItem);
+        RegisterNetFunction("SwapOrMergeItem", netFuncSwapOrMergeItem);
     }
 
-    public void Warp(string mapName, Vector3 position)
+    #region Net functions callbacks
+    protected void NetFuncPickupItemCallback(NetFieldUInt objectId)
     {
-        if (!IsServer)
+        var gameInstance = GameInstance.Singleton;
+        var spawnedObjects = Manager.Assets.SpawnedObjects;
+        // Find object by objectId, if not found don't continue
+        if (!Manager.Assets.SpawnedObjects.ContainsKey(objectId))
             return;
-
-        var loadedMaps = TempManager.TempLoadGameMaps.LoadedMaps;
-        if (!loadedMaps.ContainsKey(mapName))
+        var spawnedObject = spawnedObjects[objectId];
+        // Don't pickup item if it's too far
+        if (Vector3.Distance(TempTransform.position, spawnedObject.transform.position) >= gameInstance.pickUpItemDistance)
+            return;
+        var itemDropEntity = spawnedObject.GetComponent<ItemDropEntity>();
+        var itemDropData = itemDropEntity.dropData;
+        if (!itemDropData.IsValid)
         {
-            Debug.LogWarning("Cannot warp character to " + mapName + ", map not found.");
+            // Destroy item drop entity without item add because this is not valid
+            Manager.Assets.NetworkDestroy(objectId);
             return;
         }
+        var itemId = itemDropData.itemId;
+        var level = itemDropData.level;
+        var amount = itemDropData.amount;
+        if (IncreaseItems(itemId, level, amount))
+            Manager.Assets.NetworkDestroy(objectId);
+    }
 
-        // If warping to same map player does not have to reload new map data
-        if (mapName.Equals(CurrentMapName))
+    protected void NetFuncDropItemCallback(NetFieldInt index, NetFieldInt amount)
+    {
+        var gameInstance = GameInstance.Singleton;
+        if (index < 0 || index > nonEquipItems.Count)
+            return;
+        var nonEquipItem = nonEquipItems[index];
+        if (!nonEquipItem.IsValid || amount > nonEquipItem.amount)
+            return;
+        var itemId = nonEquipItem.itemId;
+        var level = nonEquipItem.level;
+        if (DecreaseItems(index, amount))
         {
-            if (!currentMapEntity.IsLocalPositionInMap(position))
+            var dropPosition = TempTransform.position + new Vector3(Random.value * gameInstance.dropDistance, 0, Random.value * gameInstance.dropDistance);
+            var identity = Manager.Assets.NetworkSpawn(gameInstance.itemDropEntityPrefab.gameObject, dropPosition);
+            var itemDropEntity = identity.GetComponent<ItemDropEntity>();
+            var dropData = new CharacterItem();
+            dropData.itemId = itemId;
+            dropData.level = level;
+            dropData.amount = amount;
+            itemDropEntity.dropData = dropData;
+        }
+    }
+
+    protected void NetFuncSwapOrMergeItemCallback(NetFieldInt fromIndex, NetFieldInt toIndex)
+    {
+        if (fromIndex < 0 || fromIndex > nonEquipItems.Count ||
+            toIndex < 0 || toIndex > nonEquipItems.Count)
+            return;
+        var fromItem = nonEquipItems[fromIndex];
+        var toItem = nonEquipItems[toIndex];
+        if (!fromItem.IsValid || !toItem.IsValid)
+            return;
+        if (fromItem.itemId.Equals(toItem.itemId) && !fromItem.IsFull && !toItem.IsFull)
+        {
+            // Merge if same id and not full
+            var maxStack = toItem.MaxStack;
+            if (toItem.amount + fromItem.amount <= maxStack)
             {
-                Debug.LogWarning("Cannot warp character to " + mapName + " at " + position + ", position out of bound.");
-                return;
+                toItem.amount += fromItem.amount;
+                fromItem.Empty();
+                nonEquipItems[fromIndex] = fromItem;
+                nonEquipItems[toIndex] = toItem;
             }
-            CurrentPosition = position;
-            WorldPosition = currentMapEntity.ConvertLocalPositionToWorld(position);
+            else
+            {
+                var remains = toItem.amount + fromItem.amount - maxStack;
+                toItem.amount = maxStack;
+                fromItem.amount = remains;
+                nonEquipItems[fromIndex] = fromItem;
+                nonEquipItems[toIndex] = toItem;
+            }
         }
         else
         {
-            var newMap = loadedMaps[mapName];
-            if (!newMap.IsLocalPositionInMap(position))
-            {
-                Debug.LogWarning("Cannot warp character to " + mapName + " at " + position + ", position out of bound.");
-                return;
-            }
-            currentMapEntity = newMap;
-            CurrentMapName = mapName;
-            CurrentPosition = position;
-            WorldPosition = currentMapEntity.ConvertLocalPositionToWorld(position);
-            // If this is player, warp with messages that tell player to load new map
-            var player = Identity.Player;
-            if (player != null)
-            {
-                // Keep character data to pending character list, we'll use it after warped
-                TempManager.AddPendingCharacter(player.Peer, this);
-                // Set player to non ready to remove objects/subscribing to not receive objects data
-                TempManager.SetPlayerReady(player.Peer, false);
-                // Send new map data to client
-                TempManager.SendMapResultToPeer(player.Peer, mapName);
-            }
+            // Swap
+            nonEquipItems[fromIndex] = toItem;
+            nonEquipItems[toIndex] = fromItem;
+            nonEquipItems.Dirty(fromIndex);
+            nonEquipItems.Dirty(toIndex);
         }
     }
+    #endregion
 
-    #region Interest Management
-    public override bool ShouldAddSubscriber(LiteNetLibPlayer subscriber)
+    #region Net functions callers
+    public void PickupItem(uint objectId)
     {
-        var spawnedObjects = subscriber.SpawnedObjects.Values;
-        foreach (var spawnedObject in spawnedObjects)
-        {
-            var characterEntity = spawnedObject.GetComponent<CharacterEntity>();
-            if (characterEntity == null)
-                continue;
-            // There are some characters that have same map?, if yes return true
-            if (!string.IsNullOrEmpty(characterEntity.CurrentMapName) && 
-                characterEntity.CurrentMapName.Equals(CurrentMapName))
-                return true;
-        }
-        return false;
+        CallNetFunction("PickupItem", FunctionReceivers.Server, objectId);
     }
 
-    public override bool OnRebuildSubscribers(HashSet<LiteNetLibPlayer> subscribers, bool initialize)
+    public void DropItem(int index, int amount)
     {
-        var players = Manager.Players.Values;
-        foreach (var subscriber in players)
+        CallNetFunction("DropItem", FunctionReceivers.Server, index, amount);
+    }
+
+    public void SwapOrMergeItem(int fromIndex, int toIndex)
+    {
+        CallNetFunction("SwapOrMergeItem", FunctionReceivers.Server, fromIndex, toIndex);
+    }
+    #endregion
+
+    #region Inventory helpers
+    public bool IncreaseItems(string itemId, int level, int amount)
+    {
+        // If item not valid
+        if (string.IsNullOrEmpty(itemId) || amount <= 0 || !GameInstance.Items.ContainsKey(itemId))
+            return false;
+        var maxStack = GameInstance.Items[itemId].maxStack;
+        var emptySlots = new Dictionary<int, CharacterItem>();
+        var changes = new Dictionary<int, CharacterItem>();
+        // Loop to all slots to add amount to any slots that item amount not max in stack
+        for (var i = 0; i < nonEquipItems.Count; ++i)
         {
-            var spawnedObjects = subscriber.SpawnedObjects.Values;
-            foreach (var spawnedObject in spawnedObjects)
+            var nonEquipItem = nonEquipItems[i];
+            if (!nonEquipItem.IsValid)
+                emptySlots[i] = nonEquipItem;
+            else if (nonEquipItem.itemId.Equals(itemId))
             {
-                var characterEntity = spawnedObject.GetComponent<CharacterEntity>();
-                if (characterEntity == null)
-                    continue;
-                // There are some characters that have same map?, if yes add to new subscribers list
-                if (characterEntity != null && 
-                    !string.IsNullOrEmpty(characterEntity.CurrentMapName) && 
-                    characterEntity.CurrentMapName.Equals(CurrentMapName))
+                if (nonEquipItem.amount + amount <= maxStack)
                 {
-                    subscribers.Add(subscriber);
+                    nonEquipItem.amount += amount;
+                    changes[i] = nonEquipItem;
+                    amount = 0;
                     break;
                 }
+                else if (maxStack - nonEquipItem.amount > 0)
+                {
+                    amount = maxStack - nonEquipItem.amount;
+                    nonEquipItem.amount = amount;
+                    changes[i] = nonEquipItem;
+                }
             }
+        }
+        if (changes.Count == 0 && emptySlots.Count > 0)
+        {
+            foreach (var emptySlot in emptySlots)
+            {
+                var value = emptySlot.Value;
+                var newItem = new CharacterItem();
+                newItem.id = System.Guid.NewGuid().ToString();
+                newItem.itemId = itemId;
+                var addAmount = 0;
+                if (amount - maxStack >= 0)
+                {
+                    addAmount = maxStack;
+                    amount -= maxStack;
+                }
+                else
+                {
+                    addAmount = amount;
+                    amount = 0;
+                }
+                newItem.amount = addAmount;
+                changes[emptySlot.Key] = newItem;
+            }
+        }
+        // Cannot add all items
+        if (amount > 0)
+            return false;
+        // Apply all changes
+        foreach (var change in changes)
+        {
+            nonEquipItems[change.Key] = change.Value;
+            nonEquipItems.Dirty(change.Key);
+        }
+        return true;
+    }
+    
+    public bool DecreaseItems(int index, int amount)
+    {
+        if (index < 0 || index > nonEquipItems.Count)
+            return false;
+        var nonEquipItem = nonEquipItems[index];
+        if (!nonEquipItem.IsValid || amount > nonEquipItem.amount)
+            return false;
+        if (nonEquipItem.amount - amount == 0)
+            nonEquipItems.RemoveAt(index);
+        else
+        {
+            nonEquipItem.amount -= amount;
+            nonEquipItems[index] = nonEquipItem;
+            nonEquipItems.Dirty(index);
         }
         return true;
     }
@@ -318,6 +382,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         id.sendOptions = SendOptions.ReliableOrdered;
         characterName.sendOptions = SendOptions.ReliableOrdered;
         prototypeId.sendOptions = SendOptions.ReliableOrdered;
+        prototypeId.onChange += OnPrototypeIdChange;
         level.sendOptions = SendOptions.ReliableOrdered;
         exp.sendOptions = SendOptions.ReliableOrdered;
         currentHp.sendOptions = SendOptions.ReliableOrdered;
@@ -329,5 +394,34 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         gold.sendOptions = SendOptions.ReliableOrdered;
         skillLevels.forOwnerOnly = true;
         nonEquipItems.forOwnerOnly = true;
+    }
+
+    protected void OnPrototypeIdChange(string prototypeId)
+    {
+        // Setup model
+        if (model != null)
+            Destroy(model.gameObject);
+        model = this.InstantiateModel(transform);
+        TempCapsuleCollider.center = model.center;
+        TempCapsuleCollider.radius = model.radius;
+        TempCapsuleCollider.height = model.height;
+    }
+
+    public void Warp(string mapName, Vector3 position)
+    {
+        if (!IsServer)
+            return;
+
+        // If warping to same map player does not have to reload new map data
+        if (string.IsNullOrEmpty(mapName) || mapName.Equals(CurrentMapName))
+        {
+            CurrentPosition = position;
+            return;
+        }
+    }
+
+    protected virtual void OnDestroy()
+    {
+        prototypeId.onChange -= OnPrototypeIdChange;
     }
 }

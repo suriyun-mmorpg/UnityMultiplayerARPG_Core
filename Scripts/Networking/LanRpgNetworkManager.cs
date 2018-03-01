@@ -8,9 +8,44 @@ using LiteNetLib.Utils;
 
 public class LanRpgNetworkManager : BaseRpgNetworkManager
 {
-    public static CharacterData SelectedCharacter;
+    public enum GameStartType
+    {
+        Client,
+        Host,
+        SinglePlayer,
+    }
 
-    protected override void SerializeCharacterRequest(NetDataWriter writer)
+    public static GameStartType StartType;
+    public static string ConnectingNetworkAddress;
+    public static int ConnectingNetworkPort;
+    public static CharacterData SelectedCharacter;
+    
+    protected virtual void Start()
+    {
+        switch (StartType)
+        {
+            case GameStartType.Host:
+                StartHost();
+                break;
+            case GameStartType.SinglePlayer:
+                maxConnections = 1;
+                StartHost();
+                break;
+            case GameStartType.Client:
+                networkAddress = ConnectingNetworkAddress;
+                networkPort = ConnectingNetworkPort;
+                StartClient();
+                break;
+        }
+    }
+
+    public override void OnClientDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
+    {
+        base.OnClientDisconnected(peer, disconnectInfo);
+        UISceneLoading.Singleton.LoadScene(GameInstance.Singleton.homeSceneName);
+    }
+
+    public override void SerializeClientReadyExtra(NetDataWriter writer)
     {
         writer.Put(SelectedCharacter.Id);
         writer.Put(SelectedCharacter.CharacterName);
@@ -61,7 +96,7 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
         }
     }
 
-    protected override CharacterData DeserializeCharacterRequest(NetPeer peer, NetDataReader reader)
+    public override void DeserializeClientReadyExtra(LiteNetLibIdentity playerIdentity, NetDataReader reader)
     {
         var character = new CharacterData();
         character.Id = reader.GetString();
@@ -116,6 +151,7 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
             entry.amount = reader.GetInt();
             character.NonEquipItems.Add(entry);
         }
-        return character;
+        var characterEntity = playerIdentity.GetComponent<CharacterEntity>();
+        character.CloneTo(characterEntity);
     }
 }
