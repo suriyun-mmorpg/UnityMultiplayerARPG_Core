@@ -42,7 +42,6 @@ public class GameInstance : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         Singleton = this;
         
-        ClientScene.RegisterPrefab(characterEntityPrefab.gameObject);
         AddGameMaps(gameMaps);
         AddCharacterPrototypes(characterPrototypes);
         AddItems(items);
