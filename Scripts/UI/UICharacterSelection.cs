@@ -109,7 +109,7 @@ public class UICharacterSelection : UIBase
         var characterData = new CharacterData();
         selectedUI.data.CloneTo(characterData);
         LanRpgNetworkManager.SelectedCharacter = characterData;
-        SceneManager.LoadScene(GameInstance.Singleton.gameplaySceneName, LoadSceneMode.Single);
+        UISceneLoading.Singleton.LoadScene(GameInstance.Singleton.startSceneName);
     }
 
     public virtual void OnClickDelete()

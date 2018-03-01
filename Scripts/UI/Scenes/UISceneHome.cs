@@ -9,7 +9,7 @@ public class UISceneHome : UIHistory
 
     public void OnClickSinglePlayer()
     {
-        BaseRpgNetworkManager.StartType = BaseRpgNetworkManager.GameStartType.SinglePlayer;
+        LanRpgNetworkManager.StartType = LanRpgNetworkManager.GameStartType.SinglePlayer;
         Next(uiCharacterSelection);
     }
 
