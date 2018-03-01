@@ -97,7 +97,8 @@ public class UICharacterSelection : UIBase
 
     public virtual void OnClickStart()
     {
-        if (SelectionManager.SelectedUI == null)
+        var selectedUI = SelectionManager.SelectedUI;
+        if (selectedUI == null)
         {
             UISceneGlobal.Singleton.ShowMessageDialog("Cannot start game", "Please choose character to start game");
             Debug.LogWarning("Cannot start game, No chosen character");
@@ -105,6 +106,9 @@ public class UICharacterSelection : UIBase
         }
         // Load gameplay scene, we're going to manage maps in gameplay scene later
         // So we can add gameplay UI just once in gameplay scene
+        var characterData = new CharacterData();
+        selectedUI.data.CloneTo(characterData);
+        LanRpgNetworkManager.SelectedCharacter = characterData;
         SceneManager.LoadScene(GameInstance.Singleton.gameplaySceneName, LoadSceneMode.Single);
     }
 
