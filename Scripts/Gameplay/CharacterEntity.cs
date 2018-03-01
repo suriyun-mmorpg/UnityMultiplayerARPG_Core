@@ -7,10 +7,11 @@ using LiteNetLibHighLevel;
 using UnityEditor;
 #endif
 
+[RequireComponent(typeof(CapsuleCollider))]
+[RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(CharacterMovement))]
-public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
+public class CharacterEntity : RpgNetworkEntity, ICharacterData
 {
-    public const float UPDATE_CURRENT_MAP_INTERVAL = 1f;
     // Use id as primary key
     [Header("Sync Fields")]
     public SyncFieldString id = new SyncFieldString();
@@ -33,8 +34,6 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
     #region Protected data
     // Entity data
     protected CharacterModel model;
-    protected bool isSetup;
-    protected float lastUpdateCurrentMapTime;
     protected GameMapEntity currentMapEntity;
     // Save data
     protected string currentMapName;
@@ -52,8 +51,9 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
             if (model != null)
                 Destroy(model.gameObject);
             model = this.InstantiateModel(transform);
-            // Wake up rigidbody
-            TempRigidbody.WakeUp();
+            TempCapsuleCollider.center = model.center;
+            TempCapsuleCollider.radius = model.radius;
+            TempCapsuleCollider.height = model.height;
         }
     }
     public int Level { get { return level.Value; } set { level.Value = value; } }
@@ -68,7 +68,7 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
         get { return currentMapName; }
         set
         {
-            if (isSetup && IsServer && !currentMapName.Equals(value))
+            if (IsServer && (string.IsNullOrEmpty(currentMapName) || !currentMapName.Equals(value)))
                 Identity.RebuildSubscribers(false);
             currentMapName = value;
         }
@@ -119,14 +119,14 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
         }
     }
 
-    private Transform tempTransform;
-    public Transform TempTransform
+    private CapsuleCollider tempCapsuleCollider;
+    public CapsuleCollider TempCapsuleCollider
     {
         get
         {
-            if (tempTransform == null)
-                tempTransform = GetComponent<Transform>();
-            return tempTransform;
+            if (tempCapsuleCollider == null)
+                tempCapsuleCollider = GetComponent<CapsuleCollider>();
+            return tempCapsuleCollider;
         }
     }
 
@@ -152,17 +152,6 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
         }
     }
 
-    private BaseRpgNetworkManager tempManager;
-    public BaseRpgNetworkManager TempManager
-    {
-        get
-        {
-            if (tempManager == null)
-                tempManager = Manager as BaseRpgNetworkManager;
-            return tempManager;
-        }
-    }
-
     public virtual Vector3 WorldPosition
     {
         get { return TempTransform.position; }
@@ -172,29 +161,52 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
     protected virtual void Awake()
     {
         TempCharacterMovement.enabled = false;
-        TempRigidbody.Sleep();
+    }
 
-        prototypeId.onChange += OnPrototypeIdChange;
+    protected virtual void Start()
+    {
+        if (IsServer)
+        {
+            var loadedMaps = TempManager.TempLoadGameMaps.LoadedMaps;
+            // Setup current map and position
+            if (loadedMaps.ContainsKey(CurrentMapName))
+            {
+                currentMapEntity = loadedMaps[CurrentMapName];
+                WorldPosition = currentMapEntity.ConvertLocalPositionToWorld(CurrentPosition);
+            }
+            else
+            {
+                Debug.LogWarning("Cannot find character's map [" + CurrentMapName + "]");
+                // If no map found try to spawn character at any maps
+                var gameMapValues = new List<GameMapEntity>(loadedMaps.Values);
+                CurrentMapName = gameMapValues[Random.Range(0, gameMapValues.Count - 1)].MapName;
+                currentMapEntity = loadedMaps[CurrentMapName];
+                RaycastHit rayHit;
+                if (Physics.Raycast(currentMapEntity.MapOffsets + (Vector3.up * currentMapEntity.MapExtents.y), Vector3.down, out rayHit, currentMapEntity.MapExtents.y * 2))
+                {
+                    WorldPosition = rayHit.point;
+                    CurrentPosition = currentMapEntity.ConvertWorldPositionToLocal(WorldPosition);
+                }
+            }
+        }
+
+        if (IsLocalClient)
+            TempCharacterMovement.enabled = true;
     }
 
     protected virtual void Update()
     {
-        if (!isSetup)
-            return;
+        // Use this to update animations
+    }
 
+    protected virtual void FixedUpdate()
+    {
         if (IsServer)
-        {
-            if (Time.realtimeSinceStartup - lastUpdateCurrentMapTime >= UPDATE_CURRENT_MAP_INTERVAL)
-            {
-                ConvertWorldToSavePosition();
-                lastUpdateCurrentMapTime = Time.realtimeSinceStartup;
-            }
-        }
+            CurrentPosition = currentMapEntity.ConvertWorldPositionToLocal(WorldPosition);
     }
 
     protected virtual void OnDestroy()
     {
-        prototypeId.onChange -= OnPrototypeIdChange;
     }
 
     public override void OnBehaviourValidate()
@@ -208,52 +220,58 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
     public override void OnSetup()
     {
         SetupNetElements();
-        if (IsLocalClient)
-            TempCharacterMovement.enabled = true;
-
-        if (IsServer)
-        {
-            ConvertSaveToWorldPosition();
-            lastUpdateCurrentMapTime = Time.realtimeSinceStartup;
-        }
-        isSetup = true;
     }
 
-    protected void ConvertWorldToSavePosition()
+    public void Warp(string mapName, Vector3 position)
     {
-        // Convert world position to save position
-        if (!currentMapEntity.IsInMap(WorldPosition))
-        {
-            currentMapEntity = TempManager.TempLoadGameMaps.GetMapByWorldPosition(WorldPosition);
-            CurrentMapName = currentMapEntity.SceneName;
-        }
-        CurrentPosition = WorldPosition - currentMapEntity.MapOffsets;
-    }
+        if (!IsServer)
+            return;
 
-    protected void ConvertSaveToWorldPosition()
-    {
-        // Convert save position to world position
-        if (TempManager.TempLoadGameMaps.LoadedMaps.ContainsKey(CurrentMapName))
+        var loadedMaps = TempManager.TempLoadGameMaps.LoadedMaps;
+        if (!loadedMaps.ContainsKey(mapName))
         {
-            currentMapEntity = TempManager.TempLoadGameMaps.LoadedMaps[CurrentMapName];
-            WorldPosition = CurrentPosition + currentMapEntity.MapOffsets;
+            Debug.LogWarning("Cannot warp character to " + mapName + ", map not found.");
+            return;
+        }
+
+        // If warping to same map player does not have to reload new map data
+        if (mapName.Equals(CurrentMapName))
+        {
+            if (!currentMapEntity.IsLocalPositionInMap(position))
+            {
+                Debug.LogWarning("Cannot warp character to " + mapName + " at " + position + ", position out of bound.");
+                return;
+            }
+            CurrentPosition = position;
+            WorldPosition = currentMapEntity.ConvertLocalPositionToWorld(position);
         }
         else
         {
-            Debug.LogWarning("Cannot find character's map [" + CurrentMapName + "]");
-            // If no map found try to spawn character at any maps
-            var gameMapValues = new List<GameMapEntity>(TempManager.TempLoadGameMaps.LoadedMaps.Values);
-            CurrentMapName = gameMapValues[Random.Range(0, gameMapValues.Count - 1)].SceneName;
-            currentMapEntity = TempManager.TempLoadGameMaps.LoadedMaps[CurrentMapName];
-            RaycastHit rayHit;
-            if (Physics.Raycast(currentMapEntity.MapOffsets + (Vector3.up * currentMapEntity.MapBounds.size.y / 2), Vector3.down, out rayHit, currentMapEntity.MapBounds.size.y))
+            var newMap = loadedMaps[mapName];
+            if (!newMap.IsLocalPositionInMap(position))
             {
-                WorldPosition = rayHit.point;
-                CurrentPosition = WorldPosition - currentMapEntity.MapOffsets;
+                Debug.LogWarning("Cannot warp character to " + mapName + " at " + position + ", position out of bound.");
+                return;
+            }
+            currentMapEntity = newMap;
+            CurrentMapName = mapName;
+            CurrentPosition = position;
+            WorldPosition = currentMapEntity.ConvertLocalPositionToWorld(position);
+            // If this is player, warp with messages that tell player to load new map
+            var player = Identity.Player;
+            if (player != null)
+            {
+                // Keep character data to pending character list, we'll use it after warped
+                TempManager.AddPendingCharacter(player.Peer, this);
+                // Set player to non ready to remove objects/subscribing to not receive objects data
+                TempManager.SetPlayerReady(player.Peer, false);
+                // Send new map data to client
+                TempManager.SendMapResultToPeer(player.Peer, mapName);
             }
         }
     }
 
+    #region Interest Management
     public override bool ShouldAddSubscriber(LiteNetLibPlayer subscriber)
     {
         var spawnedObjects = subscriber.SpawnedObjects.Values;
@@ -263,7 +281,8 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
             if (characterEntity == null)
                 continue;
             // There are some characters that have same map?, if yes return true
-            if (characterEntity.CurrentMapName.Equals(CurrentMapName))
+            if (!string.IsNullOrEmpty(characterEntity.CurrentMapName) && 
+                characterEntity.CurrentMapName.Equals(CurrentMapName))
                 return true;
         }
         return false;
@@ -281,7 +300,9 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
                 if (characterEntity == null)
                     continue;
                 // There are some characters that have same map?, if yes add to new subscribers list
-                if (characterEntity != null && characterEntity.CurrentMapName.Equals(CurrentMapName))
+                if (characterEntity != null && 
+                    !string.IsNullOrEmpty(characterEntity.CurrentMapName) && 
+                    characterEntity.CurrentMapName.Equals(CurrentMapName))
                 {
                     subscribers.Add(subscriber);
                     break;
@@ -290,6 +311,7 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
         }
         return true;
     }
+    #endregion
 
     private void SetupNetElements()
     {
@@ -308,11 +330,4 @@ public class CharacterEntity : LiteNetLibBehaviour, ICharacterData
         skillLevels.forOwnerOnly = true;
         nonEquipItems.forOwnerOnly = true;
     }
-
-    #region SyncVar Hooks
-    protected virtual void OnPrototypeIdChange(string prototypeId)
-    {
-        PrototypeId = prototypeId;
-    }
-    #endregion
 }
