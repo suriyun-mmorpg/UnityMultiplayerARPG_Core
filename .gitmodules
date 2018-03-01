@@ -1,3 +1,6 @@
 [submodule "LiteNetLibManager"]
 	path = LiteNetLibManager
 	url = https://github.com/insthync/LiteNetLibManager.git
+[submodule "CameraAndInput"]
+	path = CameraAndInput
+	url = https://github.com/insthync/unity-camera-and-input.git
