@@ -402,9 +402,12 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         if (model != null)
             Destroy(model.gameObject);
         model = this.InstantiateModel(transform);
-        TempCapsuleCollider.center = model.center;
-        TempCapsuleCollider.radius = model.radius;
-        TempCapsuleCollider.height = model.height;
+        if (model != null)
+        {
+            TempCapsuleCollider.center = model.center;
+            TempCapsuleCollider.radius = model.radius;
+            TempCapsuleCollider.height = model.height;
+        }
     }
 
     public void Warp(string mapName, Vector3 position)
