@@ -9,11 +9,24 @@ public enum WeaponItemEquipType : byte
     TwoHand,
 }
 
+[CreateAssetMenu(fileName = "WeaponItem", menuName = "Create GameData/WeaponItem")]
 public class WeaponItem : EquipmentItem
 {
+    public float attackRange;
+    public DamageEntity damageEntityPrefab;
     public DamageAmount[] damages;
     public DamageEffectivenessAttribute[] effectivenessAttributes;
     public WeaponItemEquipType equipType;
+
+    public DamageEntity DamageEntityPrefab
+    {
+        get
+        {
+            if (damageEntityPrefab == null)
+                return GameInstance.Singleton.damageEntityPrefab;
+            return damageEntityPrefab;
+        }
+    }
 
 #if UNITY_EDITOR
     protected override void OnValidate()

@@ -10,6 +10,7 @@ public class Skill : BaseGameData
     public float coolDown;
     [Header("Attack")]
     public bool isAttack;
+    public DamageEntity damageEntityPrefab;
     public DamageAmount[] damages;
     [Header("Buffs")]
     public bool isBuff;
@@ -18,6 +19,16 @@ public class Skill : BaseGameData
     public CharacterStats baseStats;
     public CharacterStats statsIncreaseEachLevel;
     public CharacterStatsPercentage statsPercentageIncreaseEachLevel;
+
+    public DamageEntity DamageEntityPrefab
+    {
+        get
+        {
+            if (damageEntityPrefab == null)
+                return GameInstance.Singleton.damageEntityPrefab;
+            return damageEntityPrefab;
+        }
+    }
 }
 
 [System.Serializable]
