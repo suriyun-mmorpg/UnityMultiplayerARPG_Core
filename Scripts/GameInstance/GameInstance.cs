@@ -178,11 +178,12 @@ public class GameInstance : MonoBehaviour
                 }
                 AddCharacterAttributes(attributes);
                 var damages = new List<Damage>();
-                foreach (var damage in weaponItem.damages)
+                var tempDamageAmounts = weaponItem.TempDamageAmounts.Values;
+                foreach (var tempDamageAmount in tempDamageAmounts)
                 {
-                    if (damage == null || damage.damage == null || Damages.ContainsKey(damage.damage.Id))
+                    if (tempDamageAmount == null || tempDamageAmount.damage == null || Damages.ContainsKey(tempDamageAmount.damage.Id))
                         continue;
-                    damages.Add(damage.damage);
+                    damages.Add(tempDamageAmount.damage);
                 }
                 AddDamages(damages);
                 AddDamageEntities(new DamageEntity[] { weaponItem.DamageEntityPrefab });
@@ -198,11 +199,12 @@ public class GameInstance : MonoBehaviour
                 continue;
             Skills[skill.Id] = skill;
             var damages = new List<Damage>();
-            foreach (var damage in skill.damages)
+            var tempDamageAmounts = skill.TempDamageAmounts.Values;
+            foreach (var tempDamageAmount in tempDamageAmounts)
             {
-                if (damage == null || damage.damage == null || Damages.ContainsKey(damage.damage.Id))
+                if (tempDamageAmount == null || tempDamageAmount.damage == null || Damages.ContainsKey(tempDamageAmount.damage.Id))
                     continue;
-                damages.Add(damage.damage);
+                damages.Add(tempDamageAmount.damage);
             }
             AddDamages(damages);
             AddDamageEntities(new DamageEntity[] { skill.DamageEntityPrefab });

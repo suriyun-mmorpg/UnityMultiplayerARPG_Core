@@ -14,6 +14,28 @@ public struct CharacterAttributeLevel
     {
         get { return GameInstance.CharacterAttributes.ContainsKey(attributeId) ? GameInstance.CharacterAttributes[attributeId] : null; }
     }
+
+    public CharacterStats Stats
+    {
+        get
+        {
+            var attribute = Attribute;
+            if (attribute == null)
+                return new CharacterStats();
+            return attribute.statsIncreaseEachLevel * amount;
+        }
+    }
+
+    public CharacterStatsPercentage StatsPercentage
+    {
+        get
+        {
+            var attribute = Attribute;
+            if (attribute == null)
+                return new CharacterStatsPercentage();
+            return attribute.statsPercentageIncreaseEachLevel * amount;
+        }
+    }
 }
 
 public class NetFieldCharacterAttributeLevel : LiteNetLibNetField<CharacterAttributeLevel>

@@ -23,6 +23,16 @@ public struct CharacterItem
         get { return Item != null ? Item as EquipmentItem : null; }
     }
 
+    public WeaponItem WeaponItem
+    {
+        get { return Item != null ? Item as WeaponItem : null; }
+    }
+
+    public ShieldItem ShieldItem
+    {
+        get { return Item != null ? Item as ShieldItem : null; }
+    }
+
     public int MaxStack
     {
         get { return Item.maxStack; }
@@ -36,6 +46,28 @@ public struct CharacterItem
     public bool IsFull
     {
         get { return amount == MaxStack; }
+    }
+
+    public CharacterStats Stats
+    {
+        get
+        {
+            var equipmentItem = EquipmentItem;
+            if (equipmentItem == null)
+                return new CharacterStats();
+            return equipmentItem.baseStats + equipmentItem.statsIncreaseEachLevel * level;
+        }
+    }
+
+    public CharacterStatsPercentage StatsPercentage
+    {
+        get
+        {
+            var equipmentItem = EquipmentItem;
+            if (equipmentItem == null)
+                return new CharacterStatsPercentage();
+            return equipmentItem.statsPercentageIncreaseEachLevel * level;
+        }
     }
 
     public void Empty()

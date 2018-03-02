@@ -11,7 +11,7 @@ public class Skill : BaseGameData
     [Header("Attack")]
     public bool isAttack;
     public DamageEntity damageEntityPrefab;
-    public DamageAmount[] damages;
+    public DamageAmount[] damageAmounts;
     [Header("Buffs")]
     public bool isBuff;
     [Tooltip("`buffDistance` = 0, will buff only caster")]
@@ -27,6 +27,24 @@ public class Skill : BaseGameData
             if (damageEntityPrefab == null)
                 return GameInstance.Singleton.damageEntityPrefab;
             return damageEntityPrefab;
+        }
+    }
+
+    private Dictionary<string, DamageAmount> tempDamageAmounts;
+    public Dictionary<string, DamageAmount> TempDamageAmounts
+    {
+        get
+        {
+            if (tempDamageAmounts == null)
+            {
+                tempDamageAmounts = new Dictionary<string, DamageAmount>();
+                foreach (var damageAmount in damageAmounts)
+                {
+                    var id = damageAmount.damage == null ? GameDataConst.DEFAULT_DAMAGE_ID : damageAmount.damage.Id;
+                    tempDamageAmounts[id] = damageAmount;
+                }
+            }
+            return tempDamageAmounts;
         }
     }
 }

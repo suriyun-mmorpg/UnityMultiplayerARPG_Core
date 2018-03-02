@@ -205,7 +205,7 @@ public static class CharacterDataExtension
                 Debug.LogError("Attribute: " + attributeLevel.attributeId + " owned by " + id + " is invalid data");
                 continue;
             }
-            result += attributeLevel.Attribute.statsIncreaseEachLevel * attributeLevel.amount;
+            result += attributeLevel.Stats;
         }
         foreach (var equipment in equipItems)
         {
@@ -214,8 +214,7 @@ public static class CharacterDataExtension
                 Debug.LogError("Item: " + equipment.id + " owned by " + id + " is not equipment");
                 continue;
             }
-            result += equipment.EquipmentItem.baseStats;
-            result += equipment.EquipmentItem.statsIncreaseEachLevel * equipment.level;
+            result += equipment.Stats;
         }
         return result;
     }
@@ -235,7 +234,7 @@ public static class CharacterDataExtension
                 Debug.LogError("Attribute: " + attributeLevel.attributeId + " owned by " + id + " is invalid data");
                 continue;
             }
-            result += attributeLevel.Attribute.statsPercentageIncreaseEachLevel * attributeLevel.amount;
+            result += attributeLevel.StatsPercentage;
         }
         foreach (var equipment in equipItems)
         {
@@ -244,7 +243,7 @@ public static class CharacterDataExtension
                 Debug.LogError("Item: " + equipment.id + " owned by " + id + " is not equipment");
                 continue;
             }
-            result += equipment.EquipmentItem.statsPercentageIncreaseEachLevel * equipment.level;
+            result += equipment.StatsPercentage;
         }
         return result;
     }
@@ -263,6 +262,23 @@ public static class CharacterDataExtension
     public static int GetMaxMp(this ICharacterData data)
     {
         return (int)data.GetStatsWithoutBuffs().mp;
+    }
+
+    public static List<WeaponItem> GetWeapons(this ICharacterData data)
+    {
+        var result = new List<WeaponItem>();
+        var equipItems = data.EquipItems;
+        foreach (var equipItem in equipItems)
+        {
+            if (!equipItem.IsValid)
+                continue;
+            var weaponItem = equipItem.WeaponItem;
+            if (weaponItem != null)
+                result.Add(weaponItem);
+        }
+        if (result.Count == 0)
+            result.Add(GameInstance.Singleton.defaultWeaponItem);
+        return result;
     }
 
     public static void SavePersistentCharacterData<T>(this T characterData) where T : ICharacterData

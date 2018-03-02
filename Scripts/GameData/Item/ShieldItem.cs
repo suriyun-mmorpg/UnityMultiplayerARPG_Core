@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[CreateAssetMenu(fileName = "ShieldItem", menuName = "Create GameData/ShieldItem")]
 public class ShieldItem : EquipmentItem
 {
 #if UNITY_EDITOR

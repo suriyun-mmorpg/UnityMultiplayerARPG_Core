@@ -11,6 +11,7 @@ public class Damage : BaseGameData
 [System.Serializable]
 public class DamageAmount
 {
+    [Tooltip("You can leave Damage to be empty to make it as physical damage which won't calculate with resistance stats")]
     public Damage damage;
     public float minDamage;
     public float maxDamage;
