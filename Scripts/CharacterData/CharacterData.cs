@@ -155,17 +155,24 @@ public static class CharacterDataExtension
 
     public static CharacterPrototype GetPrototype(this ICharacterData data)
     {
+        if (string.IsNullOrEmpty(data.PrototypeId))
+            return null;
         return GameInstance.CharacterPrototypes[data.PrototypeId];
     }
 
     public static CharacterClass GetClass(this ICharacterData data)
     {
-        return data.GetPrototype().characterClass;
+        var prototype = data.GetPrototype();
+        if (prototype == null)
+            return null;
+        return prototype.characterClass;
     }
 
     public static CharacterModel InstantiateModel(this ICharacterData data, Transform parent)
     {
         var prototype = data.GetPrototype();
+        if (prototype == null)
+            return null;
         var result = Object.Instantiate(prototype.characterModel, parent);
         result.gameObject.SetActive(true);
         result.transform.localPosition = Vector3.zero;
@@ -176,7 +183,7 @@ public static class CharacterDataExtension
     {
         var level = data.Level;
         var expTree = GameInstance.Singleton.expTree;
-        if (level > expTree.Count)
+        if (level > expTree.Length)
             return 0;
         return expTree[level - 1];
     }
