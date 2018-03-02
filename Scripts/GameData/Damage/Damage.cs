@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[CreateAssetMenu(fileName = "Damage", menuName = "Create GameData/Damage")]
 public class Damage : BaseGameData
 {
     // TODO: Resistance
