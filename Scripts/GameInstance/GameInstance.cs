@@ -9,15 +9,19 @@ using UnityEditor;
 public class GameInstance : MonoBehaviour
 {
     public static GameInstance Singleton { get; protected set; }
+    public BaseGameInstanceExtra extra;
     [Header("Gameplay Objects")]
     public CharacterEntity characterEntityPrefab;
+    public DamageEntity damageEntityPrefab;
     public ItemDropEntity itemDropEntityPrefab;
     public FollowCameraControls gameplayCameraPrefab;
     [Header("Gameplay Database")]
-    public List<CharacterPrototype> characterPrototypes;
-    public List<Item> items;
-    public List<Skill> skills;
-    public List<int> expTree;
+    [Tooltip("Default weapon item, will be used when character not equip any weapon")]
+    public WeaponItem defaultWeaponItem;
+    public CharacterPrototype[] characterPrototypes;
+    public Item[] items;
+    public Skill[] skills;
+    public int[] expTree;
     [Header("Gameplay Configs")]
     public int increaseStatPointEachLevel = 5;
     public int increaseSkillPointEachLevel = 1;
@@ -36,11 +40,13 @@ public class GameInstance : MonoBehaviour
     public static readonly Dictionary<string, CharacterClass> CharacterClasses = new Dictionary<string, CharacterClass>();
     public static readonly Dictionary<string, CharacterPrototype> CharacterPrototypes = new Dictionary<string, CharacterPrototype>();
     public static readonly Dictionary<string, Damage> Damages = new Dictionary<string, Damage>();
+    public static readonly Dictionary<string, DamageEntity> DamageEntities = new Dictionary<string, DamageEntity>();
     public static readonly Dictionary<string, Item> Items = new Dictionary<string, Item>();
     public static readonly Dictionary<string, Skill> Skills = new Dictionary<string, Skill>();
 
     protected virtual void Awake()
     {
+        Application.runInBackground = true;
         if (Singleton != null)
         {
             Destroy(gameObject);
@@ -48,13 +54,41 @@ public class GameInstance : MonoBehaviour
         }
         DontDestroyOnLoad(gameObject);
         Singleton = this;
-        
+
+        if (characterEntityPrefab == null)
+        {
+            Debug.LogError("You must set character entity prefab");
+            return;
+        }
+        if (damageEntityPrefab == null)
+        {
+            Debug.LogError("You must set damage entity prefab");
+            return;
+        }
+        if (itemDropEntityPrefab == null)
+        {
+            Debug.LogError("You must set item drop entity prefab");
+            return;
+        }
+        if (gameplayCameraPrefab == null)
+        {
+            Debug.LogError("You must set gameplay camera prefab");
+            return;
+        }
+        if (defaultWeaponItem == null)
+        {
+            Debug.LogError("You must set default weapon item");
+            return;
+        }
+
         AddCharacterPrototypes(characterPrototypes);
+        AddDamageEntities(new DamageEntity[] { damageEntityPrefab });
+        AddItems(new Item[] { defaultWeaponItem });
         AddItems(items);
         AddSkills(skills);
     }
 
-    public static void AddCharacterAttributes(List<CharacterAttribute> characterAttributes)
+    public static void AddCharacterAttributes(IEnumerable<CharacterAttribute> characterAttributes)
     {
         foreach (var characterAttribute in characterAttributes)
         {
@@ -64,7 +98,7 @@ public class GameInstance : MonoBehaviour
         }
     }
 
-    public static void AddCharacterClasses(List<CharacterClass> characterClasses)
+    public static void AddCharacterClasses(IEnumerable<CharacterClass> characterClasses)
     {
         foreach (var characterClass in characterClasses)
         {
@@ -82,18 +116,18 @@ public class GameInstance : MonoBehaviour
         }
     }
 
-    public static void AddCharacterPrototypes(List<CharacterPrototype> characterPrototypes)
+    public static void AddCharacterPrototypes(IEnumerable<CharacterPrototype> characterPrototypes)
     {
         foreach (var characterPrototype in characterPrototypes)
         {
             if (characterPrototype == null || CharacterPrototypes.ContainsKey(characterPrototype.Id))
                 continue;
             CharacterPrototypes[characterPrototype.Id] = characterPrototype;
-            AddCharacterClasses(new List<CharacterClass>() { characterPrototype.characterClass });
+            AddCharacterClasses(new CharacterClass[] { characterPrototype.characterClass });
         }
     }
 
-    public static void AddDamages(List<Damage> damages)
+    public static void AddDamages(IEnumerable<Damage> damages)
     {
         foreach (var damage in damages)
         {
@@ -103,7 +137,17 @@ public class GameInstance : MonoBehaviour
         }
     }
 
-    public static void AddItems(List<Item> items)
+    public static void AddDamageEntities(IEnumerable<DamageEntity> damageEntities)
+    {
+        foreach (var damageEntity in damageEntities)
+        {
+            if (damageEntity == null || DamageEntities.ContainsKey(damageEntity.name))
+                continue;
+            DamageEntities[damageEntity.name] = damageEntity;
+        }
+    }
+
+    public static void AddItems(IEnumerable<Item> items)
     {
         foreach (var item in items)
         {
@@ -141,11 +185,12 @@ public class GameInstance : MonoBehaviour
                     damages.Add(damage.damage);
                 }
                 AddDamages(damages);
+                AddDamageEntities(new DamageEntity[] { weaponItem.DamageEntityPrefab });
             }
         }
     }
 
-    public static void AddSkills(List<Skill> skills)
+    public static void AddSkills(IEnumerable<Skill> skills)
     {
         foreach (var skill in skills)
         {
@@ -160,6 +205,12 @@ public class GameInstance : MonoBehaviour
                 damages.Add(damage.damage);
             }
             AddDamages(damages);
+            AddDamageEntities(new DamageEntity[] { skill.DamageEntityPrefab });
         }
+    }
+
+    public T GetExtra<T>() where T : BaseGameInstanceExtra
+    {
+        return extra as T;
     }
 }
