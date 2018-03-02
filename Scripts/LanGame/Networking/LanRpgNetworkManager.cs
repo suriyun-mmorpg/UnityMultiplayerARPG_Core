@@ -17,32 +17,30 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
 
     public static GameStartType StartType;
     public static string ConnectingNetworkAddress;
-    public static int ConnectingNetworkPort;
     public static CharacterData SelectedCharacter;
     
     protected virtual void Start()
     {
+        var gameInstance = GameInstance.Singleton;
+        var gameInstanceExtra = gameInstance.GetExtra<LanGameInstanceExtra>();
         switch (StartType)
         {
             case GameStartType.Host:
+                networkPort = gameInstanceExtra.networkPort;
+                maxConnections = gameInstanceExtra.maxConnections;
                 StartHost();
                 break;
             case GameStartType.SinglePlayer:
+                networkPort = 0;
                 maxConnections = 1;
                 StartHost();
                 break;
             case GameStartType.Client:
                 networkAddress = ConnectingNetworkAddress;
-                networkPort = ConnectingNetworkPort;
+                networkPort = gameInstanceExtra.networkPort;
                 StartClient();
                 break;
         }
-    }
-
-    public override void OnClientDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
-    {
-        base.OnClientDisconnected(peer, disconnectInfo);
-        UISceneLoading.Singleton.LoadScene(GameInstance.Singleton.homeSceneName);
     }
 
     public override void SerializeClientReadyExtra(NetDataWriter writer)
