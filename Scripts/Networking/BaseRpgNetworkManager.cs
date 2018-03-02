@@ -9,20 +9,20 @@ using LiteNetLib.Utils;
 
 public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
 {
+    protected bool isQuit;
     protected override void Awake()
     {
         var gameInstance = GameInstance.Singleton;
         Assets.playerPrefab = gameInstance.characterEntityPrefab.Identity;
-        /*
-        var damages = GameInstance.Damages.Values;
-        foreach (var damage in damages)
+        Assets.RegisterPrefab(gameInstance.itemDropEntityPrefab.Identity);
+        var damageEntities = GameInstance.DamageEntities.Values;
+        foreach (var damageEntity in damageEntities)
         {
-            Assets.RegisterPrefab(damage)
+            Assets.RegisterPrefab(damageEntity.Identity);
         }
-        */
         base.Awake();
     }
-    
+
 #if UNITY_EDITOR
     private void OnValidate()
     {
@@ -45,13 +45,47 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
         base.OnPeerDisconnected(peer, disconnectInfo);
     }
 
-    public override void SerializeClientReadyExtra(NetDataWriter writer)
+    public override void OnClientDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
     {
-        base.SerializeClientReadyExtra(writer);
+        base.OnClientDisconnected(peer, disconnectInfo);
+        var errorMessage = "Unknow";
+        switch (disconnectInfo.Reason)
+        {
+            case DisconnectReason.ConnectionFailed:
+                errorMessage = "Cannot connect to the server";
+                break;
+            case DisconnectReason.RemoteConnectionClose:
+                errorMessage = "Server has been closed";
+                break;
+            case DisconnectReason.SocketReceiveError:
+                errorMessage = "Cannot receive data";
+                break;
+            case DisconnectReason.SocketSendError:
+                errorMessage = "Cannot send data";
+                break;
+            case DisconnectReason.Timeout:
+                errorMessage = "Connection timeout";
+                break;
+        }
+        if (disconnectInfo.Reason != DisconnectReason.DisconnectPeerCalled)
+        {
+            UISceneGlobal.Singleton.ShowMessageDialog("Disconnected", errorMessage, true, false, false, false, () =>
+            {
+                UISceneLoading.Singleton.LoadScene(GameInstance.Singleton.homeSceneName);
+            });
+        }
     }
 
-    public override void DeserializeClientReadyExtra(LiteNetLibIdentity playerIdentity, NetDataReader reader)
+    protected override void OnApplicationQuit()
     {
-        base.DeserializeClientReadyExtra(playerIdentity, reader);
+        isQuit = true;
+        base.OnApplicationQuit();
+    }
+
+    public override void OnStopHost()
+    {
+        if (!isQuit)
+            UISceneLoading.Singleton.LoadScene(GameInstance.Singleton.homeSceneName);
+        base.OnStopHost();
     }
 }
