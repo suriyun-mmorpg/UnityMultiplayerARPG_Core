@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum AnimationActions : int {
+public enum AnimationActions : int
+{
     Custom = -1,
     Melee001 = 0,
     Melee002,
