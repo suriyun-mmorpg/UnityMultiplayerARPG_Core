@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(UIList)), RequireComponent(typeof(UICharacterSelectionManager))]
-public class UICharacterSelection : UIBase
+public class UICharacterList : UIBase
 {
     public Transform characterModelContainer;
     [Header("UI Elements")]
