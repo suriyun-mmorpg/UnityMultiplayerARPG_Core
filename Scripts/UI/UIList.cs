@@ -8,7 +8,7 @@ public class UIList : MonoBehaviour
     public Transform uiContainer;
     protected readonly List<GameObject> uis = new List<GameObject>();
 
-    public void Generate<T>(List<T> list, System.Action<T, GameObject> onGenerateEntry)
+    public void Generate<T>(IList<T> list, System.Action<T, GameObject> onGenerateEntry)
     {
         var i = 0;
         for (; i < list.Count; ++i)

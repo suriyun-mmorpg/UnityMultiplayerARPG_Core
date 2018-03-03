@@ -6,6 +6,7 @@ using UnityEngine.Events;
 public abstract class UISelectionManager : MonoBehaviour
 {
     public abstract void Select(object ui);
+    public abstract void DeSelectAll();
 }
 
 public abstract class UISelectionManager<TData, TUI, TEvent> : UISelectionManager
@@ -54,6 +55,15 @@ public abstract class UISelectionManager<TData, TUI, TEvent> : UISelectionManage
         {
             if (deselectUI != castedUI)
                 deselectUI.Deselect();
+        }
+    }
+
+    public override sealed void DeSelectAll()
+    {
+        SelectedUI = null;
+        foreach (var deselectUI in uis)
+        {
+            deselectUI.Deselect();
         }
     }
 }
