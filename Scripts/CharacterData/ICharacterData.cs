@@ -28,6 +28,7 @@ public interface ICharacterData
     int LastUpdate { get; set; }
     IList<CharacterAttributeLevel> AttributeLevels { get; set; }
     IList<CharacterSkillLevel> SkillLevels { get; set; }
+    IList<CharacterBuff> Buffs { get; set; }
     IList<CharacterItem> EquipItems { get; set; }
     IList<CharacterItem> NonEquipItems { get; set; }
 }

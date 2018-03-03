@@ -25,6 +25,7 @@ public class CharacterData : ICharacterData
     public int lastUpdate;
     public List<CharacterAttributeLevel> attributeLevels = new List<CharacterAttributeLevel>();
     public List<CharacterSkillLevel> skillLevels = new List<CharacterSkillLevel>();
+    public List<CharacterBuff> buffs = new List<CharacterBuff>();
     public List<CharacterItem> equipItems = new List<CharacterItem>();
     public List<CharacterItem> nonEquipItems = new List<CharacterItem>();
 
@@ -59,6 +60,15 @@ public class CharacterData : ICharacterData
         {
             skillLevels = new List<CharacterSkillLevel>();
             skillLevels.AddRange(value);
+        }
+    }
+    public IList<CharacterBuff> Buffs
+    {
+        get { return buffs; }
+        set
+        {
+            buffs = new List<CharacterBuff>();
+            buffs.AddRange(value);
         }
     }
     public IList<CharacterItem> EquipItems
@@ -252,16 +262,35 @@ public static class CharacterDataExtension
     {
         return data.GetStats() + data.GetStatsPercentage();
     }
+
+    public static CharacterStats GetStatsWithBuffs(this ICharacterData data)
+    {
+        var id = data.Id;
+        var stats = data.GetStats();
+        var statsPercentage = data.GetStatsPercentage();
+        var buffs = data.Buffs;
+        foreach (var buff in buffs)
+        {
+            if (buff.Skill == null)
+            {
+                Debug.LogError("Buff: " + buff.skillId + " owned by " + id + " is invalid data");
+                continue;
+            }
+            stats += buff.Stats;
+            statsPercentage += buff.StatsPercentage;
+        }
+        return stats + statsPercentage;
+    }
     #endregion
 
     public static int GetMaxHp(this ICharacterData data)
     {
-        return (int)data.GetStatsWithoutBuffs().hp;
+        return (int)data.GetStatsWithBuffs().hp;
     }
 
     public static int GetMaxMp(this ICharacterData data)
     {
-        return (int)data.GetStatsWithoutBuffs().mp;
+        return (int)data.GetStatsWithBuffs().mp;
     }
 
     public static List<WeaponItem> GetWeapons(this ICharacterData data)
