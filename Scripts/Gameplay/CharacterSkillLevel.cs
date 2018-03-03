@@ -8,6 +8,7 @@ public struct CharacterSkillLevel
 {
     public string skillId;
     public int level;
+    public float coolDownRemainsDuration;
 
     public Skill Skill
     {
@@ -93,6 +94,26 @@ public struct CharacterSkillLevel
             return skill.baseRecoveryMp + skill.recoveryMpIncreaseEachLevel * level;
         }
     }
+
+    public bool CanUse()
+    {
+        return level >= 1 && coolDownRemainsDuration <= 0;
+    }
+
+    public void Used()
+    {
+        coolDownRemainsDuration = CoolDown;
+    }
+
+    public bool ShouldUpdate()
+    {
+        return coolDownRemainsDuration > 0;
+    }
+
+    public void Update(float deltaTime)
+    {
+        coolDownRemainsDuration -= deltaTime;
+    }
 }
 
 public class NetFieldCharacterSkillLevel : LiteNetLibNetField<CharacterSkillLevel>
@@ -102,6 +123,7 @@ public class NetFieldCharacterSkillLevel : LiteNetLibNetField<CharacterSkillLeve
         var newValue = new CharacterSkillLevel();
         newValue.skillId = reader.GetString();
         newValue.level = reader.GetInt();
+        newValue.coolDownRemainsDuration = reader.GetFloat();
         Value = newValue;
     }
 
@@ -109,6 +131,7 @@ public class NetFieldCharacterSkillLevel : LiteNetLibNetField<CharacterSkillLeve
     {
         writer.Put(Value.skillId);
         writer.Put(Value.level);
+        writer.Put(Value.coolDownRemainsDuration);
     }
 
     public override bool IsValueChanged(CharacterSkillLevel newValue)
