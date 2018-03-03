@@ -2,29 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum WeaponItemEquipType : byte
-{
-    OneHand,
-    OneHandCanDual,
-    TwoHand,
-}
-
 [CreateAssetMenu(fileName = "WeaponItem", menuName = "Create GameData/WeaponItem")]
 public class WeaponItem : EquipmentItem
 {
-    public float attackRange;
-    public DamageEntity damageEntityPrefab;
+    public WeaponType weaponType;
     public DamageAmount[] damageAmounts;
-    public DamageEffectivenessAttribute[] effectivenessAttributes;
-    public WeaponItemEquipType equipType;
 
-    public DamageEntity DamageEntityPrefab
+    public WeaponType WeaponType
     {
         get
         {
-            if (damageEntityPrefab == null)
-                return GameInstance.Singleton.damageEntityPrefab;
-            return damageEntityPrefab;
+            if (weaponType == null)
+            {
+                weaponType = CreateInstance<WeaponType>();
+                weaponType.effectivenessAttributes = new DamageEffectivenessAttribute[0];
+                weaponType.mainAttackAnimations = new WeaponAttackAnimation[0];
+                weaponType.subAttackAnimations = new WeaponAttackAnimation[0];
+            }
+            return weaponType;
         }
     }
 
