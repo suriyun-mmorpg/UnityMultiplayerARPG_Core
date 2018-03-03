@@ -12,6 +12,7 @@ using UnityEditor;
 [RequireComponent(typeof(CharacterMovement))]
 public class CharacterEntity : RpgNetworkEntity, ICharacterData
 {
+    public const float UPDATE_SKILL_BUFF_INTERVAL = 1f;
     // Use id as primary key
     [Header("Sync Fields")]
     public SyncFieldString id = new SyncFieldString();
@@ -28,12 +29,14 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     [Header("Sync Lists")]
     public SyncListCharacterAttributeLevel attributeLevels = new SyncListCharacterAttributeLevel();
     public SyncListCharacterSkillLevel skillLevels = new SyncListCharacterSkillLevel();
+    public SyncListCharacterBuff buffs = new SyncListCharacterBuff();
     public SyncListCharacterItem equipItems = new SyncListCharacterItem();
     public SyncListCharacterItem nonEquipItems = new SyncListCharacterItem();
     
     #region Protected data
     // Entity data
     protected CharacterModel model;
+    protected float lastUpdateSkillAndBuffTime = 0f;
     // Net Functions
     protected LiteNetLibFunction<NetFieldUInt> netFuncPickupItem;
     protected LiteNetLibFunction<NetFieldInt, NetFieldInt> netFuncDropItem;
@@ -76,6 +79,16 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                 skillLevels.Add(entry);
         }
     }
+    public IList<CharacterBuff> Buffs
+    {
+        get { return buffs; }
+        set
+        {
+            buffs.Clear();
+            foreach (var entry in value)
+                buffs.Add(entry);
+        }
+    }
     public IList<CharacterItem> EquipItems
     {
         get { return equipItems; }
@@ -93,6 +106,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         {
             var gameInstance = GameInstance.Singleton;
             nonEquipItems.Clear();
+            // Adjust inventory size
             var countItem = 0;
             foreach (var entry in value)
             {
@@ -163,6 +177,39 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     protected virtual void Update()
     {
         // Use this to update animations
+        if (CurrentHp > 0)
+            UpdateSkillAndBuff();
+    }
+
+    protected void UpdateSkillAndBuff()
+    {
+        var timeDiff = Time.realtimeSinceStartup - lastUpdateSkillAndBuffTime;
+        var count = skillLevels.Count;
+        for (var i = count - 1; i >= 0; --i)
+        {
+            var skillLevel = skillLevels[i];
+            if (skillLevel.ShouldUpdate())
+            {
+                skillLevel.Update(Time.unscaledDeltaTime);
+                if (timeDiff > UPDATE_SKILL_BUFF_INTERVAL)
+                    skillLevels.Dirty(i);
+            }
+        }
+        count = buffs.Count;
+        for (var i = count - 1; i >= 0; --i)
+        {
+            var buff = buffs[i];
+            if (buff.ShouldRemove())
+                buffs.RemoveAt(i);
+            else
+            {
+                buff.Update(Time.unscaledDeltaTime);
+                if (timeDiff > UPDATE_SKILL_BUFF_INTERVAL)
+                    buffs.Dirty(i);
+            }
+        }
+        if (timeDiff > UPDATE_SKILL_BUFF_INTERVAL)
+            lastUpdateSkillAndBuffTime = Time.realtimeSinceStartup;
     }
 
     public override void OnBehaviourValidate()
@@ -176,6 +223,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     public override void OnSetup()
     {
         SetupNetElements();
+        prototypeId.onChange += OnPrototypeIdChange;
         netFuncPickupItem = new LiteNetLibFunction<NetFieldUInt>(NetFuncPickupItemCallback);
         netFuncDropItem = new LiteNetLibFunction<NetFieldInt, NetFieldInt>(NetFuncDropItemCallback);
         netFuncSwapOrMergeItem = new LiteNetLibFunction<NetFieldInt, NetFieldInt>(NetFuncSwapOrMergeItemCallback);
@@ -382,7 +430,6 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         id.sendOptions = SendOptions.ReliableOrdered;
         characterName.sendOptions = SendOptions.ReliableOrdered;
         prototypeId.sendOptions = SendOptions.ReliableOrdered;
-        prototypeId.onChange += OnPrototypeIdChange;
         level.sendOptions = SendOptions.ReliableOrdered;
         exp.sendOptions = SendOptions.ReliableOrdered;
         currentHp.sendOptions = SendOptions.ReliableOrdered;
