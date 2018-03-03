@@ -58,6 +58,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
     [Header("UI Elements")]
     public Text textTitle;
     public Text textDescription;
+    public Image imageIcon;
     public Text textSellPrice;
     public Text textStack;
     public Text textRequireClass;
@@ -75,6 +76,9 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
 
         if (textDescription != null)
             textDescription.text = string.Format(descriptionFormat, itemData == null ? "N/A" : itemData.description);
+
+        if (imageIcon != null)
+            imageIcon.sprite = itemData == null ? null : itemData.icon;
 
         if (textSellPrice != null)
             textSellPrice.text = string.Format(sellPriceFormat, itemData == null ? "0" : itemData.sellPrice.ToString("N0"));

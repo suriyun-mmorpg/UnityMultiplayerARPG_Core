@@ -17,6 +17,8 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
     public string consumeMpFormat = "Consume Mp: {0}";
     [Tooltip("CoolDown Format => {0} = {CoolDown}")]
     public string coolDownFormat = "Cooldown: {0}";
+    [Tooltip("CoolDown Remains Duration Format => {0} = {Remains duration}")]
+    public string coolDownRemainsDurationFormat = "{0}";
 
     [Header("Generic Buff Format")]
     [Tooltip("Buff Duration Format => {0} = {Duration}")]
@@ -62,9 +64,11 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
     [Header("UI Elements")]
     public Text textTitle;
     public Text textDescription;
+    public Image imageIcon;
     public Text textRequireSkillLevel;
     public Text textConsumeMp;
     public Text textCoolDown;
+    public Text textCoolDownRemainsDuration;
     public Text textBuffDuration;
     public Text textRecoveryHp;
     public Text textRecoveryMp;
@@ -81,6 +85,9 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
 
         if (textDescription != null)
             textDescription.text = string.Format(descriptionFormat, skillData == null ? "N/A" : skillData.description);
+
+        if (imageIcon != null)
+            imageIcon.sprite = skillData == null ? null : skillData.icon;
 
         if (textRequireSkillLevel != null)
         {
@@ -106,6 +113,9 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
 
         if (textCoolDown != null)
             textCoolDown.text = string.Format(coolDownFormat, data.CoolDown.ToString("N0"));
+
+        if (textCoolDownRemainsDuration != null)
+            textCoolDownRemainsDuration.text = string.Format(coolDownRemainsDurationFormat, data.coolDownRemainsDuration.ToString("N0"));
 
         var isBuff = skillData != null && skillData.isBuff;
 

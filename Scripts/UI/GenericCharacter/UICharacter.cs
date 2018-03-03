@@ -43,8 +43,11 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public Text textName;
     public Text textLevel;
     public Text textExp;
+    public Image imageExpGage;
     public Text textHp;
+    public Image imageHpGage;
     public Text textMp;
+    public Image imageMpGage;
     public Text textStatPoint;
     public Text textSkillPoint;
     public Text textGold;
@@ -58,6 +61,8 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public Text textClassTitle;
     public Text textClassDescription;
     public Image imageClassIcon;
+    [Header("Options")]
+    public bool showStatsWithBuff;
 
     protected virtual void Update()
     {
@@ -67,43 +72,54 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         if (textLevel != null)
             textLevel.text = string.Format(levelFormat, data == null ? "N/A" : data.Level.ToString("N0"));
 
-        if (textExp != null)
+        var expTree = GameInstance.Singleton.expTree;
+        var currentExp = 0;
+        var nextLevelExp = 0;
+        if (data != null && data.GetNextLevelExp() > 0)
         {
-            var expString = "";
-            if (data == null)
-                expString = string.Format(expFormat, "0", "0");
-            else if (data.GetNextLevelExp() > 0)
-                expString = string.Format(expFormat, data.Exp.ToString("N0"), data.GetNextLevelExp().ToString("N0"));
-            else
-            {
-                var maxExp = 0;
-                var expTree = GameInstance.Singleton.expTree;
-                if (data.Level - 2 > 0 && data.Level - 2 < expTree.Length)
-                    maxExp = expTree[data.Level - 2];
-                expString = string.Format(expFormat, maxExp.ToString("N0"), maxExp.ToString("N0"));
-            }
-            textExp.text = expString;
+            currentExp = data.Exp;
+            nextLevelExp = data.GetNextLevelExp();
+        }
+        else if (data != null && data.Level - 2 > 0 && data.Level - 2 < expTree.Length)
+        {
+            var maxExp = expTree[data.Level - 2];
+            currentExp = maxExp;
+            nextLevelExp = maxExp;
+        }
+
+        if (textExp != null)
+            textExp.text = string.Format(expFormat, currentExp.ToString("N0"), nextLevelExp.ToString("N0"));
+
+        if (imageExpGage != null)
+            imageExpGage.fillAmount = nextLevelExp <= 0 ? 1 : currentExp / nextLevelExp;
+
+        var currentHp = 0;
+        var maxHp = 0;
+        if (data != null)
+        {
+            currentHp = data.CurrentHp;
+            maxHp = data.GetMaxHp();
         }
 
         if (textHp != null)
+            textHp.text = string.Format(hpFormat, currentHp.ToString("N0"), maxHp.ToString("N0"));
+
+        if (imageHpGage != null)
+            imageHpGage.fillAmount = maxHp <= 0 ? 1 : currentHp / maxHp;
+
+        var currentMp = 0;
+        var maxMp = 0;
+        if (data != null)
         {
-            var hpString = "";
-            if (data == null)
-                hpString = string.Format(hpFormat, "0", "0");
-            else
-                hpString = string.Format(hpFormat, data.CurrentHp.ToString("N0"), data.GetMaxHp().ToString("N0"));
-            textHp.text = hpString;
+            currentMp = data.CurrentMp;
+            maxMp = data.GetMaxMp();
         }
 
         if (textMp != null)
-        {
-            var mpString = "";
-            if (data == null)
-                mpString = string.Format(mpFormat, "0", "0");
-            else
-                mpString = string.Format(mpFormat, data.CurrentMp.ToString("N0"), data.GetMaxMp().ToString("N0"));
-            textMp.text = mpString;
-        }
+            textMp.text = string.Format(mpFormat, currentMp.ToString("N0"), maxMp.ToString("N0"));
+
+        if (imageMpGage != null)
+            imageMpGage.fillAmount = maxMp <= 0 ? 1 : currentMp / maxMp;
 
         if (textStatPoint != null)
             textStatPoint.text = string.Format(statPointFormat, data == null ? "N/A" : data.StatPoint.ToString("N0"));
@@ -114,7 +130,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         if (textGold != null)
             textGold.text = string.Format(goldFormat, data == null ? "N/A" : data.Gold.ToString("N0"));
 
-        var stats = data.GetStatsWithoutBuffs();
+        var stats = showStatsWithBuff ? data.GetStatsWithBuffs() : data.GetStatsWithoutBuffs();
 
         if (textAtkRateStats != null)
         {
