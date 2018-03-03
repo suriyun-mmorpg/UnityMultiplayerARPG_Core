@@ -35,7 +35,7 @@ public struct CharacterItem
 
     public int MaxStack
     {
-        get { return Item.maxStack; }
+        get { return Item == null ? 0 : Item.maxStack; }
     }
 
     public bool IsValid
