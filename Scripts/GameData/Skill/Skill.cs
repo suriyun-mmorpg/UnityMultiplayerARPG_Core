@@ -6,8 +6,10 @@ using UnityEngine;
 public class Skill : BaseGameData
 {
     public SkillLevel[] requireSkillLevels;
-    public int consumeMp;
-    public float coolDown;
+    public float baseConsumeMp;
+    public float consumeMpIncreaseEachLevel;
+    public float baseCoolDown;
+    public float coolDownIncreaseEachLevel;
     [Header("Attack")]
     public bool isAttack;
     public DamageEntity damageEntityPrefab;
@@ -16,6 +18,13 @@ public class Skill : BaseGameData
     public bool isBuff;
     [Tooltip("`buffDistance` = 0, will buff only caster")]
     public float buffDistance;
+    [Tooltip("If buff duration less than or equals to 0, buff stats won't applied")]
+    public float baseBuffDuration;
+    public float buffDurationIncreaseEachLevel;
+    public float baseRecoveryHp;
+    public float recoveryHpIncreaseEachLevel;
+    public float baseRecoveryMp;
+    public float recoveryMpIncreaseEachLevel;
     public CharacterStats baseStats;
     public CharacterStats statsIncreaseEachLevel;
     public CharacterStatsPercentage statsPercentageIncreaseEachLevel;
@@ -52,6 +61,6 @@ public class Skill : BaseGameData
 [System.Serializable]
 public class SkillLevel
 {
-    public SkillLevel skill;
+    public Skill skill;
     public int level;
 }
