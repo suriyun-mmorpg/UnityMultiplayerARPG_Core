@@ -71,11 +71,17 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         {
             var expString = "";
             if (data == null)
-                expString = string.Format(expFormat, 0, 0);
+                expString = string.Format(expFormat, "0", "0");
             else if (data.GetNextLevelExp() > 0)
                 expString = string.Format(expFormat, data.Exp.ToString("N0"), data.GetNextLevelExp().ToString("N0"));
             else
-                expString = string.Format(expFormat, "Max");
+            {
+                var maxExp = 0;
+                var expTree = GameInstance.Singleton.expTree;
+                if (data.Level - 2 > 0 && data.Level - 2 < expTree.Length)
+                    maxExp = expTree[data.Level - 2];
+                expString = string.Format(expFormat, maxExp.ToString("N0"), maxExp.ToString("N0"));
+            }
             textExp.text = expString;
         }
 
@@ -83,7 +89,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         {
             var hpString = "";
             if (data == null)
-                hpString = string.Format(hpFormat, 0, 0);
+                hpString = string.Format(hpFormat, "0", "0");
             else
                 hpString = string.Format(hpFormat, data.CurrentHp.ToString("N0"), data.GetMaxHp().ToString("N0"));
             textHp.text = hpString;
@@ -93,7 +99,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         {
             var mpString = "";
             if (data == null)
-                mpString = string.Format(mpFormat, 0, 0);
+                mpString = string.Format(mpFormat, "0", "0");
             else
                 mpString = string.Format(mpFormat, data.CurrentMp.ToString("N0"), data.GetMaxMp().ToString("N0"));
             textMp.text = mpString;

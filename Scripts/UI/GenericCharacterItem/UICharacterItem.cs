@@ -74,16 +74,16 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
             textTitle.text = string.Format(titleFormat, itemData == null ? "Unknow" : itemData.title);
 
         if (textDescription != null)
-            textDescription.text = string.Format(titleFormat, itemData == null ? "N/A" : itemData.description);
+            textDescription.text = string.Format(descriptionFormat, itemData == null ? "N/A" : itemData.description);
 
         if (textSellPrice != null)
-            textSellPrice.text = string.Format(sellPriceFormat, itemData == null ? "N/A" : itemData.sellPrice.ToString("N0"));
+            textSellPrice.text = string.Format(sellPriceFormat, itemData == null ? "0" : itemData.sellPrice.ToString("N0"));
 
         if (textStack != null)
         {
             var stackString = "";
             if (itemData == null)
-                stackString = string.Format(stackFormat, 0, 0);
+                stackString = string.Format(stackFormat, "0", "0");
             else
                 stackString = string.Format(stackFormat, data.amount.ToString("N0"), itemData.maxStack);
             textStack.text = stackString;
