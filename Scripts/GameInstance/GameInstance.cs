@@ -12,9 +12,9 @@ public class GameInstance : MonoBehaviour
     public BaseGameInstanceExtra extra;
     [Header("Gameplay Objects")]
     public CharacterEntity characterEntityPrefab;
-    public DamageEntity damageEntityPrefab;
     public ItemDropEntity itemDropEntityPrefab;
     public FollowCameraControls gameplayCameraPrefab;
+    public UISceneGameplay uiSceneGameplayPrefab;
     [Header("Gameplay Database")]
     [Tooltip("Default weapon item, will be used when character not equip any weapon")]
     public WeaponItem defaultWeaponItem;
@@ -26,6 +26,7 @@ public class GameInstance : MonoBehaviour
     public int increaseStatPointEachLevel = 5;
     public int increaseSkillPointEachLevel = 1;
     public int startGold = 0;
+    public ItemAmountPair[] startItems;
     public int inventorySize = 30;
     public float pickUpItemDistance = 2f;
     public float dropDistance = 2f;
@@ -36,6 +37,7 @@ public class GameInstance : MonoBehaviour
     [Header("Player Configs")]
     public int minCharacterNameLength = 2;
     public int maxCharacterNameLength = 16;
+    public static readonly HashSet<string> EquipmentPositions = new HashSet<string>();
     public static readonly Dictionary<string, CharacterAttribute> CharacterAttributes = new Dictionary<string, CharacterAttribute>();
     public static readonly Dictionary<string, CharacterClass> CharacterClasses = new Dictionary<string, CharacterClass>();
     public static readonly Dictionary<string, CharacterPrototype> CharacterPrototypes = new Dictionary<string, CharacterPrototype>();
@@ -60,11 +62,6 @@ public class GameInstance : MonoBehaviour
             Debug.LogError("You must set character entity prefab");
             return;
         }
-        if (damageEntityPrefab == null)
-        {
-            Debug.LogError("You must set damage entity prefab");
-            return;
-        }
         if (itemDropEntityPrefab == null)
         {
             Debug.LogError("You must set item drop entity prefab");
@@ -75,17 +72,43 @@ public class GameInstance : MonoBehaviour
             Debug.LogError("You must set gameplay camera prefab");
             return;
         }
+        if (uiSceneGameplayPrefab == null)
+        {
+            Debug.LogError("You must set ui scene gameplay prefab");
+            return;
+        }
         if (defaultWeaponItem == null)
         {
             Debug.LogError("You must set default weapon item");
             return;
         }
 
+
+        EquipmentPositions.Clear();
+        CharacterAttributes.Clear();
+        CharacterClasses.Clear();
+        CharacterPrototypes.Clear();
+        Damages.Clear();
+        DamageEntities.Clear();
+        Items.Clear();
+        Skills.Clear();
+
+        EquipmentPositions.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
+        EquipmentPositions.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND);
+
         AddCharacterPrototypes(characterPrototypes);
-        AddDamageEntities(new DamageEntity[] { damageEntityPrefab });
         AddItems(new Item[] { defaultWeaponItem });
         AddItems(items);
         AddSkills(skills);
+
+        var tempStartItems = new List<Item>();
+        foreach (var startItem in startItems)
+        {
+            if (startItem.item == null)
+                continue;
+            tempStartItems.Add(startItem.item);
+        }
+        AddItems(tempStartItems);
     }
 
     public static void AddCharacterAttributes(IEnumerable<CharacterAttribute> characterAttributes)
@@ -141,9 +164,9 @@ public class GameInstance : MonoBehaviour
     {
         foreach (var damageEntity in damageEntities)
         {
-            if (damageEntity == null || DamageEntities.ContainsKey(damageEntity.name))
+            if (damageEntity == null || DamageEntities.ContainsKey(damageEntity.Identity.AssetId))
                 continue;
-            DamageEntities[damageEntity.name] = damageEntity;
+            DamageEntities[damageEntity.Identity.AssetId] = damageEntity;
         }
     }
 
@@ -157,6 +180,9 @@ public class GameInstance : MonoBehaviour
             if (item is EquipmentItem)
             {
                 var equipmentItem = item as EquipmentItem;
+                if (!EquipmentPositions.Contains(equipmentItem.equipPosition))
+                    EquipmentPositions.Add(equipmentItem.equipPosition);
+
                 var attributes = new List<CharacterAttribute>();
                 foreach (var requireAttribute in equipmentItem.requireAttributes)
                 {
@@ -170,7 +196,7 @@ public class GameInstance : MonoBehaviour
             {
                 var weaponItem = item as WeaponItem;
                 var attributes = new List<CharacterAttribute>();
-                foreach (var effectivenessAttribute in weaponItem.effectivenessAttributes)
+                foreach (var effectivenessAttribute in weaponItem.WeaponType.effectivenessAttributes)
                 {
                     if (effectivenessAttribute == null || effectivenessAttribute.attribute == null || CharacterAttributes.ContainsKey(effectivenessAttribute.attribute.Id))
                         continue;
@@ -186,7 +212,9 @@ public class GameInstance : MonoBehaviour
                     damages.Add(tempDamageAmount.damage);
                 }
                 AddDamages(damages);
-                AddDamageEntities(new DamageEntity[] { weaponItem.DamageEntityPrefab });
+                var damageEntityPrefab = weaponItem.WeaponType.damageEntityPrefab;
+                if (damageEntityPrefab != null)
+                    AddDamageEntities(new DamageEntity[] { damageEntityPrefab });
             }
         }
     }
@@ -207,7 +235,9 @@ public class GameInstance : MonoBehaviour
                 damages.Add(tempDamageAmount.damage);
             }
             AddDamages(damages);
-            AddDamageEntities(new DamageEntity[] { skill.DamageEntityPrefab });
+            var damageEntityPrefab = skill.damageEntityPrefab;
+            if (damageEntityPrefab != null)
+                AddDamageEntities(new DamageEntity[] { damageEntityPrefab });
         }
     }
 
