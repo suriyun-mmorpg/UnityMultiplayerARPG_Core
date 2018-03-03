@@ -69,7 +69,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
 
     protected virtual void Update()
     {
-        var itemData = data.Item;
+        var itemData = data.GetItem();
 
         if (textTitle != null)
             textTitle.text = string.Format(titleFormat, itemData == null ? "Unknow" : itemData.title);
@@ -93,7 +93,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
             textStack.text = stackString;
         }
 
-        var equipmentItem = data.EquipmentItem;
+        var equipmentItem = data.GetEquipmentItem();
 
         if (textRequireClass != null)
         {
@@ -125,7 +125,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
             }
         }
 
-        var stats = data.Stats;
+        var stats = data.GetStats();
 
         if (textStats != null)
         {
@@ -146,7 +146,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
             textStats.text = statsString;
         }
 
-        var statsPercentage = data.StatsPercentage;
+        var statsPercentage = data.GetStatsPercentage();
 
         if (textStatsPercentage != null)
         {
@@ -167,7 +167,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
             textStatsPercentage.text = statsPercentageString;
         }
 
-        var weaponItem = data.WeaponItem;
+        var weaponItem = data.GetWeaponItem();
 
         if (textDamage != null)
         {

@@ -53,6 +53,7 @@ public class UICharacterBuff : UISelectionEntry<CharacterBuff>
     public Image imageIcon;
     public Text textBuffDuration;
     public Text textBuffRemainsDuration;
+    public Image imageBuffDurationGage;
     public Text textRecoveryHp;
     public Text textRecoveryMp;
     public Text textStats;
@@ -60,7 +61,7 @@ public class UICharacterBuff : UISelectionEntry<CharacterBuff>
 
     protected virtual void Update()
     {
-        var skillData = data.Skill;
+        var skillData = data.GetSkill();
 
         if (textTitle != null)
             textTitle.text = string.Format(titleFormat, skillData == null ? "Unknow" : skillData.title);
@@ -68,19 +69,25 @@ public class UICharacterBuff : UISelectionEntry<CharacterBuff>
         if (imageIcon != null)
             imageIcon.sprite = skillData == null ? null : skillData.icon;
 
+        var buffRemainDuration = data.buffRemainsDuration;
+        var buffDuration = data.GetBuffDuration();
+
         if (textBuffDuration != null)
-            textBuffDuration.text = string.Format(buffDurationFormat, data.BuffDuration.ToString("N0"));
+            textBuffDuration.text = string.Format(buffDurationFormat, buffDuration.ToString("N0"));
 
         if (textBuffRemainsDuration != null)
-            textBuffRemainsDuration.text = string.Format(buffRemainsDurationFormat, data.buffRemainsDuration.ToString("N0"));
+            textBuffRemainsDuration.text = string.Format(buffRemainsDurationFormat, buffRemainDuration.ToString("N0"));
+
+        if (imageBuffDurationGage != null)
+            imageBuffDurationGage.fillAmount = buffDuration <= 0 ? 1 : buffRemainDuration / buffDuration;
 
         if (textRecoveryHp != null)
-            textRecoveryHp.text = string.Format(recoveryHpFormat, data.RecoveryHp.ToString("N0"));
+            textRecoveryHp.text = string.Format(recoveryHpFormat, data.GetRecoveryHp().ToString("N0"));
 
         if (textRecoveryMp != null)
-            textRecoveryMp.text = string.Format(recoveryMpFormat, data.RecoveryMp.ToString("N0"));
+            textRecoveryMp.text = string.Format(recoveryMpFormat, data.GetRecoveryMp().ToString("N0"));
 
-        var stats = data.Stats;
+        var stats = data.GetStats();
 
         if (textStats != null)
         {
@@ -101,7 +108,7 @@ public class UICharacterBuff : UISelectionEntry<CharacterBuff>
             textStats.text = statsString;
         }
 
-        var statsPercentage = data.StatsPercentage;
+        var statsPercentage = data.GetStatsPercentage();
 
         if (textStatsPercentage != null)
         {

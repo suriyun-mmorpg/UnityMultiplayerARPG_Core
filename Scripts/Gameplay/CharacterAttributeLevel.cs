@@ -4,37 +4,31 @@ using LiteNetLib.Utils;
 using LiteNetLibHighLevel;
 
 [System.Serializable]
-public struct CharacterAttributeLevel
+public class CharacterAttributeLevel
 {
     // Use attributeId as primary key
     public string attributeId;
     public int amount;
-    
-    public CharacterAttribute Attribute
+
+    public CharacterAttribute GetAttribute()
     {
-        get { return GameInstance.CharacterAttributes.ContainsKey(attributeId) ? GameInstance.CharacterAttributes[attributeId] : null; }
+        return GameInstance.CharacterAttributes.ContainsKey(attributeId) ? GameInstance.CharacterAttributes[attributeId] : null;
     }
 
-    public CharacterStats Stats
+    public CharacterStats GetStats()
     {
-        get
-        {
-            var attribute = Attribute;
-            if (attribute == null)
-                return new CharacterStats();
-            return attribute.statsIncreaseEachLevel * amount;
-        }
+        var attribute = GetAttribute();
+        if (attribute == null)
+            return new CharacterStats();
+        return attribute.statsIncreaseEachLevel * amount;
     }
 
-    public CharacterStatsPercentage StatsPercentage
+    public CharacterStatsPercentage GetStatsPercentage()
     {
-        get
-        {
-            var attribute = Attribute;
-            if (attribute == null)
-                return new CharacterStatsPercentage();
-            return attribute.statsPercentageIncreaseEachLevel * amount;
-        }
+        var attribute = GetAttribute();
+        if (attribute == null)
+            return new CharacterStatsPercentage();
+        return attribute.statsPercentageIncreaseEachLevel * amount;
     }
 }
 
@@ -50,13 +44,15 @@ public class NetFieldCharacterAttributeLevel : LiteNetLibNetField<CharacterAttri
 
     public override void Serialize(NetDataWriter writer)
     {
+        if (Value == null)
+            Value = new CharacterAttributeLevel();
         writer.Put(Value.attributeId);
         writer.Put(Value.amount);
     }
 
     public override bool IsValueChanged(CharacterAttributeLevel newValue)
     {
-        return !newValue.Equals(Value);
+        return true;
     }
 }
 

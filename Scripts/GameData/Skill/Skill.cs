@@ -8,8 +8,8 @@ public class Skill : BaseGameData
     public SkillLevel[] requireSkillLevels;
     public float baseConsumeMp;
     public float consumeMpIncreaseEachLevel;
-    public float baseCoolDown;
-    public float coolDownIncreaseEachLevel;
+    public float baseCoolDownDuration;
+    public float coolDownDurationIncreaseEachLevel;
     [Header("Attack")]
     public bool isAttack;
     public DamageEntity damageEntityPrefab;
@@ -28,16 +28,6 @@ public class Skill : BaseGameData
     public CharacterStats baseStats;
     public CharacterStats statsIncreaseEachLevel;
     public CharacterStatsPercentage statsPercentageIncreaseEachLevel;
-
-    public DamageEntity DamageEntityPrefab
-    {
-        get
-        {
-            if (damageEntityPrefab == null)
-                return GameInstance.Singleton.damageEntityPrefab;
-            return damageEntityPrefab;
-        }
-    }
 
     private Dictionary<string, DamageAmount> tempDamageAmounts;
     public Dictionary<string, DamageAmount> TempDamageAmounts

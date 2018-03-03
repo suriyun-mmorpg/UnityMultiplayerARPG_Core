@@ -4,77 +4,78 @@ using LiteNetLib.Utils;
 using LiteNetLibHighLevel;
 
 [System.Serializable]
-public struct CharacterItem
+public class CharacterItem
 {
     // Use id as primary key
     public string id;
     public string itemId;
+    public bool isSubWeapon;
     public int level;
     public int amount;
     // TODO: I want to add random item bonus
 
-    public Item Item
+    public Item GetItem()
     {
-        get { return GameInstance.Items.ContainsKey(itemId) ? GameInstance.Items[itemId] : null; }
+        return GameInstance.Items.ContainsKey(itemId) ? GameInstance.Items[itemId] : null;
     }
 
-    public EquipmentItem EquipmentItem
+    public EquipmentItem GetEquipmentItem()
     {
-        get { return Item != null ? Item as EquipmentItem : null; }
+        var item = GetItem();
+        return item != null ? item as EquipmentItem : null;
     }
 
-    public WeaponItem WeaponItem
+    public WeaponItem GetWeaponItem()
     {
-        get { return Item != null ? Item as WeaponItem : null; }
+        var item = GetItem();
+        return item != null ? item as WeaponItem : null;
     }
 
-    public ShieldItem ShieldItem
+    public ShieldItem GetShieldItem()
     {
-        get { return Item != null ? Item as ShieldItem : null; }
+        var item = GetItem();
+        return item != null ? item as ShieldItem : null;
     }
 
-    public int MaxStack
+    public int GetMaxStack()
     {
-        get { return Item == null ? 0 : Item.maxStack; }
+        var item = GetItem();
+        return item == null ? 0 : item.maxStack;
     }
 
-    public bool IsValid
+    public bool IsValid()
     {
-        get { return !string.IsNullOrEmpty(id) && Item != null && amount > 0; }
+        var item = GetItem();
+        return !string.IsNullOrEmpty(id) && item != null && amount > 0;
     }
 
-    public bool IsFull
+    public bool IsFull()
     {
-        get { return amount == MaxStack; }
+        return amount == GetMaxStack();
     }
 
-    public CharacterStats Stats
+    public CharacterStats GetStats()
     {
-        get
-        {
-            var equipmentItem = EquipmentItem;
-            if (equipmentItem == null)
-                return new CharacterStats();
-            return equipmentItem.baseStats + equipmentItem.statsIncreaseEachLevel * level;
-        }
+        var equipmentItem = GetEquipmentItem();
+        if (equipmentItem == null)
+            return new CharacterStats();
+        return equipmentItem.baseStats + equipmentItem.statsIncreaseEachLevel * level;
     }
 
-    public CharacterStatsPercentage StatsPercentage
+    public CharacterStatsPercentage GetStatsPercentage()
     {
-        get
-        {
-            var equipmentItem = EquipmentItem;
-            if (equipmentItem == null)
-                return new CharacterStatsPercentage();
-            return equipmentItem.statsPercentageIncreaseEachLevel * level;
-        }
+        var equipmentItem = GetEquipmentItem();
+        if (equipmentItem == null)
+            return new CharacterStatsPercentage();
+        return equipmentItem.statsPercentageIncreaseEachLevel * level;
     }
 
     public void Empty()
     {
         id = "";
         itemId = "";
-        level = 0;
+        isSubWeapon = false;
+        level = 1;
         amount = 0;
     }
 }
@@ -86,6 +87,7 @@ public class NetFieldCharacterItem : LiteNetLibNetField<CharacterItem>
         var newValue = new CharacterItem();
         newValue.id = reader.GetString();
         newValue.itemId = reader.GetString();
+        newValue.isSubWeapon = reader.GetBool();
         newValue.level = reader.GetInt();
         newValue.amount = reader.GetInt();
         Value = newValue;
@@ -93,15 +95,18 @@ public class NetFieldCharacterItem : LiteNetLibNetField<CharacterItem>
 
     public override void Serialize(NetDataWriter writer)
     {
+        if (Value == null)
+            Value = new CharacterItem();
         writer.Put(Value.id);
         writer.Put(Value.itemId);
+        writer.Put(Value.isSubWeapon);
         writer.Put(Value.level);
         writer.Put(Value.amount);
     }
 
     public override bool IsValueChanged(CharacterItem newValue)
     {
-        return !newValue.Equals(Value);
+        return true;
     }
 }
 

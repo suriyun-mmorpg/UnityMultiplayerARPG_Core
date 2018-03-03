@@ -15,9 +15,9 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
     public string requireSkillLevelFormat = "Require {0}: {1}";
     [Tooltip("Consume Mp Format => {0} = {Consume Mp amount}")]
     public string consumeMpFormat = "Consume Mp: {0}";
-    [Tooltip("CoolDown Format => {0} = {CoolDown}")]
-    public string coolDownFormat = "Cooldown: {0}";
-    [Tooltip("CoolDown Remains Duration Format => {0} = {Remains duration}")]
+    [Tooltip("Cool Down Duration Format => {0} = {Duration}")]
+    public string coolDownDurationFormat = "Cooldown: {0}";
+    [Tooltip("Cool Down Remains Duration Format => {0} = {Remains duration}")]
     public string coolDownRemainsDurationFormat = "{0}";
 
     [Header("Generic Buff Format")]
@@ -67,8 +67,9 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
     public Image imageIcon;
     public Text textRequireSkillLevel;
     public Text textConsumeMp;
-    public Text textCoolDown;
+    public Text textCoolDownDuration;
     public Text textCoolDownRemainsDuration;
+    public Image imageCoolDownGage;
     public Text textBuffDuration;
     public Text textRecoveryHp;
     public Text textRecoveryMp;
@@ -78,7 +79,7 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
 
     protected virtual void Update()
     {
-        var skillData = data.Skill;
+        var skillData = data.GetSkill();
 
         if (textTitle != null)
             textTitle.text = string.Format(titleFormat, skillData == null ? "Unknow" : skillData.title);
@@ -109,35 +110,41 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
         }
 
         if (textConsumeMp != null)
-            textConsumeMp.text = string.Format(consumeMpFormat, data.ConsumeMp.ToString("N0"));
+            textConsumeMp.text = string.Format(consumeMpFormat, data.GetConsumeMp().ToString("N0"));
 
-        if (textCoolDown != null)
-            textCoolDown.text = string.Format(coolDownFormat, data.CoolDown.ToString("N0"));
+        var coolDownRemainDuration = data.coolDownRemainsDuration;
+        var coolDownDuration = data.GetCoolDownDuration();
+
+        if (textCoolDownDuration != null)
+            textCoolDownDuration.text = string.Format(coolDownDurationFormat, coolDownDuration.ToString("N0"));
 
         if (textCoolDownRemainsDuration != null)
-            textCoolDownRemainsDuration.text = string.Format(coolDownRemainsDurationFormat, data.coolDownRemainsDuration.ToString("N0"));
+            textCoolDownRemainsDuration.text = string.Format(coolDownRemainsDurationFormat, coolDownRemainDuration.ToString("N0"));
+
+        if (imageCoolDownGage != null)
+            imageCoolDownGage.fillAmount = coolDownDuration <= 0 ? 1 : coolDownRemainDuration / coolDownDuration;
 
         var isBuff = skillData != null && skillData.isBuff;
 
         if (textBuffDuration != null)
         {
-            textBuffDuration.text = string.Format(buffDurationFormat, data.BuffDuration.ToString("N0"));
+            textBuffDuration.text = string.Format(buffDurationFormat, data.GetBuffDuration().ToString("N0"));
             textBuffDuration.gameObject.SetActive(isBuff);
         }
 
         if (textRecoveryHp != null)
         {
-            textRecoveryHp.text = string.Format(recoveryHpFormat, data.RecoveryHp.ToString("N0"));
+            textRecoveryHp.text = string.Format(recoveryHpFormat, data.GetRecoveryHp().ToString("N0"));
             textRecoveryHp.gameObject.SetActive(isBuff);
         }
 
         if (textRecoveryMp != null)
         {
-            textRecoveryMp.text = string.Format(recoveryMpFormat, data.RecoveryMp.ToString("N0"));
+            textRecoveryMp.text = string.Format(recoveryMpFormat, data.GetRecoveryMp().ToString("N0"));
             textRecoveryMp.gameObject.SetActive(isBuff);
         }
 
-        var stats = data.Stats;
+        var stats = data.GetStats();
 
         if (textStats != null)
         {
@@ -161,7 +168,7 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
             textStats.text = statsString;
         }
 
-        var statsPercentage = data.StatsPercentage;
+        var statsPercentage = data.GetStatsPercentage();
 
         if (textStatsPercentage != null)
         {

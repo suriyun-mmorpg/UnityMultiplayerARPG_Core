@@ -4,73 +4,59 @@ using LiteNetLib.Utils;
 using LiteNetLibHighLevel;
 
 [System.Serializable]
-public struct CharacterBuff
+public class CharacterBuff
 {
     public string skillId;
     public int level;
     public float buffRemainsDuration;
 
-    public Skill Skill
+    public Skill GetSkill()
     {
-        get { return GameInstance.Skills.ContainsKey(skillId) ? GameInstance.Skills[skillId] : null; }
+        return GameInstance.Skills.ContainsKey(skillId) ? GameInstance.Skills[skillId] : null;
     }
 
-    public CharacterStats Stats
+
+    public CharacterStats GetStats()
     {
-        get
-        {
-            var skill = Skill;
-            if (skill == null)
-                return new CharacterStats();
-            return skill.baseStats + skill.statsIncreaseEachLevel * level;
-        }
+        var skill = GetSkill();
+        if (skill == null)
+            return new CharacterStats();
+        return skill.baseStats + skill.statsIncreaseEachLevel * level;
     }
 
-    public CharacterStatsPercentage StatsPercentage
+    public CharacterStatsPercentage GetStatsPercentage()
     {
-        get
-        {
-            var skill = Skill;
-            if (skill == null)
-                return new CharacterStatsPercentage();
-            return skill.statsPercentageIncreaseEachLevel * level;
-        }
+        var skill = GetSkill();
+        if (skill == null)
+            return new CharacterStatsPercentage();
+        return skill.statsPercentageIncreaseEachLevel * level;
     }
 
-    public float BuffDuration
+    public float GetBuffDuration()
     {
-        get
-        {
-            var skill = Skill;
-            if (skill == null)
-                return 0f;
-            var duration = skill.baseBuffDuration + skill.buffDurationIncreaseEachLevel * level;
-            if (duration < 0)
-                duration = 0;
-            return duration;
-        }
+        var skill = GetSkill();
+        if (skill == null)
+            return 0f;
+        var duration = skill.baseBuffDuration + skill.buffDurationIncreaseEachLevel * level;
+        if (duration < 0)
+            duration = 0;
+        return duration;
     }
 
-    public float RecoveryHp
+    public float GetRecoveryHp()
     {
-        get
-        {
-            var skill = Skill;
-            if (skill == null)
-                return 0f;
-            return skill.baseRecoveryHp + skill.recoveryHpIncreaseEachLevel * level;
-        }
+        var skill = GetSkill();
+        if (skill == null)
+            return 0f;
+        return skill.baseRecoveryHp + skill.recoveryHpIncreaseEachLevel * level;
     }
 
-    public float RecoveryMp
+    public float GetRecoveryMp()
     {
-        get
-        {
-            var skill = Skill;
-            if (skill == null)
-                return 0f;
-            return skill.baseRecoveryMp + skill.recoveryMpIncreaseEachLevel * level;
-        }
+        var skill = GetSkill();
+        if (skill == null)
+            return 0f;
+        return skill.baseRecoveryMp + skill.recoveryMpIncreaseEachLevel * level;
     }
 
     public bool ShouldRemove()
@@ -80,7 +66,7 @@ public struct CharacterBuff
 
     public void Added()
     {
-        buffRemainsDuration = BuffDuration;
+        buffRemainsDuration = GetBuffDuration();
     }
 
     public void Update(float deltaTime)
@@ -102,6 +88,8 @@ public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>
 
     public override void Serialize(NetDataWriter writer)
     {
+        if (Value == null)
+            Value = new CharacterBuff();
         writer.Put(Value.skillId);
         writer.Put(Value.level);
         writer.Put(Value.buffRemainsDuration);
@@ -109,7 +97,7 @@ public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>
 
     public override bool IsValueChanged(CharacterBuff newValue)
     {
-        return !newValue.Equals(Value);
+        return true;
     }
 }
 

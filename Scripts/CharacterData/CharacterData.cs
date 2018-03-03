@@ -133,6 +133,7 @@ public static class CharacterDataExtension
         to.LastUpdate = from.LastUpdate;
         to.AttributeLevels = from.AttributeLevels;
         to.SkillLevels = from.SkillLevels;
+        to.Buffs = from.Buffs;
         to.EquipItems = from.EquipItems;
         to.NonEquipItems = from.NonEquipItems;
         return to;
@@ -154,6 +155,23 @@ public static class CharacterDataExtension
         character.CurrentHp = character.GetMaxHp();
         character.CurrentMp = character.GetMaxMp();
         character.Gold = gameInstance.startGold;
+
+        var startItems = gameInstance.startItems;
+        foreach (var startItem in startItems)
+        {
+            if (startItem.item == null || startItem.amount <= 0)
+                continue;
+            var characterItem = new CharacterItem();
+            var amount = startItem.amount;
+            if (amount > startItem.item.maxStack)
+                amount = startItem.item.maxStack;
+            characterItem.id = System.Guid.NewGuid().ToString();
+            characterItem.itemId = startItem.item.Id;
+            characterItem.isSubWeapon = false;
+            characterItem.level = 1;
+            characterItem.amount = amount;
+            character.NonEquipItems.Add(characterItem);
+        }
 
         character.CurrentMapName = gameInstance.startSceneName;
         character.RespawnMapName = gameInstance.startSceneName;
@@ -210,21 +228,21 @@ public static class CharacterDataExtension
         result += characterClass.statsIncreaseEachLevel * level;
         foreach (var attributeLevel in attributeLevels)
         {
-            if (attributeLevel.Attribute == null)
+            if (attributeLevel.GetAttribute() == null)
             {
                 Debug.LogError("Attribute: " + attributeLevel.attributeId + " owned by " + id + " is invalid data");
                 continue;
             }
-            result += attributeLevel.Stats;
+            result += attributeLevel.GetStats();
         }
         foreach (var equipment in equipItems)
         {
-            if (equipment.EquipmentItem == null)
+            if (equipment.GetEquipmentItem() == null)
             {
                 Debug.LogError("Item: " + equipment.id + " owned by " + id + " is not equipment");
                 continue;
             }
-            result += equipment.Stats;
+            result += equipment.GetStats();
         }
         return result;
     }
@@ -239,21 +257,21 @@ public static class CharacterDataExtension
         var result = characterClass.statsPercentageIncreaseEachLevel * level;
         foreach (var attributeLevel in attributeLevels)
         {
-            if (attributeLevel.Attribute == null)
+            if (attributeLevel.GetAttribute() == null)
             {
                 Debug.LogError("Attribute: " + attributeLevel.attributeId + " owned by " + id + " is invalid data");
                 continue;
             }
-            result += attributeLevel.StatsPercentage;
+            result += attributeLevel.GetStatsPercentage();
         }
         foreach (var equipment in equipItems)
         {
-            if (equipment.EquipmentItem == null)
+            if (equipment.GetEquipmentItem() == null)
             {
                 Debug.LogError("Item: " + equipment.id + " owned by " + id + " is not equipment");
                 continue;
             }
-            result += equipment.StatsPercentage;
+            result += equipment.GetStatsPercentage();
         }
         return result;
     }
@@ -271,13 +289,13 @@ public static class CharacterDataExtension
         var buffs = data.Buffs;
         foreach (var buff in buffs)
         {
-            if (buff.Skill == null)
+            if (buff.GetSkill() == null)
             {
                 Debug.LogError("Buff: " + buff.skillId + " owned by " + id + " is invalid data");
                 continue;
             }
-            stats += buff.Stats;
-            statsPercentage += buff.StatsPercentage;
+            stats += buff.GetStats();
+            statsPercentage += buff.GetStatsPercentage();
         }
         return stats + statsPercentage;
     }
@@ -299,9 +317,9 @@ public static class CharacterDataExtension
         var equipItems = data.EquipItems;
         foreach (var equipItem in equipItems)
         {
-            if (!equipItem.IsValid)
+            if (!equipItem.IsValid())
                 continue;
-            var weaponItem = equipItem.WeaponItem;
+            var weaponItem = equipItem.GetWeaponItem();
             if (weaponItem != null)
                 result.Add(weaponItem);
         }
