@@ -36,6 +36,62 @@ public class CharacterModel : MonoBehaviour
         }
     }
 
+    private Dictionary<string, Transform> tempEquipmentContainers = null;
+    public Dictionary<string, Transform> TempEquipmentContainers
+    {
+        get
+        {
+            if (tempEquipmentContainers == null)
+            {
+                tempEquipmentContainers = new Dictionary<string, Transform>();
+                if (rightHandContainer != null)
+                    tempEquipmentContainers.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandContainer);
+                if (leftHandContainer != null)
+                    tempEquipmentContainers.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandContainer);
+                foreach (var equipmentContainer in equipmentContainers)
+                {
+                    if (equipmentContainer.container != null && !tempEquipmentContainers.ContainsKey(equipmentContainer.equipPosition))
+                        tempEquipmentContainers[equipmentContainer.equipPosition] = equipmentContainer.container;
+                }
+            }
+            return tempEquipmentContainers;
+        }
+    }
+    
+    public void SetEquipItems(IList<CharacterItem> equipItems)
+    {
+        var containers = TempEquipmentContainers.Values;
+        // Clear equipped item models
+        foreach (var container in containers)
+        {
+            container.RemoveChildren();
+        }
+
+        foreach (var equipItem in equipItems)
+        {
+            var weaponItem = equipItem.GetWeaponItem();
+            var shieldItem = equipItem.GetShieldItem();
+            var equipmentItem = equipItem.GetEquipmentItem();
+            if (equipmentItem == null)
+                continue;
+
+            var position = equipmentItem.equipPosition;
+            if (weaponItem != null || shieldItem != null)
+                position = equipItem.isSubWeapon ? GameDataConst.EQUIP_POSITION_LEFT_HAND : GameDataConst.EQUIP_POSITION_RIGHT_HAND;
+
+            var equipmentModelPrefab = equipmentItem.equipmentModel;
+            if (equipmentModelPrefab != null && TempEquipmentContainers.ContainsKey(position))
+            {
+                var container = TempEquipmentContainers[position];
+                var equipmentModel = Instantiate(equipmentModelPrefab, container);
+                equipmentModel.transform.localPosition = Vector3.zero;
+                equipmentModel.transform.localEulerAngles = Vector3.zero;
+                equipmentModel.transform.localScale = Vector3.one;
+                equipmentModel.gameObject.SetActive(true);
+            }
+        }
+    }
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.magenta;

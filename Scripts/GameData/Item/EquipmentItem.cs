@@ -9,6 +9,7 @@ using UnityEditor;
 public class EquipmentItem : Item
 {
     public string equipPosition;
+    public GameObject equipmentModel;
     public CharacterClass requireClass;
     public CharacterAttributeAmount[] requireAttributes;
     public CharacterStats baseStats;
