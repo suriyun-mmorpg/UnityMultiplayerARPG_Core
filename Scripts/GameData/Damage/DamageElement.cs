@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Damage", menuName = "Create GameData/Damage")]
-public class Damage : BaseGameData
+[CreateAssetMenu(fileName = "DamageElement", menuName = "Create GameData/DamageElement")]
+public class DamageElement : BaseGameData
 {
     // TODO: Resistance
 }
@@ -12,7 +12,7 @@ public class Damage : BaseGameData
 public class DamageAmount
 {
     [Tooltip("You can leave Damage to be empty to make it as physical damage which won't calculate with resistance stats")]
-    public Damage damage;
+    public DamageElement damageElement;
     public float minDamage;
     public float maxDamage;
 

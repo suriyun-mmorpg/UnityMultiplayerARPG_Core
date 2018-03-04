@@ -203,7 +203,7 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
                 foreach (var damageAmount in damageAmounts)
                 {
                     damagesText += string.Format(damageFormat,
-                        damageAmount.damage == null ? defaultDamageTitle : damageAmount.damage.title,
+                        damageAmount.damageElement == null ? defaultDamageTitle : damageAmount.damageElement.title,
                         damageAmount.minDamage,
                         damageAmount.maxDamage) + "\n";
                 }

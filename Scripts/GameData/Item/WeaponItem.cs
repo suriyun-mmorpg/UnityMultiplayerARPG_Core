@@ -33,7 +33,7 @@ public class WeaponItem : EquipmentItem
                 tempDamageAmounts = new Dictionary<string, DamageAmount>();
                 foreach (var damageAmount in damageAmounts)
                 {
-                    var id = damageAmount.damage == null ? GameDataConst.DEFAULT_DAMAGE_ID : damageAmount.damage.Id;
+                    var id = damageAmount.damageElement == null ? GameDataConst.DEFAULT_DAMAGE_ID : damageAmount.damageElement.Id;
                     tempDamageAmounts[id] = damageAmount;
                 }
             }

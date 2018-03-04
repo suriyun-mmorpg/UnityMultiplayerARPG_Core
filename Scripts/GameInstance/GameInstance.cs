@@ -41,7 +41,7 @@ public class GameInstance : MonoBehaviour
     public static readonly Dictionary<string, CharacterAttribute> CharacterAttributes = new Dictionary<string, CharacterAttribute>();
     public static readonly Dictionary<string, CharacterClass> CharacterClasses = new Dictionary<string, CharacterClass>();
     public static readonly Dictionary<string, CharacterPrototype> CharacterPrototypes = new Dictionary<string, CharacterPrototype>();
-    public static readonly Dictionary<string, Damage> Damages = new Dictionary<string, Damage>();
+    public static readonly Dictionary<string, DamageElement> DamageElements = new Dictionary<string, DamageElement>();
     public static readonly Dictionary<string, DamageEntity> DamageEntities = new Dictionary<string, DamageEntity>();
     public static readonly Dictionary<string, Item> Items = new Dictionary<string, Item>();
     public static readonly Dictionary<string, Skill> Skills = new Dictionary<string, Skill>();
@@ -88,7 +88,7 @@ public class GameInstance : MonoBehaviour
         CharacterAttributes.Clear();
         CharacterClasses.Clear();
         CharacterPrototypes.Clear();
-        Damages.Clear();
+        DamageElements.Clear();
         DamageEntities.Clear();
         Items.Clear();
         Skills.Clear();
@@ -150,13 +150,13 @@ public class GameInstance : MonoBehaviour
         }
     }
 
-    public static void AddDamages(IEnumerable<Damage> damages)
+    public static void AddDamageElements(IEnumerable<DamageElement> damageElements)
     {
-        foreach (var damage in damages)
+        foreach (var damageElement in damageElements)
         {
-            if (damage == null || Damages.ContainsKey(damage.Id))
+            if (damageElement == null || DamageElements.ContainsKey(damageElement.Id))
                 continue;
-            Damages[damage.Id] = damage;
+            DamageElements[damageElement.Id] = damageElement;
         }
     }
 
@@ -203,15 +203,15 @@ public class GameInstance : MonoBehaviour
                     attributes.Add(effectivenessAttribute.attribute);
                 }
                 AddCharacterAttributes(attributes);
-                var damages = new List<Damage>();
+                var damageElements = new List<DamageElement>();
                 var tempDamageAmounts = weaponItem.TempDamageAmounts.Values;
                 foreach (var tempDamageAmount in tempDamageAmounts)
                 {
-                    if (tempDamageAmount == null || tempDamageAmount.damage == null || Damages.ContainsKey(tempDamageAmount.damage.Id))
+                    if (tempDamageAmount == null || tempDamageAmount.damageElement == null || DamageElements.ContainsKey(tempDamageAmount.damageElement.Id))
                         continue;
-                    damages.Add(tempDamageAmount.damage);
+                    damageElements.Add(tempDamageAmount.damageElement);
                 }
-                AddDamages(damages);
+                AddDamageElements(damageElements);
                 var damageEntityPrefab = weaponItem.WeaponType.damageEntityPrefab;
                 if (damageEntityPrefab != null)
                     AddDamageEntities(new DamageEntity[] { damageEntityPrefab });
@@ -226,15 +226,15 @@ public class GameInstance : MonoBehaviour
             if (skill == null || Skills.ContainsKey(skill.Id))
                 continue;
             Skills[skill.Id] = skill;
-            var damages = new List<Damage>();
+            var damageElements = new List<DamageElement>();
             var tempDamageAmounts = skill.TempDamageAmounts.Values;
             foreach (var tempDamageAmount in tempDamageAmounts)
             {
-                if (tempDamageAmount == null || tempDamageAmount.damage == null || Damages.ContainsKey(tempDamageAmount.damage.Id))
+                if (tempDamageAmount == null || tempDamageAmount.damageElement == null || DamageElements.ContainsKey(tempDamageAmount.damageElement.Id))
                     continue;
-                damages.Add(tempDamageAmount.damage);
+                damageElements.Add(tempDamageAmount.damageElement);
             }
-            AddDamages(damages);
+            AddDamageElements(damageElements);
             var damageEntityPrefab = skill.damageEntityPrefab;
             if (damageEntityPrefab != null)
                 AddDamageEntities(new DamageEntity[] { damageEntityPrefab });

@@ -174,7 +174,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
                     damageAmountMin += damageAmount.minDamage;
                     damageAmountMax += damageAmount.maxDamage;
                     damagesString += string.Format(damageFormat,
-                        damageAmount.damage == null ? defaultDamageTitle : damageAmount.damage.title,
+                        damageAmount.damageElement == null ? defaultDamageTitle : damageAmount.damageElement.title,
                         damageAmount.minDamage,
                         damageAmount.maxDamage) + "\n";
                 }
