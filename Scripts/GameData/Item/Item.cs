@@ -9,3 +9,10 @@ public class Item : BaseGameData
     [Range(1, 1000)]
     public int maxStack = 1;
 }
+
+[System.Serializable]
+public struct ItemAmountPair
+{
+    public Item item;
+    public int amount;
+}
