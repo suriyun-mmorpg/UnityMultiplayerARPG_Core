@@ -9,21 +9,31 @@ public enum WeaponItemEquipType : byte
     TwoHand,
 }
 
-[System.Serializable]
-public class WeaponAttackAnimation
-{
-    public int actionId;
-    public float damageDuration;
-    public float totalDuration;
-}
-
 [CreateAssetMenu(fileName = "WeaponItem", menuName = "Create GameData/WeaponItem")]
 public class WeaponType : BaseGameData
 {
-    public float attackRange = 1f;
     public WeaponItemEquipType equipType = WeaponItemEquipType.OneHand;
     public DamageEffectivenessAttribute[] effectivenessAttributes;
-    public WeaponAttackAnimation[] mainAttackAnimations;
-    public WeaponAttackAnimation[] subAttackAnimations;
-    public DamageEntity damageEntityPrefab;
+    public ActionAnimation[] mainAttackAnimations;
+    public ActionAnimation[] subAttackAnimations;
+    public Damage damage;
+
+    private Dictionary<string, DamageEffectivenessAttribute> tempEffectivenessAttributes;
+    public Dictionary<string, DamageEffectivenessAttribute> TempEffectivenessAttributes
+    {
+        get
+        {
+            if (tempEffectivenessAttributes == null)
+            {
+                tempEffectivenessAttributes = new Dictionary<string, DamageEffectivenessAttribute>();
+                foreach (var effectivenessAttribute in effectivenessAttributes)
+                {
+                    if (effectivenessAttribute.attribute == null)
+                        continue;
+                    tempEffectivenessAttributes[effectivenessAttribute.attribute.Id] = effectivenessAttribute;
+                }
+            }
+            return tempEffectivenessAttributes;
+        }
+    }
 }

@@ -212,9 +212,9 @@ public class GameInstance : MonoBehaviour
                     damageElements.Add(tempDamageAmount.damageElement);
                 }
                 AddDamageElements(damageElements);
-                var damageEntityPrefab = weaponItem.WeaponType.damageEntityPrefab;
-                if (damageEntityPrefab != null)
-                    AddDamageEntities(new DamageEntity[] { damageEntityPrefab });
+                var missileDamageEntity = weaponItem.WeaponType.damage.missileDamageEntity;
+                if (missileDamageEntity != null)
+                    AddDamageEntities(new DamageEntity[] { missileDamageEntity });
             }
         }
     }
@@ -235,9 +235,9 @@ public class GameInstance : MonoBehaviour
                 damageElements.Add(tempDamageAmount.damageElement);
             }
             AddDamageElements(damageElements);
-            var damageEntityPrefab = skill.damageEntityPrefab;
-            if (damageEntityPrefab != null)
-                AddDamageEntities(new DamageEntity[] { damageEntityPrefab });
+            var missileDamageEntity = skill.damage.missileDamageEntity;
+            if (missileDamageEntity != null)
+                AddDamageEntities(new DamageEntity[] { missileDamageEntity });
         }
     }
 

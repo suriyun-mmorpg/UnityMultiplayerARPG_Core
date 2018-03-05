@@ -10,13 +10,16 @@ public class Skill : BaseGameData
     public float consumeMpIncreaseEachLevel;
     public float baseCoolDownDuration;
     public float coolDownDurationIncreaseEachLevel;
+    public ActionAnimation castAnimation;
     [Header("Attack")]
     public bool isAttack;
-    public DamageEntity damageEntityPrefab;
     public DamageAmount[] damageAmounts;
+    public Damage damage;
+    public DamageEffectivenessAttribute[] effectivenessAttributes;
     [Header("Buffs")]
     public bool isBuff;
     [Tooltip("`buffDistance` = 0, will buff only caster")]
+    [Range(0f, 100f)]
     public float buffDistance;
     [Tooltip("If buff duration less than or equals to 0, buff stats won't applied")]
     public float baseBuffDuration;
@@ -28,6 +31,25 @@ public class Skill : BaseGameData
     public CharacterStats baseStats;
     public CharacterStats statsIncreaseEachLevel;
     public CharacterStatsPercentage statsPercentageIncreaseEachLevel;
+
+    private Dictionary<string, DamageEffectivenessAttribute> tempEffectivenessAttributes;
+    public Dictionary<string, DamageEffectivenessAttribute> TempEffectivenessAttributes
+    {
+        get
+        {
+            if (tempEffectivenessAttributes == null)
+            {
+                tempEffectivenessAttributes = new Dictionary<string, DamageEffectivenessAttribute>();
+                foreach (var effectivenessAttribute in effectivenessAttributes)
+                {
+                    if (effectivenessAttribute.attribute == null)
+                        continue;
+                    tempEffectivenessAttributes[effectivenessAttribute.attribute.Id] = effectivenessAttribute;
+                }
+            }
+            return tempEffectivenessAttributes;
+        }
+    }
 
     private Dictionary<string, DamageAmount> tempDamageAmounts;
     public Dictionary<string, DamageAmount> TempDamageAmounts

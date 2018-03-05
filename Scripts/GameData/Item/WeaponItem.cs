@@ -16,8 +16,9 @@ public class WeaponItem : EquipmentItem
             {
                 weaponType = CreateInstance<WeaponType>();
                 weaponType.effectivenessAttributes = new DamageEffectivenessAttribute[0];
-                weaponType.mainAttackAnimations = new WeaponAttackAnimation[0];
-                weaponType.subAttackAnimations = new WeaponAttackAnimation[0];
+                weaponType.mainAttackAnimations = new ActionAnimation[0];
+                weaponType.subAttackAnimations = new ActionAnimation[0];
+                weaponType.damage = new Damage();
             }
             return weaponType;
         }
