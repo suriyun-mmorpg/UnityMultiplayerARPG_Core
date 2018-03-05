@@ -42,11 +42,13 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     // Entity data
     protected CharacterModel model;
     protected bool doingAction;
+    protected readonly Dictionary<string, int> buffLocations = new Dictionary<string, int>();
     protected readonly Dictionary<string, int> equipItemLocations = new Dictionary<string, int>();
     protected readonly List<CharacterItem> equipWeapons = new List<CharacterItem>();
     protected float lastUpdateSkillAndBuffTime = 0f;
     // Net Functions
     protected LiteNetLibFunction netFunctionAttack;
+    protected LiteNetLibFunction<NetFieldInt> netFunctionUseSkill;
     protected LiteNetLibFunction<NetFieldFloat, NetFieldInt> netFuncPlayActionAnimation;
     protected LiteNetLibFunction<NetFieldUInt> netFuncPickupItem;
     protected LiteNetLibFunction<NetFieldInt, NetFieldInt> netFuncDropItem;
@@ -261,9 +263,11 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     {
         SetupNetElements();
         prototypeId.onChange += OnPrototypeIdChange;
+        buffs.onOperation += OnBuffsOperation;
         equipItems.onOperation += OnEquipItemsOperation;
         nonEquipItems.onOperation += OnNonEquipItemsOperation;
         netFunctionAttack = new LiteNetLibFunction(NetFuncAttackCallback);
+        netFunctionUseSkill = new LiteNetLibFunction<NetFieldInt>(NetFuncUseSkillCallback);
         netFuncPlayActionAnimation = new LiteNetLibFunction<NetFieldFloat, NetFieldInt>(NetFuncPlayActionAnimationCallback);
         netFuncPickupItem = new LiteNetLibFunction<NetFieldUInt>(NetFuncPickupItemCallback);
         netFuncDropItem = new LiteNetLibFunction<NetFieldInt, NetFieldInt>(NetFuncDropItemCallback);
@@ -316,14 +320,116 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
         var anim = animArray[Random.Range(0, animLength - 1)];
         PlayActionAnimation(anim.totalDuration, anim.actionId);
-        StartCoroutine(AttackRoutine(anim.damageDuration, anim.totalDuration, weaponType.damageEntityPrefab, weapon.damageAmounts));
+        StartCoroutine(AttackRoutine(anim.triggerDuration, anim.totalDuration, weapon.TempDamageAmounts, weaponType.damage, weaponType.TempEffectivenessAttributes));
     }
 
-    IEnumerator AttackRoutine(float damageDuration, float totalDuration, DamageEntity damageEntity, DamageAmount[] damageAmounts)
+    IEnumerator AttackRoutine(float damageDuration,
+        float totalDuration,
+        Dictionary<string, DamageAmount> damageAmounts,
+        Damage damage,
+        Dictionary<string, DamageEffectivenessAttribute> effectivenessAttributes)
     {
         yield return new WaitForSecondsRealtime(damageDuration);
-        Manager.Assets.NetworkSpawn(damageEntity.Identity, TempTransform.position);
+        switch (damage.damageType)
+        {
+            case DamageType.Melee:
+                var hits = Physics.OverlapSphere(TempTransform.position, model.radius + damage.hitDistance);
+                foreach (var hit in hits)
+                {
+                    var characterEntity = hit.GetComponent<CharacterEntity>();
+                    if (characterEntity == null)
+                        continue;
+                    characterEntity.ReceiveDamage(this, damageAmounts, effectivenessAttributes);
+                }
+                break;
+            case DamageType.Missile:
+                if (damage.missileDamageEntity != null)
+                {
+                    var missileDamageIdentity = Manager.Assets.NetworkSpawn(damage.missileDamageEntity.Identity, TempTransform.position);
+                    var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
+                    missileDamageEntity.SetupDamage(this, damageAmounts, effectivenessAttributes, damage.missileDistance, damage.missileSpeed);
+                }
+                break;
+        }
         yield return new WaitForSecondsRealtime(totalDuration - damageDuration);
+        doingAction = false;
+    }
+
+    protected void NetFuncUseSkillCallback(NetFieldInt skillIndex)
+    {
+        NetFuncUseSkill(skillIndex);
+    }
+
+    protected void NetFuncUseSkill(int skillIndex)
+    {
+        if (CurrentHp <= 0 || model == null || doingAction || skillIndex < 0 || skillIndex >= skillLevels.Count)
+            return;
+
+        var characterSkill = skillLevels[skillIndex];
+        var skill = characterSkill.GetSkill();
+        if (skill == null)
+            return;
+
+        if (!characterSkill.CanUse(CurrentMp))
+            return;
+
+        doingAction = true;
+        var anim = skill.castAnimation;
+        PlayActionAnimation(anim.totalDuration, anim.actionId);
+        StartCoroutine(UseSkillRoutine(skillIndex));
+    }
+
+    IEnumerator UseSkillRoutine(int skillIndex)
+    {
+        var characterSkill = skillLevels[skillIndex];
+        var skill = characterSkill.GetSkill();
+        var anim = skill.castAnimation;
+        yield return new WaitForSecondsRealtime(anim.triggerDuration);
+        if (skill.isAttack)
+        {
+            var damageAmounts = skill.TempDamageAmounts;
+            var damage = skill.damage;
+            var effectivenessAttributes = skill.TempEffectivenessAttributes;
+            switch (damage.damageType)
+            {
+                case DamageType.Melee:
+                    var hits = Physics.OverlapSphere(TempTransform.position, model.radius + damage.hitDistance);
+                    foreach (var hit in hits)
+                    {
+                        var characterEntity = hit.GetComponent<CharacterEntity>();
+                        if (characterEntity == null)
+                            continue;
+                        characterEntity.ReceiveDamage(this, damageAmounts, effectivenessAttributes);
+                    }
+                    break;
+                case DamageType.Missile:
+                    if (damage.missileDamageEntity != null)
+                    {
+                        var missileDamageIdentity = Manager.Assets.NetworkSpawn(damage.missileDamageEntity.Identity, TempTransform.position);
+                        var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
+                        missileDamageEntity.SetupDamage(this, damageAmounts, effectivenessAttributes, damage.missileDistance, damage.missileSpeed);
+                    }
+                    break;
+            }
+        }
+        if (skill.isBuff)
+        {
+            // TODO: Implement buff add to another characters
+            if (buffLocations.ContainsKey(characterSkill.skillId))
+            {
+                var buffIndex = buffLocations[characterSkill.skillId];
+                // Don't update here let it update at update function to remove it
+                buffs[buffIndex].buffRemainsDuration = 0;
+            }
+            var characterBuff = new CharacterBuff();
+            characterBuff.skillId = characterSkill.skillId;
+            characterBuff.level = characterSkill.level;
+            characterBuff.Added();
+            buffs.Add(characterBuff);
+        }
+        skillLevels[skillIndex].Used();
+        skillLevels.Dirty(skillIndex);
+        yield return new WaitForSecondsRealtime(anim.totalDuration - anim.triggerDuration);
         doingAction = false;
     }
 
@@ -735,6 +841,24 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
         return true;
     }
+
+    public virtual void ReceiveDamage(CharacterEntity attacker, Dictionary<string, DamageAmount> damageAmounts, Dictionary<string, DamageEffectivenessAttribute> effectivenessAttributes)
+    {
+        // TODO: calculate damages
+        if (CurrentHp <= 0)
+        {
+            StopAllCoroutines();
+            doingAction = false;
+            buffs.Clear();
+            var count = skillLevels.Count;
+            for (var i = 0; i < count; ++i)
+            {
+                var skillLevel = skillLevels[i];
+                skillLevel.coolDownRemainsDuration = 0;
+                skillLevels.Dirty(i);
+            }
+        }
+    }
     #endregion
 
     private void SetupNetElements()
@@ -767,6 +891,17 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             TempCapsuleCollider.radius = model.radius;
             TempCapsuleCollider.height = model.height;
             model.SetEquipItems(equipItems);
+        }
+    }
+
+    protected void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
+    {
+        buffLocations.Clear();
+
+        for (var i = 0; i < buffs.Count; ++i)
+        {
+            var buff = buffs[i];
+            buffLocations[buff.skillId] = i;
         }
     }
 
@@ -830,6 +965,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     protected virtual void OnDestroy()
     {
         prototypeId.onChange -= OnPrototypeIdChange;
+        buffs.onOperation -= OnBuffsOperation;
         equipItems.onOperation -= OnEquipItemsOperation;
         nonEquipItems.onOperation -= OnNonEquipItemsOperation;
     }
