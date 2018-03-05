@@ -74,9 +74,9 @@ public class CharacterSkillLevel
         return skill.baseRecoveryMp + skill.recoveryMpIncreaseEachLevel * level;
     }
 
-    public bool CanUse()
+    public bool CanUse(int currentMp)
     {
-        return level >= 1 && coolDownRemainsDuration <= 0;
+        return level >= 1 && coolDownRemainsDuration <= 0 && currentMp >= GetConsumeMp();
     }
 
     public void Used()
