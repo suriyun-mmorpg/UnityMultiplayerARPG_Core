@@ -6,7 +6,7 @@ public class UISceneGameplay : MonoBehaviour
 {
     public static UISceneGameplay Singleton { get; private set; }
 
-    public UICharacter uiCharacter;
+    public UICharacter[] uiCharacters;
     public UIEquipItems uiEquipItems;
     public UINonEquipItems uiNonEquipItems;
     private CharacterEntity owningCharacterEntity;
@@ -40,8 +40,11 @@ public class UISceneGameplay : MonoBehaviour
     public void SetOwningCharacter(CharacterEntity characterEntity)
     {
         owningCharacterEntity = characterEntity;
-        if (uiCharacter != null)
-            uiCharacter.data = owningCharacterEntity;
+        foreach (var uiCharacter in uiCharacters)
+        {
+            if (uiCharacter != null)
+                uiCharacter.data = owningCharacterEntity;
+        }
     }
 
     private void OnSelectEquipItem(UICharacterItem ui)
