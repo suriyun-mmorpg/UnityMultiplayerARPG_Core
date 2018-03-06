@@ -11,6 +11,8 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
     public string titleFormat = "{0}";
     [Tooltip("Description Format => {0} = {Description}")]
     public string descriptionFormat = "{0}";
+    [Tooltip("Level Format => {0} = {Level}")]
+    public string levelFormat = "Lv: {0}";
     [Tooltip("Require Skill Level Format => {0} = {Skill title}, {1} = {Skill level}")]
     public string requireSkillLevelFormat = "Require {0}: {1}";
     [Tooltip("Consume Mp Format => {0} = {Consume Mp amount}")]
@@ -64,6 +66,7 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
     [Header("UI Elements")]
     public Text textTitle;
     public Text textDescription;
+    public Text textLevel;
     public Image imageIcon;
     public Text textRequireSkillLevel;
     public Text textConsumeMp;
@@ -86,6 +89,9 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
 
         if (textDescription != null)
             textDescription.text = string.Format(descriptionFormat, skillData == null ? "N/A" : skillData.description);
+
+        if (textLevel != null)
+            textLevel.text = string.Format(levelFormat, data == null ? "N/A" : data.level.ToString("N0"));
 
         if (imageIcon != null)
             imageIcon.sprite = skillData == null ? null : skillData.icon;
