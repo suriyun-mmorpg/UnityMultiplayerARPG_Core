@@ -6,13 +6,17 @@ using LiteNetLibHighLevel;
 [System.Serializable]
 public class CharacterAttributeLevel
 {
-    // Use attributeId as primary key
     public string attributeId;
-    public int amount;
+    public int level;
 
     public CharacterAttribute GetAttribute()
     {
         return GameInstance.CharacterAttributes.ContainsKey(attributeId) ? GameInstance.CharacterAttributes[attributeId] : null;
+    }
+
+    public bool CanLevelUp()
+    {
+        return GetAttribute() != null;
     }
 
     public CharacterStats GetStats()
@@ -20,7 +24,7 @@ public class CharacterAttributeLevel
         var attribute = GetAttribute();
         if (attribute == null)
             return new CharacterStats();
-        return attribute.statsIncreaseEachLevel * amount;
+        return attribute.statsIncreaseEachLevel * level;
     }
 
     public CharacterStatsPercentage GetStatsPercentage()
@@ -28,7 +32,7 @@ public class CharacterAttributeLevel
         var attribute = GetAttribute();
         if (attribute == null)
             return new CharacterStatsPercentage();
-        return attribute.statsPercentageIncreaseEachLevel * amount;
+        return attribute.statsPercentageIncreaseEachLevel * level;
     }
 }
 
@@ -38,7 +42,7 @@ public class NetFieldCharacterAttributeLevel : LiteNetLibNetField<CharacterAttri
     {
         var newValue = new CharacterAttributeLevel();
         newValue.attributeId = reader.GetString();
-        newValue.amount = reader.GetInt();
+        newValue.level = reader.GetInt();
         Value = newValue;
     }
 
@@ -47,7 +51,7 @@ public class NetFieldCharacterAttributeLevel : LiteNetLibNetField<CharacterAttri
         if (Value == null)
             Value = new CharacterAttributeLevel();
         writer.Put(Value.attributeId);
-        writer.Put(Value.amount);
+        writer.Put(Value.level);
     }
 
     public override bool IsValueChanged(CharacterAttributeLevel newValue)

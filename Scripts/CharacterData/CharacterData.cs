@@ -149,7 +149,7 @@ public static class CharacterDataExtension
         {
             var attributeLevel = new CharacterAttributeLevel();
             attributeLevel.attributeId = baseAttribute.attribute.Id;
-            attributeLevel.amount = baseAttribute.amount;
+            attributeLevel.level = baseAttribute.amount;
             character.AttributeLevels.Add(attributeLevel);
         }
         character.CurrentHp = character.GetMaxHp();
