@@ -5,6 +5,17 @@ using UnityEngine;
 public class UIBase : MonoBehaviour
 {
     public bool hideOnAwake = false;
+    public GameObject root;
+    
+    public GameObject TempRoot
+    {
+        get
+        {
+            if (root == null)
+                root = gameObject;
+            return root;
+        }
+    }
 
     protected virtual void Awake()
     {
@@ -12,13 +23,26 @@ public class UIBase : MonoBehaviour
             Hide();
     }
 
+    public virtual bool IsVisible()
+    {
+        return TempRoot.activeSelf;
+    }
+
     public virtual void Show()
     {
-        gameObject.SetActive(true);
+        TempRoot.SetActive(true);
     }
 
     public virtual void Hide()
     {
-        gameObject.SetActive(false);
+        TempRoot.SetActive(false);
+    }
+
+    public virtual void Toggle()
+    {
+        if (IsVisible())
+            Hide();
+        else
+            Show();
     }
 }
