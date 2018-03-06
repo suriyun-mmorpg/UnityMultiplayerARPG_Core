@@ -47,14 +47,16 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     protected readonly List<CharacterItem> equipWeapons = new List<CharacterItem>();
     protected float lastUpdateSkillAndBuffTime = 0f;
     // Net Functions
-    protected LiteNetLibFunction netFunctionAttack;
-    protected LiteNetLibFunction<NetFieldInt> netFunctionUseSkill;
+    protected LiteNetLibFunction netFuncAttack;
+    protected LiteNetLibFunction<NetFieldInt> netFuncUseSkill;
     protected LiteNetLibFunction<NetFieldFloat, NetFieldInt> netFuncPlayActionAnimation;
     protected LiteNetLibFunction<NetFieldUInt> netFuncPickupItem;
     protected LiteNetLibFunction<NetFieldInt, NetFieldInt> netFuncDropItem;
     protected LiteNetLibFunction<NetFieldInt, NetFieldInt> netFuncSwapOrMergeItem;
     protected LiteNetLibFunction<NetFieldInt, NetFieldString> netFuncEquipItem;
     protected LiteNetLibFunction<NetFieldString, NetFieldInt> netFuncUnEquipItem;
+    protected LiteNetLibFunction<NetFieldInt> netFuncAddAttributeLevel;
+    protected LiteNetLibFunction<NetFieldInt> netFuncAddSkillLevel;
     #endregion
 
     public string Id { get { return id; } set { id.Value = value; } }
@@ -266,21 +268,25 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         buffs.onOperation += OnBuffsOperation;
         equipItems.onOperation += OnEquipItemsOperation;
         nonEquipItems.onOperation += OnNonEquipItemsOperation;
-        netFunctionAttack = new LiteNetLibFunction(NetFuncAttackCallback);
-        netFunctionUseSkill = new LiteNetLibFunction<NetFieldInt>(NetFuncUseSkillCallback);
+        netFuncAttack = new LiteNetLibFunction(NetFuncAttackCallback);
+        netFuncUseSkill = new LiteNetLibFunction<NetFieldInt>(NetFuncUseSkillCallback);
         netFuncPlayActionAnimation = new LiteNetLibFunction<NetFieldFloat, NetFieldInt>(NetFuncPlayActionAnimationCallback);
         netFuncPickupItem = new LiteNetLibFunction<NetFieldUInt>(NetFuncPickupItemCallback);
         netFuncDropItem = new LiteNetLibFunction<NetFieldInt, NetFieldInt>(NetFuncDropItemCallback);
         netFuncSwapOrMergeItem = new LiteNetLibFunction<NetFieldInt, NetFieldInt>(NetFuncSwapOrMergeItemCallback);
         netFuncEquipItem = new LiteNetLibFunction<NetFieldInt, NetFieldString>(NetFuncEquipItemCallback);
         netFuncUnEquipItem = new LiteNetLibFunction<NetFieldString, NetFieldInt>(NetFuncUnEquipItemCallback);
-        RegisterNetFunction("Attack", netFunctionAttack);
+        netFuncAddAttributeLevel = new LiteNetLibFunction<NetFieldInt>(NetFuncAddAttributeLevelCallback);
+        netFuncAddSkillLevel = new LiteNetLibFunction<NetFieldInt>(NetFuncAddSkillLevelCallback);
+        RegisterNetFunction("Attack", netFuncAttack);
         RegisterNetFunction("PlayActionAnimation", netFuncPlayActionAnimation);
         RegisterNetFunction("PickupItem", netFuncPickupItem);
         RegisterNetFunction("DropItem", netFuncDropItem);
         RegisterNetFunction("SwapOrMergeItem", netFuncSwapOrMergeItem);
         RegisterNetFunction("EquipItem", netFuncEquipItem);
         RegisterNetFunction("UnEquipItem", netFuncUnEquipItem);
+        RegisterNetFunction("AddAttributeLevel", netFuncAddAttributeLevel);
+        RegisterNetFunction("AddSkillLevel", netFuncAddSkillLevel);
     }
 
     #region Net functions callbacks
@@ -366,14 +372,12 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             return;
 
         var characterSkill = skillLevels[skillIndex];
-        var skill = characterSkill.GetSkill();
-        if (skill == null)
-            return;
-
         if (!characterSkill.CanUse(CurrentMp))
             return;
 
         doingAction = true;
+
+        var skill = characterSkill.GetSkill();
         var anim = skill.castAnimation;
         PlayActionAnimation(anim.totalDuration, anim.actionId);
         StartCoroutine(UseSkillRoutine(skillIndex));
@@ -442,6 +446,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     {
         if (CurrentHp <= 0 || model == null)
             return;
+
         StartCoroutine(PlayActionAnimationRoutine(duration, actionId));
     }
 
@@ -461,15 +466,20 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected void NetFuncPickupItem(uint objectId)
     {
+        if (CurrentHp <= 0 || doingAction)
+            return;
+
         var gameInstance = GameInstance.Singleton;
         var spawnedObjects = Manager.Assets.SpawnedObjects;
         // Find object by objectId, if not found don't continue
         if (!Manager.Assets.SpawnedObjects.ContainsKey(objectId))
             return;
+
         var spawnedObject = spawnedObjects[objectId];
         // Don't pickup item if it's too far
         if (Vector3.Distance(TempTransform.position, spawnedObject.transform.position) >= gameInstance.pickUpItemDistance)
             return;
+
         var itemDropEntity = spawnedObject.GetComponent<ItemDropEntity>();
         var itemDropData = itemDropEntity.dropData;
         if (!itemDropData.IsValid())
@@ -493,11 +503,13 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     protected void NetFuncDropItem(int index, int amount)
     {
         var gameInstance = GameInstance.Singleton;
-        if (index < 0 || index > nonEquipItems.Count)
+        if (CurrentHp <= 0 || doingAction || index < 0 || index > nonEquipItems.Count)
             return;
+
         var nonEquipItem = nonEquipItems[index];
         if (!nonEquipItem.IsValid() || amount > nonEquipItem.amount)
             return;
+
         var itemId = nonEquipItem.itemId;
         var level = nonEquipItem.level;
         if (DecreaseItems(index, amount))
@@ -520,13 +532,16 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected void NetFuncSwapOrMergeItem(int fromIndex, int toIndex)
     {
-        if (fromIndex < 0 || fromIndex > nonEquipItems.Count ||
+        if (CurrentHp <= 0 || doingAction || 
+            fromIndex < 0 || fromIndex > nonEquipItems.Count ||
             toIndex < 0 || toIndex > nonEquipItems.Count)
             return;
+
         var fromItem = nonEquipItems[fromIndex];
         var toItem = nonEquipItems[toIndex];
         if (!fromItem.IsValid() || !toItem.IsValid())
             return;
+
         if (fromItem.itemId.Equals(toItem.itemId) && !fromItem.IsFull() && !toItem.IsFull())
         {
             // Merge if same id and not full
@@ -562,7 +577,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected void NetFuncEquipItem(int fromIndex, string toEquipPosition)
     {
-        if (fromIndex < 0 || fromIndex > nonEquipItems.Count || !GameInstance.EquipmentPositions.Contains(toEquipPosition))
+        if (CurrentHp <= 0 || doingAction || fromIndex < 0 || fromIndex > nonEquipItems.Count || !GameInstance.EquipmentPositions.Contains(toEquipPosition))
             return;
         var equipItem = nonEquipItems[fromIndex];
         string reasonWhyCannot;
@@ -600,7 +615,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected void NetFuncUnEquipItem(string fromEquipPosition, int toIndex)
     {
-        if (toIndex < 0 || toIndex > nonEquipItems.Count || !equipItemLocations.ContainsKey(fromEquipPosition) || !GameInstance.EquipmentPositions.Contains(fromEquipPosition))
+        if (CurrentHp <= 0 || doingAction || toIndex < 0 || toIndex > nonEquipItems.Count || !equipItemLocations.ContainsKey(fromEquipPosition) || !GameInstance.EquipmentPositions.Contains(fromEquipPosition))
             return;
         var fromIndex = equipItemLocations[fromEquipPosition];
         var unEquipItem = equipItems[fromIndex];
@@ -615,6 +630,42 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             unEquipItem.isSubWeapon = false;
             nonEquipItems[toIndex] = unEquipItem;
         }
+    }
+
+    protected void NetFuncAddAttributeLevelCallback(NetFieldInt attributeIndex)
+    {
+        NetFuncAddAttributeLevel(attributeIndex);
+    }
+
+    protected void NetFuncAddAttributeLevel(int attributeIndex)
+    {
+        if (CurrentHp <= 0 || attributeIndex < 0 || attributeIndex >= attributeLevels.Count)
+            return;
+
+        var attributeLevel = attributeLevels[attributeIndex];
+        if (attributeLevel.CanLevelUp())
+            return;
+
+        ++attributeLevels[attributeIndex].level;
+        attributeLevels.Dirty(attributeIndex);
+    }
+
+    protected void NetFuncAddSkillLevelCallback(NetFieldInt skillIndex)
+    {
+        NetFuncAddSkillLevel(skillIndex);
+    }
+
+    protected void NetFuncAddSkillLevel(int skillIndex)
+    {
+        if (CurrentHp <= 0 || skillIndex < 0 || skillIndex >= skillLevels.Count)
+            return;
+
+        var characterSkill = skillLevels[skillIndex];
+        if (characterSkill.CanLevelUp())
+            return;
+
+        ++skillLevels[skillIndex].level;
+        skillLevels.Dirty(skillIndex);
     }
     #endregion
 
@@ -687,6 +738,16 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     public void UnEquipItem(string fromEquipPosition, int toIndex)
     {
         CallNetFunction("UnEquipItem", FunctionReceivers.Server, fromEquipPosition, toIndex);
+    }
+
+    public void AddAttributeLevel(int attributeIndex)
+    {
+        CallNetFunction("AddAttributeLevel", FunctionReceivers.Server, attributeIndex);
+    }
+
+    public void AddSkillLevel(int skillIndex)
+    {
+        CallNetFunction("AddSkillLevel", FunctionReceivers.Server, skillIndex);
     }
     #endregion
 
