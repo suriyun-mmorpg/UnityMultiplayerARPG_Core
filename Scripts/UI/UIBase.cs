@@ -6,7 +6,9 @@ public class UIBase : MonoBehaviour
 {
     public bool hideOnAwake = false;
     public GameObject root;
-    
+
+    private bool isAwaken;
+
     public GameObject TempRoot
     {
         get
@@ -19,6 +21,10 @@ public class UIBase : MonoBehaviour
 
     protected virtual void Awake()
     {
+        if (isAwaken)
+            return;
+        isAwaken = true;
+
         if (hideOnAwake)
             Hide();
     }
@@ -30,11 +36,13 @@ public class UIBase : MonoBehaviour
 
     public virtual void Show()
     {
+        isAwaken = true;
         TempRoot.SetActive(true);
     }
 
     public virtual void Hide()
     {
+        isAwaken = true;
         TempRoot.SetActive(false);
     }
 
