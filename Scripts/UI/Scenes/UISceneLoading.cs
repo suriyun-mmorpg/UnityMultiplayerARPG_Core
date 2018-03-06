@@ -40,12 +40,17 @@ public class UISceneLoading : MonoBehaviour
         while (!asyncOp.isDone)
         {
             if (textProgress != null)
-                textProgress.text = (asyncOp.progress * 100) + " / 100%";
+                textProgress.text = (asyncOp.progress * 100f).ToString("N0") + " / 100%";
             if (imageGage != null)
                 imageGage.fillAmount = asyncOp.progress;
             yield return null;
         }
         yield return null;
+        if (textProgress != null)
+            textProgress.text = "100 / 100%";
+        if (imageGage != null)
+            imageGage.fillAmount = 1;
+        yield return new WaitForSecondsRealtime(1f);
         if (rootObject != null)
             rootObject.SetActive(false);
     }
