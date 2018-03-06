@@ -9,10 +9,10 @@ public class UISceneGameplay : MonoBehaviour
     public UICharacter[] uiCharacters;
     public UIEquipItems uiEquipItems;
     public UINonEquipItems uiNonEquipItems;
-    private CharacterEntity owningCharacterEntity;
 
-    public UICharacterItem SelectedEquipItem { get; protected set; }
-    public UICharacterItem SelectedNonEquipItem { get; protected set; }
+    public CharacterEntity OwningCharacterEntity { get; private set; }
+    public UICharacterItem SelectedEquipItem { get; private set; }
+    public UICharacterItem SelectedNonEquipItem { get; private set; }
 
     private void Awake()
     {
@@ -39,11 +39,11 @@ public class UISceneGameplay : MonoBehaviour
 
     public void SetOwningCharacter(CharacterEntity characterEntity)
     {
-        owningCharacterEntity = characterEntity;
+        OwningCharacterEntity = characterEntity;
         foreach (var uiCharacter in uiCharacters)
         {
             if (uiCharacter != null)
-                uiCharacter.data = owningCharacterEntity;
+                uiCharacter.data = OwningCharacterEntity;
         }
     }
 
@@ -56,7 +56,7 @@ public class UISceneGameplay : MonoBehaviour
         }
         if (SelectedNonEquipItem != null)
         {
-            owningCharacterEntity.EquipItem(SelectedNonEquipItem.data, ui.data);
+            OwningCharacterEntity.EquipItem(SelectedNonEquipItem.data, ui.data);
             uiEquipItems.SelectionManager.DeSelectAll();
             uiNonEquipItems.SelectionManager.DeSelectAll();
         }
@@ -70,13 +70,13 @@ public class UISceneGameplay : MonoBehaviour
     {
         if (SelectedNonEquipItem != null)
         {
-            owningCharacterEntity.SwapOrMergeItem(SelectedNonEquipItem.data, ui.data);
+            OwningCharacterEntity.SwapOrMergeItem(SelectedNonEquipItem.data, ui.data);
             uiNonEquipItems.SelectionManager.DeSelectAll();
             SelectedNonEquipItem = null;
         }
         else if (SelectedEquipItem != null)
         {
-            owningCharacterEntity.UnEquipItem(SelectedNonEquipItem.data, ui.data);
+            OwningCharacterEntity.UnEquipItem(SelectedNonEquipItem.data, ui.data);
             uiEquipItems.SelectionManager.DeSelectAll();
             uiNonEquipItems.SelectionManager.DeSelectAll();
         }
