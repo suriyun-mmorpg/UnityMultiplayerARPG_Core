@@ -32,9 +32,9 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
     [Tooltip("Def Stats Format => {0} = {Amount}")]
     public string defStatsFormat = "Def: {0}";
     [Tooltip("Cri Hit Rate Stats Format => {0} = {Amount}")]
-    public string criHitRateStatsFormat = "Cri Hit: {0}";
+    public string criHitRateStatsFormat = "Cri Hit: {0}%";
     [Tooltip("Cri Dmg Rate Stats Format => {0} = {Amount}")]
-    public string criDmgRateStatsFormat = "Cri Dmg: {0}";
+    public string criDmgRateStatsFormat = "Cri Dmg: {0}%";
 
     [Header("Equipment Stats Percentage Format")]
     [Tooltip("Hp Stats Percentage Format => {0} = {Amount}")]
@@ -139,9 +139,9 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
             if (stats.def != 0)
                 statsString += string.Format(defStatsFormat, stats.def) + "\n";
             if (stats.criHitRate != 0)
-                statsString += string.Format(criHitRateStatsFormat, stats.criHitRate) + "\n";
+                statsString += string.Format(criHitRateStatsFormat, (stats.criHitRate * 100f).ToString("N2")) + "\n";
             if (stats.criDmgRate != 0)
-                statsString += string.Format(criDmgRateStatsFormat, stats.criDmgRate) + "\n";
+                statsString += string.Format(criDmgRateStatsFormat, (stats.criDmgRate * 100f).ToString("N2")) + "\n";
             textStats.gameObject.SetActive(!string.IsNullOrEmpty(statsString));
             textStats.text = statsString;
         }
@@ -160,9 +160,9 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
             if (statsPercentage.def != 0)
                 statsPercentageString += string.Format(defStatsPercentageFormat, statsPercentage.def) + "\n";
             if (statsPercentage.criHitRate != 0)
-                statsPercentageString += string.Format(criHitRateStatsPercentageFormat, statsPercentage.criHitRate) + "\n";
+                statsPercentageString += string.Format(criHitRateStatsPercentageFormat, (statsPercentage.criHitRate * 100f).ToString("N2")) + "\n";
             if (statsPercentage.criDmgRate != 0)
-                statsPercentageString += string.Format(criDmgRateStatsPercentageFormat, statsPercentage.criDmgRate) + "\n";
+                statsPercentageString += string.Format(criDmgRateStatsPercentageFormat, (statsPercentage.criDmgRate * 100f).ToString("N2")) + "\n";
             textStatsPercentage.gameObject.SetActive(!string.IsNullOrEmpty(statsPercentageString));
             textStatsPercentage.text = statsPercentageString;
         }
