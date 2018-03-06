@@ -15,6 +15,14 @@ public class CharacterSkillLevel
         return GameInstance.Skills.ContainsKey(skillId) ? GameInstance.Skills[skillId] : null;
     }
 
+    public int GetMaxLevel()
+    {
+        var skill = GetSkill();
+        if (skill == null)
+            return 0;
+        return skill.maxLevel;
+    }
+
     public float GetConsumeMp()
     {
         var skill = GetSkill();
@@ -74,9 +82,14 @@ public class CharacterSkillLevel
         return skill.baseRecoveryMp + skill.recoveryMpIncreaseEachLevel * level;
     }
 
+    public bool CanLevelUp()
+    {
+        return GetSkill() != null && level < GetMaxLevel();
+    }
+
     public bool CanUse(int currentMp)
     {
-        return level >= 1 && coolDownRemainsDuration <= 0 && currentMp >= GetConsumeMp();
+        return GetSkill() != null && level >= 1 && coolDownRemainsDuration <= 0 && currentMp >= GetConsumeMp();
     }
 
     public void Used()
