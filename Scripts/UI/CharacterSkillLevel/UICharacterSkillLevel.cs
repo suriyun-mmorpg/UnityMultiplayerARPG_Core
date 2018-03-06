@@ -30,30 +30,6 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
     [Tooltip("Recovery Mp Format => {0} = {Recovery amount}")]
     public string recoveryMpFormat = "Recovery Mp: {0}";
 
-    [Header("Skill Buff Stats Format")]
-    [Tooltip("Hp Stats Format => {0} = {Amount}")]
-    public string hpStatsFormat = "Hp: {0}";
-    [Tooltip("Mp Stats Format => {0} = {Amount}")]
-    public string mpStatsFormat = "Mp: {0}";
-    [Tooltip("Atk Rate Stats Format => {0} = {Amount}")]
-    public string atkRateStatsFormat = "Atk Rate: {0}";
-    [Tooltip("Def Stats Format => {0} = {Amount}")]
-    public string defStatsFormat = "Def: {0}";
-    [Tooltip("Cri Hit Rate Stats Format => {0} = {Amount}")]
-    public string criHitRateStatsFormat = "Cri Hit: {0}";
-    [Tooltip("Cri Dmg Rate Stats Format => {0} = {Amount}")]
-    public string criDmgRateStatsFormat = "Cri Dmg: {0}";
-
-    [Header("Skill Buff Stats Percentage Format")]
-    [Tooltip("Hp Stats Percentage Format => {0} = {Amount}")]
-    public string hpStatsPercentageFormat = "Hp: {0}%";
-    [Tooltip("Mp Stats Percentage Format => {0} = {Amount}")]
-    public string mpStatsPercentageFormat = "Mp: {0}%";
-    [Tooltip("Atk Rate Stats Percentage Format => {0} = {Amount}")]
-    public string atkRateStatsPercentageFormat = "Atk Rate: {0}%";
-    [Tooltip("Def Stats Percentage Format => {0} = {Amount}")]
-    public string defStatsPercentageFormat = "Def: {0}%";
-
     [Header("Skill Attack Damage Format")]
     [Tooltip("Damage Format => {0} = {Damage title}, {1} = {Min damage}, {2} = {Max damage}")]
     public string damageFormat = "{0}: {1}~{2}";
@@ -72,9 +48,9 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
     public Text textBuffDuration;
     public Text textRecoveryHp;
     public Text textRecoveryMp;
-    public Text textStats;
-    public Text textStatsPercentage;
     public Text textDamage;
+    public UICharacterStats uiCharacterStats;
+    public UICharacterStatsPercentage uiCharacterStatsPercentage;
 
     protected virtual void Update()
     {
@@ -147,48 +123,12 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
         }
 
         var stats = data.GetStats();
-
-        if (textStats != null)
-        {
-            var statsString = "";
-            if (isBuff)
-            {
-                if (stats.hp != 0)
-                    statsString += string.Format(hpStatsFormat, stats.hp) + "\n";
-                if (stats.mp != 0)
-                    statsString += string.Format(mpStatsFormat, stats.mp) + "\n";
-                if (stats.atkRate != 0)
-                    statsString += string.Format(atkRateStatsFormat, stats.atkRate) + "\n";
-                if (stats.def != 0)
-                    statsString += string.Format(defStatsFormat, stats.def) + "\n";
-                if (stats.criHitRate != 0)
-                    statsString += string.Format(criHitRateStatsFormat, stats.criHitRate) + "\n";
-                if (stats.criDmgRate != 0)
-                    statsString += string.Format(criDmgRateStatsFormat, stats.criDmgRate) + "\n";
-            }
-            textStats.gameObject.SetActive(!string.IsNullOrEmpty(statsString));
-            textStats.text = statsString;
-        }
+        if (uiCharacterStats != null)
+            uiCharacterStats.data = skillData != null && skillData.isBuff ? stats : new CharacterStats();
 
         var statsPercentage = data.GetStatsPercentage();
-
-        if (textStatsPercentage != null)
-        {
-            var statsPercentageString = "";
-            if (isBuff)
-            {
-                if (statsPercentage.hp != 0)
-                    statsPercentageString += string.Format(hpStatsPercentageFormat, statsPercentage.hp) + "\n";
-                if (statsPercentage.mp != 0)
-                    statsPercentageString += string.Format(mpStatsPercentageFormat, statsPercentage.mp) + "\n";
-                if (statsPercentage.atkRate != 0)
-                    statsPercentageString += string.Format(atkRateStatsPercentageFormat, statsPercentage.atkRate) + "\n";
-                if (statsPercentage.def != 0)
-                    statsPercentageString += string.Format(defStatsPercentageFormat, statsPercentage.def) + "\n";
-            }
-            textStatsPercentage.gameObject.SetActive(!string.IsNullOrEmpty(statsPercentageString));
-            textStatsPercentage.text = statsPercentageString;
-        }
+        if (uiCharacterStatsPercentage != null)
+            uiCharacterStatsPercentage.data = skillData != null && skillData.isBuff ? statsPercentage : new CharacterStatsPercentage();
 
         if (textDamage != null)
         {

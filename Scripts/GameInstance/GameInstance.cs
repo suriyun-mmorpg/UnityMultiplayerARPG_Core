@@ -27,7 +27,6 @@ public class GameInstance : MonoBehaviour
     public int increaseSkillPointEachLevel = 1;
     public int startGold = 0;
     public ItemAmountPair[] startItems;
-    public int inventorySize = 30;
     public float pickUpItemDistance = 2f;
     public float dropDistance = 2f;
     [Header("Scene")]

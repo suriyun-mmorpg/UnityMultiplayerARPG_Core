@@ -75,6 +75,21 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     public Vector3 RespawnPosition { get; set; }
     public int LastUpdate { get; set; }
 
+    public float CurrentWeight
+    {
+        get
+        {
+            var result = 0f;
+            foreach (var nonEquipItem in nonEquipItems)
+            {
+                var itemData = nonEquipItem.GetItem();
+                var weight = itemData == null ? 0 : itemData.weight;
+                result += nonEquipItem.amount * weight;
+            }
+            return result;
+        }
+    }
+
     public IList<CharacterAttributeLevel> AttributeLevels
     {
         get { return attributeLevels; }
@@ -120,20 +135,9 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         get { return nonEquipItems; }
         set
         {
-            var gameInstance = GameInstance.Singleton;
             nonEquipItems.Clear();
-            // Adjust inventory size
-            var countItem = 0;
             foreach (var entry in value)
-            {
-                if (countItem < gameInstance.inventorySize)
-                    nonEquipItems.Add(entry);
-                ++countItem;
-            }
-            for (var i = countItem; i < gameInstance.inventorySize; ++i)
-            {
-                nonEquipItems.Add(new CharacterItem());
-            }
+                nonEquipItems.Add(entry);
         }
     }
 
@@ -758,7 +762,14 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         // If item not valid
         if (string.IsNullOrEmpty(itemId) || amount <= 0 || !GameInstance.Items.ContainsKey(itemId))
             return false;
-        var maxStack = GameInstance.Items[itemId].maxStack;
+        var stats = this.GetStatsWithBuffs();
+        var itemData = GameInstance.Items[itemId];
+        var maxStack = itemData.maxStack;
+        var weight = itemData.weight;
+        // If overwhelming
+        if (CurrentWeight + (amount * weight) >= stats.weightLimit)
+            return false;
+
         var emptySlots = new Dictionary<int, CharacterItem>();
         var changes = new Dictionary<int, CharacterItem>();
         // Loop to all slots to add amount to any slots that item amount not max in stack

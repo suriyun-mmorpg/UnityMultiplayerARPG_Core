@@ -8,6 +8,7 @@ public class Item : BaseGameData
     public int sellPrice;
     [Range(1, 1000)]
     public int maxStack = 1;
+    public float weight;
 }
 
 [System.Serializable]

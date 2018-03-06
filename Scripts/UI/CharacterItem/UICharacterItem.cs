@@ -15,36 +15,14 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
     public string sellPriceFormat = "{0}";
     [Tooltip("Stack Format => {0} = {Amount}, {1} = {Max stack}")]
     public string stackFormat = "{0}/{1}";
+    [Tooltip("Weight Format => {0} = {Weight}")]
+    public string weightFormat = "{0}";
 
     [Header("Equipment Info Format")]
     [Tooltip("Require Class Format => {0} = {Class title}")]
     public string requireClassFormat = "Require Class: {0}";
     [Tooltip("Require Attribute Format => {0} = {Attribute title}, {1} = {Amount}")]
     public string requireAttributeFormat = "Require {0}: {1}";
-
-    [Header("Equipment Stats Format")]
-    [Tooltip("Hp Stats Format => {0} = {Amount}")]
-    public string hpStatsFormat = "Hp: {0}";
-    [Tooltip("Mp Stats Format => {0} = {Amount}")]
-    public string mpStatsFormat = "Mp: {0}";
-    [Tooltip("Atk Rate Stats Format => {0} = {Amount}")]
-    public string atkRateStatsFormat = "Atk Rate: {0}";
-    [Tooltip("Def Stats Format => {0} = {Amount}")]
-    public string defStatsFormat = "Def: {0}";
-    [Tooltip("Cri Hit Rate Stats Format => {0} = {Amount}")]
-    public string criHitRateStatsFormat = "Cri Hit: {0}%";
-    [Tooltip("Cri Dmg Rate Stats Format => {0} = {Amount}")]
-    public string criDmgRateStatsFormat = "Cri Dmg: {0}%";
-
-    [Header("Equipment Stats Percentage Format")]
-    [Tooltip("Hp Stats Percentage Format => {0} = {Amount}")]
-    public string hpStatsPercentageFormat = "Hp: {0}%";
-    [Tooltip("Mp Stats Percentage Format => {0} = {Amount}")]
-    public string mpStatsPercentageFormat = "Mp: {0}%";
-    [Tooltip("Atk Rate Stats Percentage Format => {0} = {Amount}")]
-    public string atkRateStatsPercentageFormat = "Atk Rate: {0}%";
-    [Tooltip("Def Stats Percentage Format => {0} = {Amount}")]
-    public string defStatsPercentageFormat = "Def: {0}%";
 
     [Header("Weapon Damage Format")]
     [Tooltip("Damage Format => {0} = {Damage title}, {1} = {Min damage}, {2} = {Max damage}")]
@@ -57,11 +35,12 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
     public Image imageIcon;
     public Text textSellPrice;
     public Text textStack;
+    public Text textWeight;
     public Text textRequireClass;
     public Text textRequireAttributes;
-    public Text textStats;
-    public Text textStatsPercentage;
     public Text textDamage;
+    public UICharacterStats uiCharacterStats;
+    public UICharacterStatsPercentage uiCharacterStatsPercentage;
 
     protected virtual void Update()
     {
@@ -88,6 +67,9 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
                 stackString = string.Format(stackFormat, data.amount.ToString("N0"), itemData.maxStack);
             textStack.text = stackString;
         }
+
+        if (textWeight != null)
+            textWeight.text = string.Format(weightFormat, itemData == null ? "0" : itemData.weight.ToString("N0"));
 
         var equipmentItem = data.GetEquipmentItem();
 
@@ -122,42 +104,12 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
         }
 
         var stats = data.GetStats();
-
-        if (textStats != null)
-        {
-            var statsString = "";
-            if (stats.hp != 0)
-                statsString += string.Format(hpStatsFormat, stats.hp) + "\n";
-            if (stats.mp != 0)
-                statsString += string.Format(mpStatsFormat, stats.mp) + "\n";
-            if (stats.atkRate != 0)
-                statsString += string.Format(atkRateStatsFormat, stats.atkRate) + "\n";
-            if (stats.def != 0)
-                statsString += string.Format(defStatsFormat, stats.def) + "\n";
-            if (stats.criHitRate != 0)
-                statsString += string.Format(criHitRateStatsFormat, (stats.criHitRate * 100f).ToString("N2")) + "\n";
-            if (stats.criDmgRate != 0)
-                statsString += string.Format(criDmgRateStatsFormat, (stats.criDmgRate * 100f).ToString("N2")) + "\n";
-            textStats.gameObject.SetActive(!string.IsNullOrEmpty(statsString));
-            textStats.text = statsString;
-        }
+        if (uiCharacterStats != null)
+            uiCharacterStats.data = stats;
 
         var statsPercentage = data.GetStatsPercentage();
-
-        if (textStatsPercentage != null)
-        {
-            var statsPercentageString = "";
-            if (statsPercentage.hp != 0)
-                statsPercentageString += string.Format(hpStatsPercentageFormat, statsPercentage.hp) + "\n";
-            if (statsPercentage.mp != 0)
-                statsPercentageString += string.Format(mpStatsPercentageFormat, statsPercentage.mp) + "\n";
-            if (statsPercentage.atkRate != 0)
-                statsPercentageString += string.Format(atkRateStatsPercentageFormat, statsPercentage.atkRate) + "\n";
-            if (statsPercentage.def != 0)
-                statsPercentageString += string.Format(defStatsPercentageFormat, statsPercentage.def) + "\n";
-            textStatsPercentage.gameObject.SetActive(!string.IsNullOrEmpty(statsPercentageString));
-            textStatsPercentage.text = statsPercentageString;
-        }
+        if (uiCharacterStatsPercentage != null)
+            uiCharacterStatsPercentage.data = statsPercentage;
 
         var weaponItem = data.GetWeaponItem();
 

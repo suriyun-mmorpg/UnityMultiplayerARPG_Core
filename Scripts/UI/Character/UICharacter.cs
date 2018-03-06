@@ -13,6 +13,8 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public string levelFormat = "Lv: {0}";
     [Tooltip("Exp Format => {0} = {Current exp}, {1} = {Max exp}")]
     public string expFormat = "Exp: {0}/{1}";
+
+    [Header("Stats")]
     [Tooltip("Hp Format => {0} = {Current hp}, {1} = {Max hp}")]
     public string hpFormat = "Hp: {0}/{1}";
     [Tooltip("Mp Format => {0} = {Current mp}, {1} = {Max mp}")]
@@ -31,11 +33,17 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public string criHitRateStatsFormat = "Cri Hit: {0}%";
     [Tooltip("Cri Dmg Rate Stats Format => {0} = {Amount}")]
     public string criDmgRateStatsFormat = "Cri Dmg: {0}%";
+    [Tooltip("Weight Limit Stats Format => {0} = {Weight Limit}")]
+    public string weightLimitStatsFormat = "Weight Limit: {0}";
+
+    [Header("Damage")]
     [Tooltip("Damage Format => {0} = {Damage title}, {1} = {Min damage}, {2} = {Max damage}")]
     public string damageFormat = "{0}: {1}~{2}";
     [Tooltip("Average Damage Format => {0} = {Min damage}, {1} = {Max damage}")]
     public string averageDamageFormat = "{0}~{1}";
     public string defaultDamageTitle = "Damage";
+
+    [Header("Class")]
     [Tooltip("Class Title Format => {0} = {Class title}")]
     public string classTitleFormat = "Class: {0}";
     [Tooltip("Class Description Format => {0} = {Class description}")]
@@ -56,6 +64,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public Text textDefStats;
     public Text textCriHitRateStats;
     public Text textCriDmgRateStats;
+    public Text textWeightLimit;
     public Text textAverageDamage;
     public Text textAllDamages;
     public UICharacterAttributeLevel[] attributeLevels;
@@ -165,6 +174,9 @@ public class UICharacter : UISelectionEntry<ICharacterData>
 
         if (textCriDmgRateStats != null)
             textCriDmgRateStats.text = string.Format(criDmgRateStatsFormat, (stats.criDmgRate * 100f).ToString("N2"));
+
+        if (textWeightLimit != null)
+            textWeightLimit.text = string.Format(weightLimitStatsFormat, stats.weightLimit.ToString("N2"));
         
         if (textAverageDamage != null || textAllDamages != null)
         {
