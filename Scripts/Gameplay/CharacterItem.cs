@@ -45,8 +45,7 @@ public class CharacterItem
 
     public bool IsValid()
     {
-        var item = GetItem();
-        return !string.IsNullOrEmpty(id) && item != null && amount > 0;
+        return GetItem() != null && amount > 0;
     }
 
     public bool IsFull()
@@ -85,7 +84,6 @@ public class NetFieldCharacterItem : LiteNetLibNetField<CharacterItem>
     public override void Deserialize(NetDataReader reader)
     {
         var newValue = new CharacterItem();
-        newValue.id = reader.GetString();
         newValue.itemId = reader.GetString();
         newValue.isSubWeapon = reader.GetBool();
         newValue.level = reader.GetInt();
@@ -97,7 +95,6 @@ public class NetFieldCharacterItem : LiteNetLibNetField<CharacterItem>
     {
         if (Value == null)
             Value = new CharacterItem();
-        writer.Put(Value.id);
         writer.Put(Value.itemId);
         writer.Put(Value.isSubWeapon);
         writer.Put(Value.level);
