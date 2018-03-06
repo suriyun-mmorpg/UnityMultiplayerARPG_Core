@@ -6,6 +6,7 @@ using UnityEngine;
 public class Skill : BaseGameData
 {
     public SkillLevel[] requireSkillLevels;
+    public int maxLevel;
     public float baseConsumeMp;
     public float consumeMpIncreaseEachLevel;
     public float baseCoolDownDuration;
