@@ -68,8 +68,7 @@ public class UIEquipItems : UIBase
             return selectionManager;
         }
     }
-
-
+    
     public override void Show()
     {
         base.Show();
