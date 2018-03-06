@@ -268,6 +268,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         buffs.onOperation += OnBuffsOperation;
         equipItems.onOperation += OnEquipItemsOperation;
         nonEquipItems.onOperation += OnNonEquipItemsOperation;
+        skillLevels.onOperation += OnSkillLevelsOperation;
         netFuncAttack = new LiteNetLibFunction(NetFuncAttackCallback);
         netFuncUseSkill = new LiteNetLibFunction<NetFieldInt>(NetFuncUseSkillCallback);
         netFuncPlayActionAnimation = new LiteNetLibFunction<NetFieldFloat, NetFieldInt>(NetFuncPlayActionAnimationCallback);
@@ -964,6 +965,9 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             var buff = buffs[i];
             buffLocations[buff.skillId] = i;
         }
+
+        if (TempUISceneGameplay != null)
+            TempUISceneGameplay.SetBuffs(buffs);
     }
 
     protected void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
@@ -1010,6 +1014,12 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             TempUISceneGameplay.SetNonEquipItems(nonEquipItems);
     }
 
+    protected void OnSkillLevelsOperation(LiteNetLibSyncList.Operation operation, int index)
+    {
+        if (TempUISceneGameplay != null)
+            TempUISceneGameplay.SetSkillLevels(skillLevels);
+    }
+
     public void Warp(string mapName, Vector3 position)
     {
         if (!IsServer)
@@ -1029,5 +1039,6 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         buffs.onOperation -= OnBuffsOperation;
         equipItems.onOperation -= OnEquipItemsOperation;
         nonEquipItems.onOperation -= OnNonEquipItemsOperation;
+        skillLevels.onOperation -= OnSkillLevelsOperation;
     }
 }
