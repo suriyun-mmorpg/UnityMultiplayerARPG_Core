@@ -14,6 +14,7 @@ public class UISceneGameplay : MonoBehaviour
     public static UISceneGameplay Singleton { get; private set; }
 
     public UICharacter[] uiCharacters;
+    public UICharacterBuffList uiBuffList;
     public UIEquipItems uiEquipItems;
     public UINonEquipItems uiNonEquipItems;
     public UICharacterSkillLevelList uiSkillLevelList;
@@ -105,6 +106,17 @@ public class UISceneGameplay : MonoBehaviour
             uiNonEquipItems.SelectionManager.DeSelectAll();
     }
 
+    private void OnSelectCharacterSkillLevel(UICharacterSkillLevel ui)
+    {
+        SelectedSkillLevel = ui;
+    }
+
+    public void SetBuffs(IList<CharacterBuff> buffs)
+    {
+        if (uiBuffList != null)
+            uiBuffList.SetBuffs(buffs);
+    }
+
     public void SetEquipItems(IList<CharacterItem> items)
     {
         if (uiEquipItems != null)
@@ -115,5 +127,11 @@ public class UISceneGameplay : MonoBehaviour
     {
         if (uiNonEquipItems != null)
             uiNonEquipItems.SetItems(items);
+    }
+
+    public void SetSkillLevels(IList<CharacterSkillLevel> skillLevels)
+    {
+        if (uiSkillLevelList != null)
+            uiSkillLevelList.SetSkills(skillLevels);
     }
 }
