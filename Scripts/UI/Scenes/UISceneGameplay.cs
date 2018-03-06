@@ -4,15 +4,25 @@ using UnityEngine;
 
 public class UISceneGameplay : MonoBehaviour
 {
+    [System.Serializable]
+    public struct UIToggleUI
+    {
+        public UIBase ui;
+        public KeyCode key;
+    }
+
     public static UISceneGameplay Singleton { get; private set; }
 
     public UICharacter[] uiCharacters;
     public UIEquipItems uiEquipItems;
     public UINonEquipItems uiNonEquipItems;
+    public UICharacterSkillLevelList uiSkillLevelList;
+    public UIToggleUI[] toggleUis;
 
     public CharacterEntity OwningCharacterEntity { get; private set; }
     public UICharacterItem SelectedEquipItem { get; private set; }
     public UICharacterItem SelectedNonEquipItem { get; private set; }
+    public UICharacterSkillLevel SelectedSkillLevel { get; private set; }
 
     private void Awake()
     {
@@ -26,6 +36,15 @@ public class UISceneGameplay : MonoBehaviour
 
         if (uiNonEquipItems != null)
             uiNonEquipItems.onSelectCharacterItem += OnSelectNonEquipItem;
+    }
+
+    private void Update()
+    {
+        foreach (var toggleUi in toggleUis)
+        {
+            if (Input.GetKeyDown(toggleUi.key))
+                toggleUi.ui.Toggle();
+        }
     }
 
     private void OnDestroy()
