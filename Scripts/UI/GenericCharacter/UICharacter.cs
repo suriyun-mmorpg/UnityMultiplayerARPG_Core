@@ -28,13 +28,14 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     [Tooltip("Def Stats Format => {0} = {Amount}")]
     public string defStatsFormat = "Def: {0}";
     [Tooltip("Cri Hit Rate Stats Format => {0} = {Amount}")]
-    public string criHitRateStatsFormat = "Cri Hit: {0}";
+    public string criHitRateStatsFormat = "Cri Hit: {0}%";
     [Tooltip("Cri Dmg Rate Stats Format => {0} = {Amount}")]
-    public string criDmgRateStatsFormat = "Cri Dmg: {0}";
+    public string criDmgRateStatsFormat = "Cri Dmg: {0}%";
     [Tooltip("Damage Format => {0} = {Damage title}, {1} = {Min damage}, {2} = {Max damage}")]
     public string damageFormat = "{0}: {1}~{2}";
+    [Tooltip("Average Damage Format => {0} = {Min damage}, {1} = {Max damage}")]
+    public string averageDamageFormat = "{0}~{1}";
     public string defaultDamageTitle = "Damage";
-    public string averageDamageTitle = "Average Damage";
     [Tooltip("Class Title Format => {0} = {Class title}")]
     public string classTitleFormat = "Class: {0}";
     [Tooltip("Class Description Format => {0} = {Class description}")]
@@ -57,12 +58,33 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public Text textCriDmgRateStats;
     public Text textAverageDamage;
     public Text textAllDamages;
+    public UICharacterAttributeLevel[] attributeLevels;
     [Header("Class information")]
     public Text textClassTitle;
     public Text textClassDescription;
     public Image imageClassIcon;
     [Header("Options")]
     public bool showStatsWithBuff;
+
+    private Dictionary<string, UICharacterAttributeLevel> tempAttributeLevels = null;
+    public Dictionary<string, UICharacterAttributeLevel> TempAttributeLevels
+    {
+        get
+        {
+            if (tempAttributeLevels == null)
+            {
+                tempAttributeLevels = new Dictionary<string, UICharacterAttributeLevel>();
+                foreach (var attributeLevel in attributeLevels)
+                {
+                    if (attributeLevel != null && 
+                        attributeLevel.attribute != null && 
+                        !tempAttributeLevels.ContainsKey(attributeLevel.attribute.Id))
+                        tempAttributeLevels.Add(attributeLevel.attribute.Id, attributeLevel);
+                }
+            }
+            return tempAttributeLevels;
+        }
+    }
 
     protected virtual void Update()
     {
@@ -133,30 +155,18 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         var stats = showStatsWithBuff ? data.GetStatsWithBuffs() : data.GetStatsWithoutBuffs();
 
         if (textAtkRateStats != null)
-        {
-            textAtkRateStats.gameObject.SetActive(stats.atkRate != 0);
-            textAtkRateStats.text = stats.atkRate.ToString("N0");
-        }
+            textAtkRateStats.text = string.Format(atkRateStatsFormat, stats.atkRate.ToString("N0"));
 
         if (textDefStats != null)
-        {
-            textDefStats.gameObject.SetActive(stats.def != 0);
-            textDefStats.text = stats.def.ToString("N0");
-        }
+            textDefStats.text = string.Format(defStatsFormat, stats.def.ToString("N0"));
 
         if (textCriHitRateStats != null)
-        {
-            textCriHitRateStats.gameObject.SetActive(stats.criHitRate != 0);
-            textCriHitRateStats.text = stats.criHitRate.ToString("N0");
-        }
+            textCriHitRateStats.text = string.Format(criHitRateStatsFormat, (stats.criHitRate * 100f).ToString("N2"));
 
         if (textCriDmgRateStats != null)
-        {
-            textCriDmgRateStats.gameObject.SetActive(stats.criDmgRate != 0);
-            textCriDmgRateStats.text = stats.criDmgRate.ToString("N0");
-        }
+            textCriDmgRateStats.text = string.Format(criDmgRateStatsFormat, (stats.criDmgRate * 100f).ToString("N2"));
         
-        if (textAllDamages != null || textAllDamages != null)
+        if (textAverageDamage != null || textAllDamages != null)
         {
             var damageAmountCount = 0;
             var damageAmountMin = 0f;
@@ -188,16 +198,10 @@ public class UICharacter : UISelectionEntry<ICharacterData>
             }
 
             if (textAverageDamage != null)
-            {
-                textAverageDamage.gameObject.SetActive(damageAmountCount > 0);
-                textAverageDamage.text = string.Format(damageFormat, averageDamageTitle, damageAmountMin, damageAmountMax);
-            }
+                textAverageDamage.text = string.Format(averageDamageFormat, damageAmountMin, damageAmountMax);
 
             if (textAllDamages != null)
-            {
-                textAllDamages.gameObject.SetActive(damageAmountCount > 0);
                 textAllDamages.text = damagesString;
-            }
         }
 
         if (textClassTitle != null)
@@ -208,6 +212,17 @@ public class UICharacter : UISelectionEntry<ICharacterData>
 
         if (imageClassIcon != null)
             imageClassIcon.sprite = data == null ? null : data.GetClass().icon;
+
+        if (TempAttributeLevels.Count > 0 && data != null)
+        {
+            var attributeLevels = data.AttributeLevels;
+            foreach (var attributeLevel in attributeLevels)
+            {
+                var attributeId = attributeLevel.attributeId;
+                if (TempAttributeLevels.ContainsKey(attributeId))
+                    TempAttributeLevels[attributeId].data = attributeLevel;
+            }
+        }
     }
 }
 
