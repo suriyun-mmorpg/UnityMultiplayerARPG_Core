@@ -218,6 +218,13 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
             }
         }
     }
+
+    public void OnClickAdd()
+    {
+        var uiSceneGameplay = UISceneGameplay.Singleton;
+        if (uiSceneGameplay != null)
+            uiSceneGameplay.OwningCharacterEntity.AddSkillLevel(uiSceneGameplay.OwningCharacterEntity.skillLevels.IndexOf(data));
+    }
 }
 
 [System.Serializable]
