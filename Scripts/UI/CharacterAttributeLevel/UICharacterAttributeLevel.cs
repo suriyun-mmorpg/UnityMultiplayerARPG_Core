@@ -39,10 +39,6 @@ public class UICharacterAttributeLevel : UISelectionEntry<CharacterAttributeLeve
     public string atkRateStatsPercentageFormat = "Atk Rate: {0}%";
     [Tooltip("Def Stats Percentage Format => {0} = {Amount}")]
     public string defStatsPercentageFormat = "Def: {0}%";
-    [Tooltip("Cri Hit Rate Stats Percentage Format => {0} = {Amount}")]
-    public string criHitRateStatsPercentageFormat = "Cri Hit: {0}%";
-    [Tooltip("Cri Dmg Rate Stats Percentage Format => {0} = {Amount}")]
-    public string criDmgRateStatsPercentageFormat = "Cri Dmg: {0}%";
 
     [Header("UI Elements")]
     public Text textTitle;
@@ -102,10 +98,6 @@ public class UICharacterAttributeLevel : UISelectionEntry<CharacterAttributeLeve
                 statsPercentageString += string.Format(atkRateStatsPercentageFormat, statsPercentage.atkRate) + "\n";
             if (statsPercentage.def != 0)
                 statsPercentageString += string.Format(defStatsPercentageFormat, statsPercentage.def) + "\n";
-            if (statsPercentage.criHitRate != 0)
-                statsPercentageString += string.Format(criHitRateStatsPercentageFormat, statsPercentage.criHitRate) + "\n";
-            if (statsPercentage.criDmgRate != 0)
-                statsPercentageString += string.Format(criDmgRateStatsPercentageFormat, statsPercentage.criDmgRate) + "\n";
             textStatsPercentage.gameObject.SetActive(!string.IsNullOrEmpty(statsPercentageString));
             textStatsPercentage.text = statsPercentageString;
         }

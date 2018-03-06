@@ -11,6 +11,7 @@ public class CharacterStats
     public float def;
     public float criHitRate;
     public float criDmgRate;
+    public float weightLimit;
 
     public static CharacterStats operator +(CharacterStats a, CharacterStats b)
     {
@@ -21,6 +22,7 @@ public class CharacterStats
         result.def = a.def + b.def;
         result.criHitRate = a.criHitRate + b.criHitRate;
         result.criDmgRate = a.criDmgRate + b.criDmgRate;
+        result.weightLimit = a.weightLimit + b.weightLimit;
         return result;
     }
 
@@ -33,6 +35,7 @@ public class CharacterStats
         result.def = a.def * level;
         result.criHitRate = a.criHitRate * level;
         result.criDmgRate = a.criDmgRate * level;
+        result.weightLimit = a.weightLimit * level;
         return result;
     }
 }
@@ -44,8 +47,6 @@ public class CharacterStatsPercentage
     public float mp;
     public float atkRate;
     public float def;
-    public float criHitRate;
-    public float criDmgRate;
 
     public static CharacterStats operator +(CharacterStats a, CharacterStatsPercentage b)
     {
@@ -55,8 +56,6 @@ public class CharacterStatsPercentage
         result.mp = a.mp + (a.hp * b.mp * 0.01f);
         result.atkRate = a.atkRate + (a.atkRate * b.atkRate * 0.01f);
         result.def = a.def + (a.def * b.def * 0.01f);
-        result.criHitRate = a.criHitRate + (a.criHitRate * b.criHitRate * 0.01f);
-        result.criDmgRate = a.criDmgRate + (a.criDmgRate * b.criDmgRate * 0.01f);
         return result;
     }
 
@@ -67,8 +66,6 @@ public class CharacterStatsPercentage
         result.mp = a.mp + b.mp;
         result.atkRate = a.atkRate + b.atkRate;
         result.def = a.def + b.def;
-        result.criHitRate = a.criHitRate + b.criHitRate;
-        result.criDmgRate = a.criDmgRate + b.criDmgRate;
         return result;
     }
 
@@ -79,8 +76,6 @@ public class CharacterStatsPercentage
         result.mp = a.mp * level;
         result.atkRate = a.atkRate * level;
         result.def = a.def * level;
-        result.criHitRate = a.criHitRate * level;
-        result.criDmgRate = a.criDmgRate * level;
         return result;
     }
 }

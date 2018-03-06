@@ -45,10 +45,6 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
     public string atkRateStatsPercentageFormat = "Atk Rate: {0}%";
     [Tooltip("Def Stats Percentage Format => {0} = {Amount}")]
     public string defStatsPercentageFormat = "Def: {0}%";
-    [Tooltip("Cri Hit Rate Stats Percentage Format => {0} = {Amount}")]
-    public string criHitRateStatsPercentageFormat = "Cri Hit: {0}%";
-    [Tooltip("Cri Dmg Rate Stats Percentage Format => {0} = {Amount}")]
-    public string criDmgRateStatsPercentageFormat = "Cri Dmg: {0}%";
 
     [Header("Weapon Damage Format")]
     [Tooltip("Damage Format => {0} = {Damage title}, {1} = {Min damage}, {2} = {Max damage}")]
@@ -159,10 +155,6 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
                 statsPercentageString += string.Format(atkRateStatsPercentageFormat, statsPercentage.atkRate) + "\n";
             if (statsPercentage.def != 0)
                 statsPercentageString += string.Format(defStatsPercentageFormat, statsPercentage.def) + "\n";
-            if (statsPercentage.criHitRate != 0)
-                statsPercentageString += string.Format(criHitRateStatsPercentageFormat, (statsPercentage.criHitRate * 100f).ToString("N2")) + "\n";
-            if (statsPercentage.criDmgRate != 0)
-                statsPercentageString += string.Format(criDmgRateStatsPercentageFormat, (statsPercentage.criDmgRate * 100f).ToString("N2")) + "\n";
             textStatsPercentage.gameObject.SetActive(!string.IsNullOrEmpty(statsPercentageString));
             textStatsPercentage.text = statsPercentageString;
         }
