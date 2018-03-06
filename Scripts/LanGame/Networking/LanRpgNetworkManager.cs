@@ -31,7 +31,7 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
                 StartHost();
                 break;
             case GameStartType.SinglePlayer:
-                networkPort = 0;
+                networkPort = 1;
                 maxConnections = 1;
                 StartHost();
                 break;
@@ -68,7 +68,7 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
         foreach (var entry in SelectedCharacter.AttributeLevels)
         {
             writer.Put(entry.attributeId);
-            writer.Put(entry.amount);
+            writer.Put(entry.level);
         }
         writer.Put(SelectedCharacter.SkillLevels.Count);
         foreach (var entry in SelectedCharacter.SkillLevels)
@@ -118,7 +118,7 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
         {
             var entry = new CharacterAttributeLevel();
             entry.attributeId = reader.GetString();
-            entry.amount = reader.GetInt();
+            entry.level = reader.GetInt();
             character.AttributeLevels.Add(entry);
         }
         count = reader.GetInt();
