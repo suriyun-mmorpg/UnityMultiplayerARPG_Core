@@ -151,6 +151,8 @@ public class GameInstance : MonoBehaviour
             }
             AddCharacterAttributes(attributes);
             AddSkills(characterClass.skills);
+            AddItems(new Item[] { characterClass.rightHandEquipItem, characterClass.leftHandEquipItem });
+            AddItems(characterClass.otherEquipItems);
         }
     }
 
