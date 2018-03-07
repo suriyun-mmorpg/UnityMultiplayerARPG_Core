@@ -45,6 +45,21 @@ public class GameInstance : MonoBehaviour
     public static readonly Dictionary<string, Item> Items = new Dictionary<string, Item>();
     public static readonly Dictionary<string, Skill> Skills = new Dictionary<string, Skill>();
 
+    private DamageElement tempDefaultDamageElement;
+    public DamageElement DefaultDamageElement
+    {
+        get
+        {
+            if (tempDefaultDamageElement == null)
+            {
+                tempDefaultDamageElement = ScriptableObject.CreateInstance<DamageElement>();
+                tempDefaultDamageElement.name = GameDataConst.DEFAULT_DAMAGE_ID;
+                tempDefaultDamageElement.title = GameDataConst.DEFAULT_DAMAGE_TITLE;
+            }
+            return tempDefaultDamageElement;
+        }
+    }
+
     protected virtual void Awake()
     {
         Application.runInBackground = true;
@@ -203,12 +218,12 @@ public class GameInstance : MonoBehaviour
                 }
                 AddCharacterAttributes(attributes);
                 var damageElements = new List<DamageElement>();
-                var tempDamageAmounts = weaponItem.TempDamageAmounts.Values;
-                foreach (var tempDamageAmount in tempDamageAmounts)
+                var damageAttributes = weaponItem.damageAttributes;
+                foreach (var damageAttribute in damageAttributes)
                 {
-                    if (tempDamageAmount == null || tempDamageAmount.damageElement == null || DamageElements.ContainsKey(tempDamageAmount.damageElement.Id))
+                    if (damageAttribute == null || damageAttribute.damageElement == null || DamageElements.ContainsKey(damageAttribute.damageElement.Id))
                         continue;
-                    damageElements.Add(tempDamageAmount.damageElement);
+                    damageElements.Add(damageAttribute.damageElement);
                 }
                 AddDamageElements(damageElements);
                 var missileDamageEntity = weaponItem.WeaponType.damage.missileDamageEntity;
@@ -226,12 +241,12 @@ public class GameInstance : MonoBehaviour
                 continue;
             Skills[skill.Id] = skill;
             var damageElements = new List<DamageElement>();
-            var tempDamageAmounts = skill.TempDamageAmounts.Values;
-            foreach (var tempDamageAmount in tempDamageAmounts)
+            var damageAttributes = skill.damageAttributes;
+            foreach (var damageAttribute in damageAttributes)
             {
-                if (tempDamageAmount == null || tempDamageAmount.damageElement == null || DamageElements.ContainsKey(tempDamageAmount.damageElement.Id))
+                if (damageAttribute == null || damageAttribute.damageElement == null || DamageElements.ContainsKey(damageAttribute.damageElement.Id))
                     continue;
-                damageElements.Add(tempDamageAmount.damageElement);
+                damageElements.Add(damageAttribute.damageElement);
             }
             AddDamageElements(damageElements);
             var missileDamageEntity = skill.damage.missileDamageEntity;

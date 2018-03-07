@@ -5,15 +5,15 @@ using UnityEngine;
 public abstract class DamageEntity : RpgNetworkEntity
 {
     protected CharacterEntity attacker;
-    protected Dictionary<string, DamageAmount> damageAmounts;
+    protected Dictionary<DamageElement, DamageAmount> damageElementAmountPairs;
     protected Dictionary<string, DamageEffectivenessAttribute> effectivenessAttributes;
 
     public virtual void SetupDamage(CharacterEntity attacker,
-        Dictionary<string, DamageAmount> damageAmounts,
+        Dictionary<DamageElement, DamageAmount> damageElementAmountPairs,
         Dictionary<string, DamageEffectivenessAttribute> effectivenessAttributes)
     {
         this.attacker = attacker;
-        this.damageAmounts = damageAmounts;
+        this.damageElementAmountPairs = damageElementAmountPairs;
         this.effectivenessAttributes = effectivenessAttributes;
     }
 
@@ -21,6 +21,6 @@ public abstract class DamageEntity : RpgNetworkEntity
     {
         if (target == null)
             return;
-        target.ReceiveDamage(attacker, damageAmounts, effectivenessAttributes);
+        target.ReceiveDamage(attacker, damageElementAmountPairs, effectivenessAttributes);
     }
 }

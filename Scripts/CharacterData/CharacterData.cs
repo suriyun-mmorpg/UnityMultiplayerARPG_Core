@@ -311,20 +311,18 @@ public static class CharacterDataExtension
         return (int)data.GetStatsWithBuffs().mp;
     }
 
-    public static List<WeaponItem> GetWeapons(this ICharacterData data)
+    public static List<CharacterItem> GetWeapons(this ICharacterData data)
     {
-        var result = new List<WeaponItem>();
-        var equipItems = data.EquipItems;
-        foreach (var equipItem in equipItems)
-        {
-            if (!equipItem.IsValid())
-                continue;
-            var weaponItem = equipItem.GetWeaponItem();
-            if (weaponItem != null)
-                result.Add(weaponItem);
-        }
+        var gameInstance = GameInstance.Singleton;
+        var result = new List<CharacterItem>(data.EquipItems);
         if (result.Count == 0)
-            result.Add(GameInstance.Singleton.defaultWeaponItem);
+        {
+            var characterItem = new CharacterItem();
+            characterItem.itemId = gameInstance.defaultWeaponItem.Id;
+            characterItem.level = 1;
+            characterItem.amount = 1;
+            result.Add(characterItem);
+        }
         return result;
     }
 

@@ -53,7 +53,10 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
             textDescription.text = string.Format(descriptionFormat, itemData == null ? "N/A" : itemData.description);
 
         if (imageIcon != null)
+        {
             imageIcon.sprite = itemData == null ? null : itemData.icon;
+            imageIcon.gameObject.SetActive(itemData != null);
+        }
 
         if (textSellPrice != null)
             textSellPrice.text = string.Format(sellPriceFormat, itemData == null ? "0" : itemData.sellPrice.ToString("N0"));
@@ -115,18 +118,20 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
 
         if (textDamage != null)
         {
-            if (weaponItem == null || weaponItem.TempDamageAmounts.Count == 0)
+            var damageElementAmountPairs = data.GetDamageElementAmountPairs();
+            if (weaponItem == null || damageElementAmountPairs.Count == 0)
                 textDamage.gameObject.SetActive(false);
             else
             {
-                var damageAmounts = weaponItem.TempDamageAmounts.Values;
                 var damagesText = "";
-                foreach (var damageAmount in damageAmounts)
+                foreach (var damageElementAmountPair in damageElementAmountPairs)
                 {
-                    damagesText += string.Format(damageFormat, 
-                        damageAmount.damageElement == null ? defaultDamageTitle : damageAmount.damageElement.title, 
-                        damageAmount.minDamage, 
-                        damageAmount.maxDamage) + "\n";
+                    var element = damageElementAmountPair.Key;
+                    var amount = damageElementAmountPair.Value;
+                    damagesText += string.Format(damageFormat,
+                        element.title,
+                        amount.minDamage,
+                        amount.maxDamage) + "\n";
                 }
                 textDamage.gameObject.SetActive(!string.IsNullOrEmpty(damagesText));
                 textDamage.text = damagesText;

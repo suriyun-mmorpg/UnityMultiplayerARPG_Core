@@ -306,17 +306,21 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             return;
         doingAction = true;
 
+        CharacterItem equipWeapon;
         WeaponItem weapon;
         var useSubAttackAnims = false;
         // Random left hand / right hand weapon
         if (equipWeapons.Count > 0)
         {
-            var equipWeapon = equipWeapons[Random.Range(0, equipWeapons.Count - 1)];
+            equipWeapon = equipWeapons[Random.Range(0, equipWeapons.Count - 1)];
             weapon = equipWeapon.GetWeaponItem();
             useSubAttackAnims = equipWeapon.isSubWeapon;
         }
         else
+        {
             weapon = GameInstance.Singleton.defaultWeaponItem;
+            equipWeapon = CharacterItem.MakeCharaterItem(weapon, 1);
+        }
 
         var weaponType = weapon.WeaponType;
         if (weaponType.subAttackAnimations == null || weaponType.subAttackAnimations.Length == 0)
@@ -331,12 +335,12 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
         var anim = animArray[Random.Range(0, animLength - 1)];
         PlayActionAnimation(anim.totalDuration, anim.actionId);
-        StartCoroutine(AttackRoutine(anim.triggerDuration, anim.totalDuration, weapon.TempDamageAmounts, weaponType.damage, weaponType.TempEffectivenessAttributes));
+        StartCoroutine(AttackRoutine(anim.triggerDuration, anim.totalDuration, equipWeapon.GetDamageElementAmountPairs(), weaponType.damage, weaponType.TempEffectivenessAttributes));
     }
 
     IEnumerator AttackRoutine(float damageDuration,
         float totalDuration,
-        Dictionary<string, DamageAmount> damageAmounts,
+        Dictionary<DamageElement, DamageAmount> damageElementAmountPairs,
         Damage damage,
         Dictionary<string, DamageEffectivenessAttribute> effectivenessAttributes)
     {
@@ -350,7 +354,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                     var characterEntity = hit.GetComponent<CharacterEntity>();
                     if (characterEntity == null)
                         continue;
-                    characterEntity.ReceiveDamage(this, damageAmounts, effectivenessAttributes);
+                    characterEntity.ReceiveDamage(this, damageElementAmountPairs, effectivenessAttributes);
                 }
                 break;
             case DamageType.Missile:
@@ -358,7 +362,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                 {
                     var missileDamageIdentity = Manager.Assets.NetworkSpawn(damage.missileDamageEntity.Identity, TempTransform.position);
                     var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
-                    missileDamageEntity.SetupDamage(this, damageAmounts, effectivenessAttributes, damage.missileDistance, damage.missileSpeed);
+                    missileDamageEntity.SetupDamage(this, damageElementAmountPairs, effectivenessAttributes, damage.missileDistance, damage.missileSpeed);
                 }
                 break;
         }
@@ -396,7 +400,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         yield return new WaitForSecondsRealtime(anim.triggerDuration);
         if (skill.isAttack)
         {
-            var damageAmounts = skill.TempDamageAmounts;
+            var damageElementAmountPairs = characterSkill.GetDamageElementAmountPairs();
             var damage = skill.damage;
             var effectivenessAttributes = skill.TempEffectivenessAttributes;
             switch (damage.damageType)
@@ -408,7 +412,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                         var characterEntity = hit.GetComponent<CharacterEntity>();
                         if (characterEntity == null)
                             continue;
-                        characterEntity.ReceiveDamage(this, damageAmounts, effectivenessAttributes);
+                        characterEntity.ReceiveDamage(this, damageElementAmountPairs, effectivenessAttributes);
                     }
                     break;
                 case DamageType.Missile:
@@ -416,7 +420,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                     {
                         var missileDamageIdentity = Manager.Assets.NetworkSpawn(damage.missileDamageEntity.Identity, TempTransform.position);
                         var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
-                        missileDamageEntity.SetupDamage(this, damageAmounts, effectivenessAttributes, damage.missileDistance, damage.missileSpeed);
+                        missileDamageEntity.SetupDamage(this, damageElementAmountPairs, effectivenessAttributes, damage.missileDistance, damage.missileSpeed);
                     }
                     break;
             }
@@ -695,49 +699,14 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         CallNetFunction("DropItem", FunctionReceivers.Server, index, amount);
     }
 
-    public void SwapOrMergeItem(CharacterItem fromItem, CharacterItem toItem)
-    {
-        SwapOrMergeItem(nonEquipItems.IndexOf(fromItem), nonEquipItems.IndexOf(toItem));
-    }
-
     public void SwapOrMergeItem(int fromIndex, int toIndex)
     {
         CallNetFunction("SwapOrMergeItem", FunctionReceivers.Server, fromIndex, toIndex);
     }
 
-    public void EquipItem(CharacterItem fromItem, CharacterItem toItem)
-    {
-        var equipmentItem = toItem.GetEquipmentItem();
-        if (equipmentItem == null)
-            return;
-        var equipPosition = equipmentItem.equipPosition;
-        var weaponItem = toItem.GetWeaponItem();
-        var shieldItem = toItem.GetShieldItem();
-        if (weaponItem != null)
-            equipPosition = !toItem.isSubWeapon ? GameDataConst.EQUIP_POSITION_RIGHT_HAND : GameDataConst.EQUIP_POSITION_LEFT_HAND;
-        else if (shieldItem != null)
-            equipPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
-        EquipItem(nonEquipItems.IndexOf(fromItem), equipPosition);
-    }
-
     public void EquipItem(int fromIndex, string toEquipPosition)
     {
         CallNetFunction("EquipItem", FunctionReceivers.Server, fromIndex, toEquipPosition);
-    }
-
-    public void UnEquipItem(CharacterItem fromItem, CharacterItem toItem)
-    {
-        var equipmentItem = fromItem.GetEquipmentItem();
-        if (equipmentItem == null)
-            return;
-        var equipPosition = equipmentItem.equipPosition;
-        var weaponItem = fromItem.GetWeaponItem();
-        var shieldItem = fromItem.GetShieldItem();
-        if (weaponItem != null)
-            equipPosition = !fromItem.isSubWeapon ? GameDataConst.EQUIP_POSITION_RIGHT_HAND : GameDataConst.EQUIP_POSITION_LEFT_HAND;
-        else if (shieldItem != null)
-            equipPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
-        UnEquipItem(equipPosition, nonEquipItems.IndexOf(toItem));
     }
 
     public void UnEquipItem(string fromEquipPosition, int toIndex)
@@ -915,7 +884,9 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         return true;
     }
 
-    public virtual void ReceiveDamage(CharacterEntity attacker, Dictionary<string, DamageAmount> damageAmounts, Dictionary<string, DamageEffectivenessAttribute> effectivenessAttributes)
+    public virtual void ReceiveDamage(CharacterEntity attacker, 
+        Dictionary<DamageElement, DamageAmount> damageElementAmountPairs, 
+        Dictionary<string, DamageEffectivenessAttribute> effectivenessAttributes)
     {
         // TODO: calculate damages
         if (CurrentHp <= 0)

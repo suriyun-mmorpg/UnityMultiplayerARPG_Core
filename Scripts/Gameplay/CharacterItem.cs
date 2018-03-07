@@ -14,27 +14,72 @@ public class CharacterItem
     public int amount;
     // TODO: I want to add random item bonus
 
+    private string dirtyItemId;
+    private int dirtyLevel;
+    private Item cacheItem;
+    private EquipmentItem cacheEquipmentItem;
+    private WeaponItem cacheWeaponItem;
+    private ShieldItem cacheShieldItem;
+    private readonly Dictionary<DamageElement, DamageAmount> cacheDamageElementAmountPairs = new Dictionary<DamageElement, DamageAmount>();
+
+    private bool IsDirty()
+    {
+        return string.IsNullOrEmpty(dirtyItemId) ||
+            !dirtyItemId.Equals(itemId) ||
+            dirtyLevel != level;
+    }
+
+    private void MakeCache()
+    {
+        if (!IsDirty())
+            return;
+
+        dirtyItemId = itemId;
+        dirtyLevel = level;
+        var gameInstance = GameInstance.Singleton;
+        cacheItem = GameInstance.Items.ContainsKey(itemId) ? GameInstance.Items[itemId] : null;
+        cacheEquipmentItem = cacheItem != null ? cacheItem as EquipmentItem : null;
+        cacheWeaponItem = cacheItem != null ? cacheItem as WeaponItem : null;
+        cacheShieldItem = cacheItem != null ? cacheItem as ShieldItem : null;
+        cacheDamageElementAmountPairs.Clear();
+        if (cacheWeaponItem != null)
+        {
+            var damageAttributes = cacheWeaponItem.damageAttributes;
+            foreach (var damageAttribute in damageAttributes)
+            {
+                var element = damageAttribute.damageElement;
+                if (element == null)
+                    element = gameInstance.DefaultDamageElement;
+                if (!cacheDamageElementAmountPairs.ContainsKey(element))
+                    cacheDamageElementAmountPairs[element] = damageAttribute.damageAmount + damageAttribute.damageAmountIncreaseEachLevel * level;
+            }
+        }
+    }
+
     public Item GetItem()
     {
-        return GameInstance.Items.ContainsKey(itemId) ? GameInstance.Items[itemId] : null;
+        return cacheItem;
     }
 
     public EquipmentItem GetEquipmentItem()
     {
-        var item = GetItem();
-        return item != null ? item as EquipmentItem : null;
+        return cacheEquipmentItem;
     }
 
     public WeaponItem GetWeaponItem()
     {
-        var item = GetItem();
-        return item != null ? item as WeaponItem : null;
+        return cacheWeaponItem;
     }
 
     public ShieldItem GetShieldItem()
     {
-        var item = GetItem();
-        return item != null ? item as ShieldItem : null;
+        return cacheShieldItem;
+    }
+
+    public Dictionary<DamageElement, DamageAmount> GetDamageElementAmountPairs()
+    {
+        MakeCache();
+        return cacheDamageElementAmountPairs;
     }
 
     public int GetMaxStack()
@@ -76,6 +121,15 @@ public class CharacterItem
         isSubWeapon = false;
         level = 1;
         amount = 0;
+    }
+
+    public static CharacterItem MakeCharaterItem(Item item, int level)
+    {
+        var newItem = new CharacterItem();
+        newItem.itemId = item.Id;
+        newItem.level = level;
+        newItem.amount = 1;
+        return newItem;
     }
 }
 

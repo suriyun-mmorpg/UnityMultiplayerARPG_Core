@@ -8,6 +8,25 @@ public abstract class UISelectionEntry<T> : UIBase
     public GameObject objectSelected;
     public T data;
     public UISelectionManager selectionManager;
+
+    private bool isSelected;
+    public bool IsSelected
+    {
+        get { return isSelected; }
+        protected set
+        {
+            isSelected = value;
+            if (objectSelected != null)
+                objectSelected.SetActive(value);
+        }
+    }
+
+    protected override void Awake()
+    {
+        base.Awake();
+        IsSelected = false;
+    }
+
     public void OnClickSelect()
     {
         if (selectionManager != null)
@@ -16,13 +35,11 @@ public abstract class UISelectionEntry<T> : UIBase
 
     public void Select()
     {
-        if (objectSelected != null)
-            objectSelected.SetActive(true);
+        IsSelected = true;
     }
 
     public void Deselect()
     {
-        if (objectSelected != null)
-            objectSelected.SetActive(false);
+        IsSelected = false;
     }
 }

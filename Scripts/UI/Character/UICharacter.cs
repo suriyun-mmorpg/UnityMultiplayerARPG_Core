@@ -41,7 +41,6 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public string damageFormat = "{0}: {1}~{2}";
     [Tooltip("Average Damage Format => {0} = {Min damage}, {1} = {Max damage}")]
     public string averageDamageFormat = "{0}~{1}";
-    public string defaultDamageTitle = "Damage";
 
     [Header("Class")]
     [Tooltip("Class Title Format => {0} = {Class title}")]
@@ -184,21 +183,23 @@ public class UICharacter : UISelectionEntry<ICharacterData>
             var damageAmountMin = 0f;
             var damageAmountMax = 0f;
             var damagesString = "";
-            var weaponItems = data.GetWeapons();
-            foreach (var weaponItem in weaponItems)
+            var characterWeapons = data.GetWeapons();
+            foreach (var characterWeapon in characterWeapons)
             {
                 if (!string.IsNullOrEmpty(damagesString))
                     damagesString += "\n";
-                var damageAmounts = weaponItem.TempDamageAmounts.Values;
-                foreach (var damageAmount in damageAmounts)
+                var damageElementAmountPairs = characterWeapon.GetDamageElementAmountPairs();
+                foreach (var damageElementAmountPair in damageElementAmountPairs)
                 {
                     ++damageAmountCount;
-                    damageAmountMin += damageAmount.minDamage;
-                    damageAmountMax += damageAmount.maxDamage;
+                    var element = damageElementAmountPair.Key;
+                    var amount = damageElementAmountPair.Value;
+                    damageAmountMin += amount.minDamage;
+                    damageAmountMax += amount.maxDamage;
                     damagesString += string.Format(damageFormat,
-                        damageAmount.damageElement == null ? defaultDamageTitle : damageAmount.damageElement.title,
-                        damageAmount.minDamage,
-                        damageAmount.maxDamage) + "\n";
+                        element.title,
+                        amount.minDamage,
+                        amount.maxDamage) + "\n";
                 }
             }
 
@@ -216,14 +217,18 @@ public class UICharacter : UISelectionEntry<ICharacterData>
                 textAllDamages.text = damagesString;
         }
 
+        var classData = data == null ? null : data.GetClass();
         if (textClassTitle != null)
-            textClassTitle.text = string.Format(classTitleFormat, data == null ? "N/A" : data.GetClass().title);
+            textClassTitle.text = string.Format(classTitleFormat, classData == null ? "N/A" : classData.title);
 
         if (textClassDescription != null)
-            textClassDescription.text = string.Format(classDescriptionFormat, data == null ? "N/A" : data.GetClass().description);
+            textClassDescription.text = string.Format(classDescriptionFormat, classData == null ? "N/A" : classData.description);
 
         if (imageClassIcon != null)
-            imageClassIcon.sprite = data == null ? null : data.GetClass().icon;
+        {
+            imageClassIcon.sprite = classData == null ? null : classData.icon;
+            imageClassIcon.gameObject.SetActive(classData != null);
+        }
 
         if (TempAttributeLevels.Count > 0 && data != null)
         {

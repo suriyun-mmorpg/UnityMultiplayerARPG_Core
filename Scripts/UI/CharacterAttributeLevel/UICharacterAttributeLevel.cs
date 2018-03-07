@@ -21,6 +21,7 @@ public class UICharacterAttributeLevel : UISelectionEntry<CharacterAttributeLeve
     public Text textDescription;
     public Text textLevel;
     public Image imageIcon;
+    public Button addButton;
     public UICharacterStats uiCharacterStats;
     public UICharacterStatsPercentage uiCharacterStatsPercentage;
 
@@ -47,9 +48,23 @@ public class UICharacterAttributeLevel : UISelectionEntry<CharacterAttributeLeve
         var statsPercentage = data.GetStatsPercentage();
         if (uiCharacterStatsPercentage != null)
             uiCharacterStatsPercentage.data = statsPercentage;
+
+        var uiSceneGameplay = UISceneGameplay.Singleton;
+        if (addButton != null)
+            addButton.interactable = uiSceneGameplay.OwningCharacterEntity.SkillPoint > 0;
     }
 
-    public void OnClickAdd()
+    public override void Show()
+    {
+        base.Show();
+        if (addButton != null)
+        {
+            addButton.onClick.RemoveAllListeners();
+            addButton.onClick.AddListener(OnClickAdd);
+        }
+    }
+
+    private void OnClickAdd()
     {
         var uiSceneGameplay = UISceneGameplay.Singleton;
         if (uiSceneGameplay != null)

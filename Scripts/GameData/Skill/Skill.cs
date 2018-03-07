@@ -14,7 +14,7 @@ public class Skill : BaseGameData
     public ActionAnimation castAnimation;
     [Header("Attack")]
     public bool isAttack;
-    public DamageAmount[] damageAmounts;
+    public DamageAttribute[] damageAttributes;
     public Damage damage;
     public DamageEffectivenessAttribute[] effectivenessAttributes;
     [Header("Buffs")]
@@ -49,24 +49,6 @@ public class Skill : BaseGameData
                 }
             }
             return tempEffectivenessAttributes;
-        }
-    }
-
-    private Dictionary<string, DamageAmount> tempDamageAmounts;
-    public Dictionary<string, DamageAmount> TempDamageAmounts
-    {
-        get
-        {
-            if (tempDamageAmounts == null)
-            {
-                tempDamageAmounts = new Dictionary<string, DamageAmount>();
-                foreach (var damageAmount in damageAmounts)
-                {
-                    var id = damageAmount.damageElement == null ? GameDataConst.DEFAULT_DAMAGE_ID : damageAmount.damageElement.Id;
-                    tempDamageAmounts[id] = damageAmount;
-                }
-            }
-            return tempDamageAmounts;
         }
     }
 }

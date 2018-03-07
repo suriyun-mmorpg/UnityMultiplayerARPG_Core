@@ -10,9 +10,52 @@ public class CharacterSkillLevel
     public int level;
     public float coolDownRemainsDuration;
 
+    private string dirtySkillId;
+    private int dirtyLevel;
+    private Skill cacheSkill;
+    private readonly Dictionary<DamageElement, DamageAmount> cacheDamageElementAmountPairs = new Dictionary<DamageElement, DamageAmount>();
+
+    private bool IsDirty()
+    {
+        return string.IsNullOrEmpty(dirtySkillId) ||
+            !dirtySkillId.Equals(skillId) ||
+            dirtyLevel != level;
+    }
+
+    private void MakeCache()
+    {
+        if (!IsDirty())
+            return;
+
+        dirtySkillId = skillId;
+        dirtyLevel = level;
+        var gameInstance = GameInstance.Singleton;
+        cacheSkill = GameInstance.Skills.ContainsKey(skillId) ? GameInstance.Skills[skillId] : null;
+        cacheDamageElementAmountPairs.Clear();
+        if (cacheSkill != null)
+        {
+            var damageAttributes = cacheSkill.damageAttributes;
+            foreach (var damageAttribute in damageAttributes)
+            {
+                var element = damageAttribute.damageElement;
+                if (element == null)
+                    element = gameInstance.DefaultDamageElement;
+                if (!cacheDamageElementAmountPairs.ContainsKey(element))
+                    cacheDamageElementAmountPairs[element] = damageAttribute.damageAmount + damageAttribute.damageAmountIncreaseEachLevel * level;
+            }
+        }
+    }
+
     public Skill GetSkill()
     {
-        return GameInstance.Skills.ContainsKey(skillId) ? GameInstance.Skills[skillId] : null;
+        MakeCache();
+        return cacheSkill;
+    }
+
+    public Dictionary<DamageElement, DamageAmount> GetDamageElementAmountPairs()
+    {
+        MakeCache();
+        return cacheDamageElementAmountPairs;
     }
 
     public int GetMaxLevel()

@@ -9,4 +9,5 @@ public class CharacterClass : BaseGameData
     public CharacterStats baseStats;
     public CharacterStats statsIncreaseEachLevel;
     public CharacterStatsPercentage statsPercentageIncreaseEachLevel;
+    public Skill[] skills;
 }

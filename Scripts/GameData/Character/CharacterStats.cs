@@ -26,16 +26,16 @@ public class CharacterStats
         return result;
     }
 
-    public static CharacterStats operator *(CharacterStats a, int level)
+    public static CharacterStats operator *(CharacterStats a, float multiplier)
     {
         var result = new CharacterStats();
-        result.hp = a.hp * level;
-        result.mp = a.mp * level;
-        result.atkRate = a.atkRate * level;
-        result.def = a.def * level;
-        result.criHitRate = a.criHitRate * level;
-        result.criDmgRate = a.criDmgRate * level;
-        result.weightLimit = a.weightLimit * level;
+        result.hp = a.hp * multiplier;
+        result.mp = a.mp * multiplier;
+        result.atkRate = a.atkRate * multiplier;
+        result.def = a.def * multiplier;
+        result.criHitRate = a.criHitRate * multiplier;
+        result.criDmgRate = a.criDmgRate * multiplier;
+        result.weightLimit = a.weightLimit * multiplier;
         return result;
     }
 }
@@ -69,13 +69,13 @@ public class CharacterStatsPercentage
         return result;
     }
 
-    public static CharacterStatsPercentage operator *(CharacterStatsPercentage a, int level)
+    public static CharacterStatsPercentage operator *(CharacterStatsPercentage a, float multiplier)
     {
         var result = new CharacterStatsPercentage();
-        result.hp = a.hp * level;
-        result.mp = a.mp * level;
-        result.atkRate = a.atkRate * level;
-        result.def = a.def * level;
+        result.hp = a.hp * multiplier;
+        result.mp = a.mp * multiplier;
+        result.atkRate = a.atkRate * multiplier;
+        result.def = a.def * multiplier;
         return result;
     }
 }

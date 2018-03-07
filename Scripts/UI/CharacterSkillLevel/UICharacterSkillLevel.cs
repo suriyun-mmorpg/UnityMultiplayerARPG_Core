@@ -49,6 +49,7 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
     public Text textRecoveryHp;
     public Text textRecoveryMp;
     public Text textDamage;
+    public Button addButton;
     public UICharacterStats uiCharacterStats;
     public UICharacterStatsPercentage uiCharacterStatsPercentage;
 
@@ -66,7 +67,10 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
             textLevel.text = string.Format(levelFormat, data == null ? "N/A" : data.level.ToString("N0"));
 
         if (imageIcon != null)
+        {
             imageIcon.sprite = skillData == null ? null : skillData.icon;
+            imageIcon.gameObject.SetActive(skillData != null);
+        }
 
         if (textRequireSkillLevel != null)
         {
@@ -132,26 +136,42 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
 
         if (textDamage != null)
         {
-            if (skillData == null || !skillData.isAttack || skillData.TempDamageAmounts.Count == 0)
+            var damageElementAmountPairs = data.GetDamageElementAmountPairs();
+            if (skillData == null || !skillData.isAttack || damageElementAmountPairs.Count == 0)
                 textDamage.gameObject.SetActive(false);
             else
             {
-                var damageAmounts = skillData.TempDamageAmounts.Values;
                 var damagesText = "";
-                foreach (var damageAmount in damageAmounts)
+                foreach (var damageElementAmountPair in damageElementAmountPairs)
                 {
+                    var element = damageElementAmountPair.Key;
+                    var amount = damageElementAmountPair.Value;
                     damagesText += string.Format(damageFormat,
-                        damageAmount.damageElement == null ? defaultDamageTitle : damageAmount.damageElement.title,
-                        damageAmount.minDamage,
-                        damageAmount.maxDamage) + "\n";
+                        element.title,
+                        amount.minDamage,
+                        amount.maxDamage) + "\n";
                 }
                 textDamage.gameObject.SetActive(!string.IsNullOrEmpty(damagesText));
                 textDamage.text = damagesText;
             }
         }
+
+        var uiSceneGameplay = UISceneGameplay.Singleton;
+        if (addButton != null)
+            addButton.interactable = uiSceneGameplay.OwningCharacterEntity.StatPoint > 0;
     }
 
-    public void OnClickAdd()
+    public override void Show()
+    {
+        base.Show();
+        if (addButton != null)
+        {
+            addButton.onClick.RemoveAllListeners();
+            addButton.onClick.AddListener(OnClickAdd);
+        }
+    }
+
+    private void OnClickAdd()
     {
         var uiSceneGameplay = UISceneGameplay.Singleton;
         if (uiSceneGameplay != null)

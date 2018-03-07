@@ -39,7 +39,10 @@ public class UICharacterBuff : UISelectionEntry<CharacterBuff>
             textTitle.text = string.Format(titleFormat, skillData == null ? "Unknow" : skillData.title);
 
         if (imageIcon != null)
+        {
             imageIcon.sprite = skillData == null ? null : skillData.icon;
+            imageIcon.gameObject.SetActive(skillData != null);
+        }
 
         var buffRemainDuration = data.buffRemainsDuration;
         var buffDuration = data.GetBuffDuration();
