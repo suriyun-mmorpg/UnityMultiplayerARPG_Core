@@ -14,6 +14,7 @@ public class CharacterSkillLevel
     private int dirtyLevel;
     private Skill cacheSkill;
     private readonly Dictionary<DamageElement, DamageAmount> cacheDamageElementAmountPairs = new Dictionary<DamageElement, DamageAmount>();
+    private readonly Dictionary<DamageElement, DamageAmount> cacheInflictDamageElementAmountPairs = new Dictionary<DamageElement, DamageAmount>();
 
     private bool IsDirty()
     {
@@ -32,6 +33,7 @@ public class CharacterSkillLevel
         var gameInstance = GameInstance.Singleton;
         cacheSkill = GameInstance.Skills.ContainsKey(skillId) ? GameInstance.Skills[skillId] : null;
         cacheDamageElementAmountPairs.Clear();
+        cacheInflictDamageElementAmountPairs.Clear();
         if (cacheSkill != null)
         {
             var damageAttributes = cacheSkill.damageAttributes;
@@ -42,6 +44,15 @@ public class CharacterSkillLevel
                     element = gameInstance.DefaultDamageElement;
                 if (!cacheDamageElementAmountPairs.ContainsKey(element))
                     cacheDamageElementAmountPairs[element] = damageAttribute.damageAmount + damageAttribute.damageAmountIncreaseEachLevel * level;
+            }
+            var inflictDamageAttributes = cacheSkill.inflictDamageAttributes;
+            foreach (var inflictDamageAttribute in inflictDamageAttributes)
+            {
+                var element = inflictDamageAttribute.damageElement;
+                if (element == null)
+                    element = gameInstance.DefaultDamageElement;
+                if (!cacheInflictDamageElementAmountPairs.ContainsKey(element))
+                    cacheInflictDamageElementAmountPairs[element] = inflictDamageAttribute.damageAmount + inflictDamageAttribute.damageAmountIncreaseEachLevel * level;
             }
         }
     }
@@ -56,6 +67,12 @@ public class CharacterSkillLevel
     {
         MakeCache();
         return cacheDamageElementAmountPairs;
+    }
+
+    public Dictionary<DamageElement, DamageAmount> GetInflictDamageElementAmountPairs()
+    {
+        MakeCache();
+        return cacheInflictDamageElementAmountPairs;
     }
 
     public int GetMaxLevel()

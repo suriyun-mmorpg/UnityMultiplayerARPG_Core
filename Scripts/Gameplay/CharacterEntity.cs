@@ -305,7 +305,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         if (CurrentHp <= 0 || model == null || doingAction)
             return;
         doingAction = true;
-
+        // Prepare weapon data
         CharacterItem equipWeapon;
         WeaponItem weapon;
         var useSubAttackAnims = false;
@@ -321,21 +321,24 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             weapon = GameInstance.Singleton.defaultWeaponItem;
             equipWeapon = CharacterItem.MakeCharaterItem(weapon, 1);
         }
-
         var weaponType = weapon.WeaponType;
         if (weaponType.subAttackAnimations == null || weaponType.subAttackAnimations.Length == 0)
             useSubAttackAnims = false;
+        // Random animation
         var animArray = useSubAttackAnims ? weaponType.subAttackAnimations : weaponType.mainAttackAnimations;
+        var actionId = -1;
+        var triggerDuration = 0f;
+        var totalDuration = 0f;
         var animLength = animArray.Length;
-        if (animLength == 0)
+        if (animLength > 0)
         {
-            doingAction = false;
-            Debug.LogError("Cannot attack, animLength == 0 (" + weapon.Id + ")");
-            return;
+            var anim = animArray[Random.Range(0, animLength - 1)];
+            actionId = anim.actionId;
+            triggerDuration = anim.triggerDuration;
+            totalDuration = anim.totalDuration;
         }
-        var anim = animArray[Random.Range(0, animLength - 1)];
-        PlayActionAnimation(anim.totalDuration, anim.actionId);
-        StartCoroutine(AttackRoutine(anim.triggerDuration, anim.totalDuration, equipWeapon.GetDamageElementAmountPairs(), weaponType.damage, weaponType.TempEffectivenessAttributes));
+        PlayActionAnimation(totalDuration, actionId);
+        StartCoroutine(AttackRoutine(triggerDuration, totalDuration, equipWeapon.GetDamageElementAmountPairs(), weaponType.damage, weaponType.TempEffectivenessAttributes));
     }
 
     IEnumerator AttackRoutine(float damageDuration,
@@ -387,6 +390,12 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         doingAction = true;
 
         var skill = characterSkill.GetSkill();
+        if (skill == null)
+        {
+            doingAction = false;
+            return;
+        }
+
         var anim = skill.castAnimation;
         PlayActionAnimation(anim.totalDuration, anim.actionId);
         StartCoroutine(UseSkillRoutine(skillIndex));
@@ -398,33 +407,133 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         var skill = characterSkill.GetSkill();
         var anim = skill.castAnimation;
         yield return new WaitForSecondsRealtime(anim.triggerDuration);
-        if (skill.isAttack)
+        switch (skill.skillAttackType)
         {
-            var damageElementAmountPairs = characterSkill.GetDamageElementAmountPairs();
-            var damage = skill.damage;
-            var effectivenessAttributes = skill.TempEffectivenessAttributes;
-            switch (damage.damageType)
-            {
-                case DamageType.Melee:
-                    var hits = Physics.OverlapSphere(TempTransform.position, model.radius + damage.hitDistance);
-                    foreach (var hit in hits)
-                    {
-                        var characterEntity = hit.GetComponent<CharacterEntity>();
-                        if (characterEntity == null)
-                            continue;
-                        characterEntity.ReceiveDamage(this, damageElementAmountPairs, effectivenessAttributes, characterSkill);
-                    }
-                    break;
-                case DamageType.Missile:
-                    if (damage.missileDamageEntity != null)
-                    {
-                        var missileDamageIdentity = Manager.Assets.NetworkSpawn(damage.missileDamageEntity.Identity, TempTransform.position);
-                        var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
-                        missileDamageEntity.SetupDamage(this, damageElementAmountPairs, effectivenessAttributes, characterSkill, damage.missileDistance, damage.missileSpeed);
-                    }
-                    break;
-            }
+            case SkillAttackType.PureSkillDamage:
+                AttackAsPureSkillDamage(characterSkill);
+                break;
+            case SkillAttackType.WeaponDamageInflict:
+                AttackAsWeaponDamageInflict(characterSkill);
+                break;
         }
+        ApplySkillBuff(characterSkill);
+        skillLevels[skillIndex].Used();
+        skillLevels.Dirty(skillIndex);
+        yield return new WaitForSecondsRealtime(anim.totalDuration - anim.triggerDuration);
+        doingAction = false;
+    }
+
+    protected void AttackAsPureSkillDamage(CharacterSkillLevel characterSkill)
+    {
+        if (characterSkill == null)
+            return;
+
+        var skill = characterSkill.GetSkill();
+        if (skill == null)
+            return;
+
+        var damageElementAmountPairs = characterSkill.GetDamageElementAmountPairs();
+        var damage = skill.damage;
+        var effectivenessAttributes = skill.TempEffectivenessAttributes;
+        var debuff = skill.isDebuff ? CharacterBuff.MakeCharacterBuff(skill, characterSkill.level, true) : null;
+        switch (damage.damageType)
+        {
+            case DamageType.Melee:
+                var hits = Physics.OverlapSphere(TempTransform.position, model.radius + damage.hitDistance);
+                foreach (var hit in hits)
+                {
+                    var characterEntity = hit.GetComponent<CharacterEntity>();
+                    if (characterEntity == null)
+                        continue;
+                    characterEntity.ReceiveDamage(this, damageElementAmountPairs, effectivenessAttributes, debuff);
+                }
+                break;
+            case DamageType.Missile:
+                if (damage.missileDamageEntity != null)
+                {
+                    var missileDamageIdentity = Manager.Assets.NetworkSpawn(damage.missileDamageEntity.Identity, TempTransform.position);
+                    var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
+                    missileDamageEntity.SetupDamage(this, damageElementAmountPairs, effectivenessAttributes, debuff, damage.missileDistance, damage.missileSpeed);
+                }
+                break;
+        }
+    }
+
+    protected void AttackAsWeaponDamageInflict(CharacterSkillLevel characterSkill)
+    {
+        if (characterSkill == null)
+            return;
+
+        var skill = characterSkill.GetSkill();
+        if (skill == null)
+            return;
+        // Prepare weapon data
+        CharacterItem equipWeapon;
+        WeaponItem weapon;
+        // Random left hand / right hand weapon
+        if (equipWeapons.Count > 0)
+        {
+            equipWeapon = equipWeapons[Random.Range(0, equipWeapons.Count - 1)];
+            weapon = equipWeapon.GetWeaponItem();
+        }
+        else
+        {
+            weapon = GameInstance.Singleton.defaultWeaponItem;
+            equipWeapon = CharacterItem.MakeCharaterItem(weapon, 1);
+        }
+        // Prepare damage element amount pairs
+        var weaponDamageElementAmountPairs = equipWeapon.GetDamageElementAmountPairs();
+        var inflictDamageElementAmountPairs = characterSkill.GetInflictDamageElementAmountPairs();
+        var sumDamageElementAmountPairs = new Dictionary<DamageElement, DamageAmount>();
+        foreach (var weaponDamageElementAmountPair in weaponDamageElementAmountPairs)
+        {
+            var element = weaponDamageElementAmountPair.Key;
+            var amount = weaponDamageElementAmountPair.Value;
+            if (!sumDamageElementAmountPairs.ContainsKey(element))
+                sumDamageElementAmountPairs[element] = amount;
+        }
+        foreach (var inflictDamageElementAmountPair in inflictDamageElementAmountPairs)
+        {
+            var element = inflictDamageElementAmountPair.Key;
+            var amount = inflictDamageElementAmountPair.Value;
+            if (!sumDamageElementAmountPairs.ContainsKey(element))
+                sumDamageElementAmountPairs[element] = amount;
+            else
+                sumDamageElementAmountPairs[element] = sumDamageElementAmountPairs[element] + amount;
+        }
+        // Prepare other attributes
+        var weaponType = weapon.WeaponType;
+        var damage = weaponType.damage;
+        var effectivenessAttributes = weaponType.TempEffectivenessAttributes;
+        var debuff = skill.isDebuff ? CharacterBuff.MakeCharacterBuff(skill, characterSkill.level, true) : null;
+        switch (damage.damageType)
+        {
+            case DamageType.Melee:
+                var hits = Physics.OverlapSphere(TempTransform.position, model.radius + damage.hitDistance);
+                foreach (var hit in hits)
+                {
+                    var characterEntity = hit.GetComponent<CharacterEntity>();
+                    if (characterEntity == null)
+                        continue;
+                    characterEntity.ReceiveDamage(this, sumDamageElementAmountPairs, effectivenessAttributes, debuff);
+                }
+                break;
+            case DamageType.Missile:
+                if (damage.missileDamageEntity != null)
+                {
+                    var missileDamageIdentity = Manager.Assets.NetworkSpawn(damage.missileDamageEntity.Identity, TempTransform.position);
+                    var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
+                    missileDamageEntity.SetupDamage(this, sumDamageElementAmountPairs, effectivenessAttributes, debuff, damage.missileDistance, damage.missileSpeed);
+                }
+                break;
+        }
+    }
+
+    protected void ApplySkillBuff(CharacterSkillLevel characterSkill)
+    {
+        if (characterSkill == null)
+            return;
+        var skill = characterSkill.GetSkill();
         if (skill.skillBuffType == SkillBuffType.BuffToUser)
         {
             // TODO: Implement buff add to another characters
@@ -436,14 +545,11 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             }
             var characterBuff = new CharacterBuff();
             characterBuff.skillId = characterSkill.skillId;
+            characterBuff.isDebuff = false;
             characterBuff.level = characterSkill.level;
             characterBuff.Added();
             buffs.Add(characterBuff);
         }
-        skillLevels[skillIndex].Used();
-        skillLevels.Dirty(skillIndex);
-        yield return new WaitForSecondsRealtime(anim.totalDuration - anim.triggerDuration);
-        doingAction = false;
     }
 
     protected void NetFuncPlayActionAnimationCallback(NetFieldFloat duration, NetFieldInt actionId)
@@ -887,7 +993,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     public virtual void ReceiveDamage(CharacterEntity attacker, 
         Dictionary<DamageElement, DamageAmount> damageElementAmountPairs, 
         Dictionary<string, DamageEffectivenessAttribute> effectivenessAttributes,
-        CharacterSkillLevel attackSkillLevel)
+        CharacterBuff debuff)
     {
         // TODO: calculate damages
         if (CurrentHp <= 0)

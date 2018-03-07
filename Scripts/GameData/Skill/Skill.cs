@@ -2,6 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum SkillAttackType
+{
+    None,
+    PureSkillDamage,
+    WeaponDamageInflict,
+}
+
 public enum SkillBuffType
 {
     None,
@@ -36,10 +43,17 @@ public class Skill : BaseGameData
     public ActionAnimation castAnimation;
 
     [Header("Attack")]
-    public bool isAttack;
+    public SkillAttackType skillAttackType;
+
+    [Header("Attack As Pure Skill Damage")]
     public DamageAttribute[] damageAttributes;
     public Damage damage;
     public DamageEffectivenessAttribute[] effectivenessAttributes;
+
+    [Header("Attack As Weapon Damage Inflict")]
+    public float baseInflictPercentage;
+    public float inflictPercentageIncreaseEachLevel;
+    public DamageAttribute[] inflictDamageAttributes;
 
     [Header("Attack Debuff")]
     public bool isDebuff;

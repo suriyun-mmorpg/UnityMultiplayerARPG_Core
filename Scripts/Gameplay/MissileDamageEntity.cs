@@ -22,11 +22,11 @@ public class MissileDamageEntity : DamageEntity
     public void SetupDamage(CharacterEntity attacker,
         Dictionary<DamageElement, DamageAmount> damageElementAmountPairs,
         Dictionary<string, DamageEffectivenessAttribute> effectivenessAttributes,
-        CharacterSkillLevel attackerSkillLevel,
+        CharacterBuff debuff,
         float missileDistance,
         float missileSpeed)
     {
-        SetupDamage(attacker, damageElementAmountPairs, effectivenessAttributes, attackerSkillLevel);
+        SetupDamage(attacker, damageElementAmountPairs, effectivenessAttributes, debuff);
         this.missileDistance = missileDistance;
         this.missileSpeed = missileSpeed;
         TempRigidbody.velocity = attacker.TempTransform.forward * missileSpeed;

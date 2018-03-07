@@ -120,6 +120,25 @@ public class CharacterBuff
     {
         buffRemainsDuration -= deltaTime;
     }
+
+    public static CharacterBuff MakeCharacterBuff(Skill skill, int level, bool isDebuff)
+    {
+        var newBuff = new CharacterBuff();
+        newBuff.skillId = skill.Id;
+        newBuff.level = level;
+        newBuff.isDebuff = isDebuff;
+        return newBuff;
+    }
+
+    public CharacterBuff Clone()
+    {
+        var newBuff = new CharacterBuff();
+        newBuff.skillId = skillId;
+        newBuff.level = level;
+        newBuff.isDebuff = isDebuff;
+        newBuff.buffRemainsDuration = buffRemainsDuration;
+        return newBuff;
+    }
 }
 
 public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>

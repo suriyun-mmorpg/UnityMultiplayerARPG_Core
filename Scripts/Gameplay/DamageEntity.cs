@@ -7,23 +7,23 @@ public abstract class DamageEntity : RpgNetworkEntity
     protected CharacterEntity attacker;
     protected Dictionary<DamageElement, DamageAmount> damageElementAmountPairs;
     protected Dictionary<string, DamageEffectivenessAttribute> effectivenessAttributes;
-    protected CharacterSkillLevel attackerSkillLevel;
+    protected CharacterBuff debuff;
 
     public virtual void SetupDamage(CharacterEntity attacker,
         Dictionary<DamageElement, DamageAmount> damageElementAmountPairs,
         Dictionary<string, DamageEffectivenessAttribute> effectivenessAttributes,
-        CharacterSkillLevel attackerSkillLevel)
+        CharacterBuff debuff)
     {
         this.attacker = attacker;
         this.damageElementAmountPairs = damageElementAmountPairs;
         this.effectivenessAttributes = effectivenessAttributes;
-        this.attackerSkillLevel = attackerSkillLevel;
+        this.debuff = debuff;
     }
 
     public virtual void ApplyDamageTo(CharacterEntity target)
     {
         if (target == null)
             return;
-        target.ReceiveDamage(attacker, damageElementAmountPairs, effectivenessAttributes, attackerSkillLevel);
+        target.ReceiveDamage(attacker, damageElementAmountPairs, effectivenessAttributes, debuff);
     }
 }
