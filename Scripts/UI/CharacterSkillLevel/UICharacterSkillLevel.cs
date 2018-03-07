@@ -106,7 +106,7 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
         if (imageCoolDownGage != null)
             imageCoolDownGage.fillAmount = coolDownDuration <= 0 ? 1 : coolDownRemainDuration / coolDownDuration;
 
-        var isBuff = skillData != null && skillData.isBuff;
+        var isBuff = skillData != null && skillData.skillBuffType != SkillBuffType.None;
 
         if (textBuffDuration != null)
         {
@@ -116,23 +116,23 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
 
         if (textRecoveryHp != null)
         {
-            textRecoveryHp.text = string.Format(recoveryHpFormat, data.GetRecoveryHp().ToString("N0"));
+            textRecoveryHp.text = string.Format(recoveryHpFormat, data.GetBuffRecoveryHp().ToString("N0"));
             textRecoveryHp.gameObject.SetActive(isBuff);
         }
 
         if (textRecoveryMp != null)
         {
-            textRecoveryMp.text = string.Format(recoveryMpFormat, data.GetRecoveryMp().ToString("N0"));
+            textRecoveryMp.text = string.Format(recoveryMpFormat, data.GetBuffRecoveryMp().ToString("N0"));
             textRecoveryMp.gameObject.SetActive(isBuff);
         }
 
-        var stats = data.GetStats();
+        var stats = data.GetBuffStats();
         if (uiCharacterStats != null)
-            uiCharacterStats.data = skillData != null && skillData.isBuff ? stats : new CharacterStats();
+            uiCharacterStats.data = isBuff ? stats : new CharacterStats();
 
-        var statsPercentage = data.GetStatsPercentage();
+        var statsPercentage = data.GetBuffStatsPercentage();
         if (uiCharacterStatsPercentage != null)
-            uiCharacterStatsPercentage.data = skillData != null && skillData.isBuff ? statsPercentage : new CharacterStatsPercentage();
+            uiCharacterStatsPercentage.data = isBuff ? statsPercentage : new CharacterStatsPercentage();
 
         if (textDamage != null)
         {

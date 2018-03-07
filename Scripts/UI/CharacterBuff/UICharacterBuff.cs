@@ -57,16 +57,16 @@ public class UICharacterBuff : UISelectionEntry<CharacterBuff>
             imageBuffDurationGage.fillAmount = buffDuration <= 0 ? 1 : buffRemainDuration / buffDuration;
 
         if (textRecoveryHp != null)
-            textRecoveryHp.text = string.Format(recoveryHpFormat, data.GetRecoveryHp().ToString("N0"));
+            textRecoveryHp.text = string.Format(recoveryHpFormat, data.GetBuffRecoveryHp().ToString("N0"));
 
         if (textRecoveryMp != null)
-            textRecoveryMp.text = string.Format(recoveryMpFormat, data.GetRecoveryMp().ToString("N0"));
+            textRecoveryMp.text = string.Format(recoveryMpFormat, data.GetBuffRecoveryMp().ToString("N0"));
 
-        var stats = data.GetStats();
+        var stats = data.GetBuffStats();
         if (uiCharacterStats != null)
             uiCharacterStats.data = stats;
 
-        var statsPercentage = data.GetStatsPercentage();
+        var statsPercentage = data.GetBuffStatsPercentage();
         if (uiCharacterStatsPercentage != null)
             uiCharacterStatsPercentage.data = statsPercentage;
     }

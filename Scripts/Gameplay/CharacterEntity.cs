@@ -354,7 +354,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                     var characterEntity = hit.GetComponent<CharacterEntity>();
                     if (characterEntity == null)
                         continue;
-                    characterEntity.ReceiveDamage(this, damageElementAmountPairs, effectivenessAttributes);
+                    characterEntity.ReceiveDamage(this, damageElementAmountPairs, effectivenessAttributes, null);
                 }
                 break;
             case DamageType.Missile:
@@ -362,7 +362,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                 {
                     var missileDamageIdentity = Manager.Assets.NetworkSpawn(damage.missileDamageEntity.Identity, TempTransform.position);
                     var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
-                    missileDamageEntity.SetupDamage(this, damageElementAmountPairs, effectivenessAttributes, damage.missileDistance, damage.missileSpeed);
+                    missileDamageEntity.SetupDamage(this, damageElementAmountPairs, effectivenessAttributes, null, damage.missileDistance, damage.missileSpeed);
                 }
                 break;
         }
@@ -412,7 +412,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                         var characterEntity = hit.GetComponent<CharacterEntity>();
                         if (characterEntity == null)
                             continue;
-                        characterEntity.ReceiveDamage(this, damageElementAmountPairs, effectivenessAttributes);
+                        characterEntity.ReceiveDamage(this, damageElementAmountPairs, effectivenessAttributes, characterSkill);
                     }
                     break;
                 case DamageType.Missile:
@@ -420,12 +420,12 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                     {
                         var missileDamageIdentity = Manager.Assets.NetworkSpawn(damage.missileDamageEntity.Identity, TempTransform.position);
                         var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
-                        missileDamageEntity.SetupDamage(this, damageElementAmountPairs, effectivenessAttributes, damage.missileDistance, damage.missileSpeed);
+                        missileDamageEntity.SetupDamage(this, damageElementAmountPairs, effectivenessAttributes, characterSkill, damage.missileDistance, damage.missileSpeed);
                     }
                     break;
             }
         }
-        if (skill.isBuff)
+        if (skill.skillBuffType == SkillBuffType.BuffToUser)
         {
             // TODO: Implement buff add to another characters
             if (buffLocations.ContainsKey(characterSkill.skillId))
@@ -886,7 +886,8 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     public virtual void ReceiveDamage(CharacterEntity attacker, 
         Dictionary<DamageElement, DamageAmount> damageElementAmountPairs, 
-        Dictionary<string, DamageEffectivenessAttribute> effectivenessAttributes)
+        Dictionary<string, DamageEffectivenessAttribute> effectivenessAttributes,
+        CharacterSkillLevel attackSkillLevel)
     {
         // TODO: calculate damages
         if (CurrentHp <= 0)

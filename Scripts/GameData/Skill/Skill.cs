@@ -2,6 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum SkillBuffType
+{
+    None,
+    BuffToUser,
+}
+
+[System.Serializable]
+public class SkillBuff
+{
+    [Tooltip("If buff duration less than or equals to 0, buff stats won't applied")]
+    public float baseDuration;
+    public float durationIncreaseEachLevel;
+    public float baseRecoveryHp;
+    public float recoveryHpIncreaseEachLevel;
+    public float baseRecoveryMp;
+    public float recoveryMpIncreaseEachLevel;
+    public CharacterStats baseStats;
+    public CharacterStats statsIncreaseEachLevel;
+    public CharacterStatsPercentage baseStatsPercentage;
+    public CharacterStatsPercentage statsPercentageIncreaseEachLevel;
+}
+
 [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill")]
 public class Skill : BaseGameData
 {
@@ -12,26 +34,20 @@ public class Skill : BaseGameData
     public float baseCoolDownDuration;
     public float coolDownDurationIncreaseEachLevel;
     public ActionAnimation castAnimation;
+
     [Header("Attack")]
     public bool isAttack;
     public DamageAttribute[] damageAttributes;
     public Damage damage;
     public DamageEffectivenessAttribute[] effectivenessAttributes;
+
+    [Header("Attack Debuff")]
+    public bool isDebuff;
+    public SkillBuff debuff;
+
     [Header("Buffs")]
-    public bool isBuff;
-    [Tooltip("`buffDistance` = 0, will buff only caster")]
-    [Range(0f, 100f)]
-    public float buffDistance;
-    [Tooltip("If buff duration less than or equals to 0, buff stats won't applied")]
-    public float baseBuffDuration;
-    public float buffDurationIncreaseEachLevel;
-    public float baseRecoveryHp;
-    public float recoveryHpIncreaseEachLevel;
-    public float baseRecoveryMp;
-    public float recoveryMpIncreaseEachLevel;
-    public CharacterStats baseStats;
-    public CharacterStats statsIncreaseEachLevel;
-    public CharacterStatsPercentage statsPercentageIncreaseEachLevel;
+    public SkillBuffType skillBuffType;
+    public SkillBuff buff;
 
     private Dictionary<string, DamageEffectivenessAttribute> tempEffectivenessAttributes;
     public Dictionary<string, DamageEffectivenessAttribute> TempEffectivenessAttributes

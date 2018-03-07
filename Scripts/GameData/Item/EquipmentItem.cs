@@ -14,6 +14,7 @@ public class EquipmentItem : Item
     public CharacterAttributeAmount[] requireAttributes;
     public CharacterStats baseStats;
     public CharacterStats statsIncreaseEachLevel;
+    public CharacterStatsPercentage baseStatsPercentage;
     public CharacterStatsPercentage statsPercentageIncreaseEachLevel;
 
 #if UNITY_EDITOR

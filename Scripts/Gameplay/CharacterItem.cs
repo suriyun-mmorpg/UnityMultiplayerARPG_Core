@@ -111,7 +111,7 @@ public class CharacterItem
         var equipmentItem = GetEquipmentItem();
         if (equipmentItem == null)
             return new CharacterStatsPercentage();
-        return equipmentItem.statsPercentageIncreaseEachLevel * level;
+        return equipmentItem.baseStatsPercentage + equipmentItem.statsPercentageIncreaseEachLevel * level;
     }
 
     public void Empty()
