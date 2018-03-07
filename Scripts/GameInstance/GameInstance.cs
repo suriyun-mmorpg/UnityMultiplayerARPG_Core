@@ -150,6 +150,7 @@ public class GameInstance : MonoBehaviour
                 attributes.Add(baseAttribute.attribute);
             }
             AddCharacterAttributes(attributes);
+            AddSkills(characterClass.skills);
         }
     }
 
