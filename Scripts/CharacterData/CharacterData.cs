@@ -294,8 +294,8 @@ public static class CharacterDataExtension
                 Debug.LogError("Buff: " + buff.skillId + " owned by " + id + " is invalid data");
                 continue;
             }
-            stats += buff.GetBuffStats();
-            statsPercentage += buff.GetBuffStatsPercentage();
+            stats += buff.GetBuffStats() + buff.GetDebuffStats();
+            statsPercentage += buff.GetBuffStatsPercentage() + buff.GetDebuffStatsPercentage();
         }
         return stats + statsPercentage;
     }

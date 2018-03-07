@@ -20,7 +20,7 @@ public class CharacterBuff
     public CharacterStats GetBuffStats()
     {
         var skill = GetSkill();
-        if (skill == null)
+        if (skill == null && !isDebuff)
             return new CharacterStats();
         return skill.buff.baseStats + skill.buff.statsIncreaseEachLevel * level;
     }
@@ -28,7 +28,7 @@ public class CharacterBuff
     public CharacterStatsPercentage GetBuffStatsPercentage()
     {
         var skill = GetSkill();
-        if (skill == null)
+        if (skill == null && !isDebuff)
             return new CharacterStatsPercentage();
         return skill.buff.baseStatsPercentage + skill.buff.statsPercentageIncreaseEachLevel * level;
     }
@@ -36,7 +36,7 @@ public class CharacterBuff
     public float GetBuffDuration()
     {
         var skill = GetSkill();
-        if (skill == null)
+        if (skill == null && !isDebuff)
             return 0f;
         var duration = skill.buff.baseDuration + skill.buff.durationIncreaseEachLevel * level;
         if (duration < 0)
@@ -47,7 +47,7 @@ public class CharacterBuff
     public float GetBuffRecoveryHp()
     {
         var skill = GetSkill();
-        if (skill == null)
+        if (skill == null && !isDebuff)
             return 0f;
         return skill.buff.baseRecoveryHp + skill.buff.recoveryHpIncreaseEachLevel * level;
     }
@@ -55,7 +55,7 @@ public class CharacterBuff
     public float GetBuffRecoveryMp()
     {
         var skill = GetSkill();
-        if (skill == null)
+        if (skill == null && !isDebuff)
             return 0f;
         return skill.buff.baseRecoveryMp + skill.buff.recoveryMpIncreaseEachLevel * level;
     }
@@ -65,7 +65,7 @@ public class CharacterBuff
     public CharacterStats GetDebuffStats()
     {
         var skill = GetSkill();
-        if (skill == null)
+        if (skill == null && isDebuff)
             return new CharacterStats();
         return skill.debuff.baseStats + skill.debuff.statsIncreaseEachLevel * level;
     }
@@ -73,7 +73,7 @@ public class CharacterBuff
     public CharacterStatsPercentage GetDebuffStatsPercentage()
     {
         var skill = GetSkill();
-        if (skill == null)
+        if (skill == null && isDebuff)
             return new CharacterStatsPercentage();
         return skill.debuff.baseStatsPercentage + skill.debuff.statsPercentageIncreaseEachLevel * level;
     }
@@ -81,7 +81,7 @@ public class CharacterBuff
     public float GetDebuffDuration()
     {
         var skill = GetSkill();
-        if (skill == null)
+        if (skill == null && isDebuff)
             return 0f;
         var duration = skill.debuff.baseDuration + skill.debuff.durationIncreaseEachLevel * level;
         if (duration < 0)
@@ -92,7 +92,7 @@ public class CharacterBuff
     public float GetDebuffRecoveryHp()
     {
         var skill = GetSkill();
-        if (skill == null)
+        if (skill == null && isDebuff)
             return 0f;
         return skill.debuff.baseRecoveryHp + skill.debuff.recoveryHpIncreaseEachLevel * level;
     }
@@ -100,7 +100,7 @@ public class CharacterBuff
     public float GetDebuffRecoveryMp()
     {
         var skill = GetSkill();
-        if (skill == null)
+        if (skill == null && isDebuff)
             return 0f;
         return skill.debuff.baseRecoveryMp + skill.debuff.recoveryMpIncreaseEachLevel * level;
     }
