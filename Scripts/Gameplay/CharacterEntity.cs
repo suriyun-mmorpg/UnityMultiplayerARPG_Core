@@ -1016,7 +1016,8 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         var receivingDamage = 0f;
         var damageElement = baseDamageAttribute.Key;
         var damageAmount = baseDamageAttribute.Value;
-        var damageEffectiveness = 0f;
+        // Find damage effectiveness
+        var damageEffectiveness = 1f;
         var attributeLevels = attacker.attributeLevels;
         foreach (var attributeLevel in attributeLevels)
         {
@@ -1024,8 +1025,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             if (effectivenessAttributes.ContainsKey(attributeId))
                 damageEffectiveness += effectivenessAttributes[attributeId] * attributeLevel.level;
         }
-        damageEffectiveness += damageElement.GetDamageReceiveRate(this);
-        receivingDamage = damageEffectiveness * Random.Range(damageAmount.minDamage, damageAmount.maxDamage);
+        receivingDamage = damageElement.GetDamageReceiveRate(this) * damageEffectiveness * Random.Range(damageAmount.minDamage, damageAmount.maxDamage);
         if (receivingDamage > 0f)
             totalDamage += receivingDamage;
 
@@ -1036,8 +1036,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             {
                 damageElement = damageAttribute.Key;
                 damageAmount = damageAttribute.Value;
-                damageEffectiveness += damageElement.GetDamageReceiveRate(this);
-                receivingDamage = damageEffectiveness * Random.Range(damageAmount.minDamage, damageAmount.maxDamage);
+                receivingDamage = damageElement.GetDamageReceiveRate(this) * Random.Range(damageAmount.minDamage, damageAmount.maxDamage);
                 if (receivingDamage > 0f)
                     totalDamage += receivingDamage;
             }
