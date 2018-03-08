@@ -6,4 +6,8 @@ using UnityEngine;
 public class DamageElement : BaseGameData
 {
     // TODO: Resistance
+    public float GetDamageReceiveRate(ICharacterData characterData)
+    {
+        return 1f;
+    }
 }

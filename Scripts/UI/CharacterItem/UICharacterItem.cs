@@ -118,7 +118,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
 
         if (textDamage != null)
         {
-            var damageElementAmountPairs = data.GetDamageElementAmountPairs();
+            var damageElementAmountPairs = data.GetAdditionalDamageAttributes();
             if (weaponItem == null || damageElementAmountPairs.Count == 0)
                 textDamage.gameObject.SetActive(false);
             else

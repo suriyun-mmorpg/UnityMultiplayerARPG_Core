@@ -338,14 +338,15 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             totalDuration = anim.totalDuration;
         }
         PlayActionAnimation(totalDuration, actionId);
-        StartCoroutine(AttackRoutine(triggerDuration, totalDuration, equipWeapon.GetDamageElementAmountPairs(), weaponType.damage, weaponType.TempEffectivenessAttributes));
+        StartCoroutine(AttackRoutine(triggerDuration, totalDuration, equipWeapon.GetBaseDamageAttribute(), equipWeapon.GetAdditionalDamageAttributes(), weaponType.damage, weaponType.TempEffectivenessAttributes));
     }
 
     IEnumerator AttackRoutine(float damageDuration,
         float totalDuration,
-        Dictionary<DamageElement, DamageAmount> damageElementAmountPairs,
+        KeyValuePair<DamageElement, DamageAmount> baseDamageAttribute,
+        Dictionary<DamageElement, DamageAmount> additionalDamageAttributes,
         Damage damage,
-        Dictionary<string, DamageEffectivenessAttribute> effectivenessAttributes)
+        Dictionary<string, float> effectivenessAttributes)
     {
         yield return new WaitForSecondsRealtime(damageDuration);
         switch (damage.damageType)
@@ -357,7 +358,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                     var characterEntity = hit.GetComponent<CharacterEntity>();
                     if (characterEntity == null)
                         continue;
-                    characterEntity.ReceiveDamage(this, damageElementAmountPairs, effectivenessAttributes, null);
+                    characterEntity.ReceiveDamage(this, baseDamageAttribute, additionalDamageAttributes, effectivenessAttributes, null);
                 }
                 break;
             case DamageType.Missile:
@@ -365,7 +366,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                 {
                     var missileDamageIdentity = Manager.Assets.NetworkSpawn(damage.missileDamageEntity.Identity, TempTransform.position);
                     var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
-                    missileDamageEntity.SetupDamage(this, damageElementAmountPairs, effectivenessAttributes, null, damage.missileDistance, damage.missileSpeed);
+                    missileDamageEntity.SetupDamage(this, baseDamageAttribute, additionalDamageAttributes, effectivenessAttributes, null, damage.missileDistance, damage.missileSpeed);
                 }
                 break;
         }
@@ -432,7 +433,8 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         if (skill == null)
             return;
 
-        var damageElementAmountPairs = characterSkill.GetDamageElementAmountPairs();
+        var baseDamageAttribute = characterSkill.GetBaseDamageAttribute();
+        var damageElementAmountPairs = characterSkill.GetAdditionalDamageAttributes();
         var damage = skill.damage;
         var effectivenessAttributes = skill.TempEffectivenessAttributes;
         var debuff = skill.isDebuff ? CharacterBuff.MakeCharacterBuff(skill, characterSkill.level, true) : null;
@@ -445,7 +447,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                     var characterEntity = hit.GetComponent<CharacterEntity>();
                     if (characterEntity == null)
                         continue;
-                    characterEntity.ReceiveDamage(this, damageElementAmountPairs, effectivenessAttributes, debuff);
+                    characterEntity.ReceiveDamage(this, baseDamageAttribute, damageElementAmountPairs, effectivenessAttributes, debuff);
                 }
                 break;
             case DamageType.Missile:
@@ -453,7 +455,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                 {
                     var missileDamageIdentity = Manager.Assets.NetworkSpawn(damage.missileDamageEntity.Identity, TempTransform.position);
                     var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
-                    missileDamageEntity.SetupDamage(this, damageElementAmountPairs, effectivenessAttributes, debuff, damage.missileDistance, damage.missileSpeed);
+                    missileDamageEntity.SetupDamage(this, baseDamageAttribute, damageElementAmountPairs, effectivenessAttributes, debuff, damage.missileDistance, damage.missileSpeed);
                 }
                 break;
         }
@@ -482,24 +484,25 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             equipWeapon = CharacterItem.MakeCharaterItem(weapon, 1);
         }
         // Prepare damage element amount pairs
-        var weaponDamageElementAmountPairs = equipWeapon.GetDamageElementAmountPairs();
-        var inflictDamageElementAmountPairs = characterSkill.GetInflictDamageElementAmountPairs();
-        var sumDamageElementAmountPairs = new Dictionary<DamageElement, DamageAmount>();
-        foreach (var weaponDamageElementAmountPair in weaponDamageElementAmountPairs)
+        var baseDamageAttribute = equipWeapon.GetBaseDamageAttribute();
+        var weaponAdditionalDamageAttributes = equipWeapon.GetAdditionalDamageAttributes();
+        var inflictDamageAttributes = characterSkill.GetInflictDamageAttributes();
+        var allAdditionalDamageAttributes = new Dictionary<DamageElement, DamageAmount>();
+        foreach (var weaponAdditionalDamageAttribute in weaponAdditionalDamageAttributes)
         {
-            var element = weaponDamageElementAmountPair.Key;
-            var amount = weaponDamageElementAmountPair.Value;
-            if (!sumDamageElementAmountPairs.ContainsKey(element))
-                sumDamageElementAmountPairs[element] = amount;
+            var element = weaponAdditionalDamageAttribute.Key;
+            var amount = weaponAdditionalDamageAttribute.Value;
+            if (!allAdditionalDamageAttributes.ContainsKey(element))
+                allAdditionalDamageAttributes[element] = amount;
         }
-        foreach (var inflictDamageElementAmountPair in inflictDamageElementAmountPairs)
+        foreach (var inflictDamageAttribute in inflictDamageAttributes)
         {
-            var element = inflictDamageElementAmountPair.Key;
-            var amount = inflictDamageElementAmountPair.Value;
-            if (!sumDamageElementAmountPairs.ContainsKey(element))
-                sumDamageElementAmountPairs[element] = amount;
+            var element = inflictDamageAttribute.Key;
+            var amount = inflictDamageAttribute.Value;
+            if (!allAdditionalDamageAttributes.ContainsKey(element))
+                allAdditionalDamageAttributes[element] = amount;
             else
-                sumDamageElementAmountPairs[element] = sumDamageElementAmountPairs[element] + amount;
+                allAdditionalDamageAttributes[element] += amount;
         }
         // Prepare other attributes
         var weaponType = weapon.WeaponType;
@@ -515,7 +518,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                     var characterEntity = hit.GetComponent<CharacterEntity>();
                     if (characterEntity == null)
                         continue;
-                    characterEntity.ReceiveDamage(this, sumDamageElementAmountPairs, effectivenessAttributes, debuff);
+                    characterEntity.ReceiveDamage(this, baseDamageAttribute, allAdditionalDamageAttributes, effectivenessAttributes, debuff);
                 }
                 break;
             case DamageType.Missile:
@@ -523,7 +526,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                 {
                     var missileDamageIdentity = Manager.Assets.NetworkSpawn(damage.missileDamageEntity.Identity, TempTransform.position);
                     var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
-                    missileDamageEntity.SetupDamage(this, sumDamageElementAmountPairs, effectivenessAttributes, debuff, damage.missileDistance, damage.missileSpeed);
+                    missileDamageEntity.SetupDamage(this, baseDamageAttribute, allAdditionalDamageAttributes, effectivenessAttributes, debuff, damage.missileDistance, damage.missileSpeed);
                 }
                 break;
         }
@@ -536,17 +539,14 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         var skill = characterSkill.GetSkill();
         if (skill.skillBuffType == SkillBuffType.BuffToUser)
         {
-            // TODO: Implement buff add to another characters
-            if (buffLocations.ContainsKey(characterSkill.skillId))
+            var buffKey = GetBuffKey(characterSkill.skillId, true);
+            if (buffLocations.ContainsKey(buffKey))
             {
-                var buffIndex = buffLocations[characterSkill.skillId];
+                var buffIndex = buffLocations[buffKey];
                 // Don't update here let it update at update function to remove it
                 buffs[buffIndex].buffRemainsDuration = 0;
             }
-            var characterBuff = new CharacterBuff();
-            characterBuff.skillId = characterSkill.skillId;
-            characterBuff.isDebuff = false;
-            characterBuff.level = characterSkill.level;
+            var characterBuff = CharacterBuff.MakeCharacterBuff(skill, level, false);
             characterBuff.Added();
             buffs.Add(characterBuff);
         }
@@ -990,14 +990,65 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         return true;
     }
 
-    public virtual void ReceiveDamage(CharacterEntity attacker, 
-        Dictionary<DamageElement, DamageAmount> damageElementAmountPairs, 
-        Dictionary<string, DamageEffectivenessAttribute> effectivenessAttributes,
+    public virtual void ReceiveDamage(CharacterEntity attacker,
+        KeyValuePair<DamageElement, DamageAmount> baseDamageAttribute,
+        Dictionary<DamageElement, DamageAmount> additionalDamageAttributes,
+        Dictionary<string, float> effectivenessAttributes,
         CharacterBuff debuff)
     {
-        // TODO: calculate damages
+        var gameInstance = GameInstance.Singleton;
+        // Damage receiver stats
+        var dmgReceiverStats = this.GetStatsWithBuffs();
+        // Attacker stats
+        var dmgAttackerStats = attacker.GetStatsWithBuffs();
+        // Calculate chance to hit
+        var hitChance = 2 * (dmgAttackerStats.atkRate / (dmgAttackerStats.atkRate + dmgReceiverStats.def)) * (attacker.Level / (attacker.Level + Level));
+        if (hitChance < 0.05f)
+            hitChance = 0.05f;
+        if (hitChance > 0.95f)
+            hitChance = 0.95f;
+        // If miss, return don't calculate damages
+        if (Random.value > hitChance)
+            return;
+
+        // Base damage receives
+        var totalDamage = 0f;
+        var receivingDamage = 0f;
+        var damageElement = baseDamageAttribute.Key;
+        var damageAmount = baseDamageAttribute.Value;
+        var damageEffectiveness = 0f;
+        var attributeLevels = attacker.attributeLevels;
+        foreach (var attributeLevel in attributeLevels)
+        {
+            var attributeId = attributeLevel.attributeId;
+            if (effectivenessAttributes.ContainsKey(attributeId))
+                damageEffectiveness += effectivenessAttributes[attributeId] * attributeLevel.level;
+        }
+        damageEffectiveness += damageElement.GetDamageReceiveRate(this);
+        receivingDamage = damageEffectiveness * Random.Range(damageAmount.minDamage, damageAmount.maxDamage);
+        if (receivingDamage > 0f)
+            totalDamage += receivingDamage;
+
+        // Additional damages receives
+        if (additionalDamageAttributes.Count > 0)
+        {
+            foreach (var damageAttribute in additionalDamageAttributes)
+            {
+                damageElement = damageAttribute.Key;
+                damageAmount = damageAttribute.Value;
+                damageEffectiveness += damageElement.GetDamageReceiveRate(this);
+                receivingDamage = damageEffectiveness * Random.Range(damageAmount.minDamage, damageAmount.maxDamage);
+                if (receivingDamage > 0f)
+                    totalDamage += receivingDamage;
+            }
+        }
+        // Apply damages
+        CurrentHp -= (int)totalDamage;
+
+        // If current hp <= 0, character dead
         if (CurrentHp <= 0)
         {
+            CurrentHp = 0;
             StopAllCoroutines();
             doingAction = false;
             buffs.Clear();
@@ -1008,6 +1059,19 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                 skillLevel.coolDownRemainsDuration = 0;
                 skillLevels.Dirty(i);
             }
+        }
+        else if (debuff != null)
+        {
+            var buffKey = GetBuffKey(debuff.skillId, true);
+            if (buffLocations.ContainsKey(buffKey))
+            {
+                var buffIndex = buffLocations[buffKey];
+                // Don't update here let it update at update function to remove it
+                buffs[buffIndex].buffRemainsDuration = 0;
+            }
+            var characterDebuff = debuff.Clone();
+            characterDebuff.Added();
+            buffs.Add(characterDebuff);
         }
     }
     #endregion
@@ -1052,7 +1116,8 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         for (var i = 0; i < buffs.Count; ++i)
         {
             var buff = buffs[i];
-            buffLocations[buff.skillId] = i;
+            var buffKey = GetBuffKey(buff.skillId, buff.isDebuff);
+            buffLocations[buffKey] = i;
         }
 
         if (TempUISceneGameplay != null)
@@ -1129,5 +1194,11 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         equipItems.onOperation -= OnEquipItemsOperation;
         nonEquipItems.onOperation -= OnNonEquipItemsOperation;
         skillLevels.onOperation -= OnSkillLevelsOperation;
+    }
+
+    public static string GetBuffKey(string skillId, bool isDebuff)
+    {
+        var keyPrefix = isDebuff ? GameDataConst.CHARACTER_DEBUFF_PREFIX : GameDataConst.CHARACTER_BUFF_PREFIX;
+        return keyPrefix + skillId;
     }
 }

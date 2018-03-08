@@ -136,7 +136,7 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
 
         if (textDamage != null)
         {
-            var damageElementAmountPairs = data.GetDamageElementAmountPairs();
+            var damageElementAmountPairs = data.GetAdditionalDamageAttributes();
             if (skillData == null || skillData.skillAttackType == SkillAttackType.None || damageElementAmountPairs.Count == 0)
                 textDamage.gameObject.SetActive(false);
             else

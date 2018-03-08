@@ -20,7 +20,8 @@ public class CharacterItem
     private EquipmentItem cacheEquipmentItem;
     private WeaponItem cacheWeaponItem;
     private ShieldItem cacheShieldItem;
-    private readonly Dictionary<DamageElement, DamageAmount> cacheDamageElementAmountPairs = new Dictionary<DamageElement, DamageAmount>();
+    private KeyValuePair<DamageElement, DamageAmount> cacheBaseDamageAttribute;
+    private readonly Dictionary<DamageElement, DamageAmount> cacheAdditionalDamageAttributes = new Dictionary<DamageElement, DamageAmount>();
 
     private bool IsDirty()
     {
@@ -41,17 +42,26 @@ public class CharacterItem
         cacheEquipmentItem = cacheItem != null ? cacheItem as EquipmentItem : null;
         cacheWeaponItem = cacheItem != null ? cacheItem as WeaponItem : null;
         cacheShieldItem = cacheItem != null ? cacheItem as ShieldItem : null;
-        cacheDamageElementAmountPairs.Clear();
+        cacheBaseDamageAttribute = new KeyValuePair<DamageElement, DamageAmount>();
+        cacheAdditionalDamageAttributes.Clear();
         if (cacheWeaponItem != null)
         {
-            var damageAttributes = cacheWeaponItem.damageAttributes;
-            foreach (var damageAttribute in damageAttributes)
+            var baseDamageAttribute = cacheWeaponItem.baseDamageAttribute;
+            var baseElement = baseDamageAttribute.damageElement;
+            if (baseElement == null)
+                baseElement = gameInstance.DefaultDamageElement;
+            cacheBaseDamageAttribute = new KeyValuePair<DamageElement, DamageAmount>(baseElement, baseDamageAttribute.baseDamageAmount + baseDamageAttribute.damageAmountIncreaseEachLevel * level);
+
+            var additionalDamageAttributes = cacheWeaponItem.additionalDamageAttributes;
+            foreach (var damageAttribute in additionalDamageAttributes)
             {
                 var element = damageAttribute.damageElement;
                 if (element == null)
                     element = gameInstance.DefaultDamageElement;
-                if (!cacheDamageElementAmountPairs.ContainsKey(element))
-                    cacheDamageElementAmountPairs[element] = damageAttribute.damageAmount + damageAttribute.damageAmountIncreaseEachLevel * level;
+                if (!cacheAdditionalDamageAttributes.ContainsKey(element))
+                    cacheAdditionalDamageAttributes[element] = damageAttribute.baseDamageAmount + damageAttribute.damageAmountIncreaseEachLevel * level;
+                else
+                    cacheAdditionalDamageAttributes[element] += damageAttribute.baseDamageAmount + damageAttribute.damageAmountIncreaseEachLevel * level;
             }
         }
     }
@@ -76,10 +86,16 @@ public class CharacterItem
         return cacheShieldItem;
     }
 
-    public Dictionary<DamageElement, DamageAmount> GetDamageElementAmountPairs()
+    public KeyValuePair<DamageElement, DamageAmount> GetBaseDamageAttribute()
     {
         MakeCache();
-        return cacheDamageElementAmountPairs;
+        return cacheBaseDamageAttribute;
+    }
+
+    public Dictionary<DamageElement, DamageAmount> GetAdditionalDamageAttributes()
+    {
+        MakeCache();
+        return cacheAdditionalDamageAttributes;
     }
 
     public int GetMaxStack()

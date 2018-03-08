@@ -53,7 +53,7 @@ public class DamageAttribute
 {
     [Tooltip("You can leave Damage to be empty to make it as physical damage which won't calculate with resistance stats")]
     public DamageElement damageElement;
-    public DamageAmount damageAmount;
+    public DamageAmount baseDamageAmount;
     public DamageAmount damageAmountIncreaseEachLevel;
 }
 

@@ -221,7 +221,7 @@ public class GameInstance : MonoBehaviour
                 }
                 AddCharacterAttributes(attributes);
                 var damageElements = new List<DamageElement>();
-                var damageAttributes = weaponItem.damageAttributes;
+                var damageAttributes = weaponItem.additionalDamageAttributes;
                 foreach (var damageAttribute in damageAttributes)
                 {
                     if (damageAttribute == null || damageAttribute.damageElement == null || DamageElements.ContainsKey(damageAttribute.damageElement.Id))
@@ -244,7 +244,7 @@ public class GameInstance : MonoBehaviour
                 continue;
             Skills[skill.Id] = skill;
             var damageElements = new List<DamageElement>();
-            var damageAttributes = skill.damageAttributes;
+            var damageAttributes = skill.additionalDamageAttributes;
             foreach (var damageAttribute in damageAttributes)
             {
                 if (damageAttribute == null || damageAttribute.damageElement == null || DamageElements.ContainsKey(damageAttribute.damageElement.Id))

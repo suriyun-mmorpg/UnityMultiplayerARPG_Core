@@ -188,7 +188,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
             {
                 if (!string.IsNullOrEmpty(damagesString))
                     damagesString += "\n";
-                var damageElementAmountPairs = characterWeapon.GetDamageElementAmountPairs();
+                var damageElementAmountPairs = characterWeapon.GetAdditionalDamageAttributes();
                 foreach (var damageElementAmountPair in damageElementAmountPairs)
                 {
                     ++damageAmountCount;

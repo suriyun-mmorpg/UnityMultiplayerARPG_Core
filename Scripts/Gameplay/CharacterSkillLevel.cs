@@ -13,8 +13,9 @@ public class CharacterSkillLevel
     private string dirtySkillId;
     private int dirtyLevel;
     private Skill cacheSkill;
-    private readonly Dictionary<DamageElement, DamageAmount> cacheDamageElementAmountPairs = new Dictionary<DamageElement, DamageAmount>();
-    private readonly Dictionary<DamageElement, DamageAmount> cacheInflictDamageElementAmountPairs = new Dictionary<DamageElement, DamageAmount>();
+    private KeyValuePair<DamageElement, DamageAmount> cacheBaseDamageAttribute;
+    private readonly Dictionary<DamageElement, DamageAmount> cacheAdditionalDamageAttributes = new Dictionary<DamageElement, DamageAmount>();
+    private readonly Dictionary<DamageElement, DamageAmount> cacheInflictDamageAttributes = new Dictionary<DamageElement, DamageAmount>();
 
     private bool IsDirty()
     {
@@ -32,27 +33,38 @@ public class CharacterSkillLevel
         dirtyLevel = level;
         var gameInstance = GameInstance.Singleton;
         cacheSkill = GameInstance.Skills.ContainsKey(skillId) ? GameInstance.Skills[skillId] : null;
-        cacheDamageElementAmountPairs.Clear();
-        cacheInflictDamageElementAmountPairs.Clear();
+        cacheBaseDamageAttribute = new KeyValuePair<DamageElement, DamageAmount>();
+        cacheAdditionalDamageAttributes.Clear();
+        cacheInflictDamageAttributes.Clear();
         if (cacheSkill != null)
         {
-            var damageAttributes = cacheSkill.damageAttributes;
-            foreach (var damageAttribute in damageAttributes)
+            var baseDamageAttribute = cacheSkill.baseDamageAttribute;
+            var baseElement = baseDamageAttribute.damageElement;
+            if (baseElement == null)
+                baseElement = gameInstance.DefaultDamageElement;
+            cacheBaseDamageAttribute = new KeyValuePair<DamageElement, DamageAmount>(baseElement, baseDamageAttribute.baseDamageAmount + baseDamageAttribute.damageAmountIncreaseEachLevel * level);
+
+            var additionalDamageAttributes = cacheSkill.additionalDamageAttributes;
+            foreach (var damageAttribute in additionalDamageAttributes)
             {
                 var element = damageAttribute.damageElement;
                 if (element == null)
                     element = gameInstance.DefaultDamageElement;
-                if (!cacheDamageElementAmountPairs.ContainsKey(element))
-                    cacheDamageElementAmountPairs[element] = damageAttribute.damageAmount + damageAttribute.damageAmountIncreaseEachLevel * level;
+                if (!cacheAdditionalDamageAttributes.ContainsKey(element))
+                    cacheAdditionalDamageAttributes[element] = damageAttribute.baseDamageAmount + damageAttribute.damageAmountIncreaseEachLevel * level;
+                else
+                    cacheAdditionalDamageAttributes[element] += damageAttribute.baseDamageAmount + damageAttribute.damageAmountIncreaseEachLevel * level;
             }
             var inflictDamageAttributes = cacheSkill.inflictDamageAttributes;
-            foreach (var inflictDamageAttribute in inflictDamageAttributes)
+            foreach (var damageAttribute in inflictDamageAttributes)
             {
-                var element = inflictDamageAttribute.damageElement;
+                var element = damageAttribute.damageElement;
                 if (element == null)
                     element = gameInstance.DefaultDamageElement;
-                if (!cacheInflictDamageElementAmountPairs.ContainsKey(element))
-                    cacheInflictDamageElementAmountPairs[element] = inflictDamageAttribute.damageAmount + inflictDamageAttribute.damageAmountIncreaseEachLevel * level;
+                if (!cacheInflictDamageAttributes.ContainsKey(element))
+                    cacheInflictDamageAttributes[element] = damageAttribute.baseDamageAmount + damageAttribute.damageAmountIncreaseEachLevel * level;
+                else
+                    cacheInflictDamageAttributes[element] += damageAttribute.baseDamageAmount + damageAttribute.damageAmountIncreaseEachLevel * level;
             }
         }
     }
@@ -63,16 +75,22 @@ public class CharacterSkillLevel
         return cacheSkill;
     }
 
-    public Dictionary<DamageElement, DamageAmount> GetDamageElementAmountPairs()
+    public KeyValuePair<DamageElement, DamageAmount> GetBaseDamageAttribute()
     {
         MakeCache();
-        return cacheDamageElementAmountPairs;
+        return cacheBaseDamageAttribute;
     }
 
-    public Dictionary<DamageElement, DamageAmount> GetInflictDamageElementAmountPairs()
+    public Dictionary<DamageElement, DamageAmount> GetAdditionalDamageAttributes()
     {
         MakeCache();
-        return cacheInflictDamageElementAmountPairs;
+        return cacheAdditionalDamageAttributes;
+    }
+
+    public Dictionary<DamageElement, DamageAmount> GetInflictDamageAttributes()
+    {
+        MakeCache();
+        return cacheInflictDamageAttributes;
     }
 
     public int GetMaxLevel()
@@ -103,7 +121,7 @@ public class CharacterSkillLevel
     public CharacterStats GetBuffStats()
     {
         var skill = GetSkill();
-        if (skill == null)
+        if (skill == null || skill.skillBuffType == SkillBuffType.None)
             return new CharacterStats();
         return skill.buff.baseStats + skill.buff.statsIncreaseEachLevel * level;
     }
@@ -111,7 +129,7 @@ public class CharacterSkillLevel
     public CharacterStatsPercentage GetBuffStatsPercentage()
     {
         var skill = GetSkill();
-        if (skill == null)
+        if (skill == null || skill.skillBuffType == SkillBuffType.None)
             return new CharacterStatsPercentage();
         return skill.buff.baseStatsPercentage + skill.buff.statsPercentageIncreaseEachLevel * level;
     }
@@ -119,18 +137,18 @@ public class CharacterSkillLevel
     public float GetBuffDuration()
     {
         var skill = GetSkill();
-        if (skill == null)
+        if (skill == null || skill.skillBuffType == SkillBuffType.None)
             return 0f;
         var duration = skill.buff.baseDuration + skill.buff.durationIncreaseEachLevel * level;
-        if (duration < 0)
-            duration = 0;
+        if (duration < 0f)
+            duration = 0f;
         return duration;
     }
 
     public float GetBuffRecoveryHp()
     {
         var skill = GetSkill();
-        if (skill == null)
+        if (skill == null || skill.skillBuffType == SkillBuffType.None)
             return 0f;
         return skill.buff.baseRecoveryHp + skill.buff.recoveryHpIncreaseEachLevel * level;
     }
@@ -138,7 +156,7 @@ public class CharacterSkillLevel
     public float GetBuffRecoveryMp()
     {
         var skill = GetSkill();
-        if (skill == null)
+        if (skill == null || skill.skillBuffType == SkillBuffType.None)
             return 0f;
         return skill.buff.baseRecoveryMp + skill.buff.recoveryMpIncreaseEachLevel * level;
     }
@@ -148,7 +166,7 @@ public class CharacterSkillLevel
     public CharacterStats GetDebuffStats()
     {
         var skill = GetSkill();
-        if (skill == null)
+        if (skill == null || !skill.isDebuff)
             return new CharacterStats();
         return skill.debuff.baseStats + skill.debuff.statsIncreaseEachLevel * level;
     }
@@ -156,7 +174,7 @@ public class CharacterSkillLevel
     public CharacterStatsPercentage GetDebuffStatsPercentage()
     {
         var skill = GetSkill();
-        if (skill == null)
+        if (skill == null || !skill.isDebuff)
             return new CharacterStatsPercentage();
         return skill.debuff.baseStatsPercentage + skill.debuff.statsPercentageIncreaseEachLevel * level;
     }
@@ -164,18 +182,18 @@ public class CharacterSkillLevel
     public float GetDebuffDuration()
     {
         var skill = GetSkill();
-        if (skill == null)
+        if (skill == null || !skill.isDebuff)
             return 0f;
         var duration = skill.debuff.baseDuration + skill.debuff.durationIncreaseEachLevel * level;
-        if (duration < 0)
-            duration = 0;
+        if (duration < 0f)
+            duration = 0f;
         return duration;
     }
 
     public float GetDebuffRecoveryHp()
     {
         var skill = GetSkill();
-        if (skill == null)
+        if (skill == null || !skill.isDebuff)
             return 0f;
         return skill.debuff.baseRecoveryHp + skill.debuff.recoveryHpIncreaseEachLevel * level;
     }
@@ -183,7 +201,7 @@ public class CharacterSkillLevel
     public float GetDebuffRecoveryMp()
     {
         var skill = GetSkill();
-        if (skill == null)
+        if (skill == null || !skill.isDebuff)
             return 0f;
         return skill.debuff.baseRecoveryMp + skill.debuff.recoveryMpIncreaseEachLevel * level;
     }
@@ -196,7 +214,7 @@ public class CharacterSkillLevel
 
     public bool CanUse(int currentMp)
     {
-        return GetSkill() != null && level >= 1 && coolDownRemainsDuration <= 0 && currentMp >= GetConsumeMp();
+        return GetSkill() != null && level >= 1 && coolDownRemainsDuration <= 0f && currentMp >= GetConsumeMp();
     }
 
     public void Used()
@@ -206,7 +224,7 @@ public class CharacterSkillLevel
 
     public bool ShouldUpdate()
     {
-        return coolDownRemainsDuration > 0;
+        return coolDownRemainsDuration > 0f;
     }
 
     public void Update(float deltaTime)

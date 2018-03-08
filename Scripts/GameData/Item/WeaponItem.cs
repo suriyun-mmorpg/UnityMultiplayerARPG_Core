@@ -6,7 +6,8 @@ using UnityEngine;
 public class WeaponItem : EquipmentItem
 {
     public WeaponType weaponType;
-    public DamageAttribute[] damageAttributes;
+    public DamageAttribute baseDamageAttribute;
+    public DamageAttribute[] additionalDamageAttributes;
 
     public WeaponType WeaponType
     {
@@ -28,8 +29,8 @@ public class WeaponItem : EquipmentItem
     protected override void OnValidate()
     {
         // Damage Amounts must have at least 1
-        if (damageAttributes == null || damageAttributes.Length == 0)
-            damageAttributes = new DamageAttribute[] { new DamageAttribute() };
+        if (additionalDamageAttributes == null || additionalDamageAttributes.Length == 0)
+            additionalDamageAttributes = new DamageAttribute[] { new DamageAttribute() };
         // Weapon equipment cannot set custom equip position
         equipPosition = string.Empty;
         base.OnValidate();

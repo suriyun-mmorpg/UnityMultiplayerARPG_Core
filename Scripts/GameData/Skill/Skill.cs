@@ -46,7 +46,8 @@ public class Skill : BaseGameData
     public SkillAttackType skillAttackType;
 
     [Header("Attack As Pure Skill Damage")]
-    public DamageAttribute[] damageAttributes;
+    public DamageAttribute baseDamageAttribute;
+    public DamageAttribute[] additionalDamageAttributes;
     public Damage damage;
     public DamageEffectivenessAttribute[] effectivenessAttributes;
 
@@ -63,19 +64,19 @@ public class Skill : BaseGameData
     public SkillBuffType skillBuffType;
     public SkillBuff buff;
 
-    private Dictionary<string, DamageEffectivenessAttribute> tempEffectivenessAttributes;
-    public Dictionary<string, DamageEffectivenessAttribute> TempEffectivenessAttributes
+    private Dictionary<string, float> tempEffectivenessAttributes;
+    public Dictionary<string, float> TempEffectivenessAttributes
     {
         get
         {
             if (tempEffectivenessAttributes == null)
             {
-                tempEffectivenessAttributes = new Dictionary<string, DamageEffectivenessAttribute>();
+                tempEffectivenessAttributes = new Dictionary<string, float>();
                 foreach (var effectivenessAttribute in effectivenessAttributes)
                 {
                     if (effectivenessAttribute.attribute == null)
                         continue;
-                    tempEffectivenessAttributes[effectivenessAttribute.attribute.Id] = effectivenessAttribute;
+                    tempEffectivenessAttributes[effectivenessAttribute.attribute.Id] = effectivenessAttribute.effectiveness;
                 }
             }
             return tempEffectivenessAttributes;
