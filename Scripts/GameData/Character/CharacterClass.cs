@@ -12,7 +12,6 @@ public class CharacterClass : BaseGameData
     public CharacterAttributeAmount[] baseAttributes;
     public CharacterStats baseStats;
     public CharacterStats statsIncreaseEachLevel;
-    public CharacterStatsPercentage statsPercentageIncreaseEachLevel;
 
     [Header("Skills")]
     public Skill[] skills;

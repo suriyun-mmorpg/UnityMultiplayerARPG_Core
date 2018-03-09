@@ -18,22 +18,6 @@ public class CharacterAttributeLevel
     {
         return GetAttribute() != null;
     }
-
-    public CharacterStats GetStats()
-    {
-        var attribute = GetAttribute();
-        if (attribute == null)
-            return new CharacterStats();
-        return attribute.statsIncreaseEachLevel * level;
-    }
-
-    public CharacterStatsPercentage GetStatsPercentage()
-    {
-        var attribute = GetAttribute();
-        if (attribute == null)
-            return new CharacterStatsPercentage();
-        return attribute.statsPercentageIncreaseEachLevel * level;
-    }
 }
 
 public class NetFieldCharacterAttributeLevel : LiteNetLibNetField<CharacterAttributeLevel>

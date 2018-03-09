@@ -51,11 +51,11 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
     public Text textDamage;
     public Button addButton;
     public UICharacterStats uiCharacterStats;
-    public UICharacterStatsPercentage uiCharacterStatsPercentage;
 
     protected virtual void Update()
     {
         var skillData = data.GetSkill();
+        var character = CharacterEntity.OwningCharacter;
 
         if (textTitle != null)
             textTitle.text = string.Format(titleFormat, skillData == null ? "Unknow" : skillData.title);
@@ -130,10 +130,6 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
         if (uiCharacterStats != null)
             uiCharacterStats.data = isBuff ? stats : new CharacterStats();
 
-        var statsPercentage = data.GetBuffStatsPercentage();
-        if (uiCharacterStatsPercentage != null)
-            uiCharacterStatsPercentage.data = isBuff ? statsPercentage : new CharacterStatsPercentage();
-
         if (textDamage != null)
         {
             var damageElementAmountPairs = data.GetAdditionalDamageAttributes();
@@ -155,10 +151,9 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
                 textDamage.text = damagesText;
             }
         }
-
-        var uiSceneGameplay = UISceneGameplay.Singleton;
+        
         if (addButton != null)
-            addButton.interactable = uiSceneGameplay.OwningCharacterEntity.StatPoint > 0;
+            addButton.interactable = character != null && character.SkillPoint > 0;
     }
 
     public override void Show()
@@ -173,9 +168,9 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
 
     private void OnClickAdd()
     {
-        var uiSceneGameplay = UISceneGameplay.Singleton;
-        if (uiSceneGameplay != null)
-            uiSceneGameplay.OwningCharacterEntity.AddSkillLevel(uiSceneGameplay.OwningCharacterEntity.skillLevels.IndexOf(data));
+        var owningCharacter = CharacterEntity.OwningCharacter;
+        if (owningCharacter != null)
+            owningCharacter.AddSkillLevel(owningCharacter.skillLevels.IndexOf(data));
     }
 }
 

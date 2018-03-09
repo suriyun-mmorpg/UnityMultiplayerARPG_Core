@@ -11,11 +11,16 @@ public class EquipmentItem : Item
     public string equipPosition;
     public GameObject equipmentModel;
     public CharacterClass requireClass;
+    [Header("Requirements")]
+    public int requireCharacterLevel;
     public CharacterAttributeAmount[] requireAttributes;
+    [Header("Add Attributes")]
+    public CharacterAttributeIncremental[] increaseAttributes;
+    [Header("Add Resistances")]
+    public CharacterResistanceIncremental[] increaseResistances;
+    [Header("Add Stats")]
     public CharacterStats baseStats;
     public CharacterStats statsIncreaseEachLevel;
-    public CharacterStatsPercentage baseStatsPercentage;
-    public CharacterStatsPercentage statsPercentageIncreaseEachLevel;
 
 #if UNITY_EDITOR
     protected virtual void OnValidate()

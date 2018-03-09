@@ -40,7 +40,6 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
     public Text textRequireAttributes;
     public Text textDamage;
     public UICharacterStats uiCharacterStats;
-    public UICharacterStatsPercentage uiCharacterStatsPercentage;
 
     protected virtual void Update()
     {
@@ -109,10 +108,6 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
         var stats = data.GetStats();
         if (uiCharacterStats != null)
             uiCharacterStats.data = stats;
-
-        var statsPercentage = data.GetStatsPercentage();
-        if (uiCharacterStatsPercentage != null)
-            uiCharacterStatsPercentage.data = statsPercentage;
 
         var weaponItem = data.GetWeaponItem();
 

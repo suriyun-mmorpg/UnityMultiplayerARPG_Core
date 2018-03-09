@@ -29,7 +29,6 @@ public class UICharacterBuff : UISelectionEntry<CharacterBuff>
     public Text textRecoveryHp;
     public Text textRecoveryMp;
     public UICharacterStats uiCharacterStats;
-    public UICharacterStatsPercentage uiCharacterStatsPercentage;
 
     protected virtual void Update()
     {
@@ -65,10 +64,6 @@ public class UICharacterBuff : UISelectionEntry<CharacterBuff>
         var stats = data.GetBuffStats();
         if (uiCharacterStats != null)
             uiCharacterStats.data = stats;
-
-        var statsPercentage = data.GetBuffStatsPercentage();
-        if (uiCharacterStatsPercentage != null)
-            uiCharacterStatsPercentage.data = statsPercentage;
     }
 }
 

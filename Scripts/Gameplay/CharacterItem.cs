@@ -22,6 +22,8 @@ public class CharacterItem
     private ShieldItem cacheShieldItem;
     private KeyValuePair<DamageElement, DamageAmount> cacheBaseDamageAttribute;
     private readonly Dictionary<DamageElement, DamageAmount> cacheAdditionalDamageAttributes = new Dictionary<DamageElement, DamageAmount>();
+    private readonly Dictionary<CharacterAttribute, int> cacheIncreaseAttributes = new Dictionary<CharacterAttribute, int>();
+    private readonly Dictionary<CharacterResistance, float> cacheIncreaseResistances = new Dictionary<CharacterResistance, float>();
 
     private bool IsDirty()
     {
@@ -37,52 +39,45 @@ public class CharacterItem
 
         dirtyItemId = itemId;
         dirtyLevel = level;
-        var gameInstance = GameInstance.Singleton;
         cacheItem = GameInstance.Items.ContainsKey(itemId) ? GameInstance.Items[itemId] : null;
         cacheEquipmentItem = cacheItem != null ? cacheItem as EquipmentItem : null;
         cacheWeaponItem = cacheItem != null ? cacheItem as WeaponItem : null;
         cacheShieldItem = cacheItem != null ? cacheItem as ShieldItem : null;
         cacheBaseDamageAttribute = new KeyValuePair<DamageElement, DamageAmount>();
         cacheAdditionalDamageAttributes.Clear();
+        if (cacheEquipmentItem != null)
+        {
+            CharacterDataHelpers.MakeAttributeIncrementalCache(cacheEquipmentItem.increaseAttributes, cacheIncreaseAttributes, level);
+            CharacterDataHelpers.MakeResistanceIncrementalCache(cacheEquipmentItem.increaseResistances, cacheIncreaseResistances, level);
+        }
         if (cacheWeaponItem != null)
         {
-            var baseDamageAttribute = cacheWeaponItem.baseDamageAttribute;
-            var baseElement = baseDamageAttribute.damageElement;
-            if (baseElement == null)
-                baseElement = gameInstance.DefaultDamageElement;
-            cacheBaseDamageAttribute = new KeyValuePair<DamageElement, DamageAmount>(baseElement, baseDamageAttribute.baseDamageAmount + baseDamageAttribute.damageAmountIncreaseEachLevel * level);
-
-            var additionalDamageAttributes = cacheWeaponItem.additionalDamageAttributes;
-            foreach (var damageAttribute in additionalDamageAttributes)
-            {
-                var element = damageAttribute.damageElement;
-                if (element == null)
-                    element = gameInstance.DefaultDamageElement;
-                if (!cacheAdditionalDamageAttributes.ContainsKey(element))
-                    cacheAdditionalDamageAttributes[element] = damageAttribute.baseDamageAmount + damageAttribute.damageAmountIncreaseEachLevel * level;
-                else
-                    cacheAdditionalDamageAttributes[element] += damageAttribute.baseDamageAmount + damageAttribute.damageAmountIncreaseEachLevel * level;
-            }
+            cacheBaseDamageAttribute = CharacterDataHelpers.MakeDamageAttributeCache(cacheWeaponItem.baseDamageAttribute, level);
+            CharacterDataHelpers.MakeDamageAttributesCache(cacheWeaponItem.additionalDamageAttributes, cacheAdditionalDamageAttributes, level);
         }
     }
 
     public Item GetItem()
     {
+        MakeCache();
         return cacheItem;
     }
 
     public EquipmentItem GetEquipmentItem()
     {
+        MakeCache();
         return cacheEquipmentItem;
     }
 
     public WeaponItem GetWeaponItem()
     {
+        MakeCache();
         return cacheWeaponItem;
     }
 
     public ShieldItem GetShieldItem()
     {
+        MakeCache();
         return cacheShieldItem;
     }
 
@@ -96,6 +91,18 @@ public class CharacterItem
     {
         MakeCache();
         return cacheAdditionalDamageAttributes;
+    }
+
+    public Dictionary<CharacterAttribute, int> GetIncreaseAttributes()
+    {
+        MakeCache();
+        return cacheIncreaseAttributes;
+    }
+
+    public Dictionary<CharacterResistance, float> GetIncreaseResistances()
+    {
+        MakeCache();
+        return cacheIncreaseResistances;
     }
 
     public int GetMaxStack()
@@ -120,14 +127,6 @@ public class CharacterItem
         if (equipmentItem == null)
             return new CharacterStats();
         return equipmentItem.baseStats + equipmentItem.statsIncreaseEachLevel * level;
-    }
-
-    public CharacterStatsPercentage GetStatsPercentage()
-    {
-        var equipmentItem = GetEquipmentItem();
-        if (equipmentItem == null)
-            return new CharacterStatsPercentage();
-        return equipmentItem.baseStatsPercentage + equipmentItem.statsPercentageIncreaseEachLevel * level;
     }
 
     public void Empty()

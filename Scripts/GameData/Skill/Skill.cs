@@ -18,29 +18,42 @@ public enum SkillBuffType
 [System.Serializable]
 public class SkillBuff
 {
+    [Header("Duration")]
     [Tooltip("If buff duration less than or equals to 0, buff stats won't applied")]
     public float baseDuration;
     public float durationIncreaseEachLevel;
+    [Header("Hp recovery")]
     public float baseRecoveryHp;
     public float recoveryHpIncreaseEachLevel;
+    [Header("Mp recovery")]
     public float baseRecoveryMp;
     public float recoveryMpIncreaseEachLevel;
+    [Header("Add Attributes")]
+    public CharacterAttributeIncremental[] increaseAttributes;
+    [Header("Add Resistances")]
+    public CharacterResistanceIncremental[] increaseResistances;
+    [Header("Add Stats")]
     public CharacterStats baseStats;
     public CharacterStats statsIncreaseEachLevel;
-    public CharacterStatsPercentage baseStatsPercentage;
-    public CharacterStatsPercentage statsPercentageIncreaseEachLevel;
 }
 
 [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill")]
 public class Skill : BaseGameData
 {
-    public SkillLevel[] requireSkillLevels;
+    public ActionAnimation castAnimation;
     public int maxLevel;
+
+    [Header("Consume Mp")]
     public float baseConsumeMp;
     public float consumeMpIncreaseEachLevel;
+
+    [Header("Cool Down")]
     public float baseCoolDownDuration;
     public float coolDownDurationIncreaseEachLevel;
-    public ActionAnimation castAnimation;
+
+    [Header("Requirements")]
+    public int requireCharacterLevel;
+    public SkillLevel[] requireSkillLevels;
 
     [Header("Attack")]
     public SkillAttackType skillAttackType;

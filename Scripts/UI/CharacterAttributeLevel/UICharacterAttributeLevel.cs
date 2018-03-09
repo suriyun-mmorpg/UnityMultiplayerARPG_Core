@@ -23,35 +23,41 @@ public class UICharacterAttributeLevel : UISelectionEntry<CharacterAttributeLeve
     public Image imageIcon;
     public Button addButton;
     public UICharacterStats uiCharacterStats;
-    public UICharacterStatsPercentage uiCharacterStatsPercentage;
 
     private void Update()
     {
-        var attributeData = data.GetAttribute();
+        var uiSceneGameplay = UISceneGameplay.Singleton;
+        Dictionary<CharacterAttribute, int> attributes = null;
+        int attributeLevel = 0;
+        var character = CharacterEntity.OwningCharacter;
+        if (character != null)
+        {
+            attributes = character.GetAttributes();
+            attributeLevel = attributes[attribute];
+        }
+        else if (data != null)
+        {
+            attributeLevel = data.level;
+        }
 
         if (textTitle != null)
-            textTitle.text = string.Format(titleFormat, attributeData == null ? "Unknow" : attributeData.title);
+            textTitle.text = string.Format(titleFormat, attribute == null ? "Unknow" : attribute.title);
 
         if (textDescription != null)
-            textDescription.text = string.Format(descriptionFormat, attributeData == null ? "N/A" : attributeData.description);
+            textDescription.text = string.Format(descriptionFormat, attribute == null ? "N/A" : attribute.description);
 
         if (textLevel != null)
-            textLevel.text = string.Format(levelFormat, data == null ? "N/A" : data.level.ToString("N0"));
+            textLevel.text = string.Format(levelFormat, data == null ? "N/A" : attributeLevel.ToString("N0"));
 
         if (imageIcon != null)
-            imageIcon.sprite = attributeData == null ? null : attributeData.icon;
+            imageIcon.sprite = attribute == null ? null : attribute.icon;
 
-        var stats = data.GetStats();
+        var stats = CharacterDataHelpers.GetStatsByAttributeAmountPairs(attributes);
         if (uiCharacterStats != null)
             uiCharacterStats.data = stats;
 
-        var statsPercentage = data.GetStatsPercentage();
-        if (uiCharacterStatsPercentage != null)
-            uiCharacterStatsPercentage.data = statsPercentage;
-
-        var uiSceneGameplay = UISceneGameplay.Singleton;
         if (addButton != null)
-            addButton.interactable = uiSceneGameplay.OwningCharacterEntity.SkillPoint > 0;
+            addButton.interactable = character != null && character.StatPoint > 0;
     }
 
     public override void Show()
@@ -66,8 +72,8 @@ public class UICharacterAttributeLevel : UISelectionEntry<CharacterAttributeLeve
 
     private void OnClickAdd()
     {
-        var uiSceneGameplay = UISceneGameplay.Singleton;
-        if (uiSceneGameplay != null)
-            uiSceneGameplay.OwningCharacterEntity.AddAttributeLevel(uiSceneGameplay.OwningCharacterEntity.attributeLevels.IndexOf(data));
+        var owningCharacter = CharacterEntity.OwningCharacter;
+        if (owningCharacter != null)
+            owningCharacter.AddAttributeLevel(owningCharacter.attributeLevels.IndexOf(data));
     }
 }

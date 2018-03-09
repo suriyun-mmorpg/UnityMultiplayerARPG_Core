@@ -217,87 +217,174 @@ public static class CharacterDataExtension
     }
 
     #region Stats calculation, make saperate stats for buffs calculation
-    public static CharacterStats GetStats(this ICharacterData data)
+    public static Dictionary<CharacterAttribute, int> GetAttributes(this ICharacterData data)
     {
-        var id = data.Id;
-        var level = data.Level;
-        var characterClass = data.GetClass();
-        var attributeLevels = data.AttributeLevels;
+        var result = new Dictionary<CharacterAttribute, int>();
         var equipItems = data.EquipItems;
-        var result = characterClass.baseStats;
-        result += characterClass.statsIncreaseEachLevel * level;
-        foreach (var attributeLevel in attributeLevels)
-        {
-            if (attributeLevel.GetAttribute() == null)
-            {
-                Debug.LogError("Attribute: " + attributeLevel.attributeId + " owned by " + id + " is invalid data");
-                continue;
-            }
-            result += attributeLevel.GetStats();
-        }
         foreach (var equipment in equipItems)
         {
             if (equipment.GetEquipmentItem() == null)
-            {
-                Debug.LogError("Item: " + equipment.id + " owned by " + id + " is not equipment");
                 continue;
+            var increaseAttributes = equipment.GetIncreaseAttributes();
+            foreach (var increaseAttribute in increaseAttributes)
+            {
+                var key = increaseAttribute.Key;
+                var value = increaseAttribute.Value;
+                if (key == null)
+                    continue;
+                if (!result.ContainsKey(key))
+                    result[key] = value;
+                else
+                    result[key] += value;
             }
-            result += equipment.GetStats();
+        }
+        var attributeLevels = data.AttributeLevels;
+        foreach (var attributeLevel in attributeLevels)
+        {
+            var key = attributeLevel.GetAttribute();
+            var value = attributeLevel.level;
+            if (key == null)
+                continue;
+            if (!result.ContainsKey(key))
+                result[key] = value;
+            else
+                result[key] += value;
         }
         return result;
     }
 
-    public static CharacterStatsPercentage GetStatsPercentage(this ICharacterData data)
+    public static Dictionary<CharacterAttribute, int> GetAttributesWithBuffs(this ICharacterData data)
     {
-        var id = data.Id;
-        var level = data.Level;
-        var characterClass = data.GetClass();
-        var attributeLevels = data.AttributeLevels;
-        var equipItems = data.EquipItems;
-        var result = characterClass.statsPercentageIncreaseEachLevel * level;
-        foreach (var attributeLevel in attributeLevels)
+        var result = GetAttributes(data);
+        var buffs = data.Buffs;
+        foreach (var buff in buffs)
         {
-            if (attributeLevel.GetAttribute() == null)
+            // Buff
+            var buffAttributes = buff.GetBuffAttributes();
+            foreach (var buffAttribute in buffAttributes)
             {
-                Debug.LogError("Attribute: " + attributeLevel.attributeId + " owned by " + id + " is invalid data");
-                continue;
+                var key = buffAttribute.Key;
+                var value = buffAttribute.Value;
+                if (key == null)
+                    continue;
+                if (!result.ContainsKey(key))
+                    result[key] = value;
+                else
+                    result[key] += value;
             }
-            result += attributeLevel.GetStatsPercentage();
+            // Debuff
+            var debuffAttributes = buff.GetDebuffAttributes();
+            foreach (var debuffAttribute in debuffAttributes)
+            {
+                var key = debuffAttribute.Key;
+                var value = debuffAttribute.Value;
+                if (key == null)
+                    continue;
+                if (!result.ContainsKey(key))
+                    result[key] = value;
+                else
+                    result[key] += value;
+            }
         }
+        return result;
+    }
+
+    public static Dictionary<CharacterResistance, float> GetResistances(this ICharacterData data)
+    {
+        var result = new Dictionary<CharacterResistance, float>();
+        var equipItems = data.EquipItems;
         foreach (var equipment in equipItems)
         {
             if (equipment.GetEquipmentItem() == null)
-            {
-                Debug.LogError("Item: " + equipment.id + " owned by " + id + " is not equipment");
                 continue;
+            var increaseResistances = equipment.GetIncreaseResistances();
+            foreach (var increaseResistance in increaseResistances)
+            {
+                var key = increaseResistance.Key;
+                var value = increaseResistance.Value;
+                if (key == null)
+                    continue;
+                if (!result.ContainsKey(key))
+                    result[key] = value;
+                else
+                    result[key] += value;
             }
-            result += equipment.GetStatsPercentage();
+        }
+        return result;
+    }
+
+    public static Dictionary<CharacterResistance, float> GetResistancesWithBuffs(this ICharacterData data)
+    {
+        var result = GetResistances(data);
+        var buffs = data.Buffs;
+        foreach (var buff in buffs)
+        {
+            // Buff
+            var buffResistances = buff.GetBuffResistances();
+            foreach (var buffResistance in buffResistances)
+            {
+                var key = buffResistance.Key;
+                var value = buffResistance.Value;
+                if (key == null)
+                    continue;
+                if (!result.ContainsKey(key))
+                    result[key] = value;
+                else
+                    result[key] += value;
+            }
+            // Debuff
+            var debuffResistances = buff.GetDebuffResistances();
+            foreach (var debuffResistance in debuffResistances)
+            {
+                var key = debuffResistance.Key;
+                var value = debuffResistance.Value;
+                if (key == null)
+                    continue;
+                if (!result.ContainsKey(key))
+                    result[key] = value;
+                else
+                    result[key] += value;
+            }
         }
         return result;
     }
 
     public static CharacterStats GetStatsWithoutBuffs(this ICharacterData data)
     {
-        return data.GetStats() + data.GetStatsPercentage();
+        var id = data.Id;
+        var level = data.Level;
+        var characterClass = data.GetClass();
+        var result = characterClass.baseStats + characterClass.statsIncreaseEachLevel * level;
+
+        var equipItems = data.EquipItems;
+        foreach (var equipment in equipItems)
+        {
+            result += equipment.GetStats();
+        }
+        result += CharacterDataHelpers.GetStatsByAttributeAmountPairs(GetAttributes(data));
+        return result;
     }
 
     public static CharacterStats GetStatsWithBuffs(this ICharacterData data)
     {
         var id = data.Id;
-        var stats = data.GetStats();
-        var statsPercentage = data.GetStatsPercentage();
+        var level = data.Level;
+        var characterClass = data.GetClass();
+        var result = characterClass.baseStats + characterClass.statsIncreaseEachLevel * level;
+
+        var equipItems = data.EquipItems;
+        foreach (var equipment in equipItems)
+        {
+            result += equipment.GetStats();
+        }
+
         var buffs = data.Buffs;
         foreach (var buff in buffs)
         {
-            if (buff.GetSkill() == null)
-            {
-                Debug.LogError("Buff: " + buff.skillId + " owned by " + id + " is invalid data");
-                continue;
-            }
-            stats += buff.GetBuffStats() + buff.GetDebuffStats();
-            statsPercentage += buff.GetBuffStatsPercentage() + buff.GetDebuffStatsPercentage();
+            result += buff.GetBuffStats() + buff.GetDebuffStats();
         }
-        return stats + statsPercentage;
+        result += CharacterDataHelpers.GetStatsByAttributeAmountPairs(GetAttributesWithBuffs(data));
+        return result;
     }
     #endregion
 

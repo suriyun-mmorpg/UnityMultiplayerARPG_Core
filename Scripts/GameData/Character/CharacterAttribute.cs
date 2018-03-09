@@ -6,7 +6,6 @@ using UnityEngine;
 public class CharacterAttribute : BaseGameData
 {
     public CharacterStats statsIncreaseEachLevel;
-    public CharacterStatsPercentage statsPercentageIncreaseEachLevel;
 }
 
 [System.Serializable]
@@ -14,4 +13,12 @@ public class CharacterAttributeAmount
 {
     public CharacterAttribute attribute;
     public int amount;
+}
+
+[System.Serializable]
+public class CharacterAttributeIncremental
+{
+    public CharacterAttribute attribute;
+    public int baseAmount;
+    public float amountIncreaseEachLevel;
 }

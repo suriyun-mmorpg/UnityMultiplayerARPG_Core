@@ -18,6 +18,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     public const string ANIM_DO_ACTION = "DoAction";
     public const string ANIM_ACTION_ID = "ActionId";
     public const float UPDATE_SKILL_BUFF_INTERVAL = 1f;
+    public static CharacterEntity OwningCharacter { get; private set; }
     // Use id as primary key
     [Header("Sync Fields")]
     public SyncFieldString id = new SyncFieldString();
@@ -193,8 +194,9 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             TempFollowCameraControls = Instantiate(gameInstance.gameplayCameraPrefab);
             TempFollowCameraControls.target = TempTransform;
 
+            OwningCharacter = this;
             TempUISceneGameplay = Instantiate(gameInstance.uiSceneGameplayPrefab);
-            TempUISceneGameplay.SetOwningCharacter(this);
+            TempUISceneGameplay.SetOwningCharacter();
         }
     }
 

@@ -11,9 +11,76 @@ public class CharacterBuff
     public int level;
     public float buffRemainsDuration;
 
+    private string dirtySkillId;
+    private int dirtyLevel;
+    private Skill cacheSkill;
+    private readonly Dictionary<CharacterAttribute, int> cacheBuffAttributes = new Dictionary<CharacterAttribute, int>();
+    private readonly Dictionary<CharacterResistance, float> cacheBuffResistances = new Dictionary<CharacterResistance, float>();
+    private readonly Dictionary<CharacterAttribute, int> cacheDebuffAttributes = new Dictionary<CharacterAttribute, int>();
+    private readonly Dictionary<CharacterResistance, float> cacheDebuffResistances = new Dictionary<CharacterResistance, float>();
+
+    private bool IsDirty()
+    {
+        return string.IsNullOrEmpty(dirtySkillId) ||
+            !dirtySkillId.Equals(skillId) ||
+            dirtyLevel != level;
+    }
+
+    private void MakeCache()
+    {
+        if (!IsDirty())
+            return;
+
+        dirtySkillId = skillId;
+        dirtyLevel = level;
+        cacheSkill = GameInstance.Skills.ContainsKey(skillId) ? GameInstance.Skills[skillId] : null;
+        cacheBuffAttributes.Clear();
+        cacheBuffResistances.Clear();
+        cacheDebuffAttributes.Clear();
+        cacheDebuffResistances.Clear();
+        if (cacheSkill != null)
+        {
+            if (isDebuff)
+            {
+                CharacterDataHelpers.MakeAttributeIncrementalCache(cacheSkill.debuff.increaseAttributes, cacheDebuffAttributes, level);
+                CharacterDataHelpers.MakeResistanceIncrementalCache(cacheSkill.debuff.increaseResistances, cacheDebuffResistances, level);
+            }
+            else
+            {
+                CharacterDataHelpers.MakeAttributeIncrementalCache(cacheSkill.buff.increaseAttributes, cacheBuffAttributes, level);
+                CharacterDataHelpers.MakeResistanceIncrementalCache(cacheSkill.buff.increaseResistances, cacheBuffResistances, level);
+            }
+        }
+    }
+
     public Skill GetSkill()
     {
-        return GameInstance.Skills.ContainsKey(skillId) ? GameInstance.Skills[skillId] : null;
+        MakeCache();
+        return cacheSkill;
+    }
+
+    public Dictionary<CharacterAttribute, int> GetBuffAttributes()
+    {
+        MakeCache();
+        return cacheBuffAttributes;
+    }
+
+    public Dictionary<CharacterResistance, float> GetBuffResistances()
+    {
+        MakeCache();
+        return cacheBuffResistances;
+    }
+
+    public Dictionary<CharacterAttribute, int> GetDebuffAttributes()
+    {
+        MakeCache();
+        return cacheDebuffAttributes;
+    }
+
+    public Dictionary<CharacterResistance, float> GetDebuffResistances()
+    {
+        MakeCache();
+        return cacheDebuffResistances;
     }
 
     #region Buff
@@ -23,14 +90,6 @@ public class CharacterBuff
         if (skill == null || isDebuff)
             return new CharacterStats();
         return skill.buff.baseStats + skill.buff.statsIncreaseEachLevel * level;
-    }
-
-    public CharacterStatsPercentage GetBuffStatsPercentage()
-    {
-        var skill = GetSkill();
-        if (skill == null || isDebuff)
-            return new CharacterStatsPercentage();
-        return skill.buff.baseStatsPercentage + skill.buff.statsPercentageIncreaseEachLevel * level;
     }
 
     public float GetBuffDuration()
@@ -68,14 +127,6 @@ public class CharacterBuff
         if (skill == null || !isDebuff)
             return new CharacterStats();
         return skill.debuff.baseStats + skill.debuff.statsIncreaseEachLevel * level;
-    }
-
-    public CharacterStatsPercentage GetDebuffStatsPercentage()
-    {
-        var skill = GetSkill();
-        if (skill == null || !isDebuff)
-            return new CharacterStatsPercentage();
-        return skill.debuff.baseStatsPercentage + skill.debuff.statsPercentageIncreaseEachLevel * level;
     }
 
     public float GetDebuffDuration()
