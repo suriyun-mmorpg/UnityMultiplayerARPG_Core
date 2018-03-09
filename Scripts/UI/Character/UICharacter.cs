@@ -233,11 +233,17 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         if (TempAttributeLevels.Count > 0 && data != null)
         {
             var attributeLevels = data.AttributeLevels;
-            foreach (var attributeLevel in attributeLevels)
+            for (var i = 0; i < attributeLevels.Count; ++i)
             {
+                var attributeLevel = attributeLevels[i];
                 var attributeId = attributeLevel.attributeId;
                 if (TempAttributeLevels.ContainsKey(attributeId))
-                    TempAttributeLevels[attributeId].data = attributeLevel;
+                {
+                    var tempAttributeLevel = TempAttributeLevels[attributeId];
+                    tempAttributeLevel.data = attributeLevel.level;
+                    tempAttributeLevel.owningCharacter = data as CharacterEntity;
+                    tempAttributeLevel.indexOfData = i;
+                }
             }
         }
     }

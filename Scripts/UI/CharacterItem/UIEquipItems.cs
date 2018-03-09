@@ -101,8 +101,11 @@ public class UIEquipItems : UIBase
     }
 #endif
 
-    public void SetItems(IList<CharacterItem> equipItems)
+    public void UpdateData(CharacterEntity characterEntity)
     {
+        if (characterEntity == null)
+            return;
+
         var slots = TempEquipItemSlots.Values;
         // Clear slots data
         foreach (var slot in slots)
@@ -110,8 +113,10 @@ public class UIEquipItems : UIBase
             slot.data.Empty();
         }
 
-        foreach (var equipItem in equipItems)
+        var equipItems = characterEntity.equipItems;
+        for (var i = 0; i < equipItems.Count; ++i)
         {
+            var equipItem = equipItems[i];
             var weaponItem = equipItem.GetWeaponItem();
             var shieldItem = equipItem.GetShieldItem();
             var equipmentItem = equipItem.GetEquipmentItem();
@@ -123,7 +128,12 @@ public class UIEquipItems : UIBase
                 position = equipItem.isSubWeapon ? GameDataConst.EQUIP_POSITION_LEFT_HAND : GameDataConst.EQUIP_POSITION_RIGHT_HAND;
 
             if (TempEquipItemSlots.ContainsKey(position))
-                TempEquipItemSlots[position].data = equipItem;
+            {
+                var slot = TempEquipItemSlots[position];
+                slot.data = equipItem;
+                slot.owningCharacter = characterEntity;
+                slot.indexOfData = i;
+            }
         }
     }
 }

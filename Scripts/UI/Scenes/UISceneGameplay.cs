@@ -14,10 +14,10 @@ public class UISceneGameplay : MonoBehaviour
     public static UISceneGameplay Singleton { get; private set; }
 
     public UICharacter[] uiCharacters;
-    public UICharacterBuffList uiBuffList;
+    public UICharacterBuffs uiBuffList;
     public UIEquipItems uiEquipItems;
     public UINonEquipItems uiNonEquipItems;
-    public UICharacterSkillLevelList uiSkillLevelList;
+    public UICharacterSkillLevels uiSkillLevelList;
     public UIToggleUI[] toggleUis;
     
     public UIEquipItemSlot SelectedEquipItem { get; private set; }
@@ -31,6 +31,12 @@ public class UISceneGameplay : MonoBehaviour
 
     private void Start()
     {
+        foreach (var uiCharacter in uiCharacters)
+        {
+            if (uiCharacter != null)
+                uiCharacter.data = CharacterEntity.OwningCharacter;
+        }
+
         if (uiEquipItems != null)
             uiEquipItems.onSelectCharacterItem += OnSelectEquipItem;
 
@@ -56,15 +62,6 @@ public class UISceneGameplay : MonoBehaviour
             uiNonEquipItems.onSelectCharacterItem -= OnSelectNonEquipItem;
     }
 
-    public void SetOwningCharacter()
-    {
-        foreach (var uiCharacter in uiCharacters)
-        {
-            if (uiCharacter != null)
-                uiCharacter.data = CharacterEntity.OwningCharacter;
-        }
-    }
-
     private void OnSelectEquipItem(UICharacterItem ui)
     {
         var owningCharacter = CharacterEntity.OwningCharacter;
@@ -76,7 +73,7 @@ public class UISceneGameplay : MonoBehaviour
         }
         if (SelectedNonEquipItem != null)
         {
-            owningCharacter.EquipItem(owningCharacter.nonEquipItems.IndexOf(SelectedNonEquipItem.data), slot.equipPosition);
+            owningCharacter.EquipItem(SelectedNonEquipItem.indexOfData, slot.equipPosition);
             uiEquipItems.SelectionManager.DeSelectAll();
             uiNonEquipItems.SelectionManager.DeSelectAll();
         }
@@ -91,13 +88,13 @@ public class UISceneGameplay : MonoBehaviour
         var owningCharacter = CharacterEntity.OwningCharacter;
         if (SelectedNonEquipItem != null)
         {
-            owningCharacter.SwapOrMergeItem(owningCharacter.nonEquipItems.IndexOf(SelectedNonEquipItem.data), owningCharacter.nonEquipItems.IndexOf(ui.data));
+            owningCharacter.SwapOrMergeItem(SelectedNonEquipItem.indexOfData, ui.indexOfData);
             uiNonEquipItems.SelectionManager.DeSelectAll();
             SelectedNonEquipItem = null;
         }
         else if (SelectedEquipItem != null)
         {
-            owningCharacter.UnEquipItem(SelectedEquipItem.equipPosition, owningCharacter.nonEquipItems.IndexOf(ui.data));
+            owningCharacter.UnEquipItem(SelectedEquipItem.equipPosition, ui.indexOfData);
             uiEquipItems.SelectionManager.DeSelectAll();
             uiNonEquipItems.SelectionManager.DeSelectAll();
         }
@@ -112,27 +109,27 @@ public class UISceneGameplay : MonoBehaviour
         SelectedSkillLevel = ui;
     }
 
-    public void SetBuffs(IList<CharacterBuff> buffs)
+    public void UpdateBuffs()
     {
         if (uiBuffList != null)
-            uiBuffList.SetBuffs(buffs);
+            uiBuffList.UpdateData(CharacterEntity.OwningCharacter);
     }
 
-    public void SetEquipItems(IList<CharacterItem> items)
+    public void UpdateEquipItems()
     {
         if (uiEquipItems != null)
-            uiEquipItems.SetItems(items);
+            uiEquipItems.UpdateData(CharacterEntity.OwningCharacter);
     }
 
-    public void SetNonEquipItems(IList<CharacterItem> items)
+    public void UpdateNonEquipItems()
     {
         if (uiNonEquipItems != null)
-            uiNonEquipItems.SetItems(items);
+            uiNonEquipItems.UpdateData(CharacterEntity.OwningCharacter);
     }
 
-    public void SetSkillLevels(IList<CharacterSkillLevel> skillLevels)
+    public void UpdateSkillLevels()
     {
         if (uiSkillLevelList != null)
-            uiSkillLevelList.SetSkills(skillLevels);
+            uiSkillLevelList.UpdateData(CharacterEntity.OwningCharacter);
     }
 }

@@ -45,13 +45,18 @@ public class UINonEquipItems : UIBase
             onSelectCharacterItem(ui);
     }
 
-    public void SetItems(IList<CharacterItem> equipItems)
+    public void UpdateData(CharacterEntity characterEntity)
     {
+        if (characterEntity == null)
+            return;
         SelectionManager.Clear();
-        TempList.Generate(equipItems, (characterItem, ui) =>
+        var nonEquipItems = characterEntity.nonEquipItems;
+        TempList.Generate(nonEquipItems, (index, characterItem, ui) =>
         {
             var uiCharacterItem = ui.GetComponent<UICharacterItem>();
             uiCharacterItem.data = characterItem;
+            uiCharacterItem.owningCharacter = characterEntity;
+            uiCharacterItem.indexOfData = index;
             SelectionManager.Add(uiCharacterItem);
         });
     }

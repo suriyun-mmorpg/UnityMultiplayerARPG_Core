@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(UIList)), RequireComponent(typeof(UICharacterSkillLevelSelectionManager))]
-public class UICharacterSkillLevelList : UIBase
+public class UICharacterSkillLevels : UIBase
 {
     public System.Action<UICharacterSkillLevel> onSelectCharacterSkillLevel;
 
@@ -45,13 +45,18 @@ public class UICharacterSkillLevelList : UIBase
             onSelectCharacterSkillLevel(ui);
     }
 
-    public void SetSkills(IList<CharacterSkillLevel> skillLevels)
+    public void UpdateData(CharacterEntity characterEntity)
     {
+        if (characterEntity == null)
+            return;
         SelectionManager.Clear();
-        TempList.Generate(skillLevels, (characterSkillLevel, ui) =>
+        var skillLevels = characterEntity.skillLevels;
+        TempList.Generate(skillLevels, (index, characterSkillLevel, ui) =>
         {
             var uiCharacterSkillLevel = ui.GetComponent<UICharacterSkillLevel>();
             uiCharacterSkillLevel.data = characterSkillLevel;
+            uiCharacterSkillLevel.owningCharacter = characterEntity;
+            uiCharacterSkillLevel.indexOfData = index;
             SelectionManager.Add(uiCharacterSkillLevel);
         });
     }

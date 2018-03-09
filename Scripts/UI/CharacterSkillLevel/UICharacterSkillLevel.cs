@@ -6,6 +6,9 @@ using UnityEngine.UI;
 
 public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
 {
+    public CharacterEntity owningCharacter;
+    public int indexOfData;
+
     [Header("Generic Info Format")]
     [Tooltip("Title Format => {0} = {Title}")]
     public string titleFormat = "{0}";
@@ -55,7 +58,6 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
     protected virtual void Update()
     {
         var skillData = data.GetSkill();
-        var character = CharacterEntity.OwningCharacter;
 
         if (textTitle != null)
             textTitle.text = string.Format(titleFormat, skillData == null ? "Unknow" : skillData.title);
@@ -151,9 +153,9 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
                 textDamage.text = damagesText;
             }
         }
-        
+
         if (addButton != null)
-            addButton.interactable = character != null && character.SkillPoint > 0;
+            addButton.interactable = owningCharacter != null && owningCharacter.SkillPoint > 0;
     }
 
     public override void Show()
@@ -168,9 +170,7 @@ public class UICharacterSkillLevel : UISelectionEntry<CharacterSkillLevel>
 
     private void OnClickAdd()
     {
-        var owningCharacter = CharacterEntity.OwningCharacter;
-        if (owningCharacter != null)
-            owningCharacter.AddSkillLevel(owningCharacter.skillLevels.IndexOf(data));
+        owningCharacter.AddSkillLevel(indexOfData);
     }
 }
 

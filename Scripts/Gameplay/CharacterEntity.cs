@@ -196,7 +196,6 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
 
             OwningCharacter = this;
             TempUISceneGameplay = Instantiate(gameInstance.uiSceneGameplayPrefab);
-            TempUISceneGameplay.SetOwningCharacter();
         }
     }
 
@@ -649,7 +648,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected void NetFuncSwapOrMergeItem(int fromIndex, int toIndex)
     {
-        if (CurrentHp <= 0 || doingAction || 
+        if (CurrentHp <= 0 || doingAction ||
             fromIndex < 0 || fromIndex > nonEquipItems.Count ||
             toIndex < 0 || toIndex > nonEquipItems.Count)
             return;
@@ -1121,8 +1120,8 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             buffLocations[buffKey] = i;
         }
 
-        if (TempUISceneGameplay != null)
-            TempUISceneGameplay.SetBuffs(buffs);
+        if (IsLocalClient && TempUISceneGameplay != null)
+            TempUISceneGameplay.UpdateBuffs();
     }
 
     protected void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
@@ -1159,20 +1158,20 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         if (model != null)
             model.SetEquipItems(equipItems);
 
-        if (TempUISceneGameplay != null)
-            TempUISceneGameplay.SetEquipItems(equipItems);
+        if (IsLocalClient && TempUISceneGameplay != null)
+            TempUISceneGameplay.UpdateEquipItems();
     }
 
     protected void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
-        if (TempUISceneGameplay != null)
-            TempUISceneGameplay.SetNonEquipItems(nonEquipItems);
+        if (IsLocalClient && TempUISceneGameplay != null)
+            TempUISceneGameplay.UpdateNonEquipItems();
     }
 
     protected void OnSkillLevelsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
-        if (TempUISceneGameplay != null)
-            TempUISceneGameplay.SetSkillLevels(skillLevels);
+        if (IsLocalClient && TempUISceneGameplay != null)
+            TempUISceneGameplay.UpdateSkillLevels();
     }
 
     public void Warp(string mapName, Vector3 position)

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(UIList))]
-public class UICharacterBuffList : UIBase
+public class UICharacterBuffs : UIBase
 {
     private UIList tempList;
     public UIList TempList
@@ -21,9 +21,12 @@ public class UICharacterBuffList : UIBase
         base.Show();
     }
 
-    public void SetBuffs(IList<CharacterBuff> buffs)
+    public void UpdateData(CharacterEntity characterEntity)
     {
-        TempList.Generate(buffs, (characterBuff, ui) =>
+        if (characterEntity == null)
+            return;
+        var buffs = characterEntity.buffs;
+        TempList.Generate(buffs, (index, characterBuff, ui) =>
         {
             var uiCharacterBuff = ui.GetComponent<UICharacterBuff>();
             uiCharacterBuff.data = characterBuff;

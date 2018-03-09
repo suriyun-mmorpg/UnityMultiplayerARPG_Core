@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacterAttributeLevel : UISelectionEntry<CharacterAttributeLevel>
+public class UICharacterAttributeLevel : UISelectionEntry<int>
 {
     public CharacterAttribute attribute;
+    public CharacterEntity owningCharacter;
+    public int indexOfData;
 
     [Header("Generic Info Format")]
     [Tooltip("Title Format => {0} = {Title}")]
@@ -22,24 +23,9 @@ public class UICharacterAttributeLevel : UISelectionEntry<CharacterAttributeLeve
     public Text textLevel;
     public Image imageIcon;
     public Button addButton;
-    public UICharacterStats uiCharacterStats;
 
     private void Update()
     {
-        var uiSceneGameplay = UISceneGameplay.Singleton;
-        Dictionary<CharacterAttribute, int> attributes = null;
-        int attributeLevel = 0;
-        var character = CharacterEntity.OwningCharacter;
-        if (character != null)
-        {
-            attributes = character.GetAttributes();
-            attributeLevel = attributes[attribute];
-        }
-        else if (data != null)
-        {
-            attributeLevel = data.level;
-        }
-
         if (textTitle != null)
             textTitle.text = string.Format(titleFormat, attribute == null ? "Unknow" : attribute.title);
 
@@ -47,17 +33,16 @@ public class UICharacterAttributeLevel : UISelectionEntry<CharacterAttributeLeve
             textDescription.text = string.Format(descriptionFormat, attribute == null ? "N/A" : attribute.description);
 
         if (textLevel != null)
-            textLevel.text = string.Format(levelFormat, data == null ? "N/A" : attributeLevel.ToString("N0"));
+            textLevel.text = string.Format(levelFormat, data.ToString("N0"));
 
         if (imageIcon != null)
+        {
             imageIcon.sprite = attribute == null ? null : attribute.icon;
-
-        var stats = CharacterDataHelpers.GetStatsByAttributeAmountPairs(attributes);
-        if (uiCharacterStats != null)
-            uiCharacterStats.data = stats;
-
+            imageIcon.gameObject.SetActive(attribute != null);
+        }
+        
         if (addButton != null)
-            addButton.interactable = character != null && character.StatPoint > 0;
+            addButton.interactable = owningCharacter != null && owningCharacter.StatPoint > 0;
     }
 
     public override void Show()
@@ -72,8 +57,7 @@ public class UICharacterAttributeLevel : UISelectionEntry<CharacterAttributeLeve
 
     private void OnClickAdd()
     {
-        var owningCharacter = CharacterEntity.OwningCharacter;
         if (owningCharacter != null)
-            owningCharacter.AddAttributeLevel(owningCharacter.attributeLevels.IndexOf(data));
+            owningCharacter.AddAttributeLevel(indexOfData);
     }
 }

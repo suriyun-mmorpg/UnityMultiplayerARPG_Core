@@ -59,7 +59,7 @@ public class UICharacterList : UIBase
         // Show list of created characters
         var selectableCharacters = CharacterDataExtension.LoadAllPersistentCharacterData();
         selectableCharacters.Sort(new CharacterDataLastUpdateComparer().Desc());
-        TempList.Generate(selectableCharacters, (character, ui) =>
+        TempList.Generate(selectableCharacters, (index, character, ui) =>
         {
             var uiCharacter = ui.GetComponent<UICharacter>();
             uiCharacter.data = character;

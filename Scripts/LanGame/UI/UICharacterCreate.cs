@@ -50,7 +50,7 @@ public class UICharacterCreate : UIBase
         SelectionManager.Clear();
         // Show list of characters that can be create
         var selectableCharacters = GameInstance.CharacterPrototypes.Values.ToList();
-        TempList.Generate(selectableCharacters, (characterPrototype, ui) =>
+        TempList.Generate(selectableCharacters, (index, characterPrototype, ui) =>
         {
             var character = new CharacterData();
             character.Id = characterPrototype.Id;

@@ -6,6 +6,9 @@ using UnityEngine.UI;
 
 public class UICharacterItem : UISelectionEntry<CharacterItem>
 {
+    public CharacterEntity owningCharacter;
+    public int indexOfData;
+
     [Header("Generic Info Format")]
     [Tooltip("Title Format => {0} = {Title}")]
     public string titleFormat = "{0}";
