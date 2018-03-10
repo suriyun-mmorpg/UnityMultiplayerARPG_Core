@@ -4,19 +4,30 @@ using LiteNetLib.Utils;
 using LiteNetLibHighLevel;
 
 [System.Serializable]
-public class CharacterAttribute
+public struct CharacterAttribute
 {
+    public static readonly CharacterAttribute Empty = new CharacterAttribute();
     public string attributeId;
     public int amount;
+
+    public bool IsEmpty()
+    {
+        return Equals(Empty);
+    }
 
     public Attribute GetAttribute()
     {
         return GameInstance.CharacterAttributes.ContainsKey(attributeId) ? GameInstance.CharacterAttributes[attributeId] : null;
     }
 
-    public bool CanLevelUp()
+    public bool CanIncrease(ICharacterData character)
     {
-        return GetAttribute() != null;
+        return GetAttribute() != null && character.StatPoint > 0;
+    }
+
+    public void Increase(int amount)
+    {
+        this.amount += amount;
     }
 }
 
@@ -32,8 +43,6 @@ public class NetFieldCharacterAttribute : LiteNetLibNetField<CharacterAttribute>
 
     public override void Serialize(NetDataWriter writer)
     {
-        if (Value == null)
-            Value = new CharacterAttribute();
         writer.Put(Value.attributeId);
         writer.Put(Value.amount);
     }

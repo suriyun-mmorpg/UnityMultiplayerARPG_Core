@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIAttributeAmount : UISelectionEntry<KeyValuePair<Attribute, int>>
+public class UIAttributeAmount : UISelectionEntry<KeyValuePair<CharacterAttribute, int>>
 {
     [System.NonSerialized]
     public int indexOfData;
@@ -27,12 +27,13 @@ public class UIAttributeAmount : UISelectionEntry<KeyValuePair<Attribute, int>>
     {
         var owningCharacter = CharacterEntity.OwningCharacter;
         if (addButton != null)
-            addButton.interactable = owningCharacter != null && owningCharacter.StatPoint > 0;
+            addButton.interactable = Data.Key.CanIncrease(owningCharacter);
     }
 
     protected override void UpdateData()
     {
-        var attribute = Data.Key;
+        var characterAttribute = Data.Key;
+        var attribute = characterAttribute.GetAttribute();
         var amount = Data.Value;
 
         if (textTitle != null)

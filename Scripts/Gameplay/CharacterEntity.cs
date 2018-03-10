@@ -320,7 +320,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         else
         {
             weapon = GameInstance.Singleton.defaultWeaponItem;
-            equipWeapon = CharacterItem.MakeCharaterItem(weapon, 1);
+            equipWeapon = CharacterItem.Create(weapon, 1);
         }
         var weaponType = weapon.WeaponType;
         if (weaponType.subAttackAnimations == null || weaponType.subAttackAnimations.Length == 0)
@@ -364,7 +364,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                     var characterEntity = hit.GetComponent<CharacterEntity>();
                     if (characterEntity == null)
                         continue;
-                    characterEntity.ReceiveDamage(this, allDamageAttributes, null);
+                    characterEntity.ReceiveDamage(this, allDamageAttributes, CharacterBuff.Empty);
                 }
                 break;
             case DamageType.Missile:
@@ -372,7 +372,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                 {
                     var missileDamageIdentity = Manager.Assets.NetworkSpawn(damage.missileDamageEntity.Identity, CacheTransform.position);
                     var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
-                    missileDamageEntity.SetupDamage(this, allDamageAttributes, null, damage.missileDistance, damage.missileSpeed);
+                    missileDamageEntity.SetupDamage(this, allDamageAttributes, CharacterBuff.Empty, damage.missileDistance, damage.missileSpeed);
                 }
                 break;
         }
@@ -432,9 +432,6 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected void AttackAsPureSkillDamage(CharacterSkill characterSkill)
     {
-        if (characterSkill == null)
-            return;
-
         var skill = characterSkill.GetSkill();
         if (skill == null)
             return;
@@ -446,7 +443,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, baseDamageAttribute);
         var damage = skill.damage;
         var effectivenessAttributes = skill.CacheEffectivenessAttributes;
-        var debuff = skill.isDebuff ? CharacterBuff.MakeCharacterBuff(skill, characterSkill.level, true) : null;
+        var debuff = skill.isDebuff ? CharacterBuff.Create(skill, characterSkill.level, true) : CharacterBuff.Empty;
         switch (damage.damageType)
         {
             case DamageType.Melee:
@@ -472,9 +469,6 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected void AttackAsWeaponDamageInflict(CharacterSkill characterSkill)
     {
-        if (characterSkill == null)
-            return;
-
         var skill = characterSkill.GetSkill();
         if (skill == null)
             return;
@@ -490,7 +484,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         else
         {
             weapon = GameInstance.Singleton.defaultWeaponItem;
-            equipWeapon = CharacterItem.MakeCharaterItem(weapon, 1);
+            equipWeapon = CharacterItem.Create(weapon, 1);
         }
         // Calculate all damages
         var inflictRate = weapon.GetDamageEffectiveness(this) * skill.GetInflictRate(characterSkill.level);
@@ -506,7 +500,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         var weaponType = weapon.WeaponType;
         var damage = weaponType.damage;
         var effectivenessAttributes = weaponType.CacheEffectivenessAttributes;
-        var debuff = skill.isDebuff ? CharacterBuff.MakeCharacterBuff(skill, characterSkill.level, true) : null;
+        var debuff = skill.isDebuff ? CharacterBuff.Create(skill, characterSkill.level, true) : CharacterBuff.Empty;
         switch (damage.damageType)
         {
             case DamageType.Melee:
@@ -532,8 +526,6 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected void ApplySkillBuff(CharacterSkill characterSkill)
     {
-        if (characterSkill == null)
-            return;
         var skill = characterSkill.GetSkill();
         if (skill.skillBuffType == SkillBuffType.BuffToUser)
         {
@@ -542,9 +534,11 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             {
                 var buffIndex = buffLocations[buffKey];
                 // Don't update here let it update at update function to remove it
-                buffs[buffIndex].buffRemainsDuration = 0;
+                var buff = buffs[buffIndex];
+                buff.ClearDuration();
+                buffs[buffIndex] = buff;
             }
-            var characterBuff = CharacterBuff.MakeCharacterBuff(skill, level, false);
+            var characterBuff = CharacterBuff.Create(skill, level, false);
             characterBuff.Added();
             buffs.Add(characterBuff);
         }
@@ -662,8 +656,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             if (toItem.amount + fromItem.amount <= maxStack)
             {
                 toItem.amount += fromItem.amount;
-                fromItem.Empty();
-                nonEquipItems[fromIndex] = fromItem;
+                nonEquipItems[fromIndex] = CharacterItem.Empty;
                 nonEquipItems[toIndex] = toItem;
             }
             else
@@ -716,8 +709,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         {
             equipItem.isSubWeapon = isSubWeapon;
             equipItems.Add(equipItem);
-            nonEquipItems[fromIndex].Empty();
-            nonEquipItems.Dirty(fromIndex);
+            nonEquipItems[fromIndex] = CharacterItem.Empty;
         }
     }
 
@@ -756,11 +748,11 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             return;
 
         var attribute = attributes[attributeIndex];
-        if (!attribute.CanLevelUp())
+        if (!attribute.CanIncrease(this))
             return;
 
-        ++attributes[attributeIndex].amount;
-        attributes.Dirty(attributeIndex);
+        attribute.Increase(1);
+        attributes[attributeIndex] = attribute;
     }
 
     protected void NetFuncAddSkillCallback(NetFieldInt skillIndex)
@@ -773,12 +765,12 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         if (CurrentHp <= 0 || skillIndex < 0 || skillIndex >= skills.Count)
             return;
 
-        var characterSkill = skills[skillIndex];
-        if (!characterSkill.CanLevelUp(this))
+        var skill = skills[skillIndex];
+        if (!skill.CanLevelUp(this))
             return;
 
-        ++skills[skillIndex].level;
-        skills.Dirty(skillIndex);
+        skill.LevelUp(1);
+        skills[skillIndex] = skill;
     }
     #endregion
 
@@ -1044,14 +1036,16 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                 skills.Dirty(i);
             }
         }
-        else if (debuff != null)
+        else if (!debuff.IsEmpty())
         {
             var buffKey = GetBuffKey(debuff.skillId, true);
             if (buffLocations.ContainsKey(buffKey))
             {
                 var buffIndex = buffLocations[buffKey];
                 // Don't update here let it update at update function to remove it
-                buffs[buffIndex].buffRemainsDuration = 0;
+                var buff = buffs[buffIndex];
+                buff.ClearDuration();
+                buffs[buffIndex] = buff;
             }
             var characterDebuff = debuff.Clone();
             characterDebuff.Added();

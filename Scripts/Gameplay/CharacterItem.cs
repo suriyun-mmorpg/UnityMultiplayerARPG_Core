@@ -4,8 +4,9 @@ using LiteNetLib.Utils;
 using LiteNetLibHighLevel;
 
 [System.Serializable]
-public class CharacterItem
+public struct CharacterItem
 {
+    public static readonly CharacterItem Empty = new CharacterItem();
     // Use id as primary key
     public string id;
     public string itemId;
@@ -13,6 +14,11 @@ public class CharacterItem
     public int level;
     public int amount;
     // TODO: I want to add random item bonus
+
+    public bool IsEmpty()
+    {
+        return Equals(Empty);
+    }
 
     public Item GetItem()
     {
@@ -63,19 +69,11 @@ public class CharacterItem
         return GetEquipmentItem().GetStats(level);
     }
 
-    public void Empty()
-    {
-        id = "";
-        itemId = "";
-        isSubWeapon = false;
-        level = 1;
-        amount = 0;
-    }
-
-    public static CharacterItem MakeCharaterItem(Item item, int level)
+    public static CharacterItem Create(Item item, int level)
     {
         var newItem = new CharacterItem();
         newItem.itemId = item.Id;
+        newItem.isSubWeapon = false;
         newItem.level = level;
         newItem.amount = 1;
         return newItem;
@@ -96,8 +94,6 @@ public class NetFieldCharacterItem : LiteNetLibNetField<CharacterItem>
 
     public override void Serialize(NetDataWriter writer)
     {
-        if (Value == null)
-            Value = new CharacterItem();
         writer.Put(Value.itemId);
         writer.Put(Value.isSubWeapon);
         writer.Put(Value.level);

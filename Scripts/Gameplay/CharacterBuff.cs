@@ -4,12 +4,18 @@ using LiteNetLib.Utils;
 using LiteNetLibHighLevel;
 
 [System.Serializable]
-public class CharacterBuff
+public struct CharacterBuff
 {
+    public static readonly CharacterBuff Empty = new CharacterBuff();
     public string skillId;
     public bool isDebuff;
     public int level;
     public float buffRemainsDuration;
+
+    public bool IsEmpty()
+    {
+        return Equals(Empty);
+    }
 
     public Skill GetSkill()
     {
@@ -61,14 +67,9 @@ public class CharacterBuff
         buffRemainsDuration -= deltaTime;
     }
 
-    public static CharacterBuff MakeCharacterBuff(Skill skill, int level, bool isDebuff)
+    public void ClearDuration()
     {
-        var newBuff = new CharacterBuff();
-        newBuff.skillId = skill.Id;
-        newBuff.level = level;
-        newBuff.isDebuff = isDebuff;
-        newBuff.buffRemainsDuration = 0f;
-        return newBuff;
+        buffRemainsDuration = 0;
     }
 
     public CharacterBuff Clone()
@@ -78,6 +79,16 @@ public class CharacterBuff
         newBuff.level = level;
         newBuff.isDebuff = isDebuff;
         newBuff.buffRemainsDuration = buffRemainsDuration;
+        return newBuff;
+    }
+
+    public static CharacterBuff Create(Skill skill, int level, bool isDebuff)
+    {
+        var newBuff = new CharacterBuff();
+        newBuff.skillId = skill.Id;
+        newBuff.level = level;
+        newBuff.isDebuff = isDebuff;
+        newBuff.buffRemainsDuration = 0f;
         return newBuff;
     }
 }
@@ -96,8 +107,6 @@ public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>
 
     public override void Serialize(NetDataWriter writer)
     {
-        if (Value == null)
-            Value = new CharacterBuff();
         writer.Put(Value.skillId);
         writer.Put(Value.isDebuff);
         writer.Put(Value.level);

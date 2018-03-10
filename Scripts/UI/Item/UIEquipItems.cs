@@ -109,7 +109,7 @@ public class UIEquipItems : UIBase
         // Clear slots data
         foreach (var slot in slots)
         {
-            slot.Data.Empty();
+            slot.Data = CharacterItem.Empty;
         }
 
         var equipItems = characterEntity.equipItems;

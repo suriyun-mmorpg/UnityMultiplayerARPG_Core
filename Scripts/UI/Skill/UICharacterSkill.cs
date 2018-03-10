@@ -62,7 +62,7 @@ public class UICharacterSkill : UISelectionEntry<CharacterSkill>
     {
         var owningCharacter = CharacterEntity.OwningCharacter;
         if (addButton != null)
-            addButton.interactable = Data != null && Data.CanLevelUp(owningCharacter);
+            addButton.interactable = Data.CanLevelUp(owningCharacter);
 
         var coolDownRemainDuration = Data.coolDownRemainsDuration;
         var coolDownDuration = Data.GetCoolDownDuration();

@@ -156,8 +156,8 @@ public class UICharacter : UISelectionEntry<ICharacterData>
 
         if (uiRightHandDamages != null)
         {
-            var rightHandWeapon = Data.EquipItems.Where(a => a.GetWeaponItem() != null && !a.isSubWeapon).First();
-            if (rightHandWeapon == null)
+            var rightHandWeapon = Data.EquipItems.Where(a => a.GetWeaponItem() != null && !a.isSubWeapon).FirstOrDefault();
+            if (rightHandWeapon.IsEmpty())
                 uiRightHandDamages.Hide();
             else
             {
@@ -168,8 +168,8 @@ public class UICharacter : UISelectionEntry<ICharacterData>
 
         if (uiLeftHandDamages != null)
         {
-            var leftHandWeapon = Data.EquipItems.Where(a => a.GetWeaponItem() != null && a.isSubWeapon).First();
-            if (leftHandWeapon == null)
+            var leftHandWeapon = Data.EquipItems.Where(a => a.GetWeaponItem() != null && a.isSubWeapon).FirstOrDefault();
+            if (leftHandWeapon.IsEmpty())
                 uiLeftHandDamages.Hide();
             else
             {
@@ -192,7 +192,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
                 if (CacheUICharacterAttributes.ContainsKey(attribute))
                 {
                     var cacheUICharacterAttribute = CacheUICharacterAttributes[attribute];
-                    cacheUICharacterAttribute.Data = new KeyValuePair<Attribute, int>(attribute, totalAttributes[attribute]);
+                    cacheUICharacterAttribute.Data = new KeyValuePair<CharacterAttribute, int>(characterAttribute, totalAttributes[attribute]);
                     cacheUICharacterAttribute.indexOfData = i;
                 }
             }

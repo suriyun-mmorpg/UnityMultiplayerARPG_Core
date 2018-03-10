@@ -4,11 +4,17 @@ using LiteNetLib.Utils;
 using LiteNetLibHighLevel;
 
 [System.Serializable]
-public class CharacterSkill
+public struct CharacterSkill
 {
+    public static readonly CharacterSkill Empty = new CharacterSkill();
     public string skillId;
     public int level;
     public float coolDownRemainsDuration;
+
+    public bool IsEmpty()
+    {
+        return Equals(Empty);
+    }
     
     public Skill GetSkill()
     {
@@ -30,6 +36,11 @@ public class CharacterSkill
         return GetSkill().CanLevelUp(character, level);
     }
 
+    public void LevelUp(int level)
+    {
+        this.level += level;
+    }
+
     public bool CanUse(int currentMp)
     {
         return level >= 1 && coolDownRemainsDuration <= 0f && currentMp >= GetConsumeMp();
@@ -49,6 +60,20 @@ public class CharacterSkill
     {
         coolDownRemainsDuration -= deltaTime;
     }
+
+    public void ClearCoolDown()
+    {
+        coolDownRemainsDuration = 0;
+    }
+
+    public static CharacterSkill Create(Skill skill, int level)
+    {
+        var newBuff = new CharacterSkill();
+        newBuff.skillId = skill.Id;
+        newBuff.level = level;
+        newBuff.coolDownRemainsDuration = 0f;
+        return newBuff;
+    }
 }
 
 public class NetFieldCharacterSkill : LiteNetLibNetField<CharacterSkill>
@@ -64,8 +89,6 @@ public class NetFieldCharacterSkill : LiteNetLibNetField<CharacterSkill>
 
     public override void Serialize(NetDataWriter writer)
     {
-        if (Value == null)
-            Value = new CharacterSkill();
         writer.Put(Value.skillId);
         writer.Put(Value.level);
         writer.Put(Value.coolDownRemainsDuration);
