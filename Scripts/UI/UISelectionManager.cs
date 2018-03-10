@@ -3,10 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+public enum UISelectionMode
+{
+    SelectSingle,
+    Toggle,
+}
+
 public abstract class UISelectionManager : MonoBehaviour
 {
+    public UISelectionMode selectionMode;
+    public abstract object GetSelectedUI();
     public abstract void Select(object ui);
-    public abstract void DeSelectAll();
+    public abstract void Deselect(object ui);
+    public abstract void DeselectAll();
+    public abstract void DeselectSelectedUI();
 }
 
 public abstract class UISelectionManager<TData, TUI, TEvent> : UISelectionManager
@@ -14,6 +24,7 @@ public abstract class UISelectionManager<TData, TUI, TEvent> : UISelectionManage
     where TEvent : UnityEvent<TUI>
 {
     public TEvent eventOnSelect;
+    public TEvent eventOnDeselect;
 
     protected readonly List<TUI> uis = new List<TUI>();
     public TUI SelectedUI { get; protected set; }
@@ -25,7 +36,7 @@ public abstract class UISelectionManager<TData, TUI, TEvent> : UISelectionManage
 
         ui.selectionManager = this;
         // Select first ui
-        if (uis.Count == 0)
+        if (uis.Count == 0 && selectionMode == UISelectionMode.Toggle)
             Select(ui);
         else
             ui.Deselect();
@@ -37,6 +48,11 @@ public abstract class UISelectionManager<TData, TUI, TEvent> : UISelectionManage
     {
         uis.Clear();
         SelectedUI = null;
+    }
+
+    public override sealed object GetSelectedUI()
+    {
+        return SelectedUI;
     }
 
     public override sealed void Select(object ui)
@@ -58,12 +74,29 @@ public abstract class UISelectionManager<TData, TUI, TEvent> : UISelectionManage
         }
     }
 
-    public override sealed void DeSelectAll()
+    public override sealed void Deselect(object ui)
+    {
+        var castedUI = (TUI)ui;
+
+        if (eventOnDeselect != null)
+            eventOnDeselect.Invoke(castedUI);
+
+        SelectedUI = null;
+        castedUI.Deselect();
+    }
+
+    public override sealed void DeselectAll()
     {
         SelectedUI = null;
         foreach (var deselectUI in uis)
         {
             deselectUI.Deselect();
         }
+    }
+
+    public override sealed void DeselectSelectedUI()
+    {
+        if (SelectedUI != null)
+            Deselect(SelectedUI);
     }
 }

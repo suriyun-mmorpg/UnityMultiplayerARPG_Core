@@ -10,10 +10,10 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
     public string hpStatsFormat = "Hp: {0}";
     [Tooltip("Mp Stats Format => {0} = {Amount}")]
     public string mpStatsFormat = "Mp: {0}";
-    [Tooltip("Atk Rate Stats Format => {0} = {Amount}")]
-    public string atkRateStatsFormat = "Atk Rate: {0}";
-    [Tooltip("Def Stats Format => {0} = {Amount}")]
-    public string defStatsFormat = "Def: {0}";
+    [Tooltip("Accuracy Stats Format => {0} = {Amount}")]
+    public string accuracyStatsFormat = "Acc: {0}";
+    [Tooltip("Evasion Format => {0} = {Amount}")]
+    public string evasionStatsFormat = "Eva: {0}";
     [Tooltip("Cri Hit Rate Stats Format => {0} = {Amount}")]
     public string criHitRateStatsFormat = "Cri Hit: {0}%";
     [Tooltip("Cri Dmg Rate Stats Format => {0} = {Amount}")]
@@ -23,6 +23,13 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
 
     [Header("UI Elements")]
     public Text textStats;
+    public Text textHp;
+    public Text textMp;
+    public Text textAccuracy;
+    public Text textEvasion;
+    public Text textCriHitRate;
+    public Text textCriDmgRate;
+    public Text textWeightLimit;
 
     protected override void UpdateData()
     {
@@ -33,10 +40,10 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
                 statsString += string.Format(hpStatsFormat, Data.hp) + "\n";
             if (Data.mp != 0)
                 statsString += string.Format(mpStatsFormat, Data.mp) + "\n";
-            if (Data.atkRate != 0)
-                statsString += string.Format(atkRateStatsFormat, Data.atkRate) + "\n";
-            if (Data.def != 0)
-                statsString += string.Format(defStatsFormat, Data.def) + "\n";
+            if (Data.accuracy != 0)
+                statsString += string.Format(accuracyStatsFormat, Data.accuracy) + "\n";
+            if (Data.evasion != 0)
+                statsString += string.Format(evasionStatsFormat, Data.evasion) + "\n";
             if (Data.criHitRate != 0)
                 statsString += string.Format(criHitRateStatsFormat, (Data.criHitRate * 100).ToString("N2")) + "\n";
             if (Data.criDmgRate != 0)

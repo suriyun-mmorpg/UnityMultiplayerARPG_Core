@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(UIList)), RequireComponent(typeof(UICharacterItemSelectionManager))]
 public class UINonEquipItems : UIBase
 {
-    public System.Action<UICharacterItem> onSelectCharacterItem;
+    public UICharacterItem uiItemDialog;
 
     private UIList cacheList;
     public UIList CacheList
@@ -25,6 +25,7 @@ public class UINonEquipItems : UIBase
         {
             if (selectionManager == null)
                 selectionManager = GetComponent<UICharacterItemSelectionManager>();
+            selectionManager.selectionMode = UISelectionMode.SelectSingle;
             return selectionManager;
         }
     }
@@ -34,15 +35,29 @@ public class UINonEquipItems : UIBase
         base.Show();
         SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterItem);
         SelectionManager.eventOnSelect.AddListener(OnSelectCharacterItem);
+        SelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterItem);
+        SelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterItem);
+    }
+
+    public override void Hide()
+    {
+        base.Hide();
+        SelectionManager.DeselectSelectedUI();
     }
 
     protected void OnSelectCharacterItem(UICharacterItem ui)
     {
-        if (ui == null)
-            return;
+        if (uiItemDialog != null)
+        {
+            uiItemDialog.Data = ui.Data;
+            uiItemDialog.Show();
+        }
+    }
 
-        if (onSelectCharacterItem != null)
-            onSelectCharacterItem(ui);
+    protected void OnDeselectCharacterItem(UICharacterItem ui)
+    {
+        if (uiItemDialog != null)
+            uiItemDialog.Hide();
     }
 
     public void UpdateData(CharacterEntity characterEntity)

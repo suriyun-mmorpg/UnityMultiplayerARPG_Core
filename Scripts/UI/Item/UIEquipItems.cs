@@ -8,7 +8,7 @@ using UnityEditor;
 [RequireComponent(typeof(UICharacterItemSelectionManager))]
 public class UIEquipItems : UIBase
 {
-    public System.Action<UICharacterItem> onSelectCharacterItem;
+    public UICharacterItem uiItemDialog;
     public UICharacterItemPair rightHandSlot;
     public UICharacterItemPair leftHandSlot;
     public UICharacterItemPair[] otherEquipSlots;
@@ -71,6 +71,7 @@ public class UIEquipItems : UIBase
         {
             if (selectionManager == null)
                 selectionManager = GetComponent<UICharacterItemSelectionManager>();
+            selectionManager.selectionMode = UISelectionMode.SelectSingle;
             return selectionManager;
         }
     }
@@ -80,15 +81,29 @@ public class UIEquipItems : UIBase
         base.Show();
         SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterItem);
         SelectionManager.eventOnSelect.AddListener(OnSelectCharacterItem);
+        SelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterItem);
+        SelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterItem);
+    }
+
+    public override void Hide()
+    {
+        base.Hide();
+        SelectionManager.DeselectSelectedUI();
     }
 
     protected void OnSelectCharacterItem(UICharacterItem ui)
     {
-        if (ui == null)
-            return;
+        if (uiItemDialog != null)
+        {
+            uiItemDialog.Data = ui.Data;
+            uiItemDialog.Show();
+        }
+    }
 
-        if (onSelectCharacterItem != null)
-            onSelectCharacterItem(ui);
+    protected void OnDeselectCharacterItem(UICharacterItem ui)
+    {
+        if (uiItemDialog != null)
+            uiItemDialog.Hide();
     }
 
 #if UNITY_EDITOR

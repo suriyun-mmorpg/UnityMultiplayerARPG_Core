@@ -31,6 +31,7 @@ public class UICharacterCreate : UIBase
         {
             if (selectionManager == null)
                 selectionManager = GetComponent<UICharacterSelectionManager>();
+            selectionManager.selectionMode = UISelectionMode.Toggle;
             return selectionManager;
         }
     }
@@ -74,9 +75,6 @@ public class UICharacterCreate : UIBase
 
     protected void OnSelectCharacter(UICharacter ui)
     {
-        if (ui == null)
-            return;
-
         characterModelContainer.SetChildrenActive(false);
         ShowCharacter(ui.Data.Id);
     }

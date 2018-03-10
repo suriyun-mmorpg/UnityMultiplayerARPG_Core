@@ -402,7 +402,7 @@ public static class CharacterDataExtension
         var file = File.Open(path, FileMode.OpenOrCreate);
         binaryFormatter.Serialize(file, savingData);
         file.Close();
-        Debug.Log("Character Saved: " + path);
+        Debug.Log("Character Saved to: " + path);
     }
 
 
@@ -436,6 +436,7 @@ public static class CharacterDataExtension
             var characterData = new CharacterData();
             result.Add(characterData.LoadPersistentCharacterData(file));
         }
+        Debug.Log("Characters loaded from: " + Application.persistentDataPath);
         return result;
     }
 

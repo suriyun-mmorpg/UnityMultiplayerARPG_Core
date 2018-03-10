@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(UIList)), RequireComponent(typeof(UICharacterSkillSelectionManager))]
 public class UICharacterSkills : UIBase
 {
-    public System.Action<UICharacterSkill> onSelectCharacterSkill;
+    public UICharacterSkill uiSkillDialog;
 
     private UIList cacheList;
     public UIList CacheList
@@ -25,6 +25,7 @@ public class UICharacterSkills : UIBase
         {
             if (selectionManager == null)
                 selectionManager = GetComponent<UICharacterSkillSelectionManager>();
+            selectionManager.selectionMode = UISelectionMode.SelectSingle;
             return selectionManager;
         }
     }
@@ -34,15 +35,29 @@ public class UICharacterSkills : UIBase
         base.Show();
         SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterSkill);
         SelectionManager.eventOnSelect.AddListener(OnSelectCharacterSkill);
+        SelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterSkill);
+        SelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterSkill);
+    }
+
+    public override void Hide()
+    {
+        base.Hide();
+        SelectionManager.DeselectSelectedUI();
     }
 
     protected void OnSelectCharacterSkill(UICharacterSkill ui)
     {
-        if (ui == null)
-            return;
+        if (uiSkillDialog != null)
+        {
+            uiSkillDialog.Data = ui.Data;
+            uiSkillDialog.Show();
+        }
+    }
 
-        if (onSelectCharacterSkill != null)
-            onSelectCharacterSkill(ui);
+    protected void OnDeselectCharacterSkill(UICharacterSkill ui)
+    {
+        if (uiSkillDialog != null)
+            uiSkillDialog.Hide();
     }
 
     public void UpdateData(CharacterEntity characterEntity)

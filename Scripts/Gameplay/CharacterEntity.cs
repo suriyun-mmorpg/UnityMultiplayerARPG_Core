@@ -996,7 +996,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         // Attacker stats
         var dmgAttackerStats = attacker.GetStatsWithBuffs();
         // Calculate chance to hit
-        var hitChance = 2 * (dmgAttackerStats.atkRate / (dmgAttackerStats.atkRate + dmgReceiverStats.def)) * (attacker.Level / (attacker.Level + Level));
+        var hitChance = 2 * (dmgAttackerStats.accuracy / (dmgAttackerStats.accuracy + dmgReceiverStats.evasion)) * (attacker.Level / (attacker.Level + Level));
         if (hitChance < 0.05f)
             hitChance = 0.05f;
         if (hitChance > 0.95f)

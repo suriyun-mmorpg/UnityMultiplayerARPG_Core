@@ -29,15 +29,6 @@ public class UISceneGameplay : MonoBehaviour
         Singleton = this;
     }
 
-    private void Start()
-    {
-        if (uiEquipItems != null)
-            uiEquipItems.onSelectCharacterItem += OnSelectEquipItem;
-
-        if (uiNonEquipItems != null)
-            uiNonEquipItems.onSelectCharacterItem += OnSelectNonEquipItem;
-    }
-
     private void Update()
     {
         foreach (var toggleUi in toggleUis)
@@ -47,34 +38,25 @@ public class UISceneGameplay : MonoBehaviour
         }
     }
 
-    private void OnDestroy()
-    {
-        if (uiEquipItems != null)
-            uiEquipItems.onSelectCharacterItem -= OnSelectEquipItem;
-
-        if (uiNonEquipItems != null)
-            uiNonEquipItems.onSelectCharacterItem -= OnSelectNonEquipItem;
-    }
-
     private void OnSelectEquipItem(UICharacterItem ui)
     {
         var owningCharacter = CharacterEntity.OwningCharacter;
         var slot = ui as UICharacterItem;
         if (SelectedEquipItem != null)
         {
-            uiEquipItems.SelectionManager.DeSelectAll();
+            uiEquipItems.SelectionManager.DeselectAll();
             SelectedEquipItem = null;
         }
         if (SelectedNonEquipItem != null)
         {
             owningCharacter.EquipItem(SelectedNonEquipItem.indexOfData, slot.equipPosition);
-            uiEquipItems.SelectionManager.DeSelectAll();
-            uiNonEquipItems.SelectionManager.DeSelectAll();
+            uiEquipItems.SelectionManager.DeselectAll();
+            uiNonEquipItems.SelectionManager.DeselectAll();
         }
         else if (ui.Data.IsValid())
             SelectedEquipItem = slot;
         else
-            uiEquipItems.SelectionManager.DeSelectAll();
+            uiEquipItems.SelectionManager.DeselectAll();
     }
 
     private void OnSelectNonEquipItem(UICharacterItem ui)
@@ -83,24 +65,19 @@ public class UISceneGameplay : MonoBehaviour
         if (SelectedNonEquipItem != null)
         {
             owningCharacter.SwapOrMergeItem(SelectedNonEquipItem.indexOfData, ui.indexOfData);
-            uiNonEquipItems.SelectionManager.DeSelectAll();
+            uiNonEquipItems.SelectionManager.DeselectAll();
             SelectedNonEquipItem = null;
         }
         else if (SelectedEquipItem != null)
         {
             owningCharacter.UnEquipItem(SelectedEquipItem.equipPosition, ui.indexOfData);
-            uiEquipItems.SelectionManager.DeSelectAll();
-            uiNonEquipItems.SelectionManager.DeSelectAll();
+            uiEquipItems.SelectionManager.DeselectAll();
+            uiNonEquipItems.SelectionManager.DeselectAll();
         }
         else if (ui.Data.IsValid())
             SelectedNonEquipItem = ui;
         else
-            uiNonEquipItems.SelectionManager.DeSelectAll();
-    }
-
-    private void OnSelectCharacterSkill(UICharacterSkill ui)
-    {
-        SelectedSkillLevel = ui;
+            uiNonEquipItems.SelectionManager.DeselectAll();
     }
 
     public void UpdateCharacter()

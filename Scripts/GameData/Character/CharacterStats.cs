@@ -6,8 +6,8 @@ public struct CharacterStats
 {
     public float hp;
     public float mp;
-    public float atkRate;
-    public float def;
+    public float accuracy;
+    public float evasion;
     public float criHitRate;
     public float criDmgRate;
     public float moveSpeed;
@@ -18,8 +18,8 @@ public struct CharacterStats
         var result = new CharacterStats();
         result.hp = a.hp + b.hp;
         result.mp = a.mp + b.mp;
-        result.atkRate = a.atkRate + b.atkRate;
-        result.def = a.def + b.def;
+        result.accuracy = a.accuracy + b.accuracy;
+        result.evasion = a.evasion + b.evasion;
         result.criHitRate = a.criHitRate + b.criHitRate;
         result.criDmgRate = a.criDmgRate + b.criDmgRate;
         result.moveSpeed = a.moveSpeed + b.moveSpeed;
@@ -32,8 +32,8 @@ public struct CharacterStats
         var result = new CharacterStats();
         result.hp = a.hp * multiplier;
         result.mp = a.mp * multiplier;
-        result.atkRate = a.atkRate * multiplier;
-        result.def = a.def * multiplier;
+        result.accuracy = a.accuracy * multiplier;
+        result.evasion = a.evasion * multiplier;
         result.criHitRate = a.criHitRate * multiplier;
         result.criDmgRate = a.criDmgRate * multiplier;
         result.moveSpeed = a.moveSpeed * multiplier;

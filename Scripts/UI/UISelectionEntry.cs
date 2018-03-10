@@ -44,7 +44,14 @@ public abstract class UISelectionEntry<T> : UIBase
     public void OnClickSelect()
     {
         if (selectionManager != null)
-            selectionManager.Select(this);
+        {
+            var selectionMode = selectionManager.selectionMode;
+            var selectedUI = selectionManager.GetSelectedUI();
+            if (selectionMode != UISelectionMode.Toggle && selectedUI != null && (UIBase)selectedUI == this)
+                selectionManager.Deselect(this);
+            else if (selectedUI == null || (UIBase)selectedUI != this)
+                selectionManager.Select(this);
+        }
     }
 
     public void Select()

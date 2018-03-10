@@ -29,6 +29,7 @@ public class UICharacterList : UIBase
         {
             if (selectionManager == null)
                 selectionManager = GetComponent<UICharacterSelectionManager>();
+            selectionManager.selectionMode = UISelectionMode.Toggle;
             return selectionManager;
         }
     }
@@ -79,9 +80,6 @@ public class UICharacterList : UIBase
 
     protected void OnSelectCharacter(UICharacter ui)
     {
-        if (ui == null)
-            return;
-
         buttonStart.gameObject.SetActive(true);
         buttonDelete.gameObject.SetActive(true);
         characterModelContainer.SetChildrenActive(false);
