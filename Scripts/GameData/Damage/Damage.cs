@@ -26,7 +26,7 @@ public class Damage
 }
 
 [System.Serializable]
-public class DamageAmount
+public struct DamageAmount
 {
     public float minDamage;
     public float maxDamage;
@@ -49,7 +49,7 @@ public class DamageAmount
 }
 
 [System.Serializable]
-public class DamageAttribute
+public struct DamageAttribute
 {
     [Tooltip("You can leave Damage to be empty to make it as physical damage which won't calculate with resistance stats")]
     public DamageElement damageElement;
@@ -58,8 +58,8 @@ public class DamageAttribute
 }
 
 [System.Serializable]
-public class DamageEffectivenessAttribute
+public struct DamageEffectivenessAttribute
 {
-    public CharacterAttribute attribute;
-    public float effectiveness = 1f;
+    public Attribute attribute;
+    public float effectiveness;
 }

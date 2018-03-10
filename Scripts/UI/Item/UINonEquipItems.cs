@@ -54,8 +54,7 @@ public class UINonEquipItems : UIBase
         TempList.Generate(nonEquipItems, (index, characterItem, ui) =>
         {
             var uiCharacterItem = ui.GetComponent<UICharacterItem>();
-            uiCharacterItem.data = characterItem;
-            uiCharacterItem.owningCharacter = characterEntity;
+            uiCharacterItem.Data = characterItem;
             uiCharacterItem.indexOfData = index;
             SelectionManager.Add(uiCharacterItem);
         });

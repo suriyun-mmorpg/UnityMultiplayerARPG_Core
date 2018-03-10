@@ -23,8 +23,8 @@ public class CharacterData : ICharacterData
     public string respawnMapName;
     public Vector3 respawnPosition;
     public int lastUpdate;
-    public List<CharacterAttributeLevel> attributeLevels = new List<CharacterAttributeLevel>();
-    public List<CharacterSkillLevel> skillLevels = new List<CharacterSkillLevel>();
+    public List<CharacterAttribute> attributes = new List<CharacterAttribute>();
+    public List<CharacterSkill> skills = new List<CharacterSkill>();
     public List<CharacterBuff> buffs = new List<CharacterBuff>();
     public List<CharacterItem> equipItems = new List<CharacterItem>();
     public List<CharacterItem> nonEquipItems = new List<CharacterItem>();
@@ -44,22 +44,22 @@ public class CharacterData : ICharacterData
     public string RespawnMapName { get { return respawnMapName; } set { respawnMapName = value; } }
     public Vector3 RespawnPosition { get { return respawnPosition; } set { respawnPosition = value; } }
     public int LastUpdate { get { return lastUpdate; } set { lastUpdate = value; } }
-    public IList<CharacterAttributeLevel> AttributeLevels
+    public IList<CharacterAttribute> Attributes
     {
-        get { return attributeLevels; }
+        get { return attributes; }
         set
         {
-            attributeLevels = new List<CharacterAttributeLevel>();
-            attributeLevels.AddRange(value);
+            attributes = new List<CharacterAttribute>();
+            attributes.AddRange(value);
         }
     }
-    public IList<CharacterSkillLevel> SkillLevels
+    public IList<CharacterSkill> Skills
     {
-        get { return skillLevels; }
+        get { return skills; }
         set
         {
-            skillLevels = new List<CharacterSkillLevel>();
-            skillLevels.AddRange(value);
+            skills = new List<CharacterSkill>();
+            skills.AddRange(value);
         }
     }
     public IList<CharacterBuff> Buffs
@@ -131,8 +131,8 @@ public static class CharacterDataExtension
         to.RespawnMapName = from.RespawnMapName;
         to.RespawnPosition = from.RespawnPosition;
         to.LastUpdate = from.LastUpdate;
-        to.AttributeLevels = from.AttributeLevels;
-        to.SkillLevels = from.SkillLevels;
+        to.Attributes = from.Attributes;
+        to.Skills = from.Skills;
         to.Buffs = from.Buffs;
         to.EquipItems = from.EquipItems;
         to.NonEquipItems = from.NonEquipItems;
@@ -147,10 +147,10 @@ public static class CharacterDataExtension
         character.Level = 1;
         foreach (var baseAttribute in character.GetClass().baseAttributes)
         {
-            var attributeLevel = new CharacterAttributeLevel();
-            attributeLevel.attributeId = baseAttribute.attribute.Id;
-            attributeLevel.level = baseAttribute.amount;
-            character.AttributeLevels.Add(attributeLevel);
+            var characterAttribute = new CharacterAttribute();
+            characterAttribute.attributeId = baseAttribute.attribute.Id;
+            characterAttribute.amount = baseAttribute.amount;
+            character.Attributes.Add(characterAttribute);
         }
         character.CurrentHp = character.GetMaxHp();
         character.CurrentMp = character.GetMaxMp();
@@ -217,9 +217,9 @@ public static class CharacterDataExtension
     }
 
     #region Stats calculation, make saperate stats for buffs calculation
-    public static Dictionary<CharacterAttribute, int> GetAttributes(this ICharacterData data)
+    public static Dictionary<Attribute, int> GetAttributes(this ICharacterData data)
     {
-        var result = new Dictionary<CharacterAttribute, int>();
+        var result = new Dictionary<Attribute, int>();
         var equipItems = data.EquipItems;
         foreach (var equipment in equipItems)
         {
@@ -238,11 +238,11 @@ public static class CharacterDataExtension
                     result[key] += value;
             }
         }
-        var attributeLevels = data.AttributeLevels;
-        foreach (var attributeLevel in attributeLevels)
+        var characterAttributes = data.Attributes;
+        foreach (var characterAttribute in characterAttributes)
         {
-            var key = attributeLevel.GetAttribute();
-            var value = attributeLevel.level;
+            var key = characterAttribute.GetAttribute();
+            var value = characterAttribute.amount;
             if (key == null)
                 continue;
             if (!result.ContainsKey(key))
@@ -253,14 +253,14 @@ public static class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<CharacterAttribute, int> GetAttributesWithBuffs(this ICharacterData data)
+    public static Dictionary<Attribute, int> GetAttributesWithBuffs(this ICharacterData data)
     {
         var result = GetAttributes(data);
         var buffs = data.Buffs;
         foreach (var buff in buffs)
         {
             // Buff
-            var buffAttributes = buff.GetBuffAttributes();
+            var buffAttributes = buff.GetAttributes();
             foreach (var buffAttribute in buffAttributes)
             {
                 var key = buffAttribute.Key;
@@ -272,26 +272,13 @@ public static class CharacterDataExtension
                 else
                     result[key] += value;
             }
-            // Debuff
-            var debuffAttributes = buff.GetDebuffAttributes();
-            foreach (var debuffAttribute in debuffAttributes)
-            {
-                var key = debuffAttribute.Key;
-                var value = debuffAttribute.Value;
-                if (key == null)
-                    continue;
-                if (!result.ContainsKey(key))
-                    result[key] = value;
-                else
-                    result[key] += value;
-            }
         }
         return result;
     }
 
-    public static Dictionary<CharacterResistance, float> GetResistances(this ICharacterData data)
+    public static Dictionary<Resistance, float> GetResistances(this ICharacterData data)
     {
-        var result = new Dictionary<CharacterResistance, float>();
+        var result = new Dictionary<Resistance, float>();
         var equipItems = data.EquipItems;
         foreach (var equipment in equipItems)
         {
@@ -313,14 +300,14 @@ public static class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<CharacterResistance, float> GetResistancesWithBuffs(this ICharacterData data)
+    public static Dictionary<Resistance, float> GetResistancesWithBuffs(this ICharacterData data)
     {
         var result = GetResistances(data);
         var buffs = data.Buffs;
         foreach (var buff in buffs)
         {
             // Buff
-            var buffResistances = buff.GetBuffResistances();
+            var buffResistances = buff.GetResistances();
             foreach (var buffResistance in buffResistances)
             {
                 var key = buffResistance.Key;
@@ -332,24 +319,11 @@ public static class CharacterDataExtension
                 else
                     result[key] += value;
             }
-            // Debuff
-            var debuffResistances = buff.GetDebuffResistances();
-            foreach (var debuffResistance in debuffResistances)
-            {
-                var key = debuffResistance.Key;
-                var value = debuffResistance.Value;
-                if (key == null)
-                    continue;
-                if (!result.ContainsKey(key))
-                    result[key] = value;
-                else
-                    result[key] += value;
-            }
         }
         return result;
     }
 
-    public static CharacterStats GetStatsWithoutBuffs(this ICharacterData data)
+    public static CharacterStats GetStats(this ICharacterData data)
     {
         var id = data.Id;
         var level = data.Level;
@@ -361,7 +335,7 @@ public static class CharacterDataExtension
         {
             result += equipment.GetStats();
         }
-        result += CharacterDataHelpers.GetStatsByAttributeAmountPairs(GetAttributes(data));
+        result += GameDataHelpers.GetStatsByAttributeAmountPairs(GetAttributes(data));
         return result;
     }
 
@@ -381,9 +355,9 @@ public static class CharacterDataExtension
         var buffs = data.Buffs;
         foreach (var buff in buffs)
         {
-            result += buff.GetBuffStats() + buff.GetDebuffStats();
+            result += buff.GetStats();
         }
-        result += CharacterDataHelpers.GetStatsByAttributeAmountPairs(GetAttributesWithBuffs(data));
+        result += GameDataHelpers.GetStatsByAttributeAmountPairs(GetAttributesWithBuffs(data));
         return result;
     }
     #endregion

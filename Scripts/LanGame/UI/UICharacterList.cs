@@ -62,7 +62,7 @@ public class UICharacterList : UIBase
         TempList.Generate(selectableCharacters, (index, character, ui) =>
         {
             var uiCharacter = ui.GetComponent<UICharacter>();
-            uiCharacter.data = character;
+            uiCharacter.Data = character;
             // Select trigger when add first entry so deactive all models is okay beacause first model will active
             var characterModel = character.InstantiateModel(characterModelContainer);
             CharacterModels[character.Id] = characterModel;
@@ -85,7 +85,7 @@ public class UICharacterList : UIBase
         buttonStart.gameObject.SetActive(true);
         buttonDelete.gameObject.SetActive(true);
         characterModelContainer.SetChildrenActive(false);
-        ShowCharacter(ui.data.Id);
+        ShowCharacter(ui.Data.Id);
     }
 
     protected void ShowCharacter(string id)
@@ -107,7 +107,7 @@ public class UICharacterList : UIBase
         // Load gameplay scene, we're going to manage maps in gameplay scene later
         // So we can add gameplay UI just once in gameplay scene
         var characterData = new CharacterData();
-        selectedUI.data.CloneTo(characterData);
+        selectedUI.Data.CloneTo(characterData);
         LanRpgNetworkManager.SelectedCharacter = characterData;
         UISceneLoading.Singleton.LoadScene(GameInstance.Singleton.startSceneName);
     }
@@ -121,7 +121,7 @@ public class UICharacterList : UIBase
             return;
         }
 
-        SelectionManager.SelectedUI.data.DeletePersistentCharacterData();
+        SelectionManager.SelectedUI.Data.DeletePersistentCharacterData();
         // Reload characters
         LoadCharacters();
     }

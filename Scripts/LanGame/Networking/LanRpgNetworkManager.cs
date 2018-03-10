@@ -64,14 +64,14 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
         writer.Put(SelectedCharacter.RespawnPosition.y);
         writer.Put(SelectedCharacter.RespawnPosition.z);
         writer.Put(SelectedCharacter.LastUpdate);
-        writer.Put(SelectedCharacter.AttributeLevels.Count);
-        foreach (var entry in SelectedCharacter.AttributeLevels)
+        writer.Put(SelectedCharacter.Attributes.Count);
+        foreach (var entry in SelectedCharacter.Attributes)
         {
             writer.Put(entry.attributeId);
-            writer.Put(entry.level);
+            writer.Put(entry.amount);
         }
-        writer.Put(SelectedCharacter.SkillLevels.Count);
-        foreach (var entry in SelectedCharacter.SkillLevels)
+        writer.Put(SelectedCharacter.Skills.Count);
+        foreach (var entry in SelectedCharacter.Skills)
         {
             writer.Put(entry.skillId);
             writer.Put(entry.level);
@@ -116,18 +116,18 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
         count = reader.GetInt();
         for (var i = 0; i < count; ++i)
         {
-            var entry = new CharacterAttributeLevel();
+            var entry = new CharacterAttribute();
             entry.attributeId = reader.GetString();
-            entry.level = reader.GetInt();
-            character.AttributeLevels.Add(entry);
+            entry.amount = reader.GetInt();
+            character.Attributes.Add(entry);
         }
         count = reader.GetInt();
         for (var i = 0; i < count; ++i)
         {
-            var entry = new CharacterSkillLevel();
+            var entry = new CharacterSkill();
             entry.skillId = reader.GetString();
             entry.level = reader.GetInt();
-            character.SkillLevels.Add(entry);
+            character.Skills.Add(entry);
         }
         count = reader.GetInt();
         for (var i = 0; i < count; ++i)

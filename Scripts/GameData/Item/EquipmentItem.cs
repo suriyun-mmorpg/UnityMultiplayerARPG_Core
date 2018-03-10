@@ -10,14 +10,12 @@ public class EquipmentItem : Item
 {
     public string equipPosition;
     public GameObject equipmentModel;
-    public CharacterClass requireClass;
     [Header("Requirements")]
-    public int requireCharacterLevel;
-    public CharacterAttributeAmount[] requireAttributes;
+    public EquipmentRequirement requirement;
     [Header("Add Attributes")]
-    public CharacterAttributeIncremental[] increaseAttributes;
+    public AttributeIncremental[] increaseAttributes;
     [Header("Add Resistances")]
-    public CharacterResistanceIncremental[] increaseResistances;
+    public ResistanceIncremental[] increaseResistances;
     [Header("Add Stats")]
     public CharacterStats baseStats;
     public CharacterStats statsIncreaseEachLevel;
@@ -30,4 +28,23 @@ public class EquipmentItem : Item
         EditorUtility.SetDirty(this);
     }
 #endif
+
+    private Dictionary<Attribute, int> tempRequireAttributeAmounts;
+    public Dictionary<Attribute, int> TempRequireAttributeAmounts
+    {
+        get
+        {
+            if (tempRequireAttributeAmounts == null)
+                tempRequireAttributeAmounts = GameDataHelpers.MakeAttributeAmountDictionary(requirement.attributeAmounts, new Dictionary<Attribute, int>());
+            return tempRequireAttributeAmounts;
+        }
+    }
+}
+
+[System.Serializable]
+public struct EquipmentRequirement
+{
+    public CharacterClass characterClass;
+    public int characterLevel;
+    public AttributeAmount[] attributeAmounts;
 }

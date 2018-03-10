@@ -9,7 +9,7 @@ using UnityEditor;
 public class CharacterClass : BaseGameData
 {
     [Header("Attributes/Stats")]
-    public CharacterAttributeAmount[] baseAttributes;
+    public AttributeAmount[] baseAttributes;
     public CharacterStats baseStats;
     public CharacterStats statsIncreaseEachLevel;
 

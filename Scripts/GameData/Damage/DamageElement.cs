@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "DamageElement", menuName = "Create GameData/DamageElement")]
 public class DamageElement : BaseGameData
 {
-    public CharacterResistance resistance;
+    public Resistance resistance;
     public float GetDamageReceiveRate(ICharacterData characterData)
     {
         if (resistance == null)

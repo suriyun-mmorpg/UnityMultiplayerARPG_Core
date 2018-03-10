@@ -37,7 +37,7 @@ public class GameInstance : MonoBehaviour
     public int minCharacterNameLength = 2;
     public int maxCharacterNameLength = 16;
     public static readonly HashSet<string> EquipmentPositions = new HashSet<string>();
-    public static readonly Dictionary<string, CharacterAttribute> CharacterAttributes = new Dictionary<string, CharacterAttribute>();
+    public static readonly Dictionary<string, Attribute> CharacterAttributes = new Dictionary<string, Attribute>();
     public static readonly Dictionary<string, CharacterClass> CharacterClasses = new Dictionary<string, CharacterClass>();
     public static readonly Dictionary<string, CharacterPrototype> CharacterPrototypes = new Dictionary<string, CharacterPrototype>();
     public static readonly Dictionary<string, DamageElement> DamageElements = new Dictionary<string, DamageElement>();
@@ -125,7 +125,7 @@ public class GameInstance : MonoBehaviour
         AddItems(tempStartItems);
     }
 
-    public static void AddCharacterAttributes(IEnumerable<CharacterAttribute> characterAttributes)
+    public static void AddCharacterAttributes(IEnumerable<Attribute> characterAttributes)
     {
         foreach (var characterAttribute in characterAttributes)
         {
@@ -142,10 +142,10 @@ public class GameInstance : MonoBehaviour
             if (characterClass == null || CharacterClasses.ContainsKey(characterClass.Id))
                 continue;
             CharacterClasses[characterClass.Id] = characterClass;
-            var attributes = new List<CharacterAttribute>();
+            var attributes = new List<Attribute>();
             foreach (var baseAttribute in characterClass.baseAttributes)
             {
-                if (baseAttribute == null || baseAttribute.attribute == null || CharacterAttributes.ContainsKey(baseAttribute.attribute.Id))
+                if (baseAttribute.attribute == null || CharacterAttributes.ContainsKey(baseAttribute.attribute.Id))
                     continue;
                 attributes.Add(baseAttribute.attribute);
             }
@@ -200,10 +200,11 @@ public class GameInstance : MonoBehaviour
                 if (!EquipmentPositions.Contains(equipmentItem.equipPosition))
                     EquipmentPositions.Add(equipmentItem.equipPosition);
 
-                var attributes = new List<CharacterAttribute>();
-                foreach (var requireAttribute in equipmentItem.requireAttributes)
+                var attributes = new List<Attribute>();
+                var requireAttributes = equipmentItem.requirement.attributeAmounts;
+                foreach (var requireAttribute in requireAttributes)
                 {
-                    if (requireAttribute == null || requireAttribute.attribute == null || CharacterAttributes.ContainsKey(requireAttribute.attribute.Id))
+                    if (requireAttribute.attribute == null || CharacterAttributes.ContainsKey(requireAttribute.attribute.Id))
                         continue;
                     attributes.Add(requireAttribute.attribute);
                 }
@@ -212,10 +213,10 @@ public class GameInstance : MonoBehaviour
             if (item is WeaponItem)
             {
                 var weaponItem = item as WeaponItem;
-                var attributes = new List<CharacterAttribute>();
+                var attributes = new List<Attribute>();
                 foreach (var effectivenessAttribute in weaponItem.WeaponType.effectivenessAttributes)
                 {
-                    if (effectivenessAttribute == null || effectivenessAttribute.attribute == null || CharacterAttributes.ContainsKey(effectivenessAttribute.attribute.Id))
+                    if (effectivenessAttribute.attribute == null || CharacterAttributes.ContainsKey(effectivenessAttribute.attribute.Id))
                         continue;
                     attributes.Add(effectivenessAttribute.attribute);
                 }
@@ -224,7 +225,7 @@ public class GameInstance : MonoBehaviour
                 var damageAttributes = weaponItem.additionalDamageAttributes;
                 foreach (var damageAttribute in damageAttributes)
                 {
-                    if (damageAttribute == null || damageAttribute.damageElement == null || DamageElements.ContainsKey(damageAttribute.damageElement.Id))
+                    if (damageAttribute.damageElement == null || DamageElements.ContainsKey(damageAttribute.damageElement.Id))
                         continue;
                     damageElements.Add(damageAttribute.damageElement);
                 }
@@ -247,7 +248,7 @@ public class GameInstance : MonoBehaviour
             var damageAttributes = skill.additionalDamageAttributes;
             foreach (var damageAttribute in damageAttributes)
             {
-                if (damageAttribute == null || damageAttribute.damageElement == null || DamageElements.ContainsKey(damageAttribute.damageElement.Id))
+                if (damageAttribute.damageElement == null || DamageElements.ContainsKey(damageAttribute.damageElement.Id))
                     continue;
                 damageElements.Add(damageAttribute.damageElement);
             }

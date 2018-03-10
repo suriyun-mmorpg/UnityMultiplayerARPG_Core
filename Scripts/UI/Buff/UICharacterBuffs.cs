@@ -29,7 +29,7 @@ public class UICharacterBuffs : UIBase
         TempList.Generate(buffs, (index, characterBuff, ui) =>
         {
             var uiCharacterBuff = ui.GetComponent<UICharacterBuff>();
-            uiCharacterBuff.data = characterBuff;
+            uiCharacterBuff.Data = characterBuff;
         });
     }
 }

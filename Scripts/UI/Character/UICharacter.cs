@@ -66,53 +66,59 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public Text textWeightLimit;
     public Text textAverageDamage;
     public Text textAllDamages;
-    public UICharacterAttributeLevel[] attributeLevels;
+    public UIAttributeAmountPair[] uiCharacterAttributes;
     [Header("Class information")]
     public Text textClassTitle;
     public Text textClassDescription;
     public Image imageClassIcon;
     [Header("Options")]
-    public bool showStatsWithBuff;
+    public bool showStatsWithBuffs;
+    public bool showAttributeWithBuffs;
 
-    private Dictionary<string, UICharacterAttributeLevel> tempAttributeLevels = null;
-    public Dictionary<string, UICharacterAttributeLevel> TempAttributeLevels
+    private Dictionary<string, UIAttributeAmount> tempUICharacterAttributes = null;
+    public Dictionary<string, UIAttributeAmount> TempUICharacterAttributes
     {
         get
         {
-            if (tempAttributeLevels == null)
+            if (tempUICharacterAttributes == null)
             {
-                tempAttributeLevels = new Dictionary<string, UICharacterAttributeLevel>();
-                foreach (var attributeLevel in attributeLevels)
+                tempUICharacterAttributes = new Dictionary<string, UIAttributeAmount>();
+                foreach (var uiCharacterAttribute in uiCharacterAttributes)
                 {
-                    if (attributeLevel != null && 
-                        attributeLevel.attribute != null && 
-                        !tempAttributeLevels.ContainsKey(attributeLevel.attribute.Id))
-                        tempAttributeLevels.Add(attributeLevel.attribute.Id, attributeLevel);
+                    if (uiCharacterAttribute.attribute != null &&
+                        uiCharacterAttribute.ui != null &&
+                        !tempUICharacterAttributes.ContainsKey(uiCharacterAttribute.attribute.Id))
+                        tempUICharacterAttributes.Add(uiCharacterAttribute.attribute.Id, uiCharacterAttribute.ui);
                 }
             }
-            return tempAttributeLevels;
+            return tempUICharacterAttributes;
         }
     }
 
-    protected virtual void Update()
+    private void Update()
+    {
+        UpdateData();
+    }
+
+    protected override void UpdateData()
     {
         if (textName != null)
-            textName.text = string.Format(nameFormat, data == null ? "Unknow" : data.CharacterName);
+            textName.text = string.Format(nameFormat, Data == null ? "Unknow" : Data.CharacterName);
 
         if (textLevel != null)
-            textLevel.text = string.Format(levelFormat, data == null ? "N/A" : data.Level.ToString("N0"));
+            textLevel.text = string.Format(levelFormat, Data == null ? "N/A" : Data.Level.ToString("N0"));
 
         var expTree = GameInstance.Singleton.expTree;
         var currentExp = 0;
         var nextLevelExp = 0;
-        if (data != null && data.GetNextLevelExp() > 0)
+        if (Data != null && Data.GetNextLevelExp() > 0)
         {
-            currentExp = data.Exp;
-            nextLevelExp = data.GetNextLevelExp();
+            currentExp = Data.Exp;
+            nextLevelExp = Data.GetNextLevelExp();
         }
-        else if (data != null && data.Level - 2 > 0 && data.Level - 2 < expTree.Length)
+        else if (Data != null && Data.Level - 2 > 0 && Data.Level - 2 < expTree.Length)
         {
-            var maxExp = expTree[data.Level - 2];
+            var maxExp = expTree[Data.Level - 2];
             currentExp = maxExp;
             nextLevelExp = maxExp;
         }
@@ -125,10 +131,10 @@ public class UICharacter : UISelectionEntry<ICharacterData>
 
         var currentHp = 0;
         var maxHp = 0;
-        if (data != null)
+        if (Data != null)
         {
-            currentHp = data.CurrentHp;
-            maxHp = data.GetMaxHp();
+            currentHp = Data.CurrentHp;
+            maxHp = Data.GetMaxHp();
         }
 
         if (textHp != null)
@@ -139,10 +145,10 @@ public class UICharacter : UISelectionEntry<ICharacterData>
 
         var currentMp = 0;
         var maxMp = 0;
-        if (data != null)
+        if (Data != null)
         {
-            currentMp = data.CurrentMp;
-            maxMp = data.GetMaxMp();
+            currentMp = Data.CurrentMp;
+            maxMp = Data.GetMaxMp();
         }
 
         if (textMp != null)
@@ -152,15 +158,15 @@ public class UICharacter : UISelectionEntry<ICharacterData>
             imageMpGage.fillAmount = maxMp <= 0 ? 1 : currentMp / maxMp;
 
         if (textStatPoint != null)
-            textStatPoint.text = string.Format(statPointFormat, data == null ? "N/A" : data.StatPoint.ToString("N0"));
+            textStatPoint.text = string.Format(statPointFormat, Data == null ? "N/A" : Data.StatPoint.ToString("N0"));
 
         if (textSkillPoint != null)
-            textSkillPoint.text = string.Format(skillPointFormat, data == null ? "N/A" : data.SkillPoint.ToString("N0"));
+            textSkillPoint.text = string.Format(skillPointFormat, Data == null ? "N/A" : Data.SkillPoint.ToString("N0"));
 
         if (textGold != null)
-            textGold.text = string.Format(goldFormat, data == null ? "N/A" : data.Gold.ToString("N0"));
+            textGold.text = string.Format(goldFormat, Data == null ? "N/A" : Data.Gold.ToString("N0"));
 
-        var stats = showStatsWithBuff ? data.GetStatsWithBuffs() : data.GetStatsWithoutBuffs();
+        var stats = showStatsWithBuffs ? Data.GetStatsWithBuffs() : Data.GetStats();
 
         if (textAtkRateStats != null)
             textAtkRateStats.text = string.Format(atkRateStatsFormat, stats.atkRate.ToString("N0"));
@@ -183,7 +189,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
             var damageAmountMin = 0f;
             var damageAmountMax = 0f;
             var damagesString = "";
-            var characterWeapons = data.GetWeapons();
+            var characterWeapons = Data.GetWeapons();
             foreach (var characterWeapon in characterWeapons)
             {
                 if (!string.IsNullOrEmpty(damagesString))
@@ -217,7 +223,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
                 textAllDamages.text = damagesString;
         }
 
-        var classData = data == null ? null : data.GetClass();
+        var classData = Data == null ? null : Data.GetClass();
         if (textClassTitle != null)
             textClassTitle.text = string.Format(classTitleFormat, classData == null ? "N/A" : classData.title);
 
@@ -230,19 +236,20 @@ public class UICharacter : UISelectionEntry<ICharacterData>
             imageClassIcon.gameObject.SetActive(classData != null);
         }
 
-        if (TempAttributeLevels.Count > 0 && data != null)
+        if (TempUICharacterAttributes.Count > 0 && Data != null)
         {
-            var attributeLevels = data.AttributeLevels;
-            for (var i = 0; i < attributeLevels.Count; ++i)
+            var totalAttributes = showAttributeWithBuffs ? Data.GetAttributesWithBuffs() : Data.GetAttributes();
+            var characterAttributes = Data.Attributes;
+            for (var i = 0; i < characterAttributes.Count; ++i)
             {
-                var attributeLevel = attributeLevels[i];
-                var attributeId = attributeLevel.attributeId;
-                if (TempAttributeLevels.ContainsKey(attributeId))
+                var characterAttribute = characterAttributes[i];
+                var attributeId = characterAttribute.attributeId;
+                var attribute = characterAttribute.GetAttribute();
+                if (TempUICharacterAttributes.ContainsKey(attributeId))
                 {
-                    var tempAttributeLevel = TempAttributeLevels[attributeId];
-                    tempAttributeLevel.data = attributeLevel.level;
-                    tempAttributeLevel.owningCharacter = data as CharacterEntity;
-                    tempAttributeLevel.indexOfData = i;
+                    var tempUICharacterAttribute = TempUICharacterAttributes[attributeId];
+                    tempUICharacterAttribute.Data = new KeyValuePair<Attribute, int>(attribute, totalAttributes[attribute]);
+                    tempUICharacterAttribute.indexOfData = i;
                 }
             }
         }

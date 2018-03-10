@@ -1,0 +1,67 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class UIAttributeAmounts : UISelectionEntry<Dictionary<Attribute, int>>
+{
+    [Tooltip("Attribute Amount Format => {0} = {Attribute title}, {1} = {Amount}")]
+    public string amountFormat = "{0}: {1}";
+
+    [Header("UI Elements")]
+    public Text textAllAmounts;
+    public UIAttributeTextTuple[] textAmounts;
+
+    private Dictionary<Attribute, Text> tempTextAmounts;
+    public Dictionary<Attribute, Text> TempTextAmounts
+    {
+        get
+        {
+            if (tempTextAmounts == null)
+            {
+                tempTextAmounts = new Dictionary<Attribute, Text>();
+                foreach (var textAmount in textAmounts)
+                {
+                    if (textAmount.attribute == null || textAmount.text == null)
+                        continue;
+                    var key = textAmount.attribute;
+                    var textComp = textAmount.text;
+                    textComp.text = string.Format(amountFormat, key.title, "0", "0");
+                    tempTextAmounts[key] = textComp;
+                }
+            }
+            return tempTextAmounts;
+        }
+    }
+
+    protected override void UpdateData()
+    {
+        if (textAllAmounts != null)
+        {
+            if (Data == null || Data.Count == 0)
+            {
+                textAllAmounts.gameObject.SetActive(false);
+                foreach (var textAmount in TempTextAmounts)
+                {
+                    var element = textAmount.Key;
+                    textAmount.Value.text = string.Format(amountFormat, element.title, "0", "0");
+                }
+            }
+            else
+            {
+                var text = "";
+                foreach (var dataEntry in Data)
+                {
+                    if (dataEntry.Key == null || dataEntry.Value == 0)
+                        continue;
+                    var amountText = string.Format(amountFormat, dataEntry.Key.title, dataEntry.Value);
+                    text += amountText + "\n";
+                    if (TempTextAmounts.ContainsKey(dataEntry.Key))
+                        TempTextAmounts[dataEntry.Key].text = amountText;
+                }
+                textAllAmounts.gameObject.SetActive(!string.IsNullOrEmpty(text));
+                textAllAmounts.text = text;
+            }
+        }
+    }
+}

@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
-public class UIEquipItemSlot : UICharacterItem
+[System.Serializable]
+public struct UICharacterItemPair
 {
     public string equipPosition;
+    public UICharacterItem ui;
 }

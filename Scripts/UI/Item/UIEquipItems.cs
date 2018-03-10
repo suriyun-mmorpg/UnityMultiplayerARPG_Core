@@ -9,37 +9,43 @@ using UnityEditor;
 public class UIEquipItems : UIBase
 {
     public System.Action<UICharacterItem> onSelectCharacterItem;
-    public UIEquipItemSlot rightHandSlot;
-    public UIEquipItemSlot leftHandSlot;
-    public UIEquipItemSlot[] otherEquipSlots;
+    public UICharacterItemPair rightHandSlot;
+    public UICharacterItemPair leftHandSlot;
+    public UICharacterItemPair[] otherEquipSlots;
 
-    private Dictionary<string, UIEquipItemSlot> tempEquipItemSlots = null;
-    public Dictionary<string, UIEquipItemSlot> TempEquipItemSlots
+    private Dictionary<string, UICharacterItem> tempEquipItemSlots = null;
+    public Dictionary<string, UICharacterItem> TempEquipItemSlots
     {
         get
         {
             if (tempEquipItemSlots == null)
             {
-                tempEquipItemSlots = new Dictionary<string, UIEquipItemSlot>();
+                tempEquipItemSlots = new Dictionary<string, UICharacterItem>();
                 SelectionManager.Clear();
-                if (rightHandSlot != null)
+                if (rightHandSlot.ui != null)
                 {
-                    rightHandSlot.equipPosition = GameDataConst.EQUIP_POSITION_RIGHT_HAND;
-                    tempEquipItemSlots.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandSlot);
-                    SelectionManager.Add(rightHandSlot);
+                    var equipPosition = GameDataConst.EQUIP_POSITION_RIGHT_HAND;
+                    rightHandSlot.ui.equipPosition = equipPosition;
+                    tempEquipItemSlots.Add(equipPosition, rightHandSlot.ui);
+                    SelectionManager.Add(rightHandSlot.ui);
                 }
-                if (leftHandSlot != null)
+                if (leftHandSlot.ui != null)
                 {
-                    leftHandSlot.equipPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
-                    tempEquipItemSlots.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandSlot);
-                    SelectionManager.Add(leftHandSlot);
+                    var equipPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
+                    leftHandSlot.ui.equipPosition = equipPosition;
+                    tempEquipItemSlots.Add(equipPosition, leftHandSlot.ui);
+                    SelectionManager.Add(leftHandSlot.ui);
                 }
                 foreach (var otherEquipSlot in otherEquipSlots)
                 {
-                    if (otherEquipSlot != null && !tempEquipItemSlots.ContainsKey(otherEquipSlot.equipPosition))
+                    if (!string.IsNullOrEmpty(otherEquipSlot.equipPosition) &&
+                        otherEquipSlot.ui != null && 
+                        !tempEquipItemSlots.ContainsKey(otherEquipSlot.equipPosition))
                     {
-                        tempEquipItemSlots.Add(otherEquipSlot.equipPosition, otherEquipSlot);
-                        SelectionManager.Add(otherEquipSlot);
+                        var equipPosition = otherEquipSlot.equipPosition;
+                        otherEquipSlot.ui.equipPosition = equipPosition;
+                        tempEquipItemSlots.Add(equipPosition, otherEquipSlot.ui);
+                        SelectionManager.Add(otherEquipSlot.ui);
                     }
                 }
             }
@@ -88,16 +94,9 @@ public class UIEquipItems : UIBase
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        if (rightHandSlot != null)
-        {
-            rightHandSlot.equipPosition = GameDataConst.EQUIP_POSITION_RIGHT_HAND;
-            EditorUtility.SetDirty(rightHandSlot);
-        }
-        if (leftHandSlot != null)
-        {
-            leftHandSlot.equipPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
-            EditorUtility.SetDirty(leftHandSlot);
-        }
+        rightHandSlot.equipPosition = GameDataConst.EQUIP_POSITION_RIGHT_HAND;
+        leftHandSlot.equipPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
+        EditorUtility.SetDirty(this);
     }
 #endif
 
@@ -110,7 +109,7 @@ public class UIEquipItems : UIBase
         // Clear slots data
         foreach (var slot in slots)
         {
-            slot.data.Empty();
+            slot.Data.Empty();
         }
 
         var equipItems = characterEntity.equipItems;
@@ -130,8 +129,7 @@ public class UIEquipItems : UIBase
             if (TempEquipItemSlots.ContainsKey(position))
             {
                 var slot = TempEquipItemSlots[position];
-                slot.data = equipItem;
-                slot.owningCharacter = characterEntity;
+                slot.Data = equipItem;
                 slot.indexOfData = i;
             }
         }

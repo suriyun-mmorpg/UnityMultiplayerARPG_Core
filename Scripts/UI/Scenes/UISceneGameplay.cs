@@ -17,12 +17,12 @@ public class UISceneGameplay : MonoBehaviour
     public UICharacterBuffs uiBuffList;
     public UIEquipItems uiEquipItems;
     public UINonEquipItems uiNonEquipItems;
-    public UICharacterSkillLevels uiSkillLevelList;
+    public UICharacterSkills uiSkills;
     public UIToggleUI[] toggleUis;
     
-    public UIEquipItemSlot SelectedEquipItem { get; private set; }
+    public UICharacterItem SelectedEquipItem { get; private set; }
     public UICharacterItem SelectedNonEquipItem { get; private set; }
-    public UICharacterSkillLevel SelectedSkillLevel { get; private set; }
+    public UICharacterSkill SelectedSkillLevel { get; private set; }
 
     private void Awake()
     {
@@ -31,12 +31,6 @@ public class UISceneGameplay : MonoBehaviour
 
     private void Start()
     {
-        foreach (var uiCharacter in uiCharacters)
-        {
-            if (uiCharacter != null)
-                uiCharacter.data = CharacterEntity.OwningCharacter;
-        }
-
         if (uiEquipItems != null)
             uiEquipItems.onSelectCharacterItem += OnSelectEquipItem;
 
@@ -65,7 +59,7 @@ public class UISceneGameplay : MonoBehaviour
     private void OnSelectEquipItem(UICharacterItem ui)
     {
         var owningCharacter = CharacterEntity.OwningCharacter;
-        var slot = ui as UIEquipItemSlot;
+        var slot = ui as UICharacterItem;
         if (SelectedEquipItem != null)
         {
             uiEquipItems.SelectionManager.DeSelectAll();
@@ -77,7 +71,7 @@ public class UISceneGameplay : MonoBehaviour
             uiEquipItems.SelectionManager.DeSelectAll();
             uiNonEquipItems.SelectionManager.DeSelectAll();
         }
-        else if (ui.data.IsValid())
+        else if (ui.Data.IsValid())
             SelectedEquipItem = slot;
         else
             uiEquipItems.SelectionManager.DeSelectAll();
@@ -98,15 +92,24 @@ public class UISceneGameplay : MonoBehaviour
             uiEquipItems.SelectionManager.DeSelectAll();
             uiNonEquipItems.SelectionManager.DeSelectAll();
         }
-        else if (ui.data.IsValid())
+        else if (ui.Data.IsValid())
             SelectedNonEquipItem = ui;
         else
             uiNonEquipItems.SelectionManager.DeSelectAll();
     }
 
-    private void OnSelectCharacterSkillLevel(UICharacterSkillLevel ui)
+    private void OnSelectCharacterSkill(UICharacterSkill ui)
     {
         SelectedSkillLevel = ui;
+    }
+
+    public void UpdateCharacter()
+    {
+        foreach (var uiCharacter in uiCharacters)
+        {
+            if (uiCharacter != null)
+                uiCharacter.Data = CharacterEntity.OwningCharacter;
+        }
     }
 
     public void UpdateBuffs()
@@ -127,9 +130,9 @@ public class UISceneGameplay : MonoBehaviour
             uiNonEquipItems.UpdateData(CharacterEntity.OwningCharacter);
     }
 
-    public void UpdateSkillLevels()
+    public void UpdateSkills()
     {
-        if (uiSkillLevelList != null)
-            uiSkillLevelList.UpdateData(CharacterEntity.OwningCharacter);
+        if (uiSkills != null)
+            uiSkills.UpdateData(CharacterEntity.OwningCharacter);
     }
 }

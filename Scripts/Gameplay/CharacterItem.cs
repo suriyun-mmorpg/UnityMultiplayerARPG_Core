@@ -22,8 +22,8 @@ public class CharacterItem
     private ShieldItem cacheShieldItem;
     private KeyValuePair<DamageElement, DamageAmount> cacheBaseDamageAttribute;
     private readonly Dictionary<DamageElement, DamageAmount> cacheAdditionalDamageAttributes = new Dictionary<DamageElement, DamageAmount>();
-    private readonly Dictionary<CharacterAttribute, int> cacheIncreaseAttributes = new Dictionary<CharacterAttribute, int>();
-    private readonly Dictionary<CharacterResistance, float> cacheIncreaseResistances = new Dictionary<CharacterResistance, float>();
+    private readonly Dictionary<Attribute, int> cacheIncreaseAttributes = new Dictionary<Attribute, int>();
+    private readonly Dictionary<Resistance, float> cacheIncreaseResistances = new Dictionary<Resistance, float>();
 
     private bool IsDirty()
     {
@@ -47,13 +47,13 @@ public class CharacterItem
         cacheAdditionalDamageAttributes.Clear();
         if (cacheEquipmentItem != null)
         {
-            CharacterDataHelpers.MakeAttributeIncrementalCache(cacheEquipmentItem.increaseAttributes, cacheIncreaseAttributes, level);
-            CharacterDataHelpers.MakeResistanceIncrementalCache(cacheEquipmentItem.increaseResistances, cacheIncreaseResistances, level);
+            GameDataHelpers.MakeAttributeIncrementalDictionary(cacheEquipmentItem.increaseAttributes, cacheIncreaseAttributes, level);
+            GameDataHelpers.MakeResistanceIncrementalDictionary(cacheEquipmentItem.increaseResistances, cacheIncreaseResistances, level);
         }
         if (cacheWeaponItem != null)
         {
-            cacheBaseDamageAttribute = CharacterDataHelpers.MakeDamageAttributeCache(cacheWeaponItem.baseDamageAttribute, level);
-            CharacterDataHelpers.MakeDamageAttributesCache(cacheWeaponItem.additionalDamageAttributes, cacheAdditionalDamageAttributes, level);
+            cacheBaseDamageAttribute = GameDataHelpers.MakeDamageAttributePair(cacheWeaponItem.baseDamageAttribute, level);
+            GameDataHelpers.MakeDamageAttributesDictionary(cacheWeaponItem.additionalDamageAttributes, cacheAdditionalDamageAttributes, level);
         }
     }
 
@@ -93,13 +93,13 @@ public class CharacterItem
         return cacheAdditionalDamageAttributes;
     }
 
-    public Dictionary<CharacterAttribute, int> GetIncreaseAttributes()
+    public Dictionary<Attribute, int> GetIncreaseAttributes()
     {
         MakeCache();
         return cacheIncreaseAttributes;
     }
 
-    public Dictionary<CharacterResistance, float> GetIncreaseResistances()
+    public Dictionary<Resistance, float> GetIncreaseResistances()
     {
         MakeCache();
         return cacheIncreaseResistances;
@@ -121,12 +121,14 @@ public class CharacterItem
         return amount == GetMaxStack();
     }
 
+    public bool CanEquip(ICharacterData character)
+    {
+        return GetEquipmentItem().CanEquip(character, level);
+    }
+
     public CharacterStats GetStats()
     {
-        var equipmentItem = GetEquipmentItem();
-        if (equipmentItem == null)
-            return new CharacterStats();
-        return equipmentItem.baseStats + equipmentItem.statsIncreaseEachLevel * level;
+        return GetEquipmentItem().GetStats(level);
     }
 
     public void Empty()

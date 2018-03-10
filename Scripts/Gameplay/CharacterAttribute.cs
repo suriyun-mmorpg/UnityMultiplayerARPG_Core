@@ -4,12 +4,12 @@ using LiteNetLib.Utils;
 using LiteNetLibHighLevel;
 
 [System.Serializable]
-public class CharacterAttributeLevel
+public class CharacterAttribute
 {
     public string attributeId;
-    public int level;
+    public int amount;
 
-    public CharacterAttribute GetAttribute()
+    public Attribute GetAttribute()
     {
         return GameInstance.CharacterAttributes.ContainsKey(attributeId) ? GameInstance.CharacterAttributes[attributeId] : null;
     }
@@ -20,29 +20,29 @@ public class CharacterAttributeLevel
     }
 }
 
-public class NetFieldCharacterAttributeLevel : LiteNetLibNetField<CharacterAttributeLevel>
+public class NetFieldCharacterAttribute : LiteNetLibNetField<CharacterAttribute>
 {
     public override void Deserialize(NetDataReader reader)
     {
-        var newValue = new CharacterAttributeLevel();
+        var newValue = new CharacterAttribute();
         newValue.attributeId = reader.GetString();
-        newValue.level = reader.GetInt();
+        newValue.amount = reader.GetInt();
         Value = newValue;
     }
 
     public override void Serialize(NetDataWriter writer)
     {
         if (Value == null)
-            Value = new CharacterAttributeLevel();
+            Value = new CharacterAttribute();
         writer.Put(Value.attributeId);
-        writer.Put(Value.level);
+        writer.Put(Value.amount);
     }
 
-    public override bool IsValueChanged(CharacterAttributeLevel newValue)
+    public override bool IsValueChanged(CharacterAttribute newValue)
     {
         return true;
     }
 }
 
 [System.Serializable]
-public class SyncListCharacterAttributeLevel : LiteNetLibSyncList<NetFieldCharacterAttributeLevel, CharacterAttributeLevel> { }
+public class SyncListCharacterAttribute : LiteNetLibSyncList<NetFieldCharacterAttribute, CharacterAttribute> { }

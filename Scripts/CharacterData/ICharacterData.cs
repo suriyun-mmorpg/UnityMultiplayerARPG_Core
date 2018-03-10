@@ -26,8 +26,8 @@ public interface ICharacterData
     string RespawnMapName { get; set; }
     Vector3 RespawnPosition { get; set; }
     int LastUpdate { get; set; }
-    IList<CharacterAttributeLevel> AttributeLevels { get; set; }
-    IList<CharacterSkillLevel> SkillLevels { get; set; }
+    IList<CharacterAttribute> Attributes { get; set; }
+    IList<CharacterSkill> Skills { get; set; }
     IList<CharacterBuff> Buffs { get; set; }
     IList<CharacterItem> EquipItems { get; set; }
     IList<CharacterItem> NonEquipItems { get; set; }

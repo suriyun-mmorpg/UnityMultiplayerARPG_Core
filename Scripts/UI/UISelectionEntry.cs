@@ -6,7 +6,16 @@ public abstract class UISelectionEntry<T> : UIBase
 {
     [Header("UI Selection Elements")]
     public GameObject objectSelected;
-    public T data;
+    private T data;
+    public T Data
+    {
+        get { return data; }
+        set
+        {
+            data = value;
+            UpdateData();
+        }
+    }
     public UISelectionManager selectionManager;
 
     private bool isSelected;
@@ -27,6 +36,11 @@ public abstract class UISelectionEntry<T> : UIBase
         IsSelected = false;
     }
 
+    public void ForceUpdate()
+    {
+        UpdateData();
+    }
+
     public void OnClickSelect()
     {
         if (selectionManager != null)
@@ -42,4 +56,6 @@ public abstract class UISelectionEntry<T> : UIBase
     {
         IsSelected = false;
     }
+
+    protected abstract void UpdateData();
 }

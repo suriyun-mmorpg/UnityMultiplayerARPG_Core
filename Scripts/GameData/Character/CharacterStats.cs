@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 [System.Serializable]
-public class CharacterStats
+public struct CharacterStats
 {
     public float hp;
     public float mp;

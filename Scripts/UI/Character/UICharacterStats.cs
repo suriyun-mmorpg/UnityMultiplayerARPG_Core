@@ -24,25 +24,25 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
     [Header("UI Elements")]
     public Text textStats;
 
-    private void Update()
+    protected override void UpdateData()
     {
         if (textStats != null)
         {
             var statsString = "";
-            if (data.hp != 0)
-                statsString += string.Format(hpStatsFormat, data.hp) + "\n";
-            if (data.mp != 0)
-                statsString += string.Format(mpStatsFormat, data.mp) + "\n";
-            if (data.atkRate != 0)
-                statsString += string.Format(atkRateStatsFormat, data.atkRate) + "\n";
-            if (data.def != 0)
-                statsString += string.Format(defStatsFormat, data.def) + "\n";
-            if (data.criHitRate != 0)
-                statsString += string.Format(criHitRateStatsFormat, (data.criHitRate * 100).ToString("N2")) + "\n";
-            if (data.criDmgRate != 0)
-                statsString += string.Format(criDmgRateStatsFormat, (data.criDmgRate * 100).ToString("N2")) + "\n";
-            if (data.weightLimit != 0)
-                statsString += string.Format(weightLimitStatsFormat, data.weightLimit.ToString("N2")) + "\n";
+            if (Data.hp != 0)
+                statsString += string.Format(hpStatsFormat, Data.hp) + "\n";
+            if (Data.mp != 0)
+                statsString += string.Format(mpStatsFormat, Data.mp) + "\n";
+            if (Data.atkRate != 0)
+                statsString += string.Format(atkRateStatsFormat, Data.atkRate) + "\n";
+            if (Data.def != 0)
+                statsString += string.Format(defStatsFormat, Data.def) + "\n";
+            if (Data.criHitRate != 0)
+                statsString += string.Format(criHitRateStatsFormat, (Data.criHitRate * 100).ToString("N2")) + "\n";
+            if (Data.criDmgRate != 0)
+                statsString += string.Format(criDmgRateStatsFormat, (Data.criDmgRate * 100).ToString("N2")) + "\n";
+            if (Data.weightLimit != 0)
+                statsString += string.Format(weightLimitStatsFormat, Data.weightLimit.ToString("N2")) + "\n";
             textStats.gameObject.SetActive(!string.IsNullOrEmpty(statsString));
             textStats.text = statsString;
         }

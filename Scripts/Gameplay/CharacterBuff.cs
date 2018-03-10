@@ -14,10 +14,10 @@ public class CharacterBuff
     private string dirtySkillId;
     private int dirtyLevel;
     private Skill cacheSkill;
-    private readonly Dictionary<CharacterAttribute, int> cacheBuffAttributes = new Dictionary<CharacterAttribute, int>();
-    private readonly Dictionary<CharacterResistance, float> cacheBuffResistances = new Dictionary<CharacterResistance, float>();
-    private readonly Dictionary<CharacterAttribute, int> cacheDebuffAttributes = new Dictionary<CharacterAttribute, int>();
-    private readonly Dictionary<CharacterResistance, float> cacheDebuffResistances = new Dictionary<CharacterResistance, float>();
+    private readonly Dictionary<Attribute, int> cacheBuffAttributes = new Dictionary<Attribute, int>();
+    private readonly Dictionary<Resistance, float> cacheBuffResistances = new Dictionary<Resistance, float>();
+    private readonly Dictionary<Attribute, int> cacheDebuffAttributes = new Dictionary<Attribute, int>();
+    private readonly Dictionary<Resistance, float> cacheDebuffResistances = new Dictionary<Resistance, float>();
 
     private bool IsDirty()
     {
@@ -42,13 +42,13 @@ public class CharacterBuff
         {
             if (isDebuff)
             {
-                CharacterDataHelpers.MakeAttributeIncrementalCache(cacheSkill.debuff.increaseAttributes, cacheDebuffAttributes, level);
-                CharacterDataHelpers.MakeResistanceIncrementalCache(cacheSkill.debuff.increaseResistances, cacheDebuffResistances, level);
+                GameDataHelpers.MakeAttributeIncrementalDictionary(cacheSkill.debuff.increaseAttributes, cacheDebuffAttributes, level);
+                GameDataHelpers.MakeResistanceIncrementalDictionary(cacheSkill.debuff.increaseResistances, cacheDebuffResistances, level);
             }
             else
             {
-                CharacterDataHelpers.MakeAttributeIncrementalCache(cacheSkill.buff.increaseAttributes, cacheBuffAttributes, level);
-                CharacterDataHelpers.MakeResistanceIncrementalCache(cacheSkill.buff.increaseResistances, cacheBuffResistances, level);
+                GameDataHelpers.MakeAttributeIncrementalDictionary(cacheSkill.buff.increaseAttributes, cacheBuffAttributes, level);
+                GameDataHelpers.MakeResistanceIncrementalDictionary(cacheSkill.buff.increaseResistances, cacheBuffResistances, level);
             }
         }
     }
@@ -59,103 +59,37 @@ public class CharacterBuff
         return cacheSkill;
     }
 
-    public Dictionary<CharacterAttribute, int> GetBuffAttributes()
+    public Dictionary<Attribute, int> GetAttributes()
     {
         MakeCache();
-        return cacheBuffAttributes;
+        return !isDebuff ? cacheBuffAttributes : cacheDebuffAttributes;
     }
 
-    public Dictionary<CharacterResistance, float> GetBuffResistances()
+    public Dictionary<Resistance, float> GetResistances()
     {
         MakeCache();
-        return cacheBuffResistances;
+        return !isDebuff ? cacheBuffResistances : cacheDebuffResistances;
     }
 
-    public Dictionary<CharacterAttribute, int> GetDebuffAttributes()
+    public float GetDuration()
     {
-        MakeCache();
-        return cacheDebuffAttributes;
+        return !isDebuff ? GetSkill().GetBuffDuration(level) : GetSkill().GetDebuffDuration(level);
     }
 
-    public Dictionary<CharacterResistance, float> GetDebuffResistances()
+    public CharacterStats GetStats()
     {
-        MakeCache();
-        return cacheDebuffResistances;
+        return !isDebuff ? GetSkill().GetBuffStats(level) : GetSkill().GetDebuffStats(level);
     }
 
-    #region Buff
-    public CharacterStats GetBuffStats()
+    public int GetBuffRecoveryHp()
     {
-        var skill = GetSkill();
-        if (skill == null || isDebuff)
-            return new CharacterStats();
-        return skill.buff.baseStats + skill.buff.statsIncreaseEachLevel * level;
+        return !isDebuff ? GetSkill().GetBuffRecoveryHp(level) : GetSkill().GetDebuffRecoveryHp(level);
     }
 
-    public float GetBuffDuration()
+    public int GetBuffRecoveryMp()
     {
-        var skill = GetSkill();
-        if (skill == null || isDebuff)
-            return 0f;
-        var duration = skill.buff.baseDuration + skill.buff.durationIncreaseEachLevel * level;
-        if (duration < 0f)
-            duration = 0f;
-        return duration;
+        return !isDebuff ? GetSkill().GetBuffRecoveryMp(level) : GetSkill().GetDebuffRecoveryMp(level);
     }
-
-    public float GetBuffRecoveryHp()
-    {
-        var skill = GetSkill();
-        if (skill == null || isDebuff)
-            return 0f;
-        return skill.buff.baseRecoveryHp + skill.buff.recoveryHpIncreaseEachLevel * level;
-    }
-
-    public float GetBuffRecoveryMp()
-    {
-        var skill = GetSkill();
-        if (skill == null || isDebuff)
-            return 0f;
-        return skill.buff.baseRecoveryMp + skill.buff.recoveryMpIncreaseEachLevel * level;
-    }
-    #endregion
-
-    #region Debuff
-    public CharacterStats GetDebuffStats()
-    {
-        var skill = GetSkill();
-        if (skill == null || !isDebuff)
-            return new CharacterStats();
-        return skill.debuff.baseStats + skill.debuff.statsIncreaseEachLevel * level;
-    }
-
-    public float GetDebuffDuration()
-    {
-        var skill = GetSkill();
-        if (skill == null || !isDebuff)
-            return 0f;
-        var duration = skill.debuff.baseDuration + skill.debuff.durationIncreaseEachLevel * level;
-        if (duration < 0f)
-            duration = 0f;
-        return duration;
-    }
-
-    public float GetDebuffRecoveryHp()
-    {
-        var skill = GetSkill();
-        if (skill == null || !isDebuff)
-            return 0f;
-        return skill.debuff.baseRecoveryHp + skill.debuff.recoveryHpIncreaseEachLevel * level;
-    }
-
-    public float GetDebuffRecoveryMp()
-    {
-        var skill = GetSkill();
-        if (skill == null || !isDebuff)
-            return 0f;
-        return skill.debuff.baseRecoveryMp + skill.debuff.recoveryMpIncreaseEachLevel * level;
-    }
-    #endregion
 
     public bool ShouldRemove()
     {
@@ -164,7 +98,7 @@ public class CharacterBuff
 
     public void Added()
     {
-        buffRemainsDuration = GetBuffDuration();
+        buffRemainsDuration = GetDuration();
     }
 
     public void Update(float deltaTime)

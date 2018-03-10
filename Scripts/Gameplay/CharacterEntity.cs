@@ -33,8 +33,8 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     public SyncFieldInt gold = new SyncFieldInt();
 
     [Header("Sync Lists")]
-    public SyncListCharacterAttributeLevel attributeLevels = new SyncListCharacterAttributeLevel();
-    public SyncListCharacterSkillLevel skillLevels = new SyncListCharacterSkillLevel();
+    public SyncListCharacterAttribute attributes = new SyncListCharacterAttribute();
+    public SyncListCharacterSkill skills = new SyncListCharacterSkill();
     public SyncListCharacterBuff buffs = new SyncListCharacterBuff();
     public SyncListCharacterItem equipItems = new SyncListCharacterItem();
     public SyncListCharacterItem nonEquipItems = new SyncListCharacterItem();
@@ -56,8 +56,8 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     protected LiteNetLibFunction<NetFieldInt, NetFieldInt> netFuncSwapOrMergeItem;
     protected LiteNetLibFunction<NetFieldInt, NetFieldString> netFuncEquipItem;
     protected LiteNetLibFunction<NetFieldString, NetFieldInt> netFuncUnEquipItem;
-    protected LiteNetLibFunction<NetFieldInt> netFuncAddAttributeLevel;
-    protected LiteNetLibFunction<NetFieldInt> netFuncAddSkillLevel;
+    protected LiteNetLibFunction<NetFieldInt> netFuncAddAttribute;
+    protected LiteNetLibFunction<NetFieldInt> netFuncAddSkill;
     #endregion
 
     public string Id { get { return id; } set { id.Value = value; } }
@@ -91,24 +91,24 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
 
-    public IList<CharacterAttributeLevel> AttributeLevels
+    public IList<CharacterAttribute> Attributes
     {
-        get { return attributeLevels; }
+        get { return attributes; }
         set
         {
-            attributeLevels.Clear();
+            attributes.Clear();
             foreach (var entry in value)
-                attributeLevels.Add(entry);
+                attributes.Add(entry);
         }
     }
-    public IList<CharacterSkillLevel> SkillLevels
+    public IList<CharacterSkill> Skills
     {
-        get { return skillLevels; }
+        get { return skills; }
         set
         {
-            skillLevels.Clear();
+            skills.Clear();
             foreach (var entry in value)
-                skillLevels.Add(entry);
+                skills.Add(entry);
         }
     }
     public IList<CharacterBuff> Buffs
@@ -230,15 +230,15 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         if (CurrentHp <= 0 || !IsServer)
             return;
         var timeDiff = Time.realtimeSinceStartup - lastUpdateSkillAndBuffTime;
-        var count = skillLevels.Count;
+        var count = skills.Count;
         for (var i = count - 1; i >= 0; --i)
         {
-            var skillLevel = skillLevels[i];
-            if (skillLevel.ShouldUpdate())
+            var level = skills[i];
+            if (level.ShouldUpdate())
             {
-                skillLevel.Update(Time.unscaledDeltaTime);
+                level.Update(Time.unscaledDeltaTime);
                 if (timeDiff > UPDATE_SKILL_BUFF_INTERVAL)
-                    skillLevels.Dirty(i);
+                    skills.Dirty(i);
             }
         }
         count = buffs.Count;
@@ -273,7 +273,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         buffs.onOperation += OnBuffsOperation;
         equipItems.onOperation += OnEquipItemsOperation;
         nonEquipItems.onOperation += OnNonEquipItemsOperation;
-        skillLevels.onOperation += OnSkillLevelsOperation;
+        skills.onOperation += OnSkillsOperation;
         netFuncAttack = new LiteNetLibFunction(NetFuncAttackCallback);
         netFuncUseSkill = new LiteNetLibFunction<NetFieldInt>(NetFuncUseSkillCallback);
         netFuncPlayActionAnimation = new LiteNetLibFunction<NetFieldFloat, NetFieldInt>(NetFuncPlayActionAnimationCallback);
@@ -282,8 +282,8 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         netFuncSwapOrMergeItem = new LiteNetLibFunction<NetFieldInt, NetFieldInt>(NetFuncSwapOrMergeItemCallback);
         netFuncEquipItem = new LiteNetLibFunction<NetFieldInt, NetFieldString>(NetFuncEquipItemCallback);
         netFuncUnEquipItem = new LiteNetLibFunction<NetFieldString, NetFieldInt>(NetFuncUnEquipItemCallback);
-        netFuncAddAttributeLevel = new LiteNetLibFunction<NetFieldInt>(NetFuncAddAttributeLevelCallback);
-        netFuncAddSkillLevel = new LiteNetLibFunction<NetFieldInt>(NetFuncAddSkillLevelCallback);
+        netFuncAddAttribute = new LiteNetLibFunction<NetFieldInt>(NetFuncAddAttributeCallback);
+        netFuncAddSkill = new LiteNetLibFunction<NetFieldInt>(NetFuncAddSkillCallback);
         RegisterNetFunction("Attack", netFuncAttack);
         RegisterNetFunction("PlayActionAnimation", netFuncPlayActionAnimation);
         RegisterNetFunction("PickupItem", netFuncPickupItem);
@@ -291,8 +291,8 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         RegisterNetFunction("SwapOrMergeItem", netFuncSwapOrMergeItem);
         RegisterNetFunction("EquipItem", netFuncEquipItem);
         RegisterNetFunction("UnEquipItem", netFuncUnEquipItem);
-        RegisterNetFunction("AddAttributeLevel", netFuncAddAttributeLevel);
-        RegisterNetFunction("AddSkillLevel", netFuncAddSkillLevel);
+        RegisterNetFunction("AddAttribute", netFuncAddAttribute);
+        RegisterNetFunction("AddSkill", netFuncAddSkill);
     }
 
     #region Net functions callbacks
@@ -382,10 +382,10 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected void NetFuncUseSkill(int skillIndex)
     {
-        if (CurrentHp <= 0 || model == null || doingAction || skillIndex < 0 || skillIndex >= skillLevels.Count)
+        if (CurrentHp <= 0 || model == null || doingAction || skillIndex < 0 || skillIndex >= skills.Count)
             return;
 
-        var characterSkill = skillLevels[skillIndex];
+        var characterSkill = skills[skillIndex];
         if (!characterSkill.CanUse(CurrentMp))
             return;
 
@@ -405,7 +405,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     IEnumerator UseSkillRoutine(int skillIndex)
     {
-        var characterSkill = skillLevels[skillIndex];
+        var characterSkill = skills[skillIndex];
         var skill = characterSkill.GetSkill();
         var anim = skill.castAnimation;
         yield return new WaitForSecondsRealtime(anim.triggerDuration);
@@ -419,13 +419,13 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                 break;
         }
         ApplySkillBuff(characterSkill);
-        skillLevels[skillIndex].Used();
-        skillLevels.Dirty(skillIndex);
+        skills[skillIndex].Used();
+        skills.Dirty(skillIndex);
         yield return new WaitForSecondsRealtime(anim.totalDuration - anim.triggerDuration);
         doingAction = false;
     }
 
-    protected void AttackAsPureSkillDamage(CharacterSkillLevel characterSkill)
+    protected void AttackAsPureSkillDamage(CharacterSkill characterSkill)
     {
         if (characterSkill == null)
             return;
@@ -462,7 +462,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
 
-    protected void AttackAsWeaponDamageInflict(CharacterSkillLevel characterSkill)
+    protected void AttackAsWeaponDamageInflict(CharacterSkill characterSkill)
     {
         if (characterSkill == null)
             return;
@@ -489,6 +489,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         var weaponAdditionalDamageAttributes = equipWeapon.GetAdditionalDamageAttributes();
         var inflictDamageAttributes = characterSkill.GetInflictDamageAttributes();
         var allAdditionalDamageAttributes = new Dictionary<DamageElement, DamageAmount>();
+        baseDamageAttribute = new KeyValuePair<DamageElement, DamageAmount>(baseDamageAttribute.Key, baseDamageAttribute.Value * characterSkill.GetInflictRate());
         foreach (var weaponAdditionalDamageAttribute in weaponAdditionalDamageAttributes)
         {
             var element = weaponAdditionalDamageAttribute.Key;
@@ -533,7 +534,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
 
-    protected void ApplySkillBuff(CharacterSkillLevel characterSkill)
+    protected void ApplySkillBuff(CharacterSkill characterSkill)
     {
         if (characterSkill == null)
             return;
@@ -748,40 +749,40 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
 
-    protected void NetFuncAddAttributeLevelCallback(NetFieldInt attributeIndex)
+    protected void NetFuncAddAttributeCallback(NetFieldInt attributeIndex)
     {
-        NetFuncAddAttributeLevel(attributeIndex);
+        NetFuncAddAttribute(attributeIndex);
     }
 
-    protected void NetFuncAddAttributeLevel(int attributeIndex)
+    protected void NetFuncAddAttribute(int attributeIndex)
     {
-        if (CurrentHp <= 0 || attributeIndex < 0 || attributeIndex >= attributeLevels.Count)
+        if (CurrentHp <= 0 || attributeIndex < 0 || attributeIndex >= attributes.Count)
             return;
 
-        var attributeLevel = attributeLevels[attributeIndex];
-        if (attributeLevel.CanLevelUp())
+        var attribute = attributes[attributeIndex];
+        if (!attribute.CanLevelUp())
             return;
 
-        ++attributeLevels[attributeIndex].level;
-        attributeLevels.Dirty(attributeIndex);
+        ++attributes[attributeIndex].amount;
+        attributes.Dirty(attributeIndex);
     }
 
-    protected void NetFuncAddSkillLevelCallback(NetFieldInt skillIndex)
+    protected void NetFuncAddSkillCallback(NetFieldInt skillIndex)
     {
-        NetFuncAddSkillLevel(skillIndex);
+        NetFuncAddSkill(skillIndex);
     }
 
-    protected void NetFuncAddSkillLevel(int skillIndex)
+    protected void NetFuncAddSkill(int skillIndex)
     {
-        if (CurrentHp <= 0 || skillIndex < 0 || skillIndex >= skillLevels.Count)
+        if (CurrentHp <= 0 || skillIndex < 0 || skillIndex >= skills.Count)
             return;
 
-        var characterSkill = skillLevels[skillIndex];
-        if (characterSkill.CanLevelUp())
+        var characterSkill = skills[skillIndex];
+        if (!characterSkill.CanLevelUp(this))
             return;
 
-        ++skillLevels[skillIndex].level;
-        skillLevels.Dirty(skillIndex);
+        ++skills[skillIndex].level;
+        skills.Dirty(skillIndex);
     }
     #endregion
 
@@ -821,14 +822,14 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         CallNetFunction("UnEquipItem", FunctionReceivers.Server, fromEquipPosition, toIndex);
     }
 
-    public void AddAttributeLevel(int attributeIndex)
+    public void AddAttribute(int attributeIndex)
     {
-        CallNetFunction("AddAttributeLevel", FunctionReceivers.Server, attributeIndex);
+        CallNetFunction("AddAttribute", FunctionReceivers.Server, attributeIndex);
     }
 
-    public void AddSkillLevel(int skillIndex)
+    public void AddSkill(int skillIndex)
     {
-        CallNetFunction("AddSkillLevel", FunctionReceivers.Server, skillIndex);
+        CallNetFunction("AddSkill", FunctionReceivers.Server, skillIndex);
     }
     #endregion
 
@@ -933,6 +934,12 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             return false;
         }
 
+        if (!nonEquipItem.CanEquip(this))
+        {
+            reasonWhyCannot = "Character level or attributes does not meet requirements";
+            return false;
+        }
+
         var weaponItem = nonEquipItem.GetWeaponItem();
         if (weaponItem != null)
         {
@@ -1019,12 +1026,12 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         var damageAmount = baseDamageAttribute.Value;
         // Find damage effectiveness
         var damageEffectiveness = 1f;
-        var attributeLevels = attacker.attributeLevels;
-        foreach (var attributeLevel in attributeLevels)
+        var characterAttributes = attacker.attributes;
+        foreach (var characterAttribute in characterAttributes)
         {
-            var attributeId = attributeLevel.attributeId;
+            var attributeId = characterAttribute.attributeId;
             if (effectivenessAttributes.ContainsKey(attributeId))
-                damageEffectiveness += effectivenessAttributes[attributeId] * attributeLevel.level;
+                damageEffectiveness += effectivenessAttributes[attributeId] * characterAttribute.amount;
         }
         receivingDamage = damageElement.GetDamageReceiveRate(this) * damageEffectiveness * Random.Range(damageAmount.minDamage, damageAmount.maxDamage);
         if (receivingDamage > 0f)
@@ -1052,12 +1059,12 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             StopAllCoroutines();
             doingAction = false;
             buffs.Clear();
-            var count = skillLevels.Count;
+            var count = skills.Count;
             for (var i = 0; i < count; ++i)
             {
-                var skillLevel = skillLevels[i];
-                skillLevel.coolDownRemainsDuration = 0;
-                skillLevels.Dirty(i);
+                var skill = skills[i];
+                skill.coolDownRemainsDuration = 0;
+                skills.Dirty(i);
             }
         }
         else if (debuff != null)
@@ -1090,7 +1097,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         skillPoint.sendOptions = SendOptions.ReliableOrdered;
         skillPoint.forOwnerOnly = true;
         gold.sendOptions = SendOptions.ReliableOrdered;
-        skillLevels.forOwnerOnly = true;
+        skills.forOwnerOnly = true;
         nonEquipItems.forOwnerOnly = true;
     }
 
@@ -1168,10 +1175,10 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             TempUISceneGameplay.UpdateNonEquipItems();
     }
 
-    protected void OnSkillLevelsOperation(LiteNetLibSyncList.Operation operation, int index)
+    protected void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
         if (IsLocalClient && TempUISceneGameplay != null)
-            TempUISceneGameplay.UpdateSkillLevels();
+            TempUISceneGameplay.UpdateSkills();
     }
 
     public void Warp(string mapName, Vector3 position)
@@ -1193,7 +1200,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         buffs.onOperation -= OnBuffsOperation;
         equipItems.onOperation -= OnEquipItemsOperation;
         nonEquipItems.onOperation -= OnNonEquipItemsOperation;
-        skillLevels.onOperation -= OnSkillLevelsOperation;
+        skills.onOperation -= OnSkillsOperation;
     }
 
     public static string GetBuffKey(string skillId, bool isDebuff)

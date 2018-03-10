@@ -16,25 +16,25 @@ public enum SkillBuffType
 }
 
 [System.Serializable]
-public class SkillBuff
+public struct SkillBuff
 {
     [Header("Duration")]
     [Tooltip("If buff duration less than or equals to 0, buff stats won't applied")]
     public float baseDuration;
     public float durationIncreaseEachLevel;
     [Header("Hp recovery")]
-    public float baseRecoveryHp;
+    public int baseRecoveryHp;
     public float recoveryHpIncreaseEachLevel;
     [Header("Mp recovery")]
-    public float baseRecoveryMp;
+    public int baseRecoveryMp;
     public float recoveryMpIncreaseEachLevel;
-    [Header("Add Attributes")]
-    public CharacterAttributeIncremental[] increaseAttributes;
-    [Header("Add Resistances")]
-    public CharacterResistanceIncremental[] increaseResistances;
     [Header("Add Stats")]
     public CharacterStats baseStats;
     public CharacterStats statsIncreaseEachLevel;
+    [Header("Add Attributes")]
+    public AttributeIncremental[] increaseAttributes;
+    [Header("Add Resistances")]
+    public ResistanceIncremental[] increaseResistances;
 }
 
 [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill")]
@@ -44,7 +44,7 @@ public class Skill : BaseGameData
     public int maxLevel;
 
     [Header("Consume Mp")]
-    public float baseConsumeMp;
+    public int baseConsumeMp;
     public float consumeMpIncreaseEachLevel;
 
     [Header("Cool Down")]
@@ -52,8 +52,7 @@ public class Skill : BaseGameData
     public float coolDownDurationIncreaseEachLevel;
 
     [Header("Requirements")]
-    public int requireCharacterLevel;
-    public SkillLevel[] requireSkillLevels;
+    public SkillRequirement requirement;
 
     [Header("Attack")]
     public SkillAttackType skillAttackType;
@@ -65,8 +64,8 @@ public class Skill : BaseGameData
     public DamageEffectivenessAttribute[] effectivenessAttributes;
 
     [Header("Attack As Weapon Damage Inflict")]
-    public float baseInflictPercentage;
-    public float inflictPercentageIncreaseEachLevel;
+    public float baseInflictRate;
+    public float inflictRateIncreaseEachLevel;
     public DamageAttribute[] inflictDamageAttributes;
 
     [Header("Attack Debuff")]
@@ -76,6 +75,17 @@ public class Skill : BaseGameData
     [Header("Buffs")]
     public SkillBuffType skillBuffType;
     public SkillBuff buff;
+
+    private Dictionary<Skill, int> tempRequireSkillLevels;
+    public Dictionary<Skill, int> TempRequireSkillLevels
+    {
+        get
+        {
+            if (tempRequireSkillLevels == null)
+                tempRequireSkillLevels = GameDataHelpers.MakeSkillLevelDictionary(requirement.skillLevels, new Dictionary<Skill, int>());
+            return tempRequireSkillLevels;
+        }
+    }
 
     private Dictionary<string, float> tempEffectivenessAttributes;
     public Dictionary<string, float> TempEffectivenessAttributes
@@ -87,9 +97,13 @@ public class Skill : BaseGameData
                 tempEffectivenessAttributes = new Dictionary<string, float>();
                 foreach (var effectivenessAttribute in effectivenessAttributes)
                 {
-                    if (effectivenessAttribute.attribute == null)
+                    if (effectivenessAttribute.attribute == null || effectivenessAttribute.effectiveness == 0f)
                         continue;
-                    tempEffectivenessAttributes[effectivenessAttribute.attribute.Id] = effectivenessAttribute.effectiveness;
+                    var id = effectivenessAttribute.attribute.Id;
+                    if (!tempEffectivenessAttributes.ContainsKey(id))
+                        tempEffectivenessAttributes[id] = effectivenessAttribute.effectiveness;
+                    else
+                        tempEffectivenessAttributes[id] += effectivenessAttribute.effectiveness;
                 }
             }
             return tempEffectivenessAttributes;
@@ -98,7 +112,15 @@ public class Skill : BaseGameData
 }
 
 [System.Serializable]
-public class SkillLevel
+public struct SkillRequirement
+{
+    public int baseCharacterLevel;
+    public float characterLevelIncreaseEachLevel;
+    public SkillLevel[] skillLevels;
+}
+
+[System.Serializable]
+public struct SkillLevel
 {
     public Skill skill;
     public int level;
