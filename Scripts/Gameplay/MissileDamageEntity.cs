@@ -8,29 +8,27 @@ public class MissileDamageEntity : DamageEntity
     protected float missileDistance;
     protected float missileSpeed;
 
-    private Rigidbody tempRigidbody;
-    public Rigidbody TempRigidbody
+    private Rigidbody cacheRigidbody;
+    public Rigidbody CacheRigidbody
     {
         get
         {
-            if (tempRigidbody == null)
-                tempRigidbody = GetComponent<Rigidbody>();
-            return tempRigidbody;
+            if (cacheRigidbody == null)
+                cacheRigidbody = GetComponent<Rigidbody>();
+            return cacheRigidbody;
         }
     }
 
     public void SetupDamage(CharacterEntity attacker,
-        KeyValuePair<DamageElement, DamageAmount> baseDamageAttribute,
-        Dictionary<DamageElement, DamageAmount> additionalDamageAttributes,
-        Dictionary<string, float> effectivenessAttributes,
+        Dictionary<DamageElement, DamageAmount> allDamageAttributes,
         CharacterBuff debuff,
         float missileDistance,
         float missileSpeed)
     {
-        SetupDamage(attacker, baseDamageAttribute, additionalDamageAttributes, effectivenessAttributes, debuff);
+        SetupDamage(attacker, allDamageAttributes, debuff);
         this.missileDistance = missileDistance;
         this.missileSpeed = missileSpeed;
-        TempRigidbody.velocity = attacker.TempTransform.forward * missileSpeed;
+        CacheRigidbody.velocity = attacker.CacheTransform.forward * missileSpeed;
 
         if (missileDistance > 0)
             NetworkDestroy(missileSpeed / missileDistance);

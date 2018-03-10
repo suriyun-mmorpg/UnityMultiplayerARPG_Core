@@ -5,21 +5,15 @@ using UnityEngine;
 public abstract class DamageEntity : RpgNetworkEntity
 {
     protected CharacterEntity attacker;
-    protected KeyValuePair<DamageElement, DamageAmount> baseDamageAttribute;
-    protected Dictionary<DamageElement, DamageAmount> additionalDamageAttributes;
-    protected Dictionary<string, float> effectivenessAttributes;
+    protected Dictionary<DamageElement, DamageAmount> allDamageAttributes;
     protected CharacterBuff debuff;
 
     public virtual void SetupDamage(CharacterEntity attacker,
-        KeyValuePair<DamageElement, DamageAmount> baseDamageAttribute,
-        Dictionary<DamageElement, DamageAmount> additionalDamageAttributes,
-        Dictionary<string, float> effectivenessAttributes,
+        Dictionary<DamageElement, DamageAmount> allDamageAttributes,
         CharacterBuff debuff)
     {
         this.attacker = attacker;
-        this.baseDamageAttribute = baseDamageAttribute;
-        this.additionalDamageAttributes = additionalDamageAttributes;
-        this.effectivenessAttributes = effectivenessAttributes;
+        this.allDamageAttributes = allDamageAttributes;
         this.debuff = debuff;
     }
 
@@ -27,6 +21,6 @@ public abstract class DamageEntity : RpgNetworkEntity
     {
         if (target == null)
             return;
-        target.ReceiveDamage(attacker, baseDamageAttribute, additionalDamageAttributes, effectivenessAttributes, debuff);
+        target.ReceiveDamage(attacker, allDamageAttributes, debuff);
     }
 }

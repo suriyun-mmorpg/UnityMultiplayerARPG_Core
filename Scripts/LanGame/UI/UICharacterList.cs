@@ -11,14 +11,14 @@ public class UICharacterList : UIBase
     [Header("UI Elements")]
     public Button buttonStart;
     public Button buttonDelete;
-    private UIList tempList;
-    public UIList TempList
+    private UIList cacheList;
+    public UIList CacheList
     {
         get
         {
-            if (tempList == null)
-                tempList = GetComponent<UIList>();
-            return tempList;
+            if (cacheList == null)
+                cacheList = GetComponent<UIList>();
+            return cacheList;
         }
     }
 
@@ -59,7 +59,7 @@ public class UICharacterList : UIBase
         // Show list of created characters
         var selectableCharacters = CharacterDataExtension.LoadAllPersistentCharacterData();
         selectableCharacters.Sort(new CharacterDataLastUpdateComparer().Desc());
-        TempList.Generate(selectableCharacters, (index, character, ui) =>
+        CacheList.Generate(selectableCharacters, (index, character, ui) =>
         {
             var uiCharacter = ui.GetComponent<UICharacter>();
             uiCharacter.Data = character;

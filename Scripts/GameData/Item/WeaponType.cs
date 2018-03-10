@@ -18,22 +18,14 @@ public class WeaponType : BaseGameData
     public ActionAnimation[] subAttackAnimations;
     public Damage damage;
 
-    private Dictionary<string, float> tempEffectivenessAttributes;
-    public Dictionary<string, float> TempEffectivenessAttributes
+    private Dictionary<Attribute, float> cacheEffectivenessAttributes;
+    public Dictionary<Attribute, float> CacheEffectivenessAttributes
     {
         get
         {
-            if (tempEffectivenessAttributes == null)
-            {
-                tempEffectivenessAttributes = new Dictionary<string, float>();
-                foreach (var effectivenessAttribute in effectivenessAttributes)
-                {
-                    if (effectivenessAttribute.attribute == null)
-                        continue;
-                    tempEffectivenessAttributes[effectivenessAttribute.attribute.Id] = effectivenessAttribute.effectiveness;
-                }
-            }
-            return tempEffectivenessAttributes;
+            if (cacheEffectivenessAttributes == null)
+                cacheEffectivenessAttributes = GameDataHelpers.MakeDamageEffectivenessAttributesDictionary(effectivenessAttributes, new Dictionary<Attribute, float>());
+            return cacheEffectivenessAttributes;
         }
     }
 }

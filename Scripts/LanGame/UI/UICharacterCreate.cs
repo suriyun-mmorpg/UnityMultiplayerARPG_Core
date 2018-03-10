@@ -13,14 +13,14 @@ public class UICharacterCreate : UIBase
     public InputField inputCharacterName;
     [Header("Event")]
     public UnityEvent eventOnCreateCharacter;
-    private UIList tempList;
-    public UIList TempList
+    private UIList cacheList;
+    public UIList CacheList
     {
         get
         {
-            if (tempList == null)
-                tempList = GetComponent<UIList>();
-            return tempList;
+            if (cacheList == null)
+                cacheList = GetComponent<UIList>();
+            return cacheList;
         }
     }
 
@@ -50,7 +50,7 @@ public class UICharacterCreate : UIBase
         SelectionManager.Clear();
         // Show list of characters that can be create
         var selectableCharacters = GameInstance.CharacterPrototypes.Values.ToList();
-        TempList.Generate(selectableCharacters, (index, characterPrototype, ui) =>
+        CacheList.Generate(selectableCharacters, (index, characterPrototype, ui) =>
         {
             var character = new CharacterData();
             character.Id = characterPrototype.Id;

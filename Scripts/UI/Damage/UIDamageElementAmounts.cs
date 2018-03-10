@@ -6,62 +6,81 @@ using UnityEngine.UI;
 public class UIDamageElementAmounts : UISelectionEntry<Dictionary<DamageElement, DamageAmount>>
 {
     [Tooltip("Damage Amount Format => {0} = {Element title}, {1} = {Min damage}, {2} = {Max damage}")]
-    public string amountFormat = "{0}: {1}~{2}";
+    public string damageFormat = "{0}: {1}~{2}";
+    [Tooltip("Average Damage Amount Format => {0} = {Min damage}, {1} = {Max damage}")]
+    public string averageDamageFormat = "{0}~{1}";
 
     [Header("UI Elements")]
-    public Text textAllAmounts;
-    public UIDamageElementTextPair[] textAmounts;
+    public Text textAllDamages;
+    public Text textAverageDamage;
+    public UIDamageElementTextPair[] textDamages;
 
-    private Dictionary<DamageElement, Text> tempTextAmounts;
-    public Dictionary<DamageElement, Text> TempTextAmounts
+    private Dictionary<DamageElement, Text> cacheTextDamages;
+    public Dictionary<DamageElement, Text> CacheTextDamages
     {
         get
         {
-            if (tempTextAmounts == null)
+            if (cacheTextDamages == null)
             {
-                tempTextAmounts = new Dictionary<DamageElement, Text>();
-                foreach (var textAmount in textAmounts)
+                cacheTextDamages = new Dictionary<DamageElement, Text>();
+                foreach (var textAmount in textDamages)
                 {
                     if (textAmount.damageElement == null || textAmount.text == null)
                         continue;
                     var key = textAmount.damageElement;
                     var textComp = textAmount.text;
-                    textComp.text = string.Format(amountFormat, key.title, "0", "0");
-                    tempTextAmounts[key] = textComp;
+                    textComp.text = string.Format(damageFormat, key.title, "0", "0");
+                    cacheTextDamages[key] = textComp;
                 }
             }
-            return tempTextAmounts;
+            return cacheTextDamages;
         }
     }
 
     protected override void UpdateData()
     {
-        if (textAllAmounts != null)
+        if (Data == null || Data.Count == 0)
         {
-            if (Data == null || Data.Count == 0)
+            if (textAllDamages != null)
+                textAllDamages.gameObject.SetActive(false);
+
+            if (textAverageDamage != null)
+                textAverageDamage.text = string.Format(averageDamageFormat, "0", "0");
+
+            foreach (var textAmount in CacheTextDamages)
             {
-                textAllAmounts.gameObject.SetActive(false);
-                foreach (var textAmount in TempTextAmounts)
-                {
-                    var element = textAmount.Key;
-                    textAmount.Value.text = string.Format(amountFormat, element.title, "0", "0");
-                }
+                var element = textAmount.Key;
+                textAmount.Value.text = string.Format(damageFormat, element.title, "0", "0");
             }
-            else
+        }
+        else
+        {
+            var text = "";
+            var averageMinDamage = 0f;
+            var averageMaxDamage = 0f;
+            foreach (var dataEntry in Data)
             {
-                var text = "";
-                foreach (var dataEntry in Data)
-                {
-                    var element = dataEntry.Key;
-                    var amount = dataEntry.Value;
-                    var amountText = string.Format(amountFormat, element.title, amount.minDamage, amount.maxDamage);
-                    text += amountText + "\n";
-                    if (TempTextAmounts.ContainsKey(dataEntry.Key))
-                        TempTextAmounts[dataEntry.Key].text = amountText;
-                }
-                textAllAmounts.gameObject.SetActive(!string.IsNullOrEmpty(text));
-                textAllAmounts.text = text;
+                var element = dataEntry.Key;
+                var amount = dataEntry.Value;
+                var amountText = string.Format(damageFormat, element.title, amount.minDamage.ToString("N0"), amount.maxDamage.ToString("N0"));
+                text += amountText + "\n";
+                if (CacheTextDamages.ContainsKey(dataEntry.Key))
+                    CacheTextDamages[dataEntry.Key].text = amountText;
+                averageMinDamage += amount.minDamage;
+                averageMaxDamage += amount.maxDamage;
             }
+
+            averageMinDamage /= Data.Count;
+            averageMaxDamage /= Data.Count;
+
+            if (textAllDamages != null)
+            {
+                textAllDamages.gameObject.SetActive(!string.IsNullOrEmpty(text));
+                textAllDamages.text = text;
+            }
+
+            if (textAverageDamage != null)
+                textAverageDamage.text = string.Format(averageDamageFormat, averageMinDamage.ToString("N0"), averageMaxDamage.ToString("N0"));
         }
     }
 }

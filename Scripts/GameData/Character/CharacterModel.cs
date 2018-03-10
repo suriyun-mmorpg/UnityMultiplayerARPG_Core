@@ -14,53 +14,53 @@ public class CharacterModel : MonoBehaviour
     public Transform leftHandContainer;
     public CharacterModelContainer[] equipmentContainers;
 
-    private Transform tempTransform;
-    public Transform TempTransform
+    private Transform cacheTransform;
+    public Transform CacheTransform
     {
         get
         {
-            if (tempTransform == null)
-                tempTransform = GetComponent<Transform>();
-            return tempTransform;
+            if (cacheTransform == null)
+                cacheTransform = GetComponent<Transform>();
+            return cacheTransform;
         }
     }
 
-    private Animator tempAnimator;
-    public Animator TempAnimator
+    private Animator cacheAnimator;
+    public Animator CacheAnimator
     {
         get
         {
-            if (tempAnimator == null)
-                tempAnimator = GetComponent<Animator>();
-            return tempAnimator;
+            if (cacheAnimator == null)
+                cacheAnimator = GetComponent<Animator>();
+            return cacheAnimator;
         }
     }
 
-    private Dictionary<string, Transform> tempEquipmentContainers = null;
-    public Dictionary<string, Transform> TempEquipmentContainers
+    private Dictionary<string, Transform> cacheEquipmentContainers = null;
+    public Dictionary<string, Transform> CacheEquipmentContainers
     {
         get
         {
-            if (tempEquipmentContainers == null)
+            if (cacheEquipmentContainers == null)
             {
-                tempEquipmentContainers = new Dictionary<string, Transform>();
+                cacheEquipmentContainers = new Dictionary<string, Transform>();
                 if (rightHandContainer != null)
-                    tempEquipmentContainers.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandContainer);
+                    cacheEquipmentContainers.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandContainer);
                 if (leftHandContainer != null)
-                    tempEquipmentContainers.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandContainer);
+                    cacheEquipmentContainers.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandContainer);
                 foreach (var equipmentContainer in equipmentContainers)
                 {
-                    if (equipmentContainer.container != null && !tempEquipmentContainers.ContainsKey(equipmentContainer.equipPosition))
-                        tempEquipmentContainers[equipmentContainer.equipPosition] = equipmentContainer.container;
+                    if (equipmentContainer.container != null && !cacheEquipmentContainers.ContainsKey(equipmentContainer.equipPosition))
+                        cacheEquipmentContainers[equipmentContainer.equipPosition] = equipmentContainer.container;
                 }
             }
-            return tempEquipmentContainers;
+            return cacheEquipmentContainers;
         }
     }
     
     public void SetEquipItems(IList<CharacterItem> equipItems)
     {
-        var containers = TempEquipmentContainers.Values;
+        var containers = CacheEquipmentContainers.Values;
         // Clear equipped item models
         foreach (var container in containers)
         {
@@ -80,9 +80,9 @@ public class CharacterModel : MonoBehaviour
                 position = equipItem.isSubWeapon ? GameDataConst.EQUIP_POSITION_LEFT_HAND : GameDataConst.EQUIP_POSITION_RIGHT_HAND;
 
             var equipmentModelPrefab = equipmentItem.equipmentModel;
-            if (equipmentModelPrefab != null && TempEquipmentContainers.ContainsKey(position))
+            if (equipmentModelPrefab != null && CacheEquipmentContainers.ContainsKey(position))
             {
-                var container = TempEquipmentContainers[position];
+                var container = CacheEquipmentContainers[position];
                 var equipmentModel = Instantiate(equipmentModelPrefab, container);
                 equipmentModel.transform.localPosition = Vector3.zero;
                 equipmentModel.transform.localEulerAngles = Vector3.zero;
@@ -95,8 +95,8 @@ public class CharacterModel : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.magenta;
-        var topCorner = TempTransform.position + center + (Vector3.up * height * 0.5f) - (Vector3.up * radius);
-        var bottomCorner = TempTransform.position + center - (Vector3.up * height * 0.5f) + (Vector3.up * radius);
+        var topCorner = CacheTransform.position + center + (Vector3.up * height * 0.5f) - (Vector3.up * radius);
+        var bottomCorner = CacheTransform.position + center - (Vector3.up * height * 0.5f) + (Vector3.up * radius);
         Gizmos.DrawWireSphere(topCorner, radius);
         Gizmos.DrawWireSphere(bottomCorner, radius);
         Gizmos.DrawLine(topCorner + Vector3.left * radius, bottomCorner + Vector3.left * radius);

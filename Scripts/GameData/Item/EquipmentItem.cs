@@ -29,14 +29,14 @@ public class EquipmentItem : Item
     }
 #endif
 
-    private Dictionary<Attribute, int> tempRequireAttributeAmounts;
-    public Dictionary<Attribute, int> TempRequireAttributeAmounts
+    private Dictionary<Attribute, int> cacheRequireAttributeAmounts;
+    public Dictionary<Attribute, int> CacheRequireAttributeAmounts
     {
         get
         {
-            if (tempRequireAttributeAmounts == null)
-                tempRequireAttributeAmounts = GameDataHelpers.MakeAttributeAmountDictionary(requirement.attributeAmounts, new Dictionary<Attribute, int>());
-            return tempRequireAttributeAmounts;
+            if (cacheRequireAttributeAmounts == null)
+                cacheRequireAttributeAmounts = GameDataHelpers.MakeAttributeAmountsDictionary(requirement.attributeAmounts, new Dictionary<Attribute, int>());
+            return cacheRequireAttributeAmounts;
         }
     }
 }

@@ -12,14 +12,14 @@ public class UISkillLevels : UISelectionEntry<Dictionary<Skill, int>>
     public Text textAllLevels;
     public UISkillTextPair[] textLevels;
 
-    private Dictionary<Skill, Text> tempTextLevels;
-    public Dictionary<Skill, Text> TempTextLevels
+    private Dictionary<Skill, Text> cacheTextLevels;
+    public Dictionary<Skill, Text> CacheTextLevels
     {
         get
         {
-            if (tempTextLevels == null)
+            if (cacheTextLevels == null)
             {
-                tempTextLevels = new Dictionary<Skill, Text>();
+                cacheTextLevels = new Dictionary<Skill, Text>();
                 foreach (var textLevel in textLevels)
                 {
                     if (textLevel.skill == null || textLevel.text == null)
@@ -27,10 +27,10 @@ public class UISkillLevels : UISelectionEntry<Dictionary<Skill, int>>
                     var key = textLevel.skill;
                     var textComp = textLevel.text;
                     textComp.text = string.Format(levelFormat, key.title, "0", "0");
-                    tempTextLevels[key] = textComp;
+                    cacheTextLevels[key] = textComp;
                 }
             }
-            return tempTextLevels;
+            return cacheTextLevels;
         }
     }
 
@@ -41,7 +41,7 @@ public class UISkillLevels : UISelectionEntry<Dictionary<Skill, int>>
             if (Data == null || Data.Count == 0)
             {
                 textAllLevels.gameObject.SetActive(false);
-                foreach (var textLevel in TempTextLevels)
+                foreach (var textLevel in CacheTextLevels)
                 {
                     var element = textLevel.Key;
                     textLevel.Value.text = string.Format(levelFormat, element.title, "0", "0");
@@ -56,8 +56,8 @@ public class UISkillLevels : UISelectionEntry<Dictionary<Skill, int>>
                         continue;
                     var amountText = string.Format(levelFormat, dataEntry.Key.title, dataEntry.Value.ToString("N0"));
                     text += amountText + "\n";
-                    if (TempTextLevels.ContainsKey(dataEntry.Key))
-                        TempTextLevels[dataEntry.Key].text = amountText;
+                    if (CacheTextLevels.ContainsKey(dataEntry.Key))
+                        CacheTextLevels[dataEntry.Key].text = amountText;
                 }
                 textAllLevels.gameObject.SetActive(!string.IsNullOrEmpty(text));
                 textAllLevels.text = text;

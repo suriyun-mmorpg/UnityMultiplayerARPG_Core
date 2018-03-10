@@ -53,7 +53,7 @@ public static class SkillExtension
                 continue;
             skillLevelsDict[skillLevel.GetSkill()] = skillLevel.level;
         }
-        var requireSkillLevels = skill.TempRequireSkillLevels;
+        var requireSkillLevels = skill.CacheRequireSkillLevels;
         foreach (var requireSkillLevel in requireSkillLevels)
         {
             if (!skillLevelsDict.ContainsKey(requireSkillLevel.Key) || 
@@ -163,6 +163,47 @@ public static class SkillExtension
     }
     #endregion
 
+    #region Attack
+    public static KeyValuePair<DamageElement, DamageAmount> GetBaseDamageAttribute(this Skill skill, int level, float inflictRate)
+    {
+        if (!skill.IsAttack() || skill.skillAttackType != SkillAttackType.PureSkillDamage)
+            return new KeyValuePair<DamageElement, DamageAmount>();
+        level = skill.GetAdjustedLevel(level);
+        return GameDataHelpers.MakeDamageAttributePair(skill.baseDamageAttribute, level, inflictRate);
+    }
+
+    public static Dictionary<DamageElement, DamageAmount> GetAdditionalDamageAttributes(this Skill skill, int level)
+    {
+        if (!skill.IsAttack() || skill.skillAttackType != SkillAttackType.PureSkillDamage)
+            return new Dictionary<DamageElement, DamageAmount>();
+        level = skill.GetAdjustedLevel(level);
+        return GameDataHelpers.MakeDamageAttributesDictionary(skill.additionalDamageAttributes, new Dictionary<DamageElement, DamageAmount>(), level);
+    }
+
+    public static float GetDamageEffectiveness(this Skill skill, ICharacterData character)
+    {
+        if (skill == null)
+            return 1f;
+        return GameDataHelpers.CalculateDamageEffectiveness(skill.CacheEffectivenessAttributes, character);
+    }
+
+    public static float GetInflictRate(this Skill skill, int level)
+    {
+        if (!skill.IsAttack() || skill.skillAttackType != SkillAttackType.WeaponDamageInflict)
+            return 1f;
+        level = skill.GetAdjustedLevel(level);
+        return skill.baseInflictRate + skill.inflictRateIncreaseEachLevel * level;
+    }
+
+    public static Dictionary<DamageElement, DamageAmount> GetInflictDamageAttributes(this Skill skill, int level)
+    {
+        if (!skill.IsAttack() || skill.skillAttackType != SkillAttackType.WeaponDamageInflict)
+            return new Dictionary<DamageElement, DamageAmount>();
+        level = skill.GetAdjustedLevel(level);
+        return GameDataHelpers.MakeDamageAttributesDictionary(skill.inflictDamageAttributes, new Dictionary<DamageElement, DamageAmount>(), level);
+    }
+    #endregion
+
     #region Buff Extension
     public static float GetDuration(this SkillBuff skillBuff, int level)
     {
@@ -182,6 +223,16 @@ public static class SkillExtension
     public static CharacterStats GetStats(this SkillBuff skillBuff, int level)
     {
         return skillBuff.baseStats + skillBuff.statsIncreaseEachLevel * level;
+    }
+
+    public static Dictionary<Attribute, int> GetIncreaseAttributes(this SkillBuff skillBuff, int level)
+    {
+        return GameDataHelpers.MakeAttributeIncrementalsDictionary(skillBuff.increaseAttributes, new Dictionary<Attribute, int>(), level);
+    }
+
+    public static Dictionary<Resistance, float> GetIncreaseResistances(this SkillBuff skillBuff, int level)
+    {
+        return GameDataHelpers.MakeResistanceIncrementalsDictionary(skillBuff.increaseResistances, new Dictionary<Resistance, float>(), level);
     }
     #endregion
 }

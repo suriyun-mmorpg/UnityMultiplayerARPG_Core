@@ -221,11 +221,12 @@ public static class CharacterDataExtension
     {
         var result = new Dictionary<Attribute, int>();
         var equipItems = data.EquipItems;
-        foreach (var equipment in equipItems)
+        foreach (var equipItem in equipItems)
         {
-            if (equipment.GetEquipmentItem() == null)
+            if (equipItem.GetEquipmentItem() == null)
                 continue;
-            var increaseAttributes = equipment.GetIncreaseAttributes();
+            var equipment = equipItem.GetEquipmentItem();
+            var increaseAttributes = equipment.GetIncreaseAttributes(equipItem.level);
             foreach (var increaseAttribute in increaseAttributes)
             {
                 var key = increaseAttribute.Key;
@@ -280,11 +281,12 @@ public static class CharacterDataExtension
     {
         var result = new Dictionary<Resistance, float>();
         var equipItems = data.EquipItems;
-        foreach (var equipment in equipItems)
+        foreach (var equipItem in equipItems)
         {
-            if (equipment.GetEquipmentItem() == null)
+            if (equipItem.GetEquipmentItem() == null)
                 continue;
-            var increaseResistances = equipment.GetIncreaseResistances();
+            var equipment = equipItem.GetEquipmentItem();
+            var increaseResistances = equipment.GetIncreaseResistances(equipItem.level);
             foreach (var increaseResistance in increaseResistances)
             {
                 var key = increaseResistance.Key;

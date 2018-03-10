@@ -7,14 +7,14 @@ public class UICharacterSkills : UIBase
 {
     public System.Action<UICharacterSkill> onSelectCharacterSkill;
 
-    private UIList tempList;
-    public UIList TempList
+    private UIList cacheList;
+    public UIList CacheList
     {
         get
         {
-            if (tempList == null)
-                tempList = GetComponent<UIList>();
-            return tempList;
+            if (cacheList == null)
+                cacheList = GetComponent<UIList>();
+            return cacheList;
         }
     }
 
@@ -51,7 +51,7 @@ public class UICharacterSkills : UIBase
             return;
         SelectionManager.Clear();
         var skillLevels = characterEntity.skills;
-        TempList.Generate(skillLevels, (index, characterSkill, ui) =>
+        CacheList.Generate(skillLevels, (index, characterSkill, ui) =>
         {
             var uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
             uiCharacterSkill.Data = characterSkill;

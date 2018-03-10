@@ -45,18 +45,18 @@ public class GameInstance : MonoBehaviour
     public static readonly Dictionary<string, Item> Items = new Dictionary<string, Item>();
     public static readonly Dictionary<string, Skill> Skills = new Dictionary<string, Skill>();
 
-    private DamageElement tempDefaultDamageElement;
+    private DamageElement cacheDefaultDamageElement;
     public DamageElement DefaultDamageElement
     {
         get
         {
-            if (tempDefaultDamageElement == null)
+            if (cacheDefaultDamageElement == null)
             {
-                tempDefaultDamageElement = ScriptableObject.CreateInstance<DamageElement>();
-                tempDefaultDamageElement.name = GameDataConst.DEFAULT_DAMAGE_ID;
-                tempDefaultDamageElement.title = GameDataConst.DEFAULT_DAMAGE_TITLE;
+                cacheDefaultDamageElement = ScriptableObject.CreateInstance<DamageElement>();
+                cacheDefaultDamageElement.name = GameDataConst.DEFAULT_DAMAGE_ID;
+                cacheDefaultDamageElement.title = GameDataConst.DEFAULT_DAMAGE_TITLE;
             }
-            return tempDefaultDamageElement;
+            return cacheDefaultDamageElement;
         }
     }
 
@@ -115,14 +115,14 @@ public class GameInstance : MonoBehaviour
         AddItems(items);
         AddSkills(skills);
 
-        var tempStartItems = new List<Item>();
+        var cacheStartItems = new List<Item>();
         foreach (var startItem in startItems)
         {
             if (startItem.item == null)
                 continue;
-            tempStartItems.Add(startItem.item);
+            cacheStartItems.Add(startItem.item);
         }
-        AddItems(tempStartItems);
+        AddItems(cacheStartItems);
     }
 
     public static void AddCharacterAttributes(IEnumerable<Attribute> characterAttributes)

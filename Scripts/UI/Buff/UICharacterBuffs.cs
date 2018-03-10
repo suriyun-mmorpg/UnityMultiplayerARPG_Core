@@ -5,14 +5,14 @@ using UnityEngine;
 [RequireComponent(typeof(UIList))]
 public class UICharacterBuffs : UIBase
 {
-    private UIList tempList;
-    public UIList TempList
+    private UIList cacheList;
+    public UIList CacheList
     {
         get
         {
-            if (tempList == null)
-                tempList = GetComponent<UIList>();
-            return tempList;
+            if (cacheList == null)
+                cacheList = GetComponent<UIList>();
+            return cacheList;
         }
     }
 
@@ -26,7 +26,7 @@ public class UICharacterBuffs : UIBase
         if (characterEntity == null)
             return;
         var buffs = characterEntity.buffs;
-        TempList.Generate(buffs, (index, characterBuff, ui) =>
+        CacheList.Generate(buffs, (index, characterBuff, ui) =>
         {
             var uiCharacterBuff = ui.GetComponent<UICharacterBuff>();
             uiCharacterBuff.Data = characterBuff;

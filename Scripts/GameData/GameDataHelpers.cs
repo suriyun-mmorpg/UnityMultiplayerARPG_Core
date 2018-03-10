@@ -3,13 +3,52 @@ using System.Collections.Generic;
 
 public static class GameDataHelpers
 {
-    public static KeyValuePair<DamageElement, DamageAmount> MakeDamageAttributePair(DamageAttribute source, int level)
+    public static float CalculateDamageEffectiveness(Dictionary<Attribute, float> effectivenessAttributes, ICharacterData character)
+    {
+        var damageEffectiveness = 1f;
+        var characterAttributes = character.Attributes;
+        foreach (var characterAttribute in characterAttributes)
+        {
+            var attribute = characterAttribute.GetAttribute();
+            if (effectivenessAttributes.ContainsKey(attribute))
+                damageEffectiveness += effectivenessAttributes[attribute] * characterAttribute.amount;
+        }
+        return damageEffectiveness;
+    }
+
+    public static KeyValuePair<DamageElement, DamageAmount> MakeDamageAttributePair(DamageAttribute source, int level, float inflictRate)
     {
         var gameInstance = GameInstance.Singleton;
         var element = source.damageElement;
         if (element == null)
             element = gameInstance.DefaultDamageElement;
-        return new KeyValuePair<DamageElement, DamageAmount>(element, source.baseDamageAmount + source.damageAmountIncreaseEachLevel * level);
+        return new KeyValuePair<DamageElement, DamageAmount>(element, (source.baseDamageAmount + source.damageAmountIncreaseEachLevel * level) * inflictRate);
+    }
+
+    public static Dictionary<Attribute, float> MakeDamageEffectivenessAttributesDictionary(DamageEffectivenessAttribute[] sourceEffectivesses, Dictionary<Attribute, float> targetDictionary)
+    {
+        if (targetDictionary == null)
+            targetDictionary = new Dictionary<Attribute, float>();
+        foreach (var sourceEffectivess in sourceEffectivesses)
+        {
+            var key = sourceEffectivess.attribute;
+            if (!targetDictionary.ContainsKey(key))
+                targetDictionary[key] = sourceEffectivess.effectiveness;
+            else
+                targetDictionary[key] += sourceEffectivess.effectiveness;
+        }
+        return targetDictionary;
+    }
+
+    public static Dictionary<DamageElement, DamageAmount> CombineDamageAttributesDictionary(Dictionary<DamageElement, DamageAmount> sourceDictionary, KeyValuePair<DamageElement, DamageAmount> newEntry)
+    {
+        var key = newEntry.Key;
+        var value = newEntry.Value;
+        if (!sourceDictionary.ContainsKey(key))
+            sourceDictionary[key] = value;
+        else
+            sourceDictionary[key] += value;
+        return sourceDictionary;
     }
 
     public static Dictionary<DamageElement, DamageAmount> MakeDamageAttributesDictionary(DamageAttribute[] sourceAttributes, Dictionary<DamageElement, DamageAmount> targetDictionary, int level)
@@ -30,7 +69,18 @@ public static class GameDataHelpers
         return targetDictionary;
     }
 
-    public static Dictionary<Attribute, int> MakeAttributeAmountDictionary(AttributeAmount[] sourceAmounts, Dictionary<Attribute, int> targetDictionary)
+    public static Dictionary<Attribute, int> CombineAttributeAmountsDictionary(Dictionary<Attribute, int> sourceDictionary, KeyValuePair<Attribute, int> newEntry)
+    {
+        var key = newEntry.Key;
+        var value = newEntry.Value;
+        if (!sourceDictionary.ContainsKey(key))
+            sourceDictionary[key] = value;
+        else
+            sourceDictionary[key] += value;
+        return sourceDictionary;
+    }
+
+    public static Dictionary<Attribute, int> MakeAttributeAmountsDictionary(AttributeAmount[] sourceAmounts, Dictionary<Attribute, int> targetDictionary)
     {
         if (targetDictionary == null)
             targetDictionary = new Dictionary<Attribute, int>();
@@ -47,7 +97,7 @@ public static class GameDataHelpers
         return targetDictionary;
     }
 
-    public static Dictionary<Attribute, int> MakeAttributeIncrementalDictionary(AttributeIncremental[] sourceIncrementals, Dictionary<Attribute, int> targetDictionary, int level)
+    public static Dictionary<Attribute, int> MakeAttributeIncrementalsDictionary(AttributeIncremental[] sourceIncrementals, Dictionary<Attribute, int> targetDictionary, int level)
     {
         if (targetDictionary == null)
             targetDictionary = new Dictionary<Attribute, int>();
@@ -64,7 +114,18 @@ public static class GameDataHelpers
         return targetDictionary;
     }
 
-    public static Dictionary<Resistance, float> MakeResistanceAmountDictionary(ResistanceAmount[] sourceAmounts, Dictionary<Resistance, float> targetDictionary)
+    public static Dictionary<Resistance, float> CombineResistanceAmountsDictionary(Dictionary<Resistance, float> sourceDictionary, KeyValuePair<Resistance, float> newEntry)
+    {
+        var key = newEntry.Key;
+        var value = newEntry.Value;
+        if (!sourceDictionary.ContainsKey(key))
+            sourceDictionary[key] = value;
+        else
+            sourceDictionary[key] += value;
+        return sourceDictionary;
+    }
+
+    public static Dictionary<Resistance, float> MakeResistanceAmountsDictionary(ResistanceAmount[] sourceAmounts, Dictionary<Resistance, float> targetDictionary)
     {
         if (targetDictionary == null)
             targetDictionary = new Dictionary<Resistance, float>();
@@ -81,7 +142,7 @@ public static class GameDataHelpers
         return targetDictionary;
     }
 
-    public static Dictionary<Resistance, float> MakeResistanceIncrementalDictionary(ResistanceIncremental[] sourceIncrementals, Dictionary<Resistance, float> targetDictionary, int level)
+    public static Dictionary<Resistance, float> MakeResistanceIncrementalsDictionary(ResistanceIncremental[] sourceIncrementals, Dictionary<Resistance, float> targetDictionary, int level)
     {
         if (targetDictionary == null)
             targetDictionary = new Dictionary<Resistance, float>();
@@ -98,7 +159,18 @@ public static class GameDataHelpers
         return targetDictionary;
     }
 
-    public static Dictionary<Skill, int> MakeSkillLevelDictionary(SkillLevel[] sourceLevels, Dictionary<Skill, int> targetDictionary)
+    public static Dictionary<Skill, int> CombineSkillLevelsDictionary(Dictionary<Skill, int> sourceDictionary, KeyValuePair<Skill, int> newEntry)
+    {
+        var key = newEntry.Key;
+        var value = newEntry.Value;
+        if (!sourceDictionary.ContainsKey(key))
+            sourceDictionary[key] = value;
+        else
+            sourceDictionary[key] += value;
+        return sourceDictionary;
+    }
+
+    public static Dictionary<Skill, int> MakeSkillLevelsDictionary(SkillLevel[] sourceLevels, Dictionary<Skill, int> targetDictionary)
     {
         if (targetDictionary == null)
             targetDictionary = new Dictionary<Skill, int>();

@@ -11,64 +11,19 @@ public class CharacterBuff
     public int level;
     public float buffRemainsDuration;
 
-    private string dirtySkillId;
-    private int dirtyLevel;
-    private Skill cacheSkill;
-    private readonly Dictionary<Attribute, int> cacheBuffAttributes = new Dictionary<Attribute, int>();
-    private readonly Dictionary<Resistance, float> cacheBuffResistances = new Dictionary<Resistance, float>();
-    private readonly Dictionary<Attribute, int> cacheDebuffAttributes = new Dictionary<Attribute, int>();
-    private readonly Dictionary<Resistance, float> cacheDebuffResistances = new Dictionary<Resistance, float>();
-
-    private bool IsDirty()
-    {
-        return string.IsNullOrEmpty(dirtySkillId) ||
-            !dirtySkillId.Equals(skillId) ||
-            dirtyLevel != level;
-    }
-
-    private void MakeCache()
-    {
-        if (!IsDirty())
-            return;
-
-        dirtySkillId = skillId;
-        dirtyLevel = level;
-        cacheSkill = GameInstance.Skills.ContainsKey(skillId) ? GameInstance.Skills[skillId] : null;
-        cacheBuffAttributes.Clear();
-        cacheBuffResistances.Clear();
-        cacheDebuffAttributes.Clear();
-        cacheDebuffResistances.Clear();
-        if (cacheSkill != null)
-        {
-            if (isDebuff)
-            {
-                GameDataHelpers.MakeAttributeIncrementalDictionary(cacheSkill.debuff.increaseAttributes, cacheDebuffAttributes, level);
-                GameDataHelpers.MakeResistanceIncrementalDictionary(cacheSkill.debuff.increaseResistances, cacheDebuffResistances, level);
-            }
-            else
-            {
-                GameDataHelpers.MakeAttributeIncrementalDictionary(cacheSkill.buff.increaseAttributes, cacheBuffAttributes, level);
-                GameDataHelpers.MakeResistanceIncrementalDictionary(cacheSkill.buff.increaseResistances, cacheBuffResistances, level);
-            }
-        }
-    }
-
     public Skill GetSkill()
     {
-        MakeCache();
-        return cacheSkill;
+        return GameInstance.Skills.ContainsKey(skillId) ? GameInstance.Skills[skillId] : null;
     }
 
     public Dictionary<Attribute, int> GetAttributes()
     {
-        MakeCache();
-        return !isDebuff ? cacheBuffAttributes : cacheDebuffAttributes;
+        return !isDebuff ? GetSkill().buff.GetIncreaseAttributes(level) : GetSkill().debuff.GetIncreaseAttributes(level);
     }
 
     public Dictionary<Resistance, float> GetResistances()
     {
-        MakeCache();
-        return !isDebuff ? cacheBuffResistances : cacheDebuffResistances;
+        return !isDebuff ? GetSkill().buff.GetIncreaseResistances(level) : GetSkill().debuff.GetIncreaseResistances(level);
     }
 
     public float GetDuration()

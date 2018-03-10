@@ -9,7 +9,7 @@ public class UIBase : MonoBehaviour
 
     private bool isAwaken;
 
-    public GameObject TempRoot
+    public GameObject CacheRoot
     {
         get
         {
@@ -31,19 +31,19 @@ public class UIBase : MonoBehaviour
 
     public virtual bool IsVisible()
     {
-        return TempRoot.activeSelf;
+        return CacheRoot.activeSelf;
     }
 
     public virtual void Show()
     {
         isAwaken = true;
-        TempRoot.SetActive(true);
+        CacheRoot.SetActive(true);
     }
 
     public virtual void Hide()
     {
         isAwaken = true;
-        TempRoot.SetActive(false);
+        CacheRoot.SetActive(false);
     }
 
     public virtual void Toggle()

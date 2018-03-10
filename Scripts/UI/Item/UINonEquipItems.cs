@@ -7,14 +7,14 @@ public class UINonEquipItems : UIBase
 {
     public System.Action<UICharacterItem> onSelectCharacterItem;
 
-    private UIList tempList;
-    public UIList TempList
+    private UIList cacheList;
+    public UIList CacheList
     {
         get
         {
-            if (tempList == null)
-                tempList = GetComponent<UIList>();
-            return tempList;
+            if (cacheList == null)
+                cacheList = GetComponent<UIList>();
+            return cacheList;
         }
     }
 
@@ -51,7 +51,7 @@ public class UINonEquipItems : UIBase
             return;
         SelectionManager.Clear();
         var nonEquipItems = characterEntity.nonEquipItems;
-        TempList.Generate(nonEquipItems, (index, characterItem, ui) =>
+        CacheList.Generate(nonEquipItems, (index, characterItem, ui) =>
         {
             var uiCharacterItem = ui.GetComponent<UICharacterItem>();
             uiCharacterItem.Data = characterItem;

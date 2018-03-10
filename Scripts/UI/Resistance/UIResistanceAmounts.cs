@@ -12,14 +12,14 @@ public class UIResistanceAmounts : UISelectionEntry<Dictionary<Resistance, float
     public Text textAllAmounts;
     public UIResistanceTextPair[] textAmounts;
 
-    private Dictionary<Resistance, Text> tempTextAmounts;
-    public Dictionary<Resistance, Text> TempTextAmounts
+    private Dictionary<Resistance, Text> cacheTextAmounts;
+    public Dictionary<Resistance, Text> CacheTextAmounts
     {
         get
         {
-            if (tempTextAmounts == null)
+            if (cacheTextAmounts == null)
             {
-                tempTextAmounts = new Dictionary<Resistance, Text>();
+                cacheTextAmounts = new Dictionary<Resistance, Text>();
                 foreach (var textAmount in textAmounts)
                 {
                     if (textAmount.resistance == null || textAmount.text == null)
@@ -27,10 +27,10 @@ public class UIResistanceAmounts : UISelectionEntry<Dictionary<Resistance, float
                     var key = textAmount.resistance;
                     var textComp = textAmount.text;
                     textComp.text = string.Format(amountFormat, key.title, "0", "0");
-                    tempTextAmounts[key] = textComp;
+                    cacheTextAmounts[key] = textComp;
                 }
             }
-            return tempTextAmounts;
+            return cacheTextAmounts;
         }
     }
 
@@ -41,7 +41,7 @@ public class UIResistanceAmounts : UISelectionEntry<Dictionary<Resistance, float
             if (Data == null || Data.Count == 0)
             {
                 textAllAmounts.gameObject.SetActive(false);
-                foreach (var textAmount in TempTextAmounts)
+                foreach (var textAmount in CacheTextAmounts)
                 {
                     var element = textAmount.Key;
                     textAmount.Value.text = string.Format(amountFormat, element.title, "0", "0");
@@ -56,8 +56,8 @@ public class UIResistanceAmounts : UISelectionEntry<Dictionary<Resistance, float
                         continue;
                     var amountText = string.Format(amountFormat, dataEntry.Key.title, (dataEntry.Value * 100f).ToString("N0"));
                     text += amountText + "\n";
-                    if (TempTextAmounts.ContainsKey(dataEntry.Key))
-                        TempTextAmounts[dataEntry.Key].text = amountText;
+                    if (CacheTextAmounts.ContainsKey(dataEntry.Key))
+                        CacheTextAmounts[dataEntry.Key].text = amountText;
                 }
                 textAllAmounts.gameObject.SetActive(!string.IsNullOrEmpty(text));
                 textAllAmounts.text = text;

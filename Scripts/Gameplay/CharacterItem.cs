@@ -14,95 +14,27 @@ public class CharacterItem
     public int amount;
     // TODO: I want to add random item bonus
 
-    private string dirtyItemId;
-    private int dirtyLevel;
-    private Item cacheItem;
-    private EquipmentItem cacheEquipmentItem;
-    private WeaponItem cacheWeaponItem;
-    private ShieldItem cacheShieldItem;
-    private KeyValuePair<DamageElement, DamageAmount> cacheBaseDamageAttribute;
-    private readonly Dictionary<DamageElement, DamageAmount> cacheAdditionalDamageAttributes = new Dictionary<DamageElement, DamageAmount>();
-    private readonly Dictionary<Attribute, int> cacheIncreaseAttributes = new Dictionary<Attribute, int>();
-    private readonly Dictionary<Resistance, float> cacheIncreaseResistances = new Dictionary<Resistance, float>();
-
-    private bool IsDirty()
-    {
-        return string.IsNullOrEmpty(dirtyItemId) ||
-            !dirtyItemId.Equals(itemId) ||
-            dirtyLevel != level;
-    }
-
-    private void MakeCache()
-    {
-        if (!IsDirty())
-            return;
-
-        dirtyItemId = itemId;
-        dirtyLevel = level;
-        cacheItem = GameInstance.Items.ContainsKey(itemId) ? GameInstance.Items[itemId] : null;
-        cacheEquipmentItem = cacheItem != null ? cacheItem as EquipmentItem : null;
-        cacheWeaponItem = cacheItem != null ? cacheItem as WeaponItem : null;
-        cacheShieldItem = cacheItem != null ? cacheItem as ShieldItem : null;
-        cacheBaseDamageAttribute = new KeyValuePair<DamageElement, DamageAmount>();
-        cacheAdditionalDamageAttributes.Clear();
-        if (cacheEquipmentItem != null)
-        {
-            GameDataHelpers.MakeAttributeIncrementalDictionary(cacheEquipmentItem.increaseAttributes, cacheIncreaseAttributes, level);
-            GameDataHelpers.MakeResistanceIncrementalDictionary(cacheEquipmentItem.increaseResistances, cacheIncreaseResistances, level);
-        }
-        if (cacheWeaponItem != null)
-        {
-            cacheBaseDamageAttribute = GameDataHelpers.MakeDamageAttributePair(cacheWeaponItem.baseDamageAttribute, level);
-            GameDataHelpers.MakeDamageAttributesDictionary(cacheWeaponItem.additionalDamageAttributes, cacheAdditionalDamageAttributes, level);
-        }
-    }
-
     public Item GetItem()
     {
-        MakeCache();
-        return cacheItem;
+        return GameInstance.Items.ContainsKey(itemId) ? GameInstance.Items[itemId] : null;
     }
 
     public EquipmentItem GetEquipmentItem()
     {
-        MakeCache();
-        return cacheEquipmentItem;
+        var item = GetItem();
+        return item != null ? item as EquipmentItem : null;
     }
 
     public WeaponItem GetWeaponItem()
     {
-        MakeCache();
-        return cacheWeaponItem;
+        var item = GetItem();
+        return item != null ? item as WeaponItem : null;
     }
 
     public ShieldItem GetShieldItem()
     {
-        MakeCache();
-        return cacheShieldItem;
-    }
-
-    public KeyValuePair<DamageElement, DamageAmount> GetBaseDamageAttribute()
-    {
-        MakeCache();
-        return cacheBaseDamageAttribute;
-    }
-
-    public Dictionary<DamageElement, DamageAmount> GetAdditionalDamageAttributes()
-    {
-        MakeCache();
-        return cacheAdditionalDamageAttributes;
-    }
-
-    public Dictionary<Attribute, int> GetIncreaseAttributes()
-    {
-        MakeCache();
-        return cacheIncreaseAttributes;
-    }
-
-    public Dictionary<Resistance, float> GetIncreaseResistances()
-    {
-        MakeCache();
-        return cacheIncreaseResistances;
+        var item = GetItem();
+        return item != null ? item as ShieldItem : null;
     }
 
     public int GetMaxStack()

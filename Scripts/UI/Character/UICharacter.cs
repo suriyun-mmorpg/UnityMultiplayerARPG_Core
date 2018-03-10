@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -25,22 +26,8 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public string skillPointFormat = "Skill Points: {0}";
     [Tooltip("Gold Format => {0} = {Gold}")]
     public string goldFormat = "Gold: {0}";
-    [Tooltip("Atk Rate Stats Format => {0} = {Amount}")]
-    public string atkRateStatsFormat = "Atk Rate: {0}";
-    [Tooltip("Def Stats Format => {0} = {Amount}")]
-    public string defStatsFormat = "Def: {0}";
-    [Tooltip("Cri Hit Rate Stats Format => {0} = {Amount}")]
-    public string criHitRateStatsFormat = "Cri Hit: {0}%";
-    [Tooltip("Cri Dmg Rate Stats Format => {0} = {Amount}")]
-    public string criDmgRateStatsFormat = "Cri Dmg: {0}%";
     [Tooltip("Weight Limit Stats Format => {0} = {Weight Limit}")]
     public string weightLimitStatsFormat = "Weight Limit: {0}";
-
-    [Header("Damage")]
-    [Tooltip("Damage Format => {0} = {Damage title}, {1} = {Min damage}, {2} = {Max damage}")]
-    public string damageFormat = "{0}: {1}~{2}";
-    [Tooltip("Average Damage Format => {0} = {Min damage}, {1} = {Max damage}")]
-    public string averageDamageFormat = "{0}~{1}";
 
     [Header("Class")]
     [Tooltip("Class Title Format => {0} = {Class title}")]
@@ -59,13 +46,10 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public Text textStatPoint;
     public Text textSkillPoint;
     public Text textGold;
-    public Text textAtkRateStats;
-    public Text textDefStats;
-    public Text textCriHitRateStats;
-    public Text textCriDmgRateStats;
     public Text textWeightLimit;
-    public Text textAverageDamage;
-    public Text textAllDamages;
+    public UIDamageElementAmounts uiRightHandDamages;
+    public UIDamageElementAmounts uiLeftHandDamages;
+    public UICharacterStats uiCharacterStats;
     public UIAttributeAmountPair[] uiCharacterAttributes;
     [Header("Class information")]
     public Text textClassTitle;
@@ -75,32 +59,27 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public bool showStatsWithBuffs;
     public bool showAttributeWithBuffs;
 
-    private Dictionary<string, UIAttributeAmount> tempUICharacterAttributes = null;
-    public Dictionary<string, UIAttributeAmount> TempUICharacterAttributes
+    private Dictionary<Attribute, UIAttributeAmount> cacheUICharacterAttributes = null;
+    public Dictionary<Attribute, UIAttributeAmount> CacheUICharacterAttributes
     {
         get
         {
-            if (tempUICharacterAttributes == null)
+            if (cacheUICharacterAttributes == null)
             {
-                tempUICharacterAttributes = new Dictionary<string, UIAttributeAmount>();
+                cacheUICharacterAttributes = new Dictionary<Attribute, UIAttributeAmount>();
                 foreach (var uiCharacterAttribute in uiCharacterAttributes)
                 {
                     if (uiCharacterAttribute.attribute != null &&
                         uiCharacterAttribute.ui != null &&
-                        !tempUICharacterAttributes.ContainsKey(uiCharacterAttribute.attribute.Id))
-                        tempUICharacterAttributes.Add(uiCharacterAttribute.attribute.Id, uiCharacterAttribute.ui);
+                        !cacheUICharacterAttributes.ContainsKey(uiCharacterAttribute.attribute))
+                        cacheUICharacterAttributes.Add(uiCharacterAttribute.attribute, uiCharacterAttribute.ui);
                 }
             }
-            return tempUICharacterAttributes;
+            return cacheUICharacterAttributes;
         }
     }
 
     private void Update()
-    {
-        UpdateData();
-    }
-
-    protected override void UpdateData()
     {
         if (textName != null)
             textName.text = string.Format(nameFormat, Data == null ? "Unknow" : Data.CharacterName);
@@ -166,62 +145,59 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         if (textGold != null)
             textGold.text = string.Format(goldFormat, Data == null ? "N/A" : Data.Gold.ToString("N0"));
 
+    }
+
+    protected override void UpdateData()
+    {
         var stats = showStatsWithBuffs ? Data.GetStatsWithBuffs() : Data.GetStats();
-
-        if (textAtkRateStats != null)
-            textAtkRateStats.text = string.Format(atkRateStatsFormat, stats.atkRate.ToString("N0"));
-
-        if (textDefStats != null)
-            textDefStats.text = string.Format(defStatsFormat, stats.def.ToString("N0"));
-
-        if (textCriHitRateStats != null)
-            textCriHitRateStats.text = string.Format(criHitRateStatsFormat, (stats.criHitRate * 100f).ToString("N2"));
-
-        if (textCriDmgRateStats != null)
-            textCriDmgRateStats.text = string.Format(criDmgRateStatsFormat, (stats.criDmgRate * 100f).ToString("N2"));
 
         if (textWeightLimit != null)
             textWeightLimit.text = string.Format(weightLimitStatsFormat, stats.weightLimit.ToString("N2"));
-        
-        if (textAverageDamage != null || textAllDamages != null)
+
+        if (uiRightHandDamages != null)
         {
-            var damageAmountCount = 0;
-            var damageAmountMin = 0f;
-            var damageAmountMax = 0f;
-            var damagesString = "";
-            var characterWeapons = Data.GetWeapons();
-            foreach (var characterWeapon in characterWeapons)
+            var rightHandWeapon = Data.EquipItems.Where(a => a.GetWeaponItem() != null && !a.isSubWeapon).First();
+            if (rightHandWeapon == null)
+                uiRightHandDamages.Hide();
+            else
             {
-                if (!string.IsNullOrEmpty(damagesString))
-                    damagesString += "\n";
-                var damageElementAmountPairs = characterWeapon.GetAdditionalDamageAttributes();
-                foreach (var damageElementAmountPair in damageElementAmountPairs)
+                uiRightHandDamages.Data = rightHandWeapon.GetWeaponItem().GetAllDamages(Data, rightHandWeapon.level);
+                uiRightHandDamages.Show();
+            }
+        }
+
+        if (uiLeftHandDamages != null)
+        {
+            var leftHandWeapon = Data.EquipItems.Where(a => a.GetWeaponItem() != null && a.isSubWeapon).First();
+            if (leftHandWeapon == null)
+                uiLeftHandDamages.Hide();
+            else
+            {
+                uiLeftHandDamages.Data = leftHandWeapon.GetWeaponItem().GetAllDamages(Data, leftHandWeapon.level);
+                uiLeftHandDamages.Show();
+            }
+        }
+
+        if (uiCharacterStats != null)
+            uiCharacterStats.Data = stats;
+
+        if (CacheUICharacterAttributes.Count > 0 && Data != null)
+        {
+            var totalAttributes = showAttributeWithBuffs ? Data.GetAttributesWithBuffs() : Data.GetAttributes();
+            var characterAttributes = Data.Attributes;
+            for (var i = 0; i < characterAttributes.Count; ++i)
+            {
+                var characterAttribute = characterAttributes[i];
+                var attribute = characterAttribute.GetAttribute();
+                if (CacheUICharacterAttributes.ContainsKey(attribute))
                 {
-                    ++damageAmountCount;
-                    var element = damageElementAmountPair.Key;
-                    var amount = damageElementAmountPair.Value;
-                    damageAmountMin += amount.minDamage;
-                    damageAmountMax += amount.maxDamage;
-                    damagesString += string.Format(damageFormat,
-                        element.title,
-                        amount.minDamage,
-                        amount.maxDamage) + "\n";
+                    var cacheUICharacterAttribute = CacheUICharacterAttributes[attribute];
+                    cacheUICharacterAttribute.Data = new KeyValuePair<Attribute, int>(attribute, totalAttributes[attribute]);
+                    cacheUICharacterAttribute.indexOfData = i;
                 }
             }
-
-            // Find average damage
-            if (damageAmountCount > 0)
-            {
-                damageAmountMin /= damageAmountCount;
-                damageAmountMax /= damageAmountCount;
-            }
-
-            if (textAverageDamage != null)
-                textAverageDamage.text = string.Format(averageDamageFormat, damageAmountMin, damageAmountMax);
-
-            if (textAllDamages != null)
-                textAllDamages.text = damagesString;
         }
+        
 
         var classData = Data == null ? null : Data.GetClass();
         if (textClassTitle != null)
@@ -234,24 +210,6 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         {
             imageClassIcon.sprite = classData == null ? null : classData.icon;
             imageClassIcon.gameObject.SetActive(classData != null);
-        }
-
-        if (TempUICharacterAttributes.Count > 0 && Data != null)
-        {
-            var totalAttributes = showAttributeWithBuffs ? Data.GetAttributesWithBuffs() : Data.GetAttributes();
-            var characterAttributes = Data.Attributes;
-            for (var i = 0; i < characterAttributes.Count; ++i)
-            {
-                var characterAttribute = characterAttributes[i];
-                var attributeId = characterAttribute.attributeId;
-                var attribute = characterAttribute.GetAttribute();
-                if (TempUICharacterAttributes.ContainsKey(attributeId))
-                {
-                    var tempUICharacterAttribute = TempUICharacterAttributes[attributeId];
-                    tempUICharacterAttribute.Data = new KeyValuePair<Attribute, int>(attribute, totalAttributes[attribute]);
-                    tempUICharacterAttribute.indexOfData = i;
-                }
-            }
         }
     }
 }

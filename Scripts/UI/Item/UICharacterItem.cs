@@ -118,7 +118,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
                 uiRequireAttributeAmounts.gameObject.SetActive(false);
             else
             {
-                uiRequireAttributeAmounts.Data = equipmentItem.TempRequireAttributeAmounts;
+                uiRequireAttributeAmounts.Data = equipmentItem.CacheRequireAttributeAmounts;
                 uiRequireAttributeAmounts.gameObject.SetActive(true);
             }
         }
@@ -140,7 +140,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
                 uiIncreaseAttributes.Hide();
             else
             {
-                uiIncreaseAttributes.Data = Data.GetIncreaseAttributes();
+                uiIncreaseAttributes.Data = equipmentItem.GetIncreaseAttributes(Data.level);
                 uiIncreaseAttributes.Show();
             }
         }
@@ -151,7 +151,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
                 uiIncreaseResistances.Hide();
             else
             {
-                uiIncreaseResistances.Data = Data.GetIncreaseResistances();
+                uiIncreaseResistances.Data = equipmentItem.GetIncreaseResistances(Data.level);
                 uiIncreaseResistances.Show();
             }
         }
@@ -175,7 +175,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
                 uiBaseDamageAttribute.Hide();
             else
             {
-                uiBaseDamageAttribute.Data = Data.GetBaseDamageAttribute();
+                uiBaseDamageAttribute.Data = weaponItem.GetBaseDamageAttribute(Data.level, 1f);
                 uiBaseDamageAttribute.Show();
             }
         }
@@ -186,7 +186,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
                 uiAdditionalDamageAttributes.Hide();
             else
             {
-                uiAdditionalDamageAttributes.Data = Data.GetAdditionalDamageAttributes();
+                uiAdditionalDamageAttributes.Data = weaponItem.GetAdditionalDamageAttributes(Data.level);
                 uiAdditionalDamageAttributes.Show();
             }
         }

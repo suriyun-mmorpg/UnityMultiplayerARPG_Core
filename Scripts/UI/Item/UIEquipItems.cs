@@ -13,54 +13,54 @@ public class UIEquipItems : UIBase
     public UICharacterItemPair leftHandSlot;
     public UICharacterItemPair[] otherEquipSlots;
 
-    private Dictionary<string, UICharacterItem> tempEquipItemSlots = null;
-    public Dictionary<string, UICharacterItem> TempEquipItemSlots
+    private Dictionary<string, UICharacterItem> cacheEquipItemSlots = null;
+    public Dictionary<string, UICharacterItem> CacheEquipItemSlots
     {
         get
         {
-            if (tempEquipItemSlots == null)
+            if (cacheEquipItemSlots == null)
             {
-                tempEquipItemSlots = new Dictionary<string, UICharacterItem>();
+                cacheEquipItemSlots = new Dictionary<string, UICharacterItem>();
                 SelectionManager.Clear();
                 if (rightHandSlot.ui != null)
                 {
                     var equipPosition = GameDataConst.EQUIP_POSITION_RIGHT_HAND;
                     rightHandSlot.ui.equipPosition = equipPosition;
-                    tempEquipItemSlots.Add(equipPosition, rightHandSlot.ui);
+                    cacheEquipItemSlots.Add(equipPosition, rightHandSlot.ui);
                     SelectionManager.Add(rightHandSlot.ui);
                 }
                 if (leftHandSlot.ui != null)
                 {
                     var equipPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
                     leftHandSlot.ui.equipPosition = equipPosition;
-                    tempEquipItemSlots.Add(equipPosition, leftHandSlot.ui);
+                    cacheEquipItemSlots.Add(equipPosition, leftHandSlot.ui);
                     SelectionManager.Add(leftHandSlot.ui);
                 }
                 foreach (var otherEquipSlot in otherEquipSlots)
                 {
                     if (!string.IsNullOrEmpty(otherEquipSlot.equipPosition) &&
                         otherEquipSlot.ui != null && 
-                        !tempEquipItemSlots.ContainsKey(otherEquipSlot.equipPosition))
+                        !cacheEquipItemSlots.ContainsKey(otherEquipSlot.equipPosition))
                     {
                         var equipPosition = otherEquipSlot.equipPosition;
                         otherEquipSlot.ui.equipPosition = equipPosition;
-                        tempEquipItemSlots.Add(equipPosition, otherEquipSlot.ui);
+                        cacheEquipItemSlots.Add(equipPosition, otherEquipSlot.ui);
                         SelectionManager.Add(otherEquipSlot.ui);
                     }
                 }
             }
-            return tempEquipItemSlots;
+            return cacheEquipItemSlots;
         }
     }
 
-    private UIList tempList;
-    public UIList TempList
+    private UIList cacheList;
+    public UIList CacheList
     {
         get
         {
-            if (tempList == null)
-                tempList = GetComponent<UIList>();
-            return tempList;
+            if (cacheList == null)
+                cacheList = GetComponent<UIList>();
+            return cacheList;
         }
     }
 
@@ -105,7 +105,7 @@ public class UIEquipItems : UIBase
         if (characterEntity == null)
             return;
 
-        var slots = TempEquipItemSlots.Values;
+        var slots = CacheEquipItemSlots.Values;
         // Clear slots data
         foreach (var slot in slots)
         {
@@ -126,9 +126,9 @@ public class UIEquipItems : UIBase
             if (weaponItem != null || shieldItem != null)
                 position = equipItem.isSubWeapon ? GameDataConst.EQUIP_POSITION_LEFT_HAND : GameDataConst.EQUIP_POSITION_RIGHT_HAND;
 
-            if (TempEquipItemSlots.ContainsKey(position))
+            if (CacheEquipItemSlots.ContainsKey(position))
             {
-                var slot = TempEquipItemSlots[position];
+                var slot = CacheEquipItemSlots[position];
                 slot.Data = equipItem;
                 slot.indexOfData = i;
             }

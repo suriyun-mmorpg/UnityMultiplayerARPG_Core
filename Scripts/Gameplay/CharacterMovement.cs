@@ -8,22 +8,22 @@ public class CharacterMovement : MonoBehaviour
     public Vector3 moveVelocity;
     public float moveVelocityMultiplier = 1f;
 
-    private Rigidbody tempRigidbody;
-    public Rigidbody TempRigidbody
+    private Rigidbody cacheRigidbody;
+    public Rigidbody CacheRigidbody
     {
         get
         {
-            if (tempRigidbody == null)
-                tempRigidbody = GetComponent<Rigidbody>();
-            return tempRigidbody;
+            if (cacheRigidbody == null)
+                cacheRigidbody = GetComponent<Rigidbody>();
+            return cacheRigidbody;
         }
     }
 
     protected virtual void FixedUpdate()
     {
-        var oldVelocity = TempRigidbody.velocity;
+        var oldVelocity = CacheRigidbody.velocity;
         var velocityChange = (moveVelocity * moveVelocityMultiplier) - oldVelocity;
         velocityChange.y = 0;
-        TempRigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
+        CacheRigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
     }
 }

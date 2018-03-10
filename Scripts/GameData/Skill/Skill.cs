@@ -76,37 +76,25 @@ public class Skill : BaseGameData
     public SkillBuffType skillBuffType;
     public SkillBuff buff;
 
-    private Dictionary<Skill, int> tempRequireSkillLevels;
-    public Dictionary<Skill, int> TempRequireSkillLevels
+    private Dictionary<Skill, int> cacheRequireSkillLevels;
+    public Dictionary<Skill, int> CacheRequireSkillLevels
     {
         get
         {
-            if (tempRequireSkillLevels == null)
-                tempRequireSkillLevels = GameDataHelpers.MakeSkillLevelDictionary(requirement.skillLevels, new Dictionary<Skill, int>());
-            return tempRequireSkillLevels;
+            if (cacheRequireSkillLevels == null)
+                cacheRequireSkillLevels = GameDataHelpers.MakeSkillLevelsDictionary(requirement.skillLevels, new Dictionary<Skill, int>());
+            return cacheRequireSkillLevels;
         }
     }
 
-    private Dictionary<string, float> tempEffectivenessAttributes;
-    public Dictionary<string, float> TempEffectivenessAttributes
+    private Dictionary<Attribute, float> cacheEffectivenessAttributes;
+    public Dictionary<Attribute, float> CacheEffectivenessAttributes
     {
         get
         {
-            if (tempEffectivenessAttributes == null)
-            {
-                tempEffectivenessAttributes = new Dictionary<string, float>();
-                foreach (var effectivenessAttribute in effectivenessAttributes)
-                {
-                    if (effectivenessAttribute.attribute == null || effectivenessAttribute.effectiveness == 0f)
-                        continue;
-                    var id = effectivenessAttribute.attribute.Id;
-                    if (!tempEffectivenessAttributes.ContainsKey(id))
-                        tempEffectivenessAttributes[id] = effectivenessAttribute.effectiveness;
-                    else
-                        tempEffectivenessAttributes[id] += effectivenessAttribute.effectiveness;
-                }
-            }
-            return tempEffectivenessAttributes;
+            if (cacheEffectivenessAttributes == null)
+                cacheEffectivenessAttributes = GameDataHelpers.MakeDamageEffectivenessAttributesDictionary(effectivenessAttributes, new Dictionary<Attribute, float>());
+            return cacheEffectivenessAttributes;
         }
     }
 }

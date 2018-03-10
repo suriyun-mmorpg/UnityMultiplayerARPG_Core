@@ -5,25 +5,25 @@ using LiteNetLibHighLevel;
 
 public class RpgNetworkEntity : LiteNetLibBehaviour
 {
-    private Transform tempTransform;
-    public Transform TempTransform
+    private Transform cacheTransform;
+    public Transform CacheTransform
     {
         get
         {
-            if (tempTransform == null)
-                tempTransform = GetComponent<Transform>();
-            return tempTransform;
+            if (cacheTransform == null)
+                cacheTransform = GetComponent<Transform>();
+            return cacheTransform;
         }
     }
 
-    private BaseRpgNetworkManager tempManager;
-    public BaseRpgNetworkManager TempManager
+    private BaseRpgNetworkManager cacheManager;
+    public BaseRpgNetworkManager CacheManager
     {
         get
         {
-            if (tempManager == null)
-                tempManager = Manager as BaseRpgNetworkManager;
-            return tempManager;
+            if (cacheManager == null)
+                cacheManager = Manager as BaseRpgNetworkManager;
+            return cacheManager;
         }
     }
 }
