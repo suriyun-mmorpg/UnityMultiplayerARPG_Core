@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "WeaponItem", menuName = "Create GameData/WeaponItem")]
-public class WeaponItem : EquipmentItem
+public class WeaponItem : BaseEquipmentItem
 {
+    [Header("Weapon Data")]
     public WeaponType weaponType;
-    public DamageAttribute baseDamageAttribute;
-    public DamageAttribute[] additionalDamageAttributes;
+    public DamageAttribute damageAttribute;
 
     public WeaponType WeaponType
     {
@@ -17,23 +17,11 @@ public class WeaponItem : EquipmentItem
             {
                 weaponType = CreateInstance<WeaponType>();
                 weaponType.effectivenessAttributes = new DamageEffectivenessAttribute[0];
-                weaponType.mainAttackAnimations = new ActionAnimation[0];
-                weaponType.subAttackAnimations = new ActionAnimation[0];
+                weaponType.rightHandAttackAnimations = new ActionAnimation[0];
+                weaponType.leftHandAttackAnimations = new ActionAnimation[0];
                 weaponType.damage = new Damage();
             }
             return weaponType;
         }
     }
-
-#if UNITY_EDITOR
-    protected override void OnValidate()
-    {
-        // Damage Amounts must have at least 1
-        if (additionalDamageAttributes == null || additionalDamageAttributes.Length == 0)
-            additionalDamageAttributes = new DamageAttribute[] { new DamageAttribute() };
-        // Weapon equipment cannot set custom equip position
-        equipPosition = string.Empty;
-        base.OnValidate();
-    }
-#endif
 }

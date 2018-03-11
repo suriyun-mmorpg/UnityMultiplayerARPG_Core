@@ -194,12 +194,9 @@ public class GameInstance : MonoBehaviour
             if (item == null || Items.ContainsKey(item.Id))
                 continue;
             Items[item.Id] = item;
-            if (item is EquipmentItem)
+            if (item is BaseEquipmentItem)
             {
-                var equipmentItem = item as EquipmentItem;
-                if (!EquipmentPositions.Contains(equipmentItem.equipPosition))
-                    EquipmentPositions.Add(equipmentItem.equipPosition);
-
+                var equipmentItem = item as BaseEquipmentItem;
                 var attributes = new List<Attribute>();
                 var requireAttributes = equipmentItem.requirement.attributeAmounts;
                 foreach (var requireAttribute in requireAttributes)
@@ -209,6 +206,12 @@ public class GameInstance : MonoBehaviour
                     attributes.Add(requireAttribute.attribute);
                 }
                 AddCharacterAttributes(attributes);
+            }
+            if (item is ArmorItem)
+            {
+                var armorItem = item as ArmorItem;
+                if (!EquipmentPositions.Contains(armorItem.equipPosition))
+                    EquipmentPositions.Add(armorItem.equipPosition);
             }
             if (item is WeaponItem)
             {
@@ -222,7 +225,7 @@ public class GameInstance : MonoBehaviour
                 }
                 AddCharacterAttributes(attributes);
                 var damageElements = new List<DamageElement>();
-                var damageAttributes = weaponItem.additionalDamageAttributes;
+                var damageAttributes = weaponItem.increaseDamageAttributes;
                 foreach (var damageAttribute in damageAttributes)
                 {
                     if (damageAttribute.damageElement == null || DamageElements.ContainsKey(damageAttribute.damageElement.Id))

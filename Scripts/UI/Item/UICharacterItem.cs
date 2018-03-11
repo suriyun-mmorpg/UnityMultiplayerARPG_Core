@@ -45,6 +45,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
     public UICharacterStats uiStats;
     public UIAttributeAmounts uiIncreaseAttributes;
     public UIResistanceAmounts uiIncreaseResistances;
+    public UIDamageElementAmounts uiIncreaseDamageAttributes;
 
     [Header("Equipment Requirement - UI Elements")]
     public Text textRequireLevel;
@@ -53,8 +54,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
 
     [Header("Weapon - UI Elements")]
     public Text textWeaponType;
-    public UIDamageElementAmount uiBaseDamageAttribute;
-    public UIDamageElementAmounts uiAdditionalDamageAttributes;
+    public UIDamageElementAmount uiDamageAttribute;
 
     protected override void UpdateData()
     {
@@ -156,6 +156,17 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
             }
         }
 
+        if (uiIncreaseDamageAttributes != null)
+        {
+            if (equipmentItem == null)
+                uiIncreaseDamageAttributes.Hide();
+            else
+            {
+                uiIncreaseDamageAttributes.Data = equipmentItem.GetIncreaseDamageAttributes(Data.level);
+                uiIncreaseDamageAttributes.Show();
+            }
+        }
+
         var weaponItem = Data.GetWeaponItem();
 
         if (textWeaponType != null)
@@ -169,25 +180,14 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
             }
         }
 
-        if (uiBaseDamageAttribute != null)
+        if (uiDamageAttribute != null)
         {
             if (weaponItem == null)
-                uiBaseDamageAttribute.Hide();
+                uiDamageAttribute.Hide();
             else
             {
-                uiBaseDamageAttribute.Data = weaponItem.GetBaseDamageAttribute(Data.level, 1f);
-                uiBaseDamageAttribute.Show();
-            }
-        }
-
-        if (uiAdditionalDamageAttributes != null)
-        {
-            if (weaponItem == null)
-                uiAdditionalDamageAttributes.Hide();
-            else
-            {
-                uiAdditionalDamageAttributes.Data = weaponItem.GetAdditionalDamageAttributes(Data.level);
-                uiAdditionalDamageAttributes.Show();
+                uiDamageAttribute.Data = weaponItem.GetDamageAttribute(Data.level, 1f);
+                uiDamageAttribute.Show();
             }
         }
     }

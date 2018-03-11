@@ -5,18 +5,18 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-[CreateAssetMenu(fileName = "EquipmentItem", menuName = "Create GameData/EquipmentItem")]
-public class EquipmentItem : Item
+public abstract class BaseEquipmentItem : Item
 {
-    public string equipPosition;
     public GameObject equipmentModel;
     [Header("Requirements")]
     public EquipmentRequirement requirement;
-    [Header("Add Attributes")]
+    [Header("Attributes Bonus")]
     public AttributeIncremental[] increaseAttributes;
-    [Header("Add Resistances")]
+    [Header("Resistances Bonus")]
     public ResistanceIncremental[] increaseResistances;
-    [Header("Add Stats")]
+    [Header("Damages Bonus")]
+    public DamageAttribute[] increaseDamageAttributes;
+    [Header("Stats Bonus")]
     public CharacterStats baseStats;
     public CharacterStats statsIncreaseEachLevel;
 

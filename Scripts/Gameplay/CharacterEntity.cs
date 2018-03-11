@@ -323,10 +323,10 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             equipWeapon = CharacterItem.Create(weapon, 1);
         }
         var weaponType = weapon.WeaponType;
-        if (weaponType.subAttackAnimations == null || weaponType.subAttackAnimations.Length == 0)
+        if (weaponType.leftHandAttackAnimations == null || weaponType.leftHandAttackAnimations.Length == 0)
             useSubAttackAnims = false;
         // Random animation
-        var animArray = useSubAttackAnims ? weaponType.subAttackAnimations : weaponType.mainAttackAnimations;
+        var animArray = useSubAttackAnims ? weaponType.leftHandAttackAnimations : weaponType.rightHandAttackAnimations;
         var actionId = -1;
         var triggerDuration = 0f;
         var totalDuration = 0f;
@@ -341,8 +341,8 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         PlayActionAnimation(totalDuration, actionId);
         // Calculate all damages
         var inflictRate = weapon.GetDamageEffectiveness(this);
-        var baseDamageAttribute = weapon.GetBaseDamageAttribute(equipWeapon.level, inflictRate);
-        var allDamageAttributes = weapon.GetAdditionalDamageAttributes(equipWeapon.level);
+        var baseDamageAttribute = weapon.GetDamageAttribute(equipWeapon.level, inflictRate);
+        var allDamageAttributes = weapon.GetIncreaseDamageAttributes(equipWeapon.level);
         allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, baseDamageAttribute);
         // Start attack routine
         StartCoroutine(AttackRoutine(triggerDuration, totalDuration, allDamageAttributes, weaponType.damage, weaponType.CacheEffectivenessAttributes));
@@ -488,8 +488,8 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
         // Calculate all damages
         var inflictRate = weapon.GetDamageEffectiveness(this) * skill.GetInflictRate(characterSkill.level);
-        var baseDamageAttribute = weapon.GetBaseDamageAttribute(equipWeapon.level, inflictRate);
-        var allDamageAttributes = weapon.GetAdditionalDamageAttributes(equipWeapon.level);
+        var baseDamageAttribute = weapon.GetDamageAttribute(equipWeapon.level, inflictRate);
+        var allDamageAttributes = weapon.GetIncreaseDamageAttributes(equipWeapon.level);
         allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, baseDamageAttribute);
         var inflictDamageAttributes = skill.GetInflictDamageAttributes(characterSkill.level);
         foreach (var inflictDamageAttribute in inflictDamageAttributes)
@@ -978,7 +978,8 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             }
         }
 
-        if (!equipmentItem.equipPosition.Equals(equipPosition))
+        var armorItem = nonEquipItem.GetArmorItem();
+        if (armorItem != null && !armorItem.equipPosition.Equals(equipPosition))
         {
             reasonWhyCannot = "Can equip to " + equipPosition + " only";
             return false;
@@ -1120,6 +1121,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             if (equipmentItem == null)
                 continue;
 
+            var armorItem = equipItem.GetArmorItem();
             var weaponItem = equipItem.GetWeaponItem();
             var shieldItem = equipItem.GetShieldItem();
             if (weaponItem != null)
@@ -1132,8 +1134,8 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             }
             else if (shieldItem != null)
                 equipItemLocations[GameDataConst.EQUIP_POSITION_LEFT_HAND] = i;
-            else
-                equipItemLocations[equipmentItem.equipPosition] = i;
+            else if (armorItem != null)
+                equipItemLocations[armorItem.equipPosition] = i;
         }
 
         if (model != null)

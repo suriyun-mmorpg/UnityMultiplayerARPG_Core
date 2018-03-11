@@ -93,6 +93,10 @@ public class UIEquipItems : UIBase
 
     protected void OnSelectCharacterItem(UICharacterItem ui)
     {
+        var uiGameplay = UISceneGameplay.Singleton;
+        if (uiGameplay != null && uiGameplay.uiEquipItems != null)
+            uiGameplay.uiEquipItems.SelectionManager.DeselectSelectedUI();
+
         if (uiItemDialog != null)
         {
             uiItemDialog.Data = ui.Data;
@@ -131,15 +135,15 @@ public class UIEquipItems : UIBase
         for (var i = 0; i < equipItems.Count; ++i)
         {
             var equipItem = equipItems[i];
-            var weaponItem = equipItem.GetWeaponItem();
-            var shieldItem = equipItem.GetShieldItem();
             var equipmentItem = equipItem.GetEquipmentItem();
             if (equipmentItem == null)
                 continue;
 
-            var position = equipmentItem.equipPosition;
-            if (weaponItem != null || shieldItem != null)
+            var position = "";
+            if (equipmentItem is WeaponItem || equipmentItem is ShieldItem)
                 position = equipItem.isSubWeapon ? GameDataConst.EQUIP_POSITION_LEFT_HAND : GameDataConst.EQUIP_POSITION_RIGHT_HAND;
+            else if (equipmentItem is ArmorItem)
+                position = (equipmentItem as ArmorItem).equipPosition;
 
             if (CacheEquipItemSlots.ContainsKey(position))
             {

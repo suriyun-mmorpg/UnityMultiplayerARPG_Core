@@ -47,6 +47,10 @@ public class UINonEquipItems : UIBase
 
     protected void OnSelectCharacterItem(UICharacterItem ui)
     {
+        var uiGameplay = UISceneGameplay.Singleton;
+        if (uiGameplay != null && uiGameplay.uiNonEquipItems != null)
+            uiGameplay.uiNonEquipItems.SelectionManager.DeselectSelectedUI();
+
         if (uiItemDialog != null)
         {
             uiItemDialog.Data = ui.Data;

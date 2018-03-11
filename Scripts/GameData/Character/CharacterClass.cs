@@ -17,9 +17,9 @@ public class CharacterClass : BaseGameData
     public Skill[] skills;
 
     [Header("Start Equipments")]
-    public EquipmentItem rightHandEquipItem;
-    public EquipmentItem leftHandEquipItem;
-    public EquipmentItem[] otherEquipItems;
+    public BaseEquipmentItem rightHandEquipItem;
+    public BaseEquipmentItem leftHandEquipItem;
+    public BaseEquipmentItem[] otherEquipItems;
 
 #if UNITY_EDITOR
     void OnValidate()
@@ -59,10 +59,13 @@ public class CharacterClass : BaseGameData
                 otherEquipItems[i] = null;
                 continue;
             }
-            if (equipedPositions.Contains(otherEquipItem.equipPosition))
+            var armorEquipItem = otherEquipItem as ArmorItem;
+            if (armorEquipItem == null)
+                continue;
+            if (equipedPositions.Contains(armorEquipItem.equipPosition))
                 otherEquipItems[i] = null;
             else
-                equipedPositions.Add(otherEquipItem.equipPosition);
+                equipedPositions.Add(armorEquipItem.equipPosition);
         }
         EditorUtility.SetDirty(this);
     }

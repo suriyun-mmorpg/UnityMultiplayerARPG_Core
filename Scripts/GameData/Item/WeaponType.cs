@@ -9,13 +9,13 @@ public enum WeaponItemEquipType : byte
     TwoHand,
 }
 
-[CreateAssetMenu(fileName = "WeaponItem", menuName = "Create GameData/WeaponItem")]
+[CreateAssetMenu(fileName = "WeaponType", menuName = "Create GameData/WeaponType")]
 public class WeaponType : BaseGameData
 {
     public WeaponItemEquipType equipType = WeaponItemEquipType.OneHand;
     public DamageEffectivenessAttribute[] effectivenessAttributes;
-    public ActionAnimation[] mainAttackAnimations;
-    public ActionAnimation[] subAttackAnimations;
+    public ActionAnimation[] rightHandAttackAnimations;
+    public ActionAnimation[] leftHandAttackAnimations;
     public Damage damage;
 
     private Dictionary<Attribute, float> cacheEffectivenessAttributes;

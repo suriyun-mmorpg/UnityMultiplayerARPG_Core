@@ -11,6 +11,7 @@ public struct CharacterStats
     public float criHitRate;
     public float criDmgRate;
     public float moveSpeed;
+    public float atkSpeed;
     public float weightLimit;
 
     public static CharacterStats operator +(CharacterStats a, CharacterStats b)
@@ -23,6 +24,7 @@ public struct CharacterStats
         result.criHitRate = a.criHitRate + b.criHitRate;
         result.criDmgRate = a.criDmgRate + b.criDmgRate;
         result.moveSpeed = a.moveSpeed + b.moveSpeed;
+        result.atkSpeed = a.atkSpeed + b.atkSpeed;
         result.weightLimit = a.weightLimit + b.weightLimit;
         return result;
     }
@@ -37,6 +39,7 @@ public struct CharacterStats
         result.criHitRate = a.criHitRate * multiplier;
         result.criDmgRate = a.criDmgRate * multiplier;
         result.moveSpeed = a.moveSpeed * multiplier;
+        result.atkSpeed = a.atkSpeed * multiplier;
         result.weightLimit = a.weightLimit * multiplier;
         return result;
     }

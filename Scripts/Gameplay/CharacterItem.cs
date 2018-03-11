@@ -25,10 +25,16 @@ public struct CharacterItem
         return GameInstance.Items.ContainsKey(itemId) ? GameInstance.Items[itemId] : null;
     }
 
-    public EquipmentItem GetEquipmentItem()
+    public BaseEquipmentItem GetEquipmentItem()
     {
         var item = GetItem();
-        return item != null ? item as EquipmentItem : null;
+        return item != null ? item as BaseEquipmentItem : null;
+    }
+
+    public ArmorItem GetArmorItem()
+    {
+        var item = GetItem();
+        return item != null ? item as ArmorItem : null;
     }
 
     public WeaponItem GetWeaponItem()
@@ -42,6 +48,7 @@ public struct CharacterItem
         var item = GetItem();
         return item != null ? item as ShieldItem : null;
     }
+
 
     public int GetMaxStack()
     {

@@ -69,14 +69,17 @@ public class CharacterModel : MonoBehaviour
 
         foreach (var equipItem in equipItems)
         {
-            var weaponItem = equipItem.GetWeaponItem();
-            var shieldItem = equipItem.GetShieldItem();
             var equipmentItem = equipItem.GetEquipmentItem();
             if (equipmentItem == null)
                 continue;
 
-            var position = equipmentItem.equipPosition;
-            if (weaponItem != null || shieldItem != null)
+            var armorItem = equipItem.GetArmorItem();
+            var weaponItem = equipItem.GetWeaponItem();
+            var shieldItem = equipItem.GetShieldItem();
+            var position = "";
+            if (armorItem != null)
+                position = armorItem.equipPosition;
+            else if (weaponItem != null || shieldItem != null)
                 position = equipItem.isSubWeapon ? GameDataConst.EQUIP_POSITION_LEFT_HAND : GameDataConst.EQUIP_POSITION_RIGHT_HAND;
 
             var equipmentModelPrefab = equipmentItem.equipmentModel;
