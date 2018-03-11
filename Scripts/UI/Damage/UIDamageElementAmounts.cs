@@ -7,12 +7,12 @@ public class UIDamageElementAmounts : UISelectionEntry<Dictionary<DamageElement,
 {
     [Tooltip("Damage Amount Format => {0} = {Element title}, {1} = {Min damage}, {2} = {Max damage}")]
     public string damageFormat = "{0}: {1}~{2}";
-    [Tooltip("Average Damage Amount Format => {0} = {Min damage}, {1} = {Max damage}")]
-    public string averageDamageFormat = "{0}~{1}";
+    [Tooltip("Sum Damage Amount Format => {0} = {Min damage}, {1} = {Max damage}")]
+    public string sumDamageFormat = "{0}~{1}";
 
     [Header("UI Elements")]
     public Text textAllDamages;
-    public Text textAverageDamage;
+    public Text textSumDamage;
     public UIDamageElementTextPair[] textDamages;
 
     private Dictionary<DamageElement, Text> cacheTextDamages;
@@ -44,8 +44,8 @@ public class UIDamageElementAmounts : UISelectionEntry<Dictionary<DamageElement,
             if (textAllDamages != null)
                 textAllDamages.gameObject.SetActive(false);
 
-            if (textAverageDamage != null)
-                textAverageDamage.text = string.Format(averageDamageFormat, "0", "0");
+            if (textSumDamage != null)
+                textSumDamage.text = string.Format(sumDamageFormat, "0", "0");
 
             foreach (var textAmount in CacheTextDamages)
             {
@@ -56,8 +56,7 @@ public class UIDamageElementAmounts : UISelectionEntry<Dictionary<DamageElement,
         else
         {
             var text = "";
-            var averageMinDamage = 0f;
-            var averageMaxDamage = 0f;
+            var sumDamage = new DamageAmount();
             foreach (var dataEntry in Data)
             {
                 var element = dataEntry.Key;
@@ -66,12 +65,8 @@ public class UIDamageElementAmounts : UISelectionEntry<Dictionary<DamageElement,
                 text += amountText + "\n";
                 if (CacheTextDamages.ContainsKey(dataEntry.Key))
                     CacheTextDamages[dataEntry.Key].text = amountText;
-                averageMinDamage += amount.minDamage;
-                averageMaxDamage += amount.maxDamage;
+                sumDamage += amount;
             }
-
-            averageMinDamage /= Data.Count;
-            averageMaxDamage /= Data.Count;
 
             if (textAllDamages != null)
             {
@@ -79,8 +74,8 @@ public class UIDamageElementAmounts : UISelectionEntry<Dictionary<DamageElement,
                 textAllDamages.text = text;
             }
 
-            if (textAverageDamage != null)
-                textAverageDamage.text = string.Format(averageDamageFormat, averageMinDamage.ToString("N0"), averageMaxDamage.ToString("N0"));
+            if (textSumDamage != null)
+                textSumDamage.text = string.Format(sumDamageFormat, sumDamage.minDamage.ToString("N0"), sumDamage.maxDamage.ToString("N0"));
         }
     }
 }

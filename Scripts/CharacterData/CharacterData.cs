@@ -18,6 +18,7 @@ public class CharacterData : ICharacterData
     public int statPoint;
     public int skillPoint;
     public int gold;
+    public EquipWeapons equipWeapons;
     public string currentMapName;
     public Vector3 currentPosition;
     public string respawnMapName;
@@ -39,6 +40,7 @@ public class CharacterData : ICharacterData
     public int StatPoint { get { return statPoint; } set { statPoint = value; } }
     public int SkillPoint { get { return skillPoint; } set { skillPoint = value; } }
     public int Gold { get { return gold; } set { gold = value; } }
+    public EquipWeapons EquipWeapons { get { return equipWeapons; } set { equipWeapons = value; } }
     public string CurrentMapName { get { return currentMapName; } set { currentMapName = value; } }
     public Vector3 CurrentPosition { get { return currentPosition; } set { currentPosition = value; } }
     public string RespawnMapName { get { return respawnMapName; } set { respawnMapName = value; } }
@@ -126,6 +128,7 @@ public static class CharacterDataExtension
         to.StatPoint = from.StatPoint;
         to.SkillPoint = from.SkillPoint;
         to.Gold = from.Gold;
+        to.EquipWeapons = from.EquipWeapons;
         to.CurrentMapName = from.CurrentMapName;
         to.CurrentPosition = from.CurrentPosition;
         to.RespawnMapName = from.RespawnMapName;
@@ -167,7 +170,6 @@ public static class CharacterDataExtension
                 amount = startItem.item.maxStack;
             characterItem.id = System.Guid.NewGuid().ToString();
             characterItem.itemId = startItem.item.Id;
-            characterItem.isSubWeapon = false;
             characterItem.level = 1;
             characterItem.amount = amount;
             character.NonEquipItems.Add(characterItem);

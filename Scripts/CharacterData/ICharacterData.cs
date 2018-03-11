@@ -13,6 +13,7 @@ public interface ICharacterData
     int StatPoint { get; set; }
     int SkillPoint { get; set; }
     int Gold { get; set; }
+    EquipWeapons EquipWeapons { get; set; }
     /// <summary>
     /// Current Map Name will be work with MMORPG system only
     /// For Lan game it will be scene name which set in game instance

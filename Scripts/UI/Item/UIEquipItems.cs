@@ -131,25 +131,43 @@ public class UIEquipItems : UIBase
             slot.Data = CharacterItem.Empty;
         }
 
+        string tempPosition;
+        UICharacterItem tempSlot;
         var equipItems = characterEntity.equipItems;
         for (var i = 0; i < equipItems.Count; ++i)
         {
             var equipItem = equipItems[i];
-            var equipmentItem = equipItem.GetEquipmentItem();
-            if (equipmentItem == null)
+            var armorItem = equipItem.GetArmorItem();
+            if (armorItem == null)
                 continue;
 
-            var position = "";
-            if (equipmentItem is WeaponItem || equipmentItem is ShieldItem)
-                position = equipItem.isSubWeapon ? GameDataConst.EQUIP_POSITION_LEFT_HAND : GameDataConst.EQUIP_POSITION_RIGHT_HAND;
-            else if (equipmentItem is ArmorItem)
-                position = (equipmentItem as ArmorItem).equipPosition;
-
-            if (CacheEquipItemSlots.ContainsKey(position))
+            tempPosition = armorItem.equipPosition;
+            if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
             {
-                var slot = CacheEquipItemSlots[position];
-                slot.Data = equipItem;
-                slot.indexOfData = i;
+                tempSlot.Data = equipItem;
+                tempSlot.indexOfData = i;
+            }
+        }
+
+        var equipWeapons = characterEntity.EquipWeapons;
+        var rightHandEquipment = equipWeapons.rightHand.GetEquipmentItem();
+        var leftHandEquipment = equipWeapons.leftHand.GetEquipmentItem();
+        tempPosition = GameDataConst.EQUIP_POSITION_RIGHT_HAND;
+        if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
+        {
+            if (rightHandEquipment != null)
+            {
+                tempSlot.Data = equipWeapons.rightHand;
+                tempSlot.indexOfData = -1;
+            }
+        }
+        tempPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
+        if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
+        {
+            if (leftHandEquipment != null)
+            {
+                tempSlot.Data = equipWeapons.leftHand;
+                tempSlot.indexOfData = -1;
             }
         }
     }

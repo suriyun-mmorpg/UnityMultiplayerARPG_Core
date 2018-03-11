@@ -39,6 +39,14 @@ public struct DamageAmount
         return result;
     }
 
+    public static DamageAmount operator +(DamageAmount a, float damage)
+    {
+        var result = new DamageAmount();
+        result.minDamage = a.minDamage + damage;
+        result.maxDamage = a.maxDamage + damage;
+        return result;
+    }
+
     public static DamageAmount operator *(DamageAmount a, float multiplier)
     {
         var result = new DamageAmount();

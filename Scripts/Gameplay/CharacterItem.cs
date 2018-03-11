@@ -10,7 +10,6 @@ public struct CharacterItem
     // Use id as primary key
     public string id;
     public string itemId;
-    public bool isSubWeapon;
     public int level;
     public int amount;
     // TODO: I want to add random item bonus
@@ -58,7 +57,7 @@ public struct CharacterItem
 
     public bool IsValid()
     {
-        return GetItem() != null && amount > 0;
+        return !IsEmpty() && GetItem() != null && amount > 0;
     }
 
     public bool IsFull()
@@ -80,7 +79,6 @@ public struct CharacterItem
     {
         var newItem = new CharacterItem();
         newItem.itemId = item.Id;
-        newItem.isSubWeapon = false;
         newItem.level = level;
         newItem.amount = 1;
         return newItem;
@@ -93,7 +91,6 @@ public class NetFieldCharacterItem : LiteNetLibNetField<CharacterItem>
     {
         var newValue = new CharacterItem();
         newValue.itemId = reader.GetString();
-        newValue.isSubWeapon = reader.GetBool();
         newValue.level = reader.GetInt();
         newValue.amount = reader.GetInt();
         Value = newValue;
@@ -102,7 +99,6 @@ public class NetFieldCharacterItem : LiteNetLibNetField<CharacterItem>
     public override void Serialize(NetDataWriter writer)
     {
         writer.Put(Value.itemId);
-        writer.Put(Value.isSubWeapon);
         writer.Put(Value.level);
         writer.Put(Value.amount);
     }

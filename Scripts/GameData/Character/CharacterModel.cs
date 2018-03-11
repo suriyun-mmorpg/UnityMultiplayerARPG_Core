@@ -12,6 +12,7 @@ public class CharacterModel : MonoBehaviour
     [Header("Equipment Containers")]
     public Transform rightHandContainer;
     public Transform leftHandContainer;
+    public Transform shieldContainer;
     public CharacterModelContainer[] equipmentContainers;
 
     private Transform cacheTransform;
@@ -44,10 +45,6 @@ public class CharacterModel : MonoBehaviour
             if (cacheEquipmentContainers == null)
             {
                 cacheEquipmentContainers = new Dictionary<string, Transform>();
-                if (rightHandContainer != null)
-                    cacheEquipmentContainers.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandContainer);
-                if (leftHandContainer != null)
-                    cacheEquipmentContainers.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandContainer);
                 foreach (var equipmentContainer in equipmentContainers)
                 {
                     if (equipmentContainer.container != null && !cacheEquipmentContainers.ContainsKey(equipmentContainer.equipPosition))
@@ -56,6 +53,26 @@ public class CharacterModel : MonoBehaviour
             }
             return cacheEquipmentContainers;
         }
+    }
+
+    public void SetEquipWeapons(EquipWeapons equipWeapons)
+    {
+        if (rightHandContainer != null)
+            rightHandContainer.RemoveChildren();
+        if (leftHandContainer != null)
+            leftHandContainer.RemoveChildren();
+        if (shieldContainer != null)
+            shieldContainer.RemoveChildren();
+
+        var rightHandWeapon = equipWeapons.rightHand.GetWeaponItem();
+        var leftHandWeapon = equipWeapons.leftHand.GetWeaponItem();
+        var leftHandShield = equipWeapons.leftHand.GetShieldItem();
+        if (rightHandWeapon != null)
+            InstantiateEquipModel(rightHandWeapon.equipmentModel, rightHandContainer);
+        if (leftHandWeapon != null)
+            InstantiateEquipModel(leftHandWeapon.equipmentModel, leftHandContainer);
+        if (leftHandShield != null)
+            InstantiateEquipModel(leftHandShield.equipmentModel, shieldContainer);
     }
     
     public void SetEquipItems(IList<CharacterItem> equipItems)
@@ -69,30 +86,25 @@ public class CharacterModel : MonoBehaviour
 
         foreach (var equipItem in equipItems)
         {
-            var equipmentItem = equipItem.GetEquipmentItem();
-            if (equipmentItem == null)
-                continue;
-
             var armorItem = equipItem.GetArmorItem();
-            var weaponItem = equipItem.GetWeaponItem();
-            var shieldItem = equipItem.GetShieldItem();
-            var position = "";
-            if (armorItem != null)
-                position = armorItem.equipPosition;
-            else if (weaponItem != null || shieldItem != null)
-                position = equipItem.isSubWeapon ? GameDataConst.EQUIP_POSITION_LEFT_HAND : GameDataConst.EQUIP_POSITION_RIGHT_HAND;
-
-            var equipmentModelPrefab = equipmentItem.equipmentModel;
-            if (equipmentModelPrefab != null && CacheEquipmentContainers.ContainsKey(position))
-            {
-                var container = CacheEquipmentContainers[position];
-                var equipmentModel = Instantiate(equipmentModelPrefab, container);
-                equipmentModel.transform.localPosition = Vector3.zero;
-                equipmentModel.transform.localEulerAngles = Vector3.zero;
-                equipmentModel.transform.localScale = Vector3.one;
-                equipmentModel.gameObject.SetActive(true);
-            }
+            if (armorItem == null)
+                continue;
+            
+            Transform container;
+            if (CacheEquipmentContainers.TryGetValue(armorItem.equipPosition, out container))
+                InstantiateEquipModel(armorItem.equipmentModel, container);
         }
+    }
+
+    private void InstantiateEquipModel(GameObject prefab, Transform container)
+    {
+        if (prefab == null || container == null)
+            return;
+        var equipmentModel = Instantiate(prefab, container);
+        equipmentModel.transform.localPosition = Vector3.zero;
+        equipmentModel.transform.localEulerAngles = Vector3.zero;
+        equipmentModel.transform.localScale = Vector3.one;
+        equipmentModel.gameObject.SetActive(true);
     }
 
     private void OnDrawGizmos()

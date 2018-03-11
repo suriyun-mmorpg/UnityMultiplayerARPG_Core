@@ -186,7 +186,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
                 uiDamageAttribute.Hide();
             else
             {
-                uiDamageAttribute.Data = weaponItem.GetDamageAttribute(Data.level, 1f);
+                uiDamageAttribute.Data = weaponItem.GetDamageAttribute(Data.level, 0f, 1f);
                 uiDamageAttribute.Show();
             }
         }

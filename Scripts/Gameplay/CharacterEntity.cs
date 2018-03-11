@@ -31,6 +31,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     public SyncFieldInt statPoint = new SyncFieldInt();
     public SyncFieldInt skillPoint = new SyncFieldInt();
     public SyncFieldInt gold = new SyncFieldInt();
+    public SyncFieldEquipWeapons equipWeapons = new SyncFieldEquipWeapons();
 
     [Header("Sync Lists")]
     public SyncListCharacterAttribute attributes = new SyncListCharacterAttribute();
@@ -43,9 +44,8 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     // Entity data
     protected CharacterModel model;
     protected bool doingAction;
-    protected readonly Dictionary<string, int> buffLocations = new Dictionary<string, int>();
-    protected readonly Dictionary<string, int> equipItemLocations = new Dictionary<string, int>();
-    protected readonly List<CharacterItem> equipWeapons = new List<CharacterItem>();
+    protected readonly Dictionary<string, int> buffIndexes = new Dictionary<string, int>();
+    protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
     protected float lastUpdateSkillAndBuffTime = 0f;
     // Net Functions
     protected LiteNetLibFunction netFuncAttack;
@@ -55,7 +55,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     protected LiteNetLibFunction<NetFieldInt, NetFieldInt> netFuncDropItem;
     protected LiteNetLibFunction<NetFieldInt, NetFieldInt> netFuncSwapOrMergeItem;
     protected LiteNetLibFunction<NetFieldInt, NetFieldString> netFuncEquipItem;
-    protected LiteNetLibFunction<NetFieldString, NetFieldInt> netFuncUnEquipItem;
+    protected LiteNetLibFunction<NetFieldString> netFuncUnEquipItem;
     protected LiteNetLibFunction<NetFieldInt> netFuncAddAttribute;
     protected LiteNetLibFunction<NetFieldInt> netFuncAddSkill;
     #endregion
@@ -70,6 +70,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     public int StatPoint { get { return statPoint.Value; } set { statPoint.Value = value; } }
     public int SkillPoint { get { return skillPoint.Value; } set { skillPoint.Value = value; } }
     public int Gold { get { return gold.Value; } set { gold.Value = value; } }
+    public EquipWeapons EquipWeapons { get { return equipWeapons; } set { equipWeapons.Value = value; } }
     public string CurrentMapName { get; set; }
     public Vector3 CurrentPosition { get { return CacheTransform.position; } set { CacheTransform.position = value; } }
     public string RespawnMapName { get; set; }
@@ -116,9 +117,18 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         get { return buffs; }
         set
         {
+            buffIndexes.Clear();
             buffs.Clear();
-            foreach (var entry in value)
-                buffs.Add(entry);
+            for (var i = 0; i < value.Count; ++i)
+            {
+                var entry = value[i];
+                var buffKey = GetBuffKey(entry.skillId, entry.isDebuff);
+                if (!buffIndexes.ContainsKey(buffKey))
+                {
+                    buffIndexes.Add(buffKey, i);
+                    buffs.Add(entry);
+                }
+            }
         }
     }
     public IList<CharacterItem> EquipItems
@@ -126,9 +136,18 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         get { return equipItems; }
         set
         {
+            equipItemIndexes.Clear();
             equipItems.Clear();
-            foreach (var entry in value)
-                equipItems.Add(entry);
+            for (var i = 0; i < value.Count; ++i)
+            {
+                var entry = value[i];
+                var armorItem = entry.GetArmorItem();
+                if (entry.IsValid() && armorItem != null && !equipItemIndexes.ContainsKey(armorItem.equipPosition))
+                {
+                    equipItemIndexes.Add(armorItem.equipPosition, i);
+                    equipItems.Add(entry);
+                }
+            }
         }
     }
     public IList<CharacterItem> NonEquipItems
@@ -246,7 +265,11 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         {
             var buff = buffs[i];
             if (buff.ShouldRemove())
+            {
+                var buffKey = GetBuffKey(buff.skillId, buff.isDebuff);
                 buffs.RemoveAt(i);
+                buffIndexes.Remove(buffKey);
+            }
             else
             {
                 buff.Update(Time.unscaledDeltaTime);
@@ -270,6 +293,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     {
         SetupNetElements();
         prototypeId.onChange += OnPrototypeIdChange;
+        equipWeapons.onChange += OnChangeEquipWeapons;
         buffs.onOperation += OnBuffsOperation;
         equipItems.onOperation += OnEquipItemsOperation;
         nonEquipItems.onOperation += OnNonEquipItemsOperation;
@@ -281,7 +305,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         netFuncDropItem = new LiteNetLibFunction<NetFieldInt, NetFieldInt>(NetFuncDropItemCallback);
         netFuncSwapOrMergeItem = new LiteNetLibFunction<NetFieldInt, NetFieldInt>(NetFuncSwapOrMergeItemCallback);
         netFuncEquipItem = new LiteNetLibFunction<NetFieldInt, NetFieldString>(NetFuncEquipItemCallback);
-        netFuncUnEquipItem = new LiteNetLibFunction<NetFieldString, NetFieldInt>(NetFuncUnEquipItemCallback);
+        netFuncUnEquipItem = new LiteNetLibFunction<NetFieldString>(NetFuncUnEquipItemCallback);
         netFuncAddAttribute = new LiteNetLibFunction<NetFieldInt>(NetFuncAddAttributeCallback);
         netFuncAddSkill = new LiteNetLibFunction<NetFieldInt>(NetFuncAddSkillCallback);
         RegisterNetFunction("Attack", netFuncAttack);
@@ -298,35 +322,21 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     #region Net functions callbacks
     protected void NetFuncAttackCallback()
     {
-        NetFuncAttack();
+        NetFuncAttack(1, null, CharacterBuff.Empty);
     }
 
-    protected void NetFuncAttack()
+    protected void NetFuncAttack(float inflictRate, Dictionary<DamageElement, DamageAmount> additionalDamageAttributes, CharacterBuff debuff)
     {
         if (CurrentHp <= 0 || model == null || doingAction)
             return;
         doingAction = true;
         // Prepare weapon data
-        CharacterItem equipWeapon;
-        WeaponItem weapon;
-        var useSubAttackAnims = false;
-        // Random left hand / right hand weapon
-        if (equipWeapons.Count > 0)
-        {
-            equipWeapon = equipWeapons[Random.Range(0, equipWeapons.Count - 1)];
-            weapon = equipWeapon.GetWeaponItem();
-            useSubAttackAnims = equipWeapon.isSubWeapon;
-        }
-        else
-        {
-            weapon = GameInstance.Singleton.defaultWeaponItem;
-            equipWeapon = CharacterItem.Create(weapon, 1);
-        }
+        bool isLeftHand = false;
+        CharacterItem equipWeapon = equipWeapons.Value.GetRandomedItem(out isLeftHand);
+        WeaponItem weapon = equipWeapon.GetWeaponItem();
         var weaponType = weapon.WeaponType;
-        if (weaponType.leftHandAttackAnimations == null || weaponType.leftHandAttackAnimations.Length == 0)
-            useSubAttackAnims = false;
         // Random animation
-        var animArray = useSubAttackAnims ? weaponType.leftHandAttackAnimations : weaponType.rightHandAttackAnimations;
+        var animArray = !isLeftHand ? weaponType.rightHandAttackAnimations : weaponType.leftHandAttackAnimations;
         var actionId = -1;
         var triggerDuration = 0f;
         var totalDuration = 0f;
@@ -338,21 +348,23 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             triggerDuration = anim.triggerDuration;
             totalDuration = anim.totalDuration;
         }
+        // Play animation on clients
         PlayActionAnimation(totalDuration, actionId);
         // Calculate all damages
-        var inflictRate = weapon.GetDamageEffectiveness(this);
-        var baseDamageAttribute = weapon.GetDamageAttribute(equipWeapon.level, inflictRate);
+        var effectiveness = weapon.GetEffectivenessDamage(this);
+        var damageAttribute = weapon.GetDamageAttribute(equipWeapon.level, effectiveness, inflictRate);
         var allDamageAttributes = weapon.GetIncreaseDamageAttributes(equipWeapon.level);
-        allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, baseDamageAttribute);
+        allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, damageAttribute);
+        allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, additionalDamageAttributes);
         // Start attack routine
-        StartCoroutine(AttackRoutine(triggerDuration, totalDuration, allDamageAttributes, weaponType.damage, weaponType.CacheEffectivenessAttributes));
+        StartCoroutine(AttackRoutine(triggerDuration, totalDuration, allDamageAttributes, weaponType.damage, debuff));
     }
 
     IEnumerator AttackRoutine(float damageDuration,
         float totalDuration,
         Dictionary<DamageElement, DamageAmount> allDamageAttributes,
-        Damage damage,
-        Dictionary<Attribute, float> effectivenessAttributes)
+        Damage damage, 
+        CharacterBuff debuff)
     {
         yield return new WaitForSecondsRealtime(damageDuration);
         switch (damage.damageType)
@@ -364,7 +376,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                     var characterEntity = hit.GetComponent<CharacterEntity>();
                     if (characterEntity == null)
                         continue;
-                    characterEntity.ReceiveDamage(this, allDamageAttributes, CharacterBuff.Empty);
+                    characterEntity.ReceiveDamage(this, allDamageAttributes, debuff);
                 }
                 break;
             case DamageType.Missile:
@@ -372,7 +384,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                 {
                     var missileDamageIdentity = Manager.Assets.NetworkSpawn(damage.missileDamageEntity.Identity, CacheTransform.position);
                     var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
-                    missileDamageEntity.SetupDamage(this, allDamageAttributes, CharacterBuff.Empty, damage.missileDistance, damage.missileSpeed);
+                    missileDamageEntity.SetupDamage(this, allDamageAttributes, debuff, damage.missileDistance, damage.missileSpeed);
                 }
                 break;
         }
@@ -435,10 +447,10 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         var skill = characterSkill.GetSkill();
         if (skill == null)
             return;
-
+        
         // Calculate all damages
-        var inflictRate = skill.GetDamageEffectiveness(this);
-        var baseDamageAttribute = skill.GetBaseDamageAttribute(characterSkill.level, inflictRate);
+        var effectiveness = skill.GetDamageEffectiveness(this);
+        var baseDamageAttribute = skill.GetBaseDamageAttribute(characterSkill.level, effectiveness, 1f);
         var allDamageAttributes = skill.GetAdditionalDamageAttributes(characterSkill.level);
         allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, baseDamageAttribute);
         var damage = skill.damage;
@@ -472,56 +484,8 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         var skill = characterSkill.GetSkill();
         if (skill == null)
             return;
-        // Prepare weapon data
-        CharacterItem equipWeapon;
-        WeaponItem weapon;
-        // Random left hand / right hand weapon
-        if (equipWeapons.Count > 0)
-        {
-            equipWeapon = equipWeapons[Random.Range(0, equipWeapons.Count - 1)];
-            weapon = equipWeapon.GetWeaponItem();
-        }
-        else
-        {
-            weapon = GameInstance.Singleton.defaultWeaponItem;
-            equipWeapon = CharacterItem.Create(weapon, 1);
-        }
-        // Calculate all damages
-        var inflictRate = weapon.GetDamageEffectiveness(this) * skill.GetInflictRate(characterSkill.level);
-        var baseDamageAttribute = weapon.GetDamageAttribute(equipWeapon.level, inflictRate);
-        var allDamageAttributes = weapon.GetIncreaseDamageAttributes(equipWeapon.level);
-        allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, baseDamageAttribute);
-        var inflictDamageAttributes = skill.GetInflictDamageAttributes(characterSkill.level);
-        foreach (var inflictDamageAttribute in inflictDamageAttributes)
-        {
-            allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, inflictDamageAttribute);
-        }
-        // Prepare other attributes
-        var weaponType = weapon.WeaponType;
-        var damage = weaponType.damage;
-        var effectivenessAttributes = weaponType.CacheEffectivenessAttributes;
-        var debuff = skill.isDebuff ? CharacterBuff.Create(skill, characterSkill.level, true) : CharacterBuff.Empty;
-        switch (damage.damageType)
-        {
-            case DamageType.Melee:
-                var hits = Physics.OverlapSphere(CacheTransform.position, model.radius + damage.hitDistance);
-                foreach (var hit in hits)
-                {
-                    var characterEntity = hit.GetComponent<CharacterEntity>();
-                    if (characterEntity == null)
-                        continue;
-                    characterEntity.ReceiveDamage(this, allDamageAttributes, debuff);
-                }
-                break;
-            case DamageType.Missile:
-                if (damage.missileDamageEntity != null)
-                {
-                    var missileDamageIdentity = Manager.Assets.NetworkSpawn(damage.missileDamageEntity.Identity, CacheTransform.position);
-                    var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
-                    missileDamageEntity.SetupDamage(this, allDamageAttributes, debuff, damage.missileDistance, damage.missileSpeed);
-                }
-                break;
-        }
+
+        NetFuncAttack(skill.GetInflictRate(characterSkill.level), skill.GetInflictDamageAttributes(characterSkill.level), skill.isDebuff ? CharacterBuff.Create(skill, characterSkill.level, true) : CharacterBuff.Empty);
     }
 
     protected void ApplySkillBuff(CharacterSkill characterSkill)
@@ -529,18 +493,17 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         var skill = characterSkill.GetSkill();
         if (skill.skillBuffType == SkillBuffType.BuffToUser)
         {
-            var buffKey = GetBuffKey(characterSkill.skillId, true);
-            if (buffLocations.ContainsKey(buffKey))
+            var buffKey = GetBuffKey(characterSkill.skillId, false);
+            var buffIndex = -1;
+            if (buffIndexes.TryGetValue(buffKey, out buffIndex))
             {
-                var buffIndex = buffLocations[buffKey];
-                // Don't update here let it update at update function to remove it
-                var buff = buffs[buffIndex];
-                buff.ClearDuration();
-                buffs[buffIndex] = buff;
+                buffs.RemoveAt(buffIndex);
+                buffIndexes.Remove(buffKey);
             }
             var characterBuff = CharacterBuff.Create(skill, level, false);
             characterBuff.Added();
             buffs.Add(characterBuff);
+            buffIndexes[buffKey] = buffs.Count - 1;
         }
     }
 
@@ -676,65 +639,81 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
 
-    protected void NetFuncEquipItemCallback(NetFieldInt fromIndex, NetFieldString toEquipPosition)
+    protected void NetFuncEquipItemCallback(NetFieldInt nonEquipIndex, NetFieldString equipPosition)
     {
-        NetFuncEquipItem(fromIndex, toEquipPosition);
+        NetFuncEquipItem(nonEquipIndex, equipPosition);
     }
 
-    protected void NetFuncEquipItem(int fromIndex, string toEquipPosition)
+    protected void NetFuncEquipItem(int nonEquipIndex, string equipPosition)
     {
-        if (CurrentHp <= 0 || doingAction || fromIndex < 0 || fromIndex > nonEquipItems.Count || !GameInstance.EquipmentPositions.Contains(toEquipPosition))
+        if (CurrentHp <= 0 || doingAction || 
+            nonEquipIndex < 0 || nonEquipIndex > nonEquipItems.Count)
             return;
-        var equipItem = nonEquipItems[fromIndex];
+
+        var equippingItem = nonEquipItems[nonEquipIndex];
+
         string reasonWhyCannot;
-        if (!CanEquipItem(equipItem, toEquipPosition, out reasonWhyCannot))
+        HashSet<string> shouldUnequipPositions;
+        if (!CanEquipItem(equippingItem, equipPosition, out reasonWhyCannot, out shouldUnequipPositions))
             return;
-        var weaponItem = equipItem.GetWeaponItem();
-        var isSubWeapon = false;
-        if (weaponItem != null && GameDataConst.EQUIP_POSITION_LEFT_HAND.Equals(toEquipPosition))
-            isSubWeapon = true;
-        // Unequip old item
-        if (equipItemLocations.ContainsKey(toEquipPosition))
-        {
-            var equipItemIndex = equipItemLocations[toEquipPosition];
-            var unEquipItem = equipItems[equipItemIndex];
-            equipItems.RemoveAt(equipItemIndex);
-            equipItem.isSubWeapon = isSubWeapon;
-            equipItems.Add(equipItem);
 
-            unEquipItem.isSubWeapon = false;
-            nonEquipItems[fromIndex] = unEquipItem;
+        // Unequip equipped item if exists
+        foreach (var shouldUnequipPosition in shouldUnequipPositions)
+        {
+            NetFuncUnEquipItem(shouldUnequipPosition);
+        }
+        // Equipping items
+        var tempEquipWeapons = equipWeapons.Value;
+        if (equipPosition.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND))
+        {
+            tempEquipWeapons.rightHand = equippingItem;
+            equipWeapons.Value = tempEquipWeapons;
+        }
+        else if (equipPosition.Equals(GameDataConst.EQUIP_POSITION_LEFT_HAND))
+        {
+            tempEquipWeapons.leftHand = equippingItem;
+            equipWeapons.Value = tempEquipWeapons;
         }
         else
         {
-            equipItem.isSubWeapon = isSubWeapon;
-            equipItems.Add(equipItem);
-            nonEquipItems[fromIndex] = CharacterItem.Empty;
+            equipItems.Add(equippingItem);
+            equipItemIndexes.Add(equipPosition, equipItems.Count - 1);
         }
     }
 
-    protected void NetFuncUnEquipItemCallback(NetFieldString fromEquipPosition, NetFieldInt toIndex)
+    protected void NetFuncUnEquipItemCallback(NetFieldString fromEquipPosition)
     {
-        NetFuncUnEquipItem(fromEquipPosition, toIndex);
+        NetFuncUnEquipItem(fromEquipPosition);
     }
 
-    protected void NetFuncUnEquipItem(string fromEquipPosition, int toIndex)
+    protected void NetFuncUnEquipItem(string fromEquipPosition)
     {
-        if (CurrentHp <= 0 || doingAction || toIndex < 0 || toIndex > nonEquipItems.Count || !equipItemLocations.ContainsKey(fromEquipPosition) || !GameInstance.EquipmentPositions.Contains(fromEquipPosition))
+        if (CurrentHp <= 0 || doingAction)
             return;
-        var fromIndex = equipItemLocations[fromEquipPosition];
-        var unEquipItem = equipItems[fromIndex];
-        var toItem = nonEquipItems[toIndex];
-        // If drop slot is not empty, try to equip
-        if (toItem.IsValid())
-            NetFuncEquipItem(toIndex, fromEquipPosition);
-        else
+
+        var equippedArmorIndex = -1;
+        var tempEquipWeapons = equipWeapons.Value;
+        var unEquipItem = CharacterItem.Empty;
+        if (fromEquipPosition.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND))
         {
-            // Unequip to toIndex
-            equipItems.RemoveAt(fromIndex);
-            unEquipItem.isSubWeapon = false;
-            nonEquipItems[toIndex] = unEquipItem;
+            unEquipItem = tempEquipWeapons.rightHand;
+            tempEquipWeapons.rightHand = CharacterItem.Empty;
+            equipWeapons.Value = tempEquipWeapons;
         }
+        else if (fromEquipPosition.Equals(GameDataConst.EQUIP_POSITION_LEFT_HAND))
+        {
+            unEquipItem = tempEquipWeapons.leftHand;
+            tempEquipWeapons.leftHand = CharacterItem.Empty;
+            equipWeapons.Value = tempEquipWeapons;
+        }
+        else if (equipItemIndexes.TryGetValue(fromEquipPosition, out equippedArmorIndex))
+        {
+            unEquipItem = equipItems[equippedArmorIndex];
+            equipItems.RemoveAt(equippedArmorIndex);
+            equipItemIndexes.Remove(fromEquipPosition);
+        }
+        if (unEquipItem.IsValid())
+            nonEquipItems.Add(unEquipItem);
     }
 
     protected void NetFuncAddAttributeCallback(NetFieldInt attributeIndex)
@@ -800,14 +779,14 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         CallNetFunction("SwapOrMergeItem", FunctionReceivers.Server, fromIndex, toIndex);
     }
 
-    public void EquipItem(int fromIndex, string toEquipPosition)
+    public void EquipItem(int nonEquipIndex, string equipPosition)
     {
-        CallNetFunction("EquipItem", FunctionReceivers.Server, fromIndex, toEquipPosition);
+        CallNetFunction("EquipItem", FunctionReceivers.Server, nonEquipIndex, equipPosition);
     }
 
-    public void UnEquipItem(string fromEquipPosition, int toIndex)
+    public void UnEquipItem(string equipPosition)
     {
-        CallNetFunction("UnEquipItem", FunctionReceivers.Server, fromEquipPosition, toIndex);
+        CallNetFunction("UnEquipItem", FunctionReceivers.Server, equipPosition);
     }
 
     public void AddAttribute(int attributeIndex)
@@ -912,78 +891,113 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         return true;
     }
 
-    public bool CanEquipItem(CharacterItem nonEquipItem, string equipPosition, out string reasonWhyCannot)
+    public bool CanEquipItem(CharacterItem equippingItem, string equipPosition, out string reasonWhyCannot, out HashSet<string> shouldUnequipPositions)
     {
         reasonWhyCannot = "";
-        var equipmentItem = nonEquipItem.GetEquipmentItem();
+        shouldUnequipPositions = new HashSet<string>();
+
+        var equipmentItem = equippingItem.GetEquipmentItem();
         if (equipmentItem == null)
         {
             reasonWhyCannot = "This item is not equipment item";
             return false;
         }
 
-        if (!nonEquipItem.CanEquip(this))
+        if (string.IsNullOrEmpty(equipPosition))
+        {
+            reasonWhyCannot = "Invalid equip position";
+            return false;
+        }
+
+        if (!equippingItem.CanEquip(this))
         {
             reasonWhyCannot = "Character level or attributes does not meet requirements";
             return false;
         }
 
-        var weaponItem = nonEquipItem.GetWeaponItem();
+        var weaponItem = equippingItem.GetWeaponItem();
+        var shieldItem = equippingItem.GetShieldItem();
+        var armorItem = equippingItem.GetArmorItem();
+
+        var tempEquipWeapons = equipWeapons.Value;
+        var rightHandWeapon = tempEquipWeapons.rightHand.GetWeaponItem();
+        var leftHandWeapon = tempEquipWeapons.leftHand.GetWeaponItem();
+
+        WeaponItemEquipType rightHandEquipType;
+        var hasRightHandWeapon = rightHandWeapon.TryGetWeaponItemEquipType(out rightHandEquipType);
+        WeaponItemEquipType leftHandEquipType;
+        var hasLeftHandWeapon = leftHandWeapon.TryGetWeaponItemEquipType(out leftHandEquipType);
+
         if (weaponItem != null)
         {
             switch (weaponItem.WeaponType.equipType)
             {
                 case WeaponItemEquipType.OneHand:
                     // If weapon is one hand its equip position must be right hand
-                    if (!GameDataConst.EQUIP_POSITION_RIGHT_HAND.Equals(equipPosition))
+                    if (!equipPosition.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND))
                     {
                         reasonWhyCannot = "Can equip to right hand only";
                         return false;
                     }
+                    // One hand can equip with shield only 
+                    // if there are weapons on left hand it should unequip
+                    if (hasRightHandWeapon)
+                        shouldUnequipPositions.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
+                    if (hasLeftHandWeapon)
+                        shouldUnequipPositions.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND);
                     break;
                 case WeaponItemEquipType.OneHandCanDual:
                     // If weapon is one hand can dual its equip position must be right or left hand
-                    if (!GameDataConst.EQUIP_POSITION_RIGHT_HAND.Equals(equipPosition) &&
-                        !GameDataConst.EQUIP_POSITION_LEFT_HAND.Equals(equipPosition))
+                    if (!equipPosition.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND) &&
+                        !equipPosition.Equals(GameDataConst.EQUIP_POSITION_LEFT_HAND))
                     {
                         reasonWhyCannot = "Can equip to right hand or left hand only";
                         return false;
+                    }
+                    // Unequip item if right hand weapon is one hand or two hand
+                    if (hasRightHandWeapon)
+                    {
+                        if (rightHandEquipType == WeaponItemEquipType.OneHand ||
+                            rightHandEquipType == WeaponItemEquipType.TwoHand)
+                            shouldUnequipPositions.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
                     }
                     break;
                 case WeaponItemEquipType.TwoHand:
-                    // If weapon is two hand its equip position must be right or left hand
-                    if (!GameDataConst.EQUIP_POSITION_RIGHT_HAND.Equals(equipPosition) &&
-                        !GameDataConst.EQUIP_POSITION_LEFT_HAND.Equals(equipPosition))
+                    // If weapon is one hand its equip position must be right hand
+                    if (!equipPosition.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND))
                     {
                         reasonWhyCannot = "Can equip to right hand or left hand only";
                         return false;
                     }
-                    if (equipItemLocations.ContainsKey(GameDataConst.EQUIP_POSITION_RIGHT_HAND) &&
-                        equipItemLocations.ContainsKey(GameDataConst.EQUIP_POSITION_LEFT_HAND))
-                    {
-                        reasonWhyCannot = "Have to unequip right hand or left hand equipment";
-                        return false;
-                    }
+                    // Unequip both left and right hand
+                    if (hasRightHandWeapon)
+                        shouldUnequipPositions.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
+                    if (hasLeftHandWeapon)
+                        shouldUnequipPositions.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND);
                     break;
             }
         }
 
-        var shieldItem = nonEquipItem.GetShieldItem();
         if (shieldItem != null)
         {
-            if (!GameDataConst.EQUIP_POSITION_LEFT_HAND.Equals(equipPosition))
+            if (!equipPosition.Equals(GameDataConst.EQUIP_POSITION_LEFT_HAND))
             {
                 reasonWhyCannot = "Can equip to left hand only";
                 return false;
             }
+            if (hasRightHandWeapon && rightHandEquipType == WeaponItemEquipType.TwoHand)
+                shouldUnequipPositions.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
         }
 
-        var armorItem = nonEquipItem.GetArmorItem();
-        if (armorItem != null && !armorItem.equipPosition.Equals(equipPosition))
+        if (armorItem != null)
         {
-            reasonWhyCannot = "Can equip to " + equipPosition + " only";
-            return false;
+            if (!equipPosition.Equals(armorItem.equipPosition))
+            {
+                reasonWhyCannot = "Can equip to " + armorItem.equipPosition + " only";
+                return false;
+            }
         }
+        shouldUnequipPositions.Add(equipPosition);
         return true;
     }
 
@@ -1039,18 +1053,17 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
         else if (!debuff.IsEmpty())
         {
-            var buffKey = GetBuffKey(debuff.skillId, true);
-            if (buffLocations.ContainsKey(buffKey))
+            var buffKey = GetBuffKey(debuff.skillId, debuff.isDebuff);
+            var buffIndex = -1;
+            if (buffIndexes.TryGetValue(buffKey, out buffIndex))
             {
-                var buffIndex = buffLocations[buffKey];
-                // Don't update here let it update at update function to remove it
-                var buff = buffs[buffIndex];
-                buff.ClearDuration();
-                buffs[buffIndex] = buff;
+                buffs.RemoveAt(buffIndex);
+                buffIndexes.Remove(buffKey);
             }
             var characterDebuff = debuff.Clone();
             characterDebuff.Added();
             buffs.Add(characterDebuff);
+            buffIndexes[buffKey] = buffs.Count - 1;
         }
     }
     #endregion
@@ -1069,6 +1082,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         skillPoint.sendOptions = SendOptions.ReliableOrdered;
         skillPoint.forOwnerOnly = true;
         gold.sendOptions = SendOptions.ReliableOrdered;
+        equipWeapons.sendOptions = SendOptions.ReliableOrdered;
         skills.forOwnerOnly = true;
         nonEquipItems.forOwnerOnly = true;
     }
@@ -1078,27 +1092,35 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         // Setup model
         if (model != null)
             Destroy(model.gameObject);
+
         model = this.InstantiateModel(transform);
         if (model != null)
         {
             CacheCapsuleCollider.center = model.center;
             CacheCapsuleCollider.radius = model.radius;
             CacheCapsuleCollider.height = model.height;
+            model.SetEquipWeapons(equipWeapons);
             model.SetEquipItems(equipItems);
+        }
+
+        if (IsLocalClient && CacheUISceneGameplay != null)
+            CacheUISceneGameplay.UpdateCharacter();
+    }
+
+    protected void OnChangeEquipWeapons(EquipWeapons equipWeapons)
+    {
+        if (model)
+            model.SetEquipWeapons(equipWeapons);
+
+        if (IsLocalClient && CacheUISceneGameplay != null)
+        {
+            CacheUISceneGameplay.UpdateCharacter();
+            CacheUISceneGameplay.UpdateEquipItems();
         }
     }
 
     protected void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
-        buffLocations.Clear();
-
-        for (var i = 0; i < buffs.Count; ++i)
-        {
-            var buff = buffs[i];
-            var buffKey = GetBuffKey(buff.skillId, buff.isDebuff);
-            buffLocations[buffKey] = i;
-        }
-
         if (IsLocalClient && CacheUISceneGameplay != null)
         {
             CacheUISceneGameplay.UpdateCharacter();
@@ -1108,36 +1130,6 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
-        equipItemLocations.Clear();
-        equipWeapons.Clear();
-
-        for (var i = 0; i < equipItems.Count; ++i)
-        {
-            var equipItem = equipItems[i];
-            if (!equipItem.IsValid())
-                continue;
-
-            var equipmentItem = equipItem.GetEquipmentItem();
-            if (equipmentItem == null)
-                continue;
-
-            var armorItem = equipItem.GetArmorItem();
-            var weaponItem = equipItem.GetWeaponItem();
-            var shieldItem = equipItem.GetShieldItem();
-            if (weaponItem != null)
-            {
-                equipWeapons.Add(equipItem);
-                if (!equipItem.isSubWeapon)
-                    equipItemLocations[GameDataConst.EQUIP_POSITION_RIGHT_HAND] = i;
-                else
-                    equipItemLocations[GameDataConst.EQUIP_POSITION_LEFT_HAND] = i;
-            }
-            else if (shieldItem != null)
-                equipItemLocations[GameDataConst.EQUIP_POSITION_LEFT_HAND] = i;
-            else if (armorItem != null)
-                equipItemLocations[armorItem.equipPosition] = i;
-        }
-
         if (model != null)
             model.SetEquipItems(equipItems);
 

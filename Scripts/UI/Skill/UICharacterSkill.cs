@@ -131,7 +131,7 @@ public class UICharacterSkill : UISelectionEntry<CharacterSkill>
                 uiBaseDamageAttribute.Hide();
             else
             {
-                uiBaseDamageAttribute.Data = skill.GetBaseDamageAttribute(Data.level, 1f);
+                uiBaseDamageAttribute.Data = skill.GetBaseDamageAttribute(Data.level, 0f, 1f);
                 uiBaseDamageAttribute.Show();
             }
         }

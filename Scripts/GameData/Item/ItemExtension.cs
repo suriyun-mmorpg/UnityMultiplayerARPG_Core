@@ -69,26 +69,36 @@ public static class ItemExtension
     #endregion
 
     #region Weapon Extension
-    public static KeyValuePair<DamageElement, DamageAmount> GetDamageAttribute(this WeaponItem weaponItem, int level, float inflictRate)
-    {
-        var result = new KeyValuePair<DamageElement, DamageAmount>();
-        if (weaponItem != null)
-            result = GameDataHelpers.MakeDamageAttributePair(weaponItem.damageAttribute, level, inflictRate);
-        return result;
-    }
-
-    public static float GetDamageEffectiveness(this WeaponItem weaponItem, ICharacterData character)
+    public static KeyValuePair<DamageElement, DamageAmount> GetDamageAttribute(this WeaponItem weaponItem, int level, float effectiveness, float inflictRate)
     {
         if (weaponItem == null)
-            return 1f;
-        return GameDataHelpers.CalculateDamageEffectiveness(weaponItem.WeaponType.CacheEffectivenessAttributes, character);
+            return new KeyValuePair<DamageElement, DamageAmount>();
+        return GameDataHelpers.MakeDamageAttributePair(weaponItem.damageAttribute, level, effectiveness, inflictRate);
+    }
+
+    public static float GetEffectivenessDamage(this WeaponItem weaponItem, ICharacterData character)
+    {
+        if (weaponItem == null)
+            return 0f;
+        return GameDataHelpers.CalculateEffectivenessDamage(weaponItem.WeaponType.CacheEffectivenessAttributes, character);
     }
 
     public static Dictionary<DamageElement, DamageAmount> GetAllDamages(this WeaponItem weaponItem, ICharacterData character, int level)
     {
-        var baseDamageAttribute = weaponItem.GetDamageAttribute(level, weaponItem.GetDamageEffectiveness(character));
+        if (weaponItem == null)
+            return new Dictionary<DamageElement, DamageAmount>();
+        var baseDamageAttribute = weaponItem.GetDamageAttribute(level, weaponItem.GetEffectivenessDamage(character), 1f);
         var additionalDamageAttributes = weaponItem.GetIncreaseDamageAttributes(level);
         return GameDataHelpers.CombineDamageAttributesDictionary(additionalDamageAttributes, baseDamageAttribute);
+    }
+
+    public static bool TryGetWeaponItemEquipType(this WeaponItem weaponItem, out WeaponItemEquipType equipType)
+    {
+        equipType = WeaponItemEquipType.OneHand;
+        if (weaponItem == null)
+            return false;
+        equipType = weaponItem.WeaponType.equipType;
+        return true;
     }
     #endregion
 }

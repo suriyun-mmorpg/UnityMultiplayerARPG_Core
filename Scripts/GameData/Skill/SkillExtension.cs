@@ -164,12 +164,12 @@ public static class SkillExtension
     #endregion
 
     #region Attack
-    public static KeyValuePair<DamageElement, DamageAmount> GetBaseDamageAttribute(this Skill skill, int level, float inflictRate)
+    public static KeyValuePair<DamageElement, DamageAmount> GetBaseDamageAttribute(this Skill skill, int level, float effectiveness, float inflictRate)
     {
         if (!skill.IsAttack() || skill.skillAttackType != SkillAttackType.PureSkillDamage)
             return new KeyValuePair<DamageElement, DamageAmount>();
         level = skill.GetAdjustedLevel(level);
-        return GameDataHelpers.MakeDamageAttributePair(skill.baseDamageAttribute, level, inflictRate);
+        return GameDataHelpers.MakeDamageAttributePair(skill.baseDamageAttribute, level, effectiveness, inflictRate);
     }
 
     public static Dictionary<DamageElement, DamageAmount> GetAdditionalDamageAttributes(this Skill skill, int level)
@@ -184,7 +184,7 @@ public static class SkillExtension
     {
         if (skill == null)
             return 1f;
-        return GameDataHelpers.CalculateDamageEffectiveness(skill.CacheEffectivenessAttributes, character);
+        return GameDataHelpers.CalculateEffectivenessDamage(skill.CacheEffectivenessAttributes, character);
     }
 
     public static float GetInflictRate(this Skill skill, int level)

@@ -36,7 +36,6 @@ public class GameInstance : MonoBehaviour
     [Header("Player Configs")]
     public int minCharacterNameLength = 2;
     public int maxCharacterNameLength = 16;
-    public static readonly HashSet<string> EquipmentPositions = new HashSet<string>();
     public static readonly Dictionary<string, Attribute> CharacterAttributes = new Dictionary<string, Attribute>();
     public static readonly Dictionary<string, CharacterClass> CharacterClasses = new Dictionary<string, CharacterClass>();
     public static readonly Dictionary<string, CharacterPrototype> CharacterPrototypes = new Dictionary<string, CharacterPrototype>();
@@ -96,9 +95,7 @@ public class GameInstance : MonoBehaviour
             Debug.LogError("You must set default weapon item");
             return;
         }
-
-
-        EquipmentPositions.Clear();
+        
         CharacterAttributes.Clear();
         CharacterClasses.Clear();
         CharacterPrototypes.Clear();
@@ -106,9 +103,6 @@ public class GameInstance : MonoBehaviour
         DamageEntities.Clear();
         Items.Clear();
         Skills.Clear();
-
-        EquipmentPositions.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
-        EquipmentPositions.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND);
 
         AddCharacterPrototypes(characterPrototypes);
         AddItems(new Item[] { defaultWeaponItem });
@@ -206,12 +200,6 @@ public class GameInstance : MonoBehaviour
                     attributes.Add(requireAttribute.attribute);
                 }
                 AddCharacterAttributes(attributes);
-            }
-            if (item is ArmorItem)
-            {
-                var armorItem = item as ArmorItem;
-                if (!EquipmentPositions.Contains(armorItem.equipPosition))
-                    EquipmentPositions.Add(armorItem.equipPosition);
             }
             if (item is WeaponItem)
             {

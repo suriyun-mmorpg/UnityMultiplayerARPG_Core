@@ -28,6 +28,8 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public string goldFormat = "Gold: {0}";
     [Tooltip("Weight Limit Stats Format => {0} = {Weight Limit}")]
     public string weightLimitStatsFormat = "Weight Limit: {0}";
+    [Tooltip("Weapon Damage => {0} = {Min damage}, {1} = {Max damage}")]
+    public string weaponDamageFormat = "{0}~{1}";
 
     [Header("Class")]
     [Tooltip("Class Title Format => {0} = {Class title}")]
@@ -47,6 +49,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public Text textSkillPoint;
     public Text textGold;
     public Text textWeightLimit;
+    public Text textWeaponDamages;
     public UIDamageElementAmounts uiRightHandDamages;
     public UIDamageElementAmounts uiLeftHandDamages;
     public UICharacterStats uiCharacterStats;
@@ -153,27 +156,52 @@ public class UICharacter : UISelectionEntry<ICharacterData>
 
         if (textWeightLimit != null)
             textWeightLimit.text = string.Format(weightLimitStatsFormat, stats.weightLimit.ToString("N2"));
+        
+        var rightHandItem = Data.EquipWeapons.rightHand;
+        var leftHandItem = Data.EquipWeapons.leftHand;
+        var hasRightHandWeapon = rightHandItem.IsValid();
+        var hasLeftHandWeapon = leftHandItem.IsValid();
+        var rightHandDamages = hasRightHandWeapon ? rightHandItem.GetWeaponItem().GetAllDamages(Data, rightHandItem.level) : null;
+        var leftHandDamages = hasLeftHandWeapon ? leftHandItem.GetWeaponItem().GetAllDamages(Data, leftHandItem.level) : null;
+
+        if (textWeaponDamages != null)
+        {
+            var textDamages = "";
+            if (hasRightHandWeapon)
+            {
+                var sumDamages = GameDataHelpers.GetSumDamages(rightHandDamages);
+                if (!string.IsNullOrEmpty(textDamages))
+                    textDamages += "\n";
+                textDamages += string.Format(weaponDamageFormat, sumDamages);
+            }
+            if (hasLeftHandWeapon)
+            {
+                var sumDamages = GameDataHelpers.GetSumDamages(leftHandDamages);
+                if (!string.IsNullOrEmpty(textDamages))
+                    textDamages += "\n";
+                textDamages += string.Format(weaponDamageFormat, sumDamages);
+            }
+            textWeaponDamages.text = textDamages;
+        }
 
         if (uiRightHandDamages != null)
         {
-            var rightHandWeapon = Data.EquipItems.Where(a => a.GetWeaponItem() != null && !a.isSubWeapon).FirstOrDefault();
-            if (rightHandWeapon.IsEmpty())
+            if (!hasRightHandWeapon)
                 uiRightHandDamages.Hide();
             else
             {
-                uiRightHandDamages.Data = rightHandWeapon.GetWeaponItem().GetAllDamages(Data, rightHandWeapon.level);
+                uiRightHandDamages.Data = rightHandDamages;
                 uiRightHandDamages.Show();
             }
         }
 
         if (uiLeftHandDamages != null)
         {
-            var leftHandWeapon = Data.EquipItems.Where(a => a.GetWeaponItem() != null && a.isSubWeapon).FirstOrDefault();
-            if (leftHandWeapon.IsEmpty())
+            if (!hasLeftHandWeapon)
                 uiLeftHandDamages.Hide();
             else
             {
-                uiLeftHandDamages.Data = leftHandWeapon.GetWeaponItem().GetAllDamages(Data, leftHandWeapon.level);
+                uiLeftHandDamages.Data = leftHandDamages;
                 uiLeftHandDamages.Show();
             }
         }
