@@ -47,7 +47,7 @@ public static class ItemExtension
     {
         var result = new Dictionary<Attribute, int>();
         if (equipmentItem != null)
-            result = GameDataHelpers.MakeAttributeIncrementalsDictionary(equipmentItem.increaseAttributes, result, level);
+            result = GameDataHelpers.MakeAttributeAmountsDictionary(equipmentItem.increaseAttributes, result, level);
         return result;
     }
 
@@ -55,7 +55,7 @@ public static class ItemExtension
     {
         var result = new Dictionary<Resistance, float>();
         if (equipmentItem != null)
-            result = GameDataHelpers.MakeResistanceIncrementalsDictionary(equipmentItem.increaseResistances, result, level);
+            result = GameDataHelpers.MakeResistanceAmountsDictionary(equipmentItem.increaseResistances, result, level);
         return result;
     }
 
@@ -65,6 +65,15 @@ public static class ItemExtension
         if (equipmentItem != null)
             result = GameDataHelpers.MakeDamageAttributesDictionary(equipmentItem.increaseDamageAttributes, result, level);
         return result;
+    }
+    #endregion
+
+    #region Defend Extension
+    public static float GetArmor(this BaseDefendItem defendItem, int level)
+    {
+        if (defendItem == null)
+            return 0f;
+        return defendItem.baseArmor + defendItem.armorIncreaseEachLevel * level;
     }
     #endregion
 
@@ -97,7 +106,7 @@ public static class ItemExtension
         equipType = WeaponItemEquipType.OneHand;
         if (weaponItem == null)
             return false;
-        equipType = weaponItem.WeaponType.equipType;
+        equipType = weaponItem.EquipType;
         return true;
     }
     #endregion

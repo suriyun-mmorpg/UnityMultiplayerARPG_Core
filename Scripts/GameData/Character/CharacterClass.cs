@@ -41,9 +41,9 @@ public class CharacterClass : BaseGameData
                 leftHandEquipItem = null;
             else if (rightHandAsWeapon != null)
             {
-                if (leftHandAsShield != null && rightHandAsWeapon.weaponType.equipType == WeaponItemEquipType.TwoHand)
+                if (leftHandAsShield != null && rightHandAsWeapon.EquipType == WeaponItemEquipType.TwoHand)
                     leftHandEquipItem = null;
-                else if (leftHandAsWeapon != null && rightHandAsWeapon.weaponType.equipType != WeaponItemEquipType.OneHandCanDual)
+                else if (leftHandAsWeapon != null && rightHandAsWeapon.EquipType != WeaponItemEquipType.OneHandCanDual)
                     leftHandEquipItem = null;
             }
         }
@@ -62,10 +62,10 @@ public class CharacterClass : BaseGameData
             var armorEquipItem = otherEquipItem as ArmorItem;
             if (armorEquipItem == null)
                 continue;
-            if (equipedPositions.Contains(armorEquipItem.equipPosition))
+            if (equipedPositions.Contains(armorEquipItem.EquipPosition))
                 otherEquipItems[i] = null;
             else
-                equipedPositions.Add(armorEquipItem.equipPosition);
+                equipedPositions.Add(armorEquipItem.EquipPosition);
         }
         EditorUtility.SetDirty(this);
     }

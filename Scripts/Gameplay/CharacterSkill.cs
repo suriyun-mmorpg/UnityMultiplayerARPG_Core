@@ -10,6 +10,7 @@ public struct CharacterSkill
     public string skillId;
     public int level;
     public float coolDownRemainsDuration;
+    private Skill skill;
 
     public bool IsEmpty()
     {
@@ -18,17 +19,9 @@ public struct CharacterSkill
     
     public Skill GetSkill()
     {
-        return GameInstance.Skills.ContainsKey(skillId) ? GameInstance.Skills[skillId] : null;
-    }
-
-    public int GetConsumeMp()
-    {
-        return GetSkill().GetConsumeMp(level);
-    }
-
-    public float GetCoolDownDuration()
-    {
-        return GetSkill().GetCoolDownDuration(level);
+        if (skill == null)
+            skill = GameInstance.Skills.ContainsKey(skillId) ? GameInstance.Skills[skillId] : null;
+        return skill;
     }
 
     public bool CanLevelUp(ICharacterData character)
@@ -43,12 +36,12 @@ public struct CharacterSkill
 
     public bool CanUse(int currentMp)
     {
-        return level >= 1 && coolDownRemainsDuration <= 0f && currentMp >= GetConsumeMp();
+        return level >= 1 && coolDownRemainsDuration <= 0f && currentMp >= GetSkill().GetConsumeMp(level);
     }
 
     public void Used()
     {
-        coolDownRemainsDuration = GetCoolDownDuration();
+        coolDownRemainsDuration = GetSkill().GetCoolDownDuration(level);
     }
 
     public bool ShouldUpdate()
@@ -68,11 +61,11 @@ public struct CharacterSkill
 
     public static CharacterSkill Create(Skill skill, int level)
     {
-        var newBuff = new CharacterSkill();
-        newBuff.skillId = skill.Id;
-        newBuff.level = level;
-        newBuff.coolDownRemainsDuration = 0f;
-        return newBuff;
+        var newSkill = new CharacterSkill();
+        newSkill.skillId = skill.Id;
+        newSkill.level = level;
+        newSkill.coolDownRemainsDuration = 0f;
+        return newSkill;
     }
 }
 

@@ -33,23 +33,67 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
 
     protected override void UpdateData()
     {
+        var statsString = "";
+        var statsStringPart = "";
+        // Hp
+        if (!string.IsNullOrEmpty(statsString))
+            statsString += "\n";
+        statsStringPart = string.Format(hpStatsFormat, Data.hp.ToString("N0"));
+        if (Data.hp != 0)
+            statsString += statsStringPart;
+        if (textHp != null)
+            textHp.text = statsStringPart;
+        // Mp
+        if (!string.IsNullOrEmpty(statsString))
+            statsString += "\n";
+        statsStringPart = string.Format(mpStatsFormat, Data.mp.ToString("N0"));
+        if (Data.mp != 0)
+            statsString += statsStringPart;
+        if (textMp != null)
+            textMp.text = statsStringPart;
+        // Accuracy
+        if (!string.IsNullOrEmpty(statsString))
+            statsString += "\n";
+        statsStringPart = string.Format(accuracyStatsFormat, Data.accuracy.ToString("N0"));
+        if (Data.accuracy != 0)
+            statsString += statsStringPart;
+        if (textAccuracy != null)
+            textAccuracy.text = statsStringPart;
+        // Evasion
+        if (!string.IsNullOrEmpty(statsString))
+            statsString += "\n";
+        statsStringPart = string.Format(evasionStatsFormat, Data.evasion.ToString("N0"));
+        if (Data.evasion != 0)
+            statsString += statsStringPart;
+        if (textEvasion != null)
+            textEvasion.text = statsStringPart;
+        // Cri Hit Rate
+        if (!string.IsNullOrEmpty(statsString))
+            statsString += "\n";
+        statsStringPart = string.Format(criHitRateStatsFormat, (Data.criHitRate * 100).ToString("N2"));
+        if (Data.criHitRate != 0)
+            statsString += statsStringPart;
+        if (textCriHitRate != null)
+            textCriHitRate.text = statsStringPart;
+        // Cri Dmg Rate
+        if (!string.IsNullOrEmpty(statsString))
+            statsString += "\n";
+        statsStringPart = string.Format(criDmgRateStatsFormat, (Data.criDmgRate * 100).ToString("N2"));
+        if (Data.criDmgRate != 0)
+            statsString += statsStringPart;
+        if (textCriDmgRate != null)
+            textCriDmgRate.text = statsStringPart;
+        // Weight
+        if (!string.IsNullOrEmpty(statsString))
+            statsString += "\n";
+        statsStringPart = string.Format(weightLimitStatsFormat, Data.weightLimit.ToString("N2"));
+        if (Data.weightLimit != 0)
+            statsString += statsStringPart;
+        if (textWeightLimit != null)
+            textWeightLimit.text = statsStringPart;
+        // All stats text
         if (textStats != null)
         {
-            var statsString = "";
-            if (Data.hp != 0)
-                statsString += string.Format(hpStatsFormat, Data.hp) + "\n";
-            if (Data.mp != 0)
-                statsString += string.Format(mpStatsFormat, Data.mp) + "\n";
-            if (Data.accuracy != 0)
-                statsString += string.Format(accuracyStatsFormat, Data.accuracy) + "\n";
-            if (Data.evasion != 0)
-                statsString += string.Format(evasionStatsFormat, Data.evasion) + "\n";
-            if (Data.criHitRate != 0)
-                statsString += string.Format(criHitRateStatsFormat, (Data.criHitRate * 100).ToString("N2")) + "\n";
-            if (Data.criDmgRate != 0)
-                statsString += string.Format(criDmgRateStatsFormat, (Data.criDmgRate * 100).ToString("N2")) + "\n";
-            if (Data.weightLimit != 0)
-                statsString += string.Format(weightLimitStatsFormat, Data.weightLimit.ToString("N2")) + "\n";
             textStats.gameObject.SetActive(!string.IsNullOrEmpty(statsString));
             textStats.text = statsString;
         }

@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "ShieldItem", menuName = "Create GameData/ShieldItem")]
-public class ShieldItem : BaseEquipmentItem
+public class ShieldItem : BaseDefendItem
 {
-    [Header("Armor")]
-    public float baseArmor;
-    public float armorIncreaseEachLevel;
 }

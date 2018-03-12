@@ -16,6 +16,8 @@ public class WeaponItem : BaseEquipmentItem
             if (weaponType == null)
             {
                 weaponType = CreateInstance<WeaponType>();
+                weaponType.name = GameDataConst.UNKNOW_WEAPON_ID;
+                weaponType.title = GameDataConst.UNKNOW_WEAPON_TITLE;
                 weaponType.effectivenessAttributes = new DamageEffectivenessAttribute[0];
                 weaponType.rightHandAttackAnimations = new ActionAnimation[0];
                 weaponType.leftHandAttackAnimations = new ActionAnimation[0];
@@ -23,5 +25,10 @@ public class WeaponItem : BaseEquipmentItem
             }
             return weaponType;
         }
+    }
+
+    public WeaponItemEquipType EquipType
+    {
+        get { return WeaponType.equipType; }
     }
 }

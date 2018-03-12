@@ -141,7 +141,7 @@ public class UIEquipItems : UIBase
             if (armorItem == null)
                 continue;
 
-            tempPosition = armorItem.equipPosition;
+            tempPosition = armorItem.EquipPosition;
             if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
             {
                 tempSlot.Data = equipItem;

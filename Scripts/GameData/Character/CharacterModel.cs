@@ -91,7 +91,7 @@ public class CharacterModel : MonoBehaviour
                 continue;
             
             Transform container;
-            if (CacheEquipmentContainers.TryGetValue(armorItem.equipPosition, out container))
+            if (CacheEquipmentContainers.TryGetValue(armorItem.EquipPosition, out container))
                 InstantiateEquipModel(armorItem.equipmentModel, container);
         }
     }

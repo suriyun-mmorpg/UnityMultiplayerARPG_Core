@@ -6,10 +6,15 @@ using UnityEngine;
 public class DamageElement : BaseGameData
 {
     public Resistance resistance;
-    public float GetDamageReceiveRate(ICharacterData characterData)
+    public float GetAdjustedDamageReceives(ICharacterData characterData, float damageAmount)
     {
         if (resistance == null)
-            return 1f;
-        return 1f;  // TODO: Implement this
+            return damageAmount -= characterData.GetArmor();
+        var resistances = characterData.GetResistancesWithBuffs();
+        float resistanceAmount = 0f;
+        resistances.TryGetValue(resistance, out resistanceAmount);
+        if (resistanceAmount > resistance.maxAmount)
+            resistanceAmount = resistance.maxAmount;
+        return damageAmount -= damageAmount * resistanceAmount;
     }
 }

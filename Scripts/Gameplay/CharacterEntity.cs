@@ -142,9 +142,9 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             {
                 var entry = value[i];
                 var armorItem = entry.GetArmorItem();
-                if (entry.IsValid() && armorItem != null && !equipItemIndexes.ContainsKey(armorItem.equipPosition))
+                if (entry.IsValid() && armorItem != null && !equipItemIndexes.ContainsKey(armorItem.EquipPosition))
                 {
-                    equipItemIndexes.Add(armorItem.equipPosition, i);
+                    equipItemIndexes.Add(armorItem.EquipPosition, i);
                     equipItems.Add(entry);
                 }
             }
@@ -450,7 +450,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         
         // Calculate all damages
         var effectiveness = skill.GetDamageEffectiveness(this);
-        var baseDamageAttribute = skill.GetBaseDamageAttribute(characterSkill.level, effectiveness, 1f);
+        var baseDamageAttribute = skill.GetDamageAttribute(characterSkill.level, effectiveness, 1f);
         var allDamageAttributes = skill.GetAdditionalDamageAttributes(characterSkill.level);
         allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, baseDamageAttribute);
         var damage = skill.damage;
@@ -485,7 +485,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         if (skill == null)
             return;
 
-        NetFuncAttack(skill.GetInflictRate(characterSkill.level), skill.GetInflictDamageAttributes(characterSkill.level), skill.isDebuff ? CharacterBuff.Create(skill, characterSkill.level, true) : CharacterBuff.Empty);
+        NetFuncAttack(skill.GetInflictRate(characterSkill.level), skill.GetAdditionalDamageAttributes(characterSkill.level), skill.isDebuff ? CharacterBuff.Create(skill, characterSkill.level, true) : CharacterBuff.Empty);
     }
 
     protected void ApplySkillBuff(CharacterSkill characterSkill)
@@ -930,7 +930,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
 
         if (weaponItem != null)
         {
-            switch (weaponItem.WeaponType.equipType)
+            switch (weaponItem.EquipType)
             {
                 case WeaponItemEquipType.OneHand:
                     // If weapon is one hand its equip position must be right hand
@@ -991,9 +991,9 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
 
         if (armorItem != null)
         {
-            if (!equipPosition.Equals(armorItem.equipPosition))
+            if (!equipPosition.Equals(armorItem.EquipPosition))
             {
-                reasonWhyCannot = "Can equip to " + armorItem.equipPosition + " only";
+                reasonWhyCannot = "Can equip to " + armorItem.EquipPosition + " only";
                 return false;
             }
         }
@@ -1028,7 +1028,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             {
                 var damageElement = allDamageAttribute.Key;
                 var damageAmount = allDamageAttribute.Value;
-                var receivingDamage = damageElement.GetDamageReceiveRate(this) * Random.Range(damageAmount.minDamage, damageAmount.maxDamage);
+                var receivingDamage = damageElement.GetAdjustedDamageReceives(this, Random.Range(damageAmount.minDamage, damageAmount.maxDamage));
                 if (receivingDamage > 0f)
                     totalDamage += receivingDamage;
             }

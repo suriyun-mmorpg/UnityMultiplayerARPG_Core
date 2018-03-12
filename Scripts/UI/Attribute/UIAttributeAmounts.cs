@@ -54,8 +54,10 @@ public class UIAttributeAmounts : UISelectionEntry<Dictionary<Attribute, int>>
                 {
                     if (dataEntry.Key == null || dataEntry.Value == 0)
                         continue;
+                    if (!string.IsNullOrEmpty(text))
+                        text += "\n";
                     var amountText = string.Format(amountFormat, dataEntry.Key.title, dataEntry.Value);
-                    text += amountText + "\n";
+                    text += amountText;
                     if (CacheTextAmounts.ContainsKey(dataEntry.Key))
                         CacheTextAmounts[dataEntry.Key].text = amountText;
                 }

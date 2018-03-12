@@ -34,7 +34,12 @@ public class UISceneGameplay : MonoBehaviour
         foreach (var toggleUi in toggleUis)
         {
             if (Input.GetKeyDown(toggleUi.key))
-                toggleUi.ui.Toggle();
+            {
+                var ui = toggleUi.ui;
+                ui.Toggle();
+                if (ui.IsVisible())
+                    ui.CacheRoot.transform.SetAsLastSibling();
+            }
         }
     }
 

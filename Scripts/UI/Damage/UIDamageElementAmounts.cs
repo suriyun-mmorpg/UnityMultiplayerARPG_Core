@@ -59,12 +59,17 @@ public class UIDamageElementAmounts : UISelectionEntry<Dictionary<DamageElement,
             var sumDamage = new DamageAmount();
             foreach (var dataEntry in Data)
             {
+                if (dataEntry.Key == null || (dataEntry.Value.minDamage == 0 && dataEntry.Value.maxDamage == 0))
+                    continue;
                 var element = dataEntry.Key;
                 var amount = dataEntry.Value;
+                if (!string.IsNullOrEmpty(text))
+                    text += "\n";
                 var amountText = string.Format(damageFormat, element.title, amount.minDamage.ToString("N0"), amount.maxDamage.ToString("N0"));
-                text += amountText + "\n";
-                if (CacheTextDamages.ContainsKey(dataEntry.Key))
-                    CacheTextDamages[dataEntry.Key].text = amountText;
+                text += amountText;
+                Text textDamages;
+                if (CacheTextDamages.TryGetValue(dataEntry.Key, out textDamages))
+                    textDamages.text = amountText;
                 sumDamage += amount;
             }
 

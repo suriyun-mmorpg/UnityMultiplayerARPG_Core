@@ -38,9 +38,9 @@ public class UISkillBuff : UISelectionEntry<KeyValuePair<SkillBuff, int>>
             uiBuffStats.Data = skillBuff.GetStats(skillLevel);
 
         if (uiBuffAttributes != null)
-            uiBuffAttributes.Data = GameDataHelpers.MakeAttributeIncrementalsDictionary(skillBuff.increaseAttributes, new Dictionary<Attribute, int>(), skillLevel);
+            uiBuffAttributes.Data = GameDataHelpers.MakeAttributeAmountsDictionary(skillBuff.increaseAttributes, new Dictionary<Attribute, int>(), skillLevel);
 
         if (uiBuffResistances != null)
-            uiBuffResistances.Data = GameDataHelpers.MakeResistanceIncrementalsDictionary(skillBuff.increaseResistances, new Dictionary<Resistance, float>(), skillLevel);
+            uiBuffResistances.Data = GameDataHelpers.MakeResistanceAmountsDictionary(skillBuff.increaseResistances, new Dictionary<Resistance, float>(), skillLevel);
     }
 }

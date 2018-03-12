@@ -54,8 +54,10 @@ public class UIResistanceAmounts : UISelectionEntry<Dictionary<Resistance, float
                 {
                     if (dataEntry.Key == null || dataEntry.Value == 0)
                         continue;
+                    if (!string.IsNullOrEmpty(text))
+                        text += "\n";
                     var amountText = string.Format(amountFormat, dataEntry.Key.title, (dataEntry.Value * 100f).ToString("N0"));
-                    text += amountText + "\n";
+                    text += amountText;
                     if (CacheTextAmounts.ContainsKey(dataEntry.Key))
                         CacheTextAmounts[dataEntry.Key].text = amountText;
                 }

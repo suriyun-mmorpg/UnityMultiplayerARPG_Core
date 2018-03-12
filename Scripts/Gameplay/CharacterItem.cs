@@ -30,6 +30,12 @@ public struct CharacterItem
         return item != null ? item as BaseEquipmentItem : null;
     }
 
+    public BaseDefendItem GetDefendItem()
+    {
+        var item = GetItem();
+        return item != null ? item as BaseDefendItem : null;
+    }
+
     public ArmorItem GetArmorItem()
     {
         var item = GetItem();
@@ -68,11 +74,6 @@ public struct CharacterItem
     public bool CanEquip(ICharacterData character)
     {
         return GetEquipmentItem().CanEquip(character, level);
-    }
-
-    public CharacterStats GetStats()
-    {
-        return GetEquipmentItem().GetStats(level);
     }
 
     public static CharacterItem Create(Item item, int level)

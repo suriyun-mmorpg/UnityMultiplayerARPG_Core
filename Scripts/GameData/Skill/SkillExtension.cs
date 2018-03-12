@@ -164,20 +164,12 @@ public static class SkillExtension
     #endregion
 
     #region Attack
-    public static KeyValuePair<DamageElement, DamageAmount> GetBaseDamageAttribute(this Skill skill, int level, float effectiveness, float inflictRate)
+    public static KeyValuePair<DamageElement, DamageAmount> GetDamageAttribute(this Skill skill, int level, float effectiveness, float inflictRate)
     {
         if (!skill.IsAttack() || skill.skillAttackType != SkillAttackType.PureSkillDamage)
             return new KeyValuePair<DamageElement, DamageAmount>();
         level = skill.GetAdjustedLevel(level);
-        return GameDataHelpers.MakeDamageAttributePair(skill.baseDamageAttribute, level, effectiveness, inflictRate);
-    }
-
-    public static Dictionary<DamageElement, DamageAmount> GetAdditionalDamageAttributes(this Skill skill, int level)
-    {
-        if (!skill.IsAttack() || skill.skillAttackType != SkillAttackType.PureSkillDamage)
-            return new Dictionary<DamageElement, DamageAmount>();
-        level = skill.GetAdjustedLevel(level);
-        return GameDataHelpers.MakeDamageAttributesDictionary(skill.additionalDamageAttributes, new Dictionary<DamageElement, DamageAmount>(), level);
+        return GameDataHelpers.MakeDamageAttributePair(skill.damageAttribute, level, effectiveness, inflictRate);
     }
 
     public static float GetDamageEffectiveness(this Skill skill, ICharacterData character)
@@ -195,12 +187,12 @@ public static class SkillExtension
         return skill.baseInflictRate + skill.inflictRateIncreaseEachLevel * level;
     }
 
-    public static Dictionary<DamageElement, DamageAmount> GetInflictDamageAttributes(this Skill skill, int level)
+    public static Dictionary<DamageElement, DamageAmount> GetAdditionalDamageAttributes(this Skill skill, int level)
     {
-        if (!skill.IsAttack() || skill.skillAttackType != SkillAttackType.WeaponDamageInflict)
+        if (!skill.IsAttack() || skill.skillAttackType != SkillAttackType.PureSkillDamage)
             return new Dictionary<DamageElement, DamageAmount>();
         level = skill.GetAdjustedLevel(level);
-        return GameDataHelpers.MakeDamageAttributesDictionary(skill.inflictDamageAttributes, new Dictionary<DamageElement, DamageAmount>(), level);
+        return GameDataHelpers.MakeDamageAttributesDictionary(skill.additionalDamageAttributes, new Dictionary<DamageElement, DamageAmount>(), level);
     }
     #endregion
 
@@ -227,12 +219,12 @@ public static class SkillExtension
 
     public static Dictionary<Attribute, int> GetIncreaseAttributes(this SkillBuff skillBuff, int level)
     {
-        return GameDataHelpers.MakeAttributeIncrementalsDictionary(skillBuff.increaseAttributes, new Dictionary<Attribute, int>(), level);
+        return GameDataHelpers.MakeAttributeAmountsDictionary(skillBuff.increaseAttributes, new Dictionary<Attribute, int>(), level);
     }
 
     public static Dictionary<Resistance, float> GetIncreaseResistances(this SkillBuff skillBuff, int level)
     {
-        return GameDataHelpers.MakeResistanceIncrementalsDictionary(skillBuff.increaseResistances, new Dictionary<Resistance, float>(), level);
+        return GameDataHelpers.MakeResistanceAmountsDictionary(skillBuff.increaseResistances, new Dictionary<Resistance, float>(), level);
     }
     #endregion
 }

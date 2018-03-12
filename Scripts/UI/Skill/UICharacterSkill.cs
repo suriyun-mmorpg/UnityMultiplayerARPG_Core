@@ -23,10 +23,6 @@ public class UICharacterSkill : UISelectionEntry<CharacterSkill>
     [Tooltip("Cool Down Remains Duration Format => {0} = {Remains duration}")]
     public string coolDownRemainsDurationFormat = "{0}";
 
-    [Header("Requirement Format")]
-    [Tooltip("Require Level Format => {0} = {Level}")]
-    public string requireLevelFormat = "Require Level: {0}";
-
     [Header("Attack Format")]
     [Tooltip("Inflict Rate Format => {0} = {Rate * 100f}")]
     public string inflictRateFormat = "Inflict {0}%";
@@ -41,18 +37,16 @@ public class UICharacterSkill : UISelectionEntry<CharacterSkill>
     public Text textCoolDownRemainsDuration;
     public Image imageCoolDownGage;
     public Button addButton;
-
-    [Header("Skill Requirement - UI Elements")]
-    public Text textRequireLevel;
-    public UISkillLevels uiRequireSkillLevels;
+    public UISkillRequirement uiRequirement;
 
     [Header("Attack as Pure Skill Damage - UI Elements")]
-    public UIDamageElementAmount uiBaseDamageAttribute;
-    public UIDamageElementAmounts uiAdditionalDamageAttributes;
+    public UIDamageElementAmount uiDamageAttribute;
 
     [Header("Attack as Weapon Damage Inflict - UI Elements")]
     public Text textInflictRate;
-    public UIDamageElementAmounts uiInflictDamageAttributes;
+
+    [Header("Attack additional attributes")]
+    public UIDamageElementAmounts uiAdditionalDamageAttributes;
 
     [Header("Buff/Debuff")]
     public UISkillBuff uiSkillBuff;
@@ -60,12 +54,15 @@ public class UICharacterSkill : UISelectionEntry<CharacterSkill>
 
     private void Update()
     {
+        var skill = Data.GetSkill();
+        var skillLevel = Data.level;
+
         var owningCharacter = CharacterEntity.OwningCharacter;
         if (addButton != null)
             addButton.interactable = Data.CanLevelUp(owningCharacter);
 
         var coolDownRemainDuration = Data.coolDownRemainsDuration;
-        var coolDownDuration = Data.GetCoolDownDuration();
+        var coolDownDuration = skill.GetCoolDownDuration(skillLevel);
 
         if (textCoolDownDuration != null)
             textCoolDownDuration.text = string.Format(coolDownDurationFormat, coolDownDuration.ToString("N0"));
@@ -80,6 +77,7 @@ public class UICharacterSkill : UISelectionEntry<CharacterSkill>
     protected override void UpdateData()
     {
         var skill = Data.GetSkill();
+        var skillLevel = Data.level;
 
         if (textTitle != null)
             textTitle.text = string.Format(titleFormat, skill == null ? "Unknow" : skill.title);
@@ -88,7 +86,7 @@ public class UICharacterSkill : UISelectionEntry<CharacterSkill>
             textDescription.text = string.Format(descriptionFormat, skill == null ? "N/A" : skill.description);
 
         if (textLevel != null)
-            textLevel.text = string.Format(levelFormat, Data.level.ToString("N0"));
+            textLevel.text = string.Format(levelFormat, skillLevel.ToString("N0"));
 
         if (imageIcon != null)
         {
@@ -98,52 +96,30 @@ public class UICharacterSkill : UISelectionEntry<CharacterSkill>
         }
 
         if (textConsumeMp != null)
-            textConsumeMp.text = string.Format(consumeMpFormat, Data.GetConsumeMp().ToString("N0"));
+            textConsumeMp.text = string.Format(consumeMpFormat, skill.GetConsumeMp(skillLevel).ToString("N0"));
         
-        if (textRequireLevel != null)
+        if (uiRequirement != null)
         {
-            if (skill == null)
-                textRequireLevel.gameObject.SetActive(false);
+            if (skill == null || (skill.GetRequireCharacterLevel(skillLevel) == 0 && skill.CacheRequireSkillLevels.Count == 0))
+                uiRequirement.Hide();
             else
             {
-                textRequireLevel.text = string.Format(requireLevelFormat, skill.GetRequireCharacterLevel(Data.level).ToString("N0"));
-                textRequireLevel.gameObject.SetActive(true);
-            }
-        }
-
-        if (uiRequireSkillLevels != null)
-        {
-            if (skill == null)
-                uiRequireSkillLevels.gameObject.SetActive(false);
-            else
-            {
-                uiRequireSkillLevels.Data = skill.CacheRequireSkillLevels;
-                uiRequireSkillLevels.gameObject.SetActive(true);
+                uiRequirement.Data = new KeyValuePair<Skill, int>(skill, skillLevel);
+                uiRequirement.Show();
             }
         }
 
         var isAttackPure = skill != null && skill.IsAttack() && skill.skillAttackType == SkillAttackType.PureSkillDamage;
         var isAttackWeaponInflict = skill != null && skill.IsAttack() && skill.skillAttackType == SkillAttackType.WeaponDamageInflict;
 
-        if (uiBaseDamageAttribute != null)
+        if (uiDamageAttribute != null)
         {
             if (!isAttackPure)
-                uiBaseDamageAttribute.Hide();
+                uiDamageAttribute.Hide();
             else
             {
-                uiBaseDamageAttribute.Data = skill.GetBaseDamageAttribute(Data.level, 0f, 1f);
-                uiBaseDamageAttribute.Show();
-            }
-        }
-
-        if (uiAdditionalDamageAttributes != null)
-        {
-            if (!isAttackPure)
-                uiAdditionalDamageAttributes.Hide();
-            else
-            {
-                uiAdditionalDamageAttributes.Data = skill.GetAdditionalDamageAttributes(Data.level);
-                uiAdditionalDamageAttributes.Show();
+                uiDamageAttribute.Data = skill.GetDamageAttribute(skillLevel, 0f, 1f);
+                uiDamageAttribute.Show();
             }
         }
 
@@ -153,19 +129,19 @@ public class UICharacterSkill : UISelectionEntry<CharacterSkill>
                 textInflictRate.gameObject.SetActive(false);
             else
             {
-                textInflictRate.text = string.Format(inflictRateFormat, (skill.GetInflictRate(Data.level) * 100f).ToString("N0"));
+                textInflictRate.text = string.Format(inflictRateFormat, (skill.GetInflictRate(skillLevel) * 100f).ToString("N0"));
                 textInflictRate.gameObject.SetActive(true);
             }
         }
 
-        if (uiInflictDamageAttributes != null)
+        if (uiAdditionalDamageAttributes != null)
         {
-            if (!isAttackWeaponInflict)
-                uiInflictDamageAttributes.Hide();
+            if (!isAttackPure)
+                uiAdditionalDamageAttributes.Hide();
             else
             {
-                uiInflictDamageAttributes.Data = skill.GetInflictDamageAttributes(Data.level);
-                uiInflictDamageAttributes.Hide();
+                uiAdditionalDamageAttributes.Data = skill.GetAdditionalDamageAttributes(skillLevel);
+                uiAdditionalDamageAttributes.Show();
             }
         }
 
@@ -175,7 +151,7 @@ public class UICharacterSkill : UISelectionEntry<CharacterSkill>
                 uiSkillBuff.Hide();
             else
             {
-                uiSkillBuff.Data = new KeyValuePair<SkillBuff, int>(skill.buff, Data.level);
+                uiSkillBuff.Data = new KeyValuePair<SkillBuff, int>(skill.buff, skillLevel);
                 uiSkillBuff.Show();
             }
         }
@@ -186,7 +162,7 @@ public class UICharacterSkill : UISelectionEntry<CharacterSkill>
                 uiSkillDebuff.Hide();
             else
             {
-                uiSkillDebuff.Data = new KeyValuePair<SkillBuff, int>(skill.debuff, Data.level);
+                uiSkillDebuff.Data = new KeyValuePair<SkillBuff, int>(skill.debuff, skillLevel);
                 uiSkillDebuff.Show();
             }
         }

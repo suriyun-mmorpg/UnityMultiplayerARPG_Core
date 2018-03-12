@@ -16,55 +16,64 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
     public string titleFormat = "{0}";
     [Tooltip("Description Format => {0} = {Description}")]
     public string descriptionFormat = "{0}";
+    [Tooltip("Level Format => {0} = {Level}")]
+    public string levelFormat = "Lv: {0}";
     [Tooltip("Sell Price Format => {0} = {Sell price}")]
     public string sellPriceFormat = "{0}";
     [Tooltip("Stack Format => {0} = {Amount}, {1} = {Max stack}")]
     public string stackFormat = "{0}/{1}";
     [Tooltip("Weight Format => {0} = {Weight}")]
     public string weightFormat = "{0}";
-
-    [Header("Requirement Format")]
-    [Tooltip("Require Level Format => {0} = {Level}")]
-    public string requireLevelFormat = "Require Level: {0}";
-    [Tooltip("Require Class Format => {0} = {Class title}")]
-    public string requireClassFormat = "Require Class: {0}";
-
-    [Header("Weapon Info Format")]
-    [Tooltip("Weapon Type Format => {0} = {Weapon Type title}")]
-    public string weaponTypeFormat = "Weapon Type: {0}";
+    [Tooltip("Item Type Format => {0} = {Item Type title}")]
+    public string itemTypeFormat = "Item Type: {0}";
+    [Tooltip("General Item Type")]
+    public string generalItemType = "General Item";
+    [Tooltip("Shield Item Type")]
+    public string shieldItemType = "Shield";
+    [Tooltip("Armor Format => {0} = {Armor}")]
+    public string armorFormat = "Armor: {0}";
 
     [Header("UI Elements")]
     public Text textTitle;
     public Text textDescription;
+    public Text textLevel;
     public Image imageIcon;
     public Text textSellPrice;
     public Text textStack;
     public Text textWeight;
+    public Text textItemType;
 
     [Header("Equipment - UI Elements")]
+    public UIEquipmentItemRequirement uiRequirement;
     public UICharacterStats uiStats;
     public UIAttributeAmounts uiIncreaseAttributes;
     public UIResistanceAmounts uiIncreaseResistances;
     public UIDamageElementAmounts uiIncreaseDamageAttributes;
 
-    [Header("Equipment Requirement - UI Elements")]
-    public Text textRequireLevel;
-    public Text textRequireClass;
-    public UIAttributeAmounts uiRequireAttributeAmounts;
+    [Header("Armor/Shield - UI Elements")]
+    public Text textArmor;
 
     [Header("Weapon - UI Elements")]
-    public Text textWeaponType;
     public UIDamageElementAmount uiDamageAttribute;
 
     protected override void UpdateData()
     {
         var itemData = Data.GetItem();
+        var itemLevel = Data.level;
+        var equipmentItem = Data.GetEquipmentItem();
+        var defendItem = Data.GetDefendItem();
+        var armorItem = Data.GetArmorItem();
+        var weaponItem = Data.GetWeaponItem();
+        var shieldItem = Data.GetShieldItem();
 
         if (textTitle != null)
             textTitle.text = string.Format(titleFormat, itemData == null ? "Unknow" : itemData.title);
 
         if (textDescription != null)
             textDescription.text = string.Format(descriptionFormat, itemData == null ? "N/A" : itemData.description);
+
+        if (textLevel != null)
+            textLevel.text = string.Format(levelFormat, itemLevel.ToString("N0"));
 
         if (imageIcon != null)
         {
@@ -86,40 +95,28 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
         }
 
         if (textWeight != null)
-            textWeight.text = string.Format(weightFormat, itemData == null ? "0" : itemData.weight.ToString("N0"));
+            textWeight.text = string.Format(weightFormat, itemData == null ? "0" : itemData.weight.ToString("N2"));
 
-        var equipmentItem = Data.GetEquipmentItem();
-
-        if (textRequireLevel != null)
+        if (textItemType != null)
         {
-            if (equipmentItem == null)
-                textRequireLevel.gameObject.SetActive(false);
+            if (armorItem != null)
+                textItemType.text = string.Format(itemTypeFormat, armorItem.armorType.title);
+            else if (weaponItem != null)
+                textItemType.text = string.Format(itemTypeFormat, weaponItem.WeaponType.title);
+            else if (shieldItem != null)
+                textItemType.text = string.Format(itemTypeFormat, shieldItemType);
             else
-            {
-                textRequireLevel.text = string.Format(requireLevelFormat, equipmentItem.requirement.characterLevel.ToString("N0"));
-                textRequireLevel.gameObject.SetActive(true);
-            }
+                textItemType.text = string.Format(itemTypeFormat, generalItemType);
         }
 
-        if (textRequireClass != null)
+        if (uiRequirement != null)
         {
-            if (equipmentItem == null || equipmentItem.requirement.characterClass == null)
-                textRequireClass.gameObject.SetActive(false);
+            if (equipmentItem == null || (equipmentItem.requirement.characterLevel == 0 && equipmentItem.requirement.characterClass == null && equipmentItem.CacheRequireAttributeAmounts.Count == 0))
+                uiRequirement.Hide();
             else
             {
-                textRequireClass.text = string.Format(requireClassFormat, equipmentItem.requirement.characterClass.title);
-                textRequireClass.gameObject.SetActive(true);
-            }
-        }
-
-        if (uiRequireAttributeAmounts != null)
-        {
-            if (equipmentItem == null)
-                uiRequireAttributeAmounts.gameObject.SetActive(false);
-            else
-            {
-                uiRequireAttributeAmounts.Data = equipmentItem.CacheRequireAttributeAmounts;
-                uiRequireAttributeAmounts.gameObject.SetActive(true);
+                uiRequirement.Data = new KeyValuePair<BaseEquipmentItem, int>(equipmentItem, itemLevel);
+                uiRequirement.Show();
             }
         }
 
@@ -129,7 +126,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
                 uiStats.Hide();
             else
             {
-                uiStats.Data = Data.GetStats();
+                uiStats.Data = equipmentItem.GetStats(itemLevel);
                 uiStats.Show();
             }
         }
@@ -140,7 +137,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
                 uiIncreaseAttributes.Hide();
             else
             {
-                uiIncreaseAttributes.Data = equipmentItem.GetIncreaseAttributes(Data.level);
+                uiIncreaseAttributes.Data = equipmentItem.GetIncreaseAttributes(itemLevel);
                 uiIncreaseAttributes.Show();
             }
         }
@@ -151,7 +148,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
                 uiIncreaseResistances.Hide();
             else
             {
-                uiIncreaseResistances.Data = equipmentItem.GetIncreaseResistances(Data.level);
+                uiIncreaseResistances.Data = equipmentItem.GetIncreaseResistances(itemLevel);
                 uiIncreaseResistances.Show();
             }
         }
@@ -162,21 +159,19 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
                 uiIncreaseDamageAttributes.Hide();
             else
             {
-                uiIncreaseDamageAttributes.Data = equipmentItem.GetIncreaseDamageAttributes(Data.level);
+                uiIncreaseDamageAttributes.Data = equipmentItem.GetIncreaseDamageAttributes(itemLevel);
                 uiIncreaseDamageAttributes.Show();
             }
         }
 
-        var weaponItem = Data.GetWeaponItem();
-
-        if (textWeaponType != null)
+        if (textArmor != null)
         {
-            if (weaponItem == null)
-                textWeaponType.gameObject.SetActive(false);
+            if (defendItem == null)
+                textArmor.gameObject.SetActive(false);
             else
             {
-                textWeaponType.text = string.Format(weaponTypeFormat, weaponItem.WeaponType.title);
-                textWeaponType.gameObject.SetActive(true);
+                textArmor.text = string.Format(armorFormat, defendItem.GetArmor(itemLevel));
+                textArmor.gameObject.SetActive(true);
             }
         }
 
@@ -186,7 +181,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
                 uiDamageAttribute.Hide();
             else
             {
-                uiDamageAttribute.Data = weaponItem.GetDamageAttribute(Data.level, 0f, 1f);
+                uiDamageAttribute.Data = weaponItem.GetDamageAttribute(itemLevel, 0f, 1f);
                 uiDamageAttribute.Show();
             }
         }

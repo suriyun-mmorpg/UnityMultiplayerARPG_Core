@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class UICharacter : UISelectionEntry<ICharacterData>
 {
     [Header("Display Format")]
-    [Tooltip("Name Format => {0} = {name}")]
+    [Tooltip("Name Format => {0} = {Character name}")]
     public string nameFormat = "{0}";
     [Tooltip("Level Format => {0} = {Level}")]
     public string levelFormat = "Lv: {0}";
@@ -30,6 +30,8 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public string weightLimitStatsFormat = "Weight Limit: {0}";
     [Tooltip("Weapon Damage => {0} = {Min damage}, {1} = {Max damage}")]
     public string weaponDamageFormat = "{0}~{1}";
+    [Tooltip("Armor Format => {0} = {Armor}")]
+    public string armorFormat = "Armor: {0}";
 
     [Header("Class")]
     [Tooltip("Class Title Format => {0} = {Class title}")]
@@ -49,6 +51,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public Text textSkillPoint;
     public Text textGold;
     public Text textWeightLimit;
+    public Text textArmor;
     public Text textWeaponDamages;
     public UIDamageElementAmounts uiRightHandDamages;
     public UIDamageElementAmounts uiLeftHandDamages;
@@ -90,6 +93,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         if (textLevel != null)
             textLevel.text = string.Format(levelFormat, Data == null ? "N/A" : Data.Level.ToString("N0"));
 
+        var statsWithBuff = Data.GetStatsWithBuffs();
         var expTree = GameInstance.Singleton.expTree;
         var currentExp = 0;
         var nextLevelExp = 0;
@@ -116,7 +120,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         if (Data != null)
         {
             currentHp = Data.CurrentHp;
-            maxHp = Data.GetMaxHp();
+            maxHp = (int)statsWithBuff.hp;
         }
 
         if (textHp != null)
@@ -130,7 +134,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         if (Data != null)
         {
             currentMp = Data.CurrentMp;
-            maxMp = Data.GetMaxMp();
+            maxMp = (int)statsWithBuff.mp;
         }
 
         if (textMp != null)
@@ -152,10 +156,12 @@ public class UICharacter : UISelectionEntry<ICharacterData>
 
     protected override void UpdateData()
     {
-        var stats = showStatsWithBuffs ? Data.GetStatsWithBuffs() : Data.GetStats();
+        var statsWithBuff = Data.GetStatsWithBuffs();
+        var displayingStats = showStatsWithBuffs ? statsWithBuff : Data.GetStats();
+        var displayingAttributes = showAttributeWithBuffs ? Data.GetAttributesWithBuffs() : Data.GetAttributes();
 
         if (textWeightLimit != null)
-            textWeightLimit.text = string.Format(weightLimitStatsFormat, stats.weightLimit.ToString("N2"));
+            textWeightLimit.text = string.Format(weightLimitStatsFormat, Data.GetTotalItemWeight().ToString("N2"), statsWithBuff.weightLimit.ToString("N2"));
         
         var rightHandItem = Data.EquipWeapons.rightHand;
         var leftHandItem = Data.EquipWeapons.leftHand;
@@ -207,11 +213,10 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         }
 
         if (uiCharacterStats != null)
-            uiCharacterStats.Data = stats;
+            uiCharacterStats.Data = displayingStats;
 
         if (CacheUICharacterAttributes.Count > 0 && Data != null)
         {
-            var totalAttributes = showAttributeWithBuffs ? Data.GetAttributesWithBuffs() : Data.GetAttributes();
             var characterAttributes = Data.Attributes;
             for (var i = 0; i < characterAttributes.Count; ++i)
             {
@@ -220,13 +225,12 @@ public class UICharacter : UISelectionEntry<ICharacterData>
                 if (CacheUICharacterAttributes.ContainsKey(attribute))
                 {
                     var cacheUICharacterAttribute = CacheUICharacterAttributes[attribute];
-                    cacheUICharacterAttribute.Data = new KeyValuePair<CharacterAttribute, int>(characterAttribute, totalAttributes[attribute]);
+                    cacheUICharacterAttribute.Data = new KeyValuePair<CharacterAttribute, int>(characterAttribute, displayingAttributes[attribute]);
                     cacheUICharacterAttribute.indexOfData = i;
                 }
             }
         }
         
-
         var classData = Data == null ? null : Data.GetClass();
         if (textClassTitle != null)
             textClassTitle.text = string.Format(classTitleFormat, classData == null ? "N/A" : classData.title);

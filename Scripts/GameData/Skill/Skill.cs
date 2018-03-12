@@ -58,15 +58,16 @@ public class Skill : BaseGameData
     public SkillAttackType skillAttackType;
 
     [Header("Attack As Pure Skill Damage")]
-    public DamageAttribute baseDamageAttribute;
-    public DamageAttribute[] additionalDamageAttributes;
+    public DamageAttribute damageAttribute;
     public Damage damage;
     public DamageEffectivenessAttribute[] effectivenessAttributes;
 
     [Header("Attack As Weapon Damage Inflict")]
     public float baseInflictRate;
     public float inflictRateIncreaseEachLevel;
-    public DamageAttribute[] inflictDamageAttributes;
+
+    [Header("Additional Damage Attributes")]
+    public DamageAttribute[] additionalDamageAttributes;
 
     [Header("Attack Debuff")]
     public bool isDebuff;

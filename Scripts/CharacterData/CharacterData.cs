@@ -219,28 +219,75 @@ public static class CharacterDataExtension
     }
 
     #region Stats calculation, make saperate stats for buffs calculation
-    public static Dictionary<Attribute, int> GetAttributes(this ICharacterData data)
+    public static float GetTotalItemWeight(this ICharacterData data)
     {
-        var result = new Dictionary<Attribute, int>();
+        var result = 0f;
         var equipItems = data.EquipItems;
         foreach (var equipItem in equipItems)
         {
-            if (equipItem.GetEquipmentItem() == null)
+            if (!equipItem.IsValid())
                 continue;
-            var equipment = equipItem.GetEquipmentItem();
-            var increaseAttributes = equipment.GetIncreaseAttributes(equipItem.level);
-            foreach (var increaseAttribute in increaseAttributes)
-            {
-                var key = increaseAttribute.Key;
-                var value = increaseAttribute.Value;
-                if (key == null)
-                    continue;
-                if (!result.ContainsKey(key))
-                    result[key] = value;
-                else
-                    result[key] += value;
-            }
+            result += equipItem.GetItem().weight;
         }
+        var nonEquipItems = data.NonEquipItems;
+        foreach (var nonEquipItem in nonEquipItems)
+        {
+            if (!nonEquipItem.IsValid())
+                continue;
+            result += nonEquipItem.GetItem().weight * nonEquipItem.amount;
+        }
+        var equipWeapons = data.EquipWeapons;
+        var rightHandItem = equipWeapons.rightHand;
+        var leftHandItem = equipWeapons.leftHand;
+        if (rightHandItem.IsValid())
+            result += rightHandItem.GetItem().weight;
+        if (leftHandItem.IsValid())
+            result += leftHandItem.GetItem().weight;
+        return result;
+    }
+
+    public static float GetArmor(this ICharacterData data)
+    {
+        var result = 0f;
+        var equipItems = data.EquipItems;
+        foreach (var equipItem in equipItems)
+        {
+            var defendItem = equipItem.GetDefendItem();
+            if (defendItem == null)
+                continue;
+            result += defendItem.GetArmor(equipItem.level);
+        }
+        var equipWeapons = data.EquipWeapons;
+        var leftHandItem = equipWeapons.leftHand;
+        if (leftHandItem.IsValid())
+            result += leftHandItem.GetShieldItem().GetArmor(leftHandItem.level);
+        return result;
+    }
+
+    public static Dictionary<Attribute, int> GetAttributes(this ICharacterData data)
+    {
+        var result = new Dictionary<Attribute, int>();
+        // Armors attributes
+        var equipItems = data.EquipItems;
+        foreach (var equipItem in equipItems)
+        {
+            var equipment = equipItem.GetEquipmentItem();
+            if (equipment == null)
+                continue;
+            result = GameDataHelpers.CombineAttributeAmountsDictionary(result, 
+                equipment.GetIncreaseAttributes(equipItem.level));
+        }
+        // Weapons attributes
+        var equipWeapons = data.EquipWeapons;
+        var rightHandItem = equipWeapons.rightHand;
+        var leftHandItem = equipWeapons.leftHand;
+        if (rightHandItem.IsValid())
+            result = GameDataHelpers.CombineAttributeAmountsDictionary(result, 
+                rightHandItem.GetEquipmentItem().GetIncreaseAttributes(rightHandItem.level));
+        if (leftHandItem.IsValid())
+            result = GameDataHelpers.CombineAttributeAmountsDictionary(result, 
+                leftHandItem.GetEquipmentItem().GetIncreaseAttributes(leftHandItem.level));
+        // Character attributes
         var characterAttributes = data.Attributes;
         foreach (var characterAttribute in characterAttributes)
         {
@@ -258,23 +305,12 @@ public static class CharacterDataExtension
 
     public static Dictionary<Attribute, int> GetAttributesWithBuffs(this ICharacterData data)
     {
-        var result = GetAttributes(data);
+        var result = data.GetAttributes();
         var buffs = data.Buffs;
         foreach (var buff in buffs)
         {
-            // Buff
-            var buffAttributes = buff.GetAttributes();
-            foreach (var buffAttribute in buffAttributes)
-            {
-                var key = buffAttribute.Key;
-                var value = buffAttribute.Value;
-                if (key == null)
-                    continue;
-                if (!result.ContainsKey(key))
-                    result[key] = value;
-                else
-                    result[key] += value;
-            }
+            result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
+                buff.GetAttributes());
         }
         return result;
     }
@@ -288,18 +324,8 @@ public static class CharacterDataExtension
             if (equipItem.GetEquipmentItem() == null)
                 continue;
             var equipment = equipItem.GetEquipmentItem();
-            var increaseResistances = equipment.GetIncreaseResistances(equipItem.level);
-            foreach (var increaseResistance in increaseResistances)
-            {
-                var key = increaseResistance.Key;
-                var value = increaseResistance.Value;
-                if (key == null)
-                    continue;
-                if (!result.ContainsKey(key))
-                    result[key] = value;
-                else
-                    result[key] += value;
-            }
+            result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
+                equipment.GetIncreaseResistances(equipItem.level));
         }
         return result;
     }
@@ -310,19 +336,8 @@ public static class CharacterDataExtension
         var buffs = data.Buffs;
         foreach (var buff in buffs)
         {
-            // Buff
-            var buffResistances = buff.GetResistances();
-            foreach (var buffResistance in buffResistances)
-            {
-                var key = buffResistance.Key;
-                var value = buffResistance.Value;
-                if (key == null)
-                    continue;
-                if (!result.ContainsKey(key))
-                    result[key] = value;
-                else
-                    result[key] += value;
-            }
+            result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
+                buff.GetResistances());
         }
         return result;
     }
@@ -337,31 +352,20 @@ public static class CharacterDataExtension
         var equipItems = data.EquipItems;
         foreach (var equipment in equipItems)
         {
-            result += equipment.GetStats();
+            result += equipment.GetEquipmentItem().GetStats(equipment.level);
         }
-        result += GameDataHelpers.GetStatsByAttributeAmountPairs(GetAttributes(data));
+        result += GameDataHelpers.CaculateStats(GetAttributes(data));
         return result;
     }
 
     public static CharacterStats GetStatsWithBuffs(this ICharacterData data)
     {
-        var id = data.Id;
-        var level = data.Level;
-        var characterClass = data.GetClass();
-        var result = characterClass.baseStats + characterClass.statsIncreaseEachLevel * level;
-
-        var equipItems = data.EquipItems;
-        foreach (var equipment in equipItems)
-        {
-            result += equipment.GetStats();
-        }
-
+        var result = data.GetStats();
         var buffs = data.Buffs;
         foreach (var buff in buffs)
         {
             result += buff.GetStats();
         }
-        result += GameDataHelpers.GetStatsByAttributeAmountPairs(GetAttributesWithBuffs(data));
         return result;
     }
     #endregion

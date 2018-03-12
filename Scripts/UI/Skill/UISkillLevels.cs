@@ -54,8 +54,10 @@ public class UISkillLevels : UISelectionEntry<Dictionary<Skill, int>>
                 {
                     if (dataEntry.Key == null || dataEntry.Value == 0)
                         continue;
+                    if (!string.IsNullOrEmpty(text))
+                        text += "\n";
                     var amountText = string.Format(levelFormat, dataEntry.Key.title, dataEntry.Value.ToString("N0"));
-                    text += amountText + "\n";
+                    text += amountText;
                     if (CacheTextLevels.ContainsKey(dataEntry.Key))
                         CacheTextLevels[dataEntry.Key].text = amountText;
                 }
