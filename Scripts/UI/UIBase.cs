@@ -5,6 +5,7 @@ using UnityEngine;
 public class UIBase : MonoBehaviour
 {
     public bool hideOnAwake = false;
+    public bool moveToLastSiblingOnShow = false;
     public GameObject root;
 
     private bool isAwaken;
@@ -38,6 +39,8 @@ public class UIBase : MonoBehaviour
     {
         isAwaken = true;
         CacheRoot.SetActive(true);
+        if (moveToLastSiblingOnShow)
+            CacheRoot.transform.SetAsLastSibling();
     }
 
     public virtual void Hide()

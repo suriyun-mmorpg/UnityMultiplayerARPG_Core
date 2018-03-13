@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UISceneGameplay : MonoBehaviour
 {
@@ -19,6 +20,8 @@ public class UISceneGameplay : MonoBehaviour
     public UINonEquipItems uiNonEquipItems;
     public UICharacterSkills uiSkills;
     public UIToggleUI[] toggleUis;
+    public Button buttonRespawn;
+    public Button buttonExit;
     
     public UICharacterItem SelectedEquipItem { get; private set; }
     public UICharacterItem SelectedNonEquipItem { get; private set; }
@@ -37,10 +40,10 @@ public class UISceneGameplay : MonoBehaviour
             {
                 var ui = toggleUi.ui;
                 ui.Toggle();
-                if (ui.IsVisible())
-                    ui.CacheRoot.transform.SetAsLastSibling();
             }
         }
+        if (buttonRespawn != null)
+            buttonRespawn.gameObject.SetActive(CharacterEntity.OwningCharacter.CurrentHp <= 0);
     }
 
     public void UpdateCharacter()

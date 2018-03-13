@@ -4,6 +4,6 @@ using System.Collections.Generic;
 [System.Serializable]
 public struct UICharacterItemPair
 {
-    public string equipPosition;
+    public ArmorType armorType;
     public UICharacterItem ui;
 }

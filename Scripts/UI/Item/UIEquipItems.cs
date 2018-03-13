@@ -9,8 +9,8 @@ using UnityEditor;
 public class UIEquipItems : UIBase
 {
     public UICharacterItem uiItemDialog;
-    public UICharacterItemPair rightHandSlot;
-    public UICharacterItemPair leftHandSlot;
+    public UICharacterItem rightHandSlot;
+    public UICharacterItem leftHandSlot;
     public UICharacterItemPair[] otherEquipSlots;
 
     private Dictionary<string, UICharacterItem> cacheEquipItemSlots = null;
@@ -22,27 +22,27 @@ public class UIEquipItems : UIBase
             {
                 cacheEquipItemSlots = new Dictionary<string, UICharacterItem>();
                 SelectionManager.Clear();
-                if (rightHandSlot.ui != null)
+                if (rightHandSlot != null)
                 {
                     var equipPosition = GameDataConst.EQUIP_POSITION_RIGHT_HAND;
-                    rightHandSlot.ui.equipPosition = equipPosition;
-                    cacheEquipItemSlots.Add(equipPosition, rightHandSlot.ui);
-                    SelectionManager.Add(rightHandSlot.ui);
+                    rightHandSlot.equipPosition = equipPosition;
+                    cacheEquipItemSlots.Add(equipPosition, rightHandSlot);
+                    SelectionManager.Add(rightHandSlot);
                 }
-                if (leftHandSlot.ui != null)
+                if (leftHandSlot != null)
                 {
                     var equipPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
-                    leftHandSlot.ui.equipPosition = equipPosition;
-                    cacheEquipItemSlots.Add(equipPosition, leftHandSlot.ui);
-                    SelectionManager.Add(leftHandSlot.ui);
+                    leftHandSlot.equipPosition = equipPosition;
+                    cacheEquipItemSlots.Add(equipPosition, leftHandSlot);
+                    SelectionManager.Add(leftHandSlot);
                 }
                 foreach (var otherEquipSlot in otherEquipSlots)
                 {
-                    if (!string.IsNullOrEmpty(otherEquipSlot.equipPosition) &&
+                    if (!string.IsNullOrEmpty(otherEquipSlot.armorType.equipPosition) &&
                         otherEquipSlot.ui != null && 
-                        !cacheEquipItemSlots.ContainsKey(otherEquipSlot.equipPosition))
+                        !cacheEquipItemSlots.ContainsKey(otherEquipSlot.armorType.equipPosition))
                     {
-                        var equipPosition = otherEquipSlot.equipPosition;
+                        var equipPosition = otherEquipSlot.armorType.equipPosition;
                         otherEquipSlot.ui.equipPosition = equipPosition;
                         cacheEquipItemSlots.Add(equipPosition, otherEquipSlot.ui);
                         SelectionManager.Add(otherEquipSlot.ui);
@@ -109,15 +109,6 @@ public class UIEquipItems : UIBase
         if (uiItemDialog != null)
             uiItemDialog.Hide();
     }
-
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-        rightHandSlot.equipPosition = GameDataConst.EQUIP_POSITION_RIGHT_HAND;
-        leftHandSlot.equipPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
-        EditorUtility.SetDirty(this);
-    }
-#endif
 
     public void UpdateData(CharacterEntity characterEntity)
     {

@@ -77,21 +77,6 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     public Vector3 RespawnPosition { get; set; }
     public int LastUpdate { get; set; }
 
-    public float CurrentWeight
-    {
-        get
-        {
-            var result = 0f;
-            foreach (var nonEquipItem in nonEquipItems)
-            {
-                var itemData = nonEquipItem.GetItem();
-                var weight = itemData == null ? 0 : itemData.weight;
-                result += nonEquipItem.amount * weight;
-            }
-            return result;
-        }
-    }
-
     public IList<CharacterAttribute> Attributes
     {
         get { return attributes; }
@@ -811,7 +796,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         var maxStack = itemData.maxStack;
         var weight = itemData.weight;
         // If overwhelming
-        if (CurrentWeight + (amount * weight) >= stats.weightLimit)
+        if (this.GetTotalItemWeight() + (amount * weight) >= stats.weightLimit)
             return false;
 
         var emptySlots = new Dictionary<int, CharacterItem>();
