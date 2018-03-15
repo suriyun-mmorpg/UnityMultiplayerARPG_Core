@@ -5,5 +5,4 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "ArmorType", menuName = "Create GameData/ArmorType")]
 public class ArmorType : BaseGameData
 {
-    public string equipPosition;
 }

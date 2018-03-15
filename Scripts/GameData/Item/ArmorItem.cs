@@ -17,7 +17,6 @@ public class ArmorItem : BaseDefendItem
                 armorType = CreateInstance<ArmorType>();
                 armorType.name = GameDataConst.UNKNOW_ARMOR_ID;
                 armorType.title = GameDataConst.UNKNOW_ARMOR_TITLE;
-                armorType.equipPosition = GameDataConst.UNKNOW_ARMOR_EQUIP_POSITION;
             }
             return armorType;
         }
@@ -25,6 +24,6 @@ public class ArmorItem : BaseDefendItem
 
     public string EquipPosition
     {
-        get { return ArmorType.equipPosition; }
+        get { return ArmorType.Id; }
     }
 }

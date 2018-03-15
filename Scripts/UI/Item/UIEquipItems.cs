@@ -38,11 +38,11 @@ public class UIEquipItems : UIBase
                 }
                 foreach (var otherEquipSlot in otherEquipSlots)
                 {
-                    if (!string.IsNullOrEmpty(otherEquipSlot.armorType.equipPosition) &&
+                    if (!string.IsNullOrEmpty(otherEquipSlot.armorType.Id) &&
                         otherEquipSlot.ui != null && 
-                        !cacheEquipItemSlots.ContainsKey(otherEquipSlot.armorType.equipPosition))
+                        !cacheEquipItemSlots.ContainsKey(otherEquipSlot.armorType.Id))
                     {
-                        var equipPosition = otherEquipSlot.armorType.equipPosition;
+                        var equipPosition = otherEquipSlot.armorType.Id;
                         otherEquipSlot.ui.equipPosition = equipPosition;
                         cacheEquipItemSlots.Add(equipPosition, otherEquipSlot.ui);
                         SelectionManager.Add(otherEquipSlot.ui);
