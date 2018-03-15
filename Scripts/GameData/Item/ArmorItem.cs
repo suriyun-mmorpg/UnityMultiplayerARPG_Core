@@ -13,11 +13,7 @@ public class ArmorItem : BaseDefendItem
         get
         {
             if (armorType == null)
-            {
-                armorType = CreateInstance<ArmorType>();
-                armorType.name = GameDataConst.UNKNOW_ARMOR_ID;
-                armorType.title = GameDataConst.UNKNOW_ARMOR_TITLE;
-            }
+                armorType = GameInstance.Singleton.DefaultArmorType;
             return armorType;
         }
     }

@@ -387,7 +387,7 @@ public static class CharacterDataExtension
         if (result.Count == 0)
         {
             var characterItem = new CharacterItem();
-            characterItem.itemId = gameInstance.defaultWeaponItem.Id;
+            characterItem.itemId = gameInstance.DefaultWeaponItem.Id;
             characterItem.level = 1;
             characterItem.amount = 1;
             result.Add(characterItem);

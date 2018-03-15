@@ -14,15 +14,7 @@ public class WeaponItem : BaseEquipmentItem
         get
         {
             if (weaponType == null)
-            {
-                weaponType = CreateInstance<WeaponType>();
-                weaponType.name = GameDataConst.UNKNOW_WEAPON_ID;
-                weaponType.title = GameDataConst.UNKNOW_WEAPON_TITLE;
-                weaponType.effectivenessAttributes = new DamageEffectivenessAttribute[0];
-                weaponType.rightHandAttackAnimations = new ActionAnimation[0];
-                weaponType.leftHandAttackAnimations = new ActionAnimation[0];
-                weaponType.damage = new Damage();
-            }
+                weaponType = GameInstance.Singleton.DefaultWeaponType;
             return weaponType;
         }
     }

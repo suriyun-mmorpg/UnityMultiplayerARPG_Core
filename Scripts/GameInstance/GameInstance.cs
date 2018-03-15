@@ -59,6 +59,74 @@ public class GameInstance : MonoBehaviour
         }
     }
 
+
+    private ArmorType cacheDefaultArmorType;
+    public ArmorType DefaultArmorType
+    {
+        get
+        {
+            if (cacheDefaultArmorType == null)
+            {
+                cacheDefaultArmorType = ScriptableObject.CreateInstance<ArmorType>();
+                cacheDefaultArmorType.name = GameDataConst.UNKNOW_ARMOR_TYPE_ID;
+                cacheDefaultArmorType.title = GameDataConst.UNKNOW_ARMOR_TYPE_TITLE;
+            }
+            return cacheDefaultArmorType;
+        }
+    }
+
+    private WeaponType cacheDefaultWeaponType;
+    public WeaponType DefaultWeaponType
+    {
+        get
+        {
+            if (cacheDefaultWeaponType == null)
+            {
+                cacheDefaultWeaponType = ScriptableObject.CreateInstance<WeaponType>();
+                cacheDefaultWeaponType.name = GameDataConst.UNKNOW_WEAPON_TYPE_ID;
+                cacheDefaultWeaponType.title = GameDataConst.UNKNOW_WEAPON_TYPE_TITLE;
+                cacheDefaultWeaponType.effectivenessAttributes = new DamageEffectivenessAttribute[0];
+                var sampleAttackAnimation = new ActionAnimation()
+                {
+                    actionId = 0,
+                    triggerDuration = 0.4f,
+                    totalDuration = 0.8f,
+                };
+                cacheDefaultWeaponType.rightHandAttackAnimations = new ActionAnimation[1]
+                {
+                    sampleAttackAnimation,
+                };
+                cacheDefaultWeaponType.leftHandAttackAnimations = new ActionAnimation[1]
+                {
+                    sampleAttackAnimation,
+                };
+                cacheDefaultWeaponType.damage = new Damage();
+            }
+            return cacheDefaultWeaponType;
+        }
+    }
+
+    public WeaponItem DefaultWeaponItem
+    {
+        get
+        {
+            if (defaultWeaponItem == null)
+            {
+                defaultWeaponItem = ScriptableObject.CreateInstance<WeaponItem>();
+                defaultWeaponItem.name = GameDataConst.DEFAULT_WEAPON_ID;
+                defaultWeaponItem.title = GameDataConst.DEFAULT_WEAPON_TITLE;
+                defaultWeaponItem.weaponType = DefaultWeaponType;
+                var sampleDamageAttribute = new DamageAttribute()
+                {
+                    baseDamageAmount = new DamageAmount() { minDamage = 1, maxDamage = 1 },
+                    damageAmountIncreaseEachLevel = new DamageAmount(),
+                };
+                defaultWeaponItem.damageAttribute = sampleDamageAttribute;
+            }
+            return defaultWeaponItem;
+        }
+    }
+
     protected virtual void Awake()
     {
         Application.runInBackground = true;
@@ -90,11 +158,6 @@ public class GameInstance : MonoBehaviour
             Debug.LogError("You must set ui scene gameplay prefab");
             return;
         }
-        if (defaultWeaponItem == null)
-        {
-            Debug.LogError("You must set default weapon item");
-            return;
-        }
         
         CharacterAttributes.Clear();
         CharacterClasses.Clear();
@@ -105,7 +168,7 @@ public class GameInstance : MonoBehaviour
         Skills.Clear();
 
         AddCharacterPrototypes(characterPrototypes);
-        AddItems(new Item[] { defaultWeaponItem });
+        AddItems(new Item[] { DefaultWeaponItem });
         AddItems(items);
         AddSkills(skills);
 
