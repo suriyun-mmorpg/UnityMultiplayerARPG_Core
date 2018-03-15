@@ -29,32 +29,34 @@ public class UINonEquipItems : UIBase
             return selectionManager;
         }
     }
-
+    
     public override void Show()
     {
-        base.Show();
         SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterItem);
         SelectionManager.eventOnSelect.AddListener(OnSelectCharacterItem);
         SelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterItem);
         SelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterItem);
+        base.Show();
     }
 
     public override void Hide()
     {
-        base.Hide();
         SelectionManager.DeselectSelectedUI();
+        base.Hide();
     }
 
     protected void OnSelectCharacterItem(UICharacterItem ui)
     {
         var uiGameplay = UISceneGameplay.Singleton;
-        if (uiGameplay != null && uiGameplay.uiNonEquipItems != null)
-            uiGameplay.uiNonEquipItems.SelectionManager.DeselectSelectedUI();
+        if (uiGameplay != null && uiGameplay.uiEquipItems != null)
+            uiGameplay.uiEquipItems.SelectionManager.DeselectSelectedUI();
 
         if (uiItemDialog != null)
         {
-            uiItemDialog.Data = ui.Data;
             uiItemDialog.Show();
+            uiItemDialog.Data = ui.Data;
+            uiItemDialog.indexOfData = ui.indexOfData;
+            uiItemDialog.equipPosition = string.Empty;
         }
     }
 
@@ -68,6 +70,7 @@ public class UINonEquipItems : UIBase
     {
         if (characterEntity == null)
             return;
+
         SelectionManager.Clear();
         var nonEquipItems = characterEntity.nonEquipItems;
         CacheList.Generate(nonEquipItems, (index, characterItem, ui) =>
@@ -75,6 +78,7 @@ public class UINonEquipItems : UIBase
             var uiCharacterItem = ui.GetComponent<UICharacterItem>();
             uiCharacterItem.Data = characterItem;
             uiCharacterItem.indexOfData = index;
+            uiItemDialog.equipPosition = string.Empty;
             SelectionManager.Add(uiCharacterItem);
         });
     }

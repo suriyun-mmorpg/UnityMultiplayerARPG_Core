@@ -36,31 +36,36 @@ public class UIResistanceAmounts : UISelectionEntry<Dictionary<Resistance, float
 
     protected override void UpdateData()
     {
-        if (textAllAmounts != null)
+        if (Data == null || Data.Count == 0)
         {
-            if (Data == null || Data.Count == 0)
+            if (textAllAmounts != null)
             {
+                Debug.LogError("2");
                 textAllAmounts.gameObject.SetActive(false);
-                foreach (var textAmount in CacheTextAmounts)
-                {
-                    var element = textAmount.Key;
-                    textAmount.Value.text = string.Format(amountFormat, element.title, "0", "0");
-                }
             }
-            else
+
+            foreach (var textAmount in CacheTextAmounts)
             {
-                var text = "";
-                foreach (var dataEntry in Data)
-                {
-                    if (dataEntry.Key == null || dataEntry.Value == 0)
-                        continue;
-                    if (!string.IsNullOrEmpty(text))
-                        text += "\n";
-                    var amountText = string.Format(amountFormat, dataEntry.Key.title, (dataEntry.Value * 100f).ToString("N0"));
-                    text += amountText;
-                    if (CacheTextAmounts.ContainsKey(dataEntry.Key))
-                        CacheTextAmounts[dataEntry.Key].text = amountText;
-                }
+                var element = textAmount.Key;
+                textAmount.Value.text = string.Format(amountFormat, element.title, "0", "0");
+            }
+        }
+        else
+        {
+            var text = "";
+            foreach (var dataEntry in Data)
+            {
+                if (dataEntry.Key == null || dataEntry.Value == 0)
+                    continue;
+                if (!string.IsNullOrEmpty(text))
+                    text += "\n";
+                var amountText = string.Format(amountFormat, dataEntry.Key.title, (dataEntry.Value * 100f).ToString("N0"));
+                text += amountText;
+                if (CacheTextAmounts.ContainsKey(dataEntry.Key))
+                    CacheTextAmounts[dataEntry.Key].text = amountText;
+            }
+            if (textAllAmounts != null)
+            {
                 textAllAmounts.gameObject.SetActive(!string.IsNullOrEmpty(text));
                 textAllAmounts.text = text;
             }

@@ -37,13 +37,13 @@ public class UICharacterCreate : UIBase
     }
 
     protected readonly Dictionary<string, CharacterModel> CharacterModels = new Dictionary<string, CharacterModel>();
-
+    
     public override void Show()
     {
-        base.Show();
         SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
         SelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
         LoadCharacters();
+        base.Show();
     }
 
     protected void LoadCharacters()
@@ -68,9 +68,9 @@ public class UICharacterCreate : UIBase
 
     public override void Hide()
     {
-        base.Hide();
         characterModelContainer.RemoveChildren();
         inputCharacterName.text = "";
+        base.Hide();
     }
 
     protected void OnSelectCharacter(UICharacter ui)

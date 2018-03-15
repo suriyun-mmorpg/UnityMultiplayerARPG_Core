@@ -156,6 +156,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
 
     protected override void UpdateData()
     {
+        var gameInstance = GameInstance.Singleton;
         var statsWithBuff = Data.GetStatsWithBuffs();
         var displayingStats = showStatsWithBuffs ? statsWithBuff : Data.GetStats();
         var displayingAttributes = showAttributeWithBuffs ? Data.GetAttributesWithBuffs() : Data.GetAttributes();
@@ -178,14 +179,22 @@ public class UICharacter : UISelectionEntry<ICharacterData>
                 var sumDamages = GameDataHelpers.GetSumDamages(rightHandDamages);
                 if (!string.IsNullOrEmpty(textDamages))
                     textDamages += "\n";
-                textDamages += string.Format(weaponDamageFormat, sumDamages);
+                textDamages += string.Format(weaponDamageFormat, sumDamages.minDamage, sumDamages.maxDamage);
             }
             if (hasLeftHandWeapon)
             {
                 var sumDamages = GameDataHelpers.GetSumDamages(leftHandDamages);
                 if (!string.IsNullOrEmpty(textDamages))
                     textDamages += "\n";
-                textDamages += string.Format(weaponDamageFormat, sumDamages);
+                textDamages += string.Format(weaponDamageFormat, sumDamages.minDamage, sumDamages.maxDamage);
+            }
+            if (!hasRightHandWeapon && !hasRightHandWeapon)
+            {
+                var defaultWeaponItem = gameInstance.DefaultWeaponItem;
+                var defaultWeaponItemType = defaultWeaponItem.EquipType;
+                var effectiveness = defaultWeaponItem.GetEffectivenessDamage(Data);
+                var damageAmount = defaultWeaponItem.GetDamageAttribute(1, effectiveness, 1f);
+                textDamages += string.Format(weaponDamageFormat, damageAmount.Value.minDamage, damageAmount.Value.maxDamage);
             }
             textWeaponDamages.text = textDamages;
         }
@@ -196,8 +205,8 @@ public class UICharacter : UISelectionEntry<ICharacterData>
                 uiRightHandDamages.Hide();
             else
             {
-                uiRightHandDamages.Data = rightHandDamages;
                 uiRightHandDamages.Show();
+                uiRightHandDamages.Data = rightHandDamages;
             }
         }
 
@@ -207,8 +216,8 @@ public class UICharacter : UISelectionEntry<ICharacterData>
                 uiLeftHandDamages.Hide();
             else
             {
-                uiLeftHandDamages.Data = leftHandDamages;
                 uiLeftHandDamages.Show();
+                uiLeftHandDamages.Data = leftHandDamages;
             }
         }
 

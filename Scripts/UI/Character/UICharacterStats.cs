@@ -35,6 +35,7 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
     {
         var statsString = "";
         var statsStringPart = "";
+
         // Hp
         if (!string.IsNullOrEmpty(statsString))
             statsString += "\n";
@@ -43,6 +44,7 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
             statsString += statsStringPart;
         if (textHp != null)
             textHp.text = statsStringPart;
+
         // Mp
         if (!string.IsNullOrEmpty(statsString))
             statsString += "\n";
@@ -51,6 +53,7 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
             statsString += statsStringPart;
         if (textMp != null)
             textMp.text = statsStringPart;
+
         // Accuracy
         if (!string.IsNullOrEmpty(statsString))
             statsString += "\n";
@@ -59,6 +62,7 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
             statsString += statsStringPart;
         if (textAccuracy != null)
             textAccuracy.text = statsStringPart;
+
         // Evasion
         if (!string.IsNullOrEmpty(statsString))
             statsString += "\n";
@@ -67,6 +71,7 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
             statsString += statsStringPart;
         if (textEvasion != null)
             textEvasion.text = statsStringPart;
+
         // Cri Hit Rate
         if (!string.IsNullOrEmpty(statsString))
             statsString += "\n";
@@ -75,6 +80,7 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
             statsString += statsStringPart;
         if (textCriHitRate != null)
             textCriHitRate.text = statsStringPart;
+
         // Cri Dmg Rate
         if (!string.IsNullOrEmpty(statsString))
             statsString += "\n";
@@ -83,6 +89,7 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
             statsString += statsStringPart;
         if (textCriDmgRate != null)
             textCriDmgRate.text = statsStringPart;
+
         // Weight
         if (!string.IsNullOrEmpty(statsString))
             statsString += "\n";
@@ -91,6 +98,7 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
             statsString += statsStringPart;
         if (textWeightLimit != null)
             textWeightLimit.text = statsStringPart;
+
         // All stats text
         if (textStats != null)
         {

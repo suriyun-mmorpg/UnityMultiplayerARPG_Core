@@ -42,9 +42,12 @@ public class UIDamageElementAmounts : UISelectionEntry<Dictionary<DamageElement,
         if (Data == null || Data.Count == 0)
         {
             if (textAllDamages != null)
+            {
                 textAllDamages.gameObject.SetActive(false);
+                Debug.LogError("3");
+            }
 
-            if (textSumDamage != null)
+                if (textSumDamage != null)
                 textSumDamage.text = string.Format(sumDamageFormat, "0", "0");
 
             foreach (var textAmount in CacheTextDamages)

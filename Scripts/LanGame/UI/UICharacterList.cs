@@ -35,19 +35,7 @@ public class UICharacterList : UIBase
     }
 
     protected readonly Dictionary<string, CharacterModel> CharacterModels = new Dictionary<string, CharacterModel>();
-
-    public override void Show()
-    {
-        base.Show();
-        buttonStart.onClick.RemoveListener(OnClickStart);
-        buttonStart.onClick.AddListener(OnClickStart);
-        buttonDelete.onClick.RemoveListener(OnClickDelete);
-        buttonDelete.onClick.AddListener(OnClickDelete);
-        SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
-        SelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
-        LoadCharacters();
-    }
-
+    
     protected void LoadCharacters()
     {
         SelectionManager.Clear();
@@ -72,10 +60,22 @@ public class UICharacterList : UIBase
         });
     }
 
+    public override void Show()
+    {
+        buttonStart.onClick.RemoveListener(OnClickStart);
+        buttonStart.onClick.AddListener(OnClickStart);
+        buttonDelete.onClick.RemoveListener(OnClickDelete);
+        buttonDelete.onClick.AddListener(OnClickDelete);
+        SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
+        SelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
+        LoadCharacters();
+        base.Show();
+    }
+
     public override void Hide()
     {
-        base.Hide();
         characterModelContainer.RemoveChildren();
+        base.Hide();
     }
 
     protected void OnSelectCharacter(UICharacter ui)

@@ -59,8 +59,8 @@ public class UICharacterBuff : UISelectionEntry<CharacterBuff>
             else
             {
                 var skillBuff = !Data.isDebuff ? skillData.buff : skillData.debuff;
-                uiSkillBuff.Data = new KeyValuePair<SkillBuff, int>(skillBuff, Data.level);
                 uiSkillBuff.Show();
+                uiSkillBuff.Data = new KeyValuePair<SkillBuff, int>(skillBuff, Data.level);
             }
         }
     }

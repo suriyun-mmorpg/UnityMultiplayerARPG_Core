@@ -59,7 +59,7 @@ public abstract class UISelectionManager<TData, TUI, TEvent> : UISelectionManage
     {
         if (ui == null)
             return;
-
+        
         var castedUI = (TUI)ui;
         castedUI.Select();
 

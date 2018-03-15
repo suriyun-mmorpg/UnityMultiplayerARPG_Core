@@ -4,6 +4,7 @@ using System.Collections.Generic;
 [System.Serializable]
 public struct CharacterStats
 {
+    public static readonly CharacterStats Empty = new CharacterStats();
     public float hp;
     public float mp;
     public float accuracy;
@@ -13,6 +14,11 @@ public struct CharacterStats
     public float moveSpeed;
     public float atkSpeed;
     public float weightLimit;
+
+    public bool IsEmpty()
+    {
+        return Equals(Empty);
+    }
 
     public static CharacterStats operator +(CharacterStats a, CharacterStats b)
     {

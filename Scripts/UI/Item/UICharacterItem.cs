@@ -56,6 +56,15 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
     [Header("Weapon - UI Elements")]
     public UIDamageElementAmount uiDamageAttribute;
 
+    [Header("Action Buttons")]
+    public Button buttonEquip;
+    public Button buttonUnEquip;
+    public Button buttonTransfer;
+    public Button buttonDrop;
+
+    [Header("Options")]
+    public bool hideAmountWhenMaxIsOne;
+
     protected override void UpdateData()
     {
         var itemData = Data.GetItem();
@@ -65,6 +74,26 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
         var armorItem = Data.GetArmorItem();
         var weaponItem = Data.GetWeaponItem();
         var shieldItem = Data.GetShieldItem();
+
+        if (buttonEquip != null)
+        {
+
+        }
+
+        if (buttonUnEquip != null)
+        {
+
+        }
+
+        if (buttonTransfer != null)
+        {
+
+        }
+
+        if (buttonDrop != null)
+        {
+
+        }
 
         if (textTitle != null)
             textTitle.text = string.Format(titleFormat, itemData == null ? "Unknow" : itemData.title);
@@ -87,10 +116,13 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
         if (textStack != null)
         {
             var stackString = "";
-            if (itemData == null)
-                stackString = string.Format(stackFormat, "0", "0");
-            else
-                stackString = string.Format(stackFormat, Data.amount.ToString("N0"), itemData.maxStack);
+            if (!hideAmountWhenMaxIsOne)
+            {
+                if (itemData == null)
+                    stackString = string.Format(stackFormat, "0", "0");
+                else
+                    stackString = string.Format(stackFormat, Data.amount.ToString("N0"), itemData.maxStack);
+            }
             textStack.text = stackString;
         }
 
@@ -115,52 +147,56 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
                 uiRequirement.Hide();
             else
             {
-                uiRequirement.Data = new KeyValuePair<BaseEquipmentItem, int>(equipmentItem, itemLevel);
                 uiRequirement.Show();
+                uiRequirement.Data = new KeyValuePair<BaseEquipmentItem, int>(equipmentItem, itemLevel);
             }
         }
 
         if (uiStats != null)
         {
-            if (equipmentItem == null)
+            var stats = equipmentItem.GetStats(itemLevel);
+            if (equipmentItem == null || stats.IsEmpty())
                 uiStats.Hide();
             else
             {
-                uiStats.Data = equipmentItem.GetStats(itemLevel);
                 uiStats.Show();
+                uiStats.Data = stats;
             }
         }
 
         if (uiIncreaseAttributes != null)
         {
-            if (equipmentItem == null)
+            var attributes = equipmentItem.GetIncreaseAttributes(itemLevel);
+            if (equipmentItem == null || attributes == null || attributes.Count == 0)
                 uiIncreaseAttributes.Hide();
             else
             {
-                uiIncreaseAttributes.Data = equipmentItem.GetIncreaseAttributes(itemLevel);
                 uiIncreaseAttributes.Show();
+                uiIncreaseAttributes.Data = attributes;
             }
         }
 
         if (uiIncreaseResistances != null)
         {
-            if (equipmentItem == null)
+            var resistances = equipmentItem.GetIncreaseResistances(itemLevel);
+            if (equipmentItem == null || resistances == null || resistances.Count == 0)
                 uiIncreaseResistances.Hide();
             else
             {
-                uiIncreaseResistances.Data = equipmentItem.GetIncreaseResistances(itemLevel);
                 uiIncreaseResistances.Show();
+                uiIncreaseResistances.Data = resistances;
             }
         }
 
         if (uiIncreaseDamageAttributes != null)
         {
-            if (equipmentItem == null)
+            var damageAttributes = equipmentItem.GetIncreaseDamageAttributes(itemLevel);
+            if (equipmentItem == null || damageAttributes == null || damageAttributes.Count == 0)
                 uiIncreaseDamageAttributes.Hide();
             else
             {
-                uiIncreaseDamageAttributes.Data = equipmentItem.GetIncreaseDamageAttributes(itemLevel);
                 uiIncreaseDamageAttributes.Show();
+                uiIncreaseDamageAttributes.Data = damageAttributes;
             }
         }
 
@@ -181,10 +217,50 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
                 uiDamageAttribute.Hide();
             else
             {
-                uiDamageAttribute.Data = weaponItem.GetDamageAttribute(itemLevel, 0f, 1f);
                 uiDamageAttribute.Show();
+                uiDamageAttribute.Data = weaponItem.GetDamageAttribute(itemLevel, 0f, 1f);
             }
         }
+    }
+
+    private void OnClickEquip(string targetEquipPosition)
+    {
+        // Only unequpped equipment can be equipped
+        if (string.IsNullOrEmpty(equipPosition))
+            return;
+
+        var owningCharacter = CharacterEntity.OwningCharacter;
+        if (owningCharacter != null)
+            owningCharacter.EquipItem(indexOfData, targetEquipPosition);
+    }
+
+    private void OnClickUnEquip()
+    {
+        // Only equipped equipment can be unequipped
+        if (!string.IsNullOrEmpty(equipPosition))
+            return;
+        
+        var owningCharacter = CharacterEntity.OwningCharacter;
+        if (owningCharacter != null)
+            owningCharacter.UnEquipItem(equipPosition);
+    }
+
+    private void OnClickTranster(int amount)
+    {
+        // Only unequpped equipment can be transterred
+        if (string.IsNullOrEmpty(equipPosition))
+            return;
+    }
+
+    private void OnClickDrop(int amount)
+    {
+        // Only unequpped equipment can be dropped
+        if (string.IsNullOrEmpty(equipPosition))
+            return;
+        
+        var owningCharacter = CharacterEntity.OwningCharacter;
+        if (owningCharacter != null)
+            owningCharacter.DropItem(indexOfData, amount);
     }
 }
 

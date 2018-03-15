@@ -197,9 +197,13 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             CacheCharacterMovement.enabled = true;
             CacheFollowCameraControls = Instantiate(gameInstance.gameplayCameraPrefab);
             CacheFollowCameraControls.target = CacheTransform;
-
             OwningCharacter = this;
             CacheUISceneGameplay = Instantiate(gameInstance.uiSceneGameplayPrefab);
+            CacheUISceneGameplay.UpdateCharacter();
+            CacheUISceneGameplay.UpdateSkills();
+            CacheUISceneGameplay.UpdateBuffs();
+            CacheUISceneGameplay.UpdateEquipItems();
+            CacheUISceneGameplay.UpdateNonEquipItems();
         }
     }
 

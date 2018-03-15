@@ -32,17 +32,17 @@ public class UICharacterSkills : UIBase
 
     public override void Show()
     {
-        base.Show();
         SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterSkill);
         SelectionManager.eventOnSelect.AddListener(OnSelectCharacterSkill);
         SelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterSkill);
         SelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterSkill);
+        base.Show();
     }
 
     public override void Hide()
     {
-        base.Hide();
         SelectionManager.DeselectSelectedUI();
+        base.Hide();
     }
 
     protected void OnSelectCharacterSkill(UICharacterSkill ui)

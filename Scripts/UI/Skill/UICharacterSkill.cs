@@ -104,8 +104,8 @@ public class UICharacterSkill : UISelectionEntry<CharacterSkill>
                 uiRequirement.Hide();
             else
             {
-                uiRequirement.Data = new KeyValuePair<Skill, int>(skill, skillLevel);
                 uiRequirement.Show();
+                uiRequirement.Data = new KeyValuePair<Skill, int>(skill, skillLevel);
             }
         }
 
@@ -118,8 +118,8 @@ public class UICharacterSkill : UISelectionEntry<CharacterSkill>
                 uiDamageAttribute.Hide();
             else
             {
-                uiDamageAttribute.Data = skill.GetDamageAttribute(skillLevel, 0f, 1f);
                 uiDamageAttribute.Show();
+                uiDamageAttribute.Data = skill.GetDamageAttribute(skillLevel, 0f, 1f);
             }
         }
 
@@ -136,12 +136,13 @@ public class UICharacterSkill : UISelectionEntry<CharacterSkill>
 
         if (uiAdditionalDamageAttributes != null)
         {
-            if (!isAttackPure)
+            var additionalDamageAttributes = skill.GetAdditionalDamageAttributes(skillLevel);
+            if (!isAttackPure || additionalDamageAttributes == null || additionalDamageAttributes.Count == 0)
                 uiAdditionalDamageAttributes.Hide();
             else
             {
-                uiAdditionalDamageAttributes.Data = skill.GetAdditionalDamageAttributes(skillLevel);
                 uiAdditionalDamageAttributes.Show();
+                uiAdditionalDamageAttributes.Data = additionalDamageAttributes;
             }
         }
 
@@ -151,8 +152,8 @@ public class UICharacterSkill : UISelectionEntry<CharacterSkill>
                 uiSkillBuff.Hide();
             else
             {
-                uiSkillBuff.Data = new KeyValuePair<SkillBuff, int>(skill.buff, skillLevel);
                 uiSkillBuff.Show();
+                uiSkillBuff.Data = new KeyValuePair<SkillBuff, int>(skill.buff, skillLevel);
             }
         }
 
@@ -162,20 +163,20 @@ public class UICharacterSkill : UISelectionEntry<CharacterSkill>
                 uiSkillDebuff.Hide();
             else
             {
-                uiSkillDebuff.Data = new KeyValuePair<SkillBuff, int>(skill.debuff, skillLevel);
                 uiSkillDebuff.Show();
+                uiSkillDebuff.Data = new KeyValuePair<SkillBuff, int>(skill.debuff, skillLevel);
             }
         }
     }
 
     public override void Show()
     {
-        base.Show();
         if (addButton != null)
         {
             addButton.onClick.RemoveAllListeners();
             addButton.onClick.AddListener(OnClickAdd);
         }
+        base.Show();
     }
 
     private void OnClickAdd()

@@ -49,7 +49,7 @@ public class UIBase : MonoBehaviour
         CacheRoot.SetActive(false);
     }
 
-    public virtual void Toggle()
+    public void Toggle()
     {
         if (IsVisible())
             Hide();
