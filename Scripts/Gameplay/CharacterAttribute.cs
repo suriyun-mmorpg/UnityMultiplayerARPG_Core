@@ -9,6 +9,22 @@ public struct CharacterAttribute
     public static readonly CharacterAttribute Empty = new CharacterAttribute();
     public string attributeId;
     public int amount;
+    private string dirtyAttributeId;
+    private int dirtyAmount;
+    private Attribute cacheAttribute;
+
+    private void MakeCache()
+    {
+        if (string.IsNullOrEmpty(attributeId))
+            return;
+        if (string.IsNullOrEmpty(dirtyAttributeId) || dirtyAttributeId.Equals(attributeId) || amount != dirtyAmount)
+        {
+            dirtyAttributeId = attributeId;
+            dirtyAmount = amount;
+            if (cacheAttribute == null)
+                cacheAttribute = GameInstance.Attributes.ContainsKey(attributeId) ? GameInstance.Attributes[attributeId] : null;
+        }
+    }
 
     public bool IsEmpty()
     {
@@ -17,7 +33,8 @@ public struct CharacterAttribute
 
     public Attribute GetAttribute()
     {
-        return GameInstance.CharacterAttributes.ContainsKey(attributeId) ? GameInstance.CharacterAttributes[attributeId] : null;
+        MakeCache();
+        return cacheAttribute;
     }
 
     public bool CanIncrease(ICharacterData character)

@@ -13,6 +13,35 @@ public struct CharacterItem
     public int level;
     public int amount;
     // TODO: I want to add random item bonus
+    private string dirtyItemId;
+    private int dirtyLevel;
+    private Item cacheItem;
+    private BaseEquipmentItem cacheEquipmentItem;
+    private BaseDefendItem cacheDefendItem;
+    private ArmorItem cacheArmorItem;
+    private WeaponItem cacheWeaponItem;
+    private ShieldItem cacheShieldItem;
+
+    private void MakeCache()
+    {
+        if (string.IsNullOrEmpty(itemId))
+            return;
+        if (string.IsNullOrEmpty(dirtyItemId) || dirtyItemId.Equals(itemId) || level != dirtyLevel)
+        {
+            dirtyItemId = itemId;
+            dirtyLevel = level;
+            if (cacheItem == null)
+                cacheItem = GameInstance.Items.ContainsKey(itemId) ? GameInstance.Items[itemId] : null;
+            if (cacheItem != null)
+            {
+                cacheEquipmentItem = cacheItem as BaseEquipmentItem;
+                cacheDefendItem = cacheItem as BaseDefendItem;
+                cacheArmorItem = cacheItem as ArmorItem;
+                cacheWeaponItem = cacheItem as WeaponItem;
+                cacheShieldItem = cacheItem as ShieldItem;
+            }
+        }
+    }
 
     public bool IsEmpty()
     {
@@ -21,39 +50,39 @@ public struct CharacterItem
 
     public Item GetItem()
     {
-        return GameInstance.Items.ContainsKey(itemId) ? GameInstance.Items[itemId] : null;
+        MakeCache();
+        return cacheItem;
     }
 
     public BaseEquipmentItem GetEquipmentItem()
     {
-        var item = GetItem();
-        return item != null ? item as BaseEquipmentItem : null;
+        MakeCache();
+        return cacheEquipmentItem;
     }
 
     public BaseDefendItem GetDefendItem()
     {
-        var item = GetItem();
-        return item != null ? item as BaseDefendItem : null;
+        MakeCache();
+        return cacheDefendItem;
     }
 
     public ArmorItem GetArmorItem()
     {
-        var item = GetItem();
-        return item != null ? item as ArmorItem : null;
+        MakeCache();
+        return cacheArmorItem;
     }
 
     public WeaponItem GetWeaponItem()
     {
-        var item = GetItem();
-        return item != null ? item as WeaponItem : null;
+        MakeCache();
+        return cacheWeaponItem;
     }
 
     public ShieldItem GetShieldItem()
     {
-        var item = GetItem();
-        return item != null ? item as ShieldItem : null;
+        MakeCache();
+        return cacheShieldItem;
     }
-
 
     public int GetMaxStack()
     {

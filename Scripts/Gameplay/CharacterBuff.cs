@@ -11,6 +11,22 @@ public struct CharacterBuff
     public bool isDebuff;
     public int level;
     public float buffRemainsDuration;
+    private string dirtySkillId;
+    private int dirtyLevel;
+    private Skill cacheSkill;
+
+    private void MakeCache()
+    {
+        if (string.IsNullOrEmpty(skillId))
+            return;
+        if (string.IsNullOrEmpty(dirtySkillId) || dirtySkillId.Equals(skillId) || level != dirtyLevel)
+        {
+            dirtySkillId = skillId;
+            dirtyLevel = level;
+            if (cacheSkill == null)
+                cacheSkill = GameInstance.Skills.ContainsKey(skillId) ? GameInstance.Skills[skillId] : null;
+        }
+    }
 
     public bool IsEmpty()
     {
@@ -19,7 +35,8 @@ public struct CharacterBuff
 
     public Skill GetSkill()
     {
-        return GameInstance.Skills.ContainsKey(skillId) ? GameInstance.Skills[skillId] : null;
+        MakeCache();
+        return cacheSkill;
     }
 
     public Dictionary<Attribute, int> GetAttributes()

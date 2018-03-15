@@ -10,7 +10,22 @@ public struct CharacterSkill
     public string skillId;
     public int level;
     public float coolDownRemainsDuration;
-    private Skill skill;
+    private string dirtySkillId;
+    private int dirtyLevel;
+    private Skill cacheSkill;
+
+    private void MakeCache()
+    {
+        if (string.IsNullOrEmpty(skillId))
+            return;
+        if (string.IsNullOrEmpty(dirtySkillId) || dirtySkillId.Equals(skillId) || level != dirtyLevel)
+        {
+            dirtySkillId = skillId;
+            dirtyLevel = level;
+            if (cacheSkill == null)
+                cacheSkill = GameInstance.Skills.ContainsKey(skillId) ? GameInstance.Skills[skillId] : null;
+        }
+    }
 
     public bool IsEmpty()
     {
@@ -19,9 +34,8 @@ public struct CharacterSkill
     
     public Skill GetSkill()
     {
-        if (skill == null)
-            skill = GameInstance.Skills.ContainsKey(skillId) ? GameInstance.Skills[skillId] : null;
-        return skill;
+        MakeCache();
+        return cacheSkill;
     }
 
     public bool CanLevelUp(ICharacterData character)

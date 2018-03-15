@@ -20,7 +20,6 @@ public class GameInstance : MonoBehaviour
     public WeaponItem defaultWeaponItem;
     public CharacterPrototype[] characterPrototypes;
     public Item[] items;
-    public Skill[] skills;
     public int[] expTree;
     [Header("Gameplay Configs")]
     public int increaseStatPointEachLevel = 5;
@@ -36,7 +35,7 @@ public class GameInstance : MonoBehaviour
     [Header("Player Configs")]
     public int minCharacterNameLength = 2;
     public int maxCharacterNameLength = 16;
-    public static readonly Dictionary<string, Attribute> CharacterAttributes = new Dictionary<string, Attribute>();
+    public static readonly Dictionary<string, Attribute> Attributes = new Dictionary<string, Attribute>();
     public static readonly Dictionary<string, CharacterClass> CharacterClasses = new Dictionary<string, CharacterClass>();
     public static readonly Dictionary<string, CharacterPrototype> CharacterPrototypes = new Dictionary<string, CharacterPrototype>();
     public static readonly Dictionary<string, DamageElement> DamageElements = new Dictionary<string, DamageElement>();
@@ -159,7 +158,7 @@ public class GameInstance : MonoBehaviour
             return;
         }
         
-        CharacterAttributes.Clear();
+        Attributes.Clear();
         CharacterClasses.Clear();
         CharacterPrototypes.Clear();
         DamageElements.Clear();
@@ -170,25 +169,24 @@ public class GameInstance : MonoBehaviour
         AddCharacterPrototypes(characterPrototypes);
         AddItems(new Item[] { DefaultWeaponItem });
         AddItems(items);
-        AddSkills(skills);
 
-        var cacheStartItems = new List<Item>();
+        var startItemsList = new List<Item>();
         foreach (var startItem in startItems)
         {
             if (startItem.item == null)
                 continue;
-            cacheStartItems.Add(startItem.item);
+            startItemsList.Add(startItem.item);
         }
-        AddItems(cacheStartItems);
+        AddItems(startItemsList);
     }
 
-    public static void AddCharacterAttributes(IEnumerable<Attribute> characterAttributes)
+    public static void AddAttributes(IEnumerable<Attribute> attributes)
     {
-        foreach (var characterAttribute in characterAttributes)
+        foreach (var attribute in attributes)
         {
-            if (characterAttribute == null || CharacterAttributes.ContainsKey(characterAttribute.Id))
+            if (attribute == null || Attributes.ContainsKey(attribute.Id))
                 continue;
-            CharacterAttributes[characterAttribute.Id] = characterAttribute;
+            Attributes[attribute.Id] = attribute;
         }
     }
 
@@ -202,11 +200,11 @@ public class GameInstance : MonoBehaviour
             var attributes = new List<Attribute>();
             foreach (var baseAttribute in characterClass.baseAttributes)
             {
-                if (baseAttribute.attribute == null || CharacterAttributes.ContainsKey(baseAttribute.attribute.Id))
+                if (baseAttribute.attribute == null || Attributes.ContainsKey(baseAttribute.attribute.Id))
                     continue;
                 attributes.Add(baseAttribute.attribute);
             }
-            AddCharacterAttributes(attributes);
+            AddAttributes(attributes);
             AddSkills(characterClass.skills);
             AddItems(new Item[] { characterClass.rightHandEquipItem, characterClass.leftHandEquipItem });
             AddItems(characterClass.otherEquipItems);
@@ -258,11 +256,11 @@ public class GameInstance : MonoBehaviour
                 var requireAttributes = equipmentItem.requirement.attributeAmounts;
                 foreach (var requireAttribute in requireAttributes)
                 {
-                    if (requireAttribute.attribute == null || CharacterAttributes.ContainsKey(requireAttribute.attribute.Id))
+                    if (requireAttribute.attribute == null || Attributes.ContainsKey(requireAttribute.attribute.Id))
                         continue;
                     attributes.Add(requireAttribute.attribute);
                 }
-                AddCharacterAttributes(attributes);
+                AddAttributes(attributes);
             }
             if (item is WeaponItem)
             {
@@ -270,11 +268,11 @@ public class GameInstance : MonoBehaviour
                 var attributes = new List<Attribute>();
                 foreach (var effectivenessAttribute in weaponItem.WeaponType.effectivenessAttributes)
                 {
-                    if (effectivenessAttribute.attribute == null || CharacterAttributes.ContainsKey(effectivenessAttribute.attribute.Id))
+                    if (effectivenessAttribute.attribute == null || Attributes.ContainsKey(effectivenessAttribute.attribute.Id))
                         continue;
                     attributes.Add(effectivenessAttribute.attribute);
                 }
-                AddCharacterAttributes(attributes);
+                AddAttributes(attributes);
                 var damageElements = new List<DamageElement>();
                 var damageAttributes = weaponItem.increaseDamageAttributes;
                 foreach (var damageAttribute in damageAttributes)
