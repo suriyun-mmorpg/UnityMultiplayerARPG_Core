@@ -405,6 +405,7 @@ public static class CharacterDataExtension
         surrogateSelector.AddAllUnitySurrogate();
         binaryFormatter.SurrogateSelector = surrogateSelector;
         var path = Application.persistentDataPath + "/" + savingData.Id + ".sav";
+        Debug.Log("Character Saving to: " + path);
         var file = File.Open(path, FileMode.OpenOrCreate);
         binaryFormatter.Serialize(file, savingData);
         file.Close();
@@ -436,13 +437,15 @@ public static class CharacterDataExtension
     public static List<CharacterData> LoadAllPersistentCharacterData()
     {
         var result = new List<CharacterData>();
-        var files = Directory.GetFiles(Application.persistentDataPath, "*.sav");
+        var path = Application.persistentDataPath;
+        var files = Directory.GetFiles(path, "*.sav");
+        Debug.Log("Characters loading from: " + path);
         foreach (var file in files)
         {
             var characterData = new CharacterData();
             result.Add(characterData.LoadPersistentCharacterData(file));
         }
-        Debug.Log("Characters loaded from: " + Application.persistentDataPath);
+        Debug.Log("Characters loaded from: " + path);
         return result;
     }
 
