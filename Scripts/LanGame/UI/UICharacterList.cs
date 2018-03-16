@@ -88,9 +88,10 @@ public class UICharacterList : UIBase
 
     protected void ShowCharacter(string id)
     {
-        if (string.IsNullOrEmpty(id) || !CharacterModels.ContainsKey(id))
+        CharacterModel characterModel;
+        if (string.IsNullOrEmpty(id) || !CharacterModels.TryGetValue(id, out characterModel))
             return;
-        CharacterModels[id].gameObject.SetActive(true);
+        characterModel.gameObject.SetActive(true);
     }
 
     public virtual void OnClickStart()

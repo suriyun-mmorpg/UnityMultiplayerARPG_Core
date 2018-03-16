@@ -530,11 +530,11 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
 
         var gameInstance = GameInstance.Singleton;
         var spawnedObjects = Manager.Assets.SpawnedObjects;
+        LiteNetLibIdentity spawnedObject;
         // Find object by objectId, if not found don't continue
-        if (!Manager.Assets.SpawnedObjects.ContainsKey(objectId))
+        if (!spawnedObjects.TryGetValue(objectId, out spawnedObject))
             return;
-
-        var spawnedObject = spawnedObjects[objectId];
+        
         // Don't pickup item if it's too far
         if (Vector3.Distance(CacheTransform.position, spawnedObject.transform.position) >= gameInstance.pickUpItemDistance)
             return;
@@ -796,11 +796,11 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     #region Inventory helpers
     public bool IncreaseItems(string itemId, int level, int amount)
     {
+        Item itemData;
         // If item not valid
-        if (string.IsNullOrEmpty(itemId) || amount <= 0 || !GameInstance.Items.ContainsKey(itemId))
+        if (string.IsNullOrEmpty(itemId) || amount <= 0 || !GameInstance.Items.TryGetValue(itemId, out itemData))
             return false;
         var stats = this.GetStatsWithBuffs();
-        var itemData = GameInstance.Items[itemId];
         var maxStack = itemData.maxStack;
         var weight = itemData.weight;
         // If overwhelming

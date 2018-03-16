@@ -39,12 +39,9 @@ public class UIAttributeAmounts : UISelectionEntry<Dictionary<Attribute, int>>
         if (Data == null || Data.Count == 0)
         {
             if (textAllAmounts != null)
-            {
                 textAllAmounts.gameObject.SetActive(false);
-                Debug.LogError("1");
-            }
 
-                foreach (var textAmount in CacheTextAmounts)
+            foreach (var textAmount in CacheTextAmounts)
             {
                 var element = textAmount.Key;
                 textAmount.Value.text = string.Format(amountFormat, element.title, "0", "0");
@@ -61,8 +58,9 @@ public class UIAttributeAmounts : UISelectionEntry<Dictionary<Attribute, int>>
                     text += "\n";
                 var amountText = string.Format(amountFormat, dataEntry.Key.title, dataEntry.Value);
                 text += amountText;
-                if (CacheTextAmounts.ContainsKey(dataEntry.Key))
-                    CacheTextAmounts[dataEntry.Key].text = amountText;
+                Text cacheTextAmount;
+                if (CacheTextAmounts.TryGetValue(dataEntry.Key, out cacheTextAmount))
+                    cacheTextAmount.text = amountText;
             }
             if (textAllAmounts != null)
             {

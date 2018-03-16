@@ -231,9 +231,9 @@ public class UICharacter : UISelectionEntry<ICharacterData>
             {
                 var characterAttribute = characterAttributes[i];
                 var attribute = characterAttribute.GetAttribute();
-                if (CacheUICharacterAttributes.ContainsKey(attribute))
+                UIAttributeAmount cacheUICharacterAttribute;
+                if (CacheUICharacterAttributes.TryGetValue(attribute, out cacheUICharacterAttribute))
                 {
-                    var cacheUICharacterAttribute = CacheUICharacterAttributes[attribute];
                     cacheUICharacterAttribute.Data = new KeyValuePair<CharacterAttribute, int>(characterAttribute, displayingAttributes[attribute]);
                     cacheUICharacterAttribute.indexOfData = i;
                 }

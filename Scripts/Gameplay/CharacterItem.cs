@@ -31,7 +31,7 @@ public struct CharacterItem
             dirtyItemId = itemId;
             dirtyLevel = level;
             if (cacheItem == null)
-                cacheItem = GameInstance.Items.ContainsKey(itemId) ? GameInstance.Items[itemId] : null;
+                cacheItem = GameInstance.Items.TryGetValue(itemId, out cacheItem) ? cacheItem : null;
             if (cacheItem != null)
             {
                 cacheEquipmentItem = cacheItem as BaseEquipmentItem;

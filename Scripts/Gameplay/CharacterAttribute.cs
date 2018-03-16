@@ -22,7 +22,7 @@ public struct CharacterAttribute
             dirtyAttributeId = attributeId;
             dirtyAmount = amount;
             if (cacheAttribute == null)
-                cacheAttribute = GameInstance.Attributes.ContainsKey(attributeId) ? GameInstance.Attributes[attributeId] : null;
+                cacheAttribute = GameInstance.Attributes.TryGetValue(attributeId, out cacheAttribute) ? cacheAttribute : null;
         }
     }
 

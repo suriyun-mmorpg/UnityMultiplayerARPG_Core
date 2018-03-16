@@ -24,7 +24,7 @@ public struct CharacterBuff
             dirtySkillId = skillId;
             dirtyLevel = level;
             if (cacheSkill == null)
-                cacheSkill = GameInstance.Skills.ContainsKey(skillId) ? GameInstance.Skills[skillId] : null;
+                cacheSkill = GameInstance.Skills.TryGetValue(skillId, out cacheSkill) ? cacheSkill : null;
         }
     }
 
