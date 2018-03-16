@@ -70,11 +70,20 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
             writer.Put(entry.attributeId);
             writer.Put(entry.amount);
         }
+        writer.Put(SelectedCharacter.Buffs.Count);
+        foreach (var entry in SelectedCharacter.Buffs)
+        {
+            writer.Put(entry.skillId);
+            writer.Put(entry.isDebuff);
+            writer.Put(entry.level);
+            writer.Put(entry.buffRemainsDuration);
+        }
         writer.Put(SelectedCharacter.Skills.Count);
         foreach (var entry in SelectedCharacter.Skills)
         {
             writer.Put(entry.skillId);
             writer.Put(entry.level);
+            writer.Put(entry.coolDownRemainsDuration);
         }
         writer.Put(SelectedCharacter.EquipItems.Count);
         foreach (var entry in SelectedCharacter.EquipItems)
@@ -124,9 +133,20 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
         count = reader.GetInt();
         for (var i = 0; i < count; ++i)
         {
+            var entry = new CharacterBuff();
+            entry.skillId = reader.GetString();
+            entry.isDebuff = reader.GetBool();
+            entry.level = reader.GetInt();
+            entry.buffRemainsDuration = reader.GetFloat();
+            character.Buffs.Add(entry);
+        }
+        count = reader.GetInt();
+        for (var i = 0; i < count; ++i)
+        {
             var entry = new CharacterSkill();
             entry.skillId = reader.GetString();
             entry.level = reader.GetInt();
+            entry.coolDownRemainsDuration = reader.GetFloat();
             character.Skills.Add(entry);
         }
         count = reader.GetInt();
