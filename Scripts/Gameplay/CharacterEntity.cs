@@ -1001,16 +1001,8 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         CharacterBuff debuff)
     {
         var gameInstance = GameInstance.Singleton;
-        // Damage receiver stats
-        var dmgReceiverStats = this.GetStatsWithBuffs();
-        // Attacker stats
-        var dmgAttackerStats = attacker.GetStatsWithBuffs();
         // Calculate chance to hit
-        var hitChance = 2 * (dmgAttackerStats.accuracy / (dmgAttackerStats.accuracy + dmgReceiverStats.evasion)) * (attacker.Level / (attacker.Level + Level));
-        if (hitChance < 0.05f)
-            hitChance = 0.05f;
-        if (hitChance > 0.95f)
-            hitChance = 0.95f;
+        var hitChance = gameInstance.GameplayRule.GetHitChance(attacker, this);
         // If miss, return don't calculate damages
         if (Random.value > hitChance)
             return;
@@ -1023,7 +1015,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             {
                 var damageElement = allDamageAttribute.Key;
                 var damageAmount = allDamageAttribute.Value;
-                var receivingDamage = damageElement.GetAdjustedDamageReceives(this, Random.Range(damageAmount.minDamage, damageAmount.maxDamage));
+                var receivingDamage = damageElement.GetDamageReducedByResistance(this, Random.Range(damageAmount.minDamage, damageAmount.maxDamage));
                 if (receivingDamage > 0f)
                     totalDamage += receivingDamage;
             }

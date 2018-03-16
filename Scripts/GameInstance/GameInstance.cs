@@ -16,6 +16,7 @@ public class GameInstance : MonoBehaviour
     public FollowCameraControls gameplayCameraPrefab;
     public UISceneGameplay uiSceneGameplayPrefab;
     [Header("Gameplay Database")]
+    public BaseGameplayRule gameplayRule;
     [Tooltip("Default weapon item, will be used when character not equip any weapon")]
     public WeaponItem defaultWeaponItem;
     public CharacterPrototype[] characterPrototypes;
@@ -42,6 +43,16 @@ public class GameInstance : MonoBehaviour
     public static readonly Dictionary<string, DamageEntity> DamageEntities = new Dictionary<string, DamageEntity>();
     public static readonly Dictionary<string, Item> Items = new Dictionary<string, Item>();
     public static readonly Dictionary<string, Skill> Skills = new Dictionary<string, Skill>();
+
+    public BaseGameplayRule GameplayRule
+    {
+        get
+        {
+            if (gameplayRule == null)
+                gameplayRule = ScriptableObject.CreateInstance<SimpleGameplayRule>();
+            return gameplayRule;
+        }
+    }
 
     private DamageElement cacheDefaultDamageElement;
     public DamageElement DefaultDamageElement
