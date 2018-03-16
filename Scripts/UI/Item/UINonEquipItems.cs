@@ -56,7 +56,8 @@ public class UINonEquipItems : UIBase
             uiItemDialog.Show();
             uiItemDialog.Data = ui.Data;
             uiItemDialog.indexOfData = ui.indexOfData;
-            uiItemDialog.equipPosition = string.Empty;
+            uiItemDialog.equipPosition = ui.equipPosition;
+            uiItemDialog.selectionManager = selectionManager;
         }
     }
 

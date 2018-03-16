@@ -232,11 +232,33 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
         // Only unequpped equipment can be equipped
         if (!string.IsNullOrEmpty(equipPosition))
             return;
+        
+        if (selectionManager != null)
+            selectionManager.DeselectSelectedUI();
 
         var owningCharacter = CharacterEntity.OwningCharacter;
-        /*
         if (owningCharacter != null)
-            owningCharacter.EquipItem(indexOfData, targetEquipPosition);*/
+        {
+            var armorItem = Data.GetArmorItem();
+            var weaponItem = Data.GetWeaponItem();
+            var shieldItem = Data.GetShieldItem();
+            if (weaponItem != null)
+            {
+                if (weaponItem.EquipType == WeaponItemEquipType.OneHandCanDual)
+                {
+                    if (!owningCharacter.EquipWeapons.rightHand.IsValid())
+                        owningCharacter.EquipItem(indexOfData, GameDataConst.EQUIP_POSITION_RIGHT_HAND);
+                    else
+                        owningCharacter.EquipItem(indexOfData, GameDataConst.EQUIP_POSITION_LEFT_HAND);
+                }
+                else
+                    owningCharacter.EquipItem(indexOfData, GameDataConst.EQUIP_POSITION_RIGHT_HAND);
+            }
+            else if (shieldItem != null)
+                owningCharacter.EquipItem(indexOfData, GameDataConst.EQUIP_POSITION_LEFT_HAND);
+            else if (armorItem != null)
+                owningCharacter.EquipItem(indexOfData, armorItem.EquipPosition);
+        }
     }
 
     private void OnClickUnEquip()
@@ -244,7 +266,10 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
         // Only equipped equipment can be unequipped
         if (string.IsNullOrEmpty(equipPosition))
             return;
-        
+
+        if (selectionManager != null)
+            selectionManager.DeselectSelectedUI();
+
         var owningCharacter = CharacterEntity.OwningCharacter;
         if (owningCharacter != null)
             owningCharacter.UnEquipItem(equipPosition);
@@ -255,6 +280,9 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
         // Only unequpped equipment can be dropped
         if (!string.IsNullOrEmpty(equipPosition))
             return;
+
+        if (selectionManager != null)
+            selectionManager.DeselectSelectedUI();
 
         UISceneGlobal.Singleton.ShowInputDialog(dropInputTitle, dropInputDescription, OnDropAmountConfirmed);
     }

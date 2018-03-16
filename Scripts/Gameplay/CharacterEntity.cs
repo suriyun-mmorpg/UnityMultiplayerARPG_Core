@@ -644,7 +644,10 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         string reasonWhyCannot;
         HashSet<string> shouldUnequipPositions;
         if (!CanEquipItem(equippingItem, equipPosition, out reasonWhyCannot, out shouldUnequipPositions))
+        {
+            Debug.LogError("Cannot equip item " + nonEquipIndex + " " + equipPosition + " " + reasonWhyCannot);
             return;
+        }
 
         // Unequip equipped item if exists
         foreach (var shouldUnequipPosition in shouldUnequipPositions)
@@ -668,6 +671,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             equipItems.Add(equippingItem);
             equipItemIndexes.Add(equipPosition, equipItems.Count - 1);
         }
+        nonEquipItems.RemoveAt(nonEquipIndex);
     }
 
     protected void NetFuncUnEquipItemCallback(NetFieldString fromEquipPosition)
@@ -1060,19 +1064,32 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     private void SetupNetElements()
     {
         id.sendOptions = SendOptions.ReliableOrdered;
+        id.forOwnerOnly = false;
         characterName.sendOptions = SendOptions.ReliableOrdered;
+        characterName.forOwnerOnly = false;
         prototypeId.sendOptions = SendOptions.ReliableOrdered;
+        prototypeId.forOwnerOnly = false;
         level.sendOptions = SendOptions.ReliableOrdered;
+        level.forOwnerOnly = false;
         exp.sendOptions = SendOptions.ReliableOrdered;
+        exp.forOwnerOnly = false;
         currentHp.sendOptions = SendOptions.ReliableOrdered;
+        currentHp.forOwnerOnly = false;
         currentMp.sendOptions = SendOptions.ReliableOrdered;
+        currentMp.forOwnerOnly = false;
         statPoint.sendOptions = SendOptions.ReliableOrdered;
         statPoint.forOwnerOnly = true;
         skillPoint.sendOptions = SendOptions.ReliableOrdered;
         skillPoint.forOwnerOnly = true;
         gold.sendOptions = SendOptions.ReliableOrdered;
+        gold.forOwnerOnly = false;
         equipWeapons.sendOptions = SendOptions.ReliableOrdered;
+        equipWeapons.forOwnerOnly = false;
+
+        attributes.forOwnerOnly = false;
         skills.forOwnerOnly = true;
+        buffs.forOwnerOnly = false;
+        equipItems.forOwnerOnly = false;
         nonEquipItems.forOwnerOnly = true;
     }
 

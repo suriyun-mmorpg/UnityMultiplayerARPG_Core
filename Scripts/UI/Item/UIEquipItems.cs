@@ -104,6 +104,9 @@ public class UIEquipItems : UIBase
         {
             uiItemDialog.Show();
             uiItemDialog.Data = ui.Data;
+            uiItemDialog.indexOfData = ui.indexOfData;
+            uiItemDialog.equipPosition = ui.equipPosition;
+            uiItemDialog.selectionManager = selectionManager;
         }
     }
 
@@ -141,7 +144,7 @@ public class UIEquipItems : UIBase
             if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
             {
                 tempSlot.Data = equipItem;
-                tempSlot.indexOfData = i;
+                tempSlot.indexOfData = -1;
                 tempSlot.equipPosition = tempPosition;
             }
         }
