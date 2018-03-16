@@ -6,6 +6,7 @@ public class UISceneGlobal : MonoBehaviour
 {
     public static UISceneGlobal Singleton { get; private set; }
     public UIMessageDialog uiMessageDialog;
+    public UIInputDialog uiInputDialog;
 
     private void Awake()
     {
@@ -39,5 +40,32 @@ public class UISceneGlobal : MonoBehaviour
             onClickYes,
             onClickNo,
             onClickCancel);
+    }
+    
+    public void ShowInputDialog(string title,
+        string description,
+        System.Action<string> onConfirmText)
+    {
+        uiInputDialog.Show(title,
+            description,
+            onConfirmText);
+    }
+
+    public void ShowInputDialog(string title,
+        string description,
+        System.Action<int> onConfirmInteger)
+    {
+        uiInputDialog.Show(title,
+            description,
+            onConfirmInteger);
+    }
+
+    public void ShowInputDialog(string title,
+        string description,
+        System.Action<float> onConfirmDecimal)
+    {
+        uiInputDialog.Show(title,
+            description,
+            onConfirmDecimal);
     }
 }
