@@ -33,6 +33,10 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
     [Tooltip("Armor Format => {0} = {Armor}")]
     public string armorFormat = "Armor: {0}";
 
+    [Header("Input Dialog Settings")]
+    public string dropInputTitle = "Drop Item";
+    public string dropInputDescription = "";
+
     [Header("UI Elements")]
     public Text textTitle;
     public Text textDescription;
@@ -59,7 +63,6 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
     [Header("Action Buttons")]
     public Button buttonEquip;
     public Button buttonUnEquip;
-    public Button buttonTransfer;
     public Button buttonDrop;
 
     [Header("Options")]
@@ -77,22 +80,23 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
 
         if (buttonEquip != null)
         {
-
+            buttonEquip.gameObject.SetActive(string.IsNullOrEmpty(equipPosition));
+            buttonEquip.onClick.RemoveListener(OnClickEquip);
+            buttonEquip.onClick.AddListener(OnClickEquip);
         }
 
         if (buttonUnEquip != null)
         {
-
-        }
-
-        if (buttonTransfer != null)
-        {
-
+            buttonUnEquip.gameObject.SetActive(!string.IsNullOrEmpty(equipPosition));
+            buttonUnEquip.onClick.RemoveListener(OnClickUnEquip);
+            buttonUnEquip.onClick.AddListener(OnClickUnEquip);
         }
 
         if (buttonDrop != null)
         {
-
+            buttonDrop.gameObject.SetActive(string.IsNullOrEmpty(equipPosition));
+            buttonDrop.onClick.RemoveListener(OnClickDrop);
+            buttonDrop.onClick.AddListener(OnClickDrop);
         }
 
         if (textTitle != null)
@@ -223,21 +227,22 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
         }
     }
 
-    private void OnClickEquip(string targetEquipPosition)
+    private void OnClickEquip()
     {
         // Only unequpped equipment can be equipped
-        if (string.IsNullOrEmpty(equipPosition))
+        if (!string.IsNullOrEmpty(equipPosition))
             return;
 
         var owningCharacter = CharacterEntity.OwningCharacter;
+        /*
         if (owningCharacter != null)
-            owningCharacter.EquipItem(indexOfData, targetEquipPosition);
+            owningCharacter.EquipItem(indexOfData, targetEquipPosition);*/
     }
 
     private void OnClickUnEquip()
     {
         // Only equipped equipment can be unequipped
-        if (!string.IsNullOrEmpty(equipPosition))
+        if (string.IsNullOrEmpty(equipPosition))
             return;
         
         var owningCharacter = CharacterEntity.OwningCharacter;
@@ -245,19 +250,17 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
             owningCharacter.UnEquipItem(equipPosition);
     }
 
-    private void OnClickTranster(int amount)
-    {
-        // Only unequpped equipment can be transterred
-        if (string.IsNullOrEmpty(equipPosition))
-            return;
-    }
-
-    private void OnClickDrop(int amount)
+    private void OnClickDrop()
     {
         // Only unequpped equipment can be dropped
-        if (string.IsNullOrEmpty(equipPosition))
+        if (!string.IsNullOrEmpty(equipPosition))
             return;
-        
+
+        UISceneGlobal.Singleton.ShowInputDialog(dropInputTitle, dropInputDescription, OnDropAmountConfirmed);
+    }
+
+    private void OnDropAmountConfirmed(int amount)
+    {
         var owningCharacter = CharacterEntity.OwningCharacter;
         if (owningCharacter != null)
             owningCharacter.DropItem(indexOfData, amount);
