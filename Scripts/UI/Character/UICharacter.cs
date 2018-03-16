@@ -160,7 +160,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         var statsWithBuff = Data.GetStatsWithBuffs();
         var displayingStats = showStatsWithBuffs ? statsWithBuff : Data.GetStats();
         var displayingAttributes = showAttributeWithBuffs ? Data.GetAttributesWithBuffs() : Data.GetAttributes();
-
+        
         if (textWeightLimit != null)
             textWeightLimit.text = string.Format(weightLimitStatsFormat, Data.GetTotalItemWeight().ToString("N2"), statsWithBuff.weightLimit.ToString("N2"));
         
@@ -232,9 +232,11 @@ public class UICharacter : UISelectionEntry<ICharacterData>
                 var characterAttribute = characterAttributes[i];
                 var attribute = characterAttribute.GetAttribute();
                 UIAttributeAmount cacheUICharacterAttribute;
-                if (CacheUICharacterAttributes.TryGetValue(attribute, out cacheUICharacterAttribute))
+                int amount;
+                if (CacheUICharacterAttributes.TryGetValue(attribute, out cacheUICharacterAttribute) &&
+                    displayingAttributes.TryGetValue(attribute, out amount))
                 {
-                    cacheUICharacterAttribute.Data = new KeyValuePair<CharacterAttribute, int>(characterAttribute, displayingAttributes[attribute]);
+                    cacheUICharacterAttribute.Data = new KeyValuePair<CharacterAttribute, int>(characterAttribute, amount);
                     cacheUICharacterAttribute.indexOfData = i;
                 }
             }
