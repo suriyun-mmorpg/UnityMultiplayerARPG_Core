@@ -9,8 +9,11 @@ public struct CharacterAttribute
     public static readonly CharacterAttribute Empty = new CharacterAttribute();
     public string attributeId;
     public int amount;
+    [System.NonSerialized]
     private string dirtyAttributeId;
+    [System.NonSerialized]
     private int dirtyAmount;
+    [System.NonSerialized]
     private Attribute cacheAttribute;
 
     private void MakeCache()

@@ -11,8 +11,11 @@ public struct CharacterBuff
     public bool isDebuff;
     public int level;
     public float buffRemainsDuration;
+    [System.NonSerialized]
     private string dirtySkillId;
+    [System.NonSerialized]
     private int dirtyLevel;
+    [System.NonSerialized]
     private Skill cacheSkill;
 
     private void MakeCache()

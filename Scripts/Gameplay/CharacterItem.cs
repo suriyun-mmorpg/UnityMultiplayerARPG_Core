@@ -13,13 +13,21 @@ public struct CharacterItem
     public int level;
     public int amount;
     // TODO: I want to add random item bonus
+    [System.NonSerialized]
     private string dirtyItemId;
+    [System.NonSerialized]
     private int dirtyLevel;
+    [System.NonSerialized]
     private Item cacheItem;
+    [System.NonSerialized]
     private BaseEquipmentItem cacheEquipmentItem;
+    [System.NonSerialized]
     private BaseDefendItem cacheDefendItem;
+    [System.NonSerialized]
     private ArmorItem cacheArmorItem;
+    [System.NonSerialized]
     private WeaponItem cacheWeaponItem;
+    [System.NonSerialized]
     private ShieldItem cacheShieldItem;
 
     private void MakeCache()

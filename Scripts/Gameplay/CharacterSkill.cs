@@ -10,8 +10,11 @@ public struct CharacterSkill
     public string skillId;
     public int level;
     public float coolDownRemainsDuration;
+    [System.NonSerialized]
     private string dirtySkillId;
+    [System.NonSerialized]
     private int dirtyLevel;
+    [System.NonSerialized]
     private Skill cacheSkill;
 
     private void MakeCache()
