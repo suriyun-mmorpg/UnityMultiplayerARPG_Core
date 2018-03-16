@@ -12,8 +12,10 @@ public class SimpleGameplayRule : BaseGameplayRule
         var attackerStats = attacker.GetStatsWithBuffs();
         // Calculate chance to hit
         var hitChance = 2 * (attackerStats.accuracy / (attackerStats.accuracy + dmgReceiverStats.evasion)) * (attacker.Level / (attacker.Level + damageReceiver.Level));
+        // Minimum hit chance is 5%
         if (hitChance < 0.05f)
             hitChance = 0.05f;
+        // Maximum hit chance is 95%
         if (hitChance > 0.95f)
             hitChance = 0.95f;
         return hitChance;
