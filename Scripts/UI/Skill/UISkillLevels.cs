@@ -36,31 +36,34 @@ public class UISkillLevels : UISelectionEntry<Dictionary<Skill, int>>
 
     protected override void UpdateData()
     {
-        if (textAllLevels != null)
+        if (Data == null || Data.Count == 0)
         {
-            if (Data == null || Data.Count == 0)
-            {
+            if (textAllLevels != null)
                 textAllLevels.gameObject.SetActive(false);
-                foreach (var textLevel in CacheTextLevels)
-                {
-                    var element = textLevel.Key;
-                    textLevel.Value.text = string.Format(levelFormat, element.title, "0", "0");
-                }
-            }
-            else
+
+            foreach (var textLevel in CacheTextLevels)
             {
-                var text = "";
-                foreach (var dataEntry in Data)
-                {
-                    if (dataEntry.Key == null || dataEntry.Value == 0)
-                        continue;
-                    if (!string.IsNullOrEmpty(text))
-                        text += "\n";
-                    var amountText = string.Format(levelFormat, dataEntry.Key.title, dataEntry.Value.ToString("N0"));
-                    text += amountText;
-                    if (CacheTextLevels.ContainsKey(dataEntry.Key))
-                        CacheTextLevels[dataEntry.Key].text = amountText;
-                }
+                var element = textLevel.Key;
+                textLevel.Value.text = string.Format(levelFormat, element.title, "0", "0");
+            }
+        }
+        else
+        {
+            var text = "";
+            foreach (var dataEntry in Data)
+            {
+                if (dataEntry.Key == null || dataEntry.Value == 0)
+                    continue;
+                if (!string.IsNullOrEmpty(text))
+                    text += "\n";
+                var amountText = string.Format(levelFormat, dataEntry.Key.title, dataEntry.Value.ToString("N0"));
+                text += amountText;
+                Text cacheTextAmount;
+                if (CacheTextLevels.TryGetValue(dataEntry.Key, out cacheTextAmount))
+                    cacheTextAmount.text = amountText;
+            }
+            if (textAllLevels != null)
+            {
                 textAllLevels.gameObject.SetActive(!string.IsNullOrEmpty(text));
                 textAllLevels.text = text;
             }

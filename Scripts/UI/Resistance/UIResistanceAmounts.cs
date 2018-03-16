@@ -39,10 +39,7 @@ public class UIResistanceAmounts : UISelectionEntry<Dictionary<Resistance, float
         if (Data == null || Data.Count == 0)
         {
             if (textAllAmounts != null)
-            {
-                Debug.LogError("2");
                 textAllAmounts.gameObject.SetActive(false);
-            }
 
             foreach (var textAmount in CacheTextAmounts)
             {
@@ -61,8 +58,9 @@ public class UIResistanceAmounts : UISelectionEntry<Dictionary<Resistance, float
                     text += "\n";
                 var amountText = string.Format(amountFormat, dataEntry.Key.title, (dataEntry.Value * 100f).ToString("N0"));
                 text += amountText;
-                if (CacheTextAmounts.ContainsKey(dataEntry.Key))
-                    CacheTextAmounts[dataEntry.Key].text = amountText;
+                Text cacheTextAmount;
+                if (CacheTextAmounts.TryGetValue(dataEntry.Key, out cacheTextAmount))
+                    cacheTextAmount.text = amountText;
             }
             if (textAllAmounts != null)
             {
