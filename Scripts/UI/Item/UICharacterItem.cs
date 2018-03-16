@@ -246,10 +246,12 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
             {
                 if (weaponItem.EquipType == WeaponItemEquipType.OneHandCanDual)
                 {
-                    if (!owningCharacter.EquipWeapons.rightHand.IsValid())
-                        owningCharacter.EquipItem(indexOfData, GameDataConst.EQUIP_POSITION_RIGHT_HAND);
-                    else
+                    var equipWeapons = owningCharacter.EquipWeapons;
+                    var rightWeapon = equipWeapons.rightHand.GetWeaponItem();
+                    if (rightWeapon != null && rightWeapon.EquipType == WeaponItemEquipType.OneHandCanDual)
                         owningCharacter.EquipItem(indexOfData, GameDataConst.EQUIP_POSITION_LEFT_HAND);
+                    else
+                        owningCharacter.EquipItem(indexOfData, GameDataConst.EQUIP_POSITION_RIGHT_HAND);
                 }
                 else
                     owningCharacter.EquipItem(indexOfData, GameDataConst.EQUIP_POSITION_RIGHT_HAND);

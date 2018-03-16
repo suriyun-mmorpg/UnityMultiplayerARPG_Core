@@ -915,11 +915,12 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         var tempEquipWeapons = equipWeapons.Value;
         var rightHandWeapon = tempEquipWeapons.rightHand.GetWeaponItem();
         var leftHandWeapon = tempEquipWeapons.leftHand.GetWeaponItem();
+        var leftHandShield = tempEquipWeapons.leftHand.GetShieldItem();
 
         WeaponItemEquipType rightHandEquipType;
-        var hasRightHandWeapon = rightHandWeapon.TryGetWeaponItemEquipType(out rightHandEquipType);
+        var hasRightHandItem = rightHandWeapon.TryGetWeaponItemEquipType(out rightHandEquipType);
         WeaponItemEquipType leftHandEquipType;
-        var hasLeftHandWeapon = leftHandWeapon.TryGetWeaponItemEquipType(out leftHandEquipType);
+        var hasLeftHandItem = leftHandShield != null || leftHandWeapon.TryGetWeaponItemEquipType(out leftHandEquipType);
 
         if (weaponItem != null)
         {
@@ -934,9 +935,9 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                     }
                     // One hand can equip with shield only 
                     // if there are weapons on left hand it should unequip
-                    if (hasRightHandWeapon)
+                    if (hasRightHandItem)
                         shouldUnequipPositions.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
-                    if (hasLeftHandWeapon)
+                    if (hasLeftHandItem)
                         shouldUnequipPositions.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND);
                     break;
                 case WeaponItemEquipType.OneHandCanDual:
@@ -948,7 +949,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                         return false;
                     }
                     // Unequip item if right hand weapon is one hand or two hand
-                    if (hasRightHandWeapon)
+                    if (hasRightHandItem)
                     {
                         if (rightHandEquipType == WeaponItemEquipType.OneHand ||
                             rightHandEquipType == WeaponItemEquipType.TwoHand)
@@ -963,9 +964,9 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                         return false;
                     }
                     // Unequip both left and right hand
-                    if (hasRightHandWeapon)
+                    if (hasRightHandItem)
                         shouldUnequipPositions.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
-                    if (hasLeftHandWeapon)
+                    if (hasLeftHandItem)
                         shouldUnequipPositions.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND);
                     break;
             }
@@ -978,7 +979,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                 reasonWhyCannot = "Can equip to left hand only";
                 return false;
             }
-            if (hasRightHandWeapon && rightHandEquipType == WeaponItemEquipType.TwoHand)
+            if (hasRightHandItem && rightHandEquipType == WeaponItemEquipType.TwoHand)
                 shouldUnequipPositions.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
         }
 
