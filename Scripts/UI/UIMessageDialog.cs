@@ -47,10 +47,10 @@ public class UIMessageDialog : UIBase
         set { if (buttonCancel != null) buttonCancel.gameObject.SetActive(value); }
     }
 
-    public System.Action onClickOkay;
-    public System.Action onClickYes;
-    public System.Action onClickNo;
-    public System.Action onClickCancel;
+    private System.Action onClickOkay;
+    private System.Action onClickYes;
+    private System.Action onClickNo;
+    private System.Action onClickCancel;
 
     public override void Show()
     {
@@ -58,22 +58,22 @@ public class UIMessageDialog : UIBase
         // Set click events to all buttons
         if (buttonOkay != null)
         {
-            buttonOkay.onClick.RemoveAllListeners();
+            buttonOkay.onClick.RemoveListener(OnClickOkay);
             buttonOkay.onClick.AddListener(OnClickOkay);
         }
         if (buttonYes != null)
         {
-            buttonYes.onClick.RemoveAllListeners();
+            buttonYes.onClick.RemoveListener(OnClickYes);
             buttonYes.onClick.AddListener(OnClickYes);
         }
         if (buttonNo != null)
         {
-            buttonNo.onClick.RemoveAllListeners();
+            buttonNo.onClick.RemoveListener(OnClickNo);
             buttonNo.onClick.AddListener(OnClickNo);
         }
         if (buttonCancel != null)
         {
-            buttonCancel.onClick.RemoveAllListeners();
+            buttonCancel.onClick.RemoveListener(OnClickCancel);
             buttonCancel.onClick.AddListener(OnClickCancel);
         }
     }
@@ -102,28 +102,28 @@ public class UIMessageDialog : UIBase
         Show();
     }
 
-    public void OnClickOkay()
+    private void OnClickOkay()
     {
         if (onClickOkay != null)
             onClickOkay.Invoke();
         Hide();
     }
 
-    public void OnClickYes()
+    private void OnClickYes()
     {
         if (onClickYes != null)
             onClickYes.Invoke();
         Hide();
     }
 
-    public void OnClickNo()
+    private void OnClickNo()
     {
         if (onClickNo != null)
             onClickNo.Invoke();
         Hide();
     }
 
-    public void OnClickCancel()
+    private void OnClickCancel()
     {
         if (onClickCancel != null)
             onClickCancel.Invoke();
