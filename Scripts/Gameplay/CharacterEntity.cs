@@ -283,6 +283,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         SetupNetElements();
         prototypeId.onChange += OnPrototypeIdChange;
         equipWeapons.onChange += OnChangeEquipWeapons;
+        attributes.onOperation += OnAttributesOperation;
         buffs.onOperation += OnBuffsOperation;
         equipItems.onOperation += OnEquipItemsOperation;
         nonEquipItems.onOperation += OnNonEquipItemsOperation;
@@ -1126,6 +1127,12 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
 
+    protected void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index)
+    {
+        if (IsLocalClient && CacheUISceneGameplay != null)
+            CacheUISceneGameplay.UpdateCharacter();
+    }
+
     protected void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
         if (IsLocalClient && CacheUISceneGameplay != null)
@@ -1181,6 +1188,8 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     protected virtual void OnDestroy()
     {
         prototypeId.onChange -= OnPrototypeIdChange;
+        equipWeapons.onChange -= OnChangeEquipWeapons;
+        attributes.onOperation -= OnAttributesOperation;
         buffs.onOperation -= OnBuffsOperation;
         equipItems.onOperation -= OnEquipItemsOperation;
         nonEquipItems.onOperation -= OnNonEquipItemsOperation;
