@@ -26,6 +26,12 @@ public class UIInputDialog : UIBase
         set { if (textDescription != null) textDescription.text = value; }
     }
 
+    public string InputFieldText
+    {
+        get { return inputField == null ? "" : inputField.text; }
+        set { if (inputField != null) inputField.text = value; }
+    }
+
     public override void Show()
     {
         if (inputField != null)
@@ -40,10 +46,12 @@ public class UIInputDialog : UIBase
     
     public void Show(string title,
         string description, 
-        System.Action<string> onConfirmText)
+        System.Action<string> onConfirmText,
+        string defaultText = "")
     {
         Title = title;
         Description = description;
+        InputFieldText = defaultText;
         contentType = InputField.ContentType.Standard;
         this.onConfirmText = onConfirmText;
         Show();
@@ -51,10 +59,12 @@ public class UIInputDialog : UIBase
 
     public void Show(string title,
         string description, 
-        System.Action<int> onConfirmInteger)
+        System.Action<int> onConfirmInteger,
+        int defaultAmount = 0)
     {
         Title = title;
         Description = description;
+        InputFieldText = defaultAmount.ToString();
         contentType = InputField.ContentType.IntegerNumber;
         this.onConfirmInteger = onConfirmInteger;
         Show();
@@ -62,10 +72,12 @@ public class UIInputDialog : UIBase
 
     public void Show(string title,
         string description, 
-        System.Action<float> onConfirmDecimal)
+        System.Action<float> onConfirmDecimal,
+        float defaultAmount = 0f)
     {
         Title = title;
         Description = description;
+        InputFieldText = defaultAmount.ToString();
         contentType = InputField.ContentType.DecimalNumber;
         this.onConfirmDecimal = onConfirmDecimal;
         Show();
@@ -76,23 +88,17 @@ public class UIInputDialog : UIBase
         switch (contentType)
         {
             case InputField.ContentType.Standard:
-                var text = "";
-                if (inputField != null)
-                    text = inputField.text;
+                var text = InputFieldText;
                 if (onConfirmText != null)
                     onConfirmText.Invoke(text);
                 break;
             case InputField.ContentType.IntegerNumber:
-                var intAmount = 0;
-                if (inputField != null)
-                    intAmount = int.Parse(inputField.text);
+                var intAmount = int.Parse(InputFieldText);
                 if (onConfirmInteger != null)
                     onConfirmInteger.Invoke(intAmount);
                 break;
             case InputField.ContentType.DecimalNumber:
-                var floatAmount = 0f;
-                if (inputField != null)
-                    floatAmount = float.Parse(inputField.text);
+                var floatAmount = float.Parse(InputFieldText);
                 if (onConfirmDecimal != null)
                     onConfirmDecimal.Invoke(floatAmount);
                 break;
