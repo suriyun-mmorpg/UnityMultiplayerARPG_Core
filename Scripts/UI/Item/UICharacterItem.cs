@@ -295,7 +295,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
                 owningCharacter.DropItem(indexOfData, 1);
         }
         else
-            UISceneGlobal.Singleton.ShowInputDialog(dropInputTitle, dropInputDescription, OnDropAmountConfirmed, Data.amount);
+            UISceneGlobal.Singleton.ShowInputDialog(dropInputTitle, dropInputDescription, OnDropAmountConfirmed, 1, Data.amount, Data.amount);
     }
 
     private void OnDropAmountConfirmed(int amount)

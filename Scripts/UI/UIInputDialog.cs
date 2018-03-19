@@ -60,11 +60,33 @@ public class UIInputDialog : UIBase
     public void Show(string title,
         string description, 
         System.Action<int> onConfirmInteger,
+        int? minAmount = null,
+        int? maxAmount = null,
         int defaultAmount = 0)
     {
         Title = title;
         Description = description;
         InputFieldText = defaultAmount.ToString();
+        if (inputField != null)
+        {
+            if (minAmount.Value > maxAmount.Value)
+            {
+                minAmount = null;
+                Debug.LogWarning("min amount is more than max amount");
+            }
+            inputField.onValueChanged.RemoveAllListeners();
+            inputField.onValueChanged.AddListener((result) =>
+            {
+                var amount = defaultAmount;
+                if (int.TryParse(result, out amount))
+                {
+                    if (minAmount.HasValue && minAmount.Value < amount)
+                        InputFieldText = minAmount.Value.ToString();
+                    if (maxAmount.HasValue && maxAmount.Value > amount)
+                        InputFieldText = maxAmount.Value.ToString();
+                }
+            });
+        }
         contentType = InputField.ContentType.IntegerNumber;
         this.onConfirmInteger = onConfirmInteger;
         Show();
@@ -73,11 +95,33 @@ public class UIInputDialog : UIBase
     public void Show(string title,
         string description, 
         System.Action<float> onConfirmDecimal,
+        float? minAmount = null,
+        float? maxAmount = null,
         float defaultAmount = 0f)
     {
         Title = title;
         Description = description;
         InputFieldText = defaultAmount.ToString();
+        if (inputField != null)
+        {
+            if (minAmount.Value > maxAmount.Value)
+            {
+                minAmount = null;
+                Debug.LogWarning("min amount is more than max amount");
+            }
+            inputField.onValueChanged.RemoveAllListeners();
+            inputField.onValueChanged.AddListener((result) =>
+            {
+                var amount = defaultAmount;
+                if (float.TryParse(result, out amount))
+                {
+                    if (minAmount.HasValue && minAmount.Value < amount)
+                        InputFieldText = minAmount.Value.ToString();
+                    if (maxAmount.HasValue && maxAmount.Value > amount)
+                        InputFieldText = maxAmount.Value.ToString();
+                }
+            });
+        }
         contentType = InputField.ContentType.DecimalNumber;
         this.onConfirmDecimal = onConfirmDecimal;
         Show();

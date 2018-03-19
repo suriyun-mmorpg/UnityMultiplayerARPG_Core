@@ -56,22 +56,30 @@ public class UISceneGlobal : MonoBehaviour
     public void ShowInputDialog(string title,
         string description,
         System.Action<int> onConfirmInteger,
+        int? minAmount = null,
+        int? maxAmount = null,
         int defaultAmount = 0)
     {
         uiInputDialog.Show(title,
             description,
             onConfirmInteger,
+            minAmount,
+            maxAmount,
             defaultAmount);
     }
 
     public void ShowInputDialog(string title,
         string description,
         System.Action<float> onConfirmDecimal,
+        float? minAmount = null,
+        float? maxAmount = null,
         float defaultAmount = 0f)
     {
         uiInputDialog.Show(title,
             description,
             onConfirmDecimal,
+            minAmount,
+            maxAmount,
             defaultAmount);
     }
 }
