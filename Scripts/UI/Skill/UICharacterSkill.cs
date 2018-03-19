@@ -6,8 +6,7 @@ using UnityEngine.UI;
 
 public class UICharacterSkill : UISelectionEntry<CharacterSkill>
 {
-    [System.NonSerialized]
-    public int indexOfData;
+    public int indexOfData { get; protected set; }
 
     [Header("Generic Info Format")]
     [Tooltip("Title Format => {0} = {Title}")]
@@ -52,12 +51,18 @@ public class UICharacterSkill : UISelectionEntry<CharacterSkill>
     public UISkillBuff uiSkillBuff;
     public UISkillBuff uiSkillDebuff;
 
+    public void Setup(CharacterSkill data, int indexOfData)
+    {
+        this.indexOfData = indexOfData;
+        Data = data;
+    }
+
     private void Update()
     {
         var skill = Data.GetSkill();
         var skillLevel = Data.level;
 
-        var owningCharacter = CharacterEntity.OwningCharacter;
+        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
         if (addButton != null)
             addButton.interactable = Data.CanLevelUp(owningCharacter);
 
@@ -181,7 +186,7 @@ public class UICharacterSkill : UISelectionEntry<CharacterSkill>
 
     private void OnClickAdd()
     {
-        var owningCharacter = CharacterEntity.OwningCharacter;
+        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
         owningCharacter.AddSkill(indexOfData);
     }
 }

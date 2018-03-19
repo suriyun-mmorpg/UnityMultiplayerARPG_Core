@@ -54,10 +54,8 @@ public class UINonEquipItems : UIBase
         if (uiItemDialog != null)
         {
             uiItemDialog.Show();
-            uiItemDialog.Data = ui.Data;
-            uiItemDialog.indexOfData = ui.indexOfData;
-            uiItemDialog.equipPosition = ui.equipPosition;
             uiItemDialog.selectionManager = selectionManager;
+            uiItemDialog.Setup(ui.Data, ui.indexOfData, ui.equipPosition);
         }
     }
 
@@ -77,9 +75,7 @@ public class UINonEquipItems : UIBase
         CacheList.Generate(nonEquipItems, (index, characterItem, ui) =>
         {
             var uiCharacterItem = ui.GetComponent<UICharacterItem>();
-            uiCharacterItem.Data = characterItem;
-            uiCharacterItem.indexOfData = index;
-            uiItemDialog.equipPosition = string.Empty;
+            uiCharacterItem.Setup(characterItem, index, string.Empty);
             SelectionManager.Add(uiCharacterItem);
         });
     }

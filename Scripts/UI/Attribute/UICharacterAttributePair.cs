@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 
 [System.Serializable]
-public struct UIAttributeAmountPair
+public struct UICharacterAttributePair
 {
     public Attribute attribute;
-    public UIAttributeAmount ui;
+    public UICharacterAttribute ui;
 }

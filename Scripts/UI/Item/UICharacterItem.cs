@@ -6,10 +6,8 @@ using UnityEngine.UI;
 
 public class UICharacterItem : UISelectionEntry<CharacterItem>
 {
-    [System.NonSerialized]
-    public int indexOfData;
-    [System.NonSerialized]
-    public string equipPosition;
+    public int indexOfData { get; protected set; }
+    public string equipPosition { get; protected set; }
 
     [Header("Generic Info Format")]
     [Tooltip("Title Format => {0} = {Title}")]
@@ -67,6 +65,13 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
 
     [Header("Options")]
     public bool hideAmountWhenMaxIsOne;
+
+    public void Setup(CharacterItem data, int indexOfData, string equipPosition)
+    {
+        this.indexOfData = indexOfData;
+        this.equipPosition = equipPosition;
+        Data = data;
+    }
 
     protected override void UpdateData()
     {
@@ -236,7 +241,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
         if (selectionManager != null)
             selectionManager.DeselectSelectedUI();
 
-        var owningCharacter = CharacterEntity.OwningCharacter;
+        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
         if (owningCharacter != null)
         {
             var armorItem = Data.GetArmorItem();
@@ -272,7 +277,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
         if (selectionManager != null)
             selectionManager.DeselectSelectedUI();
 
-        var owningCharacter = CharacterEntity.OwningCharacter;
+        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
         if (owningCharacter != null)
             owningCharacter.UnEquipItem(equipPosition);
     }
@@ -291,7 +296,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
 
     private void OnDropAmountConfirmed(int amount)
     {
-        var owningCharacter = CharacterEntity.OwningCharacter;
+        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
         if (owningCharacter != null)
             owningCharacter.DropItem(indexOfData, amount);
     }

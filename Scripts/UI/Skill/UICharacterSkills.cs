@@ -69,8 +69,7 @@ public class UICharacterSkills : UIBase
         CacheList.Generate(skillLevels, (index, characterSkill, ui) =>
         {
             var uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
-            uiCharacterSkill.Data = characterSkill;
-            uiCharacterSkill.indexOfData = index;
+            uiCharacterSkill.Setup(characterSkill, index);
             SelectionManager.Add(uiCharacterSkill);
         });
     }

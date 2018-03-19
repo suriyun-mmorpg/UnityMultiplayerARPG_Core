@@ -56,7 +56,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public UIDamageElementAmounts uiRightHandDamages;
     public UIDamageElementAmounts uiLeftHandDamages;
     public UICharacterStats uiCharacterStats;
-    public UIAttributeAmountPair[] uiCharacterAttributes;
+    public UICharacterAttributePair[] uiCharacterAttributes;
     [Header("Class information")]
     public Text textClassTitle;
     public Text textClassDescription;
@@ -65,14 +65,14 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public bool showStatsWithBuffs;
     public bool showAttributeWithBuffs;
 
-    private Dictionary<Attribute, UIAttributeAmount> cacheUICharacterAttributes = null;
-    public Dictionary<Attribute, UIAttributeAmount> CacheUICharacterAttributes
+    private Dictionary<Attribute, UICharacterAttribute> cacheUICharacterAttributes = null;
+    public Dictionary<Attribute, UICharacterAttribute> CacheUICharacterAttributes
     {
         get
         {
             if (cacheUICharacterAttributes == null)
             {
-                cacheUICharacterAttributes = new Dictionary<Attribute, UIAttributeAmount>();
+                cacheUICharacterAttributes = new Dictionary<Attribute, UICharacterAttribute>();
                 foreach (var uiCharacterAttribute in uiCharacterAttributes)
                 {
                     if (uiCharacterAttribute.attribute != null &&
@@ -231,14 +231,11 @@ public class UICharacter : UISelectionEntry<ICharacterData>
             {
                 var characterAttribute = characterAttributes[i];
                 var attribute = characterAttribute.GetAttribute();
-                UIAttributeAmount cacheUICharacterAttribute;
+                UICharacterAttribute cacheUICharacterAttribute;
                 int amount;
                 if (CacheUICharacterAttributes.TryGetValue(attribute, out cacheUICharacterAttribute) &&
                     displayingAttributes.TryGetValue(attribute, out amount))
-                {
-                    cacheUICharacterAttribute.Data = new KeyValuePair<CharacterAttribute, int>(characterAttribute, amount);
-                    cacheUICharacterAttribute.indexOfData = i;
-                }
+                    cacheUICharacterAttribute.Setup(new KeyValuePair<CharacterAttribute, int>(characterAttribute, amount), i);
             }
         }
         

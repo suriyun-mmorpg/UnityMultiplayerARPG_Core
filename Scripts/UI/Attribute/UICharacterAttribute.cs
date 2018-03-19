@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIAttributeAmount : UISelectionEntry<KeyValuePair<CharacterAttribute, int>>
+public class UICharacterAttribute : UISelectionEntry<KeyValuePair<CharacterAttribute, int>>
 {
-    [System.NonSerialized]
-    public int indexOfData;
+    public int indexOfData { get; protected set; }
 
     [Header("Generic Info Format")]
     [Tooltip("Title Format => {0} = {Title}")]
@@ -23,9 +22,15 @@ public class UIAttributeAmount : UISelectionEntry<KeyValuePair<CharacterAttribut
     public Image imageIcon;
     public Button addButton;
 
+    public void Setup(KeyValuePair<CharacterAttribute, int> data, int indexOfData)
+    {
+        this.indexOfData = indexOfData;
+        Data = data;
+    }
+
     private void Update()
     {
-        var owningCharacter = CharacterEntity.OwningCharacter;
+        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
         if (addButton != null)
             addButton.interactable = Data.Key.CanIncrease(owningCharacter);
     }
@@ -65,7 +70,7 @@ public class UIAttributeAmount : UISelectionEntry<KeyValuePair<CharacterAttribut
 
     private void OnClickAdd()
     {
-        var owningCharacter = CharacterEntity.OwningCharacter;
+        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
         if (owningCharacter != null)
             owningCharacter.AddAttribute(indexOfData);
     }
