@@ -43,7 +43,7 @@ public class UISceneGameplay : MonoBehaviour
             }
         }
         if (buttonRespawn != null)
-            buttonRespawn.gameObject.SetActive(CharacterEntity.OwningCharacter.CurrentHp <= 0);
+            buttonRespawn.gameObject.SetActive(PlayerCharacterEntity.OwningCharacter.CurrentHp <= 0);
     }
 
     public void UpdateCharacter()
@@ -51,31 +51,31 @@ public class UISceneGameplay : MonoBehaviour
         foreach (var uiCharacter in uiCharacters)
         {
             if (uiCharacter != null)
-                uiCharacter.Data = CharacterEntity.OwningCharacter;
+                uiCharacter.Data = PlayerCharacterEntity.OwningCharacter;
         }
     }
 
     public void UpdateBuffs()
     {
         if (uiBuffList != null)
-            uiBuffList.UpdateData(CharacterEntity.OwningCharacter);
+            uiBuffList.UpdateData(PlayerCharacterEntity.OwningCharacter);
     }
 
     public void UpdateEquipItems()
     {
         if (uiEquipItems != null)
-            uiEquipItems.UpdateData(CharacterEntity.OwningCharacter);
+            uiEquipItems.UpdateData(PlayerCharacterEntity.OwningCharacter);
     }
 
     public void UpdateNonEquipItems()
     {
         if (uiNonEquipItems != null)
-            uiNonEquipItems.UpdateData(CharacterEntity.OwningCharacter);
+            uiNonEquipItems.UpdateData(PlayerCharacterEntity.OwningCharacter);
     }
 
     public void UpdateSkills()
     {
         if (uiSkills != null)
-            uiSkills.UpdateData(CharacterEntity.OwningCharacter);
+            uiSkills.UpdateData(PlayerCharacterEntity.OwningCharacter);
     }
 }
