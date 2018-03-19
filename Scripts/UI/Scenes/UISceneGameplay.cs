@@ -78,4 +78,12 @@ public class UISceneGameplay : MonoBehaviour
         if (uiSkills != null)
             uiSkills.UpdateData(PlayerCharacterEntity.OwningCharacter);
     }
+
+    public void DeselectSelectedItem()
+    {
+        if (uiEquipItems != null)
+            uiEquipItems.SelectionManager.DeselectSelectedUI();
+        if (uiNonEquipItems != null)
+            uiNonEquipItems.SelectionManager.DeselectSelectedUI();
+    }
 }

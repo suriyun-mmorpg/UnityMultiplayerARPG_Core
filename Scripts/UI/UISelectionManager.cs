@@ -24,7 +24,9 @@ public abstract class UISelectionManager<TData, TUI, TEvent> : UISelectionManage
     where TEvent : UnityEvent<TUI>
 {
     public TEvent eventOnSelect;
+    public TEvent eventOnSelected;
     public TEvent eventOnDeselect;
+    public TEvent eventOnDeselected;
 
     protected readonly List<TUI> uis = new List<TUI>();
     public TUI SelectedUI { get; protected set; }
@@ -72,6 +74,9 @@ public abstract class UISelectionManager<TData, TUI, TEvent> : UISelectionManage
             if (deselectUI != castedUI)
                 deselectUI.Deselect();
         }
+
+        if (eventOnSelected != null)
+            eventOnSelected.Invoke(castedUI);
     }
 
     public override sealed void Deselect(object ui)
@@ -83,6 +88,9 @@ public abstract class UISelectionManager<TData, TUI, TEvent> : UISelectionManage
 
         SelectedUI = null;
         castedUI.Deselect();
+
+        if (eventOnDeselected != null)
+            eventOnDeselected.Invoke(castedUI);
     }
 
     public override sealed void DeselectAll()
