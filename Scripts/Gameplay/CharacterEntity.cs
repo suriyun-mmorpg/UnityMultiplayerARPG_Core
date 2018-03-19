@@ -10,7 +10,7 @@ using UnityEditor;
 [RequireComponent(typeof(CapsuleCollider))]
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(CharacterMovement))]
-public class CharacterEntity : RpgNetworkEntity, ICharacterData
+public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
 {
     public const string ANIM_IS_DEAD = "IsDead";
     public const string ANIM_MOVE_SPEED = "MoveSpeed";
@@ -18,7 +18,6 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     public const string ANIM_DO_ACTION = "DoAction";
     public const string ANIM_ACTION_ID = "ActionId";
     public const float UPDATE_SKILL_BUFF_INTERVAL = 1f;
-    public static CharacterEntity OwningCharacter { get; private set; }
     // Use id as primary key
     [Header("Sync Fields")]
     public SyncFieldString id = new SyncFieldString();
@@ -53,11 +52,8 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     protected LiteNetLibFunction<NetFieldFloat, NetFieldInt> netFuncPlayActionAnimation;
     protected LiteNetLibFunction<NetFieldUInt> netFuncPickupItem;
     protected LiteNetLibFunction<NetFieldInt, NetFieldInt> netFuncDropItem;
-    protected LiteNetLibFunction<NetFieldInt, NetFieldInt> netFuncSwapOrMergeItem;
     protected LiteNetLibFunction<NetFieldInt, NetFieldString> netFuncEquipItem;
     protected LiteNetLibFunction<NetFieldString> netFuncUnEquipItem;
-    protected LiteNetLibFunction<NetFieldInt> netFuncAddAttribute;
-    protected LiteNetLibFunction<NetFieldInt> netFuncAddSkill;
     #endregion
 
     public string Id { get { return id; } set { id.Value = value; } }
@@ -87,6 +83,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                 attributes.Add(entry);
         }
     }
+
     public IList<CharacterSkill> Skills
     {
         get { return skills; }
@@ -97,6 +94,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
                 skills.Add(entry);
         }
     }
+
     public IList<CharacterBuff> Buffs
     {
         get { return buffs; }
@@ -116,6 +114,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             }
         }
     }
+
     public IList<CharacterItem> EquipItems
     {
         get { return equipItems; }
@@ -135,6 +134,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             }
         }
     }
+
     public IList<CharacterItem> NonEquipItems
     {
         get { return nonEquipItems; }
@@ -179,32 +179,11 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             return cacheCharacterMovement;
         }
     }
-
-    public FollowCameraControls CacheFollowCameraControls { get; protected set; }
-    public UISceneGameplay CacheUISceneGameplay { get; protected set; }
     #endregion
 
     protected virtual void Awake()
     {
         CacheCharacterMovement.enabled = false;
-    }
-
-    protected virtual void Start()
-    {
-        var gameInstance = GameInstance.Singleton;
-        if (IsLocalClient)
-        {
-            CacheCharacterMovement.enabled = true;
-            CacheFollowCameraControls = Instantiate(gameInstance.gameplayCameraPrefab);
-            CacheFollowCameraControls.target = CacheTransform;
-            OwningCharacter = this;
-            CacheUISceneGameplay = Instantiate(gameInstance.uiSceneGameplayPrefab);
-            CacheUISceneGameplay.UpdateCharacter();
-            CacheUISceneGameplay.UpdateSkills();
-            CacheUISceneGameplay.UpdateBuffs();
-            CacheUISceneGameplay.UpdateEquipItems();
-            CacheUISceneGameplay.UpdateNonEquipItems();
-        }
     }
 
     protected virtual void Update()
@@ -257,7 +236,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             {
                 var buffKey = GetBuffKey(buff.skillId, buff.isDebuff);
                 buffs.RemoveAt(i);
-                buffIndexes.Remove(buffKey);
+                UpdateBuffIndexes();
             }
             else
             {
@@ -283,30 +262,29 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         SetupNetElements();
         prototypeId.onChange += OnPrototypeIdChange;
         equipWeapons.onChange += OnChangeEquipWeapons;
-        attributes.onOperation += OnAttributesOperation;
         buffs.onOperation += OnBuffsOperation;
         equipItems.onOperation += OnEquipItemsOperation;
-        nonEquipItems.onOperation += OnNonEquipItemsOperation;
-        skills.onOperation += OnSkillsOperation;
         netFuncAttack = new LiteNetLibFunction(NetFuncAttackCallback);
         netFuncUseSkill = new LiteNetLibFunction<NetFieldInt>(NetFuncUseSkillCallback);
         netFuncPlayActionAnimation = new LiteNetLibFunction<NetFieldFloat, NetFieldInt>(NetFuncPlayActionAnimationCallback);
         netFuncPickupItem = new LiteNetLibFunction<NetFieldUInt>(NetFuncPickupItemCallback);
         netFuncDropItem = new LiteNetLibFunction<NetFieldInt, NetFieldInt>(NetFuncDropItemCallback);
-        netFuncSwapOrMergeItem = new LiteNetLibFunction<NetFieldInt, NetFieldInt>(NetFuncSwapOrMergeItemCallback);
         netFuncEquipItem = new LiteNetLibFunction<NetFieldInt, NetFieldString>(NetFuncEquipItemCallback);
         netFuncUnEquipItem = new LiteNetLibFunction<NetFieldString>(NetFuncUnEquipItemCallback);
-        netFuncAddAttribute = new LiteNetLibFunction<NetFieldInt>(NetFuncAddAttributeCallback);
-        netFuncAddSkill = new LiteNetLibFunction<NetFieldInt>(NetFuncAddSkillCallback);
         RegisterNetFunction("Attack", netFuncAttack);
         RegisterNetFunction("PlayActionAnimation", netFuncPlayActionAnimation);
         RegisterNetFunction("PickupItem", netFuncPickupItem);
         RegisterNetFunction("DropItem", netFuncDropItem);
-        RegisterNetFunction("SwapOrMergeItem", netFuncSwapOrMergeItem);
         RegisterNetFunction("EquipItem", netFuncEquipItem);
         RegisterNetFunction("UnEquipItem", netFuncUnEquipItem);
-        RegisterNetFunction("AddAttribute", netFuncAddAttribute);
-        RegisterNetFunction("AddSkill", netFuncAddSkill);
+    }
+
+    protected virtual void OnDestroy()
+    {
+        prototypeId.onChange -= OnPrototypeIdChange;
+        equipWeapons.onChange -= OnChangeEquipWeapons;
+        buffs.onOperation -= OnBuffsOperation;
+        equipItems.onOperation -= OnEquipItemsOperation;
     }
 
     #region Net functions callbacks
@@ -488,12 +466,12 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             if (buffIndexes.TryGetValue(buffKey, out buffIndex))
             {
                 buffs.RemoveAt(buffIndex);
-                buffIndexes.Remove(buffKey);
+                UpdateBuffIndexes();
             }
-            var characterBuff = CharacterBuff.Create(skill, level, false);
+            var characterBuff = CharacterBuff.Create(skill, characterSkill.level, false);
             characterBuff.Added();
             buffs.Add(characterBuff);
-            buffIndexes[buffKey] = buffs.Count - 1;
+            buffIndexes.Add(buffKey, buffs.Count - 1);
         }
     }
 
@@ -585,50 +563,6 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
 
-    protected void NetFuncSwapOrMergeItemCallback(NetFieldInt fromIndex, NetFieldInt toIndex)
-    {
-        NetFuncSwapOrMergeItem(fromIndex, toIndex);
-    }
-
-    protected void NetFuncSwapOrMergeItem(int fromIndex, int toIndex)
-    {
-        if (CurrentHp <= 0 || doingAction ||
-            fromIndex < 0 || fromIndex > nonEquipItems.Count ||
-            toIndex < 0 || toIndex > nonEquipItems.Count)
-            return;
-
-        var fromItem = nonEquipItems[fromIndex];
-        var toItem = nonEquipItems[toIndex];
-        if (!fromItem.IsValid() || !toItem.IsValid())
-            return;
-
-        if (fromItem.itemId.Equals(toItem.itemId) && !fromItem.IsFull() && !toItem.IsFull())
-        {
-            // Merge if same id and not full
-            var maxStack = toItem.GetMaxStack();
-            if (toItem.amount + fromItem.amount <= maxStack)
-            {
-                toItem.amount += fromItem.amount;
-                nonEquipItems[fromIndex] = CharacterItem.Empty;
-                nonEquipItems[toIndex] = toItem;
-            }
-            else
-            {
-                var remains = toItem.amount + fromItem.amount - maxStack;
-                toItem.amount = maxStack;
-                fromItem.amount = remains;
-                nonEquipItems[fromIndex] = fromItem;
-                nonEquipItems[toIndex] = toItem;
-            }
-        }
-        else
-        {
-            // Swap
-            nonEquipItems[fromIndex] = toItem;
-            nonEquipItems[toIndex] = fromItem;
-        }
-    }
-
     protected void NetFuncEquipItemCallback(NetFieldInt nonEquipIndex, NetFieldString equipPosition)
     {
         NetFuncEquipItem(nonEquipIndex, equipPosition);
@@ -704,46 +638,10 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         {
             unEquipItem = equipItems[equippedArmorIndex];
             equipItems.RemoveAt(equippedArmorIndex);
-            equipItemIndexes.Remove(fromEquipPosition);
+            UpdateEquipItemIndexes();
         }
         if (unEquipItem.IsValid())
             nonEquipItems.Add(unEquipItem);
-    }
-
-    protected void NetFuncAddAttributeCallback(NetFieldInt attributeIndex)
-    {
-        NetFuncAddAttribute(attributeIndex);
-    }
-
-    protected void NetFuncAddAttribute(int attributeIndex)
-    {
-        if (CurrentHp <= 0 || attributeIndex < 0 || attributeIndex >= attributes.Count)
-            return;
-
-        var attribute = attributes[attributeIndex];
-        if (!attribute.CanIncrease(this))
-            return;
-
-        attribute.Increase(1);
-        attributes[attributeIndex] = attribute;
-    }
-
-    protected void NetFuncAddSkillCallback(NetFieldInt skillIndex)
-    {
-        NetFuncAddSkill(skillIndex);
-    }
-
-    protected void NetFuncAddSkill(int skillIndex)
-    {
-        if (CurrentHp <= 0 || skillIndex < 0 || skillIndex >= skills.Count)
-            return;
-
-        var skill = skills[skillIndex];
-        if (!skill.CanLevelUp(this))
-            return;
-
-        skill.LevelUp(1);
-        skills[skillIndex] = skill;
     }
     #endregion
 
@@ -768,11 +666,6 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         CallNetFunction("DropItem", FunctionReceivers.Server, index, amount);
     }
 
-    public void SwapOrMergeItem(int fromIndex, int toIndex)
-    {
-        CallNetFunction("SwapOrMergeItem", FunctionReceivers.Server, fromIndex, toIndex);
-    }
-
     public void EquipItem(int nonEquipIndex, string equipPosition)
     {
         CallNetFunction("EquipItem", FunctionReceivers.Server, nonEquipIndex, equipPosition);
@@ -781,16 +674,6 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
     public void UnEquipItem(string equipPosition)
     {
         CallNetFunction("UnEquipItem", FunctionReceivers.Server, equipPosition);
-    }
-
-    public void AddAttribute(int attributeIndex)
-    {
-        CallNetFunction("AddAttribute", FunctionReceivers.Server, attributeIndex);
-    }
-
-    public void AddSkill(int skillIndex)
-    {
-        CallNetFunction("AddSkill", FunctionReceivers.Server, skillIndex);
     }
     #endregion
 
@@ -1045,12 +928,12 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             if (buffIndexes.TryGetValue(buffKey, out buffIndex))
             {
                 buffs.RemoveAt(buffIndex);
-                buffIndexes.Remove(buffKey);
+                UpdateBuffIndexes();
             }
             var characterDebuff = debuff.Clone();
             characterDebuff.Added();
             buffs.Add(characterDebuff);
-            buffIndexes[buffKey] = buffs.Count - 1;
+            buffIndexes.Add(buffKey, buffs.Count - 1);
         }
     }
     #endregion
@@ -1087,7 +970,7 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         nonEquipItems.forOwnerOnly = true;
     }
 
-    protected void OnPrototypeIdChange(string prototypeId)
+    protected virtual void OnPrototypeIdChange(string prototypeId)
     {
         // Setup model
         if (model != null)
@@ -1102,66 +985,22 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
             model.SetEquipWeapons(equipWeapons);
             model.SetEquipItems(equipItems);
         }
-
-        if (IsLocalClient && CacheUISceneGameplay != null)
-            CacheUISceneGameplay.UpdateCharacter();
     }
 
-    protected void OnChangeEquipWeapons(EquipWeapons equipWeapons)
+    protected virtual void OnChangeEquipWeapons(EquipWeapons equipWeapons)
     {
-        if (model)
+        if (model != null)
             model.SetEquipWeapons(equipWeapons);
-
-        if (IsLocalClient && CacheUISceneGameplay != null)
-        {
-            CacheUISceneGameplay.UpdateCharacter();
-            CacheUISceneGameplay.UpdateEquipItems();
-        }
     }
 
-    protected void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index)
+    protected virtual void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
-        if (IsLocalClient && CacheUISceneGameplay != null)
-            CacheUISceneGameplay.UpdateCharacter();
     }
 
-    protected void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
-    {
-        if (IsLocalClient && CacheUISceneGameplay != null)
-        {
-            CacheUISceneGameplay.UpdateCharacter();
-            CacheUISceneGameplay.UpdateBuffs();
-        }
-    }
-
-    protected void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+    protected virtual void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
         if (model != null)
             model.SetEquipItems(equipItems);
-
-        if (IsLocalClient && CacheUISceneGameplay != null)
-        {
-            CacheUISceneGameplay.UpdateCharacter();
-            CacheUISceneGameplay.UpdateEquipItems();
-        }
-    }
-
-    protected void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-    {
-        if (IsLocalClient && CacheUISceneGameplay != null)
-        {
-            CacheUISceneGameplay.UpdateCharacter();
-            CacheUISceneGameplay.UpdateNonEquipItems();
-        }
-    }
-
-    protected void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
-    {
-        if (IsLocalClient && CacheUISceneGameplay != null)
-        {
-            CacheUISceneGameplay.UpdateCharacter();
-            CacheUISceneGameplay.UpdateSkills();
-        }
     }
 
     public void Warp(string mapName, Vector3 position)
@@ -1177,15 +1016,28 @@ public class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
 
-    protected virtual void OnDestroy()
+    protected void UpdateBuffIndexes()
     {
-        prototypeId.onChange -= OnPrototypeIdChange;
-        equipWeapons.onChange -= OnChangeEquipWeapons;
-        attributes.onOperation -= OnAttributesOperation;
-        buffs.onOperation -= OnBuffsOperation;
-        equipItems.onOperation -= OnEquipItemsOperation;
-        nonEquipItems.onOperation -= OnNonEquipItemsOperation;
-        skills.onOperation -= OnSkillsOperation;
+        buffIndexes.Clear();
+        for (var i = 0; i < buffs.Count; ++i)
+        {
+            var entry = buffs[i];
+            var buffKey = GetBuffKey(entry.skillId, entry.isDebuff);
+            if (!buffIndexes.ContainsKey(buffKey))
+                buffIndexes.Add(buffKey, i);
+        }
+    }
+
+    protected void UpdateEquipItemIndexes()
+    {
+        equipItemIndexes.Clear();
+        for (var i = 0; i < equipItems.Count; ++i)
+        {
+            var entry = equipItems[i];
+            var armorItem = entry.GetArmorItem();
+            if (entry.IsValid() && armorItem != null && !equipItemIndexes.ContainsKey(armorItem.EquipPosition))
+                equipItemIndexes.Add(armorItem.EquipPosition, i);
+        }
     }
 
     public static string GetBuffKey(string skillId, bool isDebuff)

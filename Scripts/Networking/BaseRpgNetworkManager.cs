@@ -13,7 +13,7 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
     protected override void Awake()
     {
         var gameInstance = GameInstance.Singleton;
-        Assets.playerPrefab = gameInstance.characterEntityPrefab.Identity;
+        Assets.playerPrefab = gameInstance.playerCharacterEntityPrefab.Identity;
         Assets.RegisterPrefab(gameInstance.itemDropEntityPrefab.Identity);
         var damageEntities = GameInstance.DamageEntities.Values;
         foreach (var damageEntity in damageEntities)

@@ -11,7 +11,7 @@ public class GameInstance : MonoBehaviour
     public static GameInstance Singleton { get; protected set; }
     public BaseGameInstanceExtra extra;
     [Header("Gameplay Objects")]
-    public CharacterEntity characterEntityPrefab;
+    public PlayerCharacterEntity playerCharacterEntityPrefab;
     public ItemDropEntity itemDropEntityPrefab;
     public FollowCameraControls gameplayCameraPrefab;
     public UISceneGameplay uiSceneGameplayPrefab;
@@ -148,7 +148,7 @@ public class GameInstance : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         Singleton = this;
 
-        if (characterEntityPrefab == null)
+        if (playerCharacterEntityPrefab == null)
         {
             Debug.LogError("You must set character entity prefab");
             return;
