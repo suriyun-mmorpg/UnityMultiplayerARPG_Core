@@ -234,7 +234,6 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             var buff = buffs[i];
             if (buff.ShouldRemove())
             {
-                var buffKey = GetBuffKey(buff.skillId, buff.isDebuff);
                 buffs.RemoveAt(i);
                 UpdateBuffIndexes();
             }
