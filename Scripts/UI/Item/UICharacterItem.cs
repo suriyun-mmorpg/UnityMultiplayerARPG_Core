@@ -288,14 +288,21 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
         if (!string.IsNullOrEmpty(equipPosition))
             return;
 
-        if (selectionManager != null)
-            selectionManager.DeselectSelectedUI();
-
-        UISceneGlobal.Singleton.ShowInputDialog(dropInputTitle, dropInputDescription, OnDropAmountConfirmed);
+        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
+        if (Data.amount == 1)
+        {
+            if (owningCharacter != null)
+                owningCharacter.DropItem(indexOfData, 1);
+        }
+        else
+            UISceneGlobal.Singleton.ShowInputDialog(dropInputTitle, dropInputDescription, OnDropAmountConfirmed, Data.amount);
     }
 
     private void OnDropAmountConfirmed(int amount)
     {
+        if (selectionManager != null)
+            selectionManager.DeselectSelectedUI();
+
         var owningCharacter = PlayerCharacterEntity.OwningCharacter;
         if (owningCharacter != null)
             owningCharacter.DropItem(indexOfData, amount);
