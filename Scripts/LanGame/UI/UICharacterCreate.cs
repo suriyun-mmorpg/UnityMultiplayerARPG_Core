@@ -97,7 +97,7 @@ public class UICharacterCreate : UIBase
             Debug.LogWarning("Cannot create character, did not selected character class");
             return;
         }
-        var prototypeId = selectedUI.Data.PrototypeId;
+        var prototypeId = selectedUI.Data.ClassId;
         var characterName = inputCharacterName.text.Trim();
         var minCharacterNameLength = gameInstance.minCharacterNameLength;
         var maxCharacterNameLength = gameInstance.maxCharacterNameLength;

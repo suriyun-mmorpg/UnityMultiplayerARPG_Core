@@ -4,27 +4,22 @@ using UnityEngine;
 
 public static class CharacterDataExtension
 {
-    public static CharacterPrototype GetPrototype(this ICharacterData data)
-    {
-        if (string.IsNullOrEmpty(data.PrototypeId))
-            return null;
-        return GameInstance.CharacterPrototypes[data.PrototypeId];
-    }
-
     public static CharacterClass GetClass(this ICharacterData data)
     {
-        var prototype = data.GetPrototype();
-        if (prototype == null)
+        CharacterClass characterClass = null;
+        if (!GameInstance.CharacterClasses.TryGetValue(data.ClassId, out characterClass))
             return null;
-        return prototype.characterClass;
+
+        return characterClass;
     }
 
     public static CharacterModel InstantiateModel(this ICharacterData data, Transform parent)
     {
-        var prototype = data.GetPrototype();
-        if (prototype == null)
+        CharacterModel characterModel = null;
+        if (!GameInstance.CharacterModels.TryGetValue(data.ModelId, out characterModel))
             return null;
-        var result = Object.Instantiate(prototype.characterModel, parent);
+
+        var result = Object.Instantiate(characterModel, parent);
         result.gameObject.SetActive(true);
         result.transform.localPosition = Vector3.zero;
         return result;

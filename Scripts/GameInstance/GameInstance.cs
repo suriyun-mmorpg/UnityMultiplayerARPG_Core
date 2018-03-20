@@ -38,6 +38,7 @@ public class GameInstance : MonoBehaviour
     public int maxCharacterNameLength = 16;
     public static readonly Dictionary<string, Attribute> Attributes = new Dictionary<string, Attribute>();
     public static readonly Dictionary<string, CharacterClass> CharacterClasses = new Dictionary<string, CharacterClass>();
+    public static readonly Dictionary<string, CharacterModel> CharacterModels = new Dictionary<string, CharacterModel>();
     public static readonly Dictionary<string, CharacterPrototype> CharacterPrototypes = new Dictionary<string, CharacterPrototype>();
     public static readonly Dictionary<string, DamageElement> DamageElements = new Dictionary<string, DamageElement>();
     public static readonly Dictionary<string, DamageEntity> DamageEntities = new Dictionary<string, DamageEntity>();
@@ -171,6 +172,7 @@ public class GameInstance : MonoBehaviour
         
         Attributes.Clear();
         CharacterClasses.Clear();
+        CharacterModels.Clear();
         CharacterPrototypes.Clear();
         DamageElements.Clear();
         DamageEntities.Clear();
@@ -222,6 +224,16 @@ public class GameInstance : MonoBehaviour
         }
     }
 
+    public static void AddCharacterModels(IEnumerable<CharacterModel> characterModels)
+    {
+        foreach (var characterModel in characterModels)
+        {
+            if (characterModel == null || CharacterModels.ContainsKey(characterModel.Id))
+                continue;
+            CharacterModels[characterModel.Id] = characterModel;
+        }
+    }
+
     public static void AddCharacterPrototypes(IEnumerable<CharacterPrototype> characterPrototypes)
     {
         foreach (var characterPrototype in characterPrototypes)
@@ -230,6 +242,7 @@ public class GameInstance : MonoBehaviour
                 continue;
             CharacterPrototypes[characterPrototype.Id] = characterPrototype;
             AddCharacterClasses(new CharacterClass[] { characterPrototype.characterClass });
+            AddCharacterModels(new CharacterModel[] { characterPrototype.characterModel });
         }
     }
 

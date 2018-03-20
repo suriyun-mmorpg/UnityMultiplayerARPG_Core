@@ -5,7 +5,8 @@ using UnityEngine;
 [System.Serializable]
 public class CharacterData : ICharacterData
 {
-    public string prototypeId;
+    public string modelId;
+    public string classId;
     public string characterName;
     public int level;
     public int exp;
@@ -19,7 +20,8 @@ public class CharacterData : ICharacterData
     public List<CharacterItem> equipItems = new List<CharacterItem>();
     public List<CharacterItem> nonEquipItems = new List<CharacterItem>();
 
-    public string PrototypeId { get { return prototypeId; } set { prototypeId = value; } }
+    public string ModelId { get { return modelId; } set { modelId = value; } }
+    public string ClassId { get { return classId; } set { classId = value; } }
     public string CharacterName { get { return characterName; } set { characterName = value; } }
     public int Level { get { return level; } set { level = value; } }
     public int Exp { get { return exp; } set { exp = value; } }

@@ -10,8 +10,9 @@ public static class PlayerCharacterDataExtension
     public static T CloneTo<T>(this IPlayerCharacterData from, T to) where T : IPlayerCharacterData
     {
         to.Id = from.Id;
+        to.ModelId = from.ModelId;
+        to.ClassId = from.ClassId;
         to.CharacterName = from.CharacterName;
-        to.PrototypeId = from.PrototypeId;
         to.Level = from.Level;
         to.Exp = from.Exp;
         to.CurrentHp = from.CurrentHp;
@@ -36,8 +37,15 @@ public static class PlayerCharacterDataExtension
     public static T SetNewCharacterData<T>(this T character, string characterName, string prototypeId) where T : IPlayerCharacterData
     {
         var gameInstance = GameInstance.Singleton;
+        CharacterPrototype prototype;
+        if (!GameInstance.CharacterPrototypes.TryGetValue(prototypeId, out prototype) ||
+            prototype.characterModel == null ||
+            prototype.characterClass == null)
+            return character;
+
+        character.ModelId = prototype.characterModel.Id;
+        character.ClassId = prototype.characterClass.Id;
         character.CharacterName = characterName;
-        character.PrototypeId = prototypeId;
         character.Level = 1;
         foreach (var baseAttribute in character.GetClass().baseAttributes)
         {

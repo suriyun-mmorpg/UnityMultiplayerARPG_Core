@@ -5,6 +5,8 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class CharacterModel : MonoBehaviour
 {
+    public string Id { get { return name; } }
+
     [Header("Collider")]
     public Vector3 center;
     public float radius = 0.5f;

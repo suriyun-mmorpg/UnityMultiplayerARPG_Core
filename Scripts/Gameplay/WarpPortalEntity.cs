@@ -13,10 +13,10 @@ public class WarpPortalEntity : RpgNetworkEntity
         if (!IsServer)
             return;
 
-        var characterEntity = other.GetComponent<CharacterEntity>();
-        if (characterEntity == null)
+        var playerCharacterEntity = other.GetComponent<PlayerCharacterEntity>();
+        if (playerCharacterEntity == null)
             return;
 
-        characterEntity.Warp(mapName, position);
+        playerCharacterEntity.Warp(mapName, position);
     }
 }

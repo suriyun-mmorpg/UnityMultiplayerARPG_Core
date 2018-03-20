@@ -7,9 +7,6 @@ using LiteNetLibHighLevel;
 using UnityEditor;
 #endif
 
-[RequireComponent(typeof(CapsuleCollider))]
-[RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(CharacterMovement))]
 public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
 {
     public const string ANIM_IS_DEAD = "IsDead";
@@ -19,25 +16,22 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     public const string ANIM_ACTION_ID = "ActionId";
     public const float UPDATE_SKILL_BUFF_INTERVAL = 1f;
     // Use id as primary key
-    [Header("Sync Fields")]
-    public SyncFieldString id = new SyncFieldString();
+    #region Sync data
+    public SyncFieldString modelId = new SyncFieldString();
+    public SyncFieldString classId = new SyncFieldString();
     public SyncFieldString characterName = new SyncFieldString();
-    public SyncFieldString prototypeId = new SyncFieldString();
     public SyncFieldInt level = new SyncFieldInt();
     public SyncFieldInt exp = new SyncFieldInt();
     public SyncFieldFloat currentHp = new SyncFieldFloat();
     public SyncFieldFloat currentMp = new SyncFieldFloat();
-    public SyncFieldInt statPoint = new SyncFieldInt();
-    public SyncFieldInt skillPoint = new SyncFieldInt();
-    public SyncFieldInt gold = new SyncFieldInt();
     public SyncFieldEquipWeapons equipWeapons = new SyncFieldEquipWeapons();
-
-    [Header("Sync Lists")]
+    // List
     public SyncListCharacterAttribute attributes = new SyncListCharacterAttribute();
     public SyncListCharacterSkill skills = new SyncListCharacterSkill();
     public SyncListCharacterBuff buffs = new SyncListCharacterBuff();
     public SyncListCharacterItem equipItems = new SyncListCharacterItem();
     public SyncListCharacterItem nonEquipItems = new SyncListCharacterItem();
+    #endregion
 
     #region Protected data
     // Entity data
@@ -56,22 +50,15 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     protected LiteNetLibFunction<NetFieldString> netFuncUnEquipItem;
     #endregion
 
-    public string Id { get { return id; } set { id.Value = value; } }
+    #region Interface implementation
+    public string ModelId { get { return modelId; } set { modelId.Value = value; } }
+    public string ClassId { get { return classId; } set { classId.Value = value; } }
     public string CharacterName { get { return characterName; } set { characterName.Value = value; } }
-    public string PrototypeId { get { return prototypeId; } set { prototypeId.Value = value; } }
     public int Level { get { return level.Value; } set { level.Value = value; } }
     public int Exp { get { return exp.Value; } set { exp.Value = value; } }
     public int CurrentHp { get { return (int)currentHp.Value; } set { currentHp.Value = value; } }
     public int CurrentMp { get { return (int)currentMp.Value; } set { currentMp.Value = value; } }
-    public int StatPoint { get { return statPoint.Value; } set { statPoint.Value = value; } }
-    public int SkillPoint { get { return skillPoint.Value; } set { skillPoint.Value = value; } }
-    public int Gold { get { return gold.Value; } set { gold.Value = value; } }
     public EquipWeapons EquipWeapons { get { return equipWeapons; } set { equipWeapons.Value = value; } }
-    public string CurrentMapName { get; set; }
-    public Vector3 CurrentPosition { get { return CacheTransform.position; } set { CacheTransform.position = value; } }
-    public string RespawnMapName { get; set; }
-    public Vector3 RespawnPosition { get; set; }
-    public int LastUpdate { get; set; }
 
     public IList<CharacterAttribute> Attributes
     {
@@ -145,47 +132,8 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
                 nonEquipItems.Add(entry);
         }
     }
-
-    #region Cache components
-    private CapsuleCollider cacheCapsuleCollider;
-    public CapsuleCollider CacheCapsuleCollider
-    {
-        get
-        {
-            if (cacheCapsuleCollider == null)
-                cacheCapsuleCollider = GetComponent<CapsuleCollider>();
-            return cacheCapsuleCollider;
-        }
-    }
-
-    private Rigidbody cacheRigidbody;
-    public Rigidbody CacheRigidbody
-    {
-        get
-        {
-            if (cacheRigidbody == null)
-                cacheRigidbody = GetComponent<Rigidbody>();
-            return cacheRigidbody;
-        }
-    }
-
-    private CharacterMovement cacheCharacterMovement;
-    public CharacterMovement CacheCharacterMovement
-    {
-        get
-        {
-            if (cacheCharacterMovement == null)
-                cacheCharacterMovement = GetComponent<CharacterMovement>();
-            return cacheCharacterMovement;
-        }
-    }
     #endregion
-
-    protected virtual void Awake()
-    {
-        CacheCharacterMovement.enabled = false;
-    }
-
+    
     protected virtual void Update()
     {
         // Use this to update animations
@@ -198,7 +146,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         if (model != null)
         {
             var isDead = CurrentHp <= 0;
-            var velocity = CacheRigidbody.velocity;
+            var velocity = GetMovementVelocity();
             var moveSpeed = new Vector3(velocity.x, 0, velocity.z).magnitude;
             if (isDead)
             {
@@ -259,10 +207,17 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     public override void OnSetup()
     {
         SetupNetElements();
-        prototypeId.onChange += OnPrototypeIdChange;
+        // On data changes events
+        modelId.onChange += OnModelIdChange;
+        classId.onChange += OnClassIdChange;
         equipWeapons.onChange += OnChangeEquipWeapons;
+        // On list changes events
+        attributes.onOperation += OnAttributesOperation;
+        skills.onOperation += OnSkillsOperation;
         buffs.onOperation += OnBuffsOperation;
         equipItems.onOperation += OnEquipItemsOperation;
+        nonEquipItems.onOperation += OnNonEquipItemsOperation;
+        // Setup Network functions
         netFuncAttack = new LiteNetLibFunction(NetFuncAttackCallback);
         netFuncUseSkill = new LiteNetLibFunction<NetFieldInt>(NetFuncUseSkillCallback);
         netFuncPlayActionAnimation = new LiteNetLibFunction<NetFieldFloat, NetFieldInt>(NetFuncPlayActionAnimationCallback);
@@ -270,6 +225,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         netFuncDropItem = new LiteNetLibFunction<NetFieldInt, NetFieldInt>(NetFuncDropItemCallback);
         netFuncEquipItem = new LiteNetLibFunction<NetFieldInt, NetFieldString>(NetFuncEquipItemCallback);
         netFuncUnEquipItem = new LiteNetLibFunction<NetFieldString>(NetFuncUnEquipItemCallback);
+        // Register Network functions
         RegisterNetFunction("Attack", netFuncAttack);
         RegisterNetFunction("PlayActionAnimation", netFuncPlayActionAnimation);
         RegisterNetFunction("PickupItem", netFuncPickupItem);
@@ -280,10 +236,16 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected virtual void OnDestroy()
     {
-        prototypeId.onChange -= OnPrototypeIdChange;
+        // On data changes events
+        modelId.onChange -= OnModelIdChange;
+        classId.onChange -= OnClassIdChange;
         equipWeapons.onChange -= OnChangeEquipWeapons;
+        // On list changes events
+        attributes.onOperation -= OnAttributesOperation;
+        skills.onOperation -= OnSkillsOperation;
         buffs.onOperation -= OnBuffsOperation;
         equipItems.onOperation -= OnEquipItemsOperation;
+        nonEquipItems.onOperation -= OnNonEquipItemsOperation;
     }
 
     #region Net functions callbacks
@@ -937,14 +899,14 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     }
     #endregion
 
-    private void SetupNetElements()
+    protected virtual void SetupNetElements()
     {
-        id.sendOptions = SendOptions.ReliableOrdered;
-        id.forOwnerOnly = false;
-        characterName.sendOptions = SendOptions.ReliableOrdered;
+        characterName.sendOptions = SendOptions.ReliableUnordered;
         characterName.forOwnerOnly = false;
-        prototypeId.sendOptions = SendOptions.ReliableOrdered;
-        prototypeId.forOwnerOnly = false;
+        modelId.sendOptions = SendOptions.ReliableUnordered;
+        modelId.forOwnerOnly = false;
+        classId.sendOptions = SendOptions.ReliableUnordered;
+        classId.forOwnerOnly = false;
         level.sendOptions = SendOptions.ReliableOrdered;
         level.forOwnerOnly = false;
         exp.sendOptions = SendOptions.ReliableOrdered;
@@ -953,12 +915,6 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         currentHp.forOwnerOnly = false;
         currentMp.sendOptions = SendOptions.ReliableOrdered;
         currentMp.forOwnerOnly = false;
-        statPoint.sendOptions = SendOptions.ReliableOrdered;
-        statPoint.forOwnerOnly = true;
-        skillPoint.sendOptions = SendOptions.ReliableOrdered;
-        skillPoint.forOwnerOnly = true;
-        gold.sendOptions = SendOptions.ReliableOrdered;
-        gold.forOwnerOnly = false;
         equipWeapons.sendOptions = SendOptions.ReliableOrdered;
         equipWeapons.forOwnerOnly = false;
 
@@ -969,7 +925,12 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         nonEquipItems.forOwnerOnly = true;
     }
 
-    protected virtual void OnPrototypeIdChange(string prototypeId)
+    #region Sync data changes callback
+    /// <summary>
+    /// Override this to do stuffs when model Id changed
+    /// </summary>
+    /// <param name="modelId"></param>
+    protected virtual void OnModelIdChange(string modelId)
     {
         // Setup model
         if (model != null)
@@ -978,42 +939,79 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         model = this.InstantiateModel(transform);
         if (model != null)
         {
-            CacheCapsuleCollider.center = model.center;
-            CacheCapsuleCollider.radius = model.radius;
-            CacheCapsuleCollider.height = model.height;
+            SetupModel(model);
             model.SetEquipWeapons(equipWeapons);
             model.SetEquipItems(equipItems);
         }
     }
 
+    /// <summary>
+    /// Override this to do stuffs when class Id changed
+    /// </summary>
+    /// <param name="classId"></param>
+    protected virtual void OnClassIdChange(string classId)
+    {
+    }
+
+    /// <summary>
+    /// Override this to do stuffs when equip weapons changes
+    /// </summary>
+    /// <param name="equipWeapons"></param>
     protected virtual void OnChangeEquipWeapons(EquipWeapons equipWeapons)
     {
         if (model != null)
             model.SetEquipWeapons(equipWeapons);
     }
+    #endregion
 
+    #region Net functions operation callback
+    /// <summary>
+    /// Override this to do stuffs when attributes changes
+    /// </summary>
+    /// <param name="operation"></param>
+    /// <param name="index"></param>
+    protected virtual void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index)
+    {
+    }
+
+    /// <summary>
+    /// Override this to do stuffs when skills changes
+    /// </summary>
+    /// <param name="operation"></param>
+    /// <param name="index"></param>
+    protected virtual void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
+    {
+    }
+
+    /// <summary>
+    /// Override this to do stuffs when buffs changes
+    /// </summary>
+    /// <param name="operation"></param>
+    /// <param name="index"></param>
     protected virtual void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
     }
 
+    /// <summary>
+    /// Override this to do stuffs when equip items changes
+    /// </summary>
+    /// <param name="operation"></param>
+    /// <param name="index"></param>
     protected virtual void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
         if (model != null)
             model.SetEquipItems(equipItems);
     }
 
-    public void Warp(string mapName, Vector3 position)
+    /// <summary>
+    /// Override this to do stuffs when non equip items changes
+    /// </summary>
+    /// <param name="operation"></param>
+    /// <param name="index"></param>
+    protected virtual void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
-        if (!IsServer)
-            return;
-
-        // If warping to same map player does not have to reload new map data
-        if (string.IsNullOrEmpty(mapName) || mapName.Equals(CurrentMapName))
-        {
-            CurrentPosition = position;
-            return;
-        }
     }
+    #endregion
 
     protected void UpdateBuffIndexes()
     {
@@ -1038,6 +1036,9 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
                 equipItemIndexes.Add(armorItem.EquipPosition, i);
         }
     }
+
+    protected abstract void SetupModel(CharacterModel characterModel);
+    protected abstract Vector3 GetMovementVelocity();
 
     public static string GetBuffKey(string skillId, bool isDebuff)
     {
