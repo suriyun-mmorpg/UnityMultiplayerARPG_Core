@@ -25,6 +25,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     protected LiteNetLibFunction<NetFieldInt, NetFieldInt> netFuncSwapOrMergeItem;
     protected LiteNetLibFunction<NetFieldInt> netFuncAddAttribute;
     protected LiteNetLibFunction<NetFieldInt> netFuncAddSkill;
+    protected LiteNetLibFunction<NetFieldVector3> netFuncPointClickMovement;
     #endregion
 
     #region Interface implementation
@@ -100,35 +101,51 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         UpdateInput();
     }
 
+    protected void FixedUpdate()
+    {
+        if (!IsServer)
+            return;
+    }
+
+    protected void LateUpdate()
+    {
+        if (!IsServer)
+            return;
+
+        if (navPaths != null)
+        {
+            if (navPaths.Count > 0)
+            {
+                var target = navPaths.Peek();
+                target = new Vector3(target.x, 0, target.z);
+                var currentPosition = transform.position;
+                currentPosition = new Vector3(currentPosition.x, 0, currentPosition.z);
+                moveDirection = (target - currentPosition).normalized;
+                if (Vector3.Distance(target, currentPosition) < stoppingDistance)
+                    navPaths.Dequeue();
+            }
+            else
+            {
+                navPaths = null;
+                moveDirection = Vector3.zero;
+            }
+        }
+    }
+
     protected virtual void UpdateInput()
     {
+        if (!IsLocalClient)
+            return;
+
+        if (CacheFollowCameraControls != null)
+            CacheFollowCameraControls.updateRotation = Input.GetMouseButton(1);
+
         if (Input.GetMouseButtonDown(0))
         {
             RaycastHit hit;
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 100))
-            {
-                var navPath = new NavMeshPath();
-                if (NavMesh.CalculatePath(transform.position, hit.point, NavMesh.AllAreas, navPath))
-                {
-                    navPaths = new Queue<Vector3>(navPath.corners);
-                    // Dequeue first path it's not require for future movement
-                    navPaths.Dequeue();
-                }
-            }
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 100f))
+                PointClickMovement(hit.point);
         }
-
-        if (navPaths != null && navPaths.Count > 0)
-        {
-            var target = navPaths.Peek();
-            target = new Vector3(target.x, 0, target.z);
-            var currentPosition = transform.position;
-            currentPosition = new Vector3(currentPosition.x, 0, currentPosition.z);
-            moveDirection = (target - currentPosition).normalized;
-            if (Vector3.Distance(target, currentPosition) < stoppingDistance)
-                navPaths.Dequeue();
-        }
-        else
-            moveDirection = Vector3.zero;
     }
 
     protected override void SetupNetElements()
@@ -151,10 +168,12 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         netFuncSwapOrMergeItem = new LiteNetLibFunction<NetFieldInt, NetFieldInt>(NetFuncSwapOrMergeItemCallback);
         netFuncAddAttribute = new LiteNetLibFunction<NetFieldInt>(NetFuncAddAttributeCallback);
         netFuncAddSkill = new LiteNetLibFunction<NetFieldInt>(NetFuncAddSkillCallback);
+        netFuncPointClickMovement = new LiteNetLibFunction<NetFieldVector3>(NetFuncPointClickMovementCallback);
 
         RegisterNetFunction("SwapOrMergeItem", netFuncSwapOrMergeItem);
         RegisterNetFunction("AddAttribute", netFuncAddAttribute);
         RegisterNetFunction("AddSkill", netFuncAddSkill);
+        RegisterNetFunction("PointClickMovement", netFuncPointClickMovement);
     }
 
     #region Net functions callbacks
@@ -237,6 +256,22 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         skill.LevelUp(1);
         skills[skillIndex] = skill;
     }
+
+    protected void NetFuncPointClickMovementCallback(NetFieldVector3 position)
+    {
+        NetFuncPointClickMovement(position);
+    }
+
+    protected void NetFuncPointClickMovement(Vector3 position)
+    {
+        var navPath = new NavMeshPath();
+        if (NavMesh.CalculatePath(CacheTransform.position, position, NavMesh.AllAreas, navPath))
+        {
+            navPaths = new Queue<Vector3>(navPath.corners);
+            // Dequeue first path it's not require for future movement
+            navPaths.Dequeue();
+        }
+    }
     #endregion
 
     #region Net functions callers
@@ -253,6 +288,11 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     public void AddSkill(int skillIndex)
     {
         CallNetFunction("AddSkill", FunctionReceivers.Server, skillIndex);
+    }
+
+    public void PointClickMovement(Vector3 position)
+    {
+        CallNetFunction("PointClickMovement", FunctionReceivers.Server, position);
     }
     #endregion
 
