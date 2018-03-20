@@ -46,8 +46,8 @@ public class UICharacterList : UIBase
         characterModelContainer.RemoveChildren();
         CharacterModels.Clear();
         // Show list of created characters
-        var selectableCharacters = CharacterDataExtension.LoadAllPersistentCharacterData();
-        selectableCharacters.Sort(new CharacterDataLastUpdateComparer().Desc());
+        var selectableCharacters = PlayerCharacterDataExtension.LoadAllPersistentCharacterData();
+        selectableCharacters.Sort(new PlayerCharacterDataLastUpdateComparer().Desc());
         CacheList.Generate(selectableCharacters, (index, character, ui) =>
         {
             var uiCharacter = ui.GetComponent<UICharacter>();
@@ -105,7 +105,7 @@ public class UICharacterList : UIBase
         }
         // Load gameplay scene, we're going to manage maps in gameplay scene later
         // So we can add gameplay UI just once in gameplay scene
-        var characterData = new CharacterData();
+        var characterData = new PlayerCharacterData();
         selectedUI.Data.CloneTo(characterData);
         LanRpgNetworkManager.SelectedCharacter = characterData;
         UISceneLoading.Singleton.LoadScene(GameInstance.Singleton.startSceneName);

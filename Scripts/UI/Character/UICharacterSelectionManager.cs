@@ -2,6 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UICharacterSelectionManager : UISelectionManager<ICharacterData, UICharacter, UICharacterEvent>
+public class UICharacterSelectionManager : UISelectionManager<IPlayerCharacterData, UICharacter, UICharacterEvent>
 {
 }

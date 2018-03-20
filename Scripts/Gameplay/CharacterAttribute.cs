@@ -40,7 +40,7 @@ public struct CharacterAttribute
         return cacheAttribute;
     }
 
-    public bool CanIncrease(ICharacterData character)
+    public bool CanIncrease(IPlayerCharacterData character)
     {
         return GetAttribute() != null && character.StatPoint > 0;
     }

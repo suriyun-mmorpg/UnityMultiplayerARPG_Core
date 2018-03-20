@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacter : UISelectionEntry<ICharacterData>
+public class UICharacter : UISelectionEntry<IPlayerCharacterData>
 {
     [Header("Display Format")]
     [Tooltip("Name Format => {0} = {Character name}")]

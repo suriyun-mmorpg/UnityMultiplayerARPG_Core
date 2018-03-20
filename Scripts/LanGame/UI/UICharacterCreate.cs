@@ -53,7 +53,7 @@ public class UICharacterCreate : UIBase
         var selectableCharacters = GameInstance.CharacterPrototypes.Values.ToList();
         CacheList.Generate(selectableCharacters, (index, characterPrototype, ui) =>
         {
-            var character = new CharacterData();
+            var character = new PlayerCharacterData();
             character.Id = characterPrototype.Id;
             character.SetNewCharacterData(characterPrototype.title, characterPrototype.Id);
             var uiCharacter = ui.GetComponent<UICharacter>();
@@ -115,7 +115,7 @@ public class UICharacterCreate : UIBase
         }
 
         var characterId = System.Guid.NewGuid().ToString();
-        var characterData = new CharacterData();
+        var characterData = new PlayerCharacterData();
         characterData.SetNewCharacterData(characterName, prototypeId);
         characterData.Id = characterId;
         characterData.SavePersistentCharacterData();

@@ -7,7 +7,7 @@ using LiteNetLibHighLevel;
 using UnityEditor;
 #endif
 
-public class PlayerCharacterEntity : CharacterEntity
+public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
 {
     public static PlayerCharacterEntity OwningCharacter { get; private set; }
 

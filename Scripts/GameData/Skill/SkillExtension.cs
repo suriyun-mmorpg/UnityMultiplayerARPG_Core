@@ -39,7 +39,7 @@ public static class SkillExtension
         return skill.maxLevel;
     }
 
-    public static bool CanLevelUp(this Skill skill, ICharacterData character, int level)
+    public static bool CanLevelUp(this Skill skill, IPlayerCharacterData character, int level)
     {
         if (skill == null || character == null)
             return false;

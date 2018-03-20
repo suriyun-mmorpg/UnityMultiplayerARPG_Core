@@ -41,7 +41,7 @@ public struct CharacterSkill
         return cacheSkill;
     }
 
-    public bool CanLevelUp(ICharacterData character)
+    public bool CanLevelUp(IPlayerCharacterData character)
     {
         return GetSkill().CanLevelUp(character, level);
     }

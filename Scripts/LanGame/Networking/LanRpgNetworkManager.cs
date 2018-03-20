@@ -17,7 +17,7 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
 
     public static GameStartType StartType;
     public static string ConnectingNetworkAddress;
-    public static CharacterData SelectedCharacter;
+    public static PlayerCharacterData SelectedCharacter;
     
     protected virtual void Start()
     {
@@ -105,7 +105,7 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
 
     public override void DeserializeClientReadyExtra(LiteNetLibIdentity playerIdentity, NetDataReader reader)
     {
-        var character = new CharacterData();
+        var character = new PlayerCharacterData();
         character.Id = reader.GetString();
         character.CharacterName = reader.GetString();
         character.PrototypeId = reader.GetString();
@@ -169,7 +169,7 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
             entry.amount = reader.GetInt();
             character.NonEquipItems.Add(entry);
         }
-        var characterEntity = playerIdentity.GetComponent<CharacterEntity>();
-        character.CloneTo(characterEntity);
+        var playerCharacterEntity = playerIdentity.GetComponent<PlayerCharacterEntity>();
+        character.CloneTo(playerCharacterEntity);
     }
 }
