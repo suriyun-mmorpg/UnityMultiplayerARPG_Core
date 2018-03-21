@@ -133,7 +133,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         {
             var destinationValue = destination.Value;
             CacheTargetObject.transform.position = destinationValue;
-            if (Vector3.Distance(destinationValue, CacheTransform.position) < stoppingDistance)
+            if (Vector3.Distance(destinationValue, CacheTransform.position) < stoppingDistance + 0.5f)
                 destination = null;
             CacheTargetObject.gameObject.SetActive(destination.HasValue);
         }
