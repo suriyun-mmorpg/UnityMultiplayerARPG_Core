@@ -196,12 +196,40 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             lastUpdateSkillAndBuffTime = Time.realtimeSinceStartup;
     }
 
+    #region Setup functions
     public override void OnBehaviourValidate()
     {
+        base.OnBehaviourValidate();
 #if UNITY_EDITOR
         SetupNetElements();
         EditorUtility.SetDirty(this);
 #endif
+    }
+
+    protected virtual void SetupNetElements()
+    {
+        characterName.sendOptions = SendOptions.ReliableUnordered;
+        characterName.forOwnerOnly = false;
+        modelId.sendOptions = SendOptions.ReliableUnordered;
+        modelId.forOwnerOnly = false;
+        classId.sendOptions = SendOptions.ReliableUnordered;
+        classId.forOwnerOnly = false;
+        level.sendOptions = SendOptions.ReliableOrdered;
+        level.forOwnerOnly = false;
+        exp.sendOptions = SendOptions.ReliableOrdered;
+        exp.forOwnerOnly = false;
+        currentHp.sendOptions = SendOptions.ReliableOrdered;
+        currentHp.forOwnerOnly = false;
+        currentMp.sendOptions = SendOptions.ReliableOrdered;
+        currentMp.forOwnerOnly = false;
+        equipWeapons.sendOptions = SendOptions.ReliableOrdered;
+        equipWeapons.forOwnerOnly = false;
+
+        attributes.forOwnerOnly = false;
+        skills.forOwnerOnly = true;
+        buffs.forOwnerOnly = false;
+        equipItems.forOwnerOnly = false;
+        nonEquipItems.forOwnerOnly = true;
     }
 
     public override void OnSetup()
@@ -247,6 +275,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         equipItems.onOperation -= OnEquipItemsOperation;
         nonEquipItems.onOperation -= OnNonEquipItemsOperation;
     }
+    #endregion
 
     #region Net functions callbacks
     protected void NetFuncAttackCallback()
@@ -898,33 +927,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
     #endregion
-
-    protected virtual void SetupNetElements()
-    {
-        characterName.sendOptions = SendOptions.ReliableUnordered;
-        characterName.forOwnerOnly = false;
-        modelId.sendOptions = SendOptions.ReliableUnordered;
-        modelId.forOwnerOnly = false;
-        classId.sendOptions = SendOptions.ReliableUnordered;
-        classId.forOwnerOnly = false;
-        level.sendOptions = SendOptions.ReliableOrdered;
-        level.forOwnerOnly = false;
-        exp.sendOptions = SendOptions.ReliableOrdered;
-        exp.forOwnerOnly = false;
-        currentHp.sendOptions = SendOptions.ReliableOrdered;
-        currentHp.forOwnerOnly = false;
-        currentMp.sendOptions = SendOptions.ReliableOrdered;
-        currentMp.forOwnerOnly = false;
-        equipWeapons.sendOptions = SendOptions.ReliableOrdered;
-        equipWeapons.forOwnerOnly = false;
-
-        attributes.forOwnerOnly = false;
-        skills.forOwnerOnly = true;
-        buffs.forOwnerOnly = false;
-        equipItems.forOwnerOnly = false;
-        nonEquipItems.forOwnerOnly = true;
-    }
-
+    
     #region Sync data changes callback
     /// <summary>
     /// Override this to do stuffs when model Id changed
