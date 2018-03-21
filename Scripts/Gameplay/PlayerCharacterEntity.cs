@@ -4,12 +4,10 @@ using UnityEngine;
 using UnityEngine.AI;
 using LiteNetLib;
 using LiteNetLibHighLevel;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 [RequireComponent(typeof(CapsuleCollider))]
 [RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(LiteNetLibTransform))]
 public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
 {
     public static PlayerCharacterEntity OwningCharacter { get; private set; }
@@ -44,11 +42,18 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     [Header("Movement AI")]
     [Range(0.01f, 1f)]
     public float stoppingDistance = 0.1f;
+    [Header("Movement Settings")]
+    public float groundingDistance = 0.1f;
+    public float jumpHeight = 2f;
+    public float gravityRate = 1f;
+    public float turnSpeed = 5f;
     #endregion
 
     #region Protected data
     protected Queue<Vector3> navPaths;
     protected Vector3 moveDirection;
+    protected bool isJumping;
+    protected bool isGrounded;
     #endregion
 
     #region Cache components
@@ -74,9 +79,26 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         }
     }
 
-    public FollowCameraControls CacheFollowCameraControls { get; protected set; }
+    private LiteNetLibTransform cacheNetTransform;
+    public LiteNetLibTransform CacheNetTransform
+    {
+        get
+        {
+            if (cacheNetTransform == null)
+                cacheNetTransform = GetComponent<LiteNetLibTransform>();
+            return cacheNetTransform;
+        }
+    }
+
+    public FollowCameraControls CacheMinimapCameraControls { get; protected set; }
+    public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
     public UISceneGameplay CacheUISceneGameplay { get; protected set; }
     #endregion
+
+    protected virtual void Awake()
+    {
+        CacheRigidbody.useGravity = false;
+    }
 
     protected virtual void Start()
     {
@@ -84,8 +106,10 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         if (IsLocalClient)
         {
             OwningCharacter = this;
-            CacheFollowCameraControls = Instantiate(gameInstance.gameplayCameraPrefab);
-            CacheFollowCameraControls.target = CacheTransform;
+            CacheMinimapCameraControls = Instantiate(gameInstance.minimapCameraPrefab);
+            CacheMinimapCameraControls.target = CacheTransform;
+            CacheGameplayCameraControls = Instantiate(gameInstance.gameplayCameraPrefab);
+            CacheGameplayCameraControls.target = CacheTransform;
             CacheUISceneGameplay = Instantiate(gameInstance.uiSceneGameplayPrefab);
             CacheUISceneGameplay.UpdateCharacter();
             CacheUISceneGameplay.UpdateSkills();
@@ -101,10 +125,49 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         UpdateInput();
     }
 
-    protected void FixedUpdate()
+    protected virtual void OnCollisionStay(Collision collisionInfo)
+    {
+        if (!isGrounded && collisionInfo.impulse.y > 0)
+            isGrounded = true;
+    }
+
+    protected virtual void FixedUpdate()
     {
         if (!IsServer)
             return;
+
+        if (isGrounded)
+        {
+            Vector3 velocity = CacheRigidbody.velocity;
+
+            if (moveDirection.magnitude != 0)
+            {
+                if (moveDirection.magnitude > 1)
+                    moveDirection = moveDirection.normalized;
+
+                var moveSpeed = this.GetStatsWithBuffs().moveSpeed;
+                var targetVelocity = moveDirection * moveSpeed;
+
+                // Apply a force that attempts to reach our target velocity
+                Vector3 velocityChange = (targetVelocity - velocity);
+                velocityChange.x = Mathf.Clamp(velocityChange.x, -moveSpeed, moveSpeed);
+                velocityChange.y = 0;
+                velocityChange.z = Mathf.Clamp(velocityChange.z, -moveSpeed, moveSpeed);
+                CacheRigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
+                // slerp to the desired rotation over time
+                CacheTransform.rotation = Quaternion.Slerp(CacheTransform.rotation, Quaternion.LookRotation(moveDirection), turnSpeed * Time.deltaTime);
+            }
+
+            // Jump
+            if (isJumping)
+            {
+                CacheRigidbody.velocity = new Vector3(velocity.x, CalculateJumpVerticalSpeed(), velocity.z);
+                isGrounded = false;
+            }
+        }
+
+        // We apply gravity manually for more tuning control
+        CacheRigidbody.AddForce(new Vector3(0, Physics.gravity.y * CacheRigidbody.mass * gravityRate, 0));
     }
 
     protected void LateUpdate()
@@ -137,8 +200,8 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         if (!IsLocalClient)
             return;
 
-        if (CacheFollowCameraControls != null)
-            CacheFollowCameraControls.updateRotation = Input.GetMouseButton(1);
+        if (CacheGameplayCameraControls != null)
+            CacheGameplayCameraControls.updateRotation = Input.GetMouseButton(1);
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -147,7 +210,27 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
                 PointClickMovement(hit.point);
         }
     }
+    
+    protected float CalculateJumpVerticalSpeed()
+    {
+        // From the jump height and gravity we deduce the upwards speed 
+        // for the character to reach at the apex.
+        return Mathf.Sqrt(2f * jumpHeight * -Physics.gravity.y * gravityRate);
+    }
 
+    protected override void SetupModel(CharacterModel characterModel)
+    {
+        CacheCapsuleCollider.center = characterModel.center;
+        CacheCapsuleCollider.radius = characterModel.radius;
+        CacheCapsuleCollider.height = characterModel.height;
+    }
+
+    protected override Vector3 GetMovementVelocity()
+    {
+        return CacheRigidbody.velocity;
+    }
+
+    #region Setup functions
     protected override void SetupNetElements()
     {
         base.SetupNetElements();
@@ -175,6 +258,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         RegisterNetFunction("AddSkill", netFuncAddSkill);
         RegisterNetFunction("PointClickMovement", netFuncPointClickMovement);
     }
+    #endregion
 
     #region Net functions callbacks
     protected void NetFuncSwapOrMergeItemCallback(NetFieldInt fromIndex, NetFieldInt toIndex)
@@ -296,6 +380,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     }
     #endregion
 
+    #region Sync data changes callback
     protected override void OnClassIdChange(string classId)
     {
         base.OnClassIdChange(classId);
@@ -371,6 +456,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
             CacheUISceneGameplay.UpdateNonEquipItems();
         }
     }
+    #endregion
 
     public void Warp(string mapName, Vector3 position)
     {
@@ -383,17 +469,5 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
             CurrentPosition = position;
             return;
         }
-    }
-
-    protected override void SetupModel(CharacterModel characterModel)
-    {
-        CacheCapsuleCollider.center = characterModel.center;
-        CacheCapsuleCollider.radius = characterModel.radius;
-        CacheCapsuleCollider.height = characterModel.height;
-    }
-
-    protected override Vector3 GetMovementVelocity()
-    {
-        return CacheRigidbody.velocity;
     }
 }
