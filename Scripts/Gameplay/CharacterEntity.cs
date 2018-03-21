@@ -208,11 +208,11 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected virtual void SetupNetElements()
     {
-        characterName.sendOptions = SendOptions.ReliableUnordered;
+        characterName.sendOptions = SendOptions.ReliableOrdered;
         characterName.forOwnerOnly = false;
-        modelId.sendOptions = SendOptions.ReliableUnordered;
+        modelId.sendOptions = SendOptions.ReliableOrdered;
         modelId.forOwnerOnly = false;
-        classId.sendOptions = SendOptions.ReliableUnordered;
+        classId.sendOptions = SendOptions.ReliableOrdered;
         classId.forOwnerOnly = false;
         level.sendOptions = SendOptions.ReliableOrdered;
         level.forOwnerOnly = false;
