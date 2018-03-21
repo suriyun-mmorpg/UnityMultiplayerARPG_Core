@@ -156,7 +156,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     {
         if (!IsServer)
             return;
-
+        
         if (isGrounded)
         {
             Vector3 velocity = CacheRigidbody.velocity;
