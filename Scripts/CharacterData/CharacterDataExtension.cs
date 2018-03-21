@@ -162,7 +162,10 @@ public static class CharacterDataExtension
     {
         var level = data.Level;
         var characterClass = data.GetClass();
-        var result = characterClass.baseStats + characterClass.statsIncreaseEachLevel * level;
+        var result = new CharacterStats();
+
+        if (characterClass != null)
+            result += characterClass.baseStats + characterClass.statsIncreaseEachLevel * level;
 
         var equipItems = data.EquipItems;
         foreach (var equipment in equipItems)
