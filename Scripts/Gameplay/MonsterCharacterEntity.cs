@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using LiteNetLibHighLevel;
 
 [RequireComponent(typeof(CapsuleCollider))]
 [RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(LiteNetLibTransform))]
 public class MonsterCharacterEntity : CharacterEntity
 {
     #region Cache components
@@ -29,7 +31,19 @@ public class MonsterCharacterEntity : CharacterEntity
             return cacheNavMeshAgent;
         }
     }
+
+    private LiteNetLibTransform cacheNetTransform;
+    public LiteNetLibTransform CacheNetTransform
+    {
+        get
+        {
+            if (cacheNetTransform == null)
+                cacheNetTransform = GetComponent<LiteNetLibTransform>();
+            return cacheNetTransform;
+        }
+    }
     #endregion
+
     protected override void SetupModel(CharacterModel characterModel)
     {
         CacheCapsuleCollider.center = characterModel.center;

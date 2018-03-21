@@ -17,3 +17,12 @@ public struct ItemAmountPair
     public Item item;
     public int amount;
 }
+
+[System.Serializable]
+public struct ItemDrop
+{
+    public Item item;
+    public int amount;
+    [Range(0f, 1f)]
+    public float dropRate;
+}
