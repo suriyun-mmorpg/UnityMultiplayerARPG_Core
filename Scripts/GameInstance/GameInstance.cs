@@ -13,6 +13,7 @@ public class GameInstance : MonoBehaviour
     [Header("Gameplay Objects")]
     public PlayerCharacterEntity playerCharacterEntityPrefab;
     public ItemDropEntity itemDropEntityPrefab;
+    public FollowCameraControls minimapCameraPrefab;
     public FollowCameraControls gameplayCameraPrefab;
     public UISceneGameplay uiSceneGameplayPrefab;
     [Header("Gameplay Database")]
