@@ -125,9 +125,16 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         UpdateInput();
     }
 
-    protected virtual void OnCollisionStay(Collision collisionInfo)
+
+    protected virtual void OnCollisionEnter(Collision collision)
     {
-        if (!isGrounded && collisionInfo.impulse.y > 0)
+        if (!isGrounded && collision.impulse.y > 0)
+            isGrounded = true;
+    }
+
+    protected virtual void OnCollisionStay(Collision collision)
+    {
+        if (!isGrounded && collision.impulse.y > 0)
             isGrounded = true;
     }
 
@@ -160,10 +167,10 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
 
             // Jump
             if (isJumping)
-            {
                 CacheRigidbody.velocity = new Vector3(velocity.x, CalculateJumpVerticalSpeed(), velocity.z);
+
+            if (Mathf.Abs(velocity.y) > groundingDistance)
                 isGrounded = false;
-            }
         }
 
         // We apply gravity manually for more tuning control
