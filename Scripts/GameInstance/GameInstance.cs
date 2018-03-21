@@ -15,6 +15,7 @@ public class GameInstance : MonoBehaviour
     public ItemDropEntity itemDropEntityPrefab;
     public FollowCameraControls minimapCameraPrefab;
     public FollowCameraControls gameplayCameraPrefab;
+    public GameObject targetObject;
     public UISceneGameplay uiSceneGameplayPrefab;
     [Header("Gameplay Database")]
     public BaseGameplayRule gameplayRule;

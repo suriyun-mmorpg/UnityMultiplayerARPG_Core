@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.EventSystems;
 using LiteNetLib;
 using LiteNetLibHighLevel;
 
@@ -54,6 +55,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     protected Vector3 moveDirection;
     protected bool isJumping;
     protected bool isGrounded;
+    protected Vector3? destination;
     #endregion
 
     #region Cache components
@@ -92,6 +94,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
 
     public FollowCameraControls CacheMinimapCameraControls { get; protected set; }
     public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
+    public GameObject CacheTargetObject { get; protected set; }
     public UISceneGameplay CacheUISceneGameplay { get; protected set; }
     #endregion
 
@@ -110,6 +113,8 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
             CacheMinimapCameraControls.target = CacheTransform;
             CacheGameplayCameraControls = Instantiate(gameInstance.gameplayCameraPrefab);
             CacheGameplayCameraControls.target = CacheTransform;
+            CacheTargetObject = Instantiate(gameInstance.targetObject);
+            CacheTargetObject.gameObject.SetActive(false);
             CacheUISceneGameplay = Instantiate(gameInstance.uiSceneGameplayPrefab);
             CacheUISceneGameplay.UpdateCharacter();
             CacheUISceneGameplay.UpdateSkills();
@@ -123,6 +128,15 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     {
         base.Update();
         UpdateInput();
+
+        if (destination.HasValue)
+        {
+            var destinationValue = destination.Value;
+            CacheTargetObject.transform.position = destinationValue;
+            if (Vector3.Distance(destinationValue, CacheTransform.position) < stoppingDistance)
+                destination = null;
+            CacheTargetObject.gameObject.SetActive(destination.HasValue);
+        }
     }
 
 
@@ -188,7 +202,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
             {
                 var target = navPaths.Peek();
                 target = new Vector3(target.x, 0, target.z);
-                var currentPosition = transform.position;
+                var currentPosition = CacheTransform.position;
                 currentPosition = new Vector3(currentPosition.x, 0, currentPosition.z);
                 moveDirection = (target - currentPosition).normalized;
                 if (Vector3.Distance(target, currentPosition) < stoppingDistance)
@@ -198,6 +212,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
             {
                 navPaths = null;
                 moveDirection = Vector3.zero;
+                CacheRigidbody.velocity = Vector3.zero;
             }
         }
     }
@@ -210,7 +225,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         if (CacheGameplayCameraControls != null)
             CacheGameplayCameraControls.updateRotation = Input.GetMouseButton(1);
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
         {
             RaycastHit hit;
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 100f))
@@ -383,6 +398,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
 
     public void PointClickMovement(Vector3 position)
     {
+        destination = position;
         CallNetFunction("PointClickMovement", FunctionReceivers.Server, position);
     }
     #endregion
