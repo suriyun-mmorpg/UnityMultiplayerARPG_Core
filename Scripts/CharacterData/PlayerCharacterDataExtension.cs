@@ -74,8 +74,8 @@ public static class PlayerCharacterDataExtension
             character.NonEquipItems.Add(characterItem);
         }
 
-        character.CurrentMapName = gameInstance.startSceneName;
-        character.RespawnMapName = gameInstance.startSceneName;
+        character.CurrentMapName = gameInstance.startScene;
+        character.RespawnMapName = gameInstance.startScene;
         character.CurrentPosition = gameInstance.startPosition;
         character.RespawnPosition = gameInstance.startPosition;
 

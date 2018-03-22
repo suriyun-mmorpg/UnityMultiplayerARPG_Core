@@ -71,7 +71,7 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
         {
             UISceneGlobal.Singleton.ShowMessageDialog("Disconnected", errorMessage, true, false, false, false, () =>
             {
-                UISceneLoading.Singleton.LoadScene(GameInstance.Singleton.homeSceneName);
+                UISceneLoading.Singleton.LoadScene(GameInstance.Singleton.homeScene);
             });
         }
     }
@@ -85,7 +85,7 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
     public override void OnStopHost()
     {
         if (!isQuit)
-            UISceneLoading.Singleton.LoadScene(GameInstance.Singleton.homeSceneName);
+            UISceneLoading.Singleton.LoadScene(GameInstance.Singleton.homeScene);
         base.OnStopHost();
     }
 }

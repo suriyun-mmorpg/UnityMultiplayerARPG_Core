@@ -36,8 +36,8 @@ public class GameInstance : MonoBehaviour
     public float pickUpItemDistance = 2f;
     public float dropDistance = 2f;
     [Header("Scene")]
-    public string homeSceneName = "Home";
-    public string startSceneName;
+    public UnityScene homeScene;
+    public UnityScene startScene;
     public Vector3 startPosition;
     [Header("Player Configs")]
     public int minCharacterNameLength = 2;
