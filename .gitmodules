@@ -4,3 +4,6 @@
 [submodule "CameraAndInput"]
 	path = CameraAndInput
 	url = https://github.com/insthync/unity-camera-and-input.git
+[submodule "UnityEditorUtils"]
+	path = UnityEditorUtils
+	url = https://github.com/insthync/UnityEditorUtils.git
