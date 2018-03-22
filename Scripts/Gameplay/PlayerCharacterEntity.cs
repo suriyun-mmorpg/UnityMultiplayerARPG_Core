@@ -6,7 +6,6 @@ using UnityEngine.EventSystems;
 using LiteNetLib;
 using LiteNetLibHighLevel;
 
-[RequireComponent(typeof(CapsuleCollider))]
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(LiteNetLibTransform))]
 public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
@@ -59,17 +58,6 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     #endregion
 
     #region Cache components
-    private CapsuleCollider cacheCapsuleCollider;
-    public CapsuleCollider CacheCapsuleCollider
-    {
-        get
-        {
-            if (cacheCapsuleCollider == null)
-                cacheCapsuleCollider = GetComponent<CapsuleCollider>();
-            return cacheCapsuleCollider;
-        }
-    }
-
     private Rigidbody cacheRigidbody;
     public Rigidbody CacheRigidbody
     {
@@ -98,8 +86,9 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     public UISceneGameplay CacheUISceneGameplay { get; protected set; }
     #endregion
 
-    protected virtual void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         CacheRigidbody.useGravity = false;
     }
 
@@ -238,13 +227,6 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         // From the jump height and gravity we deduce the upwards speed 
         // for the character to reach at the apex.
         return Mathf.Sqrt(2f * jumpHeight * -Physics.gravity.y * gravityRate);
-    }
-
-    protected override void SetupModel(CharacterModel characterModel)
-    {
-        CacheCapsuleCollider.center = characterModel.center;
-        CacheCapsuleCollider.radius = characterModel.radius;
-        CacheCapsuleCollider.height = characterModel.height;
     }
 
     protected override Vector3 GetMovementVelocity()

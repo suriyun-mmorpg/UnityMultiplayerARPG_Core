@@ -7,6 +7,7 @@ using LiteNetLibHighLevel;
 using UnityEditor;
 #endif
 
+[RequireComponent(typeof(CapsuleCollider))]
 public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
 {
     public const string ANIM_IS_DEAD = "IsDead";
@@ -134,6 +135,25 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     }
     #endregion
     
+    #region Cache components
+    private CapsuleCollider cacheCapsuleCollider;
+    public CapsuleCollider CacheCapsuleCollider
+    {
+        get
+        {
+            if (cacheCapsuleCollider == null)
+                cacheCapsuleCollider = GetComponent<CapsuleCollider>();
+            return cacheCapsuleCollider;
+        }
+    }
+    #endregion
+
+    protected virtual void Awake()
+    {
+        // Disable colliders, it will be enabled later when initialize model
+        CacheCapsuleCollider.enabled = false;
+    }
+
     protected virtual void Update()
     {
         // Use this to update animations
@@ -1040,7 +1060,14 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
 
-    protected abstract void SetupModel(CharacterModel characterModel);
+    protected virtual void SetupModel(CharacterModel characterModel)
+    {
+        CacheCapsuleCollider.center = characterModel.center;
+        CacheCapsuleCollider.radius = characterModel.radius;
+        CacheCapsuleCollider.height = characterModel.height;
+        CacheCapsuleCollider.enabled = true;
+    }
+
     protected abstract Vector3 GetMovementVelocity();
 
     public static string GetBuffKey(string skillId, bool isDebuff)
