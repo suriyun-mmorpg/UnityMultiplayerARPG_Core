@@ -25,6 +25,10 @@ public class GameInstance : MonoBehaviour
     public Item[] items;
     public int[] expTree;
     [Header("Gameplay Configs")]
+    public UnityLayer playerCharacterLayer;
+    public UnityLayer monsterCharacterLayer;
+    public UnityLayer npcCharacterLayer;
+    public UnityLayer itemDropLayer;
     public int increaseStatPointEachLevel = 5;
     public int increaseSkillPointEachLevel = 1;
     public int startGold = 0;
