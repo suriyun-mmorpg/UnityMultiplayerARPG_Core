@@ -17,7 +17,7 @@ public class CollisionIgnore : MonoBehaviour
 [System.Serializable]
 public struct CollisionIgnoreOption
 {
-    public SingleUnityLayer layer1;
-    public SingleUnityLayer layer2;
+    public UnityLayer layer1;
+    public UnityLayer layer2;
     public bool ignore;
 }
