@@ -4,23 +4,11 @@ using UnityEngine;
 using UnityEngine.AI;
 using LiteNetLibHighLevel;
 
-[RequireComponent(typeof(CapsuleCollider))]
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(LiteNetLibTransform))]
 public class MonsterCharacterEntity : CharacterEntity
 {
     #region Cache components
-    private CapsuleCollider cacheCapsuleCollider;
-    public CapsuleCollider CacheCapsuleCollider
-    {
-        get
-        {
-            if (cacheCapsuleCollider == null)
-                cacheCapsuleCollider = GetComponent<CapsuleCollider>();
-            return cacheCapsuleCollider;
-        }
-    }
-
     private NavMeshAgent cacheNavMeshAgent;
     public NavMeshAgent CacheNavMeshAgent
     {
@@ -43,6 +31,11 @@ public class MonsterCharacterEntity : CharacterEntity
         }
     }
     #endregion
+
+    protected override void Awake()
+    {
+        base.Awake();
+    }
 
     protected override void SetupModel(CharacterModel characterModel)
     {
