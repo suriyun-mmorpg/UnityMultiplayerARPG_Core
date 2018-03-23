@@ -28,8 +28,7 @@ public class GameInstance : MonoBehaviour
     public UnityTag playerTag;
     public UnityTag npcTag;
     public UnityTag itemDropTag;
-    public UnityLayer playerLayer;
-    public UnityLayer npcLayer;
+    public UnityLayer characterLayer;
     public UnityLayer itemDropLayer;
     public int increaseStatPointEachLevel = 5;
     public int increaseSkillPointEachLevel = 1;

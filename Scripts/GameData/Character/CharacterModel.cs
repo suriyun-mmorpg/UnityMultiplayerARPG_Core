@@ -57,14 +57,31 @@ public class CharacterModel : MonoBehaviour
         }
     }
 
+    private readonly Dictionary<Transform, GameObject> cacheModels = new Dictionary<Transform, GameObject>();
+
+    private void CreateCacheModel(Transform container, GameObject model)
+    {
+        DestroyCacheModel(container);
+        if (model == null)
+            return;
+        cacheModels[container] = model;
+    }
+
+    private void DestroyCacheModel(Transform container)
+    {
+        GameObject oldModel;
+        if (container != null && cacheModels.TryGetValue(container, out oldModel))
+        {
+            Destroy(oldModel);
+            cacheModels.Remove(container);
+        }
+    }
+
     public void SetEquipWeapons(EquipWeapons equipWeapons)
     {
-        if (rightHandContainer != null)
-            rightHandContainer.RemoveChildren();
-        if (leftHandContainer != null)
-            leftHandContainer.RemoveChildren();
-        if (shieldContainer != null)
-            shieldContainer.RemoveChildren();
+        DestroyCacheModel(rightHandContainer);
+        DestroyCacheModel(leftHandContainer);
+        DestroyCacheModel(shieldContainer);
 
         var rightHandWeapon = equipWeapons.rightHand.GetWeaponItem();
         var leftHandWeapon = equipWeapons.leftHand.GetWeaponItem();
@@ -83,7 +100,7 @@ public class CharacterModel : MonoBehaviour
         // Clear equipped item models
         foreach (var container in containers)
         {
-            container.RemoveChildren();
+            DestroyCacheModel(container);
         }
 
         foreach (var equipItem in equipItems)
@@ -107,6 +124,7 @@ public class CharacterModel : MonoBehaviour
         equipmentModel.transform.localEulerAngles = Vector3.zero;
         equipmentModel.transform.localScale = Vector3.one;
         equipmentModel.gameObject.SetActive(true);
+        CreateCacheModel(container, equipmentModel);
     }
 
     private void OnDrawGizmos()

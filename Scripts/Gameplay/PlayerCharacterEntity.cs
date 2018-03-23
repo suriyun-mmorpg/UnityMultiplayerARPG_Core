@@ -86,18 +86,19 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     public UISceneGameplay CacheUISceneGameplay { get; protected set; }
     #endregion
 
-    protected virtual void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         CacheRigidbody.useGravity = false;
         var gameInstance = GameInstance.Singleton;
         gameObject.tag = gameInstance.playerTag;
-        gameObject.layer = gameInstance.playerLayer;
     }
 
-    protected virtual void Start()
+    protected override void Start()
     {
+        base.Start();
         var gameInstance = GameInstance.Singleton;
-        if (IsLocalClient)
+        if (IsOwnerClient)
         {
             OwningCharacter = this;
             CacheMinimapCameraControls = Instantiate(gameInstance.minimapCameraPrefab);
@@ -147,7 +148,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
 
     protected virtual void FixedUpdate()
     {
-        if (!IsServer && !IsLocalClient)
+        if (!IsServer && !IsOwnerClient)
             return;
         
         if (isGrounded)
@@ -186,7 +187,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
 
     protected void LateUpdate()
     {
-        if (!IsServer && !IsLocalClient)
+        if (!IsServer && !IsOwnerClient)
             return;
 
         if (navPaths != null)
@@ -215,7 +216,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
 
     protected virtual void UpdateInput()
     {
-        if (!IsLocalClient)
+        if (!IsOwnerClient)
             return;
 
         if (CacheGameplayCameraControls != null)
@@ -231,8 +232,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
                 var hitTransform = hit.transform;
                 var hitLayer = hitTransform.gameObject.layer;
                 var hitPoint = hit.point;
-                if (hitLayer == gameInstance.playerLayer ||
-                    hitLayer == gameInstance.npcLayer ||
+                if (hitLayer == gameInstance.characterLayer ||
                     hitLayer == gameInstance.itemDropLayer)
                 {
                     var networkEntity = hitTransform.GetComponent<RpgNetworkEntity>();
@@ -435,7 +435,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     {
         base.OnClassIdChange(classId);
 
-        if (IsLocalClient && CacheUISceneGameplay != null)
+        if (IsOwnerClient && CacheUISceneGameplay != null)
         {
             CacheUISceneGameplay.UpdateCharacter();
             CacheUISceneGameplay.UpdateSkills();
@@ -448,7 +448,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     {
         base.OnChangeEquipWeapons(equipWeapons);
 
-        if (IsLocalClient && CacheUISceneGameplay != null)
+        if (IsOwnerClient && CacheUISceneGameplay != null)
         {
             CacheUISceneGameplay.UpdateCharacter();
             CacheUISceneGameplay.UpdateEquipItems();
@@ -459,7 +459,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     {
         base.OnAttributesOperation(operation, index);
 
-        if (IsLocalClient && CacheUISceneGameplay != null)
+        if (IsOwnerClient && CacheUISceneGameplay != null)
             CacheUISceneGameplay.UpdateCharacter();
     }
 
@@ -467,7 +467,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     {
         base.OnSkillsOperation(operation, index);
 
-        if (IsLocalClient && CacheUISceneGameplay != null)
+        if (IsOwnerClient && CacheUISceneGameplay != null)
         {
             CacheUISceneGameplay.UpdateCharacter();
             CacheUISceneGameplay.UpdateSkills();
@@ -478,7 +478,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     {
         base.OnBuffsOperation(operation, index);
 
-        if (IsLocalClient && CacheUISceneGameplay != null)
+        if (IsOwnerClient && CacheUISceneGameplay != null)
         {
             CacheUISceneGameplay.UpdateCharacter();
             CacheUISceneGameplay.UpdateBuffs();
@@ -489,7 +489,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     {
         base.OnEquipItemsOperation(operation, index);
 
-        if (IsLocalClient && CacheUISceneGameplay != null)
+        if (IsOwnerClient && CacheUISceneGameplay != null)
         {
             CacheUISceneGameplay.UpdateCharacter();
             CacheUISceneGameplay.UpdateEquipItems();
@@ -500,7 +500,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     {
         base.OnNonEquipItemsOperation(operation, index);
 
-        if (IsLocalClient && CacheUISceneGameplay != null)
+        if (IsOwnerClient && CacheUISceneGameplay != null)
         {
             CacheUISceneGameplay.UpdateCharacter();
             CacheUISceneGameplay.UpdateNonEquipItems();
@@ -518,20 +518,20 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
             {
                 position = entity.CacheTransform.position;
                 var gameInstance = GameInstance.Singleton;
-                var layer = entity.gameObject.layer;
-                if (layer == gameInstance.playerLayer)
+                var tag = entity.gameObject.tag;
+                if (tag.Equals(gameInstance.playerTag))
                 {
                     var playerEntity = entity as PlayerCharacterEntity;
                     if (playerEntity != null && playerEntity.CurrentHp > 0)
                         SetTargetEntity(playerEntity);
                 }
-                else if (layer == gameInstance.npcLayer)
+                else if (tag.Equals(gameInstance.npcTag))
                 {
                     var npcEntity = entity as NonPlayerCharacterEntity;
                     if (npcEntity != null && npcEntity.CurrentHp > 0)
                         SetTargetEntity(npcEntity);
                 }
-                else if (layer == gameInstance.itemDropLayer)
+                else if (tag.Equals(gameInstance.itemDropTag))
                 {
                     var itemDropEntity = entity as ItemDropEntity;
                     if (itemDropEntity != null)

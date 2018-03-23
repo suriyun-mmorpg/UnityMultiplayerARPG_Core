@@ -44,11 +44,11 @@ public class NonPlayerCharacterEntity : CharacterEntity
     }
     #endregion
 
-    protected virtual void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         var gameInstance = GameInstance.Singleton;
         gameObject.tag = gameInstance.npcTag;
-        gameObject.layer = gameInstance.npcLayer;
         RandomWanderTime();
         SetFindTargetTime();
     }
@@ -97,7 +97,7 @@ public class NonPlayerCharacterEntity : CharacterEntity
                     if (targetCharacter == null || targetCharacter.CurrentHp <= 0)
                     {
                         // Find nearby character by layer mask
-                        var foundObjects = new List<Collider>(Physics.OverlapSphere(CacheTransform.position, prototype.visualRange, gameInstance.playerLayer.Mask | gameInstance.npcLayer.Mask));
+                        var foundObjects = new List<Collider>(Physics.OverlapSphere(CacheTransform.position, prototype.visualRange, gameInstance.characterLayer.Mask));
                         foundObjects = foundObjects.OrderBy(a => System.Guid.NewGuid()).ToList();
                         foreach (var foundObject in foundObjects)
                         {
@@ -186,7 +186,7 @@ public class NonPlayerCharacterEntity : CharacterEntity
                 // If it's assist character call another character for assist
                 if (prototype.characteristic == NpcCharacteristic.Assist)
                 {
-                    var foundObjects = new List<Collider>(Physics.OverlapSphere(CacheTransform.position, prototype.visualRange, gameInstance.npcLayer.Mask));
+                    var foundObjects = new List<Collider>(Physics.OverlapSphere(CacheTransform.position, prototype.visualRange, gameInstance.characterLayer.Mask));
                     foreach (var foundObject in foundObjects)
                     {
                         var npcEntity = foundObject.GetComponent<NonPlayerCharacterEntity>();

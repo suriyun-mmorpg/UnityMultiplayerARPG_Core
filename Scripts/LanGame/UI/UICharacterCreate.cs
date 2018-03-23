@@ -53,11 +53,12 @@ public class UICharacterCreate : UIBase
         var selectableCharacters = GameInstance.CharacterPrototypes.Values.ToList();
         CacheList.Generate(selectableCharacters, (index, characterPrototype, ui) =>
         {
+            var prototypeId = characterPrototype.Id;
             var character = new PlayerCharacterData();
-            character.Id = characterPrototype.Id;
+            character.Id = prototypeId;
             character.SetNewCharacterData(characterPrototype.title, characterPrototype.Id);
             var uiCharacter = ui.GetComponent<UICharacter>();
-            uiCharacter.Data = character;
+            uiCharacter.Setup(character, prototypeId);
             // Select trigger when add first entry so deactive all models is okay beacause first model will active
             var characterModel = character.InstantiateModel(characterModelContainer);
             CharacterModels[character.Id] = characterModel;
@@ -76,7 +77,7 @@ public class UICharacterCreate : UIBase
     protected void OnSelectCharacter(UICharacter ui)
     {
         characterModelContainer.SetChildrenActive(false);
-        ShowCharacter(ui.Data.Id);
+        ShowCharacter(ui.prototypeId);
     }
 
     protected void ShowCharacter(string id)
@@ -97,7 +98,7 @@ public class UICharacterCreate : UIBase
             Debug.LogWarning("Cannot create character, did not selected character class");
             return;
         }
-        var prototypeId = selectedUI.Data.ClassId;
+        var prototypeId = selectedUI.prototypeId;
         var characterName = inputCharacterName.text.Trim();
         var minCharacterNameLength = gameInstance.minCharacterNameLength;
         var maxCharacterNameLength = gameInstance.maxCharacterNameLength;

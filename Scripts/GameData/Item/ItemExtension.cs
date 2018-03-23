@@ -92,7 +92,7 @@ public static class ItemExtension
         return GameDataHelpers.CalculateEffectivenessDamage(weaponItem.WeaponType.CacheEffectivenessAttributes, character);
     }
 
-    public static Dictionary<DamageElement, DamageAmount> GetAllDamages(this WeaponItem weaponItem, IPlayerCharacterData character, int level)
+    public static Dictionary<DamageElement, DamageAmount> GetAllDamages(this WeaponItem weaponItem, ICharacterData character, int level)
     {
         if (weaponItem == null)
             return new Dictionary<DamageElement, DamageAmount>();

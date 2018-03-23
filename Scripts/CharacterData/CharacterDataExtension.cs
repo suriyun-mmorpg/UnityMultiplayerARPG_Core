@@ -7,7 +7,7 @@ public static class CharacterDataExtension
     public static CharacterClass GetClass(this ICharacterData data)
     {
         CharacterClass characterClass = null;
-        if (!GameInstance.CharacterClasses.TryGetValue(data.ClassId, out characterClass))
+        if (string.IsNullOrEmpty(data.ClassId) || !GameInstance.CharacterClasses.TryGetValue(data.ClassId, out characterClass))
             return null;
 
         return characterClass;
@@ -16,10 +16,11 @@ public static class CharacterDataExtension
     public static CharacterModel InstantiateModel(this ICharacterData data, Transform parent)
     {
         CharacterModel characterModel = null;
-        if (!GameInstance.CharacterModels.TryGetValue(data.ModelId, out characterModel))
+        if (string.IsNullOrEmpty(data.ModelId) || !GameInstance.CharacterModels.TryGetValue(data.ModelId, out characterModel))
             return null;
 
         var result = Object.Instantiate(characterModel, parent);
+        result.gameObject.SetLayerRecursively(GameInstance.Singleton.characterLayer, true);
         result.gameObject.SetActive(true);
         result.transform.localPosition = Vector3.zero;
         return result;

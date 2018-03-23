@@ -83,7 +83,8 @@ public class UICharacterList : UIBase
         buttonStart.gameObject.SetActive(true);
         buttonDelete.gameObject.SetActive(true);
         characterModelContainer.SetChildrenActive(false);
-        ShowCharacter(ui.Data.Id);
+        var playerCharacter = ui.Data as IPlayerCharacterData;
+        ShowCharacter(playerCharacter.Id);
     }
 
     protected void ShowCharacter(string id)
@@ -106,7 +107,8 @@ public class UICharacterList : UIBase
         // Load gameplay scene, we're going to manage maps in gameplay scene later
         // So we can add gameplay UI just once in gameplay scene
         var characterData = new PlayerCharacterData();
-        selectedUI.Data.CloneTo(characterData);
+        var playerCharacter = selectedUI.Data as IPlayerCharacterData;
+        playerCharacter.CloneTo(characterData);
         LanRpgNetworkManager.SelectedCharacter = characterData;
         UISceneLoading.Singleton.LoadScene(GameInstance.Singleton.startScene);
     }
@@ -119,8 +121,9 @@ public class UICharacterList : UIBase
             Debug.LogWarning("Cannot delete character, No chosen character");
             return;
         }
-
-        SelectionManager.SelectedUI.Data.DeletePersistentCharacterData();
+        
+        var playerCharacter = SelectionManager.SelectedUI.Data as IPlayerCharacterData;
+        playerCharacter.DeletePersistentCharacterData();
         // Reload characters
         LoadCharacters();
     }

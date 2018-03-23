@@ -78,7 +78,6 @@ public static class PlayerCharacterDataExtension
         character.RespawnMapName = gameInstance.startScene;
         character.CurrentPosition = gameInstance.startPosition;
         character.RespawnPosition = gameInstance.startPosition;
-
         return character;
     }
 

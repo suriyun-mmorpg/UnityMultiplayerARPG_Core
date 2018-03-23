@@ -5,8 +5,10 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacter : UISelectionEntry<IPlayerCharacterData>
+public class UICharacter : UISelectionEntry<ICharacterData>
 {
+    public string prototypeId { get; protected set; }
+
     [Header("Display Format")]
     [Tooltip("Name Format => {0} = {Character name}")]
     public string nameFormat = "{0}";
@@ -85,6 +87,12 @@ public class UICharacter : UISelectionEntry<IPlayerCharacterData>
         }
     }
 
+    public void Setup(ICharacterData data, string prototypeId)
+    {
+        this.prototypeId = prototypeId;
+        Data = data;
+    }
+
     private void Update()
     {
         if (textName != null)
@@ -143,14 +151,15 @@ public class UICharacter : UISelectionEntry<IPlayerCharacterData>
         if (imageMpGage != null)
             imageMpGage.fillAmount = maxMp <= 0 ? 1 : currentMp / maxMp;
 
+        var playerCharacter = Data as IPlayerCharacterData;
         if (textStatPoint != null)
-            textStatPoint.text = string.Format(statPointFormat, Data == null ? "N/A" : Data.StatPoint.ToString("N0"));
+            textStatPoint.text = string.Format(statPointFormat, playerCharacter == null ? "N/A" : playerCharacter.StatPoint.ToString("N0"));
 
         if (textSkillPoint != null)
-            textSkillPoint.text = string.Format(skillPointFormat, Data == null ? "N/A" : Data.SkillPoint.ToString("N0"));
+            textSkillPoint.text = string.Format(skillPointFormat, playerCharacter == null ? "N/A" : playerCharacter.SkillPoint.ToString("N0"));
 
         if (textGold != null)
-            textGold.text = string.Format(goldFormat, Data == null ? "N/A" : Data.Gold.ToString("N0"));
+            textGold.text = string.Format(goldFormat, playerCharacter == null ? "N/A" : playerCharacter.Gold.ToString("N0"));
 
     }
 

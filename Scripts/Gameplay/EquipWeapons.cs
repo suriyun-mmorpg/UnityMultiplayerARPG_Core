@@ -10,6 +10,49 @@ public struct EquipWeapons
     public CharacterItem rightHand;
     public CharacterItem leftHand;
 
+    public float GetAttackRange()
+    {
+        float? minRange = null;
+        Damage tempDamage;
+        float tempRange = 0f;
+        var rightHandWeapon = rightHand.GetWeaponItem();
+        var leftHandWeapon = leftHand.GetWeaponItem();
+        if (rightHandWeapon != null)
+        {
+            tempDamage = rightHandWeapon.WeaponType.damage;
+            if (TryGetAttackRange(tempDamage, out tempRange) && (!minRange.HasValue || minRange.Value > tempRange))
+                minRange = tempRange;
+        }
+        if (leftHandWeapon)
+        {
+            tempDamage = leftHandWeapon.WeaponType.damage;
+            if (TryGetAttackRange(tempDamage, out tempRange) && (!minRange.HasValue || minRange.Value > tempRange))
+                minRange = tempRange;
+        }
+        if (!minRange.HasValue)
+        {
+            tempDamage = GameInstance.Singleton.DefaultWeaponType.damage;
+            if (TryGetAttackRange(tempDamage, out tempRange) && (!minRange.HasValue || minRange.Value > tempRange))
+                minRange = tempRange;
+        }
+        return minRange.Value;
+    }
+
+    private bool TryGetAttackRange(Damage weaponDamage, out float range)
+    {
+        range = 0f;
+        switch (weaponDamage.damageType)
+        {
+            case DamageType.Melee:
+                range = weaponDamage.hitDistance;
+                return true;
+            case DamageType.Missile:
+                range = weaponDamage.missileDistance;
+                return true;
+        }
+        return false;
+    }
+
     public CharacterItem GetRandomedItem(out bool isLeftHand)
     {
         isLeftHand = false;

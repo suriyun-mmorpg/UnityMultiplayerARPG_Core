@@ -23,23 +23,6 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     public const string ANIM_DO_ACTION = "DoAction";
     public const string ANIM_ACTION_ID = "ActionId";
     public const float UPDATE_SKILL_BUFF_INTERVAL = 1f;
-    // Use id as primary key
-    #region Sync data
-    public SyncFieldString modelId = new SyncFieldString();
-    public SyncFieldString classId = new SyncFieldString();
-    public SyncFieldString characterName = new SyncFieldString();
-    public SyncFieldInt level = new SyncFieldInt();
-    public SyncFieldInt exp = new SyncFieldInt();
-    public SyncFieldFloat currentHp = new SyncFieldFloat();
-    public SyncFieldFloat currentMp = new SyncFieldFloat();
-    public SyncFieldEquipWeapons equipWeapons = new SyncFieldEquipWeapons();
-    // List
-    public SyncListCharacterAttribute attributes = new SyncListCharacterAttribute();
-    public SyncListCharacterSkill skills = new SyncListCharacterSkill();
-    public SyncListCharacterBuff buffs = new SyncListCharacterBuff();
-    public SyncListCharacterItem equipItems = new SyncListCharacterItem();
-    public SyncListCharacterItem nonEquipItems = new SyncListCharacterItem();
-    #endregion
 
     #region Private data
     private RpgNetworkEntity targetEntity;
@@ -60,6 +43,29 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     protected LiteNetLibFunction<NetFieldInt, NetFieldInt> netFuncDropItem;
     protected LiteNetLibFunction<NetFieldInt, NetFieldString> netFuncEquipItem;
     protected LiteNetLibFunction<NetFieldString> netFuncUnEquipItem;
+    #endregion
+
+    #region Public data
+    public GameObject[] ownerObjects;
+    public GameObject[] nonOwnerObjects;
+    #endregion
+
+    // Use id as primary key
+    #region Sync data
+    public SyncFieldString modelId = new SyncFieldString();
+    public SyncFieldString classId = new SyncFieldString();
+    public SyncFieldString characterName = new SyncFieldString();
+    public SyncFieldInt level = new SyncFieldInt();
+    public SyncFieldInt exp = new SyncFieldInt();
+    public SyncFieldFloat currentHp = new SyncFieldFloat();
+    public SyncFieldFloat currentMp = new SyncFieldFloat();
+    public SyncFieldEquipWeapons equipWeapons = new SyncFieldEquipWeapons();
+    // List
+    public SyncListCharacterAttribute attributes = new SyncListCharacterAttribute();
+    public SyncListCharacterSkill skills = new SyncListCharacterSkill();
+    public SyncListCharacterBuff buffs = new SyncListCharacterBuff();
+    public SyncListCharacterItem equipItems = new SyncListCharacterItem();
+    public SyncListCharacterItem nonEquipItems = new SyncListCharacterItem();
     #endregion
 
     #region Interface implementation
@@ -158,6 +164,24 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
     #endregion
+
+    protected virtual void Awake()
+    {
+        var gameInstance = GameInstance.Singleton;
+        gameObject.layer = gameInstance.characterLayer;
+    }
+
+    protected virtual void Start()
+    {
+        foreach (var ownerObject in ownerObjects)
+        {
+            ownerObject.SetActive(IsOwnerClient);
+        }
+        foreach (var nonOwnerObject in nonOwnerObjects)
+        {
+            nonOwnerObject.SetActive(!IsOwnerClient);
+        }
+    }
 
     protected virtual void Update()
     {
