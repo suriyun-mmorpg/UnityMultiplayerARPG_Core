@@ -6,6 +6,7 @@ public enum NpcCharacteristic
 {
     Normal,
     Aggressive,
+    Assist,
     Conversate,
 }
 
@@ -14,14 +15,12 @@ public class NpcPrototype : CharacterPrototype
 {
     [Header("Monster Data")]
     public NpcCharacteristic characteristic;
+    [Tooltip("This will work with assist characteristic only, to detect ally")]
+    public ushort allyId;
     public float visualRange = 5f;
-    public float randomWanderDurationMin = 1f;
-    public float randomWanderDurationMax = 5f;
-    public float randomWanderRadius = 5f;
     [Tooltip("Level will be used to show only, not calculating with stats/skills")]
     public int level;
     public CharacterStats stats;
-    public Skill[] skills;
 
     [Header("Killing Rewards")]
     public int randomExpMin;

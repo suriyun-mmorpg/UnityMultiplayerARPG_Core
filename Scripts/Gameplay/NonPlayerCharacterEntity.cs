@@ -9,11 +9,15 @@ using LiteNetLibHighLevel;
 [RequireComponent(typeof(LiteNetLibTransform))]
 public class NonPlayerCharacterEntity : CharacterEntity
 {
+    public const float RANDOM_WANDER_DURATION_MIN = 1f;
+    public const float RANDOM_WANDER_DURATION_MAX = 5f;
+    public const float RANDOM_WANDER_RADIUS = 5f;
+    public const float AGGRESSIVE_FIND_TARGET_DELAY = 1f;
+
     #region Protected data
-    protected RpgNetworkEntity targetEntity;
-    protected CharacterTargetType targetType;
     protected NpcPrototype prototype;
     protected float wanderTime;
+    protected float findTargetTime;
     #endregion
 
     #region Cache components
@@ -46,6 +50,7 @@ public class NonPlayerCharacterEntity : CharacterEntity
         gameObject.tag = gameInstance.npcTag;
         gameObject.layer = gameInstance.npcLayer;
         RandomWanderTime();
+        SetFindTargetTime();
     }
 
     protected override void Update()
@@ -53,35 +58,52 @@ public class NonPlayerCharacterEntity : CharacterEntity
         base.Update();
 
         var gameInstance = GameInstance.Singleton;
+        var targetEntity = GetTargetEntity();
         if (targetEntity != null)
         {
             // Lookat target then do anything when it's in range
+            CacheNavMeshAgent.updateRotation = false;
+            var currentPosition = CacheTransform.position;
+            var targetPosition = targetEntity.CacheTransform.position;
+            var moveDirection = (targetPosition - currentPosition).normalized;
+            // slerp to the desired rotation over time
+            CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(moveDirection), CacheNavMeshAgent.angularSpeed * Time.deltaTime);
         }
         else
         {
+            // Update rotation while wandering
+            CacheNavMeshAgent.updateRotation = true;
+            // While character is moving then random next wander time
+            // To let character stop movement some time before random next wander time
+            if (!CacheNavMeshAgent.isStopped)
+                RandomWanderTime();
             // Wandering when it's time
             if (Time.realtimeSinceStartup >= wanderTime)
             {
-                Vector3 randomPosition = CacheTransform.position + (Random.insideUnitSphere * prototype.randomWanderRadius);
+                // If stopped then random
+                Vector3 randomPosition = CacheTransform.position + (Random.insideUnitSphere * RANDOM_WANDER_RADIUS);
                 NavMeshHit navMeshHit;
-                NavMesh.SamplePosition(randomPosition, out navMeshHit, prototype.randomWanderRadius, 1);
+                NavMesh.SamplePosition(randomPosition, out navMeshHit, RANDOM_WANDER_RADIUS, 1);
                 CacheNavMeshAgent.SetDestination(navMeshHit.position);
-                RandomWanderTime();
             }
             else
             {
-                if (prototype.characteristic == NpcCharacteristic.Aggressive)
+                // If it's aggressive character, finding attacking target
+                if (prototype.characteristic == NpcCharacteristic.Aggressive &&
+                    Time.realtimeSinceStartup >= findTargetTime)
                 {
-                    // Find nearby character by layer mask
-                    var foundObjects = new List<Collider>(Physics.OverlapSphere(CacheTransform.position, gameInstance.playerLayer.Mask | gameInstance.npcLayer.Mask));
-                    foundObjects = foundObjects.OrderBy(a => System.Guid.NewGuid()).ToList();
-                    foreach (var foundObject in foundObjects)
+                    SetFindTargetTime();
+                    var targetCharacter = GetTargetEntity<CharacterEntity>();
+                    if (targetCharacter == null || targetCharacter.CurrentHp <= 0)
                     {
-                        var characterEntity = foundObject.GetComponent<CharacterEntity>();
-                        if (characterEntity != null && characterEntity.IsEnemy(this))
+                        // Find nearby character by layer mask
+                        var foundObjects = new List<Collider>(Physics.OverlapSphere(CacheTransform.position, prototype.visualRange, gameInstance.playerLayer.Mask | gameInstance.npcLayer.Mask));
+                        foundObjects = foundObjects.OrderBy(a => System.Guid.NewGuid()).ToList();
+                        foreach (var foundObject in foundObjects)
                         {
-                            targetEntity = characterEntity;
-                            CacheNavMeshAgent.SetDestination(targetEntity.CacheTransform.position);
+                            var characterEntity = foundObject.GetComponent<CharacterEntity>();
+                            if (characterEntity != null && IsEnemy(characterEntity))
+                                SetAttackTarget(characterEntity);
                         }
                     }
                 }
@@ -91,37 +113,86 @@ public class NonPlayerCharacterEntity : CharacterEntity
 
     protected void RandomWanderTime()
     {
-        wanderTime = Time.realtimeSinceStartup + Random.Range(prototype.randomWanderDurationMin, prototype.randomWanderDurationMax);
+        wanderTime = Time.realtimeSinceStartup + Random.Range(RANDOM_WANDER_DURATION_MIN, RANDOM_WANDER_DURATION_MAX);
     }
 
-    public override Vector3 GetMovementVelocity()
+    protected void SetFindTargetTime()
+    {
+        findTargetTime = Time.realtimeSinceStartup + AGGRESSIVE_FIND_TARGET_DELAY;
+    }
+
+    protected override Vector3 GetMovementVelocity()
     {
         return CacheNavMeshAgent.velocity;
     }
 
-    public override CharacterAction GetCharacterAction(CharacterEntity characterEntity)
+    protected override CharacterAction GetCharacterAction(CharacterEntity characterEntity)
     {
         return CharacterAction.Attack;
     }
 
-    public override bool IsAlly(CharacterEntity characterEntity)
+    protected override bool IsAlly(CharacterEntity characterEntity)
     {
+        // If this character have been attacked by any character
+        // It will tell another ally nearby to help
+        if (characterEntity == null)
+            return false;
+        var npcEntity = characterEntity as NonPlayerCharacterEntity;
+        if (npcEntity != null && npcEntity.prototype.allyId == prototype.allyId)
+            return true;
         return false;
     }
 
-    public override bool IsEnemy(CharacterEntity characterEntity)
+    protected override bool IsEnemy(CharacterEntity characterEntity)
     {
-        return true;
+        // TODO: Mercenary will be implemented later
+        // So there are NonPlayerCharacterEntity that is enemy with this character
+        if (characterEntity is PlayerCharacterEntity)
+            return true;
+        return false;
+    }
+
+    public void SetAttackTarget(CharacterEntity target)
+    {
+        if (target == null || target.CurrentHp <= 0)
+            return;
+        // Already have target so don't set target
+        var oldTarget = GetTargetEntity<CharacterEntity>();
+        if (oldTarget != null && oldTarget.CurrentHp > 0)
+            return;
+        // Set target to attack
+        SetTargetEntity(target);
+        // Set destination to target
+        CacheNavMeshAgent.SetDestination(target.CacheTransform.position);
     }
 
     public override void ReceiveDamage(CharacterEntity attacker, Dictionary<DamageElement, DamageAmount> allDamageAttributes, CharacterBuff debuff)
     {
         base.ReceiveDamage(attacker, allDamageAttributes, debuff);
+        var gameInstance = GameInstance.Singleton;
+        var targetEntity = GetTargetEntity();
         if (CurrentHp > 0)
         {
-            // Random 50% to change target when receive damage from anyone
-            if (targetEntity == null || Random.value <= 0.5f)
-                targetEntity = attacker;
+            if (targetEntity == null)
+            {
+                SetAttackTarget(attacker);
+                // If it's assist character call another character for assist
+                if (prototype.characteristic == NpcCharacteristic.Assist)
+                {
+                    var foundObjects = new List<Collider>(Physics.OverlapSphere(CacheTransform.position, prototype.visualRange, gameInstance.npcLayer.Mask));
+                    foreach (var foundObject in foundObjects)
+                    {
+                        var npcEntity = foundObject.GetComponent<NonPlayerCharacterEntity>();
+                        if (npcEntity != null && IsAlly(npcEntity))
+                            npcEntity.SetAttackTarget(attacker);
+                    }
+                }
+            }
+            else if (attacker != targetEntity && Random.value <= 0.5f)
+            {
+                // Random 50% to change target when receive damage from anyone
+                SetAttackTarget(attacker);
+            }
         }
     }
 }

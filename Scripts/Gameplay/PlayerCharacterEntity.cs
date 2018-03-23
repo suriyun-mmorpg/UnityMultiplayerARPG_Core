@@ -46,7 +46,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     public float groundingDistance = 0.1f;
     public float jumpHeight = 2f;
     public float gravityRate = 1f;
-    public float turnSpeed = 5f;
+    public float angularSpeed = 120f;
     #endregion
 
     #region Protected data
@@ -55,7 +55,6 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     protected bool isJumping;
     protected bool isGrounded;
     protected Vector3? destination;
-    protected RpgNetworkEntity targetEntity;
     #endregion
 
     #region Cache components
@@ -168,7 +167,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
                 velocityChange.z = Mathf.Clamp(velocityChange.z, -moveSpeed, moveSpeed);
                 CacheRigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
                 // slerp to the desired rotation over time
-                CacheTransform.rotation = Quaternion.Slerp(CacheTransform.rotation, Quaternion.LookRotation(moveDirection), turnSpeed * Time.deltaTime);
+                CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(moveDirection), angularSpeed * Time.deltaTime);
             }
 
             // Jump
@@ -254,22 +253,23 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         return Mathf.Sqrt(2f * jumpHeight * -Physics.gravity.y * gravityRate);
     }
 
-    public override Vector3 GetMovementVelocity()
+    protected override Vector3 GetMovementVelocity()
     {
         return CacheRigidbody.velocity;
     }
 
-    public override CharacterAction GetCharacterAction(CharacterEntity characterEntity)
+    protected override CharacterAction GetCharacterAction(CharacterEntity characterEntity)
     {
         return CharacterAction.None;
     }
 
-    public override bool IsAlly(CharacterEntity characterEntity)
+    protected override bool IsAlly(CharacterEntity characterEntity)
     {
+        // TOOD: Will be implement it later with party/guild system
         return false;
     }
 
-    public override bool IsEnemy(CharacterEntity characterEntity)
+    protected override bool IsEnemy(CharacterEntity characterEntity)
     {
         return true;
     }
@@ -406,19 +406,19 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
                 {
                     var playerEntity = entity as PlayerCharacterEntity;
                     if (playerEntity != null && playerEntity.CurrentHp > 0)
-                        targetEntity = playerEntity;
+                        SetTargetEntity(playerEntity);
                 }
                 else if (layer == gameInstance.npcLayer)
                 {
                     var npcEntity = entity as NonPlayerCharacterEntity;
                     if (npcEntity != null && npcEntity.CurrentHp > 0)
-                        targetEntity = npcEntity;
+                        SetTargetEntity(npcEntity);
                 }
                 else if (layer == gameInstance.itemDropLayer)
                 {
                     var itemDropEntity = entity as ItemDropEntity;
                     if (itemDropEntity != null)
-                        targetEntity = itemDropEntity;
+                        SetTargetEntity(itemDropEntity);
                 }
             }
         }

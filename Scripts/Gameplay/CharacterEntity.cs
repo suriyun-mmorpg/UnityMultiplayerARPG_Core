@@ -14,15 +14,6 @@ public enum CharacterAction
     Conversate,
 }
 
-public enum CharacterTargetType
-{
-    None,
-    Destination,
-    Player,
-    Npc,
-    ItemDrop
-}
-
 [RequireComponent(typeof(CapsuleCollider))]
 public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
 {
@@ -50,13 +41,17 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     public SyncListCharacterItem nonEquipItems = new SyncListCharacterItem();
     #endregion
 
+    #region Private data
+    private RpgNetworkEntity targetEntity;
+    private float updatedSkillAndBuffTime;
+    #endregion
+
     #region Protected data
     // Entity data
     protected CharacterModel model;
     protected bool doingAction;
     protected readonly Dictionary<string, int> buffIndexes = new Dictionary<string, int>();
     protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
-    protected float lastUpdateSkillAndBuffTime = 0f;
     // Net Functions
     protected LiteNetLibFunction netFuncAttack;
     protected LiteNetLibFunction<NetFieldInt> netFuncUseSkill;
@@ -194,7 +189,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     {
         if (CurrentHp <= 0 || !IsServer)
             return;
-        var timeDiff = Time.realtimeSinceStartup - lastUpdateSkillAndBuffTime;
+        var timeDiff = Time.realtimeSinceStartup - updatedSkillAndBuffTime;
         var count = skills.Count;
         for (var i = count - 1; i >= 0; --i)
         {
@@ -223,7 +218,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             }
         }
         if (timeDiff > UPDATE_SKILL_BUFF_INTERVAL)
-            lastUpdateSkillAndBuffTime = Time.realtimeSinceStartup;
+            updatedSkillAndBuffTime = Time.realtimeSinceStartup;
     }
 
     #region Setup functions
@@ -1077,10 +1072,27 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         CacheCapsuleCollider.height = characterModel.height;
     }
 
-    public abstract Vector3 GetMovementVelocity();
-    public abstract CharacterAction GetCharacterAction(CharacterEntity characterEntity);
-    public abstract bool IsAlly(CharacterEntity characterEntity);
-    public abstract bool IsEnemy(CharacterEntity characterEntity);
+    protected void SetTargetEntity(RpgNetworkEntity newTargetEntity)
+    {
+        targetEntity = newTargetEntity;
+    }
+
+    protected RpgNetworkEntity GetTargetEntity()
+    {
+        return targetEntity;
+    }
+
+    protected T GetTargetEntity<T>() where T : RpgNetworkEntity
+    {
+        if (targetEntity == null)
+            return null;
+        return targetEntity as T;
+    }
+
+    protected abstract Vector3 GetMovementVelocity();
+    protected abstract CharacterAction GetCharacterAction(CharacterEntity characterEntity);
+    protected abstract bool IsAlly(CharacterEntity characterEntity);
+    protected abstract bool IsEnemy(CharacterEntity characterEntity);
 
     public static string GetBuffKey(string skillId, bool isDebuff)
     {
