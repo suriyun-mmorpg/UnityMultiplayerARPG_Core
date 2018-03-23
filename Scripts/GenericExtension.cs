@@ -4,6 +4,15 @@ using UnityEngine;
 
 public static class GenericExtension
 {
+    public static void SetLayerRecursively(this GameObject gameObject, int layerIndex, bool includeInactive)
+    {
+        var childrenTransforms = gameObject.GetComponentsInChildren<Transform>(includeInactive);
+        foreach (Transform childTransform in childrenTransforms)
+        {
+            childTransform.gameObject.layer = layerIndex;
+        }
+    }
+
     public static void RemoveChildren(this Transform transform)
     {
         for (var i = transform.childCount - 1; i >= 0; --i)
