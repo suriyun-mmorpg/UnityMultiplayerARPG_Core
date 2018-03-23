@@ -7,6 +7,22 @@ using LiteNetLibHighLevel;
 using UnityEditor;
 #endif
 
+public enum CharacterAction
+{
+    None,
+    Attack,
+    Conversate,
+}
+
+public enum CharacterTargetType
+{
+    None,
+    Destination,
+    Player,
+    Npc,
+    ItemDrop
+}
+
 [RequireComponent(typeof(CapsuleCollider))]
 public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
 {
@@ -147,12 +163,6 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
     #endregion
-
-    protected virtual void Awake()
-    {
-        // Disable colliders, it will be enabled later when initialize model
-        CacheCapsuleCollider.enabled = false;
-    }
 
     protected virtual void Update()
     {
@@ -1065,10 +1075,12 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         CacheCapsuleCollider.center = characterModel.center;
         CacheCapsuleCollider.radius = characterModel.radius;
         CacheCapsuleCollider.height = characterModel.height;
-        CacheCapsuleCollider.enabled = true;
     }
 
-    protected abstract Vector3 GetMovementVelocity();
+    public abstract Vector3 GetMovementVelocity();
+    public abstract CharacterAction GetCharacterAction(CharacterEntity characterEntity);
+    public abstract bool IsAlly(CharacterEntity characterEntity);
+    public abstract bool IsEnemy(CharacterEntity characterEntity);
 
     public static string GetBuffKey(string skillId, bool isDebuff)
     {

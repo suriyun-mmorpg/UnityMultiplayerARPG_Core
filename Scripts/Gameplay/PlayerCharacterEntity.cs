@@ -23,7 +23,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     protected LiteNetLibFunction<NetFieldInt, NetFieldInt> netFuncSwapOrMergeItem;
     protected LiteNetLibFunction<NetFieldInt> netFuncAddAttribute;
     protected LiteNetLibFunction<NetFieldInt> netFuncAddSkill;
-    protected LiteNetLibFunction<NetFieldVector3> netFuncPointClickMovement;
+    protected LiteNetLibFunction<NetFieldVector3, NetFieldUInt> netFuncPointClickMovement;
     #endregion
 
     #region Interface implementation
@@ -55,6 +55,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     protected bool isJumping;
     protected bool isGrounded;
     protected Vector3? destination;
+    protected RpgNetworkEntity targetEntity;
     #endregion
 
     #region Cache components
@@ -86,10 +87,12 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     public UISceneGameplay CacheUISceneGameplay { get; protected set; }
     #endregion
 
-    protected override void Awake()
+    protected virtual void Awake()
     {
-        base.Awake();
         CacheRigidbody.useGravity = false;
+        var gameInstance = GameInstance.Singleton;
+        gameObject.tag = gameInstance.playerTag;
+        gameObject.layer = gameInstance.playerLayer;
     }
 
     protected virtual void Start()
@@ -124,8 +127,8 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
             CacheTargetObject.transform.position = destinationValue;
             if (Vector3.Distance(destinationValue, CacheTransform.position) < stoppingDistance + 0.5f)
                 destination = null;
-            CacheTargetObject.gameObject.SetActive(destination.HasValue);
         }
+        CacheTargetObject.gameObject.SetActive(destination.HasValue);
     }
 
 
@@ -198,12 +201,15 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
                     navPaths.Dequeue();
             }
             else
-            {
-                navPaths = null;
-                moveDirection = Vector3.zero;
-                CacheRigidbody.velocity = Vector3.zero;
-            }
+                ClearPaths();
         }
+    }
+
+    protected virtual void ClearPaths()
+    {
+        navPaths = null;
+        moveDirection = Vector3.zero;
+        CacheRigidbody.velocity = Vector3.zero;
     }
 
     protected virtual void UpdateInput()
@@ -216,9 +222,28 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
 
         if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
         {
+            var gameInstance = GameInstance.Singleton;
+            var targetCamera = CacheGameplayCameraControls != null ? CacheGameplayCameraControls.targetCamera : Camera.main;
             RaycastHit hit;
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 100f))
-                PointClickMovement(hit.point);
+            if (Physics.Raycast(targetCamera.ScreenPointToRay(Input.mousePosition), out hit, 100f))
+            {
+                var hitTransform = hit.transform;
+                var hitLayer = hitTransform.gameObject.layer;
+                var hitPoint = hit.point;
+                if (hitLayer == gameInstance.playerLayer ||
+                    hitLayer == gameInstance.npcLayer ||
+                    hitLayer == gameInstance.itemDropLayer)
+                {
+                    var networkEntity = hitTransform.GetComponent<RpgNetworkEntity>();
+                    destination = null;
+                    PointClickMovement(hitPoint, networkEntity.ObjectId);
+                }
+                else
+                {
+                    destination = hitPoint;
+                    PointClickMovement(hitPoint, 0);
+                }
+            }
         }
     }
     
@@ -229,9 +254,24 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         return Mathf.Sqrt(2f * jumpHeight * -Physics.gravity.y * gravityRate);
     }
 
-    protected override Vector3 GetMovementVelocity()
+    public override Vector3 GetMovementVelocity()
     {
         return CacheRigidbody.velocity;
+    }
+
+    public override CharacterAction GetCharacterAction(CharacterEntity characterEntity)
+    {
+        return CharacterAction.None;
+    }
+
+    public override bool IsAlly(CharacterEntity characterEntity)
+    {
+        return false;
+    }
+
+    public override bool IsEnemy(CharacterEntity characterEntity)
+    {
+        return true;
     }
 
     #region Setup functions
@@ -255,7 +295,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         netFuncSwapOrMergeItem = new LiteNetLibFunction<NetFieldInt, NetFieldInt>(NetFuncSwapOrMergeItemCallback);
         netFuncAddAttribute = new LiteNetLibFunction<NetFieldInt>(NetFuncAddAttributeCallback);
         netFuncAddSkill = new LiteNetLibFunction<NetFieldInt>(NetFuncAddSkillCallback);
-        netFuncPointClickMovement = new LiteNetLibFunction<NetFieldVector3>(NetFuncPointClickMovementCallback);
+        netFuncPointClickMovement = new LiteNetLibFunction<NetFieldVector3, NetFieldUInt>(NetFuncPointClickMovementCallback);
 
         RegisterNetFunction("SwapOrMergeItem", netFuncSwapOrMergeItem);
         RegisterNetFunction("AddAttribute", netFuncAddAttribute);
@@ -345,14 +385,43 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         skills[skillIndex] = skill;
     }
 
-    protected void NetFuncPointClickMovementCallback(NetFieldVector3 position)
+    protected void NetFuncPointClickMovementCallback(NetFieldVector3 position, NetFieldUInt entityId)
     {
-        NetFuncPointClickMovement(position);
+        NetFuncPointClickMovement(position, entityId);
     }
 
-    protected void NetFuncPointClickMovement(Vector3 position)
+    protected void NetFuncPointClickMovement(Vector3 position, uint entityId)
     {
         var navPath = new NavMeshPath();
+        LiteNetLibIdentity identity;
+        if (entityId > 0 && Manager.Assets.SpawnedObjects.TryGetValue(entityId, out identity))
+        {
+            var entity = identity.GetComponent<RpgNetworkEntity>();
+            if (entity != null)
+            {
+                position = entity.CacheTransform.position;
+                var gameInstance = GameInstance.Singleton;
+                var layer = entity.gameObject.layer;
+                if (layer == gameInstance.playerLayer)
+                {
+                    var playerEntity = entity as PlayerCharacterEntity;
+                    if (playerEntity != null && playerEntity.CurrentHp > 0)
+                        targetEntity = playerEntity;
+                }
+                else if (layer == gameInstance.npcLayer)
+                {
+                    var npcEntity = entity as NonPlayerCharacterEntity;
+                    if (npcEntity != null && npcEntity.CurrentHp > 0)
+                        targetEntity = npcEntity;
+                }
+                else if (layer == gameInstance.itemDropLayer)
+                {
+                    var itemDropEntity = entity as ItemDropEntity;
+                    if (itemDropEntity != null)
+                        targetEntity = itemDropEntity;
+                }
+            }
+        }
         if (NavMesh.CalculatePath(CacheTransform.position, position, NavMesh.AllAreas, navPath))
         {
             navPaths = new Queue<Vector3>(navPath.corners);
@@ -378,10 +447,9 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         CallNetFunction("AddSkill", FunctionReceivers.Server, skillIndex);
     }
 
-    public void PointClickMovement(Vector3 position)
+    public void PointClickMovement(Vector3 position, uint entityId)
     {
-        destination = position;
-        CallNetFunction("PointClickMovement", FunctionReceivers.Server, position);
+        CallNetFunction("PointClickMovement", FunctionReceivers.Server, position, entityId);
     }
     #endregion
 

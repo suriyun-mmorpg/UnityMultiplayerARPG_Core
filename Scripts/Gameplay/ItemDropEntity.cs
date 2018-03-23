@@ -8,6 +8,13 @@ public class ItemDropEntity : RpgNetworkEntity
     public CharacterItem dropData;
     public SyncFieldString itemId = new SyncFieldString();
 
+    private void Awake()
+    {
+        var gameInstance = GameInstance.Singleton;
+        gameObject.tag = gameInstance.itemDropTag;
+        gameObject.layer = gameInstance.itemDropLayer;
+    }
+
     private void Start()
     {
         if (IsServer)

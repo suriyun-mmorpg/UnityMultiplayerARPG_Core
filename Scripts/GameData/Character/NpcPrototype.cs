@@ -2,24 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum MonsterCharacteristic
+public enum NpcCharacteristic
 {
     Normal,
     Aggressive,
+    Conversate,
 }
 
-
 [CreateAssetMenu(fileName = "MonsterPrototype", menuName = "Create GameData/MonsterPrototype")]
-public class MonsterPrototype : CharacterPrototype
+public class NpcPrototype : CharacterPrototype
 {
     [Header("Monster Data")]
-    public MonsterCharacteristic characteristic;
+    public NpcCharacteristic characteristic;
+    public float visualRange = 5f;
+    public float randomWanderDurationMin = 1f;
+    public float randomWanderDurationMax = 5f;
+    public float randomWanderRadius = 5f;
     [Tooltip("Level will be used to show only, not calculating with stats/skills")]
     public int level;
     public CharacterStats stats;
     public Skill[] skills;
 
-    [Header("Monster Rewards")]
+    [Header("Killing Rewards")]
     public int randomExpMin;
     public int randomExpMax;
     public int randomGoldMin;
