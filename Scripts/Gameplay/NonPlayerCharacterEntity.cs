@@ -195,7 +195,7 @@ public class NonPlayerCharacterEntity : CharacterEntity
                     }
                 }
             }
-            else if (attacker != targetEntity && Random.value <= 0.5f)
+            else if (attacker != targetEntity && Random.Range(0, 1) == 1)
             {
                 // Random 50% to change target when receive damage from anyone
                 SetAttackTarget(attacker);
