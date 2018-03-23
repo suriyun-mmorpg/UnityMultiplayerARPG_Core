@@ -167,7 +167,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
                 velocityChange.z = Mathf.Clamp(velocityChange.z, -moveSpeed, moveSpeed);
                 CacheRigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
                 // slerp to the desired rotation over time
-                CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(moveDirection), angularSpeed * Time.deltaTime);
+                CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(moveDirection), angularSpeed * Time.fixedDeltaTime);
             }
 
             // Jump
