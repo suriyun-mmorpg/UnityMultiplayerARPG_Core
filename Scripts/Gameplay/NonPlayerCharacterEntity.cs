@@ -111,6 +111,13 @@ public class NonPlayerCharacterEntity : CharacterEntity
         }
     }
 
+    public override void OnSetup()
+    {
+        base.OnSetup();
+
+        CacheNetTransform.ownerClientCanSendTransform = false;
+    }
+
     protected void RandomWanderTime()
     {
         wanderTime = Time.realtimeSinceStartup + Random.Range(RANDOM_WANDER_DURATION_MIN, RANDOM_WANDER_DURATION_MAX);
