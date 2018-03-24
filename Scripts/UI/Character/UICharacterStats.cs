@@ -10,6 +10,8 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
     public string hpStatsFormat = "Hp: {0}";
     [Tooltip("Mp Stats Format => {0} = {Amount}")]
     public string mpStatsFormat = "Mp: {0}";
+    [Tooltip("Armor Stats Format => {0} = {Amount}")]
+    public string armorStatsFormat = "Armor: {0}";
     [Tooltip("Accuracy Stats Format => {0} = {Amount}")]
     public string accuracyStatsFormat = "Acc: {0}";
     [Tooltip("Evasion Format => {0} = {Amount}")]
@@ -25,6 +27,7 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
     public Text textStats;
     public Text textHp;
     public Text textMp;
+    public Text textArmor;
     public Text textAccuracy;
     public Text textEvasion;
     public Text textCriHitRate;
@@ -53,6 +56,15 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
             statsString += statsStringPart;
         if (textMp != null)
             textMp.text = statsStringPart;
+
+        // Armor
+        if (!string.IsNullOrEmpty(statsString))
+            statsString += "\n";
+        statsStringPart = string.Format(armorStatsFormat, Data.armor.ToString("N0"));
+        if (Data.accuracy != 0)
+            statsString += statsStringPart;
+        if (textArmor != null)
+            textArmor.text = statsStringPart;
 
         // Accuracy
         if (!string.IsNullOrEmpty(statsString))

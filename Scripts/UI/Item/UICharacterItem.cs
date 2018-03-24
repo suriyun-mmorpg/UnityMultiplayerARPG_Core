@@ -28,8 +28,6 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
     public string generalItemType = "General Item";
     [Tooltip("Shield Item Type")]
     public string shieldItemType = "Shield";
-    [Tooltip("Armor Format => {0} = {Armor}")]
-    public string armorFormat = "Armor: {0}";
 
     [Header("Input Dialog Settings")]
     public string dropInputTitle = "Drop Item";
@@ -51,9 +49,6 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
     public UIAttributeAmounts uiIncreaseAttributes;
     public UIResistanceAmounts uiIncreaseResistances;
     public UIDamageElementAmounts uiIncreaseDamageAttributes;
-
-    [Header("Armor/Shield - UI Elements")]
-    public Text textArmor;
 
     [Header("Weapon - UI Elements")]
     public UIDamageElementAmount uiDamageAttribute;
@@ -78,7 +73,6 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
         var itemData = Data.GetItem();
         var itemLevel = Data.level;
         var equipmentItem = Data.GetEquipmentItem();
-        var defendItem = Data.GetDefendItem();
         var armorItem = Data.GetArmorItem();
         var weaponItem = Data.GetWeaponItem();
         var shieldItem = Data.GetShieldItem();
@@ -157,7 +151,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
             else
             {
                 uiRequirement.Show();
-                uiRequirement.Data = new KeyValuePair<BaseEquipmentItem, int>(equipmentItem, itemLevel);
+                uiRequirement.Data = new KeyValuePair<Item, int>(equipmentItem, itemLevel);
             }
         }
 
@@ -206,17 +200,6 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
             {
                 uiIncreaseDamageAttributes.Show();
                 uiIncreaseDamageAttributes.Data = damageAttributes;
-            }
-        }
-
-        if (textArmor != null)
-        {
-            if (defendItem == null)
-                textArmor.gameObject.SetActive(false);
-            else
-            {
-                textArmor.text = string.Format(armorFormat, defendItem.GetArmor(itemLevel));
-                textArmor.gameObject.SetActive(true);
             }
         }
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIEquipmentItemRequirement : UISelectionEntry<KeyValuePair<BaseEquipmentItem, int>>
+public class UIEquipmentItemRequirement : UISelectionEntry<KeyValuePair<Item, int>>
 {
     [Header("Requirement Format")]
     [Tooltip("Require Level Format => {0} = {Level}")]

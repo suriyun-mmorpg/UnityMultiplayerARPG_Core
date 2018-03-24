@@ -24,7 +24,7 @@ public class SimpleGameplayRule : BaseGameplayRule
     public override float GetDamageReducedByResistance(ICharacterData damageReceiver, float damageAmount, Resistance resistance)
     {
         if (resistance == null)
-            return damageAmount -= damageReceiver.GetArmor(); // If armor is minus damage will be increased
+            return damageAmount -= damageReceiver.GetStats().armor; // If armor is minus damage will be increased
         var resistances = damageReceiver.GetResistancesWithBuffs();
         float resistanceAmount = 0f;
         resistances.TryGetValue(resistance, out resistanceAmount);

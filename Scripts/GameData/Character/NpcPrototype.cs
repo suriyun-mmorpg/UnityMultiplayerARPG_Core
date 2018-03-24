@@ -15,6 +15,7 @@ public class NpcPrototype : CharacterPrototype
 {
     [Header("Monster Data")]
     public NpcCharacteristic characteristic;
+    public bool Immovable;
     [Tooltip("This will work with assist characteristic only, to detect ally")]
     public ushort allyId;
     public float visualRange = 5f;

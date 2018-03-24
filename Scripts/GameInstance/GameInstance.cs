@@ -20,7 +20,7 @@ public class GameInstance : MonoBehaviour
     [Header("Gameplay Database")]
     public BaseGameplayRule gameplayRule;
     [Tooltip("Default weapon item, will be used when character not equip any weapon")]
-    public WeaponItem defaultWeaponItem;
+    public Item defaultWeaponItem;
     public CharacterPrototype[] characterPrototypes;
     public Item[] items;
     public int[] expTree;
@@ -124,15 +124,16 @@ public class GameInstance : MonoBehaviour
         }
     }
 
-    public WeaponItem DefaultWeaponItem
+    public Item DefaultWeaponItem
     {
         get
         {
             if (defaultWeaponItem == null)
             {
-                defaultWeaponItem = ScriptableObject.CreateInstance<WeaponItem>();
+                defaultWeaponItem = ScriptableObject.CreateInstance<Item>();
                 defaultWeaponItem.name = GameDataConst.DEFAULT_WEAPON_ID;
                 defaultWeaponItem.title = GameDataConst.DEFAULT_WEAPON_TITLE;
+                defaultWeaponItem.itemType = ItemType.Weapon;
                 defaultWeaponItem.weaponType = DefaultWeaponType;
                 var sampleDamageAttribute = new DamageAttribute()
                 {
@@ -227,7 +228,7 @@ public class GameInstance : MonoBehaviour
             AddAttributes(attributes);
             AddSkills(characterClass.skills);
             AddItems(new Item[] { characterClass.rightHandEquipItem, characterClass.leftHandEquipItem });
-            AddItems(characterClass.otherEquipItems);
+            AddItems(characterClass.armorItems);
         }
     }
 
@@ -280,11 +281,10 @@ public class GameInstance : MonoBehaviour
             if (item == null || Items.ContainsKey(item.Id))
                 continue;
             Items[item.Id] = item;
-            if (item is BaseEquipmentItem)
+            if (item.IsEquipment())
             {
-                var equipmentItem = item as BaseEquipmentItem;
                 var attributes = new List<Attribute>();
-                var requireAttributes = equipmentItem.requirement.attributeAmounts;
+                var requireAttributes = item.requirement.attributeAmounts;
                 foreach (var requireAttribute in requireAttributes)
                 {
                     if (requireAttribute.attribute == null || Attributes.ContainsKey(requireAttribute.attribute.Id))
@@ -293,11 +293,10 @@ public class GameInstance : MonoBehaviour
                 }
                 AddAttributes(attributes);
             }
-            if (item is WeaponItem)
+            if (item.IsWeapon())
             {
-                var weaponItem = item as WeaponItem;
                 var attributes = new List<Attribute>();
-                foreach (var effectivenessAttribute in weaponItem.WeaponType.effectivenessAttributes)
+                foreach (var effectivenessAttribute in item.WeaponType.effectivenessAttributes)
                 {
                     if (effectivenessAttribute.attribute == null || Attributes.ContainsKey(effectivenessAttribute.attribute.Id))
                         continue;
@@ -305,7 +304,7 @@ public class GameInstance : MonoBehaviour
                 }
                 AddAttributes(attributes);
                 var damageElements = new List<DamageElement>();
-                var damageAttributes = weaponItem.increaseDamageAttributes;
+                var damageAttributes = item.increaseDamageAttributes;
                 foreach (var damageAttribute in damageAttributes)
                 {
                     if (damageAttribute.damageElement == null || DamageElements.ContainsKey(damageAttribute.damageElement.Id))
@@ -313,7 +312,7 @@ public class GameInstance : MonoBehaviour
                     damageElements.Add(damageAttribute.damageElement);
                 }
                 AddDamageElements(damageElements);
-                var missileDamageEntity = weaponItem.WeaponType.damage.missileDamageEntity;
+                var missileDamageEntity = item.WeaponType.damage.missileDamageEntity;
                 if (missileDamageEntity != null)
                     AddDamageEntities(new DamageEntity[] { missileDamageEntity });
             }

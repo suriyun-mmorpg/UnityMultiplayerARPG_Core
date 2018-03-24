@@ -20,15 +20,15 @@ public struct CharacterItem
     [System.NonSerialized]
     private Item cacheItem;
     [System.NonSerialized]
-    private BaseEquipmentItem cacheEquipmentItem;
+    private Item cacheEquipmentItem;
     [System.NonSerialized]
-    private BaseDefendItem cacheDefendItem;
+    private Item cacheDefendItem;
     [System.NonSerialized]
-    private ArmorItem cacheArmorItem;
+    private Item cacheArmorItem;
     [System.NonSerialized]
-    private WeaponItem cacheWeaponItem;
+    private Item cacheWeaponItem;
     [System.NonSerialized]
-    private ShieldItem cacheShieldItem;
+    private Item cacheShieldItem;
 
     private void MakeCache()
     {
@@ -42,11 +42,16 @@ public struct CharacterItem
                 cacheItem = GameInstance.Items.TryGetValue(itemId, out cacheItem) ? cacheItem : null;
             if (cacheItem != null)
             {
-                cacheEquipmentItem = cacheItem as BaseEquipmentItem;
-                cacheDefendItem = cacheItem as BaseDefendItem;
-                cacheArmorItem = cacheItem as ArmorItem;
-                cacheWeaponItem = cacheItem as WeaponItem;
-                cacheShieldItem = cacheItem as ShieldItem;
+                if (cacheItem.IsEquipment())
+                    cacheEquipmentItem = cacheItem;
+                if (cacheItem.IsDefendEquipment())
+                    cacheDefendItem = cacheItem;
+                if (cacheItem.IsArmor())
+                    cacheArmorItem = cacheItem;
+                if (cacheItem.IsWeapon())
+                    cacheWeaponItem = cacheItem;
+                if (cacheItem.IsShield())
+                    cacheShieldItem = cacheItem;
             }
         }
     }
@@ -62,31 +67,31 @@ public struct CharacterItem
         return cacheItem;
     }
 
-    public BaseEquipmentItem GetEquipmentItem()
+    public Item GetEquipmentItem()
     {
         MakeCache();
         return cacheEquipmentItem;
     }
 
-    public BaseDefendItem GetDefendItem()
+    public Item GetDefendItem()
     {
         MakeCache();
         return cacheDefendItem;
     }
 
-    public ArmorItem GetArmorItem()
+    public Item GetArmorItem()
     {
         MakeCache();
         return cacheArmorItem;
     }
 
-    public WeaponItem GetWeaponItem()
+    public Item GetWeaponItem()
     {
         MakeCache();
         return cacheWeaponItem;
     }
 
-    public ShieldItem GetShieldItem()
+    public Item GetShieldItem()
     {
         MakeCache();
         return cacheShieldItem;

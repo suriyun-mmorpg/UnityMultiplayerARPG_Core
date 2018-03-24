@@ -175,42 +175,42 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         
         var rightHandItem = Data.EquipWeapons.rightHand;
         var leftHandItem = Data.EquipWeapons.leftHand;
-        var hasRightHandWeapon = rightHandItem.IsValid();
-        var hasLeftHandWeapon = leftHandItem.IsValid();
-        var rightHandDamages = hasRightHandWeapon ? rightHandItem.GetWeaponItem().GetAllDamages(Data, rightHandItem.level) : null;
-        var leftHandDamages = hasLeftHandWeapon ? leftHandItem.GetWeaponItem().GetAllDamages(Data, leftHandItem.level) : null;
+        var rightHandWeapon = rightHandItem.GetWeaponItem();
+        var leftHandWeapon = leftHandItem.GetWeaponItem();
+        var rightHandDamages = rightHandWeapon != null ? rightHandWeapon.GetAllDamages(Data, rightHandItem.level) : null;
+        var leftHandDamages = leftHandWeapon != null ? leftHandWeapon.GetAllDamages(Data, leftHandItem.level) : null;
 
         if (textWeaponDamages != null)
         {
             var textDamages = "";
-            if (hasRightHandWeapon)
+            if (rightHandWeapon != null)
             {
                 var sumDamages = GameDataHelpers.GetSumDamages(rightHandDamages);
                 if (!string.IsNullOrEmpty(textDamages))
                     textDamages += "\n";
                 textDamages += string.Format(weaponDamageFormat, sumDamages.minDamage, sumDamages.maxDamage);
             }
-            if (hasLeftHandWeapon)
+            if (leftHandWeapon != null)
             {
                 var sumDamages = GameDataHelpers.GetSumDamages(leftHandDamages);
                 if (!string.IsNullOrEmpty(textDamages))
                     textDamages += "\n";
                 textDamages += string.Format(weaponDamageFormat, sumDamages.minDamage, sumDamages.maxDamage);
             }
-            if (!hasRightHandWeapon && !hasRightHandWeapon)
+            if (rightHandWeapon == null && leftHandWeapon == null)
             {
                 var defaultWeaponItem = gameInstance.DefaultWeaponItem;
                 var defaultWeaponItemType = defaultWeaponItem.EquipType;
                 var effectiveness = defaultWeaponItem.GetEffectivenessDamage(Data);
                 var damageAmount = defaultWeaponItem.GetDamageAttribute(1, effectiveness, 1f);
-                textDamages += string.Format(weaponDamageFormat, damageAmount.Value.minDamage, damageAmount.Value.maxDamage);
+                textDamages = string.Format(weaponDamageFormat, damageAmount.Value.minDamage, damageAmount.Value.maxDamage);
             }
             textWeaponDamages.text = textDamages;
         }
 
         if (uiRightHandDamages != null)
         {
-            if (!hasRightHandWeapon)
+            if (rightHandWeapon == null)
                 uiRightHandDamages.Hide();
             else
             {
@@ -221,7 +221,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
 
         if (uiLeftHandDamages != null)
         {
-            if (!hasLeftHandWeapon)
+            if (leftHandWeapon == null)
                 uiLeftHandDamages.Hide();
             else
             {

@@ -17,55 +17,58 @@ public class CharacterClass : BaseGameData
     public Skill[] skills;
 
     [Header("Start Equipments")]
-    public BaseEquipmentItem rightHandEquipItem;
-    public BaseEquipmentItem leftHandEquipItem;
-    public BaseEquipmentItem[] otherEquipItems;
+    public Item rightHandEquipItem;
+    public Item leftHandEquipItem;
+    public Item[] armorItems;
 
 #if UNITY_EDITOR
     void OnValidate()
     {
-        WeaponItem rightHandAsWeapon = null;
-        WeaponItem leftHandAsWeapon = null;
-        ShieldItem leftHandAsShield = null;
+        Item tempRightHandWeapon = null;
+        Item tempLeftHandWeapon = null;
+        Item tempLeftHandShield = null;
         if (rightHandEquipItem != null)
         {
-            rightHandAsWeapon = rightHandEquipItem as WeaponItem;
-            if (rightHandAsWeapon == null || rightHandAsWeapon.weaponType == null)
+            if (rightHandEquipItem.itemType == ItemType.Weapon)
+                tempRightHandWeapon = rightHandEquipItem;
+
+            if (tempRightHandWeapon == null || tempRightHandWeapon.weaponType == null)
                 rightHandEquipItem = null;
         }
         if (leftHandEquipItem != null)
         {
-            leftHandAsWeapon = leftHandEquipItem as WeaponItem;
-            leftHandAsShield = leftHandEquipItem as ShieldItem;
-            if ((leftHandAsWeapon == null || leftHandAsWeapon.weaponType == null) && leftHandAsShield == null)
+            if (leftHandEquipItem.itemType == ItemType.Weapon)
+                tempLeftHandWeapon = leftHandEquipItem;
+            if (leftHandEquipItem.itemType == ItemType.Shield)
+                tempLeftHandShield = leftHandEquipItem;
+
+            if ((tempLeftHandWeapon == null || tempLeftHandWeapon.weaponType == null) && tempLeftHandShield == null)
                 leftHandEquipItem = null;
-            else if (rightHandAsWeapon != null)
+            else if (tempRightHandWeapon != null)
             {
-                if (leftHandAsShield != null && rightHandAsWeapon.EquipType == WeaponItemEquipType.TwoHand)
+                if (tempLeftHandShield != null && tempRightHandWeapon.EquipType == WeaponItemEquipType.TwoHand)
                     leftHandEquipItem = null;
-                else if (leftHandAsWeapon != null && rightHandAsWeapon.EquipType != WeaponItemEquipType.OneHandCanDual)
+                else if (tempLeftHandWeapon != null && tempRightHandWeapon.EquipType != WeaponItemEquipType.OneHandCanDual)
                     leftHandEquipItem = null;
             }
         }
         var equipedPositions = new List<string>();
-        for (var i = 0; i < otherEquipItems.Length; ++i)
+        for (var i = 0; i < armorItems.Length; ++i)
         {
-            var otherEquipItem = otherEquipItems[i];
-            if (otherEquipItem == null)
+            var armorItem = armorItems[i];
+            if (armorItem == null)
                 continue;
-            if (otherEquipItem as WeaponItem != null ||
-                otherEquipItem as ShieldItem != null)
+
+            if (armorItem.itemType != ItemType.Armor)
             {
-                otherEquipItems[i] = null;
+                armorItems[i] = null;
                 continue;
             }
-            var armorEquipItem = otherEquipItem as ArmorItem;
-            if (armorEquipItem == null)
-                continue;
-            if (equipedPositions.Contains(armorEquipItem.EquipPosition))
-                otherEquipItems[i] = null;
+
+            if (equipedPositions.Contains(armorItem.EquipPosition))
+                armorItems[i] = null;
             else
-                equipedPositions.Add(armorEquipItem.EquipPosition);
+                equipedPositions.Add(armorItem.EquipPosition);
         }
         EditorUtility.SetDirty(this);
     }

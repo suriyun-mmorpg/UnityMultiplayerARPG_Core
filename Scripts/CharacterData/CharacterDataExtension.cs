@@ -63,47 +63,35 @@ public static class CharacterDataExtension
         return result;
     }
 
-    public static float GetArmor(this ICharacterData data)
-    {
-        var result = 0f;
-        var equipItems = data.EquipItems;
-        foreach (var equipItem in equipItems)
-        {
-            var defendItem = equipItem.GetDefendItem();
-            if (defendItem == null)
-                continue;
-            result += defendItem.GetArmor(equipItem.level);
-        }
-        var equipWeapons = data.EquipWeapons;
-        var leftHandItem = equipWeapons.leftHand;
-        if (leftHandItem.IsValid())
-            result += leftHandItem.GetShieldItem().GetArmor(leftHandItem.level);
-        return result;
-    }
-
     public static Dictionary<Attribute, int> GetAttributes(this ICharacterData data)
     {
         var result = new Dictionary<Attribute, int>();
-        // Armors attributes
+
+        Item tempEquipment = null;
         var equipItems = data.EquipItems;
         foreach (var equipItem in equipItems)
         {
-            var equipment = equipItem.GetEquipmentItem();
-            if (equipment == null)
-                continue;
-            result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
-                equipment.GetIncreaseAttributes(equipItem.level));
+            tempEquipment = equipItem.GetEquipmentItem();
+            if (tempEquipment != null)
+                result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
+                tempEquipment.GetIncreaseAttributes(equipItem.level));
         }
+
         // Weapons attributes
         var equipWeapons = data.EquipWeapons;
+        // Right hand equipment
         var rightHandItem = equipWeapons.rightHand;
+        tempEquipment = rightHandItem.GetEquipmentItem();
+        if (tempEquipment != null)
+            result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
+                tempEquipment.GetIncreaseAttributes(rightHandItem.level));
+        // Left hand equipment
         var leftHandItem = equipWeapons.leftHand;
-        if (rightHandItem.IsValid())
+        tempEquipment = leftHandItem.GetEquipmentItem();
+        if (tempEquipment != null)
             result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
-                rightHandItem.GetEquipmentItem().GetIncreaseAttributes(rightHandItem.level));
-        if (leftHandItem.IsValid())
-            result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
-                leftHandItem.GetEquipmentItem().GetIncreaseAttributes(leftHandItem.level));
+                tempEquipment.GetIncreaseAttributes(leftHandItem.level));
+
         // Character attributes
         var characterAttributes = data.Attributes;
         foreach (var characterAttribute in characterAttributes)
@@ -135,15 +123,31 @@ public static class CharacterDataExtension
     public static Dictionary<Resistance, float> GetResistances(this ICharacterData data)
     {
         var result = new Dictionary<Resistance, float>();
+
+        Item tempEquipment = null;
         var equipItems = data.EquipItems;
         foreach (var equipItem in equipItems)
         {
-            if (equipItem.GetEquipmentItem() == null)
-                continue;
-            var equipment = equipItem.GetEquipmentItem();
-            result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
-                equipment.GetIncreaseResistances(equipItem.level));
+            tempEquipment = equipItem.GetEquipmentItem();
+            if (tempEquipment != null)
+                result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
+                    tempEquipment.GetIncreaseResistances(equipItem.level));
         }
+
+        var equipWeapons = data.EquipWeapons;
+        // Right hand equipment
+        var rightHandItem = equipWeapons.rightHand;
+        tempEquipment = rightHandItem.GetEquipmentItem();
+        if (tempEquipment != null)
+            result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
+                tempEquipment.GetIncreaseResistances(rightHandItem.level));
+        // Left hand equipment
+        var leftHandItem = equipWeapons.leftHand;
+        tempEquipment = leftHandItem.GetEquipmentItem();
+        if (tempEquipment != null)
+            result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
+                tempEquipment.GetIncreaseResistances(leftHandItem.level));
+
         return result;
     }
 
@@ -168,11 +172,27 @@ public static class CharacterDataExtension
         if (characterClass != null)
             result += characterClass.baseStats + characterClass.statsIncreaseEachLevel * level;
 
+        Item tempEquipment = null;
         var equipItems = data.EquipItems;
         foreach (var equipment in equipItems)
         {
-            result += equipment.GetEquipmentItem().GetStats(equipment.level);
+            tempEquipment = equipment.GetEquipmentItem();
+            if (tempEquipment != null)
+                result += tempEquipment.GetStats(equipment.level);
         }
+
+        var equipWeapons = data.EquipWeapons;
+        // Right hand equipment
+        var rightHandItem = equipWeapons.rightHand;
+        tempEquipment = rightHandItem.GetEquipmentItem();
+        if (tempEquipment != null)
+            result += tempEquipment.GetStats(rightHandItem.level);
+        // Left hand equipment
+        var leftHandItem = equipWeapons.leftHand;
+        tempEquipment = leftHandItem.GetEquipmentItem();
+        if (tempEquipment != null)
+            result += tempEquipment.GetStats(leftHandItem.level);
+
         result += GameDataHelpers.CaculateStats(GetAttributes(data));
         return result;
     }

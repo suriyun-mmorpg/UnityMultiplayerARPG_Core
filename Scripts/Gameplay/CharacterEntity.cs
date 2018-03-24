@@ -340,7 +340,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         // Prepare weapon data
         bool isLeftHand = false;
         CharacterItem equipWeapon = equipWeapons.Value.GetRandomedItem(out isLeftHand);
-        WeaponItem weapon = equipWeapon.GetWeaponItem();
+        Item weapon = equipWeapon.GetWeaponItem();
         var weaponType = weapon.WeaponType;
         // Random animation
         var animArray = !isLeftHand ? weaponType.rightHandAttackAnimations : weaponType.leftHandAttackAnimations;
