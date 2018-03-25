@@ -10,8 +10,8 @@ public static class PlayerCharacterDataExtension
     public static T CloneTo<T>(this IPlayerCharacterData from, T to) where T : IPlayerCharacterData
     {
         to.Id = from.Id;
-        to.ModelId = from.ModelId;
         to.ClassId = from.ClassId;
+        to.ModelId = from.ModelId;
         to.CharacterName = from.CharacterName;
         to.Level = from.Level;
         to.Exp = from.Exp;
@@ -39,12 +39,12 @@ public static class PlayerCharacterDataExtension
         var gameInstance = GameInstance.Singleton;
         CharacterPrototype prototype;
         if (!GameInstance.CharacterPrototypes.TryGetValue(prototypeId, out prototype) ||
-            prototype.characterModel == null ||
-            prototype.characterClass == null)
+            prototype.characterClass == null ||
+            prototype.characterModel == null)
             return character;
-
-        character.ModelId = prototype.characterModel.Id;
+        // General data
         character.ClassId = prototype.characterClass.Id;
+        character.ModelId = prototype.characterModel.Id;
         character.CharacterName = characterName;
         character.Level = 1;
         foreach (var baseAttribute in character.GetClass().baseAttributes)
@@ -57,7 +57,45 @@ public static class PlayerCharacterDataExtension
         character.CurrentHp = character.GetMaxHp();
         character.CurrentMp = character.GetMaxMp();
         character.Gold = gameInstance.startGold;
+        // Right hand & left hand items
+        var rightHandEquipItem = prototype.characterClass.rightHandEquipItem;
+        var leftHandEquipItem = prototype.characterClass.leftHandEquipItem;
+        var equipWeapons = new EquipWeapons();
+        // Right hand equipped item
+        if (rightHandEquipItem != null)
+        {
+            var characterItem = new CharacterItem();
+            characterItem.id = System.Guid.NewGuid().ToString();
+            characterItem.itemId = rightHandEquipItem.Id;
+            characterItem.level = 1;
+            characterItem.amount = rightHandEquipItem.maxStack;
+            equipWeapons.rightHand = characterItem;
+        }
+        // Left hand equipped item
+        if (leftHandEquipItem != null)
+        {
+            var characterItem = new CharacterItem();
+            characterItem.id = System.Guid.NewGuid().ToString();
+            characterItem.itemId = leftHandEquipItem.Id;
+            characterItem.level = 1;
+            characterItem.amount = leftHandEquipItem.maxStack;
+            equipWeapons.leftHand = characterItem;
+        }
+        // Armors
+        var armorItems = prototype.characterClass.armorItems;
+        foreach (var armorItem in armorItems)
+        {
+            if (armorItem == null)
+                continue;
+            var characterItem = new CharacterItem();
+            characterItem.id = System.Guid.NewGuid().ToString();
+            characterItem.itemId = armorItem.Id;
+            characterItem.level = 1;
+            characterItem.amount = armorItem.maxStack;
+            character.EquipItems.Add(characterItem);
+        }
 
+        // Inventory
         var startItems = gameInstance.startItems;
         foreach (var startItem in startItems)
         {
@@ -73,7 +111,7 @@ public static class PlayerCharacterDataExtension
             characterItem.amount = amount;
             character.NonEquipItems.Add(characterItem);
         }
-
+        // Position
         character.CurrentMapName = gameInstance.startScene;
         character.RespawnMapName = gameInstance.startScene;
         character.CurrentPosition = gameInstance.startPosition;

@@ -46,8 +46,8 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
     public override void SerializeClientReadyExtra(NetDataWriter writer)
     {
         writer.Put(SelectedCharacter.Id);
-        writer.Put(SelectedCharacter.ModelId);
         writer.Put(SelectedCharacter.ClassId);
+        writer.Put(SelectedCharacter.ModelId);
         writer.Put(SelectedCharacter.CharacterName);
         writer.Put(SelectedCharacter.Level);
         writer.Put(SelectedCharacter.Exp);
@@ -108,8 +108,8 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
     {
         var character = new PlayerCharacterData();
         character.Id = reader.GetString();
-        character.ModelId = reader.GetString();
         character.ClassId = reader.GetString();
+        character.ModelId = reader.GetString();
         character.CharacterName = reader.GetString();
         character.Level = reader.GetInt();
         character.Exp = reader.GetInt();
