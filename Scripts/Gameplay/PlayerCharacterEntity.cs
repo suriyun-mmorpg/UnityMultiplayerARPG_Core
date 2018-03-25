@@ -431,9 +431,9 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     #endregion
 
     #region Sync data changes callback
-    protected override void OnClassIdChange(string classId)
+    protected override void OnDatabaseIdChange(string databaseId)
     {
-        base.OnClassIdChange(classId);
+        base.OnDatabaseIdChange(databaseId);
 
         if (IsOwnerClient && CacheUISceneGameplay != null)
         {

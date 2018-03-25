@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BaseGameData : ScriptableObject
+public abstract class BaseGameData : ScriptableObject
 {
     public string title;
     [TextArea]

@@ -21,7 +21,7 @@ public class GameInstance : MonoBehaviour
     public BaseGameplayRule gameplayRule;
     [Tooltip("Default weapon item, will be used when character not equip any weapon")]
     public Item defaultWeaponItem;
-    public CharacterPrototype[] characterPrototypes;
+    public BaseCharacterDatabase[] characterDatabases;
     public Item[] items;
     public int[] expTree;
     [Header("Gameplay Configs")]
@@ -44,9 +44,7 @@ public class GameInstance : MonoBehaviour
     public int minCharacterNameLength = 2;
     public int maxCharacterNameLength = 16;
     public static readonly Dictionary<string, Attribute> Attributes = new Dictionary<string, Attribute>();
-    public static readonly Dictionary<string, CharacterClass> CharacterClasses = new Dictionary<string, CharacterClass>();
-    public static readonly Dictionary<string, CharacterModel> CharacterModels = new Dictionary<string, CharacterModel>();
-    public static readonly Dictionary<string, CharacterPrototype> CharacterPrototypes = new Dictionary<string, CharacterPrototype>();
+    public static readonly Dictionary<string, BaseCharacterDatabase> CharacterDatabases = new Dictionary<string, BaseCharacterDatabase>();
     public static readonly Dictionary<string, DamageElement> DamageElements = new Dictionary<string, DamageElement>();
     public static readonly Dictionary<string, DamageEntity> DamageEntities = new Dictionary<string, DamageEntity>();
     public static readonly Dictionary<string, Item> Items = new Dictionary<string, Item>();
@@ -179,15 +177,13 @@ public class GameInstance : MonoBehaviour
         }
         
         Attributes.Clear();
-        CharacterClasses.Clear();
-        CharacterModels.Clear();
-        CharacterPrototypes.Clear();
+        CharacterDatabases.Clear();
         DamageElements.Clear();
         DamageEntities.Clear();
         Items.Clear();
         Skills.Clear();
 
-        AddCharacterPrototypes(characterPrototypes);
+        AddCharacterDatabases(characterDatabases);
         AddItems(new Item[] { DefaultWeaponItem });
         AddItems(items);
 
@@ -211,46 +207,28 @@ public class GameInstance : MonoBehaviour
         }
     }
 
-    public static void AddCharacterClasses(IEnumerable<CharacterClass> characterClasses)
+    public static void AddCharacterDatabases(IEnumerable<BaseCharacterDatabase> characterDatabases)
     {
-        foreach (var characterClass in characterClasses)
+        foreach (var characterDatabase in characterDatabases)
         {
-            if (characterClass == null || CharacterClasses.ContainsKey(characterClass.Id))
+            if (characterDatabase == null || CharacterDatabases.ContainsKey(characterDatabase.Id))
                 continue;
-            CharacterClasses[characterClass.Id] = characterClass;
-            var attributes = new List<Attribute>();
-            foreach (var baseAttribute in characterClass.baseAttributes)
+            CharacterDatabases[characterDatabase.Id] = characterDatabase;
+            if (characterDatabase is PlayerCharacterDatabase)
             {
-                if (baseAttribute.attribute == null || Attributes.ContainsKey(baseAttribute.attribute.Id))
-                    continue;
-                attributes.Add(baseAttribute.attribute);
+                var playerCharacterDatabase = characterDatabase as PlayerCharacterDatabase;
+                var attributes = new List<Attribute>();
+                foreach (var baseAttribute in playerCharacterDatabase.baseAttributes)
+                {
+                    if (baseAttribute.attribute == null || Attributes.ContainsKey(baseAttribute.attribute.Id))
+                        continue;
+                    attributes.Add(baseAttribute.attribute);
+                }
+                AddAttributes(attributes);
+                AddSkills(playerCharacterDatabase.skills);
+                AddItems(new Item[] { playerCharacterDatabase.rightHandEquipItem, playerCharacterDatabase.leftHandEquipItem });
+                AddItems(playerCharacterDatabase.armorItems);
             }
-            AddAttributes(attributes);
-            AddSkills(characterClass.skills);
-            AddItems(new Item[] { characterClass.rightHandEquipItem, characterClass.leftHandEquipItem });
-            AddItems(characterClass.armorItems);
-        }
-    }
-
-    public static void AddCharacterModels(IEnumerable<CharacterModel> characterModels)
-    {
-        foreach (var characterModel in characterModels)
-        {
-            if (characterModel == null || CharacterModels.ContainsKey(characterModel.Id))
-                continue;
-            CharacterModels[characterModel.Id] = characterModel;
-        }
-    }
-
-    public static void AddCharacterPrototypes(IEnumerable<CharacterPrototype> characterPrototypes)
-    {
-        foreach (var characterPrototype in characterPrototypes)
-        {
-            if (characterPrototype == null || CharacterPrototypes.ContainsKey(characterPrototype.Id))
-                continue;
-            CharacterPrototypes[characterPrototype.Id] = characterPrototype;
-            AddCharacterClasses(new CharacterClass[] { characterPrototype.characterClass });
-            AddCharacterModels(new CharacterModel[] { characterPrototype.characterModel });
         }
     }
 

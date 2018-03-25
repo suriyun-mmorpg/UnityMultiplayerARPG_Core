@@ -154,7 +154,7 @@ public struct ItemDrop
 [System.Serializable]
 public struct EquipmentRequirement
 {
-    public CharacterClass characterClass;
-    public int characterLevel;
+    public PlayerCharacterDatabase character;
+    public int level;
     public AttributeAmount[] attributeAmounts;
 }

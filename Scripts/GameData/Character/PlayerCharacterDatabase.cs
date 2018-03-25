@@ -5,13 +5,12 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-[CreateAssetMenu(fileName = "CharacterClass", menuName = "Create GameData/CharacterClass")]
-public class CharacterClass : BaseGameData
+[CreateAssetMenu(fileName = "CharacterDatabase", menuName = "Create GameData/CharacterDatabase")]
+public class PlayerCharacterDatabase : BaseCharacterDatabase
 {
     [Header("Attributes/Stats")]
     public AttributeAmount[] baseAttributes;
-    public CharacterStats baseStats;
-    public CharacterStats statsIncreaseEachLevel;
+    public CharacterStatsIncremental stats;
 
     [Header("Skills")]
     public Skill[] skills;
@@ -33,7 +32,10 @@ public class CharacterClass : BaseGameData
                 tempRightHandWeapon = rightHandEquipItem;
 
             if (tempRightHandWeapon == null || tempRightHandWeapon.weaponType == null)
+            {
+                Debug.LogWarning("Right hand equipment is not weapon");
                 rightHandEquipItem = null;
+            }
         }
         if (leftHandEquipItem != null)
         {
@@ -43,13 +45,31 @@ public class CharacterClass : BaseGameData
                 tempLeftHandShield = leftHandEquipItem;
 
             if ((tempLeftHandWeapon == null || tempLeftHandWeapon.weaponType == null) && tempLeftHandShield == null)
+            {
+                Debug.LogWarning("Left hand equipment is not weapon or shield");
                 leftHandEquipItem = null;
+            }
             else if (tempRightHandWeapon != null)
             {
                 if (tempLeftHandShield != null && tempRightHandWeapon.EquipType == WeaponItemEquipType.TwoHand)
+                {
+                    Debug.LogWarning("Cannot set left hand equipment because it's equipping two hand weapon");
                     leftHandEquipItem = null;
+                }
                 else if (tempLeftHandWeapon != null && tempRightHandWeapon.EquipType != WeaponItemEquipType.OneHandCanDual)
+                {
+                    Debug.LogWarning("Cannot set left hand equipment because it's equipping one hand weapon which cannot equip dual");
                     leftHandEquipItem = null;
+                }
+            }
+            if (leftHandEquipItem != null)
+            {
+                if (leftHandEquipItem.EquipType == WeaponItemEquipType.OneHand ||
+                    leftHandEquipItem.EquipType == WeaponItemEquipType.TwoHand)
+                {
+                    Debug.LogWarning("Left hand weapon cannot be OneHand or TwoHand");
+                    leftHandEquipItem = null;
+                }
             }
         }
         var equipedPositions = new List<string>();
@@ -73,4 +93,9 @@ public class CharacterClass : BaseGameData
         EditorUtility.SetDirty(this);
     }
 #endif
+
+    public override CharacterStats GetCharacterStats(int level)
+    {
+        return stats.GetCharacterStats(level);
+    }
 }

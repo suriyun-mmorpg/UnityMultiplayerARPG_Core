@@ -10,8 +10,7 @@ public static class PlayerCharacterDataExtension
     public static T CloneTo<T>(this IPlayerCharacterData from, T to) where T : IPlayerCharacterData
     {
         to.Id = from.Id;
-        to.ClassId = from.ClassId;
-        to.ModelId = from.ModelId;
+        to.DatabaseId = from.DatabaseId;
         to.CharacterName = from.CharacterName;
         to.Level = from.Level;
         to.Exp = from.Exp;
@@ -34,67 +33,70 @@ public static class PlayerCharacterDataExtension
         return to;
     }
 
-    public static T SetNewCharacterData<T>(this T character, string characterName, string prototypeId) where T : IPlayerCharacterData
+    public static T SetNewCharacterData<T>(this T character, string characterName, string databaseId) where T : IPlayerCharacterData
     {
         var gameInstance = GameInstance.Singleton;
-        CharacterPrototype prototype;
-        if (!GameInstance.CharacterPrototypes.TryGetValue(prototypeId, out prototype) ||
-            prototype.characterClass == null ||
-            prototype.characterModel == null)
+        BaseCharacterDatabase characterDatabase;
+        if (!GameInstance.CharacterDatabases.TryGetValue(databaseId, out characterDatabase))
             return character;
+        // Player character database
+        if (characterDatabase is PlayerCharacterDatabase)
+        {
+            var playerCharacterDatabase = characterDatabase as PlayerCharacterDatabase;
+            // Attributes
+            var baseAttributes = playerCharacterDatabase.baseAttributes;
+            foreach (var baseAttribute in baseAttributes)
+            {
+                var characterAttribute = new CharacterAttribute();
+                characterAttribute.attributeId = baseAttribute.attribute.Id;
+                characterAttribute.amount = baseAttribute.amount;
+                character.Attributes.Add(characterAttribute);
+            }
+            // Right hand & left hand items
+            var rightHandEquipItem = playerCharacterDatabase.rightHandEquipItem;
+            var leftHandEquipItem = playerCharacterDatabase.leftHandEquipItem;
+            var equipWeapons = new EquipWeapons();
+            // Right hand equipped item
+            if (rightHandEquipItem != null)
+            {
+                var characterItem = new CharacterItem();
+                characterItem.id = System.Guid.NewGuid().ToString();
+                characterItem.itemId = rightHandEquipItem.Id;
+                characterItem.level = 1;
+                characterItem.amount = rightHandEquipItem.maxStack;
+                equipWeapons.rightHand = characterItem;
+            }
+            // Left hand equipped item
+            if (leftHandEquipItem != null)
+            {
+                var characterItem = new CharacterItem();
+                characterItem.id = System.Guid.NewGuid().ToString();
+                characterItem.itemId = leftHandEquipItem.Id;
+                characterItem.level = 1;
+                characterItem.amount = leftHandEquipItem.maxStack;
+                equipWeapons.leftHand = characterItem;
+            }
+            // Armors
+            var armorItems = playerCharacterDatabase.armorItems;
+            foreach (var armorItem in armorItems)
+            {
+                if (armorItem == null)
+                    continue;
+                var characterItem = new CharacterItem();
+                characterItem.id = System.Guid.NewGuid().ToString();
+                characterItem.itemId = armorItem.Id;
+                characterItem.level = 1;
+                characterItem.amount = armorItem.maxStack;
+                character.EquipItems.Add(characterItem);
+            }
+        }
         // General data
-        character.ClassId = prototype.characterClass.Id;
-        character.ModelId = prototype.characterModel.Id;
+        character.DatabaseId = characterDatabase.Id;
         character.CharacterName = characterName;
         character.Level = 1;
-        foreach (var baseAttribute in character.GetClass().baseAttributes)
-        {
-            var characterAttribute = new CharacterAttribute();
-            characterAttribute.attributeId = baseAttribute.attribute.Id;
-            characterAttribute.amount = baseAttribute.amount;
-            character.Attributes.Add(characterAttribute);
-        }
         character.CurrentHp = character.GetMaxHp();
         character.CurrentMp = character.GetMaxMp();
         character.Gold = gameInstance.startGold;
-        // Right hand & left hand items
-        var rightHandEquipItem = prototype.characterClass.rightHandEquipItem;
-        var leftHandEquipItem = prototype.characterClass.leftHandEquipItem;
-        var equipWeapons = new EquipWeapons();
-        // Right hand equipped item
-        if (rightHandEquipItem != null)
-        {
-            var characterItem = new CharacterItem();
-            characterItem.id = System.Guid.NewGuid().ToString();
-            characterItem.itemId = rightHandEquipItem.Id;
-            characterItem.level = 1;
-            characterItem.amount = rightHandEquipItem.maxStack;
-            equipWeapons.rightHand = characterItem;
-        }
-        // Left hand equipped item
-        if (leftHandEquipItem != null)
-        {
-            var characterItem = new CharacterItem();
-            characterItem.id = System.Guid.NewGuid().ToString();
-            characterItem.itemId = leftHandEquipItem.Id;
-            characterItem.level = 1;
-            characterItem.amount = leftHandEquipItem.maxStack;
-            equipWeapons.leftHand = characterItem;
-        }
-        // Armors
-        var armorItems = prototype.characterClass.armorItems;
-        foreach (var armorItem in armorItems)
-        {
-            if (armorItem == null)
-                continue;
-            var characterItem = new CharacterItem();
-            characterItem.id = System.Guid.NewGuid().ToString();
-            characterItem.itemId = armorItem.Id;
-            characterItem.level = 1;
-            characterItem.amount = armorItem.maxStack;
-            character.EquipItems.Add(characterItem);
-        }
-
         // Inventory
         var startItems = gameInstance.startItems;
         foreach (var startItem in startItems)

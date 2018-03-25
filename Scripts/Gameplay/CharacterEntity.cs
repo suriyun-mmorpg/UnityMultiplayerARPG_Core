@@ -52,8 +52,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     // Use id as primary key
     #region Sync data
-    public SyncFieldString modelId = new SyncFieldString();
-    public SyncFieldString classId = new SyncFieldString();
+    public SyncFieldString databaseId = new SyncFieldString();
     public SyncFieldString characterName = new SyncFieldString();
     public SyncFieldInt level = new SyncFieldInt();
     public SyncFieldInt exp = new SyncFieldInt();
@@ -69,8 +68,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Interface implementation
-    public string ModelId { get { return modelId; } set { modelId.Value = value; } }
-    public string ClassId { get { return classId; } set { classId.Value = value; } }
+    public string DatabaseId { get { return databaseId; } set { databaseId.Value = value; } }
     public string CharacterName { get { return characterName; } set { characterName.Value = value; } }
     public int Level { get { return level.Value; } set { level.Value = value; } }
     public int Exp { get { return exp.Value; } set { exp.Value = value; } }
@@ -259,10 +257,8 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     {
         characterName.sendOptions = SendOptions.ReliableOrdered;
         characterName.forOwnerOnly = false;
-        modelId.sendOptions = SendOptions.ReliableOrdered;
-        modelId.forOwnerOnly = false;
-        classId.sendOptions = SendOptions.ReliableOrdered;
-        classId.forOwnerOnly = false;
+        databaseId.sendOptions = SendOptions.ReliableOrdered;
+        databaseId.forOwnerOnly = false;
         level.sendOptions = SendOptions.ReliableOrdered;
         level.forOwnerOnly = false;
         exp.sendOptions = SendOptions.ReliableOrdered;
@@ -285,8 +281,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     {
         SetupNetElements();
         // On data changes events
-        modelId.onChange += OnModelIdChange;
-        classId.onChange += OnClassIdChange;
+        databaseId.onChange += OnDatabaseIdChange;
         equipWeapons.onChange += OnChangeEquipWeapons;
         // On list changes events
         attributes.onOperation += OnAttributesOperation;
@@ -314,8 +309,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     protected virtual void OnDestroy()
     {
         // On data changes events
-        modelId.onChange -= OnModelIdChange;
-        classId.onChange -= OnClassIdChange;
+        databaseId.onChange -= OnDatabaseIdChange;
         equipWeapons.onChange -= OnChangeEquipWeapons;
         // On list changes events
         attributes.onOperation -= OnAttributesOperation;
@@ -979,10 +973,10 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     
     #region Sync data changes callback
     /// <summary>
-    /// Override this to do stuffs when model Id changed
+    /// Override this to do stuffs when database Id changed
     /// </summary>
-    /// <param name="modelId"></param>
-    protected virtual void OnModelIdChange(string modelId)
+    /// <param name="databaseId"></param>
+    protected virtual void OnDatabaseIdChange(string databaseId)
     {
         // Setup model
         if (model != null)
@@ -995,14 +989,6 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             model.SetEquipWeapons(equipWeapons);
             model.SetEquipItems(equipItems);
         }
-    }
-
-    /// <summary>
-    /// Override this to do stuffs when class Id changed
-    /// </summary>
-    /// <param name="classId"></param>
-    protected virtual void OnClassIdChange(string classId)
-    {
     }
 
     /// <summary>

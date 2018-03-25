@@ -4,22 +4,22 @@ using UnityEngine;
 
 public static class CharacterDataExtension
 {
-    public static CharacterClass GetClass(this ICharacterData data)
+    public static BaseCharacterDatabase GetDatabase(this ICharacterData data)
     {
-        CharacterClass characterClass = null;
-        if (string.IsNullOrEmpty(data.ClassId) || !GameInstance.CharacterClasses.TryGetValue(data.ClassId, out characterClass))
+        BaseCharacterDatabase database = null;
+        if (string.IsNullOrEmpty(data.DatabaseId) || !GameInstance.CharacterDatabases.TryGetValue(data.DatabaseId, out database))
             return null;
 
-        return characterClass;
+        return database;
     }
 
     public static CharacterModel InstantiateModel(this ICharacterData data, Transform parent)
     {
-        CharacterModel characterModel = null;
-        if (string.IsNullOrEmpty(data.ModelId) || !GameInstance.CharacterModels.TryGetValue(data.ModelId, out characterModel))
+        BaseCharacterDatabase characterDatabase = null;
+        if (string.IsNullOrEmpty(data.DatabaseId) || !GameInstance.CharacterDatabases.TryGetValue(data.DatabaseId, out characterDatabase))
             return null;
 
-        var result = Object.Instantiate(characterModel, parent);
+        var result = Object.Instantiate(characterDatabase.model, parent);
         result.gameObject.SetLayerRecursively(GameInstance.Singleton.characterLayer, true);
         result.gameObject.SetActive(true);
         result.transform.localPosition = Vector3.zero;
@@ -166,11 +166,11 @@ public static class CharacterDataExtension
     public static CharacterStats GetStats(this ICharacterData data)
     {
         var level = data.Level;
-        var characterClass = data.GetClass();
+        var characterDatabase = data.GetDatabase();
         var result = new CharacterStats();
 
-        if (characterClass != null)
-            result += characterClass.baseStats + characterClass.statsIncreaseEachLevel * level;
+        if (characterDatabase != null)
+            result += characterDatabase.GetCharacterStats(level);
 
         Item tempEquipment = null;
         var equipItems = data.EquipItems;

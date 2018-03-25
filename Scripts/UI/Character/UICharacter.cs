@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class UICharacter : UISelectionEntry<ICharacterData>
 {
-    public string prototypeId { get; protected set; }
+    public string databaseId { get; protected set; }
 
     [Header("Display Format")]
     [Tooltip("Name Format => {0} = {Character name}")]
@@ -87,9 +87,9 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         }
     }
 
-    public void Setup(ICharacterData data, string prototypeId)
+    public void Setup(ICharacterData data, string databaseId)
     {
-        this.prototypeId = prototypeId;
+        this.databaseId = databaseId;
         Data = data;
     }
 
@@ -248,17 +248,17 @@ public class UICharacter : UISelectionEntry<ICharacterData>
             }
         }
         
-        var classData = Data == null ? null : Data.GetClass();
+        var characterDatabase = Data == null ? null : Data.GetDatabase();
         if (textClassTitle != null)
-            textClassTitle.text = string.Format(classTitleFormat, classData == null ? "N/A" : classData.title);
+            textClassTitle.text = string.Format(classTitleFormat, characterDatabase == null ? "N/A" : characterDatabase.title);
 
         if (textClassDescription != null)
-            textClassDescription.text = string.Format(classDescriptionFormat, classData == null ? "N/A" : classData.description);
+            textClassDescription.text = string.Format(classDescriptionFormat, characterDatabase == null ? "N/A" : characterDatabase.description);
 
         if (imageClassIcon != null)
         {
-            imageClassIcon.sprite = classData == null ? null : classData.icon;
-            imageClassIcon.gameObject.SetActive(classData != null);
+            imageClassIcon.sprite = characterDatabase == null ? null : characterDatabase.icon;
+            imageClassIcon.gameObject.SetActive(characterDatabase != null);
         }
     }
 }

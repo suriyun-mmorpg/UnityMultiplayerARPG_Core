@@ -22,22 +22,22 @@ public class UIEquipmentItemRequirement : UISelectionEntry<KeyValuePair<Item, in
 
         if (textRequireLevel != null)
         {
-            if (equipmentItem == null || equipmentItem.requirement.characterLevel <= 0)
+            if (equipmentItem == null || equipmentItem.requirement.level <= 0)
                 textRequireLevel.gameObject.SetActive(false);
             else
             {
-                textRequireLevel.text = string.Format(requireLevelFormat, equipmentItem.requirement.characterLevel.ToString("N0"));
+                textRequireLevel.text = string.Format(requireLevelFormat, equipmentItem.requirement.level.ToString("N0"));
                 textRequireLevel.gameObject.SetActive(true);
             }
         }
 
         if (textRequireClass != null)
         {
-            if (equipmentItem == null || equipmentItem.requirement.characterClass == null)
+            if (equipmentItem == null || equipmentItem.requirement.character == null)
                 textRequireClass.gameObject.SetActive(false);
             else
             {
-                textRequireClass.text = string.Format(requireClassFormat, equipmentItem.requirement.characterClass.title);
+                textRequireClass.text = string.Format(requireClassFormat, equipmentItem.requirement.character.title);
                 textRequireClass.gameObject.SetActive(true);
             }
         }

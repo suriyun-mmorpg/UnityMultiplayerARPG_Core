@@ -15,7 +15,7 @@ public class NonPlayerCharacterEntity : CharacterEntity
     public const float AGGRESSIVE_FIND_TARGET_DELAY = 1f;
 
     #region Protected data
-    protected NpcPrototype prototype;
+    protected MonsterCharacterDatabase prototype;
     protected float wanderTime;
     protected float findTargetTime;
     #endregion

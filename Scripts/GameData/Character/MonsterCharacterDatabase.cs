@@ -11,7 +11,7 @@ public enum NpcCharacteristic
 }
 
 [CreateAssetMenu(fileName = "MonsterPrototype", menuName = "Create GameData/MonsterPrototype")]
-public class NpcPrototype : CharacterPrototype
+public class MonsterCharacterDatabase : BaseCharacterDatabase
 {
     [Header("Monster Data")]
     public NpcCharacteristic characteristic;
@@ -65,5 +65,10 @@ public class NpcPrototype : CharacterPrototype
                 });
         }
         return rewards;
+    }
+
+    public override CharacterStats GetCharacterStats(int level)
+    {
+        return stats;
     }
 }

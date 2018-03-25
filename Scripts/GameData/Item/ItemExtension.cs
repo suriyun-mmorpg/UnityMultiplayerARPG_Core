@@ -32,10 +32,10 @@ public static class ItemExtension
             }
         }
 
-        if (equipmentItem.requirement.characterClass != null && equipmentItem.requirement.characterClass != character.GetClass())
+        if (equipmentItem.requirement.character != null && equipmentItem.requirement.character != character.GetDatabase())
             isPass = false;
 
-        return character.Level >= equipmentItem.requirement.characterLevel && isPass;
+        return character.Level >= equipmentItem.requirement.level && isPass;
     }
 
     public static CharacterStats GetStats(this Item equipmentItem, int level)

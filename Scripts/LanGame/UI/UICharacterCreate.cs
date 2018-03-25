@@ -50,15 +50,15 @@ public class UICharacterCreate : UIBase
     {
         SelectionManager.Clear();
         // Show list of characters that can be create
-        var selectableCharacters = GameInstance.CharacterPrototypes.Values.ToList();
-        CacheList.Generate(selectableCharacters, (index, characterPrototype, ui) =>
+        var selectableCharacters = GameInstance.CharacterDatabases.Values.ToList();
+        CacheList.Generate(selectableCharacters, (index, characterDatabase, ui) =>
         {
-            var prototypeId = characterPrototype.Id;
+            var databaseId = characterDatabase.Id;
             var character = new PlayerCharacterData();
-            character.Id = prototypeId;
-            character.SetNewCharacterData(characterPrototype.title, characterPrototype.Id);
+            character.Id = databaseId;
+            character.SetNewCharacterData(characterDatabase.title, characterDatabase.Id);
             var uiCharacter = ui.GetComponent<UICharacter>();
-            uiCharacter.Setup(character, prototypeId);
+            uiCharacter.Setup(character, databaseId);
             // Select trigger when add first entry so deactive all models is okay beacause first model will active
             var characterModel = character.InstantiateModel(characterModelContainer);
             CharacterModels[character.Id] = characterModel;
@@ -77,7 +77,7 @@ public class UICharacterCreate : UIBase
     protected void OnSelectCharacter(UICharacter ui)
     {
         characterModelContainer.SetChildrenActive(false);
-        ShowCharacter(ui.prototypeId);
+        ShowCharacter(ui.databaseId);
     }
 
     protected void ShowCharacter(string id)
@@ -98,7 +98,7 @@ public class UICharacterCreate : UIBase
             Debug.LogWarning("Cannot create character, did not selected character class");
             return;
         }
-        var prototypeId = selectedUI.prototypeId;
+        var prototypeId = selectedUI.databaseId;
         var characterName = inputCharacterName.text.Trim();
         var minCharacterNameLength = gameInstance.minCharacterNameLength;
         var maxCharacterNameLength = gameInstance.maxCharacterNameLength;

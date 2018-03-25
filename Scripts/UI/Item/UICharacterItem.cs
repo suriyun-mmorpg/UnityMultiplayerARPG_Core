@@ -146,7 +146,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
 
         if (uiRequirement != null)
         {
-            if (equipmentItem == null || (equipmentItem.requirement.characterLevel == 0 && equipmentItem.requirement.characterClass == null && equipmentItem.CacheRequireAttributeAmounts.Count == 0))
+            if (equipmentItem == null || (equipmentItem.requirement.level == 0 && equipmentItem.requirement.character == null && equipmentItem.CacheRequireAttributeAmounts.Count == 0))
                 uiRequirement.Hide();
             else
             {
