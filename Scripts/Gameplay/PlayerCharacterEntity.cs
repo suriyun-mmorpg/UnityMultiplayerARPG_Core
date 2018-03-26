@@ -24,7 +24,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     protected LiteNetLibFunction<NetFieldInt, NetFieldInt> netFuncSwapOrMergeItem;
     protected LiteNetLibFunction<NetFieldInt> netFuncAddAttribute;
     protected LiteNetLibFunction<NetFieldInt> netFuncAddSkill;
-    protected LiteNetLibFunction<NetFieldVector3, NetFieldUInt> netFuncPointClickMovement;
+    protected LiteNetLibFunction<NetFieldVector3> netFuncPointClickMovement;
     #endregion
 
     #region Interface implementation
@@ -52,6 +52,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
 
     #region Protected data
     protected float updatedTargetEntityPositionTime;
+    protected bool pointClickMoveStopped;
     protected Queue<Vector3> navPaths;
     protected Vector3 moveDirection;
     protected bool isJumping;
@@ -94,6 +95,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         CacheRigidbody.useGravity = false;
         var gameInstance = GameInstance.Singleton;
         gameObject.tag = gameInstance.playerTag;
+        ClearPaths();
     }
 
     protected override void Start()
@@ -215,6 +217,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         navPaths = null;
         moveDirection = Vector3.zero;
         CacheRigidbody.velocity = Vector3.zero;
+        pointClickMoveStopped = true;
     }
 
     protected virtual void UpdateInput()
@@ -233,75 +236,130 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
             RaycastHit hit;
             if (Physics.Raycast(targetCamera.ScreenPointToRay(Input.mousePosition), out hit, 100f))
             {
+                SetTargetEntity(null);
                 var hitTransform = hit.transform;
-                var hitLayer = hitTransform.gameObject.layer;
+                var hitTag = hitTransform.gameObject.tag;
                 var hitPoint = hit.point;
-                if (hitLayer == gameInstance.characterLayer ||
-                    hitLayer == gameInstance.itemDropLayer)
+                if (hitTag.Equals(gameInstance.playerTag) ||
+                    hitTag.Equals(gameInstance.monsterTag) ||
+                    hitTag.Equals(gameInstance.npcTag) ||
+                    hitTag.Equals(gameInstance.itemDropTag))
                 {
-                    var networkEntity = hitTransform.GetComponent<RpgNetworkEntity>();
                     destination = null;
-                    PointClickMovement(hitPoint, networkEntity.Identity);
+                    var entity = hitTransform.GetComponent<RpgNetworkEntity>();
+                    if (entity != null)
+                    {
+                        hitPoint = entity.CacheTransform.position;
+                        if (hitTag.Equals(gameInstance.playerTag))
+                        {
+                            var playerEntity = entity as PlayerCharacterEntity;
+                            if (playerEntity != null && playerEntity.CurrentHp > 0)
+                                SetTargetEntity(playerEntity);
+                        }
+                        else if (hitTag.Equals(gameInstance.monsterTag))
+                        {
+                            var monsterEntity = entity as MonsterCharacterEntity;
+                            if (monsterEntity != null && monsterEntity.CurrentHp > 0)
+                                SetTargetEntity(monsterEntity);
+                        }
+                        else if (hitTag.Equals(gameInstance.npcTag))
+                        {
+                            var npcEntity = entity as NpcEntity;
+                            if (npcEntity != null)
+                                SetTargetEntity(npcEntity);
+                        }
+                        else if (hitTag.Equals(gameInstance.itemDropTag))
+                        {
+                            var itemDropEntity = entity as ItemDropEntity;
+                            if (itemDropEntity != null)
+                                SetTargetEntity(itemDropEntity);
+                        }
+                    }
                 }
                 else
-                {
                     destination = hitPoint;
-                    PointClickMovement(hitPoint, null);
-                }
+                PointClickMovement(hitPoint);
             }
         }
-        
+
+        // Temp variables
         PlayerCharacterEntity targetPlayer;
         MonsterCharacterEntity targetMonster;
         NpcEntity targetNpc;
         ItemDropEntity targetItemDrop;
         if (TryGetTargetEntity(out targetPlayer))
         {
-            UpdateTargetEntityPosition(targetPlayer);
             if (targetPlayer.CurrentHp <= 0)
             {
                 SetTargetEntity(null);
+                StopPointClickMove();
                 return;
             }
-            // Do something ...
+            var conversationDistance = gameInstance.conversationDistance;
+            if (Vector3.Distance(CurrentPosition, targetPlayer.CacheTransform.position) <= conversationDistance)
+            {
+                StopPointClickMove();
+                // TODO: do something
+            }
+            else
+                UpdateTargetEntityPosition(targetPlayer);
         }
         else if (TryGetTargetEntity(out targetMonster))
         {
-            UpdateTargetEntityPosition(targetMonster);
             if (targetMonster.CurrentHp <= 0)
             {
                 SetTargetEntity(null);
+                StopPointClickMove();
                 return;
             }
             var attackDistance = EquipWeapons.GetAttackDistance() + targetMonster.CacheCapsuleCollider.radius;
             if (Vector3.Distance(CurrentPosition, targetMonster.CacheTransform.position) <= attackDistance)
+            {
+                StopPointClickMove();
                 Attack();
+            }
+            else
+                UpdateTargetEntityPosition(targetMonster);
         }
         else if (TryGetTargetEntity(out targetNpc))
         {
-            UpdateTargetEntityPosition(targetNpc);
             var conversationDistance = gameInstance.conversationDistance;
             if (Vector3.Distance(CurrentPosition, targetNpc.CacheTransform.position) <= conversationDistance)
             {
+                StopPointClickMove();
                 // TODO: implement npc conversation
             }
+            else
+                UpdateTargetEntityPosition(targetNpc);
         }
         else if (TryGetTargetEntity(out targetItemDrop))
         {
-            UpdateTargetEntityPosition(targetItemDrop);
             var pickUpItemDistance = gameInstance.pickUpItemDistance;
             if (Vector3.Distance(CurrentPosition, targetItemDrop.CacheTransform.position) <= pickUpItemDistance)
+            {
+                StopPointClickMove();
                 PickupItem(targetItemDrop.ObjectId);
+            }
+            else
+                UpdateTargetEntityPosition(targetItemDrop);
         }
+    }
+
+    protected void StopPointClickMove()
+    {
+        if (!pointClickMoveStopped)
+            PointClickMovement(CurrentPosition);
+        pointClickMoveStopped = true;
     }
 
     protected void UpdateTargetEntityPosition(RpgNetworkEntity entity)
     {
         if (entity == null)
             return;
+
         var timeDiff = Time.realtimeSinceStartup - updatedTargetEntityPositionTime;
         if (timeDiff > UPDATE_INTERVAL_TARGET_ENTITY)
-            PointClickMovement(entity.CacheTransform.position, entity.Identity);
+            PointClickMovement(entity.CacheTransform.position);
     }
     
     protected float CalculateJumpVerticalSpeed()
@@ -352,7 +410,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         netFuncSwapOrMergeItem = new LiteNetLibFunction<NetFieldInt, NetFieldInt>(NetFuncSwapOrMergeItemCallback);
         netFuncAddAttribute = new LiteNetLibFunction<NetFieldInt>(NetFuncAddAttributeCallback);
         netFuncAddSkill = new LiteNetLibFunction<NetFieldInt>(NetFuncAddSkillCallback);
-        netFuncPointClickMovement = new LiteNetLibFunction<NetFieldVector3, NetFieldUInt>(NetFuncPointClickMovementCallback);
+        netFuncPointClickMovement = new LiteNetLibFunction<NetFieldVector3>(NetFuncPointClickMovementCallback);
 
         RegisterNetFunction("SwapOrMergeItem", netFuncSwapOrMergeItem);
         RegisterNetFunction("AddAttribute", netFuncAddAttribute);
@@ -442,16 +500,14 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         skills[skillIndex] = skill;
     }
 
-    protected void NetFuncPointClickMovementCallback(NetFieldVector3 position, NetFieldUInt entityId)
+    protected void NetFuncPointClickMovementCallback(NetFieldVector3 position)
     {
-        NetFuncPointClickMovement(position, entityId);
+        NetFuncPointClickMovement(position);
     }
 
-    protected void NetFuncPointClickMovement(Vector3 position, uint entityId)
+    protected void NetFuncPointClickMovement(Vector3 position)
     {
-        LiteNetLibIdentity targetIdentity;
-        Manager.Assets.SpawnedObjects.TryGetValue(entityId, out targetIdentity);
-        SetMovePaths(position, targetIdentity);
+        SetMovePaths(position);
     }
     #endregion
 
@@ -471,14 +527,12 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         CallNetFunction("AddSkill", FunctionReceivers.Server, skillIndex);
     }
 
-    public void PointClickMovement(Vector3 position, LiteNetLibIdentity targetIdentity)
+    public void PointClickMovement(Vector3 position)
     {
-        if (!IsServer)
-            SetMovePaths(position, targetIdentity);
-        uint entityId = 0;
-        if (targetIdentity != null)
-            entityId = targetIdentity.ObjectId;
-        CallNetFunction("PointClickMovement", FunctionReceivers.Server, position, entityId);
+        if (!IsServer && CacheNetTransform.ownerClientNotInterpolate)
+            SetMovePaths(position);
+        pointClickMoveStopped = false;
+        CallNetFunction("PointClickMovement", FunctionReceivers.Server, position);
     }
     #endregion
 
@@ -560,37 +614,9 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     }
     #endregion
 
-    protected void SetMovePaths(Vector3 position, LiteNetLibIdentity targetIdentity)
+    protected void SetMovePaths(Vector3 position)
     {
         var navPath = new NavMeshPath();
-        if (targetIdentity != null)
-        {
-            var entity = targetIdentity.GetComponent<RpgNetworkEntity>();
-            if (entity != null)
-            {
-                position = entity.CacheTransform.position;
-                var gameInstance = GameInstance.Singleton;
-                var tag = entity.gameObject.tag;
-                if (tag.Equals(gameInstance.playerTag))
-                {
-                    var playerEntity = entity as PlayerCharacterEntity;
-                    if (playerEntity != null && playerEntity.CurrentHp > 0)
-                        SetTargetEntity(playerEntity);
-                }
-                else if (tag.Equals(gameInstance.npcTag))
-                {
-                    var npcEntity = entity as MonsterCharacterEntity;
-                    if (npcEntity != null && npcEntity.CurrentHp > 0)
-                        SetTargetEntity(npcEntity);
-                }
-                else if (tag.Equals(gameInstance.itemDropTag))
-                {
-                    var itemDropEntity = entity as ItemDropEntity;
-                    if (itemDropEntity != null)
-                        SetTargetEntity(itemDropEntity);
-                }
-            }
-        }
         if (NavMesh.CalculatePath(CacheTransform.position, position, NavMesh.AllAreas, navPath))
         {
             navPaths = new Queue<Vector3>(navPath.corners);
