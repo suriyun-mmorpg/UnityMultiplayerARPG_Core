@@ -58,8 +58,8 @@ public class MonsterCharacterEntity : CharacterEntity
         base.Update();
 
         var gameInstance = GameInstance.Singleton;
-        var targetEntity = GetTargetEntity();
-        if (targetEntity != null)
+        CharacterEntity targetEntity;
+        if (TryGetTargetEntity(out targetEntity))
         {
             // Lookat target then do anything when it's in range
             CacheNavMeshAgent.updateRotation = false;
@@ -93,17 +93,18 @@ public class MonsterCharacterEntity : CharacterEntity
                     Time.realtimeSinceStartup >= findTargetTime)
                 {
                     SetFindTargetTime();
-                    var targetCharacter = GetTargetEntity<CharacterEntity>();
-                    if (targetCharacter == null || targetCharacter.CurrentHp <= 0)
+                    CharacterEntity targetCharacter;
+                    // If no target enenmy or target enemy is dead
+                    if (!TryGetTargetEntity(out targetCharacter) || targetCharacter.CurrentHp <= 0)
                     {
                         // Find nearby character by layer mask
                         var foundObjects = new List<Collider>(Physics.OverlapSphere(CacheTransform.position, prototype.visualRange, gameInstance.characterLayer.Mask));
                         foundObjects = foundObjects.OrderBy(a => System.Guid.NewGuid()).ToList();
                         foreach (var foundObject in foundObjects)
                         {
-                            var playerCharacterEntity = foundObject.GetComponent<PlayerCharacterEntity>();
-                            if (playerCharacterEntity != null && IsEnemy(playerCharacterEntity))
-                                SetAttackTarget(playerCharacterEntity);
+                            var characterEntity = foundObject.GetComponent<CharacterEntity>();
+                            if (characterEntity != null && IsEnemy(characterEntity))
+                                SetAttackTarget(characterEntity);
                         }
                     }
                 }
@@ -155,8 +156,8 @@ public class MonsterCharacterEntity : CharacterEntity
         if (target == null || target.CurrentHp <= 0)
             return;
         // Already have target so don't set target
-        var oldTarget = GetTargetEntity<CharacterEntity>();
-        if (oldTarget != null && oldTarget.CurrentHp > 0)
+        CharacterEntity oldTarget;
+        if (TryGetTargetEntity(out oldTarget) && oldTarget.CurrentHp > 0)
             return;
         // Set target to attack
         SetTargetEntity(target);
@@ -167,11 +168,16 @@ public class MonsterCharacterEntity : CharacterEntity
     public override void ReceiveDamage(CharacterEntity attacker, Dictionary<DamageElement, DamageAmount> allDamageAttributes, CharacterBuff debuff)
     {
         base.ReceiveDamage(attacker, allDamageAttributes, debuff);
-        var gameInstance = GameInstance.Singleton;
-        var targetEntity = GetTargetEntity();
+        // If no attacker, skip next logics
+        if (attacker == null)
+            return;
+        // If character isn't dead
         if (CurrentHp > 0)
         {
-            if (targetEntity == null)
+            var gameInstance = GameInstance.Singleton;
+            // If no target enemy and current target is character, try to attack
+            CharacterEntity targetEntity;
+            if (!TryGetTargetEntity(out targetEntity))
             {
                 SetAttackTarget(attacker);
                 // If it's assist character call another character for assist

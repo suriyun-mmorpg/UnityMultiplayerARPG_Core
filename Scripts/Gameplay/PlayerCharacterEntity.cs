@@ -10,6 +10,7 @@ using LiteNetLibHighLevel;
 [RequireComponent(typeof(LiteNetLibTransform))]
 public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
 {
+    public const float UPDATE_INTERVAL_TARGET_ENTITY = 1f;
     public static PlayerCharacterEntity OwningCharacter { get; private set; }
 
     #region Sync data
@@ -50,6 +51,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     #endregion
 
     #region Protected data
+    protected float updatedTargetEntityPositionTime;
     protected Queue<Vector3> navPaths;
     protected Vector3 moveDirection;
     protected bool isJumping;
@@ -126,9 +128,10 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
             var destinationValue = destination.Value;
             if (CacheTargetObject != null)
                 CacheTargetObject.transform.position = destinationValue;
-            if (Vector3.Distance(destinationValue, CacheTransform.position) < stoppingDistance + 0.5f)
+            if (Vector3.Distance(destinationValue, CurrentPosition) < stoppingDistance + 0.5f)
                 destination = null;
         }
+        
         if (CacheTargetObject != null)
             CacheTargetObject.gameObject.SetActive(destination.HasValue);
     }
@@ -196,7 +199,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
             {
                 var target = navPaths.Peek();
                 target = new Vector3(target.x, 0, target.z);
-                var currentPosition = CacheTransform.position;
+                var currentPosition = CurrentPosition;
                 currentPosition = new Vector3(currentPosition.x, 0, currentPosition.z);
                 moveDirection = (target - currentPosition).normalized;
                 if (Vector3.Distance(target, currentPosition) < stoppingDistance)
@@ -219,12 +222,13 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         if (!IsOwnerClient)
             return;
 
+        var gameInstance = GameInstance.Singleton;
+
         if (CacheGameplayCameraControls != null)
             CacheGameplayCameraControls.updateRotation = Input.GetMouseButton(1);
 
         if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
         {
-            var gameInstance = GameInstance.Singleton;
             var targetCamera = CacheGameplayCameraControls != null ? CacheGameplayCameraControls.targetCamera : Camera.main;
             RaycastHit hit;
             if (Physics.Raycast(targetCamera.ScreenPointToRay(Input.mousePosition), out hit, 100f))
@@ -246,6 +250,58 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
                 }
             }
         }
+        
+        PlayerCharacterEntity targetPlayer;
+        MonsterCharacterEntity targetMonster;
+        NpcEntity targetNpc;
+        ItemDropEntity targetItemDrop;
+        if (TryGetTargetEntity(out targetPlayer))
+        {
+            UpdateTargetEntityPosition(targetPlayer);
+            if (targetPlayer.CurrentHp <= 0)
+            {
+                SetTargetEntity(null);
+                return;
+            }
+            // Do something ...
+        }
+        else if (TryGetTargetEntity(out targetMonster))
+        {
+            UpdateTargetEntityPosition(targetMonster);
+            if (targetMonster.CurrentHp <= 0)
+            {
+                SetTargetEntity(null);
+                return;
+            }
+            var attackDistance = EquipWeapons.GetAttackDistance() + targetMonster.CacheCapsuleCollider.radius;
+            if (Vector3.Distance(CurrentPosition, targetMonster.CacheTransform.position) <= attackDistance)
+                Attack();
+        }
+        else if (TryGetTargetEntity(out targetNpc))
+        {
+            UpdateTargetEntityPosition(targetNpc);
+            var conversationDistance = gameInstance.conversationDistance;
+            if (Vector3.Distance(CurrentPosition, targetNpc.CacheTransform.position) <= conversationDistance)
+            {
+                // TODO: implement npc conversation
+            }
+        }
+        else if (TryGetTargetEntity(out targetItemDrop))
+        {
+            UpdateTargetEntityPosition(targetItemDrop);
+            var pickUpItemDistance = gameInstance.pickUpItemDistance;
+            if (Vector3.Distance(CurrentPosition, targetItemDrop.CacheTransform.position) <= pickUpItemDistance)
+                PickupItem(targetItemDrop.ObjectId);
+        }
+    }
+
+    protected void UpdateTargetEntityPosition(RpgNetworkEntity entity)
+    {
+        if (entity == null)
+            return;
+        var timeDiff = Time.realtimeSinceStartup - updatedTargetEntityPositionTime;
+        if (timeDiff > UPDATE_INTERVAL_TARGET_ENTITY)
+            PointClickMovement(entity.CacheTransform.position, entity.Identity);
     }
     
     protected float CalculateJumpVerticalSpeed()

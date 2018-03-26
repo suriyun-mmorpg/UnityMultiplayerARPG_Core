@@ -22,7 +22,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     public const string ANIM_Y_SPEED = "YSpeed";
     public const string ANIM_DO_ACTION = "DoAction";
     public const string ANIM_ACTION_ID = "ActionId";
-    public const float UPDATE_SKILL_BUFF_INTERVAL = 1f;
+    public const float UPDATE_INTERVAL_SKILL_BUFF = 1f;
 
     #region Private data
     private RpgNetworkEntity targetEntity;
@@ -219,7 +219,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             if (level.ShouldUpdate())
             {
                 level.Update(Time.unscaledDeltaTime);
-                if (timeDiff > UPDATE_SKILL_BUFF_INTERVAL)
+                if (timeDiff > UPDATE_INTERVAL_SKILL_BUFF)
                     skills.Dirty(i);
             }
         }
@@ -235,11 +235,11 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             else
             {
                 buff.Update(Time.unscaledDeltaTime);
-                if (timeDiff > UPDATE_SKILL_BUFF_INTERVAL)
+                if (timeDiff > UPDATE_INTERVAL_SKILL_BUFF)
                     buffs.Dirty(i);
             }
         }
-        if (timeDiff > UPDATE_SKILL_BUFF_INTERVAL)
+        if (timeDiff > UPDATE_INTERVAL_SKILL_BUFF)
             updatedSkillAndBuffTime = Time.realtimeSinceStartup;
     }
 
@@ -371,7 +371,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         switch (damage.damageType)
         {
             case DamageType.Melee:
-                var hits = Physics.OverlapSphere(CacheTransform.position, GetMeleeAttackRadius(damage.hitDistance));
+                var hits = Physics.OverlapSphere(CacheTransform.position, damage.hitDistance);
                 foreach (var hit in hits)
                 {
                     var characterEntity = hit.GetComponent<CharacterEntity>();
@@ -460,7 +460,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         switch (damage.damageType)
         {
             case DamageType.Melee:
-                var hits = Physics.OverlapSphere(CacheTransform.position, GetMeleeAttackRadius(damage.hitDistance));
+                var hits = Physics.OverlapSphere(CacheTransform.position, damage.hitDistance);
                 foreach (var hit in hits)
                 {
                     var characterEntity = hit.GetComponent<CharacterEntity>();
@@ -1087,26 +1087,18 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         targetEntity = newTargetEntity;
     }
 
-    protected RpgNetworkEntity GetTargetEntity()
+    protected bool TryGetTargetEntity<T>(out T entity) where T : RpgNetworkEntity
     {
-        return targetEntity;
-    }
-
-    protected T GetTargetEntity<T>() where T : RpgNetworkEntity
-    {
+        entity = null;
         if (targetEntity == null)
-            return null;
-        return targetEntity as T;
+            return false;
+        entity = targetEntity as T;
+        return entity != null;
     }
 
     protected abstract Vector3 GetMovementVelocity();
     protected abstract bool IsAlly(CharacterEntity characterEntity);
     protected abstract bool IsEnemy(CharacterEntity characterEntity);
-
-    public float GetMeleeAttackRadius(float hitDistance)
-    {
-        return (model == null ? 0 : model.radius) + 0.1f + hitDistance;
-    }
 
     public static string GetBuffKey(string skillId, bool isDebuff)
     {

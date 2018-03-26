@@ -10,44 +10,44 @@ public struct EquipWeapons
     public CharacterItem rightHand;
     public CharacterItem leftHand;
 
-    public float GetAttackRange()
+    public float GetAttackDistance()
     {
-        float? minRange = null;
+        float? minDistance = null;
         Damage tempDamage;
-        float tempRange = 0f;
+        float tempDistance = 0f;
         var rightHandWeapon = rightHand.GetWeaponItem();
         var leftHandWeapon = leftHand.GetWeaponItem();
         if (rightHandWeapon != null)
         {
             tempDamage = rightHandWeapon.WeaponType.damage;
-            if (TryGetAttackRange(tempDamage, out tempRange) && (!minRange.HasValue || minRange.Value > tempRange))
-                minRange = tempRange;
+            if (TryGetAttackDistance(tempDamage, out tempDistance) && (!minDistance.HasValue || minDistance.Value > tempDistance))
+                minDistance = tempDistance;
         }
         if (leftHandWeapon)
         {
             tempDamage = leftHandWeapon.WeaponType.damage;
-            if (TryGetAttackRange(tempDamage, out tempRange) && (!minRange.HasValue || minRange.Value > tempRange))
-                minRange = tempRange;
+            if (TryGetAttackDistance(tempDamage, out tempDistance) && (!minDistance.HasValue || minDistance.Value > tempDistance))
+                minDistance = tempDistance;
         }
-        if (!minRange.HasValue)
+        if (!minDistance.HasValue)
         {
             tempDamage = GameInstance.Singleton.DefaultWeaponType.damage;
-            if (TryGetAttackRange(tempDamage, out tempRange) && (!minRange.HasValue || minRange.Value > tempRange))
-                minRange = tempRange;
+            if (TryGetAttackDistance(tempDamage, out tempDistance) && (!minDistance.HasValue || minDistance.Value > tempDistance))
+                minDistance = tempDistance;
         }
-        return minRange.Value;
+        return minDistance.Value;
     }
 
-    private bool TryGetAttackRange(Damage weaponDamage, out float range)
+    private bool TryGetAttackDistance(Damage weaponDamage, out float distance)
     {
-        range = 0f;
+        distance = 0f;
         switch (weaponDamage.damageType)
         {
             case DamageType.Melee:
-                range = weaponDamage.hitDistance;
+                distance = weaponDamage.hitDistance;
                 return true;
             case DamageType.Missile:
-                range = weaponDamage.missileDistance;
+                distance = weaponDamage.missileDistance;
                 return true;
         }
         return false;
