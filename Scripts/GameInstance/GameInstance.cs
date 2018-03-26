@@ -26,6 +26,7 @@ public class GameInstance : MonoBehaviour
     public int[] expTree;
     [Header("Gameplay Configs")]
     public UnityTag playerTag;
+    public UnityTag monsterTag;
     public UnityTag npcTag;
     public UnityTag itemDropTag;
     public UnityLayer characterLayer;
@@ -34,8 +35,9 @@ public class GameInstance : MonoBehaviour
     public int increaseSkillPointEachLevel = 1;
     public int startGold = 0;
     public ItemAmountPair[] startItems;
-    public float pickUpItemDistance = 2f;
-    public float dropDistance = 2f;
+    public float pickUpItemDistance = 1f;
+    public float dropDistance = 1f;
+    public float conversationDistance = 1f;
     [Header("Scene")]
     public UnityScene homeScene;
     public UnityScene startScene;

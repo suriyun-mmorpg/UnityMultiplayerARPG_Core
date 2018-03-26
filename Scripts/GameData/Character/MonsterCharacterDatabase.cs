@@ -2,19 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum NpcCharacteristic
+public enum MonsterCharacteristic
 {
     Normal,
     Aggressive,
     Assist,
-    Conversate,
 }
 
 [CreateAssetMenu(fileName = "MonsterPrototype", menuName = "Create GameData/MonsterPrototype")]
 public class MonsterCharacterDatabase : BaseCharacterDatabase
 {
     [Header("Monster Data")]
-    public NpcCharacteristic characteristic;
+    public MonsterCharacteristic characteristic;
+    [Tooltip("If this is TRUE, character will not move")]
     public bool Immovable;
     [Tooltip("This will work with assist characteristic only, to detect ally")]
     public ushort allyId;

@@ -260,19 +260,15 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         return CacheRigidbody.velocity;
     }
 
-    protected override CharacterAction GetCharacterAction(CharacterEntity characterEntity)
-    {
-        return CharacterAction.None;
-    }
-
     protected override bool IsAlly(CharacterEntity characterEntity)
     {
-        // TOOD: Will be implement it later with party/guild system
+        // TODO: May implement this for party/guild battle purposes
         return false;
     }
 
     protected override bool IsEnemy(CharacterEntity characterEntity)
     {
+        // TODO: May implement this for party/guild battle purposes
         return true;
     }
 
@@ -527,7 +523,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
                 }
                 else if (tag.Equals(gameInstance.npcTag))
                 {
-                    var npcEntity = entity as NonPlayerCharacterEntity;
+                    var npcEntity = entity as MonsterCharacterEntity;
                     if (npcEntity != null && npcEntity.CurrentHp > 0)
                         SetTargetEntity(npcEntity);
                 }

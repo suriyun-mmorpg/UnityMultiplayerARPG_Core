@@ -7,7 +7,7 @@ using LiteNetLibHighLevel;
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(LiteNetLibTransform))]
-public class NonPlayerCharacterEntity : CharacterEntity
+public class MonsterCharacterEntity : CharacterEntity
 {
     public const float RANDOM_WANDER_DURATION_MIN = 1f;
     public const float RANDOM_WANDER_DURATION_MAX = 5f;
@@ -48,7 +48,7 @@ public class NonPlayerCharacterEntity : CharacterEntity
     {
         base.Awake();
         var gameInstance = GameInstance.Singleton;
-        gameObject.tag = gameInstance.npcTag;
+        gameObject.tag = gameInstance.monsterTag;
         RandomWanderTime();
         SetFindTargetTime();
     }
@@ -89,7 +89,7 @@ public class NonPlayerCharacterEntity : CharacterEntity
             else
             {
                 // If it's aggressive character, finding attacking target
-                if (prototype.characteristic == NpcCharacteristic.Aggressive &&
+                if (prototype.characteristic == MonsterCharacteristic.Aggressive &&
                     Time.realtimeSinceStartup >= findTargetTime)
                 {
                     SetFindTargetTime();
@@ -101,9 +101,9 @@ public class NonPlayerCharacterEntity : CharacterEntity
                         foundObjects = foundObjects.OrderBy(a => System.Guid.NewGuid()).ToList();
                         foreach (var foundObject in foundObjects)
                         {
-                            var characterEntity = foundObject.GetComponent<CharacterEntity>();
-                            if (characterEntity != null && IsEnemy(characterEntity))
-                                SetAttackTarget(characterEntity);
+                            var playerCharacterEntity = foundObject.GetComponent<PlayerCharacterEntity>();
+                            if (playerCharacterEntity != null && IsEnemy(playerCharacterEntity))
+                                SetAttackTarget(playerCharacterEntity);
                         }
                     }
                 }
@@ -133,30 +133,21 @@ public class NonPlayerCharacterEntity : CharacterEntity
         return CacheNavMeshAgent.velocity;
     }
 
-    protected override CharacterAction GetCharacterAction(CharacterEntity characterEntity)
-    {
-        return CharacterAction.Attack;
-    }
-
     protected override bool IsAlly(CharacterEntity characterEntity)
     {
-        // If this character have been attacked by any character
-        // It will tell another ally nearby to help
         if (characterEntity == null)
             return false;
-        var npcEntity = characterEntity as NonPlayerCharacterEntity;
-        if (npcEntity != null && npcEntity.prototype.allyId == prototype.allyId)
+        // If this character have been attacked by any character
+        // It will tell another ally nearby to help
+        var monsterCharacterEntity = characterEntity as MonsterCharacterEntity;
+        if (monsterCharacterEntity != null && monsterCharacterEntity.prototype.allyId == prototype.allyId)
             return true;
         return false;
     }
 
     protected override bool IsEnemy(CharacterEntity characterEntity)
     {
-        // TODO: Mercenary will be implemented later
-        // So there are NonPlayerCharacterEntity that is enemy with this character
-        if (characterEntity is PlayerCharacterEntity)
-            return true;
-        return false;
+        return true;
     }
 
     public void SetAttackTarget(CharacterEntity target)
@@ -184,14 +175,14 @@ public class NonPlayerCharacterEntity : CharacterEntity
             {
                 SetAttackTarget(attacker);
                 // If it's assist character call another character for assist
-                if (prototype.characteristic == NpcCharacteristic.Assist)
+                if (prototype.characteristic == MonsterCharacteristic.Assist)
                 {
                     var foundObjects = new List<Collider>(Physics.OverlapSphere(CacheTransform.position, prototype.visualRange, gameInstance.characterLayer.Mask));
                     foreach (var foundObject in foundObjects)
                     {
-                        var npcEntity = foundObject.GetComponent<NonPlayerCharacterEntity>();
-                        if (npcEntity != null && IsAlly(npcEntity))
-                            npcEntity.SetAttackTarget(attacker);
+                        var monsterCharacterEntity = foundObject.GetComponent<MonsterCharacterEntity>();
+                        if (monsterCharacterEntity != null && IsAlly(monsterCharacterEntity))
+                            monsterCharacterEntity.SetAttackTarget(attacker);
                     }
                 }
             }
