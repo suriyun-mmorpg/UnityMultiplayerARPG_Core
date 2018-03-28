@@ -12,6 +12,7 @@ public class GameInstance : MonoBehaviour
     public BaseGameInstanceExtra extra;
     [Header("Gameplay Objects")]
     public PlayerCharacterEntity playerCharacterEntityPrefab;
+    public MonsterCharacterEntity monsterCharacterEntityPrefab;
     public ItemDropEntity itemDropEntityPrefab;
     public FollowCameraControls minimapCameraPrefab;
     public FollowCameraControls gameplayCameraPrefab;
@@ -159,7 +160,12 @@ public class GameInstance : MonoBehaviour
 
         if (playerCharacterEntityPrefab == null)
         {
-            Debug.LogError("You must set character entity prefab");
+            Debug.LogError("You must set player character entity prefab");
+            return;
+        }
+        if (monsterCharacterEntityPrefab == null)
+        {
+            Debug.LogError("You must set monster character entity prefab");
             return;
         }
         if (itemDropEntityPrefab == null)

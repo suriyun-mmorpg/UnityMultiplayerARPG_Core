@@ -14,6 +14,7 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
     {
         var gameInstance = GameInstance.Singleton;
         Assets.playerPrefab = gameInstance.playerCharacterEntityPrefab.Identity;
+        Assets.RegisterPrefab(gameInstance.monsterCharacterEntityPrefab.Identity);
         Assets.RegisterPrefab(gameInstance.itemDropEntityPrefab.Identity);
         var damageEntities = GameInstance.DamageEntities.Values;
         foreach (var damageEntity in damageEntities)
@@ -80,6 +81,16 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
     {
         isQuit = true;
         base.OnApplicationQuit();
+    }
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+        var monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
+        foreach (var monsterSpawnArea in monsterSpawnAreas)
+        {
+            monsterSpawnArea.RandomSpawn(this);
+        }
     }
 
     public override void OnStopHost()
