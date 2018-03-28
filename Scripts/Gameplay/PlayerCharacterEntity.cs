@@ -386,8 +386,8 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         var targetPosition = entity.CacheTransform.position;
         if (oldFollowTargetPosition != targetPosition)
         {
-            PointClickMovement(oldFollowTargetPosition, entity.Identity);
-            oldFollowTargetPosition = entity.CacheTransform.position;
+            PointClickMovement(targetPosition, entity.Identity);
+            oldFollowTargetPosition = targetPosition;
             lookAtTargetUpdated = false;
         }
     }
