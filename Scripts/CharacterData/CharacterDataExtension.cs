@@ -29,6 +29,8 @@ public static class CharacterDataExtension
     public static int GetNextLevelExp(this ICharacterData data)
     {
         var level = data.Level;
+        if (level <= 0)
+            return 0;
         var expTree = GameInstance.Singleton.expTree;
         if (level > expTree.Length)
             return 0;

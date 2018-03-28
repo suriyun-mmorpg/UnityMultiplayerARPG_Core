@@ -56,7 +56,13 @@ public class MonsterCharacterEntity : CharacterEntity
     protected override void Update()
     {
         base.Update();
+        UpdateActivity();
+    }
 
+    protected virtual void UpdateActivity()
+    {
+        if (!IsServer)
+            return;
         var gameInstance = GameInstance.Singleton;
         CharacterEntity targetEntity;
         if (TryGetTargetEntity(out targetEntity))
