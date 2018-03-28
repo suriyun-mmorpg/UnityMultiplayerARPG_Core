@@ -18,6 +18,7 @@ public class MonsterCharacterEntity : CharacterEntity
     protected MonsterCharacterDatabase prototype;
     protected float wanderTime;
     protected float findTargetTime;
+    protected Vector3 oldFollowTargetPosition;
     #endregion
 
     #region Cache components
@@ -67,13 +68,32 @@ public class MonsterCharacterEntity : CharacterEntity
         CharacterEntity targetEntity;
         if (TryGetTargetEntity(out targetEntity))
         {
-            // Lookat target then do anything when it's in range
-            CacheNavMeshAgent.updateRotation = false;
+            // If it has target then go to target
             var currentPosition = CacheTransform.position;
             var targetPosition = targetEntity.CacheTransform.position;
-            var moveDirection = (targetPosition - currentPosition).normalized;
-            // slerp to the desired rotation over time
-            CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(moveDirection), CacheNavMeshAgent.angularSpeed * Time.deltaTime);
+            var attackDistance = EquipWeapons.GetAttackDistance() + targetEntity.CacheCapsuleCollider.radius;
+            if (Vector3.Distance(currentPosition, targetPosition) <= attackDistance)
+            {
+                // Lookat target then do anything when it's in range
+                CacheNavMeshAgent.updateRotation = false;
+                CacheNavMeshAgent.isStopped = true;
+                var lookAtDirection = (targetPosition - currentPosition).normalized;
+                // slerp to the desired rotation over time
+                CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(lookAtDirection), CacheNavMeshAgent.angularSpeed * Time.deltaTime);
+                Attack();
+                // TODO: Random to use skills
+            }
+            else
+            {
+                // Following target
+                CacheNavMeshAgent.updateRotation = true;
+                if (oldFollowTargetPosition != targetPosition)
+                {
+                    CacheNavMeshAgent.SetDestination(targetPosition);
+                    CacheNavMeshAgent.isStopped = false;
+                    oldFollowTargetPosition = targetPosition;
+                }
+            }
         }
         else
         {
@@ -91,6 +111,7 @@ public class MonsterCharacterEntity : CharacterEntity
                 NavMeshHit navMeshHit;
                 NavMesh.SamplePosition(randomPosition, out navMeshHit, RANDOM_WANDER_RADIUS, 1);
                 CacheNavMeshAgent.SetDestination(navMeshHit.position);
+                CacheNavMeshAgent.isStopped = false;
             }
             else
             {
@@ -167,8 +188,6 @@ public class MonsterCharacterEntity : CharacterEntity
             return;
         // Set target to attack
         SetTargetEntity(target);
-        // Set destination to target
-        CacheNavMeshAgent.SetDestination(target.CacheTransform.position);
     }
 
     public override void ReceiveDamage(CharacterEntity attacker, Dictionary<DamageElement, DamageAmount> allDamageAttributes, CharacterBuff debuff)
