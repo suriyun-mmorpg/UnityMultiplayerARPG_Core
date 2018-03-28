@@ -9,7 +9,7 @@ public enum MonsterCharacteristic
     Assist,
 }
 
-[CreateAssetMenu(fileName = "MonsterPrototype", menuName = "Create GameData/MonsterPrototype")]
+[CreateAssetMenu(fileName = "MonsterCharacterDatabase", menuName = "Create GameData/MonsterCharacterDatabase")]
 public class MonsterCharacterDatabase : BaseCharacterDatabase
 {
     [Header("Monster Data")]

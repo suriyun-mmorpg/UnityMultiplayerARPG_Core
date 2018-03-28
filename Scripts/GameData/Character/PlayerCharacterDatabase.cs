@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-[CreateAssetMenu(fileName = "CharacterDatabase", menuName = "Create GameData/CharacterDatabase")]
+[CreateAssetMenu(fileName = "PlayerCharacterDatabase", menuName = "Create GameData/PlayerCharacterDatabase")]
 public class PlayerCharacterDatabase : BaseCharacterDatabase
 {
     [Header("Attributes/Stats")]
