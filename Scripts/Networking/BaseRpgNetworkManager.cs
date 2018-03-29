@@ -14,13 +14,15 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
     {
         var gameInstance = GameInstance.Singleton;
         Assets.playerPrefab = gameInstance.playerCharacterEntityPrefab.Identity;
-        Assets.RegisterPrefab(gameInstance.monsterCharacterEntityPrefab.Identity);
-        Assets.RegisterPrefab(gameInstance.itemDropEntityPrefab.Identity);
+        var spawnablePrefabs = new List<LiteNetLibIdentity>();
+        spawnablePrefabs.Add(gameInstance.monsterCharacterEntityPrefab.Identity);
+        spawnablePrefabs.Add(gameInstance.itemDropEntityPrefab.Identity);
         var damageEntities = GameInstance.DamageEntities.Values;
         foreach (var damageEntity in damageEntities)
         {
-            Assets.RegisterPrefab(damageEntity.Identity);
+            spawnablePrefabs.Add(damageEntity.Identity);
         }
+        Assets.spawnablePrefabs = spawnablePrefabs.ToArray();
         base.Awake();
     }
 
