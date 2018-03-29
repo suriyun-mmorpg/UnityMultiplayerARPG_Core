@@ -110,7 +110,7 @@ public class GameInstance : MonoBehaviour
                 var sampleAttackAnimation = new ActionAnimation()
                 {
                     actionId = 0,
-                    triggerDuration = 0.4f,
+                    triggerDurationRate = 0.5f,
                     totalDuration = 0.8f,
                 };
                 cacheDefaultWeaponType.rightHandAttackAnimations = new ActionAnimation[1]

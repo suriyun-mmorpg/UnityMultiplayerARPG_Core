@@ -1,7 +1,15 @@
-﻿[System.Serializable]
+﻿using UnityEngine;
+
+[System.Serializable]
 public class ActionAnimation
 {
     public int actionId;
-    public float triggerDuration;
+    [Range(0f, 1f)]
+    public float triggerDurationRate;
     public float totalDuration;
+
+    public float triggerDuration
+    {
+        get { return totalDuration * triggerDurationRate; }
+    }
 }
