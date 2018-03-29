@@ -95,7 +95,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         CacheRigidbody.useGravity = false;
         var gameInstance = GameInstance.Singleton;
         gameObject.tag = gameInstance.playerTag;
-        ClearPaths();
+        ClearDestination();
     }
 
     protected override void Start()
@@ -126,7 +126,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
 
         if (CurrentHp <= 0)
         {
-            ClearPaths();
+            ClearDestination();
             return;
         }
 
@@ -225,11 +225,11 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
                     navPaths.Dequeue();
             }
             else
-                ClearPaths();
+                ClearDestination();
         }
     }
 
-    protected virtual void ClearPaths()
+    protected virtual void ClearDestination()
     {
         navPaths = null;
         moveDirection = Vector3.zero;

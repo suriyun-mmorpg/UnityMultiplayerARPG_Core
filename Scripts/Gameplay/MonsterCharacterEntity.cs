@@ -14,11 +14,15 @@ public class MonsterCharacterEntity : CharacterEntity
     public const float RANDOM_WANDER_AREA_MIN = 2f;
     public const float RANDOM_WANDER_AREA_MAX = 5f;
     public const float AGGRESSIVE_FIND_TARGET_DELAY = 1f;
+    public const float SET_TARGET_DESTINATION_DELAY = 1f;
+    public const float FOLLOW_TARGET_DURATION = 5f;
 
     #region Protected data
     protected MonsterCharacterDatabase database;
     protected float wanderTime;
     protected float findTargetTime;
+    protected float setTargetDestinationTime;
+    protected float startFollowTargetCountTime;
     protected Vector3? wanderDestination;
     protected Vector3 oldMovePosition;
     #endregion
@@ -62,12 +66,18 @@ public class MonsterCharacterEntity : CharacterEntity
 
         if (CurrentHp <= 0)
         {
-            CacheNavMeshAgent.isStopped = true;
-            wanderDestination = null;
+            ClearDestination();
             return;
         }
 
         UpdateActivity();
+    }
+
+    protected virtual void ClearDestination()
+    {
+        SetTargetEntity(null);
+        CacheNavMeshAgent.isStopped = true;
+        wanderDestination = null;
     }
 
     protected virtual void UpdateActivity()
@@ -88,6 +98,7 @@ public class MonsterCharacterEntity : CharacterEntity
             attackDistance += targetEntity.CacheCapsuleCollider.radius;
             if (Vector3.Distance(currentPosition, targetPosition) <= attackDistance)
             {
+                startFollowTargetCountTime = Time.realtimeSinceStartup;
                 // Lookat target then do anything when it's in range
                 CacheNavMeshAgent.updateRotation = false;
                 CacheNavMeshAgent.isStopped = true;
@@ -101,13 +112,20 @@ public class MonsterCharacterEntity : CharacterEntity
             {
                 // Following target
                 CacheNavMeshAgent.updateRotation = true;
-                if (oldMovePosition != targetPosition)
+                if (oldMovePosition != targetPosition &&
+                    Time.realtimeSinceStartup - setTargetDestinationTime >= SET_TARGET_DESTINATION_DELAY)
                 {
+                    setTargetDestinationTime = Time.realtimeSinceStartup;
                     CacheNavMeshAgent.speed = this.GetStatsWithBuffs().moveSpeed;
                     CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.MedQualityObstacleAvoidance;
                     CacheNavMeshAgent.SetDestination(targetPosition);
                     CacheNavMeshAgent.isStopped = false;
                     oldMovePosition = targetPosition;
+                }
+                if (Time.realtimeSinceStartup - startFollowTargetCountTime >= FOLLOW_TARGET_DURATION)
+                {
+                    ClearDestination();
+                    return;
                 }
             }
         }
@@ -158,7 +176,10 @@ public class MonsterCharacterEntity : CharacterEntity
                         {
                             var characterEntity = foundObject.GetComponent<CharacterEntity>();
                             if (characterEntity != null && IsEnemy(characterEntity))
+                            {
+                                startFollowTargetCountTime = Time.realtimeSinceStartup;
                                 SetAttackTarget(characterEntity);
+                            }
                         }
                     }
                 }
