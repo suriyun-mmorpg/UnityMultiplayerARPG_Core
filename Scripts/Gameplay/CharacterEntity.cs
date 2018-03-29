@@ -35,6 +35,8 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     protected bool doingAction;
     protected readonly Dictionary<string, int> buffIndexes = new Dictionary<string, int>();
     protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
+    protected Vector3 previousPosition;
+    protected Vector3 currentVelocity;
     // Net Functions
     protected LiteNetLibFunction netFuncAttack;
     protected LiteNetLibFunction<NetFieldInt> netFuncUseSkill;
@@ -188,12 +190,20 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         UpdateAnimation();
     }
 
+    protected virtual void FixedUpdate()
+    {
+        // Update current velocity
+        Vector3 currentMove = CacheTransform.position - previousPosition;
+        currentVelocity = currentMove / Time.deltaTime;
+        previousPosition = CacheTransform.position;
+    }
+
     protected virtual void UpdateAnimation()
     {
         if (model != null)
         {
             var isDead = CurrentHp <= 0;
-            var velocity = GetMovementVelocity();
+            var velocity = currentVelocity;
             var moveSpeed = new Vector3(velocity.x, 0, velocity.z).magnitude;
             if (isDead)
             {
@@ -381,7 +391,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             case DamageType.Missile:
                 if (damageInfo.missileDamageEntity != null)
                 {
-                    var missileDamageIdentity = Manager.Assets.NetworkSpawn(damageInfo.missileDamageEntity.Identity, CacheTransform.position);
+                    var missileDamageIdentity = Manager.Assets.NetworkSpawn(damageInfo.missileDamageEntity.Identity, CacheTransform.position, CacheTransform.rotation);
                     var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
                     missileDamageEntity.SetupDamage(this, allDamageAttributes, debuff, damageInfo.missileDistance, damageInfo.missileSpeed);
                 }
@@ -470,7 +480,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             case DamageType.Missile:
                 if (damageInfo.missileDamageEntity != null)
                 {
-                    var missileDamageIdentity = Manager.Assets.NetworkSpawn(damageInfo.missileDamageEntity.Identity, CacheTransform.position);
+                    var missileDamageIdentity = Manager.Assets.NetworkSpawn(damageInfo.missileDamageEntity.Identity, CacheTransform.position, CacheTransform.rotation);
                     var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
                     missileDamageEntity.SetupDamage(this, allDamageAttributes, debuff, damageInfo.missileDistance, damageInfo.missileSpeed);
                 }
@@ -607,7 +617,8 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         if (DecreaseItems(index, amount))
         {
             var dropPosition = CacheTransform.position + new Vector3(Random.value * gameInstance.dropDistance, 0, Random.value * gameInstance.dropDistance);
-            var identity = Manager.Assets.NetworkSpawn(gameInstance.itemDropEntityPrefab.gameObject, dropPosition);
+            var dropRotation = Vector3.up * Random.Range(0, 360); 
+            var identity = Manager.Assets.NetworkSpawn(gameInstance.itemDropEntityPrefab.gameObject, dropPosition, Quaternion.Euler(dropRotation));
             var itemDropEntity = identity.GetComponent<ItemDropEntity>();
             var dropData = new CharacterItem();
             dropData.itemId = itemId;
@@ -1246,7 +1257,6 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         CacheCapsuleCollider.radius = characterModel.radius;
         CacheCapsuleCollider.height = characterModel.height;
     }
-    protected abstract Vector3 GetMovementVelocity();
     protected abstract bool IsAlly(CharacterEntity characterEntity);
     protected abstract bool IsEnemy(CharacterEntity characterEntity);
 

@@ -28,7 +28,8 @@ public class MonsterSpawnArea : MonoBehaviour
         {
             var randomedPosition = Random.insideUnitSphere * randomRadius;
             randomedPosition = transform.position + new Vector3(randomedPosition.x, 0, randomedPosition.z);
-            var identity = manager.Assets.NetworkSpawn(gameInstance.monsterCharacterEntityPrefab.gameObject, randomedPosition);
+            var randomedRotation = Vector3.up * Random.Range(0, 360);
+            var identity = manager.Assets.NetworkSpawn(gameInstance.monsterCharacterEntityPrefab.gameObject, randomedPosition, Quaternion.Euler(randomedRotation));
             var entity = identity.GetComponent<MonsterCharacterEntity>();
             entity.DatabaseId = databaseId;
             var baseAttributes = database.attributes;

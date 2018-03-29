@@ -204,11 +204,6 @@ public class MonsterCharacterEntity : CharacterEntity
         findTargetTime = Time.realtimeSinceStartup + AGGRESSIVE_FIND_TARGET_DELAY;
     }
 
-    protected override Vector3 GetMovementVelocity()
-    {
-        return CacheNavMeshAgent.desiredVelocity;
-    }
-
     protected override bool IsAlly(CharacterEntity characterEntity)
     {
         if (characterEntity == null)

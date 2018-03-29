@@ -158,8 +158,9 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
             isGrounded = true;
     }
 
-    protected virtual void FixedUpdate()
+    protected override void FixedUpdate()
     {
+        base.FixedUpdate();
         if (!IsServer && !IsOwnerClient)
             return;
 
@@ -207,7 +208,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         CacheRigidbody.AddForce(new Vector3(0, Physics.gravity.y * CacheRigidbody.mass * gravityRate, 0));
     }
 
-    protected void LateUpdate()
+    protected  void LateUpdate()
     {
         if (!IsServer && !IsOwnerClient)
             return;
@@ -409,11 +410,6 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         // From the jump height and gravity we deduce the upwards speed 
         // for the character to reach at the apex.
         return Mathf.Sqrt(2f * jumpHeight * -Physics.gravity.y * gravityRate);
-    }
-
-    protected override Vector3 GetMovementVelocity()
-    {
-        return CacheRigidbody.velocity;
     }
 
     protected override bool IsAlly(CharacterEntity characterEntity)
