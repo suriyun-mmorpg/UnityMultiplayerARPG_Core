@@ -16,7 +16,7 @@ public class WeaponType : BaseGameData
     public DamageEffectivenessAttribute[] effectivenessAttributes;
     public ActionAnimation[] rightHandAttackAnimations;
     public ActionAnimation[] leftHandAttackAnimations;
-    public Damage damage;
+    public DamageInfo damageInfo;
 
     private Dictionary<Attribute, float> cacheEffectivenessAttributes;
     public Dictionary<Attribute, float> CacheEffectivenessAttributes

@@ -59,7 +59,7 @@ public class Skill : BaseGameData
 
     [Header("Attack As Pure Skill Damage")]
     public DamageAttribute damageAttribute;
-    public Damage damage;
+    public DamageInfo damageInfo;
     public DamageEffectivenessAttribute[] effectivenessAttributes;
 
     [Header("Attack As Weapon Damage Inflict")]

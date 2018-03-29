@@ -36,6 +36,14 @@ public class MonsterSpawnArea : MonoBehaviour
             var identity = manager.Assets.NetworkSpawn(gameInstance.monsterCharacterEntityPrefab.gameObject, randomedPosition);
             var entity = identity.GetComponent<MonsterCharacterEntity>();
             entity.DatabaseId = databaseId;
+            var baseAttributes = database.attributes;
+            foreach (var baseAttribute in baseAttributes)
+            {
+                var characterAttribute = new CharacterAttribute();
+                characterAttribute.attributeId = baseAttribute.attribute.Id;
+                characterAttribute.amount = baseAttribute.amount;
+                entity.Attributes.Add(characterAttribute);
+            }
             entity.CurrentHp = entity.GetMaxHp();
             entity.CurrentMp = entity.GetMaxMp();
         }

@@ -119,7 +119,7 @@ public class GameInstance : MonoBehaviour
                 {
                     sampleAttackAnimation,
                 };
-                cacheDefaultWeaponType.damage = new Damage();
+                cacheDefaultWeaponType.damageInfo = new DamageInfo();
             }
             return cacheDefaultWeaponType;
         }
@@ -298,7 +298,7 @@ public class GameInstance : MonoBehaviour
                     damageElements.Add(damageAttribute.damageElement);
                 }
                 AddDamageElements(damageElements);
-                var missileDamageEntity = item.WeaponType.damage.missileDamageEntity;
+                var missileDamageEntity = item.WeaponType.damageInfo.missileDamageEntity;
                 if (missileDamageEntity != null)
                     AddDamageEntities(new DamageEntity[] { missileDamageEntity });
             }
@@ -321,7 +321,7 @@ public class GameInstance : MonoBehaviour
                 damageElements.Add(damageAttribute.damageElement);
             }
             AddDamageElements(damageElements);
-            var missileDamageEntity = skill.damage.missileDamageEntity;
+            var missileDamageEntity = skill.damageInfo.missileDamageEntity;
             if (missileDamageEntity != null)
                 AddDamageEntities(new DamageEntity[] { missileDamageEntity });
         }

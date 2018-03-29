@@ -9,7 +9,7 @@ public enum DamageType
 }
 
 [System.Serializable]
-public class Damage
+public class DamageInfo
 {
     public DamageType damageType;
 
@@ -23,6 +23,21 @@ public class Damage
     public float missileDistance = 5f;
     public float missileSpeed = 5f;
     public MissileDamageEntity missileDamageEntity;
+    
+    public float GetDistance()
+    {
+        var distance = 0f;
+        switch (damageType)
+        {
+            case DamageType.Melee:
+                distance = hitDistance;
+                break;
+            case DamageType.Missile:
+                distance = missileDistance;
+                break;
+        }
+        return distance;
+    }
 }
 
 [System.Serializable]

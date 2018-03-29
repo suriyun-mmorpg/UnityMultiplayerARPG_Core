@@ -336,7 +336,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
                 StopPointClickMove(null);
                 return;
             }
-            var attackDistance = EquipWeapons.GetAttackDistance() + targetMonster.CacheCapsuleCollider.radius;
+            var attackDistance = GetAttackDistance() + targetMonster.CacheCapsuleCollider.radius;
             if (Vector3.Distance(CurrentPosition, targetMonster.CacheTransform.position) <= attackDistance)
             {
                 UpdateLookAtTargetEntityPosition(targetMonster);

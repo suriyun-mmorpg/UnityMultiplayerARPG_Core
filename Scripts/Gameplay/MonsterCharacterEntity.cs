@@ -15,7 +15,7 @@ public class MonsterCharacterEntity : CharacterEntity
     public const float AGGRESSIVE_FIND_TARGET_DELAY = 1f;
 
     #region Protected data
-    protected MonsterCharacterDatabase prototype;
+    protected MonsterCharacterDatabase database;
     protected float wanderTime;
     protected float findTargetTime;
     protected Vector3 oldFollowTargetPosition;
@@ -71,7 +71,7 @@ public class MonsterCharacterEntity : CharacterEntity
             // If it has target then go to target
             var currentPosition = CacheTransform.position;
             var targetPosition = targetEntity.CacheTransform.position;
-            var attackDistance = EquipWeapons.GetAttackDistance() + targetEntity.CacheCapsuleCollider.radius;
+            var attackDistance = GetAttackDistance() + targetEntity.CacheCapsuleCollider.radius;
             if (Vector3.Distance(currentPosition, targetPosition) <= attackDistance)
             {
                 // Lookat target then do anything when it's in range
@@ -116,7 +116,7 @@ public class MonsterCharacterEntity : CharacterEntity
             else
             {
                 // If it's aggressive character, finding attacking target
-                if (prototype.characteristic == MonsterCharacteristic.Aggressive &&
+                if (database.characteristic == MonsterCharacteristic.Aggressive &&
                     Time.realtimeSinceStartup >= findTargetTime)
                 {
                     SetFindTargetTime();
@@ -125,7 +125,7 @@ public class MonsterCharacterEntity : CharacterEntity
                     if (!TryGetTargetEntity(out targetCharacter) || targetCharacter.CurrentHp <= 0)
                     {
                         // Find nearby character by layer mask
-                        var foundObjects = new List<Collider>(Physics.OverlapSphere(CacheTransform.position, prototype.visualRange, gameInstance.characterLayer.Mask));
+                        var foundObjects = new List<Collider>(Physics.OverlapSphere(CacheTransform.position, database.visualRange, gameInstance.characterLayer.Mask));
                         foundObjects = foundObjects.OrderBy(a => System.Guid.NewGuid()).ToList();
                         foreach (var foundObject in foundObjects)
                         {
@@ -168,7 +168,7 @@ public class MonsterCharacterEntity : CharacterEntity
         // If this character have been attacked by any character
         // It will tell another ally nearby to help
         var monsterCharacterEntity = characterEntity as MonsterCharacterEntity;
-        if (monsterCharacterEntity != null && monsterCharacterEntity.prototype.allyId == prototype.allyId)
+        if (monsterCharacterEntity != null && monsterCharacterEntity.database.allyId == database.allyId)
             return true;
         return false;
     }
@@ -192,6 +192,9 @@ public class MonsterCharacterEntity : CharacterEntity
 
     public override void ReceiveDamage(CharacterEntity attacker, Dictionary<DamageElement, DamageAmount> allDamageAttributes, CharacterBuff debuff)
     {
+        // Damage calculations apply at server only
+        if (!IsServer)
+            return;
         base.ReceiveDamage(attacker, allDamageAttributes, debuff);
         // If no attacker, skip next logics
         if (attacker == null)
@@ -206,9 +209,9 @@ public class MonsterCharacterEntity : CharacterEntity
             {
                 SetAttackTarget(attacker);
                 // If it's assist character call another character for assist
-                if (prototype.characteristic == MonsterCharacteristic.Assist)
+                if (database.characteristic == MonsterCharacteristic.Assist)
                 {
-                    var foundObjects = new List<Collider>(Physics.OverlapSphere(CacheTransform.position, prototype.visualRange, gameInstance.characterLayer.Mask));
+                    var foundObjects = new List<Collider>(Physics.OverlapSphere(CacheTransform.position, database.visualRange, gameInstance.characterLayer.Mask));
                     foreach (var foundObject in foundObjects)
                     {
                         var monsterCharacterEntity = foundObject.GetComponent<MonsterCharacterEntity>();
@@ -223,5 +226,58 @@ public class MonsterCharacterEntity : CharacterEntity
                 SetAttackTarget(attacker);
             }
         }
+    }
+
+    protected override void OnDatabaseIdChange(string databaseId)
+    {
+        base.OnDatabaseIdChange(databaseId);
+        BaseCharacterDatabase foundDatabase;
+        if (GameInstance.CharacterDatabases.TryGetValue(databaseId, out foundDatabase) && foundDatabase is MonsterCharacterDatabase)
+            database = foundDatabase as MonsterCharacterDatabase;
+    }
+
+    public override void GetAttackData(
+        float inflictRate, 
+        Dictionary<DamageElement, DamageAmount> additionalDamageAttributes, 
+        out int actionId, 
+        out float damageDuration, 
+        out float totalDuration, 
+        out Dictionary<DamageElement, DamageAmount> allDamageAttributes, 
+        out DamageInfo damageInfo)
+    {
+        var gameInstance = GameInstance.Singleton;
+
+        // Initialize attack animation
+        actionId = -1;
+        damageDuration = 0f;
+        totalDuration = 0f;
+
+        // Random attack animation
+        var animArray = database.attackAnimations;
+        var animLength = animArray.Length;
+        if (animLength > 0)
+        {
+            var anim = animArray[Random.Range(0, animLength - 1)];
+            // Assign animation data
+            actionId = anim.actionId;
+            damageDuration = anim.triggerDuration;
+            totalDuration = anim.totalDuration;
+        }
+
+        // Assign damage attributes
+        allDamageAttributes = new Dictionary<DamageElement, DamageAmount>();
+        var damageElement = database.damageElement;
+        var damageAmount = database.damageAmount;
+        if (damageElement == null)
+            damageElement = gameInstance.DefaultDamageElement;
+        allDamageAttributes.Add(database.damageElement, damageAmount * inflictRate);
+        allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, additionalDamageAttributes);
+        // Assign damage data
+        damageInfo = database.damageInfo;
+    }
+
+    public override float GetAttackDistance()
+    {
+        return database.damageInfo.GetDistance();
     }
 }

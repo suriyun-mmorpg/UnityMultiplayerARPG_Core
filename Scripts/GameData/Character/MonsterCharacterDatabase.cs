@@ -21,7 +21,17 @@ public class MonsterCharacterDatabase : BaseCharacterDatabase
     public float visualRange = 5f;
     [Tooltip("Level will be used to show only, not calculating with stats/skills")]
     public int level;
+    [Header("Attributes/Stats")]
+    public AttributeAmount[] attributes;
     public CharacterStats stats;
+
+    [Header("Attack animations")]
+    public ActionAnimation[] attackAnimations;
+
+    [Header("Weapon/Attack Abilities")]
+    public DamageElement damageElement;
+    public DamageAmount damageAmount;
+    public DamageInfo damageInfo;
 
     [Header("Killing Rewards")]
     public int randomExpMin;
