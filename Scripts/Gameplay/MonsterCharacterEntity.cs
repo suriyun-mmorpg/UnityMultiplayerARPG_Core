@@ -9,16 +9,18 @@ using LiteNetLibHighLevel;
 [RequireComponent(typeof(LiteNetLibTransform))]
 public class MonsterCharacterEntity : CharacterEntity
 {
-    public const float RANDOM_WANDER_DURATION_MIN = 1f;
+    public const float RANDOM_WANDER_DURATION_MIN = 2f;
     public const float RANDOM_WANDER_DURATION_MAX = 5f;
-    public const float RANDOM_WANDER_RADIUS = 5f;
+    public const float RANDOM_WANDER_AREA_MIN = 2f;
+    public const float RANDOM_WANDER_AREA_MAX = 5f;
     public const float AGGRESSIVE_FIND_TARGET_DELAY = 1f;
 
     #region Protected data
     protected MonsterCharacterDatabase database;
     protected float wanderTime;
     protected float findTargetTime;
-    protected Vector3 oldFollowTargetPosition;
+    protected Vector3? wanderDestination;
+    protected Vector3 oldMovePosition;
     #endregion
 
     #region Cache components
@@ -57,21 +59,33 @@ public class MonsterCharacterEntity : CharacterEntity
     protected override void Update()
     {
         base.Update();
+
+        if (CurrentHp <= 0)
+        {
+            CacheNavMeshAgent.isStopped = true;
+            wanderDestination = null;
+            return;
+        }
+
         UpdateActivity();
     }
 
     protected virtual void UpdateActivity()
     {
-        if (!IsServer)
+        if (!IsServer || database == null || CurrentHp <= 0)
             return;
+
         var gameInstance = GameInstance.Singleton;
+        var currentPosition = CacheTransform.position;
         CharacterEntity targetEntity;
         if (TryGetTargetEntity(out targetEntity))
         {
             // If it has target then go to target
-            var currentPosition = CacheTransform.position;
             var targetPosition = targetEntity.CacheTransform.position;
-            var attackDistance = GetAttackDistance() + targetEntity.CacheCapsuleCollider.radius;
+            var attackDistance = GetAttackDistance();
+            attackDistance -= attackDistance * 0.1f;
+            attackDistance -= CacheNavMeshAgent.stoppingDistance;
+            attackDistance += targetEntity.CacheCapsuleCollider.radius;
             if (Vector3.Distance(currentPosition, targetPosition) <= attackDistance)
             {
                 // Lookat target then do anything when it's in range
@@ -87,11 +101,13 @@ public class MonsterCharacterEntity : CharacterEntity
             {
                 // Following target
                 CacheNavMeshAgent.updateRotation = true;
-                if (oldFollowTargetPosition != targetPosition)
+                if (oldMovePosition != targetPosition)
                 {
+                    CacheNavMeshAgent.speed = this.GetStatsWithBuffs().moveSpeed;
+                    CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.MedQualityObstacleAvoidance;
                     CacheNavMeshAgent.SetDestination(targetPosition);
                     CacheNavMeshAgent.isStopped = false;
-                    oldFollowTargetPosition = targetPosition;
+                    oldMovePosition = targetPosition;
                 }
             }
         }
@@ -101,17 +117,28 @@ public class MonsterCharacterEntity : CharacterEntity
             CacheNavMeshAgent.updateRotation = true;
             // While character is moving then random next wander time
             // To let character stop movement some time before random next wander time
-            if (!CacheNavMeshAgent.isStopped)
+            if ((wanderDestination.HasValue && Vector3.Distance(currentPosition, wanderDestination.Value) > CacheNavMeshAgent.stoppingDistance)
+                || oldMovePosition != currentPosition)
+            {
                 RandomWanderTime();
+                oldMovePosition = currentPosition;
+            }
             // Wandering when it's time
             if (Time.realtimeSinceStartup >= wanderTime)
             {
                 // If stopped then random
-                Vector3 randomPosition = CacheTransform.position + (Random.insideUnitSphere * RANDOM_WANDER_RADIUS);
+                var randomX = Random.Range(RANDOM_WANDER_AREA_MIN, RANDOM_WANDER_AREA_MAX) * (Random.value > 0.5f ? -1 : 1);
+                var randomZ = Random.Range(RANDOM_WANDER_AREA_MIN, RANDOM_WANDER_AREA_MAX) * (Random.value > 0.5f ? -1 : 1);
+                var randomPosition = currentPosition + new Vector3(randomX, 0, randomZ);
                 NavMeshHit navMeshHit;
-                NavMesh.SamplePosition(randomPosition, out navMeshHit, RANDOM_WANDER_RADIUS, 1);
-                CacheNavMeshAgent.SetDestination(navMeshHit.position);
-                CacheNavMeshAgent.isStopped = false;
+                if (NavMesh.SamplePosition(randomPosition, out navMeshHit, RANDOM_WANDER_AREA_MAX, 1))
+                {
+                    wanderDestination = navMeshHit.position;
+                    CacheNavMeshAgent.speed = database.wanderMoveSpeed;
+                    CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
+                    CacheNavMeshAgent.SetDestination(wanderDestination.Value);
+                    CacheNavMeshAgent.isStopped = false;
+                }
             }
             else
             {
@@ -125,7 +152,7 @@ public class MonsterCharacterEntity : CharacterEntity
                     if (!TryGetTargetEntity(out targetCharacter) || targetCharacter.CurrentHp <= 0)
                     {
                         // Find nearby character by layer mask
-                        var foundObjects = new List<Collider>(Physics.OverlapSphere(CacheTransform.position, database.visualRange, gameInstance.characterLayer.Mask));
+                        var foundObjects = new List<Collider>(Physics.OverlapSphere(currentPosition, database.visualRange, gameInstance.characterLayer.Mask));
                         foundObjects = foundObjects.OrderBy(a => System.Guid.NewGuid()).ToList();
                         foreach (var foundObject in foundObjects)
                         {
@@ -158,7 +185,7 @@ public class MonsterCharacterEntity : CharacterEntity
 
     protected override Vector3 GetMovementVelocity()
     {
-        return CacheNavMeshAgent.velocity;
+        return CacheNavMeshAgent.desiredVelocity;
     }
 
     protected override bool IsAlly(CharacterEntity characterEntity)
@@ -270,7 +297,7 @@ public class MonsterCharacterEntity : CharacterEntity
         var damageAmount = database.damageAmount;
         if (damageElement == null)
             damageElement = gameInstance.DefaultDamageElement;
-        allDamageAttributes.Add(database.damageElement, damageAmount * inflictRate);
+        allDamageAttributes.Add(damageElement, damageAmount * inflictRate);
         allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, additionalDamageAttributes);
         // Assign damage data
         damageInfo = database.damageInfo;

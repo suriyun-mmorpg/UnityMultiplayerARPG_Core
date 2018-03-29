@@ -123,7 +123,12 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     protected override void Update()
     {
         base.Update();
-        UpdateInput();
+
+        if (CurrentHp <= 0)
+        {
+            ClearPaths();
+            return;
+        }
 
         if (destination.HasValue)
         {
@@ -136,6 +141,8 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         
         if (CacheTargetObject != null)
             CacheTargetObject.gameObject.SetActive(destination.HasValue);
+
+        UpdateInput();
     }
 
 
@@ -228,11 +235,13 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         moveDirection = Vector3.zero;
         CacheRigidbody.velocity = Vector3.zero;
         pointClickMoveStopped = true;
+        lookAtTargetUpdated = false;
+        destination = null;
     }
 
     protected virtual void UpdateInput()
     {
-        if (!IsOwnerClient)
+        if (!IsOwnerClient || CurrentHp <= 0)
             return;
 
         var gameInstance = GameInstance.Singleton;
@@ -336,7 +345,10 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
                 StopPointClickMove(null);
                 return;
             }
-            var attackDistance = GetAttackDistance() + targetMonster.CacheCapsuleCollider.radius;
+            var attackDistance = GetAttackDistance();
+            attackDistance -= attackDistance * 0.1f;
+            attackDistance -= stoppingDistance;
+            attackDistance += targetMonster.CacheCapsuleCollider.radius;
             if (Vector3.Distance(CurrentPosition, targetMonster.CacheTransform.position) <= attackDistance)
             {
                 UpdateLookAtTargetEntityPosition(targetMonster);
@@ -551,21 +563,29 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     #region Net functions callers
     public void SwapOrMergeItem(int fromIndex, int toIndex)
     {
+        if (CurrentHp <= 0)
+            return;
         CallNetFunction("SwapOrMergeItem", FunctionReceivers.Server, fromIndex, toIndex);
     }
 
     public void AddAttribute(int attributeIndex)
     {
+        if (CurrentHp <= 0)
+            return;
         CallNetFunction("AddAttribute", FunctionReceivers.Server, attributeIndex);
     }
 
     public void AddSkill(int skillIndex)
     {
+        if (CurrentHp <= 0)
+            return;
         CallNetFunction("AddSkill", FunctionReceivers.Server, skillIndex);
     }
 
     public void PointClickMovement(Vector3 position, LiteNetLibIdentity identity)
     {
+        if (CurrentHp <= 0)
+            return;
         if (!IsServer && CacheNetTransform.ownerClientNotInterpolate)
             SetMovePaths(position);
         pointClickMoveStopped = false;

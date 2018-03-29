@@ -711,31 +711,43 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     #region Net functions callers
     public void Attack()
     {
+        if (CurrentHp <= 0)
+            return;
         CallNetFunction("Attack", FunctionReceivers.Server);
     }
 
     public void PlayActionAnimation(float duration, int actionId, bool waitTillFinished)
     {
+        if (CurrentHp <= 0)
+            return;
         CallNetFunction("PlayActionAnimation", FunctionReceivers.All, duration, actionId, waitTillFinished);
     }
 
     public void PickupItem(uint objectId)
     {
+        if (CurrentHp <= 0)
+            return;
         CallNetFunction("PickupItem", FunctionReceivers.Server, objectId);
     }
 
     public void DropItem(int index, int amount)
     {
+        if (CurrentHp <= 0)
+            return;
         CallNetFunction("DropItem", FunctionReceivers.Server, index, amount);
     }
 
     public void EquipItem(int nonEquipIndex, string equipPosition)
     {
+        if (CurrentHp <= 0)
+            return;
         CallNetFunction("EquipItem", FunctionReceivers.Server, nonEquipIndex, equipPosition);
     }
 
     public void UnEquipItem(string equipPosition)
     {
+        if (CurrentHp <= 0)
+            return;
         CallNetFunction("UnEquipItem", FunctionReceivers.Server, equipPosition);
     }
     #endregion

@@ -16,6 +16,8 @@ public class MonsterCharacterDatabase : BaseCharacterDatabase
     public MonsterCharacteristic characteristic;
     [Tooltip("If this is TRUE, character will not move")]
     public bool Immovable;
+    [Tooltip("This move speed will be applies when it's wandering. if it's going to chase enemy, stats'moveSpeed will be applies")]
+    public float wanderMoveSpeed;
     [Tooltip("This will work with assist characteristic only, to detect ally")]
     public ushort allyId;
     public float visualRange = 5f;
