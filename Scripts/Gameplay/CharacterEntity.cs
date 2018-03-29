@@ -1203,7 +1203,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         var animLength = animArray.Length;
         if (animLength > 0)
         {
-            var anim = animArray[Random.Range(0, animLength - 1)];
+            var anim = animArray[Random.Range(0, animLength)];
             // Assign animation data
             actionId = anim.actionId;
             damageDuration = anim.triggerDuration;
