@@ -18,15 +18,10 @@ public class MonsterSpawnArea : MonoBehaviour
         }
         var gameInstance = GameInstance.Singleton;
         var databaseId = database.Id;
-        BaseCharacterDatabase foundDatabase;
-        if (!GameInstance.CharacterDatabases.TryGetValue(databaseId, out foundDatabase))
+        MonsterCharacterDatabase foundDatabase;
+        if (!GameInstance.MonsterCharacterDatabases.TryGetValue(databaseId, out foundDatabase))
         {
             Debug.LogWarning("The monster database have to be added to game instance");
-            return;
-        }
-        if (!(foundDatabase is MonsterCharacterDatabase))
-        {
-            Debug.LogWarning("This is not monster database");
             return;
         }
         for (var i = 0; i < amount; ++i)

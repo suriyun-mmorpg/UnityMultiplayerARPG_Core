@@ -7,7 +7,7 @@ public static class CharacterDataExtension
     public static BaseCharacterDatabase GetDatabase(this ICharacterData data)
     {
         BaseCharacterDatabase database = null;
-        if (string.IsNullOrEmpty(data.DatabaseId) || !GameInstance.CharacterDatabases.TryGetValue(data.DatabaseId, out database))
+        if (string.IsNullOrEmpty(data.DatabaseId) || !GameInstance.AllCharacterDatabases.TryGetValue(data.DatabaseId, out database))
             return null;
 
         return database;
@@ -16,7 +16,7 @@ public static class CharacterDataExtension
     public static CharacterModel InstantiateModel(this ICharacterData data, Transform parent)
     {
         BaseCharacterDatabase characterDatabase = null;
-        if (string.IsNullOrEmpty(data.DatabaseId) || !GameInstance.CharacterDatabases.TryGetValue(data.DatabaseId, out characterDatabase))
+        if (string.IsNullOrEmpty(data.DatabaseId) || !GameInstance.AllCharacterDatabases.TryGetValue(data.DatabaseId, out characterDatabase))
             return null;
 
         var result = Object.Instantiate(characterDatabase.model, parent);

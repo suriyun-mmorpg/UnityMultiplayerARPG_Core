@@ -279,9 +279,7 @@ public class MonsterCharacterEntity : CharacterEntity
     protected override void OnDatabaseIdChange(string databaseId)
     {
         base.OnDatabaseIdChange(databaseId);
-        BaseCharacterDatabase foundDatabase;
-        if (GameInstance.CharacterDatabases.TryGetValue(databaseId, out foundDatabase) && foundDatabase is MonsterCharacterDatabase)
-            database = foundDatabase as MonsterCharacterDatabase;
+        GameInstance.MonsterCharacterDatabases.TryGetValue(databaseId, out database);
     }
 
     public override void GetAttackData(

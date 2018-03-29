@@ -101,6 +101,16 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
             writer.Put(entry.level);
             writer.Put(entry.amount);
         }
+        var rightHand = SelectedCharacter.EquipWeapons.rightHand;
+        writer.Put(rightHand.id);
+        writer.Put(rightHand.itemId);
+        writer.Put(rightHand.level);
+        writer.Put(rightHand.amount);
+        var leftHand = SelectedCharacter.EquipWeapons.leftHand;
+        writer.Put(leftHand.id);
+        writer.Put(leftHand.itemId);
+        writer.Put(leftHand.level);
+        writer.Put(leftHand.amount);
     }
 
     public override void DeserializeClientReadyExtra(LiteNetLibIdentity playerIdentity, NetDataReader reader)
@@ -169,6 +179,25 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
             entry.amount = reader.GetInt();
             character.NonEquipItems.Add(entry);
         }
+
+        var rightWeapon = new CharacterItem();
+        rightWeapon.id = reader.GetString();
+        rightWeapon.itemId = reader.GetString();
+        rightWeapon.level = reader.GetInt();
+        rightWeapon.amount = reader.GetInt();
+
+        var leftWeapon = new CharacterItem();
+        leftWeapon.id = reader.GetString();
+        leftWeapon.itemId = reader.GetString();
+        leftWeapon.level = reader.GetInt();
+        leftWeapon.amount = reader.GetInt();
+
+        var equipWeapons = new EquipWeapons();
+        equipWeapons.rightHand = rightWeapon;
+        equipWeapons.leftHand = leftWeapon;
+
+        character.EquipWeapons = equipWeapons;
+
         var playerCharacterEntity = playerIdentity.GetComponent<PlayerCharacterEntity>();
         character.CloneTo(playerCharacterEntity);
     }

@@ -47,7 +47,9 @@ public class GameInstance : MonoBehaviour
     public int minCharacterNameLength = 2;
     public int maxCharacterNameLength = 16;
     public static readonly Dictionary<string, Attribute> Attributes = new Dictionary<string, Attribute>();
-    public static readonly Dictionary<string, BaseCharacterDatabase> CharacterDatabases = new Dictionary<string, BaseCharacterDatabase>();
+    public static readonly Dictionary<string, BaseCharacterDatabase> AllCharacterDatabases = new Dictionary<string, BaseCharacterDatabase>();
+    public static readonly Dictionary<string, PlayerCharacterDatabase> PlayerCharacterDatabases = new Dictionary<string, PlayerCharacterDatabase>();
+    public static readonly Dictionary<string, MonsterCharacterDatabase> MonsterCharacterDatabases = new Dictionary<string, MonsterCharacterDatabase>();
     public static readonly Dictionary<string, DamageElement> DamageElements = new Dictionary<string, DamageElement>();
     public static readonly Dictionary<string, DamageEntity> DamageEntities = new Dictionary<string, DamageEntity>();
     public static readonly Dictionary<string, Item> Items = new Dictionary<string, Item>();
@@ -185,7 +187,9 @@ public class GameInstance : MonoBehaviour
         }
         
         Attributes.Clear();
-        CharacterDatabases.Clear();
+        AllCharacterDatabases.Clear();
+        PlayerCharacterDatabases.Clear();
+        MonsterCharacterDatabases.Clear();
         DamageElements.Clear();
         DamageEntities.Clear();
         Items.Clear();
@@ -219,12 +223,13 @@ public class GameInstance : MonoBehaviour
     {
         foreach (var characterDatabase in characterDatabases)
         {
-            if (characterDatabase == null || CharacterDatabases.ContainsKey(characterDatabase.Id))
+            if (characterDatabase == null || AllCharacterDatabases.ContainsKey(characterDatabase.Id))
                 continue;
-            CharacterDatabases[characterDatabase.Id] = characterDatabase;
+            AllCharacterDatabases[characterDatabase.Id] = characterDatabase;
             if (characterDatabase is PlayerCharacterDatabase)
             {
                 var playerCharacterDatabase = characterDatabase as PlayerCharacterDatabase;
+                PlayerCharacterDatabases[characterDatabase.Id] = playerCharacterDatabase;
                 var attributes = new List<Attribute>();
                 foreach (var baseAttribute in playerCharacterDatabase.baseAttributes)
                 {
@@ -236,6 +241,11 @@ public class GameInstance : MonoBehaviour
                 AddSkills(playerCharacterDatabase.skills);
                 AddItems(new Item[] { playerCharacterDatabase.rightHandEquipItem, playerCharacterDatabase.leftHandEquipItem });
                 AddItems(playerCharacterDatabase.armorItems);
+            }
+            else if (characterDatabase is MonsterCharacterDatabase)
+            {
+                var monsterCharacterDatabase = characterDatabase as MonsterCharacterDatabase;
+                MonsterCharacterDatabases[characterDatabase.Id] = monsterCharacterDatabase;
             }
         }
     }

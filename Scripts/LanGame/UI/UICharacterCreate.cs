@@ -50,7 +50,7 @@ public class UICharacterCreate : UIBase
     {
         SelectionManager.Clear();
         // Show list of characters that can be create
-        var selectableCharacters = GameInstance.CharacterDatabases.Values.ToList();
+        var selectableCharacters = GameInstance.PlayerCharacterDatabases.Values.ToList();
         CacheList.Generate(selectableCharacters, (index, characterDatabase, ui) =>
         {
             var databaseId = characterDatabase.Id;
@@ -117,8 +117,8 @@ public class UICharacterCreate : UIBase
 
         var characterId = System.Guid.NewGuid().ToString();
         var characterData = new PlayerCharacterData();
-        characterData.SetNewCharacterData(characterName, prototypeId);
         characterData.Id = characterId;
+        characterData.SetNewCharacterData(characterName, prototypeId);
         characterData.SavePersistentCharacterData();
 
         if (eventOnCreateCharacter != null)

@@ -36,62 +36,60 @@ public static class PlayerCharacterDataExtension
     public static T SetNewCharacterData<T>(this T character, string characterName, string databaseId) where T : IPlayerCharacterData
     {
         var gameInstance = GameInstance.Singleton;
-        BaseCharacterDatabase characterDatabase;
-        if (!GameInstance.CharacterDatabases.TryGetValue(databaseId, out characterDatabase))
+        PlayerCharacterDatabase database;
+        if (!GameInstance.PlayerCharacterDatabases.TryGetValue(databaseId, out database))
             return character;
         // Player character database
-        if (characterDatabase is PlayerCharacterDatabase)
+        var playerCharacterDatabase = database as PlayerCharacterDatabase;
+        // Attributes
+        var baseAttributes = playerCharacterDatabase.baseAttributes;
+        foreach (var baseAttribute in baseAttributes)
         {
-            var playerCharacterDatabase = characterDatabase as PlayerCharacterDatabase;
-            // Attributes
-            var baseAttributes = playerCharacterDatabase.baseAttributes;
-            foreach (var baseAttribute in baseAttributes)
-            {
-                var characterAttribute = new CharacterAttribute();
-                characterAttribute.attributeId = baseAttribute.attribute.Id;
-                characterAttribute.amount = baseAttribute.amount;
-                character.Attributes.Add(characterAttribute);
-            }
-            // Right hand & left hand items
-            var rightHandEquipItem = playerCharacterDatabase.rightHandEquipItem;
-            var leftHandEquipItem = playerCharacterDatabase.leftHandEquipItem;
-            var equipWeapons = new EquipWeapons();
-            // Right hand equipped item
-            if (rightHandEquipItem != null)
-            {
-                var characterItem = new CharacterItem();
-                characterItem.id = System.Guid.NewGuid().ToString();
-                characterItem.itemId = rightHandEquipItem.Id;
-                characterItem.level = 1;
-                characterItem.amount = rightHandEquipItem.maxStack;
-                equipWeapons.rightHand = characterItem;
-            }
-            // Left hand equipped item
-            if (leftHandEquipItem != null)
-            {
-                var characterItem = new CharacterItem();
-                characterItem.id = System.Guid.NewGuid().ToString();
-                characterItem.itemId = leftHandEquipItem.Id;
-                characterItem.level = 1;
-                characterItem.amount = leftHandEquipItem.maxStack;
-                equipWeapons.leftHand = characterItem;
-            }
-            // Armors
-            var armorItems = playerCharacterDatabase.armorItems;
-            foreach (var armorItem in armorItems)
-            {
-                if (armorItem == null)
-                    continue;
-                var characterItem = new CharacterItem();
-                characterItem.id = System.Guid.NewGuid().ToString();
-                characterItem.itemId = armorItem.Id;
-                characterItem.level = 1;
-                characterItem.amount = armorItem.maxStack;
-                character.EquipItems.Add(characterItem);
-            }
+            var characterAttribute = new CharacterAttribute();
+            characterAttribute.attributeId = baseAttribute.attribute.Id;
+            characterAttribute.amount = baseAttribute.amount;
+            character.Attributes.Add(characterAttribute);
+        }
+        // Right hand & left hand items
+        var rightHandEquipItem = playerCharacterDatabase.rightHandEquipItem;
+        var leftHandEquipItem = playerCharacterDatabase.leftHandEquipItem;
+        var equipWeapons = new EquipWeapons();
+        // Right hand equipped item
+        if (rightHandEquipItem != null)
+        {
+            var characterItem = new CharacterItem();
+            characterItem.id = System.Guid.NewGuid().ToString();
+            characterItem.itemId = rightHandEquipItem.Id;
+            characterItem.level = 1;
+            characterItem.amount = rightHandEquipItem.maxStack;
+            equipWeapons.rightHand = characterItem;
+        }
+        // Left hand equipped item
+        if (leftHandEquipItem != null)
+        {
+            var characterItem = new CharacterItem();
+            characterItem.id = System.Guid.NewGuid().ToString();
+            characterItem.itemId = leftHandEquipItem.Id;
+            characterItem.level = 1;
+            characterItem.amount = leftHandEquipItem.maxStack;
+            equipWeapons.leftHand = characterItem;
+        }
+        character.EquipWeapons = equipWeapons;
+        // Armors
+        var armorItems = playerCharacterDatabase.armorItems;
+        foreach (var armorItem in armorItems)
+        {
+            if (armorItem == null)
+                continue;
+            var characterItem = new CharacterItem();
+            characterItem.id = System.Guid.NewGuid().ToString();
+            characterItem.itemId = armorItem.Id;
+            characterItem.level = 1;
+            characterItem.amount = armorItem.maxStack;
+            character.EquipItems.Add(characterItem);
         }
         // General data
-        character.DatabaseId = characterDatabase.Id;
+        character.DatabaseId = database.Id;
         character.CharacterName = characterName;
         character.Level = 1;
         character.CurrentHp = character.GetMaxHp();
