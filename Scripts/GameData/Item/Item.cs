@@ -24,7 +24,7 @@ public class Item : BaseGameData
 
     [Space(10)]
     [Header("Equipment")]
-    public GameObject equipmentModel;
+    public EquipmentModel[] equipmentModels;
     [Header("Requirements")]
     public EquipmentRequirement requirement;
     [Header("Attributes Bonus")]
@@ -133,6 +133,13 @@ public class Item : BaseGameData
         get { return WeaponType.equipType; }
     }
     #endregion
+}
+
+[System.Serializable]
+public struct EquipmentModel
+{
+    public string equipSocket;
+    public GameObject model;
 }
 
 [System.Serializable]

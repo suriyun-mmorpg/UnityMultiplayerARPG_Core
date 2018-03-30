@@ -11,10 +11,6 @@ public class CharacterModel : MonoBehaviour
     public Vector3 center;
     public float radius = 0.5f;
     public float height = 2f;
-    [Header("Equipment Containers")]
-    public Transform rightHandContainer;
-    public Transform leftHandContainer;
-    public Transform shieldContainer;
     public CharacterModelContainer[] equipmentContainers;
 
     private Transform cacheTransform;
@@ -39,92 +35,122 @@ public class CharacterModel : MonoBehaviour
         }
     }
 
-    private Dictionary<string, Transform> cacheEquipmentContainers = null;
-    public Dictionary<string, Transform> CacheEquipmentContainers
+    private Dictionary<string, CharacterModelContainer> cacheEquipmentContainers = null;
+    /// <summary>
+    /// Dictionary[equipSocket(String), container(CharacterModelContainer)]
+    /// </summary>
+    public Dictionary<string, CharacterModelContainer> CacheEquipmentContainers
     {
         get
         {
             if (cacheEquipmentContainers == null)
             {
-                cacheEquipmentContainers = new Dictionary<string, Transform>();
+                cacheEquipmentContainers = new Dictionary<string, CharacterModelContainer>();
                 foreach (var equipmentContainer in equipmentContainers)
                 {
-                    if (equipmentContainer.container != null && !cacheEquipmentContainers.ContainsKey(equipmentContainer.equipPosition))
-                        cacheEquipmentContainers[equipmentContainer.equipPosition] = equipmentContainer.container;
+                    if (equipmentContainer.transform != null && !cacheEquipmentContainers.ContainsKey(equipmentContainer.equipSocket))
+                        cacheEquipmentContainers[equipmentContainer.equipSocket] = equipmentContainer;
                 }
             }
             return cacheEquipmentContainers;
         }
     }
+    
+    /// <summary>
+    /// Dictionary[equipPosition(String), Dictionary[equipSocket(String), model(GameObject)]]
+    /// </summary>
+    private readonly Dictionary<string, Dictionary<string, GameObject>> cacheModels = new Dictionary<string, Dictionary<string, GameObject>>();
 
-    private readonly Dictionary<Transform, GameObject> cacheModels = new Dictionary<Transform, GameObject>();
-
-    private void CreateCacheModel(Transform container, GameObject model)
+    private void CreateCacheModel(string equipPosition, Dictionary<string, GameObject> models)
     {
-        DestroyCacheModel(container);
-        if (model == null)
+        DestroyCacheModel(equipPosition);
+        if (models == null)
             return;
-        cacheModels[container] = model;
+        foreach (var model in models)
+        {
+            CharacterModelContainer container;
+            if (!CacheEquipmentContainers.TryGetValue(model.Key, out container))
+                continue;
+            if (container.defaultModel != null)
+                container.defaultModel.SetActive(false);
+        }
+        cacheModels[equipPosition] = models;
     }
 
-    private void DestroyCacheModel(Transform container)
+    private void DestroyCacheModel(string equipPosition)
     {
-        GameObject oldModel;
-        if (container != null && cacheModels.TryGetValue(container, out oldModel))
+        Dictionary<string, GameObject> oldModels;
+        if (!string.IsNullOrEmpty(equipPosition) && cacheModels.TryGetValue(equipPosition, out oldModels) && oldModels != null)
         {
-            Destroy(oldModel);
-            cacheModels.Remove(container);
+            foreach (var model in oldModels)
+            {
+                Destroy(model.Value);
+                CharacterModelContainer container;
+                if (!CacheEquipmentContainers.TryGetValue(model.Key, out container))
+                    continue;
+                if (container.defaultModel != null)
+                    container.defaultModel.SetActive(true);
+            }
+            cacheModels.Remove(equipPosition);
         }
     }
 
     public void SetEquipWeapons(EquipWeapons equipWeapons)
     {
-        DestroyCacheModel(rightHandContainer);
-        DestroyCacheModel(leftHandContainer);
-        DestroyCacheModel(shieldContainer);
+        // Clear equipped item models
+        DestroyCacheModel(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
+        DestroyCacheModel(GameDataConst.EQUIP_POSITION_LEFT_HAND);
 
-        var rightHandWeapon = equipWeapons.rightHand.GetWeaponItem();
-        var leftHandWeapon = equipWeapons.leftHand.GetWeaponItem();
-        var leftHandShield = equipWeapons.leftHand.GetShieldItem();
-        if (rightHandWeapon != null)
-            InstantiateEquipModel(rightHandWeapon.equipmentModel, rightHandContainer);
-        if (leftHandWeapon != null)
-            InstantiateEquipModel(leftHandWeapon.equipmentModel, leftHandContainer);
-        if (leftHandShield != null)
-            InstantiateEquipModel(leftHandShield.equipmentModel, shieldContainer);
+        var rightHandEquipment = equipWeapons.rightHand.GetEquipmentItem();
+        var leftHandEquipment = equipWeapons.leftHand.GetEquipmentItem();
+        if (rightHandEquipment != null)
+            InstantiateEquipModel(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandEquipment.equipmentModels);
+        if (leftHandEquipment != null)
+            InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandEquipment.equipmentModels);
     }
     
     public void SetEquipItems(IList<CharacterItem> equipItems)
     {
-        var containers = CacheEquipmentContainers.Values;
         // Clear equipped item models
-        foreach (var container in containers)
+        foreach (var cacheModel in cacheModels)
         {
-            DestroyCacheModel(container);
+            var equipPosition = cacheModel.Key;
+            if (!GameDataConst.EQUIP_POSITION_RIGHT_HAND.Equals(equipPosition) &&
+                !GameDataConst.EQUIP_POSITION_LEFT_HAND.Equals(equipPosition))
+                DestroyCacheModel(equipPosition);
         }
 
         foreach (var equipItem in equipItems)
         {
-            var armorItem = equipItem.GetArmorItem();
-            if (armorItem == null)
+            var equipmentItem = equipItem.GetEquipmentItem();
+            if (equipmentItem == null)
                 continue;
-            
-            Transform container;
-            if (CacheEquipmentContainers.TryGetValue(armorItem.EquipPosition, out container))
-                InstantiateEquipModel(armorItem.equipmentModel, container);
+            InstantiateEquipModel(equipmentItem.EquipPosition, equipmentItem.equipmentModels);
         }
     }
-
-    private void InstantiateEquipModel(GameObject prefab, Transform container)
+    
+    private void InstantiateEquipModel(string equipPosition, EquipmentModel[] equipmentModels)
     {
-        if (prefab == null || container == null)
+        if (equipmentModels == null || equipmentModels.Length == 0)
             return;
-        var equipmentModel = Instantiate(prefab, container);
-        equipmentModel.transform.localPosition = Vector3.zero;
-        equipmentModel.transform.localEulerAngles = Vector3.zero;
-        equipmentModel.transform.localScale = Vector3.one;
-        equipmentModel.gameObject.SetActive(true);
-        CreateCacheModel(container, equipmentModel);
+        var models = new Dictionary<string, GameObject>();
+        foreach (var equipmentModel in equipmentModels)
+        {
+            var equipSocket = equipmentModel.equipSocket;
+            var model = equipmentModel.model;
+            if (string.IsNullOrEmpty(equipSocket) || model == null)
+                continue;
+            CharacterModelContainer container;
+            if (!CacheEquipmentContainers.TryGetValue(equipSocket, out container))
+                continue;
+            var newModel = Instantiate(model, container.transform);
+            newModel.transform.localPosition = Vector3.zero;
+            newModel.transform.localEulerAngles = Vector3.zero;
+            newModel.transform.localScale = Vector3.one;
+            newModel.gameObject.SetActive(true);
+            models.Add(equipSocket, newModel);
+        }
+        CreateCacheModel(equipPosition, models);
     }
 
     private void OnDrawGizmos()
@@ -144,6 +170,7 @@ public class CharacterModel : MonoBehaviour
 [System.Serializable]
 public struct CharacterModelContainer
 {
-    public string equipPosition;
-    public Transform container;
+    public string equipSocket;
+    public GameObject defaultModel;
+    public Transform transform;
 }
