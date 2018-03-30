@@ -77,6 +77,7 @@ public class MonsterCharacterEntity : CharacterEntity
     {
         SetTargetEntity(null);
         CacheNavMeshAgent.isStopped = true;
+        CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
         wanderDestination = null;
     }
 
@@ -104,7 +105,8 @@ public class MonsterCharacterEntity : CharacterEntity
                 CacheNavMeshAgent.isStopped = true;
                 var lookAtDirection = (targetPosition - currentPosition).normalized;
                 // slerp to the desired rotation over time
-                CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(lookAtDirection), CacheNavMeshAgent.angularSpeed * Time.deltaTime);
+                if (lookAtDirection.magnitude > 0)
+                    CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(lookAtDirection), CacheNavMeshAgent.angularSpeed * Time.deltaTime);
                 Attack();
                 // TODO: Random to use skills
             }
@@ -218,7 +220,7 @@ public class MonsterCharacterEntity : CharacterEntity
 
     protected override bool IsEnemy(CharacterEntity characterEntity)
     {
-        return true;
+        return characterEntity is PlayerCharacterEntity;
     }
 
     public void SetAttackTarget(CharacterEntity target)

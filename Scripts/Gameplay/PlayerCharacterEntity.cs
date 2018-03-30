@@ -465,9 +465,12 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
 
     protected void NetFuncSwapOrMergeItem(int fromIndex, int toIndex)
     {
-        if (CurrentHp <= 0 || doingAction ||
-            fromIndex < 0 || fromIndex > nonEquipItems.Count ||
-            toIndex < 0 || toIndex > nonEquipItems.Count)
+        if (CurrentHp <= 0 || 
+            isDoingAction.Value ||
+            fromIndex < 0 || 
+            fromIndex > nonEquipItems.Count ||
+            toIndex < 0 || 
+            toIndex > nonEquipItems.Count)
             return;
 
         var fromItem = nonEquipItems[fromIndex];
