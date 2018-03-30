@@ -27,6 +27,14 @@ public class MonsterCharacterEntity : CharacterEntity
     protected Vector3 oldMovePosition;
     #endregion
 
+    #region Interface implementation
+    public override string CharacterName
+    {
+        get { return database == null ? "Unknow" : database.title; }
+        set { }
+    }
+    #endregion
+
     #region Cache components
     private NavMeshAgent cacheNavMeshAgent;
     public NavMeshAgent CacheNavMeshAgent
@@ -91,6 +99,11 @@ public class MonsterCharacterEntity : CharacterEntity
         CharacterEntity targetEntity;
         if (TryGetTargetEntity(out targetEntity))
         {
+            if (targetEntity.CurrentHp <= 0)
+            {
+                ClearDestination();
+                return;
+            }
             // If it has target then go to target
             var targetPosition = targetEntity.CacheTransform.position;
             var attackDistance = GetAttackDistance();
@@ -206,6 +219,11 @@ public class MonsterCharacterEntity : CharacterEntity
         findTargetTime = Time.realtimeSinceStartup + AGGRESSIVE_FIND_TARGET_DELAY;
     }
 
+    protected override bool CanReceiveDamageFrom(CharacterEntity characterEntity)
+    {
+        return characterEntity != null && characterEntity is PlayerCharacterEntity;
+    }
+
     protected override bool IsAlly(CharacterEntity characterEntity)
     {
         if (characterEntity == null)
@@ -220,7 +238,7 @@ public class MonsterCharacterEntity : CharacterEntity
 
     protected override bool IsEnemy(CharacterEntity characterEntity)
     {
-        return characterEntity is PlayerCharacterEntity;
+        return characterEntity != null && characterEntity is PlayerCharacterEntity;
     }
 
     public void SetAttackTarget(CharacterEntity target)
@@ -242,7 +260,7 @@ public class MonsterCharacterEntity : CharacterEntity
             return;
         base.ReceiveDamage(attacker, allDamageAttributes, debuff);
         // If no attacker, skip next logics
-        if (attacker == null)
+        if (attacker == null || !IsEnemy(attacker))
             return;
         // If character isn't dead
         if (CurrentHp > 0)

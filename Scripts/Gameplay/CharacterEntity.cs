@@ -22,6 +22,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     public const string ANIM_Y_SPEED = "YSpeed";
     public const string ANIM_DO_ACTION = "DoAction";
     public const string ANIM_ACTION_ID = "ActionId";
+    public const string ANIM_HURT = "Hurt";
     public const float UPDATE_INTERVAL_SKILL_BUFF = 1f;
 
     #region Private data
@@ -70,13 +71,13 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Interface implementation
-    public string DatabaseId { get { return databaseId; } set { databaseId.Value = value; } }
-    public string CharacterName { get { return characterName; } set { characterName.Value = value; } }
-    public int Level { get { return level.Value; } set { level.Value = value; } }
-    public int Exp { get { return exp.Value; } set { exp.Value = value; } }
-    public int CurrentHp { get { return (int)currentHp.Value; } set { currentHp.Value = value; } }
-    public int CurrentMp { get { return (int)currentMp.Value; } set { currentMp.Value = value; } }
-    public EquipWeapons EquipWeapons { get { return equipWeapons; } set { equipWeapons.Value = value; } }
+    public virtual string DatabaseId { get { return databaseId; } set { databaseId.Value = value; } }
+    public virtual string CharacterName { get { return characterName; } set { characterName.Value = value; } }
+    public virtual int Level { get { return level.Value; } set { level.Value = value; } }
+    public virtual int Exp { get { return exp.Value; } set { exp.Value = value; } }
+    public virtual int CurrentHp { get { return (int)currentHp.Value; } set { currentHp.Value = value; } }
+    public virtual int CurrentMp { get { return (int)currentMp.Value; } set { currentMp.Value = value; } }
+    public virtual EquipWeapons EquipWeapons { get { return equipWeapons; } set { equipWeapons.Value = value; } }
 
     public IList<CharacterAttribute> Attributes
     {
@@ -202,6 +203,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     {
         if (model != null)
         {
+            var animator = model.CacheAnimator;
             var isDead = CurrentHp <= 0;
             var velocity = currentVelocity;
             var moveSpeed = new Vector3(velocity.x, 0, velocity.z).magnitude;
@@ -209,11 +211,11 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             {
                 moveSpeed = 0f;
                 // Force set to none action when dead
-                model.CacheAnimator.SetBool(ANIM_DO_ACTION, false);
+                animator.SetBool(ANIM_DO_ACTION, false);
             }
-            model.CacheAnimator.SetFloat(ANIM_MOVE_SPEED, moveSpeed);
-            model.CacheAnimator.SetFloat(ANIM_Y_SPEED, velocity.y);
-            model.CacheAnimator.SetBool(ANIM_IS_DEAD, isDead);
+            animator.SetFloat(ANIM_MOVE_SPEED, moveSpeed);
+            animator.SetFloat(ANIM_Y_SPEED, velocity.y);
+            animator.SetBool(ANIM_IS_DEAD, isDead);
         }
     }
 
@@ -985,7 +987,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         CharacterBuff debuff)
     {
         // Damage calculations apply at server only
-        if (!IsServer)
+        if (!IsServer || !CanReceiveDamageFrom(attacker))
             return;
         var gameInstance = GameInstance.Singleton;
         // Calculate chance to hit
@@ -993,7 +995,6 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         // If miss, return don't calculate damages
         if (Random.value > hitChance)
             return;
-
         // Calculate damages
         var totalDamage = 0f;
         if (allDamageAttributes.Count > 0)
@@ -1007,8 +1008,25 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
                     totalDamage += receivingDamage;
             }
         }
+        // Calculate chance to critical
+        var criticalChance = gameInstance.GameplayRule.GetCriticalChance(attacker, this);
+        // If critical occurs
+        if (Random.value <= criticalChance)
+            totalDamage = gameInstance.GameplayRule.GetCriticalDamage(attacker, this, totalDamage);
+        // Calculate chance to block
+        var blockChance = gameInstance.GameplayRule.GetBlockChance(attacker, this);
+        // If block occurs
+        if (Random.value <= blockChance)
+            totalDamage = gameInstance.GameplayRule.GetBlockDamage(attacker, this, totalDamage);
         // Apply damages
         CurrentHp -= (int)totalDamage;
+
+        if (model != null)
+        {
+            var animator =  model.CacheAnimator;
+            animator.ResetTrigger(ANIM_HURT);
+            animator.SetTrigger(ANIM_HURT);
+        }
 
         // If current hp <= 0, character dead
         if (CurrentHp <= 0)
@@ -1140,12 +1158,12 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Target Entity Getter/Setter
-    protected void SetTargetEntity(RpgNetworkEntity newTargetEntity)
+    public void SetTargetEntity(RpgNetworkEntity newTargetEntity)
     {
         targetEntity = newTargetEntity;
     }
 
-    protected bool TryGetTargetEntity<T>(out T entity) where T : RpgNetworkEntity
+    public bool TryGetTargetEntity<T>(out T entity) where T : RpgNetworkEntity
     {
         entity = null;
         if (targetEntity == null)
@@ -1278,6 +1296,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
 
+    protected abstract bool CanReceiveDamageFrom(CharacterEntity characterEntity);
     protected abstract bool IsAlly(CharacterEntity characterEntity);
     protected abstract bool IsEnemy(CharacterEntity characterEntity);
 

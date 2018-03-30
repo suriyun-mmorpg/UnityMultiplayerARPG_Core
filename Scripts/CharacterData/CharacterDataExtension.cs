@@ -201,6 +201,8 @@ public static class CharacterDataExtension
 
     public static CharacterStats GetStatsWithBuffs(this ICharacterData data)
     {
+        if (data == null)
+            return new CharacterStats();
         var result = data.GetStats();
         var buffs = data.Buffs;
         foreach (var buff in buffs)
