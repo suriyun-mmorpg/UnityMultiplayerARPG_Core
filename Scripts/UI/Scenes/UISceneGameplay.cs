@@ -15,7 +15,7 @@ public class UISceneGameplay : MonoBehaviour
     public static UISceneGameplay Singleton { get; private set; }
 
     public UICharacter[] uiCharacters;
-    public UICharacterBuffs uiBuffList;
+    public UICharacter uiEnemyCharacter;
     public UIEquipItems uiEquipItems;
     public UINonEquipItems uiNonEquipItems;
     public UICharacterSkills uiSkills;
@@ -38,6 +38,7 @@ public class UISceneGameplay : MonoBehaviour
 
     private void Update()
     {
+        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
         foreach (var toggleUi in toggleUis)
         {
             if (Input.GetKeyDown(toggleUi.key))
@@ -46,8 +47,31 @@ public class UISceneGameplay : MonoBehaviour
                 ui.Toggle();
             }
         }
+        // Respawn button will show when character dead
         if (buttonRespawn != null)
             buttonRespawn.gameObject.SetActive(PlayerCharacterEntity.OwningCharacter.CurrentHp <= 0);
+        // Enemy status will be show when selected at enemy and enemy hp more than 0
+        if (uiEnemyCharacter != null)
+        {
+            CharacterEntity targetCharacter = null;
+            if (uiEnemyCharacter.IsVisible())
+            {
+                if (owningCharacter == null ||
+                    !owningCharacter.TryGetTargetEntity(out targetCharacter) ||
+                    targetCharacter.CurrentHp <= 0)
+                    uiEnemyCharacter.Hide();
+            }
+            else
+            {
+                if (owningCharacter != null &&
+                    owningCharacter.TryGetTargetEntity(out targetCharacter) &&
+                    targetCharacter.CurrentHp > 0)
+                {
+                    uiEnemyCharacter.Data = targetCharacter;
+                    uiEnemyCharacter.Show();
+                }
+            }
+        }
     }
 
     public void UpdateCharacter()
@@ -57,12 +81,6 @@ public class UISceneGameplay : MonoBehaviour
             if (uiCharacter != null)
                 uiCharacter.Data = PlayerCharacterEntity.OwningCharacter;
         }
-    }
-
-    public void UpdateBuffs()
-    {
-        if (uiBuffList != null)
-            uiBuffList.UpdateData(PlayerCharacterEntity.OwningCharacter);
     }
 
     public void UpdateEquipItems()

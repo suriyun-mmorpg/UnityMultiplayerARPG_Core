@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(UIList))]
-public class UICharacterBuffs : UIBase
+public class UICharacterBuffs : UISelectionEntry<ICharacterData>
 {
     private UIList cacheList;
     public UIList CacheList
@@ -16,16 +16,12 @@ public class UICharacterBuffs : UIBase
         }
     }
 
-    public override void Show()
+    protected override void UpdateData()
     {
-        base.Show();
-    }
-
-    public void UpdateData(CharacterEntity characterEntity)
-    {
-        if (characterEntity == null)
+        if (Data == null)
             return;
-        var buffs = characterEntity.buffs;
+
+        var buffs = Data.Buffs;
         CacheList.Generate(buffs, (index, characterBuff, ui) =>
         {
             var uiCharacterBuff = ui.GetComponent<UICharacterBuff>();

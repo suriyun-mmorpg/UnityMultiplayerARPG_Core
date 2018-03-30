@@ -114,7 +114,6 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
             CacheUISceneGameplay = Instantiate(gameInstance.uiSceneGameplayPrefab);
             CacheUISceneGameplay.UpdateCharacter();
             CacheUISceneGameplay.UpdateSkills();
-            CacheUISceneGameplay.UpdateBuffs();
             CacheUISceneGameplay.UpdateEquipItems();
             CacheUISceneGameplay.UpdateNonEquipItems();
         }
@@ -412,6 +411,12 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         return Mathf.Sqrt(2f * jumpHeight * -Physics.gravity.y * gravityRate);
     }
 
+    protected override bool CanReceiveDamageFrom(CharacterEntity characterEntity)
+    {
+        // TODO: May implement this for party/guild battle purposes
+        return characterEntity != null && characterEntity is MonsterCharacterEntity;
+    }
+
     protected override bool IsAlly(CharacterEntity characterEntity)
     {
         // TODO: May implement this for party/guild battle purposes
@@ -421,7 +426,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     protected override bool IsEnemy(CharacterEntity characterEntity)
     {
         // TODO: May implement this for party/guild battle purposes
-        return true;
+        return characterEntity != null && characterEntity is MonsterCharacterEntity;
     }
 
     #region Setup functions
@@ -651,10 +656,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         base.OnBuffsOperation(operation, index);
 
         if (IsOwnerClient && CacheUISceneGameplay != null)
-        {
             CacheUISceneGameplay.UpdateCharacter();
-            CacheUISceneGameplay.UpdateBuffs();
-        }
     }
 
     protected override void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)

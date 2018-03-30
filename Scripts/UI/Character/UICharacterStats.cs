@@ -16,10 +16,14 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
     public string accuracyStatsFormat = "Acc: {0}";
     [Tooltip("Evasion Format => {0} = {Amount}")]
     public string evasionStatsFormat = "Eva: {0}";
-    [Tooltip("Cri Hit Rate Stats Format => {0} = {Amount}")]
-    public string criHitRateStatsFormat = "Cri Hit: {0}%";
+    [Tooltip("Cri Rate Stats Format => {0} = {Amount}")]
+    public string criRateStatsFormat = "Critical: {0}%";
     [Tooltip("Cri Dmg Rate Stats Format => {0} = {Amount}")]
     public string criDmgRateStatsFormat = "Cri Dmg: {0}%";
+    [Tooltip("Block Rate Stats Format => {0} = {Amount}")]
+    public string blockRateStatsFormat = "Block: {0}%";
+    [Tooltip("Block Dmg Rate Stats Format => {0} = {Amount}")]
+    public string blockDmgRateStatsFormat = "Block Dmg: {0}%";
     [Tooltip("Weight Limit Stats Format => {0} = {Weight Limit}")]
     public string weightLimitStatsFormat = "Weight Limit: {0}";
 
@@ -30,8 +34,10 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
     public Text textArmor;
     public Text textAccuracy;
     public Text textEvasion;
-    public Text textCriHitRate;
+    public Text textCriRate;
     public Text textCriDmgRate;
+    public Text textBlockRate;
+    public Text textBlockDmgRate;
     public Text textWeightLimit;
 
     protected override void UpdateData()
@@ -84,14 +90,14 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
         if (textEvasion != null)
             textEvasion.text = statsStringPart;
 
-        // Cri Hit Rate
+        // Cri Rate
         if (!string.IsNullOrEmpty(statsString))
             statsString += "\n";
-        statsStringPart = string.Format(criHitRateStatsFormat, (Data.criHitRate * 100).ToString("N2"));
-        if (Data.criHitRate != 0)
+        statsStringPart = string.Format(criRateStatsFormat, (Data.criRate * 100).ToString("N2"));
+        if (Data.criRate != 0)
             statsString += statsStringPart;
-        if (textCriHitRate != null)
-            textCriHitRate.text = statsStringPart;
+        if (textCriRate != null)
+            textCriRate.text = statsStringPart;
 
         // Cri Dmg Rate
         if (!string.IsNullOrEmpty(statsString))
@@ -101,6 +107,24 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
             statsString += statsStringPart;
         if (textCriDmgRate != null)
             textCriDmgRate.text = statsStringPart;
+        
+        // Block Rate
+        if (!string.IsNullOrEmpty(statsString))
+            statsString += "\n";
+        statsStringPart = string.Format(blockRateStatsFormat, (Data.blockRate * 100).ToString("N2"));
+        if (Data.blockRate != 0)
+            statsString += statsStringPart;
+        if (textBlockRate != null)
+            textBlockRate.text = statsStringPart;
+
+        // Block Dmg Rate
+        if (!string.IsNullOrEmpty(statsString))
+            statsString += "\n";
+        statsStringPart = string.Format(blockDmgRateStatsFormat, (Data.blockDmgRate * 100).ToString("N2"));
+        if (Data.blockDmgRate != 0)
+            statsString += statsStringPart;
+        if (textBlockDmgRate != null)
+            textBlockDmgRate.text = statsStringPart;
 
         // Weight
         if (!string.IsNullOrEmpty(statsString))
