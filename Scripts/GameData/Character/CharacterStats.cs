@@ -10,8 +10,10 @@ public struct CharacterStats
     public float armor;
     public float accuracy;
     public float evasion;
-    public float criHitRate;
+    public float criRate;
     public float criDmgRate;
+    public float blockRate;
+    public float blockDmgRate;
     public float moveSpeed;
     public float atkSpeed;
     public float weightLimit;
@@ -29,8 +31,10 @@ public struct CharacterStats
         result.armor = a.armor + b.armor;
         result.accuracy = a.accuracy + b.accuracy;
         result.evasion = a.evasion + b.evasion;
-        result.criHitRate = a.criHitRate + b.criHitRate;
+        result.criRate = a.criRate + b.criRate;
         result.criDmgRate = a.criDmgRate + b.criDmgRate;
+        result.blockRate = a.blockRate + b.blockRate;
+        result.blockDmgRate = a.blockDmgRate + b.blockDmgRate;
         result.moveSpeed = a.moveSpeed + b.moveSpeed;
         result.atkSpeed = a.atkSpeed + b.atkSpeed;
         result.weightLimit = a.weightLimit + b.weightLimit;
@@ -45,8 +49,10 @@ public struct CharacterStats
         result.armor = a.armor * multiplier;
         result.accuracy = a.accuracy * multiplier;
         result.evasion = a.evasion * multiplier;
-        result.criHitRate = a.criHitRate * multiplier;
+        result.criRate = a.criRate * multiplier;
         result.criDmgRate = a.criDmgRate * multiplier;
+        result.blockRate = a.blockRate * multiplier;
+        result.blockDmgRate = a.blockDmgRate * multiplier;
         result.moveSpeed = a.moveSpeed * multiplier;
         result.atkSpeed = a.atkSpeed * multiplier;
         result.weightLimit = a.weightLimit * multiplier;
