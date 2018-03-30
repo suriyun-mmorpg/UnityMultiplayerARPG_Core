@@ -16,10 +16,13 @@ public class SimpleGameplayRule : BaseGameplayRule
         var attackerLvl = attacker.Level;
         var dmgReceiverLvl = damageReceiver.Level;
         var hitChance = 2f;
+        
         if (attackerAcc != 0 && dmgReceiverEva != 0)
             hitChance *= (attackerAcc / (attackerAcc + dmgReceiverEva));
+
         if (attackerLvl != 0 && dmgReceiverLvl != 0)
-            hitChance *= (attackerLvl / (attackerLvl + dmgReceiverLvl));
+            hitChance *= ((float)attackerLvl / (float)(attackerLvl + dmgReceiverLvl));
+
         // Minimum hit chance is 5%
         if (hitChance < 0.05f)
             hitChance = 0.05f;
@@ -27,6 +30,47 @@ public class SimpleGameplayRule : BaseGameplayRule
         if (hitChance > 0.95f)
             hitChance = 0.95f;
         return hitChance;
+    }
+
+    public override float GetCriticalChance(ICharacterData attacker, ICharacterData damageReceiver)
+    {
+        var criRate = damageReceiver.GetStatsWithBuffs().criRate;
+        // Minimum critical chance is 5%
+        if (criRate < 0.05f)
+            criRate = 0.05f;
+        // Maximum critical chance is 95%
+        if (criRate > 0.95f)
+            criRate = 0.95f;
+        return criRate;
+    }
+
+    public override float GetCriticalDamage(ICharacterData attacker, ICharacterData damageReceiver, float damage)
+    {
+        return damage * attacker.GetStatsWithBuffs().criDmgRate;
+    }
+
+    public override float GetBlockChance(ICharacterData attacker, ICharacterData damageReceiver)
+    {
+        var blockRate = damageReceiver.GetStatsWithBuffs().blockRate;
+        // Minimum block chance is 5%
+        if (blockRate < 0.05f)
+            blockRate = 0.05f;
+        // Maximum block chance is 95%
+        if (blockRate > 0.95f)
+            blockRate = 0.95f;
+        return blockRate;
+    }
+
+    public override float GetBlockDamage(ICharacterData attacker, ICharacterData damageReceiver, float damage)
+    {
+        var blockDmgRate = damageReceiver.GetStatsWithBuffs().blockDmgRate;
+        // Minimum block damage is 5%
+        if (blockDmgRate < 0.05f)
+            blockDmgRate = 0.05f;
+        // Maximum block damage is 5%
+        if (blockDmgRate > 0.95f)
+            blockDmgRate = 0.95f;
+        return damage * blockDmgRate;
     }
 
     public override float GetDamageReducedByResistance(ICharacterData damageReceiver, float damageAmount, Resistance resistance)
