@@ -6,12 +6,20 @@ public class SimpleGameplayRule : BaseGameplayRule
 {
     public override float GetHitChance(ICharacterData attacker, ICharacterData damageReceiver)
     {
-        // Damage receiver stats
-        var dmgReceiverStats = damageReceiver.GetStatsWithBuffs();
         // Attacker stats
         var attackerStats = attacker.GetStatsWithBuffs();
+        // Damage receiver stats
+        var dmgReceiverStats = damageReceiver.GetStatsWithBuffs();
         // Calculate chance to hit
-        var hitChance = 2 * (attackerStats.accuracy / (attackerStats.accuracy + dmgReceiverStats.evasion)) * (attacker.Level / (attacker.Level + damageReceiver.Level));
+        var attackerAcc = attackerStats.accuracy;
+        var dmgReceiverEva = dmgReceiverStats.evasion;
+        var attackerLvl = attacker.Level;
+        var dmgReceiverLvl = damageReceiver.Level;
+        var hitChance = 2f;
+        if (attackerAcc != 0 && dmgReceiverEva != 0)
+            hitChance *= (attackerAcc / (attackerAcc + dmgReceiverEva));
+        if (attackerLvl != 0 && dmgReceiverLvl != 0)
+            hitChance *= (attackerLvl / (attackerLvl + dmgReceiverLvl));
         // Minimum hit chance is 5%
         if (hitChance < 0.05f)
             hitChance = 0.05f;
