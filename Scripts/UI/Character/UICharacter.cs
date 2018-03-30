@@ -32,8 +32,6 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public string weightLimitStatsFormat = "Weight Limit: {0}";
     [Tooltip("Weapon Damage => {0} = {Min damage}, {1} = {Max damage}")]
     public string weaponDamageFormat = "{0}~{1}";
-    [Tooltip("Armor Format => {0} = {Armor}")]
-    public string armorFormat = "Armor: {0}";
 
     [Header("Class")]
     [Tooltip("Class Title Format => {0} = {Class title}")]
@@ -53,11 +51,11 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public Text textSkillPoint;
     public Text textGold;
     public Text textWeightLimit;
-    public Text textArmor;
     public Text textWeaponDamages;
     public UIDamageElementAmounts uiRightHandDamages;
     public UIDamageElementAmounts uiLeftHandDamages;
     public UICharacterStats uiCharacterStats;
+    public UICharacterBuffs uiCharacterBuffs;
     public UICharacterAttributePair[] uiCharacterAttributes;
     [Header("Class information")]
     public Text textClassTitle;
@@ -121,7 +119,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
             textExp.text = string.Format(expFormat, currentExp.ToString("N0"), nextLevelExp.ToString("N0"));
 
         if (imageExpGage != null)
-            imageExpGage.fillAmount = nextLevelExp <= 0 ? 1 : currentExp / nextLevelExp;
+            imageExpGage.fillAmount = nextLevelExp <= 0 ? 1 : (float)currentExp / (float)nextLevelExp;
 
         var currentHp = 0;
         var maxHp = 0;
@@ -135,7 +133,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
             textHp.text = string.Format(hpFormat, currentHp.ToString("N0"), maxHp.ToString("N0"));
 
         if (imageHpGage != null)
-            imageHpGage.fillAmount = maxHp <= 0 ? 1 : currentHp / maxHp;
+            imageHpGage.fillAmount = maxHp <= 0 ? 1 : (float)currentHp / (float)maxHp;
 
         var currentMp = 0;
         var maxMp = 0;
@@ -149,7 +147,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
             textMp.text = string.Format(mpFormat, currentMp.ToString("N0"), maxMp.ToString("N0"));
 
         if (imageMpGage != null)
-            imageMpGage.fillAmount = maxMp <= 0 ? 1 : currentMp / maxMp;
+            imageMpGage.fillAmount = maxMp <= 0 ? 1 : (float)currentMp / (float)maxMp;
 
         var playerCharacter = Data as IPlayerCharacterData;
         if (textStatPoint != null)
@@ -160,7 +158,9 @@ public class UICharacter : UISelectionEntry<ICharacterData>
 
         if (textGold != null)
             textGold.text = string.Format(goldFormat, playerCharacter == null ? "N/A" : playerCharacter.Gold.ToString("N0"));
-
+        
+        if (uiCharacterBuffs != null)
+            uiCharacterBuffs.Data = Data;
     }
 
     protected override void UpdateData()
