@@ -22,8 +22,9 @@ public class GameInstance : MonoBehaviour
     public BaseGameplayRule gameplayRule;
     [Tooltip("Default weapon item, will be used when character not equip any weapon")]
     public Item defaultWeaponItem;
-    public BaseCharacterDatabase[] characterDatabases;
     public Item[] items;
+    public BaseCharacterDatabase[] characterDatabases;
+    public Attribute[] attributes;
     public int[] expTree;
     [Header("Gameplay Configs")]
     public UnityTag playerTag;
@@ -47,13 +48,13 @@ public class GameInstance : MonoBehaviour
     public int minCharacterNameLength = 2;
     public int maxCharacterNameLength = 16;
     public static readonly Dictionary<string, Attribute> Attributes = new Dictionary<string, Attribute>();
+    public static readonly Dictionary<string, Item> Items = new Dictionary<string, Item>();
     public static readonly Dictionary<string, BaseCharacterDatabase> AllCharacterDatabases = new Dictionary<string, BaseCharacterDatabase>();
     public static readonly Dictionary<string, PlayerCharacterDatabase> PlayerCharacterDatabases = new Dictionary<string, PlayerCharacterDatabase>();
     public static readonly Dictionary<string, MonsterCharacterDatabase> MonsterCharacterDatabases = new Dictionary<string, MonsterCharacterDatabase>();
-    public static readonly Dictionary<string, DamageElement> DamageElements = new Dictionary<string, DamageElement>();
     public static readonly Dictionary<string, DamageEntity> DamageEntities = new Dictionary<string, DamageEntity>();
-    public static readonly Dictionary<string, Item> Items = new Dictionary<string, Item>();
     public static readonly Dictionary<string, Skill> Skills = new Dictionary<string, Skill>();
+    public static readonly Dictionary<int, ActionAnimation> ActionAnimations = new Dictionary<int, ActionAnimation>();
 
     public BaseGameplayRule GameplayRule
     {
@@ -107,20 +108,6 @@ public class GameInstance : MonoBehaviour
                 cacheDefaultWeaponType.name = GameDataConst.UNKNOW_WEAPON_TYPE_ID;
                 cacheDefaultWeaponType.title = GameDataConst.UNKNOW_WEAPON_TYPE_TITLE;
                 cacheDefaultWeaponType.effectivenessAttributes = new DamageEffectivenessAttribute[0];
-                var sampleAttackAnimation = new ActionAnimation()
-                {
-                    actionId = 0,
-                    triggerDurationRate = 0.5f,
-                    totalDuration = 0.8f,
-                };
-                cacheDefaultWeaponType.rightHandAttackAnimations = new ActionAnimation[1]
-                {
-                    sampleAttackAnimation,
-                };
-                cacheDefaultWeaponType.leftHandAttackAnimations = new ActionAnimation[1]
-                {
-                    sampleAttackAnimation,
-                };
                 cacheDefaultWeaponType.damageInfo = new DamageInfo();
             }
             return cacheDefaultWeaponType;
@@ -190,14 +177,15 @@ public class GameInstance : MonoBehaviour
         AllCharacterDatabases.Clear();
         PlayerCharacterDatabases.Clear();
         MonsterCharacterDatabases.Clear();
-        DamageElements.Clear();
         DamageEntities.Clear();
         Items.Clear();
         Skills.Clear();
+        ActionAnimations.Clear();
 
+        AddAttributes(attributes);
+        AddItems(items);
         AddCharacterDatabases(characterDatabases);
         AddItems(new Item[] { DefaultWeaponItem });
-        AddItems(items);
 
         var startItemsList = new List<Item>();
         foreach (var startItem in startItems)
@@ -219,6 +207,27 @@ public class GameInstance : MonoBehaviour
         }
     }
 
+    public static void AddItems(IEnumerable<Item> items)
+    {
+        foreach (var item in items)
+        {
+            if (item == null || Items.ContainsKey(item.Id))
+                continue;
+            Items[item.Id] = item;
+            if (item.IsWeapon())
+            {
+                var weaponType = item.WeaponType;
+                // Initialize animation index
+                AddActionAnimations(ActionAnimationType.WeaponAttack, weaponType.rightHandAttackAnimations);
+                AddActionAnimations(ActionAnimationType.WeaponAttack, weaponType.leftHandAttackAnimations);
+                // Add damage entities
+                var missileDamageEntity = weaponType.damageInfo.missileDamageEntity;
+                if (missileDamageEntity != null)
+                    AddDamageEntities(new DamageEntity[] { missileDamageEntity });
+            }
+        }
+    }
+
     public static void AddCharacterDatabases(IEnumerable<BaseCharacterDatabase> characterDatabases)
     {
         foreach (var characterDatabase in characterDatabases)
@@ -230,14 +239,6 @@ public class GameInstance : MonoBehaviour
             {
                 var playerCharacterDatabase = characterDatabase as PlayerCharacterDatabase;
                 PlayerCharacterDatabases[characterDatabase.Id] = playerCharacterDatabase;
-                var attributes = new List<Attribute>();
-                foreach (var baseAttribute in playerCharacterDatabase.baseAttributes)
-                {
-                    if (baseAttribute.attribute == null || Attributes.ContainsKey(baseAttribute.attribute.Id))
-                        continue;
-                    attributes.Add(baseAttribute.attribute);
-                }
-                AddAttributes(attributes);
                 AddSkills(playerCharacterDatabase.skills);
                 AddItems(new Item[] { playerCharacterDatabase.rightHandEquipItem, playerCharacterDatabase.leftHandEquipItem });
                 AddItems(playerCharacterDatabase.armorItems);
@@ -246,17 +247,8 @@ public class GameInstance : MonoBehaviour
             {
                 var monsterCharacterDatabase = characterDatabase as MonsterCharacterDatabase;
                 MonsterCharacterDatabases[characterDatabase.Id] = monsterCharacterDatabase;
+                AddActionAnimations(ActionAnimationType.MonsterAttack, monsterCharacterDatabase.attackAnimations);
             }
-        }
-    }
-
-    public static void AddDamageElements(IEnumerable<DamageElement> damageElements)
-    {
-        foreach (var damageElement in damageElements)
-        {
-            if (damageElement == null || DamageElements.ContainsKey(damageElement.Id))
-                continue;
-            DamageElements[damageElement.Id] = damageElement;
         }
     }
 
@@ -270,51 +262,6 @@ public class GameInstance : MonoBehaviour
         }
     }
 
-    public static void AddItems(IEnumerable<Item> items)
-    {
-        foreach (var item in items)
-        {
-            if (item == null || Items.ContainsKey(item.Id))
-                continue;
-            Items[item.Id] = item;
-            if (item.IsEquipment())
-            {
-                var attributes = new List<Attribute>();
-                var requireAttributes = item.requirement.attributeAmounts;
-                foreach (var requireAttribute in requireAttributes)
-                {
-                    if (requireAttribute.attribute == null || Attributes.ContainsKey(requireAttribute.attribute.Id))
-                        continue;
-                    attributes.Add(requireAttribute.attribute);
-                }
-                AddAttributes(attributes);
-            }
-            if (item.IsWeapon())
-            {
-                var attributes = new List<Attribute>();
-                foreach (var effectivenessAttribute in item.WeaponType.effectivenessAttributes)
-                {
-                    if (effectivenessAttribute.attribute == null || Attributes.ContainsKey(effectivenessAttribute.attribute.Id))
-                        continue;
-                    attributes.Add(effectivenessAttribute.attribute);
-                }
-                AddAttributes(attributes);
-                var damageElements = new List<DamageElement>();
-                var damageAttributes = item.increaseDamageAttributes;
-                foreach (var damageAttribute in damageAttributes)
-                {
-                    if (damageAttribute.damageElement == null || DamageElements.ContainsKey(damageAttribute.damageElement.Id))
-                        continue;
-                    damageElements.Add(damageAttribute.damageElement);
-                }
-                AddDamageElements(damageElements);
-                var missileDamageEntity = item.WeaponType.damageInfo.missileDamageEntity;
-                if (missileDamageEntity != null)
-                    AddDamageEntities(new DamageEntity[] { missileDamageEntity });
-            }
-        }
-    }
-
     public static void AddSkills(IEnumerable<Skill> skills)
     {
         foreach (var skill in skills)
@@ -322,18 +269,24 @@ public class GameInstance : MonoBehaviour
             if (skill == null || Skills.ContainsKey(skill.Id))
                 continue;
             Skills[skill.Id] = skill;
-            var damageElements = new List<DamageElement>();
-            var damageAttributes = skill.additionalDamageAttributes;
-            foreach (var damageAttribute in damageAttributes)
-            {
-                if (damageAttribute.damageElement == null || DamageElements.ContainsKey(damageAttribute.damageElement.Id))
-                    continue;
-                damageElements.Add(damageAttribute.damageElement);
-            }
-            AddDamageElements(damageElements);
+            // Initialize animation index
+            AddActionAnimations(ActionAnimationType.SkillCast, new ActionAnimation[] { skill.castAnimation });
+            // Add damage entities
             var missileDamageEntity = skill.damageInfo.missileDamageEntity;
             if (missileDamageEntity != null)
                 AddDamageEntities(new DamageEntity[] { missileDamageEntity });
+        }
+    }
+
+    public static void AddActionAnimations(ActionAnimationType type, IEnumerable<ActionAnimation> actionAnimations)
+    {
+        foreach (var actionAnimation in actionAnimations)
+        {
+            if (!actionAnimation.Initialize(type))
+                continue;
+            if (actionAnimation == null || ActionAnimations.ContainsKey(actionAnimation.Id))
+                continue;
+            ActionAnimations[actionAnimation.Id] = actionAnimation;
         }
     }
 

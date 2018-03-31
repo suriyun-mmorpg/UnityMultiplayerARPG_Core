@@ -21,7 +21,6 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     public const string ANIM_MOVE_SPEED = "MoveSpeed";
     public const string ANIM_Y_SPEED = "YSpeed";
     public const string ANIM_DO_ACTION = "DoAction";
-    public const string ANIM_ACTION_ID = "ActionId";
     public const string ANIM_HURT = "Hurt";
     public const float UPDATE_INTERVAL_SKILL_BUFF = 1f;
 
@@ -40,7 +39,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     // Net Functions
     protected LiteNetLibFunction netFuncAttack;
     protected LiteNetLibFunction<NetFieldInt> netFuncUseSkill;
-    protected LiteNetLibFunction<NetFieldFloat, NetFieldInt> netFuncPlayActionAnimation;
+    protected LiteNetLibFunction<NetFieldInt> netFuncPlayActionAnimation;
     protected LiteNetLibFunction<NetFieldUInt> netFuncPickupItem;
     protected LiteNetLibFunction<NetFieldInt, NetFieldInt> netFuncDropItem;
     protected LiteNetLibFunction<NetFieldInt, NetFieldString> netFuncEquipItem;
@@ -306,7 +305,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         // Setup Network functions
         netFuncAttack = new LiteNetLibFunction(NetFuncAttackCallback);
         netFuncUseSkill = new LiteNetLibFunction<NetFieldInt>(NetFuncUseSkillCallback);
-        netFuncPlayActionAnimation = new LiteNetLibFunction<NetFieldFloat, NetFieldInt>(NetFuncPlayActionAnimationCallback);
+        netFuncPlayActionAnimation = new LiteNetLibFunction<NetFieldInt>(NetFuncPlayActionAnimationCallback);
         netFuncPickupItem = new LiteNetLibFunction<NetFieldUInt>(NetFuncPickupItemCallback);
         netFuncDropItem = new LiteNetLibFunction<NetFieldInt, NetFieldInt>(NetFuncDropItemCallback);
         netFuncEquipItem = new LiteNetLibFunction<NetFieldInt, NetFieldString>(NetFuncEquipItemCallback);
@@ -369,7 +368,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
 
         isDoingAction.Value = true;
         // Play animation on clients
-        PlayActionAnimation(totalDuration, actionId);
+        PlayActionAnimation(actionId);
         // Start attack routine
         StartCoroutine(AttackRoutine(damageDuration, totalDuration, allDamageAttributes, damageInfo, debuff));
     }
@@ -435,7 +434,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         isDoingAction.Value = true;
         var anim = skill.castAnimation;
         // Play animation on clients
-        PlayActionAnimation(anim.totalDuration, anim.actionId);
+        PlayActionAnimation(anim.Id);
         // Start use skill routine
         StartCoroutine(UseSkillRoutine(skillIndex));
     }
@@ -445,7 +444,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         var characterSkill = skills[skillIndex];
         var skill = characterSkill.GetSkill();
         var anim = skill.castAnimation;
-        yield return new WaitForSecondsRealtime(anim.triggerDuration);
+        yield return new WaitForSecondsRealtime(anim.TriggerDuration);
         switch (skill.skillAttackType)
         {
             case SkillAttackType.PureSkillDamage:
@@ -458,7 +457,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         ApplySkillBuff(characterSkill);
         skills[skillIndex].Used();
         skills.Dirty(skillIndex);
-        yield return new WaitForSecondsRealtime(anim.totalDuration - anim.triggerDuration);
+        yield return new WaitForSecondsRealtime(anim.ClipLength - anim.TriggerDuration);
         isDoingAction.Value = false;
     }
 
@@ -527,9 +526,9 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
 
-    protected void NetFuncPlayActionAnimationCallback(NetFieldFloat duration, NetFieldInt actionId)
+    protected void NetFuncPlayActionAnimationCallback(NetFieldInt actionId)
     {
-        NetFuncPlayActionAnimation(duration, actionId);
+        NetFuncPlayActionAnimation(actionId);
     }
 
     /// <summary>
@@ -537,22 +536,23 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     /// </summary>
     /// <param name="duration"></param>
     /// <param name="actionId"></param>
-    protected void NetFuncPlayActionAnimation(float duration, int actionId)
+    protected void NetFuncPlayActionAnimation(int actionId)
     {
         if (CurrentHp <= 0)
             return;
-        StartCoroutine(PlayActionAnimationRoutine(duration, actionId));
+        StartCoroutine(PlayActionAnimationRoutine(actionId));
     }
 
-    IEnumerator PlayActionAnimationRoutine(float duration, int actionId)
+    IEnumerator PlayActionAnimationRoutine(int actionId)
     {
         Animator animator = model == null ? null : model.CacheAnimator;
         // If animator is not null, play the action animation
-        if (animator != null)
+        ActionAnimation actionAnimation;
+        if (animator != null && GameInstance.ActionAnimations.TryGetValue(actionId, out actionAnimation))
         {
+            model.ChangeActionClip(actionAnimation.clip);
             animator.SetBool(ANIM_DO_ACTION, true);
-            animator.SetInteger(ANIM_ACTION_ID, actionId);
-            yield return new WaitForSecondsRealtime(duration);
+            yield return new WaitForSecondsRealtime(actionAnimation.ClipLength);
             animator.SetBool(ANIM_DO_ACTION, false);
         }
     }
@@ -744,11 +744,11 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         CallNetFunction("UseSkill", FunctionReceivers.Server, skillIndex);
     }
 
-    public void PlayActionAnimation(float duration, int actionId)
+    public void PlayActionAnimation(int actionId)
     {
         if (CurrentHp <= 0)
             return;
-        CallNetFunction("PlayActionAnimation", FunctionReceivers.All, duration, actionId);
+        CallNetFunction("PlayActionAnimation", FunctionReceivers.All, actionId);
     }
 
     public void PickupItem(uint objectId)
@@ -1229,9 +1229,9 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         {
             var anim = animArray[Random.Range(0, animLength)];
             // Assign animation data
-            actionId = anim.actionId;
-            damageDuration = anim.triggerDuration;
-            totalDuration = anim.totalDuration;
+            actionId = anim.Id;
+            damageDuration = anim.TriggerDuration;
+            totalDuration = anim.ClipLength;
         }
         // Calculate all damages
         var effectiveness = weapon.GetEffectivenessDamage(this);

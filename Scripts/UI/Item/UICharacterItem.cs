@@ -135,7 +135,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
         if (textItemType != null)
         {
             if (armorItem != null)
-                textItemType.text = string.Format(itemTypeFormat, armorItem.armorType.title);
+                textItemType.text = string.Format(itemTypeFormat, armorItem.ArmorType.title);
             else if (weaponItem != null)
                 textItemType.text = string.Format(itemTypeFormat, weaponItem.WeaponType.title);
             else if (shieldItem != null)

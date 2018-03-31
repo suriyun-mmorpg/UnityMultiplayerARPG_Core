@@ -320,9 +320,9 @@ public class MonsterCharacterEntity : CharacterEntity
         {
             var anim = animArray[Random.Range(0, animLength)];
             // Assign animation data
-            actionId = anim.actionId;
-            damageDuration = anim.triggerDuration;
-            totalDuration = anim.totalDuration;
+            actionId = anim.Id;
+            damageDuration = anim.TriggerDuration;
+            totalDuration = anim.ClipLength;
         }
 
         // Assign damage attributes

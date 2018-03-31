@@ -5,12 +5,15 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class CharacterModel : MonoBehaviour
 {
+    public const string ANIM_ACTION_STATE = "_Action";
     public string Id { get { return name; } }
-
+    [Header("Animator")]
+    public RuntimeAnimatorController animatorController;
     [Header("Collider")]
     public Vector3 center;
     public float radius = 0.5f;
     public float height = 2f;
+    [Header("Equipment Containers")]
     public CharacterModelContainer[] equipmentContainers;
 
     private Transform cacheTransform;
@@ -30,11 +33,25 @@ public class CharacterModel : MonoBehaviour
         get
         {
             if (cacheAnimator == null)
+            {
                 cacheAnimator = GetComponent<Animator>();
+                cacheAnimator.runtimeAnimatorController = CacheAnimatorController;
+            }
             return cacheAnimator;
         }
     }
 
+    private AnimatorOverrideController cacheAnimatorController;
+    public AnimatorOverrideController CacheAnimatorController
+    {
+        get
+        {
+            if (cacheAnimatorController == null)
+                cacheAnimatorController = new AnimatorOverrideController(animatorController);
+            return cacheAnimatorController;
+        }
+    }
+    
     private Dictionary<string, CharacterModelContainer> cacheEquipmentContainers = null;
     /// <summary>
     /// Dictionary[equipSocket(String), container(CharacterModelContainer)]
@@ -151,6 +168,11 @@ public class CharacterModel : MonoBehaviour
             models.Add(equipSocket, newModel);
         }
         CreateCacheModel(equipPosition, models);
+    }
+
+    public void ChangeActionClip(AnimationClip clip)
+    {
+        CacheAnimatorController[ANIM_ACTION_STATE] = clip;
     }
 
     private void OnDrawGizmos()
