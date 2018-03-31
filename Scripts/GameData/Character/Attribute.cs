@@ -21,4 +21,9 @@ public struct AttributeIncremental
     public Attribute attribute;
     public int baseAmount;
     public float amountIncreaseEachLevel;
+
+    public int GetAmount(int level)
+    {
+        return (int)(baseAmount + amountIncreaseEachLevel * level);
+    }
 }

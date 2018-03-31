@@ -135,7 +135,7 @@ public static class GameDataHelpers
     {
         if (sourceIncremental.attribute == null)
             return new KeyValuePair<Attribute, int>();
-        return new KeyValuePair<Attribute, int>(sourceIncremental.attribute, (int)(sourceIncremental.baseAmount + sourceIncremental.amountIncreaseEachLevel * level));
+        return new KeyValuePair<Attribute, int>(sourceIncremental.attribute, sourceIncremental.GetAmount(level));
     }
 
     public static KeyValuePair<Resistance, float> MakeResistanceAmountPair(ResistanceAmount sourceAmount)
@@ -149,7 +149,7 @@ public static class GameDataHelpers
     {
         if (sourceIncremental.resistance == null)
             return new KeyValuePair<Resistance, float>();
-        return new KeyValuePair<Resistance, float>(sourceIncremental.resistance, sourceIncremental.baseAmount + sourceIncremental.amountIncreaseEachLevel * level);
+        return new KeyValuePair<Resistance, float>(sourceIncremental.resistance, sourceIncremental.GetAmount(level));
     }
 
     public static KeyValuePair<Skill, int> MakeSkillLevelPair(SkillLevel sourceLevel)

@@ -21,11 +21,9 @@ public class MonsterCharacterDatabase : BaseCharacterDatabase
     [Tooltip("This will work with assist characteristic only, to detect ally")]
     public ushort allyId;
     public float visualRange = 5f;
-    [Tooltip("Level will be used to show only, not calculating with stats/skills")]
-    public int level;
     [Header("Attributes/Stats")]
-    public AttributeAmount[] attributes;
-    public CharacterStats stats;
+    public AttributeIncremental[] attributes;
+    public CharacterStatsIncremental stats;
 
     [Header("Attack animations")]
     public ActionAnimation[] attackAnimations;
@@ -81,6 +79,6 @@ public class MonsterCharacterDatabase : BaseCharacterDatabase
 
     public override CharacterStats GetCharacterStats(int level)
     {
-        return stats;
+        return stats.GetCharacterStats(level);
     }
 }

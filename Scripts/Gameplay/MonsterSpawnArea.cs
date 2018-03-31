@@ -6,8 +6,9 @@ using LiteNetLibHighLevel;
 public class MonsterSpawnArea : MonoBehaviour
 {
     public MonsterCharacterDatabase database;
-    public int amount;
-    public float randomRadius;
+    public int level = 1;
+    public int amount = 1;
+    public float randomRadius = 5f;
 
     public void RandomSpawn(LiteNetLibGameManager manager)
     {
@@ -32,13 +33,13 @@ public class MonsterSpawnArea : MonoBehaviour
             var identity = manager.Assets.NetworkSpawn(gameInstance.monsterCharacterEntityPrefab.gameObject, randomedPosition, Quaternion.Euler(randomedRotation));
             var entity = identity.GetComponent<MonsterCharacterEntity>();
             entity.DatabaseId = databaseId;
-            entity.Level = database.level;
+            entity.Level = level;
             var attributes = database.attributes;
-            foreach (var baseAttribute in attributes)
+            foreach (var attribute in attributes)
             {
                 var characterAttribute = new CharacterAttribute();
-                characterAttribute.attributeId = baseAttribute.attribute.Id;
-                characterAttribute.amount = baseAttribute.amount;
+                characterAttribute.attributeId = attribute.attribute.Id;
+                characterAttribute.amount = attribute.GetAmount(level);
                 entity.Attributes.Add(characterAttribute);
             }
             entity.CurrentHp = entity.GetMaxHp();
