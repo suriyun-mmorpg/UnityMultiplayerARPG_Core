@@ -42,8 +42,7 @@ public class MonsterSpawnArea : MonoBehaviour
                 characterAttribute.amount = attribute.GetAmount(level);
                 entity.Attributes.Add(characterAttribute);
             }
-            entity.CurrentHp = entity.GetMaxHp();
-            entity.CurrentMp = entity.GetMaxMp();
+            entity.Respawn();
         }
     }
 

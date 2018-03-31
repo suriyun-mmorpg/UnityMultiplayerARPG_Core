@@ -75,6 +75,7 @@ public class MonsterCharacterEntity : CharacterEntity
         if (CurrentHp <= 0)
         {
             ClearDestination();
+            SetTargetEntity(null);
             return;
         }
 
@@ -83,7 +84,6 @@ public class MonsterCharacterEntity : CharacterEntity
 
     protected virtual void ClearDestination()
     {
-        SetTargetEntity(null);
         CacheNavMeshAgent.isStopped = true;
         CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
         wanderDestination = null;
@@ -102,6 +102,7 @@ public class MonsterCharacterEntity : CharacterEntity
             if (targetEntity.CurrentHp <= 0)
             {
                 ClearDestination();
+                SetTargetEntity(null);
                 return;
             }
             // If it has target then go to target
@@ -140,6 +141,7 @@ public class MonsterCharacterEntity : CharacterEntity
                 if (Time.realtimeSinceStartup - startFollowTargetCountTime >= FOLLOW_TARGET_DURATION)
                 {
                     ClearDestination();
+                    SetTargetEntity(null);
                     return;
                 }
             }

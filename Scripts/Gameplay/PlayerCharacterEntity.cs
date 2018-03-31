@@ -24,6 +24,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     protected LiteNetLibFunction<NetFieldInt> netFuncAddAttribute;
     protected LiteNetLibFunction<NetFieldInt> netFuncAddSkill;
     protected LiteNetLibFunction<NetFieldVector3, NetFieldUInt> netFuncPointClickMovement;
+    protected LiteNetLibFunction netFuncRespawn;
     #endregion
 
     #region Interface implementation
@@ -126,6 +127,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         if (CurrentHp <= 0)
         {
             ClearDestination();
+            SetTargetEntity(null);
             return;
         }
 
@@ -411,6 +413,14 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         return Mathf.Sqrt(2f * jumpHeight * -Physics.gravity.y * gravityRate);
     }
 
+    public override void Respawn()
+    {
+        if (CurrentHp > 0)
+            return;
+        base.Respawn();
+        Warp(RespawnMapName, RespawnPosition);
+    }
+
     protected override bool CanReceiveDamageFrom(CharacterEntity characterEntity)
     {
         // TODO: May implement this for party/guild battle purposes
@@ -454,11 +464,13 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         netFuncAddAttribute = new LiteNetLibFunction<NetFieldInt>(NetFuncAddAttributeCallback);
         netFuncAddSkill = new LiteNetLibFunction<NetFieldInt>(NetFuncAddSkillCallback);
         netFuncPointClickMovement = new LiteNetLibFunction<NetFieldVector3, NetFieldUInt>(NetFuncPointClickMovementCallback);
+        netFuncRespawn = new LiteNetLibFunction(NetFuncRespawnCallback);
 
         RegisterNetFunction("SwapOrMergeItem", netFuncSwapOrMergeItem);
         RegisterNetFunction("AddAttribute", netFuncAddAttribute);
         RegisterNetFunction("AddSkill", netFuncAddSkill);
         RegisterNetFunction("PointClickMovement", netFuncPointClickMovement);
+        RegisterNetFunction("Respawn", netFuncRespawn);
     }
     #endregion
 
@@ -562,6 +574,11 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         }
         SetMovePaths(position);
     }
+
+    protected void NetFuncRespawnCallback()
+    {
+        Respawn();
+    }
     #endregion
 
     #region Net functions callers
@@ -604,6 +621,11 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         if (!pointClickMoveStopped)
             PointClickMovement(CurrentPosition, entity);
         pointClickMoveStopped = true;
+    }
+
+    public void RequestRespawn()
+    {
+        CallNetFunction("Respawn", FunctionReceivers.Server);
     }
     #endregion
 

@@ -1296,6 +1296,12 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
 
+    public virtual void Respawn()
+    {
+        CurrentHp = this.GetMaxHp();
+        CurrentMp = this.GetMaxMp();
+    }
+
     protected abstract bool CanReceiveDamageFrom(CharacterEntity characterEntity);
     protected abstract bool IsAlly(CharacterEntity characterEntity);
     protected abstract bool IsEnemy(CharacterEntity characterEntity);

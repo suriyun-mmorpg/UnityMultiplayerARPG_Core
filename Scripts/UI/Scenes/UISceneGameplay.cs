@@ -19,6 +19,7 @@ public class UISceneGameplay : MonoBehaviour
     public UIEquipItems uiEquipItems;
     public UINonEquipItems uiNonEquipItems;
     public UICharacterSkills uiSkills;
+    public UIBase uiDeadDialog;
     public UIToggleUI[] toggleUis;
     public Button buttonRespawn;
     public Button buttonExit;
@@ -26,6 +27,9 @@ public class UISceneGameplay : MonoBehaviour
     public UICharacterItem SelectedEquipItem { get; private set; }
     public UICharacterItem SelectedNonEquipItem { get; private set; }
     public UICharacterSkill SelectedSkillLevel { get; private set; }
+
+    protected int lastCharacterHp = 0;
+    protected bool isDeadDialogShown;
 
     private void Awake()
     {
@@ -49,7 +53,7 @@ public class UISceneGameplay : MonoBehaviour
         }
         // Respawn button will show when character dead
         if (buttonRespawn != null)
-            buttonRespawn.gameObject.SetActive(PlayerCharacterEntity.OwningCharacter.CurrentHp <= 0);
+            buttonRespawn.gameObject.SetActive(owningCharacter.CurrentHp <= 0);
         // Enemy status will be show when selected at enemy and enemy hp more than 0
         if (uiEnemyCharacter != null)
         {
@@ -72,6 +76,27 @@ public class UISceneGameplay : MonoBehaviour
                 }
             }
         }
+
+        if (uiDeadDialog != null)
+        {
+            var currentCharacterHp = 0;
+            if (owningCharacter != null)
+                currentCharacterHp = owningCharacter.CurrentHp;
+            if (owningCharacter.CurrentHp <= 0)
+            {
+                // Avoid dead dialog showing when start game first time
+                if (!isDeadDialogShown && lastCharacterHp != owningCharacter.CurrentHp)
+                {
+                    uiDeadDialog.Show();
+                    isDeadDialogShown = true;
+                }
+            }
+            else
+                isDeadDialogShown = false;
+        }
+
+        if (owningCharacter != null)
+            lastCharacterHp = owningCharacter.CurrentHp;
     }
 
     public void UpdateCharacter()
@@ -111,7 +136,9 @@ public class UISceneGameplay : MonoBehaviour
 
     private void OnClickRespawn()
     {
-
+        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
+        if (owningCharacter != null)
+            owningCharacter.RequestRespawn();
     }
 
     private void OnClickExit()
