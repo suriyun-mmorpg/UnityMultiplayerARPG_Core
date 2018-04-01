@@ -153,6 +153,7 @@ public class CharacterModel : MonoBehaviour
     {
         if (equipmentModels == null || equipmentModels.Length == 0)
             return;
+        var gameInstance = GameInstance.Singleton;
         var models = new Dictionary<string, GameObject>();
         foreach (var equipmentModel in equipmentModels)
         {
@@ -168,6 +169,8 @@ public class CharacterModel : MonoBehaviour
             newModel.transform.localEulerAngles = Vector3.zero;
             newModel.transform.localScale = Vector3.one;
             newModel.gameObject.SetActive(true);
+            newModel.gameObject.layer = gameInstance.characterLayer;
+            newModel.RemoveComponentsInChildren<Collider>(false);
             models.Add(equipSocket, newModel);
         }
         CreateCacheModel(equipPosition, models);
