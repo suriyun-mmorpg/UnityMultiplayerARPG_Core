@@ -635,39 +635,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         var itemId = nonEquipItem.itemId;
         var level = nonEquipItem.level;
         if (DecreaseItems(index, amount))
-        {
-            var dropPosition = CacheTransform.position + new Vector3(Random.Range(-1, 1) * gameInstance.dropDistance, 0, Random.Range(-1, 1) * gameInstance.dropDistance);
-            // Raycast to find hit floor
-            Vector3? aboveHitPoint = null;
-            Vector3? underHitPoint = null;
-            var raycastLayerMask = ~(gameInstance.characterLayer | gameInstance.itemDropLayer);
-            RaycastHit tempHit;
-            if (Physics.Raycast(dropPosition, Vector3.up, out tempHit, 100f, raycastLayerMask))
-                aboveHitPoint = tempHit.point;
-            if (Physics.Raycast(dropPosition, Vector3.down, out tempHit, 100f, raycastLayerMask))
-                underHitPoint = tempHit.point;
-            // Set drop position to nearest hit point
-            if (aboveHitPoint.HasValue && underHitPoint.HasValue)
-            {
-                if (Vector3.Distance(dropPosition, aboveHitPoint.Value) < Vector3.Distance(dropPosition, underHitPoint.Value))
-                    dropPosition = aboveHitPoint.Value;
-                else
-                    dropPosition = underHitPoint.Value;
-            }
-            else if (aboveHitPoint.HasValue)
-                dropPosition = aboveHitPoint.Value;
-            else if (underHitPoint.HasValue)
-                dropPosition = underHitPoint.Value;
-            // Random rotation
-            var dropRotation = Vector3.up * Random.Range(0, 360); 
-            var identity = Manager.Assets.NetworkSpawn(gameInstance.itemDropEntityPrefab.gameObject, dropPosition, Quaternion.Euler(dropRotation));
-            var itemDropEntity = identity.GetComponent<ItemDropEntity>();
-            var dropData = new CharacterItem();
-            dropData.itemId = itemId;
-            dropData.level = level;
-            dropData.amount = amount;
-            itemDropEntity.dropData = dropData;
-        }
+            ItemDropEntity.DropItem(this, itemId, level, amount);
     }
 
     protected void NetFuncEquipItemCallback(NetFieldInt nonEquipIndex, NetFieldString equipPosition)
@@ -1043,10 +1011,20 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         return true;
     }
 
-    public virtual void ReceiveDamage(CharacterEntity attacker,
+
+    public void ReceiveDamage(CharacterEntity attacker,
         Dictionary<DamageElement, DamageAmount> allDamageAttributes,
         CharacterBuff debuff)
     {
+        float totalDamage;
+        ReceiveDamage(attacker, allDamageAttributes, debuff, out totalDamage);
+    }
+
+    public virtual void ReceiveDamage(CharacterEntity attacker,
+        Dictionary<DamageElement, DamageAmount> allDamageAttributes,
+        CharacterBuff debuff, out float totalDamage)
+    {
+        totalDamage = 0f;
         // Damage calculations apply at server only
         if (!IsServer || !CanReceiveDamageFrom(attacker))
             return;
@@ -1057,7 +1035,6 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         if (Random.value > hitChance)
             return;
         // Calculate damages
-        var totalDamage = 0f;
         if (allDamageAttributes.Count > 0)
         {
             foreach (var allDamageAttribute in allDamageAttributes)
@@ -1357,10 +1334,19 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
 
-    public virtual void Respawn()
+    internal virtual void Respawn()
     {
+        if (!IsServer)
+            return;
         CurrentHp = this.GetMaxHp();
         CurrentMp = this.GetMaxMp();
+    }
+
+    internal virtual void IncreaseExp(int exp)
+    {
+        if (!IsServer)
+            return;
+        GameInstance.Singleton.GameplayRule.IncreaseExp(this, exp);
     }
 
     protected abstract bool CanReceiveDamageFrom(CharacterEntity characterEntity);
