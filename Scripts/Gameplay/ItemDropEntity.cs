@@ -73,7 +73,7 @@ public class ItemDropEntity : RpgNetworkEntity
         // Raycast to find hit floor
         Vector3? aboveHitPoint = null;
         Vector3? underHitPoint = null;
-        var raycastLayerMask = ~(gameInstance.characterLayer | gameInstance.itemDropLayer);
+        var raycastLayerMask = ~(gameInstance.characterLayer.Mask | gameInstance.itemDropLayer.Mask);
         RaycastHit tempHit;
         if (Physics.Raycast(dropPosition, Vector3.up, out tempHit, 100f, raycastLayerMask))
             aboveHitPoint = tempHit.point;
