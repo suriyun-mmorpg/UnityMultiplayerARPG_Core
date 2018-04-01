@@ -68,6 +68,6 @@ public struct CharacterStatsIncremental
 
     public CharacterStats GetCharacterStats(int level)
     {
-        return baseStats + (statsIncreaseEachLevel * level);
+        return baseStats + (statsIncreaseEachLevel * (level - 1));
     }
 }

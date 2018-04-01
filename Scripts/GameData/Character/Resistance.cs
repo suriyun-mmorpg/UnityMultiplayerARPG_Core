@@ -23,8 +23,8 @@ public struct ResistanceIncremental
     public float baseAmount;
     public float amountIncreaseEachLevel;
 
-    public int GetAmount(int level)
+    public float GetAmount(int level)
     {
-        return (int)(baseAmount + amountIncreaseEachLevel * level);
+        return baseAmount + (amountIncreaseEachLevel * (level - 1));
     }
 }
