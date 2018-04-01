@@ -49,6 +49,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     #region Public data
     public GameObject[] ownerObjects;
     public GameObject[] nonOwnerObjects;
+    public Transform modelContainer;
     #endregion
 
     // Use id as primary key
@@ -161,6 +162,16 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             if (cacheCapsuleCollider == null)
                 cacheCapsuleCollider = GetComponent<CapsuleCollider>();
             return cacheCapsuleCollider;
+        }
+    }
+
+    public Transform CacheModelContainer
+    {
+        get
+        {
+            if (modelContainer == null)
+                modelContainer = GetComponent<Transform>();
+            return modelContainer;
         }
     }
     #endregion
@@ -551,6 +562,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         if (animator != null && GameInstance.ActionAnimations.TryGetValue(actionId, out actionAnimation))
         {
             model.ChangeActionClip(actionAnimation.clip);
+            animator.SetBool(ANIM_DO_ACTION, false);
             animator.SetBool(ANIM_DO_ACTION, true);
             yield return new WaitForSecondsRealtime(actionAnimation.ClipLength);
             animator.SetBool(ANIM_DO_ACTION, false);
@@ -624,7 +636,29 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         var level = nonEquipItem.level;
         if (DecreaseItems(index, amount))
         {
-            var dropPosition = CacheTransform.position + new Vector3(Random.value * gameInstance.dropDistance, 0, Random.value * gameInstance.dropDistance);
+            var dropPosition = CacheTransform.position + new Vector3(Random.Range(-1, 1) * gameInstance.dropDistance, 0, Random.Range(-1, 1) * gameInstance.dropDistance);
+            // Raycast to find hit floor
+            Vector3? aboveHitPoint = null;
+            Vector3? underHitPoint = null;
+            var raycastLayerMask = ~(gameInstance.characterLayer | gameInstance.itemDropLayer);
+            RaycastHit tempHit;
+            if (Physics.Raycast(dropPosition, Vector3.up, out tempHit, 100f, raycastLayerMask))
+                aboveHitPoint = tempHit.point;
+            if (Physics.Raycast(dropPosition, Vector3.down, out tempHit, 100f, raycastLayerMask))
+                underHitPoint = tempHit.point;
+            // Set drop position to nearest hit point
+            if (aboveHitPoint.HasValue && underHitPoint.HasValue)
+            {
+                if (Vector3.Distance(dropPosition, aboveHitPoint.Value) < Vector3.Distance(dropPosition, underHitPoint.Value))
+                    dropPosition = aboveHitPoint.Value;
+                else
+                    dropPosition = underHitPoint.Value;
+            }
+            else if (aboveHitPoint.HasValue)
+                dropPosition = aboveHitPoint.Value;
+            else if (underHitPoint.HasValue)
+                dropPosition = underHitPoint.Value;
+            // Random rotation
             var dropRotation = Vector3.up * Random.Range(0, 360); 
             var identity = Manager.Assets.NetworkSpawn(gameInstance.itemDropEntityPrefab.gameObject, dropPosition, Quaternion.Euler(dropRotation));
             var itemDropEntity = identity.GetComponent<ItemDropEntity>();
@@ -787,6 +821,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         // If item not valid
         if (string.IsNullOrEmpty(itemId) || amount <= 0 || !GameInstance.Items.TryGetValue(itemId, out itemData))
             return false;
+
         var stats = this.GetStatsWithBuffs();
         var maxStack = itemData.maxStack;
         var weight = itemData.weight;
@@ -801,9 +836,13 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         {
             var nonEquipItem = nonEquipItems[i];
             if (!nonEquipItem.IsValid())
+            {
+                // If current entry is not valid, add it to empty list, going to replacing it later
                 emptySlots[i] = nonEquipItem;
+            }
             else if (nonEquipItem.itemId.Equals(itemId))
             {
+                // If same item id, increase its amount
                 if (nonEquipItem.amount + amount <= maxStack)
                 {
                     nonEquipItem.amount += amount;
@@ -819,15 +858,17 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
                 }
             }
         }
+
         if (changes.Count == 0 && emptySlots.Count > 0)
         {
+            // If there are no changes and there are an empty entries, fill them
             foreach (var emptySlot in emptySlots)
             {
                 var value = emptySlot.Value;
                 var newItem = new CharacterItem();
                 newItem.id = System.Guid.NewGuid().ToString();
                 newItem.itemId = itemId;
-                newItem.level = 1;
+                newItem.level = level;
                 var addAmount = 0;
                 if (amount - maxStack >= 0)
                 {
@@ -843,13 +884,33 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
                 changes[emptySlot.Key] = newItem;
             }
         }
-        // Cannot add all items
-        if (amount > 0)
-            return false;
+        
         // Apply all changes
         foreach (var change in changes)
         {
             nonEquipItems[change.Key] = change.Value;
+        }
+
+        // Add new items
+        while (amount > 0)
+        {
+            var newItem = new CharacterItem();
+            newItem.id = System.Guid.NewGuid().ToString();
+            newItem.itemId = itemId;
+            newItem.level = level;
+            var addAmount = 0;
+            if (amount - maxStack >= 0)
+            {
+                addAmount = maxStack;
+                amount -= maxStack;
+            }
+            else
+            {
+                addAmount = amount;
+                amount = 0;
+            }
+            newItem.amount = addAmount;
+            nonEquipItems.Add(newItem);
         }
         return true;
     }
@@ -1062,7 +1123,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         if (model != null)
             Destroy(model.gameObject);
 
-        model = this.InstantiateModel(transform);
+        model = this.InstantiateModel(CacheModelContainer);
         if (model != null)
         {
             SetupModel(model);

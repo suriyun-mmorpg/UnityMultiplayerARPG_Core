@@ -118,20 +118,23 @@ public class CharacterModel : MonoBehaviour
         DestroyCacheModel(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
         DestroyCacheModel(GameDataConst.EQUIP_POSITION_LEFT_HAND);
 
-        var rightHandEquipment = equipWeapons.rightHand.GetEquipmentItem();
-        var leftHandEquipment = equipWeapons.leftHand.GetEquipmentItem();
-        if (rightHandEquipment != null)
-            InstantiateEquipModel(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandEquipment.equipmentModels);
-        if (leftHandEquipment != null)
-            InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandEquipment.equipmentModels);
+        var rightHandWeapon = equipWeapons.rightHand.GetWeaponItem();
+        var leftHandWeapon = equipWeapons.leftHand.GetWeaponItem();
+        var leftHandShield = equipWeapons.leftHand.GetShieldItem();
+        if (rightHandWeapon != null)
+            InstantiateEquipModel(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandWeapon.equipmentModels);
+        if (leftHandWeapon != null)
+            InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandWeapon.subEquipmentModels);
+        if (leftHandShield != null)
+            InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandShield.equipmentModels);
     }
     
     public void SetEquipItems(IList<CharacterItem> equipItems)
     {
         // Clear equipped item models
-        foreach (var cacheModel in cacheModels)
+        var keys = new List<string>(cacheModels.Keys);
+        foreach (var equipPosition in keys)
         {
-            var equipPosition = cacheModel.Key;
             if (!GameDataConst.EQUIP_POSITION_RIGHT_HAND.Equals(equipPosition) &&
                 !GameDataConst.EQUIP_POSITION_LEFT_HAND.Equals(equipPosition))
                 DestroyCacheModel(equipPosition);

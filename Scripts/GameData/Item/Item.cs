@@ -21,10 +21,13 @@ public class Item : BaseGameData
     [Range(1, 1000)]
     public int maxStack = 1;
     public float weight;
+    public GameObject dropModel;
 
     [Space(10)]
     [Header("Equipment")]
     public EquipmentModel[] equipmentModels;
+    [Tooltip("This will be available with `Weapon` item, set it in case that it will be equipped at left hand")]
+    public EquipmentModel[] subEquipmentModels;
     [Header("Requirements")]
     public EquipmentRequirement requirement;
     [Header("Attributes Bonus")]
