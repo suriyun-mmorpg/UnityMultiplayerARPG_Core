@@ -93,7 +93,7 @@ public class SimpleGameplayRule : BaseGameplayRule
         var nextLevelExp = character.GetNextLevelExp();
         if (nextLevelExp > 0 && character.Exp >= nextLevelExp)
         {
-            character.Exp = nextLevelExp - character.Exp;
+            character.Exp = character.Exp - nextLevelExp;
             ++character.Level;
         }
         if (character is IPlayerCharacterData && character.Level > oldLevel)
