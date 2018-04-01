@@ -333,7 +333,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
                 StopPointClickMove(null);
                 return;
             }
-            var conversationDistance = gameInstance.conversationDistance;
+            var conversationDistance = gameInstance.conversationDistance - stoppingDistance;
             if (Vector3.Distance(CurrentPosition, targetPlayer.CacheTransform.position) <= conversationDistance)
             {
                 UpdateLookAtTargetEntityPosition(targetPlayer);
@@ -364,7 +364,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         }
         else if (TryGetTargetEntity(out targetNpc))
         {
-            var conversationDistance = gameInstance.conversationDistance;
+            var conversationDistance = gameInstance.conversationDistance - stoppingDistance;
             if (Vector3.Distance(CurrentPosition, targetNpc.CacheTransform.position) <= conversationDistance)
             {
                 UpdateLookAtTargetEntityPosition(targetNpc);
@@ -375,7 +375,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         }
         else if (TryGetTargetEntity(out targetItemDrop))
         {
-            var pickUpItemDistance = gameInstance.pickUpItemDistance;
+            var pickUpItemDistance = gameInstance.pickUpItemDistance - stoppingDistance;
             if (Vector3.Distance(CurrentPosition, targetItemDrop.CacheTransform.position) <= pickUpItemDistance)
             {
                 UpdateLookAtTargetEntityPosition(targetItemDrop);
