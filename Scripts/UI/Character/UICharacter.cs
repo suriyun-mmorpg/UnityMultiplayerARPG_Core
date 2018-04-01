@@ -244,7 +244,12 @@ public class UICharacter : UISelectionEntry<ICharacterData>
                 int amount;
                 if (CacheUICharacterAttributes.TryGetValue(attribute, out cacheUICharacterAttribute) &&
                     displayingAttributes.TryGetValue(attribute, out amount))
+                {
                     cacheUICharacterAttribute.Setup(new KeyValuePair<CharacterAttribute, int>(characterAttribute, amount), i);
+                    cacheUICharacterAttribute.Show();
+                }
+                else
+                    cacheUICharacterAttribute.Hide();
             }
         }
         
