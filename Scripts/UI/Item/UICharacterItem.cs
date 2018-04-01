@@ -274,6 +274,8 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
         var owningCharacter = PlayerCharacterEntity.OwningCharacter;
         if (Data.amount == 1)
         {
+            if (selectionManager != null)
+                selectionManager.DeselectSelectedUI();
             if (owningCharacter != null)
                 owningCharacter.DropItem(indexOfData, 1);
         }
@@ -283,10 +285,9 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
 
     private void OnDropAmountConfirmed(int amount)
     {
+        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
         if (selectionManager != null)
             selectionManager.DeselectSelectedUI();
-
-        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
         if (owningCharacter != null)
             owningCharacter.DropItem(indexOfData, amount);
     }
