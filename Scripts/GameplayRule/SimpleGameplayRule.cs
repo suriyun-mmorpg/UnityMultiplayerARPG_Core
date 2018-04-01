@@ -84,4 +84,23 @@ public class SimpleGameplayRule : BaseGameplayRule
             resistanceAmount = resistance.maxAmount;
         return damageAmount -= damageAmount * resistanceAmount; // If resistance is minus damage will be increased
     }
+
+    public override void IncreaseExp(ICharacterData character, int exp)
+    {
+        var gameInstance = GameInstance.Singleton;
+        var oldLevel = character.Level;
+        character.Exp += exp;
+        var nextLevelExp = character.GetNextLevelExp();
+        if (nextLevelExp > 0 && character.Exp >= nextLevelExp)
+        {
+            character.Exp = nextLevelExp - character.Exp;
+            ++character.Level;
+        }
+        if (character is IPlayerCharacterData && character.Level > oldLevel)
+        {
+            var playerCharacter = character as IPlayerCharacterData;
+            playerCharacter.StatPoint += gameInstance.increaseStatPointEachLevel;
+            playerCharacter.SkillPoint += gameInstance.increaseSkillPointEachLevel;
+        }
+    }
 }

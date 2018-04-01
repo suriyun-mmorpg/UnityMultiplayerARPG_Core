@@ -416,7 +416,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         return Mathf.Sqrt(2f * jumpHeight * -Physics.gravity.y * gravityRate);
     }
 
-    public override void Respawn()
+    internal override void Respawn()
     {
         if (CurrentHp > 0)
             return;
@@ -541,6 +541,8 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
 
         attribute.Increase(1);
         attributes[attributeIndex] = attribute;
+
+        --StatPoint;
     }
 
     protected void NetFuncAddSkillCallback(NetFieldInt skillIndex)
@@ -559,6 +561,8 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
 
         skill.LevelUp(1);
         skills[skillIndex] = skill;
+
+        --SkillPoint;
     }
 
     protected void NetFuncPointClickMovementCallback(NetFieldVector3 position, NetFieldUInt entityId)
@@ -729,5 +733,12 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
             CacheNetTransform.Teleport(position, Quaternion.identity);
             return;
         }
+    }
+
+    internal virtual void IncreaseGold(int gold)
+    {
+        if (!IsServer)
+            return;
+        Gold += gold;
     }
 }

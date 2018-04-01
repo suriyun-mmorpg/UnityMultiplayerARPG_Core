@@ -13,9 +13,11 @@ public class MonsterCharacterEntity : CharacterEntity
     public const float RANDOM_WANDER_DURATION_MAX = 5f;
     public const float RANDOM_WANDER_AREA_MIN = 2f;
     public const float RANDOM_WANDER_AREA_MAX = 5f;
-    public const float AGGRESSIVE_FIND_TARGET_DELAY = 1f;
+    public const float AGGRESSIVE_FIND_TARGET_DELAY = 2f;
     public const float SET_TARGET_DESTINATION_DELAY = 1f;
     public const float FOLLOW_TARGET_DURATION = 5f;
+    public const float RECEIVED_DAMAGE_RECORDS_DURATION = 30f;
+    public const float RECEIVED_DAMAGE_RECORDS_UPDATE_DELAY = 5f;
 
     #region Protected data
     protected MonsterCharacterDatabase database;
@@ -23,8 +25,10 @@ public class MonsterCharacterEntity : CharacterEntity
     protected float findTargetTime;
     protected float setTargetDestinationTime;
     protected float startFollowTargetCountTime;
+    protected float receivedDamageRecordsUpdateTime;
     protected Vector3? wanderDestination;
     protected Vector3 oldMovePosition;
+    protected readonly Dictionary<CharacterEntity, ReceivedDamageRecord> receivedDamageRecords = new Dictionary<CharacterEntity, ReceivedDamageRecord>();
     #endregion
 
     #region Interface implementation
@@ -71,6 +75,20 @@ public class MonsterCharacterEntity : CharacterEntity
     protected override void Update()
     {
         base.Update();
+
+        if (IsServer && 
+            receivedDamageRecords.Count > 0 &&
+            Time.realtimeSinceStartup - receivedDamageRecordsUpdateTime >= RECEIVED_DAMAGE_RECORDS_UPDATE_DELAY)
+        {
+            receivedDamageRecordsUpdateTime = Time.realtimeSinceStartup;
+            var enemies = new List<CharacterEntity>(receivedDamageRecords.Keys);
+            foreach (var enemy in enemies)
+            {
+                var receivedDamageRecord = receivedDamageRecords[enemy];
+                if (Time.realtimeSinceStartup - receivedDamageRecord.lastReceivedDamageTime >= RECEIVED_DAMAGE_RECORDS_DURATION)
+                    receivedDamageRecords.Remove(enemy);
+            }
+        }
 
         if (CurrentHp <= 0)
         {
@@ -196,6 +214,7 @@ public class MonsterCharacterEntity : CharacterEntity
                             {
                                 startFollowTargetCountTime = Time.realtimeSinceStartup;
                                 SetAttackTarget(characterEntity);
+                                return;
                             }
                         }
                     }
@@ -255,12 +274,15 @@ public class MonsterCharacterEntity : CharacterEntity
         SetTargetEntity(target);
     }
 
-    public override void ReceiveDamage(CharacterEntity attacker, Dictionary<DamageElement, DamageAmount> allDamageAttributes, CharacterBuff debuff)
+    public override void ReceiveDamage(CharacterEntity attacker, 
+        Dictionary<DamageElement, DamageAmount> allDamageAttributes, 
+        CharacterBuff debuff, out float totalDamage)
     {
+        totalDamage = 0f;
         // Damage calculations apply at server only
         if (!IsServer)
             return;
-        base.ReceiveDamage(attacker, allDamageAttributes, debuff);
+        base.ReceiveDamage(attacker, allDamageAttributes, debuff, out totalDamage);
         // If no attacker, skip next logics
         if (attacker == null || !IsEnemy(attacker))
             return;
@@ -285,11 +307,21 @@ public class MonsterCharacterEntity : CharacterEntity
                     }
                 }
             }
-            else if (attacker != targetEntity && Random.Range(0, 1) == 1)
+            else if (attacker != targetEntity && Random.value >= 0.5f)
             {
                 // Random 50% to change target when receive damage from anyone
                 SetAttackTarget(attacker);
             }
+            // Add received damage entry
+            var receivedDamageRecord = new ReceivedDamageRecord();
+            receivedDamageRecord.totalReceivedDamage = 0;
+            if (receivedDamageRecords.ContainsKey(attacker))
+            {
+                receivedDamageRecord = receivedDamageRecords[attacker];
+                receivedDamageRecord.totalReceivedDamage += totalDamage;
+            }
+            receivedDamageRecord.lastReceivedDamageTime = Time.realtimeSinceStartup;
+            receivedDamageRecords[attacker] = receivedDamageRecord;
         }
     }
 
@@ -343,4 +375,51 @@ public class MonsterCharacterEntity : CharacterEntity
     {
         return database.damageInfo.GetDistance();
     }
+
+    protected override void OnDead()
+    {
+        base.OnDead();
+        var maxHp = this.GetStats().hp;
+        var randomedExp = Random.Range(database.randomExpMin, database.randomExpMax);
+        var randomedGold = Random.Range(database.randomGoldMin, database.randomGoldMax);
+        if (receivedDamageRecords.Count > 0)
+        {
+            var enemies = new List<CharacterEntity>(receivedDamageRecords.Keys);
+            foreach (var enemy in enemies)
+            {
+                var receivedDamageRecord = receivedDamageRecords[enemy];
+                var rewardRate = receivedDamageRecord.totalReceivedDamage / maxHp;
+                if (rewardRate > 1)
+                    rewardRate = 1;
+                enemy.IncreaseExp((int)(randomedExp * rewardRate));
+                if (enemy is PlayerCharacterEntity)
+                {
+                    var enemyPlayer = enemy as PlayerCharacterEntity;
+                    enemyPlayer.IncreaseGold((int)(randomedGold * rewardRate));
+                }
+            }
+        }
+        receivedDamageRecords.Clear();
+        foreach (var randomItem in database.randomItems)
+        {
+            if (randomItem.dropRate < Random.value)
+            {
+                var item = randomItem.item;
+                var amount = randomItem.amount;
+                if (item != null && GameInstance.Items.ContainsKey(item.Id))
+                {
+                    var itemId = item.Id;
+                    if (amount > item.maxStack)
+                        amount = item.maxStack;
+                    ItemDropEntity.DropItem(this, itemId, 1, amount);
+                }
+            }
+        }
+    }
+}
+
+public struct ReceivedDamageRecord
+{
+    public float lastReceivedDamageTime;
+    public float totalReceivedDamage;
 }
