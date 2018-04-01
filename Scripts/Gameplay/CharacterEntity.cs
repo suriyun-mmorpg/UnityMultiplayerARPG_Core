@@ -1026,7 +1026,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     {
         totalDamage = 0f;
         // Damage calculations apply at server only
-        if (!IsServer || !CanReceiveDamageFrom(attacker))
+        if (!IsServer || !CanReceiveDamageFrom(attacker) || CurrentHp <= 0)
             return;
         var gameInstance = GameInstance.Singleton;
         // Calculate chance to hit

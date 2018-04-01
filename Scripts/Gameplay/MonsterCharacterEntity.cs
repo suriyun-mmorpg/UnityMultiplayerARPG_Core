@@ -280,7 +280,7 @@ public class MonsterCharacterEntity : CharacterEntity
     {
         totalDamage = 0f;
         // Damage calculations apply at server only
-        if (!IsServer)
+        if (!IsServer || CurrentHp <= 0)
             return;
         base.ReceiveDamage(attacker, allDamageAttributes, debuff, out totalDamage);
         // If no attacker, skip next logics
@@ -402,7 +402,7 @@ public class MonsterCharacterEntity : CharacterEntity
         receivedDamageRecords.Clear();
         foreach (var randomItem in database.randomItems)
         {
-            if (randomItem.dropRate < Random.value)
+            if (Random.value <= randomItem.dropRate)
             {
                 var item = randomItem.item;
                 var amount = randomItem.amount;
