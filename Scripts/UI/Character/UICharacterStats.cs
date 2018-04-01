@@ -67,7 +67,7 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
         if (!string.IsNullOrEmpty(statsString))
             statsString += "\n";
         statsStringPart = string.Format(armorStatsFormat, Data.armor.ToString("N0"));
-        if (Data.accuracy != 0)
+        if (Data.armor != 0)
             statsString += statsStringPart;
         if (textArmor != null)
             textArmor.text = statsStringPart;
