@@ -56,6 +56,8 @@ public class UICharacterList : UIBase
             var characterModel = character.InstantiateModel(characterModelContainer);
             CharacterModels[character.Id] = characterModel;
             characterModel.gameObject.SetActive(false);
+            characterModel.SetEquipWeapons(character.EquipWeapons);
+            characterModel.SetEquipItems(character.EquipItems);
             SelectionManager.Add(uiCharacter);
         });
     }
