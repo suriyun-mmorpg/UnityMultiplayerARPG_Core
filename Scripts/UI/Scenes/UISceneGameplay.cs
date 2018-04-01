@@ -15,7 +15,7 @@ public class UISceneGameplay : MonoBehaviour
     public static UISceneGameplay Singleton { get; private set; }
 
     public UICharacter[] uiCharacters;
-    public UICharacter uiEnemyCharacter;
+    public UICharacter uiTargetCharacter;
     public UIEquipItems uiEquipItems;
     public UINonEquipItems uiNonEquipItems;
     public UICharacterSkills uiSkills;
@@ -29,6 +29,7 @@ public class UISceneGameplay : MonoBehaviour
     public UICharacterSkill SelectedSkillLevel { get; private set; }
 
     protected int lastCharacterHp = 0;
+    protected CharacterEntity lastSelectedCharacter;
     protected bool isDeadDialogShown;
 
     private void Awake()
@@ -55,15 +56,17 @@ public class UISceneGameplay : MonoBehaviour
         if (buttonRespawn != null)
             buttonRespawn.gameObject.SetActive(owningCharacter.CurrentHp <= 0);
         // Enemy status will be show when selected at enemy and enemy hp more than 0
-        if (uiEnemyCharacter != null)
+        if (uiTargetCharacter != null)
         {
             CharacterEntity targetCharacter = null;
-            if (uiEnemyCharacter.IsVisible())
+            if (uiTargetCharacter.IsVisible())
             {
                 if (owningCharacter == null ||
                     !owningCharacter.TryGetTargetEntity(out targetCharacter) ||
                     targetCharacter.CurrentHp <= 0)
-                    uiEnemyCharacter.Hide();
+                    uiTargetCharacter.Hide();
+                else if (targetCharacter != lastSelectedCharacter)
+                    uiTargetCharacter.Data = lastSelectedCharacter = targetCharacter;
             }
             else
             {
@@ -71,8 +74,8 @@ public class UISceneGameplay : MonoBehaviour
                     owningCharacter.TryGetTargetEntity(out targetCharacter) &&
                     targetCharacter.CurrentHp > 0)
                 {
-                    uiEnemyCharacter.Data = targetCharacter;
-                    uiEnemyCharacter.Show();
+                    uiTargetCharacter.Data = lastSelectedCharacter = targetCharacter;
+                    uiTargetCharacter.Show();
                 }
             }
         }
