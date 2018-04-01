@@ -243,13 +243,16 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
 
     protected virtual void UpdateInput()
     {
-        if (!IsOwnerClient || CurrentHp <= 0)
+        if (!IsOwnerClient)
             return;
-
-        var gameInstance = GameInstance.Singleton;
 
         if (CacheGameplayCameraControls != null)
             CacheGameplayCameraControls.updateRotation = Input.GetMouseButton(1);
+
+        if (CurrentHp <= 0)
+            return;
+
+        var gameInstance = GameInstance.Singleton;
 
         if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
         {
@@ -723,7 +726,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         // If warping to same map player does not have to reload new map data
         if (string.IsNullOrEmpty(mapName) || mapName.Equals(CurrentMapName))
         {
-            CurrentPosition = position;
+            CacheNetTransform.Teleport(position, Quaternion.identity);
             return;
         }
     }
