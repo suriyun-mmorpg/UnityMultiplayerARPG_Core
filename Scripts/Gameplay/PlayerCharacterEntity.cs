@@ -257,66 +257,52 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
         {
             var targetCamera = CacheGameplayCameraControls != null ? CacheGameplayCameraControls.targetCamera : Camera.main;
-            RaycastHit hit;
-            if (Physics.Raycast(targetCamera.ScreenPointToRay(Input.mousePosition), out hit, 100f))
+            SetTargetEntity(null);
+            LiteNetLibIdentity targetIdentity = null;
+            Vector3? targetPosition = null;
+            RaycastHit[] hits = Physics.RaycastAll(targetCamera.ScreenPointToRay(Input.mousePosition), 100f);
+            foreach (var hit in hits)
             {
-                SetTargetEntity(null);
-                LiteNetLibIdentity targetIdentity = null;
                 var hitTransform = hit.transform;
-                var hitTag = hitTransform.gameObject.tag;
-                var hitPoint = hit.point;
-                if (hitTag.Equals(gameInstance.playerTag) ||
-                    hitTag.Equals(gameInstance.monsterTag) ||
-                    hitTag.Equals(gameInstance.npcTag) ||
-                    hitTag.Equals(gameInstance.itemDropTag))
+                targetPosition = hit.point;
+                var entity = hitTransform.GetComponent<RpgNetworkEntity>();
+                if (entity != null)
                 {
-                    destination = null;
-                    var entity = hitTransform.GetComponent<RpgNetworkEntity>();
-                    if (entity != null)
+                    targetPosition = entity.CacheTransform.position;
+                    var playerEntity = entity as PlayerCharacterEntity;
+                    var monsterEntity = entity as MonsterCharacterEntity;
+                    var npcEntity = entity as NpcEntity;
+                    var itemDropEntity = entity as ItemDropEntity;
+                    if (playerEntity != null && playerEntity.CurrentHp > 0)
                     {
-                        hitPoint = entity.CacheTransform.position;
-                        if (hitTag.Equals(gameInstance.playerTag))
-                        {
-                            var playerEntity = entity as PlayerCharacterEntity;
-                            if (playerEntity != null && playerEntity.CurrentHp > 0)
-                            {
-                                targetIdentity = playerEntity.Identity;
-                                SetTargetEntity(playerEntity);
-                            }
-                        }
-                        else if (hitTag.Equals(gameInstance.monsterTag))
-                        {
-                            var monsterEntity = entity as MonsterCharacterEntity;
-                            if (monsterEntity != null && monsterEntity.CurrentHp > 0)
-                            {
-                                targetIdentity = monsterEntity.Identity;
-                                SetTargetEntity(monsterEntity);
-                            }
-                        }
-                        else if (hitTag.Equals(gameInstance.npcTag))
-                        {
-                            var npcEntity = entity as NpcEntity;
-                            if (npcEntity != null)
-                            {
-                                targetIdentity = npcEntity.Identity;
-                                SetTargetEntity(npcEntity);
-                            }
-                        }
-                        else if (hitTag.Equals(gameInstance.itemDropTag))
-                        {
-                            var itemDropEntity = entity as ItemDropEntity;
-                            if (itemDropEntity != null)
-                            {
-                                targetIdentity = itemDropEntity.Identity;
-                                SetTargetEntity(itemDropEntity);
-                            }
-                        }
+                        targetIdentity = playerEntity.Identity;
+                        SetTargetEntity(playerEntity);
+                    }
+                    else if (monsterEntity != null && monsterEntity.CurrentHp > 0)
+                    {
+                        targetIdentity = monsterEntity.Identity;
+                        SetTargetEntity(monsterEntity);
+                    }
+                    else if (npcEntity != null)
+                    {
+                        targetIdentity = npcEntity.Identity;
+                        SetTargetEntity(npcEntity);
+                    }
+                    else if (itemDropEntity != null)
+                    {
+                        targetIdentity = itemDropEntity.Identity;
+                        SetTargetEntity(itemDropEntity);
                     }
                 }
-                else
-                    destination = hitPoint;
+            }
+            if (targetPosition.HasValue)
+            {
                 lookAtTargetUpdated = false;
-                PointClickMovement(hitPoint, targetIdentity);
+                if (targetIdentity != null)
+                    destination = null;
+                else
+                    destination = targetPosition.Value;
+                PointClickMovement(targetPosition.Value, targetIdentity);
             }
         }
 
