@@ -69,7 +69,7 @@ public class ItemDropEntity : RpgNetworkEntity
     public static ItemDropEntity DropItem(RpgNetworkEntity dropper, string itemId, int level, int amount)
     {
         var gameInstance = GameInstance.Singleton;
-        var dropPosition = dropper.CacheTransform.position + new Vector3(Random.Range(-1, 1) * gameInstance.dropDistance, 0, Random.Range(-1, 1) * gameInstance.dropDistance);
+        var dropPosition = dropper.CacheTransform.position + new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, 0, Random.Range(-1f, 1f) * gameInstance.dropDistance);
         // Raycast to find hit floor
         Vector3? aboveHitPoint = null;
         Vector3? underHitPoint = null;
