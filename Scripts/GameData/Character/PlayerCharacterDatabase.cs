@@ -27,6 +27,7 @@ public class PlayerCharacterDatabase : BaseCharacterDatabase
         {
             if (cacheSkills == null)
             {
+                cacheSkills = new Dictionary<string, Skill>();
                 foreach (var skill in skills)
                 {
                     cacheSkills[skill.Id] = skill;
