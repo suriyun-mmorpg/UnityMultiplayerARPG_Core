@@ -59,7 +59,7 @@ public class UICharacterCreate : UIBase
             character.SetNewCharacterData(characterDatabase.title, characterDatabase.Id);
             var uiCharacter = ui.GetComponent<UICharacter>();
             uiCharacter.Setup(character, databaseId);
-            // Select trigger when add first entry so deactive all models is okay beacause first model will active
+            // Select trigger when add first entry so deactivate all models is okay beacause first model will active
             var characterModel = character.InstantiateModel(characterModelContainer);
             CharacterModels[character.Id] = characterModel;
             characterModel.gameObject.SetActive(false);

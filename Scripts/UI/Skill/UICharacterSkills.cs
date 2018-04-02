@@ -108,6 +108,7 @@ public class UICharacterSkills : UIBase
                 {
                     var uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
                     uiCharacterSkill.Setup(new KeyValuePair<CharacterSkill, int>(characterSkill, characterSkill.level), index);
+                    uiCharacterSkill.Show();
                     SelectionManager.Add(uiCharacterSkill);
                 });
                 break;

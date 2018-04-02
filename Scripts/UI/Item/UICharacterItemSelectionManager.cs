@@ -2,6 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UICharacterItemSelectionManager : UISelectionManager<CharacterItem, UICharacterItem, UICharacterItemEvent>
+public class UICharacterItemSelectionManager : UISelectionManager<KeyValuePair<CharacterItem, int>, UICharacterItem, UICharacterItemEvent>
 {
 }

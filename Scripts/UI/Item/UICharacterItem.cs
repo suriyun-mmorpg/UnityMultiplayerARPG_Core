@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacterItem : UISelectionEntry<CharacterItem>
+public class UICharacterItem : UISelectionEntry<KeyValuePair<CharacterItem, int>>
 {
     public int indexOfData { get; protected set; }
     public string equipPosition { get; protected set; }
@@ -59,9 +59,11 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
     public Button buttonDrop;
 
     [Header("Options")]
+    public UICharacterItem uiNextLevelItem;
+    public GameObject[] levelZeroDeactivateObjects;
     public bool hideAmountWhenMaxIsOne;
 
-    public void Setup(CharacterItem data, int indexOfData, string equipPosition)
+    public void Setup(KeyValuePair<CharacterItem, int> data, int indexOfData, string equipPosition)
     {
         this.indexOfData = indexOfData;
         this.equipPosition = equipPosition;
@@ -70,12 +72,18 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
 
     protected override void UpdateData()
     {
-        var itemData = Data.GetItem();
-        var itemLevel = Data.level;
-        var equipmentItem = Data.GetEquipmentItem();
-        var armorItem = Data.GetArmorItem();
-        var weaponItem = Data.GetWeaponItem();
-        var shieldItem = Data.GetShieldItem();
+        var characterItem = Data.Key;
+        var level = Data.Value;
+        var item = characterItem.GetItem();
+        var equipmentItem = characterItem.GetEquipmentItem();
+        var armorItem = characterItem.GetArmorItem();
+        var weaponItem = characterItem.GetWeaponItem();
+        var shieldItem = characterItem.GetShieldItem();
+        
+        foreach (var levelZeroDeactivateObject in levelZeroDeactivateObjects)
+        {
+            levelZeroDeactivateObject.SetActive(level > 0);
+        }
 
         if (buttonEquip != null)
         {
@@ -99,38 +107,38 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
         }
 
         if (textTitle != null)
-            textTitle.text = string.Format(titleFormat, itemData == null ? "Unknow" : itemData.title);
+            textTitle.text = string.Format(titleFormat, item == null ? "Unknow" : item.title);
 
         if (textDescription != null)
-            textDescription.text = string.Format(descriptionFormat, itemData == null ? "N/A" : itemData.description);
+            textDescription.text = string.Format(descriptionFormat, item == null ? "N/A" : item.description);
 
         if (textLevel != null)
-            textLevel.text = string.Format(levelFormat, itemLevel.ToString("N0"));
+            textLevel.text = string.Format(levelFormat, level.ToString("N0"));
 
         if (imageIcon != null)
         {
-            imageIcon.sprite = itemData == null ? null : itemData.icon;
-            imageIcon.gameObject.SetActive(itemData != null);
+            imageIcon.sprite = item == null ? null : item.icon;
+            imageIcon.gameObject.SetActive(item != null);
         }
 
         if (textSellPrice != null)
-            textSellPrice.text = string.Format(sellPriceFormat, itemData == null ? "0" : itemData.sellPrice.ToString("N0"));
+            textSellPrice.text = string.Format(sellPriceFormat, item == null ? "0" : item.sellPrice.ToString("N0"));
 
         if (textStack != null)
         {
             var stackString = "";
             if (!hideAmountWhenMaxIsOne)
             {
-                if (itemData == null)
+                if (item == null)
                     stackString = string.Format(stackFormat, "0", "0");
                 else
-                    stackString = string.Format(stackFormat, Data.amount.ToString("N0"), itemData.maxStack);
+                    stackString = string.Format(stackFormat, characterItem.amount.ToString("N0"), item.maxStack);
             }
             textStack.text = stackString;
         }
 
         if (textWeight != null)
-            textWeight.text = string.Format(weightFormat, itemData == null ? "0" : itemData.weight.ToString("N2"));
+            textWeight.text = string.Format(weightFormat, item == null ? "0" : item.weight.ToString("N2"));
 
         if (textItemType != null)
         {
@@ -151,13 +159,13 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
             else
             {
                 uiRequirement.Show();
-                uiRequirement.Data = new KeyValuePair<Item, int>(equipmentItem, itemLevel);
+                uiRequirement.Data = new KeyValuePair<Item, int>(equipmentItem, level);
             }
         }
 
         if (uiStats != null)
         {
-            var stats = equipmentItem.GetStats(itemLevel);
+            var stats = equipmentItem.GetStats(level);
             if (equipmentItem == null || stats.IsEmpty())
                 uiStats.Hide();
             else
@@ -169,7 +177,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
 
         if (uiIncreaseAttributes != null)
         {
-            var attributes = equipmentItem.GetIncreaseAttributes(itemLevel);
+            var attributes = equipmentItem.GetIncreaseAttributes(level);
             if (equipmentItem == null || attributes == null || attributes.Count == 0)
                 uiIncreaseAttributes.Hide();
             else
@@ -181,7 +189,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
 
         if (uiIncreaseResistances != null)
         {
-            var resistances = equipmentItem.GetIncreaseResistances(itemLevel);
+            var resistances = equipmentItem.GetIncreaseResistances(level);
             if (equipmentItem == null || resistances == null || resistances.Count == 0)
                 uiIncreaseResistances.Hide();
             else
@@ -193,7 +201,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
 
         if (uiIncreaseDamageAttributes != null)
         {
-            var damageAttributes = equipmentItem.GetIncreaseDamageAttributes(itemLevel);
+            var damageAttributes = equipmentItem.GetIncreaseDamageAttributes(level);
             if (equipmentItem == null || damageAttributes == null || damageAttributes.Count == 0)
                 uiIncreaseDamageAttributes.Hide();
             else
@@ -210,7 +218,18 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
             else
             {
                 uiDamageAttribute.Show();
-                uiDamageAttribute.Data = weaponItem.GetDamageAttribute(itemLevel, 0f, 1f);
+                uiDamageAttribute.Data = weaponItem.GetDamageAttribute(level, 0f, 1f);
+            }
+        }
+
+        if (uiNextLevelItem != null)
+        {
+            if (level + 1 > item.maxLevel)
+                uiNextLevelItem.Hide();
+            else
+            {
+                uiNextLevelItem.Setup(new KeyValuePair<CharacterItem, int>(characterItem, level + 1), indexOfData, equipPosition);
+                uiNextLevelItem.Show();
             }
         }
     }
@@ -224,12 +243,13 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
         if (selectionManager != null)
             selectionManager.DeselectSelectedUI();
 
+        var characterItem = Data.Key;
         var owningCharacter = PlayerCharacterEntity.OwningCharacter;
         if (owningCharacter != null)
         {
-            var armorItem = Data.GetArmorItem();
-            var weaponItem = Data.GetWeaponItem();
-            var shieldItem = Data.GetShieldItem();
+            var armorItem = characterItem.GetArmorItem();
+            var weaponItem = characterItem.GetWeaponItem();
+            var shieldItem = characterItem.GetShieldItem();
             if (weaponItem != null)
             {
                 if (weaponItem.EquipType == WeaponItemEquipType.OneHandCanDual)
@@ -271,8 +291,9 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
         if (!string.IsNullOrEmpty(equipPosition))
             return;
 
+        var characterItem = Data.Key;
         var owningCharacter = PlayerCharacterEntity.OwningCharacter;
-        if (Data.amount == 1)
+        if (characterItem.amount == 1)
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
@@ -280,7 +301,7 @@ public class UICharacterItem : UISelectionEntry<CharacterItem>
                 owningCharacter.DropItem(indexOfData, 1);
         }
         else
-            UISceneGlobal.Singleton.ShowInputDialog(dropInputTitle, dropInputDescription, OnDropAmountConfirmed, 1, Data.amount, Data.amount);
+            UISceneGlobal.Singleton.ShowInputDialog(dropInputTitle, dropInputDescription, OnDropAmountConfirmed, 1, characterItem.amount, characterItem.amount);
     }
 
     private void OnDropAmountConfirmed(int amount)

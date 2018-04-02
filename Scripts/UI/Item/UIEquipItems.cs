@@ -25,14 +25,14 @@ public class UIEquipItems : UIBase
                 if (rightHandSlot != null)
                 {
                     var equipPosition = GameDataConst.EQUIP_POSITION_RIGHT_HAND;
-                    rightHandSlot.Setup(CharacterItem.Empty, -1, equipPosition);
+                    rightHandSlot.Setup(GetEmptyUIData(), -1, equipPosition);
                     cacheEquipItemSlots.Add(equipPosition, rightHandSlot);
                     SelectionManager.Add(rightHandSlot);
                 }
                 if (leftHandSlot != null)
                 {
                     var equipPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
-                    leftHandSlot.Setup(CharacterItem.Empty, -1, equipPosition);
+                    leftHandSlot.Setup(GetEmptyUIData(), -1, equipPosition);
                     cacheEquipItemSlots.Add(equipPosition, leftHandSlot);
                     SelectionManager.Add(leftHandSlot);
                 }
@@ -43,7 +43,7 @@ public class UIEquipItems : UIBase
                         !cacheEquipItemSlots.ContainsKey(otherEquipSlot.armorType.Id))
                     {
                         var equipPosition = otherEquipSlot.armorType.Id;
-                        otherEquipSlot.ui.Setup(CharacterItem.Empty, -1, equipPosition);
+                        otherEquipSlot.ui.Setup(GetEmptyUIData(), -1, equipPosition);
                         cacheEquipItemSlots.Add(equipPosition, otherEquipSlot.ui);
                         SelectionManager.Add(otherEquipSlot.ui);
                     }
@@ -102,7 +102,7 @@ public class UIEquipItems : UIBase
         if (uiGameplay != null)
             uiGameplay.DeselectSelectedItem();
 
-        if (uiItemDialog != null && ui.Data.IsValid())
+        if (uiItemDialog != null && ui.Data.Key.IsValid())
         {
             uiItemDialog.Show();
             uiItemDialog.selectionManager = selectionManager;
@@ -116,7 +116,7 @@ public class UIEquipItems : UIBase
     {
         var uiGameplay = UISceneGameplay.Singleton;
 
-        if (uiGameplay != null && !ui.Data.IsValid())
+        if (uiGameplay != null && !ui.Data.Key.IsValid())
             uiGameplay.DeselectSelectedItem();
     }
 
@@ -132,7 +132,7 @@ public class UIEquipItems : UIBase
         // Clear slots data
         foreach (var slot in slots)
         {
-            slot.Setup(CharacterItem.Empty, -1, string.Empty);
+            slot.Setup(GetEmptyUIData(), -1, string.Empty);
         }
 
         if (characterData == null)
@@ -150,7 +150,7 @@ public class UIEquipItems : UIBase
 
             tempPosition = armorItem.EquipPosition;
             if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
-                tempSlot.Setup(equipItem, -1, tempPosition);
+                tempSlot.Setup(new KeyValuePair<CharacterItem, int>(equipItem, equipItem.level), -1, tempPosition);
         }
 
         var equipWeapons = characterData.EquipWeapons;
@@ -160,13 +160,18 @@ public class UIEquipItems : UIBase
         if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
         {
             if (rightHandEquipment != null)
-                tempSlot.Setup(equipWeapons.rightHand, -1, tempPosition);
+                tempSlot.Setup(GetEmptyUIData(), -1, tempPosition);
         }
         tempPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
         if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
         {
             if (leftHandEquipment != null)
-                tempSlot.Setup(equipWeapons.leftHand, -1, tempPosition);
+                tempSlot.Setup(GetEmptyUIData(), -1, tempPosition);
         }
+    }
+
+    private KeyValuePair<CharacterItem, int> GetEmptyUIData()
+    {
+        return new KeyValuePair<CharacterItem, int>(CharacterItem.Empty, 1);
     }
 }

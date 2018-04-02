@@ -41,6 +41,12 @@ public class UICharacterAttribute : UISelectionEntry<KeyValuePair<CharacterAttri
         var attribute = characterAttribute.GetAttribute();
         var amount = Data.Value;
 
+        if (addButton != null)
+        {
+            addButton.onClick.RemoveAllListeners();
+            addButton.onClick.AddListener(OnClickAdd);
+        }
+
         if (textTitle != null)
             textTitle.text = string.Format(titleFormat, attribute == null ? "Unknow" : attribute.title);
 
@@ -55,16 +61,6 @@ public class UICharacterAttribute : UISelectionEntry<KeyValuePair<CharacterAttri
             var iconSprite = attribute == null ? null : attribute.icon;
             imageIcon.sprite = iconSprite;
             imageIcon.gameObject.SetActive(iconSprite != null);
-        }
-    }
-
-    public override void Show()
-    {
-        base.Show();
-        if (addButton != null)
-        {
-            addButton.onClick.RemoveAllListeners();
-            addButton.onClick.AddListener(OnClickAdd);
         }
     }
 

@@ -56,7 +56,7 @@ public class UINonEquipItems : UIBase
         if (uiGameplay != null)
             uiGameplay.DeselectSelectedItem();
 
-        if (uiItemDialog != null && ui.Data.IsValid())
+        if (uiItemDialog != null && ui.Data.Key.IsValid())
         {
             uiItemDialog.Show();
             uiItemDialog.selectionManager = selectionManager;
@@ -70,7 +70,7 @@ public class UINonEquipItems : UIBase
     {
         var uiGameplay = UISceneGameplay.Singleton;
 
-        if (uiGameplay != null && !ui.Data.IsValid())
+        if (uiGameplay != null && !ui.Data.Key.IsValid())
             uiGameplay.DeselectSelectedItem();
     }
 
@@ -94,7 +94,7 @@ public class UINonEquipItems : UIBase
         CacheList.Generate(nonEquipItems, (index, characterItem, ui) =>
         {
             var uiCharacterItem = ui.GetComponent<UICharacterItem>();
-            uiCharacterItem.Setup(characterItem, index, string.Empty);
+            uiCharacterItem.Setup(new KeyValuePair<CharacterItem, int>(characterItem, characterItem.level), index, string.Empty);
             SelectionManager.Add(uiCharacterItem);
         });
     }

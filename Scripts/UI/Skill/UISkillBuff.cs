@@ -26,13 +26,25 @@ public class UISkillBuff : UISelectionEntry<KeyValuePair<SkillBuff, int>>
         var skillLevel = Data.Value;
 
         if (textDuration != null)
-            textDuration.text = string.Format(durationFormat, skillBuff.GetDuration(skillLevel).ToString("N0"));
+        {
+            var duration = skillBuff.GetDuration(skillLevel);
+            textDuration.text = string.Format(durationFormat, duration.ToString("N0"));
+            textDuration.gameObject.SetActive(duration != 0);
+        }
 
         if (textRecoveryHp != null)
-            textRecoveryHp.text = string.Format(durationFormat, skillBuff.GetRecoveryHp(skillLevel).ToString("N0"));
+        {
+            var recoveryHp = skillBuff.GetRecoveryHp(skillLevel);
+            textRecoveryHp.text = string.Format(recoveryHpFormat, recoveryHp.ToString("N0"));
+            textRecoveryHp.gameObject.SetActive(recoveryHp != 0);
+        }
 
         if (textRecoveryMp != null)
-            textRecoveryMp.text = string.Format(durationFormat, skillBuff.GetRecoveryMp(skillLevel).ToString("N0"));
+        {
+            var recoveryMp = skillBuff.GetRecoveryMp(skillLevel);
+            textRecoveryMp.text = string.Format(recoveryMpFormat, recoveryMp.ToString("N0"));
+            textRecoveryMp.gameObject.SetActive(recoveryMp != 0);
+        }
 
         if (uiBuffStats != null)
             uiBuffStats.Data = skillBuff.GetStats(skillLevel);
