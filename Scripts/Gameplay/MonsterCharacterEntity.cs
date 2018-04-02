@@ -16,8 +16,6 @@ public class MonsterCharacterEntity : CharacterEntity
     public const float AGGRESSIVE_FIND_TARGET_DELAY = 2f;
     public const float SET_TARGET_DESTINATION_DELAY = 1f;
     public const float FOLLOW_TARGET_DURATION = 5f;
-    public const float RECEIVED_DAMAGE_RECORDS_DURATION = 30f;
-    public const float RECEIVED_DAMAGE_RECORDS_UPDATE_DELAY = 5f;
 
     #region Protected data
     protected MonsterCharacterDatabase database;
@@ -75,20 +73,6 @@ public class MonsterCharacterEntity : CharacterEntity
     protected override void Update()
     {
         base.Update();
-
-        if (IsServer && 
-            receivedDamageRecords.Count > 0 &&
-            Time.realtimeSinceStartup - receivedDamageRecordsUpdateTime >= RECEIVED_DAMAGE_RECORDS_UPDATE_DELAY)
-        {
-            receivedDamageRecordsUpdateTime = Time.realtimeSinceStartup;
-            var enemies = new List<CharacterEntity>(receivedDamageRecords.Keys);
-            foreach (var enemy in enemies)
-            {
-                var receivedDamageRecord = receivedDamageRecords[enemy];
-                if (Time.realtimeSinceStartup - receivedDamageRecord.lastReceivedDamageTime >= RECEIVED_DAMAGE_RECORDS_DURATION)
-                    receivedDamageRecords.Remove(enemy);
-            }
-        }
 
         if (CurrentHp <= 0)
         {
@@ -276,17 +260,17 @@ public class MonsterCharacterEntity : CharacterEntity
 
     public override void ReceiveDamage(CharacterEntity attacker, 
         Dictionary<DamageElement, DamageAmount> allDamageAttributes, 
-        CharacterBuff debuff, out float totalDamage)
+        CharacterBuff debuff)
     {
-        totalDamage = 0f;
         // Damage calculations apply at server only
         if (!IsServer || CurrentHp <= 0)
             return;
-        base.ReceiveDamage(attacker, allDamageAttributes, debuff, out totalDamage);
+        base.ReceiveDamage(attacker, allDamageAttributes, debuff);
         // If no attacker, skip next logics
         if (attacker == null || !IsEnemy(attacker))
             return;
         // If character isn't dead
+        // If character is not dead, try to attack
         if (CurrentHp > 0)
         {
             var gameInstance = GameInstance.Singleton;
@@ -312,16 +296,6 @@ public class MonsterCharacterEntity : CharacterEntity
                 // Random 50% to change target when receive damage from anyone
                 SetAttackTarget(attacker);
             }
-            // Add received damage entry
-            var receivedDamageRecord = new ReceivedDamageRecord();
-            receivedDamageRecord.totalReceivedDamage = 0;
-            if (receivedDamageRecords.ContainsKey(attacker))
-            {
-                receivedDamageRecord = receivedDamageRecords[attacker];
-                receivedDamageRecord.totalReceivedDamage += totalDamage;
-            }
-            receivedDamageRecord.lastReceivedDamageTime = Time.realtimeSinceStartup;
-            receivedDamageRecords[attacker] = receivedDamageRecord;
         }
     }
 
@@ -377,9 +351,26 @@ public class MonsterCharacterEntity : CharacterEntity
         return database.damageInfo.GetDistance();
     }
 
-    protected override void OnDead()
+    protected override void OnReceivedDamage(CharacterEntity attacker, int damage)
     {
-        base.OnDead();
+        base.OnReceivedDamage(attacker, damage);
+        // Add received damage entry
+        if (attacker == null)
+            return;
+        var receivedDamageRecord = new ReceivedDamageRecord();
+        receivedDamageRecord.totalReceivedDamage = damage;
+        if (receivedDamageRecords.ContainsKey(attacker))
+        {
+            receivedDamageRecord = receivedDamageRecords[attacker];
+            receivedDamageRecord.totalReceivedDamage += damage;
+        }
+        receivedDamageRecord.lastReceivedDamageTime = Time.realtimeSinceStartup;
+        receivedDamageRecords[attacker] = receivedDamageRecord;
+    }
+
+    protected override void OnDead(CharacterEntity lastAttacker, int lastDamage)
+    {
+        base.OnDead(lastAttacker, lastDamage);
         var maxHp = this.GetStats().hp;
         var randomedExp = Random.Range(database.randomExpMin, database.randomExpMax);
         var randomedGold = Random.Range(database.randomGoldMin, database.randomGoldMax);
@@ -422,5 +413,5 @@ public class MonsterCharacterEntity : CharacterEntity
 public struct ReceivedDamageRecord
 {
     public float lastReceivedDamageTime;
-    public float totalReceivedDamage;
+    public int totalReceivedDamage;
 }

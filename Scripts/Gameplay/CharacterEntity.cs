@@ -970,20 +970,11 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         return true;
     }
 
-
-    public void ReceiveDamage(CharacterEntity attacker,
+    public virtual void ReceiveDamage(CharacterEntity attacker,
         Dictionary<DamageElement, DamageAmount> allDamageAttributes,
         CharacterBuff debuff)
     {
-        float totalDamage;
-        ReceiveDamage(attacker, allDamageAttributes, debuff, out totalDamage);
-    }
-
-    public virtual void ReceiveDamage(CharacterEntity attacker,
-        Dictionary<DamageElement, DamageAmount> allDamageAttributes,
-        CharacterBuff debuff, out float totalDamage)
-    {
-        totalDamage = 0f;
+        var calculatingTotalDamage = 0f;
         // Damage calculations apply at server only
         if (!IsServer || !CanReceiveDamageFrom(attacker) || CurrentHp <= 0)
             return;
@@ -1002,21 +993,23 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
                 var damageAmount = allDamageAttribute.Value;
                 var receivingDamage = damageElement.GetDamageReducedByResistance(this, Random.Range(damageAmount.minDamage, damageAmount.maxDamage));
                 if (receivingDamage > 0f)
-                    totalDamage += receivingDamage;
+                    calculatingTotalDamage += receivingDamage;
             }
         }
         // Calculate chance to critical
         var criticalChance = gameInstance.GameplayRule.GetCriticalChance(attacker, this);
         // If critical occurs
         if (Random.value <= criticalChance)
-            totalDamage = gameInstance.GameplayRule.GetCriticalDamage(attacker, this, totalDamage);
+            calculatingTotalDamage = gameInstance.GameplayRule.GetCriticalDamage(attacker, this, calculatingTotalDamage);
         // Calculate chance to block
         var blockChance = gameInstance.GameplayRule.GetBlockChance(attacker, this);
         // If block occurs
         if (Random.value <= blockChance)
-            totalDamage = gameInstance.GameplayRule.GetBlockDamage(attacker, this, totalDamage);
+            calculatingTotalDamage = gameInstance.GameplayRule.GetBlockDamage(attacker, this, calculatingTotalDamage);
         // Apply damages
-        CurrentHp -= (int)totalDamage;
+        var totalDamage = (int)calculatingTotalDamage;
+        CurrentHp -= totalDamage;
+        OnReceivedDamage(attacker, totalDamage);
 
         if (model != null)
         {
@@ -1029,7 +1022,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         if (CurrentHp <= 0)
         {
             CurrentHp = 0;
-            OnDead();
+            OnDead(attacker, totalDamage);
         }
         else if (!debuff.IsEmpty())
         {
@@ -1331,7 +1324,11 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         return CacheTransform;
     }
 
-    protected virtual void OnDead()
+    protected virtual void OnReceivedDamage(CharacterEntity attacker, int damage)
+    {
+    }
+
+    protected virtual void OnDead(CharacterEntity lastAttacker, int lastDamage)
     {
         StopAllCoroutines();
         isDoingAction.Value = false;
