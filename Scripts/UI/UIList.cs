@@ -33,4 +33,13 @@ public class UIList : MonoBehaviour
             ui.SetActive(false);
         }
     }
+
+    public void HideAll()
+    {
+        for (var i = 0; i < uis.Count; ++i)
+        {
+            GameObject ui = uis[i];
+            ui.SetActive(false);
+        }
+    }
 }
