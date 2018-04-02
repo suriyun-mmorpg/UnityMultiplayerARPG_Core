@@ -374,45 +374,25 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             out actionId,
             out damageDuration,
             out totalDuration,
-            out allDamageAttributes,
-            out damageInfo);
+            out damageInfo,
+            out allDamageAttributes);
 
         isDoingAction.Value = true;
         // Play animation on clients
         PlayActionAnimation(actionId);
         // Start attack routine
-        StartCoroutine(AttackRoutine(damageDuration, totalDuration, allDamageAttributes, damageInfo, debuff));
+        StartCoroutine(AttackRoutine(damageDuration, totalDuration, damageInfo, allDamageAttributes, debuff));
     }
 
     IEnumerator AttackRoutine(
         float damageDuration,
         float totalDuration,
+        DamageInfo damageInfo,
         Dictionary<DamageElement, DamageAmount> allDamageAttributes,
-        DamageInfo damageInfo, 
         CharacterBuff debuff)
     {
         yield return new WaitForSecondsRealtime(damageDuration);
-        switch (damageInfo.damageType)
-        {
-            case DamageType.Melee:
-                var hits = Physics.OverlapSphere(CacheTransform.position, damageInfo.hitDistance);
-                foreach (var hit in hits)
-                {
-                    var characterEntity = hit.GetComponent<CharacterEntity>();
-                    if (characterEntity == null)
-                        continue;
-                    characterEntity.ReceiveDamage(this, allDamageAttributes, debuff);
-                }
-                break;
-            case DamageType.Missile:
-                if (damageInfo.missileDamageEntity != null)
-                {
-                    var missileDamageIdentity = Manager.Assets.NetworkSpawn(damageInfo.missileDamageEntity.Identity, CacheTransform.position, CacheTransform.rotation);
-                    var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
-                    missileDamageEntity.SetupDamage(this, allDamageAttributes, debuff, damageInfo.missileDistance, damageInfo.missileSpeed);
-                }
-                break;
-        }
+        LaunchDamageEntity(damageInfo, allDamageAttributes, debuff);
         yield return new WaitForSecondsRealtime(totalDuration - damageDuration);
         isDoingAction.Value = false;
     }
@@ -484,29 +464,8 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         var allDamageAttributes = skill.GetAdditionalDamageAttributes(characterSkill.level);
         allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, baseDamageAttribute);
         var damageInfo = skill.damageInfo;
-        var effectivenessAttributes = skill.CacheEffectivenessAttributes;
         var debuff = skill.isDebuff ? CharacterBuff.Create(skill, characterSkill.level, true) : CharacterBuff.Empty;
-        switch (damageInfo.damageType)
-        {
-            case DamageType.Melee:
-                var hits = Physics.OverlapSphere(CacheTransform.position, damageInfo.hitDistance);
-                foreach (var hit in hits)
-                {
-                    var characterEntity = hit.GetComponent<CharacterEntity>();
-                    if (characterEntity == null)
-                        continue;
-                    characterEntity.ReceiveDamage(this, allDamageAttributes, debuff);
-                }
-                break;
-            case DamageType.Missile:
-                if (damageInfo.missileDamageEntity != null)
-                {
-                    var missileDamageIdentity = Manager.Assets.NetworkSpawn(damageInfo.missileDamageEntity.Identity, CacheTransform.position, CacheTransform.rotation);
-                    var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
-                    missileDamageEntity.SetupDamage(this, allDamageAttributes, debuff, damageInfo.missileDistance, damageInfo.missileSpeed);
-                }
-                break;
-        }
+        LaunchDamageEntity(damageInfo, allDamageAttributes, debuff);
     }
 
     protected void AttackAsWeaponDamageInflict(CharacterSkill characterSkill)
@@ -1211,31 +1170,34 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     }
     #endregion
 
-    #region Weapons data
+    #region Weapons / Damage
     public CharacterItem GetRandomedWeapon(out bool isLeftHand)
     {
         isLeftHand = false;
+        // Start with default weapon, if character not equip any weapons, will return this
+        var resultWeapon = CharacterItem.Create(GameInstance.Singleton.defaultWeaponItem, 1);
+        // Find right hand and left and to set result weapon
         var rightHand = EquipWeapons.rightHand;
         var leftHand = EquipWeapons.leftHand;
-        var resultItem = CharacterItem.Create(GameInstance.Singleton.defaultWeaponItem, 1);
         var rightWeaponItem = rightHand.GetWeaponItem();
         var leftWeaponItem = leftHand.GetWeaponItem();
         if (rightWeaponItem != null && leftWeaponItem != null)
         {
+            // Random right hand or left hand weapon
             isLeftHand = Random.Range(0, 1) == 1;
-            resultItem = !isLeftHand ? rightHand : leftHand;
+            resultWeapon = !isLeftHand ? rightHand : leftHand;
         }
         else if (rightWeaponItem != null)
         {
-            resultItem = rightHand;
+            resultWeapon = rightHand;
             isLeftHand = false;
         }
         else if (leftWeaponItem != null)
         {
-            resultItem = leftHand;
+            resultWeapon = leftHand;
             isLeftHand = true;
         }
-        return resultItem;
+        return resultWeapon;
     }
 
     public virtual void GetAttackData(
@@ -1244,15 +1206,15 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         out int actionId,
         out float damageDuration,
         out float totalDuration,
-        out Dictionary<DamageElement, DamageAmount> allDamageAttributes,
-        out DamageInfo damageInfo)
+        out DamageInfo damageInfo,
+        out Dictionary<DamageElement, DamageAmount> allDamageAttributes)
     {
         // Initialize data
         actionId = -1;
         damageDuration = 0f;
         totalDuration = 0f;
-        allDamageAttributes = new Dictionary<DamageElement, DamageAmount>();
         damageInfo = null;
+        allDamageAttributes = new Dictionary<DamageElement, DamageAmount>();
         // Prepare weapon data
         var isLeftHand = false;
         var equipWeapon = GetRandomedWeapon(out isLeftHand);
@@ -1281,7 +1243,10 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     public virtual float GetAttackDistance()
     {
-        float? minDistance = null;
+        // Finding minimum distance of equipped weapons
+        // For example, if right hand attack distance is 1m and left hand attack distance is 0.7m
+        // it will return 0.7m. if no equipped weapons, it will return default weapon attack distance
+        float minDistance = float.MaxValue;
         DamageInfo tempDamageInfo;
         float tempDistance = 0f;
         var rightHand = EquipWeapons.rightHand;
@@ -1292,24 +1257,55 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         {
             tempDamageInfo = rightHandWeapon.WeaponType.damageInfo;
             tempDistance = tempDamageInfo.GetDistance();
-            if (!minDistance.HasValue || minDistance.Value > tempDistance)
+            if (minDistance > tempDistance)
                 minDistance = tempDistance;
         }
-        if (leftHandWeapon)
+        if (leftHandWeapon != null)
         {
             tempDamageInfo = leftHandWeapon.WeaponType.damageInfo;
             tempDistance = tempDamageInfo.GetDistance();
-            if (!minDistance.HasValue || minDistance.Value > tempDistance)
+            if (minDistance > tempDistance)
                 minDistance = tempDistance;
         }
-        if (!minDistance.HasValue)
+        if (rightHandWeapon == null && leftHandWeapon == null)
         {
             tempDamageInfo = GameInstance.Singleton.DefaultWeaponType.damageInfo;
             tempDistance = tempDamageInfo.GetDistance();
-            if (!minDistance.HasValue || minDistance.Value > tempDistance)
-                minDistance = tempDistance;
+            minDistance = tempDistance;
         }
-        return minDistance.Value;
+        return minDistance;
+    }
+
+    public virtual void LaunchDamageEntity(
+        DamageInfo damageInfo,
+        Dictionary<DamageElement, DamageAmount> allDamageAttributes,
+        CharacterBuff debuff)
+    {
+        if (!IsServer)
+            return;
+
+        Transform damageTransform = GetDamageTransform(damageInfo.damageType);
+        switch (damageInfo.damageType)
+        {
+            case DamageType.Melee:
+                var hits = Physics.OverlapSphere(damageTransform.position, damageInfo.hitDistance);
+                foreach (var hit in hits)
+                {
+                    var characterEntity = hit.GetComponent<CharacterEntity>();
+                    if (characterEntity == null)
+                        continue;
+                    characterEntity.ReceiveDamage(this, allDamageAttributes, debuff);
+                }
+                break;
+            case DamageType.Missile:
+                if (damageInfo.missileDamageEntity != null)
+                {
+                    var missileDamageIdentity = Manager.Assets.NetworkSpawn(damageInfo.missileDamageEntity.Identity, damageTransform.position, damageTransform.rotation);
+                    var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
+                    missileDamageEntity.SetupDamage(this, allDamageAttributes, debuff, damageInfo.missileDistance, damageInfo.missileSpeed);
+                }
+                break;
+        }
     }
     #endregion
 
@@ -1318,6 +1314,21 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         CacheCapsuleCollider.center = characterModel.center;
         CacheCapsuleCollider.radius = characterModel.radius;
         CacheCapsuleCollider.height = characterModel.height;
+    }
+
+    protected virtual Transform GetDamageTransform(DamageType damageType)
+    {
+        if (model != null)
+        {
+            switch (damageType)
+            {
+                case DamageType.Melee:
+                    return model.MeleeDamageTransform;
+                case DamageType.Missile:
+                    return model.MissileDamageTransform;
+            }
+        }
+        return CacheTransform;
     }
 
     protected virtual void OnDead()

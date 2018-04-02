@@ -336,9 +336,9 @@ public class MonsterCharacterEntity : CharacterEntity
         Dictionary<DamageElement, DamageAmount> additionalDamageAttributes, 
         out int actionId, 
         out float damageDuration, 
-        out float totalDuration, 
-        out Dictionary<DamageElement, DamageAmount> allDamageAttributes, 
-        out DamageInfo damageInfo)
+        out float totalDuration,
+        out DamageInfo damageInfo, 
+        out Dictionary<DamageElement, DamageAmount> allDamageAttributes)
     {
         var gameInstance = GameInstance.Singleton;
 
@@ -359,6 +359,9 @@ public class MonsterCharacterEntity : CharacterEntity
             totalDuration = anim.ClipLength;
         }
 
+        // Assign damage data
+        damageInfo = database.damageInfo;
+
         // Assign damage attributes
         allDamageAttributes = new Dictionary<DamageElement, DamageAmount>();
         var damageElement = database.damageElement;
@@ -367,8 +370,6 @@ public class MonsterCharacterEntity : CharacterEntity
             damageElement = gameInstance.DefaultDamageElement;
         allDamageAttributes.Add(damageElement, damageAmount * inflictRate);
         allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, additionalDamageAttributes);
-        // Assign damage data
-        damageInfo = database.damageInfo;
     }
 
     public override float GetAttackDistance()

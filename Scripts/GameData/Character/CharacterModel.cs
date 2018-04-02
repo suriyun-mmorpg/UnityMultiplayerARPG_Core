@@ -8,13 +8,20 @@ public class CharacterModel : MonoBehaviour
     public const string ANIM_ACTION_STATE = "_Action";
     public string Id { get { return name; } }
     [Header("Animator")]
-    public RuntimeAnimatorController animatorController;
+    [SerializeField]
+    private RuntimeAnimatorController animatorController;
     [Header("Collider")]
     public Vector3 center;
     public float radius = 0.5f;
     public float height = 2f;
+    [Header("Damage transform")]
+    [SerializeField]
+    private Transform meleeDamageTransform;
+    [SerializeField]
+    private Transform missileDamageTransform;
     [Header("Equipment Containers")]
-    public CharacterModelContainer[] equipmentContainers;
+    [SerializeField]
+    private CharacterModelContainer[] equipmentContainers;
 
     private Transform cacheTransform;
     public Transform CacheTransform
@@ -72,7 +79,27 @@ public class CharacterModel : MonoBehaviour
             return cacheEquipmentContainers;
         }
     }
-    
+
+    public Transform MeleeDamageTransform
+    {
+        get
+        {
+            if (meleeDamageTransform == null)
+                meleeDamageTransform = CacheTransform;
+            return meleeDamageTransform;
+        }
+    }
+
+    public Transform MissileDamageTransform
+    {
+        get
+        {
+            if (missileDamageTransform == null)
+                missileDamageTransform = CacheTransform;
+            return missileDamageTransform;
+        }
+    }
+
     /// <summary>
     /// Dictionary[equipPosition(String), Dictionary[equipSocket(String), model(GameObject)]]
     /// </summary>
