@@ -38,6 +38,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public string classTitleFormat = "Class: {0}";
     [Tooltip("Class Description Format => {0} = {Class description}")]
     public string classDescriptionFormat = "{0}";
+
     [Header("UI Elements")]
     public Text textName;
     public Text textLevel;
