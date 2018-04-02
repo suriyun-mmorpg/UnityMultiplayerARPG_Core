@@ -85,7 +85,10 @@ public class UINonEquipItems : UIBase
         SelectionManager.Clear();
 
         if (characterData == null)
+        {
+            CacheList.HideAll();
             return;
+        }
 
         var nonEquipItems = characterData.NonEquipItems;
         CacheList.Generate(nonEquipItems, (index, characterItem, ui) =>
