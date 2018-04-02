@@ -81,7 +81,7 @@ public static class SkillExtension
         if (skill == null)
             return 0;
         level = skill.GetAdjustedLevel(level);
-        return skill.baseConsumeMp + (int)(skill.consumeMpIncreaseEachLevel * level);
+        return skill.baseConsumeMp + (int)(skill.consumeMpIncreaseEachLevel * (level - 1));
     }
 
     public static float GetCoolDownDuration(this Skill skill, int level)
@@ -89,7 +89,7 @@ public static class SkillExtension
         if (skill == null)
             return 0f;
         level = skill.GetAdjustedLevel(level);
-        return skill.baseCoolDownDuration + skill.coolDownDurationIncreaseEachLevel * level;
+        return skill.baseCoolDownDuration + (skill.coolDownDurationIncreaseEachLevel * (level - 1));
     }
 
     public static float GetBuffDuration(this Skill skill, int level)
