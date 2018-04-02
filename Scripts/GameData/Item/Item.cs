@@ -20,6 +20,8 @@ public class Item : BaseGameData
     public int sellPrice;
     [Range(1, 1000)]
     public int maxStack = 1;
+    [Range(1, 30)]
+    public int maxLevel = 1;
     public float weight;
     public GameObject dropModel;
 

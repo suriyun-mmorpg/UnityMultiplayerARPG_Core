@@ -41,7 +41,8 @@ public struct SkillBuff
 public class Skill : BaseGameData
 {
     public ActionAnimation castAnimation;
-    public int maxLevel;
+    [Range(1, 30)]
+    public int maxLevel = 1;
 
     [Header("Consume Mp")]
     public int baseConsumeMp;
