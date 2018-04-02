@@ -20,6 +20,22 @@ public class PlayerCharacterDatabase : BaseCharacterDatabase
     public Item leftHandEquipItem;
     public Item[] armorItems;
 
+    private Dictionary<string, Skill> cacheSkills;
+    public Dictionary<string, Skill> CacheSkills
+    {
+        get
+        {
+            if (cacheSkills == null)
+            {
+                foreach (var skill in skills)
+                {
+                    cacheSkills[skill.Id] = skill;
+                }
+            }
+            return cacheSkills;
+        }
+    }
+
 #if UNITY_EDITOR
     void OnValidate()
     {

@@ -195,9 +195,9 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
         var equipWeapons = new EquipWeapons();
         equipWeapons.rightHand = rightWeapon;
         equipWeapons.leftHand = leftWeapon;
-
         character.EquipWeapons = equipWeapons;
 
+        character.ValidateCharacterData();
         var playerCharacterEntity = playerIdentity.GetComponent<PlayerCharacterEntity>();
         character.CloneTo(playerCharacterEntity);
     }

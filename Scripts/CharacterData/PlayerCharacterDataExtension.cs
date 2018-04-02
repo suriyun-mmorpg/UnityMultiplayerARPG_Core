@@ -33,6 +33,89 @@ public static class PlayerCharacterDataExtension
         return to;
     }
 
+    public static T ValidateCharacterData<T>(this T character) where T : IPlayerCharacterData
+    {
+        var gameInstance = GameInstance.Singleton;
+        PlayerCharacterDatabase database;
+        if (!GameInstance.PlayerCharacterDatabases.TryGetValue(character.DatabaseId, out database))
+            return character;
+        // Player character database
+        var playerCharacterDatabase = database as PlayerCharacterDatabase;
+        // Validating character attributes
+        var returningStatPoint = 0;
+        var characterAttributes = character.Attributes;
+        for (var i = characterAttributes.Count - 1; i >= 0; --i)
+        {
+            var characterAttribute = characterAttributes[i];
+            // If attribute is invalid
+            if (characterAttribute.GetAttribute() == null)
+            {
+                returningStatPoint += characterAttribute.amount;
+                character.Attributes.RemoveAt(i);
+            }
+        }
+        character.StatPoint += returningStatPoint;
+        // Validating character skills
+        var returningSkillPoint = 0;
+        var characterSkills = character.Skills;
+        for (var i = characterSkills.Count - 1; i >= 0; --i)
+        {
+            var characterSkill = characterSkills[i];
+            // If skill is invalid or this character database does not have skill
+            if (characterSkill.GetSkill() == null || !database.CacheSkills.ContainsKey(characterSkill.skillId))
+            {
+                returningSkillPoint += characterSkill.level;
+                character.Skills.RemoveAt(i);
+            }
+        }
+        character.SkillPoint += returningSkillPoint;
+        // Validating character equip weapons
+        var returningItems = new List<CharacterItem>();
+        var equipWeapons = character.EquipWeapons;
+        var rightHand = equipWeapons.rightHand;
+        var leftHand = equipWeapons.leftHand;
+        if (rightHand.GetEquipmentItem() == null)
+        {
+            if (rightHand.IsValid())
+                returningItems.Add(rightHand);
+            equipWeapons.rightHand = CharacterItem.Empty;
+        }
+        if (leftHand.GetEquipmentItem() == null)
+        {
+            if (leftHand.IsValid())
+                returningItems.Add(leftHand);
+            equipWeapons.leftHand = CharacterItem.Empty;
+        }
+        // Validating character equip items
+        var equipItems = character.EquipItems;
+        for (var i = equipItems.Count - 1; i >= 0; --i)
+        {
+            var equipItem = equipItems[i];
+            // If equipment is invalid
+            if (equipItem.GetEquipmentItem() == null)
+            {
+                if (equipItem.IsValid())
+                    returningItems.Add(equipItem);
+                character.EquipItems.RemoveAt(i);
+            }
+        }
+        // Return items to non equip items
+        foreach (var returningItem in returningItems)
+        {
+            character.NonEquipItems.Add(returningItem);
+        }
+        // Validating character non equip items
+        var nonEquipItems = character.NonEquipItems;
+        for (var i = nonEquipItems.Count - 1; i >= 0; --i)
+        {
+            var nonEquipItem = nonEquipItems[i];
+            // If equipment is invalid
+            if (!nonEquipItem.IsValid())
+                character.NonEquipItems.RemoveAt(i);
+        }
+        return character;
+    }
+
     public static T SetNewCharacterData<T>(this T character, string characterName, string databaseId) where T : IPlayerCharacterData
     {
         var gameInstance = GameInstance.Singleton;
@@ -49,6 +132,14 @@ public static class PlayerCharacterDataExtension
             characterAttribute.attributeId = baseAttribute.attribute.Id;
             characterAttribute.amount = baseAttribute.amount;
             character.Attributes.Add(characterAttribute);
+        }
+        var skills = playerCharacterDatabase.skills;
+        foreach (var skill in skills)
+        {
+            var characterSkill = new CharacterSkill();
+            characterSkill.skillId = skill.Id;
+            characterSkill.level = 0;
+            character.Skills.Add(characterSkill);
         }
         // Right hand & left hand items
         var rightHandEquipItem = playerCharacterDatabase.rightHandEquipItem;
