@@ -126,11 +126,8 @@ public class UIEquipItems : UIBase
             uiItemDialog.Hide();
     }
 
-    public void UpdateData(CharacterEntity characterEntity)
+    public void UpdateData(ICharacterData characterData)
     {
-        if (characterEntity == null)
-            return;
-
         var slots = CacheEquipItemSlots.Values;
         // Clear slots data
         foreach (var slot in slots)
@@ -138,9 +135,12 @@ public class UIEquipItems : UIBase
             slot.Setup(CharacterItem.Empty, -1, string.Empty);
         }
 
+        if (characterData == null)
+            return;
+
         string tempPosition;
         UICharacterItem tempSlot;
-        var equipItems = characterEntity.equipItems;
+        var equipItems = characterData.EquipItems;
         for (var i = 0; i < equipItems.Count; ++i)
         {
             var equipItem = equipItems[i];
@@ -153,7 +153,7 @@ public class UIEquipItems : UIBase
                 tempSlot.Setup(equipItem, -1, tempPosition);
         }
 
-        var equipWeapons = characterEntity.EquipWeapons;
+        var equipWeapons = characterData.EquipWeapons;
         var rightHandEquipment = equipWeapons.rightHand.GetEquipmentItem();
         var leftHandEquipment = equipWeapons.leftHand.GetEquipmentItem();
         tempPosition = GameDataConst.EQUIP_POSITION_RIGHT_HAND;

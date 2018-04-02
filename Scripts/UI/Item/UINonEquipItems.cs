@@ -80,13 +80,14 @@ public class UINonEquipItems : UIBase
             uiItemDialog.Hide();
     }
 
-    public void UpdateData(CharacterEntity characterEntity)
+    public void UpdateData(ICharacterData characterData)
     {
-        if (characterEntity == null)
+        SelectionManager.Clear();
+
+        if (characterData == null)
             return;
 
-        SelectionManager.Clear();
-        var nonEquipItems = characterEntity.nonEquipItems;
+        var nonEquipItems = characterData.NonEquipItems;
         CacheList.Generate(nonEquipItems, (index, characterItem, ui) =>
         {
             var uiCharacterItem = ui.GetComponent<UICharacterItem>();
