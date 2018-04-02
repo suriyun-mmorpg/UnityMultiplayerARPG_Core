@@ -39,36 +39,58 @@ public static class PlayerCharacterDataExtension
         PlayerCharacterDatabase database;
         if (!GameInstance.PlayerCharacterDatabases.TryGetValue(character.DatabaseId, out database))
             return character;
-        // Player character database
-        var playerCharacterDatabase = database as PlayerCharacterDatabase;
         // Validating character attributes
         var returningStatPoint = 0;
+        var validAttributeIds = new HashSet<string>();
         var characterAttributes = character.Attributes;
         for (var i = characterAttributes.Count - 1; i >= 0; --i)
         {
             var characterAttribute = characterAttributes[i];
+            var attributeId = characterAttribute.attributeId;
             // If attribute is invalid
-            if (characterAttribute.GetAttribute() == null)
+            if (string.IsNullOrEmpty(attributeId) || 
+                characterAttribute.GetAttribute() == null ||
+                validAttributeIds.Contains(attributeId))
             {
                 returningStatPoint += characterAttribute.amount;
                 character.Attributes.RemoveAt(i);
             }
+            else
+                validAttributeIds.Add(attributeId);
         }
         character.StatPoint += returningStatPoint;
         // Validating character skills
         var returningSkillPoint = 0;
+        var validSkillIds = new HashSet<string>();
         var characterSkills = character.Skills;
         for (var i = characterSkills.Count - 1; i >= 0; --i)
         {
             var characterSkill = characterSkills[i];
+            var skillId = characterSkill.skillId;
             // If skill is invalid or this character database does not have skill
-            if (characterSkill.GetSkill() == null || !database.CacheSkills.ContainsKey(characterSkill.skillId))
+            if (string.IsNullOrEmpty(skillId) || 
+                characterSkill.GetSkill() == null || 
+                !database.CacheSkills.ContainsKey(skillId) || 
+                validSkillIds.Contains(skillId))
             {
                 returningSkillPoint += characterSkill.level;
                 character.Skills.RemoveAt(i);
             }
+            else
+                validSkillIds.Add(skillId);
         }
         character.SkillPoint += returningSkillPoint;
+        // Add character's skills
+        var skills = database.skills;
+        foreach (var skill in skills)
+        {
+            if (validSkillIds.Contains(skill.Id))
+                continue;
+            var characterSkill = new CharacterSkill();
+            characterSkill.skillId = skill.Id;
+            characterSkill.level = 0;
+            character.Skills.Add(characterSkill);
+        }
         // Validating character equip weapons
         var returningItems = new List<CharacterItem>();
         var equipWeapons = character.EquipWeapons;
