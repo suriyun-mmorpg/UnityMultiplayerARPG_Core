@@ -5,7 +5,37 @@ using UnityEngine;
 [RequireComponent(typeof(UIList)), RequireComponent(typeof(UICharacterSkillSelectionManager))]
 public class UICharacterSkills : UIBase
 {
+    public enum ListingMode
+    {
+        DefiningByCharacter,
+        Predefined,
+    }
     public UICharacterSkill uiSkillDialog;
+    [Tooltip("If listing mode is `Defining By Character` it will make list of skills by `UI List` component, with data from character. If it's `Predefined`, it will showing predefined skills")]
+    public ListingMode listingMode;
+
+    [Header("Predefined Listing Mode")]
+    public UICharacterSkillPair[] uiCharacterSkills;
+
+    private Dictionary<Skill, UICharacterSkill> cacheUICharacterSkills = null;
+    public Dictionary<Skill, UICharacterSkill> CacheUICharacterSkills
+    {
+        get
+        {
+            if (cacheUICharacterSkills == null)
+            {
+                cacheUICharacterSkills = new Dictionary<Skill, UICharacterSkill>();
+                foreach (var uiCharacterSkill in uiCharacterSkills)
+                {
+                    if (uiCharacterSkill.skill != null &&
+                        uiCharacterSkill.ui != null &&
+                        !cacheUICharacterSkills.ContainsKey(uiCharacterSkill.skill))
+                        cacheUICharacterSkills.Add(uiCharacterSkill.skill, uiCharacterSkill.ui);
+                }
+            }
+            return cacheUICharacterSkills;
+        }
+    }
 
     private UIList cacheList;
     public UIList CacheList
@@ -60,17 +90,44 @@ public class UICharacterSkills : UIBase
             uiSkillDialog.Hide();
     }
 
-    public void UpdateData(CharacterEntity characterEntity)
+    public void UpdateData(ICharacterData characterData)
     {
-        if (characterEntity == null)
-            return;
         SelectionManager.Clear();
-        var skillLevels = characterEntity.skills;
-        CacheList.Generate(skillLevels, (index, characterSkill, ui) =>
+
+        if (characterData == null)
         {
-            var uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
-            uiCharacterSkill.Setup(characterSkill, index);
-            SelectionManager.Add(uiCharacterSkill);
-        });
+            CacheList.HideAll();
+            return;
+        }
+
+        var characterSkills = characterData.Skills;
+        switch (listingMode)
+        {
+            case ListingMode.DefiningByCharacter:
+                CacheList.Generate(characterSkills, (index, characterSkill, ui) =>
+                {
+                    var uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
+                    uiCharacterSkill.Setup(new KeyValuePair<CharacterSkill, int>(characterSkill, characterSkill.level), index);
+                    SelectionManager.Add(uiCharacterSkill);
+                });
+                break;
+            case ListingMode.Predefined:
+                CacheList.HideAll();
+                for (var i = 0; i < characterSkills.Count; ++i)
+                {
+                    var characterSkill = characterSkills[i];
+                    var level = characterSkill.level;
+                    var skill = characterSkill.GetSkill();
+                    UICharacterSkill cacheUICharacterSkill;
+                    if (CacheUICharacterSkills.TryGetValue(skill, out cacheUICharacterSkill))
+                    {
+                        cacheUICharacterSkill.Setup(new KeyValuePair<CharacterSkill, int>(characterSkill, level), i);
+                        cacheUICharacterSkill.Show();
+                    }
+                    else
+                        cacheUICharacterSkill.Hide();
+                }
+                break;
+        }
     }
 }

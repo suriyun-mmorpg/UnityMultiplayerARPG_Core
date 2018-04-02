@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacterSkill : UISelectionEntry<CharacterSkill>
+public class UICharacterSkill : UISelectionEntry<KeyValuePair<CharacterSkill, int>>
 {
     public int indexOfData { get; protected set; }
 
@@ -51,7 +51,7 @@ public class UICharacterSkill : UISelectionEntry<CharacterSkill>
     public UISkillBuff uiSkillBuff;
     public UISkillBuff uiSkillDebuff;
 
-    public void Setup(CharacterSkill data, int indexOfData)
+    public void Setup(KeyValuePair<CharacterSkill, int> data, int indexOfData)
     {
         this.indexOfData = indexOfData;
         Data = data;
@@ -59,15 +59,16 @@ public class UICharacterSkill : UISelectionEntry<CharacterSkill>
 
     private void Update()
     {
-        var skill = Data.GetSkill();
-        var skillLevel = Data.level;
+        var characterSkill = Data.Key;
+        var skill = characterSkill.GetSkill();
+        var level = Data.Value;
 
         var owningCharacter = PlayerCharacterEntity.OwningCharacter;
         if (addButton != null)
-            addButton.interactable = Data.CanLevelUp(owningCharacter);
+            addButton.interactable = characterSkill.CanLevelUp(owningCharacter);
 
-        var coolDownRemainDuration = Data.coolDownRemainsDuration;
-        var coolDownDuration = skill.GetCoolDownDuration(skillLevel);
+        var coolDownRemainDuration = characterSkill.coolDownRemainsDuration;
+        var coolDownDuration = skill.GetCoolDownDuration(level);
 
         if (textCoolDownDuration != null)
             textCoolDownDuration.text = string.Format(coolDownDurationFormat, coolDownDuration.ToString("N0"));
@@ -81,8 +82,9 @@ public class UICharacterSkill : UISelectionEntry<CharacterSkill>
 
     protected override void UpdateData()
     {
-        var skill = Data.GetSkill();
-        var skillLevel = Data.level;
+        var characterSkill = Data.Key;
+        var skill = characterSkill.GetSkill();
+        var skillLevel = Data.Value;
 
         if (textTitle != null)
             textTitle.text = string.Format(titleFormat, skill == null ? "Unknow" : skill.title);
