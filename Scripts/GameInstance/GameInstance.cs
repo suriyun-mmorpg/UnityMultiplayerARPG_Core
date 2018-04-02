@@ -23,7 +23,8 @@ public class GameInstance : MonoBehaviour
     [Tooltip("Default weapon item, will be used when character not equip any weapon")]
     public Item defaultWeaponItem;
     public Item[] items;
-    public BaseCharacterDatabase[] characterDatabases;
+    public PlayerCharacterDatabase[] playerCharacterDatabases;
+    public MonsterCharacterDatabase[] monsterCharacterDatabases;
     public Attribute[] attributes;
     public int[] expTree;
     [Header("Gameplay Configs")]
@@ -184,7 +185,8 @@ public class GameInstance : MonoBehaviour
 
         AddAttributes(attributes);
         AddItems(items);
-        AddCharacterDatabases(characterDatabases);
+        AddCharacterDatabases(playerCharacterDatabases);
+        AddCharacterDatabases(monsterCharacterDatabases);
         AddItems(new Item[] { DefaultWeaponItem });
 
         var startItemsList = new List<Item>();
