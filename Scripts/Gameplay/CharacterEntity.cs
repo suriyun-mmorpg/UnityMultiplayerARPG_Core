@@ -1342,6 +1342,10 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
 
+    protected virtual void OnLevelUp()
+    {
+    }
+
     internal virtual void Respawn()
     {
         if (!IsServer)
@@ -1354,7 +1358,8 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     {
         if (!IsServer)
             return;
-        GameInstance.Singleton.GameplayRule.IncreaseExp(this, exp);
+        if (GameInstance.Singleton.GameplayRule.IncreaseExp(this, exp))
+            OnLevelUp();
     }
 
     protected abstract bool CanReceiveDamageFrom(CharacterEntity characterEntity);
