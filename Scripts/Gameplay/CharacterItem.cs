@@ -43,8 +43,7 @@ public struct CharacterItem
         if (string.IsNullOrEmpty(dirtyItemId) || !dirtyItemId.Equals(itemId))
         {
             dirtyItemId = itemId;
-            if (cacheItem == null)
-                cacheItem = GameInstance.Items.TryGetValue(itemId, out cacheItem) ? cacheItem : null;
+            cacheItem = GameInstance.Items.TryGetValue(itemId, out cacheItem) ? cacheItem : null;
             if (cacheItem != null)
             {
                 if (cacheItem.IsEquipment())

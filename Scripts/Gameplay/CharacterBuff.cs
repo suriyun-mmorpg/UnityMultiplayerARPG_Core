@@ -26,8 +26,7 @@ public struct CharacterBuff
         if (string.IsNullOrEmpty(dirtySkillId) || !dirtySkillId.Equals(skillId))
         {
             dirtySkillId = skillId;
-            if (cacheSkill == null)
-                cacheSkill = GameInstance.Skills.TryGetValue(skillId, out cacheSkill) ? cacheSkill : null;
+            cacheSkill = GameInstance.Skills.TryGetValue(skillId, out cacheSkill) ? cacheSkill : null;
         }
     }
 

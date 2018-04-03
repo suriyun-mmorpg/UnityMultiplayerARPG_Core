@@ -35,11 +35,25 @@ public struct CharacterHotkey
         if (string.IsNullOrEmpty(dirtyDataId) || !dirtyDataId.Equals(dataId))
         {
             dirtyDataId = dataId;
-            if (cacheSkill == null)
+            cacheSkill = null;
+            cacheItem = null;
+            if (type == HotkeyTypes.Skill)
                 cacheSkill = GameInstance.Skills.TryGetValue(dataId, out cacheSkill) ? cacheSkill : null;
-            if (cacheItem == null)
+            if (type == HotkeyTypes.Item)
                 cacheItem = GameInstance.Items.TryGetValue(dataId, out cacheItem) ? cacheItem : null;
         }
+    }
+    
+    public Skill GetSkill()
+    {
+        MakeCache();
+        return cacheSkill;
+    }
+
+    public Item GetItem()
+    {
+        MakeCache();
+        return cacheItem;
     }
 }
 

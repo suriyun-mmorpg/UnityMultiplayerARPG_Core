@@ -24,8 +24,7 @@ public struct CharacterAttribute
         if (string.IsNullOrEmpty(dirtyAttributeId) || !dirtyAttributeId.Equals(attributeId))
         {
             dirtyAttributeId = attributeId;
-            if (cacheAttribute == null)
-                cacheAttribute = GameInstance.Attributes.TryGetValue(attributeId, out cacheAttribute) ? cacheAttribute : null;
+            cacheAttribute = GameInstance.Attributes.TryGetValue(attributeId, out cacheAttribute) ? cacheAttribute : null;
         }
     }
 
