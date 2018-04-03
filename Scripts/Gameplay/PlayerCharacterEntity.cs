@@ -19,14 +19,6 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     public SyncFieldInt gold = new SyncFieldInt();
     #endregion
 
-    #region Net Functions
-    protected LiteNetLibFunction<NetFieldInt, NetFieldInt> netFuncSwapOrMergeItem;
-    protected LiteNetLibFunction<NetFieldInt> netFuncAddAttribute;
-    protected LiteNetLibFunction<NetFieldInt> netFuncAddSkill;
-    protected LiteNetLibFunction<NetFieldVector3, NetFieldUInt> netFuncPointClickMovement;
-    protected LiteNetLibFunction netFuncRespawn;
-    #endregion
-
     #region Interface implementation
     public string Id { get { return id; } set { id.Value = value; } }
     public int StatPoint { get { return statPoint.Value; } set { statPoint.Value = value; } }
@@ -302,7 +294,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
                     destination = null;
                 else
                     destination = targetPosition.Value;
-                PointClickMovement(targetPosition.Value, targetIdentity);
+                RequestPointClickMovement(targetPosition.Value, targetIdentity);
             }
         }
 
@@ -343,7 +335,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
             if (Vector3.Distance(CurrentPosition, targetMonster.CacheTransform.position) <= attackDistance)
             {
                 UpdateLookAtTargetEntityPosition(targetMonster);
-                Attack();
+                RequestAttack();
             }
             else
                 UpdateTargetEntityPosition(targetMonster);
@@ -365,7 +357,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
             if (Vector3.Distance(CurrentPosition, targetItemDrop.CacheTransform.position) <= pickUpItemDistance)
             {
                 UpdateLookAtTargetEntityPosition(targetItemDrop);
-                PickupItem(targetItemDrop.ObjectId);
+                RequestPickupItem(targetItemDrop.ObjectId);
             }
             else
                 UpdateTargetEntityPosition(targetItemDrop);
@@ -389,7 +381,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         var targetPosition = entity.CacheTransform.position;
         if (oldFollowTargetPosition != targetPosition)
         {
-            PointClickMovement(targetPosition, entity.Identity);
+            RequestPointClickMovement(targetPosition, entity.Identity);
             oldFollowTargetPosition = targetPosition;
             lookAtTargetUpdated = false;
         }
@@ -445,30 +437,19 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     public override void OnSetup()
     {
         base.OnSetup();
-
+        // Setup network components
         CacheNetTransform.ownerClientCanSendTransform = false;
         CacheNetTransform.ownerClientNotInterpolate = true;
-
-        netFuncSwapOrMergeItem = new LiteNetLibFunction<NetFieldInt, NetFieldInt>(NetFuncSwapOrMergeItemCallback);
-        netFuncAddAttribute = new LiteNetLibFunction<NetFieldInt>(NetFuncAddAttributeCallback);
-        netFuncAddSkill = new LiteNetLibFunction<NetFieldInt>(NetFuncAddSkillCallback);
-        netFuncPointClickMovement = new LiteNetLibFunction<NetFieldVector3, NetFieldUInt>(NetFuncPointClickMovementCallback);
-        netFuncRespawn = new LiteNetLibFunction(NetFuncRespawnCallback);
-
-        RegisterNetFunction("SwapOrMergeItem", netFuncSwapOrMergeItem);
-        RegisterNetFunction("AddAttribute", netFuncAddAttribute);
-        RegisterNetFunction("AddSkill", netFuncAddSkill);
-        RegisterNetFunction("PointClickMovement", netFuncPointClickMovement);
-        RegisterNetFunction("Respawn", netFuncRespawn);
+        // Register Network functions
+        RegisterNetFunction("SwapOrMergeItem", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((fromIndex, toIndex) => NetFuncSwapOrMergeItem(fromIndex, toIndex)));
+        RegisterNetFunction("AddAttribute", new LiteNetLibFunction<NetFieldInt>((attributeIndex) => NetFuncAddAttribute(attributeIndex)));
+        RegisterNetFunction("AddSkill", new LiteNetLibFunction<NetFieldInt>((skillIndex) => NetFuncAddSkill(skillIndex)));
+        RegisterNetFunction("PointClickMovement", new LiteNetLibFunction<NetFieldVector3, NetFieldUInt>((position, entityId) => NetFuncPointClickMovement(position, entityId)));
+        RegisterNetFunction("Respawn", new LiteNetLibFunction(NetFuncRespawn));
     }
     #endregion
 
     #region Net functions callbacks
-    protected void NetFuncSwapOrMergeItemCallback(NetFieldInt fromIndex, NetFieldInt toIndex)
-    {
-        NetFuncSwapOrMergeItem(fromIndex, toIndex);
-    }
-
     protected void NetFuncSwapOrMergeItem(int fromIndex, int toIndex)
     {
         if (CurrentHp <= 0 || 
@@ -511,11 +492,6 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         }
     }
 
-    protected void NetFuncAddAttributeCallback(NetFieldInt attributeIndex)
-    {
-        NetFuncAddAttribute(attributeIndex);
-    }
-
     protected void NetFuncAddAttribute(int attributeIndex)
     {
         if (CurrentHp <= 0 || attributeIndex < 0 || attributeIndex >= attributes.Count)
@@ -529,11 +505,6 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         attributes[attributeIndex] = attribute;
 
         --StatPoint;
-    }
-
-    protected void NetFuncAddSkillCallback(NetFieldInt skillIndex)
-    {
-        NetFuncAddSkill(skillIndex);
     }
 
     protected void NetFuncAddSkill(int skillIndex)
@@ -551,11 +522,6 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         --SkillPoint;
     }
 
-    protected void NetFuncPointClickMovementCallback(NetFieldVector3 position, NetFieldUInt entityId)
-    {
-        NetFuncPointClickMovement(position, entityId);
-    }
-
     protected void NetFuncPointClickMovement(Vector3 position, uint entityId)
     {
         SetTargetEntity(null);
@@ -568,35 +534,35 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         SetMovePaths(position);
     }
 
-    protected void NetFuncRespawnCallback()
+    protected void NetFuncRespawn()
     {
         Respawn();
     }
     #endregion
 
     #region Net functions callers
-    public void SwapOrMergeItem(int fromIndex, int toIndex)
+    public void RequestSwapOrMergeItem(int fromIndex, int toIndex)
     {
         if (CurrentHp <= 0)
             return;
         CallNetFunction("SwapOrMergeItem", FunctionReceivers.Server, fromIndex, toIndex);
     }
 
-    public void AddAttribute(int attributeIndex)
+    public void RequestAddAttribute(int attributeIndex)
     {
         if (CurrentHp <= 0)
             return;
         CallNetFunction("AddAttribute", FunctionReceivers.Server, attributeIndex);
     }
 
-    public void AddSkill(int skillIndex)
+    public void RequestAddSkill(int skillIndex)
     {
         if (CurrentHp <= 0)
             return;
         CallNetFunction("AddSkill", FunctionReceivers.Server, skillIndex);
     }
 
-    public void PointClickMovement(Vector3 position, LiteNetLibIdentity identity)
+    public void RequestPointClickMovement(Vector3 position, LiteNetLibIdentity identity)
     {
         if (CurrentHp <= 0)
             return;
@@ -612,7 +578,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     public void StopPointClickMove(LiteNetLibIdentity entity)
     {
         if (!pointClickMoveStopped)
-            PointClickMovement(CurrentPosition, entity);
+            RequestPointClickMovement(CurrentPosition, entity);
         pointClickMoveStopped = true;
     }
 

@@ -257,17 +257,17 @@ public class UICharacterItem : UISelectionEntry<KeyValuePair<CharacterItem, int>
                     var equipWeapons = owningCharacter.EquipWeapons;
                     var rightWeapon = equipWeapons.rightHand.GetWeaponItem();
                     if (rightWeapon != null && rightWeapon.EquipType == WeaponItemEquipType.OneHandCanDual)
-                        owningCharacter.EquipItem(indexOfData, GameDataConst.EQUIP_POSITION_LEFT_HAND);
+                        owningCharacter.RequestEquipItem(indexOfData, GameDataConst.EQUIP_POSITION_LEFT_HAND);
                     else
-                        owningCharacter.EquipItem(indexOfData, GameDataConst.EQUIP_POSITION_RIGHT_HAND);
+                        owningCharacter.RequestEquipItem(indexOfData, GameDataConst.EQUIP_POSITION_RIGHT_HAND);
                 }
                 else
-                    owningCharacter.EquipItem(indexOfData, GameDataConst.EQUIP_POSITION_RIGHT_HAND);
+                    owningCharacter.RequestEquipItem(indexOfData, GameDataConst.EQUIP_POSITION_RIGHT_HAND);
             }
             else if (shieldItem != null)
-                owningCharacter.EquipItem(indexOfData, GameDataConst.EQUIP_POSITION_LEFT_HAND);
+                owningCharacter.RequestEquipItem(indexOfData, GameDataConst.EQUIP_POSITION_LEFT_HAND);
             else if (armorItem != null)
-                owningCharacter.EquipItem(indexOfData, armorItem.EquipPosition);
+                owningCharacter.RequestEquipItem(indexOfData, armorItem.EquipPosition);
         }
     }
 
@@ -282,7 +282,7 @@ public class UICharacterItem : UISelectionEntry<KeyValuePair<CharacterItem, int>
 
         var owningCharacter = PlayerCharacterEntity.OwningCharacter;
         if (owningCharacter != null)
-            owningCharacter.UnEquipItem(equipPosition);
+            owningCharacter.RequestUnEquipItem(equipPosition);
     }
 
     private void OnClickDrop()
@@ -298,7 +298,7 @@ public class UICharacterItem : UISelectionEntry<KeyValuePair<CharacterItem, int>
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
             if (owningCharacter != null)
-                owningCharacter.DropItem(indexOfData, 1);
+                owningCharacter.RequestDropItem(indexOfData, 1);
         }
         else
             UISceneGlobal.Singleton.ShowInputDialog(dropInputTitle, dropInputDescription, OnDropAmountConfirmed, 1, characterItem.amount, characterItem.amount);
@@ -310,7 +310,7 @@ public class UICharacterItem : UISelectionEntry<KeyValuePair<CharacterItem, int>
         if (selectionManager != null)
             selectionManager.DeselectSelectedUI();
         if (owningCharacter != null)
-            owningCharacter.DropItem(indexOfData, amount);
+            owningCharacter.RequestDropItem(indexOfData, amount);
     }
 }
 

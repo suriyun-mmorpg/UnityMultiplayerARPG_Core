@@ -123,7 +123,7 @@ public class MonsterCharacterEntity : CharacterEntity
                 // slerp to the desired rotation over time
                 if (lookAtDirection.magnitude > 0)
                     CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(lookAtDirection), CacheNavMeshAgent.angularSpeed * Time.deltaTime);
-                Attack();
+                RequestAttack();
                 // TODO: Random to use skills
             }
             else

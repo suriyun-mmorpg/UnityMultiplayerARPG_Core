@@ -36,14 +36,6 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
     protected Vector3 previousPosition;
     protected Vector3 currentVelocity;
-    // Net Functions
-    protected LiteNetLibFunction netFuncAttack;
-    protected LiteNetLibFunction<NetFieldInt> netFuncUseSkill;
-    protected LiteNetLibFunction<NetFieldInt> netFuncPlayActionAnimation;
-    protected LiteNetLibFunction<NetFieldUInt> netFuncPickupItem;
-    protected LiteNetLibFunction<NetFieldInt, NetFieldInt> netFuncDropItem;
-    protected LiteNetLibFunction<NetFieldInt, NetFieldString> netFuncEquipItem;
-    protected LiteNetLibFunction<NetFieldString> netFuncUnEquipItem;
     #endregion
 
     #region Public data
@@ -313,22 +305,14 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         buffs.onOperation += OnBuffsOperation;
         equipItems.onOperation += OnEquipItemsOperation;
         nonEquipItems.onOperation += OnNonEquipItemsOperation;
-        // Setup Network functions
-        netFuncAttack = new LiteNetLibFunction(NetFuncAttackCallback);
-        netFuncUseSkill = new LiteNetLibFunction<NetFieldInt>(NetFuncUseSkillCallback);
-        netFuncPlayActionAnimation = new LiteNetLibFunction<NetFieldInt>(NetFuncPlayActionAnimationCallback);
-        netFuncPickupItem = new LiteNetLibFunction<NetFieldUInt>(NetFuncPickupItemCallback);
-        netFuncDropItem = new LiteNetLibFunction<NetFieldInt, NetFieldInt>(NetFuncDropItemCallback);
-        netFuncEquipItem = new LiteNetLibFunction<NetFieldInt, NetFieldString>(NetFuncEquipItemCallback);
-        netFuncUnEquipItem = new LiteNetLibFunction<NetFieldString>(NetFuncUnEquipItemCallback);
         // Register Network functions
-        RegisterNetFunction("Attack", netFuncAttack);
-        RegisterNetFunction("UseSkill", netFuncUseSkill);
-        RegisterNetFunction("PlayActionAnimation", netFuncPlayActionAnimation);
-        RegisterNetFunction("PickupItem", netFuncPickupItem);
-        RegisterNetFunction("DropItem", netFuncDropItem);
-        RegisterNetFunction("EquipItem", netFuncEquipItem);
-        RegisterNetFunction("UnEquipItem", netFuncUnEquipItem);
+        RegisterNetFunction("Attack", new LiteNetLibFunction(() => NetFuncAttack(1, null, CharacterBuff.Empty)));
+        RegisterNetFunction("UseSkill", new LiteNetLibFunction<NetFieldInt>((skillIndex) => NetFuncUseSkill(skillIndex)));
+        RegisterNetFunction("PlayActionAnimation", new LiteNetLibFunction<NetFieldInt>((actionId) => NetFuncPlayActionAnimation(actionId)));
+        RegisterNetFunction("PickupItem", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncPickupItem(objectId)));
+        RegisterNetFunction("DropItem", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((index, amount) => NetFuncDropItem(index, amount)));
+        RegisterNetFunction("EquipItem", new LiteNetLibFunction<NetFieldInt, NetFieldString>((nonEquipIndex, equipPosition) => NetFuncEquipItem(nonEquipIndex, equipPosition)));
+        RegisterNetFunction("UnEquipItem", new LiteNetLibFunction<NetFieldString>((fromEquipPosition) => NetFuncUnEquipItem(fromEquipPosition)));
     }
 
     protected virtual void OnDestroy()
@@ -346,10 +330,6 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Net functions callbacks
-    protected void NetFuncAttackCallback()
-    {
-        NetFuncAttack(1, null, CharacterBuff.Empty);
-    }
     /// <summary>
     /// Is function will be called at server to order character to attack
     /// </summary>
@@ -379,7 +359,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
 
         isDoingAction.Value = true;
         // Play animation on clients
-        PlayActionAnimation(actionId);
+        RequestPlayActionAnimation(actionId);
         // Start attack routine
         StartCoroutine(AttackRoutine(damageDuration, totalDuration, damageInfo, allDamageAttributes, debuff));
     }
@@ -425,7 +405,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         isDoingAction.Value = true;
         var anim = skill.castAnimation;
         // Play animation on clients
-        PlayActionAnimation(anim.Id);
+        RequestPlayActionAnimation(anim.Id);
         // Start use skill routine
         StartCoroutine(UseSkillRoutine(skillIndex));
     }
@@ -496,11 +476,6 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
 
-    protected void NetFuncPlayActionAnimationCallback(NetFieldInt actionId)
-    {
-        NetFuncPlayActionAnimation(actionId);
-    }
-
     /// <summary>
     /// This will be called at every clients to play any action animation
     /// </summary>
@@ -526,11 +501,6 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             yield return new WaitForSecondsRealtime(actionAnimation.ClipLength);
             animator.SetBool(ANIM_DO_ACTION, false);
         }
-    }
-
-    protected void NetFuncPickupItemCallback(NetFieldUInt objectId)
-    {
-        NetFuncPickupItem(objectId);
     }
 
     /// <summary>
@@ -568,11 +538,6 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             Manager.Assets.NetworkDestroy(objectId);
     }
 
-    protected void NetFuncDropItemCallback(NetFieldInt index, NetFieldInt amount)
-    {
-        NetFuncDropItem(index, amount);
-    }
-
     /// <summary>
     /// This will be called at server to order character to drop items
     /// </summary>
@@ -595,11 +560,6 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         var level = nonEquipItem.level;
         if (DecreaseItems(index, amount))
             ItemDropEntity.DropItem(this, itemId, level, amount);
-    }
-
-    protected void NetFuncEquipItemCallback(NetFieldInt nonEquipIndex, NetFieldString equipPosition)
-    {
-        NetFuncEquipItem(nonEquipIndex, equipPosition);
     }
 
     /// <summary>
@@ -650,11 +610,6 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         nonEquipItems.RemoveAt(nonEquipIndex);
     }
 
-    protected void NetFuncUnEquipItemCallback(NetFieldString fromEquipPosition)
-    {
-        NetFuncUnEquipItem(fromEquipPosition);
-    }
-
     /// <summary>
     /// This will be called at server to order character to unequip equipments
     /// </summary>
@@ -691,49 +646,49 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Net functions callers
-    public void Attack()
+    public void RequestAttack()
     {
         if (CurrentHp <= 0 || isDoingAction.Value)
             return;
         CallNetFunction("Attack", FunctionReceivers.Server);
     }
 
-    protected void UseSkill(int skillIndex)
+    protected void RequestUseSkill(int skillIndex)
     {
         if (CurrentHp <= 0 || isDoingAction.Value)
             return;
         CallNetFunction("UseSkill", FunctionReceivers.Server, skillIndex);
     }
 
-    public void PlayActionAnimation(int actionId)
+    public void RequestPlayActionAnimation(int actionId)
     {
         if (CurrentHp <= 0)
             return;
         CallNetFunction("PlayActionAnimation", FunctionReceivers.All, actionId);
     }
 
-    public void PickupItem(uint objectId)
+    public void RequestPickupItem(uint objectId)
     {
         if (CurrentHp <= 0 || isDoingAction.Value)
             return;
         CallNetFunction("PickupItem", FunctionReceivers.Server, objectId);
     }
 
-    public void DropItem(int index, int amount)
+    public void RequestDropItem(int index, int amount)
     {
         if (CurrentHp <= 0 || isDoingAction.Value)
             return;
         CallNetFunction("DropItem", FunctionReceivers.Server, index, amount);
     }
 
-    public void EquipItem(int nonEquipIndex, string equipPosition)
+    public void RequestEquipItem(int nonEquipIndex, string equipPosition)
     {
         if (CurrentHp <= 0 || isDoingAction.Value)
             return;
         CallNetFunction("EquipItem", FunctionReceivers.Server, nonEquipIndex, equipPosition);
     }
 
-    public void UnEquipItem(string equipPosition)
+    public void RequestUnEquipItem(string equipPosition)
     {
         if (CurrentHp <= 0 || isDoingAction.Value)
             return;
