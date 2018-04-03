@@ -14,6 +14,7 @@ public class PlayerCharacterData : CharacterData, IPlayerCharacterData
     public string respawnMapName;
     public Vector3 respawnPosition;
     public int lastUpdate;
+    public List<CharacterHotkey> hotkeys = new List<CharacterHotkey>();
 
     public string Id { get { return id; } set { id = value; } }
     public int StatPoint { get { return statPoint; } set { statPoint = value; } }
@@ -24,6 +25,16 @@ public class PlayerCharacterData : CharacterData, IPlayerCharacterData
     public string RespawnMapName { get { return respawnMapName; } set { respawnMapName = value; } }
     public Vector3 RespawnPosition { get { return respawnPosition; } set { respawnPosition = value; } }
     public int LastUpdate { get { return lastUpdate; } set { lastUpdate = value; } }
+    
+    public IList<CharacterHotkey> Hotkeys
+    {
+        get { return hotkeys; }
+        set
+        {
+            hotkeys = new List<CharacterHotkey>();
+            hotkeys.AddRange(value);
+        }
+    }
 }
 
 public class PlayerCharacterDataLastUpdateComparer : IComparer<PlayerCharacterData>

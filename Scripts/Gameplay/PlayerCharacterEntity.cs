@@ -17,6 +17,8 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     public SyncFieldInt statPoint = new SyncFieldInt();
     public SyncFieldInt skillPoint = new SyncFieldInt();
     public SyncFieldInt gold = new SyncFieldInt();
+    // List
+    public SyncListCharacterHotkey hotkeys = new SyncListCharacterHotkey();
     #endregion
 
     #region Interface implementation
@@ -29,6 +31,17 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     public string RespawnMapName { get; set; }
     public Vector3 RespawnPosition { get; set; }
     public int LastUpdate { get; set; }
+
+    public IList<CharacterHotkey> Hotkeys
+    {
+        get { return hotkeys; }
+        set
+        {
+            hotkeys.Clear();
+            foreach (var entry in value)
+                hotkeys.Add(entry);
+        }
+    }
     #endregion
 
     #region Settings
