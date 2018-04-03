@@ -368,9 +368,9 @@ public class MonsterCharacterEntity : CharacterEntity
         receivedDamageRecords[attacker] = receivedDamageRecord;
     }
 
-    protected override void OnDead(CharacterEntity lastAttacker, int lastDamage)
+    protected override void OnDead(CharacterEntity lastAttacker)
     {
-        base.OnDead(lastAttacker, lastDamage);
+        base.OnDead(lastAttacker);
         var maxHp = this.GetStats().hp;
         var randomedExp = Random.Range(database.randomExpMin, database.randomExpMax);
         var randomedGold = Random.Range(database.randomGoldMin, database.randomGoldMax);

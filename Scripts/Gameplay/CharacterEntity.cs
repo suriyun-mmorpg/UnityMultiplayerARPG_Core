@@ -977,7 +977,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         if (CurrentHp <= 0)
         {
             CurrentHp = 0;
-            OnDead(attacker, totalDamage);
+            OnDead(attacker);
         }
         else if (!debuff.IsEmpty())
         {
@@ -1283,7 +1283,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     {
     }
 
-    protected virtual void OnDead(CharacterEntity lastAttacker, int lastDamage)
+    protected virtual void OnDead(CharacterEntity lastAttacker)
     {
         StopAllCoroutines();
         isDoingAction.Value = false;
