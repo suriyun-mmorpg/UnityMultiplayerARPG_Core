@@ -7,12 +7,7 @@ using LiteNetLibHighLevel;
 using UnityEditor;
 #endif
 
-public enum CharacterAction
-{
-    None,
-    Attack,
-    Conversate,
-}
+
 
 [RequireComponent(typeof(CapsuleCollider))]
 public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
