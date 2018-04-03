@@ -1333,7 +1333,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     internal virtual void Respawn()
     {
-        if (!IsServer)
+        if (!IsServer || CurrentHp > 0)
             return;
         CurrentHp = this.GetMaxHp();
         CurrentMp = this.GetMaxMp();

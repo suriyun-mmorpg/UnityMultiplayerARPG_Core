@@ -409,7 +409,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
 
     internal override void Respawn()
     {
-        if (CurrentHp > 0)
+        if (!IsServer || CurrentHp > 0)
             return;
         base.Respawn();
         Warp(RespawnMapName, RespawnPosition);
@@ -459,6 +459,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         RegisterNetFunction("AddSkill", new LiteNetLibFunction<NetFieldInt>((skillIndex) => NetFuncAddSkill(skillIndex)));
         RegisterNetFunction("PointClickMovement", new LiteNetLibFunction<NetFieldVector3, NetFieldUInt>((position, entityId) => NetFuncPointClickMovement(position, entityId)));
         RegisterNetFunction("Respawn", new LiteNetLibFunction(NetFuncRespawn));
+        RegisterNetFunction("AssignHotkey", new LiteNetLibFunction<NetFieldInt, NetFieldByte, NetFieldString>((hotkeyIndex, type, dataId) => NetFuncAssignHotkey(hotkeyIndex, type, dataId)));
     }
     #endregion
 
@@ -537,6 +538,8 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
 
     protected void NetFuncPointClickMovement(Vector3 position, uint entityId)
     {
+        if (CurrentHp <= 0)
+            return;
         SetTargetEntity(null);
         LiteNetLibIdentity identity;
         if (Manager.Assets.SpawnedObjects.TryGetValue(entityId, out identity))
@@ -550,6 +553,16 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     protected void NetFuncRespawn()
     {
         Respawn();
+    }
+
+    protected void NetFuncAssignHotkey(int hotkeyIndex, byte type, string dataId)
+    {
+        if (hotkeyIndex < 0 || hotkeyIndex >= hotkeys.Count)
+            return;
+        var characterHotkey = new CharacterHotkey();
+        characterHotkey.type = (HotkeyTypes)type;
+        characterHotkey.dataId = dataId;
+        hotkeys[hotkeyIndex] = characterHotkey;
     }
     #endregion
 
@@ -598,6 +611,11 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     public void RequestRespawn()
     {
         CallNetFunction("Respawn", FunctionReceivers.Server);
+    }
+
+    public void AssignHotkey(int hotkeyIndex, HotkeyTypes type, string dataId)
+    {
+        CallNetFunction("AssignHotkey", FunctionReceivers.Server, hotkeyIndex, (byte)type, dataId);
     }
     #endregion
 

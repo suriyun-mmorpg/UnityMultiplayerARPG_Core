@@ -3,28 +3,43 @@ using System.Collections.Generic;
 using LiteNetLib.Utils;
 using LiteNetLibHighLevel;
 
+public enum HotkeyTypes : byte
+{
+    None,
+    Skill,
+    Item,
+}
+
 [System.Serializable]
 public struct CharacterHotkey
 {
-    public const byte HOTKEY_TYPE_NONE = 0;
-    public const byte HOTKEY_TYPE_SKILL = 1;
-    public const byte HOTKEY_TYPE_ITEM = 2;
+    public HotkeyTypes type;
+    public string dataId;
+    [System.NonSerialized]
+    private HotkeyTypes dirtyType;
+    [System.NonSerialized]
+    private string dirtyDataId;
+    [System.NonSerialized]
+    private Skill cacheSkill;
+    [System.NonSerialized]
+    private Item cacheItem;
 
-    public byte type;
-    public int dataIndex;
-
-    public CharacterSkill GetCharacterSkill(ICharacterData characterData)
+    private void MakeCache()
     {
-        if (type == HOTKEY_TYPE_SKILL && dataIndex >= 0 && dataIndex < characterData.Skills.Count)
-            return characterData.Skills[dataIndex];
-        return CharacterSkill.Empty;
-    }
-
-    public CharacterItem GetCharacterItem(ICharacterData characterData)
-    {
-        if (type == HOTKEY_TYPE_ITEM && dataIndex >= 0 && dataIndex < characterData.NonEquipItems.Count)
-            return characterData.NonEquipItems[dataIndex];
-        return CharacterItem.Empty;
+        if (type == HotkeyTypes.None || string.IsNullOrEmpty(dataId))
+        {
+            cacheSkill = null;
+            cacheItem = null;
+            return;
+        }
+        if (string.IsNullOrEmpty(dirtyDataId) || !dirtyDataId.Equals(dataId))
+        {
+            dirtyDataId = dataId;
+            if (cacheSkill == null)
+                cacheSkill = GameInstance.Skills.TryGetValue(dataId, out cacheSkill) ? cacheSkill : null;
+            if (cacheItem == null)
+                cacheItem = GameInstance.Items.TryGetValue(dataId, out cacheItem) ? cacheItem : null;
+        }
     }
 }
 
@@ -33,15 +48,15 @@ public class NetFieldCharacterHotkey : LiteNetLibNetField<CharacterHotkey>
     public override void Deserialize(NetDataReader reader)
     {
         var newValue = new CharacterHotkey();
-        newValue.type = reader.GetByte();
-        newValue.dataIndex = reader.GetInt();
+        newValue.type = (HotkeyTypes)reader.GetByte();
+        newValue.dataId = reader.GetString();
         Value = newValue;
     }
 
     public override void Serialize(NetDataWriter writer)
     {
-        writer.Put(Value.type);
-        writer.Put(Value.dataIndex);
+        writer.Put((byte)Value.type);
+        writer.Put(Value.dataId);
     }
 
     public override bool IsValueChanged(CharacterHotkey newValue)
