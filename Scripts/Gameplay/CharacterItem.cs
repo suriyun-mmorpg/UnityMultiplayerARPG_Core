@@ -16,8 +16,6 @@ public struct CharacterItem
     [System.NonSerialized]
     private string dirtyItemId;
     [System.NonSerialized]
-    private int dirtyLevel;
-    [System.NonSerialized]
     private Item cacheItem;
     [System.NonSerialized]
     private Item cacheEquipmentItem;
@@ -33,11 +31,18 @@ public struct CharacterItem
     private void MakeCache()
     {
         if (string.IsNullOrEmpty(itemId))
+        {
+            cacheItem = null;
+            cacheEquipmentItem = null;
+            cacheDefendItem = null;
+            cacheArmorItem = null;
+            cacheWeaponItem = null;
+            cacheShieldItem = null;
             return;
-        if (string.IsNullOrEmpty(dirtyItemId) || dirtyItemId.Equals(itemId) || level != dirtyLevel)
+        }
+        if (string.IsNullOrEmpty(dirtyItemId) || !dirtyItemId.Equals(itemId))
         {
             dirtyItemId = itemId;
-            dirtyLevel = level;
             if (cacheItem == null)
                 cacheItem = GameInstance.Items.TryGetValue(itemId, out cacheItem) ? cacheItem : null;
             if (cacheItem != null)

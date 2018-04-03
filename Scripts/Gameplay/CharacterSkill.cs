@@ -13,18 +13,18 @@ public struct CharacterSkill
     [System.NonSerialized]
     private string dirtySkillId;
     [System.NonSerialized]
-    private int dirtyLevel;
-    [System.NonSerialized]
     private Skill cacheSkill;
 
     private void MakeCache()
     {
         if (string.IsNullOrEmpty(skillId))
+        {
+            cacheSkill = null;
             return;
-        if (string.IsNullOrEmpty(dirtySkillId) || dirtySkillId.Equals(skillId) || level != dirtyLevel)
+        }
+        if (string.IsNullOrEmpty(dirtySkillId) || !dirtySkillId.Equals(skillId))
         {
             dirtySkillId = skillId;
-            dirtyLevel = level;
             if (cacheSkill == null)
                 cacheSkill = GameInstance.Skills.TryGetValue(skillId, out cacheSkill) ? cacheSkill : null;
         }

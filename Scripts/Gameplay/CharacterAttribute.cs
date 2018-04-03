@@ -12,18 +12,18 @@ public struct CharacterAttribute
     [System.NonSerialized]
     private string dirtyAttributeId;
     [System.NonSerialized]
-    private int dirtyAmount;
-    [System.NonSerialized]
     private Attribute cacheAttribute;
 
     private void MakeCache()
     {
         if (string.IsNullOrEmpty(attributeId))
+        {
+            cacheAttribute = null;
             return;
-        if (string.IsNullOrEmpty(dirtyAttributeId) || dirtyAttributeId.Equals(attributeId) || amount != dirtyAmount)
+        }
+        if (string.IsNullOrEmpty(dirtyAttributeId) || !dirtyAttributeId.Equals(attributeId))
         {
             dirtyAttributeId = attributeId;
-            dirtyAmount = amount;
             if (cacheAttribute == null)
                 cacheAttribute = GameInstance.Attributes.TryGetValue(attributeId, out cacheAttribute) ? cacheAttribute : null;
         }

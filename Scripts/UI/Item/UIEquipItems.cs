@@ -154,19 +154,21 @@ public class UIEquipItems : UIBase
         }
 
         var equipWeapons = characterData.EquipWeapons;
-        var rightHandEquipment = equipWeapons.rightHand.GetEquipmentItem();
-        var leftHandEquipment = equipWeapons.leftHand.GetEquipmentItem();
+        var rightHand = equipWeapons.rightHand;
+        var leftHand = equipWeapons.leftHand;
+        var rightHandEquipment = rightHand.GetEquipmentItem();
+        var leftHandEquipment = leftHand.GetEquipmentItem();
         tempPosition = GameDataConst.EQUIP_POSITION_RIGHT_HAND;
         if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
         {
             if (rightHandEquipment != null)
-                tempSlot.Setup(GetEmptyUIData(), -1, tempPosition);
+                tempSlot.Setup(new KeyValuePair<CharacterItem, int>(rightHand, rightHand.level), -1, tempPosition);
         }
         tempPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
         if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
         {
             if (leftHandEquipment != null)
-                tempSlot.Setup(GetEmptyUIData(), -1, tempPosition);
+                tempSlot.Setup(new KeyValuePair<CharacterItem, int>(leftHand, leftHand.level), -1, tempPosition);
         }
     }
 
