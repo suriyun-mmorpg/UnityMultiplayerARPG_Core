@@ -7,7 +7,15 @@ using LiteNetLibHighLevel;
 using UnityEditor;
 #endif
 
-
+public enum CombatAmountTypes : byte
+{
+    Miss,
+    NormalDamage,
+    CriticalDamage,
+    BlockedDamage,
+    HpRecovery,
+    MpRecovery,
+}
 
 [RequireComponent(typeof(CapsuleCollider))]
 public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
@@ -308,6 +316,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         RegisterNetFunction("DropItem", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((index, amount) => NetFuncDropItem(index, amount)));
         RegisterNetFunction("EquipItem", new LiteNetLibFunction<NetFieldInt, NetFieldString>((nonEquipIndex, equipPosition) => NetFuncEquipItem(nonEquipIndex, equipPosition)));
         RegisterNetFunction("UnEquipItem", new LiteNetLibFunction<NetFieldString>((fromEquipPosition) => NetFuncUnEquipItem(fromEquipPosition)));
+        RegisterNetFunction("CombatAmount", new LiteNetLibFunction<NetFieldByte, NetFieldInt>((combatAmountTypes, amount) => NetFuncCombatAmount((CombatAmountTypes)combatAmountTypes.Value, amount)));
     }
 
     protected virtual void OnDestroy()
@@ -638,6 +647,16 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         if (unEquipItem.IsValid())
             nonEquipItems.Add(unEquipItem);
     }
+
+    /// <summary>
+    /// This will be called on clients to display combat texts
+    /// </summary>
+    /// <param name="combatAmountTypes"></param>
+    /// <param name="amount"></param>
+    protected void NetFuncCombatAmount(CombatAmountTypes combatAmountTypes, int amount)
+    {
+
+    }
     #endregion
 
     #region Net functions callers
@@ -688,6 +707,11 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         if (CurrentHp <= 0 || isDoingAction.Value)
             return;
         CallNetFunction("UnEquipItem", FunctionReceivers.Server, equipPosition);
+    }
+
+    public void RequestCombatAmount(CombatAmountTypes combatAmountTypes, int amount)
+    {
+        CallNetFunction("CombatAmount", FunctionReceivers.All, combatAmountTypes, amount);
     }
     #endregion
 
@@ -933,7 +957,10 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         var hitChance = gameInstance.GameplayRule.GetHitChance(attacker, this);
         // If miss, return don't calculate damages
         if (Random.value > hitChance)
+        {
+            RequestCombatAmount(CombatAmountTypes.Miss, 0);
             return;
+        }
         // Calculate damages
         if (allDamageAttributes.Count > 0)
         {
@@ -948,18 +975,26 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
         // Calculate chance to critical
         var criticalChance = gameInstance.GameplayRule.GetCriticalChance(attacker, this);
+        var isCritical = Random.value <= criticalChance;
         // If critical occurs
-        if (Random.value <= criticalChance)
+        if (isCritical)
             calculatingTotalDamage = gameInstance.GameplayRule.GetCriticalDamage(attacker, this, calculatingTotalDamage);
         // Calculate chance to block
         var blockChance = gameInstance.GameplayRule.GetBlockChance(attacker, this);
+        var isBlocked = Random.value <= blockChance;
         // If block occurs
-        if (Random.value <= blockChance)
+        if (isBlocked)
             calculatingTotalDamage = gameInstance.GameplayRule.GetBlockDamage(attacker, this, calculatingTotalDamage);
         // Apply damages
         var totalDamage = (int)calculatingTotalDamage;
         CurrentHp -= totalDamage;
         OnReceivedDamage(attacker, totalDamage);
+        if (isBlocked)
+            RequestCombatAmount(CombatAmountTypes.BlockedDamage, totalDamage);
+        else if (isCritical)
+            RequestCombatAmount(CombatAmountTypes.CriticalDamage, totalDamage);
+        else
+            RequestCombatAmount(CombatAmountTypes.NormalDamage, totalDamage);
 
         if (model != null)
         {
