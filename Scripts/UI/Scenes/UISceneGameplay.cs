@@ -36,9 +36,15 @@ public class UISceneGameplay : MonoBehaviour
     {
         Singleton = this;
         if (buttonRespawn != null)
+        {
+            buttonRespawn.onClick.RemoveListener(OnClickRespawn);
             buttonRespawn.onClick.AddListener(OnClickRespawn);
+        }
         if (buttonExit != null)
+        {
+            buttonExit.onClick.RemoveListener(OnClickExit);
             buttonExit.onClick.AddListener(OnClickExit);
+        }
     }
 
     private void Update()
@@ -137,14 +143,14 @@ public class UISceneGameplay : MonoBehaviour
             uiNonEquipItems.SelectionManager.DeselectSelectedUI();
     }
 
-    private void OnClickRespawn()
+    public void OnClickRespawn()
     {
         var owningCharacter = PlayerCharacterEntity.OwningCharacter;
         if (owningCharacter != null)
             owningCharacter.RequestRespawn();
     }
 
-    private void OnClickExit()
+    public void OnClickExit()
     {
         var networkManager = FindObjectOfType<BaseRpgNetworkManager>();
         networkManager.StopHost();

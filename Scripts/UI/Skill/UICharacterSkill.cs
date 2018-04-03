@@ -35,7 +35,6 @@ public class UICharacterSkill : UISelectionEntry<KeyValuePair<CharacterSkill, in
     public Text textCoolDownDuration;
     public Text textCoolDownRemainsDuration;
     public Image imageCoolDownGage;
-    public Button addButton;
     public UISkillRequirement uiRequirement;
 
     [Header("Attack as Pure Skill Damage - UI Elements")]
@@ -51,10 +50,15 @@ public class UICharacterSkill : UISelectionEntry<KeyValuePair<CharacterSkill, in
     public UISkillBuff uiSkillBuff;
     public UISkillBuff uiSkillDebuff;
 
+    [Header("Events")]
+    public UnityEvent onSetLevelZeroData;
+    public UnityEvent onSetNonLevelZeroData;
+    public UnityEvent onAbleToLevelUp;
+    public UnityEvent onUnableToLevelUp;
+
     [Header("Options")]
     public UICharacterSkill uiNextLevelSkill;
-    public GameObject[] levelZeroDeactivateObjects;
-
+    
     public void Setup(KeyValuePair<CharacterSkill, int> data, int indexOfData)
     {
         this.indexOfData = indexOfData;
@@ -68,8 +72,10 @@ public class UICharacterSkill : UISelectionEntry<KeyValuePair<CharacterSkill, in
         var level = Data.Value;
 
         var owningCharacter = PlayerCharacterEntity.OwningCharacter;
-        if (addButton != null)
-            addButton.interactable = characterSkill.CanLevelUp(owningCharacter);
+        if (characterSkill.CanLevelUp(owningCharacter))
+            onAbleToLevelUp.Invoke();
+        else
+            onUnableToLevelUp.Invoke();
 
         var coolDownRemainDuration = characterSkill.coolDownRemainsDuration;
         var coolDownDuration = skill.GetCoolDownDuration(level);
@@ -90,16 +96,10 @@ public class UICharacterSkill : UISelectionEntry<KeyValuePair<CharacterSkill, in
         var skill = characterSkill.GetSkill();
         var level = Data.Value;
 
-        foreach (var levelZeroDeactivateObject in levelZeroDeactivateObjects)
-        {
-            levelZeroDeactivateObject.SetActive(level > 0);
-        }
-
-        if (addButton != null)
-        {
-            addButton.onClick.RemoveAllListeners();
-            addButton.onClick.AddListener(OnClickAdd);
-        }
+        if (level <= 0)
+            onSetLevelZeroData.Invoke();
+        else
+            onSetNonLevelZeroData.Invoke();
 
         if (textTitle != null)
             textTitle.text = string.Format(titleFormat, skill == null ? "Unknow" : skill.title);
@@ -202,7 +202,7 @@ public class UICharacterSkill : UISelectionEntry<KeyValuePair<CharacterSkill, in
         }
     }
 
-    private void OnClickAdd()
+    public void OnClickAdd()
     {
         if (selectionManager != null)
             selectionManager.DeselectSelectedUI();

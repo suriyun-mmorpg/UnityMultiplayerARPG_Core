@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class UICharacterAttribute : UISelectionEntry<KeyValuePair<CharacterAttribute, int>>
@@ -20,7 +21,10 @@ public class UICharacterAttribute : UISelectionEntry<KeyValuePair<CharacterAttri
     public Text textDescription;
     public Text textAmount;
     public Image imageIcon;
-    public Button addButton;
+
+    [Header("Events")]
+    public UnityEvent onAbleToIncrease;
+    public UnityEvent onUnableToIncrease;
 
     public void Setup(KeyValuePair<CharacterAttribute, int> data, int indexOfData)
     {
@@ -30,22 +34,21 @@ public class UICharacterAttribute : UISelectionEntry<KeyValuePair<CharacterAttri
 
     private void Update()
     {
+        var characterAttribute = Data.Key;
+
         var owningCharacter = PlayerCharacterEntity.OwningCharacter;
-        if (addButton != null)
-            addButton.interactable = Data.Key.CanIncrease(owningCharacter);
+        if (characterAttribute.CanIncrease(owningCharacter))
+            onAbleToIncrease.Invoke();
+        else
+            onUnableToIncrease.Invoke();
     }
 
     protected override void UpdateData()
     {
+        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
         var characterAttribute = Data.Key;
         var attribute = characterAttribute.GetAttribute();
         var amount = Data.Value;
-
-        if (addButton != null)
-        {
-            addButton.onClick.RemoveAllListeners();
-            addButton.onClick.AddListener(OnClickAdd);
-        }
 
         if (textTitle != null)
             textTitle.text = string.Format(titleFormat, attribute == null ? "Unknow" : attribute.title);
@@ -64,7 +67,7 @@ public class UICharacterAttribute : UISelectionEntry<KeyValuePair<CharacterAttri
         }
     }
 
-    private void OnClickAdd()
+    public void OnClickAdd()
     {
         var owningCharacter = PlayerCharacterEntity.OwningCharacter;
         if (owningCharacter != null)

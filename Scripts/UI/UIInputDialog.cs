@@ -127,7 +127,7 @@ public class UIInputDialog : UIBase
         Show();
     }
 
-    private void OnClickConfirm()
+    public void OnClickConfirm()
     {
         switch (contentType)
         {

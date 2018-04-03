@@ -102,28 +102,28 @@ public class UIMessageDialog : UIBase
         Show();
     }
 
-    private void OnClickOkay()
+    public void OnClickOkay()
     {
         if (onClickOkay != null)
             onClickOkay.Invoke();
         Hide();
     }
 
-    private void OnClickYes()
+    public void OnClickYes()
     {
         if (onClickYes != null)
             onClickYes.Invoke();
         Hide();
     }
 
-    private void OnClickNo()
+    public void OnClickNo()
     {
         if (onClickNo != null)
             onClickNo.Invoke();
         Hide();
     }
 
-    private void OnClickCancel()
+    public void OnClickCancel()
     {
         if (onClickCancel != null)
             onClickCancel.Invoke();

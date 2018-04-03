@@ -53,14 +53,14 @@ public class UICharacterItem : UISelectionEntry<KeyValuePair<CharacterItem, int>
     [Header("Weapon - UI Elements")]
     public UIDamageElementAmount uiDamageAttribute;
 
-    [Header("Action Buttons")]
-    public Button buttonEquip;
-    public Button buttonUnEquip;
-    public Button buttonDrop;
+    [Header("Events")]
+    public UnityEvent onSetLevelZeroData;
+    public UnityEvent onSetNonLevelZeroData;
+    public UnityEvent onSetEquippedData;
+    public UnityEvent onSetUnEquippedData;
 
     [Header("Options")]
     public UICharacterItem uiNextLevelItem;
-    public GameObject[] levelZeroDeactivateObjects;
     public bool hideAmountWhenMaxIsOne;
 
     public void Setup(KeyValuePair<CharacterItem, int> data, int indexOfData, string equipPosition)
@@ -79,32 +79,16 @@ public class UICharacterItem : UISelectionEntry<KeyValuePair<CharacterItem, int>
         var armorItem = characterItem.GetArmorItem();
         var weaponItem = characterItem.GetWeaponItem();
         var shieldItem = characterItem.GetShieldItem();
-        
-        foreach (var levelZeroDeactivateObject in levelZeroDeactivateObjects)
-        {
-            levelZeroDeactivateObject.SetActive(level > 0);
-        }
 
-        if (buttonEquip != null)
-        {
-            buttonEquip.gameObject.SetActive(string.IsNullOrEmpty(equipPosition));
-            buttonEquip.onClick.RemoveListener(OnClickEquip);
-            buttonEquip.onClick.AddListener(OnClickEquip);
-        }
+        if (level <= 0)
+            onSetLevelZeroData.Invoke();
+        else
+            onSetNonLevelZeroData.Invoke();
 
-        if (buttonUnEquip != null)
-        {
-            buttonUnEquip.gameObject.SetActive(!string.IsNullOrEmpty(equipPosition));
-            buttonUnEquip.onClick.RemoveListener(OnClickUnEquip);
-            buttonUnEquip.onClick.AddListener(OnClickUnEquip);
-        }
-
-        if (buttonDrop != null)
-        {
-            buttonDrop.gameObject.SetActive(string.IsNullOrEmpty(equipPosition));
-            buttonDrop.onClick.RemoveListener(OnClickDrop);
-            buttonDrop.onClick.AddListener(OnClickDrop);
-        }
+        if (!string.IsNullOrEmpty(equipPosition))
+            onSetEquippedData.Invoke();
+        else
+            onSetUnEquippedData.Invoke();
 
         if (textTitle != null)
             textTitle.text = string.Format(titleFormat, item == null ? "Unknow" : item.title);
@@ -234,7 +218,7 @@ public class UICharacterItem : UISelectionEntry<KeyValuePair<CharacterItem, int>
         }
     }
 
-    private void OnClickEquip()
+    public void OnClickEquip()
     {
         // Only unequpped equipment can be equipped
         if (!string.IsNullOrEmpty(equipPosition))
@@ -271,7 +255,7 @@ public class UICharacterItem : UISelectionEntry<KeyValuePair<CharacterItem, int>
         }
     }
 
-    private void OnClickUnEquip()
+    public void OnClickUnEquip()
     {
         // Only equipped equipment can be unequipped
         if (string.IsNullOrEmpty(equipPosition))
@@ -285,7 +269,7 @@ public class UICharacterItem : UISelectionEntry<KeyValuePair<CharacterItem, int>
             owningCharacter.RequestUnEquipItem(equipPosition);
     }
 
-    private void OnClickDrop()
+    public void OnClickDrop()
     {
         // Only unequpped equipment can be dropped
         if (!string.IsNullOrEmpty(equipPosition))
