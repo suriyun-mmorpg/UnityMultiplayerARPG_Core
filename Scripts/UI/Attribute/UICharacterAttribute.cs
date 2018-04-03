@@ -68,6 +68,6 @@ public class UICharacterAttribute : UISelectionEntry<KeyValuePair<CharacterAttri
     {
         var owningCharacter = PlayerCharacterEntity.OwningCharacter;
         if (owningCharacter != null)
-            owningCharacter.RequestAddAttribute(indexOfData);
+            owningCharacter.RequestAddAttribute(indexOfData, 1);
     }
 }

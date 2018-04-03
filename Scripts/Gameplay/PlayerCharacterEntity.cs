@@ -455,8 +455,8 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         CacheNetTransform.ownerClientNotInterpolate = true;
         // Register Network functions
         RegisterNetFunction("SwapOrMergeItem", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((fromIndex, toIndex) => NetFuncSwapOrMergeItem(fromIndex, toIndex)));
-        RegisterNetFunction("AddAttribute", new LiteNetLibFunction<NetFieldInt>((attributeIndex) => NetFuncAddAttribute(attributeIndex)));
-        RegisterNetFunction("AddSkill", new LiteNetLibFunction<NetFieldInt>((skillIndex) => NetFuncAddSkill(skillIndex)));
+        RegisterNetFunction("AddAttribute", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((attributeIndex, amount) => NetFuncAddAttribute(attributeIndex, amount)));
+        RegisterNetFunction("AddSkill", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((skillIndex, amount) => NetFuncAddSkill(skillIndex, amount)));
         RegisterNetFunction("PointClickMovement", new LiteNetLibFunction<NetFieldVector3, NetFieldUInt>((position, entityId) => NetFuncPointClickMovement(position, entityId)));
         RegisterNetFunction("Respawn", new LiteNetLibFunction(NetFuncRespawn));
         RegisterNetFunction("AssignHotkey", new LiteNetLibFunction<NetFieldInt, NetFieldByte, NetFieldString>((hotkeyIndex, type, dataId) => NetFuncAssignHotkey(hotkeyIndex, type, dataId)));
@@ -506,34 +506,34 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         }
     }
 
-    protected void NetFuncAddAttribute(int attributeIndex)
+    protected void NetFuncAddAttribute(int attributeIndex, int amount)
     {
-        if (CurrentHp <= 0 || attributeIndex < 0 || attributeIndex >= attributes.Count)
+        if (CurrentHp <= 0 || attributeIndex < 0 || attributeIndex >= attributes.Count || amount <= 0 || amount > StatPoint)
             return;
 
         var attribute = attributes[attributeIndex];
         if (!attribute.CanIncrease(this))
             return;
 
-        attribute.Increase(1);
+        attribute.Increase(amount);
         attributes[attributeIndex] = attribute;
 
-        --StatPoint;
+        StatPoint -= amount;
     }
 
-    protected void NetFuncAddSkill(int skillIndex)
+    protected void NetFuncAddSkill(int skillIndex, int amount)
     {
-        if (CurrentHp <= 0 || skillIndex < 0 || skillIndex >= skills.Count)
+        if (CurrentHp <= 0 || skillIndex < 0 || skillIndex >= skills.Count || amount <= 0 || amount > SkillPoint)
             return;
 
         var skill = skills[skillIndex];
         if (!skill.CanLevelUp(this))
             return;
 
-        skill.LevelUp(1);
+        skill.LevelUp(amount);
         skills[skillIndex] = skill;
 
-        --SkillPoint;
+        SkillPoint -= amount;
     }
 
     protected void NetFuncPointClickMovement(Vector3 position, uint entityId)
@@ -574,18 +574,18 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         CallNetFunction("SwapOrMergeItem", FunctionReceivers.Server, fromIndex, toIndex);
     }
 
-    public void RequestAddAttribute(int attributeIndex)
+    public void RequestAddAttribute(int attributeIndex, int amount)
     {
         if (CurrentHp <= 0)
             return;
-        CallNetFunction("AddAttribute", FunctionReceivers.Server, attributeIndex);
+        CallNetFunction("AddAttribute", FunctionReceivers.Server, attributeIndex, amount);
     }
 
-    public void RequestAddSkill(int skillIndex)
+    public void RequestAddSkill(int skillIndex, int amount)
     {
         if (CurrentHp <= 0)
             return;
-        CallNetFunction("AddSkill", FunctionReceivers.Server, skillIndex);
+        CallNetFunction("AddSkill", FunctionReceivers.Server, skillIndex, amount);
     }
 
     public void RequestPointClickMovement(Vector3 position, LiteNetLibIdentity identity)
@@ -601,19 +601,12 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         CallNetFunction("PointClickMovement", FunctionReceivers.Server, position, entityId);
     }
 
-    public void StopPointClickMove(LiteNetLibIdentity entity)
-    {
-        if (!pointClickMoveStopped)
-            RequestPointClickMovement(CurrentPosition, entity);
-        pointClickMoveStopped = true;
-    }
-
     public void RequestRespawn()
     {
         CallNetFunction("Respawn", FunctionReceivers.Server);
     }
 
-    public void AssignHotkey(int hotkeyIndex, HotkeyTypes type, string dataId)
+    public void RequestAssignHotkey(int hotkeyIndex, HotkeyTypes type, string dataId)
     {
         CallNetFunction("AssignHotkey", FunctionReceivers.Server, hotkeyIndex, (byte)type, dataId);
     }
@@ -693,6 +686,33 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         }
     }
     #endregion
+
+    public void StopPointClickMove(LiteNetLibIdentity entity)
+    {
+        if (!pointClickMoveStopped)
+            RequestPointClickMovement(CurrentPosition, entity);
+        pointClickMoveStopped = true;
+    }
+
+    public void UseHotkey(int hotkeyIndex)
+    {
+        if (hotkeyIndex < 0 || hotkeyIndex >= hotkeys.Count)
+            return;
+
+        var hotkey = hotkeys[hotkeyIndex];
+        var skill = hotkey.GetSkill();
+        if (skill != null)
+        {
+            var skillIndex = skills.IndexOf(skill.Id);
+            if (skillIndex >= 0)
+                RequestUseSkill(skillIndex);
+        }
+        var item = hotkey.GetItem();
+        if (item != null)
+        {
+            // TODO: Implement use item functions
+        }
+    }
 
     protected void SetMovePaths(Vector3 position)
     {

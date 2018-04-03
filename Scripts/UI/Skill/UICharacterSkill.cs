@@ -208,7 +208,7 @@ public class UICharacterSkill : UISelectionEntry<KeyValuePair<CharacterSkill, in
             selectionManager.DeselectSelectedUI();
 
         var owningCharacter = PlayerCharacterEntity.OwningCharacter;
-        owningCharacter.RequestAddSkill(indexOfData);
+        owningCharacter.RequestAddSkill(indexOfData, 1);
     }
 }
 
