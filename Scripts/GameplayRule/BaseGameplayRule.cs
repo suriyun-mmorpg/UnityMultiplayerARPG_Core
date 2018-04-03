@@ -10,5 +10,5 @@ public abstract class BaseGameplayRule : ScriptableObject
     public abstract float GetBlockChance(ICharacterData attacker, ICharacterData damageReceiver);
     public abstract float GetBlockDamage(ICharacterData attacker, ICharacterData damageReceiver, float damage);
     public abstract float GetDamageReducedByResistance(ICharacterData damageReceiver, float damageAmount, Resistance resistance);
-    public abstract void IncreaseExp(ICharacterData character, int exp);
+    public abstract bool IncreaseExp(ICharacterData character, int exp);
 }
