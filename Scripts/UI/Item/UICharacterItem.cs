@@ -111,7 +111,7 @@ public class UICharacterItem : UISelectionEntry<KeyValuePair<CharacterItem, int>
         if (textStack != null)
         {
             var stackString = "";
-            if (!hideAmountWhenMaxIsOne)
+            if (!hideAmountWhenMaxIsOne || characterItem.amount > 1)
             {
                 if (item == null)
                     stackString = string.Format(stackFormat, "0", "0");

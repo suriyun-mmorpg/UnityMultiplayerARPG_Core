@@ -58,7 +58,8 @@ public class UICharacterSkill : UISelectionEntry<KeyValuePair<CharacterSkill, in
 
     [Header("Options")]
     public UICharacterSkill uiNextLevelSkill;
-    
+    public bool hideRemainsDurationWhenIsZero;
+
     public void Setup(KeyValuePair<CharacterSkill, int> data, int indexOfData)
     {
         this.indexOfData = indexOfData;
@@ -84,7 +85,17 @@ public class UICharacterSkill : UISelectionEntry<KeyValuePair<CharacterSkill, in
             textCoolDownDuration.text = string.Format(coolDownDurationFormat, coolDownDuration.ToString("N0"));
 
         if (textCoolDownRemainsDuration != null)
-            textCoolDownRemainsDuration.text = string.Format(coolDownRemainsDurationFormat, coolDownRemainDuration.ToString("N0"));
+        {
+            var remainsDurationString = "";
+            if (!hideRemainsDurationWhenIsZero || characterSkill.coolDownRemainsDuration > 0)
+            {
+                if (skill == null)
+                    remainsDurationString = string.Format(coolDownRemainsDurationFormat, "0");
+                else
+                    remainsDurationString = string.Format(coolDownRemainsDurationFormat, coolDownRemainDuration.ToString("N0"));
+            }
+            textCoolDownRemainsDuration.text = remainsDurationString;
+        }
 
         if (imageCoolDownGage != null)
             imageCoolDownGage.fillAmount = coolDownDuration <= 0 ? 1 : coolDownRemainDuration / coolDownDuration;

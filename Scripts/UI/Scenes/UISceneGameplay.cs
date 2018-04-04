@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Events;
 
 public class UISceneGameplay : MonoBehaviour
 {
@@ -19,37 +19,34 @@ public class UISceneGameplay : MonoBehaviour
     public UIEquipItems uiEquipItems;
     public UINonEquipItems uiNonEquipItems;
     public UICharacterSkills uiSkills;
-    public UIBase uiDeadDialog;
+    public UICharacterHotkeys uiHotkeys;
     public UIToggleUI[] toggleUis;
-    public Button buttonRespawn;
-    public Button buttonExit;
-    
+
+    [Header("Events")]
+    public UnityEvent onAbleToRespawn;
+    public UnityEvent onUnableToRespawn;
+    public UnityEvent onCharacterDead;
+    public UnityEvent onCharacterRespawn;
+
     public UICharacterItem SelectedEquipItem { get; private set; }
     public UICharacterItem SelectedNonEquipItem { get; private set; }
     public UICharacterSkill SelectedSkillLevel { get; private set; }
 
     protected int lastCharacterHp = 0;
     protected CharacterEntity lastSelectedCharacter;
-    protected bool isDeadDialogShown;
 
     private void Awake()
     {
         Singleton = this;
-        if (buttonRespawn != null)
-        {
-            buttonRespawn.onClick.RemoveListener(OnClickRespawn);
-            buttonRespawn.onClick.AddListener(OnClickRespawn);
-        }
-        if (buttonExit != null)
-        {
-            buttonExit.onClick.RemoveListener(OnClickExit);
-            buttonExit.onClick.AddListener(OnClickExit);
-        }
     }
 
     private void Update()
     {
+        var currentCharacterHp = 0;
         var owningCharacter = PlayerCharacterEntity.OwningCharacter;
+        if (owningCharacter != null)
+            currentCharacterHp = owningCharacter.CurrentHp;
+
         foreach (var toggleUi in toggleUis)
         {
             if (Input.GetKeyDown(toggleUi.key))
@@ -58,9 +55,7 @@ public class UISceneGameplay : MonoBehaviour
                 ui.Toggle();
             }
         }
-        // Respawn button will show when character dead
-        if (buttonRespawn != null)
-            buttonRespawn.gameObject.SetActive(owningCharacter.CurrentHp <= 0);
+
         // Enemy status will be show when selected at enemy and enemy hp more than 0
         if (uiTargetCharacter != null)
         {
@@ -86,26 +81,21 @@ public class UISceneGameplay : MonoBehaviour
             }
         }
 
-        if (uiDeadDialog != null)
-        {
-            var currentCharacterHp = 0;
-            if (owningCharacter != null)
-                currentCharacterHp = owningCharacter.CurrentHp;
-            if (owningCharacter.CurrentHp <= 0)
-            {
-                // Avoid dead dialog showing when start game first time
-                if (!isDeadDialogShown && lastCharacterHp != owningCharacter.CurrentHp)
-                {
-                    uiDeadDialog.Show();
-                    isDeadDialogShown = true;
-                }
-            }
-            else
-                isDeadDialogShown = false;
-        }
+        // Event when character dead
+        if (owningCharacter.CurrentHp <= 0 && lastCharacterHp != owningCharacter.CurrentHp)
+            onCharacterDead.Invoke();
+        else if (lastCharacterHp != owningCharacter.CurrentHp)
+            onCharacterRespawn.Invoke();
 
+        // Respawn button will show when character dead
+        if (owningCharacter.CurrentHp <= 0)
+            onAbleToRespawn.Invoke();
+        else
+            onUnableToRespawn.Invoke();
+
+        // Update last character hp to compare on next frame
         if (owningCharacter != null)
-            lastCharacterHp = owningCharacter.CurrentHp;
+            lastCharacterHp = currentCharacterHp;
     }
 
     public void UpdateCharacter()
@@ -133,6 +123,12 @@ public class UISceneGameplay : MonoBehaviour
     {
         if (uiSkills != null)
             uiSkills.UpdateData(PlayerCharacterEntity.OwningCharacter);
+    }
+
+    public void UpdateHotkeys()
+    {
+        if (uiHotkeys != null)
+            uiHotkeys.UpdateData(PlayerCharacterEntity.OwningCharacter);
     }
 
     public void DeselectSelectedItem()

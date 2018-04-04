@@ -10,7 +10,8 @@ public enum ItemType
     Junk,
     Armor,
     Weapon,
-    Shield
+    Shield,
+    Potion,
 }
 
 [CreateAssetMenu(fileName = "Item", menuName = "Create GameData/Item")]
@@ -94,6 +95,11 @@ public class Item : BaseGameData
     public bool IsShield()
     {
         return itemType == ItemType.Shield;
+    }
+
+    public bool IsPotion()
+    {
+        return itemType == ItemType.Potion;
     }
 
     #region Cache Data

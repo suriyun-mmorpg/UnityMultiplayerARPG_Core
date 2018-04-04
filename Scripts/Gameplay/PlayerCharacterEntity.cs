@@ -445,6 +445,8 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         skillPoint.forOwnerOnly = true;
         gold.sendOptions = SendOptions.ReliableOrdered;
         gold.forOwnerOnly = false;
+
+        hotkeys.forOwnerOnly = true;
     }
 
     public override void OnSetup()
@@ -453,13 +455,15 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         // Setup network components
         CacheNetTransform.ownerClientCanSendTransform = false;
         CacheNetTransform.ownerClientNotInterpolate = true;
+        // On list changes events
+        hotkeys.onOperation += OnHotkeysOperation;
         // Register Network functions
         RegisterNetFunction("SwapOrMergeItem", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((fromIndex, toIndex) => NetFuncSwapOrMergeItem(fromIndex, toIndex)));
         RegisterNetFunction("AddAttribute", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((attributeIndex, amount) => NetFuncAddAttribute(attributeIndex, amount)));
         RegisterNetFunction("AddSkill", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((skillIndex, amount) => NetFuncAddSkill(skillIndex, amount)));
         RegisterNetFunction("PointClickMovement", new LiteNetLibFunction<NetFieldVector3, NetFieldUInt>((position, entityId) => NetFuncPointClickMovement(position, entityId)));
         RegisterNetFunction("Respawn", new LiteNetLibFunction(NetFuncRespawn));
-        RegisterNetFunction("AssignHotkey", new LiteNetLibFunction<NetFieldInt, NetFieldByte, NetFieldString>((hotkeyIndex, type, dataId) => NetFuncAssignHotkey(hotkeyIndex, type, dataId)));
+        RegisterNetFunction("AssignHotkey", new LiteNetLibFunction<NetFieldString, NetFieldByte, NetFieldString>((hotkeyId, type, dataId) => NetFuncAssignHotkey(hotkeyId, type, dataId)));
     }
     #endregion
 
@@ -555,14 +559,17 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         Respawn();
     }
 
-    protected void NetFuncAssignHotkey(int hotkeyIndex, byte type, string dataId)
+    protected void NetFuncAssignHotkey(string hotkeyId, byte type, string dataId)
     {
-        if (hotkeyIndex < 0 || hotkeyIndex >= hotkeys.Count)
-            return;
         var characterHotkey = new CharacterHotkey();
+        characterHotkey.hotkeyId = hotkeyId;
         characterHotkey.type = (HotkeyTypes)type;
         characterHotkey.dataId = dataId;
-        hotkeys[hotkeyIndex] = characterHotkey;
+        var hotkeyIndex = hotkeys.IndexOf(hotkeyId);
+        if (hotkeyIndex >= 0)
+            hotkeys[hotkeyIndex] = characterHotkey;
+        else
+            hotkeys.Add(characterHotkey);
     }
     #endregion
 
@@ -606,9 +613,9 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         CallNetFunction("Respawn", FunctionReceivers.Server);
     }
 
-    public void RequestAssignHotkey(int hotkeyIndex, HotkeyTypes type, string dataId)
+    public void RequestAssignHotkey(string hotkeyId, HotkeyTypes type, string dataId)
     {
-        CallNetFunction("AssignHotkey", FunctionReceivers.Server, hotkeyIndex, (byte)type, dataId);
+        CallNetFunction("AssignHotkey", FunctionReceivers.Server, hotkeyId, (byte)type, dataId);
     }
     #endregion
 
@@ -684,6 +691,12 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
             CacheUISceneGameplay.UpdateCharacter();
             CacheUISceneGameplay.UpdateNonEquipItems();
         }
+    }
+
+    protected virtual void OnHotkeysOperation(LiteNetLibSyncList.Operation operation, int index)
+    {
+        if (IsOwnerClient && CacheUISceneGameplay != null)
+            CacheUISceneGameplay.UpdateHotkeys();
     }
     #endregion
 
