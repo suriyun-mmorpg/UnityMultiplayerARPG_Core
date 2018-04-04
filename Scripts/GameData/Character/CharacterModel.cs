@@ -165,13 +165,26 @@ public class CharacterModel : MonoBehaviour
 
     public void SetEquipWeapons(EquipWeapons equipWeapons)
     {
-        // Clear equipped item models
-        DestroyCacheModel(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
-        DestroyCacheModel(GameDataConst.EQUIP_POSITION_LEFT_HAND);
-
         var rightHandWeapon = equipWeapons.rightHand.GetWeaponItem();
         var leftHandWeapon = equipWeapons.leftHand.GetWeaponItem();
         var leftHandShield = equipWeapons.leftHand.GetShieldItem();
+
+        // Clear equipped item models
+        var keepingKeys = new List<string>();
+        if (rightHandWeapon != null)
+            keepingKeys.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
+        if (leftHandWeapon != null || leftHandShield != null)
+            keepingKeys.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND);
+
+        var keys = new List<string>(cacheModels.Keys);
+        foreach (var key in keys)
+        {
+            if (!keepingKeys.Contains(key) &&
+                (key.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND) ||
+                key.Equals(GameDataConst.EQUIP_POSITION_LEFT_HAND)))
+                DestroyCacheModel(key);
+        }
+
         if (rightHandWeapon != null)
             InstantiateEquipModel(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandWeapon.equipmentModels);
         if (leftHandWeapon != null)
@@ -194,7 +207,9 @@ public class CharacterModel : MonoBehaviour
         var keys = new List<string>(cacheModels.Keys);
         foreach (var key in keys)
         {
-            if (!keepingKeys.Contains(key))
+            if (!keepingKeys.Contains(key) && 
+                !key.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND) &&
+                !key.Equals(GameDataConst.EQUIP_POSITION_LEFT_HAND))
                 DestroyCacheModel(key);
         }
 
@@ -206,8 +221,6 @@ public class CharacterModel : MonoBehaviour
             var equipPosition = armorItem.EquipPosition;
             if (keepingKeys.Contains(equipPosition))
                 InstantiateEquipModel(equipPosition, armorItem.equipmentModels);
-            else
-                DestroyCacheModel(equipPosition);
         }
     }
     
