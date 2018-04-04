@@ -93,7 +93,7 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
         }
 
         if (imageCoolDownGage != null)
-            imageCoolDownGage.fillAmount = coolDownDuration <= 0 ? 1 : coolDownRemainDuration / coolDownDuration;
+            imageCoolDownGage.fillAmount = coolDownDuration <= 0 ? 0 : coolDownRemainDuration / coolDownDuration;
     }
 
     protected override void UpdateData()

@@ -42,7 +42,7 @@ public class UICharacterBuff : UIDataForCharacter<CharacterBuff>
             textRemainsDuration.text = string.Format(buffRemainsDurationFormat, buffRemainDuration.ToString("N0"));
 
         if (imageDurationGage != null)
-            imageDurationGage.fillAmount = buffDuration <= 0 ? 1 : buffRemainDuration / buffDuration;
+            imageDurationGage.fillAmount = buffDuration <= 0 ? 0 : buffRemainDuration / buffDuration;
     }
 
     protected override void UpdateData()
