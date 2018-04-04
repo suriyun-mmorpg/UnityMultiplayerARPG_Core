@@ -94,7 +94,7 @@ public static class SkillExtension
 
     public static float GetBuffDuration(this Skill skill, int level)
     {
-        if (skill.IsBuff())
+        if (!skill.IsBuff())
             return 0f;
         level = skill.GetAdjustedLevel(level);
         var duration = skill.buff.GetDuration(level);
@@ -105,7 +105,7 @@ public static class SkillExtension
 
     public static int GetBuffRecoveryHp(this Skill skill, int level)
     {
-        if (skill.IsBuff())
+        if (!skill.IsBuff())
             return 0;
         level = skill.GetAdjustedLevel(level);
         return skill.buff.GetRecoveryHp(level);
@@ -113,7 +113,7 @@ public static class SkillExtension
 
     public static int GetBuffRecoveryMp(this Skill skill, int level)
     {
-        if (skill.IsBuff())
+        if (!skill.IsBuff())
             return 0;
         level = skill.GetAdjustedLevel(level);
         return skill.buff.GetRecoveryMp(level);
@@ -121,7 +121,7 @@ public static class SkillExtension
 
     public static CharacterStats GetBuffStats(this Skill skill, int level)
     {
-        if (skill.IsBuff())
+        if (!skill.IsBuff())
             return new CharacterStats();
         level = skill.GetAdjustedLevel(level);
         return skill.buff.GetStats(level);
@@ -129,7 +129,7 @@ public static class SkillExtension
 
     public static float GetDebuffDuration(this Skill skill, int level)
     {
-        if (skill.IsDebuff())
+        if (!skill.IsDebuff())
             return 0f;
         level = skill.GetAdjustedLevel(level);
         var duration = skill.debuff.GetDuration(level);
@@ -140,7 +140,7 @@ public static class SkillExtension
 
     public static int GetDebuffRecoveryHp(this Skill skill, int level)
     {
-        if (skill.IsDebuff())
+        if (!skill.IsDebuff())
             return 0;
         level = skill.GetAdjustedLevel(level);
         return skill.debuff.GetRecoveryHp(level);
@@ -148,7 +148,7 @@ public static class SkillExtension
 
     public static int GetDebuffRecoveryMp(this Skill skill, int level)
     {
-        if (skill.IsDebuff())
+        if (!skill.IsDebuff())
             return 0;
         level = skill.GetAdjustedLevel(level);
         return skill.debuff.GetRecoveryMp(level);
@@ -156,7 +156,7 @@ public static class SkillExtension
 
     public static CharacterStats GetDebuffStats(this Skill skill, int level)
     {
-        if (skill.IsDebuff())
+        if (!skill.IsDebuff())
             return new CharacterStats();
         level = skill.GetAdjustedLevel(level);
         return skill.debuff.GetStats(level);
