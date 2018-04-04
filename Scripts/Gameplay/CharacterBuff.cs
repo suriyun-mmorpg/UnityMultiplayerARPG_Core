@@ -101,14 +101,25 @@ public struct CharacterBuff
         return newBuff;
     }
 
-    public static CharacterBuff Create(Skill skill, int level, bool isDebuff)
+    public string GetBuffId()
+    {
+        return GetBuffId(skillId, isDebuff);
+    }
+
+    public static CharacterBuff Create(string skillId, bool isDebuff, int level)
     {
         var newBuff = new CharacterBuff();
-        newBuff.skillId = skill.Id;
-        newBuff.level = level;
+        newBuff.skillId = skillId;
         newBuff.isDebuff = isDebuff;
+        newBuff.level = level;
         newBuff.buffRemainsDuration = 0f;
         return newBuff;
+    }
+
+    public static string GetBuffId(string skillId, bool isDebuff)
+    {
+        var keyPrefix = isDebuff ? GameDataConst.CHARACTER_DEBUFF_PREFIX : GameDataConst.CHARACTER_BUFF_PREFIX;
+        return keyPrefix + skillId;
     }
 }
 
@@ -139,4 +150,22 @@ public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>
 }
 
 [System.Serializable]
-public class SyncListCharacterBuff : LiteNetLibSyncList<NetFieldCharacterBuff, CharacterBuff> { }
+public class SyncListCharacterBuff : LiteNetLibSyncList<NetFieldCharacterBuff, CharacterBuff>
+{
+    public int IndexOf(string skillId, bool isDebuff)
+    {
+        CharacterBuff tempBuff;
+        var index = -1;
+        for (var i = 0; i < list.Count; ++i)
+        {
+            tempBuff = list[i];
+            if (!string.IsNullOrEmpty(tempBuff.skillId) &&
+                tempBuff.skillId.Equals(skillId) && tempBuff.isDebuff == isDebuff)
+            {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+}

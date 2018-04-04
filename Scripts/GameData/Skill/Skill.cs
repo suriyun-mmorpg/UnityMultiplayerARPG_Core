@@ -25,6 +25,14 @@ public struct SkillBuff
     public CharacterStatsIncremental increaseStats;
     public AttributeIncremental[] increaseAttributes;
     public ResistanceIncremental[] increaseResistances;
+    public BuffEffect[] effects;
+}
+
+[System.Serializable]
+public struct BuffEffect
+{
+    public string effectSocket;
+    public GameEffect effect;
 }
 
 [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill")]

@@ -129,6 +129,11 @@ public class CharacterModel : MonoBehaviour
     /// </summary>
     private readonly Dictionary<string, Dictionary<string, GameObject>> cacheModels = new Dictionary<string, Dictionary<string, GameObject>>();
 
+    /// <summary>
+    /// Dictionary[equipPosition(String), List[effect(GameEffect)]]
+    /// </summary>
+    private readonly Dictionary<string, List<GameEffect>> cacheEffects = new Dictionary<string, List<GameEffect>>();
+
     private void CreateCacheModel(string equipPosition, Dictionary<string, GameObject> models)
     {
         DestroyCacheModel(equipPosition);
@@ -192,7 +197,7 @@ public class CharacterModel : MonoBehaviour
         if (leftHandShield != null)
             InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandShield.equipmentModels);
     }
-    
+
     public void SetEquipItems(IList<CharacterItem> equipItems)
     {
         // Clear equipped item models
@@ -207,7 +212,7 @@ public class CharacterModel : MonoBehaviour
         var keys = new List<string>(cacheModels.Keys);
         foreach (var key in keys)
         {
-            if (!keepingKeys.Contains(key) && 
+            if (!keepingKeys.Contains(key) &&
                 !key.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND) &&
                 !key.Equals(GameDataConst.EQUIP_POSITION_LEFT_HAND))
                 DestroyCacheModel(key);
@@ -223,7 +228,7 @@ public class CharacterModel : MonoBehaviour
                 InstantiateEquipModel(equipPosition, armorItem.equipmentModels);
         }
     }
-    
+
     private void InstantiateEquipModel(string equipPosition, EquipmentModel[] equipmentModels)
     {
         if (equipmentModels == null || equipmentModels.Length == 0)
@@ -249,6 +254,84 @@ public class CharacterModel : MonoBehaviour
             models.Add(equipSocket, newModel);
         }
         CreateCacheModel(equipPosition, models);
+    }
+
+    private void CreateCacheEffect(string buffId, List<GameEffect> effects)
+    {
+        DestroyCacheEffect(buffId);
+        if (effects == null)
+            return;
+        cacheEffects[buffId] = effects;
+    }
+
+    private void DestroyCacheEffect(string buffId)
+    {
+        List<GameEffect> oldEffects;
+        if (!string.IsNullOrEmpty(buffId) && cacheEffects.TryGetValue(buffId, out oldEffects) && oldEffects != null)
+        {
+            foreach (var effect in oldEffects)
+            {
+                effect.DestroyEffect();
+            }
+            cacheEffects.Remove(buffId);
+        }
+    }
+
+    public void SetBuffs(IList<CharacterBuff> buffs)
+    {
+        var keepingKeys = new List<string>();
+        foreach (var buff in buffs)
+        {
+            var buffId = buff.GetBuffId();
+            var skill = buff.GetSkill();
+            if (skill != null)
+                keepingKeys.Add(buffId);
+        }
+
+        var keys = new List<string>(cacheEffects.Keys);
+        foreach (var key in keys)
+        {
+            if (!keepingKeys.Contains(key))
+                DestroyCacheEffect(key);
+        }
+
+        foreach (var buff in buffs)
+        {
+            var buffId = buff.GetBuffId();
+            var isDebuff = buff.isDebuff;
+            if (keepingKeys.Contains(buffId))
+            {
+                var skill = buff.GetSkill();
+                var skillBuff = !isDebuff ? skill.buff : skill.debuff;
+                InstantiateBuffEffect(buffId, skillBuff.effects);
+            }
+        }
+    }
+
+    private void InstantiateBuffEffect(string buffId, BuffEffect[] buffEffects)
+    {
+        if (buffEffects == null || buffEffects.Length == 0)
+            return;
+        var gameInstance = GameInstance.Singleton;
+        var effects = new List<GameEffect>();
+        foreach (var buffEffect in buffEffects)
+        {
+            var effectSocket = buffEffect.effectSocket;
+            var effect = buffEffect.effect;
+            if (string.IsNullOrEmpty(effectSocket) || effect == null)
+                continue;
+            EffectContainer container;
+            if (!CacheEffectContainers.TryGetValue(effectSocket, out container))
+                continue;
+            var newEffect = Instantiate(effect, container.transform);
+            newEffect.transform.localPosition = Vector3.zero;
+            newEffect.transform.localEulerAngles = Vector3.zero;
+            newEffect.transform.localScale = Vector3.one;
+            newEffect.gameObject.SetActive(true);
+            newEffect.gameObject.layer = gameInstance.characterLayer;
+            effects.Add(newEffect);
+        }
+        CreateCacheEffect(buffId, effects);
     }
 
     public void ChangeActionClip(AnimationClip clip)

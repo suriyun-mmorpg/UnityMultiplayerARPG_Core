@@ -100,7 +100,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             for (var i = 0; i < value.Count; ++i)
             {
                 var entry = value[i];
-                var buffKey = GetBuffKey(entry.skillId, entry.isDebuff);
+                var buffKey = CharacterBuff.GetBuffId(entry.skillId, entry.isDebuff);
                 if (!buffIndexes.ContainsKey(buffKey))
                 {
                     buffIndexes.Add(buffKey, i);
@@ -436,7 +436,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         var allDamageAttributes = skill.GetAdditionalDamageAttributes(characterSkill.level);
         allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, baseDamageAttribute);
         var damageInfo = skill.damageInfo;
-        var debuff = skill.isDebuff ? CharacterBuff.Create(skill, characterSkill.level, true) : CharacterBuff.Empty;
+        var debuff = skill.isDebuff ? CharacterBuff.Create(skill.Id, true, characterSkill.level) : CharacterBuff.Empty;
         LaunchDamageEntity(damageInfo, allDamageAttributes, debuff);
     }
 
@@ -446,7 +446,10 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         if (skill == null)
             return;
 
-        NetFuncAttack(skill.GetInflictRate(characterSkill.level), skill.GetAdditionalDamageAttributes(characterSkill.level), skill.isDebuff ? CharacterBuff.Create(skill, characterSkill.level, true) : CharacterBuff.Empty);
+        NetFuncAttack(
+            skill.GetInflictRate(characterSkill.level), 
+            skill.GetAdditionalDamageAttributes(characterSkill.level), 
+            skill.isDebuff ? CharacterBuff.Create(characterSkill.skillId, true, characterSkill.level) : CharacterBuff.Empty);
     }
 
     protected void ApplySkillBuff(CharacterSkill characterSkill)
@@ -454,14 +457,14 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         var skill = characterSkill.GetSkill();
         if (skill.skillBuffType == SkillBuffType.BuffToUser)
         {
-            var buffKey = GetBuffKey(characterSkill.skillId, false);
+            var buffKey = CharacterBuff.GetBuffId(characterSkill.skillId, false);
             var buffIndex = -1;
             if (buffIndexes.TryGetValue(buffKey, out buffIndex))
             {
                 buffs.RemoveAt(buffIndex);
                 UpdateBuffIndexes();
             }
-            var characterBuff = CharacterBuff.Create(skill, characterSkill.level, false);
+            var characterBuff = CharacterBuff.Create(characterSkill.skillId, false, characterSkill.level);
             characterBuff.Added();
             buffs.Add(characterBuff);
             buffIndexes.Add(buffKey, buffs.Count - 1);
@@ -1000,7 +1003,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
         else if (!debuff.IsEmpty())
         {
-            var buffKey = GetBuffKey(debuff.skillId, debuff.isDebuff);
+            var buffKey = CharacterBuff.GetBuffId(debuff.skillId, debuff.isDebuff);
             var buffIndex = -1;
             if (buffIndexes.TryGetValue(buffKey, out buffIndex))
             {
@@ -1072,6 +1075,8 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="index"></param>
     protected virtual void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
+        if (model != null)
+            model.SetBuffs(buffs);
     }
 
     /// <summary>
@@ -1102,7 +1107,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         for (var i = 0; i < buffs.Count; ++i)
         {
             var entry = buffs[i];
-            var buffKey = GetBuffKey(entry.skillId, entry.isDebuff);
+            var buffKey = CharacterBuff.GetBuffId(entry.skillId, entry.isDebuff);
             if (!buffIndexes.ContainsKey(buffKey))
                 buffIndexes.Add(buffKey, i);
         }
@@ -1340,10 +1345,4 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     protected abstract bool CanReceiveDamageFrom(CharacterEntity characterEntity);
     protected abstract bool IsAlly(CharacterEntity characterEntity);
     protected abstract bool IsEnemy(CharacterEntity characterEntity);
-
-    public static string GetBuffKey(string skillId, bool isDebuff)
-    {
-        var keyPrefix = isDebuff ? GameDataConst.CHARACTER_DEBUFF_PREFIX : GameDataConst.CHARACTER_BUFF_PREFIX;
-        return keyPrefix + skillId;
-    }
 }
