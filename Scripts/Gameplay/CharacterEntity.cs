@@ -25,15 +25,9 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     public const string ANIM_Y_SPEED = "YSpeed";
     public const string ANIM_DO_ACTION = "DoAction";
     public const string ANIM_HURT = "Hurt";
-    public const float UPDATE_INTERVAL_SKILL_BUFF = 1f;
-
-    #region Private data
-    private RpgNetworkEntity targetEntity;
-    private float updatedSkillAndBuffTime;
-    #endregion
-
+    
     #region Protected data
-    // Entity data
+    protected RpgNetworkEntity targetEntity;
     protected CharacterModel model;
     protected readonly Dictionary<string, int> buffIndexes = new Dictionary<string, int>();
     protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
@@ -224,20 +218,18 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
 
-    protected void UpdateSkillAndBuff()
+    protected virtual void UpdateSkillAndBuff()
     {
         if (CurrentHp <= 0 || !IsServer)
             return;
-        var timeDiff = Time.realtimeSinceStartup - updatedSkillAndBuffTime;
         var count = skills.Count;
         for (var i = count - 1; i >= 0; --i)
         {
-            var level = skills[i];
-            if (level.ShouldUpdate())
+            var skill = skills[i];
+            if (skill.ShouldUpdate())
             {
-                level.Update(Time.unscaledDeltaTime);
-                if (timeDiff > UPDATE_INTERVAL_SKILL_BUFF)
-                    skills.Dirty(i);
+                skill.Update(Time.unscaledDeltaTime);
+                skills[i] = skill;
             }
         }
         count = buffs.Count;
@@ -252,12 +244,9 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             else
             {
                 buff.Update(Time.unscaledDeltaTime);
-                if (timeDiff > UPDATE_INTERVAL_SKILL_BUFF)
-                    buffs.Dirty(i);
+                buffs[i] = buff;
             }
         }
-        if (timeDiff > UPDATE_INTERVAL_SKILL_BUFF)
-            updatedSkillAndBuffTime = Time.realtimeSinceStartup;
     }
 
     #region Setup functions
@@ -399,13 +388,10 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             return;
 
         var characterSkill = skills[skillIndex];
-        if (!characterSkill.CanUse(CurrentMp))
+        if (!characterSkill.CanUse(this))
             return;
 
         var skill = characterSkill.GetSkill();
-        if (skill == null)
-            return;
-
         isDoingAction.Value = true;
         var anim = skill.castAnimation;
         // Play animation on clients
@@ -417,6 +403,10 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     IEnumerator UseSkillRoutine(int skillIndex)
     {
         var characterSkill = skills[skillIndex];
+        characterSkill.Used();
+        characterSkill.ReduceMp(this);
+        skills[skillIndex] = characterSkill;
+
         var skill = characterSkill.GetSkill();
         var anim = skill.castAnimation;
         yield return new WaitForSecondsRealtime(anim.TriggerDuration);
@@ -430,8 +420,6 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
                 break;
         }
         ApplySkillBuff(characterSkill);
-        skills[skillIndex].Used();
-        skills.Dirty(skillIndex);
         yield return new WaitForSecondsRealtime(anim.ClipLength - anim.TriggerDuration);
         isDoingAction.Value = false;
     }
@@ -952,13 +940,14 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         // Damage calculations apply at server only
         if (!IsServer || !CanReceiveDamageFrom(attacker) || CurrentHp <= 0)
             return;
+
         var gameInstance = GameInstance.Singleton;
         // Calculate chance to hit
         var hitChance = gameInstance.GameplayRule.GetHitChance(attacker, this);
         // If miss, return don't calculate damages
         if (Random.value > hitChance)
         {
-            RequestCombatAmount(CombatAmountTypes.Miss, 0);
+            OnReceivedDamage(attacker, CombatAmountTypes.Miss, 0);
             return;
         }
         // Calculate damages
@@ -988,13 +977,13 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         // Apply damages
         var totalDamage = (int)calculatingTotalDamage;
         CurrentHp -= totalDamage;
-        OnReceivedDamage(attacker, totalDamage);
+
         if (isBlocked)
-            RequestCombatAmount(CombatAmountTypes.BlockedDamage, totalDamage);
+            OnReceivedDamage(attacker, CombatAmountTypes.BlockedDamage, totalDamage);
         else if (isCritical)
-            RequestCombatAmount(CombatAmountTypes.CriticalDamage, totalDamage);
+            OnReceivedDamage(attacker, CombatAmountTypes.CriticalDamage, totalDamage);
         else
-            RequestCombatAmount(CombatAmountTypes.NormalDamage, totalDamage);
+            OnReceivedDamage(attacker, CombatAmountTypes.NormalDamage, totalDamage);
 
         if (model != null)
         {
@@ -1309,8 +1298,9 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         return CacheTransform;
     }
 
-    protected virtual void OnReceivedDamage(CharacterEntity attacker, int damage)
+    protected virtual void OnReceivedDamage(CharacterEntity attacker, CombatAmountTypes damageAmountType, int damage)
     {
+        RequestCombatAmount(damageAmountType, damage);
     }
 
     protected virtual void OnDead(CharacterEntity lastAttacker)

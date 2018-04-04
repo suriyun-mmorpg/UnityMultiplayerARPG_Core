@@ -4,10 +4,8 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacterAttribute : UISelectionEntry<KeyValuePair<CharacterAttribute, int>>
+public class UICharacterAttribute : UIDataForCharacter<KeyValuePair<CharacterAttribute, int>>
 {
-    public int indexOfData { get; protected set; }
-
     [Header("Generic Info Format")]
     [Tooltip("Title Format => {0} = {Title}")]
     public string titleFormat = "{0}";
@@ -25,19 +23,13 @@ public class UICharacterAttribute : UISelectionEntry<KeyValuePair<CharacterAttri
     [Header("Events")]
     public UnityEvent onAbleToIncrease;
     public UnityEvent onUnableToIncrease;
-
-    public void Setup(KeyValuePair<CharacterAttribute, int> data, int indexOfData)
-    {
-        this.indexOfData = indexOfData;
-        Data = data;
-    }
-
+    
     private void Update()
     {
         var characterAttribute = Data.Key;
-
-        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
-        if (characterAttribute.CanIncrease(owningCharacter))
+        var amount = Data.Value;
+        
+        if (IsOwningCharacter() && characterAttribute.CanIncrease(PlayerCharacterEntity.OwningCharacter))
             onAbleToIncrease.Invoke();
         else
             onUnableToIncrease.Invoke();
@@ -69,8 +61,10 @@ public class UICharacterAttribute : UISelectionEntry<KeyValuePair<CharacterAttri
 
     public void OnClickAdd()
     {
+        if (!IsOwningCharacter())
+            return;
+
         var owningCharacter = PlayerCharacterEntity.OwningCharacter;
-        if (owningCharacter != null)
-            owningCharacter.RequestAddAttribute(indexOfData, 1);
+        owningCharacter.RequestAddAttribute(indexOfData, 1);
     }
 }

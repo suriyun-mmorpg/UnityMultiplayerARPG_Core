@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacterBuff : UISelectionEntry<CharacterBuff>
+public class UICharacterBuff : UIDataForCharacter<CharacterBuff>
 {
     [Header("Generic Info Format")]
     [Tooltip("Title Format => {0} = {Title}")]
@@ -26,8 +26,14 @@ public class UICharacterBuff : UISelectionEntry<CharacterBuff>
 
     private void Update()
     {
-        var buffRemainDuration = Data.buffRemainsDuration;
-        var buffDuration = Data.GetDuration();
+        var characterBuff = Data;
+
+        // Update duration
+        if (character != null && indexOfData >= 0 && indexOfData < character.Buffs.Count)
+            characterBuff = character.Buffs[indexOfData];
+
+        var buffRemainDuration = characterBuff.buffRemainsDuration;
+        var buffDuration = characterBuff.GetDuration();
 
         if (textDuration != null)
             textDuration.text = string.Format(buffDurationFormat, buffDuration.ToString("N0"));

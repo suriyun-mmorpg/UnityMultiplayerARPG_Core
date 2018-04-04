@@ -5,6 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(UIList)), RequireComponent(typeof(UICharacterItemSelectionManager))]
 public class UINonEquipItems : UIBase
 {
+    public ICharacterData character { get; protected set; }
     public UICharacterItem uiItemDialog;
 
     private UIList cacheList;
@@ -60,7 +61,7 @@ public class UINonEquipItems : UIBase
         {
             uiItemDialog.Show();
             uiItemDialog.selectionManager = selectionManager;
-            uiItemDialog.Setup(ui.Data, ui.indexOfData, ui.equipPosition);
+            uiItemDialog.Setup(ui.Data, character, ui.indexOfData, ui.equipPosition);
         }
         else if (uiGameplay != null)
             uiGameplay.DeselectSelectedItem();
@@ -80,21 +81,23 @@ public class UINonEquipItems : UIBase
             uiItemDialog.Hide();
     }
 
-    public void UpdateData(ICharacterData characterData)
+    public void UpdateData(ICharacterData character)
     {
+        this.character = character;
         SelectionManager.Clear();
 
-        if (characterData == null)
+        if (character == null)
         {
             CacheList.HideAll();
             return;
         }
 
-        var nonEquipItems = characterData.NonEquipItems;
+        var nonEquipItems = character.NonEquipItems;
         CacheList.Generate(nonEquipItems, (index, characterItem, ui) =>
         {
             var uiCharacterItem = ui.GetComponent<UICharacterItem>();
-            uiCharacterItem.Setup(new KeyValuePair<CharacterItem, int>(characterItem, characterItem.level), index, string.Empty);
+            uiCharacterItem.Setup(new KeyValuePair<CharacterItem, int>(characterItem, characterItem.level), this.character, index, string.Empty);
+            uiCharacterItem.Show();
             SelectionManager.Add(uiCharacterItem);
         });
     }

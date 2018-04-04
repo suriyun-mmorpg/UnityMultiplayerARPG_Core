@@ -666,7 +666,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     protected override void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
         base.OnBuffsOperation(operation, index);
-
+        
         if (IsOwnerClient && CacheUISceneGameplay != null)
             CacheUISceneGameplay.UpdateCharacter();
     }

@@ -21,7 +21,10 @@ public class CharacterModel : MonoBehaviour
     private Transform missileDamageTransform;
     [Header("Equipment Containers")]
     [SerializeField]
-    private CharacterModelContainer[] equipmentContainers;
+    private EquipmentModelContainer[] equipmentContainers;
+    [Header("Effect Containers")]
+    [SerializeField]
+    private EffectContainer[] effectContainers;
 
     private Transform cacheTransform;
     public Transform CacheTransform
@@ -58,27 +61,6 @@ public class CharacterModel : MonoBehaviour
             return cacheAnimatorController;
         }
     }
-    
-    private Dictionary<string, CharacterModelContainer> cacheEquipmentContainers = null;
-    /// <summary>
-    /// Dictionary[equipSocket(String), container(CharacterModelContainer)]
-    /// </summary>
-    public Dictionary<string, CharacterModelContainer> CacheEquipmentContainers
-    {
-        get
-        {
-            if (cacheEquipmentContainers == null)
-            {
-                cacheEquipmentContainers = new Dictionary<string, CharacterModelContainer>();
-                foreach (var equipmentContainer in equipmentContainers)
-                {
-                    if (equipmentContainer.transform != null && !cacheEquipmentContainers.ContainsKey(equipmentContainer.equipSocket))
-                        cacheEquipmentContainers[equipmentContainer.equipSocket] = equipmentContainer;
-                }
-            }
-            return cacheEquipmentContainers;
-        }
-    }
 
     public Transform MeleeDamageTransform
     {
@@ -100,6 +82,48 @@ public class CharacterModel : MonoBehaviour
         }
     }
 
+    private Dictionary<string, EquipmentModelContainer> cacheEquipmentModelContainers = null;
+    /// <summary>
+    /// Dictionary[equipSocket(String), container(EquipmentModelContainer)]
+    /// </summary>
+    public Dictionary<string, EquipmentModelContainer> CacheEquipmentModelContainers
+    {
+        get
+        {
+            if (cacheEquipmentModelContainers == null)
+            {
+                cacheEquipmentModelContainers = new Dictionary<string, EquipmentModelContainer>();
+                foreach (var equipmentContainer in equipmentContainers)
+                {
+                    if (equipmentContainer.transform != null && !cacheEquipmentModelContainers.ContainsKey(equipmentContainer.equipSocket))
+                        cacheEquipmentModelContainers[equipmentContainer.equipSocket] = equipmentContainer;
+                }
+            }
+            return cacheEquipmentModelContainers;
+        }
+    }
+
+    private Dictionary<string, EffectContainer> cacheEffectContainers = null;
+    /// <summary>
+    /// Dictionary[effectSocket(String), container(CharacterModelContainer)]
+    /// </summary>
+    public Dictionary<string, EffectContainer> CacheEffectContainers
+    {
+        get
+        {
+            if (cacheEffectContainers == null)
+            {
+                cacheEffectContainers = new Dictionary<string, EffectContainer>();
+                foreach (var effectContainer in effectContainers)
+                {
+                    if (effectContainer.transform != null && !cacheEffectContainers.ContainsKey(effectContainer.effectSocket))
+                        cacheEffectContainers[effectContainer.effectSocket] = effectContainer;
+                }
+            }
+            return cacheEffectContainers;
+        }
+    }
+
     /// <summary>
     /// Dictionary[equipPosition(String), Dictionary[equipSocket(String), model(GameObject)]]
     /// </summary>
@@ -112,8 +136,8 @@ public class CharacterModel : MonoBehaviour
             return;
         foreach (var model in models)
         {
-            CharacterModelContainer container;
-            if (!CacheEquipmentContainers.TryGetValue(model.Key, out container))
+            EquipmentModelContainer container;
+            if (!CacheEquipmentModelContainers.TryGetValue(model.Key, out container))
                 continue;
             if (container.defaultModel != null)
                 container.defaultModel.SetActive(false);
@@ -129,8 +153,8 @@ public class CharacterModel : MonoBehaviour
             foreach (var model in oldModels)
             {
                 Destroy(model.Value);
-                CharacterModelContainer container;
-                if (!CacheEquipmentContainers.TryGetValue(model.Key, out container))
+                EquipmentModelContainer container;
+                if (!CacheEquipmentModelContainers.TryGetValue(model.Key, out container))
                     continue;
                 if (container.defaultModel != null)
                     container.defaultModel.SetActive(true);
@@ -159,20 +183,31 @@ public class CharacterModel : MonoBehaviour
     public void SetEquipItems(IList<CharacterItem> equipItems)
     {
         // Clear equipped item models
-        var keys = new List<string>(cacheModels.Keys);
-        foreach (var equipPosition in keys)
+        var keepingKeys = new List<string>();
+        foreach (var equipItem in equipItems)
         {
-            if (!GameDataConst.EQUIP_POSITION_RIGHT_HAND.Equals(equipPosition) &&
-                !GameDataConst.EQUIP_POSITION_LEFT_HAND.Equals(equipPosition))
-                DestroyCacheModel(equipPosition);
+            var armorItem = equipItem.GetArmorItem();
+            if (armorItem != null)
+                keepingKeys.Add(armorItem.EquipPosition);
+        }
+
+        var keys = new List<string>(cacheModels.Keys);
+        foreach (var key in keys)
+        {
+            if (!keepingKeys.Contains(key))
+                DestroyCacheModel(key);
         }
 
         foreach (var equipItem in equipItems)
         {
-            var equipmentItem = equipItem.GetEquipmentItem();
-            if (equipmentItem == null)
+            var armorItem = equipItem.GetArmorItem();
+            if (armorItem == null)
                 continue;
-            InstantiateEquipModel(equipmentItem.EquipPosition, equipmentItem.equipmentModels);
+            var equipPosition = armorItem.EquipPosition;
+            if (keepingKeys.Contains(equipPosition))
+                InstantiateEquipModel(equipPosition, armorItem.equipmentModels);
+            else
+                DestroyCacheModel(equipPosition);
         }
     }
     
@@ -188,8 +223,8 @@ public class CharacterModel : MonoBehaviour
             var model = equipmentModel.model;
             if (string.IsNullOrEmpty(equipSocket) || model == null)
                 continue;
-            CharacterModelContainer container;
-            if (!CacheEquipmentContainers.TryGetValue(equipSocket, out container))
+            EquipmentModelContainer container;
+            if (!CacheEquipmentModelContainers.TryGetValue(equipSocket, out container))
                 continue;
             var newModel = Instantiate(model, container.transform);
             newModel.transform.localPosition = Vector3.zero;
@@ -223,9 +258,16 @@ public class CharacterModel : MonoBehaviour
 }
 
 [System.Serializable]
-public struct CharacterModelContainer
+public struct EquipmentModelContainer
 {
     public string equipSocket;
     public GameObject defaultModel;
+    public Transform transform;
+}
+
+[System.Serializable]
+public struct EffectContainer
+{
+    public string effectSocket;
     public Transform transform;
 }

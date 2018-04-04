@@ -50,9 +50,16 @@ public struct CharacterSkill
         this.level += level;
     }
 
-    public bool CanUse(int currentMp)
+    public bool CanUse(ICharacterData character)
     {
-        return level >= 1 && coolDownRemainsDuration <= 0f && currentMp >= GetSkill().GetConsumeMp(level);
+        return GetSkill() != null && level >= 1 && coolDownRemainsDuration <= 0f && character.CurrentMp >= GetSkill().GetConsumeMp(level);
+    }
+
+    public void ReduceMp(ICharacterData character)
+    {
+        var consumeMp = GetSkill().GetConsumeMp(level);
+        if (character.CurrentMp >= consumeMp)
+            character.CurrentMp -= consumeMp;
     }
 
     public void Used()

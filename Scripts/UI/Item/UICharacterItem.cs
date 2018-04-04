@@ -4,9 +4,8 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacterItem : UISelectionEntry<KeyValuePair<CharacterItem, int>>
+public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, int>>
 {
-    public int indexOfData { get; protected set; }
     public string equipPosition { get; protected set; }
 
     [Header("Generic Info Format")]
@@ -63,11 +62,10 @@ public class UICharacterItem : UISelectionEntry<KeyValuePair<CharacterItem, int>
     public UICharacterItem uiNextLevelItem;
     public bool hideAmountWhenMaxIsOne;
 
-    public void Setup(KeyValuePair<CharacterItem, int> data, int indexOfData, string equipPosition)
+    public void Setup(KeyValuePair<CharacterItem, int> data, ICharacterData character, int indexOfData, string equipPosition)
     {
-        this.indexOfData = indexOfData;
+        Setup(data, character, indexOfData);
         this.equipPosition = equipPosition;
-        Data = data;
     }
 
     protected override void UpdateData()
@@ -212,7 +210,7 @@ public class UICharacterItem : UISelectionEntry<KeyValuePair<CharacterItem, int>
                 uiNextLevelItem.Hide();
             else
             {
-                uiNextLevelItem.Setup(new KeyValuePair<CharacterItem, int>(characterItem, level + 1), indexOfData, equipPosition);
+                uiNextLevelItem.Setup(new KeyValuePair<CharacterItem, int>(characterItem, level + 1), character, indexOfData, equipPosition);
                 uiNextLevelItem.Show();
             }
         }
@@ -221,7 +219,7 @@ public class UICharacterItem : UISelectionEntry<KeyValuePair<CharacterItem, int>
     public void OnClickEquip()
     {
         // Only unequpped equipment can be equipped
-        if (!string.IsNullOrEmpty(equipPosition))
+        if (!IsOwningCharacter() || !string.IsNullOrEmpty(equipPosition))
             return;
         
         if (selectionManager != null)
@@ -258,7 +256,7 @@ public class UICharacterItem : UISelectionEntry<KeyValuePair<CharacterItem, int>
     public void OnClickUnEquip()
     {
         // Only equipped equipment can be unequipped
-        if (string.IsNullOrEmpty(equipPosition))
+        if (!IsOwningCharacter() || string.IsNullOrEmpty(equipPosition))
             return;
 
         if (selectionManager != null)
@@ -272,7 +270,7 @@ public class UICharacterItem : UISelectionEntry<KeyValuePair<CharacterItem, int>
     public void OnClickDrop()
     {
         // Only unequpped equipment can be dropped
-        if (!string.IsNullOrEmpty(equipPosition))
+        if (!IsOwningCharacter() || !string.IsNullOrEmpty(equipPosition))
             return;
 
         var characterItem = Data.Key;

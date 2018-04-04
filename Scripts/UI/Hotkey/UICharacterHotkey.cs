@@ -41,7 +41,7 @@ public class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
                 if (index >= 0 && index < owningCharacter.skills.Count)
                 {
                     var characterSkill = owningCharacter.skills[index];
-                    uiCharacterSkill.Setup(new KeyValuePair<CharacterSkill, int>(characterSkill, characterSkill.level), index);
+                    uiCharacterSkill.Setup(new KeyValuePair<CharacterSkill, int>(characterSkill, characterSkill.level), owningCharacter, index);
                     uiCharacterSkill.Show();
                 }
                 else
@@ -59,7 +59,7 @@ public class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
                 if (index >= 0 && index < owningCharacter.nonEquipItems.Count)
                 {
                     var characterItem = owningCharacter.nonEquipItems[index];
-                    uiCharacterItem.Setup(new KeyValuePair<CharacterItem, int>(characterItem, characterItem.level), index, string.Empty);
+                    uiCharacterItem.Setup(new KeyValuePair<CharacterItem, int>(characterItem, characterItem.level), owningCharacter, index, string.Empty);
                     uiCharacterItem.Show();
                 }
                 else

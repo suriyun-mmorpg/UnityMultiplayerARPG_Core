@@ -5,6 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(UIList)), RequireComponent(typeof(UICharacterSkillSelectionManager))]
 public class UICharacterSkills : UIBase
 {
+    public ICharacterData character { get; protected set; }
     public enum ListingMode
     {
         DefiningByCharacter,
@@ -90,24 +91,25 @@ public class UICharacterSkills : UIBase
             uiSkillDialog.Hide();
     }
 
-    public void UpdateData(ICharacterData characterData)
+    public void UpdateData(ICharacterData character)
     {
+        this.character = character;
         SelectionManager.Clear();
 
-        if (characterData == null)
+        if (character == null)
         {
             CacheList.HideAll();
             return;
         }
 
-        var characterSkills = characterData.Skills;
+        var characterSkills = character.Skills;
         switch (listingMode)
         {
             case ListingMode.DefiningByCharacter:
                 CacheList.Generate(characterSkills, (index, characterSkill, ui) =>
                 {
                     var uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
-                    uiCharacterSkill.Setup(new KeyValuePair<CharacterSkill, int>(characterSkill, characterSkill.level), index);
+                    uiCharacterSkill.Setup(new KeyValuePair<CharacterSkill, int>(characterSkill, characterSkill.level), character, index);
                     uiCharacterSkill.Show();
                     SelectionManager.Add(uiCharacterSkill);
                 });
@@ -122,7 +124,7 @@ public class UICharacterSkills : UIBase
                     UICharacterSkill cacheUICharacterSkill;
                     if (CacheUICharacterSkills.TryGetValue(skill, out cacheUICharacterSkill))
                     {
-                        cacheUICharacterSkill.Setup(new KeyValuePair<CharacterSkill, int>(characterSkill, level), i);
+                        cacheUICharacterSkill.Setup(new KeyValuePair<CharacterSkill, int>(characterSkill, level), character, i);
                         cacheUICharacterSkill.Show();
                     }
                     else

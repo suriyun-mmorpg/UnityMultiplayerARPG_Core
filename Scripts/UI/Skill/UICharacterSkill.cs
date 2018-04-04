@@ -4,10 +4,8 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacterSkill : UISelectionEntry<KeyValuePair<CharacterSkill, int>>
+public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, int>>
 {
-    public int indexOfData { get; protected set; }
-
     [Header("Generic Info Format")]
     [Tooltip("Title Format => {0} = {Title}")]
     public string titleFormat = "{0}";
@@ -59,24 +57,21 @@ public class UICharacterSkill : UISelectionEntry<KeyValuePair<CharacterSkill, in
     [Header("Options")]
     public UICharacterSkill uiNextLevelSkill;
     public bool hideRemainsDurationWhenIsZero;
-
-    public void Setup(KeyValuePair<CharacterSkill, int> data, int indexOfData)
-    {
-        this.indexOfData = indexOfData;
-        Data = data;
-    }
-
+    
     private void Update()
     {
         var characterSkill = Data.Key;
         var skill = characterSkill.GetSkill();
         var level = Data.Value;
-
-        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
-        if (characterSkill.CanLevelUp(owningCharacter))
+        
+        if (IsOwningCharacter() && characterSkill.CanLevelUp(PlayerCharacterEntity.OwningCharacter))
             onAbleToLevelUp.Invoke();
         else
             onUnableToLevelUp.Invoke();
+
+        // Update duration
+        if (character != null && indexOfData >= 0 && indexOfData < character.Skills.Count)
+            characterSkill = character.Skills[indexOfData];
 
         var coolDownRemainDuration = characterSkill.coolDownRemainsDuration;
         var coolDownDuration = skill.GetCoolDownDuration(level);
@@ -207,7 +202,7 @@ public class UICharacterSkill : UISelectionEntry<KeyValuePair<CharacterSkill, in
                 uiNextLevelSkill.Hide();
             else
             {
-                uiNextLevelSkill.Setup(new KeyValuePair<CharacterSkill, int>(characterSkill, level + 1), indexOfData);
+                uiNextLevelSkill.Setup(new KeyValuePair<CharacterSkill, int>(characterSkill, level + 1), character, indexOfData);
                 uiNextLevelSkill.Show();
             }
         }
@@ -215,6 +210,9 @@ public class UICharacterSkill : UISelectionEntry<KeyValuePair<CharacterSkill, in
 
     public void OnClickAdd()
     {
+        if (!IsOwningCharacter())
+            return;
+
         if (selectionManager != null)
             selectionManager.DeselectSelectedUI();
 

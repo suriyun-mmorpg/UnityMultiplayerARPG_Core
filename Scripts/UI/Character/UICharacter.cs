@@ -159,9 +159,6 @@ public class UICharacter : UISelectionEntry<ICharacterData>
 
         if (textGold != null)
             textGold.text = string.Format(goldFormat, playerCharacter == null ? "N/A" : playerCharacter.Gold.ToString("N0"));
-        
-        if (uiCharacterBuffs != null)
-            uiCharacterBuffs.Data = Data;
     }
 
     protected override void UpdateData()
@@ -246,14 +243,17 @@ public class UICharacter : UISelectionEntry<ICharacterData>
                 if (CacheUICharacterAttributes.TryGetValue(attribute, out cacheUICharacterAttribute) &&
                     displayingAttributes.TryGetValue(attribute, out amount))
                 {
-                    cacheUICharacterAttribute.Setup(new KeyValuePair<CharacterAttribute, int>(characterAttribute, amount), i);
+                    cacheUICharacterAttribute.Setup(new KeyValuePair<CharacterAttribute, int>(characterAttribute, amount), Data, i);
                     cacheUICharacterAttribute.Show();
                 }
                 else
                     cacheUICharacterAttribute.Hide();
             }
         }
-        
+
+        if (uiCharacterBuffs != null)
+            uiCharacterBuffs.UpdateData(Data);
+
         var characterDatabase = Data == null ? null : Data.GetDatabase();
         if (textClassTitle != null)
             textClassTitle.text = string.Format(classTitleFormat, characterDatabase == null ? "N/A" : characterDatabase.title);

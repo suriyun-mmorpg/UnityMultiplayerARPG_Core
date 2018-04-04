@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(UIList))]
-public class UICharacterBuffs : UISelectionEntry<ICharacterData>
+public class UICharacterBuffs : UIBase
 {
+    public ICharacterData character { get; protected set; }
     private UIList cacheList;
     public UIList CacheList
     {
@@ -16,16 +17,22 @@ public class UICharacterBuffs : UISelectionEntry<ICharacterData>
         }
     }
 
-    protected override void UpdateData()
+    public void UpdateData(ICharacterData character)
     {
-        if (Data == null)
-            return;
+        this.character = character;
 
-        var buffs = Data.Buffs;
+        if (character == null)
+        {
+            CacheList.HideAll();
+            return;
+        }
+
+        var buffs = character.Buffs;
         CacheList.Generate(buffs, (index, characterBuff, ui) =>
         {
             var uiCharacterBuff = ui.GetComponent<UICharacterBuff>();
-            uiCharacterBuff.Data = characterBuff;
+            uiCharacterBuff.Setup(characterBuff, character, index);
+            uiCharacterBuff.Show();
         });
     }
 }
