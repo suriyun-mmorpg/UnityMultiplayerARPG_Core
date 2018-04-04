@@ -5,7 +5,6 @@ using UnityEngine;
 [System.Serializable]
 public class PlayerCharacterData : CharacterData, IPlayerCharacterData
 {
-    public string id;
     public int statPoint;
     public int skillPoint;
     public int gold;
@@ -16,7 +15,6 @@ public class PlayerCharacterData : CharacterData, IPlayerCharacterData
     public int lastUpdate;
     public List<CharacterHotkey> hotkeys = new List<CharacterHotkey>();
 
-    public string Id { get { return id; } set { id = value; } }
     public int StatPoint { get { return statPoint; } set { statPoint = value; } }
     public int SkillPoint { get { return skillPoint; } set { skillPoint = value; } }
     public int Gold { get { return gold; } set { gold = value; } }

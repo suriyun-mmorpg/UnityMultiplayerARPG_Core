@@ -4,6 +4,7 @@ using UnityEngine;
 
 public interface ICharacterData
 {
+    string Id { get; set; }
     string DatabaseId { get; set; }
     string CharacterName { get; set; }
     int Level { get; set; }

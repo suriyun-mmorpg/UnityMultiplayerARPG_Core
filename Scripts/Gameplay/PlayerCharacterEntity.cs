@@ -13,7 +13,6 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     public static PlayerCharacterEntity OwningCharacter { get; private set; }
 
     #region Sync data
-    public SyncFieldString id = new SyncFieldString();
     public SyncFieldInt statPoint = new SyncFieldInt();
     public SyncFieldInt skillPoint = new SyncFieldInt();
     public SyncFieldInt gold = new SyncFieldInt();
@@ -22,7 +21,6 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     #endregion
 
     #region Interface implementation
-    public string Id { get { return id; } set { id.Value = value; } }
     public int StatPoint { get { return statPoint.Value; } set { statPoint.Value = value; } }
     public int SkillPoint { get { return skillPoint.Value; } set { skillPoint.Value = value; } }
     public int Gold { get { return gold.Value; } set { gold.Value = value; } }
@@ -437,8 +435,6 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     protected override void SetupNetElements()
     {
         base.SetupNetElements();
-        id.sendOptions = SendOptions.ReliableOrdered;
-        id.forOwnerOnly = false;
         statPoint.sendOptions = SendOptions.ReliableOrdered;
         statPoint.forOwnerOnly = true;
         skillPoint.sendOptions = SendOptions.ReliableOrdered;

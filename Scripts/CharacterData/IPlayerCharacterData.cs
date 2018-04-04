@@ -3,7 +3,6 @@ using UnityEngine;
 
 public interface IPlayerCharacterData : ICharacterData
 {
-    string Id { get; set; }
     int StatPoint { get; set; }
     int SkillPoint { get; set; }
     int Gold { get; set; }

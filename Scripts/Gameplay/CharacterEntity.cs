@@ -43,6 +43,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     // Use id as primary key
     #region Sync data
+    public SyncFieldString id = new SyncFieldString();
     public SyncFieldString databaseId = new SyncFieldString();
     public SyncFieldString characterName = new SyncFieldString();
     public SyncFieldInt level = new SyncFieldInt();
@@ -60,6 +61,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Interface implementation
+    public virtual string Id { get { return id; } set { id.Value = value; } }
     public virtual string DatabaseId { get { return databaseId; } set { databaseId.Value = value; } }
     public virtual string CharacterName { get { return characterName; } set { characterName.Value = value; } }
     public virtual int Level { get { return level.Value; } set { level.Value = value; } }
@@ -261,10 +263,12 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected virtual void SetupNetElements()
     {
-        characterName.sendOptions = SendOptions.ReliableOrdered;
-        characterName.forOwnerOnly = false;
+        id.sendOptions = SendOptions.ReliableOrdered;
+        id.forOwnerOnly = false;
         databaseId.sendOptions = SendOptions.ReliableOrdered;
         databaseId.forOwnerOnly = false;
+        characterName.sendOptions = SendOptions.ReliableOrdered;
+        characterName.forOwnerOnly = false;
         level.sendOptions = SendOptions.ReliableOrdered;
         level.forOwnerOnly = false;
         exp.sendOptions = SendOptions.ReliableOrdered;

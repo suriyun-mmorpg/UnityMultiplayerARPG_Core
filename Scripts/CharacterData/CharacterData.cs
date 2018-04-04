@@ -5,6 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class CharacterData : ICharacterData
 {
+    public string id;
     public string databaseId;
     public string characterName;
     public int level;
@@ -18,7 +19,8 @@ public class CharacterData : ICharacterData
     public List<CharacterBuff> buffs = new List<CharacterBuff>();
     public List<CharacterItem> equipItems = new List<CharacterItem>();
     public List<CharacterItem> nonEquipItems = new List<CharacterItem>();
-    
+
+    public string Id { get { return id; } set { id = value; } }
     public string DatabaseId { get { return databaseId; } set { databaseId = value; } }
     public string CharacterName { get { return characterName; } set { characterName = value; } }
     public int Level { get { return level; } set { level = value; } }
