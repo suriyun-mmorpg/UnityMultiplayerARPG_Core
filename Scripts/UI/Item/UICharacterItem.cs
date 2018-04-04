@@ -64,8 +64,8 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
 
     public void Setup(KeyValuePair<CharacterItem, int> data, ICharacterData character, int indexOfData, string equipPosition)
     {
-        Setup(data, character, indexOfData);
         this.equipPosition = equipPosition;
+        Setup(data, character, indexOfData);
     }
 
     protected override void UpdateData()

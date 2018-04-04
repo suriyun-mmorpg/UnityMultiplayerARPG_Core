@@ -9,9 +9,9 @@ public abstract class UIDataForCharacter<T> : UISelectionEntry<T>
 
     public void Setup(T data, ICharacterData character, int indexOfData)
     {
-        Data = data;
         this.character = character;
         this.indexOfData = indexOfData;
+        Data = data;
     }
 
     public bool IsOwningCharacter()
