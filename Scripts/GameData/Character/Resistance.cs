@@ -20,11 +20,10 @@ public struct ResistanceAmount
 public struct ResistanceIncremental
 {
     public Resistance resistance;
-    public float baseAmount;
-    public float amountIncreaseEachLevel;
+    public IncrementalFloat amount;
 
     public float GetAmount(int level)
     {
-        return baseAmount + (amountIncreaseEachLevel * (level - 1));
+        return amount.baseAmount + (amount.amountIncreaseEachLevel * (level - 1));
     }
 }

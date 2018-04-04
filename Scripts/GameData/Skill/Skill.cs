@@ -18,22 +18,12 @@ public enum SkillBuffType
 [System.Serializable]
 public struct SkillBuff
 {
-    [Header("Duration")]
     [Tooltip("If buff duration less than or equals to 0, buff stats won't applied")]
-    public float baseDuration;
-    public float durationIncreaseEachLevel;
-    [Header("Hp recovery")]
-    public int baseRecoveryHp;
-    public float recoveryHpIncreaseEachLevel;
-    [Header("Mp recovery")]
-    public int baseRecoveryMp;
-    public float recoveryMpIncreaseEachLevel;
-    [Header("Add Stats")]
-    public CharacterStats baseStats;
-    public CharacterStats statsIncreaseEachLevel;
-    [Header("Add Attributes")]
+    public IncrementalFloat duration;
+    public IncrementalInt recoveryHp;
+    public IncrementalInt recoveryMp;
+    public CharacterStatsIncremental increaseStats;
     public AttributeIncremental[] increaseAttributes;
-    [Header("Add Resistances")]
     public ResistanceIncremental[] increaseResistances;
 }
 
@@ -45,12 +35,10 @@ public class Skill : BaseGameData
     public int maxLevel = 1;
 
     [Header("Consume Mp")]
-    public int baseConsumeMp;
-    public float consumeMpIncreaseEachLevel;
+    public IncrementalInt consumeMp;
 
     [Header("Cool Down")]
-    public float baseCoolDownDuration;
-    public float coolDownDurationIncreaseEachLevel;
+    public IncrementalFloat coolDownDuration;
 
     [Header("Requirements")]
     public SkillRequirement requirement;
@@ -64,8 +52,7 @@ public class Skill : BaseGameData
     public DamageEffectivenessAttribute[] effectivenessAttributes;
 
     [Header("Attack As Weapon Damage Inflict")]
-    public float baseInflictRate;
-    public float inflictRateIncreaseEachLevel;
+    public IncrementalFloat inflictRate;
 
     [Header("Additional Damage Attributes")]
     public DamageAttribute[] additionalDamageAttributes;
@@ -104,8 +91,7 @@ public class Skill : BaseGameData
 [System.Serializable]
 public struct SkillRequirement
 {
-    public int baseCharacterLevel;
-    public float characterLevelIncreaseEachLevel;
+    public IncrementalInt characterLevel;
     public SkillLevel[] skillLevels;
 }
 

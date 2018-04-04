@@ -29,7 +29,7 @@ public static class SkillExtension
     {
         if (skill == null)
             return 0;
-        return skill.requirement.baseCharacterLevel + (int)(skill.requirement.characterLevelIncreaseEachLevel * level);
+        return skill.requirement.characterLevel.baseAmount + (int)(skill.requirement.characterLevel.amountIncreaseEachLevel * level);
     }
 
     public static int GetMaxLevel(this Skill skill)
@@ -81,7 +81,7 @@ public static class SkillExtension
         if (skill == null)
             return 0;
         level = skill.GetAdjustedLevel(level);
-        return skill.baseConsumeMp + (int)(skill.consumeMpIncreaseEachLevel * (level - 1));
+        return skill.consumeMp.baseAmount + (int)(skill.consumeMp.amountIncreaseEachLevel * (level - 1));
     }
 
     public static float GetCoolDownDuration(this Skill skill, int level)
@@ -89,7 +89,7 @@ public static class SkillExtension
         if (skill == null)
             return 0f;
         level = skill.GetAdjustedLevel(level);
-        return skill.baseCoolDownDuration + (skill.coolDownDurationIncreaseEachLevel * (level - 1));
+        return skill.coolDownDuration.baseAmount + (skill.coolDownDuration.amountIncreaseEachLevel * (level - 1));
     }
 
     public static float GetBuffDuration(this Skill skill, int level)
@@ -184,7 +184,7 @@ public static class SkillExtension
         if (!skill.IsAttack() || skill.skillAttackType != SkillAttackType.WeaponDamageInflict)
             return 1f;
         level = skill.GetAdjustedLevel(level);
-        return skill.baseInflictRate + skill.inflictRateIncreaseEachLevel * level;
+        return skill.inflictRate.baseAmount + skill.inflictRate.amountIncreaseEachLevel * level;
     }
 
     public static Dictionary<DamageElement, DamageAmount> GetAdditionalDamageAttributes(this Skill skill, int level)
@@ -199,22 +199,22 @@ public static class SkillExtension
     #region Buff Extension
     public static float GetDuration(this SkillBuff skillBuff, int level)
     {
-        return skillBuff.baseDuration + skillBuff.durationIncreaseEachLevel * level;
+        return skillBuff.duration.GetAmount(level);
     }
 
     public static int GetRecoveryHp(this SkillBuff skillBuff, int level)
     {
-        return skillBuff.baseRecoveryHp + (int)(skillBuff.recoveryHpIncreaseEachLevel * level);
+        return skillBuff.recoveryHp.GetAmount(level);
     }
 
     public static int GetRecoveryMp(this SkillBuff skillBuff, int level)
     {
-        return skillBuff.baseRecoveryMp + (int)(skillBuff.recoveryMpIncreaseEachLevel * level);
+        return skillBuff.recoveryMp.GetAmount(level);
     }
 
     public static CharacterStats GetStats(this SkillBuff skillBuff, int level)
     {
-        return skillBuff.baseStats + skillBuff.statsIncreaseEachLevel * level;
+        return skillBuff.increaseStats.GetCharacterStats(level);
     }
 
     public static Dictionary<Attribute, int> GetIncreaseAttributes(this SkillBuff skillBuff, int level)

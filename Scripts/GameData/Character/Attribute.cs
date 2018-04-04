@@ -19,11 +19,10 @@ public struct AttributeAmount
 public struct AttributeIncremental
 {
     public Attribute attribute;
-    public int baseAmount;
-    public float amountIncreaseEachLevel;
+    public IncrementalInt amount;
 
     public int GetAmount(int level)
     {
-        return baseAmount + (int)(amountIncreaseEachLevel * (level - 1));
+        return amount.baseAmount + (int)(amount.amountIncreaseEachLevel * (level - 1));
     }
 }
