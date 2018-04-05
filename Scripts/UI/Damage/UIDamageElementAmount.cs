@@ -17,7 +17,7 @@ public class UIDamageElementAmount : UISelectionEntry<KeyValuePair<DamageElement
         {
             var element = Data.Key;
             var amount = Data.Value;
-            textAmount.text = string.Format(amountFormat, element.title, amount.minDamage, amount.maxDamage);
+            textAmount.text = string.Format(amountFormat, element.title, amount.minDamage.ToString("N0"), amount.maxDamage.ToString("N0"));
         }
     }
 }

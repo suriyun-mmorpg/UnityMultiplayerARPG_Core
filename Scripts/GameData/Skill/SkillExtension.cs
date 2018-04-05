@@ -81,7 +81,7 @@ public static class SkillExtension
         if (skill == null)
             return 0;
         level = skill.GetAdjustedLevel(level);
-        return skill.consumeMp.baseAmount + (int)(skill.consumeMp.amountIncreaseEachLevel * (level - 1));
+        return skill.consumeMp.GetAmount(level);
     }
 
     public static float GetCoolDownDuration(this Skill skill, int level)
@@ -89,77 +89,10 @@ public static class SkillExtension
         if (skill == null)
             return 0f;
         level = skill.GetAdjustedLevel(level);
-        return skill.coolDownDuration.baseAmount + (skill.coolDownDuration.amountIncreaseEachLevel * (level - 1));
-    }
-
-    public static float GetBuffDuration(this Skill skill, int level)
-    {
-        if (!skill.IsBuff())
-            return 0f;
-        level = skill.GetAdjustedLevel(level);
-        var duration = skill.buff.GetDuration(level);
+        var duration = skill.coolDownDuration.GetAmount(level);
         if (duration < 0f)
             duration = 0f;
         return duration;
-    }
-
-    public static int GetBuffRecoveryHp(this Skill skill, int level)
-    {
-        if (!skill.IsBuff())
-            return 0;
-        level = skill.GetAdjustedLevel(level);
-        return skill.buff.GetRecoveryHp(level);
-    }
-
-    public static int GetBuffRecoveryMp(this Skill skill, int level)
-    {
-        if (!skill.IsBuff())
-            return 0;
-        level = skill.GetAdjustedLevel(level);
-        return skill.buff.GetRecoveryMp(level);
-    }
-
-    public static CharacterStats GetBuffStats(this Skill skill, int level)
-    {
-        if (!skill.IsBuff())
-            return new CharacterStats();
-        level = skill.GetAdjustedLevel(level);
-        return skill.buff.GetStats(level);
-    }
-
-    public static float GetDebuffDuration(this Skill skill, int level)
-    {
-        if (!skill.IsDebuff())
-            return 0f;
-        level = skill.GetAdjustedLevel(level);
-        var duration = skill.debuff.GetDuration(level);
-        if (duration < 0f)
-            duration = 0f;
-        return duration;
-    }
-
-    public static int GetDebuffRecoveryHp(this Skill skill, int level)
-    {
-        if (!skill.IsDebuff())
-            return 0;
-        level = skill.GetAdjustedLevel(level);
-        return skill.debuff.GetRecoveryHp(level);
-    }
-
-    public static int GetDebuffRecoveryMp(this Skill skill, int level)
-    {
-        if (!skill.IsDebuff())
-            return 0;
-        level = skill.GetAdjustedLevel(level);
-        return skill.debuff.GetRecoveryMp(level);
-    }
-
-    public static CharacterStats GetDebuffStats(this Skill skill, int level)
-    {
-        if (!skill.IsDebuff())
-            return new CharacterStats();
-        level = skill.GetAdjustedLevel(level);
-        return skill.debuff.GetStats(level);
     }
     #endregion
 
@@ -212,7 +145,7 @@ public static class SkillExtension
         return skillBuff.recoveryMp.GetAmount(level);
     }
 
-    public static CharacterStats GetStats(this SkillBuff skillBuff, int level)
+    public static CharacterStats GetIncreaseStats(this SkillBuff skillBuff, int level)
     {
         return skillBuff.increaseStats.GetCharacterStats(level);
     }

@@ -47,7 +47,7 @@ public class UISkillBuff : UISelectionEntry<KeyValuePair<SkillBuff, int>>
         }
 
         if (uiBuffStats != null)
-            uiBuffStats.Data = skillBuff.GetStats(skillLevel);
+            uiBuffStats.Data = skillBuff.GetIncreaseStats(skillLevel);
 
         if (uiBuffAttributes != null)
             uiBuffAttributes.Data = GameDataHelpers.MakeAttributeAmountsDictionary(skillBuff.increaseAttributes, new Dictionary<Attribute, int>(), skillLevel);

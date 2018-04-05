@@ -7,6 +7,7 @@ using LiteNetLibHighLevel;
 public struct CharacterBuff
 {
     public static readonly CharacterBuff Empty = new CharacterBuff();
+    public string characterId;
     public string skillId;
     public bool isDebuff;
     public int level;
@@ -15,18 +16,45 @@ public struct CharacterBuff
     private string dirtySkillId;
     [System.NonSerialized]
     private Skill cacheSkill;
+    [System.NonSerialized]
+    private float cacheDuration;
+    [System.NonSerialized]
+    private int cacheRecoveryHp;
+    [System.NonSerialized]
+    private int cacheRecoveryMp;
+    [System.NonSerialized]
+    private CharacterStats cacheIncreaseStats;
+    [System.NonSerialized]
+    private Dictionary<Attribute, int> cacheIncreaseAttributes;
+    [System.NonSerialized]
+    private Dictionary<Resistance, float> cacheIncreaseResistances;
 
     private void MakeCache()
     {
         if (string.IsNullOrEmpty(skillId))
         {
             cacheSkill = null;
+            cacheDuration = 0f;
+            cacheRecoveryHp = 0;
+            cacheRecoveryMp = 0;
+            cacheIncreaseStats = new CharacterStats();
+            cacheIncreaseAttributes = new Dictionary<Attribute, int>();
+            cacheIncreaseResistances = new Dictionary<Resistance, float>();
             return;
         }
         if (string.IsNullOrEmpty(dirtySkillId) || !dirtySkillId.Equals(skillId))
         {
             dirtySkillId = skillId;
             cacheSkill = GameInstance.Skills.TryGetValue(skillId, out cacheSkill) ? cacheSkill : null;
+            if (cacheSkill != null)
+            {
+                cacheDuration = !isDebuff ? cacheSkill.buff.GetDuration(level) : cacheSkill.debuff.GetDuration(level);
+                cacheRecoveryHp = !isDebuff ? cacheSkill.buff.GetRecoveryHp(level) : cacheSkill.debuff.GetRecoveryHp(level);
+                cacheRecoveryMp = !isDebuff ? cacheSkill.buff.GetRecoveryMp(level) : cacheSkill.debuff.GetRecoveryMp(level);
+                cacheIncreaseStats = !isDebuff ? cacheSkill.buff.GetIncreaseStats(level) : cacheSkill.debuff.GetIncreaseStats(level);
+                cacheIncreaseAttributes = !isDebuff ? cacheSkill.buff.GetIncreaseAttributes(level) : cacheSkill.debuff.GetIncreaseAttributes(level);
+                cacheIncreaseResistances = !isDebuff ? cacheSkill.buff.GetIncreaseResistances(level) : cacheSkill.debuff.GetIncreaseResistances(level);
+            }
         }
     }
 
@@ -41,34 +69,40 @@ public struct CharacterBuff
         return cacheSkill;
     }
 
-    public Dictionary<Attribute, int> GetAttributes()
-    {
-        return !isDebuff ? GetSkill().buff.GetIncreaseAttributes(level) : GetSkill().debuff.GetIncreaseAttributes(level);
-    }
-
-    public Dictionary<Resistance, float> GetResistances()
-    {
-        return !isDebuff ? GetSkill().buff.GetIncreaseResistances(level) : GetSkill().debuff.GetIncreaseResistances(level);
-    }
-
     public float GetDuration()
     {
-        return !isDebuff ? GetSkill().GetBuffDuration(level) : GetSkill().GetDebuffDuration(level);
-    }
-
-    public CharacterStats GetStats()
-    {
-        return !isDebuff ? GetSkill().GetBuffStats(level) : GetSkill().GetDebuffStats(level);
+        MakeCache();
+        return cacheDuration;
     }
 
     public int GetBuffRecoveryHp()
     {
-        return !isDebuff ? GetSkill().GetBuffRecoveryHp(level) : GetSkill().GetDebuffRecoveryHp(level);
+        MakeCache();
+        return cacheRecoveryHp;
     }
 
     public int GetBuffRecoveryMp()
     {
-        return !isDebuff ? GetSkill().GetBuffRecoveryMp(level) : GetSkill().GetDebuffRecoveryMp(level);
+        MakeCache();
+        return cacheRecoveryMp;
+    }
+
+    public CharacterStats GetIncreaseStats()
+    {
+        MakeCache();
+        return cacheIncreaseStats;
+    }
+
+    public Dictionary<Attribute, int> GetIncreaseAttributes()
+    {
+        MakeCache();
+        return cacheIncreaseAttributes;
+    }
+
+    public Dictionary<Resistance, float> GetIncreaseResistances()
+    {
+        MakeCache();
+        return cacheIncreaseResistances;
     }
 
     public bool ShouldRemove()
@@ -103,12 +137,13 @@ public struct CharacterBuff
 
     public string GetBuffId()
     {
-        return GetBuffId(skillId, isDebuff);
+        return GetBuffId(characterId, skillId, isDebuff);
     }
 
-    public static CharacterBuff Create(string skillId, bool isDebuff, int level)
+    public static CharacterBuff Create(string characterId, string skillId, bool isDebuff, int level)
     {
         var newBuff = new CharacterBuff();
+        newBuff.characterId = characterId;
         newBuff.skillId = skillId;
         newBuff.isDebuff = isDebuff;
         newBuff.level = level;
@@ -116,10 +151,9 @@ public struct CharacterBuff
         return newBuff;
     }
 
-    public static string GetBuffId(string skillId, bool isDebuff)
+    public static string GetBuffId(string characterId, string skillId, bool isDebuff)
     {
-        var keyPrefix = isDebuff ? GameDataConst.CHARACTER_DEBUFF_PREFIX : GameDataConst.CHARACTER_BUFF_PREFIX;
-        return keyPrefix + skillId;
+        return string.Format("<{0}>_<{1}>_<{2}>", characterId, skillId, isDebuff.ToString());
     }
 }
 
@@ -128,6 +162,7 @@ public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>
     public override void Deserialize(NetDataReader reader)
     {
         var newValue = new CharacterBuff();
+        newValue.characterId = reader.GetString();
         newValue.skillId = reader.GetString();
         newValue.isDebuff = reader.GetBool();
         newValue.level = reader.GetInt();
@@ -137,6 +172,7 @@ public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>
 
     public override void Serialize(NetDataWriter writer)
     {
+        writer.Put(Value.characterId);
         writer.Put(Value.skillId);
         writer.Put(Value.isDebuff);
         writer.Put(Value.level);
@@ -152,15 +188,14 @@ public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>
 [System.Serializable]
 public class SyncListCharacterBuff : LiteNetLibSyncList<NetFieldCharacterBuff, CharacterBuff>
 {
-    public int IndexOf(string skillId, bool isDebuff)
+    public int IndexOf(string characterId, string skillId, bool isDebuff)
     {
         CharacterBuff tempBuff;
         var index = -1;
         for (var i = 0; i < list.Count; ++i)
         {
             tempBuff = list[i];
-            if (!string.IsNullOrEmpty(tempBuff.skillId) &&
-                tempBuff.skillId.Equals(skillId) && tempBuff.isDebuff == isDebuff)
+            if (tempBuff.characterId.Equals(characterId) && tempBuff.skillId.Equals(skillId) && tempBuff.isDebuff == isDebuff)
             {
                 index = i;
                 break;

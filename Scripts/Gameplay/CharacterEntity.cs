@@ -102,10 +102,10 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             for (var i = 0; i < value.Count; ++i)
             {
                 var entry = value[i];
-                var buffKey = CharacterBuff.GetBuffId(entry.skillId, entry.isDebuff);
-                if (!buffIndexes.ContainsKey(buffKey))
+                var buffId = entry.GetBuffId();
+                if (!buffIndexes.ContainsKey(buffId))
                 {
-                    buffIndexes.Add(buffKey, i);
+                    buffIndexes.Add(buffId, i);
                     buffs.Add(entry);
                 }
             }
@@ -407,13 +407,13 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     IEnumerator UseSkillRoutine(int skillIndex)
     {
         var characterSkill = skills[skillIndex];
-        characterSkill.Used();
-        characterSkill.ReduceMp(this);
-        skills[skillIndex] = characterSkill;
 
         var skill = characterSkill.GetSkill();
         var anim = skill.castAnimation;
         yield return new WaitForSecondsRealtime(anim.TriggerDuration);
+        characterSkill.Used();
+        characterSkill.ReduceMp(this);
+        skills[skillIndex] = characterSkill;
         switch (skill.skillAttackType)
         {
             case SkillAttackType.PureSkillDamage:
@@ -440,7 +440,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         var allDamageAttributes = skill.GetAdditionalDamageAttributes(characterSkill.level);
         allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, baseDamageAttribute);
         var damageInfo = skill.damageInfo;
-        var debuff = skill.isDebuff ? CharacterBuff.Create(skill.Id, true, characterSkill.level) : CharacterBuff.Empty;
+        var debuff = skill.isDebuff ? CharacterBuff.Create(Id, skill.Id, true, characterSkill.level) : CharacterBuff.Empty;
         LaunchDamageEntity(damageInfo, allDamageAttributes, debuff);
     }
 
@@ -453,7 +453,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         NetFuncAttack(
             skill.GetInflictRate(characterSkill.level), 
             skill.GetAdditionalDamageAttributes(characterSkill.level), 
-            skill.isDebuff ? CharacterBuff.Create(characterSkill.skillId, true, characterSkill.level) : CharacterBuff.Empty);
+            skill.isDebuff ? CharacterBuff.Create(Id, characterSkill.skillId, true, characterSkill.level) : CharacterBuff.Empty);
     }
 
     protected void ApplySkillBuff(CharacterSkill characterSkill)
@@ -461,17 +461,17 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         var skill = characterSkill.GetSkill();
         if (skill.skillBuffType == SkillBuffType.BuffToUser)
         {
-            var buffKey = CharacterBuff.GetBuffId(characterSkill.skillId, false);
+            var buffId = CharacterBuff.GetBuffId(Id, characterSkill.skillId, false);
             var buffIndex = -1;
-            if (buffIndexes.TryGetValue(buffKey, out buffIndex))
+            if (buffIndexes.TryGetValue(buffId, out buffIndex))
             {
                 buffs.RemoveAt(buffIndex);
                 UpdateBuffIndexes();
             }
-            var characterBuff = CharacterBuff.Create(characterSkill.skillId, false, characterSkill.level);
+            var characterBuff = CharacterBuff.Create(Id, characterSkill.skillId, false, characterSkill.level);
             characterBuff.Added();
             buffs.Add(characterBuff);
-            buffIndexes.Add(buffKey, buffs.Count - 1);
+            buffIndexes.Add(buffId, buffs.Count - 1);
         }
     }
 
@@ -492,7 +492,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         Animator animator = model == null ? null : model.CacheAnimator;
         // If animator is not null, play the action animation
         ActionAnimation actionAnimation;
-        if (animator != null && GameInstance.ActionAnimations.TryGetValue(actionId, out actionAnimation))
+        if (animator != null && GameInstance.ActionAnimations.TryGetValue(actionId, out actionAnimation) && actionAnimation.clip != null)
         {
             model.ChangeActionClip(actionAnimation.clip);
             animator.SetBool(ANIM_DO_ACTION, false);
@@ -1007,9 +1007,9 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
         else if (!debuff.IsEmpty())
         {
-            var buffKey = CharacterBuff.GetBuffId(debuff.skillId, debuff.isDebuff);
+            var buffId = debuff.GetBuffId();
             var buffIndex = -1;
-            if (buffIndexes.TryGetValue(buffKey, out buffIndex))
+            if (buffIndexes.TryGetValue(buffId, out buffIndex))
             {
                 buffs.RemoveAt(buffIndex);
                 UpdateBuffIndexes();
@@ -1017,7 +1017,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             var characterDebuff = debuff.Clone();
             characterDebuff.Added();
             buffs.Add(characterDebuff);
-            buffIndexes.Add(buffKey, buffs.Count - 1);
+            buffIndexes.Add(buffId, buffs.Count - 1);
         }
     }
     #endregion
@@ -1111,9 +1111,9 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         for (var i = 0; i < buffs.Count; ++i)
         {
             var entry = buffs[i];
-            var buffKey = CharacterBuff.GetBuffId(entry.skillId, entry.isDebuff);
-            if (!buffIndexes.ContainsKey(buffKey))
-                buffIndexes.Add(buffKey, i);
+            var buffId = CharacterBuff.GetBuffId(Id, entry.skillId, entry.isDebuff);
+            if (!buffIndexes.ContainsKey(buffId))
+                buffIndexes.Add(buffId, i);
         }
     }
 

@@ -116,8 +116,7 @@ public static class CharacterDataExtension
         var buffs = data.Buffs;
         foreach (var buff in buffs)
         {
-            result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
-                buff.GetAttributes());
+            result = GameDataHelpers.CombineAttributeAmountsDictionary(result, buff.GetIncreaseAttributes());
         }
         return result;
     }
@@ -159,8 +158,7 @@ public static class CharacterDataExtension
         var buffs = data.Buffs;
         foreach (var buff in buffs)
         {
-            result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
-                buff.GetResistances());
+            result = GameDataHelpers.CombineResistanceAmountsDictionary(result, buff.GetIncreaseResistances());
         }
         return result;
     }
@@ -194,7 +192,6 @@ public static class CharacterDataExtension
         tempEquipment = leftHandItem.GetEquipmentItem();
         if (tempEquipment != null)
             result += tempEquipment.GetStats(leftHandItem.level);
-
         result += GameDataHelpers.CaculateStats(GetAttributes(data));
         return result;
     }
@@ -207,7 +204,8 @@ public static class CharacterDataExtension
         var buffs = data.Buffs;
         foreach (var buff in buffs)
         {
-            result += buff.GetStats();
+            result += buff.GetIncreaseStats();
+            result += GameDataHelpers.CaculateStats(buff.GetIncreaseAttributes());
         }
         return result;
     }
