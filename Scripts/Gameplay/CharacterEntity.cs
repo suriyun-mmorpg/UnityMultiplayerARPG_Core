@@ -527,14 +527,14 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         if (!itemDropData.IsValid())
         {
             // Destroy item drop entity without item add because this is not valid
-            Manager.Assets.NetworkDestroy(objectId);
+            itemDropEntity.NetworkDestroy();
             return;
         }
         var itemId = itemDropData.itemId;
         var level = itemDropData.level;
         var amount = itemDropData.amount;
         if (IncreaseItems(itemId, level, amount))
-            Manager.Assets.NetworkDestroy(objectId);
+            itemDropEntity.NetworkDestroy();
     }
 
     /// <summary>
