@@ -31,7 +31,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     protected CharacterModel model;
     protected readonly Dictionary<string, int> buffIndexes = new Dictionary<string, int>();
     protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
-    protected Vector3 previousPosition;
+    protected Vector3? previousPosition;
     protected Vector3 currentVelocity;
     #endregion
 
@@ -195,7 +195,9 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     protected virtual void FixedUpdate()
     {
         // Update current velocity
-        Vector3 currentMove = CacheTransform.position - previousPosition;
+        if (!previousPosition.HasValue)
+            previousPosition = CacheTransform.position;
+        var currentMove = CacheTransform.position - previousPosition.Value;
         currentVelocity = currentMove / Time.deltaTime;
         previousPosition = CacheTransform.position;
     }
@@ -655,56 +657,56 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Net functions callers
-    public void RequestAttack()
+    public virtual void RequestAttack()
     {
         if (CurrentHp <= 0 || isDoingAction.Value)
             return;
         CallNetFunction("Attack", FunctionReceivers.Server);
     }
 
-    protected void RequestUseSkill(int skillIndex)
+    public virtual void RequestUseSkill(int skillIndex)
     {
         if (CurrentHp <= 0 || isDoingAction.Value)
             return;
         CallNetFunction("UseSkill", FunctionReceivers.Server, skillIndex);
     }
 
-    public void RequestPlayActionAnimation(int actionId)
+    public virtual void RequestPlayActionAnimation(int actionId)
     {
         if (CurrentHp <= 0)
             return;
         CallNetFunction("PlayActionAnimation", FunctionReceivers.All, actionId);
     }
 
-    public void RequestPickupItem(uint objectId)
+    public virtual void RequestPickupItem(uint objectId)
     {
         if (CurrentHp <= 0 || isDoingAction.Value)
             return;
         CallNetFunction("PickupItem", FunctionReceivers.Server, objectId);
     }
 
-    public void RequestDropItem(int index, int amount)
+    public virtual void RequestDropItem(int index, int amount)
     {
         if (CurrentHp <= 0 || isDoingAction.Value)
             return;
         CallNetFunction("DropItem", FunctionReceivers.Server, index, amount);
     }
 
-    public void RequestEquipItem(int nonEquipIndex, string equipPosition)
+    public virtual void RequestEquipItem(int nonEquipIndex, string equipPosition)
     {
         if (CurrentHp <= 0 || isDoingAction.Value)
             return;
         CallNetFunction("EquipItem", FunctionReceivers.Server, nonEquipIndex, equipPosition);
     }
 
-    public void RequestUnEquipItem(string equipPosition)
+    public virtual void RequestUnEquipItem(string equipPosition)
     {
         if (CurrentHp <= 0 || isDoingAction.Value)
             return;
         CallNetFunction("UnEquipItem", FunctionReceivers.Server, equipPosition);
     }
 
-    public void RequestCombatAmount(CombatAmountTypes combatAmountTypes, int amount)
+    public virtual void RequestCombatAmount(CombatAmountTypes combatAmountTypes, int amount)
     {
         CallNetFunction("CombatAmount", FunctionReceivers.All, combatAmountTypes, amount);
     }

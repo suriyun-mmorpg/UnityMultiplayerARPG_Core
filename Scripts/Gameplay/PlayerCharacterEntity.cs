@@ -62,6 +62,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     protected bool lookAtTargetUpdated;
     protected Vector3 oldFollowTargetPosition;
     protected Vector3? destination;
+    protected int queueUsingSkillIndex = -1;
     #endregion
 
     #region Cache components
@@ -171,32 +172,34 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         if (isGrounded)
         {
             Vector3 velocity = CacheRigidbody.velocity;
-
-            if (moveDirection.magnitude != 0)
+            if (!isDoingAction.Value && CurrentHp > 0)
             {
-                if (moveDirection.magnitude > 1)
-                    moveDirection = moveDirection.normalized;
-
-                var moveSpeed = this.GetStatsWithBuffs().moveSpeed;
-                var targetVelocity = moveDirection * moveSpeed;
-
-                // Apply a force that attempts to reach our target velocity
-                Vector3 velocityChange = (targetVelocity - velocity);
-                velocityChange.x = Mathf.Clamp(velocityChange.x, -moveSpeed, moveSpeed);
-                velocityChange.y = 0;
-                velocityChange.z = Mathf.Clamp(velocityChange.z, -moveSpeed, moveSpeed);
-                CacheRigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
-                // slerp to the desired rotation over time
-                CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(moveDirection), angularSpeed * Time.fixedDeltaTime);
-            }
-            else if (navPaths == null)
-            {
-                CharacterEntity tempCharacterEntity;
-                if (TryGetTargetEntity(out tempCharacterEntity))
+                if (moveDirection.magnitude != 0)
                 {
-                    var targetDirection = (tempCharacterEntity.CacheTransform.position - CurrentPosition).normalized;
-                    if (targetDirection.magnitude != 0f)
-                        CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(targetDirection), angularSpeed * Time.fixedDeltaTime);
+                    if (moveDirection.magnitude > 1)
+                        moveDirection = moveDirection.normalized;
+
+                    var moveSpeed = this.GetStatsWithBuffs().moveSpeed;
+                    var targetVelocity = moveDirection * moveSpeed;
+
+                    // Apply a force that attempts to reach our target velocity
+                    Vector3 velocityChange = (targetVelocity - velocity);
+                    velocityChange.x = Mathf.Clamp(velocityChange.x, -moveSpeed, moveSpeed);
+                    velocityChange.y = 0;
+                    velocityChange.z = Mathf.Clamp(velocityChange.z, -moveSpeed, moveSpeed);
+                    CacheRigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
+                    // slerp to the desired rotation over time
+                    CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(moveDirection), angularSpeed * Time.fixedDeltaTime);
+                }
+                else if (navPaths == null)
+                {
+                    CharacterEntity tempCharacterEntity;
+                    if (TryGetTargetEntity(out tempCharacterEntity))
+                    {
+                        var targetDirection = (tempCharacterEntity.CacheTransform.position - CurrentPosition).normalized;
+                        if (targetDirection.magnitude != 0f)
+                            CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(targetDirection), angularSpeed * Time.fixedDeltaTime);
+                    }
                 }
             }
 
@@ -300,6 +303,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
             }
             if (targetPosition.HasValue)
             {
+                queueUsingSkillIndex = -1;
                 lookAtTargetUpdated = false;
                 if (targetIdentity != null)
                     destination = null;
@@ -318,6 +322,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         {
             if (targetPlayer.CurrentHp <= 0)
             {
+                queueUsingSkillIndex = -1;
                 SetTargetEntity(null);
                 StopPointClickMove(null);
                 return;
@@ -335,6 +340,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         {
             if (targetMonster.CurrentHp <= 0)
             {
+                queueUsingSkillIndex = -1;
                 SetTargetEntity(null);
                 StopPointClickMove(null);
                 return;
@@ -570,6 +576,26 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     #endregion
 
     #region Net functions callers
+    public override void RequestAttack()
+    {
+        if (!isDoingAction.Value && queueUsingSkillIndex >= 0)
+        {
+            RequestUseSkill(queueUsingSkillIndex);
+            queueUsingSkillIndex = -1;
+        }
+        base.RequestAttack();
+    }
+
+    public override void RequestUseSkill(int skillIndex)
+    {
+        if (CurrentHp > 0 &&
+            isDoingAction.Value &&
+            skillIndex >= 0 &&
+            skillIndex < skills.Count)
+            queueUsingSkillIndex = skillIndex;
+        base.RequestUseSkill(skillIndex);
+    }
+
     public void RequestSwapOrMergeItem(int fromIndex, int toIndex)
     {
         if (CurrentHp <= 0)
@@ -695,6 +721,12 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
             CacheUISceneGameplay.UpdateHotkeys();
     }
     #endregion
+
+    protected override void OnDead(CharacterEntity lastAttacker)
+    {
+        base.OnDead(lastAttacker);
+        queueUsingSkillIndex = -1;
+    }
 
     public void StopPointClickMove(LiteNetLibIdentity entity)
     {
