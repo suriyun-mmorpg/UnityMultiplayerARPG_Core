@@ -28,12 +28,10 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
             case GameStartType.Host:
                 networkPort = gameInstanceExtra.networkPort;
                 maxConnections = gameInstanceExtra.maxConnections;
-                StartHost();
+                StartHost(false);
                 break;
             case GameStartType.SinglePlayer:
-                networkPort = 1;
-                maxConnections = 1;
-                StartHost();
+                StartHost(true);
                 break;
             case GameStartType.Client:
                 networkAddress = ConnectingNetworkAddress;
