@@ -48,7 +48,7 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
         base.Update();
         if (Time.realtimeSinceStartup - lastSaveTime > autoSaveDuration)
         {
-            var owningCharacter = PlayerCharacterEntity.OwningCharacter;
+            var owningCharacter = PlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
                 owningCharacter.SavePersistentCharacterData();
             lastSaveTime = Time.realtimeSinceStartup;

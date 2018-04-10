@@ -64,7 +64,7 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
         var skill = characterSkill.GetSkill();
         var level = Data.Value;
         
-        if (IsOwningCharacter() && characterSkill.CanLevelUp(PlayerCharacterEntity.OwningCharacter))
+        if (IsOwningCharacter() && characterSkill.CanLevelUp(PlayerCharacterController.OwningCharacter))
             onAbleToLevelUp.Invoke();
         else
             onUnableToLevelUp.Invoke();
@@ -216,8 +216,9 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
         if (selectionManager != null)
             selectionManager.DeselectSelectedUI();
 
-        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
-        owningCharacter.RequestAddSkill(indexOfData, 1);
+        var owningCharacter = PlayerCharacterController.OwningCharacter;
+        if (owningCharacter != null)
+            owningCharacter.RequestAddSkill(indexOfData, 1);
     }
 }
 

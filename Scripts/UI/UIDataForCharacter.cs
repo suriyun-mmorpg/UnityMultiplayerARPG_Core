@@ -16,6 +16,6 @@ public abstract class UIDataForCharacter<T> : UISelectionEntry<T>
 
     public bool IsOwningCharacter()
     {
-        return character != null && character is PlayerCharacterEntity && (PlayerCharacterEntity)character == PlayerCharacterEntity.OwningCharacter;
+        return character != null && character is PlayerCharacterEntity && (PlayerCharacterEntity)character == PlayerCharacterController.OwningCharacter;
     }
 }

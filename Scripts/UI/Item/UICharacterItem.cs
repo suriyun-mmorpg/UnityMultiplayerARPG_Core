@@ -226,7 +226,7 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
             selectionManager.DeselectSelectedUI();
 
         var characterItem = Data.Key;
-        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
+        var owningCharacter = PlayerCharacterController.OwningCharacter;
         if (owningCharacter != null)
         {
             var armorItem = characterItem.GetArmorItem();
@@ -262,7 +262,7 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
         if (selectionManager != null)
             selectionManager.DeselectSelectedUI();
 
-        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
+        var owningCharacter = PlayerCharacterController.OwningCharacter;
         if (owningCharacter != null)
             owningCharacter.RequestUnEquipItem(equipPosition);
     }
@@ -274,7 +274,7 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
             return;
 
         var characterItem = Data.Key;
-        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
+        var owningCharacter = PlayerCharacterController.OwningCharacter;
         if (characterItem.amount == 1)
         {
             if (selectionManager != null)
@@ -288,7 +288,7 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
 
     private void OnDropAmountConfirmed(int amount)
     {
-        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
+        var owningCharacter = PlayerCharacterController.OwningCharacter;
         if (selectionManager != null)
             selectionManager.DeselectSelectedUI();
         if (owningCharacter != null)

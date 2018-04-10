@@ -19,6 +19,8 @@ public class CharacterModel : MonoBehaviour
     private Transform meleeDamageTransform;
     [SerializeField]
     private Transform missileDamageTransform;
+    [SerializeField]
+    private Transform combatTextTransform;
     [Header("Equipment Containers")]
     [SerializeField]
     private EquipmentModelContainer[] equipmentContainers;
@@ -79,6 +81,16 @@ public class CharacterModel : MonoBehaviour
             if (missileDamageTransform == null)
                 missileDamageTransform = CacheTransform;
             return missileDamageTransform;
+        }
+    }
+
+    public Transform CombatTextTransform
+    {
+        get
+        {
+            if (combatTextTransform == null)
+                combatTextTransform = CacheTransform;
+            return combatTextTransform;
         }
     }
 

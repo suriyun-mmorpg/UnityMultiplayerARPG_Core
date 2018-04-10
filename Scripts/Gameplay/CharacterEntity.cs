@@ -25,24 +25,10 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     public const string ANIM_Y_SPEED = "YSpeed";
     public const string ANIM_DO_ACTION = "DoAction";
     public const string ANIM_HURT = "Hurt";
-    
-    #region Protected data
-    protected RpgNetworkEntity targetEntity;
-    protected CharacterModel model;
-    protected readonly Dictionary<string, int> buffIndexes = new Dictionary<string, int>();
-    protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
-    protected Vector3? previousPosition;
-    protected Vector3 currentVelocity;
-    #endregion
-
-    #region Public data
-    public GameObject[] ownerObjects;
-    public GameObject[] nonOwnerObjects;
-    public Transform modelContainer;
-    #endregion
 
     // Use id as primary key
     #region Sync data
+    [Header("Sync Fields")]
     public SyncFieldString id = new SyncFieldString();
     public SyncFieldString databaseId = new SyncFieldString();
     public SyncFieldString characterName = new SyncFieldString();
@@ -53,12 +39,56 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     public SyncFieldEquipWeapons equipWeapons = new SyncFieldEquipWeapons();
     public SyncFieldBool isDoingAction = new SyncFieldBool();
     public SyncFieldBool isHidding = new SyncFieldBool();
-    // List
+    [Header("Sync Lists")]
     public SyncListCharacterAttribute attributes = new SyncListCharacterAttribute();
     public SyncListCharacterSkill skills = new SyncListCharacterSkill();
     public SyncListCharacterBuff buffs = new SyncListCharacterBuff();
     public SyncListCharacterItem equipItems = new SyncListCharacterItem();
     public SyncListCharacterItem nonEquipItems = new SyncListCharacterItem();
+    #endregion
+
+    #region Public data
+    [Header("Settings")]
+    [Tooltip("These objects will be hidden on non owner objects")]
+    public GameObject[] ownerObjects;
+    [Tooltip("These objects will be hidden on owner objects")]
+    public GameObject[] nonOwnerObjects;
+    [Tooltip("Model will be instantiated inside this transform, if not set will use this component's transform")]
+    public Transform modelContainer;
+    #endregion
+    
+    #region Protected data
+    protected RpgNetworkEntity targetEntity;
+    protected CharacterModel model;
+    protected readonly Dictionary<string, int> buffIndexes = new Dictionary<string, int>();
+    protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
+    protected Vector3? previousPosition;
+    protected Vector3 currentVelocity;
+    #endregion
+
+    #region Sync data actions
+    public System.Action<string> onIdChange;
+    public System.Action<string> onDatabaseIdChange;
+    public System.Action<string> onCharacterNameChange;
+    public System.Action<int> onLevelChange;
+    public System.Action<int> onExpChange;
+    public System.Action<int> onCurrentHpChange;
+    public System.Action<int> onCurrentMpChange;
+    public System.Action<EquipWeapons> onEquipWeaponsChange;
+    public System.Action<bool> onIsDoingActionChange;
+    public System.Action<bool> onIsHiddingChange;
+    // List
+    public System.Action<LiteNetLibSyncList.Operation, int> onAttributesOperation;
+    public System.Action<LiteNetLibSyncList.Operation, int> onSkillsOperation;
+    public System.Action<LiteNetLibSyncList.Operation, int> onBuffsOperation;
+    public System.Action<LiteNetLibSyncList.Operation, int> onEquipItemsOperation;
+    public System.Action<LiteNetLibSyncList.Operation, int> onNonEquipItemsOperation;
+    #endregion
+
+    #region Another actions
+    public System.Action onDead;
+    public System.Action onRespawn;
+    public System.Action onLevelUp;
     #endregion
 
     #region Interface implementation
@@ -306,7 +336,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     currentHp.onChange += OnCurrentHpChange;
     currentMp.onChange += OnCurrentMpChange;
     equipWeapons.onChange += OnEquipWeaponsChange;
-    isDoingAction.onChange += OnDoingActionChange;
+    isDoingAction.onChange += OnIsDoingActionChange;
     isHidding.onChange += OnIsHiddingChange;
     // On list changes events
     attributes.onOperation += OnAttributesOperation;
@@ -324,6 +354,9 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         RegisterNetFunction("UnEquipItem", new LiteNetLibFunction<NetFieldString>((fromEquipPosition) => NetFuncUnEquipItem(fromEquipPosition)));
         RegisterNetFunction("CombatAmount", new LiteNetLibFunction<NetFieldByte, NetFieldInt>((combatAmountTypes, amount) => NetFuncCombatAmount((CombatAmountTypes)combatAmountTypes.Value, amount)));
         RegisterNetFunction("SetTargetEntity", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncSetTargetEntity(objectId)));
+        RegisterNetFunction("OnDead", new LiteNetLibFunction(() => { if (onDead != null) onDead.Invoke(); }));
+        RegisterNetFunction("OnRespawn", new LiteNetLibFunction(() => { if (onRespawn != null) onRespawn.Invoke(); }));
+        RegisterNetFunction("OnLevelUp", new LiteNetLibFunction(() => { if (onLevelUp != null) onLevelUp.Invoke(); }));
     }
 
     protected virtual void OnDestroy()
@@ -991,7 +1024,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         // If miss, return don't calculate damages
         if (Random.value > hitChance)
         {
-            OnReceivedDamage(attacker, CombatAmountTypes.Miss, 0);
+            ReceivedDamage(attacker, CombatAmountTypes.Miss, 0);
             return;
         }
         // Calculate damages
@@ -1023,11 +1056,11 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         CurrentHp -= totalDamage;
 
         if (isBlocked)
-            OnReceivedDamage(attacker, CombatAmountTypes.BlockedDamage, totalDamage);
+            ReceivedDamage(attacker, CombatAmountTypes.BlockedDamage, totalDamage);
         else if (isCritical)
-            OnReceivedDamage(attacker, CombatAmountTypes.CriticalDamage, totalDamage);
+            ReceivedDamage(attacker, CombatAmountTypes.CriticalDamage, totalDamage);
         else
-            OnReceivedDamage(attacker, CombatAmountTypes.NormalDamage, totalDamage);
+            ReceivedDamage(attacker, CombatAmountTypes.NormalDamage, totalDamage);
 
         if (model != null)
         {
@@ -1040,7 +1073,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         if (CurrentHp <= 0)
         {
             CurrentHp = 0;
-            OnDead(attacker);
+            Killed(attacker);
         }
         else if (!debuff.IsEmpty())
         {
@@ -1064,7 +1097,11 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     /// Override this to do stuffs when id changes
     /// </summary>
     /// <param name="id"></param>
-    protected virtual void OnIdChange(string id) { }
+    protected virtual void OnIdChange(string id)
+    {
+        if (onIdChange != null)
+            onIdChange.Invoke(id);
+    }
 
     /// <summary>
     /// Override this to do stuffs when database Id changes
@@ -1084,38 +1121,61 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             model.SetEquipItems(equipItems);
             model.gameObject.SetActive(!isHidding.Value);
         }
+
+        if (onDatabaseIdChange != null)
+            onDatabaseIdChange.Invoke(databaseId);
     }
 
     /// <summary>
     /// Override this to do stuffs when character name changes
     /// </summary>
     /// <param name="characterName"></param>
-    protected virtual void OnCharacterNameChange(string characterName) { }
+    protected virtual void OnCharacterNameChange(string characterName)
+    {
+        if (onCharacterNameChange != null)
+            onCharacterNameChange.Invoke(characterName);
+    }
 
     /// <summary>
     /// Override this to do stuffs when level changes
     /// </summary>
     /// <param name="level"></param>
-    protected virtual void OnLevelChange(int level) { }
+    protected virtual void OnLevelChange(int level)
+    {
+        if (onLevelChange != null)
+            onLevelChange.Invoke(level);
+    }
 
     /// <summary>
     /// Override this to do stuffs when exp changes
     /// </summary>
     /// <param name="exp"></param>
-    protected virtual void OnExpChange(int exp) { }
+    protected virtual void OnExpChange(int exp)
+    {
+        if (onExpChange != null)
+            onExpChange.Invoke(exp);
+    }
 
     /// <summary>
     /// Override this to do stuffs when current hp changes
     /// </summary>
     /// <param name="currentHp"></param>
-    protected virtual void OnCurrentHpChange(int currentHp) { }
+    protected virtual void OnCurrentHpChange(int currentHp)
+    {
+        if (onCurrentHpChange != null)
+            onCurrentHpChange.Invoke(currentHp);
+    }
 
     /// <summary>
     /// Override this to do stuffs when current mp changes
     /// </summary>
     /// <param name="currentMp"></param>
-    protected virtual void OnCurrentMpChange(int currentMp) { }
-    
+    protected virtual void OnCurrentMpChange(int currentMp)
+    {
+        if (onCurrentMpChange != null)
+            onCurrentMpChange.Invoke(currentMp);
+    }
+
     /// <summary>
     /// Override this to do stuffs when equip weapons changes
     /// </summary>
@@ -1124,13 +1184,20 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     {
         if (model != null)
             model.SetEquipWeapons(equipWeapons);
+
+        if (onEquipWeaponsChange != null)
+            onEquipWeaponsChange.Invoke(equipWeapons);
     }
 
     /// <summary>
     /// Overrride this to do stuffs when doing action state changes
     /// </summary>
     /// <param name="doingAction"></param>
-    protected virtual void OnDoingActionChange(bool doingAction) { }
+    protected virtual void OnIsDoingActionChange(bool doingAction)
+    {
+        if (onIsDoingActionChange != null)
+            onIsDoingActionChange.Invoke(doingAction);
+    }
 
     /// <summary>
     /// Override this to do stuffs when hidding state changes
@@ -1140,6 +1207,9 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     {
         if (model != null)
             model.gameObject.SetActive(!isHidding);
+
+        if (onIsHiddingChange != null)
+            onIsHiddingChange.Invoke(isHidding);
     }
     #endregion
 
@@ -1149,14 +1219,22 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     /// </summary>
     /// <param name="operation"></param>
     /// <param name="index"></param>
-    protected virtual void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index) { }
+    protected virtual void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index)
+    {
+        if (onAttributesOperation != null)
+            onAttributesOperation.Invoke(operation, index);
+    }
 
     /// <summary>
     /// Override this to do stuffs when skills changes
     /// </summary>
     /// <param name="operation"></param>
     /// <param name="index"></param>
-    protected virtual void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index) { }
+    protected virtual void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
+    {
+        if (onSkillsOperation != null)
+            onSkillsOperation.Invoke(operation, index);
+    }
 
     /// <summary>
     /// Override this to do stuffs when buffs changes
@@ -1167,6 +1245,9 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     {
         if (model != null)
             model.SetBuffs(buffs);
+
+        if (onBuffsOperation != null)
+            onBuffsOperation.Invoke(operation, index);
     }
 
     /// <summary>
@@ -1178,6 +1259,9 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     {
         if (model != null)
             model.SetEquipItems(equipItems);
+
+        if (onEquipItemsOperation != null)
+            onEquipItemsOperation.Invoke(operation, index);
     }
 
     /// <summary>
@@ -1185,7 +1269,11 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     /// </summary>
     /// <param name="operation"></param>
     /// <param name="index"></param>
-    protected virtual void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index) { }
+    protected virtual void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+    {
+        if (onNonEquipItemsOperation != null)
+            onNonEquipItemsOperation.Invoke(operation, index);
+    }
     #endregion
 
     #region Keys indexes update functions
@@ -1360,7 +1448,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
                         continue;
                     var targetDir = (CacheTransform.position - characterEntity.CacheTransform.position).normalized;
                     var angle = Vector3.Angle(targetDir, CacheTransform.forward);
-                    // Angle in foward position is 180 so we use this value to determine that target is in hit fov or not
+                    // Angle in forward position is 180 so we use this value to determine that target is in hit fov or not
                     if (angle < 180 + halfFov && angle > 180 - halfFov)
                         characterEntity.ReceiveDamage(this, allDamageAttributes, debuff);
                 }
@@ -1399,12 +1487,12 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         return CacheTransform;
     }
 
-    protected virtual void OnReceivedDamage(CharacterEntity attacker, CombatAmountTypes damageAmountType, int damage)
+    protected virtual void ReceivedDamage(CharacterEntity attacker, CombatAmountTypes damageAmountType, int damage)
     {
         RequestCombatAmount(damageAmountType, damage);
     }
 
-    protected virtual void OnDead(CharacterEntity lastAttacker)
+    protected virtual void Killed(CharacterEntity lastAttacker)
     {
         StopAllCoroutines();
         isDoingAction.Value = false;
@@ -1416,10 +1504,8 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             skill.coolDownRemainsDuration = 0;
             skills.Dirty(i);
         }
-    }
-
-    protected virtual void OnLevelUp()
-    {
+        // Send OnDead to owner player only
+        CallNetFunction("OnDead", ConnectId);
     }
 
     protected virtual void Respawn()
@@ -1428,14 +1514,19 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             return;
         CurrentHp = this.GetMaxHp();
         CurrentMp = this.GetMaxMp();
+        // Send OnRespawn to owner player only
+        CallNetFunction("OnRespawn", ConnectId);
     }
 
     internal virtual void IncreaseExp(int exp)
     {
         if (!IsServer)
             return;
-        if (GameInstance.Singleton.GameplayRule.IncreaseExp(this, exp))
-            OnLevelUp();
+        var gameInstance = GameInstance.Singleton;
+        if (!gameInstance.GameplayRule.IncreaseExp(this, exp))
+            return;
+        // Send OnLevelUp to owner player only
+        CallNetFunction("OnLevelUp", ConnectId);
     }
 
     protected abstract bool CanReceiveDamageFrom(CharacterEntity characterEntity);

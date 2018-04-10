@@ -23,17 +23,8 @@ public class UISceneGameplay : MonoBehaviour
     public UIToggleUI[] toggleUis;
 
     [Header("Events")]
-    public UnityEvent onAbleToRespawn;
-    public UnityEvent onUnableToRespawn;
     public UnityEvent onCharacterDead;
     public UnityEvent onCharacterRespawn;
-
-    public UICharacterItem SelectedEquipItem { get; private set; }
-    public UICharacterItem SelectedNonEquipItem { get; private set; }
-    public UICharacterSkill SelectedSkillLevel { get; private set; }
-
-    protected int lastCharacterHp = 0;
-    protected CharacterEntity lastSelectedCharacter;
 
     private void Awake()
     {
@@ -43,7 +34,7 @@ public class UISceneGameplay : MonoBehaviour
     private void Update()
     {
         var currentCharacterHp = 0;
-        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
+        var owningCharacter = PlayerCharacterController.OwningCharacter;
         if (owningCharacter != null)
             currentCharacterHp = owningCharacter.CurrentHp;
 
@@ -55,47 +46,6 @@ public class UISceneGameplay : MonoBehaviour
                 ui.Toggle();
             }
         }
-
-        // Enemy status will be show when selected at enemy and enemy hp more than 0
-        if (uiTargetCharacter != null)
-        {
-            CharacterEntity targetCharacter = null;
-            if (uiTargetCharacter.IsVisible())
-            {
-                if (owningCharacter == null ||
-                    !owningCharacter.TryGetTargetEntity(out targetCharacter) ||
-                    targetCharacter.CurrentHp <= 0)
-                    uiTargetCharacter.Hide();
-                else if (targetCharacter != lastSelectedCharacter)
-                    uiTargetCharacter.Data = lastSelectedCharacter = targetCharacter;
-            }
-            else
-            {
-                if (owningCharacter != null &&
-                    owningCharacter.TryGetTargetEntity(out targetCharacter) &&
-                    targetCharacter.CurrentHp > 0)
-                {
-                    uiTargetCharacter.Data = lastSelectedCharacter = targetCharacter;
-                    uiTargetCharacter.Show();
-                }
-            }
-        }
-
-        // Event when character dead
-        if (owningCharacter.CurrentHp <= 0 && lastCharacterHp != owningCharacter.CurrentHp)
-            onCharacterDead.Invoke();
-        else if (lastCharacterHp != owningCharacter.CurrentHp)
-            onCharacterRespawn.Invoke();
-
-        // Respawn button will show when character dead
-        if (owningCharacter.CurrentHp <= 0)
-            onAbleToRespawn.Invoke();
-        else
-            onUnableToRespawn.Invoke();
-
-        // Update last character hp to compare on next frame
-        if (owningCharacter != null)
-            lastCharacterHp = currentCharacterHp;
     }
 
     public void UpdateCharacter()
@@ -103,32 +53,47 @@ public class UISceneGameplay : MonoBehaviour
         foreach (var uiCharacter in uiCharacters)
         {
             if (uiCharacter != null)
-                uiCharacter.Data = PlayerCharacterEntity.OwningCharacter;
+                uiCharacter.Data = PlayerCharacterController.OwningCharacter;
         }
     }
 
     public void UpdateEquipItems()
     {
         if (uiEquipItems != null)
-            uiEquipItems.UpdateData(PlayerCharacterEntity.OwningCharacter);
+            uiEquipItems.UpdateData(PlayerCharacterController.OwningCharacter);
     }
 
     public void UpdateNonEquipItems()
     {
         if (uiNonEquipItems != null)
-            uiNonEquipItems.UpdateData(PlayerCharacterEntity.OwningCharacter);
+            uiNonEquipItems.UpdateData(PlayerCharacterController.OwningCharacter);
     }
 
     public void UpdateSkills()
     {
         if (uiSkills != null)
-            uiSkills.UpdateData(PlayerCharacterEntity.OwningCharacter);
+            uiSkills.UpdateData(PlayerCharacterController.OwningCharacter);
     }
 
     public void UpdateHotkeys()
     {
         if (uiHotkeys != null)
-            uiHotkeys.UpdateData(PlayerCharacterEntity.OwningCharacter);
+            uiHotkeys.UpdateData(PlayerCharacterController.OwningCharacter);
+    }
+
+    public void SetTargetCharacter(CharacterEntity character)
+    {
+        if (uiTargetCharacter == null)
+            return;
+
+        if (character == null || character.CurrentHp <= 0)
+        {
+            uiTargetCharacter.Hide();
+            return;
+        }
+
+        uiTargetCharacter.Data = character;
+        uiTargetCharacter.Show();
     }
 
     public void DeselectSelectedItem()
@@ -141,7 +106,7 @@ public class UISceneGameplay : MonoBehaviour
 
     public void OnClickRespawn()
     {
-        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
+        var owningCharacter = PlayerCharacterController.OwningCharacter;
         if (owningCharacter != null)
             owningCharacter.RequestRespawn();
     }
@@ -150,5 +115,15 @@ public class UISceneGameplay : MonoBehaviour
     {
         var networkManager = FindObjectOfType<BaseRpgNetworkManager>();
         networkManager.StopHost();
+    }
+
+    public void OnCharacterDead()
+    {
+        onCharacterDead.Invoke();
+    }
+
+    public void OnCharacterRespawn()
+    {
+        onCharacterRespawn.Invoke();
     }
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.EventSystems;
 using LiteNetLib;
 using LiteNetLibHighLevel;
 
@@ -10,25 +9,20 @@ using LiteNetLibHighLevel;
 [RequireComponent(typeof(LiteNetLibTransform))]
 public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
 {
-    public static PlayerCharacterEntity OwningCharacter { get; private set; }
-
-    public struct UsingSkillData
-    {
-        public Vector3 position;
-        public int skillIndex;
-        public UsingSkillData(Vector3 position, int skillIndex)
-        {
-            this.position = position;
-            this.skillIndex = skillIndex;
-        }
-    }
-
     #region Sync data
     public SyncFieldInt statPoint = new SyncFieldInt();
     public SyncFieldInt skillPoint = new SyncFieldInt();
     public SyncFieldInt gold = new SyncFieldInt();
     // List
     public SyncListCharacterHotkey hotkeys = new SyncListCharacterHotkey();
+    #endregion
+
+    #region Sync data actions
+    public System.Action<int> onStatPointChange;
+    public System.Action<int> onSkillPointChange;
+    public System.Action<int> onGoldChange;
+    // List
+    public System.Action<LiteNetLibSyncList.Operation, int> onHotkeysOperation;
     #endregion
 
     #region Interface implementation
@@ -69,10 +63,6 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     protected Vector3 moveDirection;
     protected bool isJumping;
     protected bool isGrounded;
-    protected bool pointClickMoveStopped;
-    protected Vector3 oldFollowTargetPosition;
-    protected Vector3? destination;
-    protected UsingSkillData? queueUsingSkill;
     #endregion
 
     #region Cache components
@@ -97,11 +87,6 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
             return cacheNetTransform;
         }
     }
-
-    public FollowCameraControls CacheMinimapCameraControls { get; protected set; }
-    public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
-    public GameObject CacheTargetObject { get; protected set; }
-    public UISceneGameplay CacheUISceneGameplay { get; protected set; }
     #endregion
 
     protected override void Awake()
@@ -110,28 +95,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         CacheRigidbody.useGravity = false;
         var gameInstance = GameInstance.Singleton;
         gameObject.tag = gameInstance.playerTag;
-        ClearDestination();
-    }
-
-    protected override void Start()
-    {
-        base.Start();
-        var gameInstance = GameInstance.Singleton;
-        if (IsOwnerClient)
-        {
-            OwningCharacter = this;
-            CacheMinimapCameraControls = Instantiate(gameInstance.minimapCameraPrefab);
-            CacheMinimapCameraControls.target = CacheTransform;
-            CacheGameplayCameraControls = Instantiate(gameInstance.gameplayCameraPrefab);
-            CacheGameplayCameraControls.target = CacheTransform;
-            CacheTargetObject = Instantiate(gameInstance.targetObject);
-            CacheTargetObject.gameObject.SetActive(false);
-            CacheUISceneGameplay = Instantiate(gameInstance.uiSceneGameplayPrefab);
-            CacheUISceneGameplay.UpdateCharacter();
-            CacheUISceneGameplay.UpdateSkills();
-            CacheUISceneGameplay.UpdateEquipItems();
-            CacheUISceneGameplay.UpdateNonEquipItems();
-        }
+        StopMove();
     }
 
     protected override void Update()
@@ -140,24 +104,10 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
 
         if (CurrentHp <= 0)
         {
-            ClearDestination();
+            StopMove();
             SetTargetEntity(null);
             return;
         }
-
-        if (destination.HasValue)
-        {
-            var destinationValue = destination.Value;
-            if (CacheTargetObject != null)
-                CacheTargetObject.transform.position = destinationValue;
-            if (Vector3.Distance(destinationValue, CacheTransform.position) < stoppingDistance + 0.5f)
-                destination = null;
-        }
-        
-        if (CacheTargetObject != null)
-            CacheTargetObject.gameObject.SetActive(destination.HasValue);
-
-        UpdateInput();
     }
 
 
@@ -229,7 +179,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         CacheRigidbody.AddForce(new Vector3(0, Physics.gravity.y * CacheRigidbody.mass * gravityRate, 0));
     }
 
-    protected  void LateUpdate()
+    protected void LateUpdate()
     {
         if (!IsServer && !IsOwnerClient)
             return;
@@ -247,169 +197,17 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
                     navPaths.Dequeue();
             }
             else
-                ClearDestination();
+                StopMove();
         }
     }
 
-    protected virtual void ClearDestination()
+    protected virtual void StopMove()
     {
         navPaths = null;
         moveDirection = Vector3.zero;
         CacheRigidbody.velocity = Vector3.zero;
-        pointClickMoveStopped = true;
-        destination = null;
     }
 
-    protected virtual void UpdateInput()
-    {
-        if (!IsOwnerClient)
-            return;
-
-        if (CacheGameplayCameraControls != null)
-            CacheGameplayCameraControls.updateRotation = Input.GetMouseButton(1);
-
-        if (CurrentHp <= 0)
-            return;
-
-        var gameInstance = GameInstance.Singleton;
-        // HINT: Target entity will be set at owning client only
-        if (!EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButtonDown(0))
-        {
-            var targetCamera = CacheGameplayCameraControls != null ? CacheGameplayCameraControls.targetCamera : Camera.main;
-            SetTargetEntity(null);
-            LiteNetLibIdentity targetIdentity = null;
-            Vector3? targetPosition = null;
-            RaycastHit[] hits = Physics.RaycastAll(targetCamera.ScreenPointToRay(Input.mousePosition), 100f);
-            foreach (var hit in hits)
-            {
-                var hitTransform = hit.transform;
-                targetPosition = hit.point;
-                var playerEntity = hitTransform.GetComponent<PlayerCharacterEntity>();
-                var monsterEntity = hitTransform.GetComponent<MonsterCharacterEntity>();
-                var npcEntity = hitTransform.GetComponent<NpcEntity>();
-                var itemDropEntity = hitTransform.GetComponent<ItemDropEntity>();
-                if (playerEntity != null && playerEntity.CurrentHp > 0)
-                {
-                    targetPosition = playerEntity.CacheTransform.position;
-                    targetIdentity = playerEntity.Identity;
-                    SetTargetEntity(playerEntity);
-                    break;
-                }
-                else if (monsterEntity != null && monsterEntity.CurrentHp > 0)
-                {
-                    targetPosition = monsterEntity.CacheTransform.position;
-                    targetIdentity = monsterEntity.Identity;
-                    SetTargetEntity(monsterEntity);
-                    break;
-                }
-                else if (npcEntity != null)
-                {
-                    targetPosition = npcEntity.CacheTransform.position;
-                    targetIdentity = npcEntity.Identity;
-                    SetTargetEntity(npcEntity);
-                    break;
-                }
-                else if (itemDropEntity != null)
-                {
-                    targetPosition = itemDropEntity.CacheTransform.position;
-                    targetIdentity = itemDropEntity.Identity;
-                    SetTargetEntity(itemDropEntity);
-                    break;
-                }
-            }
-            if (targetPosition.HasValue)
-            {
-                queueUsingSkill = null;
-                if (targetIdentity != null)
-                    destination = null;
-                else
-                    destination = targetPosition.Value;
-                RequestPointClickMovement(targetPosition.Value);
-            }
-        }
-
-        // Temp variables
-        PlayerCharacterEntity targetPlayer;
-        MonsterCharacterEntity targetMonster;
-        NpcEntity targetNpc;
-        ItemDropEntity targetItemDrop;
-        if (TryGetTargetEntity(out targetPlayer))
-        {
-            if (targetPlayer.CurrentHp <= 0)
-            {
-                queueUsingSkill = null;
-                SetTargetEntity(null);
-                StopPointClickMove();
-                return;
-            }
-            var conversationDistance = gameInstance.conversationDistance - stoppingDistance;
-            if (Vector3.Distance(CacheTransform.position, targetPlayer.CacheTransform.position) <= conversationDistance)
-            {
-                StopPointClickMove();
-                // TODO: do something
-            }
-            else
-                UpdateTargetEntityPosition(targetPlayer);
-        }
-        else if (TryGetTargetEntity(out targetMonster))
-        {
-            if (targetMonster.CurrentHp <= 0)
-            {
-                queueUsingSkill = null;
-                SetTargetEntity(null);
-                StopPointClickMove();
-                return;
-            }
-            var attackDistance = GetAttackDistance();
-            attackDistance -= attackDistance * 0.1f;
-            attackDistance -= stoppingDistance;
-            attackDistance += targetMonster.CacheCapsuleCollider.radius;
-            if (Vector3.Distance(CacheTransform.position, targetMonster.CacheTransform.position) <= attackDistance)
-            {
-                StopPointClickMove();
-                RequestAttack();
-            }
-            else
-                UpdateTargetEntityPosition(targetMonster);
-        }
-        else if (TryGetTargetEntity(out targetNpc))
-        {
-            var conversationDistance = gameInstance.conversationDistance - stoppingDistance;
-            if (Vector3.Distance(CacheTransform.position, targetNpc.CacheTransform.position) <= conversationDistance)
-            {
-                StopPointClickMove();
-                // TODO: implement npc conversation
-            }
-            else
-                UpdateTargetEntityPosition(targetNpc);
-        }
-        else if (TryGetTargetEntity(out targetItemDrop))
-        {
-            var pickUpItemDistance = gameInstance.pickUpItemDistance - stoppingDistance;
-            if (Vector3.Distance(CacheTransform.position, targetItemDrop.CacheTransform.position) <= pickUpItemDistance)
-            {
-                StopPointClickMove();
-                RequestPickupItem();
-                SetTargetEntity(null);
-            }
-            else
-                UpdateTargetEntityPosition(targetItemDrop);
-        }
-    }
-
-    protected void UpdateTargetEntityPosition(RpgNetworkEntity entity)
-    {
-        if (entity == null)
-            return;
-
-        var targetPosition = entity.CacheTransform.position;
-        if (oldFollowTargetPosition != targetPosition)
-        {
-            RequestPointClickMovement(targetPosition);
-            oldFollowTargetPosition = targetPosition;
-        }
-    }
-    
     protected float CalculateJumpVerticalSpeed()
     {
         // From the jump height and gravity we deduce the upwards speed 
@@ -463,6 +261,10 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         // Setup network components
         CacheNetTransform.ownerClientCanSendTransform = false;
         CacheNetTransform.ownerClientNotInterpolate = true;
+        // On data changes events
+        statPoint.onChange += OnStatPointChange;
+        skillPoint.onChange += OnSkillPointChange;
+        gold.onChange += OnGoldChange;
         // On list changes events
         hotkeys.onOperation += OnHotkeysOperation;
         // Register Network functions
@@ -475,14 +277,25 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     }
     #endregion
 
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        // On data changes events
+        statPoint.onChange -= OnStatPointChange;
+        skillPoint.onChange -= OnSkillPointChange;
+        gold.onChange += OnGoldChange;
+        // On list changes events
+        hotkeys.onOperation -= OnHotkeysOperation;
+    }
+
     #region Net functions callbacks
     protected void NetFuncSwapOrMergeItem(int fromIndex, int toIndex)
     {
-        if (CurrentHp <= 0 || 
+        if (CurrentHp <= 0 ||
             isDoingAction.Value ||
-            fromIndex < 0 || 
+            fromIndex < 0 ||
             fromIndex > nonEquipItems.Count ||
-            toIndex < 0 || 
+            toIndex < 0 ||
             toIndex > nonEquipItems.Count)
             return;
 
@@ -575,27 +388,6 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     #endregion
 
     #region Net functions callers
-    public override void RequestAttack()
-    {
-        if (!isDoingAction.Value && queueUsingSkill.HasValue)
-        {
-            var usingSkill = queueUsingSkill.Value;
-            RequestUseSkill(usingSkill.position, usingSkill.skillIndex);
-            queueUsingSkill = null;
-        }
-        base.RequestAttack();
-    }
-
-    public override void RequestUseSkill(Vector3 position, int skillIndex)
-    {
-        if (CurrentHp > 0 &&
-            isDoingAction.Value &&
-            skillIndex >= 0 &&
-            skillIndex < skills.Count)
-            queueUsingSkill = new UsingSkillData(position, skillIndex);
-        base.RequestUseSkill(position, skillIndex);
-    }
-
     public void RequestSwapOrMergeItem(int fromIndex, int toIndex)
     {
         if (CurrentHp <= 0)
@@ -623,7 +415,6 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
             return;
         if (!IsServer && CacheNetTransform.ownerClientNotInterpolate)
             SetMovePaths(position);
-        pointClickMoveStopped = false;
         CallNetFunction("PointClickMovement", FunctionReceivers.Server, position);
     }
 
@@ -639,120 +430,30 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
     #endregion
 
     #region Sync data changes callback
-    protected override void OnDatabaseIdChange(string databaseId)
+    protected virtual void OnStatPointChange(int statPoint)
     {
-        base.OnDatabaseIdChange(databaseId);
-
-        if (IsOwnerClient && CacheUISceneGameplay != null)
-        {
-            CacheUISceneGameplay.UpdateCharacter();
-            CacheUISceneGameplay.UpdateSkills();
-            CacheUISceneGameplay.UpdateEquipItems();
-            CacheUISceneGameplay.UpdateNonEquipItems();
-        }
+        if (onStatPointChange != null)
+            onStatPointChange.Invoke(statPoint);
     }
 
-    protected override void OnEquipWeaponsChange(EquipWeapons equipWeapons)
+    protected virtual void OnSkillPointChange(int skillPoint)
     {
-        base.OnEquipWeaponsChange(equipWeapons);
-
-        if (IsOwnerClient && CacheUISceneGameplay != null)
-        {
-            CacheUISceneGameplay.UpdateCharacter();
-            CacheUISceneGameplay.UpdateEquipItems();
-        }
+        if (onSkillPointChange != null)
+            onSkillPointChange.Invoke(skillPoint);
     }
 
-    protected override void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index)
+    protected virtual void OnGoldChange(int gold)
     {
-        base.OnAttributesOperation(operation, index);
-
-        if (IsOwnerClient && CacheUISceneGameplay != null)
-            CacheUISceneGameplay.UpdateCharacter();
-    }
-
-    protected override void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
-    {
-        base.OnSkillsOperation(operation, index);
-
-        if (IsOwnerClient && CacheUISceneGameplay != null)
-        {
-            CacheUISceneGameplay.UpdateCharacter();
-            CacheUISceneGameplay.UpdateSkills();
-        }
-    }
-
-    protected override void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
-    {
-        base.OnBuffsOperation(operation, index);
-        
-        if (IsOwnerClient && CacheUISceneGameplay != null)
-            CacheUISceneGameplay.UpdateCharacter();
-    }
-
-    protected override void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-    {
-        base.OnEquipItemsOperation(operation, index);
-
-        if (IsOwnerClient && CacheUISceneGameplay != null)
-        {
-            CacheUISceneGameplay.UpdateCharacter();
-            CacheUISceneGameplay.UpdateEquipItems();
-        }
-    }
-
-    protected override void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-    {
-        base.OnNonEquipItemsOperation(operation, index);
-
-        if (IsOwnerClient && CacheUISceneGameplay != null)
-        {
-            CacheUISceneGameplay.UpdateCharacter();
-            CacheUISceneGameplay.UpdateNonEquipItems();
-        }
+        if (onGoldChange != null)
+            onGoldChange.Invoke(gold);
     }
 
     protected virtual void OnHotkeysOperation(LiteNetLibSyncList.Operation operation, int index)
     {
-        if (IsOwnerClient && CacheUISceneGameplay != null)
-            CacheUISceneGameplay.UpdateHotkeys();
+        if (onHotkeysOperation != null)
+            onHotkeysOperation.Invoke(operation, index);
     }
     #endregion
-
-    protected override void OnDead(CharacterEntity lastAttacker)
-    {
-        base.OnDead(lastAttacker);
-        queueUsingSkill = null;
-    }
-
-    public void StopPointClickMove()
-    {
-        if (!pointClickMoveStopped)
-            RequestPointClickMovement(CacheTransform.position);
-        pointClickMoveStopped = true;
-    }
-
-    public void UseHotkey(int hotkeyIndex)
-    {
-        if (hotkeyIndex < 0 || hotkeyIndex >= hotkeys.Count)
-            return;
-
-        var hotkey = hotkeys[hotkeyIndex];
-        var skill = hotkey.GetSkill();
-        if (skill != null)
-        {
-            var skillIndex = skills.IndexOf(skill.Id);
-            CharacterEntity target = null;
-            TryGetTargetEntity(out target);
-            if (skillIndex >= 0)
-                RequestUseSkill(CacheTransform.position, skillIndex);
-        }
-        var item = hotkey.GetItem();
-        if (item != null)
-        {
-            // TODO: Implement use item functions
-        }
-    }
 
     protected void SetMovePaths(Vector3 position)
     {

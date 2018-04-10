@@ -29,7 +29,7 @@ public class UICharacterAttribute : UIDataForCharacter<KeyValuePair<CharacterAtt
         var characterAttribute = Data.Key;
         var amount = Data.Value;
         
-        if (IsOwningCharacter() && characterAttribute.CanIncrease(PlayerCharacterEntity.OwningCharacter))
+        if (IsOwningCharacter() && characterAttribute.CanIncrease(PlayerCharacterController.OwningCharacter))
             onAbleToIncrease.Invoke();
         else
             onUnableToIncrease.Invoke();
@@ -37,7 +37,7 @@ public class UICharacterAttribute : UIDataForCharacter<KeyValuePair<CharacterAtt
 
     protected override void UpdateData()
     {
-        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
+        var owningCharacter = PlayerCharacterController.OwningCharacter;
         var characterAttribute = Data.Key;
         var attribute = characterAttribute.GetAttribute();
         var amount = Data.Value;
@@ -64,7 +64,8 @@ public class UICharacterAttribute : UIDataForCharacter<KeyValuePair<CharacterAtt
         if (!IsOwningCharacter())
             return;
 
-        var owningCharacter = PlayerCharacterEntity.OwningCharacter;
-        owningCharacter.RequestAddAttribute(indexOfData, 1);
+        var owningCharacter = PlayerCharacterController.OwningCharacter;
+        if (owningCharacter != null)
+            owningCharacter.RequestAddAttribute(indexOfData, 1);
     }
 }

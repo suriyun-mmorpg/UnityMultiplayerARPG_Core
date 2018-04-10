@@ -81,7 +81,7 @@ public class MonsterCharacterEntity : CharacterEntity
 
         if (CurrentHp <= 0)
         {
-            ClearDestination();
+            StopMove();
             SetTargetEntity(null);
             if (Time.realtimeSinceStartup - deadTime >= database.deadHideDelay)
                 isHidding.Value = true;
@@ -93,7 +93,7 @@ public class MonsterCharacterEntity : CharacterEntity
         UpdateActivity();
     }
 
-    protected virtual void ClearDestination()
+    protected virtual void StopMove()
     {
         CacheNavMeshAgent.isStopped = true;
         CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
@@ -112,7 +112,7 @@ public class MonsterCharacterEntity : CharacterEntity
         {
             if (targetEntity.CurrentHp <= 0)
             {
-                ClearDestination();
+                StopMove();
                 SetTargetEntity(null);
                 return;
             }
@@ -151,7 +151,7 @@ public class MonsterCharacterEntity : CharacterEntity
                 }
                 if (Time.realtimeSinceStartup - startFollowTargetCountTime >= FOLLOW_TARGET_DURATION)
                 {
-                    ClearDestination();
+                    StopMove();
                     SetTargetEntity(null);
                     return;
                 }
@@ -360,9 +360,9 @@ public class MonsterCharacterEntity : CharacterEntity
         return database.damageInfo.GetDistance();
     }
 
-    protected override void OnReceivedDamage(CharacterEntity attacker, CombatAmountTypes damageAmountType, int damage)
+    protected override void ReceivedDamage(CharacterEntity attacker, CombatAmountTypes damageAmountType, int damage)
     {
-        base.OnReceivedDamage(attacker, damageAmountType, damage);
+        base.ReceivedDamage(attacker, damageAmountType, damage);
         // Add received damage entry
         if (attacker == null)
             return;
@@ -377,9 +377,9 @@ public class MonsterCharacterEntity : CharacterEntity
         receivedDamageRecords[attacker] = receivedDamageRecord;
     }
 
-    protected override void OnDead(CharacterEntity lastAttacker)
+    protected override void Killed(CharacterEntity lastAttacker)
     {
-        base.OnDead(lastAttacker);
+        base.Killed(lastAttacker);
         deadTime = Time.realtimeSinceStartup;
         var maxHp = this.GetStats().hp;
         var randomedExp = Random.Range(database.randomExpMin, database.randomExpMax);
