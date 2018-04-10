@@ -15,6 +15,8 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
         SinglePlayer,
     }
 
+    public float autoSaveDuration = 2f;
+    protected float lastSaveTime;
     public static GameStartType StartType;
     public static string ConnectingNetworkAddress;
     public static PlayerCharacterData SelectedCharacter;
@@ -38,6 +40,18 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
                 networkPort = gameInstanceExtra.networkPort;
                 StartClient();
                 break;
+        }
+    }
+
+    protected override void Update()
+    {
+        base.Update();
+        if (Time.realtimeSinceStartup - lastSaveTime > autoSaveDuration)
+        {
+            var owningCharacter = PlayerCharacterEntity.OwningCharacter;
+            if (owningCharacter != null)
+                owningCharacter.SavePersistentCharacterData();
+            lastSaveTime = Time.realtimeSinceStartup;
         }
     }
 
