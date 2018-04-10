@@ -48,10 +48,11 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     public SyncFieldString characterName = new SyncFieldString();
     public SyncFieldInt level = new SyncFieldInt();
     public SyncFieldInt exp = new SyncFieldInt();
-    public SyncFieldFloat currentHp = new SyncFieldFloat();
-    public SyncFieldFloat currentMp = new SyncFieldFloat();
+    public SyncFieldInt currentHp = new SyncFieldInt();
+    public SyncFieldInt currentMp = new SyncFieldInt();
     public SyncFieldEquipWeapons equipWeapons = new SyncFieldEquipWeapons();
     public SyncFieldBool isDoingAction = new SyncFieldBool();
+    public SyncFieldBool isHidding = new SyncFieldBool();
     // List
     public SyncListCharacterAttribute attributes = new SyncListCharacterAttribute();
     public SyncListCharacterSkill skills = new SyncListCharacterSkill();
@@ -66,8 +67,8 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     public virtual string CharacterName { get { return characterName; } set { characterName.Value = value; } }
     public virtual int Level { get { return level.Value; } set { level.Value = value; } }
     public virtual int Exp { get { return exp.Value; } set { exp.Value = value; } }
-    public virtual int CurrentHp { get { return (int)currentHp.Value; } set { currentHp.Value = value; } }
-    public virtual int CurrentMp { get { return (int)currentMp.Value; } set { currentMp.Value = value; } }
+    public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
+    public virtual int CurrentMp { get { return currentMp.Value; } set { currentMp.Value = value; } }
     public virtual EquipWeapons EquipWeapons { get { return equipWeapons; } set { equipWeapons.Value = value; } }
 
     public IList<CharacterAttribute> Attributes
@@ -204,7 +205,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected virtual void UpdateAnimation()
     {
-        if (model != null)
+        if (model != null && model.gameObject.activeInHierarchy)
         {
             var animator = model.CacheAnimator;
             var isDead = CurrentHp <= 0;
@@ -283,6 +284,8 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         equipWeapons.forOwnerOnly = false;
         isDoingAction.sendOptions = SendOptions.ReliableOrdered;
         isDoingAction.forOwnerOnly = true;
+        isHidding.sendOptions = SendOptions.ReliableOrdered;
+        isHidding.forOwnerOnly = false;
 
         attributes.forOwnerOnly = false;
         skills.forOwnerOnly = true;
@@ -295,30 +298,39 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     {
         SetupNetElements();
         // On data changes events
-        databaseId.onChange += OnDatabaseIdChange;
-        equipWeapons.onChange += OnChangeEquipWeapons;
-        // On list changes events
-        attributes.onOperation += OnAttributesOperation;
+    id.onChange += OnIdChange;
+    databaseId.onChange += OnDatabaseIdChange;
+    characterName.onChange += OnCharacterNameChange;
+    level.onChange += OnLevelChange;
+    exp.onChange += OnExpChange;
+    currentHp.onChange += OnCurrentHpChange;
+    currentMp.onChange += OnCurrentMpChange;
+    equipWeapons.onChange += OnEquipWeaponsChange;
+    isDoingAction.onChange += OnDoingActionChange;
+    isHidding.onChange += OnIsHiddingChange;
+    // On list changes events
+    attributes.onOperation += OnAttributesOperation;
         skills.onOperation += OnSkillsOperation;
         buffs.onOperation += OnBuffsOperation;
         equipItems.onOperation += OnEquipItemsOperation;
         nonEquipItems.onOperation += OnNonEquipItemsOperation;
         // Register Network functions
         RegisterNetFunction("Attack", new LiteNetLibFunction(() => NetFuncAttack(1, null, CharacterBuff.Empty)));
-        RegisterNetFunction("UseSkill", new LiteNetLibFunction<NetFieldInt>((skillIndex) => NetFuncUseSkill(skillIndex)));
+        RegisterNetFunction("UseSkill", new LiteNetLibFunction<NetFieldVector3, NetFieldInt>((position, skillIndex) => NetFuncUseSkill(position, skillIndex)));
         RegisterNetFunction("PlayActionAnimation", new LiteNetLibFunction<NetFieldInt>((actionId) => NetFuncPlayActionAnimation(actionId)));
-        RegisterNetFunction("PickupItem", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncPickupItem(objectId)));
+        RegisterNetFunction("PickupItem", new LiteNetLibFunction(() => NetFuncPickupItem()));
         RegisterNetFunction("DropItem", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((index, amount) => NetFuncDropItem(index, amount)));
         RegisterNetFunction("EquipItem", new LiteNetLibFunction<NetFieldInt, NetFieldString>((nonEquipIndex, equipPosition) => NetFuncEquipItem(nonEquipIndex, equipPosition)));
         RegisterNetFunction("UnEquipItem", new LiteNetLibFunction<NetFieldString>((fromEquipPosition) => NetFuncUnEquipItem(fromEquipPosition)));
         RegisterNetFunction("CombatAmount", new LiteNetLibFunction<NetFieldByte, NetFieldInt>((combatAmountTypes, amount) => NetFuncCombatAmount((CombatAmountTypes)combatAmountTypes.Value, amount)));
+        RegisterNetFunction("SetTargetEntity", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncSetTargetEntity(objectId)));
     }
 
     protected virtual void OnDestroy()
     {
         // On data changes events
         databaseId.onChange -= OnDatabaseIdChange;
-        equipWeapons.onChange -= OnChangeEquipWeapons;
+        equipWeapons.onChange -= OnEquipWeaponsChange;
         // On list changes events
         attributes.onOperation -= OnAttributesOperation;
         skills.onOperation -= OnSkillsOperation;
@@ -335,7 +347,10 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="inflictRate">This will be multiplied with weapon damage to calculate total damage</param>
     /// <param name="additionalDamageAttributes">This will be sum with calculated weapon damage to calculate total damage</param>
     /// <param name="debuff">Debuff which will be applies to damage receivers</param>
-    protected void NetFuncAttack(float inflictRate, Dictionary<DamageElement, DamageAmount> additionalDamageAttributes, CharacterBuff debuff)
+    protected void NetFuncAttack(
+        float inflictRate, 
+        Dictionary<DamageElement, DamageAmount> additionalDamageAttributes, 
+        CharacterBuff debuff)
     {
         if (CurrentHp <= 0 || isDoingAction.Value)
             return;
@@ -344,8 +359,8 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         int actionId;
         float damageDuration;
         float totalDuration;
-        Dictionary<DamageElement, DamageAmount> allDamageAttributes;
         DamageInfo damageInfo;
+        Dictionary<DamageElement, DamageAmount> allDamageAttributes;
 
         GetAttackData(
             inflictRate,
@@ -360,10 +375,11 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         // Play animation on clients
         RequestPlayActionAnimation(actionId);
         // Start attack routine
-        StartCoroutine(AttackRoutine(damageDuration, totalDuration, damageInfo, allDamageAttributes, debuff));
+        StartCoroutine(AttackRoutine(CacheTransform.position, damageDuration, totalDuration, damageInfo, allDamageAttributes, debuff));
     }
 
     IEnumerator AttackRoutine(
+        Vector3 position,
         float damageDuration,
         float totalDuration,
         DamageInfo damageInfo,
@@ -371,21 +387,17 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         CharacterBuff debuff)
     {
         yield return new WaitForSecondsRealtime(damageDuration);
-        LaunchDamageEntity(damageInfo, allDamageAttributes, debuff);
+        LaunchDamageEntity(position, damageInfo, allDamageAttributes, debuff);
         yield return new WaitForSecondsRealtime(totalDuration - damageDuration);
         isDoingAction.Value = false;
-    }
-
-    protected void NetFuncUseSkillCallback(NetFieldInt skillIndex)
-    {
-        NetFuncUseSkill(skillIndex);
     }
 
     /// <summary>
     /// Is function will be called at server to order character to use skill
     /// </summary>
+    /// <param name="position">Target position to apply skill at</param>
     /// <param name="skillIndex">Index in `characterSkills` list which will be used</param>
-    protected void NetFuncUseSkill(int skillIndex)
+    protected void NetFuncUseSkill(Vector3 position, int skillIndex)
     {
         if (CurrentHp <= 0 ||
             isDoingAction.Value ||
@@ -403,13 +415,12 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         // Play animation on clients
         RequestPlayActionAnimation(anim.Id);
         // Start use skill routine
-        StartCoroutine(UseSkillRoutine(skillIndex));
+        StartCoroutine(UseSkillRoutine(position, skillIndex));
     }
 
-    IEnumerator UseSkillRoutine(int skillIndex)
+    IEnumerator UseSkillRoutine(Vector3 position, int skillIndex)
     {
         var characterSkill = skills[skillIndex];
-
         var skill = characterSkill.GetSkill();
         var anim = skill.castAnimation;
         yield return new WaitForSecondsRealtime(anim.TriggerDuration);
@@ -443,7 +454,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, baseDamageAttribute);
         var damageInfo = skill.damageInfo;
         var debuff = skill.isDebuff ? CharacterBuff.Create(Id, skill.Id, true, characterSkill.level) : CharacterBuff.Empty;
-        LaunchDamageEntity(damageInfo, allDamageAttributes, debuff);
+        LaunchDamageEntity(CacheTransform.position, damageInfo, allDamageAttributes, debuff);
     }
 
     protected void AttackAsWeaponDamageInflict(CharacterSkill characterSkill)
@@ -451,11 +462,11 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         var skill = characterSkill.GetSkill();
         if (skill == null)
             return;
-
-        NetFuncAttack(
-            skill.GetInflictRate(characterSkill.level), 
-            skill.GetAdditionalDamageAttributes(characterSkill.level), 
-            skill.isDebuff ? CharacterBuff.Create(Id, characterSkill.skillId, true, characterSkill.level) : CharacterBuff.Empty);
+        
+        var inflictRate = skill.GetInflictRate(characterSkill.level);
+        var additionalDamageAttributes = skill.GetAdditionalDamageAttributes(characterSkill.level);
+        var debuff = skill.isDebuff ? CharacterBuff.Create(Id, characterSkill.skillId, true, characterSkill.level) : CharacterBuff.Empty;
+        NetFuncAttack(inflictRate, additionalDamageAttributes, debuff);
     }
 
     protected void ApplySkillBuff(CharacterSkill characterSkill)
@@ -508,23 +519,30 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     /// This will be called at server to order character to pickup items
     /// </summary>
     /// <param name="objectId"></param>
-    protected void NetFuncPickupItem(uint objectId)
+    protected void NetFuncPickupItem()
     {
         if (CurrentHp <= 0 || isDoingAction.Value)
             return;
 
         var gameInstance = GameInstance.Singleton;
-        var spawnedObjects = Manager.Assets.SpawnedObjects;
-        LiteNetLibIdentity spawnedObject;
-        // Find object by objectId, if not found don't continue
-        if (!spawnedObjects.TryGetValue(objectId, out spawnedObject))
-            return;
-        
-        // Don't pickup item if it's too far
-        if (Vector3.Distance(CacheTransform.position, spawnedObject.transform.position) >= gameInstance.pickUpItemDistance)
+        ItemDropEntity itemDropEntity;
+        var isFoundTargetEntity = TryGetTargetEntity(out itemDropEntity);
+        // If have target entity but it's too far from character, don't pick it up
+        if (isFoundTargetEntity && Vector3.Distance(CacheTransform.position, itemDropEntity.CacheTransform.position) >= gameInstance.pickUpItemDistance)
             return;
 
-        var itemDropEntity = spawnedObject.GetComponent<ItemDropEntity>();
+        // If target entity have not been set, try to pick up item randomly within range
+        if (!isFoundTargetEntity)
+        {
+            var foundEntities = Physics.OverlapSphere(CacheTransform.position, gameInstance.pickUpItemDistance, gameInstance.itemDropLayer.Mask);
+            foreach (var foundEntity in foundEntities)
+            {
+                itemDropEntity = foundEntity.GetComponent<ItemDropEntity>();
+                if (itemDropEntity != null)
+                    break;
+            }
+        }
+
         var itemDropData = itemDropEntity.dropData;
         if (!itemDropData.IsValid())
         {
@@ -654,6 +672,18 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     {
 
     }
+
+    /// <summary>
+    /// This will be cladded on server to set target entity
+    /// </summary>
+    /// <param name="objectId"></param>
+    protected void NetFuncSetTargetEntity(uint objectId)
+    {
+        RpgNetworkEntity entity;
+        if (!Manager.Assets.TryGetSpawnedObject(objectId, out entity))
+            return;
+        SetTargetEntity(entity);
+    }
     #endregion
 
     #region Net functions callers
@@ -664,11 +694,11 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         CallNetFunction("Attack", FunctionReceivers.Server);
     }
 
-    public virtual void RequestUseSkill(int skillIndex)
+    public virtual void RequestUseSkill(Vector3 position, int skillIndex)
     {
         if (CurrentHp <= 0 || isDoingAction.Value)
             return;
-        CallNetFunction("UseSkill", FunctionReceivers.Server, skillIndex);
+        CallNetFunction("UseSkill", FunctionReceivers.Server, position, skillIndex);
     }
 
     public virtual void RequestPlayActionAnimation(int actionId)
@@ -678,11 +708,11 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         CallNetFunction("PlayActionAnimation", FunctionReceivers.All, actionId);
     }
 
-    public virtual void RequestPickupItem(uint objectId)
+    public virtual void RequestPickupItem()
     {
         if (CurrentHp <= 0 || isDoingAction.Value)
             return;
-        CallNetFunction("PickupItem", FunctionReceivers.Server, objectId);
+        CallNetFunction("PickupItem", FunctionReceivers.Server);
     }
 
     public virtual void RequestDropItem(int index, int amount)
@@ -709,6 +739,11 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     public virtual void RequestCombatAmount(CombatAmountTypes combatAmountTypes, int amount)
     {
         CallNetFunction("CombatAmount", FunctionReceivers.All, combatAmountTypes, amount);
+    }
+
+    public virtual void RequestSetTargetEntity(uint objectId)
+    {
+        CallNetFunction("SetTargetEntity", FunctionReceivers.Server, objectId);
     }
     #endregion
 
@@ -1026,7 +1061,13 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     
     #region Sync data changes callback
     /// <summary>
-    /// Override this to do stuffs when database Id changed
+    /// Override this to do stuffs when id changes
+    /// </summary>
+    /// <param name="id"></param>
+    protected virtual void OnIdChange(string id) { }
+
+    /// <summary>
+    /// Override this to do stuffs when database Id changes
     /// </summary>
     /// <param name="databaseId"></param>
     protected virtual void OnDatabaseIdChange(string databaseId)
@@ -1041,17 +1082,64 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
             SetupModel(model);
             model.SetEquipWeapons(equipWeapons);
             model.SetEquipItems(equipItems);
+            model.gameObject.SetActive(!isHidding.Value);
         }
     }
 
     /// <summary>
+    /// Override this to do stuffs when character name changes
+    /// </summary>
+    /// <param name="characterName"></param>
+    protected virtual void OnCharacterNameChange(string characterName) { }
+
+    /// <summary>
+    /// Override this to do stuffs when level changes
+    /// </summary>
+    /// <param name="level"></param>
+    protected virtual void OnLevelChange(int level) { }
+
+    /// <summary>
+    /// Override this to do stuffs when exp changes
+    /// </summary>
+    /// <param name="exp"></param>
+    protected virtual void OnExpChange(int exp) { }
+
+    /// <summary>
+    /// Override this to do stuffs when current hp changes
+    /// </summary>
+    /// <param name="currentHp"></param>
+    protected virtual void OnCurrentHpChange(int currentHp) { }
+
+    /// <summary>
+    /// Override this to do stuffs when current mp changes
+    /// </summary>
+    /// <param name="currentMp"></param>
+    protected virtual void OnCurrentMpChange(int currentMp) { }
+    
+    /// <summary>
     /// Override this to do stuffs when equip weapons changes
     /// </summary>
     /// <param name="equipWeapons"></param>
-    protected virtual void OnChangeEquipWeapons(EquipWeapons equipWeapons)
+    protected virtual void OnEquipWeaponsChange(EquipWeapons equipWeapons)
     {
         if (model != null)
             model.SetEquipWeapons(equipWeapons);
+    }
+
+    /// <summary>
+    /// Overrride this to do stuffs when doing action state changes
+    /// </summary>
+    /// <param name="doingAction"></param>
+    protected virtual void OnDoingActionChange(bool doingAction) { }
+
+    /// <summary>
+    /// Override this to do stuffs when hidding state changes
+    /// </summary>
+    /// <param name="isHidding"></param>
+    protected virtual void OnIsHiddingChange(bool isHidding)
+    {
+        if (model != null)
+            model.gameObject.SetActive(!isHidding);
     }
     #endregion
 
@@ -1061,18 +1149,14 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     /// </summary>
     /// <param name="operation"></param>
     /// <param name="index"></param>
-    protected virtual void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index)
-    {
-    }
+    protected virtual void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index) { }
 
     /// <summary>
     /// Override this to do stuffs when skills changes
     /// </summary>
     /// <param name="operation"></param>
     /// <param name="index"></param>
-    protected virtual void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
-    {
-    }
+    protected virtual void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index) { }
 
     /// <summary>
     /// Override this to do stuffs when buffs changes
@@ -1101,9 +1185,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     /// </summary>
     /// <param name="operation"></param>
     /// <param name="index"></param>
-    protected virtual void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-    {
-    }
+    protected virtual void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index) { }
     #endregion
 
     #region Keys indexes update functions
@@ -1133,9 +1215,11 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Target Entity Getter/Setter
-    public void SetTargetEntity(RpgNetworkEntity newTargetEntity)
+    public void SetTargetEntity(RpgNetworkEntity entity)
     {
-        targetEntity = newTargetEntity;
+        targetEntity = entity;
+        if (!IsServer)
+            RequestSetTargetEntity(entity == null ? 0 : entity.ObjectId);
     }
 
     public bool TryGetTargetEntity<T>(out T entity) where T : RpgNetworkEntity
@@ -1255,6 +1339,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     }
 
     public virtual void LaunchDamageEntity(
+        Vector3 position,
         DamageInfo damageInfo,
         Dictionary<DamageElement, DamageAmount> allDamageAttributes,
         CharacterBuff debuff)
@@ -1332,7 +1417,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     {
     }
 
-    internal virtual void Respawn()
+    protected virtual void Respawn()
     {
         if (!IsServer || CurrentHp > 0)
             return;

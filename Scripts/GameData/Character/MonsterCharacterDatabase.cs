@@ -21,6 +21,8 @@ public class MonsterCharacterDatabase : BaseCharacterDatabase
     [Tooltip("This will work with assist characteristic only, to detect ally")]
     public ushort allyId;
     public float visualRange = 5f;
+    public float deadHideDelay = 2f;
+    public float deadRespawnDelay = 5f;
     [Header("Attributes/Stats")]
     public AttributeIncremental[] attributes;
     public CharacterStatsIncremental stats;

@@ -24,9 +24,14 @@ public class MonsterCharacterEntity : CharacterEntity
     protected float setTargetDestinationTime;
     protected float startFollowTargetCountTime;
     protected float receivedDamageRecordsUpdateTime;
+    protected float deadTime;
     protected Vector3? wanderDestination;
     protected Vector3 oldMovePosition;
     protected readonly Dictionary<CharacterEntity, ReceivedDamageRecord> receivedDamageRecords = new Dictionary<CharacterEntity, ReceivedDamageRecord>();
+    #endregion
+
+    #region Public data
+    public Vector3 respawnPosition;
     #endregion
 
     #region Interface implementation
@@ -78,6 +83,10 @@ public class MonsterCharacterEntity : CharacterEntity
         {
             ClearDestination();
             SetTargetEntity(null);
+            if (Time.realtimeSinceStartup - deadTime >= database.deadHideDelay)
+                isHidding.Value = true;
+            if (Time.realtimeSinceStartup - deadTime >= database.deadRespawnDelay)
+                Respawn();
             return;
         }
 
@@ -371,6 +380,7 @@ public class MonsterCharacterEntity : CharacterEntity
     protected override void OnDead(CharacterEntity lastAttacker)
     {
         base.OnDead(lastAttacker);
+        deadTime = Time.realtimeSinceStartup;
         var maxHp = this.GetStats().hp;
         var randomedExp = Random.Range(database.randomExpMin, database.randomExpMax);
         var randomedGold = Random.Range(database.randomGoldMin, database.randomGoldMax);
@@ -407,6 +417,15 @@ public class MonsterCharacterEntity : CharacterEntity
                 }
             }
         }
+    }
+
+    protected override void Respawn()
+    {
+        if (!IsServer || CurrentHp > 0)
+            return;
+        base.Respawn();
+        CacheTransform.position = respawnPosition;
+        isHidding.Value = false;
     }
 }
 

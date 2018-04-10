@@ -45,6 +45,7 @@ public class MonsterSpawnArea : MonoBehaviour
             }
             entity.CurrentHp = entity.GetMaxHp();
             entity.CurrentMp = entity.GetMaxMp();
+            entity.respawnPosition = randomedPosition;
         }
     }
 
