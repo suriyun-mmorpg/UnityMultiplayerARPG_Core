@@ -1351,13 +1351,18 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         switch (damageInfo.damageType)
         {
             case DamageType.Melee:
+                var halfFov = damageInfo.hitFov * 0.5f;
                 var hits = Physics.OverlapSphere(damageTransform.position, damageInfo.hitDistance);
                 foreach (var hit in hits)
                 {
                     var characterEntity = hit.GetComponent<CharacterEntity>();
-                    if (characterEntity == null)
+                    if (characterEntity == null || characterEntity == this || characterEntity.CurrentHp <= 0)
                         continue;
-                    characterEntity.ReceiveDamage(this, allDamageAttributes, debuff);
+                    var targetDir = (CacheTransform.position - characterEntity.CacheTransform.position).normalized;
+                    var angle = Vector3.Angle(targetDir, CacheTransform.forward);
+                    // Angle in foward position is 180 so we use this value to determine that target is in hit fov or not
+                    if (angle < 180 + halfFov && angle > 180 - halfFov)
+                        characterEntity.ReceiveDamage(this, allDamageAttributes, debuff);
                 }
                 break;
             case DamageType.Missile:
