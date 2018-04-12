@@ -18,13 +18,14 @@ public enum CombatAmountTypes : byte
 }
 
 [RequireComponent(typeof(CapsuleCollider))]
-public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
+public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 {
     public const string ANIM_IS_DEAD = "IsDead";
     public const string ANIM_MOVE_SPEED = "MoveSpeed";
     public const string ANIM_Y_SPEED = "YSpeed";
     public const string ANIM_DO_ACTION = "DoAction";
     public const string ANIM_HURT = "Hurt";
+    public const float RECOVERY_UPDATE_DURATION = 0.5f;
 
     // Use id as primary key
     #region Sync data
@@ -56,7 +57,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     [Tooltip("Model will be instantiated inside this transform, if not set will use this component's transform")]
     public Transform modelContainer;
     #endregion
-    
+
     #region Protected data
     protected RpgNetworkEntity targetEntity;
     protected CharacterModel model;
@@ -64,6 +65,9 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
     protected Vector3? previousPosition;
     protected Vector3 currentVelocity;
+    protected float recoveryingHp;
+    protected float recoveryingMp;
+    protected float recoveryTime;
     #endregion
 
     #region Sync data actions
@@ -97,8 +101,32 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     public virtual string CharacterName { get { return characterName; } set { characterName.Value = value; } }
     public virtual int Level { get { return level.Value; } set { level.Value = value; } }
     public virtual int Exp { get { return exp.Value; } set { exp.Value = value; } }
-    public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
-    public virtual int CurrentMp { get { return currentMp.Value; } set { currentMp.Value = value; } }
+    public virtual int CurrentHp
+    {
+        get { return currentHp.Value; }
+        set
+        {
+            if (value <= 0)
+                value = 0;
+            var maxHp = this.GetMaxHp();
+            if (maxHp > 0 && value > maxHp)
+                value = maxHp;
+            currentHp.Value = value;
+        }
+    }
+    public virtual int CurrentMp
+    {
+        get { return currentMp.Value; }
+        set
+        {
+            if (value <= 0)
+                value = 0;
+            var maxMp = this.GetMaxMp();
+            if (maxMp > 0 && value > maxMp)
+                value = maxMp;
+            currentMp.Value = value;
+        }
+    }
     public virtual EquipWeapons EquipWeapons { get { return equipWeapons; } set { equipWeapons.Value = value; } }
 
     public IList<CharacterAttribute> Attributes
@@ -174,7 +202,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
     #endregion
-    
+
     #region Cache components
     private CapsuleCollider cacheCapsuleCollider;
     public CapsuleCollider CacheCapsuleCollider
@@ -218,9 +246,9 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected virtual void Update()
     {
-        // Use this to update animations
-        UpdateSkillAndBuff();
         UpdateAnimation();
+        UpdateSkillAndBuff();
+        UpdateRecoverying();
     }
 
     protected virtual void FixedUpdate()
@@ -284,6 +312,46 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
 
+    protected virtual void UpdateRecoverying()
+    {
+        if (CurrentHp <= 0)
+            return;
+
+        var gameRule = GameInstance.Singleton.GameplayRule;
+        var timeDiff = Time.realtimeSinceStartup - recoveryTime;
+        if (timeDiff >= RECOVERY_UPDATE_DURATION)
+        {
+            recoveryingHp += timeDiff * gameRule.GetRecoveryHpPerSeconds(this);
+            recoveryingMp += timeDiff * gameRule.GetRecoveryMpPerSeconds(this);
+            recoveryTime = Time.realtimeSinceStartup;
+            var maxHp = this.GetMaxHp();
+            var maxMp = this.GetMaxMp();
+            if (CurrentHp < maxHp)
+            {
+                if (recoveryingHp >= 0)
+                {
+                    var intRecoveryingHp = (int)recoveryingHp;
+                    CurrentHp += intRecoveryingHp;
+                    recoveryingHp -= intRecoveryingHp;
+                }
+            }
+            else
+                recoveryingHp = 0;
+
+            if (CurrentMp < maxMp)
+            {
+                if (recoveryingMp >= 0)
+                {
+                    var intRecoveryingMp = (int)recoveryingMp;
+                    CurrentMp += intRecoveryingMp;
+                    recoveryingMp -= intRecoveryingMp;
+                }
+            }
+            else
+                recoveryingMp = 0;
+        }
+    }
+
     #region Setup functions
     public override void OnBehaviourValidate()
     {
@@ -328,18 +396,18 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     {
         SetupNetElements();
         // On data changes events
-    id.onChange += OnIdChange;
-    databaseId.onChange += OnDatabaseIdChange;
-    characterName.onChange += OnCharacterNameChange;
-    level.onChange += OnLevelChange;
-    exp.onChange += OnExpChange;
-    currentHp.onChange += OnCurrentHpChange;
-    currentMp.onChange += OnCurrentMpChange;
-    equipWeapons.onChange += OnEquipWeaponsChange;
-    isDoingAction.onChange += OnIsDoingActionChange;
-    isHidding.onChange += OnIsHiddingChange;
-    // On list changes events
-    attributes.onOperation += OnAttributesOperation;
+        id.onChange += OnIdChange;
+        databaseId.onChange += OnDatabaseIdChange;
+        characterName.onChange += OnCharacterNameChange;
+        level.onChange += OnLevelChange;
+        exp.onChange += OnExpChange;
+        currentHp.onChange += OnCurrentHpChange;
+        currentMp.onChange += OnCurrentMpChange;
+        equipWeapons.onChange += OnEquipWeaponsChange;
+        isDoingAction.onChange += OnIsDoingActionChange;
+        isHidding.onChange += OnIsHiddingChange;
+        // On list changes events
+        attributes.onOperation += OnAttributesOperation;
         skills.onOperation += OnSkillsOperation;
         buffs.onOperation += OnBuffsOperation;
         equipItems.onOperation += OnEquipItemsOperation;
@@ -381,8 +449,8 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="additionalDamageAttributes">This will be sum with calculated weapon damage to calculate total damage</param>
     /// <param name="debuff">Debuff which will be applies to damage receivers</param>
     protected void NetFuncAttack(
-        float inflictRate, 
-        Dictionary<DamageElement, DamageAmount> additionalDamageAttributes, 
+        float inflictRate,
+        Dictionary<DamageElement, DamageAmount> additionalDamageAttributes,
         CharacterBuff debuff)
     {
         if (CurrentHp <= 0 || isDoingAction.Value)
@@ -479,7 +547,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         var skill = characterSkill.GetSkill();
         if (skill == null)
             return;
-        
+
         // Calculate all damages
         var effectiveness = skill.GetDamageEffectiveness(this);
         var baseDamageAttribute = skill.GetDamageAttribute(characterSkill.level, effectiveness, 1f);
@@ -495,7 +563,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         var skill = characterSkill.GetSkill();
         if (skill == null)
             return;
-        
+
         var inflictRate = skill.GetInflictRate(characterSkill.level);
         var additionalDamageAttributes = skill.GetAdditionalDamageAttributes(characterSkill.level);
         var debuff = skill.isDebuff ? CharacterBuff.Create(Id, characterSkill.skillId, true, characterSkill.level) : CharacterBuff.Empty;
@@ -598,9 +666,9 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     protected void NetFuncDropItem(int index, int amount)
     {
         var gameInstance = GameInstance.Singleton;
-        if (CurrentHp <= 0 || 
-            isDoingAction.Value || 
-            index < 0 || 
+        if (CurrentHp <= 0 ||
+            isDoingAction.Value ||
+            index < 0 ||
             index > nonEquipItems.Count)
             return;
 
@@ -621,9 +689,9 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="equipPosition"></param>
     protected void NetFuncEquipItem(int nonEquipIndex, string equipPosition)
     {
-        if (CurrentHp <= 0 || 
-            isDoingAction.Value || 
-            nonEquipIndex < 0 || 
+        if (CurrentHp <= 0 ||
+            isDoingAction.Value ||
+            nonEquipIndex < 0 ||
             nonEquipIndex > nonEquipItems.Count)
             return;
 
@@ -850,7 +918,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
                 changes[emptySlot.Key] = newItem;
             }
         }
-        
+
         // Apply all changes
         foreach (var change in changes)
         {
@@ -1009,7 +1077,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         return true;
     }
 
-    public virtual void ReceiveDamage(CharacterEntity attacker,
+    public virtual void ReceiveDamage(BaseCharacterEntity attacker,
         Dictionary<DamageElement, DamageAmount> allDamageAttributes,
         CharacterBuff debuff)
     {
@@ -1064,17 +1132,14 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
 
         if (model != null)
         {
-            var animator =  model.CacheAnimator;
+            var animator = model.CacheAnimator;
             animator.ResetTrigger(ANIM_HURT);
             animator.SetTrigger(ANIM_HURT);
         }
 
         // If current hp <= 0, character dead
         if (CurrentHp <= 0)
-        {
-            CurrentHp = 0;
             Killed(attacker);
-        }
         else if (!debuff.IsEmpty())
         {
             var buffId = debuff.GetBuffId();
@@ -1091,7 +1156,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
     #endregion
-    
+
     #region Sync data changes callback
     /// <summary>
     /// Override this to do stuffs when id changes
@@ -1443,7 +1508,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
                 var hits = Physics.OverlapSphere(damageTransform.position, damageInfo.hitDistance);
                 foreach (var hit in hits)
                 {
-                    var characterEntity = hit.GetComponent<CharacterEntity>();
+                    var characterEntity = hit.GetComponent<BaseCharacterEntity>();
                     if (characterEntity == null || characterEntity == this || characterEntity.CurrentHp <= 0)
                         continue;
                     var targetDir = (CacheTransform.position - characterEntity.CacheTransform.position).normalized;
@@ -1487,12 +1552,12 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         return CacheTransform;
     }
 
-    protected virtual void ReceivedDamage(CharacterEntity attacker, CombatAmountTypes damageAmountType, int damage)
+    protected virtual void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountTypes damageAmountType, int damage)
     {
         RequestCombatAmount(damageAmountType, damage);
     }
 
-    protected virtual void Killed(CharacterEntity lastAttacker)
+    protected virtual void Killed(BaseCharacterEntity lastAttacker)
     {
         StopAllCoroutines();
         isDoingAction.Value = false;
@@ -1529,7 +1594,7 @@ public abstract class CharacterEntity : RpgNetworkEntity, ICharacterData
         CallNetFunction("OnLevelUp", ConnectId);
     }
 
-    protected abstract bool CanReceiveDamageFrom(CharacterEntity characterEntity);
-    protected abstract bool IsAlly(CharacterEntity characterEntity);
-    protected abstract bool IsEnemy(CharacterEntity characterEntity);
+    protected abstract bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity);
+    protected abstract bool IsAlly(BaseCharacterEntity characterEntity);
+    protected abstract bool IsEnemy(BaseCharacterEntity characterEntity);
 }

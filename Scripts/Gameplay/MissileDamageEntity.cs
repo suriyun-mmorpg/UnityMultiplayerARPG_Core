@@ -19,7 +19,7 @@ public class MissileDamageEntity : DamageEntity
         }
     }
 
-    public void SetupDamage(CharacterEntity attacker,
+    public void SetupDamage(BaseCharacterEntity attacker,
         Dictionary<DamageElement, DamageAmount> allDamageAttributes,
         CharacterBuff debuff,
         float missileDistance,
@@ -41,7 +41,7 @@ public class MissileDamageEntity : DamageEntity
         if (!IsServer)
             return;
 
-        var characterEntity = other.GetComponent<CharacterEntity>();
+        var characterEntity = other.GetComponent<BaseCharacterEntity>();
         if (characterEntity == null)
             return;
 

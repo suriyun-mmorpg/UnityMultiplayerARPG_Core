@@ -7,7 +7,7 @@ using LiteNetLibHighLevel;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(LiteNetLibTransform))]
-public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
+public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
 {
     #region Sync data
     public SyncFieldInt statPoint = new SyncFieldInt();
@@ -153,7 +153,7 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
                     CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(moveDirection), angularSpeed * Time.fixedDeltaTime);
                 }
 
-                CharacterEntity tempCharacterEntity;
+                BaseCharacterEntity tempCharacterEntity;
                 if (moveDirectionMagnitude == 0 && TryGetTargetEntity(out tempCharacterEntity))
                 {
                     var targetDirection = (tempCharacterEntity.CacheTransform.position - CacheTransform.position).normalized;
@@ -223,19 +223,19 @@ public class PlayerCharacterEntity : CharacterEntity, IPlayerCharacterData
         Warp(RespawnMapName, RespawnPosition);
     }
 
-    protected override bool CanReceiveDamageFrom(CharacterEntity characterEntity)
+    protected override bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity)
     {
         // TODO: May implement this for party/guild battle purposes
         return characterEntity != null && characterEntity is MonsterCharacterEntity;
     }
 
-    protected override bool IsAlly(CharacterEntity characterEntity)
+    protected override bool IsAlly(BaseCharacterEntity characterEntity)
     {
         // TODO: May implement this for party/guild battle purposes
         return false;
     }
 
-    protected override bool IsEnemy(CharacterEntity characterEntity)
+    protected override bool IsEnemy(BaseCharacterEntity characterEntity)
     {
         // TODO: May implement this for party/guild battle purposes
         return characterEntity != null && characterEntity is MonsterCharacterEntity;

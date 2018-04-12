@@ -194,7 +194,7 @@ public class PlayerCharacterController : MonoBehaviour
         }
         else
         {
-            CharacterEntity targetCharacter = null;
+            BaseCharacterEntity targetCharacter = null;
             CacheCharacterEntity.TryGetTargetEntity(out targetCharacter);
             if (CacheUISceneGameplay != null)
                 CacheUISceneGameplay.SetTargetCharacter(targetCharacter);
@@ -401,7 +401,7 @@ public class PlayerCharacterController : MonoBehaviour
         if (skill != null)
         {
             var skillIndex = CacheCharacterEntity.skills.IndexOf(skill.Id);
-            CharacterEntity target = null;
+            BaseCharacterEntity target = null;
             CacheCharacterEntity.TryGetTargetEntity(out target);
             if (skillIndex >= 0)
                 RequestUseSkill(CacheCharacterTransform.position, skillIndex);

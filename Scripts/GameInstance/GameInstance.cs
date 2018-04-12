@@ -19,7 +19,6 @@ public class GameInstance : MonoBehaviour
     public GameObject targetObject;
     public UISceneGameplay uiSceneGameplayPrefab;
     [Header("Gameplay Database")]
-    public BaseGameplayRule gameplayRule;
     [Tooltip("Default weapon item, will be used when character not equip any weapon")]
     public Item defaultWeaponItem;
     public Item[] items;
@@ -57,13 +56,16 @@ public class GameInstance : MonoBehaviour
     public static readonly Dictionary<string, Skill> Skills = new Dictionary<string, Skill>();
     public static readonly Dictionary<int, ActionAnimation> ActionAnimations = new Dictionary<int, ActionAnimation>();
 
+    private BaseGameplayRule cacheGameplayRule;
     public BaseGameplayRule GameplayRule
     {
         get
         {
-            if (gameplayRule == null)
-                gameplayRule = ScriptableObject.CreateInstance<SimpleGameplayRule>();
-            return gameplayRule;
+            if (cacheGameplayRule == null)
+                cacheGameplayRule = GetComponent<BaseGameplayRule>();
+            if (cacheGameplayRule == null)
+                cacheGameplayRule = gameObject.AddComponent<SimpleGameplayRule>();
+            return cacheGameplayRule;
         }
     }
 

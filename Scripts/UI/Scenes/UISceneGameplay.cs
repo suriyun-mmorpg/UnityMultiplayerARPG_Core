@@ -81,7 +81,7 @@ public class UISceneGameplay : MonoBehaviour
             uiHotkeys.UpdateData(PlayerCharacterController.OwningCharacter);
     }
 
-    public void SetTargetCharacter(CharacterEntity character)
+    public void SetTargetCharacter(BaseCharacterEntity character)
     {
         if (uiTargetCharacter == null)
             return;

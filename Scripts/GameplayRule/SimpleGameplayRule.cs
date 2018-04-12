@@ -85,6 +85,16 @@ public class SimpleGameplayRule : BaseGameplayRule
         return damageAmount -= damageAmount * resistanceAmount; // If resistance is minus damage will be increased
     }
 
+    public override float GetRecoveryHpPerSeconds(ICharacterData character)
+    {
+        return character.GetMaxHp() * 0.01f; // 1% of total hp
+    }
+
+    public override float GetRecoveryMpPerSeconds(ICharacterData character)
+    {
+        return character.GetMaxMp() * 0.01f; // 1% of total mp
+    }
+
     public override bool IncreaseExp(ICharacterData character, int exp)
     {
         var isLevelUp = false;

@@ -4,11 +4,11 @@ using UnityEngine;
 
 public abstract class DamageEntity : RpgNetworkEntity
 {
-    protected CharacterEntity attacker;
+    protected BaseCharacterEntity attacker;
     protected Dictionary<DamageElement, DamageAmount> allDamageAttributes;
     protected CharacterBuff debuff;
 
-    public virtual void SetupDamage(CharacterEntity attacker,
+    public virtual void SetupDamage(BaseCharacterEntity attacker,
         Dictionary<DamageElement, DamageAmount> allDamageAttributes,
         CharacterBuff debuff)
     {
@@ -17,7 +17,7 @@ public abstract class DamageEntity : RpgNetworkEntity
         this.debuff = debuff;
     }
 
-    public virtual void ApplyDamageTo(CharacterEntity target)
+    public virtual void ApplyDamageTo(BaseCharacterEntity target)
     {
         if (target == null)
             return;

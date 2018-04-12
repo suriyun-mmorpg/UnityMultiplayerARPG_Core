@@ -7,7 +7,7 @@ using LiteNetLibHighLevel;
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(LiteNetLibTransform))]
-public class MonsterCharacterEntity : CharacterEntity
+public class MonsterCharacterEntity : BaseCharacterEntity
 {
     public const float RANDOM_WANDER_DURATION_MIN = 2f;
     public const float RANDOM_WANDER_DURATION_MAX = 5f;
@@ -27,7 +27,7 @@ public class MonsterCharacterEntity : CharacterEntity
     protected float deadTime;
     protected Vector3? wanderDestination;
     protected Vector3 oldMovePosition;
-    protected readonly Dictionary<CharacterEntity, ReceivedDamageRecord> receivedDamageRecords = new Dictionary<CharacterEntity, ReceivedDamageRecord>();
+    protected readonly Dictionary<BaseCharacterEntity, ReceivedDamageRecord> receivedDamageRecords = new Dictionary<BaseCharacterEntity, ReceivedDamageRecord>();
     #endregion
 
     #region Public data
@@ -107,7 +107,7 @@ public class MonsterCharacterEntity : CharacterEntity
 
         var gameInstance = GameInstance.Singleton;
         var currentPosition = CacheTransform.position;
-        CharacterEntity targetEntity;
+        BaseCharacterEntity targetEntity;
         if (TryGetTargetEntity(out targetEntity))
         {
             if (targetEntity.CurrentHp <= 0)
@@ -193,7 +193,7 @@ public class MonsterCharacterEntity : CharacterEntity
                     Time.realtimeSinceStartup >= findTargetTime)
                 {
                     SetFindTargetTime();
-                    CharacterEntity targetCharacter;
+                    BaseCharacterEntity targetCharacter;
                     // If no target enenmy or target enemy is dead
                     if (!TryGetTargetEntity(out targetCharacter) || targetCharacter.CurrentHp <= 0)
                     {
@@ -202,7 +202,7 @@ public class MonsterCharacterEntity : CharacterEntity
                         foundObjects = foundObjects.OrderBy(a => System.Guid.NewGuid()).ToList();
                         foreach (var foundObject in foundObjects)
                         {
-                            var characterEntity = foundObject.GetComponent<CharacterEntity>();
+                            var characterEntity = foundObject.GetComponent<BaseCharacterEntity>();
                             if (characterEntity != null && IsEnemy(characterEntity))
                             {
                                 startFollowTargetCountTime = Time.realtimeSinceStartup;
@@ -233,12 +233,12 @@ public class MonsterCharacterEntity : CharacterEntity
         findTargetTime = Time.realtimeSinceStartup + AGGRESSIVE_FIND_TARGET_DELAY;
     }
 
-    protected override bool CanReceiveDamageFrom(CharacterEntity characterEntity)
+    protected override bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity)
     {
         return characterEntity != null && characterEntity is PlayerCharacterEntity;
     }
 
-    protected override bool IsAlly(CharacterEntity characterEntity)
+    protected override bool IsAlly(BaseCharacterEntity characterEntity)
     {
         if (characterEntity == null)
             return false;
@@ -250,24 +250,24 @@ public class MonsterCharacterEntity : CharacterEntity
         return false;
     }
 
-    protected override bool IsEnemy(CharacterEntity characterEntity)
+    protected override bool IsEnemy(BaseCharacterEntity characterEntity)
     {
         return characterEntity != null && characterEntity is PlayerCharacterEntity;
     }
 
-    public void SetAttackTarget(CharacterEntity target)
+    public void SetAttackTarget(BaseCharacterEntity target)
     {
         if (target == null || target.CurrentHp <= 0)
             return;
         // Already have target so don't set target
-        CharacterEntity oldTarget;
+        BaseCharacterEntity oldTarget;
         if (TryGetTargetEntity(out oldTarget) && oldTarget.CurrentHp > 0)
             return;
         // Set target to attack
         SetTargetEntity(target);
     }
 
-    public override void ReceiveDamage(CharacterEntity attacker, 
+    public override void ReceiveDamage(BaseCharacterEntity attacker, 
         Dictionary<DamageElement, DamageAmount> allDamageAttributes, 
         CharacterBuff debuff)
     {
@@ -284,7 +284,7 @@ public class MonsterCharacterEntity : CharacterEntity
         {
             var gameInstance = GameInstance.Singleton;
             // If no target enemy and current target is character, try to attack
-            CharacterEntity targetEntity;
+            BaseCharacterEntity targetEntity;
             if (!TryGetTargetEntity(out targetEntity))
             {
                 SetAttackTarget(attacker);
@@ -360,7 +360,7 @@ public class MonsterCharacterEntity : CharacterEntity
         return database.damageInfo.GetDistance();
     }
 
-    protected override void ReceivedDamage(CharacterEntity attacker, CombatAmountTypes damageAmountType, int damage)
+    protected override void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountTypes damageAmountType, int damage)
     {
         base.ReceivedDamage(attacker, damageAmountType, damage);
         // Add received damage entry
@@ -377,7 +377,7 @@ public class MonsterCharacterEntity : CharacterEntity
         receivedDamageRecords[attacker] = receivedDamageRecord;
     }
 
-    protected override void Killed(CharacterEntity lastAttacker)
+    protected override void Killed(BaseCharacterEntity lastAttacker)
     {
         base.Killed(lastAttacker);
         deadTime = Time.realtimeSinceStartup;
@@ -386,7 +386,7 @@ public class MonsterCharacterEntity : CharacterEntity
         var randomedGold = Random.Range(database.randomGoldMin, database.randomGoldMax);
         if (receivedDamageRecords.Count > 0)
         {
-            var enemies = new List<CharacterEntity>(receivedDamageRecords.Keys);
+            var enemies = new List<BaseCharacterEntity>(receivedDamageRecords.Keys);
             foreach (var enemy in enemies)
             {
                 var receivedDamageRecord = receivedDamageRecords[enemy];
