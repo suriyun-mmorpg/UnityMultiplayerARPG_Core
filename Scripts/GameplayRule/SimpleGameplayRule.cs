@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class SimpleGameplayRule : BaseGameplayRule
 {
-    public override float GetHitChance(ICharacterData attacker, ICharacterData damageReceiver)
+    public override float GetHitChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
     {
         // Attacker stats
-        var attackerStats = attacker.GetStatsWithBuffs();
+        var attackerStats = attacker.CacheStatsWithBuffs;
         // Damage receiver stats
-        var dmgReceiverStats = damageReceiver.GetStatsWithBuffs();
+        var dmgReceiverStats = damageReceiver.CacheStatsWithBuffs;
         // Calculate chance to hit
         var attackerAcc = attackerStats.accuracy;
         var dmgReceiverEva = dmgReceiverStats.evasion;
@@ -32,9 +32,9 @@ public class SimpleGameplayRule : BaseGameplayRule
         return hitChance;
     }
 
-    public override float GetCriticalChance(ICharacterData attacker, ICharacterData damageReceiver)
+    public override float GetCriticalChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
     {
-        var criRate = damageReceiver.GetStatsWithBuffs().criRate;
+        var criRate = damageReceiver.CacheStatsWithBuffs.criRate;
         // Minimum critical chance is 5%
         if (criRate < 0.05f)
             criRate = 0.05f;
@@ -44,14 +44,14 @@ public class SimpleGameplayRule : BaseGameplayRule
         return criRate;
     }
 
-    public override float GetCriticalDamage(ICharacterData attacker, ICharacterData damageReceiver, float damage)
+    public override float GetCriticalDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, float damage)
     {
-        return damage * attacker.GetStatsWithBuffs().criDmgRate;
+        return damage * attacker.CacheStatsWithBuffs.criDmgRate;
     }
 
-    public override float GetBlockChance(ICharacterData attacker, ICharacterData damageReceiver)
+    public override float GetBlockChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
     {
-        var blockRate = damageReceiver.GetStatsWithBuffs().blockRate;
+        var blockRate = damageReceiver.CacheStatsWithBuffs.blockRate;
         // Minimum block chance is 5%
         if (blockRate < 0.05f)
             blockRate = 0.05f;
@@ -61,9 +61,9 @@ public class SimpleGameplayRule : BaseGameplayRule
         return blockRate;
     }
 
-    public override float GetBlockDamage(ICharacterData attacker, ICharacterData damageReceiver, float damage)
+    public override float GetBlockDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, float damage)
     {
-        var blockDmgRate = damageReceiver.GetStatsWithBuffs().blockDmgRate;
+        var blockDmgRate = damageReceiver.CacheStatsWithBuffs.blockDmgRate;
         // Minimum block damage is 5%
         if (blockDmgRate < 0.05f)
             blockDmgRate = 0.05f;
@@ -73,11 +73,11 @@ public class SimpleGameplayRule : BaseGameplayRule
         return damage * blockDmgRate;
     }
 
-    public override float GetDamageReducedByResistance(ICharacterData damageReceiver, float damageAmount, Resistance resistance)
+    public override float GetDamageReducedByResistance(BaseCharacterEntity damageReceiver, float damageAmount, Resistance resistance)
     {
         if (resistance == null)
-            return damageAmount -= damageReceiver.GetStats().armor; // If armor is minus damage will be increased
-        var resistances = damageReceiver.GetResistancesWithBuffs();
+            return damageAmount -= damageReceiver.CacheStatsWithBuffs.armor; // If armor is minus damage will be increased
+        var resistances = damageReceiver.CacheResistancesWithBuffs;
         float resistanceAmount = 0f;
         resistances.TryGetValue(resistance, out resistanceAmount);
         if (resistanceAmount > resistance.maxAmount)
@@ -85,17 +85,17 @@ public class SimpleGameplayRule : BaseGameplayRule
         return damageAmount -= damageAmount * resistanceAmount; // If resistance is minus damage will be increased
     }
 
-    public override float GetRecoveryHpPerSeconds(ICharacterData character)
+    public override float GetRecoveryHpPerSeconds(BaseCharacterEntity character)
     {
-        return character.GetMaxHp() * 0.01f; // 1% of total hp
+        return character.CacheMaxHp * 0.01f; // 1% of total hp
     }
 
-    public override float GetRecoveryMpPerSeconds(ICharacterData character)
+    public override float GetRecoveryMpPerSeconds(BaseCharacterEntity character)
     {
-        return character.GetMaxMp() * 0.01f; // 1% of total mp
+        return character.CacheMaxMp * 0.01f; // 1% of total mp
     }
 
-    public override bool IncreaseExp(ICharacterData character, int exp)
+    public override bool IncreaseExp(BaseCharacterEntity character, int exp)
     {
         var isLevelUp = false;
         var gameInstance = GameInstance.Singleton;

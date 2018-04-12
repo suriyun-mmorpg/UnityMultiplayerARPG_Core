@@ -72,6 +72,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Caches Data
+    public CharacterStats CacheStatsWithBuffs { get; protected set; }
+    public Dictionary<Attribute, int> CacheAttributesWithBuffs { get; protected set; }
+    public Dictionary<Resistance, float> CacheResistancesWithBuffs { get; protected set; }
     public int CacheMaxHp { get; protected set; }
     public int CacheMaxMp { get; protected set; }
     #endregion
@@ -1596,8 +1599,11 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     {
         if (!shouldRecaches)
             return;
-        CacheMaxHp = this.GetMaxHp();
-        CacheMaxMp = this.GetMaxMp();
+        CacheStatsWithBuffs = this.GetStatsWithBuffs();
+        CacheAttributesWithBuffs = this.GetAttributesWithBuffs();
+        CacheResistancesWithBuffs = this.GetResistancesWithBuffs();
+        CacheMaxHp = (int)CacheStatsWithBuffs.hp;
+        CacheMaxMp = (int)CacheStatsWithBuffs.mp;
         shouldRecaches = false;
     }
 

@@ -4,13 +4,13 @@ using UnityEngine;
 
 public abstract class BaseGameplayRule : MonoBehaviour
 {
-    public abstract float GetHitChance(ICharacterData attacker, ICharacterData damageReceiver);
-    public abstract float GetCriticalChance(ICharacterData attacker, ICharacterData damageReceiver);
-    public abstract float GetCriticalDamage(ICharacterData attacker, ICharacterData damageReceiver, float damage);
-    public abstract float GetBlockChance(ICharacterData attacker, ICharacterData damageReceiver);
-    public abstract float GetBlockDamage(ICharacterData attacker, ICharacterData damageReceiver, float damage);
-    public abstract float GetDamageReducedByResistance(ICharacterData damageReceiver, float damageAmount, Resistance resistance);
-    public abstract float GetRecoveryHpPerSeconds(ICharacterData character);
-    public abstract float GetRecoveryMpPerSeconds(ICharacterData character);
-    public abstract bool IncreaseExp(ICharacterData character, int exp);
+    public abstract float GetHitChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver);
+    public abstract float GetCriticalChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver);
+    public abstract float GetCriticalDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, float damage);
+    public abstract float GetBlockChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver);
+    public abstract float GetBlockDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, float damage);
+    public abstract float GetDamageReducedByResistance(BaseCharacterEntity damageReceiver, float damageAmount, Resistance resistance);
+    public abstract float GetRecoveryHpPerSeconds(BaseCharacterEntity character);
+    public abstract float GetRecoveryMpPerSeconds(BaseCharacterEntity character);
+    public abstract bool IncreaseExp(BaseCharacterEntity character, int exp);
 }

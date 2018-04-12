@@ -6,7 +6,7 @@ using UnityEngine;
 public class DamageElement : BaseGameData
 {
     public Resistance resistance;
-    public float GetDamageReducedByResistance(ICharacterData damageReceiver, float damageAmount)
+    public float GetDamageReducedByResistance(BaseCharacterEntity damageReceiver, float damageAmount)
     {
         var gameInstance = GameInstance.Singleton;
         return gameInstance.GameplayRule.GetDamageReducedByResistance(damageReceiver, damageAmount, resistance);
