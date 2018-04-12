@@ -101,32 +101,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public virtual string CharacterName { get { return characterName; } set { characterName.Value = value; } }
     public virtual int Level { get { return level.Value; } set { level.Value = value; } }
     public virtual int Exp { get { return exp.Value; } set { exp.Value = value; } }
-    public virtual int CurrentHp
-    {
-        get { return currentHp.Value; }
-        set
-        {
-            if (value <= 0)
-                value = 0;
-            var maxHp = this.GetMaxHp();
-            if (maxHp > 0 && value > maxHp)
-                value = maxHp;
-            currentHp.Value = value;
-        }
-    }
-    public virtual int CurrentMp
-    {
-        get { return currentMp.Value; }
-        set
-        {
-            if (value <= 0)
-                value = 0;
-            var maxMp = this.GetMaxMp();
-            if (maxMp > 0 && value > maxMp)
-                value = maxMp;
-            currentMp.Value = value;
-        }
-    }
+    public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
+    public virtual int CurrentMp { get { return currentMp.Value; } set { currentMp.Value = value; } }
     public virtual EquipWeapons EquipWeapons { get { return equipWeapons; } set { equipWeapons.Value = value; } }
 
     public IList<CharacterAttribute> Attributes
@@ -314,42 +290,53 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected virtual void UpdateRecoverying()
     {
-        if (CurrentHp <= 0)
-            return;
+        var maxHp = this.GetMaxHp();
+        var maxMp = this.GetMaxMp();
 
-        var gameRule = GameInstance.Singleton.GameplayRule;
-        var timeDiff = Time.realtimeSinceStartup - recoveryTime;
-        if (timeDiff >= RECOVERY_UPDATE_DURATION)
+        if (CurrentHp > 0)
         {
-            recoveryingHp += timeDiff * gameRule.GetRecoveryHpPerSeconds(this);
-            recoveryingMp += timeDiff * gameRule.GetRecoveryMpPerSeconds(this);
-            recoveryTime = Time.realtimeSinceStartup;
-            var maxHp = this.GetMaxHp();
-            var maxMp = this.GetMaxMp();
-            if (CurrentHp < maxHp)
+            var gameRule = GameInstance.Singleton.GameplayRule;
+            var timeDiff = Time.realtimeSinceStartup - recoveryTime;
+            if (timeDiff >= RECOVERY_UPDATE_DURATION)
             {
-                if (recoveryingHp >= 0)
+                recoveryingHp += timeDiff * gameRule.GetRecoveryHpPerSeconds(this);
+                recoveryingMp += timeDiff * gameRule.GetRecoveryMpPerSeconds(this);
+                recoveryTime = Time.realtimeSinceStartup;
+                if (CurrentHp < maxHp)
                 {
-                    var intRecoveryingHp = (int)recoveryingHp;
-                    CurrentHp += intRecoveryingHp;
-                    recoveryingHp -= intRecoveryingHp;
+                    if (recoveryingHp >= 0)
+                    {
+                        var intRecoveryingHp = (int)recoveryingHp;
+                        CurrentHp += intRecoveryingHp;
+                        recoveryingHp -= intRecoveryingHp;
+                    }
                 }
-            }
-            else
-                recoveryingHp = 0;
+                else
+                    recoveryingHp = 0;
 
-            if (CurrentMp < maxMp)
-            {
-                if (recoveryingMp >= 0)
+                if (CurrentMp < maxMp)
                 {
-                    var intRecoveryingMp = (int)recoveryingMp;
-                    CurrentMp += intRecoveryingMp;
-                    recoveryingMp -= intRecoveryingMp;
+                    if (recoveryingMp >= 0)
+                    {
+                        var intRecoveryingMp = (int)recoveryingMp;
+                        CurrentMp += intRecoveryingMp;
+                        recoveryingMp -= intRecoveryingMp;
+                    }
                 }
+                else
+                    recoveryingMp = 0;
             }
-            else
-                recoveryingMp = 0;
         }
+
+        // Validates Hp / Mp
+        if (CurrentHp < 0)
+            CurrentHp = 0;
+        if (CurrentMp < 0)
+            CurrentMp = 0;
+        if (CurrentHp > maxHp)
+            CurrentHp = maxHp;
+        if (CurrentMp > maxMp)
+            CurrentMp = maxMp;
     }
 
     #region Setup functions
