@@ -68,6 +68,12 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected float recoveryingHp;
     protected float recoveryingMp;
     protected float recoveryTime;
+    protected bool shouldRecaches;
+    #endregion
+
+    #region Caches Data
+    public int CacheMaxHp { get; protected set; }
+    public int CacheMaxMp { get; protected set; }
     #endregion
 
     #region Sync data actions
@@ -222,6 +228,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected virtual void Update()
     {
+        MakeCaches();
         UpdateAnimation();
         UpdateSkillAndBuff();
         UpdateRecoverying();
@@ -290,8 +297,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected virtual void UpdateRecoverying()
     {
-        var maxHp = this.GetMaxHp();
-        var maxMp = this.GetMaxMp();
+        var maxHp = CacheMaxHp;
+        var maxMp = CacheMaxMp;
 
         if (CurrentHp > 0)
         {
@@ -1273,6 +1280,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="index"></param>
     protected virtual void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index)
     {
+        if (IsServer)
+            shouldRecaches = true;
+
         if (onAttributesOperation != null)
             onAttributesOperation.Invoke(operation, index);
     }
@@ -1284,6 +1294,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="index"></param>
     protected virtual void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
+        if (IsServer)
+            shouldRecaches = true;
+
         if (onSkillsOperation != null)
             onSkillsOperation.Invoke(operation, index);
     }
@@ -1295,6 +1308,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="index"></param>
     protected virtual void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
+        if (IsServer)
+            shouldRecaches = true;
+
         if (model != null)
             model.SetBuffs(buffs);
 
@@ -1309,6 +1325,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="index"></param>
     protected virtual void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
+        if (IsServer)
+            shouldRecaches = true;
+
         if (model != null)
             model.SetEquipItems(equipItems);
 
@@ -1323,6 +1342,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="index"></param>
     protected virtual void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
+        if (IsServer)
+            shouldRecaches = true;
+
         if (onNonEquipItemsOperation != null)
             onNonEquipItemsOperation.Invoke(operation, index);
     }
@@ -1564,10 +1586,19 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     {
         if (!IsServer || CurrentHp > 0)
             return;
-        CurrentHp = this.GetMaxHp();
-        CurrentMp = this.GetMaxMp();
+        CurrentHp = CacheMaxHp;
+        CurrentMp = CacheMaxMp;
         // Send OnRespawn to owner player only
         CallNetFunction("OnRespawn", ConnectId);
+    }
+
+    protected virtual void MakeCaches()
+    {
+        if (!shouldRecaches)
+            return;
+        CacheMaxHp = this.GetMaxHp();
+        CacheMaxMp = this.GetMaxMp();
+        shouldRecaches = false;
     }
 
     internal virtual void IncreaseExp(int exp)
