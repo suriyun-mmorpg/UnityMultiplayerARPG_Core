@@ -359,6 +359,7 @@ public class PlayerCharacterController : MonoBehaviour
         if (oldFollowTargetPosition != targetPosition)
         {
             CacheCharacterEntity.RequestPointClickMovement(targetPosition);
+            pointClickMoveStopped = false;
             oldFollowTargetPosition = targetPosition;
         }
     }
@@ -366,8 +367,10 @@ public class PlayerCharacterController : MonoBehaviour
     public void StopPointClickMove()
     {
         if (!pointClickMoveStopped)
+        {
             CacheCharacterEntity.RequestPointClickMovement(CacheCharacterTransform.position);
-        pointClickMoveStopped = true;
+            pointClickMoveStopped = true;
+        }
     }
 
     public void RequestAttack()
