@@ -6,39 +6,54 @@ public class GameEffect : MonoBehaviour
 {
     public bool isLoop;
     public float lifeTime;
+    public Transform followingTarget;
 
-    private Transform tempTransform;
-    public Transform TempTransform
+    private Transform cacheTransform;
+    public Transform CacheTransform
     {
         get
         {
-            if (tempTransform == null)
-                tempTransform = GetComponent<Transform>();
-            return tempTransform;
+            if (cacheTransform == null)
+                cacheTransform = GetComponent<Transform>();
+            return cacheTransform;
         }
     }
 
+    public AudioClip[] soundEffects;
     private ParticleSystem[] particles;
     private AudioSource[] audioSources;
 
     private void Awake()
     {
         particles = GetComponentsInChildren<ParticleSystem>();
-        foreach (var particle in particles)
-        {
-            particle.Play();
-        }
         audioSources = GetComponentsInChildren<AudioSource>();
-        foreach (var audioSource in audioSources)
-        {
-            audioSource.Play();
-        }
     }
 
     private void Start()
     {
+        foreach (var soundEffect in soundEffects)
+        {
+            AudioSource.PlayClipAtPoint(soundEffect, transform.position);
+        }
+        foreach (var particle in particles)
+        {
+            particle.Play();
+        }
+        foreach (var audioSource in audioSources)
+        {
+            audioSource.Play();
+        }
         if (!isLoop)
             Destroy(gameObject, lifeTime);
+    }
+
+    private void Update()
+    {
+        if (followingTarget != null)
+        {
+            CacheTransform.position = followingTarget.position;
+            CacheTransform.rotation = followingTarget.rotation;
+        }
     }
 
     public void DestroyEffect()
@@ -53,15 +68,5 @@ public class GameEffect : MonoBehaviour
             audioSource.loop = false;
         }
         Destroy(gameObject, lifeTime);
-    }
-
-    public GameEffect InstantiateTo(Transform parent, bool asChildren = true)
-    {
-        var effect = Instantiate(this, asChildren ? parent : null);
-        effect.TempTransform.localPosition = Vector3.zero;
-        effect.TempTransform.localEulerAngles = Vector3.zero;
-        effect.TempTransform.localScale = Vector3.one;
-        effect.gameObject.SetActive(true);
-        return effect;
     }
 }
