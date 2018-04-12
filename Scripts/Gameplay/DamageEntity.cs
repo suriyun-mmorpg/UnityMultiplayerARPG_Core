@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using LiteNetLibHighLevel;
 
 public abstract class DamageEntity : RpgNetworkEntity
 {
@@ -8,7 +9,8 @@ public abstract class DamageEntity : RpgNetworkEntity
     protected Dictionary<DamageElement, DamageAmount> allDamageAttributes;
     protected CharacterBuff debuff;
 
-    public virtual void SetupDamage(BaseCharacterEntity attacker,
+    public virtual void SetupDamage(
+        BaseCharacterEntity attacker,
         Dictionary<DamageElement, DamageAmount> allDamageAttributes,
         CharacterBuff debuff)
     {

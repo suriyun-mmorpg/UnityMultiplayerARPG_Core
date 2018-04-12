@@ -1,12 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using LiteNetLibHighLevel;
 
 [RequireComponent(typeof(Rigidbody))]
 public class MissileDamageEntity : DamageEntity
 {
     protected float missileDistance;
-    protected float missileSpeed;
+    [SerializeField]
+    protected SyncFieldFloat missileSpeed = new SyncFieldFloat();
 
     private Rigidbody cacheRigidbody;
     public Rigidbody CacheRigidbody
@@ -19,7 +21,8 @@ public class MissileDamageEntity : DamageEntity
         }
     }
 
-    public void SetupDamage(BaseCharacterEntity attacker,
+    public void SetupDamage(
+        BaseCharacterEntity attacker,
         Dictionary<DamageElement, DamageAmount> allDamageAttributes,
         CharacterBuff debuff,
         float missileDistance,
@@ -27,13 +30,17 @@ public class MissileDamageEntity : DamageEntity
     {
         SetupDamage(attacker, allDamageAttributes, debuff);
         this.missileDistance = missileDistance;
-        this.missileSpeed = missileSpeed;
-        CacheRigidbody.velocity = attacker.CacheTransform.forward * missileSpeed;
+        this.missileSpeed.Value = missileSpeed;
 
-        if (missileDistance > 0)
-            NetworkDestroy(missileSpeed / missileDistance);
+        if (missileDistance > 0 && missileSpeed > 0)
+            NetworkDestroy(missileDistance / missileSpeed);
         else
             NetworkDestroy();
+    }
+
+    private void FixedUpdate()
+    {
+        CacheRigidbody.velocity = CacheTransform.forward * missileSpeed.Value;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -42,7 +49,7 @@ public class MissileDamageEntity : DamageEntity
             return;
 
         var characterEntity = other.GetComponent<BaseCharacterEntity>();
-        if (characterEntity == null)
+        if (characterEntity == null || characterEntity == attacker || characterEntity.CurrentHp <= 0)
             return;
 
         ApplyDamageTo(characterEntity);
