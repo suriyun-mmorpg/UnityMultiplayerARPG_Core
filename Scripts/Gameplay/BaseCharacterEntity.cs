@@ -768,7 +768,47 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="amount"></param>
     protected void NetFuncCombatAmount(CombatAmountTypes combatAmountTypes, int amount)
     {
+        var uiSceneGameplay = UISceneGameplay.Singleton;
+        if (uiSceneGameplay == null)
+            return;
+        switch (combatAmountTypes)
+        {
+            case CombatAmountTypes.Miss:
+                SpawnCombatText(uiSceneGameplay.uiCombatTextMiss, amount);
+                break;
+            case CombatAmountTypes.NormalDamage:
+                SpawnCombatText(uiSceneGameplay.uiCombatTextNormalDamage, amount);
+                break;
+            case CombatAmountTypes.CriticalDamage:
+                SpawnCombatText(uiSceneGameplay.uiCombatTextCriticalDamage, amount);
+                break;
+            case CombatAmountTypes.BlockedDamage:
+                SpawnCombatText(uiSceneGameplay.uiCombatTextBlockedDamage, amount);
+                break;
+            case CombatAmountTypes.HpRecovery:
+                SpawnCombatText(uiSceneGameplay.uiCombatTextHpRecovery, amount);
+                break;
+            case CombatAmountTypes.MpRecovery:
+                SpawnCombatText(uiSceneGameplay.uiCombatTextMpRecovery, amount);
+                break;
+        }
+    }
 
+    protected void SpawnCombatText(UICombatText prefab, int amount)
+    {
+        var uiSceneGameplay = UISceneGameplay.Singleton;
+        if (uiSceneGameplay == null)
+            return;
+        var combatTextTransform = CacheTransform;
+        if (model != null)
+            combatTextTransform = model.CombatTextTransform;
+        if (uiSceneGameplay.combatTextTransform != null)
+        {
+            var combatText = Instantiate(prefab, uiSceneGameplay.combatTextTransform);
+            combatText.transform.localScale = Vector3.one;
+            combatText.CacheObjectFollower.targetObject = combatTextTransform;
+            combatText.Amount = amount;
+        }
     }
 
     /// <summary>

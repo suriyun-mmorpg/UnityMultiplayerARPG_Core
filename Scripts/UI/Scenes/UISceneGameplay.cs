@@ -22,6 +22,15 @@ public class UISceneGameplay : MonoBehaviour
     public UICharacterHotkeys uiHotkeys;
     public UIToggleUI[] toggleUis;
 
+    [Header("Combat Text")]
+    public Transform combatTextTransform;
+    public UICombatText uiCombatTextMiss;
+    public UICombatText uiCombatTextNormalDamage;
+    public UICombatText uiCombatTextCriticalDamage;
+    public UICombatText uiCombatTextBlockedDamage;
+    public UICombatText uiCombatTextHpRecovery;
+    public UICombatText uiCombatTextMpRecovery;
+
     [Header("Events")]
     public UnityEvent onCharacterDead;
     public UnityEvent onCharacterRespawn;
