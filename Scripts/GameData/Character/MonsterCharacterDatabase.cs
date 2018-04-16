@@ -23,9 +23,6 @@ public class MonsterCharacterDatabase : BaseCharacterDatabase
     public float visualRange = 5f;
     public float deadHideDelay = 2f;
     public float deadRespawnDelay = 5f;
-    [Header("Attributes/Stats")]
-    public AttributeIncremental[] attributes;
-    public CharacterStatsIncremental stats;
 
     [Header("Attack animations")]
     public ActionAnimation[] attackAnimations;
@@ -77,10 +74,5 @@ public class MonsterCharacterDatabase : BaseCharacterDatabase
                 });
         }
         return rewards;
-    }
-
-    public override CharacterStats GetCharacterStats(int level)
-    {
-        return stats.GetCharacterStats(level);
     }
 }

@@ -35,6 +35,7 @@ public class GameInstance : MonoBehaviour
     public UnityLayer itemDropLayer;
     public int increaseStatPointEachLevel = 5;
     public int increaseSkillPointEachLevel = 1;
+    public float moveSpeedMultiplier = 5f;
     public int startGold = 0;
     public ItemAmountPair[] startItems;
     public float pickUpItemDistance = 1f;

@@ -17,6 +17,13 @@ public enum CombatAmountTypes : byte
     MpRecovery,
 }
 
+public enum AnimActionTypes : byte
+{
+    Generic,
+    Attack,
+    Skill,
+}
+
 [RequireComponent(typeof(CapsuleCollider))]
 public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 {
@@ -25,6 +32,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public const string ANIM_Y_SPEED = "YSpeed";
     public const string ANIM_DO_ACTION = "DoAction";
     public const string ANIM_HURT = "Hurt";
+    public const string ANIM_MOVE_CLIP_MULTIPLIER = "MoveSpeedMultiplier";
+    public const string ANIM_ACTION_CLIP_MULTIPLIER = "ActionSpeedMultiplier";
     public const float RECOVERY_UPDATE_DURATION = 0.5f;
 
     // Use id as primary key
@@ -59,6 +68,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Protected data
+    protected BaseCharacterDatabase database;
     protected RpgNetworkEntity targetEntity;
     protected CharacterModel model;
     protected readonly Dictionary<string, int> buffIndexes = new Dictionary<string, int>();
@@ -99,12 +109,12 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Another actions
-    public System.Action onDead;
-    public System.Action onRespawn;
+    public System.Action<bool> onDead;
+    public System.Action<bool> onRespawn;
     public System.Action onLevelUp;
     #endregion
 
-    #region Interface implementation
+    #region Fields/Interface implementation
     public virtual string Id { get { return id; } set { id.Value = value; } }
     public virtual string DatabaseId { get { return databaseId; } set { databaseId.Value = value; } }
     public virtual string CharacterName { get { return characterName; } set { characterName.Value = value; } }
@@ -113,6 +123,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
     public virtual int CurrentMp { get { return currentMp.Value; } set { currentMp.Value = value; } }
     public virtual EquipWeapons EquipWeapons { get { return equipWeapons; } set { equipWeapons.Value = value; } }
+    public virtual float MoveSpeed { get { return this.GetMoveSpeed(); } }
+    public virtual float AttackSpeed { get { return this.GetAttackSpeed(); } }
 
     public IList<CharacterAttribute> Attributes
     {
@@ -227,6 +239,14 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         {
             nonOwnerObject.SetActive(!IsOwnerClient);
         }
+        // Notify clients that this character is spawn or dead
+        if (IsServer)
+        {
+            if (CurrentHp > 0)
+                RequestOnRespawn(true);
+            else
+                RequestOnDead(true);
+        }
     }
 
     protected virtual void Update()
@@ -252,18 +272,17 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (model != null && model.gameObject.activeInHierarchy)
         {
             var animator = model.CacheAnimator;
-            var isDead = CurrentHp <= 0;
             var velocity = currentVelocity;
             var moveSpeed = new Vector3(velocity.x, 0, velocity.z).magnitude;
-            if (isDead)
+            if (CurrentHp <= 0)
             {
                 moveSpeed = 0f;
                 // Force set to none action when dead
                 animator.SetBool(ANIM_DO_ACTION, false);
             }
             animator.SetFloat(ANIM_MOVE_SPEED, moveSpeed);
+            animator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, MoveSpeed);
             animator.SetFloat(ANIM_Y_SPEED, velocity.y);
-            animator.SetBool(ANIM_IS_DEAD, isDead);
         }
     }
 
@@ -412,16 +431,16 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         // Register Network functions
         RegisterNetFunction("Attack", new LiteNetLibFunction(() => NetFuncAttack(1, null, CharacterBuff.Empty)));
         RegisterNetFunction("UseSkill", new LiteNetLibFunction<NetFieldVector3, NetFieldInt>((position, skillIndex) => NetFuncUseSkill(position, skillIndex)));
-        RegisterNetFunction("PlayActionAnimation", new LiteNetLibFunction<NetFieldInt>((actionId) => NetFuncPlayActionAnimation(actionId)));
+        RegisterNetFunction("PlayActionAnimation", new LiteNetLibFunction<NetFieldInt, NetFieldByte>((actionId, animActionTypes) => NetFuncPlayActionAnimation(actionId, (AnimActionTypes)animActionTypes.Value)));
         RegisterNetFunction("PickupItem", new LiteNetLibFunction(() => NetFuncPickupItem()));
         RegisterNetFunction("DropItem", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((index, amount) => NetFuncDropItem(index, amount)));
         RegisterNetFunction("EquipItem", new LiteNetLibFunction<NetFieldInt, NetFieldString>((nonEquipIndex, equipPosition) => NetFuncEquipItem(nonEquipIndex, equipPosition)));
         RegisterNetFunction("UnEquipItem", new LiteNetLibFunction<NetFieldString>((fromEquipPosition) => NetFuncUnEquipItem(fromEquipPosition)));
         RegisterNetFunction("CombatAmount", new LiteNetLibFunction<NetFieldByte, NetFieldInt>((combatAmountTypes, amount) => NetFuncCombatAmount((CombatAmountTypes)combatAmountTypes.Value, amount)));
         RegisterNetFunction("SetTargetEntity", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncSetTargetEntity(objectId)));
-        RegisterNetFunction("OnDead", new LiteNetLibFunction(() => { if (onDead != null) onDead.Invoke(); }));
-        RegisterNetFunction("OnRespawn", new LiteNetLibFunction(() => { if (onRespawn != null) onRespawn.Invoke(); }));
-        RegisterNetFunction("OnLevelUp", new LiteNetLibFunction(() => { if (onLevelUp != null) onLevelUp.Invoke(); }));
+        RegisterNetFunction("OnDead", new LiteNetLibFunction<NetFieldBool>((isInitialize) => NetFuncOnDead(isInitialize)));
+        RegisterNetFunction("OnRespawn", new LiteNetLibFunction<NetFieldBool>((isInitialize) => NetFuncOnRespawn(isInitialize)));
+        RegisterNetFunction("OnLevelUp", new LiteNetLibFunction(() => NetFuncOnLevelUp()));
     }
 
     protected virtual void OnDestroy()
@@ -471,7 +490,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
         isDoingAction.Value = true;
         // Play animation on clients
-        RequestPlayActionAnimation(actionId);
+        RequestPlayActionAnimation(actionId, AnimActionTypes.Attack);
         // Start attack routine
         StartCoroutine(AttackRoutine(CacheTransform.position, damageDuration, totalDuration, damageInfo, allDamageAttributes, debuff));
     }
@@ -511,7 +530,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         isDoingAction.Value = true;
         var anim = skill.castAnimation;
         // Play animation on clients
-        RequestPlayActionAnimation(anim.Id);
+        RequestPlayActionAnimation(anim.Id, AnimActionTypes.Skill);
         // Start use skill routine
         StartCoroutine(UseSkillRoutine(position, skillIndex));
     }
@@ -535,7 +554,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                 break;
         }
         ApplySkillBuff(characterSkill);
-        yield return new WaitForSecondsRealtime(anim.ClipLength - anim.TriggerDuration);
+        yield return new WaitForSecondsRealtime(anim.ClipLength + anim.extraDuration - anim.TriggerDuration);
         isDoingAction.Value = false;
     }
 
@@ -591,14 +610,14 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// </summary>
     /// <param name="duration"></param>
     /// <param name="actionId"></param>
-    protected void NetFuncPlayActionAnimation(int actionId)
+    protected void NetFuncPlayActionAnimation(int actionId, AnimActionTypes animActionTypes)
     {
         if (CurrentHp <= 0)
             return;
-        StartCoroutine(PlayActionAnimationRoutine(actionId));
+        StartCoroutine(PlayActionAnimationRoutine(actionId, animActionTypes));
     }
 
-    IEnumerator PlayActionAnimationRoutine(int actionId)
+    IEnumerator PlayActionAnimationRoutine(int actionId, AnimActionTypes animActionTypes)
     {
         Animator animator = model == null ? null : model.CacheAnimator;
         // If animator is not null, play the action animation
@@ -606,9 +625,16 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (animator != null && GameInstance.ActionAnimations.TryGetValue(actionId, out actionAnimation) && actionAnimation.clip != null)
         {
             model.ChangeActionClip(actionAnimation.clip);
-            animator.SetBool(ANIM_DO_ACTION, false);
+            var actionClipMultiplier = 1f;
+            switch (animActionTypes)
+            {
+                case AnimActionTypes.Attack:
+                    actionClipMultiplier = AttackSpeed;
+                    break;
+            }
+            animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, actionClipMultiplier);
             animator.SetBool(ANIM_DO_ACTION, true);
-            yield return new WaitForSecondsRealtime(actionAnimation.ClipLength);
+            yield return new WaitForSecondsRealtime(actionAnimation.ClipLength / actionClipMultiplier);
             animator.SetBool(ANIM_DO_ACTION, false);
         }
     }
@@ -822,6 +848,34 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             return;
         SetTargetEntity(entity);
     }
+
+    protected void NetFuncOnDead(bool isInitialize)
+    {
+        if (model != null && model.gameObject.activeInHierarchy)
+        {
+            var animator = model.CacheAnimator;
+            animator.SetBool(ANIM_IS_DEAD, true);
+        }
+        if (onDead != null)
+            onDead.Invoke(isInitialize);
+    }
+
+    protected void NetFuncOnRespawn(bool isInitialize)
+    {
+        if (model != null && model.gameObject.activeInHierarchy)
+        {
+            var animator = model.CacheAnimator;
+            animator.SetBool(ANIM_IS_DEAD, false);
+        }
+        if (onRespawn != null)
+            onRespawn.Invoke(isInitialize);
+    }
+
+    protected void NetFuncOnLevelUp()
+    {
+        if (onLevelUp != null)
+            onLevelUp.Invoke();
+    }
     #endregion
 
     #region Net functions callers
@@ -839,11 +893,11 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         CallNetFunction("UseSkill", FunctionReceivers.Server, position, skillIndex);
     }
 
-    public virtual void RequestPlayActionAnimation(int actionId)
+    public virtual void RequestPlayActionAnimation(int actionId, AnimActionTypes animActionTypes)
     {
         if (CurrentHp <= 0)
             return;
-        CallNetFunction("PlayActionAnimation", FunctionReceivers.All, actionId);
+        CallNetFunction("PlayActionAnimation", FunctionReceivers.All, actionId, animActionTypes);
     }
 
     public virtual void RequestPickupItem()
@@ -882,6 +936,21 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public virtual void RequestSetTargetEntity(uint objectId)
     {
         CallNetFunction("SetTargetEntity", FunctionReceivers.Server, objectId);
+    }
+
+    public virtual void RequestOnDead(bool isInitialize)
+    {
+        CallNetFunction("OnDead", FunctionReceivers.All, isInitialize);
+    }
+
+    public virtual void RequestOnRespawn(bool isInitialize)
+    {
+        CallNetFunction("OnRespawn", FunctionReceivers.All, isInitialize);
+    }
+
+    public virtual void RequestOnLevelUp()
+    {
+        CallNetFunction("OnLevelUp", FunctionReceivers.All);
     }
     #endregion
 
@@ -1211,6 +1280,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="databaseId"></param>
     protected virtual void OnDatabaseIdChange(string databaseId)
     {
+        // Get database
+        GameInstance.AllCharacterDatabases.TryGetValue(databaseId, out database);
+
         // Setup model
         if (model != null)
             Destroy(model.gameObject);
@@ -1497,8 +1569,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             var anim = animArray[Random.Range(0, animLength)];
             // Assign animation data
             actionId = anim.Id;
-            damageDuration = anim.TriggerDuration;
-            totalDuration = anim.ClipLength;
+            damageDuration = anim.TriggerDuration / AttackSpeed;
+            totalDuration = (anim.ClipLength + anim.extraDuration) / AttackSpeed;
         }
         // Calculate all damages
         var effectiveness = weapon.GetEffectivenessDamage(this);
@@ -1622,7 +1694,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             skills.Dirty(i);
         }
         // Send OnDead to owner player only
-        CallNetFunction("OnDead", ConnectId);
+        RequestOnDead(false);
     }
 
     protected virtual void Respawn()
@@ -1632,7 +1704,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         CurrentHp = CacheMaxHp;
         CurrentMp = CacheMaxMp;
         // Send OnRespawn to owner player only
-        CallNetFunction("OnRespawn", ConnectId);
+        RequestOnRespawn(false);
     }
 
     protected virtual void MakeCaches()
@@ -1655,7 +1727,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (!gameInstance.GameplayRule.IncreaseExp(this, exp))
             return;
         // Send OnLevelUp to owner player only
-        CallNetFunction("OnLevelUp", ConnectId);
+        RequestOnLevelUp();
     }
 
     protected abstract bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity);

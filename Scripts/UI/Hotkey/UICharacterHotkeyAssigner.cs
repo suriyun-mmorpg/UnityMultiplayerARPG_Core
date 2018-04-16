@@ -80,7 +80,7 @@ public class UICharacterHotkeyAssigner : UIBase
     public void Setup(string hotkeyId)
     {
         this.hotkeyId = hotkeyId;
-        var owningCharacter = PlayerCharacterController.OwningCharacter;
+        var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (owningCharacter == null)
         {
             CacheSkillList.HideAll();
@@ -137,7 +137,7 @@ public class UICharacterHotkeyAssigner : UIBase
 
     protected void OnSelectCharacterSkill(UICharacterSkill ui)
     {
-        var owningCharacter = PlayerCharacterController.OwningCharacter;
+        var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (owningCharacter != null)
             owningCharacter.RequestAssignHotkey(hotkeyId, HotkeyTypes.Skill, ui.Data.Key.skillId);
         Hide();
@@ -145,7 +145,7 @@ public class UICharacterHotkeyAssigner : UIBase
 
     protected void OnSelectCharacterItem(UICharacterItem ui)
     {
-        var owningCharacter = PlayerCharacterController.OwningCharacter;
+        var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (owningCharacter != null)
             owningCharacter.RequestAssignHotkey(hotkeyId, HotkeyTypes.Item, ui.Data.Key.itemId);
         Hide();
@@ -153,7 +153,7 @@ public class UICharacterHotkeyAssigner : UIBase
 
     public void OnClickUnAssign()
     {
-        var owningCharacter = PlayerCharacterController.OwningCharacter;
+        var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (owningCharacter != null)
             owningCharacter.RequestAssignHotkey(hotkeyId, HotkeyTypes.None, string.Empty);
         Hide();

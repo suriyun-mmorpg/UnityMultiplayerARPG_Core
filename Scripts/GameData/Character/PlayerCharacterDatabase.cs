@@ -8,10 +8,6 @@ using UnityEditor;
 [CreateAssetMenu(fileName = "PlayerCharacterDatabase", menuName = "Create GameData/PlayerCharacterDatabase")]
 public class PlayerCharacterDatabase : BaseCharacterDatabase
 {
-    [Header("Attributes/Stats")]
-    public AttributeAmount[] baseAttributes;
-    public CharacterStatsIncremental stats;
-
     [Header("Skills")]
     public Skill[] skills;
 
@@ -110,9 +106,4 @@ public class PlayerCharacterDatabase : BaseCharacterDatabase
         EditorUtility.SetDirty(this);
     }
 #endif
-
-    public override CharacterStats GetCharacterStats(int level)
-    {
-        return stats.GetCharacterStats(level);
-    }
 }

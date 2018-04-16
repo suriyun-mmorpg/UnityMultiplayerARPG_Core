@@ -69,6 +69,13 @@ public static class CharacterDataExtension
     {
         var result = new Dictionary<Attribute, int>();
 
+        // Attributes from character database
+        var characterDatabase = data.GetDatabase();
+        if (characterDatabase != null)
+            result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
+                characterDatabase.GetCharacterAttributes(data.Level));
+
+        // Attributes from armors
         Item tempEquipment = null;
         var equipItems = data.EquipItems;
         foreach (var equipItem in equipItems)
@@ -76,10 +83,10 @@ public static class CharacterDataExtension
             tempEquipment = equipItem.GetEquipmentItem();
             if (tempEquipment != null)
                 result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
-                tempEquipment.GetIncreaseAttributes(equipItem.level));
+                    tempEquipment.GetIncreaseAttributes(equipItem.level));
         }
 
-        // Weapons attributes
+        // Attributes from weapons
         var equipWeapons = data.EquipWeapons;
         // Right hand equipment
         var rightHandItem = equipWeapons.rightHand;
@@ -178,7 +185,7 @@ public static class CharacterDataExtension
         {
             tempEquipment = equipment.GetEquipmentItem();
             if (tempEquipment != null)
-                result += tempEquipment.GetStats(equipment.level);
+                result += tempEquipment.GetIncreaseStats(equipment.level);
         }
 
         var equipWeapons = data.EquipWeapons;
@@ -186,12 +193,12 @@ public static class CharacterDataExtension
         var rightHandItem = equipWeapons.rightHand;
         tempEquipment = rightHandItem.GetEquipmentItem();
         if (tempEquipment != null)
-            result += tempEquipment.GetStats(rightHandItem.level);
+            result += tempEquipment.GetIncreaseStats(rightHandItem.level);
         // Left hand equipment
         var leftHandItem = equipWeapons.leftHand;
         tempEquipment = leftHandItem.GetEquipmentItem();
         if (tempEquipment != null)
-            result += tempEquipment.GetStats(leftHandItem.level);
+            result += tempEquipment.GetIncreaseStats(leftHandItem.level);
         result += GameDataHelpers.CaculateStats(GetAttributes(data));
         return result;
     }
@@ -219,6 +226,16 @@ public static class CharacterDataExtension
     public static int GetMaxMp(this ICharacterData data)
     {
         return (int)data.GetStatsWithBuffs().mp;
+    }
+
+    public static float GetMoveSpeed(this ICharacterData data)
+    {
+        return data.GetStatsWithBuffs().moveSpeed;
+    }
+
+    public static float GetAttackSpeed(this ICharacterData data)
+    {
+        return data.GetStatsWithBuffs().atkSpeed;
     }
 
     public static List<CharacterItem> GetWeapons(this ICharacterData data)

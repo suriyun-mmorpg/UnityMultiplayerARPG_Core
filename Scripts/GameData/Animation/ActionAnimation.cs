@@ -19,6 +19,8 @@ public class ActionAnimation
     public AnimationClip clip;
     [Range(0f, 1f)]
     public float triggerDurationRate;
+    [Tooltip("Extra duration after played animation clip")]
+    public float extraDuration;
     protected int? id;
     public int Id
     {

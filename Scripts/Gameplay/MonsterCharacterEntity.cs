@@ -18,7 +18,6 @@ public class MonsterCharacterEntity : BaseCharacterEntity
     public const float FOLLOW_TARGET_DURATION = 5f;
 
     #region Protected data
-    protected MonsterCharacterDatabase database;
     protected float wanderTime;
     protected float findTargetTime;
     protected float setTargetDestinationTime;
@@ -37,12 +36,17 @@ public class MonsterCharacterEntity : BaseCharacterEntity
     #region Interface implementation
     public override string CharacterName
     {
-        get { return database == null ? "Unknow" : database.title; }
+        get { return MonsterDatabase == null ? "Unknow" : MonsterDatabase.title; }
         set { }
     }
     #endregion
 
-    #region Cache components
+    #region Fields/Cache components
+    public MonsterCharacterDatabase MonsterDatabase
+    {
+        get { return database as MonsterCharacterDatabase; }
+    }
+
     private NavMeshAgent cacheNavMeshAgent;
     public NavMeshAgent CacheNavMeshAgent
     {
@@ -83,9 +87,9 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         {
             StopMove();
             SetTargetEntity(null);
-            if (Time.realtimeSinceStartup - deadTime >= database.deadHideDelay)
+            if (Time.realtimeSinceStartup - deadTime >= MonsterDatabase.deadHideDelay)
                 isHidding.Value = true;
-            if (Time.realtimeSinceStartup - deadTime >= database.deadRespawnDelay)
+            if (Time.realtimeSinceStartup - deadTime >= MonsterDatabase.deadRespawnDelay)
                 Respawn();
             return;
         }
@@ -102,7 +106,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
 
     protected virtual void UpdateActivity()
     {
-        if (!IsServer || database == null || CurrentHp <= 0)
+        if (!IsServer || MonsterDatabase == null || CurrentHp <= 0)
             return;
 
         var gameInstance = GameInstance.Singleton;
@@ -143,7 +147,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
                     Time.realtimeSinceStartup - setTargetDestinationTime >= SET_TARGET_DESTINATION_DELAY)
                 {
                     setTargetDestinationTime = Time.realtimeSinceStartup;
-                    CacheNavMeshAgent.speed = this.GetStatsWithBuffs().moveSpeed;
+                    CacheNavMeshAgent.speed = MoveSpeed * gameInstance.moveSpeedMultiplier;
                     CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.MedQualityObstacleAvoidance;
                     CacheNavMeshAgent.SetDestination(targetPosition);
                     CacheNavMeshAgent.isStopped = false;
@@ -180,7 +184,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
                 if (NavMesh.SamplePosition(randomPosition, out navMeshHit, RANDOM_WANDER_AREA_MAX, 1))
                 {
                     wanderDestination = navMeshHit.position;
-                    CacheNavMeshAgent.speed = database.wanderMoveSpeed;
+                    CacheNavMeshAgent.speed = MonsterDatabase.wanderMoveSpeed * gameInstance.moveSpeedMultiplier;
                     CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
                     CacheNavMeshAgent.SetDestination(wanderDestination.Value);
                     CacheNavMeshAgent.isStopped = false;
@@ -189,7 +193,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
             else
             {
                 // If it's aggressive character, finding attacking target
-                if (database.characteristic == MonsterCharacteristic.Aggressive &&
+                if (MonsterDatabase.characteristic == MonsterCharacteristic.Aggressive &&
                     Time.realtimeSinceStartup >= findTargetTime)
                 {
                     SetFindTargetTime();
@@ -198,7 +202,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
                     if (!TryGetTargetEntity(out targetCharacter) || targetCharacter.CurrentHp <= 0)
                     {
                         // Find nearby character by layer mask
-                        var foundObjects = new List<Collider>(Physics.OverlapSphere(currentPosition, database.visualRange, gameInstance.characterLayer.Mask));
+                        var foundObjects = new List<Collider>(Physics.OverlapSphere(currentPosition, MonsterDatabase.visualRange, gameInstance.characterLayer.Mask));
                         foundObjects = foundObjects.OrderBy(a => System.Guid.NewGuid()).ToList();
                         foreach (var foundObject in foundObjects)
                         {
@@ -245,7 +249,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         // If this character have been attacked by any character
         // It will tell another ally nearby to help
         var monsterCharacterEntity = characterEntity as MonsterCharacterEntity;
-        if (monsterCharacterEntity != null && monsterCharacterEntity.database.allyId == database.allyId)
+        if (monsterCharacterEntity != null && monsterCharacterEntity.MonsterDatabase.allyId == MonsterDatabase.allyId)
             return true;
         return false;
     }
@@ -289,9 +293,9 @@ public class MonsterCharacterEntity : BaseCharacterEntity
             {
                 SetAttackTarget(attacker);
                 // If it's assist character call another character for assist
-                if (database.characteristic == MonsterCharacteristic.Assist)
+                if (MonsterDatabase.characteristic == MonsterCharacteristic.Assist)
                 {
-                    var foundObjects = new List<Collider>(Physics.OverlapSphere(CacheTransform.position, database.visualRange, gameInstance.characterLayer.Mask));
+                    var foundObjects = new List<Collider>(Physics.OverlapSphere(CacheTransform.position, MonsterDatabase.visualRange, gameInstance.characterLayer.Mask));
                     foreach (var foundObject in foundObjects)
                     {
                         var monsterCharacterEntity = foundObject.GetComponent<MonsterCharacterEntity>();
@@ -306,12 +310,6 @@ public class MonsterCharacterEntity : BaseCharacterEntity
                 SetAttackTarget(attacker);
             }
         }
-    }
-
-    protected override void OnDatabaseIdChange(string databaseId)
-    {
-        base.OnDatabaseIdChange(databaseId);
-        GameInstance.MonsterCharacterDatabases.TryGetValue(databaseId, out database);
     }
 
     public override void GetAttackData(
@@ -331,24 +329,24 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         totalDuration = 0f;
 
         // Random attack animation
-        var animArray = database.attackAnimations;
+        var animArray = MonsterDatabase.attackAnimations;
         var animLength = animArray.Length;
         if (animLength > 0)
         {
             var anim = animArray[Random.Range(0, animLength)];
             // Assign animation data
             actionId = anim.Id;
-            damageDuration = anim.TriggerDuration;
-            totalDuration = anim.ClipLength;
+            damageDuration = anim.TriggerDuration / AttackSpeed;
+            totalDuration = (anim.ClipLength + anim.extraDuration) / AttackSpeed;
         }
 
         // Assign damage data
-        damageInfo = database.damageInfo;
+        damageInfo = MonsterDatabase.damageInfo;
 
         // Assign damage attributes
         allDamageAttributes = new Dictionary<DamageElement, DamageAmount>();
-        var damageElement = database.damageElement;
-        var damageAmount = database.damageAmount;
+        var damageElement = MonsterDatabase.damageElement;
+        var damageAmount = MonsterDatabase.damageAmount;
         if (damageElement == null)
             damageElement = gameInstance.DefaultDamageElement;
         allDamageAttributes.Add(damageElement, damageAmount * inflictRate);
@@ -357,7 +355,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
 
     public override float GetAttackDistance()
     {
-        return database.damageInfo.GetDistance();
+        return MonsterDatabase.damageInfo.GetDistance();
     }
 
     protected override void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountTypes damageAmountType, int damage)
@@ -382,8 +380,8 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         base.Killed(lastAttacker);
         deadTime = Time.realtimeSinceStartup;
         var maxHp = this.GetStats().hp;
-        var randomedExp = Random.Range(database.randomExpMin, database.randomExpMax);
-        var randomedGold = Random.Range(database.randomGoldMin, database.randomGoldMax);
+        var randomedExp = Random.Range(MonsterDatabase.randomExpMin, MonsterDatabase.randomExpMax);
+        var randomedGold = Random.Range(MonsterDatabase.randomGoldMin, MonsterDatabase.randomGoldMax);
         if (receivedDamageRecords.Count > 0)
         {
             var enemies = new List<BaseCharacterEntity>(receivedDamageRecords.Keys);
@@ -402,7 +400,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
             }
         }
         receivedDamageRecords.Clear();
-        foreach (var randomItem in database.randomItems)
+        foreach (var randomItem in MonsterDatabase.randomItems)
         {
             if (Random.value <= randomItem.dropRate)
             {
@@ -425,6 +423,8 @@ public class MonsterCharacterEntity : BaseCharacterEntity
             return;
         base.Respawn();
         CacheTransform.position = respawnPosition;
+        StopMove();
+        RandomWanderTime();
         isHidding.Value = false;
     }
 }

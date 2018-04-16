@@ -30,7 +30,7 @@ public class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
         var skill = characterHotkey.GetSkill();
         var item = characterHotkey.GetItem();
         
-        var owningCharacter = PlayerCharacterController.OwningCharacter;
+        var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (uiCharacterSkill != null)
         {
             if (skill == null)
@@ -79,7 +79,7 @@ public class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
 
     public void OnClickUse()
     {
-        var owningCharacterController = PlayerCharacterController.OwningCharacterController;
+        var owningCharacterController = BasePlayerCharacterController.OwningCharacterController;
         if (owningCharacterController != null)
             owningCharacterController.UseHotkey(indexOfData);
     }

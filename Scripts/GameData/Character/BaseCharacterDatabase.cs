@@ -6,5 +6,17 @@ public abstract class BaseCharacterDatabase : BaseGameData
 {
     public CharacterModel model;
 
-    public abstract CharacterStats GetCharacterStats(int level);
+    [Header("Attributes/Stats")]
+    public AttributeIncremental[] attributes;
+    public CharacterStatsIncremental stats;
+    
+    public CharacterStats GetCharacterStats(int level)
+    {
+        return stats.GetCharacterStats(level);
+    }
+
+    public Dictionary<Attribute, int> GetCharacterAttributes(int level)
+    {
+        return GameDataHelpers.MakeAttributeAmountsDictionary(attributes, new Dictionary<Attribute, int>(), level);
+    }
 }

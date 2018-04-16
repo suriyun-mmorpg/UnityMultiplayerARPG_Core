@@ -59,6 +59,17 @@ public static class PlayerCharacterDataExtension
                 validAttributeIds.Add(attributeId);
         }
         character.StatPoint += returningStatPoint;
+        // Add character's attributes
+        var attributes = GameInstance.Attributes.Values;
+        foreach (var attribute in attributes)
+        {
+            if (validAttributeIds.Contains(attribute.Id))
+                continue;
+            var characterAttribute = new CharacterAttribute();
+            characterAttribute.attributeId = attribute.Id;
+            characterAttribute.amount = 0;
+            character.Attributes.Add(characterAttribute);
+        }
         // Validating character skills
         var returningSkillPoint = 0;
         var validSkillIds = new HashSet<string>();
@@ -147,12 +158,12 @@ public static class PlayerCharacterDataExtension
         // Player character database
         var playerCharacterDatabase = database as PlayerCharacterDatabase;
         // Attributes
-        var baseAttributes = playerCharacterDatabase.baseAttributes;
-        foreach (var baseAttribute in baseAttributes)
+        var attributes = GameInstance.Attributes.Values;
+        foreach (var attribute in attributes)
         {
             var characterAttribute = new CharacterAttribute();
-            characterAttribute.attributeId = baseAttribute.attribute.Id;
-            characterAttribute.amount = baseAttribute.amount;
+            characterAttribute.attributeId = attribute.Id;
+            characterAttribute.amount = 0;
             character.Attributes.Add(characterAttribute);
         }
         var skills = playerCharacterDatabase.skills;

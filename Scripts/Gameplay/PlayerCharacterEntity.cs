@@ -129,6 +129,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         if (!IsServer && !IsOwnerClient)
             return;
 
+        var gameInstance = GameInstance.Singleton;
         if (isGrounded)
         {
             Vector3 velocity = CacheRigidbody.velocity;
@@ -140,7 +141,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
                     if (moveDirectionMagnitude > 1)
                         moveDirection = moveDirection.normalized;
 
-                    var moveSpeed = this.GetStatsWithBuffs().moveSpeed;
+                    var moveSpeed = MoveSpeed * gameInstance.moveSpeedMultiplier;
                     var targetVelocity = moveDirection * moveSpeed;
 
                     // Apply a force that attempts to reach our target velocity

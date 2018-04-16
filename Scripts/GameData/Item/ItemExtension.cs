@@ -38,7 +38,7 @@ public static class ItemExtension
         return character.Level >= equipmentItem.requirement.level && isPass;
     }
 
-    public static CharacterStats GetStats(this Item equipmentItem, int level)
+    public static CharacterStats GetIncreaseStats(this Item equipmentItem, int level)
     {
         if (equipmentItem == null ||
             !equipmentItem.IsEquipment())

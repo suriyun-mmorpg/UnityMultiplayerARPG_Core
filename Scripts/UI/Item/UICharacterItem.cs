@@ -147,7 +147,7 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
 
         if (uiStats != null)
         {
-            var stats = equipmentItem.GetStats(level);
+            var stats = equipmentItem.GetIncreaseStats(level);
             if (equipmentItem == null || stats.IsEmpty())
                 uiStats.Hide();
             else
@@ -226,7 +226,7 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
             selectionManager.DeselectSelectedUI();
 
         var characterItem = Data.Key;
-        var owningCharacter = PlayerCharacterController.OwningCharacter;
+        var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (owningCharacter != null)
         {
             var armorItem = characterItem.GetArmorItem();
@@ -262,7 +262,7 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
         if (selectionManager != null)
             selectionManager.DeselectSelectedUI();
 
-        var owningCharacter = PlayerCharacterController.OwningCharacter;
+        var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (owningCharacter != null)
             owningCharacter.RequestUnEquipItem(equipPosition);
     }
@@ -274,7 +274,7 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
             return;
 
         var characterItem = Data.Key;
-        var owningCharacter = PlayerCharacterController.OwningCharacter;
+        var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (characterItem.amount == 1)
         {
             if (selectionManager != null)
@@ -288,7 +288,7 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
 
     private void OnDropAmountConfirmed(int amount)
     {
-        var owningCharacter = PlayerCharacterController.OwningCharacter;
+        var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (selectionManager != null)
             selectionManager.DeselectSelectedUI();
         if (owningCharacter != null)

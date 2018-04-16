@@ -43,7 +43,7 @@ public class UISceneGameplay : MonoBehaviour
     private void Update()
     {
         var currentCharacterHp = 0;
-        var owningCharacter = PlayerCharacterController.OwningCharacter;
+        var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (owningCharacter != null)
             currentCharacterHp = owningCharacter.CurrentHp;
 
@@ -62,32 +62,32 @@ public class UISceneGameplay : MonoBehaviour
         foreach (var uiCharacter in uiCharacters)
         {
             if (uiCharacter != null)
-                uiCharacter.Data = PlayerCharacterController.OwningCharacter;
+                uiCharacter.Data = BasePlayerCharacterController.OwningCharacter;
         }
     }
 
     public void UpdateEquipItems()
     {
         if (uiEquipItems != null)
-            uiEquipItems.UpdateData(PlayerCharacterController.OwningCharacter);
+            uiEquipItems.UpdateData(BasePlayerCharacterController.OwningCharacter);
     }
 
     public void UpdateNonEquipItems()
     {
         if (uiNonEquipItems != null)
-            uiNonEquipItems.UpdateData(PlayerCharacterController.OwningCharacter);
+            uiNonEquipItems.UpdateData(BasePlayerCharacterController.OwningCharacter);
     }
 
     public void UpdateSkills()
     {
         if (uiSkills != null)
-            uiSkills.UpdateData(PlayerCharacterController.OwningCharacter);
+            uiSkills.UpdateData(BasePlayerCharacterController.OwningCharacter);
     }
 
     public void UpdateHotkeys()
     {
         if (uiHotkeys != null)
-            uiHotkeys.UpdateData(PlayerCharacterController.OwningCharacter);
+            uiHotkeys.UpdateData(BasePlayerCharacterController.OwningCharacter);
     }
 
     public void SetTargetCharacter(BaseCharacterEntity character)
@@ -115,7 +115,7 @@ public class UISceneGameplay : MonoBehaviour
 
     public void OnClickRespawn()
     {
-        var owningCharacter = PlayerCharacterController.OwningCharacter;
+        var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (owningCharacter != null)
             owningCharacter.RequestRespawn();
     }
@@ -126,12 +126,12 @@ public class UISceneGameplay : MonoBehaviour
         networkManager.StopHost();
     }
 
-    public void OnCharacterDead()
+    public void OnCharacterDead(bool isInitialize)
     {
         onCharacterDead.Invoke();
     }
 
-    public void OnCharacterRespawn()
+    public void OnCharacterRespawn(bool isInitialize)
     {
         onCharacterRespawn.Invoke();
     }
