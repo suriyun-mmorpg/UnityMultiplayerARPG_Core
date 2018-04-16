@@ -19,25 +19,17 @@ public class UICharacterHotkeys : UIBase
                     var id = uiCharacterHotkey.hotkeyId;
                     var ui = uiCharacterHotkey.ui;
                     if (!string.IsNullOrEmpty(id) && ui != null && !cacheUICharacterHotkeys.ContainsKey(id))
+                    {
+                        var characterHotkey = new CharacterHotkey();
+                        characterHotkey.hotkeyId = id;
+                        characterHotkey.type = HotkeyTypes.None;
+                        characterHotkey.dataId = string.Empty;
+                        ui.Setup(characterHotkey, -1);
                         cacheUICharacterHotkeys.Add(id, ui);
+                    }
                 }
             }
             return cacheUICharacterHotkeys;
-        }
-    }
-
-    private void Start()
-    {
-        var cacheUICharacterHotkeys = CacheUICharacterHotkeys;
-        foreach (var cacheUICharacterHotkey in cacheUICharacterHotkeys)
-        {
-            var id = cacheUICharacterHotkey.Key;
-            var ui = cacheUICharacterHotkey.Value;
-            var characterHotkey = new CharacterHotkey();
-            characterHotkey.hotkeyId = id;
-            characterHotkey.type = HotkeyTypes.None;
-            characterHotkey.dataId = string.Empty;
-            ui.Setup(characterHotkey, -1);
         }
     }
 
