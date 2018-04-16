@@ -9,6 +9,7 @@ public abstract class BaseCharacterDatabase : BaseGameData
     [Header("Attributes/Stats")]
     public AttributeIncremental[] attributes;
     public CharacterStatsIncremental stats;
+    public ResistanceIncremental[] resistances;
     
     public CharacterStats GetCharacterStats(int level)
     {
@@ -18,5 +19,10 @@ public abstract class BaseCharacterDatabase : BaseGameData
     public Dictionary<Attribute, int> GetCharacterAttributes(int level)
     {
         return GameDataHelpers.MakeAttributeAmountsDictionary(attributes, new Dictionary<Attribute, int>(), level);
+    }
+
+    public Dictionary<Resistance, float> GetCharacterResistances(int level)
+    {
+        return GameDataHelpers.MakeResistanceAmountsDictionary(resistances, new Dictionary<Resistance, float>(), level);
     }
 }

@@ -64,7 +64,7 @@ public static class SkillExtension
             }
         }
 
-        return character.SkillPoint > 0 && character.Level >= skill.GetRequireCharacterLevel(level) && isPass;
+        return character.SkillPoint > 0 && level < skill.maxLevel && character.Level >= skill.GetRequireCharacterLevel(level) && isPass;
     }
 
     public static int GetAdjustedLevel(this Skill skill, int level)

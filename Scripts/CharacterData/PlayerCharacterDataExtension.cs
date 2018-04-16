@@ -30,6 +30,7 @@ public static class PlayerCharacterDataExtension
         to.Buffs = from.Buffs;
         to.EquipItems = from.EquipItems;
         to.NonEquipItems = from.NonEquipItems;
+        to.Hotkeys = from.Hotkeys;
         return to;
     }
 

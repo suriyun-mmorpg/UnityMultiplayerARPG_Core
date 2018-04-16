@@ -100,7 +100,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         if (textLevel != null)
             textLevel.text = string.Format(levelFormat, Data == null ? "N/A" : Data.Level.ToString("N0"));
 
-        var statsWithBuff = Data.GetStatsWithBuffs();
+        var statsWithBuff = Data.GetStats();
         var expTree = GameInstance.Singleton.expTree;
         var currentExp = 0;
         var nextLevelExp = 0;
@@ -164,9 +164,10 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     protected override void UpdateData()
     {
         var gameInstance = GameInstance.Singleton;
-        var statsWithBuff = Data.GetStatsWithBuffs();
-        var displayingStats = showStatsWithBuffs ? statsWithBuff : Data.GetStats();
-        var displayingAttributes = showAttributeWithBuffs ? Data.GetAttributesWithBuffs() : Data.GetAttributes();
+        var statsWithBuff = Data.GetStats();
+        var attributesWithBuff = Data.GetAttributes();
+        var displayingStats = showStatsWithBuffs ? statsWithBuff : Data.GetStats(true, false);
+        var displayingAttributes = showAttributeWithBuffs ? attributesWithBuff : Data.GetAttributes(true, false);
         
         if (textWeightLimit != null)
             textWeightLimit.text = string.Format(weightLimitStatsFormat, Data.GetTotalItemWeight().ToString("N2"), statsWithBuff.weightLimit.ToString("N2"));

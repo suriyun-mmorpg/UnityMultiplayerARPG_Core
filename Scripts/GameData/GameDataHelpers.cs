@@ -255,7 +255,7 @@ public static class GameDataHelpers
     public static float CalculateEffectivenessDamage(Dictionary<Attribute, float> effectivenessAttributes, ICharacterData character)
     {
         var damageEffectiveness = 0f;
-        var characterAttributes = character.GetAttributesWithBuffs();
+        var characterAttributes = character.GetAttributes();
         foreach (var characterAttribute in characterAttributes)
         {
             var attribute = characterAttribute.Key;

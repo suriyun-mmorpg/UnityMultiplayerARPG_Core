@@ -65,43 +65,18 @@ public static class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<Attribute, int> GetAttributes(this ICharacterData data)
+    public static Dictionary<Attribute, int> GetCharacterAttributes(this ICharacterData data)
     {
+        if (data == null)
+            return new Dictionary<Attribute, int>();
         var result = new Dictionary<Attribute, int>();
-
         // Attributes from character database
         var characterDatabase = data.GetDatabase();
         if (characterDatabase != null)
             result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
                 characterDatabase.GetCharacterAttributes(data.Level));
 
-        // Attributes from armors
-        Item tempEquipment = null;
-        var equipItems = data.EquipItems;
-        foreach (var equipItem in equipItems)
-        {
-            tempEquipment = equipItem.GetEquipmentItem();
-            if (tempEquipment != null)
-                result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
-                    tempEquipment.GetIncreaseAttributes(equipItem.level));
-        }
-
-        // Attributes from weapons
-        var equipWeapons = data.EquipWeapons;
-        // Right hand equipment
-        var rightHandItem = equipWeapons.rightHand;
-        tempEquipment = rightHandItem.GetEquipmentItem();
-        if (tempEquipment != null)
-            result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
-                tempEquipment.GetIncreaseAttributes(rightHandItem.level));
-        // Left hand equipment
-        var leftHandItem = equipWeapons.leftHand;
-        tempEquipment = leftHandItem.GetEquipmentItem();
-        if (tempEquipment != null)
-            result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
-                tempEquipment.GetIncreaseAttributes(leftHandItem.level));
-
-        // Character attributes
+        // Added attributes
         var characterAttributes = data.Attributes;
         foreach (var characterAttribute in characterAttributes)
         {
@@ -117,9 +92,42 @@ public static class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<Attribute, int> GetAttributesWithBuffs(this ICharacterData data)
+    public static Dictionary<Attribute, int> GetEquipmentAttributes(this ICharacterData data)
     {
-        var result = data.GetAttributes();
+        if (data == null)
+            return new Dictionary<Attribute, int>();
+        var result = new Dictionary<Attribute, int>();
+        // Armors
+        Item tempEquipment = null;
+        var equipItems = data.EquipItems;
+        foreach (var equipItem in equipItems)
+        {
+            tempEquipment = equipItem.GetEquipmentItem();
+            if (tempEquipment != null)
+                result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
+                    tempEquipment.GetIncreaseAttributes(equipItem.level));
+        }
+        // Weapons
+        var equipWeapons = data.EquipWeapons;
+        // Right hand equipment
+        var rightHandItem = equipWeapons.rightHand;
+        tempEquipment = rightHandItem.GetEquipmentItem();
+        if (tempEquipment != null)
+            result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
+                tempEquipment.GetIncreaseAttributes(rightHandItem.level));
+        // Left hand equipment
+        var leftHandItem = equipWeapons.leftHand;
+        tempEquipment = leftHandItem.GetEquipmentItem();
+        if (tempEquipment != null)
+            result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
+                tempEquipment.GetIncreaseAttributes(leftHandItem.level));
+
+        return result;
+    }
+
+    public static Dictionary<Attribute, int> GetBuffAttributes(this ICharacterData data)
+    {
+        var result = new Dictionary<Attribute, int>();
         var buffs = data.Buffs;
         foreach (var buff in buffs)
         {
@@ -128,10 +136,34 @@ public static class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<Resistance, float> GetResistances(this ICharacterData data)
+    public static Dictionary<Attribute, int> GetAttributes(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
     {
-        var result = new Dictionary<Resistance, float>();
+        var result = data.GetCharacterAttributes();
+        if (sumWithEquipments)
+            result = GameDataHelpers.CombineAttributeAmountsDictionary(result, data.GetEquipmentAttributes());
+        if (sumWithBuffs)
+            result = GameDataHelpers.CombineAttributeAmountsDictionary(result, data.GetBuffAttributes());
+        return result;
+    }
 
+    public static Dictionary<Resistance, float> GetCharacterResistances(this ICharacterData data)
+    {
+        if (data == null)
+            return new Dictionary<Resistance, float>();
+        var result = new Dictionary<Resistance, float>();
+        var characterDatabase = data.GetDatabase();
+        if (characterDatabase != null)
+            result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
+                characterDatabase.GetCharacterResistances(data.Level));
+        return result;
+    }
+
+    public static Dictionary<Resistance, float> GetEquipmentResistances(this ICharacterData data)
+    {
+        if (data == null)
+            return new Dictionary<Resistance, float>();
+        var result = new Dictionary<Resistance, float>();
+        // Armors
         Item tempEquipment = null;
         var equipItems = data.EquipItems;
         foreach (var equipItem in equipItems)
@@ -141,7 +173,7 @@ public static class CharacterDataExtension
                 result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
                     tempEquipment.GetIncreaseResistances(equipItem.level));
         }
-
+        // Weapons
         var equipWeapons = data.EquipWeapons;
         // Right hand equipment
         var rightHandItem = equipWeapons.rightHand;
@@ -155,13 +187,14 @@ public static class CharacterDataExtension
         if (tempEquipment != null)
             result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
                 tempEquipment.GetIncreaseResistances(leftHandItem.level));
-
         return result;
     }
 
-    public static Dictionary<Resistance, float> GetResistancesWithBuffs(this ICharacterData data)
+    public static Dictionary<Resistance, float> GetBuffResistances(this ICharacterData data)
     {
-        var result = GetResistances(data);
+        if (data == null)
+            return new Dictionary<Resistance, float>();
+        var result = new Dictionary<Resistance, float>();
         var buffs = data.Buffs;
         foreach (var buff in buffs)
         {
@@ -170,44 +203,72 @@ public static class CharacterDataExtension
         return result;
     }
 
-    public static CharacterStats GetStats(this ICharacterData data)
+    public static Dictionary<Resistance, float> GetResistances(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
     {
+        var result = data.GetCharacterResistances();
+        if (sumWithEquipments)
+            result = GameDataHelpers.CombineResistanceAmountsDictionary(result, data.GetEquipmentResistances());
+        if (sumWithBuffs)
+            result = GameDataHelpers.CombineResistanceAmountsDictionary(result, data.GetBuffResistances());
+        return result;
+    }
+
+    public static CharacterStats GetCharacterStats(this ICharacterData data)
+    {
+        if (data == null)
+            return new CharacterStats();
         var level = data.Level;
         var characterDatabase = data.GetDatabase();
         var result = new CharacterStats();
-
         if (characterDatabase != null)
             result += characterDatabase.GetCharacterStats(level);
+        result += GameDataHelpers.CaculateStats(GetAttributes(data));
+        return result;
+    }
 
+    public static CharacterStats GetEquipmentStats(this ICharacterData data)
+    {
+        if (data == null)
+            return new CharacterStats();
+        var result = new CharacterStats();
+        // Armors
         Item tempEquipment = null;
         var equipItems = data.EquipItems;
         foreach (var equipment in equipItems)
         {
             tempEquipment = equipment.GetEquipmentItem();
             if (tempEquipment != null)
+            {
                 result += tempEquipment.GetIncreaseStats(equipment.level);
+                result += GameDataHelpers.CaculateStats(tempEquipment.GetIncreaseAttributes(equipment.level));
+            }
         }
-
+        // Weapons
         var equipWeapons = data.EquipWeapons;
         // Right hand equipment
         var rightHandItem = equipWeapons.rightHand;
         tempEquipment = rightHandItem.GetEquipmentItem();
         if (tempEquipment != null)
+        {
             result += tempEquipment.GetIncreaseStats(rightHandItem.level);
+            result += GameDataHelpers.CaculateStats(tempEquipment.GetIncreaseAttributes(rightHandItem.level));
+        }
         // Left hand equipment
         var leftHandItem = equipWeapons.leftHand;
         tempEquipment = leftHandItem.GetEquipmentItem();
         if (tempEquipment != null)
+        {
             result += tempEquipment.GetIncreaseStats(leftHandItem.level);
-        result += GameDataHelpers.CaculateStats(GetAttributes(data));
+            result += GameDataHelpers.CaculateStats(tempEquipment.GetIncreaseAttributes(leftHandItem.level));
+        }
         return result;
     }
 
-    public static CharacterStats GetStatsWithBuffs(this ICharacterData data)
+    public static CharacterStats GetBuffStats(this ICharacterData data)
     {
         if (data == null)
             return new CharacterStats();
-        var result = data.GetStats();
+        var result = new CharacterStats();
         var buffs = data.Buffs;
         foreach (var buff in buffs)
         {
@@ -216,26 +277,36 @@ public static class CharacterDataExtension
         }
         return result;
     }
+
+    public static CharacterStats GetStats(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
+    {
+        var result = data.GetCharacterStats();
+        if (sumWithEquipments)
+            result += data.GetEquipmentStats();
+        if (sumWithBuffs)
+            result += data.GetBuffStats();
+        return result;
+    }
     #endregion
 
     public static int GetMaxHp(this ICharacterData data)
     {
-        return (int)data.GetStatsWithBuffs().hp;
+        return (int)data.GetStats().hp;
     }
 
     public static int GetMaxMp(this ICharacterData data)
     {
-        return (int)data.GetStatsWithBuffs().mp;
+        return (int)data.GetStats().mp;
     }
 
     public static float GetMoveSpeed(this ICharacterData data)
     {
-        return data.GetStatsWithBuffs().moveSpeed;
+        return data.GetStats().moveSpeed;
     }
 
     public static float GetAttackSpeed(this ICharacterData data)
     {
-        return data.GetStatsWithBuffs().atkSpeed;
+        return data.GetStats().atkSpeed;
     }
 
     public static List<CharacterItem> GetWeapons(this ICharacterData data)

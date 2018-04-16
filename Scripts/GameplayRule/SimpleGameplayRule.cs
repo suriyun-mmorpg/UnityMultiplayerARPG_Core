@@ -7,9 +7,9 @@ public class SimpleGameplayRule : BaseGameplayRule
     public override float GetHitChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
     {
         // Attacker stats
-        var attackerStats = attacker.CacheStatsWithBuffs;
+        var attackerStats = attacker.CacheStats;
         // Damage receiver stats
-        var dmgReceiverStats = damageReceiver.CacheStatsWithBuffs;
+        var dmgReceiverStats = damageReceiver.CacheStats;
         // Calculate chance to hit
         var attackerAcc = attackerStats.accuracy;
         var dmgReceiverEva = dmgReceiverStats.evasion;
@@ -34,7 +34,7 @@ public class SimpleGameplayRule : BaseGameplayRule
 
     public override float GetCriticalChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
     {
-        var criRate = damageReceiver.CacheStatsWithBuffs.criRate;
+        var criRate = damageReceiver.CacheStats.criRate;
         // Minimum critical chance is 5%
         if (criRate < 0.05f)
             criRate = 0.05f;
@@ -46,12 +46,12 @@ public class SimpleGameplayRule : BaseGameplayRule
 
     public override float GetCriticalDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, float damage)
     {
-        return damage * attacker.CacheStatsWithBuffs.criDmgRate;
+        return damage * attacker.CacheStats.criDmgRate;
     }
 
     public override float GetBlockChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
     {
-        var blockRate = damageReceiver.CacheStatsWithBuffs.blockRate;
+        var blockRate = damageReceiver.CacheStats.blockRate;
         // Minimum block chance is 5%
         if (blockRate < 0.05f)
             blockRate = 0.05f;
@@ -63,7 +63,7 @@ public class SimpleGameplayRule : BaseGameplayRule
 
     public override float GetBlockDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, float damage)
     {
-        var blockDmgRate = damageReceiver.CacheStatsWithBuffs.blockDmgRate;
+        var blockDmgRate = damageReceiver.CacheStats.blockDmgRate;
         // Minimum block damage is 5%
         if (blockDmgRate < 0.05f)
             blockDmgRate = 0.05f;
@@ -76,8 +76,8 @@ public class SimpleGameplayRule : BaseGameplayRule
     public override float GetDamageReducedByResistance(BaseCharacterEntity damageReceiver, float damageAmount, Resistance resistance)
     {
         if (resistance == null)
-            return damageAmount -= damageReceiver.CacheStatsWithBuffs.armor; // If armor is minus damage will be increased
-        var resistances = damageReceiver.CacheResistancesWithBuffs;
+            return damageAmount -= damageReceiver.CacheStats.armor; // If armor is minus damage will be increased
+        var resistances = damageReceiver.CacheResistances;
         float resistanceAmount = 0f;
         resistances.TryGetValue(resistance, out resistanceAmount);
         if (resistanceAmount > resistance.maxAmount)

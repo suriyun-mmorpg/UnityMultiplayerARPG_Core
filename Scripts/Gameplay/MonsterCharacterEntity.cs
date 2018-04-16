@@ -82,7 +82,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
     protected override void Update()
     {
         base.Update();
-
+        
         if (CurrentHp <= 0)
         {
             StopMove();

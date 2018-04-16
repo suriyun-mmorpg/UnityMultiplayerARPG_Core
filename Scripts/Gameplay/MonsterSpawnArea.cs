@@ -35,14 +35,6 @@ public class MonsterSpawnArea : MonoBehaviour
             entity.Id = System.Guid.NewGuid().ToString();
             entity.DatabaseId = databaseId;
             entity.Level = level;
-            var attributes = database.attributes;
-            foreach (var attribute in attributes)
-            {
-                var characterAttribute = new CharacterAttribute();
-                characterAttribute.attributeId = attribute.attribute.Id;
-                characterAttribute.amount = attribute.GetAmount(level);
-                entity.Attributes.Add(characterAttribute);
-            }
             entity.CurrentHp = entity.GetMaxHp();
             entity.CurrentMp = entity.GetMaxMp();
             entity.respawnPosition = randomedPosition;

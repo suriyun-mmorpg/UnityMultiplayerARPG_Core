@@ -82,9 +82,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Caches Data
-    public CharacterStats CacheStatsWithBuffs { get; protected set; }
-    public Dictionary<Attribute, int> CacheAttributesWithBuffs { get; protected set; }
-    public Dictionary<Resistance, float> CacheResistancesWithBuffs { get; protected set; }
+    public CharacterStats CacheStats { get; protected set; }
+    public Dictionary<Attribute, int> CacheAttributes { get; protected set; }
+    public Dictionary<Resistance, float> CacheResistances { get; protected set; }
     public int CacheMaxHp { get; protected set; }
     public int CacheMaxMp { get; protected set; }
     #endregion
@@ -227,6 +227,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     {
         var gameInstance = GameInstance.Singleton;
         gameObject.layer = gameInstance.characterLayer;
+        shouldRecaches = true;
     }
 
     protected virtual void Start()
@@ -961,12 +962,11 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         // If item not valid
         if (string.IsNullOrEmpty(itemId) || amount <= 0 || !GameInstance.Items.TryGetValue(itemId, out itemData))
             return false;
-
-        var stats = this.GetStatsWithBuffs();
+        
         var maxStack = itemData.maxStack;
         var weight = itemData.weight;
         // If overwhelming
-        if (this.GetTotalItemWeight() + (amount * weight) >= stats.weightLimit)
+        if (this.GetTotalItemWeight() + (amount * weight) >= CacheStats.weightLimit)
             return false;
 
         var emptySlots = new Dictionary<int, CharacterItem>();
@@ -1711,11 +1711,11 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     {
         if (!shouldRecaches)
             return;
-        CacheStatsWithBuffs = this.GetStatsWithBuffs();
-        CacheAttributesWithBuffs = this.GetAttributesWithBuffs();
-        CacheResistancesWithBuffs = this.GetResistancesWithBuffs();
-        CacheMaxHp = (int)CacheStatsWithBuffs.hp;
-        CacheMaxMp = (int)CacheStatsWithBuffs.mp;
+        CacheStats = this.GetStats();
+        CacheAttributes = this.GetAttributes();
+        CacheResistances = this.GetResistances();
+        CacheMaxHp = (int)CacheStats.hp;
+        CacheMaxMp = (int)CacheStats.mp;
         shouldRecaches = false;
     }
 

@@ -113,6 +113,13 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
             writer.Put(entry.level);
             writer.Put(entry.amount);
         }
+        writer.Put(SelectedCharacter.Hotkeys.Count);
+        foreach (var entry in SelectedCharacter.Hotkeys)
+        {
+            writer.Put(entry.hotkeyId);
+            writer.Put((byte)entry.type);
+            writer.Put(entry.dataId);
+        }
         var rightHand = SelectedCharacter.EquipWeapons.rightHand;
         writer.Put(rightHand.id);
         writer.Put(rightHand.itemId);
@@ -190,6 +197,15 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
             entry.level = reader.GetInt();
             entry.amount = reader.GetInt();
             character.NonEquipItems.Add(entry);
+        }
+        count = reader.GetInt();
+        for (var i = 0; i < count; ++i)
+        {
+            var entry = new CharacterHotkey();
+            entry.hotkeyId = reader.GetString();
+            entry.type = (HotkeyTypes)reader.GetByte();
+            entry.dataId = reader.GetString();
+            character.Hotkeys.Add(entry);
         }
 
         var rightWeapon = new CharacterItem();
