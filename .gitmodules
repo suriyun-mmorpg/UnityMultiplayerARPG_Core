@@ -7,3 +7,6 @@
 [submodule "UnityEditorUtils"]
 	path = UnityEditorUtils
 	url = https://github.com/insthync/UnityEditorUtils.git
+[submodule "AudioManager"]
+	path = AudioManager
+	url = https://github.com/insthync/unity-audio-manager.git
