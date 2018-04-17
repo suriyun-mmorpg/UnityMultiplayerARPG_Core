@@ -98,7 +98,7 @@ public static class ItemExtension
             return new Dictionary<DamageElement, MinMaxFloat>();
         var baseDamageAttribute = weaponItem.GetDamageAttribute(level, weaponItem.GetEffectivenessDamage(character), 1f);
         var additionalDamageAttributes = weaponItem.GetIncreaseDamageAttributes(level);
-        return GameDataHelpers.CombineDamageAttributesDictionary(additionalDamageAttributes, baseDamageAttribute);
+        return GameDataHelpers.CombineDamageAmountsDictionary(additionalDamageAttributes, baseDamageAttribute);
     }
 
     public static bool TryGetWeaponItemEquipType(this Item weaponItem, out WeaponItemEquipType equipType)

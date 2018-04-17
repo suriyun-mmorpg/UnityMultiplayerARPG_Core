@@ -572,7 +572,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         var effectiveness = skill.GetDamageEffectiveness(this);
         var baseDamageAttribute = skill.GetDamageAttribute(characterSkill.level, effectiveness, 1f);
         var allDamageAttributes = skill.GetAdditionalDamageAttributes(characterSkill.level);
-        allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, baseDamageAttribute);
+        allDamageAttributes = GameDataHelpers.CombineDamageAmountsDictionary(allDamageAttributes, baseDamageAttribute);
         var damageInfo = skill.damageInfo;
         var debuff = skill.isDebuff ? CharacterBuff.Create(Id, skill.Id, true, characterSkill.level) : CharacterBuff.Empty;
         LaunchDamageEntity(CacheTransform.position, damageInfo, allDamageAttributes, debuff, skill.hitEffects.Id);
@@ -1601,7 +1601,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         var effectiveness = weapon.GetEffectivenessDamage(this);
         var damageAttribute = weapon.GetDamageAttribute(equipWeapon.level, effectiveness, inflictRate);
         allDamageAttributes = weapon.GetIncreaseDamageAttributes(equipWeapon.level);
-        allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, damageAttribute);
+        allDamageAttributes = GameDataHelpers.CombineDamageAmountsDictionary(allDamageAttributes, damageAttribute);
         allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, additionalDamageAttributes);
     }
 

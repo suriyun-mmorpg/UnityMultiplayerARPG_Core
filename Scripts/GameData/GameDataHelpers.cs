@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public static class GameDataHelpers
 {
     #region Combine Dictionary with KeyValuePair functions
-    public static Dictionary<DamageElement, MinMaxFloat> CombineDamageAttributesDictionary(Dictionary<DamageElement, MinMaxFloat> sourceDictionary, KeyValuePair<DamageElement, MinMaxFloat> newEntry)
+    public static Dictionary<DamageElement, MinMaxFloat> CombineDamageAmountsDictionary(Dictionary<DamageElement, MinMaxFloat> sourceDictionary, KeyValuePair<DamageElement, MinMaxFloat> newEntry)
     {
         var key = newEntry.Key;
         if (key != null)
@@ -68,7 +68,7 @@ public static class GameDataHelpers
         {
             foreach (var entry in combineDictionary)
             {
-                CombineDamageAttributesDictionary(sourceDictionary, entry);
+                CombineDamageAmountsDictionary(sourceDictionary, entry);
             }
         }
         return sourceDictionary;
@@ -162,28 +162,34 @@ public static class GameDataHelpers
     {
         if (targetDictionary == null)
             targetDictionary = new Dictionary<Attribute, float>();
-        foreach (var sourceEffectivess in sourceEffectivesses)
+        if (sourceEffectivesses != null)
         {
-            var key = sourceEffectivess.attribute;
-            if (key == null)
-                continue;
-            if (!targetDictionary.ContainsKey(key))
-                targetDictionary[key] = sourceEffectivess.effectiveness;
-            else
-                targetDictionary[key] += sourceEffectivess.effectiveness;
+            foreach (var sourceEffectivess in sourceEffectivesses)
+            {
+                var key = sourceEffectivess.attribute;
+                if (key == null)
+                    continue;
+                if (!targetDictionary.ContainsKey(key))
+                    targetDictionary[key] = sourceEffectivess.effectiveness;
+                else
+                    targetDictionary[key] += sourceEffectivess.effectiveness;
+            }
         }
         return targetDictionary;
     }
 
-    public static Dictionary<DamageElement, MinMaxFloat> MakeDamageAttributesDictionary(DamageIncremental[] sourceAttributes, Dictionary<DamageElement, MinMaxFloat> targetDictionary, int level)
+    public static Dictionary<DamageElement, MinMaxFloat> MakeDamageAttributesDictionary(DamageIncremental[] sourceIncrementals, Dictionary<DamageElement, MinMaxFloat> targetDictionary, int level)
     {
         if (targetDictionary == null)
             targetDictionary = new Dictionary<DamageElement, MinMaxFloat>();
-        var gameInstance = GameInstance.Singleton;
-        foreach (var sourceAttribute in sourceAttributes)
+        if (sourceIncrementals != null)
         {
-            var pair = MakeDamageAttributePair(sourceAttribute, level, 0f, 1f);
-            targetDictionary = CombineDamageAttributesDictionary(targetDictionary, pair);
+            var gameInstance = GameInstance.Singleton;
+            foreach (var sourceIncremental in sourceIncrementals)
+            {
+                var pair = MakeDamageAttributePair(sourceIncremental, level, 0f, 1f);
+                targetDictionary = CombineDamageAmountsDictionary(targetDictionary, pair);
+            }
         }
         return targetDictionary;
     }
@@ -192,10 +198,13 @@ public static class GameDataHelpers
     {
         if (targetDictionary == null)
             targetDictionary = new Dictionary<Attribute, int>();
-        foreach (var sourceAmount in sourceAmounts)
+        if (sourceAmounts != null)
         {
-            var pair = MakeAttributeAmountPair(sourceAmount);
-            targetDictionary = CombineAttributeAmountsDictionary(targetDictionary, pair);
+            foreach (var sourceAmount in sourceAmounts)
+            {
+                var pair = MakeAttributeAmountPair(sourceAmount);
+                targetDictionary = CombineAttributeAmountsDictionary(targetDictionary, pair);
+            }
         }
         return targetDictionary;
     }
@@ -204,10 +213,13 @@ public static class GameDataHelpers
     {
         if (targetDictionary == null)
             targetDictionary = new Dictionary<Attribute, int>();
-        foreach (var sourceIncremental in sourceIncrementals)
+        if (sourceIncrementals != null)
         {
-            var pair = MakeAttributeAmountPair(sourceIncremental, level);
-            targetDictionary = CombineAttributeAmountsDictionary(targetDictionary, pair);
+            foreach (var sourceIncremental in sourceIncrementals)
+            {
+                var pair = MakeAttributeAmountPair(sourceIncremental, level);
+                targetDictionary = CombineAttributeAmountsDictionary(targetDictionary, pair);
+            }
         }
         return targetDictionary;
     }
@@ -216,10 +228,13 @@ public static class GameDataHelpers
     {
         if (targetDictionary == null)
             targetDictionary = new Dictionary<DamageElement, float>();
-        foreach (var sourceAmount in sourceAmounts)
+        if (sourceAmounts != null)
         {
-            var pair = MakeResistanceAmountPair(sourceAmount);
-            targetDictionary = CombineResistanceAmountsDictionary(targetDictionary, pair);
+            foreach (var sourceAmount in sourceAmounts)
+            {
+                var pair = MakeResistanceAmountPair(sourceAmount);
+                targetDictionary = CombineResistanceAmountsDictionary(targetDictionary, pair);
+            }
         }
         return targetDictionary;
     }
@@ -228,22 +243,28 @@ public static class GameDataHelpers
     {
         if (targetDictionary == null)
             targetDictionary = new Dictionary<DamageElement, float>();
-        foreach (var sourceIncremental in sourceIncrementals)
+        if (sourceIncrementals != null)
         {
-            var pair = MakeResistanceAmountPair(sourceIncremental, level);
-            targetDictionary = CombineResistanceAmountsDictionary(targetDictionary, pair);
+            foreach (var sourceIncremental in sourceIncrementals)
+            {
+                var pair = MakeResistanceAmountPair(sourceIncremental, level);
+                targetDictionary = CombineResistanceAmountsDictionary(targetDictionary, pair);
+            }
         }
         return targetDictionary;
     }
-    
+
     public static Dictionary<Skill, int> MakeSkillLevelsDictionary(SkillLevel[] sourceLevels, Dictionary<Skill, int> targetDictionary)
     {
         if (targetDictionary == null)
             targetDictionary = new Dictionary<Skill, int>();
-        foreach (var sourceLevel in sourceLevels)
+        if (sourceLevels != null)
         {
-            var pair = MakeSkillLevelPair(sourceLevel);
-            targetDictionary = CombineSkillLevelsDictionary(targetDictionary, pair);
+            foreach (var sourceLevel in sourceLevels)
+            {
+                var pair = MakeSkillLevelPair(sourceLevel);
+                targetDictionary = CombineSkillLevelsDictionary(targetDictionary, pair);
+            }
         }
         return targetDictionary;
     }
@@ -252,12 +273,15 @@ public static class GameDataHelpers
     public static float CalculateEffectivenessDamage(Dictionary<Attribute, float> effectivenessAttributes, ICharacterData character)
     {
         var damageEffectiveness = 0f;
-        var characterAttributes = character.GetAttributes();
-        foreach (var characterAttribute in characterAttributes)
+        if (effectivenessAttributes != null && character != null)
         {
-            var attribute = characterAttribute.Key;
-            if (attribute != null && effectivenessAttributes.ContainsKey(attribute))
-                damageEffectiveness += effectivenessAttributes[attribute] * characterAttribute.Value;
+            var characterAttributes = character.GetAttributes();
+            foreach (var characterAttribute in characterAttributes)
+            {
+                var attribute = characterAttribute.Key;
+                if (attribute != null && effectivenessAttributes.ContainsKey(attribute))
+                    damageEffectiveness += effectivenessAttributes[attribute] * characterAttribute.Value;
+            }
         }
         return damageEffectiveness;
     }
@@ -265,11 +289,14 @@ public static class GameDataHelpers
     public static CharacterStats CaculateStats(Dictionary<Attribute, int> attributeAmountsDictionary)
     {
         var stats = new CharacterStats();
-        foreach (var attributeAmountPair in attributeAmountsDictionary)
+        if (attributeAmountsDictionary != null)
         {
-            var attribute = attributeAmountPair.Key;
-            var level = attributeAmountPair.Value;
-            stats += attribute.statsIncreaseEachLevel * level;
+            foreach (var attributeAmountPair in attributeAmountsDictionary)
+            {
+                var attribute = attributeAmountPair.Key;
+                var level = attributeAmountPair.Value;
+                stats += attribute.statsIncreaseEachLevel * level;
+            }
         }
         return stats;
     }
