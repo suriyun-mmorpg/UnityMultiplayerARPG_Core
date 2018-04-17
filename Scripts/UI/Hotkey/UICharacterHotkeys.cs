@@ -40,9 +40,8 @@ public class UICharacterHotkeys : UIBase
         {
             var characterHotkey = characterHotkeys[i];
             UICharacterHotkey ui;
-            if (string.IsNullOrEmpty(characterHotkey.hotkeyId) || !CacheUICharacterHotkeys.TryGetValue(characterHotkey.hotkeyId, out ui))
-                continue;
-            ui.Setup(characterHotkey, i);
+            if (CacheUICharacterHotkeys.TryGetValue(characterHotkey.hotkeyId, out ui))
+                ui.Setup(characterHotkey, i);
         }
     }
 }
