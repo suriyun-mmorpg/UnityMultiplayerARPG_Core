@@ -292,12 +292,16 @@ public class CharacterModel : MonoBehaviour
     public void SetBuffs(IList<CharacterBuff> buffs)
     {
         var keepingKeys = new List<string>();
+        var addingKeys = new List<string>();
         foreach (var buff in buffs)
         {
             var buffId = buff.GetBuffId();
             var skill = buff.GetSkill();
             if (skill != null)
+            {
                 keepingKeys.Add(buffId);
+                addingKeys.Add(buffId);
+            }
         }
 
         var keys = new List<string>(cacheEffects.Keys);
@@ -305,13 +309,15 @@ public class CharacterModel : MonoBehaviour
         {
             if (!keepingKeys.Contains(key))
                 DestroyCacheEffect(key);
+            else
+                addingKeys.Remove(key);
         }
 
         foreach (var buff in buffs)
         {
             var buffId = buff.GetBuffId();
             var isDebuff = buff.isDebuff;
-            if (keepingKeys.Contains(buffId))
+            if (addingKeys.Contains(buffId))
             {
                 var skill = buff.GetSkill();
                 var skillBuff = !isDebuff ? skill.buff : skill.debuff;
@@ -320,7 +326,7 @@ public class CharacterModel : MonoBehaviour
         }
     }
 
-    private void InstantiateBuffEffect(string buffId, BuffEffect[] buffEffects)
+    private void InstantiateBuffEffect(string buffId, GameEffect[] buffEffects)
     {
         if (buffEffects == null || buffEffects.Length == 0)
             return;
@@ -328,17 +334,19 @@ public class CharacterModel : MonoBehaviour
         var effects = new List<GameEffect>();
         foreach (var buffEffect in buffEffects)
         {
+            var effect = buffEffect;
+            if (effect == null)
+                continue;
             var effectSocket = buffEffect.effectSocket;
-            var effect = buffEffect.effect;
-            if (string.IsNullOrEmpty(effectSocket) || effect == null)
+            if (string.IsNullOrEmpty(effectSocket))
                 continue;
             EffectContainer container;
             if (!CacheEffectContainers.TryGetValue(effectSocket, out container))
                 continue;
-            var newEffect = Instantiate(effect, container.transform);
-            newEffect.transform.localPosition = Vector3.zero;
-            newEffect.transform.localEulerAngles = Vector3.zero;
-            newEffect.transform.localScale = Vector3.one;
+            var newEffect = effect.InstantiateTo(null);
+            newEffect.followingTarget = container.transform;
+            newEffect.CacheTransform.position = newEffect.followingTarget.position;
+            newEffect.CacheTransform.rotation = newEffect.followingTarget.rotation;
             newEffect.gameObject.SetActive(true);
             newEffect.gameObject.layer = gameInstance.characterLayer;
             effects.Add(newEffect);

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class GameEffect : MonoBehaviour
 {
+    public string effectSocket;
     public bool isLoop;
     public float lifeTime;
     public Transform followingTarget;
@@ -33,7 +34,7 @@ public class GameEffect : MonoBehaviour
     {
         foreach (var soundEffect in soundEffects)
         {
-            AudioSource.PlayClipAtPoint(soundEffect, transform.position);
+            AudioSource.PlayClipAtPoint(soundEffect, transform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
         }
         foreach (var particle in particles)
         {
@@ -68,5 +69,14 @@ public class GameEffect : MonoBehaviour
             audioSource.loop = false;
         }
         Destroy(gameObject, lifeTime);
+    }
+
+    public GameEffect InstantiateTo(Transform parent)
+    {
+        var newEffect = Instantiate(this, parent);
+        newEffect.transform.localPosition = Vector3.zero;
+        newEffect.transform.localEulerAngles = Vector3.zero;
+        newEffect.transform.localScale = Vector3.one;
+        return newEffect;
     }
 }
