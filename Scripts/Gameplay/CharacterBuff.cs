@@ -27,7 +27,7 @@ public struct CharacterBuff
     [System.NonSerialized]
     private Dictionary<Attribute, int> cacheIncreaseAttributes;
     [System.NonSerialized]
-    private Dictionary<Resistance, float> cacheIncreaseResistances;
+    private Dictionary<DamageElement, float> cacheIncreaseResistances;
 
     private void MakeCache()
     {
@@ -39,7 +39,7 @@ public struct CharacterBuff
             cacheRecoveryMp = 0;
             cacheIncreaseStats = new CharacterStats();
             cacheIncreaseAttributes = new Dictionary<Attribute, int>();
-            cacheIncreaseResistances = new Dictionary<Resistance, float>();
+            cacheIncreaseResistances = new Dictionary<DamageElement, float>();
             return;
         }
         if (string.IsNullOrEmpty(dirtySkillId) || !dirtySkillId.Equals(skillId))
@@ -99,7 +99,7 @@ public struct CharacterBuff
         return cacheIncreaseAttributes;
     }
 
-    public Dictionary<Resistance, float> GetIncreaseResistances()
+    public Dictionary<DamageElement, float> GetIncreaseResistances()
     {
         MakeCache();
         return cacheIncreaseResistances;

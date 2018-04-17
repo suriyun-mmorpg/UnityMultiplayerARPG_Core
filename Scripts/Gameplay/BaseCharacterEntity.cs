@@ -84,7 +84,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     #region Caches Data
     public CharacterStats CacheStats { get; protected set; }
     public Dictionary<Attribute, int> CacheAttributes { get; protected set; }
-    public Dictionary<Resistance, float> CacheResistances { get; protected set; }
+    public Dictionary<DamageElement, float> CacheResistances { get; protected set; }
     public int CacheMaxHp { get; protected set; }
     public int CacheMaxMp { get; protected set; }
     #endregion
@@ -430,9 +430,10 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         equipItems.onOperation += OnEquipItemsOperation;
         nonEquipItems.onOperation += OnNonEquipItemsOperation;
         // Register Network functions
-        RegisterNetFunction("Attack", new LiteNetLibFunction(() => NetFuncAttack(1, null, CharacterBuff.Empty)));
+        RegisterNetFunction("Attack", new LiteNetLibFunction(() => NetFuncAttack(1, null, CharacterBuff.Empty, -1)));
         RegisterNetFunction("UseSkill", new LiteNetLibFunction<NetFieldVector3, NetFieldInt>((position, skillIndex) => NetFuncUseSkill(position, skillIndex)));
         RegisterNetFunction("PlayActionAnimation", new LiteNetLibFunction<NetFieldInt, NetFieldByte>((actionId, animActionTypes) => NetFuncPlayActionAnimation(actionId, (AnimActionTypes)animActionTypes.Value)));
+        RegisterNetFunction("PlayEffect", new LiteNetLibFunction<NetFieldInt>((effectId) => NetFuncPlayEffect(effectId)));
         RegisterNetFunction("PickupItem", new LiteNetLibFunction(() => NetFuncPickupItem()));
         RegisterNetFunction("DropItem", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((index, amount) => NetFuncDropItem(index, amount)));
         RegisterNetFunction("EquipItem", new LiteNetLibFunction<NetFieldInt, NetFieldString>((nonEquipIndex, equipPosition) => NetFuncEquipItem(nonEquipIndex, equipPosition)));
@@ -467,8 +468,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="debuff">Debuff which will be applies to damage receivers</param>
     protected void NetFuncAttack(
         float inflictRate,
-        Dictionary<DamageElement, DamageAmount> additionalDamageAttributes,
-        CharacterBuff debuff)
+        Dictionary<DamageElement, MinMaxFloat> additionalDamageAttributes,
+        CharacterBuff debuff,
+        int hitEffectsId)
     {
         if (CurrentHp <= 0 || isDoingAction.Value)
             return;
@@ -478,7 +480,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         float damageDuration;
         float totalDuration;
         DamageInfo damageInfo;
-        Dictionary<DamageElement, DamageAmount> allDamageAttributes;
+        Dictionary<DamageElement, MinMaxFloat> allDamageAttributes;
 
         GetAttackData(
             inflictRate,
@@ -493,7 +495,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         // Play animation on clients
         RequestPlayActionAnimation(actionId, AnimActionTypes.Attack);
         // Start attack routine
-        StartCoroutine(AttackRoutine(CacheTransform.position, damageDuration, totalDuration, damageInfo, allDamageAttributes, debuff));
+        StartCoroutine(AttackRoutine(CacheTransform.position, damageDuration, totalDuration, damageInfo, allDamageAttributes, debuff, hitEffectsId));
     }
 
     IEnumerator AttackRoutine(
@@ -501,11 +503,12 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         float damageDuration,
         float totalDuration,
         DamageInfo damageInfo,
-        Dictionary<DamageElement, DamageAmount> allDamageAttributes,
-        CharacterBuff debuff)
+        Dictionary<DamageElement, MinMaxFloat> allDamageAttributes,
+        CharacterBuff debuff,
+        int hitEffectsId)
     {
         yield return new WaitForSecondsRealtime(damageDuration);
-        LaunchDamageEntity(position, damageInfo, allDamageAttributes, debuff);
+        LaunchDamageEntity(position, damageInfo, allDamageAttributes, debuff, hitEffectsId);
         yield return new WaitForSecondsRealtime(totalDuration - damageDuration);
         isDoingAction.Value = false;
     }
@@ -572,7 +575,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, baseDamageAttribute);
         var damageInfo = skill.damageInfo;
         var debuff = skill.isDebuff ? CharacterBuff.Create(Id, skill.Id, true, characterSkill.level) : CharacterBuff.Empty;
-        LaunchDamageEntity(CacheTransform.position, damageInfo, allDamageAttributes, debuff);
+        LaunchDamageEntity(CacheTransform.position, damageInfo, allDamageAttributes, debuff, skill.hitEffects.Id);
     }
 
     protected void AttackAsWeaponDamageInflict(CharacterSkill characterSkill)
@@ -584,7 +587,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         var inflictRate = skill.GetInflictRate(characterSkill.level);
         var additionalDamageAttributes = skill.GetAdditionalDamageAttributes(characterSkill.level);
         var debuff = skill.isDebuff ? CharacterBuff.Create(Id, characterSkill.skillId, true, characterSkill.level) : CharacterBuff.Empty;
-        NetFuncAttack(inflictRate, additionalDamageAttributes, debuff);
+        NetFuncAttack(inflictRate, additionalDamageAttributes, debuff, skill.hitEffects.Id);
     }
 
     protected void ApplySkillBuff(CharacterSkill characterSkill)
@@ -609,8 +612,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <summary>
     /// This will be called at every clients to play any action animation
     /// </summary>
-    /// <param name="duration"></param>
     /// <param name="actionId"></param>
+    /// <param name="animActionTypes"></param>
     protected void NetFuncPlayActionAnimation(int actionId, AnimActionTypes animActionTypes)
     {
         if (CurrentHp <= 0)
@@ -638,6 +641,18 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             yield return new WaitForSecondsRealtime(actionAnimation.ClipLength / actionClipMultiplier);
             animator.SetBool(ANIM_DO_ACTION, false);
         }
+    }
+
+    /// <summary>
+    /// This will be called at every clients to play any effect
+    /// </summary>
+    /// <param name="effectId"></param>
+    protected void NetFuncPlayEffect(int effectId)
+    {
+        GameEffectCollection gameEffectCollection;
+        if (model == null || !GameInstance.GameEffectCollections.TryGetValue(effectId, out gameEffectCollection))
+            return;
+        model.InstantiateEffect(gameEffectCollection.effects);
     }
 
     /// <summary>
@@ -896,9 +911,16 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     public virtual void RequestPlayActionAnimation(int actionId, AnimActionTypes animActionTypes)
     {
-        if (CurrentHp <= 0)
+        if (CurrentHp <= 0 || actionId < 0)
             return;
         CallNetFunction("PlayActionAnimation", FunctionReceivers.All, actionId, animActionTypes);
+    }
+
+    public virtual void RequestPlayEffect(int effectId)
+    {
+        if (effectId < 0)
+            return;
+        CallNetFunction("PlayEffect", FunctionReceivers.All, effectId);
     }
 
     public virtual void RequestPickupItem()
@@ -1183,9 +1205,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         return true;
     }
 
-    public virtual void ReceiveDamage(BaseCharacterEntity attacker,
-        Dictionary<DamageElement, DamageAmount> allDamageAttributes,
-        CharacterBuff debuff)
+    public virtual void ReceiveDamage(BaseCharacterEntity attacker, Dictionary<DamageElement, MinMaxFloat> allDamageAttributes, CharacterBuff debuff, int hitEffectsId)
     {
         var calculatingTotalDamage = 0f;
         // Damage calculations apply at server only
@@ -1208,11 +1228,16 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             {
                 var damageElement = allDamageAttribute.Key;
                 var damageAmount = allDamageAttribute.Value;
-                var receivingDamage = damageElement.GetDamageReducedByResistance(this, Random.Range(damageAmount.minDamage, damageAmount.maxDamage));
+                if (hitEffectsId < 0 && damageElement != gameInstance.DefaultDamageElement)
+                    hitEffectsId = damageElement.hitEffects.Id;
+                var receivingDamage = damageElement.GetDamageReducedByResistance(this, Random.Range(damageAmount.min, damageAmount.max));
                 if (receivingDamage > 0f)
                     calculatingTotalDamage += receivingDamage;
             }
         }
+        if (hitEffectsId < 0)
+            hitEffectsId = gameInstance.defaultHitEffects.Id;
+        RequestPlayEffect(hitEffectsId);
         // Calculate chance to critical
         var criticalChance = gameInstance.GameplayRule.GetCriticalChance(attacker, this);
         var isCritical = Random.value <= criticalChance;
@@ -1541,19 +1566,19 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     public virtual void GetAttackData(
         float inflictRate,
-        Dictionary<DamageElement, DamageAmount> additionalDamageAttributes,
+        Dictionary<DamageElement, MinMaxFloat> additionalDamageAttributes,
         out int actionId,
         out float damageDuration,
         out float totalDuration,
         out DamageInfo damageInfo,
-        out Dictionary<DamageElement, DamageAmount> allDamageAttributes)
+        out Dictionary<DamageElement, MinMaxFloat> allDamageAttributes)
     {
         // Initialize data
         actionId = -1;
         damageDuration = 0f;
         totalDuration = 0f;
         damageInfo = null;
-        allDamageAttributes = new Dictionary<DamageElement, DamageAmount>();
+        allDamageAttributes = new Dictionary<DamageElement, MinMaxFloat>();
         // Prepare weapon data
         var isLeftHand = false;
         var equipWeapon = GetRandomedWeapon(out isLeftHand);
@@ -1618,8 +1643,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public virtual void LaunchDamageEntity(
         Vector3 position,
         DamageInfo damageInfo,
-        Dictionary<DamageElement, DamageAmount> allDamageAttributes,
-        CharacterBuff debuff)
+        Dictionary<DamageElement, MinMaxFloat> allDamageAttributes,
+        CharacterBuff debuff,
+        int hitEffectsId)
     {
         if (!IsServer)
             return;
@@ -1639,7 +1665,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                     var angle = Vector3.Angle(targetDir, CacheTransform.forward);
                     // Angle in forward position is 180 so we use this value to determine that target is in hit fov or not
                     if (angle < 180 + halfFov && angle > 180 - halfFov)
-                        characterEntity.ReceiveDamage(this, allDamageAttributes, debuff);
+                        characterEntity.ReceiveDamage(this, allDamageAttributes, debuff, hitEffectsId);
                 }
                 break;
             case DamageType.Missile:
@@ -1647,7 +1673,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                 {
                     var missileDamageIdentity = Manager.Assets.NetworkSpawn(damageInfo.missileDamageEntity.Identity, damageTransform.position, damageTransform.rotation);
                     var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
-                    missileDamageEntity.SetupDamage(this, allDamageAttributes, debuff, damageInfo.missileDistance, damageInfo.missileSpeed);
+                    missileDamageEntity.SetupDamage(this, allDamageAttributes, debuff, hitEffectsId, damageInfo.missileDistance, damageInfo.missileSpeed);
                 }
                 break;
         }

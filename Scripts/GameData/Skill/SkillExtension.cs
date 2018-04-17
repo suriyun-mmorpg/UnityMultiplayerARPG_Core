@@ -29,7 +29,7 @@ public static class SkillExtension
     {
         if (skill == null)
             return 0;
-        return skill.requirement.characterLevel.baseAmount + (int)(skill.requirement.characterLevel.amountIncreaseEachLevel * level);
+        return skill.requirement.characterLevel.GetAmount(level + 1);
     }
 
     public static int GetMaxLevel(this Skill skill)
@@ -97,10 +97,10 @@ public static class SkillExtension
     #endregion
 
     #region Attack
-    public static KeyValuePair<DamageElement, DamageAmount> GetDamageAttribute(this Skill skill, int level, float effectiveness, float inflictRate)
+    public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAttribute(this Skill skill, int level, float effectiveness, float inflictRate)
     {
         if (!skill.IsAttack() || skill.skillAttackType != SkillAttackType.PureSkillDamage)
-            return new KeyValuePair<DamageElement, DamageAmount>();
+            return new KeyValuePair<DamageElement, MinMaxFloat>();
         level = skill.GetAdjustedLevel(level);
         return GameDataHelpers.MakeDamageAttributePair(skill.damageAttribute, level, effectiveness, inflictRate);
     }
@@ -117,47 +117,47 @@ public static class SkillExtension
         if (!skill.IsAttack() || skill.skillAttackType != SkillAttackType.WeaponDamageInflict)
             return 1f;
         level = skill.GetAdjustedLevel(level);
-        return skill.inflictRate.baseAmount + skill.inflictRate.amountIncreaseEachLevel * level;
+        return skill.inflictRate.GetAmount(level);
     }
 
-    public static Dictionary<DamageElement, DamageAmount> GetAdditionalDamageAttributes(this Skill skill, int level)
+    public static Dictionary<DamageElement, MinMaxFloat> GetAdditionalDamageAttributes(this Skill skill, int level)
     {
         if (!skill.IsAttack() || skill.skillAttackType != SkillAttackType.PureSkillDamage)
-            return new Dictionary<DamageElement, DamageAmount>();
+            return new Dictionary<DamageElement, MinMaxFloat>();
         level = skill.GetAdjustedLevel(level);
-        return GameDataHelpers.MakeDamageAttributesDictionary(skill.additionalDamageAttributes, new Dictionary<DamageElement, DamageAmount>(), level);
+        return GameDataHelpers.MakeDamageAttributesDictionary(skill.additionalDamageAttributes, new Dictionary<DamageElement, MinMaxFloat>(), level);
     }
     #endregion
 
     #region Buff Extension
-    public static float GetDuration(this SkillBuff skillBuff, int level)
+    public static float GetDuration(this Buff skillBuff, int level)
     {
         return skillBuff.duration.GetAmount(level);
     }
 
-    public static int GetRecoveryHp(this SkillBuff skillBuff, int level)
+    public static int GetRecoveryHp(this Buff skillBuff, int level)
     {
         return skillBuff.recoveryHp.GetAmount(level);
     }
 
-    public static int GetRecoveryMp(this SkillBuff skillBuff, int level)
+    public static int GetRecoveryMp(this Buff skillBuff, int level)
     {
         return skillBuff.recoveryMp.GetAmount(level);
     }
 
-    public static CharacterStats GetIncreaseStats(this SkillBuff skillBuff, int level)
+    public static CharacterStats GetIncreaseStats(this Buff skillBuff, int level)
     {
         return skillBuff.increaseStats.GetCharacterStats(level);
     }
 
-    public static Dictionary<Attribute, int> GetIncreaseAttributes(this SkillBuff skillBuff, int level)
+    public static Dictionary<Attribute, int> GetIncreaseAttributes(this Buff skillBuff, int level)
     {
         return GameDataHelpers.MakeAttributeAmountsDictionary(skillBuff.increaseAttributes, new Dictionary<Attribute, int>(), level);
     }
 
-    public static Dictionary<Resistance, float> GetIncreaseResistances(this SkillBuff skillBuff, int level)
+    public static Dictionary<DamageElement, float> GetIncreaseResistances(this Buff skillBuff, int level)
     {
-        return GameDataHelpers.MakeResistanceAmountsDictionary(skillBuff.increaseResistances, new Dictionary<Resistance, float>(), level);
+        return GameDataHelpers.MakeResistanceAmountsDictionary(skillBuff.increaseResistances, new Dictionary<DamageElement, float>(), level);
     }
     #endregion
 }

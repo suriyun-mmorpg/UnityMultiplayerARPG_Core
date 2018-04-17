@@ -55,18 +55,18 @@ public static class ItemExtension
         return result;
     }
 
-    public static Dictionary<Resistance, float> GetIncreaseResistances(this Item equipmentItem, int level)
+    public static Dictionary<DamageElement, float> GetIncreaseResistances(this Item equipmentItem, int level)
     {
-        var result = new Dictionary<Resistance, float>();
+        var result = new Dictionary<DamageElement, float>();
         if (equipmentItem != null &&
             equipmentItem.IsEquipment())
             result = GameDataHelpers.MakeResistanceAmountsDictionary(equipmentItem.increaseResistances, result, level);
         return result;
     }
 
-    public static Dictionary<DamageElement, DamageAmount> GetIncreaseDamageAttributes(this Item equipmentItem, int level)
+    public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamageAttributes(this Item equipmentItem, int level)
     {
-        var result = new Dictionary<DamageElement, DamageAmount>();
+        var result = new Dictionary<DamageElement, MinMaxFloat>();
         if (equipmentItem != null &&
             equipmentItem.IsEquipment())
             result = GameDataHelpers.MakeDamageAttributesDictionary(equipmentItem.increaseDamageAttributes, result, level);
@@ -75,11 +75,11 @@ public static class ItemExtension
     #endregion    
 
     #region Weapon Extension
-    public static KeyValuePair<DamageElement, DamageAmount> GetDamageAttribute(this Item weaponItem, int level, float effectiveness, float inflictRate)
+    public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAttribute(this Item weaponItem, int level, float effectiveness, float inflictRate)
     {
         if (weaponItem == null ||
             !weaponItem.IsWeapon())
-            return new KeyValuePair<DamageElement, DamageAmount>();
+            return new KeyValuePair<DamageElement, MinMaxFloat>();
         return GameDataHelpers.MakeDamageAttributePair(weaponItem.damageAttribute, level, effectiveness, inflictRate);
     }
 
@@ -91,11 +91,11 @@ public static class ItemExtension
         return GameDataHelpers.CalculateEffectivenessDamage(weaponItem.WeaponType.CacheEffectivenessAttributes, character);
     }
 
-    public static Dictionary<DamageElement, DamageAmount> GetAllDamages(this Item weaponItem, ICharacterData character, int level)
+    public static Dictionary<DamageElement, MinMaxFloat> GetAllDamages(this Item weaponItem, ICharacterData character, int level)
     {
         if (weaponItem == null ||
             !weaponItem.IsWeapon())
-            return new Dictionary<DamageElement, DamageAmount>();
+            return new Dictionary<DamageElement, MinMaxFloat>();
         var baseDamageAttribute = weaponItem.GetDamageAttribute(level, weaponItem.GetEffectivenessDamage(character), 1f);
         var additionalDamageAttributes = weaponItem.GetIncreaseDamageAttributes(level);
         return GameDataHelpers.CombineDamageAttributesDictionary(additionalDamageAttributes, baseDamageAttribute);

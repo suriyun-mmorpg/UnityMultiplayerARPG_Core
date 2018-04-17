@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UISkillBuff : UISelectionEntry<KeyValuePair<SkillBuff, int>>
+public class UISkillBuff : UISelectionEntry<KeyValuePair<Buff, int>>
 {
     [Tooltip("Duration Format => {0} = {Duration}")]
     public string durationFormat = "Duration: {0}";
@@ -53,6 +53,6 @@ public class UISkillBuff : UISelectionEntry<KeyValuePair<SkillBuff, int>>
             uiBuffAttributes.Data = GameDataHelpers.MakeAttributeAmountsDictionary(skillBuff.increaseAttributes, new Dictionary<Attribute, int>(), skillLevel);
 
         if (uiBuffResistances != null)
-            uiBuffResistances.Data = GameDataHelpers.MakeResistanceAmountsDictionary(skillBuff.increaseResistances, new Dictionary<Resistance, float>(), skillLevel);
+            uiBuffResistances.Data = GameDataHelpers.MakeResistanceAmountsDictionary(skillBuff.increaseResistances, new Dictionary<DamageElement, float>(), skillLevel);
     }
 }

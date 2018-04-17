@@ -29,7 +29,7 @@ public class MonsterCharacterDatabase : BaseCharacterDatabase
 
     [Header("Weapon/Attack Abilities")]
     public DamageElement damageElement;
-    public DamageAmount damageAmount;
+    public MinMaxFloat damageAmount;
     public DamageInfo damageInfo;
 
     [Header("Killing Rewards")]

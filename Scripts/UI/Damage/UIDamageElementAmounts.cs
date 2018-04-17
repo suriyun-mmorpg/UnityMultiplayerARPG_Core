@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIDamageElementAmounts : UISelectionEntry<Dictionary<DamageElement, DamageAmount>>
+public class UIDamageElementAmounts : UISelectionEntry<Dictionary<DamageElement, MinMaxFloat>>
 {
     [Tooltip("Damage Amount Format => {0} = {Element title}, {1} = {Min damage}, {2} = {Max damage}")]
     public string damageFormat = "{0}: {1}~{2}";
@@ -56,16 +56,16 @@ public class UIDamageElementAmounts : UISelectionEntry<Dictionary<DamageElement,
         else
         {
             var text = "";
-            var sumDamage = new DamageAmount();
+            var sumDamage = new MinMaxFloat();
             foreach (var dataEntry in Data)
             {
-                if (dataEntry.Key == null || (dataEntry.Value.minDamage == 0 && dataEntry.Value.maxDamage == 0))
+                if (dataEntry.Key == null || (dataEntry.Value.min == 0 && dataEntry.Value.max == 0))
                     continue;
                 var element = dataEntry.Key;
                 var amount = dataEntry.Value;
                 if (!string.IsNullOrEmpty(text))
                     text += "\n";
-                var amountText = string.Format(damageFormat, element.title, amount.minDamage.ToString("N0"), amount.maxDamage.ToString("N0"));
+                var amountText = string.Format(damageFormat, element.title, amount.min.ToString("N0"), amount.max.ToString("N0"));
                 text += amountText;
                 Text textDamages;
                 if (CacheTextDamages.TryGetValue(dataEntry.Key, out textDamages))
@@ -80,7 +80,7 @@ public class UIDamageElementAmounts : UISelectionEntry<Dictionary<DamageElement,
             }
 
             if (textSumDamage != null)
-                textSumDamage.text = string.Format(sumDamageFormat, sumDamage.minDamage.ToString("N0"), sumDamage.maxDamage.ToString("N0"));
+                textSumDamage.text = string.Format(sumDamageFormat, sumDamage.min.ToString("N0"), sumDamage.max.ToString("N0"));
         }
     }
 }

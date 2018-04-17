@@ -271,14 +271,12 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         SetTargetEntity(target);
     }
 
-    public override void ReceiveDamage(BaseCharacterEntity attacker, 
-        Dictionary<DamageElement, DamageAmount> allDamageAttributes, 
-        CharacterBuff debuff)
+    public override void ReceiveDamage(BaseCharacterEntity attacker, Dictionary<DamageElement, MinMaxFloat> allDamageAttributes, CharacterBuff debuff, int hitEffectsId)
     {
         // Damage calculations apply at server only
         if (!IsServer || CurrentHp <= 0)
             return;
-        base.ReceiveDamage(attacker, allDamageAttributes, debuff);
+        base.ReceiveDamage(attacker, allDamageAttributes, debuff, hitEffectsId);
         // If no attacker, skip next logics
         if (attacker == null || !IsEnemy(attacker))
             return;
@@ -314,12 +312,12 @@ public class MonsterCharacterEntity : BaseCharacterEntity
 
     public override void GetAttackData(
         float inflictRate, 
-        Dictionary<DamageElement, DamageAmount> additionalDamageAttributes, 
+        Dictionary<DamageElement, MinMaxFloat> additionalDamageAttributes, 
         out int actionId, 
         out float damageDuration, 
         out float totalDuration,
         out DamageInfo damageInfo, 
-        out Dictionary<DamageElement, DamageAmount> allDamageAttributes)
+        out Dictionary<DamageElement, MinMaxFloat> allDamageAttributes)
     {
         var gameInstance = GameInstance.Singleton;
 
@@ -344,7 +342,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         damageInfo = MonsterDatabase.damageInfo;
 
         // Assign damage attributes
-        allDamageAttributes = new Dictionary<DamageElement, DamageAmount>();
+        allDamageAttributes = new Dictionary<DamageElement, MinMaxFloat>();
         var damageElement = MonsterDatabase.damageElement;
         var damageAmount = MonsterDatabase.damageAmount;
         if (damageElement == null)

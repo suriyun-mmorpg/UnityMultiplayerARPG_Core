@@ -35,6 +35,7 @@ public class ItemDropEntity : RpgNetworkEntity
             if (!GameInstance.Items.ContainsKey(id))
                 NetworkDestroy();
             itemId.Value = id;
+            NetworkDestroy(GameInstance.Singleton.itemDisappearDuration);
         }
     }
 

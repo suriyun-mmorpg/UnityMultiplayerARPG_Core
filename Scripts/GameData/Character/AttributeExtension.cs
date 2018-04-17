@@ -23,6 +23,6 @@ public static class AttributeExtension
         if (attributeIncremental.attribute == null)
             return new CharacterStats();
         var attribute = attributeIncremental.attribute;
-        return attribute.GetStats(attributeIncremental.GetAmount(level));
+        return attribute.GetStats(attributeIncremental.amount.GetAmount(level));
     }
 }

@@ -38,7 +38,7 @@ public class Item : BaseGameData
     [Header("Resistances Bonus")]
     public ResistanceIncremental[] increaseResistances;
     [Header("Damages Bonus")]
-    public DamageAttribute[] increaseDamageAttributes;
+    public DamageIncremental[] increaseDamageAttributes;
     [Header("Stats Bonus")]
     public CharacterStatsIncremental increaseStats;
 
@@ -49,7 +49,12 @@ public class Item : BaseGameData
     [Space(10)]
     [Header("Weapon")]
     public WeaponType weaponType;
-    public DamageAttribute damageAttribute;
+    public DamageIncremental damageAttribute;
+
+    [Space(10)]
+    [Header("Potion")]
+    public Buff buff;
+    public float buffDuration;
 
 #if UNITY_EDITOR
     protected virtual void OnValidate()

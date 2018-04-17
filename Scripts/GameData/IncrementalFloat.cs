@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-
-[System.Serializable]
+﻿[System.Serializable]
 public struct IncrementalFloat
 {
     public int baseAmount;

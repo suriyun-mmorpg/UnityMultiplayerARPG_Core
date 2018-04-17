@@ -181,7 +181,7 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
             else
             {
                 uiSkillBuff.Show();
-                uiSkillBuff.Data = new KeyValuePair<SkillBuff, int>(skill.buff, level);
+                uiSkillBuff.Data = new KeyValuePair<Buff, int>(skill.buff, level);
             }
         }
 
@@ -192,7 +192,7 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
             else
             {
                 uiSkillDebuff.Show();
-                uiSkillDebuff.Data = new KeyValuePair<SkillBuff, int>(skill.debuff, level);
+                uiSkillDebuff.Data = new KeyValuePair<Buff, int>(skill.debuff, level);
             }
         }
 

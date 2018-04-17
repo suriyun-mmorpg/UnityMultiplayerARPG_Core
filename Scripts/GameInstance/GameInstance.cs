@@ -21,10 +21,8 @@ public class GameInstance : MonoBehaviour
     [Header("Gameplay Database")]
     [Tooltip("Default weapon item, will be used when character not equip any weapon")]
     public Item defaultWeaponItem;
-    public Item[] items;
-    public PlayerCharacterDatabase[] playerCharacterDatabases;
-    public MonsterCharacterDatabase[] monsterCharacterDatabases;
-    public Attribute[] attributes;
+    [Tooltip("Default hit effect, will be used when attacks to enemies")]
+    public GameEffectCollection defaultHitEffects;
     public int[] expTree;
     [Header("Gameplay Configs")]
     public UnityTag playerTag;
@@ -38,6 +36,7 @@ public class GameInstance : MonoBehaviour
     public float moveSpeedMultiplier = 5f;
     public int startGold = 0;
     public ItemAmountPair[] startItems;
+    public float itemDisappearDuration = 60f;
     public float pickUpItemDistance = 1f;
     public float dropDistance = 1f;
     public float conversationDistance = 1f;
@@ -53,9 +52,10 @@ public class GameInstance : MonoBehaviour
     public static readonly Dictionary<string, BaseCharacterDatabase> AllCharacterDatabases = new Dictionary<string, BaseCharacterDatabase>();
     public static readonly Dictionary<string, PlayerCharacterDatabase> PlayerCharacterDatabases = new Dictionary<string, PlayerCharacterDatabase>();
     public static readonly Dictionary<string, MonsterCharacterDatabase> MonsterCharacterDatabases = new Dictionary<string, MonsterCharacterDatabase>();
-    public static readonly Dictionary<string, DamageEntity> DamageEntities = new Dictionary<string, DamageEntity>();
+    public static readonly Dictionary<string, BaseDamageEntity> DamageEntities = new Dictionary<string, BaseDamageEntity>();
     public static readonly Dictionary<string, Skill> Skills = new Dictionary<string, Skill>();
     public static readonly Dictionary<int, ActionAnimation> ActionAnimations = new Dictionary<int, ActionAnimation>();
+    public static readonly Dictionary<int, GameEffectCollection> GameEffectCollections = new Dictionary<int, GameEffectCollection>();
 
     private BaseGameplayRule cacheGameplayRule;
     public BaseGameplayRule GameplayRule
@@ -80,6 +80,7 @@ public class GameInstance : MonoBehaviour
                 cacheDefaultDamageElement = ScriptableObject.CreateInstance<DamageElement>();
                 cacheDefaultDamageElement.name = GameDataConst.DEFAULT_DAMAGE_ID;
                 cacheDefaultDamageElement.title = GameDataConst.DEFAULT_DAMAGE_TITLE;
+                cacheDefaultDamageElement.hitEffects = defaultHitEffects;
             }
             return cacheDefaultDamageElement;
         }
@@ -129,10 +130,12 @@ public class GameInstance : MonoBehaviour
                 defaultWeaponItem.title = GameDataConst.DEFAULT_WEAPON_TITLE;
                 defaultWeaponItem.itemType = ItemType.Weapon;
                 defaultWeaponItem.weaponType = DefaultWeaponType;
-                var sampleDamageAttribute = new DamageAttribute()
+                var sampleDamageAttributeAmount = new IncrementalMinMaxFloat();
+                sampleDamageAttributeAmount.baseAmount = new MinMaxFloat() { min = 1, max = 1 };
+                sampleDamageAttributeAmount.amountIncreaseEachLevel = new MinMaxFloat() { min = 0, max = 0 };
+                var sampleDamageAttribute = new DamageIncremental()
                 {
-                    baseDamageAmount = new DamageAmount() { minDamage = 1, maxDamage = 1 },
-                    damageAmountIncreaseEachLevel = new DamageAmount(),
+                    amount = sampleDamageAttributeAmount,
                 };
                 defaultWeaponItem.damageAttribute = sampleDamageAttribute;
             }
@@ -178,28 +181,54 @@ public class GameInstance : MonoBehaviour
         }
         
         Attributes.Clear();
+        Items.Clear();
+        Skills.Clear();
         AllCharacterDatabases.Clear();
         PlayerCharacterDatabases.Clear();
         MonsterCharacterDatabases.Clear();
         DamageEntities.Clear();
-        Items.Clear();
-        Skills.Clear();
         ActionAnimations.Clear();
+        GameEffectCollections.Clear();
+
+        var gameDataList = Resources.LoadAll<BaseGameData>("");
+        var attributes = new List<Attribute>();
+        var damageElements = new List<DamageElement>();
+        var items = new List<Item>();
+        var skills = new List<Skill>();
+        var playerCharacterDatabases = new List<BaseCharacterDatabase>();
+        var monsterCharacterDatabases = new List<BaseCharacterDatabase>();
+        // Filtering game data
+        foreach (var gameData in gameDataList)
+        {
+            if (gameData is Attribute)
+                attributes.Add(gameData as Attribute);
+            if (gameData is DamageElement)
+                damageElements.Add(gameData as DamageElement);
+            if (gameData is Item)
+                items.Add(gameData as Item);
+            if (gameData is Skill)
+                skills.Add(gameData as Skill);
+            if (gameData is PlayerCharacterDatabase)
+                playerCharacterDatabases.Add(gameData as PlayerCharacterDatabase);
+            if (gameData is MonsterCharacterDatabase)
+                monsterCharacterDatabases.Add(gameData as MonsterCharacterDatabase);
+        }
+        items.Add(DefaultWeaponItem);
+        damageElements.Add(DefaultDamageElement);
 
         AddAttributes(attributes);
         AddItems(items);
+        AddSkills(skills);
         AddCharacterDatabases(playerCharacterDatabases);
         AddCharacterDatabases(monsterCharacterDatabases);
-        AddItems(new Item[] { DefaultWeaponItem });
 
-        var startItemsList = new List<Item>();
-        foreach (var startItem in startItems)
+        var weaponHitEffects = new List<GameEffectCollection>();
+        foreach (var damageElement in damageElements)
         {
-            if (startItem.item == null)
-                continue;
-            startItemsList.Add(startItem.item);
+            if (damageElement.hitEffects != null)
+                weaponHitEffects.Add(damageElement.hitEffects);
         }
-        AddItems(startItemsList);
+        AddGameEffectCollections(GameEffectCollectionType.WeaponHit, weaponHitEffects);
     }
 
     public static void AddAttributes(IEnumerable<Attribute> attributes)
@@ -214,6 +243,7 @@ public class GameInstance : MonoBehaviour
 
     public static void AddItems(IEnumerable<Item> items)
     {
+        var damageEntities = new List<BaseDamageEntity>();
         foreach (var item in items)
         {
             if (item == null || Items.ContainsKey(item.Id))
@@ -228,9 +258,10 @@ public class GameInstance : MonoBehaviour
                 // Add damage entities
                 var missileDamageEntity = weaponType.damageInfo.missileDamageEntity;
                 if (missileDamageEntity != null)
-                    AddDamageEntities(new DamageEntity[] { missileDamageEntity });
+                    damageEntities.Add(missileDamageEntity);
             }
         }
+        AddDamageEntities(damageEntities);
     }
 
     public static void AddCharacterDatabases(IEnumerable<BaseCharacterDatabase> characterDatabases)
@@ -244,9 +275,6 @@ public class GameInstance : MonoBehaviour
             {
                 var playerCharacterDatabase = characterDatabase as PlayerCharacterDatabase;
                 PlayerCharacterDatabases[characterDatabase.Id] = playerCharacterDatabase;
-                AddSkills(playerCharacterDatabase.skills);
-                AddItems(new Item[] { playerCharacterDatabase.rightHandEquipItem, playerCharacterDatabase.leftHandEquipItem });
-                AddItems(playerCharacterDatabase.armorItems);
             }
             else if (characterDatabase is MonsterCharacterDatabase)
             {
@@ -257,29 +285,34 @@ public class GameInstance : MonoBehaviour
         }
     }
 
-    public static void AddDamageEntities(IEnumerable<DamageEntity> damageEntities)
+    public static void AddSkills(IEnumerable<Skill> skills)
+    {
+        var castAnimations = new List<ActionAnimation>();
+        var skillHitEffects = new List<GameEffectCollection>();
+        var damageEntities = new List<BaseDamageEntity>();
+        foreach (var skill in skills)
+        {
+            if (skill == null || Skills.ContainsKey(skill.Id))
+                continue;
+            Skills[skill.Id] = skill;
+            castAnimations.Add(skill.castAnimation);
+            skillHitEffects.Add(skill.hitEffects);
+            var missileDamageEntity = skill.damageInfo.missileDamageEntity;
+            if (missileDamageEntity != null)
+                damageEntities.Add(missileDamageEntity);
+        }
+        AddActionAnimations(ActionAnimationType.SkillCast, castAnimations);
+        AddGameEffectCollections(GameEffectCollectionType.SkillHit, skillHitEffects);
+        AddDamageEntities(damageEntities);
+    }
+
+    public static void AddDamageEntities(IEnumerable<BaseDamageEntity> damageEntities)
     {
         foreach (var damageEntity in damageEntities)
         {
             if (damageEntity == null || DamageEntities.ContainsKey(damageEntity.Identity.AssetId))
                 continue;
             DamageEntities[damageEntity.Identity.AssetId] = damageEntity;
-        }
-    }
-
-    public static void AddSkills(IEnumerable<Skill> skills)
-    {
-        foreach (var skill in skills)
-        {
-            if (skill == null || Skills.ContainsKey(skill.Id))
-                continue;
-            Skills[skill.Id] = skill;
-            // Initialize animation index
-            AddActionAnimations(ActionAnimationType.SkillCast, new ActionAnimation[] { skill.castAnimation });
-            // Add damage entities
-            var missileDamageEntity = skill.damageInfo.missileDamageEntity;
-            if (missileDamageEntity != null)
-                AddDamageEntities(new DamageEntity[] { missileDamageEntity });
         }
     }
 
@@ -292,6 +325,18 @@ public class GameInstance : MonoBehaviour
             if (actionAnimation == null || ActionAnimations.ContainsKey(actionAnimation.Id))
                 continue;
             ActionAnimations[actionAnimation.Id] = actionAnimation;
+        }
+    }
+
+    public static void AddGameEffectCollections(GameEffectCollectionType type, IEnumerable<GameEffectCollection> gameEffectCollections)
+    {
+        foreach (var gameEffectCollection in gameEffectCollections)
+        {
+            if (!gameEffectCollection.Initialize(type))
+                continue;
+            if (gameEffectCollection == null || GameEffectCollections.ContainsKey(gameEffectCollection.Id))
+                continue;
+            GameEffectCollections[gameEffectCollection.Id] = gameEffectCollection;
         }
     }
 

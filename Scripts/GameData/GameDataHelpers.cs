@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public static class GameDataHelpers
 {
     #region Combine Dictionary with KeyValuePair functions
-    public static Dictionary<DamageElement, DamageAmount> CombineDamageAttributesDictionary(Dictionary<DamageElement, DamageAmount> sourceDictionary, KeyValuePair<DamageElement, DamageAmount> newEntry)
+    public static Dictionary<DamageElement, MinMaxFloat> CombineDamageAttributesDictionary(Dictionary<DamageElement, MinMaxFloat> sourceDictionary, KeyValuePair<DamageElement, MinMaxFloat> newEntry)
     {
         var key = newEntry.Key;
         if (key != null)
@@ -32,7 +32,7 @@ public static class GameDataHelpers
         return sourceDictionary;
     }
 
-    public static Dictionary<Resistance, float> CombineResistanceAmountsDictionary(Dictionary<Resistance, float> sourceDictionary, KeyValuePair<Resistance, float> newEntry)
+    public static Dictionary<DamageElement, float> CombineResistanceAmountsDictionary(Dictionary<DamageElement, float> sourceDictionary, KeyValuePair<DamageElement, float> newEntry)
     {
         var key = newEntry.Key;
         if (key != null)
@@ -62,7 +62,7 @@ public static class GameDataHelpers
     #endregion
 
     #region Combine Dictionary with Dictionary functions
-    public static Dictionary<DamageElement, DamageAmount> CombineDamageAttributesDictionary(Dictionary<DamageElement, DamageAmount> sourceDictionary, Dictionary<DamageElement, DamageAmount> combineDictionary)
+    public static Dictionary<DamageElement, MinMaxFloat> CombineDamageAttributesDictionary(Dictionary<DamageElement, MinMaxFloat> sourceDictionary, Dictionary<DamageElement, MinMaxFloat> combineDictionary)
     {
         if (combineDictionary != null)
         {
@@ -86,7 +86,7 @@ public static class GameDataHelpers
         return sourceDictionary;
     }
 
-    public static Dictionary<Resistance, float> CombineResistanceAmountsDictionary(Dictionary<Resistance, float> sourceDictionary, Dictionary<Resistance, float> combineDictionary)
+    public static Dictionary<DamageElement, float> CombineResistanceAmountsDictionary(Dictionary<DamageElement, float> sourceDictionary, Dictionary<DamageElement, float> combineDictionary)
     {
         if (combineDictionary != null)
         {
@@ -112,16 +112,13 @@ public static class GameDataHelpers
     #endregion
 
     #region Make KeyValuePair functions
-    public static KeyValuePair<DamageElement, DamageAmount> MakeDamageAttributePair(DamageAttribute source, int level, float effectiveness, float inflictRate)
+    public static KeyValuePair<DamageElement, MinMaxFloat> MakeDamageAttributePair(DamageIncremental source, int level, float effectiveness, float inflictRate)
     {
         var gameInstance = GameInstance.Singleton;
-        var element = source.damageElement;
-        if (element == null)
-            element = gameInstance.DefaultDamageElement;
-        return new KeyValuePair<DamageElement, DamageAmount>(element,
-            (source.baseDamageAmount +
-            (source.damageAmountIncreaseEachLevel * level) +
-            effectiveness) * inflictRate);
+        var damageElement = source.damageElement;
+        if (damageElement == null)
+            damageElement = gameInstance.DefaultDamageElement;
+        return new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, (source.amount.GetAmount(level) + effectiveness) * inflictRate);
     }
 
     public static KeyValuePair<Attribute, int> MakeAttributeAmountPair(AttributeAmount sourceAmount)
@@ -135,21 +132,21 @@ public static class GameDataHelpers
     {
         if (sourceIncremental.attribute == null)
             return new KeyValuePair<Attribute, int>();
-        return new KeyValuePair<Attribute, int>(sourceIncremental.attribute, sourceIncremental.GetAmount(level));
+        return new KeyValuePair<Attribute, int>(sourceIncremental.attribute, sourceIncremental.amount.GetAmount(level));
     }
 
-    public static KeyValuePair<Resistance, float> MakeResistanceAmountPair(ResistanceAmount sourceAmount)
+    public static KeyValuePair<DamageElement, float> MakeResistanceAmountPair(ResistanceAmount sourceAmount)
     {
-        if (sourceAmount.resistance == null)
-            return new KeyValuePair<Resistance, float>();
-        return new KeyValuePair<Resistance, float>(sourceAmount.resistance, sourceAmount.amount);
+        if (sourceAmount.damageElement == null)
+            return new KeyValuePair<DamageElement, float>();
+        return new KeyValuePair<DamageElement, float>(sourceAmount.damageElement, sourceAmount.amount);
     }
 
-    public static KeyValuePair<Resistance, float> MakeResistanceAmountPair(ResistanceIncremental sourceIncremental, int level)
+    public static KeyValuePair<DamageElement, float> MakeResistanceAmountPair(ResistanceIncremental sourceIncremental, int level)
     {
-        if (sourceIncremental.resistance == null)
-            return new KeyValuePair<Resistance, float>();
-        return new KeyValuePair<Resistance, float>(sourceIncremental.resistance, sourceIncremental.GetAmount(level));
+        if (sourceIncremental.damageElement == null)
+            return new KeyValuePair<DamageElement, float>();
+        return new KeyValuePair<DamageElement, float>(sourceIncremental.damageElement, sourceIncremental.amount.GetAmount(level));
     }
 
     public static KeyValuePair<Skill, int> MakeSkillLevelPair(SkillLevel sourceLevel)
@@ -178,10 +175,10 @@ public static class GameDataHelpers
         return targetDictionary;
     }
 
-    public static Dictionary<DamageElement, DamageAmount> MakeDamageAttributesDictionary(DamageAttribute[] sourceAttributes, Dictionary<DamageElement, DamageAmount> targetDictionary, int level)
+    public static Dictionary<DamageElement, MinMaxFloat> MakeDamageAttributesDictionary(DamageIncremental[] sourceAttributes, Dictionary<DamageElement, MinMaxFloat> targetDictionary, int level)
     {
         if (targetDictionary == null)
-            targetDictionary = new Dictionary<DamageElement, DamageAmount>();
+            targetDictionary = new Dictionary<DamageElement, MinMaxFloat>();
         var gameInstance = GameInstance.Singleton;
         foreach (var sourceAttribute in sourceAttributes)
         {
@@ -215,10 +212,10 @@ public static class GameDataHelpers
         return targetDictionary;
     }
 
-    public static Dictionary<Resistance, float> MakeResistanceAmountsDictionary(ResistanceAmount[] sourceAmounts, Dictionary<Resistance, float> targetDictionary)
+    public static Dictionary<DamageElement, float> MakeResistanceAmountsDictionary(ResistanceAmount[] sourceAmounts, Dictionary<DamageElement, float> targetDictionary)
     {
         if (targetDictionary == null)
-            targetDictionary = new Dictionary<Resistance, float>();
+            targetDictionary = new Dictionary<DamageElement, float>();
         foreach (var sourceAmount in sourceAmounts)
         {
             var pair = MakeResistanceAmountPair(sourceAmount);
@@ -227,10 +224,10 @@ public static class GameDataHelpers
         return targetDictionary;
     }
 
-    public static Dictionary<Resistance, float> MakeResistanceAmountsDictionary(ResistanceIncremental[] sourceIncrementals, Dictionary<Resistance, float> targetDictionary, int level)
+    public static Dictionary<DamageElement, float> MakeResistanceAmountsDictionary(ResistanceIncremental[] sourceIncrementals, Dictionary<DamageElement, float> targetDictionary, int level)
     {
         if (targetDictionary == null)
-            targetDictionary = new Dictionary<Resistance, float>();
+            targetDictionary = new Dictionary<DamageElement, float>();
         foreach (var sourceIncremental in sourceIncrementals)
         {
             var pair = MakeResistanceAmountPair(sourceIncremental, level);
@@ -277,11 +274,11 @@ public static class GameDataHelpers
         return stats;
     }
 
-    public static DamageAmount GetSumDamages(Dictionary<DamageElement, DamageAmount> damages)
+    public static MinMaxFloat GetSumDamages(Dictionary<DamageElement, MinMaxFloat> damages)
     {
-        var damageAmount = new DamageAmount();
-        damageAmount.minDamage = 0;
-        damageAmount.maxDamage = 0;
+        var damageAmount = new MinMaxFloat();
+        damageAmount.min = 0;
+        damageAmount.max = 0;
         if (damages == null || damages.Count == 0)
             return damageAmount;
         foreach (var damage in damages)

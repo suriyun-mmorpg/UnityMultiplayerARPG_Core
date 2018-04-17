@@ -20,9 +20,4 @@ public struct AttributeIncremental
 {
     public Attribute attribute;
     public IncrementalInt amount;
-
-    public int GetAmount(int level)
-    {
-        return amount.baseAmount + (int)(amount.amountIncreaseEachLevel * (level - 1));
-    }
 }

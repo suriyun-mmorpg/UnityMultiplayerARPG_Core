@@ -66,7 +66,7 @@ public class UICharacterBuff : UIDataForCharacter<CharacterBuff>
             {
                 var skillBuff = !Data.isDebuff ? skillData.buff : skillData.debuff;
                 uiSkillBuff.Show();
-                uiSkillBuff.Data = new KeyValuePair<SkillBuff, int>(skillBuff, Data.level);
+                uiSkillBuff.Data = new KeyValuePair<Buff, int>(skillBuff, Data.level);
             }
         }
     }

@@ -187,14 +187,14 @@ public class UICharacter : UISelectionEntry<ICharacterData>
                 var sumDamages = GameDataHelpers.GetSumDamages(rightHandDamages);
                 if (!string.IsNullOrEmpty(textDamages))
                     textDamages += "\n";
-                textDamages += string.Format(weaponDamageFormat, sumDamages.minDamage.ToString("N0"), sumDamages.maxDamage.ToString("N0"));
+                textDamages += string.Format(weaponDamageFormat, sumDamages.min.ToString("N0"), sumDamages.max.ToString("N0"));
             }
             if (leftHandWeapon != null)
             {
                 var sumDamages = GameDataHelpers.GetSumDamages(leftHandDamages);
                 if (!string.IsNullOrEmpty(textDamages))
                     textDamages += "\n";
-                textDamages += string.Format(weaponDamageFormat, sumDamages.minDamage.ToString("N0"), sumDamages.maxDamage.ToString("N0"));
+                textDamages += string.Format(weaponDamageFormat, sumDamages.min.ToString("N0"), sumDamages.max.ToString("N0"));
             }
             if (rightHandWeapon == null && leftHandWeapon == null)
             {
@@ -202,7 +202,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
                 var defaultWeaponItemType = defaultWeaponItem.EquipType;
                 var effectiveness = defaultWeaponItem.GetEffectivenessDamage(Data);
                 var damageAmount = defaultWeaponItem.GetDamageAttribute(1, effectiveness, 1f);
-                textDamages = string.Format(weaponDamageFormat, damageAmount.Value.minDamage.ToString("N0"), damageAmount.Value.maxDamage.ToString("N0"));
+                textDamages = string.Format(weaponDamageFormat, damageAmount.Value.min.ToString("N0"), damageAmount.Value.max.ToString("N0"));
             }
             textWeaponDamages.text = textDamages;
         }

@@ -11,36 +11,42 @@ public class UICharacterHotkeys : UIBase
     {
         get
         {
-            if (cacheUICharacterHotkeys == null)
+            InitCaches();
+            return cacheUICharacterHotkeys;
+        }
+    }
+
+    private void InitCaches()
+    {
+        if (cacheUICharacterHotkeys == null)
+        {
+            cacheUICharacterHotkeys = new Dictionary<string, UICharacterHotkey>();
+            foreach (var uiCharacterHotkey in uiCharacterHotkeys)
             {
-                cacheUICharacterHotkeys = new Dictionary<string, UICharacterHotkey>();
-                foreach (var uiCharacterHotkey in uiCharacterHotkeys)
+                var id = uiCharacterHotkey.hotkeyId;
+                var ui = uiCharacterHotkey.ui;
+                if (!string.IsNullOrEmpty(id) && ui != null && !cacheUICharacterHotkeys.ContainsKey(id))
                 {
-                    var id = uiCharacterHotkey.hotkeyId;
-                    var ui = uiCharacterHotkey.ui;
-                    if (!string.IsNullOrEmpty(id) && ui != null && !cacheUICharacterHotkeys.ContainsKey(id))
-                    {
-                        var characterHotkey = new CharacterHotkey();
-                        characterHotkey.hotkeyId = id;
-                        characterHotkey.type = HotkeyTypes.None;
-                        characterHotkey.dataId = string.Empty;
-                        ui.Setup(characterHotkey, -1);
-                        cacheUICharacterHotkeys.Add(id, ui);
-                    }
+                    var characterHotkey = new CharacterHotkey();
+                    characterHotkey.hotkeyId = id;
+                    characterHotkey.type = HotkeyTypes.None;
+                    characterHotkey.dataId = string.Empty;
+                    ui.Setup(characterHotkey, -1);
+                    cacheUICharacterHotkeys.Add(id, ui);
                 }
             }
-            return cacheUICharacterHotkeys;
         }
     }
 
     public void UpdateData(IPlayerCharacterData characterData)
     {
+        InitCaches();
         var characterHotkeys = characterData.Hotkeys;
         for (var i = 0; i < characterHotkeys.Count; ++i)
         {
             var characterHotkey = characterHotkeys[i];
             UICharacterHotkey ui;
-            if (CacheUICharacterHotkeys.TryGetValue(characterHotkey.hotkeyId, out ui))
+            if (!string.IsNullOrEmpty(characterHotkey.hotkeyId) && CacheUICharacterHotkeys.TryGetValue(characterHotkey.hotkeyId, out ui))
                 ui.Setup(characterHotkey, i);
         }
     }

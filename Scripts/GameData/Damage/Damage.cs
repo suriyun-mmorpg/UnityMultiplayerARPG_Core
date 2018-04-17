@@ -41,43 +41,11 @@ public class DamageInfo
 }
 
 [System.Serializable]
-public struct DamageAmount
-{
-    public float minDamage;
-    public float maxDamage;
-
-    public static DamageAmount operator +(DamageAmount a, DamageAmount b)
-    {
-        var result = new DamageAmount();
-        result.minDamage = a.minDamage + b.minDamage;
-        result.maxDamage = a.maxDamage + b.maxDamage;
-        return result;
-    }
-
-    public static DamageAmount operator +(DamageAmount a, float damage)
-    {
-        var result = new DamageAmount();
-        result.minDamage = a.minDamage + damage;
-        result.maxDamage = a.maxDamage + damage;
-        return result;
-    }
-
-    public static DamageAmount operator *(DamageAmount a, float multiplier)
-    {
-        var result = new DamageAmount();
-        result.minDamage = a.minDamage * multiplier;
-        result.maxDamage = a.maxDamage * multiplier;
-        return result;
-    }
-}
-
-[System.Serializable]
-public struct DamageAttribute
+public struct DamageIncremental
 {
     [Tooltip("You can leave Damage to be empty to make it as physical damage which won't calculate with resistance stats")]
     public DamageElement damageElement;
-    public DamageAmount baseDamageAmount;
-    public DamageAmount damageAmountIncreaseEachLevel;
+    public IncrementalMinMaxFloat amount;
 }
 
 [System.Serializable]

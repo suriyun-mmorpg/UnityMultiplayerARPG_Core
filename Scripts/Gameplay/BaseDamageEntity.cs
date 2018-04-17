@@ -1,28 +1,29 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using LiteNetLibHighLevel;
 
-public abstract class DamageEntity : RpgNetworkEntity
+public abstract class BaseDamageEntity : RpgNetworkEntity
 {
     protected BaseCharacterEntity attacker;
-    protected Dictionary<DamageElement, DamageAmount> allDamageAttributes;
+    protected Dictionary<DamageElement, MinMaxFloat> allDamageAttributes;
     protected CharacterBuff debuff;
+    protected int hitEffectsId;
 
     public virtual void SetupDamage(
         BaseCharacterEntity attacker,
-        Dictionary<DamageElement, DamageAmount> allDamageAttributes,
-        CharacterBuff debuff)
+        Dictionary<DamageElement, MinMaxFloat> allDamageAttributes,
+        CharacterBuff debuff,
+        int hitEffectsId)
     {
         this.attacker = attacker;
         this.allDamageAttributes = allDamageAttributes;
         this.debuff = debuff;
+        this.hitEffectsId = hitEffectsId;
     }
 
     public virtual void ApplyDamageTo(BaseCharacterEntity target)
     {
         if (target == null)
             return;
-        target.ReceiveDamage(attacker, allDamageAttributes, debuff);
+        target.ReceiveDamage(attacker, allDamageAttributes, debuff, hitEffectsId);
     }
 }

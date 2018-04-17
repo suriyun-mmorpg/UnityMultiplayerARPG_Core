@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIResistanceAmounts : UISelectionEntry<Dictionary<Resistance, float>>
+public class UIResistanceAmounts : UISelectionEntry<Dictionary<DamageElement, float>>
 {
     [Tooltip("Resistance Amount Format => {0} = {Resistance title}, {1} = {Amount * 100f}")]
     public string amountFormat = "{0}: {1}%";
@@ -12,19 +12,19 @@ public class UIResistanceAmounts : UISelectionEntry<Dictionary<Resistance, float
     public Text textAllAmounts;
     public UIResistanceTextPair[] textAmounts;
 
-    private Dictionary<Resistance, Text> cacheTextAmounts;
-    public Dictionary<Resistance, Text> CacheTextAmounts
+    private Dictionary<DamageElement, Text> cacheTextAmounts;
+    public Dictionary<DamageElement, Text> CacheTextAmounts
     {
         get
         {
             if (cacheTextAmounts == null)
             {
-                cacheTextAmounts = new Dictionary<Resistance, Text>();
+                cacheTextAmounts = new Dictionary<DamageElement, Text>();
                 foreach (var textAmount in textAmounts)
                 {
-                    if (textAmount.resistance == null || textAmount.text == null)
+                    if (textAmount.damageElement == null || textAmount.text == null)
                         continue;
-                    var key = textAmount.resistance;
+                    var key = textAmount.damageElement;
                     var textComp = textAmount.text;
                     textComp.text = string.Format(amountFormat, key.title, "0", "0");
                     cacheTextAmounts[key] = textComp;

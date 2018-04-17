@@ -73,15 +73,15 @@ public class SimpleGameplayRule : BaseGameplayRule
         return damage * blockDmgRate;
     }
 
-    public override float GetDamageReducedByResistance(BaseCharacterEntity damageReceiver, float damageAmount, Resistance resistance)
+    public override float GetDamageReducedByResistance(BaseCharacterEntity damageReceiver, float damageAmount, DamageElement damageElement)
     {
-        if (resistance == null)
+        if (damageElement == null)
             return damageAmount -= damageReceiver.CacheStats.armor; // If armor is minus damage will be increased
         var resistances = damageReceiver.CacheResistances;
         float resistanceAmount = 0f;
-        resistances.TryGetValue(resistance, out resistanceAmount);
-        if (resistanceAmount > resistance.maxAmount)
-            resistanceAmount = resistance.maxAmount;
+        resistances.TryGetValue(damageElement, out resistanceAmount);
+        if (resistanceAmount > damageElement.maxResistanceAmount)
+            resistanceAmount = damageElement.maxResistanceAmount;
         return damageAmount -= damageAmount * resistanceAmount; // If resistance is minus damage will be increased
     }
 

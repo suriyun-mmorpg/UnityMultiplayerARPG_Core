@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIDamageElementAmount : UISelectionEntry<KeyValuePair<DamageElement, DamageAmount>>
+public class UIDamageElementAmount : UISelectionEntry<KeyValuePair<DamageElement, MinMaxFloat>>
 {
     [Tooltip("Damage Amount Format => {0} = {Element title}, {1} = {Min damage}, {2} = {Max damage}")]
     public string amountFormat = "{0}: {1}~{2}";
@@ -17,7 +17,7 @@ public class UIDamageElementAmount : UISelectionEntry<KeyValuePair<DamageElement
         {
             var element = Data.Key;
             var amount = Data.Value;
-            textAmount.text = string.Format(amountFormat, element.title, amount.minDamage.ToString("N0"), amount.maxDamage.ToString("N0"));
+            textAmount.text = string.Format(amountFormat, element.title, amount.min.ToString("N0"), amount.max.ToString("N0"));
         }
     }
 }

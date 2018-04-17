@@ -15,19 +15,6 @@ public enum SkillBuffType
     BuffToUser,
 }
 
-[System.Serializable]
-public struct SkillBuff
-{
-    [Tooltip("If buff duration less than or equals to 0, buff stats won't applied")]
-    public IncrementalFloat duration;
-    public IncrementalInt recoveryHp;
-    public IncrementalInt recoveryMp;
-    public CharacterStatsIncremental increaseStats;
-    public AttributeIncremental[] increaseAttributes;
-    public ResistanceIncremental[] increaseResistances;
-    public GameEffect[] effects;
-}
-
 [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill")]
 public class Skill : BaseGameData
 {
@@ -46,25 +33,26 @@ public class Skill : BaseGameData
 
     [Header("Attack")]
     public SkillAttackType skillAttackType;
+    public GameEffectCollection hitEffects;
 
     [Header("Attack As Pure Skill Damage")]
-    public DamageAttribute damageAttribute;
     public DamageInfo damageInfo;
+    public DamageIncremental damageAttribute;
     public DamageEffectivenessAttribute[] effectivenessAttributes;
 
     [Header("Attack As Weapon Damage Inflict")]
     public IncrementalFloat inflictRate;
 
     [Header("Additional Damage Attributes")]
-    public DamageAttribute[] additionalDamageAttributes;
+    public DamageIncremental[] additionalDamageAttributes;
 
     [Header("Attack Debuff")]
     public bool isDebuff;
-    public SkillBuff debuff;
+    public Buff debuff;
 
     [Header("Buffs")]
     public SkillBuffType skillBuffType;
-    public SkillBuff buff;
+    public Buff buff;
 
     private Dictionary<Skill, int> cacheRequireSkillLevels;
     public Dictionary<Skill, int> CacheRequireSkillLevels

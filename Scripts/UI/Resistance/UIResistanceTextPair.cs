@@ -5,6 +5,6 @@ using UnityEngine.UI;
 [System.Serializable]
 public struct UIResistanceTextPair
 {
-    public Resistance resistance;
+    public DamageElement damageElement;
     public Text text;
 }

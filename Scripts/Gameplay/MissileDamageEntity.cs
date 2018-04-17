@@ -4,7 +4,7 @@ using UnityEngine;
 using LiteNetLibHighLevel;
 
 [RequireComponent(typeof(Rigidbody))]
-public class MissileDamageEntity : DamageEntity
+public class MissileDamageEntity : BaseDamageEntity
 {
     protected float missileDistance;
     [SerializeField]
@@ -23,12 +23,13 @@ public class MissileDamageEntity : DamageEntity
 
     public void SetupDamage(
         BaseCharacterEntity attacker,
-        Dictionary<DamageElement, DamageAmount> allDamageAttributes,
+        Dictionary<DamageElement, MinMaxFloat> allDamageAttributes,
         CharacterBuff debuff,
+        int hitEffectsId,
         float missileDistance,
         float missileSpeed)
     {
-        SetupDamage(attacker, allDamageAttributes, debuff);
+        SetupDamage(attacker, allDamageAttributes, debuff, hitEffectsId);
         this.missileDistance = missileDistance;
         this.missileSpeed.Value = missileSpeed;
 

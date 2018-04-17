@@ -241,7 +241,7 @@ public class CharacterModel : MonoBehaviour
         }
     }
 
-    private void InstantiateEquipModel(string equipPosition, EquipmentModel[] equipmentModels)
+    public void InstantiateEquipModel(string equipPosition, EquipmentModel[] equipmentModels)
     {
         if (equipmentModels == null || equipmentModels.Length == 0)
             return;
@@ -326,18 +326,17 @@ public class CharacterModel : MonoBehaviour
         }
     }
 
-    private void InstantiateBuffEffect(string buffId, GameEffect[] buffEffects)
+    public List<GameEffect> InstantiateEffect(GameEffect[] effects)
     {
-        if (buffEffects == null || buffEffects.Length == 0)
-            return;
+        if (effects == null || effects.Length == 0)
+            return new List<GameEffect>();
         var gameInstance = GameInstance.Singleton;
-        var effects = new List<GameEffect>();
-        foreach (var buffEffect in buffEffects)
+        var newEffects = new List<GameEffect>();
+        foreach (var effect in effects)
         {
-            var effect = buffEffect;
             if (effect == null)
                 continue;
-            var effectSocket = buffEffect.effectSocket;
+            var effectSocket = effect.effectSocket;
             if (string.IsNullOrEmpty(effectSocket))
                 continue;
             EffectContainer container;
@@ -349,8 +348,17 @@ public class CharacterModel : MonoBehaviour
             newEffect.CacheTransform.rotation = newEffect.followingTarget.rotation;
             newEffect.gameObject.SetActive(true);
             newEffect.gameObject.layer = gameInstance.characterLayer;
-            effects.Add(newEffect);
+            newEffects.Add(newEffect);
         }
+        return newEffects;
+    }
+
+    public void InstantiateBuffEffect(string buffId, GameEffect[] buffEffects)
+    {
+        if (buffEffects == null || buffEffects.Length == 0)
+            return;
+        var gameInstance = GameInstance.Singleton;
+        var effects = InstantiateEffect(buffEffects);
         CreateCacheEffect(buffId, effects);
     }
 

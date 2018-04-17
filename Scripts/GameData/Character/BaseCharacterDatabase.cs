@@ -21,8 +21,8 @@ public abstract class BaseCharacterDatabase : BaseGameData
         return GameDataHelpers.MakeAttributeAmountsDictionary(attributes, new Dictionary<Attribute, int>(), level);
     }
 
-    public Dictionary<Resistance, float> GetCharacterResistances(int level)
+    public Dictionary<DamageElement, float> GetCharacterResistances(int level)
     {
-        return GameDataHelpers.MakeResistanceAmountsDictionary(resistances, new Dictionary<Resistance, float>(), level);
+        return GameDataHelpers.MakeResistanceAmountsDictionary(resistances, new Dictionary<DamageElement, float>(), level);
     }
 }

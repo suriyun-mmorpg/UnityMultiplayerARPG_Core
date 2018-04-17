@@ -146,11 +146,11 @@ public static class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<Resistance, float> GetCharacterResistances(this ICharacterData data)
+    public static Dictionary<DamageElement, float> GetCharacterResistances(this ICharacterData data)
     {
         if (data == null)
-            return new Dictionary<Resistance, float>();
-        var result = new Dictionary<Resistance, float>();
+            return new Dictionary<DamageElement, float>();
+        var result = new Dictionary<DamageElement, float>();
         var characterDatabase = data.GetDatabase();
         if (characterDatabase != null)
             result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
@@ -158,11 +158,11 @@ public static class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<Resistance, float> GetEquipmentResistances(this ICharacterData data)
+    public static Dictionary<DamageElement, float> GetEquipmentResistances(this ICharacterData data)
     {
         if (data == null)
-            return new Dictionary<Resistance, float>();
-        var result = new Dictionary<Resistance, float>();
+            return new Dictionary<DamageElement, float>();
+        var result = new Dictionary<DamageElement, float>();
         // Armors
         Item tempEquipment = null;
         var equipItems = data.EquipItems;
@@ -190,11 +190,11 @@ public static class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<Resistance, float> GetBuffResistances(this ICharacterData data)
+    public static Dictionary<DamageElement, float> GetBuffResistances(this ICharacterData data)
     {
         if (data == null)
-            return new Dictionary<Resistance, float>();
-        var result = new Dictionary<Resistance, float>();
+            return new Dictionary<DamageElement, float>();
+        var result = new Dictionary<DamageElement, float>();
         var buffs = data.Buffs;
         foreach (var buff in buffs)
         {
@@ -203,7 +203,7 @@ public static class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<Resistance, float> GetResistances(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
+    public static Dictionary<DamageElement, float> GetResistances(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
     {
         var result = data.GetCharacterResistances();
         if (sumWithEquipments)
