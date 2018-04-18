@@ -35,6 +35,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public const string ANIM_MOVE_CLIP_MULTIPLIER = "MoveSpeedMultiplier";
     public const string ANIM_ACTION_CLIP_MULTIPLIER = "ActionSpeedMultiplier";
     public const float RECOVERY_UPDATE_DURATION = 0.5f;
+    public const float SKILL_BUFF_UPDATE_DURATION = 0.5f;
 
     // Use id as primary key
     #region Sync data
@@ -77,7 +78,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected Vector3 currentVelocity;
     protected float recoveryingHp;
     protected float recoveryingMp;
-    protected float recoveryTime;
+    protected float skillBuffUpdateDeltaTime;
+    protected float recoveryUpdateDeltaTime;
     protected bool shouldRecaches;
     #endregion
 
@@ -227,6 +229,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     {
         var gameInstance = GameInstance.Singleton;
         gameObject.layer = gameInstance.characterLayer;
+        skillBuffUpdateDeltaTime = 0;
         shouldRecaches = true;
     }
 
@@ -292,30 +295,41 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     {
         if (CurrentHp <= 0 || !IsServer)
             return;
-        var count = skills.Count;
-        for (var i = count - 1; i >= 0; --i)
+
+        skillBuffUpdateDeltaTime += Time.unscaledDeltaTime;
+        if (skillBuffUpdateDeltaTime >= SKILL_BUFF_UPDATE_DURATION)
         {
-            var skill = skills[i];
-            if (skill.ShouldUpdate())
+            var count = skills.Count;
+            for (var i = count - 1; i >= 0; --i)
             {
-                skill.Update(Time.unscaledDeltaTime);
-                skills[i] = skill;
+                var skill = skills[i];
+                if (skill.ShouldUpdate())
+                {
+                    skill.Update(skillBuffUpdateDeltaTime);
+                    skills[i] = skill;
+                }
             }
-        }
-        count = buffs.Count;
-        for (var i = count - 1; i >= 0; --i)
-        {
-            var buff = buffs[i];
-            if (buff.ShouldRemove())
+            count = buffs.Count;
+            for (var i = count - 1; i >= 0; --i)
             {
-                buffs.RemoveAt(i);
-                UpdateBuffIndexes();
+                var buff = buffs[i];
+                var duration = buff.GetDuration();
+                var addingRecoveryingHp = duration > 0 ? (float)buff.GetBuffRecoveryHp() / duration * skillBuffUpdateDeltaTime : (float)buff.GetBuffRecoveryHp();
+                var addingRecoveryingMp = duration > 0 ? (float)buff.GetBuffRecoveryMp() / duration * skillBuffUpdateDeltaTime : (float)buff.GetBuffRecoveryMp();
+                if (buff.ShouldRemove())
+                {
+                    buffs.RemoveAt(i);
+                    UpdateBuffIndexes();
+                }
+                else
+                {
+                    buff.Update(skillBuffUpdateDeltaTime);
+                    buffs[i] = buff;
+                }
+                recoveryingHp += addingRecoveryingHp;
+                recoveryingMp += addingRecoveryingMp;
             }
-            else
-            {
-                buff.Update(Time.unscaledDeltaTime);
-                buffs[i] = buff;
-            }
+            skillBuffUpdateDeltaTime = 0;
         }
     }
 
@@ -327,18 +341,18 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (CurrentHp > 0)
         {
             var gameRule = GameInstance.Singleton.GameplayRule;
-            var timeDiff = Time.realtimeSinceStartup - recoveryTime;
-            if (timeDiff >= RECOVERY_UPDATE_DURATION)
+            recoveryUpdateDeltaTime += Time.unscaledDeltaTime;
+            if (recoveryUpdateDeltaTime >= RECOVERY_UPDATE_DURATION)
             {
-                recoveryingHp += timeDiff * gameRule.GetRecoveryHpPerSeconds(this);
-                recoveryingMp += timeDiff * gameRule.GetRecoveryMpPerSeconds(this);
-                recoveryTime = Time.realtimeSinceStartup;
+                recoveryingHp += recoveryUpdateDeltaTime * gameRule.GetRecoveryHpPerSeconds(this);
+                recoveryingMp += recoveryUpdateDeltaTime * gameRule.GetRecoveryMpPerSeconds(this);
                 if (CurrentHp < maxHp)
                 {
-                    if (recoveryingHp >= 0)
+                    if (recoveryingHp >= 1)
                     {
                         var intRecoveryingHp = (int)recoveryingHp;
                         CurrentHp += intRecoveryingHp;
+                        RequestCombatAmount(CombatAmountTypes.HpRecovery, intRecoveryingHp);
                         recoveryingHp -= intRecoveryingHp;
                     }
                 }
@@ -347,15 +361,18 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
                 if (CurrentMp < maxMp)
                 {
-                    if (recoveryingMp >= 0)
+                    if (recoveryingMp >= 1)
                     {
                         var intRecoveryingMp = (int)recoveryingMp;
                         CurrentMp += intRecoveryingMp;
+                        RequestCombatAmount(CombatAmountTypes.MpRecovery, intRecoveryingMp);
                         recoveryingMp -= intRecoveryingMp;
                     }
                 }
                 else
                     recoveryingMp = 0;
+
+                recoveryUpdateDeltaTime = 0;
             }
         }
 

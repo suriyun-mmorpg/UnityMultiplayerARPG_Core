@@ -128,36 +128,4 @@ public static class SkillExtension
         return GameDataHelpers.MakeDamageAttributesDictionary(skill.additionalDamageAttributes, new Dictionary<DamageElement, MinMaxFloat>(), level);
     }
     #endregion
-
-    #region Buff Extension
-    public static float GetDuration(this Buff skillBuff, int level)
-    {
-        return skillBuff.duration.GetAmount(level);
-    }
-
-    public static int GetRecoveryHp(this Buff skillBuff, int level)
-    {
-        return skillBuff.recoveryHp.GetAmount(level);
-    }
-
-    public static int GetRecoveryMp(this Buff skillBuff, int level)
-    {
-        return skillBuff.recoveryMp.GetAmount(level);
-    }
-
-    public static CharacterStats GetIncreaseStats(this Buff skillBuff, int level)
-    {
-        return skillBuff.increaseStats.GetCharacterStats(level);
-    }
-
-    public static Dictionary<Attribute, int> GetIncreaseAttributes(this Buff skillBuff, int level)
-    {
-        return GameDataHelpers.MakeAttributeAmountsDictionary(skillBuff.increaseAttributes, new Dictionary<Attribute, int>(), level);
-    }
-
-    public static Dictionary<DamageElement, float> GetIncreaseResistances(this Buff skillBuff, int level)
-    {
-        return GameDataHelpers.MakeResistanceAmountsDictionary(skillBuff.increaseResistances, new Dictionary<DamageElement, float>(), level);
-    }
-    #endregion
 }
