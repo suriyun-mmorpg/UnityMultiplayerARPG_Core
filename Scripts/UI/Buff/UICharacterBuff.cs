@@ -24,13 +24,13 @@ public class UICharacterBuff : UIDataForCharacter<CharacterBuff>
     public Image imageDurationGage;
     public UIBuff uiBuff;
 
+    protected float collectedDeltaTime;
+
     private void Update()
     {
         var characterBuff = Data;
-
-        // Update duration
-        if (character != null && indexOfData >= 0 && indexOfData < character.Buffs.Count)
-            characterBuff = character.Buffs[indexOfData];
+        
+        collectedDeltaTime += Time.deltaTime;
 
         var buffRemainDuration = characterBuff.buffRemainsDuration;
         var buffDuration = characterBuff.GetDuration();
@@ -42,13 +42,15 @@ public class UICharacterBuff : UIDataForCharacter<CharacterBuff>
             textRemainsDuration.text = string.Format(buffRemainsDurationFormat, buffRemainDuration.ToString("N0"));
 
         if (imageDurationGage != null)
-            imageDurationGage.fillAmount = buffDuration <= 0 ? 0 : buffRemainDuration / buffDuration;
+            imageDurationGage.fillAmount = buffDuration <= 0 ? 0 : (buffRemainDuration - collectedDeltaTime) / buffDuration;
     }
 
     protected override void UpdateData()
     {
         var skill = Data.GetSkill();
         var item = Data.GetItem();
+
+        collectedDeltaTime = 0f;
 
         if (Data.type == BuffTypes.SkillBuff || Data.type == BuffTypes.SkillDebuff)
         {
