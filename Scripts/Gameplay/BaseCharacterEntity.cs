@@ -284,6 +284,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             animator.SetFloat(ANIM_MOVE_SPEED, moveSpeed);
             animator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, MoveSpeed);
             animator.SetFloat(ANIM_Y_SPEED, velocity.y);
+            animator.SetBool(ANIM_IS_DEAD, CurrentHp <= 0);
         }
     }
 
@@ -432,6 +433,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         // Register Network functions
         RegisterNetFunction("Attack", new LiteNetLibFunction(() => NetFuncAttack(1, null, CharacterBuff.Empty, -1)));
         RegisterNetFunction("UseSkill", new LiteNetLibFunction<NetFieldVector3, NetFieldInt>((position, skillIndex) => NetFuncUseSkill(position, skillIndex)));
+        RegisterNetFunction("UseItem", new LiteNetLibFunction<NetFieldInt>((itemIndex) => NetFuncUseItem(itemIndex)));
         RegisterNetFunction("PlayActionAnimation", new LiteNetLibFunction<NetFieldInt, NetFieldByte>((actionId, animActionTypes) => NetFuncPlayActionAnimation(actionId, (AnimActionTypes)animActionTypes.Value)));
         RegisterNetFunction("PlayEffect", new LiteNetLibFunction<NetFieldInt>((effectId) => NetFuncPlayEffect(effectId)));
         RegisterNetFunction("PickupItem", new LiteNetLibFunction(() => NetFuncPickupItem()));
@@ -574,7 +576,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         var allDamageAttributes = skill.GetAdditionalDamageAttributes(characterSkill.level);
         allDamageAttributes = GameDataHelpers.CombineDamageAmountsDictionary(allDamageAttributes, baseDamageAttribute);
         var damageInfo = skill.damageInfo;
-        var debuff = skill.isDebuff ? CharacterBuff.Create(Id, skill.Id, true, characterSkill.level) : CharacterBuff.Empty;
+        var debuff = skill.isDebuff ? CharacterBuff.Create(Id, skill.Id, BuffTypes.SkillDebuff, characterSkill.level) : CharacterBuff.Empty;
         LaunchDamageEntity(CacheTransform.position, damageInfo, allDamageAttributes, debuff, skill.hitEffects.Id);
     }
 
@@ -586,27 +588,25 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
         var inflictRate = skill.GetInflictRate(characterSkill.level);
         var additionalDamageAttributes = skill.GetAdditionalDamageAttributes(characterSkill.level);
-        var debuff = skill.isDebuff ? CharacterBuff.Create(Id, characterSkill.skillId, true, characterSkill.level) : CharacterBuff.Empty;
+        var debuff = skill.isDebuff ? CharacterBuff.Create(Id, characterSkill.skillId, BuffTypes.SkillDebuff, characterSkill.level) : CharacterBuff.Empty;
         NetFuncAttack(inflictRate, additionalDamageAttributes, debuff, skill.hitEffects.Id);
     }
-
-    protected void ApplySkillBuff(CharacterSkill characterSkill)
+    
+    /// <summary>
+    /// This will be called on server to use item
+    /// </summary>
+    /// <param name="itemIndex"></param>
+    protected void NetFuncUseItem(int itemIndex)
     {
-        var skill = characterSkill.GetSkill();
-        if (skill.skillBuffType == SkillBuffType.BuffToUser)
-        {
-            var buffId = CharacterBuff.GetBuffId(Id, characterSkill.skillId, false);
-            var buffIndex = -1;
-            if (buffIndexes.TryGetValue(buffId, out buffIndex))
-            {
-                buffs.RemoveAt(buffIndex);
-                UpdateBuffIndexes();
-            }
-            var characterBuff = CharacterBuff.Create(Id, characterSkill.skillId, false, characterSkill.level);
-            characterBuff.Added();
-            buffs.Add(characterBuff);
-            buffIndexes.Add(buffId, buffs.Count - 1);
-        }
+        if (CurrentHp <= 0 ||
+            itemIndex < 0 ||
+            itemIndex > nonEquipItems.Count)
+            return;
+
+        var item = nonEquipItems[itemIndex];
+        var potionItem = item.GetPotionItem();
+        if (potionItem != null && DecreaseItems(itemIndex, 1))
+            ApplyPotionBuff(item);
     }
 
     /// <summary>
@@ -854,7 +854,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     }
 
     /// <summary>
-    /// This will be cladded on server to set target entity
+    /// This will be called on server to set target entity
     /// </summary>
     /// <param name="objectId"></param>
     protected void NetFuncSetTargetEntity(uint objectId)
@@ -867,22 +867,12 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected void NetFuncOnDead(bool isInitialize)
     {
-        if (model != null && model.gameObject.activeInHierarchy)
-        {
-            var animator = model.CacheAnimator;
-            animator.SetBool(ANIM_IS_DEAD, true);
-        }
         if (onDead != null)
             onDead.Invoke(isInitialize);
     }
 
     protected void NetFuncOnRespawn(bool isInitialize)
     {
-        if (model != null && model.gameObject.activeInHierarchy)
-        {
-            var animator = model.CacheAnimator;
-            animator.SetBool(ANIM_IS_DEAD, false);
-        }
         if (onRespawn != null)
             onRespawn.Invoke(isInitialize);
     }
@@ -907,6 +897,13 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (CurrentHp <= 0 || isDoingAction.Value)
             return;
         CallNetFunction("UseSkill", FunctionReceivers.Server, position, skillIndex);
+    }
+
+    public virtual void RequestUseItem(int itemIndex)
+    {
+        if (CurrentHp <= 0)
+            return;
+        CallNetFunction("UseItem", FunctionReceivers.Server, itemIndex);
     }
 
     public virtual void RequestPlayActionAnimation(int actionId, AnimActionTypes animActionTypes)
@@ -984,7 +981,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         // If item not valid
         if (string.IsNullOrEmpty(itemId) || amount <= 0 || !GameInstance.Items.TryGetValue(itemId, out itemData))
             return false;
-        
+
         var maxStack = itemData.maxStack;
         var weight = itemData.weight;
         // If overwhelming
@@ -1272,19 +1269,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (CurrentHp <= 0)
             Killed(attacker);
         else if (!debuff.IsEmpty())
-        {
-            var buffId = debuff.GetBuffId();
-            var buffIndex = -1;
-            if (buffIndexes.TryGetValue(buffId, out buffIndex))
-            {
-                buffs.RemoveAt(buffIndex);
-                UpdateBuffIndexes();
-            }
-            var characterDebuff = debuff.Clone();
-            characterDebuff.Added();
-            buffs.Add(characterDebuff);
-            buffIndexes.Add(buffId, buffs.Count - 1);
-        }
+            ApplyBuff(debuff.dataId, debuff.type, debuff.level);
     }
     #endregion
 
@@ -1497,7 +1482,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         for (var i = 0; i < buffs.Count; ++i)
         {
             var entry = buffs[i];
-            var buffId = CharacterBuff.GetBuffId(Id, entry.skillId, entry.isDebuff);
+            var buffId = CharacterBuff.GetBuffId(Id, entry.dataId, entry.type);
             if (!buffIndexes.ContainsKey(buffId))
                 buffIndexes.Add(buffId, i);
         }
@@ -1534,7 +1519,39 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     }
     #endregion
 
-    #region Weapons / Damage
+    #region Buffs / Weapons / Damage
+    protected void ApplyBuff(string dataId, BuffTypes type, int level)
+    {
+        var buffId = CharacterBuff.GetBuffId(Id, dataId, type);
+        var buffIndex = -1;
+        if (buffIndexes.TryGetValue(buffId, out buffIndex))
+        {
+            buffs.RemoveAt(buffIndex);
+            UpdateBuffIndexes();
+        }
+        var characterBuff = CharacterBuff.Create(Id, dataId, type, level);
+        characterBuff.Added();
+        buffs.Add(characterBuff);
+        buffIndexes.Add(buffId, buffs.Count - 1);
+    }
+
+    protected void ApplyPotionBuff(CharacterItem characterItem)
+    {
+        var item = characterItem.GetPotionItem();
+        if (item == null)
+            return;
+        ApplyBuff(item.Id, BuffTypes.PotionBuff, characterItem.level);
+    }
+
+    protected void ApplySkillBuff(CharacterSkill characterSkill)
+    {
+        var skill = characterSkill.GetSkill();
+        if (skill == null)
+            return;
+        if (skill.skillBuffType == SkillBuffType.BuffToUser)
+            ApplyBuff(skill.Id, BuffTypes.SkillBuff, characterSkill.level);
+    }
+
     public CharacterItem GetRandomedWeapon(out bool isLeftHand)
     {
         isLeftHand = false;

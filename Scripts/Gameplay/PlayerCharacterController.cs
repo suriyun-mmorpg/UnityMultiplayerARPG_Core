@@ -230,12 +230,17 @@ public class PlayerCharacterController : BasePlayerCharacterController
 
     public void RequestUseSkill(Vector3 position, int skillIndex)
     {
-        if (CacheCharacterEntity.CurrentHp > 0 &&
-            CacheCharacterEntity.isDoingAction.Value &&
+        if (CacheCharacterEntity.isDoingAction.Value &&
             skillIndex >= 0 &&
             skillIndex < CacheCharacterEntity.skills.Count)
             queueUsingSkill = new UsingSkillData(position, skillIndex);
         CacheCharacterEntity.RequestUseSkill(position, skillIndex);
+    }
+
+    public void RequestUseItem(int itemIndex)
+    {
+        if (CacheCharacterEntity.CurrentHp > 0)
+            CacheCharacterEntity.RequestUseItem(itemIndex);
     }
 
     public override void UseHotkey(int hotkeyIndex)
@@ -248,15 +253,15 @@ public class PlayerCharacterController : BasePlayerCharacterController
         if (skill != null)
         {
             var skillIndex = CacheCharacterEntity.skills.IndexOf(skill.Id);
-            BaseCharacterEntity target = null;
-            CacheCharacterEntity.TryGetTargetEntity(out target);
             if (skillIndex >= 0)
                 RequestUseSkill(CacheCharacterTransform.position, skillIndex);
         }
         var item = hotkey.GetItem();
         if (item != null)
         {
-            // TODO: Implement use item functions
+            var itemIndex = CacheCharacterEntity.nonEquipItems.IndexOf(item.Id);
+            if (itemIndex >= 0)
+                RequestUseItem(itemIndex);
         }
     }
 }

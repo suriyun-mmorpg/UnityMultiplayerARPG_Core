@@ -22,7 +22,7 @@ public class UICharacterBuff : UIDataForCharacter<CharacterBuff>
     public Text textDuration;
     public Text textRemainsDuration;
     public Image imageDurationGage;
-    public UISkillBuff uiSkillBuff;
+    public UIBuff uiBuff;
 
     private void Update()
     {
@@ -47,26 +47,42 @@ public class UICharacterBuff : UIDataForCharacter<CharacterBuff>
 
     protected override void UpdateData()
     {
-        var skillData = Data.GetSkill();
+        var skill = Data.GetSkill();
+        var item = Data.GetItem();
 
-        if (textTitle != null)
-            textTitle.text = string.Format(titleFormat, skillData == null ? "Unknow" : skillData.title);
-
-        if (imageIcon != null)
+        if (Data.type == BuffTypes.SkillBuff || Data.type == BuffTypes.SkillDebuff)
         {
-            imageIcon.sprite = skillData == null ? null : skillData.icon;
-            imageIcon.gameObject.SetActive(skillData != null);
+            if (textTitle != null)
+                textTitle.text = string.Format(titleFormat, skill == null ? "Unknow" : skill.title);
+
+            if (imageIcon != null)
+            {
+                imageIcon.sprite = skill == null ? null : skill.icon;
+                imageIcon.gameObject.SetActive(skill != null);
+            }
         }
 
-        if (uiSkillBuff != null)
+        if (Data.type == BuffTypes.PotionBuff)
         {
-            if (skillData == null)
-                uiSkillBuff.Hide();
+            if (textTitle != null)
+                textTitle.text = string.Format(titleFormat, item == null ? "Unknow" : item.title);
+
+            if (imageIcon != null)
+            {
+                imageIcon.sprite = item == null ? null : item.icon;
+                imageIcon.gameObject.SetActive(item != null);
+            }
+        }
+
+        if (uiBuff != null)
+        {
+            if (skill == null && item == null)
+                uiBuff.Hide();
             else
             {
-                var skillBuff = !Data.isDebuff ? skillData.buff : skillData.debuff;
-                uiSkillBuff.Show();
-                uiSkillBuff.Data = new KeyValuePair<Buff, int>(skillBuff, Data.level);
+                var buff = Data.GetBuff();
+                uiBuff.Show();
+                uiBuff.Data = new KeyValuePair<Buff, int>(buff, Data.level);
             }
         }
     }

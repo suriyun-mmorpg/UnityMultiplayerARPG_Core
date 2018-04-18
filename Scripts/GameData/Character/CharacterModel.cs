@@ -6,7 +6,6 @@ using UnityEngine;
 public class CharacterModel : MonoBehaviour
 {
     public const string ANIM_ACTION_STATE = "_Action";
-    public string Id { get { return name; } }
     [Header("Animator")]
     [SerializeField]
     private RuntimeAnimatorController animatorController;
@@ -316,12 +315,10 @@ public class CharacterModel : MonoBehaviour
         foreach (var buff in buffs)
         {
             var buffId = buff.GetBuffId();
-            var isDebuff = buff.isDebuff;
             if (addingKeys.Contains(buffId))
             {
-                var skill = buff.GetSkill();
-                var skillBuff = !isDebuff ? skill.buff : skill.debuff;
-                InstantiateBuffEffect(buffId, skillBuff.effects);
+                var buffData = buff.GetBuff();
+                InstantiateBuffEffect(buffId, buffData.effects);
             }
         }
     }

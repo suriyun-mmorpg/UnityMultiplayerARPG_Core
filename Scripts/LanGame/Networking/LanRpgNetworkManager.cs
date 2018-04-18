@@ -85,8 +85,8 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
         writer.Put(SelectedCharacter.Buffs.Count);
         foreach (var entry in SelectedCharacter.Buffs)
         {
-            writer.Put(entry.skillId);
-            writer.Put(entry.isDebuff);
+            writer.Put(entry.dataId);
+            writer.Put((byte)entry.type);
             writer.Put(entry.level);
             writer.Put(entry.buffRemainsDuration);
         }
@@ -163,8 +163,8 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterBuff();
-            entry.skillId = reader.GetString();
-            entry.isDebuff = reader.GetBool();
+            entry.dataId = reader.GetString();
+            entry.type = (BuffTypes)reader.GetByte();
             entry.level = reader.GetInt();
             entry.buffRemainsDuration = reader.GetFloat();
             character.Buffs.Add(entry);

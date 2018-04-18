@@ -54,7 +54,6 @@ public class Item : BaseGameData
     [Space(10)]
     [Header("Potion")]
     public Buff buff;
-    public float buffDuration;
 
 #if UNITY_EDITOR
     protected virtual void OnValidate()

@@ -16,11 +16,6 @@ public class ActionAnimation
     private static int monsterAttackIdCount = -1;
     private static int weaponAttackIdCount = -1;
     private static int skillCastIdCount = -1;
-    public AnimationClip clip;
-    [Range(0f, 1f)]
-    public float triggerDurationRate;
-    [Tooltip("Extra duration after played animation clip")]
-    public float extraDuration;
     protected int? id;
     public int Id
     {
@@ -36,6 +31,12 @@ public class ActionAnimation
     {
         get { return clip == null ? 0f : clip.length; }
     }
+
+    public AnimationClip clip;
+    [Range(0f, 1f)]
+    public float triggerDurationRate;
+    [Tooltip("Extra duration after played animation clip")]
+    public float extraDuration;
 
     /// <summary>
     /// Initialize action id, will return false if it's already initialized

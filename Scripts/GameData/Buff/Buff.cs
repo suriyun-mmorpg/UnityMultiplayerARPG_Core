@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public struct Buff
+public class Buff
 {
     [Tooltip("If buff duration less than or equals to 0, buff stats won't applied")]
     public IncrementalFloat duration;

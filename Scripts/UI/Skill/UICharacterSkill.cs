@@ -45,8 +45,8 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
     public UIDamageElementAmounts uiAdditionalDamageAttributes;
 
     [Header("Buff/Debuff")]
-    public UISkillBuff uiSkillBuff;
-    public UISkillBuff uiSkillDebuff;
+    public UIBuff uiSkillBuff;
+    public UIBuff uiSkillDebuff;
 
     [Header("Events")]
     public UnityEvent onSetLevelZeroData;

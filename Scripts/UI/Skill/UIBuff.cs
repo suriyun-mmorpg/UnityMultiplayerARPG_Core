@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UISkillBuff : UISelectionEntry<KeyValuePair<Buff, int>>
+public class UIBuff : UISelectionEntry<KeyValuePair<Buff, int>>
 {
     [Tooltip("Duration Format => {0} = {Duration}")]
     public string durationFormat = "Duration: {0}";
@@ -22,37 +22,37 @@ public class UISkillBuff : UISelectionEntry<KeyValuePair<Buff, int>>
 
     protected override void UpdateData()
     {
-        var skillBuff = Data.Key;
+        var buff = Data.Key;
         var skillLevel = Data.Value;
 
         if (textDuration != null)
         {
-            var duration = skillBuff.GetDuration(skillLevel);
+            var duration = buff.GetDuration(skillLevel);
             textDuration.text = string.Format(durationFormat, duration.ToString("N0"));
             textDuration.gameObject.SetActive(duration != 0);
         }
 
         if (textRecoveryHp != null)
         {
-            var recoveryHp = skillBuff.GetRecoveryHp(skillLevel);
+            var recoveryHp = buff.GetRecoveryHp(skillLevel);
             textRecoveryHp.text = string.Format(recoveryHpFormat, recoveryHp.ToString("N0"));
             textRecoveryHp.gameObject.SetActive(recoveryHp != 0);
         }
 
         if (textRecoveryMp != null)
         {
-            var recoveryMp = skillBuff.GetRecoveryMp(skillLevel);
+            var recoveryMp = buff.GetRecoveryMp(skillLevel);
             textRecoveryMp.text = string.Format(recoveryMpFormat, recoveryMp.ToString("N0"));
             textRecoveryMp.gameObject.SetActive(recoveryMp != 0);
         }
 
         if (uiBuffStats != null)
-            uiBuffStats.Data = skillBuff.GetIncreaseStats(skillLevel);
+            uiBuffStats.Data = buff.GetIncreaseStats(skillLevel);
 
         if (uiBuffAttributes != null)
-            uiBuffAttributes.Data = GameDataHelpers.MakeAttributeAmountsDictionary(skillBuff.increaseAttributes, new Dictionary<Attribute, int>(), skillLevel);
+            uiBuffAttributes.Data = GameDataHelpers.MakeAttributeAmountsDictionary(buff.increaseAttributes, new Dictionary<Attribute, int>(), skillLevel);
 
         if (uiBuffResistances != null)
-            uiBuffResistances.Data = GameDataHelpers.MakeResistanceAmountsDictionary(skillBuff.increaseResistances, new Dictionary<DamageElement, float>(), skillLevel);
+            uiBuffResistances.Data = GameDataHelpers.MakeResistanceAmountsDictionary(buff.increaseResistances, new Dictionary<DamageElement, float>(), skillLevel);
     }
 }

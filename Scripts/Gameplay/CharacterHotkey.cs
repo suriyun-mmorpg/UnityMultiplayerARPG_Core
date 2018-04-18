@@ -33,9 +33,10 @@ public struct CharacterHotkey
             cacheItem = null;
             return;
         }
-        if (string.IsNullOrEmpty(dirtyDataId) || !dirtyDataId.Equals(dataId))
+        if (string.IsNullOrEmpty(dirtyDataId) || !dirtyDataId.Equals(dataId) || type != dirtyType)
         {
             dirtyDataId = dataId;
+            dirtyType = type;
             cacheSkill = null;
             cacheItem = null;
             if (type == HotkeyTypes.Skill)
