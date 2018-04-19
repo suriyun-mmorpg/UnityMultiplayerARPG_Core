@@ -122,7 +122,7 @@ public static class SkillExtension
 
     public static Dictionary<DamageElement, MinMaxFloat> GetAdditionalDamageAttributes(this Skill skill, int level)
     {
-        if (!skill.IsAttack() || skill.skillAttackType != SkillAttackType.PureSkillDamage)
+        if (!skill.IsAttack())
             return new Dictionary<DamageElement, MinMaxFloat>();
         level = skill.GetAdjustedLevel(level);
         return GameDataHelpers.MakeDamageAttributesDictionary(skill.additionalDamageAttributes, new Dictionary<DamageElement, MinMaxFloat>(), level);
