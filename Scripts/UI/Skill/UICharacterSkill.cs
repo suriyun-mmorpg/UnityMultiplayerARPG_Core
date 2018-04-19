@@ -57,23 +57,25 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
     [Header("Options")]
     public UICharacterSkill uiNextLevelSkill;
     public bool hideRemainsDurationWhenIsZero;
-    
+
+    protected float collectedDeltaTime;
+
     private void Update()
     {
         var characterSkill = Data.Key;
         var skill = characterSkill.GetSkill();
         var level = Data.Value;
-        
+
+        collectedDeltaTime += Time.deltaTime;
+
         if (IsOwningCharacter() && characterSkill.CanLevelUp(BasePlayerCharacterController.OwningCharacter))
             onAbleToLevelUp.Invoke();
         else
             onUnableToLevelUp.Invoke();
 
-        // Update duration
-        if (character != null && indexOfData >= 0 && indexOfData < character.Skills.Count)
-            characterSkill = character.Skills[indexOfData];
-
-        var coolDownRemainDuration = characterSkill.coolDownRemainsDuration;
+        var coolDownRemainsDuration = characterSkill.coolDownRemainsDuration - collectedDeltaTime;
+        if (coolDownRemainsDuration < 0)
+            coolDownRemainsDuration = 0;
         var coolDownDuration = skill.GetCoolDownDuration(level);
 
         if (textCoolDownDuration != null)
@@ -82,18 +84,18 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
         if (textCoolDownRemainsDuration != null)
         {
             var remainsDurationString = "";
-            if (!hideRemainsDurationWhenIsZero || characterSkill.coolDownRemainsDuration > 0)
+            if (!hideRemainsDurationWhenIsZero || coolDownRemainsDuration > 0)
             {
                 if (skill == null)
                     remainsDurationString = string.Format(coolDownRemainsDurationFormat, "0");
                 else
-                    remainsDurationString = string.Format(coolDownRemainsDurationFormat, coolDownRemainDuration.ToString("N0"));
+                    remainsDurationString = string.Format(coolDownRemainsDurationFormat, Mathf.CeilToInt(coolDownRemainsDuration).ToString("N0"));
             }
             textCoolDownRemainsDuration.text = remainsDurationString;
         }
 
         if (imageCoolDownGage != null)
-            imageCoolDownGage.fillAmount = coolDownDuration <= 0 ? 0 : coolDownRemainDuration / coolDownDuration;
+            imageCoolDownGage.fillAmount = coolDownDuration <= 0 ? 0 : coolDownRemainsDuration / coolDownDuration;
     }
 
     protected override void UpdateData()
@@ -101,6 +103,8 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
         var characterSkill = Data.Key;
         var skill = characterSkill.GetSkill();
         var level = Data.Value;
+
+        collectedDeltaTime = 0f;
 
         if (level <= 0)
             onSetLevelZeroData.Invoke();

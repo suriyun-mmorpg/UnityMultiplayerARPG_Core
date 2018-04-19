@@ -21,6 +21,8 @@ public class Skill : BaseGameData
     public ActionAnimation castAnimation;
     [Range(1, 30)]
     public int maxLevel = 1;
+    [Tooltip("An available weapons, if it not set every weapons is available")]
+    public WeaponType[] availableWeapons;
 
     [Header("Consume Mp")]
     public IncrementalInt consumeMp;

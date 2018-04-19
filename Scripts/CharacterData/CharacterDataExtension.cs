@@ -308,19 +308,4 @@ public static class CharacterDataExtension
     {
         return data.GetStats().atkSpeed;
     }
-
-    public static List<CharacterItem> GetWeapons(this ICharacterData data)
-    {
-        var gameInstance = GameInstance.Singleton;
-        var result = new List<CharacterItem>(data.EquipItems);
-        if (result.Count == 0)
-        {
-            var characterItem = new CharacterItem();
-            characterItem.itemId = gameInstance.DefaultWeaponItem.Id;
-            characterItem.level = 1;
-            characterItem.amount = 1;
-            result.Add(characterItem);
-        }
-        return result;
-    }
 }

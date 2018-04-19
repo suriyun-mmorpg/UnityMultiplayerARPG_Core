@@ -230,11 +230,16 @@ public class PlayerCharacterController : BasePlayerCharacterController
 
     public void RequestUseSkill(Vector3 position, int skillIndex)
     {
-        if (CacheCharacterEntity.isDoingAction.Value &&
+        if (CacheCharacterEntity.CurrentHp > 0 &&
             skillIndex >= 0 &&
-            skillIndex < CacheCharacterEntity.skills.Count)
-            queueUsingSkill = new UsingSkillData(position, skillIndex);
-        CacheCharacterEntity.RequestUseSkill(position, skillIndex);
+            skillIndex < CacheCharacterEntity.skills.Count &&
+            CacheCharacterEntity.skills[skillIndex].CanUse(CacheCharacterEntity))
+        {
+            if (CacheCharacterEntity.isDoingAction.Value)
+                queueUsingSkill = new UsingSkillData(position, skillIndex);
+            else
+                CacheCharacterEntity.RequestUseSkill(position, skillIndex);
+        }
     }
 
     public void RequestUseItem(int itemIndex)

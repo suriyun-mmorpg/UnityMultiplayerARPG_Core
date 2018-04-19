@@ -104,6 +104,7 @@ public abstract class BasePlayerCharacterController : MonoBehaviour
         {
             CacheUISceneGameplay.UpdateCharacter();
             CacheUISceneGameplay.UpdateSkills();
+            CacheUISceneGameplay.UpdateHotkeys();
         }
     }
 
@@ -128,6 +129,7 @@ public abstract class BasePlayerCharacterController : MonoBehaviour
         {
             CacheUISceneGameplay.UpdateCharacter();
             CacheUISceneGameplay.UpdateNonEquipItems();
+            CacheUISceneGameplay.UpdateHotkeys();
         }
     }
 

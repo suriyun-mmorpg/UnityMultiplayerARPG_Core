@@ -567,18 +567,16 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         characterSkill.Used();
         characterSkill.ReduceMp(this);
         skills[skillIndex] = characterSkill;
-        switch (skill.skillAttackType)
-        {
-            case SkillAttackType.PureSkillDamage:
-                AttackAsPureSkillDamage(characterSkill);
-                break;
-            case SkillAttackType.WeaponDamageInflict:
-                AttackAsWeaponDamageInflict(characterSkill);
-                break;
-        }
         ApplySkillBuff(characterSkill);
+
+        if (skill.skillAttackType == SkillAttackType.PureSkillDamage)
+            AttackAsPureSkillDamage(characterSkill);
+
         yield return new WaitForSecondsRealtime(anim.ClipLength + anim.extraDuration - anim.TriggerDuration);
         isDoingAction.Value = false;
+
+        if (skill.skillAttackType == SkillAttackType.WeaponDamageInflict)
+            AttackAsWeaponDamageInflict(characterSkill);
     }
 
     protected void AttackAsPureSkillDamage(CharacterSkill characterSkill)
@@ -1667,7 +1665,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         }
         if (rightHandWeapon == null && leftHandWeapon == null)
         {
-            tempDamageInfo = GameInstance.Singleton.DefaultWeaponType.damageInfo;
+            tempDamageInfo = GameInstance.Singleton.DefaultWeaponItem.WeaponType.damageInfo;
             tempDistance = tempDamageInfo.GetDistance();
             minDistance = tempDistance;
         }

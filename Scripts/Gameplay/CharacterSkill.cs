@@ -52,7 +52,34 @@ public struct CharacterSkill
 
     public bool CanUse(ICharacterData character)
     {
-        return GetSkill() != null && level >= 1 && coolDownRemainsDuration <= 0f && character.CurrentMp >= GetSkill().GetConsumeMp(level);
+        var skill = GetSkill();
+        if (skill == null)
+            return false;
+        var availableWeapons = skill.availableWeapons;
+        var available = availableWeapons.Length == 0;
+        var rightHand = character.EquipWeapons.rightHand;
+        var leftHand = character.EquipWeapons.leftHand;
+        var rightWeaponItem = rightHand.GetWeaponItem();
+        var leftWeaponItem = leftHand.GetWeaponItem();
+        foreach (var availableWeapon in availableWeapons)
+        {
+            if (rightWeaponItem != null && rightWeaponItem.WeaponType == availableWeapon)
+            {
+                available = true;
+                break;
+            }
+            else if (leftWeaponItem != null && leftWeaponItem.WeaponType == availableWeapon)
+            {
+                available = true;
+                break;
+            }
+            else if (rightWeaponItem == null && leftWeaponItem == null && GameInstance.Singleton.DefaultWeaponItem.WeaponType == availableWeapon)
+            {
+                available = true;
+                break;
+            }
+        }
+        return level >= 1 && coolDownRemainsDuration <= 0f && character.CurrentMp >= skill.GetConsumeMp(level) && available;
     }
 
     public void ReduceMp(ICharacterData character)

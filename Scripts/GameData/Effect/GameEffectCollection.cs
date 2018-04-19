@@ -29,7 +29,7 @@ public class GameEffectCollection
     /// <returns></returns>
     public bool Initialize(GameEffectCollectionType type)
     {
-        if (id.HasValue)
+        if (effects == null || effects.Length == 0 || id.HasValue)
             return false;
         
         switch (type)

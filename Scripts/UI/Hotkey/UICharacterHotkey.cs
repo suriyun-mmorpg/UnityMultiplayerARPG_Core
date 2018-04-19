@@ -21,7 +21,20 @@ public class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
     private void Update()
     {
         if (Input.GetKeyDown(key))
-            OnClickUse();
+        {
+            bool canUse = true;
+            var fields = FindObjectsOfType<InputField>();
+            foreach (var field in fields)
+            {
+                if (field.isFocused)
+                {
+                    canUse = false;
+                    break;
+                }
+            }
+            if (canUse)
+                OnClickUse();
+        }
     }
 
     protected override void UpdateData()
@@ -29,7 +42,7 @@ public class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
         var characterHotkey = Data;
         var skill = characterHotkey.GetSkill();
         var item = characterHotkey.GetItem();
-        
+
         var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (uiCharacterSkill != null)
         {
