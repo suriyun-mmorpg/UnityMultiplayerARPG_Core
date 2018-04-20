@@ -13,10 +13,10 @@ public enum WeaponItemEquipType : byte
 public class WeaponType : BaseGameData
 {
     public WeaponItemEquipType equipType = WeaponItemEquipType.OneHand;
+    public DamageInfo damageInfo;
     public DamageEffectivenessAttribute[] effectivenessAttributes;
     public ActionAnimation[] rightHandAttackAnimations;
     public ActionAnimation[] leftHandAttackAnimations;
-    public DamageInfo damageInfo;
 
     private Dictionary<Attribute, float> cacheEffectivenessAttributes;
     public Dictionary<Attribute, float> CacheEffectivenessAttributes

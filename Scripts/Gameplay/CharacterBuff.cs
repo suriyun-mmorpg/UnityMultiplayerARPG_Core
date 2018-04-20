@@ -41,6 +41,8 @@ public struct CharacterBuff
     private Dictionary<Attribute, int> cacheIncreaseAttributes;
     [System.NonSerialized]
     private Dictionary<DamageElement, float> cacheIncreaseResistances;
+    [System.NonSerialized]
+    private Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages;
 
     private void MakeCache()
     {
@@ -55,6 +57,7 @@ public struct CharacterBuff
             cacheIncreaseStats = new CharacterStats();
             cacheIncreaseAttributes = new Dictionary<Attribute, int>();
             cacheIncreaseResistances = new Dictionary<DamageElement, float>();
+            cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
             return;
         }
         if (string.IsNullOrEmpty(dirtyDataId) || !dirtyDataId.Equals(dataId) || type != dirtyType)
@@ -84,6 +87,7 @@ public struct CharacterBuff
                 cacheIncreaseStats = cacheBuff.GetIncreaseStats(level);
                 cacheIncreaseAttributes = cacheBuff.GetIncreaseAttributes(level);
                 cacheIncreaseResistances = cacheBuff.GetIncreaseResistances(level);
+                cacheIncreaseDamages = cacheBuff.GetIncreaseDamages(level);
             }
         }
     }
@@ -145,6 +149,12 @@ public struct CharacterBuff
     {
         MakeCache();
         return cacheIncreaseResistances;
+    }
+
+    public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages()
+    {
+        MakeCache();
+        return cacheIncreaseDamages;
     }
 
     public bool ShouldRemove()

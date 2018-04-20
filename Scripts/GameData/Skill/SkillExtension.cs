@@ -97,35 +97,42 @@ public static class SkillExtension
     #endregion
 
     #region Attack
-    public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAttribute(this Skill skill, int level, float effectiveness, float inflictRate)
+    public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount(this Skill skill, int level, ICharacterData character)
     {
-        if (!skill.IsAttack() || skill.skillAttackType != SkillAttackType.PureSkillDamage)
+        if (!skill.IsAttack() || skill.skillAttackType != SkillAttackType.Normal)
             return new KeyValuePair<DamageElement, MinMaxFloat>();
-        level = skill.GetAdjustedLevel(level);
-        return GameDataHelpers.MakeDamageAttributePair(skill.damageAttribute, level, effectiveness, inflictRate);
+        return GameDataHelpers.MakeDamageAmountPair(skill.damageAmount, level, skill.GetEffectivenessDamage(character));
     }
 
-    public static float GetDamageEffectiveness(this Skill skill, ICharacterData character)
+    public static Dictionary<DamageElement, MinMaxFloat> GetDamageAmountWithInflictions(this Skill skill, int level, ICharacterData character)
+    {
+        if (!skill.IsAttack() || skill.skillAttackType != SkillAttackType.Normal)
+            return new Dictionary<DamageElement, MinMaxFloat>();
+        level = skill.GetAdjustedLevel(level);
+        return GameDataHelpers.MakeDamageAmountWithInflictions(skill.damageAmount, level, skill.GetEffectivenessDamage(character), skill.GetDamageInflictions(level));
+    }
+
+    public static float GetEffectivenessDamage(this Skill skill, ICharacterData character)
     {
         if (skill == null)
             return 1f;
         return GameDataHelpers.CalculateEffectivenessDamage(skill.CacheEffectivenessAttributes, character);
     }
 
-    public static float GetInflictRate(this Skill skill, int level)
+    public static Dictionary<DamageElement, float> GetDamageInflictions(this Skill skill, int level)
     {
-        if (!skill.IsAttack() || skill.skillAttackType != SkillAttackType.WeaponDamageInflict)
-            return 1f;
+        if (!skill.IsAttack())
+            return new Dictionary<DamageElement, float>();
         level = skill.GetAdjustedLevel(level);
-        return skill.inflictRate.GetAmount(level);
+        return GameDataHelpers.MakeDamageInflictionAmountsDictionary(skill.damageInflictions, new Dictionary<DamageElement, float>(), level);
     }
 
-    public static Dictionary<DamageElement, MinMaxFloat> GetAdditionalDamageAttributes(this Skill skill, int level)
+    public static Dictionary<DamageElement, MinMaxFloat> GetAdditionalDamageAmounts(this Skill skill, int level)
     {
         if (!skill.IsAttack())
             return new Dictionary<DamageElement, MinMaxFloat>();
         level = skill.GetAdjustedLevel(level);
-        return GameDataHelpers.MakeDamageAttributesDictionary(skill.additionalDamageAttributes, new Dictionary<DamageElement, MinMaxFloat>(), level);
+        return GameDataHelpers.MakeDamageAmountsDictionary(skill.additionalDamageAmounts, new Dictionary<DamageElement, MinMaxFloat>(), level);
     }
     #endregion
 }

@@ -13,7 +13,6 @@ public class GameEffectCollection
     private const int SKILL_HIT_ID_START = 1000;
     private static int weaponHitEffectIdCount = -1;
     private static int skillHitEffectIdCount = -1;
-
     protected int? id;
     public int Id
     {

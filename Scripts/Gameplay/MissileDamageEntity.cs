@@ -23,13 +23,13 @@ public class MissileDamageEntity : BaseDamageEntity
 
     public void SetupDamage(
         BaseCharacterEntity attacker,
-        Dictionary<DamageElement, MinMaxFloat> allDamageAttributes,
-        CharacterBuff debuff,
+        Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
+        CharacterBuff? debuff,
         int hitEffectsId,
         float missileDistance,
         float missileSpeed)
     {
-        SetupDamage(attacker, allDamageAttributes, debuff, hitEffectsId);
+        SetupDamage(attacker, allDamageAmounts, debuff, hitEffectsId);
         this.missileDistance = missileDistance;
         this.missileSpeed.Value = missileSpeed;
 

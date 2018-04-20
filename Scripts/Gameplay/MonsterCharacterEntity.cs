@@ -271,12 +271,12 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         SetTargetEntity(target);
     }
 
-    public override void ReceiveDamage(BaseCharacterEntity attacker, Dictionary<DamageElement, MinMaxFloat> allDamageAttributes, CharacterBuff debuff, int hitEffectsId)
+    public override void ReceiveDamage(BaseCharacterEntity attacker, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff? debuff, int hitEffectsId)
     {
         // Damage calculations apply at server only
         if (!IsServer || CurrentHp <= 0)
             return;
-        base.ReceiveDamage(attacker, allDamageAttributes, debuff, hitEffectsId);
+        base.ReceiveDamage(attacker, allDamageAmounts, debuff, hitEffectsId);
         // If no attacker, skip next logics
         if (attacker == null || !IsEnemy(attacker))
             return;
@@ -310,14 +310,12 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         }
     }
 
-    public override void GetAttackData(
-        float inflictRate, 
-        Dictionary<DamageElement, MinMaxFloat> additionalDamageAttributes, 
+    public override void GetAttackingData(
         out int actionId, 
         out float damageDuration, 
         out float totalDuration,
         out DamageInfo damageInfo, 
-        out Dictionary<DamageElement, MinMaxFloat> allDamageAttributes)
+        out Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
     {
         var gameInstance = GameInstance.Singleton;
 
@@ -341,14 +339,13 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         // Assign damage data
         damageInfo = MonsterDatabase.damageInfo;
 
-        // Assign damage attributes
-        allDamageAttributes = new Dictionary<DamageElement, MinMaxFloat>();
+        // Assign damage amounts
+        allDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
         var damageElement = MonsterDatabase.damageElement;
         var damageAmount = MonsterDatabase.damageAmount;
         if (damageElement == null)
             damageElement = gameInstance.DefaultDamageElement;
-        allDamageAttributes.Add(damageElement, damageAmount * inflictRate);
-        allDamageAttributes = GameDataHelpers.CombineDamageAttributesDictionary(allDamageAttributes, additionalDamageAttributes);
+        allDamageAmounts.Add(damageElement, damageAmount);
     }
 
     public override float GetAttackDistance()

@@ -64,41 +64,40 @@ public static class ItemExtension
         return result;
     }
 
-    public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamageAttributes(this Item equipmentItem, int level)
+    public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this Item equipmentItem, int level)
     {
         var result = new Dictionary<DamageElement, MinMaxFloat>();
         if (equipmentItem != null &&
             equipmentItem.IsEquipment())
-            result = GameDataHelpers.MakeDamageAttributesDictionary(equipmentItem.increaseDamageAttributes, result, level);
+            result = GameDataHelpers.MakeDamageAmountsDictionary(equipmentItem.increaseDamages, result, level);
         return result;
     }
     #endregion    
 
     #region Weapon Extension
-    public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAttribute(this Item weaponItem, int level, float effectiveness, float inflictRate)
+    public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount(this Item weaponItem, int level, ICharacterData character)
     {
         if (weaponItem == null ||
             !weaponItem.IsWeapon())
             return new KeyValuePair<DamageElement, MinMaxFloat>();
-        return GameDataHelpers.MakeDamageAttributePair(weaponItem.damageAttribute, level, effectiveness, inflictRate);
+        return GameDataHelpers.MakeDamageAmountPair(weaponItem.damageAmount, level, weaponItem.GetEffectivenessDamage(character));
+    }
+
+    public static Dictionary<DamageElement, MinMaxFloat> GetDamageAmountWithInflictions(this Item weaponItem, int level, ICharacterData character, Dictionary<DamageElement, float> damageInflictionAmounts)
+    {
+        if (weaponItem == null ||
+            !weaponItem.IsWeapon())
+            return new Dictionary<DamageElement, MinMaxFloat>();
+        return GameDataHelpers.MakeDamageAmountWithInflictions(weaponItem.damageAmount, level, weaponItem.GetEffectivenessDamage(character), damageInflictionAmounts);
     }
 
     public static float GetEffectivenessDamage(this Item weaponItem, ICharacterData character)
     {
         if (weaponItem == null ||
-            !weaponItem.IsWeapon())
+            !weaponItem.IsWeapon() ||
+            character == null)
             return 0f;
         return GameDataHelpers.CalculateEffectivenessDamage(weaponItem.WeaponType.CacheEffectivenessAttributes, character);
-    }
-
-    public static Dictionary<DamageElement, MinMaxFloat> GetAllDamages(this Item weaponItem, ICharacterData character, int level)
-    {
-        if (weaponItem == null ||
-            !weaponItem.IsWeapon())
-            return new Dictionary<DamageElement, MinMaxFloat>();
-        var baseDamageAttribute = weaponItem.GetDamageAttribute(level, weaponItem.GetEffectivenessDamage(character), 1f);
-        var additionalDamageAttributes = weaponItem.GetIncreaseDamageAttributes(level);
-        return GameDataHelpers.CombineDamageAmountsDictionary(additionalDamageAttributes, baseDamageAttribute);
     }
 
     public static bool TryGetWeaponItemEquipType(this Item weaponItem, out WeaponItemEquipType equipType)

@@ -5,8 +5,8 @@ using UnityEngine;
 public enum SkillAttackType
 {
     None,
-    PureSkillDamage,
-    WeaponDamageInflict,
+    Normal,
+    BasedOnWeapon,
 }
 
 public enum SkillBuffType
@@ -18,7 +18,8 @@ public enum SkillBuffType
 [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill")]
 public class Skill : BaseGameData
 {
-    public ActionAnimation castAnimation;
+    [Tooltip("Randoming cast animations")]
+    public ActionAnimation[] castAnimations;
     [Range(1, 30)]
     public int maxLevel = 1;
     [Tooltip("An available weapons, if it not set every weapons is available")]
@@ -36,17 +37,11 @@ public class Skill : BaseGameData
     [Header("Attack")]
     public SkillAttackType skillAttackType;
     public GameEffectCollection hitEffects;
-
-    [Header("Attack As Pure Skill Damage")]
     public DamageInfo damageInfo;
-    public DamageIncremental damageAttribute;
     public DamageEffectivenessAttribute[] effectivenessAttributes;
-
-    [Header("Attack As Weapon Damage Inflict")]
-    public IncrementalFloat inflictRate;
-
-    [Header("Additional Damage Attributes")]
-    public DamageIncremental[] additionalDamageAttributes;
+    public DamageIncremental damageAmount;
+    public DamageInflictionIncremental[] damageInflictions;
+    public DamageIncremental[] additionalDamageAmounts;
 
     [Header("Attack Debuff")]
     public bool isDebuff;

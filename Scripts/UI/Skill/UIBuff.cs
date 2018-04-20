@@ -19,6 +19,7 @@ public class UIBuff : UISelectionEntry<KeyValuePair<Buff, int>>
     public UICharacterStats uiBuffStats;
     public UIAttributeAmounts uiBuffAttributes;
     public UIResistanceAmounts uiBuffResistances;
+    public UIDamageElementAmounts uiBuffDamages;
 
     protected override void UpdateData()
     {
@@ -54,5 +55,8 @@ public class UIBuff : UISelectionEntry<KeyValuePair<Buff, int>>
 
         if (uiBuffResistances != null)
             uiBuffResistances.Data = GameDataHelpers.MakeResistanceAmountsDictionary(buff.increaseResistances, new Dictionary<DamageElement, float>(), skillLevel);
+
+        if (uiBuffDamages != null)
+            uiBuffDamages.Data = GameDataHelpers.MakeDamageAmountsDictionary(buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), skillLevel);
     }
 }

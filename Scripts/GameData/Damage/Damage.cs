@@ -54,3 +54,17 @@ public struct DamageEffectivenessAttribute
     public Attribute attribute;
     public float effectiveness;
 }
+
+[System.Serializable]
+public struct DamageInflictionAmount
+{
+    public DamageElement damageElement;
+    public float rate;
+}
+
+[System.Serializable]
+public struct DamageInflictionIncremental
+{
+    public DamageElement damageElement;
+    public IncrementalFloat rate;
+}

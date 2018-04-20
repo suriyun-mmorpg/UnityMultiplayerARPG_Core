@@ -34,5 +34,10 @@ public static class BuffExtension
     {
         return GameDataHelpers.MakeResistanceAmountsDictionary(buff.increaseResistances, new Dictionary<DamageElement, float>(), level);
     }
+
+    public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this Buff buff, int level)
+    {
+        return GameDataHelpers.MakeDamageAmountsDictionary(buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), level);
+    }
     #endregion
 }

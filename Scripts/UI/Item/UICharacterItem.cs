@@ -47,10 +47,10 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
     public UICharacterStats uiStats;
     public UIAttributeAmounts uiIncreaseAttributes;
     public UIResistanceAmounts uiIncreaseResistances;
-    public UIDamageElementAmounts uiIncreaseDamageAttributes;
+    public UIDamageElementAmounts uiIncreaseDamageAmounts;
 
     [Header("Weapon - UI Elements")]
-    public UIDamageElementAmount uiDamageAttribute;
+    public UIDamageElementAmount uiDamageAmounts;
 
     [Header("Events")]
     public UnityEvent onSetLevelZeroData;
@@ -181,26 +181,26 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
             }
         }
 
-        if (uiIncreaseDamageAttributes != null)
+        if (uiIncreaseDamageAmounts != null)
         {
-            var damageAttributes = equipmentItem.GetIncreaseDamageAttributes(level);
-            if (equipmentItem == null || damageAttributes == null || damageAttributes.Count == 0)
-                uiIncreaseDamageAttributes.Hide();
+            var damageAmounts = equipmentItem.GetIncreaseDamages(level);
+            if (equipmentItem == null || damageAmounts == null || damageAmounts.Count == 0)
+                uiIncreaseDamageAmounts.Hide();
             else
             {
-                uiIncreaseDamageAttributes.Show();
-                uiIncreaseDamageAttributes.Data = damageAttributes;
+                uiIncreaseDamageAmounts.Show();
+                uiIncreaseDamageAmounts.Data = damageAmounts;
             }
         }
 
-        if (uiDamageAttribute != null)
+        if (uiDamageAmounts != null)
         {
             if (weaponItem == null)
-                uiDamageAttribute.Hide();
+                uiDamageAmounts.Hide();
             else
             {
-                uiDamageAttribute.Show();
-                uiDamageAttribute.Data = weaponItem.GetDamageAttribute(level, 0f, 1f);
+                uiDamageAmounts.Show();
+                uiDamageAmounts.Data = weaponItem.GetDamageAmount(level, null);
             }
         }
 

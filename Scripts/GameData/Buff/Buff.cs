@@ -12,5 +12,6 @@ public class Buff
     public CharacterStatsIncremental increaseStats;
     public AttributeIncremental[] increaseAttributes;
     public ResistanceIncremental[] increaseResistances;
+    public DamageIncremental[] increaseDamages;
     public GameEffect[] effects;
 }

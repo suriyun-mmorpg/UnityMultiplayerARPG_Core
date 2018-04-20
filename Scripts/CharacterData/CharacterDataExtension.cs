@@ -213,6 +213,61 @@ public static class CharacterDataExtension
         return result;
     }
 
+    public static Dictionary<DamageElement, MinMaxFloat> GetEquipmentIncreaseDamages(this ICharacterData data)
+    {
+        if (data == null)
+            return new Dictionary<DamageElement, MinMaxFloat>();
+        var result = new Dictionary<DamageElement, MinMaxFloat>();
+        // Armors
+        Item tempEquipment = null;
+        var equipItems = data.EquipItems;
+        foreach (var equipItem in equipItems)
+        {
+            tempEquipment = equipItem.GetEquipmentItem();
+            if (tempEquipment != null)
+                result = GameDataHelpers.CombineDamageAmountsDictionary(result,
+                    tempEquipment.GetIncreaseDamages(equipItem.level));
+        }
+        // Weapons
+        var equipWeapons = data.EquipWeapons;
+        // Right hand equipment
+        var rightHandItem = equipWeapons.rightHand;
+        tempEquipment = rightHandItem.GetEquipmentItem();
+        if (tempEquipment != null)
+            result = GameDataHelpers.CombineDamageAmountsDictionary(result,
+                tempEquipment.GetIncreaseDamages(rightHandItem.level));
+        // Left hand equipment
+        var leftHandItem = equipWeapons.leftHand;
+        tempEquipment = leftHandItem.GetEquipmentItem();
+        if (tempEquipment != null)
+            result = GameDataHelpers.CombineDamageAmountsDictionary(result,
+                tempEquipment.GetIncreaseDamages(leftHandItem.level));
+        return result;
+    }
+
+    public static Dictionary<DamageElement, MinMaxFloat> GetBuffIncreaseDamages(this ICharacterData data)
+    {
+        if (data == null)
+            return new Dictionary<DamageElement, MinMaxFloat>();
+        var result = new Dictionary<DamageElement, MinMaxFloat>();
+        var buffs = data.Buffs;
+        foreach (var buff in buffs)
+        {
+            result = GameDataHelpers.CombineDamageAmountsDictionary(result, buff.GetIncreaseDamages());
+        }
+        return result;
+    }
+
+    public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
+    {
+        var result = new Dictionary<DamageElement, MinMaxFloat>();
+        if (sumWithEquipments)
+            result = GameDataHelpers.CombineDamageAmountsDictionary(result, data.GetEquipmentIncreaseDamages());
+        if (sumWithBuffs)
+            result = GameDataHelpers.CombineDamageAmountsDictionary(result, data.GetBuffIncreaseDamages());
+        return result;
+    }
+
     public static CharacterStats GetCharacterStats(this ICharacterData data)
     {
         if (data == null)

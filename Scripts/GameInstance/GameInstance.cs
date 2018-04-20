@@ -130,14 +130,14 @@ public class GameInstance : MonoBehaviour
                 defaultWeaponItem.title = GameDataConst.DEFAULT_WEAPON_TITLE;
                 defaultWeaponItem.itemType = ItemType.Weapon;
                 defaultWeaponItem.weaponType = DefaultWeaponType;
-                var sampleDamageAttributeAmount = new IncrementalMinMaxFloat();
-                sampleDamageAttributeAmount.baseAmount = new MinMaxFloat() { min = 1, max = 1 };
-                sampleDamageAttributeAmount.amountIncreaseEachLevel = new MinMaxFloat() { min = 0, max = 0 };
-                var sampleDamageAttribute = new DamageIncremental()
+                var damageAmountMinMax = new IncrementalMinMaxFloat();
+                damageAmountMinMax.baseAmount = new MinMaxFloat() { min = 1, max = 1 };
+                damageAmountMinMax.amountIncreaseEachLevel = new MinMaxFloat() { min = 0, max = 0 };
+                var damageAmount = new DamageIncremental()
                 {
-                    amount = sampleDamageAttributeAmount,
+                    amount = damageAmountMinMax,
                 };
-                defaultWeaponItem.damageAttribute = sampleDamageAttribute;
+                defaultWeaponItem.damageAmount = damageAmount;
             }
             return defaultWeaponItem;
         }
@@ -287,7 +287,6 @@ public class GameInstance : MonoBehaviour
 
     public static void AddSkills(IEnumerable<Skill> skills)
     {
-        var castAnimations = new List<ActionAnimation>();
         var skillHitEffects = new List<GameEffectCollection>();
         var damageEntities = new List<BaseDamageEntity>();
         foreach (var skill in skills)
@@ -295,19 +294,20 @@ public class GameInstance : MonoBehaviour
             if (skill == null || Skills.ContainsKey(skill.Id))
                 continue;
             Skills[skill.Id] = skill;
-            castAnimations.Add(skill.castAnimation);
+            AddActionAnimations(ActionAnimationType.SkillCast, skill.castAnimations);
             skillHitEffects.Add(skill.hitEffects);
             var missileDamageEntity = skill.damageInfo.missileDamageEntity;
             if (missileDamageEntity != null)
                 damageEntities.Add(missileDamageEntity);
         }
-        AddActionAnimations(ActionAnimationType.SkillCast, castAnimations);
         AddGameEffectCollections(GameEffectCollectionType.SkillHit, skillHitEffects);
         AddDamageEntities(damageEntities);
     }
 
     public static void AddDamageEntities(IEnumerable<BaseDamageEntity> damageEntities)
     {
+        if (damageEntities == null)
+            return;
         foreach (var damageEntity in damageEntities)
         {
             if (damageEntity == null || DamageEntities.ContainsKey(damageEntity.Identity.AssetId))
@@ -318,6 +318,8 @@ public class GameInstance : MonoBehaviour
 
     public static void AddActionAnimations(ActionAnimationType type, IEnumerable<ActionAnimation> actionAnimations)
     {
+        if (actionAnimations == null)
+            return;
         foreach (var actionAnimation in actionAnimations)
         {
             if (!actionAnimation.Initialize(type))
@@ -330,6 +332,8 @@ public class GameInstance : MonoBehaviour
 
     public static void AddGameEffectCollections(GameEffectCollectionType type, IEnumerable<GameEffectCollection> gameEffectCollections)
     {
+        if (gameEffectCollections == null)
+            return;
         foreach (var gameEffectCollection in gameEffectCollections)
         {
             if (!gameEffectCollection.Initialize(type))

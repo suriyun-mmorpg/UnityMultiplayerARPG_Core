@@ -31,15 +31,10 @@ public class Item : BaseGameData
     public EquipmentModel[] equipmentModels;
     [Tooltip("This will be available with `Weapon` item, set it in case that it will be equipped at left hand")]
     public EquipmentModel[] subEquipmentModels;
-    [Header("Requirements")]
     public EquipmentRequirement requirement;
-    [Header("Attributes Bonus")]
     public AttributeIncremental[] increaseAttributes;
-    [Header("Resistances Bonus")]
     public ResistanceIncremental[] increaseResistances;
-    [Header("Damages Bonus")]
-    public DamageIncremental[] increaseDamageAttributes;
-    [Header("Stats Bonus")]
+    public DamageIncremental[] increaseDamages;
     public CharacterStatsIncremental increaseStats;
 
     [Space(10)]
@@ -49,7 +44,7 @@ public class Item : BaseGameData
     [Space(10)]
     [Header("Weapon")]
     public WeaponType weaponType;
-    public DamageIncremental damageAttribute;
+    public DamageIncremental damageAmount;
 
     [Space(10)]
     [Header("Potion")]

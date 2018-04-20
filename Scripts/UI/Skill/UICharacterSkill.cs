@@ -20,10 +20,6 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
     [Tooltip("Cool Down Remains Duration Format => {0} = {Remains duration}")]
     public string coolDownRemainsDurationFormat = "{0}";
 
-    [Header("Attack Format")]
-    [Tooltip("Inflict Rate Format => {0} = {Rate * 100f}")]
-    public string inflictRateFormat = "Inflict {0}%";
-
     [Header("UI Elements")]
     public Text textTitle;
     public Text textDescription;
@@ -35,14 +31,10 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
     public Image imageCoolDownGage;
     public UISkillRequirement uiRequirement;
 
-    [Header("Attack as Pure Skill Damage - UI Elements")]
-    public UIDamageElementAmount uiDamageAttribute;
-
-    [Header("Attack as Weapon Damage Inflict - UI Elements")]
-    public Text textInflictRate;
-
-    [Header("Attack additional attributes")]
-    public UIDamageElementAmounts uiAdditionalDamageAttributes;
+    [Header("Skill Attack")]
+    public UIDamageElementAmount uiDamageAmount;
+    public UIDamageElementInflictions uiDamageInflictions;
+    public UIDamageElementAmounts uiAdditionalDamageAmounts;
 
     [Header("Buff/Debuff")]
     public UIBuff uiSkillBuff;
@@ -141,40 +133,40 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
             }
         }
 
-        var isAttackPure = skill != null && skill.IsAttack() && skill.skillAttackType == SkillAttackType.PureSkillDamage;
-        var isAttackWeaponInflict = skill != null && skill.IsAttack() && skill.skillAttackType == SkillAttackType.WeaponDamageInflict;
-
-        if (uiDamageAttribute != null)
+        var isAttack = skill != null && skill.IsAttack();
+        var isOverrideWeaponDamage = isAttack && skill.skillAttackType == SkillAttackType.Normal;
+        if (uiDamageAmount != null)
         {
-            if (!isAttackPure)
-                uiDamageAttribute.Hide();
+            if (!isOverrideWeaponDamage)
+                uiDamageAmount.Hide();
             else
             {
-                uiDamageAttribute.Show();
-                uiDamageAttribute.Data = skill.GetDamageAttribute(level, 0f, 1f);
+                uiDamageAmount.Show();
+                uiDamageAmount.Data = skill.GetDamageAmount(level, null);
             }
         }
 
-        if (textInflictRate != null)
+        if (uiDamageInflictions != null)
         {
-            if (!isAttackWeaponInflict)
-                textInflictRate.gameObject.SetActive(false);
+            var damageInflictionRates = skill.GetDamageInflictions(level);
+            if (!isAttack || damageInflictionRates == null || damageInflictionRates.Count == 0)
+                uiDamageInflictions.Hide();
             else
             {
-                textInflictRate.text = string.Format(inflictRateFormat, (skill.GetInflictRate(level) * 100f).ToString("N0"));
-                textInflictRate.gameObject.SetActive(true);
+                uiDamageInflictions.Show();
+                uiDamageInflictions.Data = damageInflictionRates;
             }
         }
 
-        if (uiAdditionalDamageAttributes != null)
+        if (uiAdditionalDamageAmounts != null)
         {
-            var additionalDamageAttributes = skill.GetAdditionalDamageAttributes(level);
-            if (!isAttackPure || additionalDamageAttributes == null || additionalDamageAttributes.Count == 0)
-                uiAdditionalDamageAttributes.Hide();
+            var additionalDamageAmounts = skill.GetAdditionalDamageAmounts(level);
+            if (!isAttack || additionalDamageAmounts == null || additionalDamageAmounts.Count == 0)
+                uiAdditionalDamageAmounts.Hide();
             else
             {
-                uiAdditionalDamageAttributes.Show();
-                uiAdditionalDamageAttributes.Data = additionalDamageAttributes;
+                uiAdditionalDamageAmounts.Show();
+                uiAdditionalDamageAmounts.Data = additionalDamageAmounts;
             }
         }
 

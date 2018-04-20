@@ -1,7 +1,7 @@
 ﻿[System.Serializable]
 public struct IncrementalFloat
 {
-    public int baseAmount;
+    public float baseAmount;
     public float amountIncreaseEachLevel;
 
     public float GetAmount(int level)
