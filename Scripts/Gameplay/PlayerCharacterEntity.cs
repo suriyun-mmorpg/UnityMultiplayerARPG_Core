@@ -136,7 +136,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
             if (CurrentHp > 0)
             {
                 var moveDirectionMagnitude = moveDirection.sqrMagnitude;
-                if (!isDoingAction.Value && moveDirectionMagnitude != 0)
+                if (!IsPlayingActionAnimation() && moveDirectionMagnitude != 0)
                 {
                     if (moveDirectionMagnitude > 1)
                         moveDirection = moveDirection.normalized;
@@ -293,7 +293,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     protected void NetFuncSwapOrMergeItem(int fromIndex, int toIndex)
     {
         if (CurrentHp <= 0 ||
-            isDoingAction.Value ||
+            IsPlayingActionAnimation() ||
             fromIndex < 0 ||
             fromIndex > nonEquipItems.Count ||
             toIndex < 0 ||

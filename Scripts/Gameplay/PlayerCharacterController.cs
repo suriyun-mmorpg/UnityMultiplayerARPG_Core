@@ -219,7 +219,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
 
     public void RequestAttack()
     {
-        if (!CacheCharacterEntity.isDoingAction.Value && queueUsingSkill.HasValue)
+        if (!CacheCharacterEntity.IsPlayingActionAnimation() && queueUsingSkill.HasValue)
         {
             var usingSkill = queueUsingSkill.Value;
             RequestUseSkill(usingSkill.position, usingSkill.skillIndex);
@@ -235,10 +235,10 @@ public class PlayerCharacterController : BasePlayerCharacterController
             skillIndex < CacheCharacterEntity.skills.Count &&
             CacheCharacterEntity.skills[skillIndex].CanUse(CacheCharacterEntity))
         {
-            if (CacheCharacterEntity.isDoingAction.Value)
-                queueUsingSkill = new UsingSkillData(position, skillIndex);
-            else
+            if (!CacheCharacterEntity.IsPlayingActionAnimation())
                 CacheCharacterEntity.RequestUseSkill(position, skillIndex);
+            else
+                queueUsingSkill = new UsingSkillData(position, skillIndex);
         }
     }
 

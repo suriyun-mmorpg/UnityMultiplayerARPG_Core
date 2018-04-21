@@ -19,6 +19,7 @@ public enum CombatAmountTypes : byte
 
 public enum AnimActionTypes : byte
 {
+    None,
     Generic,
     Attack,
     Skill,
@@ -48,7 +49,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public SyncFieldInt currentHp = new SyncFieldInt();
     public SyncFieldInt currentMp = new SyncFieldInt();
     public SyncFieldEquipWeapons equipWeapons = new SyncFieldEquipWeapons();
-    public SyncFieldBool isDoingAction = new SyncFieldBool();
     public SyncFieldBool isHidding = new SyncFieldBool();
     [Header("Sync Lists")]
     public SyncListCharacterAttribute attributes = new SyncListCharacterAttribute();
@@ -76,6 +76,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
     protected Vector3? previousPosition;
     protected Vector3 currentVelocity;
+    protected AnimActionTypes animActionType;
     protected float recoveryingHp;
     protected float recoveryingMp;
     protected float skillBuffUpdateDeltaTime;
@@ -101,7 +102,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public System.Action<int> onCurrentHpChange;
     public System.Action<int> onCurrentMpChange;
     public System.Action<EquipWeapons> onEquipWeaponsChange;
-    public System.Action<bool> onIsDoingActionChange;
     public System.Action<bool> onIsHiddingChange;
     // List
     public System.Action<LiteNetLibSyncList.Operation, int> onAttributesOperation;
@@ -231,6 +231,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         var gameInstance = GameInstance.Singleton;
         gameObject.layer = gameInstance.characterLayer;
         skillBuffUpdateDeltaTime = 0;
+        animActionType = AnimActionTypes.None;
         shouldRecaches = true;
     }
 
@@ -416,8 +417,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         currentMp.forOwnerOnly = false;
         equipWeapons.sendOptions = SendOptions.ReliableOrdered;
         equipWeapons.forOwnerOnly = false;
-        isDoingAction.sendOptions = SendOptions.ReliableOrdered;
-        isDoingAction.forOwnerOnly = true;
         isHidding.sendOptions = SendOptions.ReliableOrdered;
         isHidding.forOwnerOnly = false;
 
@@ -440,7 +439,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         currentHp.onChange += OnCurrentHpChange;
         currentMp.onChange += OnCurrentMpChange;
         equipWeapons.onChange += OnEquipWeaponsChange;
-        isDoingAction.onChange += OnIsDoingActionChange;
         isHidding.onChange += OnIsHiddingChange;
         // On list changes events
         attributes.onOperation += OnAttributesOperation;
@@ -485,7 +483,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// </summary>
     protected void NetFuncAttack()
     {
-        if (CurrentHp <= 0 || isDoingAction.Value)
+        if (CurrentHp <= 0 || IsPlayingActionAnimation())
             return;
 
         // Prepare requires data
@@ -501,8 +499,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             out totalDuration,
             out damageInfo,
             out allDamageAmounts);
-
-        isDoingAction.Value = true;
+        
         // Play animation on clients
         RequestPlayActionAnimation(actionId, AnimActionTypes.Attack);
         // Start attack routine
@@ -519,7 +516,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         yield return new WaitForSecondsRealtime(triggerDuration);
         LaunchDamageEntity(position, damageInfo, allDamageAmounts, null, -1);
         yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
-        isDoingAction.Value = false;
     }
 
     /// <summary>
@@ -530,7 +526,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected void NetFuncUseSkill(Vector3 position, int skillIndex)
     {
         if (CurrentHp <= 0 ||
-            isDoingAction.Value ||
+            IsPlayingActionAnimation() ||
             skillIndex < 0 ||
             skillIndex >= skills.Count)
             return;
@@ -555,8 +551,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             out isAttack,
             out damageInfo,
             out allDamageAmounts);
-
-        isDoingAction.Value = true;
+        
         // Play animation on clients
         RequestPlayActionAnimation(actionId, AnimActionTypes.Skill);
         // Start use skill routine
@@ -588,7 +583,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             LaunchDamageEntity(position, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id);
         }
         yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
-        isDoingAction.Value = false;
     }
     
     /// <summary>
@@ -612,16 +606,17 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// This will be called at every clients to play any action animation
     /// </summary>
     /// <param name="actionId"></param>
-    /// <param name="animActionTypes"></param>
-    protected void NetFuncPlayActionAnimation(int actionId, AnimActionTypes animActionTypes)
+    /// <param name="animActionType"></param>
+    protected void NetFuncPlayActionAnimation(int actionId, AnimActionTypes animActionType)
     {
         if (CurrentHp <= 0)
             return;
-        StartCoroutine(PlayActionAnimationRoutine(actionId, animActionTypes));
+        StartCoroutine(PlayActionAnimationRoutine(actionId, animActionType));
     }
 
-    IEnumerator PlayActionAnimationRoutine(int actionId, AnimActionTypes animActionTypes)
+    IEnumerator PlayActionAnimationRoutine(int actionId, AnimActionTypes animActionType)
     {
+        this.animActionType = animActionType;
         Animator animator = model == null ? null : model.CacheAnimator;
         // If animator is not null, play the action animation
         ActionAnimation actionAnimation;
@@ -629,7 +624,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         {
             model.ChangeActionClip(actionAnimation.clip);
             var actionClipMultiplier = 1f;
-            switch (animActionTypes)
+            switch (animActionType)
             {
                 case AnimActionTypes.Attack:
                     actionClipMultiplier = AttackSpeed;
@@ -640,6 +635,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             yield return new WaitForSecondsRealtime(actionAnimation.ClipLength / actionClipMultiplier);
             animator.SetBool(ANIM_DO_ACTION, false);
         }
+        this.animActionType = AnimActionTypes.None;
     }
 
     /// <summary>
@@ -660,7 +656,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="objectId"></param>
     protected void NetFuncPickupItem()
     {
-        if (CurrentHp <= 0 || isDoingAction.Value)
+        if (CurrentHp <= 0 || IsPlayingActionAnimation())
             return;
 
         var gameInstance = GameInstance.Singleton;
@@ -705,7 +701,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     {
         var gameInstance = GameInstance.Singleton;
         if (CurrentHp <= 0 ||
-            isDoingAction.Value ||
+            IsPlayingActionAnimation() ||
             index < 0 ||
             index > nonEquipItems.Count)
             return;
@@ -728,7 +724,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected void NetFuncEquipItem(int nonEquipIndex, string equipPosition)
     {
         if (CurrentHp <= 0 ||
-            isDoingAction.Value ||
+            IsPlayingActionAnimation() ||
             nonEquipIndex < 0 ||
             nonEquipIndex > nonEquipItems.Count)
             return;
@@ -774,7 +770,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="fromEquipPosition"></param>
     protected void NetFuncUnEquipItem(string fromEquipPosition)
     {
-        if (CurrentHp <= 0 || isDoingAction.Value)
+        if (CurrentHp <= 0 || IsPlayingActionAnimation())
             return;
 
         var equippedArmorIndex = -1;
@@ -866,12 +862,14 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected void NetFuncOnDead(bool isInitialize)
     {
+        animActionType = AnimActionTypes.None;
         if (onDead != null)
             onDead.Invoke(isInitialize);
     }
 
     protected void NetFuncOnRespawn(bool isInitialize)
     {
+        animActionType = AnimActionTypes.None;
         if (onRespawn != null)
             onRespawn.Invoke(isInitialize);
     }
@@ -886,14 +884,14 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     #region Net functions callers
     public virtual void RequestAttack()
     {
-        if (CurrentHp <= 0 || isDoingAction.Value)
+        if (CurrentHp <= 0 || IsPlayingActionAnimation())
             return;
         CallNetFunction("Attack", FunctionReceivers.Server);
     }
 
     public virtual void RequestUseSkill(Vector3 position, int skillIndex)
     {
-        if (CurrentHp <= 0 || isDoingAction.Value)
+        if (CurrentHp <= 0 || IsPlayingActionAnimation())
             return;
         CallNetFunction("UseSkill", FunctionReceivers.Server, position, skillIndex);
     }
@@ -905,11 +903,11 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         CallNetFunction("UseItem", FunctionReceivers.Server, itemIndex);
     }
 
-    public virtual void RequestPlayActionAnimation(int actionId, AnimActionTypes animActionTypes)
+    public virtual void RequestPlayActionAnimation(int actionId, AnimActionTypes animActionType)
     {
         if (CurrentHp <= 0 || actionId < 0)
             return;
-        CallNetFunction("PlayActionAnimation", FunctionReceivers.All, actionId, animActionTypes);
+        CallNetFunction("PlayActionAnimation", FunctionReceivers.All, actionId, animActionType);
     }
 
     public virtual void RequestPlayEffect(int effectId)
@@ -921,28 +919,28 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     public virtual void RequestPickupItem()
     {
-        if (CurrentHp <= 0 || isDoingAction.Value)
+        if (CurrentHp <= 0 || IsPlayingActionAnimation())
             return;
         CallNetFunction("PickupItem", FunctionReceivers.Server);
     }
 
     public virtual void RequestDropItem(int index, int amount)
     {
-        if (CurrentHp <= 0 || isDoingAction.Value)
+        if (CurrentHp <= 0 || IsPlayingActionAnimation())
             return;
         CallNetFunction("DropItem", FunctionReceivers.Server, index, amount);
     }
 
     public virtual void RequestEquipItem(int nonEquipIndex, string equipPosition)
     {
-        if (CurrentHp <= 0 || isDoingAction.Value)
+        if (CurrentHp <= 0 || IsPlayingActionAnimation())
             return;
         CallNetFunction("EquipItem", FunctionReceivers.Server, nonEquipIndex, equipPosition);
     }
 
     public virtual void RequestUnEquipItem(string equipPosition)
     {
-        if (CurrentHp <= 0 || isDoingAction.Value)
+        if (CurrentHp <= 0 || IsPlayingActionAnimation())
             return;
         CallNetFunction("UnEquipItem", FunctionReceivers.Server, equipPosition);
     }
@@ -1374,16 +1372,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     }
 
     /// <summary>
-    /// Overrride this to do stuffs when doing action state changes
-    /// </summary>
-    /// <param name="doingAction"></param>
-    protected virtual void OnIsDoingActionChange(bool doingAction)
-    {
-        if (onIsDoingActionChange != null)
-            onIsDoingActionChange.Invoke(doingAction);
-    }
-
-    /// <summary>
     /// Override this to do stuffs when hidding state changes
     /// </summary>
     /// <param name="isHidding"></param>
@@ -1810,7 +1798,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected virtual void Killed(BaseCharacterEntity lastAttacker)
     {
         StopAllCoroutines();
-        isDoingAction.Value = false;
         buffs.Clear();
         var count = skills.Count;
         for (var i = 0; i < count; ++i)
@@ -1846,6 +1833,11 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         shouldRecaches = false;
     }
 
+    public virtual bool IsPlayingActionAnimation()
+    {
+        return animActionType == AnimActionTypes.Attack || animActionType == AnimActionTypes.Skill;
+    }
+
     internal virtual void IncreaseExp(int exp)
     {
         if (!IsServer)
@@ -1856,7 +1848,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         // Send OnLevelUp to owner player only
         RequestOnLevelUp();
     }
-
     protected abstract bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity);
     protected abstract bool IsAlly(BaseCharacterEntity characterEntity);
     protected abstract bool IsEnemy(BaseCharacterEntity characterEntity);
