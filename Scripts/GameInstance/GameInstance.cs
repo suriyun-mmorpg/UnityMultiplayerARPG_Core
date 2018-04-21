@@ -179,7 +179,13 @@ public class GameInstance : MonoBehaviour
             Debug.LogError("You must set ui scene gameplay prefab");
             return;
         }
-        
+        StartCoroutine(LoadData());
+    }
+
+    IEnumerator LoadData()
+    {
+        yield return null;
+
         Attributes.Clear();
         Items.Clear();
         Skills.Clear();
@@ -189,8 +195,11 @@ public class GameInstance : MonoBehaviour
         DamageEntities.Clear();
         ActionAnimations.Clear();
         GameEffectCollections.Clear();
-
+        
+        // Use Resources Load Async ?
         var gameDataList = Resources.LoadAll<BaseGameData>("");
+        yield return null;
+
         var attributes = new List<Attribute>();
         var damageElements = new List<DamageElement>();
         var items = new List<Item>();
@@ -229,6 +238,9 @@ public class GameInstance : MonoBehaviour
                 weaponHitEffects.Add(damageElement.hitEffects);
         }
         AddGameEffectCollections(GameEffectCollectionType.WeaponHit, weaponHitEffects);
+
+        yield return null;
+        UISceneLoading.Singleton.LoadScene(homeScene);
     }
 
     public static void AddAttributes(IEnumerable<Attribute> attributes)
