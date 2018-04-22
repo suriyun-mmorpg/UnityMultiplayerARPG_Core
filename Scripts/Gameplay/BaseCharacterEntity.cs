@@ -891,7 +891,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     public virtual void RequestUseSkill(Vector3 position, int skillIndex)
     {
-        if (CurrentHp <= 0 || IsPlayingActionAnimation())
+        if (CurrentHp <= 0 || IsPlayingActionAnimation() || skillIndex < 0 || skillIndex >= skills.Count || !skills[skillIndex].CanUse(this))
             return;
         CallNetFunction("UseSkill", FunctionReceivers.Server, position, skillIndex);
     }
@@ -1758,6 +1758,26 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             minFov = tempFov;
         }
         return minFov;
+    }
+
+    public virtual float GetSkillAttackDistance(Skill skill)
+    {
+        if (skill == null || !skill.IsAttack())
+            return 0f;
+        if (skill.skillAttackType == SkillAttackType.Normal)
+            return skill.damageInfo.hitDistance;
+        else
+            return GetAttackDistance();
+    }
+
+    public virtual float GetSkillAttackFov(Skill skill)
+    {
+        if (skill == null || !skill.IsAttack())
+            return 0f;
+        if (skill.skillAttackType == SkillAttackType.Normal)
+            return skill.damageInfo.hitFov;
+        else
+            return GetAttackFov();
     }
 
     public virtual void LaunchDamageEntity(
