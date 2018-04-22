@@ -325,7 +325,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
         character = null;
         if (CacheCharacterEntity.TryGetTargetEntity(out character))
         {
-            // TODO: Get Pvp characters
+            // TODO: Returning Pvp characters
             if (character is MonsterCharacterEntity)
                 return true;
             else
