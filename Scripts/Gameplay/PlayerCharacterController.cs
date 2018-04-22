@@ -157,14 +157,18 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 StopPointClickMove();
                 return;
             }
-            var actDistance = attackDistance;
+            var actDistance = CacheCharacterEntity.GetAttackDistance();
             actDistance -= actDistance * 0.1f;
             actDistance -= stoppingDistance;
             actDistance += targetMonster.CacheCapsuleCollider.radius;
             if (Vector3.Distance(CacheCharacterTransform.position, targetMonster.CacheTransform.position) <= actDistance)
             {
                 StopPointClickMove();
-                RequestAttack();
+                var halfFov = CacheCharacterEntity.GetAttackFov() * 0.5f;
+                var targetDir = (CacheCharacterTransform.position - targetMonster.CacheTransform.position).normalized;
+                var angle = Vector3.Angle(targetDir, CacheCharacterTransform.forward);
+                if (angle < 180 + halfFov && angle > 180 - halfFov)
+                    RequestAttack();
             }
             else
                 UpdateTargetEntityPosition(targetMonster);

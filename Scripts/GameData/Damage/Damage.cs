@@ -38,6 +38,21 @@ public class DamageInfo
         }
         return distance;
     }
+
+    public float GetFov()
+    {
+        var fov = 0f;
+        switch (damageType)
+        {
+            case DamageType.Melee:
+                fov = hitFov;
+                break;
+            case DamageType.Missile:
+                fov = 1f;
+                break;
+        }
+        return fov;
+    }
 }
 
 [System.Serializable]
