@@ -26,11 +26,6 @@ public abstract class BasePlayerCharacterController : MonoBehaviour
         get { return CacheCharacterEntity.CacheTransform; }
     }
 
-    public float attackDistance
-    {
-        get { return CacheCharacterEntity.GetAttackDistance(); }
-    }
-
     public float stoppingDistance
     {
         get { return CacheCharacterEntity.stoppingDistance; }

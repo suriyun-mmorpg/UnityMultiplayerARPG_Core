@@ -1728,6 +1728,38 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         return minDistance;
     }
 
+    public virtual float GetAttackFov()
+    {
+        float minFov = float.MaxValue;
+        DamageInfo tempDamageInfo;
+        float tempFov = 0f;
+        var rightHand = EquipWeapons.rightHand;
+        var leftHand = EquipWeapons.leftHand;
+        var rightHandWeapon = rightHand.GetWeaponItem();
+        var leftHandWeapon = leftHand.GetWeaponItem();
+        if (rightHandWeapon != null)
+        {
+            tempDamageInfo = rightHandWeapon.WeaponType.damageInfo;
+            tempFov = tempDamageInfo.GetFov();
+            if (minFov > tempFov)
+                minFov = tempFov;
+        }
+        if (leftHandWeapon != null)
+        {
+            tempDamageInfo = leftHandWeapon.WeaponType.damageInfo;
+            tempFov = tempDamageInfo.GetFov();
+            if (minFov > tempFov)
+                minFov = tempFov;
+        }
+        if (rightHandWeapon == null && leftHandWeapon == null)
+        {
+            tempDamageInfo = GameInstance.Singleton.DefaultWeaponItem.WeaponType.damageInfo;
+            tempFov = tempDamageInfo.GetFov();
+            minFov = tempFov;
+        }
+        return minFov;
+    }
+
     public virtual void LaunchDamageEntity(
         Vector3 position,
         DamageInfo damageInfo,
