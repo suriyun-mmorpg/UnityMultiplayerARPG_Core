@@ -26,8 +26,14 @@ public class Item : BaseGameData
     public float weight;
     public GameObject dropModel;
 
-    [Space(10)]
-    [Header("Equipment")]
+    // Armor
+    public ArmorType armorType;
+
+    // Weapon
+    public WeaponType weaponType;
+    public DamageIncremental damageAmount;
+
+    // Equipment
     public EquipmentModel[] equipmentModels;
     [Tooltip("This will be available with `Weapon` item, set it in case that it will be equipped at left hand")]
     public EquipmentModel[] subEquipmentModels;
@@ -36,18 +42,8 @@ public class Item : BaseGameData
     public ResistanceIncremental[] increaseResistances;
     public DamageIncremental[] increaseDamages;
     public CharacterStatsIncremental increaseStats;
-
-    [Space(10)]
-    [Header("Armor")]
-    public ArmorType armorType;
-
-    [Space(10)]
-    [Header("Weapon")]
-    public WeaponType weaponType;
-    public DamageIncremental damageAmount;
-
-    [Space(10)]
-    [Header("Potion")]
+    
+    // Potion
     public Buff buff;
 
 #if UNITY_EDITOR
