@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 
 [CustomEditor(typeof(Item))]
+[CanEditMultipleObjects]
 public class ItemEditor : BaseCustomEditor
 {
     private static Item cacheItem;
