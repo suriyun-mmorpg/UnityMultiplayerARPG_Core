@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BaseCharacterDatabase : BaseGameData
+public abstract class BaseCharacter : BaseGameData
 {
     public CharacterModel model;
 

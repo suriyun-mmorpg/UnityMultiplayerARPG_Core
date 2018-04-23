@@ -37,8 +37,8 @@ public static class PlayerCharacterDataExtension
     public static T ValidateCharacterData<T>(this T character) where T : IPlayerCharacterData
     {
         var gameInstance = GameInstance.Singleton;
-        PlayerCharacterDatabase database;
-        if (!GameInstance.PlayerCharacterDatabases.TryGetValue(character.DatabaseId, out database))
+        PlayerCharacter database;
+        if (!GameInstance.PlayerCharacters.TryGetValue(character.DatabaseId, out database))
             return character;
         // Validating character attributes
         var returningStatPoint = 0;
@@ -153,11 +153,11 @@ public static class PlayerCharacterDataExtension
     public static T SetNewCharacterData<T>(this T character, string characterName, string databaseId) where T : IPlayerCharacterData
     {
         var gameInstance = GameInstance.Singleton;
-        PlayerCharacterDatabase database;
-        if (!GameInstance.PlayerCharacterDatabases.TryGetValue(databaseId, out database))
+        PlayerCharacter database;
+        if (!GameInstance.PlayerCharacters.TryGetValue(databaseId, out database))
             return character;
         // Player character database
-        var playerCharacterDatabase = database as PlayerCharacterDatabase;
+        var playerCharacter = database as PlayerCharacter;
         // Attributes
         var attributes = GameInstance.Attributes.Values;
         foreach (var attribute in attributes)
@@ -167,7 +167,7 @@ public static class PlayerCharacterDataExtension
             characterAttribute.amount = 0;
             character.Attributes.Add(characterAttribute);
         }
-        var skills = playerCharacterDatabase.skills;
+        var skills = playerCharacter.skills;
         foreach (var skill in skills)
         {
             var characterSkill = new CharacterSkill();
@@ -176,8 +176,8 @@ public static class PlayerCharacterDataExtension
             character.Skills.Add(characterSkill);
         }
         // Right hand & left hand items
-        var rightHandEquipItem = playerCharacterDatabase.rightHandEquipItem;
-        var leftHandEquipItem = playerCharacterDatabase.leftHandEquipItem;
+        var rightHandEquipItem = playerCharacter.rightHandEquipItem;
+        var leftHandEquipItem = playerCharacter.leftHandEquipItem;
         var equipWeapons = new EquipWeapons();
         // Right hand equipped item
         if (rightHandEquipItem != null)
@@ -201,7 +201,7 @@ public static class PlayerCharacterDataExtension
         }
         character.EquipWeapons = equipWeapons;
         // Armors
-        var armorItems = playerCharacterDatabase.armorItems;
+        var armorItems = playerCharacter.armorItems;
         foreach (var armorItem in armorItems)
         {
             if (armorItem == null)

@@ -5,7 +5,7 @@ using LiteNetLibHighLevel;
 
 public class MonsterSpawnArea : MonoBehaviour
 {
-    public MonsterCharacterDatabase database;
+    public MonsterCharacter database;
     public int level = 1;
     public int amount = 1;
     public float randomRadius = 5f;
@@ -19,8 +19,8 @@ public class MonsterSpawnArea : MonoBehaviour
         }
         var gameInstance = GameInstance.Singleton;
         var databaseId = database.Id;
-        MonsterCharacterDatabase foundDatabase;
-        if (!GameInstance.MonsterCharacterDatabases.TryGetValue(databaseId, out foundDatabase))
+        MonsterCharacter foundDatabase;
+        if (!GameInstance.MonsterCharacters.TryGetValue(databaseId, out foundDatabase))
         {
             Debug.LogWarning("The monster database have to be added to game instance");
             return;

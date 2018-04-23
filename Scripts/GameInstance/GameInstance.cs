@@ -49,9 +49,9 @@ public class GameInstance : MonoBehaviour
     public int maxCharacterNameLength = 16;
     public static readonly Dictionary<string, Attribute> Attributes = new Dictionary<string, Attribute>();
     public static readonly Dictionary<string, Item> Items = new Dictionary<string, Item>();
-    public static readonly Dictionary<string, BaseCharacterDatabase> AllCharacterDatabases = new Dictionary<string, BaseCharacterDatabase>();
-    public static readonly Dictionary<string, PlayerCharacterDatabase> PlayerCharacterDatabases = new Dictionary<string, PlayerCharacterDatabase>();
-    public static readonly Dictionary<string, MonsterCharacterDatabase> MonsterCharacterDatabases = new Dictionary<string, MonsterCharacterDatabase>();
+    public static readonly Dictionary<string, BaseCharacter> AllCharacters = new Dictionary<string, BaseCharacter>();
+    public static readonly Dictionary<string, PlayerCharacter> PlayerCharacters = new Dictionary<string, PlayerCharacter>();
+    public static readonly Dictionary<string, MonsterCharacter> MonsterCharacters = new Dictionary<string, MonsterCharacter>();
     public static readonly Dictionary<string, BaseDamageEntity> DamageEntities = new Dictionary<string, BaseDamageEntity>();
     public static readonly Dictionary<string, Skill> Skills = new Dictionary<string, Skill>();
     public static readonly Dictionary<int, ActionAnimation> ActionAnimations = new Dictionary<int, ActionAnimation>();
@@ -189,9 +189,9 @@ public class GameInstance : MonoBehaviour
         Attributes.Clear();
         Items.Clear();
         Skills.Clear();
-        AllCharacterDatabases.Clear();
-        PlayerCharacterDatabases.Clear();
-        MonsterCharacterDatabases.Clear();
+        AllCharacters.Clear();
+        PlayerCharacters.Clear();
+        MonsterCharacters.Clear();
         DamageEntities.Clear();
         ActionAnimations.Clear();
         GameEffectCollections.Clear();
@@ -204,8 +204,8 @@ public class GameInstance : MonoBehaviour
         var damageElements = new List<DamageElement>();
         var items = new List<Item>();
         var skills = new List<Skill>();
-        var playerCharacterDatabases = new List<BaseCharacterDatabase>();
-        var monsterCharacterDatabases = new List<BaseCharacterDatabase>();
+        var playerCharacters = new List<BaseCharacter>();
+        var monsterCharacters = new List<BaseCharacter>();
         // Filtering game data
         foreach (var gameData in gameDataList)
         {
@@ -217,10 +217,10 @@ public class GameInstance : MonoBehaviour
                 items.Add(gameData as Item);
             if (gameData is Skill)
                 skills.Add(gameData as Skill);
-            if (gameData is PlayerCharacterDatabase)
-                playerCharacterDatabases.Add(gameData as PlayerCharacterDatabase);
-            if (gameData is MonsterCharacterDatabase)
-                monsterCharacterDatabases.Add(gameData as MonsterCharacterDatabase);
+            if (gameData is PlayerCharacter)
+                playerCharacters.Add(gameData as PlayerCharacter);
+            if (gameData is MonsterCharacter)
+                monsterCharacters.Add(gameData as MonsterCharacter);
         }
         items.Add(DefaultWeaponItem);
         damageElements.Add(DefaultDamageElement);
@@ -228,8 +228,8 @@ public class GameInstance : MonoBehaviour
         AddAttributes(attributes);
         AddItems(items);
         AddSkills(skills);
-        AddCharacterDatabases(playerCharacterDatabases);
-        AddCharacterDatabases(monsterCharacterDatabases);
+        AddCharacters(playerCharacters);
+        AddCharacters(monsterCharacters);
 
         var weaponHitEffects = new List<GameEffectCollection>();
         foreach (var damageElement in damageElements)
@@ -276,23 +276,23 @@ public class GameInstance : MonoBehaviour
         AddDamageEntities(damageEntities);
     }
 
-    public static void AddCharacterDatabases(IEnumerable<BaseCharacterDatabase> characterDatabases)
+    public static void AddCharacters(IEnumerable<BaseCharacter> characters)
     {
-        foreach (var characterDatabase in characterDatabases)
+        foreach (var character in characters)
         {
-            if (characterDatabase == null || AllCharacterDatabases.ContainsKey(characterDatabase.Id))
+            if (character == null || AllCharacters.ContainsKey(character.Id))
                 continue;
-            AllCharacterDatabases[characterDatabase.Id] = characterDatabase;
-            if (characterDatabase is PlayerCharacterDatabase)
+            AllCharacters[character.Id] = character;
+            if (character is PlayerCharacter)
             {
-                var playerCharacterDatabase = characterDatabase as PlayerCharacterDatabase;
-                PlayerCharacterDatabases[characterDatabase.Id] = playerCharacterDatabase;
+                var playerCharacter = character as PlayerCharacter;
+                PlayerCharacters[character.Id] = playerCharacter;
             }
-            else if (characterDatabase is MonsterCharacterDatabase)
+            else if (character is MonsterCharacter)
             {
-                var monsterCharacterDatabase = characterDatabase as MonsterCharacterDatabase;
-                MonsterCharacterDatabases[characterDatabase.Id] = monsterCharacterDatabase;
-                AddActionAnimations(ActionAnimationType.MonsterAttack, monsterCharacterDatabase.attackAnimations);
+                var monsterCharacter = character as MonsterCharacter;
+                MonsterCharacters[character.Id] = monsterCharacter;
+                AddActionAnimations(ActionAnimationType.MonsterAttack, monsterCharacter.attackAnimations);
             }
         }
     }

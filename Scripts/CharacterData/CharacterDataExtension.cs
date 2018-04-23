@@ -4,10 +4,10 @@ using UnityEngine;
 
 public static class CharacterDataExtension
 {
-    public static BaseCharacterDatabase GetDatabase(this ICharacterData data)
+    public static BaseCharacter GetDatabase(this ICharacterData data)
     {
-        BaseCharacterDatabase database = null;
-        if (string.IsNullOrEmpty(data.DatabaseId) || !GameInstance.AllCharacterDatabases.TryGetValue(data.DatabaseId, out database))
+        BaseCharacter database = null;
+        if (string.IsNullOrEmpty(data.DatabaseId) || !GameInstance.AllCharacters.TryGetValue(data.DatabaseId, out database))
             return null;
 
         return database;
@@ -15,11 +15,11 @@ public static class CharacterDataExtension
 
     public static CharacterModel InstantiateModel(this ICharacterData data, Transform parent)
     {
-        BaseCharacterDatabase characterDatabase = null;
-        if (string.IsNullOrEmpty(data.DatabaseId) || !GameInstance.AllCharacterDatabases.TryGetValue(data.DatabaseId, out characterDatabase))
+        BaseCharacter character = null;
+        if (string.IsNullOrEmpty(data.DatabaseId) || !GameInstance.AllCharacters.TryGetValue(data.DatabaseId, out character))
             return null;
 
-        var result = Object.Instantiate(characterDatabase.model, parent);
+        var result = Object.Instantiate(character.model, parent);
         result.gameObject.SetLayerRecursively(GameInstance.Singleton.characterLayer, true);
         result.gameObject.SetActive(true);
         result.transform.localPosition = Vector3.zero;
@@ -71,10 +71,10 @@ public static class CharacterDataExtension
             return new Dictionary<Attribute, int>();
         var result = new Dictionary<Attribute, int>();
         // Attributes from character database
-        var characterDatabase = data.GetDatabase();
-        if (characterDatabase != null)
+        var character = data.GetDatabase();
+        if (character != null)
             result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
-                characterDatabase.GetCharacterAttributes(data.Level));
+                character.GetCharacterAttributes(data.Level));
 
         // Added attributes
         var characterAttributes = data.Attributes;
@@ -151,10 +151,10 @@ public static class CharacterDataExtension
         if (data == null)
             return new Dictionary<DamageElement, float>();
         var result = new Dictionary<DamageElement, float>();
-        var characterDatabase = data.GetDatabase();
-        if (characterDatabase != null)
+        var character = data.GetDatabase();
+        if (character != null)
             result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
-                characterDatabase.GetCharacterResistances(data.Level));
+                character.GetCharacterResistances(data.Level));
         return result;
     }
 
@@ -273,10 +273,10 @@ public static class CharacterDataExtension
         if (data == null)
             return new CharacterStats();
         var level = data.Level;
-        var characterDatabase = data.GetDatabase();
+        var character = data.GetDatabase();
         var result = new CharacterStats();
-        if (characterDatabase != null)
-            result += characterDatabase.GetCharacterStats(level);
+        if (character != null)
+            result += character.GetCharacterStats(level);
         result += GameDataHelpers.CaculateStats(GetAttributes(data));
         return result;
     }

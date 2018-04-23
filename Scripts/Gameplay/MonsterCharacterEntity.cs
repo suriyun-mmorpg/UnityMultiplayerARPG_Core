@@ -42,9 +42,9 @@ public class MonsterCharacterEntity : BaseCharacterEntity
     #endregion
 
     #region Fields/Cache components
-    public MonsterCharacterDatabase MonsterDatabase
+    public MonsterCharacter MonsterDatabase
     {
-        get { return database as MonsterCharacterDatabase; }
+        get { return database as MonsterCharacter; }
     }
 
     private NavMeshAgent cacheNavMeshAgent;

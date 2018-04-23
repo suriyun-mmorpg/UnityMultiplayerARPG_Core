@@ -50,18 +50,18 @@ public class UICharacterCreate : UIBase
     {
         SelectionManager.Clear();
         // Show list of characters that can be create
-        var selectableCharacters = GameInstance.PlayerCharacterDatabases.Values.ToList();
-        CacheList.Generate(selectableCharacters, (index, characterDatabase, ui) =>
+        var selectableCharacters = GameInstance.PlayerCharacters.Values.ToList();
+        CacheList.Generate(selectableCharacters, (index, character, ui) =>
         {
-            var databaseId = characterDatabase.Id;
-            var character = new PlayerCharacterData();
-            character.Id = databaseId;
-            character.SetNewCharacterData(characterDatabase.title, characterDatabase.Id);
+            var databaseId = character.Id;
+            var characterData = new PlayerCharacterData();
+            characterData.Id = databaseId;
+            characterData.SetNewCharacterData(character.title, character.Id);
             var uiCharacter = ui.GetComponent<UICharacter>();
-            uiCharacter.Setup(character, databaseId);
+            uiCharacter.Setup(characterData, databaseId);
             // Select trigger when add first entry so deactivate all models is okay beacause first model will active
-            var characterModel = character.InstantiateModel(characterModelContainer);
-            CharacterModels[character.Id] = characterModel;
+            var characterModel = characterData.InstantiateModel(characterModelContainer);
+            CharacterModels[characterData.Id] = characterModel;
             characterModel.gameObject.SetActive(false);
             SelectionManager.Add(uiCharacter);
         });

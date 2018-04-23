@@ -9,8 +9,15 @@ public enum MonsterCharacteristic
     Assist,
 }
 
-[CreateAssetMenu(fileName = "MonsterCharacterDatabase", menuName = "Create GameData/MonsterCharacterDatabase")]
-public class MonsterCharacterDatabase : BaseCharacterDatabase
+[System.Serializable]
+public struct MonsterCharacterAmountPair
+{
+    public MonsterCharacter monster;
+    public int amount;
+}
+
+[CreateAssetMenu(fileName = "MonsterCharacter", menuName = "Create GameData/MonsterCharacter")]
+public class MonsterCharacter : BaseCharacter
 {
     [Header("Monster Data")]
     public MonsterCharacteristic characteristic;

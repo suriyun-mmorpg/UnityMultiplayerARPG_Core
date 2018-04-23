@@ -69,7 +69,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Protected data
-    protected BaseCharacterDatabase database;
+    protected BaseCharacter database;
     protected RpgNetworkEntity targetEntity;
     protected CharacterModel model;
     protected readonly Dictionary<string, int> buffIndexes = new Dictionary<string, int>();
@@ -1289,7 +1289,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected virtual void OnDatabaseIdChange(string databaseId)
     {
         // Get database
-        GameInstance.AllCharacterDatabases.TryGetValue(databaseId, out database);
+        GameInstance.AllCharacters.TryGetValue(databaseId, out database);
 
         // Setup model
         if (model != null)

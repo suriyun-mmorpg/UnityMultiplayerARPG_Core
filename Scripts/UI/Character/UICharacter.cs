@@ -254,17 +254,17 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         if (uiCharacterBuffs != null)
             uiCharacterBuffs.UpdateData(Data);
 
-        var characterDatabase = Data == null ? null : Data.GetDatabase();
+        var character = Data == null ? null : Data.GetDatabase();
         if (textClassTitle != null)
-            textClassTitle.text = string.Format(classTitleFormat, characterDatabase == null ? "N/A" : characterDatabase.title);
+            textClassTitle.text = string.Format(classTitleFormat, character == null ? "N/A" : character.title);
 
         if (textClassDescription != null)
-            textClassDescription.text = string.Format(classDescriptionFormat, characterDatabase == null ? "N/A" : characterDatabase.description);
+            textClassDescription.text = string.Format(classDescriptionFormat, character == null ? "N/A" : character.description);
 
         if (imageClassIcon != null)
         {
-            imageClassIcon.sprite = characterDatabase == null ? null : characterDatabase.icon;
-            imageClassIcon.gameObject.SetActive(characterDatabase != null);
+            imageClassIcon.sprite = character == null ? null : character.icon;
+            imageClassIcon.gameObject.SetActive(character != null);
         }
     }
 }
