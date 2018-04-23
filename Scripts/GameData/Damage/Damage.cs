@@ -12,16 +12,19 @@ public enum DamageType
 public class DamageInfo
 {
     public DamageType damageType;
-
-    [Header("Melee damage settings")]
+    
     [Tooltip("This will be sum with character's radius before find hitting characters")]
+    [StringShowConditional(conditionFieldName: "damageType", conditionValue: "Melee")]
     public float hitDistance = 1f;
     [Range(0f, 360f)]
+    [StringShowConditional(conditionFieldName: "damageType", conditionValue: "Melee")]
     public float hitFov;
-
-    [Header("Missile damage settings")]
+    
+    [StringShowConditional(conditionFieldName: "damageType", conditionValue: "Missile")]
     public float missileDistance = 5f;
+    [StringShowConditional(conditionFieldName: "damageType", conditionValue: "Missile")]
     public float missileSpeed = 5f;
+    [StringShowConditional(conditionFieldName: "damageType", conditionValue: "Missile")]
     public MissileDamageEntity missileDamageEntity;
     
     public float GetDistance()

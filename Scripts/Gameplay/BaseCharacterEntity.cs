@@ -1670,8 +1670,12 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                     // Assign damage data
                     damageInfo = skill.damageInfo;
                     // Calculate all damages
-                    allDamageAmounts = skill.GetDamageAmountWithInflictions(equipWeapon.level, this);
+                    allDamageAmounts = weapon.GetDamageAmountWithInflictions(equipWeapon.level, this, skill.GetWeaponDamageInflictions(characterSkill.level));
                     // Sum damage with additional damage amounts
+                    allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(
+                        allDamageAmounts, 
+                        skill.GetDamageAmount(characterSkill.level, this));
+                    // Sum damage with skill damage
                     allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(
                         allDamageAmounts,
                         skill.GetAdditionalDamageAmounts(characterSkill.level));
@@ -1680,7 +1684,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                     // Assign damage data
                     damageInfo = weaponType.damageInfo;
                     // Calculate all damages
-                    allDamageAmounts = weapon.GetDamageAmountWithInflictions(equipWeapon.level, this, skill.GetDamageInflictions(characterSkill.level));
+                    allDamageAmounts = weapon.GetDamageAmountWithInflictions(equipWeapon.level, this, skill.GetWeaponDamageInflictions(characterSkill.level));
                     // Sum damage with additional damage amounts
                     allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(
                         allDamageAmounts,

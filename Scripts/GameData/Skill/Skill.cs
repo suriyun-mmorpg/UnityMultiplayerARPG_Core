@@ -40,10 +40,8 @@ public class Skill : BaseGameData
     public DamageInfo damageInfo;
     public DamageEffectivenessAttribute[] effectivenessAttributes;
     public DamageIncremental damageAmount;
-    public DamageInflictionIncremental[] damageInflictions;
+    public DamageInflictionIncremental[] weaponDamageInflictions;
     public DamageIncremental[] additionalDamageAmounts;
-
-    [Header("Attack Debuff")]
     public bool isDebuff;
     public Buff debuff;
 

@@ -148,7 +148,7 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
 
         if (uiDamageInflictions != null)
         {
-            var damageInflictionRates = skill.GetDamageInflictions(level);
+            var damageInflictionRates = skill.GetWeaponDamageInflictions(level);
             if (!isAttack || damageInflictionRates == null || damageInflictionRates.Count == 0)
                 uiDamageInflictions.Hide();
             else
