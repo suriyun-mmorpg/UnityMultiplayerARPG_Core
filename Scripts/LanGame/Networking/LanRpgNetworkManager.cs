@@ -164,7 +164,7 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
         {
             var entry = new CharacterBuff();
             entry.dataId = reader.GetString();
-            entry.type = (BuffTypes)reader.GetByte();
+            entry.type = (BuffType)reader.GetByte();
             entry.level = reader.GetInt();
             entry.buffRemainsDuration = reader.GetFloat();
             character.Buffs.Add(entry);
@@ -203,7 +203,7 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
         {
             var entry = new CharacterHotkey();
             entry.hotkeyId = reader.GetString();
-            entry.type = (HotkeyTypes)reader.GetByte();
+            entry.type = (HotkeyType)reader.GetByte();
             entry.dataId = reader.GetString();
             character.Hotkeys.Add(entry);
         }

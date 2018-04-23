@@ -29,7 +29,7 @@ public class UICharacterHotkeys : UIBase
                 {
                     var characterHotkey = new CharacterHotkey();
                     characterHotkey.hotkeyId = id;
-                    characterHotkey.type = HotkeyTypes.None;
+                    characterHotkey.type = HotkeyType.None;
                     characterHotkey.dataId = string.Empty;
                     ui.Setup(characterHotkey, -1);
                     cacheUICharacterHotkeys.Add(id, ui);

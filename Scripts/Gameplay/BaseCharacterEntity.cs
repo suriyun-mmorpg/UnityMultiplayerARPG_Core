@@ -7,7 +7,7 @@ using LiteNetLibHighLevel;
 using UnityEditor;
 #endif
 
-public enum CombatAmountTypes : byte
+public enum CombatAmountType : byte
 {
     Miss,
     NormalDamage,
@@ -17,7 +17,7 @@ public enum CombatAmountTypes : byte
     MpRecovery,
 }
 
-public enum AnimActionTypes : byte
+public enum AnimActionType : byte
 {
     None,
     Generic,
@@ -76,7 +76,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
     protected Vector3? previousPosition;
     protected Vector3 currentVelocity;
-    protected AnimActionTypes animActionType;
+    protected AnimActionType animActionType;
     protected float recoveryingHp;
     protected float recoveryingMp;
     protected float skillBuffUpdateDeltaTime;
@@ -231,7 +231,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         var gameInstance = GameInstance.Singleton;
         gameObject.layer = gameInstance.characterLayer;
         skillBuffUpdateDeltaTime = 0;
-        animActionType = AnimActionTypes.None;
+        animActionType = AnimActionType.None;
         shouldRecaches = true;
     }
 
@@ -354,7 +354,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                     {
                         var intRecoveryingHp = (int)recoveryingHp;
                         CurrentHp += intRecoveryingHp;
-                        RequestCombatAmount(CombatAmountTypes.HpRecovery, intRecoveryingHp);
+                        RequestCombatAmount(CombatAmountType.HpRecovery, intRecoveryingHp);
                         recoveryingHp -= intRecoveryingHp;
                     }
                 }
@@ -367,7 +367,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                     {
                         var intRecoveryingMp = (int)recoveryingMp;
                         CurrentMp += intRecoveryingMp;
-                        RequestCombatAmount(CombatAmountTypes.MpRecovery, intRecoveryingMp);
+                        RequestCombatAmount(CombatAmountType.MpRecovery, intRecoveryingMp);
                         recoveryingMp -= intRecoveryingMp;
                     }
                 }
@@ -450,13 +450,13 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         RegisterNetFunction("Attack", new LiteNetLibFunction(() => NetFuncAttack()));
         RegisterNetFunction("UseSkill", new LiteNetLibFunction<NetFieldVector3, NetFieldInt>((position, skillIndex) => NetFuncUseSkill(position, skillIndex)));
         RegisterNetFunction("UseItem", new LiteNetLibFunction<NetFieldInt>((itemIndex) => NetFuncUseItem(itemIndex)));
-        RegisterNetFunction("PlayActionAnimation", new LiteNetLibFunction<NetFieldInt, NetFieldByte>((actionId, animActionTypes) => NetFuncPlayActionAnimation(actionId, (AnimActionTypes)animActionTypes.Value)));
+        RegisterNetFunction("PlayActionAnimation", new LiteNetLibFunction<NetFieldInt, NetFieldByte>((actionId, animActionType) => NetFuncPlayActionAnimation(actionId, (AnimActionType)animActionType.Value)));
         RegisterNetFunction("PlayEffect", new LiteNetLibFunction<NetFieldInt>((effectId) => NetFuncPlayEffect(effectId)));
         RegisterNetFunction("PickupItem", new LiteNetLibFunction(() => NetFuncPickupItem()));
         RegisterNetFunction("DropItem", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((index, amount) => NetFuncDropItem(index, amount)));
         RegisterNetFunction("EquipItem", new LiteNetLibFunction<NetFieldInt, NetFieldString>((nonEquipIndex, equipPosition) => NetFuncEquipItem(nonEquipIndex, equipPosition)));
         RegisterNetFunction("UnEquipItem", new LiteNetLibFunction<NetFieldString>((fromEquipPosition) => NetFuncUnEquipItem(fromEquipPosition)));
-        RegisterNetFunction("CombatAmount", new LiteNetLibFunction<NetFieldByte, NetFieldInt>((combatAmountTypes, amount) => NetFuncCombatAmount((CombatAmountTypes)combatAmountTypes.Value, amount)));
+        RegisterNetFunction("CombatAmount", new LiteNetLibFunction<NetFieldByte, NetFieldInt>((combatAmountType, amount) => NetFuncCombatAmount((CombatAmountType)combatAmountType.Value, amount)));
         RegisterNetFunction("SetTargetEntity", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncSetTargetEntity(objectId)));
         RegisterNetFunction("OnDead", new LiteNetLibFunction<NetFieldBool>((isInitialize) => NetFuncOnDead(isInitialize)));
         RegisterNetFunction("OnRespawn", new LiteNetLibFunction<NetFieldBool>((isInitialize) => NetFuncOnRespawn(isInitialize)));
@@ -501,7 +501,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             out allDamageAmounts);
         
         // Play animation on clients
-        RequestPlayActionAnimation(actionId, AnimActionTypes.Attack);
+        RequestPlayActionAnimation(actionId, AnimActionType.Attack);
         // Start attack routine
         StartCoroutine(AttackRoutine(CacheTransform.position, triggerDuration, totalDuration, damageInfo, allDamageAmounts));
     }
@@ -553,7 +553,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             out allDamageAmounts);
         
         // Play animation on clients
-        RequestPlayActionAnimation(actionId, AnimActionTypes.Skill);
+        RequestPlayActionAnimation(actionId, AnimActionType.Skill);
         // Start use skill routine
         StartCoroutine(UseSkillRoutine(skillIndex, position, triggerDuration, totalDuration, isAttack, damageInfo, allDamageAmounts));
     }
@@ -579,7 +579,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         {
             CharacterBuff? debuff = null;
             if (skill.isDebuff)
-                debuff = CharacterBuff.Create(Id, skill.Id, BuffTypes.SkillDebuff, characterSkill.level);
+                debuff = CharacterBuff.Create(Id, skill.Id, BuffType.SkillDebuff, characterSkill.level);
             LaunchDamageEntity(position, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id);
         }
         yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
@@ -607,14 +607,14 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// </summary>
     /// <param name="actionId"></param>
     /// <param name="animActionType"></param>
-    protected void NetFuncPlayActionAnimation(int actionId, AnimActionTypes animActionType)
+    protected void NetFuncPlayActionAnimation(int actionId, AnimActionType animActionType)
     {
         if (CurrentHp <= 0)
             return;
         StartCoroutine(PlayActionAnimationRoutine(actionId, animActionType));
     }
 
-    IEnumerator PlayActionAnimationRoutine(int actionId, AnimActionTypes animActionType)
+    IEnumerator PlayActionAnimationRoutine(int actionId, AnimActionType animActionType)
     {
         this.animActionType = animActionType;
         Animator animator = model == null ? null : model.CacheAnimator;
@@ -626,7 +626,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             var actionClipMultiplier = 1f;
             switch (animActionType)
             {
-                case AnimActionTypes.Attack:
+                case AnimActionType.Attack:
                     actionClipMultiplier = AttackSpeed;
                     break;
             }
@@ -635,7 +635,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             yield return new WaitForSecondsRealtime(actionAnimation.ClipLength / actionClipMultiplier);
             animator.SetBool(ANIM_DO_ACTION, false);
         }
-        this.animActionType = AnimActionTypes.None;
+        this.animActionType = AnimActionType.None;
     }
 
     /// <summary>
@@ -801,31 +801,31 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <summary>
     /// This will be called on clients to display combat texts
     /// </summary>
-    /// <param name="combatAmountTypes"></param>
+    /// <param name="combatAmountType"></param>
     /// <param name="amount"></param>
-    protected void NetFuncCombatAmount(CombatAmountTypes combatAmountTypes, int amount)
+    protected void NetFuncCombatAmount(CombatAmountType combatAmountType, int amount)
     {
         var uiSceneGameplay = UISceneGameplay.Singleton;
         if (uiSceneGameplay == null)
             return;
-        switch (combatAmountTypes)
+        switch (combatAmountType)
         {
-            case CombatAmountTypes.Miss:
+            case CombatAmountType.Miss:
                 SpawnCombatText(uiSceneGameplay.uiCombatTextMiss, amount);
                 break;
-            case CombatAmountTypes.NormalDamage:
+            case CombatAmountType.NormalDamage:
                 SpawnCombatText(uiSceneGameplay.uiCombatTextNormalDamage, amount);
                 break;
-            case CombatAmountTypes.CriticalDamage:
+            case CombatAmountType.CriticalDamage:
                 SpawnCombatText(uiSceneGameplay.uiCombatTextCriticalDamage, amount);
                 break;
-            case CombatAmountTypes.BlockedDamage:
+            case CombatAmountType.BlockedDamage:
                 SpawnCombatText(uiSceneGameplay.uiCombatTextBlockedDamage, amount);
                 break;
-            case CombatAmountTypes.HpRecovery:
+            case CombatAmountType.HpRecovery:
                 SpawnCombatText(uiSceneGameplay.uiCombatTextHpRecovery, amount);
                 break;
-            case CombatAmountTypes.MpRecovery:
+            case CombatAmountType.MpRecovery:
                 SpawnCombatText(uiSceneGameplay.uiCombatTextMpRecovery, amount);
                 break;
         }
@@ -862,14 +862,14 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected void NetFuncOnDead(bool isInitialize)
     {
-        animActionType = AnimActionTypes.None;
+        animActionType = AnimActionType.None;
         if (onDead != null)
             onDead.Invoke(isInitialize);
     }
 
     protected void NetFuncOnRespawn(bool isInitialize)
     {
-        animActionType = AnimActionTypes.None;
+        animActionType = AnimActionType.None;
         if (onRespawn != null)
             onRespawn.Invoke(isInitialize);
     }
@@ -903,7 +903,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         CallNetFunction("UseItem", FunctionReceivers.Server, itemIndex);
     }
 
-    public virtual void RequestPlayActionAnimation(int actionId, AnimActionTypes animActionType)
+    public virtual void RequestPlayActionAnimation(int actionId, AnimActionType animActionType)
     {
         if (CurrentHp <= 0 || actionId < 0)
             return;
@@ -945,9 +945,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         CallNetFunction("UnEquipItem", FunctionReceivers.Server, equipPosition);
     }
 
-    public virtual void RequestCombatAmount(CombatAmountTypes combatAmountTypes, int amount)
+    public virtual void RequestCombatAmount(CombatAmountType combatAmountType, int amount)
     {
-        CallNetFunction("CombatAmount", FunctionReceivers.All, combatAmountTypes, amount);
+        CallNetFunction("CombatAmount", FunctionReceivers.All, combatAmountType, amount);
     }
 
     public virtual void RequestSetTargetEntity(uint objectId)
@@ -1212,7 +1212,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         // If miss, return don't calculate damages
         if (Random.value > hitChance)
         {
-            ReceivedDamage(attacker, CombatAmountTypes.Miss, 0);
+            ReceivedDamage(attacker, CombatAmountType.Miss, 0);
             return;
         }
         // Calculate damages
@@ -1250,11 +1250,11 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         CurrentHp -= totalDamage;
 
         if (isBlocked)
-            ReceivedDamage(attacker, CombatAmountTypes.BlockedDamage, totalDamage);
+            ReceivedDamage(attacker, CombatAmountType.BlockedDamage, totalDamage);
         else if (isCritical)
-            ReceivedDamage(attacker, CombatAmountTypes.CriticalDamage, totalDamage);
+            ReceivedDamage(attacker, CombatAmountType.CriticalDamage, totalDamage);
         else
-            ReceivedDamage(attacker, CombatAmountTypes.NormalDamage, totalDamage);
+            ReceivedDamage(attacker, CombatAmountType.NormalDamage, totalDamage);
 
         if (model != null)
         {
@@ -1508,7 +1508,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Buffs / Weapons / Damage
-    protected void ApplyBuff(string dataId, BuffTypes type, int level)
+    protected void ApplyBuff(string dataId, BuffType type, int level)
     {
         var buffId = CharacterBuff.GetBuffId(Id, dataId, type);
         var buffIndex = -1;
@@ -1528,7 +1528,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         var item = characterItem.GetPotionItem();
         if (item == null)
             return;
-        ApplyBuff(item.Id, BuffTypes.PotionBuff, characterItem.level);
+        ApplyBuff(item.Id, BuffType.PotionBuff, characterItem.level);
     }
 
     protected void ApplySkillBuff(CharacterSkill characterSkill)
@@ -1537,7 +1537,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (skill == null)
             return;
         if (skill.skillBuffType == SkillBuffType.BuffToUser)
-            ApplyBuff(skill.Id, BuffTypes.SkillBuff, characterSkill.level);
+            ApplyBuff(skill.Id, BuffType.SkillBuff, characterSkill.level);
     }
 
     public CharacterItem GetRandomedWeapon(out bool isLeftHand)
@@ -1846,9 +1846,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         return CacheTransform;
     }
 
-    protected virtual void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountTypes damageAmountType, int damage)
+    protected virtual void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountType combatAmountType, int damage)
     {
-        RequestCombatAmount(damageAmountType, damage);
+        RequestCombatAmount(combatAmountType, damage);
     }
 
     protected virtual void Killed(BaseCharacterEntity lastAttacker)
@@ -1891,7 +1891,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     public virtual bool IsPlayingActionAnimation()
     {
-        return animActionType == AnimActionTypes.Attack || animActionType == AnimActionTypes.Skill;
+        return animActionType == AnimActionType.Attack || animActionType == AnimActionType.Skill;
     }
 
     internal virtual void IncreaseExp(int exp)

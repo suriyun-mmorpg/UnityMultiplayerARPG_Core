@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using LiteNetLib.Utils;
 using LiteNetLibHighLevel;
 
-public enum HotkeyTypes : byte
+public enum HotkeyType : byte
 {
     None,
     Skill,
@@ -14,10 +14,10 @@ public enum HotkeyTypes : byte
 public struct CharacterHotkey
 {
     public string hotkeyId;
-    public HotkeyTypes type;
+    public HotkeyType type;
     public string dataId;
     [System.NonSerialized]
-    private HotkeyTypes dirtyType;
+    private HotkeyType dirtyType;
     [System.NonSerialized]
     private string dirtyDataId;
     [System.NonSerialized]
@@ -27,7 +27,7 @@ public struct CharacterHotkey
 
     private void MakeCache()
     {
-        if (type == HotkeyTypes.None || string.IsNullOrEmpty(dataId))
+        if (type == HotkeyType.None || string.IsNullOrEmpty(dataId))
         {
             cacheSkill = null;
             cacheItem = null;
@@ -39,9 +39,9 @@ public struct CharacterHotkey
             dirtyType = type;
             cacheSkill = null;
             cacheItem = null;
-            if (type == HotkeyTypes.Skill)
+            if (type == HotkeyType.Skill)
                 cacheSkill = GameInstance.Skills.TryGetValue(dataId, out cacheSkill) ? cacheSkill : null;
-            if (type == HotkeyTypes.Item)
+            if (type == HotkeyType.Item)
                 cacheItem = GameInstance.Items.TryGetValue(dataId, out cacheItem) ? cacheItem : null;
         }
     }
@@ -65,7 +65,7 @@ public class NetFieldCharacterHotkey : LiteNetLibNetField<CharacterHotkey>
     {
         var newValue = new CharacterHotkey();
         newValue.hotkeyId = reader.GetString();
-        newValue.type = (HotkeyTypes)reader.GetByte();
+        newValue.type = (HotkeyType)reader.GetByte();
         newValue.dataId = reader.GetString();
         Value = newValue;
     }

@@ -378,7 +378,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     {
         var characterHotkey = new CharacterHotkey();
         characterHotkey.hotkeyId = hotkeyId;
-        characterHotkey.type = (HotkeyTypes)type;
+        characterHotkey.type = (HotkeyType)type;
         characterHotkey.dataId = dataId;
         var hotkeyIndex = hotkeys.IndexOf(hotkeyId);
         if (hotkeyIndex >= 0)
@@ -424,7 +424,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         CallNetFunction("Respawn", FunctionReceivers.Server);
     }
 
-    public void RequestAssignHotkey(string hotkeyId, HotkeyTypes type, string dataId)
+    public void RequestAssignHotkey(string hotkeyId, HotkeyType type, string dataId)
     {
         CallNetFunction("AssignHotkey", FunctionReceivers.Server, hotkeyId, (byte)type, dataId);
     }

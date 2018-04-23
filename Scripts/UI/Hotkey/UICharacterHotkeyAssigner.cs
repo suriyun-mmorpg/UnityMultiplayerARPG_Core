@@ -139,7 +139,7 @@ public class UICharacterHotkeyAssigner : UIBase
     {
         var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (owningCharacter != null)
-            owningCharacter.RequestAssignHotkey(hotkeyId, HotkeyTypes.Skill, ui.Data.Key.skillId);
+            owningCharacter.RequestAssignHotkey(hotkeyId, HotkeyType.Skill, ui.Data.Key.skillId);
         Hide();
     }
 
@@ -147,7 +147,7 @@ public class UICharacterHotkeyAssigner : UIBase
     {
         var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (owningCharacter != null)
-            owningCharacter.RequestAssignHotkey(hotkeyId, HotkeyTypes.Item, ui.Data.Key.itemId);
+            owningCharacter.RequestAssignHotkey(hotkeyId, HotkeyType.Item, ui.Data.Key.itemId);
         Hide();
     }
 
@@ -155,7 +155,7 @@ public class UICharacterHotkeyAssigner : UIBase
     {
         var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (owningCharacter != null)
-            owningCharacter.RequestAssignHotkey(hotkeyId, HotkeyTypes.None, string.Empty);
+            owningCharacter.RequestAssignHotkey(hotkeyId, HotkeyType.None, string.Empty);
         Hide();
     }
 }

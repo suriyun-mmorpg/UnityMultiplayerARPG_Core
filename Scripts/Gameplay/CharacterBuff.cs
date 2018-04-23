@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using LiteNetLib.Utils;
 using LiteNetLibHighLevel;
 
-public enum BuffTypes : byte
+public enum BuffType : byte
 {
     SkillBuff,
     SkillDebuff,
@@ -16,11 +16,11 @@ public struct CharacterBuff
     public static readonly CharacterBuff Empty = new CharacterBuff();
     public string characterId;
     public string dataId;
-    public BuffTypes type;
+    public BuffType type;
     public int level;
     public float buffRemainsDuration;
     [System.NonSerialized]
-    private BuffTypes dirtyType;
+    private BuffType dirtyType;
     [System.NonSerialized]
     private string dirtyDataId;
     [System.NonSerialized]
@@ -67,13 +67,13 @@ public struct CharacterBuff
             cacheSkill = null;
             cacheItem = null;
             cacheBuff = null;
-            if (type == BuffTypes.SkillBuff || type == BuffTypes.SkillDebuff)
+            if (type == BuffType.SkillBuff || type == BuffType.SkillDebuff)
             {
                 cacheSkill = GameInstance.Skills.TryGetValue(dataId, out cacheSkill) ? cacheSkill : null;
                 if (cacheSkill != null)
-                    cacheBuff = type == BuffTypes.SkillBuff ? cacheSkill.buff : cacheSkill.debuff;
+                    cacheBuff = type == BuffType.SkillBuff ? cacheSkill.buff : cacheSkill.debuff;
             }
-            if (type == BuffTypes.PotionBuff)
+            if (type == BuffType.PotionBuff)
             {
                 cacheItem = GameInstance.Items.TryGetValue(dataId, out cacheItem) ? cacheItem : null;
                 if (cacheItem != null)
@@ -192,7 +192,7 @@ public struct CharacterBuff
         return GetBuffId(characterId, dataId, type);
     }
 
-    public static CharacterBuff Create(string characterId, string dataId, BuffTypes type, int level)
+    public static CharacterBuff Create(string characterId, string dataId, BuffType type, int level)
     {
         var newBuff = new CharacterBuff();
         newBuff.characterId = characterId;
@@ -203,7 +203,7 @@ public struct CharacterBuff
         return newBuff;
     }
 
-    public static string GetBuffId(string characterId, string dataId, BuffTypes type)
+    public static string GetBuffId(string characterId, string dataId, BuffType type)
     {
         return string.Format("<{0}>_<{1}>_<{2}>", characterId, dataId, type.ToString());
     }
@@ -216,7 +216,7 @@ public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>
         var newValue = new CharacterBuff();
         newValue.characterId = reader.GetString();
         newValue.dataId = reader.GetString();
-        newValue.type = (BuffTypes)reader.GetByte();
+        newValue.type = (BuffType)reader.GetByte();
         newValue.level = reader.GetInt();
         newValue.buffRemainsDuration = reader.GetFloat();
         Value = newValue;
@@ -240,7 +240,7 @@ public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>
 [System.Serializable]
 public class SyncListCharacterBuff : LiteNetLibSyncList<NetFieldCharacterBuff, CharacterBuff>
 {
-    public int IndexOf(string characterId, string dataId, BuffTypes type)
+    public int IndexOf(string characterId, string dataId, BuffType type)
     {
         CharacterBuff tempBuff;
         var index = -1;

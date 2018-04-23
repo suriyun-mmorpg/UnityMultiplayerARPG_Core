@@ -353,7 +353,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         return MonsterDatabase.damageInfo.GetDistance();
     }
 
-    protected override void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountTypes damageAmountType, int damage)
+    protected override void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountType damageAmountType, int damage)
     {
         base.ReceivedDamage(attacker, damageAmountType, damage);
         // Add received damage entry

@@ -54,7 +54,7 @@ public class UICharacterBuff : UIDataForCharacter<CharacterBuff>
 
         collectedDeltaTime = 0f;
 
-        if (Data.type == BuffTypes.SkillBuff || Data.type == BuffTypes.SkillDebuff)
+        if (Data.type == BuffType.SkillBuff || Data.type == BuffType.SkillDebuff)
         {
             if (textTitle != null)
                 textTitle.text = string.Format(titleFormat, skill == null ? "Unknow" : skill.title);
@@ -66,7 +66,7 @@ public class UICharacterBuff : UIDataForCharacter<CharacterBuff>
             }
         }
 
-        if (Data.type == BuffTypes.PotionBuff)
+        if (Data.type == BuffType.PotionBuff)
         {
             if (textTitle != null)
                 textTitle.text = string.Format(titleFormat, item == null ? "Unknow" : item.title);
