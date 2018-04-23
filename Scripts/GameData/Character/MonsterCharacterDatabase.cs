@@ -28,9 +28,8 @@ public class MonsterCharacterDatabase : BaseCharacterDatabase
     public ActionAnimation[] attackAnimations;
 
     [Header("Weapon/Attack Abilities")]
-    public DamageElement damageElement;
-    public MinMaxFloat damageAmount;
     public DamageInfo damageInfo;
+    public DamageIncremental damageAmount;
 
     [Header("Killing Rewards")]
     public int randomExpMin;

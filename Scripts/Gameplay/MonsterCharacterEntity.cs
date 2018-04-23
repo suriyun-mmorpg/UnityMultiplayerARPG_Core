@@ -341,8 +341,8 @@ public class MonsterCharacterEntity : BaseCharacterEntity
 
         // Assign damage amounts
         allDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
-        var damageElement = MonsterDatabase.damageElement;
-        var damageAmount = MonsterDatabase.damageAmount;
+        var damageElement = MonsterDatabase.damageAmount.damageElement;
+        var damageAmount = MonsterDatabase.damageAmount.amount.GetAmount(Level);
         if (damageElement == null)
             damageElement = gameInstance.DefaultDamageElement;
         allDamageAmounts.Add(damageElement, damageAmount);
