@@ -363,4 +363,19 @@ public static class CharacterDataExtension
     {
         return data.GetStats().atkSpeed;
     }
+
+    public static int CountNonEquipItems(this ICharacterData data, string itemId)
+    {
+        var count = 0;
+        if (data != null && data.NonEquipItems.Count > 0)
+        {
+            var nonEquipItems = data.NonEquipItems;
+            foreach (var nonEquipItem in nonEquipItems)
+            {
+                if (nonEquipItem.itemId.Equals(itemId))
+                    count += nonEquipItem.amount;
+            }
+        }
+        return count;
+    }
 }

@@ -267,6 +267,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         gold.forOwnerOnly = false;
 
         hotkeys.forOwnerOnly = true;
+        quests.forOwnerOnly = true;
     }
 
     public override void OnSetup()

@@ -20,7 +20,7 @@ public class UICharacterQuest : UISelectionEntry<CharacterQuest>
     public Text textDescription;
     public Text textRewardGold;
     public Text textRewardExp;
-    public UICharacterSkill uiCharacterSkillPrefab;
+    public UIQuestTask uiQuestTaskPrefab;
     public UICharacterItem uiRewardItemPrefab;
     public Transform uiQuestTaskContainer;
     public Transform uiRewardItemContainer;
@@ -34,7 +34,7 @@ public class UICharacterQuest : UISelectionEntry<CharacterQuest>
             if (cacheQuestTaskList == null)
             {
                 cacheQuestTaskList = gameObject.AddComponent<UIList>();
-                cacheQuestTaskList.uiPrefab = uiCharacterSkillPrefab.gameObject;
+                cacheQuestTaskList.uiPrefab = uiQuestTaskPrefab.gameObject;
                 cacheQuestTaskList.uiContainer = uiQuestTaskContainer;
             }
             return cacheQuestTaskList;

@@ -40,6 +40,24 @@ public struct CharacterQuest
         return cacheQuest;
     }
 
+    public int GetProgress(ICharacterData character, int taskIndex)
+    {
+        var quest = GetQuest();
+        if (character == null || quest == null || taskIndex < 0 || taskIndex >= quest.tasks.Length)
+            return 0;
+        var task = quest.tasks[taskIndex];
+        switch (task.taskType)
+        {
+            case QuestTaskType.KillMonster:
+                var monsterCharacterAmount = task.monsterCharacterAmount;
+                return monsterCharacterAmount.monster == null ? 0 : CountKillMonster(monsterCharacterAmount.monster.Id);
+            case QuestTaskType.CollectItem:
+                var itemAmount = task.itemAmount;
+                return itemAmount.item == null ? 0 : character.CountNonEquipItems(itemAmount.item.Id);
+        }
+        return 0;
+    }
+
     public void AddKillMonster(MonsterCharacterEntity monsterEntity, int killCount)
     {
         AddKillMonster(monsterEntity.DatabaseId, killCount);
@@ -55,6 +73,14 @@ public struct CharacterQuest
         if (!killedMonsters.ContainsKey(monsterId))
             killedMonsters.Add(monsterId, 0);
         killedMonsters[monsterId] += killCount;
+    }
+
+    public int CountKillMonster(string monsterId)
+    {
+        var count = 0;
+        if (!string.IsNullOrEmpty(monsterId))
+            killedMonsters.TryGetValue(monsterId, out count);
+        return count;
     }
 }
 
