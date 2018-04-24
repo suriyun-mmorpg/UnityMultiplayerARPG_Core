@@ -240,19 +240,4 @@ public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>
 [System.Serializable]
 public class SyncListCharacterBuff : LiteNetLibSyncList<NetFieldCharacterBuff, CharacterBuff>
 {
-    public int IndexOf(string characterId, string dataId, BuffType type)
-    {
-        CharacterBuff tempBuff;
-        var index = -1;
-        for (var i = 0; i < list.Count; ++i)
-        {
-            tempBuff = list[i];
-            if (tempBuff.characterId.Equals(characterId) && tempBuff.dataId.Equals(dataId) && tempBuff.type == type)
-            {
-                index = i;
-                break;
-            }
-        }
-        return index;
-    }
 }

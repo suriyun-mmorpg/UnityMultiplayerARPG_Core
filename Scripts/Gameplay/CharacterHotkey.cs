@@ -86,21 +86,5 @@ public class NetFieldCharacterHotkey : LiteNetLibNetField<CharacterHotkey>
 [System.Serializable]
 public class SyncListCharacterHotkey : LiteNetLibSyncList<NetFieldCharacterHotkey, CharacterHotkey>
 {
-    public int IndexOf(string hotkeyId)
-    {
-        CharacterHotkey tempHotkey;
-        var index = -1;
-        for (var i = 0; i < list.Count; ++i)
-        {
-            tempHotkey = list[i];
-            if (!string.IsNullOrEmpty(tempHotkey.hotkeyId) &&
-                tempHotkey.hotkeyId.Equals(hotkeyId))
-            {
-                index = i;
-                break;
-            }
-        }
-        return index;
-    }
 }
 

@@ -163,20 +163,4 @@ public class NetFieldCharacterQuest : LiteNetLibNetField<CharacterQuest>
 [System.Serializable]
 public class SyncListCharacterQuest : LiteNetLibSyncList<NetFieldCharacterQuest, CharacterQuest>
 {
-    public int IndexOf(string questId)
-    {
-        CharacterQuest tempQuest;
-        var index = -1;
-        for (var i = 0; i < list.Count; ++i)
-        {
-            tempQuest = list[i];
-            if (!string.IsNullOrEmpty(tempQuest.questId) &&
-                tempQuest.questId.Equals(questId))
-            {
-                index = i;
-                break;
-            }
-        }
-        return index;
-    }
 }

@@ -50,7 +50,7 @@ public class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
                 uiCharacterSkill.Hide();
             else
             {
-                var index = owningCharacter.skills.IndexOf(characterHotkey.dataId);
+                var index = owningCharacter.IndexOfSkill(characterHotkey.dataId);
                 if (index >= 0 && index < owningCharacter.skills.Count)
                 {
                     var characterSkill = owningCharacter.skills[index];
@@ -68,7 +68,7 @@ public class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
                 uiCharacterItem.Hide();
             else
             {
-                var index = owningCharacter.nonEquipItems.IndexOf(characterHotkey.dataId);
+                var index = owningCharacter.IndexOfNonEquipItem(characterHotkey.dataId);
                 if (index >= 0 && index < owningCharacter.nonEquipItems.Count)
                 {
                     var characterItem = owningCharacter.nonEquipItems[index];

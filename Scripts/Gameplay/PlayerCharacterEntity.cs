@@ -395,7 +395,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         characterHotkey.hotkeyId = hotkeyId;
         characterHotkey.type = (HotkeyType)type;
         characterHotkey.dataId = dataId;
-        var hotkeyIndex = hotkeys.IndexOf(hotkeyId);
+        var hotkeyIndex = this.IndexOfHotkey(hotkeyId);
         if (hotkeyIndex >= 0)
             hotkeys[hotkeyIndex] = characterHotkey;
         else

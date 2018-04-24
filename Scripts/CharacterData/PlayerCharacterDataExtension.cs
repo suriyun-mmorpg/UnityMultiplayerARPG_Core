@@ -317,4 +317,40 @@ public static class PlayerCharacterDataExtension
         }
         DeletePersistentCharacterData(characterData.Id);
     }
+
+    public static int IndexOfHotkey(this IPlayerCharacterData data, string hotkeyId)
+    {
+        var list = data.Hotkeys;
+        CharacterHotkey tempHotkey;
+        var index = -1;
+        for (var i = 0; i < list.Count; ++i)
+        {
+            tempHotkey = list[i];
+            if (!string.IsNullOrEmpty(tempHotkey.hotkeyId) &&
+                tempHotkey.hotkeyId.Equals(hotkeyId))
+            {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
+    public static int IndexOfQuest(this IPlayerCharacterData data, string questId)
+    {
+        var list = data.Quests;
+        CharacterQuest tempQuest;
+        var index = -1;
+        for (var i = 0; i < list.Count; ++i)
+        {
+            tempQuest = list[i];
+            if (!string.IsNullOrEmpty(tempQuest.questId) &&
+                tempQuest.questId.Equals(questId))
+            {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
 }

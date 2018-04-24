@@ -75,20 +75,4 @@ public class NetFieldCharacterAttribute : LiteNetLibNetField<CharacterAttribute>
 [System.Serializable]
 public class SyncListCharacterAttribute : LiteNetLibSyncList<NetFieldCharacterAttribute, CharacterAttribute>
 {
-    public int IndexOf(string attributeId)
-    {
-        CharacterAttribute tempAttribute;
-        var index = -1;
-        for (var i = 0; i < list.Count; ++i)
-        {
-            tempAttribute = list[i];
-            if (!string.IsNullOrEmpty(tempAttribute.attributeId) &&
-                tempAttribute.attributeId.Equals(attributeId))
-            {
-                index = i;
-                break;
-            }
-        }
-        return index;
-    }
 }

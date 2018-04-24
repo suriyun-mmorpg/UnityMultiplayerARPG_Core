@@ -170,20 +170,4 @@ public class NetFieldCharacterItem : LiteNetLibNetField<CharacterItem>
 [System.Serializable]
 public class SyncListCharacterItem : LiteNetLibSyncList<NetFieldCharacterItem, CharacterItem>
 {
-    public int IndexOf(string itemId)
-    {
-        CharacterItem tempItem;
-        var index = -1;
-        for (var i = 0; i < list.Count; ++i)
-        {
-            tempItem = list[i];
-            if (!string.IsNullOrEmpty(tempItem.itemId) &&
-                tempItem.itemId.Equals(itemId))
-            {
-                index = i;
-                break;
-            }
-        }
-        return index;
-    }
 }

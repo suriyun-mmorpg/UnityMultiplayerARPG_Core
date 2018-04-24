@@ -63,17 +63,13 @@ public class UINpcDialog : UISelectionEntry<NpcDialog>
                         var declineMenuAction = new UINpcDialogMenuAction();
                         var abandonMenuAction = new UINpcDialogMenuAction();
                         var completeMenuAction = new UINpcDialogMenuAction();
-                        acceptMenuAction.type = UINpcDialogMenuActionType.QuestAccept;
                         acceptMenuAction.title = messageQuestAccept;
-                        declineMenuAction.type = UINpcDialogMenuActionType.QuestDecline;
                         declineMenuAction.title = messageQuestDecline;
-                        abandonMenuAction.type = UINpcDialogMenuActionType.QuestAbandon;
                         abandonMenuAction.title = messageQuestAbandon;
-                        completeMenuAction.type = UINpcDialogMenuActionType.QuestComplete;
                         completeMenuAction.title = messageQuestComplete;
 
                         CharacterQuest characterQuest;
-                        var index = owningCharacter.quests.IndexOf(quest.Id);
+                        var index = owningCharacter.IndexOfQuest(quest.Id);
                         if (index > 0)
                         {
                             characterQuest = owningCharacter.quests[index];
@@ -95,12 +91,14 @@ public class UINpcDialog : UISelectionEntry<NpcDialog>
                 break;
             case NpcDialogType.Normal:
                 var menus = dialog.menus;
-                foreach (var menu in menus)
+                for (var i = 0; i < menus.Length; ++i)
                 {
+                    var menu = menus[i];
                     if (menu.IsPassConditions(owningCharacter))
                     {
                         var menuAction = new UINpcDialogMenuAction();
-                        menuAction.Setup(menu);
+                        menuAction.title = menu.title;
+                        menuAction.menuIndex = i;
                         menuActions.Add(menuAction);
                     }
                 }

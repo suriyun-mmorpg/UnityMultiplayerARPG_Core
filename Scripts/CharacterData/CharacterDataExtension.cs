@@ -378,4 +378,93 @@ public static class CharacterDataExtension
         }
         return count;
     }
+
+    public static int IndexOfAttribute(this ICharacterData data, string attributeId)
+    {
+        var list = data.Attributes;
+        CharacterAttribute tempAttribute;
+        var index = -1;
+        for (var i = 0; i < list.Count; ++i)
+        {
+            tempAttribute = list[i];
+            if (!string.IsNullOrEmpty(tempAttribute.attributeId) &&
+                tempAttribute.attributeId.Equals(attributeId))
+            {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
+    public static int IndexOfSkill(this ICharacterData data, string skillId)
+    {
+        var list = data.Skills;
+        CharacterSkill tempSkill;
+        var index = -1;
+        for (var i = 0; i < list.Count; ++i)
+        {
+            tempSkill = list[i];
+            if (!string.IsNullOrEmpty(tempSkill.skillId) &&
+                tempSkill.skillId.Equals(skillId))
+            {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
+    public static int IndexOfBuff(this ICharacterData data, string characterId, string dataId, BuffType type)
+    {
+        var list = data.Buffs;
+        CharacterBuff tempBuff;
+        var index = -1;
+        for (var i = 0; i < list.Count; ++i)
+        {
+            tempBuff = list[i];
+            if (tempBuff.characterId.Equals(characterId) && tempBuff.dataId.Equals(dataId) && tempBuff.type == type)
+            {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
+    public static int IndexOfEquipItem(this ICharacterData data, string itemId)
+    {
+        var list = data.EquipItems;
+        CharacterItem tempItem;
+        var index = -1;
+        for (var i = 0; i < list.Count; ++i)
+        {
+            tempItem = list[i];
+            if (!string.IsNullOrEmpty(tempItem.itemId) &&
+                tempItem.itemId.Equals(itemId))
+            {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
+    public static int IndexOfNonEquipItem(this ICharacterData data, string itemId)
+    {
+        var list = data.NonEquipItems;
+        CharacterItem tempItem;
+        var index = -1;
+        for (var i = 0; i < list.Count; ++i)
+        {
+            tempItem = list[i];
+            if (!string.IsNullOrEmpty(tempItem.itemId) &&
+                tempItem.itemId.Equals(itemId))
+            {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
 }

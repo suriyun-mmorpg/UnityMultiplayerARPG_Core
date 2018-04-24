@@ -149,20 +149,4 @@ public class NetFieldCharacterSkill : LiteNetLibNetField<CharacterSkill>
 [System.Serializable]
 public class SyncListCharacterSkill : LiteNetLibSyncList<NetFieldCharacterSkill, CharacterSkill>
 {
-    public int IndexOf(string skillId)
-    {
-        CharacterSkill tempSkill;
-        var index = -1;
-        for (var i = 0; i < list.Count; ++i)
-        {
-            tempSkill = list[i];
-            if (!string.IsNullOrEmpty(tempSkill.skillId) &&
-                tempSkill.skillId.Equals(skillId))
-            {
-                index = i;
-                break;
-            }
-        }
-        return index;
-    }
 }

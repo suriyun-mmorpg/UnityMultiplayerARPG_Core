@@ -3,27 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum UINpcDialogMenuActionType : byte
-{
-    Normal,
-    QuestAccept,
-    QuestDecline,
-    QuestAbandon,
-    QuestComplete,
-}
-
 public class UINpcDialogMenuAction
 {
-    public UINpcDialogMenuActionType type;
     public string title;
-    public string nextDialogId;
-
-    public void Setup(NpcDialogMenu menu)
-    {
-        type = UINpcDialogMenuActionType.Normal;
-        title = menu.title;
-        nextDialogId = menu.isCloseMenu || menu.dialog == null ? "" : menu.dialog.Id;
-    }
+    public int menuIndex;
 }
 
 public class UINpcDialogMenu : UISelectionEntry<UINpcDialogMenuAction>
@@ -41,20 +24,5 @@ public class UINpcDialogMenu : UISelectionEntry<UINpcDialogMenuAction>
     public void OnClick()
     {
         // TODO: Implement this
-        switch (Data.type)
-        {
-            case UINpcDialogMenuActionType.Normal:
-                if (string.IsNullOrEmpty(Data.nextDialogId))
-                    uiNpcDialog.Hide();
-                break;
-            case UINpcDialogMenuActionType.QuestAccept:
-                break;
-            case UINpcDialogMenuActionType.QuestDecline:
-                break;
-            case UINpcDialogMenuActionType.QuestAbandon:
-                break;
-            case UINpcDialogMenuActionType.QuestComplete:
-                break;
-        }
     }
 }
