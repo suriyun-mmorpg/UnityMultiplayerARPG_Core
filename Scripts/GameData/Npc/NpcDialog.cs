@@ -10,10 +10,12 @@ public enum NpcDialogType : byte
 
 public enum NpcDialogConditionType : byte
 {
+    LevelMoreThanOrEqual,
+    LevelLessThanOrEqual,
     QuestNotStarted,
-    QuestTasksNotFinished,
-    QuestTasksFinished,
-    QuestFinished,
+    QuestTasksNotCompleted,
+    QuestTasksCompleted,
+    QuestCompleted,
 }
 
 [System.Serializable]
@@ -22,6 +24,40 @@ public struct NpcDialogCondition
     public NpcDialogConditionType conditionType;
     [StringShowConditional(conditionFieldName: "conditionType", conditionValues: new string[] { "QuestNotStarted", "QuestTasksNotFinished", "QuestTasksFinished", "QuestFinished" })]
     public Quest quest;
+    [StringShowConditional(conditionFieldName: "conditionType", conditionValues: new string[] { "LevelMoreThan", "LevelLessThan" })]
+    public int conditionalLevel;
+    public bool IsPass(IPlayerCharacterData character)
+    {
+        var indexOfQuest = -1;
+        var questTasksCompleted = false;
+        var questCompleted = false;
+        if (quest != null)
+        {
+            indexOfQuest = character.IndexOfQuest(quest.Id);
+            if (indexOfQuest >= 0)
+            {
+                var characterQuest = character.Quests[indexOfQuest];
+                questTasksCompleted = characterQuest.IsAllTasksDone(character);
+                questCompleted = characterQuest.isComplete;
+            }
+        }
+        switch (conditionType)
+        {
+            case NpcDialogConditionType.LevelMoreThanOrEqual:
+                return character.Level >= conditionalLevel;
+            case NpcDialogConditionType.LevelLessThanOrEqual:
+                return character.Level <= conditionalLevel;
+            case NpcDialogConditionType.QuestNotStarted:
+                return indexOfQuest < 0;
+            case NpcDialogConditionType.QuestTasksNotCompleted:
+                return !questTasksCompleted;
+            case NpcDialogConditionType.QuestTasksCompleted:
+                return questTasksCompleted;
+            case NpcDialogConditionType.QuestCompleted:
+                return questCompleted;
+        }
+        return true;
+    }
 }
 
 [System.Serializable]
@@ -33,8 +69,13 @@ public struct NpcDialogMenu
     [BoolShowConditional(conditionFieldName: "isCloseMenu", conditionValue: false)]
     public NpcDialog dialog;
 
-    public bool IsPassConditions(ICharacterData character)
+    public bool IsPassConditions(IPlayerCharacterData character)
     {
+        foreach (var showCondition in showConditions)
+        {
+            if (!showCondition.IsPass(character))
+                return false;
+        }
         return true;
     }
 }
