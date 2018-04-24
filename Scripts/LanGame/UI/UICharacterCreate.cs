@@ -5,21 +5,28 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(UIList)), RequireComponent(typeof(UICharacterSelectionManager))]
+[RequireComponent(typeof(UICharacterSelectionManager))]
 public class UICharacterCreate : UIBase
 {
+    public UICharacter uiCharacterPrefab;
+    public Transform uiCharacterContainer;
     public Transform characterModelContainer;
     [Header("Input")]
     public InputField inputCharacterName;
     [Header("Event")]
     public UnityEvent eventOnCreateCharacter;
+
     private UIList cacheList;
     public UIList CacheList
     {
         get
         {
             if (cacheList == null)
-                cacheList = GetComponent<UIList>();
+            {
+                cacheList = gameObject.AddComponent<UIList>();
+                cacheList.uiPrefab = uiCharacterPrefab.gameObject;
+                cacheList.uiContainer = uiCharacterContainer;
+            }
             return cacheList;
         }
     }

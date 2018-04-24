@@ -80,6 +80,14 @@ public class UICharacterHotkeyAssigner : UIBase
     public void Setup(string hotkeyId)
     {
         this.hotkeyId = hotkeyId;
+    }
+
+    public override void Show()
+    {
+        CacheSkillSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterSkill);
+        CacheSkillSelectionManager.eventOnSelect.AddListener(OnSelectCharacterSkill);
+        CacheItemSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterItem);
+        CacheItemSelectionManager.eventOnSelect.AddListener(OnSelectCharacterItem);
         var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (owningCharacter == null)
         {
@@ -89,7 +97,7 @@ public class UICharacterHotkeyAssigner : UIBase
         }
         var filterSkills = new List<CharacterSkill>();
         var filterItems = new List<CharacterItem>();
-        var characterSkills = owningCharacter.skills;
+        var characterSkills = owningCharacter.Skills;
         var characterItems = owningCharacter.NonEquipItems;
         foreach (var characterSkill in characterSkills)
         {
@@ -117,14 +125,6 @@ public class UICharacterHotkeyAssigner : UIBase
             uiCharacterItem.Show();
             CacheItemSelectionManager.Add(uiCharacterItem);
         });
-    }
-
-    public override void Show()
-    {
-        CacheSkillSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterSkill);
-        CacheSkillSelectionManager.eventOnSelect.AddListener(OnSelectCharacterSkill);
-        CacheItemSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterItem);
-        CacheItemSelectionManager.eventOnSelect.AddListener(OnSelectCharacterItem);
         base.Show();
     }
 

@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(UIList)), RequireComponent(typeof(UICharacterItemSelectionManager))]
+[RequireComponent(typeof(UICharacterItemSelectionManager))]
 public class UINonEquipItems : UIBase
 {
     public ICharacterData character { get; protected set; }
     public UICharacterItem uiItemDialog;
+    public UICharacterItem uiCharacterItemPrefab;
+    public Transform uiCharacterItemContainer;
 
     private UIList cacheList;
     public UIList CacheList
@@ -14,7 +16,11 @@ public class UINonEquipItems : UIBase
         get
         {
             if (cacheList == null)
-                cacheList = GetComponent<UIList>();
+            {
+                cacheList = gameObject.AddComponent<UIList>();
+                cacheList.uiPrefab = uiCharacterItemPrefab.gameObject;
+                cacheList.uiContainer = uiCharacterItemContainer;
+            }
             return cacheList;
         }
     }

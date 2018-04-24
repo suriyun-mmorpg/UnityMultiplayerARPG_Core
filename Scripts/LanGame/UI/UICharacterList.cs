@@ -4,20 +4,27 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-[RequireComponent(typeof(UIList)), RequireComponent(typeof(UICharacterSelectionManager))]
+[RequireComponent(typeof(UICharacterSelectionManager))]
 public class UICharacterList : UIBase
 {
+    public UICharacter uiCharacterPrefab;
+    public Transform uiCharacterContainer;
     public Transform characterModelContainer;
     [Header("UI Elements")]
     public Button buttonStart;
     public Button buttonDelete;
+
     private UIList cacheList;
     public UIList CacheList
     {
         get
         {
             if (cacheList == null)
-                cacheList = GetComponent<UIList>();
+            {
+                cacheList = gameObject.AddComponent<UIList>();
+                cacheList.uiPrefab = uiCharacterPrefab.gameObject;
+                cacheList.uiContainer = uiCharacterContainer;
+            }
             return cacheList;
         }
     }

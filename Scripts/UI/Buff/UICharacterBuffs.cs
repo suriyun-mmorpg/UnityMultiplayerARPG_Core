@@ -2,17 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(UIList))]
 public class UICharacterBuffs : UIBase
 {
     public ICharacterData character { get; protected set; }
+    public UICharacterBuff uiCharacterBuffPrefab;
+    public Transform uiCharacterBuffContainer;
+
     private UIList cacheList;
     public UIList CacheList
     {
         get
         {
             if (cacheList == null)
-                cacheList = GetComponent<UIList>();
+            {
+                cacheList = gameObject.AddComponent<UIList>();
+                cacheList.uiPrefab = uiCharacterBuffPrefab.gameObject;
+                cacheList.uiContainer = uiCharacterBuffContainer;
+            }
             return cacheList;
         }
     }

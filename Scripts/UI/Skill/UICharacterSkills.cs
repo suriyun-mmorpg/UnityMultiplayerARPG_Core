@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(UIList)), RequireComponent(typeof(UICharacterSkillSelectionManager))]
+[RequireComponent(typeof(UICharacterSkillSelectionManager))]
 public class UICharacterSkills : UIBase
 {
     public ICharacterData character { get; protected set; }
@@ -12,6 +12,9 @@ public class UICharacterSkills : UIBase
         Predefined,
     }
     public UICharacterSkill uiSkillDialog;
+    public UICharacterSkill uiCharacterSkillPrefab;
+    public Transform uiCharacterSkillContainer;
+
     [Tooltip("If listing mode is `Defining By Character` it will make list of skills by `UI List` component, with data from character. If it's `Predefined`, it will showing predefined skills")]
     public ListingMode listingMode;
 
@@ -44,7 +47,11 @@ public class UICharacterSkills : UIBase
         get
         {
             if (cacheList == null)
-                cacheList = GetComponent<UIList>();
+            {
+                cacheList = gameObject.AddComponent<UIList>();
+                cacheList.uiPrefab = uiCharacterSkillPrefab.gameObject;
+                cacheList.uiContainer = uiCharacterSkillContainer;
+            }
             return cacheList;
         }
     }

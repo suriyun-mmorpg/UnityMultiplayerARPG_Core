@@ -1519,8 +1519,16 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         }
         var characterBuff = CharacterBuff.Create(Id, dataId, type, level);
         characterBuff.Added();
-        buffs.Add(characterBuff);
-        buffIndexes.Add(buffId, buffs.Count - 1);
+        if (characterBuff.GetDuration() > 0)
+        {
+            buffs.Add(characterBuff);
+            buffIndexes.Add(buffId, buffs.Count - 1);
+        }
+        else
+        {
+            recoveryingHp += characterBuff.GetBuffRecoveryHp();
+            recoveryingMp += characterBuff.GetBuffRecoveryMp();
+        }
     }
 
     protected void ApplyPotionBuff(CharacterItem characterItem)
