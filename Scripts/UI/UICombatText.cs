@@ -9,6 +9,7 @@ public class UICombatText : MonoBehaviour
 {
     public float lifeTime = 2f;
     public string format = "{0}";
+    public bool showPositiveSign;
 
     private UIFollowWorldObject cacheObjectFollower;
     public UIFollowWorldObject CacheObjectFollower
@@ -39,7 +40,8 @@ public class UICombatText : MonoBehaviour
         set
         {
             amount = value;
-            CacheText.text = string.Format(format, amount.ToString("N0"));
+            var positiveSign = showPositiveSign && amount > 0 ? "+" : "";
+            CacheText.text = string.Format(format, (positiveSign + amount.ToString("N0")));
         }
     }
 
