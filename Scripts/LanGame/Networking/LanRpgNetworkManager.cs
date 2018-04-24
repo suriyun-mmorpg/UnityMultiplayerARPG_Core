@@ -120,6 +120,23 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
             writer.Put((byte)entry.type);
             writer.Put(entry.dataId);
         }
+        writer.Put(SelectedCharacter.Quests.Count);
+        foreach (var entry in SelectedCharacter.Quests)
+        {
+            writer.Put(entry.questId);
+            writer.Put(entry.isDone);
+            var killedMonsters = entry.killedMonsters;
+            var killMonsterCount = killedMonsters == null ? 0 : killedMonsters.Count;
+            writer.Put(killMonsterCount);
+            if (killMonsterCount > 0)
+            {
+                foreach (var killedMonster in killedMonsters)
+                {
+                    writer.Put(killedMonster.Key);
+                    writer.Put(killedMonster.Value);
+                }
+            }
+        }
         var rightHand = SelectedCharacter.EquipWeapons.rightHand;
         writer.Put(rightHand.id);
         writer.Put(rightHand.itemId);
@@ -206,6 +223,20 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
             entry.type = (HotkeyType)reader.GetByte();
             entry.dataId = reader.GetString();
             character.Hotkeys.Add(entry);
+        }
+        count = reader.GetInt();
+        for (var i = 0; i < count; ++i)
+        {
+            var entry = new CharacterQuest();
+            entry.questId = reader.GetString();
+            entry.isDone = reader.GetBool();
+            var killMonsterCount = reader.GetInt();
+            entry.killedMonsters = new Dictionary<string, int>();
+            for (var j = 0; j < killMonsterCount; ++j)
+            {
+                entry.killedMonsters.Add(reader.GetString(), reader.GetInt());
+            }
+            character.Quests.Add(entry);
         }
 
         var rightWeapon = new CharacterItem();

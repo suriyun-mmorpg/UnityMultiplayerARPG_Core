@@ -35,7 +35,7 @@ public class GameInstance : MonoBehaviour
     public int increaseSkillPointEachLevel = 1;
     public float moveSpeedMultiplier = 5f;
     public int startGold = 0;
-    public ItemAmountPair[] startItems;
+    public ItemAmount[] startItems;
     public float itemDisappearDuration = 60f;
     public float pickUpItemDistance = 1f;
     public float dropDistance = 1f;
@@ -54,6 +54,7 @@ public class GameInstance : MonoBehaviour
     public static readonly Dictionary<string, MonsterCharacter> MonsterCharacters = new Dictionary<string, MonsterCharacter>();
     public static readonly Dictionary<string, BaseDamageEntity> DamageEntities = new Dictionary<string, BaseDamageEntity>();
     public static readonly Dictionary<string, Skill> Skills = new Dictionary<string, Skill>();
+    public static readonly Dictionary<string, Quest> Quests = new Dictionary<string, Quest>();
     public static readonly Dictionary<int, ActionAnimation> ActionAnimations = new Dictionary<int, ActionAnimation>();
     public static readonly Dictionary<int, GameEffectCollection> GameEffectCollections = new Dictionary<int, GameEffectCollection>();
 
@@ -189,6 +190,7 @@ public class GameInstance : MonoBehaviour
         Attributes.Clear();
         Items.Clear();
         Skills.Clear();
+        Quests.Clear();
         AllCharacters.Clear();
         PlayerCharacters.Clear();
         MonsterCharacters.Clear();
@@ -204,6 +206,7 @@ public class GameInstance : MonoBehaviour
         var damageElements = new List<DamageElement>();
         var items = new List<Item>();
         var skills = new List<Skill>();
+        var quests = new List<Quest>();
         var playerCharacters = new List<BaseCharacter>();
         var monsterCharacters = new List<BaseCharacter>();
         // Filtering game data
@@ -217,6 +220,8 @@ public class GameInstance : MonoBehaviour
                 items.Add(gameData as Item);
             if (gameData is Skill)
                 skills.Add(gameData as Skill);
+            if (gameData is Quest)
+                quests.Add(gameData as Quest);
             if (gameData is PlayerCharacter)
                 playerCharacters.Add(gameData as PlayerCharacter);
             if (gameData is MonsterCharacter)
@@ -228,6 +233,7 @@ public class GameInstance : MonoBehaviour
         AddAttributes(attributes);
         AddItems(items);
         AddSkills(skills);
+        AddQuests(quests);
         AddCharacters(playerCharacters);
         AddCharacters(monsterCharacters);
 
@@ -314,6 +320,16 @@ public class GameInstance : MonoBehaviour
         }
         AddGameEffectCollections(GameEffectCollectionType.SkillHit, skillHitEffects);
         AddDamageEntities(damageEntities);
+    }
+
+    public static void AddQuests(IEnumerable<Quest> quests)
+    {
+        foreach (var quest in quests)
+        {
+            if (quest == null || Quests.ContainsKey(quest.Id))
+                continue;
+            Quests[quest.Id] = quest;
+        }
     }
 
     public static void AddDamageEntities(IEnumerable<BaseDamageEntity> damageEntities)

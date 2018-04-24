@@ -10,7 +10,7 @@ public enum MonsterCharacteristic
 }
 
 [System.Serializable]
-public struct MonsterCharacterAmountPair
+public struct MonsterCharacterAmount
 {
     public MonsterCharacter monster;
     public int amount;
@@ -63,9 +63,9 @@ public class MonsterCharacter : BaseCharacter
         return Random.Range(min, max);
     }
 
-    public List<ItemAmountPair> RandomItems()
+    public List<ItemAmount> RandomItems()
     {
-        var rewards = new List<ItemAmountPair>();
+        var rewards = new List<ItemAmount>();
         foreach (var randomItem in randomItems)
         {
             if (randomItem.item == null ||
@@ -73,7 +73,7 @@ public class MonsterCharacter : BaseCharacter
                 !GameInstance.Items.ContainsKey(randomItem.item.Id) ||
                 Random.value > randomItem.dropRate)
                 continue;
-                rewards.Add(new ItemAmountPair()
+                rewards.Add(new ItemAmount()
                 {
                     item = randomItem.item,
                     amount = randomItem.amount,

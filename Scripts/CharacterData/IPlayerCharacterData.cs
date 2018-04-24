@@ -20,4 +20,5 @@ public interface IPlayerCharacterData : ICharacterData
     Vector3 RespawnPosition { get; set; }
     int LastUpdate { get; set; }
     IList<CharacterHotkey> Hotkeys { get; set; }
+    IList<CharacterQuest> Quests { get; set; }
 }

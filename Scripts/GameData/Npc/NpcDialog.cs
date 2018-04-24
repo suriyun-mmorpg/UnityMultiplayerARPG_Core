@@ -31,6 +31,6 @@ public struct NpcDialogMenu
 [CreateAssetMenu(fileName = "NpcDialog", menuName = "Create GameData/NpcDialog")]
 public class NpcDialog : BaseGameData
 {
-    public NpcDialogCondition[] dialogConditions;
+    public NpcDialogCondition[] conditions;
     public NpcDialogMenu[] menus;
 }

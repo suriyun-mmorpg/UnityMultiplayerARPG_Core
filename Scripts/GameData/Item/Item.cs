@@ -149,7 +149,7 @@ public struct EquipmentModel
 }
 
 [System.Serializable]
-public struct ItemAmountPair
+public struct ItemAmount
 {
     public Item item;
     public int amount;

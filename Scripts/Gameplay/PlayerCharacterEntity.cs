@@ -15,6 +15,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     public SyncFieldInt gold = new SyncFieldInt();
     // List
     public SyncListCharacterHotkey hotkeys = new SyncListCharacterHotkey();
+    public SyncListCharacterQuest quests = new SyncListCharacterQuest();
     #endregion
 
     #region Sync data actions
@@ -23,6 +24,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     public System.Action<int> onGoldChange;
     // List
     public System.Action<LiteNetLibSyncList.Operation, int> onHotkeysOperation;
+    public System.Action<LiteNetLibSyncList.Operation, int> onQuestsOperation;
     #endregion
 
     #region Interface implementation
@@ -43,6 +45,17 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
             hotkeys.Clear();
             foreach (var entry in value)
                 hotkeys.Add(entry);
+        }
+    }
+
+    public IList<CharacterQuest> Quests
+    {
+        get { return quests; }
+        set
+        {
+            quests.Clear();
+            foreach (var entry in value)
+                quests.Add(entry);
         }
     }
     #endregion
@@ -287,6 +300,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         gold.onChange += OnGoldChange;
         // On list changes events
         hotkeys.onOperation -= OnHotkeysOperation;
+        quests.onOperation -= OnQuestsOperation;
     }
 
     #region Net functions callbacks
@@ -453,6 +467,12 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     {
         if (onHotkeysOperation != null)
             onHotkeysOperation.Invoke(operation, index);
+    }
+
+    protected virtual void OnQuestsOperation(LiteNetLibSyncList.Operation operation, int index)
+    {
+        if (onQuestsOperation != null)
+            onQuestsOperation.Invoke(operation, index);
     }
     #endregion
 
