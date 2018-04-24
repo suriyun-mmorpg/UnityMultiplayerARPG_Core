@@ -21,6 +21,7 @@ public class UIList : MonoBehaviour
                 ui = Instantiate(uiPrefab);
                 ui.transform.SetParent(uiContainer);
                 ui.transform.localScale = Vector3.one;
+                ui.transform.SetAsLastSibling();
                 uis.Add(ui);
             }
             ui.SetActive(true);

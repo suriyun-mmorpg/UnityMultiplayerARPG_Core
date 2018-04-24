@@ -106,14 +106,14 @@ public class UICharacterHotkeyAssigner : UIBase
         CacheSkillList.Generate(filterSkills, (index, characterSkill, ui) =>
         {
             var uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
-            uiCharacterSkill.Setup(new KeyValuePair<CharacterSkill, int>(characterSkill, characterSkill.level), owningCharacter, index);
+            uiCharacterSkill.Setup(new KeyValuePair<CharacterSkill, int>(characterSkill, characterSkill.level), null, -1);
             uiCharacterSkill.Show();
             CacheSkillSelectionManager.Add(uiCharacterSkill);
         });
         CacheItemList.Generate(filterItems, (index, characterItem, ui) =>
         {
             var uiCharacterItem = ui.GetComponent<UICharacterItem>();
-            uiCharacterItem.Setup(new KeyValuePair<CharacterItem, int>(characterItem, characterItem.level), owningCharacter, index, string.Empty);
+            uiCharacterItem.Setup(new KeyValuePair<CharacterItem, int>(characterItem, characterItem.level), null, -1, string.Empty);
             uiCharacterItem.Show();
             CacheItemSelectionManager.Add(uiCharacterItem);
         });
