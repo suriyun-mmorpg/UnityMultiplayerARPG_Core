@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacterQuest : UISelectionEntry<CharacterQuest>
+public class UICharacterQuest : UIDataForCharacter<CharacterQuest>
 {
     [Header("Generic Info Format")]
     [Tooltip("Title Format => {0} = {Title}")]
@@ -20,26 +21,14 @@ public class UICharacterQuest : UISelectionEntry<CharacterQuest>
     public Text textDescription;
     public Text textRewardGold;
     public Text textRewardExp;
-    public UIQuestTask uiQuestTaskPrefab;
+    public GameObject questCompleteObject;
+    public GameObject allTasksCompleteObject;
+    public bool showRewardItemList;
     public UICharacterItem uiRewardItemPrefab;
-    public Transform uiQuestTaskContainer;
     public Transform uiRewardItemContainer;
-    public GameObject questDoneObject;
-
-    private UIList cacheQuestTaskList;
-    public UIList CacheQuestTaskList
-    {
-        get
-        {
-            if (cacheQuestTaskList == null)
-            {
-                cacheQuestTaskList = gameObject.AddComponent<UIList>();
-                cacheQuestTaskList.uiPrefab = uiQuestTaskPrefab.gameObject;
-                cacheQuestTaskList.uiContainer = uiQuestTaskContainer;
-            }
-            return cacheQuestTaskList;
-        }
-    }
+    public bool showQuestTaskList;
+    public UIQuestTask uiQuestTaskPrefab;
+    public Transform uiQuestTaskContainer;
 
     private UIList cacheRewardItemList;
     public UIList CacheRewardItemList
@@ -56,10 +45,43 @@ public class UICharacterQuest : UISelectionEntry<CharacterQuest>
         }
     }
 
+    private UIList cacheQuestTaskList;
+    public UIList CacheQuestTaskList
+    {
+        get
+        {
+            if (cacheQuestTaskList == null)
+            {
+                cacheQuestTaskList = gameObject.AddComponent<UIList>();
+                cacheQuestTaskList.uiPrefab = uiQuestTaskPrefab.gameObject;
+                cacheQuestTaskList.uiContainer = uiQuestTaskContainer;
+            }
+            return cacheQuestTaskList;
+        }
+    }
+
+    protected void Update()
+    {
+        var characterQuest = Data;
+        var quest = characterQuest.GetQuest();
+
+        if (quest != null && showQuestTaskList)
+        {
+            CacheQuestTaskList.Generate(quest.tasks, (index, task, ui) =>
+            {
+                var uiQuestTask = ui.GetComponent<UIQuestTask>();
+                var isComplete = false;
+                uiQuestTask.Data = new KeyValuePair<QuestTask, int>(task, characterQuest.GetProgress(character, index, out isComplete));
+                uiQuestTask.Show();
+            });
+        }
+    }
+
     protected override void UpdateData()
     {
         var characterQuest = Data;
         var quest = characterQuest.GetQuest();
+        var owningCharacter = BasePlayerCharacterController.OwningCharacter;
 
         if (textTitle != null)
             textTitle.text = string.Format(titleFormat, quest == null ? "Unknow" : quest.title);
@@ -73,16 +95,25 @@ public class UICharacterQuest : UISelectionEntry<CharacterQuest>
         if (textRewardExp != null)
             textRewardExp.text = string.Format(rewardExpFormat, quest == null ? "0" : quest.rewardExp.ToString("N0"));
 
-        if (questDoneObject != null)
-            questDoneObject.SetActive(characterQuest.isDone);
+        if (questCompleteObject != null)
+            questCompleteObject.SetActive(characterQuest.isComplete);
 
-        CacheRewardItemList.Generate(quest.rewardItems, (index, rewardItem, ui) =>
+        if (allTasksCompleteObject != null)
+            allTasksCompleteObject.SetActive(characterQuest.IsAllTasksDone(owningCharacter));
+
+        if (quest != null && showRewardItemList)
         {
-            var characterItem = CharacterItem.Create(rewardItem.item, 1);
-            characterItem.amount = rewardItem.amount;
-            var uiCharacterItem = ui.GetComponent<UICharacterItem>();
-            uiCharacterItem.Setup(new KeyValuePair<CharacterItem, int>(characterItem, characterItem.level), null, -1, string.Empty);
-            uiCharacterItem.Show();
-        });
+            CacheRewardItemList.Generate(quest.rewardItems, (index, rewardItem, ui) =>
+            {
+                var characterItem = CharacterItem.Create(rewardItem.item, 1);
+                characterItem.amount = rewardItem.amount;
+                var uiCharacterItem = ui.GetComponent<UICharacterItem>();
+                uiCharacterItem.Setup(new KeyValuePair<CharacterItem, int>(characterItem, characterItem.level), null, -1, string.Empty);
+                uiCharacterItem.Show();
+            });
+        }
     }
 }
+
+[System.Serializable]
+public class UICharacterQuestEvent : UnityEvent<UICharacterQuest> { }

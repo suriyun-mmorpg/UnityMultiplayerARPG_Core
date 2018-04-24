@@ -8,12 +8,22 @@ public struct CharacterQuest
 {
     public static readonly CharacterQuest Empty = new CharacterQuest();
     public string questId;
-    public bool isDone;
+    public bool isComplete;
     public Dictionary<string, int> killedMonsters;
     [System.NonSerialized]
     private string dirtyQuestId;
     [System.NonSerialized]
     private Quest cacheQuest;
+
+    public Dictionary<string, int> KilledMonsters
+    {
+        get
+        {
+            if (killedMonsters == null)
+                killedMonsters = new Dictionary<string, int>();
+            return killedMonsters;
+        }
+    }
 
     private void MakeCache()
     {
@@ -40,20 +50,42 @@ public struct CharacterQuest
         return cacheQuest;
     }
 
-    public int GetProgress(ICharacterData character, int taskIndex)
+    public bool IsAllTasksDone(ICharacterData character)
     {
+        var quest = GetQuest();
+        if (character == null || quest == null)
+            return false;
+        var tasks = quest.tasks;
+        for (var i = 0; i < tasks.Length; ++i)
+        {
+            var isComplete = false;
+            GetProgress(character, i, out isComplete);
+            if (!isComplete)
+                return false;
+        }
+        return true;
+    }
+
+    public int GetProgress(ICharacterData character, int taskIndex, out bool isComplete)
+    {
+        isComplete = false;
         var quest = GetQuest();
         if (character == null || quest == null || taskIndex < 0 || taskIndex >= quest.tasks.Length)
             return 0;
         var task = quest.tasks[taskIndex];
+        var progress = 0;
         switch (task.taskType)
         {
             case QuestTaskType.KillMonster:
                 var monsterCharacterAmount = task.monsterCharacterAmount;
-                return monsterCharacterAmount.monster == null ? 0 : CountKillMonster(monsterCharacterAmount.monster.Id);
+                progress = monsterCharacterAmount.monster == null ? 0 : CountKillMonster(monsterCharacterAmount.monster.Id);
+                isComplete = progress >= monsterCharacterAmount.amount;
+                return progress;
             case QuestTaskType.CollectItem:
                 var itemAmount = task.itemAmount;
-                return itemAmount.item == null ? 0 : character.CountNonEquipItems(itemAmount.item.Id);
+                progress = itemAmount.item == null ? 0 : character.CountNonEquipItems(itemAmount.item.Id);
+                isComplete = progress >= itemAmount.amount;
+                return progress;
         }
         return 0;
     }
@@ -68,19 +100,25 @@ public struct CharacterQuest
         var quest = GetQuest();
         if (quest == null || !quest.CacheKillMonsterIds.Contains(monsterId))
             return;
-        if (killedMonsters == null)
-            killedMonsters = new Dictionary<string, int>();
-        if (!killedMonsters.ContainsKey(monsterId))
-            killedMonsters.Add(monsterId, 0);
-        killedMonsters[monsterId] += killCount;
+        if (!KilledMonsters.ContainsKey(monsterId))
+            KilledMonsters.Add(monsterId, 0);
+        KilledMonsters[monsterId] += killCount;
     }
 
     public int CountKillMonster(string monsterId)
     {
         var count = 0;
         if (!string.IsNullOrEmpty(monsterId))
-            killedMonsters.TryGetValue(monsterId, out count);
+            KilledMonsters.TryGetValue(monsterId, out count);
         return count;
+    }
+
+    public static CharacterQuest Create(Quest quest)
+    {
+        var newQuest = new CharacterQuest();
+        newQuest.questId = quest.Id;
+        newQuest.isComplete = false;
+        return newQuest;
     }
 }
 
@@ -90,12 +128,11 @@ public class NetFieldCharacterQuest : LiteNetLibNetField<CharacterQuest>
     {
         var newValue = new CharacterQuest();
         newValue.questId = reader.GetString();
-        newValue.isDone = reader.GetBool();
+        newValue.isComplete = reader.GetBool();
         var killMonsterCount = reader.GetInt();
-        newValue.killedMonsters = new Dictionary<string, int>();
         for (var i = 0; i < killMonsterCount; ++i)
         {
-            newValue.killedMonsters.Add(reader.GetString(), reader.GetInt());
+            newValue.KilledMonsters.Add(reader.GetString(), reader.GetInt());
         }
         Value = newValue;
     }
@@ -103,9 +140,9 @@ public class NetFieldCharacterQuest : LiteNetLibNetField<CharacterQuest>
     public override void Serialize(NetDataWriter writer)
     {
         writer.Put(Value.questId);
-        writer.Put(Value.isDone);
-        var killedMonsters = Value.killedMonsters;
-        var killMonsterCount = killedMonsters == null ? 0 : killedMonsters.Count;
+        writer.Put(Value.isComplete);
+        var killedMonsters = Value.KilledMonsters;
+        var killMonsterCount = killedMonsters.Count;
         writer.Put(killMonsterCount);
         if (killMonsterCount > 0)
         {

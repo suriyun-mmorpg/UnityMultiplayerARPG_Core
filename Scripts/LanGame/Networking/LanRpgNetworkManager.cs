@@ -124,7 +124,7 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
         foreach (var entry in SelectedCharacter.Quests)
         {
             writer.Put(entry.questId);
-            writer.Put(entry.isDone);
+            writer.Put(entry.isComplete);
             var killedMonsters = entry.killedMonsters;
             var killMonsterCount = killedMonsters == null ? 0 : killedMonsters.Count;
             writer.Put(killMonsterCount);
@@ -229,7 +229,7 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
         {
             var entry = new CharacterQuest();
             entry.questId = reader.GetString();
-            entry.isDone = reader.GetBool();
+            entry.isComplete = reader.GetBool();
             var killMonsterCount = reader.GetInt();
             entry.killedMonsters = new Dictionary<string, int>();
             for (var j = 0; j < killMonsterCount; ++j)

@@ -10,6 +10,9 @@ public class UIList : MonoBehaviour
 
     public void Generate<T>(IList<T> list, System.Action<int, T, GameObject> onGenerateEntry)
     {
+        if (uiPrefab == null)
+            return;
+
         var i = 0;
         for (; i < list.Count; ++i)
         {
