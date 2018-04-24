@@ -18,7 +18,7 @@ public class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
         Data = data;
     }
 
-    private void Update()
+    protected void Update()
     {
         if (Input.GetKeyDown(key))
         {

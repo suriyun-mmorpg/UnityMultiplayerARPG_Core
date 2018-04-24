@@ -26,7 +26,7 @@ public class UICharacterBuff : UIDataForCharacter<CharacterBuff>
     
     protected float collectedDeltaTime;
 
-    private void Update()
+    protected void Update()
     {
         var characterBuff = Data;
         

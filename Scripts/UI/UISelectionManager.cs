@@ -17,6 +17,7 @@ public abstract class UISelectionManager : MonoBehaviour
     public abstract void Deselect(object ui);
     public abstract void DeselectAll();
     public abstract void DeselectSelectedUI();
+    public abstract bool Contains(object ui);
 }
 
 public abstract class UISelectionManager<TData, TUI, TEvent> : UISelectionManager
@@ -106,5 +107,10 @@ public abstract class UISelectionManager<TData, TUI, TEvent> : UISelectionManage
     {
         if (SelectedUI != null)
             Deselect(SelectedUI);
+    }
+
+    public override bool Contains(object ui)
+    {
+        return ui is TUI && uis.Contains(ui as TUI);
     }
 }

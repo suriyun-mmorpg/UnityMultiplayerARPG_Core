@@ -101,6 +101,8 @@ public class UICharacterSkills : UIBase
     public void UpdateData(ICharacterData character)
     {
         this.character = character;
+        var selectedSkillId = SelectionManager.SelectedUI != null ? SelectionManager.SelectedUI.Data.Key.skillId : "";
+        SelectionManager.DeselectSelectedUI();
         SelectionManager.Clear();
 
         if (character == null)
@@ -119,6 +121,8 @@ public class UICharacterSkills : UIBase
                     uiCharacterSkill.Setup(new KeyValuePair<CharacterSkill, int>(characterSkill, characterSkill.level), character, index);
                     uiCharacterSkill.Show();
                     SelectionManager.Add(uiCharacterSkill);
+                    if (selectedSkillId.Equals(characterSkill.skillId))
+                        uiCharacterSkill.OnClickSelect();
                 });
                 break;
             case ListingMode.Predefined:
@@ -133,6 +137,8 @@ public class UICharacterSkills : UIBase
                     {
                         cacheUICharacterSkill.Setup(new KeyValuePair<CharacterSkill, int>(characterSkill, level), character, i);
                         cacheUICharacterSkill.Show();
+                        if (selectedSkillId.Equals(characterSkill.skillId))
+                            cacheUICharacterSkill.OnClickSelect();
                     }
                     else
                         cacheUICharacterSkill.Hide();

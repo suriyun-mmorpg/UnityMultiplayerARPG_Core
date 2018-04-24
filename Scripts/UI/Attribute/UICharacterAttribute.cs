@@ -24,7 +24,7 @@ public class UICharacterAttribute : UIDataForCharacter<KeyValuePair<CharacterAtt
     public UnityEvent onAbleToIncrease;
     public UnityEvent onUnableToIncrease;
     
-    private void Update()
+    protected void Update()
     {
         var characterAttribute = Data.Key;
         var amount = Data.Value;

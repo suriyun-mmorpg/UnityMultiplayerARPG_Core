@@ -57,6 +57,7 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
     public UnityEvent onSetNonLevelZeroData;
     public UnityEvent onSetEquippedData;
     public UnityEvent onSetUnEquippedData;
+    public UnityEvent onSetUnEquippableData;
 
     [Header("Options")]
     public UICharacterItem uiNextLevelItem;
@@ -83,10 +84,15 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
         else
             onSetNonLevelZeroData.Invoke();
 
-        if (!string.IsNullOrEmpty(equipPosition))
-            onSetEquippedData.Invoke();
+        if (equipmentItem != null)
+        {
+            if (!string.IsNullOrEmpty(equipPosition))
+                onSetEquippedData.Invoke();
+            else
+                onSetUnEquippedData.Invoke();
+        }
         else
-            onSetUnEquippedData.Invoke();
+            onSetUnEquippableData.Invoke();
 
         if (textTitle != null)
             textTitle.text = string.Format(titleFormat, item == null ? "Unknow" : item.title);

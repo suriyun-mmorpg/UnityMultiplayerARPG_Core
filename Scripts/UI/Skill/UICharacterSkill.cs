@@ -52,7 +52,7 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
 
     protected float collectedDeltaTime;
 
-    private void Update()
+    protected void Update()
     {
         var characterSkill = Data.Key;
         var skill = characterSkill.GetSkill();
@@ -208,9 +208,6 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
     {
         if (!IsOwningCharacter())
             return;
-
-        if (selectionManager != null)
-            selectionManager.DeselectSelectedUI();
 
         var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (owningCharacter != null)

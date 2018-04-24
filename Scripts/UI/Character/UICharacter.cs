@@ -92,7 +92,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         Data = data;
     }
 
-    private void Update()
+    protected void Update()
     {
         if (textName != null)
             textName.text = string.Format(nameFormat, Data == null ? "Unknow" : Data.CharacterName);

@@ -90,6 +90,8 @@ public class UINonEquipItems : UIBase
     public void UpdateData(ICharacterData character)
     {
         this.character = character;
+        var selectedId = SelectionManager.SelectedUI != null ? SelectionManager.SelectedUI.Data.Key.id : "";
+        SelectionManager.DeselectSelectedUI();
         SelectionManager.Clear();
 
         if (character == null)
@@ -105,6 +107,8 @@ public class UINonEquipItems : UIBase
             uiCharacterItem.Setup(new KeyValuePair<CharacterItem, int>(characterItem, characterItem.level), this.character, index, string.Empty);
             uiCharacterItem.Show();
             SelectionManager.Add(uiCharacterItem);
+            if (selectedId.Equals(characterItem.id))
+                uiCharacterItem.OnClickSelect();
         });
     }
 }
