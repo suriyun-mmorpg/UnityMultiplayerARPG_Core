@@ -46,6 +46,7 @@ public abstract class BasePlayerCharacterController : MonoBehaviour
         CacheCharacterEntity.onEquipItemsOperation += OnEquipItemsOperation;
         CacheCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
         CacheCharacterEntity.onHotkeysOperation += OnHotkeysOperation;
+        CacheCharacterEntity.onQuestsOperation += OnQuestsOperation;
     }
 
     protected virtual void OnDestroy()
@@ -58,6 +59,7 @@ public abstract class BasePlayerCharacterController : MonoBehaviour
         CacheCharacterEntity.onEquipItemsOperation -= OnEquipItemsOperation;
         CacheCharacterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
         CacheCharacterEntity.onHotkeysOperation -= OnHotkeysOperation;
+        CacheCharacterEntity.onQuestsOperation -= OnQuestsOperation;
         if (CacheUISceneGameplay != null)
         {
             CacheCharacterEntity.onDead -= CacheUISceneGameplay.OnCharacterDead;
@@ -132,6 +134,12 @@ public abstract class BasePlayerCharacterController : MonoBehaviour
     {
         if (CacheCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
             CacheUISceneGameplay.UpdateHotkeys();
+    }
+
+    protected void OnQuestsOperation(LiteNetLibSyncList.Operation operation, int index)
+    {
+        if (CacheCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            CacheUISceneGameplay.UpdateQuests();
     }
     #endregion
 

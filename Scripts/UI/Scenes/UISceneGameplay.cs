@@ -20,6 +20,7 @@ public class UISceneGameplay : MonoBehaviour
     public UINonEquipItems uiNonEquipItems;
     public UICharacterSkills uiSkills;
     public UICharacterHotkeys uiHotkeys;
+    public UICharacterQuests uiQuests;
     public UIToggleUI[] toggleUis;
 
     [Header("Combat Text")]
@@ -88,6 +89,12 @@ public class UISceneGameplay : MonoBehaviour
     {
         if (uiHotkeys != null)
             uiHotkeys.UpdateData(BasePlayerCharacterController.OwningCharacter);
+    }
+
+    public void UpdateQuests()
+    {
+        if (uiQuests != null)
+            uiQuests.UpdateData(BasePlayerCharacterController.OwningCharacter);
     }
 
     public void SetTargetCharacter(BaseCharacterEntity character)

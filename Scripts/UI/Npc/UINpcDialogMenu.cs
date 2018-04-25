@@ -23,6 +23,7 @@ public class UINpcDialogMenu : UISelectionEntry<UINpcDialogMenuAction>
 
     public void OnClick()
     {
-        // TODO: Implement this
+        var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+        owningCharacter.RequestSelectNpcDialogMenu(Data.menuIndex);
     }
 }

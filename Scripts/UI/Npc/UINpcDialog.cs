@@ -64,9 +64,13 @@ public class UINpcDialog : UISelectionEntry<NpcDialog>
                         var abandonMenuAction = new UINpcDialogMenuAction();
                         var completeMenuAction = new UINpcDialogMenuAction();
                         acceptMenuAction.title = messageQuestAccept;
+                        acceptMenuAction.menuIndex = NpcDialog.QUEST_ACCEPT_MENU_INDEX;
                         declineMenuAction.title = messageQuestDecline;
+                        declineMenuAction.menuIndex = NpcDialog.QUEST_DECLINE_MENU_INDEX;
                         abandonMenuAction.title = messageQuestAbandon;
+                        abandonMenuAction.menuIndex = NpcDialog.QUEST_ABANDON_MENU_INDEX;
                         completeMenuAction.title = messageQuestComplete;
+                        completeMenuAction.menuIndex = NpcDialog.QUEST_COMPLETE_MENU_INDEX;
 
                         CharacterQuest characterQuest;
                         var index = owningCharacter.IndexOfQuest(quest.Id);

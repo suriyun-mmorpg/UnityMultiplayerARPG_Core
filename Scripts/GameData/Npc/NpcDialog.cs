@@ -83,9 +83,16 @@ public struct NpcDialogMenu
 [CreateAssetMenu(fileName = "NpcDialog", menuName = "Create GameData/NpcDialog")]
 public class NpcDialog : BaseGameData
 {
+    public const int QUEST_ACCEPT_MENU_INDEX = 0;
+    public const int QUEST_DECLINE_MENU_INDEX = 1;
+    public const int QUEST_ABANDON_MENU_INDEX = 2;
+    public const int QUEST_COMPLETE_MENU_INDEX = 3;
+
     public NpcDialogType type;
-    [StringShowConditional(conditionFieldName: "type", conditionValue: "Quest")]
-    public Quest quest;
-    [StringShowConditional(conditionFieldName: "type", conditionValue: "Normal")]
     public NpcDialogMenu[] menus;
+    public Quest quest;
+    public NpcDialog questAcceptedDialog;
+    public NpcDialog questDeclinedDialog;
+    public NpcDialog questAbandonedDialog;
+    public NpcDialog questCompletedDailog;
 }

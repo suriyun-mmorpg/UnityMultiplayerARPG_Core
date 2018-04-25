@@ -76,6 +76,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     protected Vector3 moveDirection;
     protected bool isJumping;
     protected bool isGrounded;
+    protected NpcDialog currentNpcDialog;
     #endregion
 
     #region Cache components
@@ -282,6 +283,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         gold.onChange += OnGoldChange;
         // On list changes events
         hotkeys.onOperation += OnHotkeysOperation;
+        quests.onOperation += OnQuestsOperation;
         // Register Network functions
         RegisterNetFunction("SwapOrMergeItem", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((fromIndex, toIndex) => NetFuncSwapOrMergeItem(fromIndex, toIndex)));
         RegisterNetFunction("AddAttribute", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((attributeIndex, amount) => NetFuncAddAttribute(attributeIndex, amount)));
@@ -289,6 +291,9 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         RegisterNetFunction("PointClickMovement", new LiteNetLibFunction<NetFieldVector3>((position) => NetFuncPointClickMovement(position)));
         RegisterNetFunction("Respawn", new LiteNetLibFunction(NetFuncRespawn));
         RegisterNetFunction("AssignHotkey", new LiteNetLibFunction<NetFieldString, NetFieldByte, NetFieldString>((hotkeyId, type, dataId) => NetFuncAssignHotkey(hotkeyId, type, dataId)));
+        RegisterNetFunction("NpcActivated", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncNpcActivated(objectId)));
+        RegisterNetFunction("ShowNpcDialog", new LiteNetLibFunction<NetFieldString>((npcDialogId) => NetFuncShowNpcDialog(npcDialogId)));
+        RegisterNetFunction("SelectNpcDialogMenu", new LiteNetLibFunction<NetFieldInt>((menuIndex) => NetFuncSelectNpcDialogMenu(menuIndex)));
     }
     #endregion
 
@@ -401,6 +406,115 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         else
             hotkeys.Add(characterHotkey);
     }
+
+    protected void NetFuncNpcActivated(uint objectId)
+    {
+        NpcEntity entity;
+        if (!Manager.Assets.TryGetSpawnedObject(objectId, out entity))
+            return;
+        currentNpcDialog = entity.startDialog;
+        if (currentNpcDialog != null)
+            RequestShowNpcDialog(currentNpcDialog.Id);
+    }
+
+    protected void NetFuncShowNpcDialog(string npcDialogId)
+    {
+        // TODO: Show/Hide npc dialog
+    }
+
+    protected void NetFuncSelectNpcDialogMenu(int menuIndex)
+    {
+        if (currentNpcDialog == null)
+            return;
+        var menus = currentNpcDialog.menus;
+        NpcDialogMenu selectedMenu;
+        switch (currentNpcDialog.type)
+        {
+            case NpcDialogType.Normal:
+                if (menuIndex < 0 || menuIndex >= menus.Length)
+                    return;
+                selectedMenu = menus[menuIndex];
+                if (!selectedMenu.IsPassConditions(this) || selectedMenu.dialog == null || selectedMenu.isCloseMenu)
+                {
+                    currentNpcDialog = null;
+                    RequestShowNpcDialog("");
+                    return;
+                }
+                currentNpcDialog = selectedMenu.dialog;
+                RequestShowNpcDialog(currentNpcDialog.Id);
+                break;
+            case NpcDialogType.Quest:
+                NetFuncSelectNpcDialogQuestMenu(menuIndex);
+                break;
+        }
+    }
+
+    protected void NetFuncSelectNpcDialogQuestMenu(int menuIndex)
+    {
+        if (currentNpcDialog == null || currentNpcDialog.type != NpcDialogType.Quest || currentNpcDialog.quest == null)
+        {
+            currentNpcDialog = null;
+            RequestShowNpcDialog("");
+            return;
+        }
+        switch (menuIndex)
+        {
+            case NpcDialog.QUEST_ACCEPT_MENU_INDEX:
+                currentNpcDialog = currentNpcDialog.questAcceptedDialog;
+                NetFuncAcceptQuest(currentNpcDialog.quest.Id);
+                break;
+            case NpcDialog.QUEST_DECLINE_MENU_INDEX:
+                currentNpcDialog = currentNpcDialog.questDeclinedDialog;
+                break;
+            case NpcDialog.QUEST_ABANDON_MENU_INDEX:
+                currentNpcDialog = currentNpcDialog.questAbandonedDialog;
+                NetFuncAbandonQuest(currentNpcDialog.quest.Id);
+                break;
+            case NpcDialog.QUEST_COMPLETE_MENU_INDEX:
+                currentNpcDialog = currentNpcDialog.questCompletedDailog;
+                NetFuncCompleteQuest(currentNpcDialog.quest.Id);
+                break;
+        }
+        if (currentNpcDialog == null)
+            RequestShowNpcDialog("");
+        else
+            RequestShowNpcDialog(currentNpcDialog.Id);
+    }
+
+    protected void NetFuncAcceptQuest(string questId)
+    {
+        var indexOfQuest = this.IndexOfQuest(questId);
+        Quest quest;
+        if (indexOfQuest >= 0 || !GameInstance.Quests.TryGetValue(questId, out quest))
+            return;
+        var characterQuest = CharacterQuest.Create(quest);
+        quests.Add(characterQuest);
+    }
+
+    protected void NetFuncAbandonQuest(string questId)
+    {
+        var indexOfQuest = this.IndexOfQuest(questId);
+        Quest quest;
+        if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questId, out quest))
+            return;
+        var characterQuest = quests[indexOfQuest];
+        if (characterQuest.isComplete)
+            return;
+        quests.RemoveAt(indexOfQuest);
+    }
+
+    protected void NetFuncCompleteQuest(string questId)
+    {
+        var indexOfQuest = this.IndexOfQuest(questId);
+        Quest quest;
+        if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questId, out quest))
+            return;
+        var characterQuest = quests[indexOfQuest];
+        if (!characterQuest.IsAllTasksDone(this))
+            return;
+        characterQuest.isComplete = true;
+        quests[indexOfQuest] = characterQuest;
+    }
     #endregion
 
     #region Net functions callers
@@ -442,6 +556,21 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     public void RequestAssignHotkey(string hotkeyId, HotkeyType type, string dataId)
     {
         CallNetFunction("AssignHotkey", FunctionReceivers.Server, hotkeyId, (byte)type, dataId);
+    }
+
+    public void RequestNpcActivated(uint objectId)
+    {
+        CallNetFunction("NpcActivated", FunctionReceivers.Server, objectId);
+    }
+
+    public void RequestShowNpcDialog(string npcDialogId)
+    {
+        CallNetFunction("ShowNpcDialog", ConnectId, npcDialogId);
+    }
+
+    public void RequestSelectNpcDialogMenu(int menuIndex)
+    {
+        CallNetFunction("SelectNpcDialogMenu", FunctionReceivers.Server, menuIndex);
     }
     #endregion
 
@@ -499,6 +628,12 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
             CacheNetTransform.Teleport(position, Quaternion.identity);
             return;
         }
+    }
+
+    protected override void Killed(BaseCharacterEntity lastAttacker)
+    {
+        base.Killed(lastAttacker);
+        currentNpcDialog = null;
     }
 
     internal virtual void IncreaseGold(int gold)
