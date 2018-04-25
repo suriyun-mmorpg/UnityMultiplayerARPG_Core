@@ -9,7 +9,6 @@ public abstract class BasePlayerCharacterController : MonoBehaviour
     public static BasePlayerCharacterController OwningCharacterController { get; protected set; }
     public static PlayerCharacterEntity OwningCharacter { get { return OwningCharacterController == null ? null : OwningCharacterController.CacheCharacterEntity; } }
 
-
     private PlayerCharacterEntity cacheCharacterEntity;
     public PlayerCharacterEntity CacheCharacterEntity
     {
@@ -62,6 +61,7 @@ public abstract class BasePlayerCharacterController : MonoBehaviour
         CacheCharacterEntity.onQuestsOperation -= OnQuestsOperation;
         if (CacheUISceneGameplay != null)
         {
+            CacheCharacterEntity.onShowNpcDialog -= CacheUISceneGameplay.OnShowNpcDialog;
             CacheCharacterEntity.onDead -= CacheUISceneGameplay.OnCharacterDead;
             CacheCharacterEntity.onRespawn -= CacheUISceneGameplay.OnCharacterRespawn;
         }
@@ -163,6 +163,8 @@ public abstract class BasePlayerCharacterController : MonoBehaviour
                 CacheUISceneGameplay.UpdateEquipItems();
                 CacheUISceneGameplay.UpdateNonEquipItems();
                 CacheUISceneGameplay.UpdateHotkeys();
+                CacheUISceneGameplay.UpdateQuests();
+                CacheCharacterEntity.onShowNpcDialog += CacheUISceneGameplay.OnShowNpcDialog;
                 CacheCharacterEntity.onDead += CacheUISceneGameplay.OnCharacterDead;
                 CacheCharacterEntity.onRespawn += CacheUISceneGameplay.OnCharacterRespawn;
             }

@@ -21,6 +21,7 @@ public class UISceneGameplay : MonoBehaviour
     public UICharacterSkills uiSkills;
     public UICharacterHotkeys uiHotkeys;
     public UICharacterQuests uiQuests;
+    public UINpcDialog uiNpcDialog;
     public UIToggleUI[] toggleUis;
 
     [Header("Combat Text")]
@@ -141,5 +142,19 @@ public class UISceneGameplay : MonoBehaviour
     public void OnCharacterRespawn(bool isInitialize)
     {
         onCharacterRespawn.Invoke();
+    }
+
+    public void OnShowNpcDialog(string npcDialogId)
+    {
+        if (uiNpcDialog == null)
+            return;
+        NpcDialog npcDialog;
+        if (string.IsNullOrEmpty(npcDialogId) || !GameInstance.NpcDialogs.TryGetValue(npcDialogId, out npcDialog))
+        {
+            uiNpcDialog.Hide();
+            return;
+        }
+        uiNpcDialog.Data = npcDialog;
+        uiNpcDialog.Show();
     }
 }

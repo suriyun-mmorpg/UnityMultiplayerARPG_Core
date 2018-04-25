@@ -19,6 +19,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     #endregion
 
     #region Sync data actions
+    public System.Action<string> onShowNpcDialog;
     public System.Action<int> onStatPointChange;
     public System.Action<int> onSkillPointChange;
     public System.Action<int> onGoldChange;
@@ -419,7 +420,8 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
 
     protected void NetFuncShowNpcDialog(string npcDialogId)
     {
-        // TODO: Show/Hide npc dialog
+        if (onShowNpcDialog != null)
+            onShowNpcDialog(npcDialogId);
     }
 
     protected void NetFuncSelectNpcDialogMenu(int menuIndex)
