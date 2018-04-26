@@ -114,6 +114,8 @@ public class PlayerCharacterController : BasePlayerCharacterController
             }
             if (targetPosition.HasValue)
             {
+                if (CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
+                    CacheUISceneGameplay.uiNpcDialog.Hide();
                 queueUsingSkill = null;
                 if (targetIdentity != null)
                     destination = null;

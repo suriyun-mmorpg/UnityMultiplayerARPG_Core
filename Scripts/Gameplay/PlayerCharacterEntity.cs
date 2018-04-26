@@ -390,6 +390,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         if (CurrentHp <= 0)
             return;
         SetMovePaths(position);
+        currentNpcDialog = null;
     }
 
     protected void NetFuncRespawn()
