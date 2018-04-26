@@ -22,9 +22,10 @@ public struct QuestTask
 public class Quest : BaseGameData
 {
     public QuestTask[] tasks;
-    public int rewardGold;
     public int rewardExp;
+    public int rewardGold;
     public ItemAmount[] rewardItems;
+    public bool canRepeat;
     private HashSet<string> cacheKillMonsterIds;
     public HashSet<string> CacheKillMonsterIds
     {

@@ -87,7 +87,7 @@ public class UICharacterSkills : UIBase
     {
         if (uiSkillDialog != null)
         {
-            uiSkillDialog.Data = ui.Data;
+            uiSkillDialog.Setup(ui.Data, character, ui.indexOfData);
             uiSkillDialog.Show();
         }
     }

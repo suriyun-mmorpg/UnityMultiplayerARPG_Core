@@ -1,10 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using LiteNetLibHighLevel;
 
 public class RpgNetworkEntity : LiteNetLibBehaviour
 {
+    public string title;
+    public Text textTitle;
+
+    public virtual string Title { get { return title; } }
+
     private Transform cacheTransform;
     public Transform CacheTransform
     {
@@ -25,5 +31,11 @@ public class RpgNetworkEntity : LiteNetLibBehaviour
                 cacheManager = Manager as BaseRpgNetworkManager;
             return cacheManager;
         }
+    }
+
+    protected virtual void LateUpdate()
+    {
+        if (textTitle != null)
+            textTitle.text = Title;
     }
 }

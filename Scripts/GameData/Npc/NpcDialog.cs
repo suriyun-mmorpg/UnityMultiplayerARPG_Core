@@ -13,7 +13,7 @@ public enum NpcDialogConditionType : byte
     LevelMoreThanOrEqual,
     LevelLessThanOrEqual,
     QuestNotStarted,
-    QuestTasksNotCompleted,
+    QuestOngoing,
     QuestTasksCompleted,
     QuestCompleted,
 }
@@ -22,9 +22,9 @@ public enum NpcDialogConditionType : byte
 public struct NpcDialogCondition
 {
     public NpcDialogConditionType conditionType;
-    [StringShowConditional(conditionFieldName: "conditionType", conditionValues: new string[] { "QuestNotStarted", "QuestTasksNotFinished", "QuestTasksFinished", "QuestFinished" })]
+    [StringShowConditional(conditionFieldName: "conditionType", conditionValues: new string[] { "QuestNotStarted", "QuestOngoing", "QuestTasksCompleted", "QuestCompleted" })]
     public Quest quest;
-    [StringShowConditional(conditionFieldName: "conditionType", conditionValues: new string[] { "LevelMoreThan", "LevelLessThan" })]
+    [StringShowConditional(conditionFieldName: "conditionType", conditionValues: new string[] { "LevelMoreThanOrEqual", "LevelLessThanOrEqual" })]
     public int conditionalLevel;
     public bool IsPass(IPlayerCharacterData character)
     {
@@ -49,7 +49,7 @@ public struct NpcDialogCondition
                 return character.Level <= conditionalLevel;
             case NpcDialogConditionType.QuestNotStarted:
                 return indexOfQuest < 0;
-            case NpcDialogConditionType.QuestTasksNotCompleted:
+            case NpcDialogConditionType.QuestOngoing:
                 return !questTasksCompleted;
             case NpcDialogConditionType.QuestTasksCompleted:
                 return questTasksCompleted;
@@ -71,6 +71,14 @@ public struct NpcDialogMenu
 
     public bool IsPassConditions(IPlayerCharacterData character)
     {
+        if (dialog != null && dialog.type == NpcDialogType.Quest)
+        {
+            if (dialog.quest == null)
+                return false;
+            var indexOfQuest = character.IndexOfQuest(dialog.quest.Id);
+            if (indexOfQuest >= 0 && character.Quests[indexOfQuest].isComplete)
+                return false;
+        }
         foreach (var showCondition in showConditions)
         {
             if (!showCondition.IsPass(character))

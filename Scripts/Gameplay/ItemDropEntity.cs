@@ -9,6 +9,24 @@ public class ItemDropEntity : RpgNetworkEntity
     public CharacterItem dropData;
     public Transform modelContainer;
     public SyncFieldString itemId = new SyncFieldString();
+    public Item Item
+    {
+        get
+        {
+            Item item;
+            if (GameInstance.Items.TryGetValue(itemId, out item))
+                return item;
+            return null;
+        }
+    }
+    public override string Title
+    {
+        get
+        {
+            var item = Item;
+            return item == null ? "Unknow" : item.title;
+        }
+    }
 
     public Transform CacheModelContainer
     {

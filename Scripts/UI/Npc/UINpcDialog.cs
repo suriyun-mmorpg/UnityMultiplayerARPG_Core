@@ -74,7 +74,7 @@ public class UINpcDialog : UISelectionEntry<NpcDialog>
 
                         CharacterQuest characterQuest;
                         var index = owningCharacter.IndexOfQuest(quest.Id);
-                        if (index > 0)
+                        if (index >= 0)
                         {
                             characterQuest = owningCharacter.quests[index];
                             if (!characterQuest.IsAllTasksDone(owningCharacter))
@@ -94,6 +94,8 @@ public class UINpcDialog : UISelectionEntry<NpcDialog>
                 }
                 break;
             case NpcDialogType.Normal:
+                if (uiCharacterQuest != null)
+                    uiCharacterQuest.Hide();
                 var menus = dialog.menus;
                 for (var i = 0; i < menus.Length; ++i)
                 {

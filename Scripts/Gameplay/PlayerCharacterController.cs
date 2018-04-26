@@ -18,7 +18,6 @@ public class PlayerCharacterController : BasePlayerCharacterController
     }
 
     protected bool pointClickMoveStopped;
-    protected Vector3 oldFollowTargetPosition;
     protected Vector3? destination;
     protected UsingSkillData? queueUsingSkill;
 
@@ -229,7 +228,8 @@ public class PlayerCharacterController : BasePlayerCharacterController
             if (Vector3.Distance(CacheCharacterTransform.position, targetNpc.CacheTransform.position) <= actDistance)
             {
                 StopPointClickMove();
-                // TODO: implement npc conversation
+                CacheCharacterEntity.RequestNpcActivate(targetNpc.ObjectId);
+                CacheCharacterEntity.SetTargetEntity(null);
             }
             else
                 UpdateTargetEntityPosition(targetNpc);
@@ -254,12 +254,8 @@ public class PlayerCharacterController : BasePlayerCharacterController
             return;
 
         var targetPosition = entity.CacheTransform.position;
-        if (oldFollowTargetPosition != targetPosition)
-        {
-            CacheCharacterEntity.RequestPointClickMovement(targetPosition);
-            pointClickMoveStopped = false;
-            oldFollowTargetPosition = targetPosition;
-        }
+        CacheCharacterEntity.RequestPointClickMovement(targetPosition);
+        pointClickMoveStopped = false;
     }
 
     public void StopPointClickMove()

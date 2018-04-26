@@ -410,6 +410,9 @@ public class MonsterCharacterEntity : BaseCharacterEntity
                 }
             }
         }
+        var lastPlayer = lastAttacker as PlayerCharacterEntity;
+        if (lastPlayer != null)
+            lastPlayer.OnKillMonster(this);
     }
 
     protected override void Respawn()

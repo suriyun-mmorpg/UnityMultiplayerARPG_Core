@@ -56,7 +56,7 @@ public class UICharacterQuests : UIBase
     {
         if (uiQuestDialog != null)
         {
-            uiQuestDialog.Data = ui.Data;
+            uiQuestDialog.Setup(ui.Data, character, ui.indexOfData);
             uiQuestDialog.Show();
         }
     }

@@ -128,6 +128,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public virtual EquipWeapons EquipWeapons { get { return equipWeapons; } set { equipWeapons.Value = value; } }
     public virtual float MoveSpeed { get { return this.GetMoveSpeed(); } }
     public virtual float AttackSpeed { get { return this.GetAttackSpeed(); } }
+    public override string Title { get { return CharacterName; } }
 
     public IList<CharacterAttribute> Attributes
     {
@@ -598,7 +599,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
         var item = nonEquipItems[itemIndex];
         var potionItem = item.GetPotionItem();
-        if (potionItem != null && DecreaseItems(itemIndex, 1))
+        if (potionItem != null && this.DecreaseItems(itemIndex, 1))
             ApplyPotionBuff(item);
     }
 
@@ -688,7 +689,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         var itemId = itemDropData.itemId;
         var level = itemDropData.level;
         var amount = itemDropData.amount;
-        if (IncreaseItems(itemId, level, amount))
+        if (!IncreasingItemsWillOverwhelming(itemId, level, amount) && this.IncreaseItems(itemId, level, amount))
             itemDropEntity.NetworkDestroy();
     }
 
@@ -712,7 +713,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
         var itemId = nonEquipItem.itemId;
         var level = nonEquipItem.level;
-        if (DecreaseItems(index, amount))
+        if (this.DecreaseItems(index, amount))
             ItemDropEntity.DropItem(this, itemId, level, amount);
     }
 
@@ -972,120 +973,19 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Inventory helpers
-    public bool IncreaseItems(string itemId, int level, int amount)
+    public bool IncreasingItemsWillOverwhelming(string itemId, int level, int amount)
     {
         Item itemData;
         // If item not valid
         if (string.IsNullOrEmpty(itemId) || amount <= 0 || !GameInstance.Items.TryGetValue(itemId, out itemData))
             return false;
 
-        var maxStack = itemData.maxStack;
         var weight = itemData.weight;
         // If overwhelming
         if (this.GetTotalItemWeight() + (amount * weight) >= CacheStats.weightLimit)
-            return false;
+            return true;
 
-        var emptySlots = new Dictionary<int, CharacterItem>();
-        var changes = new Dictionary<int, CharacterItem>();
-        // Loop to all slots to add amount to any slots that item amount not max in stack
-        for (var i = 0; i < nonEquipItems.Count; ++i)
-        {
-            var nonEquipItem = nonEquipItems[i];
-            if (!nonEquipItem.IsValid())
-            {
-                // If current entry is not valid, add it to empty list, going to replacing it later
-                emptySlots[i] = nonEquipItem;
-            }
-            else if (nonEquipItem.itemId.Equals(itemId))
-            {
-                // If same item id, increase its amount
-                if (nonEquipItem.amount + amount <= maxStack)
-                {
-                    nonEquipItem.amount += amount;
-                    changes[i] = nonEquipItem;
-                    amount = 0;
-                    break;
-                }
-                else if (maxStack - nonEquipItem.amount > 0)
-                {
-                    amount = maxStack - nonEquipItem.amount;
-                    nonEquipItem.amount = amount;
-                    changes[i] = nonEquipItem;
-                }
-            }
-        }
-
-        if (changes.Count == 0 && emptySlots.Count > 0)
-        {
-            // If there are no changes and there are an empty entries, fill them
-            foreach (var emptySlot in emptySlots)
-            {
-                var value = emptySlot.Value;
-                var newItem = new CharacterItem();
-                newItem.id = System.Guid.NewGuid().ToString();
-                newItem.itemId = itemId;
-                newItem.level = level;
-                var addAmount = 0;
-                if (amount - maxStack >= 0)
-                {
-                    addAmount = maxStack;
-                    amount -= maxStack;
-                }
-                else
-                {
-                    addAmount = amount;
-                    amount = 0;
-                }
-                newItem.amount = addAmount;
-                changes[emptySlot.Key] = newItem;
-            }
-        }
-
-        // Apply all changes
-        foreach (var change in changes)
-        {
-            nonEquipItems[change.Key] = change.Value;
-        }
-
-        // Add new items
-        while (amount > 0)
-        {
-            var newItem = new CharacterItem();
-            newItem.id = System.Guid.NewGuid().ToString();
-            newItem.itemId = itemId;
-            newItem.level = level;
-            var addAmount = 0;
-            if (amount - maxStack >= 0)
-            {
-                addAmount = maxStack;
-                amount -= maxStack;
-            }
-            else
-            {
-                addAmount = amount;
-                amount = 0;
-            }
-            newItem.amount = addAmount;
-            nonEquipItems.Add(newItem);
-        }
-        return true;
-    }
-
-    public bool DecreaseItems(int index, int amount)
-    {
-        if (index < 0 || index > nonEquipItems.Count)
-            return false;
-        var nonEquipItem = nonEquipItems[index];
-        if (!nonEquipItem.IsValid() || amount > nonEquipItem.amount)
-            return false;
-        if (nonEquipItem.amount - amount == 0)
-            nonEquipItems.RemoveAt(index);
-        else
-        {
-            nonEquipItem.amount -= amount;
-            nonEquipItems[index] = nonEquipItem;
-        }
-        return true;
+        return false;
     }
 
     public bool CanEquipItem(CharacterItem equippingItem, string equipPosition, out string reasonWhyCannot, out HashSet<string> shouldUnequipPositions)
@@ -1902,7 +1802,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         return animActionType == AnimActionType.Attack || animActionType == AnimActionType.Skill;
     }
 
-    internal virtual void IncreaseExp(int exp)
+    public virtual void IncreaseExp(int exp)
     {
         if (!IsServer)
             return;

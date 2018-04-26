@@ -21,7 +21,7 @@ public class UINpcDialogMenu : UISelectionEntry<UINpcDialogMenuAction>
             title.text = Data.title;
     }
 
-    public void OnClick()
+    public void OnClickMenu()
     {
         var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         owningCharacter.RequestSelectNpcDialogMenu(Data.menuIndex);

@@ -31,6 +31,7 @@ public static class PlayerCharacterDataExtension
         to.EquipItems = from.EquipItems;
         to.NonEquipItems = from.NonEquipItems;
         to.Hotkeys = from.Hotkeys;
+        to.Quests = from.Quests;
         return to;
     }
 

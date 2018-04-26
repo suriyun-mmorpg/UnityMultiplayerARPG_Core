@@ -8,12 +8,15 @@ public class UIQuestTask : UISelectionEntry<KeyValuePair<QuestTask, int>>
     [Header("Generic Info Format")]
     [Tooltip("Kill Monster Task Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}")]
     public string killMonsterTaskFormat = "Kills {0}: {1}/{2}";
+    [Tooltip("Kill Monster Task Complete Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}")]
+    public string killMonsterTaskCompleteFormat = "Kills {0}: Completed";
     [Tooltip("Collect Item Task Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}")]
     public string collectItemTaskFormat = "Collects {0}: {1}/{2}";
+    [Tooltip("Collect Item Task Complete Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}")]
+    public string collectItemTaskCompleteFormat = "Collects {0}: Completed";
 
     [Header("UI Elements")]
     public Text taskDescription;
-    public GameObject taskCompleteObject;
 
     protected override void UpdateData()
     {
@@ -28,7 +31,7 @@ public class UIQuestTask : UISelectionEntry<KeyValuePair<QuestTask, int>>
                 var monsterKillAmount = monsterCharacterAmount.amount;
                 isComplete = progress >= monsterKillAmount;
                 if (taskDescription != null)
-                    taskDescription.text = string.Format(killMonsterTaskFormat, monsterTitle, progress.ToString("N0"), monsterKillAmount.ToString("N0"));
+                    taskDescription.text = string.Format(isComplete ? killMonsterTaskCompleteFormat : killMonsterTaskFormat, monsterTitle, progress.ToString("N0"), monsterKillAmount.ToString("N0"));
                 break;
             case QuestTaskType.CollectItem:
                 var itemAmount = task.itemAmount;
@@ -36,10 +39,8 @@ public class UIQuestTask : UISelectionEntry<KeyValuePair<QuestTask, int>>
                 var itemCollectAmount = itemAmount.amount;
                 isComplete = progress >= itemCollectAmount;
                 if (taskDescription != null)
-                    taskDescription.text = string.Format(killMonsterTaskFormat, itemTitle, progress.ToString("N0"), itemCollectAmount.ToString("N0"));
+                    taskDescription.text = string.Format(isComplete ? collectItemTaskCompleteFormat : collectItemTaskFormat, itemTitle, progress.ToString("N0"), itemCollectAmount.ToString("N0"));
                 break;
         }
-        if (taskCompleteObject != null)
-            taskCompleteObject.SetActive(isComplete);
     }
 }

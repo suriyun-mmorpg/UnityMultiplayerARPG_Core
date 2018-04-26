@@ -379,6 +379,117 @@ public static class CharacterDataExtension
         return count;
     }
 
+    public static bool IncreaseItems(this ICharacterData data, string itemId, int level, int amount)
+    {
+        Item itemData;
+        // If item not valid
+        if (string.IsNullOrEmpty(itemId) || amount <= 0 || !GameInstance.Items.TryGetValue(itemId, out itemData))
+            return false;
+
+        var maxStack = itemData.maxStack;
+        var emptySlots = new Dictionary<int, CharacterItem>();
+        var changes = new Dictionary<int, CharacterItem>();
+        // Loop to all slots to add amount to any slots that item amount not max in stack
+        for (var i = 0; i < data.NonEquipItems.Count; ++i)
+        {
+            var nonEquipItem = data.NonEquipItems[i];
+            if (!nonEquipItem.IsValid())
+            {
+                // If current entry is not valid, add it to empty list, going to replacing it later
+                emptySlots[i] = nonEquipItem;
+            }
+            else if (nonEquipItem.itemId.Equals(itemId))
+            {
+                // If same item id, increase its amount
+                if (nonEquipItem.amount + amount <= maxStack)
+                {
+                    nonEquipItem.amount += amount;
+                    changes[i] = nonEquipItem;
+                    amount = 0;
+                    break;
+                }
+                else if (maxStack - nonEquipItem.amount > 0)
+                {
+                    amount = maxStack - nonEquipItem.amount;
+                    nonEquipItem.amount = amount;
+                    changes[i] = nonEquipItem;
+                }
+            }
+        }
+
+        if (changes.Count == 0 && emptySlots.Count > 0)
+        {
+            // If there are no changes and there are an empty entries, fill them
+            foreach (var emptySlot in emptySlots)
+            {
+                var value = emptySlot.Value;
+                var newItem = new CharacterItem();
+                newItem.id = System.Guid.NewGuid().ToString();
+                newItem.itemId = itemId;
+                newItem.level = level;
+                var addAmount = 0;
+                if (amount - maxStack >= 0)
+                {
+                    addAmount = maxStack;
+                    amount -= maxStack;
+                }
+                else
+                {
+                    addAmount = amount;
+                    amount = 0;
+                }
+                newItem.amount = addAmount;
+                changes[emptySlot.Key] = newItem;
+            }
+        }
+
+        // Apply all changes
+        foreach (var change in changes)
+        {
+            data.NonEquipItems[change.Key] = change.Value;
+        }
+
+        // Add new items
+        while (amount > 0)
+        {
+            var newItem = new CharacterItem();
+            newItem.id = System.Guid.NewGuid().ToString();
+            newItem.itemId = itemId;
+            newItem.level = level;
+            var addAmount = 0;
+            if (amount - maxStack >= 0)
+            {
+                addAmount = maxStack;
+                amount -= maxStack;
+            }
+            else
+            {
+                addAmount = amount;
+                amount = 0;
+            }
+            newItem.amount = addAmount;
+            data.NonEquipItems.Add(newItem);
+        }
+        return true;
+    }
+
+    public static bool DecreaseItems(this ICharacterData data, int index, int amount)
+    {
+        if (index < 0 || index > data.NonEquipItems.Count)
+            return false;
+        var nonEquipItem = data.NonEquipItems[index];
+        if (!nonEquipItem.IsValid() || amount > nonEquipItem.amount)
+            return false;
+        if (nonEquipItem.amount - amount == 0)
+            data.NonEquipItems.RemoveAt(index);
+        else
+        {
+            nonEquipItem.amount -= amount;
+            data.NonEquipItems[index] = nonEquipItem;
+        }
+        return true;
+    }
+
     public static int IndexOfAttribute(this ICharacterData data, string attributeId)
     {
         var list = data.Attributes;

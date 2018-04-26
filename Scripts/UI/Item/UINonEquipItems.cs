@@ -65,9 +65,8 @@ public class UINonEquipItems : UIBase
 
         if (uiItemDialog != null && ui.Data.Key.IsValid())
         {
-            uiItemDialog.Show();
-            uiItemDialog.selectionManager = selectionManager;
             uiItemDialog.Setup(ui.Data, character, ui.indexOfData, ui.equipPosition);
+            uiItemDialog.Show();
         }
         else if (uiGameplay != null)
             uiGameplay.DeselectSelectedItem();

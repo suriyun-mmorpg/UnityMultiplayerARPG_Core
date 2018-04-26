@@ -1,12 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class UIBase : MonoBehaviour
 {
     public bool hideOnAwake = false;
     public bool moveToLastSiblingOnShow = false;
     public GameObject root;
+    public UnityEvent onShow;
+    public UnityEvent onHide;
 
     private bool isAwaken;
 
@@ -39,6 +42,7 @@ public class UIBase : MonoBehaviour
     {
         isAwaken = true;
         CacheRoot.SetActive(true);
+        onShow.Invoke();
         if (moveToLastSiblingOnShow)
             CacheRoot.transform.SetAsLastSibling();
     }
@@ -47,6 +51,7 @@ public class UIBase : MonoBehaviour
     {
         isAwaken = true;
         CacheRoot.SetActive(false);
+        onHide.Invoke();
     }
 
     public void Toggle()

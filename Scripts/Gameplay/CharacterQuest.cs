@@ -90,19 +90,20 @@ public struct CharacterQuest
         return 0;
     }
 
-    public void AddKillMonster(MonsterCharacterEntity monsterEntity, int killCount)
+    public bool AddKillMonster(MonsterCharacterEntity monsterEntity, int killCount)
     {
-        AddKillMonster(monsterEntity.DatabaseId, killCount);
+        return AddKillMonster(monsterEntity.DatabaseId, killCount);
     }
 
-    public void AddKillMonster(string monsterId, int killCount)
+    public bool AddKillMonster(string monsterId, int killCount)
     {
         var quest = GetQuest();
         if (quest == null || !quest.CacheKillMonsterIds.Contains(monsterId))
-            return;
+            return false;
         if (!KilledMonsters.ContainsKey(monsterId))
             KilledMonsters.Add(monsterId, 0);
         KilledMonsters[monsterId] += killCount;
+        return true;
     }
 
     public int CountKillMonster(string monsterId)
