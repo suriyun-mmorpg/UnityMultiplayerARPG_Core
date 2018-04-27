@@ -23,10 +23,12 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
     public string weightFormat = "{0}";
     [Tooltip("Item Type Format => {0} = {Item Type title}")]
     public string itemTypeFormat = "Item Type: {0}";
-    [Tooltip("General Item Type")]
-    public string generalItemType = "General Item";
+    [Tooltip("Junk Item Type")]
+    public string junkItemType = "Junk";
     [Tooltip("Shield Item Type")]
     public string shieldItemType = "Shield";
+    [Tooltip("Potion Item Type")]
+    public string potionItemType = "Potion";
 
     [Header("Input Dialog Settings")]
     public string dropInputTitle = "Drop Item";
@@ -78,6 +80,7 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
         var armorItem = characterItem.GetArmorItem();
         var weaponItem = characterItem.GetWeaponItem();
         var shieldItem = characterItem.GetShieldItem();
+        var potionItem = characterItem.GetPotionItem();
 
         if (level <= 0)
             onSetLevelZeroData.Invoke();
@@ -136,8 +139,10 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
                 textItemType.text = string.Format(itemTypeFormat, weaponItem.WeaponType.title);
             else if (shieldItem != null)
                 textItemType.text = string.Format(itemTypeFormat, shieldItemType);
+            else if (potionItem != null)
+                textItemType.text = string.Format(itemTypeFormat, potionItemType);
             else
-                textItemType.text = string.Format(itemTypeFormat, generalItemType);
+                textItemType.text = string.Format(itemTypeFormat, junkItemType);
         }
 
         if (uiRequirement != null)

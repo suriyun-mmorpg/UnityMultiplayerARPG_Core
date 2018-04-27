@@ -64,12 +64,12 @@ public class Item : BaseGameData
 
     public bool IsEquipment()
     {
-        return itemType != ItemType.Junk;
+        return IsArmor() || IsShield() || IsWeapon();
     }
 
     public bool IsDefendEquipment()
     {
-        return itemType == ItemType.Armor || itemType == ItemType.Shield;
+        return IsArmor() || IsShield();
     }
 
     public bool IsJunk()
@@ -82,14 +82,14 @@ public class Item : BaseGameData
         return itemType == ItemType.Armor;
     }
 
-    public bool IsWeapon()
-    {
-        return itemType == ItemType.Weapon;
-    }
-
     public bool IsShield()
     {
         return itemType == ItemType.Shield;
+    }
+
+    public bool IsWeapon()
+    {
+        return itemType == ItemType.Weapon;
     }
 
     public bool IsPotion()

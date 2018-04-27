@@ -87,6 +87,7 @@ public class UICharacterSkills : UIBase
     {
         if (uiSkillDialog != null)
         {
+            uiSkillDialog.selectionManager = SelectionManager;
             uiSkillDialog.Setup(ui.Data, character, ui.indexOfData);
             uiSkillDialog.Show();
         }

@@ -56,6 +56,7 @@ public class UICharacterQuests : UIBase
     {
         if (uiQuestDialog != null)
         {
+            uiQuestDialog.selectionManager = SelectionManager;
             uiQuestDialog.Setup(ui.Data, character, ui.indexOfData);
             uiQuestDialog.Show();
         }

@@ -67,6 +67,13 @@ public struct CharacterBuff
             cacheSkill = null;
             cacheItem = null;
             cacheBuff = null;
+            cacheDuration = 0;
+            cacheRecoveryHp = 0;
+            cacheRecoveryMp = 0;
+            cacheIncreaseStats = new CharacterStats();
+            cacheIncreaseAttributes = null;
+            cacheIncreaseResistances = null;
+            cacheIncreaseDamages = null;
             if (type == BuffType.SkillBuff || type == BuffType.SkillDebuff)
             {
                 cacheSkill = GameInstance.Skills.TryGetValue(dataId, out cacheSkill) ? cacheSkill : null;

@@ -105,6 +105,7 @@ public class UIEquipItems : UIBase
 
         if (uiItemDialog != null && ui.Data.Key.IsValid())
         {
+            uiItemDialog.selectionManager = SelectionManager;
             uiItemDialog.Setup(ui.Data, character, ui.indexOfData, ui.equipPosition);
             uiItemDialog.Show();
         }
