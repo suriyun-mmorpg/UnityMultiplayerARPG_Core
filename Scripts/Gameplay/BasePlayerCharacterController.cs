@@ -127,6 +127,7 @@ public abstract class BasePlayerCharacterController : MonoBehaviour
             CacheUISceneGameplay.UpdateCharacter();
             CacheUISceneGameplay.UpdateNonEquipItems();
             CacheUISceneGameplay.UpdateHotkeys();
+            CacheUISceneGameplay.UpdateQuests();
         }
     }
 

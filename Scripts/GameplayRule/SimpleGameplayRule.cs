@@ -102,7 +102,7 @@ public class SimpleGameplayRule : BaseGameplayRule
         var oldLevel = character.Level;
         character.Exp += exp;
         var nextLevelExp = character.GetNextLevelExp();
-        if (nextLevelExp > 0 && character.Exp >= nextLevelExp)
+        while (nextLevelExp > 0 && character.Exp >= nextLevelExp)
         {
             character.Exp = character.Exp - nextLevelExp;
             ++character.Level;
