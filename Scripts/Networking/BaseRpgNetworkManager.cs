@@ -29,7 +29,7 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        clientReadyOnConnect = true;
+        doNotEnterGameOnConnect = false;
     }
 #endif
 
