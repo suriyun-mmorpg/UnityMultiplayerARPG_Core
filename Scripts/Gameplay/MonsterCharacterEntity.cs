@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
-using LiteNetLibHighLevel;
+using LiteNetLibManager;
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(LiteNetLibTransform))]

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using LiteNetLib.Utils;
-using LiteNetLibHighLevel;
+using LiteNetLibManager;
 
 [System.Serializable]
 public struct CharacterQuest

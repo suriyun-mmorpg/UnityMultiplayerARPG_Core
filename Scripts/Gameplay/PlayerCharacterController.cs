@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using LiteNetLibHighLevel;
+using LiteNetLibManager;
 
 public class PlayerCharacterController : BasePlayerCharacterController
 {

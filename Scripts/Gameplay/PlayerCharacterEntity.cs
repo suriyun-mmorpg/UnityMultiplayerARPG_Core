@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using LiteNetLib;
-using LiteNetLibHighLevel;
+using LiteNetLibManager;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(LiteNetLibTransform))]

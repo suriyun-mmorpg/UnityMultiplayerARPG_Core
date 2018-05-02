@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLib.Utils;
-using LiteNetLibHighLevel;
+using LiteNetLibManager;
 
 [System.Serializable]
 public struct EquipWeapons

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLib;
-using LiteNetLibHighLevel;
+using LiteNetLibManager;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif

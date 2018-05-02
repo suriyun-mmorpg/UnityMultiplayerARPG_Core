@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using LiteNetLibHighLevel;
+using LiteNetLibManager;
 
 public class RpgNetworkEntity : LiteNetLibBehaviour
 {
