@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-public static class ReflectionUtils
+public static class MemberReflectionUtils
 {
     public static string GetMemberName<T>(this T instance, Expression<Func<T, object>> expression)
     {
