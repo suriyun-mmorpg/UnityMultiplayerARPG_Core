@@ -51,7 +51,7 @@ public class DamageInfo
                 fov = hitFov;
                 break;
             case DamageType.Missile:
-                fov = 1f;
+                fov = 15f;
                 break;
         }
         return fov;

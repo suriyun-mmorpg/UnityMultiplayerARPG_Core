@@ -34,12 +34,15 @@ public class GameInstance : MonoBehaviour
     public int increaseStatPointEachLevel = 5;
     public int increaseSkillPointEachLevel = 1;
     public float moveSpeedMultiplier = 5f;
-    public int startGold = 0;
-    public ItemAmount[] startItems;
     public float itemDisappearDuration = 60f;
     public float pickUpItemDistance = 1f;
     public float dropDistance = 1f;
     public float conversationDistance = 1f;
+    [Header("Game Effects")]
+    public GameEffect levelUpEffect;
+    [Header("New Character")]
+    public int startGold = 0;
+    public ItemAmount[] startItems;
     [Header("Scene")]
     public UnityScene homeScene;
     public UnityScene startScene;

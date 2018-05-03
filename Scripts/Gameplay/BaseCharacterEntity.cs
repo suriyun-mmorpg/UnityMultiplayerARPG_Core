@@ -380,14 +380,17 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         }
 
         // Validates Hp / Mp
-        if (CurrentHp < 0)
-            CurrentHp = 0;
-        if (CurrentMp < 0)
-            CurrentMp = 0;
-        if (CurrentHp > maxHp)
-            CurrentHp = maxHp;
-        if (CurrentMp > maxMp)
-            CurrentMp = maxMp;
+        if (IsServer)
+        {
+            if (CurrentHp < 0)
+                CurrentHp = 0;
+            if (CurrentMp < 0)
+                CurrentMp = 0;
+            if (CurrentHp > maxHp)
+                CurrentHp = maxHp;
+            if (CurrentMp > maxMp)
+                CurrentMp = maxMp;
+        }
     }
 
     #region Setup functions
@@ -862,9 +865,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="objectId"></param>
     protected void NetFuncSetTargetEntity(uint objectId)
     {
-        RpgNetworkEntity entity;
-        if (!Manager.Assets.TryGetSpawnedObject(objectId, out entity))
-            return;
+        RpgNetworkEntity entity = null;
+        Manager.Assets.TryGetSpawnedObject(objectId, out entity);
         SetTargetEntity(entity);
     }
 
@@ -884,6 +886,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected void NetFuncOnLevelUp()
     {
+        var gameInstance = GameInstance.Singleton;
+        if (gameInstance != null && gameInstance.levelUpEffect != null && model != null)
+            model.InstantiateEffect(new GameEffect[] { gameInstance.levelUpEffect });
         if (onLevelUp != null)
             onLevelUp.Invoke();
     }
@@ -1426,16 +1431,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         }
         var characterBuff = CharacterBuff.Create(Id, dataId, type, level);
         characterBuff.Added();
-        if (characterBuff.GetDuration() > 0)
-        {
-            buffs.Add(characterBuff);
-            buffIndexes.Add(buffId, buffs.Count - 1);
-        }
-        else
-        {
-            recoveryingHp += characterBuff.GetBuffRecoveryHp();
-            recoveryingMp += characterBuff.GetBuffRecoveryMp();
-        }
+        buffs.Add(characterBuff);
+        buffIndexes.Add(buffId, buffs.Count - 1);
     }
 
     protected void ApplyPotionBuff(CharacterItem characterItem)
@@ -1551,7 +1548,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         var weapon = equipWeapon.GetWeaponItem();
         var weaponType = weapon.WeaponType;
         // Prepare animation
-        if (skill.castAnimations.Length == 0 && isAttack)
+        if ((skill.castAnimations == null || skill.castAnimations.Length == 0) && isAttack)
         {
             // If there is no cast animations
                 // Random attack animation
@@ -1566,7 +1563,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                     totalDuration = (anim.ClipLength + anim.extraDuration) / AttackSpeed;
                 }
         }
-        else if (skill.castAnimations.Length > 0)
+        else if (skill.castAnimations != null && skill.castAnimations.Length > 0)
         {
             // Random animation
             var animArray = skill.castAnimations;

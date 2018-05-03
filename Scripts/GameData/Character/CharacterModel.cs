@@ -295,12 +295,8 @@ public class CharacterModel : MonoBehaviour
         foreach (var buff in buffs)
         {
             var buffId = buff.GetBuffId();
-            var skill = buff.GetSkill();
-            if (skill != null)
-            {
-                keepingKeys.Add(buffId);
-                addingKeys.Add(buffId);
-            }
+            keepingKeys.Add(buffId);
+            addingKeys.Add(buffId);
         }
 
         var keys = new List<string>(cacheEffects.Keys);
