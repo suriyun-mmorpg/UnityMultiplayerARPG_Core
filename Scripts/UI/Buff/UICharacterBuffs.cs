@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class UICharacterBuffs : UIBase
@@ -33,7 +34,7 @@ public class UICharacterBuffs : UIBase
             return;
         }
 
-        var buffs = character.Buffs;
+        var buffs = character.Buffs.Where(a => a.GetDuration() > 0).ToList();
         CacheList.Generate(buffs, (index, characterBuff, ui) =>
         {
             var uiCharacterBuff = ui.GetComponent<UICharacterBuff>();
