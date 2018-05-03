@@ -37,6 +37,8 @@ public class ActionAnimation
     public float triggerDurationRate;
     [Tooltip("Extra duration after played animation clip")]
     public float extraDuration;
+    [Tooltip("Audio clips playing randomly while play this animation (not loop)")]
+    public AudioClip[] audioClips;
 
     /// <summary>
     /// Initialize action id, will return false if it's already initialized

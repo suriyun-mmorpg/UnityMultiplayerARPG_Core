@@ -631,6 +631,13 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                     actionClipMultiplier = AttackSpeed;
                     break;
             }
+            if (actionAnimation.audioClips != null && actionAnimation.audioClips.Length > 0)
+            {
+                var audioClips = actionAnimation.audioClips;
+                var soundEffect = audioClips[Random.Range(0, audioClips.Length)];
+                if (soundEffect != null)
+                    AudioSource.PlayClipAtPoint(soundEffect, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
+            }
             animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, actionClipMultiplier);
             animator.SetBool(ANIM_DO_ACTION, true);
             yield return new WaitForSecondsRealtime(actionAnimation.ClipLength / actionClipMultiplier);
