@@ -82,7 +82,10 @@ public class MonsterCharacterEntity : BaseCharacterEntity
     protected override void Update()
     {
         base.Update();
-        
+
+        if (MonsterDatabase == null || !IsServer)
+            return;
+
         if (CurrentHp <= 0)
         {
             StopMove();
@@ -179,7 +182,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
                 // If stopped then random
                 var randomX = Random.Range(RANDOM_WANDER_AREA_MIN, RANDOM_WANDER_AREA_MAX) * (Random.value > 0.5f ? -1 : 1);
                 var randomZ = Random.Range(RANDOM_WANDER_AREA_MIN, RANDOM_WANDER_AREA_MAX) * (Random.value > 0.5f ? -1 : 1);
-                var randomPosition = currentPosition + new Vector3(randomX, 0, randomZ);
+                var randomPosition = respawnPosition + new Vector3(randomX, 0, randomZ);
                 NavMeshHit navMeshHit;
                 if (NavMesh.SamplePosition(randomPosition, out navMeshHit, RANDOM_WANDER_AREA_MAX, 1))
                 {
