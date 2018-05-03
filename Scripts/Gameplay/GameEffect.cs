@@ -20,7 +20,7 @@ public class GameEffect : MonoBehaviour
         }
     }
 
-    public AudioClip[] soundEffects;
+    public AudioClip[] randomSoundEffects;
     private ParticleSystem[] particles;
     private AudioSource[] audioSources;
 
@@ -32,9 +32,11 @@ public class GameEffect : MonoBehaviour
 
     private void Start()
     {
-        foreach (var soundEffect in soundEffects)
+        if (randomSoundEffects.Length > 0)
         {
-            AudioSource.PlayClipAtPoint(soundEffect, transform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
+            var soundEffect = randomSoundEffects[Random.Range(0, randomSoundEffects.Length)];
+            if (soundEffect != null)
+            AudioSource.PlayClipAtPoint(soundEffect, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
         }
         foreach (var particle in particles)
         {
