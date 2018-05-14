@@ -18,13 +18,13 @@ public enum ItemType
 public class Item : BaseGameData
 {
     public ItemType itemType;
+    public GameObject dropModel;
     public int sellPrice;
+    public float weight;
     [Range(1, 1000)]
     public int maxStack = 1;
     [Range(1, 30)]
     public int maxLevel = 1;
-    public float weight;
-    public GameObject dropModel;
 
     // Armor
     public ArmorType armorType;
@@ -56,6 +56,10 @@ public class Item : BaseGameData
             case ItemType.Weapon:
             case ItemType.Shield:
                 maxStack = 1;
+                break;
+            case ItemType.Junk:
+            case ItemType.Potion:
+                maxLevel = 1;
                 break;
         }
         EditorUtility.SetDirty(this);

@@ -34,7 +34,7 @@ public class GameInstance : MonoBehaviour
     public int increaseStatPointEachLevel = 5;
     public int increaseSkillPointEachLevel = 1;
     public float moveSpeedMultiplier = 5f;
-    public float itemDisappearDuration = 60f;
+    public float itemAppearDuration = 60f;
     public float pickUpItemDistance = 1f;
     public float dropDistance = 1f;
     public float conversationDistance = 1f;

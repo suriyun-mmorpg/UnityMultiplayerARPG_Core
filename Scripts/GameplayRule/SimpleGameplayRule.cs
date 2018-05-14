@@ -67,10 +67,10 @@ public class SimpleGameplayRule : BaseGameplayRule
         // Minimum block damage is 5%
         if (blockDmgRate < 0.05f)
             blockDmgRate = 0.05f;
-        // Maximum block damage is 5%
+        // Maximum block damage is 95%
         if (blockDmgRate > 0.95f)
             blockDmgRate = 0.95f;
-        return damage * blockDmgRate;
+        return damage - (damage * blockDmgRate);
     }
 
     public override float GetDamageReducedByResistance(BaseCharacterEntity damageReceiver, float damageAmount, DamageElement damageElement)

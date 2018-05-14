@@ -21,12 +21,12 @@ public class MonsterCharacter : BaseCharacter
 {
     [Header("Monster Data")]
     public MonsterCharacteristic characteristic;
+    [Tooltip("This will work with assist characteristic only, to detect ally")]
+    public ushort allyId;
     [Tooltip("If this is TRUE, character will not move")]
     public bool Immovable;
     [Tooltip("This move speed will be applies when it's wandering. if it's going to chase enemy, stats'moveSpeed will be applies")]
     public float wanderMoveSpeed;
-    [Tooltip("This will work with assist characteristic only, to detect ally")]
-    public ushort allyId;
     public float visualRange = 5f;
     public float deadHideDelay = 2f;
     public float deadRespawnDelay = 5f;
