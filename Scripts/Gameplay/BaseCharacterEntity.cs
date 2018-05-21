@@ -503,8 +503,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             out totalDuration,
             out damageInfo,
             out allDamageAmounts);
-        
+
         // Play animation on clients
+        animActionType = AnimActionType.Attack;
         RequestPlayActionAnimation(actionId, AnimActionType.Attack);
         // Start attack routine
         StartCoroutine(AttackRoutine(CacheTransform.position, triggerDuration, totalDuration, damageInfo, allDamageAmounts));
@@ -555,8 +556,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             out isAttack,
             out damageInfo,
             out allDamageAmounts);
-        
+
         // Play animation on clients
+        animActionType = AnimActionType.Skill;
         RequestPlayActionAnimation(actionId, AnimActionType.Skill);
         // Start use skill routine
         StartCoroutine(UseSkillRoutine(skillIndex, position, triggerDuration, totalDuration, isAttack, damageInfo, allDamageAmounts));
@@ -615,12 +617,12 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     {
         if (CurrentHp <= 0)
             return;
+        this.animActionType = animActionType;
         StartCoroutine(PlayActionAnimationRoutine(actionId, animActionType));
     }
 
     IEnumerator PlayActionAnimationRoutine(int actionId, AnimActionType animActionType)
     {
-        this.animActionType = animActionType;
         Animator animator = model == null ? null : model.CacheAnimator;
         // If animator is not null, play the action animation
         ActionAnimation actionAnimation;
