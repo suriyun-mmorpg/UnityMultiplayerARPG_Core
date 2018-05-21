@@ -12,6 +12,8 @@ public class CharacterData : ICharacterData
     public int exp;
     public int currentHp;
     public int currentMp;
+    public int currentFood;
+    public int currentWater;
     public EquipWeapons equipWeapons;
 
     public List<CharacterAttribute> attributes = new List<CharacterAttribute>();
