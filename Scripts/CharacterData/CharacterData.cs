@@ -12,6 +12,7 @@ public class CharacterData : ICharacterData
     public int exp;
     public int currentHp;
     public int currentMp;
+    public int currentStamina;
     public int currentFood;
     public int currentWater;
     public EquipWeapons equipWeapons;
@@ -29,6 +30,9 @@ public class CharacterData : ICharacterData
     public int Exp { get { return exp; } set { exp = value; } }
     public int CurrentHp { get { return currentHp; } set { currentHp = value; } }
     public int CurrentMp { get { return currentMp; } set { currentMp = value; } }
+    public int CurrentStamina { get { return currentStamina; } set { currentStamina = value; } }
+    public int CurrentFood { get { return currentFood; } set { currentFood = value; } }
+    public int CurrentWater { get { return currentWater; } set { currentWater = value; } }
     public EquipWeapons EquipWeapons { get { return equipWeapons; } set { equipWeapons = value; } }
 
     public IList<CharacterAttribute> Attributes

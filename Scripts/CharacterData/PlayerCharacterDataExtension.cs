@@ -16,6 +16,9 @@ public static class PlayerCharacterDataExtension
         to.Exp = from.Exp;
         to.CurrentHp = from.CurrentHp;
         to.CurrentMp = from.CurrentMp;
+        to.CurrentStamina = from.CurrentStamina;
+        to.CurrentFood = from.CurrentFood;
+        to.CurrentWater = from.CurrentWater;
         to.StatPoint = from.StatPoint;
         to.SkillPoint = from.SkillPoint;
         to.Gold = from.Gold;
@@ -183,22 +186,20 @@ public static class PlayerCharacterDataExtension
         // Right hand equipped item
         if (rightHandEquipItem != null)
         {
-            var characterItem = new CharacterItem();
-            characterItem.id = System.Guid.NewGuid().ToString();
-            characterItem.itemId = rightHandEquipItem.Id;
-            characterItem.level = 1;
-            characterItem.amount = rightHandEquipItem.maxStack;
-            equipWeapons.rightHand = characterItem;
+            var newItem = BaseRpgNetworkManager.Singleton.PrepareNewCharacterItem();
+            newItem.itemId = rightHandEquipItem.Id;
+            newItem.level = 1;
+            newItem.amount = rightHandEquipItem.maxStack;
+            equipWeapons.rightHand = newItem;
         }
         // Left hand equipped item
         if (leftHandEquipItem != null)
         {
-            var characterItem = new CharacterItem();
-            characterItem.id = System.Guid.NewGuid().ToString();
-            characterItem.itemId = leftHandEquipItem.Id;
-            characterItem.level = 1;
-            characterItem.amount = leftHandEquipItem.maxStack;
-            equipWeapons.leftHand = characterItem;
+            var newItem = BaseRpgNetworkManager.Singleton.PrepareNewCharacterItem();
+            newItem.itemId = leftHandEquipItem.Id;
+            newItem.level = 1;
+            newItem.amount = leftHandEquipItem.maxStack;
+            equipWeapons.leftHand = newItem;
         }
         character.EquipWeapons = equipWeapons;
         // Armors
@@ -207,12 +208,11 @@ public static class PlayerCharacterDataExtension
         {
             if (armorItem == null)
                 continue;
-            var characterItem = new CharacterItem();
-            characterItem.id = System.Guid.NewGuid().ToString();
-            characterItem.itemId = armorItem.Id;
-            characterItem.level = 1;
-            characterItem.amount = armorItem.maxStack;
-            character.EquipItems.Add(characterItem);
+            var newItem = BaseRpgNetworkManager.Singleton.PrepareNewCharacterItem();
+            newItem.itemId = armorItem.Id;
+            newItem.level = 1;
+            newItem.amount = armorItem.maxStack;
+            character.EquipItems.Add(newItem);
         }
         // General data
         character.DatabaseId = database.Id;
@@ -227,15 +227,14 @@ public static class PlayerCharacterDataExtension
         {
             if (startItem.item == null || startItem.amount <= 0)
                 continue;
-            var characterItem = new CharacterItem();
             var amount = startItem.amount;
             if (amount > startItem.item.maxStack)
                 amount = startItem.item.maxStack;
-            characterItem.id = System.Guid.NewGuid().ToString();
-            characterItem.itemId = startItem.item.Id;
-            characterItem.level = 1;
-            characterItem.amount = amount;
-            character.NonEquipItems.Add(characterItem);
+            var newItem = BaseRpgNetworkManager.Singleton.PrepareNewCharacterItem();
+            newItem.itemId = startItem.item.Id;
+            newItem.level = 1;
+            newItem.amount = amount;
+            character.NonEquipItems.Add(newItem);
         }
         // Position
         character.CurrentMapName = gameInstance.startScene;

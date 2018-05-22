@@ -294,7 +294,7 @@ public class CharacterModel : MonoBehaviour
         var addingKeys = new List<string>();
         foreach (var buff in buffs)
         {
-            var buffId = buff.GetBuffId();
+            var buffId = buff.id;
             keepingKeys.Add(buffId);
             addingKeys.Add(buffId);
         }
@@ -310,7 +310,7 @@ public class CharacterModel : MonoBehaviour
 
         foreach (var buff in buffs)
         {
-            var buffId = buff.GetBuffId();
+            var buffId = buff.id;
             if (addingKeys.Contains(buffId))
             {
                 var buffData = buff.GetBuff();

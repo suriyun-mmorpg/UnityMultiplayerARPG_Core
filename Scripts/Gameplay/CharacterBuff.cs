@@ -14,6 +14,8 @@ public enum BuffType : byte
 public struct CharacterBuff
 {
     public static readonly CharacterBuff Empty = new CharacterBuff();
+    // Use id as primary key
+    public string id;
     public string characterId;
     public string dataId;
     public BuffType type;
@@ -184,21 +186,6 @@ public struct CharacterBuff
         buffRemainsDuration = 0;
     }
 
-    public CharacterBuff Clone()
-    {
-        var newBuff = new CharacterBuff();
-        newBuff.dataId = dataId;
-        newBuff.level = level;
-        newBuff.type = type;
-        newBuff.buffRemainsDuration = buffRemainsDuration;
-        return newBuff;
-    }
-
-    public string GetBuffId()
-    {
-        return GetBuffId(characterId, dataId, type);
-    }
-
     public static CharacterBuff Create(string characterId, string dataId, BuffType type, int level)
     {
         var newBuff = new CharacterBuff();
@@ -208,11 +195,6 @@ public struct CharacterBuff
         newBuff.level = level;
         newBuff.buffRemainsDuration = 0f;
         return newBuff;
-    }
-
-    public static string GetBuffId(string characterId, string dataId, BuffType type)
-    {
-        return string.Format("<{0}>_<{1}>_<{2}>", characterId, dataId, type.ToString());
     }
 }
 

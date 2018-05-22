@@ -423,8 +423,7 @@ public static class CharacterDataExtension
             foreach (var emptySlot in emptySlots)
             {
                 var value = emptySlot.Value;
-                var newItem = new CharacterItem();
-                newItem.id = System.Guid.NewGuid().ToString();
+                var newItem = BaseRpgNetworkManager.Singleton.PrepareNewCharacterItem();
                 newItem.itemId = itemId;
                 newItem.level = level;
                 var addAmount = 0;
@@ -452,8 +451,7 @@ public static class CharacterDataExtension
         // Add new items
         while (amount > 0)
         {
-            var newItem = new CharacterItem();
-            newItem.id = System.Guid.NewGuid().ToString();
+            var newItem = BaseRpgNetworkManager.Singleton.PrepareNewCharacterItem();
             newItem.itemId = itemId;
             newItem.level = level;
             var addAmount = 0;

@@ -48,6 +48,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public SyncFieldInt exp = new SyncFieldInt();
     public SyncFieldInt currentHp = new SyncFieldInt();
     public SyncFieldInt currentMp = new SyncFieldInt();
+    public SyncFieldInt currentStamina = new SyncFieldInt();
+    public SyncFieldInt currentFood = new SyncFieldInt();
+    public SyncFieldInt currentWater = new SyncFieldInt();
     public SyncFieldEquipWeapons equipWeapons = new SyncFieldEquipWeapons();
     public SyncFieldBool isHidding = new SyncFieldBool();
     [Header("Sync Lists")]
@@ -72,7 +75,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected BaseCharacter database;
     protected RpgNetworkEntity targetEntity;
     protected CharacterModel model;
-    protected readonly Dictionary<string, int> buffIndexes = new Dictionary<string, int>();
     protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
     protected Vector3? previousPosition;
     protected Vector3 currentVelocity;
@@ -125,6 +127,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public virtual int Exp { get { return exp.Value; } set { exp.Value = value; } }
     public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
     public virtual int CurrentMp { get { return currentMp.Value; } set { currentMp.Value = value; } }
+    public virtual int CurrentStamina { get { return currentStamina.Value; } set { currentStamina.Value = value; } }
+    public virtual int CurrentFood { get { return currentFood.Value; } set { currentFood.Value = value; } }
+    public virtual int CurrentWater { get { return currentWater.Value; } set { currentWater.Value = value; } }
     public virtual EquipWeapons EquipWeapons { get { return equipWeapons; } set { equipWeapons.Value = value; } }
     public virtual float MoveSpeed { get { return this.GetMoveSpeed(); } }
     public virtual float AttackSpeed { get { return this.GetAttackSpeed(); } }
@@ -157,18 +162,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         get { return buffs; }
         set
         {
-            buffIndexes.Clear();
             buffs.Clear();
-            for (var i = 0; i < value.Count; ++i)
-            {
-                var entry = value[i];
-                var buffId = entry.GetBuffId();
-                if (!buffIndexes.ContainsKey(buffId))
-                {
-                    buffIndexes.Add(buffId, i);
-                    buffs.Add(entry);
-                }
-            }
+            foreach (var entry in value)
+                buffs.Add(entry);
         }
     }
 
@@ -320,10 +316,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                 var addingRecoveryingHp = duration > 0 ? (float)buff.GetBuffRecoveryHp() / duration * skillBuffUpdateDeltaTime : (float)buff.GetBuffRecoveryHp();
                 var addingRecoveryingMp = duration > 0 ? (float)buff.GetBuffRecoveryMp() / duration * skillBuffUpdateDeltaTime : (float)buff.GetBuffRecoveryMp();
                 if (buff.ShouldRemove())
-                {
                     buffs.RemoveAt(i);
-                    UpdateBuffIndexes();
-                }
                 else
                 {
                     buff.Update(skillBuffUpdateDeltaTime);
@@ -1181,7 +1174,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (CurrentHp <= 0)
             Killed(attacker);
         else if (debuff.HasValue)
-            ApplyBuff(debuff.Value.dataId, debuff.Value.type, debuff.Value.level);
+            ApplyBuff(debuff.Value.characterId, debuff.Value.dataId, debuff.Value.type, debuff.Value.level);
     }
     #endregion
 
@@ -1378,18 +1371,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Keys indexes update functions
-    protected void UpdateBuffIndexes()
-    {
-        buffIndexes.Clear();
-        for (var i = 0; i < buffs.Count; ++i)
-        {
-            var entry = buffs[i];
-            var buffId = CharacterBuff.GetBuffId(Id, entry.dataId, entry.type);
-            if (!buffIndexes.ContainsKey(buffId))
-                buffIndexes.Add(buffId, i);
-        }
-    }
-
     protected void UpdateEquipItemIndexes()
     {
         equipItemIndexes.Clear();
@@ -1422,19 +1403,20 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Buffs / Weapons / Damage
-    protected void ApplyBuff(string dataId, BuffType type, int level)
+    protected void ApplyBuff(string characterId, string dataId, BuffType type, int level)
     {
-        var buffId = CharacterBuff.GetBuffId(Id, dataId, type);
-        var buffIndex = -1;
-        if (buffIndexes.TryGetValue(buffId, out buffIndex))
-        {
+        var buffIndex = this.IndexOfBuff(characterId, dataId, type);
+        if (buffIndex >= 0)
             buffs.RemoveAt(buffIndex);
-            UpdateBuffIndexes();
-        }
-        var characterBuff = CharacterBuff.Create(Id, dataId, type, level);
-        characterBuff.Added();
-        buffs.Add(characterBuff);
-        buffIndexes.Add(buffId, buffs.Count - 1);
+
+        var newBuff = BaseRpgNetworkManager.Singleton.PrepareNewCharacterBuff();
+        newBuff.characterId = characterId;
+        newBuff.dataId = dataId;
+        newBuff.type = type;
+        newBuff.level = level;
+        newBuff.buffRemainsDuration = 0f;
+        newBuff.Added();
+        buffs.Add(newBuff);
     }
 
     protected void ApplyPotionBuff(CharacterItem characterItem)
@@ -1442,7 +1424,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         var item = characterItem.GetPotionItem();
         if (item == null)
             return;
-        ApplyBuff(item.Id, BuffType.PotionBuff, characterItem.level);
+        ApplyBuff(Id, item.Id, BuffType.PotionBuff, characterItem.level);
     }
 
     protected void ApplySkillBuff(CharacterSkill characterSkill)
@@ -1451,7 +1433,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (skill == null)
             return;
         if (skill.skillBuffType == SkillBuffType.BuffToUser)
-            ApplyBuff(skill.Id, BuffType.SkillBuff, characterSkill.level);
+            ApplyBuff(Id, skill.Id, BuffType.SkillBuff, characterSkill.level);
     }
 
     public CharacterItem GetRandomedWeapon(out bool isLeftHand)

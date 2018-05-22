@@ -17,6 +17,7 @@ public struct CharacterStats
     public float moveSpeed;
     public float atkSpeed;
     public float weightLimit;
+    public float stamina;
     public float food;
     public float water;
 
@@ -40,6 +41,7 @@ public struct CharacterStats
         result.moveSpeed = a.moveSpeed + b.moveSpeed;
         result.atkSpeed = a.atkSpeed + b.atkSpeed;
         result.weightLimit = a.weightLimit + b.weightLimit;
+        result.stamina = a.stamina + b.stamina;
         result.food = a.food + b.food;
         result.water = a.water + b.water;
         return result;
@@ -60,6 +62,7 @@ public struct CharacterStats
         result.moveSpeed = a.moveSpeed * multiplier;
         result.atkSpeed = a.atkSpeed * multiplier;
         result.weightLimit = a.weightLimit * multiplier;
+        result.stamina = a.stamina * multiplier;
         result.food = a.food * multiplier;
         result.water = a.water * multiplier;
         return result;

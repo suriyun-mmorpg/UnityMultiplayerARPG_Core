@@ -13,6 +13,7 @@ public enum HotkeyType : byte
 [System.Serializable]
 public struct CharacterHotkey
 {
+    public static readonly CharacterHotkey Empty = new CharacterHotkey();
     public string hotkeyId;
     public HotkeyType type;
     public string dataId;
@@ -45,7 +46,12 @@ public struct CharacterHotkey
                 cacheItem = GameInstance.Items.TryGetValue(dataId, out cacheItem) ? cacheItem : null;
         }
     }
-    
+
+    public bool IsEmpty()
+    {
+        return Equals(Empty);
+    }
+
     public Skill GetSkill()
     {
         MakeCache();

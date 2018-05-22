@@ -11,6 +11,9 @@ public interface ICharacterData
     int Exp { get; set; }
     int CurrentHp { get; set; }
     int CurrentMp { get; set; }
+    int CurrentStamina { get; set; }
+    int CurrentFood { get; set; }
+    int CurrentWater { get; set; }
     EquipWeapons EquipWeapons { get; set; }
     // Listing
     IList<CharacterAttribute> Attributes { get; set; }

@@ -9,9 +9,11 @@ using LiteNetLib.Utils;
 
 public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
 {
+    public static BaseRpgNetworkManager Singleton { get; protected set; }
     protected bool isQuit;
     protected override void Awake()
     {
+        Singleton = this;
         var gameInstance = GameInstance.Singleton;
         Assets.playerPrefab = gameInstance.playerCharacterEntityPrefab.Identity;
         var spawnablePrefabs = new List<LiteNetLibIdentity>();
@@ -100,5 +102,19 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
         if (!isQuit)
             UISceneLoading.Singleton.LoadScene(GameInstance.Singleton.homeScene);
         base.OnStopHost();
+    }
+
+    public virtual CharacterItem PrepareNewCharacterItem()
+    {
+        var result = new CharacterItem();
+        result.id = System.Guid.NewGuid().ToString();
+        return result;
+    }
+
+    public virtual CharacterBuff PrepareNewCharacterBuff()
+    {
+        var result = new CharacterBuff();
+        result.id = System.Guid.NewGuid().ToString();
+        return result;
     }
 }
