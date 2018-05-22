@@ -37,6 +37,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public const string ANIM_ACTION_CLIP_MULTIPLIER = "ActionSpeedMultiplier";
     public const float RECOVERY_UPDATE_DURATION = 0.5f;
     public const float SKILL_BUFF_UPDATE_DURATION = 0.5f;
+    public const float ACTION_COMMAND_DELAY = 0.1f;
 
     // Use id as primary key
     #region Sync data
@@ -84,6 +85,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected float skillBuffUpdateDeltaTime;
     protected float recoveryUpdateDeltaTime;
     protected bool shouldRecaches;
+    protected float lastActionCommandReceivedTime;
     #endregion
 
     #region Caches Data
@@ -480,6 +482,10 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// </summary>
     protected void NetFuncAttack()
     {
+        if (Time.realtimeSinceStartup - lastActionCommandReceivedTime < ACTION_COMMAND_DELAY)
+            return;
+        lastActionCommandReceivedTime = Time.realtimeSinceStartup;
+
         if (CurrentHp <= 0 || IsPlayingActionAnimation())
             return;
 
@@ -498,7 +504,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             out allDamageAmounts);
 
         // Play animation on clients
-        animActionType = AnimActionType.Attack;
         RequestPlayActionAnimation(actionId, AnimActionType.Attack);
         // Start attack routine
         StartCoroutine(AttackRoutine(CacheTransform.position, triggerDuration, totalDuration, damageInfo, allDamageAmounts));
@@ -523,6 +528,10 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="skillIndex">Index in `characterSkills` list which will be used</param>
     protected void NetFuncUseSkill(Vector3 position, int skillIndex)
     {
+        if (Time.realtimeSinceStartup - lastActionCommandReceivedTime < ACTION_COMMAND_DELAY)
+            return;
+        lastActionCommandReceivedTime = Time.realtimeSinceStartup;
+
         if (CurrentHp <= 0 ||
             IsPlayingActionAnimation() ||
             skillIndex < 0 ||
@@ -551,7 +560,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             out allDamageAmounts);
 
         // Play animation on clients
-        animActionType = AnimActionType.Skill;
         RequestPlayActionAnimation(actionId, AnimActionType.Skill);
         // Start use skill routine
         StartCoroutine(UseSkillRoutine(skillIndex, position, triggerDuration, totalDuration, isAttack, damageInfo, allDamageAmounts));
@@ -849,7 +857,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         {
             var combatText = Instantiate(prefab, uiSceneGameplay.combatTextTransform);
             combatText.transform.localScale = Vector3.one;
-            combatText.CacheObjectFollower.targetObject = combatTextTransform;
+            combatText.CacheObjectFollower.TargetObject = combatTextTransform;
             combatText.Amount = amount;
         }
     }
