@@ -15,15 +15,20 @@ public class NetFieldEquipWeapons : LiteNetLibNetField<EquipWeapons>
 {
     public override void Deserialize(NetDataReader reader)
     {
-        var newValue = new EquipWeapons();
+        // Right hand
         var rightHand = new CharacterItem();
+        rightHand.id = reader.GetString();
         rightHand.itemId = reader.GetString();
         rightHand.level = reader.GetInt();
         rightHand.amount = reader.GetInt();
+        // Left hand
         var leftHand = new CharacterItem();
+        leftHand.id = reader.GetString();
         leftHand.itemId = reader.GetString();
         leftHand.level = reader.GetInt();
         leftHand.amount = reader.GetInt();
+        // Set result
+        var newValue = new EquipWeapons();
         newValue.rightHand = rightHand;
         newValue.leftHand = leftHand;
         Value = newValue;
@@ -31,9 +36,13 @@ public class NetFieldEquipWeapons : LiteNetLibNetField<EquipWeapons>
 
     public override void Serialize(NetDataWriter writer)
     {
+        // Right hand
+        writer.Put(Value.rightHand.id);
         writer.Put(Value.rightHand.itemId);
         writer.Put(Value.rightHand.level);
         writer.Put(Value.rightHand.amount);
+        // Left hand
+        writer.Put(Value.leftHand.id);
         writer.Put(Value.leftHand.itemId);
         writer.Put(Value.leftHand.level);
         writer.Put(Value.leftHand.amount);

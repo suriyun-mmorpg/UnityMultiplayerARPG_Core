@@ -8,7 +8,7 @@ public class UILanConnection : UIBase
     public InputField inputNetworkAddress;
     public string DefaultNetworkAddress
     {
-        get { return GameInstance.Singleton.GetExtra<LanGameInstanceExtra>().networkAddress; }
+        get { return GameInstance.Singleton.GetGameServiceConnection<LanGameServiceConnection>().networkAddress; }
     }
     public string NetworkAddress
     {

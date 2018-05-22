@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LanGameInstanceExtra : BaseGameInstanceExtra
+public class LanGameServiceConnection : BaseGameServiceConnection
 {
     public string networkAddress = "127.0.0.1";
     public int networkPort = 7770;

@@ -9,7 +9,7 @@ using UnityEditor;
 public class GameInstance : MonoBehaviour
 {
     public static GameInstance Singleton { get; protected set; }
-    public BaseGameInstanceExtra extra;
+    public BaseGameServiceConnection gameServiceConnection;
     [Header("Gameplay Objects")]
     public PlayerCharacterEntity playerCharacterEntityPrefab;
     public MonsterCharacterEntity monsterCharacterEntityPrefab;
@@ -391,8 +391,8 @@ public class GameInstance : MonoBehaviour
         }
     }
 
-    public T GetExtra<T>() where T : BaseGameInstanceExtra
+    public T GetGameServiceConnection<T>() where T : BaseGameServiceConnection
     {
-        return extra as T;
+        return gameServiceConnection as T;
     }
 }

@@ -186,19 +186,13 @@ public static class PlayerCharacterDataExtension
         // Right hand equipped item
         if (rightHandEquipItem != null)
         {
-            var newItem = BaseRpgNetworkManager.Singleton.PrepareNewCharacterItem();
-            newItem.itemId = rightHandEquipItem.Id;
-            newItem.level = 1;
-            newItem.amount = rightHandEquipItem.maxStack;
+            var newItem = CharacterItem.Create(rightHandEquipItem);
             equipWeapons.rightHand = newItem;
         }
         // Left hand equipped item
         if (leftHandEquipItem != null)
         {
-            var newItem = BaseRpgNetworkManager.Singleton.PrepareNewCharacterItem();
-            newItem.itemId = leftHandEquipItem.Id;
-            newItem.level = 1;
-            newItem.amount = leftHandEquipItem.maxStack;
+            var newItem = CharacterItem.Create(leftHandEquipItem);
             equipWeapons.leftHand = newItem;
         }
         character.EquipWeapons = equipWeapons;
@@ -208,10 +202,7 @@ public static class PlayerCharacterDataExtension
         {
             if (armorItem == null)
                 continue;
-            var newItem = BaseRpgNetworkManager.Singleton.PrepareNewCharacterItem();
-            newItem.itemId = armorItem.Id;
-            newItem.level = 1;
-            newItem.amount = armorItem.maxStack;
+            var newItem = CharacterItem.Create(armorItem);
             character.EquipItems.Add(newItem);
         }
         // General data
@@ -230,10 +221,7 @@ public static class PlayerCharacterDataExtension
             var amount = startItem.amount;
             if (amount > startItem.item.maxStack)
                 amount = startItem.item.maxStack;
-            var newItem = BaseRpgNetworkManager.Singleton.PrepareNewCharacterItem();
-            newItem.itemId = startItem.item.Id;
-            newItem.level = 1;
-            newItem.amount = amount;
+            var newItem = CharacterItem.Create(startItem.item, 1, amount);
             character.NonEquipItems.Add(newItem);
         }
         // Position

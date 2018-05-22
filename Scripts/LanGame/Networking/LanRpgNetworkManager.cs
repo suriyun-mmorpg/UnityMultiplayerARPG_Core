@@ -24,12 +24,12 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
     protected virtual void Start()
     {
         var gameInstance = GameInstance.Singleton;
-        var gameInstanceExtra = gameInstance.GetExtra<LanGameInstanceExtra>();
+        var gameServiceConnection = gameInstance.GetGameServiceConnection<LanGameServiceConnection>();
         switch (StartType)
         {
             case GameStartType.Host:
-                networkPort = gameInstanceExtra.networkPort;
-                maxConnections = gameInstanceExtra.maxConnections;
+                networkPort = gameServiceConnection.networkPort;
+                maxConnections = gameServiceConnection.maxConnections;
                 StartHost(false);
                 break;
             case GameStartType.SinglePlayer:
@@ -37,7 +37,7 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
                 break;
             case GameStartType.Client:
                 networkAddress = ConnectingNetworkAddress;
-                networkPort = gameInstanceExtra.networkPort;
+                networkPort = gameServiceConnection.networkPort;
                 StartClient();
                 break;
         }
@@ -85,6 +85,8 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
         writer.Put(SelectedCharacter.Buffs.Count);
         foreach (var entry in SelectedCharacter.Buffs)
         {
+            writer.Put(entry.id);
+            writer.Put(entry.characterId);
             writer.Put(entry.dataId);
             writer.Put((byte)entry.type);
             writer.Put(entry.level);
@@ -180,6 +182,8 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterBuff();
+            entry.id = reader.GetString();
+            entry.characterId = reader.GetString();
             entry.dataId = reader.GetString();
             entry.type = (BuffType)reader.GetByte();
             entry.level = reader.GetInt();

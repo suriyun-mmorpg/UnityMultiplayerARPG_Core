@@ -114,7 +114,7 @@ public class UICharacterQuest : UIDataForCharacter<CharacterQuest>
         {
             CacheRewardItemList.Generate(quest.rewardItems, (index, rewardItem, ui) =>
             {
-                var characterItem = CharacterItem.Create(rewardItem.item, 1);
+                var characterItem = CharacterItem.Create(rewardItem.item);
                 characterItem.amount = rewardItem.amount;
                 var uiCharacterItem = ui.GetComponent<UICharacterItem>();
                 uiCharacterItem.Setup(new KeyValuePair<CharacterItem, int>(characterItem, characterItem.level), null, -1, string.Empty);

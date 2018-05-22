@@ -1409,12 +1409,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (buffIndex >= 0)
             buffs.RemoveAt(buffIndex);
 
-        var newBuff = BaseRpgNetworkManager.Singleton.PrepareNewCharacterBuff();
-        newBuff.characterId = characterId;
-        newBuff.dataId = dataId;
-        newBuff.type = type;
-        newBuff.level = level;
-        newBuff.buffRemainsDuration = 0f;
+        var newBuff = CharacterBuff.Create(characterId, dataId, type, level);
         newBuff.Added();
         buffs.Add(newBuff);
     }
@@ -1440,7 +1435,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     {
         isLeftHand = false;
         // Start with default weapon, if character not equip any weapons, will return this
-        var resultWeapon = CharacterItem.Create(GameInstance.Singleton.defaultWeaponItem, 1);
+        CharacterItem resultWeapon;
         // Find right hand and left and to set result weapon
         var rightHand = EquipWeapons.rightHand;
         var leftHand = EquipWeapons.leftHand;
@@ -1462,6 +1457,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             resultWeapon = leftHand;
             isLeftHand = true;
         }
+        else
+            resultWeapon = CharacterItem.Create(GameInstance.Singleton.defaultWeaponItem);
         return resultWeapon;
     }
 

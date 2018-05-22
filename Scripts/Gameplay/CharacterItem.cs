@@ -140,12 +140,18 @@ public struct CharacterItem
         return GetEquipmentItem().CanEquip(character, level);
     }
 
-    public static CharacterItem Create(Item item, int level)
+    public static CharacterItem Create(Item item, int level = 1, int amount = 1)
+    {
+        return Create(item.Id, level, amount);
+    }
+
+    public static CharacterItem Create(string itemId, int level = 1, int amount = 1)
     {
         var newItem = new CharacterItem();
-        newItem.itemId = item.Id;
+        newItem.id = System.Guid.NewGuid().ToString();
+        newItem.itemId = itemId;
         newItem.level = level;
-        newItem.amount = 1;
+        newItem.amount = amount;
         return newItem;
     }
 }
@@ -155,6 +161,7 @@ public class NetFieldCharacterItem : LiteNetLibNetField<CharacterItem>
     public override void Deserialize(NetDataReader reader)
     {
         var newValue = new CharacterItem();
+        newValue.id = reader.GetString();
         newValue.itemId = reader.GetString();
         newValue.level = reader.GetInt();
         newValue.amount = reader.GetInt();
@@ -163,6 +170,7 @@ public class NetFieldCharacterItem : LiteNetLibNetField<CharacterItem>
 
     public override void Serialize(NetDataWriter writer)
     {
+        writer.Put(Value.id);
         writer.Put(Value.itemId);
         writer.Put(Value.level);
         writer.Put(Value.amount);

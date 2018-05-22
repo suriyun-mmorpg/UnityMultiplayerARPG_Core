@@ -114,10 +114,7 @@ public class ItemDropEntity : RpgNetworkEntity
         var dropRotation = Vector3.up * Random.Range(0, 360);
         var identity = dropper.Manager.Assets.NetworkSpawn(gameInstance.itemDropEntityPrefab.gameObject, dropPosition, Quaternion.Euler(dropRotation));
         var itemDropEntity = identity.GetComponent<ItemDropEntity>();
-        var dropData = new CharacterItem();
-        dropData.itemId = itemId;
-        dropData.level = level;
-        dropData.amount = amount;
+        var dropData = CharacterItem.Create(itemId, level, amount);
         itemDropEntity.dropData = dropData;
         return itemDropEntity;
     }

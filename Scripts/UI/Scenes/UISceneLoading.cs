@@ -37,6 +37,8 @@ public class UISceneLoading : MonoBehaviour
             rootObject.SetActive(true);
         if (textProgress != null)
             textProgress.text = "0.00%";
+        if (imageGage != null)
+            imageGage.fillAmount = 0;
         yield return null;
         var asyncOp = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
         while (!asyncOp.isDone)

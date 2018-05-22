@@ -186,9 +186,10 @@ public struct CharacterBuff
         buffRemainsDuration = 0;
     }
 
-    public static CharacterBuff Create(string characterId, string dataId, BuffType type, int level)
+    public static CharacterBuff Create(string characterId, string dataId, BuffType type, int level = 1)
     {
         var newBuff = new CharacterBuff();
+        newBuff.id = System.Guid.NewGuid().ToString();
         newBuff.characterId = characterId;
         newBuff.dataId = dataId;
         newBuff.type = type;
@@ -203,6 +204,7 @@ public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>
     public override void Deserialize(NetDataReader reader)
     {
         var newValue = new CharacterBuff();
+        newValue.id = reader.GetString();
         newValue.characterId = reader.GetString();
         newValue.dataId = reader.GetString();
         newValue.type = (BuffType)reader.GetByte();
@@ -213,6 +215,7 @@ public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>
 
     public override void Serialize(NetDataWriter writer)
     {
+        writer.Put(Value.id);
         writer.Put(Value.characterId);
         writer.Put(Value.dataId);
         writer.Put((byte)Value.type);
