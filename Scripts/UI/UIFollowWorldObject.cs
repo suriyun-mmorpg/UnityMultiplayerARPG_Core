@@ -6,6 +6,16 @@ using UnityEngine;
 public class UIFollowWorldObject : MonoBehaviour
 {
     public Transform targetObject;
+    public Transform TargetObject
+    {
+        get { return targetObject; }
+        set
+        {
+            targetObject = value;
+            UpdatePosition();
+        }
+    }
+
     private UIFollowWorldPosition cachePositionFollower;
     public UIFollowWorldPosition CachePositionFollower
     {
@@ -17,22 +27,21 @@ public class UIFollowWorldObject : MonoBehaviour
         }
     }
 
-    private void Awake()
+    private void OnEnable()
     {
-        // Set target position to hidden position
-        CachePositionFollower.targetPosition = Camera.main.transform.position - (Vector3.up * 10000f);
+        UpdatePosition();
     }
 
-    private void LateUpdate()
+    private void Update()
     {
         UpdatePosition();
     }
 
     public void UpdatePosition()
     {
-        if (targetObject == null)
+        if (TargetObject == null)
             return;
 
-        CachePositionFollower.targetPosition = targetObject.transform.position;
+        CachePositionFollower.targetPosition = TargetObject.position;
     }
 }

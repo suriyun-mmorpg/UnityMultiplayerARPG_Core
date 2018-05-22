@@ -8,17 +8,7 @@ using UnityEngine.UI;
 public class UIFollowWorldPosition : MonoBehaviour
 {
     public Vector3 targetPosition;
-    private bool alreadyShown;
-    private CanvasGroup cacheCanvasGroup;
-    public CanvasGroup CacheCanvasGroup
-    {
-        get
-        {
-            if (cacheCanvasGroup == null)
-                cacheCanvasGroup = GetComponent<CanvasGroup>();
-            return cacheCanvasGroup;
-        }
-    }
+    public float damping = 5f;
 
     private RectTransform cacheTransform;
     public RectTransform CacheTransform
@@ -31,24 +21,15 @@ public class UIFollowWorldPosition : MonoBehaviour
         }
     }
 
-    private void Awake()
+    private void Start()
     {
-        CacheCanvasGroup.alpha = 0;
+        Vector2 wantedPosition = RectTransformUtility.WorldToScreenPoint(Camera.main, targetPosition);
+        CacheTransform.position = wantedPosition;
     }
 
-    private void LateUpdate()
+    private void Update()
     {
-        UpdatePosition();
-        if (!alreadyShown)
-        {
-            CacheCanvasGroup.alpha = 1;
-            alreadyShown = true;
-        }
-    }
-
-    public void UpdatePosition()
-    {
-        Vector2 pos = RectTransformUtility.WorldToScreenPoint(Camera.main, targetPosition);
-        CacheTransform.position = pos;
+        Vector2 wantedPosition = RectTransformUtility.WorldToScreenPoint(Camera.main, targetPosition);
+        CacheTransform.position = Vector3.Slerp(CacheTransform.position, wantedPosition, damping * Time.deltaTime);
     }
 }
