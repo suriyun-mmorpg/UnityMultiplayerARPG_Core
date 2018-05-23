@@ -17,8 +17,8 @@ public struct CharacterBuff
     // Use id as primary key
     public string id;
     public string characterId;
-    public string dataId;
     public BuffType type;
+    public string dataId;
     public int level;
     public float buffRemainsDuration;
     [System.NonSerialized]
@@ -186,13 +186,13 @@ public struct CharacterBuff
         buffRemainsDuration = 0;
     }
 
-    public static CharacterBuff Create(string characterId, string dataId, BuffType type, int level = 1)
+    public static CharacterBuff Create(string characterId, BuffType type, string dataId, int level = 1)
     {
         var newBuff = new CharacterBuff();
         newBuff.id = System.Guid.NewGuid().ToString();
         newBuff.characterId = characterId;
-        newBuff.dataId = dataId;
         newBuff.type = type;
+        newBuff.dataId = dataId;
         newBuff.level = level;
         newBuff.buffRemainsDuration = 0f;
         return newBuff;
@@ -206,8 +206,8 @@ public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>
         var newValue = new CharacterBuff();
         newValue.id = reader.GetString();
         newValue.characterId = reader.GetString();
-        newValue.dataId = reader.GetString();
         newValue.type = (BuffType)reader.GetByte();
+        newValue.dataId = reader.GetString();
         newValue.level = reader.GetInt();
         newValue.buffRemainsDuration = reader.GetFloat();
         Value = newValue;
@@ -217,8 +217,8 @@ public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>
     {
         writer.Put(Value.id);
         writer.Put(Value.characterId);
-        writer.Put(Value.dataId);
         writer.Put((byte)Value.type);
+        writer.Put(Value.dataId);
         writer.Put(Value.level);
         writer.Put(Value.buffRemainsDuration);
     }

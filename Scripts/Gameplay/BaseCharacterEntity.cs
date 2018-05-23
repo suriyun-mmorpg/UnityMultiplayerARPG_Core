@@ -586,7 +586,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         {
             CharacterBuff? debuff = null;
             if (skill.isDebuff)
-                debuff = CharacterBuff.Create(Id, skill.Id, BuffType.SkillDebuff, characterSkill.level);
+                debuff = CharacterBuff.Create(Id, BuffType.SkillDebuff, skill.Id, characterSkill.level);
             LaunchDamageEntity(position, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id);
         }
         yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
@@ -1417,7 +1417,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (buffIndex >= 0)
             buffs.RemoveAt(buffIndex);
 
-        var newBuff = CharacterBuff.Create(characterId, dataId, type, level);
+        var newBuff = CharacterBuff.Create(characterId, type, dataId, level);
         newBuff.Added();
         buffs.Add(newBuff);
     }
