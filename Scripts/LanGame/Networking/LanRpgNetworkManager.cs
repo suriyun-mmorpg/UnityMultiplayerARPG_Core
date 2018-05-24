@@ -6,7 +6,8 @@ using LiteNetLibManager;
 using LiteNetLib;
 using LiteNetLib.Utils;
 
-public class LanRpgNetworkManager : BaseRpgNetworkManager
+[RequireComponent(typeof(RpgGameHandler))]
+public class LanRpgNetworkManager : LiteNetLibGameManager
 {
     public enum GameStartType
     {
@@ -20,11 +21,29 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
     public static GameStartType StartType;
     public static string ConnectingNetworkAddress;
     public static PlayerCharacterData SelectedCharacter;
-    
-    protected virtual void Start()
+
+    private RpgGameHandler cacheGameHandler;
+    public RpgGameHandler CacheGameHandler
     {
+        get
+        {
+            if (cacheGameHandler == null)
+                cacheGameHandler = GetComponent<RpgGameHandler>();
+            return cacheGameHandler;
+        }
+    }
+
+    protected override void Awake()
+    {
+        CacheGameHandler.Init(this);
+        base.Awake();
+    }
+
+    protected override void Start()
+    {
+        base.Start();
         var gameInstance = GameInstance.Singleton;
-        var gameServiceConnection = gameInstance.GetGameServiceConnection<LanGameServiceConnection>();
+        var gameServiceConnection = gameInstance.NetworkSetting;
         switch (StartType)
         {
             case GameStartType.Host:
@@ -53,6 +72,18 @@ public class LanRpgNetworkManager : BaseRpgNetworkManager
                 owningCharacter.SavePersistentCharacterData();
             lastSaveTime = Time.realtimeSinceStartup;
         }
+    }
+
+    public override void OnClientDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
+    {
+        base.OnClientDisconnected(peer, disconnectInfo);
+        CacheGameHandler.OnClientDisconnected(peer, disconnectInfo);
+    }
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+        CacheGameHandler.OnStartServer();
     }
 
     public override void SerializeClientReadyExtra(NetDataWriter writer)

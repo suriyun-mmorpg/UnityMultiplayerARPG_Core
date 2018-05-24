@@ -22,17 +22,6 @@ public class RpgNetworkEntity : LiteNetLibBehaviour
         }
     }
 
-    private BaseRpgNetworkManager cacheManager;
-    public BaseRpgNetworkManager CacheManager
-    {
-        get
-        {
-            if (cacheManager == null)
-                cacheManager = Manager as BaseRpgNetworkManager;
-            return cacheManager;
-        }
-    }
-
     protected virtual void LateUpdate()
     {
         if (textTitle != null)

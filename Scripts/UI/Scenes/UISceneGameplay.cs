@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using LiteNetLibManager;
 
 public class UISceneGameplay : MonoBehaviour
 {
@@ -130,8 +131,8 @@ public class UISceneGameplay : MonoBehaviour
 
     public void OnClickExit()
     {
-        var networkManager = FindObjectOfType<BaseRpgNetworkManager>();
-        networkManager.StopHost();
+        var gameHandler = FindObjectOfType<RpgGameHandler>();
+        gameHandler.Disconnect();
     }
 
     public void OnCharacterDead(bool isInitialize)

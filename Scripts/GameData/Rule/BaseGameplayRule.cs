@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BaseGameplayRule : MonoBehaviour
+public abstract class BaseGameplayRule : ScriptableObject
 {
     public abstract float GetHitChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver);
     public abstract float GetCriticalChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver);

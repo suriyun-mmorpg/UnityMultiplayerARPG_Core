@@ -9,7 +9,10 @@ using UnityEditor;
 public class GameInstance : MonoBehaviour
 {
     public static GameInstance Singleton { get; protected set; }
-    public BaseGameServiceConnection gameServiceConnection;
+    [SerializeField]
+    private BaseGameplayRule gameplayRule;
+    [SerializeField]
+    private NetworkSetting networkSetting;
     [Header("Gameplay Objects")]
     public PlayerCharacterEntity playerCharacterEntityPrefab;
     public MonsterCharacterEntity monsterCharacterEntityPrefab;
@@ -61,17 +64,24 @@ public class GameInstance : MonoBehaviour
     public static readonly Dictionary<string, Quest> Quests = new Dictionary<string, Quest>();
     public static readonly Dictionary<int, ActionAnimation> ActionAnimations = new Dictionary<int, ActionAnimation>();
     public static readonly Dictionary<int, GameEffectCollection> GameEffectCollections = new Dictionary<int, GameEffectCollection>();
-
-    private BaseGameplayRule cacheGameplayRule;
+    
     public BaseGameplayRule GameplayRule
     {
         get
         {
-            if (cacheGameplayRule == null)
-                cacheGameplayRule = GetComponent<BaseGameplayRule>();
-            if (cacheGameplayRule == null)
-                cacheGameplayRule = gameObject.AddComponent<SimpleGameplayRule>();
-            return cacheGameplayRule;
+            if (gameplayRule == null)
+                gameplayRule = ScriptableObject.CreateInstance<SimpleGameplayRule>();
+            return gameplayRule;
+        }
+    }
+
+    public NetworkSetting NetworkSetting
+    {
+        get
+        {
+            if (networkSetting == null)
+                networkSetting = ScriptableObject.CreateInstance<NetworkSetting>();
+            return networkSetting;
         }
     }
 
@@ -389,10 +399,5 @@ public class GameInstance : MonoBehaviour
                 continue;
             GameEffectCollections[gameEffectCollection.Id] = gameEffectCollection;
         }
-    }
-
-    public T GetGameServiceConnection<T>() where T : BaseGameServiceConnection
-    {
-        return gameServiceConnection as T;
     }
 }

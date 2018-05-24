@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[CreateAssetMenu(fileName = "SimpleGameplayRule", menuName = "Create GameplayRule/SimpleGameplayRule")]
 public class SimpleGameplayRule : BaseGameplayRule
 {
     public override float GetHitChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)

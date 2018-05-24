@@ -1,15 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using LiteNetLibManager;
+using UnityEngine;
 using LiteNetLib;
+using LiteNetLibManager;
 
-public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
+public class RpgGameHandler : MonoBehaviour
 {
-    protected bool isQuit;
-    protected override void Awake()
+    private LiteNetLibGameManager networkManager;
+
+    public void Init(LiteNetLibGameManager networkManager)
     {
+        this.networkManager = networkManager;
+        networkManager.doNotEnterGameOnConnect = false;
         var gameInstance = GameInstance.Singleton;
-        Assets.playerPrefab = gameInstance.playerCharacterEntityPrefab.Identity;
+        networkManager.Assets.playerPrefab = gameInstance.playerCharacterEntityPrefab.Identity;
         var spawnablePrefabs = new List<LiteNetLibIdentity>();
         spawnablePrefabs.Add(gameInstance.monsterCharacterEntityPrefab.Identity);
         spawnablePrefabs.Add(gameInstance.itemDropEntityPrefab.Identity);
@@ -18,35 +22,21 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
         {
             spawnablePrefabs.Add(damageEntity.Identity);
         }
-        Assets.spawnablePrefabs = spawnablePrefabs.ToArray();
-        base.Awake();
+        networkManager.Assets.spawnablePrefabs = spawnablePrefabs.ToArray();
     }
 
-#if UNITY_EDITOR
-    private void OnValidate()
+    public void Disconnect()
     {
-        doNotEnterGameOnConnect = false;
-    }
-#endif
-
-    protected override void RegisterServerMessages()
-    {
-        base.RegisterServerMessages();
+        networkManager.StopHost();
     }
 
-    protected override void RegisterClientMessages()
+    public void Quit()
     {
-        base.RegisterClientMessages();
+        Application.Quit();
     }
 
-    public override void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
+    public void OnClientDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
     {
-        base.OnPeerDisconnected(peer, disconnectInfo);
-    }
-
-    public override void OnClientDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
-    {
-        base.OnClientDisconnected(peer, disconnectInfo);
         var errorMessage = "Unknow";
         switch (disconnectInfo.Reason)
         {
@@ -75,26 +65,12 @@ public abstract class BaseRpgNetworkManager : LiteNetLibGameManager
         }
     }
 
-    protected override void OnApplicationQuit()
+    public void OnStartServer()
     {
-        isQuit = true;
-        base.OnApplicationQuit();
-    }
-
-    public override void OnStartServer()
-    {
-        base.OnStartServer();
-        var monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
+        var monsterSpawnAreas = Object.FindObjectsOfType<MonsterSpawnArea>();
         foreach (var monsterSpawnArea in monsterSpawnAreas)
         {
-            monsterSpawnArea.RandomSpawn(this);
+            monsterSpawnArea.RandomSpawn(networkManager);
         }
-    }
-
-    public override void OnStopHost()
-    {
-        if (!isQuit)
-            UISceneLoading.Singleton.LoadScene(GameInstance.Singleton.homeScene);
-        base.OnStopHost();
     }
 }
