@@ -4,7 +4,7 @@ using UnityEngine;
 using LiteNetLib;
 using LiteNetLibManager;
 
-public class RpgGameHandler : MonoBehaviour
+public class RpgGameManager : MonoBehaviour
 {
     private LiteNetLibGameManager networkManager;
 
@@ -65,9 +65,14 @@ public class RpgGameHandler : MonoBehaviour
         }
     }
 
+    public void OnStopClient()
+    {
+        UISceneLoading.Singleton.LoadScene(GameInstance.Singleton.homeScene);
+    }
+
     public void OnStartServer()
     {
-        var monsterSpawnAreas = Object.FindObjectsOfType<MonsterSpawnArea>();
+        var monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
         foreach (var monsterSpawnArea in monsterSpawnAreas)
         {
             monsterSpawnArea.RandomSpawn(networkManager);
