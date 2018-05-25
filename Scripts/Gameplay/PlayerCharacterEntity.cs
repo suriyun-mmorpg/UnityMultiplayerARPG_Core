@@ -181,11 +181,14 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
                         CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.Euler(lookAtRotation), angularSpeed * Time.fixedDeltaTime);
                     }
                 }
-            }
 
-            // Jump
-            if (isJumping)
-                CacheRigidbody.velocity = new Vector3(velocity.x, CalculateJumpVerticalSpeed(), velocity.z);
+                // Jump
+                if (isJumping)
+                {
+                    CacheRigidbody.velocity = new Vector3(velocity.x, CalculateJumpVerticalSpeed(), velocity.z);
+                    isJumping = false;
+                }
+            }
 
             if (Mathf.Abs(velocity.y) > groundingDistance)
                 isGrounded = false;
@@ -219,7 +222,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         }
     }
 
-    protected virtual void StopMove()
+    public virtual void StopMove()
     {
         navPaths = null;
         moveDirection = Vector3.zero;
@@ -278,8 +281,8 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     {
         base.OnSetup();
         // Setup network components
-        CacheNetTransform.ownerClientCanSendTransform = false;
-        CacheNetTransform.ownerClientNotInterpolate = true;
+        CacheNetTransform.ownerClientCanSendTransform = true;
+        CacheNetTransform.ownerClientNotInterpolate = false;
         // On data changes events
         statPoint.onChange += OnStatPointChange;
         skillPoint.onChange += OnSkillPointChange;
@@ -291,7 +294,6 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         RegisterNetFunction("SwapOrMergeItem", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((fromIndex, toIndex) => NetFuncSwapOrMergeItem(fromIndex, toIndex)));
         RegisterNetFunction("AddAttribute", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((attributeIndex, amount) => NetFuncAddAttribute(attributeIndex, amount)));
         RegisterNetFunction("AddSkill", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((skillIndex, amount) => NetFuncAddSkill(skillIndex, amount)));
-        RegisterNetFunction("PointClickMovement", new LiteNetLibFunction<NetFieldVector3>((position) => NetFuncPointClickMovement(position)));
         RegisterNetFunction("Respawn", new LiteNetLibFunction(NetFuncRespawn));
         RegisterNetFunction("AssignHotkey", new LiteNetLibFunction<NetFieldString, NetFieldByte, NetFieldString>((hotkeyId, type, dataId) => NetFuncAssignHotkey(hotkeyId, type, dataId)));
         RegisterNetFunction("NpcActivate", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncNpcActivate(objectId)));
@@ -383,14 +385,6 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         skills[skillIndex] = skill;
 
         SkillPoint -= amount;
-    }
-
-    protected void NetFuncPointClickMovement(Vector3 position)
-    {
-        if (CurrentHp <= 0)
-            return;
-        SetMovePaths(position);
-        currentNpcDialog = null;
     }
 
     protected void NetFuncRespawn()
@@ -560,15 +554,6 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         CallNetFunction("AddSkill", FunctionReceivers.Server, skillIndex, amount);
     }
 
-    public void RequestPointClickMovement(Vector3 position)
-    {
-        if (CurrentHp <= 0)
-            return;
-        if (!IsServer && CacheNetTransform.ownerClientNotInterpolate)
-            SetMovePaths(position);
-        CallNetFunction("PointClickMovement", FunctionReceivers.Server, position);
-    }
-
     public void RequestRespawn()
     {
         CallNetFunction("Respawn", FunctionReceivers.Server);
@@ -636,6 +621,22 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
             // Dequeue first path it's not require for future movement
             navPaths.Dequeue();
         }
+    }
+
+    public void KeyMovement(Vector3 direction, bool isJump)
+    {
+        if (CurrentHp <= 0)
+            return;
+        moveDirection = direction;
+        if (!isJumping)
+            isJumping = isGrounded && isJump;
+    }
+
+    public void PointClickMovement(Vector3 position)
+    {
+        if (CurrentHp <= 0)
+            return;
+        SetMovePaths(position);
     }
 
     public void Warp(string mapName, Vector3 position)

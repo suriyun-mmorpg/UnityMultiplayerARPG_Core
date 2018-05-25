@@ -4,8 +4,15 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using LiteNetLibManager;
 
+public enum PlayerCharacterControllerMode
+{
+    PointClick,
+    WASD,
+}
+
 public class PlayerCharacterController : BasePlayerCharacterController
 {
+    public PlayerCharacterControllerMode controllerMode;
     public struct UsingSkillData
     {
         public Vector3 position;
@@ -16,7 +23,6 @@ public class PlayerCharacterController : BasePlayerCharacterController
             this.skillIndex = skillIndex;
         }
     }
-
     protected bool pointClickMoveStopped;
     protected Vector3? destination;
     protected UsingSkillData? queueUsingSkill;
@@ -67,6 +73,22 @@ public class PlayerCharacterController : BasePlayerCharacterController
         if (CacheCharacterEntity.CurrentHp <= 0)
             return;
 
+        switch (controllerMode)
+        {
+            case PlayerCharacterControllerMode.PointClick:
+                UpdatePointClickInput();
+                break;
+            case PlayerCharacterControllerMode.WASD:
+                UpdateWASDInput();
+                break;
+        }
+
+        if (InputManager.GetButtonDown("PickUpItem"))
+            CacheCharacterEntity.RequestPickupItem();
+    }
+
+    protected void UpdatePointClickInput()
+    {
         var gameInstance = GameInstance.Singleton;
         if (!EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButtonDown(0))
         {
@@ -122,7 +144,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 else
                 {
                     destination = targetPosition.Value;
-                    CacheCharacterEntity.RequestPointClickMovement(targetPosition.Value);
+                    CacheCharacterEntity.PointClickMovement(targetPosition.Value);
                 }
                 pointClickMoveStopped = false;
             }
@@ -250,13 +272,35 @@ public class PlayerCharacterController : BasePlayerCharacterController
         }
     }
 
+    protected void UpdateWASDInput()
+    {
+        destination = null;
+        var gameInstance = GameInstance.Singleton;
+        var horizontalInput = InputManager.GetAxis("Horizontal", true);
+        var verticalInput = InputManager.GetAxis("Vertical", true);
+        var jumpInput = InputManager.GetButtonDown("Jump");
+
+        var moveDirection = Vector3.zero;
+        moveDirection += CacheGameplayCameraControls.transform.forward * verticalInput;
+        moveDirection += CacheGameplayCameraControls.transform.right * horizontalInput;
+        moveDirection.y = 0;
+        moveDirection = moveDirection.normalized;
+
+        CacheCharacterEntity.KeyMovement(moveDirection, jumpInput);
+        if (InputManager.GetButton("Fire1"))
+        {
+            CacheCharacterEntity.StopMove();
+            CacheCharacterEntity.RequestAttack();
+        }
+    }
+
     protected void UpdateTargetEntityPosition(RpgNetworkEntity entity)
     {
         if (entity == null)
             return;
 
         var targetPosition = entity.CacheTransform.position;
-        CacheCharacterEntity.RequestPointClickMovement(targetPosition);
+        CacheCharacterEntity.PointClickMovement(targetPosition);
         pointClickMoveStopped = false;
     }
 
@@ -264,7 +308,8 @@ public class PlayerCharacterController : BasePlayerCharacterController
     {
         if (!pointClickMoveStopped)
         {
-            CacheCharacterEntity.RequestPointClickMovement(CacheCharacterTransform.position);
+            destination = null;
+            CacheCharacterEntity.StopMove();
             pointClickMoveStopped = true;
         }
     }
