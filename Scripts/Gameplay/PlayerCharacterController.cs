@@ -23,7 +23,6 @@ public class PlayerCharacterController : BasePlayerCharacterController
             this.skillIndex = skillIndex;
         }
     }
-    protected bool pointClickMoveStopped;
     protected Vector3? destination;
     protected UsingSkillData? queueUsingSkill;
 
@@ -147,7 +146,6 @@ public class PlayerCharacterController : BasePlayerCharacterController
                     destination = targetPosition.Value;
                     CacheCharacterEntity.PointClickMovement(targetPosition.Value);
                 }
-                pointClickMoveStopped = false;
             }
         }
 
@@ -162,11 +160,16 @@ public class PlayerCharacterController : BasePlayerCharacterController
             {
                 queueUsingSkill = null;
                 CacheCharacterEntity.SetTargetEntity(null);
-                StopPointClickMove();
+                CacheCharacterEntity.StopMove();
                 return;
             }
+
             if (CacheCharacterEntity.IsPlayingActionAnimation())
+            {
+                CacheCharacterEntity.StopMove();
                 return;
+            }
+
             // Find attack distance and fov, from weapon or skill
             var attackDistance = CacheCharacterEntity.GetAttackDistance();
             var attackFov = CacheCharacterEntity.GetAttackFov();
@@ -185,7 +188,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
                     else
                     {
                         // Stop movement to use non attack skill
-                        StopPointClickMove();
+                        CacheCharacterEntity.StopMove();
                         RequestUseSkill(queueUsingSkillValue.position, queueUsingSkillValue.skillIndex);
                         queueUsingSkill = null;
                         return;
@@ -199,7 +202,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
             if (Vector3.Distance(CacheCharacterTransform.position, targetEnemy.CacheTransform.position) <= actDistance)
             {
                 // Stop movement to attack
-                StopPointClickMove();
+                CacheCharacterEntity.StopMove();
                 var halfFov = attackFov * 0.5f;
                 var targetDir = (CacheCharacterTransform.position - targetEnemy.CacheTransform.position).normalized;
                 var angle = Vector3.Angle(targetDir, CacheCharacterTransform.forward);
@@ -235,13 +238,13 @@ public class PlayerCharacterController : BasePlayerCharacterController
             {
                 queueUsingSkill = null;
                 CacheCharacterEntity.SetTargetEntity(null);
-                StopPointClickMove();
+                CacheCharacterEntity.StopMove();
                 return;
             }
             var actDistance = gameInstance.conversationDistance - stoppingDistance;
             if (Vector3.Distance(CacheCharacterTransform.position, targetPlayer.CacheTransform.position) <= actDistance)
             {
-                StopPointClickMove();
+                CacheCharacterEntity.StopMove();
                 // TODO: do something
             }
             else
@@ -252,7 +255,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
             var actDistance = gameInstance.conversationDistance - stoppingDistance;
             if (Vector3.Distance(CacheCharacterTransform.position, targetNpc.CacheTransform.position) <= actDistance)
             {
-                StopPointClickMove();
+                CacheCharacterEntity.StopMove();
                 CacheCharacterEntity.RequestNpcActivate();
                 CacheCharacterEntity.SetTargetEntity(null);
             }
@@ -264,7 +267,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
             var actDistance = gameInstance.pickUpItemDistance - stoppingDistance;
             if (Vector3.Distance(CacheCharacterTransform.position, targetItemDrop.CacheTransform.position) <= actDistance)
             {
-                StopPointClickMove();
+                CacheCharacterEntity.StopMove();
                 CacheCharacterEntity.RequestPickupItem();
                 CacheCharacterEntity.SetTargetEntity(null);
             }
@@ -276,11 +279,18 @@ public class PlayerCharacterController : BasePlayerCharacterController
     protected void UpdateWASDInput()
     {
         destination = null;
+
+        if (CacheCharacterEntity.IsPlayingActionAnimation())
+        {
+            CacheCharacterEntity.StopMove();
+            return;
+        }
+
         var gameInstance = GameInstance.Singleton;
         var horizontalInput = InputManager.GetAxis("Horizontal", true);
         var verticalInput = InputManager.GetAxis("Vertical", true);
         var jumpInput = InputManager.GetButtonDown("Jump");
-
+        
         var moveDirection = Vector3.zero;
         moveDirection += CacheGameplayCameraControls.transform.forward * verticalInput;
         moveDirection += CacheGameplayCameraControls.transform.right * horizontalInput;
@@ -290,12 +300,20 @@ public class PlayerCharacterController : BasePlayerCharacterController
         if (moveDirection.sqrMagnitude > 0.1f && CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
             CacheUISceneGameplay.uiNpcDialog.Hide();
 
-        CacheCharacterEntity.KeyMovement(moveDirection, jumpInput);
-        if (!EventSystem.current.IsPointerOverGameObject() && InputManager.GetButton("Fire1"))
+        if (queueUsingSkill.HasValue)
         {
             CacheCharacterEntity.StopMove();
-            CacheCharacterEntity.RequestAttack();
+            var queueUsingSkillValue = queueUsingSkill.Value;
+            RequestUseSkill(queueUsingSkillValue.position, queueUsingSkillValue.skillIndex);
+            queueUsingSkill = null;
         }
+        else if (!EventSystem.current.IsPointerOverGameObject() && InputManager.GetButton("Fire1"))
+        {
+            CacheCharacterEntity.StopMove();
+            RequestAttack();
+        }
+        else
+            CacheCharacterEntity.KeyMovement(moveDirection, jumpInput);
     }
 
     protected void UpdateTargetEntityPosition(RpgNetworkEntity entity)
@@ -305,17 +323,6 @@ public class PlayerCharacterController : BasePlayerCharacterController
 
         var targetPosition = entity.CacheTransform.position;
         CacheCharacterEntity.PointClickMovement(targetPosition);
-        pointClickMoveStopped = false;
-    }
-
-    public void StopPointClickMove()
-    {
-        if (!pointClickMoveStopped)
-        {
-            destination = null;
-            CacheCharacterEntity.StopMove();
-            pointClickMoveStopped = true;
-        }
     }
 
     public void RequestAttack()
@@ -353,7 +360,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 {
                     destination = null;
                     queueUsingSkill = null;
-                    StopPointClickMove();
+                    CacheCharacterEntity.StopMove();
                     RequestUseSkill(CacheCharacterTransform.position, skillIndex);
                 }
             }

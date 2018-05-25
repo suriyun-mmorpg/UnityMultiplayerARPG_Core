@@ -226,7 +226,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     {
         navPaths = null;
         moveDirection = Vector3.zero;
-        CacheRigidbody.velocity = Vector3.zero;
+        CacheRigidbody.velocity = new Vector3(0, CacheRigidbody.velocity.y, 0);
     }
 
     protected float CalculateJumpVerticalSpeed()
@@ -650,6 +650,8 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         if (CurrentHp <= 0)
             return;
         moveDirection = direction;
+        if (moveDirection.sqrMagnitude == 0 && isGrounded)
+            CacheRigidbody.velocity = new Vector3(0, CacheRigidbody.velocity.y, 0);
         if (!isJumping)
             isJumping = isGrounded && isJump;
     }
