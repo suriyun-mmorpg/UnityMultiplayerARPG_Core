@@ -57,8 +57,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
             if (Vector3.Distance(destinationValue, CacheCharacterTransform.position) < stoppingDistance + 0.5f)
                 destination = null;
         }
-
-
+        
         UpdateInput();
     }
 
@@ -83,6 +82,8 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 break;
         }
 
+        if (InputManager.GetButtonDown("Activate"))
+            CacheCharacterEntity.RequestNpcActivate();
         if (InputManager.GetButtonDown("PickUpItem"))
             CacheCharacterEntity.RequestPickupItem();
     }
@@ -252,7 +253,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
             if (Vector3.Distance(CacheCharacterTransform.position, targetNpc.CacheTransform.position) <= actDistance)
             {
                 StopPointClickMove();
-                CacheCharacterEntity.RequestNpcActivate(targetNpc.ObjectId);
+                CacheCharacterEntity.RequestNpcActivate();
                 CacheCharacterEntity.SetTargetEntity(null);
             }
             else
@@ -286,8 +287,11 @@ public class PlayerCharacterController : BasePlayerCharacterController
         moveDirection.y = 0;
         moveDirection = moveDirection.normalized;
 
+        if (moveDirection.sqrMagnitude > 0.1f && CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
+            CacheUISceneGameplay.uiNpcDialog.Hide();
+
         CacheCharacterEntity.KeyMovement(moveDirection, jumpInput);
-        if (InputManager.GetButton("Fire1"))
+        if (!EventSystem.current.IsPointerOverGameObject() && InputManager.GetButton("Fire1"))
         {
             CacheCharacterEntity.StopMove();
             CacheCharacterEntity.RequestAttack();

@@ -692,6 +692,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             }
         }
 
+        if (itemDropEntity == null)
+            return;
+
         var itemDropData = itemDropEntity.dropData;
         if (!itemDropData.IsValid())
         {

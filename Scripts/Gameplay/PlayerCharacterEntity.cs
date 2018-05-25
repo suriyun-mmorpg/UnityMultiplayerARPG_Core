@@ -296,7 +296,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         RegisterNetFunction("AddSkill", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((skillIndex, amount) => NetFuncAddSkill(skillIndex, amount)));
         RegisterNetFunction("Respawn", new LiteNetLibFunction(NetFuncRespawn));
         RegisterNetFunction("AssignHotkey", new LiteNetLibFunction<NetFieldString, NetFieldByte, NetFieldString>((hotkeyId, type, dataId) => NetFuncAssignHotkey(hotkeyId, type, dataId)));
-        RegisterNetFunction("NpcActivate", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncNpcActivate(objectId)));
+        RegisterNetFunction("NpcActivate", new LiteNetLibFunction(() => NetFuncNpcActivate()));
         RegisterNetFunction("ShowNpcDialog", new LiteNetLibFunction<NetFieldString>((npcDialogId) => NetFuncShowNpcDialog(npcDialogId)));
         RegisterNetFunction("SelectNpcDialogMenu", new LiteNetLibFunction<NetFieldInt>((menuIndex) => NetFuncSelectNpcDialogMenu(menuIndex)));
     }
@@ -405,12 +405,34 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
             hotkeys.Add(characterHotkey);
     }
 
-    protected void NetFuncNpcActivate(uint objectId)
+    protected void NetFuncNpcActivate()
     {
-        NpcEntity entity;
-        if (!Manager.Assets.TryGetSpawnedObject(objectId, out entity))
+        if (CurrentHp <= 0 || IsPlayingActionAnimation())
             return;
-        currentNpcDialog = entity.startDialog;
+
+        var gameInstance = GameInstance.Singleton;
+        NpcEntity npcEntity;
+        var isFoundTargetEntity = TryGetTargetEntity(out npcEntity);
+        // If have target entity but it's too far from character, don't pick it up
+        if (isFoundTargetEntity && Vector3.Distance(CacheTransform.position, npcEntity.CacheTransform.position) >= gameInstance.conversationDistance)
+            return;
+
+        // If target entity have not been set, try to find nearby npc
+        if (!isFoundTargetEntity)
+        {
+            var foundEntities = Physics.OverlapSphere(CacheTransform.position, gameInstance.conversationDistance, gameInstance.characterLayer.Mask);
+            foreach (var foundEntity in foundEntities)
+            {
+                npcEntity = foundEntity.GetComponent<NpcEntity>();
+                if (npcEntity != null)
+                    break;
+            }
+        }
+
+        if (npcEntity == null)
+            return;
+
+        currentNpcDialog = npcEntity.startDialog;
         if (currentNpcDialog != null)
             RequestShowNpcDialog(currentNpcDialog.Id);
     }
@@ -564,9 +586,9 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         CallNetFunction("AssignHotkey", FunctionReceivers.Server, hotkeyId, (byte)type, dataId);
     }
 
-    public void RequestNpcActivate(uint objectId)
+    public void RequestNpcActivate()
     {
-        CallNetFunction("NpcActivate", FunctionReceivers.Server, objectId);
+        CallNetFunction("NpcActivate", FunctionReceivers.Server);
     }
 
     public void RequestShowNpcDialog(string npcDialogId)
