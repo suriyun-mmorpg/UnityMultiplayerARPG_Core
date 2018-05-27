@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class UIBase : MonoBehaviour
 {
@@ -23,6 +24,32 @@ public class UIBase : MonoBehaviour
         }
     }
 
+    private Canvas cacheRootCanvas;
+    public Canvas CacheRootCanvas
+    {
+        get
+        {
+            if (cacheRootCanvas == null)
+                cacheRootCanvas = CacheRoot.GetComponent<Canvas>();
+            if (cacheRootCanvas == null)
+                cacheRootCanvas = CacheRoot.AddComponent<Canvas>();
+            return cacheRootCanvas;
+        }
+    }
+
+    private GraphicRaycaster cacheGraphicRaycaster;
+    public GraphicRaycaster CacheGraphicRaycaster
+    {
+        get
+        {
+            if (cacheGraphicRaycaster == null)
+                cacheGraphicRaycaster = CacheRoot.GetComponent<GraphicRaycaster>();
+            if (cacheGraphicRaycaster == null)
+                cacheGraphicRaycaster = CacheRoot.AddComponent<GraphicRaycaster>();
+            return cacheGraphicRaycaster;
+        }
+    }
+
     protected virtual void Awake()
     {
         if (isAwaken)
@@ -35,13 +62,16 @@ public class UIBase : MonoBehaviour
 
     public virtual bool IsVisible()
     {
-        return CacheRoot.activeSelf;
+        return CacheRoot.activeSelf && CacheRootCanvas.enabled;
     }
 
     public virtual void Show()
     {
         isAwaken = true;
-        CacheRoot.SetActive(true);
+        CacheRootCanvas.enabled = true;
+        CacheGraphicRaycaster.enabled = true;
+        if (!CacheRoot.activeSelf)
+            CacheRoot.SetActive(true);
         onShow.Invoke();
         if (moveToLastSiblingOnShow)
             CacheRoot.transform.SetAsLastSibling();
@@ -50,7 +80,8 @@ public class UIBase : MonoBehaviour
     public virtual void Hide()
     {
         isAwaken = true;
-        CacheRoot.SetActive(false);
+        CacheRootCanvas.enabled = false;
+        CacheGraphicRaycaster.enabled = false;
         onHide.Invoke();
     }
 
