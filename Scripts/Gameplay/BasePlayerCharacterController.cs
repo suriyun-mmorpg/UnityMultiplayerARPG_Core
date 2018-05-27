@@ -156,9 +156,9 @@ public abstract class BasePlayerCharacterController : MonoBehaviour
             CacheGameplayCameraControls.target = CacheCharacterTransform;
             CacheTargetObject = Instantiate(gameInstance.targetObject);
             CacheTargetObject.gameObject.SetActive(false);
-            if (gameInstance.uiSceneGameplayPrefab != null)
+            if (gameInstance.UISceneGameplayPrefab != null)
             {
-                CacheUISceneGameplay = Instantiate(gameInstance.uiSceneGameplayPrefab);
+                CacheUISceneGameplay = Instantiate(gameInstance.UISceneGameplayPrefab);
                 CacheUISceneGameplay.UpdateCharacter();
                 CacheUISceneGameplay.UpdateSkills();
                 CacheUISceneGameplay.UpdateEquipItems();

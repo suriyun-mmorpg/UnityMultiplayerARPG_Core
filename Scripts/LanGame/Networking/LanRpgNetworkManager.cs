@@ -65,12 +65,12 @@ public class LanRpgNetworkManager : LiteNetLibGameManager
     protected override void Update()
     {
         base.Update();
-        if (Time.realtimeSinceStartup - lastSaveTime > autoSaveDuration)
+        if (Time.unscaledTime - lastSaveTime > autoSaveDuration)
         {
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
                 owningCharacter.SavePersistentCharacterData();
-            lastSaveTime = Time.realtimeSinceStartup;
+            lastSaveTime = Time.unscaledTime;
         }
     }
 

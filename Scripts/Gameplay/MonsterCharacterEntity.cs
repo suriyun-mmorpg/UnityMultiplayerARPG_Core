@@ -90,9 +90,9 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         {
             StopMove();
             SetTargetEntity(null);
-            if (Time.realtimeSinceStartup - deadTime >= MonsterDatabase.deadHideDelay)
+            if (Time.unscaledTime - deadTime >= MonsterDatabase.deadHideDelay)
                 isHidding.Value = true;
-            if (Time.realtimeSinceStartup - deadTime >= MonsterDatabase.deadRespawnDelay)
+            if (Time.unscaledTime - deadTime >= MonsterDatabase.deadRespawnDelay)
                 Respawn();
             return;
         }
@@ -131,7 +131,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
             attackDistance += targetEntity.CacheCapsuleCollider.radius;
             if (Vector3.Distance(currentPosition, targetPosition) <= attackDistance)
             {
-                startFollowTargetCountTime = Time.realtimeSinceStartup;
+                startFollowTargetCountTime = Time.unscaledTime;
                 // Lookat target then do anything when it's in range
                 CacheNavMeshAgent.updateRotation = false;
                 CacheNavMeshAgent.isStopped = true;
@@ -147,16 +147,16 @@ public class MonsterCharacterEntity : BaseCharacterEntity
                 // Following target
                 CacheNavMeshAgent.updateRotation = true;
                 if (oldMovePosition != targetPosition &&
-                    Time.realtimeSinceStartup - setTargetDestinationTime >= SET_TARGET_DESTINATION_DELAY)
+                    Time.unscaledTime - setTargetDestinationTime >= SET_TARGET_DESTINATION_DELAY)
                 {
-                    setTargetDestinationTime = Time.realtimeSinceStartup;
+                    setTargetDestinationTime = Time.unscaledTime;
                     CacheNavMeshAgent.speed = MoveSpeed * gameInstance.moveSpeedMultiplier;
                     CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.MedQualityObstacleAvoidance;
                     CacheNavMeshAgent.SetDestination(targetPosition);
                     CacheNavMeshAgent.isStopped = false;
                     oldMovePosition = targetPosition;
                 }
-                if (Time.realtimeSinceStartup - startFollowTargetCountTime >= FOLLOW_TARGET_DURATION)
+                if (Time.unscaledTime - startFollowTargetCountTime >= FOLLOW_TARGET_DURATION)
                 {
                     StopMove();
                     SetTargetEntity(null);
@@ -177,7 +177,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
                 oldMovePosition = currentPosition;
             }
             // Wandering when it's time
-            if (Time.realtimeSinceStartup >= wanderTime)
+            if (Time.unscaledTime >= wanderTime)
             {
                 // If stopped then random
                 var randomX = Random.Range(RANDOM_WANDER_AREA_MIN, RANDOM_WANDER_AREA_MAX) * (Random.value > 0.5f ? -1 : 1);
@@ -197,7 +197,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
             {
                 // If it's aggressive character, finding attacking target
                 if (MonsterDatabase.characteristic == MonsterCharacteristic.Aggressive &&
-                    Time.realtimeSinceStartup >= findTargetTime)
+                    Time.unscaledTime >= findTargetTime)
                 {
                     SetFindTargetTime();
                     BaseCharacterEntity targetCharacter;
@@ -212,7 +212,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
                             var characterEntity = foundObject.GetComponent<BaseCharacterEntity>();
                             if (characterEntity != null && IsEnemy(characterEntity))
                             {
-                                startFollowTargetCountTime = Time.realtimeSinceStartup;
+                                startFollowTargetCountTime = Time.unscaledTime;
                                 SetAttackTarget(characterEntity);
                                 return;
                             }
@@ -232,12 +232,12 @@ public class MonsterCharacterEntity : BaseCharacterEntity
 
     protected void RandomWanderTime()
     {
-        wanderTime = Time.realtimeSinceStartup + Random.Range(RANDOM_WANDER_DURATION_MIN, RANDOM_WANDER_DURATION_MAX);
+        wanderTime = Time.unscaledTime + Random.Range(RANDOM_WANDER_DURATION_MIN, RANDOM_WANDER_DURATION_MAX);
     }
 
     protected void SetFindTargetTime()
     {
-        findTargetTime = Time.realtimeSinceStartup + AGGRESSIVE_FIND_TARGET_DELAY;
+        findTargetTime = Time.unscaledTime + AGGRESSIVE_FIND_TARGET_DELAY;
     }
 
     protected override bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity)
@@ -369,14 +369,14 @@ public class MonsterCharacterEntity : BaseCharacterEntity
             receivedDamageRecord = receivedDamageRecords[attacker];
             receivedDamageRecord.totalReceivedDamage += damage;
         }
-        receivedDamageRecord.lastReceivedDamageTime = Time.realtimeSinceStartup;
+        receivedDamageRecord.lastReceivedDamageTime = Time.unscaledTime;
         receivedDamageRecords[attacker] = receivedDamageRecord;
     }
 
     protected override void Killed(BaseCharacterEntity lastAttacker)
     {
         base.Killed(lastAttacker);
-        deadTime = Time.realtimeSinceStartup;
+        deadTime = Time.unscaledTime;
         var maxHp = this.GetStats().hp;
         var randomedExp = Random.Range(MonsterDatabase.randomExpMin, MonsterDatabase.randomExpMax);
         var randomedGold = Random.Range(MonsterDatabase.randomGoldMin, MonsterDatabase.randomGoldMax);

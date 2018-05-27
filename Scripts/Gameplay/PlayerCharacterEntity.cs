@@ -73,11 +73,16 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     #endregion
 
     #region Protected data
-    protected Queue<Vector3> navPaths;
-    protected Vector3 moveDirection;
-    protected bool isJumping;
-    protected bool isGrounded;
-    protected NpcDialog currentNpcDialog;
+    public Queue<Vector3> navPaths { get; protected set; }
+    public Vector3 moveDirection { get; protected set; }
+    public bool isJumping { get; protected set; }
+    public bool isGrounded { get; protected set; }
+    public NpcDialog currentNpcDialog { get; protected set; }
+
+    public bool HasNavPaths
+    {
+        get { return navPaths != null && navPaths.Count > 0; }
+    }
     #endregion
 
     #region Cache components

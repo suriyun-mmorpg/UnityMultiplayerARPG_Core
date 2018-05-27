@@ -482,9 +482,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// </summary>
     protected void NetFuncAttack()
     {
-        if (Time.realtimeSinceStartup - lastActionCommandReceivedTime < ACTION_COMMAND_DELAY)
+        if (Time.unscaledTime - lastActionCommandReceivedTime < ACTION_COMMAND_DELAY)
             return;
-        lastActionCommandReceivedTime = Time.realtimeSinceStartup;
+        lastActionCommandReceivedTime = Time.unscaledTime;
 
         if (CurrentHp <= 0 || IsPlayingActionAnimation())
             return;
@@ -528,9 +528,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="skillIndex">Index in `characterSkills` list which will be used</param>
     protected void NetFuncUseSkill(Vector3 position, int skillIndex)
     {
-        if (Time.realtimeSinceStartup - lastActionCommandReceivedTime < ACTION_COMMAND_DELAY)
+        if (Time.unscaledTime - lastActionCommandReceivedTime < ACTION_COMMAND_DELAY)
             return;
-        lastActionCommandReceivedTime = Time.realtimeSinceStartup;
+        lastActionCommandReceivedTime = Time.unscaledTime;
 
         if (CurrentHp <= 0 ||
             IsPlayingActionAnimation() ||

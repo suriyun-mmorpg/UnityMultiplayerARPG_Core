@@ -6,8 +6,8 @@ public class UICharacterHotkeys : UIBase
 {
     public UICharacterHotkeyPair[] uiCharacterHotkeys;
 
-    private Dictionary<string, UICharacterHotkey> cacheUICharacterHotkeys = null;
-    public Dictionary<string, UICharacterHotkey> CacheUICharacterHotkeys
+    private Dictionary<string, List<UICharacterHotkey>> cacheUICharacterHotkeys = null;
+    public Dictionary<string, List<UICharacterHotkey>> CacheUICharacterHotkeys
     {
         get
         {
@@ -20,19 +20,21 @@ public class UICharacterHotkeys : UIBase
     {
         if (cacheUICharacterHotkeys == null)
         {
-            cacheUICharacterHotkeys = new Dictionary<string, UICharacterHotkey>();
+            cacheUICharacterHotkeys = new Dictionary<string, List<UICharacterHotkey>>();
             foreach (var uiCharacterHotkey in uiCharacterHotkeys)
             {
                 var id = uiCharacterHotkey.hotkeyId;
                 var ui = uiCharacterHotkey.ui;
-                if (!string.IsNullOrEmpty(id) && ui != null && !cacheUICharacterHotkeys.ContainsKey(id))
+                if (!string.IsNullOrEmpty(id) && ui != null)
                 {
                     var characterHotkey = new CharacterHotkey();
                     characterHotkey.hotkeyId = id;
                     characterHotkey.type = HotkeyType.None;
                     characterHotkey.dataId = string.Empty;
                     ui.Setup(characterHotkey, -1);
-                    cacheUICharacterHotkeys.Add(id, ui);
+                    if (!cacheUICharacterHotkeys.ContainsKey(id))
+                        cacheUICharacterHotkeys.Add(id, new List<UICharacterHotkey>());
+                    cacheUICharacterHotkeys[id].Add(ui);
                 }
             }
         }
@@ -45,9 +47,14 @@ public class UICharacterHotkeys : UIBase
         for (var i = 0; i < characterHotkeys.Count; ++i)
         {
             var characterHotkey = characterHotkeys[i];
-            UICharacterHotkey ui;
-            if (!string.IsNullOrEmpty(characterHotkey.hotkeyId) && CacheUICharacterHotkeys.TryGetValue(characterHotkey.hotkeyId, out ui))
-                ui.Setup(characterHotkey, i);
+            List<UICharacterHotkey> uis;
+            if (!string.IsNullOrEmpty(characterHotkey.hotkeyId) && CacheUICharacterHotkeys.TryGetValue(characterHotkey.hotkeyId, out uis))
+            {
+                foreach (var ui in uis)
+                {
+                    ui.Setup(characterHotkey, i);
+                }
+            }
         }
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using LiteNetLibManager;
+using UnityEngine.EventSystems;
 
 public class UISceneGameplay : MonoBehaviour
 {
@@ -24,6 +24,7 @@ public class UISceneGameplay : MonoBehaviour
     public UICharacterQuests uiQuests;
     public UINpcDialog uiNpcDialog;
     public UIToggleUI[] toggleUis;
+    public List<GameObject> ignorePointerDetectionUis;
 
     [Header("Combat Text")]
     public Transform combatTextTransform;
@@ -157,5 +158,29 @@ public class UISceneGameplay : MonoBehaviour
         }
         uiNpcDialog.Data = npcDialog;
         uiNpcDialog.Show();
+    }
+
+    public bool IsPointerOverUIObject()
+    {
+        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+        eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+        // If it's not mobile ui, assume it's over UI
+        var overUI = false;
+        if (ignorePointerDetectionUis != null && ignorePointerDetectionUis.Count > 0)
+        {
+            foreach (var result in results)
+            {
+                if (!ignorePointerDetectionUis.Contains(result.gameObject))
+                {
+                    overUI = true;
+                    break;
+                }
+            }
+        }
+        else
+            overUI = results.Count > 0;
+        return overUI;
     }
 }

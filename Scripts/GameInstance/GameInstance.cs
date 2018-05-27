@@ -21,6 +21,7 @@ public class GameInstance : MonoBehaviour
     public FollowCameraControls gameplayCameraPrefab;
     public GameObject targetObject;
     public UISceneGameplay uiSceneGameplayPrefab;
+    public UISceneGameplay uiSceneGameplayMobilePrefab;
     [Header("Gameplay Database")]
     [Tooltip("Default weapon item, will be used when character not equip any weapon")]
     public Item defaultWeaponItem;
@@ -53,6 +54,8 @@ public class GameInstance : MonoBehaviour
     [Header("Player Configs")]
     public int minCharacterNameLength = 2;
     public int maxCharacterNameLength = 16;
+    [Header("Playing In Editor")]
+    public bool useMobileInEditor;
     public static readonly Dictionary<string, Attribute> Attributes = new Dictionary<string, Attribute>();
     public static readonly Dictionary<string, Item> Items = new Dictionary<string, Item>();
     public static readonly Dictionary<string, BaseCharacter> AllCharacters = new Dictionary<string, BaseCharacter>();
@@ -82,6 +85,16 @@ public class GameInstance : MonoBehaviour
             if (networkSetting == null)
                 networkSetting = ScriptableObject.CreateInstance<NetworkSetting>();
             return networkSetting;
+        }
+    }
+
+    public UISceneGameplay UISceneGameplayPrefab
+    {
+        get
+        {
+            if ((Application.isMobilePlatform || (useMobileInEditor && Application.isEditor)) && uiSceneGameplayMobilePrefab != null)
+                return uiSceneGameplayMobilePrefab;
+            return uiSceneGameplayPrefab;
         }
     }
 
@@ -194,6 +207,9 @@ public class GameInstance : MonoBehaviour
             Debug.LogError("You must set ui scene gameplay prefab");
             return;
         }
+
+        InputManager.useMobileInputOnNonMobile = useMobileInEditor;
+
         StartCoroutine(LoadData());
     }
 

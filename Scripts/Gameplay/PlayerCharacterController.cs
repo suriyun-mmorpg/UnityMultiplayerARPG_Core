@@ -8,10 +8,13 @@ public enum PlayerCharacterControllerMode
 {
     PointClick,
     WASD,
+    Both,
 }
 
 public class PlayerCharacterController : BasePlayerCharacterController
 {
+    public const float DETECT_MOUSE_DRAG_DISTANCE = 10f;
+    public const float DETECT_MOUSE_HOLD_DURATION = 1f;
     public PlayerCharacterControllerMode controllerMode;
     public struct UsingSkillData
     {
@@ -25,6 +28,9 @@ public class PlayerCharacterController : BasePlayerCharacterController
     }
     protected Vector3? destination;
     protected UsingSkillData? queueUsingSkill;
+    protected Vector3 mouseDownPosition;
+    protected float mouseDownTime;
+    protected bool isMouseDragOrHold;
 
     protected override void Update()
     {
@@ -66,7 +72,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
             return;
 
         if (CacheGameplayCameraControls != null)
-            CacheGameplayCameraControls.updateRotation = Input.GetMouseButton(1);
+            CacheGameplayCameraControls.updateRotation = InputManager.GetButton("CameraRotate");
 
         if (CacheCharacterEntity.CurrentHp <= 0)
             return;
@@ -77,6 +83,10 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 UpdatePointClickInput();
                 break;
             case PlayerCharacterControllerMode.WASD:
+                UpdateWASDInput();
+                break;
+            default:
+                UpdatePointClickInput();
                 UpdateWASDInput();
                 break;
         }
@@ -90,7 +100,15 @@ public class PlayerCharacterController : BasePlayerCharacterController
     protected void UpdatePointClickInput()
     {
         var gameInstance = GameInstance.Singleton;
-        if (!EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0))
+        {
+            isMouseDragOrHold = false;
+            mouseDownTime = Time.realtimeSinceStartup;
+            mouseDownPosition = Input.mousePosition;
+        }
+        if ((Input.mousePosition - mouseDownPosition).sqrMagnitude > DETECT_MOUSE_DRAG_DISTANCE || Time.realtimeSinceStartup - mouseDownTime > DETECT_MOUSE_HOLD_DURATION)
+            isMouseDragOrHold = true;
+        if (!CacheUISceneGameplay.IsPointerOverUIObject() && Input.GetMouseButtonUp(0) && !isMouseDragOrHold)
         {
             var targetCamera = CacheGameplayCameraControls != null ? CacheGameplayCameraControls.targetCamera : Camera.main;
             CacheCharacterEntity.SetTargetEntity(null);
@@ -220,7 +238,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
 
                     /** Hint: Uncomment these to make it attack one time and stop 
                     //  when reached target and doesn't pressed on mouse like as diablo
-                    if (EventSystem.current.IsPointerOverGameObject() || !Input.GetMouseButton(0))
+                    if (CacheUISceneGameplay.IsPointerOverUIObject() || !Input.GetMouseButtonUp(0))
                     {
                         queueUsingSkill = null;
                         CacheCharacterEntity.SetTargetEntity(null);
@@ -278,8 +296,6 @@ public class PlayerCharacterController : BasePlayerCharacterController
 
     protected void UpdateWASDInput()
     {
-        destination = null;
-
         if (CacheCharacterEntity.IsPlayingActionAnimation())
         {
             CacheCharacterEntity.StopMove();
@@ -302,18 +318,28 @@ public class PlayerCharacterController : BasePlayerCharacterController
 
         if (queueUsingSkill.HasValue)
         {
+            destination = null;
             CacheCharacterEntity.StopMove();
             var queueUsingSkillValue = queueUsingSkill.Value;
             RequestUseSkill(queueUsingSkillValue.position, queueUsingSkillValue.skillIndex);
             queueUsingSkill = null;
         }
-        else if (!EventSystem.current.IsPointerOverGameObject() && InputManager.GetButton("Fire1"))
+        else if (InputManager.GetButton("Attack"))
         {
+            destination = null;
             CacheCharacterEntity.StopMove();
             RequestAttack();
         }
         else
+        {
+            if (moveDirection.sqrMagnitude > 0)
+            {
+                if (CacheCharacterEntity.HasNavPaths)
+                    CacheCharacterEntity.StopMove();
+                destination = null;
+            }
             CacheCharacterEntity.KeyMovement(moveDirection, jumpInput);
+        }
     }
 
     protected void UpdateTargetEntityPosition(RpgNetworkEntity entity)
