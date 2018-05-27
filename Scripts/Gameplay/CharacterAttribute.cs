@@ -41,7 +41,7 @@ public struct CharacterAttribute
 
     public bool CanIncrease(IPlayerCharacterData character)
     {
-        return GetAttribute() != null && character.StatPoint > 0;
+        return GetAttribute() != null && character != null && character.StatPoint > 0;
     }
 
     public void Increase(int amount)
