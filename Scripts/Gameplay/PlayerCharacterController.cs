@@ -103,10 +103,10 @@ public class PlayerCharacterController : BasePlayerCharacterController
         if (Input.GetMouseButtonDown(0))
         {
             isMouseDragOrHold = false;
-            mouseDownTime = Time.realtimeSinceStartup;
+            mouseDownTime = Time.unscaledTime;
             mouseDownPosition = Input.mousePosition;
         }
-        if ((Input.mousePosition - mouseDownPosition).sqrMagnitude > DETECT_MOUSE_DRAG_DISTANCE || Time.realtimeSinceStartup - mouseDownTime > DETECT_MOUSE_HOLD_DURATION)
+        if ((Input.mousePosition - mouseDownPosition).sqrMagnitude > DETECT_MOUSE_DRAG_DISTANCE || Time.unscaledTime - mouseDownTime > DETECT_MOUSE_HOLD_DURATION)
             isMouseDragOrHold = true;
         if (!CacheUISceneGameplay.IsPointerOverUIObject() && Input.GetMouseButtonUp(0) && !isMouseDragOrHold)
         {
