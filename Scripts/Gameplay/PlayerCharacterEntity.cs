@@ -150,54 +150,50 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
             return;
 
         var gameInstance = GameInstance.Singleton;
-        if (isGrounded)
+        var velocity = CacheRigidbody.velocity;
+        if (CurrentHp > 0)
         {
-            Vector3 velocity = CacheRigidbody.velocity;
-            if (CurrentHp > 0)
+            var moveDirectionMagnitude = moveDirection.sqrMagnitude;
+            if (!IsPlayingActionAnimation() && moveDirectionMagnitude != 0)
             {
-                var moveDirectionMagnitude = moveDirection.sqrMagnitude;
-                if (!IsPlayingActionAnimation() && moveDirectionMagnitude != 0)
-                {
-                    if (moveDirectionMagnitude > 1)
-                        moveDirection = moveDirection.normalized;
+                if (moveDirectionMagnitude > 1)
+                    moveDirection = moveDirection.normalized;
 
-                    var moveSpeed = MoveSpeed * gameInstance.moveSpeedMultiplier;
-                    var targetVelocity = moveDirection * moveSpeed;
+                var moveSpeed = MoveSpeed * gameInstance.moveSpeedMultiplier;
+                var targetVelocity = moveDirection * moveSpeed;
 
-                    // Apply a force that attempts to reach our target velocity
-                    Vector3 velocityChange = (targetVelocity - velocity);
-                    velocityChange.x = Mathf.Clamp(velocityChange.x, -moveSpeed, moveSpeed);
-                    velocityChange.y = 0;
-                    velocityChange.z = Mathf.Clamp(velocityChange.z, -moveSpeed, moveSpeed);
-                    CacheRigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
-                    // Calculate rotation on client only, will send update to server later
-                    CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(moveDirection), angularSpeed * Time.fixedDeltaTime);
-                }
-
-                BaseCharacterEntity tempCharacterEntity;
-                if (moveDirectionMagnitude == 0 && TryGetTargetEntity(out tempCharacterEntity))
-                {
-                    var targetDirection = (tempCharacterEntity.CacheTransform.position - CacheTransform.position).normalized;
-                    if (targetDirection.sqrMagnitude != 0f)
-                    {
-                        var fromRotation = CacheTransform.rotation.eulerAngles;
-                        var lookAtRotation = Quaternion.LookRotation(targetDirection).eulerAngles;
-                        lookAtRotation = new Vector3(fromRotation.x, lookAtRotation.y, fromRotation.z);
-                        CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.Euler(lookAtRotation), angularSpeed * Time.fixedDeltaTime);
-                    }
-                }
-
-                // Jump
-                if (isJumping)
-                {
-                    CacheRigidbody.velocity = new Vector3(velocity.x, CalculateJumpVerticalSpeed(), velocity.z);
-                    isJumping = false;
-                }
+                // Apply a force that attempts to reach our target velocity
+                Vector3 velocityChange = (targetVelocity - velocity);
+                velocityChange.x = Mathf.Clamp(velocityChange.x, -moveSpeed, moveSpeed);
+                velocityChange.y = 0;
+                velocityChange.z = Mathf.Clamp(velocityChange.z, -moveSpeed, moveSpeed);
+                CacheRigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
+                // Calculate rotation on client only, will send update to server later
+                CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(moveDirection), angularSpeed * Time.fixedDeltaTime);
             }
 
-            if (Mathf.Abs(velocity.y) > groundingDistance)
-                isGrounded = false;
+            BaseCharacterEntity tempCharacterEntity;
+            if (moveDirectionMagnitude == 0 && TryGetTargetEntity(out tempCharacterEntity))
+            {
+                var targetDirection = (tempCharacterEntity.CacheTransform.position - CacheTransform.position).normalized;
+                if (targetDirection.sqrMagnitude != 0f)
+                {
+                    var fromRotation = CacheTransform.rotation.eulerAngles;
+                    var lookAtRotation = Quaternion.LookRotation(targetDirection).eulerAngles;
+                    lookAtRotation = new Vector3(fromRotation.x, lookAtRotation.y, fromRotation.z);
+                    CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.Euler(lookAtRotation), angularSpeed * Time.fixedDeltaTime);
+                }
+            }
+            // Jump
+            if (isGrounded && isJumping)
+            {
+                CacheRigidbody.velocity = new Vector3(velocity.x, CalculateJumpVerticalSpeed(), velocity.z);
+                isJumping = false;
+            }
         }
+
+        if (Mathf.Abs(velocity.y) > groundingDistance)
+            isGrounded = false;
 
         // We apply gravity manually for more tuning control
         CacheRigidbody.AddForce(new Vector3(0, Physics.gravity.y * CacheRigidbody.mass * gravityRate, 0));
