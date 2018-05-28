@@ -82,21 +82,6 @@ public class MonsterCharacterEntity : BaseCharacterEntity
     protected override void Update()
     {
         base.Update();
-
-        if (MonsterDatabase == null || !IsServer)
-            return;
-
-        if (CurrentHp <= 0)
-        {
-            StopMove();
-            SetTargetEntity(null);
-            if (Time.unscaledTime - deadTime >= MonsterDatabase.deadHideDelay)
-                isHidding.Value = true;
-            if (Time.unscaledTime - deadTime >= MonsterDatabase.deadRespawnDelay)
-                Respawn();
-            return;
-        }
-
         UpdateActivity();
     }
 
@@ -109,8 +94,20 @@ public class MonsterCharacterEntity : BaseCharacterEntity
 
     protected virtual void UpdateActivity()
     {
-        if (!IsServer || MonsterDatabase == null || CurrentHp <= 0)
+
+        if (!IsServer || MonsterDatabase == null)
             return;
+
+        if (CurrentHp <= 0)
+        {
+            StopMove();
+            SetTargetEntity(null);
+            if (Time.unscaledTime - deadTime >= MonsterDatabase.deadHideDelay)
+                isHidding.Value = true;
+            if (Time.unscaledTime - deadTime >= MonsterDatabase.deadRespawnDelay)
+                Respawn();
+            return;
+        }
 
         var gameInstance = GameInstance.Singleton;
         var currentPosition = CacheTransform.position;
@@ -240,12 +237,12 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         findTargetTime = Time.unscaledTime + AGGRESSIVE_FIND_TARGET_DELAY;
     }
 
-    protected override bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity)
+    public override bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity)
     {
         return characterEntity != null && characterEntity is PlayerCharacterEntity;
     }
 
-    protected override bool IsAlly(BaseCharacterEntity characterEntity)
+    public override bool IsAlly(BaseCharacterEntity characterEntity)
     {
         if (characterEntity == null)
             return false;
@@ -257,7 +254,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         return false;
     }
 
-    protected override bool IsEnemy(BaseCharacterEntity characterEntity)
+    public override bool IsEnemy(BaseCharacterEntity characterEntity)
     {
         return characterEntity != null && characterEntity is PlayerCharacterEntity;
     }

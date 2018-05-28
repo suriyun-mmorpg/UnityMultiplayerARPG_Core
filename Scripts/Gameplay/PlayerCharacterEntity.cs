@@ -234,7 +234,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         CacheRigidbody.velocity = new Vector3(0, CacheRigidbody.velocity.y, 0);
     }
 
-    protected float CalculateJumpVerticalSpeed()
+    private float CalculateJumpVerticalSpeed()
     {
         // From the jump height and gravity we deduce the upwards speed 
         // for the character to reach at the apex.
@@ -249,19 +249,19 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         Warp(RespawnMapName, RespawnPosition);
     }
 
-    protected override bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity)
+    public override bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity)
     {
         // TODO: May implement this for party/guild battle purposes
         return characterEntity != null && characterEntity is MonsterCharacterEntity;
     }
 
-    protected override bool IsAlly(BaseCharacterEntity characterEntity)
+    public override bool IsAlly(BaseCharacterEntity characterEntity)
     {
         // TODO: May implement this for party/guild battle purposes
         return false;
     }
 
-    protected override bool IsEnemy(BaseCharacterEntity characterEntity)
+    public override bool IsEnemy(BaseCharacterEntity characterEntity)
     {
         // TODO: May implement this for party/guild battle purposes
         return characterEntity != null && characterEntity is MonsterCharacterEntity;

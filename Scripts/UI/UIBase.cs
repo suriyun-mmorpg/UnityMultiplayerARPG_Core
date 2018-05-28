@@ -82,6 +82,7 @@ public class UIBase : MonoBehaviour
         isAwaken = true;
         CacheRootCanvas.enabled = false;
         CacheGraphicRaycaster.enabled = false;
+        CacheRoot.SetActive(false);
         onHide.Invoke();
     }
 

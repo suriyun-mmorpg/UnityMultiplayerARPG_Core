@@ -28,13 +28,13 @@ public enum AnimActionType : byte
 [RequireComponent(typeof(CapsuleCollider))]
 public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 {
-    public const string ANIM_IS_DEAD = "IsDead";
-    public const string ANIM_MOVE_SPEED = "MoveSpeed";
-    public const string ANIM_Y_SPEED = "YSpeed";
-    public const string ANIM_DO_ACTION = "DoAction";
-    public const string ANIM_HURT = "Hurt";
-    public const string ANIM_MOVE_CLIP_MULTIPLIER = "MoveSpeedMultiplier";
-    public const string ANIM_ACTION_CLIP_MULTIPLIER = "ActionSpeedMultiplier";
+    public static readonly int ANIM_IS_DEAD = Animator.StringToHash("IsDead");
+    public static readonly int ANIM_MOVE_SPEED = Animator.StringToHash("MoveSpeed");
+    public static readonly int ANIM_Y_SPEED = Animator.StringToHash("YSpeed");
+    public static readonly int ANIM_DO_ACTION = Animator.StringToHash("DoAction");
+    public static readonly int ANIM_HURT = Animator.StringToHash("Hurt");
+    public static readonly int ANIM_MOVE_CLIP_MULTIPLIER = Animator.StringToHash("MoveSpeedMultiplier");
+    public static readonly int ANIM_ACTION_CLIP_MULTIPLIER = Animator.StringToHash("ActionSpeedMultiplier");
     public const float RECOVERY_UPDATE_DURATION = 0.5f;
     public const float SKILL_BUFF_UPDATE_DURATION = 0.5f;
     public const float ACTION_COMMAND_DELAY = 0.1f;
@@ -1808,7 +1808,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         // Send OnLevelUp to owner player only
         RequestOnLevelUp();
     }
-    protected abstract bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity);
-    protected abstract bool IsAlly(BaseCharacterEntity characterEntity);
-    protected abstract bool IsEnemy(BaseCharacterEntity characterEntity);
+    public abstract bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity);
+    public abstract bool IsAlly(BaseCharacterEntity characterEntity);
+    public abstract bool IsEnemy(BaseCharacterEntity characterEntity);
 }

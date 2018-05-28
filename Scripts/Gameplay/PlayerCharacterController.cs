@@ -30,7 +30,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
     protected UsingSkillData? queueUsingSkill;
     protected Vector3 mouseDownPosition;
     protected float mouseDownTime;
-    protected bool isMouseDragOrHold;
+    protected bool isMouseDragOrHoldOrOverUI;
 
     protected override void Update()
     {
@@ -102,13 +102,16 @@ public class PlayerCharacterController : BasePlayerCharacterController
         var gameInstance = GameInstance.Singleton;
         if (Input.GetMouseButtonDown(0))
         {
-            isMouseDragOrHold = false;
+            isMouseDragOrHoldOrOverUI = false;
             mouseDownTime = Time.unscaledTime;
             mouseDownPosition = Input.mousePosition;
         }
-        if ((Input.mousePosition - mouseDownPosition).sqrMagnitude > DETECT_MOUSE_DRAG_DISTANCE || Time.unscaledTime - mouseDownTime > DETECT_MOUSE_HOLD_DURATION)
-            isMouseDragOrHold = true;
-        if (!CacheUISceneGameplay.IsPointerOverUIObject() && Input.GetMouseButtonUp(0) && !isMouseDragOrHold)
+        if (!isMouseDragOrHoldOrOverUI && 
+            ((Input.mousePosition - mouseDownPosition).sqrMagnitude > DETECT_MOUSE_DRAG_DISTANCE || 
+            Time.unscaledTime - mouseDownTime > DETECT_MOUSE_HOLD_DURATION ||
+            CacheUISceneGameplay.IsPointerOverUIObject()))
+            isMouseDragOrHoldOrOverUI = true;
+        if (!CacheUISceneGameplay.IsPointerOverUIObject() && Input.GetMouseButtonUp(0) && !isMouseDragOrHoldOrOverUI)
         {
             var targetCamera = CacheGameplayCameraControls != null ? CacheGameplayCameraControls.targetCamera : Camera.main;
             CacheCharacterEntity.SetTargetEntity(null);
@@ -303,8 +306,8 @@ public class PlayerCharacterController : BasePlayerCharacterController
         }
 
         var gameInstance = GameInstance.Singleton;
-        var horizontalInput = InputManager.GetAxis("Horizontal", true);
-        var verticalInput = InputManager.GetAxis("Vertical", true);
+        var horizontalInput = InputManager.GetAxis("Horizontal", false);
+        var verticalInput = InputManager.GetAxis("Vertical", false);
         var jumpInput = InputManager.GetButtonDown("Jump");
         
         var moveDirection = Vector3.zero;
