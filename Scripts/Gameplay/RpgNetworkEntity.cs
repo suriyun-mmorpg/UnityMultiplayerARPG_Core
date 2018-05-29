@@ -26,6 +26,10 @@ public class RpgNetworkEntity : LiteNetLibBehaviour
 
     protected virtual void Start() { }
 
+    protected virtual void OnEnable() { }
+
+    protected virtual void OnDisable() { }
+
     protected virtual void Update() { }
 
     protected virtual void LateUpdate()

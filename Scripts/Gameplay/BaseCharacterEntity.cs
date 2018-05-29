@@ -261,21 +261,17 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected override void Update()
     {
         base.Update();
-        MakeCaches();
-        UpdateAnimation();
-        UpdateSkillAndBuff();
-        UpdateRecoverying();
-    }
-
-    protected override void FixedUpdate()
-    {
-        base.FixedUpdate();
         // Update current velocity
         if (!previousPosition.HasValue)
             previousPosition = CacheTransform.position;
         var currentMoveDistance = CacheTransform.position - previousPosition.Value;
         currentVelocity = currentMoveDistance / Time.deltaTime;
         previousPosition = CacheTransform.position;
+
+        MakeCaches();
+        UpdateAnimation();
+        UpdateSkillAndBuff();
+        UpdateRecoverying();
     }
 
     protected virtual void UpdateAnimation()
