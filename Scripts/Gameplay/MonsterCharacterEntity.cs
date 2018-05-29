@@ -108,7 +108,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
                 Respawn();
             return;
         }
-
+        
         var gameInstance = GameInstance.Singleton;
         var currentPosition = CacheTransform.position;
         BaseCharacterEntity targetEntity;

@@ -102,18 +102,19 @@ public class SimpleGameplayRule : BaseGameplayRule
         var gameInstance = GameInstance.Singleton;
         var oldLevel = character.Level;
         character.Exp += exp;
+        var playerCharacter = character as IPlayerCharacterData;
         var nextLevelExp = character.GetNextLevelExp();
         while (nextLevelExp > 0 && character.Exp >= nextLevelExp)
         {
             character.Exp = character.Exp - nextLevelExp;
             ++character.Level;
+            nextLevelExp = character.GetNextLevelExp();
+            if (playerCharacter != null)
+            {
+                playerCharacter.StatPoint += gameInstance.increaseStatPointEachLevel;
+                playerCharacter.SkillPoint += gameInstance.increaseSkillPointEachLevel;
+            }
             isLevelUp = true;
-        }
-        if (character is IPlayerCharacterData && character.Level > oldLevel)
-        {
-            var playerCharacter = character as IPlayerCharacterData;
-            playerCharacter.StatPoint += gameInstance.increaseStatPointEachLevel;
-            playerCharacter.SkillPoint += gameInstance.increaseSkillPointEachLevel;
         }
         return isLevelUp;
     }

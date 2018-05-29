@@ -16,6 +16,8 @@ public class PlayerCharacterController : BasePlayerCharacterController
     public const float DETECT_MOUSE_DRAG_DISTANCE = 10f;
     public const float DETECT_MOUSE_HOLD_DURATION = 1f;
     public PlayerCharacterControllerMode controllerMode;
+    public bool wasdLockAttackTarget;
+    public float lockAttackTargetDistance = 10f;
     public struct UsingSkillData
     {
         public Vector3 position;
@@ -31,6 +33,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
     protected Vector3 mouseDownPosition;
     protected float mouseDownTime;
     protected bool isMouseDragOrHoldOrOverUI;
+    protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
 
     protected override void Update()
     {
@@ -64,6 +67,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
         }
         
         UpdateInput();
+        UpdateFollowTarget();
     }
 
     protected virtual void UpdateInput()
@@ -99,7 +103,6 @@ public class PlayerCharacterController : BasePlayerCharacterController
 
     protected void UpdatePointClickInput()
     {
-        var gameInstance = GameInstance.Singleton;
         if (Input.GetMouseButtonDown(0))
         {
             isMouseDragOrHoldOrOverUI = false;
@@ -169,7 +172,92 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 }
             }
         }
+    }
 
+    protected void UpdateWASDInput()
+    {
+        if (CacheCharacterEntity.IsPlayingActionAnimation())
+        {
+            CacheCharacterEntity.StopMove();
+            return;
+        }
+
+        var horizontalInput = InputManager.GetAxis("Horizontal", false);
+        var verticalInput = InputManager.GetAxis("Vertical", false);
+        var jumpInput = InputManager.GetButtonDown("Jump");
+
+        var moveDirection = Vector3.zero;
+        moveDirection += CacheGameplayCameraControls.transform.forward * verticalInput;
+        moveDirection += CacheGameplayCameraControls.transform.right * horizontalInput;
+        moveDirection.y = 0;
+        moveDirection = moveDirection.normalized;
+
+        if (moveDirection.sqrMagnitude > 0.1f && CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
+            CacheUISceneGameplay.uiNpcDialog.Hide();
+
+        if (queueUsingSkill.HasValue)
+        {
+            destination = null;
+            CacheCharacterEntity.StopMove();
+            var queueUsingSkillValue = queueUsingSkill.Value;
+            var characterSkill = CacheCharacterEntity.Skills[queueUsingSkillValue.skillIndex];
+            var skill = characterSkill.GetSkill();
+            if (skill != null)
+            {
+                if (skill.IsAttack())
+                {
+                    BaseCharacterEntity targetEntity;
+                    if (wasdLockAttackTarget && !CacheCharacterEntity.TryGetTargetEntity(out targetEntity))
+                    {
+                        var attackDistance = CacheCharacterEntity.GetSkillAttackDistance(skill);
+                        var attackFov = CacheCharacterEntity.GetSkillAttackFov(skill);
+                        var nearestTarget = FindNearestAliveCharacter<MonsterCharacterEntity>(attackDistance, attackFov);
+                        if (nearestTarget != null)
+                            CacheCharacterEntity.SetTargetEntity(nearestTarget);
+                        else
+                            RequestUsePendingSkill();
+                    }
+                    else if (!wasdLockAttackTarget)
+                        RequestUsePendingSkill();
+                }
+                else
+                    RequestUsePendingSkill();
+            }
+            else
+                queueUsingSkill = null;
+        }
+        else if (InputManager.GetButton("Attack"))
+        {
+            destination = null;
+            CacheCharacterEntity.StopMove();
+            BaseCharacterEntity targetEntity;
+            if (wasdLockAttackTarget && !CacheCharacterEntity.TryGetTargetEntity(out targetEntity))
+            {
+                var attackDistance = CacheCharacterEntity.GetAttackDistance();
+                var attackFov = CacheCharacterEntity.GetAttackFov();
+                var nearestTarget = FindNearestAliveCharacter<MonsterCharacterEntity>(attackDistance, attackFov);
+                if (nearestTarget != null)
+                    CacheCharacterEntity.SetTargetEntity(nearestTarget);
+                else
+                    RequestAttack();
+            }
+            else if (!wasdLockAttackTarget)
+                RequestAttack();
+        }
+        else
+        {
+            if (moveDirection.sqrMagnitude > 0)
+            {
+                if (CacheCharacterEntity.HasNavPaths)
+                    CacheCharacterEntity.StopMove();
+                destination = null;
+            }
+            CacheCharacterEntity.KeyMovement(moveDirection, jumpInput);
+        }
+    }
+
+    protected void UpdateFollowTarget()
+    {
         // Temp variables
         BaseCharacterEntity targetEnemy;
         PlayerCharacterEntity targetPlayer;
@@ -210,11 +298,12 @@ public class PlayerCharacterController : BasePlayerCharacterController
                     {
                         // Stop movement to use non attack skill
                         CacheCharacterEntity.StopMove();
-                        RequestUseSkill(queueUsingSkillValue.position, queueUsingSkillValue.skillIndex);
-                        queueUsingSkill = null;
+                        RequestUsePendingSkill();
                         return;
                     }
                 }
+                else
+                    queueUsingSkill = null;
             }
             var actDistance = attackDistance;
             actDistance -= actDistance * 0.1f;
@@ -231,11 +320,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 {
                     // If has queue using skill, attack by the skill
                     if (queueUsingSkill.HasValue)
-                    {
-                        var queueUsingSkillValue = queueUsingSkill.Value;
-                        RequestUseSkill(queueUsingSkillValue.position, queueUsingSkillValue.skillIndex);
-                        queueUsingSkill = null;
-                    }
+                        RequestUsePendingSkill();
                     else
                         RequestAttack();
 
@@ -297,54 +382,6 @@ public class PlayerCharacterController : BasePlayerCharacterController
         }
     }
 
-    protected void UpdateWASDInput()
-    {
-        if (CacheCharacterEntity.IsPlayingActionAnimation())
-        {
-            CacheCharacterEntity.StopMove();
-            return;
-        }
-
-        var gameInstance = GameInstance.Singleton;
-        var horizontalInput = InputManager.GetAxis("Horizontal", false);
-        var verticalInput = InputManager.GetAxis("Vertical", false);
-        var jumpInput = InputManager.GetButtonDown("Jump");
-        
-        var moveDirection = Vector3.zero;
-        moveDirection += CacheGameplayCameraControls.transform.forward * verticalInput;
-        moveDirection += CacheGameplayCameraControls.transform.right * horizontalInput;
-        moveDirection.y = 0;
-        moveDirection = moveDirection.normalized;
-
-        if (moveDirection.sqrMagnitude > 0.1f && CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
-            CacheUISceneGameplay.uiNpcDialog.Hide();
-
-        if (queueUsingSkill.HasValue)
-        {
-            destination = null;
-            CacheCharacterEntity.StopMove();
-            var queueUsingSkillValue = queueUsingSkill.Value;
-            RequestUseSkill(queueUsingSkillValue.position, queueUsingSkillValue.skillIndex);
-            queueUsingSkill = null;
-        }
-        else if (InputManager.GetButton("Attack"))
-        {
-            destination = null;
-            CacheCharacterEntity.StopMove();
-            RequestAttack();
-        }
-        else
-        {
-            if (moveDirection.sqrMagnitude > 0)
-            {
-                if (CacheCharacterEntity.HasNavPaths)
-                    CacheCharacterEntity.StopMove();
-                destination = null;
-            }
-            CacheCharacterEntity.KeyMovement(moveDirection, jumpInput);
-        }
-    }
-
     protected void UpdateTargetEntityPosition(RpgNetworkEntity entity)
     {
         if (entity == null)
@@ -352,6 +389,46 @@ public class PlayerCharacterController : BasePlayerCharacterController
 
         var targetPosition = entity.CacheTransform.position;
         CacheCharacterEntity.PointClickMovement(targetPosition);
+    }
+
+    protected T FindNearestAliveCharacter<T>(float distance, float fov) where T : BaseCharacterEntity
+    {
+        T result = null;
+        var findDistance = CacheCharacterEntity.GetAttackDistance() + lockAttackTargetDistance;
+        var colliders = Physics.OverlapSphere(CacheCharacterTransform.position, findDistance, gameInstance.characterLayer.Mask);
+        if (colliders != null && colliders.Length > 0)
+        {
+            float tempDistance;
+            T tempEntity;
+            float nearestDistance = float.MaxValue;
+            T nearestEntity = null;
+            foreach (var collider in colliders)
+            {
+                tempEntity = collider.GetComponent<T>();
+                if (tempEntity == null || tempEntity.CurrentHp <= 0)
+                    continue;
+
+                tempDistance = distance;
+                tempDistance -= tempDistance * 0.1f;
+                tempDistance -= stoppingDistance;
+                tempDistance += tempEntity.CacheCapsuleCollider.radius;
+                // This character is in fov or not?
+                var halfFov = fov * 0.5f;
+                var targetDir = (CacheCharacterTransform.position - tempEntity.CacheTransform.position).normalized;
+                var angle = Vector3.Angle(targetDir, CacheCharacterTransform.forward);
+                // If character is in fov, assume that it is closer than characters that is not in fov
+                if (angle < 180 + halfFov && angle > 180 - halfFov)
+                    tempDistance -= (findDistance - lockAttackTargetDistance);
+
+                if (tempDistance < nearestDistance)
+                {
+                    nearestDistance = tempDistance;
+                    nearestEntity = tempEntity;
+                }
+            }
+            result = nearestEntity;
+        }
+        return result;
     }
 
     public void RequestAttack()
@@ -362,6 +439,16 @@ public class PlayerCharacterController : BasePlayerCharacterController
     public void RequestUseSkill(Vector3 position, int skillIndex)
     {
         CacheCharacterEntity.RequestUseSkill(position, skillIndex);
+    }
+
+    public void RequestUsePendingSkill()
+    {
+        if (queueUsingSkill.HasValue)
+        {
+            var queueUsingSkillValue = queueUsingSkill.Value;
+            RequestUseSkill(queueUsingSkillValue.position, queueUsingSkillValue.skillIndex);
+            queueUsingSkill = null;
+        }
     }
 
     public void RequestUseItem(int itemIndex)
@@ -384,6 +471,8 @@ public class PlayerCharacterController : BasePlayerCharacterController
             {
                 BaseCharacterEntity attackingCharacter;
                 if (TryGetAttackingCharacter(out attackingCharacter))
+                    queueUsingSkill = new UsingSkillData(CacheCharacterTransform.position, skillIndex);
+                else if ((controllerMode == PlayerCharacterControllerMode.WASD || controllerMode == PlayerCharacterControllerMode.Both) || skill.IsAttack())
                     queueUsingSkill = new UsingSkillData(CacheCharacterTransform.position, skillIndex);
                 else if (CacheCharacterEntity.skills[skillIndex].CanUse(CacheCharacterEntity))
                 {

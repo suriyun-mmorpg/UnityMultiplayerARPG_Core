@@ -79,6 +79,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
     protected Vector3? previousPosition;
     protected Vector3 currentVelocity;
+    protected float currentVelocityXZMagnitude;
     protected AnimActionType animActionType;
     protected float recoveryingHp;
     protected float recoveryingMp;
@@ -223,6 +224,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             return modelContainer;
         }
     }
+
+    public Animator ModelAnimator { get { return model == null ? null : model.CacheAnimator; } }
     #endregion
 
     protected virtual void Awake()
@@ -269,26 +272,23 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             previousPosition = CacheTransform.position;
         var currentMove = CacheTransform.position - previousPosition.Value;
         currentVelocity = currentMove / Time.deltaTime;
+        currentVelocityXZMagnitude = new Vector3(currentVelocity.x, 0, currentVelocity.z).sqrMagnitude;
         previousPosition = CacheTransform.position;
     }
 
     protected virtual void UpdateAnimation()
     {
-        if (model != null && model.gameObject.activeInHierarchy)
+        if (ModelAnimator != null && ModelAnimator.isActiveAndEnabled)
         {
-            var animator = model.CacheAnimator;
-            var velocity = currentVelocity;
-            var moveSpeed = new Vector3(velocity.x, 0, velocity.z).magnitude;
             if (CurrentHp <= 0)
             {
-                moveSpeed = 0f;
                 // Force set to none action when dead
-                animator.SetBool(ANIM_DO_ACTION, false);
+                ModelAnimator.SetBool(ANIM_DO_ACTION, false);
             }
-            animator.SetFloat(ANIM_MOVE_SPEED, moveSpeed);
-            animator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, MoveSpeed);
-            animator.SetFloat(ANIM_Y_SPEED, velocity.y);
-            animator.SetBool(ANIM_IS_DEAD, CurrentHp <= 0);
+            ModelAnimator.SetFloat(ANIM_MOVE_SPEED, CurrentHp <= 0 ? 0 : currentVelocityXZMagnitude);
+            ModelAnimator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, MoveSpeed);
+            ModelAnimator.SetFloat(ANIM_Y_SPEED, currentVelocity.y);
+            ModelAnimator.SetBool(ANIM_IS_DEAD, CurrentHp <= 0);
         }
     }
 
@@ -333,9 +333,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected virtual void UpdateRecoverying()
     {
-        var maxHp = CacheMaxHp;
-        var maxMp = CacheMaxMp;
-
         if (CurrentHp > 0)
         {
             var gameRule = GameInstance.Singleton.GameplayRule;
@@ -344,7 +341,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             {
                 recoveryingHp += recoveryUpdateDeltaTime * gameRule.GetRecoveryHpPerSeconds(this);
                 recoveryingMp += recoveryUpdateDeltaTime * gameRule.GetRecoveryMpPerSeconds(this);
-                if (CurrentHp < maxHp)
+                if (CurrentHp < CacheMaxHp)
                 {
                     if (recoveryingHp >= 1)
                     {
@@ -357,7 +354,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                 else
                     recoveryingHp = 0;
 
-                if (CurrentMp < maxMp)
+                if (CurrentMp < CacheMaxMp)
                 {
                     if (recoveryingMp >= 1)
                     {
@@ -381,10 +378,10 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                 CurrentHp = 0;
             if (CurrentMp < 0)
                 CurrentMp = 0;
-            if (CurrentHp > maxHp)
-                CurrentHp = maxHp;
-            if (CurrentMp > maxMp)
-                CurrentMp = maxMp;
+            if (CurrentHp > CacheMaxHp)
+                CurrentHp = CacheMaxHp;
+            if (CurrentMp > CacheMaxMp)
+                CurrentMp = CacheMaxMp;
         }
     }
 
