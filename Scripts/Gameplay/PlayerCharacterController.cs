@@ -110,7 +110,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
             mouseDownPosition = Input.mousePosition;
         }
         if (!isMouseDragOrHoldOrOverUI && 
-            ((Input.mousePosition - mouseDownPosition).sqrMagnitude > DETECT_MOUSE_DRAG_DISTANCE || 
+            ((Input.mousePosition - mouseDownPosition).magnitude > DETECT_MOUSE_DRAG_DISTANCE || 
             Time.unscaledTime - mouseDownTime > DETECT_MOUSE_HOLD_DURATION ||
             CacheUISceneGameplay.IsPointerOverUIObject()))
             isMouseDragOrHoldOrOverUI = true;
@@ -192,7 +192,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
         moveDirection.y = 0;
         moveDirection = moveDirection.normalized;
 
-        if (moveDirection.sqrMagnitude > 0.1f && CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
+        if (moveDirection.magnitude > 0.1f && CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
             CacheUISceneGameplay.uiNpcDialog.Hide();
 
         if (queueUsingSkill.HasValue)
@@ -246,7 +246,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
         }
         else
         {
-            if (moveDirection.sqrMagnitude > 0)
+            if (moveDirection.magnitude > 0)
             {
                 if (CacheCharacterEntity.HasNavPaths)
                     CacheCharacterEntity.StopMove();
@@ -419,7 +419,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 var angle = Vector3.Angle(targetDir, CacheCharacterTransform.forward);
                 // If character is in fov, assume that it is closer than characters that is not in fov
                 if (angle < 180 + halfFov && angle > 180 - halfFov)
-                    tempDistance -= (findDistance - lockAttackTargetDistance);
+                    tempDistance -= angle;
 
                 if (tempDistance < nearestDistance)
                 {

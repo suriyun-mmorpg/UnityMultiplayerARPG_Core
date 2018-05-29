@@ -22,9 +22,17 @@ public class RpgNetworkEntity : LiteNetLibBehaviour
         }
     }
 
+    protected virtual void Awake() { }
+
+    protected virtual void Start() { }
+
+    protected virtual void Update() { }
+
     protected virtual void LateUpdate()
     {
         if (textTitle != null)
             textTitle.text = Title;
     }
+
+    protected virtual void FixedUpdate() { }
 }

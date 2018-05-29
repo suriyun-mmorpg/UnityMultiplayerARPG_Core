@@ -153,7 +153,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         var velocity = CacheRigidbody.velocity;
         if (CurrentHp > 0)
         {
-            var moveDirectionMagnitude = moveDirection.sqrMagnitude;
+            var moveDirectionMagnitude = moveDirection.magnitude;
             if (!IsPlayingActionAnimation() && moveDirectionMagnitude != 0)
             {
                 if (moveDirectionMagnitude > 1)
@@ -176,7 +176,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
             if (moveDirectionMagnitude == 0 && TryGetTargetEntity(out tempCharacterEntity))
             {
                 var targetDirection = (tempCharacterEntity.CacheTransform.position - CacheTransform.position).normalized;
-                if (targetDirection.sqrMagnitude != 0f)
+                if (targetDirection.magnitude != 0f)
                 {
                     var fromRotation = CacheTransform.rotation.eulerAngles;
                     var lookAtRotation = Quaternion.LookRotation(targetDirection).eulerAngles;
@@ -661,7 +661,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         if (CurrentHp <= 0)
             return;
         moveDirection = direction;
-        if (moveDirection.sqrMagnitude == 0 && isGrounded)
+        if (moveDirection.magnitude == 0 && isGrounded)
             CacheRigidbody.velocity = new Vector3(0, CacheRigidbody.velocity.y, 0);
         if (!isJumping)
             isJumping = isGrounded && isJump;

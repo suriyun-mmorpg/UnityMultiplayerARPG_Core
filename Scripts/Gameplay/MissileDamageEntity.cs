@@ -39,8 +39,9 @@ public class MissileDamageEntity : BaseDamageEntity
             NetworkDestroy();
     }
 
-    private void FixedUpdate()
+    protected override void FixedUpdate()
     {
+        base.FixedUpdate();
         CacheRigidbody.velocity = CacheTransform.forward * missileSpeed.Value;
     }
 

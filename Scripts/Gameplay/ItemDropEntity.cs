@@ -38,15 +38,17 @@ public class ItemDropEntity : RpgNetworkEntity
         }
     }
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         var gameInstance = GameInstance.Singleton;
         gameObject.tag = gameInstance.itemDropTag;
         gameObject.layer = gameInstance.itemDropLayer;
     }
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
         if (IsServer)
         {
             var id = dropData.itemId;

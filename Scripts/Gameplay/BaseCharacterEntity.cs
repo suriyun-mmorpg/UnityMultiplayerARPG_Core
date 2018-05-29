@@ -79,7 +79,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
     protected Vector3? previousPosition;
     protected Vector3 currentVelocity;
-    protected float currentVelocityXZMagnitude;
     protected AnimActionType animActionType;
     protected float recoveryingHp;
     protected float recoveryingMp;
@@ -228,8 +227,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public Animator ModelAnimator { get { return model == null ? null : model.CacheAnimator; } }
     #endregion
 
-    protected virtual void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         var gameInstance = GameInstance.Singleton;
         gameObject.layer = gameInstance.characterLayer;
         skillBuffUpdateDeltaTime = 0;
@@ -237,8 +237,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         shouldRecaches = true;
     }
 
-    protected virtual void Start()
+    protected override void Start()
     {
+        base.Start();
         foreach (var ownerObject in ownerObjects)
         {
             ownerObject.SetActive(IsOwnerClient);
@@ -257,22 +258,23 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         }
     }
 
-    protected virtual void Update()
+    protected override void Update()
     {
+        base.Update();
         MakeCaches();
         UpdateAnimation();
         UpdateSkillAndBuff();
         UpdateRecoverying();
     }
 
-    protected virtual void FixedUpdate()
+    protected override void FixedUpdate()
     {
+        base.FixedUpdate();
         // Update current velocity
         if (!previousPosition.HasValue)
             previousPosition = CacheTransform.position;
-        var currentMove = CacheTransform.position - previousPosition.Value;
-        currentVelocity = currentMove / Time.deltaTime;
-        currentVelocityXZMagnitude = new Vector3(currentVelocity.x, 0, currentVelocity.z).sqrMagnitude;
+        var currentMoveDistance = CacheTransform.position - previousPosition.Value;
+        currentVelocity = currentMoveDistance / Time.deltaTime;
         previousPosition = CacheTransform.position;
     }
 
@@ -285,7 +287,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                 // Force set to none action when dead
                 ModelAnimator.SetBool(ANIM_DO_ACTION, false);
             }
-            ModelAnimator.SetFloat(ANIM_MOVE_SPEED, CurrentHp <= 0 ? 0 : currentVelocityXZMagnitude);
+            ModelAnimator.SetFloat(ANIM_MOVE_SPEED, CurrentHp <= 0 ? 0 : new Vector3(currentVelocity.x, 0, currentVelocity.z).magnitude);
             ModelAnimator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, MoveSpeed);
             ModelAnimator.SetFloat(ANIM_Y_SPEED, currentVelocity.y);
             ModelAnimator.SetBool(ANIM_IS_DEAD, CurrentHp <= 0);
