@@ -536,6 +536,16 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
             return;
         if (characterQuest.isComplete)
             return;
+        var tasks = quest.tasks;
+        foreach (var task in tasks)
+        {
+            switch (task.taskType)
+            {
+                case QuestTaskType.CollectItem:
+                    this.DecreaseItems(task.itemAmount.item.Id, task.itemAmount.amount);
+                    break;
+            }
+        }
         IncreaseExp(quest.rewardExp);
         IncreaseGold(quest.rewardGold);
         var rewardItems = quest.rewardItems;
