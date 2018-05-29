@@ -209,9 +209,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
                     BaseCharacterEntity targetEntity;
                     if (wasdLockAttackTarget && !CacheCharacterEntity.TryGetTargetEntity(out targetEntity))
                     {
-                        var attackDistance = CacheCharacterEntity.GetSkillAttackDistance(skill);
-                        var attackFov = CacheCharacterEntity.GetSkillAttackFov(skill);
-                        var nearestTarget = FindNearestAliveCharacter<MonsterCharacterEntity>(attackDistance, attackFov);
+                        var nearestTarget = FindNearestAliveCharacter<MonsterCharacterEntity>(CacheCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance);
                         if (nearestTarget != null)
                             CacheCharacterEntity.SetTargetEntity(nearestTarget);
                         else
@@ -233,9 +231,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
             BaseCharacterEntity targetEntity;
             if (wasdLockAttackTarget && !CacheCharacterEntity.TryGetTargetEntity(out targetEntity))
             {
-                var attackDistance = CacheCharacterEntity.GetAttackDistance();
-                var attackFov = CacheCharacterEntity.GetAttackFov();
-                var nearestTarget = FindNearestAliveCharacter<MonsterCharacterEntity>(attackDistance, attackFov);
+                var nearestTarget = FindNearestAliveCharacter<MonsterCharacterEntity>(CacheCharacterEntity.GetAttackDistance() + lockAttackTargetDistance);
                 if (nearestTarget != null)
                     CacheCharacterEntity.SetTargetEntity(nearestTarget);
                 else
@@ -392,11 +388,10 @@ public class PlayerCharacterController : BasePlayerCharacterController
         CacheCharacterEntity.PointClickMovement(targetPosition);
     }
 
-    protected T FindNearestAliveCharacter<T>(float distance, float fov) where T : BaseCharacterEntity
+    protected T FindNearestAliveCharacter<T>(float distance) where T : BaseCharacterEntity
     {
         T result = null;
-        var findDistance = CacheCharacterEntity.GetAttackDistance() + lockAttackTargetDistance;
-        var colliders = Physics.OverlapSphere(CacheCharacterTransform.position, findDistance, gameInstance.characterLayer.Mask);
+        var colliders = Physics.OverlapSphere(CacheCharacterTransform.position, distance, gameInstance.characterLayer.Mask);
         if (colliders != null && colliders.Length > 0)
         {
             float tempDistance;
@@ -409,18 +404,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 if (tempEntity == null || tempEntity.CurrentHp <= 0)
                     continue;
 
-                tempDistance = distance;
-                tempDistance -= tempDistance * 0.1f;
-                tempDistance -= stoppingDistance;
-                tempDistance += tempEntity.CacheCapsuleCollider.radius;
-                // This character is in fov or not?
-                var halfFov = fov * 0.5f;
-                var targetDir = (CacheCharacterTransform.position - tempEntity.CacheTransform.position).normalized;
-                var angle = Vector3.Angle(targetDir, CacheCharacterTransform.forward);
-                // If character is in fov, assume that it is closer than characters that is not in fov
-                if (angle < 180 + halfFov && angle > 180 - halfFov)
-                    tempDistance -= angle;
-
+                tempDistance = Vector3.Distance(CacheCharacterTransform.position, tempEntity.CacheTransform.position);
                 if (tempDistance < nearestDistance)
                 {
                     nearestDistance = tempDistance;
