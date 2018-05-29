@@ -251,6 +251,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 if (CacheCharacterEntity.HasNavPaths)
                     CacheCharacterEntity.StopMove();
                 destination = null;
+                CacheCharacterEntity.SetTargetEntity(null);
             }
             CacheCharacterEntity.KeyMovement(moveDirection, jumpInput);
         }
