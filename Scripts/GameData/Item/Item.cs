@@ -12,6 +12,7 @@ public enum ItemType
     Weapon,
     Shield,
     Potion,
+    Ammo,
 }
 
 [CreateAssetMenu(fileName = "Item", menuName = "Create GameData/Item")]
@@ -45,6 +46,9 @@ public class Item : BaseGameData
     
     // Potion
     public Buff buff;
+
+    // Ammo
+    public AmmoType ammoType;
 
 #if UNITY_EDITOR
     protected virtual void OnValidate()
@@ -99,6 +103,11 @@ public class Item : BaseGameData
     public bool IsPotion()
     {
         return itemType == ItemType.Potion;
+    }
+
+    public bool IsAmmo()
+    {
+        return itemType == ItemType.Ammo;
     }
 
     #region Cache Data

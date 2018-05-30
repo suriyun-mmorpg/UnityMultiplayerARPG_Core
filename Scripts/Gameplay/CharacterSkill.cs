@@ -55,12 +55,12 @@ public struct CharacterSkill
         var skill = GetSkill();
         if (skill == null)
             return false;
+        if (skill.IsAttack() && !character.CanAttack())
+            return false;
         var availableWeapons = skill.availableWeapons;
         var available = availableWeapons == null || availableWeapons.Length == 0;
-        var rightHand = character.EquipWeapons.rightHand;
-        var leftHand = character.EquipWeapons.leftHand;
-        var rightWeaponItem = rightHand.GetWeaponItem();
-        var leftWeaponItem = leftHand.GetWeaponItem();
+        var rightWeaponItem = character.EquipWeapons.rightHand.GetWeaponItem();
+        var leftWeaponItem = character.EquipWeapons.leftHand.GetWeaponItem();
         if (!available)
         {
             foreach (var availableWeapon in availableWeapons)

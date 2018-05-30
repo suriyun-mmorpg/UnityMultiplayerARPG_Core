@@ -44,5 +44,9 @@ public class ItemEditor : BaseCustomEditor
         // Potion
         ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Potion.ToString(), cacheItem.GetMemberName(a => a.maxStack));
         ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Potion.ToString(), cacheItem.GetMemberName(a => a.buff));
+        // Ammo
+        ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Ammo.ToString(), cacheItem.GetMemberName(a => a.maxStack));
+        ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Ammo.ToString(), cacheItem.GetMemberName(a => a.increaseDamages));
+        ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Ammo.ToString(), cacheItem.GetMemberName(a => a.ammoType));
     }
 }

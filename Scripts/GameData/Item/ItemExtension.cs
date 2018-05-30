@@ -38,6 +38,17 @@ public static class ItemExtension
         return character.Level >= equipmentItem.requirement.level && isPass;
     }
 
+    public static bool CanAttack(this Item weaponItem, ICharacterData character)
+    {
+        if (weaponItem == null ||
+            !weaponItem.IsWeapon() ||
+            character == null)
+            return false;
+
+        var requireAmmoType = weaponItem.WeaponType.requireAmmoType;
+        return requireAmmoType == null || character.IndexOfAmmoItem(requireAmmoType) >= 0;
+    }
+
     public static CharacterStats GetIncreaseStats(this Item equipmentItem, int level)
     {
         if (equipmentItem == null ||

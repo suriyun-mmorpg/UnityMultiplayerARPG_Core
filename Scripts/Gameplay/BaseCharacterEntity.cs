@@ -481,10 +481,11 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             return;
         lastActionCommandReceivedTime = Time.unscaledTime;
 
-        if (CurrentHp <= 0 || IsPlayingActionAnimation())
+        if (CurrentHp <= 0 || IsPlayingActionAnimation() || !this.CanAttack())
             return;
 
         // Prepare requires data
+        Item weapon;
         int actionId;
         float triggerDuration;
         float totalDuration;
@@ -492,11 +493,16 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         Dictionary<DamageElement, MinMaxFloat> allDamageAmounts;
 
         GetAttackingData(
+            out weapon,
             out actionId,
             out triggerDuration,
             out totalDuration,
             out damageInfo,
             out allDamageAmounts);
+
+        // Reduce ammo amount
+        if (weapon != null && weapon.WeaponType.requireAmmoType != null)
+            this.DecreaseItems(this.IndexOfAmmoItem(weapon.WeaponType.requireAmmoType), 1);
 
         // Play animation on clients
         RequestPlayActionAnimation(actionId, AnimActionType.Attack);
@@ -1437,38 +1443,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             ApplyBuff(Id, skill.Id, BuffType.SkillBuff, characterSkill.level);
     }
 
-    public CharacterItem GetRandomedWeapon(out bool isLeftHand)
-    {
-        isLeftHand = false;
-        // Start with default weapon, if character not equip any weapons, will return this
-        CharacterItem resultWeapon;
-        // Find right hand and left and to set result weapon
-        var rightHand = EquipWeapons.rightHand;
-        var leftHand = EquipWeapons.leftHand;
-        var rightWeaponItem = rightHand.GetWeaponItem();
-        var leftWeaponItem = leftHand.GetWeaponItem();
-        if (rightWeaponItem != null && leftWeaponItem != null)
-        {
-            // Random right hand or left hand weapon
-            isLeftHand = Random.Range(0, 1) == 1;
-            resultWeapon = !isLeftHand ? rightHand : leftHand;
-        }
-        else if (rightWeaponItem != null)
-        {
-            resultWeapon = rightHand;
-            isLeftHand = false;
-        }
-        else if (leftWeaponItem != null)
-        {
-            resultWeapon = leftHand;
-            isLeftHand = true;
-        }
-        else
-            resultWeapon = CharacterItem.Create(GameInstance.Singleton.defaultWeaponItem);
-        return resultWeapon;
-    }
-
     public virtual void GetAttackingData(
+        out Item weapon,
         out int actionId,
         out float triggerDuration,
         out float totalDuration,
@@ -1483,8 +1459,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         allDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
         // Prepare weapon data
         var isLeftHand = false;
-        var equipWeapon = GetRandomedWeapon(out isLeftHand);
-        var weapon = equipWeapon.GetWeaponItem();
+        var equipWeapon = this.GetRandomedWeapon(out isLeftHand);
+        weapon = equipWeapon.GetWeaponItem();
         var weaponType = weapon.WeaponType;
         // Assign damage data
         damageInfo = weaponType.damageInfo;
@@ -1531,7 +1507,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         isAttack = skill.IsAttack();
         // Prepare weapon data
         var isLeftHand = false;
-        var equipWeapon = GetRandomedWeapon(out isLeftHand);
+        var equipWeapon = this.GetRandomedWeapon(out isLeftHand);
         var weapon = equipWeapon.GetWeaponItem();
         var weaponType = weapon.WeaponType;
         // Prepare animation

@@ -29,6 +29,8 @@ public struct CharacterItem
     private Item cacheShieldItem;
     [System.NonSerialized]
     private Item cachePotionItem;
+    [System.NonSerialized]
+    private Item cacheAmmoItem;
 
     private void MakeCache()
     {
@@ -41,6 +43,7 @@ public struct CharacterItem
             cacheWeaponItem = null;
             cacheShieldItem = null;
             cachePotionItem = null;
+            cacheAmmoItem = null;
             return;
         }
         if (string.IsNullOrEmpty(dirtyItemId) || !dirtyItemId.Equals(itemId))
@@ -53,6 +56,7 @@ public struct CharacterItem
             cacheWeaponItem = null;
             cacheShieldItem = null;
             cachePotionItem = null;
+            cacheAmmoItem = null;
             cacheItem = GameInstance.Items.TryGetValue(itemId, out cacheItem) ? cacheItem : null;
             if (cacheItem != null)
             {
@@ -68,6 +72,8 @@ public struct CharacterItem
                     cacheShieldItem = cacheItem;
                 if (cacheItem.IsPotion())
                     cachePotionItem = cacheItem;
+                if (cacheItem.IsAmmo())
+                    cacheAmmoItem = cacheItem;
             }
         }
     }
@@ -117,6 +123,12 @@ public struct CharacterItem
     {
         MakeCache();
         return cachePotionItem;
+    }
+
+    public Item GetAmmoItem()
+    {
+        MakeCache();
+        return cacheAmmoItem;
     }
 
     public int GetMaxStack()

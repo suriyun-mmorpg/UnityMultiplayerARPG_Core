@@ -513,6 +513,46 @@ public static class CharacterDataExtension
         return true;
     }
 
+    public static CharacterItem GetRandomedWeapon(this ICharacterData data, out bool isLeftHand)
+    {
+        isLeftHand = false;
+        // Find right hand and left and to set result weapon
+        var rightHand = data.EquipWeapons.rightHand;
+        var leftHand = data.EquipWeapons.leftHand;
+        var rightWeaponItem = rightHand.GetWeaponItem();
+        var leftWeaponItem = leftHand.GetWeaponItem();
+        if (rightWeaponItem != null && leftWeaponItem != null)
+        {
+            // Random right hand or left hand weapon
+            isLeftHand = Random.Range(0, 1) == 1;
+            return !isLeftHand ? rightHand : leftHand;
+        }
+        else if (rightWeaponItem != null)
+        {
+            isLeftHand = false;
+            return rightHand;
+        }
+        else if (leftWeaponItem != null)
+        {
+            isLeftHand = true;
+            return leftHand;
+        }
+        return CharacterItem.Create(GameInstance.Singleton.defaultWeaponItem);
+    }
+
+    public static bool CanAttack(this ICharacterData data)
+    {
+        var rightWeapon = data.EquipWeapons.rightHand.GetWeaponItem();
+        var leftWeapon = data.EquipWeapons.leftHand.GetWeaponItem();
+        if (rightWeapon != null && leftWeapon != null)
+            return leftWeapon.CanAttack(data) && rightWeapon.CanAttack(data);
+        else if (rightWeapon != null)
+            return rightWeapon.CanAttack(data);
+        else if (leftWeapon != null)
+            return leftWeapon.CanAttack(data);
+        return GameInstance.Singleton.defaultWeaponItem.CanAttack(data);
+    }
+
     public static int IndexOfAttribute(this ICharacterData data, string attributeId)
     {
         var list = data.Attributes;
@@ -594,6 +634,23 @@ public static class CharacterDataExtension
             tempItem = list[i];
             if (!string.IsNullOrEmpty(tempItem.itemId) &&
                 tempItem.itemId.Equals(itemId))
+            {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
+    public static int IndexOfAmmoItem(this ICharacterData data, AmmoType ammoType)
+    {
+        var list = data.NonEquipItems;
+        Item tempAmmoItem;
+        var index = -1;
+        for (var i = 0; i < list.Count; ++i)
+        {
+            tempAmmoItem = list[i].GetAmmoItem();
+            if (tempAmmoItem != null && tempAmmoItem.ammoType == ammoType)
             {
                 index = i;
                 break;

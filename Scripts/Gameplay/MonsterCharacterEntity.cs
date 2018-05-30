@@ -311,6 +311,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
     }
 
     public override void GetAttackingData(
+        out Item weapon,
         out int actionId, 
         out float damageDuration, 
         out float totalDuration,
@@ -319,7 +320,8 @@ public class MonsterCharacterEntity : BaseCharacterEntity
     {
         var gameInstance = GameInstance.Singleton;
 
-        // Initialize attack animation
+        // Initialize data
+        weapon = null;
         actionId = -1;
         damageDuration = 0f;
         totalDuration = 0f;
