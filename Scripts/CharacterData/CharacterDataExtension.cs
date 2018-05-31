@@ -89,6 +89,7 @@ public static class CharacterDataExtension
             else
                 result[key] += value;
         }
+
         return result;
     }
 
@@ -132,6 +133,16 @@ public static class CharacterDataExtension
         foreach (var buff in buffs)
         {
             result = GameDataHelpers.CombineAttributeAmountsDictionary(result, buff.GetIncreaseAttributes());
+        }
+
+        // Passive skills
+        var skills = data.Skills;
+        foreach (var skill in skills)
+        {
+            if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive)
+                continue;
+            result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
+                skill.GetSkill().buff.GetIncreaseAttributes(skill.level));
         }
         return result;
     }
@@ -200,6 +211,16 @@ public static class CharacterDataExtension
         {
             result = GameDataHelpers.CombineResistanceAmountsDictionary(result, buff.GetIncreaseResistances());
         }
+
+        // Passive skills
+        var skills = data.Skills;
+        foreach (var skill in skills)
+        {
+            if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive)
+                continue;
+            result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
+                skill.GetSkill().buff.GetIncreaseResistances(skill.level));
+        }
         return result;
     }
 
@@ -254,6 +275,16 @@ public static class CharacterDataExtension
         foreach (var buff in buffs)
         {
             result = GameDataHelpers.CombineDamageAmountsDictionary(result, buff.GetIncreaseDamages());
+        }
+
+        // Passive skills
+        var skills = data.Skills;
+        foreach (var skill in skills)
+        {
+            if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive)
+                continue;
+            result = GameDataHelpers.CombineDamageAmountsDictionary(result,
+                skill.GetSkill().buff.GetIncreaseDamages(skill.level));
         }
         return result;
     }
@@ -329,6 +360,15 @@ public static class CharacterDataExtension
         {
             result += buff.GetIncreaseStats();
             result += GameDataHelpers.CaculateStats(buff.GetIncreaseAttributes());
+        }
+
+        // Passive skills
+        var skills = data.Skills;
+        foreach (var skill in skills)
+        {
+            if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive)
+                continue;
+            result += skill.GetSkill().buff.GetIncreaseStats(skill.level);
         }
         return result;
     }

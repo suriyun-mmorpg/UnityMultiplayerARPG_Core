@@ -2,6 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum SkillType
+{
+    Active,
+    Passive,
+    CraftItem,
+}
+
 public enum SkillAttackType
 {
     None,
@@ -18,10 +25,11 @@ public enum SkillBuffType
 [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill")]
 public class Skill : BaseGameData
 {
-    [Tooltip("Randoming cast animations")]
-    public ActionAnimation[] castAnimations;
+    public SkillType skillType;
     [Range(1, 30)]
     public int maxLevel = 1;
+    [Tooltip("Randoming cast animations")]
+    public ActionAnimation[] castAnimations;
     [Tooltip("An available weapons, if it not set every weapons is available")]
     public WeaponType[] availableWeapons;
 
@@ -48,6 +56,9 @@ public class Skill : BaseGameData
     [Header("Buffs")]
     public SkillBuffType skillBuffType;
     public Buff buff;
+
+    [Header("Craft")]
+    public Item craftingItem;
 
     private Dictionary<Skill, int> cacheRequireSkillLevels;
     public Dictionary<Skill, int> CacheRequireSkillLevels

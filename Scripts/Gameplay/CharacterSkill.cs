@@ -55,30 +55,42 @@ public struct CharacterSkill
         var skill = GetSkill();
         if (skill == null)
             return false;
-        var availableWeapons = skill.availableWeapons;
-        var available = availableWeapons == null || availableWeapons.Length == 0;
-        var rightWeaponItem = character.EquipWeapons.rightHand.GetWeaponItem();
-        var leftWeaponItem = character.EquipWeapons.leftHand.GetWeaponItem();
-        if (!available)
+        var available = true;
+        switch (skill.skillType)
         {
-            foreach (var availableWeapon in availableWeapons)
-            {
-                if (rightWeaponItem != null && rightWeaponItem.WeaponType == availableWeapon)
+            case SkillType.Active:
+                var availableWeapons = skill.availableWeapons;
+                available = availableWeapons == null || availableWeapons.Length == 0;
+                if (!available)
                 {
-                    available = true;
-                    break;
+                    var rightWeaponItem = character.EquipWeapons.rightHand.GetWeaponItem();
+                    var leftWeaponItem = character.EquipWeapons.leftHand.GetWeaponItem();
+                    foreach (var availableWeapon in availableWeapons)
+                    {
+                        if (rightWeaponItem != null && rightWeaponItem.WeaponType == availableWeapon)
+                        {
+                            available = true;
+                            break;
+                        }
+                        else if (leftWeaponItem != null && leftWeaponItem.WeaponType == availableWeapon)
+                        {
+                            available = true;
+                            break;
+                        }
+                        else if (rightWeaponItem == null && leftWeaponItem == null && GameInstance.Singleton.DefaultWeaponItem.WeaponType == availableWeapon)
+                        {
+                            available = true;
+                            break;
+                        }
+                    }
                 }
-                else if (leftWeaponItem != null && leftWeaponItem.WeaponType == availableWeapon)
-                {
-                    available = true;
-                    break;
-                }
-                else if (rightWeaponItem == null && leftWeaponItem == null && GameInstance.Singleton.DefaultWeaponItem.WeaponType == availableWeapon)
-                {
-                    available = true;
-                    break;
-                }
-            }
+                break;
+            case SkillType.CraftItem:
+                if (!skill.craftingItem.CanCraft(character))
+                    return false;
+                break;
+            default:
+                return false;
         }
         return level >= 1 && coolDownRemainsDuration <= 0f && character.CurrentMp >= skill.GetConsumeMp(level) && available;
     }

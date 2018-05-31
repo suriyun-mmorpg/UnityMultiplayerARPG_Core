@@ -601,15 +601,33 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         characterSkill.Used();
         characterSkill.ReduceMp(this);
         skills[skillIndex] = characterSkill;
-        var skill = characterSkill.GetSkill();
         yield return new WaitForSecondsRealtime(triggerDuration);
-        ApplySkillBuff(characterSkill);
-        if (isAttack)
+        var skill = characterSkill.GetSkill();
+        switch (skill.skillType)
         {
-            CharacterBuff? debuff = null;
-            if (skill.isDebuff)
-                debuff = CharacterBuff.Create(Id, BuffType.SkillDebuff, skill.Id, characterSkill.level);
-            LaunchDamageEntity(position, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id);
+            case SkillType.Active:
+                ApplySkillBuff(characterSkill);
+                if (isAttack)
+                {
+                    CharacterBuff? debuff = null;
+                    if (skill.isDebuff)
+                        debuff = CharacterBuff.Create(Id, BuffType.SkillDebuff, skill.Id, characterSkill.level);
+                    LaunchDamageEntity(position, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id);
+                }
+                break;
+            case SkillType.CraftItem:
+                var craftingItem = skill.craftingItem;
+                if (craftingItem.CanCraft(this))
+                {
+                    var craftRequirements = craftingItem.craftRequirements;
+                    foreach (var craftRequirement in craftRequirements)
+                    {
+                        if (craftRequirement.item != null && craftRequirement.amount > 0)
+                            this.DecreaseItems(craftRequirement.item.Id, craftRequirement.amount);
+                    }
+                    this.IncreaseItems(craftingItem.Id, 1, 1);
+                }
+                break;
         }
         yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
     }
