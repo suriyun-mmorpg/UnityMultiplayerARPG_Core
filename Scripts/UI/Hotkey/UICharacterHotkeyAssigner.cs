@@ -102,7 +102,8 @@ public class UICharacterHotkeyAssigner : UIBase
         foreach (var characterSkill in characterSkills)
         {
             var skill = characterSkill.GetSkill();
-            if (skill != null && characterSkill.level > 0)
+            if (skill != null && characterSkill.level > 0 && 
+                (skill.skillType == SkillType.Active || skill.skillType == SkillType.CraftItem))
                 filterSkills.Add(characterSkill);
         }
         foreach (var characterItem in characterItems)

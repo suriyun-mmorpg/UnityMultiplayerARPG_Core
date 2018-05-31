@@ -59,6 +59,7 @@ public class Skill : BaseGameData
 
     [Header("Craft")]
     public Item craftingItem;
+    public ItemAmount[] craftRequirements;
 
     private Dictionary<Skill, int> cacheRequireSkillLevels;
     public Dictionary<Skill, int> CacheRequireSkillLevels

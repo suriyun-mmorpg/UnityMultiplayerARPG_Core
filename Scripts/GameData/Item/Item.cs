@@ -27,9 +27,6 @@ public class Item : BaseGameData
     [Range(1, 30)]
     public int maxLevel = 1;
 
-    [Header("Craft")]
-    public ItemAmount[] craftRequirements;
-
     // Armor
     public ArmorType armorType;
 

@@ -86,7 +86,7 @@ public struct CharacterSkill
                 }
                 break;
             case SkillType.CraftItem:
-                if (!skill.craftingItem.CanCraft(character))
+                if (!skill.CanCraft(character))
                     return false;
                 break;
             default:

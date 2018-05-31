@@ -616,16 +616,15 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                 }
                 break;
             case SkillType.CraftItem:
-                var craftingItem = skill.craftingItem;
-                if (craftingItem.CanCraft(this))
+                if (skill.CanCraft(this))
                 {
-                    var craftRequirements = craftingItem.craftRequirements;
+                    var craftRequirements = skill.craftRequirements;
                     foreach (var craftRequirement in craftRequirements)
                     {
                         if (craftRequirement.item != null && craftRequirement.amount > 0)
                             this.DecreaseItems(craftRequirement.item.Id, craftRequirement.amount);
                     }
-                    this.IncreaseItems(craftingItem.Id, 1, 1);
+                    this.IncreaseItems(skill.craftingItem.Id, 1, 1);
                 }
                 break;
         }

@@ -4,21 +4,6 @@ using UnityEngine;
 
 public static class ItemExtension
 {
-    public static bool CanCraft(this Item item, ICharacterData character)
-    {
-        if (item == null)
-            return false;
-        var craftRequirements = item.craftRequirements;
-        if (craftRequirements == null || craftRequirements.Length == 0)
-            return true;
-        foreach (var craftRequirement in craftRequirements)
-        {
-            if (craftRequirement.item != null && character.CountNonEquipItems(craftRequirement.item.Id) < craftRequirement.amount)
-                return false;
-        }
-        return true;
-    }
-
     #region Equipment Extension
     public static bool CanEquip(this Item equipmentItem, ICharacterData character, int level)
     {

@@ -94,6 +94,21 @@ public static class SkillExtension
             duration = 0f;
         return duration;
     }
+
+    public static bool CanCraft(this Skill skill, ICharacterData character)
+    {
+        if (skill.skillType != SkillType.CraftItem || skill.craftingItem == null)
+            return false;
+        var craftRequirements = skill.craftRequirements;
+        if (craftRequirements == null || craftRequirements.Length == 0)
+            return true;
+        foreach (var craftRequirement in craftRequirements)
+        {
+            if (craftRequirement.item != null && character.CountNonEquipItems(craftRequirement.item.Id) < craftRequirement.amount)
+                return false;
+        }
+        return true;
+    }
     #endregion
 
     #region Attack
