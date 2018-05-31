@@ -55,8 +55,6 @@ public struct CharacterSkill
         var skill = GetSkill();
         if (skill == null)
             return false;
-        if (skill.IsAttack() && !character.CanAttack())
-            return false;
         var availableWeapons = skill.availableWeapons;
         var available = availableWeapons == null || availableWeapons.Length == 0;
         var rightWeaponItem = character.EquipWeapons.rightHand.GetWeaponItem();

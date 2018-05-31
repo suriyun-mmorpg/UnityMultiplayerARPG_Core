@@ -481,7 +481,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             return;
         lastActionCommandReceivedTime = Time.unscaledTime;
 
-        if (CurrentHp <= 0 || IsPlayingActionAnimation() || !this.CanAttack())
+        if (CurrentHp <= 0 || IsPlayingActionAnimation())
             return;
 
         // Prepare requires data
@@ -502,7 +502,10 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
         // Reduce ammo amount
         if (weapon != null && weapon.WeaponType.requireAmmoType != null)
-            this.DecreaseItems(this.IndexOfAmmoItem(weapon.WeaponType.requireAmmoType), 1);
+        {
+            if (!this.DecreaseItems(weapon.WeaponType.requireAmmoType, 1))
+                return;
+        }
 
         // Play animation on clients
         RequestPlayActionAnimation(actionId, AnimActionType.Attack);
@@ -544,6 +547,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             return;
 
         // Prepare requires data
+        Item weapon;
         int actionId;
         float triggerDuration;
         float totalDuration;
@@ -553,12 +557,20 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
         GetUsingSkillData(
             characterSkill,
+            out weapon,
             out actionId,
             out triggerDuration,
             out totalDuration,
             out isAttack,
             out damageInfo,
             out allDamageAmounts);
+
+        // Reduce ammo amount
+        if (characterSkill.GetSkill().IsAttack() && weapon != null && weapon.WeaponType.requireAmmoType != null)
+        {
+            if (!this.DecreaseItems(weapon.WeaponType.requireAmmoType, 1))
+                return;
+        }
 
         // Play animation on clients
         RequestPlayActionAnimation(actionId, AnimActionType.Skill);
@@ -1452,6 +1464,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         out Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
     {
         // Initialize data
+        weapon = null;
         actionId = -1;
         triggerDuration = 0f;
         totalDuration = 0f;
@@ -1486,6 +1499,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     public virtual void GetUsingSkillData(
         CharacterSkill characterSkill,
+        out Item weapon, 
         out int actionId,
         out float triggerDuration,
         out float totalDuration,
@@ -1494,6 +1508,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         out Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
     {
         // Initialize data
+        weapon = null;
         isAttack = false;
         actionId = -1;
         triggerDuration = 0f;
@@ -1508,7 +1523,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         // Prepare weapon data
         var isLeftHand = false;
         var equipWeapon = this.GetRandomedWeapon(out isLeftHand);
-        var weapon = equipWeapon.GetWeaponItem();
+        weapon = equipWeapon.GetWeaponItem();
         var weaponType = weapon.WeaponType;
         // Prepare animation
         if ((skill.castAnimations == null || skill.castAnimations.Length == 0) && isAttack)

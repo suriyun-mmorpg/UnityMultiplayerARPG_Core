@@ -496,6 +496,35 @@ public static class CharacterDataExtension
         return true;
     }
 
+    public static bool DecreaseItems(this ICharacterData data, AmmoType ammoType, int amount)
+    {
+        var decreasingItems = new Dictionary<int, int>();
+        var nonEquipItems = data.NonEquipItems;
+        var tempDecresingAmount = 0;
+        for (var i = 0; i < nonEquipItems.Count; ++i)
+        {
+            var nonEquipItem = nonEquipItems[i];
+            if (nonEquipItem.GetAmmoItem() != null && nonEquipItem.GetAmmoItem().ammoType == ammoType)
+            {
+                if (amount - nonEquipItem.amount > 0)
+                    tempDecresingAmount = nonEquipItem.amount;
+                else
+                    tempDecresingAmount = amount;
+                amount -= tempDecresingAmount;
+                decreasingItems[i] = tempDecresingAmount;
+            }
+            if (amount == 0)
+                break;
+        }
+        if (amount > 0)
+            return false;
+        foreach (var decreasingItem in decreasingItems)
+        {
+            DecreaseItems(data, decreasingItem.Key, decreasingItem.Value);
+        }
+        return true;
+    }
+
     public static bool DecreaseItems(this ICharacterData data, int index, int amount)
     {
         if (index < 0 || index > data.NonEquipItems.Count)
