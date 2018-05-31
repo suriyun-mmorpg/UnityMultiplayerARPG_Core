@@ -469,7 +469,14 @@ public static class CharacterDataExtension
 
     public static bool DecreaseItems(this ICharacterData data, string itemId, int amount)
     {
-        var decreasingItems = new Dictionary<int, int>();
+        Dictionary<CharacterItem, int> decreaseItems;
+        return DecreaseItems(data, itemId, amount, out decreaseItems);
+    }
+
+    public static bool DecreaseItems(this ICharacterData data, string itemId, int amount, out Dictionary<CharacterItem, int> decreaseItems)
+    {
+        decreaseItems = new Dictionary<CharacterItem, int>();
+        var decreasingItemIndexes = new Dictionary<int, int>();
         var nonEquipItems = data.NonEquipItems;
         var tempDecresingAmount = 0;
         for (var i = 0; i < nonEquipItems.Count; ++i)
@@ -482,15 +489,16 @@ public static class CharacterDataExtension
                 else
                     tempDecresingAmount = amount;
                 amount -= tempDecresingAmount;
-                decreasingItems[i] = tempDecresingAmount;
+                decreasingItemIndexes[i] = tempDecresingAmount;
             }
             if (amount == 0)
                 break;
         }
         if (amount > 0)
             return false;
-        foreach (var decreasingItem in decreasingItems)
+        foreach (var decreasingItem in decreasingItemIndexes)
         {
+            decreaseItems.Add(data.NonEquipItems[decreasingItem.Key], decreasingItem.Value);
             DecreaseItems(data, decreasingItem.Key, decreasingItem.Value);
         }
         return true;
@@ -498,7 +506,14 @@ public static class CharacterDataExtension
 
     public static bool DecreaseItems(this ICharacterData data, AmmoType ammoType, int amount)
     {
-        var decreasingItems = new Dictionary<int, int>();
+        Dictionary<CharacterItem, int> decreaseItems;
+        return DecreaseItems(data, ammoType, amount, out decreaseItems);
+    }
+
+    public static bool DecreaseItems(this ICharacterData data, AmmoType ammoType, int amount, out Dictionary<CharacterItem, int> decreaseItems)
+    {
+        decreaseItems = new Dictionary<CharacterItem, int>();
+        var decreasingItemIndexes = new Dictionary<int, int>();
         var nonEquipItems = data.NonEquipItems;
         var tempDecresingAmount = 0;
         for (var i = 0; i < nonEquipItems.Count; ++i)
@@ -511,15 +526,16 @@ public static class CharacterDataExtension
                 else
                     tempDecresingAmount = amount;
                 amount -= tempDecresingAmount;
-                decreasingItems[i] = tempDecresingAmount;
+                decreasingItemIndexes[i] = tempDecresingAmount;
             }
             if (amount == 0)
                 break;
         }
         if (amount > 0)
             return false;
-        foreach (var decreasingItem in decreasingItems)
+        foreach (var decreasingItem in decreasingItemIndexes)
         {
+            decreaseItems.Add(data.NonEquipItems[decreasingItem.Key], decreasingItem.Value);
             DecreaseItems(data, decreasingItem.Key, decreasingItem.Value);
         }
         return true;

@@ -54,6 +54,9 @@ public class MissileDamageEntity : BaseDamageEntity
         if (characterEntity == null || characterEntity == attacker || characterEntity.CurrentHp <= 0)
             return;
 
+        if (attacker is MonsterCharacterEntity && characterEntity is MonsterCharacterEntity)
+            return;
+
         ApplyDamageTo(characterEntity);
         NetworkDestroy();
     }

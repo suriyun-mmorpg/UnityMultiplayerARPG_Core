@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using LiteNetLib;
 using LiteNetLibManager;
@@ -503,8 +504,12 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         // Reduce ammo amount
         if (weapon != null && weapon.WeaponType.requireAmmoType != null)
         {
-            if (!this.DecreaseItems(weapon.WeaponType.requireAmmoType, 1))
+            Dictionary<CharacterItem, int> decreaseItems;
+            if (!this.DecreaseItems(weapon.WeaponType.requireAmmoType, 1, out decreaseItems))
                 return;
+            var firstEntry = decreaseItems.FirstOrDefault();
+            if (firstEntry.Key.GetItem() != null && firstEntry.Value > 0)
+                allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(allDamageAmounts, firstEntry.Key.GetItem().GetIncreaseDamages(firstEntry.Key.level));
         }
 
         // Play animation on clients
@@ -568,8 +573,12 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         // Reduce ammo amount
         if (characterSkill.GetSkill().IsAttack() && weapon != null && weapon.WeaponType.requireAmmoType != null)
         {
-            if (!this.DecreaseItems(weapon.WeaponType.requireAmmoType, 1))
+            Dictionary<CharacterItem, int> decreaseItems;
+            if (!this.DecreaseItems(weapon.WeaponType.requireAmmoType, 1, out decreaseItems))
                 return;
+            var firstEntry = decreaseItems.FirstOrDefault();
+            if (firstEntry.Key.GetItem() != null && firstEntry.Value > 0)
+                allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(allDamageAmounts, firstEntry.Key.GetItem().GetIncreaseDamages(firstEntry.Key.level));
         }
 
         // Play animation on clients
