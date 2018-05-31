@@ -15,7 +15,7 @@ public static class SkillExtension
     {
         if (skill == null)
             return false;
-        return skill.skillBuffType != SkillBuffType.None;
+        return skill.skillType == SkillType.Passive || skill.skillBuffType != SkillBuffType.None;
     }
 
     public static bool IsDebuff(this Skill skill)

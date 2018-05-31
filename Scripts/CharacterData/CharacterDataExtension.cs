@@ -139,7 +139,7 @@ public static class CharacterDataExtension
         var skills = data.Skills;
         foreach (var skill in skills)
         {
-            if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive)
+            if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
                 continue;
             result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
                 skill.GetSkill().buff.GetIncreaseAttributes(skill.level));
@@ -216,7 +216,7 @@ public static class CharacterDataExtension
         var skills = data.Skills;
         foreach (var skill in skills)
         {
-            if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive)
+            if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
                 continue;
             result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
                 skill.GetSkill().buff.GetIncreaseResistances(skill.level));
@@ -281,7 +281,7 @@ public static class CharacterDataExtension
         var skills = data.Skills;
         foreach (var skill in skills)
         {
-            if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive)
+            if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
                 continue;
             result = GameDataHelpers.CombineDamageAmountsDictionary(result,
                 skill.GetSkill().buff.GetIncreaseDamages(skill.level));
@@ -366,7 +366,7 @@ public static class CharacterDataExtension
         var skills = data.Skills;
         foreach (var skill in skills)
         {
-            if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive)
+            if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
                 continue;
             result += skill.GetSkill().buff.GetIncreaseStats(skill.level);
         }
