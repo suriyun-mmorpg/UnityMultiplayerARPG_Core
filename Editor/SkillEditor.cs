@@ -22,6 +22,7 @@ public class SkillEditor : BaseCustomEditor
         ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.CraftItem.ToString(), cacheSkill.GetMemberName(a => a.consumeMp));
         ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.CraftItem.ToString(), cacheSkill.GetMemberName(a => a.coolDownDuration));
         ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.CraftItem.ToString(), cacheSkill.GetMemberName(a => a.craftingItem));
+        ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.CraftItem.ToString(), cacheSkill.GetMemberName(a => a.craftRequirements));
         // Normal Attack skill
         ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), SkillAttackType.Normal.ToString(), cacheSkill.GetMemberName(a => a.hitEffects));
         ShowOnEnum(cacheSkill.GetMemberName(a => a.skillAttackType), SkillAttackType.Normal.ToString(), cacheSkill.GetMemberName(a => a.damageInfo));
