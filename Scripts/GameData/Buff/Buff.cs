@@ -9,6 +9,9 @@ public class Buff
     public IncrementalFloat duration;
     public IncrementalInt recoveryHp;
     public IncrementalInt recoveryMp;
+    public IncrementalInt recoveryStamina;
+    public IncrementalInt recoveryFood;
+    public IncrementalInt recoveryWater;
     public CharacterStatsIncremental increaseStats;
     public AttributeIncremental[] increaseAttributes;
     public ResistanceIncremental[] increaseResistances;

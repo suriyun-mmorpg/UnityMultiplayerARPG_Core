@@ -73,6 +73,20 @@ public static class GameDataHelpers
         }
         return sourceDictionary;
     }
+
+    public static Dictionary<Item, int> CombineItemAmountsDictionary(Dictionary<Item, int> sourceDictionary, KeyValuePair<Item, int> newEntry)
+    {
+        var item = newEntry.Key;
+        if (item != null)
+        {
+            var value = newEntry.Value;
+            if (!sourceDictionary.ContainsKey(item))
+                sourceDictionary[item] = value;
+            else
+                sourceDictionary[item] += value;
+        }
+        return sourceDictionary;
+    }
     #endregion
 
     #region Combine Dictionary with Dictionary functions
@@ -222,6 +236,13 @@ public static class GameDataHelpers
             return new KeyValuePair<Skill, int>();
         return new KeyValuePair<Skill, int>(source.skill, source.level);
     }
+
+    public static KeyValuePair<Item, int> MakeItemAmountPair(ItemAmount source)
+    {
+        if (source.item == null)
+            return new KeyValuePair<Item, int>();
+        return new KeyValuePair<Item, int>(source.item, source.amount);
+    }
     #endregion
 
     #region Make Dictionary functions
@@ -347,6 +368,21 @@ public static class GameDataHelpers
             {
                 var pair = MakeSkillLevelPair(sourceLevel);
                 targetDictionary = CombineSkillLevelsDictionary(targetDictionary, pair);
+            }
+        }
+        return targetDictionary;
+    }
+
+    public static Dictionary<Item, int> MakeItemAmountsDictionary(ItemAmount[] sourceAmounts, Dictionary<Item, int> targetDictionary)
+    {
+        if (targetDictionary == null)
+            targetDictionary = new Dictionary<Item, int>();
+        if (sourceAmounts != null)
+        {
+            foreach (var sourceAmount in sourceAmounts)
+            {
+                var pair = MakeItemAmountPair(sourceAmount);
+                targetDictionary = CombineItemAmountsDictionary(targetDictionary, pair);
             }
         }
         return targetDictionary;

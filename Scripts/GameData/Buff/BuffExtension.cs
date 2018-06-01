@@ -20,6 +20,21 @@ public static class BuffExtension
         return buff.recoveryMp.GetAmount(level);
     }
 
+    public static int GetRecoveryStamina(this Buff buff, int level)
+    {
+        return buff.recoveryStamina.GetAmount(level);
+    }
+
+    public static int GetRecoveryFood(this Buff buff, int level)
+    {
+        return buff.recoveryFood.GetAmount(level);
+    }
+
+    public static int GetRecoveryWater(this Buff buff, int level)
+    {
+        return buff.recoveryWater.GetAmount(level);
+    }
+
     public static CharacterStats GetIncreaseStats(this Buff buff, int level)
     {
         return buff.increaseStats.GetCharacterStats(level);

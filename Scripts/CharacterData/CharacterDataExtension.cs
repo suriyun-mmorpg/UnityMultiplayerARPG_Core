@@ -157,6 +157,25 @@ public static class CharacterDataExtension
         return result;
     }
 
+    public static Dictionary<Skill, int> GetSkills(this ICharacterData data)
+    {
+        var result = new Dictionary<Skill, int>();
+        // Added skills
+        var skills = data.Skills;
+        foreach (var characterSkill in skills)
+        {
+            var key = characterSkill.GetSkill();
+            var value = characterSkill.level;
+            if (key == null)
+                continue;
+            if (!result.ContainsKey(key))
+                result[key] = value;
+            else
+                result[key] += value;
+        }
+        return result;
+    }
+
     public static Dictionary<DamageElement, float> GetCharacterResistances(this ICharacterData data)
     {
         if (data == null)

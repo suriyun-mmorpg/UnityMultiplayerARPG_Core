@@ -82,6 +82,17 @@ public class Skill : BaseGameData
             return cacheEffectivenessAttributes;
         }
     }
+
+    private Dictionary<Item, int> cacheCraftRequirements;
+    public Dictionary<Item, int> CacheCraftRequirements
+    {
+        get
+        {
+            if (cacheCraftRequirements == null)
+                cacheCraftRequirements = GameDataHelpers.MakeItemAmountsDictionary(craftRequirements, new Dictionary<Item, int>());
+            return cacheCraftRequirements;
+        }
+    }
 }
 
 [System.Serializable]

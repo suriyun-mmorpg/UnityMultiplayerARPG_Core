@@ -8,16 +8,6 @@ using LiteNetLibManager;
 using UnityEditor;
 #endif
 
-public enum CombatAmountType : byte
-{
-    Miss,
-    NormalDamage,
-    CriticalDamage,
-    BlockedDamage,
-    HpRecovery,
-    MpRecovery,
-}
-
 public enum AnimActionType : byte
 {
     None,
@@ -92,6 +82,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     #region Caches Data
     public CharacterStats CacheStats { get; protected set; }
     public Dictionary<Attribute, int> CacheAttributes { get; protected set; }
+    public Dictionary<Skill, int> CacheSkills { get; protected set; }
     public Dictionary<DamageElement, float> CacheResistances { get; protected set; }
     public Dictionary<DamageElement, MinMaxFloat> CacheIncreaseDamages { get; protected set; }
     public int CacheMaxHp { get; protected set; }
@@ -864,44 +855,12 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         var uiSceneGameplay = UISceneGameplay.Singleton;
         if (uiSceneGameplay == null)
             return;
-        switch (combatAmountType)
-        {
-            case CombatAmountType.Miss:
-                SpawnCombatText(uiSceneGameplay.uiCombatTextMiss, amount);
-                break;
-            case CombatAmountType.NormalDamage:
-                SpawnCombatText(uiSceneGameplay.uiCombatTextNormalDamage, amount);
-                break;
-            case CombatAmountType.CriticalDamage:
-                SpawnCombatText(uiSceneGameplay.uiCombatTextCriticalDamage, amount);
-                break;
-            case CombatAmountType.BlockedDamage:
-                SpawnCombatText(uiSceneGameplay.uiCombatTextBlockedDamage, amount);
-                break;
-            case CombatAmountType.HpRecovery:
-                SpawnCombatText(uiSceneGameplay.uiCombatTextHpRecovery, amount);
-                break;
-            case CombatAmountType.MpRecovery:
-                SpawnCombatText(uiSceneGameplay.uiCombatTextMpRecovery, amount);
-                break;
-        }
-    }
 
-    protected void SpawnCombatText(UICombatText prefab, int amount)
-    {
-        var uiSceneGameplay = UISceneGameplay.Singleton;
-        if (uiSceneGameplay == null)
-            return;
         var combatTextTransform = CacheTransform;
         if (model != null)
             combatTextTransform = model.CombatTextTransform;
-        if (uiSceneGameplay.combatTextTransform != null)
-        {
-            var combatText = Instantiate(prefab, uiSceneGameplay.combatTextTransform);
-            combatText.transform.localScale = Vector3.one;
-            combatText.CacheObjectFollower.TargetObject = combatTextTransform;
-            combatText.Amount = amount;
-        }
+
+        uiSceneGameplay.SpawnCombatText(combatTextTransform, combatAmountType, amount);
     }
 
     /// <summary>
@@ -1798,6 +1757,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             return;
         CacheStats = this.GetStats();
         CacheAttributes = this.GetAttributes();
+        CacheSkills = this.GetSkills();
         CacheResistances = this.GetResistances();
         CacheIncreaseDamages = this.GetIncreaseDamages();
         CacheMaxHp = (int)CacheStats.hp;
