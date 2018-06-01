@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UISkillItemCraft : UISelectionEntry<Skill>
+public class UISkillCraftItem : UISelectionEntry<Skill>
 {
     [Header("UI Elements")]
     public UICharacterItem uiCraftingItem;

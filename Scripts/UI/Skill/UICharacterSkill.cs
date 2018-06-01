@@ -39,6 +39,7 @@ public class UICharacterSkill : UIDataForCharacter<Tuple<CharacterSkill, int>>
     public Text textCoolDownRemainsDuration;
     public Image imageCoolDownGage;
     public UISkillRequirement uiRequirement;
+    public UISkillCraftItem uiCraftItem;
 
     [Header("Skill Attack")]
     public UIDamageElementAmount uiDamageAmount;
@@ -155,6 +156,17 @@ public class UICharacterSkill : UIDataForCharacter<Tuple<CharacterSkill, int>>
             {
                 uiRequirement.Show();
                 uiRequirement.Data = new Tuple<Skill, int>(skill, level);
+            }
+        }
+
+        if (uiCraftItem != null)
+        {
+            if (skill == null || skill.skillType != SkillType.CraftItem)
+                uiCraftItem.Hide();
+            else
+            {
+                uiCraftItem.Show();
+                uiCraftItem.Data = skill;
             }
         }
 

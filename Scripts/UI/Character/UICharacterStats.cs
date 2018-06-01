@@ -55,119 +55,145 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
         var statsStringPart = "";
 
         // Hp
-        if (!string.IsNullOrEmpty(statsString))
-            statsString += "\n";
         statsStringPart = string.Format(hpStatsFormat, Data.hp.ToString("N0"));
         if (Data.hp != 0)
+        {
+            if (!string.IsNullOrEmpty(statsString))
+                statsString += "\n";
             statsString += statsStringPart;
+        }
         if (textHp != null)
             textHp.text = statsStringPart;
 
         // Mp
-        if (!string.IsNullOrEmpty(statsString))
-            statsString += "\n";
         statsStringPart = string.Format(mpStatsFormat, Data.mp.ToString("N0"));
         if (Data.mp != 0)
+        {
+            if (!string.IsNullOrEmpty(statsString))
+                statsString += "\n";
             statsString += statsStringPart;
+        }
         if (textMp != null)
             textMp.text = statsStringPart;
 
         // Armor
-        if (!string.IsNullOrEmpty(statsString))
-            statsString += "\n";
         statsStringPart = string.Format(armorStatsFormat, Data.armor.ToString("N0"));
         if (Data.armor != 0)
+        {
+            if (!string.IsNullOrEmpty(statsString))
+                statsString += "\n";
             statsString += statsStringPart;
+        }
         if (textArmor != null)
             textArmor.text = statsStringPart;
 
         // Accuracy
-        if (!string.IsNullOrEmpty(statsString))
-            statsString += "\n";
         statsStringPart = string.Format(accuracyStatsFormat, Data.accuracy.ToString("N0"));
         if (Data.accuracy != 0)
+        {
+            if (!string.IsNullOrEmpty(statsString))
+                statsString += "\n";
             statsString += statsStringPart;
+        }
         if (textAccuracy != null)
             textAccuracy.text = statsStringPart;
 
         // Evasion
-        if (!string.IsNullOrEmpty(statsString))
-            statsString += "\n";
         statsStringPart = string.Format(evasionStatsFormat, Data.evasion.ToString("N0"));
         if (Data.evasion != 0)
+        {
+            if (!string.IsNullOrEmpty(statsString))
+                statsString += "\n";
             statsString += statsStringPart;
+        }
         if (textEvasion != null)
             textEvasion.text = statsStringPart;
 
         // Cri Rate
-        if (!string.IsNullOrEmpty(statsString))
-            statsString += "\n";
         statsStringPart = string.Format(criRateStatsFormat, (Data.criRate * 100).ToString("N2"));
         if (Data.criRate != 0)
+        {
+            if (!string.IsNullOrEmpty(statsString))
+                statsString += "\n";
             statsString += statsStringPart;
+        }
         if (textCriRate != null)
             textCriRate.text = statsStringPart;
 
         // Cri Dmg Rate
-        if (!string.IsNullOrEmpty(statsString))
-            statsString += "\n";
         statsStringPart = string.Format(criDmgRateStatsFormat, (Data.criDmgRate * 100).ToString("N2"));
         if (Data.criDmgRate != 0)
+        {
+            if (!string.IsNullOrEmpty(statsString))
+                statsString += "\n";
             statsString += statsStringPart;
+        }
         if (textCriDmgRate != null)
             textCriDmgRate.text = statsStringPart;
         
         // Block Rate
-        if (!string.IsNullOrEmpty(statsString))
-            statsString += "\n";
         statsStringPart = string.Format(blockRateStatsFormat, (Data.blockRate * 100).ToString("N2"));
         if (Data.blockRate != 0)
+        {
+            if (!string.IsNullOrEmpty(statsString))
+                statsString += "\n";
             statsString += statsStringPart;
+        }
         if (textBlockRate != null)
             textBlockRate.text = statsStringPart;
 
         // Block Dmg Rate
-        if (!string.IsNullOrEmpty(statsString))
-            statsString += "\n";
         statsStringPart = string.Format(blockDmgRateStatsFormat, (Data.blockDmgRate * 100).ToString("N2"));
         if (Data.blockDmgRate != 0)
+        {
+            if (!string.IsNullOrEmpty(statsString))
+                statsString += "\n";
             statsString += statsStringPart;
+        }
         if (textBlockDmgRate != null)
             textBlockDmgRate.text = statsStringPart;
 
         // Weight
-        if (!string.IsNullOrEmpty(statsString))
-            statsString += "\n";
         statsStringPart = string.Format(weightLimitStatsFormat, Data.weightLimit.ToString("N2"));
         if (Data.weightLimit != 0)
+        {
+            if (!string.IsNullOrEmpty(statsString))
+                statsString += "\n";
             statsString += statsStringPart;
+        }
         if (textWeightLimit != null)
             textWeightLimit.text = statsStringPart;
 
         // Stamina
-        if (!string.IsNullOrEmpty(statsString))
-            statsString += "\n";
         statsStringPart = string.Format(staminaStatsFormat, Data.stamina.ToString("N0"));
         if (Data.stamina != 0)
+        {
+            if (!string.IsNullOrEmpty(statsString))
+                statsString += "\n";
             statsString += statsStringPart;
+        }
         if (textStamina != null)
             textStamina.text = statsStringPart;
 
         // Food
-        if (!string.IsNullOrEmpty(statsString))
-            statsString += "\n";
         statsStringPart = string.Format(foodStatsFormat, Data.food.ToString("N0"));
         if (Data.food != 0)
+        {
+            if (!string.IsNullOrEmpty(statsString))
+                statsString += "\n";
             statsString += statsStringPart;
+        }
         if (textFood != null)
             textFood.text = statsStringPart;
 
         // Water
-        if (!string.IsNullOrEmpty(statsString))
-            statsString += "\n";
         statsStringPart = string.Format(waterStatsFormat, Data.water.ToString("N0"));
         if (Data.water != 0)
+        {
+            if (!string.IsNullOrEmpty(statsString))
+                statsString += "\n";
             statsString += statsStringPart;
+        }
         if (textWater != null)
             textWater.text = statsStringPart;
 
