@@ -35,8 +35,12 @@ public class MonsterSpawnArea : MonoBehaviour
             entity.Id = System.Guid.NewGuid().ToString();
             entity.DatabaseId = databaseId;
             entity.Level = level;
-            entity.CurrentHp = entity.GetMaxHp();
-            entity.CurrentMp = entity.GetMaxMp();
+            var stats = entity.GetStats();
+            entity.CurrentHp = (int)stats.hp;
+            entity.CurrentMp = (int)stats.mp;
+            entity.CurrentStamina = (int)stats.stamina;
+            entity.CurrentFood = (int)stats.food;
+            entity.CurrentWater = (int)stats.water;
             entity.respawnPosition = randomedPosition;
         }
     }

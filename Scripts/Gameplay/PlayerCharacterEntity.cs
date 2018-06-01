@@ -158,15 +158,14 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
             {
                 if (moveDirectionMagnitude > 1)
                     moveDirection = moveDirection.normalized;
-
-                var moveSpeed = MoveSpeed * gameInstance.moveSpeedMultiplier;
-                var targetVelocity = moveDirection * moveSpeed;
+                
+                var targetVelocity = moveDirection * CacheMoveSpeed;
 
                 // Apply a force that attempts to reach our target velocity
                 Vector3 velocityChange = (targetVelocity - velocity);
-                velocityChange.x = Mathf.Clamp(velocityChange.x, -moveSpeed, moveSpeed);
+                velocityChange.x = Mathf.Clamp(velocityChange.x, -CacheMoveSpeed, CacheMoveSpeed);
                 velocityChange.y = 0;
-                velocityChange.z = Mathf.Clamp(velocityChange.z, -moveSpeed, moveSpeed);
+                velocityChange.z = Mathf.Clamp(velocityChange.z, -CacheMoveSpeed, CacheMoveSpeed);
                 CacheRigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
                 // Calculate rotation on client only, will send update to server later
                 CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(moveDirection), angularSpeed * Time.fixedDeltaTime);

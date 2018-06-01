@@ -38,6 +38,12 @@ public struct CharacterBuff
     [System.NonSerialized]
     private int cacheRecoveryMp;
     [System.NonSerialized]
+    private int cacheRecoveryStamina;
+    [System.NonSerialized]
+    private int cacheRecoveryFood;
+    [System.NonSerialized]
+    private int cacheRecoveryWater;
+    [System.NonSerialized]
     private CharacterStats cacheIncreaseStats;
     [System.NonSerialized]
     private Dictionary<Attribute, int> cacheIncreaseAttributes;
@@ -56,6 +62,9 @@ public struct CharacterBuff
             cacheDuration = 0f;
             cacheRecoveryHp = 0;
             cacheRecoveryMp = 0;
+            cacheRecoveryStamina = 0;
+            cacheRecoveryFood = 0;
+            cacheRecoveryWater = 0;
             cacheIncreaseStats = new CharacterStats();
             cacheIncreaseAttributes = new Dictionary<Attribute, int>();
             cacheIncreaseResistances = new Dictionary<DamageElement, float>();
@@ -72,6 +81,9 @@ public struct CharacterBuff
             cacheDuration = 0;
             cacheRecoveryHp = 0;
             cacheRecoveryMp = 0;
+            cacheRecoveryStamina = 0;
+            cacheRecoveryFood = 0;
+            cacheRecoveryWater = 0;
             cacheIncreaseStats = new CharacterStats();
             cacheIncreaseAttributes = null;
             cacheIncreaseResistances = null;
@@ -93,6 +105,9 @@ public struct CharacterBuff
                 cacheDuration = cacheBuff.GetDuration(level);
                 cacheRecoveryHp = cacheBuff.GetRecoveryHp(level);
                 cacheRecoveryMp = cacheBuff.GetRecoveryMp(level);
+                cacheRecoveryStamina = cacheBuff.GetRecoveryStamina(level);
+                cacheRecoveryFood = cacheBuff.GetRecoveryFood(level);
+                cacheRecoveryWater = cacheBuff.GetRecoveryWater(level);
                 cacheIncreaseStats = cacheBuff.GetIncreaseStats(level);
                 cacheIncreaseAttributes = cacheBuff.GetIncreaseAttributes(level);
                 cacheIncreaseResistances = cacheBuff.GetIncreaseResistances(level);
@@ -140,6 +155,24 @@ public struct CharacterBuff
     {
         MakeCache();
         return cacheRecoveryMp;
+    }
+
+    public int GetBuffRecoveryStamina()
+    {
+        MakeCache();
+        return cacheRecoveryStamina;
+    }
+
+    public int GetBuffRecoveryFood()
+    {
+        MakeCache();
+        return cacheRecoveryFood;
+    }
+
+    public int GetBuffRecoveryWater()
+    {
+        MakeCache();
+        return cacheRecoveryWater;
     }
 
     public CharacterStats GetIncreaseStats()

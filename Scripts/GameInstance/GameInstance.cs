@@ -35,9 +35,6 @@ public class GameInstance : MonoBehaviour
     public UnityTag itemDropTag;
     public UnityLayer characterLayer;
     public UnityLayer itemDropLayer;
-    public int increaseStatPointEachLevel = 5;
-    public int increaseSkillPointEachLevel = 1;
-    public float moveSpeedMultiplier = 5f;
     public float itemAppearDuration = 60f;
     public float pickUpItemDistance = 1f;
     public float dropDistance = 1f;

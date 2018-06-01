@@ -236,11 +236,11 @@ public class UISceneGameplay : MonoBehaviour
 
     public void SpawnCombatText(Transform followingTransform, UICombatText prefab, int amount)
     {
-        if (combatTextTransform != null)
+        if (combatTextTransform != null && prefab != null)
         {
             var combatText = Instantiate(prefab, combatTextTransform);
             combatText.transform.localScale = Vector3.one;
-            combatText.CacheObjectFollower.TargetObject = combatTextTransform;
+            combatText.CacheObjectFollower.TargetObject = followingTransform;
             combatText.Amount = amount;
         }
     }

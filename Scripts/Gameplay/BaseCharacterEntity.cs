@@ -73,10 +73,19 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected AnimActionType animActionType;
     protected float recoveryingHp;
     protected float recoveryingMp;
+    protected float recoveryingStamina;
+    protected float recoveryingFood;
+    protected float recoveryingWater;
+    protected float decreasingHp;
+    protected float decreasingMp;
+    protected float decreasingStamina;
+    protected float decreasingFood;
+    protected float decreasingWater;
     protected float skillBuffUpdateDeltaTime;
     protected float recoveryUpdateDeltaTime;
-    protected bool shouldRecaches;
+    protected bool shouldReCaches;
     protected float lastActionCommandReceivedTime;
+    public bool isSprinting { get; protected set; }
     #endregion
 
     #region Caches Data
@@ -87,6 +96,12 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public Dictionary<DamageElement, MinMaxFloat> CacheIncreaseDamages { get; protected set; }
     public int CacheMaxHp { get; protected set; }
     public int CacheMaxMp { get; protected set; }
+    public int CacheMaxStamina { get; protected set; }
+    public int CacheMaxFood { get; protected set; }
+    public int CacheMaxWater { get; protected set; }
+    public float CacheBaseMoveSpeed { get; protected set; }
+    public float CacheMoveSpeed { get; protected set; }
+    public float CacheAtkSpeed { get; protected set; }
     #endregion
 
     #region Sync data actions
@@ -125,8 +140,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public virtual int CurrentFood { get { return currentFood.Value; } set { currentFood.Value = value; } }
     public virtual int CurrentWater { get { return currentWater.Value; } set { currentWater.Value = value; } }
     public virtual EquipWeapons EquipWeapons { get { return equipWeapons; } set { equipWeapons.Value = value; } }
-    public virtual float MoveSpeed { get { return this.GetMoveSpeed(); } }
-    public virtual float AttackSpeed { get { return this.GetAttackSpeed(); } }
     public override string Title { get { return CharacterName; } }
 
     public IList<CharacterAttribute> Attributes
@@ -226,7 +239,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         gameObject.layer = gameInstance.characterLayer;
         skillBuffUpdateDeltaTime = 0;
         animActionType = AnimActionType.None;
-        shouldRecaches = true;
+        shouldReCaches = true;
     }
 
     protected override void Start()
@@ -270,13 +283,14 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     {
         if (ModelAnimator != null && ModelAnimator.isActiveAndEnabled)
         {
+            var gameRule = GameInstance.Singleton.GameplayRule;
             if (CurrentHp <= 0)
             {
                 // Force set to none action when dead
                 ModelAnimator.SetBool(ANIM_DO_ACTION, false);
             }
             ModelAnimator.SetFloat(ANIM_MOVE_SPEED, CurrentHp <= 0 ? 0 : new Vector3(currentVelocity.x, 0, currentVelocity.z).magnitude);
-            ModelAnimator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, MoveSpeed);
+            ModelAnimator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, gameRule.GetMoveSpeed(this) / CacheBaseMoveSpeed);
             ModelAnimator.SetFloat(ANIM_Y_SPEED, currentVelocity.y);
             ModelAnimator.SetBool(ANIM_IS_DEAD, CurrentHp <= 0);
         }
@@ -305,8 +319,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             {
                 var buff = buffs[i];
                 var duration = buff.GetDuration();
-                var addingRecoveryingHp = duration > 0 ? (float)buff.GetBuffRecoveryHp() / duration * skillBuffUpdateDeltaTime : (float)buff.GetBuffRecoveryHp();
-                var addingRecoveryingMp = duration > 0 ? (float)buff.GetBuffRecoveryMp() / duration * skillBuffUpdateDeltaTime : (float)buff.GetBuffRecoveryMp();
                 if (buff.ShouldRemove())
                     buffs.RemoveAt(i);
                 else
@@ -314,8 +326,11 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                     buff.Update(skillBuffUpdateDeltaTime);
                     buffs[i] = buff;
                 }
-                recoveryingHp += addingRecoveryingHp;
-                recoveryingMp += addingRecoveryingMp;
+                recoveryingHp += duration > 0f ? (float)buff.GetBuffRecoveryHp() / duration * skillBuffUpdateDeltaTime : 0f;
+                recoveryingMp += duration > 0f ? (float)buff.GetBuffRecoveryMp() / duration * skillBuffUpdateDeltaTime : 0f;
+                recoveryingStamina += duration > 0f ? (float)buff.GetBuffRecoveryStamina() / duration * skillBuffUpdateDeltaTime : 0f;
+                recoveryingFood += duration > 0f ? (float)buff.GetBuffRecoveryFood() / duration * skillBuffUpdateDeltaTime : 0f;
+                recoveryingWater += duration > 0f ? (float)buff.GetBuffRecoveryWater() / duration * skillBuffUpdateDeltaTime : 0f;
             }
             skillBuffUpdateDeltaTime = 0;
         }
@@ -323,47 +338,168 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected virtual void UpdateRecoverying()
     {
-        if (CurrentHp > 0)
+        if (CurrentHp <= 0 || !IsServer)
+            return;
+
+        var gameRule = GameInstance.Singleton.GameplayRule;
+        recoveryUpdateDeltaTime += Time.unscaledDeltaTime;
+        if (recoveryUpdateDeltaTime >= RECOVERY_UPDATE_DURATION)
         {
-            var gameRule = GameInstance.Singleton.GameplayRule;
-            recoveryUpdateDeltaTime += Time.unscaledDeltaTime;
-            if (recoveryUpdateDeltaTime >= RECOVERY_UPDATE_DURATION)
+            // Hp
+            recoveryingHp += recoveryUpdateDeltaTime * gameRule.GetRecoveryHpPerSeconds(this);
+            if (CurrentHp < CacheMaxHp)
             {
-                recoveryingHp += recoveryUpdateDeltaTime * gameRule.GetRecoveryHpPerSeconds(this);
-                recoveryingMp += recoveryUpdateDeltaTime * gameRule.GetRecoveryMpPerSeconds(this);
-                if (CurrentHp < CacheMaxHp)
+                if (recoveryingHp >= 1)
                 {
-                    if (recoveryingHp >= 1)
-                    {
-                        var intRecoveryingHp = (int)recoveryingHp;
-                        CurrentHp += intRecoveryingHp;
-                        RequestCombatAmount(CombatAmountType.HpRecovery, intRecoveryingHp);
-                        recoveryingHp -= intRecoveryingHp;
-                    }
+                    var intRecoveryingHp = (int)recoveryingHp;
+                    CurrentHp += intRecoveryingHp;
+                    RequestCombatAmount(CombatAmountType.HpRecovery, intRecoveryingHp);
+                    recoveryingHp -= intRecoveryingHp;
                 }
-                else
-                    recoveryingHp = 0;
-
-                if (CurrentMp < CacheMaxMp)
-                {
-                    if (recoveryingMp >= 1)
-                    {
-                        var intRecoveryingMp = (int)recoveryingMp;
-                        CurrentMp += intRecoveryingMp;
-                        RequestCombatAmount(CombatAmountType.MpRecovery, intRecoveryingMp);
-                        recoveryingMp -= intRecoveryingMp;
-                    }
-                }
-                else
-                    recoveryingMp = 0;
-
-                recoveryUpdateDeltaTime = 0;
             }
+            else
+                recoveryingHp = 0;
+
+            // Decrease Hp
+            decreasingHp += recoveryUpdateDeltaTime * gameRule.GetDecreasingHpPerSeconds(this);
+            if (CurrentHp > 0)
+            {
+                if (decreasingHp >= 1)
+                {
+                    var intDecreasingHp = (int)decreasingHp;
+                    CurrentHp -= intDecreasingHp;
+                    decreasingHp -= intDecreasingHp;
+                }
+            }
+            else
+                decreasingHp = 0;
+
+            // Mp
+            recoveryingMp += recoveryUpdateDeltaTime * gameRule.GetRecoveryMpPerSeconds(this);
+            if (CurrentMp < CacheMaxMp)
+            {
+                if (recoveryingMp >= 1)
+                {
+                    var intRecoveryingMp = (int)recoveryingMp;
+                    CurrentMp += intRecoveryingMp;
+                    RequestCombatAmount(CombatAmountType.MpRecovery, intRecoveryingMp);
+                    recoveryingMp -= intRecoveryingMp;
+                }
+            }
+            else
+                recoveryingMp = 0;
+
+            // Decrease Mp
+            decreasingMp += recoveryUpdateDeltaTime * gameRule.GetDecreasingMpPerSeconds(this);
+            if (CurrentMp > 0)
+            {
+                if (decreasingMp >= 1)
+                {
+                    var intDecreasingMp = (int)decreasingMp;
+                    CurrentMp -= intDecreasingMp;
+                    decreasingMp -= intDecreasingMp;
+                }
+            }
+            else
+                decreasingMp = 0;
+
+            // Stamina
+            recoveryingStamina += recoveryUpdateDeltaTime * gameRule.GetRecoveryStaminaPerSeconds(this);
+            if (CurrentStamina < CacheMaxStamina)
+            {
+                if (recoveryingStamina >= 1)
+                {
+                    var intRecoveryingStamina = (int)recoveryingStamina;
+                    CurrentStamina += intRecoveryingStamina;
+                    RequestCombatAmount(CombatAmountType.StaminaRecovery, intRecoveryingStamina);
+                    recoveryingStamina -= intRecoveryingStamina;
+                }
+            }
+            else
+                recoveryingStamina = 0;
+
+            // Decrease Stamina while sprinting
+            decreasingStamina += recoveryUpdateDeltaTime * gameRule.GetDecreasingStaminaPerSeconds(this);
+            if (isSprinting && CurrentStamina > 0)
+            {
+                if (decreasingStamina >= 1)
+                {
+                    var intDecreasingStamina = (int)decreasingStamina;
+                    CurrentStamina -= intDecreasingStamina;
+                    decreasingStamina -= intDecreasingStamina;
+                }
+            }
+            else
+                decreasingStamina = 0;
+
+            // Food
+            if (CurrentFood < CacheMaxFood)
+            {
+                if (recoveryingFood >= 1)
+                {
+                    var intRecoveryingFood = (int)recoveryingFood;
+                    CurrentFood += intRecoveryingFood;
+                    RequestCombatAmount(CombatAmountType.FoodRecovery, intRecoveryingFood);
+                    recoveryingFood -= intRecoveryingFood;
+                }
+            }
+            else
+                recoveryingFood = 0;
+
+            // Decrease Food
+            decreasingFood += recoveryUpdateDeltaTime * gameRule.GetDecreasingFoodPerSeconds(this);
+            if (CurrentFood > 0)
+            {
+                if (decreasingFood >= 1)
+                {
+                    var intDecreasingFood = (int)decreasingFood;
+                    CurrentFood -= intDecreasingFood;
+                    decreasingFood -= intDecreasingFood;
+                }
+            }
+            else
+                decreasingFood = 0;
+
+            // Water
+            if (CurrentWater < CacheMaxWater)
+            {
+                if (recoveryingWater >= 1)
+                {
+                    var intRecoveryingWater = (int)recoveryingWater;
+                    CurrentWater += intRecoveryingWater;
+                    RequestCombatAmount(CombatAmountType.WaterRecovery, intRecoveryingWater);
+                    recoveryingWater -= intRecoveryingWater;
+                }
+            }
+            else
+                recoveryingWater = 0;
+
+            // Decrease Water
+            decreasingWater += recoveryUpdateDeltaTime * gameRule.GetDecreasingWaterPerSeconds(this);
+            if (CurrentWater > 0)
+            {
+                if (decreasingWater >= 1)
+                {
+                    var intDecreasingWater = (int)decreasingWater;
+                    CurrentWater -= intDecreasingWater;
+                    decreasingWater -= intDecreasingWater;
+                }
+            }
+            else
+                decreasingWater = 0;
+
+            recoveryUpdateDeltaTime = 0;
         }
 
-        // Validates Hp / Mp
-        if (IsServer)
-        {
+        ValidateRecovery();
+    }
+
+    protected virtual void ValidateRecovery()
+    {
+        if (!IsServer)
+            return;
+
+        // Validates Hp / Mp / Stamina / Food / Water
             if (CurrentHp < 0)
                 CurrentHp = 0;
             if (CurrentMp < 0)
@@ -372,7 +508,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                 CurrentHp = CacheMaxHp;
             if (CurrentMp > CacheMaxMp)
                 CurrentMp = CacheMaxMp;
-        }
     }
 
     #region Setup functions
@@ -664,7 +799,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             switch (animActionType)
             {
                 case AnimActionType.Attack:
-                    actionClipMultiplier = AttackSpeed;
+                    actionClipMultiplier = CacheAtkSpeed;
                     break;
             }
             if (actionAnimation.audioClips != null && actionAnimation.audioClips.Length > 0)
@@ -1310,7 +1445,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected virtual void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index)
     {
         if (IsServer)
-            shouldRecaches = true;
+            shouldReCaches = true;
 
         if (onAttributesOperation != null)
             onAttributesOperation.Invoke(operation, index);
@@ -1324,7 +1459,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected virtual void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
         if (IsServer)
-            shouldRecaches = true;
+            shouldReCaches = true;
 
         if (onSkillsOperation != null)
             onSkillsOperation.Invoke(operation, index);
@@ -1338,7 +1473,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected virtual void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
         if (IsServer)
-            shouldRecaches = true;
+            shouldReCaches = true;
 
         if (model != null)
             model.SetBuffs(buffs);
@@ -1355,7 +1490,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected virtual void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
         if (IsServer)
-            shouldRecaches = true;
+            shouldReCaches = true;
 
         if (model != null)
             model.SetEquipItems(equipItems);
@@ -1372,7 +1507,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected virtual void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
         if (IsServer)
-            shouldRecaches = true;
+            shouldReCaches = true;
 
         if (onNonEquipItemsOperation != null)
             onNonEquipItemsOperation.Invoke(operation, index);
@@ -1421,6 +1556,39 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         var newBuff = CharacterBuff.Create(characterId, type, dataId, level);
         newBuff.Added();
         buffs.Add(newBuff);
+
+        var duration = newBuff.GetDuration();
+        var recoveryHp = duration <= 0f ? newBuff.GetBuffRecoveryHp() : 0;
+        if (recoveryHp != 0)
+        {
+            CurrentHp += recoveryHp;
+            RequestCombatAmount(CombatAmountType.HpRecovery, recoveryHp);
+        }
+        var recoveryMp = duration <= 0f ? newBuff.GetBuffRecoveryMp() : 0;
+        if (recoveryMp != 0)
+        {
+            CurrentMp += recoveryMp;
+            RequestCombatAmount(CombatAmountType.HpRecovery, recoveryMp);
+        }
+        var recoveryStamina = duration <= 0f ? newBuff.GetBuffRecoveryStamina() : 0;
+        if (recoveryStamina != 0)
+        {
+            CurrentStamina += recoveryStamina;
+            RequestCombatAmount(CombatAmountType.HpRecovery, recoveryStamina);
+        }
+        var recoveryFood = duration <= 0f ? newBuff.GetBuffRecoveryFood() : 0;
+        if (recoveryFood != 0)
+        {
+            CurrentFood += recoveryFood;
+            RequestCombatAmount(CombatAmountType.FoodRecovery, recoveryFood);
+        }
+        var recoveryWater = duration <= 0f ? newBuff.GetBuffRecoveryWater() : 0;
+        if (recoveryWater != 0)
+        {
+            CurrentWater += recoveryWater;
+            RequestCombatAmount(CombatAmountType.WaterRecovery, recoveryWater);
+        }
+        ValidateRecovery();
     }
 
     protected void ApplyPotionBuff(CharacterItem characterItem)
@@ -1470,8 +1638,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             var anim = animArray[Random.Range(0, animLength)];
             // Assign animation data
             actionId = anim.Id;
-            triggerDuration = anim.TriggerDuration / AttackSpeed;
-            totalDuration = (anim.ClipLength + anim.extraDuration) / AttackSpeed;
+            triggerDuration = anim.TriggerDuration / CacheAtkSpeed;
+            totalDuration = (anim.ClipLength + anim.extraDuration) / CacheAtkSpeed;
         }
         // Calculate all damages
         allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(
@@ -1522,8 +1690,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                     var anim = animArray[Random.Range(0, animLength)];
                     // Assign animation data
                     actionId = anim.Id;
-                    triggerDuration = anim.TriggerDuration / AttackSpeed;
-                    totalDuration = (anim.ClipLength + anim.extraDuration) / AttackSpeed;
+                    triggerDuration = anim.TriggerDuration / CacheAtkSpeed;
+                    totalDuration = (anim.ClipLength + anim.extraDuration) / CacheAtkSpeed;
                 }
         }
         else if (skill.castAnimations != null && skill.castAnimations.Length > 0)
@@ -1534,8 +1702,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             var anim = animArray[Random.Range(0, animLength)];
             // Assign animation data
             actionId = anim.Id;
-            triggerDuration = anim.TriggerDuration / AttackSpeed;
-            totalDuration = (anim.ClipLength + anim.extraDuration) / AttackSpeed;
+            triggerDuration = anim.TriggerDuration / CacheAtkSpeed;
+            totalDuration = (anim.ClipLength + anim.extraDuration) / CacheAtkSpeed;
         }
         if (isAttack)
         {
@@ -1747,13 +1915,16 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             return;
         CurrentHp = CacheMaxHp;
         CurrentMp = CacheMaxMp;
+        CurrentStamina = CacheMaxStamina;
+        CurrentFood = CacheMaxFood;
+        CurrentWater = CacheMaxWater;
         // Send OnRespawn to owner player only
         RequestOnRespawn(false);
     }
 
     protected virtual void MakeCaches()
     {
-        if (!shouldRecaches)
+        if (!shouldReCaches)
             return;
         CacheStats = this.GetStats();
         CacheAttributes = this.GetAttributes();
@@ -1762,7 +1933,13 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         CacheIncreaseDamages = this.GetIncreaseDamages();
         CacheMaxHp = (int)CacheStats.hp;
         CacheMaxMp = (int)CacheStats.mp;
-        shouldRecaches = false;
+        CacheMaxStamina = (int)CacheStats.stamina;
+        CacheMaxFood = (int)CacheStats.food;
+        CacheMaxWater = (int)CacheStats.water;
+        CacheBaseMoveSpeed = database.stats.baseStats.moveSpeed;
+        CacheMoveSpeed = CacheStats.moveSpeed;
+        CacheAtkSpeed = CacheStats.atkSpeed;
+        shouldReCaches = false;
     }
 
     public virtual bool IsPlayingActionAnimation()

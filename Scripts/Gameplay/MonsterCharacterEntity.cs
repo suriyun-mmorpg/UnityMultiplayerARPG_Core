@@ -27,6 +27,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
     protected Vector3? wanderDestination;
     protected Vector3 oldMovePosition;
     protected readonly Dictionary<BaseCharacterEntity, ReceivedDamageRecord> receivedDamageRecords = new Dictionary<BaseCharacterEntity, ReceivedDamageRecord>();
+    public bool isWandering { get; protected set; }
     #endregion
 
     #region Public data
@@ -110,6 +111,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         }
         
         var gameInstance = GameInstance.Singleton;
+        var gameRule = gameInstance.GameplayRule;
         var currentPosition = CacheTransform.position;
         BaseCharacterEntity targetEntity;
         if (TryGetTargetEntity(out targetEntity))
@@ -146,8 +148,9 @@ public class MonsterCharacterEntity : BaseCharacterEntity
                 if (oldMovePosition != targetPosition &&
                     Time.unscaledTime - setTargetDestinationTime >= SET_TARGET_DESTINATION_DELAY)
                 {
+                    isWandering = false;
                     setTargetDestinationTime = Time.unscaledTime;
-                    CacheNavMeshAgent.speed = MoveSpeed * gameInstance.moveSpeedMultiplier;
+                    CacheNavMeshAgent.speed = gameRule.GetMoveSpeed(this);
                     CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.MedQualityObstacleAvoidance;
                     CacheNavMeshAgent.SetDestination(targetPosition);
                     CacheNavMeshAgent.isStopped = false;
@@ -183,8 +186,9 @@ public class MonsterCharacterEntity : BaseCharacterEntity
                 NavMeshHit navMeshHit;
                 if (NavMesh.SamplePosition(randomPosition, out navMeshHit, RANDOM_WANDER_AREA_MAX, 1))
                 {
+                    isWandering = true;
                     wanderDestination = navMeshHit.position;
-                    CacheNavMeshAgent.speed = MonsterDatabase.wanderMoveSpeed * gameInstance.moveSpeedMultiplier;
+                    CacheNavMeshAgent.speed = gameRule.GetMoveSpeed(this);
                     CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
                     CacheNavMeshAgent.SetDestination(wanderDestination.Value);
                     CacheNavMeshAgent.isStopped = false;
@@ -334,8 +338,8 @@ public class MonsterCharacterEntity : BaseCharacterEntity
             var anim = animArray[Random.Range(0, animLength)];
             // Assign animation data
             actionId = anim.Id;
-            damageDuration = anim.TriggerDuration / AttackSpeed;
-            totalDuration = (anim.ClipLength + anim.extraDuration) / AttackSpeed;
+            damageDuration = anim.TriggerDuration / CacheAtkSpeed;
+            totalDuration = (anim.ClipLength + anim.extraDuration) / CacheAtkSpeed;
         }
 
         // Assign damage data

@@ -211,8 +211,12 @@ public static class PlayerCharacterDataExtension
         character.DatabaseId = database.Id;
         character.CharacterName = characterName;
         character.Level = 1;
-        character.CurrentHp = character.GetMaxHp();
-        character.CurrentMp = character.GetMaxMp();
+        var stats = character.GetStats();
+        character.CurrentHp = (int)stats.hp;
+        character.CurrentMp = (int)stats.mp;
+        character.CurrentStamina = (int)stats.stamina;
+        character.CurrentFood = (int)stats.food;
+        character.CurrentWater = (int)stats.water;
         character.Gold = gameInstance.startGold;
         // Inventory
         var startItems = gameInstance.startItems;

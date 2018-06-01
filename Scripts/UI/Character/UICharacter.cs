@@ -21,6 +21,12 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public string hpFormat = "Hp: {0}/{1}";
     [Tooltip("Mp Format => {0} = {Current mp}, {1} = {Max mp}")]
     public string mpFormat = "Mp: {0}/{1}";
+    [Tooltip("Stamina Format => {0} = {Current stamina}, {1} = {Max stamina}")]
+    public string staminaFormat = "Stamina: {0}/{1}";
+    [Tooltip("Food Format => {0} = {Current food}, {1} = {Max food}")]
+    public string foodFormat = "Food: {0}/{1}";
+    [Tooltip("Water Format => {0} = {Current water}, {1} = {Max water}")]
+    public string waterFormat = "Water: {0}/{1}";
     [Tooltip("Stat Point Format => {0} = {Stat point}")]
     public string statPointFormat = "Stat Points: {0}";
     [Tooltip("Skill Point Format => {0} = {Skill point}")]
@@ -47,6 +53,12 @@ public class UICharacter : UISelectionEntry<ICharacterData>
     public Image imageHpGage;
     public Text textMp;
     public Image imageMpGage;
+    public Text textStamina;
+    public Image imageStaminaGage;
+    public Text textFood;
+    public Image imageFoodGage;
+    public Text textWater;
+    public Image imageWaterGage;
     public Text textStatPoint;
     public Text textSkillPoint;
     public Text textGold;
@@ -121,6 +133,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         if (imageExpGage != null)
             imageExpGage.fillAmount = nextLevelExp <= 0 ? 1 : (float)currentExp / (float)nextLevelExp;
 
+        // Hp
         var currentHp = 0;
         var maxHp = 0;
         if (Data != null)
@@ -135,6 +148,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         if (imageHpGage != null)
             imageHpGage.fillAmount = maxHp <= 0 ? 1 : (float)currentHp / (float)maxHp;
 
+        // Mp
         var currentMp = 0;
         var maxMp = 0;
         if (Data != null)
@@ -149,6 +163,52 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         if (imageMpGage != null)
             imageMpGage.fillAmount = maxMp <= 0 ? 1 : (float)currentMp / (float)maxMp;
 
+        // Stamina
+        var currentStamina = 0;
+        var maxStamina = 0;
+        if (Data != null)
+        {
+            currentStamina = Data.CurrentStamina;
+            maxStamina = (int)statsWithBuff.stamina;
+        }
+
+        if (textStamina != null)
+            textStamina.text = string.Format(staminaFormat, currentStamina.ToString("N0"), maxStamina.ToString("N0"));
+
+        if (imageStaminaGage != null)
+            imageStaminaGage.fillAmount = maxStamina <= 0 ? 1 : (float)currentStamina / (float)maxStamina;
+
+        // Food
+        var currentFood = 0;
+        var maxFood = 0;
+        if (Data != null)
+        {
+            currentFood = Data.CurrentFood;
+            maxFood = (int)statsWithBuff.food;
+        }
+
+        if (textFood != null)
+            textFood.text = string.Format(foodFormat, currentFood.ToString("N0"), maxFood.ToString("N0"));
+
+        if (imageFoodGage != null)
+            imageFoodGage.fillAmount = maxFood <= 0 ? 1 : (float)currentFood / (float)maxFood;
+
+        // Water
+        var currentWater = 0;
+        var maxWater = 0;
+        if (Data != null)
+        {
+            currentWater = Data.CurrentWater;
+            maxWater = (int)statsWithBuff.water;
+        }
+
+        if (textWater != null)
+            textWater.text = string.Format(waterFormat, currentWater.ToString("N0"), maxWater.ToString("N0"));
+
+        if (imageWaterGage != null)
+            imageWaterGage.fillAmount = maxWater <= 0 ? 1 : (float)currentWater / (float)maxWater;
+
+        // Player character data
         var playerCharacter = Data as IPlayerCharacterData;
         if (textStatPoint != null)
             textStatPoint.text = string.Format(statPointFormat, playerCharacter == null ? "N/A" : playerCharacter.StatPoint.ToString("N0"));

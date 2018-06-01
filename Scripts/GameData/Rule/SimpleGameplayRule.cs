@@ -5,6 +5,30 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "SimpleGameplayRule", menuName = "Create GameplayRule/SimpleGameplayRule")]
 public class SimpleGameplayRule : BaseGameplayRule
 {
+    public int increaseStatPointEachLevel = 5;
+    public int increaseSkillPointEachLevel = 1;
+    public int hungryWhenFoodLowerThan = 40;
+    public int thirstyWhenWaterLowerThan = 40;
+    public int staminaRecoveryPerSeconds = 5;
+    public int staminaDecreasePerSeconds = 5;
+    public int foodDecreasePerSeconds = 4;
+    public int waterDecreasePerSeconds = 2;
+    public float moveSpeedRateWhileSprint = 1.5f;
+    [Range(0.01f, 1f)]
+    public float hpRecoveryRatePerSeconds = 0.05f;
+    [Range(0.01f, 1f)]
+    public float mpRecoveryRatePerSeconds = 0.05f;
+    [Range(0.01f, 1f)]
+    public float staminaRecoveryRatePerSeconds = 0.05f;
+    [Range(0.01f, 1f)]
+    public float hpDecreaseRatePerSecondsWhenHungry = 0.05f;
+    [Range(0.01f, 1f)]
+    public float mpDecreaseRatePerSecondsWhenHungry = 0.05f;
+    [Range(0.01f, 1f)]
+    public float hpDecreaseRatePerSecondsWhenThirsty = 0.05f;
+    [Range(0.01f, 1f)]
+    public float mpDecreaseRatePerSecondsWhenThirsty = 0.05f;
+
     public override float GetHitChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
     {
         // Attacker stats
@@ -88,18 +112,77 @@ public class SimpleGameplayRule : BaseGameplayRule
 
     public override float GetRecoveryHpPerSeconds(BaseCharacterEntity character)
     {
-        return character.CacheMaxHp * 0.01f; // 1% of total hp
+        return character.CacheMaxHp * hpRecoveryRatePerSeconds;
     }
 
     public override float GetRecoveryMpPerSeconds(BaseCharacterEntity character)
     {
-        return character.CacheMaxMp * 0.01f; // 1% of total mp
+        return character.CacheMaxMp * mpRecoveryRatePerSeconds;
+    }
+
+    public override float GetRecoveryStaminaPerSeconds(BaseCharacterEntity character)
+    {
+        return staminaRecoveryPerSeconds;
+    }
+
+    public override float GetDecreasingHpPerSeconds(BaseCharacterEntity character)
+    {
+        if (character is MonsterCharacterEntity)
+            return 0f;
+        var result = 0f;
+        if (character.CurrentFood < hungryWhenFoodLowerThan)
+            result += character.CacheMaxHp * hpDecreaseRatePerSecondsWhenHungry;
+        if (character.CurrentWater < thirstyWhenWaterLowerThan)
+            result += character.CacheMaxHp * hpDecreaseRatePerSecondsWhenThirsty;
+        return result;
+    }
+
+    public override float GetDecreasingMpPerSeconds(BaseCharacterEntity character)
+    {
+        if (character is MonsterCharacterEntity)
+            return 0f;
+        var result = 0f;
+        if (character.CurrentFood < hungryWhenFoodLowerThan)
+            result += character.CacheMaxMp * mpDecreaseRatePerSecondsWhenHungry;
+        if (character.CurrentWater < thirstyWhenWaterLowerThan)
+            result += character.CacheMaxMp * mpDecreaseRatePerSecondsWhenThirsty;
+        return result;
+    }
+
+    public override float GetDecreasingStaminaPerSeconds(BaseCharacterEntity character)
+    {
+        if (character is MonsterCharacterEntity)
+            return 0f;
+        return staminaDecreasePerSeconds;
+    }
+
+    public override float GetDecreasingFoodPerSeconds(BaseCharacterEntity character)
+    {
+        if (character is MonsterCharacterEntity)
+            return 0f;
+        return foodDecreasePerSeconds;
+    }
+
+    public override float GetDecreasingWaterPerSeconds(BaseCharacterEntity character)
+    {
+        if (character is MonsterCharacterEntity)
+            return 0f;
+        return waterDecreasePerSeconds;
+    }
+
+    public override float GetMoveSpeed(BaseCharacterEntity character)
+    {
+        if (character is MonsterCharacterEntity)
+        {
+            var monsterCharacter = character as MonsterCharacterEntity;
+            return monsterCharacter.isWandering ? monsterCharacter.MonsterDatabase.wanderMoveSpeed : monsterCharacter.CacheMoveSpeed;
+        }
+        return character.CacheMoveSpeed * (character.isSprinting ? moveSpeedRateWhileSprint : 1f);
     }
 
     public override bool IncreaseExp(BaseCharacterEntity character, int exp)
     {
         var isLevelUp = false;
-        var gameInstance = GameInstance.Singleton;
         var oldLevel = character.Level;
         character.Exp += exp;
         var playerCharacter = character as IPlayerCharacterData;
@@ -111,8 +194,8 @@ public class SimpleGameplayRule : BaseGameplayRule
             nextLevelExp = character.GetNextLevelExp();
             if (playerCharacter != null)
             {
-                playerCharacter.StatPoint += gameInstance.increaseStatPointEachLevel;
-                playerCharacter.SkillPoint += gameInstance.increaseSkillPointEachLevel;
+                playerCharacter.StatPoint += increaseStatPointEachLevel;
+                playerCharacter.SkillPoint += increaseSkillPointEachLevel;
             }
             isLevelUp = true;
         }

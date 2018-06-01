@@ -403,26 +403,6 @@ public static class CharacterDataExtension
     }
     #endregion
 
-    public static int GetMaxHp(this ICharacterData data)
-    {
-        return (int)data.GetStats().hp;
-    }
-
-    public static int GetMaxMp(this ICharacterData data)
-    {
-        return (int)data.GetStats().mp;
-    }
-
-    public static float GetMoveSpeed(this ICharacterData data)
-    {
-        return data.GetStats().moveSpeed;
-    }
-
-    public static float GetAttackSpeed(this ICharacterData data)
-    {
-        return data.GetStats().atkSpeed;
-    }
-
     public static int CountNonEquipItems(this ICharacterData data, string itemId)
     {
         var count = 0;
