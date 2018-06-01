@@ -9,27 +9,28 @@ using UnityEditor;
 public class PlayerCharacter : BaseCharacter
 {
     [Header("Skills")]
-    public Skill[] skills;
+    public SkillLevel[] skillLevels;
 
     [Header("Start Equipments")]
     public Item rightHandEquipItem;
     public Item leftHandEquipItem;
     public Item[] armorItems;
 
-    private Dictionary<string, Skill> cacheSkills;
-    public Dictionary<string, Skill> CacheSkills
+    private Dictionary<string, SkillLevel> cacheSkillLevels;
+    public Dictionary<string, SkillLevel> CacheSkillLevels
     {
         get
         {
-            if (cacheSkills == null)
+            if (cacheSkillLevels == null)
             {
-                cacheSkills = new Dictionary<string, Skill>();
-                foreach (var skill in skills)
+                cacheSkillLevels = new Dictionary<string, SkillLevel>();
+                foreach (var skillLevel in skillLevels)
                 {
-                    cacheSkills[skill.Id] = skill;
+                    if (skillLevel.skill != null)
+                    cacheSkillLevels[skillLevel.skill.Id] = skillLevel;
                 }
             }
-            return cacheSkills;
+            return cacheSkillLevels;
         }
     }
 

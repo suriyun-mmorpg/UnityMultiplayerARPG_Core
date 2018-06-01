@@ -86,7 +86,7 @@ public static class PlayerCharacterDataExtension
             // If skill is invalid or this character database does not have skill
             if (string.IsNullOrEmpty(skillId) || 
                 characterSkill.GetSkill() == null || 
-                !database.CacheSkills.ContainsKey(skillId) || 
+                !database.CacheSkillLevels.ContainsKey(skillId) || 
                 validSkillIds.Contains(skillId))
             {
                 returningSkillPoint += characterSkill.level;
@@ -97,14 +97,14 @@ public static class PlayerCharacterDataExtension
         }
         character.SkillPoint += returningSkillPoint;
         // Add character's skills
-        var skills = database.skills;
-        foreach (var skill in skills)
+        var skillLevels = database.skillLevels;
+        foreach (var skillLevel in skillLevels)
         {
-            if (validSkillIds.Contains(skill.Id))
+            if (skillLevel.skill != null && validSkillIds.Contains(skillLevel.skill.Id))
                 continue;
             var characterSkill = new CharacterSkill();
-            characterSkill.skillId = skill.Id;
-            characterSkill.level = 0;
+            characterSkill.skillId = skillLevel.skill.Id;
+            characterSkill.level = skillLevel.level;
             character.Skills.Add(characterSkill);
         }
         // Validating character equip weapons
@@ -171,12 +171,14 @@ public static class PlayerCharacterDataExtension
             characterAttribute.amount = 0;
             character.Attributes.Add(characterAttribute);
         }
-        var skills = playerCharacter.skills;
-        foreach (var skill in skills)
+        var skillLevels = playerCharacter.skillLevels;
+        foreach (var skillLevel in skillLevels)
         {
+            if (skillLevel.skill == null)
+                continue;
             var characterSkill = new CharacterSkill();
-            characterSkill.skillId = skill.Id;
-            characterSkill.level = 0;
+            characterSkill.skillId = skillLevel.skill.Id;
+            characterSkill.level = skillLevel.level;
             character.Skills.Add(characterSkill);
         }
         // Right hand & left hand items
