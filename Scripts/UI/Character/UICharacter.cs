@@ -1,6 +1,5 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -243,7 +242,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
                 if (CacheUICharacterAttributes.TryGetValue(attribute, out cacheUICharacterAttribute) &&
                     displayingAttributes.TryGetValue(attribute, out amount))
                 {
-                    cacheUICharacterAttribute.Setup(new KeyValuePair<CharacterAttribute, int>(characterAttribute, amount), Data, i);
+                    cacheUICharacterAttribute.Setup(new Tuple<CharacterAttribute, int>(characterAttribute, amount), Data, i);
                     cacheUICharacterAttribute.Show();
                 }
                 else
@@ -263,8 +262,9 @@ public class UICharacter : UISelectionEntry<ICharacterData>
 
         if (imageClassIcon != null)
         {
-            imageClassIcon.sprite = character == null ? null : character.icon;
-            imageClassIcon.gameObject.SetActive(character != null);
+            var iconSprite = character == null ? null : character.icon;
+            imageClassIcon.gameObject.SetActive(iconSprite != null);
+            imageClassIcon.sprite = iconSprite;
         }
     }
 }

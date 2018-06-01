@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -115,14 +115,14 @@ public class UICharacterHotkeyAssigner : UIBase
         CacheSkillList.Generate(filterSkills, (index, characterSkill, ui) =>
         {
             var uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
-            uiCharacterSkill.Setup(new KeyValuePair<CharacterSkill, int>(characterSkill, characterSkill.level), null, -1);
+            uiCharacterSkill.Setup(new Tuple<CharacterSkill, int>(characterSkill, characterSkill.level), null, -1);
             uiCharacterSkill.Show();
             CacheSkillSelectionManager.Add(uiCharacterSkill);
         });
         CacheItemList.Generate(filterItems, (index, characterItem, ui) =>
         {
             var uiCharacterItem = ui.GetComponent<UICharacterItem>();
-            uiCharacterItem.Setup(new KeyValuePair<CharacterItem, int>(characterItem, characterItem.level), null, -1, string.Empty);
+            uiCharacterItem.Setup(new Tuple<CharacterItem, int>(characterItem, characterItem.level), null, -1, string.Empty);
             uiCharacterItem.Show();
             CacheItemSelectionManager.Add(uiCharacterItem);
         });
@@ -140,7 +140,7 @@ public class UICharacterHotkeyAssigner : UIBase
     {
         var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (owningCharacter != null)
-            owningCharacter.RequestAssignHotkey(hotkeyId, HotkeyType.Skill, ui.Data.Key.skillId);
+            owningCharacter.RequestAssignHotkey(hotkeyId, HotkeyType.Skill, ui.Data.Item1.skillId);
         Hide();
     }
 
@@ -148,7 +148,7 @@ public class UICharacterHotkeyAssigner : UIBase
     {
         var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (owningCharacter != null)
-            owningCharacter.RequestAssignHotkey(hotkeyId, HotkeyType.Item, ui.Data.Key.itemId);
+            owningCharacter.RequestAssignHotkey(hotkeyId, HotkeyType.Item, ui.Data.Item1.itemId);
         Hide();
     }
 

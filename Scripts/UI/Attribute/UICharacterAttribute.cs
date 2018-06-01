@@ -1,10 +1,10 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacterAttribute : UIDataForCharacter<KeyValuePair<CharacterAttribute, int>>
+public class UICharacterAttribute : UIDataForCharacter<Tuple<CharacterAttribute, int>>
 {
     [Header("Generic Info Format")]
     [Tooltip("Title Format => {0} = {Title}")]
@@ -26,8 +26,8 @@ public class UICharacterAttribute : UIDataForCharacter<KeyValuePair<CharacterAtt
     
     protected void Update()
     {
-        var characterAttribute = Data.Key;
-        var amount = Data.Value;
+        var characterAttribute = Data.Item1;
+        var amount = Data.Item2;
         
         if (IsOwningCharacter() && characterAttribute.CanIncrease(BasePlayerCharacterController.OwningCharacter))
             onAbleToIncrease.Invoke();
@@ -38,9 +38,9 @@ public class UICharacterAttribute : UIDataForCharacter<KeyValuePair<CharacterAtt
     protected override void UpdateData()
     {
         var owningCharacter = BasePlayerCharacterController.OwningCharacter;
-        var characterAttribute = Data.Key;
+        var characterAttribute = Data.Item1;
         var attribute = characterAttribute.GetAttribute();
-        var amount = Data.Value;
+        var amount = Data.Item2;
 
         if (textTitle != null)
             textTitle.text = string.Format(titleFormat, attribute == null ? "Unknow" : attribute.title);
@@ -54,8 +54,8 @@ public class UICharacterAttribute : UIDataForCharacter<KeyValuePair<CharacterAtt
         if (imageIcon != null)
         {
             var iconSprite = attribute == null ? null : attribute.icon;
-            imageIcon.sprite = iconSprite;
             imageIcon.gameObject.SetActive(iconSprite != null);
+            imageIcon.sprite = iconSprite;
         }
     }
 

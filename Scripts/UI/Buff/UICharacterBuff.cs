@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -61,8 +61,9 @@ public class UICharacterBuff : UIDataForCharacter<CharacterBuff>
 
             if (imageIcon != null)
             {
-                imageIcon.sprite = skill == null ? null : skill.icon;
-                imageIcon.gameObject.SetActive(skill != null);
+                var iconSprite = skill == null ? null : skill.icon;
+                imageIcon.gameObject.SetActive(iconSprite != null);
+                imageIcon.sprite = iconSprite;
             }
         }
 
@@ -73,8 +74,9 @@ public class UICharacterBuff : UIDataForCharacter<CharacterBuff>
 
             if (imageIcon != null)
             {
-                imageIcon.sprite = item == null ? null : item.icon;
-                imageIcon.gameObject.SetActive(item != null);
+                var iconSprite = item == null ? null : item.icon;
+                imageIcon.gameObject.SetActive(iconSprite != null);
+                imageIcon.sprite = iconSprite;
             }
         }
 
@@ -86,7 +88,7 @@ public class UICharacterBuff : UIDataForCharacter<CharacterBuff>
             {
                 var buff = Data.GetBuff();
                 uiBuff.Show();
-                uiBuff.Data = new KeyValuePair<Buff, int>(buff, Data.level);
+                uiBuff.Data = new Tuple<Buff, int>(buff, Data.level);
             }
         }
     }

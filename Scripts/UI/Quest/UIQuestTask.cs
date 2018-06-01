@@ -1,9 +1,9 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIQuestTask : UISelectionEntry<KeyValuePair<QuestTask, int>>
+public class UIQuestTask : UISelectionEntry<Tuple<QuestTask, int>>
 {
     [Header("Generic Info Format")]
     [Tooltip("Kill Monster Task Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}")]
@@ -20,8 +20,8 @@ public class UIQuestTask : UISelectionEntry<KeyValuePair<QuestTask, int>>
 
     protected override void UpdateData()
     {
-        var task = Data.Key;
-        var progress = Data.Value;
+        var task = Data.Item1;
+        var progress = Data.Item2;
         var isComplete = false;
         switch (task.taskType)
         {

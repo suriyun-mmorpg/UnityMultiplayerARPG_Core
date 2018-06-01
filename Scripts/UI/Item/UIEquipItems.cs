@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
@@ -103,7 +103,7 @@ public class UIEquipItems : UIBase
         if (uiGameplay != null)
             uiGameplay.DeselectSelectedItem();
 
-        if (uiItemDialog != null && ui.Data.Key.IsValid())
+        if (uiItemDialog != null && ui.Data.Item1.IsValid())
         {
             uiItemDialog.selectionManager = SelectionManager;
             uiItemDialog.Setup(ui.Data, character, ui.indexOfData, ui.equipPosition);
@@ -117,7 +117,7 @@ public class UIEquipItems : UIBase
     {
         var uiGameplay = UISceneGameplay.Singleton;
 
-        if (uiGameplay != null && !ui.Data.Key.IsValid())
+        if (uiGameplay != null && !ui.Data.Item1.IsValid())
             uiGameplay.DeselectSelectedItem();
     }
 
@@ -153,7 +153,7 @@ public class UIEquipItems : UIBase
 
             tempPosition = armorItem.EquipPosition;
             if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
-                tempSlot.Setup(new KeyValuePair<CharacterItem, int>(equipItem, equipItem.level), this.character, -1, tempPosition);
+                tempSlot.Setup(new Tuple<CharacterItem, int>(equipItem, equipItem.level), this.character, -1, tempPosition);
         }
 
         var equipWeapons = character.EquipWeapons;
@@ -165,18 +165,18 @@ public class UIEquipItems : UIBase
         if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
         {
             if (rightHandEquipment != null)
-                tempSlot.Setup(new KeyValuePair<CharacterItem, int>(rightHand, rightHand.level), this.character, -1, tempPosition);
+                tempSlot.Setup(new Tuple<CharacterItem, int>(rightHand, rightHand.level), this.character, -1, tempPosition);
         }
         tempPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
         if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
         {
             if (leftHandEquipment != null)
-                tempSlot.Setup(new KeyValuePair<CharacterItem, int>(leftHand, leftHand.level), this.character, -1, tempPosition);
+                tempSlot.Setup(new Tuple<CharacterItem, int>(leftHand, leftHand.level), this.character, -1, tempPosition);
         }
     }
 
-    private KeyValuePair<CharacterItem, int> GetEmptyUIData()
+    private Tuple<CharacterItem, int> GetEmptyUIData()
     {
-        return new KeyValuePair<CharacterItem, int>(CharacterItem.Empty, 1);
+        return new Tuple<CharacterItem, int>(CharacterItem.Empty, 1);
     }
 }

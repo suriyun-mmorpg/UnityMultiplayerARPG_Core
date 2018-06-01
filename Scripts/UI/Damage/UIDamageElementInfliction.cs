@@ -1,9 +1,9 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIDamageElementInfliction : UISelectionEntry<KeyValuePair<DamageElement, float>>
+public class UIDamageElementInfliction : UISelectionEntry<Tuple<DamageElement, float>>
 {
     [Tooltip("Default Element Infliction Format => {1} = {Rate}")]
     public string defaultElementInflictionFormat = "Inflict {1}% damage";
@@ -17,8 +17,8 @@ public class UIDamageElementInfliction : UISelectionEntry<KeyValuePair<DamageEle
     {
         if (textInfliction != null)
         {
-            var element = Data.Key;
-            var rate = Data.Value;
+            var element = Data.Item1;
+            var rate = Data.Item2;
             var format = element == GameInstance.Singleton.DefaultDamageElement ? defaultElementInflictionFormat : inflictionFormat;
             textInfliction.text = string.Format(format, element.title, (rate * 100f).ToString("N0"));
         }

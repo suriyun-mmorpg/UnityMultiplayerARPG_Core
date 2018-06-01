@@ -1,9 +1,9 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIEquipmentItemRequirement : UISelectionEntry<KeyValuePair<Item, int>>
+public class UIEquipmentItemRequirement : UISelectionEntry<Item>
 {
     [Header("Requirement Format")]
     [Tooltip("Require Level Format => {0} = {Level}")]
@@ -18,7 +18,7 @@ public class UIEquipmentItemRequirement : UISelectionEntry<KeyValuePair<Item, in
 
     protected override void UpdateData()
     {
-        var equipmentItem = Data.Key;
+        var equipmentItem = Data;
 
         if (textRequireLevel != null)
         {
@@ -26,8 +26,8 @@ public class UIEquipmentItemRequirement : UISelectionEntry<KeyValuePair<Item, in
                 textRequireLevel.gameObject.SetActive(false);
             else
             {
-                textRequireLevel.text = string.Format(requireLevelFormat, equipmentItem.requirement.level.ToString("N0"));
                 textRequireLevel.gameObject.SetActive(true);
+                textRequireLevel.text = string.Format(requireLevelFormat, equipmentItem.requirement.level.ToString("N0"));
             }
         }
 
@@ -37,19 +37,19 @@ public class UIEquipmentItemRequirement : UISelectionEntry<KeyValuePair<Item, in
                 textRequireClass.gameObject.SetActive(false);
             else
             {
-                textRequireClass.text = string.Format(requireClassFormat, equipmentItem.requirement.character.title);
                 textRequireClass.gameObject.SetActive(true);
+                textRequireClass.text = string.Format(requireClassFormat, equipmentItem.requirement.character.title);
             }
         }
 
         if (uiRequireAttributeAmounts != null)
         {
             if (equipmentItem == null)
-                uiRequireAttributeAmounts.gameObject.SetActive(false);
+                uiRequireAttributeAmounts.Hide();
             else
             {
+                uiRequireAttributeAmounts.Show();
                 uiRequireAttributeAmounts.Data = equipmentItem.CacheRequireAttributeAmounts;
-                uiRequireAttributeAmounts.gameObject.SetActive(true);
             }
         }
     }

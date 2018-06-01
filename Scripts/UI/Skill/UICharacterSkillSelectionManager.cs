@@ -1,7 +1,7 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UICharacterSkillSelectionManager : UISelectionManager<KeyValuePair<CharacterSkill, int>, UICharacterSkill, UICharacterSkillEvent>
+public class UICharacterSkillSelectionManager : UISelectionManager<Tuple<CharacterSkill, int>, UICharacterSkill, UICharacterSkillEvent>
 {
 }

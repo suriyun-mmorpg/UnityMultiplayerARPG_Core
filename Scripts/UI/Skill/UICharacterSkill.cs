@@ -1,10 +1,10 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, int>>
+public class UICharacterSkill : UIDataForCharacter<Tuple<CharacterSkill, int>>
 {
     [Header("Generic Info Format")]
     [Tooltip("Title Format => {0} = {Title}")]
@@ -19,12 +19,21 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
     public string coolDownDurationFormat = "Cooldown: {0}";
     [Tooltip("Cool Down Remains Duration Format => {0} = {Remains duration}")]
     public string coolDownRemainsDurationFormat = "{0}";
+    [Tooltip("Skill Type Format => {0} = {Skill Type title}")]
+    public string skillTypeFormat = "Skill Type: {0}";
+    [Tooltip("Active Skill Type")]
+    public string activeSkillType = "Active";
+    [Tooltip("Passive Skill Type")]
+    public string passiveSkillType = "Passive";
+    [Tooltip("Craft Item Skill Type")]
+    public string craftItemSkillType = "Craft Item";
 
     [Header("UI Elements")]
     public Text textTitle;
     public Text textDescription;
     public Text textLevel;
     public Image imageIcon;
+    public Text textSkillType;
     public Text textConsumeMp;
     public Text textCoolDownDuration;
     public Text textCoolDownRemainsDuration;
@@ -54,9 +63,9 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
 
     protected void Update()
     {
-        var characterSkill = Data.Key;
+        var characterSkill = Data.Item1;
         var skill = characterSkill.GetSkill();
-        var level = Data.Value;
+        var level = Data.Item2;
 
         collectedDeltaTime += Time.deltaTime;
 
@@ -92,9 +101,9 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
 
     protected override void UpdateData()
     {
-        var characterSkill = Data.Key;
+        var characterSkill = Data.Item1;
         var skill = characterSkill.GetSkill();
-        var level = Data.Value;
+        var level = Data.Item2;
 
         collectedDeltaTime = 0f;
 
@@ -115,8 +124,24 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
         if (imageIcon != null)
         {
             var iconSprite = skill == null ? null : skill.icon;
-            imageIcon.sprite = iconSprite;
             imageIcon.gameObject.SetActive(iconSprite != null);
+            imageIcon.sprite = iconSprite;
+        }
+
+        if (textSkillType != null)
+        {
+            switch (skill.skillType)
+            {
+                case SkillType.Active:
+                    textSkillType.text = string.Format(skillTypeFormat, activeSkillType);
+                    break;
+                case SkillType.Passive:
+                    textSkillType.text = string.Format(skillTypeFormat, passiveSkillType);
+                    break;
+                case SkillType.CraftItem:
+                    textSkillType.text = string.Format(skillTypeFormat, craftItemSkillType);
+                    break;
+            }
         }
 
         if (textConsumeMp != null)
@@ -129,7 +154,7 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
             else
             {
                 uiRequirement.Show();
-                uiRequirement.Data = new KeyValuePair<Skill, int>(skill, level);
+                uiRequirement.Data = new Tuple<Skill, int>(skill, level);
             }
         }
 
@@ -142,7 +167,8 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
             else
             {
                 uiDamageAmount.Show();
-                uiDamageAmount.Data = skill.GetDamageAmount(level, null);
+                var keyValuePair = skill.GetDamageAmount(level, null);
+                uiDamageAmount.Data = new Tuple<DamageElement, MinMaxFloat>(keyValuePair.Key, keyValuePair.Value);
             }
         }
 
@@ -177,7 +203,7 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
             else
             {
                 uiSkillBuff.Show();
-                uiSkillBuff.Data = new KeyValuePair<Buff, int>(skill.buff, level);
+                uiSkillBuff.Data = new Tuple<Buff, int>(skill.buff, level);
             }
         }
 
@@ -188,7 +214,7 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
             else
             {
                 uiSkillDebuff.Show();
-                uiSkillDebuff.Data = new KeyValuePair<Buff, int>(skill.debuff, level);
+                uiSkillDebuff.Data = new Tuple<Buff, int>(skill.debuff, level);
             }
         }
 
@@ -198,7 +224,7 @@ public class UICharacterSkill : UIDataForCharacter<KeyValuePair<CharacterSkill, 
                 uiNextLevelSkill.Hide();
             else
             {
-                uiNextLevelSkill.Setup(new KeyValuePair<CharacterSkill, int>(characterSkill, level + 1), character, indexOfData);
+                uiNextLevelSkill.Setup(new Tuple<CharacterSkill, int>(characterSkill, level + 1), character, indexOfData);
                 uiNextLevelSkill.Show();
             }
         }

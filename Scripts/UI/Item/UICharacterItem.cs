@@ -1,10 +1,10 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, int>>
+public class UICharacterItem : UIDataForCharacter<Tuple<CharacterItem, int>>
 {
     public string equipPosition { get; protected set; }
 
@@ -29,6 +29,8 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
     public string shieldItemType = "Shield";
     [Tooltip("Potion Item Type")]
     public string potionItemType = "Potion";
+    [Tooltip("Ammo Item Type")]
+    public string ammoItemType = "Ammo";
 
     [Header("Input Dialog Settings")]
     public string dropInputTitle = "Drop Item";
@@ -39,10 +41,10 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
     public Text textDescription;
     public Text textLevel;
     public Image imageIcon;
+    public Text textItemType;
     public Text textSellPrice;
     public Text textStack;
     public Text textWeight;
-    public Text textItemType;
 
     [Header("Equipment - UI Elements")]
     public UIEquipmentItemRequirement uiRequirement;
@@ -65,7 +67,7 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
     public UICharacterItem uiNextLevelItem;
     public bool hideAmountWhenMaxIsOne;
 
-    public void Setup(KeyValuePair<CharacterItem, int> data, ICharacterData character, int indexOfData, string equipPosition)
+    public void Setup(Tuple<CharacterItem, int> data, ICharacterData character, int indexOfData, string equipPosition)
     {
         this.equipPosition = equipPosition;
         Setup(data, character, indexOfData);
@@ -73,14 +75,12 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
 
     protected override void UpdateData()
     {
-        var characterItem = Data.Key;
-        var level = Data.Value;
+        var characterItem = Data.Item1;
+        var level = Data.Item2;
         var item = characterItem.GetItem();
         var equipmentItem = characterItem.GetEquipmentItem();
         var armorItem = characterItem.GetArmorItem();
         var weaponItem = characterItem.GetWeaponItem();
-        var shieldItem = characterItem.GetShieldItem();
-        var potionItem = characterItem.GetPotionItem();
 
         if (level <= 0)
             onSetLevelZeroData.Invoke();
@@ -108,8 +108,34 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
 
         if (imageIcon != null)
         {
-            imageIcon.sprite = item == null ? null : item.icon;
-            imageIcon.gameObject.SetActive(item != null);
+            var iconSprite = item == null ? null : item.icon;
+            imageIcon.gameObject.SetActive(iconSprite != null);
+            imageIcon.sprite = iconSprite;
+        }
+
+        if (textItemType != null)
+        {
+            switch (item.itemType)
+            {
+                case ItemType.Junk:
+                    textItemType.text = string.Format(itemTypeFormat, junkItemType);
+                    break;
+                case ItemType.Armor:
+                    textItemType.text = string.Format(itemTypeFormat, armorItem.ArmorType.title);
+                    break;
+                case ItemType.Weapon:
+                    textItemType.text = string.Format(itemTypeFormat, weaponItem.WeaponType.title);
+                    break;
+                case ItemType.Shield:
+                    textItemType.text = string.Format(itemTypeFormat, shieldItemType);
+                    break;
+                case ItemType.Potion:
+                    textItemType.text = string.Format(itemTypeFormat, potionItemType);
+                    break;
+                case ItemType.Ammo:
+                    textItemType.text = string.Format(itemTypeFormat, ammoItemType);
+                    break;
+            }
         }
 
         if (textSellPrice != null)
@@ -131,20 +157,6 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
         if (textWeight != null)
             textWeight.text = string.Format(weightFormat, item == null ? "0" : item.weight.ToString("N2"));
 
-        if (textItemType != null)
-        {
-            if (armorItem != null)
-                textItemType.text = string.Format(itemTypeFormat, armorItem.ArmorType.title);
-            else if (weaponItem != null)
-                textItemType.text = string.Format(itemTypeFormat, weaponItem.WeaponType.title);
-            else if (shieldItem != null)
-                textItemType.text = string.Format(itemTypeFormat, shieldItemType);
-            else if (potionItem != null)
-                textItemType.text = string.Format(itemTypeFormat, potionItemType);
-            else
-                textItemType.text = string.Format(itemTypeFormat, junkItemType);
-        }
-
         if (uiRequirement != null)
         {
             if (equipmentItem == null || (equipmentItem.requirement.level == 0 && equipmentItem.requirement.character == null && equipmentItem.CacheRequireAttributeAmounts.Count == 0))
@@ -152,7 +164,7 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
             else
             {
                 uiRequirement.Show();
-                uiRequirement.Data = new KeyValuePair<Item, int>(equipmentItem, level);
+                uiRequirement.Data = equipmentItem;
             }
         }
 
@@ -211,7 +223,8 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
             else
             {
                 uiDamageAmounts.Show();
-                uiDamageAmounts.Data = weaponItem.GetDamageAmount(level, null);
+                var keyValuePair = weaponItem.GetDamageAmount(level, null);
+                uiDamageAmounts.Data = new Tuple<DamageElement, MinMaxFloat>(keyValuePair.Key, keyValuePair.Value);
             }
         }
 
@@ -221,7 +234,7 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
                 uiNextLevelItem.Hide();
             else
             {
-                uiNextLevelItem.Setup(new KeyValuePair<CharacterItem, int>(characterItem, level + 1), character, indexOfData, equipPosition);
+                uiNextLevelItem.Setup(new Tuple<CharacterItem, int>(characterItem, level + 1), character, indexOfData, equipPosition);
                 uiNextLevelItem.Show();
             }
         }
@@ -236,7 +249,7 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
         if (selectionManager != null)
             selectionManager.DeselectSelectedUI();
 
-        var characterItem = Data.Key;
+        var characterItem = Data.Item1;
         var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (owningCharacter != null)
         {
@@ -284,7 +297,7 @@ public class UICharacterItem : UIDataForCharacter<KeyValuePair<CharacterItem, in
         if (!IsOwningCharacter() || !string.IsNullOrEmpty(equipPosition))
             return;
 
-        var characterItem = Data.Key;
+        var characterItem = Data.Item1;
         var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (characterItem.amount == 1)
         {

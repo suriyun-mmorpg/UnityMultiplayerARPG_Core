@@ -26,6 +26,12 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
     public string blockDmgRateStatsFormat = "Block Dmg: {0}%";
     [Tooltip("Weight Limit Stats Format => {0} = {Weight Limit}")]
     public string weightLimitStatsFormat = "Weight Limit: {0}";
+    [Tooltip("Stamina Stats Format => {0} = {Amount}")]
+    public string staminaStatsFormat = "Hp: {0}";
+    [Tooltip("Food Stats Format => {0} = {Amount}")]
+    public string foodStatsFormat = "Mp: {0}";
+    [Tooltip("Water Stats Format => {0} = {Amount}")]
+    public string waterStatsFormat = "Mp: {0}";
 
     [Header("UI Elements")]
     public Text textStats;
@@ -39,6 +45,9 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
     public Text textBlockRate;
     public Text textBlockDmgRate;
     public Text textWeightLimit;
+    public Text textStamina;
+    public Text textFood;
+    public Text textWater;
 
     protected override void UpdateData()
     {
@@ -134,6 +143,33 @@ public class UICharacterStats : UISelectionEntry<CharacterStats>
             statsString += statsStringPart;
         if (textWeightLimit != null)
             textWeightLimit.text = statsStringPart;
+
+        // Stamina
+        if (!string.IsNullOrEmpty(statsString))
+            statsString += "\n";
+        statsStringPart = string.Format(staminaStatsFormat, Data.stamina.ToString("N0"));
+        if (Data.stamina != 0)
+            statsString += statsStringPart;
+        if (textStamina != null)
+            textStamina.text = statsStringPart;
+
+        // Food
+        if (!string.IsNullOrEmpty(statsString))
+            statsString += "\n";
+        statsStringPart = string.Format(foodStatsFormat, Data.food.ToString("N0"));
+        if (Data.food != 0)
+            statsString += statsStringPart;
+        if (textFood != null)
+            textFood.text = statsStringPart;
+
+        // Water
+        if (!string.IsNullOrEmpty(statsString))
+            statsString += "\n";
+        statsStringPart = string.Format(waterStatsFormat, Data.water.ToString("N0"));
+        if (Data.water != 0)
+            statsString += statsStringPart;
+        if (textWater != null)
+            textWater.text = statsStringPart;
 
         // All stats text
         if (textStats != null)

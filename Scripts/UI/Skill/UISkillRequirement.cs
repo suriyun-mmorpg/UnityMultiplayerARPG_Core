@@ -1,9 +1,9 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UISkillRequirement : UISelectionEntry<KeyValuePair<Skill, int>>
+public class UISkillRequirement : UISelectionEntry<Tuple<Skill, int>>
 {
     [Header("Requirement Format")]
     [Tooltip("Require Level Format => {0} = {Level}")]
@@ -15,8 +15,8 @@ public class UISkillRequirement : UISelectionEntry<KeyValuePair<Skill, int>>
 
     protected override void UpdateData()
     {
-        var skill = Data.Key;
-        var level = Data.Value;
+        var skill = Data.Item1;
+        var level = Data.Item2;
 
         if (textRequireLevel != null)
         {
@@ -24,19 +24,19 @@ public class UISkillRequirement : UISelectionEntry<KeyValuePair<Skill, int>>
                 textRequireLevel.gameObject.SetActive(false);
             else
             {
-                textRequireLevel.text = string.Format(requireLevelFormat, skill.GetRequireCharacterLevel(level).ToString("N0"));
                 textRequireLevel.gameObject.SetActive(true);
+                textRequireLevel.text = string.Format(requireLevelFormat, skill.GetRequireCharacterLevel(level).ToString("N0"));
             }
         }
 
         if (uiRequireSkillLevels != null)
         {
             if (skill == null)
-                uiRequireSkillLevels.gameObject.SetActive(false);
+                uiRequireSkillLevels.Hide();
             else
             {
+                uiRequireSkillLevels.Show();
                 uiRequireSkillLevels.Data = skill.CacheRequireSkillLevels;
-                uiRequireSkillLevels.gameObject.SetActive(true);
             }
         }
     }

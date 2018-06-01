@@ -4,6 +4,19 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
+public enum CombatAmountType : byte
+{
+    Miss,
+    NormalDamage,
+    CriticalDamage,
+    BlockedDamage,
+    HpRecovery,
+    MpRecovery,
+    StaminaRecovery,
+    FoodRecovery,
+    WaterRecovery,
+}
+
 public class UISceneGameplay : MonoBehaviour
 {
     [System.Serializable]
@@ -34,6 +47,9 @@ public class UISceneGameplay : MonoBehaviour
     public UICombatText uiCombatTextBlockedDamage;
     public UICombatText uiCombatTextHpRecovery;
     public UICombatText uiCombatTextMpRecovery;
+    public UICombatText uiCombatTextStaminaRecovery;
+    public UICombatText uiCombatTextFoodRecovery;
+    public UICombatText uiCombatTextWaterRecovery;
 
     [Header("Events")]
     public UnityEvent onCharacterDead;
@@ -182,5 +198,50 @@ public class UISceneGameplay : MonoBehaviour
         else
             overUI = results.Count > 0;
         return overUI;
+    }
+
+    public void SpawnCombatText(Transform followingTransform, CombatAmountType combatAmountType, int amount)
+    {
+        switch (combatAmountType)
+        {
+            case CombatAmountType.Miss:
+                SpawnCombatText(followingTransform, uiCombatTextMiss, amount);
+                break;
+            case CombatAmountType.NormalDamage:
+                SpawnCombatText(followingTransform, uiCombatTextNormalDamage, amount);
+                break;
+            case CombatAmountType.CriticalDamage:
+                SpawnCombatText(followingTransform, uiCombatTextCriticalDamage, amount);
+                break;
+            case CombatAmountType.BlockedDamage:
+                SpawnCombatText(followingTransform, uiCombatTextBlockedDamage, amount);
+                break;
+            case CombatAmountType.HpRecovery:
+                SpawnCombatText(followingTransform, uiCombatTextHpRecovery, amount);
+                break;
+            case CombatAmountType.MpRecovery:
+                SpawnCombatText(followingTransform, uiCombatTextMpRecovery, amount);
+                break;
+            case CombatAmountType.StaminaRecovery:
+                SpawnCombatText(followingTransform, uiCombatTextStaminaRecovery, amount);
+                break;
+            case CombatAmountType.FoodRecovery:
+                SpawnCombatText(followingTransform, uiCombatTextFoodRecovery, amount);
+                break;
+            case CombatAmountType.WaterRecovery:
+                SpawnCombatText(followingTransform, uiCombatTextWaterRecovery, amount);
+                break;
+        }
+    }
+
+    public void SpawnCombatText(Transform followingTransform, UICombatText prefab, int amount)
+    {
+        if (combatTextTransform != null)
+        {
+            var combatText = Instantiate(prefab, combatTextTransform);
+            combatText.transform.localScale = Vector3.one;
+            combatText.CacheObjectFollower.TargetObject = combatTextTransform;
+            combatText.Amount = amount;
+        }
     }
 }

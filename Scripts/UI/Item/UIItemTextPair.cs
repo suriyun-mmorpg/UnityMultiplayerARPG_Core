@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 
 [System.Serializable]
-public struct UIAttributeTextPair
+public struct UIItemTextPair
 {
-    public Attribute attribute;
+    public Item item;
     public Text text;
 }
