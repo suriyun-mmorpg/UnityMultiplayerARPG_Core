@@ -120,9 +120,14 @@ public class UICharacterList : UIBase
         playerCharacter.CloneTo(characterData);
         var gameInstance = GameInstance.Singleton;
         var networkManager = LanRpgNetworkManager.Singleton;
-        networkManager.selectedCharacter = characterData;
         networkManager.Assets.offlineScene.SceneName = gameInstance.homeScene;
         networkManager.Assets.onlineScene.SceneName = characterData.CurrentMapName;
+        if (string.IsNullOrEmpty(networkManager.Assets.onlineScene.SceneName))
+        {
+            characterData.CurrentMapName = networkManager.Assets.onlineScene.SceneName = gameInstance.startScene;
+            characterData.CurrentPosition = gameInstance.startPosition;
+        }
+        networkManager.selectedCharacter = characterData;
         networkManager.StartGame();
     }
 

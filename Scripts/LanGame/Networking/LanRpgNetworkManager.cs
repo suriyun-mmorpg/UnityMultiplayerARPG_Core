@@ -68,7 +68,7 @@ public class LanRpgNetworkManager : LiteNetLibGameManager
         if (Time.unscaledTime - lastSaveTime > autoSaveDuration)
         {
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter != null)
+            if (owningCharacter != null && IsNetworkActive)
                 owningCharacter.SavePersistentCharacterData();
             lastSaveTime = Time.unscaledTime;
         }
