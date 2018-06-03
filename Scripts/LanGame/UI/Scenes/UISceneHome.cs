@@ -10,7 +10,8 @@ public class UISceneHome : UIHistory
 
     public void OnClickSinglePlayer()
     {
-        LanRpgNetworkManager.StartType = LanRpgNetworkManager.GameStartType.SinglePlayer;
+        var networkManager = LanRpgNetworkManager.Singleton;
+        networkManager.startType = LanRpgNetworkManager.GameStartType.SinglePlayer;
         Next(uiCharacterList);
     }
 
@@ -21,14 +22,16 @@ public class UISceneHome : UIHistory
 
     public void OnClickJoin()
     {
-        LanRpgNetworkManager.StartType = LanRpgNetworkManager.GameStartType.Client;
-        LanRpgNetworkManager.ConnectingNetworkAddress = uiLanConnection.NetworkAddress;
+        var networkManager = LanRpgNetworkManager.Singleton;
+        networkManager.startType = LanRpgNetworkManager.GameStartType.Client;
+        networkManager.networkAddress = uiLanConnection.NetworkAddress;
         Next(uiCharacterList);
     }
 
     public void OnClickHost()
     {
-        LanRpgNetworkManager.StartType = LanRpgNetworkManager.GameStartType.Host;
+        var networkManager = LanRpgNetworkManager.Singleton;
+        networkManager.startType = LanRpgNetworkManager.GameStartType.Host;
         Next(uiCharacterList);
     }
 

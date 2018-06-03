@@ -9,6 +9,7 @@ using LiteNetLib.Utils;
 [RequireComponent(typeof(RpgGameManager))]
 public class LanRpgNetworkManager : LiteNetLibGameManager
 {
+    public static LanRpgNetworkManager Singleton { get; protected set; }
     public enum GameStartType
     {
         Client,
@@ -17,10 +18,9 @@ public class LanRpgNetworkManager : LiteNetLibGameManager
     }
 
     public float autoSaveDuration = 2f;
+    public GameStartType startType;
+    public PlayerCharacterData selectedCharacter;
     protected float lastSaveTime;
-    public static GameStartType StartType;
-    public static string ConnectingNetworkAddress;
-    public static PlayerCharacterData SelectedCharacter;
 
     private RpgGameManager cacheGameManager;
     public RpgGameManager CacheGameManager
@@ -35,16 +35,17 @@ public class LanRpgNetworkManager : LiteNetLibGameManager
 
     protected override void Awake()
     {
-        CacheGameManager.Init(this);
+        Singleton = this;
+        doNotDestroyOnSceneChanges = true;
         base.Awake();
     }
 
-    protected override void Start()
+    public void StartGame()
     {
-        base.Start();
+        CacheGameManager.Init(this);
         var gameInstance = GameInstance.Singleton;
         var gameServiceConnection = gameInstance.NetworkSetting;
-        switch (StartType)
+        switch (startType)
         {
             case GameStartType.Host:
                 networkPort = gameServiceConnection.networkPort;
@@ -55,7 +56,6 @@ public class LanRpgNetworkManager : LiteNetLibGameManager
                 StartHost(true);
                 break;
             case GameStartType.Client:
-                networkAddress = ConnectingNetworkAddress;
                 networkPort = gameServiceConnection.networkPort;
                 StartClient();
                 break;
@@ -80,47 +80,41 @@ public class LanRpgNetworkManager : LiteNetLibGameManager
         CacheGameManager.OnClientDisconnected(peer, disconnectInfo);
     }
 
-    public override void OnStopClient()
+    public override void OnServerOnlineSceneLoaded()
     {
-        base.OnStopClient();
-        CacheGameManager.OnStopClient();
-    }
-
-    public override void OnStartServer()
-    {
-        base.OnStartServer();
-        CacheGameManager.OnStartServer();
+        base.OnServerOnlineSceneLoaded();
+        CacheGameManager.OnServerOnlineSceneLoaded();
     }
 
     public override void SerializeClientReadyExtra(NetDataWriter writer)
     {
-        writer.Put(SelectedCharacter.Id);
-        writer.Put(SelectedCharacter.DatabaseId);
-        writer.Put(SelectedCharacter.CharacterName);
-        writer.Put(SelectedCharacter.Level);
-        writer.Put(SelectedCharacter.Exp);
-        writer.Put(SelectedCharacter.CurrentHp);
-        writer.Put(SelectedCharacter.CurrentMp);
-        writer.Put(SelectedCharacter.StatPoint);
-        writer.Put(SelectedCharacter.SkillPoint);
-        writer.Put(SelectedCharacter.Gold);
-        writer.Put(SelectedCharacter.CurrentMapName);
-        writer.Put(SelectedCharacter.CurrentPosition.x);
-        writer.Put(SelectedCharacter.CurrentPosition.y);
-        writer.Put(SelectedCharacter.CurrentPosition.z);
-        writer.Put(SelectedCharacter.RespawnMapName);
-        writer.Put(SelectedCharacter.RespawnPosition.x);
-        writer.Put(SelectedCharacter.RespawnPosition.y);
-        writer.Put(SelectedCharacter.RespawnPosition.z);
-        writer.Put(SelectedCharacter.LastUpdate);
-        writer.Put(SelectedCharacter.Attributes.Count);
-        foreach (var entry in SelectedCharacter.Attributes)
+        writer.Put(selectedCharacter.Id);
+        writer.Put(selectedCharacter.DatabaseId);
+        writer.Put(selectedCharacter.CharacterName);
+        writer.Put(selectedCharacter.Level);
+        writer.Put(selectedCharacter.Exp);
+        writer.Put(selectedCharacter.CurrentHp);
+        writer.Put(selectedCharacter.CurrentMp);
+        writer.Put(selectedCharacter.StatPoint);
+        writer.Put(selectedCharacter.SkillPoint);
+        writer.Put(selectedCharacter.Gold);
+        writer.Put(selectedCharacter.CurrentMapName);
+        writer.Put(selectedCharacter.CurrentPosition.x);
+        writer.Put(selectedCharacter.CurrentPosition.y);
+        writer.Put(selectedCharacter.CurrentPosition.z);
+        writer.Put(selectedCharacter.RespawnMapName);
+        writer.Put(selectedCharacter.RespawnPosition.x);
+        writer.Put(selectedCharacter.RespawnPosition.y);
+        writer.Put(selectedCharacter.RespawnPosition.z);
+        writer.Put(selectedCharacter.LastUpdate);
+        writer.Put(selectedCharacter.Attributes.Count);
+        foreach (var entry in selectedCharacter.Attributes)
         {
             writer.Put(entry.attributeId);
             writer.Put(entry.amount);
         }
-        writer.Put(SelectedCharacter.Buffs.Count);
-        foreach (var entry in SelectedCharacter.Buffs)
+        writer.Put(selectedCharacter.Buffs.Count);
+        foreach (var entry in selectedCharacter.Buffs)
         {
             writer.Put(entry.id);
             writer.Put(entry.characterId);
@@ -129,38 +123,38 @@ public class LanRpgNetworkManager : LiteNetLibGameManager
             writer.Put(entry.level);
             writer.Put(entry.buffRemainsDuration);
         }
-        writer.Put(SelectedCharacter.Skills.Count);
-        foreach (var entry in SelectedCharacter.Skills)
+        writer.Put(selectedCharacter.Skills.Count);
+        foreach (var entry in selectedCharacter.Skills)
         {
             writer.Put(entry.skillId);
             writer.Put(entry.level);
             writer.Put(entry.coolDownRemainsDuration);
         }
-        writer.Put(SelectedCharacter.EquipItems.Count);
-        foreach (var entry in SelectedCharacter.EquipItems)
+        writer.Put(selectedCharacter.EquipItems.Count);
+        foreach (var entry in selectedCharacter.EquipItems)
         {
             writer.Put(entry.id);
             writer.Put(entry.itemId);
             writer.Put(entry.level);
             writer.Put(entry.amount);
         }
-        writer.Put(SelectedCharacter.NonEquipItems.Count);
-        foreach (var entry in SelectedCharacter.NonEquipItems)
+        writer.Put(selectedCharacter.NonEquipItems.Count);
+        foreach (var entry in selectedCharacter.NonEquipItems)
         {
             writer.Put(entry.id);
             writer.Put(entry.itemId);
             writer.Put(entry.level);
             writer.Put(entry.amount);
         }
-        writer.Put(SelectedCharacter.Hotkeys.Count);
-        foreach (var entry in SelectedCharacter.Hotkeys)
+        writer.Put(selectedCharacter.Hotkeys.Count);
+        foreach (var entry in selectedCharacter.Hotkeys)
         {
             writer.Put(entry.hotkeyId);
             writer.Put((byte)entry.type);
             writer.Put(entry.dataId);
         }
-        writer.Put(SelectedCharacter.Quests.Count);
-        foreach (var entry in SelectedCharacter.Quests)
+        writer.Put(selectedCharacter.Quests.Count);
+        foreach (var entry in selectedCharacter.Quests)
         {
             writer.Put(entry.questId);
             writer.Put(entry.isComplete);
@@ -176,12 +170,12 @@ public class LanRpgNetworkManager : LiteNetLibGameManager
                 }
             }
         }
-        var rightHand = SelectedCharacter.EquipWeapons.rightHand;
+        var rightHand = selectedCharacter.EquipWeapons.rightHand;
         writer.Put(rightHand.id);
         writer.Put(rightHand.itemId);
         writer.Put(rightHand.level);
         writer.Put(rightHand.amount);
-        var leftHand = SelectedCharacter.EquipWeapons.leftHand;
+        var leftHand = selectedCharacter.EquipWeapons.leftHand;
         writer.Put(leftHand.id);
         writer.Put(leftHand.itemId);
         writer.Put(leftHand.level);

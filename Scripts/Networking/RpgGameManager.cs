@@ -57,20 +57,10 @@ public class RpgGameManager : MonoBehaviour
                 break;
         }
         if (disconnectInfo.Reason != DisconnectReason.DisconnectPeerCalled)
-        {
-            UISceneGlobal.Singleton.ShowMessageDialog("Disconnected", errorMessage, true, false, false, false, () =>
-            {
-                UISceneLoading.Singleton.LoadScene(GameInstance.Singleton.homeScene);
-            });
-        }
+            UISceneGlobal.Singleton.ShowMessageDialog("Disconnected", errorMessage, true, false, false, false);
     }
 
-    public void OnStopClient()
-    {
-        UISceneLoading.Singleton.LoadScene(GameInstance.Singleton.homeScene);
-    }
-
-    public void OnStartServer()
+    public void OnServerOnlineSceneLoaded()
     {
         var monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
         foreach (var monsterSpawnArea in monsterSpawnAreas)
