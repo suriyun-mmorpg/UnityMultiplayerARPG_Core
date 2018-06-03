@@ -28,7 +28,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public static readonly int ANIM_ACTION_CLIP_MULTIPLIER = Animator.StringToHash("ActionSpeedMultiplier");
     public const float RECOVERY_UPDATE_DURATION = 0.5f;
     public const float SKILL_BUFF_UPDATE_DURATION = 0.5f;
-    public const float ACTION_COMMAND_DELAY = 0.1f;
+    public const float ACTION_COMMAND_DELAY = 0.2f;
+    public const float UPDATE_VELOCITY_DURATION = 0.1f;
 
     // Use id as primary key
     #region Sync data
@@ -70,6 +71,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
     protected Vector3? previousPosition;
     protected Vector3 currentVelocity;
+    protected float velocityCalculationDeltaTime;
     protected AnimActionType animActionType;
     protected float recoveryingHp;
     protected float recoveryingMp;
@@ -267,11 +269,16 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     {
         base.Update();
         // Update current velocity
-        if (!previousPosition.HasValue)
+        velocityCalculationDeltaTime += Time.unscaledDeltaTime;
+        if (velocityCalculationDeltaTime >= UPDATE_VELOCITY_DURATION)
+        {
+            if (!previousPosition.HasValue)
+                previousPosition = CacheTransform.position;
+            var currentMoveDistance = CacheTransform.position - previousPosition.Value;
+            currentVelocity = currentMoveDistance / velocityCalculationDeltaTime;
             previousPosition = CacheTransform.position;
-        var currentMoveDistance = CacheTransform.position - previousPosition.Value;
-        currentVelocity = currentMoveDistance / Time.deltaTime;
-        previousPosition = CacheTransform.position;
+            velocityCalculationDeltaTime = 0f;
+        }
 
         MakeCaches();
         UpdateAnimation();
