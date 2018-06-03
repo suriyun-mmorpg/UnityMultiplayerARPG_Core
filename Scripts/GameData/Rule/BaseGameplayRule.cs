@@ -19,5 +19,7 @@ public abstract class BaseGameplayRule : ScriptableObject
     public abstract float GetDecreasingFoodPerSeconds(BaseCharacterEntity character);
     public abstract float GetDecreasingWaterPerSeconds(BaseCharacterEntity character);
     public abstract float GetMoveSpeed(BaseCharacterEntity character);
+    public abstract bool IsHungry(BaseCharacterEntity character);
+    public abstract bool IsThirsty(BaseCharacterEntity character);
     public abstract bool IncreaseExp(BaseCharacterEntity character, int exp);
 }

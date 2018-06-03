@@ -95,6 +95,9 @@ public class LanRpgNetworkManager : LiteNetLibGameManager
         writer.Put(selectedCharacter.Exp);
         writer.Put(selectedCharacter.CurrentHp);
         writer.Put(selectedCharacter.CurrentMp);
+        writer.Put(selectedCharacter.CurrentStamina);
+        writer.Put(selectedCharacter.CurrentFood);
+        writer.Put(selectedCharacter.CurrentWater);
         writer.Put(selectedCharacter.StatPoint);
         writer.Put(selectedCharacter.SkillPoint);
         writer.Put(selectedCharacter.Gold);
@@ -192,6 +195,9 @@ public class LanRpgNetworkManager : LiteNetLibGameManager
         character.Exp = reader.GetInt();
         character.CurrentHp = reader.GetInt();
         character.CurrentMp = reader.GetInt();
+        character.CurrentStamina = reader.GetInt();
+        character.CurrentFood = reader.GetInt();
+        character.CurrentWater = reader.GetInt();
         character.StatPoint = reader.GetInt();
         character.SkillPoint = reader.GetInt();
         character.Gold = reader.GetInt();

@@ -62,11 +62,6 @@ public class UISceneGameplay : MonoBehaviour
 
     private void Update()
     {
-        var currentCharacterHp = 0;
-        var owningCharacter = BasePlayerCharacterController.OwningCharacter;
-        if (owningCharacter != null)
-            currentCharacterHp = owningCharacter.CurrentHp;
-
         foreach (var toggleUi in toggleUis)
         {
             if (Input.GetKeyDown(toggleUi.key))

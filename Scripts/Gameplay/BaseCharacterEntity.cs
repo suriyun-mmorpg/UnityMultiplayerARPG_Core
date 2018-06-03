@@ -340,7 +340,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     {
         if (CurrentHp <= 0 || !IsServer)
             return;
-
+        
         var gameRule = GameInstance.Singleton.GameplayRule;
         recoveryUpdateDeltaTime += Time.unscaledDeltaTime;
         if (recoveryUpdateDeltaTime >= RECOVERY_UPDATE_DURATION)
@@ -499,15 +499,34 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (!IsServer)
             return;
 
-        // Validates Hp / Mp / Stamina / Food / Water
-            if (CurrentHp < 0)
-                CurrentHp = 0;
-            if (CurrentMp < 0)
-                CurrentMp = 0;
-            if (CurrentHp > CacheMaxHp)
-                CurrentHp = CacheMaxHp;
-            if (CurrentMp > CacheMaxMp)
-                CurrentMp = CacheMaxMp;
+        // Validate Hp
+        if (CurrentHp < 0)
+            CurrentHp = 0;
+        if (CurrentHp > CacheMaxHp)
+            CurrentHp = CacheMaxHp;
+        // Validate Mp
+        if (CurrentMp < 0)
+            CurrentMp = 0;
+        if (CurrentMp > CacheMaxMp)
+            CurrentMp = CacheMaxMp;
+        // Validate Stamina
+        if (CurrentStamina < 0)
+            CurrentStamina = 0;
+        if (CurrentStamina > CacheMaxStamina)
+            CurrentStamina = CacheMaxStamina;
+        // Validate Food
+        if (CurrentFood < 0)
+            CurrentFood = 0;
+        if (CurrentFood > CacheMaxFood)
+            CurrentFood = CacheMaxFood;
+        // Validate Water
+        if (CurrentWater < 0)
+            CurrentWater = 0;
+        if (CurrentWater > CacheMaxWater)
+            CurrentWater = CacheMaxWater;
+
+        if (CurrentHp <= 0)
+            Killed(null);
     }
 
     #region Setup functions

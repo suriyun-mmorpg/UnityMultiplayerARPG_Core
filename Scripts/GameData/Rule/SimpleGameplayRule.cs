@@ -9,10 +9,10 @@ public class SimpleGameplayRule : BaseGameplayRule
     public int increaseSkillPointEachLevel = 1;
     public int hungryWhenFoodLowerThan = 40;
     public int thirstyWhenWaterLowerThan = 40;
-    public int staminaRecoveryPerSeconds = 5;
-    public int staminaDecreasePerSeconds = 5;
-    public int foodDecreasePerSeconds = 4;
-    public int waterDecreasePerSeconds = 2;
+    public float staminaRecoveryPerSeconds = 5;
+    public float staminaDecreasePerSeconds = 5;
+    public float foodDecreasePerSeconds = 4;
+    public float waterDecreasePerSeconds = 2;
     public float moveSpeedRateWhileSprint = 1.5f;
     [Range(0f, 1f)]
     public float hpRecoveryRatePerSeconds = 0.05f;
@@ -110,11 +110,15 @@ public class SimpleGameplayRule : BaseGameplayRule
 
     public override float GetRecoveryHpPerSeconds(BaseCharacterEntity character)
     {
+        if (IsHungry(character))
+            return 0;
         return character.CacheMaxHp * hpRecoveryRatePerSeconds;
     }
 
     public override float GetRecoveryMpPerSeconds(BaseCharacterEntity character)
     {
+        if (IsThirsty(character))
+            return 0;
         return character.CacheMaxMp * mpRecoveryRatePerSeconds;
     }
 
@@ -128,9 +132,9 @@ public class SimpleGameplayRule : BaseGameplayRule
         if (character is MonsterCharacterEntity)
             return 0f;
         var result = 0f;
-        if (character.CurrentFood < hungryWhenFoodLowerThan)
+        if (IsHungry(character))
             result += character.CacheMaxHp * hpDecreaseRatePerSecondsWhenHungry;
-        if (character.CurrentWater < thirstyWhenWaterLowerThan)
+        if (IsThirsty(character))
             result += character.CacheMaxHp * hpDecreaseRatePerSecondsWhenThirsty;
         return result;
     }
@@ -140,9 +144,9 @@ public class SimpleGameplayRule : BaseGameplayRule
         if (character is MonsterCharacterEntity)
             return 0f;
         var result = 0f;
-        if (character.CurrentFood < hungryWhenFoodLowerThan)
+        if (IsHungry(character))
             result += character.CacheMaxMp * mpDecreaseRatePerSecondsWhenHungry;
-        if (character.CurrentWater < thirstyWhenWaterLowerThan)
+        if (IsThirsty(character))
             result += character.CacheMaxMp * mpDecreaseRatePerSecondsWhenThirsty;
         return result;
     }
@@ -176,6 +180,16 @@ public class SimpleGameplayRule : BaseGameplayRule
             return monsterCharacter.isWandering ? monsterCharacter.MonsterDatabase.wanderMoveSpeed : monsterCharacter.CacheMoveSpeed;
         }
         return character.CacheMoveSpeed * (character.isSprinting ? moveSpeedRateWhileSprint : 1f);
+    }
+
+    public override bool IsHungry(BaseCharacterEntity character)
+    {
+        return character.CurrentFood < hungryWhenFoodLowerThan;
+    }
+
+    public override bool IsThirsty(BaseCharacterEntity character)
+    {
+        return character.CurrentWater < thirstyWhenWaterLowerThan;
     }
 
     public override bool IncreaseExp(BaseCharacterEntity character, int exp)
