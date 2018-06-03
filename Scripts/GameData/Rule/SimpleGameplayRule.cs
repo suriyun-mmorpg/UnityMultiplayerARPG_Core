@@ -14,19 +14,17 @@ public class SimpleGameplayRule : BaseGameplayRule
     public int foodDecreasePerSeconds = 4;
     public int waterDecreasePerSeconds = 2;
     public float moveSpeedRateWhileSprint = 1.5f;
-    [Range(0.01f, 1f)]
+    [Range(0f, 1f)]
     public float hpRecoveryRatePerSeconds = 0.05f;
-    [Range(0.01f, 1f)]
+    [Range(0f, 1f)]
     public float mpRecoveryRatePerSeconds = 0.05f;
-    [Range(0.01f, 1f)]
-    public float staminaRecoveryRatePerSeconds = 0.05f;
-    [Range(0.01f, 1f)]
+    [Range(0f, 1f)]
     public float hpDecreaseRatePerSecondsWhenHungry = 0.05f;
-    [Range(0.01f, 1f)]
+    [Range(0f, 1f)]
     public float mpDecreaseRatePerSecondsWhenHungry = 0.05f;
-    [Range(0.01f, 1f)]
+    [Range(0f, 1f)]
     public float hpDecreaseRatePerSecondsWhenThirsty = 0.05f;
-    [Range(0.01f, 1f)]
+    [Range(0f, 1f)]
     public float mpDecreaseRatePerSecondsWhenThirsty = 0.05f;
 
     public override float GetHitChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
