@@ -236,7 +236,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         return Mathf.Sqrt(2f * jumpHeight * -Physics.gravity.y * gravityRate);
     }
 
-    protected override void Respawn()
+    public override void Respawn()
     {
         if (!IsServer || CurrentHp > 0)
             return;
@@ -686,7 +686,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         }
     }
 
-    protected override void Killed(BaseCharacterEntity lastAttacker)
+    public override void Killed(BaseCharacterEntity lastAttacker)
     {
         base.Killed(lastAttacker);
         currentNpcDialog = null;
