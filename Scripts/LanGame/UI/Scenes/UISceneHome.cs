@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class UISceneHome : UIHistory
 {
-    public UICharacterCreate uiCharacterCreate;
-    public UICharacterList uiCharacterList;
     public UILanConnection uiLanConnection;
+    public UICharacterList uiCharacterList;
+    public UICharacterCreate uiCharacterCreate;
 
     public void OnClickSinglePlayer()
     {
@@ -33,11 +33,6 @@ public class UISceneHome : UIHistory
         var networkManager = LanRpgNetworkManager.Singleton;
         networkManager.startType = LanRpgNetworkManager.GameStartType.Host;
         Next(uiCharacterList);
-    }
-
-    public void OnClickCreateCharacter()
-    {
-        Next(uiCharacterCreate);
     }
 
     public void OnClickExit()
