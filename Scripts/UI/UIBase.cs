@@ -58,6 +58,8 @@ public class UIBase : MonoBehaviour
 
         if (hideOnAwake)
             Hide();
+        else
+            Show();
     }
 
     public virtual bool IsVisible()
