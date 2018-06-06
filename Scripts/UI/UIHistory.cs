@@ -41,4 +41,16 @@ public class UIHistory : MonoBehaviour
         else if (firstUI != null)
             firstUI.Show();
     }
+
+    public void ClearHistory()
+    {
+        while (uiStack.Count > 0)
+        {
+            var ui = uiStack.Pop();
+            ui.Hide();
+        }
+        uiStack.Clear();
+        if (firstUI != null)
+            firstUI.Show();
+    }
 }
