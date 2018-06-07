@@ -23,7 +23,7 @@ public class LanRpgNetworkManager : LiteNetLibGameManager
     protected float lastSaveTime;
 
     private RpgGameManager cacheGameManager;
-    public RpgGameManager CacheGameManager
+    public RpgGameManager GameManager
     {
         get
         {
@@ -42,7 +42,7 @@ public class LanRpgNetworkManager : LiteNetLibGameManager
 
     public void StartGame()
     {
-        CacheGameManager.Init(this);
+        GameManager.Init(this);
         var gameInstance = GameInstance.Singleton;
         var gameServiceConnection = gameInstance.NetworkSetting;
         switch (startType)
@@ -77,13 +77,13 @@ public class LanRpgNetworkManager : LiteNetLibGameManager
     public override void OnClientDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
     {
         base.OnClientDisconnected(peer, disconnectInfo);
-        CacheGameManager.OnClientDisconnected(peer, disconnectInfo);
+        GameManager.OnClientDisconnected(peer, disconnectInfo);
     }
 
     public override void OnServerOnlineSceneLoaded()
     {
         base.OnServerOnlineSceneLoaded();
-        CacheGameManager.OnServerOnlineSceneLoaded();
+        GameManager.OnServerOnlineSceneLoaded();
     }
 
     public override void SerializeClientReadyExtra(NetDataWriter writer)
