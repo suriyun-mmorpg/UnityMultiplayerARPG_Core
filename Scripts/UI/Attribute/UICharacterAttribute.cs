@@ -1,10 +1,10 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacterAttribute : UIDataForCharacter<Tuple<CharacterAttribute, int>>
+public class UICharacterAttribute : UIDataForCharacter<(CharacterAttribute characterAttribute, int targetAmount)>
 {
     [Header("Generic Info Format")]
     [Tooltip("Title Format => {0} = {Title}")]
@@ -26,8 +26,8 @@ public class UICharacterAttribute : UIDataForCharacter<Tuple<CharacterAttribute,
     
     protected void Update()
     {
-        var characterAttribute = Data.Item1;
-        var amount = Data.Item2;
+        var characterAttribute = Data.characterAttribute;
+        var amount = Data.targetAmount;
         
         if (IsOwningCharacter() && characterAttribute.CanIncrease(BasePlayerCharacterController.OwningCharacter))
             onAbleToIncrease.Invoke();
@@ -38,9 +38,9 @@ public class UICharacterAttribute : UIDataForCharacter<Tuple<CharacterAttribute,
     protected override void UpdateData()
     {
         var owningCharacter = BasePlayerCharacterController.OwningCharacter;
-        var characterAttribute = Data.Item1;
+        var characterAttribute = Data.characterAttribute;
         var attribute = characterAttribute.GetAttribute();
-        var amount = Data.Item2;
+        var amount = Data.targetAmount;
 
         if (textTitle != null)
             textTitle.text = string.Format(titleFormat, attribute == null ? "Unknow" : attribute.title);

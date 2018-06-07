@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,7 +19,7 @@ public class UISkillCraftItem : UISelectionEntry<Skill>
             else
             {
                 uiCraftingItem.Show();
-                uiCraftingItem.Data = new Tuple<CharacterItem, int>(CharacterItem.Create(skill.craftingItem), 1);
+                uiCraftingItem.Data = (CharacterItem.Create(skill.craftingItem), 1);
             }
         }
 

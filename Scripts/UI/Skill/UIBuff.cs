@@ -1,9 +1,9 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIBuff : UISelectionEntry<Tuple<Buff, int>>
+public class UIBuff : UISelectionEntry<(Buff buff, int targetLevel)>
 {
     [Tooltip("Duration Format => {0} = {Duration}")]
     public string durationFormat = "Duration: {0}";
@@ -32,8 +32,8 @@ public class UIBuff : UISelectionEntry<Tuple<Buff, int>>
 
     protected override void UpdateData()
     {
-        var buff = Data.Item1;
-        var level = Data.Item2;
+        var buff = Data.buff;
+        var level = Data.targetLevel;
 
         if (textDuration != null)
         {

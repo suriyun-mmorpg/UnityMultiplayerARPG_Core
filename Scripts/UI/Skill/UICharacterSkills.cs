@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -102,7 +102,7 @@ public class UICharacterSkills : UIBase
     public void UpdateData(ICharacterData character)
     {
         this.character = character;
-        var selectedSkillId = SelectionManager.SelectedUI != null ? SelectionManager.SelectedUI.Data.Item1.skillId : "";
+        var selectedSkillId = SelectionManager.SelectedUI != null ? SelectionManager.SelectedUI.Data.characterSkill.skillId : "";
         SelectionManager.DeselectSelectedUI();
         SelectionManager.Clear();
 
@@ -119,7 +119,7 @@ public class UICharacterSkills : UIBase
                 CacheList.Generate(characterSkills, (index, characterSkill, ui) =>
                 {
                     var uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
-                    uiCharacterSkill.Setup(new Tuple<CharacterSkill, int>(characterSkill, characterSkill.level), character, index);
+                    uiCharacterSkill.Setup((characterSkill, characterSkill.level), character, index);
                     uiCharacterSkill.Show();
                     SelectionManager.Add(uiCharacterSkill);
                     if (selectedSkillId.Equals(characterSkill.skillId))
@@ -136,7 +136,7 @@ public class UICharacterSkills : UIBase
                     UICharacterSkill cacheUICharacterSkill;
                     if (CacheUICharacterSkills.TryGetValue(skill, out cacheUICharacterSkill))
                     {
-                        cacheUICharacterSkill.Setup(new Tuple<CharacterSkill, int>(characterSkill, level), character, i);
+                        cacheUICharacterSkill.Setup((characterSkill, level), character, i);
                         cacheUICharacterSkill.Show();
                         if (selectedSkillId.Equals(characterSkill.skillId))
                             cacheUICharacterSkill.OnClickSelect();

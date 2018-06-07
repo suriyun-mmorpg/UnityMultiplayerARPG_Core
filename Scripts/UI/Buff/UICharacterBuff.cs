@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -88,7 +88,7 @@ public class UICharacterBuff : UIDataForCharacter<CharacterBuff>
             {
                 var buff = Data.GetBuff();
                 uiBuff.Show();
-                uiBuff.Data = new Tuple<Buff, int>(buff, Data.level);
+                uiBuff.Data = (buff, Data.level);
             }
         }
     }

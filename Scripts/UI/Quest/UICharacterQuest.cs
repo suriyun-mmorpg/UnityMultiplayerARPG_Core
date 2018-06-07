@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -82,7 +82,7 @@ public class UICharacterQuest : UIDataForCharacter<CharacterQuest>
                 var uiQuestTask = ui.GetComponent<UIQuestTask>();
                 var isComplete = false;
                 var progress = characterQuest.GetProgress(character, index, out isComplete);
-                uiQuestTask.Data = new Tuple<QuestTask, int>(task, progress);
+                uiQuestTask.Data = (task, progress);
                 uiQuestTask.Show();
             });
         }
@@ -117,7 +117,7 @@ public class UICharacterQuest : UIDataForCharacter<CharacterQuest>
                 var characterItem = CharacterItem.Create(rewardItem.item);
                 characterItem.amount = rewardItem.amount;
                 var uiCharacterItem = ui.GetComponent<UICharacterItem>();
-                uiCharacterItem.Setup(new Tuple<CharacterItem, int>(characterItem, characterItem.level), null, -1, string.Empty);
+                uiCharacterItem.Setup((characterItem, characterItem.level), null, -1, string.Empty);
                 uiCharacterItem.Show();
             });
         }

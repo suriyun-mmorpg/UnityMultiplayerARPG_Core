@@ -1,10 +1,10 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacterItem : UIDataForCharacter<Tuple<CharacterItem, int>>
+public class UICharacterItem : UIDataForCharacter<(CharacterItem characterItem, int targetLevel)>
 {
     public string equipPosition { get; protected set; }
 
@@ -67,7 +67,7 @@ public class UICharacterItem : UIDataForCharacter<Tuple<CharacterItem, int>>
     public UICharacterItem uiNextLevelItem;
     public bool hideAmountWhenMaxIsOne;
 
-    public void Setup(Tuple<CharacterItem, int> data, ICharacterData character, int indexOfData, string equipPosition)
+    public void Setup((CharacterItem, int) data, ICharacterData character, int indexOfData, string equipPosition)
     {
         this.equipPosition = equipPosition;
         Setup(data, character, indexOfData);
@@ -75,8 +75,8 @@ public class UICharacterItem : UIDataForCharacter<Tuple<CharacterItem, int>>
 
     protected override void UpdateData()
     {
-        var characterItem = Data.Item1;
-        var level = Data.Item2;
+        var characterItem = Data.characterItem;
+        var level = Data.targetLevel;
         var item = characterItem.GetItem();
         var equipmentItem = characterItem.GetEquipmentItem();
         var armorItem = characterItem.GetArmorItem();
@@ -224,7 +224,7 @@ public class UICharacterItem : UIDataForCharacter<Tuple<CharacterItem, int>>
             {
                 uiDamageAmounts.Show();
                 var keyValuePair = weaponItem.GetDamageAmount(level, null);
-                uiDamageAmounts.Data = new Tuple<DamageElement, MinMaxFloat>(keyValuePair.Key, keyValuePair.Value);
+                uiDamageAmounts.Data = (keyValuePair.Key, keyValuePair.Value);
             }
         }
 
@@ -234,7 +234,7 @@ public class UICharacterItem : UIDataForCharacter<Tuple<CharacterItem, int>>
                 uiNextLevelItem.Hide();
             else
             {
-                uiNextLevelItem.Setup(new Tuple<CharacterItem, int>(characterItem, level + 1), character, indexOfData, equipPosition);
+                uiNextLevelItem.Setup((characterItem, level + 1), character, indexOfData, equipPosition);
                 uiNextLevelItem.Show();
             }
         }
@@ -249,7 +249,7 @@ public class UICharacterItem : UIDataForCharacter<Tuple<CharacterItem, int>>
         if (selectionManager != null)
             selectionManager.DeselectSelectedUI();
 
-        var characterItem = Data.Item1;
+        var characterItem = Data.characterItem;
         var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (owningCharacter != null)
         {
@@ -297,7 +297,7 @@ public class UICharacterItem : UIDataForCharacter<Tuple<CharacterItem, int>>
         if (!IsOwningCharacter() || !string.IsNullOrEmpty(equipPosition))
             return;
 
-        var characterItem = Data.Item1;
+        var characterItem = Data.characterItem;
         var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (characterItem.amount == 1)
         {

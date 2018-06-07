@@ -1,10 +1,10 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacterSkill : UIDataForCharacter<Tuple<CharacterSkill, int>>
+public class UICharacterSkill : UIDataForCharacter<(CharacterSkill characterSkill, int targetLevel)>
 {
     [Header("Generic Info Format")]
     [Tooltip("Title Format => {0} = {Title}")]
@@ -64,9 +64,9 @@ public class UICharacterSkill : UIDataForCharacter<Tuple<CharacterSkill, int>>
 
     protected void Update()
     {
-        var characterSkill = Data.Item1;
+        var characterSkill = Data.characterSkill;
         var skill = characterSkill.GetSkill();
-        var level = Data.Item2;
+        var level = Data.targetLevel;
 
         collectedDeltaTime += Time.deltaTime;
 
@@ -102,9 +102,9 @@ public class UICharacterSkill : UIDataForCharacter<Tuple<CharacterSkill, int>>
 
     protected override void UpdateData()
     {
-        var characterSkill = Data.Item1;
+        var characterSkill = Data.characterSkill;
         var skill = characterSkill.GetSkill();
-        var level = Data.Item2;
+        var level = Data.targetLevel;
 
         collectedDeltaTime = 0f;
 
@@ -155,7 +155,7 @@ public class UICharacterSkill : UIDataForCharacter<Tuple<CharacterSkill, int>>
             else
             {
                 uiRequirement.Show();
-                uiRequirement.Data = new Tuple<Skill, int>(skill, level);
+                uiRequirement.Data = (skill, level);
             }
         }
 
@@ -180,7 +180,7 @@ public class UICharacterSkill : UIDataForCharacter<Tuple<CharacterSkill, int>>
             {
                 uiDamageAmount.Show();
                 var keyValuePair = skill.GetDamageAmount(level, null);
-                uiDamageAmount.Data = new Tuple<DamageElement, MinMaxFloat>(keyValuePair.Key, keyValuePair.Value);
+                uiDamageAmount.Data = (keyValuePair.Key, keyValuePair.Value);
             }
         }
 
@@ -215,7 +215,7 @@ public class UICharacterSkill : UIDataForCharacter<Tuple<CharacterSkill, int>>
             else
             {
                 uiSkillBuff.Show();
-                uiSkillBuff.Data = new Tuple<Buff, int>(skill.buff, level);
+                uiSkillBuff.Data = (skill.buff, level);
             }
         }
 
@@ -226,7 +226,7 @@ public class UICharacterSkill : UIDataForCharacter<Tuple<CharacterSkill, int>>
             else
             {
                 uiSkillDebuff.Show();
-                uiSkillDebuff.Data = new Tuple<Buff, int>(skill.debuff, level);
+                uiSkillDebuff.Data = (skill.debuff, level);
             }
         }
 
@@ -236,7 +236,7 @@ public class UICharacterSkill : UIDataForCharacter<Tuple<CharacterSkill, int>>
                 uiNextLevelSkill.Hide();
             else
             {
-                uiNextLevelSkill.Setup(new Tuple<CharacterSkill, int>(characterSkill, level + 1), character, indexOfData);
+                uiNextLevelSkill.Setup((characterSkill, level + 1), character, indexOfData);
                 uiNextLevelSkill.Show();
             }
         }

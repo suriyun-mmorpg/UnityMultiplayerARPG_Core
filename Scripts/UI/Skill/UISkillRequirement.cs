@@ -1,9 +1,9 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UISkillRequirement : UISelectionEntry<Tuple<Skill, int>>
+public class UISkillRequirement : UISelectionEntry<(Skill skill, int targetLevel)>
 {
     [Header("Requirement Format")]
     [Tooltip("Require Level Format => {0} = {Level}")]
@@ -15,8 +15,8 @@ public class UISkillRequirement : UISelectionEntry<Tuple<Skill, int>>
 
     protected override void UpdateData()
     {
-        var skill = Data.Item1;
-        var level = Data.Item2;
+        var skill = Data.skill;
+        var level = Data.targetLevel;
 
         if (textRequireLevel != null)
         {

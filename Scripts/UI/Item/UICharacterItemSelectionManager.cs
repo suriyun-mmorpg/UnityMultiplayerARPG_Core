@@ -1,7 +1,7 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UICharacterItemSelectionManager : UISelectionManager<Tuple<CharacterItem, int>, UICharacterItem, UICharacterItemEvent>
+public class UICharacterItemSelectionManager : UISelectionManager<(CharacterItem characterItem, int targetLevel), UICharacterItem, UICharacterItemEvent>
 {
 }

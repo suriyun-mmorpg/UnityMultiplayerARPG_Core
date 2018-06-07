@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -302,7 +302,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
                 if (CacheUICharacterAttributes.TryGetValue(attribute, out cacheUICharacterAttribute) &&
                     displayingAttributes.TryGetValue(attribute, out amount))
                 {
-                    cacheUICharacterAttribute.Setup(new Tuple<CharacterAttribute, int>(characterAttribute, amount), Data, i);
+                    cacheUICharacterAttribute.Setup((characterAttribute, amount), Data, i);
                     cacheUICharacterAttribute.Show();
                 }
                 else

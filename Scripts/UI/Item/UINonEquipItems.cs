@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -63,7 +63,7 @@ public class UINonEquipItems : UIBase
         if (uiGameplay != null)
             uiGameplay.DeselectSelectedItem();
 
-        if (uiItemDialog != null && ui.Data.Item1.IsValid())
+        if (uiItemDialog != null && ui.Data.characterItem.IsValid())
         {
             uiItemDialog.selectionManager = SelectionManager;
             uiItemDialog.Setup(ui.Data, character, ui.indexOfData, ui.equipPosition);
@@ -77,7 +77,7 @@ public class UINonEquipItems : UIBase
     {
         var uiGameplay = UISceneGameplay.Singleton;
 
-        if (uiGameplay != null && !ui.Data.Item1.IsValid())
+        if (uiGameplay != null && !ui.Data.characterItem.IsValid())
             uiGameplay.DeselectSelectedItem();
     }
 
@@ -90,7 +90,7 @@ public class UINonEquipItems : UIBase
     public void UpdateData(ICharacterData character)
     {
         this.character = character;
-        var selectedId = SelectionManager.SelectedUI != null ? SelectionManager.SelectedUI.Data.Item1.id : "";
+        var selectedId = SelectionManager.SelectedUI != null ? SelectionManager.SelectedUI.Data.characterItem.id : "";
         SelectionManager.DeselectSelectedUI();
         SelectionManager.Clear();
 
@@ -104,7 +104,7 @@ public class UINonEquipItems : UIBase
         CacheList.Generate(nonEquipItems, (index, characterItem, ui) =>
         {
             var uiCharacterItem = ui.GetComponent<UICharacterItem>();
-            uiCharacterItem.Setup(new Tuple<CharacterItem, int>(characterItem, characterItem.level), this.character, index, string.Empty);
+            uiCharacterItem.Setup((characterItem, characterItem.level), this.character, index, string.Empty);
             uiCharacterItem.Show();
             SelectionManager.Add(uiCharacterItem);
             if (selectedId.Equals(characterItem.id))
