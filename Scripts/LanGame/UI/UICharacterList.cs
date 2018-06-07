@@ -133,14 +133,15 @@ public class UICharacterList : UIBase
 
     private void OnClickDelete()
     {
-        if (SelectionManager.SelectedUI == null)
+        var selectedUI = SelectionManager.SelectedUI;
+        if (selectedUI == null)
         {
             UISceneGlobal.Singleton.ShowMessageDialog("Cannot delete character", "Please choose character to delete");
             Debug.LogWarning("Cannot delete character, No chosen character");
             return;
         }
         
-        var playerCharacter = SelectionManager.SelectedUI.Data as IPlayerCharacterData;
+        var playerCharacter = selectedUI.Data as IPlayerCharacterData;
         playerCharacter.DeletePersistentCharacterData();
         // Reload characters
         LoadCharacters();
