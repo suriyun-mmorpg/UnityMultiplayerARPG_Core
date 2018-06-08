@@ -1713,7 +1713,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         CacheMaxStamina = (int)CacheStats.stamina;
         CacheMaxFood = (int)CacheStats.food;
         CacheMaxWater = (int)CacheStats.water;
-        CacheBaseMoveSpeed = database.stats.baseStats.moveSpeed;
+        if (database != null)
+            CacheBaseMoveSpeed = database.stats.baseStats.moveSpeed;
         CacheMoveSpeed = CacheStats.moveSpeed;
         CacheAtkSpeed = CacheStats.atkSpeed;
         isRecaching = false;
