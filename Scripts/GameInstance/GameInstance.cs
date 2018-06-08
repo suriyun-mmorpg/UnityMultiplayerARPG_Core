@@ -50,6 +50,8 @@ public class GameInstance : MonoBehaviour
     [Header("Player Configs")]
     public int minCharacterNameLength = 2;
     public int maxCharacterNameLength = 16;
+    [Header("Other Settings")]
+    public bool doNotLoadHomeSceneOnStart;
     [Header("Playing In Editor")]
     public bool useMobileInEditor;
     public static readonly Dictionary<string, Attribute> Attributes = new Dictionary<string, Attribute>();
@@ -205,14 +207,8 @@ public class GameInstance : MonoBehaviour
         }
 
         InputManager.useMobileInputOnNonMobile = useMobileInEditor;
-
-        StartCoroutine(LoadData());
-    }
-
-    IEnumerator LoadData()
-    {
-        yield return null;
-
+        
+        // Load game data
         Attributes.Clear();
         Items.Clear();
         Skills.Clear();
@@ -224,10 +220,9 @@ public class GameInstance : MonoBehaviour
         DamageEntities.Clear();
         ActionAnimations.Clear();
         GameEffectCollections.Clear();
-        
+
         // Use Resources Load Async ?
         var gameDataList = Resources.LoadAll<BaseGameData>("");
-        yield return null;
 
         var attributes = new List<Attribute>();
         var damageElements = new List<DamageElement>();
@@ -275,9 +270,12 @@ public class GameInstance : MonoBehaviour
                 weaponHitEffects.Add(damageElement.hitEffects);
         }
         AddGameEffectCollections(GameEffectCollectionType.WeaponHit, weaponHitEffects);
+    }
 
-        yield return null;
-        UISceneLoading.Singleton.LoadScene(homeScene);
+    private void Start()
+    {
+        if (!doNotLoadHomeSceneOnStart)
+            UISceneLoading.Singleton.LoadScene(homeScene);
     }
 
     public static void AddAttributes(IEnumerable<Attribute> attributes)
