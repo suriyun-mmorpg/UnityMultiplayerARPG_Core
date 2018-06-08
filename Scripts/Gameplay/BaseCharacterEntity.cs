@@ -232,14 +232,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         {
             nonOwnerObject.SetActive(!IsOwnerClient);
         }
-        // Notify clients that this character is spawn or dead
-        if (IsServer)
-        {
-            if (CurrentHp > 0)
-                RequestOnRespawn(true);
-            else
-                RequestOnDead(true);
-        }
     }
 
     protected override void Update()
@@ -1113,6 +1105,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="databaseId"></param>
     protected virtual void OnDatabaseIdChange(string databaseId)
     {
+        if (IsServer)
+            isRecaching = true;
+
         // Get database
         GameInstance.AllCharacters.TryGetValue(databaseId, out database);
 
@@ -1149,6 +1144,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="level"></param>
     protected virtual void OnLevelChange(int level)
     {
+        if (IsServer)
+            isRecaching = true;
+
         if (onLevelChange != null)
             onLevelChange.Invoke(level);
     }

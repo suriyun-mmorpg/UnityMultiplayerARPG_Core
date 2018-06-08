@@ -13,6 +13,7 @@ public class RpgGameManager : MonoBehaviour
         this.networkManager = networkManager;
         networkManager.doNotEnterGameOnConnect = false;
         var gameInstance = GameInstance.Singleton;
+        networkManager.Assets.offlineScene.SceneName = gameInstance.homeScene;
         networkManager.Assets.playerPrefab = gameInstance.playerCharacterEntityPrefab.Identity;
         var spawnablePrefabs = new List<LiteNetLibIdentity>();
         spawnablePrefabs.Add(gameInstance.monsterCharacterEntityPrefab.Identity);

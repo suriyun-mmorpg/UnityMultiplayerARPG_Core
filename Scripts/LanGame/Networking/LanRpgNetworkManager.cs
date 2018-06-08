@@ -97,5 +97,10 @@ public class LanRpgNetworkManager : LiteNetLibGameManager
             return;
         var playerCharacterEntity = playerIdentity.GetComponent<PlayerCharacterEntity>();
         playerCharacterEntity.DeserializeCharacterData(reader);
+        // Notify clients that this character is spawn or dead
+        if (playerCharacterEntity.CurrentHp > 0)
+            playerCharacterEntity.RequestOnRespawn(true);
+        else
+            playerCharacterEntity.RequestOnDead(true);
     }
 }
