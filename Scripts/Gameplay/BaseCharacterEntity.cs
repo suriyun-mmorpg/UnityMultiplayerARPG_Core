@@ -1105,8 +1105,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="databaseId"></param>
     protected virtual void OnDatabaseIdChange(string databaseId)
     {
-        if (IsServer)
-            isRecaching = true;
+        isRecaching = true;
 
         // Get database
         GameInstance.AllCharacters.TryGetValue(databaseId, out database);
@@ -1144,8 +1143,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="level"></param>
     protected virtual void OnLevelChange(int level)
     {
-        if (IsServer)
-            isRecaching = true;
+        isRecaching = true;
 
         if (onLevelChange != null)
             onLevelChange.Invoke(level);
@@ -1216,8 +1214,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="index"></param>
     protected virtual void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index)
     {
-        if (IsServer)
-            isRecaching = true;
+        isRecaching = true;
 
         if (onAttributesOperation != null)
             onAttributesOperation.Invoke(operation, index);
@@ -1230,8 +1227,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="index"></param>
     protected virtual void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
-        if (IsServer)
-            isRecaching = true;
+        isRecaching = true;
 
         if (onSkillsOperation != null)
             onSkillsOperation.Invoke(operation, index);
@@ -1244,8 +1240,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="index"></param>
     protected virtual void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
-        if (IsServer)
-            isRecaching = true;
+        isRecaching = true;
 
         if (model != null)
             model.SetBuffs(buffs);
@@ -1261,8 +1256,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="index"></param>
     protected virtual void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
-        if (IsServer)
-            isRecaching = true;
+        isRecaching = true;
 
         if (model != null)
             model.SetEquipItems(equipItems);
@@ -1278,8 +1272,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="index"></param>
     protected virtual void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
     {
-        if (IsServer)
-            isRecaching = true;
+        isRecaching = true;
 
         if (onNonEquipItemsOperation != null)
             onNonEquipItemsOperation.Invoke(operation, index);
