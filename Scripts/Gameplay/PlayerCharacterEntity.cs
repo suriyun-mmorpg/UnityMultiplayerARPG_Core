@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 using LiteNetLib;
 using LiteNetLibManager;
 
@@ -32,7 +33,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     public int StatPoint { get { return statPoint.Value; } set { statPoint.Value = value; } }
     public int SkillPoint { get { return skillPoint.Value; } set { skillPoint.Value = value; } }
     public int Gold { get { return gold.Value; } set { gold.Value = value; } }
-    public string CurrentMapName { get; set; }
+    public string CurrentMapName { get { return SceneManager.GetActiveScene().name; } set { } }
     public Vector3 CurrentPosition { get { return CacheTransform.position; } set { CacheTransform.position = value; } }
     public string RespawnMapName { get; set; }
     public Vector3 RespawnPosition { get; set; }
