@@ -55,7 +55,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public GameObject[] nonOwnerObjects;
     [Tooltip("Model will be instantiated inside this transform, if not set will use this component's transform")]
     public Transform modelContainer;
-    public float actionAnimationTransition = 0.2f;
     #endregion
 
     #region Protected data
@@ -562,26 +561,24 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (animator != null && GameInstance.ActionAnimations.TryGetValue(actionId, out actionAnimation) && actionAnimation.clip != null)
         {
             animator.SetBool(CharacterAnimationSystem.ANIM_DO_ACTION, false);
-            yield return new WaitForSecondsRealtime(actionAnimationTransition);
             model.ChangeActionClip(actionAnimation.clip);
-            var actionClipMultiplier = 1f;
+            var playSpeedMultiplier = 1f;
             switch (animActionType)
             {
                 case AnimActionType.Attack:
-                    actionClipMultiplier = CacheAtkSpeed;
+                    playSpeedMultiplier = CacheAtkSpeed;
                     break;
             }
-            if (actionAnimation.audioClips != null && actionAnimation.audioClips.Length > 0)
-            {
-                var audioClips = actionAnimation.audioClips;
-                var soundEffect = audioClips[Random.Range(0, audioClips.Length)];
-                if (soundEffect != null)
-                    AudioSource.PlayClipAtPoint(soundEffect, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
-            }
-            animator.SetFloat(CharacterAnimationSystem.ANIM_ACTION_CLIP_MULTIPLIER, actionClipMultiplier);
+            AudioClip soundEffect;
+            if (actionAnimation.TryGetRandomAudioClip(out soundEffect))
+                AudioSource.PlayClipAtPoint(soundEffect, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
+            animator.SetFloat(CharacterAnimationSystem.ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
             animator.SetBool(CharacterAnimationSystem.ANIM_DO_ACTION, true);
-            yield return new WaitForSecondsRealtime(actionAnimation.ClipLength / actionClipMultiplier);
+            yield return new WaitForSecondsRealtime(animator.GetAnimatorTransitionInfo(0).duration + (actionAnimation.ClipLength / playSpeedMultiplier));
             animator.SetBool(CharacterAnimationSystem.ANIM_DO_ACTION, false);
+            yield return new WaitForSecondsRealtime(animator.GetAnimatorTransitionInfo(0).duration);
+            // Waits by extra duration before end animation state
+            yield return new WaitForSecondsRealtime(actionAnimation.extraDuration / playSpeedMultiplier);
         }
         this.animActionType = AnimActionType.None;
     }

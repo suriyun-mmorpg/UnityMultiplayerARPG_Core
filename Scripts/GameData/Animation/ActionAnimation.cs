@@ -67,4 +67,15 @@ public class ActionAnimation
         }
         return true;
     }
+
+    public bool TryGetRandomAudioClip(out AudioClip clip)
+    {
+        clip = null;
+        if (audioClips != null && audioClips.Length > 0)
+        {
+            clip = audioClips[Random.Range(0, audioClips.Length)];
+            return clip != null;
+        }
+        return false;
+    }
 }
