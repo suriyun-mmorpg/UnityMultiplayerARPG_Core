@@ -5,7 +5,6 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class CharacterModel : MonoBehaviour
 {
-    public const string ANIM_ACTION_STATE = "_Action";
     [Header("Animator")]
     [SerializeField]
     private RuntimeAnimatorController animatorController;
@@ -357,7 +356,7 @@ public class CharacterModel : MonoBehaviour
 
     public void ChangeActionClip(AnimationClip clip)
     {
-        CacheAnimatorController[ANIM_ACTION_STATE] = clip;
+        CacheAnimatorController[CharacterAnimationSystem.ANIM_STATE_ACTION_CLIP] = clip;
     }
 
     private void OnDrawGizmos()

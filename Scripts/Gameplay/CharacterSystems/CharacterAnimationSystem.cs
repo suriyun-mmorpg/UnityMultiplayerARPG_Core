@@ -5,6 +5,7 @@ using Unity.Entities;
 
 public class CharacterAnimationSystem : ComponentSystem
 {
+    public const string ANIM_STATE_ACTION_CLIP = "_Action";
     public static readonly int ANIM_IS_DEAD = Animator.StringToHash("IsDead");
     public static readonly int ANIM_MOVE_SPEED = Animator.StringToHash("MoveSpeed");
     public static readonly int ANIM_Y_SPEED = Animator.StringToHash("YSpeed");
