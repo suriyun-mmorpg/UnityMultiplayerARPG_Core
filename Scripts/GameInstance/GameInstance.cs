@@ -21,6 +21,7 @@ public class GameInstance : MonoBehaviour
     public GameObject targetObject;
     public UISceneGameplay uiSceneGameplayPrefab;
     public UISceneGameplay uiSceneGameplayMobilePrefab;
+    public ServerCharacter serverCharacterPrefab;
     [Header("Gameplay Database")]
     [Tooltip("Default weapon item, will be used when character not equip any weapon")]
     public Item defaultWeaponItem;

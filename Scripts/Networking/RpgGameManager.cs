@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using LiteNetLib;
 using LiteNetLibManager;
 
@@ -41,6 +42,9 @@ public class RpgGameManager : MonoBehaviour
         var errorMessage = "Unknow";
         switch (disconnectInfo.Reason)
         {
+            case DisconnectReason.DisconnectPeerCalled:
+                errorMessage = "You have been kicked from server";
+                break;
             case DisconnectReason.ConnectionFailed:
                 errorMessage = "Cannot connect to the server";
                 break;
@@ -57,8 +61,7 @@ public class RpgGameManager : MonoBehaviour
                 errorMessage = "Connection timeout";
                 break;
         }
-        if (disconnectInfo.Reason != DisconnectReason.DisconnectPeerCalled)
-            UISceneGlobal.Singleton.ShowMessageDialog("Disconnected", errorMessage, true, false, false, false);
+        UISceneGlobal.Singleton.ShowMessageDialog("Disconnected", errorMessage, true, false, false, false);
     }
 
     public void OnServerOnlineSceneLoaded()
@@ -68,5 +71,7 @@ public class RpgGameManager : MonoBehaviour
         {
             monsterSpawnArea.RandomSpawn(networkManager);
         }
+        if (networkManager.IsServer && !networkManager.IsClient && GameInstance.Singleton.serverCharacterPrefab != null)
+            Instantiate(GameInstance.Singleton.serverCharacterPrefab);
     }
 }

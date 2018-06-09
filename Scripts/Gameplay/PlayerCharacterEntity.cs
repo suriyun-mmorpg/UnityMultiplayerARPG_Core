@@ -129,8 +129,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
             return;
         }
     }
-
-
+    
     protected virtual void OnCollisionEnter(Collision collision)
     {
         if (!isGrounded && collision.impulse.y > 0)
@@ -148,8 +147,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         base.FixedUpdate();
         if (!IsServer && !IsOwnerClient)
             return;
-
-        var gameInstance = GameInstance.Singleton;
+        
         var velocity = CacheRigidbody.velocity;
         if (CurrentHp > 0)
         {
