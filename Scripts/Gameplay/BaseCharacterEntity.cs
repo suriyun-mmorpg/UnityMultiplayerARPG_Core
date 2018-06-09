@@ -55,6 +55,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public GameObject[] nonOwnerObjects;
     [Tooltip("Model will be instantiated inside this transform, if not set will use this component's transform")]
     public Transform modelContainer;
+    public float actionAnimationTransition = 0.2f;
     #endregion
 
     #region Protected data
@@ -561,7 +562,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (animator != null && GameInstance.ActionAnimations.TryGetValue(actionId, out actionAnimation) && actionAnimation.clip != null)
         {
             animator.SetBool(CharacterAnimationSystem.ANIM_DO_ACTION, false);
-            yield return null;
+            yield return new WaitForSecondsRealtime(actionAnimationTransition);
             model.ChangeActionClip(actionAnimation.clip);
             var actionClipMultiplier = 1f;
             switch (animActionType)
