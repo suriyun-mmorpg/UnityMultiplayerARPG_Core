@@ -26,7 +26,7 @@ public class MonsterActivitySystem : ComponentSystem
     {
         var time = Time.unscaledTime;
         var gameInstance = GameInstance.Singleton;
-        var gameplayRule = gameInstance.GameplayRule;
+        var gameplayRule = gameInstance != null ? gameInstance.GameplayRule : null;
         foreach (var comp in GetEntities<Components>())
         {
             UpdateActivity(time, gameInstance, gameplayRule, comp.monsterCharacterEntity, comp.transform, comp.navMeshAgent);
