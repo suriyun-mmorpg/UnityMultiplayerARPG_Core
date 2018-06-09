@@ -91,7 +91,7 @@ public class LanRpgNetworkManager : LiteNetLibGameManager
         selectedCharacter.SerializeCharacterData(writer);
     }
 
-    public override void DeserializeClientReadyExtra(LiteNetLibIdentity playerIdentity, NetDataReader reader)
+    public override void DeserializeClientReadyExtra(LiteNetLibIdentity playerIdentity, NetPeer peer, NetDataReader reader)
     {
         if (playerIdentity == null)
             return;
