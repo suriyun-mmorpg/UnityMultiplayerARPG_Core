@@ -103,18 +103,18 @@ public class PlayerCharacterController : BasePlayerCharacterController
 
     protected void UpdatePointClickInput()
     {
+        var isPointerOverUI = CacheUISceneGameplay != null && CacheUISceneGameplay.IsPointerOverUIObject();
         if (Input.GetMouseButtonDown(0))
         {
             isMouseDragOrHoldOrOverUI = false;
             mouseDownTime = Time.unscaledTime;
             mouseDownPosition = Input.mousePosition;
         }
-        if (!isMouseDragOrHoldOrOverUI && 
-            ((Input.mousePosition - mouseDownPosition).magnitude > DETECT_MOUSE_DRAG_DISTANCE || 
-            Time.unscaledTime - mouseDownTime > DETECT_MOUSE_HOLD_DURATION ||
-            CacheUISceneGameplay.IsPointerOverUIObject()))
+        var isMouseDragDetected = (Input.mousePosition - mouseDownPosition).magnitude > DETECT_MOUSE_DRAG_DISTANCE;
+        var isMouseHoldDetected = Time.unscaledTime - mouseDownTime > DETECT_MOUSE_HOLD_DURATION;
+        if (!isMouseDragOrHoldOrOverUI && (isMouseDragDetected || isMouseHoldDetected || isPointerOverUI))
             isMouseDragOrHoldOrOverUI = true;
-        if (!CacheUISceneGameplay.IsPointerOverUIObject() && Input.GetMouseButtonUp(0) && !isMouseDragOrHoldOrOverUI)
+        if (!isPointerOverUI && Input.GetMouseButtonUp(0) && !isMouseDragOrHoldOrOverUI)
         {
             var targetCamera = CacheGameplayCameraControls != null ? CacheGameplayCameraControls.targetCamera : Camera.main;
             CacheCharacterEntity.SetTargetEntity(null);
@@ -187,8 +187,12 @@ public class PlayerCharacterController : BasePlayerCharacterController
         var jumpInput = InputManager.GetButtonDown("Jump");
 
         var moveDirection = Vector3.zero;
-        moveDirection += CacheGameplayCameraControls.transform.forward * verticalInput;
-        moveDirection += CacheGameplayCameraControls.transform.right * horizontalInput;
+        var cameraTransform = CacheGameplayCameraControls != null ? CacheGameplayCameraControls.targetCamera.transform : Camera.main.transform;
+        if (cameraTransform != null)
+        {
+            moveDirection += cameraTransform.forward * verticalInput;
+            moveDirection += cameraTransform.right * horizontalInput;
+        }
         moveDirection.y = 0;
         moveDirection = moveDirection.normalized;
 

@@ -195,16 +195,6 @@ public class GameInstance : MonoBehaviour
             Debug.LogError("You must set item drop entity prefab");
             return;
         }
-        if (gameplayCameraPrefab == null)
-        {
-            Debug.LogError("You must set gameplay camera prefab");
-            return;
-        }
-        if (uiSceneGameplayPrefab == null)
-        {
-            Debug.LogError("You must set ui scene gameplay prefab");
-            return;
-        }
 
         InputManager.useMobileInputOnNonMobile = useMobileInEditor;
         

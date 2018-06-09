@@ -150,12 +150,21 @@ public abstract class BasePlayerCharacterController : MonoBehaviour
         if (CacheCharacterEntity.IsOwnerClient)
         {
             OwningCharacterController = this;
-            CacheMinimapCameraControls = Instantiate(gameInstance.minimapCameraPrefab);
-            CacheMinimapCameraControls.target = CacheCharacterTransform;
-            CacheGameplayCameraControls = Instantiate(gameInstance.gameplayCameraPrefab);
-            CacheGameplayCameraControls.target = CacheCharacterTransform;
-            CacheTargetObject = Instantiate(gameInstance.targetObject);
-            CacheTargetObject.gameObject.SetActive(false);
+            if (gameInstance.minimapCameraPrefab != null)
+            {
+                CacheMinimapCameraControls = Instantiate(gameInstance.minimapCameraPrefab);
+                CacheMinimapCameraControls.target = CacheCharacterTransform;
+            }
+            if (gameInstance.gameplayCameraPrefab != null)
+            {
+                CacheGameplayCameraControls = Instantiate(gameInstance.gameplayCameraPrefab);
+                CacheGameplayCameraControls.target = CacheCharacterTransform;
+            }
+            if (gameInstance.targetObject != null)
+            {
+                CacheTargetObject = Instantiate(gameInstance.targetObject);
+                CacheTargetObject.gameObject.SetActive(false);
+            }
             if (gameInstance.UISceneGameplayPrefab != null)
             {
                 CacheUISceneGameplay = Instantiate(gameInstance.UISceneGameplayPrefab);
