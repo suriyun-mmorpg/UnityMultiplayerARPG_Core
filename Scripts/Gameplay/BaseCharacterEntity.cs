@@ -560,6 +560,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         ActionAnimation actionAnimation;
         if (animator != null && GameInstance.ActionAnimations.TryGetValue(actionId, out actionAnimation) && actionAnimation.clip != null)
         {
+            animator.SetBool(CharacterAnimationSystem.ANIM_DO_ACTION, false);
+            yield return null;
             model.ChangeActionClip(actionAnimation.clip);
             var actionClipMultiplier = 1f;
             switch (animActionType)

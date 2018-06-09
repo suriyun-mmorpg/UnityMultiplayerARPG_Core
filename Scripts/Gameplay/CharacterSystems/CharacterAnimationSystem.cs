@@ -50,7 +50,7 @@ public class CharacterAnimationSystem : ComponentSystem
         var modelAnimator = characterEntity.ModelAnimator;
         if (modelAnimator != null && modelAnimator.isActiveAndEnabled)
         {
-            if (characterEntity.CurrentHp <= 0)
+            if (characterEntity.CurrentHp <= 0 && modelAnimator.GetBool(ANIM_DO_ACTION))
             {
                 // Force set to none action when dead
                 modelAnimator.SetBool(ANIM_DO_ACTION, false);
