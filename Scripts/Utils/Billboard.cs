@@ -28,6 +28,7 @@ public class Billboard : MonoBehaviour
 
     void Update()
     {
-        CacheTransform.rotation = Quaternion.Euler(Quaternion.LookRotation(CacheTargetCamera.transform.forward, CacheTargetCamera.transform.up).eulerAngles);
+        if (CacheTargetCamera != null)
+            CacheTransform.rotation = Quaternion.Euler(Quaternion.LookRotation(CacheTargetCamera.transform.forward, CacheTargetCamera.transform.up).eulerAngles);
     }
 }
