@@ -387,8 +387,8 @@ public class PlayerCharacterController : BasePlayerCharacterController
             var actDistance = gameInstance.conversationDistance - stoppingDistance;
             if (Vector3.Distance(CacheCharacterTransform.position, targetNpc.CacheTransform.position) <= actDistance)
             {
-                CacheCharacterEntity.StopMove();
                 CacheCharacterEntity.RequestNpcActivate(targetNpc.ObjectId);
+                CacheCharacterEntity.StopMove();
                 CacheCharacterEntity.SetTargetEntity(null);
             }
             else
@@ -399,8 +399,8 @@ public class PlayerCharacterController : BasePlayerCharacterController
             var actDistance = gameInstance.pickUpItemDistance - stoppingDistance;
             if (Vector3.Distance(CacheCharacterTransform.position, targetItemDrop.CacheTransform.position) <= actDistance)
             {
-                CacheCharacterEntity.StopMove();
                 CacheCharacterEntity.RequestPickupItem(targetItemDrop.ObjectId);
+                CacheCharacterEntity.StopMove();
                 CacheCharacterEntity.SetTargetEntity(null);
             }
             else
