@@ -48,6 +48,7 @@ public class GameInstance : MonoBehaviour
     public UnityScene homeScene;
     public UnityScene startScene;
     public Vector3 startPosition;
+    public UnityScene[] otherScenes;
     [Header("Player Configs")]
     public int minCharacterNameLength = 2;
     public int maxCharacterNameLength = 16;
