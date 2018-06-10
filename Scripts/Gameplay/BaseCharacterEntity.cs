@@ -339,12 +339,11 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         RegisterNetFunction("UseItem", new LiteNetLibFunction<NetFieldInt>((itemIndex) => NetFuncUseItem(itemIndex)));
         RegisterNetFunction("PlayActionAnimation", new LiteNetLibFunction<NetFieldInt, NetFieldByte>((actionId, animActionType) => NetFuncPlayActionAnimation(actionId, (AnimActionType)animActionType.Value)));
         RegisterNetFunction("PlayEffect", new LiteNetLibFunction<NetFieldInt>((effectId) => NetFuncPlayEffect(effectId)));
-        RegisterNetFunction("PickupItem", new LiteNetLibFunction(() => NetFuncPickupItem()));
+        RegisterNetFunction("PickupItem", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncPickupItem(objectId)));
         RegisterNetFunction("DropItem", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((index, amount) => NetFuncDropItem(index, amount)));
         RegisterNetFunction("EquipItem", new LiteNetLibFunction<NetFieldInt, NetFieldString>((nonEquipIndex, equipPosition) => NetFuncEquipItem(nonEquipIndex, equipPosition)));
         RegisterNetFunction("UnEquipItem", new LiteNetLibFunction<NetFieldString>((fromEquipPosition) => NetFuncUnEquipItem(fromEquipPosition)));
         RegisterNetFunction("CombatAmount", new LiteNetLibFunction<NetFieldByte, NetFieldInt>((combatAmountType, amount) => NetFuncCombatAmount((CombatAmountType)combatAmountType.Value, amount)));
-        RegisterNetFunction("SetTargetEntity", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncSetTargetEntity(objectId)));
         RegisterNetFunction("OnDead", new LiteNetLibFunction<NetFieldBool>((isInitialize) => NetFuncOnDead(isInitialize)));
         RegisterNetFunction("OnRespawn", new LiteNetLibFunction<NetFieldBool>((isInitialize) => NetFuncOnRespawn(isInitialize)));
         RegisterNetFunction("OnLevelUp", new LiteNetLibFunction(() => NetFuncOnLevelUp()));
@@ -599,31 +598,20 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// This will be called at server to order character to pickup items
     /// </summary>
     /// <param name="objectId"></param>
-    protected void NetFuncPickupItem()
+    protected void NetFuncPickupItem(uint objectId)
     {
         if (CurrentHp <= 0 || IsPlayingActionAnimation())
             return;
-
-        var gameInstance = GameInstance.Singleton;
-        ItemDropEntity itemDropEntity;
-        var isFoundTargetEntity = TryGetTargetEntity(out itemDropEntity);
-        // If have target entity but it's too far from character, don't pick it up
-        if (isFoundTargetEntity && Vector3.Distance(CacheTransform.position, itemDropEntity.CacheTransform.position) >= gameInstance.pickUpItemDistance)
+        
+        LiteNetLibIdentity entity;
+        if (!Manager.Assets.TryGetSpawnedObject(objectId, out entity))
             return;
 
-        // If target entity have not been set, try to pick up item randomly within range
-        if (!isFoundTargetEntity)
-        {
-            var foundEntities = Physics.OverlapSphere(CacheTransform.position, gameInstance.pickUpItemDistance, gameInstance.itemDropLayer.Mask);
-            foreach (var foundEntity in foundEntities)
-            {
-                itemDropEntity = foundEntity.GetComponent<ItemDropEntity>();
-                if (itemDropEntity != null)
-                    break;
-            }
-        }
-
+        var itemDropEntity = entity.GetComponent<ItemDropEntity>();
         if (itemDropEntity == null)
+            return;
+
+        if (Vector3.Distance(CacheTransform.position, itemDropEntity.CacheTransform.position) >= GameInstance.Singleton.pickUpItemDistance)
             return;
 
         var itemDropData = itemDropEntity.dropData;
@@ -764,17 +752,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         uiSceneGameplay.SpawnCombatText(combatTextTransform, combatAmountType, amount);
     }
 
-    /// <summary>
-    /// This will be called on server to set target entity
-    /// </summary>
-    /// <param name="objectId"></param>
-    protected void NetFuncSetTargetEntity(uint objectId)
-    {
-        RpgNetworkEntity entity = null;
-        Manager.Assets.TryGetSpawnedObject(objectId, out entity);
-        SetTargetEntity(entity);
-    }
-
     protected void NetFuncOnDead(bool isInitialize)
     {
         animActionType = AnimActionType.None;
@@ -835,11 +812,11 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         CallNetFunction("PlayEffect", FunctionReceivers.All, effectId);
     }
 
-    public virtual void RequestPickupItem()
+    public virtual void RequestPickupItem(uint objectId)
     {
         if (CurrentHp <= 0 || IsPlayingActionAnimation())
             return;
-        CallNetFunction("PickupItem", FunctionReceivers.Server);
+        CallNetFunction("PickupItem", FunctionReceivers.Server, objectId);
     }
 
     public virtual void RequestDropItem(int index, int amount)
@@ -866,11 +843,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public virtual void RequestCombatAmount(CombatAmountType combatAmountType, int amount)
     {
         CallNetFunction("CombatAmount", FunctionReceivers.All, combatAmountType, amount);
-    }
-
-    public virtual void RequestSetTargetEntity(uint objectId)
-    {
-        CallNetFunction("SetTargetEntity", FunctionReceivers.Server, objectId);
     }
 
     public virtual void RequestOnDead(bool isInitialize)
@@ -1297,8 +1269,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public void SetTargetEntity(RpgNetworkEntity entity)
     {
         targetEntity = entity;
-        if (!IsServer)
-            RequestSetTargetEntity(entity == null ? 0 : entity.ObjectId);
     }
 
     public bool TryGetTargetEntity<T>(out T entity) where T : RpgNetworkEntity

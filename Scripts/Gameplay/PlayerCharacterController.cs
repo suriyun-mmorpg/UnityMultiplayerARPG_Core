@@ -95,10 +95,34 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 break;
         }
 
+        // Activate nearby npcs
         if (InputManager.GetButtonDown("Activate"))
-            CacheCharacterEntity.RequestNpcActivate();
+        {
+            var foundEntities = Physics.OverlapSphere(CacheCharacterTransform.position, gameInstance.conversationDistance, gameInstance.characterLayer.Mask);
+            foreach (var foundEntity in foundEntities)
+            {
+                var npcEntity = foundEntity.GetComponent<NpcEntity>();
+                if (npcEntity != null)
+                {
+                    CacheCharacterEntity.RequestNpcActivate(npcEntity.ObjectId);
+                    break;
+                }
+            }
+        }
+        // Pick up nearby items
         if (InputManager.GetButtonDown("PickUpItem"))
-            CacheCharacterEntity.RequestPickupItem();
+        {
+            var foundEntities = Physics.OverlapSphere(CacheCharacterTransform.position, gameInstance.pickUpItemDistance, gameInstance.itemDropLayer.Mask);
+            foreach (var foundEntity in foundEntities)
+            {
+                var itemDropEntity = foundEntity.GetComponent<ItemDropEntity>();
+                if (itemDropEntity != null)
+                {
+                    CacheCharacterEntity.RequestPickupItem(itemDropEntity.ObjectId);
+                    break;
+                }
+            }
+        }
     }
 
     protected void UpdatePointClickInput()
@@ -129,6 +153,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 var monsterEntity = hitTransform.GetComponent<MonsterCharacterEntity>();
                 var npcEntity = hitTransform.GetComponent<NpcEntity>();
                 var itemDropEntity = hitTransform.GetComponent<ItemDropEntity>();
+                CacheCharacterEntity.SetTargetEntity(null);
                 if (playerEntity != null && playerEntity.CurrentHp > 0)
                 {
                     targetPosition = playerEntity.CacheTransform.position;
@@ -363,7 +388,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
             if (Vector3.Distance(CacheCharacterTransform.position, targetNpc.CacheTransform.position) <= actDistance)
             {
                 CacheCharacterEntity.StopMove();
-                CacheCharacterEntity.RequestNpcActivate();
+                CacheCharacterEntity.RequestNpcActivate(targetNpc.ObjectId);
                 CacheCharacterEntity.SetTargetEntity(null);
             }
             else
@@ -375,7 +400,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
             if (Vector3.Distance(CacheCharacterTransform.position, targetItemDrop.CacheTransform.position) <= actDistance)
             {
                 CacheCharacterEntity.StopMove();
-                CacheCharacterEntity.RequestPickupItem();
+                CacheCharacterEntity.RequestPickupItem(targetItemDrop.ObjectId);
                 CacheCharacterEntity.SetTargetEntity(null);
             }
             else
