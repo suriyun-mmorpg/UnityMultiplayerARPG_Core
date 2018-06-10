@@ -6,7 +6,6 @@ using LiteNetLibManager;
 using LiteNetLib;
 using LiteNetLib.Utils;
 
-[RequireComponent(typeof(RpgGameManager))]
 public class LanRpgNetworkManager : LiteNetLibGameManager
 {
     public static LanRpgNetworkManager Singleton { get; protected set; }
@@ -22,17 +21,6 @@ public class LanRpgNetworkManager : LiteNetLibGameManager
     public PlayerCharacterData selectedCharacter;
     protected float lastSaveTime;
 
-    private RpgGameManager cacheGameManager;
-    public RpgGameManager GameManager
-    {
-        get
-        {
-            if (cacheGameManager == null)
-                cacheGameManager = GetComponent<RpgGameManager>();
-            return cacheGameManager;
-        }
-    }
-
     protected override void Awake()
     {
         Singleton = this;
@@ -42,7 +30,6 @@ public class LanRpgNetworkManager : LiteNetLibGameManager
 
     public void StartGame()
     {
-        GameManager.Init(this);
         var gameInstance = GameInstance.Singleton;
         var gameServiceConnection = gameInstance.NetworkSetting;
         switch (startType)
@@ -72,18 +59,6 @@ public class LanRpgNetworkManager : LiteNetLibGameManager
                 owningCharacter.SavePersistentCharacterData();
             lastSaveTime = Time.unscaledTime;
         }
-    }
-
-    public override void OnClientDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
-    {
-        base.OnClientDisconnected(peer, disconnectInfo);
-        GameManager.OnClientDisconnected(peer, disconnectInfo);
-    }
-
-    public override void OnServerOnlineSceneLoaded()
-    {
-        base.OnServerOnlineSceneLoaded();
-        GameManager.OnServerOnlineSceneLoaded();
     }
 
     public override void SerializeClientReadyExtra(NetDataWriter writer)

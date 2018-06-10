@@ -143,8 +143,8 @@ public class UISceneGameplay : MonoBehaviour
 
     public void OnClickExit()
     {
-        var gameManager = FindObjectOfType<RpgGameManager>();
-        gameManager.Disconnect();
+        var gameManager = FindObjectOfType<BaseGameNetworkManager>();
+        gameManager.StopHost();
     }
 
     public void OnCharacterDead(bool isInitialize)

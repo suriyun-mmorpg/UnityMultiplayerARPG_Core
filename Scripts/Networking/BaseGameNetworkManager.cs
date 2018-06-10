@@ -5,17 +5,27 @@ using UnityEngine.AI;
 using LiteNetLib;
 using LiteNetLibManager;
 
-public class RpgGameManager : MonoBehaviour
+public class BaseGameNetworkManager : LiteNetLibGameManager
 {
-    private LiteNetLibGameManager networkManager;
 
-    public void Init(LiteNetLibGameManager networkManager)
+    public override bool StartServer()
     {
-        this.networkManager = networkManager;
-        networkManager.doNotEnterGameOnConnect = false;
+        Init();
+        return base.StartServer();
+    }
+
+    public override LiteNetLibClient StartClient(string networkAddress, int networkPort, string connectKey)
+    {
+        Init();
+        return base.StartClient(networkAddress, networkPort, connectKey);
+    }
+
+    public void Init()
+    {
+        doNotEnterGameOnConnect = false;
         var gameInstance = GameInstance.Singleton;
-        networkManager.Assets.offlineScene.SceneName = gameInstance.homeScene;
-        networkManager.Assets.playerPrefab = gameInstance.playerCharacterEntityPrefab.Identity;
+        Assets.offlineScene.SceneName = gameInstance.homeScene;
+        Assets.playerPrefab = gameInstance.playerCharacterEntityPrefab.Identity;
         var spawnablePrefabs = new List<LiteNetLibIdentity>();
         spawnablePrefabs.Add(gameInstance.monsterCharacterEntityPrefab.Identity);
         spawnablePrefabs.Add(gameInstance.itemDropEntityPrefab.Identity);
@@ -24,12 +34,27 @@ public class RpgGameManager : MonoBehaviour
         {
             spawnablePrefabs.Add(damageEntity.Identity);
         }
-        networkManager.Assets.spawnablePrefabs = spawnablePrefabs.ToArray();
+        Assets.spawnablePrefabs = spawnablePrefabs.ToArray();
     }
 
-    public void Disconnect()
+    public void SendChatMessage(string message)
     {
-        networkManager.StopHost();
+
+    }
+
+    public void SendChatWhisperMessage(string targetCharacterName, string message)
+    {
+
+    }
+
+    public void SendChatPartyMessage(string message)
+    {
+
+    }
+
+    public void SendChatGuildMessage(string message)
+    {
+
     }
 
     public void Quit()
@@ -37,8 +62,9 @@ public class RpgGameManager : MonoBehaviour
         Application.Quit();
     }
 
-    public void OnClientDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
+    public override void OnClientDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
     {
+        base.OnClientDisconnected(peer, disconnectInfo);
         var errorMessage = "Unknow";
         switch (disconnectInfo.Reason)
         {
@@ -64,14 +90,15 @@ public class RpgGameManager : MonoBehaviour
         UISceneGlobal.Singleton.ShowMessageDialog("Disconnected", errorMessage, true, false, false, false);
     }
 
-    public void OnServerOnlineSceneLoaded()
+    public override void OnServerOnlineSceneLoaded()
     {
+        base.OnServerOnlineSceneLoaded();
         var monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
         foreach (var monsterSpawnArea in monsterSpawnAreas)
         {
-            monsterSpawnArea.RandomSpawn(networkManager);
+            monsterSpawnArea.RandomSpawn(this);
         }
-        if (networkManager.IsServer && !networkManager.IsClient && GameInstance.Singleton.serverCharacterPrefab != null)
+        if (IsServer && !IsClient && GameInstance.Singleton.serverCharacterPrefab != null)
             Instantiate(GameInstance.Singleton.serverCharacterPrefab);
     }
 }
