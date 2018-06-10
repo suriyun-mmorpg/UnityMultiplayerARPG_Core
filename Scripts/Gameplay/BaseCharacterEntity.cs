@@ -574,11 +574,11 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                 AudioSource.PlayClipAtPoint(soundEffect, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
             animator.SetFloat(CharacterAnimationSystem.ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
             animator.SetBool(CharacterAnimationSystem.ANIM_DO_ACTION, true);
+            // Waits by current transition + clip duration before end animation
             yield return new WaitForSecondsRealtime(animator.GetAnimatorTransitionInfo(0).duration + (actionAnimation.ClipLength / playSpeedMultiplier));
             animator.SetBool(CharacterAnimationSystem.ANIM_DO_ACTION, false);
-            yield return new WaitForSecondsRealtime(animator.GetAnimatorTransitionInfo(0).duration);
-            // Waits by extra duration before end animation state
-            yield return new WaitForSecondsRealtime(actionAnimation.extraDuration / playSpeedMultiplier);
+            // Waits by current transition + extra duration before end playing animation state
+            yield return new WaitForSecondsRealtime(animator.GetAnimatorTransitionInfo(0).duration + (actionAnimation.extraDuration / playSpeedMultiplier));
         }
         this.animActionType = AnimActionType.None;
     }
