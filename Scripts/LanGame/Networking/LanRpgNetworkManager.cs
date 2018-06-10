@@ -1,12 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 using LiteNetLibManager;
 using LiteNetLib;
 using LiteNetLib.Utils;
 
-public class LanRpgNetworkManager : LiteNetLibGameManager
+public class LanRpgNetworkManager : BaseGameNetworkManager
 {
     public static LanRpgNetworkManager Singleton { get; protected set; }
     public enum GameStartType
