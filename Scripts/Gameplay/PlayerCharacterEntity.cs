@@ -425,7 +425,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         if (npcEntity == null)
             return;
         
-        if (Vector3.Distance(CacheTransform.position, npcEntity.CacheTransform.position) >= GameInstance.Singleton.conversationDistance)
+        if (Vector3.Distance(CacheTransform.position, npcEntity.CacheTransform.position) > GameInstance.Singleton.conversationDistance + CacheCapsuleCollider.radius)
             return;
         
         currentNpcDialog = npcEntity.startDialog;

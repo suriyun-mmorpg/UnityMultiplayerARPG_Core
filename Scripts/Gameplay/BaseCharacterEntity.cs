@@ -611,7 +611,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (itemDropEntity == null)
             return;
 
-        if (Vector3.Distance(CacheTransform.position, itemDropEntity.CacheTransform.position) >= GameInstance.Singleton.pickUpItemDistance)
+        if (Vector3.Distance(CacheTransform.position, itemDropEntity.CacheTransform.position) > GameInstance.Singleton.pickUpItemDistance + CacheCapsuleCollider.radius)
             return;
 
         var itemDropData = itemDropEntity.dropData;
