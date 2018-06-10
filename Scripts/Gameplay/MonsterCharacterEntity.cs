@@ -282,7 +282,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         if (!IsServer || CurrentHp > 0)
             return;
         base.Respawn();
-        CacheTransform.position = respawnPosition;
+        CacheNetTransform.Teleport(respawnPosition, CacheTransform.rotation);
         StopMove();
         MonsterActivitySystem.RandomNextWanderTime(Time.unscaledTime, this, CacheTransform);
         isHidding.Value = false;

@@ -34,7 +34,15 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     public int SkillPoint { get { return skillPoint.Value; } set { skillPoint.Value = value; } }
     public int Gold { get { return gold.Value; } set { gold.Value = value; } }
     public string CurrentMapName { get { return SceneManager.GetActiveScene().name; } set { } }
-    public Vector3 CurrentPosition { get { return CacheTransform.position; } set { CacheTransform.position = value; } }
+    public Vector3 CurrentPosition
+    {
+        get { return CacheTransform.position; }
+        set
+        {
+            CacheNetTransform.Teleport(value, CacheTransform.rotation);
+            CacheTransform.position = value;
+        }
+    }
     public string RespawnMapName { get; set; }
     public Vector3 RespawnPosition { get; set; }
     public int LastUpdate { get; set; }
