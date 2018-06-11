@@ -29,13 +29,13 @@ public static class PlayerCharacterDataExtension
         to.RespawnMapName = from.RespawnMapName;
         to.RespawnPosition = from.RespawnPosition;
         to.LastUpdate = from.LastUpdate;
-        to.Attributes = from.Attributes;
-        to.Skills = from.Skills;
-        to.Buffs = from.Buffs;
-        to.EquipItems = from.EquipItems;
-        to.NonEquipItems = from.NonEquipItems;
-        to.Hotkeys = from.Hotkeys;
-        to.Quests = from.Quests;
+        to.Attributes = new List<CharacterAttribute>(from.Attributes);
+        to.Buffs = new List<CharacterBuff>(from.Buffs);
+        to.Hotkeys = new List<CharacterHotkey>(from.Hotkeys);
+        to.Quests = new List<CharacterQuest>(from.Quests);
+        to.EquipItems = new List<CharacterItem>(from.EquipItems);
+        to.NonEquipItems = new List<CharacterItem>(from.NonEquipItems);
+        to.Skills = new List<CharacterSkill>(from.Skills);
         return to;
     }
 
