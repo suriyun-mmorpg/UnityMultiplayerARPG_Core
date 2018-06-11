@@ -7,7 +7,7 @@ public static class CharacterDataExtension
     public static BaseCharacter GetDatabase(this ICharacterData data)
     {
         BaseCharacter database = null;
-        if (string.IsNullOrEmpty(data.DatabaseId) || !GameInstance.AllCharacters.TryGetValue(data.DatabaseId, out database))
+        if (!GameInstance.AllCharacters.TryGetValue(data.DataId, out database))
             return null;
 
         return database;
@@ -16,7 +16,7 @@ public static class CharacterDataExtension
     public static CharacterModel InstantiateModel(this ICharacterData data, Transform parent)
     {
         BaseCharacter character = null;
-        if (string.IsNullOrEmpty(data.DatabaseId) || !GameInstance.AllCharacters.TryGetValue(data.DatabaseId, out character))
+        if (!GameInstance.AllCharacters.TryGetValue(data.DataId, out character))
             return null;
 
         var result = Object.Instantiate(character.model, parent);
@@ -403,7 +403,7 @@ public static class CharacterDataExtension
     }
     #endregion
 
-    public static int CountNonEquipItems(this ICharacterData data, string itemId)
+    public static int CountNonEquipItems(this ICharacterData data, int dataId)
     {
         var count = 0;
         if (data != null && data.NonEquipItems.Count > 0)
@@ -411,18 +411,18 @@ public static class CharacterDataExtension
             var nonEquipItems = data.NonEquipItems;
             foreach (var nonEquipItem in nonEquipItems)
             {
-                if (nonEquipItem.itemId.Equals(itemId))
+                if (nonEquipItem.dataId == dataId)
                     count += nonEquipItem.amount;
             }
         }
         return count;
     }
 
-    public static bool IncreaseItems(this ICharacterData data, string itemId, int level, int amount)
+    public static bool IncreaseItems(this ICharacterData data, int dataId, int level, int amount)
     {
         Item itemData;
         // If item not valid
-        if (string.IsNullOrEmpty(itemId) || amount <= 0 || !GameInstance.Items.TryGetValue(itemId, out itemData))
+        if (amount <= 0 || !GameInstance.Items.TryGetValue(dataId, out itemData))
             return false;
 
         var maxStack = itemData.maxStack;
@@ -437,7 +437,7 @@ public static class CharacterDataExtension
                 // If current entry is not valid, add it to empty list, going to replacing it later
                 emptySlots[i] = nonEquipItem;
             }
-            else if (nonEquipItem.itemId.Equals(itemId))
+            else if (nonEquipItem.dataId == dataId)
             {
                 // If same item id, increase its amount
                 if (nonEquipItem.amount + amount <= maxStack)
@@ -449,8 +449,8 @@ public static class CharacterDataExtension
                 }
                 else if (maxStack - nonEquipItem.amount > 0)
                 {
-                    amount = maxStack - nonEquipItem.amount;
-                    nonEquipItem.amount = amount;
+                    amount = maxStack - (maxStack - nonEquipItem.amount);
+                    nonEquipItem.amount = maxStack;
                     changes[i] = nonEquipItem;
                 }
             }
@@ -462,7 +462,7 @@ public static class CharacterDataExtension
             foreach (var emptySlot in emptySlots)
             {
                 var value = emptySlot.Value;
-                var newItem = CharacterItem.Create(itemId, level);
+                var newItem = CharacterItem.Create(dataId, level);
                 var addAmount = 0;
                 if (amount - maxStack >= 0)
                 {
@@ -488,7 +488,7 @@ public static class CharacterDataExtension
         // Add new items
         while (amount > 0)
         {
-            var newItem = CharacterItem.Create(itemId, level);
+            var newItem = CharacterItem.Create(dataId, level);
             var addAmount = 0;
             if (amount - maxStack >= 0)
             {
@@ -506,13 +506,13 @@ public static class CharacterDataExtension
         return true;
     }
 
-    public static bool DecreaseItems(this ICharacterData data, string itemId, int amount)
+    public static bool DecreaseItems(this ICharacterData data, int dataId, int amount)
     {
         Dictionary<CharacterItem, int> decreaseItems;
-        return DecreaseItems(data, itemId, amount, out decreaseItems);
+        return DecreaseItems(data, dataId, amount, out decreaseItems);
     }
 
-    public static bool DecreaseItems(this ICharacterData data, string itemId, int amount, out Dictionary<CharacterItem, int> decreaseItems)
+    public static bool DecreaseItems(this ICharacterData data, int dataId, int amount, out Dictionary<CharacterItem, int> decreaseItems)
     {
         decreaseItems = new Dictionary<CharacterItem, int>();
         var decreasingItemIndexes = new Dictionary<int, int>();
@@ -521,7 +521,7 @@ public static class CharacterDataExtension
         for (var i = 0; i < nonEquipItems.Count; ++i)
         {
             var nonEquipItem = nonEquipItems[i];
-            if (!string.IsNullOrEmpty(nonEquipItem.itemId) && nonEquipItem.itemId.Equals(itemId))
+            if (nonEquipItem.dataId == dataId)
             {
                 if (amount - nonEquipItem.amount > 0)
                     tempDecresingAmount = nonEquipItem.amount;
@@ -538,18 +538,18 @@ public static class CharacterDataExtension
         foreach (var decreasingItem in decreasingItemIndexes)
         {
             decreaseItems.Add(data.NonEquipItems[decreasingItem.Key], decreasingItem.Value);
-            DecreaseItems(data, decreasingItem.Key, decreasingItem.Value);
+            DecreaseItemsByIndex(data, decreasingItem.Key, decreasingItem.Value);
         }
         return true;
     }
 
-    public static bool DecreaseItems(this ICharacterData data, AmmoType ammoType, int amount)
+    public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, int amount)
     {
         Dictionary<CharacterItem, int> decreaseItems;
-        return DecreaseItems(data, ammoType, amount, out decreaseItems);
+        return DecreaseAmmos(data, ammoType, amount, out decreaseItems);
     }
 
-    public static bool DecreaseItems(this ICharacterData data, AmmoType ammoType, int amount, out Dictionary<CharacterItem, int> decreaseItems)
+    public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, int amount, out Dictionary<CharacterItem, int> decreaseItems)
     {
         decreaseItems = new Dictionary<CharacterItem, int>();
         var decreasingItemIndexes = new Dictionary<int, int>();
@@ -575,12 +575,12 @@ public static class CharacterDataExtension
         foreach (var decreasingItem in decreasingItemIndexes)
         {
             decreaseItems.Add(data.NonEquipItems[decreasingItem.Key], decreasingItem.Value);
-            DecreaseItems(data, decreasingItem.Key, decreasingItem.Value);
+            DecreaseItemsByIndex(data, decreasingItem.Key, decreasingItem.Value);
         }
         return true;
     }
 
-    public static bool DecreaseItems(this ICharacterData data, int index, int amount)
+    public static bool DecreaseItemsByIndex(this ICharacterData data, int index, int amount)
     {
         if (index < 0 || index > data.NonEquipItems.Count)
             return false;
@@ -637,7 +637,7 @@ public static class CharacterDataExtension
         return GameInstance.Singleton.defaultWeaponItem.CanAttack(data);
     }
 
-    public static int IndexOfAttribute(this ICharacterData data, string attributeId)
+    public static int IndexOfAttribute(this ICharacterData data, int dataId)
     {
         var list = data.Attributes;
         CharacterAttribute tempAttribute;
@@ -645,8 +645,7 @@ public static class CharacterDataExtension
         for (var i = 0; i < list.Count; ++i)
         {
             tempAttribute = list[i];
-            if (!string.IsNullOrEmpty(tempAttribute.attributeId) &&
-                tempAttribute.attributeId.Equals(attributeId))
+            if (tempAttribute.dataId == dataId)
             {
                 index = i;
                 break;
@@ -655,7 +654,7 @@ public static class CharacterDataExtension
         return index;
     }
 
-    public static int IndexOfSkill(this ICharacterData data, string skillId)
+    public static int IndexOfSkill(this ICharacterData data, int dataId)
     {
         var list = data.Skills;
         CharacterSkill tempSkill;
@@ -663,8 +662,7 @@ public static class CharacterDataExtension
         for (var i = 0; i < list.Count; ++i)
         {
             tempSkill = list[i];
-            if (!string.IsNullOrEmpty(tempSkill.skillId) &&
-                tempSkill.skillId.Equals(skillId))
+            if (tempSkill.dataId == dataId)
             {
                 index = i;
                 break;
@@ -673,7 +671,7 @@ public static class CharacterDataExtension
         return index;
     }
 
-    public static int IndexOfBuff(this ICharacterData data, string characterId, string dataId, BuffType type)
+    public static int IndexOfBuff(this ICharacterData data, string characterId, int dataId, BuffType type)
     {
         var list = data.Buffs;
         CharacterBuff tempBuff;
@@ -681,7 +679,7 @@ public static class CharacterDataExtension
         for (var i = 0; i < list.Count; ++i)
         {
             tempBuff = list[i];
-            if (tempBuff.characterId.Equals(characterId) && tempBuff.dataId.Equals(dataId) && tempBuff.type == type)
+            if (tempBuff.characterId.Equals(characterId) && tempBuff.dataId == dataId && tempBuff.type == type)
             {
                 index = i;
                 break;
@@ -690,7 +688,7 @@ public static class CharacterDataExtension
         return index;
     }
 
-    public static int IndexOfEquipItem(this ICharacterData data, string itemId)
+    public static int IndexOfEquipItem(this ICharacterData data, int dataId)
     {
         var list = data.EquipItems;
         CharacterItem tempItem;
@@ -698,8 +696,7 @@ public static class CharacterDataExtension
         for (var i = 0; i < list.Count; ++i)
         {
             tempItem = list[i];
-            if (!string.IsNullOrEmpty(tempItem.itemId) &&
-                tempItem.itemId.Equals(itemId))
+            if (tempItem.dataId == dataId)
             {
                 index = i;
                 break;
@@ -708,7 +705,7 @@ public static class CharacterDataExtension
         return index;
     }
 
-    public static int IndexOfNonEquipItem(this ICharacterData data, string itemId)
+    public static int IndexOfNonEquipItem(this ICharacterData data, int dataId)
     {
         var list = data.NonEquipItems;
         CharacterItem tempItem;
@@ -716,8 +713,7 @@ public static class CharacterDataExtension
         for (var i = 0; i < list.Count; ++i)
         {
             tempItem = list[i];
-            if (!string.IsNullOrEmpty(tempItem.itemId) &&
-                tempItem.itemId.Equals(itemId))
+            if (tempItem.dataId == dataId)
             {
                 index = i;
                 break;

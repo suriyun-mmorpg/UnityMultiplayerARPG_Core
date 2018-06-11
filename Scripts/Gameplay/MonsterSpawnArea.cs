@@ -18,9 +18,9 @@ public class MonsterSpawnArea : MonoBehaviour
             return;
         }
         var gameInstance = GameInstance.Singleton;
-        var databaseId = database.Id;
+        var dataId = database.HashId;
         MonsterCharacter foundDatabase;
-        if (!GameInstance.MonsterCharacters.TryGetValue(databaseId, out foundDatabase))
+        if (!GameInstance.MonsterCharacters.TryGetValue(dataId, out foundDatabase))
         {
             Debug.LogWarning("The monster database have to be added to game instance");
             return;
@@ -32,8 +32,8 @@ public class MonsterSpawnArea : MonoBehaviour
             var randomedRotation = Vector3.up * Random.Range(0, 360);
             var identity = manager.Assets.NetworkSpawn(gameInstance.monsterCharacterEntityPrefab.gameObject, randomedPosition, Quaternion.Euler(randomedRotation));
             var entity = identity.GetComponent<MonsterCharacterEntity>();
-            entity.Id = System.Guid.NewGuid().ToString();
-            entity.DatabaseId = databaseId;
+            entity.Id = GenericUtils.GetUniqueId();
+            entity.DataId = dataId;
             entity.Level = level;
             var stats = entity.GetStats();
             entity.CurrentHp = (int)stats.hp;

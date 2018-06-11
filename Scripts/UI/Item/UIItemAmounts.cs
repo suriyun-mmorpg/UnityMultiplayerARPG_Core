@@ -63,7 +63,7 @@ public class UIItemAmounts : UISelectionEntry<Dictionary<Item, int>>
                     text += "\n";
                 var currentAmount = 0;
                 if (owningCharacter != null)
-                    currentAmount = owningCharacter.CountNonEquipItems(item.Id);
+                    currentAmount = owningCharacter.CountNonEquipItems(item.HashId);
                 var format = currentAmount >= targetAmount ? amountFormat : amountNotReachTargetFormat;
                 var amountText = string.Format(format, dataEntry.Key.title, currentAmount.ToString("N0"), targetAmount.ToString("N0"));
                 text += amountText;

@@ -4,33 +4,28 @@ using LiteNetLib.Utils;
 using LiteNetLibManager;
 
 [System.Serializable]
-public struct CharacterAttribute
+public class CharacterAttribute
 {
     public static readonly CharacterAttribute Empty = new CharacterAttribute();
-    public string attributeId;
+    public int dataId;
     public int amount;
     [System.NonSerialized]
-    private string dirtyAttributeId;
+    private int dirtyDataId;
     [System.NonSerialized]
     private Attribute cacheAttribute;
 
     private void MakeCache()
     {
-        if (string.IsNullOrEmpty(attributeId))
+        if (!GameInstance.Attributes.ContainsKey(dataId))
         {
             cacheAttribute = null;
             return;
         }
-        if (string.IsNullOrEmpty(dirtyAttributeId) || !dirtyAttributeId.Equals(attributeId))
+        if (dirtyDataId != dataId)
         {
-            dirtyAttributeId = attributeId;
-            cacheAttribute = GameInstance.Attributes.TryGetValue(attributeId, out cacheAttribute) ? cacheAttribute : null;
+            dirtyDataId = dataId;
+            cacheAttribute = GameInstance.Attributes.TryGetValue(dataId, out cacheAttribute) ? cacheAttribute : null;
         }
-    }
-
-    public bool IsEmpty()
-    {
-        return Equals(Empty);
     }
 
     public Attribute GetAttribute()
@@ -55,14 +50,14 @@ public class NetFieldCharacterAttribute : LiteNetLibNetField<CharacterAttribute>
     public override void Deserialize(NetDataReader reader)
     {
         var newValue = new CharacterAttribute();
-        newValue.attributeId = reader.GetString();
+        newValue.dataId = reader.GetInt();
         newValue.amount = reader.GetInt();
         Value = newValue;
     }
 
     public override void Serialize(NetDataWriter writer)
     {
-        writer.Put(Value.attributeId);
+        writer.Put(Value.dataId);
         writer.Put(Value.amount);
     }
 

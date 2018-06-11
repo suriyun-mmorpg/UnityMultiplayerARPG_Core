@@ -4,44 +4,39 @@ using LiteNetLib.Utils;
 using LiteNetLibManager;
 
 [System.Serializable]
-public struct CharacterQuest
+public class CharacterQuest
 {
     public static readonly CharacterQuest Empty = new CharacterQuest();
-    public string questId;
+    public int dataId;
     public bool isComplete;
-    public Dictionary<string, int> killedMonsters;
+    public Dictionary<int, int> killedMonsters = new Dictionary<int, int>();
     [System.NonSerialized]
-    private string dirtyQuestId;
+    private int dirtyDataId;
     [System.NonSerialized]
     private Quest cacheQuest;
 
-    public Dictionary<string, int> KilledMonsters
+    public Dictionary<int, int> KilledMonsters
     {
         get
         {
             if (killedMonsters == null)
-                killedMonsters = new Dictionary<string, int>();
+                killedMonsters = new Dictionary<int, int>();
             return killedMonsters;
         }
     }
 
     private void MakeCache()
     {
-        if (string.IsNullOrEmpty(questId))
+        if (!GameInstance.Quests.ContainsKey(dataId))
         {
             cacheQuest = null;
             return;
         }
-        if (string.IsNullOrEmpty(dirtyQuestId) || !dirtyQuestId.Equals(questId))
+        if (dirtyDataId != dataId)
         {
-            dirtyQuestId = questId;
-            cacheQuest = GameInstance.Quests.TryGetValue(questId, out cacheQuest) ? cacheQuest : null;
+            dirtyDataId = dataId;
+            cacheQuest = GameInstance.Quests.TryGetValue(dataId, out cacheQuest) ? cacheQuest : null;
         }
-    }
-
-    public bool IsEmpty()
-    {
-        return Equals(Empty);
     }
 
     public Quest GetQuest()
@@ -78,12 +73,12 @@ public struct CharacterQuest
         {
             case QuestTaskType.KillMonster:
                 var monsterCharacterAmount = task.monsterCharacterAmount;
-                progress = monsterCharacterAmount.monster == null ? 0 : CountKillMonster(monsterCharacterAmount.monster.Id);
+                progress = monsterCharacterAmount.monster == null ? 0 : CountKillMonster(monsterCharacterAmount.monster.HashId);
                 isComplete = progress >= monsterCharacterAmount.amount;
                 return progress;
             case QuestTaskType.CollectItem:
                 var itemAmount = task.itemAmount;
-                progress = itemAmount.item == null ? 0 : character.CountNonEquipItems(itemAmount.item.Id);
+                progress = itemAmount.item == null ? 0 : character.CountNonEquipItems(itemAmount.item.HashId);
                 isComplete = progress >= itemAmount.amount;
                 return progress;
         }
@@ -92,32 +87,31 @@ public struct CharacterQuest
 
     public bool AddKillMonster(MonsterCharacterEntity monsterEntity, int killCount)
     {
-        return AddKillMonster(monsterEntity.DatabaseId, killCount);
+        return AddKillMonster(monsterEntity.DataId, killCount);
     }
 
-    public bool AddKillMonster(string monsterId, int killCount)
+    public bool AddKillMonster(int monsterDataId, int killCount)
     {
         var quest = GetQuest();
-        if (quest == null || !quest.CacheKillMonsterIds.Contains(monsterId))
+        if (quest == null || !quest.CacheKillMonsterIds.Contains(monsterDataId))
             return false;
-        if (!KilledMonsters.ContainsKey(monsterId))
-            KilledMonsters.Add(monsterId, 0);
-        KilledMonsters[monsterId] += killCount;
+        if (!KilledMonsters.ContainsKey(monsterDataId))
+            KilledMonsters.Add(monsterDataId, 0);
+        KilledMonsters[monsterDataId] += killCount;
         return true;
     }
 
-    public int CountKillMonster(string monsterId)
+    public int CountKillMonster(int monsterDataId)
     {
         var count = 0;
-        if (!string.IsNullOrEmpty(monsterId))
-            KilledMonsters.TryGetValue(monsterId, out count);
+        KilledMonsters.TryGetValue(monsterDataId, out count);
         return count;
     }
 
     public static CharacterQuest Create(Quest quest)
     {
         var newQuest = new CharacterQuest();
-        newQuest.questId = quest.Id;
+        newQuest.dataId = quest.HashId;
         newQuest.isComplete = false;
         return newQuest;
     }
@@ -128,19 +122,19 @@ public class NetFieldCharacterQuest : LiteNetLibNetField<CharacterQuest>
     public override void Deserialize(NetDataReader reader)
     {
         var newValue = new CharacterQuest();
-        newValue.questId = reader.GetString();
+        newValue.dataId = reader.GetInt();
         newValue.isComplete = reader.GetBool();
         var killMonsterCount = reader.GetInt();
         for (var i = 0; i < killMonsterCount; ++i)
         {
-            newValue.KilledMonsters.Add(reader.GetString(), reader.GetInt());
+            newValue.KilledMonsters.Add(reader.GetInt(), reader.GetInt());
         }
         Value = newValue;
     }
 
     public override void Serialize(NetDataWriter writer)
     {
-        writer.Put(Value.questId);
+        writer.Put(Value.dataId);
         writer.Put(Value.isComplete);
         var killedMonsters = Value.KilledMonsters;
         var killMonsterCount = killedMonsters.Count;

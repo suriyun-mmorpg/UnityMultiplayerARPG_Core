@@ -131,7 +131,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         SetTargetEntity(target);
     }
 
-    public override void ReceiveDamage(BaseCharacterEntity attacker, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff? debuff, int hitEffectsId)
+    public override void ReceiveDamage(BaseCharacterEntity attacker, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId)
     {
         // Damage calculations apply at server only
         if (!IsServer || CurrentHp <= 0)
@@ -263,12 +263,12 @@ public class MonsterCharacterEntity : BaseCharacterEntity
             {
                 var item = randomItem.item;
                 var amount = randomItem.amount;
-                if (item != null && GameInstance.Items.ContainsKey(item.Id))
+                if (item != null && GameInstance.Items.ContainsKey(item.HashId))
                 {
-                    var itemId = item.Id;
+                    var itemDataId = item.HashId;
                     if (amount > item.maxStack)
                         amount = item.maxStack;
-                    ItemDropEntity.DropItem(this, itemId, 1, amount);
+                    ItemDropEntity.DropItem(this, itemDataId, 1, amount);
                 }
             }
         }

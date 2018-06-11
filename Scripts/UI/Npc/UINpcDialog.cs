@@ -73,7 +73,7 @@ public class UINpcDialog : UISelectionEntry<NpcDialog>
                         completeMenuAction.menuIndex = NpcDialog.QUEST_COMPLETE_MENU_INDEX;
 
                         CharacterQuest characterQuest;
-                        var index = owningCharacter.IndexOfQuest(quest.Id);
+                        var index = owningCharacter.IndexOfQuest(quest.HashId);
                         if (index >= 0)
                         {
                             characterQuest = owningCharacter.quests[index];

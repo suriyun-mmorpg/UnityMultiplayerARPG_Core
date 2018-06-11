@@ -8,13 +8,13 @@ public class ItemDropEntity : RpgNetworkEntity
 {
     public CharacterItem dropData;
     public Transform modelContainer;
-    public SyncFieldString itemId = new SyncFieldString();
+    public SyncFieldInt itemDataId = new SyncFieldInt();
     public Item Item
     {
         get
         {
             Item item;
-            if (GameInstance.Items.TryGetValue(itemId, out item))
+            if (GameInstance.Items.TryGetValue(itemDataId, out item))
                 return item;
             return null;
         }
@@ -51,10 +51,10 @@ public class ItemDropEntity : RpgNetworkEntity
         base.Start();
         if (IsServer)
         {
-            var id = dropData.itemId;
+            var id = dropData.dataId;
             if (!GameInstance.Items.ContainsKey(id))
                 NetworkDestroy();
-            itemId.Value = id;
+            itemDataId.Value = id;
             NetworkDestroy(GameInstance.Singleton.itemAppearDuration);
         }
     }
@@ -62,16 +62,16 @@ public class ItemDropEntity : RpgNetworkEntity
     public override void OnSetup()
     {
         base.OnSetup();
-        itemId.sendOptions = SendOptions.ReliableOrdered;
-        itemId.forOwnerOnly = false;
-        itemId.onChange += OnItemIdChange;
+        itemDataId.sendOptions = SendOptions.ReliableOrdered;
+        itemDataId.forOwnerOnly = false;
+        itemDataId.onChange += OnItemDataIdChange;
     }
 
-    protected void OnItemIdChange(string itemId)
+    protected void OnItemDataIdChange(int itemDataId)
     {
         var gameInstance = GameInstance.Singleton;
         Item item;
-        if (GameInstance.Items.TryGetValue(itemId, out item) && item.dropModel != null)
+        if (GameInstance.Items.TryGetValue(itemDataId, out item) && item.dropModel != null)
         {
             var model = Instantiate(item.dropModel, CacheModelContainer);
             model.gameObject.SetLayerRecursively(GameInstance.Singleton.itemDropLayer, true);
@@ -84,10 +84,10 @@ public class ItemDropEntity : RpgNetworkEntity
 
     private void OnDestroy()
     {
-        itemId.onChange -= OnItemIdChange;
+        itemDataId.onChange -= OnItemDataIdChange;
     }
 
-    public static ItemDropEntity DropItem(RpgNetworkEntity dropper, string itemId, int level, int amount)
+    public static ItemDropEntity DropItem(RpgNetworkEntity dropper, int itemDataId, int level, int amount)
     {
         var gameInstance = GameInstance.Singleton;
         var dropPosition = dropper.CacheTransform.position + new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, 0, Random.Range(-1f, 1f) * gameInstance.dropDistance);
@@ -116,7 +116,7 @@ public class ItemDropEntity : RpgNetworkEntity
         var dropRotation = Vector3.up * Random.Range(0, 360);
         var identity = dropper.Manager.Assets.NetworkSpawn(gameInstance.itemDropEntityPrefab.gameObject, dropPosition, Quaternion.Euler(dropRotation));
         var itemDropEntity = identity.GetComponent<ItemDropEntity>();
-        var dropData = CharacterItem.Create(itemId, level, amount);
+        var dropData = CharacterItem.Create(itemDataId, level, amount);
         itemDropEntity.dropData = dropData;
         return itemDropEntity;
     }

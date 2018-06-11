@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq.Expressions;
+﻿using System.Security.Cryptography;
+using System.Text;
 using UnityEngine;
 
-public static class GenericExtension
+public static class GenericUtils
 {
     public static void SetLayerRecursively(this GameObject gameObject, int layerIndex, bool includeInactive)
     {
@@ -74,5 +73,31 @@ public static class GenericExtension
         {
             Object.DestroyImmediate(component);
         }
+    }
+
+    public static string GetUniqueId(int length = 8, string mask = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
+    {
+        char[] chars = mask.ToCharArray();
+        RNGCryptoServiceProvider crypto = new RNGCryptoServiceProvider();
+        var data = new byte[length];
+        crypto.GetNonZeroBytes(data);
+        StringBuilder result = new StringBuilder(length);
+        foreach (byte b in data)
+        {
+            result.Append(chars[b % (chars.Length - 1)]);
+        }
+        return result.ToString();
+    }
+
+    public static string GetMD5(string text)
+    {
+        // byte array representation of that string
+        byte[] encodedPassword = new UTF8Encoding().GetBytes(text);
+
+        // need MD5 to calculate the hash
+        byte[] hash = ((HashAlgorithm)CryptoConfig.CreateFromName("MD5")).ComputeHash(encodedPassword);
+
+        // string representation (similar to UNIX format)
+        return System.BitConverter.ToString(hash).Replace("-", string.Empty).ToLower();
     }
 }

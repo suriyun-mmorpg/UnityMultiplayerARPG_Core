@@ -5,13 +5,13 @@ public abstract class BaseDamageEntity : RpgNetworkEntity
 {
     protected BaseCharacterEntity attacker;
     protected Dictionary<DamageElement, MinMaxFloat> allDamageAmounts;
-    protected CharacterBuff? debuff;
+    protected CharacterBuff debuff;
     protected int hitEffectsId;
 
     public virtual void SetupDamage(
         BaseCharacterEntity attacker,
         Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
-        CharacterBuff? debuff,
+        CharacterBuff debuff,
         int hitEffectsId)
     {
         this.attacker = attacker;

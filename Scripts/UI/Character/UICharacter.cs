@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class UICharacter : UISelectionEntry<ICharacterData>
 {
-    public string databaseId { get; protected set; }
+    public int dataId { get; protected set; }
 
     [Header("Display Format")]
     [Tooltip("Name Format => {0} = {Character name}")]
@@ -97,9 +97,9 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         }
     }
 
-    public void Setup(ICharacterData data, string databaseId)
+    public void Setup(ICharacterData data, int dataId)
     {
-        this.databaseId = databaseId;
+        this.dataId = dataId;
         Data = data;
     }
 

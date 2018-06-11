@@ -20,7 +20,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     #endregion
 
     #region Sync data actions
-    public System.Action<string> onShowNpcDialog;
+    public System.Action<int> onShowNpcDialog;
     public System.Action<int> onStatPointChange;
     public System.Action<int> onSkillPointChange;
     public System.Action<int> onGoldChange;
@@ -302,9 +302,9 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         RegisterNetFunction("AddAttribute", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((attributeIndex, amount) => NetFuncAddAttribute(attributeIndex, amount)));
         RegisterNetFunction("AddSkill", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((skillIndex, amount) => NetFuncAddSkill(skillIndex, amount)));
         RegisterNetFunction("Respawn", new LiteNetLibFunction(NetFuncRespawn));
-        RegisterNetFunction("AssignHotkey", new LiteNetLibFunction<NetFieldString, NetFieldByte, NetFieldString>((hotkeyId, type, dataId) => NetFuncAssignHotkey(hotkeyId, type, dataId)));
+        RegisterNetFunction("AssignHotkey", new LiteNetLibFunction<NetFieldString, NetFieldByte, NetFieldInt>((hotkeyId, type, dataId) => NetFuncAssignHotkey(hotkeyId, type, dataId)));
         RegisterNetFunction("NpcActivate", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncNpcActivate(objectId)));
-        RegisterNetFunction("ShowNpcDialog", new LiteNetLibFunction<NetFieldString>((npcDialogId) => NetFuncShowNpcDialog(npcDialogId)));
+        RegisterNetFunction("ShowNpcDialog", new LiteNetLibFunction<NetFieldInt>((npcDialogId) => NetFuncShowNpcDialog(npcDialogId)));
         RegisterNetFunction("SelectNpcDialogMenu", new LiteNetLibFunction<NetFieldInt>((menuIndex) => NetFuncSelectNpcDialogMenu(menuIndex)));
     }
     #endregion
@@ -337,7 +337,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         if (!fromItem.IsValid() || !toItem.IsValid())
             return;
 
-        if (fromItem.itemId.Equals(toItem.itemId) && !fromItem.IsFull() && !toItem.IsFull())
+        if (fromItem.dataId.Equals(toItem.dataId) && !fromItem.IsFull() && !toItem.IsFull())
         {
             // Merge if same id and not full
             var maxStack = toItem.GetMaxStack();
@@ -399,7 +399,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         Respawn();
     }
 
-    protected void NetFuncAssignHotkey(string hotkeyId, byte type, string dataId)
+    protected void NetFuncAssignHotkey(string hotkeyId, byte type, int dataId)
     {
         var characterHotkey = new CharacterHotkey();
         characterHotkey.hotkeyId = hotkeyId;
@@ -430,13 +430,13 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         
         currentNpcDialog = npcEntity.startDialog;
         if (currentNpcDialog != null)
-            RequestShowNpcDialog(currentNpcDialog.Id);
+            RequestShowNpcDialog(currentNpcDialog.HashId);
     }
 
-    protected void NetFuncShowNpcDialog(string npcDialogId)
+    protected void NetFuncShowNpcDialog(int npcDialogDataId)
     {
         if (onShowNpcDialog != null)
-            onShowNpcDialog(npcDialogId);
+            onShowNpcDialog(npcDialogDataId);
     }
 
     protected void NetFuncSelectNpcDialogMenu(int menuIndex)
@@ -454,11 +454,11 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
                 if (!selectedMenu.IsPassConditions(this) || selectedMenu.dialog == null || selectedMenu.isCloseMenu)
                 {
                     currentNpcDialog = null;
-                    RequestShowNpcDialog("");
+                    RequestShowNpcDialog(0);
                     return;
                 }
                 currentNpcDialog = selectedMenu.dialog;
-                RequestShowNpcDialog(currentNpcDialog.Id);
+                RequestShowNpcDialog(currentNpcDialog.HashId);
                 break;
             case NpcDialogType.Quest:
                 NetFuncSelectNpcDialogQuestMenu(menuIndex);
@@ -471,48 +471,48 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         if (currentNpcDialog == null || currentNpcDialog.type != NpcDialogType.Quest || currentNpcDialog.quest == null)
         {
             currentNpcDialog = null;
-            RequestShowNpcDialog("");
+            RequestShowNpcDialog(0);
             return;
         }
         switch (menuIndex)
         {
             case NpcDialog.QUEST_ACCEPT_MENU_INDEX:
-                NetFuncAcceptQuest(currentNpcDialog.quest.Id);
+                NetFuncAcceptQuest(currentNpcDialog.quest.HashId);
                 currentNpcDialog = currentNpcDialog.questAcceptedDialog;
                 break;
             case NpcDialog.QUEST_DECLINE_MENU_INDEX:
                 currentNpcDialog = currentNpcDialog.questDeclinedDialog;
                 break;
             case NpcDialog.QUEST_ABANDON_MENU_INDEX:
-                NetFuncAbandonQuest(currentNpcDialog.quest.Id);
+                NetFuncAbandonQuest(currentNpcDialog.quest.HashId);
                 currentNpcDialog = currentNpcDialog.questAbandonedDialog;
                 break;
             case NpcDialog.QUEST_COMPLETE_MENU_INDEX:
-                NetFuncCompleteQuest(currentNpcDialog.quest.Id);
+                NetFuncCompleteQuest(currentNpcDialog.quest.HashId);
                 currentNpcDialog = currentNpcDialog.questCompletedDailog;
                 break;
         }
         if (currentNpcDialog == null)
-            RequestShowNpcDialog("");
+            RequestShowNpcDialog(0);
         else
-            RequestShowNpcDialog(currentNpcDialog.Id);
+            RequestShowNpcDialog(currentNpcDialog.HashId);
     }
 
-    protected void NetFuncAcceptQuest(string questId)
+    protected void NetFuncAcceptQuest(int questDataId)
     {
-        var indexOfQuest = this.IndexOfQuest(questId);
+        var indexOfQuest = this.IndexOfQuest(questDataId);
         Quest quest;
-        if (indexOfQuest >= 0 || !GameInstance.Quests.TryGetValue(questId, out quest))
+        if (indexOfQuest >= 0 || !GameInstance.Quests.TryGetValue(questDataId, out quest))
             return;
         var characterQuest = CharacterQuest.Create(quest);
         quests.Add(characterQuest);
     }
 
-    protected void NetFuncAbandonQuest(string questId)
+    protected void NetFuncAbandonQuest(int questDataId)
     {
-        var indexOfQuest = this.IndexOfQuest(questId);
+        var indexOfQuest = this.IndexOfQuest(questDataId);
         Quest quest;
-        if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questId, out quest))
+        if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questDataId, out quest))
             return;
         var characterQuest = quests[indexOfQuest];
         if (characterQuest.isComplete)
@@ -520,11 +520,11 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         quests.RemoveAt(indexOfQuest);
     }
 
-    protected void NetFuncCompleteQuest(string questId)
+    protected void NetFuncCompleteQuest(int questDataId)
     {
-        var indexOfQuest = this.IndexOfQuest(questId);
+        var indexOfQuest = this.IndexOfQuest(questDataId);
         Quest quest;
-        if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questId, out quest))
+        if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questDataId, out quest))
             return;
         var characterQuest = quests[indexOfQuest];
         if (!characterQuest.IsAllTasksDone(this))
@@ -537,7 +537,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
             switch (task.taskType)
             {
                 case QuestTaskType.CollectItem:
-                    this.DecreaseItems(task.itemAmount.item.Id, task.itemAmount.amount);
+                    this.DecreaseItems(task.itemAmount.item.HashId, task.itemAmount.amount);
                     break;
             }
         }
@@ -549,7 +549,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
             foreach (var rewardItem in rewardItems)
             {
                 if (rewardItem.item != null && rewardItem.amount > 0)
-                    this.IncreaseItems(rewardItem.item.Id, 1, rewardItem.amount);
+                    this.IncreaseItems(rewardItem.item.HashId, 1, rewardItem.amount);
             }
         }
         characterQuest.isComplete = true;
@@ -587,7 +587,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         CallNetFunction("Respawn", FunctionReceivers.Server);
     }
 
-    public void RequestAssignHotkey(string hotkeyId, HotkeyType type, string dataId)
+    public void RequestAssignHotkey(string hotkeyId, HotkeyType type, int dataId)
     {
         CallNetFunction("AssignHotkey", FunctionReceivers.Server, hotkeyId, (byte)type, dataId);
     }
@@ -597,9 +597,9 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         CallNetFunction("NpcActivate", FunctionReceivers.Server, objectId);
     }
 
-    public void RequestShowNpcDialog(string npcDialogId)
+    public void RequestShowNpcDialog(int npcDialogDataId)
     {
-        CallNetFunction("ShowNpcDialog", ConnectId, npcDialogId);
+        CallNetFunction("ShowNpcDialog", ConnectId, npcDialogDataId);
     }
 
     public void RequestSelectNpcDialogMenu(int menuIndex)

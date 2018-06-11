@@ -26,20 +26,20 @@ public class Quest : BaseGameData
     public int rewardGold;
     public ItemAmount[] rewardItems;
     public bool canRepeat;
-    private HashSet<string> cacheKillMonsterIds;
-    public HashSet<string> CacheKillMonsterIds
+    private HashSet<int> cacheKillMonsterIds;
+    public HashSet<int> CacheKillMonsterIds
     {
         get
         {
             if (cacheKillMonsterIds == null)
             {
-                cacheKillMonsterIds = new HashSet<string>();
+                cacheKillMonsterIds = new HashSet<int>();
                 foreach (var task in tasks)
                 {
                     if (task.taskType == QuestTaskType.KillMonster &&
                         task.monsterCharacterAmount.monster != null &&
                         task.monsterCharacterAmount.amount > 0)
-                        cacheKillMonsterIds.Add(task.monsterCharacterAmount.monster.Id);
+                        cacheKillMonsterIds.Add(task.monsterCharacterAmount.monster.HashId);
                 }
             }
             return cacheKillMonsterIds;

@@ -73,7 +73,7 @@ public class UICharacterQuest : UIDataForCharacter<CharacterQuest>
     protected void Update()
     {
         var characterQuest = Data;
-        var quest = characterQuest.GetQuest();
+        var quest = !characterQuest.IsEmpty() ? characterQuest.GetQuest() : null;
 
         if (quest != null && showQuestTaskList)
         {

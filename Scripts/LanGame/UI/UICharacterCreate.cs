@@ -44,7 +44,7 @@ public class UICharacterCreate : UIBase
         }
     }
 
-    private readonly Dictionary<string, CharacterModel> CharacterModels = new Dictionary<string, CharacterModel>();
+    private readonly Dictionary<int, CharacterModel> CharacterModels = new Dictionary<int, CharacterModel>();
     
     public override void Show()
     {
@@ -63,15 +63,15 @@ public class UICharacterCreate : UIBase
         var selectableCharacters = GameInstance.PlayerCharacters.Values.ToList();
         CacheList.Generate(selectableCharacters, (index, character, ui) =>
         {
-            var databaseId = character.Id;
+            var dataId = character.HashId;
             var characterData = new PlayerCharacterData();
-            characterData.Id = databaseId;
-            characterData.SetNewCharacterData(character.title, character.Id);
+            characterData.DataId = dataId;
+            characterData.SetNewCharacterData(character.title, character.HashId);
             var uiCharacter = ui.GetComponent<UICharacter>();
-            uiCharacter.Setup(characterData, databaseId);
+            uiCharacter.Setup(characterData, dataId);
             // Select trigger when add first entry so deactivate all models is okay beacause first model will active
             var characterModel = characterData.InstantiateModel(characterModelContainer);
-            CharacterModels[characterData.Id] = characterModel;
+            CharacterModels[characterData.dataId] = characterModel;
             characterModel.gameObject.SetActive(false);
             SelectionManager.Add(uiCharacter);
         });
@@ -87,13 +87,13 @@ public class UICharacterCreate : UIBase
     private void OnSelectCharacter(UICharacter ui)
     {
         characterModelContainer.SetChildrenActive(false);
-        ShowCharacter(ui.databaseId);
+        ShowCharacter(ui.dataId);
     }
 
-    private void ShowCharacter(string id)
+    private void ShowCharacter(int id)
     {
         CharacterModel characterModel;
-        if (string.IsNullOrEmpty(id) || !CharacterModels.TryGetValue(id, out characterModel))
+        if (!CharacterModels.TryGetValue(id, out characterModel))
             return;
         characterModel.gameObject.SetActive(true);
     }
@@ -108,7 +108,7 @@ public class UICharacterCreate : UIBase
             Debug.LogWarning("Cannot create character, did not selected character class");
             return;
         }
-        var prototypeId = selectedUI.databaseId;
+        var dataId = selectedUI.dataId;
         var characterName = inputCharacterName.text.Trim();
         var minCharacterNameLength = gameInstance.minCharacterNameLength;
         var maxCharacterNameLength = gameInstance.maxCharacterNameLength;
@@ -125,10 +125,10 @@ public class UICharacterCreate : UIBase
             return;
         }
 
-        var characterId = System.Guid.NewGuid().ToString();
+        var characterId = GenericUtils.GetUniqueId();
         var characterData = new PlayerCharacterData();
         characterData.Id = characterId;
-        characterData.SetNewCharacterData(characterName, prototypeId);
+        characterData.SetNewCharacterData(characterName, dataId);
         characterData.SavePersistentCharacterData();
 
         if (eventOnCreateCharacter != null)

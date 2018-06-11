@@ -6,7 +6,7 @@ using UnityEngine;
 public class CharacterData : ICharacterData
 {
     public string id;
-    public string databaseId;
+    public int dataId;
     public string characterName;
     public int level;
     public int exp;
@@ -24,7 +24,7 @@ public class CharacterData : ICharacterData
     public List<CharacterItem> nonEquipItems = new List<CharacterItem>();
 
     public string Id { get { return id; } set { id = value; } }
-    public string DatabaseId { get { return databaseId; } set { databaseId = value; } }
+    public int DataId { get { return dataId; } set { dataId = value; } }
     public string CharacterName { get { return characterName; } set { characterName = value; } }
     public int Level { get { return level; } set { level = value; } }
     public int Exp { get { return exp; } set { exp = value; } }

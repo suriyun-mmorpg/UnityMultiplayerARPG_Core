@@ -28,7 +28,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     #region Sync data
     [Header("Sync Fields")]
     public SyncFieldString id = new SyncFieldString();
-    public SyncFieldString databaseId = new SyncFieldString();
+    public SyncFieldInt dataId = new SyncFieldInt();
     public SyncFieldString characterName = new SyncFieldString();
     public SyncFieldInt level = new SyncFieldInt();
     public SyncFieldInt exp = new SyncFieldInt();
@@ -86,7 +86,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     #region Sync data actions
     public System.Action<string> onIdChange;
-    public System.Action<string> onDatabaseIdChange;
+    public System.Action<int> onDataIdChange;
     public System.Action<string> onCharacterNameChange;
     public System.Action<int> onLevelChange;
     public System.Action<int> onExpChange;
@@ -110,7 +110,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     #region Fields/Interface implementation
     public virtual string Id { get { return id; } set { id.Value = value; } }
-    public virtual string DatabaseId { get { return databaseId; } set { databaseId.Value = value; } }
+    public virtual int DataId { get { return dataId; } set { dataId.Value = value; } }
     public virtual string CharacterName { get { return characterName; } set { characterName.Value = value; } }
     public virtual int Level { get { return level.Value; } set { level.Value = value; } }
     public virtual int Exp { get { return exp.Value; } set { exp.Value = value; } }
@@ -290,8 +290,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     {
         id.sendOptions = SendOptions.ReliableOrdered;
         id.forOwnerOnly = false;
-        databaseId.sendOptions = SendOptions.ReliableOrdered;
-        databaseId.forOwnerOnly = false;
+        dataId.sendOptions = SendOptions.ReliableOrdered;
+        dataId.forOwnerOnly = false;
         characterName.sendOptions = SendOptions.ReliableOrdered;
         characterName.forOwnerOnly = false;
         level.sendOptions = SendOptions.ReliableOrdered;
@@ -319,7 +319,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         SetupNetElements();
         // On data changes events
         id.onChange += OnIdChange;
-        databaseId.onChange += OnDatabaseIdChange;
+        dataId.onChange += OnDataIdChange;
         characterName.onChange += OnCharacterNameChange;
         level.onChange += OnLevelChange;
         exp.onChange += OnExpChange;
@@ -352,7 +352,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected virtual void OnDestroy()
     {
         // On data changes events
-        databaseId.onChange -= OnDatabaseIdChange;
+        dataId.onChange -= OnDataIdChange;
         equipWeapons.onChange -= OnEquipWeaponsChange;
         // On list changes events
         attributes.onOperation -= OnAttributesOperation;
@@ -396,7 +396,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (weapon != null && weapon.WeaponType.requireAmmoType != null)
         {
             Dictionary<CharacterItem, int> decreaseItems;
-            if (!this.DecreaseItems(weapon.WeaponType.requireAmmoType, 1, out decreaseItems))
+            if (!this.DecreaseAmmos(weapon.WeaponType.requireAmmoType, 1, out decreaseItems))
                 return;
             var firstEntry = decreaseItems.FirstOrDefault();
             if (firstEntry.Key.GetItem() != null && firstEntry.Value > 0)
@@ -417,7 +417,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
     {
         yield return new WaitForSecondsRealtime(triggerDuration);
-        LaunchDamageEntity(position, damageInfo, allDamageAmounts, null, -1);
+        LaunchDamageEntity(position, damageInfo, allDamageAmounts, CharacterBuff.Empty, -1);
         yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
     }
 
@@ -465,7 +465,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (characterSkill.GetSkill().IsAttack() && weapon != null && weapon.WeaponType.requireAmmoType != null)
         {
             Dictionary<CharacterItem, int> decreaseItems;
-            if (!this.DecreaseItems(weapon.WeaponType.requireAmmoType, 1, out decreaseItems))
+            if (!this.DecreaseAmmos(weapon.WeaponType.requireAmmoType, 1, out decreaseItems))
                 return;
             var firstEntry = decreaseItems.FirstOrDefault();
             if (firstEntry.Key.GetItem() != null && firstEntry.Value > 0)
@@ -500,9 +500,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                 ApplySkillBuff(characterSkill);
                 if (isAttack)
                 {
-                    CharacterBuff? debuff = null;
+                    CharacterBuff debuff = CharacterBuff.Empty;
                     if (skill.isDebuff)
-                        debuff = CharacterBuff.Create(Id, BuffType.SkillDebuff, skill.Id, characterSkill.level);
+                        debuff = CharacterBuff.Create(Id, BuffType.SkillDebuff, skill.HashId, characterSkill.level);
                     LaunchDamageEntity(position, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id);
                 }
                 break;
@@ -513,9 +513,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                     foreach (var craftRequirement in craftRequirements)
                     {
                         if (craftRequirement.item != null && craftRequirement.amount > 0)
-                            this.DecreaseItems(craftRequirement.item.Id, craftRequirement.amount);
+                            this.DecreaseItems(craftRequirement.item.HashId, craftRequirement.amount);
                     }
-                    this.IncreaseItems(skill.craftingItem.Id, 1, 1);
+                    this.IncreaseItems(skill.craftingItem.HashId, 1, 1);
                 }
                 break;
         }
@@ -535,7 +535,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
         var item = nonEquipItems[itemIndex];
         var potionItem = item.GetPotionItem();
-        if (potionItem != null && this.DecreaseItems(itemIndex, 1))
+        if (potionItem != null && this.DecreaseItemsByIndex(itemIndex, 1))
             ApplyPotionBuff(item);
     }
 
@@ -621,10 +621,10 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             itemDropEntity.NetworkDestroy();
             return;
         }
-        var itemId = itemDropData.itemId;
+        var itemDataId = itemDropData.dataId;
         var level = itemDropData.level;
         var amount = itemDropData.amount;
-        if (!IncreasingItemsWillOverwhelming(itemId, level, amount) && this.IncreaseItems(itemId, level, amount))
+        if (!IncreasingItemsWillOverwhelming(itemDataId, level, amount) && this.IncreaseItems(itemDataId, level, amount))
             itemDropEntity.NetworkDestroy();
     }
 
@@ -646,10 +646,10 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (!nonEquipItem.IsValid() || amount > nonEquipItem.amount)
             return;
 
-        var itemId = nonEquipItem.itemId;
+        var itemDataId = nonEquipItem.dataId;
         var level = nonEquipItem.level;
-        if (this.DecreaseItems(index, amount))
-            ItemDropEntity.DropItem(this, itemId, level, amount);
+        if (this.DecreaseItemsByIndex(index, amount))
+            ItemDropEntity.DropItem(this, itemDataId, level, amount);
     }
 
     /// <summary>
@@ -862,16 +862,16 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Inventory helpers
-    public bool IncreasingItemsWillOverwhelming(string itemId, int level, int amount)
+    public bool IncreasingItemsWillOverwhelming(int itemDataId, int level, int amount)
     {
         Item itemData;
         // If item not valid
-        if (string.IsNullOrEmpty(itemId) || amount <= 0 || !GameInstance.Items.TryGetValue(itemId, out itemData))
+        if (amount <= 0 || !GameInstance.Items.TryGetValue(itemDataId, out itemData))
             return false;
 
         var weight = itemData.weight;
         // If overwhelming
-        if (this.GetTotalItemWeight() + (amount * weight) >= CacheStats.weightLimit)
+        if (this.GetTotalItemWeight() + (amount * weight) > CacheStats.weightLimit)
             return true;
 
         return false;
@@ -988,7 +988,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         return true;
     }
 
-    public virtual void ReceiveDamage(BaseCharacterEntity attacker, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff? debuff, int hitEffectsId)
+    public virtual void ReceiveDamage(BaseCharacterEntity attacker, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId)
     {
         var calculatingTotalDamage = 0f;
         // Damage calculations apply at server only
@@ -1055,8 +1055,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         // If current hp <= 0, character dead
         if (CurrentHp <= 0)
             Killed(attacker);
-        else if (debuff.HasValue)
-            ApplyBuff(debuff.Value.characterId, debuff.Value.dataId, debuff.Value.type, debuff.Value.level);
+        else if (!debuff.IsEmpty())
+            ApplyBuff(debuff.characterId, debuff.dataId, debuff.type, debuff.level);
     }
     #endregion
 
@@ -1072,15 +1072,15 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     }
 
     /// <summary>
-    /// Override this to do stuffs when database Id changes
+    /// Override this to do stuffs when data Id changes
     /// </summary>
-    /// <param name="databaseId"></param>
-    protected virtual void OnDatabaseIdChange(string databaseId)
+    /// <param name="dataId"></param>
+    protected virtual void OnDataIdChange(int dataId)
     {
         isRecaching = true;
 
         // Get database
-        GameInstance.AllCharacters.TryGetValue(databaseId, out database);
+        GameInstance.AllCharacters.TryGetValue(dataId, out database);
 
         // Setup model
         if (model != null)
@@ -1095,8 +1095,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             model.gameObject.SetActive(!isHidding.Value);
         }
 
-        if (onDatabaseIdChange != null)
-            onDatabaseIdChange.Invoke(databaseId);
+        if (onDataIdChange != null)
+            onDataIdChange.Invoke(dataId);
     }
 
     /// <summary>
@@ -1282,7 +1282,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Buffs / Weapons / Damage
-    protected void ApplyBuff(string characterId, string dataId, BuffType type, int level)
+    protected void ApplyBuff(string characterId, int dataId, BuffType type, int level)
     {
         if (CurrentHp <= 0 || !IsServer)
             return;
@@ -1334,7 +1334,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         var item = characterItem.GetPotionItem();
         if (item == null)
             return;
-        ApplyBuff(Id, item.Id, BuffType.PotionBuff, characterItem.level);
+        ApplyBuff(Id, item.HashId, BuffType.PotionBuff, characterItem.level);
     }
 
     protected void ApplySkillBuff(CharacterSkill characterSkill)
@@ -1343,7 +1343,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (skill == null)
             return;
         if (skill.skillBuffType == SkillBuffType.BuffToUser)
-            ApplyBuff(Id, skill.Id, BuffType.SkillBuff, characterSkill.level);
+            ApplyBuff(Id, skill.HashId, BuffType.SkillBuff, characterSkill.level);
     }
 
     public virtual void GetAttackingData(
@@ -1569,7 +1569,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         Vector3 position,
         DamageInfo damageInfo,
         Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
-        CharacterBuff? debuff,
+        CharacterBuff debuff,
         int hitEffectsId)
     {
         if (!IsServer)

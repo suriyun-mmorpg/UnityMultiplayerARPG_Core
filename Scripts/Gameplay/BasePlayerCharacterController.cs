@@ -37,7 +37,7 @@ public abstract class BasePlayerCharacterController : MonoBehaviour
 
     protected virtual void Awake()
     {
-        CacheCharacterEntity.onDatabaseIdChange += OnDatabaseIdChange;
+        CacheCharacterEntity.onDataIdChange += OnDataIdChange;
         CacheCharacterEntity.onEquipWeaponsChange += OnEquipWeaponsChange;
         CacheCharacterEntity.onAttributesOperation += OnAttributesOperation;
         CacheCharacterEntity.onSkillsOperation += OnSkillsOperation;
@@ -50,7 +50,7 @@ public abstract class BasePlayerCharacterController : MonoBehaviour
 
     protected virtual void OnDestroy()
     {
-        CacheCharacterEntity.onDatabaseIdChange -= OnDatabaseIdChange;
+        CacheCharacterEntity.onDataIdChange -= OnDataIdChange;
         CacheCharacterEntity.onEquipWeaponsChange -= OnEquipWeaponsChange;
         CacheCharacterEntity.onAttributesOperation -= OnAttributesOperation;
         CacheCharacterEntity.onSkillsOperation -= OnSkillsOperation;
@@ -69,7 +69,7 @@ public abstract class BasePlayerCharacterController : MonoBehaviour
 
 
     #region Sync data changes callback
-    protected void OnDatabaseIdChange(string databaseId)
+    protected void OnDataIdChange(int dataId)
     {
         if (CacheCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
         {

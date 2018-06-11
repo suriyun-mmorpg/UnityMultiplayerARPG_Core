@@ -24,7 +24,7 @@ public class MissileDamageEntity : BaseDamageEntity
     public void SetupDamage(
         BaseCharacterEntity attacker,
         Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
-        CharacterBuff? debuff,
+        CharacterBuff debuff,
         int hitEffectsId,
         float missileDistance,
         float missileSpeed)

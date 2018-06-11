@@ -33,7 +33,7 @@ public struct NpcDialogCondition
         var questCompleted = false;
         if (quest != null)
         {
-            indexOfQuest = character.IndexOfQuest(quest.Id);
+            indexOfQuest = character.IndexOfQuest(quest.HashId);
             if (indexOfQuest >= 0)
             {
                 var characterQuest = character.Quests[indexOfQuest];
@@ -75,7 +75,7 @@ public struct NpcDialogMenu
         {
             if (dialog.quest == null)
                 return false;
-            var indexOfQuest = character.IndexOfQuest(dialog.quest.Id);
+            var indexOfQuest = character.IndexOfQuest(dialog.quest.HashId);
             if (indexOfQuest >= 0 && character.Quests[indexOfQuest].isComplete)
                 return false;
         }

@@ -4,17 +4,17 @@ using LiteNetLib.Utils;
 using LiteNetLibManager;
 
 [System.Serializable]
-public struct CharacterItem
+public class CharacterItem
 {
     public static readonly CharacterItem Empty = new CharacterItem();
     // Use id as primary key
     public string id;
-    public string itemId;
+    public int dataId;
     public int level;
     public int amount;
     // TODO: I want to add random item bonus
     [System.NonSerialized]
-    private string dirtyItemId;
+    private int dirtyDataId;
     [System.NonSerialized]
     private Item cacheItem;
     [System.NonSerialized]
@@ -34,7 +34,7 @@ public struct CharacterItem
 
     private void MakeCache()
     {
-        if (string.IsNullOrEmpty(itemId))
+        if (!GameInstance.Items.ContainsKey(dataId))
         {
             cacheItem = null;
             cacheEquipmentItem = null;
@@ -46,9 +46,9 @@ public struct CharacterItem
             cacheAmmoItem = null;
             return;
         }
-        if (string.IsNullOrEmpty(dirtyItemId) || !dirtyItemId.Equals(itemId))
+        if (dirtyDataId != dataId)
         {
-            dirtyItemId = itemId;
+            dirtyDataId = dataId;
             cacheItem = null;
             cacheEquipmentItem = null;
             cacheDefendItem = null;
@@ -57,7 +57,7 @@ public struct CharacterItem
             cacheShieldItem = null;
             cachePotionItem = null;
             cacheAmmoItem = null;
-            cacheItem = GameInstance.Items.TryGetValue(itemId, out cacheItem) ? cacheItem : null;
+            cacheItem = GameInstance.Items.TryGetValue(dataId, out cacheItem) ? cacheItem : null;
             if (cacheItem != null)
             {
                 if (cacheItem.IsEquipment())
@@ -76,11 +76,6 @@ public struct CharacterItem
                     cacheAmmoItem = cacheItem;
             }
         }
-    }
-
-    public bool IsEmpty()
-    {
-        return Equals(Empty);
     }
 
     public Item GetItem()
@@ -139,7 +134,7 @@ public struct CharacterItem
 
     public bool IsValid()
     {
-        return !IsEmpty() && GetItem() != null && amount > 0;
+        return !this.IsEmpty() && GetItem() != null && amount > 0;
     }
 
     public bool IsFull()
@@ -154,14 +149,14 @@ public struct CharacterItem
 
     public static CharacterItem Create(Item item, int level = 1, int amount = 1)
     {
-        return Create(item.Id, level, amount);
+        return Create(item.HashId, level, amount);
     }
 
-    public static CharacterItem Create(string itemId, int level = 1, int amount = 1)
+    public static CharacterItem Create(int dataId, int level = 1, int amount = 1)
     {
         var newItem = new CharacterItem();
-        newItem.id = System.Guid.NewGuid().ToString();
-        newItem.itemId = itemId;
+        newItem.id = GenericUtils.GetUniqueId();
+        newItem.dataId = dataId;
         newItem.level = level;
         newItem.amount = amount;
         return newItem;
@@ -174,7 +169,7 @@ public class NetFieldCharacterItem : LiteNetLibNetField<CharacterItem>
     {
         var newValue = new CharacterItem();
         newValue.id = reader.GetString();
-        newValue.itemId = reader.GetString();
+        newValue.dataId = reader.GetInt();
         newValue.level = reader.GetInt();
         newValue.amount = reader.GetInt();
         Value = newValue;
@@ -183,7 +178,7 @@ public class NetFieldCharacterItem : LiteNetLibNetField<CharacterItem>
     public override void Serialize(NetDataWriter writer)
     {
         writer.Put(Value.id);
-        writer.Put(Value.itemId);
+        writer.Put(Value.dataId);
         writer.Put(Value.level);
         writer.Put(Value.amount);
     }

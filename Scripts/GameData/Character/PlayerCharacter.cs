@@ -16,18 +16,18 @@ public class PlayerCharacter : BaseCharacter
     public Item leftHandEquipItem;
     public Item[] armorItems;
 
-    private Dictionary<string, SkillLevel> cacheSkillLevels;
-    public Dictionary<string, SkillLevel> CacheSkillLevels
+    private Dictionary<int, SkillLevel> cacheSkillLevels;
+    public Dictionary<int, SkillLevel> CacheSkillLevels
     {
         get
         {
             if (cacheSkillLevels == null)
             {
-                cacheSkillLevels = new Dictionary<string, SkillLevel>();
+                cacheSkillLevels = new Dictionary<int, SkillLevel>();
                 foreach (var skillLevel in skillLevels)
                 {
                     if (skillLevel.skill != null)
-                    cacheSkillLevels[skillLevel.skill.Id] = skillLevel;
+                    cacheSkillLevels[skillLevel.skill.HashId] = skillLevel;
                 }
             }
             return cacheSkillLevels;

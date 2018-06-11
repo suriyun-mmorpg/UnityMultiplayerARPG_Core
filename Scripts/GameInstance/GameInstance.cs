@@ -56,15 +56,15 @@ public class GameInstance : MonoBehaviour
     public bool doNotLoadHomeSceneOnStart;
     [Header("Playing In Editor")]
     public bool useMobileInEditor;
-    public static readonly Dictionary<string, Attribute> Attributes = new Dictionary<string, Attribute>();
-    public static readonly Dictionary<string, Item> Items = new Dictionary<string, Item>();
-    public static readonly Dictionary<string, BaseCharacter> AllCharacters = new Dictionary<string, BaseCharacter>();
-    public static readonly Dictionary<string, PlayerCharacter> PlayerCharacters = new Dictionary<string, PlayerCharacter>();
-    public static readonly Dictionary<string, MonsterCharacter> MonsterCharacters = new Dictionary<string, MonsterCharacter>();
+    public static readonly Dictionary<int, Attribute> Attributes = new Dictionary<int, Attribute>();
+    public static readonly Dictionary<int, Item> Items = new Dictionary<int, Item>();
+    public static readonly Dictionary<int, BaseCharacter> AllCharacters = new Dictionary<int, BaseCharacter>();
+    public static readonly Dictionary<int, PlayerCharacter> PlayerCharacters = new Dictionary<int, PlayerCharacter>();
+    public static readonly Dictionary<int, MonsterCharacter> MonsterCharacters = new Dictionary<int, MonsterCharacter>();
+    public static readonly Dictionary<int, Skill> Skills = new Dictionary<int, Skill>();
+    public static readonly Dictionary<int, NpcDialog> NpcDialogs = new Dictionary<int, NpcDialog>();
+    public static readonly Dictionary<int, Quest> Quests = new Dictionary<int, Quest>();
     public static readonly Dictionary<string, BaseDamageEntity> DamageEntities = new Dictionary<string, BaseDamageEntity>();
-    public static readonly Dictionary<string, Skill> Skills = new Dictionary<string, Skill>();
-    public static readonly Dictionary<string, NpcDialog> NpcDialogs = new Dictionary<string, NpcDialog>();
-    public static readonly Dictionary<string, Quest> Quests = new Dictionary<string, Quest>();
     public static readonly Dictionary<int, ActionAnimation> ActionAnimations = new Dictionary<int, ActionAnimation>();
     public static readonly Dictionary<int, GameEffectCollection> GameEffectCollections = new Dictionary<int, GameEffectCollection>();
     
@@ -274,9 +274,9 @@ public class GameInstance : MonoBehaviour
     {
         foreach (var attribute in attributes)
         {
-            if (attribute == null || Attributes.ContainsKey(attribute.Id))
+            if (attribute == null || Attributes.ContainsKey(attribute.HashId))
                 continue;
-            Attributes[attribute.Id] = attribute;
+            Attributes[attribute.HashId] = attribute;
         }
     }
 
@@ -285,9 +285,9 @@ public class GameInstance : MonoBehaviour
         var damageEntities = new List<BaseDamageEntity>();
         foreach (var item in items)
         {
-            if (item == null || Items.ContainsKey(item.Id))
+            if (item == null || Items.ContainsKey(item.HashId))
                 continue;
-            Items[item.Id] = item;
+            Items[item.HashId] = item;
             if (item.IsWeapon())
             {
                 var weaponType = item.WeaponType;
@@ -307,18 +307,18 @@ public class GameInstance : MonoBehaviour
     {
         foreach (var character in characters)
         {
-            if (character == null || AllCharacters.ContainsKey(character.Id))
+            if (character == null || AllCharacters.ContainsKey(character.HashId))
                 continue;
-            AllCharacters[character.Id] = character;
+            AllCharacters[character.HashId] = character;
             if (character is PlayerCharacter)
             {
                 var playerCharacter = character as PlayerCharacter;
-                PlayerCharacters[character.Id] = playerCharacter;
+                PlayerCharacters[character.HashId] = playerCharacter;
             }
             else if (character is MonsterCharacter)
             {
                 var monsterCharacter = character as MonsterCharacter;
-                MonsterCharacters[character.Id] = monsterCharacter;
+                MonsterCharacters[character.HashId] = monsterCharacter;
                 AddActionAnimations(ActionAnimationType.MonsterAttack, monsterCharacter.attackAnimations);
             }
         }
@@ -330,9 +330,9 @@ public class GameInstance : MonoBehaviour
         var damageEntities = new List<BaseDamageEntity>();
         foreach (var skill in skills)
         {
-            if (skill == null || Skills.ContainsKey(skill.Id))
+            if (skill == null || Skills.ContainsKey(skill.HashId))
                 continue;
-            Skills[skill.Id] = skill;
+            Skills[skill.HashId] = skill;
             AddActionAnimations(ActionAnimationType.SkillCast, skill.castAnimations);
             skillHitEffects.Add(skill.hitEffects);
             var missileDamageEntity = skill.damageInfo.missileDamageEntity;
@@ -347,9 +347,9 @@ public class GameInstance : MonoBehaviour
     {
         foreach (var npcDialog in npcDialogs)
         {
-            if (npcDialog == null || NpcDialogs.ContainsKey(npcDialog.Id))
+            if (npcDialog == null || NpcDialogs.ContainsKey(npcDialog.HashId))
                 continue;
-            NpcDialogs[npcDialog.Id] = npcDialog;
+            NpcDialogs[npcDialog.HashId] = npcDialog;
         }
     }
 
@@ -357,9 +357,9 @@ public class GameInstance : MonoBehaviour
     {
         foreach (var quest in quests)
         {
-            if (quest == null || Quests.ContainsKey(quest.Id))
+            if (quest == null || Quests.ContainsKey(quest.HashId))
                 continue;
-            Quests[quest.Id] = quest;
+            Quests[quest.HashId] = quest;
         }
     }
 

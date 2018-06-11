@@ -11,20 +11,20 @@ public enum BuffType : byte
 }
 
 [System.Serializable]
-public struct CharacterBuff
+public class CharacterBuff
 {
     public static readonly CharacterBuff Empty = new CharacterBuff();
     // Use id as primary key
     public string id;
     public string characterId;
     public BuffType type;
-    public string dataId;
+    public int dataId;
     public int level;
     public float buffRemainsDuration;
     [System.NonSerialized]
     private BuffType dirtyType;
     [System.NonSerialized]
-    private string dirtyDataId;
+    private int dirtyDataId;
     [System.NonSerialized]
     private Skill cacheSkill;
     [System.NonSerialized]
@@ -54,7 +54,7 @@ public struct CharacterBuff
 
     private void MakeCache()
     {
-        if (string.IsNullOrEmpty(dataId))
+        if (!GameInstance.Skills.ContainsKey(dataId) && !GameInstance.Items.ContainsKey(dataId))
         {
             cacheSkill = null;
             cacheItem = null;
@@ -71,7 +71,7 @@ public struct CharacterBuff
             cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
             return;
         }
-        if (string.IsNullOrEmpty(dirtyDataId) || !dirtyDataId.Equals(dataId) || type != dirtyType)
+        if (dirtyDataId != dataId || type != dirtyType)
         {
             dirtyDataId = dataId;
             dirtyType = type;
@@ -114,11 +114,6 @@ public struct CharacterBuff
                 cacheIncreaseDamages = cacheBuff.GetIncreaseDamages(level);
             }
         }
-    }
-
-    public bool IsEmpty()
-    {
-        return Equals(Empty);
     }
 
     public Skill GetSkill()
@@ -219,10 +214,10 @@ public struct CharacterBuff
         buffRemainsDuration = 0;
     }
 
-    public static CharacterBuff Create(string characterId, BuffType type, string dataId, int level = 1)
+    public static CharacterBuff Create(string characterId, BuffType type, int dataId, int level = 1)
     {
         var newBuff = new CharacterBuff();
-        newBuff.id = System.Guid.NewGuid().ToString();
+        newBuff.id = GenericUtils.GetUniqueId();
         newBuff.characterId = characterId;
         newBuff.type = type;
         newBuff.dataId = dataId;
@@ -240,7 +235,7 @@ public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>
         newValue.id = reader.GetString();
         newValue.characterId = reader.GetString();
         newValue.type = (BuffType)reader.GetByte();
-        newValue.dataId = reader.GetString();
+        newValue.dataId = reader.GetInt();
         newValue.level = reader.GetInt();
         newValue.buffRemainsDuration = reader.GetFloat();
         Value = newValue;

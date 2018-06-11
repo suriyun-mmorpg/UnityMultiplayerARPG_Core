@@ -157,12 +157,12 @@ public class UISceneGameplay : MonoBehaviour
         onCharacterRespawn.Invoke();
     }
 
-    public void OnShowNpcDialog(string npcDialogId)
+    public void OnShowNpcDialog(int npcDialogDataId)
     {
         if (uiNpcDialog == null)
             return;
         NpcDialog npcDialog;
-        if (string.IsNullOrEmpty(npcDialogId) || !GameInstance.NpcDialogs.TryGetValue(npcDialogId, out npcDialog))
+        if (!GameInstance.NpcDialogs.TryGetValue(npcDialogDataId, out npcDialog))
         {
             uiNpcDialog.Hide();
             return;

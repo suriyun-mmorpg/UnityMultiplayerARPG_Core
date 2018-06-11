@@ -4,34 +4,29 @@ using LiteNetLib.Utils;
 using LiteNetLibManager;
 
 [System.Serializable]
-public struct CharacterSkill
+public class CharacterSkill
 {
     public static readonly CharacterSkill Empty = new CharacterSkill();
-    public string skillId;
+    public int dataId;
     public int level;
     public float coolDownRemainsDuration;
     [System.NonSerialized]
-    private string dirtySkillId;
+    private int dirtyDataId;
     [System.NonSerialized]
     private Skill cacheSkill;
 
     private void MakeCache()
     {
-        if (string.IsNullOrEmpty(skillId))
+        if (!GameInstance.Skills.ContainsKey(dataId))
         {
             cacheSkill = null;
             return;
         }
-        if (string.IsNullOrEmpty(dirtySkillId) || !dirtySkillId.Equals(skillId))
+        if (dirtyDataId != dataId)
         {
-            dirtySkillId = skillId;
-            cacheSkill = GameInstance.Skills.TryGetValue(skillId, out cacheSkill) ? cacheSkill : null;
+            dirtyDataId = dataId;
+            cacheSkill = GameInstance.Skills.TryGetValue(dataId, out cacheSkill) ? cacheSkill : null;
         }
-    }
-
-    public bool IsEmpty()
-    {
-        return Equals(Empty);
     }
     
     public Skill GetSkill()
@@ -125,7 +120,7 @@ public struct CharacterSkill
     public static CharacterSkill Create(Skill skill, int level)
     {
         var newSkill = new CharacterSkill();
-        newSkill.skillId = skill.Id;
+        newSkill.dataId = skill.HashId;
         newSkill.level = level;
         newSkill.coolDownRemainsDuration = 0f;
         return newSkill;
@@ -137,7 +132,7 @@ public class NetFieldCharacterSkill : LiteNetLibNetField<CharacterSkill>
     public override void Deserialize(NetDataReader reader)
     {
         var newValue = new CharacterSkill();
-        newValue.skillId = reader.GetString();
+        newValue.dataId = reader.GetInt();
         newValue.level = reader.GetInt();
         newValue.coolDownRemainsDuration = reader.GetFloat();
         Value = newValue;
@@ -145,7 +140,7 @@ public class NetFieldCharacterSkill : LiteNetLibNetField<CharacterSkill>
 
     public override void Serialize(NetDataWriter writer)
     {
-        writer.Put(Value.skillId);
+        writer.Put(Value.dataId);
         writer.Put(Value.level);
         writer.Put(Value.coolDownRemainsDuration);
     }

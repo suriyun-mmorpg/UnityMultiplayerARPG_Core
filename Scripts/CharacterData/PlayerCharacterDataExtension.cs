@@ -11,7 +11,7 @@ public static class PlayerCharacterDataExtension
     public static T CloneTo<T>(this IPlayerCharacterData from, T to) where T : IPlayerCharacterData
     {
         to.Id = from.Id;
-        to.DatabaseId = from.DatabaseId;
+        to.DataId = from.DataId;
         to.CharacterName = from.CharacterName;
         to.Level = from.Level;
         to.Exp = from.Exp;
@@ -43,68 +43,66 @@ public static class PlayerCharacterDataExtension
     {
         var gameInstance = GameInstance.Singleton;
         PlayerCharacter database;
-        if (!GameInstance.PlayerCharacters.TryGetValue(character.DatabaseId, out database))
+        if (!GameInstance.PlayerCharacters.TryGetValue(character.DataId, out database))
             return character;
         // Validating character attributes
         var returningStatPoint = 0;
-        var validAttributeIds = new HashSet<string>();
+        var validAttributeIds = new HashSet<int>();
         var characterAttributes = character.Attributes;
         for (var i = characterAttributes.Count - 1; i >= 0; --i)
         {
             var characterAttribute = characterAttributes[i];
-            var attributeId = characterAttribute.attributeId;
+            var attributeDataId = characterAttribute.dataId;
             // If attribute is invalid
-            if (string.IsNullOrEmpty(attributeId) ||
-                characterAttribute.GetAttribute() == null ||
-                validAttributeIds.Contains(attributeId))
+            if (characterAttribute.GetAttribute() == null ||
+                validAttributeIds.Contains(attributeDataId))
             {
                 returningStatPoint += characterAttribute.amount;
                 character.Attributes.RemoveAt(i);
             }
             else
-                validAttributeIds.Add(attributeId);
+                validAttributeIds.Add(attributeDataId);
         }
         character.StatPoint += returningStatPoint;
         // Add character's attributes
         var attributes = GameInstance.Attributes.Values;
         foreach (var attribute in attributes)
         {
-            if (validAttributeIds.Contains(attribute.Id))
+            if (validAttributeIds.Contains(attribute.HashId))
                 continue;
             var characterAttribute = new CharacterAttribute();
-            characterAttribute.attributeId = attribute.Id;
+            characterAttribute.dataId = attribute.HashId;
             characterAttribute.amount = 0;
             character.Attributes.Add(characterAttribute);
         }
         // Validating character skills
         var returningSkillPoint = 0;
-        var validSkillIds = new HashSet<string>();
+        var validSkillIds = new HashSet<int>();
         var characterSkills = character.Skills;
         for (var i = characterSkills.Count - 1; i >= 0; --i)
         {
             var characterSkill = characterSkills[i];
-            var skillId = characterSkill.skillId;
+            var skillDataId = characterSkill.dataId;
             // If skill is invalid or this character database does not have skill
-            if (string.IsNullOrEmpty(skillId) ||
-                characterSkill.GetSkill() == null ||
-                !database.CacheSkillLevels.ContainsKey(skillId) ||
-                validSkillIds.Contains(skillId))
+            if (characterSkill.GetSkill() == null ||
+                !database.CacheSkillLevels.ContainsKey(skillDataId) ||
+                validSkillIds.Contains(skillDataId))
             {
                 returningSkillPoint += characterSkill.level;
                 character.Skills.RemoveAt(i);
             }
             else
-                validSkillIds.Add(skillId);
+                validSkillIds.Add(skillDataId);
         }
         character.SkillPoint += returningSkillPoint;
         // Add character's skills
         var skillLevels = database.skillLevels;
         foreach (var skillLevel in skillLevels)
         {
-            if (skillLevel.skill != null && validSkillIds.Contains(skillLevel.skill.Id))
+            if (skillLevel.skill != null && validSkillIds.Contains(skillLevel.skill.HashId))
                 continue;
             var characterSkill = new CharacterSkill();
-            characterSkill.skillId = skillLevel.skill.Id;
+            characterSkill.dataId = skillLevel.skill.HashId;
             characterSkill.level = skillLevel.level;
             character.Skills.Add(characterSkill);
         }
@@ -155,11 +153,11 @@ public static class PlayerCharacterDataExtension
         return character;
     }
 
-    public static T SetNewCharacterData<T>(this T character, string characterName, string databaseId) where T : IPlayerCharacterData
+    public static T SetNewCharacterData<T>(this T character, string characterName, int dataId) where T : IPlayerCharacterData
     {
         var gameInstance = GameInstance.Singleton;
         PlayerCharacter database;
-        if (!GameInstance.PlayerCharacters.TryGetValue(databaseId, out database))
+        if (!GameInstance.PlayerCharacters.TryGetValue(dataId, out database))
             return character;
         // Player character database
         var playerCharacter = database as PlayerCharacter;
@@ -168,7 +166,7 @@ public static class PlayerCharacterDataExtension
         foreach (var attribute in attributes)
         {
             var characterAttribute = new CharacterAttribute();
-            characterAttribute.attributeId = attribute.Id;
+            characterAttribute.dataId = attribute.HashId;
             characterAttribute.amount = 0;
             character.Attributes.Add(characterAttribute);
         }
@@ -178,7 +176,7 @@ public static class PlayerCharacterDataExtension
             if (skillLevel.skill == null)
                 continue;
             var characterSkill = new CharacterSkill();
-            characterSkill.skillId = skillLevel.skill.Id;
+            characterSkill.dataId = skillLevel.skill.HashId;
             characterSkill.level = skillLevel.level;
             character.Skills.Add(characterSkill);
         }
@@ -209,7 +207,7 @@ public static class PlayerCharacterDataExtension
             character.EquipItems.Add(newItem);
         }
         // General data
-        character.DatabaseId = database.Id;
+        character.DataId = database.HashId;
         character.CharacterName = characterName;
         character.Level = 1;
         var stats = character.GetStats();
@@ -239,6 +237,25 @@ public static class PlayerCharacterDataExtension
         return character;
     }
 
+    public static void AddAllCharacterRelatesDataSurrogate(this SurrogateSelector surrogateSelector)
+    {
+        var attributeSS = new CharacterAttributeSerializationSurrogate();
+        var buffSS = new CharacterBuffSerializationSurrogate();
+        var hotkeySS = new CharacterHotkeySerializationSurrogate();
+        var itemSS = new CharacterItemSerializationSurrogate();
+        var questSS = new CharacterQuestSerializationSurrogate();
+        var skillSS = new CharacterSkillSerializationSurrogate();
+        surrogateSelector.AddSurrogate(typeof(CharacterAttribute), new StreamingContext(StreamingContextStates.All), attributeSS);
+        surrogateSelector.AddSurrogate(typeof(CharacterBuff), new StreamingContext(StreamingContextStates.All), buffSS);
+        surrogateSelector.AddSurrogate(typeof(CharacterHotkey), new StreamingContext(StreamingContextStates.All), hotkeySS);
+        surrogateSelector.AddSurrogate(typeof(CharacterItem), new StreamingContext(StreamingContextStates.All), itemSS);
+        surrogateSelector.AddSurrogate(typeof(CharacterQuest), new StreamingContext(StreamingContextStates.All), questSS);
+        surrogateSelector.AddSurrogate(typeof(CharacterSkill), new StreamingContext(StreamingContextStates.All), skillSS);
+        var playerCharacterDataSS = new PlayerCharacterSerializationSurrogate();
+        surrogateSelector.AddSurrogate(typeof(PlayerCharacterData), new StreamingContext(StreamingContextStates.All), playerCharacterDataSS);
+        surrogateSelector.AddSurrogate(typeof(PlayerCharacterEntity), new StreamingContext(StreamingContextStates.All), playerCharacterDataSS);
+    }
+
     public static void SavePersistentCharacterData<T>(this T characterData) where T : IPlayerCharacterData
     {
         var savingData = new PlayerCharacterData();
@@ -247,6 +264,7 @@ public static class PlayerCharacterDataExtension
         var binaryFormatter = new BinaryFormatter();
         var surrogateSelector = new SurrogateSelector();
         surrogateSelector.AddAllUnitySurrogate();
+        surrogateSelector.AddAllCharacterRelatesDataSurrogate();
         binaryFormatter.SurrogateSelector = surrogateSelector;
         var path = Application.persistentDataPath + "/" + savingData.Id + ".sav";
         Debug.Log("Character Saving to: " + path);
@@ -269,6 +287,7 @@ public static class PlayerCharacterDataExtension
             var binaryFormatter = new BinaryFormatter();
             var surrogateSelector = new SurrogateSelector();
             surrogateSelector.AddAllUnitySurrogate();
+            surrogateSelector.AddAllCharacterRelatesDataSurrogate();
             binaryFormatter.SurrogateSelector = surrogateSelector;
             var file = File.Open(path, FileMode.Open);
             PlayerCharacterData loadedData = (PlayerCharacterData)binaryFormatter.Deserialize(file);
@@ -316,7 +335,7 @@ public static class PlayerCharacterDataExtension
     public static void SerializeCharacterData<T>(this T characterData, NetDataWriter writer) where T : IPlayerCharacterData
     {
         writer.Put(characterData.Id);
-        writer.Put(characterData.DatabaseId);
+        writer.Put(characterData.DataId);
         writer.Put(characterData.CharacterName);
         writer.Put(characterData.Level);
         writer.Put(characterData.Exp);
@@ -340,7 +359,7 @@ public static class PlayerCharacterDataExtension
         writer.Put(characterData.Attributes.Count);
         foreach (var entry in characterData.Attributes)
         {
-            writer.Put(entry.attributeId);
+            writer.Put(entry.dataId);
             writer.Put(entry.amount);
         }
         writer.Put(characterData.Buffs.Count);
@@ -356,7 +375,7 @@ public static class PlayerCharacterDataExtension
         writer.Put(characterData.Skills.Count);
         foreach (var entry in characterData.Skills)
         {
-            writer.Put(entry.skillId);
+            writer.Put(entry.dataId);
             writer.Put(entry.level);
             writer.Put(entry.coolDownRemainsDuration);
         }
@@ -364,7 +383,7 @@ public static class PlayerCharacterDataExtension
         foreach (var entry in characterData.EquipItems)
         {
             writer.Put(entry.id);
-            writer.Put(entry.itemId);
+            writer.Put(entry.dataId);
             writer.Put(entry.level);
             writer.Put(entry.amount);
         }
@@ -372,7 +391,7 @@ public static class PlayerCharacterDataExtension
         foreach (var entry in characterData.NonEquipItems)
         {
             writer.Put(entry.id);
-            writer.Put(entry.itemId);
+            writer.Put(entry.dataId);
             writer.Put(entry.level);
             writer.Put(entry.amount);
         }
@@ -386,7 +405,7 @@ public static class PlayerCharacterDataExtension
         writer.Put(characterData.Quests.Count);
         foreach (var entry in characterData.Quests)
         {
-            writer.Put(entry.questId);
+            writer.Put(entry.dataId);
             writer.Put(entry.isComplete);
             var killedMonsters = entry.killedMonsters;
             var killMonsterCount = killedMonsters == null ? 0 : killedMonsters.Count;
@@ -402,12 +421,12 @@ public static class PlayerCharacterDataExtension
         }
         var rightHand = characterData.EquipWeapons.rightHand;
         writer.Put(rightHand.id);
-        writer.Put(rightHand.itemId);
+        writer.Put(rightHand.dataId);
         writer.Put(rightHand.level);
         writer.Put(rightHand.amount);
         var leftHand = characterData.EquipWeapons.leftHand;
         writer.Put(leftHand.id);
-        writer.Put(leftHand.itemId);
+        writer.Put(leftHand.dataId);
         writer.Put(leftHand.level);
         writer.Put(leftHand.amount);
     }
@@ -416,7 +435,7 @@ public static class PlayerCharacterDataExtension
     {
         var tempCharacterData = new PlayerCharacterData();
         tempCharacterData.Id = reader.GetString();
-        tempCharacterData.DatabaseId = reader.GetString();
+        tempCharacterData.DataId = reader.GetInt();
         tempCharacterData.CharacterName = reader.GetString();
         tempCharacterData.Level = reader.GetInt();
         tempCharacterData.Exp = reader.GetInt();
@@ -438,7 +457,7 @@ public static class PlayerCharacterDataExtension
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterAttribute();
-            entry.attributeId = reader.GetString();
+            entry.dataId = reader.GetInt();
             entry.amount = reader.GetInt();
             tempCharacterData.Attributes.Add(entry);
         }
@@ -448,7 +467,7 @@ public static class PlayerCharacterDataExtension
             var entry = new CharacterBuff();
             entry.id = reader.GetString();
             entry.characterId = reader.GetString();
-            entry.dataId = reader.GetString();
+            entry.dataId = reader.GetInt();
             entry.type = (BuffType)reader.GetByte();
             entry.level = reader.GetInt();
             entry.buffRemainsDuration = reader.GetFloat();
@@ -458,7 +477,7 @@ public static class PlayerCharacterDataExtension
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterSkill();
-            entry.skillId = reader.GetString();
+            entry.dataId = reader.GetInt();
             entry.level = reader.GetInt();
             entry.coolDownRemainsDuration = reader.GetFloat();
             tempCharacterData.Skills.Add(entry);
@@ -468,7 +487,7 @@ public static class PlayerCharacterDataExtension
         {
             var entry = new CharacterItem();
             entry.id = reader.GetString();
-            entry.itemId = reader.GetString();
+            entry.dataId = reader.GetInt();
             entry.level = reader.GetInt();
             entry.amount = reader.GetInt();
             tempCharacterData.EquipItems.Add(entry);
@@ -478,7 +497,7 @@ public static class PlayerCharacterDataExtension
         {
             var entry = new CharacterItem();
             entry.id = reader.GetString();
-            entry.itemId = reader.GetString();
+            entry.dataId = reader.GetInt();
             entry.level = reader.GetInt();
             entry.amount = reader.GetInt();
             tempCharacterData.NonEquipItems.Add(entry);
@@ -489,33 +508,33 @@ public static class PlayerCharacterDataExtension
             var entry = new CharacterHotkey();
             entry.hotkeyId = reader.GetString();
             entry.type = (HotkeyType)reader.GetByte();
-            entry.dataId = reader.GetString();
+            entry.dataId = reader.GetInt();
             tempCharacterData.Hotkeys.Add(entry);
         }
         count = reader.GetInt();
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterQuest();
-            entry.questId = reader.GetString();
+            entry.dataId = reader.GetInt();
             entry.isComplete = reader.GetBool();
             var killMonsterCount = reader.GetInt();
-            entry.killedMonsters = new Dictionary<string, int>();
+            entry.killedMonsters = new Dictionary<int, int>();
             for (var j = 0; j < killMonsterCount; ++j)
             {
-                entry.killedMonsters.Add(reader.GetString(), reader.GetInt());
+                entry.killedMonsters.Add(reader.GetInt(), reader.GetInt());
             }
             tempCharacterData.Quests.Add(entry);
         }
 
         var rightWeapon = new CharacterItem();
         rightWeapon.id = reader.GetString();
-        rightWeapon.itemId = reader.GetString();
+        rightWeapon.dataId = reader.GetInt();
         rightWeapon.level = reader.GetInt();
         rightWeapon.amount = reader.GetInt();
 
         var leftWeapon = new CharacterItem();
         leftWeapon.id = reader.GetString();
-        leftWeapon.itemId = reader.GetString();
+        leftWeapon.dataId = reader.GetInt();
         leftWeapon.level = reader.GetInt();
         leftWeapon.amount = reader.GetInt();
 
@@ -547,7 +566,7 @@ public static class PlayerCharacterDataExtension
         return index;
     }
 
-    public static int IndexOfQuest(this IPlayerCharacterData data, string questId)
+    public static int IndexOfQuest(this IPlayerCharacterData data, int dataId)
     {
         var list = data.Quests;
         CharacterQuest tempQuest;
@@ -555,8 +574,7 @@ public static class PlayerCharacterDataExtension
         for (var i = 0; i < list.Count; ++i)
         {
             tempQuest = list[i];
-            if (!string.IsNullOrEmpty(tempQuest.questId) &&
-                tempQuest.questId.Equals(questId))
+            if (tempQuest.dataId == dataId)
             {
                 index = i;
                 break;

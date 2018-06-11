@@ -43,6 +43,10 @@ public class UICharacterQuests : UIBase
         SelectionManager.eventOnSelect.AddListener(OnSelectCharacterQuest);
         SelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterQuest);
         SelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterQuest);
+        if (SelectionManager.Count > 0)
+            SelectionManager.Get(0).OnClickSelect();
+        else if (uiQuestDialog != null)
+            uiQuestDialog.Hide();
         base.Show();
     }
 
@@ -71,7 +75,7 @@ public class UICharacterQuests : UIBase
     public void UpdateData(IPlayerCharacterData character)
     {
         this.character = character;
-        var selectedQuestId = SelectionManager.SelectedUI != null ? SelectionManager.SelectedUI.Data.questId : "";
+        var selectedQuestId = SelectionManager.SelectedUI != null ? SelectionManager.SelectedUI.Data.dataId : 0;
         SelectionManager.DeselectSelectedUI();
         SelectionManager.Clear();
 
@@ -88,7 +92,7 @@ public class UICharacterQuests : UIBase
             uiCharacterQuest.Setup(characterQuest, character, index);
             uiCharacterQuest.Show();
             SelectionManager.Add(uiCharacterQuest);
-            if (selectedQuestId.Equals(characterQuest.questId))
+            if (selectedQuestId.Equals(characterQuest.dataId))
                 uiCharacterQuest.OnClickSelect();
         });
     }
