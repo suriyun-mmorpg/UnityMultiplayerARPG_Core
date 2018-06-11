@@ -7,8 +7,6 @@ using LiteNetLibManager;
 public class CharacterItem
 {
     public static readonly CharacterItem Empty = new CharacterItem();
-    // Use id as primary key
-    public string id;
     public int dataId;
     public int level;
     public int amount;
@@ -155,7 +153,6 @@ public class CharacterItem
     public static CharacterItem Create(int dataId, int level = 1, int amount = 1)
     {
         var newItem = new CharacterItem();
-        newItem.id = GenericUtils.GetUniqueId();
         newItem.dataId = dataId;
         newItem.level = level;
         newItem.amount = amount;
@@ -168,7 +165,6 @@ public class NetFieldCharacterItem : LiteNetLibNetField<CharacterItem>
     public override void Deserialize(NetDataReader reader)
     {
         var newValue = new CharacterItem();
-        newValue.id = reader.GetString();
         newValue.dataId = reader.GetInt();
         newValue.level = reader.GetInt();
         newValue.amount = reader.GetInt();
@@ -177,7 +173,6 @@ public class NetFieldCharacterItem : LiteNetLibNetField<CharacterItem>
 
     public override void Serialize(NetDataWriter writer)
     {
-        writer.Put(Value.id);
         writer.Put(Value.dataId);
         writer.Put(Value.level);
         writer.Put(Value.amount);

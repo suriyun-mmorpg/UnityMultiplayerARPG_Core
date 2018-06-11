@@ -382,7 +382,6 @@ public static class PlayerCharacterDataExtension
         writer.Put(characterData.EquipItems.Count);
         foreach (var entry in characterData.EquipItems)
         {
-            writer.Put(entry.id);
             writer.Put(entry.dataId);
             writer.Put(entry.level);
             writer.Put(entry.amount);
@@ -390,7 +389,6 @@ public static class PlayerCharacterDataExtension
         writer.Put(characterData.NonEquipItems.Count);
         foreach (var entry in characterData.NonEquipItems)
         {
-            writer.Put(entry.id);
             writer.Put(entry.dataId);
             writer.Put(entry.level);
             writer.Put(entry.amount);
@@ -420,12 +418,10 @@ public static class PlayerCharacterDataExtension
             }
         }
         var rightHand = characterData.EquipWeapons.rightHand;
-        writer.Put(rightHand.id);
         writer.Put(rightHand.dataId);
         writer.Put(rightHand.level);
         writer.Put(rightHand.amount);
         var leftHand = characterData.EquipWeapons.leftHand;
-        writer.Put(leftHand.id);
         writer.Put(leftHand.dataId);
         writer.Put(leftHand.level);
         writer.Put(leftHand.amount);
@@ -486,7 +482,6 @@ public static class PlayerCharacterDataExtension
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterItem();
-            entry.id = reader.GetString();
             entry.dataId = reader.GetInt();
             entry.level = reader.GetInt();
             entry.amount = reader.GetInt();
@@ -496,7 +491,6 @@ public static class PlayerCharacterDataExtension
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterItem();
-            entry.id = reader.GetString();
             entry.dataId = reader.GetInt();
             entry.level = reader.GetInt();
             entry.amount = reader.GetInt();
@@ -527,13 +521,11 @@ public static class PlayerCharacterDataExtension
         }
 
         var rightWeapon = new CharacterItem();
-        rightWeapon.id = reader.GetString();
         rightWeapon.dataId = reader.GetInt();
         rightWeapon.level = reader.GetInt();
         rightWeapon.amount = reader.GetInt();
 
         var leftWeapon = new CharacterItem();
-        leftWeapon.id = reader.GetString();
         leftWeapon.dataId = reader.GetInt();
         leftWeapon.level = reader.GetInt();
         leftWeapon.amount = reader.GetInt();

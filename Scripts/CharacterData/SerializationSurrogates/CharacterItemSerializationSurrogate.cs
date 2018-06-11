@@ -9,7 +9,6 @@ public class CharacterItemSerializationSurrogate : ISerializationSurrogate
                               SerializationInfo info, StreamingContext context)
     {
         CharacterItem data = (CharacterItem)obj;
-        info.AddValue("id", data.id);
         info.AddValue("dataId", data.dataId);
         info.AddValue("level", data.level);
         info.AddValue("amount", data.amount);
@@ -20,7 +19,6 @@ public class CharacterItemSerializationSurrogate : ISerializationSurrogate
                                        ISurrogateSelector selector)
     {
         CharacterItem data = (CharacterItem)obj;
-        data.id = info.GetString("id");
         // Backward compatible
         var stringId = string.Empty;
         try { stringId = info.GetString("itemId"); }

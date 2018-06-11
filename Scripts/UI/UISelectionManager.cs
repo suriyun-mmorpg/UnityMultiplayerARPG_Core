@@ -47,6 +47,11 @@ public abstract class UISelectionManager<TData, TUI, TEvent> : UISelectionManage
         uis.Add(ui);
     }
 
+    public int IndexOf(TUI ui)
+    {
+        return uis.IndexOf(ui);
+    }
+
     public TUI Get(int index)
     {
         return uis[index];
