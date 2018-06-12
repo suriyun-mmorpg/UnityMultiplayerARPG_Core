@@ -10,6 +10,8 @@ using LiteNetLibManager;
 [RequireComponent(typeof(LiteNetLibTransform))]
 public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
 {
+    public WarpPortalEntity warpingPortal;
+
     #region Sync data
     public SyncFieldInt statPoint = new SyncFieldInt();
     public SyncFieldInt skillPoint = new SyncFieldInt();
@@ -248,7 +250,9 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         if (!IsServer || CurrentHp > 0)
             return;
         base.Respawn();
-        Warp(RespawnMapName, RespawnPosition);
+        var manager = Manager as BaseGameNetworkManager;
+        if (manager != null)
+            manager.WarpCharacter(this, RespawnMapName, RespawnPosition);
     }
 
     public override bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity)
@@ -306,6 +310,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         RegisterNetFunction("NpcActivate", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncNpcActivate(objectId)));
         RegisterNetFunction("ShowNpcDialog", new LiteNetLibFunction<NetFieldInt>((npcDialogId) => NetFuncShowNpcDialog(npcDialogId)));
         RegisterNetFunction("SelectNpcDialogMenu", new LiteNetLibFunction<NetFieldInt>((menuIndex) => NetFuncSelectNpcDialogMenu(menuIndex)));
+        RegisterNetFunction("EnterWarp", new LiteNetLibFunction(() => NetFuncEnterWarp()));
     }
     #endregion
 
@@ -558,6 +563,14 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         else
             quests.RemoveAt(indexOfQuest);
     }
+
+    protected void NetFuncEnterWarp()
+    {
+        if (CurrentHp <= 0 || IsPlayingActionAnimation() || warpingPortal == null)
+            return;
+
+        warpingPortal.EnterWarp(this);
+    }
     #endregion
 
     #region Net functions callers
@@ -605,6 +618,13 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     public void RequestSelectNpcDialogMenu(int menuIndex)
     {
         CallNetFunction("SelectNpcDialogMenu", FunctionReceivers.Server, menuIndex);
+    }
+
+    public void RequestEnterWarp()
+    {
+        if (CurrentHp <= 0 || IsPlayingActionAnimation() || warpingPortal == null)
+            return;
+        CallNetFunction("EnterWarp", FunctionReceivers.Server);
     }
     #endregion
 
@@ -667,19 +687,6 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         if (CurrentHp <= 0)
             return;
         SetMovePaths(position);
-    }
-
-    public void Warp(string mapName, Vector3 position)
-    {
-        if (!IsServer)
-            return;
-
-        // If warping to same map player does not have to reload new map data
-        if (string.IsNullOrEmpty(mapName) || mapName.Equals(CurrentMapName))
-        {
-            CacheNetTransform.Teleport(position, Quaternion.identity);
-            return;
-        }
     }
 
     public override void Killed(BaseCharacterEntity lastAttacker)

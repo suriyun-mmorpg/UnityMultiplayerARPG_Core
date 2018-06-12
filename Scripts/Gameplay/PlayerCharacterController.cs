@@ -108,6 +108,8 @@ public class PlayerCharacterController : BasePlayerCharacterController
                     break;
                 }
             }
+            if (foundEntities.Length == 0)
+                CacheCharacterEntity.RequestEnterWarp();
         }
         // Pick up nearby items
         if (InputManager.GetButtonDown("PickUpItem"))
@@ -140,11 +142,22 @@ public class PlayerCharacterController : BasePlayerCharacterController
             isMouseDragOrHoldOrOverUI = true;
         if (!isPointerOverUI && Input.GetMouseButtonUp(0) && !isMouseDragOrHoldOrOverUI)
         {
+            var gameInstance = GameInstance.Singleton;
             var targetCamera = CacheGameplayCameraControls != null ? CacheGameplayCameraControls.targetCamera : Camera.main;
             CacheCharacterEntity.SetTargetEntity(null);
             LiteNetLibIdentity targetIdentity = null;
             Vector3? targetPosition = null;
-            RaycastHit[] hits = Physics.RaycastAll(targetCamera.ScreenPointToRay(Input.mousePosition), 100f);
+            var layerMask = 0;
+            if (gameInstance.nonTargetingLayers.Length > 0)
+            {
+                foreach (var nonTargetingLayer in gameInstance.nonTargetingLayers)
+                {
+                    layerMask = layerMask | ~(nonTargetingLayer.Mask);
+                }
+            }
+            else
+                layerMask = -1;
+            RaycastHit[] hits = Physics.RaycastAll(targetCamera.ScreenPointToRay(Input.mousePosition), 100f, layerMask);
             foreach (var hit in hits)
             {
                 var hitTransform = hit.transform;

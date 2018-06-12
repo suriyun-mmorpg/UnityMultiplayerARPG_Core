@@ -7,6 +7,21 @@ using LiteNetLibManager;
 
 public class BaseGameNetworkManager : LiteNetLibGameManager
 {
+    public class MsgTypes
+    {
+        public const short ResponseWarp = 100;
+    }
+
+    protected override void RegisterClientMessages()
+    {
+        base.RegisterClientMessages();
+        RegisterClientMessage(MsgTypes.ResponseWarp, HandleResponseWarp);
+    }
+
+    protected virtual void HandleResponseWarp(LiteNetLibMessageHandler messageHandler)
+    {
+
+    }
 
     public override bool StartServer()
     {
@@ -37,24 +52,36 @@ public class BaseGameNetworkManager : LiteNetLibGameManager
         Assets.spawnablePrefabs = spawnablePrefabs.ToArray();
     }
 
-    public void SendChatMessage(string message)
+    public virtual void SendChatMessage(string message)
     {
 
     }
 
-    public void SendChatWhisperMessage(string targetCharacterName, string message)
+    public virtual void SendChatWhisperMessage(string targetCharacterName, string message)
     {
 
     }
 
-    public void SendChatPartyMessage(string message)
+    public virtual void SendChatPartyMessage(string message)
     {
 
     }
 
-    public void SendChatGuildMessage(string message)
+    public virtual void SendChatGuildMessage(string message)
     {
 
+    }
+
+    public virtual void WarpCharacter(PlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+    {
+        if (playerCharacterEntity == null || !IsServer)
+            return;
+        // If warping to same map player does not have to reload new map data
+        if (string.IsNullOrEmpty(mapName) || mapName.Equals(playerCharacterEntity.CurrentMapName))
+        {
+            playerCharacterEntity.CacheNetTransform.Teleport(position, Quaternion.identity);
+            return;
+        }
     }
 
     public void Quit()
