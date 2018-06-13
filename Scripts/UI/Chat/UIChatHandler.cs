@@ -58,6 +58,13 @@ public class UIChatHandler : UIBase
         HideEnterChatField();
         if (CacheGameNetworkManager != null)
             CacheGameNetworkManager.onReceiveChat += OnReceiveChat;
+        if (enterChatField != null)
+        {
+            enterChatField.onValueChanged.RemoveListener(OnInputFieldValueChange);
+            enterChatField.onValueChanged.AddListener(OnInputFieldValueChange);
+            enterChatField.onEndEdit.RemoveListener(OnInputFieldEndEdit);
+            enterChatField.onEndEdit.AddListener(OnInputFieldEndEdit);
+        }
     }
 
     private void OnDestroy()
@@ -142,10 +149,28 @@ public class UIChatHandler : UIBase
             uiChatMessage.Data = message;
             uiChatMessage.Show();
         });
+        StartCoroutine(VerticalScroll(0f));
+    }
+
+    private void OnInputFieldValueChange(string text)
+    {
+        if (text.Length > 0 && !enterChatFieldVisible)
+            ShowEnterChatField();
+    }
+
+    private void OnInputFieldEndEdit(string text)
+    {
+        if (enterChatFieldVisible)
+            HideEnterChatField();
+    }
+
+    IEnumerator VerticalScroll(float normalize)
+    {
         if (scrollRect != null)
         {
             Canvas.ForceUpdateCanvases();
-            scrollRect.verticalScrollbar.value = 0f;
+            yield return null;
+            scrollRect.verticalScrollbar.value = normalize;
             Canvas.ForceUpdateCanvases();
         }
     }
