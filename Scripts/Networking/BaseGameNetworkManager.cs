@@ -40,6 +40,11 @@ public class BaseGameNetworkManager : LiteNetLibGameManager
     {
         var peer = messageHandler.peer;
         var message = messageHandler.ReadMessage<ChatMessage>();
+        HandleChatAtServer(message);
+    }
+
+    protected virtual void HandleChatAtServer(ChatMessage message)
+    {
         switch (message.channel)
         {
             case ChatChannel.Global:
@@ -47,7 +52,11 @@ public class BaseGameNetworkManager : LiteNetLibGameManager
                 SendPacketToAllPeers(SendOptions.ReliableOrdered, MsgTypes.Chat, message);
                 break;
             case ChatChannel.Whisper:
+                NetPeer senderPeer;
                 NetPeer receiverPeer;
+                if (!string.IsNullOrEmpty(message.sender) &&
+                    peersByCharacterName.TryGetValue(message.sender, out senderPeer))
+                    LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, senderPeer, MsgTypes.Chat, message);
                 if (!string.IsNullOrEmpty(message.receiver) &&
                     peersByCharacterName.TryGetValue(message.receiver, out receiverPeer))
                     LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, receiverPeer, MsgTypes.Chat, message);

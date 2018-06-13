@@ -129,6 +129,7 @@ public class UIChatHandler : UIBase
             var cmd = splitedText[0];
             if (cmd == whisperCommand && splitedText.Length > 2)
             {
+                channel = ChatChannel.Whisper;
                 receiver = splitedText[1];
                 message = trimText.Substring(cmd.Length + receiver.Length + 1); // +1 for space
                 EnterChatMessage = trimText.Substring(0, cmd.Length + receiver.Length + 1); // +1 for space
