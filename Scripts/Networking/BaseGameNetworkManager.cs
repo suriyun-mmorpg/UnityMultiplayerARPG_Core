@@ -4,23 +4,69 @@ using UnityEngine;
 using UnityEngine.AI;
 using LiteNetLib;
 using LiteNetLibManager;
+using LiteNetLib.Utils;
 
 public class BaseGameNetworkManager : LiteNetLibGameManager
 {
     public class MsgTypes
     {
-        public const short ResponseWarp = 100;
+        public const short Warp = 100;
+        public const short Chat = 101;
     }
+
+    protected readonly Dictionary<long, PlayerCharacterEntity> playerCharacters = new Dictionary<long, PlayerCharacterEntity>();
+    protected readonly Dictionary<string, NetPeer> peersByCharacterName = new Dictionary<string, NetPeer>();
+    // Events
+    public ChatDelegate onReceiveChat;
 
     protected override void RegisterClientMessages()
     {
         base.RegisterClientMessages();
-        RegisterClientMessage(MsgTypes.ResponseWarp, HandleResponseWarp);
+        RegisterClientMessage(MsgTypes.Warp, HandleWarpAtClient);
+        RegisterClientMessage(MsgTypes.Chat, HandleChatAtClient);
     }
 
-    protected virtual void HandleResponseWarp(LiteNetLibMessageHandler messageHandler)
+    protected override void RegisterServerMessages()
     {
+        base.RegisterServerMessages();
+        RegisterClientMessage(MsgTypes.Chat, HandleChatAtServer);
+    }
 
+    protected virtual void HandleWarpAtClient(LiteNetLibMessageHandler messageHandler)
+    {
+        // TODO: May fade black when warping
+    }
+
+    protected virtual void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
+    {
+        var peer = messageHandler.peer;
+        var message = messageHandler.ReadMessage<ChatMessage>();
+        switch (message.channel)
+        {
+            case ChatChannel.Global:
+                // Send message to all peers (clients)
+                SendPacketToAllPeers(SendOptions.ReliableOrdered, MsgTypes.Chat, message);
+                break;
+            case ChatChannel.Whisper:
+                NetPeer receiverPeer;
+                if (!string.IsNullOrEmpty(message.receiver) &&
+                    peersByCharacterName.TryGetValue(message.receiver, out receiverPeer))
+                    LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, receiverPeer, MsgTypes.Chat, message);
+                break;
+            case ChatChannel.Party:
+                // TODO: Implement this later when party system ready
+                break;
+            case ChatChannel.Guild:
+                // TODO: Implement this later when guild system ready
+                break;
+        }
+    }
+
+    protected virtual void HandleChatAtClient(LiteNetLibMessageHandler messageHandler)
+    {
+        var message = messageHandler.ReadMessage<ChatMessage>();
+        if (onReceiveChat != null)
+            onReceiveChat.Invoke(message.channel, message.message, message.sender, message.receiver);
     }
 
     public override bool StartServer()
@@ -52,24 +98,17 @@ public class BaseGameNetworkManager : LiteNetLibGameManager
         Assets.spawnablePrefabs = spawnablePrefabs.ToArray();
     }
 
-    public virtual void SendChatMessage(string message)
+    public virtual void EnterChat(ChatChannel channel, string message, string senderName, string receiverName = "")
     {
-
-    }
-
-    public virtual void SendChatWhisperMessage(string targetCharacterName, string message)
-    {
-
-    }
-
-    public virtual void SendChatPartyMessage(string message)
-    {
-
-    }
-
-    public virtual void SendChatGuildMessage(string message)
-    {
-
+        if (!IsClientConnected)
+            return;
+        // Send chat message to server
+        var chatMessage = new ChatMessage();
+        chatMessage.channel = channel;
+        chatMessage.message = message;
+        chatMessage.sender = senderName;
+        chatMessage.receiver = receiverName;
+        LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MsgTypes.Chat, chatMessage);
     }
 
     public virtual void WarpCharacter(PlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
@@ -127,5 +166,22 @@ public class BaseGameNetworkManager : LiteNetLibGameManager
         }
         if (IsServer && !IsClient && GameInstance.Singleton.serverCharacterPrefab != null)
             Instantiate(GameInstance.Singleton.serverCharacterPrefab);
+    }
+
+    public virtual void RegisterPlayerCharacter(NetPeer peer, PlayerCharacterEntity playerCharacterEntity)
+    {
+        if (playerCharacterEntity == null || !Peers.ContainsKey(peer.ConnectId) || playerCharacters.ContainsKey(peer.ConnectId))
+            return;
+        playerCharacters[peer.ConnectId] = playerCharacterEntity;
+        peersByCharacterName[playerCharacterEntity.CharacterName] = peer;
+    }
+
+    public virtual void UnregisterPlayerCharacter(NetPeer peer)
+    {
+        PlayerCharacterEntity playerCharacterEntity;
+        if (!playerCharacters.TryGetValue(peer.ConnectId, out playerCharacterEntity))
+            return;
+        peersByCharacterName.Remove(playerCharacterEntity.CharacterName);
+        playerCharacters.Remove(peer.ConnectId);
     }
 }
