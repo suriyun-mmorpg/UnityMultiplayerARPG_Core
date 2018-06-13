@@ -62,8 +62,6 @@ public class UIChatHandler : UIBase
         {
             enterChatField.onValueChanged.RemoveListener(OnInputFieldValueChange);
             enterChatField.onValueChanged.AddListener(OnInputFieldValueChange);
-            enterChatField.onEndEdit.RemoveListener(OnInputFieldEndEdit);
-            enterChatField.onEndEdit.AddListener(OnInputFieldEndEdit);
         }
     }
 
@@ -92,7 +90,10 @@ public class UIChatHandler : UIBase
                 enterChatActiveObject.SetActive(true);
         }
         if (enterChatField != null)
+        {
+            enterChatField.Select();
             enterChatField.ActivateInputField();
+        }
         enterChatFieldVisible = true;
     }
 
@@ -156,12 +157,6 @@ public class UIChatHandler : UIBase
     {
         if (text.Length > 0 && !enterChatFieldVisible)
             ShowEnterChatField();
-    }
-
-    private void OnInputFieldEndEdit(string text)
-    {
-        if (enterChatFieldVisible)
-            HideEnterChatField();
     }
 
     IEnumerator VerticalScroll(float normalize)
