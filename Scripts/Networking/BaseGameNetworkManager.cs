@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.AI;
 using LiteNetLib;
 using LiteNetLibManager;
-using LiteNetLib.Utils;
 
 public class BaseGameNetworkManager : LiteNetLibGameManager
 {
@@ -17,7 +16,7 @@ public class BaseGameNetworkManager : LiteNetLibGameManager
     protected readonly Dictionary<long, PlayerCharacterEntity> playerCharacters = new Dictionary<long, PlayerCharacterEntity>();
     protected readonly Dictionary<string, NetPeer> peersByCharacterName = new Dictionary<string, NetPeer>();
     // Events
-    public ChatDelegate onReceiveChat;
+    public System.Action<ChatMessage> onReceiveChat;
 
     protected override void RegisterClientMessages()
     {
@@ -29,7 +28,7 @@ public class BaseGameNetworkManager : LiteNetLibGameManager
     protected override void RegisterServerMessages()
     {
         base.RegisterServerMessages();
-        RegisterClientMessage(MsgTypes.Chat, HandleChatAtServer);
+        RegisterServerMessage(MsgTypes.Chat, HandleChatAtServer);
     }
 
     protected virtual void HandleWarpAtClient(LiteNetLibMessageHandler messageHandler)
@@ -66,7 +65,7 @@ public class BaseGameNetworkManager : LiteNetLibGameManager
     {
         var message = messageHandler.ReadMessage<ChatMessage>();
         if (onReceiveChat != null)
-            onReceiveChat.Invoke(message.channel, message.message, message.sender, message.receiver);
+            onReceiveChat.Invoke(message);
     }
 
     public override bool StartServer()
@@ -98,7 +97,7 @@ public class BaseGameNetworkManager : LiteNetLibGameManager
         Assets.spawnablePrefabs = spawnablePrefabs.ToArray();
     }
 
-    public virtual void EnterChat(ChatChannel channel, string message, string senderName, string receiverName = "")
+    public virtual void EnterChat(ChatChannel channel, string message, string senderName, string receiverName)
     {
         if (!IsClientConnected)
             return;

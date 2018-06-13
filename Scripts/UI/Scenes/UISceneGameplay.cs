@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public enum CombatAmountType : byte
 {
@@ -55,6 +56,19 @@ public class UISceneGameplay : MonoBehaviour
     public UnityEvent onCharacterDead;
     public UnityEvent onCharacterRespawn;
 
+    #region Cache components
+    private BaseGameNetworkManager cacheGameNetworkManager;
+    public BaseGameNetworkManager CacheGameNetworkManager
+    {
+        get
+        {
+            if (cacheGameNetworkManager == null)
+                cacheGameNetworkManager = FindObjectOfType<BaseGameNetworkManager>();
+            return cacheGameNetworkManager;
+        }
+    }
+    #endregion
+
     private void Awake()
     {
         Singleton = this;
@@ -62,6 +76,13 @@ public class UISceneGameplay : MonoBehaviour
 
     private void Update()
     {
+        var fields = FindObjectsOfType<InputField>();
+        foreach (var field in fields)
+        {
+            if (field.isFocused)
+                return;
+        }
+
         foreach (var toggleUi in toggleUis)
         {
             if (Input.GetKeyDown(toggleUi.key))
@@ -143,8 +164,7 @@ public class UISceneGameplay : MonoBehaviour
 
     public void OnClickExit()
     {
-        var gameManager = FindObjectOfType<BaseGameNetworkManager>();
-        gameManager.StopHost();
+        CacheGameNetworkManager.StopHost();
     }
 
     public void OnCharacterDead(bool isInitialize)

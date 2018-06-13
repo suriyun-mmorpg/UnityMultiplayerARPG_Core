@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using LiteNetLibManager;
 
 public enum PlayerCharacterControllerMode
@@ -74,6 +74,13 @@ public class PlayerCharacterController : BasePlayerCharacterController
     {
         if (!CacheCharacterEntity.IsOwnerClient)
             return;
+        
+        var fields = FindObjectsOfType<InputField>();
+        foreach (var field in fields)
+        {
+            if (field.isFocused)
+                return;
+        }
 
         if (CacheGameplayCameraControls != null)
             CacheGameplayCameraControls.updateRotation = InputManager.GetButton("CameraRotate");

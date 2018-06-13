@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using LiteNetLibManager;
+﻿using LiteNetLibManager;
 using LiteNetLib.Utils;
 
 public class ChatMessage : ILiteNetLibMessage
