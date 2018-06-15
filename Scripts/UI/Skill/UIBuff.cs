@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIBuff : UISelectionEntry<(Buff buff, int targetLevel)>
+public class UIBuff : UISelectionEntry<(Buff buff, short targetLevel)>
 {
     [Tooltip("Duration Format => {0} = {Duration}")]
     public string durationFormat = "Duration: {0}";
@@ -81,7 +80,7 @@ public class UIBuff : UISelectionEntry<(Buff buff, int targetLevel)>
             uiBuffStats.Data = buff.GetIncreaseStats(level);
 
         if (uiBuffAttributes != null)
-            uiBuffAttributes.Data = GameDataHelpers.MakeAttributeAmountsDictionary(buff.increaseAttributes, new Dictionary<Attribute, int>(), level);
+            uiBuffAttributes.Data = GameDataHelpers.MakeAttributeAmountsDictionary(buff.increaseAttributes, new Dictionary<Attribute, short>(), level);
 
         if (uiBuffResistances != null)
             uiBuffResistances.Data = GameDataHelpers.MakeResistanceAmountsDictionary(buff.increaseResistances, new Dictionary<DamageElement, float>(), level);

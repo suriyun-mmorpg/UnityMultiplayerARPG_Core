@@ -8,7 +8,7 @@ public class CharacterAttribute
 {
     public static readonly CharacterAttribute Empty = new CharacterAttribute();
     public int dataId;
-    public int amount;
+    public short amount;
     [System.NonSerialized]
     private int dirtyDataId;
     [System.NonSerialized]
@@ -39,7 +39,7 @@ public class CharacterAttribute
         return GetAttribute() != null && character != null && character.StatPoint > 0;
     }
 
-    public void Increase(int amount)
+    public void Increase(short amount)
     {
         this.amount += amount;
     }
@@ -51,7 +51,7 @@ public class NetFieldCharacterAttribute : LiteNetLibNetField<CharacterAttribute>
     {
         var newValue = new CharacterAttribute();
         newValue.dataId = reader.GetInt();
-        newValue.amount = reader.GetInt();
+        newValue.amount = reader.GetShort();
         Value = newValue;
     }
 

@@ -12,12 +12,12 @@ public class Attribute : BaseGameData
 public struct AttributeAmount
 {
     public Attribute attribute;
-    public int amount;
+    public short amount;
 }
 
 [System.Serializable]
 public struct AttributeIncremental
 {
     public Attribute attribute;
-    public IncrementalInt amount;
+    public IncrementalShort amount;
 }

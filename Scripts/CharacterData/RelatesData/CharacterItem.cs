@@ -8,8 +8,8 @@ public class CharacterItem
 {
     public static readonly CharacterItem Empty = new CharacterItem();
     public int dataId;
-    public int level;
-    public int amount;
+    public short level;
+    public short amount;
     // TODO: I want to add random item bonus
     [System.NonSerialized]
     private int dirtyDataId;
@@ -124,10 +124,10 @@ public class CharacterItem
         return cacheAmmoItem;
     }
 
-    public int GetMaxStack()
+    public short GetMaxStack()
     {
         var item = GetItem();
-        return item == null ? 0 : item.maxStack;
+        return item == null ? (short)0 : item.maxStack;
     }
 
     public bool IsValid()
@@ -145,12 +145,12 @@ public class CharacterItem
         return GetEquipmentItem().CanEquip(character, level);
     }
 
-    public static CharacterItem Create(Item item, int level = 1, int amount = 1)
+    public static CharacterItem Create(Item item, short level = 1, short amount = 1)
     {
         return Create(item.HashId, level, amount);
     }
 
-    public static CharacterItem Create(int dataId, int level = 1, int amount = 1)
+    public static CharacterItem Create(int dataId, short level = 1, short amount = 1)
     {
         var newItem = new CharacterItem();
         newItem.dataId = dataId;
@@ -166,8 +166,8 @@ public class NetFieldCharacterItem : LiteNetLibNetField<CharacterItem>
     {
         var newValue = new CharacterItem();
         newValue.dataId = reader.GetInt();
-        newValue.level = reader.GetInt();
-        newValue.amount = reader.GetInt();
+        newValue.level = reader.GetShort();
+        newValue.amount = reader.GetShort();
         Value = newValue;
     }
 

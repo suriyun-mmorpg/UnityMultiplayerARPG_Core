@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIItemAmounts : UISelectionEntry<Dictionary<Item, int>>
+public class UIItemAmounts : UISelectionEntry<Dictionary<Item, short>>
 {
     [Tooltip("Item Level Format => {0} = {Item title}, {1} = {Current Amount}, {2} = {Target Amount}")]
     public string amountFormat = "{0}: {1}/{2}";

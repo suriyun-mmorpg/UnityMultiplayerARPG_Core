@@ -6,8 +6,8 @@ using LiteNetLibManager;
 public class MonsterSpawnArea : MonoBehaviour
 {
     public MonsterCharacter database;
-    public int level = 1;
-    public int amount = 1;
+    public short level = 1;
+    public short amount = 1;
     public float randomRadius = 5f;
 
     public void RandomSpawn(LiteNetLibGameManager manager)

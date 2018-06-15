@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIAttributeAmounts : UISelectionEntry<Dictionary<Attribute, int>>
+public class UIAttributeAmounts : UISelectionEntry<Dictionary<Attribute, short>>
 {
     [Tooltip("Attribute Amount Format => {0} = {Attribute title}, {1} = {Current Amount}, {2} = {Target Amount}")]
     public string amountFormat = "{0}: {1}/{2}";
@@ -61,7 +61,7 @@ public class UIAttributeAmounts : UISelectionEntry<Dictionary<Attribute, int>>
                     continue;
                 if (!string.IsNullOrEmpty(text))
                     text += "\n";
-                var currentAmount = 0;
+                short currentAmount = 0;
                 if (owningCharacter != null)
                     owningCharacter.CacheAttributes.TryGetValue(attribute, out currentAmount);
                 var format = currentAmount >= targetAmount ? amountFormat : amountNotReachTargetFormat;

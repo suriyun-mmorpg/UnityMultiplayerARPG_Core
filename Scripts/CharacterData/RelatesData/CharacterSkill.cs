@@ -8,7 +8,7 @@ public class CharacterSkill
 {
     public static readonly CharacterSkill Empty = new CharacterSkill();
     public int dataId;
-    public int level;
+    public short level;
     public float coolDownRemainsDuration;
     [System.NonSerialized]
     private int dirtyDataId;
@@ -40,7 +40,7 @@ public class CharacterSkill
         return GetSkill().CanLevelUp(character, level);
     }
 
-    public void LevelUp(int level)
+    public void LevelUp(short level)
     {
         this.level += level;
     }
@@ -117,7 +117,7 @@ public class CharacterSkill
         coolDownRemainsDuration = 0;
     }
 
-    public static CharacterSkill Create(Skill skill, int level)
+    public static CharacterSkill Create(Skill skill, short level)
     {
         var newSkill = new CharacterSkill();
         newSkill.dataId = skill.HashId;
@@ -133,7 +133,7 @@ public class NetFieldCharacterSkill : LiteNetLibNetField<CharacterSkill>
     {
         var newValue = new CharacterSkill();
         newValue.dataId = reader.GetInt();
-        newValue.level = reader.GetInt();
+        newValue.level = reader.GetShort();
         newValue.coolDownRemainsDuration = reader.GetFloat();
         Value = newValue;
     }

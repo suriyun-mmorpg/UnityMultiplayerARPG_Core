@@ -3,8 +3,8 @@ using UnityEngine;
 
 public interface IPlayerCharacterData : ICharacterData
 {
-    int StatPoint { get; set; }
-    int SkillPoint { get; set; }
+    short StatPoint { get; set; }
+    short SkillPoint { get; set; }
     int Gold { get; set; }
     /// <summary>
     /// Current Map Name will be work with MMORPG system only

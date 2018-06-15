@@ -11,17 +11,17 @@ public abstract class BaseCharacter : BaseGameData
     public CharacterStatsIncremental stats;
     public ResistanceIncremental[] resistances;
     
-    public CharacterStats GetCharacterStats(int level)
+    public CharacterStats GetCharacterStats(short level)
     {
         return stats.GetCharacterStats(level);
     }
 
-    public Dictionary<Attribute, int> GetCharacterAttributes(int level)
+    public Dictionary<Attribute, short> GetCharacterAttributes(short level)
     {
-        return GameDataHelpers.MakeAttributeAmountsDictionary(attributes, new Dictionary<Attribute, int>(), level);
+        return GameDataHelpers.MakeAttributeAmountsDictionary(attributes, new Dictionary<Attribute, short>(), level);
     }
 
-    public Dictionary<DamageElement, float> GetCharacterResistances(int level)
+    public Dictionary<DamageElement, float> GetCharacterResistances(short level)
     {
         return GameDataHelpers.MakeResistanceAmountsDictionary(resistances, new Dictionary<DamageElement, float>(), level);
     }

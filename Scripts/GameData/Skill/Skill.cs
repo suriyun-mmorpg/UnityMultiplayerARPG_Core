@@ -27,7 +27,7 @@ public class Skill : BaseGameData
 {
     public SkillType skillType;
     [Range(1, 30)]
-    public int maxLevel = 1;
+    public short maxLevel = 1;
     [Tooltip("Randoming cast animations")]
     public ActionAnimation[] castAnimations;
     [Tooltip("An available weapons, if it not set every weapons is available")]
@@ -61,13 +61,13 @@ public class Skill : BaseGameData
     public Item craftingItem;
     public ItemAmount[] craftRequirements;
 
-    private Dictionary<Skill, int> cacheRequireSkillLevels;
-    public Dictionary<Skill, int> CacheRequireSkillLevels
+    private Dictionary<Skill, short> cacheRequireSkillLevels;
+    public Dictionary<Skill, short> CacheRequireSkillLevels
     {
         get
         {
             if (cacheRequireSkillLevels == null)
-                cacheRequireSkillLevels = GameDataHelpers.MakeSkillLevelsDictionary(requirement.skillLevels, new Dictionary<Skill, int>());
+                cacheRequireSkillLevels = GameDataHelpers.MakeSkillLevelsDictionary(requirement.skillLevels, new Dictionary<Skill, short>());
             return cacheRequireSkillLevels;
         }
     }
@@ -83,13 +83,13 @@ public class Skill : BaseGameData
         }
     }
 
-    private Dictionary<Item, int> cacheCraftRequirements;
-    public Dictionary<Item, int> CacheCraftRequirements
+    private Dictionary<Item, short> cacheCraftRequirements;
+    public Dictionary<Item, short> CacheCraftRequirements
     {
         get
         {
             if (cacheCraftRequirements == null)
-                cacheCraftRequirements = GameDataHelpers.MakeItemAmountsDictionary(craftRequirements, new Dictionary<Item, int>());
+                cacheCraftRequirements = GameDataHelpers.MakeItemAmountsDictionary(craftRequirements, new Dictionary<Item, short>());
             return cacheCraftRequirements;
         }
     }
@@ -98,7 +98,7 @@ public class Skill : BaseGameData
 [System.Serializable]
 public struct SkillRequirement
 {
-    public IncrementalInt characterLevel;
+    public IncrementalShort characterLevel;
     public SkillLevel[] skillLevels;
 }
 
@@ -106,5 +106,5 @@ public struct SkillRequirement
 public struct SkillLevel
 {
     public Skill skill;
-    public int level;
+    public short level;
 }

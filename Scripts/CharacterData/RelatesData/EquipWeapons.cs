@@ -18,13 +18,13 @@ public class NetFieldEquipWeapons : LiteNetLibNetField<EquipWeapons>
         // Right hand
         var rightHand = new CharacterItem();
         rightHand.dataId = reader.GetInt();
-        rightHand.level = reader.GetInt();
-        rightHand.amount = reader.GetInt();
+        rightHand.level = reader.GetShort();
+        rightHand.amount = reader.GetShort();
         // Left hand
         var leftHand = new CharacterItem();
         leftHand.dataId = reader.GetInt();
-        leftHand.level = reader.GetInt();
-        leftHand.amount = reader.GetInt();
+        leftHand.level = reader.GetShort();
+        leftHand.amount = reader.GetShort();
         // Set result
         var newValue = new EquipWeapons();
         newValue.rightHand = rightHand;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UISkillLevels : UISelectionEntry<Dictionary<Skill, int>>
+public class UISkillLevels : UISelectionEntry<Dictionary<Skill, short>>
 {
     [Tooltip("Skill Level Format => {0} = {Skill title}, {1} = {Current Level}, {2} = {Target Level}")]
     public string levelFormat = "{0}: {1}/{2}";
@@ -61,7 +61,7 @@ public class UISkillLevels : UISelectionEntry<Dictionary<Skill, int>>
                     continue;
                 if (!string.IsNullOrEmpty(text))
                     text += "\n";
-                var currentLevel = 0;
+                short currentLevel = 0;
                 if (owningCharacter != null)
                     owningCharacter.CacheSkills.TryGetValue(skill, out currentLevel);
                 var format = currentLevel >= targetLevel ? levelFormat : levelNotReachTargetFormat;

@@ -1,13 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
 public interface ICharacterData
 {
     string Id { get; set; }
     int DataId { get; set; }
     string CharacterName { get; set; }
-    int Level { get; set; }
+    short Level { get; set; }
     int Exp { get; set; }
     int CurrentHp { get; set; }
     int CurrentMp { get; set; }

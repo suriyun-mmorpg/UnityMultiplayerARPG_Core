@@ -19,7 +19,7 @@ public class CharacterBuff
     public string characterId;
     public BuffType type;
     public int dataId;
-    public int level;
+    public short level;
     public float buffRemainsDuration;
     [System.NonSerialized]
     private BuffType dirtyType;
@@ -46,7 +46,7 @@ public class CharacterBuff
     [System.NonSerialized]
     private CharacterStats cacheIncreaseStats;
     [System.NonSerialized]
-    private Dictionary<Attribute, int> cacheIncreaseAttributes;
+    private Dictionary<Attribute, short> cacheIncreaseAttributes;
     [System.NonSerialized]
     private Dictionary<DamageElement, float> cacheIncreaseResistances;
     [System.NonSerialized]
@@ -66,7 +66,7 @@ public class CharacterBuff
             cacheRecoveryFood = 0;
             cacheRecoveryWater = 0;
             cacheIncreaseStats = new CharacterStats();
-            cacheIncreaseAttributes = new Dictionary<Attribute, int>();
+            cacheIncreaseAttributes = new Dictionary<Attribute, short>();
             cacheIncreaseResistances = new Dictionary<DamageElement, float>();
             cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
             return;
@@ -176,7 +176,7 @@ public class CharacterBuff
         return cacheIncreaseStats;
     }
 
-    public Dictionary<Attribute, int> GetIncreaseAttributes()
+    public Dictionary<Attribute, short> GetIncreaseAttributes()
     {
         MakeCache();
         return cacheIncreaseAttributes;
@@ -214,7 +214,7 @@ public class CharacterBuff
         buffRemainsDuration = 0;
     }
 
-    public static CharacterBuff Create(string characterId, BuffType type, int dataId, int level = 1)
+    public static CharacterBuff Create(string characterId, BuffType type, int dataId, short level = 1)
     {
         var newBuff = new CharacterBuff();
         newBuff.id = GenericUtils.GetUniqueId();
@@ -236,7 +236,7 @@ public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>
         newValue.characterId = reader.GetString();
         newValue.type = (BuffType)reader.GetByte();
         newValue.dataId = reader.GetInt();
-        newValue.level = reader.GetInt();
+        newValue.level = reader.GetShort();
         newValue.buffRemainsDuration = reader.GetFloat();
         Value = newValue;
     }

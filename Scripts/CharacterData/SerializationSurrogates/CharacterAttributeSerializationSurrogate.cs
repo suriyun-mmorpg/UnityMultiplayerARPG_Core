@@ -26,7 +26,7 @@ public class CharacterAttributeSerializationSurrogate : ISerializationSurrogate
             data.dataId = BaseGameData.GenerateHashId(stringId);
         else
             data.dataId = info.GetInt32("dataId");
-        data.amount = info.GetInt32("amount");
+        data.amount = info.GetInt16("amount");
         obj = data;
         return obj;
     }

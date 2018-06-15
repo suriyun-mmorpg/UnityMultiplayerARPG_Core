@@ -27,7 +27,7 @@ public class CharacterSkillSerializationSurrogate : ISerializationSurrogate
             data.dataId = BaseGameData.GenerateHashId(stringId);
         else
             data.dataId = info.GetInt32("dataId");
-        data.level = info.GetInt32("level");
+        data.level = info.GetInt16("level");
         data.coolDownRemainsDuration = info.GetSingle("coolDownRemainsDuration");
         obj = data;
         return obj;

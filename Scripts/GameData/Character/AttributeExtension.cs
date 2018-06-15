@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public static class AttributeExtension
 {
-    public static CharacterStats GetStats(this Attribute attribute, int level)
+    public static CharacterStats GetStats(this Attribute attribute, short level)
     {
         if (attribute == null)
             return new CharacterStats();
@@ -18,7 +18,7 @@ public static class AttributeExtension
         return attribute.GetStats(attributeAmount.amount);
     }
 
-    public static CharacterStats GetStats(this AttributeIncremental attributeIncremental, int level)
+    public static CharacterStats GetStats(this AttributeIncremental attributeIncremental, short level)
     {
         if (attributeIncremental.attribute == null)
             return new CharacterStats();

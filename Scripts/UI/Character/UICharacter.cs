@@ -298,7 +298,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
                 var characterAttribute = characterAttributes[i];
                 var attribute = characterAttribute.GetAttribute();
                 UICharacterAttribute cacheUICharacterAttribute;
-                int amount;
+                short amount;
                 if (CacheUICharacterAttributes.TryGetValue(attribute, out cacheUICharacterAttribute) &&
                     displayingAttributes.TryGetValue(attribute, out amount))
                 {

@@ -53,7 +53,7 @@ public class PlayerCharacterSerializationSurrogate : ISerializationSurrogate
         else
             data.DataId = info.GetInt32("dataId");
         data.CharacterName = info.GetString("characterName");
-        data.Level = info.GetInt32("level");
+        data.Level = info.GetInt16("level");
         data.Exp = info.GetInt32("exp");
         data.CurrentHp = info.GetInt32("currentHp");
         data.CurrentMp = info.GetInt32("currentMp");
@@ -67,8 +67,8 @@ public class PlayerCharacterSerializationSurrogate : ISerializationSurrogate
         data.EquipItems = info.GetListValue<CharacterItem>("equipItems");
         data.NonEquipItems = info.GetListValue<CharacterItem>("nonEquipItems");
         // Player Character
-        data.StatPoint = info.GetInt32("statPoint");
-        data.SkillPoint = info.GetInt32("skillPoint");
+        data.StatPoint = info.GetInt16("statPoint");
+        data.SkillPoint = info.GetInt16("skillPoint");
         data.Gold = info.GetInt32("gold");
         data.CurrentMapName = info.GetString("currentMapName");
         data.CurrentPosition = (Vector3)info.GetValue("currentPosition", typeof(Vector3));

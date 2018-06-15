@@ -8,7 +8,7 @@ public class CharacterData : ICharacterData
     public string id;
     public int dataId;
     public string characterName;
-    public int level;
+    public short level;
     public int exp;
     public int currentHp;
     public int currentMp;
@@ -26,7 +26,7 @@ public class CharacterData : ICharacterData
     public string Id { get { return id; } set { id = value; } }
     public int DataId { get { return dataId; } set { dataId = value; } }
     public string CharacterName { get { return characterName; } set { characterName = value; } }
-    public int Level { get { return level; } set { level = value; } }
+    public short Level { get { return level; } set { level = value; } }
     public int Exp { get { return exp; } set { exp = value; } }
     public int CurrentHp { get { return currentHp; } set { currentHp = value; } }
     public int CurrentMp { get { return currentMp; } set { currentMp = value; } }

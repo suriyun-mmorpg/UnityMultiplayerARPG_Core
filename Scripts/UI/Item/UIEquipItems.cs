@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -175,7 +174,7 @@ public class UIEquipItems : UIBase
         }
     }
 
-    private (CharacterItem characterItem, int targetLevel) GetEmptyUIData()
+    private (CharacterItem characterItem, short targetLevel) GetEmptyUIData()
     {
         return (CharacterItem.Empty, 1);
     }

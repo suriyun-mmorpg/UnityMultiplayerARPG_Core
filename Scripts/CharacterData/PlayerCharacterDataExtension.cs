@@ -1,5 +1,4 @@
 ﻿using LiteNetLib.Utils;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
@@ -46,7 +45,7 @@ public static class PlayerCharacterDataExtension
         if (!GameInstance.PlayerCharacters.TryGetValue(character.DataId, out database))
             return character;
         // Validating character attributes
-        var returningStatPoint = 0;
+        short returningStatPoint = 0;
         var validAttributeIds = new HashSet<int>();
         var characterAttributes = character.Attributes;
         for (var i = characterAttributes.Count - 1; i >= 0; --i)
@@ -76,7 +75,7 @@ public static class PlayerCharacterDataExtension
             character.Attributes.Add(characterAttribute);
         }
         // Validating character skills
-        var returningSkillPoint = 0;
+        short returningSkillPoint = 0;
         var validSkillIds = new HashSet<int>();
         var characterSkills = character.Skills;
         for (var i = characterSkills.Count - 1; i >= 0; --i)
@@ -433,15 +432,15 @@ public static class PlayerCharacterDataExtension
         tempCharacterData.Id = reader.GetString();
         tempCharacterData.DataId = reader.GetInt();
         tempCharacterData.CharacterName = reader.GetString();
-        tempCharacterData.Level = reader.GetInt();
+        tempCharacterData.Level = reader.GetShort();
         tempCharacterData.Exp = reader.GetInt();
         tempCharacterData.CurrentHp = reader.GetInt();
         tempCharacterData.CurrentMp = reader.GetInt();
         tempCharacterData.CurrentStamina = reader.GetInt();
         tempCharacterData.CurrentFood = reader.GetInt();
         tempCharacterData.CurrentWater = reader.GetInt();
-        tempCharacterData.StatPoint = reader.GetInt();
-        tempCharacterData.SkillPoint = reader.GetInt();
+        tempCharacterData.StatPoint = reader.GetShort();
+        tempCharacterData.SkillPoint = reader.GetShort();
         tempCharacterData.Gold = reader.GetInt();
         tempCharacterData.CurrentMapName = reader.GetString();
         tempCharacterData.CurrentPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
@@ -454,7 +453,7 @@ public static class PlayerCharacterDataExtension
         {
             var entry = new CharacterAttribute();
             entry.dataId = reader.GetInt();
-            entry.amount = reader.GetInt();
+            entry.amount = reader.GetShort();
             tempCharacterData.Attributes.Add(entry);
         }
         count = reader.GetInt();
@@ -465,7 +464,7 @@ public static class PlayerCharacterDataExtension
             entry.characterId = reader.GetString();
             entry.dataId = reader.GetInt();
             entry.type = (BuffType)reader.GetByte();
-            entry.level = reader.GetInt();
+            entry.level = reader.GetShort();
             entry.buffRemainsDuration = reader.GetFloat();
             tempCharacterData.Buffs.Add(entry);
         }
@@ -474,7 +473,7 @@ public static class PlayerCharacterDataExtension
         {
             var entry = new CharacterSkill();
             entry.dataId = reader.GetInt();
-            entry.level = reader.GetInt();
+            entry.level = reader.GetShort();
             entry.coolDownRemainsDuration = reader.GetFloat();
             tempCharacterData.Skills.Add(entry);
         }
@@ -483,8 +482,8 @@ public static class PlayerCharacterDataExtension
         {
             var entry = new CharacterItem();
             entry.dataId = reader.GetInt();
-            entry.level = reader.GetInt();
-            entry.amount = reader.GetInt();
+            entry.level = reader.GetShort();
+            entry.amount = reader.GetShort();
             tempCharacterData.EquipItems.Add(entry);
         }
         count = reader.GetInt();
@@ -492,8 +491,8 @@ public static class PlayerCharacterDataExtension
         {
             var entry = new CharacterItem();
             entry.dataId = reader.GetInt();
-            entry.level = reader.GetInt();
-            entry.amount = reader.GetInt();
+            entry.level = reader.GetShort();
+            entry.amount = reader.GetShort();
             tempCharacterData.NonEquipItems.Add(entry);
         }
         count = reader.GetInt();
@@ -522,13 +521,13 @@ public static class PlayerCharacterDataExtension
 
         var rightWeapon = new CharacterItem();
         rightWeapon.dataId = reader.GetInt();
-        rightWeapon.level = reader.GetInt();
-        rightWeapon.amount = reader.GetInt();
+        rightWeapon.level = reader.GetShort();
+        rightWeapon.amount = reader.GetShort();
 
         var leftWeapon = new CharacterItem();
         leftWeapon.dataId = reader.GetInt();
-        leftWeapon.level = reader.GetInt();
-        leftWeapon.amount = reader.GetInt();
+        leftWeapon.level = reader.GetShort();
+        leftWeapon.amount = reader.GetShort();
 
         var equipWeapons = new EquipWeapons();
         equipWeapons.rightHand = rightWeapon;

@@ -33,7 +33,7 @@ public class CharacterBuffSerializationSurrogate : ISerializationSurrogate
             data.dataId = BaseGameData.GenerateHashId(stringId);
         else
             data.dataId = info.GetInt32("dataId");
-        data.level = info.GetInt32("level");
+        data.level = info.GetInt16("level");
         data.buffRemainsDuration = info.GetSingle("buffRemainsDuration");
         obj = data;
         return obj;

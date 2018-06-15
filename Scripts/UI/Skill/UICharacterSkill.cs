@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacterSkill : UIDataForCharacter<(CharacterSkill characterSkill, int targetLevel)>
+public class UICharacterSkill : UIDataForCharacter<(CharacterSkill characterSkill, short targetLevel)>
 {
     [Header("Generic Info Format")]
     [Tooltip("Title Format => {0} = {Title}")]
@@ -104,7 +104,7 @@ public class UICharacterSkill : UIDataForCharacter<(CharacterSkill characterSkil
     {
         var characterSkill = Data.characterSkill;
         var skill = characterSkill.GetSkill();
-        var level = Data.targetLevel;
+        short level = Data.targetLevel;
 
         collectedDeltaTime = 0f;
 
@@ -236,7 +236,7 @@ public class UICharacterSkill : UIDataForCharacter<(CharacterSkill characterSkil
                 uiNextLevelSkill.Hide();
             else
             {
-                uiNextLevelSkill.Setup((characterSkill, level + 1), character, indexOfData);
+                uiNextLevelSkill.Setup((characterSkill, (short)(level + 1)), character, indexOfData);
                 uiNextLevelSkill.Show();
             }
         }

@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class UISkillRequirement : UISelectionEntry<(Skill skill, int targetLevel)>
+public class UISkillRequirement : UISelectionEntry<(Skill skill, short targetLevel)>
 {
     [Header("Requirement Format")]
     [Tooltip("Require Level Format => {0} = {Level}")]

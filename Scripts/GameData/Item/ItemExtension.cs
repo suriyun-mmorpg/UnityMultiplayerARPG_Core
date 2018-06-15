@@ -5,7 +5,7 @@ using UnityEngine;
 public static class ItemExtension
 {
     #region Equipment Extension
-    public static bool CanEquip(this Item equipmentItem, ICharacterData character, int level)
+    public static bool CanEquip(this Item equipmentItem, ICharacterData character, short level)
     {
         if (equipmentItem == null || 
             !equipmentItem.IsEquipment() || 
@@ -13,7 +13,7 @@ public static class ItemExtension
             return false;
 
         var isPass = true;
-        var attributeAmountsDict = new Dictionary<Attribute, int>();
+        var attributeAmountsDict = new Dictionary<Attribute, short>();
         var attributeAmounts = character.Attributes;
         foreach (var attributeAmount in attributeAmounts)
         {
@@ -49,7 +49,7 @@ public static class ItemExtension
         return requireAmmoType == null || character.IndexOfAmmoItem(requireAmmoType) >= 0;
     }
 
-    public static CharacterStats GetIncreaseStats(this Item equipmentItem, int level)
+    public static CharacterStats GetIncreaseStats(this Item equipmentItem, short level)
     {
         if (equipmentItem == null ||
             !equipmentItem.IsEquipment())
@@ -57,16 +57,16 @@ public static class ItemExtension
         return equipmentItem.increaseStats.GetCharacterStats(level);
     }
 
-    public static Dictionary<Attribute, int> GetIncreaseAttributes(this Item equipmentItem, int level)
+    public static Dictionary<Attribute, short> GetIncreaseAttributes(this Item equipmentItem, short level)
     {
-        var result = new Dictionary<Attribute, int>();
+        var result = new Dictionary<Attribute, short>();
         if (equipmentItem != null &&
             equipmentItem.IsEquipment())
             result = GameDataHelpers.MakeAttributeAmountsDictionary(equipmentItem.increaseAttributes, result, level);
         return result;
     }
 
-    public static Dictionary<DamageElement, float> GetIncreaseResistances(this Item equipmentItem, int level)
+    public static Dictionary<DamageElement, float> GetIncreaseResistances(this Item equipmentItem, short level)
     {
         var result = new Dictionary<DamageElement, float>();
         if (equipmentItem != null &&
@@ -75,7 +75,7 @@ public static class ItemExtension
         return result;
     }
 
-    public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this Item equipmentItem, int level)
+    public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this Item equipmentItem, short level)
     {
         var result = new Dictionary<DamageElement, MinMaxFloat>();
         if (equipmentItem != null &&
@@ -86,7 +86,7 @@ public static class ItemExtension
     #endregion    
 
     #region Weapon Extension
-    public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount(this Item weaponItem, int level, ICharacterData character)
+    public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount(this Item weaponItem, short level, ICharacterData character)
     {
         if (weaponItem == null ||
             !weaponItem.IsWeapon())
@@ -94,7 +94,7 @@ public static class ItemExtension
         return GameDataHelpers.MakeDamageAmountPair(weaponItem.damageAmount, level, weaponItem.GetEffectivenessDamage(character));
     }
 
-    public static Dictionary<DamageElement, MinMaxFloat> GetDamageAmountWithInflictions(this Item weaponItem, int level, ICharacterData character, Dictionary<DamageElement, float> damageInflictionAmounts)
+    public static Dictionary<DamageElement, MinMaxFloat> GetDamageAmountWithInflictions(this Item weaponItem, short level, ICharacterData character, Dictionary<DamageElement, float> damageInflictionAmounts)
     {
         if (weaponItem == null ||
             !weaponItem.IsWeapon())

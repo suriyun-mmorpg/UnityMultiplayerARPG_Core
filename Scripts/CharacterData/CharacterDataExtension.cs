@@ -65,11 +65,11 @@ public static class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<Attribute, int> GetCharacterAttributes(this ICharacterData data)
+    public static Dictionary<Attribute, short> GetCharacterAttributes(this ICharacterData data)
     {
         if (data == null)
-            return new Dictionary<Attribute, int>();
-        var result = new Dictionary<Attribute, int>();
+            return new Dictionary<Attribute, short>();
+        var result = new Dictionary<Attribute, short>();
         // Attributes from character database
         var character = data.GetDatabase();
         if (character != null)
@@ -93,11 +93,11 @@ public static class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<Attribute, int> GetEquipmentAttributes(this ICharacterData data)
+    public static Dictionary<Attribute, short> GetEquipmentAttributes(this ICharacterData data)
     {
         if (data == null)
-            return new Dictionary<Attribute, int>();
-        var result = new Dictionary<Attribute, int>();
+            return new Dictionary<Attribute, short>();
+        var result = new Dictionary<Attribute, short>();
         // Armors
         Item tempEquipment = null;
         var equipItems = data.EquipItems;
@@ -126,9 +126,9 @@ public static class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<Attribute, int> GetBuffAttributes(this ICharacterData data)
+    public static Dictionary<Attribute, short> GetBuffAttributes(this ICharacterData data)
     {
-        var result = new Dictionary<Attribute, int>();
+        var result = new Dictionary<Attribute, short>();
         var buffs = data.Buffs;
         foreach (var buff in buffs)
         {
@@ -147,7 +147,7 @@ public static class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<Attribute, int> GetAttributes(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
+    public static Dictionary<Attribute, short> GetAttributes(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
     {
         var result = data.GetCharacterAttributes();
         if (sumWithEquipments)
@@ -157,9 +157,9 @@ public static class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<Skill, int> GetSkills(this ICharacterData data)
+    public static Dictionary<Skill, short> GetSkills(this ICharacterData data)
     {
-        var result = new Dictionary<Skill, int>();
+        var result = new Dictionary<Skill, short>();
         // Added skills
         var skills = data.Skills;
         foreach (var characterSkill in skills)
@@ -418,7 +418,7 @@ public static class CharacterDataExtension
         return count;
     }
 
-    public static bool IncreaseItems(this ICharacterData data, int dataId, int level, int amount)
+    public static bool IncreaseItems(this ICharacterData data, int dataId, short level, short amount)
     {
         Item itemData;
         // If item not valid
@@ -449,7 +449,7 @@ public static class CharacterDataExtension
                 }
                 else if (maxStack - nonEquipItem.amount > 0)
                 {
-                    amount = maxStack - (maxStack - nonEquipItem.amount);
+                    amount = (short)(maxStack - (maxStack - nonEquipItem.amount));
                     nonEquipItem.amount = maxStack;
                     changes[i] = nonEquipItem;
                 }
@@ -463,7 +463,7 @@ public static class CharacterDataExtension
             {
                 var value = emptySlot.Value;
                 var newItem = CharacterItem.Create(dataId, level);
-                var addAmount = 0;
+                short addAmount = 0;
                 if (amount - maxStack >= 0)
                 {
                     addAmount = maxStack;
@@ -489,7 +489,7 @@ public static class CharacterDataExtension
         while (amount > 0)
         {
             var newItem = CharacterItem.Create(dataId, level);
-            var addAmount = 0;
+            short addAmount = 0;
             if (amount - maxStack >= 0)
             {
                 addAmount = maxStack;
@@ -506,18 +506,18 @@ public static class CharacterDataExtension
         return true;
     }
 
-    public static bool DecreaseItems(this ICharacterData data, int dataId, int amount)
+    public static bool DecreaseItems(this ICharacterData data, int dataId, short amount)
     {
-        Dictionary<CharacterItem, int> decreaseItems;
+        Dictionary<CharacterItem, short> decreaseItems;
         return DecreaseItems(data, dataId, amount, out decreaseItems);
     }
 
-    public static bool DecreaseItems(this ICharacterData data, int dataId, int amount, out Dictionary<CharacterItem, int> decreaseItems)
+    public static bool DecreaseItems(this ICharacterData data, int dataId, short amount, out Dictionary<CharacterItem, short> decreaseItems)
     {
-        decreaseItems = new Dictionary<CharacterItem, int>();
-        var decreasingItemIndexes = new Dictionary<int, int>();
+        decreaseItems = new Dictionary<CharacterItem, short>();
+        var decreasingItemIndexes = new Dictionary<int, short>();
         var nonEquipItems = data.NonEquipItems;
-        var tempDecresingAmount = 0;
+        short tempDecresingAmount = 0;
         for (var i = 0; i < nonEquipItems.Count; ++i)
         {
             var nonEquipItem = nonEquipItems[i];
@@ -543,18 +543,18 @@ public static class CharacterDataExtension
         return true;
     }
 
-    public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, int amount)
+    public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, short amount)
     {
-        Dictionary<CharacterItem, int> decreaseItems;
+        Dictionary<CharacterItem, short> decreaseItems;
         return DecreaseAmmos(data, ammoType, amount, out decreaseItems);
     }
 
-    public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, int amount, out Dictionary<CharacterItem, int> decreaseItems)
+    public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, short amount, out Dictionary<CharacterItem, short> decreaseItems)
     {
-        decreaseItems = new Dictionary<CharacterItem, int>();
-        var decreasingItemIndexes = new Dictionary<int, int>();
+        decreaseItems = new Dictionary<CharacterItem, short>();
+        var decreasingItemIndexes = new Dictionary<int, short>();
         var nonEquipItems = data.NonEquipItems;
-        var tempDecresingAmount = 0;
+        short tempDecresingAmount = 0;
         for (var i = 0; i < nonEquipItems.Count; ++i)
         {
             var nonEquipItem = nonEquipItems[i];
@@ -580,7 +580,7 @@ public static class CharacterDataExtension
         return true;
     }
 
-    public static bool DecreaseItemsByIndex(this ICharacterData data, int index, int amount)
+    public static bool DecreaseItemsByIndex(this ICharacterData data, int index, short amount)
     {
         if (index < 0 || index > data.NonEquipItems.Count)
             return false;

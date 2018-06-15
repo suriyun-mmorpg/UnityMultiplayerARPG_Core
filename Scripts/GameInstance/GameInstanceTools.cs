@@ -9,7 +9,7 @@ using UnityEditor;
 public class GameInstanceTools : MonoBehaviour
 {
     [Header("Exp calculator")]
-    public int maxLevel;
+    public short maxLevel;
     public Int32GraphCalculator expCalculator;
     public bool calculateExp;
 
@@ -30,7 +30,7 @@ public class GameInstanceTools : MonoBehaviour
         if (calculateExp)
         {
             var expTree = new List<int>();
-            for (var i = 1; i <= maxLevel; ++i)
+            for (short i = 1; i <= maxLevel; ++i)
             {
                 expTree.Add(expCalculator.Calculate(i, maxLevel));
             }

@@ -5,8 +5,8 @@ using UnityEngine;
 [System.Serializable]
 public class PlayerCharacterData : CharacterData, IPlayerCharacterData
 {
-    public int statPoint;
-    public int skillPoint;
+    public short statPoint;
+    public short skillPoint;
     public int gold;
     public string currentMapName;
     public Vector3 currentPosition;
@@ -16,8 +16,8 @@ public class PlayerCharacterData : CharacterData, IPlayerCharacterData
     public List<CharacterHotkey> hotkeys = new List<CharacterHotkey>();
     public List<CharacterQuest> quests = new List<CharacterQuest>();
 
-    public int StatPoint { get { return statPoint; } set { statPoint = value; } }
-    public int SkillPoint { get { return skillPoint; } set { skillPoint = value; } }
+    public short StatPoint { get { return statPoint; } set { statPoint = value; } }
+    public short SkillPoint { get { return skillPoint; } set { skillPoint = value; } }
     public int Gold { get { return gold; } set { gold = value; } }
     public string CurrentMapName { get { return currentMapName; } set { currentMapName = value; } }
     public Vector3 CurrentPosition { get { return currentPosition; } set { currentPosition = value; } }

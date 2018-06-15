@@ -13,7 +13,7 @@ public enum MonsterCharacteristic
 public struct MonsterCharacterAmount
 {
     public MonsterCharacter monster;
-    public int amount;
+    public short amount;
 }
 
 [CreateAssetMenu(fileName = "MonsterCharacter", menuName = "Create GameData/MonsterCharacter")]

@@ -30,7 +30,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public SyncFieldString id = new SyncFieldString();
     public SyncFieldInt dataId = new SyncFieldInt();
     public SyncFieldString characterName = new SyncFieldString();
-    public SyncFieldInt level = new SyncFieldInt();
+    public SyncFieldShort level = new SyncFieldShort();
     public SyncFieldInt exp = new SyncFieldInt();
     public SyncFieldInt currentHp = new SyncFieldInt();
     public SyncFieldInt currentMp = new SyncFieldInt();
@@ -70,8 +70,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     #region Caches Data
     public CharacterStats CacheStats { get; protected set; }
-    public Dictionary<Attribute, int> CacheAttributes { get; protected set; }
-    public Dictionary<Skill, int> CacheSkills { get; protected set; }
+    public Dictionary<Attribute, short> CacheAttributes { get; protected set; }
+    public Dictionary<Skill, short> CacheSkills { get; protected set; }
     public Dictionary<DamageElement, float> CacheResistances { get; protected set; }
     public Dictionary<DamageElement, MinMaxFloat> CacheIncreaseDamages { get; protected set; }
     public int CacheMaxHp { get; protected set; }
@@ -88,7 +88,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public System.Action<string> onIdChange;
     public System.Action<int> onDataIdChange;
     public System.Action<string> onCharacterNameChange;
-    public System.Action<int> onLevelChange;
+    public System.Action<short> onLevelChange;
     public System.Action<int> onExpChange;
     public System.Action<int> onCurrentHpChange;
     public System.Action<int> onCurrentMpChange;
@@ -112,7 +112,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public virtual string Id { get { return id; } set { id.Value = value; } }
     public virtual int DataId { get { return dataId; } set { dataId.Value = value; } }
     public virtual string CharacterName { get { return characterName; } set { characterName.Value = value; } }
-    public virtual int Level { get { return level.Value; } set { level.Value = value; } }
+    public virtual short Level { get { return level.Value; } set { level.Value = value; } }
     public virtual int Exp { get { return exp.Value; } set { exp.Value = value; } }
     public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
     public virtual int CurrentMp { get { return currentMp.Value; } set { currentMp.Value = value; } }
@@ -340,7 +340,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         RegisterNetFunction("PlayActionAnimation", new LiteNetLibFunction<NetFieldInt, NetFieldByte>((actionId, animActionType) => NetFuncPlayActionAnimation(actionId, (AnimActionType)animActionType.Value)));
         RegisterNetFunction("PlayEffect", new LiteNetLibFunction<NetFieldInt>((effectId) => NetFuncPlayEffect(effectId)));
         RegisterNetFunction("PickupItem", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncPickupItem(objectId)));
-        RegisterNetFunction("DropItem", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((index, amount) => NetFuncDropItem(index, amount)));
+        RegisterNetFunction("DropItem", new LiteNetLibFunction<NetFieldInt, NetFieldShort>((index, amount) => NetFuncDropItem(index, amount)));
         RegisterNetFunction("EquipItem", new LiteNetLibFunction<NetFieldInt, NetFieldString>((nonEquipIndex, equipPosition) => NetFuncEquipItem(nonEquipIndex, equipPosition)));
         RegisterNetFunction("UnEquipItem", new LiteNetLibFunction<NetFieldString>((fromEquipPosition) => NetFuncUnEquipItem(fromEquipPosition)));
         RegisterNetFunction("CombatAmount", new LiteNetLibFunction<NetFieldByte, NetFieldInt>((combatAmountType, amount) => NetFuncCombatAmount((CombatAmountType)combatAmountType.Value, amount)));
@@ -395,7 +395,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         // Reduce ammo amount
         if (weapon != null && weapon.WeaponType.requireAmmoType != null)
         {
-            Dictionary<CharacterItem, int> decreaseItems;
+            Dictionary<CharacterItem, short> decreaseItems;
             if (!this.DecreaseAmmos(weapon.WeaponType.requireAmmoType, 1, out decreaseItems))
                 return;
             var firstEntry = decreaseItems.FirstOrDefault();
@@ -464,7 +464,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         // Reduce ammo amount
         if (characterSkill.GetSkill().IsAttack() && weapon != null && weapon.WeaponType.requireAmmoType != null)
         {
-            Dictionary<CharacterItem, int> decreaseItems;
+            Dictionary<CharacterItem, short> decreaseItems;
             if (!this.DecreaseAmmos(weapon.WeaponType.requireAmmoType, 1, out decreaseItems))
                 return;
             var firstEntry = decreaseItems.FirstOrDefault();
@@ -633,7 +633,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// </summary>
     /// <param name="index"></param>
     /// <param name="amount"></param>
-    protected void NetFuncDropItem(int index, int amount)
+    protected void NetFuncDropItem(int index, short amount)
     {
         var gameInstance = GameInstance.Singleton;
         if (CurrentHp <= 0 ||
@@ -819,7 +819,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         CallNetFunction("PickupItem", FunctionReceivers.Server, objectId);
     }
 
-    public virtual void RequestDropItem(int index, int amount)
+    public virtual void RequestDropItem(int index, short amount)
     {
         if (CurrentHp <= 0 || IsPlayingActionAnimation())
             return;
@@ -862,7 +862,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Inventory helpers
-    public bool IncreasingItemsWillOverwhelming(int itemDataId, int level, int amount)
+    public bool IncreasingItemsWillOverwhelming(int itemDataId, short level, short amount)
     {
         Item itemData;
         // If item not valid
@@ -1113,7 +1113,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// Override this to do stuffs when level changes
     /// </summary>
     /// <param name="level"></param>
-    protected virtual void OnLevelChange(int level)
+    protected virtual void OnLevelChange(short level)
     {
         isRecaching = true;
 
@@ -1282,7 +1282,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Buffs / Weapons / Damage
-    protected void ApplyBuff(string characterId, int dataId, BuffType type, int level)
+    protected void ApplyBuff(string characterId, int dataId, BuffType type, short level)
     {
         if (CurrentHp <= 0 || !IsServer)
             return;

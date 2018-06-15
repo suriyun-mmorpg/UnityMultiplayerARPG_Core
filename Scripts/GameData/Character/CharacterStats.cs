@@ -75,7 +75,7 @@ public struct CharacterStatsIncremental
     public CharacterStats baseStats;
     public CharacterStats statsIncreaseEachLevel;
 
-    public CharacterStats GetCharacterStats(int level)
+    public CharacterStats GetCharacterStats(short level)
     {
         return baseStats + (statsIncreaseEachLevel * (level - 1));
     }

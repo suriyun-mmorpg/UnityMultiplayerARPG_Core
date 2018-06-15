@@ -1,7 +1,3 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class UICharacterItemSelectionManager : UISelectionManager<(CharacterItem characterItem, int targetLevel), UICharacterItem, UICharacterItemEvent>
+﻿public class UICharacterItemSelectionManager : UISelectionManager<(CharacterItem characterItem, short targetLevel), UICharacterItem, UICharacterItemEvent>
 {
 }

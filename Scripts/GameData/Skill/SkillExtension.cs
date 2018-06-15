@@ -25,11 +25,11 @@ public static class SkillExtension
         return skill.IsAttack() && skill.isDebuff;
     }
 
-    public static int GetRequireCharacterLevel(this Skill skill, int level)
+    public static short GetRequireCharacterLevel(this Skill skill, short level)
     {
         if (skill == null)
             return 0;
-        return skill.requirement.characterLevel.GetAmount(level + 1);
+        return skill.requirement.characterLevel.GetAmount((short)(level + 1));
     }
 
     public static int GetMaxLevel(this Skill skill)
@@ -39,7 +39,7 @@ public static class SkillExtension
         return skill.maxLevel;
     }
 
-    public static bool CanLevelUp(this Skill skill, IPlayerCharacterData character, int level)
+    public static bool CanLevelUp(this Skill skill, IPlayerCharacterData character, short level)
     {
         if (skill == null || character == null)
             return false;
@@ -67,7 +67,7 @@ public static class SkillExtension
         return character.SkillPoint > 0 && level < skill.maxLevel && character.Level >= skill.GetRequireCharacterLevel(level) && isPass;
     }
 
-    public static int GetAdjustedLevel(this Skill skill, int level)
+    public static short GetAdjustedLevel(this Skill skill, short level)
     {
         if (skill == null)
             return 0;
@@ -76,7 +76,7 @@ public static class SkillExtension
         return level;
     }
 
-    public static int GetConsumeMp(this Skill skill, int level)
+    public static int GetConsumeMp(this Skill skill, short level)
     {
         if (skill == null)
             return 0;
@@ -84,7 +84,7 @@ public static class SkillExtension
         return skill.consumeMp.GetAmount(level);
     }
 
-    public static float GetCoolDownDuration(this Skill skill, int level)
+    public static float GetCoolDownDuration(this Skill skill, short level)
     {
         if (skill == null)
             return 0f;
@@ -112,7 +112,7 @@ public static class SkillExtension
     #endregion
 
     #region Attack
-    public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount(this Skill skill, int level, ICharacterData character)
+    public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount(this Skill skill, short level, ICharacterData character)
     {
         if (!skill.IsAttack() || skill.skillAttackType != SkillAttackType.Normal)
             return new KeyValuePair<DamageElement, MinMaxFloat>();
@@ -126,7 +126,7 @@ public static class SkillExtension
         return GameDataHelpers.CalculateEffectivenessDamage(skill.CacheEffectivenessAttributes, character);
     }
 
-    public static Dictionary<DamageElement, float> GetWeaponDamageInflictions(this Skill skill, int level)
+    public static Dictionary<DamageElement, float> GetWeaponDamageInflictions(this Skill skill, short level)
     {
         if (!skill.IsAttack())
             return new Dictionary<DamageElement, float>();
@@ -134,7 +134,7 @@ public static class SkillExtension
         return GameDataHelpers.MakeDamageInflictionAmountsDictionary(skill.weaponDamageInflictions, new Dictionary<DamageElement, float>(), level);
     }
 
-    public static Dictionary<DamageElement, MinMaxFloat> GetAdditionalDamageAmounts(this Skill skill, int level)
+    public static Dictionary<DamageElement, MinMaxFloat> GetAdditionalDamageAmounts(this Skill skill, short level)
     {
         if (!skill.IsAttack())
             return new Dictionary<DamageElement, MinMaxFloat>();

@@ -5,8 +5,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "SimpleGameplayRule", menuName = "Create GameplayRule/SimpleGameplayRule")]
 public class SimpleGameplayRule : BaseGameplayRule
 {
-    public int increaseStatPointEachLevel = 5;
-    public int increaseSkillPointEachLevel = 1;
+    public short increaseStatPointEachLevel = 5;
+    public short increaseSkillPointEachLevel = 1;
     public int hungryWhenFoodLowerThan = 40;
     public int thirstyWhenWaterLowerThan = 40;
     public float staminaRecoveryPerSeconds = 5;

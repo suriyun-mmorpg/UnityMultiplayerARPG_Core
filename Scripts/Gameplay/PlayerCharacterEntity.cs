@@ -13,8 +13,8 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     public WarpPortalEntity warpingPortal;
 
     #region Sync data
-    public SyncFieldInt statPoint = new SyncFieldInt();
-    public SyncFieldInt skillPoint = new SyncFieldInt();
+    public SyncFieldShort statPoint = new SyncFieldShort();
+    public SyncFieldShort skillPoint = new SyncFieldShort();
     public SyncFieldInt gold = new SyncFieldInt();
     // List
     public SyncListCharacterHotkey hotkeys = new SyncListCharacterHotkey();
@@ -23,8 +23,8 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
 
     #region Sync data actions
     public System.Action<int> onShowNpcDialog;
-    public System.Action<int> onStatPointChange;
-    public System.Action<int> onSkillPointChange;
+    public System.Action<short> onStatPointChange;
+    public System.Action<short> onSkillPointChange;
     public System.Action<int> onGoldChange;
     // List
     public System.Action<LiteNetLibSyncList.Operation, int> onHotkeysOperation;
@@ -32,8 +32,8 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     #endregion
 
     #region Interface implementation
-    public int StatPoint { get { return statPoint.Value; } set { statPoint.Value = value; } }
-    public int SkillPoint { get { return skillPoint.Value; } set { skillPoint.Value = value; } }
+    public short StatPoint { get { return statPoint.Value; } set { statPoint.Value = value; } }
+    public short SkillPoint { get { return skillPoint.Value; } set { skillPoint.Value = value; } }
     public int Gold { get { return gold.Value; } set { gold.Value = value; } }
     public string CurrentMapName { get { return SceneManager.GetActiveScene().name; } set { } }
     public Vector3 CurrentPosition
@@ -303,8 +303,8 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         quests.onOperation += OnQuestsOperation;
         // Register Network functions
         RegisterNetFunction("SwapOrMergeItem", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((fromIndex, toIndex) => NetFuncSwapOrMergeItem(fromIndex, toIndex)));
-        RegisterNetFunction("AddAttribute", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((attributeIndex, amount) => NetFuncAddAttribute(attributeIndex, amount)));
-        RegisterNetFunction("AddSkill", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((skillIndex, amount) => NetFuncAddSkill(skillIndex, amount)));
+        RegisterNetFunction("AddAttribute", new LiteNetLibFunction<NetFieldInt, NetFieldShort>((attributeIndex, amount) => NetFuncAddAttribute(attributeIndex, amount)));
+        RegisterNetFunction("AddSkill", new LiteNetLibFunction<NetFieldInt, NetFieldShort>((skillIndex, amount) => NetFuncAddSkill(skillIndex, amount)));
         RegisterNetFunction("Respawn", new LiteNetLibFunction(NetFuncRespawn));
         RegisterNetFunction("AssignHotkey", new LiteNetLibFunction<NetFieldString, NetFieldByte, NetFieldInt>((hotkeyId, type, dataId) => NetFuncAssignHotkey(hotkeyId, type, dataId)));
         RegisterNetFunction("NpcActivate", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncNpcActivate(objectId)));
@@ -345,7 +345,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         if (fromItem.dataId.Equals(toItem.dataId) && !fromItem.IsFull() && !toItem.IsFull())
         {
             // Merge if same id and not full
-            var maxStack = toItem.GetMaxStack();
+            short maxStack = toItem.GetMaxStack();
             if (toItem.amount + fromItem.amount <= maxStack)
             {
                 toItem.amount += fromItem.amount;
@@ -354,7 +354,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
             }
             else
             {
-                var remains = toItem.amount + fromItem.amount - maxStack;
+                short remains = (short)(toItem.amount + fromItem.amount - maxStack);
                 toItem.amount = maxStack;
                 fromItem.amount = remains;
                 nonEquipItems[fromIndex] = fromItem;
@@ -369,7 +369,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         }
     }
 
-    protected void NetFuncAddAttribute(int attributeIndex, int amount)
+    protected void NetFuncAddAttribute(int attributeIndex, short amount)
     {
         if (CurrentHp <= 0 || attributeIndex < 0 || attributeIndex >= attributes.Count || amount <= 0 || amount > StatPoint)
             return;
@@ -384,7 +384,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         StatPoint -= amount;
     }
 
-    protected void NetFuncAddSkill(int skillIndex, int amount)
+    protected void NetFuncAddSkill(int skillIndex, short amount)
     {
         if (CurrentHp <= 0 || skillIndex < 0 || skillIndex >= skills.Count || amount <= 0 || amount > SkillPoint)
             return;
@@ -581,14 +581,14 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         CallNetFunction("SwapOrMergeItem", FunctionReceivers.Server, fromIndex, toIndex);
     }
 
-    public void RequestAddAttribute(int attributeIndex, int amount)
+    public void RequestAddAttribute(int attributeIndex, short amount)
     {
         if (CurrentHp <= 0)
             return;
         CallNetFunction("AddAttribute", FunctionReceivers.Server, attributeIndex, amount);
     }
 
-    public void RequestAddSkill(int skillIndex, int amount)
+    public void RequestAddSkill(int skillIndex, short amount)
     {
         if (CurrentHp <= 0)
             return;
@@ -629,13 +629,13 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     #endregion
 
     #region Sync data changes callback
-    protected virtual void OnStatPointChange(int statPoint)
+    protected virtual void OnStatPointChange(short statPoint)
     {
         if (onStatPointChange != null)
             onStatPointChange.Invoke(statPoint);
     }
 
-    protected virtual void OnSkillPointChange(int skillPoint)
+    protected virtual void OnSkillPointChange(short skillPoint)
     {
         if (onSkillPointChange != null)
             onSkillPointChange.Invoke(skillPoint);

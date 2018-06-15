@@ -87,7 +87,7 @@ public class ItemDropEntity : RpgNetworkEntity
         itemDataId.onChange -= OnItemDataIdChange;
     }
 
-    public static ItemDropEntity DropItem(RpgNetworkEntity dropper, int itemDataId, int level, int amount)
+    public static ItemDropEntity DropItem(RpgNetworkEntity dropper, int itemDataId, short level, short amount)
     {
         var gameInstance = GameInstance.Singleton;
         var dropPosition = dropper.CacheTransform.position + new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, 0, Random.Range(-1f, 1f) * gameInstance.dropDistance);

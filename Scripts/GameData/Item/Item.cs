@@ -23,9 +23,9 @@ public class Item : BaseGameData
     public int sellPrice;
     public float weight;
     [Range(1, 1000)]
-    public int maxStack = 1;
+    public short maxStack = 1;
     [Range(1, 30)]
-    public int maxLevel = 1;
+    public short maxLevel = 1;
 
     // Armor
     public ArmorType armorType;
@@ -111,13 +111,13 @@ public class Item : BaseGameData
     }
 
     #region Cache Data
-    private Dictionary<Attribute, int> cacheRequireAttributeAmounts;
-    public Dictionary<Attribute, int> CacheRequireAttributeAmounts
+    private Dictionary<Attribute, short> cacheRequireAttributeAmounts;
+    public Dictionary<Attribute, short> CacheRequireAttributeAmounts
     {
         get
         {
             if (cacheRequireAttributeAmounts == null)
-                cacheRequireAttributeAmounts = GameDataHelpers.MakeAttributeAmountsDictionary(requirement.attributeAmounts, new Dictionary<Attribute, int>());
+                cacheRequireAttributeAmounts = GameDataHelpers.MakeAttributeAmountsDictionary(requirement.attributeAmounts, new Dictionary<Attribute, short>());
             return cacheRequireAttributeAmounts;
         }
     }
@@ -165,14 +165,14 @@ public struct EquipmentModel
 public struct ItemAmount
 {
     public Item item;
-    public int amount;
+    public short amount;
 }
 
 [System.Serializable]
 public struct ItemDrop
 {
     public Item item;
-    public int amount;
+    public short amount;
     [Range(0f, 1f)]
     public float dropRate;
 }
@@ -181,6 +181,6 @@ public struct ItemDrop
 public struct EquipmentRequirement
 {
     public PlayerCharacter character;
-    public int level;
+    public short level;
     public AttributeAmount[] attributeAmounts;
 }

@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacterItem : UIDataForCharacter<(CharacterItem characterItem, int targetLevel)>
+public class UICharacterItem : UIDataForCharacter<(CharacterItem characterItem, short targetLevel)>
 {
     public string equipPosition { get; protected set; }
 
@@ -67,7 +65,7 @@ public class UICharacterItem : UIDataForCharacter<(CharacterItem characterItem, 
     public UICharacterItem uiNextLevelItem;
     public bool hideAmountWhenMaxIsOne;
 
-    public void Setup((CharacterItem, int) data, ICharacterData character, int indexOfData, string equipPosition)
+    public void Setup((CharacterItem characterItem, short targetLevel) data, ICharacterData character, int indexOfData, string equipPosition)
     {
         this.equipPosition = equipPosition;
         Setup(data, character, indexOfData);
@@ -234,7 +232,7 @@ public class UICharacterItem : UIDataForCharacter<(CharacterItem characterItem, 
                 uiNextLevelItem.Hide();
             else
             {
-                uiNextLevelItem.Setup((characterItem, level + 1), character, indexOfData, equipPosition);
+                uiNextLevelItem.Setup((characterItem, (short)(level + 1)), character, indexOfData, equipPosition);
                 uiNextLevelItem.Show();
             }
         }
@@ -316,7 +314,7 @@ public class UICharacterItem : UIDataForCharacter<(CharacterItem characterItem, 
         if (selectionManager != null)
             selectionManager.DeselectSelectedUI();
         if (owningCharacter != null)
-            owningCharacter.RequestDropItem(indexOfData, amount);
+            owningCharacter.RequestDropItem(indexOfData, (short)amount);
     }
 }
 
