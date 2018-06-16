@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class UIDamageElementInfliction : UISelectionEntry<(DamageElement damageElement, float infliction)>
+public class UIDamageElementInfliction : UISelectionEntry<DamageElementInflictionTuple>
 {
     [Tooltip("Default Element Infliction Format => {1} = {Rate}")]
     public string defaultElementInflictionFormat = "Inflict {1}% damage";

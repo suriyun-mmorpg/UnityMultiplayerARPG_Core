@@ -1,3 +1,3 @@
-﻿public class UICharacterItemSelectionManager : UISelectionManager<(CharacterItem characterItem, short targetLevel), UICharacterItem, UICharacterItemEvent>
+﻿public class UICharacterItemSelectionManager : UISelectionManager<CharacterItemLevelTuple, UICharacterItem, UICharacterItemEvent>
 {
 }

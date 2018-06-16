@@ -2,7 +2,7 @@
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacterItem : UIDataForCharacter<(CharacterItem characterItem, short targetLevel)>
+public class UICharacterItem : UIDataForCharacter<CharacterItemLevelTuple>
 {
     public string equipPosition { get; protected set; }
 
@@ -65,7 +65,7 @@ public class UICharacterItem : UIDataForCharacter<(CharacterItem characterItem, 
     public UICharacterItem uiNextLevelItem;
     public bool hideAmountWhenMaxIsOne;
 
-    public void Setup((CharacterItem characterItem, short targetLevel) data, ICharacterData character, int indexOfData, string equipPosition)
+    public void Setup(CharacterItemLevelTuple data, ICharacterData character, int indexOfData, string equipPosition)
     {
         this.equipPosition = equipPosition;
         Setup(data, character, indexOfData);
@@ -222,7 +222,7 @@ public class UICharacterItem : UIDataForCharacter<(CharacterItem characterItem, 
             {
                 uiDamageAmounts.Show();
                 var keyValuePair = weaponItem.GetDamageAmount(level, null);
-                uiDamageAmounts.Data = (keyValuePair.Key, keyValuePair.Value);
+                uiDamageAmounts.Data = new DamageElementAmountTuple(keyValuePair.Key, keyValuePair.Value);
             }
         }
 
@@ -232,7 +232,7 @@ public class UICharacterItem : UIDataForCharacter<(CharacterItem characterItem, 
                 uiNextLevelItem.Hide();
             else
             {
-                uiNextLevelItem.Setup((characterItem, (short)(level + 1)), character, indexOfData, equipPosition);
+                uiNextLevelItem.Setup(new CharacterItemLevelTuple(characterItem, (short)(level + 1)), character, indexOfData, equipPosition);
                 uiNextLevelItem.Show();
             }
         }

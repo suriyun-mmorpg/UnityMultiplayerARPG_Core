@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
@@ -54,7 +52,7 @@ public class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
                 if (index >= 0 && index < owningCharacter.skills.Count)
                 {
                     var characterSkill = owningCharacter.skills[index];
-                    uiCharacterSkill.Setup((characterSkill, characterSkill.level), owningCharacter, index);
+                    uiCharacterSkill.Setup(new CharacterSkillLevelTuple(characterSkill, characterSkill.level), owningCharacter, index);
                     uiCharacterSkill.Show();
                 }
                 else
@@ -72,7 +70,7 @@ public class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
                 if (index >= 0 && index < owningCharacter.nonEquipItems.Count)
                 {
                     var characterItem = owningCharacter.nonEquipItems[index];
-                    uiCharacterItem.Setup((characterItem, characterItem.level), owningCharacter, index, string.Empty);
+                    uiCharacterItem.Setup(new CharacterItemLevelTuple(characterItem, characterItem.level), owningCharacter, index, string.Empty);
                     uiCharacterItem.Show();
                 }
                 else

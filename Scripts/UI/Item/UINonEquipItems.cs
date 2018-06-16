@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(UICharacterItemSelectionManager))]
 public class UINonEquipItems : UIBase
@@ -104,7 +102,7 @@ public class UINonEquipItems : UIBase
         CacheList.Generate(nonEquipItems, (index, characterItem, ui) =>
         {
             var uiCharacterItem = ui.GetComponent<UICharacterItem>();
-            uiCharacterItem.Setup((characterItem, characterItem.level), this.character, index, string.Empty);
+            uiCharacterItem.Setup(new CharacterItemLevelTuple(characterItem, characterItem.level), this.character, index, string.Empty);
             uiCharacterItem.Show();
             SelectionManager.Add(uiCharacterItem);
             if (selectedIdx == index)

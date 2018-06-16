@@ -1,3 +1,3 @@
-﻿public class UICharacterSkillSelectionManager : UISelectionManager<(CharacterSkill characterSkill, short targetLevel), UICharacterSkill, UICharacterSkillEvent>
+﻿public class UICharacterSkillSelectionManager : UISelectionManager<CharacterSkillLevelTuple, UICharacterSkill, UICharacterSkillEvent>
 {
 }

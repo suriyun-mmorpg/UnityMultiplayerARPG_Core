@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class UIDamageElementAmount : UISelectionEntry<(DamageElement damageElement, MinMaxFloat amount)>
+public class UIDamageElementAmount : UISelectionEntry<DamageElementAmountTuple>
 {
     [Tooltip("Damage Amount Format => {0} = {Element title}, {1} = {Min damage}, {2} = {Max damage}")]
     public string amountFormat = "{0}: {1}~{2}";

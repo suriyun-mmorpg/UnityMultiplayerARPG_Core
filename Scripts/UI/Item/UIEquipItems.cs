@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 [RequireComponent(typeof(UICharacterItemSelectionManager))]
 public class UIEquipItems : UIBase
@@ -152,7 +149,7 @@ public class UIEquipItems : UIBase
 
             tempPosition = armorItem.EquipPosition;
             if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
-                tempSlot.Setup((equipItem, equipItem.level), this.character, -1, tempPosition);
+                tempSlot.Setup(new CharacterItemLevelTuple(equipItem, equipItem.level), this.character, -1, tempPosition);
         }
 
         var equipWeapons = character.EquipWeapons;
@@ -164,18 +161,18 @@ public class UIEquipItems : UIBase
         if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
         {
             if (rightHandEquipment != null)
-                tempSlot.Setup((rightHand, rightHand.level), this.character, -1, tempPosition);
+                tempSlot.Setup(new CharacterItemLevelTuple(rightHand, rightHand.level), this.character, -1, tempPosition);
         }
         tempPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
         if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
         {
             if (leftHandEquipment != null)
-                tempSlot.Setup((leftHand, leftHand.level), this.character, -1, tempPosition);
+                tempSlot.Setup(new CharacterItemLevelTuple(leftHand, leftHand.level), this.character, -1, tempPosition);
         }
     }
 
-    private (CharacterItem characterItem, short targetLevel) GetEmptyUIData()
+    private CharacterItemLevelTuple GetEmptyUIData()
     {
-        return (CharacterItem.Empty, 1);
+        return new CharacterItemLevelTuple(CharacterItem.Empty, 1);
     }
 }

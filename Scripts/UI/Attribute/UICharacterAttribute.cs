@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacterAttribute : UIDataForCharacter<(CharacterAttribute characterAttribute, int targetAmount)>
+public class UICharacterAttribute : UIDataForCharacter<CharacterAttributeAmountTuple>
 {
     [Header("Generic Info Format")]
     [Tooltip("Title Format => {0} = {Title}")]

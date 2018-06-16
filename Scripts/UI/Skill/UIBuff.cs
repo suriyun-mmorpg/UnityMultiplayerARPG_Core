@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIBuff : UISelectionEntry<(Buff buff, short targetLevel)>
+public class UIBuff : UISelectionEntry<BuffLevelTuple>
 {
     [Tooltip("Duration Format => {0} = {Duration}")]
     public string durationFormat = "Duration: {0}";

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacterSkill : UIDataForCharacter<(CharacterSkill characterSkill, short targetLevel)>
+public class UICharacterSkill : UIDataForCharacter<CharacterSkillLevelTuple>
 {
     [Header("Generic Info Format")]
     [Tooltip("Title Format => {0} = {Title}")]
@@ -155,7 +155,7 @@ public class UICharacterSkill : UIDataForCharacter<(CharacterSkill characterSkil
             else
             {
                 uiRequirement.Show();
-                uiRequirement.Data = (skill, level);
+                uiRequirement.Data = new SkillLevelTuple(skill, level);
             }
         }
 
@@ -180,7 +180,7 @@ public class UICharacterSkill : UIDataForCharacter<(CharacterSkill characterSkil
             {
                 uiDamageAmount.Show();
                 var keyValuePair = skill.GetDamageAmount(level, null);
-                uiDamageAmount.Data = (keyValuePair.Key, keyValuePair.Value);
+                uiDamageAmount.Data = new DamageElementAmountTuple(keyValuePair.Key, keyValuePair.Value);
             }
         }
 
@@ -215,7 +215,7 @@ public class UICharacterSkill : UIDataForCharacter<(CharacterSkill characterSkil
             else
             {
                 uiSkillBuff.Show();
-                uiSkillBuff.Data = (skill.buff, level);
+                uiSkillBuff.Data = new BuffLevelTuple(skill.buff, level);
             }
         }
 
@@ -226,7 +226,7 @@ public class UICharacterSkill : UIDataForCharacter<(CharacterSkill characterSkil
             else
             {
                 uiSkillDebuff.Show();
-                uiSkillDebuff.Data = (skill.debuff, level);
+                uiSkillDebuff.Data = new BuffLevelTuple(skill.debuff, level);
             }
         }
 
@@ -236,7 +236,7 @@ public class UICharacterSkill : UIDataForCharacter<(CharacterSkill characterSkil
                 uiNextLevelSkill.Hide();
             else
             {
-                uiNextLevelSkill.Setup((characterSkill, (short)(level + 1)), character, indexOfData);
+                uiNextLevelSkill.Setup(new CharacterSkillLevelTuple(characterSkill, (short)(level + 1)), character, indexOfData);
                 uiNextLevelSkill.Show();
             }
         }

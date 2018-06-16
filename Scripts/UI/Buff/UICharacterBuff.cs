@@ -88,7 +88,7 @@ public class UICharacterBuff : UIDataForCharacter<CharacterBuff>
             {
                 var buff = Data.GetBuff();
                 uiBuff.Show();
-                uiBuff.Data = (buff, Data.level);
+                uiBuff.Data = new BuffLevelTuple(buff, Data.level);
             }
         }
     }

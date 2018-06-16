@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class UISkillRequirement : UISelectionEntry<(Skill skill, short targetLevel)>
+public class UISkillRequirement : UISelectionEntry<SkillLevelTuple>
 {
     [Header("Requirement Format")]
     [Tooltip("Require Level Format => {0} = {Level}")]

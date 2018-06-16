@@ -302,7 +302,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
                 if (CacheUICharacterAttributes.TryGetValue(attribute, out cacheUICharacterAttribute) &&
                     displayingAttributes.TryGetValue(attribute, out amount))
                 {
-                    cacheUICharacterAttribute.Setup((characterAttribute, amount), Data, i);
+                    cacheUICharacterAttribute.Setup(new CharacterAttributeAmountTuple(characterAttribute, amount), Data, i);
                     cacheUICharacterAttribute.Show();
                 }
                 else

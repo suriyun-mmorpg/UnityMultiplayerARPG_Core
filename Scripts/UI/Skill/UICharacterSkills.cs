@@ -119,7 +119,7 @@ public class UICharacterSkills : UIBase
                 CacheList.Generate(characterSkills, (index, characterSkill, ui) =>
                 {
                     var uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
-                    uiCharacterSkill.Setup((characterSkill, characterSkill.level), character, index);
+                    uiCharacterSkill.Setup(new CharacterSkillLevelTuple(characterSkill, characterSkill.level), character, index);
                     uiCharacterSkill.Show();
                     SelectionManager.Add(uiCharacterSkill);
                     if (selectedSkillId.Equals(characterSkill.dataId))
@@ -136,7 +136,7 @@ public class UICharacterSkills : UIBase
                     UICharacterSkill cacheUICharacterSkill;
                     if (CacheUICharacterSkills.TryGetValue(skill, out cacheUICharacterSkill))
                     {
-                        cacheUICharacterSkill.Setup((characterSkill, level), character, i);
+                        cacheUICharacterSkill.Setup(new CharacterSkillLevelTuple(characterSkill, level), character, i);
                         cacheUICharacterSkill.Show();
                         if (selectedSkillId.Equals(characterSkill.dataId))
                             cacheUICharacterSkill.OnClickSelect();

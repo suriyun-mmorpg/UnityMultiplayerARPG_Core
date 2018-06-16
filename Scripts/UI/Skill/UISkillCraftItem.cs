@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 
 public class UISkillCraftItem : UISelectionEntry<Skill>
 {
@@ -19,7 +16,7 @@ public class UISkillCraftItem : UISelectionEntry<Skill>
             else
             {
                 uiCraftingItem.Show();
-                uiCraftingItem.Data = (CharacterItem.Create(skill.craftingItem), 1);
+                uiCraftingItem.Data = new CharacterItemLevelTuple(CharacterItem.Create(skill.craftingItem), 1);
             }
         }
 

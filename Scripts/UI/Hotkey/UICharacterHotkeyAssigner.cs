@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class UICharacterHotkeyAssigner : UIBase
@@ -115,14 +114,14 @@ public class UICharacterHotkeyAssigner : UIBase
         CacheSkillList.Generate(filterSkills, (index, characterSkill, ui) =>
         {
             var uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
-            uiCharacterSkill.Setup((characterSkill, characterSkill.level), null, -1);
+            uiCharacterSkill.Setup(new CharacterSkillLevelTuple(characterSkill, characterSkill.level), null, -1);
             uiCharacterSkill.Show();
             CacheSkillSelectionManager.Add(uiCharacterSkill);
         });
         CacheItemList.Generate(filterItems, (index, characterItem, ui) =>
         {
             var uiCharacterItem = ui.GetComponent<UICharacterItem>();
-            uiCharacterItem.Setup((characterItem, characterItem.level), null, -1, string.Empty);
+            uiCharacterItem.Setup(new CharacterItemLevelTuple(characterItem, characterItem.level), null, -1, string.Empty);
             uiCharacterItem.Show();
             CacheItemSelectionManager.Add(uiCharacterItem);
         });

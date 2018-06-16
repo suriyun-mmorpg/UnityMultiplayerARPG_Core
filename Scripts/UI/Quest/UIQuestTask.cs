@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIQuestTask : UISelectionEntry<(QuestTask questTask, int progress)>
+public class UIQuestTask : UISelectionEntry<QuestTaskProgressTuple>
 {
     [Header("Generic Info Format")]
     [Tooltip("Kill Monster Task Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}")]
