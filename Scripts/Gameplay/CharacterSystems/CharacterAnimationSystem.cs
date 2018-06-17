@@ -24,7 +24,8 @@ public class CharacterAnimationSystem : ComponentSystem
     protected override void OnUpdate()
     {
         var deltaTime = Time.unscaledDeltaTime;
-        var gameplayRule = GameInstance.Singleton.GameplayRule;
+        var gameInstance = GameInstance.Singleton;
+        var gameplayRule = gameInstance != null ? gameInstance.GameplayRule : null;
         foreach (var comp in GetEntities<Components>())
         {
             UpdateAnimation(deltaTime, gameplayRule, comp.animationData, comp.animationData.CacheCharacterEntity, comp.transform);
