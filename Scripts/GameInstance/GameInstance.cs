@@ -271,6 +271,24 @@ public class GameInstance : MonoBehaviour
             UISceneLoading.Singleton.LoadScene(homeScene);
     }
 
+    public List<string> GetGameScenes()
+    {
+        var scenes = new List<string>();
+        if (startScene != null &&
+            !string.IsNullOrEmpty(startScene.SceneName))
+            scenes.Add(startScene.SceneName);
+
+        foreach (var scene in otherScenes)
+        {
+            if (scene != null &&
+                !string.IsNullOrEmpty(scene.SceneName) &&
+                !scenes.Contains(scene.SceneName))
+                scenes.Add(scene.SceneName);
+        }
+
+        return scenes;
+    }
+
     public static void AddAttributes(IEnumerable<Attribute> attributes)
     {
         foreach (var attribute in attributes)
