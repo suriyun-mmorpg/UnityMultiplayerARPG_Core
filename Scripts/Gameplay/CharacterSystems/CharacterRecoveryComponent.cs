@@ -1,33 +1,48 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.Entities;
 
-public class CharacterRecoverySystem : ComponentSystem
+public class CharacterRecoveryComponent : BaseCharacterComponent
 {
     public const float RECOVERY_UPDATE_DURATION = 0.5f;
 
-    struct Components
-    {
-        public CharacterRecoveryData recoveryData;
-    }
+    #region Recovery System Data
+    [HideInInspector, System.NonSerialized]
+    public float recoveryingHp;
+    [HideInInspector, System.NonSerialized]
+    public float recoveryingMp;
+    [HideInInspector, System.NonSerialized]
+    public float recoveryingStamina;
+    [HideInInspector, System.NonSerialized]
+    public float recoveryingFood;
+    [HideInInspector, System.NonSerialized]
+    public float recoveryingWater;
+    [HideInInspector, System.NonSerialized]
+    public float decreasingHp;
+    [HideInInspector, System.NonSerialized]
+    public float decreasingMp;
+    [HideInInspector, System.NonSerialized]
+    public float decreasingStamina;
+    [HideInInspector, System.NonSerialized]
+    public float decreasingFood;
+    [HideInInspector, System.NonSerialized]
+    public float decreasingWater;
+    [HideInInspector, System.NonSerialized]
+    public float recoveryUpdateDeltaTime;
+    #endregion
 
-    protected override void OnUpdate()
+    protected void Update()
     {
         var deltaTime = Time.unscaledDeltaTime;
-        var gameInstance = GameInstance.Singleton;
-        var gameplayRule = gameInstance != null ? gameInstance.GameplayRule : null;
-        foreach (var comp in GetEntities<Components>())
-        {
-            UpdateRecovery(deltaTime, gameplayRule, comp.recoveryData, comp.recoveryData.CacheCharacterEntity);
-        }
+        var gameplayRule = GameInstance.Singleton.GameplayRule;
+        UpdateRecovery(deltaTime, gameplayRule, this, CacheCharacterEntity);
     }
 
-    protected static void UpdateRecovery(float deltaTime, BaseGameplayRule gameplayRule, CharacterRecoveryData recoveryData, BaseCharacterEntity characterEntity)
+    protected static void UpdateRecovery(float deltaTime, BaseGameplayRule gameplayRule, CharacterRecoveryComponent recoveryData, BaseCharacterEntity characterEntity)
     {
         if (characterEntity.isRecaching || characterEntity.CurrentHp <= 0 || !characterEntity.IsServer)
             return;
-        
+
         recoveryData.recoveryUpdateDeltaTime += deltaTime;
         if (recoveryData.recoveryUpdateDeltaTime >= RECOVERY_UPDATE_DURATION)
         {

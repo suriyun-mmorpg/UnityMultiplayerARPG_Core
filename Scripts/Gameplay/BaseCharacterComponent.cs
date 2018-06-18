@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BaseCharacterComponentData : MonoBehaviour
+public abstract class BaseCharacterComponent : MonoBehaviour
 {
     private BaseCharacterEntity cacheCharacterEntity;
     public BaseCharacterEntity CacheCharacterEntity

@@ -16,9 +16,9 @@ public enum AnimActionType : byte
     Skill,
 }
 
-[RequireComponent(typeof(CharacterAnimationSystem))]
-[RequireComponent(typeof(CharacterRecoverySystem))]
-[RequireComponent(typeof(CharacterSkillAndBuffSystem))]
+[RequireComponent(typeof(CharacterAnimationComponent))]
+[RequireComponent(typeof(CharacterRecoveryComponent))]
+[RequireComponent(typeof(CharacterSkillAndBuffComponent))]
 [RequireComponent(typeof(CapsuleCollider))]
 public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 {
@@ -563,7 +563,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         ActionAnimation actionAnimation;
         if (animator != null && GameInstance.ActionAnimations.TryGetValue(actionId, out actionAnimation) && actionAnimation.clip != null)
         {
-            animator.SetBool(CharacterAnimationSystem.ANIM_DO_ACTION, false);
+            animator.SetBool(CharacterAnimationComponent.ANIM_DO_ACTION, false);
             model.ChangeActionClip(actionAnimation.clip);
             var playSpeedMultiplier = 1f;
             switch (animActionType)
@@ -575,11 +575,11 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             AudioClip soundEffect;
             if (actionAnimation.TryGetRandomAudioClip(out soundEffect))
                 AudioSource.PlayClipAtPoint(soundEffect, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
-            animator.SetFloat(CharacterAnimationSystem.ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
-            animator.SetBool(CharacterAnimationSystem.ANIM_DO_ACTION, true);
+            animator.SetFloat(CharacterAnimationComponent.ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
+            animator.SetBool(CharacterAnimationComponent.ANIM_DO_ACTION, true);
             // Waits by current transition + clip duration before end animation
             yield return new WaitForSecondsRealtime(animator.GetAnimatorTransitionInfo(0).duration + (actionAnimation.ClipLength / playSpeedMultiplier));
-            animator.SetBool(CharacterAnimationSystem.ANIM_DO_ACTION, false);
+            animator.SetBool(CharacterAnimationComponent.ANIM_DO_ACTION, false);
             // Waits by current transition + extra duration before end playing animation state
             yield return new WaitForSecondsRealtime(animator.GetAnimatorTransitionInfo(0).duration + (actionAnimation.extraDuration / playSpeedMultiplier));
         }
@@ -1052,8 +1052,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (model != null)
         {
             var animator = model.CacheAnimator;
-            animator.ResetTrigger(CharacterAnimationSystem.ANIM_HURT);
-            animator.SetTrigger(CharacterAnimationSystem.ANIM_HURT);
+            animator.ResetTrigger(CharacterAnimationComponent.ANIM_HURT);
+            animator.SetTrigger(CharacterAnimationComponent.ANIM_HURT);
         }
 
         // If current hp <= 0, character dead

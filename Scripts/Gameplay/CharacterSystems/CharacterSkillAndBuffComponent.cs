@@ -1,28 +1,34 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.Entities;
 
-public class CharacterSkillAndBuffSystem : ComponentSystem
+public class CharacterSkillAndBuffComponent : BaseCharacterComponent
 {
     public const float SKILL_BUFF_UPDATE_DURATION = 0.5f;
 
-    struct Components
-    {
-        public CharacterSkillAndBuffData skillAndBuffData;
-        public CharacterRecoveryData recoveryData;
-    }
+    #region Buff System Data
+    [HideInInspector, System.NonSerialized]
+    public float skillBuffUpdateDeltaTime;
+    #endregion
 
-    protected override void OnUpdate()
+    private CharacterRecoveryComponent cacheCharacterRecovery;
+    public CharacterRecoveryComponent CacheCharacterRecovery
     {
-        var deltaTime = Time.unscaledDeltaTime;
-        foreach (var comp in GetEntities<Components>())
+        get
         {
-            UpdateSkillAndBuff(deltaTime, comp.skillAndBuffData, comp.recoveryData, comp.skillAndBuffData.CacheCharacterEntity);
+            if (cacheCharacterRecovery == null)
+                cacheCharacterRecovery = GetComponent<CharacterRecoveryComponent>();
+            return cacheCharacterRecovery;
         }
     }
 
-    protected static void UpdateSkillAndBuff(float deltaTime, CharacterSkillAndBuffData skillAndBuffData, CharacterRecoveryData recoveryData, BaseCharacterEntity characterEntity)
+    protected void Update()
+    {
+        var deltaTime = Time.unscaledDeltaTime;
+        UpdateSkillAndBuff(deltaTime, this, CacheCharacterRecovery, CacheCharacterEntity);
+    }
+
+    protected static void UpdateSkillAndBuff(float deltaTime, CharacterSkillAndBuffComponent skillAndBuffData, CharacterRecoveryComponent recoveryData, BaseCharacterEntity characterEntity)
     {
         if (characterEntity.isRecaching || characterEntity.CurrentHp <= 0 || !characterEntity.IsServer)
             return;

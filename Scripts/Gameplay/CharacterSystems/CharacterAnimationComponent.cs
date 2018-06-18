@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.Entities;
 
-public class CharacterAnimationSystem : ComponentSystem
+public class CharacterAnimationComponent : BaseCharacterComponent
 {
     public const string ANIM_STATE_ACTION_CLIP = "_Action";
     public static readonly int ANIM_IS_DEAD = Animator.StringToHash("IsDead");
@@ -15,24 +14,23 @@ public class CharacterAnimationSystem : ComponentSystem
     public static readonly int ANIM_ACTION_CLIP_MULTIPLIER = Animator.StringToHash("ActionSpeedMultiplier");
     public const float UPDATE_VELOCITY_DURATION = 0.1f;
 
-    struct Components
-    {
-        public CharacterAnimationData animationData;
-        public Transform transform;
-    }
+    #region Animation System Data
+    [HideInInspector, System.NonSerialized]
+    public Vector3? previousPosition;
+    [HideInInspector, System.NonSerialized]
+    public Vector3 currentVelocity;
+    [HideInInspector, System.NonSerialized]
+    public float velocityCalculationDeltaTime;
+    #endregion
 
-    protected override void OnUpdate()
+    protected void Update()
     {
         var deltaTime = Time.unscaledDeltaTime;
-        var gameInstance = GameInstance.Singleton;
-        var gameplayRule = gameInstance != null ? gameInstance.GameplayRule : null;
-        foreach (var comp in GetEntities<Components>())
-        {
-            UpdateAnimation(deltaTime, gameplayRule, comp.animationData, comp.animationData.CacheCharacterEntity, comp.transform);
-        }
+        var gameplayRule = GameInstance.Singleton.GameplayRule;
+        UpdateAnimation(deltaTime, gameplayRule, this, CacheCharacterEntity, CacheCharacterEntity.CacheTransform);
     }
 
-    protected static void UpdateAnimation(float deltaTime, BaseGameplayRule gameplayRule, CharacterAnimationData animationData, BaseCharacterEntity characterEntity, Transform transform)
+    protected static void UpdateAnimation(float deltaTime, BaseGameplayRule gameplayRule, CharacterAnimationComponent animationData, BaseCharacterEntity characterEntity, Transform transform)
     {
         if (characterEntity.isRecaching)
             return;

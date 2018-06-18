@@ -356,7 +356,7 @@ public class CharacterModel : MonoBehaviour
 
     public void ChangeActionClip(AnimationClip clip)
     {
-        CacheAnimatorController[CharacterAnimationSystem.ANIM_STATE_ACTION_CLIP] = clip;
+        CacheAnimatorController[CharacterAnimationComponent.ANIM_STATE_ACTION_CLIP] = clip;
     }
 
     private void OnDrawGizmos()

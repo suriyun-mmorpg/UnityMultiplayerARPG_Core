@@ -25,7 +25,6 @@ public class UICharacterAttribute : UIDataForCharacter<CharacterAttributeAmountT
     protected void Update()
     {
         var characterAttribute = Data.characterAttribute;
-        var amount = Data.targetAmount;
         
         if (IsOwningCharacter() && characterAttribute.CanIncrease(BasePlayerCharacterController.OwningCharacter))
             onAbleToIncrease.Invoke();

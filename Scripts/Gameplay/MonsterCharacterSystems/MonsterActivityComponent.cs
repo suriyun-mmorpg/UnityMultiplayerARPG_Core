@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
-using Unity.Entities;
 
-public class MonsterActivitySystem : ComponentSystem
+public class MonsterActivityComponent : MonoBehaviour
 {
     public const float RANDOM_WANDER_DURATION_MIN = 2f;
     public const float RANDOM_WANDER_DURATION_MAX = 5f;
@@ -15,22 +14,23 @@ public class MonsterActivitySystem : ComponentSystem
     public const float SET_TARGET_DESTINATION_DELAY = 1f;
     public const float FOLLOW_TARGET_DURATION = 5f;
 
-    struct Components
+    private MonsterCharacterEntity cacheMonsterCharacterEntity;
+    public MonsterCharacterEntity CacheMonsterCharacterEntity
     {
-        public MonsterCharacterEntity monsterCharacterEntity;
-        public Transform transform;
-        public NavMeshAgent navMeshAgent;
+        get
+        {
+            if (cacheMonsterCharacterEntity == null)
+                cacheMonsterCharacterEntity = GetComponent<MonsterCharacterEntity>();
+            return cacheMonsterCharacterEntity;
+        }
     }
 
-    protected override void OnUpdate()
+    protected void Update()
     {
         var time = Time.unscaledTime;
         var gameInstance = GameInstance.Singleton;
         var gameplayRule = gameInstance != null ? gameInstance.GameplayRule : null;
-        foreach (var comp in GetEntities<Components>())
-        {
-            UpdateActivity(time, gameInstance, gameplayRule, comp.monsterCharacterEntity, comp.transform, comp.navMeshAgent);
-        }
+        UpdateActivity(time, gameInstance, gameplayRule, CacheMonsterCharacterEntity, CacheMonsterCharacterEntity.CacheTransform, CacheMonsterCharacterEntity.CacheNavMeshAgent);
     }
 
     public static void RandomNextWanderTime(float time, MonsterCharacterEntity monsterCharacterEntity, Transform transform)

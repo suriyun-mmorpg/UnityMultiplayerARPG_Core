@@ -78,9 +78,9 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         var gameInstance = GameInstance.Singleton;
         gameObject.tag = gameInstance.monsterTag;
         var time = Time.unscaledTime;
-        MonsterActivitySystem.RandomNextWanderTime(time, this, CacheTransform);
-        MonsterActivitySystem.SetFindTargetTime(time, this);
-        MonsterActivitySystem.SetStartFollowTargetTime(time, this);
+        MonsterActivityComponent.RandomNextWanderTime(time, this, CacheTransform);
+        MonsterActivityComponent.SetFindTargetTime(time, this);
+        MonsterActivityComponent.SetStartFollowTargetTime(time, this);
     }
 
     public virtual void StopMove()
@@ -284,7 +284,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         base.Respawn();
         StopMove();
         CacheNetTransform.Teleport(respawnPosition, CacheTransform.rotation);
-        MonsterActivitySystem.RandomNextWanderTime(Time.unscaledTime, this, CacheTransform);
+        MonsterActivityComponent.RandomNextWanderTime(Time.unscaledTime, this, CacheTransform);
         isHidding.Value = false;
     }
 }
