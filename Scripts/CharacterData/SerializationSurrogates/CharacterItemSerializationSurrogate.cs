@@ -12,6 +12,7 @@ public class CharacterItemSerializationSurrogate : ISerializationSurrogate
         info.AddValue("dataId", data.dataId);
         info.AddValue("level", data.level);
         info.AddValue("amount", data.amount);
+        info.AddValue("durability", data.durability);
     }
 
     public System.Object SetObjectData(System.Object obj,
@@ -29,6 +30,11 @@ public class CharacterItemSerializationSurrogate : ISerializationSurrogate
             data.dataId = info.GetInt32("dataId");
         data.level = info.GetInt16("level");
         data.amount = info.GetInt16("amount");
+        // Backward compatible
+        var durability = 0f;
+        try { durability = info.GetSingle("durability"); }
+        catch { }
+        data.durability = durability;
         obj = data;
         return obj;
     }

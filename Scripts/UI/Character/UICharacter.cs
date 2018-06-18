@@ -235,8 +235,8 @@ public class UICharacter : UISelectionEntry<ICharacterData>
         var leftHandItem = Data.EquipWeapons.leftHand;
         var rightHandWeapon = rightHandItem.GetWeaponItem();
         var leftHandWeapon = leftHandItem.GetWeaponItem();
-        var rightHandDamages = rightHandWeapon != null ? GameDataHelpers.CombineDamageAmountsDictionary(Data.GetIncreaseDamages(), rightHandWeapon.GetDamageAmount(rightHandItem.level, Data)) : null;
-        var leftHandDamages = leftHandWeapon != null ? GameDataHelpers.CombineDamageAmountsDictionary(Data.GetIncreaseDamages(), leftHandWeapon.GetDamageAmount(leftHandItem.level, Data)) : null;
+        var rightHandDamages = rightHandWeapon != null ? GameDataHelpers.CombineDamageAmountsDictionary(Data.GetIncreaseDamages(), rightHandWeapon.GetDamageAmount(rightHandItem.level, rightHandItem.GetEquipmentBonusRate(), Data)) : null;
+        var leftHandDamages = leftHandWeapon != null ? GameDataHelpers.CombineDamageAmountsDictionary(Data.GetIncreaseDamages(), leftHandWeapon.GetDamageAmount(leftHandItem.level, leftHandItem.GetEquipmentBonusRate(), Data)) : null;
 
         if (textWeaponDamages != null)
         {
@@ -259,7 +259,7 @@ public class UICharacter : UISelectionEntry<ICharacterData>
             {
                 var defaultWeaponItem = gameInstance.DefaultWeaponItem;
                 var defaultWeaponItemType = defaultWeaponItem.EquipType;
-                var damageAmount = defaultWeaponItem.GetDamageAmount(1, Data);
+                var damageAmount = defaultWeaponItem.GetDamageAmount(1, 1f, Data);
                 textDamages = string.Format(weaponDamageFormat, damageAmount.Value.min.ToString("N0"), damageAmount.Value.max.ToString("N0"));
             }
             textWeaponDamages.text = textDamages;

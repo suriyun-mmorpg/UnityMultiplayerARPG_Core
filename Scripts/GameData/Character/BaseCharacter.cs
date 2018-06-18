@@ -18,11 +18,11 @@ public abstract class BaseCharacter : BaseGameData
 
     public Dictionary<Attribute, short> GetCharacterAttributes(short level)
     {
-        return GameDataHelpers.MakeAttributeAmountsDictionary(attributes, new Dictionary<Attribute, short>(), level);
+        return GameDataHelpers.MakeAttributeAmountsDictionary(attributes, new Dictionary<Attribute, short>(), level, 1f);
     }
 
     public Dictionary<DamageElement, float> GetCharacterResistances(short level)
     {
-        return GameDataHelpers.MakeResistanceAmountsDictionary(resistances, new Dictionary<DamageElement, float>(), level);
+        return GameDataHelpers.MakeResistanceAmountsDictionary(resistances, new Dictionary<DamageElement, float>(), level, 1f);
     }
 }

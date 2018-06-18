@@ -43,6 +43,11 @@ public class Item : BaseGameData
     public ResistanceIncremental[] increaseResistances;
     public DamageIncremental[] increaseDamages;
     public CharacterStatsIncremental increaseStats;
+    [Tooltip("Equipment durability, If this set to 0 it will not broken")]
+    [Range(0f, 1000f)]
+    public float maxDurability;
+    [Tooltip("If this is TRUE, your equipment will be destroyed when durability = 0")]
+    public bool destroyIfBroken;
     
     // Potion
     public Buff buff;
@@ -117,7 +122,7 @@ public class Item : BaseGameData
         get
         {
             if (cacheRequireAttributeAmounts == null)
-                cacheRequireAttributeAmounts = GameDataHelpers.MakeAttributeAmountsDictionary(requirement.attributeAmounts, new Dictionary<Attribute, short>());
+                cacheRequireAttributeAmounts = GameDataHelpers.MakeAttributeAmountsDictionary(requirement.attributeAmounts, new Dictionary<Attribute, short>(), 1f);
             return cacheRequireAttributeAmounts;
         }
     }

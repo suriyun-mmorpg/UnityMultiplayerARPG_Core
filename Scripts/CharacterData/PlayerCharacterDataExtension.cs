@@ -384,6 +384,7 @@ public static class PlayerCharacterDataExtension
             writer.Put(entry.dataId);
             writer.Put(entry.level);
             writer.Put(entry.amount);
+            writer.Put(entry.durability);
         }
         writer.Put(characterData.NonEquipItems.Count);
         foreach (var entry in characterData.NonEquipItems)
@@ -391,6 +392,7 @@ public static class PlayerCharacterDataExtension
             writer.Put(entry.dataId);
             writer.Put(entry.level);
             writer.Put(entry.amount);
+            writer.Put(entry.durability);
         }
         writer.Put(characterData.Hotkeys.Count);
         foreach (var entry in characterData.Hotkeys)
@@ -420,10 +422,12 @@ public static class PlayerCharacterDataExtension
         writer.Put(rightHand.dataId);
         writer.Put(rightHand.level);
         writer.Put(rightHand.amount);
+        writer.Put(rightHand.durability);
         var leftHand = characterData.EquipWeapons.leftHand;
         writer.Put(leftHand.dataId);
         writer.Put(leftHand.level);
         writer.Put(leftHand.amount);
+        writer.Put(leftHand.durability);
     }
 
     public static T DeserializeCharacterData<T>(this T characterData, NetDataReader reader) where T : IPlayerCharacterData
@@ -484,6 +488,7 @@ public static class PlayerCharacterDataExtension
             entry.dataId = reader.GetInt();
             entry.level = reader.GetShort();
             entry.amount = reader.GetShort();
+            entry.durability = reader.GetFloat();
             tempCharacterData.EquipItems.Add(entry);
         }
         count = reader.GetInt();
@@ -493,6 +498,7 @@ public static class PlayerCharacterDataExtension
             entry.dataId = reader.GetInt();
             entry.level = reader.GetShort();
             entry.amount = reader.GetShort();
+            entry.durability = reader.GetFloat();
             tempCharacterData.NonEquipItems.Add(entry);
         }
         count = reader.GetInt();
@@ -523,11 +529,13 @@ public static class PlayerCharacterDataExtension
         rightWeapon.dataId = reader.GetInt();
         rightWeapon.level = reader.GetShort();
         rightWeapon.amount = reader.GetShort();
+        rightWeapon.durability = reader.GetFloat();
 
         var leftWeapon = new CharacterItem();
         leftWeapon.dataId = reader.GetInt();
         leftWeapon.level = reader.GetShort();
         leftWeapon.amount = reader.GetShort();
+        leftWeapon.durability = reader.GetFloat();
 
         var equipWeapons = new EquipWeapons();
         equipWeapons.rightHand = rightWeapon;

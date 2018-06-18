@@ -80,12 +80,12 @@ public class UIBuff : UISelectionEntry<BuffLevelTuple>
             uiBuffStats.Data = buff.GetIncreaseStats(level);
 
         if (uiBuffAttributes != null)
-            uiBuffAttributes.Data = GameDataHelpers.MakeAttributeAmountsDictionary(buff.increaseAttributes, new Dictionary<Attribute, short>(), level);
+            uiBuffAttributes.Data = GameDataHelpers.MakeAttributeAmountsDictionary(buff.increaseAttributes, new Dictionary<Attribute, short>(), level, 1f);
 
         if (uiBuffResistances != null)
-            uiBuffResistances.Data = GameDataHelpers.MakeResistanceAmountsDictionary(buff.increaseResistances, new Dictionary<DamageElement, float>(), level);
+            uiBuffResistances.Data = GameDataHelpers.MakeResistanceAmountsDictionary(buff.increaseResistances, new Dictionary<DamageElement, float>(), level, 1f);
 
         if (uiBuffDamages != null)
-            uiBuffDamages.Data = GameDataHelpers.MakeDamageAmountsDictionary(buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), level);
+            uiBuffDamages.Data = GameDataHelpers.MakeDamageAmountsDictionary(buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), level, 1f);
     }
 }

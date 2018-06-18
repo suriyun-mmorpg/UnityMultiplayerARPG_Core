@@ -22,4 +22,6 @@ public abstract class BaseGameplayRule : ScriptableObject
     public abstract bool IsHungry(BaseCharacterEntity character);
     public abstract bool IsThirsty(BaseCharacterEntity character);
     public abstract bool IncreaseExp(BaseCharacterEntity character, int exp);
+    public abstract float GetEquipmentBonusRate(CharacterItem characterItem);
+    public abstract void OnCharacterReceivedDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, CombatAmountType combatAmountType, int damage);
 }

@@ -17,6 +17,8 @@ public class UICharacterItem : UIDataForCharacter<CharacterItemLevelTuple>
     public string sellPriceFormat = "{0}";
     [Tooltip("Stack Format => {0} = {Amount}, {1} = {Max stack}")]
     public string stackFormat = "{0}/{1}";
+    [Tooltip("Durability Format => {0} = {Durability}, {1} = {Max durability}")]
+    public string durabilityFormat = "{0}/{1}";
     [Tooltip("Weight Format => {0} = {Weight}")]
     public string weightFormat = "{0}";
     [Tooltip("Item Type Format => {0} = {Item Type title}")]
@@ -42,6 +44,7 @@ public class UICharacterItem : UIDataForCharacter<CharacterItemLevelTuple>
     public Text textItemType;
     public Text textSellPrice;
     public Text textStack;
+    public Text textDurability;
     public Text textWeight;
 
     [Header("Equipment - UI Elements")]
@@ -142,14 +145,23 @@ public class UICharacterItem : UIDataForCharacter<CharacterItemLevelTuple>
         if (textStack != null)
         {
             var stackString = "";
-            if (!hideAmountWhenMaxIsOne || characterItem.amount > 1)
-            {
-                if (item == null)
-                    stackString = string.Format(stackFormat, "0", "0");
-                else
-                    stackString = string.Format(stackFormat, characterItem.amount.ToString("N0"), item.maxStack);
-            }
+            if (item == null)
+                stackString = string.Format(stackFormat, "0", "0");
+            else
+                stackString = string.Format(stackFormat, characterItem.amount.ToString("N0"), item.maxStack);
             textStack.text = stackString;
+            textStack.gameObject.SetActive(hideAmountWhenMaxIsOne && item.maxStack > 1);
+        }
+
+        if (textDurability != null)
+        {
+            var durabilityString = "";
+            if (item == null)
+                durabilityString = string.Format(durabilityFormat, "0", "0");
+            else
+                durabilityString = string.Format(durabilityFormat, characterItem.durability.ToString("N0"), item.maxDurability);
+            textDurability.text = durabilityString;
+            textDurability.gameObject.SetActive(equipmentItem != null && item.maxDurability > 0);
         }
 
         if (textWeight != null)
@@ -168,7 +180,7 @@ public class UICharacterItem : UIDataForCharacter<CharacterItemLevelTuple>
 
         if (uiStats != null)
         {
-            var stats = equipmentItem.GetIncreaseStats(level);
+            var stats = equipmentItem.GetIncreaseStats(level, characterItem.GetEquipmentBonusRate());
             if (equipmentItem == null || stats.IsEmpty())
                 uiStats.Hide();
             else
@@ -180,7 +192,7 @@ public class UICharacterItem : UIDataForCharacter<CharacterItemLevelTuple>
 
         if (uiIncreaseAttributes != null)
         {
-            var attributes = equipmentItem.GetIncreaseAttributes(level);
+            var attributes = equipmentItem.GetIncreaseAttributes(level, characterItem.GetEquipmentBonusRate());
             if (equipmentItem == null || attributes == null || attributes.Count == 0)
                 uiIncreaseAttributes.Hide();
             else
@@ -192,7 +204,7 @@ public class UICharacterItem : UIDataForCharacter<CharacterItemLevelTuple>
 
         if (uiIncreaseResistances != null)
         {
-            var resistances = equipmentItem.GetIncreaseResistances(level);
+            var resistances = equipmentItem.GetIncreaseResistances(level, characterItem.GetEquipmentBonusRate());
             if (equipmentItem == null || resistances == null || resistances.Count == 0)
                 uiIncreaseResistances.Hide();
             else
@@ -204,7 +216,7 @@ public class UICharacterItem : UIDataForCharacter<CharacterItemLevelTuple>
 
         if (uiIncreaseDamageAmounts != null)
         {
-            var damageAmounts = equipmentItem.GetIncreaseDamages(level);
+            var damageAmounts = equipmentItem.GetIncreaseDamages(level, characterItem.GetEquipmentBonusRate());
             if (equipmentItem == null || damageAmounts == null || damageAmounts.Count == 0)
                 uiIncreaseDamageAmounts.Hide();
             else
@@ -221,7 +233,7 @@ public class UICharacterItem : UIDataForCharacter<CharacterItemLevelTuple>
             else
             {
                 uiDamageAmounts.Show();
-                var keyValuePair = weaponItem.GetDamageAmount(level, null);
+                var keyValuePair = weaponItem.GetDamageAmount(level, characterItem.GetEquipmentBonusRate(), null);
                 uiDamageAmounts.Data = new DamageElementAmountTuple(keyValuePair.Key, keyValuePair.Value);
             }
         }

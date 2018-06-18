@@ -399,8 +399,10 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             if (!this.DecreaseAmmos(weapon.WeaponType.requireAmmoType, 1, out decreaseItems))
                 return;
             var firstEntry = decreaseItems.FirstOrDefault();
-            if (firstEntry.Key.GetItem() != null && firstEntry.Value > 0)
-                allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(allDamageAmounts, firstEntry.Key.GetItem().GetIncreaseDamages(firstEntry.Key.level));
+            var characterItem = firstEntry.Key;
+            var item = characterItem.GetItem();
+            if (item != null && firstEntry.Value > 0)
+                allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(allDamageAmounts, item.GetIncreaseDamages(characterItem.level, characterItem.GetEquipmentBonusRate()));
         }
 
         // Play animation on clients
@@ -468,8 +470,10 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             if (!this.DecreaseAmmos(weapon.WeaponType.requireAmmoType, 1, out decreaseItems))
                 return;
             var firstEntry = decreaseItems.FirstOrDefault();
-            if (firstEntry.Key.GetItem() != null && firstEntry.Value > 0)
-                allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(allDamageAmounts, firstEntry.Key.GetItem().GetIncreaseDamages(firstEntry.Key.level));
+            var characterItem = firstEntry.Key;
+            var item = characterItem.GetItem();
+            if (item != null && firstEntry.Value > 0)
+                allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(allDamageAmounts, item.GetIncreaseDamages(characterItem.level, characterItem.GetEquipmentBonusRate()));
         }
 
         // Play animation on clients
@@ -1382,7 +1386,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         // Calculate all damages
         allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(
             allDamageAmounts,
-            weapon.GetDamageAmount(equipWeapon.level, this));
+            weapon.GetDamageAmount(equipWeapon.level, equipWeapon.GetEquipmentBonusRate(), this));
         allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(
             allDamageAmounts,
             CacheIncreaseDamages);
@@ -1451,7 +1455,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                     // Assign damage data
                     damageInfo = skill.damageInfo;
                     // Calculate all damages
-                    allDamageAmounts = weapon.GetDamageAmountWithInflictions(equipWeapon.level, this, skill.GetWeaponDamageInflictions(characterSkill.level));
+                    allDamageAmounts = weapon.GetDamageAmountWithInflictions(equipWeapon.level, equipWeapon.GetEquipmentBonusRate(), this, skill.GetWeaponDamageInflictions(characterSkill.level));
                     // Sum damage with additional damage amounts
                     allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(
                         allDamageAmounts, 
@@ -1465,7 +1469,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                     // Assign damage data
                     damageInfo = weaponType.damageInfo;
                     // Calculate all damages
-                    allDamageAmounts = weapon.GetDamageAmountWithInflictions(equipWeapon.level, this, skill.GetWeaponDamageInflictions(characterSkill.level));
+                    allDamageAmounts = weapon.GetDamageAmountWithInflictions(equipWeapon.level, equipWeapon.GetEquipmentBonusRate(), this, skill.GetWeaponDamageInflictions(characterSkill.level));
                     // Sum damage with additional damage amounts
                     allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(
                         allDamageAmounts,
@@ -1629,6 +1633,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     public virtual void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountType combatAmountType, int damage)
     {
+        GameInstance.Singleton.GameplayRule.OnCharacterReceivedDamage(attacker, this, combatAmountType, damage);
         RequestCombatAmount(combatAmountType, damage);
     }
 

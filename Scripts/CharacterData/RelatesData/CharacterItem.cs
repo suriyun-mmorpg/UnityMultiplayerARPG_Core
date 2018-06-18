@@ -10,6 +10,7 @@ public class CharacterItem
     public int dataId;
     public short level;
     public short amount;
+    public float durability;
     // TODO: I want to add random item bonus
     [System.NonSerialized]
     private int dirtyDataId;
@@ -130,6 +131,12 @@ public class CharacterItem
         return item == null ? (short)0 : item.maxStack;
     }
 
+    public float GetMaxDurability()
+    {
+        var item = GetItem();
+        return item == null ? 0f : item.maxDurability;
+    }
+
     public bool IsValid()
     {
         return !this.IsEmpty() && GetItem() != null && amount > 0;
@@ -138,6 +145,16 @@ public class CharacterItem
     public bool IsFull()
     {
         return amount == GetMaxStack();
+    }
+    
+    public bool IsBroken()
+    {
+        return GetMaxDurability() > 0 && durability <= 0;
+    }
+
+    public float GetEquipmentBonusRate()
+    {
+        return GameInstance.Singleton.GameplayRule.GetEquipmentBonusRate(this);
     }
 
     public bool CanEquip(ICharacterData character)
@@ -153,9 +170,11 @@ public class CharacterItem
     public static CharacterItem Create(int dataId, short level = 1, short amount = 1)
     {
         var newItem = new CharacterItem();
+        Item tempItem = null;
         newItem.dataId = dataId;
         newItem.level = level;
         newItem.amount = amount;
+        newItem.durability = GameInstance.Items.TryGetValue(dataId, out tempItem) ? tempItem.maxDurability : 0;
         return newItem;
     }
 }
@@ -168,6 +187,7 @@ public class NetFieldCharacterItem : LiteNetLibNetField<CharacterItem>
         newValue.dataId = reader.GetInt();
         newValue.level = reader.GetShort();
         newValue.amount = reader.GetShort();
+        newValue.durability = reader.GetFloat();
         Value = newValue;
     }
 
@@ -176,6 +196,7 @@ public class NetFieldCharacterItem : LiteNetLibNetField<CharacterItem>
         writer.Put(Value.dataId);
         writer.Put(Value.level);
         writer.Put(Value.amount);
+        writer.Put(Value.durability);
     }
 
     public override bool IsValueChanged(CharacterItem newValue)

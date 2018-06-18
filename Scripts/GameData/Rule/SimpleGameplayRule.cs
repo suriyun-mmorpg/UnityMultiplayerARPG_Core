@@ -14,6 +14,18 @@ public class SimpleGameplayRule : BaseGameplayRule
     public float foodDecreasePerSeconds = 4;
     public float waterDecreasePerSeconds = 2;
     public float moveSpeedRateWhileSprint = 1.5f;
+    public float normalDecreaseWeaponDurability = 0.5f;
+    public float normalDecreaseShieldDurability = 0.5f;
+    public float normalDecreaseArmorDurability = 0.1f;
+    public float blockedDecreaseWeaponDurability = 0.5f;
+    public float blockedDecreaseShieldDurability = 0.75f;
+    public float blockedDecreaseArmorDurability = 0.15f;
+    public float criticalDecreaseWeaponDurability = 0.75f;
+    public float criticalDecreaseShieldDurability = 0.5f;
+    public float criticalDecreaseArmorDurability = 0.15f;
+    public float missDecreaseWeaponDurability = 0f;
+    public float missDecreaseShieldDurability = 0;
+    public float missDecreaseArmorDurability = 0f;
     [Range(0f, 1f)]
     public float hpRecoveryRatePerSeconds = 0.05f;
     [Range(0f, 1f)]
@@ -39,7 +51,7 @@ public class SimpleGameplayRule : BaseGameplayRule
         var attackerLvl = attacker.Level;
         var dmgReceiverLvl = damageReceiver.Level;
         var hitChance = 2f;
-        
+
         if (attackerAcc != 0 && dmgReceiverEva != 0)
             hitChance *= (attackerAcc / (attackerAcc + dmgReceiverEva));
 
@@ -212,5 +224,118 @@ public class SimpleGameplayRule : BaseGameplayRule
             isLevelUp = true;
         }
         return isLevelUp;
+    }
+
+    public override float GetEquipmentBonusRate(CharacterItem characterItem)
+    {
+        if (characterItem.GetMaxDurability() <= 0)
+            return 1;
+        var durabilityRate = (float)characterItem.durability / (float)characterItem.GetMaxDurability();
+        if (durabilityRate > 0.5f)
+            return 1f;
+        else if (durabilityRate > 0.3f)
+            return 0.75f;
+        else if (durabilityRate > 0.15f)
+            return 0.5f;
+        else if (durabilityRate > 0.05f)
+            return 0.25f;
+        else
+            return 0f;
+    }
+
+    public override void OnCharacterReceivedDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, CombatAmountType combatAmountType, int damage)
+    {
+        var decreaseWeaponDurability = normalDecreaseWeaponDurability;
+        var decreaseShieldDurability = normalDecreaseShieldDurability;
+        var decreaseArmorDurability = normalDecreaseArmorDurability;
+        switch (combatAmountType)
+        {
+            case CombatAmountType.BlockedDamage:
+                decreaseWeaponDurability = blockedDecreaseWeaponDurability;
+                decreaseShieldDurability = blockedDecreaseShieldDurability;
+                decreaseArmorDurability = blockedDecreaseArmorDurability;
+                break;
+            case CombatAmountType.CriticalDamage:
+                decreaseWeaponDurability = criticalDecreaseWeaponDurability;
+                decreaseShieldDurability = criticalDecreaseShieldDurability;
+                decreaseArmorDurability = criticalDecreaseArmorDurability;
+                break;
+            case CombatAmountType.Miss:
+                decreaseWeaponDurability = missDecreaseWeaponDurability;
+                decreaseShieldDurability = missDecreaseShieldDurability;
+                decreaseArmorDurability = missDecreaseArmorDurability;
+                break;
+        }
+        // Decrease Weapon Durability
+        var tempDestroy = false;
+        var equipWeapons = attacker.EquipWeapons;
+        var rightHand = equipWeapons.rightHand;
+        var leftHand = equipWeapons.leftHand;
+        if (rightHand.GetWeaponItem() != null && rightHand.GetMaxDurability() > 0)
+        {
+            rightHand = DecreaseDurability(rightHand, decreaseWeaponDurability, out tempDestroy);
+            if (tempDestroy)
+                equipWeapons.rightHand = CharacterItem.Empty;
+            else
+                equipWeapons.rightHand = rightHand;
+        }
+        if (leftHand.GetWeaponItem() != null && leftHand.GetMaxDurability() > 0)
+        {
+            leftHand = DecreaseDurability(leftHand, decreaseWeaponDurability, out tempDestroy);
+            if (tempDestroy)
+                equipWeapons.leftHand = CharacterItem.Empty;
+            else
+                equipWeapons.leftHand = leftHand;
+        }
+        attacker.equipWeapons.Value = equipWeapons;
+        // Decrease Shield Durability
+        equipWeapons = damageReceiver.EquipWeapons;
+        rightHand = equipWeapons.rightHand;
+        leftHand = equipWeapons.leftHand;
+        if (rightHand.GetShieldItem() != null && rightHand.GetMaxDurability() > 0)
+        {
+            rightHand = DecreaseDurability(rightHand, decreaseShieldDurability, out tempDestroy);
+            if (tempDestroy)
+                equipWeapons.rightHand = CharacterItem.Empty;
+            else
+                equipWeapons.rightHand = rightHand;
+        }
+        if (leftHand.GetShieldItem() != null && leftHand.GetMaxDurability() > 0)
+        {
+            leftHand = DecreaseDurability(leftHand, decreaseShieldDurability, out tempDestroy);
+            if (tempDestroy)
+                equipWeapons.leftHand = CharacterItem.Empty;
+            else
+                equipWeapons.leftHand = leftHand;
+        }
+        damageReceiver.equipWeapons.Value = equipWeapons;
+        // Decrease Armor Durability
+        var count = damageReceiver.equipItems.Count;
+        for (var i = count - 1; i >= 0; --i)
+        {
+            var equipItem = damageReceiver.equipItems[i];
+            if (equipItem.GetMaxDurability() <= 0)
+                continue;
+            equipItem = DecreaseDurability(equipItem, decreaseArmorDurability, out tempDestroy);
+            if (tempDestroy)
+                damageReceiver.equipItems.RemoveAt(i);
+            else
+                damageReceiver.equipItems[i] = equipItem;
+        }
+    }
+
+    private CharacterItem DecreaseDurability(CharacterItem characterItem, float decreaseDurability, out bool destroy)
+    {
+        destroy = false;
+        var item = characterItem.GetEquipmentItem();
+        if (item != null)
+        {
+            if (characterItem.durability - decreaseDurability <= 0 && item.destroyIfBroken)
+                destroy = true;
+            characterItem.durability -= decreaseDurability;
+            if (characterItem.durability < 0)
+                characterItem.durability = 0;
+        }
+        return characterItem;
     }
 }
