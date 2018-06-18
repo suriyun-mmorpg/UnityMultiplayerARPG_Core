@@ -60,7 +60,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     #region Protected data
     protected BaseCharacter database;
     protected RpgNetworkEntity targetEntity;
-    protected CharacterModel model;
     protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
     protected AnimActionType animActionType;
     protected float lastActionCommandReceivedTime;
@@ -69,6 +68,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Caches Data
+    public CharacterModel Model { get; protected set; }
     public CharacterStats CacheStats { get; protected set; }
     public Dictionary<Attribute, short> CacheAttributes { get; protected set; }
     public Dictionary<Skill, short> CacheSkills { get; protected set; }
@@ -208,8 +208,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             return modelContainer;
         }
     }
-
-    public Animator ModelAnimator { get { return model == null ? null : model.CacheAnimator; } }
     #endregion
 
     protected override void Awake()
@@ -553,36 +551,20 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (CurrentHp <= 0)
             return;
         this.animActionType = animActionType;
-        StartCoroutine(PlayActionAnimationRoutine(actionId, animActionType));
+        PlayActionAnimationRoutine(actionId, animActionType);
     }
 
-    IEnumerator PlayActionAnimationRoutine(int actionId, AnimActionType animActionType)
+    private async void PlayActionAnimationRoutine(int actionId, AnimActionType animActionType)
     {
-        Animator animator = model == null ? null : model.CacheAnimator;
-        // If animator is not null, play the action animation
-        ActionAnimation actionAnimation;
-        if (animator != null && GameInstance.ActionAnimations.TryGetValue(actionId, out actionAnimation) && actionAnimation.clip != null)
+        var playSpeedMultiplier = 1f;
+        switch (animActionType)
         {
-            animator.SetBool(CharacterAnimationComponent.ANIM_DO_ACTION, false);
-            model.ChangeActionClip(actionAnimation.clip);
-            var playSpeedMultiplier = 1f;
-            switch (animActionType)
-            {
-                case AnimActionType.Attack:
-                    playSpeedMultiplier = CacheAtkSpeed;
-                    break;
-            }
-            AudioClip soundEffect;
-            if (actionAnimation.TryGetRandomAudioClip(out soundEffect))
-                AudioSource.PlayClipAtPoint(soundEffect, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
-            animator.SetFloat(CharacterAnimationComponent.ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
-            animator.SetBool(CharacterAnimationComponent.ANIM_DO_ACTION, true);
-            // Waits by current transition + clip duration before end animation
-            yield return new WaitForSecondsRealtime(animator.GetAnimatorTransitionInfo(0).duration + (actionAnimation.ClipLength / playSpeedMultiplier));
-            animator.SetBool(CharacterAnimationComponent.ANIM_DO_ACTION, false);
-            // Waits by current transition + extra duration before end playing animation state
-            yield return new WaitForSecondsRealtime(animator.GetAnimatorTransitionInfo(0).duration + (actionAnimation.extraDuration / playSpeedMultiplier));
+            case AnimActionType.Attack:
+                playSpeedMultiplier = CacheAtkSpeed;
+                break;
         }
+        if (Model != null)
+            await Model.PlayActionAnimation(actionId, animActionType, playSpeedMultiplier);
         this.animActionType = AnimActionType.None;
     }
 
@@ -593,9 +575,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected void NetFuncPlayEffect(int effectId)
     {
         GameEffectCollection gameEffectCollection;
-        if (model == null || !GameInstance.GameEffectCollections.TryGetValue(effectId, out gameEffectCollection))
+        if (Model == null || !GameInstance.GameEffectCollections.TryGetValue(effectId, out gameEffectCollection))
             return;
-        model.InstantiateEffect(gameEffectCollection.effects);
+        Model.InstantiateEffect(gameEffectCollection.effects);
     }
 
     /// <summary>
@@ -750,8 +732,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             return;
 
         var combatTextTransform = CacheTransform;
-        if (model != null)
-            combatTextTransform = model.CombatTextTransform;
+        if (Model != null)
+            combatTextTransform = Model.CombatTextTransform;
 
         uiSceneGameplay.SpawnCombatText(combatTextTransform, combatAmountType, amount);
     }
@@ -773,8 +755,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected void NetFuncOnLevelUp()
     {
         var gameInstance = GameInstance.Singleton;
-        if (gameInstance != null && gameInstance.levelUpEffect != null && model != null)
-            model.InstantiateEffect(new GameEffect[] { gameInstance.levelUpEffect });
+        if (gameInstance != null && gameInstance.levelUpEffect != null && Model != null)
+            Model.InstantiateEffect(new GameEffect[] { gameInstance.levelUpEffect });
         if (onLevelUp != null)
             onLevelUp.Invoke();
     }
@@ -1049,12 +1031,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         else
             ReceivedDamage(attacker, CombatAmountType.NormalDamage, totalDamage);
 
-        if (model != null)
-        {
-            var animator = model.CacheAnimator;
-            animator.ResetTrigger(CharacterAnimationComponent.ANIM_HURT);
-            animator.SetTrigger(CharacterAnimationComponent.ANIM_HURT);
-        }
+        if (Model != null)
+            Model.PlayHurtAnimation();
 
         // If current hp <= 0, character dead
         if (CurrentHp <= 0)
@@ -1087,16 +1065,16 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         GameInstance.AllCharacters.TryGetValue(dataId, out database);
 
         // Setup model
-        if (model != null)
-            Destroy(model.gameObject);
+        if (Model != null)
+            Destroy(Model.gameObject);
 
-        model = this.InstantiateModel(CacheModelContainer);
-        if (model != null)
+        Model = this.InstantiateModel(CacheModelContainer);
+        if (Model != null)
         {
-            SetupModel(model);
-            model.SetEquipWeapons(equipWeapons);
-            model.SetEquipItems(equipItems);
-            model.gameObject.SetActive(!isHidding.Value);
+            SetupModel(Model);
+            Model.SetEquipWeapons(equipWeapons);
+            Model.SetEquipItems(equipItems);
+            Model.gameObject.SetActive(!isHidding.Value);
         }
 
         if (onDataIdChange != null)
@@ -1161,8 +1139,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="equipWeapons"></param>
     protected virtual void OnEquipWeaponsChange(EquipWeapons equipWeapons)
     {
-        if (model != null)
-            model.SetEquipWeapons(equipWeapons);
+        if (Model != null)
+            Model.SetEquipWeapons(equipWeapons);
 
         if (onEquipWeaponsChange != null)
             onEquipWeaponsChange.Invoke(equipWeapons);
@@ -1174,8 +1152,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="isHidding"></param>
     protected virtual void OnIsHiddingChange(bool isHidding)
     {
-        if (model != null)
-            model.gameObject.SetActive(!isHidding);
+        if (Model != null)
+            Model.gameObject.SetActive(!isHidding);
 
         if (onIsHiddingChange != null)
             onIsHiddingChange.Invoke(isHidding);
@@ -1218,8 +1196,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     {
         isRecaching = true;
 
-        if (model != null)
-            model.SetBuffs(buffs);
+        if (Model != null)
+            Model.SetBuffs(buffs);
 
         if (onBuffsOperation != null)
             onBuffsOperation.Invoke(operation, index);
@@ -1234,8 +1212,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     {
         isRecaching = true;
 
-        if (model != null)
-            model.SetEquipItems(equipItems);
+        if (Model != null)
+            Model.SetEquipItems(equipItems);
 
         if (onEquipItemsOperation != null)
             onEquipItemsOperation.Invoke(operation, index);
@@ -1618,14 +1596,14 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected virtual Transform GetDamageTransform(DamageType damageType)
     {
-        if (model != null)
+        if (Model != null)
         {
             switch (damageType)
             {
                 case DamageType.Melee:
-                    return model.MeleeDamageTransform;
+                    return Model.MeleeDamageTransform;
                 case DamageType.Missile:
-                    return model.MissileDamageTransform;
+                    return Model.MissileDamageTransform;
             }
         }
         return CacheTransform;

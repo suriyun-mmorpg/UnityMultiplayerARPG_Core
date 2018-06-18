@@ -1,13 +1,55 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
-[RequireComponent(typeof(Animator))]
+[System.Serializable]
+public class LegacyAnimationData
+{
+    public AnimationClip idleClip;
+    public AnimationClip moveClip;
+    public AnimationClip jumpClip;
+    public AnimationClip fallClip;
+    public AnimationClip hurtClip;
+    public AnimationClip deadClip;
+    public float actionClipFadeLength = 0.1f;
+    public float idleClipFadeLength = 0.1f;
+    public float moveClipFadeLength = 0.1f;
+    public float jumpClipFadeLength = 0.1f;
+    public float fallClipFadeLength = 0.1f;
+    public float hurtClipFadeLength = 0.1f;
+    public float deadClipFadeLength = 0.1f;
+    public float magnitudeToPlayMoveClip = 0.1f;
+    public float ySpeedToPlayJumpClip = 0.25f;
+    public float ySpeedToPlayFallClip = -0.25f;
+}
+
 public class CharacterModel : MonoBehaviour
 {
+    // Animator variables
+    public const string ANIM_STATE_ACTION_CLIP = "_Action";
+    public static readonly int ANIM_IS_DEAD = Animator.StringToHash("IsDead");
+    public static readonly int ANIM_MOVE_SPEED = Animator.StringToHash("MoveSpeed");
+    public static readonly int ANIM_Y_SPEED = Animator.StringToHash("YSpeed");
+    public static readonly int ANIM_DO_ACTION = Animator.StringToHash("DoAction");
+    public static readonly int ANIM_HURT = Animator.StringToHash("Hurt");
+    public static readonly int ANIM_MOVE_CLIP_MULTIPLIER = Animator.StringToHash("MoveSpeedMultiplier");
+    public static readonly int ANIM_ACTION_CLIP_MULTIPLIER = Animator.StringToHash("ActionSpeedMultiplier");
+    // Legacy Animation variables
+    public const string LEGACY_CLIP_ACTION = "_Action";
+
+    public enum AnimatorType
+    {
+        Animator,
+        LegacyAnimtion,
+    }
+    public AnimatorType animatorType;
     [Header("Animator")]
     [SerializeField]
     private RuntimeAnimatorController animatorController;
+    [Header("Legacy Animation")]
+    [SerializeField]
+    private LegacyAnimationData legacyAnimationData;
     [Header("Collider")]
     public Vector3 center;
     public float radius = 0.5f;
@@ -59,6 +101,25 @@ public class CharacterModel : MonoBehaviour
             if (cacheAnimatorController == null)
                 cacheAnimatorController = new AnimatorOverrideController(animatorController);
             return cacheAnimatorController;
+        }
+    }
+
+    private Animation cacheAnimation;
+    public Animation CacheAnimation
+    {
+        get
+        {
+            if (cacheAnimation == null)
+            {
+                cacheAnimation = GetComponent<Animation>();
+                cacheAnimation.AddClip(legacyAnimationData.idleClip, legacyAnimationData.idleClip.name);
+                cacheAnimation.AddClip(legacyAnimationData.moveClip, legacyAnimationData.moveClip.name);
+                cacheAnimation.AddClip(legacyAnimationData.jumpClip, legacyAnimationData.jumpClip.name);
+                cacheAnimation.AddClip(legacyAnimationData.fallClip, legacyAnimationData.fallClip.name);
+                cacheAnimation.AddClip(legacyAnimationData.hurtClip, legacyAnimationData.hurtClip.name);
+                cacheAnimation.AddClip(legacyAnimationData.deadClip, legacyAnimationData.deadClip.name);
+            }
+            return cacheAnimation;
         }
     }
 
@@ -354,11 +415,6 @@ public class CharacterModel : MonoBehaviour
         CreateCacheEffect(buffId, effects);
     }
 
-    public void ChangeActionClip(AnimationClip clip)
-    {
-        CacheAnimatorController[CharacterAnimationComponent.ANIM_STATE_ACTION_CLIP] = clip;
-    }
-
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.magenta;
@@ -370,6 +426,140 @@ public class CharacterModel : MonoBehaviour
         Gizmos.DrawLine(topCorner + Vector3.right * radius, bottomCorner + Vector3.right * radius);
         Gizmos.DrawLine(topCorner + Vector3.forward * radius, bottomCorner + Vector3.forward * radius);
         Gizmos.DrawLine(topCorner + Vector3.back * radius, bottomCorner + Vector3.back * radius);
+    }
+
+    public void UpdateAnimation(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier = 1f)
+    {
+        switch (animatorType)
+        {
+            case AnimatorType.Animator:
+                UpdateAnimation_Animator(isDead, moveVelocity, playMoveSpeedMultiplier);
+                break;
+            case AnimatorType.LegacyAnimtion:
+                UpdateAnimation_LegacyAnimation(isDead, moveVelocity, playMoveSpeedMultiplier);
+                break;
+        }
+    }
+
+    private void UpdateAnimation_Animator(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier)
+    {
+        if (isDead && CacheAnimator.GetBool(ANIM_DO_ACTION))
+        {
+            // Force set to none action when dead
+            CacheAnimator.SetBool(ANIM_DO_ACTION, false);
+        }
+        CacheAnimator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : new Vector3(moveVelocity.x, 0, moveVelocity.z).magnitude);
+        CacheAnimator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, playMoveSpeedMultiplier);
+        CacheAnimator.SetFloat(ANIM_Y_SPEED, moveVelocity.y);
+        CacheAnimator.SetBool(ANIM_IS_DEAD, isDead);
+    }
+
+    private void UpdateAnimation_LegacyAnimation(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier)
+    {
+        if (isDead)
+            CrossFadeLegacyAnimation(legacyAnimationData.deadClip, legacyAnimationData.deadClipFadeLength);
+        else
+        {
+            if (CacheAnimation.IsPlaying(LEGACY_CLIP_ACTION))
+                return;
+            var ySpeed = moveVelocity.y;
+            if (ySpeed > legacyAnimationData.ySpeedToPlayJumpClip)
+                CrossFadeLegacyAnimation(legacyAnimationData.jumpClip, legacyAnimationData.jumpClipFadeLength);
+            else if (ySpeed < legacyAnimationData.ySpeedToPlayFallClip)
+                CrossFadeLegacyAnimation(legacyAnimationData.fallClip, legacyAnimationData.fallClipFadeLength);
+            else
+            {
+                var moveMagnitude = new Vector3(moveVelocity.x, 0, moveVelocity.z).magnitude;
+                if (moveMagnitude > legacyAnimationData.magnitudeToPlayMoveClip)
+                    CrossFadeLegacyAnimation(legacyAnimationData.moveClip, legacyAnimationData.moveClipFadeLength);
+                else if (moveMagnitude < legacyAnimationData.magnitudeToPlayMoveClip)
+                    CrossFadeLegacyAnimation(legacyAnimationData.idleClip, legacyAnimationData.idleClipFadeLength);
+            }
+        }
+    }
+
+    private void CrossFadeLegacyAnimation(AnimationClip clip, float fadeLength)
+    {
+        CrossFadeLegacyAnimation(clip.name, fadeLength);
+    }
+
+    private void CrossFadeLegacyAnimation(string clipName, float fadeLength)
+    {
+        if (!CacheAnimation.IsPlaying(clipName))
+            CacheAnimation.CrossFade(clipName, fadeLength);
+    }
+
+    public async Task PlayActionAnimation(int actionId, AnimActionType animActionType, float playSpeedMultiplier = 1f)
+    {
+        switch (animatorType)
+        {
+            case AnimatorType.Animator:
+                await PlayActionAnimation_Animator(actionId, animActionType, playSpeedMultiplier);
+                break;
+            case AnimatorType.LegacyAnimtion:
+                await PlayActionAnimation_LegacyAnimation(actionId, animActionType, playSpeedMultiplier);
+                break;
+        }
+    }
+
+    public async Task PlayActionAnimation_Animator(int actionId, AnimActionType animActionType, float playSpeedMultiplier)
+    {
+        // If animator is not null, play the action animation
+        ActionAnimation actionAnimation;
+        if (GameInstance.ActionAnimations.TryGetValue(actionId, out actionAnimation) && actionAnimation.clip != null)
+        {
+            CacheAnimator.SetBool(ANIM_DO_ACTION, false);
+            CacheAnimatorController[ANIM_STATE_ACTION_CLIP] = actionAnimation.clip;
+            AudioClip soundEffect;
+            if (actionAnimation.TryGetRandomAudioClip(out soundEffect))
+                AudioSource.PlayClipAtPoint(soundEffect, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
+            CacheAnimator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
+            CacheAnimator.SetBool(ANIM_DO_ACTION, true);
+            // Waits by current transition + clip duration before end animation
+            int waitDelay = (int)(1000 * (CacheAnimator.GetAnimatorTransitionInfo(0).duration + (actionAnimation.ClipLength / playSpeedMultiplier)));
+            await Task.Delay(waitDelay);
+            CacheAnimator.SetBool(ANIM_DO_ACTION, false);
+            // Waits by current transition + extra duration before end playing animation state
+            waitDelay = (int)(1000 * (CacheAnimator.GetAnimatorTransitionInfo(0).duration + (actionAnimation.extraDuration / playSpeedMultiplier)));
+            await Task.Delay(waitDelay);
+        }
+    }
+
+    public async Task PlayActionAnimation_LegacyAnimation(int actionId, AnimActionType animActionType, float playSpeedMultiplier)
+    {
+        // If animator is not null, play the action animation
+        ActionAnimation actionAnimation;
+        if (GameInstance.ActionAnimations.TryGetValue(actionId, out actionAnimation) && actionAnimation.clip != null)
+        {
+            if (CacheAnimation.GetClip(LEGACY_CLIP_ACTION) != null)
+                CacheAnimation.RemoveClip(LEGACY_CLIP_ACTION);
+            CacheAnimation.AddClip(actionAnimation.clip, LEGACY_CLIP_ACTION);
+            AudioClip soundEffect;
+            if (actionAnimation.TryGetRandomAudioClip(out soundEffect))
+                AudioSource.PlayClipAtPoint(soundEffect, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
+            CrossFadeLegacyAnimation(LEGACY_CLIP_ACTION, legacyAnimationData.actionClipFadeLength);
+            // Waits by current transition + clip duration before end animation
+            int waitDelay = (int)(1000 * (legacyAnimationData.actionClipFadeLength + (actionAnimation.ClipLength / playSpeedMultiplier)));
+            await Task.Delay(waitDelay);
+            CrossFadeLegacyAnimation(legacyAnimationData.idleClip, legacyAnimationData.idleClipFadeLength);
+            // Waits by current transition + extra duration before end playing animation state
+            waitDelay = (int)(1000 * (legacyAnimationData.actionClipFadeLength + (actionAnimation.extraDuration / playSpeedMultiplier)));
+            await Task.Delay(waitDelay);
+        }
+    }
+
+    public void PlayHurtAnimation()
+    {
+        switch (animatorType)
+        {
+            case AnimatorType.Animator:
+                CacheAnimator.ResetTrigger(ANIM_HURT);
+                CacheAnimator.SetTrigger(ANIM_HURT);
+                break;
+            case AnimatorType.LegacyAnimtion:
+                CrossFadeLegacyAnimation(legacyAnimationData.hurtClip, legacyAnimationData.hurtClipFadeLength);
+                break;
+        }
     }
 }
 
