@@ -82,6 +82,14 @@ public class UIChatHandler : UIBase
         }
     }
 
+    public void ToggleEnterChatField()
+    {
+        if (enterChatFieldVisible)
+            HideEnterChatField();
+        else
+            ShowEnterChatField();
+    }
+
     public void ShowEnterChatField()
     {
         foreach (var enterChatActiveObject in enterChatActiveObjects)
