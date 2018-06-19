@@ -173,7 +173,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
     public override void GetAttackingData(
         out Item weapon,
         out int actionId, 
-        out float damageDuration, 
+        out float triggerDuration, 
         out float totalDuration,
         out DamageInfo damageInfo, 
         out Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
@@ -183,7 +183,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         // Initialize data
         weapon = null;
         actionId = -1;
-        damageDuration = 0f;
+        triggerDuration = 0f;
         totalDuration = 0f;
 
         // Random attack animation
@@ -194,8 +194,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
             var anim = animArray[Random.Range(0, animLength)];
             // Assign animation data
             actionId = anim.Id;
-            damageDuration = anim.TriggerDuration / CacheAtkSpeed;
-            totalDuration = (anim.ClipLength + anim.extraDuration) / CacheAtkSpeed;
+            GetActionAnimationDurations(anim, out triggerDuration, out totalDuration);
         }
 
         // Assign damage data

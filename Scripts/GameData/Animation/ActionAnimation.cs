@@ -1,10 +1,30 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public enum ActionAnimationType
 {
     MonsterAttack,
     WeaponAttack,
     SkillCast,
+}
+
+[System.Serializable]
+public struct ActionAnimationOverrideData
+{
+    public static readonly ActionAnimationOverrideData Empty = new ActionAnimationOverrideData();
+    public CharacterModel overrideTarget;
+    [Tooltip("Must set it to override default animation data")]
+    public AnimationClip overrideClip;
+    [Tooltip("Set it more than zero to override default trigger duration rate")]
+    [Range(0f, 1f)]
+    public float triggerDurationRate;
+    public float extraDuration;
+    [Tooltip("Set it length more than zero to override default audio clips")]
+    public AudioClip[] audioClips;
+    public bool IsEmpty()
+    {
+        return Equals(Empty);
+    }
 }
 
 [System.Serializable]
@@ -22,23 +42,41 @@ public class ActionAnimation
         get { return !id.HasValue ? -1 : id.Value; }
     }
 
-    public float TriggerDuration
-    {
-        get { return ClipLength * triggerDurationRate; }
-    }
-
-    public float ClipLength
-    {
-        get { return clip == null ? 0f : clip.length; }
-    }
-
-    public AnimationClip clip;
-    [Range(0f, 1f)]
-    public float triggerDurationRate;
+    [SerializeField]
+    private AnimationClip clip;
+    [Range(0.01f, 1f)]
+    [SerializeField]
+    private float triggerDurationRate;
     [Tooltip("Extra duration after played animation clip")]
-    public float extraDuration;
+    [SerializeField]
+    private float extraDuration;
     [Tooltip("Audio clips playing randomly while play this animation (not loop)")]
-    public AudioClip[] audioClips;
+    [SerializeField]
+    private AudioClip[] audioClips;
+    [Tooltip("Override clip for target model")]
+    private ActionAnimationOverrideData[] overrideClips;
+
+    private Dictionary<int, ActionAnimationOverrideData> cacheOverrideClips;
+    public Dictionary<int, ActionAnimationOverrideData> CacheOverrideClips
+    {
+        get
+        {
+            if (cacheOverrideClips == null)
+            {
+                cacheOverrideClips = new Dictionary<int, ActionAnimationOverrideData>();
+                if (overrideClips != null)
+                {
+                    foreach (var overrideClip in overrideClips)
+                    {
+                        if (overrideClip.overrideTarget == null || overrideClip.overrideClip == null)
+                            continue;
+                        cacheOverrideClips[overrideClip.overrideTarget.OverrideActionClipId] = overrideClip;
+                    }
+                }
+            }
+            return cacheOverrideClips;
+        }
+    }
 
     /// <summary>
     /// Initialize action id, will return false if it's already initialized
@@ -68,14 +106,32 @@ public class ActionAnimation
         return true;
     }
 
-    public bool TryGetRandomAudioClip(out AudioClip clip)
+    private AudioClip GetRandomAudioClip(AudioClip[] audioClips)
     {
-        clip = null;
+        AudioClip clip = null;
         if (audioClips != null && audioClips.Length > 0)
-        {
             clip = audioClips[Random.Range(0, audioClips.Length)];
-            return clip != null;
+        return clip;
+    }
+
+    public bool GetData(CharacterModel model, out AnimationClip clip, out float triggerDuration, out float extraDuration, out AudioClip audioClip)
+    {
+        clip = this.clip;
+        extraDuration = this.extraDuration;
+        var triggerDurationRate = this.triggerDurationRate;
+        var audioClips = this.audioClips;
+        ActionAnimationOverrideData overrideData;
+        if (CacheOverrideClips.TryGetValue(model.OverrideActionClipId, out overrideData))
+        {
+            clip = overrideData.overrideClip;
+            if (overrideData.triggerDurationRate > 0)
+                triggerDurationRate = overrideData.triggerDurationRate;
+            extraDuration = overrideData.extraDuration;
+            if (overrideData.audioClips != null && overrideData.audioClips.Length > 0)
+                audioClips = overrideData.audioClips;
         }
-        return false;
+        triggerDuration = (clip != null ? clip.length : 0) * triggerDurationRate;
+        audioClip = GetRandomAudioClip(audioClips);
+        return clip != null;
     }
 }

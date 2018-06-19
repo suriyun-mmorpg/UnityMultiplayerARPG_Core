@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 [System.Serializable]
 public class LegacyAnimationData
@@ -43,6 +46,9 @@ public class CharacterModel : MonoBehaviour
         Animator,
         LegacyAnimtion,
     }
+
+    [SerializeField]
+    private int overrideActionClipId;
     public AnimatorType animatorType;
     [Header("Animator")]
     [SerializeField]
@@ -67,6 +73,8 @@ public class CharacterModel : MonoBehaviour
     [Header("Effect Containers")]
     [SerializeField]
     private EffectContainer[] effectContainers;
+
+    public int OverrideActionClipId { get { return overrideActionClipId; } }
 
     private Transform cacheTransform;
     public Transform CacheTransform
@@ -204,6 +212,17 @@ public class CharacterModel : MonoBehaviour
     /// Dictionary[equipPosition(String), List[effect(GameEffect)]]
     /// </summary>
     private readonly Dictionary<string, List<GameEffect>> cacheEffects = new Dictionary<string, List<GameEffect>>();
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (!Application.isPlaying && overrideActionClipId != GetInstanceID())
+        {
+            overrideActionClipId = GetInstanceID();
+            EditorUtility.SetDirty(gameObject);
+        }
+    }
+#endif
 
     private void CreateCacheModel(string equipPosition, Dictionary<string, GameObject> models)
     {
@@ -443,6 +462,8 @@ public class CharacterModel : MonoBehaviour
 
     private void UpdateAnimation_Animator(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier)
     {
+        if (!CacheAnimator.isActiveAndEnabled)
+            return;
         if (isDead && CacheAnimator.GetBool(ANIM_DO_ACTION))
         {
             // Force set to none action when dead
@@ -506,21 +527,25 @@ public class CharacterModel : MonoBehaviour
     {
         // If animator is not null, play the action animation
         ActionAnimation actionAnimation;
-        if (GameInstance.ActionAnimations.TryGetValue(actionId, out actionAnimation) && actionAnimation.clip != null)
+        AnimationClip clip;
+        float triggerDuration;
+        float extraDuration;
+        AudioClip audioClip;
+        if (GameInstance.ActionAnimations.TryGetValue(actionId, out actionAnimation) && 
+            actionAnimation.GetData(this, out clip, out triggerDuration, out extraDuration, out audioClip))
         {
             CacheAnimator.SetBool(ANIM_DO_ACTION, false);
-            CacheAnimatorController[ANIM_STATE_ACTION_CLIP] = actionAnimation.clip;
-            AudioClip soundEffect;
-            if (actionAnimation.TryGetRandomAudioClip(out soundEffect))
-                AudioSource.PlayClipAtPoint(soundEffect, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
+            CacheAnimatorController[ANIM_STATE_ACTION_CLIP] = clip;
+            if (audioClip != null)
+                AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
             CacheAnimator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
             CacheAnimator.SetBool(ANIM_DO_ACTION, true);
             // Waits by current transition + clip duration before end animation
-            int waitDelay = (int)(1000 * (CacheAnimator.GetAnimatorTransitionInfo(0).duration + (actionAnimation.ClipLength / playSpeedMultiplier)));
+            int waitDelay = (int)(1000 * (CacheAnimator.GetAnimatorTransitionInfo(0).duration + (clip.length / playSpeedMultiplier)));
             await Task.Delay(waitDelay);
             CacheAnimator.SetBool(ANIM_DO_ACTION, false);
             // Waits by current transition + extra duration before end playing animation state
-            waitDelay = (int)(1000 * (CacheAnimator.GetAnimatorTransitionInfo(0).duration + (actionAnimation.extraDuration / playSpeedMultiplier)));
+            waitDelay = (int)(1000 * (CacheAnimator.GetAnimatorTransitionInfo(0).duration + (extraDuration / playSpeedMultiplier)));
             await Task.Delay(waitDelay);
         }
     }
@@ -529,21 +554,25 @@ public class CharacterModel : MonoBehaviour
     {
         // If animator is not null, play the action animation
         ActionAnimation actionAnimation;
-        if (GameInstance.ActionAnimations.TryGetValue(actionId, out actionAnimation) && actionAnimation.clip != null)
+        AnimationClip clip;
+        float triggerDuration;
+        float extraDuration;
+        AudioClip audioClip;
+        if (GameInstance.ActionAnimations.TryGetValue(actionId, out actionAnimation) &&
+            actionAnimation.GetData(this, out clip, out triggerDuration, out extraDuration, out audioClip))
         {
             if (CacheAnimation.GetClip(LEGACY_CLIP_ACTION) != null)
                 CacheAnimation.RemoveClip(LEGACY_CLIP_ACTION);
-            CacheAnimation.AddClip(actionAnimation.clip, LEGACY_CLIP_ACTION);
-            AudioClip soundEffect;
-            if (actionAnimation.TryGetRandomAudioClip(out soundEffect))
-                AudioSource.PlayClipAtPoint(soundEffect, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
+            CacheAnimation.AddClip(clip, LEGACY_CLIP_ACTION);
+            if (audioClip != null)
+                AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
             CrossFadeLegacyAnimation(LEGACY_CLIP_ACTION, legacyAnimationData.actionClipFadeLength);
             // Waits by current transition + clip duration before end animation
-            int waitDelay = (int)(1000 * (legacyAnimationData.actionClipFadeLength + (actionAnimation.ClipLength / playSpeedMultiplier)));
+            int waitDelay = (int)(1000 * (clip.length / playSpeedMultiplier));
             await Task.Delay(waitDelay);
             CrossFadeLegacyAnimation(legacyAnimationData.idleClip, legacyAnimationData.idleClipFadeLength);
             // Waits by current transition + extra duration before end playing animation state
-            waitDelay = (int)(1000 * (legacyAnimationData.actionClipFadeLength + (actionAnimation.extraDuration / playSpeedMultiplier)));
+            waitDelay = (int)(1000 * (extraDuration / playSpeedMultiplier));
             await Task.Delay(waitDelay);
         }
     }

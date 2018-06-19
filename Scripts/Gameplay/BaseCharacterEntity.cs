@@ -1328,6 +1328,21 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             ApplyBuff(Id, skill.HashId, BuffType.SkillBuff, characterSkill.level);
     }
 
+    public virtual void GetActionAnimationDurations(ActionAnimation anim, out float triggerDuration, out float totalDuration)
+    {
+        triggerDuration = 0f;
+        totalDuration = 0f;
+        AnimationClip animClip;
+        float animTriggerDuration;
+        float animExtraDuration;
+        AudioClip animAudioClip;
+        if (anim.GetData(Model, out animClip, out animTriggerDuration, out animExtraDuration, out animAudioClip))
+        {
+            triggerDuration = animTriggerDuration / CacheAtkSpeed;
+            totalDuration = (animClip.length + animExtraDuration) / CacheAtkSpeed;
+        }
+    }
+
     public virtual void GetAttackingData(
         out Item weapon,
         out int actionId,
@@ -1358,8 +1373,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             var anim = animArray[Random.Range(0, animLength)];
             // Assign animation data
             actionId = anim.Id;
-            triggerDuration = anim.TriggerDuration / CacheAtkSpeed;
-            totalDuration = (anim.ClipLength + anim.extraDuration) / CacheAtkSpeed;
+            GetActionAnimationDurations(anim, out triggerDuration, out totalDuration);
         }
         // Calculate all damages
         allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(
@@ -1402,17 +1416,16 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if ((skill.castAnimations == null || skill.castAnimations.Length == 0) && isAttack)
         {
             // If there is no cast animations
-                // Random attack animation
-                var animArray = !isLeftHand ? weaponType.rightHandAttackAnimations : weaponType.leftHandAttackAnimations;
-                var animLength = animArray.Length;
-                if (animLength > 0)
-                {
-                    var anim = animArray[Random.Range(0, animLength)];
-                    // Assign animation data
-                    actionId = anim.Id;
-                    triggerDuration = anim.TriggerDuration / CacheAtkSpeed;
-                    totalDuration = (anim.ClipLength + anim.extraDuration) / CacheAtkSpeed;
-                }
+            // Random attack animation
+            var animArray = !isLeftHand ? weaponType.rightHandAttackAnimations : weaponType.leftHandAttackAnimations;
+            var animLength = animArray.Length;
+            if (animLength > 0)
+            {
+                var anim = animArray[Random.Range(0, animLength)];
+                // Assign animation data
+                actionId = anim.Id;
+                GetActionAnimationDurations(anim, out triggerDuration, out totalDuration);
+            }
         }
         else if (skill.castAnimations != null && skill.castAnimations.Length > 0)
         {
@@ -1422,8 +1435,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             var anim = animArray[Random.Range(0, animLength)];
             // Assign animation data
             actionId = anim.Id;
-            triggerDuration = anim.TriggerDuration / CacheAtkSpeed;
-            totalDuration = (anim.ClipLength + anim.extraDuration) / CacheAtkSpeed;
+            GetActionAnimationDurations(anim, out triggerDuration, out totalDuration);
         }
         if (isAttack)
         {
