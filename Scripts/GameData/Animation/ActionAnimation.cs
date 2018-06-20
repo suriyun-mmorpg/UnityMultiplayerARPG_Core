@@ -12,9 +12,9 @@ public enum ActionAnimationType
 public struct ActionAnimationOverrideData
 {
     public static readonly ActionAnimationOverrideData Empty = new ActionAnimationOverrideData();
-    public CharacterModel overrideTarget;
+    public CharacterModel target;
     [Tooltip("Must set it to override default animation data")]
-    public AnimationClip overrideClip;
+    public AnimationClip clip;
     [Tooltip("Set it more than zero to override default trigger duration rate")]
     [Range(0f, 1f)]
     public float triggerDurationRate;
@@ -54,27 +54,28 @@ public class ActionAnimation
     [SerializeField]
     private AudioClip[] audioClips;
     [Tooltip("Override clip for target model")]
-    private ActionAnimationOverrideData[] overrideClips;
+    [SerializeField]
+    private ActionAnimationOverrideData[] overrideData;
 
-    private Dictionary<int, ActionAnimationOverrideData> cacheOverrideClips;
-    public Dictionary<int, ActionAnimationOverrideData> CacheOverrideClips
+    private Dictionary<int, ActionAnimationOverrideData> cacheOverrideData;
+    public Dictionary<int, ActionAnimationOverrideData> CacheOverrideData
     {
         get
         {
-            if (cacheOverrideClips == null)
+            if (cacheOverrideData == null)
             {
-                cacheOverrideClips = new Dictionary<int, ActionAnimationOverrideData>();
-                if (overrideClips != null)
+                cacheOverrideData = new Dictionary<int, ActionAnimationOverrideData>();
+                if (overrideData != null)
                 {
-                    foreach (var overrideClip in overrideClips)
+                    foreach (var overrideDataEntry in overrideData)
                     {
-                        if (overrideClip.overrideTarget == null || overrideClip.overrideClip == null)
+                        if (overrideDataEntry.target == null || overrideDataEntry.clip == null)
                             continue;
-                        cacheOverrideClips[overrideClip.overrideTarget.OverrideActionClipId] = overrideClip;
+                        cacheOverrideData[overrideDataEntry.target.OverrideActionClipId] = overrideDataEntry;
                     }
                 }
             }
-            return cacheOverrideClips;
+            return cacheOverrideData;
         }
     }
 
@@ -121,9 +122,9 @@ public class ActionAnimation
         var triggerDurationRate = this.triggerDurationRate;
         var audioClips = this.audioClips;
         ActionAnimationOverrideData overrideData;
-        if (CacheOverrideClips.TryGetValue(model.OverrideActionClipId, out overrideData))
+        if (CacheOverrideData.TryGetValue(model.OverrideActionClipId, out overrideData))
         {
-            clip = overrideData.overrideClip;
+            clip = overrideData.clip;
             if (overrideData.triggerDurationRate > 0)
                 triggerDurationRate = overrideData.triggerDurationRate;
             extraDuration = overrideData.extraDuration;
