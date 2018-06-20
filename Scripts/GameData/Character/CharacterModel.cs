@@ -462,7 +462,7 @@ public class CharacterModel : MonoBehaviour
 
     private void UpdateAnimation_Animator(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier)
     {
-        if (!CacheAnimator.isActiveAndEnabled)
+        if (!CacheAnimator.gameObject.activeInHierarchy)
             return;
         if (isDead && CacheAnimator.GetBool(ANIM_DO_ACTION))
         {

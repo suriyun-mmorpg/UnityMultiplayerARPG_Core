@@ -16,9 +16,6 @@ public class GameInstance : MonoBehaviour
     public PlayerCharacterEntity playerCharacterEntityPrefab;
     public MonsterCharacterEntity monsterCharacterEntityPrefab;
     public ItemDropEntity itemDropEntityPrefab;
-    public FollowCameraControls minimapCameraPrefab;
-    public FollowCameraControls gameplayCameraPrefab;
-    public GameObject targetObject;
     public UISceneGameplay uiSceneGameplayPrefab;
     public UISceneGameplay uiSceneGameplayMobilePrefab;
     public ServerCharacter serverCharacterPrefab;

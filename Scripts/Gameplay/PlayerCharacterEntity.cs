@@ -10,7 +10,9 @@ using LiteNetLibManager;
 [RequireComponent(typeof(LiteNetLibTransform))]
 public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
 {
+    [HideInInspector]
     public WarpPortalEntity warpingPortal;
+    public BasePlayerCharacterController controllerPrefab;
 
     #region Sync data
     public SyncFieldShort statPoint = new SyncFieldShort();
@@ -127,6 +129,19 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         var gameInstance = GameInstance.Singleton;
         gameObject.tag = gameInstance.playerTag;
         StopMove();
+    }
+
+    protected override void Start()
+    {
+        base.Start();
+        if (IsOwnerClient)
+        {
+            if (BasePlayerCharacterController.Singleton == null)
+            {
+                var controller = Instantiate(controllerPrefab);
+                controller.CharacterEntity = this;
+            }
+        }
     }
 
     protected override void Update()

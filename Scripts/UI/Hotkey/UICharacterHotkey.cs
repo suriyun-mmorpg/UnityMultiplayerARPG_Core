@@ -90,7 +90,7 @@ public class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
 
     public void OnClickUse()
     {
-        var owningCharacterController = BasePlayerCharacterController.OwningCharacterController;
+        var owningCharacterController = BasePlayerCharacterController.Singleton;
         if (owningCharacterController != null)
             owningCharacterController.UseHotkey(indexOfData);
     }
