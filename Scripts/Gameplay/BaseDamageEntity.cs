@@ -8,6 +8,9 @@ public abstract class BaseDamageEntity : RpgNetworkEntity
     protected CharacterBuff debuff;
     protected int hitEffectsId;
 
+    public string Id { get { return Identity.AssetId; } }
+    public int DataId { get { return Id.GenerateHashId(); } }
+
     public virtual void SetupDamage(
         BaseCharacterEntity attacker,
         Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,

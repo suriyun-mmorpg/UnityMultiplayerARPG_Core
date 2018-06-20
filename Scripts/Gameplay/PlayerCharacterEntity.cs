@@ -326,6 +326,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         RegisterNetFunction("ShowNpcDialog", new LiteNetLibFunction<NetFieldInt>((npcDialogId) => NetFuncShowNpcDialog(npcDialogId)));
         RegisterNetFunction("SelectNpcDialogMenu", new LiteNetLibFunction<NetFieldInt>((menuIndex) => NetFuncSelectNpcDialogMenu(menuIndex)));
         RegisterNetFunction("EnterWarp", new LiteNetLibFunction(() => NetFuncEnterWarp()));
+        RegisterNetFunction("Build", new LiteNetLibFunction<NetFieldInt, NetFieldVector3, NetFieldQuaternion>((dataId, position, rotation) => NetFuncBuild(dataId, position, rotation)));
     }
     #endregion
 
@@ -450,7 +451,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         
         currentNpcDialog = npcEntity.startDialog;
         if (currentNpcDialog != null)
-            RequestShowNpcDialog(currentNpcDialog.HashId);
+            RequestShowNpcDialog(currentNpcDialog.DataId);
     }
 
     protected void NetFuncShowNpcDialog(int npcDialogDataId)
@@ -478,7 +479,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
                     return;
                 }
                 currentNpcDialog = selectedMenu.dialog;
-                RequestShowNpcDialog(currentNpcDialog.HashId);
+                RequestShowNpcDialog(currentNpcDialog.DataId);
                 break;
             case NpcDialogType.Quest:
                 NetFuncSelectNpcDialogQuestMenu(menuIndex);
@@ -497,25 +498,25 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         switch (menuIndex)
         {
             case NpcDialog.QUEST_ACCEPT_MENU_INDEX:
-                NetFuncAcceptQuest(currentNpcDialog.quest.HashId);
+                NetFuncAcceptQuest(currentNpcDialog.quest.DataId);
                 currentNpcDialog = currentNpcDialog.questAcceptedDialog;
                 break;
             case NpcDialog.QUEST_DECLINE_MENU_INDEX:
                 currentNpcDialog = currentNpcDialog.questDeclinedDialog;
                 break;
             case NpcDialog.QUEST_ABANDON_MENU_INDEX:
-                NetFuncAbandonQuest(currentNpcDialog.quest.HashId);
+                NetFuncAbandonQuest(currentNpcDialog.quest.DataId);
                 currentNpcDialog = currentNpcDialog.questAbandonedDialog;
                 break;
             case NpcDialog.QUEST_COMPLETE_MENU_INDEX:
-                NetFuncCompleteQuest(currentNpcDialog.quest.HashId);
+                NetFuncCompleteQuest(currentNpcDialog.quest.DataId);
                 currentNpcDialog = currentNpcDialog.questCompletedDailog;
                 break;
         }
         if (currentNpcDialog == null)
             RequestShowNpcDialog(0);
         else
-            RequestShowNpcDialog(currentNpcDialog.HashId);
+            RequestShowNpcDialog(currentNpcDialog.DataId);
     }
 
     protected void NetFuncAcceptQuest(int questDataId)
@@ -557,7 +558,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
             switch (task.taskType)
             {
                 case QuestTaskType.CollectItem:
-                    this.DecreaseItems(task.itemAmount.item.HashId, task.itemAmount.amount);
+                    this.DecreaseItems(task.itemAmount.item.DataId, task.itemAmount.amount);
                     break;
             }
         }
@@ -569,7 +570,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
             foreach (var rewardItem in rewardItems)
             {
                 if (rewardItem.item != null && rewardItem.amount > 0)
-                    this.IncreaseItems(rewardItem.item.HashId, 1, rewardItem.amount);
+                    this.IncreaseItems(rewardItem.item.DataId, 1, rewardItem.amount);
             }
         }
         characterQuest.isComplete = true;
@@ -585,6 +586,21 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
             return;
 
         warpingPortal.EnterWarp(this);
+    }
+
+    protected void NetFuncBuild(int index, Vector3 position, Quaternion rotation)
+    {
+        if (CurrentHp <= 0 ||
+            IsPlayingActionAnimation() ||
+            index < 0 ||
+            index > nonEquipItems.Count)
+            return;
+
+        var nonEquipItem = nonEquipItems[index];
+        if (!nonEquipItem.IsValid() || nonEquipItem.GetBuildingItem() == null || nonEquipItem.GetBuildingItem().buildingEntity == null)
+            return;
+
+        Manager.Assets.NetworkSpawn(nonEquipItem.GetBuildingItem().buildingEntity.Identity, position, rotation);
     }
     #endregion
 
@@ -640,6 +656,13 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         if (CurrentHp <= 0 || IsPlayingActionAnimation() || warpingPortal == null)
             return;
         CallNetFunction("EnterWarp", FunctionReceivers.Server);
+    }
+
+    public void RequestBuild(int index, Vector3 position, Quaternion rotation)
+    {
+        if (CurrentHp <= 0 || IsPlayingActionAnimation())
+            return;
+        CallNetFunction("Build", FunctionReceivers.Server, index, position, rotation);
     }
     #endregion
 

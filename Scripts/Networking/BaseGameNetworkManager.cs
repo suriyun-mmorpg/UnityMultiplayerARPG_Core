@@ -1,11 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.AI;
 using LiteNetLib;
 using LiteNetLibManager;
 
-public class BaseGameNetworkManager : LiteNetLibGameManager
+public abstract class BaseGameNetworkManager : LiteNetLibGameManager
 {
     public class MsgTypes
     {
@@ -102,6 +101,11 @@ public class BaseGameNetworkManager : LiteNetLibGameManager
         foreach (var damageEntity in damageEntities)
         {
             spawnablePrefabs.Add(damageEntity.Identity);
+        }
+        var buildingEntities = GameInstance.BuildingEntities.Values;
+        foreach (var buildingEntity in buildingEntities)
+        {
+            spawnablePrefabs.Add(buildingEntity.Identity);
         }
         Assets.spawnablePrefabs = spawnablePrefabs.ToArray();
     }

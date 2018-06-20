@@ -104,7 +104,7 @@ public static class SkillExtension
             return true;
         foreach (var craftRequirement in craftRequirements)
         {
-            if (craftRequirement.item != null && character.CountNonEquipItems(craftRequirement.item.HashId) < craftRequirement.amount)
+            if (craftRequirement.item != null && character.CountNonEquipItems(craftRequirement.item.DataId) < craftRequirement.amount)
                 return false;
         }
         return true;

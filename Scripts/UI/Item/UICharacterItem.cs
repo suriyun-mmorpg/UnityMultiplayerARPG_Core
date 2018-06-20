@@ -31,6 +31,8 @@ public class UICharacterItem : UIDataForCharacter<CharacterItemLevelTuple>
     public string potionItemType = "Potion";
     [Tooltip("Ammo Item Type")]
     public string ammoItemType = "Ammo";
+    [Tooltip("Building Item Type")]
+    public string buildingItemType = "Building";
 
     [Header("Input Dialog Settings")]
     public string dropInputTitle = "Drop Item";
@@ -135,6 +137,9 @@ public class UICharacterItem : UIDataForCharacter<CharacterItemLevelTuple>
                     break;
                 case ItemType.Ammo:
                     textItemType.text = string.Format(itemTypeFormat, ammoItemType);
+                    break;
+                case ItemType.Building:
+                    textItemType.text = string.Format(itemTypeFormat, buildingItemType);
                     break;
             }
         }

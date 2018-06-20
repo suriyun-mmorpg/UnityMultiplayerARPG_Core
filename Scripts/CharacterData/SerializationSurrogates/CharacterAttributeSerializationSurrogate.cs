@@ -23,7 +23,7 @@ public class CharacterAttributeSerializationSurrogate : ISerializationSurrogate
         try { stringId = info.GetString("attributeId"); }
         catch { }
         if (!string.IsNullOrEmpty(stringId))
-            data.dataId = BaseGameData.GenerateHashId(stringId);
+            data.dataId = stringId.GenerateHashId();
         else
             data.dataId = info.GetInt32("dataId");
         data.amount = info.GetInt16("amount");

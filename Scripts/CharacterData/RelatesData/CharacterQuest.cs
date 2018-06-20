@@ -73,12 +73,12 @@ public class CharacterQuest
         {
             case QuestTaskType.KillMonster:
                 var monsterCharacterAmount = task.monsterCharacterAmount;
-                progress = monsterCharacterAmount.monster == null ? 0 : CountKillMonster(monsterCharacterAmount.monster.HashId);
+                progress = monsterCharacterAmount.monster == null ? 0 : CountKillMonster(monsterCharacterAmount.monster.DataId);
                 isComplete = progress >= monsterCharacterAmount.amount;
                 return progress;
             case QuestTaskType.CollectItem:
                 var itemAmount = task.itemAmount;
-                progress = itemAmount.item == null ? 0 : character.CountNonEquipItems(itemAmount.item.HashId);
+                progress = itemAmount.item == null ? 0 : character.CountNonEquipItems(itemAmount.item.DataId);
                 isComplete = progress >= itemAmount.amount;
                 return progress;
         }
@@ -111,7 +111,7 @@ public class CharacterQuest
     public static CharacterQuest Create(Quest quest)
     {
         var newQuest = new CharacterQuest();
-        newQuest.dataId = quest.HashId;
+        newQuest.dataId = quest.DataId;
         newQuest.isComplete = false;
         return newQuest;
     }

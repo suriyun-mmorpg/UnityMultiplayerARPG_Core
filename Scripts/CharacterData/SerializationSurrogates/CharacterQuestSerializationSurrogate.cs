@@ -24,7 +24,7 @@ public class CharacterQuestSerializationSurrogate : ISerializationSurrogate
         try { stringId = info.GetString("questId"); }
         catch { }
         if (!string.IsNullOrEmpty(stringId))
-            data.dataId = BaseGameData.GenerateHashId(stringId);
+            data.dataId = stringId.GenerateHashId();
         else
             data.dataId = info.GetInt32("dataId");
         data.isComplete = info.GetBoolean("isComplete");

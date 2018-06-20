@@ -27,7 +27,7 @@ public class PlayerCharacter : BaseCharacter
                 foreach (var skillLevel in skillLevels)
                 {
                     if (skillLevel.skill != null)
-                    cacheSkillLevels[skillLevel.skill.HashId] = skillLevel;
+                    cacheSkillLevels[skillLevel.skill.DataId] = skillLevel;
                 }
             }
             return cacheSkillLevels;

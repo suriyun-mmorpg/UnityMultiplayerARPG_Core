@@ -67,10 +67,10 @@ public static class PlayerCharacterDataExtension
         var attributes = GameInstance.Attributes.Values;
         foreach (var attribute in attributes)
         {
-            if (validAttributeIds.Contains(attribute.HashId))
+            if (validAttributeIds.Contains(attribute.DataId))
                 continue;
             var characterAttribute = new CharacterAttribute();
-            characterAttribute.dataId = attribute.HashId;
+            characterAttribute.dataId = attribute.DataId;
             characterAttribute.amount = 0;
             character.Attributes.Add(characterAttribute);
         }
@@ -98,10 +98,10 @@ public static class PlayerCharacterDataExtension
         var skillLevels = database.skillLevels;
         foreach (var skillLevel in skillLevels)
         {
-            if (skillLevel.skill != null && validSkillIds.Contains(skillLevel.skill.HashId))
+            if (skillLevel.skill != null && validSkillIds.Contains(skillLevel.skill.DataId))
                 continue;
             var characterSkill = new CharacterSkill();
-            characterSkill.dataId = skillLevel.skill.HashId;
+            characterSkill.dataId = skillLevel.skill.DataId;
             characterSkill.level = skillLevel.level;
             character.Skills.Add(characterSkill);
         }
@@ -165,7 +165,7 @@ public static class PlayerCharacterDataExtension
         foreach (var attribute in attributes)
         {
             var characterAttribute = new CharacterAttribute();
-            characterAttribute.dataId = attribute.HashId;
+            characterAttribute.dataId = attribute.DataId;
             characterAttribute.amount = 0;
             character.Attributes.Add(characterAttribute);
         }
@@ -175,7 +175,7 @@ public static class PlayerCharacterDataExtension
             if (skillLevel.skill == null)
                 continue;
             var characterSkill = new CharacterSkill();
-            characterSkill.dataId = skillLevel.skill.HashId;
+            characterSkill.dataId = skillLevel.skill.DataId;
             characterSkill.level = skillLevel.level;
             character.Skills.Add(characterSkill);
         }
@@ -206,7 +206,7 @@ public static class PlayerCharacterDataExtension
             character.EquipItems.Add(newItem);
         }
         // General data
-        character.DataId = database.HashId;
+        character.DataId = database.DataId;
         character.CharacterName = characterName;
         character.Level = 1;
         var stats = character.GetStats();
@@ -272,8 +272,7 @@ public static class PlayerCharacterDataExtension
         file.Close();
         Debug.Log("Character Saved to: " + path);
     }
-
-
+    
     public static T LoadPersistentCharacterDataById<T>(this T characterData, string id) where T : IPlayerCharacterData
     {
         return LoadPersistentCharacterData(characterData, Application.persistentDataPath + "/" + id + ".sav");
@@ -304,6 +303,8 @@ public static class PlayerCharacterDataExtension
         Debug.Log("Characters loading from: " + path);
         foreach (var file in files)
         {
+            if (file.Contains("_world_"))
+                continue;
             var characterData = new PlayerCharacterData();
             result.Add(characterData.LoadPersistentCharacterData(file));
         }

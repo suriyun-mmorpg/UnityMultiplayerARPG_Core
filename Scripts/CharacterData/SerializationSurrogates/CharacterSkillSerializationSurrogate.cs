@@ -24,7 +24,7 @@ public class CharacterSkillSerializationSurrogate : ISerializationSurrogate
         try { stringId = info.GetString("skillId"); }
         catch { }
         if (!string.IsNullOrEmpty(stringId))
-            data.dataId = BaseGameData.GenerateHashId(stringId);
+            data.dataId = stringId.GenerateHashId();
         else
             data.dataId = info.GetInt32("dataId");
         data.level = info.GetInt16("level");

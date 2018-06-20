@@ -30,6 +30,8 @@ public class CharacterItem
     private Item cachePotionItem;
     [System.NonSerialized]
     private Item cacheAmmoItem;
+    [System.NonSerialized]
+    private Item cacheBuildingItem;
 
     private void MakeCache()
     {
@@ -43,6 +45,7 @@ public class CharacterItem
             cacheShieldItem = null;
             cachePotionItem = null;
             cacheAmmoItem = null;
+            cacheBuildingItem = null;
             return;
         }
         if (dirtyDataId != dataId)
@@ -56,6 +59,7 @@ public class CharacterItem
             cacheShieldItem = null;
             cachePotionItem = null;
             cacheAmmoItem = null;
+            cacheBuildingItem = null;
             cacheItem = GameInstance.Items.TryGetValue(dataId, out cacheItem) ? cacheItem : null;
             if (cacheItem != null)
             {
@@ -73,6 +77,8 @@ public class CharacterItem
                     cachePotionItem = cacheItem;
                 if (cacheItem.IsAmmo())
                     cacheAmmoItem = cacheItem;
+                if (cacheItem.IsBuilding())
+                    cacheBuildingItem = cacheItem;
             }
         }
     }
@@ -125,6 +131,12 @@ public class CharacterItem
         return cacheAmmoItem;
     }
 
+    public Item GetBuildingItem()
+    {
+        MakeCache();
+        return cacheBuildingItem;
+    }
+
     public short GetMaxStack()
     {
         var item = GetItem();
@@ -164,7 +176,7 @@ public class CharacterItem
 
     public static CharacterItem Create(Item item, short level = 1, short amount = 1)
     {
-        return Create(item.HashId, level, amount);
+        return Create(item.DataId, level, amount);
     }
 
     public static CharacterItem Create(int dataId, short level = 1, short amount = 1)

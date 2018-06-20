@@ -520,7 +520,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
         var skill = hotkey.GetSkill();
         if (skill != null)
         {
-            var skillIndex = CharacterEntity.IndexOfSkill(skill.HashId);
+            var skillIndex = CharacterEntity.IndexOfSkill(skill.DataId);
             if (skillIndex >= 0 && skillIndex < CharacterEntity.skills.Count)
             {
                 BaseCharacterEntity attackingCharacter;
@@ -540,7 +540,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
         var item = hotkey.GetItem();
         if (item != null)
         {
-            var itemIndex = CharacterEntity.IndexOfNonEquipItem(item.HashId);
+            var itemIndex = CharacterEntity.IndexOfNonEquipItem(item.DataId);
             if (itemIndex >= 0 && itemIndex < CharacterEntity.nonEquipItems.Count)
                 RequestUseItem(itemIndex);
         }

@@ -504,7 +504,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                 {
                     CharacterBuff debuff = CharacterBuff.Empty;
                     if (skill.isDebuff)
-                        debuff = CharacterBuff.Create(Id, BuffType.SkillDebuff, skill.HashId, characterSkill.level);
+                        debuff = CharacterBuff.Create(Id, BuffType.SkillDebuff, skill.DataId, characterSkill.level);
                     LaunchDamageEntity(position, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id);
                 }
                 break;
@@ -515,9 +515,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                     foreach (var craftRequirement in craftRequirements)
                     {
                         if (craftRequirement.item != null && craftRequirement.amount > 0)
-                            this.DecreaseItems(craftRequirement.item.HashId, craftRequirement.amount);
+                            this.DecreaseItems(craftRequirement.item.DataId, craftRequirement.amount);
                     }
-                    this.IncreaseItems(skill.craftingItem.HashId, 1, 1);
+                    this.IncreaseItems(skill.craftingItem.DataId, 1, 1);
                 }
                 break;
         }
@@ -621,7 +621,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     /// <param name="amount"></param>
     protected void NetFuncDropItem(int index, short amount)
     {
-        var gameInstance = GameInstance.Singleton;
         if (CurrentHp <= 0 ||
             IsPlayingActionAnimation() ||
             index < 0 ||
@@ -754,9 +753,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected void NetFuncOnLevelUp()
     {
-        var gameInstance = GameInstance.Singleton;
-        if (gameInstance != null && gameInstance.levelUpEffect != null && Model != null)
-            Model.InstantiateEffect(new GameEffect[] { gameInstance.levelUpEffect });
+        if (GameInstance.Singleton.levelUpEffect != null && Model != null)
+            Model.InstantiateEffect(new GameEffect[] { GameInstance.Singleton.levelUpEffect });
         if (onLevelUp != null)
             onLevelUp.Invoke();
     }
@@ -1316,7 +1314,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         var item = characterItem.GetPotionItem();
         if (item == null)
             return;
-        ApplyBuff(Id, item.HashId, BuffType.PotionBuff, characterItem.level);
+        ApplyBuff(Id, item.DataId, BuffType.PotionBuff, characterItem.level);
     }
 
     protected void ApplySkillBuff(CharacterSkill characterSkill)
@@ -1325,7 +1323,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (skill == null)
             return;
         if (skill.skillBuffType == SkillBuffType.BuffToUser)
-            ApplyBuff(Id, skill.HashId, BuffType.SkillBuff, characterSkill.level);
+            ApplyBuff(Id, skill.DataId, BuffType.SkillBuff, characterSkill.level);
     }
 
     public virtual void GetActionAnimationDurations(ActionAnimation anim, out float triggerDuration, out float totalDuration)
@@ -1685,8 +1683,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     {
         if (!IsServer)
             return;
-        var gameInstance = GameInstance.Singleton;
-        if (!gameInstance.GameplayRule.IncreaseExp(this, exp))
+        if (!GameInstance.Singleton.GameplayRule.IncreaseExp(this, exp))
             return;
         // Send OnLevelUp to owner player only
         RequestOnLevelUp();

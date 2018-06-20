@@ -39,7 +39,7 @@ public class Quest : BaseGameData
                     if (task.taskType == QuestTaskType.KillMonster &&
                         task.monsterCharacterAmount.monster != null &&
                         task.monsterCharacterAmount.amount > 0)
-                        cacheKillMonsterIds.Add(task.monsterCharacterAmount.monster.HashId);
+                        cacheKillMonsterIds.Add(task.monsterCharacterAmount.monster.DataId);
                 }
             }
             return cacheKillMonsterIds;

@@ -262,9 +262,9 @@ public class MonsterCharacterEntity : BaseCharacterEntity
             {
                 var item = randomItem.item;
                 var amount = randomItem.amount;
-                if (item != null && GameInstance.Items.ContainsKey(item.HashId))
+                if (item != null && GameInstance.Items.ContainsKey(item.DataId))
                 {
-                    var itemDataId = item.HashId;
+                    var itemDataId = item.DataId;
                     if (amount > item.maxStack)
                         amount = item.maxStack;
                     ItemDropEntity.DropItem(this, itemDataId, 1, amount);

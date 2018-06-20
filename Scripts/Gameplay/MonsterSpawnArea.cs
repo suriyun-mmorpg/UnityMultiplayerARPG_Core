@@ -18,7 +18,7 @@ public class MonsterSpawnArea : MonoBehaviour
             return;
         }
         var gameInstance = GameInstance.Singleton;
-        var dataId = database.HashId;
+        var dataId = database.DataId;
         MonsterCharacter foundDatabase;
         if (!GameInstance.MonsterCharacters.TryGetValue(dataId, out foundDatabase))
         {

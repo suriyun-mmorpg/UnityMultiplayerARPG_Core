@@ -49,7 +49,7 @@ public class PlayerCharacterSerializationSurrogate : ISerializationSurrogate
         try { stringId = info.GetString("databaseId"); }
         catch { }
         if (!string.IsNullOrEmpty(stringId))
-            data.DataId = BaseGameData.GenerateHashId(stringId);
+            data.DataId = stringId.GenerateHashId();
         else
             data.DataId = info.GetInt32("dataId");
         data.CharacterName = info.GetString("characterName");

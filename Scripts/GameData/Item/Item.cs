@@ -13,6 +13,7 @@ public enum ItemType
     Shield,
     Potion,
     Ammo,
+    Building,
 }
 
 [CreateAssetMenu(fileName = "Item", menuName = "Create GameData/Item")]
@@ -55,6 +56,9 @@ public class Item : BaseGameData
     // Ammo
     public AmmoType ammoType;
 
+    // Building
+    public BuildingEntity buildingEntity;
+
 #if UNITY_EDITOR
     protected virtual void OnValidate()
     {
@@ -68,6 +72,8 @@ public class Item : BaseGameData
                 break;
             case ItemType.Junk:
             case ItemType.Potion:
+            case ItemType.Ammo:
+            case ItemType.Building:
                 maxLevel = 1;
                 break;
         }
@@ -113,6 +119,11 @@ public class Item : BaseGameData
     public bool IsAmmo()
     {
         return itemType == ItemType.Ammo;
+    }
+
+    public bool IsBuilding()
+    {
+        return itemType == ItemType.Building;
     }
 
     #region Cache Data

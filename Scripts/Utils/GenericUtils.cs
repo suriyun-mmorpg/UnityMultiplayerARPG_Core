@@ -89,7 +89,7 @@ public static class GenericUtils
         return result.ToString();
     }
 
-    public static string GetMD5(string text)
+    public static string GetMD5(this string text)
     {
         // byte array representation of that string
         byte[] encodedPassword = new UTF8Encoding().GetBytes(text);
@@ -99,5 +99,24 @@ public static class GenericUtils
 
         // string representation (similar to UNIX format)
         return System.BitConverter.ToString(hash).Replace("-", string.Empty).ToLower();
+    }
+
+    public static int GenerateHashId(this string id)
+    {
+        unchecked
+        {
+            int hash1 = 5381;
+            int hash2 = hash1;
+
+            for (int i = 0; i < id.Length && id[i] != '\0'; i += 2)
+            {
+                hash1 = ((hash1 << 5) + hash1) ^ id[i];
+                if (i == id.Length - 1 || id[i + 1] == '\0')
+                    break;
+                hash2 = ((hash2 << 5) + hash2) ^ id[i + 1];
+            }
+
+            return hash1 + (hash2 * 1566083941);
+        }
     }
 }

@@ -120,7 +120,7 @@ public class CharacterSkill
     public static CharacterSkill Create(Skill skill, short level)
     {
         var newSkill = new CharacterSkill();
-        newSkill.dataId = skill.HashId;
+        newSkill.dataId = skill.DataId;
         newSkill.level = level;
         newSkill.coolDownRemainsDuration = 0f;
         return newSkill;

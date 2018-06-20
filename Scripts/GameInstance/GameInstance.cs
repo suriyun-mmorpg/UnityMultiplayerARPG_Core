@@ -62,7 +62,8 @@ public class GameInstance : MonoBehaviour
     public static readonly Dictionary<int, Skill> Skills = new Dictionary<int, Skill>();
     public static readonly Dictionary<int, NpcDialog> NpcDialogs = new Dictionary<int, NpcDialog>();
     public static readonly Dictionary<int, Quest> Quests = new Dictionary<int, Quest>();
-    public static readonly Dictionary<string, BaseDamageEntity> DamageEntities = new Dictionary<string, BaseDamageEntity>();
+    public static readonly Dictionary<int, BaseDamageEntity> DamageEntities = new Dictionary<int, BaseDamageEntity>();
+    public static readonly Dictionary<int, BuildingEntity> BuildingEntities = new Dictionary<int, BuildingEntity>();
     public static readonly Dictionary<int, ActionAnimation> ActionAnimations = new Dictionary<int, ActionAnimation>();
     public static readonly Dictionary<int, GameEffectCollection> GameEffectCollections = new Dictionary<int, GameEffectCollection>();
     
@@ -208,6 +209,7 @@ public class GameInstance : MonoBehaviour
         PlayerCharacters.Clear();
         MonsterCharacters.Clear();
         DamageEntities.Clear();
+        BuildingEntities.Clear();
         ActionAnimations.Clear();
         GameEffectCollections.Clear();
 
@@ -290,20 +292,21 @@ public class GameInstance : MonoBehaviour
     {
         foreach (var attribute in attributes)
         {
-            if (attribute == null || Attributes.ContainsKey(attribute.HashId))
+            if (attribute == null || Attributes.ContainsKey(attribute.DataId))
                 continue;
-            Attributes[attribute.HashId] = attribute;
+            Attributes[attribute.DataId] = attribute;
         }
     }
 
     public static void AddItems(IEnumerable<Item> items)
     {
         var damageEntities = new List<BaseDamageEntity>();
+        var buildingEntities = new List<BuildingEntity>();
         foreach (var item in items)
         {
-            if (item == null || Items.ContainsKey(item.HashId))
+            if (item == null || Items.ContainsKey(item.DataId))
                 continue;
-            Items[item.HashId] = item;
+            Items[item.DataId] = item;
             if (item.IsWeapon())
             {
                 var weaponType = item.WeaponType;
@@ -311,30 +314,35 @@ public class GameInstance : MonoBehaviour
                 AddActionAnimations(ActionAnimationType.WeaponAttack, weaponType.rightHandAttackAnimations);
                 AddActionAnimations(ActionAnimationType.WeaponAttack, weaponType.leftHandAttackAnimations);
                 // Add damage entities
-                var missileDamageEntity = weaponType.damageInfo.missileDamageEntity;
-                if (missileDamageEntity != null)
-                    damageEntities.Add(missileDamageEntity);
+                if (weaponType.damageInfo.missileDamageEntity != null)
+                    damageEntities.Add(weaponType.damageInfo.missileDamageEntity);
+            }
+            if (item.IsBuilding())
+            {
+                if (item.buildingEntity != null)
+                    buildingEntities.Add(item.buildingEntity);
             }
         }
         AddDamageEntities(damageEntities);
+        AddBuildingEntities(buildingEntities);
     }
 
     public static void AddCharacters(IEnumerable<BaseCharacter> characters)
     {
         foreach (var character in characters)
         {
-            if (character == null || AllCharacters.ContainsKey(character.HashId))
+            if (character == null || AllCharacters.ContainsKey(character.DataId))
                 continue;
-            AllCharacters[character.HashId] = character;
+            AllCharacters[character.DataId] = character;
             if (character is PlayerCharacter)
             {
                 var playerCharacter = character as PlayerCharacter;
-                PlayerCharacters[character.HashId] = playerCharacter;
+                PlayerCharacters[character.DataId] = playerCharacter;
             }
             else if (character is MonsterCharacter)
             {
                 var monsterCharacter = character as MonsterCharacter;
-                MonsterCharacters[character.HashId] = monsterCharacter;
+                MonsterCharacters[character.DataId] = monsterCharacter;
                 AddActionAnimations(ActionAnimationType.MonsterAttack, monsterCharacter.attackAnimations);
             }
         }
@@ -346,9 +354,9 @@ public class GameInstance : MonoBehaviour
         var damageEntities = new List<BaseDamageEntity>();
         foreach (var skill in skills)
         {
-            if (skill == null || Skills.ContainsKey(skill.HashId))
+            if (skill == null || Skills.ContainsKey(skill.DataId))
                 continue;
-            Skills[skill.HashId] = skill;
+            Skills[skill.DataId] = skill;
             AddActionAnimations(ActionAnimationType.SkillCast, skill.castAnimations);
             skillHitEffects.Add(skill.hitEffects);
             var missileDamageEntity = skill.damageInfo.missileDamageEntity;
@@ -363,9 +371,9 @@ public class GameInstance : MonoBehaviour
     {
         foreach (var npcDialog in npcDialogs)
         {
-            if (npcDialog == null || NpcDialogs.ContainsKey(npcDialog.HashId))
+            if (npcDialog == null || NpcDialogs.ContainsKey(npcDialog.DataId))
                 continue;
-            NpcDialogs[npcDialog.HashId] = npcDialog;
+            NpcDialogs[npcDialog.DataId] = npcDialog;
         }
     }
 
@@ -373,9 +381,9 @@ public class GameInstance : MonoBehaviour
     {
         foreach (var quest in quests)
         {
-            if (quest == null || Quests.ContainsKey(quest.HashId))
+            if (quest == null || Quests.ContainsKey(quest.DataId))
                 continue;
-            Quests[quest.HashId] = quest;
+            Quests[quest.DataId] = quest;
         }
     }
 
@@ -385,9 +393,21 @@ public class GameInstance : MonoBehaviour
             return;
         foreach (var damageEntity in damageEntities)
         {
-            if (damageEntity == null || DamageEntities.ContainsKey(damageEntity.Identity.AssetId))
+            if (damageEntity == null || DamageEntities.ContainsKey(damageEntity.DataId))
                 continue;
-            DamageEntities[damageEntity.Identity.AssetId] = damageEntity;
+            DamageEntities[damageEntity.DataId] = damageEntity;
+        }
+    }
+
+    public static void AddBuildingEntities(IEnumerable<BuildingEntity> buildingEntities)
+    {
+        if (buildingEntities == null)
+            return;
+        foreach (var buildingEntity in buildingEntities)
+        {
+            if (buildingEntity == null || BuildingEntities.ContainsKey(buildingEntity.DataId))
+                continue;
+            BuildingEntities[buildingEntity.DataId] = buildingEntity;
         }
     }
 

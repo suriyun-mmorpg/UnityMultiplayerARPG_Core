@@ -2,6 +2,7 @@
 using LiteNetLibManager;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using System.Threading.Tasks;
 
 public class LanRpgNetworkManager : BaseGameNetworkManager
 {
@@ -16,7 +17,7 @@ public class LanRpgNetworkManager : BaseGameNetworkManager
     public float autoSaveDuration = 2f;
     public GameStartType startType;
     public PlayerCharacterData selectedCharacter;
-    protected float lastSaveTime;
+    private float lastSaveTime;
 
     protected override void Awake()
     {
@@ -53,7 +54,11 @@ public class LanRpgNetworkManager : BaseGameNetworkManager
         {
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null && IsNetworkActive)
+            {
                 owningCharacter.SavePersistentCharacterData();
+                if (IsServer)
+                    SaveWorld();
+            }
             lastSaveTime = Time.unscaledTime;
         }
     }
@@ -74,5 +79,44 @@ public class LanRpgNetworkManager : BaseGameNetworkManager
             playerCharacterEntity.RequestOnRespawn(true);
         else
             playerCharacterEntity.RequestOnDead(true);
+        // Load world by owner character id
+        if (playerCharacterEntity.IsOwnerClient)
+        {
+            var worldSaveData = new WorldSaveData();
+            worldSaveData.LoadPersistentData(playerCharacterEntity.Id, playerCharacterEntity.CurrentMapName);
+            foreach (var building in worldSaveData.buildings)
+            {
+                // Instantiate building
+                BuildingEntity buildingPrefab;
+                if (GameInstance.BuildingEntities.TryGetValue(building.DataId, out buildingPrefab))
+                {
+                    var buildingEntity = Instantiate(buildingPrefab);
+                    buildingEntity.Position = building.Position;
+                    buildingEntity.Rotation = building.Rotation;
+                    buildingEntity.CreatorId = building.CreatorId;
+                    buildingEntity.CreatorName = building.CreatorName;
+                }
+            }
+        }
+    }
+
+    private void SaveWorld()
+    {
+        // Save building entities / Tree / Rocks
+        var playerCharacterEntity = BasePlayerCharacterController.OwningCharacter;
+        var worldSaveData = new WorldSaveData();
+        var buildings = FindObjectsOfType<BuildingEntity>();
+        foreach (var building in buildings)
+        {
+            worldSaveData.buildings.Add(new BuildingSaveData()
+            {
+                DataId = building.DataId,
+                Position = building.Position,
+                Rotation = building.Rotation,
+                CreatorId = building.CreatorId,
+                CreatorName = building.CreatorName,
+            });
+        }
+        worldSaveData.SavePersistentWorldData(playerCharacterEntity.Id, playerCharacterEntity.CurrentMapName);
     }
 }

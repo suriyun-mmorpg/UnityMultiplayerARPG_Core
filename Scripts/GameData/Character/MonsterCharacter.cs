@@ -70,7 +70,7 @@ public class MonsterCharacter : BaseCharacter
         {
             if (randomItem.item == null ||
                 randomItem.amount == 0 ||
-                !GameInstance.Items.ContainsKey(randomItem.item.HashId) ||
+                !GameInstance.Items.ContainsKey(randomItem.item.DataId) ||
                 Random.value > randomItem.dropRate)
                 continue;
                 rewards.Add(new ItemAmount()
