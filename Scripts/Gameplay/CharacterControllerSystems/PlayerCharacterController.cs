@@ -58,6 +58,9 @@ public class PlayerCharacterController : BasePlayerCharacterController
 
     protected override void Update()
     {
+        if (CharacterEntity == null || !CharacterEntity.IsOwnerClient)
+            return;
+
         base.Update();
 
         if (CacheTargetObject != null)
@@ -93,9 +96,6 @@ public class PlayerCharacterController : BasePlayerCharacterController
 
     protected virtual void UpdateInput()
     {
-        if (!CharacterEntity.IsOwnerClient)
-            return;
-        
         var fields = FindObjectsOfType<InputField>();
         foreach (var field in fields)
         {

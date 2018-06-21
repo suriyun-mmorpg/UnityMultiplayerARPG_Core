@@ -340,6 +340,9 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         // On list changes events
         hotkeys.onOperation -= OnHotkeysOperation;
         quests.onOperation -= OnQuestsOperation;
+
+        if (IsOwnerClient && BasePlayerCharacterController.Singleton != null)
+            Destroy(BasePlayerCharacterController.Singleton.gameObject);
     }
 
     #region Net functions callbacks
