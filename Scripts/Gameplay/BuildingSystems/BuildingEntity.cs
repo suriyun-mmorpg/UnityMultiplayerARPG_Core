@@ -19,14 +19,14 @@ public class BuildingEntity : RpgNetworkEntity, IBuildingSaveData
 
     public Vector3 Position
     {
-        get { return transform.position; }
-        set { transform.position = value; }
+        get { return CacheTransform.position; }
+        set { CacheTransform.position = value; }
     }
 
     public Quaternion Rotation
     {
-        get { return transform.rotation; }
-        set { transform.rotation = value; }
+        get { return CacheTransform.rotation; }
+        set { CacheTransform.rotation = value; }
     }
 
     public string CreatorId
@@ -60,6 +60,7 @@ public class BuildingEntity : RpgNetworkEntity, IBuildingSaveData
             if (buildingObject != null)
                 Destroy(buildingObject.gameObject);
             buildingObject = Instantiate(buildingObjectPrefab);
+            buildingObject.buildingEntity = this;
             buildingObject.CacheTransform.parent = CacheTransform;
             buildingObject.CacheTransform.localPosition = Vector3.zero;
             buildingObject.CacheTransform.localRotation = Quaternion.identity;

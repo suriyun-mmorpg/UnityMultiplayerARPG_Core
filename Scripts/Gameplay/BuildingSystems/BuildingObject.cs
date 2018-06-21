@@ -9,6 +9,9 @@ public class BuildingObject : MonoBehaviour
     public string buildingType;
     public bool canPlaceOnGround;
 
+    [HideInInspector]
+    public BuildingEntity buildingEntity;
+
     public string Id { get { return name; } }
     public int DataId { get { return name.GenerateHashId(); } }
     
