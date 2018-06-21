@@ -16,6 +16,7 @@ public class GameInstance : MonoBehaviour
     public PlayerCharacterEntity playerCharacterEntityPrefab;
     public MonsterCharacterEntity monsterCharacterEntityPrefab;
     public ItemDropEntity itemDropEntityPrefab;
+    public BuildingEntity buildingEntityPrefab;
     public UISceneGameplay uiSceneGameplayPrefab;
     public UISceneGameplay uiSceneGameplayMobilePrefab;
     public ServerCharacter serverCharacterPrefab;
@@ -63,7 +64,7 @@ public class GameInstance : MonoBehaviour
     public static readonly Dictionary<int, NpcDialog> NpcDialogs = new Dictionary<int, NpcDialog>();
     public static readonly Dictionary<int, Quest> Quests = new Dictionary<int, Quest>();
     public static readonly Dictionary<int, BaseDamageEntity> DamageEntities = new Dictionary<int, BaseDamageEntity>();
-    public static readonly Dictionary<int, BuildingEntity> BuildingEntities = new Dictionary<int, BuildingEntity>();
+    public static readonly Dictionary<int, BuildingObject> BuildingObjects = new Dictionary<int, BuildingObject>();
     public static readonly Dictionary<int, ActionAnimation> ActionAnimations = new Dictionary<int, ActionAnimation>();
     public static readonly Dictionary<int, GameEffectCollection> GameEffectCollections = new Dictionary<int, GameEffectCollection>();
     
@@ -209,7 +210,7 @@ public class GameInstance : MonoBehaviour
         PlayerCharacters.Clear();
         MonsterCharacters.Clear();
         DamageEntities.Clear();
-        BuildingEntities.Clear();
+        BuildingObjects.Clear();
         ActionAnimations.Clear();
         GameEffectCollections.Clear();
 
@@ -301,7 +302,7 @@ public class GameInstance : MonoBehaviour
     public static void AddItems(IEnumerable<Item> items)
     {
         var damageEntities = new List<BaseDamageEntity>();
-        var buildingEntities = new List<BuildingEntity>();
+        var buildingObjects = new List<BuildingObject>();
         foreach (var item in items)
         {
             if (item == null || Items.ContainsKey(item.DataId))
@@ -319,12 +320,12 @@ public class GameInstance : MonoBehaviour
             }
             if (item.IsBuilding())
             {
-                if (item.buildingEntity != null)
-                    buildingEntities.Add(item.buildingEntity);
+                if (item.buildingObject != null)
+                    buildingObjects.Add(item.buildingObject);
             }
         }
         AddDamageEntities(damageEntities);
-        AddBuildingEntities(buildingEntities);
+        AddBuildingObjects(buildingObjects);
     }
 
     public static void AddCharacters(IEnumerable<BaseCharacter> characters)
@@ -399,15 +400,15 @@ public class GameInstance : MonoBehaviour
         }
     }
 
-    public static void AddBuildingEntities(IEnumerable<BuildingEntity> buildingEntities)
+    public static void AddBuildingObjects(IEnumerable<BuildingObject> buildingObjects)
     {
-        if (buildingEntities == null)
+        if (buildingObjects == null)
             return;
-        foreach (var buildingEntity in buildingEntities)
+        foreach (var buildingObject in buildingObjects)
         {
-            if (buildingEntity == null || BuildingEntities.ContainsKey(buildingEntity.DataId))
+            if (buildingObject == null || BuildingObjects.ContainsKey(buildingObject.DataId))
                 continue;
-            BuildingEntities[buildingEntity.DataId] = buildingEntity;
+            BuildingObjects[buildingObject.DataId] = buildingObject;
         }
     }
 

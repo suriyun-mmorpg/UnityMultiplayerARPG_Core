@@ -87,12 +87,12 @@ public class LanRpgNetworkManager : BaseGameNetworkManager
             foreach (var building in worldSaveData.buildings)
             {
                 // Instantiate building
-                BuildingEntity buildingPrefab;
-                if (GameInstance.BuildingEntities.TryGetValue(building.DataId, out buildingPrefab))
+                BuildingObject buildingObject;
+                if (GameInstance.BuildingObjects.TryGetValue(building.DataId, out buildingObject))
                 {
-                    var buildingEntity = Instantiate(buildingPrefab);
-                    buildingEntity.Position = building.Position;
-                    buildingEntity.Rotation = building.Rotation;
+                    var buildingIdentity = Assets.NetworkSpawn(GameInstance.Singleton.buildingEntityPrefab.Identity, building.Position, building.Rotation);
+                    var buildingEntity = buildingIdentity.GetComponent<BuildingEntity>();
+                    buildingEntity.DataId = building.DataId;
                     buildingEntity.CreatorId = building.CreatorId;
                     buildingEntity.CreatorName = building.CreatorName;
                 }

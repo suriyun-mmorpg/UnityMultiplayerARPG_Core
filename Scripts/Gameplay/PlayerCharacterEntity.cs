@@ -597,10 +597,17 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
             return;
 
         var nonEquipItem = nonEquipItems[index];
-        if (!nonEquipItem.IsValid() || nonEquipItem.GetBuildingItem() == null || nonEquipItem.GetBuildingItem().buildingEntity == null)
+        if (!nonEquipItem.IsValid() || 
+            nonEquipItem.GetBuildingItem() == null || 
+            nonEquipItem.GetBuildingItem().buildingObject == null ||
+            !GameInstance.BuildingObjects.ContainsKey(nonEquipItem.GetBuildingItem().buildingObject.DataId))
             return;
 
-        Manager.Assets.NetworkSpawn(nonEquipItem.GetBuildingItem().buildingEntity.Identity, position, rotation);
+        var buildingIdentity = Manager.Assets.NetworkSpawn(GameInstance.Singleton.buildingEntityPrefab.Identity, position, rotation);
+        var buildingEntity = buildingIdentity.GetComponent<BuildingEntity>();
+        buildingEntity.DataId = nonEquipItem.GetBuildingItem().buildingObject.DataId;
+        buildingEntity.CreatorId = Id;
+        buildingEntity.CreatorName = CharacterName;
     }
     #endregion
 

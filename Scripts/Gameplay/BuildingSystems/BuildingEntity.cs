@@ -1,23 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using LiteNetLibManager;
 
 public class BuildingEntity : RpgNetworkEntity, IBuildingSaveData
 {
-    [Header("Building Data")]
-    [Tooltip("Type of building you can set it as Foundation, Wall, Door anything as you wish")]
-    public string buildingType;
-
-    [Header("Character Data")]
-    public string creatorId;
-    public string creatorName;
-
-    public string Id { get { return Identity.AssetId; } }
+    [Header("Save Data")]
+    public SyncFieldInt dataId = new SyncFieldInt();
+    public SyncFieldString creatorId = new SyncFieldString();
+    public SyncFieldString creatorName = new SyncFieldString();
+    private BuildingObject buildingObject;
 
     public int DataId
     {
-        get { return Id.GenerateHashId(); }
-        set { }
+        get { return dataId; }
+        set { dataId.Value = value; }
     }
 
     public Vector3 Position
@@ -35,12 +32,38 @@ public class BuildingEntity : RpgNetworkEntity, IBuildingSaveData
     public string CreatorId
     {
         get { return creatorId; }
-        set { creatorId = value; }
+        set { creatorId.Value = value; }
     }
 
     public string CreatorName
     {
         get { return creatorName; }
-        set { creatorName = value; }
+        set { creatorName.Value = value; }
+    }
+
+    public override void OnSetup()
+    {
+        dataId.onChange += OnDataIdChange;
+    }
+
+    private void OnDestroy()
+    {
+        dataId.onChange -= OnDataIdChange;
+    }
+
+    private void OnDataIdChange(int dataId)
+    {
+        // Instantiate object
+        BuildingObject buildingObjectPrefab;
+        if (GameInstance.BuildingObjects.TryGetValue(dataId, out buildingObjectPrefab))
+        {
+            if (buildingObject != null)
+                Destroy(buildingObject.gameObject);
+            buildingObject = Instantiate(buildingObjectPrefab);
+            buildingObject.CacheTransform.parent = CacheTransform;
+            buildingObject.CacheTransform.localPosition = Vector3.zero;
+            buildingObject.CacheTransform.localRotation = Quaternion.identity;
+            buildingObject.CacheTransform.localScale = Vector3.one;
+        }
     }
 }

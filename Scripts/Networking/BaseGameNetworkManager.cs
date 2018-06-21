@@ -97,15 +97,11 @@ public abstract class BaseGameNetworkManager : LiteNetLibGameManager
         var spawnablePrefabs = new List<LiteNetLibIdentity>();
         spawnablePrefabs.Add(gameInstance.monsterCharacterEntityPrefab.Identity);
         spawnablePrefabs.Add(gameInstance.itemDropEntityPrefab.Identity);
+        spawnablePrefabs.Add(gameInstance.buildingEntityPrefab.Identity);
         var damageEntities = GameInstance.DamageEntities.Values;
         foreach (var damageEntity in damageEntities)
         {
             spawnablePrefabs.Add(damageEntity.Identity);
-        }
-        var buildingEntities = GameInstance.BuildingEntities.Values;
-        foreach (var buildingEntity in buildingEntities)
-        {
-            spawnablePrefabs.Add(buildingEntity.Identity);
         }
         Assets.spawnablePrefabs = spawnablePrefabs.ToArray();
     }

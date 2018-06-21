@@ -57,7 +57,7 @@ public class Item : BaseGameData
     public AmmoType ammoType;
 
     // Building
-    public BuildingEntity buildingEntity;
+    public BuildingObject buildingObject;
 
 #if UNITY_EDITOR
     protected virtual void OnValidate()
