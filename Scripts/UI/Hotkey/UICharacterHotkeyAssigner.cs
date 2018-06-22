@@ -108,7 +108,8 @@ public class UICharacterHotkeyAssigner : UIBase
         foreach (var characterItem in characterItems)
         {
             var item = characterItem.GetItem();
-            if (item != null && item.IsPotion() && characterItem.level > 0 && characterItem.amount > 0)
+            if (item != null && characterItem.level > 0 && characterItem.amount > 0 &&
+                (item.IsPotion() || item.IsBuilding()))
                 filterItems.Add(characterItem);
         }
         CacheSkillList.Generate(filterSkills, (index, characterSkill, ui) =>
