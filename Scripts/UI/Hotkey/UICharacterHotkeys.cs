@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(UICharacterHotkeySelectionManager))]
 public class UICharacterHotkeys : UIBase
 {
     public UICharacterHotkeyPair[] uiCharacterHotkeys;
 
-    private Dictionary<string, List<UICharacterHotkey>> cacheUICharacterHotkeys = null;
+    private Dictionary<string, List<UICharacterHotkey>> cacheUICharacterHotkeys;
     public Dictionary<string, List<UICharacterHotkey>> CacheUICharacterHotkeys
     {
         get
@@ -16,13 +17,31 @@ public class UICharacterHotkeys : UIBase
         }
     }
 
+    private UICharacterHotkeySelectionManager selectionManager;
+    public UICharacterHotkeySelectionManager SelectionManager
+    {
+        get
+        {
+            if (selectionManager == null)
+                selectionManager = GetComponent<UICharacterHotkeySelectionManager>();
+            selectionManager.selectionMode = UISelectionMode.SelectSingle;
+            return selectionManager;
+        }
+    }
+
     private void InitCaches()
     {
         if (cacheUICharacterHotkeys == null)
         {
+            SelectionManager.DeselectSelectedUI();
+            SelectionManager.Clear();
+            var j = 0;
             cacheUICharacterHotkeys = new Dictionary<string, List<UICharacterHotkey>>();
-            foreach (var uiCharacterHotkey in uiCharacterHotkeys)
+            for (var i = 0; i < uiCharacterHotkeys.Length; ++i)
             {
+                var uiCharacterHotkey = uiCharacterHotkeys[i];
+                if (uiCharacterHotkey == null)
+                    continue;
                 var id = uiCharacterHotkey.hotkeyId;
                 var ui = uiCharacterHotkey.ui;
                 if (!string.IsNullOrEmpty(id) && ui != null)
@@ -35,9 +54,34 @@ public class UICharacterHotkeys : UIBase
                     if (!cacheUICharacterHotkeys.ContainsKey(id))
                         cacheUICharacterHotkeys.Add(id, new List<UICharacterHotkey>());
                     cacheUICharacterHotkeys[id].Add(ui);
+                    SelectionManager.Add(ui);
+                    // Select first UI
+                    if (j == 0)
+                        ui.OnClickSelect();
+                    ++j;
                 }
             }
         }
+    }
+
+    public override void Show()
+    {
+        SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterHotkey);
+        SelectionManager.eventOnSelect.AddListener(OnSelectCharacterHotkey);
+        base.Show();
+    }
+
+    public override void Hide()
+    {
+        SelectionManager.DeselectSelectedUI();
+        base.Hide();
+    }
+
+    protected void OnSelectCharacterHotkey(UICharacterHotkey ui)
+    {
+        var owningCharacterController = BasePlayerCharacterController.Singleton;
+        if (owningCharacterController != null)
+            owningCharacterController.UseHotkey(ui.indexOfData);
     }
 
     public void UpdateData(IPlayerCharacterData characterData)
@@ -53,6 +97,7 @@ public class UICharacterHotkeys : UIBase
                 foreach (var ui in uis)
                 {
                     ui.Setup(characterHotkey, i);
+                    ui.Show();
                 }
             }
         }
