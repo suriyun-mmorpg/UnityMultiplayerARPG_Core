@@ -616,12 +616,12 @@ public class PlayerCharacterController : BasePlayerCharacterController
                     RequestUseItem(itemIndex);
                 else if (item.IsBuilding())
                 {
+                    StopAllMovement();
                     buildingItemIndex = itemIndex;
                     buildingObject = Instantiate(item.buildingObject);
                     buildingObject.SetupAsBuildMode();
                     buildingObject.CacheTransform.parent = null;
                     SetBuildingObjectByCharacterTransform();
-                    StopAllMovement();
                 }
             }
         }
