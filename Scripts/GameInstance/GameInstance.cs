@@ -38,6 +38,7 @@ public class GameInstance : MonoBehaviour
     public float pickUpItemDistance = 1f;
     public float dropDistance = 1f;
     public float conversationDistance = 1f;
+    public float buildDistance = 10f;
     [Header("Game Effects")]
     public GameEffect levelUpEffect;
     [Header("New Character")]

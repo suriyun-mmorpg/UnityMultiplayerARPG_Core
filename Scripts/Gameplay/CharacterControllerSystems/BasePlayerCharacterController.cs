@@ -32,6 +32,8 @@ public abstract class BasePlayerCharacterController : MonoBehaviour
     public FollowCameraControls CacheMinimapCameraControls { get; protected set; }
     public UISceneGameplay CacheUISceneGameplay { get; protected set; }
     protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
+    protected int buildingItemIndex;
+    protected BuildingObject buildingObject;
 
     protected virtual void Awake()
     {
@@ -170,6 +172,21 @@ public abstract class BasePlayerCharacterController : MonoBehaviour
     #endregion
 
     protected virtual void Update() { }
+
+    public void ConfirmBuild()
+    {
+        if (buildingObject != null)
+        {
+            CharacterEntity.RequestBuild(buildingItemIndex, buildingObject.CacheTransform.position, buildingObject.CacheTransform.rotation);
+            Destroy(buildingObject.gameObject);
+        }
+    }
+
+    public void CancelBuild()
+    {
+        if (buildingObject != null)
+            Destroy(buildingObject.gameObject);
+    }
 
     public abstract void UseHotkey(int hotkeyIndex);
 }

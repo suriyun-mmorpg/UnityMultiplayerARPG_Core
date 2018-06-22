@@ -20,6 +20,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
     public float lockAttackTargetDistance = 10f;
     public FollowCameraControls gameplayCameraPrefab;
     public GameObject targetObjectPrefab;
+    public float buildGridSize = 4f;
     public struct UsingSkillData
     {
         public Vector3 position;
@@ -35,10 +36,15 @@ public class PlayerCharacterController : BasePlayerCharacterController
     protected Vector3 mouseDownPosition;
     protected float mouseDownTime;
     protected bool isMouseDragOrHoldOrOverUI;
-    protected int buildingItemIndex;
-    protected BuildingObject buildingObject;
     public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
     public GameObject CacheTargetObject { get; protected set; }
+
+    protected override void Awake()
+    {
+        base.Awake();
+        buildingItemIndex = -1;
+        buildingObject = null;
+    }
 
     protected override void Start()
     {
@@ -74,6 +80,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
             destination = null;
             if (CacheUISceneGameplay != null)
                 CacheUISceneGameplay.SetTargetCharacter(null);
+            CancelBuild();
         }
         else
         {
@@ -124,41 +131,49 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 UpdateWASDInput();
                 break;
         }
-
-        // Activate nearby npcs
-        if (InputManager.GetButtonDown("Activate"))
+        // If it's building something, don't allow to activate NPC/Warp/Pickup Item
+        if (buildingObject != null)
         {
-            var foundEntities = Physics.OverlapSphere(CharacterTransform.position, gameInstance.conversationDistance, gameInstance.characterLayer.Mask);
-            foreach (var foundEntity in foundEntities)
+            // Activate nearby npcs
+            if (InputManager.GetButtonDown("Activate"))
             {
-                var npcEntity = foundEntity.GetComponent<NpcEntity>();
-                if (npcEntity != null)
+                var foundEntities = Physics.OverlapSphere(CharacterTransform.position, gameInstance.conversationDistance, gameInstance.characterLayer.Mask);
+                foreach (var foundEntity in foundEntities)
                 {
-                    CharacterEntity.RequestNpcActivate(npcEntity.ObjectId);
-                    break;
+                    var npcEntity = foundEntity.GetComponent<NpcEntity>();
+                    if (npcEntity != null)
+                    {
+                        CharacterEntity.RequestNpcActivate(npcEntity.ObjectId);
+                        break;
+                    }
+                }
+                if (foundEntities.Length == 0)
+                    CharacterEntity.RequestEnterWarp();
+            }
+            // Pick up nearby items
+            if (InputManager.GetButtonDown("PickUpItem"))
+            {
+                var foundEntities = Physics.OverlapSphere(CharacterTransform.position, gameInstance.pickUpItemDistance, gameInstance.itemDropLayer.Mask);
+                foreach (var foundEntity in foundEntities)
+                {
+                    var itemDropEntity = foundEntity.GetComponent<ItemDropEntity>();
+                    if (itemDropEntity != null)
+                    {
+                        CharacterEntity.RequestPickupItem(itemDropEntity.ObjectId);
+                        break;
+                    }
                 }
             }
-            if (foundEntities.Length == 0)
-                CharacterEntity.RequestEnterWarp();
         }
-        // Pick up nearby items
-        if (InputManager.GetButtonDown("PickUpItem"))
-        {
-            var foundEntities = Physics.OverlapSphere(CharacterTransform.position, gameInstance.pickUpItemDistance, gameInstance.itemDropLayer.Mask);
-            foreach (var foundEntity in foundEntities)
-            {
-                var itemDropEntity = foundEntity.GetComponent<ItemDropEntity>();
-                if (itemDropEntity != null)
-                {
-                    CharacterEntity.RequestPickupItem(itemDropEntity.ObjectId);
-                    break;
-                }
-            }
-        }
+        UpdateBuildingObject();
     }
 
     protected void UpdatePointClickInput()
     {
+        // If it's building something, not allow point click movement
+        if (buildingObject != null)
+            return;
+
         var isPointerOverUI = CacheUISceneGameplay != null && CacheUISceneGameplay.IsPointerOverUIObject();
         if (Input.GetMouseButtonDown(0))
         {
@@ -263,8 +278,12 @@ public class PlayerCharacterController : BasePlayerCharacterController
         moveDirection.y = 0;
         moveDirection = moveDirection.normalized;
 
-        if (moveDirection.magnitude > 0.1f && CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
-            CacheUISceneGameplay.uiNpcDialog.Hide();
+        if (moveDirection.magnitude > 0.1f)
+        {
+            if (CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
+                CacheUISceneGameplay.uiNpcDialog.Hide();
+            SetBuildingObjectByCharacterTransform();
+        }
 
         if (queueUsingSkill.HasValue)
         {
@@ -321,6 +340,30 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 CharacterEntity.SetTargetEntity(null);
             }
             CharacterEntity.KeyMovement(moveDirection, jumpInput);
+        }
+    }
+
+    protected void UpdateBuildingObject()
+    {
+        if (buildingObject == null)
+            return;
+
+        var isPointerOverUI = CacheUISceneGameplay != null && CacheUISceneGameplay.IsPointerOverUIObject();
+        if (Input.GetMouseButtonDown(0))
+        {
+            isMouseDragOrHoldOrOverUI = false;
+            mouseDownTime = Time.unscaledTime;
+            mouseDownPosition = Input.mousePosition;
+        }
+
+        var isMouseDragDetected = (Input.mousePosition - mouseDownPosition).magnitude > DETECT_MOUSE_DRAG_DISTANCE;
+        var isMouseHoldDetected = Time.unscaledTime - mouseDownTime > DETECT_MOUSE_HOLD_DURATION;
+        if (!isMouseDragOrHoldOrOverUI && (isMouseDragDetected || isMouseHoldDetected || isPointerOverUI))
+            isMouseDragOrHoldOrOverUI = true;
+        if (!isPointerOverUI && Input.GetMouseButtonUp(0) && !isMouseDragOrHoldOrOverUI)
+        {
+            var targetCamera = CacheGameplayCameraControls != null ? CacheGameplayCameraControls.targetCamera : Camera.main;
+            RaycastToSetBuildingArea(targetCamera.ScreenPointToRay(Input.mousePosition), 100f);
         }
     }
 
@@ -564,12 +607,85 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 {
                     buildingItemIndex = itemIndex;
                     buildingObject = Instantiate(item.buildingObject);
+                    buildingObject.SetupAsBuildMode();
                     buildingObject.CacheTransform.parent = null;
-                    buildingObject.CacheTransform.position = CharacterEntity.CacheTransform.position;
-                    buildingObject.CacheTransform.rotation = CharacterEntity.CacheTransform.rotation;
+                    SetBuildingObjectByCharacterTransform();
+                    destination = null;
+                    queueUsingSkill = null;
+                    CharacterEntity.StopMove();
                 }
             }
         }
+    }
+
+    private void SetBuildingObjectByCharacterTransform()
+    {
+        if (buildingObject != null)
+        {
+            var placePosition = CharacterEntity.CacheTransform.position + (CharacterEntity.CacheTransform.forward * buildGridSize);
+            buildingObject.CacheTransform.eulerAngles = GetBuildingPlaceEulerAngles(CharacterEntity.CacheTransform.eulerAngles);
+            buildingObject.buildingArea = null;
+            if (RaycastToSetBuildingArea(new Ray(placePosition + (Vector3.up * 2.5f), Vector3.down), 5f))
+                buildingObject.CacheTransform.position = GetBuildingPlacePosition(placePosition);
+        }
+    }
+
+    private int GetBuildRaycastLayerMask()
+    {
+        var layerMask = 0;
+        if (gameInstance.nonTargetingLayers.Length > 0)
+        {
+            foreach (var nonTargetingLayer in gameInstance.nonTargetingLayers)
+            {
+                layerMask = layerMask | ~(nonTargetingLayer.Mask);
+            }
+        }
+        else
+            layerMask = -1;
+        layerMask = layerMask | ~(gameInstance.characterLayer.Mask);
+        layerMask = layerMask | ~(gameInstance.itemDropLayer.Mask);
+        return layerMask;
+    }
+
+    private Vector3 GetBuildingPlacePosition(Vector3 position)
+    {
+        return new Vector3(Mathf.Round(position.x / buildGridSize) * buildGridSize, position.y, Mathf.Round(position.z / buildGridSize) * buildGridSize);
+    }
+
+    private Vector3 GetBuildingPlaceEulerAngles(Vector3 eulerAngles)
+    {
+        eulerAngles.x = 0;
+        eulerAngles.z = 0;
+        // Uncomment this to make Y rotation set to 0, 90, 180
+        eulerAngles.x = Mathf.Round(eulerAngles.x / 90) * 90;
+        eulerAngles.y = Mathf.Round(eulerAngles.y / 90) * 90;
+        eulerAngles.z = Mathf.Round(eulerAngles.z / 90) * 90;
+        return eulerAngles;
+    }
+
+    private bool RaycastToSetBuildingArea(Ray ray, float dist = 5f)
+    {
+        var layerMask = GetBuildRaycastLayerMask();
+        RaycastHit[] hits = Physics.RaycastAll(ray, dist, layerMask);
+        foreach (var hit in hits)
+        {
+            if (Vector3.Distance(hit.point, CharacterTransform.position) > gameInstance.buildDistance)
+                return false;
+
+            var buildingArea = hit.collider.GetComponent<BuildingArea>();
+            if (buildingArea == null)
+                continue;
+
+            if (buildingObject.buildingType.Equals(buildingArea.buildingType))
+            {
+                var placePosition = hit.point;
+                placePosition = new Vector3(Mathf.Round(placePosition.x / buildGridSize) * buildGridSize, placePosition.y, Mathf.Round(placePosition.z / buildGridSize) * buildGridSize);
+                buildingObject.CacheTransform.position = GetBuildingPlacePosition(placePosition);
+                buildingObject.buildingArea = buildingArea;
+                return true;
+            }
+        }
+        return false;
     }
 
     public bool TryGetAttackingCharacter(out BaseCharacterEntity character)
@@ -584,14 +700,5 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 character = null;
         }
         return false;
-    }
-
-    public void ConfirmBuild()
-    {
-        if (buildingObject != null)
-        {
-            CharacterEntity.RequestBuild(buildingItemIndex, buildingObject.CacheTransform.position, buildingObject.CacheTransform.rotation);
-            Destroy(buildingObject.gameObject);
-        }
     }
 }
