@@ -39,8 +39,6 @@ public class UINonEquipItems : UIBase
     {
         SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterItem);
         SelectionManager.eventOnSelect.AddListener(OnSelectCharacterItem);
-        SelectionManager.eventOnSelected.RemoveListener(OnSelectedCharacterItem);
-        SelectionManager.eventOnSelected.AddListener(OnSelectedCharacterItem);
         SelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterItem);
         SelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterItem);
         base.Show();
@@ -48,9 +46,7 @@ public class UINonEquipItems : UIBase
 
     public override void Hide()
     {
-        var uiGameplay = UISceneGameplay.Singleton;
-        if (uiGameplay != null)
-            uiGameplay.DeselectSelectedItem();
+        SelectionManager.DeselectSelectedUI();
         base.Hide();
     }
 
@@ -58,25 +54,14 @@ public class UINonEquipItems : UIBase
     {
         var uiGameplay = UISceneGameplay.Singleton;
 
-        if (uiGameplay != null)
-            uiGameplay.DeselectSelectedItem();
-
         if (uiItemDialog != null && ui.Data.characterItem.IsValid())
         {
             uiItemDialog.selectionManager = SelectionManager;
             uiItemDialog.Setup(ui.Data, character, ui.indexOfData, ui.equipPosition);
             uiItemDialog.Show();
         }
-        else if (uiGameplay != null)
-            uiGameplay.DeselectSelectedItem();
-    }
-
-    protected void OnSelectedCharacterItem(UICharacterItem ui)
-    {
-        var uiGameplay = UISceneGameplay.Singleton;
-
-        if (uiGameplay != null && !ui.Data.characterItem.IsValid())
-            uiGameplay.DeselectSelectedItem();
+        else
+            SelectionManager.Deselect(ui);
     }
 
     protected void OnDeselectCharacterItem(UICharacterItem ui)

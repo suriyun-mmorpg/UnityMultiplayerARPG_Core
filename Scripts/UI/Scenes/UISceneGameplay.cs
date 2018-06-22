@@ -146,15 +146,7 @@ public class UISceneGameplay : MonoBehaviour
         uiTargetCharacter.Data = character;
         uiTargetCharacter.Show();
     }
-
-    public void DeselectSelectedItem()
-    {
-        if (uiEquipItems != null)
-            uiEquipItems.SelectionManager.DeselectSelectedUI();
-        if (uiNonEquipItems != null)
-            uiNonEquipItems.SelectionManager.DeselectSelectedUI();
-    }
-
+    
     public void OnClickRespawn()
     {
         var owningCharacter = BasePlayerCharacterController.OwningCharacter;
