@@ -263,33 +263,10 @@ public class UICharacterItem : UIDataForCharacter<CharacterItemLevelTuple>
         
         if (selectionManager != null)
             selectionManager.DeselectSelectedUI();
-
-        var characterItem = Data.characterItem;
+        
         var owningCharacter = BasePlayerCharacterController.OwningCharacter;
         if (owningCharacter != null)
-        {
-            var armorItem = characterItem.GetArmorItem();
-            var weaponItem = characterItem.GetWeaponItem();
-            var shieldItem = characterItem.GetShieldItem();
-            if (weaponItem != null)
-            {
-                if (weaponItem.EquipType == WeaponItemEquipType.OneHandCanDual)
-                {
-                    var equipWeapons = owningCharacter.EquipWeapons;
-                    var rightWeapon = equipWeapons.rightHand.GetWeaponItem();
-                    if (rightWeapon != null && rightWeapon.EquipType == WeaponItemEquipType.OneHandCanDual)
-                        owningCharacter.RequestEquipItem(indexOfData, GameDataConst.EQUIP_POSITION_LEFT_HAND);
-                    else
-                        owningCharacter.RequestEquipItem(indexOfData, GameDataConst.EQUIP_POSITION_RIGHT_HAND);
-                }
-                else
-                    owningCharacter.RequestEquipItem(indexOfData, GameDataConst.EQUIP_POSITION_RIGHT_HAND);
-            }
-            else if (shieldItem != null)
-                owningCharacter.RequestEquipItem(indexOfData, GameDataConst.EQUIP_POSITION_LEFT_HAND);
-            else if (armorItem != null)
-                owningCharacter.RequestEquipItem(indexOfData, armorItem.EquipPosition);
-        }
+            owningCharacter.RequestEquipItem(indexOfData);
     }
 
     public void OnClickUnEquip()

@@ -803,16 +803,52 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         CallNetFunction("PickupItem", FunctionReceivers.Server, objectId);
     }
 
-    public virtual void RequestDropItem(int index, short amount)
+    public virtual void RequestDropItem(int nonEquipIndex, short amount)
     {
-        if (CurrentHp <= 0 || IsPlayingActionAnimation())
+        if (CurrentHp <= 0 ||
+            IsPlayingActionAnimation() ||
+            nonEquipIndex < 0 ||
+            nonEquipIndex >= NonEquipItems.Count)
             return;
-        CallNetFunction("DropItem", FunctionReceivers.Server, index, amount);
+        CallNetFunction("DropItem", FunctionReceivers.Server, nonEquipIndex, amount);
+    }
+
+    public virtual void RequestEquipItem(int nonEquipIndex)
+    {
+        if (CurrentHp <= 0 ||
+            IsPlayingActionAnimation() ||
+            nonEquipIndex < 0 ||
+            nonEquipIndex >= NonEquipItems.Count)
+            return;
+        var characterItem = NonEquipItems[nonEquipIndex];
+        var armorItem = characterItem.GetArmorItem();
+        var weaponItem = characterItem.GetWeaponItem();
+        var shieldItem = characterItem.GetShieldItem();
+        if (weaponItem != null)
+        {
+            if (weaponItem.EquipType == WeaponItemEquipType.OneHandCanDual)
+            {
+                var rightWeapon = EquipWeapons.rightHand.GetWeaponItem();
+                if (rightWeapon != null && rightWeapon.EquipType == WeaponItemEquipType.OneHandCanDual)
+                    RequestEquipItem(nonEquipIndex, GameDataConst.EQUIP_POSITION_LEFT_HAND);
+                else
+                    RequestEquipItem(nonEquipIndex, GameDataConst.EQUIP_POSITION_RIGHT_HAND);
+            }
+            else
+                RequestEquipItem(nonEquipIndex, GameDataConst.EQUIP_POSITION_RIGHT_HAND);
+        }
+        else if (shieldItem != null)
+            RequestEquipItem(nonEquipIndex, GameDataConst.EQUIP_POSITION_LEFT_HAND);
+        else if (armorItem != null)
+            RequestEquipItem(nonEquipIndex, armorItem.EquipPosition);
     }
 
     public virtual void RequestEquipItem(int nonEquipIndex, string equipPosition)
     {
-        if (CurrentHp <= 0 || IsPlayingActionAnimation())
+        if (CurrentHp <= 0 ||
+            IsPlayingActionAnimation() ||
+            nonEquipIndex < 0 ||
+            nonEquipIndex >= NonEquipItems.Count)
             return;
         CallNetFunction("EquipItem", FunctionReceivers.Server, nonEquipIndex, equipPosition);
     }
