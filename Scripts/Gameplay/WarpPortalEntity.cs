@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
 
-public class WarpPortalEntity : RpgNetworkEntity
+public sealed class WarpPortalEntity : RpgNetworkEntity
 {
     [Tooltip("Signal to tell players that their character can warp")]
     public GameObject[] warpSignals;

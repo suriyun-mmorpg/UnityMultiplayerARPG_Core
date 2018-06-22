@@ -284,7 +284,7 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         StopMove();
         CacheNetTransform.Teleport(respawnPosition, CacheTransform.rotation);
         MonsterActivityComponent.RandomNextWanderTime(Time.unscaledTime, this, CacheTransform);
-        isHidding.Value = false;
+        IsHidding = false;
     }
 }
 

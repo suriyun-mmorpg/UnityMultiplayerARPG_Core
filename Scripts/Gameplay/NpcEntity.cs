@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-
-public class NpcEntity : RpgNetworkEntity
+﻿public sealed class NpcEntity : RpgNetworkEntity
 {
     public NpcDialog startDialog;
 

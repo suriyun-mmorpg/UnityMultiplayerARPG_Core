@@ -82,7 +82,7 @@ public class MonsterActivityComponent : MonoBehaviour
             monsterCharacterEntity.StopMove();
             monsterCharacterEntity.SetTargetEntity(null);
             if (time - monsterCharacterEntity.deadTime >= monsterDatabase.deadHideDelay)
-                monsterCharacterEntity.isHidding.Value = true;
+                monsterCharacterEntity.IsHidding = true;
             if (time - monsterCharacterEntity.deadTime >= monsterDatabase.deadRespawnDelay)
                 monsterCharacterEntity.Respawn();
             return;

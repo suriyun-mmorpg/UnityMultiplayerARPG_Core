@@ -35,6 +35,8 @@ public class PlayerCharacterController : BasePlayerCharacterController
     protected Vector3 mouseDownPosition;
     protected float mouseDownTime;
     protected bool isMouseDragOrHoldOrOverUI;
+    protected int buildingItemIndex;
+    protected BuildingObject buildingObject;
     public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
     public GameObject CacheTargetObject { get; protected set; }
 
@@ -517,10 +519,17 @@ public class PlayerCharacterController : BasePlayerCharacterController
 
     public override void UseHotkey(int hotkeyIndex)
     {
-        if (hotkeyIndex < 0 || hotkeyIndex >= CharacterEntity.hotkeys.Count)
+        if (hotkeyIndex < 0 || hotkeyIndex >= CharacterEntity.Hotkeys.Count)
             return;
 
-        var hotkey = CharacterEntity.hotkeys[hotkeyIndex];
+        buildingItemIndex = -1;
+        if (buildingObject != null)
+        {
+            Destroy(buildingObject.gameObject);
+            buildingObject = null;
+        }
+
+        var hotkey = CharacterEntity.Hotkeys[hotkeyIndex];
         var skill = hotkey.GetSkill();
         if (skill != null)
         {
@@ -532,7 +541,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
                     queueUsingSkill = new UsingSkillData(CharacterTransform.position, skillIndex);
                 else if ((controllerMode == PlayerCharacterControllerMode.WASD || controllerMode == PlayerCharacterControllerMode.Both) || skill.IsAttack())
                     queueUsingSkill = new UsingSkillData(CharacterTransform.position, skillIndex);
-                else if (CharacterEntity.skills[skillIndex].CanUse(CharacterEntity))
+                else if (CharacterEntity.Skills[skillIndex].CanUse(CharacterEntity))
                 {
                     destination = null;
                     queueUsingSkill = null;
@@ -552,7 +561,13 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 else if (item.IsPotion())
                     RequestUseItem(itemIndex);
                 else if (item.IsBuilding())
-                    SwitchToBuildMode(itemIndex);
+                {
+                    buildingItemIndex = itemIndex;
+                    buildingObject = Instantiate(item.buildingObject);
+                    buildingObject.CacheTransform.parent = null;
+                    buildingObject.CacheTransform.position = CharacterEntity.CacheTransform.position;
+                    buildingObject.CacheTransform.rotation = CharacterEntity.CacheTransform.rotation;
+                }
             }
         }
     }
@@ -571,8 +586,12 @@ public class PlayerCharacterController : BasePlayerCharacterController
         return false;
     }
 
-    public void SwitchToBuildMode(int itemIndex)
+    public void ConfirmBuild()
     {
-
+        if (buildingObject != null)
+        {
+            CharacterEntity.RequestBuild(buildingItemIndex, buildingObject.CacheTransform.position, buildingObject.CacheTransform.rotation);
+            Destroy(buildingObject.gameObject);
+        }
     }
 }

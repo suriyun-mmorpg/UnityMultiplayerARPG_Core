@@ -15,12 +15,17 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     public BasePlayerCharacterController controllerPrefab;
 
     #region Sync data
-    public SyncFieldShort statPoint = new SyncFieldShort();
-    public SyncFieldShort skillPoint = new SyncFieldShort();
-    public SyncFieldInt gold = new SyncFieldInt();
+    [SerializeField]
+    protected SyncFieldShort statPoint = new SyncFieldShort();
+    [SerializeField]
+    protected SyncFieldShort skillPoint = new SyncFieldShort();
+    [SerializeField]
+    protected SyncFieldInt gold = new SyncFieldInt();
     // List
-    public SyncListCharacterHotkey hotkeys = new SyncListCharacterHotkey();
-    public SyncListCharacterQuest quests = new SyncListCharacterQuest();
+    [SerializeField]
+    protected SyncListCharacterHotkey hotkeys = new SyncListCharacterHotkey();
+    [SerializeField]
+    protected SyncListCharacterQuest quests = new SyncListCharacterQuest();
     #endregion
 
     #region Sync data actions
@@ -326,7 +331,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         RegisterNetFunction("ShowNpcDialog", new LiteNetLibFunction<NetFieldInt>((npcDialogId) => NetFuncShowNpcDialog(npcDialogId)));
         RegisterNetFunction("SelectNpcDialogMenu", new LiteNetLibFunction<NetFieldInt>((menuIndex) => NetFuncSelectNpcDialogMenu(menuIndex)));
         RegisterNetFunction("EnterWarp", new LiteNetLibFunction(() => NetFuncEnterWarp()));
-        RegisterNetFunction("Build", new LiteNetLibFunction<NetFieldInt, NetFieldVector3, NetFieldQuaternion>((dataId, position, rotation) => NetFuncBuild(dataId, position, rotation)));
+        RegisterNetFunction("Build", new LiteNetLibFunction<NetFieldInt, NetFieldVector3, NetFieldQuaternion>((itemIndex, position, rotation) => NetFuncBuild(itemIndex, position, rotation)));
     }
     #endregion
 
@@ -351,13 +356,13 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         if (CurrentHp <= 0 ||
             IsPlayingActionAnimation() ||
             fromIndex < 0 ||
-            fromIndex > nonEquipItems.Count ||
+            fromIndex >= NonEquipItems.Count ||
             toIndex < 0 ||
-            toIndex > nonEquipItems.Count)
+            toIndex >= NonEquipItems.Count)
             return;
 
-        var fromItem = nonEquipItems[fromIndex];
-        var toItem = nonEquipItems[toIndex];
+        var fromItem = NonEquipItems[fromIndex];
+        var toItem = NonEquipItems[toIndex];
         if (!fromItem.IsValid() || !toItem.IsValid())
             return;
 
@@ -368,52 +373,60 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
             if (toItem.amount + fromItem.amount <= maxStack)
             {
                 toItem.amount += fromItem.amount;
-                nonEquipItems[fromIndex] = CharacterItem.Empty;
-                nonEquipItems[toIndex] = toItem;
+                NonEquipItems[fromIndex] = CharacterItem.Empty;
+                NonEquipItems[toIndex] = toItem;
             }
             else
             {
                 short remains = (short)(toItem.amount + fromItem.amount - maxStack);
                 toItem.amount = maxStack;
                 fromItem.amount = remains;
-                nonEquipItems[fromIndex] = fromItem;
-                nonEquipItems[toIndex] = toItem;
+                NonEquipItems[fromIndex] = fromItem;
+                NonEquipItems[toIndex] = toItem;
             }
         }
         else
         {
             // Swap
-            nonEquipItems[fromIndex] = toItem;
-            nonEquipItems[toIndex] = fromItem;
+            NonEquipItems[fromIndex] = toItem;
+            NonEquipItems[toIndex] = fromItem;
         }
     }
 
     protected void NetFuncAddAttribute(int attributeIndex, short amount)
     {
-        if (CurrentHp <= 0 || attributeIndex < 0 || attributeIndex >= attributes.Count || amount <= 0 || amount > StatPoint)
+        if (CurrentHp <= 0 ||
+            attributeIndex < 0 ||
+            attributeIndex >= Attributes.Count ||
+            amount <= 0 ||
+            amount > StatPoint)
             return;
 
-        var attribute = attributes[attributeIndex];
+        var attribute = Attributes[attributeIndex];
         if (!attribute.CanIncrease(this))
             return;
 
         attribute.Increase(amount);
-        attributes[attributeIndex] = attribute;
+        Attributes[attributeIndex] = attribute;
 
         StatPoint -= amount;
     }
 
     protected void NetFuncAddSkill(int skillIndex, short amount)
     {
-        if (CurrentHp <= 0 || skillIndex < 0 || skillIndex >= skills.Count || amount <= 0 || amount > SkillPoint)
+        if (CurrentHp <= 0 ||
+            skillIndex < 0 ||
+            skillIndex >= Skills.Count ||
+            amount <= 0 ||
+            amount > SkillPoint)
             return;
 
-        var skill = skills[skillIndex];
+        var skill = Skills[skillIndex];
         if (!skill.CanLevelUp(this))
             return;
 
         skill.LevelUp(amount);
-        skills[skillIndex] = skill;
+        Skills[skillIndex] = skill;
 
         SkillPoint -= amount;
     }
@@ -596,10 +609,10 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         if (CurrentHp <= 0 ||
             IsPlayingActionAnimation() ||
             index < 0 ||
-            index > nonEquipItems.Count)
+            index >= NonEquipItems.Count)
             return;
 
-        var nonEquipItem = nonEquipItems[index];
+        var nonEquipItem = NonEquipItems[index];
         if (!nonEquipItem.IsValid() || 
             nonEquipItem.GetBuildingItem() == null || 
             nonEquipItem.GetBuildingItem().buildingObject == null ||

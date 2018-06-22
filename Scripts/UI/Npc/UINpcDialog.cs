@@ -76,7 +76,7 @@ public class UINpcDialog : UISelectionEntry<NpcDialog>
                         var index = owningCharacter.IndexOfQuest(quest.DataId);
                         if (index >= 0)
                         {
-                            characterQuest = owningCharacter.quests[index];
+                            characterQuest = owningCharacter.Quests[index];
                             if (!characterQuest.IsAllTasksDone(owningCharacter))
                                 menuActions.Add(abandonMenuAction);
                             else

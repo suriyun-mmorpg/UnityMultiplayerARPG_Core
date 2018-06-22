@@ -4,11 +4,14 @@ using UnityEngine;
 using LiteNetLibManager;
 using LiteNetLib;
 
-public class ItemDropEntity : RpgNetworkEntity
+public sealed class ItemDropEntity : RpgNetworkEntity
 {
     public CharacterItem dropData;
     public Transform modelContainer;
-    public SyncFieldInt itemDataId = new SyncFieldInt();
+
+    [SerializeField]
+    private SyncFieldInt itemDataId = new SyncFieldInt();
+
     public Item Item
     {
         get
@@ -19,6 +22,7 @@ public class ItemDropEntity : RpgNetworkEntity
             return null;
         }
     }
+
     public override string Title
     {
         get
@@ -67,7 +71,7 @@ public class ItemDropEntity : RpgNetworkEntity
         itemDataId.onChange += OnItemDataIdChange;
     }
 
-    protected void OnItemDataIdChange(int itemDataId)
+    private void OnItemDataIdChange(int itemDataId)
     {
         var gameInstance = GameInstance.Singleton;
         Item item;

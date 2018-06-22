@@ -27,24 +27,41 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     // Use id as primary key
     #region Sync data
     [Header("Sync Fields")]
-    public SyncFieldString id = new SyncFieldString();
-    public SyncFieldInt dataId = new SyncFieldInt();
-    public SyncFieldString characterName = new SyncFieldString();
-    public SyncFieldShort level = new SyncFieldShort();
-    public SyncFieldInt exp = new SyncFieldInt();
-    public SyncFieldInt currentHp = new SyncFieldInt();
-    public SyncFieldInt currentMp = new SyncFieldInt();
-    public SyncFieldInt currentStamina = new SyncFieldInt();
-    public SyncFieldInt currentFood = new SyncFieldInt();
-    public SyncFieldInt currentWater = new SyncFieldInt();
-    public SyncFieldEquipWeapons equipWeapons = new SyncFieldEquipWeapons();
-    public SyncFieldBool isHidding = new SyncFieldBool();
+    [SerializeField]
+    protected SyncFieldString id = new SyncFieldString();
+    [SerializeField]
+    protected SyncFieldInt dataId = new SyncFieldInt();
+    [SerializeField]
+    protected SyncFieldString characterName = new SyncFieldString();
+    [SerializeField]
+    protected SyncFieldShort level = new SyncFieldShort();
+    [SerializeField]
+    protected SyncFieldInt exp = new SyncFieldInt();
+    [SerializeField]
+    protected SyncFieldInt currentHp = new SyncFieldInt();
+    [SerializeField]
+    protected SyncFieldInt currentMp = new SyncFieldInt();
+    [SerializeField]
+    protected SyncFieldInt currentStamina = new SyncFieldInt();
+    [SerializeField]
+    protected SyncFieldInt currentFood = new SyncFieldInt();
+    [SerializeField]
+    protected SyncFieldInt currentWater = new SyncFieldInt();
+    [SerializeField]
+    protected SyncFieldEquipWeapons equipWeapons = new SyncFieldEquipWeapons();
+    [SerializeField]
+    protected SyncFieldBool isHidding = new SyncFieldBool();
     [Header("Sync Lists")]
-    public SyncListCharacterAttribute attributes = new SyncListCharacterAttribute();
-    public SyncListCharacterSkill skills = new SyncListCharacterSkill();
-    public SyncListCharacterBuff buffs = new SyncListCharacterBuff();
-    public SyncListCharacterItem equipItems = new SyncListCharacterItem();
-    public SyncListCharacterItem nonEquipItems = new SyncListCharacterItem();
+    [SerializeField]
+    protected SyncListCharacterAttribute attributes = new SyncListCharacterAttribute();
+    [SerializeField]
+    protected SyncListCharacterSkill skills = new SyncListCharacterSkill();
+    [SerializeField]
+    protected SyncListCharacterBuff buffs = new SyncListCharacterBuff();
+    [SerializeField]
+    protected SyncListCharacterItem equipItems = new SyncListCharacterItem();
+    [SerializeField]
+    protected SyncListCharacterItem nonEquipItems = new SyncListCharacterItem();
     #endregion
 
     #region Public data
@@ -109,9 +126,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     #endregion
 
     #region Fields/Interface implementation
-    public virtual string Id { get { return id; } set { id.Value = value; } }
-    public virtual int DataId { get { return dataId; } set { dataId.Value = value; } }
-    public virtual string CharacterName { get { return characterName; } set { characterName.Value = value; } }
+    public virtual string Id { get { return id.Value; } set { id.Value = value; } }
+    public virtual int DataId { get { return dataId.Value; } set { dataId.Value = value; } }
+    public virtual string CharacterName { get { return characterName.Value; } set { characterName.Value = value; } }
     public virtual short Level { get { return level.Value; } set { level.Value = value; } }
     public virtual int Exp { get { return exp.Value; } set { exp.Value = value; } }
     public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
@@ -119,7 +136,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public virtual int CurrentStamina { get { return currentStamina.Value; } set { currentStamina.Value = value; } }
     public virtual int CurrentFood { get { return currentFood.Value; } set { currentFood.Value = value; } }
     public virtual int CurrentWater { get { return currentWater.Value; } set { currentWater.Value = value; } }
-    public virtual EquipWeapons EquipWeapons { get { return equipWeapons; } set { equipWeapons.Value = value; } }
+    public virtual EquipWeapons EquipWeapons { get { return equipWeapons.Value; } set { equipWeapons.Value = value; } }
+    public virtual bool IsHidding { get { return isHidding.Value; } set { isHidding.Value = value; } }
     public override string Title { get { return CharacterName; } }
 
     public IList<CharacterAttribute> Attributes
@@ -532,7 +550,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     {
         if (CurrentHp <= 0 ||
             itemIndex < 0 ||
-            itemIndex > nonEquipItems.Count)
+            itemIndex >= nonEquipItems.Count)
             return;
 
         var item = nonEquipItems[itemIndex];
@@ -624,7 +642,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (CurrentHp <= 0 ||
             IsPlayingActionAnimation() ||
             index < 0 ||
-            index > nonEquipItems.Count)
+            index >= nonEquipItems.Count)
             return;
 
         var nonEquipItem = nonEquipItems[index];
@@ -647,7 +665,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (CurrentHp <= 0 ||
             IsPlayingActionAnimation() ||
             nonEquipIndex < 0 ||
-            nonEquipIndex > nonEquipItems.Count)
+            nonEquipIndex >= nonEquipItems.Count)
             return;
 
         var equippingItem = nonEquipItems[nonEquipIndex];
@@ -770,7 +788,11 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     public virtual void RequestUseSkill(Vector3 position, int skillIndex)
     {
-        if (CurrentHp <= 0 || IsPlayingActionAnimation() || skillIndex < 0 || skillIndex >= skills.Count || !skills[skillIndex].CanUse(this))
+        if (CurrentHp <= 0 ||
+            IsPlayingActionAnimation() ||
+            skillIndex < 0 ||
+            skillIndex >= Skills.Count ||
+            !Skills[skillIndex].CanUse(this))
             return;
         CallNetFunction("UseSkill", FunctionReceivers.Server, position, skillIndex);
     }

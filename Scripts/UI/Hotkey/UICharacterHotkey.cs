@@ -49,9 +49,9 @@ public class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
             else
             {
                 var index = owningCharacter.IndexOfSkill(characterHotkey.dataId);
-                if (index >= 0 && index < owningCharacter.skills.Count)
+                if (index >= 0 && index < owningCharacter.Skills.Count)
                 {
-                    var characterSkill = owningCharacter.skills[index];
+                    var characterSkill = owningCharacter.Skills[index];
                     uiCharacterSkill.Setup(new CharacterSkillLevelTuple(characterSkill, characterSkill.level), owningCharacter, index);
                     uiCharacterSkill.Show();
                 }
@@ -67,9 +67,9 @@ public class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
             else
             {
                 var index = owningCharacter.IndexOfNonEquipItem(characterHotkey.dataId);
-                if (index >= 0 && index < owningCharacter.nonEquipItems.Count)
+                if (index >= 0 && index < owningCharacter.NonEquipItems.Count)
                 {
-                    var characterItem = owningCharacter.nonEquipItems[index];
+                    var characterItem = owningCharacter.NonEquipItems[index];
                     uiCharacterItem.Setup(new CharacterItemLevelTuple(characterItem, characterItem.level), owningCharacter, index, string.Empty);
                     uiCharacterItem.Show();
                 }

@@ -582,7 +582,7 @@ public static class CharacterDataExtension
 
     public static bool DecreaseItemsByIndex(this ICharacterData data, int index, short amount)
     {
-        if (index < 0 || index > data.NonEquipItems.Count)
+        if (index < 0 || index >= data.NonEquipItems.Count)
             return false;
         var nonEquipItem = data.NonEquipItems[index];
         if (!nonEquipItem.IsValid() || amount > nonEquipItem.amount)

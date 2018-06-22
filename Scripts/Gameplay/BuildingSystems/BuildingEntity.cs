@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
 
-public class BuildingEntity : RpgNetworkEntity, IBuildingSaveData
+public sealed class BuildingEntity : RpgNetworkEntity, IBuildingSaveData
 {
     [Header("Save Data")]
-    public SyncFieldInt dataId = new SyncFieldInt();
-    public SyncFieldString creatorId = new SyncFieldString();
-    public SyncFieldString creatorName = new SyncFieldString();
+    [SerializeField]
+    private SyncFieldInt dataId = new SyncFieldInt();
+    [SerializeField]
+    private SyncFieldString creatorId = new SyncFieldString();
+    [SerializeField]
+    private SyncFieldString creatorName = new SyncFieldString();
     private BuildingObject buildingObject;
 
     public int DataId

@@ -36,27 +36,27 @@ public class CharacterSkillAndBuffComponent : BaseCharacterComponent
         skillAndBuffData.skillBuffUpdateDeltaTime += deltaTime;
         if (skillAndBuffData.skillBuffUpdateDeltaTime >= SKILL_BUFF_UPDATE_DURATION)
         {
-            var count = characterEntity.skills.Count;
+            var count = characterEntity.Skills.Count;
             for (var i = count - 1; i >= 0; --i)
             {
-                var skill = characterEntity.skills[i];
+                var skill = characterEntity.Skills[i];
                 if (skill.ShouldUpdate())
                 {
                     skill.Update(skillAndBuffData.skillBuffUpdateDeltaTime);
-                    characterEntity.skills[i] = skill;
+                    characterEntity.Skills[i] = skill;
                 }
             }
-            count = characterEntity.buffs.Count;
+            count = characterEntity.Buffs.Count;
             for (var i = count - 1; i >= 0; --i)
             {
-                var buff = characterEntity.buffs[i];
+                var buff = characterEntity.Buffs[i];
                 var duration = buff.GetDuration();
                 if (buff.ShouldRemove())
-                    characterEntity.buffs.RemoveAt(i);
+                    characterEntity.Buffs.RemoveAt(i);
                 else
                 {
                     buff.Update(skillAndBuffData.skillBuffUpdateDeltaTime);
-                    characterEntity.buffs[i] = buff;
+                    characterEntity.Buffs[i] = buff;
                 }
                 recoveryData.recoveryingHp += duration > 0f ? (float)buff.GetBuffRecoveryHp() / duration * skillAndBuffData.skillBuffUpdateDeltaTime : 0f;
                 recoveryData.recoveryingMp += duration > 0f ? (float)buff.GetBuffRecoveryMp() / duration * skillAndBuffData.skillBuffUpdateDeltaTime : 0f;

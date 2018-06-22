@@ -287,7 +287,7 @@ public class SimpleGameplayRule : BaseGameplayRule
             else
                 equipWeapons.leftHand = leftHand;
         }
-        attacker.equipWeapons.Value = equipWeapons;
+        attacker.EquipWeapons = equipWeapons;
         // Decrease Shield Durability
         equipWeapons = damageReceiver.EquipWeapons;
         rightHand = equipWeapons.rightHand;
@@ -308,19 +308,19 @@ public class SimpleGameplayRule : BaseGameplayRule
             else
                 equipWeapons.leftHand = leftHand;
         }
-        damageReceiver.equipWeapons.Value = equipWeapons;
+        damageReceiver.EquipWeapons = equipWeapons;
         // Decrease Armor Durability
-        var count = damageReceiver.equipItems.Count;
+        var count = damageReceiver.EquipItems.Count;
         for (var i = count - 1; i >= 0; --i)
         {
-            var equipItem = damageReceiver.equipItems[i];
+            var equipItem = damageReceiver.EquipItems[i];
             if (equipItem.GetMaxDurability() <= 0)
                 continue;
             equipItem = DecreaseDurability(equipItem, decreaseArmorDurability, out tempDestroy);
             if (tempDestroy)
-                damageReceiver.equipItems.RemoveAt(i);
+                damageReceiver.EquipItems.RemoveAt(i);
             else
-                damageReceiver.equipItems[i] = equipItem;
+                damageReceiver.EquipItems[i] = equipItem;
         }
     }
 
