@@ -68,7 +68,7 @@ public class UICharacterItem : UIDataForCharacter<CharacterItemLevelTuple>
 
     [Header("Options")]
     public UICharacterItem uiNextLevelItem;
-    public bool hideAmountWhenMaxIsOne;
+    public bool showAmountWhenMaxIsOne;
 
     public void Setup(CharacterItemLevelTuple data, ICharacterData character, int indexOfData, string equipPosition)
     {
@@ -155,7 +155,7 @@ public class UICharacterItem : UIDataForCharacter<CharacterItemLevelTuple>
             else
                 stackString = string.Format(stackFormat, characterItem.amount.ToString("N0"), item.maxStack);
             textStack.text = stackString;
-            textStack.gameObject.SetActive(hideAmountWhenMaxIsOne && item.maxStack > 1);
+            textStack.gameObject.SetActive(showAmountWhenMaxIsOne || item.maxStack > 1);
         }
 
         if (textDurability != null)
