@@ -25,7 +25,7 @@ public class CharacterHotkeySerializationSurrogate : ISerializationSurrogate
         var stringId = string.Empty;
         try { stringId = info.GetString("dataId"); }
         catch { }
-        if (!string.IsNullOrEmpty(stringId))
+        if (!string.IsNullOrEmpty(stringId) && !int.TryParse(stringId, out data.dataId))
             data.dataId = stringId.GenerateHashId();
         else
             data.dataId = info.GetInt32("dataId");
