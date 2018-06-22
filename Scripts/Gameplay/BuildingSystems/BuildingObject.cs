@@ -10,6 +10,7 @@ public class BuildingObject : MonoBehaviour
     [Header("Building Data")]
     [Tooltip("Type of building you can set it as Foundation, Wall, Door anything as you wish")]
     public string buildingType;
+    public float characterForwardDistance = 4;
 
     [HideInInspector]
     public BuildingEntity buildingEntity;

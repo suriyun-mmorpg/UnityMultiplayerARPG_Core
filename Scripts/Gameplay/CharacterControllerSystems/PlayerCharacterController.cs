@@ -20,7 +20,10 @@ public class PlayerCharacterController : BasePlayerCharacterController
     public float lockAttackTargetDistance = 10f;
     public FollowCameraControls gameplayCameraPrefab;
     public GameObject targetObjectPrefab;
+    [Header("Building Settings")]
+    public bool buildGridSnap;
     public float buildGridSize = 4f;
+    public bool buildRotationSnap;
     public struct UsingSkillData
     {
         public Vector3 position;
@@ -49,7 +52,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
     protected override void Start()
     {
         base.Start();
-        
+
         // Set parent transform to root for the best performance
         if (gameplayCameraPrefab != null)
         {
@@ -98,7 +101,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
             if (Vector3.Distance(destinationValue, CharacterTransform.position) < StoppingDistance + 0.5f)
                 destination = null;
         }
-        
+
         UpdateInput();
         UpdateFollowTarget();
     }
@@ -109,7 +112,10 @@ public class PlayerCharacterController : BasePlayerCharacterController
         foreach (var field in fields)
         {
             if (field.isFocused)
+            {
+                StopAllMovement();
                 return;
+            }
         }
 
         if (CacheGameplayCameraControls != null)
@@ -287,9 +293,8 @@ public class PlayerCharacterController : BasePlayerCharacterController
 
         if (queueUsingSkill.HasValue)
         {
-            destination = null;
-            CharacterEntity.StopMove();
             var queueUsingSkillValue = queueUsingSkill.Value;
+            StopAllMovement();
             var characterSkill = CharacterEntity.Skills[queueUsingSkillValue.skillIndex];
             var skill = characterSkill.GetSkill();
             if (skill != null)
@@ -316,8 +321,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
         }
         else if (InputManager.GetButton("Attack"))
         {
-            destination = null;
-            CharacterEntity.StopMove();
+            StopAllMovement();
             BaseCharacterEntity targetEntity;
             if (wasdLockAttackTarget && !CharacterEntity.TryGetTargetEntity(out targetEntity))
             {
@@ -345,6 +349,15 @@ public class PlayerCharacterController : BasePlayerCharacterController
 
     protected void UpdateBuildingObject()
     {
+        var uiBuilding = CacheUISceneGameplay.uiBuilding;
+        if (uiBuilding != null)
+        {
+            if (uiBuilding.IsVisible() && buildingObject == null)
+                uiBuilding.Hide();
+            if (!uiBuilding.IsVisible() && buildingObject != null)
+                uiBuilding.Show();
+        }
+
         if (buildingObject == null)
             return;
 
@@ -586,9 +599,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
                     queueUsingSkill = new UsingSkillData(CharacterTransform.position, skillIndex);
                 else if (CharacterEntity.Skills[skillIndex].CanUse(CharacterEntity))
                 {
-                    destination = null;
-                    queueUsingSkill = null;
-                    CharacterEntity.StopMove();
+                    StopAllMovement();
                     RequestUseSkill(CharacterTransform.position, skillIndex);
                 }
             }
@@ -610,9 +621,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
                     buildingObject.SetupAsBuildMode();
                     buildingObject.CacheTransform.parent = null;
                     SetBuildingObjectByCharacterTransform();
-                    destination = null;
-                    queueUsingSkill = null;
-                    CharacterEntity.StopMove();
+                    StopAllMovement();
                 }
             }
         }
@@ -622,10 +631,10 @@ public class PlayerCharacterController : BasePlayerCharacterController
     {
         if (buildingObject != null)
         {
-            var placePosition = CharacterEntity.CacheTransform.position + (CharacterEntity.CacheTransform.forward * buildGridSize);
+            var placePosition = CharacterEntity.CacheTransform.position + (CharacterEntity.CacheTransform.forward * buildingObject.characterForwardDistance);
             buildingObject.CacheTransform.eulerAngles = GetBuildingPlaceEulerAngles(CharacterEntity.CacheTransform.eulerAngles);
             buildingObject.buildingArea = null;
-            if (RaycastToSetBuildingArea(new Ray(placePosition + (Vector3.up * 2.5f), Vector3.down), 5f))
+            if (!RaycastToSetBuildingArea(new Ray(placePosition + (Vector3.up * 2.5f), Vector3.down), 5f))
                 buildingObject.CacheTransform.position = GetBuildingPlacePosition(placePosition);
         }
     }
@@ -649,17 +658,22 @@ public class PlayerCharacterController : BasePlayerCharacterController
 
     private Vector3 GetBuildingPlacePosition(Vector3 position)
     {
-        return new Vector3(Mathf.Round(position.x / buildGridSize) * buildGridSize, position.y, Mathf.Round(position.z / buildGridSize) * buildGridSize);
+        if (buildGridSnap)
+            position = new Vector3(Mathf.Round(position.x / buildGridSize) * buildGridSize, position.y, Mathf.Round(position.z / buildGridSize) * buildGridSize);
+        return position;
     }
 
     private Vector3 GetBuildingPlaceEulerAngles(Vector3 eulerAngles)
     {
-        eulerAngles.x = 0;
-        eulerAngles.z = 0;
-        // Uncomment this to make Y rotation set to 0, 90, 180
-        eulerAngles.x = Mathf.Round(eulerAngles.x / 90) * 90;
-        eulerAngles.y = Mathf.Round(eulerAngles.y / 90) * 90;
-        eulerAngles.z = Mathf.Round(eulerAngles.z / 90) * 90;
+        if (buildRotationSnap)
+        {
+            eulerAngles.x = 0;
+            eulerAngles.z = 0;
+            // Uncomment this to make Y rotation set to 0, 90, 180
+            eulerAngles.x = Mathf.Round(eulerAngles.x / 90) * 90;
+            eulerAngles.y = Mathf.Round(eulerAngles.y / 90) * 90;
+            eulerAngles.z = Mathf.Round(eulerAngles.z / 90) * 90;
+        }
         return eulerAngles;
     }
 
@@ -678,14 +692,20 @@ public class PlayerCharacterController : BasePlayerCharacterController
 
             if (buildingObject.buildingType.Equals(buildingArea.buildingType))
             {
-                var placePosition = hit.point;
-                placePosition = new Vector3(Mathf.Round(placePosition.x / buildGridSize) * buildGridSize, placePosition.y, Mathf.Round(placePosition.z / buildGridSize) * buildGridSize);
-                buildingObject.CacheTransform.position = GetBuildingPlacePosition(placePosition);
+                buildingObject.CacheTransform.position = GetBuildingPlacePosition(hit.point);
                 buildingObject.buildingArea = buildingArea;
                 return true;
             }
         }
         return false;
+    }
+
+    private void StopAllMovement()
+    {
+        destination = null;
+        queueUsingSkill = null;
+        CharacterEntity.StopMove();
+        CancelBuild();
     }
 
     public bool TryGetAttackingCharacter(out BaseCharacterEntity character)

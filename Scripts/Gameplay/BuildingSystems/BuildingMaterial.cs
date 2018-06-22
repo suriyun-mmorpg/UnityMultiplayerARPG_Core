@@ -54,5 +54,7 @@ public class BuildingMaterial : MonoBehaviour
         CurrentState = State.Default;
     }
 
+
+
     // TODO: Add event when hit
 }
