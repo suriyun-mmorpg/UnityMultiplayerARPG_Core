@@ -505,10 +505,14 @@ public class PlayerCharacterController : BasePlayerCharacterController
         }
     }
 
+    public void RequestEquipItem(int itemIndex)
+    {
+        CharacterEntity.RequestEquipItem(itemIndex);
+    }
+
     public void RequestUseItem(int itemIndex)
     {
-        if (CharacterEntity.CurrentHp > 0)
-            CharacterEntity.RequestUseItem(itemIndex);
+        CharacterEntity.RequestUseItem(itemIndex);
     }
 
     public override void UseHotkey(int hotkeyIndex)
@@ -521,7 +525,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
         if (skill != null)
         {
             var skillIndex = CharacterEntity.IndexOfSkill(skill.DataId);
-            if (skillIndex >= 0 && skillIndex < CharacterEntity.skills.Count)
+            if (skillIndex >= 0)
             {
                 BaseCharacterEntity attackingCharacter;
                 if (TryGetAttackingCharacter(out attackingCharacter))
@@ -541,8 +545,15 @@ public class PlayerCharacterController : BasePlayerCharacterController
         if (item != null)
         {
             var itemIndex = CharacterEntity.IndexOfNonEquipItem(item.DataId);
-            if (itemIndex >= 0 && itemIndex < CharacterEntity.nonEquipItems.Count)
-                RequestUseItem(itemIndex);
+            if (itemIndex >= 0)
+            {
+                if (item.IsEquipment())
+                    RequestEquipItem(itemIndex);
+                else if (item.IsPotion())
+                    RequestUseItem(itemIndex);
+                else if (item.IsBuilding())
+                    SwitchToBuildMode(itemIndex);
+            }
         }
     }
 
@@ -558,5 +569,10 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 character = null;
         }
         return false;
+    }
+
+    public void SwitchToBuildMode(int itemIndex)
+    {
+
     }
 }
