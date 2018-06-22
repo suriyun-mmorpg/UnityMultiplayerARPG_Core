@@ -64,24 +64,10 @@ public class UICharacterHotkeys : UIBase
         }
     }
 
-    public override void Show()
-    {
-        SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterHotkey);
-        SelectionManager.eventOnSelect.AddListener(OnSelectCharacterHotkey);
-        base.Show();
-    }
-
     public override void Hide()
     {
         SelectionManager.DeselectSelectedUI();
         base.Hide();
-    }
-
-    protected void OnSelectCharacterHotkey(UICharacterHotkey ui)
-    {
-        var owningCharacterController = BasePlayerCharacterController.Singleton;
-        if (owningCharacterController != null)
-            owningCharacterController.UseHotkey(ui.indexOfData);
     }
 
     public void UpdateData(IPlayerCharacterData characterData)

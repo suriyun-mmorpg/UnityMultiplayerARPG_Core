@@ -31,7 +31,7 @@ public class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
                 }
             }
             if (canUse)
-                OnClickSelect();
+                OnClickUse();
         }
     }
 
@@ -86,6 +86,13 @@ public class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
             uiAssigner.Setup(Data.hotkeyId);
             uiAssigner.Show();
         }
+    }
+
+    public void OnClickUse()
+    {
+        var owningCharacterController = BasePlayerCharacterController.Singleton;
+        if (owningCharacterController != null)
+            owningCharacterController.UseHotkey(indexOfData);
     }
 }
 
