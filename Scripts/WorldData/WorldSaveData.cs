@@ -25,21 +25,23 @@ public class WorldSaveData
         file.Close();
     }
 
-    public WorldSaveData LoadPersistentData(string id, string map)
+    public void LoadPersistentData(string id, string map)
     {
-        WorldSaveData result = null;
         var path = Application.persistentDataPath + "/" + id + "_world_" + map + ".sav";
         if (File.Exists(path))
         {
             var binaryFormatter = new BinaryFormatter();
             var surrogateSelector = new SurrogateSelector();
             surrogateSelector.AddAllUnitySurrogate();
-            surrogateSelector.AddAllCharacterRelatesDataSurrogate();
+            var buildingSaveDataSS = new BuildingSaveDataSerializationSurrogate();
+            var worldSaveDataSS = new WorldSaveDataSerializationSurrogate();
+            surrogateSelector.AddSurrogate(typeof(BuildingSaveData), new StreamingContext(StreamingContextStates.All), buildingSaveDataSS);
+            surrogateSelector.AddSurrogate(typeof(WorldSaveData), new StreamingContext(StreamingContextStates.All), worldSaveDataSS);
             binaryFormatter.SurrogateSelector = surrogateSelector;
             var file = File.Open(path, FileMode.Open);
-            result = (WorldSaveData)binaryFormatter.Deserialize(file);
+            var result = (WorldSaveData)binaryFormatter.Deserialize(file);
+            buildings = result.buildings;
             file.Close();
         }
-        return result;
     }
 }

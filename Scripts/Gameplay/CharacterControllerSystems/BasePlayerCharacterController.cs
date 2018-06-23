@@ -177,7 +177,13 @@ public abstract class BasePlayerCharacterController : MonoBehaviour
     {
         if (buildingObject != null)
         {
-            CharacterEntity.RequestBuild(buildingItemIndex, buildingObject.CacheTransform.position, buildingObject.CacheTransform.rotation);
+            if (buildingObject.CanBuild())
+            {
+                uint parentObjectId = 0;
+                if (buildingObject.buildingArea != null)
+                    parentObjectId = buildingObject.buildingArea.EntityObjectId;
+                CharacterEntity.RequestBuild(buildingItemIndex, buildingObject.CacheTransform.position, buildingObject.CacheTransform.rotation, parentObjectId);
+            }
             Destroy(buildingObject.gameObject);
         }
     }

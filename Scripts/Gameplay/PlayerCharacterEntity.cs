@@ -331,7 +331,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         RegisterNetFunction("ShowNpcDialog", new LiteNetLibFunction<NetFieldInt>((npcDialogId) => NetFuncShowNpcDialog(npcDialogId)));
         RegisterNetFunction("SelectNpcDialogMenu", new LiteNetLibFunction<NetFieldInt>((menuIndex) => NetFuncSelectNpcDialogMenu(menuIndex)));
         RegisterNetFunction("EnterWarp", new LiteNetLibFunction(() => NetFuncEnterWarp()));
-        RegisterNetFunction("Build", new LiteNetLibFunction<NetFieldInt, NetFieldVector3, NetFieldQuaternion>((itemIndex, position, rotation) => NetFuncBuild(itemIndex, position, rotation)));
+        RegisterNetFunction("Build", new LiteNetLibFunction<NetFieldInt, NetFieldVector3, NetFieldQuaternion, NetFieldUInt>((itemIndex, position, rotation, parentObjectId) => NetFuncBuild(itemIndex, position, rotation, parentObjectId)));
     }
     #endregion
 
@@ -604,7 +604,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         warpingPortal.EnterWarp(this);
     }
 
-    protected void NetFuncBuild(int index, Vector3 position, Quaternion rotation)
+    protected void NetFuncBuild(int index, Vector3 position, Quaternion rotation, uint parentObjectId)
     {
         if (CurrentHp <= 0 ||
             IsPlayingActionAnimation() ||
@@ -612,16 +612,20 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
             index >= NonEquipItems.Count)
             return;
 
+        BuildingObject buildingObject;
         var nonEquipItem = NonEquipItems[index];
         if (!nonEquipItem.IsValid() || 
             nonEquipItem.GetBuildingItem() == null || 
             nonEquipItem.GetBuildingItem().buildingObject == null ||
-            !GameInstance.BuildingObjects.ContainsKey(nonEquipItem.GetBuildingItem().buildingObject.DataId))
+            !GameInstance.BuildingObjects.TryGetValue(nonEquipItem.GetBuildingItem().buildingObject.DataId, out buildingObject))
             return;
 
         var buildingIdentity = Manager.Assets.NetworkSpawn(GameInstance.Singleton.buildingEntityPrefab.Identity, position, rotation);
         var buildingEntity = buildingIdentity.GetComponent<BuildingEntity>();
-        buildingEntity.DataId = nonEquipItem.GetBuildingItem().buildingObject.DataId;
+        buildingEntity.Id = GenericUtils.GetUniqueId();
+        // TODO: Implement parent Id
+        buildingEntity.DataId = buildingObject.DataId;
+        buildingEntity.CurrentHp = buildingObject.maxHp;
         buildingEntity.CreatorId = Id;
         buildingEntity.CreatorName = CharacterName;
     }
@@ -681,11 +685,11 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         CallNetFunction("EnterWarp", FunctionReceivers.Server);
     }
 
-    public void RequestBuild(int index, Vector3 position, Quaternion rotation)
+    public void RequestBuild(int index, Vector3 position, Quaternion rotation, uint parentObjectId)
     {
         if (CurrentHp <= 0 || IsPlayingActionAnimation())
             return;
-        CallNetFunction("Build", FunctionReceivers.Server, index, position, rotation);
+        CallNetFunction("Build", FunctionReceivers.Server, index, position, rotation, parentObjectId);
     }
     #endregion
 

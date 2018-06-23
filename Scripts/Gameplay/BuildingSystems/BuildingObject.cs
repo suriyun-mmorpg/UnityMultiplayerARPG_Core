@@ -11,14 +11,28 @@ public class BuildingObject : MonoBehaviour
     [Tooltip("Type of building you can set it as Foundation, Wall, Door anything as you wish")]
     public string buildingType;
     public float characterForwardDistance = 4;
+    public int maxHp = 100;
 
+    /// <summary>
+    /// Use this as reference for entity to interactive while in play mode
+    /// </summary>
     [HideInInspector]
     public BuildingEntity buildingEntity;
 
+    /// <summary>
+    /// Use this as reference for area to build this object while in build mode
+    /// </summary>
     [HideInInspector]
     public BuildingArea buildingArea;
 
-    private bool isBuildMode;
+    public bool isBuildMode { get; private set; }
+
+    private readonly List<Component> triggerComponents = new List<Component>();
+
+    public uint EntityObjectId
+    {
+        get { return buildingEntity == null ? 0 : buildingEntity.ObjectId; }
+    }
 
     [SerializeField]
     private int dataId;
@@ -47,12 +61,29 @@ public class BuildingObject : MonoBehaviour
 #endif
 
     private readonly List<BuildingMaterial> buildingMaterials = new List<BuildingMaterial>();
+    private readonly List<BuildingArea> buildingAreas = new List<BuildingArea>();
 
     private void Awake()
     {
         var materials = GetComponentsInChildren<BuildingMaterial>(true);
         if (materials != null && materials.Length > 0)
-            buildingMaterials.AddRange(materials);
+        {
+            foreach (var material in materials)
+            {
+                material.buildingObject = this;
+                buildingMaterials.Add(material);
+            }
+        }
+
+        var areas = GetComponentsInChildren<BuildingArea>(true);
+        if (areas != null && areas.Length > 0)
+        {
+            foreach (var area in areas)
+            {
+                area.buildingObject = this;
+                buildingAreas.Add(area);
+            }
+        }
     }
 
     private void Update()
@@ -74,7 +105,7 @@ public class BuildingObject : MonoBehaviour
 
     public bool CanBuild()
     {
-        if (buildingArea == null)
+        if (buildingArea == null || triggerComponents.Count > 0)
             return false;
         return buildingType.Equals(buildingArea.buildingType);
     }
@@ -85,7 +116,38 @@ public class BuildingObject : MonoBehaviour
         foreach (var collider in colliders)
         {
             collider.isTrigger = true;
+            // We'll use rigidbody to detect trigger events
+            var rigidbody = collider.GetComponent<Rigidbody>();
+            if (rigidbody == null)
+                rigidbody = collider.gameObject.AddComponent<Rigidbody>();
+            rigidbody.useGravity = false;
+            rigidbody.isKinematic = true;
+            rigidbody.constraints = RigidbodyConstraints.FreezeAll;
         }
         isBuildMode = true;
+    }
+
+    public void AddTriggerEntity(RpgNetworkEntity networkEntity)
+    {
+        if (networkEntity != null && !triggerComponents.Contains(networkEntity))
+            triggerComponents.Add(networkEntity);
+    }
+
+    public void RemoveTriggerEntity(RpgNetworkEntity networkEntity)
+    {
+        if (networkEntity != null)
+            triggerComponents.Remove(networkEntity);
+    }
+
+    public void AddTriggerBuildingMaterial(BuildingMaterial buildingMaterial)
+    {
+        if (buildingMaterial != null && buildingMaterial.buildingObject != null && !triggerComponents.Contains(buildingMaterial.buildingObject))
+            triggerComponents.Add(buildingMaterial.buildingObject);
+    }
+
+    public void RemoveTriggerBuildingMaterial(BuildingMaterial buildingMaterial)
+    {
+        if (buildingMaterial != null && buildingMaterial.buildingObject != null)
+            triggerComponents.Remove(buildingMaterial.buildingObject);
     }
 }

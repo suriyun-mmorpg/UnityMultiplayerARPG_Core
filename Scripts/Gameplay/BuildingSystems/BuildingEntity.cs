@@ -7,17 +7,41 @@ public sealed class BuildingEntity : RpgNetworkEntity, IBuildingSaveData
 {
     [Header("Save Data")]
     [SerializeField]
+    private SyncFieldString id = new SyncFieldString();
+    [SerializeField]
+    private SyncFieldString parentId = new SyncFieldString();
+    [SerializeField]
     private SyncFieldInt dataId = new SyncFieldInt();
+    [SerializeField]
+    private SyncFieldInt currentHp = new SyncFieldInt();
     [SerializeField]
     private SyncFieldString creatorId = new SyncFieldString();
     [SerializeField]
     private SyncFieldString creatorName = new SyncFieldString();
     private BuildingObject buildingObject;
 
+    public string Id
+    {
+        get { return id; }
+        set { id.Value = value; }
+    }
+
+    public string ParentId
+    {
+        get { return parentId; }
+        set { parentId.Value = value; }
+    }
+
     public int DataId
     {
         get { return dataId; }
         set { dataId.Value = value; }
+    }
+
+    public int CurrentHp
+    {
+        get { return currentHp; }
+        set { currentHp.Value = value; }
     }
 
     public Vector3 Position

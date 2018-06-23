@@ -5,16 +5,37 @@ using UnityEngine;
 [System.Serializable]
 public struct BuildingSaveData : IBuildingSaveData
 {
+    public string id;
+    public string parentId;
     public int dataId;
+    public int currentHp;
     public Vector3 position;
     public Quaternion rotation;
     public string creatorId;
     public string creatorName;
 
+    public string Id
+    {
+        get { return id; }
+        set { id = value; }
+    }
+
+    public string ParentId
+    {
+        get { return parentId; }
+        set { parentId = value; }
+    }
+
     public int DataId
     {
         get { return dataId; }
         set { dataId = value; }
+    }
+
+    public int CurrentHp
+    {
+        get { return currentHp; }
+        set { currentHp = value; }
     }
 
     public Vector3 Position

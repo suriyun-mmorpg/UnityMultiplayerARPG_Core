@@ -14,6 +14,7 @@ public class BuildingMaterial : MonoBehaviour
     private Material[] defaultMaterials;
     public Material[] canBuildMaterials;
     public Material[] cannotBuildMaterials;
+    [HideInInspector]
     public BuildingObject buildingObject;
 
     private Renderer meshRenderer;
@@ -54,7 +55,32 @@ public class BuildingMaterial : MonoBehaviour
         CurrentState = State.Default;
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (buildingObject != null)
+        {
+            buildingObject.AddTriggerEntity(other.GetComponent<RpgNetworkEntity>());
+            buildingObject.AddTriggerBuildingMaterial(other.GetComponent<BuildingMaterial>());
+        }
+    }
 
+    private void OnTriggerStay(Collider other)
+    {
+        if (buildingObject != null)
+        {
+            buildingObject.AddTriggerEntity(other.GetComponent<RpgNetworkEntity>());
+            buildingObject.AddTriggerBuildingMaterial(other.GetComponent<BuildingMaterial>());
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (buildingObject != null)
+        {
+            buildingObject.RemoveTriggerEntity(other.GetComponent<RpgNetworkEntity>());
+            buildingObject.RemoveTriggerBuildingMaterial(other.GetComponent<BuildingMaterial>());
+        }
+    }
 
     // TODO: Add event when hit
 }

@@ -92,7 +92,10 @@ public class LanRpgNetworkManager : BaseGameNetworkManager
                 {
                     var buildingIdentity = Assets.NetworkSpawn(GameInstance.Singleton.buildingEntityPrefab.Identity, building.Position, building.Rotation);
                     var buildingEntity = buildingIdentity.GetComponent<BuildingEntity>();
+                    buildingEntity.Id = building.Id;
+                    buildingEntity.ParentId = building.ParentId;
                     buildingEntity.DataId = building.DataId;
+                    buildingEntity.CurrentHp = building.CurrentHp;
                     buildingEntity.CreatorId = building.CreatorId;
                     buildingEntity.CreatorName = building.CreatorName;
                 }
@@ -110,9 +113,12 @@ public class LanRpgNetworkManager : BaseGameNetworkManager
         {
             worldSaveData.buildings.Add(new BuildingSaveData()
             {
+                Id = building.Id,
+                ParentId = building.ParentId,
                 DataId = building.DataId,
                 Position = building.Position,
                 Rotation = building.Rotation,
+                CurrentHp = building.CurrentHp,
                 CreatorId = building.CreatorId,
                 CreatorName = building.CreatorName,
             });
