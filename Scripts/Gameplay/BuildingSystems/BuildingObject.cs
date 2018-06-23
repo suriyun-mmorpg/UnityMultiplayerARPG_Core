@@ -27,7 +27,8 @@ public class BuildingObject : MonoBehaviour
 
     public bool isBuildMode { get; private set; }
 
-    private readonly List<Component> triggerComponents = new List<Component>();
+    private readonly List<RpgNetworkEntity> triggerEntities = new List<RpgNetworkEntity>();
+    private readonly List<BuildingObject> triggerBuildings = new List<BuildingObject>();
 
     public uint EntityObjectId
     {
@@ -88,13 +89,13 @@ public class BuildingObject : MonoBehaviour
 
     private void Update()
     {
-        if (buildingArea != null && buildingArea.snapBuildingObject)
-        {
-            CacheTransform.position = buildingArea.transform.position;
-            CacheTransform.rotation = buildingArea.transform.rotation;
-        }
         if (isBuildMode)
         {
+            if (buildingArea != null && buildingArea.snapBuildingObject)
+            {
+                CacheTransform.position = buildingArea.transform.position;
+                CacheTransform.rotation = buildingArea.transform.rotation;
+            }
             var canBuild = CanBuild();
             foreach (var buildingMaterial in buildingMaterials)
             {
@@ -105,7 +106,7 @@ public class BuildingObject : MonoBehaviour
 
     public bool CanBuild()
     {
-        if (buildingArea == null || triggerComponents.Count > 0)
+        if (buildingArea == null || triggerEntities.Count > 0 || HitNonParentObject())
             return false;
         return buildingType.Equals(buildingArea.buildingType);
     }
@@ -127,27 +128,44 @@ public class BuildingObject : MonoBehaviour
         isBuildMode = true;
     }
 
-    public void AddTriggerEntity(RpgNetworkEntity networkEntity)
+    public void TriggerEnterEntity(RpgNetworkEntity networkEntity)
     {
-        if (networkEntity != null && !triggerComponents.Contains(networkEntity))
-            triggerComponents.Add(networkEntity);
+        if (networkEntity != null && !triggerEntities.Contains(networkEntity))
+            triggerEntities.Add(networkEntity);
     }
 
-    public void RemoveTriggerEntity(RpgNetworkEntity networkEntity)
+    public void TriggerExitEntity(RpgNetworkEntity networkEntity)
     {
         if (networkEntity != null)
-            triggerComponents.Remove(networkEntity);
+            triggerEntities.Remove(networkEntity);
     }
 
-    public void AddTriggerBuildingMaterial(BuildingMaterial buildingMaterial)
+    public void TriggerEnterBuildingMaterial(BuildingMaterial buildingMaterial)
     {
-        if (buildingMaterial != null && buildingMaterial.buildingObject != null && !triggerComponents.Contains(buildingMaterial.buildingObject))
-            triggerComponents.Add(buildingMaterial.buildingObject);
+        if (buildingMaterial != null &&
+            buildingMaterial.buildingObject != null &&
+            buildingMaterial.buildingObject != this &&
+            buildingMaterial.buildingObject.buildingType == buildingType &&
+            !triggerBuildings.Contains(buildingMaterial.buildingObject))
+            triggerBuildings.Add(buildingMaterial.buildingObject);
     }
 
-    public void RemoveTriggerBuildingMaterial(BuildingMaterial buildingMaterial)
+    public void TriggerExitBuildingMaterial(BuildingMaterial buildingMaterial)
     {
         if (buildingMaterial != null && buildingMaterial.buildingObject != null)
-            triggerComponents.Remove(buildingMaterial.buildingObject);
+            triggerBuildings.Remove(buildingMaterial.buildingObject);
+    }
+
+    public bool HitNonParentObject()
+    {
+        foreach (var triggerBuilding in triggerBuildings)
+        {
+            if (buildingArea != null && triggerBuilding != buildingArea.buildingObject)
+            {
+                if (Vector3.Distance(triggerBuilding.CacheTransform.position, CacheTransform.position) <= 1f)
+                    return true;
+            }
+        }
+        return false;
     }
 }

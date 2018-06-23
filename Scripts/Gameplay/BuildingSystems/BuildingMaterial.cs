@@ -59,17 +59,8 @@ public class BuildingMaterial : MonoBehaviour
     {
         if (buildingObject != null)
         {
-            buildingObject.AddTriggerEntity(other.GetComponent<RpgNetworkEntity>());
-            buildingObject.AddTriggerBuildingMaterial(other.GetComponent<BuildingMaterial>());
-        }
-    }
-
-    private void OnTriggerStay(Collider other)
-    {
-        if (buildingObject != null)
-        {
-            buildingObject.AddTriggerEntity(other.GetComponent<RpgNetworkEntity>());
-            buildingObject.AddTriggerBuildingMaterial(other.GetComponent<BuildingMaterial>());
+            buildingObject.TriggerEnterEntity(other.GetComponent<RpgNetworkEntity>());
+            buildingObject.TriggerEnterBuildingMaterial(other.GetComponent<BuildingMaterial>());
         }
     }
 
@@ -77,8 +68,8 @@ public class BuildingMaterial : MonoBehaviour
     {
         if (buildingObject != null)
         {
-            buildingObject.RemoveTriggerEntity(other.GetComponent<RpgNetworkEntity>());
-            buildingObject.RemoveTriggerBuildingMaterial(other.GetComponent<BuildingMaterial>());
+            buildingObject.TriggerExitEntity(other.GetComponent<RpgNetworkEntity>());
+            buildingObject.TriggerExitBuildingMaterial(other.GetComponent<BuildingMaterial>());
         }
     }
 

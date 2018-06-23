@@ -665,21 +665,18 @@ public class PlayerCharacterController : BasePlayerCharacterController
 
     private Vector3 GetBuildingPlaceEulerAngles(Vector3 eulerAngles)
     {
+        eulerAngles.x = 0;
+        eulerAngles.z = 0;
+        // Make Y rotation set to 0, 90, 180
         if (buildRotationSnap)
-        {
-            eulerAngles.x = 0;
-            eulerAngles.z = 0;
-            // Uncomment this to make Y rotation set to 0, 90, 180
-            eulerAngles.x = Mathf.Round(eulerAngles.x / 90) * 90;
             eulerAngles.y = Mathf.Round(eulerAngles.y / 90) * 90;
-            eulerAngles.z = Mathf.Round(eulerAngles.z / 90) * 90;
-        }
         return eulerAngles;
     }
 
     private bool RaycastToSetBuildingArea(Ray ray, float dist = 5f)
     {
         var layerMask = GetBuildRaycastLayerMask();
+        BuildingArea nonSnapBuildingArea = null;
         RaycastHit[] hits = Physics.RaycastAll(ray, dist, layerMask);
         foreach (var hit in hits)
         {
@@ -687,16 +684,20 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 return false;
 
             var buildingArea = hit.collider.GetComponent<BuildingArea>();
-            if (buildingArea == null)
+            if (buildingArea == null || (buildingArea.buildingObject != null && buildingArea.buildingObject == buildingObject))
                 continue;
 
             if (buildingObject.buildingType.Equals(buildingArea.buildingType))
             {
                 buildingObject.CacheTransform.position = GetBuildingPlacePosition(hit.point);
                 buildingObject.buildingArea = buildingArea;
-                return true;
+                if (buildingArea.snapBuildingObject)
+                    return true;
+                nonSnapBuildingArea = buildingArea;
             }
         }
+        if (nonSnapBuildingArea != null)
+            return true;
         return false;
     }
 
