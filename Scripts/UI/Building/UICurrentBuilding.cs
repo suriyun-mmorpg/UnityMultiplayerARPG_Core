@@ -2,19 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIBuilding : UIBase
+public class UICurrentBuilding : UIBase
 {
-    public void OnClickConfirmBuild()
+    public void OnClickDestroy()
     {
         var controller = BasePlayerCharacterController.Singleton;
         if (controller != null)
-            controller.ConfirmBuild();
+            controller.DestroyBuilding();
     }
 
-    public void OnClickCancelBuild()
+    public void OnClickDeselect()
     {
         var controller = BasePlayerCharacterController.Singleton;
         if (controller != null)
-            controller.CancelBuild();
+            controller.DeselectBuilding();
     }
 }

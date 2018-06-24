@@ -10,6 +10,7 @@ public class RpgNetworkEntity : LiteNetLibBehaviour
     public Text textTitle;
 
     public virtual string Title { get { return title; } }
+    protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
 
     private Transform cacheTransform;
     public Transform CacheTransform
@@ -21,7 +22,7 @@ public class RpgNetworkEntity : LiteNetLibBehaviour
             return cacheTransform;
         }
     }
-
+    
     protected virtual void Awake() { }
 
     protected virtual void Start() { }

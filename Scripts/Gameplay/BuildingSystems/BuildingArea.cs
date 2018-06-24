@@ -9,6 +9,7 @@ public class BuildingArea : MonoBehaviour
 
     [HideInInspector]
     public BuildingObject buildingObject;
+    public BuildingEntity buildingEntity { get { return buildingObject == null ? null : buildingObject.buildingEntity; } }
 
     public uint EntityObjectId
     {

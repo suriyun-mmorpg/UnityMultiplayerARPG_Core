@@ -75,7 +75,6 @@ public class MonsterCharacterEntity : BaseCharacterEntity
     protected override void Awake()
     {
         base.Awake();
-        var gameInstance = GameInstance.Singleton;
         gameObject.tag = gameInstance.monsterTag;
         var time = Time.unscaledTime;
         MonsterActivityComponent.RandomNextWanderTime(time, this, CacheTransform);
@@ -131,12 +130,13 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         SetTargetEntity(target);
     }
 
-    public override void ReceiveDamage(BaseCharacterEntity attacker, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId)
+    public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId)
     {
         // Damage calculations apply at server only
         if (!IsServer || CurrentHp <= 0)
             return;
-        base.ReceiveDamage(attacker, allDamageAmounts, debuff, hitEffectsId);
+
+        base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
         // If no attacker, skip next logics
         if (attacker == null || !IsEnemy(attacker))
             return;
@@ -144,7 +144,6 @@ public class MonsterCharacterEntity : BaseCharacterEntity
         // If character is not dead, try to attack
         if (CurrentHp > 0)
         {
-            var gameInstance = GameInstance.Singleton;
             // If no target enemy and current target is character, try to attack
             BaseCharacterEntity targetEntity;
             if (!TryGetTargetEntity(out targetEntity))
@@ -171,15 +170,13 @@ public class MonsterCharacterEntity : BaseCharacterEntity
     }
 
     public override void GetAttackingData(
-        out Item weapon,
+        out CharacterItem weapon,
         out int actionId, 
         out float triggerDuration, 
         out float totalDuration,
         out DamageInfo damageInfo, 
         out Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
     {
-        var gameInstance = GameInstance.Singleton;
-
         // Initialize data
         weapon = null;
         actionId = -1;

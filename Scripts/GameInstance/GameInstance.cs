@@ -31,8 +31,10 @@ public class GameInstance : MonoBehaviour
     public UnityTag monsterTag;
     public UnityTag npcTag;
     public UnityTag itemDropTag;
+    public UnityTag buildingTag;
     public UnityLayer characterLayer;
     public UnityLayer itemDropLayer;
+    public UnityLayer buildingLayer;
     public UnityLayer[] nonTargetingLayers;
     public float itemAppearDuration = 60f;
     public float pickUpItemDistance = 1f;
@@ -169,6 +171,17 @@ public class GameInstance : MonoBehaviour
                 defaultWeaponItem.damageAmount = damageAmount;
             }
             return defaultWeaponItem;
+        }
+    }
+
+    public int DamageableLayerMask
+    {
+        get
+        {
+            var layerMask = 0;
+            layerMask = layerMask | ~characterLayer.Mask;
+            layerMask = layerMask | ~buildingLayer.Mask;
+            return layerMask;
         }
     }
 

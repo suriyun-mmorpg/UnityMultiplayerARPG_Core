@@ -37,7 +37,8 @@ public class UISceneGameplay : MonoBehaviour
     public UICharacterHotkeys uiHotkeys;
     public UICharacterQuests uiQuests;
     public UINpcDialog uiNpcDialog;
-    public UIBuilding uiBuilding;
+    public UIConstructBuilding uiConstructBuilding;
+    public UICurrentBuilding uiCurrentBuilding;
     public UIToggleUI[] toggleUis;
     public List<GameObject> ignorePointerDetectionUis;
 

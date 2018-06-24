@@ -11,4 +11,5 @@ public abstract class BaseGameData : ScriptableObject
 
     public string Id { get { return name; } }
     public int DataId { get { return Id.GenerateHashId(); } }
+    protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
 }

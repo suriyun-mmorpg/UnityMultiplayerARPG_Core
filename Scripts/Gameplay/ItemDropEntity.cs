@@ -45,7 +45,6 @@ public sealed class ItemDropEntity : RpgNetworkEntity
     protected override void Awake()
     {
         base.Awake();
-        var gameInstance = GameInstance.Singleton;
         gameObject.tag = gameInstance.itemDropTag;
         gameObject.layer = gameInstance.itemDropLayer;
     }
@@ -59,7 +58,7 @@ public sealed class ItemDropEntity : RpgNetworkEntity
             if (!GameInstance.Items.ContainsKey(id))
                 NetworkDestroy();
             itemDataId.Value = id;
-            NetworkDestroy(GameInstance.Singleton.itemAppearDuration);
+            NetworkDestroy(gameInstance.itemAppearDuration);
         }
     }
 
@@ -73,12 +72,11 @@ public sealed class ItemDropEntity : RpgNetworkEntity
 
     private void OnItemDataIdChange(int itemDataId)
     {
-        var gameInstance = GameInstance.Singleton;
         Item item;
         if (GameInstance.Items.TryGetValue(itemDataId, out item) && item.dropModel != null)
         {
             var model = Instantiate(item.dropModel, CacheModelContainer);
-            model.gameObject.SetLayerRecursively(GameInstance.Singleton.itemDropLayer, true);
+            model.gameObject.SetLayerRecursively(gameInstance.itemDropLayer, true);
             model.gameObject.SetActive(true);
             model.gameObject.layer = gameInstance.itemDropLayer;
             model.RemoveComponentsInChildren<Collider>(false);

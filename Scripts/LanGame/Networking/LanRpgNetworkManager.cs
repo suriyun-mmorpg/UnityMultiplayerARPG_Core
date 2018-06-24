@@ -28,7 +28,6 @@ public class LanRpgNetworkManager : BaseGameNetworkManager
 
     public void StartGame()
     {
-        var gameInstance = GameInstance.Singleton;
         var gameServiceConnection = gameInstance.NetworkSetting;
         switch (startType)
         {
@@ -90,7 +89,7 @@ public class LanRpgNetworkManager : BaseGameNetworkManager
                 BuildingObject buildingObject;
                 if (GameInstance.BuildingObjects.TryGetValue(building.DataId, out buildingObject))
                 {
-                    var buildingIdentity = Assets.NetworkSpawn(GameInstance.Singleton.buildingEntityPrefab.Identity, building.Position, building.Rotation);
+                    var buildingIdentity = Assets.NetworkSpawn(gameInstance.buildingEntityPrefab.Identity, building.Position, building.Rotation);
                     var buildingEntity = buildingIdentity.GetComponent<BuildingEntity>();
                     buildingEntity.Id = building.Id;
                     buildingEntity.ParentId = building.ParentId;

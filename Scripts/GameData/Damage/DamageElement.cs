@@ -11,7 +11,6 @@ public class DamageElement : BaseGameData
 
     public float GetDamageReducedByResistance(BaseCharacterEntity damageReceiver, float damageAmount)
     {
-        var gameInstance = GameInstance.Singleton;
         return gameInstance.GameplayRule.GetDamageReducedByResistance(damageReceiver, damageAmount, this);
     }
 }

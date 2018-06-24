@@ -20,7 +20,7 @@ public enum AnimActionType : byte
 [RequireComponent(typeof(CharacterRecoveryComponent))]
 [RequireComponent(typeof(CharacterSkillAndBuffComponent))]
 [RequireComponent(typeof(CapsuleCollider))]
-public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
+public abstract class BaseCharacterEntity : DamageableNetworkEntity, ICharacterData
 {
     public const float ACTION_COMMAND_DELAY = 0.2f;
 
@@ -37,8 +37,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected SyncFieldShort level = new SyncFieldShort();
     [SerializeField]
     protected SyncFieldInt exp = new SyncFieldInt();
-    [SerializeField]
-    protected SyncFieldInt currentHp = new SyncFieldInt();
     [SerializeField]
     protected SyncFieldInt currentMp = new SyncFieldInt();
     [SerializeField]
@@ -131,7 +129,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     public virtual string CharacterName { get { return characterName.Value; } set { characterName.Value = value; } }
     public virtual short Level { get { return level.Value; } set { level.Value = value; } }
     public virtual int Exp { get { return exp.Value; } set { exp.Value = value; } }
-    public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
     public virtual int CurrentMp { get { return currentMp.Value; } set { currentMp.Value = value; } }
     public virtual int CurrentStamina { get { return currentStamina.Value; } set { currentStamina.Value = value; } }
     public virtual int CurrentFood { get { return currentFood.Value; } set { currentFood.Value = value; } }
@@ -231,7 +228,6 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     protected override void Awake()
     {
         base.Awake();
-        var gameInstance = GameInstance.Singleton;
         gameObject.layer = gameInstance.characterLayer;
         animActionType = AnimActionType.None;
         isRecaching = true;
@@ -393,7 +389,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             return;
 
         // Prepare requires data
-        Item weapon;
+        CharacterItem weapon;
         int actionId;
         float triggerDuration;
         float totalDuration;
@@ -409,33 +405,38 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             out allDamageAmounts);
 
         // Reduce ammo amount
-        if (weapon != null && weapon.WeaponType.requireAmmoType != null)
+        if (weapon != null)
         {
-            Dictionary<CharacterItem, short> decreaseItems;
-            if (!this.DecreaseAmmos(weapon.WeaponType.requireAmmoType, 1, out decreaseItems))
-                return;
-            var firstEntry = decreaseItems.FirstOrDefault();
-            var characterItem = firstEntry.Key;
-            var item = characterItem.GetItem();
-            if (item != null && firstEntry.Value > 0)
-                allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(allDamageAmounts, item.GetIncreaseDamages(characterItem.level, characterItem.GetEquipmentBonusRate()));
+            var weaponItem = weapon.GetWeaponItem();
+            if (weaponItem.WeaponType.requireAmmoType != null)
+            {
+                Dictionary<CharacterItem, short> decreaseItems;
+                if (!this.DecreaseAmmos(weaponItem.WeaponType.requireAmmoType, 1, out decreaseItems))
+                    return;
+                var firstEntry = decreaseItems.FirstOrDefault();
+                var characterItem = firstEntry.Key;
+                var item = characterItem.GetItem();
+                if (item != null && firstEntry.Value > 0)
+                    allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(allDamageAmounts, item.GetIncreaseDamages(characterItem.level, characterItem.GetEquipmentBonusRate()));
+            }
         }
 
         // Play animation on clients
         RequestPlayActionAnimation(actionId, AnimActionType.Attack);
         // Start attack routine
-        StartCoroutine(AttackRoutine(CacheTransform.position, triggerDuration, totalDuration, damageInfo, allDamageAmounts));
+        StartCoroutine(AttackRoutine(CacheTransform.position, triggerDuration, totalDuration, weapon, damageInfo, allDamageAmounts));
     }
 
     IEnumerator AttackRoutine(
         Vector3 position,
         float triggerDuration,
         float totalDuration,
+        CharacterItem weapon,
         DamageInfo damageInfo,
         Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
     {
         yield return new WaitForSecondsRealtime(triggerDuration);
-        LaunchDamageEntity(position, damageInfo, allDamageAmounts, CharacterBuff.Empty, -1);
+        LaunchDamageEntity(position, weapon, damageInfo, allDamageAmounts, CharacterBuff.Empty, -1);
         yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
     }
 
@@ -461,7 +462,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             return;
 
         // Prepare requires data
-        Item weapon;
+        CharacterItem weapon;
         int actionId;
         float triggerDuration;
         float totalDuration;
@@ -479,23 +480,27 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
             out damageInfo,
             out allDamageAmounts);
 
-        // Reduce ammo amount
-        if (characterSkill.GetSkill().IsAttack() && weapon != null && weapon.WeaponType.requireAmmoType != null)
+        if (weapon != null)
         {
-            Dictionary<CharacterItem, short> decreaseItems;
-            if (!this.DecreaseAmmos(weapon.WeaponType.requireAmmoType, 1, out decreaseItems))
-                return;
-            var firstEntry = decreaseItems.FirstOrDefault();
-            var characterItem = firstEntry.Key;
-            var item = characterItem.GetItem();
-            if (item != null && firstEntry.Value > 0)
-                allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(allDamageAmounts, item.GetIncreaseDamages(characterItem.level, characterItem.GetEquipmentBonusRate()));
+            var weaponItem = weapon.GetWeaponItem();
+            // Reduce ammo amount
+            if (characterSkill.GetSkill().IsAttack() && weaponItem.WeaponType.requireAmmoType != null)
+            {
+                Dictionary<CharacterItem, short> decreaseItems;
+                if (!this.DecreaseAmmos(weaponItem.WeaponType.requireAmmoType, 1, out decreaseItems))
+                    return;
+                var firstEntry = decreaseItems.FirstOrDefault();
+                var characterItem = firstEntry.Key;
+                var item = characterItem.GetItem();
+                if (item != null && firstEntry.Value > 0)
+                    allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(allDamageAmounts, item.GetIncreaseDamages(characterItem.level, characterItem.GetEquipmentBonusRate()));
+            }
         }
 
         // Play animation on clients
         RequestPlayActionAnimation(actionId, AnimActionType.Skill);
         // Start use skill routine
-        StartCoroutine(UseSkillRoutine(skillIndex, position, triggerDuration, totalDuration, isAttack, damageInfo, allDamageAmounts));
+        StartCoroutine(UseSkillRoutine(skillIndex, position, triggerDuration, totalDuration, isAttack, weapon, damageInfo, allDamageAmounts));
     }
 
     IEnumerator UseSkillRoutine(
@@ -504,6 +509,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         float triggerDuration,
         float totalDuration,
         bool isAttack,
+        CharacterItem weapon,
         DamageInfo damageInfo,
         Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
     {
@@ -523,7 +529,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                     CharacterBuff debuff = CharacterBuff.Empty;
                     if (skill.isDebuff)
                         debuff = CharacterBuff.Create(Id, BuffType.SkillDebuff, skill.DataId, characterSkill.level);
-                    LaunchDamageEntity(position, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id);
+                    LaunchDamageEntity(position, weapon, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id);
                 }
                 break;
             case SkillType.CraftItem:
@@ -615,7 +621,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         if (itemDropEntity == null)
             return;
 
-        if (Vector3.Distance(CacheTransform.position, itemDropEntity.CacheTransform.position) > GameInstance.Singleton.pickUpItemDistance + 5f)
+        if (Vector3.Distance(CacheTransform.position, itemDropEntity.CacheTransform.position) > gameInstance.pickUpItemDistance + 5f)
             return;
 
         var itemDropData = itemDropEntity.dropData;
@@ -771,8 +777,8 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     protected void NetFuncOnLevelUp()
     {
-        if (GameInstance.Singleton.levelUpEffect != null && Model != null)
-            Model.InstantiateEffect(new GameEffect[] { GameInstance.Singleton.levelUpEffect });
+        if (gameInstance.levelUpEffect != null && Model != null)
+            Model.InstantiateEffect(new GameEffect[] { gameInstance.levelUpEffect });
         if (onLevelUp != null)
             onLevelUp.Invoke();
     }
@@ -1030,14 +1036,13 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         return true;
     }
 
-    public virtual void ReceiveDamage(BaseCharacterEntity attacker, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId)
+    public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId)
     {
         var calculatingTotalDamage = 0f;
         // Damage calculations apply at server only
         if (!IsServer || !CanReceiveDamageFrom(attacker) || CurrentHp <= 0)
             return;
-
-        var gameInstance = GameInstance.Singleton;
+        
         // Calculate chance to hit
         var hitChance = gameInstance.GameplayRule.GetHitChance(attacker, this);
         // If miss, return don't calculate damages
@@ -1400,7 +1405,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     }
 
     public virtual void GetAttackingData(
-        out Item weapon,
+        out CharacterItem weapon,
         out int actionId,
         out float triggerDuration,
         out float totalDuration,
@@ -1416,9 +1421,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         allDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
         // Prepare weapon data
         var isLeftHand = false;
-        var equipWeapon = this.GetRandomedWeapon(out isLeftHand);
-        weapon = equipWeapon.GetWeaponItem();
-        var weaponType = weapon.WeaponType;
+        weapon = this.GetRandomedWeapon(out isLeftHand);
+        var weaponItem = weapon.GetWeaponItem();
+        var weaponType = weaponItem.WeaponType;
         // Assign damage data
         damageInfo = weaponType.damageInfo;
         // Random animation
@@ -1434,7 +1439,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         // Calculate all damages
         allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(
             allDamageAmounts,
-            weapon.GetDamageAmount(equipWeapon.level, equipWeapon.GetEquipmentBonusRate(), this));
+            weaponItem.GetDamageAmount(weapon.level, weapon.GetEquipmentBonusRate(), this));
         allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(
             allDamageAmounts,
             CacheIncreaseDamages);
@@ -1442,7 +1447,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     public virtual void GetUsingSkillData(
         CharacterSkill characterSkill,
-        out Item weapon, 
+        out CharacterItem weapon, 
         out int actionId,
         out float triggerDuration,
         out float totalDuration,
@@ -1465,9 +1470,9 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         isAttack = skill.IsAttack();
         // Prepare weapon data
         var isLeftHand = false;
-        var equipWeapon = this.GetRandomedWeapon(out isLeftHand);
-        weapon = equipWeapon.GetWeaponItem();
-        var weaponType = weapon.WeaponType;
+        weapon = this.GetRandomedWeapon(out isLeftHand);
+        var weaponItem = weapon.GetWeaponItem();
+        var weaponType = weaponItem.WeaponType;
         // Prepare animation
         if ((skill.castAnimations == null || skill.castAnimations.Length == 0) && isAttack)
         {
@@ -1501,7 +1506,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                     // Assign damage data
                     damageInfo = skill.damageInfo;
                     // Calculate all damages
-                    allDamageAmounts = weapon.GetDamageAmountWithInflictions(equipWeapon.level, equipWeapon.GetEquipmentBonusRate(), this, skill.GetWeaponDamageInflictions(characterSkill.level));
+                    allDamageAmounts = weaponItem.GetDamageAmountWithInflictions(weapon.level, weapon.GetEquipmentBonusRate(), this, skill.GetWeaponDamageInflictions(characterSkill.level));
                     // Sum damage with additional damage amounts
                     allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(
                         allDamageAmounts, 
@@ -1515,7 +1520,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                     // Assign damage data
                     damageInfo = weaponType.damageInfo;
                     // Calculate all damages
-                    allDamageAmounts = weapon.GetDamageAmountWithInflictions(equipWeapon.level, equipWeapon.GetEquipmentBonusRate(), this, skill.GetWeaponDamageInflictions(characterSkill.level));
+                    allDamageAmounts = weaponItem.GetDamageAmountWithInflictions(weapon.level, weapon.GetEquipmentBonusRate(), this, skill.GetWeaponDamageInflictions(characterSkill.level));
                     // Sum damage with additional damage amounts
                     allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(
                         allDamageAmounts,
@@ -1556,7 +1561,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         }
         if (rightHandWeapon == null && leftHandWeapon == null)
         {
-            tempDamageInfo = GameInstance.Singleton.DefaultWeaponItem.WeaponType.damageInfo;
+            tempDamageInfo = gameInstance.DefaultWeaponItem.WeaponType.damageInfo;
             tempDistance = tempDamageInfo.GetDistance();
             minDistance = tempDistance;
         }
@@ -1588,7 +1593,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
         }
         if (rightHandWeapon == null && leftHandWeapon == null)
         {
-            tempDamageInfo = GameInstance.Singleton.DefaultWeaponItem.WeaponType.damageInfo;
+            tempDamageInfo = gameInstance.DefaultWeaponItem.WeaponType.damageInfo;
             tempFov = tempDamageInfo.GetFov();
             minFov = tempFov;
         }
@@ -1617,6 +1622,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     public virtual void LaunchDamageEntity(
         Vector3 position,
+        CharacterItem weapon,
         DamageInfo damageInfo,
         Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
         CharacterBuff debuff,
@@ -1624,23 +1630,30 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     {
         if (!IsServer)
             return;
-
+        
         Transform damageTransform = GetDamageTransform(damageInfo.damageType);
         switch (damageInfo.damageType)
         {
             case DamageType.Melee:
                 var halfFov = damageInfo.hitFov * 0.5f;
-                var hits = Physics.OverlapSphere(damageTransform.position, damageInfo.hitDistance);
+                var hits = Physics.OverlapSphere(damageTransform.position, damageInfo.hitDistance, gameInstance.DamageableLayerMask);
                 foreach (var hit in hits)
                 {
-                    var characterEntity = hit.GetComponent<BaseCharacterEntity>();
-                    if (characterEntity == null || characterEntity == this || characterEntity.CurrentHp <= 0)
+                    var damageableEntity = hit.GetComponent<DamageableNetworkEntity>();
+                    // Try to find damageable entity by building object materials
+                    if (damageableEntity == null)
+                    {
+                        var buildingMaterial = hit.GetComponent<BuildingMaterial>();
+                        if (buildingMaterial != null && buildingMaterial.buildingEntity != null)
+                            damageableEntity = buildingMaterial.buildingEntity;
+                    }
+                    if (damageableEntity == null || damageableEntity == this || damageableEntity.CurrentHp <= 0)
                         continue;
-                    var targetDir = (CacheTransform.position - characterEntity.CacheTransform.position).normalized;
+                    var targetDir = (CacheTransform.position - damageableEntity.CacheTransform.position).normalized;
                     var angle = Vector3.Angle(targetDir, CacheTransform.forward);
                     // Angle in forward position is 180 so we use this value to determine that target is in hit fov or not
                     if (angle < 180 + halfFov && angle > 180 - halfFov)
-                        characterEntity.ReceiveDamage(this, allDamageAmounts, debuff, hitEffectsId);
+                        damageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId);
                 }
                 break;
             case DamageType.Missile:
@@ -1648,7 +1661,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
                 {
                     var missileDamageIdentity = Manager.Assets.NetworkSpawn(damageInfo.missileDamageEntity.Identity, damageTransform.position, damageTransform.rotation);
                     var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
-                    missileDamageEntity.SetupDamage(this, allDamageAmounts, debuff, hitEffectsId, damageInfo.missileDistance, damageInfo.missileSpeed);
+                    missileDamageEntity.SetupDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId, damageInfo.missileDistance, damageInfo.missileSpeed);
                 }
                 break;
         }
@@ -1679,7 +1692,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
 
     public virtual void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountType combatAmountType, int damage)
     {
-        GameInstance.Singleton.GameplayRule.OnCharacterReceivedDamage(attacker, this, combatAmountType, damage);
+        gameInstance.GameplayRule.OnCharacterReceivedDamage(attacker, this, combatAmountType, damage);
         RequestCombatAmount(combatAmountType, damage);
     }
 
@@ -1741,7 +1754,7 @@ public abstract class BaseCharacterEntity : RpgNetworkEntity, ICharacterData
     {
         if (!IsServer)
             return;
-        if (!GameInstance.Singleton.GameplayRule.IncreaseExp(this, exp))
+        if (!gameInstance.GameplayRule.IncreaseExp(this, exp))
             return;
         // Send OnLevelUp to owner player only
         RequestOnLevelUp();

@@ -46,7 +46,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
     {
         base.Awake();
         buildingItemIndex = -1;
-        buildingObject = null;
+        currentBuildingObject = null;
     }
 
     protected override void Start()
@@ -123,22 +123,9 @@ public class PlayerCharacterController : BasePlayerCharacterController
 
         if (CharacterEntity.CurrentHp <= 0)
             return;
-
-        switch (controllerMode)
-        {
-            case PlayerCharacterControllerMode.PointClick:
-                UpdatePointClickInput();
-                break;
-            case PlayerCharacterControllerMode.WASD:
-                UpdateWASDInput();
-                break;
-            default:
-                UpdatePointClickInput();
-                UpdateWASDInput();
-                break;
-        }
+        
         // If it's building something, don't allow to activate NPC/Warp/Pickup Item
-        if (buildingObject != null)
+        if (currentBuildingObject != null)
         {
             // Activate nearby npcs
             if (InputManager.GetButtonDown("Activate"))
@@ -171,81 +158,94 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 }
             }
         }
-        UpdateBuildingObject();
+        UpdatePointClickInput();
+        UpdateWASDInput();
+        UpdateBuilding();
     }
 
     protected void UpdatePointClickInput()
     {
         // If it's building something, not allow point click movement
-        if (buildingObject != null)
+        if (currentBuildingObject != null)
             return;
-
-        var isPointerOverUI = CacheUISceneGameplay != null && CacheUISceneGameplay.IsPointerOverUIObject();
-        if (Input.GetMouseButtonDown(0))
+        var getMouseDown = Input.GetMouseButtonDown(0);
+        var getMouseUp = Input.GetMouseButtonUp(0);
+        var getMouse = Input.GetMouseButton(0);
+        if (getMouseDown)
         {
             isMouseDragOrHoldOrOverUI = false;
             mouseDownTime = Time.unscaledTime;
             mouseDownPosition = Input.mousePosition;
         }
+        var isPointerOverUI = CacheUISceneGameplay != null && CacheUISceneGameplay.IsPointerOverUIObject();
         var isMouseDragDetected = (Input.mousePosition - mouseDownPosition).magnitude > DETECT_MOUSE_DRAG_DISTANCE;
         var isMouseHoldDetected = Time.unscaledTime - mouseDownTime > DETECT_MOUSE_HOLD_DURATION;
         if (!isMouseDragOrHoldOrOverUI && (isMouseDragDetected || isMouseHoldDetected || isPointerOverUI))
             isMouseDragOrHoldOrOverUI = true;
-        if (!isPointerOverUI && Input.GetMouseButtonUp(0) && !isMouseDragOrHoldOrOverUI)
+        if (!isPointerOverUI && (getMouse || getMouseUp))
         {
             var targetCamera = CacheGameplayCameraControls != null ? CacheGameplayCameraControls.targetCamera : Camera.main;
             CharacterEntity.SetTargetEntity(null);
             LiteNetLibIdentity targetIdentity = null;
             Vector3? targetPosition = null;
-            var layerMask = 0;
-            if (gameInstance.nonTargetingLayers.Length > 0)
-            {
-                foreach (var nonTargetingLayer in gameInstance.nonTargetingLayers)
-                {
-                    layerMask = layerMask | ~(nonTargetingLayer.Mask);
-                }
-            }
-            else
-                layerMask = -1;
-            RaycastHit[] hits = Physics.RaycastAll(targetCamera.ScreenPointToRay(Input.mousePosition), 100f, layerMask);
+            var layerMask = GetTargetRaycastLayerMask();
+            var hits = Physics.RaycastAll(targetCamera.ScreenPointToRay(Input.mousePosition), 100f, layerMask);
             foreach (var hit in hits)
             {
                 var hitTransform = hit.transform;
-                targetPosition = hit.point;
-                var playerEntity = hitTransform.GetComponent<PlayerCharacterEntity>();
-                var monsterEntity = hitTransform.GetComponent<MonsterCharacterEntity>();
-                var npcEntity = hitTransform.GetComponent<NpcEntity>();
-                var itemDropEntity = hitTransform.GetComponent<ItemDropEntity>();
-                CharacterEntity.SetTargetEntity(null);
-                if (playerEntity != null && playerEntity.CurrentHp > 0)
+                if (getMouseUp &&
+                    !isMouseDragOrHoldOrOverUI &&
+                    (controllerMode == PlayerCharacterControllerMode.PointClick || controllerMode == PlayerCharacterControllerMode.Both))
                 {
-                    targetPosition = playerEntity.CacheTransform.position;
-                    targetIdentity = playerEntity.Identity;
-                    CharacterEntity.SetTargetEntity(playerEntity);
-                    break;
+                    var playerEntity = hitTransform.GetComponent<PlayerCharacterEntity>();
+                    var monsterEntity = hitTransform.GetComponent<MonsterCharacterEntity>();
+                    var npcEntity = hitTransform.GetComponent<NpcEntity>();
+                    var itemDropEntity = hitTransform.GetComponent<ItemDropEntity>();
+                    targetPosition = hit.point;
+                    CharacterEntity.SetTargetEntity(null);
+                    if (playerEntity != null && playerEntity.CurrentHp > 0)
+                    {
+                        targetPosition = playerEntity.CacheTransform.position;
+                        targetIdentity = playerEntity.Identity;
+                        CharacterEntity.SetTargetEntity(playerEntity);
+                        break;
+                    }
+                    else if (monsterEntity != null && monsterEntity.CurrentHp > 0)
+                    {
+                        targetPosition = monsterEntity.CacheTransform.position;
+                        targetIdentity = monsterEntity.Identity;
+                        CharacterEntity.SetTargetEntity(monsterEntity);
+                        break;
+                    }
+                    else if (npcEntity != null)
+                    {
+                        targetPosition = npcEntity.CacheTransform.position;
+                        targetIdentity = npcEntity.Identity;
+                        CharacterEntity.SetTargetEntity(npcEntity);
+                        break;
+                    }
+                    else if (itemDropEntity != null)
+                    {
+                        targetPosition = itemDropEntity.CacheTransform.position;
+                        targetIdentity = itemDropEntity.Identity;
+                        CharacterEntity.SetTargetEntity(itemDropEntity);
+                        break;
+                    }
                 }
-                else if (monsterEntity != null && monsterEntity.CurrentHp > 0)
+                else if (!isMouseDragDetected && isMouseHoldDetected)
                 {
-                    targetPosition = monsterEntity.CacheTransform.position;
-                    targetIdentity = monsterEntity.Identity;
-                    CharacterEntity.SetTargetEntity(monsterEntity);
-                    break;
-                }
-                else if (npcEntity != null)
-                {
-                    targetPosition = npcEntity.CacheTransform.position;
-                    targetIdentity = npcEntity.Identity;
-                    CharacterEntity.SetTargetEntity(npcEntity);
-                    break;
-                }
-                else if (itemDropEntity != null)
-                {
-                    targetPosition = itemDropEntity.CacheTransform.position;
-                    targetIdentity = itemDropEntity.Identity;
-                    CharacterEntity.SetTargetEntity(itemDropEntity);
-                    break;
+                    var buildingMaterial = hitTransform.GetComponent<BuildingMaterial>();
+                    CharacterEntity.SetTargetEntity(null);
+                    if (buildingMaterial != null && buildingMaterial.buildingEntity != null && buildingMaterial.buildingEntity.CurrentHp > 0)
+                    {
+                        targetPosition = buildingMaterial.buildingEntity.CacheTransform.position;
+                        targetIdentity = buildingMaterial.buildingEntity.Identity;
+                        CharacterEntity.SetTargetEntity(buildingMaterial.buildingEntity);
+                        break;
+                    }
                 }
             }
+            // If Found target, do something
             if (targetPosition.HasValue)
             {
                 if (CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
@@ -264,6 +264,10 @@ public class PlayerCharacterController : BasePlayerCharacterController
 
     protected void UpdateWASDInput()
     {
+        if (controllerMode != PlayerCharacterControllerMode.WASD &&
+            controllerMode != PlayerCharacterControllerMode.Both)
+            return;
+
         if (CharacterEntity.IsPlayingActionAnimation())
         {
             CharacterEntity.StopMove();
@@ -347,18 +351,28 @@ public class PlayerCharacterController : BasePlayerCharacterController
         }
     }
 
-    protected void UpdateBuildingObject()
+    protected void UpdateBuilding()
     {
-        var uiBuilding = CacheUISceneGameplay.uiBuilding;
-        if (uiBuilding != null)
+        // Current building UI
+        BuildingEntity currentBuilding;
+        var uiCurrentBuilding = CacheUISceneGameplay.uiCurrentBuilding;
+        if (uiCurrentBuilding != null)
         {
-            if (uiBuilding.IsVisible() && buildingObject == null)
-                uiBuilding.Hide();
-            if (!uiBuilding.IsVisible() && buildingObject != null)
-                uiBuilding.Show();
+            if (uiCurrentBuilding.IsVisible() && !CharacterEntity.TryGetTargetEntity(out currentBuilding))
+                uiCurrentBuilding.Hide();
         }
 
-        if (buildingObject == null)
+        // Construct building UI
+        var uiConstructBuilding = CacheUISceneGameplay.uiConstructBuilding;
+        if (uiConstructBuilding != null)
+        {
+            if (uiConstructBuilding.IsVisible() && currentBuildingObject == null)
+                uiConstructBuilding.Hide();
+            if (!uiConstructBuilding.IsVisible() && currentBuildingObject != null)
+                uiConstructBuilding.Show();
+        }
+
+        if (currentBuildingObject == null)
             return;
 
         var isPointerOverUI = CacheUISceneGameplay != null && CacheUISceneGameplay.IsPointerOverUIObject();
@@ -387,6 +401,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
         PlayerCharacterEntity targetPlayer;
         NpcEntity targetNpc;
         ItemDropEntity targetItemDrop;
+        BuildingEntity targetBuilding;
         if (TryGetAttackingCharacter(out targetEnemy))
         {
             if (targetEnemy.CurrentHp <= 0)
@@ -504,6 +519,23 @@ public class PlayerCharacterController : BasePlayerCharacterController
             else
                 UpdateTargetEntityPosition(targetItemDrop);
         }
+        else if (CharacterEntity.TryGetTargetEntity(out targetBuilding))
+        {
+            var uiCurrentBuilding = CacheUISceneGameplay.uiCurrentBuilding;
+            var actDistance = gameInstance.buildDistance - StoppingDistance;
+            if (Vector3.Distance(CharacterTransform.position, targetBuilding.CacheTransform.position) <= actDistance)
+            {
+                if (uiCurrentBuilding != null && !uiCurrentBuilding.IsVisible())
+                    uiCurrentBuilding.Show();
+                CharacterEntity.StopMove();
+            }
+            else
+            {
+                UpdateTargetEntityPosition(targetBuilding);
+                if (uiCurrentBuilding != null && uiCurrentBuilding.IsVisible())
+                    uiCurrentBuilding.Hide();
+            }
+        }
     }
 
     protected void UpdateTargetEntityPosition(RpgNetworkEntity entity)
@@ -579,10 +611,10 @@ public class PlayerCharacterController : BasePlayerCharacterController
             return;
 
         buildingItemIndex = -1;
-        if (buildingObject != null)
+        if (currentBuildingObject != null)
         {
-            Destroy(buildingObject.gameObject);
-            buildingObject = null;
+            Destroy(currentBuildingObject.gameObject);
+            currentBuildingObject = null;
         }
 
         var hotkey = CharacterEntity.Hotkeys[hotkeyIndex];
@@ -617,25 +649,41 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 else if (item.IsBuilding())
                 {
                     StopAllMovement();
+                    DeselectBuilding();
                     buildingItemIndex = itemIndex;
-                    buildingObject = Instantiate(item.buildingObject);
-                    buildingObject.SetupAsBuildMode();
-                    buildingObject.CacheTransform.parent = null;
+                    currentBuildingObject = Instantiate(item.buildingObject);
+                    currentBuildingObject.SetupAsBuildMode();
+                    currentBuildingObject.CacheTransform.parent = null;
                     SetBuildingObjectByCharacterTransform();
                 }
             }
         }
     }
 
+    private int GetTargetRaycastLayerMask()
+    {
+        var layerMask = 0;
+        if (gameInstance.nonTargetingLayers.Length > 0)
+        {
+            foreach (var nonTargetingLayer in gameInstance.nonTargetingLayers)
+            {
+                layerMask = layerMask | ~(nonTargetingLayer.Mask);
+            }
+        }
+        else
+            layerMask = -1;
+        return layerMask;
+    }
+
     private void SetBuildingObjectByCharacterTransform()
     {
-        if (buildingObject != null)
+        if (currentBuildingObject != null)
         {
-            var placePosition = CharacterEntity.CacheTransform.position + (CharacterEntity.CacheTransform.forward * buildingObject.characterForwardDistance);
-            buildingObject.CacheTransform.eulerAngles = GetBuildingPlaceEulerAngles(CharacterEntity.CacheTransform.eulerAngles);
-            buildingObject.buildingArea = null;
+            var placePosition = CharacterEntity.CacheTransform.position + (CharacterEntity.CacheTransform.forward * currentBuildingObject.characterForwardDistance);
+            currentBuildingObject.CacheTransform.eulerAngles = GetBuildingPlaceEulerAngles(CharacterEntity.CacheTransform.eulerAngles);
+            currentBuildingObject.buildingArea = null;
             if (!RaycastToSetBuildingArea(new Ray(placePosition + (Vector3.up * 2.5f), Vector3.down), 5f))
-                buildingObject.CacheTransform.position = GetBuildingPlacePosition(placePosition);
+                currentBuildingObject.CacheTransform.position = GetBuildingPlacePosition(placePosition);
         }
     }
 
@@ -684,13 +732,13 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 return false;
 
             var buildingArea = hit.collider.GetComponent<BuildingArea>();
-            if (buildingArea == null || (buildingArea.buildingObject != null && buildingArea.buildingObject == buildingObject))
+            if (buildingArea == null || (buildingArea.buildingObject != null && buildingArea.buildingObject == currentBuildingObject))
                 continue;
 
-            if (buildingObject.buildingType.Equals(buildingArea.buildingType))
+            if (currentBuildingObject.buildingType.Equals(buildingArea.buildingType))
             {
-                buildingObject.CacheTransform.position = GetBuildingPlacePosition(hit.point);
-                buildingObject.buildingArea = buildingArea;
+                currentBuildingObject.CacheTransform.position = GetBuildingPlacePosition(hit.point);
+                currentBuildingObject.buildingArea = buildingArea;
                 if (buildingArea.snapBuildingObject)
                     return true;
                 nonSnapBuildingArea = buildingArea;

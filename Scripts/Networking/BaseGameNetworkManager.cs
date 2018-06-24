@@ -12,6 +12,7 @@ public abstract class BaseGameNetworkManager : LiteNetLibGameManager
         public const short Chat = 101;
     }
 
+    protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
     protected readonly Dictionary<long, PlayerCharacterEntity> playerCharacters = new Dictionary<long, PlayerCharacterEntity>();
     protected readonly Dictionary<string, NetPeer> peersByCharacterName = new Dictionary<string, NetPeer>();
     // Events
@@ -91,7 +92,6 @@ public abstract class BaseGameNetworkManager : LiteNetLibGameManager
     public void Init()
     {
         doNotEnterGameOnConnect = false;
-        var gameInstance = GameInstance.Singleton;
         Assets.offlineScene.SceneName = gameInstance.homeScene;
         Assets.playerPrefab = gameInstance.playerCharacterEntityPrefab.Identity;
         var spawnablePrefabs = new List<LiteNetLibIdentity>();
@@ -191,5 +191,15 @@ public abstract class BaseGameNetworkManager : LiteNetLibGameManager
             return;
         peersByCharacterName.Remove(playerCharacterEntity.CharacterName);
         playerCharacters.Remove(peer.ConnectId);
+    }
+
+    public virtual void CreateBuildingEntity()
+    {
+
+    }
+
+    public virtual void DestroyBuildingEntity()
+    {
+
     }
 }

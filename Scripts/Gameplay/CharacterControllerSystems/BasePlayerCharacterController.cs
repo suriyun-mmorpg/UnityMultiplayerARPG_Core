@@ -33,7 +33,7 @@ public abstract class BasePlayerCharacterController : MonoBehaviour
     public UISceneGameplay CacheUISceneGameplay { get; protected set; }
     protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
     protected int buildingItemIndex;
-    protected BuildingObject buildingObject;
+    protected BuildingObject currentBuildingObject;
 
     protected virtual void Awake()
     {
@@ -175,23 +175,40 @@ public abstract class BasePlayerCharacterController : MonoBehaviour
 
     public void ConfirmBuild()
     {
-        if (buildingObject != null)
+        if (currentBuildingObject != null)
         {
-            if (buildingObject.CanBuild())
+            if (currentBuildingObject.CanBuild())
             {
                 uint parentObjectId = 0;
-                if (buildingObject.buildingArea != null)
-                    parentObjectId = buildingObject.buildingArea.EntityObjectId;
-                CharacterEntity.RequestBuild(buildingItemIndex, buildingObject.CacheTransform.position, buildingObject.CacheTransform.rotation, parentObjectId);
+                if (currentBuildingObject.buildingArea != null)
+                    parentObjectId = currentBuildingObject.buildingArea.EntityObjectId;
+                CharacterEntity.RequestBuild(buildingItemIndex, currentBuildingObject.CacheTransform.position, currentBuildingObject.CacheTransform.rotation, parentObjectId);
             }
-            Destroy(buildingObject.gameObject);
+            Destroy(currentBuildingObject.gameObject);
         }
     }
 
     public void CancelBuild()
     {
-        if (buildingObject != null)
-            Destroy(buildingObject.gameObject);
+        if (currentBuildingObject != null)
+            Destroy(currentBuildingObject.gameObject);
+    }
+
+    public void DestroyBuilding()
+    {
+        BuildingEntity currentBuildingEntity;
+        if (CharacterEntity.TryGetTargetEntity(out currentBuildingEntity))
+        {
+            CharacterEntity.RequestDestroyBuilding(currentBuildingEntity.ObjectId);
+            CharacterEntity.SetTargetEntity(null);
+        }
+    }
+
+    public void DeselectBuilding()
+    {
+        BuildingEntity currentBuildingEntity;
+        if (CharacterEntity.TryGetTargetEntity(out currentBuildingEntity))
+            CharacterEntity.SetTargetEntity(null);
     }
 
     public abstract void UseHotkey(int hotkeyIndex);

@@ -75,6 +75,7 @@ public class CharacterModel : MonoBehaviour
     private EffectContainer[] effectContainers;
 
     public int OverrideActionClipId { get { return overrideActionClipId; } }
+    protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
 
     private Transform cacheTransform;
     public Transform CacheTransform
@@ -323,7 +324,6 @@ public class CharacterModel : MonoBehaviour
     {
         if (equipmentModels == null || equipmentModels.Length == 0)
             return;
-        var gameInstance = GameInstance.Singleton;
         var models = new Dictionary<string, GameObject>();
         foreach (var equipmentModel in equipmentModels)
         {
@@ -402,7 +402,6 @@ public class CharacterModel : MonoBehaviour
     {
         if (effects == null || effects.Length == 0)
             return new List<GameEffect>();
-        var gameInstance = GameInstance.Singleton;
         var newEffects = new List<GameEffect>();
         foreach (var effect in effects)
         {
@@ -429,7 +428,6 @@ public class CharacterModel : MonoBehaviour
     {
         if (buffEffects == null || buffEffects.Length == 0)
             return;
-        var gameInstance = GameInstance.Singleton;
         var effects = InstantiateEffect(buffEffects);
         CreateCacheEffect(buffId, effects);
     }

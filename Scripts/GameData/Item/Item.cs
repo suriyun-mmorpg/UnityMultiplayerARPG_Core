@@ -143,7 +143,7 @@ public class Item : BaseGameData
         get
         {
             if (armorType == null)
-                armorType = GameInstance.Singleton.DefaultArmorType;
+                armorType = gameInstance.DefaultArmorType;
             return armorType;
         }
     }
@@ -158,7 +158,7 @@ public class Item : BaseGameData
         get
         {
             if (weaponType == null)
-                weaponType = GameInstance.Singleton.DefaultWeaponType;
+                weaponType = gameInstance.DefaultWeaponType;
             return weaponType;
         }
     }

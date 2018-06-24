@@ -1,10 +1,9 @@
-﻿using System.Collections;
+﻿using LiteNetLib;
+using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
-using LiteNetLib;
-using LiteNetLibManager;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(LiteNetLibTransform))]
@@ -131,7 +130,6 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     {
         base.Awake();
         CacheRigidbody.useGravity = false;
-        var gameInstance = GameInstance.Singleton;
         gameObject.tag = gameInstance.playerTag;
         StopMove();
     }
@@ -332,6 +330,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         RegisterNetFunction("SelectNpcDialogMenu", new LiteNetLibFunction<NetFieldInt>((menuIndex) => NetFuncSelectNpcDialogMenu(menuIndex)));
         RegisterNetFunction("EnterWarp", new LiteNetLibFunction(() => NetFuncEnterWarp()));
         RegisterNetFunction("Build", new LiteNetLibFunction<NetFieldInt, NetFieldVector3, NetFieldQuaternion, NetFieldUInt>((itemIndex, position, rotation, parentObjectId) => NetFuncBuild(itemIndex, position, rotation, parentObjectId)));
+        RegisterNetFunction("DestroyBuild", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncDestroyBuild(objectId)));
     }
     #endregion
 
@@ -462,7 +461,7 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         if (npcEntity == null)
             return;
         
-        if (Vector3.Distance(CacheTransform.position, npcEntity.CacheTransform.position) > GameInstance.Singleton.conversationDistance + 5f)
+        if (Vector3.Distance(CacheTransform.position, npcEntity.CacheTransform.position) > gameInstance.conversationDistance + 5f)
             return;
         
         currentNpcDialog = npcEntity.startDialog;
@@ -620,14 +619,32 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
             !GameInstance.BuildingObjects.TryGetValue(nonEquipItem.GetBuildingItem().buildingObject.DataId, out buildingObject))
             return;
 
-        var buildingIdentity = Manager.Assets.NetworkSpawn(GameInstance.Singleton.buildingEntityPrefab.Identity, position, rotation);
+        var buildingIdentity = Manager.Assets.NetworkSpawn(gameInstance.buildingEntityPrefab.Identity, position, rotation);
         var buildingEntity = buildingIdentity.GetComponent<BuildingEntity>();
         buildingEntity.Id = GenericUtils.GetUniqueId();
-        // TODO: Implement parent Id
+        buildingEntity.ParentId = string.Empty;
+        LiteNetLibIdentity entity;
+        if (Manager.Assets.TryGetSpawnedObject(parentObjectId, out entity))
+        {
+            var parentBuildingEntity = entity.GetComponent<BuildingEntity>();
+            if (parentBuildingEntity != null)
+                buildingEntity.ParentId = parentBuildingEntity.Id;
+        }
         buildingEntity.DataId = buildingObject.DataId;
         buildingEntity.CurrentHp = buildingObject.maxHp;
         buildingEntity.CreatorId = Id;
         buildingEntity.CreatorName = CharacterName;
+    }
+
+    protected void NetFuncDestroyBuild(uint objectId)
+    {
+        LiteNetLibIdentity entity;
+        if (Manager.Assets.TryGetSpawnedObject(objectId, out entity))
+        {
+            var buildingEntity = entity.GetComponent<BuildingEntity>();
+            if (buildingEntity != null && buildingEntity.CreatorId.Equals(Id))
+                buildingEntity.NetworkDestroy();
+        }
     }
     #endregion
 
@@ -690,6 +707,13 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         if (CurrentHp <= 0 || IsPlayingActionAnimation())
             return;
         CallNetFunction("Build", FunctionReceivers.Server, index, position, rotation, parentObjectId);
+    }
+
+    public void RequestDestroyBuilding(uint objectId)
+    {
+        if (CurrentHp <= 0 || IsPlayingActionAnimation())
+            return;
+        CallNetFunction("DestroyBuild", FunctionReceivers.Server, objectId);
     }
     #endregion
 

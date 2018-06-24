@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
 
-public sealed class BuildingEntity : RpgNetworkEntity, IBuildingSaveData
+public sealed class BuildingEntity : DamageableNetworkEntity, IBuildingSaveData
 {
     [Header("Save Data")]
     [SerializeField]
@@ -12,8 +12,6 @@ public sealed class BuildingEntity : RpgNetworkEntity, IBuildingSaveData
     private SyncFieldString parentId = new SyncFieldString();
     [SerializeField]
     private SyncFieldInt dataId = new SyncFieldInt();
-    [SerializeField]
-    private SyncFieldInt currentHp = new SyncFieldInt();
     [SerializeField]
     private SyncFieldString creatorId = new SyncFieldString();
     [SerializeField]
@@ -36,12 +34,6 @@ public sealed class BuildingEntity : RpgNetworkEntity, IBuildingSaveData
     {
         get { return dataId; }
         set { dataId.Value = value; }
-    }
-
-    public int CurrentHp
-    {
-        get { return currentHp; }
-        set { currentHp.Value = value; }
     }
 
     public Vector3 Position
@@ -68,6 +60,13 @@ public sealed class BuildingEntity : RpgNetworkEntity, IBuildingSaveData
         set { creatorName.Value = value; }
     }
 
+    protected override void Awake()
+    {
+        base.Awake();
+        gameObject.tag = gameInstance.buildingTag;
+        gameObject.layer = gameInstance.buildingLayer;
+    }
+
     public override void OnSetup()
     {
         dataId.onChange += OnDataIdChange;
@@ -92,6 +91,13 @@ public sealed class BuildingEntity : RpgNetworkEntity, IBuildingSaveData
             buildingObject.CacheTransform.localPosition = Vector3.zero;
             buildingObject.CacheTransform.localRotation = Quaternion.identity;
             buildingObject.CacheTransform.localScale = Vector3.one;
+            buildingObject.gameObject.SetLayerRecursively(gameInstance.buildingLayer, true);
         }
+    }
+
+    public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId)
+    {
+        // TODO: Reduce current hp
+
     }
 }

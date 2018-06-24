@@ -16,6 +16,7 @@ public class BuildingMaterial : MonoBehaviour
     public Material[] cannotBuildMaterials;
     [HideInInspector]
     public BuildingObject buildingObject;
+    public BuildingEntity buildingEntity { get { return buildingObject == null ? null : buildingObject.buildingEntity; } }
 
     private Renderer meshRenderer;
 
