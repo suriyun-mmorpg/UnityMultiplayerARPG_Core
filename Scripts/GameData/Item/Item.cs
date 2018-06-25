@@ -34,6 +34,7 @@ public class Item : BaseGameData
     // Weapon
     public WeaponType weaponType;
     public DamageIncremental damageAmount;
+    public IncrementalMinMaxFloat harvestDamageAmount;
 
     // Equipment
     public EquipmentModel[] equipmentModels;
@@ -191,6 +192,14 @@ public struct ItemDrop
     public short amount;
     [Range(0f, 1f)]
     public float dropRate;
+}
+
+[System.Serializable]
+public struct ItemDropByWeight
+{
+    public Item item;
+    public short amount;
+    public int weight;
 }
 
 [System.Serializable]
