@@ -12,26 +12,32 @@ public struct HarvestEffectiveness
     public ItemDropByWeight[] items;
 }
 
+[RequireComponent(typeof(CapsuleCollider))]
 public sealed class HarvestableEntity : DamageableNetworkEntity
 {
-    [SerializeField]
-    private SyncFieldBool isHidding = new SyncFieldBool();
-
     public HarvestEffectiveness[] harvestEffectivenesses;
     public float respawnDuration = 10f;
     public int maxHp = 100;
+
+    [SerializeField]
+    private SyncFieldBool isHidding = new SyncFieldBool();
     private float deadTime;
 
     public bool IsHidding { get { return isHidding.Value; } set { isHidding.Value = value; } }
 
-    private Collider cacheCollider;
-    public Collider CacheCollider
+    public override string Title
+    {
+        get { return title; }
+    }
+
+    private CapsuleCollider cacheCapsuleCollider;
+    public CapsuleCollider CacheCapsuleCollider
     {
         get
         {
-            if (cacheCollider == null)
-                cacheCollider = GetComponent<Collider>();
-            return cacheCollider;
+            if (cacheCapsuleCollider == null)
+                cacheCapsuleCollider = GetComponent<CapsuleCollider>();
+            return cacheCapsuleCollider;
         }
     }
     private Dictionary<WeaponType, HarvestEffectiveness> cacheHarvestEffectivenesses;
@@ -94,8 +100,8 @@ public sealed class HarvestableEntity : DamageableNetworkEntity
         {
             renderer.enabled = !isHidding;
         }
-        if (CacheCollider != null)
-            CacheCollider.enabled = !isHidding;
+        if (CacheCapsuleCollider != null)
+            CacheCapsuleCollider.enabled = !isHidding;
     }
 
     protected override void Update()

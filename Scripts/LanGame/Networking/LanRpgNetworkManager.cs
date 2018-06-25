@@ -1,8 +1,8 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using LiteNetLibManager;
 using LiteNetLib;
 using LiteNetLib.Utils;
-using System.Threading.Tasks;
 
 public class LanRpgNetworkManager : BaseGameNetworkManager
 {
@@ -83,21 +83,27 @@ public class LanRpgNetworkManager : BaseGameNetworkManager
         {
             var worldSaveData = new WorldSaveData();
             worldSaveData.LoadPersistentData(playerCharacterEntity.Id, playerCharacterEntity.CurrentMapName);
-            foreach (var building in worldSaveData.buildings)
+            StartCoroutine(SpawnBuildings(worldSaveData));
+        }
+    }
+
+    IEnumerator SpawnBuildings(WorldSaveData worldSaveData)
+    {
+        yield return new WaitForSecondsRealtime(0.1f);
+        foreach (var building in worldSaveData.buildings)
+        {
+            // Instantiate building
+            BuildingObject buildingObject;
+            if (GameInstance.BuildingObjects.TryGetValue(building.DataId, out buildingObject))
             {
-                // Instantiate building
-                BuildingObject buildingObject;
-                if (GameInstance.BuildingObjects.TryGetValue(building.DataId, out buildingObject))
-                {
-                    var buildingIdentity = Assets.NetworkSpawn(gameInstance.buildingEntityPrefab.Identity, building.Position, building.Rotation);
-                    var buildingEntity = buildingIdentity.GetComponent<BuildingEntity>();
-                    buildingEntity.Id = building.Id;
-                    buildingEntity.ParentId = building.ParentId;
-                    buildingEntity.DataId = building.DataId;
-                    buildingEntity.CurrentHp = building.CurrentHp;
-                    buildingEntity.CreatorId = building.CreatorId;
-                    buildingEntity.CreatorName = building.CreatorName;
-                }
+                var buildingIdentity = Assets.NetworkSpawn(gameInstance.buildingEntityPrefab.Identity, building.Position, building.Rotation);
+                var buildingEntity = buildingIdentity.GetComponent<BuildingEntity>();
+                buildingEntity.Id = building.Id;
+                buildingEntity.ParentId = building.ParentId;
+                buildingEntity.DataId = building.DataId;
+                buildingEntity.CurrentHp = building.CurrentHp;
+                buildingEntity.CreatorId = building.CreatorId;
+                buildingEntity.CreatorName = building.CreatorName;
             }
         }
     }

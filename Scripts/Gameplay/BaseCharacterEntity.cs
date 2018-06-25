@@ -1221,8 +1221,13 @@ public abstract class BaseCharacterEntity : DamageableNetworkEntity, ICharacterD
     /// <param name="isHidding"></param>
     protected virtual void OnIsHiddingChange(bool isHidding)
     {
-        if (Model != null)
-            Model.gameObject.SetActive(!isHidding);
+        var renderers = GetComponentsInChildren<Renderer>();
+        foreach (var renderer in renderers)
+        {
+            renderer.enabled = !isHidding;
+        }
+        if (CacheCapsuleCollider != null)
+            CacheCapsuleCollider.enabled = !isHidding;
 
         if (onIsHiddingChange != null)
             onIsHiddingChange.Invoke(isHidding);

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using LiteNetLib;
 using LiteNetLibManager;
 
 public sealed class BuildingEntity : DamageableNetworkEntity, IBuildingSaveData
@@ -58,6 +59,11 @@ public sealed class BuildingEntity : DamageableNetworkEntity, IBuildingSaveData
     {
         get { return creatorName; }
         set { creatorName.Value = value; }
+    }
+
+    public override string Title
+    {
+        get { return buildingObject == null ? "Unknow" : buildingObject.title; }
     }
 
     protected override void Awake()

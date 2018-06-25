@@ -7,6 +7,7 @@ using UnityEditor;
 
 public class BuildingObject : MonoBehaviour
 {
+    public string title;
     [Header("Building Data")]
     [Tooltip("Type of building you can set it as Foundation, Wall, Door anything as you wish")]
     public string buildingType;

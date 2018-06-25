@@ -201,6 +201,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
                     var monsterEntity = hitTransform.GetComponent<MonsterCharacterEntity>();
                     var npcEntity = hitTransform.GetComponent<NpcEntity>();
                     var itemDropEntity = hitTransform.GetComponent<ItemDropEntity>();
+                    var harvestableEntity = hitTransform.GetComponent<HarvestableEntity>();
                     targetPosition = hit.point;
                     CharacterEntity.SetTargetEntity(null);
                     if (playerEntity != null && playerEntity.CurrentHp > 0)
@@ -229,6 +230,13 @@ public class PlayerCharacterController : BasePlayerCharacterController
                         targetPosition = itemDropEntity.CacheTransform.position;
                         targetIdentity = itemDropEntity.Identity;
                         CharacterEntity.SetTargetEntity(itemDropEntity);
+                        break;
+                    }
+                    else if (harvestableEntity != null && harvestableEntity.CurrentHp > 0)
+                    {
+                        targetPosition = harvestableEntity.CacheTransform.position;
+                        targetIdentity = harvestableEntity.Identity;
+                        CharacterEntity.SetTargetEntity(harvestableEntity);
                         break;
                     }
                 }
@@ -402,6 +410,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
         NpcEntity targetNpc;
         ItemDropEntity targetItemDrop;
         BuildingEntity targetBuilding;
+        HarvestableEntity targetHarvestable;
         if (TryGetAttackingCharacter(out targetEnemy))
         {
             if (targetEnemy.CurrentHp <= 0)
@@ -419,31 +428,10 @@ public class PlayerCharacterController : BasePlayerCharacterController
             }
 
             // Find attack distance and fov, from weapon or skill
-            var attackDistance = CharacterEntity.GetAttackDistance();
-            var attackFov = CharacterEntity.GetAttackFov();
-            if (queueUsingSkill.HasValue)
-            {
-                var queueUsingSkillValue = queueUsingSkill.Value;
-                var characterSkill = CharacterEntity.Skills[queueUsingSkillValue.skillIndex];
-                var skill = characterSkill.GetSkill();
-                if (skill != null)
-                {
-                    if (skill.IsAttack())
-                    {
-                        attackDistance = CharacterEntity.GetSkillAttackDistance(skill);
-                        attackFov = CharacterEntity.GetSkillAttackFov(skill);
-                    }
-                    else
-                    {
-                        // Stop movement to use non attack skill
-                        CharacterEntity.StopMove();
-                        RequestUsePendingSkill();
-                        return;
-                    }
-                }
-                else
-                    queueUsingSkill = null;
-            }
+            var attackDistance = 0f;
+            var attackFov = 0f;
+            if (!GetAttackDistanceAndFov(out attackDistance, out attackFov))
+                return;
             var actDistance = attackDistance;
             actDistance -= actDistance * 0.1f;
             actDistance -= StoppingDistance;
@@ -535,6 +523,37 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 if (uiCurrentBuilding != null && uiCurrentBuilding.IsVisible())
                     uiCurrentBuilding.Hide();
             }
+        }
+        else if (CharacterEntity.TryGetTargetEntity(out targetHarvestable))
+        {
+            if (targetHarvestable.CurrentHp <= 0)
+            {
+                queueUsingSkill = null;
+                CharacterEntity.SetTargetEntity(null);
+                CharacterEntity.StopMove();
+                return;
+            }
+
+            var attackDistance = 0f;
+            var attackFov = 0f;
+            if (!GetAttackDistanceAndFov(out attackDistance, out attackFov))
+                return;
+            var actDistance = attackDistance;
+            actDistance -= actDistance * 0.1f;
+            actDistance -= StoppingDistance;
+            actDistance += targetHarvestable.CacheCapsuleCollider.radius;
+            if (Vector3.Distance(CharacterTransform.position, targetHarvestable.CacheTransform.position) <= actDistance)
+            {
+                // Stop movement to attack
+                CharacterEntity.StopMove();
+                var halfFov = attackFov * 0.5f;
+                var targetDir = (CharacterTransform.position - targetHarvestable.CacheTransform.position).normalized;
+                var angle = Vector3.Angle(targetDir, CharacterTransform.forward);
+                if (angle < 180 + halfFov && angle > 180 - halfFov)
+                    RequestAttack();
+            }
+            else
+                UpdateTargetEntityPosition(targetEnemy);
         }
     }
 
@@ -769,5 +788,35 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 character = null;
         }
         return false;
+    }
+
+    public bool GetAttackDistanceAndFov(out float attackDistance, out float attackFov)
+    {
+        attackDistance = CharacterEntity.GetAttackDistance();
+        attackFov = CharacterEntity.GetAttackFov();
+        if (queueUsingSkill.HasValue)
+        {
+            var queueUsingSkillValue = queueUsingSkill.Value;
+            var characterSkill = CharacterEntity.Skills[queueUsingSkillValue.skillIndex];
+            var skill = characterSkill.GetSkill();
+            if (skill != null)
+            {
+                if (skill.IsAttack())
+                {
+                    attackDistance = CharacterEntity.GetSkillAttackDistance(skill);
+                    attackFov = CharacterEntity.GetSkillAttackFov(skill);
+                }
+                else
+                {
+                    // Stop movement to use non attack skill
+                    CharacterEntity.StopMove();
+                    RequestUsePendingSkill();
+                    return false;
+                }
+            }
+            else
+                queueUsingSkill = null;
+        }
+        return true;
     }
 }
