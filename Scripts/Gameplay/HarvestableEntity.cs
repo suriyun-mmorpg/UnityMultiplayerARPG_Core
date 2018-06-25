@@ -92,7 +92,12 @@ public sealed class HarvestableEntity : DamageableNetworkEntity
         isHidding.forOwnerOnly = false;
         isHidding.onChange += OnIsHiddingChange;
     }
-    
+
+    private void OnDestroy()
+    {
+        isHidding.onChange -= OnIsHiddingChange;
+    }
+
     private void OnIsHiddingChange(bool isHidding)
     {
         var renderers = GetComponentsInChildren<Renderer>();

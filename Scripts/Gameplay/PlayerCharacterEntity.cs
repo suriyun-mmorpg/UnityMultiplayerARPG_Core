@@ -453,11 +453,11 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         if (CurrentHp <= 0 || IsPlayingActionAnimation())
             return;
 
-        LiteNetLibIdentity entity;
-        if (!Manager.Assets.TryGetSpawnedObject(objectId, out entity))
+        LiteNetLibIdentity identity;
+        if (!Manager.Assets.TryGetSpawnedObject(objectId, out identity))
             return;
 
-        var npcEntity = entity.GetComponent<NpcEntity>();
+        var npcEntity = identity.GetComponent<NpcEntity>();
         if (npcEntity == null)
             return;
         
@@ -619,32 +619,43 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
             !GameInstance.BuildingObjects.TryGetValue(nonEquipItem.GetBuildingItem().buildingObject.DataId, out buildingObject) ||
             !this.DecreaseItemsByIndex(index, 1))
             return;
-
-        var buildingIdentity = Manager.Assets.NetworkSpawn(gameInstance.buildingEntityPrefab.Identity, position, rotation);
-        var buildingEntity = buildingIdentity.GetComponent<BuildingEntity>();
-        buildingEntity.Id = GenericUtils.GetUniqueId();
-        buildingEntity.ParentId = string.Empty;
-        LiteNetLibIdentity entity;
-        if (Manager.Assets.TryGetSpawnedObject(parentObjectId, out entity))
+        
+        var manager = Manager as BaseGameNetworkManager;
+        if (manager != null)
         {
-            var parentBuildingEntity = entity.GetComponent<BuildingEntity>();
-            if (parentBuildingEntity != null)
-                buildingEntity.ParentId = parentBuildingEntity.Id;
+            var buildingSaveData = new BuildingSaveData();
+            buildingSaveData.Id = GenericUtils.GetUniqueId();
+            buildingSaveData.ParentId = string.Empty;
+            LiteNetLibIdentity entity;
+            if (Manager.Assets.TryGetSpawnedObject(parentObjectId, out entity))
+            {
+                var parentBuildingEntity = entity.GetComponent<BuildingEntity>();
+                if (parentBuildingEntity != null)
+                    buildingSaveData.ParentId = parentBuildingEntity.Id;
+            }
+            buildingSaveData.DataId = buildingObject.DataId;
+            buildingSaveData.CurrentHp = buildingObject.maxHp;
+            buildingSaveData.Position = position;
+            buildingSaveData.Rotation = rotation;
+            buildingSaveData.CreatorId = Id;
+            buildingSaveData.CreatorName = CharacterName;
+            manager.CreateBuildingEntity(buildingSaveData, false);
         }
-        buildingEntity.DataId = buildingObject.DataId;
-        buildingEntity.CurrentHp = buildingObject.maxHp;
-        buildingEntity.CreatorId = Id;
-        buildingEntity.CreatorName = CharacterName;
     }
 
     protected void NetFuncDestroyBuild(uint objectId)
     {
-        LiteNetLibIdentity entity;
-        if (Manager.Assets.TryGetSpawnedObject(objectId, out entity))
+        if (CurrentHp <= 0 ||
+            IsPlayingActionAnimation())
+            return;
+
+        LiteNetLibIdentity identity;
+        if (Manager.Assets.TryGetSpawnedObject(objectId, out identity))
         {
-            var buildingEntity = entity.GetComponent<BuildingEntity>();
-            if (buildingEntity != null && buildingEntity.CreatorId.Equals(Id))
-                buildingEntity.NetworkDestroy();
+            var manager = Manager as BaseGameNetworkManager;
+            var buildingEntity = identity.GetComponent<BuildingEntity>();
+            if (buildingEntity != null && buildingEntity.CreatorId.Equals(Id) && manager != null)
+                manager.DestroyBuildingEntity(buildingEntity.Id);
         }
     }
     #endregion

@@ -14,6 +14,7 @@ public abstract class BaseGameNetworkManager : LiteNetLibGameManager
 
     protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
     protected readonly Dictionary<long, PlayerCharacterEntity> playerCharacters = new Dictionary<long, PlayerCharacterEntity>();
+    protected readonly Dictionary<string, BuildingEntity> buildingEntities = new Dictionary<string, BuildingEntity>();
     protected readonly Dictionary<string, NetPeer> peersByCharacterName = new Dictionary<string, NetPeer>();
     // Events
     public System.Action<ChatMessage> onReceiveChat;
@@ -193,13 +194,26 @@ public abstract class BaseGameNetworkManager : LiteNetLibGameManager
         playerCharacters.Remove(peer.ConnectId);
     }
 
-    public virtual void CreateBuildingEntity()
+    public virtual void CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
     {
-
+        var buildingIdentity = Assets.NetworkSpawn(gameInstance.buildingEntityPrefab.Identity, saveData.Position, saveData.Rotation);
+        var buildingEntity = buildingIdentity.GetComponent<BuildingEntity>();
+        buildingEntity.Id = saveData.Id;
+        buildingEntity.ParentId = saveData.ParentId;
+        buildingEntity.DataId = saveData.DataId;
+        buildingEntity.CurrentHp = saveData.CurrentHp;
+        buildingEntity.CreatorId = saveData.CreatorId;
+        buildingEntity.CreatorName = saveData.CreatorName;
+        buildingEntities[buildingEntity.Id] = buildingEntity;
     }
 
-    public virtual void DestroyBuildingEntity()
+    public virtual void DestroyBuildingEntity(string id)
     {
-
+        BuildingEntity entity;
+        if (buildingEntities.TryGetValue(id, out entity))
+        {
+            entity.NetworkDestroy();
+            buildingEntities.Remove(id);
+        }
     }
 }

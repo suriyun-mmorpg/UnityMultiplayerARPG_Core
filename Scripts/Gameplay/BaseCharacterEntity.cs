@@ -613,11 +613,11 @@ public abstract class BaseCharacterEntity : DamageableNetworkEntity, ICharacterD
         if (CurrentHp <= 0 || IsPlayingActionAnimation())
             return;
         
-        LiteNetLibIdentity entity;
-        if (!Manager.Assets.TryGetSpawnedObject(objectId, out entity))
+        LiteNetLibIdentity identity;
+        if (!Manager.Assets.TryGetSpawnedObject(objectId, out identity))
             return;
 
-        var itemDropEntity = entity.GetComponent<ItemDropEntity>();
+        var itemDropEntity = identity.GetComponent<ItemDropEntity>();
         if (itemDropEntity == null)
             return;
 
