@@ -161,6 +161,7 @@ public class GameInstance : MonoBehaviour
                 defaultWeaponItem.title = GameDataConst.DEFAULT_WEAPON_TITLE;
                 defaultWeaponItem.itemType = ItemType.Weapon;
                 defaultWeaponItem.weaponType = DefaultWeaponType;
+                // Default damage amount
                 var damageAmountMinMax = new IncrementalMinMaxFloat();
                 damageAmountMinMax.baseAmount = new MinMaxFloat() { min = 1, max = 1 };
                 damageAmountMinMax.amountIncreaseEachLevel = new MinMaxFloat() { min = 0, max = 0 };
@@ -168,7 +169,13 @@ public class GameInstance : MonoBehaviour
                 {
                     amount = damageAmountMinMax,
                 };
+                // Default harvest damage amount
+                var harvestDamageAmount = new IncrementalMinMaxFloat();
+                harvestDamageAmount.baseAmount = new MinMaxFloat() { min = 1, max = 1 };
+                harvestDamageAmount.amountIncreaseEachLevel = new MinMaxFloat() { min = 0, max = 0 };
+                // Set damage amount
                 defaultWeaponItem.damageAmount = damageAmount;
+                defaultWeaponItem.harvestDamageAmount = harvestDamageAmount;
             }
             return defaultWeaponItem;
         }

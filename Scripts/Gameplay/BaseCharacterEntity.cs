@@ -634,7 +634,7 @@ public abstract class BaseCharacterEntity : DamageableNetworkEntity, ICharacterD
         var itemDataId = itemDropData.dataId;
         var level = itemDropData.level;
         var amount = itemDropData.amount;
-        if (!IncreasingItemsWillOverwhelming(itemDataId, level, amount) && this.IncreaseItems(itemDataId, level, amount))
+        if (!IncreasingItemsWillOverwhelming(itemDataId, amount) && this.IncreaseItems(itemDataId, level, amount))
             itemDropEntity.NetworkDestroy();
     }
 
@@ -910,11 +910,11 @@ public abstract class BaseCharacterEntity : DamageableNetworkEntity, ICharacterD
     #endregion
 
     #region Inventory helpers
-    public bool IncreasingItemsWillOverwhelming(int itemDataId, short level, short amount)
+    public bool IncreasingItemsWillOverwhelming(int dataId, short amount)
     {
         Item itemData;
         // If item not valid
-        if (amount <= 0 || !GameInstance.Items.TryGetValue(itemDataId, out itemData))
+        if (amount <= 0 || !GameInstance.Items.TryGetValue(dataId, out itemData))
             return false;
 
         var weight = itemData.weight;
@@ -1038,11 +1038,10 @@ public abstract class BaseCharacterEntity : DamageableNetworkEntity, ICharacterD
 
     public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId)
     {
-        var calculatingTotalDamage = 0f;
         // Damage calculations apply at server only
         if (!IsServer || !CanReceiveDamageFrom(attacker) || CurrentHp <= 0)
             return;
-        
+
         // Calculate chance to hit
         var hitChance = gameInstance.GameplayRule.GetHitChance(attacker, this);
         // If miss, return don't calculate damages
@@ -1052,6 +1051,7 @@ public abstract class BaseCharacterEntity : DamageableNetworkEntity, ICharacterD
             return;
         }
         // Calculate damages
+        var calculatingTotalDamage = 0f;
         if (allDamageAmounts.Count > 0)
         {
             foreach (var allDamageAmount in allDamageAmounts)
@@ -1060,11 +1060,12 @@ public abstract class BaseCharacterEntity : DamageableNetworkEntity, ICharacterD
                 var damageAmount = allDamageAmount.Value;
                 if (hitEffectsId < 0 && damageElement != gameInstance.DefaultDamageElement)
                     hitEffectsId = damageElement.hitEffects.Id;
-                var receivingDamage = damageElement.GetDamageReducedByResistance(this, Random.Range(damageAmount.min, damageAmount.max));
+                var receivingDamage = damageElement.GetDamageReducedByResistance(this, damageAmount.Random());
                 if (receivingDamage > 0f)
                     calculatingTotalDamage += receivingDamage;
             }
         }
+        // Play hit effect
         if (hitEffectsId < 0)
             hitEffectsId = gameInstance.defaultHitEffects.Id;
         if (hitEffectsId >= 0)
@@ -1136,6 +1137,13 @@ public abstract class BaseCharacterEntity : DamageableNetworkEntity, ICharacterD
             Model.SetEquipWeapons(equipWeapons);
             Model.SetEquipItems(equipItems);
             Model.gameObject.SetActive(!isHidding.Value);
+            // Hidding an object when it's host and character over sight
+            if (IsServer && IsClient)
+            {
+                LiteNetLibPlayer serverPlayer;
+                if (Manager.Players.TryGetValue(Manager.Client.Peer.ConnectId, out serverPlayer) && !serverPlayer.SubscribingObjects.Contains(Identity))
+                    Identity.OnServerSubscribingRemoved();
+            }
         }
 
         if (onDataIdChange != null)
