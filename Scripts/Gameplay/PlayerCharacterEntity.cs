@@ -616,7 +616,8 @@ public class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
         if (!nonEquipItem.IsValid() || 
             nonEquipItem.GetBuildingItem() == null || 
             nonEquipItem.GetBuildingItem().buildingObject == null ||
-            !GameInstance.BuildingObjects.TryGetValue(nonEquipItem.GetBuildingItem().buildingObject.DataId, out buildingObject))
+            !GameInstance.BuildingObjects.TryGetValue(nonEquipItem.GetBuildingItem().buildingObject.DataId, out buildingObject) ||
+            !this.DecreaseItemsByIndex(index, 1))
             return;
 
         var buildingIdentity = Manager.Assets.NetworkSpawn(gameInstance.buildingEntityPrefab.Identity, position, rotation);
