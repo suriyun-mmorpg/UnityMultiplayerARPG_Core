@@ -5,252 +5,255 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public enum CombatAmountType : byte
+namespace MultiplayerARPG
 {
-    Miss,
-    NormalDamage,
-    CriticalDamage,
-    BlockedDamage,
-    HpRecovery,
-    MpRecovery,
-    StaminaRecovery,
-    FoodRecovery,
-    WaterRecovery,
-}
-
-public class UISceneGameplay : MonoBehaviour
-{
-    [System.Serializable]
-    public struct UIToggleUI
+    public enum CombatAmountType : byte
     {
-        public UIBase ui;
-        public KeyCode key;
+        Miss,
+        NormalDamage,
+        CriticalDamage,
+        BlockedDamage,
+        HpRecovery,
+        MpRecovery,
+        StaminaRecovery,
+        FoodRecovery,
+        WaterRecovery,
     }
 
-    public static UISceneGameplay Singleton { get; private set; }
-
-    public UICharacter[] uiCharacters;
-    public UICharacter uiTargetCharacter;
-    public UIEquipItems uiEquipItems;
-    public UINonEquipItems uiNonEquipItems;
-    public UICharacterSkills uiSkills;
-    public UICharacterHotkeys uiHotkeys;
-    public UICharacterQuests uiQuests;
-    public UINpcDialog uiNpcDialog;
-    public UIConstructBuilding uiConstructBuilding;
-    public UICurrentBuilding uiCurrentBuilding;
-    public UIToggleUI[] toggleUis;
-    public List<GameObject> ignorePointerDetectionUis;
-
-    [Header("Combat Text")]
-    public Transform combatTextTransform;
-    public UICombatText uiCombatTextMiss;
-    public UICombatText uiCombatTextNormalDamage;
-    public UICombatText uiCombatTextCriticalDamage;
-    public UICombatText uiCombatTextBlockedDamage;
-    public UICombatText uiCombatTextHpRecovery;
-    public UICombatText uiCombatTextMpRecovery;
-    public UICombatText uiCombatTextStaminaRecovery;
-    public UICombatText uiCombatTextFoodRecovery;
-    public UICombatText uiCombatTextWaterRecovery;
-
-    [Header("Events")]
-    public UnityEvent onCharacterDead;
-    public UnityEvent onCharacterRespawn;
-
-    #region Cache components
-    private BaseGameNetworkManager cacheGameNetworkManager;
-    public BaseGameNetworkManager CacheGameNetworkManager
+    public class UISceneGameplay : MonoBehaviour
     {
-        get
+        [System.Serializable]
+        public struct UIToggleUI
         {
-            if (cacheGameNetworkManager == null)
-                cacheGameNetworkManager = FindObjectOfType<BaseGameNetworkManager>();
-            return cacheGameNetworkManager;
-        }
-    }
-    #endregion
-
-    private void Awake()
-    {
-        Singleton = this;
-    }
-
-    private void Update()
-    {
-        var fields = FindObjectsOfType<InputField>();
-        foreach (var field in fields)
-        {
-            if (field.isFocused)
-                return;
+            public UIBase ui;
+            public KeyCode key;
         }
 
-        foreach (var toggleUi in toggleUis)
+        public static UISceneGameplay Singleton { get; private set; }
+
+        public UICharacter[] uiCharacters;
+        public UICharacter uiTargetCharacter;
+        public UIEquipItems uiEquipItems;
+        public UINonEquipItems uiNonEquipItems;
+        public UICharacterSkills uiSkills;
+        public UICharacterHotkeys uiHotkeys;
+        public UICharacterQuests uiQuests;
+        public UINpcDialog uiNpcDialog;
+        public UIConstructBuilding uiConstructBuilding;
+        public UICurrentBuilding uiCurrentBuilding;
+        public UIToggleUI[] toggleUis;
+        public List<GameObject> ignorePointerDetectionUis;
+
+        [Header("Combat Text")]
+        public Transform combatTextTransform;
+        public UICombatText uiCombatTextMiss;
+        public UICombatText uiCombatTextNormalDamage;
+        public UICombatText uiCombatTextCriticalDamage;
+        public UICombatText uiCombatTextBlockedDamage;
+        public UICombatText uiCombatTextHpRecovery;
+        public UICombatText uiCombatTextMpRecovery;
+        public UICombatText uiCombatTextStaminaRecovery;
+        public UICombatText uiCombatTextFoodRecovery;
+        public UICombatText uiCombatTextWaterRecovery;
+
+        [Header("Events")]
+        public UnityEvent onCharacterDead;
+        public UnityEvent onCharacterRespawn;
+
+        #region Cache components
+        private BaseGameNetworkManager cacheGameNetworkManager;
+        public BaseGameNetworkManager CacheGameNetworkManager
         {
-            if (Input.GetKeyDown(toggleUi.key))
+            get
             {
-                var ui = toggleUi.ui;
-                ui.Toggle();
+                if (cacheGameNetworkManager == null)
+                    cacheGameNetworkManager = FindObjectOfType<BaseGameNetworkManager>();
+                return cacheGameNetworkManager;
             }
         }
-    }
+        #endregion
 
-    public void UpdateCharacter()
-    {
-        foreach (var uiCharacter in uiCharacters)
+        private void Awake()
         {
-            if (uiCharacter != null)
-                uiCharacter.Data = BasePlayerCharacterController.OwningCharacter;
-        }
-    }
-
-    public void UpdateEquipItems()
-    {
-        if (uiEquipItems != null)
-            uiEquipItems.UpdateData(BasePlayerCharacterController.OwningCharacter);
-    }
-
-    public void UpdateNonEquipItems()
-    {
-        if (uiNonEquipItems != null)
-            uiNonEquipItems.UpdateData(BasePlayerCharacterController.OwningCharacter);
-    }
-
-    public void UpdateSkills()
-    {
-        if (uiSkills != null)
-            uiSkills.UpdateData(BasePlayerCharacterController.OwningCharacter);
-    }
-
-    public void UpdateHotkeys()
-    {
-        if (uiHotkeys != null)
-            uiHotkeys.UpdateData(BasePlayerCharacterController.OwningCharacter);
-    }
-
-    public void UpdateQuests()
-    {
-        if (uiQuests != null)
-            uiQuests.UpdateData(BasePlayerCharacterController.OwningCharacter);
-    }
-
-    public void SetTargetCharacter(BaseCharacterEntity character)
-    {
-        if (uiTargetCharacter == null)
-            return;
-
-        if (character == null || character.CurrentHp <= 0)
-        {
-            uiTargetCharacter.Hide();
-            return;
+            Singleton = this;
         }
 
-        uiTargetCharacter.Data = character;
-        uiTargetCharacter.Show();
-    }
-    
-    public void OnClickRespawn()
-    {
-        var owningCharacter = BasePlayerCharacterController.OwningCharacter;
-        if (owningCharacter != null)
-            owningCharacter.RequestRespawn();
-    }
-
-    public void OnClickExit()
-    {
-        CacheGameNetworkManager.StopHost();
-    }
-
-    public void OnCharacterDead(bool isInitialize)
-    {
-        onCharacterDead.Invoke();
-    }
-
-    public void OnCharacterRespawn(bool isInitialize)
-    {
-        onCharacterRespawn.Invoke();
-    }
-
-    public void OnShowNpcDialog(int npcDialogDataId)
-    {
-        if (uiNpcDialog == null)
-            return;
-        NpcDialog npcDialog;
-        if (!GameInstance.NpcDialogs.TryGetValue(npcDialogDataId, out npcDialog))
+        private void Update()
         {
-            uiNpcDialog.Hide();
-            return;
-        }
-        uiNpcDialog.Data = npcDialog;
-        uiNpcDialog.Show();
-    }
-
-    public bool IsPointerOverUIObject()
-    {
-        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
-        eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-        List<RaycastResult> results = new List<RaycastResult>();
-        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
-        // If it's not mobile ui, assume it's over UI
-        var overUI = false;
-        if (ignorePointerDetectionUis != null && ignorePointerDetectionUis.Count > 0)
-        {
-            foreach (var result in results)
+            var fields = FindObjectsOfType<InputField>();
+            foreach (var field in fields)
             {
-                if (!ignorePointerDetectionUis.Contains(result.gameObject))
+                if (field.isFocused)
+                    return;
+            }
+
+            foreach (var toggleUi in toggleUis)
+            {
+                if (Input.GetKeyDown(toggleUi.key))
                 {
-                    overUI = true;
-                    break;
+                    var ui = toggleUi.ui;
+                    ui.Toggle();
                 }
             }
         }
-        else
-            overUI = results.Count > 0;
-        return overUI;
-    }
 
-    public void SpawnCombatText(Transform followingTransform, CombatAmountType combatAmountType, int amount)
-    {
-        switch (combatAmountType)
+        public void UpdateCharacter()
         {
-            case CombatAmountType.Miss:
-                SpawnCombatText(followingTransform, uiCombatTextMiss, amount);
-                break;
-            case CombatAmountType.NormalDamage:
-                SpawnCombatText(followingTransform, uiCombatTextNormalDamage, amount);
-                break;
-            case CombatAmountType.CriticalDamage:
-                SpawnCombatText(followingTransform, uiCombatTextCriticalDamage, amount);
-                break;
-            case CombatAmountType.BlockedDamage:
-                SpawnCombatText(followingTransform, uiCombatTextBlockedDamage, amount);
-                break;
-            case CombatAmountType.HpRecovery:
-                SpawnCombatText(followingTransform, uiCombatTextHpRecovery, amount);
-                break;
-            case CombatAmountType.MpRecovery:
-                SpawnCombatText(followingTransform, uiCombatTextMpRecovery, amount);
-                break;
-            case CombatAmountType.StaminaRecovery:
-                SpawnCombatText(followingTransform, uiCombatTextStaminaRecovery, amount);
-                break;
-            case CombatAmountType.FoodRecovery:
-                SpawnCombatText(followingTransform, uiCombatTextFoodRecovery, amount);
-                break;
-            case CombatAmountType.WaterRecovery:
-                SpawnCombatText(followingTransform, uiCombatTextWaterRecovery, amount);
-                break;
+            foreach (var uiCharacter in uiCharacters)
+            {
+                if (uiCharacter != null)
+                    uiCharacter.Data = BasePlayerCharacterController.OwningCharacter;
+            }
         }
-    }
 
-    public void SpawnCombatText(Transform followingTransform, UICombatText prefab, int amount)
-    {
-        if (combatTextTransform != null && prefab != null)
+        public void UpdateEquipItems()
         {
-            var combatText = Instantiate(prefab, combatTextTransform);
-            combatText.transform.localScale = Vector3.one;
-            combatText.CacheObjectFollower.TargetObject = followingTransform;
-            combatText.Amount = amount;
+            if (uiEquipItems != null)
+                uiEquipItems.UpdateData(BasePlayerCharacterController.OwningCharacter);
+        }
+
+        public void UpdateNonEquipItems()
+        {
+            if (uiNonEquipItems != null)
+                uiNonEquipItems.UpdateData(BasePlayerCharacterController.OwningCharacter);
+        }
+
+        public void UpdateSkills()
+        {
+            if (uiSkills != null)
+                uiSkills.UpdateData(BasePlayerCharacterController.OwningCharacter);
+        }
+
+        public void UpdateHotkeys()
+        {
+            if (uiHotkeys != null)
+                uiHotkeys.UpdateData(BasePlayerCharacterController.OwningCharacter);
+        }
+
+        public void UpdateQuests()
+        {
+            if (uiQuests != null)
+                uiQuests.UpdateData(BasePlayerCharacterController.OwningCharacter);
+        }
+
+        public void SetTargetCharacter(BaseCharacterEntity character)
+        {
+            if (uiTargetCharacter == null)
+                return;
+
+            if (character == null || character.CurrentHp <= 0)
+            {
+                uiTargetCharacter.Hide();
+                return;
+            }
+
+            uiTargetCharacter.Data = character;
+            uiTargetCharacter.Show();
+        }
+
+        public void OnClickRespawn()
+        {
+            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            if (owningCharacter != null)
+                owningCharacter.RequestRespawn();
+        }
+
+        public void OnClickExit()
+        {
+            CacheGameNetworkManager.StopHost();
+        }
+
+        public void OnCharacterDead(bool isInitialize)
+        {
+            onCharacterDead.Invoke();
+        }
+
+        public void OnCharacterRespawn(bool isInitialize)
+        {
+            onCharacterRespawn.Invoke();
+        }
+
+        public void OnShowNpcDialog(int npcDialogDataId)
+        {
+            if (uiNpcDialog == null)
+                return;
+            NpcDialog npcDialog;
+            if (!GameInstance.NpcDialogs.TryGetValue(npcDialogDataId, out npcDialog))
+            {
+                uiNpcDialog.Hide();
+                return;
+            }
+            uiNpcDialog.Data = npcDialog;
+            uiNpcDialog.Show();
+        }
+
+        public bool IsPointerOverUIObject()
+        {
+            PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+            eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+            List<RaycastResult> results = new List<RaycastResult>();
+            EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+            // If it's not mobile ui, assume it's over UI
+            var overUI = false;
+            if (ignorePointerDetectionUis != null && ignorePointerDetectionUis.Count > 0)
+            {
+                foreach (var result in results)
+                {
+                    if (!ignorePointerDetectionUis.Contains(result.gameObject))
+                    {
+                        overUI = true;
+                        break;
+                    }
+                }
+            }
+            else
+                overUI = results.Count > 0;
+            return overUI;
+        }
+
+        public void SpawnCombatText(Transform followingTransform, CombatAmountType combatAmountType, int amount)
+        {
+            switch (combatAmountType)
+            {
+                case CombatAmountType.Miss:
+                    SpawnCombatText(followingTransform, uiCombatTextMiss, amount);
+                    break;
+                case CombatAmountType.NormalDamage:
+                    SpawnCombatText(followingTransform, uiCombatTextNormalDamage, amount);
+                    break;
+                case CombatAmountType.CriticalDamage:
+                    SpawnCombatText(followingTransform, uiCombatTextCriticalDamage, amount);
+                    break;
+                case CombatAmountType.BlockedDamage:
+                    SpawnCombatText(followingTransform, uiCombatTextBlockedDamage, amount);
+                    break;
+                case CombatAmountType.HpRecovery:
+                    SpawnCombatText(followingTransform, uiCombatTextHpRecovery, amount);
+                    break;
+                case CombatAmountType.MpRecovery:
+                    SpawnCombatText(followingTransform, uiCombatTextMpRecovery, amount);
+                    break;
+                case CombatAmountType.StaminaRecovery:
+                    SpawnCombatText(followingTransform, uiCombatTextStaminaRecovery, amount);
+                    break;
+                case CombatAmountType.FoodRecovery:
+                    SpawnCombatText(followingTransform, uiCombatTextFoodRecovery, amount);
+                    break;
+                case CombatAmountType.WaterRecovery:
+                    SpawnCombatText(followingTransform, uiCombatTextWaterRecovery, amount);
+                    break;
+            }
+        }
+
+        public void SpawnCombatText(Transform followingTransform, UICombatText prefab, int amount)
+        {
+            if (combatTextTransform != null && prefab != null)
+            {
+                var combatText = Instantiate(prefab, combatTextTransform);
+                combatText.transform.localScale = Vector3.one;
+                combatText.CacheObjectFollower.TargetObject = followingTransform;
+                combatText.Amount = amount;
+            }
         }
     }
 }

@@ -2,19 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UICurrentBuilding : UIBase
+namespace MultiplayerARPG
 {
-    public void OnClickDestroy()
+    public class UICurrentBuilding : UIBase
     {
-        var controller = BasePlayerCharacterController.Singleton;
-        if (controller != null)
-            controller.DestroyBuilding();
-    }
+        public void OnClickDestroy()
+        {
+            var controller = BasePlayerCharacterController.Singleton;
+            if (controller != null)
+                controller.DestroyBuilding();
+        }
 
-    public void OnClickDeselect()
-    {
-        var controller = BasePlayerCharacterController.Singleton;
-        if (controller != null)
-            controller.DeselectBuilding();
+        public void OnClickDeselect()
+        {
+            var controller = BasePlayerCharacterController.Singleton;
+            if (controller != null)
+                controller.DeselectBuilding();
+        }
     }
 }

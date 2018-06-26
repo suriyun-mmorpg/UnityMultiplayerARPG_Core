@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 
-[System.Serializable]
-public struct UIResistanceTextPair
+namespace MultiplayerARPG
 {
-    public DamageElement damageElement;
-    public Text text;
+    [System.Serializable]
+    public struct UIResistanceTextPair
+    {
+        public DamageElement damageElement;
+        public Text text;
+    }
 }

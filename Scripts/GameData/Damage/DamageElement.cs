@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "DamageElement", menuName = "Create GameData/DamageElement")]
-public class DamageElement : BaseGameData
+namespace MultiplayerARPG
 {
-    [Range(0f, 1f)]
-    public float maxResistanceAmount;
-    public GameEffectCollection hitEffects;
-
-    public float GetDamageReducedByResistance(BaseCharacterEntity damageReceiver, float damageAmount)
+    [CreateAssetMenu(fileName = "DamageElement", menuName = "Create GameData/DamageElement")]
+    public class DamageElement : BaseGameData
     {
-        return gameInstance.GameplayRule.GetDamageReducedByResistance(damageReceiver, damageAmount, this);
+        [Range(0f, 1f)]
+        public float maxResistanceAmount;
+        public GameEffectCollection hitEffects;
+
+        public float GetDamageReducedByResistance(BaseCharacterEntity damageReceiver, float damageAmount)
+        {
+            return gameInstance.GameplayRule.GetDamageReducedByResistance(damageReceiver, damageAmount, this);
+        }
     }
 }

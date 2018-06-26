@@ -4,40 +4,43 @@ using UnityEngine;
 using UnityEngine.UI;
 using LiteNetLibManager;
 
-public class RpgNetworkEntity : LiteNetLibBehaviour
+namespace MultiplayerARPG
 {
-    public string title;
-    public Text textTitle;
-
-    public virtual string Title { get { return title; } }
-    protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
-
-    private Transform cacheTransform;
-    public Transform CacheTransform
+    public class RpgNetworkEntity : LiteNetLibBehaviour
     {
-        get
+        public string title;
+        public Text textTitle;
+
+        public virtual string Title { get { return title; } }
+        protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
+
+        private Transform cacheTransform;
+        public Transform CacheTransform
         {
-            if (cacheTransform == null)
-                cacheTransform = GetComponent<Transform>();
-            return cacheTransform;
+            get
+            {
+                if (cacheTransform == null)
+                    cacheTransform = GetComponent<Transform>();
+                return cacheTransform;
+            }
         }
+
+        protected virtual void Awake() { }
+
+        protected virtual void Start() { }
+
+        protected virtual void OnEnable() { }
+
+        protected virtual void OnDisable() { }
+
+        protected virtual void Update() { }
+
+        protected virtual void LateUpdate()
+        {
+            if (textTitle != null)
+                textTitle.text = Title;
+        }
+
+        protected virtual void FixedUpdate() { }
     }
-    
-    protected virtual void Awake() { }
-
-    protected virtual void Start() { }
-
-    protected virtual void OnEnable() { }
-
-    protected virtual void OnDisable() { }
-
-    protected virtual void Update() { }
-
-    protected virtual void LateUpdate()
-    {
-        if (textTitle != null)
-            textTitle.text = Title;
-    }
-
-    protected virtual void FixedUpdate() { }
 }

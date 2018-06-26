@@ -2,19 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIConstructBuilding : UIBase
+namespace MultiplayerARPG
 {
-    public void OnClickConfirmBuild()
+    public class UIConstructBuilding : UIBase
     {
-        var controller = BasePlayerCharacterController.Singleton;
-        if (controller != null)
-            controller.ConfirmBuild();
-    }
+        public void OnClickConfirmBuild()
+        {
+            var controller = BasePlayerCharacterController.Singleton;
+            if (controller != null)
+                controller.ConfirmBuild();
+        }
 
-    public void OnClickCancelBuild()
-    {
-        var controller = BasePlayerCharacterController.Singleton;
-        if (controller != null)
-            controller.CancelBuild();
+        public void OnClickCancelBuild()
+        {
+            var controller = BasePlayerCharacterController.Singleton;
+            if (controller != null)
+                controller.CancelBuild();
+        }
     }
 }

@@ -4,59 +4,62 @@ using UnityEngine;
 using UnityEngine.UI;
 using LiteNetLibManager;
 
-public class UINetworkSceneLoading : MonoBehaviour
+namespace MultiplayerARPG
 {
-    public static UINetworkSceneLoading Singleton { get; private set; }
-    public GameObject rootObject;
-    public Text textProgress;
-    public Image imageGage;
-
-    private void Awake()
+    public class UINetworkSceneLoading : MonoBehaviour
     {
-        if (Singleton != null)
+        public static UINetworkSceneLoading Singleton { get; private set; }
+        public GameObject rootObject;
+        public Text textProgress;
+        public Image imageGage;
+
+        private void Awake()
         {
-            Destroy(gameObject);
-            return;
+            if (Singleton != null)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            DontDestroyOnLoad(gameObject);
+            Singleton = this;
+
+            if (rootObject != null)
+                rootObject.SetActive(false);
         }
 
-        DontDestroyOnLoad(gameObject);
-        Singleton = this;
+        public void OnLoadSceneStart(string sceneName, bool isOnline, float progress)
+        {
+            if (rootObject != null)
+                rootObject.SetActive(true);
+            if (textProgress != null)
+                textProgress.text = "0.00%";
+            if (imageGage != null)
+                imageGage.fillAmount = 0;
+        }
 
-        if (rootObject != null)
-            rootObject.SetActive(false);
-    }
+        public void OnLoadSceneProgress(string sceneName, bool isOnline, float progress)
+        {
+            if (textProgress != null)
+                textProgress.text = (progress * 100f).ToString("N2") + "%";
+            if (imageGage != null)
+                imageGage.fillAmount = progress;
+        }
 
-    public void OnLoadSceneStart(string sceneName, bool isOnline, float progress)
-    {
-        if (rootObject != null)
-            rootObject.SetActive(true);
-        if (textProgress != null)
-            textProgress.text = "0.00%";
-        if (imageGage != null)
-            imageGage.fillAmount = 0;
-    }
+        public void OnLoadSceneFinish(string sceneName, bool isOnline, float progress)
+        {
+            StartCoroutine(OnLoadSceneFinishRoutine());
+        }
 
-    public void OnLoadSceneProgress(string sceneName, bool isOnline, float progress)
-    {
-        if (textProgress != null)
-            textProgress.text = (progress * 100f).ToString("N2") + "%";
-        if (imageGage != null)
-            imageGage.fillAmount = progress;
-    }
-
-    public void OnLoadSceneFinish(string sceneName, bool isOnline, float progress)
-    {
-        StartCoroutine(OnLoadSceneFinishRoutine());
-    }
-
-    IEnumerator OnLoadSceneFinishRoutine()
-    {
-        if (textProgress != null)
-            textProgress.text = "100.00%";
-        if (imageGage != null)
-            imageGage.fillAmount = 1;
-        yield return new WaitForSecondsRealtime(0.25f);
-        if (rootObject != null)
-            rootObject.SetActive(false);
+        IEnumerator OnLoadSceneFinishRoutine()
+        {
+            if (textProgress != null)
+                textProgress.text = "100.00%";
+            if (imageGage != null)
+                imageGage.fillAmount = 1;
+            yield return new WaitForSecondsRealtime(0.25f);
+            if (rootObject != null)
+                rootObject.SetActive(false);
+        }
     }
 }

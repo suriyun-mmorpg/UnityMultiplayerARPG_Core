@@ -2,17 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BuildingArea : MonoBehaviour
+namespace MultiplayerARPG
 {
-    public string buildingType;
-    public bool snapBuildingObject;
-
-    [HideInInspector]
-    public BuildingObject buildingObject;
-    public BuildingEntity buildingEntity { get { return buildingObject == null ? null : buildingObject.buildingEntity; } }
-
-    public uint EntityObjectId
+    public class BuildingArea : MonoBehaviour
     {
-        get { return buildingObject == null ? 0 : buildingObject.EntityObjectId; }
+        public string buildingType;
+        public bool snapBuildingObject;
+
+        [HideInInspector]
+        public BuildingObject buildingObject;
+        public BuildingEntity buildingEntity { get { return buildingObject == null ? null : buildingObject.buildingEntity; } }
+
+        public uint EntityObjectId
+        {
+            get { return buildingObject == null ? 0 : buildingObject.EntityObjectId; }
+        }
     }
 }

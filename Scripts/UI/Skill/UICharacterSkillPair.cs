@@ -1,9 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-[System.Serializable]
-public struct UICharacterSkillPair
+namespace MultiplayerARPG
 {
-    public Skill skill;
-    public UICharacterSkill ui;
+    [System.Serializable]
+    public struct UICharacterSkillPair
+    {
+        public Skill skill;
+        public UICharacterSkill ui;
+    }
 }

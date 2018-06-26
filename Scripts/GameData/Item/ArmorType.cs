@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "ArmorType", menuName = "Create GameData/ArmorType")]
-public class ArmorType : BaseGameData
+namespace MultiplayerARPG
 {
+    [CreateAssetMenu(fileName = "ArmorType", menuName = "Create GameData/ArmorType")]
+    public class ArmorType : BaseGameData
+    {
+    }
 }

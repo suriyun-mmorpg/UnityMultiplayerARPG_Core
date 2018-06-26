@@ -1,11 +1,14 @@
-﻿[System.Serializable]
-public struct IncrementalInt
+﻿namespace MultiplayerARPG
 {
-    public int baseAmount;
-    public float amountIncreaseEachLevel;
-
-    public int GetAmount(short level)
+    [System.Serializable]
+    public struct IncrementalInt
     {
-        return baseAmount + (int)(amountIncreaseEachLevel * (level - 1));
+        public int baseAmount;
+        public float amountIncreaseEachLevel;
+
+        public int GetAmount(short level)
+        {
+            return baseAmount + (int)(amountIncreaseEachLevel * (level - 1));
+        }
     }
 }

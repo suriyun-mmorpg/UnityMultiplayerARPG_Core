@@ -1,9 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-[System.Serializable]
-public struct UICharacterItemPair
+namespace MultiplayerARPG
 {
-    public ArmorType armorType;
-    public UICharacterItem ui;
+    [System.Serializable]
+    public struct UICharacterItemPair
+    {
+        public ArmorType armorType;
+        public UICharacterItem ui;
+    }
 }

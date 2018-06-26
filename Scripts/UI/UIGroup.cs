@@ -2,25 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIGroup : UIBase
+namespace MultiplayerARPG
 {
-    public UIBase[] subSet;
-
-    public override void Show()
+    public class UIGroup : UIBase
     {
-        foreach (var entry in subSet)
-        {
-            entry.Show();
-        }
-        base.Show();
-    }
+        public UIBase[] subSet;
 
-    public override void Hide()
-    {
-        foreach (var entry in subSet)
+        public override void Show()
         {
-            entry.Hide();
+            foreach (var entry in subSet)
+            {
+                entry.Show();
+            }
+            base.Show();
         }
-        base.Hide();
+
+        public override void Hide()
+        {
+            foreach (var entry in subSet)
+            {
+                entry.Hide();
+            }
+            base.Hide();
+        }
     }
 }

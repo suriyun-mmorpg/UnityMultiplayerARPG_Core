@@ -2,22 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CollisionIgnore : MonoBehaviour
+namespace MultiplayerARPG
 {
-    public CollisionIgnoreOption[] ignoreOptions;
-    private void Awake()
+    public class CollisionIgnore : MonoBehaviour
     {
-        foreach (var ignoreOption in ignoreOptions)
+        public CollisionIgnoreOption[] ignoreOptions;
+        private void Awake()
         {
-            Physics.IgnoreLayerCollision(ignoreOption.layer1.LayerIndex, ignoreOption.layer2.LayerIndex, ignoreOption.ignore);
+            foreach (var ignoreOption in ignoreOptions)
+            {
+                Physics.IgnoreLayerCollision(ignoreOption.layer1.LayerIndex, ignoreOption.layer2.LayerIndex, ignoreOption.ignore);
+            }
         }
     }
-}
 
-[System.Serializable]
-public struct CollisionIgnoreOption
-{
-    public UnityLayer layer1;
-    public UnityLayer layer2;
-    public bool ignore;
+    [System.Serializable]
+    public struct CollisionIgnoreOption
+    {
+        public UnityLayer layer1;
+        public UnityLayer layer2;
+        public bool ignore;
+    }
 }

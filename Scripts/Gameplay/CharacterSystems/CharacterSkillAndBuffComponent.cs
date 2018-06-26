@@ -2,69 +2,72 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CharacterSkillAndBuffComponent : BaseCharacterComponent
+namespace MultiplayerARPG
 {
-    public const float SKILL_BUFF_UPDATE_DURATION = 0.5f;
-
-    #region Buff System Data
-    [HideInInspector, System.NonSerialized]
-    public float skillBuffUpdateDeltaTime;
-    #endregion
-
-    private CharacterRecoveryComponent cacheCharacterRecovery;
-    public CharacterRecoveryComponent CacheCharacterRecovery
+    public class CharacterSkillAndBuffComponent : BaseCharacterComponent
     {
-        get
+        public const float SKILL_BUFF_UPDATE_DURATION = 0.5f;
+
+        #region Buff System Data
+        [HideInInspector, System.NonSerialized]
+        public float skillBuffUpdateDeltaTime;
+        #endregion
+
+        private CharacterRecoveryComponent cacheCharacterRecovery;
+        public CharacterRecoveryComponent CacheCharacterRecovery
         {
-            if (cacheCharacterRecovery == null)
-                cacheCharacterRecovery = GetComponent<CharacterRecoveryComponent>();
-            return cacheCharacterRecovery;
+            get
+            {
+                if (cacheCharacterRecovery == null)
+                    cacheCharacterRecovery = GetComponent<CharacterRecoveryComponent>();
+                return cacheCharacterRecovery;
+            }
         }
-    }
 
-    protected void Update()
-    {
-        var deltaTime = Time.unscaledDeltaTime;
-        UpdateSkillAndBuff(deltaTime, this, CacheCharacterRecovery, CacheCharacterEntity);
-    }
-
-    protected static void UpdateSkillAndBuff(float deltaTime, CharacterSkillAndBuffComponent skillAndBuffData, CharacterRecoveryComponent recoveryData, BaseCharacterEntity characterEntity)
-    {
-        if (characterEntity.isRecaching || characterEntity.CurrentHp <= 0 || !characterEntity.IsServer)
-            return;
-
-        skillAndBuffData.skillBuffUpdateDeltaTime += deltaTime;
-        if (skillAndBuffData.skillBuffUpdateDeltaTime >= SKILL_BUFF_UPDATE_DURATION)
+        protected void Update()
         {
-            var count = characterEntity.Skills.Count;
-            for (var i = count - 1; i >= 0; --i)
+            var deltaTime = Time.unscaledDeltaTime;
+            UpdateSkillAndBuff(deltaTime, this, CacheCharacterRecovery, CacheCharacterEntity);
+        }
+
+        protected static void UpdateSkillAndBuff(float deltaTime, CharacterSkillAndBuffComponent skillAndBuffData, CharacterRecoveryComponent recoveryData, BaseCharacterEntity characterEntity)
+        {
+            if (characterEntity.isRecaching || characterEntity.CurrentHp <= 0 || !characterEntity.IsServer)
+                return;
+
+            skillAndBuffData.skillBuffUpdateDeltaTime += deltaTime;
+            if (skillAndBuffData.skillBuffUpdateDeltaTime >= SKILL_BUFF_UPDATE_DURATION)
             {
-                var skill = characterEntity.Skills[i];
-                if (skill.ShouldUpdate())
+                var count = characterEntity.Skills.Count;
+                for (var i = count - 1; i >= 0; --i)
                 {
-                    skill.Update(skillAndBuffData.skillBuffUpdateDeltaTime);
-                    characterEntity.Skills[i] = skill;
+                    var skill = characterEntity.Skills[i];
+                    if (skill.ShouldUpdate())
+                    {
+                        skill.Update(skillAndBuffData.skillBuffUpdateDeltaTime);
+                        characterEntity.Skills[i] = skill;
+                    }
                 }
-            }
-            count = characterEntity.Buffs.Count;
-            for (var i = count - 1; i >= 0; --i)
-            {
-                var buff = characterEntity.Buffs[i];
-                var duration = buff.GetDuration();
-                if (buff.ShouldRemove())
-                    characterEntity.Buffs.RemoveAt(i);
-                else
+                count = characterEntity.Buffs.Count;
+                for (var i = count - 1; i >= 0; --i)
                 {
-                    buff.Update(skillAndBuffData.skillBuffUpdateDeltaTime);
-                    characterEntity.Buffs[i] = buff;
+                    var buff = characterEntity.Buffs[i];
+                    var duration = buff.GetDuration();
+                    if (buff.ShouldRemove())
+                        characterEntity.Buffs.RemoveAt(i);
+                    else
+                    {
+                        buff.Update(skillAndBuffData.skillBuffUpdateDeltaTime);
+                        characterEntity.Buffs[i] = buff;
+                    }
+                    recoveryData.recoveryingHp += duration > 0f ? (float)buff.GetBuffRecoveryHp() / duration * skillAndBuffData.skillBuffUpdateDeltaTime : 0f;
+                    recoveryData.recoveryingMp += duration > 0f ? (float)buff.GetBuffRecoveryMp() / duration * skillAndBuffData.skillBuffUpdateDeltaTime : 0f;
+                    recoveryData.recoveryingStamina += duration > 0f ? (float)buff.GetBuffRecoveryStamina() / duration * skillAndBuffData.skillBuffUpdateDeltaTime : 0f;
+                    recoveryData.recoveryingFood += duration > 0f ? (float)buff.GetBuffRecoveryFood() / duration * skillAndBuffData.skillBuffUpdateDeltaTime : 0f;
+                    recoveryData.recoveryingWater += duration > 0f ? (float)buff.GetBuffRecoveryWater() / duration * skillAndBuffData.skillBuffUpdateDeltaTime : 0f;
                 }
-                recoveryData.recoveryingHp += duration > 0f ? (float)buff.GetBuffRecoveryHp() / duration * skillAndBuffData.skillBuffUpdateDeltaTime : 0f;
-                recoveryData.recoveryingMp += duration > 0f ? (float)buff.GetBuffRecoveryMp() / duration * skillAndBuffData.skillBuffUpdateDeltaTime : 0f;
-                recoveryData.recoveryingStamina += duration > 0f ? (float)buff.GetBuffRecoveryStamina() / duration * skillAndBuffData.skillBuffUpdateDeltaTime : 0f;
-                recoveryData.recoveryingFood += duration > 0f ? (float)buff.GetBuffRecoveryFood() / duration * skillAndBuffData.skillBuffUpdateDeltaTime : 0f;
-                recoveryData.recoveryingWater += duration > 0f ? (float)buff.GetBuffRecoveryWater() / duration * skillAndBuffData.skillBuffUpdateDeltaTime : 0f;
+                skillAndBuffData.skillBuffUpdateDeltaTime = 0;
             }
-            skillAndBuffData.skillBuffUpdateDeltaTime = 0;
         }
     }
 }

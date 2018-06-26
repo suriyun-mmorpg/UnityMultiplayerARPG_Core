@@ -2,99 +2,102 @@
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
+namespace MultiplayerARPG
 {
-    public int indexOfData { get; protected set; }
-    public KeyCode key;
-    public UICharacterSkill uiCharacterSkill;
-    public UICharacterItem uiCharacterItem;
-    public UICharacterHotkeyAssigner uiAssigner;
-    
-    public void Setup(CharacterHotkey data, int indexOfData)
+    public class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
     {
-        this.indexOfData = indexOfData;
-        Data = data;
-    }
+        public int indexOfData { get; protected set; }
+        public KeyCode key;
+        public UICharacterSkill uiCharacterSkill;
+        public UICharacterItem uiCharacterItem;
+        public UICharacterHotkeyAssigner uiAssigner;
 
-    protected void Update()
-    {
-        if (Input.GetKeyDown(key))
+        public void Setup(CharacterHotkey data, int indexOfData)
         {
-            bool canUse = true;
-            var fields = FindObjectsOfType<InputField>();
-            foreach (var field in fields)
-            {
-                if (field.isFocused)
-                {
-                    canUse = false;
-                    break;
-                }
-            }
-            if (canUse)
-                OnClickUse();
+            this.indexOfData = indexOfData;
+            Data = data;
         }
-    }
 
-    protected override void UpdateData()
-    {
-        var characterHotkey = Data;
-        var skill = characterHotkey.GetSkill();
-        var item = characterHotkey.GetItem();
-
-        var owningCharacter = BasePlayerCharacterController.OwningCharacter;
-        if (uiCharacterSkill != null)
+        protected void Update()
         {
-            if (skill == null)
-                uiCharacterSkill.Hide();
-            else
+            if (Input.GetKeyDown(key))
             {
-                var index = owningCharacter.IndexOfSkill(characterHotkey.dataId);
-                if (index >= 0 && index < owningCharacter.Skills.Count)
+                bool canUse = true;
+                var fields = FindObjectsOfType<InputField>();
+                foreach (var field in fields)
                 {
-                    var characterSkill = owningCharacter.Skills[index];
-                    uiCharacterSkill.Setup(new CharacterSkillLevelTuple(characterSkill, characterSkill.level), owningCharacter, index);
-                    uiCharacterSkill.Show();
+                    if (field.isFocused)
+                    {
+                        canUse = false;
+                        break;
+                    }
                 }
-                else
+                if (canUse)
+                    OnClickUse();
+            }
+        }
+
+        protected override void UpdateData()
+        {
+            var characterHotkey = Data;
+            var skill = characterHotkey.GetSkill();
+            var item = characterHotkey.GetItem();
+
+            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            if (uiCharacterSkill != null)
+            {
+                if (skill == null)
                     uiCharacterSkill.Hide();
-            }
-        }
-
-        if (uiCharacterItem != null)
-        {
-            if (item == null)
-                uiCharacterItem.Hide();
-            else
-            {
-                var index = owningCharacter.IndexOfNonEquipItem(characterHotkey.dataId);
-                if (index >= 0 && index < owningCharacter.NonEquipItems.Count)
-                {
-                    var characterItem = owningCharacter.NonEquipItems[index];
-                    uiCharacterItem.Setup(new CharacterItemLevelTuple(characterItem, characterItem.level), owningCharacter, index, string.Empty);
-                    uiCharacterItem.Show();
-                }
                 else
+                {
+                    var index = owningCharacter.IndexOfSkill(characterHotkey.dataId);
+                    if (index >= 0 && index < owningCharacter.Skills.Count)
+                    {
+                        var characterSkill = owningCharacter.Skills[index];
+                        uiCharacterSkill.Setup(new CharacterSkillLevelTuple(characterSkill, characterSkill.level), owningCharacter, index);
+                        uiCharacterSkill.Show();
+                    }
+                    else
+                        uiCharacterSkill.Hide();
+                }
+            }
+
+            if (uiCharacterItem != null)
+            {
+                if (item == null)
                     uiCharacterItem.Hide();
+                else
+                {
+                    var index = owningCharacter.IndexOfNonEquipItem(characterHotkey.dataId);
+                    if (index >= 0 && index < owningCharacter.NonEquipItems.Count)
+                    {
+                        var characterItem = owningCharacter.NonEquipItems[index];
+                        uiCharacterItem.Setup(new CharacterItemLevelTuple(characterItem, characterItem.level), owningCharacter, index, string.Empty);
+                        uiCharacterItem.Show();
+                    }
+                    else
+                        uiCharacterItem.Hide();
+                }
             }
         }
-    }
 
-    public void OnClickAssign()
-    {
-        if (uiAssigner != null)
+        public void OnClickAssign()
         {
-            uiAssigner.Setup(Data.hotkeyId);
-            uiAssigner.Show();
+            if (uiAssigner != null)
+            {
+                uiAssigner.Setup(Data.hotkeyId);
+                uiAssigner.Show();
+            }
+        }
+
+        public void OnClickUse()
+        {
+            var owningCharacterController = BasePlayerCharacterController.Singleton;
+            if (owningCharacterController != null)
+                owningCharacterController.UseHotkey(indexOfData);
         }
     }
 
-    public void OnClickUse()
-    {
-        var owningCharacterController = BasePlayerCharacterController.Singleton;
-        if (owningCharacterController != null)
-            owningCharacterController.UseHotkey(indexOfData);
-    }
+    [System.Serializable]
+    public class UICharacterHotkeyEvent : UnityEvent<UICharacterHotkey> { }
 }
-
-[System.Serializable]
-public class UICharacterHotkeyEvent : UnityEvent<UICharacterHotkey> { }

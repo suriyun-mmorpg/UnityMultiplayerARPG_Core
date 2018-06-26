@@ -1,33 +1,36 @@
 ﻿using UnityEngine;
 
-public class UISkillCraftItem : UISelectionEntry<Skill>
+namespace MultiplayerARPG
 {
-    [Header("UI Elements")]
-    public UICharacterItem uiCraftingItem;
-    public UIItemAmounts uiRequireItemAmounts;
-
-    protected override void UpdateData()
+    public class UISkillCraftItem : UISelectionEntry<Skill>
     {
-        var skill = Data;
-        if (uiCraftingItem != null)
-        {
-            if (skill == null || skill.craftingItem == null)
-                uiCraftingItem.Hide();
-            else
-            {
-                uiCraftingItem.Show();
-                uiCraftingItem.Data = new CharacterItemLevelTuple(CharacterItem.Create(skill.craftingItem), 1);
-            }
-        }
+        [Header("UI Elements")]
+        public UICharacterItem uiCraftingItem;
+        public UIItemAmounts uiRequireItemAmounts;
 
-        if (uiRequireItemAmounts != null)
+        protected override void UpdateData()
         {
-            if (skill == null)
-                uiRequireItemAmounts.Hide();
-            else
+            var skill = Data;
+            if (uiCraftingItem != null)
             {
-                uiRequireItemAmounts.Show();
-                uiRequireItemAmounts.Data = skill.CacheCraftRequirements;
+                if (skill == null || skill.craftingItem == null)
+                    uiCraftingItem.Hide();
+                else
+                {
+                    uiCraftingItem.Show();
+                    uiCraftingItem.Data = new CharacterItemLevelTuple(CharacterItem.Create(skill.craftingItem), 1);
+                }
+            }
+
+            if (uiRequireItemAmounts != null)
+            {
+                if (skill == null)
+                    uiRequireItemAmounts.Hide();
+                else
+                {
+                    uiRequireItemAmounts.Show();
+                    uiRequireItemAmounts.Data = skill.CacheCraftRequirements;
+                }
             }
         }
     }

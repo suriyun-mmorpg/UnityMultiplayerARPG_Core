@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 
-[System.Serializable]
-public struct UIAttributeTextPair
+namespace MultiplayerARPG
 {
-    public Attribute attribute;
-    public Text text;
+    [System.Serializable]
+    public struct UIAttributeTextPair
+    {
+        public Attribute attribute;
+        public Text text;
+    }
 }

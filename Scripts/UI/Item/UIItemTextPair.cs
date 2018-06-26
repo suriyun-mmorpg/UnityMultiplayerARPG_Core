@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 
-[System.Serializable]
-public struct UIItemTextPair
+namespace MultiplayerARPG
 {
-    public Item item;
-    public Text text;
+    [System.Serializable]
+    public struct UIItemTextPair
+    {
+        public Item item;
+        public Text text;
+    }
 }

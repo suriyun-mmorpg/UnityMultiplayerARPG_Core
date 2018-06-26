@@ -2,67 +2,70 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class UISelectionEntry<T> : UIBase
+namespace MultiplayerARPG
 {
-    [Header("UI Selection Elements")]
-    public GameObject objectSelected;
-    private T data;
-    public T Data
+    public abstract class UISelectionEntry<T> : UIBase
     {
-        get { return data; }
-        set
+        [Header("UI Selection Elements")]
+        public GameObject objectSelected;
+        private T data;
+        public T Data
         {
-            data = value;
+            get { return data; }
+            set
+            {
+                data = value;
+                UpdateData();
+            }
+        }
+        public UISelectionManager selectionManager;
+
+        private bool isSelected;
+        public bool IsSelected
+        {
+            get { return isSelected; }
+            protected set
+            {
+                isSelected = value;
+                if (objectSelected != null)
+                    objectSelected.SetActive(value);
+            }
+        }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            IsSelected = false;
+        }
+
+        public void ForceUpdate()
+        {
             UpdateData();
         }
-    }
-    public UISelectionManager selectionManager;
 
-    private bool isSelected;
-    public bool IsSelected
-    {
-        get { return isSelected; }
-        protected set
+        public void OnClickSelect()
         {
-            isSelected = value;
-            if (objectSelected != null)
-                objectSelected.SetActive(value);
+            if (selectionManager != null)
+            {
+                var selectionMode = selectionManager.selectionMode;
+                var selectedUI = selectionManager.GetSelectedUI();
+                if (selectionMode != UISelectionMode.Toggle && selectedUI != null && (UIBase)selectedUI == this)
+                    selectionManager.Deselect(this);
+                else if (selectedUI == null || (UIBase)selectedUI != this)
+                    selectionManager.Select(this);
+            }
         }
-    }
 
-    protected override void Awake()
-    {
-        base.Awake();
-        IsSelected = false;
-    }
-
-    public void ForceUpdate()
-    {
-        UpdateData();
-    }
-
-    public void OnClickSelect()
-    {
-        if (selectionManager != null)
+        public void Select()
         {
-            var selectionMode = selectionManager.selectionMode;
-            var selectedUI = selectionManager.GetSelectedUI();
-            if (selectionMode != UISelectionMode.Toggle && selectedUI != null && (UIBase)selectedUI == this)
-                selectionManager.Deselect(this);
-            else if (selectedUI == null || (UIBase)selectedUI != this)
-                selectionManager.Select(this);
+            IsSelected = true;
         }
-    }
 
-    public void Select()
-    {
-        IsSelected = true;
-    }
+        public void Deselect()
+        {
+            IsSelected = false;
+        }
 
-    public void Deselect()
-    {
-        IsSelected = false;
+        protected abstract void UpdateData();
     }
-
-    protected abstract void UpdateData();
 }

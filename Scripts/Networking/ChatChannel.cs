@@ -1,7 +1,10 @@
-﻿public enum ChatChannel
+﻿namespace MultiplayerARPG
 {
-    Global,
-    Whisper,
-    Party,
-    Guild,
+    public enum ChatChannel
+    {
+        Global,
+        Whisper,
+        Party,
+        Guild,
+    }
 }

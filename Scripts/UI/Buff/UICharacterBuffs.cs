@@ -3,43 +3,46 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class UICharacterBuffs : UIBase
+namespace MultiplayerARPG
 {
-    public ICharacterData character { get; protected set; }
-    public UICharacterBuff uiCharacterBuffPrefab;
-    public Transform uiCharacterBuffContainer;
-
-    private UIList cacheList;
-    public UIList CacheList
+    public class UICharacterBuffs : UIBase
     {
-        get
+        public ICharacterData character { get; protected set; }
+        public UICharacterBuff uiCharacterBuffPrefab;
+        public Transform uiCharacterBuffContainer;
+
+        private UIList cacheList;
+        public UIList CacheList
         {
-            if (cacheList == null)
+            get
             {
-                cacheList = gameObject.AddComponent<UIList>();
-                cacheList.uiPrefab = uiCharacterBuffPrefab.gameObject;
-                cacheList.uiContainer = uiCharacterBuffContainer;
+                if (cacheList == null)
+                {
+                    cacheList = gameObject.AddComponent<UIList>();
+                    cacheList.uiPrefab = uiCharacterBuffPrefab.gameObject;
+                    cacheList.uiContainer = uiCharacterBuffContainer;
+                }
+                return cacheList;
             }
-            return cacheList;
-        }
-    }
-
-    public void UpdateData(ICharacterData character)
-    {
-        this.character = character;
-
-        if (character == null)
-        {
-            CacheList.HideAll();
-            return;
         }
 
-        var buffs = character.Buffs.Where(a => a.GetDuration() > 0).ToList();
-        CacheList.Generate(buffs, (index, characterBuff, ui) =>
+        public void UpdateData(ICharacterData character)
         {
-            var uiCharacterBuff = ui.GetComponent<UICharacterBuff>();
-            uiCharacterBuff.Setup(characterBuff, character, index);
-            uiCharacterBuff.Show();
-        });
+            this.character = character;
+
+            if (character == null)
+            {
+                CacheList.HideAll();
+                return;
+            }
+
+            var buffs = character.Buffs.Where(a => a.GetDuration() > 0).ToList();
+            CacheList.Generate(buffs, (index, characterBuff, ui) =>
+            {
+                var uiCharacterBuff = ui.GetComponent<UICharacterBuff>();
+                uiCharacterBuff.Setup(characterBuff, character, index);
+                uiCharacterBuff.Show();
+            });
+        }
     }
 }

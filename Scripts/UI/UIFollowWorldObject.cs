@@ -2,46 +2,49 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(UIFollowWorldPosition))]
-public class UIFollowWorldObject : MonoBehaviour
+namespace MultiplayerARPG
 {
-    public Transform targetObject;
-    public Transform TargetObject
+    [RequireComponent(typeof(UIFollowWorldPosition))]
+    public class UIFollowWorldObject : MonoBehaviour
     {
-        get { return targetObject; }
-        set
+        public Transform targetObject;
+        public Transform TargetObject
         {
-            targetObject = value;
+            get { return targetObject; }
+            set
+            {
+                targetObject = value;
+                UpdatePosition();
+            }
+        }
+
+        private UIFollowWorldPosition cachePositionFollower;
+        public UIFollowWorldPosition CachePositionFollower
+        {
+            get
+            {
+                if (cachePositionFollower == null)
+                    cachePositionFollower = GetComponent<UIFollowWorldPosition>();
+                return cachePositionFollower;
+            }
+        }
+
+        private void OnEnable()
+        {
             UpdatePosition();
         }
-    }
 
-    private UIFollowWorldPosition cachePositionFollower;
-    public UIFollowWorldPosition CachePositionFollower
-    {
-        get
+        private void Update()
         {
-            if (cachePositionFollower == null)
-                cachePositionFollower = GetComponent<UIFollowWorldPosition>();
-            return cachePositionFollower;
+            UpdatePosition();
         }
-    }
 
-    private void OnEnable()
-    {
-        UpdatePosition();
-    }
+        public void UpdatePosition()
+        {
+            if (TargetObject == null)
+                return;
 
-    private void Update()
-    {
-        UpdatePosition();
-    }
-
-    public void UpdatePosition()
-    {
-        if (TargetObject == null)
-            return;
-
-        CachePositionFollower.targetPosition = TargetObject.position;
+            CachePositionFollower.targetPosition = TargetObject.position;
+        }
     }
 }

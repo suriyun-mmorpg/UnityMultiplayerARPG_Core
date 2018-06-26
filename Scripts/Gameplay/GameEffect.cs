@@ -2,83 +2,86 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameEffect : MonoBehaviour
+namespace MultiplayerARPG
 {
-    public string effectSocket;
-    public bool isLoop;
-    public float lifeTime;
-    public Transform followingTarget;
-
-    private Transform cacheTransform;
-    public Transform CacheTransform
+    public class GameEffect : MonoBehaviour
     {
-        get
-        {
-            if (cacheTransform == null)
-                cacheTransform = GetComponent<Transform>();
-            return cacheTransform;
-        }
-    }
+        public string effectSocket;
+        public bool isLoop;
+        public float lifeTime;
+        public Transform followingTarget;
 
-    public AudioClip[] randomSoundEffects;
-    private ParticleSystem[] particles;
-    private AudioSource[] audioSources;
+        private Transform cacheTransform;
+        public Transform CacheTransform
+        {
+            get
+            {
+                if (cacheTransform == null)
+                    cacheTransform = GetComponent<Transform>();
+                return cacheTransform;
+            }
+        }
 
-    private void Awake()
-    {
-        particles = GetComponentsInChildren<ParticleSystem>();
-        audioSources = GetComponentsInChildren<AudioSource>();
-    }
+        public AudioClip[] randomSoundEffects;
+        private ParticleSystem[] particles;
+        private AudioSource[] audioSources;
 
-    private void Start()
-    {
-        if (randomSoundEffects.Length > 0)
+        private void Awake()
         {
-            var soundEffect = randomSoundEffects[Random.Range(0, randomSoundEffects.Length)];
-            if (soundEffect != null)
-            AudioSource.PlayClipAtPoint(soundEffect, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
+            particles = GetComponentsInChildren<ParticleSystem>();
+            audioSources = GetComponentsInChildren<AudioSource>();
         }
-        foreach (var particle in particles)
+
+        private void Start()
         {
-            particle.Play();
+            if (randomSoundEffects.Length > 0)
+            {
+                var soundEffect = randomSoundEffects[Random.Range(0, randomSoundEffects.Length)];
+                if (soundEffect != null)
+                    AudioSource.PlayClipAtPoint(soundEffect, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
+            }
+            foreach (var particle in particles)
+            {
+                particle.Play();
+            }
+            foreach (var audioSource in audioSources)
+            {
+                audioSource.Play();
+            }
+            if (!isLoop)
+                Destroy(gameObject, lifeTime);
         }
-        foreach (var audioSource in audioSources)
+
+        private void Update()
         {
-            audioSource.Play();
+            if (followingTarget != null)
+            {
+                CacheTransform.position = followingTarget.position;
+                CacheTransform.rotation = followingTarget.rotation;
+            }
         }
-        if (!isLoop)
+
+        public void DestroyEffect()
+        {
+            foreach (var particle in particles)
+            {
+                var mainEmitter = particle.main;
+                mainEmitter.loop = false;
+            }
+            foreach (var audioSource in audioSources)
+            {
+                audioSource.loop = false;
+            }
             Destroy(gameObject, lifeTime);
-    }
-
-    private void Update()
-    {
-        if (followingTarget != null)
-        {
-            CacheTransform.position = followingTarget.position;
-            CacheTransform.rotation = followingTarget.rotation;
         }
-    }
 
-    public void DestroyEffect()
-    {
-        foreach (var particle in particles)
+        public GameEffect InstantiateTo(Transform parent)
         {
-            var mainEmitter = particle.main;
-            mainEmitter.loop = false;
+            var newEffect = Instantiate(this, parent);
+            newEffect.transform.localPosition = Vector3.zero;
+            newEffect.transform.localEulerAngles = Vector3.zero;
+            newEffect.transform.localScale = Vector3.one;
+            return newEffect;
         }
-        foreach (var audioSource in audioSources)
-        {
-            audioSource.loop = false;
-        }
-        Destroy(gameObject, lifeTime);
-    }
-
-    public GameEffect InstantiateTo(Transform parent)
-    {
-        var newEffect = Instantiate(this, parent);
-        newEffect.transform.localPosition = Vector3.zero;
-        newEffect.transform.localEulerAngles = Vector3.zero;
-        newEffect.transform.localScale = Vector3.one;
-        return newEffect;
     }
 }

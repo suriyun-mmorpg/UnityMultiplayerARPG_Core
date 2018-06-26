@@ -2,55 +2,58 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIHistory : MonoBehaviour
+namespace MultiplayerARPG
 {
-    public UIBase firstUI;
-    protected readonly Stack<UIBase> uiStack = new Stack<UIBase>();
-
-    private void Awake()
+    public class UIHistory : MonoBehaviour
     {
-        if (firstUI != null)
-            firstUI.Show();
-    }
+        public UIBase firstUI;
+        protected readonly Stack<UIBase> uiStack = new Stack<UIBase>();
 
-    public void Next(UIBase ui)
-    {
-        if (ui == null)
-            return;
-        // Hide latest ui
-        if (uiStack.Count > 0)
-            uiStack.Peek().Hide();
-        else if (firstUI != null)
-            firstUI.Hide();
-
-        uiStack.Push(ui);
-        ui.Show();
-    }
-
-    public void Back()
-    {
-        // Remove current ui from stack
-        if (uiStack.Count > 0)
+        private void Awake()
         {
-            var ui = uiStack.Pop();
-            ui.Hide();
+            if (firstUI != null)
+                firstUI.Show();
         }
-        // Show recent ui
-        if (uiStack.Count > 0)
-            uiStack.Peek().Show();
-        else if (firstUI != null)
-            firstUI.Show();
-    }
 
-    public void ClearHistory()
-    {
-        while (uiStack.Count > 0)
+        public void Next(UIBase ui)
         {
-            var ui = uiStack.Pop();
-            ui.Hide();
+            if (ui == null)
+                return;
+            // Hide latest ui
+            if (uiStack.Count > 0)
+                uiStack.Peek().Hide();
+            else if (firstUI != null)
+                firstUI.Hide();
+
+            uiStack.Push(ui);
+            ui.Show();
         }
-        uiStack.Clear();
-        if (firstUI != null)
-            firstUI.Show();
+
+        public void Back()
+        {
+            // Remove current ui from stack
+            if (uiStack.Count > 0)
+            {
+                var ui = uiStack.Pop();
+                ui.Hide();
+            }
+            // Show recent ui
+            if (uiStack.Count > 0)
+                uiStack.Peek().Show();
+            else if (firstUI != null)
+                firstUI.Show();
+        }
+
+        public void ClearHistory()
+        {
+            while (uiStack.Count > 0)
+            {
+                var ui = uiStack.Pop();
+                ui.Hide();
+            }
+            uiStack.Clear();
+            if (firstUI != null)
+                firstUI.Show();
+        }
     }
 }

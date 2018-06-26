@@ -2,88 +2,91 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(UICharacterHotkeySelectionManager))]
-public class UICharacterHotkeys : UIBase
+namespace MultiplayerARPG
 {
-    public UICharacterHotkeyPair[] uiCharacterHotkeys;
-
-    private Dictionary<string, List<UICharacterHotkey>> cacheUICharacterHotkeys;
-    public Dictionary<string, List<UICharacterHotkey>> CacheUICharacterHotkeys
+    [RequireComponent(typeof(UICharacterHotkeySelectionManager))]
+    public class UICharacterHotkeys : UIBase
     {
-        get
-        {
-            InitCaches();
-            return cacheUICharacterHotkeys;
-        }
-    }
+        public UICharacterHotkeyPair[] uiCharacterHotkeys;
 
-    private UICharacterHotkeySelectionManager selectionManager;
-    public UICharacterHotkeySelectionManager SelectionManager
-    {
-        get
+        private Dictionary<string, List<UICharacterHotkey>> cacheUICharacterHotkeys;
+        public Dictionary<string, List<UICharacterHotkey>> CacheUICharacterHotkeys
         {
-            if (selectionManager == null)
-                selectionManager = GetComponent<UICharacterHotkeySelectionManager>();
-            selectionManager.selectionMode = UISelectionMode.SelectSingle;
-            return selectionManager;
-        }
-    }
-
-    private void InitCaches()
-    {
-        if (cacheUICharacterHotkeys == null)
-        {
-            SelectionManager.DeselectSelectedUI();
-            SelectionManager.Clear();
-            var j = 0;
-            cacheUICharacterHotkeys = new Dictionary<string, List<UICharacterHotkey>>();
-            for (var i = 0; i < uiCharacterHotkeys.Length; ++i)
+            get
             {
-                var uiCharacterHotkey = uiCharacterHotkeys[i];
-                if (uiCharacterHotkey == null)
-                    continue;
-                var id = uiCharacterHotkey.hotkeyId;
-                var ui = uiCharacterHotkey.ui;
-                if (!string.IsNullOrEmpty(id) && ui != null)
+                InitCaches();
+                return cacheUICharacterHotkeys;
+            }
+        }
+
+        private UICharacterHotkeySelectionManager selectionManager;
+        public UICharacterHotkeySelectionManager SelectionManager
+        {
+            get
+            {
+                if (selectionManager == null)
+                    selectionManager = GetComponent<UICharacterHotkeySelectionManager>();
+                selectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return selectionManager;
+            }
+        }
+
+        private void InitCaches()
+        {
+            if (cacheUICharacterHotkeys == null)
+            {
+                SelectionManager.DeselectSelectedUI();
+                SelectionManager.Clear();
+                var j = 0;
+                cacheUICharacterHotkeys = new Dictionary<string, List<UICharacterHotkey>>();
+                for (var i = 0; i < uiCharacterHotkeys.Length; ++i)
                 {
-                    var characterHotkey = new CharacterHotkey();
-                    characterHotkey.hotkeyId = id;
-                    characterHotkey.type = HotkeyType.None;
-                    characterHotkey.dataId = 0;
-                    ui.Setup(characterHotkey, -1);
-                    if (!cacheUICharacterHotkeys.ContainsKey(id))
-                        cacheUICharacterHotkeys.Add(id, new List<UICharacterHotkey>());
-                    cacheUICharacterHotkeys[id].Add(ui);
-                    SelectionManager.Add(ui);
-                    // Select first UI
-                    if (j == 0)
-                        ui.OnClickSelect();
-                    ++j;
+                    var uiCharacterHotkey = uiCharacterHotkeys[i];
+                    if (uiCharacterHotkey == null)
+                        continue;
+                    var id = uiCharacterHotkey.hotkeyId;
+                    var ui = uiCharacterHotkey.ui;
+                    if (!string.IsNullOrEmpty(id) && ui != null)
+                    {
+                        var characterHotkey = new CharacterHotkey();
+                        characterHotkey.hotkeyId = id;
+                        characterHotkey.type = HotkeyType.None;
+                        characterHotkey.dataId = 0;
+                        ui.Setup(characterHotkey, -1);
+                        if (!cacheUICharacterHotkeys.ContainsKey(id))
+                            cacheUICharacterHotkeys.Add(id, new List<UICharacterHotkey>());
+                        cacheUICharacterHotkeys[id].Add(ui);
+                        SelectionManager.Add(ui);
+                        // Select first UI
+                        if (j == 0)
+                            ui.OnClickSelect();
+                        ++j;
+                    }
                 }
             }
         }
-    }
 
-    public override void Hide()
-    {
-        SelectionManager.DeselectSelectedUI();
-        base.Hide();
-    }
-
-    public void UpdateData(IPlayerCharacterData characterData)
-    {
-        InitCaches();
-        var characterHotkeys = characterData.Hotkeys;
-        for (var i = 0; i < characterHotkeys.Count; ++i)
+        public override void Hide()
         {
-            var characterHotkey = characterHotkeys[i];
-            List<UICharacterHotkey> uis;
-            if (!string.IsNullOrEmpty(characterHotkey.hotkeyId) && CacheUICharacterHotkeys.TryGetValue(characterHotkey.hotkeyId, out uis))
+            SelectionManager.DeselectSelectedUI();
+            base.Hide();
+        }
+
+        public void UpdateData(IPlayerCharacterData characterData)
+        {
+            InitCaches();
+            var characterHotkeys = characterData.Hotkeys;
+            for (var i = 0; i < characterHotkeys.Count; ++i)
             {
-                foreach (var ui in uis)
+                var characterHotkey = characterHotkeys[i];
+                List<UICharacterHotkey> uis;
+                if (!string.IsNullOrEmpty(characterHotkey.hotkeyId) && CacheUICharacterHotkeys.TryGetValue(characterHotkey.hotkeyId, out uis))
                 {
-                    ui.Setup(characterHotkey, i);
-                    ui.Show();
+                    foreach (var ui in uis)
+                    {
+                        ui.Setup(characterHotkey, i);
+                        ui.Show();
+                    }
                 }
             }
         }

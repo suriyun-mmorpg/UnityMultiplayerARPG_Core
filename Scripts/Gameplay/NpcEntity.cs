@@ -1,10 +1,13 @@
-﻿public sealed class NpcEntity : RpgNetworkEntity
+﻿namespace MultiplayerARPG
 {
-    public NpcDialog startDialog;
-
-    protected override void Awake()
+    public sealed class NpcEntity : RpgNetworkEntity
     {
-        base.Awake();
-        gameObject.tag = gameInstance.npcTag;
+        public NpcDialog startDialog;
+
+        protected override void Awake()
+        {
+            base.Awake();
+            gameObject.tag = gameInstance.npcTag;
+        }
     }
 }

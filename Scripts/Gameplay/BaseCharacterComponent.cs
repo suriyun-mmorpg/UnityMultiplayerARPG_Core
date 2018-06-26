@@ -2,16 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BaseCharacterComponent : MonoBehaviour
+namespace MultiplayerARPG
 {
-    private BaseCharacterEntity cacheCharacterEntity;
-    public BaseCharacterEntity CacheCharacterEntity
+    public abstract class BaseCharacterComponent : MonoBehaviour
     {
-        get
+        private BaseCharacterEntity cacheCharacterEntity;
+        public BaseCharacterEntity CacheCharacterEntity
         {
-            if (cacheCharacterEntity == null)
-                cacheCharacterEntity = GetComponent<BaseCharacterEntity>();
-            return cacheCharacterEntity;
+            get
+            {
+                if (cacheCharacterEntity == null)
+                    cacheCharacterEntity = GetComponent<BaseCharacterEntity>();
+                return cacheCharacterEntity;
+            }
         }
     }
 }

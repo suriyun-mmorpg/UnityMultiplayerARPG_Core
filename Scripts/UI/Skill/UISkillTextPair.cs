@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 
-[System.Serializable]
-public struct UISkillTextPair
+namespace MultiplayerARPG
 {
-    public Skill skill;
-    public Text text;
+    [System.Serializable]
+    public struct UISkillTextPair
+    {
+        public Skill skill;
+        public Text text;
+    }
 }

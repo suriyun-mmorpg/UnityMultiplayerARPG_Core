@@ -5,39 +5,42 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-[RequireComponent(typeof(GameInstance))]
-public class GameInstanceTools : MonoBehaviour
+namespace MultiplayerARPG
 {
-    [Header("Exp calculator")]
-    public short maxLevel;
-    public Int32GraphCalculator expCalculator;
-    public bool calculateExp;
-
-    private GameInstance cacheGameInstance;
-    public GameInstance CacheGameInstance
+    [RequireComponent(typeof(GameInstance))]
+    public class GameInstanceTools : MonoBehaviour
     {
-        get
+        [Header("Exp calculator")]
+        public short maxLevel;
+        public Int32GraphCalculator expCalculator;
+        public bool calculateExp;
+
+        private GameInstance cacheGameInstance;
+        public GameInstance CacheGameInstance
         {
-            if (cacheGameInstance == null)
-                cacheGameInstance = GetComponent<GameInstance>();
-            return cacheGameInstance;
+            get
+            {
+                if (cacheGameInstance == null)
+                    cacheGameInstance = GetComponent<GameInstance>();
+                return cacheGameInstance;
+            }
         }
-    }
 
 #if UNITY_EDITOR
-    private void OnValidate()
-    {
-        if (calculateExp)
+        private void OnValidate()
         {
-            var expTree = new List<int>();
-            for (short i = 1; i <= maxLevel; ++i)
+            if (calculateExp)
             {
-                expTree.Add(expCalculator.Calculate(i, maxLevel));
+                var expTree = new List<int>();
+                for (short i = 1; i <= maxLevel; ++i)
+                {
+                    expTree.Add(expCalculator.Calculate(i, maxLevel));
+                }
+                CacheGameInstance.expTree = expTree.ToArray();
+                EditorUtility.SetDirty(CacheGameInstance);
             }
-            CacheGameInstance.expTree = expTree.ToArray();
-            EditorUtility.SetDirty(CacheGameInstance);
+            calculateExp = false;
         }
-        calculateExp = false;
-    }
 #endif
+    }
 }

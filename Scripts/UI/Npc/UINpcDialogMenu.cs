@@ -3,27 +3,31 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UINpcDialogMenuAction
+namespace MultiplayerARPG
 {
-    public string title;
-    public int menuIndex;
-}
-
-public class UINpcDialogMenu : UISelectionEntry<UINpcDialogMenuAction>
-{
-    [Header("UI Elements")]
-    public Text title;
-    public UINpcDialog uiNpcDialog;
-
-    protected override void UpdateData()
+    [System.Serializable]
+    public struct UINpcDialogMenuAction
     {
-        if (title != null)
-            title.text = Data.title;
+        public string title;
+        public int menuIndex;
     }
 
-    public void OnClickMenu()
+    public class UINpcDialogMenu : UISelectionEntry<UINpcDialogMenuAction>
     {
-        var owningCharacter = BasePlayerCharacterController.OwningCharacter;
-        owningCharacter.RequestSelectNpcDialogMenu(Data.menuIndex);
+        [Header("UI Elements")]
+        public Text title;
+        public UINpcDialog uiNpcDialog;
+
+        protected override void UpdateData()
+        {
+            if (title != null)
+                title.text = Data.title;
+        }
+
+        public void OnClickMenu()
+        {
+            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            owningCharacter.RequestSelectNpcDialogMenu(Data.menuIndex);
+        }
     }
 }
