@@ -73,7 +73,7 @@ namespace MultiplayerARPG
                         {
                             if (overrideDataEntry.target == null || overrideDataEntry.clip == null)
                                 continue;
-                            cacheOverrideData[overrideDataEntry.target.OverrideActionClipId] = overrideDataEntry;
+                            cacheOverrideData[overrideDataEntry.target.DataId] = overrideDataEntry;
                         }
                     }
                 }
@@ -124,7 +124,7 @@ namespace MultiplayerARPG
             var triggerDurationRate = this.triggerDurationRate;
             var audioClips = this.audioClips;
             ActionAnimationOverrideData overrideData;
-            if (CacheOverrideData.TryGetValue(model.OverrideActionClipId, out overrideData))
+            if (CacheOverrideData.TryGetValue(model.DataId, out overrideData))
             {
                 clip = overrideData.clip;
                 if (overrideData.triggerDurationRate > 0)

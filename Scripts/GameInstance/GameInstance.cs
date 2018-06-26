@@ -19,6 +19,8 @@ namespace MultiplayerARPG
         public MonsterCharacterEntity monsterCharacterEntityPrefab;
         public ItemDropEntity itemDropEntityPrefab;
         public BuildingEntity buildingEntityPrefab;
+        public NpcEntity npcEntityPrefab;
+        public WarpPortalEntity warpPortalEntityPrefab;
         public UISceneGameplay uiSceneGameplayPrefab;
         public UISceneGameplay uiSceneGameplayMobilePrefab;
         public ServerCharacter serverCharacterPrefab;
@@ -28,6 +30,10 @@ namespace MultiplayerARPG
         [Tooltip("Default hit effect, will be used when attacks to enemies")]
         public GameEffectCollection defaultHitEffects;
         public int[] expTree;
+        [Tooltip("You can add NPCs here or may add NPCs in the scene directly, So you can leave this empty")]
+        public NpcDatabase npcDatabase;
+        [Tooltip("You can add warp portals here or may add warp portals in the scene directly, So you can leave this empty")]
+        public WarpPortalDatabase warpPortalDatabase;
         [Header("Gameplay Configs")]
         public UnityTag playerTag;
         public UnityTag monsterTag;
@@ -74,7 +80,11 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, BuildingObject> BuildingObjects = new Dictionary<int, BuildingObject>();
         public static readonly Dictionary<int, ActionAnimation> ActionAnimations = new Dictionary<int, ActionAnimation>();
         public static readonly Dictionary<int, GameEffectCollection> GameEffectCollections = new Dictionary<int, GameEffectCollection>();
+        public static readonly Dictionary<int, CharacterModel> CharacterModels = new Dictionary<int, CharacterModel>();
+        public static readonly Dictionary<string, Npcs> MapNpcs = new Dictionary<string, Npcs>();
+        public static readonly Dictionary<string, WarpPortals> MapWarpPortals = new Dictionary<string, WarpPortals>();
 
+        #region Cache Data
         public BaseGameplayRule GameplayRule
         {
             get
@@ -192,9 +202,11 @@ namespace MultiplayerARPG
                 var layerMask = 0;
                 layerMask = layerMask | ~characterLayer.Mask;
                 layerMask = layerMask | ~buildingLayer.Mask;
+                layerMask = layerMask | ~harvestableLayer.Mask;
                 return layerMask;
             }
         }
+        #endregion
 
         protected virtual void Awake()
         {
@@ -222,6 +234,11 @@ namespace MultiplayerARPG
                 Debug.LogError("You must set item drop entity prefab");
                 return;
             }
+            if (buildingEntityPrefab == null)
+            {
+                Debug.LogError("You must set building entity prefab");
+                return;
+            }
 
             InputManager.useMobileInputOnNonMobile = useMobileInEditor;
 
@@ -238,6 +255,9 @@ namespace MultiplayerARPG
             BuildingObjects.Clear();
             ActionAnimations.Clear();
             GameEffectCollections.Clear();
+            CharacterModels.Clear();
+            MapNpcs.Clear();
+            MapWarpPortals.Clear();
 
             // Use Resources Load Async ?
             var gameDataList = Resources.LoadAll<BaseGameData>("");
@@ -288,6 +308,33 @@ namespace MultiplayerARPG
                     weaponHitEffects.Add(damageElement.hitEffects);
             }
             AddGameEffectCollections(GameEffectCollectionType.WeaponHit, weaponHitEffects);
+
+            var characterModels = new List<CharacterModel>();
+            if (npcDatabase != null)
+            {
+                foreach (var map in npcDatabase.maps)
+                {
+                    if (map.map == null || string.IsNullOrEmpty(map.map.SceneName))
+                        continue;
+                    MapNpcs[map.map.SceneName] = map;
+                    foreach (var npc in map.npcs)
+                    {
+                        if (npc.characterModel != null)
+                            characterModels.Add(npc.characterModel);
+                    }
+                }
+            }
+            AddCharacterModels(characterModels);
+
+            if (warpPortalDatabase != null)
+            {
+                foreach (var map in warpPortalDatabase.maps)
+                {
+                    if (map.map == null || string.IsNullOrEmpty(map.map.SceneName))
+                        continue;
+                    MapWarpPortals[map.map.SceneName] = map;
+                }
+            }
         }
 
         private void Start()
@@ -355,6 +402,7 @@ namespace MultiplayerARPG
 
         public static void AddCharacters(IEnumerable<BaseCharacter> characters)
         {
+            var characterModels = new List<CharacterModel>();
             foreach (var character in characters)
             {
                 if (character == null || AllCharacters.ContainsKey(character.DataId))
@@ -371,7 +419,9 @@ namespace MultiplayerARPG
                     MonsterCharacters[character.DataId] = monsterCharacter;
                     AddActionAnimations(ActionAnimationType.MonsterAttack, monsterCharacter.attackAnimations);
                 }
+                characterModels.Add(character.model);
             }
+            AddCharacterModels(characterModels);
         }
 
         public static void AddSkills(IEnumerable<Skill> skills)
@@ -462,6 +512,18 @@ namespace MultiplayerARPG
                 if (gameEffectCollection == null || GameEffectCollections.ContainsKey(gameEffectCollection.Id))
                     continue;
                 GameEffectCollections[gameEffectCollection.Id] = gameEffectCollection;
+            }
+        }
+
+        public static void AddCharacterModels(IEnumerable<CharacterModel> characterModels)
+        {
+            if (characterModels == null)
+                return;
+            foreach (var characterModel in characterModels)
+            {
+                if (characterModel == null || CharacterModels.ContainsKey(characterModel.DataId))
+                    continue;
+                CharacterModels[characterModel.DataId] = characterModel;
             }
         }
     }

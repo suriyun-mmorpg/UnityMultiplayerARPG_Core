@@ -10,16 +10,6 @@ namespace MultiplayerARPG
         CollectItem,
     }
 
-    [System.Serializable]
-    public struct QuestTask
-    {
-        public QuestTaskType taskType;
-        [StringShowConditional(conditionFieldName: "taskType", conditionValue: "KillMonster")]
-        public MonsterCharacterAmount monsterCharacterAmount;
-        [StringShowConditional(conditionFieldName: "taskType", conditionValue: "CollectItem")]
-        public ItemAmount itemAmount;
-    }
-
     [CreateAssetMenu(fileName = "Quest", menuName = "Create GameData/Quest")]
     public class Quest : BaseGameData
     {
@@ -47,5 +37,15 @@ namespace MultiplayerARPG
                 return cacheKillMonsterIds;
             }
         }
+    }
+
+    [System.Serializable]
+    public struct QuestTask
+    {
+        public QuestTaskType taskType;
+        [StringShowConditional(conditionFieldName: "taskType", conditionValue: "KillMonster")]
+        public MonsterCharacterAmount monsterCharacterAmount;
+        [StringShowConditional(conditionFieldName: "taskType", conditionValue: "CollectItem")]
+        public ItemAmount itemAmount;
     }
 }

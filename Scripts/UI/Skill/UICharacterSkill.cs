@@ -254,7 +254,4 @@ namespace MultiplayerARPG
                 owningCharacter.RequestAddSkill(indexOfData, 1);
         }
     }
-
-    [System.Serializable]
-    public class UICharacterSkillEvent : UnityEvent<UICharacterSkill> { }
 }

@@ -66,6 +66,7 @@ namespace MultiplayerARPG
         public override string Title
         {
             get { return buildingObject == null ? "Unknow" : buildingObject.title; }
+            set { }
         }
 
         protected override void Awake()

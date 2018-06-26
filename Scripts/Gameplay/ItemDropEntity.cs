@@ -32,6 +32,7 @@ namespace MultiplayerARPG
                 var item = Item;
                 return item == null ? "Unknow" : item.title;
             }
+            set { }
         }
 
         public Transform CacheModelContainer

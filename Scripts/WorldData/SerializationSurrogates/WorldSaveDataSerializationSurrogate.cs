@@ -3,22 +3,19 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using UnityEngine;
 
-namespace MultiplayerARPG
+public class WorldSaveDataSerializationSurrogate : ISerializationSurrogate
 {
-    public class WorldSaveDataSerializationSurrogate : ISerializationSurrogate
+    public void GetObjectData(object obj, SerializationInfo info, StreamingContext context)
     {
-        public void GetObjectData(object obj, SerializationInfo info, StreamingContext context)
-        {
-            var data = (WorldSaveData)obj;
-            info.AddListValue("buildings", data.buildings);
-        }
+        var data = (WorldSaveData)obj;
+        info.AddListValue("buildings", data.buildings);
+    }
 
-        public object SetObjectData(object obj, SerializationInfo info, StreamingContext context, ISurrogateSelector selector)
-        {
-            WorldSaveData data = (WorldSaveData)obj;
-            data.buildings = new List<BuildingSaveData>(info.GetListValue<BuildingSaveData>("buildings"));
-            obj = data;
-            return obj;
-        }
+    public object SetObjectData(object obj, SerializationInfo info, StreamingContext context, ISurrogateSelector selector)
+    {
+        WorldSaveData data = (WorldSaveData)obj;
+        data.buildings = new List<BuildingSaveData>(info.GetListValue<BuildingSaveData>("buildings"));
+        obj = data;
+        return obj;
     }
 }

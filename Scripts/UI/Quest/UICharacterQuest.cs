@@ -138,7 +138,4 @@ namespace MultiplayerARPG
                 questOnGoingStatusObject.SetActive(!isComplete && !isAllTasksDone);
         }
     }
-
-    [System.Serializable]
-    public class UICharacterQuestEvent : UnityEvent<UICharacterQuest> { }
 }

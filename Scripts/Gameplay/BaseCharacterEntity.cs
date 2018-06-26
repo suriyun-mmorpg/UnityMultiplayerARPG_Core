@@ -64,14 +64,18 @@ namespace MultiplayerARPG
         protected SyncListCharacterItem nonEquipItems = new SyncListCharacterItem();
         #endregion
 
-        #region Public data
+        #region Serialize data
         [Header("Settings")]
         [Tooltip("These objects will be hidden on non owner objects")]
         public GameObject[] ownerObjects;
         [Tooltip("These objects will be hidden on owner objects")]
         public GameObject[] nonOwnerObjects;
         [Tooltip("Model will be instantiated inside this transform, if not set will use this component's transform")]
-        public Transform modelContainer;
+        [SerializeField]
+        private Transform modelContainer;
+        [Tooltip("Set it to force to not change character model by data Id, when set it model container will not be used")]
+        [SerializeField]
+        private CharacterModel permanentlyModel;
         #endregion
 
         #region Protected data
@@ -85,7 +89,12 @@ namespace MultiplayerARPG
         #endregion
 
         #region Caches Data
-        public CharacterModel Model { get; protected set; }
+        private CharacterModel model;
+        public CharacterModel Model
+        {
+            get { return permanentlyModel != null ? permanentlyModel : model; }
+            private set { model = permanentlyModel != null ? null : value; }
+        }
         public CharacterStats CacheStats { get; protected set; }
         public Dictionary<Attribute, short> CacheAttributes { get; protected set; }
         public Dictionary<Skill, short> CacheSkills { get; protected set; }
@@ -137,7 +146,7 @@ namespace MultiplayerARPG
         public virtual int CurrentWater { get { return currentWater.Value; } set { currentWater.Value = value; } }
         public virtual EquipWeapons EquipWeapons { get { return equipWeapons.Value; } set { equipWeapons.Value = value; } }
         public virtual bool IsHidding { get { return isHidding.Value; } set { isHidding.Value = value; } }
-        public override string Title { get { return CharacterName; } }
+        public override string Title { get { return CharacterName; } set { } }
 
         public IList<CharacterAttribute> Attributes
         {
@@ -1128,14 +1137,20 @@ namespace MultiplayerARPG
             // Get database
             GameInstance.AllCharacters.TryGetValue(dataId, out database);
 
-            // Setup model
-            if (Model != null)
-                Destroy(Model.gameObject);
+            // If permanently model has been set, it will not changes character model
+            if (permanentlyModel == null)
+            {
+                if (Model != null)
+                    Destroy(Model.gameObject);
 
-            Model = this.InstantiateModel(CacheModelContainer);
+                Model = this.InstantiateModel(CacheModelContainer);
+            }
+            // If model is ready set its states, collider data and equipments
             if (Model != null)
             {
-                SetupModel(Model);
+                CacheCapsuleCollider.center = Model.center;
+                CacheCapsuleCollider.radius = Model.radius;
+                CacheCapsuleCollider.height = Model.height;
                 Model.SetEquipWeapons(equipWeapons);
                 Model.SetEquipItems(equipItems);
                 Model.gameObject.SetActive(!isHidding.Value);
@@ -1682,13 +1697,6 @@ namespace MultiplayerARPG
             }
         }
         #endregion
-
-        protected virtual void SetupModel(CharacterModel characterModel)
-        {
-            CacheCapsuleCollider.center = characterModel.center;
-            CacheCapsuleCollider.radius = characterModel.radius;
-            CacheCapsuleCollider.height = characterModel.height;
-        }
 
         protected virtual Transform GetDamageTransform(DamageType damageType)
         {

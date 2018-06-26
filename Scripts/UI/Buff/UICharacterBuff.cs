@@ -95,7 +95,4 @@ namespace MultiplayerARPG
             }
         }
     }
-
-    [System.Serializable]
-    public class UICharacterBuffEvent : UnityEvent<UICharacterBuff> { }
 }

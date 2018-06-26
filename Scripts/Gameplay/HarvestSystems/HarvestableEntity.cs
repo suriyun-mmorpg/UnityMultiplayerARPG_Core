@@ -22,11 +22,6 @@ namespace MultiplayerARPG
 
         private float deadTime;
 
-        public override string Title
-        {
-            get { return title; }
-        }
-
         private CapsuleCollider cacheCapsuleCollider;
         public CapsuleCollider CacheCapsuleCollider
         {

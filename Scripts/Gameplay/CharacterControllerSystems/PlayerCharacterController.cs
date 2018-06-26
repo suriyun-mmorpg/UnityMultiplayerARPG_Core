@@ -115,7 +115,8 @@ namespace MultiplayerARPG
             {
                 if (field.isFocused)
                 {
-                    StopAllMovement();
+                    destination = null;
+                    CharacterEntity.StopMove();
                     return;
                 }
             }
@@ -195,6 +196,7 @@ namespace MultiplayerARPG
                 foreach (var hit in hits)
                 {
                     var hitTransform = hit.transform;
+                    // When clicking on target
                     if (getMouseUp &&
                         !isMouseDragOrHoldOrOverUI &&
                         (controllerMode == PlayerCharacterControllerMode.PointClick || controllerMode == PlayerCharacterControllerMode.Both))
@@ -242,6 +244,7 @@ namespace MultiplayerARPG
                             break;
                         }
                     }
+                    // When holding on target
                     else if (!isMouseDragDetected && isMouseHoldDetected)
                     {
                         var buildingMaterial = hitTransform.GetComponent<BuildingMaterial>();
@@ -258,9 +261,12 @@ namespace MultiplayerARPG
                 // If Found target, do something
                 if (targetPosition.HasValue)
                 {
+                    // Close NPC dialog, when target changes
                     if (CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
                         CacheUISceneGameplay.uiNpcDialog.Hide();
+                    // Clear queue using skill
                     queueUsingSkill = null;
+                    // Move to target, will hide destination when target is object
                     if (targetIdentity != null)
                         destination = null;
                     else
@@ -305,10 +311,12 @@ namespace MultiplayerARPG
                 SetBuildingObjectByCharacterTransform();
             }
 
+            // For WASD mode, Using skill when player pressed hotkey
             if (queueUsingSkill.HasValue)
             {
                 var queueUsingSkillValue = queueUsingSkill.Value;
-                StopAllMovement();
+                destination = null;
+                CharacterEntity.StopMove();
                 var characterSkill = CharacterEntity.Skills[queueUsingSkillValue.skillIndex];
                 var skill = characterSkill.GetSkill();
                 if (skill != null)
@@ -333,9 +341,11 @@ namespace MultiplayerARPG
                 else
                     queueUsingSkill = null;
             }
+            // Attack when player pressed attack button
             else if (InputManager.GetButton("Attack"))
             {
-                StopAllMovement();
+                destination = null;
+                CharacterEntity.StopMove();
                 BaseCharacterEntity targetEntity;
                 if (wasdLockAttackTarget && !CharacterEntity.TryGetTargetEntity(out targetEntity))
                 {
@@ -348,6 +358,7 @@ namespace MultiplayerARPG
                 else if (!wasdLockAttackTarget)
                     RequestAttack();
             }
+            // Move
             else
             {
                 if (moveDirection.magnitude > 0)
@@ -629,13 +640,10 @@ namespace MultiplayerARPG
             if (hotkeyIndex < 0 || hotkeyIndex >= CharacterEntity.Hotkeys.Count)
                 return;
 
+            CancelBuild();
             buildingItemIndex = -1;
-            if (currentBuildingObject != null)
-            {
-                Destroy(currentBuildingObject.gameObject);
-                currentBuildingObject = null;
-            }
-
+            currentBuildingObject = null;
+            
             var hotkey = CharacterEntity.Hotkeys[hotkeyIndex];
             var skill = hotkey.GetSkill();
             if (skill != null)
@@ -646,11 +654,10 @@ namespace MultiplayerARPG
                     BaseCharacterEntity attackingCharacter;
                     if (TryGetAttackingCharacter(out attackingCharacter))
                         queueUsingSkill = new UsingSkillData(CharacterTransform.position, skillIndex);
-                    else if ((controllerMode == PlayerCharacterControllerMode.WASD || controllerMode == PlayerCharacterControllerMode.Both) || skill.IsAttack())
-                        queueUsingSkill = new UsingSkillData(CharacterTransform.position, skillIndex);
                     else if (CharacterEntity.Skills[skillIndex].CanUse(CharacterEntity))
                     {
-                        StopAllMovement();
+                        destination = null;
+                        CharacterEntity.StopMove();
                         RequestUseSkill(CharacterTransform.position, skillIndex);
                     }
                 }
@@ -667,8 +674,8 @@ namespace MultiplayerARPG
                         RequestUseItem(itemIndex);
                     else if (item.IsBuilding())
                     {
-                        StopAllMovement();
-                        DeselectBuilding();
+                        destination = null;
+                        CharacterEntity.StopMove();
                         buildingItemIndex = itemIndex;
                         currentBuildingObject = Instantiate(item.buildingObject);
                         currentBuildingObject.SetupAsBuildMode();
@@ -766,14 +773,6 @@ namespace MultiplayerARPG
             if (nonSnapBuildingArea != null)
                 return true;
             return false;
-        }
-
-        private void StopAllMovement()
-        {
-            destination = null;
-            queueUsingSkill = null;
-            CharacterEntity.StopMove();
-            CancelBuild();
         }
 
         public bool TryGetAttackingCharacter(out BaseCharacterEntity character)

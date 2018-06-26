@@ -1,14 +1,11 @@
-﻿namespace MultiplayerARPG
+﻿[System.Serializable]
+public struct IncrementalShort
 {
-    [System.Serializable]
-    public struct IncrementalShort
-    {
-        public short baseAmount;
-        public float amountIncreaseEachLevel;
+    public short baseAmount;
+    public float amountIncreaseEachLevel;
 
-        public short GetAmount(short level)
-        {
-            return (short)(baseAmount + (short)(amountIncreaseEachLevel * (level - 1)));
-        }
+    public short GetAmount(short level)
+    {
+        return (short)(baseAmount + (short)(amountIncreaseEachLevel * (level - 1)));
     }
 }

@@ -97,7 +97,4 @@ namespace MultiplayerARPG
                 owningCharacterController.UseHotkey(indexOfData);
         }
     }
-
-    [System.Serializable]
-    public class UICharacterHotkeyEvent : UnityEvent<UICharacterHotkey> { }
 }

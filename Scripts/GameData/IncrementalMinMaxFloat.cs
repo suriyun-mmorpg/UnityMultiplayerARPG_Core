@@ -1,14 +1,11 @@
-﻿namespace MultiplayerARPG
+﻿[System.Serializable]
+public struct IncrementalMinMaxFloat
 {
-    [System.Serializable]
-    public struct IncrementalMinMaxFloat
-    {
-        public MinMaxFloat baseAmount;
-        public MinMaxFloat amountIncreaseEachLevel;
+    public MinMaxFloat baseAmount;
+    public MinMaxFloat amountIncreaseEachLevel;
 
-        public MinMaxFloat GetAmount(short level)
-        {
-            return baseAmount + (amountIncreaseEachLevel * (level - 1));
-        }
+    public MinMaxFloat GetAmount(short level)
+    {
+        return baseAmount + (amountIncreaseEachLevel * (level - 1));
     }
 }

@@ -3,137 +3,152 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace MultiplayerARPG
+public enum UISelectionMode
 {
-    public enum UISelectionMode
+    SelectSingle,
+    Toggle,
+}
+
+public abstract class UISelectionManager : MonoBehaviour
+{
+    public UISelectionMode selectionMode;
+    public abstract object GetSelectedUI();
+    public abstract void Select(object ui);
+    public abstract void Deselect(object ui);
+    public abstract void DeselectAll();
+    public abstract void DeselectSelectedUI();
+    public abstract bool Contains(object ui);
+}
+
+public abstract class UISelectionManager<TData, TUI, TDataEvent, TUIEvent> : UISelectionManager
+    where TUI : UISelectionEntry<TData>
+    where TDataEvent : UnityEvent<TData>
+    where TUIEvent : UnityEvent<TUI>
+{
+    public TUIEvent eventOnSelect;
+    public TUIEvent eventOnSelected;
+    public TUIEvent eventOnDeselect;
+    public TUIEvent eventOnDeselected;
+
+    public TDataEvent eventOnDataSelect;
+    public TDataEvent eventOnDataSelected;
+    public TDataEvent eventOnDataDeselect;
+    public TDataEvent eventOnDataDeselected;
+
+    protected readonly List<TUI> uis = new List<TUI>();
+    public TUI SelectedUI { get; protected set; }
+
+    public void Add(TUI ui)
     {
-        SelectSingle,
-        Toggle,
+        if (ui == null)
+            return;
+
+        ui.selectionManager = this;
+        // Select first ui
+        if (uis.Count == 0 && selectionMode == UISelectionMode.Toggle)
+            Select(ui);
+        else
+            ui.Deselect();
+
+        uis.Add(ui);
     }
 
-    public abstract class UISelectionManager : MonoBehaviour
+    public int IndexOf(TUI ui)
     {
-        public UISelectionMode selectionMode;
-        public abstract object GetSelectedUI();
-        public abstract void Select(object ui);
-        public abstract void Deselect(object ui);
-        public abstract void DeselectAll();
-        public abstract void DeselectSelectedUI();
-        public abstract bool Contains(object ui);
+        return uis.IndexOf(ui);
     }
 
-    public abstract class UISelectionManager<TData, TUI, TEvent> : UISelectionManager
-        where TUI : UISelectionEntry<TData>
-        where TEvent : UnityEvent<TUI>
+    public TUI Get(int index)
     {
-        public TEvent eventOnSelect;
-        public TEvent eventOnSelected;
-        public TEvent eventOnDeselect;
-        public TEvent eventOnDeselected;
+        return uis[index];
+    }
 
-        protected readonly List<TUI> uis = new List<TUI>();
-        public TUI SelectedUI { get; protected set; }
+    public bool Remove(TUI ui)
+    {
+        return uis.Remove(ui);
+    }
 
-        public void Add(TUI ui)
+    public int Count
+    {
+        get { return uis.Count; }
+    }
+
+    public void Clear()
+    {
+        uis.Clear();
+        SelectedUI = null;
+    }
+
+    public override sealed object GetSelectedUI()
+    {
+        return SelectedUI;
+    }
+
+    public override sealed void Select(object ui)
+    {
+        if (ui == null)
+            return;
+
+        var castedUI = (TUI)ui;
+        castedUI.Select();
+
+        if (eventOnSelect != null)
+            eventOnSelect.Invoke(castedUI);
+
+        if (eventOnDataSelect != null)
+            eventOnDataSelect.Invoke(castedUI.Data);
+
+        SelectedUI = castedUI;
+        foreach (var deselectUI in uis)
         {
-            if (ui == null)
-                return;
-
-            ui.selectionManager = this;
-            // Select first ui
-            if (uis.Count == 0 && selectionMode == UISelectionMode.Toggle)
-                Select(ui);
-            else
-                ui.Deselect();
-
-            uis.Add(ui);
-        }
-
-        public int IndexOf(TUI ui)
-        {
-            return uis.IndexOf(ui);
-        }
-
-        public TUI Get(int index)
-        {
-            return uis[index];
-        }
-
-        public bool Remove(TUI ui)
-        {
-            return uis.Remove(ui);
-        }
-
-        public int Count
-        {
-            get { return uis.Count; }
-        }
-
-        public void Clear()
-        {
-            uis.Clear();
-            SelectedUI = null;
-        }
-
-        public override sealed object GetSelectedUI()
-        {
-            return SelectedUI;
-        }
-
-        public override sealed void Select(object ui)
-        {
-            if (ui == null)
-                return;
-
-            var castedUI = (TUI)ui;
-            castedUI.Select();
-
-            if (eventOnSelect != null)
-                eventOnSelect.Invoke(castedUI);
-
-            SelectedUI = castedUI;
-            foreach (var deselectUI in uis)
-            {
-                if (deselectUI != castedUI)
-                    deselectUI.Deselect();
-            }
-
-            if (eventOnSelected != null)
-                eventOnSelected.Invoke(castedUI);
-        }
-
-        public override sealed void Deselect(object ui)
-        {
-            var castedUI = (TUI)ui;
-
-            if (eventOnDeselect != null)
-                eventOnDeselect.Invoke(castedUI);
-
-            SelectedUI = null;
-            castedUI.Deselect();
-
-            if (eventOnDeselected != null)
-                eventOnDeselected.Invoke(castedUI);
-        }
-
-        public override sealed void DeselectAll()
-        {
-            SelectedUI = null;
-            foreach (var deselectUI in uis)
-            {
+            if (deselectUI != castedUI)
                 deselectUI.Deselect();
-            }
         }
 
-        public override sealed void DeselectSelectedUI()
-        {
-            if (SelectedUI != null)
-                Deselect(SelectedUI);
-        }
+        if (eventOnSelected != null)
+            eventOnSelected.Invoke(castedUI);
 
-        public override bool Contains(object ui)
+        if (eventOnDataSelected != null)
+            eventOnDataSelected.Invoke(castedUI.Data);
+    }
+
+    public override sealed void Deselect(object ui)
+    {
+        var castedUI = (TUI)ui;
+
+        if (eventOnDeselect != null)
+            eventOnDeselect.Invoke(castedUI);
+
+        if (eventOnDataDeselect != null)
+            eventOnDataDeselect.Invoke(castedUI.Data);
+
+        SelectedUI = null;
+        castedUI.Deselect();
+
+        if (eventOnDeselected != null)
+            eventOnDeselected.Invoke(castedUI);
+
+        if (eventOnDataDeselected != null)
+            eventOnDataDeselected.Invoke(castedUI.Data);
+    }
+
+    public override sealed void DeselectAll()
+    {
+        SelectedUI = null;
+        foreach (var deselectUI in uis)
         {
-            return ui is TUI && uis.Contains(ui as TUI);
+            deselectUI.Deselect();
         }
+    }
+
+    public override sealed void DeselectSelectedUI()
+    {
+        if (SelectedUI != null)
+            Deselect(SelectedUI);
+    }
+
+    public override bool Contains(object ui)
+    {
+        return ui is TUI && uis.Contains(ui as TUI);
     }
 }

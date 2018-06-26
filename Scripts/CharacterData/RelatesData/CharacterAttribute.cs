@@ -2,75 +2,73 @@
 using System.Collections.Generic;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
+using MultiplayerARPG;
 
-namespace MultiplayerARPG
+[System.Serializable]
+public class CharacterAttribute
 {
-    [System.Serializable]
-    public class CharacterAttribute
+    public static readonly CharacterAttribute Empty = new CharacterAttribute();
+    public int dataId;
+    public short amount;
+    [System.NonSerialized]
+    private int dirtyDataId;
+    [System.NonSerialized]
+    private Attribute cacheAttribute;
+
+    private void MakeCache()
     {
-        public static readonly CharacterAttribute Empty = new CharacterAttribute();
-        public int dataId;
-        public short amount;
-        [System.NonSerialized]
-        private int dirtyDataId;
-        [System.NonSerialized]
-        private Attribute cacheAttribute;
-
-        private void MakeCache()
+        if (!GameInstance.Attributes.ContainsKey(dataId))
         {
-            if (!GameInstance.Attributes.ContainsKey(dataId))
-            {
-                cacheAttribute = null;
-                return;
-            }
-            if (dirtyDataId != dataId)
-            {
-                dirtyDataId = dataId;
-                cacheAttribute = GameInstance.Attributes.TryGetValue(dataId, out cacheAttribute) ? cacheAttribute : null;
-            }
+            cacheAttribute = null;
+            return;
         }
-
-        public Attribute GetAttribute()
+        if (dirtyDataId != dataId)
         {
-            MakeCache();
-            return cacheAttribute;
-        }
-
-        public bool CanIncrease(IPlayerCharacterData character)
-        {
-            return GetAttribute() != null && character != null && character.StatPoint > 0;
-        }
-
-        public void Increase(short amount)
-        {
-            this.amount += amount;
+            dirtyDataId = dataId;
+            cacheAttribute = GameInstance.Attributes.TryGetValue(dataId, out cacheAttribute) ? cacheAttribute : null;
         }
     }
 
-    public class NetFieldCharacterAttribute : LiteNetLibNetField<CharacterAttribute>
+    public Attribute GetAttribute()
     {
-        public override void Deserialize(NetDataReader reader)
-        {
-            var newValue = new CharacterAttribute();
-            newValue.dataId = reader.GetInt();
-            newValue.amount = reader.GetShort();
-            Value = newValue;
-        }
-
-        public override void Serialize(NetDataWriter writer)
-        {
-            writer.Put(Value.dataId);
-            writer.Put(Value.amount);
-        }
-
-        public override bool IsValueChanged(CharacterAttribute newValue)
-        {
-            return true;
-        }
+        MakeCache();
+        return cacheAttribute;
     }
 
-    [System.Serializable]
-    public class SyncListCharacterAttribute : LiteNetLibSyncList<NetFieldCharacterAttribute, CharacterAttribute>
+    public bool CanIncrease(IPlayerCharacterData character)
     {
+        return GetAttribute() != null && character != null && character.StatPoint > 0;
     }
+
+    public void Increase(short amount)
+    {
+        this.amount += amount;
+    }
+}
+
+public class NetFieldCharacterAttribute : LiteNetLibNetField<CharacterAttribute>
+{
+    public override void Deserialize(NetDataReader reader)
+    {
+        var newValue = new CharacterAttribute();
+        newValue.dataId = reader.GetInt();
+        newValue.amount = reader.GetShort();
+        Value = newValue;
+    }
+
+    public override void Serialize(NetDataWriter writer)
+    {
+        writer.Put(Value.dataId);
+        writer.Put(Value.amount);
+    }
+
+    public override bool IsValueChanged(CharacterAttribute newValue)
+    {
+        return true;
+    }
+}
+
+[System.Serializable]
+public class SyncListCharacterAttribute : LiteNetLibSyncList<NetFieldCharacterAttribute, CharacterAttribute>
+{
 }

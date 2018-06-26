@@ -313,7 +313,4 @@ namespace MultiplayerARPG
                 owningCharacter.RequestDropItem(indexOfData, (short)amount);
         }
     }
-
-    [System.Serializable]
-    public class UICharacterItemEvent : UnityEvent<UICharacterItem> { }
 }

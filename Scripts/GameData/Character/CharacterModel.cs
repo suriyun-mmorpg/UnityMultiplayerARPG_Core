@@ -50,7 +50,9 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        private int overrideActionClipId;
+        private int dataId;
+        public int DataId { get { return dataId; } }
+
         public AnimatorType animatorType;
         [Header("Animator")]
         [SerializeField]
@@ -75,8 +77,7 @@ namespace MultiplayerARPG
         [Header("Effect Containers")]
         [SerializeField]
         private EffectContainer[] effectContainers;
-
-        public int OverrideActionClipId { get { return overrideActionClipId; } }
+        
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
 
         private Transform cacheTransform;
@@ -237,9 +238,9 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            if (!Application.isPlaying && overrideActionClipId != GetInstanceID())
+            if (!Application.isPlaying && dataId != name.GenerateHashId())
             {
-                overrideActionClipId = GetInstanceID();
+                dataId = name.GenerateHashId();
                 EditorUtility.SetDirty(gameObject);
             }
         }

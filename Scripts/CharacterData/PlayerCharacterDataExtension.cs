@@ -4,585 +4,583 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using MultiplayerARPG;
 
-namespace MultiplayerARPG
+public static class PlayerCharacterDataExtension
 {
-    public static class PlayerCharacterDataExtension
+    public static T CloneTo<T>(this IPlayerCharacterData from, T to) where T : IPlayerCharacterData
     {
-        public static T CloneTo<T>(this IPlayerCharacterData from, T to) where T : IPlayerCharacterData
-        {
-            to.Id = from.Id;
-            to.DataId = from.DataId;
-            to.CharacterName = from.CharacterName;
-            to.Level = from.Level;
-            to.Exp = from.Exp;
-            to.CurrentHp = from.CurrentHp;
-            to.CurrentMp = from.CurrentMp;
-            to.CurrentStamina = from.CurrentStamina;
-            to.CurrentFood = from.CurrentFood;
-            to.CurrentWater = from.CurrentWater;
-            to.StatPoint = from.StatPoint;
-            to.SkillPoint = from.SkillPoint;
-            to.Gold = from.Gold;
-            to.EquipWeapons = from.EquipWeapons;
-            to.CurrentMapName = from.CurrentMapName;
-            to.CurrentPosition = from.CurrentPosition;
-            to.RespawnMapName = from.RespawnMapName;
-            to.RespawnPosition = from.RespawnPosition;
-            to.LastUpdate = from.LastUpdate;
-            to.Attributes = new List<CharacterAttribute>(from.Attributes);
-            to.Buffs = new List<CharacterBuff>(from.Buffs);
-            to.Hotkeys = new List<CharacterHotkey>(from.Hotkeys);
-            to.Quests = new List<CharacterQuest>(from.Quests);
-            to.EquipItems = new List<CharacterItem>(from.EquipItems);
-            to.NonEquipItems = new List<CharacterItem>(from.NonEquipItems);
-            to.Skills = new List<CharacterSkill>(from.Skills);
-            return to;
-        }
+        to.Id = from.Id;
+        to.DataId = from.DataId;
+        to.CharacterName = from.CharacterName;
+        to.Level = from.Level;
+        to.Exp = from.Exp;
+        to.CurrentHp = from.CurrentHp;
+        to.CurrentMp = from.CurrentMp;
+        to.CurrentStamina = from.CurrentStamina;
+        to.CurrentFood = from.CurrentFood;
+        to.CurrentWater = from.CurrentWater;
+        to.StatPoint = from.StatPoint;
+        to.SkillPoint = from.SkillPoint;
+        to.Gold = from.Gold;
+        to.EquipWeapons = from.EquipWeapons;
+        to.CurrentMapName = from.CurrentMapName;
+        to.CurrentPosition = from.CurrentPosition;
+        to.RespawnMapName = from.RespawnMapName;
+        to.RespawnPosition = from.RespawnPosition;
+        to.LastUpdate = from.LastUpdate;
+        to.Attributes = new List<CharacterAttribute>(from.Attributes);
+        to.Buffs = new List<CharacterBuff>(from.Buffs);
+        to.Hotkeys = new List<CharacterHotkey>(from.Hotkeys);
+        to.Quests = new List<CharacterQuest>(from.Quests);
+        to.EquipItems = new List<CharacterItem>(from.EquipItems);
+        to.NonEquipItems = new List<CharacterItem>(from.NonEquipItems);
+        to.Skills = new List<CharacterSkill>(from.Skills);
+        return to;
+    }
 
-        public static T ValidateCharacterData<T>(this T character) where T : IPlayerCharacterData
-        {
-            var gameInstance = GameInstance.Singleton;
-            PlayerCharacter database;
-            if (!GameInstance.PlayerCharacters.TryGetValue(character.DataId, out database))
-                return character;
-            // Validating character attributes
-            short returningStatPoint = 0;
-            var validAttributeIds = new HashSet<int>();
-            var characterAttributes = character.Attributes;
-            for (var i = characterAttributes.Count - 1; i >= 0; --i)
-            {
-                var characterAttribute = characterAttributes[i];
-                var attributeDataId = characterAttribute.dataId;
-                // If attribute is invalid
-                if (characterAttribute.GetAttribute() == null ||
-                    validAttributeIds.Contains(attributeDataId))
-                {
-                    returningStatPoint += characterAttribute.amount;
-                    character.Attributes.RemoveAt(i);
-                }
-                else
-                    validAttributeIds.Add(attributeDataId);
-            }
-            character.StatPoint += returningStatPoint;
-            // Add character's attributes
-            var attributes = GameInstance.Attributes.Values;
-            foreach (var attribute in attributes)
-            {
-                if (validAttributeIds.Contains(attribute.DataId))
-                    continue;
-                var characterAttribute = new CharacterAttribute();
-                characterAttribute.dataId = attribute.DataId;
-                characterAttribute.amount = 0;
-                character.Attributes.Add(characterAttribute);
-            }
-            // Validating character skills
-            short returningSkillPoint = 0;
-            var validSkillIds = new HashSet<int>();
-            var characterSkills = character.Skills;
-            for (var i = characterSkills.Count - 1; i >= 0; --i)
-            {
-                var characterSkill = characterSkills[i];
-                var skillDataId = characterSkill.dataId;
-                // If skill is invalid or this character database does not have skill
-                if (characterSkill.GetSkill() == null ||
-                    !database.CacheSkillLevels.ContainsKey(skillDataId) ||
-                    validSkillIds.Contains(skillDataId))
-                {
-                    returningSkillPoint += characterSkill.level;
-                    character.Skills.RemoveAt(i);
-                }
-                else
-                    validSkillIds.Add(skillDataId);
-            }
-            character.SkillPoint += returningSkillPoint;
-            // Add character's skills
-            var skillLevels = database.skillLevels;
-            foreach (var skillLevel in skillLevels)
-            {
-                if (skillLevel.skill != null && validSkillIds.Contains(skillLevel.skill.DataId))
-                    continue;
-                var characterSkill = new CharacterSkill();
-                characterSkill.dataId = skillLevel.skill.DataId;
-                characterSkill.level = skillLevel.level;
-                character.Skills.Add(characterSkill);
-            }
-            // Validating character equip weapons
-            var returningItems = new List<CharacterItem>();
-            var equipWeapons = character.EquipWeapons;
-            var rightHand = equipWeapons.rightHand;
-            var leftHand = equipWeapons.leftHand;
-            if (rightHand.GetEquipmentItem() == null)
-            {
-                if (rightHand.IsValid())
-                    returningItems.Add(rightHand);
-                equipWeapons.rightHand = CharacterItem.Empty;
-            }
-            if (leftHand.GetEquipmentItem() == null)
-            {
-                if (leftHand.IsValid())
-                    returningItems.Add(leftHand);
-                equipWeapons.leftHand = CharacterItem.Empty;
-            }
-            // Validating character equip items
-            var equipItems = character.EquipItems;
-            for (var i = equipItems.Count - 1; i >= 0; --i)
-            {
-                var equipItem = equipItems[i];
-                // If equipment is invalid
-                if (equipItem.GetEquipmentItem() == null)
-                {
-                    if (equipItem.IsValid())
-                        returningItems.Add(equipItem);
-                    character.EquipItems.RemoveAt(i);
-                }
-            }
-            // Return items to non equip items
-            foreach (var returningItem in returningItems)
-            {
-                character.NonEquipItems.Add(returningItem);
-            }
-            // Validating character non equip items
-            var nonEquipItems = character.NonEquipItems;
-            for (var i = nonEquipItems.Count - 1; i >= 0; --i)
-            {
-                var nonEquipItem = nonEquipItems[i];
-                // If equipment is invalid
-                if (!nonEquipItem.IsValid())
-                    character.NonEquipItems.RemoveAt(i);
-            }
+    public static T ValidateCharacterData<T>(this T character) where T : IPlayerCharacterData
+    {
+        var gameInstance = GameInstance.Singleton;
+        PlayerCharacter database;
+        if (!GameInstance.PlayerCharacters.TryGetValue(character.DataId, out database))
             return character;
-        }
-
-        public static T SetNewCharacterData<T>(this T character, string characterName, int dataId) where T : IPlayerCharacterData
+        // Validating character attributes
+        short returningStatPoint = 0;
+        var validAttributeIds = new HashSet<int>();
+        var characterAttributes = character.Attributes;
+        for (var i = characterAttributes.Count - 1; i >= 0; --i)
         {
-            var gameInstance = GameInstance.Singleton;
-            PlayerCharacter database;
-            if (!GameInstance.PlayerCharacters.TryGetValue(dataId, out database))
-                return character;
-            // Player character database
-            var playerCharacter = database as PlayerCharacter;
-            // Attributes
-            var attributes = GameInstance.Attributes.Values;
-            foreach (var attribute in attributes)
+            var characterAttribute = characterAttributes[i];
+            var attributeDataId = characterAttribute.dataId;
+            // If attribute is invalid
+            if (characterAttribute.GetAttribute() == null ||
+                validAttributeIds.Contains(attributeDataId))
             {
-                var characterAttribute = new CharacterAttribute();
-                characterAttribute.dataId = attribute.DataId;
-                characterAttribute.amount = 0;
-                character.Attributes.Add(characterAttribute);
+                returningStatPoint += characterAttribute.amount;
+                character.Attributes.RemoveAt(i);
             }
-            var skillLevels = playerCharacter.skillLevels;
-            foreach (var skillLevel in skillLevels)
+            else
+                validAttributeIds.Add(attributeDataId);
+        }
+        character.StatPoint += returningStatPoint;
+        // Add character's attributes
+        var attributes = GameInstance.Attributes.Values;
+        foreach (var attribute in attributes)
+        {
+            if (validAttributeIds.Contains(attribute.DataId))
+                continue;
+            var characterAttribute = new CharacterAttribute();
+            characterAttribute.dataId = attribute.DataId;
+            characterAttribute.amount = 0;
+            character.Attributes.Add(characterAttribute);
+        }
+        // Validating character skills
+        short returningSkillPoint = 0;
+        var validSkillIds = new HashSet<int>();
+        var characterSkills = character.Skills;
+        for (var i = characterSkills.Count - 1; i >= 0; --i)
+        {
+            var characterSkill = characterSkills[i];
+            var skillDataId = characterSkill.dataId;
+            // If skill is invalid or this character database does not have skill
+            if (characterSkill.GetSkill() == null ||
+                !database.CacheSkillLevels.ContainsKey(skillDataId) ||
+                validSkillIds.Contains(skillDataId))
             {
-                if (skillLevel.skill == null)
-                    continue;
-                var characterSkill = new CharacterSkill();
-                characterSkill.dataId = skillLevel.skill.DataId;
-                characterSkill.level = skillLevel.level;
-                character.Skills.Add(characterSkill);
+                returningSkillPoint += characterSkill.level;
+                character.Skills.RemoveAt(i);
             }
-            // Right hand & left hand items
-            var rightHandEquipItem = playerCharacter.rightHandEquipItem;
-            var leftHandEquipItem = playerCharacter.leftHandEquipItem;
-            var equipWeapons = new EquipWeapons();
-            // Right hand equipped item
-            if (rightHandEquipItem != null)
+            else
+                validSkillIds.Add(skillDataId);
+        }
+        character.SkillPoint += returningSkillPoint;
+        // Add character's skills
+        var skillLevels = database.skillLevels;
+        foreach (var skillLevel in skillLevels)
+        {
+            if (skillLevel.skill != null && validSkillIds.Contains(skillLevel.skill.DataId))
+                continue;
+            var characterSkill = new CharacterSkill();
+            characterSkill.dataId = skillLevel.skill.DataId;
+            characterSkill.level = skillLevel.level;
+            character.Skills.Add(characterSkill);
+        }
+        // Validating character equip weapons
+        var returningItems = new List<CharacterItem>();
+        var equipWeapons = character.EquipWeapons;
+        var rightHand = equipWeapons.rightHand;
+        var leftHand = equipWeapons.leftHand;
+        if (rightHand.GetEquipmentItem() == null)
+        {
+            if (rightHand.IsValid())
+                returningItems.Add(rightHand);
+            equipWeapons.rightHand = CharacterItem.Empty;
+        }
+        if (leftHand.GetEquipmentItem() == null)
+        {
+            if (leftHand.IsValid())
+                returningItems.Add(leftHand);
+            equipWeapons.leftHand = CharacterItem.Empty;
+        }
+        // Validating character equip items
+        var equipItems = character.EquipItems;
+        for (var i = equipItems.Count - 1; i >= 0; --i)
+        {
+            var equipItem = equipItems[i];
+            // If equipment is invalid
+            if (equipItem.GetEquipmentItem() == null)
             {
-                var newItem = CharacterItem.Create(rightHandEquipItem);
-                equipWeapons.rightHand = newItem;
+                if (equipItem.IsValid())
+                    returningItems.Add(equipItem);
+                character.EquipItems.RemoveAt(i);
             }
-            // Left hand equipped item
-            if (leftHandEquipItem != null)
-            {
-                var newItem = CharacterItem.Create(leftHandEquipItem);
-                equipWeapons.leftHand = newItem;
-            }
-            character.EquipWeapons = equipWeapons;
-            // Armors
-            var armorItems = playerCharacter.armorItems;
-            foreach (var armorItem in armorItems)
-            {
-                if (armorItem == null)
-                    continue;
-                var newItem = CharacterItem.Create(armorItem);
-                character.EquipItems.Add(newItem);
-            }
-            // General data
-            character.DataId = database.DataId;
-            character.CharacterName = characterName;
-            character.Level = 1;
-            var stats = character.GetStats();
-            character.CurrentHp = (int)stats.hp;
-            character.CurrentMp = (int)stats.mp;
-            character.CurrentStamina = (int)stats.stamina;
-            character.CurrentFood = (int)stats.food;
-            character.CurrentWater = (int)stats.water;
-            character.Gold = gameInstance.startGold;
-            // Inventory
-            var startItems = gameInstance.startItems;
-            foreach (var startItem in startItems)
-            {
-                if (startItem.item == null || startItem.amount <= 0)
-                    continue;
-                var amount = startItem.amount;
-                if (amount > startItem.item.maxStack)
-                    amount = startItem.item.maxStack;
-                var newItem = CharacterItem.Create(startItem.item, 1, amount);
-                character.NonEquipItems.Add(newItem);
-            }
-            // Position
-            character.CurrentMapName = gameInstance.startScene;
-            character.RespawnMapName = gameInstance.startScene;
-            character.CurrentPosition = gameInstance.startPosition;
-            character.RespawnPosition = gameInstance.startPosition;
+        }
+        // Return items to non equip items
+        foreach (var returningItem in returningItems)
+        {
+            character.NonEquipItems.Add(returningItem);
+        }
+        // Validating character non equip items
+        var nonEquipItems = character.NonEquipItems;
+        for (var i = nonEquipItems.Count - 1; i >= 0; --i)
+        {
+            var nonEquipItem = nonEquipItems[i];
+            // If equipment is invalid
+            if (!nonEquipItem.IsValid())
+                character.NonEquipItems.RemoveAt(i);
+        }
+        return character;
+    }
+
+    public static T SetNewCharacterData<T>(this T character, string characterName, int dataId) where T : IPlayerCharacterData
+    {
+        var gameInstance = GameInstance.Singleton;
+        PlayerCharacter database;
+        if (!GameInstance.PlayerCharacters.TryGetValue(dataId, out database))
             return character;
-        }
-
-        public static void AddAllCharacterRelatesDataSurrogate(this SurrogateSelector surrogateSelector)
+        // Player character database
+        var playerCharacter = database as PlayerCharacter;
+        // Attributes
+        var attributes = GameInstance.Attributes.Values;
+        foreach (var attribute in attributes)
         {
-            var attributeSS = new CharacterAttributeSerializationSurrogate();
-            var buffSS = new CharacterBuffSerializationSurrogate();
-            var hotkeySS = new CharacterHotkeySerializationSurrogate();
-            var itemSS = new CharacterItemSerializationSurrogate();
-            var questSS = new CharacterQuestSerializationSurrogate();
-            var skillSS = new CharacterSkillSerializationSurrogate();
-            surrogateSelector.AddSurrogate(typeof(CharacterAttribute), new StreamingContext(StreamingContextStates.All), attributeSS);
-            surrogateSelector.AddSurrogate(typeof(CharacterBuff), new StreamingContext(StreamingContextStates.All), buffSS);
-            surrogateSelector.AddSurrogate(typeof(CharacterHotkey), new StreamingContext(StreamingContextStates.All), hotkeySS);
-            surrogateSelector.AddSurrogate(typeof(CharacterItem), new StreamingContext(StreamingContextStates.All), itemSS);
-            surrogateSelector.AddSurrogate(typeof(CharacterQuest), new StreamingContext(StreamingContextStates.All), questSS);
-            surrogateSelector.AddSurrogate(typeof(CharacterSkill), new StreamingContext(StreamingContextStates.All), skillSS);
-            var playerCharacterDataSS = new PlayerCharacterSerializationSurrogate();
-            surrogateSelector.AddSurrogate(typeof(PlayerCharacterData), new StreamingContext(StreamingContextStates.All), playerCharacterDataSS);
-            surrogateSelector.AddSurrogate(typeof(PlayerCharacterEntity), new StreamingContext(StreamingContextStates.All), playerCharacterDataSS);
+            var characterAttribute = new CharacterAttribute();
+            characterAttribute.dataId = attribute.DataId;
+            characterAttribute.amount = 0;
+            character.Attributes.Add(characterAttribute);
         }
-
-        public static void SavePersistentCharacterData<T>(this T characterData) where T : IPlayerCharacterData
+        var skillLevels = playerCharacter.skillLevels;
+        foreach (var skillLevel in skillLevels)
         {
-            var savingData = new PlayerCharacterData();
-            characterData.CloneTo(savingData);
-            savingData.LastUpdate = (int)(System.DateTime.Now.Ticks / System.TimeSpan.TicksPerMillisecond);
+            if (skillLevel.skill == null)
+                continue;
+            var characterSkill = new CharacterSkill();
+            characterSkill.dataId = skillLevel.skill.DataId;
+            characterSkill.level = skillLevel.level;
+            character.Skills.Add(characterSkill);
+        }
+        // Right hand & left hand items
+        var rightHandEquipItem = playerCharacter.rightHandEquipItem;
+        var leftHandEquipItem = playerCharacter.leftHandEquipItem;
+        var equipWeapons = new EquipWeapons();
+        // Right hand equipped item
+        if (rightHandEquipItem != null)
+        {
+            var newItem = CharacterItem.Create(rightHandEquipItem);
+            equipWeapons.rightHand = newItem;
+        }
+        // Left hand equipped item
+        if (leftHandEquipItem != null)
+        {
+            var newItem = CharacterItem.Create(leftHandEquipItem);
+            equipWeapons.leftHand = newItem;
+        }
+        character.EquipWeapons = equipWeapons;
+        // Armors
+        var armorItems = playerCharacter.armorItems;
+        foreach (var armorItem in armorItems)
+        {
+            if (armorItem == null)
+                continue;
+            var newItem = CharacterItem.Create(armorItem);
+            character.EquipItems.Add(newItem);
+        }
+        // General data
+        character.DataId = database.DataId;
+        character.CharacterName = characterName;
+        character.Level = 1;
+        var stats = character.GetStats();
+        character.CurrentHp = (int)stats.hp;
+        character.CurrentMp = (int)stats.mp;
+        character.CurrentStamina = (int)stats.stamina;
+        character.CurrentFood = (int)stats.food;
+        character.CurrentWater = (int)stats.water;
+        character.Gold = gameInstance.startGold;
+        // Inventory
+        var startItems = gameInstance.startItems;
+        foreach (var startItem in startItems)
+        {
+            if (startItem.item == null || startItem.amount <= 0)
+                continue;
+            var amount = startItem.amount;
+            if (amount > startItem.item.maxStack)
+                amount = startItem.item.maxStack;
+            var newItem = CharacterItem.Create(startItem.item, 1, amount);
+            character.NonEquipItems.Add(newItem);
+        }
+        // Position
+        character.CurrentMapName = gameInstance.startScene;
+        character.RespawnMapName = gameInstance.startScene;
+        character.CurrentPosition = gameInstance.startPosition;
+        character.RespawnPosition = gameInstance.startPosition;
+        return character;
+    }
+
+    public static void AddAllCharacterRelatesDataSurrogate(this SurrogateSelector surrogateSelector)
+    {
+        var attributeSS = new CharacterAttributeSerializationSurrogate();
+        var buffSS = new CharacterBuffSerializationSurrogate();
+        var hotkeySS = new CharacterHotkeySerializationSurrogate();
+        var itemSS = new CharacterItemSerializationSurrogate();
+        var questSS = new CharacterQuestSerializationSurrogate();
+        var skillSS = new CharacterSkillSerializationSurrogate();
+        surrogateSelector.AddSurrogate(typeof(CharacterAttribute), new StreamingContext(StreamingContextStates.All), attributeSS);
+        surrogateSelector.AddSurrogate(typeof(CharacterBuff), new StreamingContext(StreamingContextStates.All), buffSS);
+        surrogateSelector.AddSurrogate(typeof(CharacterHotkey), new StreamingContext(StreamingContextStates.All), hotkeySS);
+        surrogateSelector.AddSurrogate(typeof(CharacterItem), new StreamingContext(StreamingContextStates.All), itemSS);
+        surrogateSelector.AddSurrogate(typeof(CharacterQuest), new StreamingContext(StreamingContextStates.All), questSS);
+        surrogateSelector.AddSurrogate(typeof(CharacterSkill), new StreamingContext(StreamingContextStates.All), skillSS);
+        var playerCharacterDataSS = new PlayerCharacterSerializationSurrogate();
+        surrogateSelector.AddSurrogate(typeof(PlayerCharacterData), new StreamingContext(StreamingContextStates.All), playerCharacterDataSS);
+        surrogateSelector.AddSurrogate(typeof(PlayerCharacterEntity), new StreamingContext(StreamingContextStates.All), playerCharacterDataSS);
+    }
+
+    public static void SavePersistentCharacterData<T>(this T characterData) where T : IPlayerCharacterData
+    {
+        var savingData = new PlayerCharacterData();
+        characterData.CloneTo(savingData);
+        savingData.LastUpdate = (int)(System.DateTime.Now.Ticks / System.TimeSpan.TicksPerMillisecond);
+        var binaryFormatter = new BinaryFormatter();
+        var surrogateSelector = new SurrogateSelector();
+        surrogateSelector.AddAllUnitySurrogate();
+        surrogateSelector.AddAllCharacterRelatesDataSurrogate();
+        binaryFormatter.SurrogateSelector = surrogateSelector;
+        var path = Application.persistentDataPath + "/" + savingData.Id + ".sav";
+        Debug.Log("Character Saving to: " + path);
+        var file = File.Open(path, FileMode.OpenOrCreate);
+        binaryFormatter.Serialize(file, savingData);
+        file.Close();
+        Debug.Log("Character Saved to: " + path);
+    }
+
+    public static T LoadPersistentCharacterDataById<T>(this T characterData, string id) where T : IPlayerCharacterData
+    {
+        return LoadPersistentCharacterData(characterData, Application.persistentDataPath + "/" + id + ".sav");
+    }
+
+    public static T LoadPersistentCharacterData<T>(this T characterData, string path) where T : IPlayerCharacterData
+    {
+        if (File.Exists(path))
+        {
             var binaryFormatter = new BinaryFormatter();
             var surrogateSelector = new SurrogateSelector();
             surrogateSelector.AddAllUnitySurrogate();
             surrogateSelector.AddAllCharacterRelatesDataSurrogate();
             binaryFormatter.SurrogateSelector = surrogateSelector;
-            var path = Application.persistentDataPath + "/" + savingData.Id + ".sav";
-            Debug.Log("Character Saving to: " + path);
-            var file = File.Open(path, FileMode.OpenOrCreate);
-            binaryFormatter.Serialize(file, savingData);
+            var file = File.Open(path, FileMode.Open);
+            PlayerCharacterData loadedData = (PlayerCharacterData)binaryFormatter.Deserialize(file);
             file.Close();
-            Debug.Log("Character Saved to: " + path);
+            loadedData.CloneTo(characterData);
         }
+        return characterData;
+    }
 
-        public static T LoadPersistentCharacterDataById<T>(this T characterData, string id) where T : IPlayerCharacterData
+    public static List<PlayerCharacterData> LoadAllPersistentCharacterData()
+    {
+        var result = new List<PlayerCharacterData>();
+        var path = Application.persistentDataPath;
+        var files = Directory.GetFiles(path, "*.sav");
+        Debug.Log("Characters loading from: " + path);
+        foreach (var file in files)
         {
-            return LoadPersistentCharacterData(characterData, Application.persistentDataPath + "/" + id + ".sav");
+            if (file.Contains("_world_"))
+                continue;
+            var characterData = new PlayerCharacterData();
+            result.Add(characterData.LoadPersistentCharacterData(file));
         }
+        Debug.Log("Characters loaded from: " + path);
+        return result;
+    }
 
-        public static T LoadPersistentCharacterData<T>(this T characterData, string path) where T : IPlayerCharacterData
+    public static void DeletePersistentCharacterData(string id)
+    {
+        if (string.IsNullOrEmpty(id))
         {
-            if (File.Exists(path))
-            {
-                var binaryFormatter = new BinaryFormatter();
-                var surrogateSelector = new SurrogateSelector();
-                surrogateSelector.AddAllUnitySurrogate();
-                surrogateSelector.AddAllCharacterRelatesDataSurrogate();
-                binaryFormatter.SurrogateSelector = surrogateSelector;
-                var file = File.Open(path, FileMode.Open);
-                PlayerCharacterData loadedData = (PlayerCharacterData)binaryFormatter.Deserialize(file);
-                file.Close();
-                loadedData.CloneTo(characterData);
-            }
-            return characterData;
+            Debug.LogWarning("Cannot delete character: character id is empty");
+            return;
         }
+        File.Delete(Application.persistentDataPath + "/" + id + ".sav");
+    }
 
-        public static List<PlayerCharacterData> LoadAllPersistentCharacterData()
+    public static void DeletePersistentCharacterData<T>(this T characterData) where T : IPlayerCharacterData
+    {
+        if (characterData == null)
         {
-            var result = new List<PlayerCharacterData>();
-            var path = Application.persistentDataPath;
-            var files = Directory.GetFiles(path, "*.sav");
-            Debug.Log("Characters loading from: " + path);
-            foreach (var file in files)
-            {
-                if (file.Contains("_world_"))
-                    continue;
-                var characterData = new PlayerCharacterData();
-                result.Add(characterData.LoadPersistentCharacterData(file));
-            }
-            Debug.Log("Characters loaded from: " + path);
-            return result;
+            Debug.LogWarning("Cannot delete character: character data is empty");
+            return;
         }
+        DeletePersistentCharacterData(characterData.Id);
+    }
 
-        public static void DeletePersistentCharacterData(string id)
+    public static void SerializeCharacterData<T>(this T characterData, NetDataWriter writer) where T : IPlayerCharacterData
+    {
+        writer.Put(characterData.Id);
+        writer.Put(characterData.DataId);
+        writer.Put(characterData.CharacterName);
+        writer.Put(characterData.Level);
+        writer.Put(characterData.Exp);
+        writer.Put(characterData.CurrentHp);
+        writer.Put(characterData.CurrentMp);
+        writer.Put(characterData.CurrentStamina);
+        writer.Put(characterData.CurrentFood);
+        writer.Put(characterData.CurrentWater);
+        writer.Put(characterData.StatPoint);
+        writer.Put(characterData.SkillPoint);
+        writer.Put(characterData.Gold);
+        writer.Put(characterData.CurrentMapName);
+        writer.Put(characterData.CurrentPosition.x);
+        writer.Put(characterData.CurrentPosition.y);
+        writer.Put(characterData.CurrentPosition.z);
+        writer.Put(characterData.RespawnMapName);
+        writer.Put(characterData.RespawnPosition.x);
+        writer.Put(characterData.RespawnPosition.y);
+        writer.Put(characterData.RespawnPosition.z);
+        writer.Put(characterData.LastUpdate);
+        writer.Put(characterData.Attributes.Count);
+        foreach (var entry in characterData.Attributes)
         {
-            if (string.IsNullOrEmpty(id))
-            {
-                Debug.LogWarning("Cannot delete character: character id is empty");
-                return;
-            }
-            File.Delete(Application.persistentDataPath + "/" + id + ".sav");
+            writer.Put(entry.dataId);
+            writer.Put(entry.amount);
         }
-
-        public static void DeletePersistentCharacterData<T>(this T characterData) where T : IPlayerCharacterData
+        writer.Put(characterData.Buffs.Count);
+        foreach (var entry in characterData.Buffs)
         {
-            if (characterData == null)
-            {
-                Debug.LogWarning("Cannot delete character: character data is empty");
-                return;
-            }
-            DeletePersistentCharacterData(characterData.Id);
+            writer.Put(entry.id);
+            writer.Put(entry.characterId);
+            writer.Put(entry.dataId);
+            writer.Put((byte)entry.type);
+            writer.Put(entry.level);
+            writer.Put(entry.buffRemainsDuration);
         }
-
-        public static void SerializeCharacterData<T>(this T characterData, NetDataWriter writer) where T : IPlayerCharacterData
+        writer.Put(characterData.Skills.Count);
+        foreach (var entry in characterData.Skills)
         {
-            writer.Put(characterData.Id);
-            writer.Put(characterData.DataId);
-            writer.Put(characterData.CharacterName);
-            writer.Put(characterData.Level);
-            writer.Put(characterData.Exp);
-            writer.Put(characterData.CurrentHp);
-            writer.Put(characterData.CurrentMp);
-            writer.Put(characterData.CurrentStamina);
-            writer.Put(characterData.CurrentFood);
-            writer.Put(characterData.CurrentWater);
-            writer.Put(characterData.StatPoint);
-            writer.Put(characterData.SkillPoint);
-            writer.Put(characterData.Gold);
-            writer.Put(characterData.CurrentMapName);
-            writer.Put(characterData.CurrentPosition.x);
-            writer.Put(characterData.CurrentPosition.y);
-            writer.Put(characterData.CurrentPosition.z);
-            writer.Put(characterData.RespawnMapName);
-            writer.Put(characterData.RespawnPosition.x);
-            writer.Put(characterData.RespawnPosition.y);
-            writer.Put(characterData.RespawnPosition.z);
-            writer.Put(characterData.LastUpdate);
-            writer.Put(characterData.Attributes.Count);
-            foreach (var entry in characterData.Attributes)
+            writer.Put(entry.dataId);
+            writer.Put(entry.level);
+            writer.Put(entry.coolDownRemainsDuration);
+        }
+        writer.Put(characterData.EquipItems.Count);
+        foreach (var entry in characterData.EquipItems)
+        {
+            writer.Put(entry.dataId);
+            writer.Put(entry.level);
+            writer.Put(entry.amount);
+            writer.Put(entry.durability);
+        }
+        writer.Put(characterData.NonEquipItems.Count);
+        foreach (var entry in characterData.NonEquipItems)
+        {
+            writer.Put(entry.dataId);
+            writer.Put(entry.level);
+            writer.Put(entry.amount);
+            writer.Put(entry.durability);
+        }
+        writer.Put(characterData.Hotkeys.Count);
+        foreach (var entry in characterData.Hotkeys)
+        {
+            writer.Put(entry.hotkeyId);
+            writer.Put((byte)entry.type);
+            writer.Put(entry.dataId);
+        }
+        writer.Put(characterData.Quests.Count);
+        foreach (var entry in characterData.Quests)
+        {
+            writer.Put(entry.dataId);
+            writer.Put(entry.isComplete);
+            var killedMonsters = entry.killedMonsters;
+            var killMonsterCount = killedMonsters == null ? 0 : killedMonsters.Count;
+            writer.Put(killMonsterCount);
+            if (killMonsterCount > 0)
             {
-                writer.Put(entry.dataId);
-                writer.Put(entry.amount);
-            }
-            writer.Put(characterData.Buffs.Count);
-            foreach (var entry in characterData.Buffs)
-            {
-                writer.Put(entry.id);
-                writer.Put(entry.characterId);
-                writer.Put(entry.dataId);
-                writer.Put((byte)entry.type);
-                writer.Put(entry.level);
-                writer.Put(entry.buffRemainsDuration);
-            }
-            writer.Put(characterData.Skills.Count);
-            foreach (var entry in characterData.Skills)
-            {
-                writer.Put(entry.dataId);
-                writer.Put(entry.level);
-                writer.Put(entry.coolDownRemainsDuration);
-            }
-            writer.Put(characterData.EquipItems.Count);
-            foreach (var entry in characterData.EquipItems)
-            {
-                writer.Put(entry.dataId);
-                writer.Put(entry.level);
-                writer.Put(entry.amount);
-                writer.Put(entry.durability);
-            }
-            writer.Put(characterData.NonEquipItems.Count);
-            foreach (var entry in characterData.NonEquipItems)
-            {
-                writer.Put(entry.dataId);
-                writer.Put(entry.level);
-                writer.Put(entry.amount);
-                writer.Put(entry.durability);
-            }
-            writer.Put(characterData.Hotkeys.Count);
-            foreach (var entry in characterData.Hotkeys)
-            {
-                writer.Put(entry.hotkeyId);
-                writer.Put((byte)entry.type);
-                writer.Put(entry.dataId);
-            }
-            writer.Put(characterData.Quests.Count);
-            foreach (var entry in characterData.Quests)
-            {
-                writer.Put(entry.dataId);
-                writer.Put(entry.isComplete);
-                var killedMonsters = entry.killedMonsters;
-                var killMonsterCount = killedMonsters == null ? 0 : killedMonsters.Count;
-                writer.Put(killMonsterCount);
-                if (killMonsterCount > 0)
+                foreach (var killedMonster in killedMonsters)
                 {
-                    foreach (var killedMonster in killedMonsters)
-                    {
-                        writer.Put(killedMonster.Key);
-                        writer.Put(killedMonster.Value);
-                    }
+                    writer.Put(killedMonster.Key);
+                    writer.Put(killedMonster.Value);
                 }
             }
-            var rightHand = characterData.EquipWeapons.rightHand;
-            writer.Put(rightHand.dataId);
-            writer.Put(rightHand.level);
-            writer.Put(rightHand.amount);
-            writer.Put(rightHand.durability);
-            var leftHand = characterData.EquipWeapons.leftHand;
-            writer.Put(leftHand.dataId);
-            writer.Put(leftHand.level);
-            writer.Put(leftHand.amount);
-            writer.Put(leftHand.durability);
         }
+        var rightHand = characterData.EquipWeapons.rightHand;
+        writer.Put(rightHand.dataId);
+        writer.Put(rightHand.level);
+        writer.Put(rightHand.amount);
+        writer.Put(rightHand.durability);
+        var leftHand = characterData.EquipWeapons.leftHand;
+        writer.Put(leftHand.dataId);
+        writer.Put(leftHand.level);
+        writer.Put(leftHand.amount);
+        writer.Put(leftHand.durability);
+    }
 
-        public static T DeserializeCharacterData<T>(this T characterData, NetDataReader reader) where T : IPlayerCharacterData
+    public static T DeserializeCharacterData<T>(this T characterData, NetDataReader reader) where T : IPlayerCharacterData
+    {
+        var tempCharacterData = new PlayerCharacterData();
+        tempCharacterData.Id = reader.GetString();
+        tempCharacterData.DataId = reader.GetInt();
+        tempCharacterData.CharacterName = reader.GetString();
+        tempCharacterData.Level = reader.GetShort();
+        tempCharacterData.Exp = reader.GetInt();
+        tempCharacterData.CurrentHp = reader.GetInt();
+        tempCharacterData.CurrentMp = reader.GetInt();
+        tempCharacterData.CurrentStamina = reader.GetInt();
+        tempCharacterData.CurrentFood = reader.GetInt();
+        tempCharacterData.CurrentWater = reader.GetInt();
+        tempCharacterData.StatPoint = reader.GetShort();
+        tempCharacterData.SkillPoint = reader.GetShort();
+        tempCharacterData.Gold = reader.GetInt();
+        tempCharacterData.CurrentMapName = reader.GetString();
+        tempCharacterData.CurrentPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
+        tempCharacterData.RespawnMapName = reader.GetString();
+        tempCharacterData.RespawnPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
+        tempCharacterData.LastUpdate = reader.GetInt();
+        var count = 0;
+        count = reader.GetInt();
+        for (var i = 0; i < count; ++i)
         {
-            var tempCharacterData = new PlayerCharacterData();
-            tempCharacterData.Id = reader.GetString();
-            tempCharacterData.DataId = reader.GetInt();
-            tempCharacterData.CharacterName = reader.GetString();
-            tempCharacterData.Level = reader.GetShort();
-            tempCharacterData.Exp = reader.GetInt();
-            tempCharacterData.CurrentHp = reader.GetInt();
-            tempCharacterData.CurrentMp = reader.GetInt();
-            tempCharacterData.CurrentStamina = reader.GetInt();
-            tempCharacterData.CurrentFood = reader.GetInt();
-            tempCharacterData.CurrentWater = reader.GetInt();
-            tempCharacterData.StatPoint = reader.GetShort();
-            tempCharacterData.SkillPoint = reader.GetShort();
-            tempCharacterData.Gold = reader.GetInt();
-            tempCharacterData.CurrentMapName = reader.GetString();
-            tempCharacterData.CurrentPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
-            tempCharacterData.RespawnMapName = reader.GetString();
-            tempCharacterData.RespawnPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
-            tempCharacterData.LastUpdate = reader.GetInt();
-            var count = 0;
-            count = reader.GetInt();
-            for (var i = 0; i < count; ++i)
-            {
-                var entry = new CharacterAttribute();
-                entry.dataId = reader.GetInt();
-                entry.amount = reader.GetShort();
-                tempCharacterData.Attributes.Add(entry);
-            }
-            count = reader.GetInt();
-            for (var i = 0; i < count; ++i)
-            {
-                var entry = new CharacterBuff();
-                entry.id = reader.GetString();
-                entry.characterId = reader.GetString();
-                entry.dataId = reader.GetInt();
-                entry.type = (BuffType)reader.GetByte();
-                entry.level = reader.GetShort();
-                entry.buffRemainsDuration = reader.GetFloat();
-                tempCharacterData.Buffs.Add(entry);
-            }
-            count = reader.GetInt();
-            for (var i = 0; i < count; ++i)
-            {
-                var entry = new CharacterSkill();
-                entry.dataId = reader.GetInt();
-                entry.level = reader.GetShort();
-                entry.coolDownRemainsDuration = reader.GetFloat();
-                tempCharacterData.Skills.Add(entry);
-            }
-            count = reader.GetInt();
-            for (var i = 0; i < count; ++i)
-            {
-                var entry = new CharacterItem();
-                entry.dataId = reader.GetInt();
-                entry.level = reader.GetShort();
-                entry.amount = reader.GetShort();
-                entry.durability = reader.GetFloat();
-                tempCharacterData.EquipItems.Add(entry);
-            }
-            count = reader.GetInt();
-            for (var i = 0; i < count; ++i)
-            {
-                var entry = new CharacterItem();
-                entry.dataId = reader.GetInt();
-                entry.level = reader.GetShort();
-                entry.amount = reader.GetShort();
-                entry.durability = reader.GetFloat();
-                tempCharacterData.NonEquipItems.Add(entry);
-            }
-            count = reader.GetInt();
-            for (var i = 0; i < count; ++i)
-            {
-                var entry = new CharacterHotkey();
-                entry.hotkeyId = reader.GetString();
-                entry.type = (HotkeyType)reader.GetByte();
-                entry.dataId = reader.GetInt();
-                tempCharacterData.Hotkeys.Add(entry);
-            }
-            count = reader.GetInt();
-            for (var i = 0; i < count; ++i)
-            {
-                var entry = new CharacterQuest();
-                entry.dataId = reader.GetInt();
-                entry.isComplete = reader.GetBool();
-                var killMonsterCount = reader.GetInt();
-                entry.killedMonsters = new Dictionary<int, int>();
-                for (var j = 0; j < killMonsterCount; ++j)
-                {
-                    entry.killedMonsters.Add(reader.GetInt(), reader.GetInt());
-                }
-                tempCharacterData.Quests.Add(entry);
-            }
-
-            var rightWeapon = new CharacterItem();
-            rightWeapon.dataId = reader.GetInt();
-            rightWeapon.level = reader.GetShort();
-            rightWeapon.amount = reader.GetShort();
-            rightWeapon.durability = reader.GetFloat();
-
-            var leftWeapon = new CharacterItem();
-            leftWeapon.dataId = reader.GetInt();
-            leftWeapon.level = reader.GetShort();
-            leftWeapon.amount = reader.GetShort();
-            leftWeapon.durability = reader.GetFloat();
-
-            var equipWeapons = new EquipWeapons();
-            equipWeapons.rightHand = rightWeapon;
-            equipWeapons.leftHand = leftWeapon;
-            tempCharacterData.EquipWeapons = equipWeapons;
-
-            tempCharacterData.ValidateCharacterData();
-            tempCharacterData.CloneTo(characterData);
-            return characterData;
+            var entry = new CharacterAttribute();
+            entry.dataId = reader.GetInt();
+            entry.amount = reader.GetShort();
+            tempCharacterData.Attributes.Add(entry);
         }
-
-        public static int IndexOfHotkey(this IPlayerCharacterData data, string hotkeyId)
+        count = reader.GetInt();
+        for (var i = 0; i < count; ++i)
         {
-            var list = data.Hotkeys;
-            CharacterHotkey tempHotkey;
-            var index = -1;
-            for (var i = 0; i < list.Count; ++i)
+            var entry = new CharacterBuff();
+            entry.id = reader.GetString();
+            entry.characterId = reader.GetString();
+            entry.dataId = reader.GetInt();
+            entry.type = (BuffType)reader.GetByte();
+            entry.level = reader.GetShort();
+            entry.buffRemainsDuration = reader.GetFloat();
+            tempCharacterData.Buffs.Add(entry);
+        }
+        count = reader.GetInt();
+        for (var i = 0; i < count; ++i)
+        {
+            var entry = new CharacterSkill();
+            entry.dataId = reader.GetInt();
+            entry.level = reader.GetShort();
+            entry.coolDownRemainsDuration = reader.GetFloat();
+            tempCharacterData.Skills.Add(entry);
+        }
+        count = reader.GetInt();
+        for (var i = 0; i < count; ++i)
+        {
+            var entry = new CharacterItem();
+            entry.dataId = reader.GetInt();
+            entry.level = reader.GetShort();
+            entry.amount = reader.GetShort();
+            entry.durability = reader.GetFloat();
+            tempCharacterData.EquipItems.Add(entry);
+        }
+        count = reader.GetInt();
+        for (var i = 0; i < count; ++i)
+        {
+            var entry = new CharacterItem();
+            entry.dataId = reader.GetInt();
+            entry.level = reader.GetShort();
+            entry.amount = reader.GetShort();
+            entry.durability = reader.GetFloat();
+            tempCharacterData.NonEquipItems.Add(entry);
+        }
+        count = reader.GetInt();
+        for (var i = 0; i < count; ++i)
+        {
+            var entry = new CharacterHotkey();
+            entry.hotkeyId = reader.GetString();
+            entry.type = (HotkeyType)reader.GetByte();
+            entry.dataId = reader.GetInt();
+            tempCharacterData.Hotkeys.Add(entry);
+        }
+        count = reader.GetInt();
+        for (var i = 0; i < count; ++i)
+        {
+            var entry = new CharacterQuest();
+            entry.dataId = reader.GetInt();
+            entry.isComplete = reader.GetBool();
+            var killMonsterCount = reader.GetInt();
+            entry.killedMonsters = new Dictionary<int, int>();
+            for (var j = 0; j < killMonsterCount; ++j)
             {
-                tempHotkey = list[i];
-                if (!string.IsNullOrEmpty(tempHotkey.hotkeyId) &&
-                    tempHotkey.hotkeyId.Equals(hotkeyId))
-                {
-                    index = i;
-                    break;
-                }
+                entry.killedMonsters.Add(reader.GetInt(), reader.GetInt());
             }
-            return index;
+            tempCharacterData.Quests.Add(entry);
         }
 
-        public static int IndexOfQuest(this IPlayerCharacterData data, int dataId)
+        var rightWeapon = new CharacterItem();
+        rightWeapon.dataId = reader.GetInt();
+        rightWeapon.level = reader.GetShort();
+        rightWeapon.amount = reader.GetShort();
+        rightWeapon.durability = reader.GetFloat();
+
+        var leftWeapon = new CharacterItem();
+        leftWeapon.dataId = reader.GetInt();
+        leftWeapon.level = reader.GetShort();
+        leftWeapon.amount = reader.GetShort();
+        leftWeapon.durability = reader.GetFloat();
+
+        var equipWeapons = new EquipWeapons();
+        equipWeapons.rightHand = rightWeapon;
+        equipWeapons.leftHand = leftWeapon;
+        tempCharacterData.EquipWeapons = equipWeapons;
+
+        tempCharacterData.ValidateCharacterData();
+        tempCharacterData.CloneTo(characterData);
+        return characterData;
+    }
+
+    public static int IndexOfHotkey(this IPlayerCharacterData data, string hotkeyId)
+    {
+        var list = data.Hotkeys;
+        CharacterHotkey tempHotkey;
+        var index = -1;
+        for (var i = 0; i < list.Count; ++i)
         {
-            var list = data.Quests;
-            CharacterQuest tempQuest;
-            var index = -1;
-            for (var i = 0; i < list.Count; ++i)
+            tempHotkey = list[i];
+            if (!string.IsNullOrEmpty(tempHotkey.hotkeyId) &&
+                tempHotkey.hotkeyId.Equals(hotkeyId))
             {
-                tempQuest = list[i];
-                if (tempQuest.dataId == dataId)
-                {
-                    index = i;
-                    break;
-                }
+                index = i;
+                break;
             }
-            return index;
         }
+        return index;
+    }
+
+    public static int IndexOfQuest(this IPlayerCharacterData data, int dataId)
+    {
+        var list = data.Quests;
+        CharacterQuest tempQuest;
+        var index = -1;
+        for (var i = 0; i < list.Count; ++i)
+        {
+            tempQuest = list[i];
+            if (tempQuest.dataId == dataId)
+            {
+                index = i;
+                break;
+            }
+        }
+        return index;
     }
 }
