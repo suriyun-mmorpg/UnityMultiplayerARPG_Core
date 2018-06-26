@@ -16,14 +16,9 @@ public struct HarvestEffectiveness
 public sealed class HarvestableEntity : DamageableNetworkEntity
 {
     public HarvestEffectiveness[] harvestEffectivenesses;
-    public float respawnDuration = 10f;
     public int maxHp = 100;
-
-    [SerializeField]
-    private SyncFieldBool isHidding = new SyncFieldBool();
+    
     private float deadTime;
-
-    public bool IsHidding { get { return isHidding.Value; } set { isHidding.Value = value; } }
 
     public override string Title
     {
@@ -85,38 +80,11 @@ public sealed class HarvestableEntity : DamageableNetworkEntity
         }
     }
 
-    public override void OnSetup()
+    protected override void Awake()
     {
-        base.OnSetup();
-        isHidding.sendOptions = SendOptions.ReliableUnordered;
-        isHidding.forOwnerOnly = false;
-        isHidding.onChange += OnIsHiddingChange;
-    }
-
-    private void OnDestroy()
-    {
-        isHidding.onChange -= OnIsHiddingChange;
-    }
-
-    private void OnIsHiddingChange(bool isHidding)
-    {
-        var renderers = GetComponentsInChildren<Renderer>();
-        foreach (var renderer in renderers)
-        {
-            renderer.enabled = !isHidding;
-        }
-        if (CacheCapsuleCollider != null)
-            CacheCapsuleCollider.enabled = !isHidding;
-    }
-
-    protected override void Update()
-    {
-        base.Update();
-        if (Time.unscaledTime - deadTime >= respawnDuration)
-        {
-            CurrentHp = maxHp;
-            IsHidding = false;
-        }
+        base.Awake();
+        gameObject.tag = gameInstance.harvestableTag;
+        gameObject.layer = gameInstance.harvestableLayer;
     }
 
     public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId)
@@ -138,11 +106,7 @@ public sealed class HarvestableEntity : DamageableNetworkEntity
                 attacker.IncreaseItems(dataId, 1, amount);
             CurrentHp -= totalDamage;
             if (CurrentHp <= 0)
-            {
-                CurrentHp = 0;
-                deadTime = Time.unscaledTime;
-                IsHidding = true;
-            }
+                NetworkDestroy();
         }
     }
 }

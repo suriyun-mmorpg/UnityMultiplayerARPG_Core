@@ -32,9 +32,11 @@ public class GameInstance : MonoBehaviour
     public UnityTag npcTag;
     public UnityTag itemDropTag;
     public UnityTag buildingTag;
+    public UnityTag harvestableTag;
     public UnityLayer characterLayer;
     public UnityLayer itemDropLayer;
     public UnityLayer buildingLayer;
+    public UnityLayer harvestableLayer;
     public UnityLayer[] nonTargetingLayers;
     public float itemAppearDuration = 60f;
     public float pickUpItemDistance = 1f;

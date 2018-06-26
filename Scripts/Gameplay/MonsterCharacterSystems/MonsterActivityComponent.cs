@@ -82,9 +82,10 @@ public class MonsterActivityComponent : MonoBehaviour
             monsterCharacterEntity.StopMove();
             monsterCharacterEntity.SetTargetEntity(null);
             if (time - monsterCharacterEntity.deadTime >= monsterDatabase.deadHideDelay)
-                monsterCharacterEntity.IsHidding = true;
-            if (time - monsterCharacterEntity.deadTime >= monsterDatabase.deadRespawnDelay)
-                monsterCharacterEntity.Respawn();
+            {
+                monsterCharacterEntity.spawnArea.Spawn(monsterDatabase.deadRespawnDelay - monsterDatabase.deadHideDelay);
+                monsterCharacterEntity.NetworkDestroy();
+            }
             return;
         }
 
@@ -148,7 +149,7 @@ public class MonsterActivityComponent : MonoBehaviour
                 // If stopped then random
                 var randomX = Random.Range(RANDOM_WANDER_AREA_MIN, RANDOM_WANDER_AREA_MAX) * (Random.value > 0.5f ? -1 : 1);
                 var randomZ = Random.Range(RANDOM_WANDER_AREA_MIN, RANDOM_WANDER_AREA_MAX) * (Random.value > 0.5f ? -1 : 1);
-                var randomPosition = monsterCharacterEntity.respawnPosition + new Vector3(randomX, 0, randomZ);
+                var randomPosition = monsterCharacterEntity.spawnPosition + new Vector3(randomX, 0, randomZ);
                 NavMeshHit navMeshHit;
                 if (NavMesh.SamplePosition(randomPosition, out navMeshHit, RANDOM_WANDER_AREA_MAX, 1))
                     SetWanderDestination(time, gameplayRule, monsterCharacterEntity, navMeshAgent, navMeshHit.position);

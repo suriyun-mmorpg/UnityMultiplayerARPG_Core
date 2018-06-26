@@ -171,7 +171,8 @@ public abstract class BaseGameNetworkManager : LiteNetLibGameManager
         var monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
         foreach (var monsterSpawnArea in monsterSpawnAreas)
         {
-            monsterSpawnArea.RandomSpawn(this);
+            monsterSpawnArea.manager = this;
+            monsterSpawnArea.RandomSpawn();
         }
         if (IsServer && !IsClient && GameInstance.Singleton.serverCharacterPrefab != null)
             Instantiate(GameInstance.Singleton.serverCharacterPrefab);

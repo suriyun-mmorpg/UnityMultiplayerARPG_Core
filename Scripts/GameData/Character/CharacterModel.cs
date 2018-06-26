@@ -137,7 +137,13 @@ public class CharacterModel : MonoBehaviour
         get
         {
             if (meleeDamageTransform == null)
-                meleeDamageTransform = CacheTransform;
+            {
+                var gameObject = new GameObject("_meleeDamage");
+                meleeDamageTransform = gameObject.transform;
+                meleeDamageTransform.parent = CacheTransform;
+                meleeDamageTransform.localPosition = new Vector3(0, center.y / height / 2f, 0);
+                meleeDamageTransform.rotation = CacheTransform.rotation;
+            }
             return meleeDamageTransform;
         }
     }
@@ -147,7 +153,13 @@ public class CharacterModel : MonoBehaviour
         get
         {
             if (missileDamageTransform == null)
-                missileDamageTransform = CacheTransform;
+            {
+                var gameObject = new GameObject("_missileDamage");
+                missileDamageTransform = gameObject.transform;
+                missileDamageTransform.parent = CacheTransform;
+                missileDamageTransform.localPosition = new Vector3(0, center.y / height / 2f, 0);
+                missileDamageTransform.rotation = CacheTransform.rotation;
+            }
             return missileDamageTransform;
         }
     }
@@ -157,7 +169,13 @@ public class CharacterModel : MonoBehaviour
         get
         {
             if (combatTextTransform == null)
-                combatTextTransform = CacheTransform;
+            {
+                var gameObject = new GameObject("_combatText");
+                combatTextTransform = gameObject.transform;
+                combatTextTransform.parent = CacheTransform;
+                combatTextTransform.localPosition = new Vector3(0, center.y / height / 2f, 0);
+                combatTextTransform.rotation = CacheTransform.rotation;
+            }
             return combatTextTransform;
         }
     }

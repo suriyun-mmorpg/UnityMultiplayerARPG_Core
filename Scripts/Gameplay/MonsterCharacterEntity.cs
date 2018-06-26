@@ -32,7 +32,10 @@ public class MonsterCharacterEntity : BaseCharacterEntity
     public readonly Dictionary<BaseCharacterEntity, ReceivedDamageRecord> receivedDamageRecords = new Dictionary<BaseCharacterEntity, ReceivedDamageRecord>();
 
     #region Public data
-    public Vector3 respawnPosition;
+    [HideInInspector]
+    public MonsterSpawnArea spawnArea;
+    [HideInInspector]
+    public Vector3 spawnPosition;
     #endregion
 
     #region Interface implementation
@@ -277,11 +280,11 @@ public class MonsterCharacterEntity : BaseCharacterEntity
     {
         if (!IsServer || CurrentHp > 0)
             return;
+
         base.Respawn();
         StopMove();
-        CacheNetTransform.Teleport(respawnPosition, CacheTransform.rotation);
+        CacheNetTransform.Teleport(spawnPosition, CacheTransform.rotation);
         MonsterActivityComponent.RandomNextWanderTime(Time.unscaledTime, this, CacheTransform);
-        IsHidding = false;
     }
 }
 

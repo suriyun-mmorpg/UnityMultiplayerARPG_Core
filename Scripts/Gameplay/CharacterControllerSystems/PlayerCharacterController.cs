@@ -435,8 +435,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
             var actDistance = attackDistance;
             actDistance -= actDistance * 0.1f;
             actDistance -= StoppingDistance;
-            actDistance += targetEnemy.CacheCapsuleCollider.radius;
-            if (Vector3.Distance(CharacterTransform.position, targetEnemy.CacheTransform.position) <= actDistance)
+            if (RaycastToTarget(targetEnemy.CacheTransform, actDistance, gameInstance.characterLayer.Mask))
             {
                 // Stop movement to attack
                 CharacterEntity.StopMove();
@@ -541,8 +540,7 @@ public class PlayerCharacterController : BasePlayerCharacterController
             var actDistance = attackDistance;
             actDistance -= actDistance * 0.1f;
             actDistance -= StoppingDistance;
-            actDistance += targetHarvestable.CacheCapsuleCollider.radius;
-            if (Vector3.Distance(CharacterTransform.position, targetHarvestable.CacheTransform.position) <= actDistance)
+            if (RaycastToTarget(targetHarvestable.CacheTransform, actDistance, gameInstance.harvestableLayer.Mask))
             {
                 // Stop movement to attack
                 CharacterEntity.StopMove();
@@ -818,5 +816,16 @@ public class PlayerCharacterController : BasePlayerCharacterController
                 queueUsingSkill = null;
         }
         return true;
+    }
+
+    public bool RaycastToTarget(Transform target, float actDistance, int layerMask)
+    {
+        var targetPosition = target.position;
+        var characterPosition = CharacterEntity.CacheTransform.position;
+        var heading = targetPosition - characterPosition;
+        var distance = heading.magnitude;
+        var direction = heading / distance;
+        RaycastHit hitInfo;
+        return Physics.Raycast(characterPosition, direction, out hitInfo, actDistance, layerMask) && hitInfo.transform == target;
     }
 }
