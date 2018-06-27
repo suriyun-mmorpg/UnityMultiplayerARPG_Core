@@ -101,8 +101,6 @@ namespace MultiplayerARPG
             spawnablePrefabs.Add(gameInstance.monsterCharacterEntityPrefab.Identity);
             spawnablePrefabs.Add(gameInstance.itemDropEntityPrefab.Identity);
             spawnablePrefabs.Add(gameInstance.buildingEntityPrefab.Identity);
-            if (gameInstance.npcEntityPrefab != null)
-                spawnablePrefabs.Add(gameInstance.npcEntityPrefab.Identity);
             if (gameInstance.warpPortalEntityPrefab != null)
                 spawnablePrefabs.Add(gameInstance.warpPortalEntityPrefab.Identity);
             var damageEntities = GameInstance.DamageEntities.Values;
@@ -195,32 +193,6 @@ namespace MultiplayerARPG
             foreach (var monsterSpawnArea in monsterSpawnAreas)
             {
                 monsterSpawnArea.SpawnAll();
-            }
-            // Spawn NPCs
-            if (GameInstance.MapNpcs.Count > 0)
-            {
-                if (gameInstance.npcEntityPrefab == null)
-                    Debug.LogWarning("Cannot spawn NPCs because GameInstance's Npc Entity Prefab is empty");
-                else
-                {
-                    Npcs mapNpcs;
-                    if (GameInstance.MapNpcs.TryGetValue(Assets.onlineScene.SceneName, out mapNpcs))
-                    {
-                        foreach (var npc in mapNpcs.npcs)
-                        {
-                            if (npc.characterModel == null)
-                            {
-                                Debug.LogWarning("No character model for NPC: " + npc.title + " Map: " + Assets.onlineScene.SceneName);
-                                continue;
-                            }
-                            var npcIdentity = Assets.NetworkSpawn(gameInstance.npcEntityPrefab.Identity, npc.position, Quaternion.Euler(npc.rotation));
-                            var npcEntity = npcIdentity.GetComponent<NpcEntity>();
-                            npcEntity.Title = npc.title;
-                            npcEntity.startDialog = npc.startDialog;
-                            npcEntity.ModelId = npc.characterModel.DataId;
-                        }
-                    }
-                }
             }
             // Spawn Warp Portals
             if (GameInstance.MapWarpPortals.Count > 0)

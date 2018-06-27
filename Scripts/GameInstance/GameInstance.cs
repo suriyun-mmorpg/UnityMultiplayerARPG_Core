@@ -19,7 +19,6 @@ namespace MultiplayerARPG
         public MonsterCharacterEntity monsterCharacterEntityPrefab;
         public ItemDropEntity itemDropEntityPrefab;
         public BuildingEntity buildingEntityPrefab;
-        public NpcEntity npcEntityPrefab;
         public WarpPortalEntity warpPortalEntityPrefab;
         public UISceneGameplay uiSceneGameplayPrefab;
         public UISceneGameplay uiSceneGameplayMobilePrefab;
@@ -30,8 +29,6 @@ namespace MultiplayerARPG
         [Tooltip("Default hit effect, will be used when attacks to enemies")]
         public GameEffectCollection defaultHitEffects;
         public int[] expTree;
-        [Tooltip("You can add NPCs here or may add NPCs in the scene directly, So you can leave this empty")]
-        public NpcDatabase npcDatabase;
         [Tooltip("You can add warp portals here or may add warp portals in the scene directly, So you can leave this empty")]
         public WarpPortalDatabase warpPortalDatabase;
         [Header("Gameplay Configs")]
@@ -81,7 +78,6 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, ActionAnimation> ActionAnimations = new Dictionary<int, ActionAnimation>();
         public static readonly Dictionary<int, GameEffectCollection> GameEffectCollections = new Dictionary<int, GameEffectCollection>();
         public static readonly Dictionary<int, CharacterModel> CharacterModels = new Dictionary<int, CharacterModel>();
-        public static readonly Dictionary<string, Npcs> MapNpcs = new Dictionary<string, Npcs>();
         public static readonly Dictionary<string, WarpPortals> MapWarpPortals = new Dictionary<string, WarpPortals>();
 
         #region Cache Data
@@ -245,7 +241,6 @@ namespace MultiplayerARPG
             ActionAnimations.Clear();
             GameEffectCollections.Clear();
             CharacterModels.Clear();
-            MapNpcs.Clear();
             MapWarpPortals.Clear();
 
             // Use Resources Load Async ?
@@ -297,23 +292,6 @@ namespace MultiplayerARPG
                     weaponHitEffects.Add(damageElement.hitEffects);
             }
             AddGameEffectCollections(GameEffectCollectionType.WeaponHit, weaponHitEffects);
-
-            var characterModels = new List<CharacterModel>();
-            if (npcDatabase != null)
-            {
-                foreach (var map in npcDatabase.maps)
-                {
-                    if (map.map == null || string.IsNullOrEmpty(map.map.SceneName))
-                        continue;
-                    MapNpcs[map.map.SceneName] = map;
-                    foreach (var npc in map.npcs)
-                    {
-                        if (npc.characterModel != null)
-                            characterModels.Add(npc.characterModel);
-                    }
-                }
-            }
-            AddCharacterModels(characterModels);
 
             if (warpPortalDatabase != null)
             {
