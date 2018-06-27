@@ -19,7 +19,7 @@ namespace MultiplayerARPG
         public HarvestEffectiveness[] harvestEffectivenesses;
         public int maxHp = 100;
         public float colliderDetectionRadius = 2f;
-        public float respawnDuration = 5f;
+        public float respawnDelay = 5f;
 
         #region Public data
         [HideInInspector]
@@ -100,6 +100,8 @@ namespace MultiplayerARPG
                 if (CurrentHp <= 0)
                 {
                     CurrentHp = 0;
+                    if (spawnArea != null)
+                        spawnArea.Spawn(respawnDelay);
                     NetworkDestroy();
                 }
             }

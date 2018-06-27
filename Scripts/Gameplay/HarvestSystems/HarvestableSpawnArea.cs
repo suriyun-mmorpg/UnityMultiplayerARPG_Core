@@ -4,39 +4,14 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [System.Serializable]
-    public struct HarvestableSpawnData
-    {
-        public HarvestableEntity harvestableEntity;
-        public int amount;
-    }
-
     public class HarvestableSpawnArea : MonoBehaviour
     {
         public const float GROUND_DETECTION_DISTANCE = 100f;
+        public HarvestableEntity harvestableEntity;
+        public short amount = 1;
         public float randomRadius = 5f;
-        public HarvestableSpawnData[] spawningHarvestables;
 
-        private readonly List<string> pendingSpawningHarvestables = new List<string>();
-        private Dictionary<string, HarvestableSpawnData> cacheSpawningHarvestables;
-        public Dictionary<string, HarvestableSpawnData> CacheSpawningHarvestables
-        {
-            get
-            {
-                if (cacheSpawningHarvestables == null)
-                {
-                    cacheSpawningHarvestables = new Dictionary<string, HarvestableSpawnData>();
-                    foreach (var spawningHarvestable in spawningHarvestables)
-                    {
-                        if (spawningHarvestable.harvestableEntity == null || spawningHarvestable.amount <= 0)
-                            continue;
-                        
-                        cacheSpawningHarvestables[spawningHarvestable.harvestableEntity.Identity.AssetId] = spawningHarvestable;
-                    }
-                }
-                return cacheSpawningHarvestables;
-            }
-        }
+        private int pending;
 
         private BaseGameNetworkManager cacheGameNetworkManager;
         public BaseGameNetworkManager CacheGameNetworkManager
@@ -55,66 +30,60 @@ namespace MultiplayerARPG
 
         public void RegisterAssets()
         {
-            foreach (var spawningHarvestable in CacheSpawningHarvestables.Values)
-            {
-                CacheGameNetworkManager.Assets.RegisterPrefab(spawningHarvestable.harvestableEntity.Identity);
-            }
+            if (harvestableEntity != null)
+                CacheGameNetworkManager.Assets.RegisterPrefab(harvestableEntity.Identity);
         }
 
         public void SpawnAll()
         {
-            foreach (var spawningHarvestable in CacheSpawningHarvestables.Values)
+            if (harvestableEntity != null)
             {
-                for (var i = 0; i < spawningHarvestable.amount; ++i)
+                for (var i = 0; i < amount; ++i)
                 {
-                    Spawn(spawningHarvestable.harvestableEntity.Identity.AssetId, 0);
+                    Spawn(0);
                 }
             }
         }
 
-        public void Spawn(string assetId, float delay)
+        public void Spawn(float delay)
         {
-            StartCoroutine(SpawnRoutine(assetId, delay));
+            StartCoroutine(SpawnRoutine(delay));
         }
 
-        IEnumerator SpawnRoutine(string assetId, float delay)
+        IEnumerator SpawnRoutine(float delay)
         {
             yield return new WaitForSecondsRealtime(delay);
 
-            HarvestableSpawnData spawnData;
-            if (CacheSpawningHarvestables.TryGetValue(assetId, out spawnData))
+            var colliderDetectionRadius = harvestableEntity.colliderDetectionRadius;
+            var spawnPosition = GetRandomPosition();
+            var spawnRotation = GetRandomRotation();
+            var overlapEntities = false;
+            var overlaps = Physics.OverlapSphere(spawnPosition, colliderDetectionRadius);
+            foreach (var overlap in overlaps)
             {
-                var colliderDetectionRadius = spawnData.harvestableEntity.colliderDetectionRadius;
-                var spawnPosition = GetRandomPosition();
-                var spawnRotation = GetRandomRotation();
-                var overlapEntities = false;
-                var overlaps = Physics.OverlapSphere(spawnPosition, colliderDetectionRadius);
-                foreach (var overlap in overlaps)
+                if (overlap.gameObject.layer == gameInstance.characterLayer ||
+                    overlap.gameObject.layer == gameInstance.itemDropLayer ||
+                    overlap.gameObject.layer == gameInstance.buildingLayer ||
+                    overlap.gameObject.layer == gameInstance.harvestableLayer)
                 {
-                    if (overlap.gameObject.layer == gameInstance.characterLayer ||
-                        overlap.gameObject.layer == gameInstance.itemDropLayer ||
-                        overlap.gameObject.layer == gameInstance.buildingLayer ||
-                        overlap.gameObject.layer == gameInstance.harvestableLayer)
-                    {
-                        overlapEntities = true;
-                        break;
-                    }
+                    overlapEntities = true;
+                    break;
                 }
-                if (!overlapEntities)
+            }
+            if (!overlapEntities)
+            {
+                var identity = CacheGameNetworkManager.Assets.NetworkSpawn(harvestableEntity.Identity, spawnPosition, spawnRotation);
+                if (identity != null)
                 {
-                    var identity = CacheGameNetworkManager.Assets.NetworkSpawn(assetId, spawnPosition, spawnRotation);
-                    if (identity != null)
-                    {
-                        var entity = identity.GetComponent<HarvestableEntity>();
-                        entity.spawnArea = this;
-                        entity.spawnPosition = spawnPosition;
-                    }
+                    var entity = identity.GetComponent<HarvestableEntity>();
+                    entity.spawnArea = this;
+                    entity.spawnPosition = spawnPosition;
                 }
-                else
-                {
-                    pendingSpawningHarvestables.Add(assetId);
-                    Debug.LogWarning("[HarvestableSpawnArea(" + name + ")] Cannot spawn harvestable it is collided to another entities, pending harvestable amount " + pendingSpawningHarvestables.Count);
-                }
+            }
+            else
+            {
+                ++pending;
+                Debug.LogWarning("[HarvestableSpawnArea(" + name + ")] Cannot spawn harvestable it is collided to another entities, pending harvestable amount " + pending);
             }
         }
 

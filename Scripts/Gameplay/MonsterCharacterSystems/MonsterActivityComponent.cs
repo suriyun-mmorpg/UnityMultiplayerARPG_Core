@@ -85,7 +85,8 @@ namespace MultiplayerARPG
                 monsterCharacterEntity.SetTargetEntity(null);
                 if (time - monsterCharacterEntity.deadTime >= monsterDatabase.deadHideDelay)
                 {
-                    monsterCharacterEntity.spawnArea.Spawn(monsterDatabase.deadRespawnDelay - monsterDatabase.deadHideDelay);
+                    if (monsterCharacterEntity.spawnArea != null)
+                        monsterCharacterEntity.spawnArea.Spawn(monsterDatabase.deadRespawnDelay - monsterDatabase.deadHideDelay);
                     monsterCharacterEntity.NetworkDestroy();
                 }
                 return;
