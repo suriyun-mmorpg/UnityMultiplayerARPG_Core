@@ -101,6 +101,7 @@ namespace MultiplayerARPG
                 buildingObject.CacheTransform.localRotation = Quaternion.identity;
                 buildingObject.CacheTransform.localScale = Vector3.one;
                 buildingObject.gameObject.SetLayerRecursively(gameInstance.buildingLayer, true);
+                combatTextTransform = buildingObject.CombatTextTransform;
             }
         }
 

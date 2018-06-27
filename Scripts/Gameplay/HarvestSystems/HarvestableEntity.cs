@@ -4,19 +4,10 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [System.Serializable]
-    public struct HarvestEffectiveness
-    {
-        public WeaponType weaponType;
-        [Tooltip("This will multiply with harvest damage amount")]
-        [Range(0.1f, 5f)]
-        public float damageEffectiveness;
-        public ItemDropByWeight[] items;
-    }
 
     public sealed class HarvestableEntity : DamageableNetworkEntity
     {
-        public HarvestEffectiveness[] harvestEffectivenesses;
+        public Harvestable harvestable;
         public int maxHp = 100;
         public float colliderDetectionRadius = 2f;
         public float respawnDelay = 5f;
@@ -27,50 +18,6 @@ namespace MultiplayerARPG
         [HideInInspector]
         public Vector3 spawnPosition;
         #endregion
-
-        private Dictionary<WeaponType, HarvestEffectiveness> cacheHarvestEffectivenesses;
-        public Dictionary<WeaponType, HarvestEffectiveness> CacheHarvestEffectivenesses
-        {
-            get
-            {
-                InitCaches();
-                return cacheHarvestEffectivenesses;
-            }
-        }
-
-        private Dictionary<WeaponType, WeightedRandomizer<ItemDropByWeight>> cacheHarvestItems;
-        public Dictionary<WeaponType, WeightedRandomizer<ItemDropByWeight>> CacheHarvestItems
-        {
-            get
-            {
-                InitCaches();
-                return cacheHarvestItems;
-            }
-        }
-
-        private void InitCaches()
-        {
-            if (cacheHarvestEffectivenesses == null || cacheHarvestItems == null)
-            {
-                cacheHarvestEffectivenesses = new Dictionary<WeaponType, HarvestEffectiveness>();
-                cacheHarvestItems = new Dictionary<WeaponType, WeightedRandomizer<ItemDropByWeight>>();
-                foreach (var harvestEffectiveness in harvestEffectivenesses)
-                {
-                    if (harvestEffectiveness.weaponType != null && harvestEffectiveness.damageEffectiveness > 0)
-                    {
-                        cacheHarvestEffectivenesses[harvestEffectiveness.weaponType] = harvestEffectiveness;
-                        var harvestItems = new Dictionary<ItemDropByWeight, int>();
-                        foreach (var item in harvestEffectiveness.items)
-                        {
-                            if (item.item == null || item.amount <= 0 || item.weight <= 0)
-                                continue;
-                            harvestItems[item] = item.weight;
-                        }
-                        cacheHarvestItems[harvestEffectiveness.weaponType] = WeightedRandomizer.From(harvestItems);
-                    }
-                }
-            }
-        }
 
         protected override void Awake()
         {
@@ -84,26 +31,28 @@ namespace MultiplayerARPG
             if (!IsServer || CurrentHp <= 0 || weapon == null)
                 return;
 
+            var totalDamage = 0;
             var weaponItem = weapon.GetWeaponItem();
             HarvestEffectiveness harvestEffectiveness;
             WeightedRandomizer<ItemDropByWeight> itemRandomizer;
-            if (CacheHarvestEffectivenesses.TryGetValue(weaponItem.weaponType, out harvestEffectiveness) &&
-                CacheHarvestItems.TryGetValue(weaponItem.weaponType, out itemRandomizer))
+            if (harvestable.CacheHarvestEffectivenesses.TryGetValue(weaponItem.weaponType, out harvestEffectiveness) &&
+                harvestable.CacheHarvestItems.TryGetValue(weaponItem.weaponType, out itemRandomizer))
             {
-                var totalDamage = (int)(weaponItem.harvestDamageAmount.GetAmount(weapon.level).Random() * harvestEffectiveness.damageEffectiveness);
+                totalDamage = (int)(weaponItem.harvestDamageAmount.GetAmount(weapon.level).Random() * harvestEffectiveness.damageEffectiveness);
                 var receivingItem = itemRandomizer.TakeOne();
                 var dataId = receivingItem.item.DataId;
-                var amount = (short)(receivingItem.amount * totalDamage);
+                var amount = (short)(receivingItem.amountPerDamage * totalDamage);
                 if (!attacker.IncreasingItemsWillOverwhelming(dataId, amount))
                     attacker.IncreaseItems(dataId, 1, amount);
-                CurrentHp -= totalDamage;
-                if (CurrentHp <= 0)
-                {
-                    CurrentHp = 0;
-                    if (spawnArea != null)
-                        spawnArea.Spawn(respawnDelay);
-                    NetworkDestroy();
-                }
+            }
+            CurrentHp -= totalDamage;
+            ReceivedDamage(attacker, CombatAmountType.NormalDamage, totalDamage);
+            if (CurrentHp <= 0)
+            {
+                CurrentHp = 0;
+                if (spawnArea != null)
+                    spawnArea.Spawn(respawnDelay);
+                NetworkDestroy();
             }
         }
 

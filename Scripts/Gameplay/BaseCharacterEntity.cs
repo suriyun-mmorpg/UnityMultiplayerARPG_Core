@@ -339,6 +339,7 @@ namespace MultiplayerARPG
 
         public override void OnSetup()
         {
+            base.OnSetup();
             SetupNetElements();
             // On data changes events
             id.onChange += OnIdChange;
@@ -366,7 +367,6 @@ namespace MultiplayerARPG
             RegisterNetFunction("DropItem", new LiteNetLibFunction<NetFieldInt, NetFieldShort>((index, amount) => NetFuncDropItem(index, amount)));
             RegisterNetFunction("EquipItem", new LiteNetLibFunction<NetFieldInt, NetFieldString>((nonEquipIndex, equipPosition) => NetFuncEquipItem(nonEquipIndex, equipPosition)));
             RegisterNetFunction("UnEquipItem", new LiteNetLibFunction<NetFieldString>((fromEquipPosition) => NetFuncUnEquipItem(fromEquipPosition)));
-            RegisterNetFunction("CombatAmount", new LiteNetLibFunction<NetFieldByte, NetFieldInt>((combatAmountType, amount) => NetFuncCombatAmount((CombatAmountType)combatAmountType.Value, amount)));
             RegisterNetFunction("OnDead", new LiteNetLibFunction<NetFieldBool>((isInitialize) => NetFuncOnDead(isInitialize)));
             RegisterNetFunction("OnRespawn", new LiteNetLibFunction<NetFieldBool>((isInitialize) => NetFuncOnRespawn(isInitialize)));
             RegisterNetFunction("OnLevelUp", new LiteNetLibFunction(() => NetFuncOnLevelUp()));
@@ -754,24 +754,6 @@ namespace MultiplayerARPG
                 nonEquipItems.Add(unEquipItem);
         }
 
-        /// <summary>
-        /// This will be called on clients to display combat texts
-        /// </summary>
-        /// <param name="combatAmountType"></param>
-        /// <param name="amount"></param>
-        protected void NetFuncCombatAmount(CombatAmountType combatAmountType, int amount)
-        {
-            var uiSceneGameplay = UISceneGameplay.Singleton;
-            if (uiSceneGameplay == null)
-                return;
-
-            var combatTextTransform = CacheTransform;
-            if (Model != null)
-                combatTextTransform = Model.CombatTextTransform;
-
-            uiSceneGameplay.SpawnCombatText(combatTextTransform, combatAmountType, amount);
-        }
-
         protected void NetFuncOnDead(bool isInitialize)
         {
             animActionType = AnimActionType.None;
@@ -897,11 +879,6 @@ namespace MultiplayerARPG
             if (CurrentHp <= 0 || IsPlayingActionAnimation())
                 return;
             CallNetFunction("UnEquipItem", FunctionReceivers.Server, equipPosition);
-        }
-
-        public virtual void RequestCombatAmount(CombatAmountType combatAmountType, int amount)
-        {
-            CallNetFunction("CombatAmount", FunctionReceivers.All, combatAmountType, amount);
         }
 
         public virtual void RequestOnDead(bool isInitialize)
@@ -1154,6 +1131,8 @@ namespace MultiplayerARPG
                 Model.SetEquipWeapons(equipWeapons);
                 Model.SetEquipItems(equipItems);
                 Model.gameObject.SetActive(!isHidding.Value);
+                combatTextTransform = Model.CombatTextTransform;
+
                 // Hidding an object when it's host and character over sight
                 if (IsServer && IsClient)
                 {
@@ -1666,7 +1645,7 @@ namespace MultiplayerARPG
             {
                 case DamageType.Melee:
                     var halfFov = damageInfo.hitFov * 0.5f;
-                    var hits = Physics.OverlapSphere(damageTransform.position, damageInfo.hitDistance, gameInstance.DamageableLayerMask);
+                    var hits = Physics.OverlapSphere(damageTransform.position, damageInfo.hitDistance, gameInstance.GetDamageableLayerMask());
                     foreach (var hit in hits)
                     {
                         var damageableEntity = hit.GetComponent<DamageableNetworkEntity>();
@@ -1713,10 +1692,10 @@ namespace MultiplayerARPG
             return CacheTransform;
         }
 
-        public virtual void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountType combatAmountType, int damage)
+        public override void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountType combatAmountType, int damage)
         {
+            base.ReceivedDamage(attacker, combatAmountType, damage);
             gameInstance.GameplayRule.OnCharacterReceivedDamage(attacker, this, combatAmountType, damage);
-            RequestCombatAmount(combatAmountType, damage);
         }
 
         public virtual void Killed(BaseCharacterEntity lastAttacker)

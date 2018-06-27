@@ -194,18 +194,6 @@ namespace MultiplayerARPG
                 return defaultWeaponItem;
             }
         }
-
-        public int DamageableLayerMask
-        {
-            get
-            {
-                var layerMask = 0;
-                layerMask = layerMask | ~characterLayer.Mask;
-                layerMask = layerMask | ~buildingLayer.Mask;
-                layerMask = layerMask | ~harvestableLayer.Mask;
-                return layerMask;
-            }
-        }
         #endregion
 
         protected virtual void Awake()
@@ -374,6 +362,16 @@ namespace MultiplayerARPG
             }
             else
                 layerMask = -1;
+            return layerMask;
+        }
+
+
+        public int GetDamageableLayerMask()
+        {
+            var layerMask = 0;
+            layerMask = layerMask | ~characterLayer.Mask;
+            layerMask = layerMask | ~buildingLayer.Mask;
+            layerMask = layerMask | ~harvestableLayer.Mask;
             return layerMask;
         }
 

@@ -200,8 +200,8 @@ namespace MultiplayerARPG
     public struct ItemDropByWeight
     {
         public Item item;
-        public short amount;
-        public int weight;
+        public float amountPerDamage;
+        public int randomWeight;
     }
 
     [System.Serializable]

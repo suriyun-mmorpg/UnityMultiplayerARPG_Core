@@ -15,6 +15,8 @@ namespace MultiplayerARPG
         public string buildingType;
         public float characterForwardDistance = 4;
         public int maxHp = 100;
+        [SerializeField]
+        private Transform combatTextTransform;
 
         /// <summary>
         /// Use this as reference for entity to interactive while in play mode
@@ -50,6 +52,16 @@ namespace MultiplayerARPG
                 if (cacheTransform == null)
                     cacheTransform = GetComponent<Transform>();
                 return cacheTransform;
+            }
+        }
+
+        public Transform CombatTextTransform
+        {
+            get
+            {
+                if (combatTextTransform == null)
+                    combatTextTransform = CacheTransform;
+                return combatTextTransform;
             }
         }
 

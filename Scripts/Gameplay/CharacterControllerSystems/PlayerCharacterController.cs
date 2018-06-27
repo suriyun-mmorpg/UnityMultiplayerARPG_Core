@@ -564,7 +564,7 @@ namespace MultiplayerARPG
                         RequestAttack();
                 }
                 else
-                    UpdateTargetEntityPosition(targetEnemy);
+                    UpdateTargetEntityPosition(targetHarvestable);
             }
         }
 

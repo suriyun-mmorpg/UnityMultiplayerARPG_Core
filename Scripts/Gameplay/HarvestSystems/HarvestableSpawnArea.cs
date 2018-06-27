@@ -78,6 +78,7 @@ namespace MultiplayerARPG
                     var entity = identity.GetComponent<HarvestableEntity>();
                     entity.spawnArea = this;
                     entity.spawnPosition = spawnPosition;
+                    entity.CurrentHp = harvestableEntity.maxHp;
                 }
             }
             else
