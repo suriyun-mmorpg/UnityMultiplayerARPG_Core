@@ -1,9 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace MultiplayerARPG
 {
@@ -11,6 +8,8 @@ namespace MultiplayerARPG
     public struct HarvestEffectiveness
     {
         public WeaponType weaponType;
+        [Tooltip("This will multiply with harvest damage amount")]
+        [Range(0.1f, 5f)]
         public float damageEffectiveness;
         public ItemDropByWeight[] items;
     }
@@ -19,6 +18,7 @@ namespace MultiplayerARPG
     {
         public HarvestEffectiveness[] harvestEffectivenesses;
         public int maxHp = 100;
+        public float colliderDetectionRadius = 2f;
         public float respawnDuration = 5f;
 
         #region Public data
@@ -29,8 +29,6 @@ namespace MultiplayerARPG
         #endregion
 
         private Dictionary<WeaponType, HarvestEffectiveness> cacheHarvestEffectivenesses;
-        private Dictionary<WeaponType, WeightedRandomizer<ItemDropByWeight>> cacheHarvestItems;
-
         public Dictionary<WeaponType, HarvestEffectiveness> CacheHarvestEffectivenesses
         {
             get
@@ -40,6 +38,7 @@ namespace MultiplayerARPG
             }
         }
 
+        private Dictionary<WeaponType, WeightedRandomizer<ItemDropByWeight>> cacheHarvestItems;
         public Dictionary<WeaponType, WeightedRandomizer<ItemDropByWeight>> CacheHarvestItems
         {
             get
@@ -104,6 +103,12 @@ namespace MultiplayerARPG
                     NetworkDestroy();
                 }
             }
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawWireSphere(CacheTransform.position, colliderDetectionRadius);
         }
     }
 }

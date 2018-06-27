@@ -210,6 +210,7 @@ namespace MultiplayerARPG
 
         protected virtual void Awake()
         {
+            Application.targetFrameRate = 120;
             Application.runInBackground = true;
             if (Singleton != null)
             {
@@ -359,6 +360,56 @@ namespace MultiplayerARPG
             }
 
             return scenes;
+        }
+        
+        public int GetTargetLayerMask()
+        {
+            var layerMask = 0;
+            if (nonTargetingLayers.Length > 0)
+            {
+                foreach (var nonTargetingLayer in nonTargetingLayers)
+                {
+                    layerMask = layerMask | ~(nonTargetingLayer.Mask);
+                }
+            }
+            else
+                layerMask = -1;
+            return layerMask;
+        }
+
+        public int GetBuildLayerMask()
+        {
+            var layerMask = -1;
+            layerMask = layerMask | ~(characterLayer.Mask);
+            layerMask = layerMask | ~(itemDropLayer.Mask);
+            layerMask = layerMask | ~(harvestableLayer.Mask);
+            return layerMask;
+        }
+
+        public int GetItemDropGroundDetectionLayerMask()
+        {
+            var layerMask = -1;
+            layerMask = layerMask | ~(characterLayer.Mask);
+            layerMask = layerMask | ~(itemDropLayer.Mask);
+            return layerMask;
+        }
+
+        public int GetMonsterSpawnGroundDetectionLayerMask()
+        {
+            var layerMask = -1;
+            layerMask = layerMask | ~(buildingLayer.Mask);
+            layerMask = layerMask | ~(harvestableLayer.Mask);
+            return layerMask;
+        }
+
+        public int GetHarvestableSpawnGroundDetectionLayerMask()
+        {
+            var layerMask = -1;
+            layerMask = layerMask | ~(characterLayer.Mask);
+            layerMask = layerMask | ~(itemDropLayer.Mask);
+            layerMask = layerMask | ~(buildingLayer.Mask);
+            layerMask = layerMask | ~(harvestableLayer.Mask);
+            return layerMask;
         }
 
         public static void AddAttributes(IEnumerable<Attribute> attributes)

@@ -8,6 +8,7 @@ namespace MultiplayerARPG
 {
     public sealed class ItemDropEntity : RpgNetworkEntity
     {
+        public const float GROUND_DETECTION_DISTANCE = 100f;
         public CharacterItem dropData;
         public Transform modelContainer;
 
@@ -98,11 +99,11 @@ namespace MultiplayerARPG
             // Raycast to find hit floor
             Vector3? aboveHitPoint = null;
             Vector3? underHitPoint = null;
-            var raycastLayerMask = ~(gameInstance.characterLayer.Mask | gameInstance.itemDropLayer.Mask);
+            var raycastLayerMask = gameInstance.GetItemDropGroundDetectionLayerMask();
             RaycastHit tempHit;
-            if (Physics.Raycast(dropPosition, Vector3.up, out tempHit, 100f, raycastLayerMask))
+            if (Physics.Raycast(dropPosition, Vector3.up, out tempHit, GROUND_DETECTION_DISTANCE, raycastLayerMask))
                 aboveHitPoint = tempHit.point;
-            if (Physics.Raycast(dropPosition, Vector3.down, out tempHit, 100f, raycastLayerMask))
+            if (Physics.Raycast(dropPosition, Vector3.down, out tempHit, GROUND_DETECTION_DISTANCE, raycastLayerMask))
                 underHitPoint = tempHit.point;
             // Set drop position to nearest hit point
             if (aboveHitPoint.HasValue && underHitPoint.HasValue)

@@ -191,7 +191,7 @@ namespace MultiplayerARPG
                 CharacterEntity.SetTargetEntity(null);
                 LiteNetLibIdentity targetIdentity = null;
                 Vector3? targetPosition = null;
-                var layerMask = GetTargetRaycastLayerMask();
+                var layerMask = gameInstance.GetTargetLayerMask();
                 var hits = Physics.RaycastAll(targetCamera.ScreenPointToRay(Input.mousePosition), 100f, layerMask);
                 foreach (var hit in hits)
                 {
@@ -686,21 +686,6 @@ namespace MultiplayerARPG
             }
         }
 
-        private int GetTargetRaycastLayerMask()
-        {
-            var layerMask = 0;
-            if (gameInstance.nonTargetingLayers.Length > 0)
-            {
-                foreach (var nonTargetingLayer in gameInstance.nonTargetingLayers)
-                {
-                    layerMask = layerMask | ~(nonTargetingLayer.Mask);
-                }
-            }
-            else
-                layerMask = -1;
-            return layerMask;
-        }
-
         private void SetBuildingObjectByCharacterTransform()
         {
             if (currentBuildingObject != null)
@@ -711,23 +696,6 @@ namespace MultiplayerARPG
                 if (!RaycastToSetBuildingArea(new Ray(placePosition + (Vector3.up * 2.5f), Vector3.down), 5f))
                     currentBuildingObject.CacheTransform.position = GetBuildingPlacePosition(placePosition);
             }
-        }
-
-        private int GetBuildRaycastLayerMask()
-        {
-            var layerMask = 0;
-            if (gameInstance.nonTargetingLayers.Length > 0)
-            {
-                foreach (var nonTargetingLayer in gameInstance.nonTargetingLayers)
-                {
-                    layerMask = layerMask | ~(nonTargetingLayer.Mask);
-                }
-            }
-            else
-                layerMask = -1;
-            layerMask = layerMask | ~(gameInstance.characterLayer.Mask);
-            layerMask = layerMask | ~(gameInstance.itemDropLayer.Mask);
-            return layerMask;
         }
 
         private Vector3 GetBuildingPlacePosition(Vector3 position)
@@ -749,7 +717,7 @@ namespace MultiplayerARPG
 
         private bool RaycastToSetBuildingArea(Ray ray, float dist = 5f)
         {
-            var layerMask = GetBuildRaycastLayerMask();
+            var layerMask = gameInstance.GetBuildLayerMask();
             BuildingArea nonSnapBuildingArea = null;
             RaycastHit[] hits = Physics.RaycastAll(ray, dist, layerMask);
             foreach (var hit in hits)
