@@ -81,7 +81,6 @@ namespace MultiplayerARPG
                 var model = Instantiate(item.dropModel, CacheModelContainer);
                 model.gameObject.SetLayerRecursively(gameInstance.itemDropLayer, true);
                 model.gameObject.SetActive(true);
-                model.gameObject.layer = gameInstance.itemDropLayer;
                 model.RemoveComponentsInChildren<Collider>(false);
                 model.transform.localPosition = Vector3.zero;
             }
