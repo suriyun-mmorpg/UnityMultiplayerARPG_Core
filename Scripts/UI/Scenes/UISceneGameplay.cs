@@ -68,6 +68,8 @@ namespace MultiplayerARPG
             {
                 if (cacheGameNetworkManager == null)
                     cacheGameNetworkManager = FindObjectOfType<BaseGameNetworkManager>();
+                if (cacheGameNetworkManager == null)
+                    Debug.LogWarning("[UISceneGameplay(" + name + ")] Cannot find `BaseGameNetworkManager`");
                 return cacheGameNetworkManager;
             }
         }
@@ -160,7 +162,8 @@ namespace MultiplayerARPG
 
         public void OnClickExit()
         {
-            CacheGameNetworkManager.StopHost();
+            if (CacheGameNetworkManager != null)
+                CacheGameNetworkManager.StopHost();
         }
 
         public void OnCharacterDead(bool isInitialize)

@@ -13,7 +13,7 @@ namespace MultiplayerARPG
             public const short Warp = 100;
             public const short Chat = 101;
         }
-
+        
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
         protected readonly Dictionary<long, PlayerCharacterEntity> playerCharacters = new Dictionary<long, PlayerCharacterEntity>();
         protected readonly Dictionary<string, BuildingEntity> buildingEntities = new Dictionary<string, BuildingEntity>();
@@ -97,7 +97,7 @@ namespace MultiplayerARPG
             doNotEnterGameOnConnect = false;
             Assets.offlineScene.SceneName = gameInstance.homeScene;
             Assets.playerPrefab = gameInstance.playerCharacterEntityPrefab.Identity;
-            var spawnablePrefabs = new List<LiteNetLibIdentity>();
+            var spawnablePrefabs = new List<LiteNetLibIdentity>(Assets.spawnablePrefabs);
             spawnablePrefabs.Add(gameInstance.monsterCharacterEntityPrefab.Identity);
             spawnablePrefabs.Add(gameInstance.itemDropEntityPrefab.Identity);
             spawnablePrefabs.Add(gameInstance.buildingEntityPrefab.Identity);
@@ -171,15 +171,32 @@ namespace MultiplayerARPG
             UISceneGlobal.Singleton.ShowMessageDialog("Disconnected", errorMessage, true, false, false, false);
         }
 
+        private void RegisterEntities()
+        {
+            var harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
+            foreach (var harvestableSpawnArea in harvestableSpawnAreas)
+            {
+                harvestableSpawnArea.RegisterAssets();
+            }
+        }
+
+        public override void OnClientOnlineSceneLoaded()
+        {
+            base.OnClientOnlineSceneLoaded();
+            RegisterEntities();
+        }
+
         public override void OnServerOnlineSceneLoaded()
         {
             base.OnServerOnlineSceneLoaded();
+            RegisterEntities();
+            // Spawn monsters
             var monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
             foreach (var monsterSpawnArea in monsterSpawnAreas)
             {
-                monsterSpawnArea.manager = this;
-                monsterSpawnArea.RandomSpawn();
+                monsterSpawnArea.SpawnAll();
             }
+            // Spawn NPCs
             if (GameInstance.MapNpcs.Count > 0)
             {
                 if (gameInstance.npcEntityPrefab == null)
@@ -205,6 +222,7 @@ namespace MultiplayerARPG
                     }
                 }
             }
+            // Spawn Warp Portals
             if (GameInstance.MapWarpPortals.Count > 0)
             {
                 if (gameInstance.warpPortalEntityPrefab == null)
@@ -224,6 +242,7 @@ namespace MultiplayerARPG
                     }
                 }
             }
+            // If it's server (not host) spawn simple camera controller
             if (IsServer && !IsClient && GameInstance.Singleton.serverCharacterPrefab != null)
                 Instantiate(GameInstance.Singleton.serverCharacterPrefab);
         }

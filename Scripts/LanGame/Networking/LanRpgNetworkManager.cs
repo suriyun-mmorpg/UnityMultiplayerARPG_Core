@@ -85,16 +85,23 @@ namespace MultiplayerARPG
             {
                 var worldSaveData = new WorldSaveData();
                 worldSaveData.LoadPersistentData(playerCharacterEntity.Id, playerCharacterEntity.CurrentMapName);
-                StartCoroutine(SpawnBuildings(worldSaveData));
+                StartCoroutine(SpawnBuildingsAndHarvestables(worldSaveData));
             }
         }
 
-        IEnumerator SpawnBuildings(WorldSaveData worldSaveData)
+        IEnumerator SpawnBuildingsAndHarvestables(WorldSaveData worldSaveData)
         {
             yield return new WaitForSecondsRealtime(0.1f);
+            // Spawn buildings
             foreach (var building in worldSaveData.buildings)
             {
                 CreateBuildingEntity(building, true);
+            }
+            // Spawn harvestables
+            var harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
+            foreach (var harvestableSpawnArea in harvestableSpawnAreas)
+            {
+                harvestableSpawnArea.SpawnAll();
             }
         }
 

@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using LiteNetLib;
-using LiteNetLibManager;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -14,24 +15,19 @@ namespace MultiplayerARPG
         public ItemDropByWeight[] items;
     }
 
-    [RequireComponent(typeof(CapsuleCollider))]
     public sealed class HarvestableEntity : DamageableNetworkEntity
     {
         public HarvestEffectiveness[] harvestEffectivenesses;
         public int maxHp = 100;
+        public float respawnDuration = 5f;
 
-        private float deadTime;
+        #region Public data
+        [HideInInspector]
+        public HarvestableSpawnArea spawnArea;
+        [HideInInspector]
+        public Vector3 spawnPosition;
+        #endregion
 
-        private CapsuleCollider cacheCapsuleCollider;
-        public CapsuleCollider CacheCapsuleCollider
-        {
-            get
-            {
-                if (cacheCapsuleCollider == null)
-                    cacheCapsuleCollider = GetComponent<CapsuleCollider>();
-                return cacheCapsuleCollider;
-            }
-        }
         private Dictionary<WeaponType, HarvestEffectiveness> cacheHarvestEffectivenesses;
         private Dictionary<WeaponType, WeightedRandomizer<ItemDropByWeight>> cacheHarvestItems;
 
@@ -103,7 +99,10 @@ namespace MultiplayerARPG
                     attacker.IncreaseItems(dataId, 1, amount);
                 CurrentHp -= totalDamage;
                 if (CurrentHp <= 0)
+                {
+                    CurrentHp = 0;
                     NetworkDestroy();
+                }
             }
         }
     }

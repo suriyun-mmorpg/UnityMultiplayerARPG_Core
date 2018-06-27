@@ -51,6 +51,8 @@ namespace MultiplayerARPG
             {
                 if (cacheGameNetworkManager == null)
                     cacheGameNetworkManager = FindObjectOfType<BaseGameNetworkManager>();
+                if (cacheGameNetworkManager == null)
+                    Debug.LogWarning("[UIChatHandler(" + name + ")] Cannot find `BaseGameNetworkManager`");
                 return cacheGameNetworkManager;
             }
         }
@@ -145,7 +147,8 @@ namespace MultiplayerARPG
                     EnterChatMessage = trimText.Substring(0, cmd.Length + receiver.Length + 1); // +1 for space
                 }
             }
-            CacheGameNetworkManager.EnterChat(channel, message, sender, receiver);
+            if (CacheGameNetworkManager != null)
+                CacheGameNetworkManager.EnterChat(channel, message, sender, receiver);
             HideEnterChatField();
         }
 

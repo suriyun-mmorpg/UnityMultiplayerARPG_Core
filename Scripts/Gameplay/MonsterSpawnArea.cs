@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
@@ -10,13 +11,23 @@ namespace MultiplayerARPG
         public short level = 1;
         public short amount = 1;
         public float randomRadius = 5f;
-        [HideInInspector]
-        public BaseGameNetworkManager manager;
-
+        
+        private BaseGameNetworkManager cacheGameNetworkManager;
+        public BaseGameNetworkManager CacheGameNetworkManager
+        {
+            get
+            {
+                if (cacheGameNetworkManager == null)
+                    cacheGameNetworkManager = FindObjectOfType<BaseGameNetworkManager>();
+                if (cacheGameNetworkManager == null)
+                    Debug.LogWarning("[MonsterSpawnArea(" + name + ")] Cannot find `BaseGameNetworkManager`");
+                return cacheGameNetworkManager;
+            }
+        }
         private GameInstance gameInstance { get { return GameInstance.Singleton; } }
         private int dataId { get { return database == null ? 0 : database.DataId; } }
 
-        public void RandomSpawn()
+        public void SpawnAll()
         {
             if (database == null)
             {
@@ -45,9 +56,9 @@ namespace MultiplayerARPG
             yield return new WaitForSecondsRealtime(delay);
             var spawnPosition = GetRandomPosition();
             var spawnRotation = GetRandomRotation();
-            var identity = manager.Assets.NetworkSpawn(gameInstance.monsterCharacterEntityPrefab.gameObject, spawnPosition, spawnRotation);
+            var identity = CacheGameNetworkManager.Assets.NetworkSpawn(gameInstance.monsterCharacterEntityPrefab.gameObject, spawnPosition, spawnRotation);
             var entity = identity.GetComponent<MonsterCharacterEntity>();
-            entity.Id = GenericUtils.GetUniqueId();
+            entity.Id = string.Empty;
             entity.DataId = dataId;
             entity.Level = level;
             var stats = entity.GetStats();
