@@ -448,9 +448,9 @@ public static class CharacterDataExtension
                     amount = 0;
                     break;
                 }
-                else if (maxStack - nonEquipItem.amount > 0)
+                else if (maxStack - nonEquipItem.amount >= 0)
                 {
-                    amount = (short)(maxStack - (maxStack - nonEquipItem.amount));
+                    amount = (short)(amount - (maxStack - nonEquipItem.amount));
                     nonEquipItem.amount = maxStack;
                     changes[i] = nonEquipItem;
                 }
