@@ -157,7 +157,7 @@ namespace MultiplayerARPG
             CacheSellItemList.Generate(sellItems, (index, sellItem, ui) =>
             {
                 var uiNpcSellItem = ui.GetComponent<UINpcSellItem>();
-                uiNpcSellItem.Data = sellItem;
+                uiNpcSellItem.Setup(sellItem, index);
             });
             // Menu
             if (uiMenuRoot != null)
