@@ -79,7 +79,7 @@ namespace MultiplayerARPG
                 return;
 
             var monsterDatabase = monsterCharacterEntity.MonsterDatabase;
-            if (monsterCharacterEntity.CurrentHp <= 0)
+            if (monsterCharacterEntity.IsDead())
             {
                 monsterCharacterEntity.StopMove();
                 monsterCharacterEntity.SetTargetEntity(null);
@@ -96,7 +96,7 @@ namespace MultiplayerARPG
             BaseCharacterEntity targetEntity;
             if (monsterCharacterEntity.TryGetTargetEntity(out targetEntity))
             {
-                if (targetEntity.CurrentHp <= 0)
+                if (targetEntity.IsDead())
                 {
                     monsterCharacterEntity.StopMove();
                     monsterCharacterEntity.SetTargetEntity(null);
@@ -166,7 +166,7 @@ namespace MultiplayerARPG
                         SetFindTargetTime(time, monsterCharacterEntity);
                         BaseCharacterEntity targetCharacter;
                         // If no target enenmy or target enemy is dead
-                        if (!monsterCharacterEntity.TryGetTargetEntity(out targetCharacter) || targetCharacter.CurrentHp <= 0)
+                        if (!monsterCharacterEntity.TryGetTargetEntity(out targetCharacter) || targetCharacter.IsDead())
                         {
                             // Find nearby character by layer mask
                             var foundObjects = new List<Collider>(Physics.OverlapSphere(currentPosition, monsterDatabase.visualRange, gameInstance.characterLayer.Mask));

@@ -153,7 +153,7 @@ namespace MultiplayerARPG
         {
             base.Update();
 
-            if (CurrentHp <= 0)
+            if (IsDead())
             {
                 StopMove();
                 SetTargetEntity(null);
@@ -180,7 +180,7 @@ namespace MultiplayerARPG
                 return;
 
             var velocity = CacheRigidbody.velocity;
-            if (CurrentHp > 0)
+            if (!IsDead())
             {
                 var moveDirectionMagnitude = moveDirection.magnitude;
                 if (!IsPlayingActionAnimation() && moveDirectionMagnitude != 0)
@@ -267,7 +267,7 @@ namespace MultiplayerARPG
 
         public override void Respawn()
         {
-            if (!IsServer || CurrentHp > 0)
+            if (!IsServer || !IsDead())
                 return;
             base.Respawn();
             var manager = Manager as BaseGameNetworkManager;
@@ -330,9 +330,11 @@ namespace MultiplayerARPG
             RegisterNetFunction("NpcActivate", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncNpcActivate(objectId)));
             RegisterNetFunction("ShowNpcDialog", new LiteNetLibFunction<NetFieldInt>((npcDialogId) => NetFuncShowNpcDialog(npcDialogId)));
             RegisterNetFunction("SelectNpcDialogMenu", new LiteNetLibFunction<NetFieldInt>((menuIndex) => NetFuncSelectNpcDialogMenu(menuIndex)));
+            RegisterNetFunction("BuyNpcItem", new LiteNetLibFunction<NetFieldInt, NetFieldShort>((itemIndex, amount) => NetFuncBuyNpcItem(itemIndex, amount)));
             RegisterNetFunction("EnterWarp", new LiteNetLibFunction(() => NetFuncEnterWarp()));
             RegisterNetFunction("Build", new LiteNetLibFunction<NetFieldInt, NetFieldVector3, NetFieldQuaternion, NetFieldUInt>((itemIndex, position, rotation, parentObjectId) => NetFuncBuild(itemIndex, position, rotation, parentObjectId)));
             RegisterNetFunction("DestroyBuild", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncDestroyBuild(objectId)));
+            RegisterNetFunction("SellItem", new LiteNetLibFunction<NetFieldInt, NetFieldShort>((nonEquipIndex, amount) => NetFuncSellItem(nonEquipIndex, amount)));
         }
         #endregion
 
@@ -354,7 +356,7 @@ namespace MultiplayerARPG
         #region Net functions callbacks
         protected void NetFuncSwapOrMergeItem(int fromIndex, int toIndex)
         {
-            if (CurrentHp <= 0 ||
+            if (IsDead() ||
                 IsPlayingActionAnimation() ||
                 fromIndex < 0 ||
                 fromIndex >= NonEquipItems.Count ||
@@ -396,7 +398,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncAddAttribute(int attributeIndex, short amount)
         {
-            if (CurrentHp <= 0 ||
+            if (IsDead() ||
                 attributeIndex < 0 ||
                 attributeIndex >= Attributes.Count ||
                 amount <= 0 ||
@@ -415,7 +417,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncAddSkill(int skillIndex, short amount)
         {
-            if (CurrentHp <= 0 ||
+            if (IsDead() ||
                 skillIndex < 0 ||
                 skillIndex >= Skills.Count ||
                 amount <= 0 ||
@@ -452,7 +454,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncNpcActivate(uint objectId)
         {
-            if (CurrentHp <= 0 || IsPlayingActionAnimation())
+            if (IsDead() || IsPlayingActionAnimation())
                 return;
 
             LiteNetLibIdentity identity;
@@ -536,6 +538,29 @@ namespace MultiplayerARPG
                 RequestShowNpcDialog(currentNpcDialog.DataId);
         }
 
+        protected void NetFuncBuyNpcItem(int itemIndex, short amount)
+        {
+            if (currentNpcDialog == null)
+                return;
+            var sellItems = currentNpcDialog.sellItems;
+            if (sellItems == null || itemIndex < 0 || itemIndex >= sellItems.Length)
+                return;
+            var sellItem = sellItems[itemIndex];
+            if (Gold < sellItem.sellPrice * amount)
+            {
+                // TODO: May send not enough gold message
+                return;
+            }
+            var dataId = sellItem.item.DataId;
+            if (IncreasingItemsWillOverwhelming(dataId, amount))
+            {
+                // TODO: May send overwhelming message
+                return;
+            }
+            Gold -= sellItem.sellPrice * amount;
+            this.IncreaseItems(dataId, 1, amount);
+        }
+
         protected void NetFuncAcceptQuest(int questDataId)
         {
             var indexOfQuest = this.IndexOfQuest(questDataId);
@@ -599,7 +624,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncEnterWarp()
         {
-            if (CurrentHp <= 0 || IsPlayingActionAnimation() || warpingPortal == null)
+            if (IsDead() || IsPlayingActionAnimation() || warpingPortal == null)
                 return;
 
             warpingPortal.EnterWarp(this);
@@ -607,7 +632,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncBuild(int index, Vector3 position, Quaternion rotation, uint parentObjectId)
         {
-            if (CurrentHp <= 0 ||
+            if (IsDead() ||
                 IsPlayingActionAnimation() ||
                 index < 0 ||
                 index >= NonEquipItems.Count)
@@ -647,7 +672,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncDestroyBuild(uint objectId)
         {
-            if (CurrentHp <= 0 ||
+            if (IsDead() ||
                 IsPlayingActionAnimation())
                 return;
 
@@ -660,26 +685,46 @@ namespace MultiplayerARPG
                     manager.DestroyBuildingEntity(buildingEntity.Id);
             }
         }
+
+        protected void NetFuncSellItem(int index, short amount)
+        {
+            if (IsDead() ||
+                index < 0 ||
+                index >= nonEquipItems.Count)
+                return;
+
+            if (currentNpcDialog == null || currentNpcDialog.type != NpcDialogType.Shop)
+                return;
+
+            var nonEquipItem = nonEquipItems[index];
+            if (!nonEquipItem.IsValid() || amount > nonEquipItem.amount)
+                return;
+
+            var item = nonEquipItem.GetItem();
+            var level = nonEquipItem.level;
+            if (this.DecreaseItemsByIndex(index, amount))
+                Gold += item.sellPrice * amount;
+        }
         #endregion
 
         #region Net functions callers
         public void RequestSwapOrMergeItem(int fromIndex, int toIndex)
         {
-            if (CurrentHp <= 0)
+            if (IsDead())
                 return;
             CallNetFunction("SwapOrMergeItem", FunctionReceivers.Server, fromIndex, toIndex);
         }
 
         public void RequestAddAttribute(int attributeIndex, short amount)
         {
-            if (CurrentHp <= 0)
+            if (IsDead())
                 return;
             CallNetFunction("AddAttribute", FunctionReceivers.Server, attributeIndex, amount);
         }
 
         public void RequestAddSkill(int skillIndex, short amount)
         {
-            if (CurrentHp <= 0)
+            if (IsDead())
                 return;
             CallNetFunction("AddSkill", FunctionReceivers.Server, skillIndex, amount);
         }
@@ -696,38 +741,60 @@ namespace MultiplayerARPG
 
         public void RequestNpcActivate(uint objectId)
         {
+            if (IsDead())
+                return;
             CallNetFunction("NpcActivate", FunctionReceivers.Server, objectId);
         }
 
         public void RequestShowNpcDialog(int npcDialogDataId)
         {
+            if (IsDead())
+                return;
             CallNetFunction("ShowNpcDialog", ConnectId, npcDialogDataId);
         }
 
         public void RequestSelectNpcDialogMenu(int menuIndex)
         {
+            if (IsDead())
+                return;
             CallNetFunction("SelectNpcDialogMenu", FunctionReceivers.Server, menuIndex);
+        }
+
+        public void RequestBuyNpcItem(int itemIndex, short amount)
+        {
+            if (IsDead())
+                return;
+            CallNetFunction("BuyNpcItem", FunctionReceivers.Server, itemIndex, amount);
         }
 
         public void RequestEnterWarp()
         {
-            if (CurrentHp <= 0 || IsPlayingActionAnimation() || warpingPortal == null)
+            if (IsDead() || IsPlayingActionAnimation() || warpingPortal == null)
                 return;
             CallNetFunction("EnterWarp", FunctionReceivers.Server);
         }
 
         public void RequestBuild(int index, Vector3 position, Quaternion rotation, uint parentObjectId)
         {
-            if (CurrentHp <= 0 || IsPlayingActionAnimation())
+            if (IsDead() || IsPlayingActionAnimation())
                 return;
             CallNetFunction("Build", FunctionReceivers.Server, index, position, rotation, parentObjectId);
         }
 
         public void RequestDestroyBuilding(uint objectId)
         {
-            if (CurrentHp <= 0 || IsPlayingActionAnimation())
+            if (IsDead() || IsPlayingActionAnimation())
                 return;
             CallNetFunction("DestroyBuild", FunctionReceivers.Server, objectId);
+        }
+
+        public virtual void RequestSellItem(int nonEquipIndex, short amount)
+        {
+            if (IsDead() ||
+                nonEquipIndex < 0 ||
+                nonEquipIndex >= NonEquipItems.Count)
+                return;
+            CallNetFunction("SellItem", FunctionReceivers.Server, nonEquipIndex, amount);
         }
         #endregion
 
@@ -776,7 +843,7 @@ namespace MultiplayerARPG
 
         public void KeyMovement(Vector3 direction, bool isJump)
         {
-            if (CurrentHp <= 0)
+            if (IsDead())
                 return;
             moveDirection = direction;
             if (moveDirection.magnitude == 0 && isGrounded)
@@ -787,7 +854,7 @@ namespace MultiplayerARPG
 
         public void PointClickMovement(Vector3 position)
         {
-            if (CurrentHp <= 0)
+            if (IsDead())
                 return;
             SetMovePaths(position);
         }

@@ -250,6 +250,30 @@ namespace MultiplayerARPG
             var decreaseWeaponDurability = normalDecreaseWeaponDurability;
             var decreaseShieldDurability = normalDecreaseShieldDurability;
             var decreaseArmorDurability = normalDecreaseArmorDurability;
+            GetDecreaseDurabilityAmount(combatAmountType, out decreaseWeaponDurability, out decreaseShieldDurability, out decreaseArmorDurability);
+            // Decrease Weapon Durability
+            DecreaseEquipWeaponsDurability(attacker, decreaseWeaponDurability);
+            // Decrease Shield Durability
+            DecreaseEquipShieldsDurability(damageReceiver, decreaseShieldDurability);
+            // Decrease Armor Durability
+            DecreaseEquipItemsDurability(damageReceiver, decreaseArmorDurability);
+        }
+
+        public override void OnHarvestableReceivedDamage(BaseCharacterEntity attacker, HarvestableEntity damageReceiver, CombatAmountType combatAmountType, int damage)
+        {
+            var decreaseWeaponDurability = normalDecreaseWeaponDurability;
+            var decreaseShieldDurability = normalDecreaseShieldDurability;
+            var decreaseArmorDurability = normalDecreaseArmorDurability;
+            GetDecreaseDurabilityAmount(combatAmountType, out decreaseWeaponDurability, out decreaseShieldDurability, out decreaseArmorDurability);
+            // Decrease Weapon Durability
+            DecreaseEquipWeaponsDurability(attacker, decreaseWeaponDurability);
+        }
+
+        private void GetDecreaseDurabilityAmount(CombatAmountType combatAmountType, out float decreaseWeaponDurability, out float decreaseShieldDurability, out float decreaseArmorDurability)
+        {
+            decreaseWeaponDurability = normalDecreaseWeaponDurability;
+            decreaseShieldDurability = normalDecreaseShieldDurability;
+            decreaseArmorDurability = normalDecreaseArmorDurability;
             switch (combatAmountType)
             {
                 case CombatAmountType.BlockedDamage:
@@ -268,14 +292,17 @@ namespace MultiplayerARPG
                     decreaseArmorDurability = missDecreaseArmorDurability;
                     break;
             }
-            // Decrease Weapon Durability
+        }
+
+        private void DecreaseEquipWeaponsDurability(BaseCharacterEntity entity, float decreaseDurability)
+        {
             var tempDestroy = false;
-            var equipWeapons = attacker.EquipWeapons;
+            var equipWeapons = entity.EquipWeapons;
             var rightHand = equipWeapons.rightHand;
             var leftHand = equipWeapons.leftHand;
             if (rightHand.GetWeaponItem() != null && rightHand.GetMaxDurability() > 0)
             {
-                rightHand = DecreaseDurability(rightHand, decreaseWeaponDurability, out tempDestroy);
+                rightHand = DecreaseDurability(rightHand, decreaseDurability, out tempDestroy);
                 if (tempDestroy)
                     equipWeapons.rightHand = CharacterItem.Empty;
                 else
@@ -283,20 +310,24 @@ namespace MultiplayerARPG
             }
             if (leftHand.GetWeaponItem() != null && leftHand.GetMaxDurability() > 0)
             {
-                leftHand = DecreaseDurability(leftHand, decreaseWeaponDurability, out tempDestroy);
+                leftHand = DecreaseDurability(leftHand, decreaseDurability, out tempDestroy);
                 if (tempDestroy)
                     equipWeapons.leftHand = CharacterItem.Empty;
                 else
                     equipWeapons.leftHand = leftHand;
             }
-            attacker.EquipWeapons = equipWeapons;
-            // Decrease Shield Durability
-            equipWeapons = damageReceiver.EquipWeapons;
-            rightHand = equipWeapons.rightHand;
-            leftHand = equipWeapons.leftHand;
+            entity.EquipWeapons = equipWeapons;
+        }
+
+        private void DecreaseEquipShieldsDurability(BaseCharacterEntity entity, float decreaseDurability)
+        {
+            var tempDestroy = false;
+            var equipWeapons = entity.EquipWeapons;
+            var rightHand = equipWeapons.rightHand;
+            var leftHand = equipWeapons.leftHand;
             if (rightHand.GetShieldItem() != null && rightHand.GetMaxDurability() > 0)
             {
-                rightHand = DecreaseDurability(rightHand, decreaseShieldDurability, out tempDestroy);
+                rightHand = DecreaseDurability(rightHand, decreaseDurability, out tempDestroy);
                 if (tempDestroy)
                     equipWeapons.rightHand = CharacterItem.Empty;
                 else
@@ -304,25 +335,29 @@ namespace MultiplayerARPG
             }
             if (leftHand.GetShieldItem() != null && leftHand.GetMaxDurability() > 0)
             {
-                leftHand = DecreaseDurability(leftHand, decreaseShieldDurability, out tempDestroy);
+                leftHand = DecreaseDurability(leftHand, decreaseDurability, out tempDestroy);
                 if (tempDestroy)
                     equipWeapons.leftHand = CharacterItem.Empty;
                 else
                     equipWeapons.leftHand = leftHand;
             }
-            damageReceiver.EquipWeapons = equipWeapons;
-            // Decrease Armor Durability
-            var count = damageReceiver.EquipItems.Count;
+            entity.EquipWeapons = equipWeapons;
+        }
+
+        private void DecreaseEquipItemsDurability(BaseCharacterEntity entity, float decreaseDurability)
+        {
+            var tempDestroy = false;
+            var count = entity.EquipItems.Count;
             for (var i = count - 1; i >= 0; --i)
             {
-                var equipItem = damageReceiver.EquipItems[i];
+                var equipItem = entity.EquipItems[i];
                 if (equipItem.GetMaxDurability() <= 0)
                     continue;
-                equipItem = DecreaseDurability(equipItem, decreaseArmorDurability, out tempDestroy);
+                equipItem = DecreaseDurability(equipItem, decreaseDurability, out tempDestroy);
                 if (tempDestroy)
-                    damageReceiver.EquipItems.RemoveAt(i);
+                    entity.EquipItems.RemoveAt(i);
                 else
-                    damageReceiver.EquipItems[i] = equipItem;
+                    entity.EquipItems[i] = equipItem;
             }
         }
 

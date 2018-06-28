@@ -125,11 +125,11 @@ namespace MultiplayerARPG
 
         public void SetAttackTarget(BaseCharacterEntity target)
         {
-            if (target == null || target.CurrentHp <= 0)
+            if (target == null || target.IsDead())
                 return;
             // Already have target so don't set target
             BaseCharacterEntity oldTarget;
-            if (TryGetTargetEntity(out oldTarget) && oldTarget.CurrentHp > 0)
+            if (TryGetTargetEntity(out oldTarget) && !oldTarget.IsDead())
                 return;
             // Set target to attack
             SetTargetEntity(target);
@@ -138,7 +138,7 @@ namespace MultiplayerARPG
         public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId)
         {
             // Damage calculations apply at server only
-            if (!IsServer || CurrentHp <= 0)
+            if (!IsServer || IsDead())
                 return;
 
             base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
@@ -147,7 +147,7 @@ namespace MultiplayerARPG
                 return;
             // If character isn't dead
             // If character is not dead, try to attack
-            if (CurrentHp > 0)
+            if (!IsDead())
             {
                 // If no target enemy and current target is character, try to attack
                 BaseCharacterEntity targetEntity;
@@ -280,7 +280,7 @@ namespace MultiplayerARPG
 
         public override void Respawn()
         {
-            if (!IsServer || CurrentHp > 0)
+            if (!IsServer || !IsDead())
                 return;
 
             base.Respawn();

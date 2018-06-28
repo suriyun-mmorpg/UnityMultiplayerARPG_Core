@@ -42,7 +42,7 @@ namespace MultiplayerARPG
 
         protected static void UpdateRecovery(float deltaTime, BaseGameplayRule gameplayRule, CharacterRecoveryComponent recoveryData, BaseCharacterEntity characterEntity)
         {
-            if (characterEntity.isRecaching || characterEntity.CurrentHp <= 0 || !characterEntity.IsServer)
+            if (characterEntity.isRecaching || characterEntity.IsDead() || !characterEntity.IsServer)
                 return;
 
             recoveryData.recoveryUpdateDeltaTime += deltaTime;
@@ -65,7 +65,7 @@ namespace MultiplayerARPG
 
                 // Decrease Hp
                 recoveryData.decreasingHp += recoveryData.recoveryUpdateDeltaTime * gameplayRule.GetDecreasingHpPerSeconds(characterEntity);
-                if (characterEntity.CurrentHp > 0)
+                if (!characterEntity.IsDead())
                 {
                     if (recoveryData.decreasingHp >= 1)
                     {

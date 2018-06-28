@@ -26,5 +26,6 @@ namespace MultiplayerARPG
         public abstract bool IncreaseExp(BaseCharacterEntity character, int exp);
         public abstract float GetEquipmentBonusRate(CharacterItem characterItem);
         public abstract void OnCharacterReceivedDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, CombatAmountType combatAmountType, int damage);
+        public abstract void OnHarvestableReceivedDamage(BaseCharacterEntity attacker, HarvestableEntity damageReceiver, CombatAmountType combatAmountType, int damage);
     }
 }

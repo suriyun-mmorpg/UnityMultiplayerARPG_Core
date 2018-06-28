@@ -181,7 +181,9 @@ namespace MultiplayerARPG
         public override void OnClientOnlineSceneLoaded()
         {
             base.OnClientOnlineSceneLoaded();
-            RegisterEntities();
+            // Server will register entities later, so don't register entities now
+            if (!IsServer)
+                RegisterEntities();
         }
 
         public override void OnServerOnlineSceneLoaded()

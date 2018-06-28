@@ -79,7 +79,7 @@ namespace MultiplayerARPG
             if (CacheTargetObject != null)
                 CacheTargetObject.gameObject.SetActive(destination.HasValue);
 
-            if (CharacterEntity.CurrentHp <= 0)
+            if (CharacterEntity.IsDead())
             {
                 queueUsingSkill = null;
                 destination = null;
@@ -124,7 +124,7 @@ namespace MultiplayerARPG
             if (CacheGameplayCameraControls != null)
                 CacheGameplayCameraControls.updateRotation = InputManager.GetButton("CameraRotate");
 
-            if (CharacterEntity.CurrentHp <= 0)
+            if (CharacterEntity.IsDead())
                 return;
 
             // If it's building something, don't allow to activate NPC/Warp/Pickup Item
@@ -208,14 +208,14 @@ namespace MultiplayerARPG
                         var harvestableEntity = hitTransform.GetComponent<HarvestableEntity>();
                         targetPosition = hit.point;
                         CharacterEntity.SetTargetEntity(null);
-                        if (playerEntity != null && playerEntity.CurrentHp > 0)
+                        if (playerEntity != null && !playerEntity.IsDead())
                         {
                             targetPosition = playerEntity.CacheTransform.position;
                             targetIdentity = playerEntity.Identity;
                             CharacterEntity.SetTargetEntity(playerEntity);
                             break;
                         }
-                        else if (monsterEntity != null && monsterEntity.CurrentHp > 0)
+                        else if (monsterEntity != null && !monsterEntity.IsDead())
                         {
                             targetPosition = monsterEntity.CacheTransform.position;
                             targetIdentity = monsterEntity.Identity;
@@ -236,7 +236,7 @@ namespace MultiplayerARPG
                             CharacterEntity.SetTargetEntity(itemDropEntity);
                             break;
                         }
-                        else if (harvestableEntity != null && harvestableEntity.CurrentHp > 0)
+                        else if (harvestableEntity != null && !harvestableEntity.IsDead())
                         {
                             targetPosition = harvestableEntity.CacheTransform.position;
                             targetIdentity = harvestableEntity.Identity;
@@ -249,7 +249,7 @@ namespace MultiplayerARPG
                     {
                         var buildingMaterial = hitTransform.GetComponent<BuildingMaterial>();
                         CharacterEntity.SetTargetEntity(null);
-                        if (buildingMaterial != null && buildingMaterial.buildingEntity != null && buildingMaterial.buildingEntity.CurrentHp > 0)
+                        if (buildingMaterial != null && buildingMaterial.buildingEntity != null && !buildingMaterial.buildingEntity.IsDead())
                         {
                             targetPosition = buildingMaterial.buildingEntity.CacheTransform.position;
                             targetIdentity = buildingMaterial.buildingEntity.Identity;
@@ -426,7 +426,7 @@ namespace MultiplayerARPG
             HarvestableEntity targetHarvestable;
             if (TryGetAttackingCharacter(out targetEnemy))
             {
-                if (targetEnemy.CurrentHp <= 0)
+                if (targetEnemy.IsDead())
                 {
                     queueUsingSkill = null;
                     CharacterEntity.SetTargetEntity(null);
@@ -479,7 +479,7 @@ namespace MultiplayerARPG
             }
             else if (CharacterEntity.TryGetTargetEntity(out targetPlayer))
             {
-                if (targetPlayer.CurrentHp <= 0)
+                if (targetPlayer.IsDead())
                 {
                     queueUsingSkill = null;
                     CharacterEntity.SetTargetEntity(null);
@@ -538,7 +538,7 @@ namespace MultiplayerARPG
             }
             else if (CharacterEntity.TryGetTargetEntity(out targetHarvestable))
             {
-                if (targetHarvestable.CurrentHp <= 0)
+                if (targetHarvestable.IsDead())
                 {
                     queueUsingSkill = null;
                     CharacterEntity.SetTargetEntity(null);
@@ -590,7 +590,7 @@ namespace MultiplayerARPG
                 foreach (var collider in colliders)
                 {
                     tempEntity = collider.GetComponent<T>();
-                    if (tempEntity == null || tempEntity.CurrentHp <= 0)
+                    if (tempEntity == null || tempEntity.IsDead())
                         continue;
 
                     tempDistance = Vector3.Distance(CharacterTransform.position, tempEntity.CacheTransform.position);

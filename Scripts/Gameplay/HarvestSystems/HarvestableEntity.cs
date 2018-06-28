@@ -28,7 +28,7 @@ namespace MultiplayerARPG
 
         public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId)
         {
-            if (!IsServer || CurrentHp <= 0 || weapon == null)
+            if (!IsServer || IsDead() || weapon == null)
                 return;
 
             var totalDamage = 0;
@@ -47,13 +47,19 @@ namespace MultiplayerARPG
             }
             CurrentHp -= totalDamage;
             ReceivedDamage(attacker, CombatAmountType.NormalDamage, totalDamage);
-            if (CurrentHp <= 0)
+            if (IsDead())
             {
                 CurrentHp = 0;
                 if (spawnArea != null)
                     spawnArea.Spawn(respawnDelay);
                 NetworkDestroy();
             }
+        }
+
+        public override void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountType combatAmountType, int damage)
+        {
+            base.ReceivedDamage(attacker, combatAmountType, damage);
+            gameInstance.GameplayRule.OnHarvestableReceivedDamage(attacker, this, combatAmountType, damage);
         }
 
         private void OnDrawGizmos()

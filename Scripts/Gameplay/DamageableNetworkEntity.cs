@@ -47,6 +47,11 @@ namespace MultiplayerARPG
             CallNetFunction("CombatAmount", FunctionReceivers.All, combatAmountType, amount);
         }
 
+        public bool IsDead()
+        {
+            return CurrentHp <= 0;
+        }
+
         public virtual void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountType combatAmountType, int damage)
         {
             RequestCombatAmount(combatAmountType, damage);

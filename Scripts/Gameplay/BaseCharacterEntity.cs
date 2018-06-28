@@ -295,7 +295,7 @@ namespace MultiplayerARPG
             if (CurrentWater > CacheMaxWater)
                 CurrentWater = CacheMaxWater;
 
-            if (CurrentHp <= 0)
+            if (IsDead())
                 Killed(null);
         }
 
@@ -396,7 +396,7 @@ namespace MultiplayerARPG
                 return;
             lastActionCommandReceivedTime = Time.unscaledTime;
 
-            if (CurrentHp <= 0 || IsPlayingActionAnimation())
+            if (IsDead() || IsPlayingActionAnimation())
                 return;
 
             // Prepare requires data
@@ -462,7 +462,7 @@ namespace MultiplayerARPG
                 return;
             lastActionCommandReceivedTime = Time.unscaledTime;
 
-            if (CurrentHp <= 0 ||
+            if (IsDead() ||
                 IsPlayingActionAnimation() ||
                 skillIndex < 0 ||
                 skillIndex >= skills.Count)
@@ -565,7 +565,7 @@ namespace MultiplayerARPG
         /// <param name="itemIndex"></param>
         protected void NetFuncUseItem(int itemIndex)
         {
-            if (CurrentHp <= 0 ||
+            if (IsDead() ||
                 itemIndex < 0 ||
                 itemIndex >= nonEquipItems.Count)
                 return;
@@ -583,7 +583,7 @@ namespace MultiplayerARPG
         /// <param name="animActionType"></param>
         protected void NetFuncPlayActionAnimation(int actionId, AnimActionType animActionType)
         {
-            if (CurrentHp <= 0)
+            if (IsDead())
                 return;
             this.animActionType = animActionType;
             PlayActionAnimationRoutine(actionId, animActionType);
@@ -621,7 +621,7 @@ namespace MultiplayerARPG
         /// <param name="objectId"></param>
         protected void NetFuncPickupItem(uint objectId)
         {
-            if (CurrentHp <= 0 || IsPlayingActionAnimation())
+            if (IsDead() || IsPlayingActionAnimation())
                 return;
 
             LiteNetLibIdentity identity;
@@ -656,7 +656,7 @@ namespace MultiplayerARPG
         /// <param name="amount"></param>
         protected void NetFuncDropItem(int index, short amount)
         {
-            if (CurrentHp <= 0 ||
+            if (IsDead() ||
                 IsPlayingActionAnimation() ||
                 index < 0 ||
                 index >= nonEquipItems.Count)
@@ -679,7 +679,7 @@ namespace MultiplayerARPG
         /// <param name="equipPosition"></param>
         protected void NetFuncEquipItem(int nonEquipIndex, string equipPosition)
         {
-            if (CurrentHp <= 0 ||
+            if (IsDead() ||
                 IsPlayingActionAnimation() ||
                 nonEquipIndex < 0 ||
                 nonEquipIndex >= nonEquipItems.Count)
@@ -726,7 +726,7 @@ namespace MultiplayerARPG
         /// <param name="fromEquipPosition"></param>
         protected void NetFuncUnEquipItem(string fromEquipPosition)
         {
-            if (CurrentHp <= 0 || IsPlayingActionAnimation())
+            if (IsDead() || IsPlayingActionAnimation())
                 return;
 
             var equippedArmorIndex = -1;
@@ -780,14 +780,14 @@ namespace MultiplayerARPG
         #region Net functions callers
         public virtual void RequestAttack()
         {
-            if (CurrentHp <= 0 || IsPlayingActionAnimation())
+            if (IsDead() || IsPlayingActionAnimation())
                 return;
             CallNetFunction("Attack", FunctionReceivers.Server);
         }
 
         public virtual void RequestUseSkill(Vector3 position, int skillIndex)
         {
-            if (CurrentHp <= 0 ||
+            if (IsDead() ||
                 IsPlayingActionAnimation() ||
                 skillIndex < 0 ||
                 skillIndex >= Skills.Count ||
@@ -798,14 +798,14 @@ namespace MultiplayerARPG
 
         public virtual void RequestUseItem(int itemIndex)
         {
-            if (CurrentHp <= 0)
+            if (IsDead())
                 return;
             CallNetFunction("UseItem", FunctionReceivers.Server, itemIndex);
         }
 
         public virtual void RequestPlayActionAnimation(int actionId, AnimActionType animActionType)
         {
-            if (CurrentHp <= 0 || actionId < 0)
+            if (IsDead() || actionId < 0)
                 return;
             CallNetFunction("PlayActionAnimation", FunctionReceivers.All, actionId, animActionType);
         }
@@ -819,14 +819,14 @@ namespace MultiplayerARPG
 
         public virtual void RequestPickupItem(uint objectId)
         {
-            if (CurrentHp <= 0 || IsPlayingActionAnimation())
+            if (IsDead() || IsPlayingActionAnimation())
                 return;
             CallNetFunction("PickupItem", FunctionReceivers.Server, objectId);
         }
 
         public virtual void RequestDropItem(int nonEquipIndex, short amount)
         {
-            if (CurrentHp <= 0 ||
+            if (IsDead() ||
                 IsPlayingActionAnimation() ||
                 nonEquipIndex < 0 ||
                 nonEquipIndex >= NonEquipItems.Count)
@@ -836,7 +836,7 @@ namespace MultiplayerARPG
 
         public virtual void RequestEquipItem(int nonEquipIndex)
         {
-            if (CurrentHp <= 0 ||
+            if (IsDead() ||
                 IsPlayingActionAnimation() ||
                 nonEquipIndex < 0 ||
                 nonEquipIndex >= NonEquipItems.Count)
@@ -866,7 +866,7 @@ namespace MultiplayerARPG
 
         public virtual void RequestEquipItem(int nonEquipIndex, string equipPosition)
         {
-            if (CurrentHp <= 0 ||
+            if (IsDead() ||
                 IsPlayingActionAnimation() ||
                 nonEquipIndex < 0 ||
                 nonEquipIndex >= NonEquipItems.Count)
@@ -876,7 +876,7 @@ namespace MultiplayerARPG
 
         public virtual void RequestUnEquipItem(string equipPosition)
         {
-            if (CurrentHp <= 0 || IsPlayingActionAnimation())
+            if (IsDead() || IsPlayingActionAnimation())
                 return;
             CallNetFunction("UnEquipItem", FunctionReceivers.Server, equipPosition);
         }
@@ -1027,7 +1027,7 @@ namespace MultiplayerARPG
         public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId)
         {
             // Damage calculations apply at server only
-            if (!IsServer || !CanReceiveDamageFrom(attacker) || CurrentHp <= 0)
+            if (!IsServer || !CanReceiveDamageFrom(attacker) || IsDead())
                 return;
 
             // Calculate chance to hit
@@ -1085,7 +1085,7 @@ namespace MultiplayerARPG
                 Model.PlayHurtAnimation();
 
             // If current hp <= 0, character dead
-            if (CurrentHp <= 0)
+            if (IsDead())
                 Killed(attacker);
             else if (!debuff.IsEmpty())
                 ApplyBuff(debuff.characterId, debuff.dataId, debuff.type, debuff.level);
@@ -1336,7 +1336,7 @@ namespace MultiplayerARPG
         #region Buffs / Weapons / Damage
         protected void ApplyBuff(string characterId, int dataId, BuffType type, short level)
         {
-            if (CurrentHp <= 0 || !IsServer)
+            if (IsDead() || !IsServer)
                 return;
 
             var buffIndex = this.IndexOfBuff(characterId, dataId, type);
@@ -1656,7 +1656,7 @@ namespace MultiplayerARPG
                             if (buildingMaterial != null && buildingMaterial.buildingEntity != null)
                                 damageableEntity = buildingMaterial.buildingEntity;
                         }
-                        if (damageableEntity == null || damageableEntity == this || damageableEntity.CurrentHp <= 0)
+                        if (damageableEntity == null || damageableEntity == this || damageableEntity.IsDead())
                             continue;
                         var targetDir = (CacheTransform.position - damageableEntity.CacheTransform.position).normalized;
                         var angle = Vector3.Angle(targetDir, CacheTransform.forward);
@@ -1715,7 +1715,7 @@ namespace MultiplayerARPG
 
         public virtual void Respawn()
         {
-            if (!IsServer || CurrentHp > 0)
+            if (!IsServer || !IsDead())
                 return;
             CurrentHp = CacheMaxHp;
             CurrentMp = CacheMaxMp;
@@ -1747,7 +1747,7 @@ namespace MultiplayerARPG
             isRecaching = false;
         }
 
-        public virtual bool IsPlayingActionAnimation()
+        public bool IsPlayingActionAnimation()
         {
             return animActionType == AnimActionType.Attack || animActionType == AnimActionType.Skill;
         }

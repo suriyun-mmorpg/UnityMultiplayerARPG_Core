@@ -143,7 +143,7 @@ namespace MultiplayerARPG
             if (uiTargetCharacter == null)
                 return;
 
-            if (character == null || character.CurrentHp <= 0)
+            if (character == null || character.IsDead())
             {
                 uiTargetCharacter.Hide();
                 return;

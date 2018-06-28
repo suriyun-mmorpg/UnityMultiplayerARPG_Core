@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -18,48 +19,89 @@ namespace MultiplayerARPG
         public Text textDescription;
         public UICharacterQuest uiCharacterQuest;
         public UINpcDialogMenu uiMenuPrefab;
+        public GameObject uiMenuRoot;
         public Transform uiMenuContainer;
+        public UINpcSellItem uiSellItemPrefab;
+        public GameObject uiSellItemRoot;
+        public Transform uiSellItemContainer;
         public string messageQuestAccept = "Accept";
         public string messageQuestDecline = "Decline";
         public string messageQuestAbandon = "Abandon";
         public string messageQuestComplete = "Complete";
 
-        private UIList cacheList;
-        public UIList CacheList
+        [Header("Event")]
+        public UnityEvent onSwitchToNormalDialog;
+        public UnityEvent onSwitchToQuestDialog;
+        public UnityEvent onSwitchToSellItemDialog;
+
+        private UIList cacheMenuList;
+        public UIList CacheMenuList
         {
             get
             {
-                if (cacheList == null)
+                if (cacheMenuList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiMenuPrefab.gameObject;
-                    cacheList.uiContainer = uiMenuContainer;
+                    cacheMenuList = gameObject.AddComponent<UIList>();
+                    cacheMenuList.uiPrefab = uiMenuPrefab.gameObject;
+                    cacheMenuList.uiContainer = uiMenuContainer;
                 }
-                return cacheList;
+                return cacheMenuList;
+            }
+        }
+
+        private UIList cacheSellItemList;
+        public UIList CacheSellItemList
+        {
+            get
+            {
+                if (cacheSellItemList == null)
+                {
+                    cacheSellItemList = gameObject.AddComponent<UIList>();
+                    cacheSellItemList.uiPrefab = uiSellItemPrefab.gameObject;
+                    cacheSellItemList.uiContainer = uiSellItemContainer;
+                }
+                return cacheSellItemList;
             }
         }
 
         protected override void UpdateData()
         {
-            var dialog = Data;
-            var quest = dialog.quest;
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
 
             if (textTitle != null)
-                textTitle.text = string.Format(titleFormat, dialog == null ? "Unknow" : dialog.title);
+                textTitle.text = string.Format(titleFormat, Data == null ? "Unknow" : Data.title);
 
             if (textDescription != null)
-                textDescription.text = string.Format(descriptionFormat, dialog == null ? "N/A" : dialog.description);
+                textDescription.text = string.Format(descriptionFormat, Data == null ? "N/A" : Data.description);
 
+            Quest quest = null;
+            List<NpcSellItem> sellItems = new List<NpcSellItem>();
             List<UINpcDialogMenuAction> menuActions = new List<UINpcDialogMenuAction>();
-            switch (dialog.type)
+            switch (Data.type)
             {
+                case NpcDialogType.Normal:
+                    if (onSwitchToNormalDialog == null)
+                        onSwitchToNormalDialog.Invoke();
+                    var menus = Data.menus;
+                    for (var i = 0; i < menus.Length; ++i)
+                    {
+                        var menu = menus[i];
+                        if (menu.IsPassConditions(owningCharacter))
+                        {
+                            var menuAction = new UINpcDialogMenuAction();
+                            menuAction.title = menu.title;
+                            menuAction.menuIndex = i;
+                            menuActions.Add(menuAction);
+                        }
+                    }
+                    break;
                 case NpcDialogType.Quest:
+                    if (onSwitchToQuestDialog == null)
+                        onSwitchToQuestDialog.Invoke();
                     if (uiCharacterQuest != null)
                     {
-                        if (quest == null)
-                            uiCharacterQuest.Hide();
-                        else
+                        quest = Data.quest;
+                        if (quest != null)
                         {
                             var acceptMenuAction = new UINpcDialogMenuAction();
                             var declineMenuAction = new UINpcDialogMenuAction();
@@ -95,25 +137,32 @@ namespace MultiplayerARPG
                         }
                     }
                     break;
-                case NpcDialogType.Normal:
-                    if (uiCharacterQuest != null)
-                        uiCharacterQuest.Hide();
-                    var menus = dialog.menus;
-                    for (var i = 0; i < menus.Length; ++i)
-                    {
-                        var menu = menus[i];
-                        if (menu.IsPassConditions(owningCharacter))
-                        {
-                            var menuAction = new UINpcDialogMenuAction();
-                            menuAction.title = menu.title;
-                            menuAction.menuIndex = i;
-                            menuActions.Add(menuAction);
-                        }
-                    }
+                case NpcDialogType.Shop:
+                    if (onSwitchToSellItemDialog == null)
+                        onSwitchToSellItemDialog.Invoke();
+                    sellItems.AddRange(Data.sellItems);
                     break;
             }
-
-            CacheList.Generate(menuActions, (index, menuAction, ui) =>
+            // Quest
+            if (uiCharacterQuest != null)
+            {
+                if (quest == null)
+                    uiCharacterQuest.Hide();
+                else
+                    uiCharacterQuest.Show();
+            }
+            // Shop
+            if (uiSellItemRoot != null)
+                uiSellItemRoot.SetActive(sellItems.Count > 0);
+            CacheSellItemList.Generate(sellItems, (index, sellItem, ui) =>
+            {
+                var uiNpcSellItem = ui.GetComponent<UINpcSellItem>();
+                uiNpcSellItem.Data = sellItem;
+            });
+            // Menu
+            if (uiMenuRoot != null)
+                uiMenuRoot.SetActive(menuActions.Count > 0);
+            CacheMenuList.Generate(menuActions, (index, menuAction, ui) =>
             {
                 var uiNpcDialogMenu = ui.GetComponent<UINpcDialogMenu>();
                 uiNpcDialogMenu.Data = menuAction;

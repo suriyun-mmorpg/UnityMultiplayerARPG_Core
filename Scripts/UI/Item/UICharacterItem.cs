@@ -39,6 +39,8 @@ namespace MultiplayerARPG
         [Header("Input Dialog Settings")]
         public string dropInputTitle = "Drop Item";
         public string dropInputDescription = "";
+        public string sellInputTitle = "Sell Item";
+        public string sellInputDescription = "";
 
         [Header("UI Elements")]
         public Text textTitle;
@@ -67,15 +69,27 @@ namespace MultiplayerARPG
         public UnityEvent onSetEquippedData;
         public UnityEvent onSetUnEquippedData;
         public UnityEvent onSetUnEquippableData;
+        public UnityEvent onNpcSellItemDialogAppear;
+        public UnityEvent onNpcSellItemDialogDisappear;
 
         [Header("Options")]
         public UICharacterItem uiNextLevelItem;
         public bool showAmountWhenMaxIsOne;
 
+        private bool isSellItemDialogAppeared;
+
         public void Setup(CharacterItemLevelTuple data, ICharacterData character, int indexOfData, string equipPosition)
         {
             this.equipPosition = equipPosition;
             Setup(data, character, indexOfData);
+        }
+
+        private void Update()
+        {
+            if (!IsOwningCharacter() || !IsVisible())
+                return;
+
+            UpdateShopUIVisibility(false);
         }
 
         protected override void UpdateData()
@@ -255,6 +269,48 @@ namespace MultiplayerARPG
                     uiNextLevelItem.Show();
                 }
             }
+            UpdateShopUIVisibility(true);
+        }
+
+        private void UpdateShopUIVisibility(bool initData)
+        {
+            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            if (owningCharacter == null)
+            {
+                if (initData || isSellItemDialogAppeared)
+                {
+                    isSellItemDialogAppeared = false;
+                    if (onNpcSellItemDialogDisappear != null)
+                        onNpcSellItemDialogDisappear.Invoke();
+                }
+                return;
+            }
+            // Check visible item dialog
+            var uiGameplay = UISceneGameplay.Singleton;
+            if (uiGameplay.uiNpcDialog != null)
+            {
+                if (uiGameplay.uiNpcDialog.IsVisible() &&
+                    uiGameplay.uiNpcDialog.Data != null &&
+                    uiGameplay.uiNpcDialog.Data.type == NpcDialogType.Shop &&
+                    string.IsNullOrEmpty(equipPosition))
+                {
+                    if (initData || !isSellItemDialogAppeared)
+                    {
+                        isSellItemDialogAppeared = true;
+                        if (onNpcSellItemDialogAppear != null)
+                            onNpcSellItemDialogAppear.Invoke();
+                    }
+                }
+                else
+                {
+                    if (initData || isSellItemDialogAppeared)
+                    {
+                        isSellItemDialogAppeared = false;
+                        if (onNpcSellItemDialogDisappear != null)
+                            onNpcSellItemDialogDisappear.Invoke();
+                    }
+                }
+            }
         }
 
         public void OnClickEquip()
@@ -287,7 +343,7 @@ namespace MultiplayerARPG
 
         public void OnClickDrop()
         {
-            // Only unequpped equipment can be dropped
+            // Only unequipped equipment can be dropped
             if (!IsOwningCharacter() || !string.IsNullOrEmpty(equipPosition))
                 return;
 
@@ -311,6 +367,34 @@ namespace MultiplayerARPG
                 selectionManager.DeselectSelectedUI();
             if (owningCharacter != null)
                 owningCharacter.RequestDropItem(indexOfData, (short)amount);
+        }
+
+        public void OnClickSell()
+        {
+            // Only unequipped equipment can be sell
+            if (!IsOwningCharacter() || !string.IsNullOrEmpty(equipPosition))
+                return;
+
+            var characterItem = Data.characterItem;
+            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            if (characterItem.amount == 1)
+            {
+                if (selectionManager != null)
+                    selectionManager.DeselectSelectedUI();
+                if (owningCharacter != null)
+                    owningCharacter.RequestSellItem(indexOfData, 1);
+            }
+            else
+                UISceneGlobal.Singleton.ShowInputDialog(sellInputTitle, sellInputDescription, OnSellItemAmountConfirmed, 1, characterItem.amount, characterItem.amount);
+        }
+
+        private void OnSellItemAmountConfirmed(int amount)
+        {
+            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            if (selectionManager != null)
+                selectionManager.DeselectSelectedUI();
+            if (owningCharacter != null)
+                owningCharacter.RequestSellItem(indexOfData, (short)amount);
         }
     }
 }

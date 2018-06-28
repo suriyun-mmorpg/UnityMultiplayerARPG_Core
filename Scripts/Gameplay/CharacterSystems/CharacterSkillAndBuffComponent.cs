@@ -32,7 +32,7 @@ namespace MultiplayerARPG
 
         protected static void UpdateSkillAndBuff(float deltaTime, CharacterSkillAndBuffComponent skillAndBuffData, CharacterRecoveryComponent recoveryData, BaseCharacterEntity characterEntity)
         {
-            if (characterEntity.isRecaching || characterEntity.CurrentHp <= 0 || !characterEntity.IsServer)
+            if (characterEntity.isRecaching || characterEntity.IsDead() || !characterEntity.IsServer)
                 return;
 
             skillAndBuffData.skillBuffUpdateDeltaTime += deltaTime;

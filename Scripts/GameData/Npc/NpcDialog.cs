@@ -8,6 +8,7 @@ namespace MultiplayerARPG
     {
         Normal,
         Quest,
+        Shop,
     }
 
     [CreateAssetMenu(fileName = "NpcDialog", menuName = "Create GameData/NpcDialog")]
@@ -20,11 +21,14 @@ namespace MultiplayerARPG
 
         public NpcDialogType type;
         public NpcDialogMenu[] menus;
+        // Quest
         public Quest quest;
         public NpcDialog questAcceptedDialog;
         public NpcDialog questDeclinedDialog;
         public NpcDialog questAbandonedDialog;
         public NpcDialog questCompletedDailog;
+        // Shop
+        public NpcSellItem[] sellItems;
     }
 
     public enum NpcDialogConditionType : byte
@@ -105,5 +109,12 @@ namespace MultiplayerARPG
             }
             return true;
         }
+    }
+
+    [System.Serializable]
+    public struct NpcSellItem
+    {
+        public Item item;
+        public int sellPrice;
     }
 }

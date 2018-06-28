@@ -61,7 +61,7 @@ namespace MultiplayerARPG
                 if (buildingMaterial != null && buildingMaterial.buildingEntity != null)
                     damageableEntity = buildingMaterial.buildingEntity;
             }
-            if (damageableEntity == null || damageableEntity == attacker || damageableEntity.CurrentHp <= 0)
+            if (damageableEntity == null || damageableEntity == attacker || damageableEntity.IsDead())
                 return;
 
             if (attacker is MonsterCharacterEntity && damageableEntity is MonsterCharacterEntity)
