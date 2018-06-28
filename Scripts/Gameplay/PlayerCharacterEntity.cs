@@ -701,7 +701,6 @@ namespace MultiplayerARPG
                 return;
 
             var item = nonEquipItem.GetItem();
-            var level = nonEquipItem.level;
             if (this.DecreaseItemsByIndex(index, amount))
                 Gold += item.sellPrice * amount;
         }
