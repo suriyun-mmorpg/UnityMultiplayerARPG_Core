@@ -7,27 +7,18 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "SimpleGameplayRule", menuName = "Create GameplayRule/SimpleGameplayRule")]
     public class SimpleGameplayRule : BaseGameplayRule
     {
+        [Header("Levelling/Stat/Skill")]
         public short increaseStatPointEachLevel = 5;
         public short increaseSkillPointEachLevel = 1;
-        public int hungryWhenFoodLowerThan = 40;
-        public int thirstyWhenWaterLowerThan = 40;
+        [Header("Stamina/Sprint")]
         public float staminaRecoveryPerSeconds = 5;
         public float staminaDecreasePerSeconds = 5;
+        public float moveSpeedRateWhileSprint = 1.5f;
+        [Header("Hp/Mp/Food/Water")]
+        public int hungryWhenFoodLowerThan = 40;
+        public int thirstyWhenWaterLowerThan = 40;
         public float foodDecreasePerSeconds = 4;
         public float waterDecreasePerSeconds = 2;
-        public float moveSpeedRateWhileSprint = 1.5f;
-        public float normalDecreaseWeaponDurability = 0.5f;
-        public float normalDecreaseShieldDurability = 0.5f;
-        public float normalDecreaseArmorDurability = 0.1f;
-        public float blockedDecreaseWeaponDurability = 0.5f;
-        public float blockedDecreaseShieldDurability = 0.75f;
-        public float blockedDecreaseArmorDurability = 0.15f;
-        public float criticalDecreaseWeaponDurability = 0.75f;
-        public float criticalDecreaseShieldDurability = 0.5f;
-        public float criticalDecreaseArmorDurability = 0.15f;
-        public float missDecreaseWeaponDurability = 0f;
-        public float missDecreaseShieldDurability = 0;
-        public float missDecreaseArmorDurability = 0f;
         [Range(0f, 1f)]
         public float hpRecoveryRatePerSeconds = 0.05f;
         [Range(0f, 1f)]
@@ -40,6 +31,19 @@ namespace MultiplayerARPG
         public float hpDecreaseRatePerSecondsWhenThirsty = 0.05f;
         [Range(0f, 1f)]
         public float mpDecreaseRatePerSecondsWhenThirsty = 0.05f;
+        [Header("Durability")]
+        public float normalDecreaseWeaponDurability = 0.5f;
+        public float normalDecreaseShieldDurability = 0.5f;
+        public float normalDecreaseArmorDurability = 0.1f;
+        public float blockedDecreaseWeaponDurability = 0.5f;
+        public float blockedDecreaseShieldDurability = 0.75f;
+        public float blockedDecreaseArmorDurability = 0.15f;
+        public float criticalDecreaseWeaponDurability = 0.75f;
+        public float criticalDecreaseShieldDurability = 0.5f;
+        public float criticalDecreaseArmorDurability = 0.15f;
+        public float missDecreaseWeaponDurability = 0f;
+        public float missDecreaseShieldDurability = 0;
+        public float missDecreaseArmorDurability = 0f;
 
         public override float GetHitChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {

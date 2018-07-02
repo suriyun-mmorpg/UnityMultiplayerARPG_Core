@@ -7,8 +7,8 @@ namespace MultiplayerARPG
 
     public sealed class HarvestableEntity : DamageableNetworkEntity
     {
-        public Harvestable harvestable;
         public int maxHp = 100;
+        public Harvestable harvestable;
         public float colliderDetectionRadius = 2f;
         public float respawnDelay = 5f;
 

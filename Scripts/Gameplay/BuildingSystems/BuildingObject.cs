@@ -9,6 +9,11 @@ namespace MultiplayerARPG
 {
     public class BuildingObject : MonoBehaviour
     {
+
+        [SerializeField]
+        private int dataId;
+        public int DataId { get { return dataId; } }
+        [Header("Generice data")]
         public string title;
         [Header("Building Data")]
         [Tooltip("Type of building you can set it as Foundation, Wall, Door anything as you wish")]
@@ -39,10 +44,6 @@ namespace MultiplayerARPG
         {
             get { return buildingEntity == null ? 0 : buildingEntity.ObjectId; }
         }
-
-        [SerializeField]
-        private int dataId;
-        public int DataId { get { return dataId; } }
 
         private Transform cacheTransform;
         public Transform CacheTransform

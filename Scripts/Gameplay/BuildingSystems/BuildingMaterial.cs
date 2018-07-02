@@ -75,7 +75,5 @@ namespace MultiplayerARPG
                 buildingObject.TriggerExitBuildingMaterial(other.GetComponent<BuildingMaterial>());
             }
         }
-
-        // TODO: Add event when hit
     }
 }
