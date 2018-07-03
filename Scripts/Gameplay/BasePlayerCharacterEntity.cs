@@ -8,10 +8,6 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(LiteNetLibTransform))]
     public abstract partial class BasePlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     {
-        [Header("Movement AI")]
-        [Range(0.01f, 1f)]
-        public float stoppingDistance = 0.1f;
-
         [Header("Relates Components")]
         public BasePlayerCharacterController controllerPrefab;
 
@@ -107,6 +103,7 @@ namespace MultiplayerARPG
             }
         }
 
+        public abstract float StoppingDistance { get; }
         public abstract bool IsMoving();
         public abstract void StopMove();
         public abstract void KeyMovement(Vector3 direction, bool isJump);

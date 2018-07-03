@@ -25,9 +25,6 @@ namespace MultiplayerARPG
         public override void OnSetup()
         {
             base.OnSetup();
-            // Setup network components
-            CacheNetTransform.ownerClientCanSendTransform = true;
-            CacheNetTransform.ownerClientNotInterpolate = false;
             // On data changes events
             statPoint.onChange += OnStatPointChange;
             skillPoint.onChange += OnSkillPointChange;

@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     {
         public System.Action<int> onShowNpcDialog;
 
-        protected void NetFuncSwapOrMergeItem(int fromIndex, int toIndex)
+        protected virtual void NetFuncSwapOrMergeItem(int fromIndex, int toIndex)
         {
             if (IsDead() ||
                 IsPlayingActionAnimation() ||
@@ -51,7 +51,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void NetFuncAddAttribute(int attributeIndex, short amount)
+        protected virtual void NetFuncAddAttribute(int attributeIndex, short amount)
         {
             if (IsDead() ||
                 attributeIndex < 0 ||
@@ -70,7 +70,7 @@ namespace MultiplayerARPG
             StatPoint -= amount;
         }
 
-        protected void NetFuncAddSkill(int skillIndex, short amount)
+        protected virtual void NetFuncAddSkill(int skillIndex, short amount)
         {
             if (IsDead() ||
                 skillIndex < 0 ||
@@ -89,12 +89,12 @@ namespace MultiplayerARPG
             SkillPoint -= amount;
         }
 
-        protected void NetFuncRespawn()
+        protected virtual void NetFuncRespawn()
         {
             Respawn();
         }
 
-        protected void NetFuncAssignHotkey(string hotkeyId, byte type, int dataId)
+        protected virtual void NetFuncAssignHotkey(string hotkeyId, byte type, int dataId)
         {
             var characterHotkey = new CharacterHotkey();
             characterHotkey.hotkeyId = hotkeyId;
@@ -107,7 +107,7 @@ namespace MultiplayerARPG
                 hotkeys.Add(characterHotkey);
         }
 
-        protected void NetFuncNpcActivate(uint objectId)
+        protected virtual void NetFuncNpcActivate(uint objectId)
         {
             if (IsDead() || IsPlayingActionAnimation())
                 return;
@@ -128,13 +128,13 @@ namespace MultiplayerARPG
                 RequestShowNpcDialog(currentNpcDialog.DataId);
         }
 
-        protected void NetFuncShowNpcDialog(int npcDialogDataId)
+        protected virtual void NetFuncShowNpcDialog(int npcDialogDataId)
         {
             if (onShowNpcDialog != null)
                 onShowNpcDialog(npcDialogDataId);
         }
 
-        protected void NetFuncSelectNpcDialogMenu(int menuIndex)
+        protected virtual void NetFuncSelectNpcDialogMenu(int menuIndex)
         {
             if (currentNpcDialog == null)
                 return;
@@ -161,7 +161,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void NetFuncSelectNpcDialogQuestMenu(int menuIndex)
+        protected virtual void NetFuncSelectNpcDialogQuestMenu(int menuIndex)
         {
             if (currentNpcDialog == null || currentNpcDialog.type != NpcDialogType.Quest || currentNpcDialog.quest == null)
             {
@@ -193,7 +193,7 @@ namespace MultiplayerARPG
                 RequestShowNpcDialog(currentNpcDialog.DataId);
         }
 
-        protected void NetFuncBuyNpcItem(int itemIndex, short amount)
+        protected virtual void NetFuncBuyNpcItem(int itemIndex, short amount)
         {
             if (currentNpcDialog == null)
                 return;
@@ -216,7 +216,7 @@ namespace MultiplayerARPG
             this.IncreaseItems(dataId, 1, amount);
         }
 
-        protected void NetFuncAcceptQuest(int questDataId)
+        protected virtual void NetFuncAcceptQuest(int questDataId)
         {
             var indexOfQuest = this.IndexOfQuest(questDataId);
             Quest quest;
@@ -226,7 +226,7 @@ namespace MultiplayerARPG
             quests.Add(characterQuest);
         }
 
-        protected void NetFuncAbandonQuest(int questDataId)
+        protected virtual void NetFuncAbandonQuest(int questDataId)
         {
             var indexOfQuest = this.IndexOfQuest(questDataId);
             Quest quest;
@@ -238,7 +238,7 @@ namespace MultiplayerARPG
             quests.RemoveAt(indexOfQuest);
         }
 
-        protected void NetFuncCompleteQuest(int questDataId)
+        protected virtual void NetFuncCompleteQuest(int questDataId)
         {
             var indexOfQuest = this.IndexOfQuest(questDataId);
             Quest quest;
@@ -277,7 +277,7 @@ namespace MultiplayerARPG
                 quests.RemoveAt(indexOfQuest);
         }
 
-        protected void NetFuncEnterWarp()
+        protected virtual void NetFuncEnterWarp()
         {
             if (IsDead() || IsPlayingActionAnimation() || warpingPortal == null)
                 return;
@@ -285,7 +285,7 @@ namespace MultiplayerARPG
             warpingPortal.EnterWarp(this);
         }
 
-        protected void NetFuncBuild(int index, Vector3 position, Quaternion rotation, uint parentObjectId)
+        protected virtual void NetFuncBuild(int index, Vector3 position, Quaternion rotation, uint parentObjectId)
         {
             if (IsDead() ||
                 IsPlayingActionAnimation() ||
@@ -325,7 +325,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void NetFuncDestroyBuild(uint objectId)
+        protected virtual void NetFuncDestroyBuild(uint objectId)
         {
             if (IsDead() ||
                 IsPlayingActionAnimation())
@@ -341,7 +341,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void NetFuncSellItem(int index, short amount)
+        protected virtual void NetFuncSellItem(int index, short amount)
         {
             if (IsDead() ||
                 index < 0 ||

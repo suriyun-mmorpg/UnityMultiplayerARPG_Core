@@ -9,6 +9,9 @@ namespace MultiplayerARPG
     public partial class PlayerCharacterEntity : BasePlayerCharacterEntity
     {
         #region Settings
+        [Header("Movement AI")]
+        [Range(0.01f, 1f)]
+        public float stoppingDistance = 0.1f;
         [Header("Movement Settings")]
         public float groundingDistance = 0.1f;
         public float jumpHeight = 2f;
@@ -18,6 +21,11 @@ namespace MultiplayerARPG
         
         public Queue<Vector3> navPaths { get; protected set; }
         public Vector3 moveDirection { get; protected set; }
+
+        public override float StoppingDistance
+        {
+            get { return stoppingDistance; }
+        }
 
         public bool HasNavPaths
         {
@@ -130,6 +138,14 @@ namespace MultiplayerARPG
                 else
                     StopMove();
             }
+        }
+
+        public override void OnSetup()
+        {
+            base.OnSetup();
+            // Setup network components
+            CacheNetTransform.ownerClientCanSendTransform = true;
+            CacheNetTransform.ownerClientNotInterpolate = false;
         }
 
         public override bool IsMoving()

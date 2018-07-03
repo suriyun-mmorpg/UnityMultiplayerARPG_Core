@@ -16,7 +16,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// Is function will be called at server to order character to attack
         /// </summary>
-        protected void NetFuncAttack()
+        protected virtual void NetFuncAttack()
         {
             if (Time.unscaledTime - lastActionCommandReceivedTime < ACTION_COMMAND_DELAY)
                 return;
@@ -82,7 +82,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="position">Target position to apply skill at</param>
         /// <param name="skillIndex">Index in `characterSkills` list which will be used</param>
-        protected void NetFuncUseSkill(Vector3 position, int skillIndex)
+        protected virtual void NetFuncUseSkill(Vector3 position, int skillIndex)
         {
             if (Time.unscaledTime - lastActionCommandReceivedTime < ACTION_COMMAND_DELAY)
                 return;
@@ -189,7 +189,7 @@ namespace MultiplayerARPG
         /// This will be called on server to use item
         /// </summary>
         /// <param name="itemIndex"></param>
-        protected void NetFuncUseItem(int itemIndex)
+        protected virtual void NetFuncUseItem(int itemIndex)
         {
             if (IsDead() ||
                 itemIndex < 0 ||
@@ -207,7 +207,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="actionId"></param>
         /// <param name="animActionType"></param>
-        protected void NetFuncPlayActionAnimation(int actionId, AnimActionType animActionType)
+        protected virtual void NetFuncPlayActionAnimation(int actionId, AnimActionType animActionType)
         {
             if (IsDead())
                 return;
@@ -233,7 +233,7 @@ namespace MultiplayerARPG
         /// This will be called at every clients to play any effect
         /// </summary>
         /// <param name="effectId"></param>
-        protected void NetFuncPlayEffect(int effectId)
+        protected virtual void NetFuncPlayEffect(int effectId)
         {
             GameEffectCollection gameEffectCollection;
             if (Model == null || !GameInstance.GameEffectCollections.TryGetValue(effectId, out gameEffectCollection))
@@ -245,7 +245,7 @@ namespace MultiplayerARPG
         /// This will be called at server to order character to pickup items
         /// </summary>
         /// <param name="objectId"></param>
-        protected void NetFuncPickupItem(uint objectId)
+        protected virtual void NetFuncPickupItem(uint objectId)
         {
             if (IsDead() || IsPlayingActionAnimation())
                 return;
@@ -280,7 +280,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="index"></param>
         /// <param name="amount"></param>
-        protected void NetFuncDropItem(int index, short amount)
+        protected virtual void NetFuncDropItem(int index, short amount)
         {
             if (IsDead() ||
                 IsPlayingActionAnimation() ||
@@ -303,7 +303,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="nonEquipIndex"></param>
         /// <param name="equipPosition"></param>
-        protected void NetFuncEquipItem(int nonEquipIndex, string equipPosition)
+        protected virtual void NetFuncEquipItem(int nonEquipIndex, string equipPosition)
         {
             if (IsDead() ||
                 IsPlayingActionAnimation() ||
@@ -350,7 +350,7 @@ namespace MultiplayerARPG
         /// This will be called at server to order character to unequip equipments
         /// </summary>
         /// <param name="fromEquipPosition"></param>
-        protected void NetFuncUnEquipItem(string fromEquipPosition)
+        protected virtual void NetFuncUnEquipItem(string fromEquipPosition)
         {
             if (IsDead() || IsPlayingActionAnimation())
                 return;
@@ -380,21 +380,21 @@ namespace MultiplayerARPG
                 nonEquipItems.Add(unEquipItem);
         }
 
-        protected void NetFuncOnDead(bool isInitialize)
+        protected virtual void NetFuncOnDead(bool isInitialize)
         {
             animActionType = AnimActionType.None;
             if (onDead != null)
                 onDead.Invoke(isInitialize);
         }
 
-        protected void NetFuncOnRespawn(bool isInitialize)
+        protected virtual void NetFuncOnRespawn(bool isInitialize)
         {
             animActionType = AnimActionType.None;
             if (onRespawn != null)
                 onRespawn.Invoke(isInitialize);
         }
 
-        protected void NetFuncOnLevelUp()
+        protected virtual void NetFuncOnLevelUp()
         {
             if (gameInstance.levelUpEffect != null && Model != null)
                 Model.InstantiateEffect(new GameEffect[] { gameInstance.levelUpEffect });

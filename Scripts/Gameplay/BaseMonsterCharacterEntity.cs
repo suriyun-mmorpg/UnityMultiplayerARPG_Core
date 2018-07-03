@@ -60,6 +60,7 @@ namespace MultiplayerARPG
                 return cacheNetTransform;
             }
         }
+
         private NavMeshAgent cacheNavMeshAgent;
         public NavMeshAgent CacheNavMeshAgent
         {

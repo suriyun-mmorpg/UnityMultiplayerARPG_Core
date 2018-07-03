@@ -28,7 +28,7 @@ namespace MultiplayerARPG
 
         public float StoppingDistance
         {
-            get { return PlayerCharacterEntity.stoppingDistance; }
+            get { return PlayerCharacterEntity.StoppingDistance; }
         }
 
         public FollowCameraControls CacheMinimapCameraControls { get; protected set; }
