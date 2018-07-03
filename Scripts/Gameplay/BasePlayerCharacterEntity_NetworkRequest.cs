@@ -5,7 +5,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public partial class PlayerCharacterEntity
+    public partial class BasePlayerCharacterEntity
     {
         public void RequestSwapOrMergeItem(int fromIndex, int toIndex)
         {

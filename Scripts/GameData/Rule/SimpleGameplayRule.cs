@@ -147,7 +147,7 @@ namespace MultiplayerARPG
 
         public override float GetDecreasingHpPerSeconds(BaseCharacterEntity character)
         {
-            if (character is MonsterCharacterEntity)
+            if (character is BaseMonsterCharacterEntity)
                 return 0f;
             var result = 0f;
             if (IsHungry(character))
@@ -159,7 +159,7 @@ namespace MultiplayerARPG
 
         public override float GetDecreasingMpPerSeconds(BaseCharacterEntity character)
         {
-            if (character is MonsterCharacterEntity)
+            if (character is BaseMonsterCharacterEntity)
                 return 0f;
             var result = 0f;
             if (IsHungry(character))
@@ -171,30 +171,30 @@ namespace MultiplayerARPG
 
         public override float GetDecreasingStaminaPerSeconds(BaseCharacterEntity character)
         {
-            if (character is MonsterCharacterEntity)
+            if (character is BaseMonsterCharacterEntity)
                 return 0f;
             return staminaDecreasePerSeconds;
         }
 
         public override float GetDecreasingFoodPerSeconds(BaseCharacterEntity character)
         {
-            if (character is MonsterCharacterEntity)
+            if (character is BaseMonsterCharacterEntity)
                 return 0f;
             return foodDecreasePerSeconds;
         }
 
         public override float GetDecreasingWaterPerSeconds(BaseCharacterEntity character)
         {
-            if (character is MonsterCharacterEntity)
+            if (character is BaseMonsterCharacterEntity)
                 return 0f;
             return waterDecreasePerSeconds;
         }
 
         public override float GetMoveSpeed(BaseCharacterEntity character)
         {
-            if (character is MonsterCharacterEntity)
+            if (character is BaseMonsterCharacterEntity)
             {
-                var monsterCharacter = character as MonsterCharacterEntity;
+                var monsterCharacter = character as BaseMonsterCharacterEntity;
                 return monsterCharacter.isWandering ? monsterCharacter.MonsterDatabase.wanderMoveSpeed : monsterCharacter.CacheMoveSpeed;
             }
             return character.CacheMoveSpeed * (character.isSprinting ? moveSpeedRateWhileSprint : 1f);

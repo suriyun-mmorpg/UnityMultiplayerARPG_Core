@@ -16,13 +16,13 @@ namespace MultiplayerARPG
         public const float SET_TARGET_DESTINATION_DELAY = 1f;
         public const float FOLLOW_TARGET_DURATION = 5f;
 
-        private MonsterCharacterEntity cacheMonsterCharacterEntity;
-        public MonsterCharacterEntity CacheMonsterCharacterEntity
+        private BaseMonsterCharacterEntity cacheMonsterCharacterEntity;
+        public BaseMonsterCharacterEntity CacheMonsterCharacterEntity
         {
             get
             {
                 if (cacheMonsterCharacterEntity == null)
-                    cacheMonsterCharacterEntity = GetComponent<MonsterCharacterEntity>();
+                    cacheMonsterCharacterEntity = GetComponent<BaseMonsterCharacterEntity>();
                 return cacheMonsterCharacterEntity;
             }
         }
@@ -35,23 +35,23 @@ namespace MultiplayerARPG
             UpdateActivity(time, gameInstance, gameplayRule, CacheMonsterCharacterEntity, CacheMonsterCharacterEntity.CacheTransform, CacheMonsterCharacterEntity.CacheNavMeshAgent);
         }
 
-        public static void RandomNextWanderTime(float time, MonsterCharacterEntity monsterCharacterEntity, Transform transform)
+        public static void RandomNextWanderTime(float time, BaseMonsterCharacterEntity monsterCharacterEntity, Transform transform)
         {
             monsterCharacterEntity.wanderTime = time + Random.Range(RANDOM_WANDER_DURATION_MIN, RANDOM_WANDER_DURATION_MAX);
             monsterCharacterEntity.oldDestination = transform.position;
         }
 
-        public static void SetFindTargetTime(float time, MonsterCharacterEntity monsterCharacterEntity)
+        public static void SetFindTargetTime(float time, BaseMonsterCharacterEntity monsterCharacterEntity)
         {
             monsterCharacterEntity.findTargetTime = time + AGGRESSIVE_FIND_TARGET_DELAY;
         }
 
-        public static void SetStartFollowTargetTime(float time, MonsterCharacterEntity monsterCharacterEntity)
+        public static void SetStartFollowTargetTime(float time, BaseMonsterCharacterEntity monsterCharacterEntity)
         {
             monsterCharacterEntity.startFollowTargetTime = time;
         }
 
-        public static void SetDestination(float time, BaseGameplayRule gameplayRule, MonsterCharacterEntity monsterCharacterEntity, NavMeshAgent navMeshAgent, Vector3 targetPosition)
+        public static void SetDestination(float time, BaseGameplayRule gameplayRule, BaseMonsterCharacterEntity monsterCharacterEntity, NavMeshAgent navMeshAgent, Vector3 targetPosition)
         {
             monsterCharacterEntity.setDestinationTime = time;
             monsterCharacterEntity.isWandering = false;
@@ -62,7 +62,7 @@ namespace MultiplayerARPG
             monsterCharacterEntity.oldDestination = targetPosition;
         }
 
-        public static void SetWanderDestination(float time, BaseGameplayRule gameplayRule, MonsterCharacterEntity monsterCharacterEntity, NavMeshAgent navMeshAgent, Vector3 destination)
+        public static void SetWanderDestination(float time, BaseGameplayRule gameplayRule, BaseMonsterCharacterEntity monsterCharacterEntity, NavMeshAgent navMeshAgent, Vector3 destination)
         {
             monsterCharacterEntity.setDestinationTime = time;
             monsterCharacterEntity.isWandering = true;
@@ -73,7 +73,7 @@ namespace MultiplayerARPG
             navMeshAgent.isStopped = false;
         }
 
-        protected static void UpdateActivity(float time, GameInstance gameInstance, BaseGameplayRule gameplayRule, MonsterCharacterEntity monsterCharacterEntity, Transform transform, NavMeshAgent navMeshAgent)
+        protected static void UpdateActivity(float time, GameInstance gameInstance, BaseGameplayRule gameplayRule, BaseMonsterCharacterEntity monsterCharacterEntity, Transform transform, NavMeshAgent navMeshAgent)
         {
             if (!monsterCharacterEntity.IsServer || monsterCharacterEntity.MonsterDatabase == null)
                 return;

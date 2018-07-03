@@ -15,8 +15,8 @@ namespace MultiplayerARPG
         [SerializeField]
         private NetworkSetting networkSetting;
         [Header("Gameplay Objects")]
-        public PlayerCharacterEntity playerCharacterEntityPrefab;
-        public MonsterCharacterEntity monsterCharacterEntityPrefab;
+        public BasePlayerCharacterEntity playerCharacterEntityPrefab;
+        public BaseMonsterCharacterEntity monsterCharacterEntityPrefab;
         public ItemDropEntity itemDropEntityPrefab;
         public BuildingEntity buildingEntityPrefab;
         public WarpPortalEntity warpPortalEntityPrefab;

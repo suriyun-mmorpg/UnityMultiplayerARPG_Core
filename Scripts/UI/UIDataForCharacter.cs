@@ -18,7 +18,7 @@ namespace MultiplayerARPG
 
         public bool IsOwningCharacter()
         {
-            return character != null && character is PlayerCharacterEntity && (PlayerCharacterEntity)character == BasePlayerCharacterController.OwningCharacter;
+            return character != null && character is BasePlayerCharacterEntity && (BasePlayerCharacterEntity)character == BasePlayerCharacterController.OwningCharacter;
         }
     }
 }

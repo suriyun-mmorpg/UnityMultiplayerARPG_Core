@@ -6,7 +6,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public partial class PlayerCharacterEntity
+    public partial class BasePlayerCharacterEntity
     {
         protected override void SetupNetElements()
         {

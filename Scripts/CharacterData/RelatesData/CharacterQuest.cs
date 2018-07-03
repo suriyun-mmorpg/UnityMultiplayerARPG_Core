@@ -86,7 +86,7 @@ public class CharacterQuest
         return 0;
     }
 
-    public bool AddKillMonster(MonsterCharacterEntity monsterEntity, int killCount)
+    public bool AddKillMonster(BaseMonsterCharacterEntity monsterEntity, int killCount)
     {
         return AddKillMonster(monsterEntity.DataId, killCount);
     }

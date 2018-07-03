@@ -64,7 +64,7 @@ namespace MultiplayerARPG
             if (damageableEntity == null || damageableEntity == attacker || damageableEntity.IsDead())
                 return;
 
-            if (attacker is MonsterCharacterEntity && damageableEntity is MonsterCharacterEntity)
+            if (attacker is BaseMonsterCharacterEntity && damageableEntity is BaseMonsterCharacterEntity)
                 return;
 
             ApplyDamageTo(damageableEntity);

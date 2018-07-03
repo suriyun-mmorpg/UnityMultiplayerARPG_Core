@@ -6,38 +6,24 @@ using LiteNetLibManager;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(Rigidbody))]
-    [RequireComponent(typeof(LiteNetLibTransform))]
-    public partial class PlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
+    public partial class PlayerCharacterEntity : BasePlayerCharacterEntity
     {
-        [HideInInspector]
-        public WarpPortalEntity warpingPortal;
-        public BasePlayerCharacterController controllerPrefab;
-
         #region Settings
-        [Header("Movement AI")]
-        [Range(0.01f, 1f)]
-        public float stoppingDistance = 0.1f;
         [Header("Movement Settings")]
         public float groundingDistance = 0.1f;
         public float jumpHeight = 2f;
         public float gravityRate = 1f;
         public float angularSpeed = 120f;
         #endregion
-
-        #region Protected data
+        
         public Queue<Vector3> navPaths { get; protected set; }
         public Vector3 moveDirection { get; protected set; }
-        public bool isJumping { get; protected set; }
-        public bool isGrounded { get; protected set; }
-        public NpcDialog currentNpcDialog { get; protected set; }
 
         public bool HasNavPaths
         {
             get { return navPaths != null && navPaths.Count > 0; }
         }
-        #endregion
 
-        #region Cache components
         private Rigidbody cacheRigidbody;
         public Rigidbody CacheRigidbody
         {
@@ -49,37 +35,11 @@ namespace MultiplayerARPG
             }
         }
 
-        private LiteNetLibTransform cacheNetTransform;
-        public LiteNetLibTransform CacheNetTransform
-        {
-            get
-            {
-                if (cacheNetTransform == null)
-                    cacheNetTransform = GetComponent<LiteNetLibTransform>();
-                return cacheNetTransform;
-            }
-        }
-        #endregion
-
         protected override void Awake()
         {
             base.Awake();
             CacheRigidbody.useGravity = false;
-            gameObject.tag = gameInstance.playerTag;
             StopMove();
-        }
-
-        protected override void Start()
-        {
-            base.Start();
-            if (IsOwnerClient)
-            {
-                if (BasePlayerCharacterController.Singleton == null)
-                {
-                    var controller = Instantiate(controllerPrefab);
-                    controller.CharacterEntity = this;
-                }
-            }
         }
 
         protected override void Update()
@@ -92,18 +52,6 @@ namespace MultiplayerARPG
                 SetTargetEntity(null);
                 return;
             }
-        }
-
-        protected virtual void OnCollisionEnter(Collision collision)
-        {
-            if (!isGrounded && collision.impulse.y > 0)
-                isGrounded = true;
-        }
-
-        protected virtual void OnCollisionStay(Collision collision)
-        {
-            if (!isGrounded && collision.impulse.y > 0)
-                isGrounded = true;
         }
 
         protected override void FixedUpdate()
@@ -184,60 +132,19 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void StopMove()
+        public override bool IsMoving()
+        {
+            return HasNavPaths;
+        }
+
+        public override void StopMove()
         {
             navPaths = null;
             moveDirection = Vector3.zero;
             CacheRigidbody.velocity = new Vector3(0, CacheRigidbody.velocity.y, 0);
         }
 
-        private float CalculateJumpVerticalSpeed()
-        {
-            // From the jump height and gravity we deduce the upwards speed 
-            // for the character to reach at the apex.
-            return Mathf.Sqrt(2f * jumpHeight * -Physics.gravity.y * gravityRate);
-        }
-
-        public override void Respawn()
-        {
-            if (!IsServer || !IsDead())
-                return;
-            base.Respawn();
-            var manager = Manager as BaseGameNetworkManager;
-            if (manager != null)
-                manager.WarpCharacter(this, RespawnMapName, RespawnPosition);
-        }
-
-        public override bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity)
-        {
-            // TODO: May implement this for party/guild battle purposes
-            return characterEntity != null && characterEntity is MonsterCharacterEntity;
-        }
-
-        public override bool IsAlly(BaseCharacterEntity characterEntity)
-        {
-            // TODO: May implement this for party/guild battle purposes
-            return false;
-        }
-
-        public override bool IsEnemy(BaseCharacterEntity characterEntity)
-        {
-            // TODO: May implement this for party/guild battle purposes
-            return characterEntity != null && characterEntity is MonsterCharacterEntity;
-        }
-        
-        protected void SetMovePaths(Vector3 position)
-        {
-            var navPath = new NavMeshPath();
-            if (NavMesh.CalculatePath(CacheTransform.position, position, NavMesh.AllAreas, navPath))
-            {
-                navPaths = new Queue<Vector3>(navPath.corners);
-                // Dequeue first path it's not require for future movement
-                navPaths.Dequeue();
-            }
-        }
-
-        public void KeyMovement(Vector3 direction, bool isJump)
+        public override void KeyMovement(Vector3 direction, bool isJump)
         {
             if (IsDead())
                 return;
@@ -248,37 +155,41 @@ namespace MultiplayerARPG
                 isJumping = isGrounded && isJump;
         }
 
-        public void PointClickMovement(Vector3 position)
+        public override void PointClickMovement(Vector3 position)
         {
             if (IsDead())
                 return;
             SetMovePaths(position);
         }
 
-        public override void Killed(BaseCharacterEntity lastAttacker)
+        protected virtual void OnCollisionEnter(Collision collision)
         {
-            base.Killed(lastAttacker);
-            currentNpcDialog = null;
+            if (!isGrounded && collision.impulse.y > 0)
+                isGrounded = true;
         }
 
-        public virtual void IncreaseGold(int gold)
+        protected virtual void OnCollisionStay(Collision collision)
         {
-            if (!IsServer)
-                return;
-            Gold += gold;
+            if (!isGrounded && collision.impulse.y > 0)
+                isGrounded = true;
         }
-
-        public virtual void OnKillMonster(MonsterCharacterEntity monsterCharacterEntity)
+        
+        protected virtual void SetMovePaths(Vector3 position)
         {
-            if (!IsServer || monsterCharacterEntity == null)
-                return;
-
-            for (var i = 0; i < Quests.Count; ++i)
+            var navPath = new NavMeshPath();
+            if (NavMesh.CalculatePath(CacheTransform.position, position, NavMesh.AllAreas, navPath))
             {
-                var quest = Quests[i];
-                if (quest.AddKillMonster(monsterCharacterEntity, 1))
-                    quests[i] = quest;
+                navPaths = new Queue<Vector3>(navPath.corners);
+                // Dequeue first path it's not require for future movement
+                navPaths.Dequeue();
             }
+        }
+
+        private float CalculateJumpVerticalSpeed()
+        {
+            // From the jump height and gravity we deduce the upwards speed 
+            // for the character to reach at the apex.
+            return Mathf.Sqrt(2f * jumpHeight * -Physics.gravity.y * gravityRate);
         }
     }
 }

@@ -74,7 +74,7 @@ namespace MultiplayerARPG
             if (playerIdentity == null)
                 return;
             if (LogDev) Debug.Log("[LanRpgNetworkManager] Deserializing client ready extra");
-            var playerCharacterEntity = playerIdentity.GetComponent<PlayerCharacterEntity>();
+            var playerCharacterEntity = playerIdentity.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterEntity.DeserializeCharacterData(reader);
             // Notify clients that this character is spawn or dead
             if (!playerCharacterEntity.IsDead())

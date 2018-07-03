@@ -25,7 +25,7 @@ namespace MultiplayerARPG
 
         private void OnTriggerEnter(Collider other)
         {
-            var playerCharacterEntity = other.GetComponent<PlayerCharacterEntity>();
+            var playerCharacterEntity = other.GetComponent<BasePlayerCharacterEntity>();
             if (playerCharacterEntity == null)
                 return;
 
@@ -49,7 +49,7 @@ namespace MultiplayerARPG
 
         private void OnTriggerExit(Collider other)
         {
-            var playerCharacterEntity = other.GetComponent<PlayerCharacterEntity>();
+            var playerCharacterEntity = other.GetComponent<BasePlayerCharacterEntity>();
             if (playerCharacterEntity == null)
                 return;
 
@@ -65,7 +65,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void EnterWarp(PlayerCharacterEntity playerCharacterEntity)
+        public void EnterWarp(BasePlayerCharacterEntity playerCharacterEntity)
         {
             var manager = Manager as BaseGameNetworkManager;
             if (manager != null)

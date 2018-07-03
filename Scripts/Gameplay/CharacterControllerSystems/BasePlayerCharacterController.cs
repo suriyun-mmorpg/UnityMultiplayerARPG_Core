@@ -6,29 +6,29 @@ namespace MultiplayerARPG
     public abstract class BasePlayerCharacterController : MonoBehaviour
     {
         public static BasePlayerCharacterController Singleton { get; protected set; }
-        public static PlayerCharacterEntity OwningCharacter { get { return Singleton == null ? null : Singleton.CharacterEntity; } }
+        public static BasePlayerCharacterEntity OwningCharacter { get { return Singleton == null ? null : Singleton.PlayerCharacterEntity; } }
 
         public FollowCameraControls minimapCameraPrefab;
 
-        private PlayerCharacterEntity characterEntity;
-        public PlayerCharacterEntity CharacterEntity
+        private BasePlayerCharacterEntity playerCharacterEntity;
+        public BasePlayerCharacterEntity PlayerCharacterEntity
         {
-            get { return characterEntity; }
+            get { return playerCharacterEntity; }
             set
             {
                 if (value.IsOwnerClient)
-                    characterEntity = value;
+                    playerCharacterEntity = value;
             }
         }
 
         public Transform CharacterTransform
         {
-            get { return CharacterEntity.CacheTransform; }
+            get { return PlayerCharacterEntity.CacheTransform; }
         }
 
         public float StoppingDistance
         {
-            get { return CharacterEntity.stoppingDistance; }
+            get { return PlayerCharacterEntity.stoppingDistance; }
         }
 
         public FollowCameraControls CacheMinimapCameraControls { get; protected set; }
@@ -44,7 +44,7 @@ namespace MultiplayerARPG
 
         protected virtual void Start()
         {
-            if (CharacterEntity == null)
+            if (PlayerCharacterEntity == null)
                 return;
 
             // Instantiate Minimap camera, it will render to render texture
@@ -63,44 +63,44 @@ namespace MultiplayerARPG
                 CacheUISceneGameplay.UpdateNonEquipItems();
                 CacheUISceneGameplay.UpdateHotkeys();
                 CacheUISceneGameplay.UpdateQuests();
-                CharacterEntity.onShowNpcDialog += CacheUISceneGameplay.OnShowNpcDialog;
-                CharacterEntity.onDead += CacheUISceneGameplay.OnCharacterDead;
-                CharacterEntity.onRespawn += CacheUISceneGameplay.OnCharacterRespawn;
+                PlayerCharacterEntity.onShowNpcDialog += CacheUISceneGameplay.OnShowNpcDialog;
+                PlayerCharacterEntity.onDead += CacheUISceneGameplay.OnCharacterDead;
+                PlayerCharacterEntity.onRespawn += CacheUISceneGameplay.OnCharacterRespawn;
             }
-            CharacterEntity.onDataIdChange += OnDataIdChange;
-            CharacterEntity.onEquipWeaponsChange += OnEquipWeaponsChange;
-            CharacterEntity.onAttributesOperation += OnAttributesOperation;
-            CharacterEntity.onSkillsOperation += OnSkillsOperation;
-            CharacterEntity.onBuffsOperation += OnBuffsOperation;
-            CharacterEntity.onEquipItemsOperation += OnEquipItemsOperation;
-            CharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
-            CharacterEntity.onHotkeysOperation += OnHotkeysOperation;
-            CharacterEntity.onQuestsOperation += OnQuestsOperation;
+            PlayerCharacterEntity.onDataIdChange += OnDataIdChange;
+            PlayerCharacterEntity.onEquipWeaponsChange += OnEquipWeaponsChange;
+            PlayerCharacterEntity.onAttributesOperation += OnAttributesOperation;
+            PlayerCharacterEntity.onSkillsOperation += OnSkillsOperation;
+            PlayerCharacterEntity.onBuffsOperation += OnBuffsOperation;
+            PlayerCharacterEntity.onEquipItemsOperation += OnEquipItemsOperation;
+            PlayerCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+            PlayerCharacterEntity.onHotkeysOperation += OnHotkeysOperation;
+            PlayerCharacterEntity.onQuestsOperation += OnQuestsOperation;
         }
 
         protected virtual void OnDestroy()
         {
-            CharacterEntity.onDataIdChange -= OnDataIdChange;
-            CharacterEntity.onEquipWeaponsChange -= OnEquipWeaponsChange;
-            CharacterEntity.onAttributesOperation -= OnAttributesOperation;
-            CharacterEntity.onSkillsOperation -= OnSkillsOperation;
-            CharacterEntity.onBuffsOperation -= OnBuffsOperation;
-            CharacterEntity.onEquipItemsOperation -= OnEquipItemsOperation;
-            CharacterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
-            CharacterEntity.onHotkeysOperation -= OnHotkeysOperation;
-            CharacterEntity.onQuestsOperation -= OnQuestsOperation;
+            PlayerCharacterEntity.onDataIdChange -= OnDataIdChange;
+            PlayerCharacterEntity.onEquipWeaponsChange -= OnEquipWeaponsChange;
+            PlayerCharacterEntity.onAttributesOperation -= OnAttributesOperation;
+            PlayerCharacterEntity.onSkillsOperation -= OnSkillsOperation;
+            PlayerCharacterEntity.onBuffsOperation -= OnBuffsOperation;
+            PlayerCharacterEntity.onEquipItemsOperation -= OnEquipItemsOperation;
+            PlayerCharacterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
+            PlayerCharacterEntity.onHotkeysOperation -= OnHotkeysOperation;
+            PlayerCharacterEntity.onQuestsOperation -= OnQuestsOperation;
             if (CacheUISceneGameplay != null)
             {
-                CharacterEntity.onShowNpcDialog -= CacheUISceneGameplay.OnShowNpcDialog;
-                CharacterEntity.onDead -= CacheUISceneGameplay.OnCharacterDead;
-                CharacterEntity.onRespawn -= CacheUISceneGameplay.OnCharacterRespawn;
+                PlayerCharacterEntity.onShowNpcDialog -= CacheUISceneGameplay.OnShowNpcDialog;
+                PlayerCharacterEntity.onDead -= CacheUISceneGameplay.OnCharacterDead;
+                PlayerCharacterEntity.onRespawn -= CacheUISceneGameplay.OnCharacterRespawn;
             }
         }
 
         #region Sync data changes callback
         protected void OnDataIdChange(int dataId)
         {
-            if (CharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
             {
                 CacheUISceneGameplay.UpdateCharacter();
                 CacheUISceneGameplay.UpdateSkills();
@@ -111,7 +111,7 @@ namespace MultiplayerARPG
 
         protected void OnEquipWeaponsChange(EquipWeapons equipWeapons)
         {
-            if (CharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
             {
                 CacheUISceneGameplay.UpdateCharacter();
                 CacheUISceneGameplay.UpdateEquipItems();
@@ -120,13 +120,13 @@ namespace MultiplayerARPG
 
         protected void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            if (CharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
                 CacheUISceneGameplay.UpdateCharacter();
         }
 
         protected void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            if (CharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
             {
                 CacheUISceneGameplay.UpdateCharacter();
                 CacheUISceneGameplay.UpdateSkills();
@@ -136,13 +136,13 @@ namespace MultiplayerARPG
 
         protected void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            if (CharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
                 CacheUISceneGameplay.UpdateCharacter();
         }
 
         protected void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            if (CharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
             {
                 CacheUISceneGameplay.UpdateCharacter();
                 CacheUISceneGameplay.UpdateEquipItems();
@@ -151,7 +151,7 @@ namespace MultiplayerARPG
 
         protected void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            if (CharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
             {
                 CacheUISceneGameplay.UpdateCharacter();
                 CacheUISceneGameplay.UpdateNonEquipItems();
@@ -162,13 +162,13 @@ namespace MultiplayerARPG
 
         protected void OnHotkeysOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            if (CharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
                 CacheUISceneGameplay.UpdateHotkeys();
         }
 
         protected void OnQuestsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            if (CharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
                 CacheUISceneGameplay.UpdateQuests();
         }
         #endregion
@@ -184,7 +184,7 @@ namespace MultiplayerARPG
                     uint parentObjectId = 0;
                     if (currentBuildingObject.buildingArea != null)
                         parentObjectId = currentBuildingObject.buildingArea.EntityObjectId;
-                    CharacterEntity.RequestBuild(buildingItemIndex, currentBuildingObject.CacheTransform.position, currentBuildingObject.CacheTransform.rotation, parentObjectId);
+                    PlayerCharacterEntity.RequestBuild(buildingItemIndex, currentBuildingObject.CacheTransform.position, currentBuildingObject.CacheTransform.rotation, parentObjectId);
                 }
                 Destroy(currentBuildingObject.gameObject);
             }
@@ -199,18 +199,18 @@ namespace MultiplayerARPG
         public void DestroyBuilding()
         {
             BuildingEntity currentBuildingEntity;
-            if (CharacterEntity.TryGetTargetEntity(out currentBuildingEntity))
+            if (PlayerCharacterEntity.TryGetTargetEntity(out currentBuildingEntity))
             {
-                CharacterEntity.RequestDestroyBuilding(currentBuildingEntity.ObjectId);
-                CharacterEntity.SetTargetEntity(null);
+                PlayerCharacterEntity.RequestDestroyBuilding(currentBuildingEntity.ObjectId);
+                PlayerCharacterEntity.SetTargetEntity(null);
             }
         }
 
         public void DeselectBuilding()
         {
             BuildingEntity currentBuildingEntity;
-            if (CharacterEntity.TryGetTargetEntity(out currentBuildingEntity))
-                CharacterEntity.SetTargetEntity(null);
+            if (PlayerCharacterEntity.TryGetTargetEntity(out currentBuildingEntity))
+                PlayerCharacterEntity.SetTargetEntity(null);
         }
 
         public abstract void UseHotkey(int hotkeyIndex);

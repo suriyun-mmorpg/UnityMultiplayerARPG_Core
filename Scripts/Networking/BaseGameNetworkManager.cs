@@ -15,7 +15,7 @@ namespace MultiplayerARPG
         }
         
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
-        protected readonly Dictionary<long, PlayerCharacterEntity> playerCharacters = new Dictionary<long, PlayerCharacterEntity>();
+        protected readonly Dictionary<long, BasePlayerCharacterEntity> playerCharacters = new Dictionary<long, BasePlayerCharacterEntity>();
         protected readonly Dictionary<string, BuildingEntity> buildingEntities = new Dictionary<string, BuildingEntity>();
         protected readonly Dictionary<string, NetPeer> peersByCharacterName = new Dictionary<string, NetPeer>();
         // Events
@@ -124,7 +124,7 @@ namespace MultiplayerARPG
             LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MsgTypes.Chat, chatMessage);
         }
 
-        public virtual void WarpCharacter(PlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        public virtual void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
         {
             if (playerCharacterEntity == null || !IsServer)
                 return;
@@ -221,7 +221,7 @@ namespace MultiplayerARPG
                 Instantiate(GameInstance.Singleton.serverCharacterPrefab);
         }
 
-        public virtual void RegisterPlayerCharacter(NetPeer peer, PlayerCharacterEntity playerCharacterEntity)
+        public virtual void RegisterPlayerCharacter(NetPeer peer, BasePlayerCharacterEntity playerCharacterEntity)
         {
             if (playerCharacterEntity == null || !Peers.ContainsKey(peer.ConnectId) || playerCharacters.ContainsKey(peer.ConnectId))
                 return;
@@ -231,7 +231,7 @@ namespace MultiplayerARPG
 
         public virtual void UnregisterPlayerCharacter(NetPeer peer)
         {
-            PlayerCharacterEntity playerCharacterEntity;
+            BasePlayerCharacterEntity playerCharacterEntity;
             if (!playerCharacters.TryGetValue(peer.ConnectId, out playerCharacterEntity))
                 return;
             peersByCharacterName.Remove(playerCharacterEntity.CharacterName);
