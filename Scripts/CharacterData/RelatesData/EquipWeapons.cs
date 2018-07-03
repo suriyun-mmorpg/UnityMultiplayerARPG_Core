@@ -1,6 +1,5 @@
 ﻿using LiteNetLib.Utils;
 using LiteNetLibManager;
-using MultiplayerARPG;
 
 [System.Serializable]
 public struct EquipWeapons
