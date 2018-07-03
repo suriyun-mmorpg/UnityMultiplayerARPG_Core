@@ -359,5 +359,93 @@ namespace MultiplayerARPG
             if (this.DecreaseItemsByIndex(index, amount))
                 Gold += item.sellPrice * amount;
         }
+
+        protected virtual void NetFuncSendDealingOffer(uint objectId)
+        {
+            LiteNetLibIdentity identity;
+            if (!Manager.Assets.TryGetSpawnedObject(objectId, out identity))
+                return;
+
+            var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
+            if (playerCharacterEntity == null || playerCharacterEntity.coPlayerCharacterEntity != null)
+                return;
+
+            if (Vector3.Distance(CacheTransform.position, playerCharacterEntity.CacheTransform.position) > gameInstance.conversationDistance)
+                return;
+
+            coPlayerCharacterEntity = playerCharacterEntity;
+            playerCharacterEntity.coPlayerCharacterEntity = this;
+            playerCharacterEntity.DealingState = DealingState.ReceiveOffer;
+        }
+
+        protected virtual void NetFuncAcceptDealingOffer()
+        {
+            coPlayerCharacterEntity.ClearDealingData();
+            coPlayerCharacterEntity.DealingState = DealingState.Dealing;
+            ClearDealingData();
+            DealingState = DealingState.Dealing;
+        }
+
+        protected virtual void NetFuncDeclineDealingOffer()
+        {
+            coPlayerCharacterEntity.ClearDealingData();
+            coPlayerCharacterEntity.coPlayerCharacterEntity = null;
+            ClearDealingData();
+            coPlayerCharacterEntity = null;
+        }
+
+        protected virtual void NetFuncSetDealingItem(int itemIndex, short amount)
+        {
+            if (DealingState != DealingState.Dealing)
+            {
+                // TODO: May send warn message to start dealing before confirm
+                return;
+            }
+        }
+
+        protected virtual void NetFuncSetDealingGold(int dealingGold)
+        {
+            if (DealingState != DealingState.Dealing)
+            {
+                // TODO: May send warn message to start dealing before confirm
+                return;
+            }
+
+            if (dealingGold > Gold || dealingGold < 0)
+            {
+                // TODO: May add not enough gold messages
+                return;
+            }
+
+            DealingGold = Gold;
+        }
+
+        protected virtual void NetFuncLockDealing()
+        {
+            if (DealingState != DealingState.Dealing)
+            {
+                // TODO: May send warn message to start dealing before confirm
+                return;
+            }
+            DealingState = DealingState.Lock;
+        }
+
+        protected virtual void NetFuncConfirmDealing()
+        {
+            if (DealingState != DealingState.Lock)
+            {
+                // TODO: May send warn message to lock before confirm
+                return;
+            }
+            DealingState = DealingState.Confirm;
+            if (DealingState == DealingState.Confirm && coPlayerCharacterEntity.DealingState == DealingState.Confirm)
+            {
+                // TODO: Exchange items
+                coPlayerCharacterEntity.ClearDealingData();
+                coPlayerCharacterEntity.coPlayerCharacterEntity = null;
+                ClearDealingData();
+                coPlayerCharacterEntity = null;
+            }
+        }
     }
 }

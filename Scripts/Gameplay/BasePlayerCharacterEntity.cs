@@ -5,6 +5,15 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
+    public enum DealingState : byte
+    {
+        None,
+        ReceiveOffer,
+        Dealing,
+        Lock,
+        Confirm,
+    }
+
     [RequireComponent(typeof(LiteNetLibTransform))]
     public abstract partial class BasePlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     {
@@ -15,6 +24,8 @@ namespace MultiplayerARPG
         public WarpPortalEntity warpingPortal;
         [HideInInspector]
         public NpcDialog currentNpcDialog;
+        [HideInInspector]
+        public BasePlayerCharacterEntity coPlayerCharacterEntity;
 
         public bool isJumping { get; protected set; }
         public bool isGrounded { get; protected set; }
@@ -101,6 +112,13 @@ namespace MultiplayerARPG
                 if (quest.AddKillMonster(monsterCharacterEntity, 1))
                     quests[i] = quest;
             }
+        }
+
+        public virtual void ClearDealingData()
+        {
+            DealingState = DealingState.None;
+            DealingGold = 0;
+            DealingItems.Clear();
         }
 
         public abstract float StoppingDistance { get; }

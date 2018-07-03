@@ -16,10 +16,15 @@ namespace MultiplayerARPG
             skillPoint.sendOptions = SendOptions.ReliableOrdered;
             skillPoint.forOwnerOnly = true;
             gold.sendOptions = SendOptions.ReliableOrdered;
-            gold.forOwnerOnly = false;
+            gold.forOwnerOnly = true;
+            dealingGold.sendOptions = SendOptions.ReliableOrdered;
+            dealingGold.forOwnerOnly = false;
+            dealingState.sendOptions = SendOptions.ReliableOrdered;
+            dealingState.forOwnerOnly = false;
 
             hotkeys.forOwnerOnly = true;
             quests.forOwnerOnly = true;
+            dealingItems.forOwnerOnly = false;
         }
 
         public override void OnSetup()
@@ -29,9 +34,12 @@ namespace MultiplayerARPG
             statPoint.onChange += OnStatPointChange;
             skillPoint.onChange += OnSkillPointChange;
             gold.onChange += OnGoldChange;
+            dealingGold.onChange += OnDealingGoldChange;
+            dealingState.onChange += OnDealingStateChange;
             // On list changes events
             hotkeys.onOperation += OnHotkeysOperation;
             quests.onOperation += OnQuestsOperation;
+            dealingItems.onOperation += OnDealingItemsOperation;
             // Register Network functions
             RegisterNetFunction("SwapOrMergeItem", new LiteNetLibFunction<NetFieldInt, NetFieldInt>((fromIndex, toIndex) => NetFuncSwapOrMergeItem(fromIndex, toIndex)));
             RegisterNetFunction("AddAttribute", new LiteNetLibFunction<NetFieldInt, NetFieldShort>((attributeIndex, amount) => NetFuncAddAttribute(attributeIndex, amount)));
@@ -46,6 +54,13 @@ namespace MultiplayerARPG
             RegisterNetFunction("Build", new LiteNetLibFunction<NetFieldInt, NetFieldVector3, NetFieldQuaternion, NetFieldUInt>((itemIndex, position, rotation, parentObjectId) => NetFuncBuild(itemIndex, position, rotation, parentObjectId)));
             RegisterNetFunction("DestroyBuild", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncDestroyBuild(objectId)));
             RegisterNetFunction("SellItem", new LiteNetLibFunction<NetFieldInt, NetFieldShort>((nonEquipIndex, amount) => NetFuncSellItem(nonEquipIndex, amount)));
+            RegisterNetFunction("SendDealingOffer", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncSendDealingOffer(objectId)));
+            RegisterNetFunction("AcceptDealingOffer", new LiteNetLibFunction(NetFuncAcceptDealingOffer));
+            RegisterNetFunction("DeclineDealingOffer", new LiteNetLibFunction(NetFuncDeclineDealingOffer));
+            RegisterNetFunction("SetDealingItem", new LiteNetLibFunction<NetFieldInt, NetFieldShort>((itemIndex, amount) => NetFuncSetDealingItem(itemIndex, amount)));
+            RegisterNetFunction("SetDealingGold", new LiteNetLibFunction<NetFieldInt>((dealingGold) => NetFuncSetDealingGold(dealingGold)));
+            RegisterNetFunction("LockDealing", new LiteNetLibFunction(NetFuncLockDealing));
+            RegisterNetFunction("ConfirmDealing", new LiteNetLibFunction(NetFuncConfirmDealing));
         }
 
         protected override void OnDestroy()
