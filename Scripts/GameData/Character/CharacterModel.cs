@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -529,20 +528,14 @@ namespace MultiplayerARPG
                 CacheAnimation.CrossFade(clipName, fadeLength);
         }
 
-        public async Task PlayActionAnimation(int actionId, AnimActionType animActionType, float playSpeedMultiplier = 1f)
+        public Coroutine PlayActionAnimation(int actionId, AnimActionType animActionType, float playSpeedMultiplier = 1f)
         {
-            switch (animatorType)
-            {
-                case AnimatorType.Animator:
-                    await PlayActionAnimation_Animator(actionId, animActionType, playSpeedMultiplier);
-                    break;
-                case AnimatorType.LegacyAnimtion:
-                    await PlayActionAnimation_LegacyAnimation(actionId, animActionType, playSpeedMultiplier);
-                    break;
-            }
+            if (animatorType == AnimatorType.LegacyAnimtion)
+                return StartCoroutine(PlayActionAnimation_LegacyAnimation(actionId, animActionType, playSpeedMultiplier));
+            return StartCoroutine(PlayActionAnimation_Animator(actionId, animActionType, playSpeedMultiplier));
         }
 
-        public async Task PlayActionAnimation_Animator(int actionId, AnimActionType animActionType, float playSpeedMultiplier)
+        private IEnumerator PlayActionAnimation_Animator(int actionId, AnimActionType animActionType, float playSpeedMultiplier)
         {
             // If animator is not null, play the action animation
             ActionAnimation actionAnimation;
@@ -560,16 +553,16 @@ namespace MultiplayerARPG
                 CacheAnimator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
                 CacheAnimator.SetBool(ANIM_DO_ACTION, true);
                 // Waits by current transition + clip duration before end animation
-                int waitDelay = (int)(1000 * (CacheAnimator.GetAnimatorTransitionInfo(0).duration + (clip.length / playSpeedMultiplier)));
-                await Task.Delay(waitDelay);
+                var waitDelay = CacheAnimator.GetAnimatorTransitionInfo(0).duration + (clip.length / playSpeedMultiplier);
+                yield return new WaitForSecondsRealtime(waitDelay);
                 CacheAnimator.SetBool(ANIM_DO_ACTION, false);
                 // Waits by current transition + extra duration before end playing animation state
-                waitDelay = (int)(1000 * (CacheAnimator.GetAnimatorTransitionInfo(0).duration + (extraDuration / playSpeedMultiplier)));
-                await Task.Delay(waitDelay);
+                waitDelay = CacheAnimator.GetAnimatorTransitionInfo(0).duration + (extraDuration / playSpeedMultiplier);
+                yield return new WaitForSecondsRealtime(waitDelay);
             }
         }
 
-        public async Task PlayActionAnimation_LegacyAnimation(int actionId, AnimActionType animActionType, float playSpeedMultiplier)
+        private IEnumerator PlayActionAnimation_LegacyAnimation(int actionId, AnimActionType animActionType, float playSpeedMultiplier)
         {
             // If animator is not null, play the action animation
             ActionAnimation actionAnimation;
@@ -587,27 +580,24 @@ namespace MultiplayerARPG
                     AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
                 CrossFadeLegacyAnimation(LEGACY_CLIP_ACTION, legacyAnimationData.actionClipFadeLength);
                 // Waits by current transition + clip duration before end animation
-                int waitDelay = (int)(1000 * (clip.length / playSpeedMultiplier));
-                await Task.Delay(waitDelay);
+                var waitDelay = clip.length / playSpeedMultiplier;
+                yield return new WaitForSecondsRealtime(waitDelay);
                 CrossFadeLegacyAnimation(legacyAnimationData.idleClip, legacyAnimationData.idleClipFadeLength);
                 // Waits by current transition + extra duration before end playing animation state
-                waitDelay = (int)(1000 * (extraDuration / playSpeedMultiplier));
-                await Task.Delay(waitDelay);
+                waitDelay = extraDuration / playSpeedMultiplier;
+                yield return new WaitForSecondsRealtime(waitDelay);
             }
         }
 
         public void PlayHurtAnimation()
         {
-            switch (animatorType)
+            if (animatorType == AnimatorType.LegacyAnimtion)
             {
-                case AnimatorType.Animator:
-                    CacheAnimator.ResetTrigger(ANIM_HURT);
-                    CacheAnimator.SetTrigger(ANIM_HURT);
-                    break;
-                case AnimatorType.LegacyAnimtion:
-                    CrossFadeLegacyAnimation(legacyAnimationData.hurtClip, legacyAnimationData.hurtClipFadeLength);
-                    break;
+                CrossFadeLegacyAnimation(legacyAnimationData.hurtClip, legacyAnimationData.hurtClipFadeLength);
+                return;
             }
+            CacheAnimator.ResetTrigger(ANIM_HURT);
+            CacheAnimator.SetTrigger(ANIM_HURT);
         }
     }
 

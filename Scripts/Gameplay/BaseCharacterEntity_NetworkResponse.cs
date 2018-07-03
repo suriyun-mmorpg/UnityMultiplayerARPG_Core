@@ -61,10 +61,10 @@ namespace MultiplayerARPG
             // Play animation on clients
             RequestPlayActionAnimation(actionId, AnimActionType.Attack);
             // Start attack routine
-            AttackRoutine(CacheTransform.position, triggerDuration, totalDuration, weapon, damageInfo, allDamageAmounts);
+            StartCoroutine(AttackRoutine(CacheTransform.position, triggerDuration, totalDuration, weapon, damageInfo, allDamageAmounts));
         }
 
-        private async void AttackRoutine(
+        private IEnumerator AttackRoutine(
             Vector3 position,
             float triggerDuration,
             float totalDuration,
@@ -72,9 +72,9 @@ namespace MultiplayerARPG
             DamageInfo damageInfo,
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
-            await Task.Delay((int)(1000 * totalDuration));
+            yield return new WaitForSecondsRealtime(triggerDuration);
             LaunchDamageEntity(position, weapon, damageInfo, allDamageAmounts, CharacterBuff.Empty, -1);
-            await Task.Delay((int)(1000 * (totalDuration - triggerDuration)));
+            yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
         }
 
         /// <summary>
@@ -137,10 +137,10 @@ namespace MultiplayerARPG
             // Play animation on clients
             RequestPlayActionAnimation(actionId, AnimActionType.Skill);
             // Start use skill routine
-            UseSkillRoutine(skillIndex, position, triggerDuration, totalDuration, isAttack, weapon, damageInfo, allDamageAmounts);
+            StartCoroutine(UseSkillRoutine(skillIndex, position, triggerDuration, totalDuration, isAttack, weapon, damageInfo, allDamageAmounts));
         }
 
-        private async void UseSkillRoutine(
+        private IEnumerator UseSkillRoutine(
             int skillIndex,
             Vector3 position,
             float triggerDuration,
@@ -155,7 +155,7 @@ namespace MultiplayerARPG
             characterSkill.Used();
             characterSkill.ReduceMp(this);
             skills[skillIndex] = characterSkill;
-            await Task.Delay((int)(1000 * totalDuration));
+            yield return new WaitForSecondsRealtime(triggerDuration);
             var skill = characterSkill.GetSkill();
             switch (skill.skillType)
             {
@@ -182,7 +182,7 @@ namespace MultiplayerARPG
                     }
                     break;
             }
-            await Task.Delay((int)(1000 * (totalDuration - triggerDuration)));
+            yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
         }
 
         /// <summary>
@@ -212,10 +212,10 @@ namespace MultiplayerARPG
             if (IsDead())
                 return;
             this.animActionType = animActionType;
-            PlayActionAnimationRoutine(actionId, animActionType);
+            StartCoroutine(PlayActionAnimationRoutine(actionId, animActionType));
         }
 
-        private async void PlayActionAnimationRoutine(int actionId, AnimActionType animActionType)
+        private IEnumerator PlayActionAnimationRoutine(int actionId, AnimActionType animActionType)
         {
             var playSpeedMultiplier = 1f;
             switch (animActionType)
@@ -225,7 +225,7 @@ namespace MultiplayerARPG
                     break;
             }
             if (Model != null)
-                await Model.PlayActionAnimation(actionId, animActionType, playSpeedMultiplier);
+                yield return Model.PlayActionAnimation(actionId, animActionType, playSpeedMultiplier);
             this.animActionType = AnimActionType.None;
         }
 
