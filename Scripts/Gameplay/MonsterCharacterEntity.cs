@@ -9,7 +9,7 @@ namespace MultiplayerARPG
 {
     [RequireComponent(typeof(NavMeshAgent))]
     [RequireComponent(typeof(LiteNetLibTransform))]
-    public class MonsterCharacterEntity : BaseCharacterEntity
+    public partial class MonsterCharacterEntity : BaseCharacterEntity
     {
         #region Activity System Data
         [HideInInspector, System.NonSerialized]
@@ -87,6 +87,12 @@ namespace MultiplayerARPG
             MonsterActivityComponent.SetStartFollowTargetTime(time, this);
         }
 
+        public override void OnSetup()
+        {
+            base.OnSetup();
+            CacheNetTransform.ownerClientCanSendTransform = false;
+        }
+
         public virtual void StopMove()
         {
             CacheNavMeshAgent.isStopped = true;
@@ -94,11 +100,16 @@ namespace MultiplayerARPG
             wanderDestination = null;
         }
 
-        public override void OnSetup()
+        public virtual void SetAttackTarget(BaseCharacterEntity target)
         {
-            base.OnSetup();
-
-            CacheNetTransform.ownerClientCanSendTransform = false;
+            if (target == null || target.IsDead())
+                return;
+            // Already have target so don't set target
+            BaseCharacterEntity oldTarget;
+            if (TryGetTargetEntity(out oldTarget) && !oldTarget.IsDead())
+                return;
+            // Set target to attack
+            SetTargetEntity(target);
         }
 
         public override bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity)
@@ -121,18 +132,6 @@ namespace MultiplayerARPG
         public override bool IsEnemy(BaseCharacterEntity characterEntity)
         {
             return characterEntity != null && characterEntity is PlayerCharacterEntity;
-        }
-
-        public void SetAttackTarget(BaseCharacterEntity target)
-        {
-            if (target == null || target.IsDead())
-                return;
-            // Already have target so don't set target
-            BaseCharacterEntity oldTarget;
-            if (TryGetTargetEntity(out oldTarget) && !oldTarget.IsDead())
-                return;
-            // Set target to attack
-            SetTargetEntity(target);
         }
 
         public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId)

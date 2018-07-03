@@ -1,0 +1,355 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using LiteNetLibManager;
+
+namespace MultiplayerARPG
+{
+    public partial class BaseCharacterEntity
+    {
+        #region Sync data
+        [Header("Sync Fields")]
+        [SerializeField]
+        protected SyncFieldString id = new SyncFieldString();
+        [SerializeField]
+        protected SyncFieldInt dataId = new SyncFieldInt();
+        [SerializeField]
+        protected SyncFieldString characterName = new SyncFieldString();
+        [SerializeField]
+        protected SyncFieldShort level = new SyncFieldShort();
+        [SerializeField]
+        protected SyncFieldInt exp = new SyncFieldInt();
+        [SerializeField]
+        protected SyncFieldInt currentMp = new SyncFieldInt();
+        [SerializeField]
+        protected SyncFieldInt currentStamina = new SyncFieldInt();
+        [SerializeField]
+        protected SyncFieldInt currentFood = new SyncFieldInt();
+        [SerializeField]
+        protected SyncFieldInt currentWater = new SyncFieldInt();
+        [SerializeField]
+        protected SyncFieldEquipWeapons equipWeapons = new SyncFieldEquipWeapons();
+        [SerializeField]
+        protected SyncFieldBool isHidding = new SyncFieldBool();
+        [Header("Sync Lists")]
+        [SerializeField]
+        protected SyncListCharacterAttribute attributes = new SyncListCharacterAttribute();
+        [SerializeField]
+        protected SyncListCharacterSkill skills = new SyncListCharacterSkill();
+        [SerializeField]
+        protected SyncListCharacterBuff buffs = new SyncListCharacterBuff();
+        [SerializeField]
+        protected SyncListCharacterItem equipItems = new SyncListCharacterItem();
+        [SerializeField]
+        protected SyncListCharacterItem nonEquipItems = new SyncListCharacterItem();
+        #endregion
+
+        #region Sync data actions
+        public System.Action<string> onIdChange;
+        public System.Action<int> onDataIdChange;
+        public System.Action<string> onCharacterNameChange;
+        public System.Action<short> onLevelChange;
+        public System.Action<int> onExpChange;
+        public System.Action<int> onCurrentHpChange;
+        public System.Action<int> onCurrentMpChange;
+        public System.Action<EquipWeapons> onEquipWeaponsChange;
+        public System.Action<bool> onIsHiddingChange;
+        // List
+        public System.Action<LiteNetLibSyncList.Operation, int> onAttributesOperation;
+        public System.Action<LiteNetLibSyncList.Operation, int> onSkillsOperation;
+        public System.Action<LiteNetLibSyncList.Operation, int> onBuffsOperation;
+        public System.Action<LiteNetLibSyncList.Operation, int> onEquipItemsOperation;
+        public System.Action<LiteNetLibSyncList.Operation, int> onNonEquipItemsOperation;
+        #endregion
+
+        #region Fields/Interface implementation
+        public virtual string Id { get { return id.Value; } set { id.Value = value; } }
+        public virtual int DataId { get { return dataId.Value; } set { dataId.Value = value; } }
+        public virtual string CharacterName { get { return characterName.Value; } set { characterName.Value = value; } }
+        public virtual short Level { get { return level.Value; } set { level.Value = value; } }
+        public virtual int Exp { get { return exp.Value; } set { exp.Value = value; } }
+        public virtual int CurrentMp { get { return currentMp.Value; } set { currentMp.Value = value; } }
+        public virtual int CurrentStamina { get { return currentStamina.Value; } set { currentStamina.Value = value; } }
+        public virtual int CurrentFood { get { return currentFood.Value; } set { currentFood.Value = value; } }
+        public virtual int CurrentWater { get { return currentWater.Value; } set { currentWater.Value = value; } }
+        public virtual EquipWeapons EquipWeapons { get { return equipWeapons.Value; } set { equipWeapons.Value = value; } }
+        public virtual bool IsHidding { get { return isHidding.Value; } set { isHidding.Value = value; } }
+        public override string Title { get { return CharacterName; } set { } }
+
+        public IList<CharacterAttribute> Attributes
+        {
+            get { return attributes; }
+            set
+            {
+                attributes.Clear();
+                foreach (var entry in value)
+                    attributes.Add(entry);
+            }
+        }
+
+        public IList<CharacterSkill> Skills
+        {
+            get { return skills; }
+            set
+            {
+                skills.Clear();
+                foreach (var entry in value)
+                    skills.Add(entry);
+            }
+        }
+
+        public IList<CharacterBuff> Buffs
+        {
+            get { return buffs; }
+            set
+            {
+                buffs.Clear();
+                foreach (var entry in value)
+                    buffs.Add(entry);
+            }
+        }
+
+        public IList<CharacterItem> EquipItems
+        {
+            get { return equipItems; }
+            set
+            {
+                equipItemIndexes.Clear();
+                equipItems.Clear();
+                for (var i = 0; i < value.Count; ++i)
+                {
+                    var entry = value[i];
+                    var armorItem = entry.GetArmorItem();
+                    if (entry.IsValid() && armorItem != null && !equipItemIndexes.ContainsKey(armorItem.EquipPosition))
+                    {
+                        equipItemIndexes.Add(armorItem.EquipPosition, i);
+                        equipItems.Add(entry);
+                    }
+                }
+            }
+        }
+
+        public IList<CharacterItem> NonEquipItems
+        {
+            get { return nonEquipItems; }
+            set
+            {
+                nonEquipItems.Clear();
+                foreach (var entry in value)
+                    nonEquipItems.Add(entry);
+            }
+        }
+        #endregion
+
+        #region Sync data changes callback
+        /// <summary>
+        /// Override this to do stuffs when id changes
+        /// </summary>
+        /// <param name="id"></param>
+        protected virtual void OnIdChange(string id)
+        {
+            if (onIdChange != null)
+                onIdChange.Invoke(id);
+        }
+
+        /// <summary>
+        /// Override this to do stuffs when data Id changes
+        /// </summary>
+        /// <param name="dataId"></param>
+        protected virtual void OnDataIdChange(int dataId)
+        {
+            isRecaching = true;
+
+            // Get database
+            GameInstance.AllCharacters.TryGetValue(dataId, out database);
+
+            // If permanently model has been set, it will not changes character model
+            if (permanentlyModel == null)
+            {
+                if (Model != null)
+                    Destroy(Model.gameObject);
+
+                Model = this.InstantiateModel(CacheModelContainer);
+            }
+            // If model is ready set its states, collider data and equipments
+            if (Model != null)
+            {
+                CacheCapsuleCollider.center = Model.center;
+                CacheCapsuleCollider.radius = Model.radius;
+                CacheCapsuleCollider.height = Model.height;
+                Model.SetEquipWeapons(equipWeapons);
+                Model.SetEquipItems(equipItems);
+                Model.gameObject.SetActive(!isHidding.Value);
+                combatTextTransform = Model.CombatTextTransform;
+
+                // Hidding an object when it's host and character over sight
+                if (IsServer && IsClient)
+                {
+                    LiteNetLibPlayer serverPlayer;
+                    if (Manager.Players.TryGetValue(Manager.Client.Peer.ConnectId, out serverPlayer) && !serverPlayer.SubscribingObjects.Contains(Identity))
+                        Identity.OnServerSubscribingRemoved();
+                }
+            }
+
+            if (onDataIdChange != null)
+                onDataIdChange.Invoke(dataId);
+        }
+
+        /// <summary>
+        /// Override this to do stuffs when character name changes
+        /// </summary>
+        /// <param name="characterName"></param>
+        protected virtual void OnCharacterNameChange(string characterName)
+        {
+            if (onCharacterNameChange != null)
+                onCharacterNameChange.Invoke(characterName);
+        }
+
+        /// <summary>
+        /// Override this to do stuffs when level changes
+        /// </summary>
+        /// <param name="level"></param>
+        protected virtual void OnLevelChange(short level)
+        {
+            isRecaching = true;
+
+            if (onLevelChange != null)
+                onLevelChange.Invoke(level);
+        }
+
+        /// <summary>
+        /// Override this to do stuffs when exp changes
+        /// </summary>
+        /// <param name="exp"></param>
+        protected virtual void OnExpChange(int exp)
+        {
+            if (onExpChange != null)
+                onExpChange.Invoke(exp);
+        }
+
+        /// <summary>
+        /// Override this to do stuffs when current hp changes
+        /// </summary>
+        /// <param name="currentHp"></param>
+        protected virtual void OnCurrentHpChange(int currentHp)
+        {
+            if (onCurrentHpChange != null)
+                onCurrentHpChange.Invoke(currentHp);
+        }
+
+        /// <summary>
+        /// Override this to do stuffs when current mp changes
+        /// </summary>
+        /// <param name="currentMp"></param>
+        protected virtual void OnCurrentMpChange(int currentMp)
+        {
+            if (onCurrentMpChange != null)
+                onCurrentMpChange.Invoke(currentMp);
+        }
+
+        /// <summary>
+        /// Override this to do stuffs when equip weapons changes
+        /// </summary>
+        /// <param name="equipWeapons"></param>
+        protected virtual void OnEquipWeaponsChange(EquipWeapons equipWeapons)
+        {
+            if (Model != null)
+                Model.SetEquipWeapons(equipWeapons);
+
+            if (onEquipWeaponsChange != null)
+                onEquipWeaponsChange.Invoke(equipWeapons);
+        }
+
+        /// <summary>
+        /// Override this to do stuffs when hidding state changes
+        /// </summary>
+        /// <param name="isHidding"></param>
+        protected virtual void OnIsHiddingChange(bool isHidding)
+        {
+            var renderers = GetComponentsInChildren<Renderer>();
+            foreach (var renderer in renderers)
+            {
+                renderer.enabled = !isHidding;
+            }
+            if (CacheCapsuleCollider != null)
+                CacheCapsuleCollider.enabled = !isHidding;
+
+            if (onIsHiddingChange != null)
+                onIsHiddingChange.Invoke(isHidding);
+        }
+        #endregion
+
+        #region Net functions operation callback
+        /// <summary>
+        /// Override this to do stuffs when attributes changes
+        /// </summary>
+        /// <param name="operation"></param>
+        /// <param name="index"></param>
+        protected virtual void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            isRecaching = true;
+
+            if (onAttributesOperation != null)
+                onAttributesOperation.Invoke(operation, index);
+        }
+
+        /// <summary>
+        /// Override this to do stuffs when skills changes
+        /// </summary>
+        /// <param name="operation"></param>
+        /// <param name="index"></param>
+        protected virtual void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            isRecaching = true;
+
+            if (onSkillsOperation != null)
+                onSkillsOperation.Invoke(operation, index);
+        }
+
+        /// <summary>
+        /// Override this to do stuffs when buffs changes
+        /// </summary>
+        /// <param name="operation"></param>
+        /// <param name="index"></param>
+        protected virtual void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            isRecaching = true;
+
+            if (Model != null)
+                Model.SetBuffs(buffs);
+
+            if (onBuffsOperation != null)
+                onBuffsOperation.Invoke(operation, index);
+        }
+
+        /// <summary>
+        /// Override this to do stuffs when equip items changes
+        /// </summary>
+        /// <param name="operation"></param>
+        /// <param name="index"></param>
+        protected virtual void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            isRecaching = true;
+
+            if (Model != null)
+                Model.SetEquipItems(equipItems);
+
+            if (onEquipItemsOperation != null)
+                onEquipItemsOperation.Invoke(operation, index);
+        }
+
+        /// <summary>
+        /// Override this to do stuffs when non equip items changes
+        /// </summary>
+        /// <param name="operation"></param>
+        /// <param name="index"></param>
+        protected virtual void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            isRecaching = true;
+
+            if (onNonEquipItemsOperation != null)
+                onNonEquipItemsOperation.Invoke(operation, index);
+        }
+        #endregion
+    }
+}
