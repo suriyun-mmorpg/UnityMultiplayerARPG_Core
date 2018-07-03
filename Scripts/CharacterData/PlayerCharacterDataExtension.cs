@@ -253,7 +253,6 @@ public static class PlayerCharacterDataExtension
         surrogateSelector.AddSurrogate(typeof(CharacterSkill), new StreamingContext(StreamingContextStates.All), skillSS);
         var playerCharacterDataSS = new PlayerCharacterSerializationSurrogate();
         surrogateSelector.AddSurrogate(typeof(PlayerCharacterData), new StreamingContext(StreamingContextStates.All), playerCharacterDataSS);
-        surrogateSelector.AddSurrogate(typeof(PlayerCharacterEntity), new StreamingContext(StreamingContextStates.All), playerCharacterDataSS);
     }
 
     public static void SavePersistentCharacterData<T>(this T characterData) where T : IPlayerCharacterData
