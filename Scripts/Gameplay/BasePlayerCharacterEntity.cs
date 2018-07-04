@@ -8,7 +8,6 @@ namespace MultiplayerARPG
     public enum DealingState : byte
     {
         None,
-        ReceiveOffer,
         Dealing,
         Lock,
         Confirm,
@@ -29,7 +28,7 @@ namespace MultiplayerARPG
 
         public bool isJumping { get; protected set; }
         public bool isGrounded { get; protected set; }
-        
+
         private LiteNetLibTransform cacheNetTransform;
         public LiteNetLibTransform CacheNetTransform
         {
@@ -101,6 +100,13 @@ namespace MultiplayerARPG
             Gold += gold;
         }
 
+        public virtual void DecreaseGold(int gold)
+        {
+            if (!IsServer)
+                return;
+            Gold -= gold;
+        }
+
         public virtual void OnKillMonster(BaseMonsterCharacterEntity monsterCharacterEntity)
         {
             if (!IsServer || monsterCharacterEntity == null)
@@ -114,11 +120,44 @@ namespace MultiplayerARPG
             }
         }
 
+        public virtual void ExchangeDealingItemsAndGold()
+        {
+            if (coPlayerCharacterEntity == null)
+                return;
+            var tempDealingItems = new List<DealingCharacterItem>(DealingItems);
+            for (var i = nonEquipItems.Count - 1; i >= 0; --i)
+            {
+                var nonEquipItem = nonEquipItems[i];
+                for (var j = tempDealingItems.Count - 1; j >= 0; --j)
+                {
+                    var dealingItem = tempDealingItems[j];
+                    if (dealingItem.nonEquipIndex == i && nonEquipItem.amount >= dealingItem.amount)
+                    {
+                        nonEquipItem.amount -= dealingItem.amount;
+                        if (nonEquipItem.amount == 0)
+                            nonEquipItems.RemoveAt(i);
+                        else
+                            nonEquipItems[i] = nonEquipItem;
+                        coPlayerCharacterEntity.IncreaseItems(dealingItem.dataId, dealingItem.level, dealingItem.amount, dealingItem.durability);
+                        tempDealingItems.RemoveAt(j);
+                        break;
+                    }
+                }
+            }
+            DecreaseGold(DealingGold);
+            coPlayerCharacterEntity.IncreaseGold(DealingGold);
+        }
+
         public virtual void ClearDealingData()
         {
             DealingState = DealingState.None;
             DealingGold = 0;
             DealingItems.Clear();
+        }
+
+        public override bool CanMoveOrDoActions()
+        {
+            return base.CanMoveOrDoActions() && DealingState == DealingState.None;
         }
 
         public abstract float StoppingDistance { get; }

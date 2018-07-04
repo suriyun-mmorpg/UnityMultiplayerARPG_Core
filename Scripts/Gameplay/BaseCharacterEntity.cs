@@ -791,9 +791,14 @@ namespace MultiplayerARPG
             isRecaching = false;
         }
 
-        public bool IsPlayingActionAnimation()
+        public virtual bool IsPlayingActionAnimation()
         {
             return animActionType == AnimActionType.Attack || animActionType == AnimActionType.Skill;
+        }
+
+        public virtual bool CanMoveOrDoActions()
+        {
+            return !IsDead() && !IsPlayingActionAnimation();
         }
 
         public virtual void IncreaseExp(int exp)

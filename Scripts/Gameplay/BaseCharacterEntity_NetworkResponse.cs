@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using LiteNetLibManager;
-using System.Threading.Tasks;
 
 namespace MultiplayerARPG
 {
@@ -22,7 +21,7 @@ namespace MultiplayerARPG
                 return;
             lastActionCommandReceivedTime = Time.unscaledTime;
 
-            if (IsDead() || IsPlayingActionAnimation())
+            if (!CanMoveOrDoActions())
                 return;
 
             // Prepare requires data
@@ -88,8 +87,7 @@ namespace MultiplayerARPG
                 return;
             lastActionCommandReceivedTime = Time.unscaledTime;
 
-            if (IsDead() ||
-                IsPlayingActionAnimation() ||
+            if (!CanMoveOrDoActions() ||
                 skillIndex < 0 ||
                 skillIndex >= skills.Count)
                 return;
@@ -247,15 +245,11 @@ namespace MultiplayerARPG
         /// <param name="objectId"></param>
         protected virtual void NetFuncPickupItem(uint objectId)
         {
-            if (IsDead() || IsPlayingActionAnimation())
+            if (!CanMoveOrDoActions())
                 return;
 
-            LiteNetLibIdentity identity;
-            if (!Manager.Assets.TryGetSpawnedObject(objectId, out identity))
-                return;
-
-            var itemDropEntity = identity.GetComponent<ItemDropEntity>();
-            if (itemDropEntity == null)
+            ItemDropEntity itemDropEntity = null;
+            if (!TryGetEntityByObjectId(objectId, out itemDropEntity))
                 return;
 
             if (Vector3.Distance(CacheTransform.position, itemDropEntity.CacheTransform.position) > gameInstance.pickUpItemDistance + 5f)
@@ -282,8 +276,7 @@ namespace MultiplayerARPG
         /// <param name="amount"></param>
         protected virtual void NetFuncDropItem(int index, short amount)
         {
-            if (IsDead() ||
-                IsPlayingActionAnimation() ||
+            if (!CanMoveOrDoActions() ||
                 index < 0 ||
                 index >= nonEquipItems.Count)
                 return;
@@ -305,8 +298,7 @@ namespace MultiplayerARPG
         /// <param name="equipPosition"></param>
         protected virtual void NetFuncEquipItem(int nonEquipIndex, string equipPosition)
         {
-            if (IsDead() ||
-                IsPlayingActionAnimation() ||
+            if (!CanMoveOrDoActions() ||
                 nonEquipIndex < 0 ||
                 nonEquipIndex >= nonEquipItems.Count)
                 return;
@@ -352,7 +344,7 @@ namespace MultiplayerARPG
         /// <param name="fromEquipPosition"></param>
         protected virtual void NetFuncUnEquipItem(string fromEquipPosition)
         {
-            if (IsDead() || IsPlayingActionAnimation())
+            if (!CanMoveOrDoActions())
                 return;
 
             var equippedArmorIndex = -1;

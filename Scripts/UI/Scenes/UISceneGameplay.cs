@@ -41,6 +41,9 @@ namespace MultiplayerARPG
         public UINpcDialog uiNpcDialog;
         public UIConstructBuilding uiConstructBuilding;
         public UICurrentBuilding uiCurrentBuilding;
+        public UIPlayerActivateMenu uiPlayerActivateMenu;
+        public UIDealingRequest uiDealingRequest;
+        public UIDealing uiDealing;
         public UIToggleUI[] toggleUis;
         public List<GameObject> ignorePointerDetectionUis;
 
@@ -153,6 +156,15 @@ namespace MultiplayerARPG
             uiTargetCharacter.Show();
         }
 
+        public void SetActivePlayerCharacter(BasePlayerCharacterEntity playerCharacter)
+        {
+            if (uiPlayerActivateMenu == null)
+                return;
+
+            uiPlayerActivateMenu.Data = playerCharacter;
+            uiPlayerActivateMenu.Show();
+        }
+
         public void OnClickRespawn()
         {
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
@@ -188,6 +200,64 @@ namespace MultiplayerARPG
             }
             uiNpcDialog.Data = npcDialog;
             uiNpcDialog.Show();
+        }
+
+        public void OnShowDealingRequest(BasePlayerCharacterEntity playerCharacter)
+        {
+            if (uiDealingRequest == null)
+                return;
+            uiDealingRequest.Data = playerCharacter;
+            uiDealingRequest.Show();
+        }
+
+        public void OnShowDealing(BasePlayerCharacterEntity playerCharacter)
+        {
+            if (uiDealing == null)
+                return;
+            uiDealing.Data = playerCharacter;
+            uiDealing.Show();
+        }
+
+        public void OnUpdateDealingState(DealingState state)
+        {
+            if (uiDealing == null)
+                return;
+            uiDealing.UpdateDealingState(state);
+        }
+
+        public void OnUpdateAnotherDealingState(DealingState state)
+        {
+            if (uiDealing == null)
+                return;
+            uiDealing.UpdateAnotherDealingState(state);
+        }
+
+        public void OnUpdateDealingGold(int gold)
+        {
+            if (uiDealing == null)
+                return;
+            uiDealing.UpdateDealingGold(gold);
+        }
+
+        public void OnUpdateAnotherDealingGold(int gold)
+        {
+            if (uiDealing == null)
+                return;
+            uiDealing.UpdateAnotherDealingGold(gold);
+        }
+
+        public void OnUpdateDealingItems(DealingCharacterItems items)
+        {
+            if (uiDealing == null)
+                return;
+            uiDealing.UpdateDealingItems(items);
+        }
+
+        public void OnUpdateAnotherDealingItems(DealingCharacterItems items)
+        {
+            if (uiDealing == null)
+                return;
+            uiDealing.UpdateAnotherDealingItems(items);
         }
 
         public bool IsPointerOverUIObject()

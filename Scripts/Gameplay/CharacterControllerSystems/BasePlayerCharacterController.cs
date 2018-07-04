@@ -66,6 +66,14 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.onShowNpcDialog += CacheUISceneGameplay.OnShowNpcDialog;
                 PlayerCharacterEntity.onDead += CacheUISceneGameplay.OnCharacterDead;
                 PlayerCharacterEntity.onRespawn += CacheUISceneGameplay.OnCharacterRespawn;
+                PlayerCharacterEntity.onShowDealingRequestDialog += CacheUISceneGameplay.OnShowDealingRequest;
+                PlayerCharacterEntity.onShowDealingDialog += CacheUISceneGameplay.OnShowDealing;
+                PlayerCharacterEntity.onUpdateDealingState += CacheUISceneGameplay.OnUpdateDealingState;
+                PlayerCharacterEntity.onUpdateDealingGold += CacheUISceneGameplay.OnUpdateDealingGold;
+                PlayerCharacterEntity.onUpdateDealingItems += CacheUISceneGameplay.OnUpdateDealingItems;
+                PlayerCharacterEntity.onUpdateAnotherDealingState += CacheUISceneGameplay.OnUpdateAnotherDealingState;
+                PlayerCharacterEntity.onUpdateAnotherDealingGold += CacheUISceneGameplay.OnUpdateAnotherDealingGold;
+                PlayerCharacterEntity.onUpdateAnotherDealingItems += CacheUISceneGameplay.OnUpdateAnotherDealingItems;
             }
             PlayerCharacterEntity.onDataIdChange += OnDataIdChange;
             PlayerCharacterEntity.onEquipWeaponsChange += OnEquipWeaponsChange;
@@ -94,6 +102,14 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.onShowNpcDialog -= CacheUISceneGameplay.OnShowNpcDialog;
                 PlayerCharacterEntity.onDead -= CacheUISceneGameplay.OnCharacterDead;
                 PlayerCharacterEntity.onRespawn -= CacheUISceneGameplay.OnCharacterRespawn;
+                PlayerCharacterEntity.onShowDealingRequestDialog -= CacheUISceneGameplay.OnShowDealingRequest;
+                PlayerCharacterEntity.onShowDealingDialog -= CacheUISceneGameplay.OnShowDealing;
+                PlayerCharacterEntity.onUpdateDealingState -= CacheUISceneGameplay.OnUpdateDealingState;
+                PlayerCharacterEntity.onUpdateDealingGold -= CacheUISceneGameplay.OnUpdateDealingGold;
+                PlayerCharacterEntity.onUpdateDealingItems -= CacheUISceneGameplay.OnUpdateDealingItems;
+                PlayerCharacterEntity.onUpdateAnotherDealingState -= CacheUISceneGameplay.OnUpdateAnotherDealingState;
+                PlayerCharacterEntity.onUpdateAnotherDealingGold -= CacheUISceneGameplay.OnUpdateAnotherDealingGold;
+                PlayerCharacterEntity.onUpdateAnotherDealingItems -= CacheUISceneGameplay.OnUpdateAnotherDealingItems;
             }
         }
 

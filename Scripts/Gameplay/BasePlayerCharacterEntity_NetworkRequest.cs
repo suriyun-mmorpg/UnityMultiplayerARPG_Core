@@ -68,21 +68,21 @@ namespace MultiplayerARPG
 
         public virtual void RequestEnterWarp()
         {
-            if (IsDead() || IsPlayingActionAnimation() || warpingPortal == null)
+            if (!CanMoveOrDoActions() || warpingPortal == null)
                 return;
             CallNetFunction("EnterWarp", FunctionReceivers.Server);
         }
 
         public virtual void RequestBuild(int index, Vector3 position, Quaternion rotation, uint parentObjectId)
         {
-            if (IsDead() || IsPlayingActionAnimation())
+            if (!CanMoveOrDoActions())
                 return;
             CallNetFunction("Build", FunctionReceivers.Server, index, position, rotation, parentObjectId);
         }
 
         public virtual void RequestDestroyBuilding(uint objectId)
         {
-            if (IsDead() || IsPlayingActionAnimation())
+            if (!CanMoveOrDoActions())
                 return;
             CallNetFunction("DestroyBuild", FunctionReceivers.Server, objectId);
         }
@@ -96,9 +96,84 @@ namespace MultiplayerARPG
             CallNetFunction("SellItem", FunctionReceivers.Server, nonEquipIndex, amount);
         }
 
-        public virtual void RequestSendDealingOffer(uint objectId)
+        public virtual void RequestSendDealingRequest(uint objectId)
         {
-            CallNetFunction("SendDealingOffer", FunctionReceivers.Server, objectId);
+            CallNetFunction("SendDealingRequest", FunctionReceivers.Server, objectId);
+        }
+
+        public virtual void RequestReceiveDealingRequest(uint objectId)
+        {
+            CallNetFunction("ReceiveDealingRequest", ConnectId, objectId);
+        }
+
+        public virtual void RequestAcceptDealingRequest()
+        {
+            CallNetFunction("AcceptDealingRequest", FunctionReceivers.Server);
+        }
+
+        public virtual void RequestDeclineDealingRequest()
+        {
+            CallNetFunction("DeclineDealingRequest", FunctionReceivers.Server);
+        }
+
+        public virtual void RequestAcceptedDealingRequest(uint objectId)
+        {
+            CallNetFunction("AcceptedDealingRequest", ConnectId, objectId);
+        }
+
+        public virtual void RequestSetDealingItem(int itemIndex, short amount)
+        {
+            CallNetFunction("SetDealingItem", FunctionReceivers.Server, itemIndex, amount);
+        }
+
+        public virtual void RequestSetDealingGold(int dealingGold)
+        {
+            CallNetFunction("SetDealingGold", FunctionReceivers.Server, dealingGold);
+        }
+
+        public virtual void RequestLockDealing()
+        {
+            CallNetFunction("LockDealing", FunctionReceivers.Server);
+        }
+
+        public virtual void RequestConfirmDealing()
+        {
+            CallNetFunction("ConfirmDealing", FunctionReceivers.Server);
+        }
+
+        public virtual void RequestCancelDealing()
+        {
+            CallNetFunction("CancelDealing", FunctionReceivers.Server);
+        }
+
+        public virtual void RequestUpdateDealingState(DealingState state)
+        {
+            CallNetFunction("UpdateDealingState", ConnectId, (byte)state);
+        }
+
+        public virtual void RequestUpdateAnotherDealingState(DealingState state)
+        {
+            CallNetFunction("UpdateAnotherDealingState", ConnectId, (byte)state);
+        }
+
+        public virtual void RequestUpdateDealingGold(int gold)
+        {
+            CallNetFunction("UpdateDealingGold", ConnectId, gold);
+        }
+
+        public virtual void RequestUpdateAnotherDealingGold(int gold)
+        {
+            CallNetFunction("UpdateAnotherDealingGold", ConnectId, gold);
+        }
+
+        public virtual void RequestUpdateDealingItems(DealingCharacterItems dealingItems)
+        {
+            CallNetFunction("UpdateDealingItems", ConnectId, dealingItems);
+        }
+
+        public virtual void RequestUpdateAnotherDealingItems(DealingCharacterItems dealingItems)
+        {
+            CallNetFunction("UpdateAnotherDealingItems", ConnectId, dealingItems);
         }
     }
 }

@@ -15,37 +15,65 @@ namespace MultiplayerARPG
         protected SyncFieldShort skillPoint = new SyncFieldShort();
         [SerializeField]
         protected SyncFieldInt gold = new SyncFieldInt();
-        [SerializeField]
-        protected SyncFieldByte dealingState = new SyncFieldByte();
-        [SerializeField]
-        protected SyncFieldInt dealingGold = new SyncFieldInt();
         // List
         [SerializeField]
         protected SyncListCharacterHotkey hotkeys = new SyncListCharacterHotkey();
         [SerializeField]
         protected SyncListCharacterQuest quests = new SyncListCharacterQuest();
-        [SerializeField]
-        protected SyncListCharacterItem dealingItems = new SyncListCharacterItem();
+        #endregion
+
+        #region Dealing System
+        protected DealingState dealingState = DealingState.None;
+        protected int dealingGold = 0;
+        protected DealingCharacterItems dealingItems = new DealingCharacterItems();
+        public DealingState DealingState
+        {
+            get { return dealingState; }
+            set
+            {
+                dealingState = value;
+                RequestUpdateDealingState(value);
+                if (coPlayerCharacterEntity != null)
+                    coPlayerCharacterEntity.RequestUpdateAnotherDealingState(value);
+            }
+        }
+        public int DealingGold
+        {
+            get { return dealingGold; }
+            set
+            {
+                dealingGold = value;
+                RequestUpdateDealingGold(value);
+                if (coPlayerCharacterEntity != null)
+                    coPlayerCharacterEntity.RequestUpdateAnotherDealingGold(value);
+            }
+        }
+        public DealingCharacterItems DealingItems
+        {
+            get { return dealingItems; }
+            set
+            {
+                dealingItems = value;
+                RequestUpdateDealingItems(value);
+                if (coPlayerCharacterEntity != null)
+                    coPlayerCharacterEntity.RequestUpdateAnotherDealingItems(value);
+            }
+        }
         #endregion
 
         #region Sync data actions
         public System.Action<short> onStatPointChange;
         public System.Action<short> onSkillPointChange;
         public System.Action<int> onGoldChange;
-        public System.Action<DealingState> onDealingStateChange;
-        public System.Action<int> onDealingGoldChange;
         // List
         public System.Action<LiteNetLibSyncList.Operation, int> onHotkeysOperation;
         public System.Action<LiteNetLibSyncList.Operation, int> onQuestsOperation;
-        public System.Action<LiteNetLibSyncList.Operation, int> onDealingItemsOperation;
         #endregion
 
         #region Fields/Interface implementation
         public short StatPoint { get { return statPoint.Value; } set { statPoint.Value = value; } }
         public short SkillPoint { get { return skillPoint.Value; } set { skillPoint.Value = value; } }
         public int Gold { get { return gold.Value; } set { gold.Value = value; } }
-        public DealingState DealingState { get { return (DealingState)dealingState.Value; } set { dealingState.Value = (byte)value; } }
-        public int DealingGold { get { return dealingGold.Value; } set { dealingGold.Value = value; } }
         public string CurrentMapName { get { return SceneManager.GetActiveScene().name; } set { } }
         public Vector3 CurrentPosition
         {
@@ -81,17 +109,6 @@ namespace MultiplayerARPG
                     quests.Add(entry);
             }
         }
-
-        public IList<CharacterItem> DealingItems
-        {
-            get { return dealingItems; }
-            set
-            {
-                dealingItems.Clear();
-                foreach (var entry in value)
-                    dealingItems.Add(entry);
-            }
-        }
         #endregion
 
         #region Sync data changes callback
@@ -112,18 +129,6 @@ namespace MultiplayerARPG
             if (onGoldChange != null)
                 onGoldChange.Invoke(gold);
         }
-
-        protected virtual void OnDealingStateChange(byte dealingState)
-        {
-            if (onDealingStateChange != null)
-                onDealingStateChange.Invoke((DealingState)dealingState);
-        }
-
-        protected virtual void OnDealingGoldChange(int dealingGold)
-        {
-            if (onDealingGoldChange != null)
-                onDealingGoldChange.Invoke(dealingGold);
-        }
         #endregion
 
         #region Net functions operation callback
@@ -137,12 +142,6 @@ namespace MultiplayerARPG
         {
             if (onQuestsOperation != null)
                 onQuestsOperation.Invoke(operation, index);
-        }
-
-        protected virtual void OnDealingItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            if (onDealingItemsOperation != null)
-                onDealingItemsOperation.Invoke(operation, index);
         }
         #endregion
     }

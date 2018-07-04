@@ -128,21 +128,30 @@ namespace MultiplayerARPG
                 return;
 
             // If it's building something, don't allow to activate NPC/Warp/Pickup Item
-            if (currentBuildingObject != null)
+            if (currentBuildingObject == null)
             {
-                // Activate nearby npcs
+                // Activate nearby npcs / players / activable buildings
                 if (InputManager.GetButtonDown("Activate"))
                 {
                     var foundEntities = Physics.OverlapSphere(CharacterTransform.position, gameInstance.conversationDistance, gameInstance.characterLayer.Mask);
+                    BasePlayerCharacterEntity foundPlayer = null;
+                    NpcEntity foundNpc = null;
                     foreach (var foundEntity in foundEntities)
                     {
-                        var npcEntity = foundEntity.GetComponent<NpcEntity>();
-                        if (npcEntity != null)
+                        if (foundPlayer == null)
                         {
-                            PlayerCharacterEntity.RequestNpcActivate(npcEntity.ObjectId);
-                            break;
+                            foundPlayer = foundEntity.GetComponent<BasePlayerCharacterEntity>();
+                            if (foundPlayer == PlayerCharacterEntity)
+                                foundPlayer = null;
                         }
+                        if (foundNpc == null)
+                            foundNpc = foundEntity.GetComponent<NpcEntity>();
                     }
+                    // Priority Player -> Npc -> Buildings
+                    if (foundPlayer != null && CacheUISceneGameplay != null)
+                        CacheUISceneGameplay.SetActivePlayerCharacter(foundPlayer);
+                    else if (foundNpc != null)
+                        PlayerCharacterEntity.RequestNpcActivate(foundNpc.ObjectId);
                     if (foundEntities.Length == 0)
                         PlayerCharacterEntity.RequestEnterWarp();
                 }

@@ -419,7 +419,7 @@ public static class CharacterDataExtension
         return count;
     }
 
-    public static bool IncreaseItems(this ICharacterData data, int dataId, short level, short amount)
+    public static bool IncreaseItems(this ICharacterData data, int dataId, short level, short amount, float? durability = null)
     {
         Item itemData;
         // If item not valid
@@ -502,6 +502,8 @@ public static class CharacterDataExtension
                 amount = 0;
             }
             newItem.amount = addAmount;
+            if (durability.HasValue)
+                newItem.durability = durability.Value;
             data.NonEquipItems.Add(newItem);
         }
         return true;

@@ -9,15 +9,14 @@ namespace MultiplayerARPG
     {
         public virtual void RequestAttack()
         {
-            if (IsDead() || IsPlayingActionAnimation())
+            if (!CanMoveOrDoActions())
                 return;
             CallNetFunction("Attack", FunctionReceivers.Server);
         }
 
         public virtual void RequestUseSkill(Vector3 position, int skillIndex)
         {
-            if (IsDead() ||
-                IsPlayingActionAnimation() ||
+            if (!CanMoveOrDoActions() ||
                 skillIndex < 0 ||
                 skillIndex >= Skills.Count ||
                 !Skills[skillIndex].CanUse(this))
@@ -48,15 +47,14 @@ namespace MultiplayerARPG
 
         public virtual void RequestPickupItem(uint objectId)
         {
-            if (IsDead() || IsPlayingActionAnimation())
+            if (!CanMoveOrDoActions())
                 return;
             CallNetFunction("PickupItem", FunctionReceivers.Server, objectId);
         }
 
         public virtual void RequestDropItem(int nonEquipIndex, short amount)
         {
-            if (IsDead() ||
-                IsPlayingActionAnimation() ||
+            if (!CanMoveOrDoActions() ||
                 nonEquipIndex < 0 ||
                 nonEquipIndex >= NonEquipItems.Count)
                 return;
@@ -65,8 +63,7 @@ namespace MultiplayerARPG
 
         public virtual void RequestEquipItem(int nonEquipIndex)
         {
-            if (IsDead() ||
-                IsPlayingActionAnimation() ||
+            if (!CanMoveOrDoActions() ||
                 nonEquipIndex < 0 ||
                 nonEquipIndex >= NonEquipItems.Count)
                 return;
@@ -95,8 +92,7 @@ namespace MultiplayerARPG
 
         public virtual void RequestEquipItem(int nonEquipIndex, string equipPosition)
         {
-            if (IsDead() ||
-                IsPlayingActionAnimation() ||
+            if (!CanMoveOrDoActions() ||
                 nonEquipIndex < 0 ||
                 nonEquipIndex >= NonEquipItems.Count)
                 return;
@@ -105,7 +101,7 @@ namespace MultiplayerARPG
 
         public virtual void RequestUnEquipItem(string equipPosition)
         {
-            if (IsDead() || IsPlayingActionAnimation())
+            if (!CanMoveOrDoActions())
                 return;
             CallNetFunction("UnEquipItem", FunctionReceivers.Server, equipPosition);
         }

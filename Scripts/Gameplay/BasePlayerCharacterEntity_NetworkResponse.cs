@@ -8,11 +8,18 @@ namespace MultiplayerARPG
     public partial class BasePlayerCharacterEntity
     {
         public System.Action<int> onShowNpcDialog;
+        public System.Action<BasePlayerCharacterEntity> onShowDealingRequestDialog;
+        public System.Action<BasePlayerCharacterEntity> onShowDealingDialog;
+        public System.Action<DealingState> onUpdateDealingState;
+        public System.Action<DealingState> onUpdateAnotherDealingState;
+        public System.Action<int> onUpdateDealingGold;
+        public System.Action<int> onUpdateAnotherDealingGold;
+        public System.Action<DealingCharacterItems> onUpdateDealingItems;
+        public System.Action<DealingCharacterItems> onUpdateAnotherDealingItems;
 
         protected virtual void NetFuncSwapOrMergeItem(int fromIndex, int toIndex)
         {
-            if (IsDead() ||
-                IsPlayingActionAnimation() ||
+            if (!CanMoveOrDoActions() ||
                 fromIndex < 0 ||
                 fromIndex >= NonEquipItems.Count ||
                 toIndex < 0 ||
@@ -109,15 +116,11 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncNpcActivate(uint objectId)
         {
-            if (IsDead() || IsPlayingActionAnimation())
+            if (!CanMoveOrDoActions())
                 return;
 
-            LiteNetLibIdentity identity;
-            if (!Manager.Assets.TryGetSpawnedObject(objectId, out identity))
-                return;
-
-            var npcEntity = identity.GetComponent<NpcEntity>();
-            if (npcEntity == null)
+            NpcEntity npcEntity = null;
+            if (!TryGetEntityByObjectId(objectId, out npcEntity))
                 return;
 
             if (Vector3.Distance(CacheTransform.position, npcEntity.CacheTransform.position) > gameInstance.conversationDistance + 5f)
@@ -279,16 +282,14 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncEnterWarp()
         {
-            if (IsDead() || IsPlayingActionAnimation() || warpingPortal == null)
+            if (!CanMoveOrDoActions() || warpingPortal == null)
                 return;
-
             warpingPortal.EnterWarp(this);
         }
 
         protected virtual void NetFuncBuild(int index, Vector3 position, Quaternion rotation, uint parentObjectId)
         {
-            if (IsDead() ||
-                IsPlayingActionAnimation() ||
+            if (!CanMoveOrDoActions() ||
                 index < 0 ||
                 index >= NonEquipItems.Count)
                 return;
@@ -327,18 +328,16 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncDestroyBuild(uint objectId)
         {
-            if (IsDead() ||
-                IsPlayingActionAnimation())
+            if (!CanMoveOrDoActions())
                 return;
 
-            LiteNetLibIdentity identity;
-            if (Manager.Assets.TryGetSpawnedObject(objectId, out identity))
-            {
-                var manager = Manager as BaseGameNetworkManager;
-                var buildingEntity = identity.GetComponent<BuildingEntity>();
-                if (buildingEntity != null && buildingEntity.CreatorId.Equals(Id) && manager != null)
-                    manager.DestroyBuildingEntity(buildingEntity.Id);
-            }
+            BuildingEntity buildingEntity = null;
+            if (!TryGetEntityByObjectId(objectId, out buildingEntity))
+                return;
+
+            var manager = Manager as BaseGameNetworkManager;
+            if (buildingEntity != null && buildingEntity.CreatorId.Equals(Id) && manager != null)
+                manager.DestroyBuildingEntity(buildingEntity.Id);
         }
 
         protected virtual void NetFuncSellItem(int index, short amount)
@@ -357,41 +356,71 @@ namespace MultiplayerARPG
 
             var item = nonEquipItem.GetItem();
             if (this.DecreaseItemsByIndex(index, amount))
-                Gold += item.sellPrice * amount;
+                IncreaseGold(item.sellPrice * amount);
         }
 
-        protected virtual void NetFuncSendDealingOffer(uint objectId)
+        protected virtual void NetFuncSendDealingRequest(uint objectId)
         {
-            LiteNetLibIdentity identity;
-            if (!Manager.Assets.TryGetSpawnedObject(objectId, out identity))
+            BasePlayerCharacterEntity playerCharacterEntity = null;
+            if (!TryGetEntityByObjectId(objectId, out playerCharacterEntity) || playerCharacterEntity.coPlayerCharacterEntity != null)
                 return;
-
-            var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
-            if (playerCharacterEntity == null || playerCharacterEntity.coPlayerCharacterEntity != null)
-                return;
-
             if (Vector3.Distance(CacheTransform.position, playerCharacterEntity.CacheTransform.position) > gameInstance.conversationDistance)
+            {
+                // TODO: May send warn message that character is far from other character
                 return;
-
+            }
             coPlayerCharacterEntity = playerCharacterEntity;
-            playerCharacterEntity.coPlayerCharacterEntity = this;
-            playerCharacterEntity.DealingState = DealingState.ReceiveOffer;
+            coPlayerCharacterEntity.coPlayerCharacterEntity = this;
+            // Send receive dealing request to player
+            coPlayerCharacterEntity.RequestReceiveDealingRequest(ObjectId);
         }
 
-        protected virtual void NetFuncAcceptDealingOffer()
+        protected virtual void NetFuncReceiveDealingRequest(uint objectId)
         {
+            BasePlayerCharacterEntity playerCharacterEntity = null;
+            if (!TryGetEntityByObjectId(objectId, out playerCharacterEntity))
+                return;
+            if (onShowDealingRequestDialog != null)
+                onShowDealingRequestDialog(playerCharacterEntity);
+        }
+
+        protected virtual void NetFuncAcceptDealingRequest()
+        {
+            if (coPlayerCharacterEntity == null)
+            {
+                // TODO: May send warn message that can not accept dealing request
+                StopDealing();
+                return;
+            }
+            if (Vector3.Distance(CacheTransform.position, coPlayerCharacterEntity.CacheTransform.position) > gameInstance.conversationDistance)
+            {
+                // TODO: May send warn message that character is far from other character
+                StopDealing();
+                return;
+            }
+            // Set dealing state/data for co player character entity
             coPlayerCharacterEntity.ClearDealingData();
             coPlayerCharacterEntity.DealingState = DealingState.Dealing;
+            coPlayerCharacterEntity.RequestAcceptedDealingRequest(ObjectId);
+            // Set dealing state/data for player character entity
             ClearDealingData();
             DealingState = DealingState.Dealing;
+            RequestAcceptedDealingRequest(coPlayerCharacterEntity.ObjectId);
         }
 
-        protected virtual void NetFuncDeclineDealingOffer()
+        protected virtual void NetFuncDeclineDealingRequest()
         {
-            coPlayerCharacterEntity.ClearDealingData();
-            coPlayerCharacterEntity.coPlayerCharacterEntity = null;
-            ClearDealingData();
-            coPlayerCharacterEntity = null;
+            // TODO: May send decline message
+            StopDealing();
+        }
+
+        protected virtual void NetFuncAcceptedDealingRequest(uint objectId)
+        {
+            BasePlayerCharacterEntity playerCharacterEntity = null;
+            if (!TryGetEntityByObjectId(objectId, out playerCharacterEntity))
+                return;
+            if (onShowDealingDialog != null)
+                onShowDealingDialog(playerCharacterEntity);
         }
 
         protected virtual void NetFuncSetDealingItem(int itemIndex, short amount)
@@ -401,30 +430,50 @@ namespace MultiplayerARPG
                 // TODO: May send warn message to start dealing before confirm
                 return;
             }
+
+            if (itemIndex < 0 || itemIndex >= nonEquipItems.Count)
+                return;
+
+            var dealingItems = DealingItems;
+            for (var i = dealingItems.Count - 1; i >= 0; --i)
+            {
+                if (itemIndex == dealingItems[i].nonEquipIndex)
+                {
+                    dealingItems.RemoveAt(i);
+                    break;
+                }
+            }
+            var characterItem = nonEquipItems[itemIndex];
+            var dealingItem = new DealingCharacterItem();
+            dealingItem.nonEquipIndex = itemIndex;
+            dealingItem.dataId = characterItem.dataId;
+            dealingItem.level = characterItem.level;
+            dealingItem.amount = amount;
+            dealingItem.durability = characterItem.durability;
+            dealingItems.Add(dealingItem);
+            // Update to clients
+            DealingItems = dealingItems;
         }
 
-        protected virtual void NetFuncSetDealingGold(int dealingGold)
+        protected virtual void NetFuncSetDealingGold(int gold)
         {
             if (DealingState != DealingState.Dealing)
             {
-                // TODO: May send warn message to start dealing before confirm
+                // TODO: May send warn message to start dealing before doing this
                 return;
             }
-
-            if (dealingGold > Gold || dealingGold < 0)
-            {
-                // TODO: May add not enough gold messages
-                return;
-            }
-
-            DealingGold = Gold;
+            if (gold > Gold)
+                gold = Gold;
+            if (gold < 0)
+                gold = 0;
+            DealingGold = gold;
         }
 
         protected virtual void NetFuncLockDealing()
         {
             if (DealingState != DealingState.Dealing)
             {
-                // TODO: May send warn message to start dealing before confirm
+                // TODO: May send warn message to start dealing before doing this
                 return;
             }
             DealingState = DealingState.Lock;
@@ -432,7 +481,7 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncConfirmDealing()
         {
-            if (DealingState != DealingState.Lock)
+            if (DealingState != DealingState.Lock || !(coPlayerCharacterEntity.DealingState == DealingState.Lock || coPlayerCharacterEntity.DealingState == DealingState.Confirm))
             {
                 // TODO: May send warn message to lock before confirm
                 return;
@@ -440,12 +489,67 @@ namespace MultiplayerARPG
             DealingState = DealingState.Confirm;
             if (DealingState == DealingState.Confirm && coPlayerCharacterEntity.DealingState == DealingState.Confirm)
             {
-                // TODO: Exchange items
-                coPlayerCharacterEntity.ClearDealingData();
-                coPlayerCharacterEntity.coPlayerCharacterEntity = null;
-                ClearDealingData();
-                coPlayerCharacterEntity = null;
+                ExchangeDealingItemsAndGold();
+                coPlayerCharacterEntity.ExchangeDealingItemsAndGold();
+                StopDealing();
             }
+        }
+
+        protected virtual void NetFuncCancelDealing()
+        {
+            // TODO: May send cancel message
+            StopDealing();
+        }
+
+        protected virtual void NetFuncUpdateDealingState(DealingState state)
+        {
+            if (onUpdateDealingState != null)
+                onUpdateDealingState(state);
+        }
+
+        protected virtual void NetFuncUpdateAnotherDealingState(DealingState state)
+        {
+            if (onUpdateAnotherDealingState != null)
+                onUpdateAnotherDealingState(state);
+        }
+
+        protected virtual void NetFuncUpdateDealingGold(int gold)
+        {
+            if (onUpdateDealingGold != null)
+                onUpdateDealingGold(gold);
+        }
+
+        protected virtual void NetFuncUpdateAnotherDealingGold(int gold)
+        {
+            if (onUpdateAnotherDealingGold != null)
+                onUpdateAnotherDealingGold(gold);
+        }
+
+        protected virtual void NetFuncUpdateDealingItems(DealingCharacterItems items)
+        {
+            if (onUpdateDealingItems != null)
+                onUpdateDealingItems(items);
+        }
+
+        protected virtual void NetFuncUpdateAnotherDealingItems(DealingCharacterItems items)
+        {
+            if (onUpdateAnotherDealingItems != null)
+                onUpdateAnotherDealingItems(items);
+        }
+
+        protected virtual void StopDealing()
+        {
+            if (coPlayerCharacterEntity == null)
+            {
+                ClearDealingData();
+                return;
+            }
+            // Set dealing state/data for co player character entity
+            coPlayerCharacterEntity.ClearDealingData();
+            coPlayerCharacterEntity.coPlayerCharacterEntity = null;
+            // Set dealing state/data for player character entity
+            ClearDealingData();
+            coPlayerCharacterEntity = null;
         }
     }
 }

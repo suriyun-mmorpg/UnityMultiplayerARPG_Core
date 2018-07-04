@@ -43,5 +43,19 @@ namespace MultiplayerARPG
         }
 
         protected virtual void FixedUpdate() { }
+
+        public bool TryGetEntityByObjectId<T>(uint objectId, out T result) where T : LiteNetLibBehaviour
+        {
+            result = null;
+            LiteNetLibIdentity identity;
+            if (!Manager.Assets.TryGetSpawnedObject(objectId, out identity))
+                return false;
+
+            result = identity.GetComponent<T>();
+            if (result == null)
+                return false;
+
+            return true;
+        }
     }
 }
