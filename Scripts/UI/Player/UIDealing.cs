@@ -21,6 +21,7 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public UICharacterItem uiDealingItemPrefab;
+        public UICharacterItem uiItemDialog;
         [Header("Owning Character Elements")]
         public Text textDealingGold;
         public Transform uiDealingItemsContainer;
@@ -85,6 +86,41 @@ namespace MultiplayerARPG
                 itemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return itemSelectionManager;
             }
+        }
+
+        public override void Show()
+        {
+            ItemSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterItem);
+            ItemSelectionManager.eventOnSelect.AddListener(OnSelectCharacterItem);
+            ItemSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterItem);
+            ItemSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterItem);
+            base.Show();
+        }
+
+        public override void Hide()
+        {
+            ItemSelectionManager.DeselectSelectedUI();
+            base.Hide();
+        }
+
+        protected void OnSelectCharacterItem(UICharacterItem ui)
+        {
+            var uiGameplay = UISceneGameplay.Singleton;
+
+            if (uiItemDialog != null && ui.Data.characterItem.IsValid())
+            {
+                uiItemDialog.selectionManager = ItemSelectionManager;
+                uiItemDialog.Setup(ui.Data, null, -1, string.Empty);
+                uiItemDialog.Show();
+            }
+            else
+                ItemSelectionManager.Deselect(ui);
+        }
+
+        protected void OnDeselectCharacterItem(UICharacterItem ui)
+        {
+            if (uiItemDialog != null)
+                uiItemDialog.Hide();
         }
 
         private void Update()
@@ -221,7 +257,7 @@ namespace MultiplayerARPG
             list.Generate(filterItems, (index, characterItem, ui) =>
             {
                 var uiCharacterItem = ui.GetComponent<UICharacterItem>();
-                uiCharacterItem.Setup(new CharacterItemLevelTuple(characterItem, characterItem.level), null, index, string.Empty);
+                uiCharacterItem.Setup(new CharacterItemLevelTuple(characterItem, characterItem.level), null, -1, string.Empty);
                 uiCharacterItem.Show();
                 uiList.Add(uiCharacterItem);
             });
