@@ -70,7 +70,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void Update()
+        protected override void UpdateUI()
         {
             var characterQuest = Data;
             var quest = !characterQuest.IsEmpty() ? characterQuest.GetQuest() : null;

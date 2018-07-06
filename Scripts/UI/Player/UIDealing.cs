@@ -123,7 +123,7 @@ namespace MultiplayerARPG
                 uiItemDialog.Hide();
         }
 
-        private void Update()
+        protected override void UpdateUI()
         {
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             var anotherCharacter = Data;

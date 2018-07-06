@@ -17,6 +17,7 @@ public abstract class UISelectionEntry<T> : UIBase
         }
     }
     public UISelectionManager selectionManager;
+    public float updateUIRepeatRate = 0.5f;
 
     private bool isSelected;
     public bool IsSelected
@@ -34,7 +35,10 @@ public abstract class UISelectionEntry<T> : UIBase
     {
         base.Awake();
         IsSelected = false;
+        InvokeRepeating("UpdateUI", 0.1f, updateUIRepeatRate);
     }
+
+    protected virtual void UpdateUI() { }
 
     public void ForceUpdate()
     {

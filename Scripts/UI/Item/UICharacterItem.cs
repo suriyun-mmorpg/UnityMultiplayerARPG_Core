@@ -89,7 +89,7 @@ namespace MultiplayerARPG
             Setup(data, character, indexOfData);
         }
 
-        private void Update()
+        protected override void UpdateUI()
         {
             if (!IsOwningCharacter() || !IsVisible())
                 return;

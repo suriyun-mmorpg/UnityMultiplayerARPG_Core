@@ -105,7 +105,7 @@ namespace MultiplayerARPG
             Data = data;
         }
 
-        protected void Update()
+        protected override void UpdateUI()
         {
             if (textName != null)
                 textName.text = string.Format(nameFormat, Data == null ? "Unknow" : Data.CharacterName);

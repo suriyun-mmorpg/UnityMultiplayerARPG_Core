@@ -24,7 +24,7 @@ namespace MultiplayerARPG
         public UnityEvent onAbleToIncrease;
         public UnityEvent onUnableToIncrease;
 
-        protected void Update()
+        protected override void UpdateUI()
         {
             var characterAttribute = Data.characterAttribute;
 
