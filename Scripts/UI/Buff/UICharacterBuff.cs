@@ -28,7 +28,7 @@ namespace MultiplayerARPG
 
         protected float collectedDeltaTime;
 
-        protected override void UpdateUI()
+        private void Update()
         {
             var characterBuff = Data;
 

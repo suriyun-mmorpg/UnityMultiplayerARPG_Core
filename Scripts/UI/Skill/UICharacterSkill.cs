@@ -64,7 +64,7 @@ namespace MultiplayerARPG
 
         protected float collectedDeltaTime;
 
-        protected override void UpdateUI()
+        private void Update()
         {
             var characterSkill = Data.characterSkill;
             var skill = characterSkill.GetSkill();

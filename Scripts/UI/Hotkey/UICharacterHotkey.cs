@@ -18,7 +18,7 @@ namespace MultiplayerARPG
             Data = data;
         }
 
-        protected override void UpdateUI()
+        private void Update()
         {
             if (Input.GetKeyDown(key))
             {
