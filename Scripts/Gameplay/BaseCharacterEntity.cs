@@ -658,7 +658,7 @@ namespace MultiplayerARPG
             if (skill == null || !skill.IsAttack())
                 return 0f;
             if (skill.skillAttackType == SkillAttackType.Normal)
-                return skill.damageInfo.hitDistance;
+                return skill.damageInfo.GetDistance();
             else
                 return GetAttackDistance();
         }
@@ -668,7 +668,7 @@ namespace MultiplayerARPG
             if (skill == null || !skill.IsAttack())
                 return 0f;
             if (skill.skillAttackType == SkillAttackType.Normal)
-                return skill.damageInfo.hitFov;
+                return skill.damageInfo.GetFov();
             else
                 return GetAttackFov();
         }

@@ -18,7 +18,9 @@ namespace MultiplayerARPG
         public const float DETECT_MOUSE_DRAG_DISTANCE = 10f;
         public const float DETECT_MOUSE_HOLD_DURATION = 1f;
         public PlayerCharacterControllerMode controllerMode;
+        [Header("Set this to TRUE to find nearby enemy and look to it while attacking when `Controller Mode` is `WASD`")]
         public bool wasdLockAttackTarget;
+        [Header("This will be used to find nearby enemy when `Controller Mode` is `Point Click` or when `Wasd Lock Attack Target` is `TRUE`")]
         public float lockAttackTargetDistance = 10f;
         public FollowCameraControls gameplayCameraPrefab;
         public GameObject targetObjectPrefab;
@@ -28,9 +30,9 @@ namespace MultiplayerARPG
         public bool buildRotationSnap;
         public struct UsingSkillData
         {
-            public Vector3 position;
+            public Vector3? position;
             public int skillIndex;
-            public UsingSkillData(Vector3 position, int skillIndex)
+            public UsingSkillData(Vector3? position, int skillIndex)
             {
                 this.position = position;
                 this.skillIndex = skillIndex;
@@ -629,7 +631,8 @@ namespace MultiplayerARPG
             if (queueUsingSkill.HasValue)
             {
                 var queueUsingSkillValue = queueUsingSkill.Value;
-                RequestUseSkill(queueUsingSkillValue.position, queueUsingSkillValue.skillIndex);
+                var position = queueUsingSkillValue.position.HasValue ? queueUsingSkillValue.position.Value : CharacterTransform.position;
+                RequestUseSkill(position, queueUsingSkillValue.skillIndex);
                 queueUsingSkill = null;
             }
         }
@@ -662,12 +665,27 @@ namespace MultiplayerARPG
                 {
                     BaseCharacterEntity attackingCharacter;
                     if (TryGetAttackingCharacter(out attackingCharacter))
-                        queueUsingSkill = new UsingSkillData(CharacterTransform.position, skillIndex);
+                    {
+                        // If attacking any character, will use skill later
+                        queueUsingSkill = new UsingSkillData(null, skillIndex);
+                    }
                     else if (PlayerCharacterEntity.Skills[skillIndex].CanUse(PlayerCharacterEntity))
                     {
-                        destination = null;
-                        PlayerCharacterEntity.StopMove();
-                        RequestUseSkill(CharacterTransform.position, skillIndex);
+                        // If not attacking any character, use skill immediately
+                        if (skill.IsAttack() && IsLockTarget())
+                        {
+                            // If attacking any character, will use skill later
+                            queueUsingSkill = new UsingSkillData(null, skillIndex);
+                            var nearestTarget = FindNearestAliveCharacter<BaseMonsterCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance);
+                            if (nearestTarget != null)
+                                PlayerCharacterEntity.SetTargetEntity(nearestTarget);
+                        }
+                        else
+                        {
+                            destination = null;
+                            PlayerCharacterEntity.StopMove();
+                            RequestUseSkill(CharacterTransform.position, skillIndex);
+                        }
                     }
                 }
             }
@@ -699,8 +717,8 @@ namespace MultiplayerARPG
         {
             if (currentBuildingObject != null)
             {
-                var placePosition = PlayerCharacterEntity.CacheTransform.position + (PlayerCharacterEntity.CacheTransform.forward * currentBuildingObject.characterForwardDistance);
-                currentBuildingObject.CacheTransform.eulerAngles = GetBuildingPlaceEulerAngles(PlayerCharacterEntity.CacheTransform.eulerAngles);
+                var placePosition = CharacterTransform.position + (CharacterTransform.forward * currentBuildingObject.characterForwardDistance);
+                currentBuildingObject.CacheTransform.eulerAngles = GetBuildingPlaceEulerAngles(CharacterTransform.eulerAngles);
                 currentBuildingObject.buildingArea = null;
                 if (!RaycastToSetBuildingArea(new Ray(placePosition + (Vector3.up * 2.5f), Vector3.down), 5f))
                     currentBuildingObject.CacheTransform.position = GetBuildingPlacePosition(placePosition);
@@ -799,12 +817,19 @@ namespace MultiplayerARPG
         public bool RaycastToTarget(Transform target, float actDistance, int layerMask)
         {
             var targetPosition = target.position;
-            var characterPosition = PlayerCharacterEntity.CacheTransform.position;
+            var characterPosition = CharacterTransform.position;
             var heading = targetPosition - characterPosition;
             var distance = heading.magnitude;
             var direction = heading / distance;
             RaycastHit hitInfo;
             return Physics.Raycast(characterPosition, direction, out hitInfo, actDistance, layerMask) && hitInfo.transform == target;
+        }
+
+        public bool IsLockTarget()
+        {
+            return controllerMode == PlayerCharacterControllerMode.Both ||
+                controllerMode == PlayerCharacterControllerMode.PointClick ||
+                (controllerMode == PlayerCharacterControllerMode.WASD && wasdLockAttackTarget);
         }
     }
 }

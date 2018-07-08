@@ -430,6 +430,7 @@ namespace MultiplayerARPG
         public static void AddCharacters(IEnumerable<BaseCharacter> characters)
         {
             var characterModels = new List<CharacterModel>();
+            var damageEntities = new List<BaseDamageEntity>();
             foreach (var character in characters)
             {
                 if (character == null || AllCharacters.ContainsKey(character.DataId))
@@ -445,10 +446,14 @@ namespace MultiplayerARPG
                     var monsterCharacter = character as MonsterCharacter;
                     MonsterCharacters[character.DataId] = monsterCharacter;
                     AddActionAnimations(ActionAnimationType.MonsterAttack, monsterCharacter.attackAnimations);
+                    var missileDamageEntity = monsterCharacter.damageInfo.missileDamageEntity;
+                    if (missileDamageEntity != null)
+                        damageEntities.Add(missileDamageEntity);
                 }
                 characterModels.Add(character.model);
             }
             AddCharacterModels(characterModels);
+            AddDamageEntities(damageEntities);
         }
 
         public static void AddSkills(IEnumerable<Skill> skills)
