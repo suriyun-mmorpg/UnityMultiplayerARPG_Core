@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = "MapInfo", menuName = "Create GameData/MapInfo")]
-    public class MapInfo : ScriptableObject
+    public class MapInfo : BaseGameData
     {
         public UnityScene scene;
         [Tooltip("This will be used when new character have been created, and this map data is start map")]

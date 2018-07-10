@@ -197,14 +197,14 @@ namespace MultiplayerARPG
                 monsterSpawnArea.SpawnAll();
             }
             // Spawn Warp Portals
-            if (GameInstance.WarpPortals.Count > 0)
+            if (GameInstance.MapWarpPortals.Count > 0)
             {
                 if (gameInstance.warpPortalEntityPrefab == null)
                     Debug.LogWarning("Cannot spawn Warp portals because GameInstance's Warp Portal Entity Prefab is empty");
                 else
                 {
                     WarpPortals mapWarpPortals;
-                    if (GameInstance.WarpPortals.TryGetValue(Assets.onlineScene.SceneName, out mapWarpPortals))
+                    if (GameInstance.MapWarpPortals.TryGetValue(Assets.onlineScene.SceneName, out mapWarpPortals))
                     {
                         foreach (var warpPortal in mapWarpPortals.warpPortals)
                         {

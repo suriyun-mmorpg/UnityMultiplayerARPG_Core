@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -44,7 +45,7 @@ namespace MultiplayerARPG
             get
             {
                 if (startMap == null)
-                    return GameInstance.Singleton.mapInfos[0];
+                    return GameInstance.MapInfos.FirstOrDefault().Value;
                 return startMap;
             }
         }

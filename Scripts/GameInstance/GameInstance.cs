@@ -1,9 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace MultiplayerARPG
 {
@@ -61,7 +58,6 @@ namespace MultiplayerARPG
         public Vector3 startPosition;
         [System.Obsolete("`Other Scenes` is deprecated and will be removed next version, use `Map Infos` instead.")]
         public UnityScene[] otherScenes;
-        public MapInfo[] mapInfos;
         [Header("Player Configs")]
         public int minCharacterNameLength = 2;
         public int maxCharacterNameLength = 16;
@@ -82,7 +78,8 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, ActionAnimation> ActionAnimations = new Dictionary<int, ActionAnimation>();
         public static readonly Dictionary<int, GameEffectCollection> GameEffectCollections = new Dictionary<int, GameEffectCollection>();
         public static readonly Dictionary<int, CharacterModel> CharacterModels = new Dictionary<int, CharacterModel>();
-        public static readonly Dictionary<string, WarpPortals> WarpPortals = new Dictionary<string, WarpPortals>();
+        public static readonly Dictionary<string, WarpPortals> MapWarpPortals = new Dictionary<string, WarpPortals>();
+        public static readonly Dictionary<string, MapInfo> MapInfos = new Dictionary<string, MapInfo>();
 
         #region Cache Data
         public BaseGameplayRule GameplayRule
@@ -245,7 +242,8 @@ namespace MultiplayerARPG
             ActionAnimations.Clear();
             GameEffectCollections.Clear();
             CharacterModels.Clear();
-            WarpPortals.Clear();
+            MapWarpPortals.Clear();
+            MapInfos.Clear();
 
             // Use Resources Load Async ?
             var gameDataList = Resources.LoadAll<BaseGameData>("");
@@ -258,6 +256,28 @@ namespace MultiplayerARPG
             var quests = new List<Quest>();
             var playerCharacters = new List<BaseCharacter>();
             var monsterCharacters = new List<BaseCharacter>();
+            var mapInfos = new List<MapInfo>();
+            // Backward compatibility
+            if (startScene.IsSet())
+            {
+                Debug.LogWarning("[GameInstance] `Start Scene`/`Start Position` is deprecated and will be removed next version, use `Map Infos` instead.");
+                var newMapInfo = ScriptableObject.CreateInstance<MapInfo>();
+                newMapInfo.scene.SceneName = startScene.SceneName;
+                newMapInfo.startPosition = startPosition;
+                mapInfos.Add(newMapInfo);
+            }
+            if (otherScenes.Length > 0)
+            {
+                Debug.LogWarning("[GameInstance] `Other Scenes` is deprecated and will be removed next version, use `Map Infos` instead.");
+                foreach (var otherScene in otherScenes)
+                {
+                    if (!otherScene.IsSet())
+                        continue;
+                    var newMapInfo = ScriptableObject.CreateInstance<MapInfo>();
+                    newMapInfo.scene.SceneName = otherScene.SceneName;
+                    mapInfos.Add(newMapInfo);
+                }
+            }
             // Filtering game data
             foreach (var gameData in gameDataList)
             {
@@ -277,6 +297,8 @@ namespace MultiplayerARPG
                     playerCharacters.Add(gameData as PlayerCharacter);
                 if (gameData is MonsterCharacter)
                     monsterCharacters.Add(gameData as MonsterCharacter);
+                if (gameData is MapInfo)
+                    mapInfos.Add(gameData as MapInfo);
             }
             items.Add(DefaultWeaponItem);
             damageElements.Add(DefaultDamageElement);
@@ -288,6 +310,7 @@ namespace MultiplayerARPG
             AddQuests(quests);
             AddCharacters(playerCharacters);
             AddCharacters(monsterCharacters);
+            AddMapInfos(mapInfos);
 
             var weaponHitEffects = new List<GameEffectCollection>();
             foreach (var damageElement in damageElements)
@@ -298,14 +321,7 @@ namespace MultiplayerARPG
             AddGameEffectCollections(GameEffectCollectionType.WeaponHit, weaponHitEffects);
 
             if (warpPortalDatabase != null)
-            {
-                foreach (var map in warpPortalDatabase.maps)
-                {
-                    if (map.map == null || string.IsNullOrEmpty(map.map.SceneName))
-                        continue;
-                    WarpPortals[map.map.SceneName] = map;
-                }
-            }
+                AddMapWarpPortals(warpPortalDatabase.maps);
         }
 
         private void Start()
@@ -314,23 +330,15 @@ namespace MultiplayerARPG
                 UISceneLoading.Singleton.LoadScene(homeScene);
         }
 
-        private void OnValidate()
-        {
-            if (startScene.IsSet() || otherScenes.Length > 0)
-            {
-                Debug.LogWarning("[GameInstance] `Start Scene`, `Start Position` and `Other Scenes` is deprecated and will be removed next version, use `Map Infos` instead.");
-            }
-        }
-
         public List<string> GetGameScenes()
         {
             var scenes = new List<string>();
-            foreach (var mapInfo in mapInfos)
+            foreach (var sceneName in MapInfos.Keys)
             {
-                if (mapInfo != null &&
-                    !string.IsNullOrEmpty(mapInfo.scene.SceneName) &&
-                    !scenes.Contains(mapInfo.scene.SceneName))
-                    scenes.Add(mapInfo.scene.SceneName);
+                if (sceneName != null &&
+                    !string.IsNullOrEmpty(sceneName) &&
+                    !scenes.Contains(sceneName))
+                    scenes.Add(sceneName);
             }
 
             return scenes;
@@ -564,6 +572,30 @@ namespace MultiplayerARPG
                 if (characterModel == null || CharacterModels.ContainsKey(characterModel.DataId))
                     continue;
                 CharacterModels[characterModel.DataId] = characterModel;
+            }
+        }
+
+        public static void AddMapWarpPortals(IEnumerable<WarpPortals> mapWarpPortals)
+        {
+            if (mapWarpPortals == null)
+                return;
+            foreach (var mapWarpPortal in mapWarpPortals)
+            {
+                if (mapWarpPortal.map == null || string.IsNullOrEmpty(mapWarpPortal.map.SceneName))
+                    continue;
+                MapWarpPortals[mapWarpPortal.map.SceneName] = mapWarpPortal;
+            }
+        }
+
+        public static void AddMapInfos(IEnumerable<MapInfo> mapInfos)
+        {
+            if (mapInfos == null)
+                return;
+            foreach (var mapInfo in mapInfos)
+            {
+                if (mapInfo.scene == null || string.IsNullOrEmpty(mapInfo.scene.SceneName))
+                    continue;
+                MapInfos[mapInfo.scene.SceneName] = mapInfo;
             }
         }
     }
