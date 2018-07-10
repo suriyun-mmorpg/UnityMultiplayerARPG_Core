@@ -104,6 +104,8 @@ namespace MultiplayerARPG
             spawnablePrefabs.Add(gameInstance.buildingEntityPrefab.Identity);
             if (gameInstance.warpPortalEntityPrefab != null)
                 spawnablePrefabs.Add(gameInstance.warpPortalEntityPrefab.Identity);
+            if (gameInstance.npcEntityPrefab != null)
+                spawnablePrefabs.Add(gameInstance.npcEntityPrefab.Identity);
             var damageEntities = GameInstance.DamageEntities.Values;
             foreach (var damageEntity in damageEntities)
             {
@@ -226,6 +228,27 @@ namespace MultiplayerARPG
                             var warpPortalEntity = warpPortalIdentity.GetComponent<WarpPortalEntity>();
                             warpPortalEntity.mapScene.SceneName = warpPortal.warpToMap.SceneName;
                             warpPortalEntity.position = warpPortal.warpToPosition;
+                        }
+                    }
+                }
+            }
+            // Spawn Npcs
+            if (GameInstance.MapNpcs.Count > 0)
+            {
+                if (gameInstance.npcEntityPrefab == null)
+                    Debug.LogWarning("Cannot spawn Npcs because GameInstance's Npc Entity Prefab is empty");
+                else
+                {
+                    Npcs mapNpcs;
+                    if (GameInstance.MapNpcs.TryGetValue(Assets.onlineScene.SceneName, out mapNpcs))
+                    {
+                        foreach (var npc in mapNpcs.npcs)
+                        {
+                            var npcIdentity = Assets.NetworkSpawn(gameInstance.npcEntityPrefab.Identity, npc.position, Quaternion.Euler(npc.rotation));
+                            var npcEntity = npcIdentity.GetComponent<NpcEntity>();
+                            npcEntity.startDialog = npc.startDialog;
+                            npcEntity.Title = npc.title;
+                            npcEntity.ModelId = npc.model.DataId;
                         }
                     }
                 }

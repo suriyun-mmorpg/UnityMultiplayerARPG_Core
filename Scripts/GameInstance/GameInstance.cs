@@ -17,6 +17,7 @@ namespace MultiplayerARPG
         public ItemDropEntity itemDropEntityPrefab;
         public BuildingEntity buildingEntityPrefab;
         public WarpPortalEntity warpPortalEntityPrefab;
+        public NpcEntity npcEntityPrefab;
         public UISceneGameplay uiSceneGameplayPrefab;
         public UISceneGameplay uiSceneGameplayMobilePrefab;
         public ServerCharacter serverCharacterPrefab;
@@ -28,6 +29,7 @@ namespace MultiplayerARPG
         public int[] expTree;
         [Tooltip("You can add warp portals here or may add warp portals in the scene directly, So you can leave this empty")]
         public WarpPortalDatabase warpPortalDatabase;
+        public NpcDatabase npcDatabase;
         [Header("Gameplay Configs")]
         public UnityTag playerTag;
         public UnityTag monsterTag;
@@ -79,6 +81,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, GameEffectCollection> GameEffectCollections = new Dictionary<int, GameEffectCollection>();
         public static readonly Dictionary<int, CharacterModel> CharacterModels = new Dictionary<int, CharacterModel>();
         public static readonly Dictionary<string, WarpPortals> MapWarpPortals = new Dictionary<string, WarpPortals>();
+        public static readonly Dictionary<string, Npcs> MapNpcs = new Dictionary<string, Npcs>();
         public static readonly Dictionary<string, MapInfo> MapInfos = new Dictionary<string, MapInfo>();
 
         #region Cache Data
@@ -322,6 +325,9 @@ namespace MultiplayerARPG
 
             if (warpPortalDatabase != null)
                 AddMapWarpPortals(warpPortalDatabase.maps);
+
+            if (npcDatabase != null)
+                AddMapNpcs(npcDatabase.maps);
         }
 
         private void Start()
@@ -585,6 +591,29 @@ namespace MultiplayerARPG
                     continue;
                 MapWarpPortals[mapWarpPortal.map.SceneName] = mapWarpPortal;
             }
+        }
+
+        public static void AddMapNpcs(IEnumerable<Npcs> mapNpcs)
+        {
+            if (mapNpcs == null)
+                return;
+            var npcDialogs = new List<NpcDialog>();
+            var characterModels = new List<CharacterModel>();
+            foreach (var mapNpc in mapNpcs)
+            {
+                if (mapNpc.map == null || string.IsNullOrEmpty(mapNpc.map.SceneName))
+                    continue;
+                MapNpcs[mapNpc.map.SceneName] = mapNpc;
+                foreach (var npc in mapNpc.npcs)
+                {
+                    if (npc.startDialog != null)
+                        npcDialogs.Add(npc.startDialog);
+                    if (npc.model != null)
+                        characterModels.Add(npc.model);
+                }
+            }
+            AddNpcDialogs(npcDialogs);
+            AddCharacterModels(characterModels);
         }
 
         public static void AddMapInfos(IEnumerable<MapInfo> mapInfos)
