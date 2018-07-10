@@ -337,7 +337,7 @@ namespace MultiplayerARPG
                         BaseCharacterEntity targetEntity;
                         if (wasdLockAttackTarget && !PlayerCharacterEntity.TryGetTargetEntity(out targetEntity))
                         {
-                            var nearestTarget = FindNearestAliveCharacter<BaseMonsterCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance);
+                            var nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance, false, true);
                             if (nearestTarget != null)
                                 PlayerCharacterEntity.SetTargetEntity(nearestTarget);
                             else
@@ -360,7 +360,7 @@ namespace MultiplayerARPG
                 BaseCharacterEntity targetEntity;
                 if (wasdLockAttackTarget && !PlayerCharacterEntity.TryGetTargetEntity(out targetEntity))
                 {
-                    var nearestTarget = FindNearestAliveCharacter<BaseMonsterCharacterEntity>(PlayerCharacterEntity.GetAttackDistance() + lockAttackTargetDistance);
+                    var nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetAttackDistance() + lockAttackTargetDistance, false, true);
                     if (nearestTarget != null)
                         PlayerCharacterEntity.SetTargetEntity(nearestTarget);
                     else
@@ -459,7 +459,7 @@ namespace MultiplayerARPG
                 var actDistance = attackDistance;
                 actDistance -= actDistance * 0.1f;
                 actDistance -= StoppingDistance;
-                if (RaycastToTarget(targetEnemy.CacheTransform, actDistance, gameInstance.characterLayer.Mask))
+                if (FindTarget(targetEnemy.CacheTransform, actDistance, gameInstance.characterLayer.Mask))
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
@@ -564,7 +564,7 @@ namespace MultiplayerARPG
                 var actDistance = attackDistance;
                 actDistance -= actDistance * 0.1f;
                 actDistance -= StoppingDistance;
-                if (RaycastToTarget(targetHarvestable.CacheTransform, actDistance, gameInstance.harvestableLayer.Mask))
+                if (FindTarget(targetHarvestable.CacheTransform, actDistance, gameInstance.harvestableLayer.Mask))
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
@@ -586,34 +586,6 @@ namespace MultiplayerARPG
 
             var targetPosition = entity.CacheTransform.position;
             PlayerCharacterEntity.PointClickMovement(targetPosition);
-        }
-
-        protected T FindNearestAliveCharacter<T>(float distance) where T : BaseCharacterEntity
-        {
-            T result = null;
-            var colliders = Physics.OverlapSphere(CharacterTransform.position, distance, gameInstance.characterLayer.Mask);
-            if (colliders != null && colliders.Length > 0)
-            {
-                float tempDistance;
-                T tempEntity;
-                float nearestDistance = float.MaxValue;
-                T nearestEntity = null;
-                foreach (var collider in colliders)
-                {
-                    tempEntity = collider.GetComponent<T>();
-                    if (tempEntity == null || tempEntity.IsDead())
-                        continue;
-
-                    tempDistance = Vector3.Distance(CharacterTransform.position, tempEntity.CacheTransform.position);
-                    if (tempDistance < nearestDistance)
-                    {
-                        nearestDistance = tempDistance;
-                        nearestEntity = tempEntity;
-                    }
-                }
-                result = nearestEntity;
-            }
-            return result;
         }
 
         public void RequestAttack()
@@ -676,8 +648,7 @@ namespace MultiplayerARPG
                         {
                             // If attacking any character, will use skill later
                             queueUsingSkill = new UsingSkillData(null, skillIndex);
-                            var nearestTarget = FindNearestAliveCharacter<BaseMonsterCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance);
-                            if (nearestTarget != null)
+                            var nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance, false, true);                            if (nearestTarget != null)
                                 PlayerCharacterEntity.SetTargetEntity(nearestTarget);
                         }
                         else
@@ -775,8 +746,7 @@ namespace MultiplayerARPG
             character = null;
             if (PlayerCharacterEntity.TryGetTargetEntity(out character))
             {
-                // TODO: Returning Pvp characters
-                if (character is BaseMonsterCharacterEntity)
+                if (character.CanReceiveDamageFrom(PlayerCharacterEntity))
                     return true;
                 else
                     character = null;
@@ -814,15 +784,16 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RaycastToTarget(Transform target, float actDistance, int layerMask)
+        public bool FindTarget(Transform target, float actDistance, int layerMask)
         {
-            var targetPosition = target.position;
             var characterPosition = CharacterTransform.position;
-            var heading = targetPosition - characterPosition;
-            var distance = heading.magnitude;
-            var direction = heading / distance;
-            RaycastHit hitInfo;
-            return Physics.Raycast(characterPosition, direction, out hitInfo, actDistance, layerMask) && hitInfo.transform == target;
+            var colliders = Physics.OverlapSphere(characterPosition, actDistance, layerMask);
+            foreach (var collider in colliders)
+            {
+                if (collider.transform == target)
+                    return true;
+            }
+            return false;
         }
 
         public bool IsLockTarget()

@@ -810,6 +810,38 @@ namespace MultiplayerARPG
             // Send OnLevelUp to owner player only
             RequestOnLevelUp();
         }
+
+        public T FindNearestAliveCharacter<T>(float distance, bool findForAlly, bool findForEnemy) where T : BaseCharacterEntity
+        {
+            T result = null;
+            var colliders = Physics.OverlapSphere(CacheTransform.position, distance, gameInstance.characterLayer.Mask);
+            if (colliders != null && colliders.Length > 0)
+            {
+                float tempDistance;
+                T tempEntity;
+                float nearestDistance = float.MaxValue;
+                T nearestEntity = null;
+                foreach (var collider in colliders)
+                {
+                    tempEntity = collider.GetComponent<T>();
+                    if (tempEntity == null || tempEntity.IsDead())
+                        continue;
+                    if (findForAlly && !tempEntity.IsAlly(this))
+                        continue;
+                    if (findForEnemy && !tempEntity.IsEnemy(this))
+                        continue;
+                    tempDistance = Vector3.Distance(CacheTransform.position, tempEntity.CacheTransform.position);
+                    if (tempDistance < nearestDistance)
+                    {
+                        nearestDistance = tempDistance;
+                        nearestEntity = tempEntity;
+                    }
+                }
+                result = nearestEntity;
+            }
+            return result;
+        }
+
         public abstract bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity);
         public abstract bool IsAlly(BaseCharacterEntity characterEntity);
         public abstract bool IsEnemy(BaseCharacterEntity characterEntity);

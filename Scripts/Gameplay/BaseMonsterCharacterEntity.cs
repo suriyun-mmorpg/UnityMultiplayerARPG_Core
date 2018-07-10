@@ -109,6 +109,7 @@ namespace MultiplayerARPG
 
         public override bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity)
         {
+            // For now it can receive damage from players only
             return characterEntity != null && characterEntity is BasePlayerCharacterEntity;
         }
 
@@ -126,6 +127,7 @@ namespace MultiplayerARPG
 
         public override bool IsEnemy(BaseCharacterEntity characterEntity)
         {
+            // All players are enemy
             return characterEntity != null && characterEntity is BasePlayerCharacterEntity;
         }
 

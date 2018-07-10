@@ -72,7 +72,16 @@ namespace MultiplayerARPG
         public override bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity)
         {
             // TODO: May implement this for party/guild battle purposes
-            return characterEntity != null && characterEntity is BaseMonsterCharacterEntity;
+            if (characterEntity == null)
+                return false;
+            var manager = Manager as BaseGameNetworkManager;
+            if (manager == null)
+                return false;
+            if (characterEntity is BaseMonsterCharacterEntity)
+                return true;
+            if (!IsAlly(characterEntity) && manager.CurrentMapInfo.canPvp)
+                return true;
+            return false;
         }
 
         public override bool IsAlly(BaseCharacterEntity characterEntity)
@@ -84,7 +93,13 @@ namespace MultiplayerARPG
         public override bool IsEnemy(BaseCharacterEntity characterEntity)
         {
             // TODO: May implement this for party/guild battle purposes
-            return characterEntity != null && characterEntity is BaseMonsterCharacterEntity;
+            if (characterEntity == null)
+                return false;
+            if (characterEntity is BaseMonsterCharacterEntity)
+                return true;
+            if (!IsAlly(characterEntity))
+                return true;
+            return false;
         }
 
         public override void Killed(BaseCharacterEntity lastAttacker)

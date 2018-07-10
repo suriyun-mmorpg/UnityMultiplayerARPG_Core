@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using LiteNetLib;
 using LiteNetLibManager;
 
@@ -18,6 +18,7 @@ namespace MultiplayerARPG
         protected readonly Dictionary<long, BasePlayerCharacterEntity> playerCharacters = new Dictionary<long, BasePlayerCharacterEntity>();
         protected readonly Dictionary<string, BuildingEntity> buildingEntities = new Dictionary<string, BuildingEntity>();
         protected readonly Dictionary<string, NetPeer> peersByCharacterName = new Dictionary<string, NetPeer>();
+        public MapInfo CurrentMapInfo { get; protected set; }
         // Events
         public System.Action<ChatMessage> onReceiveChat;
 
@@ -178,18 +179,31 @@ namespace MultiplayerARPG
             }
         }
 
+        protected void SetupMapInfo()
+        {
+            MapInfo foundMapInfo;
+            if (GameInstance.MapInfos.TryGetValue(SceneManager.GetActiveScene().name, out foundMapInfo))
+                CurrentMapInfo = foundMapInfo;
+            else
+                CurrentMapInfo = ScriptableObject.CreateInstance<MapInfo>();
+        }
+
         public override void OnClientOnlineSceneLoaded()
         {
             base.OnClientOnlineSceneLoaded();
             // Server will register entities later, so don't register entities now
             if (!IsServer)
+            {
                 RegisterEntities();
+                SetupMapInfo();
+            }
         }
 
         public override void OnServerOnlineSceneLoaded()
         {
             base.OnServerOnlineSceneLoaded();
             RegisterEntities();
+            SetupMapInfo();
             // Spawn monsters
             var monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
             foreach (var monsterSpawnArea in monsterSpawnAreas)
