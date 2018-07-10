@@ -18,6 +18,9 @@ namespace MultiplayerARPG
         public Item leftHandEquipItem;
         public Item[] armorItems;
 
+        [Header("Start Map")]
+        public MapInfo startMap;
+
         private Dictionary<int, SkillLevel> cacheSkillLevels;
         public Dictionary<int, SkillLevel> CacheSkillLevels
         {
@@ -33,6 +36,16 @@ namespace MultiplayerARPG
                     }
                 }
                 return cacheSkillLevels;
+            }
+        }
+
+        public MapInfo StartMap
+        {
+            get
+            {
+                if (startMap == null)
+                    return GameInstance.Singleton.mapInfos[0];
+                return startMap;
             }
         }
 

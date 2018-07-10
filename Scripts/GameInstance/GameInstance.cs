@@ -53,11 +53,15 @@ namespace MultiplayerARPG
         [Header("New Character")]
         public int startGold = 0;
         public ItemAmount[] startItems;
-        [Header("Scene")]
+        [Header("Scene/Maps")]
         public UnityScene homeScene;
+        [System.Obsolete("`Start Scene` is deprecated and will be removed next version, use `Map Infos` instead.")]
         public UnityScene startScene;
+        [System.Obsolete("`Start Position` is deprecated and will be removed next version, use `Map Infos` instead.")]
         public Vector3 startPosition;
+        [System.Obsolete("`Other Scenes` is deprecated and will be removed next version, use `Map Infos` instead.")]
         public UnityScene[] otherScenes;
+        public MapInfo[] mapInfos;
         [Header("Player Configs")]
         public int minCharacterNameLength = 2;
         public int maxCharacterNameLength = 16;
@@ -78,7 +82,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, ActionAnimation> ActionAnimations = new Dictionary<int, ActionAnimation>();
         public static readonly Dictionary<int, GameEffectCollection> GameEffectCollections = new Dictionary<int, GameEffectCollection>();
         public static readonly Dictionary<int, CharacterModel> CharacterModels = new Dictionary<int, CharacterModel>();
-        public static readonly Dictionary<string, WarpPortals> MapWarpPortals = new Dictionary<string, WarpPortals>();
+        public static readonly Dictionary<string, WarpPortals> WarpPortals = new Dictionary<string, WarpPortals>();
 
         #region Cache Data
         public BaseGameplayRule GameplayRule
@@ -241,7 +245,7 @@ namespace MultiplayerARPG
             ActionAnimations.Clear();
             GameEffectCollections.Clear();
             CharacterModels.Clear();
-            MapWarpPortals.Clear();
+            WarpPortals.Clear();
 
             // Use Resources Load Async ?
             var gameDataList = Resources.LoadAll<BaseGameData>("");
@@ -299,7 +303,7 @@ namespace MultiplayerARPG
                 {
                     if (map.map == null || string.IsNullOrEmpty(map.map.SceneName))
                         continue;
-                    MapWarpPortals[map.map.SceneName] = map;
+                    WarpPortals[map.map.SceneName] = map;
                 }
             }
         }
@@ -310,19 +314,23 @@ namespace MultiplayerARPG
                 UISceneLoading.Singleton.LoadScene(homeScene);
         }
 
+        private void OnValidate()
+        {
+            if (startScene.IsSet() || otherScenes.Length > 0)
+            {
+                Debug.LogWarning("[GameInstance] `Start Scene`, `Start Position` and `Other Scenes` is deprecated and will be removed next version, use `Map Infos` instead.");
+            }
+        }
+
         public List<string> GetGameScenes()
         {
             var scenes = new List<string>();
-            if (startScene != null &&
-                !string.IsNullOrEmpty(startScene.SceneName))
-                scenes.Add(startScene.SceneName);
-
-            foreach (var scene in otherScenes)
+            foreach (var mapInfo in mapInfos)
             {
-                if (scene != null &&
-                    !string.IsNullOrEmpty(scene.SceneName) &&
-                    !scenes.Contains(scene.SceneName))
-                    scenes.Add(scene.SceneName);
+                if (mapInfo != null &&
+                    !string.IsNullOrEmpty(mapInfo.scene.SceneName) &&
+                    !scenes.Contains(mapInfo.scene.SceneName))
+                    scenes.Add(mapInfo.scene.SceneName);
             }
 
             return scenes;

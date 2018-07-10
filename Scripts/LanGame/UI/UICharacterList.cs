@@ -124,8 +124,9 @@ namespace MultiplayerARPG
             var networkManager = LanRpgNetworkManager.Singleton;
             if (!gameInstance.GetGameScenes().Contains(characterData.CurrentMapName))
             {
-                characterData.CurrentMapName = gameInstance.startScene;
-                characterData.CurrentPosition = gameInstance.startPosition;
+                var startMap = (characterData.GetDatabase() as PlayerCharacter).StartMap;
+                characterData.CurrentMapName = startMap.scene.SceneName;
+                characterData.CurrentPosition = startMap.startPosition;
             }
             networkManager.Assets.onlineScene.SceneName = characterData.CurrentMapName;
             networkManager.selectedCharacter = characterData;
