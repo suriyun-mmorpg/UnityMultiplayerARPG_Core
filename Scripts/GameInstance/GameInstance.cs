@@ -265,6 +265,7 @@ namespace MultiplayerARPG
             {
                 Debug.LogWarning("[GameInstance] `Start Scene`/`Start Position` is deprecated and will be removed next version, use `Map Infos` instead.");
                 var newMapInfo = ScriptableObject.CreateInstance<MapInfo>();
+                newMapInfo.scene = new UnityScene();
                 newMapInfo.scene.SceneName = startScene.SceneName;
                 newMapInfo.startPosition = startPosition;
                 mapInfos.Add(newMapInfo);
@@ -277,6 +278,7 @@ namespace MultiplayerARPG
                     if (!otherScene.IsSet())
                         continue;
                     var newMapInfo = ScriptableObject.CreateInstance<MapInfo>();
+                    newMapInfo.scene = new UnityScene();
                     newMapInfo.scene.SceneName = otherScene.SceneName;
                     mapInfos.Add(newMapInfo);
                 }
