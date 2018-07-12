@@ -26,23 +26,47 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void Awake() { }
+        protected virtual void Awake()
+        {
+            this.InvokeClassAddOnMethods("Awake");
+        }
 
-        protected virtual void Start() { }
+        protected virtual void Start()
+        {
+            this.InvokeClassAddOnMethods("Start");
+        }
 
-        protected virtual void OnEnable() { }
+        protected virtual void OnEnable()
+        {
+            this.InvokeClassAddOnMethods("OnEnable");
+        }
 
-        protected virtual void OnDisable() { }
+        protected virtual void OnDisable()
+        {
+            this.InvokeClassAddOnMethods("OnDisable");
+        }
 
-        protected virtual void Update() { }
+        protected virtual void Update()
+        {
+            this.InvokeClassAddOnMethods("Update");
+        }
 
         protected virtual void LateUpdate()
         {
+            this.InvokeClassAddOnMethods("LateUpdate");
             if (textTitle != null)
                 textTitle.text = Title;
         }
 
-        protected virtual void FixedUpdate() { }
+        protected virtual void FixedUpdate()
+        {
+            this.InvokeClassAddOnMethods("FixedUpdate");
+        }
+
+        protected virtual void OnDestroy()
+        {
+            this.InvokeClassAddOnMethods("OnDestroy");
+        }
 
         public override void OnSetup()
         {
