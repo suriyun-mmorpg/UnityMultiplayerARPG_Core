@@ -13,7 +13,7 @@ public static class AddOnUtils
     /// <param name="obj"></param>
     /// <param name="baseMethodName"></param>
     /// <param name="args"></param>
-    public static void InvokeAddOnMethods<T>(this T obj, string baseMethodName, params object[] args) where T : class
+    public static void InvokeAddOnMethods<T>(this T obj, string baseMethodName, params object[] args) where T : struct
     {
         var type = typeof(T);
         var key = new StringBuilder().Append(type.Name).Append('_').Append(baseMethodName).ToString();
