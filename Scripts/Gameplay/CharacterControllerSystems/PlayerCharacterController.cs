@@ -335,7 +335,7 @@ namespace MultiplayerARPG
                     if (skill.IsAttack())
                     {
                         BaseCharacterEntity targetEntity;
-                        if (wasdLockAttackTarget && !PlayerCharacterEntity.TryGetTargetEntity(out targetEntity))
+                        if (wasdLockAttackTarget && !TryGetAttackingCharacter(out targetEntity))
                         {
                             var nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance, false, true);
                             if (nearestTarget != null)
@@ -358,7 +358,7 @@ namespace MultiplayerARPG
                 destination = null;
                 PlayerCharacterEntity.StopMove();
                 BaseCharacterEntity targetEntity;
-                if (wasdLockAttackTarget && !PlayerCharacterEntity.TryGetTargetEntity(out targetEntity))
+                if (wasdLockAttackTarget && !TryGetAttackingCharacter(out targetEntity))
                 {
                     var nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetAttackDistance() + lockAttackTargetDistance, false, true);
                     if (nearestTarget != null)

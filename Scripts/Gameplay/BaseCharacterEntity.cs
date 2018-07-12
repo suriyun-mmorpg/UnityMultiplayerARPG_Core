@@ -824,7 +824,7 @@ namespace MultiplayerARPG
                 foreach (var collider in colliders)
                 {
                     tempEntity = collider.GetComponent<T>();
-                    if (tempEntity == null || tempEntity.IsDead())
+                    if (tempEntity == null || tempEntity == this || tempEntity.IsDead())
                         continue;
                     if (findForAlly && !tempEntity.IsAlly(this))
                         continue;
