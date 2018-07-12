@@ -45,7 +45,7 @@ namespace MultiplayerARPG
             stamina = stamina + b.stamina;
             food = food + b.food;
             water = water + b.water;
-            this.InvokeAddOnMethods("Add", b);
+            this.InvokeStructAddOnMethods("Add", b);
             return this;
         }
 
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
             stamina = stamina * multiplier;
             food = food * multiplier;
             water = water * multiplier;
-            this.InvokeAddOnMethods("Multiply", multiplier);
+            this.InvokeStructAddOnMethods("Multiply", multiplier);
             return this;
         }
 

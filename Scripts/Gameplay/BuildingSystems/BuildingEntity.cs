@@ -77,6 +77,7 @@ namespace MultiplayerARPG
 
         public override void OnSetup()
         {
+            base.OnSetup();
             dataId.onChange += OnDataIdChange;
         }
 
@@ -106,8 +107,11 @@ namespace MultiplayerARPG
 
         public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId)
         {
-            // TODO: Reduce current hp
+            if (!IsServer || IsDead())
+                return;
 
+            base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
+            // TODO: Reduce current hp
         }
     }
 }

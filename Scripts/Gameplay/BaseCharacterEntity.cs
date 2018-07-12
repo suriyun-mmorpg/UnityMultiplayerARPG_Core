@@ -281,10 +281,10 @@ namespace MultiplayerARPG
 
         public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId)
         {
-            // Damage calculations apply at server only
-            if (!IsServer || !CanReceiveDamageFrom(attacker) || IsDead())
+            if (!IsServer || IsDead() || !CanReceiveDamageFrom(attacker))
                 return;
 
+            base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
             // Calculate chance to hit
             var hitChance = gameInstance.GameplayRule.GetHitChance(attacker, this);
             // If miss, return don't calculate damages

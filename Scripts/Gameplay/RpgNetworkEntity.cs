@@ -44,6 +44,18 @@ namespace MultiplayerARPG
 
         protected virtual void FixedUpdate() { }
 
+        public override void OnSetup()
+        {
+            base.OnSetup();
+            this.InvokeClassAddOnMethods("OnSetup");
+        }
+
+        public override void OnNetworkDestroy(DestroyObjectReasons reasons)
+        {
+            base.OnNetworkDestroy(reasons);
+            this.InvokeClassAddOnMethods("OnNetworkDestroy", reasons);
+        }
+
         public bool TryGetEntityByObjectId<T>(uint objectId, out T result) where T : LiteNetLibBehaviour
         {
             result = null;

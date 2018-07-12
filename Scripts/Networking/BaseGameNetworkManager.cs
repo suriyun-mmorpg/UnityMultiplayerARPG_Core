@@ -25,6 +25,7 @@ namespace MultiplayerARPG
         protected override void RegisterClientMessages()
         {
             base.RegisterClientMessages();
+            this.InvokeClassAddOnMethods("RegisterClientMessages");
             RegisterClientMessage(MsgTypes.Warp, HandleWarpAtClient);
             RegisterClientMessage(MsgTypes.Chat, HandleChatAtClient);
         }
@@ -32,6 +33,7 @@ namespace MultiplayerARPG
         protected override void RegisterServerMessages()
         {
             base.RegisterServerMessages();
+            this.InvokeClassAddOnMethods("RegisterServerMessages");
             RegisterServerMessage(MsgTypes.Chat, HandleChatAtServer);
         }
 
@@ -112,6 +114,7 @@ namespace MultiplayerARPG
                 spawnablePrefabs.Add(damageEntity.Identity);
             }
             Assets.spawnablePrefabs = spawnablePrefabs.ToArray();
+            this.InvokeClassAddOnMethods("Init");
         }
 
         public virtual void EnterChat(ChatChannel channel, string message, string senderName, string receiverName)
@@ -193,6 +196,7 @@ namespace MultiplayerARPG
         public override void OnClientOnlineSceneLoaded()
         {
             base.OnClientOnlineSceneLoaded();
+            this.InvokeClassAddOnMethods("OnClientOnlineSceneLoaded");
             // Server will register entities later, so don't register entities now
             if (!IsServer)
             {
@@ -204,6 +208,7 @@ namespace MultiplayerARPG
         public override void OnServerOnlineSceneLoaded()
         {
             base.OnServerOnlineSceneLoaded();
+            this.InvokeClassAddOnMethods("OnServerOnlineSceneLoaded");
             RegisterEntities();
             SetupMapInfo();
             // Spawn monsters
@@ -254,7 +259,7 @@ namespace MultiplayerARPG
                 }
             }
             // If it's server (not host) spawn simple camera controller
-            if (IsServer && !IsClient && GameInstance.Singleton.serverCharacterPrefab != null)
+            if (!IsClient && GameInstance.Singleton.serverCharacterPrefab != null)
                 Instantiate(GameInstance.Singleton.serverCharacterPrefab);
         }
 

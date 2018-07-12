@@ -31,6 +31,7 @@ namespace MultiplayerARPG
             if (!IsServer || IsDead() || weapon == null)
                 return;
 
+            base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
             var totalDamage = 0;
             var weaponItem = weapon.GetWeaponItem();
             HarvestEffectiveness harvestEffectiveness;

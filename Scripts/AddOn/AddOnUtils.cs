@@ -13,7 +13,24 @@ public static class AddOnUtils
     /// <param name="obj"></param>
     /// <param name="baseMethodName"></param>
     /// <param name="args"></param>
-    public static void InvokeAddOnMethods<T>(this T obj, string baseMethodName, params object[] args) where T : struct
+    public static void InvokeClassAddOnMethods<T>(this T obj, string baseMethodName, params object[] args) where T : class
+    {
+        InvokeAddOnMethods(obj, baseMethodName, args);
+    }
+
+    /// <summary>
+    /// This will calls all methods from `obj` that have names as "[anything]_`baseMethodName`" with any number of arguments that can be set via `args`
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="obj"></param>
+    /// <param name="baseMethodName"></param>
+    /// <param name="args"></param>
+    public static void InvokeStructAddOnMethods<T>(this T obj, string baseMethodName, params object[] args) where T : struct
+    {
+        InvokeAddOnMethods(obj, baseMethodName, args);
+    }
+
+    private static void InvokeAddOnMethods<T>(this T obj, string baseMethodName, params object[] args)
     {
         var type = typeof(T);
         var key = new StringBuilder().Append(type.Name).Append('_').Append(baseMethodName).ToString();

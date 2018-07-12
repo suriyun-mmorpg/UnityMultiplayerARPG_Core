@@ -52,11 +52,17 @@ namespace MultiplayerARPG
             return CurrentHp <= 0;
         }
 
-        public virtual void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountType combatAmountType, int damage)
+        public virtual void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId)
         {
-            RequestCombatAmount(combatAmountType, damage);
+            if (!IsServer || IsDead())
+                return;
+            this.InvokeClassAddOnMethods("ReceiveDamage", attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
         }
 
-        public abstract void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId);
+        public virtual void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountType combatAmountType, int damage)
+        {
+            this.InvokeClassAddOnMethods("ReceivedDamage", attacker, combatAmountType, damage);
+            RequestCombatAmount(combatAmountType, damage);
+        }
     }
 }
