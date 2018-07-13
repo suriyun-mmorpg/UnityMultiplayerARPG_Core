@@ -168,16 +168,8 @@ namespace MultiplayerARPG
                     }
                     break;
                 case SkillType.CraftItem:
-                    if (skill.CanCraft(this))
-                    {
-                        var craftRequirements = skill.craftRequirements;
-                        foreach (var craftRequirement in craftRequirements)
-                        {
-                            if (craftRequirement.item != null && craftRequirement.amount > 0)
-                                this.DecreaseItems(craftRequirement.item.DataId, craftRequirement.amount);
-                        }
-                        this.IncreaseItems(skill.craftingItem.DataId, 1, 1);
-                    }
+                    if (skill.itemCraft.CanCraft(this))
+                        skill.itemCraft.CraftItem(this);
                     break;
             }
             yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);

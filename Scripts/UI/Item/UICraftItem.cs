@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class UISkillCraftItem : UISelectionEntry<Skill>
+    public class UICraftItem : UISelectionEntry<ItemCraft>
     {
         [Header("UI Elements")]
         public UICharacterItem uiCraftingItem;
@@ -10,26 +10,26 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            var skill = Data;
+            var craftItemData = Data;
             if (uiCraftingItem != null)
             {
-                if (skill == null || skill.craftingItem == null)
+                if (craftItemData.craftingItem == null)
                     uiCraftingItem.Hide();
                 else
                 {
                     uiCraftingItem.Show();
-                    uiCraftingItem.Data = new CharacterItemLevelTuple(CharacterItem.Create(skill.craftingItem), 1);
+                    uiCraftingItem.Data = new CharacterItemLevelTuple(CharacterItem.Create(craftItemData.craftingItem), 1);
                 }
             }
 
             if (uiRequireItemAmounts != null)
             {
-                if (skill == null)
+                if (craftItemData.craftingItem == null)
                     uiRequireItemAmounts.Hide();
                 else
                 {
                     uiRequireItemAmounts.Show();
-                    uiRequireItemAmounts.Data = skill.CacheCraftRequirements;
+                    uiRequireItemAmounts.Data = craftItemData.CacheCraftRequirements;
                 }
             }
         }

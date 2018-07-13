@@ -41,7 +41,7 @@ namespace MultiplayerARPG
         public Text textCoolDownRemainsDuration;
         public Image imageCoolDownGage;
         public UISkillRequirement uiRequirement;
-        public UISkillCraftItem uiCraftItem;
+        public UICraftItem uiCraftItem;
 
         [Header("Skill Attack")]
         public UIDamageElementAmount uiDamageAmount;
@@ -168,7 +168,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiCraftItem.Show();
-                    uiCraftItem.Data = skill;
+                    uiCraftItem.Data = skill.itemCraft;
                 }
             }
 
