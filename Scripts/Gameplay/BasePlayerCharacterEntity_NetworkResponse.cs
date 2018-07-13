@@ -295,7 +295,7 @@ namespace MultiplayerARPG
                 }
             }
             IncreaseExp(quest.rewardExp);
-            IncreaseGold(quest.rewardGold);
+            Gold += quest.rewardGold;
             var rewardItems = quest.rewardItems;
             if (rewardItems != null && rewardItems.Length > 0)
             {
@@ -388,7 +388,7 @@ namespace MultiplayerARPG
 
             var item = nonEquipItem.GetItem();
             if (this.DecreaseItemsByIndex(index, amount))
-                IncreaseGold(item.sellPrice * amount);
+                Gold += item.sellPrice * amount;
         }
 
         protected virtual void NetFuncSendDealingRequest(uint objectId)

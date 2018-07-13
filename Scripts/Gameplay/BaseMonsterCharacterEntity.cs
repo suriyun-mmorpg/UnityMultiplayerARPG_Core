@@ -248,7 +248,7 @@ namespace MultiplayerARPG
                     if (enemy is BasePlayerCharacterEntity)
                     {
                         var enemyPlayer = enemy as BasePlayerCharacterEntity;
-                        enemyPlayer.IncreaseGold((int)(randomedGold * rewardRate));
+                        enemyPlayer.Gold += (int)(randomedGold * rewardRate);
                     }
                 }
             }

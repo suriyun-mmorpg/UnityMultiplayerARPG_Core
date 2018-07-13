@@ -82,7 +82,7 @@ public class CharacterSkill
                 }
                 break;
             case SkillType.CraftItem:
-                if (!skill.itemCraft.CanCraft(character))
+                if (!(character is BasePlayerCharacterEntity) || !skill.itemCraft.CanCraft(character as BasePlayerCharacterEntity))
                     return false;
                 break;
             default:

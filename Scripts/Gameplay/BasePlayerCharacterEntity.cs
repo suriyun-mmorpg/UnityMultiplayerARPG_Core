@@ -59,6 +59,20 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void ApplySkill(CharacterSkill characterSkill, Vector3 position, bool isAttack, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
+        {
+            base.ApplySkill(characterSkill, position, isAttack, weapon, damageInfo, allDamageAmounts);
+
+            var skill = characterSkill.GetSkill();
+            switch (skill.skillType)
+            {
+                case SkillType.CraftItem:
+                    if (skill.itemCraft.CanCraft(this))
+                        skill.itemCraft.CraftItem(this);
+                    break;
+            }
+        }
+
         public override void Respawn()
         {
             if (!IsServer || !IsDead())
@@ -108,20 +122,6 @@ namespace MultiplayerARPG
             currentNpcDialog = null;
         }
 
-        public virtual void IncreaseGold(int gold)
-        {
-            if (!IsServer)
-                return;
-            Gold += gold;
-        }
-
-        public virtual void DecreaseGold(int gold)
-        {
-            if (!IsServer)
-                return;
-            Gold -= gold;
-        }
-
         public virtual void OnKillMonster(BaseMonsterCharacterEntity monsterCharacterEntity)
         {
             if (!IsServer || monsterCharacterEntity == null)
@@ -159,8 +159,8 @@ namespace MultiplayerARPG
                     }
                 }
             }
-            DecreaseGold(DealingGold);
-            coPlayerCharacterEntity.IncreaseGold(DealingGold);
+            Gold -= DealingGold;
+            coPlayerCharacterEntity.Gold += DealingGold;
         }
 
         public virtual void ClearDealingData()

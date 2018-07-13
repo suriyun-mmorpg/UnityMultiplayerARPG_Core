@@ -433,13 +433,31 @@ namespace MultiplayerARPG
             ApplyBuff(Id, item.DataId, BuffType.PotionBuff, characterItem.level);
         }
 
-        protected void ApplySkillBuff(CharacterSkill characterSkill)
+        protected virtual void ApplySkillBuff(CharacterSkill characterSkill)
         {
             var skill = characterSkill.GetSkill();
             if (skill == null)
                 return;
             if (skill.skillBuffType == SkillBuffType.BuffToUser)
                 ApplyBuff(Id, skill.DataId, BuffType.SkillBuff, characterSkill.level);
+        }
+
+        protected virtual void ApplySkill(CharacterSkill characterSkill, Vector3 position, bool isAttack, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
+        {
+            var skill = characterSkill.GetSkill();
+            switch (skill.skillType)
+            {
+                case SkillType.Active:
+                    ApplySkillBuff(characterSkill);
+                    if (isAttack)
+                    {
+                        CharacterBuff debuff = CharacterBuff.Empty;
+                        if (skill.isDebuff)
+                            debuff = CharacterBuff.Create(Id, BuffType.SkillDebuff, skill.DataId, characterSkill.level);
+                        LaunchDamageEntity(position, weapon, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id);
+                    }
+                    break;
+            }
         }
 
         public virtual void GetActionAnimationDurations(ActionAnimation anim, out float triggerDuration, out float totalDuration)

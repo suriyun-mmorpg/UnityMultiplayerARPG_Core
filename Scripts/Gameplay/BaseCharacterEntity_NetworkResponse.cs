@@ -154,24 +154,7 @@ namespace MultiplayerARPG
             characterSkill.ReduceMp(this);
             skills[skillIndex] = characterSkill;
             yield return new WaitForSecondsRealtime(triggerDuration);
-            var skill = characterSkill.GetSkill();
-            switch (skill.skillType)
-            {
-                case SkillType.Active:
-                    ApplySkillBuff(characterSkill);
-                    if (isAttack)
-                    {
-                        CharacterBuff debuff = CharacterBuff.Empty;
-                        if (skill.isDebuff)
-                            debuff = CharacterBuff.Create(Id, BuffType.SkillDebuff, skill.DataId, characterSkill.level);
-                        LaunchDamageEntity(position, weapon, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id);
-                    }
-                    break;
-                case SkillType.CraftItem:
-                    if (skill.itemCraft.CanCraft(this))
-                        skill.itemCraft.CraftItem(this);
-                    break;
-            }
+            ApplySkill(characterSkill, position, isAttack, weapon, damageInfo, allDamageAmounts);
             yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
         }
 
