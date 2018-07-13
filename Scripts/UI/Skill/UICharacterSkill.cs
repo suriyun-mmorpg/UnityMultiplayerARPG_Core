@@ -15,6 +15,8 @@ namespace MultiplayerARPG
         public string descriptionFormat = "{0}";
         [Tooltip("Level Format => {0} = {Level}")]
         public string levelFormat = "Lv: {0}";
+        [Tooltip("Available Weapons Format => {0} = {Weapon Types}")]
+        public string availableWeaponsFormat = "Available Weapons: {0}";
         [Tooltip("Consume Mp Format => {0} = {Consume Mp amount}")]
         public string consumeMpFormat = "Consume Mp: {0}";
         [Tooltip("Cool Down Duration Format => {0} = {Duration}")]
@@ -36,6 +38,7 @@ namespace MultiplayerARPG
         public Text textLevel;
         public Image imageIcon;
         public Text textSkillType;
+        public Text textAvailableWeapons;
         public Text textConsumeMp;
         public Text textCoolDownDuration;
         public Text textCoolDownRemainsDuration;
@@ -144,6 +147,24 @@ namespace MultiplayerARPG
                     case SkillType.CraftItem:
                         textSkillType.text = string.Format(skillTypeFormat, craftItemSkillType);
                         break;
+                }
+            }
+
+            if (textAvailableWeapons != null)
+            {
+                if (skill.availableWeapons == null || skill.availableWeapons.Length == 0)
+                    textAvailableWeapons.gameObject.SetActive(false);
+                else
+                {
+                    var str = string.Empty;
+                    foreach (var availableWeapon in skill.availableWeapons)
+                    {
+                        if (!string.IsNullOrEmpty(str))
+                            str += "/";
+                        str += availableWeapon.title;
+                    }
+                    textAvailableWeapons.text = string.Format(availableWeaponsFormat, str);
+                    textAvailableWeapons.gameObject.SetActive(true);
                 }
             }
 
