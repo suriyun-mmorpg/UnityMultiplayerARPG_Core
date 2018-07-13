@@ -161,6 +161,9 @@ namespace MultiplayerARPG
                 case NpcDialogType.Quest:
                     NetFuncSelectNpcDialogQuestMenu(menuIndex);
                     break;
+                case NpcDialogType.CraftItem:
+                    NetFuncSelectNpcDialogCraftItemMenu(menuIndex);
+                    break;
             }
         }
 
@@ -188,6 +191,35 @@ namespace MultiplayerARPG
                 case NpcDialog.QUEST_COMPLETE_MENU_INDEX:
                     NetFuncCompleteQuest(currentNpcDialog.quest.DataId);
                     currentNpcDialog = currentNpcDialog.questCompletedDailog;
+                    break;
+            }
+            if (currentNpcDialog == null)
+                RequestShowNpcDialog(0);
+            else
+                RequestShowNpcDialog(currentNpcDialog.DataId);
+        }
+
+        protected virtual void NetFuncSelectNpcDialogCraftItemMenu(int menuIndex)
+        {
+            if (currentNpcDialog == null || currentNpcDialog.type != NpcDialogType.CraftItem || currentNpcDialog.itemCraft == null)
+            {
+                currentNpcDialog = null;
+                RequestShowNpcDialog(0);
+                return;
+            }
+            switch (menuIndex)
+            {
+                case NpcDialog.CRAFT_ITEM_START_MENU_INDEX:
+                    if (currentNpcDialog.itemCraft.CanCraft(this))
+                    {
+                        currentNpcDialog.itemCraft.CraftItem(this);
+                        currentNpcDialog = currentNpcDialog.craftDoneDialog;
+                    }
+                    else
+                        currentNpcDialog = currentNpcDialog.craftNotMeetRequirementsDialog;
+                    break;
+                case NpcDialog.CRAFT_ITEM_CANCEL_MENU_INDEX:
+                    currentNpcDialog = currentNpcDialog.craftCancelDialog;
                     break;
             }
             if (currentNpcDialog == null)

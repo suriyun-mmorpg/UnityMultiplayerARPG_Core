@@ -27,8 +27,7 @@ namespace MultiplayerARPG
         public float weight;
         [Range(1, 1000)]
         public short maxStack = 1;
-        [Range(1, 30)]
-        public short maxLevel = 1;
+        public ItemRefineInfo itemRefineInfo;
 
         // Armor
         public ArmorType armorType;
@@ -77,7 +76,7 @@ namespace MultiplayerARPG
                 case ItemType.Potion:
                 case ItemType.Ammo:
                 case ItemType.Building:
-                    maxLevel = 1;
+                    itemRefineInfo = null;
                     break;
             }
             EditorUtility.SetDirty(this);
@@ -127,6 +126,16 @@ namespace MultiplayerARPG
         public bool IsBuilding()
         {
             return itemType == ItemType.Building;
+        }
+
+        public int MaxLevel
+        {
+            get
+            {
+                if (itemRefineInfo == null || itemRefineInfo.itemRefines == null || itemRefineInfo.itemRefines.Length == 0)
+                    return 1;
+                return itemRefineInfo.itemRefines.Length;
+            }
         }
 
         #region Cache Data

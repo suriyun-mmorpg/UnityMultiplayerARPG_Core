@@ -18,6 +18,7 @@ namespace MultiplayerARPG
         public Text textTitle;
         public Text textDescription;
         public UICharacterQuest uiCharacterQuest;
+        public UICraftItem uiCraftItem;
         public UINpcDialogMenu uiMenuPrefab;
         public GameObject uiMenuRoot;
         public Transform uiMenuContainer;
@@ -28,10 +29,13 @@ namespace MultiplayerARPG
         public string messageQuestDecline = "Decline";
         public string messageQuestAbandon = "Abandon";
         public string messageQuestComplete = "Complete";
+        public string messageCraftItemStart = "Craft";
+        public string messageCraftItemCancel = "Cancel";
 
         [Header("Event")]
         public UnityEvent onSwitchToNormalDialog;
         public UnityEvent onSwitchToQuestDialog;
+        public UnityEvent onSwitchToCraftItemDialog;
         public UnityEvent onSwitchToSellItemDialog;
 
         private UIList cacheMenuList;
@@ -75,6 +79,7 @@ namespace MultiplayerARPG
                 textDescription.text = string.Format(descriptionFormat, Data == null ? "N/A" : Data.description);
 
             Quest quest = null;
+            ItemCraft itemCraft = null;
             List<NpcSellItem> sellItems = new List<NpcSellItem>();
             List<UINpcDialogMenuAction> menuActions = new List<UINpcDialogMenuAction>();
             switch (Data.type)
@@ -133,7 +138,24 @@ namespace MultiplayerARPG
                                 menuActions.Add(declineMenuAction);
                             }
                             uiCharacterQuest.Setup(characterQuest, owningCharacter, index);
-                            uiCharacterQuest.Show();
+                        }
+                    }
+                    break;
+                case NpcDialogType.CraftItem:
+                    if (onSwitchToCraftItemDialog == null)
+                        onSwitchToCraftItemDialog.Invoke();
+                    if (uiCraftItem != null)
+                    {
+                        itemCraft = Data.itemCraft;
+                        if (itemCraft != null)
+                        {
+                            var startMenuAction = new UINpcDialogMenuAction();
+                            var cancelMenuAction = new UINpcDialogMenuAction();
+                            startMenuAction.title = messageCraftItemStart;
+                            startMenuAction.menuIndex = NpcDialog.CRAFT_ITEM_START_MENU_INDEX;
+                            cancelMenuAction.title = messageCraftItemCancel;
+                            cancelMenuAction.menuIndex = NpcDialog.CRAFT_ITEM_CANCEL_MENU_INDEX;
+                            uiCraftItem.Data = Data.itemCraft;
                         }
                     }
                     break;
@@ -150,6 +172,14 @@ namespace MultiplayerARPG
                     uiCharacterQuest.Hide();
                 else
                     uiCharacterQuest.Show();
+            }
+            // Craft Item
+            if (uiCraftItem != null)
+            {
+                if (itemCraft == null)
+                    uiCraftItem.Hide();
+                else
+                    uiCraftItem.Show();
             }
             // Shop
             if (uiSellItemRoot != null)

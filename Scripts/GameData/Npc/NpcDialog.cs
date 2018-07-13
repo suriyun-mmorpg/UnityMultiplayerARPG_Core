@@ -9,6 +9,7 @@ namespace MultiplayerARPG
         Normal,
         Quest,
         Shop,
+        CraftItem,
     }
 
     [CreateAssetMenu(fileName = "NpcDialog", menuName = "Create GameData/NpcDialog")]
@@ -18,6 +19,8 @@ namespace MultiplayerARPG
         public const int QUEST_DECLINE_MENU_INDEX = 1;
         public const int QUEST_ABANDON_MENU_INDEX = 2;
         public const int QUEST_COMPLETE_MENU_INDEX = 3;
+        public const int CRAFT_ITEM_START_MENU_INDEX = 0;
+        public const int CRAFT_ITEM_CANCEL_MENU_INDEX = 1;
 
         public NpcDialogType type;
         public NpcDialogMenu[] menus;
@@ -29,6 +32,11 @@ namespace MultiplayerARPG
         public NpcDialog questCompletedDailog;
         // Shop
         public NpcSellItem[] sellItems;
+        // Craft Item
+        public ItemCraft itemCraft;
+        public NpcDialog craftDoneDialog;
+        public NpcDialog craftNotMeetRequirementsDialog;
+        public NpcDialog craftCancelDialog;
     }
 
     public enum NpcDialogConditionType : byte

@@ -267,7 +267,7 @@ namespace MultiplayerARPG
 
             if (uiNextLevelItem != null)
             {
-                if (level + 1 > item.maxLevel)
+                if (level + 1 > item.MaxLevel)
                     uiNextLevelItem.Hide();
                 else
                 {
