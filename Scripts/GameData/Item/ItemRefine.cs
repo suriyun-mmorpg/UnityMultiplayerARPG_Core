@@ -14,7 +14,7 @@ namespace MultiplayerARPG
     public class ItemRefineLevel
     {
         [Range(0.01f, 1f)]
-        public float successRate;
+        public float successRate = 1;
         public ItemAmount[] requireItems;
         public int requireGold;
         public short refineFailDecreaseLevels;
@@ -33,7 +33,9 @@ namespace MultiplayerARPG
         
         public bool CanRefine(IPlayerCharacterData character)
         {
-            if ((requireItems == null || requireItems.Length == 0) && character.Gold >= requireGold)
+            if (character.Gold < requireGold)
+                return false;
+            if (requireItems == null || requireItems.Length == 0)
                 return true;
             foreach (var requireItem in requireItems)
             {

@@ -175,7 +175,7 @@ namespace MultiplayerARPG
 
             if (textRefineLevel != null)
             {
-                textRefineLevel.text = string.Format(refineLevelFormat, "+" + (level - 1));
+                textRefineLevel.text = string.Format(refineLevelFormat, "+" + (level - 1).ToString("N0"));
                 textRefineLevel.gameObject.SetActive(level > 1);
             }
 
@@ -535,9 +535,11 @@ namespace MultiplayerARPG
 
             var characterItem = Data.characterItem;
             var uiGameplay = UISceneGameplay.Singleton;
-            if (uiGameplay.uiRefineItem != null && characterItem.GetEquipmentItem() != null)
+            if (uiGameplay.uiRefineItem != null &&
+                characterItem.GetEquipmentItem() != null &&
+                string.IsNullOrEmpty(equipPosition))
             {
-                uiGameplay.uiRefineItem.Setup(characterItem, character, indexOfData);
+                uiGameplay.uiRefineItem.Data = indexOfData;
                 uiGameplay.uiRefineItem.Show();
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();

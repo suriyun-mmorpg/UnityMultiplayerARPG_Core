@@ -26,7 +26,9 @@ namespace MultiplayerARPG
         {
             if (craftingItem == null)
                 return false;
-            if ((craftRequirements == null || craftRequirements.Length == 0) && character.Gold >= requireGold)
+            if (character.Gold < requireGold)
+                return false;
+            if (craftRequirements == null || craftRequirements.Length == 0)
                 return true;
             foreach (var craftRequirement in craftRequirements)
             {

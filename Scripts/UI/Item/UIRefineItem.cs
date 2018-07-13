@@ -5,25 +5,37 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UIRefineItem : UIDataForCharacter<CharacterItem>
+    public class UIRefineItem : UISelectionEntry<int>
     {
         [Header("Generic Info Format")]
         [Tooltip("Require Gold Format => {0} = {Amount}")]
         public string requireGoldFormat = "Require Gold: {0}";
         [Tooltip("Success Rate Format => {0} = {Rate}")]
         public string successRateFormat = "Success Rate: {0}%";
+        [Tooltip("Refining Level Format => {0} = {Refining Level}")]
+        public string refiningLevelFormat = "{0}";
 
         [Header("UI Elements")]
         public UICharacterItem uiRefiningItem;
         public UIItemAmounts uiRequireItemAmounts;
         public Text textRequireGold;
         public Text textSuccessRate;
+        public Text textRefiningLevel;
 
-        protected override void UpdateData()
+        private bool hasSetData;
+
+        protected override void UpdateUI()
         {
-            var characterItem = Data;
-            var level = characterItem.level;
-            var equipmentItem = characterItem.GetEquipmentItem();
+            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            CharacterItem characterItem = null;
+            Item equipmentItem = null;
+            short level = 1;
+            if (Data >= 0 && Data < owningCharacter.NonEquipItems.Count)
+            {
+                characterItem = owningCharacter.NonEquipItems[Data];
+                equipmentItem = characterItem.GetEquipmentItem();
+                level = characterItem.level;
+            }
             var canRefine = characterItem != null && equipmentItem != null && level < equipmentItem.MaxLevel;
             ItemRefineLevel refineLevel = !canRefine ? null : equipmentItem.itemRefineInfo.levels[level - 1];
             if (uiRefiningItem != null)
@@ -32,7 +44,7 @@ namespace MultiplayerARPG
                     uiRefiningItem.Hide();
                 else
                 {
-                    uiRefiningItem.Setup(new CharacterItemLevelTuple(characterItem, level), character, indexOfData, string.Empty);
+                    uiRefiningItem.Setup(new CharacterItemLevelTuple(characterItem, level), owningCharacter, Data, string.Empty);
                     uiRefiningItem.Show();
                 }
             }
@@ -63,6 +75,33 @@ namespace MultiplayerARPG
                 else
                     textSuccessRate.text = string.Format(successRateFormat, refineLevel.successRate.ToString("N2"));
             }
+
+            if (textRefiningLevel != null)
+            {
+                if (!canRefine)
+                    textRefiningLevel.text = string.Format(refiningLevelFormat, "+" + (level - 1).ToString("N0"));
+                else
+                    textRefiningLevel.text = string.Format(refiningLevelFormat, "+" + level.ToString("N0"));
+            }
+        }
+
+        public override void Hide()
+        {
+            hasSetData = false;
+            base.Hide();
+        }
+
+        protected override void UpdateData()
+        {
+            hasSetData = true;
+        }
+
+        public void OnClickRefine()
+        {
+            if (!hasSetData)
+                return;
+            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            owningCharacter.RequestRefineItem(Data);
         }
     }
 }
