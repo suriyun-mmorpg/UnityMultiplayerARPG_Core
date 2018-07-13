@@ -81,8 +81,9 @@ namespace MultiplayerARPG
             dataId.onChange += OnDataIdChange;
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             dataId.onChange -= OnDataIdChange;
         }
 
