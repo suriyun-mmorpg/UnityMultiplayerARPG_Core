@@ -83,8 +83,9 @@ namespace MultiplayerARPG
             RegisterNetFunction("OnLevelUp", new LiteNetLibFunction(() => NetFuncOnLevelUp()));
         }
 
-        protected virtual void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             // On data changes events
             dataId.onChange -= OnDataIdChange;
             equipWeapons.onChange -= OnEquipWeaponsChange;
