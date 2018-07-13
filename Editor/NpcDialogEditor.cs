@@ -23,6 +23,11 @@ namespace MultiplayerARPG
             ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.Quest.ToString(), cacheNpcDialog.GetMemberName(a => a.questCompletedDailog));
             // Shop
             ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.Shop.ToString(), cacheNpcDialog.GetMemberName(a => a.sellItems));
+            // Craft Item
+            ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.CraftItem.ToString(), cacheNpcDialog.GetMemberName(a => a.itemCraft));
+            ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.CraftItem.ToString(), cacheNpcDialog.GetMemberName(a => a.craftDoneDialog));
+            ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.CraftItem.ToString(), cacheNpcDialog.GetMemberName(a => a.craftNotMeetRequirementsDialog));
+            ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.CraftItem.ToString(), cacheNpcDialog.GetMemberName(a => a.craftCancelDialog));
         }
     }
 }
