@@ -25,6 +25,8 @@ namespace MultiplayerARPG
         public string weightFormat = "{0}";
         [Tooltip("Item Type Format => {0} = {Item Type title}")]
         public string itemTypeFormat = "Item Type: {0}";
+        [Tooltip("Refine Level Format => {0} = {Refine Level}")]
+        public string refineLevelFormat = "Refine Level: {0}";
         [Tooltip("Junk Item Type")]
         public string junkItemType = "Junk";
         [Tooltip("Shield Item Type")]
@@ -50,6 +52,7 @@ namespace MultiplayerARPG
         public Text textLevel;
         public Image imageIcon;
         public Text textItemType;
+        public Text textRefineLevel;
         public Text textSellPrice;
         public Text textStack;
         public Text textDurability;
@@ -73,6 +76,8 @@ namespace MultiplayerARPG
         public UnityEvent onSetUnEquippableData;
         public UnityEvent onNpcSellItemDialogAppear;
         public UnityEvent onNpcSellItemDialogDisappear;
+        public UnityEvent onRefineItemAppear;
+        public UnityEvent onRefineItemDisappear;
         public UnityEvent onEnterDealingState;
         public UnityEvent onExitDealingState;
 
@@ -81,6 +86,7 @@ namespace MultiplayerARPG
         public bool showAmountWhenMaxIsOne;
 
         private bool isSellItemDialogAppeared;
+        private bool isRefineItemAppeared;
         private bool isDealingStateEntered;
 
         public void Setup(CharacterItemLevelTuple data, ICharacterData character, int indexOfData, string equipPosition)
@@ -95,6 +101,7 @@ namespace MultiplayerARPG
                 return;
 
             UpdateShopUIVisibility(false);
+            UpdateRefineUIVisibility(false);
             UpdateDealingState(false);
         }
 
@@ -164,6 +171,12 @@ namespace MultiplayerARPG
                         textItemType.text = string.Format(itemTypeFormat, buildingItemType);
                         break;
                 }
+            }
+
+            if (textRefineLevel != null)
+            {
+                textRefineLevel.text = string.Format(refineLevelFormat, "+" + (level - 1));
+                textRefineLevel.gameObject.SetActive(level > 1);
             }
 
             if (textSellPrice != null)
@@ -276,6 +289,7 @@ namespace MultiplayerARPG
                 }
             }
             UpdateShopUIVisibility(true);
+            UpdateRefineUIVisibility(true);
             UpdateDealingState(true);
         }
 
@@ -315,6 +329,47 @@ namespace MultiplayerARPG
                         isSellItemDialogAppeared = false;
                         if (onNpcSellItemDialogDisappear != null)
                             onNpcSellItemDialogDisappear.Invoke();
+                    }
+                }
+            }
+        }
+
+        private void UpdateRefineUIVisibility(bool initData)
+        {
+            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            if (owningCharacter == null)
+            {
+                if (initData || isRefineItemAppeared)
+                {
+                    isRefineItemAppeared = false;
+                    if (onRefineItemDisappear != null)
+                        onRefineItemDisappear.Invoke();
+                }
+                return;
+            }
+            // Check visible item dialog
+            var uiGameplay = UISceneGameplay.Singleton;
+            if (uiGameplay.uiRefineItem != null)
+            {
+                if (uiGameplay.uiRefineItem.IsVisible() &&
+                    Data.characterItem != null &&
+                    Data.characterItem.GetEquipmentItem() != null &&
+                    string.IsNullOrEmpty(equipPosition))
+                {
+                    if (initData || !isRefineItemAppeared)
+                    {
+                        isRefineItemAppeared = true;
+                        if (onRefineItemAppear != null)
+                            onRefineItemAppear.Invoke();
+                    }
+                }
+                else
+                {
+                    if (initData || isRefineItemAppeared)
+                    {
+                        isRefineItemAppeared = false;
+                        if (onRefineItemDisappear != null)
+                            onRefineItemDisappear.Invoke();
                     }
                 }
             }
@@ -470,6 +525,23 @@ namespace MultiplayerARPG
                 selectionManager.DeselectSelectedUI();
             if (owningCharacter != null)
                 owningCharacter.RequestSetDealingItem(indexOfData, (short)amount);
+        }
+
+        public void OnClickSetRefineItem()
+        {
+            // Only unequipped equipment can refining
+            if (!IsOwningCharacter() || !string.IsNullOrEmpty(equipPosition))
+                return;
+
+            var characterItem = Data.characterItem;
+            var uiGameplay = UISceneGameplay.Singleton;
+            if (uiGameplay.uiRefineItem != null && characterItem.GetEquipmentItem() != null)
+            {
+                uiGameplay.uiRefineItem.Setup(characterItem, character, indexOfData);
+                uiGameplay.uiRefineItem.Show();
+                if (selectionManager != null)
+                    selectionManager.DeselectSelectedUI();
+            }
         }
     }
 }

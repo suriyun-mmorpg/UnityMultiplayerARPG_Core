@@ -46,6 +46,7 @@ namespace MultiplayerARPG
             RegisterNetFunction("Build", new LiteNetLibFunction<NetFieldInt, NetFieldVector3, NetFieldQuaternion, NetFieldUInt>((itemIndex, position, rotation, parentObjectId) => NetFuncBuild(itemIndex, position, rotation, parentObjectId)));
             RegisterNetFunction("DestroyBuild", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncDestroyBuild(objectId)));
             RegisterNetFunction("SellItem", new LiteNetLibFunction<NetFieldInt, NetFieldShort>((nonEquipIndex, amount) => NetFuncSellItem(nonEquipIndex, amount)));
+            RegisterNetFunction("RefineItem", new LiteNetLibFunction<NetFieldInt>((nonEquipIndex) => NetFuncRefineItem(nonEquipIndex)));
             RegisterNetFunction("SendDealingRequest", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncSendDealingRequest(objectId)));
             RegisterNetFunction("ReceiveDealingRequest", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncReceiveDealingRequest(objectId)));
             RegisterNetFunction("AcceptDealingRequest", new LiteNetLibFunction(NetFuncAcceptDealingRequest));

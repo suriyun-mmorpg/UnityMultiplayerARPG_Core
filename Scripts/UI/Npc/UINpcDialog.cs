@@ -35,8 +35,8 @@ namespace MultiplayerARPG
         [Header("Event")]
         public UnityEvent onSwitchToNormalDialog;
         public UnityEvent onSwitchToQuestDialog;
-        public UnityEvent onSwitchToCraftItemDialog;
         public UnityEvent onSwitchToSellItemDialog;
+        public UnityEvent onSwitchToCraftItemDialog;
 
         private UIList cacheMenuList;
         public UIList CacheMenuList
@@ -141,6 +141,11 @@ namespace MultiplayerARPG
                         }
                     }
                     break;
+                case NpcDialogType.Shop:
+                    if (onSwitchToSellItemDialog == null)
+                        onSwitchToSellItemDialog.Invoke();
+                    sellItems.AddRange(Data.sellItems);
+                    break;
                 case NpcDialogType.CraftItem:
                     if (onSwitchToCraftItemDialog == null)
                         onSwitchToCraftItemDialog.Invoke();
@@ -161,36 +166,7 @@ namespace MultiplayerARPG
                         }
                     }
                     break;
-                case NpcDialogType.Shop:
-                    if (onSwitchToSellItemDialog == null)
-                        onSwitchToSellItemDialog.Invoke();
-                    sellItems.AddRange(Data.sellItems);
-                    break;
             }
-            // Quest
-            if (uiCharacterQuest != null)
-            {
-                if (quest == null)
-                    uiCharacterQuest.Hide();
-                else
-                    uiCharacterQuest.Show();
-            }
-            // Craft Item
-            if (uiCraftItem != null)
-            {
-                if (itemCraft == null)
-                    uiCraftItem.Hide();
-                else
-                    uiCraftItem.Show();
-            }
-            // Shop
-            if (uiSellItemRoot != null)
-                uiSellItemRoot.SetActive(sellItems.Count > 0);
-            CacheSellItemList.Generate(sellItems, (index, sellItem, ui) =>
-            {
-                var uiNpcSellItem = ui.GetComponent<UINpcSellItem>();
-                uiNpcSellItem.Setup(sellItem, index);
-            });
             // Menu
             if (uiMenuRoot != null)
                 uiMenuRoot.SetActive(menuActions.Count > 0);
@@ -201,6 +177,30 @@ namespace MultiplayerARPG
                 uiNpcDialogMenu.uiNpcDialog = this;
                 uiNpcDialogMenu.Show();
             });
+            // Quest
+            if (uiCharacterQuest != null)
+            {
+                if (quest == null)
+                    uiCharacterQuest.Hide();
+                else
+                    uiCharacterQuest.Show();
+            }
+            // Shop
+            if (uiSellItemRoot != null)
+                uiSellItemRoot.SetActive(sellItems.Count > 0);
+            CacheSellItemList.Generate(sellItems, (index, sellItem, ui) =>
+            {
+                var uiNpcSellItem = ui.GetComponent<UINpcSellItem>();
+                uiNpcSellItem.Setup(sellItem, index);
+            });
+            // Craft Item
+            if (uiCraftItem != null)
+            {
+                if (itemCraft == null)
+                    uiCraftItem.Hide();
+                else
+                    uiCraftItem.Show();
+            }
         }
     }
 }

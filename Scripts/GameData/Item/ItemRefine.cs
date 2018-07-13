@@ -17,7 +17,7 @@ namespace MultiplayerARPG
         public float successRate;
         public ItemAmount[] requireItems;
         public int requireGold;
-        public int refineFailDecreaseLevels;
+        public short refineFailDecreaseLevels;
         public bool refineFailDestroyItem;
 
         private Dictionary<Item, short> cacheRequireItems;
@@ -43,17 +43,35 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public void RefineItem(IPlayerCharacterData character, int nonEquipIndex)
+        public bool RefineItem(IPlayerCharacterData character, int nonEquipIndex)
         {
+            var isSuccess = false;
             var refiningItem = character.NonEquipItems[nonEquipIndex];
-            ++refiningItem.level;
-            character.NonEquipItems[nonEquipIndex] = refiningItem;
+            if (Random.value <= successRate)
+            {
+                ++refiningItem.level;
+                character.NonEquipItems[nonEquipIndex] = refiningItem;
+                isSuccess = true;
+            }
+            else
+            {
+                if (refineFailDestroyItem)
+                    character.NonEquipItems.RemoveAt(nonEquipIndex);
+                else
+                {
+                    refiningItem.level -= refineFailDecreaseLevels;
+                    if (refiningItem.level < 1)
+                        refiningItem.level = 1;
+                    character.NonEquipItems[nonEquipIndex] = refiningItem;
+                }
+            }
             foreach (var requireItem in requireItems)
             {
                 if (requireItem.item != null && requireItem.amount > 0)
                     character.DecreaseItems(requireItem.item.DataId, requireItem.amount);
             }
             character.Gold -= requireGold;
+            return isSuccess;
         }
     }
 }

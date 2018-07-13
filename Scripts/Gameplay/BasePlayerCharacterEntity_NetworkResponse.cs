@@ -391,6 +391,34 @@ namespace MultiplayerARPG
                 Gold += item.sellPrice * amount;
         }
 
+        protected virtual void NetFuncRefineItem(int index)
+        {
+            if (IsDead() ||
+                index < 0 ||
+                index >= nonEquipItems.Count)
+                return;
+
+            var nonEquipItem = nonEquipItems[index];
+            var equipmentItem = nonEquipItem.GetEquipmentItem();
+            if (equipmentItem == null)
+                return;
+            if (nonEquipItem.level >= equipmentItem.MaxLevel)
+            {
+                // TODO: May warn that item already reached max level
+                return;
+            }
+            var refineLevel = equipmentItem.itemRefineInfo.levels[nonEquipItem.level - 1];
+            if (!refineLevel.CanRefine(this))
+            {
+                // TODO: may warn that cannot refine
+            }
+            else
+            {
+                // TODO: may send refine success/fail message
+                refineLevel.RefineItem(this, index);
+            }
+        }
+
         protected virtual void NetFuncSendDealingRequest(uint objectId)
         {
             BasePlayerCharacterEntity playerCharacterEntity = null;

@@ -67,7 +67,11 @@ namespace MultiplayerARPG
             switch (skill.skillType)
             {
                 case SkillType.CraftItem:
-                    if (skill.itemCraft.CanCraft(this))
+                    if (!skill.itemCraft.CanCraft(this))
+                    {
+                        // TODO: may warn that cannot refine
+                    }
+                    else
                         skill.itemCraft.CraftItem(this);
                     break;
             }

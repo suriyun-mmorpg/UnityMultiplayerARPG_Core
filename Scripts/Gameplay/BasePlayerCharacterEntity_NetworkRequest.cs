@@ -96,6 +96,15 @@ namespace MultiplayerARPG
             CallNetFunction("SellItem", FunctionReceivers.Server, nonEquipIndex, amount);
         }
 
+        public virtual void RequestRefineItem(int nonEquipIndex)
+        {
+            if (IsDead() ||
+                nonEquipIndex < 0 ||
+                nonEquipIndex >= NonEquipItems.Count)
+                return;
+            CallNetFunction("RefineItem", FunctionReceivers.Server, nonEquipIndex);
+        }
+
         public virtual void RequestSendDealingRequest(uint objectId)
         {
             CallNetFunction("SendDealingRequest", FunctionReceivers.Server, objectId);

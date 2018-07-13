@@ -39,6 +39,7 @@ namespace MultiplayerARPG
         public UICharacterHotkeys uiHotkeys;
         public UICharacterQuests uiQuests;
         public UINpcDialog uiNpcDialog;
+        public UIRefineItem uiRefineItem;
         public UIConstructBuilding uiConstructBuilding;
         public UICurrentBuilding uiCurrentBuilding;
         public UIPlayerActivateMenu uiPlayerActivateMenu;

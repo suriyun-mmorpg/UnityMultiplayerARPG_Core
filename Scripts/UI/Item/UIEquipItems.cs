@@ -92,8 +92,6 @@ namespace MultiplayerARPG
 
         protected void OnSelectCharacterItem(UICharacterItem ui)
         {
-            var uiGameplay = UISceneGameplay.Singleton;
-
             if (uiItemDialog != null && ui.Data.characterItem.IsValid())
             {
                 uiItemDialog.selectionManager = SelectionManager;
