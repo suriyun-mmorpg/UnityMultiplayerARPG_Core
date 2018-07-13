@@ -82,7 +82,7 @@ public class CharacterSkill
                 }
                 break;
             case SkillType.CraftItem:
-                if (!skill.CanCraft(character))
+                if (!skill.itemCraft.CanCraft(character))
                     return false;
                 break;
             default:
