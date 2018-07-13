@@ -521,7 +521,7 @@ public static class CharacterDataExtension
         var decreasingItemIndexes = new Dictionary<int, short>();
         var nonEquipItems = data.NonEquipItems;
         short tempDecresingAmount = 0;
-        for (var i = 0; i < nonEquipItems.Count; ++i)
+        for (var i = nonEquipItems.Count - 1; i >= 0; --i)
         {
             var nonEquipItem = nonEquipItems[i];
             if (nonEquipItem.dataId == dataId)
@@ -558,7 +558,7 @@ public static class CharacterDataExtension
         var decreasingItemIndexes = new Dictionary<int, short>();
         var nonEquipItems = data.NonEquipItems;
         short tempDecresingAmount = 0;
-        for (var i = 0; i < nonEquipItems.Count; ++i)
+        for (var i = nonEquipItems.Count - 1; i >= 0; --i)
         {
             var nonEquipItem = nonEquipItems[i];
             if (nonEquipItem.GetAmmoItem() != null && nonEquipItem.GetAmmoItem().ammoType == ammoType)
