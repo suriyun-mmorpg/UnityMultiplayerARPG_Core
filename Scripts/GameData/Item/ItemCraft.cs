@@ -9,6 +9,7 @@ namespace MultiplayerARPG
     {
         public Item craftingItem;
         public ItemAmount[] craftRequirements;
+        public int requireGold;
 
         private Dictionary<Item, short> cacheCraftRequirements;
         public Dictionary<Item, short> CacheCraftRequirements
@@ -21,11 +22,11 @@ namespace MultiplayerARPG
             }
         }
 
-        public bool CanCraft(ICharacterData character)
+        public bool CanCraft(IPlayerCharacterData character)
         {
             if (craftingItem == null)
                 return false;
-            if (craftRequirements == null || craftRequirements.Length == 0)
+            if ((craftRequirements == null || craftRequirements.Length == 0) && character.Gold >= requireGold)
                 return true;
             foreach (var craftRequirement in craftRequirements)
             {
@@ -34,15 +35,16 @@ namespace MultiplayerARPG
             }
             return true;
         }
-
-        public void CraftItem(ICharacterData character)
+        
+        public void CraftItem(IPlayerCharacterData character)
         {
+            character.IncreaseItems(craftingItem.DataId, 1, 1);
             foreach (var craftRequirement in craftRequirements)
             {
                 if (craftRequirement.item != null && craftRequirement.amount > 0)
                     character.DecreaseItems(craftRequirement.item.DataId, craftRequirement.amount);
             }
-            character.IncreaseItems(craftingItem.DataId, 1, 1);
+            character.Gold -= requireGold;
         }
     }
 }
