@@ -101,7 +101,7 @@ namespace MultiplayerARPG
                 itemCraft.craftingItem = craftingItem;
                 craftingItem = null;
             }
-            if (craftRequirements != null)
+            if (craftRequirements != null && craftRequirements.Length > 0)
             {
                 itemCraft.craftRequirements = craftRequirements;
                 craftRequirements = null;
