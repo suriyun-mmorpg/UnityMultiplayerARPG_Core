@@ -27,7 +27,7 @@ namespace MultiplayerARPG
         public float weight;
         [Range(1, 1000)]
         public short maxStack = 1;
-        public ItemRefineInfo itemRefineInfo;
+        public ItemRefine itemRefineInfo;
 
         // Armor
         public ArmorType armorType;
@@ -132,9 +132,9 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (itemRefineInfo == null || itemRefineInfo.itemRefines == null || itemRefineInfo.itemRefines.Length == 0)
+                if (itemRefineInfo == null || itemRefineInfo.levels == null || itemRefineInfo.levels.Length == 0)
                     return 1;
-                return itemRefineInfo.itemRefines.Length;
+                return itemRefineInfo.levels.Length;
             }
         }
 
