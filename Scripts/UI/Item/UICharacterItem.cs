@@ -15,6 +15,10 @@ namespace MultiplayerARPG
         public string descriptionFormat = "{0}";
         [Tooltip("Level Format => {0} = {Level}")]
         public string levelFormat = "Lv: {0}";
+        [Tooltip("Refine Level Format => {0} = {Refine Level}")]
+        public string refineLevelFormat = "+{0}";
+        [Tooltip("Title Refine Level Format => {0} = {Refine Level}")]
+        public string titleRefineLevelFormat = " (+{0})";
         [Tooltip("Sell Price Format => {0} = {Sell price}")]
         public string sellPriceFormat = "{0}";
         [Tooltip("Stack Format => {0} = {Amount}, {1} = {Max stack}")]
@@ -25,8 +29,6 @@ namespace MultiplayerARPG
         public string weightFormat = "{0}";
         [Tooltip("Item Type Format => {0} = {Item Type title}")]
         public string itemTypeFormat = "Item Type: {0}";
-        [Tooltip("Refine Level Format => {0} = {Refine Level}")]
-        public string refineLevelFormat = "Refine Level: {0}";
         [Tooltip("Junk Item Type")]
         public string junkItemType = "Junk";
         [Tooltip("Shield Item Type")]
@@ -52,7 +54,6 @@ namespace MultiplayerARPG
         public Text textLevel;
         public Image imageIcon;
         public Text textItemType;
-        public Text textRefineLevel;
         public Text textSellPrice;
         public Text textStack;
         public Text textDurability;
@@ -84,6 +85,8 @@ namespace MultiplayerARPG
         [Header("Options")]
         public UICharacterItem uiNextLevelItem;
         public bool showAmountWhenMaxIsOne;
+        public bool showLevelAsDefault;
+        public bool dontAppendRefineLevelToTitle;
 
         private bool isSellItemDialogAppeared;
         private bool isRefineItemAppeared;
@@ -130,13 +133,23 @@ namespace MultiplayerARPG
                 onSetUnEquippableData.Invoke();
 
             if (textTitle != null)
-                textTitle.text = string.Format(titleFormat, item == null ? "Unknow" : item.title);
+            {
+                var str = string.Format(titleFormat, item == null ? "Unknow" : item.title);
+                if (!dontAppendRefineLevelToTitle)
+                    str += string.Format(titleRefineLevelFormat, (level - 1).ToString("N0"));
+                textTitle.text = str;
+            }
 
             if (textDescription != null)
                 textDescription.text = string.Format(descriptionFormat, item == null ? "N/A" : item.description);
 
             if (textLevel != null)
-                textLevel.text = string.Format(levelFormat, level.ToString("N0"));
+            {
+                if (showLevelAsDefault)
+                    textLevel.text = string.Format(levelFormat, level.ToString("N0"));
+                else
+                    textLevel.text = string.Format(refineLevelFormat, (level - 1).ToString("N0"));
+            }
 
             if (imageIcon != null)
             {
@@ -171,12 +184,6 @@ namespace MultiplayerARPG
                         textItemType.text = string.Format(itemTypeFormat, buildingItemType);
                         break;
                 }
-            }
-
-            if (textRefineLevel != null)
-            {
-                textRefineLevel.text = string.Format(refineLevelFormat, "+" + (level - 1).ToString("N0"));
-                textRefineLevel.gameObject.SetActive(level > 1);
             }
 
             if (textSellPrice != null)

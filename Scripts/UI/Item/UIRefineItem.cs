@@ -13,7 +13,7 @@ namespace MultiplayerARPG
         [Tooltip("Success Rate Format => {0} = {Rate}")]
         public string successRateFormat = "Success Rate: {0}%";
         [Tooltip("Refining Level Format => {0} = {Refining Level}")]
-        public string refiningLevelFormat = "{0}";
+        public string refiningLevelFormat = "Refining To: +{0}";
 
         [Header("UI Elements")]
         public UICharacterItem uiRefiningItem;
@@ -79,9 +79,9 @@ namespace MultiplayerARPG
             if (textRefiningLevel != null)
             {
                 if (!canRefine)
-                    textRefiningLevel.text = string.Format(refiningLevelFormat, "+" + (level - 1).ToString("N0"));
+                    textRefiningLevel.text = string.Format(refiningLevelFormat, (level - 1).ToString("N0"));
                 else
-                    textRefiningLevel.text = string.Format(refiningLevelFormat, "+" + level.ToString("N0"));
+                    textRefiningLevel.text = string.Format(refiningLevelFormat, level.ToString("N0"));
             }
         }
 
