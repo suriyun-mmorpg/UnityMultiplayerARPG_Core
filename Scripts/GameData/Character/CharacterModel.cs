@@ -104,6 +104,17 @@ namespace MultiplayerARPG
             }
         }
 
+        private SkinnedMeshRenderer cacheSkinnedMeshRenderer;
+        public SkinnedMeshRenderer CacheSkinnedMeshRenderer
+        {
+            get
+            {
+                if (cacheSkinnedMeshRenderer == null)
+                    cacheSkinnedMeshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
+                return cacheSkinnedMeshRenderer;
+            }
+        }
+
         private AnimatorOverrideController cacheAnimatorController;
         public AnimatorOverrideController CacheAnimatorController
         {
@@ -361,6 +372,12 @@ namespace MultiplayerARPG
                 newModel.gameObject.SetActive(true);
                 newModel.gameObject.layer = gameInstance.characterLayer;
                 newModel.RemoveComponentsInChildren<Collider>(false);
+                var skinnedMesh = newModel.GetComponentInChildren<SkinnedMeshRenderer>();
+                if (skinnedMesh != null && CacheSkinnedMeshRenderer != null)
+                {
+                    skinnedMesh.bones = CacheSkinnedMeshRenderer.bones;
+                    skinnedMesh.rootBone = CacheSkinnedMeshRenderer.rootBone;
+                }
                 models.Add(equipSocket, newModel);
             }
             CreateCacheModel(equipPosition, models);
