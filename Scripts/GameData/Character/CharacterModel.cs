@@ -59,6 +59,9 @@ namespace MultiplayerARPG
         [Header("Legacy Animation")]
         [SerializeField]
         private LegacyAnimationData legacyAnimationData;
+        [Header("Renderer")]
+        [SerializeField]
+        private SkinnedMeshRenderer skinnedMeshRenderer;
         [Header("Collider")]
         public Vector3 center;
         public float radius = 0.5f;
@@ -101,17 +104,6 @@ namespace MultiplayerARPG
                     cacheAnimator.runtimeAnimatorController = CacheAnimatorController;
                 }
                 return cacheAnimator;
-            }
-        }
-
-        private SkinnedMeshRenderer cacheSkinnedMeshRenderer;
-        public SkinnedMeshRenderer CacheSkinnedMeshRenderer
-        {
-            get
-            {
-                if (cacheSkinnedMeshRenderer == null)
-                    cacheSkinnedMeshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
-                return cacheSkinnedMeshRenderer;
             }
         }
 
@@ -373,10 +365,10 @@ namespace MultiplayerARPG
                 newModel.gameObject.layer = gameInstance.characterLayer;
                 newModel.RemoveComponentsInChildren<Collider>(false);
                 var skinnedMesh = newModel.GetComponentInChildren<SkinnedMeshRenderer>();
-                if (skinnedMesh != null && CacheSkinnedMeshRenderer != null)
+                if (skinnedMesh != null && skinnedMeshRenderer != null)
                 {
-                    skinnedMesh.bones = CacheSkinnedMeshRenderer.bones;
-                    skinnedMesh.rootBone = CacheSkinnedMeshRenderer.rootBone;
+                    skinnedMesh.bones = skinnedMeshRenderer.bones;
+                    skinnedMesh.rootBone = skinnedMeshRenderer.rootBone;
                 }
                 models.Add(equipSocket, newModel);
             }
