@@ -20,8 +20,9 @@ namespace MultiplayerARPG
 #endif
         }
 
-        protected virtual void SetupNetElements()
+        protected override void SetupNetElements()
         {
+            base.SetupNetElements();
             id.sendOptions = SendOptions.ReliableOrdered;
             id.forOwnerOnly = false;
             dataId.sendOptions = SendOptions.ReliableOrdered;
