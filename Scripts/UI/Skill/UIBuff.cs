@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UIBuff : UISelectionEntry<BuffLevelTuple>
+    public partial class UIBuff : UISelectionEntry<BuffLevelTuple>
     {
         [Tooltip("Duration Format => {0} = {Duration}")]
         public string durationFormat = "Duration: {0}";

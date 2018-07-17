@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class UICharacterHotkeyAssigner : UIBase
+    public partial class UICharacterHotkeyAssigner : UIBase
     {
         public string hotkeyId { get; protected set; }
 

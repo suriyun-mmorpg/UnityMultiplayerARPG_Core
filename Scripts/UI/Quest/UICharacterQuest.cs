@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UICharacterQuest : UIDataForCharacter<CharacterQuest>
+    public partial class UICharacterQuest : UIDataForCharacter<CharacterQuest>
     {
         [Header("Generic Info Format")]
         [Tooltip("Title Format => {0} = {Title}")]

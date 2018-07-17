@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class UIPlayerActivateMenu : UISelectionEntry<BasePlayerCharacterEntity>
+    public partial class UIPlayerActivateMenu : UISelectionEntry<BasePlayerCharacterEntity>
     {
         public UICharacter uiCharacter;
 

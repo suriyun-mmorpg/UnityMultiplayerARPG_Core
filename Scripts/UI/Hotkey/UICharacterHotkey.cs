@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
+    public partial class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
     {
         public int indexOfData { get; protected set; }
         public KeyCode key;
@@ -18,8 +18,10 @@ namespace MultiplayerARPG
             Data = data;
         }
 
-        private void Update()
+        protected override void Update()
         {
+            base.Update();
+
             if (Input.GetKeyDown(key))
             {
                 bool canUse = true;

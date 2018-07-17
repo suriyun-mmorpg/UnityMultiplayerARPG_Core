@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UIRefineItem : UISelectionEntry<int>
+    public partial class UIRefineItem : UISelectionEntry<int>
     {
         [Header("Generic Info Format")]
         [Tooltip("Require Gold Format => {0} = {Amount}")]

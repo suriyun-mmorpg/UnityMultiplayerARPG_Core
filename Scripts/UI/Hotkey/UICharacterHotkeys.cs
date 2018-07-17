@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(UICharacterHotkeySelectionManager))]
-    public class UICharacterHotkeys : UIBase
+    public partial class UICharacterHotkeys : UIBase
     {
         public UICharacterHotkeyPair[] uiCharacterHotkeys;
 
@@ -42,8 +42,6 @@ namespace MultiplayerARPG
                 for (var i = 0; i < uiCharacterHotkeys.Length; ++i)
                 {
                     var uiCharacterHotkey = uiCharacterHotkeys[i];
-                    if (uiCharacterHotkey == null)
-                        continue;
                     var id = uiCharacterHotkey.hotkeyId;
                     var ui = uiCharacterHotkey.ui;
                     if (!string.IsNullOrEmpty(id) && ui != null)

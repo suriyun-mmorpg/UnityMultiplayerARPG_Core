@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UIAttributeAmounts : UISelectionEntry<Dictionary<Attribute, short>>
+    public partial class UIAttributeAmounts : UISelectionEntry<Dictionary<Attribute, short>>
     {
         [Tooltip("Attribute Amount Format => {0} = {Attribute title}, {1} = {Current Amount}, {2} = {Target Amount}")]
         public string amountFormat = "{0}: {1}/{2}";

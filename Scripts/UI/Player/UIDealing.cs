@@ -7,7 +7,7 @@ using UnityEngine.UI;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(UICharacterItemSelectionManager))]
-    public class UIDealing : UISelectionEntry<BasePlayerCharacterEntity>
+    public partial class UIDealing : UISelectionEntry<BasePlayerCharacterEntity>
     {
         [Header("Display Format")]
         [Tooltip("Gold Format => {0} = {Gold}")]

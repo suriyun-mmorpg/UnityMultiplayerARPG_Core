@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UIResistanceAmounts : UISelectionEntry<Dictionary<DamageElement, float>>
+    public partial class UIResistanceAmounts : UISelectionEntry<Dictionary<DamageElement, float>>
     {
         [Tooltip("Resistance Amount Format => {0} = {Resistance title}, {1} = {Amount * 100f}")]
         public string amountFormat = "{0}: {1}%";

@@ -14,6 +14,7 @@ public abstract class UISelectionEntry<T> : UIBase
         {
             data = value;
             UpdateData();
+            this.InvokeClassAddOnMethods("UpdateData");
         }
     }
     public UISelectionManager selectionManager;
@@ -44,15 +45,15 @@ public abstract class UISelectionEntry<T> : UIBase
         if (Time.unscaledTime - lastUpdateTime >= updateUIRepeatRate)
         {
             UpdateUI();
+            this.InvokeClassAddOnMethods("UpdateUI");
             lastUpdateTime = Time.unscaledTime;
         }
     }
 
-    protected virtual void UpdateUI() { }
-
     public void ForceUpdate()
     {
         UpdateData();
+        this.InvokeClassAddOnMethods("UpdateData");
     }
 
     public void OnClickSelect()
@@ -61,9 +62,9 @@ public abstract class UISelectionEntry<T> : UIBase
         {
             var selectionMode = selectionManager.selectionMode;
             var selectedUI = selectionManager.GetSelectedUI();
-            if (selectionMode != UISelectionMode.Toggle && selectedUI != null && (UIBaseAddOn)selectedUI == this)
+            if (selectionMode != UISelectionMode.Toggle && selectedUI != null && (UIBase)selectedUI == this)
                 selectionManager.Deselect(this);
-            else if (selectedUI == null || (UIBaseAddOn)selectedUI != this)
+            else if (selectedUI == null || (UIBase)selectedUI != this)
                 selectionManager.Select(this);
         }
     }
@@ -77,6 +78,7 @@ public abstract class UISelectionEntry<T> : UIBase
     {
         IsSelected = false;
     }
-
+    
+    protected virtual void UpdateUI() { }
     protected abstract void UpdateData();
 }

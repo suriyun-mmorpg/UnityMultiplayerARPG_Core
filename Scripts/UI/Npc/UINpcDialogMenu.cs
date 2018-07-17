@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         public int menuIndex;
     }
 
-    public class UINpcDialogMenu : UISelectionEntry<UINpcDialogMenuAction>
+    public partial class UINpcDialogMenu : UISelectionEntry<UINpcDialogMenuAction>
     {
         [Header("UI Elements")]
         public Text title;

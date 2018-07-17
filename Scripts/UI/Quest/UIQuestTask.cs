@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UIQuestTask : UISelectionEntry<QuestTaskProgressTuple>
+    public partial class UIQuestTask : UISelectionEntry<QuestTaskProgressTuple>
     {
         [Header("Generic Info Format")]
         [Tooltip("Kill Monster Task Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}")]

@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UICharacter : UISelectionEntry<ICharacterData>
+    public partial class UICharacter : UISelectionEntry<ICharacterData>
     {
         public int dataId { get; protected set; }
 

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UICharacterStats : UISelectionEntry<CharacterStats>
+    public partial class UICharacterStats : UISelectionEntry<CharacterStats>
     {
         [Header("Format")]
         [Tooltip("Hp Stats Format => {0} = {Amount}")]

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public class UICharacterHotkeyPair
+    public struct UICharacterHotkeyPair
     {
         public string hotkeyId;
         public UICharacterHotkey ui;

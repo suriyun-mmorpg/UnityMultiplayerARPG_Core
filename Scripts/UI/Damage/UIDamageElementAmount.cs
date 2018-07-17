@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UIDamageElementAmount : UISelectionEntry<DamageElementAmountTuple>
+    public partial class UIDamageElementAmount : UISelectionEntry<DamageElementAmountTuple>
     {
         [Tooltip("Damage Amount Format => {0} = {Element title}, {1} = {Min damage}, {2} = {Max damage}")]
         public string amountFormat = "{0}: {1}~{2}";

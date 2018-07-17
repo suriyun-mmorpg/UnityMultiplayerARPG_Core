@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UICharacterAttribute : UIDataForCharacter<CharacterAttributeAmountTuple>
+    public partial class UICharacterAttribute : UIDataForCharacter<CharacterAttributeAmountTuple>
     {
         [Header("Generic Info Format")]
         [Tooltip("Title Format => {0} = {Title}")]

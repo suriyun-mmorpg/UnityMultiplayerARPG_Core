@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class UIDealingRequest : UISelectionEntry<BasePlayerCharacterEntity>
+    public partial class UIDealingRequest : UISelectionEntry<BasePlayerCharacterEntity>
     {
         public UICharacter uiAnotherCharacter;
 

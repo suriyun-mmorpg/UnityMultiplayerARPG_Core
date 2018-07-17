@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class UICharacterBuffs : UIBase
+    public partial class UICharacterBuffs : UIBase
     {
         public ICharacterData character { get; protected set; }
         public UICharacterBuff uiCharacterBuffPrefab;

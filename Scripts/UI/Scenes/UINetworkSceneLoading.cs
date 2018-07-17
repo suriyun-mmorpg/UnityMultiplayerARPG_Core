@@ -1,12 +1,10 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public class UINetworkSceneLoading : MonoBehaviour
+    public partial class UINetworkSceneLoading : MonoBehaviour
     {
         public static UINetworkSceneLoading Singleton { get; private set; }
         public GameObject rootObject;

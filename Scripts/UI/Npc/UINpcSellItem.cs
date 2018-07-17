@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UINpcSellItem : UISelectionEntry<NpcSellItem>
+    public partial class UINpcSellItem : UISelectionEntry<NpcSellItem>
     {
         [Tooltip("Sell Price Format => {0} = {Sell price}")]
         public string sellPriceFormat = "{0}";

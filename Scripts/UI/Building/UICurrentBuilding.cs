@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class UICurrentBuilding : UIBase
+    public partial class UICurrentBuilding : UIBase
     {
         public void OnClickDestroy()
         {

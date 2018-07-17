@@ -1,12 +1,11 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UISceneLoading : MonoBehaviour
+    public partial class UISceneLoading : MonoBehaviour
     {
         public static UISceneLoading Singleton { get; private set; }
         public GameObject rootObject;

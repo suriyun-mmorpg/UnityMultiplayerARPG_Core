@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(UICharacterQuestSelectionManager))]
-    public class UICharacterQuests : UIBase
+    public partial class UICharacterQuests : UIBase
     {
         public ICharacterData character { get; protected set; }
         public UICharacterQuest uiQuestDialog;

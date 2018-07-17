@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UIEquipmentItemRequirement : UISelectionEntry<Item>
+    public partial class UIEquipmentItemRequirement : UISelectionEntry<Item>
     {
         [Header("Requirement Format")]
         [Tooltip("Require Level Format => {0} = {Level}")]

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(UICharacterItemSelectionManager))]
-    public class UIEquipItems : UIBase
+    public partial class UIEquipItems : UIBase
     {
         public ICharacterData character { get; protected set; }
         public UICharacterItem uiItemDialog;

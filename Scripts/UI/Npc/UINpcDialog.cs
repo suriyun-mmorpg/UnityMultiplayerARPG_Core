@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UINpcDialog : UISelectionEntry<NpcDialog>
+    public partial class UINpcDialog : UISelectionEntry<NpcDialog>
     {
         [Header("Generic Info Format")]
         [Tooltip("Title Format => {0} = {Title}")]

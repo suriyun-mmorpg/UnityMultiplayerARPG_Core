@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UICharacterBuff : UIDataForCharacter<CharacterBuff>
+    public partial class UICharacterBuff : UIDataForCharacter<CharacterBuff>
     {
         [Header("Generic Info Format")]
         [Tooltip("Title Format => {0} = {Title}")]
@@ -28,8 +28,10 @@ namespace MultiplayerARPG
 
         protected float collectedDeltaTime;
 
-        private void Update()
+        protected override void Update()
         {
+            base.Update();
+
             var characterBuff = Data;
 
             collectedDeltaTime += Time.deltaTime;

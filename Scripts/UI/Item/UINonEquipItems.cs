@@ -3,7 +3,7 @@
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(UICharacterItemSelectionManager))]
-    public class UINonEquipItems : UIBase
+    public partial class UINonEquipItems : UIBase
     {
         public ICharacterData character { get; protected set; }
         public UICharacterItem uiItemDialog;

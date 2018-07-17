@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -20,7 +19,7 @@ namespace MultiplayerARPG
         WaterRecovery,
     }
 
-    public class UISceneGameplay : MonoBehaviour
+    public partial class UISceneGameplay : MonoBehaviour
     {
         [System.Serializable]
         public struct UIToggleUI

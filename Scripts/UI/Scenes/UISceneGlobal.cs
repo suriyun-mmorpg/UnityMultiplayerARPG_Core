@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class UISceneGlobal : MonoBehaviour
+    public partial class UISceneGlobal : MonoBehaviour
     {
         public static UISceneGlobal Singleton { get; private set; }
         public UIMessageDialog uiMessageDialog;

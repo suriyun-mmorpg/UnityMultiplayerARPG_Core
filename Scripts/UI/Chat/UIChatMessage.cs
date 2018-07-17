@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UIChatMessage : UISelectionEntry<ChatMessage>
+    public partial class UIChatMessage : UISelectionEntry<ChatMessage>
     {
         [Tooltip("Chat message format {0} = Character Name, {1} = Message")]
         public string globalFormat = "<color=white>(GLOBAL) {0}: {1}</color>";

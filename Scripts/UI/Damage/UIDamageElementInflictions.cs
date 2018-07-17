@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UIDamageElementInflictions : UISelectionEntry<Dictionary<DamageElement, float>>
+    public partial class UIDamageElementInflictions : UISelectionEntry<Dictionary<DamageElement, float>>
     {
         [Tooltip("Default Element Infliction Format => {1} = {Rate}")]
         public string defaultElementInflictionFormat = "Inflict {1}% damage";

@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UICharacterSkill : UIDataForCharacter<CharacterSkillLevelTuple>
+    public partial class UICharacterSkill : UIDataForCharacter<CharacterSkillLevelTuple>
     {
         [Header("Generic Info Format")]
         [Tooltip("Title Format => {0} = {Title}")]
@@ -67,8 +67,10 @@ namespace MultiplayerARPG
 
         protected float collectedDeltaTime;
 
-        private void Update()
+        protected override void Update()
         {
+            base.Update();
+
             var characterSkill = Data.characterSkill;
             var skill = characterSkill.GetSkill();
             var level = Data.targetLevel;

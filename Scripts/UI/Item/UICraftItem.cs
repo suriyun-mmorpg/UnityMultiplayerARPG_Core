@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UICraftItem : UISelectionEntry<ItemCraft>
+    public partial class UICraftItem : UISelectionEntry<ItemCraft>
     {
         [Header("Generic Info Format")]
         [Tooltip("Require Gold Format => {0} = {Amount}")]

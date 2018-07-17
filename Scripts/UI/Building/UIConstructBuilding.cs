@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class UIConstructBuilding : UIBase
+    public partial class UIConstructBuilding : UIBase
     {
         public void OnClickConfirmBuild()
         {

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UIChatHandler : UIBase
+    public partial class UIChatHandler : UIBase
     {
         public string whisperCommand = "/w";
         /* TODO: Implement this later

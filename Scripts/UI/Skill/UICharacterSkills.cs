@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(UICharacterSkillSelectionManager))]
-    public class UICharacterSkills : UIBase
+    public partial class UICharacterSkills : UIBase
     {
         public ICharacterData character { get; protected set; }
         public enum ListingMode
