@@ -17,8 +17,7 @@ namespace MultiplayerARPG
         public Material[] canBuildMaterials;
         public Material[] cannotBuildMaterials;
         [HideInInspector]
-        public BuildingObject buildingObject;
-        public BuildingEntity buildingEntity { get { return buildingObject == null ? null : buildingObject.buildingEntity; } }
+        public BuildingEntity buildingEntity;
 
         private Renderer meshRenderer;
 
@@ -60,19 +59,19 @@ namespace MultiplayerARPG
 
         private void OnTriggerEnter(Collider other)
         {
-            if (buildingObject != null)
+            if (buildingEntity != null)
             {
-                buildingObject.TriggerEnterEntity(other.GetComponent<RpgNetworkEntity>());
-                buildingObject.TriggerEnterBuildingMaterial(other.GetComponent<BuildingMaterial>());
+                buildingEntity.TriggerEnterEntity(other.GetComponent<RpgNetworkEntity>());
+                buildingEntity.TriggerEnterBuildingMaterial(other.GetComponent<BuildingMaterial>());
             }
         }
 
         private void OnTriggerExit(Collider other)
         {
-            if (buildingObject != null)
+            if (buildingEntity != null)
             {
-                buildingObject.TriggerExitEntity(other.GetComponent<RpgNetworkEntity>());
-                buildingObject.TriggerExitBuildingMaterial(other.GetComponent<BuildingMaterial>());
+                buildingEntity.TriggerExitEntity(other.GetComponent<RpgNetworkEntity>());
+                buildingEntity.TriggerExitBuildingMaterial(other.GetComponent<BuildingMaterial>());
             }
         }
     }

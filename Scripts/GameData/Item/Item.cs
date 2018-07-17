@@ -60,6 +60,7 @@ namespace MultiplayerARPG
 
         // Building
         public BuildingObject buildingObject;
+        public BuildingEntity buildingEntity;
 
 #if UNITY_EDITOR
         protected virtual void OnValidate()
@@ -78,6 +79,22 @@ namespace MultiplayerARPG
                 case ItemType.Building:
                     itemRefineInfo = null;
                     break;
+            }
+            if (buildingObject != null)
+            {
+                var identity = buildingObject.GetComponent<LiteNetLibManager.LiteNetLibIdentity>();
+                if (identity == null)
+                    identity = buildingObject.gameObject.AddComponent<LiteNetLibManager.LiteNetLibIdentity>();
+                buildingEntity = buildingObject.GetComponent<BuildingEntity>();
+                if (buildingEntity == null)
+                    buildingEntity = buildingObject.gameObject.AddComponent<BuildingEntity>();
+                buildingEntity.title = buildingObject.title;
+                buildingEntity.buildingType = buildingObject.buildingType;
+                buildingEntity.characterForwardDistance = buildingObject.characterForwardDistance;
+                buildingEntity.maxHp = buildingObject.maxHp;
+                buildingEntity.combatTextTransform = buildingObject.combatTextTransform;
+                Destroy(buildingObject);
+                buildingObject = null;
             }
             EditorUtility.SetDirty(this);
         }

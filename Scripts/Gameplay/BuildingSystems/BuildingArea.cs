@@ -10,12 +10,11 @@ namespace MultiplayerARPG
         public bool snapBuildingObject;
 
         [HideInInspector]
-        public BuildingObject buildingObject;
-        public BuildingEntity buildingEntity { get { return buildingObject == null ? null : buildingObject.buildingEntity; } }
+        public BuildingEntity buildingEntity;
 
         public uint EntityObjectId
         {
-            get { return buildingObject == null ? 0 : buildingObject.EntityObjectId; }
+            get { return buildingEntity == null ? 0 : buildingEntity.ObjectId; }
         }
     }
 }
