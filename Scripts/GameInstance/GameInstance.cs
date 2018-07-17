@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class GameInstance : MonoBehaviour
+    public partial class GameInstance : MonoBehaviour
     {
         public static GameInstance Singleton { get; protected set; }
         [SerializeField]
@@ -54,12 +54,6 @@ namespace MultiplayerARPG
         public ItemAmount[] startItems;
         [Header("Scene/Maps")]
         public UnityScene homeScene;
-        [System.Obsolete("`Start Scene` is deprecated and will be removed next version, use `Map Infos` instead.")]
-        public UnityScene startScene;
-        [System.Obsolete("`Start Position` is deprecated and will be removed next version, use `Map Infos` instead.")]
-        public Vector3 startPosition;
-        [System.Obsolete("`Other Scenes` is deprecated and will be removed next version, use `Map Infos` instead.")]
-        public UnityScene[] otherScenes;
         [Header("Player Configs")]
         public int minCharacterNameLength = 2;
         public int maxCharacterNameLength = 16;
@@ -260,29 +254,6 @@ namespace MultiplayerARPG
             var playerCharacters = new List<BaseCharacter>();
             var monsterCharacters = new List<BaseCharacter>();
             var mapInfos = new List<MapInfo>();
-            // Backward compatibility
-            if (startScene.IsSet())
-            {
-                Debug.LogWarning("[GameInstance] `Start Scene`/`Start Position` is deprecated and will be removed next version, use `Map Infos` instead.");
-                var newMapInfo = ScriptableObject.CreateInstance<MapInfo>();
-                newMapInfo.scene = new UnityScene();
-                newMapInfo.scene.SceneName = startScene.SceneName;
-                newMapInfo.startPosition = startPosition;
-                mapInfos.Add(newMapInfo);
-            }
-            if (otherScenes.Length > 0)
-            {
-                Debug.LogWarning("[GameInstance] `Other Scenes` is deprecated and will be removed next version, use `Map Infos` instead.");
-                foreach (var otherScene in otherScenes)
-                {
-                    if (!otherScene.IsSet())
-                        continue;
-                    var newMapInfo = ScriptableObject.CreateInstance<MapInfo>();
-                    newMapInfo.scene = new UnityScene();
-                    newMapInfo.scene.SceneName = otherScene.SceneName;
-                    mapInfos.Add(newMapInfo);
-                }
-            }
             // Filtering game data
             foreach (var gameData in gameDataList)
             {
@@ -330,6 +301,8 @@ namespace MultiplayerARPG
 
             if (npcDatabase != null)
                 AddMapNpcs(npcDatabase.maps);
+
+            this.InvokeClassAddOnMethods("Awake");
         }
 
         private void Start()
