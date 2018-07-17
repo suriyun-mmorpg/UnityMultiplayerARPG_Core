@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UICharacterItem : UIDataForCharacter<CharacterItemLevelTuple>
+    public partial class UICharacterItem : UIDataForCharacter<CharacterItemLevelTuple>
     {
         public string equipPosition { get; protected set; }
 
