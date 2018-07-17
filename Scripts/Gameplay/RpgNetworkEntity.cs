@@ -2,16 +2,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using LiteNetLib;
 using LiteNetLibManager;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
     public class RpgNetworkEntity : LiteNetLibBehaviour
     {
-        public string title;
+        [SerializeField]
+        private string title;
         public Text textTitle;
 
-        public virtual string Title { get { return title; } set { title = value; } }
+        protected SyncFieldString syncTitle = new SyncFieldString();
+        public virtual string Title
+        {
+            get { return title; }
+            set
+            {
+                title = value;
+                if (IsServer)
+                    syncTitle.Value = value;
+            }
+        }
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
 
         private Transform cacheTransform;
@@ -67,16 +82,41 @@ namespace MultiplayerARPG
             this.InvokeClassAddOnMethods("OnDestroy");
         }
 
+        public override void OnBehaviourValidate()
+        {
+            base.OnBehaviourValidate();
+#if UNITY_EDITOR
+            SetupNetElements();
+            EditorUtility.SetDirty(gameObject);
+#endif
+        }
+
         public override void OnSetup()
         {
             base.OnSetup();
             this.InvokeClassAddOnMethods("OnSetup");
+            SetupNetElements();
+            syncTitle.onChange += OnSyncTitleChange;
+            if (IsServer)
+                syncTitle.Value = title;
+        }
+
+        protected virtual void SetupNetElements()
+        {
+            syncTitle.sendOptions = SendOptions.ReliableUnordered;
+            syncTitle.forOwnerOnly = false;
         }
 
         public override void OnNetworkDestroy(DestroyObjectReasons reasons)
         {
             base.OnNetworkDestroy(reasons);
             this.InvokeClassAddOnMethods("OnNetworkDestroy", reasons);
+            syncTitle.onChange -= OnSyncTitleChange;
+        }
+
+        protected virtual void OnSyncTitleChange(string syncTitle)
+        {
+            title = syncTitle;
         }
 
         public bool TryGetEntityByObjectId<T>(uint objectId, out T result) where T : LiteNetLibBehaviour
