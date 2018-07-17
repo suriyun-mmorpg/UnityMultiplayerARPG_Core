@@ -88,7 +88,7 @@ namespace MultiplayerARPG
                 buildingEntity = buildingObject.GetComponent<BuildingEntity>();
                 if (buildingEntity == null)
                     buildingEntity = buildingObject.gameObject.AddComponent<BuildingEntity>();
-                buildingEntity.title = buildingObject.title;
+                buildingEntity.Title = buildingObject.title;
                 buildingEntity.buildingType = buildingObject.buildingType;
                 buildingEntity.characterForwardDistance = buildingObject.characterForwardDistance;
                 buildingEntity.maxHp = buildingObject.maxHp;
