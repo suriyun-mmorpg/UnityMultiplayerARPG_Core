@@ -197,8 +197,8 @@ namespace MultiplayerARPG
                     playSpeedMultiplier = CacheAtkSpeed;
                     break;
             }
-            if (Model != null)
-                yield return Model.PlayActionAnimation(actionId, animActionType, playSpeedMultiplier);
+            if (CharacterModel != null)
+                yield return CharacterModel.PlayActionAnimation(actionId, animActionType, playSpeedMultiplier);
             this.animActionType = AnimActionType.None;
         }
 
@@ -209,9 +209,9 @@ namespace MultiplayerARPG
         protected virtual void NetFuncPlayEffect(int effectId)
         {
             GameEffectCollection gameEffectCollection;
-            if (Model == null || !GameInstance.GameEffectCollections.TryGetValue(effectId, out gameEffectCollection))
+            if (CharacterModel == null || !GameInstance.GameEffectCollections.TryGetValue(effectId, out gameEffectCollection))
                 return;
-            Model.InstantiateEffect(gameEffectCollection.effects);
+            CharacterModel.InstantiateEffect(gameEffectCollection.effects);
         }
 
         /// <summary>
@@ -363,8 +363,8 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncOnLevelUp()
         {
-            if (gameInstance.levelUpEffect != null && Model != null)
-                Model.InstantiateEffect(new GameEffect[] { gameInstance.levelUpEffect });
+            if (gameInstance.levelUpEffect != null && CharacterModel != null)
+                CharacterModel.InstantiateEffect(new GameEffect[] { gameInstance.levelUpEffect });
             if (onLevelUp != null)
                 onLevelUp.Invoke();
         }

@@ -12,12 +12,8 @@ namespace MultiplayerARPG
         [SerializeField]
         private NetworkSetting networkSetting;
         [Header("Gameplay Objects")]
-        public BasePlayerCharacterEntity playerCharacterEntityPrefab;
-        public BaseMonsterCharacterEntity monsterCharacterEntityPrefab;
         public ItemDropEntity itemDropEntityPrefab;
-        public BuildingEntity buildingEntityPrefab;
         public WarpPortalEntity warpPortalEntityPrefab;
-        public NpcEntity npcEntityPrefab;
         public UISceneGameplay uiSceneGameplayPrefab;
         public UISceneGameplay uiSceneGameplayMobilePrefab;
         public ServerCharacter serverCharacterPrefab;
@@ -70,12 +66,15 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, NpcDialog> NpcDialogs = new Dictionary<int, NpcDialog>();
         public static readonly Dictionary<int, Quest> Quests = new Dictionary<int, Quest>();
         public static readonly Dictionary<int, BaseDamageEntity> DamageEntities = new Dictionary<int, BaseDamageEntity>();
-        public static readonly Dictionary<int, BuildingObject> BuildingObjects = new Dictionary<int, BuildingObject>();
+        public static readonly Dictionary<int, BuildingEntity> BuildingEntities = new Dictionary<int, BuildingEntity>();
+        public static readonly Dictionary<int, BasePlayerCharacterEntity> PlayerCharacterEntities = new Dictionary<int, BasePlayerCharacterEntity>();
+        public static readonly Dictionary<int, BaseMonsterCharacterEntity> MonsterCharacterEntities = new Dictionary<int, BaseMonsterCharacterEntity>();
+        public static readonly Dictionary<int, WarpPortalEntity> WarpPortalEntities = new Dictionary<int, WarpPortalEntity>();
+        public static readonly Dictionary<int, NpcEntity> NpcEntities = new Dictionary<int, NpcEntity>();
         public static readonly Dictionary<int, ActionAnimation> ActionAnimations = new Dictionary<int, ActionAnimation>();
         public static readonly Dictionary<int, GameEffectCollection> GameEffectCollections = new Dictionary<int, GameEffectCollection>();
-        public static readonly Dictionary<int, CharacterModel> CharacterModels = new Dictionary<int, CharacterModel>();
-        public static readonly Dictionary<string, WarpPortals> MapWarpPortals = new Dictionary<string, WarpPortals>();
-        public static readonly Dictionary<string, Npcs> MapNpcs = new Dictionary<string, Npcs>();
+        public static readonly Dictionary<string, List<WarpPortal>> MapWarpPortals = new Dictionary<string, List<WarpPortal>>();
+        public static readonly Dictionary<string, List<Npc>> MapNpcs = new Dictionary<string, List<Npc>>();
         public static readonly Dictionary<string, MapInfo> MapInfos = new Dictionary<string, MapInfo>();
 
         #region Cache Data
@@ -202,44 +201,27 @@ namespace MultiplayerARPG
             DontDestroyOnLoad(gameObject);
             Singleton = this;
 
-            if (playerCharacterEntityPrefab == null)
-            {
-                Debug.LogError("You must set player character entity prefab");
-                return;
-            }
-            if (monsterCharacterEntityPrefab == null)
-            {
-                Debug.LogError("You must set monster character entity prefab");
-                return;
-            }
-            if (itemDropEntityPrefab == null)
-            {
-                Debug.LogError("You must set item drop entity prefab");
-                return;
-            }
-            if (buildingEntityPrefab == null)
-            {
-                Debug.LogError("You must set building entity prefab");
-                return;
-            }
-
             InputManager.useMobileInputOnNonMobile = useMobileInEditor;
 
             // Load game data
             Attributes.Clear();
             Items.Clear();
-            Skills.Clear();
-            NpcDialogs.Clear();
-            Quests.Clear();
             AllCharacters.Clear();
             PlayerCharacters.Clear();
             MonsterCharacters.Clear();
+            Skills.Clear();
+            NpcDialogs.Clear();
+            Quests.Clear();
             DamageEntities.Clear();
-            BuildingObjects.Clear();
+            BuildingEntities.Clear();
+            PlayerCharacterEntities.Clear();
+            MonsterCharacterEntities.Clear();
+            WarpPortalEntities.Clear();
+            NpcEntities.Clear();
             ActionAnimations.Clear();
             GameEffectCollections.Clear();
-            CharacterModels.Clear();
             MapWarpPortals.Clear();
+            MapNpcs.Clear();
             MapInfos.Clear();
 
             // Use Resources Load Async ?
@@ -398,7 +380,7 @@ namespace MultiplayerARPG
         public static void AddItems(IEnumerable<Item> items)
         {
             var damageEntities = new List<BaseDamageEntity>();
-            var buildingObjects = new List<BuildingObject>();
+            var buildingEntities = new List<BuildingEntity>();
             foreach (var item in items)
             {
                 if (item == null || Items.ContainsKey(item.DataId))
@@ -416,17 +398,18 @@ namespace MultiplayerARPG
                 }
                 if (item.IsBuilding())
                 {
-                    if (item.buildingObject != null)
-                        buildingObjects.Add(item.buildingObject);
+                    if (item.buildingEntity != null)
+                        buildingEntities.Add(item.buildingEntity);
                 }
             }
             AddDamageEntities(damageEntities);
-            AddBuildingObjects(buildingObjects);
+            AddBuildingEntities(buildingEntities);
         }
 
         public static void AddCharacters(IEnumerable<BaseCharacter> characters)
         {
-            var characterModels = new List<CharacterModel>();
+            var playerCharacterEntities = new List<BasePlayerCharacterEntity>();
+            var monsterCharacterEntities = new List<BaseMonsterCharacterEntity>();
             var damageEntities = new List<BaseDamageEntity>();
             foreach (var character in characters)
             {
@@ -437,19 +420,21 @@ namespace MultiplayerARPG
                 {
                     var playerCharacter = character as PlayerCharacter;
                     PlayerCharacters[character.DataId] = playerCharacter;
+                    playerCharacterEntities.Add(playerCharacter.entityPrefab as BasePlayerCharacterEntity);
                 }
                 else if (character is MonsterCharacter)
                 {
                     var monsterCharacter = character as MonsterCharacter;
                     MonsterCharacters[character.DataId] = monsterCharacter;
+                    monsterCharacterEntities.Add(monsterCharacter.entityPrefab as BaseMonsterCharacterEntity);
                     AddActionAnimations(ActionAnimationType.MonsterAttack, monsterCharacter.attackAnimations);
                     var missileDamageEntity = monsterCharacter.damageInfo.missileDamageEntity;
                     if (missileDamageEntity != null)
                         damageEntities.Add(missileDamageEntity);
                 }
-                characterModels.Add(character.model);
             }
-            AddCharacterModels(characterModels);
+            AddPlayerCharacterEntities(playerCharacterEntities);
+            AddMonsterCharacterEntities(monsterCharacterEntities);
             AddDamageEntities(damageEntities);
         }
 
@@ -498,21 +483,21 @@ namespace MultiplayerARPG
                 return;
             foreach (var damageEntity in damageEntities)
             {
-                if (damageEntity == null || DamageEntities.ContainsKey(damageEntity.DataId))
+                if (damageEntity == null || DamageEntities.ContainsKey(damageEntity.Identity.HashAssetId))
                     continue;
-                DamageEntities[damageEntity.DataId] = damageEntity;
+                DamageEntities[damageEntity.Identity.HashAssetId] = damageEntity;
             }
         }
 
-        public static void AddBuildingObjects(IEnumerable<BuildingObject> buildingObjects)
+        public static void AddBuildingEntities(IEnumerable<BuildingEntity> buildingEntities)
         {
-            if (buildingObjects == null)
+            if (buildingEntities == null)
                 return;
-            foreach (var buildingObject in buildingObjects)
+            foreach (var buildingEntity in buildingEntities)
             {
-                if (buildingObject == null || BuildingObjects.ContainsKey(buildingObject.DataId))
+                if (buildingEntity == null || BuildingEntities.ContainsKey(buildingEntity.DataId))
                     continue;
-                BuildingObjects[buildingObject.DataId] = buildingObject;
+                BuildingEntities[buildingEntity.DataId] = buildingEntity;
             }
         }
 
@@ -544,15 +529,51 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void AddCharacterModels(IEnumerable<CharacterModel> characterModels)
+        public static void AddPlayerCharacterEntities(IEnumerable<BasePlayerCharacterEntity> characterEntities)
         {
-            if (characterModels == null)
+            if (characterEntities == null)
                 return;
-            foreach (var characterModel in characterModels)
+            foreach (var characterEntity in characterEntities)
             {
-                if (characterModel == null || CharacterModels.ContainsKey(characterModel.DataId))
+                if (characterEntity == null || PlayerCharacterEntities.ContainsKey(characterEntity.Identity.HashAssetId))
                     continue;
-                CharacterModels[characterModel.DataId] = characterModel;
+                PlayerCharacterEntities[characterEntity.Identity.HashAssetId] = characterEntity;
+            }
+        }
+
+        public static void AddMonsterCharacterEntities(IEnumerable<BaseMonsterCharacterEntity> characterEntities)
+        {
+            if (characterEntities == null)
+                return;
+            foreach (var characterEntity in characterEntities)
+            {
+                if (characterEntity == null || MonsterCharacterEntities.ContainsKey(characterEntity.Identity.HashAssetId))
+                    continue;
+                MonsterCharacterEntities[characterEntity.Identity.HashAssetId] = characterEntity;
+            }
+        }
+
+        public static void AddWarpPortalEntities(IEnumerable<WarpPortalEntity> warpPortalEntities)
+        {
+            if (warpPortalEntities == null)
+                return;
+            foreach (var warpPortalEntity in warpPortalEntities)
+            {
+                if (warpPortalEntity == null || WarpPortalEntities.ContainsKey(warpPortalEntity.Identity.HashAssetId))
+                    continue;
+                WarpPortalEntities[warpPortalEntity.Identity.HashAssetId] = warpPortalEntity;
+            }
+        }
+
+        public static void AddNpcEntities(IEnumerable<NpcEntity> npcEntities)
+        {
+            if (npcEntities == null)
+                return;
+            foreach (var npcEntity in npcEntities)
+            {
+                if (npcEntity == null || NpcEntities.ContainsKey(npcEntity.Identity.HashAssetId))
+                    continue;
+                NpcEntities[npcEntity.Identity.HashAssetId] = npcEntity;
             }
         }
 
@@ -560,35 +581,48 @@ namespace MultiplayerARPG
         {
             if (mapWarpPortals == null)
                 return;
+            var warpPortalEntities = new List<WarpPortalEntity>();
             foreach (var mapWarpPortal in mapWarpPortals)
             {
                 if (mapWarpPortal.map == null || string.IsNullOrEmpty(mapWarpPortal.map.SceneName))
                     continue;
-                MapWarpPortals[mapWarpPortal.map.SceneName] = mapWarpPortal;
+                if (MapWarpPortals.ContainsKey(mapWarpPortal.map.SceneName))
+                    MapWarpPortals[mapWarpPortal.map.SceneName].AddRange(mapWarpPortal.warpPortals);
+                else
+                    MapWarpPortals[mapWarpPortal.map.SceneName] = new List<WarpPortal>(mapWarpPortal.warpPortals);
+                foreach (var warpPortal in mapWarpPortal.warpPortals)
+                {
+                    if (warpPortal.entityPrefab != null)
+                        warpPortalEntities.Add(warpPortal.entityPrefab);
+                }
             }
+            AddWarpPortalEntities(warpPortalEntities);
         }
 
         public static void AddMapNpcs(IEnumerable<Npcs> mapNpcs)
         {
             if (mapNpcs == null)
                 return;
+            var npcEntities = new List<NpcEntity>();
             var npcDialogs = new List<NpcDialog>();
-            var characterModels = new List<CharacterModel>();
             foreach (var mapNpc in mapNpcs)
             {
                 if (mapNpc.map == null || string.IsNullOrEmpty(mapNpc.map.SceneName))
                     continue;
-                MapNpcs[mapNpc.map.SceneName] = mapNpc;
+                if (MapNpcs.ContainsKey(mapNpc.map.SceneName))
+                    MapNpcs[mapNpc.map.SceneName].AddRange(mapNpc.npcs);
+                else
+                    MapNpcs[mapNpc.map.SceneName] = new List<Npc>(mapNpc.npcs);
                 foreach (var npc in mapNpc.npcs)
                 {
+                    if (npc.entityPrefab != null)
+                        npcEntities.Add(npc.entityPrefab);
                     if (npc.startDialog != null)
                         npcDialogs.Add(npc.startDialog);
-                    if (npc.model != null)
-                        characterModels.Add(npc.model);
                 }
             }
+            AddNpcEntities(npcEntities);
             AddNpcDialogs(npcDialogs);
-            AddCharacterModels(characterModels);
         }
 
         public static void AddMapInfos(IEnumerable<MapInfo> mapInfos)

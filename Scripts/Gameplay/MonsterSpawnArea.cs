@@ -56,19 +56,23 @@ namespace MultiplayerARPG
             yield return new WaitForSecondsRealtime(delay);
             var spawnPosition = GetRandomPosition();
             var spawnRotation = GetRandomRotation();
-            var identity = CacheGameNetworkManager.Assets.NetworkSpawn(gameInstance.monsterCharacterEntityPrefab.gameObject, spawnPosition, spawnRotation);
-            var entity = identity.GetComponent<BaseMonsterCharacterEntity>();
-            entity.Id = string.Empty;
-            entity.DataId = dataId;
-            entity.Level = level;
-            var stats = entity.GetStats();
-            entity.CurrentHp = (int)stats.hp;
-            entity.CurrentMp = (int)stats.mp;
-            entity.CurrentStamina = (int)stats.stamina;
-            entity.CurrentFood = (int)stats.food;
-            entity.CurrentWater = (int)stats.water;
-            entity.spawnArea = this;
-            entity.spawnPosition = spawnPosition;
+            var monsterCharacterPrefab = database.entityPrefab;
+            if (monsterCharacterPrefab != null)
+            {
+                var identity = CacheGameNetworkManager.Assets.NetworkSpawn(monsterCharacterPrefab.Identity, spawnPosition, spawnRotation);
+                var entity = identity.GetComponent<BaseMonsterCharacterEntity>();
+                entity.Id = string.Empty;
+                entity.DataId = dataId;
+                entity.Level = level;
+                var stats = entity.GetStats();
+                entity.CurrentHp = (int)stats.hp;
+                entity.CurrentMp = (int)stats.mp;
+                entity.CurrentStamina = (int)stats.stamina;
+                entity.CurrentFood = (int)stats.food;
+                entity.CurrentWater = (int)stats.water;
+                entity.spawnArea = this;
+                entity.spawnPosition = spawnPosition;
+            }
         }
 
         public Vector3 GetRandomPosition()

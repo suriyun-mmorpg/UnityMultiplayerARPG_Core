@@ -62,17 +62,6 @@ namespace MultiplayerARPG
         [Header("Renderer")]
         [SerializeField]
         private SkinnedMeshRenderer skinnedMeshRenderer;
-        [Header("Collider")]
-        public Vector3 center;
-        public float radius = 0.5f;
-        public float height = 2f;
-        [Header("Damage transform")]
-        [SerializeField]
-        private Transform meleeDamageTransform;
-        [SerializeField]
-        private Transform missileDamageTransform;
-        [SerializeField]
-        private Transform combatTextTransform;
         [Header("Equipment Containers")]
         [SerializeField]
         private EquipmentModelContainer[] equipmentContainers;
@@ -134,54 +123,6 @@ namespace MultiplayerARPG
                     cacheAnimation.AddClip(legacyAnimationData.deadClip, legacyAnimationData.deadClip.name);
                 }
                 return cacheAnimation;
-            }
-        }
-
-        public Transform MeleeDamageTransform
-        {
-            get
-            {
-                if (meleeDamageTransform == null)
-                {
-                    var gameObject = new GameObject("_meleeDamage");
-                    meleeDamageTransform = gameObject.transform;
-                    meleeDamageTransform.parent = CacheTransform;
-                    meleeDamageTransform.localPosition = new Vector3(0, center.y / height / 2f, 0);
-                    meleeDamageTransform.rotation = CacheTransform.rotation;
-                }
-                return meleeDamageTransform;
-            }
-        }
-
-        public Transform MissileDamageTransform
-        {
-            get
-            {
-                if (missileDamageTransform == null)
-                {
-                    var gameObject = new GameObject("_missileDamage");
-                    missileDamageTransform = gameObject.transform;
-                    missileDamageTransform.parent = CacheTransform;
-                    missileDamageTransform.localPosition = new Vector3(0, center.y / height / 2f, 0);
-                    missileDamageTransform.rotation = CacheTransform.rotation;
-                }
-                return missileDamageTransform;
-            }
-        }
-
-        public Transform CombatTextTransform
-        {
-            get
-            {
-                if (combatTextTransform == null)
-                {
-                    var gameObject = new GameObject("_combatText");
-                    combatTextTransform = gameObject.transform;
-                    combatTextTransform.parent = CacheTransform;
-                    combatTextTransform.localPosition = new Vector3(0, center.y / height / 2f, 0);
-                    combatTextTransform.rotation = CacheTransform.rotation;
-                }
-                return combatTextTransform;
             }
         }
 
@@ -459,19 +400,6 @@ namespace MultiplayerARPG
                 return;
             var effects = InstantiateEffect(buffEffects);
             CreateCacheEffect(buffId, effects);
-        }
-
-        private void OnDrawGizmos()
-        {
-            Gizmos.color = Color.magenta;
-            var topCorner = CacheTransform.position + center + (Vector3.up * height * 0.5f) - (Vector3.up * radius);
-            var bottomCorner = CacheTransform.position + center - (Vector3.up * height * 0.5f) + (Vector3.up * radius);
-            Gizmos.DrawWireSphere(topCorner, radius);
-            Gizmos.DrawWireSphere(bottomCorner, radius);
-            Gizmos.DrawLine(topCorner + Vector3.left * radius, bottomCorner + Vector3.left * radius);
-            Gizmos.DrawLine(topCorner + Vector3.right * radius, bottomCorner + Vector3.right * radius);
-            Gizmos.DrawLine(topCorner + Vector3.forward * radius, bottomCorner + Vector3.forward * radius);
-            Gizmos.DrawLine(topCorner + Vector3.back * radius, bottomCorner + Vector3.back * radius);
         }
 
         public void UpdateAnimation(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier = 1f)

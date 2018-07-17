@@ -9,8 +9,7 @@ namespace MultiplayerARPG
     {
         [SerializeField]
         protected SyncFieldInt currentHp = new SyncFieldInt();
-        [SerializeField]
-        protected Transform combatTextTransform;
+        public Transform combatTextTransform;
         public Transform CombatTextTransform
         {
             get

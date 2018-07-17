@@ -99,19 +99,35 @@ namespace MultiplayerARPG
         {
             doNotEnterGameOnConnect = false;
             Assets.offlineScene.SceneName = gameInstance.homeScene;
-            Assets.playerPrefab = gameInstance.playerCharacterEntityPrefab.Identity;
+            Assets.playerPrefab = null;
             var spawnablePrefabs = new List<LiteNetLibIdentity>(Assets.spawnablePrefabs);
-            spawnablePrefabs.Add(gameInstance.monsterCharacterEntityPrefab.Identity);
-            spawnablePrefabs.Add(gameInstance.itemDropEntityPrefab.Identity);
-            spawnablePrefabs.Add(gameInstance.buildingEntityPrefab.Identity);
+            if (gameInstance.itemDropEntityPrefab != null)
+                spawnablePrefabs.Add(gameInstance.itemDropEntityPrefab.Identity);
             if (gameInstance.warpPortalEntityPrefab != null)
                 spawnablePrefabs.Add(gameInstance.warpPortalEntityPrefab.Identity);
-            if (gameInstance.npcEntityPrefab != null)
-                spawnablePrefabs.Add(gameInstance.npcEntityPrefab.Identity);
-            var damageEntities = GameInstance.DamageEntities.Values;
-            foreach (var damageEntity in damageEntities)
+            foreach (var entry in GameInstance.PlayerCharacterEntities)
             {
-                spawnablePrefabs.Add(damageEntity.Identity);
+                spawnablePrefabs.Add(entry.Value.Identity);
+            }
+            foreach (var entry in GameInstance.MonsterCharacterEntities)
+            {
+                spawnablePrefabs.Add(entry.Value.Identity);
+            }
+            foreach (var entry in GameInstance.WarpPortalEntities)
+            {
+                spawnablePrefabs.Add(entry.Value.Identity);
+            }
+            foreach (var entry in GameInstance.NpcEntities)
+            {
+                spawnablePrefabs.Add(entry.Value.Identity);
+            }
+            foreach (var entry in GameInstance.DamageEntities)
+            {
+                spawnablePrefabs.Add(entry.Value.Identity);
+            }
+            foreach (var entry in GameInstance.BuildingEntities)
+            {
+                spawnablePrefabs.Add(entry.Value.Identity);
             }
             Assets.spawnablePrefabs = spawnablePrefabs.ToArray();
             this.InvokeClassAddOnMethods("Init");
@@ -220,16 +236,15 @@ namespace MultiplayerARPG
             // Spawn Warp Portals
             if (GameInstance.MapWarpPortals.Count > 0)
             {
-                if (gameInstance.warpPortalEntityPrefab == null)
-                    Debug.LogWarning("Cannot spawn Warp portals because GameInstance's Warp Portal Entity Prefab is empty");
-                else
+                List<WarpPortal> mapWarpPortals;
+                if (GameInstance.MapWarpPortals.TryGetValue(Assets.onlineScene.SceneName, out mapWarpPortals))
                 {
-                    WarpPortals mapWarpPortals;
-                    if (GameInstance.MapWarpPortals.TryGetValue(Assets.onlineScene.SceneName, out mapWarpPortals))
+                    foreach (var warpPortal in mapWarpPortals)
                     {
-                        foreach (var warpPortal in mapWarpPortals.warpPortals)
+                        var warpPortalPrefab = warpPortal.entityPrefab != null ? warpPortal.entityPrefab : gameInstance.warpPortalEntityPrefab;
+                        if (warpPortalPrefab != null)
                         {
-                            var warpPortalIdentity = Assets.NetworkSpawn(gameInstance.warpPortalEntityPrefab.Identity, warpPortal.position, Quaternion.identity);
+                            var warpPortalIdentity = Assets.NetworkSpawn(warpPortalPrefab.Identity, warpPortal.position, Quaternion.identity);
                             var warpPortalEntity = warpPortalIdentity.GetComponent<WarpPortalEntity>();
                             warpPortalEntity.mapScene.SceneName = warpPortal.warpToMap.SceneName;
                             warpPortalEntity.position = warpPortal.warpToPosition;
@@ -240,20 +255,18 @@ namespace MultiplayerARPG
             // Spawn Npcs
             if (GameInstance.MapNpcs.Count > 0)
             {
-                if (gameInstance.npcEntityPrefab == null)
-                    Debug.LogWarning("Cannot spawn Npcs because GameInstance's Npc Entity Prefab is empty");
-                else
+                List<Npc> mapNpcs;
+                if (GameInstance.MapNpcs.TryGetValue(Assets.onlineScene.SceneName, out mapNpcs))
                 {
-                    Npcs mapNpcs;
-                    if (GameInstance.MapNpcs.TryGetValue(Assets.onlineScene.SceneName, out mapNpcs))
+                    foreach (var npc in mapNpcs)
                     {
-                        foreach (var npc in mapNpcs.npcs)
+                        var npcPrefab = npc.entityPrefab;
+                        if (npcPrefab != null)
                         {
-                            var npcIdentity = Assets.NetworkSpawn(gameInstance.npcEntityPrefab.Identity, npc.position, Quaternion.Euler(npc.rotation));
+                            var npcIdentity = Assets.NetworkSpawn(npcPrefab.Identity, npc.position, Quaternion.Euler(npc.rotation));
                             var npcEntity = npcIdentity.GetComponent<NpcEntity>();
                             npcEntity.startDialog = npc.startDialog;
                             npcEntity.Title = npc.title;
-                            npcEntity.ModelId = npc.model.DataId;
                         }
                     }
                 }
@@ -282,15 +295,18 @@ namespace MultiplayerARPG
 
         public virtual void CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
         {
-            var buildingIdentity = Assets.NetworkSpawn(gameInstance.buildingEntityPrefab.Identity, saveData.Position, saveData.Rotation);
-            var buildingEntity = buildingIdentity.GetComponent<BuildingEntity>();
-            buildingEntity.Id = saveData.Id;
-            buildingEntity.ParentId = saveData.ParentId;
-            buildingEntity.DataId = saveData.DataId;
-            buildingEntity.CurrentHp = saveData.CurrentHp;
-            buildingEntity.CreatorId = saveData.CreatorId;
-            buildingEntity.CreatorName = saveData.CreatorName;
-            buildingEntities[buildingEntity.Id] = buildingEntity;
+            BuildingEntity prefab;
+            if (GameInstance.BuildingEntities.TryGetValue(saveData.DataId, out prefab))
+            {
+                var buildingIdentity = Assets.NetworkSpawn(prefab.Identity, saveData.Position, saveData.Rotation);
+                var buildingEntity = buildingIdentity.GetComponent<BuildingEntity>();
+                buildingEntity.Id = saveData.Id;
+                buildingEntity.ParentId = saveData.ParentId;
+                buildingEntity.CurrentHp = saveData.CurrentHp;
+                buildingEntity.CreatorId = saveData.CreatorId;
+                buildingEntity.CreatorName = saveData.CreatorName;
+                buildingEntities[buildingEntity.Id] = buildingEntity;
+            }
         }
 
         public virtual void DestroyBuildingEntity(string id)

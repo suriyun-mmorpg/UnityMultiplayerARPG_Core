@@ -1,9 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace MultiplayerARPG
 {
@@ -14,10 +10,6 @@ namespace MultiplayerARPG
         protected Dictionary<DamageElement, MinMaxFloat> allDamageAmounts;
         protected CharacterBuff debuff;
         protected int hitEffectsId;
-
-        [SerializeField]
-        private int dataId;
-        public int DataId { get { return dataId; } }
 
         public virtual void SetupDamage(
             BaseCharacterEntity attacker,
@@ -39,16 +31,5 @@ namespace MultiplayerARPG
                 return;
             target.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
         }
-
-#if UNITY_EDITOR
-        private void OnValidate()
-        {
-            if (!Application.isPlaying && dataId != name.GenerateHashId())
-            {
-                dataId = name.GenerateHashId();
-                EditorUtility.SetDirty(gameObject);
-            }
-        }
-#endif
     }
 }

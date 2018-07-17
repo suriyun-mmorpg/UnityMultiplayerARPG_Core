@@ -6,7 +6,8 @@ namespace MultiplayerARPG
 {
     public abstract class BaseCharacter : BaseGameData
     {
-        public CharacterModel model;
+        [Header("Entity")]
+        public BaseCharacterEntity entityPrefab;
 
         [Header("Attributes/Stats")]
         public AttributeIncremental[] attributes;

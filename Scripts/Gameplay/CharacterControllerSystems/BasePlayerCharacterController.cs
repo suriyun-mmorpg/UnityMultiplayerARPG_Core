@@ -35,7 +35,7 @@ namespace MultiplayerARPG
         public UISceneGameplay CacheUISceneGameplay { get; protected set; }
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
         protected int buildingItemIndex;
-        protected BuildingObject currentBuildingObject;
+        protected BuildingEntity currentBuildingEntity;
 
         protected virtual void Awake()
         {
@@ -193,23 +193,23 @@ namespace MultiplayerARPG
 
         public void ConfirmBuild()
         {
-            if (currentBuildingObject != null)
+            if (currentBuildingEntity != null)
             {
-                if (currentBuildingObject.CanBuild())
+                if (currentBuildingEntity.CanBuild())
                 {
                     uint parentObjectId = 0;
-                    if (currentBuildingObject.buildingArea != null)
-                        parentObjectId = currentBuildingObject.buildingArea.EntityObjectId;
-                    PlayerCharacterEntity.RequestBuild(buildingItemIndex, currentBuildingObject.CacheTransform.position, currentBuildingObject.CacheTransform.rotation, parentObjectId);
+                    if (currentBuildingEntity.buildingArea != null)
+                        parentObjectId = currentBuildingEntity.buildingArea.EntityObjectId;
+                    PlayerCharacterEntity.RequestBuild(buildingItemIndex, currentBuildingEntity.CacheTransform.position, currentBuildingEntity.CacheTransform.rotation, parentObjectId);
                 }
-                Destroy(currentBuildingObject.gameObject);
+                Destroy(currentBuildingEntity.gameObject);
             }
         }
 
         public void CancelBuild()
         {
-            if (currentBuildingObject != null)
-                Destroy(currentBuildingObject.gameObject);
+            if (currentBuildingEntity != null)
+                Destroy(currentBuildingEntity.gameObject);
         }
 
         public void DestroyBuilding()

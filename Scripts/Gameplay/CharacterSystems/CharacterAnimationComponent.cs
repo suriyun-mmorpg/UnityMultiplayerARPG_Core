@@ -41,7 +41,7 @@ namespace MultiplayerARPG
                 animationData.velocityCalculationDeltaTime = 0f;
             }
 
-            var model = characterEntity.Model;
+            var model = characterEntity.CharacterModel;
             if (model != null)
                 model.UpdateAnimation(characterEntity.IsDead(), animationData.currentVelocity, gameplayRule.GetMoveSpeed(characterEntity) / characterEntity.CacheBaseMoveSpeed);
         }

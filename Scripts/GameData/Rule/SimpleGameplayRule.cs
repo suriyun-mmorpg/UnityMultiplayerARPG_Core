@@ -195,7 +195,7 @@ namespace MultiplayerARPG
             if (character is BaseMonsterCharacterEntity)
             {
                 var monsterCharacter = character as BaseMonsterCharacterEntity;
-                return monsterCharacter.isWandering ? monsterCharacter.MonsterDatabase.wanderMoveSpeed : monsterCharacter.CacheMoveSpeed;
+                return monsterCharacter.IsWandering() ? monsterCharacter.MonsterDatabase.wanderMoveSpeed : monsterCharacter.CacheMoveSpeed;
             }
             return character.CacheMoveSpeed * (character.isSprinting ? moveSpeedRateWhileSprint : 1f);
         }

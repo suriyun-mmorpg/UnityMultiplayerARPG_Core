@@ -16,7 +16,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(CharacterAnimationComponent))]
     [RequireComponent(typeof(CharacterRecoveryComponent))]
     [RequireComponent(typeof(CharacterSkillAndBuffComponent))]
-    [RequireComponent(typeof(CapsuleCollider))]
+    [RequireComponent(typeof(CharacterModel))]
     public abstract partial class BaseCharacterEntity : DamageableNetworkEntity, ICharacterData
     {
         public const float ACTION_COMMAND_DELAY = 0.2f;
@@ -27,12 +27,12 @@ namespace MultiplayerARPG
         public GameObject[] ownerObjects;
         [Tooltip("These objects will be hidden on owner objects")]
         public GameObject[] nonOwnerObjects;
-        [Tooltip("Model will be instantiated inside this transform, if not set will use this component's transform")]
-        [SerializeField]
-        private Transform modelContainer;
-        [Tooltip("Set it to force to not change character model by data Id, when set it model container will not be used")]
-        [SerializeField]
-        private CharacterModel permanentlyModel;
+        [Header("Damage transform")]
+        public Transform meleeDamageTransform;
+        public Transform missileDamageTransform;
+        [Header("Relates Element Containers")]
+        public Transform uiElementContainer;
+        public Transform miniMapElementContainer;
         #endregion
 
         #region Protected data
@@ -46,12 +46,6 @@ namespace MultiplayerARPG
         #endregion
 
         #region Caches Data
-        private CharacterModel model;
-        public CharacterModel Model
-        {
-            get { return permanentlyModel != null ? permanentlyModel : model; }
-            private set { model = permanentlyModel != null ? null : value; }
-        }
         public CharacterStats CacheStats { get; protected set; }
         public Dictionary<Attribute, short> CacheAttributes { get; protected set; }
         public Dictionary<Skill, short> CacheSkills { get; protected set; }
@@ -66,29 +60,57 @@ namespace MultiplayerARPG
         public float CacheMoveSpeed { get; protected set; }
         public float CacheAtkSpeed { get; protected set; }
         #endregion
-        
-        #region Cache components
-        private CapsuleCollider cacheCapsuleCollider;
-        public CapsuleCollider CacheCapsuleCollider
+
+        private CharacterModel characterModel;
+        public CharacterModel CharacterModel
         {
             get
             {
-                if (cacheCapsuleCollider == null)
-                    cacheCapsuleCollider = GetComponent<CapsuleCollider>();
-                return cacheCapsuleCollider;
+                if (characterModel == null)
+                    characterModel = GetComponent<CharacterModel>();
+                return characterModel;
             }
         }
 
-        public Transform CacheModelContainer
+        public Transform MeleeDamageTransform
         {
             get
             {
-                if (modelContainer == null)
-                    modelContainer = GetComponent<Transform>();
-                return modelContainer;
+                if (meleeDamageTransform == null)
+                    meleeDamageTransform = CacheTransform;
+                return meleeDamageTransform;
             }
         }
-        #endregion
+
+        public Transform MissileDamageTransform
+        {
+            get
+            {
+                if (missileDamageTransform == null)
+                    missileDamageTransform = CacheTransform;
+                return missileDamageTransform;
+            }
+        }
+
+        public Transform UIElementContainer
+        {
+            get
+            {
+                if (uiElementContainer == null)
+                    uiElementContainer = CacheTransform;
+                return uiElementContainer;
+            }
+        }
+
+        public Transform MiniMapElementContainer
+        {
+            get
+            {
+                if (miniMapElementContainer == null)
+                    miniMapElementContainer = CacheTransform;
+                return miniMapElementContainer;
+            }
+        }
 
         protected override void Awake()
         {
@@ -336,8 +358,8 @@ namespace MultiplayerARPG
             else
                 ReceivedDamage(attacker, CombatAmountType.NormalDamage, totalDamage);
 
-            if (Model != null)
-                Model.PlayHurtAnimation();
+            if (CharacterModel != null)
+                CharacterModel.PlayHurtAnimation();
 
             // If current hp <= 0, character dead
             if (IsDead())
@@ -468,7 +490,7 @@ namespace MultiplayerARPG
             float animTriggerDuration;
             float animExtraDuration;
             AudioClip animAudioClip;
-            if (anim.GetData(Model, out animClip, out animTriggerDuration, out animExtraDuration, out animAudioClip))
+            if (anim.GetData(CharacterModel, out animClip, out animTriggerDuration, out animExtraDuration, out animAudioClip))
             {
                 triggerDuration = animTriggerDuration / CacheAtkSpeed;
                 totalDuration = (animClip.length + animExtraDuration) / CacheAtkSpeed;
@@ -741,14 +763,14 @@ namespace MultiplayerARPG
 
         protected virtual Transform GetDamageTransform(DamageType damageType)
         {
-            if (Model != null)
+            if (CharacterModel != null)
             {
                 switch (damageType)
                 {
                     case DamageType.Melee:
-                        return Model.MeleeDamageTransform;
+                        return MeleeDamageTransform;
                     case DamageType.Missile:
-                        return Model.MissileDamageTransform;
+                        return MissileDamageTransform;
                 }
             }
             return CacheTransform;

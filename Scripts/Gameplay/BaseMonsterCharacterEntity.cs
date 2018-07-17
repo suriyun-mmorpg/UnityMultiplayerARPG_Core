@@ -1,34 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
 using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(NavMeshAgent))]
     [RequireComponent(typeof(LiteNetLibTransform))]
     public abstract partial class BaseMonsterCharacterEntity : BaseCharacterEntity
     {
         #region Activity System Data
-        [HideInInspector, System.NonSerialized]
-        public float wanderTime;
-        [HideInInspector, System.NonSerialized]
-        public float findTargetTime;
-        [HideInInspector, System.NonSerialized]
-        public float setDestinationTime;
-        [HideInInspector, System.NonSerialized]
-        public float startFollowTargetTime;
-        [HideInInspector, System.NonSerialized]
-        public float receivedDamageRecordsUpdateTime;
-        [HideInInspector, System.NonSerialized]
-        public float deadTime;
-        [HideInInspector, System.NonSerialized]
-        public Vector3? wanderDestination;
-        [HideInInspector, System.NonSerialized]
-        public Vector3 oldDestination;
-        [HideInInspector, System.NonSerialized]
-        public bool isWandering;
+        public float ReceivedDamageRecordsUpdateTime { get; protected set; }
+        public float DeadTime { get; protected set; }
         #endregion
         public readonly Dictionary<BaseCharacterEntity, ReceivedDamageRecord> receivedDamageRecords = new Dictionary<BaseCharacterEntity, ReceivedDamageRecord>();
 
@@ -61,38 +43,16 @@ namespace MultiplayerARPG
             }
         }
 
-        private NavMeshAgent cacheNavMeshAgent;
-        public NavMeshAgent CacheNavMeshAgent
-        {
-            get
-            {
-                if (cacheNavMeshAgent == null)
-                    cacheNavMeshAgent = GetComponent<NavMeshAgent>();
-                return cacheNavMeshAgent;
-            }
-        }
-
         protected override void Awake()
         {
             base.Awake();
             gameObject.tag = gameInstance.monsterTag;
-            var time = Time.unscaledTime;
-            MonsterActivityComponent.RandomNextWanderTime(time, this, CacheTransform);
-            MonsterActivityComponent.SetFindTargetTime(time, this);
-            MonsterActivityComponent.SetStartFollowTargetTime(time, this);
         }
 
         public override void OnSetup()
         {
             base.OnSetup();
             CacheNetTransform.ownerClientCanSendTransform = false;
-        }
-
-        public virtual void StopMove()
-        {
-            CacheNavMeshAgent.isStopped = true;
-            CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
-            wanderDestination = null;
         }
 
         public virtual void SetAttackTarget(BaseCharacterEntity target)
@@ -231,7 +191,7 @@ namespace MultiplayerARPG
         public override void Killed(BaseCharacterEntity lastAttacker)
         {
             base.Killed(lastAttacker);
-            deadTime = Time.unscaledTime;
+            DeadTime = Time.unscaledTime;
             var maxHp = this.GetStats().hp;
             var randomedExp = Random.Range(MonsterDatabase.randomExpMin, MonsterDatabase.randomExpMax);
             var randomedGold = Random.Range(MonsterDatabase.randomGoldMin, MonsterDatabase.randomGoldMax);
@@ -281,8 +241,10 @@ namespace MultiplayerARPG
             base.Respawn();
             StopMove();
             CacheNetTransform.Teleport(spawnPosition, CacheTransform.rotation);
-            MonsterActivityComponent.RandomNextWanderTime(Time.unscaledTime, this, CacheTransform);
         }
+
+        public abstract bool IsWandering();
+        public abstract void StopMove();
     }
 
     public struct ReceivedDamageRecord

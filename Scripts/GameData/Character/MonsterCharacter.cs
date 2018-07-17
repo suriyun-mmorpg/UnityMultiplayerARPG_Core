@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -47,7 +50,19 @@ namespace MultiplayerARPG
         public int randomGoldMax;
         public ItemDrop[] randomItems;
 
-        public int RandomExp()
+#if UNITY_EDITOR
+        void OnValidate()
+        {
+            if (entityPrefab != null && !(entityPrefab is BaseMonsterCharacterEntity))
+            {
+                Debug.LogWarning(name + "(MonsterCharacter) Entity Prefab MUST be `BaseMonsterCharacterEntity`");
+                entityPrefab = null;
+            }
+            EditorUtility.SetDirty(this);
+        }
+#endif
+
+    public int RandomExp()
         {
             var min = randomExpMin;
             var max = randomExpMax;

@@ -8,11 +8,10 @@ namespace MultiplayerARPG
 {
     public class RpgNetworkEntity : LiteNetLibBehaviour
     {
-        [SerializeField]
-        protected SyncFieldString title = new SyncFieldString();
+        public string title;
         public Text textTitle;
 
-        public virtual string Title { get { return title.Value; } set { title.Value = value; } }
+        public virtual string Title { get { return title; } set { title = value; } }
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
 
         private Transform cacheTransform;

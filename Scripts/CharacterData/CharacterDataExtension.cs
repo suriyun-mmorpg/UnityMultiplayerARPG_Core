@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using LiteNetLibManager;
 using MultiplayerARPG;
 
 public static class CharacterDataExtension
@@ -20,11 +21,26 @@ public static class CharacterDataExtension
         if (!GameInstance.AllCharacters.TryGetValue(data.DataId, out character))
             return null;
 
-        var result = Object.Instantiate(character.model, parent);
+        var result = Object.Instantiate(character.entityPrefab, parent);
+        var networkBehaviours = result.GetComponentsInChildren<LiteNetLibBehaviour>();
+        foreach (var networkBehaviour in networkBehaviours)
+        {
+            networkBehaviour.enabled = false;
+        }
+        var ownerObjects = result.ownerObjects;
+        foreach (var ownerObject in ownerObjects)
+        {
+            ownerObject.SetActive(false);
+        }
+        var nonOwnerObjects = result.nonOwnerObjects;
+        foreach (var nonOwnerObject in nonOwnerObjects)
+        {
+            nonOwnerObject.SetActive(false);
+        }
         result.gameObject.SetLayerRecursively(GameInstance.Singleton.characterLayer, true);
         result.gameObject.SetActive(true);
         result.transform.localPosition = Vector3.zero;
-        return result;
+        return result.CharacterModel;
     }
 
     public static int GetNextLevelExp(this ICharacterData data)

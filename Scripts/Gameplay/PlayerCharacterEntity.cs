@@ -6,6 +6,7 @@ using LiteNetLibManager;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(CapsuleCollider))]
     public partial class PlayerCharacterEntity : BasePlayerCharacterEntity
     {
         #region Settings
@@ -16,7 +17,7 @@ namespace MultiplayerARPG
         public float groundingDistance = 0.1f;
         public float jumpHeight = 2f;
         public float gravityRate = 1f;
-        public float angularSpeed = 120f;
+        public float angularSpeed = 800f;
         #endregion
         
         public Queue<Vector3> navPaths { get; protected set; }
@@ -40,6 +41,17 @@ namespace MultiplayerARPG
                 if (cacheRigidbody == null)
                     cacheRigidbody = GetComponent<Rigidbody>();
                 return cacheRigidbody;
+            }
+        }
+
+        private CapsuleCollider cacheCapsuleCollider;
+        public CapsuleCollider CacheCapsuleCollider
+        {
+            get
+            {
+                if (cacheCapsuleCollider == null)
+                    cacheCapsuleCollider = GetComponent<CapsuleCollider>();
+                return cacheCapsuleCollider;
             }
         }
 

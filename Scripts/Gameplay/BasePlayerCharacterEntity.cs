@@ -69,7 +69,7 @@ namespace MultiplayerARPG
                 case SkillType.CraftItem:
                     if (!skill.itemCraft.CanCraft(this))
                     {
-                        // TODO: may warn that cannot refine
+                        // TODO: may warn that cannot craft
                     }
                     else
                         skill.itemCraft.CraftItem(this);

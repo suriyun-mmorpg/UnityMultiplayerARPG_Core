@@ -71,11 +71,19 @@ namespace MultiplayerARPG
 
         public override void DeserializeClientReadyExtra(LiteNetLibIdentity playerIdentity, NetPeer peer, NetDataReader reader)
         {
-            if (playerIdentity == null)
-                return;
             if (LogDev) Debug.Log("[LanRpgNetworkManager] Deserializing client ready extra");
-            var playerCharacterEntity = playerIdentity.GetComponent<BasePlayerCharacterEntity>();
-            playerCharacterEntity.DeserializeCharacterData(reader);
+            var playerCharacterData = new PlayerCharacterData().DeserializeCharacterData(reader);
+            var dataId = playerCharacterData.DataId;
+            PlayerCharacter playerCharacter;
+            if (!GameInstance.PlayerCharacters.TryGetValue(dataId, out playerCharacter) || playerCharacter.entityPrefab == null)
+            {
+                Debug.LogError("[LanRpgNetworkManager] Cannot find player character with data Id: " + dataId);
+                return;
+            }
+            var playerCharacterPrefab = playerCharacter.entityPrefab;
+            var identity = SpawnPlayer(peer, playerCharacterPrefab.Identity);
+            var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
+            playerCharacterData.CloneTo(playerCharacterEntity);
             // Notify clients that this character is spawn or dead
             if (!playerCharacterEntity.IsDead())
                 playerCharacterEntity.RequestOnRespawn(true);

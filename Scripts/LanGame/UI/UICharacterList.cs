@@ -61,13 +61,16 @@ namespace MultiplayerARPG
             {
                 var uiCharacter = ui.GetComponent<UICharacter>();
                 uiCharacter.Data = character;
-            // Select trigger when add first entry so deactivate all models is okay beacause first model will active
-            var characterModel = character.InstantiateModel(characterModelContainer);
-                CharacterModels[character.Id] = characterModel;
-                characterModel.gameObject.SetActive(false);
-                characterModel.SetEquipWeapons(character.EquipWeapons);
-                characterModel.SetEquipItems(character.EquipItems);
-                SelectionManager.Add(uiCharacter);
+                // Select trigger when add first entry so deactivate all models is okay beacause first model will active
+                var characterModel = character.InstantiateModel(characterModelContainer);
+                if (characterModel != null)
+                {
+                    CharacterModels[character.Id] = characterModel;
+                    characterModel.gameObject.SetActive(false);
+                    characterModel.SetEquipWeapons(character.EquipWeapons);
+                    characterModel.SetEquipItems(character.EquipItems);
+                    SelectionManager.Add(uiCharacter);
+                }
             });
         }
 

@@ -163,32 +163,12 @@ namespace MultiplayerARPG
             // Get database
             GameInstance.AllCharacters.TryGetValue(dataId, out database);
 
-            // If permanently model has been set, it will not changes character model
-            if (permanentlyModel == null)
+            // Hidding an object when it's host and character over sight
+            if (IsServer && IsClient)
             {
-                if (Model != null)
-                    Destroy(Model.gameObject);
-
-                Model = this.InstantiateModel(CacheModelContainer);
-            }
-            // If model is ready set its states, collider data and equipments
-            if (Model != null)
-            {
-                CacheCapsuleCollider.center = Model.center;
-                CacheCapsuleCollider.radius = Model.radius;
-                CacheCapsuleCollider.height = Model.height;
-                Model.SetEquipWeapons(equipWeapons);
-                Model.SetEquipItems(equipItems);
-                Model.gameObject.SetActive(!isHidding.Value);
-                combatTextTransform = Model.CombatTextTransform;
-
-                // Hidding an object when it's host and character over sight
-                if (IsServer && IsClient)
-                {
-                    LiteNetLibPlayer serverPlayer;
-                    if (Manager.Players.TryGetValue(Manager.Client.Peer.ConnectId, out serverPlayer) && !serverPlayer.SubscribingObjects.Contains(Identity))
-                        Identity.OnServerSubscribingRemoved();
-                }
+                LiteNetLibPlayer serverPlayer;
+                if (Manager.Players.TryGetValue(Manager.Client.Peer.ConnectId, out serverPlayer) && !serverPlayer.SubscribingObjects.Contains(Identity))
+                    Identity.OnServerSubscribingRemoved();
             }
 
             if (onDataIdChange != null)
@@ -253,8 +233,8 @@ namespace MultiplayerARPG
         /// <param name="equipWeapons"></param>
         protected virtual void OnEquipWeaponsChange(EquipWeapons equipWeapons)
         {
-            if (Model != null)
-                Model.SetEquipWeapons(equipWeapons);
+            if (CharacterModel != null)
+                CharacterModel.SetEquipWeapons(equipWeapons);
 
             if (onEquipWeaponsChange != null)
                 onEquipWeaponsChange.Invoke(equipWeapons);
@@ -271,8 +251,11 @@ namespace MultiplayerARPG
             {
                 renderer.enabled = !isHidding;
             }
-            if (CacheCapsuleCollider != null)
-                CacheCapsuleCollider.enabled = !isHidding;
+            var colliders = GetComponentsInChildren<Collider>();
+            foreach (var collider in colliders)
+            {
+                collider.enabled = !isHidding;
+            }
 
             if (onIsHiddingChange != null)
                 onIsHiddingChange.Invoke(isHidding);
@@ -315,8 +298,8 @@ namespace MultiplayerARPG
         {
             isRecaching = true;
 
-            if (Model != null)
-                Model.SetBuffs(buffs);
+            if (CharacterModel != null)
+                CharacterModel.SetBuffs(buffs);
 
             if (onBuffsOperation != null)
                 onBuffsOperation.Invoke(operation, index);
@@ -331,8 +314,8 @@ namespace MultiplayerARPG
         {
             isRecaching = true;
 
-            if (Model != null)
-                Model.SetEquipItems(equipItems);
+            if (CharacterModel != null)
+                CharacterModel.SetEquipItems(equipItems);
 
             if (onEquipItemsOperation != null)
                 onEquipItemsOperation.Invoke(operation, index);

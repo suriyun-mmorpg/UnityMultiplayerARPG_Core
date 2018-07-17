@@ -326,12 +326,12 @@ namespace MultiplayerARPG
                 index >= NonEquipItems.Count)
                 return;
 
-            BuildingObject buildingObject;
+            BuildingEntity buildingEntity;
             var nonEquipItem = NonEquipItems[index];
             if (!nonEquipItem.IsValid() ||
                 nonEquipItem.GetBuildingItem() == null ||
-                nonEquipItem.GetBuildingItem().buildingObject == null ||
-                !GameInstance.BuildingObjects.TryGetValue(nonEquipItem.GetBuildingItem().buildingObject.DataId, out buildingObject) ||
+                nonEquipItem.GetBuildingItem().buildingEntity == null ||
+                !GameInstance.BuildingEntities.TryGetValue(nonEquipItem.GetBuildingItem().buildingEntity.DataId, out buildingEntity) ||
                 !this.DecreaseItemsByIndex(index, 1))
                 return;
 
@@ -348,8 +348,8 @@ namespace MultiplayerARPG
                     if (parentBuildingEntity != null)
                         buildingSaveData.ParentId = parentBuildingEntity.Id;
                 }
-                buildingSaveData.DataId = buildingObject.DataId;
-                buildingSaveData.CurrentHp = buildingObject.maxHp;
+                buildingSaveData.DataId = buildingEntity.DataId;
+                buildingSaveData.CurrentHp = buildingEntity.maxHp;
                 buildingSaveData.Position = position;
                 buildingSaveData.Rotation = rotation;
                 buildingSaveData.CreatorId = Id;

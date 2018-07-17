@@ -18,9 +18,9 @@ namespace MultiplayerARPG
         public const float DETECT_MOUSE_DRAG_DISTANCE = 10f;
         public const float DETECT_MOUSE_HOLD_DURATION = 1f;
         public PlayerCharacterControllerMode controllerMode;
-        [Header("Set this to TRUE to find nearby enemy and look to it while attacking when `Controller Mode` is `WASD`")]
+        [Tooltip("Set this to TRUE to find nearby enemy and look to it while attacking when `Controller Mode` is `WASD`")]
         public bool wasdLockAttackTarget;
-        [Header("This will be used to find nearby enemy when `Controller Mode` is `Point Click` or when `Wasd Lock Attack Target` is `TRUE`")]
+        [Tooltip("This will be used to find nearby enemy when `Controller Mode` is `Point Click` or when `Wasd Lock Attack Target` is `TRUE`")]
         public float lockAttackTargetDistance = 10f;
         public FollowCameraControls gameplayCameraPrefab;
         public GameObject targetObjectPrefab;
@@ -50,7 +50,7 @@ namespace MultiplayerARPG
         {
             base.Awake();
             buildingItemIndex = -1;
-            currentBuildingObject = null;
+            currentBuildingEntity = null;
         }
 
         protected override void Start()
@@ -130,7 +130,7 @@ namespace MultiplayerARPG
                 return;
 
             // If it's building something, don't allow to activate NPC/Warp/Pickup Item
-            if (currentBuildingObject == null)
+            if (currentBuildingEntity == null)
             {
                 // Activate nearby npcs / players / activable buildings
                 if (InputManager.GetButtonDown("Activate"))
@@ -180,7 +180,7 @@ namespace MultiplayerARPG
         protected void UpdatePointClickInput()
         {
             // If it's building something, not allow point click movement
-            if (currentBuildingObject != null)
+            if (currentBuildingEntity != null)
                 return;
             var getMouseDown = Input.GetMouseButtonDown(0);
             var getMouseUp = Input.GetMouseButtonUp(0);
@@ -398,13 +398,13 @@ namespace MultiplayerARPG
             var uiConstructBuilding = CacheUISceneGameplay.uiConstructBuilding;
             if (uiConstructBuilding != null)
             {
-                if (uiConstructBuilding.IsVisible() && currentBuildingObject == null)
+                if (uiConstructBuilding.IsVisible() && currentBuildingEntity == null)
                     uiConstructBuilding.Hide();
-                if (!uiConstructBuilding.IsVisible() && currentBuildingObject != null)
+                if (!uiConstructBuilding.IsVisible() && currentBuildingEntity != null)
                     uiConstructBuilding.Show();
             }
 
-            if (currentBuildingObject == null)
+            if (currentBuildingEntity == null)
                 return;
 
             var isPointerOverUI = CacheUISceneGameplay != null && CacheUISceneGameplay.IsPointerOverUIObject();
@@ -626,7 +626,7 @@ namespace MultiplayerARPG
 
             CancelBuild();
             buildingItemIndex = -1;
-            currentBuildingObject = null;
+            currentBuildingEntity = null;
             
             var hotkey = PlayerCharacterEntity.Hotkeys[hotkeyIndex];
             var skill = hotkey.GetSkill();
@@ -675,9 +675,9 @@ namespace MultiplayerARPG
                         destination = null;
                         PlayerCharacterEntity.StopMove();
                         buildingItemIndex = itemIndex;
-                        currentBuildingObject = Instantiate(item.buildingObject);
-                        currentBuildingObject.SetupAsBuildMode();
-                        currentBuildingObject.CacheTransform.parent = null;
+                        currentBuildingEntity = Instantiate(item.buildingEntity);
+                        currentBuildingEntity.SetupAsBuildMode();
+                        currentBuildingEntity.CacheTransform.parent = null;
                         SetBuildingObjectByCharacterTransform();
                     }
                 }
@@ -686,13 +686,13 @@ namespace MultiplayerARPG
 
         private void SetBuildingObjectByCharacterTransform()
         {
-            if (currentBuildingObject != null)
+            if (currentBuildingEntity != null)
             {
-                var placePosition = CharacterTransform.position + (CharacterTransform.forward * currentBuildingObject.characterForwardDistance);
-                currentBuildingObject.CacheTransform.eulerAngles = GetBuildingPlaceEulerAngles(CharacterTransform.eulerAngles);
-                currentBuildingObject.buildingArea = null;
+                var placePosition = CharacterTransform.position + (CharacterTransform.forward * currentBuildingEntity.characterForwardDistance);
+                currentBuildingEntity.CacheTransform.eulerAngles = GetBuildingPlaceEulerAngles(CharacterTransform.eulerAngles);
+                currentBuildingEntity.buildingArea = null;
                 if (!RaycastToSetBuildingArea(new Ray(placePosition + (Vector3.up * 2.5f), Vector3.down), 5f))
-                    currentBuildingObject.CacheTransform.position = GetBuildingPlacePosition(placePosition);
+                    currentBuildingEntity.CacheTransform.position = GetBuildingPlacePosition(placePosition);
             }
         }
 
@@ -724,13 +724,13 @@ namespace MultiplayerARPG
                     return false;
 
                 var buildingArea = hit.collider.GetComponent<BuildingArea>();
-                if (buildingArea == null || (buildingArea.buildingObject != null && buildingArea.buildingObject == currentBuildingObject))
+                if (buildingArea == null || (buildingArea.buildingEntity != null && buildingArea.buildingEntity == currentBuildingEntity))
                     continue;
 
-                if (currentBuildingObject.buildingType.Equals(buildingArea.buildingType))
+                if (currentBuildingEntity.buildingType.Equals(buildingArea.buildingType))
                 {
-                    currentBuildingObject.CacheTransform.position = GetBuildingPlacePosition(hit.point);
-                    currentBuildingObject.buildingArea = buildingArea;
+                    currentBuildingEntity.CacheTransform.position = GetBuildingPlacePosition(hit.point);
+                    currentBuildingEntity.buildingArea = buildingArea;
                     if (buildingArea.snapBuildingObject)
                         return true;
                     nonSnapBuildingArea = buildingArea;
