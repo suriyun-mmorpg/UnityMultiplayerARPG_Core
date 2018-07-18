@@ -46,16 +46,16 @@ namespace MultiplayerARPG
                 CacheCanvas.enabled = true;
             else
                 CacheCanvas.enabled = false;
-        }
 
-        protected override void UpdateData()
-        {
             if (textTitle != null)
             {
                 textTitle.text = Data.Title;
                 textTitle.gameObject.SetActive(Data != null);
             }
+        }
 
+        protected override void UpdateData()
+        {
             if (rootFollower != null)
             {
                 if (Data != null)

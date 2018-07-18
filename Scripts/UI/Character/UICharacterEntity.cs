@@ -53,6 +53,13 @@ namespace MultiplayerARPG
             else
                 CacheCanvas.enabled = false;
 
+            if (textTitle != null)
+            {
+                if (Data != null)
+                    textTitle.text = Data.Title;
+                textTitle.gameObject.SetActive(Data != null);
+            }
+
             if (uiCharacter != null)
             {
                 if (Data.CurrentHp > 0)
@@ -70,13 +77,6 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            if (textTitle != null)
-            {
-                if (Data != null)
-                    textTitle.text = Data.Title;
-                textTitle.gameObject.SetActive(Data != null);
-            }
-
             if (uiCharacter != null)
             {
                 if (Data != null)
