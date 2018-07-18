@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = "DamageElement", menuName = "Create GameData/DamageElement")]
-    public class DamageElement : BaseGameData
+    public partial class DamageElement : BaseGameData
     {
         [Range(0f, 1f)]
         public float maxResistanceAmount;

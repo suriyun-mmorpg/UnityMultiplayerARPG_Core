@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseGameData : ScriptableObject
+    public abstract partial class BaseGameData : ScriptableObject
     {
         public string title;
         [TextArea]

@@ -19,7 +19,7 @@ namespace MultiplayerARPG
     }
 
     [CreateAssetMenu(fileName = "Item", menuName = "Create GameData/Item")]
-    public class Item : BaseGameData
+    public partial class Item : BaseGameData
     {
         public ItemType itemType;
         public GameObject dropModel;

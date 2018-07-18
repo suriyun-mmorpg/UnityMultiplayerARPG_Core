@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = "Attribute", menuName = "Create GameData/Attribute")]
-    public class Attribute : BaseGameData
+    public partial class Attribute : BaseGameData
     {
         public CharacterStats statsIncreaseEachLevel;
     }

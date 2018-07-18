@@ -13,7 +13,7 @@ namespace MultiplayerARPG
     }
 
     [CreateAssetMenu(fileName = "NpcDialog", menuName = "Create GameData/NpcDialog")]
-    public class NpcDialog : BaseGameData
+    public partial class NpcDialog : BaseGameData
     {
         public const int QUEST_ACCEPT_MENU_INDEX = 0;
         public const int QUEST_DECLINE_MENU_INDEX = 1;

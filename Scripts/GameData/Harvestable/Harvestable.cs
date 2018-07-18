@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = "Harvestable", menuName = "Create GameData/Harvestable")]
-    public class Harvestable : BaseGameData
+    public partial class Harvestable : BaseGameData
     {
         public HarvestEffectiveness[] harvestEffectivenesses;
 

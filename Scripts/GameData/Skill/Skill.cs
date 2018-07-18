@@ -28,7 +28,7 @@ namespace MultiplayerARPG
     }
 
     [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill")]
-    public class Skill : BaseGameData
+    public partial class Skill : BaseGameData
     {
         public SkillType skillType;
         [Range(1, 30)]

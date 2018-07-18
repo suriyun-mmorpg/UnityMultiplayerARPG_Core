@@ -11,7 +11,7 @@ namespace MultiplayerARPG
     }
 
     [CreateAssetMenu(fileName = "Quest", menuName = "Create GameData/Quest")]
-    public class Quest : BaseGameData
+    public partial class Quest : BaseGameData
     {
         public QuestTask[] tasks;
         public int rewardExp;
