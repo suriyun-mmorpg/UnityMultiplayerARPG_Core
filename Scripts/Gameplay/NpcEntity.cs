@@ -61,15 +61,6 @@ namespace MultiplayerARPG
             gameObject.layer = gameInstance.characterLayer;
         }
 
-        protected override void Start()
-        {
-            base.Start();
-            if (gameInstance.npcUI != null)
-                InstantiateUI(gameInstance.npcUI);
-            if (gameInstance.npcQuestIndicator != null)
-                InstantiateQuestIndicator(gameInstance.npcQuestIndicator);
-        }
-
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
@@ -80,6 +71,12 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
             SetupQuestIds();
+
+            // Setup relates elements
+            if (gameInstance.npcUI != null)
+                InstantiateUI(gameInstance.npcUI);
+            if (gameInstance.npcQuestIndicator != null)
+                InstantiateQuestIndicator(gameInstance.npcQuestIndicator);
         }
 
         public void InstantiateUI(UINpcEntity prefab)

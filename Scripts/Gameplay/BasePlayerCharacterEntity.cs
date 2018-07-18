@@ -46,42 +46,6 @@ namespace MultiplayerARPG
             gameObject.tag = gameInstance.playerTag;
         }
 
-        protected override void Start()
-        {
-            base.Start();
-            if (IsOwnerClient)
-            {
-                if (BasePlayerCharacterController.Singleton == null)
-                {
-                    var controller = Instantiate(controllerPrefab);
-                    controller.PlayerCharacterEntity = this;
-                }
-                if (gameInstance.owningCharacterObjects != null && gameInstance.owningCharacterObjects.Length > 0)
-                {
-                    foreach (var obj in gameInstance.owningCharacterObjects)
-                    {
-                        if (obj == null) continue;
-                        Instantiate(obj, CacheTransform.position, CacheTransform.rotation, CacheTransform);
-                    }
-                }
-                if (gameInstance.owningCharacterMiniMapObjects != null && gameInstance.owningCharacterMiniMapObjects.Length > 0)
-                {
-                    foreach (var obj in gameInstance.owningCharacterMiniMapObjects)
-                    {
-                        if (obj == null) continue;
-                        Instantiate(obj, MiniMapElementContainer.position, MiniMapElementContainer.rotation, MiniMapElementContainer);
-                    }
-                }
-                if (gameInstance.owningCharacterUI != null)
-                    InstantiateUI(gameInstance.owningCharacterUI);
-            }
-            else
-            {
-                if (gameInstance.nonOwningCharacterUI != null)
-                    InstantiateUI(gameInstance.nonOwningCharacterUI);
-            }
-        }
-
         protected override void ApplySkill(CharacterSkill characterSkill, Vector3 position, bool isAttack, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
             base.ApplySkill(characterSkill, position, isAttack, weapon, damageInfo, allDamageAmounts);

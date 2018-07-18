@@ -49,9 +49,12 @@ namespace MultiplayerARPG
             gameObject.tag = gameInstance.monsterTag;
         }
 
-        protected override void Start()
+        public override void OnSetup()
         {
-            base.Start();
+            base.OnSetup();
+            CacheNetTransform.ownerClientCanSendTransform = false;
+
+            // Setup relates elements
             if (gameInstance.monsterCharacterMiniMapObjects != null && gameInstance.monsterCharacterMiniMapObjects.Length > 0)
             {
                 foreach (var obj in gameInstance.monsterCharacterMiniMapObjects)
@@ -62,12 +65,6 @@ namespace MultiplayerARPG
             }
             if (gameInstance.monsterCharacterUI != null)
                 InstantiateUI(gameInstance.monsterCharacterUI);
-        }
-
-        public override void OnSetup()
-        {
-            base.OnSetup();
-            CacheNetTransform.ownerClientCanSendTransform = false;
         }
 
         public virtual void SetAttackTarget(BaseCharacterEntity target)
