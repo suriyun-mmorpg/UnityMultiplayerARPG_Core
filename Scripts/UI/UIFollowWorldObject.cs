@@ -5,7 +5,8 @@ using UnityEngine;
 [RequireComponent(typeof(UIFollowWorldPosition))]
 public class UIFollowWorldObject : MonoBehaviour
 {
-    public Transform targetObject;
+    [SerializeField]
+    private Transform targetObject;
     public Transform TargetObject
     {
         get { return targetObject; }
@@ -25,11 +26,6 @@ public class UIFollowWorldObject : MonoBehaviour
                 cachePositionFollower = GetComponent<UIFollowWorldPosition>();
             return cachePositionFollower;
         }
-    }
-
-    private void OnEnable()
-    {
-        UpdatePosition();
     }
 
     private void Update()
