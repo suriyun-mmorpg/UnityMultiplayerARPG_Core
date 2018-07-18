@@ -17,6 +17,20 @@ namespace MultiplayerARPG
         public UISceneGameplay uiSceneGameplayPrefab;
         public UISceneGameplay uiSceneGameplayMobilePrefab;
         public ServerCharacter serverCharacterPrefab;
+        [Tooltip("These objects will be instantiate as owning character's children")]
+        public GameObject[] owningCharacterObjects;
+        [Tooltip("These objects will be instantiate as owning character's children")]
+        public GameObject[] owningCharacterMiniMapObjects;
+        [Tooltip("These objects will be instantiate as monster character's children")]
+        public GameObject[] monsterCharacterMiniMapObjects;
+        [Tooltip("This UI will be instaniate as owning character's child to show character name / HP / MP / Food / Water")]
+        public UICharacterEntity owningCharacterUI;
+        [Tooltip("This UI will be instaniate as non owning character's child to show character name / HP / MP / Food / Water")]
+        public UICharacterEntity nonOwningCharacterUI;
+        [Tooltip("This UI will be instaniate as monster character's child to show character name / HP / MP / Food / Water")]
+        public UICharacterEntity monsterCharacterUI;
+        [Tooltip("This UI will be instaniate as NPC's child to show character name / quest indecator")]
+        public UINpcEntity npcUI;
         [Header("Gameplay Database")]
         [Tooltip("Default weapon item, will be used when character not equip any weapon")]
         public Item defaultWeaponItem;

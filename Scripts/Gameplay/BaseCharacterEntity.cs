@@ -27,15 +27,15 @@ namespace MultiplayerARPG
         public GameObject[] ownerObjects;
         [Tooltip("These objects will be hidden on owner objects")]
         public GameObject[] nonOwnerObjects;
-        [Header("Damage transform")]
+        [Header("UI / Damage transform")]
         public Transform meleeDamageTransform;
         public Transform missileDamageTransform;
-        [Header("Relates Element Containers")]
-        public Transform uiElementContainer;
+        public Transform uiElementTransform;
         public Transform miniMapElementContainer;
         #endregion
 
         #region Protected data
+        protected UICharacterEntity uiCharacterEntity;
         protected BaseCharacter database;
         protected RpgNetworkEntity targetEntity;
         protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
@@ -92,16 +92,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public Transform UIElementContainer
-        {
-            get
-            {
-                if (uiElementContainer == null)
-                    uiElementContainer = CacheTransform;
-                return uiElementContainer;
-            }
-        }
-
         public Transform MiniMapElementContainer
         {
             get
@@ -109,6 +99,16 @@ namespace MultiplayerARPG
                 if (miniMapElementContainer == null)
                     miniMapElementContainer = CacheTransform;
                 return miniMapElementContainer;
+            }
+        }
+
+        public Transform UIElementTransform
+        {
+            get
+            {
+                if (uiElementTransform == null)
+                    uiElementTransform = CacheTransform;
+                return uiElementTransform;
             }
         }
 
@@ -125,10 +125,12 @@ namespace MultiplayerARPG
             base.Start();
             foreach (var ownerObject in ownerObjects)
             {
+                if (ownerObject == null) continue;
                 ownerObject.SetActive(IsOwnerClient);
             }
             foreach (var nonOwnerObject in nonOwnerObjects)
             {
+                if (nonOwnerObject == null) continue;
                 nonOwnerObject.SetActive(!IsOwnerClient);
             }
         }
@@ -829,6 +831,16 @@ namespace MultiplayerARPG
             CacheMoveSpeed = CacheStats.moveSpeed;
             CacheAtkSpeed = CacheStats.atkSpeed;
             isRecaching = false;
+        }
+
+        public virtual void InstantiateUI(UICharacterEntity prefab)
+        {
+            if (prefab == null)
+                return;
+            if (uiCharacterEntity != null)
+                Destroy(uiCharacterEntity.gameObject);
+            uiCharacterEntity = Instantiate(prefab);
+            uiCharacterEntity.Data = this;
         }
 
         public virtual bool IsPlayingActionAnimation()

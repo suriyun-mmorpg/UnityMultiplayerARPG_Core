@@ -126,7 +126,7 @@ namespace MultiplayerARPG
             if (Vector3.Distance(CacheTransform.position, npcEntity.CacheTransform.position) > gameInstance.conversationDistance + 5f)
                 return;
 
-            currentNpcDialog = npcEntity.startDialog;
+            currentNpcDialog = npcEntity.StartDialog;
             if (currentNpcDialog != null)
                 RequestShowNpcDialog(currentNpcDialog.DataId);
         }

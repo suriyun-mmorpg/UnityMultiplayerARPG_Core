@@ -265,7 +265,7 @@ namespace MultiplayerARPG
                         {
                             var npcIdentity = Assets.NetworkSpawn(npcPrefab.Identity, npc.position, Quaternion.Euler(npc.rotation));
                             var npcEntity = npcIdentity.GetComponent<NpcEntity>();
-                            npcEntity.startDialog = npc.startDialog;
+                            npcEntity.StartDialog = npc.startDialog;
                             npcEntity.Title = npc.title;
                         }
                     }

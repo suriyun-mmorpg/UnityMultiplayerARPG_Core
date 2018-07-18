@@ -103,6 +103,7 @@ namespace MultiplayerARPG
 
         protected virtual void SetupNetElements()
         {
+            this.InvokeClassAddOnMethods("SetupNetElements");
             syncTitle.sendOptions = SendOptions.ReliableUnordered;
             syncTitle.forOwnerOnly = false;
         }

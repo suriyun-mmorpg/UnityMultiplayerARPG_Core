@@ -49,6 +49,21 @@ namespace MultiplayerARPG
             gameObject.tag = gameInstance.monsterTag;
         }
 
+        protected override void Start()
+        {
+            base.Start();
+            if (gameInstance.monsterCharacterMiniMapObjects != null && gameInstance.monsterCharacterMiniMapObjects.Length > 0)
+            {
+                foreach (var obj in gameInstance.monsterCharacterMiniMapObjects)
+                {
+                    if (obj == null) continue;
+                    Instantiate(obj, MiniMapElementContainer.position, MiniMapElementContainer.rotation, MiniMapElementContainer);
+                }
+            }
+            if (gameInstance.monsterCharacterUI != null)
+                InstantiateUI(gameInstance.monsterCharacterUI);
+        }
+
         public override void OnSetup()
         {
             base.OnSetup();

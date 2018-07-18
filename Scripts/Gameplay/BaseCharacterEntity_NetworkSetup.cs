@@ -11,15 +11,6 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        public override void OnBehaviourValidate()
-        {
-            base.OnBehaviourValidate();
-#if UNITY_EDITOR
-            SetupNetElements();
-            EditorUtility.SetDirty(this);
-#endif
-        }
-
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
@@ -52,7 +43,6 @@ namespace MultiplayerARPG
         public override void OnSetup()
         {
             base.OnSetup();
-            SetupNetElements();
             // On data changes events
             id.onChange += OnIdChange;
             dataId.onChange += OnDataIdChange;
@@ -96,6 +86,9 @@ namespace MultiplayerARPG
             buffs.onOperation -= OnBuffsOperation;
             equipItems.onOperation -= OnEquipItemsOperation;
             nonEquipItems.onOperation -= OnNonEquipItemsOperation;
+
+            if (uiCharacterEntity != null)
+                Destroy(uiCharacterEntity.gameObject);
         }
     }
 }

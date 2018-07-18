@@ -66,11 +66,16 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void SetupNetElements()
+        {
+            base.SetupNetElements();
+            itemDataId.sendOptions = SendOptions.ReliableOrdered;
+            itemDataId.forOwnerOnly = false;
+        }
+
         public override void OnSetup()
         {
             base.OnSetup();
-            itemDataId.sendOptions = SendOptions.ReliableOrdered;
-            itemDataId.forOwnerOnly = false;
             itemDataId.onChange += OnItemDataIdChange;
         }
 
