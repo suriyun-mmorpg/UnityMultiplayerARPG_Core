@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -15,5 +18,30 @@ namespace MultiplayerARPG
         public float characterForwardDistance = 4;
         public int maxHp = 100;
         public Transform combatTextTransform;
+
+#if UNITY_EDITOR
+        protected virtual void OnValidate()
+        {
+            Migrate();
+        }
+#endif
+
+        public BuildingEntity Migrate()
+        {
+            var identity = GetComponent<LiteNetLibManager.LiteNetLibIdentity>();
+            if (identity == null)
+                identity = gameObject.AddComponent<LiteNetLibManager.LiteNetLibIdentity>();
+            var buildingEntity = GetComponent<BuildingEntity>();
+            if (buildingEntity == null)
+                buildingEntity = gameObject.AddComponent<BuildingEntity>();
+            buildingEntity.Title = title;
+            buildingEntity.buildingType = buildingType;
+            buildingEntity.characterForwardDistance = characterForwardDistance;
+            buildingEntity.maxHp = maxHp;
+            buildingEntity.combatTextTransform = combatTextTransform;
+            Destroy(this);
+            EditorUtility.SetDirty(gameObject);
+            return buildingEntity;
+        }
     }
 }
