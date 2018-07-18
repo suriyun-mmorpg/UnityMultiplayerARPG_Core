@@ -43,6 +43,7 @@ namespace MultiplayerARPG
         protected Vector3 mouseDownPosition;
         protected float mouseDownTime;
         protected bool isMouseDragOrHoldOrOverUI;
+        protected uint lastNpcObjectId;
         public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
         public GameObject CacheTargetObject { get; protected set; }
 
@@ -219,6 +220,7 @@ namespace MultiplayerARPG
                         var harvestableEntity = hitTransform.GetComponent<HarvestableEntity>();
                         targetPosition = hit.point;
                         PlayerCharacterEntity.SetTargetEntity(null);
+                        lastNpcObjectId = 0;
                         if (playerEntity != null && !playerEntity.IsDead())
                         {
                             targetPosition = playerEntity.CacheTransform.position;
@@ -511,9 +513,12 @@ namespace MultiplayerARPG
                 var actDistance = gameInstance.conversationDistance - StoppingDistance;
                 if (Vector3.Distance(CharacterTransform.position, targetNpc.CacheTransform.position) <= actDistance)
                 {
-                    PlayerCharacterEntity.RequestNpcActivate(targetNpc.ObjectId);
+                    if (lastNpcObjectId != targetNpc.ObjectId)
+                    {
+                        PlayerCharacterEntity.RequestNpcActivate(targetNpc.ObjectId);
+                        lastNpcObjectId = targetNpc.ObjectId;
+                    }
                     PlayerCharacterEntity.StopMove();
-                    PlayerCharacterEntity.SetTargetEntity(null);
                 }
                 else
                     UpdateTargetEntityPosition(targetNpc);

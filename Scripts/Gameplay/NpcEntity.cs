@@ -1,10 +1,6 @@
 ﻿using UnityEngine;
 using LiteNetLibManager;
-using LiteNetLib;
 using System.Collections.Generic;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace MultiplayerARPG
 {
@@ -15,12 +11,15 @@ namespace MultiplayerARPG
         [SerializeField]
         private NpcDialog startDialog;
         [Header("Relates Element Containers")]
-        public Transform uiElementContainer;
-        public Transform uiQuestIndicatorContainer;
+        public Transform uiElementTransform;
+        public Transform questIndicatorContainer;
 
         [Header("Sync Lists")]
         [SerializeField]
         private SyncListInt questIds = new SyncListInt();
+
+        private UINpcEntity uiNpcEntity;
+        private NpcQuestIndicator questIndicator;
 
         public NpcDialog StartDialog
         {
@@ -35,23 +34,23 @@ namespace MultiplayerARPG
             }
         }
 
-        public Transform UIElementContainer
+        public Transform UIElementTransform
         {
             get
             {
-                if (uiElementContainer == null)
-                    uiElementContainer = CacheTransform;
-                return uiElementContainer;
+                if (uiElementTransform == null)
+                    uiElementTransform = CacheTransform;
+                return uiElementTransform;
             }
         }
 
-        public Transform UIQuestIndicatorTransform
+        public Transform QuestIndicatorContainer
         {
             get
             {
-                if (uiQuestIndicatorContainer == null)
-                    uiQuestIndicatorContainer = CacheTransform;
-                return uiQuestIndicatorContainer;
+                if (questIndicatorContainer == null)
+                    questIndicatorContainer = CacheTransform;
+                return questIndicatorContainer;
             }
         }
 
@@ -62,18 +61,52 @@ namespace MultiplayerARPG
             gameObject.layer = gameInstance.characterLayer;
         }
 
+        protected override void Start()
+        {
+            base.Start();
+            if (gameInstance.npcUI != null)
+                InstantiateUI(gameInstance.npcUI);
+            if (gameInstance.npcQuestIndicator != null)
+                InstantiateQuestIndicator(gameInstance.npcQuestIndicator);
+        }
+
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
             questIds.forOwnerOnly = false;
         }
 
+        public override void OnSetup()
+        {
+            base.OnSetup();
+            SetupQuestIds();
+        }
+
+        public void InstantiateUI(UINpcEntity prefab)
+        {
+            if (prefab == null)
+                return;
+            if (uiNpcEntity != null)
+                Destroy(uiNpcEntity.gameObject);
+            uiNpcEntity = Instantiate(prefab);
+            uiNpcEntity.Data = this;
+        }
+
+        public void InstantiateQuestIndicator(NpcQuestIndicator prefab)
+        {
+            if (prefab == null)
+                return;
+            if (questIndicator != null)
+                Destroy(questIndicator.gameObject);
+            questIndicator = Instantiate(prefab, QuestIndicatorContainer);
+            questIndicator.npcEntity = this;
+        }
+
         private void SetupQuestIds()
         {
             if (!IsServer)
                 return;
-
-
+            
             questIds.Clear();
             FindQuestFromDialog(startDialog);
         }
@@ -94,11 +127,11 @@ namespace MultiplayerARPG
                     foreach (var menu in dialog.menus)
                     {
                         if (menu.isCloseMenu) continue;
-                        FindQuestFromDialog(menu.dialog);
+                        FindQuestFromDialog(menu.dialog, foundDialogs);
                     }
                     break;
                 case NpcDialogType.Quest:
-                    if (dialog.quest == null)
+                    if (dialog.quest != null)
                         questIds.Add(dialog.quest.DataId);
                     FindQuestFromDialog(dialog.questAcceptedDialog, foundDialogs);
                     FindQuestFromDialog(dialog.questDeclinedDialog, foundDialogs);

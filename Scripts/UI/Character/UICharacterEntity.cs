@@ -10,6 +10,7 @@ namespace MultiplayerARPG
     {
         [Tooltip("Visible when hit duration for non owning character")]
         public float visibleWhenHitDuration = 2f;
+        public float visibleDistance = 30f;
         public UIFollowWorldObject rootFollower;
         public Text textTitle;
         public UICharacter uiCharacter;
@@ -45,6 +46,8 @@ namespace MultiplayerARPG
             BaseCharacterEntity targetCharacter;
             if (BasePlayerCharacterController.OwningCharacter == Data)
                 CacheCanvas.enabled = true;
+            else if (Vector3.Distance(BasePlayerCharacterController.OwningCharacter.CacheTransform.position, Data.CacheTransform.position) > visibleDistance)
+                CacheCanvas.enabled = false;
             else if (BasePlayerCharacterController.OwningCharacter.TryGetTargetEntity(out targetCharacter) && targetCharacter.ObjectId == Data.ObjectId)
                 CacheCanvas.enabled = true;
             else

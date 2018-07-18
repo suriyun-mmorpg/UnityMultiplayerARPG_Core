@@ -8,6 +8,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(Canvas))]
     public class UINpcEntity : UISelectionEntry<NpcEntity>
     {
+        public float visibleDistance = 30f;
         public UIFollowWorldObject rootFollower;
         public Text textTitle;
 
@@ -39,7 +40,9 @@ namespace MultiplayerARPG
             }
 
             NpcEntity targetNpc;
-            if (!BasePlayerCharacterController.OwningCharacter.TryGetTargetEntity(out targetNpc) && targetNpc.ObjectId == Data.ObjectId)
+            if (Vector3.Distance(BasePlayerCharacterController.OwningCharacter.CacheTransform.position, Data.CacheTransform.position) > visibleDistance)
+                CacheCanvas.enabled = false;
+            else if (BasePlayerCharacterController.OwningCharacter.TryGetTargetEntity(out targetNpc) && targetNpc.ObjectId == Data.ObjectId)
                 CacheCanvas.enabled = true;
             else
                 CacheCanvas.enabled = false;
@@ -56,7 +59,7 @@ namespace MultiplayerARPG
             if (rootFollower != null)
             {
                 if (Data != null)
-                    rootFollower.TargetObject = Data.UIElementContainer;
+                    rootFollower.TargetObject = Data.UIElementTransform;
                 rootFollower.gameObject.SetActive(Data != null);
             }
         }

@@ -29,8 +29,11 @@ namespace MultiplayerARPG
         public UICharacterEntity nonOwningCharacterUI;
         [Tooltip("This UI will be instaniate as monster character's child to show character name / HP / MP / Food / Water")]
         public UICharacterEntity monsterCharacterUI;
-        [Tooltip("This UI will be instaniate as NPC's child to show character name / quest indecator")]
+        [Tooltip("This UI will be instaniate as NPC's child to show character name")]
         public UINpcEntity npcUI;
+        [Tooltip("This UI will be instaniate as NPC's child to show quest indecator")]
+        public NpcQuestIndicator npcQuestIndicator;
+
         [Header("Gameplay Database")]
         [Tooltip("Default weapon item, will be used when character not equip any weapon")]
         public Item defaultWeaponItem;
