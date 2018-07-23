@@ -1,9 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace MultiplayerARPG
 {
@@ -64,10 +61,6 @@ namespace MultiplayerARPG
 
         [Header("Craft")]
         public ItemCraft itemCraft;
-        [System.Obsolete("`craftingItem` is deprecated, will be removed on next version")]
-        public Item craftingItem;
-        [System.Obsolete("`craftRequirements` is deprecated, will be removed on next version")]
-        public ItemAmount[] craftRequirements;
 
         private Dictionary<Skill, short> cacheRequireSkillLevels;
         public Dictionary<Skill, short> CacheRequireSkillLevels
@@ -90,25 +83,6 @@ namespace MultiplayerARPG
                 return cacheEffectivenessAttributes;
             }
         }
-
-#if UNITY_EDITOR
-        private void OnValidate()
-        {
-            if (itemCraft == null)
-                itemCraft = new ItemCraft();
-            if (craftingItem != null)
-            {
-                itemCraft.craftingItem = craftingItem;
-                craftingItem = null;
-            }
-            if (craftRequirements != null && craftRequirements.Length > 0)
-            {
-                itemCraft.craftRequirements = craftRequirements;
-                craftRequirements = null;
-            }
-            EditorUtility.SetDirty(this);
-        }
-#endif
     }
 
 [System.Serializable]
