@@ -6,7 +6,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using MultiplayerARPG;
 
-public static class PlayerCharacterDataExtension
+public static partial class PlayerCharacterDataExtension
 {
     public static T CloneTo<T>(this IPlayerCharacterData from, T to) where T : IPlayerCharacterData
     {

@@ -4,7 +4,7 @@ using UnityEngine;
 using LiteNetLibManager;
 using MultiplayerARPG;
 
-public static class CharacterDataExtension
+public static partial class CharacterDataExtension
 {
     public static BaseCharacter GetDatabase(this ICharacterData data)
     {
