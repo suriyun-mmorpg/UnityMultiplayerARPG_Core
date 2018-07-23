@@ -89,9 +89,9 @@ namespace MultiplayerARPG
         private readonly List<BuildingMaterial> buildingMaterials = new List<BuildingMaterial>();
         private readonly List<BuildingArea> buildingAreas = new List<BuildingArea>();
 
-        protected override void Awake()
+        protected override void EntityAwake()
         {
-            base.Awake();
+            base.EntityAwake();
             gameObject.tag = gameInstance.buildingTag;
             gameObject.layer = gameInstance.buildingLayer;
 
@@ -116,9 +116,9 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void Update()
+        protected override void EntityUpdate()
         {
-            base.Update();
+            base.EntityUpdate();
             if (isBuildMode)
             {
                 if (buildingArea != null && buildingArea.snapBuildingObject)

@@ -42,9 +42,9 @@ namespace MultiplayerARPG
                 NetworkDestroy();
         }
 
-        protected override void FixedUpdate()
+        protected override void EntityFixedUpdate()
         {
-            base.FixedUpdate();
+            base.EntityFixedUpdate();
             CacheRigidbody.velocity = CacheTransform.forward * missileSpeed.Value;
         }
 

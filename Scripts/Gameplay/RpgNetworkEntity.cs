@@ -40,47 +40,63 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void Awake()
+        private void Awake()
         {
+            EntityAwake();
             this.InvokeClassAddOnMethods("Awake");
         }
+        protected virtual void EntityAwake() { }
 
-        protected virtual void Start()
+        private void Start()
         {
+            EntityStart();
             this.InvokeClassAddOnMethods("Start");
         }
+        protected virtual void EntityStart() { }
 
-        protected virtual void OnEnable()
+        private void OnEnable()
         {
+            EntityOnEnable();
             this.InvokeClassAddOnMethods("OnEnable");
         }
+        protected virtual void EntityOnEnable() { }
 
-        protected virtual void OnDisable()
+        private void OnDisable()
         {
+            EntityOnDisable();
             this.InvokeClassAddOnMethods("OnDisable");
         }
+        protected virtual void EntityOnDisable() { }
 
-        protected virtual void Update()
+        private void Update()
         {
+            EntityUpdate();
             this.InvokeClassAddOnMethods("Update");
         }
+        protected virtual void EntityUpdate() { }
 
-        protected virtual void LateUpdate()
+        private void LateUpdate()
         {
-            this.InvokeClassAddOnMethods("LateUpdate");
             if (textTitle != null)
                 textTitle.text = Title;
+            EntityLateUpdate();
+            this.InvokeClassAddOnMethods("LateUpdate");
         }
-
-        protected virtual void FixedUpdate()
+        protected virtual void EntityLateUpdate() { }
+        
+        private void FixedUpdate()
         {
+            EntityFixedUpdate();
             this.InvokeClassAddOnMethods("FixedUpdate");
         }
+        protected virtual void EntityFixedUpdate() { }
 
-        protected virtual void OnDestroy()
+        private void OnDestroy()
         {
+            EntityOnDestroy();
             this.InvokeClassAddOnMethods("OnDestroy");
         }
+        protected virtual void EntityOnDestroy() { }
 
         public override void OnBehaviourValidate()
         {

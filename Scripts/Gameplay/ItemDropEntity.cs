@@ -46,16 +46,16 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void Awake()
+        protected override void EntityAwake()
         {
-            base.Awake();
+            base.EntityAwake();
             gameObject.tag = gameInstance.itemDropTag;
             gameObject.layer = gameInstance.itemDropLayer;
         }
 
-        protected override void Start()
+        protected override void EntityStart()
         {
-            base.Start();
+            base.EntityStart();
             if (IsServer)
             {
                 var id = dropData.dataId;
@@ -92,9 +92,9 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void OnDestroy()
+        protected override void EntityOnDestroy()
         {
-            base.OnDestroy();
+            base.EntityOnDestroy();
             itemDataId.onChange -= OnItemDataIdChange;
         }
 

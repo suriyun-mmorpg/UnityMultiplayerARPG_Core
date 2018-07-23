@@ -98,9 +98,9 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void OnDestroy()
+        protected override void EntityOnDestroy()
         {
-            base.OnDestroy();
+            base.EntityOnDestroy();
             // On data changes events
             statPoint.onChange -= OnStatPointChange;
             skillPoint.onChange -= OnSkillPointChange;

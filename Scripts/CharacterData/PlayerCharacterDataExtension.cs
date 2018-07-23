@@ -36,6 +36,7 @@ public static partial class PlayerCharacterDataExtension
         to.EquipItems = new List<CharacterItem>(from.EquipItems);
         to.NonEquipItems = new List<CharacterItem>(from.NonEquipItems);
         to.Skills = new List<CharacterSkill>(from.Skills);
+        AddOnUtils.InvokeAddOnMethods(typeof(PlayerCharacterDataExtension), null, "CloneTo", from, to);
         return to;
     }
 
@@ -150,6 +151,7 @@ public static partial class PlayerCharacterDataExtension
             if (!nonEquipItem.IsValid())
                 character.NonEquipItems.RemoveAt(i);
         }
+        AddOnUtils.InvokeAddOnMethods(typeof(PlayerCharacterDataExtension), null, "ValidateCharacterData", character);
         return character;
     }
 
@@ -235,6 +237,7 @@ public static partial class PlayerCharacterDataExtension
         character.RespawnMapName = startMap.scene.SceneName;
         character.CurrentPosition = startMap.startPosition;
         character.RespawnPosition = startMap.startPosition;
+        AddOnUtils.InvokeAddOnMethods(typeof(PlayerCharacterDataExtension), null, "SetNewCharacterData", character, characterName, dataId);
         return character;
     }
 
@@ -254,12 +257,15 @@ public static partial class PlayerCharacterDataExtension
         surrogateSelector.AddSurrogate(typeof(CharacterSkill), new StreamingContext(StreamingContextStates.All), skillSS);
         var playerCharacterDataSS = new PlayerCharacterSerializationSurrogate();
         surrogateSelector.AddSurrogate(typeof(PlayerCharacterData), new StreamingContext(StreamingContextStates.All), playerCharacterDataSS);
+        AddOnUtils.InvokeAddOnMethods(typeof(PlayerCharacterDataExtension), null, "AddAllCharacterRelatesDataSurrogate", surrogateSelector);
     }
 
     public static void SavePersistentCharacterData<T>(this T characterData) where T : IPlayerCharacterData
     {
         var savingData = new PlayerCharacterData();
         characterData.CloneTo(savingData);
+        if (string.IsNullOrEmpty(savingData.Id))
+            return;
         savingData.LastUpdate = (int)(System.DateTime.Now.Ticks / System.TimeSpan.TicksPerMillisecond);
         var binaryFormatter = new BinaryFormatter();
         var surrogateSelector = new SurrogateSelector();
@@ -304,7 +310,7 @@ public static partial class PlayerCharacterDataExtension
         Debug.Log("Characters loading from: " + path);
         foreach (var file in files)
         {
-            if (file.Contains("_world_"))
+            if (file.Length <= 4 || file.Contains("_world_"))
                 continue;
             var characterData = new PlayerCharacterData();
             result.Add(characterData.LoadPersistentCharacterData(file));
@@ -430,6 +436,7 @@ public static partial class PlayerCharacterDataExtension
         writer.Put(leftHand.level);
         writer.Put(leftHand.amount);
         writer.Put(leftHand.durability);
+        AddOnUtils.InvokeAddOnMethods(typeof(PlayerCharacterDataExtension), null, "SerializeCharacterData", characterData, writer);
     }
 
     public static T DeserializeCharacterData<T>(this T characterData, NetDataReader reader) where T : IPlayerCharacterData
@@ -543,6 +550,8 @@ public static partial class PlayerCharacterDataExtension
         equipWeapons.rightHand = rightWeapon;
         equipWeapons.leftHand = leftWeapon;
         tempCharacterData.EquipWeapons = equipWeapons;
+
+        AddOnUtils.InvokeAddOnMethods(typeof(PlayerCharacterDataExtension), null, "DeserializeCharacterData", characterData, reader);
 
         tempCharacterData.ValidateCharacterData();
         tempCharacterData.CloneTo(characterData);

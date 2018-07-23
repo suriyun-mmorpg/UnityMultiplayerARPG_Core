@@ -112,17 +112,17 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void Awake()
+        protected override void EntityAwake()
         {
-            base.Awake();
+            base.EntityAwake();
             gameObject.layer = gameInstance.characterLayer;
             animActionType = AnimActionType.None;
             isRecaching = true;
         }
 
-        protected override void Start()
+        protected override void EntityStart()
         {
-            base.Start();
+            base.EntityStart();
             foreach (var ownerObject in ownerObjects)
             {
                 if (ownerObject == null) continue;
@@ -135,9 +135,9 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void Update()
+        protected override void EntityUpdate()
         {
-            base.Update();
+            base.EntityUpdate();
             MakeCaches();
         }
 

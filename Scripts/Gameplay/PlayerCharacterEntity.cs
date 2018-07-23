@@ -55,16 +55,16 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void Awake()
+        protected override void EntityAwake()
         {
-            base.Awake();
+            base.EntityAwake();
             CacheRigidbody.useGravity = false;
             StopMove();
         }
 
-        protected override void Update()
+        protected override void EntityUpdate()
         {
-            base.Update();
+            base.EntityUpdate();
 
             if (IsDead())
             {
@@ -74,9 +74,9 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void FixedUpdate()
+        protected override void EntityFixedUpdate()
         {
-            base.FixedUpdate();
+            base.EntityFixedUpdate();
             if (!IsServer && !IsOwnerClient)
                 return;
 
@@ -128,9 +128,9 @@ namespace MultiplayerARPG
             CacheRigidbody.AddForce(new Vector3(0, Physics.gravity.y * CacheRigidbody.mass * gravityRate, 0));
         }
 
-        protected override void LateUpdate()
+        protected override void EntityLateUpdate()
         {
-            base.LateUpdate();
+            base.EntityLateUpdate();
 
             if (!IsServer && !IsOwnerClient)
                 return;

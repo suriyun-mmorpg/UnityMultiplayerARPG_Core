@@ -40,9 +40,9 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void Awake()
+        protected override void EntityAwake()
         {
-            base.Awake();
+            base.EntityAwake();
             gameObject.tag = gameInstance.playerTag;
         }
 

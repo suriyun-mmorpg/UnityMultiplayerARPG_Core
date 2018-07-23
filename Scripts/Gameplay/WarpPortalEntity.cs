@@ -13,9 +13,9 @@ namespace MultiplayerARPG
         public UnityScene mapScene;
         public Vector3 position;
 
-        protected override void Awake()
+        protected override void EntityAwake()
         {
-            base.Awake();
+            base.EntityAwake();
             foreach (var warpSignal in warpSignals)
             {
                 if (warpSignal != null)

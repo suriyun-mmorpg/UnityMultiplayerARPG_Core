@@ -19,9 +19,9 @@ namespace MultiplayerARPG
         public Vector3 spawnPosition;
         #endregion
 
-        protected override void Awake()
+        protected override void EntityAwake()
         {
-            base.Awake();
+            base.EntityAwake();
             gameObject.tag = gameInstance.harvestableTag;
             gameObject.layer = gameInstance.harvestableLayer;
         }
