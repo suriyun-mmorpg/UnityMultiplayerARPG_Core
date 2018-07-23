@@ -2,10 +2,16 @@
 using LiteNetLibManager;
 
 [System.Serializable]
-public struct EquipWeapons
+public class EquipWeapons
 {
     public CharacterItem rightHand;
     public CharacterItem leftHand;
+
+    public EquipWeapons()
+    {
+        rightHand = new CharacterItem();
+        leftHand = new CharacterItem();
+    }
 }
 
 public class NetFieldEquipWeapons : LiteNetLibNetField<EquipWeapons>
