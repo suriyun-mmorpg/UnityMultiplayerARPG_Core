@@ -4,12 +4,11 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class HarvestableSpawnArea : MonoBehaviour
+    public class HarvestableSpawnArea : GameArea
     {
-        public const float GROUND_DETECTION_DISTANCE = 100f;
+        [Header("Spawning Data")]
         public HarvestableEntity harvestableEntity;
         public short amount = 1;
-        public float randomRadius = 5f;
 
         private int pending;
 
@@ -88,46 +87,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public Vector3 GetRandomPosition()
+        public override int GroundLayerMask
         {
-            var randomedPosition = Random.insideUnitSphere * randomRadius;
-            randomedPosition = transform.position + new Vector3(randomedPosition.x, 0, randomedPosition.z);
-
-            // Raycast to find hit floor
-            Vector3? aboveHitPoint = null;
-            Vector3? underHitPoint = null;
-            var raycastLayerMask = gameInstance.GetHarvestableSpawnGroundDetectionLayerMask();
-            RaycastHit tempHit;
-            if (Physics.Raycast(randomedPosition, Vector3.up, out tempHit, GROUND_DETECTION_DISTANCE, raycastLayerMask))
-                aboveHitPoint = tempHit.point;
-            if (Physics.Raycast(randomedPosition, Vector3.down, out tempHit, GROUND_DETECTION_DISTANCE, raycastLayerMask))
-                underHitPoint = tempHit.point;
-            // Set drop position to nearest hit point
-            if (aboveHitPoint.HasValue && underHitPoint.HasValue)
-            {
-                if (Vector3.Distance(randomedPosition, aboveHitPoint.Value) < Vector3.Distance(randomedPosition, underHitPoint.Value))
-                    randomedPosition = aboveHitPoint.Value;
-                else
-                    randomedPosition = underHitPoint.Value;
-            }
-            else if (aboveHitPoint.HasValue)
-                randomedPosition = aboveHitPoint.Value;
-            else if (underHitPoint.HasValue)
-                randomedPosition = underHitPoint.Value;
-
-            return randomedPosition;
-        }
-
-        public Quaternion GetRandomRotation()
-        {
-            var randomedRotation = Vector3.up * Random.Range(0, 360);
-            return Quaternion.Euler(randomedRotation);
-        }
-
-        private void OnDrawGizmos()
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(transform.position, randomRadius);
+            get { return gameInstance.GetHarvestableSpawnGroundDetectionLayerMask(); }
         }
     }
 }
