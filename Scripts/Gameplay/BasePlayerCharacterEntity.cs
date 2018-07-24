@@ -79,11 +79,13 @@ namespace MultiplayerARPG
             // TODO: May implement this for party/guild battle purposes
             if (characterEntity == null)
                 return false;
-            var manager = Manager as BaseGameNetworkManager;
-            if (manager == null)
+            if (safeArea != null || characterEntity.safeArea != null)
                 return false;
             if (characterEntity is BaseMonsterCharacterEntity)
                 return true;
+            var manager = Manager as BaseGameNetworkManager;
+            if (manager == null)
+                return false;
             if (!IsAlly(characterEntity) && manager.CurrentMapInfo.canPvp)
                 return true;
             return false;

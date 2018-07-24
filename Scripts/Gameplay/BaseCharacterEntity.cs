@@ -20,7 +20,9 @@ namespace MultiplayerARPG
     public abstract partial class BaseCharacterEntity : DamageableNetworkEntity, ICharacterData
     {
         public const float ACTION_COMMAND_DELAY = 0.2f;
-        
+        [HideInInspector]
+        public SafeArea safeArea;
+
         #region Serialize data
         [Header("Settings")]
         [Tooltip("These objects will be hidden on non owner objects")]

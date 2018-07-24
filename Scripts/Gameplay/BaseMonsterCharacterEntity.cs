@@ -26,6 +26,8 @@ namespace MultiplayerARPG
         public MonsterSpawnArea spawnArea;
         [HideInInspector]
         public Vector3 spawnPosition;
+        [HideInInspector]
+        public BaseCharacterEntity spawner;
 
         public MonsterCharacter MonsterDatabase
         {
@@ -82,25 +84,39 @@ namespace MultiplayerARPG
         public override bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity)
         {
             // For now it can receive damage from players only
-            return characterEntity != null && characterEntity is BasePlayerCharacterEntity;
+            if (characterEntity == null)
+                return false;
+            if (safeArea != null || characterEntity.safeArea != null)
+                return false;
+            if (IsEnemy(characterEntity))
+                return true;
+            return false;
         }
 
         public override bool IsAlly(BaseCharacterEntity characterEntity)
         {
             if (characterEntity == null)
                 return false;
+            // If spawn by another character, spawner's allies are this allies
+            if (spawner != null)
+                return characterEntity == spawner || spawner.IsAlly(characterEntity);
             // If this character have been attacked by any character
             // It will tell another ally nearby to help
             var monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
-            if (monsterCharacterEntity != null && monsterCharacterEntity.MonsterDatabase.allyId == MonsterDatabase.allyId)
-                return true;
+            if (monsterCharacterEntity != null)
+                return monsterCharacterEntity.MonsterDatabase.allyId == MonsterDatabase.allyId;
             return false;
         }
 
         public override bool IsEnemy(BaseCharacterEntity characterEntity)
         {
-            // All players are enemy
-            return characterEntity != null && characterEntity is BasePlayerCharacterEntity;
+            if (characterEntity == null)
+                return false;
+            // If spawn by another character, spawner's enemies are this enemies
+            if (spawner != null)
+                return characterEntity != spawner && spawner.IsEnemy(characterEntity);
+            // Attack only player by default
+            return characterEntity is BasePlayerCharacterEntity;
         }
 
         public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId)
