@@ -433,6 +433,7 @@ namespace MultiplayerARPG
             // Temp variables
             BaseCharacterEntity targetEnemy;
             BasePlayerCharacterEntity targetPlayer;
+            BaseMonsterCharacterEntity targetMonster;
             NpcEntity targetNpc;
             ItemDropEntity targetItemDrop;
             BuildingEntity targetBuilding;
@@ -507,6 +508,24 @@ namespace MultiplayerARPG
                 }
                 else
                     UpdateTargetEntityPosition(targetPlayer);
+            }
+            else if (PlayerCharacterEntity.TryGetTargetEntity(out targetMonster))
+            {
+                if (targetMonster.IsDead())
+                {
+                    queueUsingSkill = null;
+                    PlayerCharacterEntity.SetTargetEntity(null);
+                    PlayerCharacterEntity.StopMove();
+                    return;
+                }
+                var actDistance = gameInstance.conversationDistance - StoppingDistance;
+                if (Vector3.Distance(CharacterTransform.position, targetMonster.CacheTransform.position) <= actDistance)
+                {
+                    PlayerCharacterEntity.StopMove();
+                    // TODO: do something
+                }
+                else
+                    UpdateTargetEntityPosition(targetMonster);
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetNpc))
             {
