@@ -24,7 +24,6 @@ namespace MultiplayerARPG
         {
             Migrate();
         }
-#endif
 
         public BuildingEntity Migrate()
         {
@@ -43,5 +42,6 @@ namespace MultiplayerARPG
             EditorUtility.SetDirty(gameObject);
             return buildingEntity;
         }
+#endif
     }
 }
