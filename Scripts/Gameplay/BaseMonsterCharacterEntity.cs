@@ -88,7 +88,7 @@ namespace MultiplayerARPG
                 return false;
             if (safeArea != null || characterEntity.safeArea != null)
                 return false;
-            if (IsEnemy(characterEntity))
+            if (!IsAlly(characterEntity))
                 return true;
             return false;
         }
@@ -97,7 +97,7 @@ namespace MultiplayerARPG
         {
             if (characterEntity == null)
                 return false;
-            // If spawn by another character, spawner's allies are this allies
+            // If spawn by another character, will have same allies with spawner
             if (spawner != null)
                 return characterEntity == spawner || spawner.IsAlly(characterEntity);
             // If this character have been attacked by any character
@@ -112,7 +112,7 @@ namespace MultiplayerARPG
         {
             if (characterEntity == null)
                 return false;
-            // If spawn by another character, spawner's enemies are this enemies
+            // If spawn by another character, will have same enemies with spawner
             if (spawner != null)
                 return characterEntity != spawner && spawner.IsEnemy(characterEntity);
             // Attack only player by default
@@ -128,7 +128,6 @@ namespace MultiplayerARPG
             // If no attacker, skip next logics
             if (attacker == null || !IsEnemy(attacker))
                 return;
-            // If character isn't dead
             // If character is not dead, try to attack
             if (!IsDead())
             {
