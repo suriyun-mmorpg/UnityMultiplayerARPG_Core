@@ -6,7 +6,7 @@ using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
-    public class LanRpgNetworkManager : BaseGameNetworkManager
+    public partial class LanRpgNetworkManager : BaseGameNetworkManager
     {
         public static LanRpgNetworkManager Singleton { get; protected set; }
         public enum GameStartType

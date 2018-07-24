@@ -20,18 +20,6 @@ public static class AddOnUtils
         InvokeAddOnMethods(obj.GetType(), obj, baseMethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, args);
     }
 
-    /// <summary>
-    /// This will calls all methods from `obj` that have names as "[anything]_`baseMethodName`" with any number of arguments that can be set via `args`
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="obj"></param>
-    /// <param name="baseMethodName"></param>
-    /// <param name="args"></param>
-    public static void InvokeStructAddOnMethods<T>(this T obj, string baseMethodName, params object[] args) where T : struct
-    {
-        InvokeAddOnMethods(obj.GetType(), obj, baseMethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, args);
-    }
-
     public static void InvokeAddOnMethods(Type type, object obj, string baseMethodName, params object[] args)
     {
         InvokeAddOnMethods(type, obj, baseMethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static, args);

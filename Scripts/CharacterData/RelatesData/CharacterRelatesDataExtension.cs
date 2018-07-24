@@ -2,6 +2,11 @@
 
 public static class CharacterRelatesDataExtension
 {
+    public static bool IsEmpty(this CharacterStats data)
+    {
+        return data == null || data.Equals(CharacterStats.Empty);
+    }
+
     public static bool IsEmpty(this CharacterAttribute data)
     {
         return data == null || data.Equals(CharacterAttribute.Empty);
