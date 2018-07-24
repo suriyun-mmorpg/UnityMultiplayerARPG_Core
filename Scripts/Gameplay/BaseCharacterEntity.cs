@@ -21,7 +21,7 @@ namespace MultiplayerARPG
     {
         public const float ACTION_COMMAND_DELAY = 0.2f;
         [HideInInspector]
-        public SafeArea safeArea;
+        public bool isInSafeArea;
 
         #region Serialize data
         [Header("Settings")]

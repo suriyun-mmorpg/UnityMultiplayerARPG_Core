@@ -86,7 +86,7 @@ namespace MultiplayerARPG
             // For now it can receive damage from players only
             if (characterEntity == null)
                 return false;
-            if (safeArea != null || characterEntity.safeArea != null)
+            if (isInSafeArea || characterEntity.isInSafeArea)
                 return false;
             if (!IsAlly(characterEntity))
                 return true;

@@ -78,7 +78,7 @@ namespace MultiplayerARPG
         {
             if (characterEntity == null)
                 return false;
-            if (safeArea != null || characterEntity.safeArea != null)
+            if (isInSafeArea || characterEntity.isInSafeArea)
                 return false;
             var manager = Manager as BaseGameNetworkManager;
             if (!IsAlly(characterEntity) && manager != null && manager.CurrentMapInfo.canPvp)

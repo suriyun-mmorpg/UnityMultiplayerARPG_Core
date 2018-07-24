@@ -137,7 +137,7 @@ namespace MultiplayerARPG
                     CacheMonsterCharacterEntity.SetTargetEntity(null);
                     return;
                 }
-                if (CacheMonsterCharacterEntity.safeArea != null || targetEntity.safeArea != null)
+                if (CacheMonsterCharacterEntity.isInSafeArea || targetEntity.isInSafeArea)
                 {
                     CacheMonsterCharacterEntity.StopMove();
                     CacheMonsterCharacterEntity.SetTargetEntity(null);
