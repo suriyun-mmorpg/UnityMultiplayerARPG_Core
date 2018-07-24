@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
@@ -25,6 +24,10 @@ namespace MultiplayerARPG
 
         private void OnTriggerEnter(Collider other)
         {
+            // Improve performance by tags
+            if (!other.CompareTag(GameInstance.Singleton.playerTag))
+                return;
+
             var playerCharacterEntity = other.GetComponent<BasePlayerCharacterEntity>();
             if (playerCharacterEntity == null)
                 return;
@@ -49,6 +52,10 @@ namespace MultiplayerARPG
 
         private void OnTriggerExit(Collider other)
         {
+            // Improve performance by tags
+            if (!other.CompareTag(GameInstance.Singleton.playerTag))
+                return;
+
             var playerCharacterEntity = other.GetComponent<BasePlayerCharacterEntity>();
             if (playerCharacterEntity == null)
                 return;
