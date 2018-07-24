@@ -50,6 +50,12 @@ public abstract class UISelectionEntry<T> : UIBase
         }
     }
 
+    public override void Show()
+    {
+        base.Show();
+        UpdateUI();
+    }
+
     public void ForceUpdate()
     {
         UpdateData();
