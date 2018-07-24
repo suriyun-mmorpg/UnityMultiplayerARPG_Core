@@ -20,9 +20,9 @@ public static class AddOnUtils
         InvokeAddOnMethods(obj.GetType(), obj, baseMethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, args);
     }
 
-    public static void InvokeAddOnMethods(Type type, object obj, string baseMethodName, params object[] args)
+    public static void InvokeStaticAddOnMethods(Type type, string baseMethodName, params object[] args)
     {
-        InvokeAddOnMethods(type, obj, baseMethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static, args);
+        InvokeAddOnMethods(type, null, baseMethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static, args);
     }
 
     private static void InvokeAddOnMethods(Type type, object obj, string baseMethodName, BindingFlags bindingFlags, params object[] args)
