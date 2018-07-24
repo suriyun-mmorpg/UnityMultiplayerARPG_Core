@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class PlayerCharacterData : CharacterData, IPlayerCharacterData
+public partial class PlayerCharacterData : CharacterData, IPlayerCharacterData
 {
     public short statPoint;
     public short skillPoint;

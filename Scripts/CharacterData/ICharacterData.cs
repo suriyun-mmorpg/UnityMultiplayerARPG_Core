@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-public interface ICharacterData
+public partial interface ICharacterData
 {
     string Id { get; set; }
     int DataId { get; set; }

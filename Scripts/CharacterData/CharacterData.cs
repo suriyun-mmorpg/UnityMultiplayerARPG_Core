@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using MultiplayerARPG;
 
 [System.Serializable]
-public class CharacterData : ICharacterData
+public partial class CharacterData : ICharacterData
 {
     public string id;
     public int dataId;

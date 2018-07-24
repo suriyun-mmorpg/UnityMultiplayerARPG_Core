@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 using UnityEngine;
 using MultiplayerARPG;
 
-public class PlayerCharacterSerializationSurrogate : ISerializationSurrogate
+public partial class PlayerCharacterSerializationSurrogate : ISerializationSurrogate
 {
     public void GetObjectData(System.Object obj,
                               SerializationInfo info, StreamingContext context)
@@ -37,6 +37,7 @@ public class PlayerCharacterSerializationSurrogate : ISerializationSurrogate
         info.AddValue("lastUpdate", data.LastUpdate);
         info.AddListValue("hotkeys", data.Hotkeys);
         info.AddListValue("quests", data.Quests);
+        this.InvokeClassAddOnMethods("GetObjectData", obj, info, context);
     }
 
     public System.Object SetObjectData(System.Object obj,
@@ -78,6 +79,7 @@ public class PlayerCharacterSerializationSurrogate : ISerializationSurrogate
         data.LastUpdate = info.GetInt32("lastUpdate");
         data.Hotkeys = info.GetListValue<CharacterHotkey>("hotkeys");
         data.Quests = info.GetListValue<CharacterQuest>("quests");
+        this.InvokeClassAddOnMethods("SetObjectData", obj, info, context, selector);
         obj = data;
         return obj;
     }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public interface IPlayerCharacterData : ICharacterData
+public partial interface IPlayerCharacterData : ICharacterData
 {
     short StatPoint { get; set; }
     short SkillPoint { get; set; }

@@ -243,20 +243,20 @@ public static partial class PlayerCharacterDataExtension
 
     public static void AddAllCharacterRelatesDataSurrogate(this SurrogateSelector surrogateSelector)
     {
+        var playerCharacterDataSS = new PlayerCharacterSerializationSurrogate();
         var attributeSS = new CharacterAttributeSerializationSurrogate();
         var buffSS = new CharacterBuffSerializationSurrogate();
         var hotkeySS = new CharacterHotkeySerializationSurrogate();
         var itemSS = new CharacterItemSerializationSurrogate();
         var questSS = new CharacterQuestSerializationSurrogate();
         var skillSS = new CharacterSkillSerializationSurrogate();
+        surrogateSelector.AddSurrogate(typeof(PlayerCharacterData), new StreamingContext(StreamingContextStates.All), playerCharacterDataSS);
         surrogateSelector.AddSurrogate(typeof(CharacterAttribute), new StreamingContext(StreamingContextStates.All), attributeSS);
         surrogateSelector.AddSurrogate(typeof(CharacterBuff), new StreamingContext(StreamingContextStates.All), buffSS);
         surrogateSelector.AddSurrogate(typeof(CharacterHotkey), new StreamingContext(StreamingContextStates.All), hotkeySS);
         surrogateSelector.AddSurrogate(typeof(CharacterItem), new StreamingContext(StreamingContextStates.All), itemSS);
         surrogateSelector.AddSurrogate(typeof(CharacterQuest), new StreamingContext(StreamingContextStates.All), questSS);
         surrogateSelector.AddSurrogate(typeof(CharacterSkill), new StreamingContext(StreamingContextStates.All), skillSS);
-        var playerCharacterDataSS = new PlayerCharacterSerializationSurrogate();
-        surrogateSelector.AddSurrogate(typeof(PlayerCharacterData), new StreamingContext(StreamingContextStates.All), playerCharacterDataSS);
         AddOnUtils.InvokeStaticAddOnMethods(typeof(PlayerCharacterDataExtension), "AddAllCharacterRelatesDataSurrogate", surrogateSelector);
     }
 
