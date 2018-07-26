@@ -52,17 +52,6 @@ namespace MultiplayerARPG
             }
         }
 
-        private UIList cacheList;
-        public UIList CacheList
-        {
-            get
-            {
-                if (cacheList == null)
-                    cacheList = GetComponent<UIList>();
-                return cacheList;
-            }
-        }
-
         private UICharacterItemSelectionManager selectionManager;
         public UICharacterItemSelectionManager SelectionManager
         {
