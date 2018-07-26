@@ -85,7 +85,6 @@ namespace MultiplayerARPG
             var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterData.CloneTo(playerCharacterEntity);
             identity.SendInitSyncFields(peer);
-            identity.SendInitSyncLists(peer);
             // Notify clients that this character is spawn or dead
             if (!playerCharacterEntity.IsDead())
                 playerCharacterEntity.RequestOnRespawn(true);
