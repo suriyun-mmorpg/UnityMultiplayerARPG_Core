@@ -28,8 +28,6 @@ namespace MultiplayerARPG
         public MonsterCharacteristic characteristic;
         [Tooltip("This will work with assist characteristic only, to detect ally")]
         public ushort allyId;
-        [Tooltip("If this is TRUE, character will not move")]
-        public bool Immovable;
         [Tooltip("This move speed will be applies when it's wandering. if it's going to chase enemy, stats'moveSpeed will be applies")]
         public float wanderMoveSpeed;
         public float visualRange = 5f;
