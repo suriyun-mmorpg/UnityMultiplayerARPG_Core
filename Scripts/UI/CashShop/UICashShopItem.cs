@@ -34,19 +34,19 @@ namespace MultiplayerARPG
             if (rawImageIcon != null)
             {
                 var iconSprite = Data == null ? null : Data.icon;
-                rawImageIcon.gameObject.SetActive(iconSprite != null || !string.IsNullOrEmpty(Data.externalIconUrl));
+                rawImageIcon.gameObject.SetActive(iconSprite != null || !string.IsNullOrEmpty(Data.info.externalIconUrl));
                 rawImageIcon.texture = iconSprite.texture;
-                if (!string.IsNullOrEmpty(Data.externalIconUrl))
+                if (!string.IsNullOrEmpty(Data.info.externalIconUrl))
                     StartCoroutine(LoadExternalIcon());
             }
 
             if (textSellPrice != null)
-                textSellPrice.text = string.Format(sellPriceFormat, Data == null ? "0" : Data.sellPrice.ToString("N0"));
+                textSellPrice.text = string.Format(sellPriceFormat, Data == null ? "0" : Data.info.sellPrice.ToString("N0"));
         }
 
         IEnumerator LoadExternalIcon()
         {
-            var www = new WWW(Data.externalIconUrl);
+            var www = new WWW(Data.info.externalIconUrl);
             yield return www;
             rawImageIcon.texture = www.texture;
         }
