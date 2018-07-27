@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         public enum Error : byte
         {
             None,
+            NotAvailable,
             UserNotFound,
             CharacterNotFound,
             ItemNotFound,

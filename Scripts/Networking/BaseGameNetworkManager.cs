@@ -30,8 +30,8 @@ namespace MultiplayerARPG
             this.InvokeClassAddOnMethods("RegisterClientMessages");
             RegisterClientMessage(MsgTypes.Warp, HandleWarpAtClient);
             RegisterClientMessage(MsgTypes.Chat, HandleChatAtClient);
-            RegisterServerMessage(MsgTypes.CashShopInfo, HandleResponseCashShopInfo);
-            RegisterServerMessage(MsgTypes.CashShopBuy, HandleResponseCashShopBuy);
+            RegisterClientMessage(MsgTypes.CashShopInfo, HandleResponseCashShopInfo);
+            RegisterClientMessage(MsgTypes.CashShopBuy, HandleResponseCashShopBuy);
         }
 
         protected override void RegisterServerMessages()
@@ -122,12 +122,28 @@ namespace MultiplayerARPG
 
         protected virtual void HandleRequestCashShopInfo(LiteNetLibMessageHandler messageHandler)
         {
-
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<BaseAckMessage>();
+            var error = ResponseCashShopInfoMessage.Error.NotAvailable;
+            var responseMessage = new ResponseCashShopInfoMessage();
+            responseMessage.ackId = message.ackId;
+            responseMessage.responseCode = error == ResponseCashShopInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
+            responseMessage.error = error;
+            responseMessage.cash = 0;
+            responseMessage.cashShopItemIds = new int[0];
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.CashShopInfo, responseMessage);
         }
 
         protected virtual void HandleRequestCashShopBuy(LiteNetLibMessageHandler messageHandler)
         {
-
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<RequestCashShopBuyMessage>();
+            var error = ResponseCashShopBuyMessage.Error.NotAvailable;
+            var responseMessage = new ResponseCashShopBuyMessage();
+            responseMessage.ackId = message.ackId;
+            responseMessage.responseCode = error == ResponseCashShopBuyMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
+            responseMessage.error = error;
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.CashShopBuy, responseMessage);
         }
 
         public override bool StartServer()
