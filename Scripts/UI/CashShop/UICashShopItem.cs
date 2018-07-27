@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public partial class UICashShopItem : UIDataForCharacter<CashShopItem>
+    public partial class UICashShopItem : UIDataForCharacter<NetworkCashShopItem>
     {
         [Header("Generic Info Format")]
         [Tooltip("Title Format => {0} = {Title}")]
@@ -33,20 +33,18 @@ namespace MultiplayerARPG
 
             if (rawImageIcon != null)
             {
-                var iconSprite = Data == null ? null : Data.icon;
-                rawImageIcon.gameObject.SetActive(iconSprite != null || !string.IsNullOrEmpty(Data.info.externalIconUrl));
-                rawImageIcon.texture = iconSprite.texture;
-                if (!string.IsNullOrEmpty(Data.info.externalIconUrl))
+                rawImageIcon.gameObject.SetActive(!string.IsNullOrEmpty(Data.iconUrl));
+                if (!string.IsNullOrEmpty(Data.iconUrl))
                     StartCoroutine(LoadExternalIcon());
             }
 
             if (textSellPrice != null)
-                textSellPrice.text = string.Format(sellPriceFormat, Data == null ? "0" : Data.info.sellPrice.ToString("N0"));
+                textSellPrice.text = string.Format(sellPriceFormat, Data == null ? "0" : Data.sellPrice.ToString("N0"));
         }
 
         IEnumerator LoadExternalIcon()
         {
-            var www = new WWW(Data.info.externalIconUrl);
+            var www = new WWW(Data.iconUrl);
             yield return www;
             rawImageIcon.texture = www.texture;
         }
@@ -54,7 +52,7 @@ namespace MultiplayerARPG
         public void OnClickBuy()
         {
             if (uiCashShop != null)
-                uiCashShop.Buy(Data.DataId);
+                uiCashShop.Buy(Data.dataId);
         }
     }
 }
