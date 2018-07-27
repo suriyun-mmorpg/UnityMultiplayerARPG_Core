@@ -84,7 +84,6 @@ namespace MultiplayerARPG
             var identity = Assets.NetworkSpawn(playerCharacterPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, peer.ConnectId);
             var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterData.CloneTo(playerCharacterEntity);
-            identity.SendInitSyncFields(peer);
             // Notify clients that this character is spawn or dead
             if (!playerCharacterEntity.IsDead())
                 playerCharacterEntity.RequestOnRespawn(true);
