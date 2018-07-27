@@ -12,6 +12,8 @@ namespace MultiplayerARPG
         {
             public const short Warp = 100;
             public const short Chat = 101;
+            public const short CashShopInfo = 102;
+            public const short CashShopBuy = 103;
         }
         
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
@@ -28,6 +30,8 @@ namespace MultiplayerARPG
             this.InvokeClassAddOnMethods("RegisterClientMessages");
             RegisterClientMessage(MsgTypes.Warp, HandleWarpAtClient);
             RegisterClientMessage(MsgTypes.Chat, HandleChatAtClient);
+            RegisterServerMessage(MsgTypes.CashShopInfo, HandleResponseCashShopInfo);
+            RegisterServerMessage(MsgTypes.CashShopBuy, HandleResponseCashShopBuy);
         }
 
         protected override void RegisterServerMessages()
@@ -35,11 +39,51 @@ namespace MultiplayerARPG
             base.RegisterServerMessages();
             this.InvokeClassAddOnMethods("RegisterServerMessages");
             RegisterServerMessage(MsgTypes.Chat, HandleChatAtServer);
+            RegisterServerMessage(MsgTypes.CashShopInfo, HandleRequestCashShopInfo);
+            RegisterServerMessage(MsgTypes.CashShopBuy, HandleRequestCashShopBuy);
+        }
+
+        public uint RequestCashShopInfo(AckMessageCallback callback)
+        {
+            var message = new BaseAckMessage();
+            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MsgTypes.CashShopInfo, message, callback);
+        }
+
+        public uint RequestCashShopBuy(int dataId, AckMessageCallback callback)
+        {
+            var message = new RequestCashShopBuyMessage();
+            message.dataId = dataId;
+            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MsgTypes.CashShopBuy, message, callback);
         }
 
         protected virtual void HandleWarpAtClient(LiteNetLibMessageHandler messageHandler)
         {
             // TODO: May fade black when warping
+        }
+
+        protected virtual void HandleChatAtClient(LiteNetLibMessageHandler messageHandler)
+        {
+            var message = messageHandler.ReadMessage<ChatMessage>();
+            if (onReceiveChat != null)
+                onReceiveChat.Invoke(message);
+        }
+
+        protected virtual void HandleResponseCashShopInfo(LiteNetLibMessageHandler messageHandler)
+        {
+            var peerHandler = messageHandler.peerHandler;
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<ResponseCashShopInfoMessage>();
+            var ackId = message.ackId;
+            peerHandler.TriggerAck(ackId, message.responseCode, message);
+        }
+
+        protected virtual void HandleResponseCashShopBuy(LiteNetLibMessageHandler messageHandler)
+        {
+            var peerHandler = messageHandler.peerHandler;
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<ResponseCashShopBuyMessage>();
+            var ackId = message.ackId;
+            peerHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected virtual void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
@@ -76,11 +120,14 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void HandleChatAtClient(LiteNetLibMessageHandler messageHandler)
+        protected virtual void HandleRequestCashShopInfo(LiteNetLibMessageHandler messageHandler)
         {
-            var message = messageHandler.ReadMessage<ChatMessage>();
-            if (onReceiveChat != null)
-                onReceiveChat.Invoke(message);
+
+        }
+
+        protected virtual void HandleRequestCashShopBuy(LiteNetLibMessageHandler messageHandler)
+        {
+
         }
 
         public override bool StartServer()

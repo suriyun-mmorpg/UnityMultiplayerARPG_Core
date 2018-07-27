@@ -51,8 +51,6 @@ namespace MultiplayerARPG
             {
                 if (cacheGameNetworkManager == null)
                     cacheGameNetworkManager = FindObjectOfType<BaseGameNetworkManager>();
-                if (cacheGameNetworkManager == null)
-                    Debug.LogWarning("[UIChatHandler(" + name + ")] Cannot find `BaseGameNetworkManager`");
                 return cacheGameNetworkManager;
             }
         }

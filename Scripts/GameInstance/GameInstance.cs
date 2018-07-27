@@ -82,6 +82,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, Skill> Skills = new Dictionary<int, Skill>();
         public static readonly Dictionary<int, NpcDialog> NpcDialogs = new Dictionary<int, NpcDialog>();
         public static readonly Dictionary<int, Quest> Quests = new Dictionary<int, Quest>();
+        public static readonly Dictionary<int, CashShopItem> CashShopItems = new Dictionary<int, CashShopItem>();
         public static readonly Dictionary<int, BaseDamageEntity> DamageEntities = new Dictionary<int, BaseDamageEntity>();
         public static readonly Dictionary<int, BuildingEntity> BuildingEntities = new Dictionary<int, BuildingEntity>();
         public static readonly Dictionary<int, BasePlayerCharacterEntity> PlayerCharacterEntities = new Dictionary<int, BasePlayerCharacterEntity>();
@@ -229,6 +230,7 @@ namespace MultiplayerARPG
             Skills.Clear();
             NpcDialogs.Clear();
             Quests.Clear();
+            CashShopItems.Clear();
             DamageEntities.Clear();
             BuildingEntities.Clear();
             PlayerCharacterEntities.Clear();
@@ -494,6 +496,18 @@ namespace MultiplayerARPG
             }
         }
 
+        public static void AddCashShopItems(IEnumerable<CashShopItem> cashShopItems)
+        {
+            if (cashShopItems == null)
+                return;
+            foreach (var cashShopItem in cashShopItems)
+            {
+                if (cashShopItem == null || CashShopItems.ContainsKey(cashShopItem.DataId))
+                    continue;
+                CashShopItems[cashShopItem.DataId] = cashShopItem;
+            }
+        }
+
         public static void AddDamageEntities(IEnumerable<BaseDamageEntity> damageEntities)
         {
             if (damageEntities == null)
@@ -515,34 +529,6 @@ namespace MultiplayerARPG
                 if (buildingEntity == null || BuildingEntities.ContainsKey(buildingEntity.DataId))
                     continue;
                 BuildingEntities[buildingEntity.DataId] = buildingEntity;
-            }
-        }
-
-        public static void AddActionAnimations(ActionAnimationType type, IEnumerable<ActionAnimation> actionAnimations)
-        {
-            if (actionAnimations == null)
-                return;
-            foreach (var actionAnimation in actionAnimations)
-            {
-                if (!actionAnimation.Initialize(type))
-                    continue;
-                if (actionAnimation == null || ActionAnimations.ContainsKey(actionAnimation.Id))
-                    continue;
-                ActionAnimations[actionAnimation.Id] = actionAnimation;
-            }
-        }
-
-        public static void AddGameEffectCollections(GameEffectCollectionType type, IEnumerable<GameEffectCollection> gameEffectCollections)
-        {
-            if (gameEffectCollections == null)
-                return;
-            foreach (var gameEffectCollection in gameEffectCollections)
-            {
-                if (!gameEffectCollection.Initialize(type))
-                    continue;
-                if (gameEffectCollection == null || GameEffectCollections.ContainsKey(gameEffectCollection.Id))
-                    continue;
-                GameEffectCollections[gameEffectCollection.Id] = gameEffectCollection;
             }
         }
 
@@ -591,6 +577,34 @@ namespace MultiplayerARPG
                 if (npcEntity == null || NpcEntities.ContainsKey(npcEntity.Identity.HashAssetId))
                     continue;
                 NpcEntities[npcEntity.Identity.HashAssetId] = npcEntity;
+            }
+        }
+
+        public static void AddActionAnimations(ActionAnimationType type, IEnumerable<ActionAnimation> actionAnimations)
+        {
+            if (actionAnimations == null)
+                return;
+            foreach (var actionAnimation in actionAnimations)
+            {
+                if (!actionAnimation.Initialize(type))
+                    continue;
+                if (actionAnimation == null || ActionAnimations.ContainsKey(actionAnimation.Id))
+                    continue;
+                ActionAnimations[actionAnimation.Id] = actionAnimation;
+            }
+        }
+
+        public static void AddGameEffectCollections(GameEffectCollectionType type, IEnumerable<GameEffectCollection> gameEffectCollections)
+        {
+            if (gameEffectCollections == null)
+                return;
+            foreach (var gameEffectCollection in gameEffectCollections)
+            {
+                if (!gameEffectCollection.Initialize(type))
+                    continue;
+                if (gameEffectCollection == null || GameEffectCollections.ContainsKey(gameEffectCollection.Id))
+                    continue;
+                GameEffectCollections[gameEffectCollection.Id] = gameEffectCollection;
             }
         }
 

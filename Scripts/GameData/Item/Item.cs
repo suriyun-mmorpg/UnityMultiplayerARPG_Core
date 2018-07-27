@@ -220,18 +220,4 @@ namespace MultiplayerARPG
         public short level;
         public AttributeAmount[] attributeAmounts;
     }
-
-    public class NetworkItemAmount
-    {
-        public int dataId;
-        public short amount;
-
-        public static NetworkItemAmount MakeNetworkItemAmount(ItemAmount itemAmount)
-        {
-            var data = new NetworkItemAmount();
-            data.dataId = itemAmount.item == null ? 0 : itemAmount.item.DataId;
-            data.amount = itemAmount.amount;
-            return data;
-        }
-    }
 }

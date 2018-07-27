@@ -1,12 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public partial class UICashShopItem : UIDataForCharacter<NetworkCashShopItem>
+    public partial class UICashShopItem : UISelectionEntry<CashShopItem>
     {
         [Header("Generic Info Format")]
         [Tooltip("Title Format => {0} = {Title}")]
@@ -20,7 +19,8 @@ namespace MultiplayerARPG
         public UICashShop uiCashShop;
         public Text textTitle;
         public Text textDescription;
-        public RawImage rawImageIcon;
+        public Image imageIcon;
+        public RawImage rawImageExternalIcon;
         public Text textSellPrice;
 
         protected override void UpdateData()
@@ -30,11 +30,18 @@ namespace MultiplayerARPG
 
             if (textDescription != null)
                 textDescription.text = string.Format(descriptionFormat, Data == null ? "N/A" : Data.description);
-
-            if (rawImageIcon != null)
+            
+            if (imageIcon != null)
             {
-                rawImageIcon.gameObject.SetActive(!string.IsNullOrEmpty(Data.iconUrl));
-                if (!string.IsNullOrEmpty(Data.iconUrl))
+                var iconSprite = Data == null ? null : Data.icon;
+                imageIcon.gameObject.SetActive(iconSprite != null);
+                imageIcon.sprite = iconSprite;
+            }
+
+            if (rawImageExternalIcon != null)
+            {
+                rawImageExternalIcon.gameObject.SetActive(Data != null && !string.IsNullOrEmpty(Data.externalIconUrl));
+                if (Data != null && !string.IsNullOrEmpty(Data.externalIconUrl))
                     StartCoroutine(LoadExternalIcon());
             }
 
@@ -44,15 +51,15 @@ namespace MultiplayerARPG
 
         IEnumerator LoadExternalIcon()
         {
-            var www = new WWW(Data.iconUrl);
+            var www = new WWW(Data.externalIconUrl);
             yield return www;
-            rawImageIcon.texture = www.texture;
+            rawImageExternalIcon.texture = www.texture;
         }
 
         public void OnClickBuy()
         {
             if (uiCashShop != null)
-                uiCashShop.Buy(Data.dataId);
+                uiCashShop.Buy(Data.DataId);
         }
     }
 }

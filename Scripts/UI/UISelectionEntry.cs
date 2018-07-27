@@ -14,6 +14,7 @@ public abstract class UISelectionEntry<T> : UIBase
         {
             data = value;
             UpdateData();
+            UpdateUI();
             this.InvokeClassAddOnMethods("UpdateData");
         }
     }
@@ -52,8 +53,8 @@ public abstract class UISelectionEntry<T> : UIBase
 
     public override void Show()
     {
-        base.Show();
         UpdateUI();
+        base.Show();
     }
 
     public void ForceUpdate()
