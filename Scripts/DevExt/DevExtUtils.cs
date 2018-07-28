@@ -15,17 +15,17 @@ public static class DevExtUtils
     /// <param name="obj"></param>
     /// <param name="baseMethodName"></param>
     /// <param name="args"></param>
-    public static void InvokeClassAddOnMethods<T>(this T obj, string baseMethodName, params object[] args) where T : class
+    public static void InvokeClassDevExtMethods<T>(this T obj, string baseMethodName, params object[] args) where T : class
     {
-        InvokeAddOnMethods(obj.GetType(), obj, baseMethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, args);
+        InvokeDevExtMethods(obj.GetType(), obj, baseMethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, args);
     }
 
-    public static void InvokeStaticAddOnMethods(Type type, string baseMethodName, params object[] args)
+    public static void InvokeStaticDevExtMethods(Type type, string baseMethodName, params object[] args)
     {
-        InvokeAddOnMethods(type, null, baseMethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static, args);
+        InvokeDevExtMethods(type, null, baseMethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static, args);
     }
     
-    private static void InvokeAddOnMethods(Type type, object obj, string baseMethodName, BindingFlags bindingFlags, params object[] args)
+    private static void InvokeDevExtMethods(Type type, object obj, string baseMethodName, BindingFlags bindingFlags, params object[] args)
     {
         var key = new StringBuilder().Append(type.Name).Append('_').Append(baseMethodName).ToString();
         List<MethodInfo> methods = null;

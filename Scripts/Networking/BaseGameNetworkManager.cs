@@ -27,7 +27,7 @@ namespace MultiplayerARPG
         protected override void RegisterClientMessages()
         {
             base.RegisterClientMessages();
-            this.InvokeClassAddOnMethods("RegisterClientMessages");
+            this.InvokeClassDevExtMethods("RegisterClientMessages");
             RegisterClientMessage(MsgTypes.Warp, HandleWarpAtClient);
             RegisterClientMessage(MsgTypes.Chat, HandleChatAtClient);
             RegisterClientMessage(MsgTypes.CashShopInfo, HandleResponseCashShopInfo);
@@ -37,7 +37,7 @@ namespace MultiplayerARPG
         protected override void RegisterServerMessages()
         {
             base.RegisterServerMessages();
-            this.InvokeClassAddOnMethods("RegisterServerMessages");
+            this.InvokeClassDevExtMethods("RegisterServerMessages");
             RegisterServerMessage(MsgTypes.Chat, HandleChatAtServer);
             RegisterServerMessage(MsgTypes.CashShopInfo, HandleRequestCashShopInfo);
             RegisterServerMessage(MsgTypes.CashShopBuy, HandleRequestCashShopBuy);
@@ -193,7 +193,7 @@ namespace MultiplayerARPG
                 spawnablePrefabs.Add(entry.Value.Identity);
             }
             Assets.spawnablePrefabs = spawnablePrefabs.ToArray();
-            this.InvokeClassAddOnMethods("Init");
+            this.InvokeClassDevExtMethods("Init");
         }
 
         public virtual void EnterChat(ChatChannel channel, string message, string senderName, string receiverName)
@@ -275,7 +275,7 @@ namespace MultiplayerARPG
         public override void OnClientOnlineSceneLoaded()
         {
             base.OnClientOnlineSceneLoaded();
-            this.InvokeClassAddOnMethods("OnClientOnlineSceneLoaded");
+            this.InvokeClassDevExtMethods("OnClientOnlineSceneLoaded");
             // Server will register entities later, so don't register entities now
             if (!IsServer)
             {
@@ -287,7 +287,7 @@ namespace MultiplayerARPG
         public override void OnServerOnlineSceneLoaded()
         {
             base.OnServerOnlineSceneLoaded();
-            this.InvokeClassAddOnMethods("OnServerOnlineSceneLoaded");
+            this.InvokeClassDevExtMethods("OnServerOnlineSceneLoaded");
             RegisterEntities();
             SetupMapInfo();
             // Spawn monsters

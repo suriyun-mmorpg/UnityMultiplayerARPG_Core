@@ -15,7 +15,7 @@ public abstract class UISelectionEntry<T> : UIBase
             data = value;
             UpdateData();
             UpdateUI();
-            this.InvokeClassAddOnMethods("UpdateData");
+            this.InvokeClassDevExtMethods("UpdateData");
         }
     }
     public UISelectionManager selectionManager;
@@ -46,7 +46,7 @@ public abstract class UISelectionEntry<T> : UIBase
         if (Time.unscaledTime - lastUpdateTime >= updateUIRepeatRate)
         {
             UpdateUI();
-            this.InvokeClassAddOnMethods("UpdateUI");
+            this.InvokeClassDevExtMethods("UpdateUI");
             lastUpdateTime = Time.unscaledTime;
         }
     }
@@ -60,7 +60,7 @@ public abstract class UISelectionEntry<T> : UIBase
     public void ForceUpdate()
     {
         UpdateData();
-        this.InvokeClassAddOnMethods("UpdateData");
+        this.InvokeClassDevExtMethods("UpdateData");
     }
 
     public void OnClickSelect()

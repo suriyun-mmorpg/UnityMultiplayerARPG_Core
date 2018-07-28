@@ -303,7 +303,7 @@ namespace MultiplayerARPG
             if (npcDatabase != null)
                 AddMapNpcs(npcDatabase.maps);
 
-            this.InvokeClassAddOnMethods("Awake");
+            this.InvokeClassDevExtMethods("Awake");
         }
 
         private void Start()

@@ -43,35 +43,35 @@ namespace MultiplayerARPG
         private void Awake()
         {
             EntityAwake();
-            this.InvokeClassAddOnMethods("Awake");
+            this.InvokeClassDevExtMethods("Awake");
         }
         protected virtual void EntityAwake() { }
 
         private void Start()
         {
             EntityStart();
-            this.InvokeClassAddOnMethods("Start");
+            this.InvokeClassDevExtMethods("Start");
         }
         protected virtual void EntityStart() { }
 
         private void OnEnable()
         {
             EntityOnEnable();
-            this.InvokeClassAddOnMethods("OnEnable");
+            this.InvokeClassDevExtMethods("OnEnable");
         }
         protected virtual void EntityOnEnable() { }
 
         private void OnDisable()
         {
             EntityOnDisable();
-            this.InvokeClassAddOnMethods("OnDisable");
+            this.InvokeClassDevExtMethods("OnDisable");
         }
         protected virtual void EntityOnDisable() { }
 
         private void Update()
         {
             EntityUpdate();
-            this.InvokeClassAddOnMethods("Update");
+            this.InvokeClassDevExtMethods("Update");
         }
         protected virtual void EntityUpdate() { }
 
@@ -80,21 +80,21 @@ namespace MultiplayerARPG
             if (textTitle != null)
                 textTitle.text = Title;
             EntityLateUpdate();
-            this.InvokeClassAddOnMethods("LateUpdate");
+            this.InvokeClassDevExtMethods("LateUpdate");
         }
         protected virtual void EntityLateUpdate() { }
         
         private void FixedUpdate()
         {
             EntityFixedUpdate();
-            this.InvokeClassAddOnMethods("FixedUpdate");
+            this.InvokeClassDevExtMethods("FixedUpdate");
         }
         protected virtual void EntityFixedUpdate() { }
 
         private void OnDestroy()
         {
             EntityOnDestroy();
-            this.InvokeClassAddOnMethods("OnDestroy");
+            this.InvokeClassDevExtMethods("OnDestroy");
         }
         protected virtual void EntityOnDestroy() { }
 
@@ -110,7 +110,7 @@ namespace MultiplayerARPG
         public override void OnSetup()
         {
             base.OnSetup();
-            this.InvokeClassAddOnMethods("OnSetup");
+            this.InvokeClassDevExtMethods("OnSetup");
             SetupNetElements();
             syncTitle.onChange += OnSyncTitleChange;
             if (IsServer)
@@ -119,7 +119,7 @@ namespace MultiplayerARPG
 
         protected virtual void SetupNetElements()
         {
-            this.InvokeClassAddOnMethods("SetupNetElements");
+            this.InvokeClassDevExtMethods("SetupNetElements");
             syncTitle.sendOptions = SendOptions.ReliableUnordered;
             syncTitle.forOwnerOnly = false;
         }
@@ -127,7 +127,7 @@ namespace MultiplayerARPG
         public override void OnNetworkDestroy(DestroyObjectReasons reasons)
         {
             base.OnNetworkDestroy(reasons);
-            this.InvokeClassAddOnMethods("OnNetworkDestroy", reasons);
+            this.InvokeClassDevExtMethods("OnNetworkDestroy", reasons);
             syncTitle.onChange -= OnSyncTitleChange;
         }
 

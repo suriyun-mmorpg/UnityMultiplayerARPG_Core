@@ -77,7 +77,7 @@ public class UIBase : MonoBehaviour
         onShow.Invoke();
         if (moveToLastSiblingOnShow)
             CacheRoot.transform.SetAsLastSibling();
-        this.InvokeClassAddOnMethods("Show");
+        this.InvokeClassDevExtMethods("Show");
     }
 
     public virtual void Hide()
@@ -87,7 +87,7 @@ public class UIBase : MonoBehaviour
         CacheGraphicRaycaster.enabled = false;
         CacheRoot.SetActive(false);
         onHide.Invoke();
-        this.InvokeClassAddOnMethods("Hide");
+        this.InvokeClassDevExtMethods("Hide");
     }
 
     public void Toggle()
