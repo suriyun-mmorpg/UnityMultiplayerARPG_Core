@@ -116,6 +116,7 @@ namespace MultiplayerARPG
                 // Jump
                 if (isGrounded && isJumping)
                 {
+                    RequestTriggerJump();
                     CacheRigidbody.velocity = new Vector3(velocity.x, CalculateJumpVerticalSpeed(), velocity.z);
                     isJumping = false;
                 }
@@ -158,6 +159,8 @@ namespace MultiplayerARPG
             // Setup network components
             CacheNetTransform.ownerClientCanSendTransform = true;
             CacheNetTransform.ownerClientNotInterpolate = false;
+            // Register Network functions
+            RegisterNetFunction("TriggerJump", new LiteNetLibFunction(NetFuncTriggerJump));
         }
 
         public override bool IsMoving()
@@ -218,6 +221,24 @@ namespace MultiplayerARPG
             // From the jump height and gravity we deduce the upwards speed 
             // for the character to reach at the apex.
             return Mathf.Sqrt(2f * jumpHeight * -Physics.gravity.y * gravityRate);
+        }
+
+        protected void NetFuncTriggerJump()
+        {
+            if (IsDead() || IsOwnerClient)
+                return;
+            // Play jump animation on non owner clients
+            CharacterModel.PlayJumpAnimation();
+        }
+
+        public void RequestTriggerJump()
+        {
+            if (IsDead())
+                return;
+            // Play jump animation immediately on owner client
+            if (IsOwnerClient)
+                CharacterModel.PlayJumpAnimation();
+            CallNetFunction("TriggerJump", FunctionReceivers.All);
         }
     }
 }

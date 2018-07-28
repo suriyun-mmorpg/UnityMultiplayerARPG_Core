@@ -37,6 +37,7 @@ namespace MultiplayerARPG
         public static readonly int ANIM_Y_SPEED = Animator.StringToHash("YSpeed");
         public static readonly int ANIM_DO_ACTION = Animator.StringToHash("DoAction");
         public static readonly int ANIM_HURT = Animator.StringToHash("Hurt");
+        public static readonly int ANIM_JUMP = Animator.StringToHash("Jump");
         public static readonly int ANIM_MOVE_CLIP_MULTIPLIER = Animator.StringToHash("MoveSpeedMultiplier");
         public static readonly int ANIM_ACTION_CLIP_MULTIPLIER = Animator.StringToHash("ActionSpeedMultiplier");
         // Legacy Animation variables
@@ -439,9 +440,7 @@ namespace MultiplayerARPG
                 if (CacheAnimation.IsPlaying(LEGACY_CLIP_ACTION))
                     return;
                 var ySpeed = moveVelocity.y;
-                if (ySpeed > legacyAnimationData.ySpeedToPlayJumpClip)
-                    CrossFadeLegacyAnimation(legacyAnimationData.jumpClip, legacyAnimationData.jumpClipFadeLength);
-                else if (ySpeed < legacyAnimationData.ySpeedToPlayFallClip)
+                if (ySpeed < legacyAnimationData.ySpeedToPlayFallClip)
                     CrossFadeLegacyAnimation(legacyAnimationData.fallClip, legacyAnimationData.fallClipFadeLength);
                 else
                 {
@@ -535,6 +534,17 @@ namespace MultiplayerARPG
             }
             CacheAnimator.ResetTrigger(ANIM_HURT);
             CacheAnimator.SetTrigger(ANIM_HURT);
+        }
+
+        public void PlayJumpAnimation()
+        {
+            if (animatorType == AnimatorType.LegacyAnimtion)
+            {
+                CrossFadeLegacyAnimation(legacyAnimationData.jumpClip, legacyAnimationData.jumpClipFadeLength);
+                return;
+            }
+            CacheAnimator.ResetTrigger(ANIM_JUMP);
+            CacheAnimator.SetTrigger(ANIM_JUMP);
         }
     }
 
