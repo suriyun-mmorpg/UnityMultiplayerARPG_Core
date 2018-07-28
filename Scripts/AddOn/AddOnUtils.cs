@@ -25,6 +25,8 @@ public static class AddOnUtils
         InvokeAddOnMethods(type, null, baseMethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static, args);
     }
 
+    // Addons functions is a modification of the Finite State Machine built in a tutorial offered by Unity Gems: https://unitygem.wordpress.com/
+    // The tutorial can be accessed here: https://unitygem.wordpress.com/state-machine-basic/
     private static void InvokeAddOnMethods(Type type, object obj, string baseMethodName, BindingFlags bindingFlags, params object[] args)
     {
         var key = new StringBuilder().Append(type.Name).Append('_').Append(baseMethodName).ToString();
