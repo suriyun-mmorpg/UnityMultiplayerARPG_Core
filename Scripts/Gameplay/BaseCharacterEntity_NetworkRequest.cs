@@ -106,19 +106,19 @@ namespace MultiplayerARPG
             CallNetFunction("UnEquipItem", FunctionReceivers.Server, equipPosition);
         }
 
-        public virtual void RequestOnDead(bool isInitialize)
+        public virtual void RequestOnDead()
         {
-            CallNetFunction("OnDead", FunctionReceivers.All, isInitialize);
+            CallNetFunction("OnDead", FunctionReceivers.All);
         }
 
-        public virtual void RequestOnRespawn(bool isInitialize)
+        public virtual void RequestOnRespawn()
         {
-            CallNetFunction("OnRespawn", FunctionReceivers.All, isInitialize);
+            CallNetFunction("OnRespawn", ConnectId);
         }
 
         public virtual void RequestOnLevelUp()
         {
-            CallNetFunction("OnLevelUp", FunctionReceivers.All);
+            CallNetFunction("OnLevelUp", ConnectId);
         }
     }
 }

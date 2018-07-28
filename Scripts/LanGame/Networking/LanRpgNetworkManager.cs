@@ -87,9 +87,9 @@ namespace MultiplayerARPG
             playerCharacterData.CloneTo(playerCharacterEntity);
             // Notify clients that this character is spawn or dead
             if (!playerCharacterEntity.IsDead())
-                playerCharacterEntity.RequestOnRespawn(true);
+                playerCharacterEntity.RequestOnRespawn();
             else
-                playerCharacterEntity.RequestOnDead(true);
+                playerCharacterEntity.RequestOnDead();
             // Load world by owner character id
             if (playerCharacterEntity.IsOwnerClient)
             {

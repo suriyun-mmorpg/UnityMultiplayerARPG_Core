@@ -8,8 +8,8 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        public System.Action<bool> onDead;
-        public System.Action<bool> onRespawn;
+        public System.Action onDead;
+        public System.Action onRespawn;
         public System.Action onLevelUp;
 
         /// <summary>
@@ -347,18 +347,18 @@ namespace MultiplayerARPG
                 nonEquipItems.Add(unEquipItem);
         }
 
-        protected virtual void NetFuncOnDead(bool isInitialize)
+        protected virtual void NetFuncOnDead()
         {
             animActionType = AnimActionType.None;
             if (onDead != null)
-                onDead.Invoke(isInitialize);
+                onDead.Invoke();
         }
 
-        protected virtual void NetFuncOnRespawn(bool isInitialize)
+        protected virtual void NetFuncOnRespawn()
         {
             animActionType = AnimActionType.None;
             if (onRespawn != null)
-                onRespawn.Invoke(isInitialize);
+                onRespawn.Invoke();
         }
 
         protected virtual void NetFuncOnLevelUp()

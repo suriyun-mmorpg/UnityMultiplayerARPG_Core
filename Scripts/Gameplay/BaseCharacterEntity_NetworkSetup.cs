@@ -60,7 +60,7 @@ namespace MultiplayerARPG
             equipItems.onOperation += OnEquipItemsOperation;
             nonEquipItems.onOperation += OnNonEquipItemsOperation;
             // Register Network functions
-            RegisterNetFunction("Attack", new LiteNetLibFunction(() => NetFuncAttack()));
+            RegisterNetFunction("Attack", new LiteNetLibFunction(NetFuncAttack));
             RegisterNetFunction("UseSkill", new LiteNetLibFunction<NetFieldVector3, NetFieldInt>((position, skillIndex) => NetFuncUseSkill(position, skillIndex)));
             RegisterNetFunction("UseItem", new LiteNetLibFunction<NetFieldInt>((itemIndex) => NetFuncUseItem(itemIndex)));
             RegisterNetFunction("PlayActionAnimation", new LiteNetLibFunction<NetFieldInt, NetFieldByte>((actionId, animActionType) => NetFuncPlayActionAnimation(actionId, (AnimActionType)animActionType.Value)));
@@ -69,9 +69,9 @@ namespace MultiplayerARPG
             RegisterNetFunction("DropItem", new LiteNetLibFunction<NetFieldInt, NetFieldShort>((index, amount) => NetFuncDropItem(index, amount)));
             RegisterNetFunction("EquipItem", new LiteNetLibFunction<NetFieldInt, NetFieldString>((nonEquipIndex, equipPosition) => NetFuncEquipItem(nonEquipIndex, equipPosition)));
             RegisterNetFunction("UnEquipItem", new LiteNetLibFunction<NetFieldString>((fromEquipPosition) => NetFuncUnEquipItem(fromEquipPosition)));
-            RegisterNetFunction("OnDead", new LiteNetLibFunction<NetFieldBool>((isInitialize) => NetFuncOnDead(isInitialize)));
-            RegisterNetFunction("OnRespawn", new LiteNetLibFunction<NetFieldBool>((isInitialize) => NetFuncOnRespawn(isInitialize)));
-            RegisterNetFunction("OnLevelUp", new LiteNetLibFunction(() => NetFuncOnLevelUp()));
+            RegisterNetFunction("OnDead", new LiteNetLibFunction(NetFuncOnDead));
+            RegisterNetFunction("OnRespawn", new LiteNetLibFunction(NetFuncOnRespawn));
+            RegisterNetFunction("OnLevelUp", new LiteNetLibFunction(NetFuncOnLevelUp));
         }
 
         protected override void EntityOnDestroy()

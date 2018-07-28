@@ -798,7 +798,7 @@ namespace MultiplayerARPG
                 skills.Dirty(i);
             }
             // Send OnDead to owner player only
-            RequestOnDead(false);
+            RequestOnDead();
         }
 
         public virtual void Respawn()
@@ -811,7 +811,7 @@ namespace MultiplayerARPG
             CurrentFood = CacheMaxFood;
             CurrentWater = CacheMaxWater;
             // Send OnRespawn to owner player only
-            RequestOnRespawn(false);
+            RequestOnRespawn();
         }
 
         protected virtual void MakeCaches()

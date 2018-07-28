@@ -82,7 +82,7 @@ namespace MultiplayerARPG
         {
             Singleton = this;
         }
-
+        
         private void Update()
         {
             var fields = FindObjectsOfType<InputField>();
@@ -178,12 +178,12 @@ namespace MultiplayerARPG
                 CacheGameNetworkManager.StopHost();
         }
 
-        public void OnCharacterDead(bool isInitialize)
+        public void OnCharacterDead()
         {
             onCharacterDead.Invoke();
         }
 
-        public void OnCharacterRespawn(bool isInitialize)
+        public void OnCharacterRespawn()
         {
             onCharacterRespawn.Invoke();
         }
