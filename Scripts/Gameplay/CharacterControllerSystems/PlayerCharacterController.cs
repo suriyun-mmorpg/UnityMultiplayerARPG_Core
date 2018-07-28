@@ -52,24 +52,46 @@ namespace MultiplayerARPG
             base.Awake();
             buildingItemIndex = -1;
             currentBuildingEntity = null;
-        }
 
-        protected override void Start()
-        {
-            base.Start();
-
-            // Set parent transform to root for the best performance
             if (gameplayCameraPrefab != null)
             {
+                // Set parent transform to root for the best performance
                 CacheGameplayCameraControls = Instantiate(gameplayCameraPrefab);
-                CacheGameplayCameraControls.target = CharacterTransform;
             }
-            // Set parent transform to root for the best performance
             if (targetObjectPrefab != null)
             {
+                // Set parent transform to root for the best performance
                 CacheTargetObject = Instantiate(targetObjectPrefab);
                 CacheTargetObject.SetActive(false);
             }
+        }
+
+        protected override void Setup(BasePlayerCharacterEntity characterEntity)
+        {
+            base.Setup(characterEntity);
+
+            if (characterEntity == null)
+                return;
+
+            if (CacheGameplayCameraControls != null)
+                CacheGameplayCameraControls.target = characterEntity.CacheTransform;
+        }
+
+        protected override void Desetup(BasePlayerCharacterEntity characterEntity)
+        {
+            base.Desetup(characterEntity);
+
+            if (CacheGameplayCameraControls != null)
+                CacheGameplayCameraControls.target = null;
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            if (CacheGameplayCameraControls != null)
+                Destroy(CacheGameplayCameraControls.gameObject);
+            if (CacheTargetObject != null)
+                Destroy(CacheTargetObject.gameObject);
         }
 
         protected override void Update()

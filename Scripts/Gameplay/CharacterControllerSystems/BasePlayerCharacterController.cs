@@ -17,7 +17,11 @@ namespace MultiplayerARPG
             set
             {
                 if (value.IsOwnerClient)
+                {
+                    Desetup(playerCharacterEntity);
                     playerCharacterEntity = value;
+                    Setup(playerCharacterEntity);
+                }
             }
         }
 
@@ -40,77 +44,94 @@ namespace MultiplayerARPG
         protected virtual void Awake()
         {
             Singleton = this;
+            if (minimapCameraPrefab != null)
+                CacheMinimapCameraControls = Instantiate(minimapCameraPrefab);
+            if (gameInstance.UISceneGameplayPrefab != null)
+                CacheUISceneGameplay = Instantiate(gameInstance.UISceneGameplayPrefab);
         }
 
-        protected virtual void Start()
+        protected virtual void Setup(BasePlayerCharacterEntity characterEntity)
         {
-            if (PlayerCharacterEntity == null)
+            if (characterEntity == null)
                 return;
 
             // Instantiate Minimap camera, it will render to render texture
-            if (minimapCameraPrefab != null)
-            {
-                CacheMinimapCameraControls = Instantiate(minimapCameraPrefab);
-                CacheMinimapCameraControls.target = CharacterTransform;
-            }
+            if (CacheMinimapCameraControls != null)
+                CacheMinimapCameraControls.target = characterEntity.CacheTransform;
+
             // Instantiate gameplay UI
-            if (gameInstance.UISceneGameplayPrefab != null)
+            if (CacheUISceneGameplay != null)
             {
-                CacheUISceneGameplay = Instantiate(gameInstance.UISceneGameplayPrefab);
+                characterEntity.onShowNpcDialog += CacheUISceneGameplay.OnShowNpcDialog;
+                characterEntity.onDead += CacheUISceneGameplay.OnCharacterDead;
+                characterEntity.onRespawn += CacheUISceneGameplay.OnCharacterRespawn;
+                characterEntity.onShowDealingRequestDialog += CacheUISceneGameplay.OnShowDealingRequest;
+                characterEntity.onShowDealingDialog += CacheUISceneGameplay.OnShowDealing;
+                characterEntity.onUpdateDealingState += CacheUISceneGameplay.OnUpdateDealingState;
+                characterEntity.onUpdateDealingGold += CacheUISceneGameplay.OnUpdateDealingGold;
+                characterEntity.onUpdateDealingItems += CacheUISceneGameplay.OnUpdateDealingItems;
+                characterEntity.onUpdateAnotherDealingState += CacheUISceneGameplay.OnUpdateAnotherDealingState;
+                characterEntity.onUpdateAnotherDealingGold += CacheUISceneGameplay.OnUpdateAnotherDealingGold;
+                characterEntity.onUpdateAnotherDealingItems += CacheUISceneGameplay.OnUpdateAnotherDealingItems;
                 CacheUISceneGameplay.UpdateCharacter();
                 CacheUISceneGameplay.UpdateSkills();
                 CacheUISceneGameplay.UpdateEquipItems();
                 CacheUISceneGameplay.UpdateNonEquipItems();
                 CacheUISceneGameplay.UpdateHotkeys();
                 CacheUISceneGameplay.UpdateQuests();
-                PlayerCharacterEntity.onShowNpcDialog += CacheUISceneGameplay.OnShowNpcDialog;
-                PlayerCharacterEntity.onDead += CacheUISceneGameplay.OnCharacterDead;
-                PlayerCharacterEntity.onRespawn += CacheUISceneGameplay.OnCharacterRespawn;
-                PlayerCharacterEntity.onShowDealingRequestDialog += CacheUISceneGameplay.OnShowDealingRequest;
-                PlayerCharacterEntity.onShowDealingDialog += CacheUISceneGameplay.OnShowDealing;
-                PlayerCharacterEntity.onUpdateDealingState += CacheUISceneGameplay.OnUpdateDealingState;
-                PlayerCharacterEntity.onUpdateDealingGold += CacheUISceneGameplay.OnUpdateDealingGold;
-                PlayerCharacterEntity.onUpdateDealingItems += CacheUISceneGameplay.OnUpdateDealingItems;
-                PlayerCharacterEntity.onUpdateAnotherDealingState += CacheUISceneGameplay.OnUpdateAnotherDealingState;
-                PlayerCharacterEntity.onUpdateAnotherDealingGold += CacheUISceneGameplay.OnUpdateAnotherDealingGold;
-                PlayerCharacterEntity.onUpdateAnotherDealingItems += CacheUISceneGameplay.OnUpdateAnotherDealingItems;
             }
-            PlayerCharacterEntity.onDataIdChange += OnDataIdChange;
-            PlayerCharacterEntity.onEquipWeaponsChange += OnEquipWeaponsChange;
-            PlayerCharacterEntity.onAttributesOperation += OnAttributesOperation;
-            PlayerCharacterEntity.onSkillsOperation += OnSkillsOperation;
-            PlayerCharacterEntity.onBuffsOperation += OnBuffsOperation;
-            PlayerCharacterEntity.onEquipItemsOperation += OnEquipItemsOperation;
-            PlayerCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
-            PlayerCharacterEntity.onHotkeysOperation += OnHotkeysOperation;
-            PlayerCharacterEntity.onQuestsOperation += OnQuestsOperation;
+            characterEntity.onDataIdChange += OnDataIdChange;
+            characterEntity.onEquipWeaponsChange += OnEquipWeaponsChange;
+            characterEntity.onAttributesOperation += OnAttributesOperation;
+            characterEntity.onSkillsOperation += OnSkillsOperation;
+            characterEntity.onBuffsOperation += OnBuffsOperation;
+            characterEntity.onEquipItemsOperation += OnEquipItemsOperation;
+            characterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+            characterEntity.onHotkeysOperation += OnHotkeysOperation;
+            characterEntity.onQuestsOperation += OnQuestsOperation;
+        }
+
+        protected virtual void Desetup(BasePlayerCharacterEntity characterEntity)
+        {
+            if (CacheMinimapCameraControls != null)
+                CacheMinimapCameraControls.target = null;
+
+            if (characterEntity == null)
+                return;
+
+            characterEntity.onDataIdChange -= OnDataIdChange;
+            characterEntity.onEquipWeaponsChange -= OnEquipWeaponsChange;
+            characterEntity.onAttributesOperation -= OnAttributesOperation;
+            characterEntity.onSkillsOperation -= OnSkillsOperation;
+            characterEntity.onBuffsOperation -= OnBuffsOperation;
+            characterEntity.onEquipItemsOperation -= OnEquipItemsOperation;
+            characterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
+            characterEntity.onHotkeysOperation -= OnHotkeysOperation;
+            characterEntity.onQuestsOperation -= OnQuestsOperation;
+
+            if (CacheUISceneGameplay != null)
+            {
+                characterEntity.onShowNpcDialog -= CacheUISceneGameplay.OnShowNpcDialog;
+                characterEntity.onDead -= CacheUISceneGameplay.OnCharacterDead;
+                characterEntity.onRespawn -= CacheUISceneGameplay.OnCharacterRespawn;
+                characterEntity.onShowDealingRequestDialog -= CacheUISceneGameplay.OnShowDealingRequest;
+                characterEntity.onShowDealingDialog -= CacheUISceneGameplay.OnShowDealing;
+                characterEntity.onUpdateDealingState -= CacheUISceneGameplay.OnUpdateDealingState;
+                characterEntity.onUpdateDealingGold -= CacheUISceneGameplay.OnUpdateDealingGold;
+                characterEntity.onUpdateDealingItems -= CacheUISceneGameplay.OnUpdateDealingItems;
+                characterEntity.onUpdateAnotherDealingState -= CacheUISceneGameplay.OnUpdateAnotherDealingState;
+                characterEntity.onUpdateAnotherDealingGold -= CacheUISceneGameplay.OnUpdateAnotherDealingGold;
+                characterEntity.onUpdateAnotherDealingItems -= CacheUISceneGameplay.OnUpdateAnotherDealingItems;
+            }
         }
 
         protected virtual void OnDestroy()
         {
-            PlayerCharacterEntity.onDataIdChange -= OnDataIdChange;
-            PlayerCharacterEntity.onEquipWeaponsChange -= OnEquipWeaponsChange;
-            PlayerCharacterEntity.onAttributesOperation -= OnAttributesOperation;
-            PlayerCharacterEntity.onSkillsOperation -= OnSkillsOperation;
-            PlayerCharacterEntity.onBuffsOperation -= OnBuffsOperation;
-            PlayerCharacterEntity.onEquipItemsOperation -= OnEquipItemsOperation;
-            PlayerCharacterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
-            PlayerCharacterEntity.onHotkeysOperation -= OnHotkeysOperation;
-            PlayerCharacterEntity.onQuestsOperation -= OnQuestsOperation;
+            Desetup(PlayerCharacterEntity);
+            if (CacheMinimapCameraControls != null)
+                Destroy(CacheMinimapCameraControls.gameObject);
             if (CacheUISceneGameplay != null)
-            {
-                PlayerCharacterEntity.onShowNpcDialog -= CacheUISceneGameplay.OnShowNpcDialog;
-                PlayerCharacterEntity.onDead -= CacheUISceneGameplay.OnCharacterDead;
-                PlayerCharacterEntity.onRespawn -= CacheUISceneGameplay.OnCharacterRespawn;
-                PlayerCharacterEntity.onShowDealingRequestDialog -= CacheUISceneGameplay.OnShowDealingRequest;
-                PlayerCharacterEntity.onShowDealingDialog -= CacheUISceneGameplay.OnShowDealing;
-                PlayerCharacterEntity.onUpdateDealingState -= CacheUISceneGameplay.OnUpdateDealingState;
-                PlayerCharacterEntity.onUpdateDealingGold -= CacheUISceneGameplay.OnUpdateDealingGold;
-                PlayerCharacterEntity.onUpdateDealingItems -= CacheUISceneGameplay.OnUpdateDealingItems;
-                PlayerCharacterEntity.onUpdateAnotherDealingState -= CacheUISceneGameplay.OnUpdateAnotherDealingState;
-                PlayerCharacterEntity.onUpdateAnotherDealingGold -= CacheUISceneGameplay.OnUpdateAnotherDealingGold;
-                PlayerCharacterEntity.onUpdateAnotherDealingItems -= CacheUISceneGameplay.OnUpdateAnotherDealingItems;
-            }
+                Destroy(CacheUISceneGameplay.gameObject);
         }
 
         #region Sync data changes callback
