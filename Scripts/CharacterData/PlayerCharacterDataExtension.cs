@@ -8,6 +8,17 @@ using MultiplayerARPG;
 
 public static partial class PlayerCharacterDataExtension
 {
+    private static System.Type classType;
+    public static System.Type ClassType
+    {
+        get
+        {
+            if (classType == null)
+                classType = typeof(PlayerCharacterDataExtension);
+            return classType;
+        }
+    }
+
     public static T CloneTo<T>(this IPlayerCharacterData from, T to) where T : IPlayerCharacterData
     {
         to.Id = from.Id;
@@ -36,7 +47,7 @@ public static partial class PlayerCharacterDataExtension
         to.EquipItems = new List<CharacterItem>(from.EquipItems);
         to.NonEquipItems = new List<CharacterItem>(from.NonEquipItems);
         to.Skills = new List<CharacterSkill>(from.Skills);
-        DevExtUtils.InvokeStaticDevExtMethods(typeof(PlayerCharacterDataExtension), "CloneTo", from, to);
+        DevExtUtils.InvokeStaticDevExtMethods(ClassType, "CloneTo", from, to);
         return to;
     }
 
@@ -151,7 +162,7 @@ public static partial class PlayerCharacterDataExtension
             if (!nonEquipItem.IsValid())
                 character.NonEquipItems.RemoveAt(i);
         }
-        DevExtUtils.InvokeStaticDevExtMethods(typeof(PlayerCharacterDataExtension), "ValidateCharacterData", character);
+        DevExtUtils.InvokeStaticDevExtMethods(ClassType, "ValidateCharacterData", character);
         return character;
     }
 
@@ -237,7 +248,7 @@ public static partial class PlayerCharacterDataExtension
         character.RespawnMapName = startMap.scene.SceneName;
         character.CurrentPosition = startMap.startPosition;
         character.RespawnPosition = startMap.startPosition;
-        DevExtUtils.InvokeStaticDevExtMethods(typeof(PlayerCharacterDataExtension), "SetNewCharacterData", character, characterName, dataId);
+        DevExtUtils.InvokeStaticDevExtMethods(ClassType, "SetNewCharacterData", character, characterName, dataId);
         return character;
     }
 
@@ -257,7 +268,7 @@ public static partial class PlayerCharacterDataExtension
         surrogateSelector.AddSurrogate(typeof(CharacterItem), new StreamingContext(StreamingContextStates.All), itemSS);
         surrogateSelector.AddSurrogate(typeof(CharacterQuest), new StreamingContext(StreamingContextStates.All), questSS);
         surrogateSelector.AddSurrogate(typeof(CharacterSkill), new StreamingContext(StreamingContextStates.All), skillSS);
-        DevExtUtils.InvokeStaticDevExtMethods(typeof(PlayerCharacterDataExtension), "AddAllCharacterRelatesDataSurrogate", surrogateSelector);
+        DevExtUtils.InvokeStaticDevExtMethods(ClassType, "AddAllCharacterRelatesDataSurrogate", surrogateSelector);
     }
 
     public static void SavePersistentCharacterData<T>(this T characterData) where T : IPlayerCharacterData
@@ -436,7 +447,7 @@ public static partial class PlayerCharacterDataExtension
         writer.Put(leftHand.level);
         writer.Put(leftHand.amount);
         writer.Put(leftHand.durability);
-        DevExtUtils.InvokeStaticDevExtMethods(typeof(PlayerCharacterDataExtension), "SerializeCharacterData", characterData, writer);
+        DevExtUtils.InvokeStaticDevExtMethods(ClassType, "SerializeCharacterData", characterData, writer);
     }
 
     public static T DeserializeCharacterData<T>(this T characterData, NetDataReader reader) where T : IPlayerCharacterData
@@ -551,7 +562,7 @@ public static partial class PlayerCharacterDataExtension
         equipWeapons.leftHand = leftWeapon;
         tempCharacterData.EquipWeapons = equipWeapons;
 
-        DevExtUtils.InvokeStaticDevExtMethods(typeof(PlayerCharacterDataExtension), "DeserializeCharacterData", characterData, reader);
+        DevExtUtils.InvokeStaticDevExtMethods(ClassType, "DeserializeCharacterData", characterData, reader);
 
         tempCharacterData.ValidateCharacterData();
         tempCharacterData.CloneTo(characterData);
