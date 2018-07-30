@@ -10,3 +10,6 @@
 [submodule "AudioManager"]
 	path = AudioManager
 	url = https://github.com/insthync/unity-audio-manager.git
+[submodule "DevExtension"]
+	path = DevExtension
+	url = https://github.com/insthync/unity-dev-extension.git
