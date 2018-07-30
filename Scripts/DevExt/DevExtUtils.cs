@@ -7,9 +7,10 @@ using UnityEngine;
 
 public static class DevExtUtils
 {
+    private static Dictionary<object, Type> cacheDevExtTypes = new Dictionary<object, Type>();
     private static Dictionary<string, List<MethodInfo>> cacheDevExtMethods = new Dictionary<string, List<MethodInfo>>();
     /// <summary>
-    /// This will calls all methods from `obj` that have names as "[anything]_`baseMethodName`" with any number of arguments that can be set via `args`
+    /// This will calls all methods from `obj` that have attributes "DevExtMethodsAttribute("`baseMethodName`")" with any number of arguments that can be set via `args`
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="obj"></param>
@@ -17,9 +18,21 @@ public static class DevExtUtils
     /// <param name="args"></param>
     public static void InvokeClassDevExtMethods<T>(this T obj, string baseMethodName, params object[] args) where T : class
     {
-        InvokeDevExtMethods(obj.GetType(), obj, baseMethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, args);
+        Type type;
+        if (!cacheDevExtTypes.TryGetValue(obj, out type))
+        {
+            type = obj.GetType();
+            cacheDevExtTypes[obj] = type;
+        }
+        InvokeDevExtMethods(type, obj, baseMethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, args);
     }
 
+    /// <summary>
+    /// This will calls all static methods which its type is `type` that have attributes "DevExtMethodsAttribute("`baseMethodName`")" with any number of arguments that can be set via `args`
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="baseMethodName"></param>
+    /// <param name="args"></param>
     public static void InvokeStaticDevExtMethods(Type type, string baseMethodName, params object[] args)
     {
         InvokeDevExtMethods(type, null, baseMethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static, args);
