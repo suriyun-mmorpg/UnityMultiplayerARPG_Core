@@ -40,8 +40,11 @@ namespace MultiplayerARPG
         [Tooltip("Default hit effect, will be used when attacks to enemies")]
         public GameEffectCollection defaultHitEffects;
         public int[] expTree;
+        [Tooltip("You can add game data here or leave this empty to let it load data from Resources folders")]
+        public GameDatabase gameDatabase;
         [Tooltip("You can add warp portals here or may add warp portals in the scene directly, So you can leave this empty")]
         public WarpPortalDatabase warpPortalDatabase;
+        [Tooltip("You can add NPCs here or may add NPCs in the scene directly, so you can leave this empty")]
         public NpcDatabase npcDatabase;
         [Header("Gameplay Configs")]
         public UnityTag playerTag;
@@ -71,7 +74,7 @@ namespace MultiplayerARPG
         public int minCharacterNameLength = 2;
         public int maxCharacterNameLength = 16;
         [Header("Other Settings")]
-        public bool doNotLoadHomeSceneOnStart;
+        public bool doNotLoadHomeSceneOnLoadedGameData;
         [Header("Playing In Editor")]
         public bool useMobileInEditor;
         public static readonly Dictionary<int, Attribute> Attributes = new Dictionary<int, Attribute>();
@@ -243,6 +246,16 @@ namespace MultiplayerARPG
             MapNpcs.Clear();
             MapInfos.Clear();
 
+            if (gameDatabase != null)
+                gameDatabase.LoadData(this);
+            else
+                LoadDataFromResources();
+
+            this.InvokeClassDevExtMethods("Awake");
+        }
+        
+        public void LoadDataFromResources()
+        {
             // Use Resources Load Async ?
             var gameDataList = Resources.LoadAll<BaseGameData>("");
 
@@ -255,6 +268,7 @@ namespace MultiplayerARPG
             var playerCharacters = new List<BaseCharacter>();
             var monsterCharacters = new List<BaseCharacter>();
             var mapInfos = new List<MapInfo>();
+
             // Filtering game data
             foreach (var gameData in gameDataList)
             {
@@ -297,19 +311,28 @@ namespace MultiplayerARPG
             }
             AddGameEffectCollections(GameEffectCollectionType.WeaponHit, weaponHitEffects);
 
+            // Loaded game data from Resources
+            LoadedGameData();
+        }
+
+        public void LoadedGameData()
+        {
+            this.InvokeClassDevExtMethods("LoadedGameData");
+
             if (warpPortalDatabase != null)
                 AddMapWarpPortals(warpPortalDatabase.maps);
 
             if (npcDatabase != null)
                 AddMapNpcs(npcDatabase.maps);
 
-            this.InvokeClassDevExtMethods("Awake");
+            if (!doNotLoadHomeSceneOnLoadedGameData)
+                StartCoroutine(LoadHomeSceneOnLoadedGameDataRoutine());
         }
 
-        private void Start()
+        IEnumerator LoadHomeSceneOnLoadedGameDataRoutine()
         {
-            if (!doNotLoadHomeSceneOnStart)
-                UISceneLoading.Singleton.LoadScene(homeScene);
+            yield return null;
+            UISceneLoading.Singleton.LoadScene(homeScene);
         }
 
         public List<string> GetGameScenes()
