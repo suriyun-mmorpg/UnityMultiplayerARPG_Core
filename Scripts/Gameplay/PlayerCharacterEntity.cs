@@ -190,7 +190,7 @@ namespace MultiplayerARPG
         {
             if (IsDead())
                 return;
-            SetMovePaths(position);
+            SetMovePaths(position, true);
         }
 
         protected virtual void OnCollisionEnter(Collision collision)
@@ -205,14 +205,23 @@ namespace MultiplayerARPG
                 isGrounded = true;
         }
         
-        protected virtual void SetMovePaths(Vector3 position)
+        protected virtual void SetMovePaths(Vector3 position, bool useNavMesh)
         {
-            var navPath = new NavMeshPath();
-            if (NavMesh.CalculatePath(CacheTransform.position, position, NavMesh.AllAreas, navPath))
+            if (useNavMesh)
             {
-                navPaths = new Queue<Vector3>(navPath.corners);
-                // Dequeue first path it's not require for future movement
-                navPaths.Dequeue();
+                var navPath = new NavMeshPath();
+                if (NavMesh.CalculatePath(CacheTransform.position, position, NavMesh.AllAreas, navPath))
+                {
+                    navPaths = new Queue<Vector3>(navPath.corners);
+                    // Dequeue first path it's not require for future movement
+                    navPaths.Dequeue();
+                }
+            }
+            else
+            {
+                // If not use nav mesh, just move to position by direction
+                navPaths = new Queue<Vector3>();
+                navPaths.Enqueue(position);
             }
         }
 
@@ -223,7 +232,7 @@ namespace MultiplayerARPG
             return Mathf.Sqrt(2f * jumpHeight * -Physics.gravity.y * gravityRate);
         }
 
-        protected void NetFuncTriggerJump()
+        protected virtual void NetFuncTriggerJump()
         {
             if (IsDead() || IsOwnerClient)
                 return;
@@ -231,7 +240,7 @@ namespace MultiplayerARPG
             CharacterModel.PlayJumpAnimation();
         }
 
-        public void RequestTriggerJump()
+        public virtual void RequestTriggerJump()
         {
             if (IsDead())
                 return;

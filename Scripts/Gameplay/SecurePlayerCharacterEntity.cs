@@ -9,7 +9,6 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(Rigidbody))]
     public class SecurePlayerCharacterEntity : PlayerCharacterEntity
     {
-        private Vector3? lastClickPosition;
         public override void OnSetup()
         {
             base.OnSetup();
@@ -18,42 +17,62 @@ namespace MultiplayerARPG
             CacheNetTransform.ownerClientNotInterpolate = true;
             // Register Network functions
             RegisterNetFunction("PointClickMovement", new LiteNetLibFunction<NetFieldVector3>((position) => NetFuncPointClickMovement(position)));
+            RegisterNetFunction("KeyMovement", new LiteNetLibFunction<NetFieldVector3, NetFieldBool>((position, isJump) => NetFuncKeyMovement(position, isJump)));
         }
 
         protected void NetFuncPointClickMovement(Vector3 position)
         {
             if (IsDead())
                 return;
-            SetMovePaths(position);
+            SetMovePaths(position, true);
             currentNpcDialog = null;
         }
 
-        public void RequestPointClickMovement(Vector3 position)
+        protected void NetFuncKeyMovement(Vector3 position, bool isJump)
         {
             if (IsDead())
                 return;
-            if (!IsServer && CacheNetTransform.ownerClientNotInterpolate)
-                SetMovePaths(position);
-            CallNetFunction("PointClickMovement", FunctionReceivers.Server, position);
+            SetMovePaths(position, false);
+            if (!isJumping)
+                isJumping = isGrounded && isJump;
+            currentNpcDialog = null;
         }
 
         public override void KeyMovement(Vector3 direction, bool isJump)
         {
             if (IsDead())
                 return;
-            if (direction.magnitude <= 0.05f)
+            if (direction.magnitude <= 0.025f && !isJump)
                 return;
-            RequestPointClickMovement(CacheTransform.position + direction);
+            var position = CacheTransform.position + direction;
+            if (!IsServer && CacheNetTransform.ownerClientNotInterpolate)
+            {
+                SetMovePaths(position, false);
+                if (!isJumping)
+                    isJumping = isGrounded && isJump;
+            }
+            CallNetFunction("KeyMovement", FunctionReceivers.Server, position, isJump);
         }
 
         public override void PointClickMovement(Vector3 position)
         {
             if (IsDead())
                 return;
-            if (lastClickPosition.HasValue && lastClickPosition.Value == position)
+            if (!IsServer && CacheNetTransform.ownerClientNotInterpolate)
+                SetMovePaths(position, true);
+            CallNetFunction("PointClickMovement", FunctionReceivers.Server, position);
+        }
+
+        public override void RequestTriggerJump()
+        {
+            if (IsDead())
                 return;
-            lastClickPosition = position;
-            RequestPointClickMovement(position);
+            // Play jump animation immediately on owner client
+            if (IsOwnerClient)
+                CharacterModel.PlayJumpAnimation();
+            // Only server will call for clients to trigger jump animation for secure entity
+            if (IsServer)
+                CallNetFunction("TriggerJump", FunctionReceivers.All);
         }
     }
 }
