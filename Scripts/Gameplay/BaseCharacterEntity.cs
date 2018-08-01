@@ -388,7 +388,7 @@ namespace MultiplayerARPG
         #endregion
 
         #region Target Entity Getter/Setter
-        public void SetTargetEntity(RpgNetworkEntity entity)
+        public virtual void SetTargetEntity(RpgNetworkEntity entity)
         {
             targetEntity = entity;
         }

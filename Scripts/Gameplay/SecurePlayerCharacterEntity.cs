@@ -18,6 +18,8 @@ namespace MultiplayerARPG
             // Register Network functions
             RegisterNetFunction("PointClickMovement", new LiteNetLibFunction<NetFieldVector3>((position) => NetFuncPointClickMovement(position)));
             RegisterNetFunction("KeyMovement", new LiteNetLibFunction<NetFieldVector3, NetFieldBool>((position, isJump) => NetFuncKeyMovement(position, isJump)));
+            RegisterNetFunction("StopMove", new LiteNetLibFunction(StopMove));
+            RegisterNetFunction("SetTargetEntity", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncSetTargetEntity(objectId)));
         }
 
         protected void NetFuncPointClickMovement(Vector3 position)
@@ -38,6 +40,16 @@ namespace MultiplayerARPG
             currentNpcDialog = null;
         }
 
+        protected void NetFuncSetTargetEntity(uint objectId)
+        {
+            if (objectId == 0)
+                SetTargetEntity(null);
+            RpgNetworkEntity rpgNetworkEntity;
+            if (!TryGetEntityByObjectId(objectId, out rpgNetworkEntity))
+                return;
+            SetTargetEntity(rpgNetworkEntity);
+        }
+
         public override void KeyMovement(Vector3 direction, bool isJump)
         {
             if (IsDead())
@@ -45,7 +57,7 @@ namespace MultiplayerARPG
             if (direction.magnitude <= 0.025f && !isJump)
                 return;
             var position = CacheTransform.position + direction;
-            if (!IsServer && CacheNetTransform.ownerClientNotInterpolate)
+            if (IsOwnerClient && !IsServer && CacheNetTransform.ownerClientNotInterpolate)
             {
                 SetMovePaths(position, false);
                 if (!isJumping)
@@ -58,9 +70,23 @@ namespace MultiplayerARPG
         {
             if (IsDead())
                 return;
-            if (!IsServer && CacheNetTransform.ownerClientNotInterpolate)
+            if (IsOwnerClient && !IsServer && CacheNetTransform.ownerClientNotInterpolate)
                 SetMovePaths(position, true);
             CallNetFunction("PointClickMovement", FunctionReceivers.Server, position);
+        }
+
+        public override void StopMove()
+        {
+            base.StopMove();
+            if (IsOwnerClient && !IsServer)
+                CallNetFunction("StopMove", FunctionReceivers.Server);
+        }
+
+        public override void SetTargetEntity(RpgNetworkEntity entity)
+        {
+            base.SetTargetEntity(entity);
+            if (IsOwnerClient && !IsServer)
+                CallNetFunction("SetTargetEntity", FunctionReceivers.Server, entity == null ? 0 : entity.ObjectId);
         }
 
         public override void RequestTriggerJump()
