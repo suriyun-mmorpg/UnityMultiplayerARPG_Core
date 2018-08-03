@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
+using Unity.Jobs;
 using UnityEngine;
+using UnityEngine.Jobs;
 
 [RequireComponent(typeof(RectTransform))]
 public class UIFollowWorldPosition : MonoBehaviour
@@ -10,6 +13,14 @@ public class UIFollowWorldPosition : MonoBehaviour
     public float damping = 5f;
     public float snapDistance = 5f;
 
+    private Vector3 wantedPosition;
+    private Vector3 oldTargetPosition;
+    private Vector3 oldCameraPosition;
+    private Quaternion oldCameraRotation;
+    private TransformAccessArray followJobTransforms;
+    private UIFollowWorldPositionJob followJob;
+    private JobHandle followJobHandle;
+
     public Camera CacheTargetCamera
     {
         get
@@ -17,6 +28,17 @@ public class UIFollowWorldPosition : MonoBehaviour
             if (targetCamera == null)
                 targetCamera = Camera.main;
             return targetCamera;
+        }
+    }
+
+    private Transform cacheTargetCamera;
+    public Transform CacheCameraTransform
+    {
+        get
+        {
+            if (cacheTargetCamera == null)
+                cacheTargetCamera = CacheTargetCamera == null ? null : CacheTargetCamera.transform;
+            return cacheTargetCamera;
         }
     }
 
@@ -31,24 +53,68 @@ public class UIFollowWorldPosition : MonoBehaviour
         }
     }
 
+    private void Awake()
+    {
+        followJobTransforms = new TransformAccessArray(new Transform[] { CacheTransform });
+    }
+
     private void Start()
     {
-        Vector2 wantedPosition = RectTransformUtility.WorldToScreenPoint(CacheTargetCamera, targetPosition);
-        CacheTransform.position = wantedPosition;
+        CacheTransform.position = RectTransformUtility.WorldToScreenPoint(CacheTargetCamera, targetPosition);
     }
 
     private void OnEnable()
     {
-        Vector2 wantedPosition = RectTransformUtility.WorldToScreenPoint(CacheTargetCamera, targetPosition);
-        CacheTransform.position = wantedPosition;
+        CacheTransform.position = RectTransformUtility.WorldToScreenPoint(CacheTargetCamera, targetPosition);
+    }
+
+    private void OnDisable()
+    {
+        followJobTransforms.Dispose();
+        followJobHandle.Complete();
     }
 
     private void Update()
     {
-        Vector2 wantedPosition = RectTransformUtility.WorldToScreenPoint(CacheTargetCamera, targetPosition);
-        if (damping <= 0 || Vector3.Distance(CacheTransform.position, wantedPosition) >= snapDistance)
-            CacheTransform.position = wantedPosition;
+        if (CacheTargetCamera == null)
+            return;
+
+        followJobHandle.Complete();
+        
+        // Find wanted position only when it needed
+        if (!oldTargetPosition.Equals(targetPosition) ||
+            !CacheCameraTransform.position.Equals(oldCameraPosition) ||
+            !CacheCameraTransform.rotation.Equals(oldCameraRotation))
+            wantedPosition = RectTransformUtility.WorldToScreenPoint(CacheTargetCamera, targetPosition);
+
+        oldTargetPosition = targetPosition;
+        oldCameraPosition = CacheCameraTransform.position;
+        oldCameraRotation = CacheCameraTransform.rotation;
+
+        followJob = new UIFollowWorldPositionJob()
+        {
+            wantedPosition = wantedPosition,
+            damping = damping,
+            snapDistance = snapDistance,
+            deltaTime = Time.deltaTime,
+        };
+        followJobHandle = followJob.Schedule(followJobTransforms);
+        JobHandle.ScheduleBatchedJobs();
+    }
+}
+
+public struct UIFollowWorldPositionJob : IJobParallelForTransform
+{
+    public Vector2 wantedPosition;
+    public float damping;
+    public float snapDistance;
+    public float deltaTime;
+
+    public void Execute(int index, TransformAccess transform)
+    {
+        if (damping <= 0 || Vector3.Distance(transform.position, wantedPosition) >= snapDistance)
+            transform.position = wantedPosition;
         else
-            CacheTransform.position = Vector3.Slerp(CacheTransform.position, wantedPosition, damping * Time.deltaTime);
+            transform.position = Vector3.Slerp(transform.position, wantedPosition, damping * deltaTime);
     }
 }
