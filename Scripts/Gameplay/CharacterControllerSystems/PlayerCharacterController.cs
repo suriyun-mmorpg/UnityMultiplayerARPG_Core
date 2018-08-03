@@ -47,6 +47,24 @@ namespace MultiplayerARPG
         public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
         public GameObject CacheTargetObject { get; protected set; }
 
+        // Optimizing garbage collection
+        protected bool getMouseUp;
+        protected bool getMouseDown;
+        protected bool getMouse;
+        protected bool isPointerOverUI;
+        protected bool isMouseDragDetected;
+        protected bool isMouseHoldDetected;
+        protected RaycastHit[] foundRaycastAll;
+        protected Collider[] foundOverlapSphere;
+        protected BaseCharacterEntity targetCharacter;
+        protected BaseCharacterEntity targetEnemy;
+        protected BasePlayerCharacterEntity targetPlayer;
+        protected BaseMonsterCharacterEntity targetMonster;
+        protected NpcEntity targetNpc;
+        protected ItemDropEntity targetItemDrop;
+        protected BuildingEntity targetBuilding;
+        protected HarvestableEntity targetHarvestable;
+
         protected override void Awake()
         {
             base.Awake();
@@ -114,7 +132,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                BaseCharacterEntity targetCharacter = null;
+                targetCharacter = null;
                 PlayerCharacterEntity.TryGetTargetEntity(out targetCharacter);
                 if (CacheUISceneGameplay != null)
                     CacheUISceneGameplay.SetTargetCharacter(targetCharacter);
@@ -122,10 +140,9 @@ namespace MultiplayerARPG
 
             if (destination.HasValue)
             {
-                var destinationValue = destination.Value;
                 if (CacheTargetObject != null)
-                    CacheTargetObject.transform.position = destinationValue;
-                if (Vector3.Distance(destinationValue, CharacterTransform.position) < StoppingDistance + 0.5f)
+                    CacheTargetObject.transform.position = destination.Value;
+                if (Vector3.Distance(destination.Value, CharacterTransform.position) < StoppingDistance + 0.5f)
                     destination = null;
             }
 
@@ -158,38 +175,38 @@ namespace MultiplayerARPG
                 // Activate nearby npcs / players / activable buildings
                 if (InputManager.GetButtonDown("Activate"))
                 {
-                    var foundEntities = Physics.OverlapSphere(CharacterTransform.position, gameInstance.conversationDistance, gameInstance.characterLayer.Mask);
-                    BasePlayerCharacterEntity foundPlayer = null;
-                    NpcEntity foundNpc = null;
-                    foreach (var foundEntity in foundEntities)
+                    foundOverlapSphere = Physics.OverlapSphere(CharacterTransform.position, gameInstance.conversationDistance, gameInstance.characterLayer.Mask);
+                    targetPlayer = null;
+                    targetNpc = null;
+                    foreach (var foundEntity in foundOverlapSphere)
                     {
-                        if (foundPlayer == null)
+                        if (targetPlayer == null)
                         {
-                            foundPlayer = foundEntity.GetComponent<BasePlayerCharacterEntity>();
-                            if (foundPlayer == PlayerCharacterEntity)
-                                foundPlayer = null;
+                            targetPlayer = foundEntity.GetComponent<BasePlayerCharacterEntity>();
+                            if (targetPlayer == PlayerCharacterEntity)
+                                targetPlayer = null;
                         }
-                        if (foundNpc == null)
-                            foundNpc = foundEntity.GetComponent<NpcEntity>();
+                        if (targetNpc == null)
+                            targetNpc = foundEntity.GetComponent<NpcEntity>();
                     }
                     // Priority Player -> Npc -> Buildings
-                    if (foundPlayer != null && CacheUISceneGameplay != null)
-                        CacheUISceneGameplay.SetActivePlayerCharacter(foundPlayer);
-                    else if (foundNpc != null)
-                        PlayerCharacterEntity.RequestNpcActivate(foundNpc.ObjectId);
-                    if (foundEntities.Length == 0)
+                    if (targetPlayer != null && CacheUISceneGameplay != null)
+                        CacheUISceneGameplay.SetActivePlayerCharacter(targetPlayer);
+                    else if (targetNpc != null)
+                        PlayerCharacterEntity.RequestNpcActivate(targetNpc.ObjectId);
+                    if (foundOverlapSphere.Length == 0)
                         PlayerCharacterEntity.RequestEnterWarp();
                 }
                 // Pick up nearby items
                 if (InputManager.GetButtonDown("PickUpItem"))
                 {
-                    var foundEntities = Physics.OverlapSphere(CharacterTransform.position, gameInstance.pickUpItemDistance, gameInstance.itemDropLayer.Mask);
-                    foreach (var foundEntity in foundEntities)
+                    foundOverlapSphere = Physics.OverlapSphere(CharacterTransform.position, gameInstance.pickUpItemDistance, gameInstance.itemDropLayer.Mask);
+                    foreach (var foundEntity in foundOverlapSphere)
                     {
-                        var itemDropEntity = foundEntity.GetComponent<ItemDropEntity>();
-                        if (itemDropEntity != null)
+                        targetItemDrop = foundEntity.GetComponent<ItemDropEntity>();
+                        if (targetItemDrop != null)
                         {
-                            PlayerCharacterEntity.RequestPickupItem(itemDropEntity.ObjectId);
+                            PlayerCharacterEntity.RequestPickupItem(targetItemDrop.ObjectId);
                             break;
                         }
                     }
@@ -205,18 +222,18 @@ namespace MultiplayerARPG
             // If it's building something, not allow point click movement
             if (currentBuildingEntity != null)
                 return;
-            var getMouseDown = Input.GetMouseButtonDown(0);
-            var getMouseUp = Input.GetMouseButtonUp(0);
-            var getMouse = Input.GetMouseButton(0);
+            getMouseDown = Input.GetMouseButtonDown(0);
+            getMouseUp = Input.GetMouseButtonUp(0);
+            getMouse = Input.GetMouseButton(0);
             if (getMouseDown)
             {
                 isMouseDragOrHoldOrOverUI = false;
                 mouseDownTime = Time.unscaledTime;
                 mouseDownPosition = Input.mousePosition;
             }
-            var isPointerOverUI = CacheUISceneGameplay != null && CacheUISceneGameplay.IsPointerOverUIObject();
-            var isMouseDragDetected = (Input.mousePosition - mouseDownPosition).magnitude > DETECT_MOUSE_DRAG_DISTANCE;
-            var isMouseHoldDetected = Time.unscaledTime - mouseDownTime > DETECT_MOUSE_HOLD_DURATION;
+            isPointerOverUI = CacheUISceneGameplay != null && CacheUISceneGameplay.IsPointerOverUIObject();
+            isMouseDragDetected = (Input.mousePosition - mouseDownPosition).magnitude > DETECT_MOUSE_DRAG_DISTANCE;
+            isMouseHoldDetected = Time.unscaledTime - mouseDownTime > DETECT_MOUSE_HOLD_DURATION;
             if (!isMouseDragOrHoldOrOverUI && (isMouseDragDetected || isMouseHoldDetected || isPointerOverUI))
                 isMouseDragOrHoldOrOverUI = true;
             if (!isPointerOverUI && (getMouse || getMouseUp))
@@ -225,9 +242,8 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.SetTargetEntity(null);
                 LiteNetLibIdentity targetIdentity = null;
                 Vector3? targetPosition = null;
-                var layerMask = gameInstance.GetTargetLayerMask();
-                var hits = Physics.RaycastAll(targetCamera.ScreenPointToRay(Input.mousePosition), 100f, layerMask);
-                foreach (var hit in hits)
+                foundRaycastAll = Physics.RaycastAll(targetCamera.ScreenPointToRay(Input.mousePosition), 100f, gameInstance.GetTargetLayerMask());
+                foreach (var hit in foundRaycastAll)
                 {
                     var hitTransform = hit.transform;
                     // When clicking on target
@@ -235,47 +251,47 @@ namespace MultiplayerARPG
                         !isMouseDragOrHoldOrOverUI &&
                         (controllerMode == PlayerCharacterControllerMode.PointClick || controllerMode == PlayerCharacterControllerMode.Both))
                     {
-                        var playerEntity = hitTransform.GetComponent<BasePlayerCharacterEntity>();
-                        var monsterEntity = hitTransform.GetComponent<BaseMonsterCharacterEntity>();
-                        var npcEntity = hitTransform.GetComponent<NpcEntity>();
-                        var itemDropEntity = hitTransform.GetComponent<ItemDropEntity>();
-                        var harvestableEntity = hitTransform.GetComponent<HarvestableEntity>();
+                        targetPlayer = hitTransform.GetComponent<BasePlayerCharacterEntity>();
+                        targetMonster = hitTransform.GetComponent<BaseMonsterCharacterEntity>();
+                        targetNpc = hitTransform.GetComponent<NpcEntity>();
+                        targetItemDrop = hitTransform.GetComponent<ItemDropEntity>();
+                        targetHarvestable = hitTransform.GetComponent<HarvestableEntity>();
                         targetPosition = hit.point;
                         PlayerCharacterEntity.SetTargetEntity(null);
                         lastNpcObjectId = 0;
-                        if (playerEntity != null && !playerEntity.IsDead())
+                        if (targetPlayer != null && !targetPlayer.IsDead())
                         {
-                            targetPosition = playerEntity.CacheTransform.position;
-                            targetIdentity = playerEntity.Identity;
-                            PlayerCharacterEntity.SetTargetEntity(playerEntity);
+                            targetPosition = targetPlayer.CacheTransform.position;
+                            targetIdentity = targetPlayer.Identity;
+                            PlayerCharacterEntity.SetTargetEntity(targetPlayer);
                             break;
                         }
-                        else if (monsterEntity != null && !monsterEntity.IsDead())
+                        else if (targetMonster != null && !targetMonster.IsDead())
                         {
-                            targetPosition = monsterEntity.CacheTransform.position;
-                            targetIdentity = monsterEntity.Identity;
-                            PlayerCharacterEntity.SetTargetEntity(monsterEntity);
+                            targetPosition = targetMonster.CacheTransform.position;
+                            targetIdentity = targetMonster.Identity;
+                            PlayerCharacterEntity.SetTargetEntity(targetMonster);
                             break;
                         }
-                        else if (npcEntity != null)
+                        else if (targetNpc != null)
                         {
-                            targetPosition = npcEntity.CacheTransform.position;
-                            targetIdentity = npcEntity.Identity;
-                            PlayerCharacterEntity.SetTargetEntity(npcEntity);
+                            targetPosition = targetNpc.CacheTransform.position;
+                            targetIdentity = targetNpc.Identity;
+                            PlayerCharacterEntity.SetTargetEntity(targetNpc);
                             break;
                         }
-                        else if (itemDropEntity != null)
+                        else if (targetItemDrop != null)
                         {
-                            targetPosition = itemDropEntity.CacheTransform.position;
-                            targetIdentity = itemDropEntity.Identity;
-                            PlayerCharacterEntity.SetTargetEntity(itemDropEntity);
+                            targetPosition = targetItemDrop.CacheTransform.position;
+                            targetIdentity = targetItemDrop.Identity;
+                            PlayerCharacterEntity.SetTargetEntity(targetItemDrop);
                             break;
                         }
-                        else if (harvestableEntity != null && !harvestableEntity.IsDead())
+                        else if (targetHarvestable != null && !targetHarvestable.IsDead())
                         {
-                            targetPosition = harvestableEntity.CacheTransform.position;
-                            targetIdentity = harvestableEntity.Identity;
-                            PlayerCharacterEntity.SetTargetEntity(harvestableEntity);
+                            targetPosition = targetHarvestable.CacheTransform.position;
+                            targetIdentity = targetHarvestable.Identity;
+                            PlayerCharacterEntity.SetTargetEntity(targetHarvestable);
                             break;
                         }
                     }
@@ -453,13 +469,6 @@ namespace MultiplayerARPG
         protected void UpdateFollowTarget()
         {
             // Temp variables
-            BaseCharacterEntity targetEnemy;
-            BasePlayerCharacterEntity targetPlayer;
-            BaseMonsterCharacterEntity targetMonster;
-            NpcEntity targetNpc;
-            ItemDropEntity targetItemDrop;
-            BuildingEntity targetBuilding;
-            HarvestableEntity targetHarvestable;
             if (TryGetAttackingCharacter(out targetEnemy))
             {
                 if (targetEnemy.IsDead())
@@ -761,10 +770,9 @@ namespace MultiplayerARPG
 
         private bool RaycastToSetBuildingArea(Ray ray, float dist = 5f)
         {
-            var layerMask = gameInstance.GetBuildLayerMask();
             BuildingArea nonSnapBuildingArea = null;
-            RaycastHit[] hits = Physics.RaycastAll(ray, dist, layerMask);
-            foreach (var hit in hits)
+            foundRaycastAll = Physics.RaycastAll(ray, dist, gameInstance.GetBuildLayerMask());
+            foreach (var hit in foundRaycastAll)
             {
                 if (Vector3.Distance(hit.point, CharacterTransform.position) > gameInstance.buildDistance)
                     return false;
@@ -832,9 +840,8 @@ namespace MultiplayerARPG
 
         public bool FindTarget(Transform target, float actDistance, int layerMask)
         {
-            var characterPosition = CharacterTransform.position;
-            var colliders = Physics.OverlapSphere(characterPosition, actDistance, layerMask);
-            foreach (var collider in colliders)
+            foundOverlapSphere = Physics.OverlapSphere(CharacterTransform.position, actDistance, layerMask);
+            foreach (var collider in foundOverlapSphere)
             {
                 if (collider.transform == target)
                     return true;
