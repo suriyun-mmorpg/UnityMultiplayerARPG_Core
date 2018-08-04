@@ -1,99 +1,96 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MultiplayerARPG
+/// <summary>
+/// Static class to improve readability
+/// Example:
+/// <code>
+/// var selected = WeightedRandomizer.From(weights).TakeOne();
+/// </code>
+/// 
+/// </summary>
+public static class WeightedRandomizer
 {
+    public static WeightedRandomizer<R> From<R>(Dictionary<R, int> spawnRate)
+    {
+        return new WeightedRandomizer<R>(spawnRate);
+    }
+}
+
+public class WeightedRandomizer<T>
+{
+    public int noResultWeight;
+    private static Random _random = new Random();
+    private Dictionary<T, int> _weights;
+
     /// <summary>
-    /// Static class to improve readability
-    /// Example:
+    /// Instead of calling this constructor directly,
+    /// consider calling a static method on the WeightedRandomizer (non-generic) class
+    /// for a more readable method call, i.e.:
+    /// 
     /// <code>
     /// var selected = WeightedRandomizer.From(weights).TakeOne();
     /// </code>
     /// 
     /// </summary>
-    public static class WeightedRandomizer
+    /// <param name="weights"></param>
+    public WeightedRandomizer(Dictionary<T, int> weights)
     {
-        public static WeightedRandomizer<R> From<R>(Dictionary<R, int> spawnRate)
-        {
-            return new WeightedRandomizer<R>(spawnRate);
-        }
+        _weights = weights;
     }
 
-    public class WeightedRandomizer<T>
+    /// <summary>
+    /// Randomizes one item
+    /// </summary>
+    /// <param name="spawnRate">An ordered list withe the current spawn rates. The list will be updated so that selected items will have a smaller chance of being repeated.</param>
+    /// <returns>The randomized item.</returns>
+    public T TakeOne()
     {
-        public int noResultWeight;
-        private static Random _random = new Random();
-        private Dictionary<T, int> _weights;
+        // Sorts the spawn rate list
+        var sortedSpawnRate = Sort(_weights);
 
-        /// <summary>
-        /// Instead of calling this constructor directly,
-        /// consider calling a static method on the WeightedRandomizer (non-generic) class
-        /// for a more readable method call, i.e.:
-        /// 
-        /// <code>
-        /// var selected = WeightedRandomizer.From(weights).TakeOne();
-        /// </code>
-        /// 
-        /// </summary>
-        /// <param name="weights"></param>
-        public WeightedRandomizer(Dictionary<T, int> weights)
+        // Sums all spawn rates
+        int sum = 0;
+        foreach (var spawn in _weights)
         {
-            _weights = weights;
+            sum += spawn.Value;
         }
 
-        /// <summary>
-        /// Randomizes one item
-        /// </summary>
-        /// <param name="spawnRate">An ordered list withe the current spawn rates. The list will be updated so that selected items will have a smaller chance of being repeated.</param>
-        /// <returns>The randomized item.</returns>
-        public T TakeOne()
-        {
-            // Sorts the spawn rate list
-            var sortedSpawnRate = Sort(_weights);
+        // Randomizes a number from Zero to Sum
+        int roll = _random.Next(0, sum + noResultWeight);
+        if (roll > sum)
+            return default(T);
 
-            // Sums all spawn rates
-            int sum = 0;
-            foreach (var spawn in _weights)
+        // Finds chosen item based on spawn rate
+        T selected = sortedSpawnRate[sortedSpawnRate.Count - 1].Key;
+
+        foreach (var spawn in sortedSpawnRate)
+        {
+            if (roll < spawn.Value)
             {
-                sum += spawn.Value;
+                selected = spawn.Key;
+                break;
             }
+            roll -= spawn.Value;
+        }
 
-            // Randomizes a number from Zero to Sum
-            int roll = _random.Next(0, sum + noResultWeight);
-            if (roll > sum)
-                return default(T);
+        // Returns the selected item
+        return selected;
+    }
 
-            // Finds chosen item based on spawn rate
-            T selected = sortedSpawnRate[sortedSpawnRate.Count - 1].Key;
+    private List<KeyValuePair<T, int>> Sort(Dictionary<T, int> weights)
+    {
+        var list = new List<KeyValuePair<T, int>>(weights);
 
-            foreach (var spawn in sortedSpawnRate)
+        // Sorts the Spawn Rate List for randomization later
+        list.Sort(
+            delegate (KeyValuePair<T, int> firstPair,
+                     KeyValuePair<T, int> nextPair)
             {
-                if (roll < spawn.Value)
-                {
-                    selected = spawn.Key;
-                    break;
-                }
-                roll -= spawn.Value;
+                return firstPair.Value.CompareTo(nextPair.Value);
             }
+         );
 
-            // Returns the selected item
-            return selected;
-        }
-
-        private List<KeyValuePair<T, int>> Sort(Dictionary<T, int> weights)
-        {
-            var list = new List<KeyValuePair<T, int>>(weights);
-
-            // Sorts the Spawn Rate List for randomization later
-            list.Sort(
-                delegate (KeyValuePair<T, int> firstPair,
-                         KeyValuePair<T, int> nextPair)
-                {
-                    return firstPair.Value.CompareTo(nextPair.Value);
-                }
-             );
-
-            return list;
-        }
+        return list;
     }
 }
