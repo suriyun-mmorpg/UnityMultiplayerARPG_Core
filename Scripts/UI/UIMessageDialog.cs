@@ -1,11 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class UIMessageDialog : UIBase
 {
     public Text textTitle;
+    public TextWrapper uiTextTitle;
     public Text textDescription;
+    public TextWrapper uiTextDescription;
     public Button buttonOkay;
     public Button buttonYes;
     public Button buttonNo;
@@ -13,14 +14,30 @@ public class UIMessageDialog : UIBase
 
     public string Title
     {
-        get { return textTitle == null ? "" : textTitle.text; }
-        set { if (textTitle != null) textTitle.text = value; }
+        get
+        {
+            UpdateUIComponents();
+            return uiTextTitle == null ? "" : uiTextTitle.text;
+        }
+        set
+        {
+            UpdateUIComponents();
+            if (uiTextTitle != null) uiTextTitle.text = value;
+        }
     }
 
     public string Description
     {
-        get { return textDescription == null ? "" : textDescription.text; }
-        set { if (textDescription != null) textDescription.text = value; }
+        get
+        {
+            UpdateUIComponents();
+            return uiTextDescription == null ? "" : uiTextDescription.text;
+        }
+        set
+        {
+            UpdateUIComponents();
+            if (uiTextDescription != null) uiTextDescription.text = value;
+        }
     }
 
     public bool ShowButtonOkay
@@ -128,5 +145,12 @@ public class UIMessageDialog : UIBase
         if (onClickCancel != null)
             onClickCancel.Invoke();
         Hide();
+    }
+
+    [ContextMenu("Update UI Components")]
+    public void UpdateUIComponents()
+    {
+        uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
+        uiTextDescription = UIWrapperHelpers.SetWrapperToText(textDescription, uiTextDescription);
     }
 }

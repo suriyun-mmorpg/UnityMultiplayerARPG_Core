@@ -22,9 +22,13 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public Text textTitle;
+        public TextWrapper uiTextTitle;
         public Text textDescription;
+        public TextWrapper uiTextDescription;
         public Text textRewardExp;
+        public TextWrapper uiTextRewardExp;
         public Text textRewardGold;
+        public TextWrapper uiTextRewardGold;
         [Header("Reward Items")]
         public bool showRewardItemList;
         public GameObject uiRewardItemRoot;
@@ -90,6 +94,8 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            UpdateUIComponents();
+
             var characterQuest = Data;
             var quest = characterQuest.GetQuest();
 
@@ -98,17 +104,17 @@ namespace MultiplayerARPG
 
             var titleFormat = isComplete ? questCompleteTitleFormat : (isAllTasksDone ? questTasksCompleteTitleFormat : questOnGoingTitleFormat);
 
-            if (textTitle != null)
-                textTitle.text = string.Format(titleFormat, quest == null ? "Unknow" : quest.title);
+            if (uiTextTitle != null)
+                uiTextTitle.text = string.Format(titleFormat, quest == null ? "Unknow" : quest.title);
 
-            if (textDescription != null)
-                textDescription.text = string.Format(descriptionFormat, quest == null ? "N/A" : quest.description);
+            if (uiTextDescription != null)
+                uiTextDescription.text = string.Format(descriptionFormat, quest == null ? "N/A" : quest.description);
 
-            if (textRewardExp != null)
-                textRewardExp.text = string.Format(rewardExpFormat, quest == null ? "0" : quest.rewardExp.ToString("N0"));
+            if (uiTextRewardExp != null)
+                uiTextRewardExp.text = string.Format(rewardExpFormat, quest == null ? "0" : quest.rewardExp.ToString("N0"));
 
-            if (textRewardGold != null)
-                textRewardGold.text = string.Format(rewardGoldFormat, quest == null ? "0" : quest.rewardGold.ToString("N0"));
+            if (uiTextRewardGold != null)
+                uiTextRewardGold.text = string.Format(rewardGoldFormat, quest == null ? "0" : quest.rewardGold.ToString("N0"));
 
             if (quest != null && showRewardItemList)
             {
@@ -136,6 +142,15 @@ namespace MultiplayerARPG
 
             if (questOnGoingStatusObject != null)
                 questOnGoingStatusObject.SetActive(!isComplete && !isAllTasksDone);
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
+            uiTextDescription = UIWrapperHelpers.SetWrapperToText(textDescription, uiTextDescription);
+            uiTextRewardExp = UIWrapperHelpers.SetWrapperToText(textRewardExp, uiTextRewardExp);
+            uiTextRewardGold = UIWrapperHelpers.SetWrapperToText(textRewardGold, uiTextRewardGold);
         }
     }
 }

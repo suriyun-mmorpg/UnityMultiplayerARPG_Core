@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(UIFollowWorldObject))]
-    [RequireComponent(typeof(Text))]
+    [RequireComponent(typeof(TextWrapper))]
     public class UICombatText : MonoBehaviour
     {
         public float lifeTime = 2f;
@@ -24,13 +24,16 @@ namespace MultiplayerARPG
             }
         }
 
-        private Text cacheText;
-        public Text CacheText
+        private TextWrapper cacheText;
+        public TextWrapper CacheText
         {
             get
             {
                 if (cacheText == null)
-                    cacheText = GetComponent<Text>();
+                {
+                    var textComp = GetComponent<Text>();
+                    cacheText = UIWrapperHelpers.SetWrapperToText(textComp, cacheText);
+                }
                 return cacheText;
             }
         }

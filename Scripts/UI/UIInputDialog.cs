@@ -6,8 +6,11 @@ using UnityEngine.UI;
 public class UIInputDialog : UIBase
 {
     public Text textTitle;
+    public TextWrapper uiTextTitle;
     public Text textDescription;
+    public TextWrapper uiTextDescription;
     public InputField inputField;
+    public InputFieldWrapper uiInputField;
     public Button buttonConfirm;
     private System.Action<string> onConfirmText;
     private System.Action<int> onConfirmInteger;
@@ -19,23 +22,47 @@ public class UIInputDialog : UIBase
     private float floatDefaultAmount;
     private float? floatMinAmount;
     private float? floatMaxAmount;
-
+    
     public string Title
     {
-        get { return textTitle == null ? "" : textTitle.text; }
-        set { if (textTitle != null) textTitle.text = value; }
+        get
+        {
+            UpdateUIComponents();
+            return uiTextTitle == null ? "" : uiTextTitle.text;
+        }
+        set
+        {
+            UpdateUIComponents();
+            if (uiTextTitle != null) uiTextTitle.text = value;
+        }
     }
 
     public string Description
     {
-        get { return textDescription == null ? "" : textDescription.text; }
-        set { if (textDescription != null) textDescription.text = value; }
+        get
+        {
+            UpdateUIComponents();
+            return uiTextDescription == null ? "" : uiTextDescription.text;
+        }
+        set
+        {
+            UpdateUIComponents();
+            if (uiTextDescription != null) uiTextDescription.text = value;
+        }
     }
 
     public string InputFieldText
     {
-        get { return inputField == null ? "" : inputField.text; }
-        set { if (inputField != null) inputField.text = value; }
+        get
+        {
+            UpdateUIComponents();
+            return uiInputField == null ? "" : uiInputField.text;
+        }
+        set
+        {
+            UpdateUIComponents();
+            if (uiInputField != null) uiInputField.text = value;
+        }
     }
 
     public override void Show()
@@ -76,15 +103,15 @@ public class UIInputDialog : UIBase
         Title = title;
         Description = description;
         InputFieldText = defaultAmount.ToString();
-        if (inputField != null)
+        if (uiInputField != null)
         {
             if (minAmount.Value > maxAmount.Value)
             {
                 minAmount = null;
                 Debug.LogWarning("min amount is more than max amount");
             }
-            inputField.onValueChanged.RemoveAllListeners();
-            inputField.onValueChanged.AddListener(ValidateIntAmount);
+            uiInputField.onValueChanged.RemoveAllListeners();
+            uiInputField.onValueChanged.AddListener(ValidateIntAmount);
         }
         contentType = InputField.ContentType.IntegerNumber;
         this.onConfirmInteger = onConfirmInteger;
@@ -96,12 +123,12 @@ public class UIInputDialog : UIBase
         var amount = intDefaultAmount;
         if (int.TryParse(result, out amount))
         {
-            inputField.onValueChanged.RemoveAllListeners();
+            uiInputField.onValueChanged.RemoveAllListeners();
             if (intMinAmount.HasValue && amount < intMinAmount.Value)
                 InputFieldText = intMinAmount.Value.ToString();
             if (intMaxAmount.HasValue && amount > intMaxAmount.Value)
                 InputFieldText = intMaxAmount.Value.ToString();
-            inputField.onValueChanged.AddListener(ValidateIntAmount);
+            uiInputField.onValueChanged.AddListener(ValidateIntAmount);
         }
     }
 
@@ -118,15 +145,15 @@ public class UIInputDialog : UIBase
         Title = title;
         Description = description;
         InputFieldText = defaultAmount.ToString();
-        if (inputField != null)
+        if (uiInputField != null)
         {
             if (minAmount.Value > maxAmount.Value)
             {
                 minAmount = null;
                 Debug.LogWarning("min amount is more than max amount");
             }
-            inputField.onValueChanged.RemoveAllListeners();
-            inputField.onValueChanged.AddListener(ValidateFloatAmount);
+            uiInputField.onValueChanged.RemoveAllListeners();
+            uiInputField.onValueChanged.AddListener(ValidateFloatAmount);
         }
         contentType = InputField.ContentType.DecimalNumber;
         this.onConfirmDecimal = onConfirmDecimal;
@@ -138,12 +165,12 @@ public class UIInputDialog : UIBase
         var amount = floatDefaultAmount;
         if (float.TryParse(result, out amount))
         {
-            inputField.onValueChanged.RemoveAllListeners();
+            uiInputField.onValueChanged.RemoveAllListeners();
             if (floatMinAmount.HasValue && amount < floatMinAmount.Value)
                 InputFieldText = floatMinAmount.Value.ToString();
             if (floatMaxAmount.HasValue && amount > floatMaxAmount.Value)
                 InputFieldText = floatMaxAmount.Value.ToString();
-            inputField.onValueChanged.AddListener(ValidateFloatAmount);
+            uiInputField.onValueChanged.AddListener(ValidateFloatAmount);
         }
     }
 
@@ -168,5 +195,13 @@ public class UIInputDialog : UIBase
                 break;
         }
         Hide();
+    }
+
+    [ContextMenu("Update UI Components")]
+    public void UpdateUIComponents()
+    {
+        uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
+        uiTextDescription = UIWrapperHelpers.SetWrapperToText(textDescription, uiTextDescription);
+        uiInputField = UIWrapperHelpers.SetWrapperToInputField(inputField, uiInputField);
     }
 }

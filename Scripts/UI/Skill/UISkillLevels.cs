@@ -14,22 +14,24 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public Text textAllLevels;
+        public TextWrapper uiTextAllLevels;
         public UISkillTextPair[] textLevels;
 
-        private Dictionary<Skill, Text> cacheTextLevels;
-        public Dictionary<Skill, Text> CacheTextLevels
+        private Dictionary<Skill, TextWrapper> cacheTextLevels;
+        public Dictionary<Skill, TextWrapper> CacheTextLevels
         {
             get
             {
                 if (cacheTextLevels == null)
                 {
-                    cacheTextLevels = new Dictionary<Skill, Text>();
+                    UpdateUIComponents();
+                    cacheTextLevels = new Dictionary<Skill, TextWrapper>();
                     foreach (var textLevel in textLevels)
                     {
                         if (textLevel.skill == null || textLevel.text == null)
                             continue;
                         var key = textLevel.skill;
-                        var textComp = textLevel.text;
+                        var textComp = textLevel.uiText;
                         textComp.text = string.Format(levelFormat, key.title, "0", "0");
                         cacheTextLevels[key] = textComp;
                     }
@@ -40,11 +42,13 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            UpdateUIComponents();
+
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (Data == null || Data.Count == 0)
             {
-                if (textAllLevels != null)
-                    textAllLevels.gameObject.SetActive(false);
+                if (uiTextAllLevels != null)
+                    uiTextAllLevels.gameObject.SetActive(false);
 
                 foreach (var textLevel in CacheTextLevels)
                 {
@@ -69,14 +73,29 @@ namespace MultiplayerARPG
                     var format = currentLevel >= targetLevel ? levelFormat : levelNotReachTargetFormat;
                     var amountText = string.Format(format, skill.title, currentLevel.ToString("N0"), targetLevel.ToString("N0"));
                     text += amountText;
-                    Text cacheTextAmount;
+                    TextWrapper cacheTextAmount;
                     if (CacheTextLevels.TryGetValue(dataEntry.Key, out cacheTextAmount))
                         cacheTextAmount.text = amountText;
                 }
-                if (textAllLevels != null)
+                if (uiTextAllLevels != null)
                 {
-                    textAllLevels.gameObject.SetActive(!string.IsNullOrEmpty(text));
-                    textAllLevels.text = text;
+                    uiTextAllLevels.gameObject.SetActive(!string.IsNullOrEmpty(text));
+                    uiTextAllLevels.text = text;
+                }
+            }
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextAllLevels = UIWrapperHelpers.SetWrapperToText(textAllLevels, uiTextAllLevels);
+            if (textLevels != null && textLevels.Length > 0)
+            {
+                for (var i = 0; i < textLevels.Length; ++i)
+                {
+                    var textLevel = textLevels[i];
+                    textLevel.uiText = UIWrapperHelpers.SetWrapperToText(textLevel.text, textLevel.uiText);
+                    textLevels[i] = textLevel;
                 }
             }
         }

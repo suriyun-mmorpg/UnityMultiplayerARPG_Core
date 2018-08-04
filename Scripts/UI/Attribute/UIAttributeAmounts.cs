@@ -14,22 +14,24 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public Text textAllAmounts;
+        public TextWrapper uiTextAllAmounts;
         public UIAttributeTextPair[] textAmounts;
 
-        private Dictionary<Attribute, Text> cacheTextAmounts;
-        public Dictionary<Attribute, Text> CacheTextAmounts
+        private Dictionary<Attribute, TextWrapper> cacheTextAmounts;
+        public Dictionary<Attribute, TextWrapper> CacheTextAmounts
         {
             get
             {
                 if (cacheTextAmounts == null)
                 {
-                    cacheTextAmounts = new Dictionary<Attribute, Text>();
+                    UpdateUIComponents();
+                    cacheTextAmounts = new Dictionary<Attribute, TextWrapper>();
                     foreach (var textAmount in textAmounts)
                     {
-                        if (textAmount.attribute == null || textAmount.text == null)
+                        if (textAmount.attribute == null || textAmount.uiText == null)
                             continue;
                         var key = textAmount.attribute;
-                        var textComp = textAmount.text;
+                        var textComp = textAmount.uiText;
                         textComp.text = string.Format(amountFormat, key.title, "0", "0");
                         cacheTextAmounts[key] = textComp;
                     }
@@ -40,11 +42,12 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            UpdateUIComponents();
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (Data == null || Data.Count == 0)
             {
-                if (textAllAmounts != null)
-                    textAllAmounts.gameObject.SetActive(false);
+                if (uiTextAllAmounts != null)
+                    uiTextAllAmounts.gameObject.SetActive(false);
 
                 foreach (var textAmount in CacheTextAmounts)
                 {
@@ -69,14 +72,29 @@ namespace MultiplayerARPG
                     var format = currentAmount >= targetAmount ? amountFormat : amountNotReachTargetFormat;
                     var amountText = string.Format(format, attribute.title, currentAmount.ToString("N0"), targetAmount.ToString("N0"));
                     text += amountText;
-                    Text cacheTextAmount;
+                    TextWrapper cacheTextAmount;
                     if (CacheTextAmounts.TryGetValue(attribute, out cacheTextAmount))
                         cacheTextAmount.text = amountText;
                 }
-                if (textAllAmounts != null)
+                if (uiTextAllAmounts != null)
                 {
-                    textAllAmounts.gameObject.SetActive(!string.IsNullOrEmpty(text));
-                    textAllAmounts.text = text;
+                    uiTextAllAmounts.gameObject.SetActive(!string.IsNullOrEmpty(text));
+                    uiTextAllAmounts.text = text;
+                }
+            }
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextAllAmounts = UIWrapperHelpers.SetWrapperToText(textAllAmounts, uiTextAllAmounts);
+            if (textAmounts != null && textAmounts.Length > 0)
+            {
+                for (var i = 0; i < textAmounts.Length; ++i)
+                {
+                    var textAmount = textAmounts[i];
+                    textAmount.uiText = UIWrapperHelpers.SetWrapperToText(textAmount.text, textAmount.uiText);
+                    textAmounts[i] = textAmount;
                 }
             }
         }

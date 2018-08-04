@@ -50,14 +50,22 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public Text textTitle;
+        public TextWrapper uiTextTitle;
         public Text textDescription;
+        public TextWrapper uiTextDescription;
         public Text textLevel;
+        public TextWrapper uiTextLevel;
         public Image imageIcon;
         public Text textItemType;
+        public TextWrapper uiTextItemType;
         public Text textSellPrice;
+        public TextWrapper uiTextSellPrice;
         public Text textStack;
+        public TextWrapper uiTextStack;
         public Text textDurability;
+        public TextWrapper uiTextDurability;
         public Text textWeight;
+        public TextWrapper uiTextWeight;
 
         [Header("Equipment - UI Elements")]
         public UIEquipmentItemRequirement uiRequirement;
@@ -110,6 +118,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            UpdateUIComponents();
             var characterItem = Data.characterItem;
             var level = Data.targetLevel;
             var item = characterItem.GetItem();
@@ -132,23 +141,23 @@ namespace MultiplayerARPG
             else
                 onSetUnEquippableData.Invoke();
 
-            if (textTitle != null)
+            if (uiTextTitle != null)
             {
                 var str = string.Format(titleFormat, item == null ? "Unknow" : item.title);
                 if (!dontAppendRefineLevelToTitle)
                     str += string.Format(titleRefineLevelFormat, (level - 1).ToString("N0"));
-                textTitle.text = str;
+                uiTextTitle.text = str;
             }
 
-            if (textDescription != null)
-                textDescription.text = string.Format(descriptionFormat, item == null ? "N/A" : item.description);
+            if (uiTextDescription != null)
+                uiTextDescription.text = string.Format(descriptionFormat, item == null ? "N/A" : item.description);
 
-            if (textLevel != null)
+            if (uiTextLevel != null)
             {
                 if (showLevelAsDefault)
-                    textLevel.text = string.Format(levelFormat, level.ToString("N0"));
+                    uiTextLevel.text = string.Format(levelFormat, level.ToString("N0"));
                 else
-                    textLevel.text = string.Format(refineLevelFormat, (level - 1).ToString("N0"));
+                    uiTextLevel.text = string.Format(refineLevelFormat, (level - 1).ToString("N0"));
             }
 
             if (imageIcon != null)
@@ -158,61 +167,61 @@ namespace MultiplayerARPG
                 imageIcon.sprite = iconSprite;
             }
 
-            if (textItemType != null)
+            if (uiTextItemType != null)
             {
                 switch (item.itemType)
                 {
                     case ItemType.Junk:
-                        textItemType.text = string.Format(itemTypeFormat, junkItemType);
+                        uiTextItemType.text = string.Format(itemTypeFormat, junkItemType);
                         break;
                     case ItemType.Armor:
-                        textItemType.text = string.Format(itemTypeFormat, armorItem.ArmorType.title);
+                        uiTextItemType.text = string.Format(itemTypeFormat, armorItem.ArmorType.title);
                         break;
                     case ItemType.Weapon:
-                        textItemType.text = string.Format(itemTypeFormat, weaponItem.WeaponType.title);
+                        uiTextItemType.text = string.Format(itemTypeFormat, weaponItem.WeaponType.title);
                         break;
                     case ItemType.Shield:
-                        textItemType.text = string.Format(itemTypeFormat, shieldItemType);
+                        uiTextItemType.text = string.Format(itemTypeFormat, shieldItemType);
                         break;
                     case ItemType.Potion:
-                        textItemType.text = string.Format(itemTypeFormat, potionItemType);
+                        uiTextItemType.text = string.Format(itemTypeFormat, potionItemType);
                         break;
                     case ItemType.Ammo:
-                        textItemType.text = string.Format(itemTypeFormat, ammoItemType);
+                        uiTextItemType.text = string.Format(itemTypeFormat, ammoItemType);
                         break;
                     case ItemType.Building:
-                        textItemType.text = string.Format(itemTypeFormat, buildingItemType);
+                        uiTextItemType.text = string.Format(itemTypeFormat, buildingItemType);
                         break;
                 }
             }
 
-            if (textSellPrice != null)
-                textSellPrice.text = string.Format(sellPriceFormat, item == null ? "0" : item.sellPrice.ToString("N0"));
+            if (uiTextSellPrice != null)
+                uiTextSellPrice.text = string.Format(sellPriceFormat, item == null ? "0" : item.sellPrice.ToString("N0"));
 
-            if (textStack != null)
+            if (uiTextStack != null)
             {
                 var stackString = "";
                 if (item == null)
                     stackString = string.Format(stackFormat, "0", "0");
                 else
                     stackString = string.Format(stackFormat, characterItem.amount.ToString("N0"), item.maxStack);
-                textStack.text = stackString;
-                textStack.gameObject.SetActive(showAmountWhenMaxIsOne || item.maxStack > 1);
+                uiTextStack.text = stackString;
+                uiTextStack.gameObject.SetActive(showAmountWhenMaxIsOne || item.maxStack > 1);
             }
 
-            if (textDurability != null)
+            if (uiTextDurability != null)
             {
                 var durabilityString = "";
                 if (item == null)
                     durabilityString = string.Format(durabilityFormat, "0", "0");
                 else
                     durabilityString = string.Format(durabilityFormat, characterItem.durability.ToString("N0"), item.maxDurability);
-                textDurability.text = durabilityString;
-                textDurability.gameObject.SetActive(equipmentItem != null && item.maxDurability > 0);
+                uiTextDurability.text = durabilityString;
+                uiTextDurability.gameObject.SetActive(equipmentItem != null && item.maxDurability > 0);
             }
 
-            if (textWeight != null)
-                textWeight.text = string.Format(weightFormat, item == null ? "0" : item.weight.ToString("N2"));
+            if (uiTextWeight != null)
+                uiTextWeight.text = string.Format(weightFormat, item == null ? "0" : item.weight.ToString("N2"));
 
             if (uiRequirement != null)
             {
@@ -551,6 +560,19 @@ namespace MultiplayerARPG
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
             }
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
+            uiTextDescription = UIWrapperHelpers.SetWrapperToText(textDescription, uiTextDescription);
+            uiTextLevel = UIWrapperHelpers.SetWrapperToText(textLevel, uiTextLevel);
+            uiTextItemType = UIWrapperHelpers.SetWrapperToText(textItemType, uiTextItemType);
+            uiTextSellPrice = UIWrapperHelpers.SetWrapperToText(textSellPrice, uiTextSellPrice);
+            uiTextStack = UIWrapperHelpers.SetWrapperToText(textStack, uiTextStack);
+            uiTextDurability = UIWrapperHelpers.SetWrapperToText(textDurability, uiTextDurability);
+            uiTextWeight = UIWrapperHelpers.SetWrapperToText(textWeight, uiTextWeight);
         }
     }
 }

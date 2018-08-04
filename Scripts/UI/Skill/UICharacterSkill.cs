@@ -34,14 +34,22 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public Text textTitle;
+        public TextWrapper uiTextTitle;
         public Text textDescription;
+        public TextWrapper uiTextDescription;
         public Text textLevel;
+        public TextWrapper uiTextLevel;
         public Image imageIcon;
         public Text textSkillType;
+        public TextWrapper uiTextSkillType;
         public Text textAvailableWeapons;
+        public TextWrapper uiTextAvailableWeapons;
         public Text textConsumeMp;
+        public TextWrapper uiTextConsumeMp;
         public Text textCoolDownDuration;
+        public TextWrapper uiTextCoolDownDuration;
         public Text textCoolDownRemainsDuration;
+        public TextWrapper uiTextCoolDownRemainsDuration;
         public Image imageCoolDownGage;
         public UISkillRequirement uiRequirement;
         public UICraftItem uiCraftItem;
@@ -70,6 +78,7 @@ namespace MultiplayerARPG
         protected override void Update()
         {
             base.Update();
+            UpdateUIComponents();
 
             var characterSkill = Data.characterSkill;
             var skill = characterSkill.GetSkill();
@@ -87,10 +96,10 @@ namespace MultiplayerARPG
                 coolDownRemainsDuration = 0;
             var coolDownDuration = skill.GetCoolDownDuration(level);
 
-            if (textCoolDownDuration != null)
-                textCoolDownDuration.text = string.Format(coolDownDurationFormat, coolDownDuration.ToString("N0"));
+            if (uiTextCoolDownDuration != null)
+                uiTextCoolDownDuration.text = string.Format(coolDownDurationFormat, coolDownDuration.ToString("N0"));
 
-            if (textCoolDownRemainsDuration != null)
+            if (uiTextCoolDownRemainsDuration != null)
             {
                 var remainsDurationString = "";
                 if (!hideRemainsDurationWhenIsZero || coolDownRemainsDuration > 0)
@@ -100,7 +109,7 @@ namespace MultiplayerARPG
                     else
                         remainsDurationString = string.Format(coolDownRemainsDurationFormat, Mathf.CeilToInt(coolDownRemainsDuration).ToString("N0"));
                 }
-                textCoolDownRemainsDuration.text = remainsDurationString;
+                uiTextCoolDownRemainsDuration.text = remainsDurationString;
             }
 
             if (imageCoolDownGage != null)
@@ -109,6 +118,8 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            UpdateUIComponents();
+
             var characterSkill = Data.characterSkill;
             var skill = characterSkill.GetSkill();
             short level = Data.targetLevel;
@@ -120,14 +131,14 @@ namespace MultiplayerARPG
             else
                 onSetNonLevelZeroData.Invoke();
 
-            if (textTitle != null)
-                textTitle.text = string.Format(titleFormat, skill == null ? "Unknow" : skill.title);
+            if (uiTextTitle != null)
+                uiTextTitle.text = string.Format(titleFormat, skill == null ? "Unknow" : skill.title);
 
-            if (textDescription != null)
-                textDescription.text = string.Format(descriptionFormat, skill == null ? "N/A" : skill.description);
+            if (uiTextDescription != null)
+                uiTextDescription.text = string.Format(descriptionFormat, skill == null ? "N/A" : skill.description);
 
-            if (textLevel != null)
-                textLevel.text = string.Format(levelFormat, level.ToString("N0"));
+            if (uiTextLevel != null)
+                uiTextLevel.text = string.Format(levelFormat, level.ToString("N0"));
 
             if (imageIcon != null)
             {
@@ -136,26 +147,26 @@ namespace MultiplayerARPG
                 imageIcon.sprite = iconSprite;
             }
 
-            if (textSkillType != null)
+            if (uiTextSkillType != null)
             {
                 switch (skill.skillType)
                 {
                     case SkillType.Active:
-                        textSkillType.text = string.Format(skillTypeFormat, activeSkillType);
+                        uiTextSkillType.text = string.Format(skillTypeFormat, activeSkillType);
                         break;
                     case SkillType.Passive:
-                        textSkillType.text = string.Format(skillTypeFormat, passiveSkillType);
+                        uiTextSkillType.text = string.Format(skillTypeFormat, passiveSkillType);
                         break;
                     case SkillType.CraftItem:
-                        textSkillType.text = string.Format(skillTypeFormat, craftItemSkillType);
+                        uiTextSkillType.text = string.Format(skillTypeFormat, craftItemSkillType);
                         break;
                 }
             }
 
-            if (textAvailableWeapons != null)
+            if (uiTextAvailableWeapons != null)
             {
                 if (skill.availableWeapons == null || skill.availableWeapons.Length == 0)
-                    textAvailableWeapons.gameObject.SetActive(false);
+                    uiTextAvailableWeapons.gameObject.SetActive(false);
                 else
                 {
                     var str = string.Empty;
@@ -165,13 +176,13 @@ namespace MultiplayerARPG
                             str += "/";
                         str += availableWeapon.title;
                     }
-                    textAvailableWeapons.text = string.Format(availableWeaponsFormat, str);
-                    textAvailableWeapons.gameObject.SetActive(true);
+                    uiTextAvailableWeapons.text = string.Format(availableWeaponsFormat, str);
+                    uiTextAvailableWeapons.gameObject.SetActive(true);
                 }
             }
 
-            if (textConsumeMp != null)
-                textConsumeMp.text = string.Format(consumeMpFormat, skill == null || level <= 0 ? "N/A" : skill.GetConsumeMp(level).ToString("N0"));
+            if (uiTextConsumeMp != null)
+                uiTextConsumeMp.text = string.Format(consumeMpFormat, skill == null || level <= 0 ? "N/A" : skill.GetConsumeMp(level).ToString("N0"));
 
             if (uiRequirement != null)
             {
@@ -275,6 +286,19 @@ namespace MultiplayerARPG
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
                 owningCharacter.RequestAddSkill(indexOfData, 1);
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
+            uiTextDescription = UIWrapperHelpers.SetWrapperToText(textDescription, uiTextDescription);
+            uiTextLevel = UIWrapperHelpers.SetWrapperToText(textLevel, uiTextLevel);
+            uiTextSkillType = UIWrapperHelpers.SetWrapperToText(textSkillType, uiTextSkillType);
+            uiTextAvailableWeapons = UIWrapperHelpers.SetWrapperToText(textAvailableWeapons, uiTextAvailableWeapons);
+            uiTextConsumeMp = UIWrapperHelpers.SetWrapperToText(textConsumeMp, uiTextConsumeMp);
+            uiTextCoolDownDuration = UIWrapperHelpers.SetWrapperToText(textCoolDownDuration, uiTextCoolDownDuration);
+            uiTextCoolDownRemainsDuration = UIWrapperHelpers.SetWrapperToText(textCoolDownRemainsDuration, uiTextCoolDownRemainsDuration);
         }
     }
 }

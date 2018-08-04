@@ -16,9 +16,12 @@ namespace MultiplayerARPG
         [Tooltip("Chat message format {0} = Character Name, {1} = Message")]
         public string guildFormat = "<color=blue>(GUILD) {0}: {1}</color>";
         public Text textMessage;
+        public TextWrapper uiTextMessage;
         public UIChatHandler uiChatHandler;
         protected override void UpdateData()
         {
+            UpdateUIComponents();
+
             var format = string.Empty;
             switch (Data.channel)
             {
@@ -36,8 +39,8 @@ namespace MultiplayerARPG
                     break;
             }
 
-            if (textMessage != null)
-                textMessage.text = string.Format(format, Data.sender, Data.message);
+            if (uiTextMessage != null)
+                uiTextMessage.text = string.Format(format, Data.sender, Data.message);
         }
 
         public void OnClickEntry()
@@ -47,6 +50,12 @@ namespace MultiplayerARPG
                 uiChatHandler.ShowEnterChatField();
                 uiChatHandler.EnterChatMessage = uiChatHandler.whisperCommand + " " + Data.sender;
             }
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextMessage = UIWrapperHelpers.SetWrapperToText(textMessage, uiTextMessage);
         }
     }
 }

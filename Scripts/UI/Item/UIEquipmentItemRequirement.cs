@@ -15,32 +15,36 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public Text textRequireLevel;
+        public TextWrapper uiTextRequireLevel;
         public Text textRequireClass;
+        public TextWrapper uiTextRequireClass;
         public UIAttributeAmounts uiRequireAttributeAmounts;
 
         protected override void UpdateData()
         {
+            UpdateUIComponents();
+
             var equipmentItem = Data;
 
-            if (textRequireLevel != null)
+            if (uiTextRequireLevel != null)
             {
                 if (equipmentItem == null || equipmentItem.requirement.level <= 0)
-                    textRequireLevel.gameObject.SetActive(false);
+                    uiTextRequireLevel.gameObject.SetActive(false);
                 else
                 {
-                    textRequireLevel.gameObject.SetActive(true);
-                    textRequireLevel.text = string.Format(requireLevelFormat, equipmentItem.requirement.level.ToString("N0"));
+                    uiTextRequireLevel.gameObject.SetActive(true);
+                    uiTextRequireLevel.text = string.Format(requireLevelFormat, equipmentItem.requirement.level.ToString("N0"));
                 }
             }
 
-            if (textRequireClass != null)
+            if (uiTextRequireClass != null)
             {
                 if (equipmentItem == null || equipmentItem.requirement.character == null)
-                    textRequireClass.gameObject.SetActive(false);
+                    uiTextRequireClass.gameObject.SetActive(false);
                 else
                 {
-                    textRequireClass.gameObject.SetActive(true);
-                    textRequireClass.text = string.Format(requireClassFormat, equipmentItem.requirement.character.title);
+                    uiTextRequireClass.gameObject.SetActive(true);
+                    uiTextRequireClass.text = string.Format(requireClassFormat, equipmentItem.requirement.character.title);
                 }
             }
 
@@ -54,6 +58,13 @@ namespace MultiplayerARPG
                     uiRequireAttributeAmounts.Data = equipmentItem.CacheRequireAttributeAmounts;
                 }
             }
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextRequireLevel = UIWrapperHelpers.SetWrapperToText(textRequireLevel, uiTextRequireLevel);
+            uiTextRequireClass = UIWrapperHelpers.SetWrapperToText(textRequireClass, uiTextRequireClass);
         }
     }
 }

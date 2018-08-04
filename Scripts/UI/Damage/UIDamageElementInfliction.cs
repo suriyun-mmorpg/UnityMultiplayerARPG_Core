@@ -12,16 +12,23 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public Text textInfliction;
+        public TextWrapper uiTextInfliction;
 
         protected override void UpdateData()
         {
-            if (textInfliction != null)
+            if (uiTextInfliction != null)
             {
                 var element = Data.damageElement;
                 var rate = Data.infliction;
                 var format = element == GameInstance.Singleton.DefaultDamageElement ? defaultElementInflictionFormat : inflictionFormat;
-                textInfliction.text = string.Format(format, element.title, (rate * 100f).ToString("N0"));
+                uiTextInfliction.text = string.Format(format, element.title, (rate * 100f).ToString("N0"));
             }
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextInfliction = UIWrapperHelpers.SetWrapperToText(textInfliction, uiTextInfliction);
         }
     }
 }

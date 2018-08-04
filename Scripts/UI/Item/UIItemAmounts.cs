@@ -14,22 +14,24 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public Text textAllAmounts;
+        public TextWrapper uiTextAllAmounts;
         public UIItemTextPair[] textAmounts;
 
-        private Dictionary<Item, Text> cacheTextLevels;
-        public Dictionary<Item, Text> CacheTextLevels
+        private Dictionary<Item, TextWrapper> cacheTextLevels;
+        public Dictionary<Item, TextWrapper> CacheTextLevels
         {
             get
             {
                 if (cacheTextLevels == null)
                 {
-                    cacheTextLevels = new Dictionary<Item, Text>();
+                    UpdateUIComponents();
+                    cacheTextLevels = new Dictionary<Item, TextWrapper>();
                     foreach (var textLevel in textAmounts)
                     {
                         if (textLevel.item == null || textLevel.text == null)
                             continue;
                         var key = textLevel.item;
-                        var textComp = textLevel.text;
+                        var textComp = textLevel.uiText;
                         textComp.text = string.Format(amountFormat, key.title, "0", "0");
                         cacheTextLevels[key] = textComp;
                     }
@@ -69,14 +71,29 @@ namespace MultiplayerARPG
                     var format = currentAmount >= targetAmount ? amountFormat : amountNotReachTargetFormat;
                     var amountText = string.Format(format, dataEntry.Key.title, currentAmount.ToString("N0"), targetAmount.ToString("N0"));
                     text += amountText;
-                    Text cacheTextAmount;
+                    TextWrapper cacheTextAmount;
                     if (CacheTextLevels.TryGetValue(dataEntry.Key, out cacheTextAmount))
                         cacheTextAmount.text = amountText;
                 }
-                if (textAllAmounts != null)
+                if (uiTextAllAmounts != null)
                 {
-                    textAllAmounts.gameObject.SetActive(!string.IsNullOrEmpty(text));
-                    textAllAmounts.text = text;
+                    uiTextAllAmounts.gameObject.SetActive(!string.IsNullOrEmpty(text));
+                    uiTextAllAmounts.text = text;
+                }
+            }
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextAllAmounts = UIWrapperHelpers.SetWrapperToText(textAllAmounts, uiTextAllAmounts);
+            if (textAmounts != null && textAmounts.Length > 0)
+            {
+                for (var i = 0; i < textAmounts.Length; ++i)
+                {
+                    var textAmount = textAmounts[i];
+                    textAmount.uiText = UIWrapperHelpers.SetWrapperToText(textAmount.text, textAmount.uiText);
+                    textAmounts[i] = textAmount;
                 }
             }
         }

@@ -19,13 +19,18 @@ namespace MultiplayerARPG
         public UICharacterItem uiRefiningItem;
         public UIItemAmounts uiRequireItemAmounts;
         public Text textRequireGold;
+        public TextWrapper uiTextRequireGold;
         public Text textSuccessRate;
+        public TextWrapper uiTextSuccessRate;
         public Text textRefiningLevel;
+        public TextWrapper uiTextRefiningLevel;
 
         private bool hasSetData;
 
         protected override void UpdateUI()
         {
+            UpdateUIComponents();
+
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             CharacterItem characterItem = null;
             Item equipmentItem = null;
@@ -60,28 +65,28 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (textRequireGold != null)
+            if (uiTextRequireGold != null)
             {
                 if (!canRefine)
-                    textRequireGold.text = string.Format(requireGoldFormat, 0.ToString("N0"));
+                    uiTextRequireGold.text = string.Format(requireGoldFormat, 0.ToString("N0"));
                 else
-                    textRequireGold.text = string.Format(requireGoldFormat, refineLevel.requireGold.ToString("N0"));
+                    uiTextRequireGold.text = string.Format(requireGoldFormat, refineLevel.requireGold.ToString("N0"));
             }
 
-            if (textSuccessRate != null)
+            if (uiTextSuccessRate != null)
             {
                 if (!canRefine)
-                    textSuccessRate.text = string.Format(successRateFormat, 0.ToString("N2"));
+                    uiTextSuccessRate.text = string.Format(successRateFormat, 0.ToString("N2"));
                 else
-                    textSuccessRate.text = string.Format(successRateFormat, refineLevel.successRate.ToString("N2"));
+                    uiTextSuccessRate.text = string.Format(successRateFormat, refineLevel.successRate.ToString("N2"));
             }
 
-            if (textRefiningLevel != null)
+            if (uiTextRefiningLevel != null)
             {
                 if (!canRefine)
-                    textRefiningLevel.text = string.Format(refiningLevelFormat, (level - 1).ToString("N0"));
+                    uiTextRefiningLevel.text = string.Format(refiningLevelFormat, (level - 1).ToString("N0"));
                 else
-                    textRefiningLevel.text = string.Format(refiningLevelFormat, level.ToString("N0"));
+                    uiTextRefiningLevel.text = string.Format(refiningLevelFormat, level.ToString("N0"));
             }
         }
 
@@ -102,6 +107,14 @@ namespace MultiplayerARPG
                 return;
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             owningCharacter.RequestRefineItem(Data);
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextRequireGold = UIWrapperHelpers.SetWrapperToText(textRequireGold, uiTextRequireGold);
+            uiTextSuccessRate = UIWrapperHelpers.SetWrapperToText(textSuccessRate, uiTextSuccessRate);
+            uiTextRefiningLevel = UIWrapperHelpers.SetWrapperToText(textRefiningLevel, uiTextRefiningLevel);
         }
     }
 }

@@ -22,7 +22,7 @@ namespace MultiplayerARPG
     public partial class UISceneGameplay : MonoBehaviour
     {
         [System.Serializable]
-        public struct UIToggleUI
+        public class UIToggleUI
         {
             public UIBase ui;
             public KeyCode key;

@@ -16,6 +16,7 @@ namespace MultiplayerARPG
         public UICashShopItem uiCashShopItemPrefab;
         public Transform uiCashShopItemContainer;
         public Text textCash;
+        public TextWrapper uiTextCash;
 
         private UIList cacheList;
         public UIList CacheList
@@ -113,8 +114,8 @@ namespace MultiplayerARPG
                     UISceneGlobal.Singleton.ShowMessageDialog("Error", "Connection timeout");
                     break;
                 default:
-                    if (textCash != null)
-                        textCash.text = string.Format(cashFormat, castedMessage.cash.ToString("N0"));
+                    if (uiTextCash != null)
+                        uiTextCash.text = string.Format(cashFormat, castedMessage.cash.ToString("N0"));
                     var cashShopItems = new List<CashShopItem>();
                     foreach (var cashShopItemId in castedMessage.cashShopItemIds)
                     {
@@ -142,6 +143,7 @@ namespace MultiplayerARPG
 
         private void ResponseCashShopBuy(AckResponseCode responseCode, BaseAckMessage message)
         {
+            UpdateUIComponents();
             var castedMessage = (ResponseCashShopBuyMessage)message;
             switch (responseCode)
             {
@@ -172,6 +174,12 @@ namespace MultiplayerARPG
                     RefreshCashShopInfo();
                     break;
             }
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextCash = UIWrapperHelpers.SetWrapperToText(textCash, uiTextCash);
         }
     }
 }

@@ -13,9 +13,12 @@ namespace MultiplayerARPG
         public UICharacterItem uiCraftingItem;
         public UIItemAmounts uiRequireItemAmounts;
         public Text textRequireGold;
+        public TextWrapper uiTextRequireGold;
 
         protected override void UpdateData()
         {
+            UpdateUIComponents();
+
             var craftItemData = Data;
             if (uiCraftingItem != null)
             {
@@ -39,13 +42,19 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (textRequireGold != null)
+            if (uiTextRequireGold != null)
             {
                 if (craftItemData.craftingItem == null)
-                    textRequireGold.text = string.Format(requireGoldFormat, 0.ToString("N0"));
+                    uiTextRequireGold.text = string.Format(requireGoldFormat, 0.ToString("N0"));
                 else
-                    textRequireGold.text = string.Format(requireGoldFormat, craftItemData.requireGold.ToString("N0"));
+                    uiTextRequireGold.text = string.Format(requireGoldFormat, craftItemData.requireGold.ToString("N0"));
             }
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextRequireGold = UIWrapperHelpers.SetWrapperToText(textRequireGold, uiTextRequireGold);
         }
     }
 }

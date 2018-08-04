@@ -12,22 +12,23 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public Text textAllAmounts;
+        public TextWrapper uiTextAllAmounts;
         public UIResistanceTextPair[] textAmounts;
 
-        private Dictionary<DamageElement, Text> cacheTextAmounts;
-        public Dictionary<DamageElement, Text> CacheTextAmounts
+        private Dictionary<DamageElement, TextWrapper> cacheTextAmounts;
+        public Dictionary<DamageElement, TextWrapper> CacheTextAmounts
         {
             get
             {
                 if (cacheTextAmounts == null)
                 {
-                    cacheTextAmounts = new Dictionary<DamageElement, Text>();
+                    cacheTextAmounts = new Dictionary<DamageElement, TextWrapper>();
                     foreach (var textAmount in textAmounts)
                     {
                         if (textAmount.damageElement == null || textAmount.text == null)
                             continue;
                         var key = textAmount.damageElement;
-                        var textComp = textAmount.text;
+                        var textComp = textAmount.uiText;
                         textComp.text = string.Format(amountFormat, key.title, "0", "0");
                         cacheTextAmounts[key] = textComp;
                     }
@@ -38,6 +39,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            UpdateUIComponents();
             if (Data == null || Data.Count == 0)
             {
                 if (textAllAmounts != null)
@@ -60,7 +62,7 @@ namespace MultiplayerARPG
                         text += "\n";
                     var amountText = string.Format(amountFormat, dataEntry.Key.title, (dataEntry.Value * 100f).ToString("N0"));
                     text += amountText;
-                    Text cacheTextAmount;
+                    TextWrapper cacheTextAmount;
                     if (CacheTextAmounts.TryGetValue(dataEntry.Key, out cacheTextAmount))
                         cacheTextAmount.text = amountText;
                 }
@@ -68,6 +70,21 @@ namespace MultiplayerARPG
                 {
                     textAllAmounts.gameObject.SetActive(!string.IsNullOrEmpty(text));
                     textAllAmounts.text = text;
+                }
+            }
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextAllAmounts = UIWrapperHelpers.SetWrapperToText(textAllAmounts, uiTextAllAmounts);
+            if (textAmounts != null && textAmounts.Length > 0)
+            {
+                for (var i = 0; i < textAmounts.Length; ++i)
+                {
+                    var textAmount = textAmounts[i];
+                    textAmount.uiText = UIWrapperHelpers.SetWrapperToText(textAmount.text, textAmount.uiText);
+                    textAmounts[i] = textAmount;
                 }
             }
         }

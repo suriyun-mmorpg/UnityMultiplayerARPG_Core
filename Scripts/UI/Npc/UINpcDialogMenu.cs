@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct UINpcDialogMenuAction
+    public class UINpcDialogMenuAction
     {
         public string title;
         public int menuIndex;
@@ -16,18 +16,27 @@ namespace MultiplayerARPG
     {
         [Header("UI Elements")]
         public Text title;
+        public TextWrapper uiTextTitle;
         public UINpcDialog uiNpcDialog;
 
         protected override void UpdateData()
         {
-            if (title != null)
-                title.text = Data.title;
+            UpdateUIComponents();
+
+            if (uiTextTitle != null)
+                uiTextTitle.text = Data.title;
         }
 
         public void OnClickMenu()
         {
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             owningCharacter.RequestSelectNpcDialogMenu(Data.menuIndex);
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextTitle = UIWrapperHelpers.SetWrapperToText(title, uiTextTitle);
         }
     }
 }

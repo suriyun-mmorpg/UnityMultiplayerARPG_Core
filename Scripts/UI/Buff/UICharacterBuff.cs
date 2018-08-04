@@ -20,9 +20,12 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public Text textTitle;
+        public TextWrapper uiTextTitle;
         public Image imageIcon;
         public Text textDuration;
+        public TextWrapper uiTextDuration;
         public Text textRemainsDuration;
+        public TextWrapper uiTextRemainsDuration;
         public Image imageDurationGage;
         public UIBuff uiBuff;
 
@@ -31,9 +34,8 @@ namespace MultiplayerARPG
         protected override void Update()
         {
             base.Update();
-
+            UpdateUIComponents();
             var characterBuff = Data;
-
             collectedDeltaTime += Time.deltaTime;
 
             var buffRemainsDuration = characterBuff.buffRemainsDuration - collectedDeltaTime;
@@ -41,11 +43,11 @@ namespace MultiplayerARPG
                 buffRemainsDuration = 0;
             var buffDuration = characterBuff.GetDuration();
 
-            if (textDuration != null)
-                textDuration.text = string.Format(buffDurationFormat, buffDuration.ToString("N0"));
+            if (uiTextDuration != null)
+                uiTextDuration.text = string.Format(buffDurationFormat, buffDuration.ToString("N0"));
 
-            if (textRemainsDuration != null)
-                textRemainsDuration.text = string.Format(buffRemainsDurationFormat, Mathf.CeilToInt(buffRemainsDuration).ToString("N0"));
+            if (uiTextRemainsDuration != null)
+                uiTextRemainsDuration.text = string.Format(buffRemainsDurationFormat, Mathf.CeilToInt(buffRemainsDuration).ToString("N0"));
 
             if (imageDurationGage != null)
                 imageDurationGage.fillAmount = buffDuration <= 0 ? 0 : buffRemainsDuration / buffDuration;
@@ -53,6 +55,8 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            UpdateUIComponents();
+
             var skill = Data.GetSkill();
             var item = Data.GetItem();
 
@@ -60,8 +64,8 @@ namespace MultiplayerARPG
 
             if (Data.type == BuffType.SkillBuff || Data.type == BuffType.SkillDebuff)
             {
-                if (textTitle != null)
-                    textTitle.text = string.Format(titleFormat, skill == null ? "Unknow" : skill.title);
+                if (uiTextTitle != null)
+                    uiTextTitle.text = string.Format(titleFormat, skill == null ? "Unknow" : skill.title);
 
                 if (imageIcon != null)
                 {
@@ -73,8 +77,8 @@ namespace MultiplayerARPG
 
             if (Data.type == BuffType.PotionBuff)
             {
-                if (textTitle != null)
-                    textTitle.text = string.Format(titleFormat, item == null ? "Unknow" : item.title);
+                if (uiTextTitle != null)
+                    uiTextTitle.text = string.Format(titleFormat, item == null ? "Unknow" : item.title);
 
                 if (imageIcon != null)
                 {
@@ -95,6 +99,14 @@ namespace MultiplayerARPG
                     uiBuff.Data = new BuffLevelTuple(buff, Data.level);
                 }
             }
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
+            uiTextDuration = UIWrapperHelpers.SetWrapperToText(textDuration, uiTextDuration);
+            uiTextRemainsDuration = UIWrapperHelpers.SetWrapperToText(textRemainsDuration, uiTextRemainsDuration);
         }
     }
 }

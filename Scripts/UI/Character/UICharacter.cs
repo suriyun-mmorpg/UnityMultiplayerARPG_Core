@@ -48,24 +48,37 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public Text textName;
+        public TextWrapper uiTextName;
         public Text textLevel;
+        public TextWrapper uiTextLevel;
         public Text textExp;
+        public TextWrapper uiTextExp;
         public Image imageExpGage;
         public Text textHp;
+        public TextWrapper uiTextHp;
         public Image imageHpGage;
         public Text textMp;
+        public TextWrapper uiTextMp;
         public Image imageMpGage;
         public Text textStamina;
+        public TextWrapper uiTextStamina;
         public Image imageStaminaGage;
         public Text textFood;
+        public TextWrapper uiTextFood;
         public Image imageFoodGage;
         public Text textWater;
+        public TextWrapper uiTextWater;
         public Image imageWaterGage;
         public Text textStatPoint;
+        public TextWrapper uiTextStatPoint;
         public Text textSkillPoint;
+        public TextWrapper uiTextSkillPoint;
         public Text textGold;
+        public TextWrapper uiTextGold;
         public Text textWeightLimit;
+        public TextWrapper uiTextWeightLimit;
         public Text textWeaponDamages;
+        public TextWrapper uiTextWeaponDamages;
         public UIDamageElementAmounts uiRightHandDamages;
         public UIDamageElementAmounts uiLeftHandDamages;
         public UICharacterStats uiCharacterStats;
@@ -73,7 +86,9 @@ namespace MultiplayerARPG
         public UICharacterAttributePair[] uiCharacterAttributes;
         [Header("Class information")]
         public Text textClassTitle;
+        public TextWrapper uiTextClassTitle;
         public Text textClassDescription;
+        public TextWrapper uiTextClassDescription;
         public Image imageClassIcon;
         [Header("Options")]
         public bool showStatsWithBuffs;
@@ -107,11 +122,13 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            if (textName != null)
-                textName.text = string.Format(nameFormat, Data == null ? "Unknow" : Data.CharacterName);
+            UpdateUIComponents();
 
-            if (textLevel != null)
-                textLevel.text = string.Format(levelFormat, Data == null ? "N/A" : Data.Level.ToString("N0"));
+            if (uiTextName != null)
+                uiTextName.text = string.Format(nameFormat, Data == null ? "Unknow" : Data.CharacterName);
+
+            if (uiTextLevel != null)
+                uiTextLevel.text = string.Format(levelFormat, Data == null ? "N/A" : Data.Level.ToString("N0"));
 
             var statsWithBuff = Data.GetStats();
             var expTree = GameInstance.Singleton.expTree;
@@ -129,8 +146,8 @@ namespace MultiplayerARPG
                 nextLevelExp = maxExp;
             }
 
-            if (textExp != null)
-                textExp.text = string.Format(expFormat, currentExp.ToString("N0"), nextLevelExp.ToString("N0"));
+            if (uiTextExp != null)
+                uiTextExp.text = string.Format(expFormat, currentExp.ToString("N0"), nextLevelExp.ToString("N0"));
 
             if (imageExpGage != null)
                 imageExpGage.fillAmount = nextLevelExp <= 0 ? 1 : (float)currentExp / (float)nextLevelExp;
@@ -144,8 +161,8 @@ namespace MultiplayerARPG
                 maxHp = (int)statsWithBuff.hp;
             }
 
-            if (textHp != null)
-                textHp.text = string.Format(hpFormat, currentHp.ToString("N0"), maxHp.ToString("N0"));
+            if (uiTextHp != null)
+                uiTextHp.text = string.Format(hpFormat, currentHp.ToString("N0"), maxHp.ToString("N0"));
 
             if (imageHpGage != null)
                 imageHpGage.fillAmount = maxHp <= 0 ? 1 : (float)currentHp / (float)maxHp;
@@ -159,8 +176,8 @@ namespace MultiplayerARPG
                 maxMp = (int)statsWithBuff.mp;
             }
 
-            if (textMp != null)
-                textMp.text = string.Format(mpFormat, currentMp.ToString("N0"), maxMp.ToString("N0"));
+            if (uiTextMp != null)
+                uiTextMp.text = string.Format(mpFormat, currentMp.ToString("N0"), maxMp.ToString("N0"));
 
             if (imageMpGage != null)
                 imageMpGage.fillAmount = maxMp <= 0 ? 1 : (float)currentMp / (float)maxMp;
@@ -174,8 +191,8 @@ namespace MultiplayerARPG
                 maxStamina = (int)statsWithBuff.stamina;
             }
 
-            if (textStamina != null)
-                textStamina.text = string.Format(staminaFormat, currentStamina.ToString("N0"), maxStamina.ToString("N0"));
+            if (uiTextStamina != null)
+                uiTextStamina.text = string.Format(staminaFormat, currentStamina.ToString("N0"), maxStamina.ToString("N0"));
 
             if (imageStaminaGage != null)
                 imageStaminaGage.fillAmount = maxStamina <= 0 ? 1 : (float)currentStamina / (float)maxStamina;
@@ -189,8 +206,8 @@ namespace MultiplayerARPG
                 maxFood = (int)statsWithBuff.food;
             }
 
-            if (textFood != null)
-                textFood.text = string.Format(foodFormat, currentFood.ToString("N0"), maxFood.ToString("N0"));
+            if (uiTextFood != null)
+                uiTextFood.text = string.Format(foodFormat, currentFood.ToString("N0"), maxFood.ToString("N0"));
 
             if (imageFoodGage != null)
                 imageFoodGage.fillAmount = maxFood <= 0 ? 1 : (float)currentFood / (float)maxFood;
@@ -204,34 +221,35 @@ namespace MultiplayerARPG
                 maxWater = (int)statsWithBuff.water;
             }
 
-            if (textWater != null)
-                textWater.text = string.Format(waterFormat, currentWater.ToString("N0"), maxWater.ToString("N0"));
+            if (uiTextWater != null)
+                uiTextWater.text = string.Format(waterFormat, currentWater.ToString("N0"), maxWater.ToString("N0"));
 
             if (imageWaterGage != null)
                 imageWaterGage.fillAmount = maxWater <= 0 ? 1 : (float)currentWater / (float)maxWater;
 
             // Player character data
             var playerCharacter = Data as IPlayerCharacterData;
-            if (textStatPoint != null)
-                textStatPoint.text = string.Format(statPointFormat, playerCharacter == null ? "N/A" : playerCharacter.StatPoint.ToString("N0"));
+            if (uiTextStatPoint != null)
+                uiTextStatPoint.text = string.Format(statPointFormat, playerCharacter == null ? "N/A" : playerCharacter.StatPoint.ToString("N0"));
 
-            if (textSkillPoint != null)
-                textSkillPoint.text = string.Format(skillPointFormat, playerCharacter == null ? "N/A" : playerCharacter.SkillPoint.ToString("N0"));
+            if (uiTextSkillPoint != null)
+                uiTextSkillPoint.text = string.Format(skillPointFormat, playerCharacter == null ? "N/A" : playerCharacter.SkillPoint.ToString("N0"));
 
-            if (textGold != null)
-                textGold.text = string.Format(goldFormat, playerCharacter == null ? "N/A" : playerCharacter.Gold.ToString("N0"));
+            if (uiTextGold != null)
+                uiTextGold.text = string.Format(goldFormat, playerCharacter == null ? "N/A" : playerCharacter.Gold.ToString("N0"));
         }
 
         protected override void UpdateData()
         {
+            UpdateUIComponents();
             var gameInstance = GameInstance.Singleton;
             var statsWithBuff = Data.GetStats();
             var attributesWithBuff = Data.GetAttributes();
             var displayingStats = showStatsWithBuffs ? statsWithBuff : Data.GetStats(true, false);
             var displayingAttributes = showAttributeWithBuffs ? attributesWithBuff : Data.GetAttributes(true, false);
 
-            if (textWeightLimit != null)
-                textWeightLimit.text = string.Format(weightLimitStatsFormat, Data.GetTotalItemWeight().ToString("N2"), statsWithBuff.weightLimit.ToString("N2"));
+            if (uiTextWeightLimit != null)
+                uiTextWeightLimit.text = string.Format(weightLimitStatsFormat, Data.GetTotalItemWeight().ToString("N2"), statsWithBuff.weightLimit.ToString("N2"));
 
             var rightHandItem = Data.EquipWeapons.rightHand;
             var leftHandItem = Data.EquipWeapons.leftHand;
@@ -240,7 +258,7 @@ namespace MultiplayerARPG
             var rightHandDamages = rightHandWeapon != null ? GameDataHelpers.CombineDamageAmountsDictionary(Data.GetIncreaseDamages(), rightHandWeapon.GetDamageAmount(rightHandItem.level, rightHandItem.GetEquipmentBonusRate(), Data)) : null;
             var leftHandDamages = leftHandWeapon != null ? GameDataHelpers.CombineDamageAmountsDictionary(Data.GetIncreaseDamages(), leftHandWeapon.GetDamageAmount(leftHandItem.level, leftHandItem.GetEquipmentBonusRate(), Data)) : null;
 
-            if (textWeaponDamages != null)
+            if (uiTextWeaponDamages != null)
             {
                 var textDamages = "";
                 if (rightHandWeapon != null)
@@ -264,7 +282,7 @@ namespace MultiplayerARPG
                     var damageAmount = defaultWeaponItem.GetDamageAmount(1, 1f, Data);
                     textDamages = string.Format(weaponDamageFormat, damageAmount.Value.min.ToString("N0"), damageAmount.Value.max.ToString("N0"));
                 }
-                textWeaponDamages.text = textDamages;
+                uiTextWeaponDamages.text = textDamages;
             }
 
             if (uiRightHandDamages != null)
@@ -316,11 +334,11 @@ namespace MultiplayerARPG
                 uiCharacterBuffs.UpdateData(Data);
 
             var character = Data == null ? null : Data.GetDatabase();
-            if (textClassTitle != null)
-                textClassTitle.text = string.Format(classTitleFormat, character == null ? "N/A" : character.title);
+            if (uiTextClassTitle != null)
+                uiTextClassTitle.text = string.Format(classTitleFormat, character == null ? "N/A" : character.title);
 
-            if (textClassDescription != null)
-                textClassDescription.text = string.Format(classDescriptionFormat, character == null ? "N/A" : character.description);
+            if (uiTextClassDescription != null)
+                uiTextClassDescription.text = string.Format(classDescriptionFormat, character == null ? "N/A" : character.description);
 
             if (imageClassIcon != null)
             {
@@ -328,6 +346,26 @@ namespace MultiplayerARPG
                 imageClassIcon.gameObject.SetActive(iconSprite != null);
                 imageClassIcon.sprite = iconSprite;
             }
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextName = UIWrapperHelpers.SetWrapperToText(textName, uiTextName);
+            uiTextLevel = UIWrapperHelpers.SetWrapperToText(textLevel, uiTextLevel);
+            uiTextExp = UIWrapperHelpers.SetWrapperToText(textExp, uiTextExp);
+            uiTextHp = UIWrapperHelpers.SetWrapperToText(textHp, uiTextHp);
+            uiTextMp = UIWrapperHelpers.SetWrapperToText(textMp, uiTextMp);
+            uiTextStamina = UIWrapperHelpers.SetWrapperToText(textStamina, uiTextStamina);
+            uiTextFood = UIWrapperHelpers.SetWrapperToText(textFood, uiTextFood);
+            uiTextWater = UIWrapperHelpers.SetWrapperToText(textWater, uiTextWater);
+            uiTextStatPoint = UIWrapperHelpers.SetWrapperToText(textStatPoint, uiTextStatPoint);
+            uiTextSkillPoint = UIWrapperHelpers.SetWrapperToText(textSkillPoint, uiTextSkillPoint);
+            uiTextGold = UIWrapperHelpers.SetWrapperToText(textGold, uiTextGold);
+            uiTextWeightLimit = UIWrapperHelpers.SetWrapperToText(textWeightLimit, uiTextWeightLimit);
+            uiTextWeaponDamages = UIWrapperHelpers.SetWrapperToText(textWeaponDamages, uiTextWeaponDamages);
+            uiTextClassTitle = UIWrapperHelpers.SetWrapperToText(textClassTitle, uiTextClassTitle);
+            uiTextClassDescription = UIWrapperHelpers.SetWrapperToText(textClassDescription, uiTextClassDescription);
         }
     }
 }

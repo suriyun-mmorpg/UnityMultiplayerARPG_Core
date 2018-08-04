@@ -16,7 +16,9 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public Text textTitle;
+        public TextWrapper uiTextTitle;
         public Text textDescription;
+        public TextWrapper uiTextDescription;
         public UICharacterQuest uiCharacterQuest;
         public UICraftItem uiCraftItem;
         public UINpcDialogMenu uiMenuPrefab;
@@ -70,13 +72,14 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            UpdateUIComponents();
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
 
-            if (textTitle != null)
-                textTitle.text = string.Format(titleFormat, Data == null ? "Unknow" : Data.title);
+            if (uiTextTitle != null)
+                uiTextTitle.text = string.Format(titleFormat, Data == null ? "Unknow" : Data.title);
 
-            if (textDescription != null)
-                textDescription.text = string.Format(descriptionFormat, Data == null ? "N/A" : Data.description);
+            if (uiTextDescription != null)
+                uiTextDescription.text = string.Format(descriptionFormat, Data == null ? "N/A" : Data.description);
 
             Quest quest = null;
             ItemCraft itemCraft = null;
@@ -201,6 +204,13 @@ namespace MultiplayerARPG
                 else
                     uiCraftItem.Show();
             }
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
+            uiTextDescription = UIWrapperHelpers.SetWrapperToText(textDescription, uiTextDescription);
         }
     }
 }

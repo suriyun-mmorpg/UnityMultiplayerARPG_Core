@@ -24,10 +24,12 @@ namespace MultiplayerARPG
         public UICharacterItem uiItemDialog;
         [Header("Owning Character Elements")]
         public Text textDealingGold;
+        public TextWrapper uiTextDealingGold;
         public Transform uiDealingItemsContainer;
         [Header("Another Character Elements")]
         public UICharacter uiAnotherCharacter;
         public Text textAnotherDealingGold;
+        public TextWrapper uiTextAnotherDealingGold;
         public Transform uiAnotherDealingItemsContainer;
 
         [Header("UI Events")]
@@ -215,16 +217,17 @@ namespace MultiplayerARPG
 
         public void UpdateDealingGold(int gold)
         {
-            if (textDealingGold != null)
-                textDealingGold.text = string.Format(dealingGoldFormat, gold.ToString("N0"));
+            UpdateUIComponents();
+            if (uiTextDealingGold != null)
+                uiTextDealingGold.text = string.Format(dealingGoldFormat, gold.ToString("N0"));
             dealingGold = gold;
         }
 
         public void UpdateAnotherDealingGold(int gold)
         {
-
-            if (textAnotherDealingGold != null)
-                textAnotherDealingGold.text = string.Format(anotherDealingGoldFormat, gold.ToString("N0"));
+            UpdateUIComponents();
+            if (uiTextAnotherDealingGold != null)
+                uiTextAnotherDealingGold.text = string.Format(anotherDealingGoldFormat, gold.ToString("N0"));
             anotherDealingGold = gold;
         }
 
@@ -299,6 +302,13 @@ namespace MultiplayerARPG
         {
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             owningCharacter.RequestCancelDealing();
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextDealingGold = UIWrapperHelpers.SetWrapperToText(textDealingGold, uiTextDealingGold);
+            uiTextAnotherDealingGold = UIWrapperHelpers.SetWrapperToText(textAnotherDealingGold, uiTextAnotherDealingGold);
         }
     }
 }

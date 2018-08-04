@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine.UI;
+﻿using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
@@ -9,5 +7,6 @@ namespace MultiplayerARPG
     {
         public Attribute attribute;
         public Text text;
+        public TextWrapper uiText;
     }
 }

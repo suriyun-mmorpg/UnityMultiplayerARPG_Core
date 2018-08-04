@@ -21,11 +21,17 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public Text textDuration;
+        public TextWrapper uiTextDuration;
         public Text textRecoveryHp;
+        public TextWrapper uiTextRecoveryHp;
         public Text textRecoveryMp;
+        public TextWrapper uiTextRecoveryMp;
         public Text textRecoveryStamina;
+        public TextWrapper uiTextRecoveryStamina;
         public Text textRecoveryFood;
+        public TextWrapper uiTextRecoveryFood;
         public Text textRecoveryWater;
+        public TextWrapper uiTextRecoveryWater;
         public UICharacterStats uiBuffStats;
         public UIAttributeAmounts uiBuffAttributes;
         public UIResistanceAmounts uiBuffResistances;
@@ -33,49 +39,51 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            UpdateUIComponents();
+
             var buff = Data.buff;
             var level = Data.targetLevel;
 
-            if (textDuration != null)
+            if (uiTextDuration != null)
             {
                 var duration = buff.GetDuration(level);
-                textDuration.gameObject.SetActive(duration != 0);
-                textDuration.text = string.Format(durationFormat, duration.ToString("N0"));
+                uiTextDuration.gameObject.SetActive(duration != 0);
+                uiTextDuration.text = string.Format(durationFormat, duration.ToString("N0"));
             }
 
-            if (textRecoveryHp != null)
+            if (uiTextRecoveryHp != null)
             {
                 var recoveryHp = buff.GetRecoveryHp(level);
-                textRecoveryHp.gameObject.SetActive(recoveryHp != 0);
-                textRecoveryHp.text = string.Format(recoveryHpFormat, recoveryHp.ToString("N0"));
+                uiTextRecoveryHp.gameObject.SetActive(recoveryHp != 0);
+                uiTextRecoveryHp.text = string.Format(recoveryHpFormat, recoveryHp.ToString("N0"));
             }
 
-            if (textRecoveryMp != null)
+            if (uiTextRecoveryMp != null)
             {
                 var recoveryMp = buff.GetRecoveryMp(level);
-                textRecoveryMp.gameObject.SetActive(recoveryMp != 0);
-                textRecoveryMp.text = string.Format(recoveryMpFormat, recoveryMp.ToString("N0"));
+                uiTextRecoveryMp.gameObject.SetActive(recoveryMp != 0);
+                uiTextRecoveryMp.text = string.Format(recoveryMpFormat, recoveryMp.ToString("N0"));
             }
 
-            if (textRecoveryStamina != null)
+            if (uiTextRecoveryStamina != null)
             {
                 var recoveryStamina = buff.GetRecoveryStamina(level);
-                textRecoveryStamina.gameObject.SetActive(recoveryStamina != 0);
-                textRecoveryStamina.text = string.Format(recoveryStaminaFormat, recoveryStamina.ToString("N0"));
+                uiTextRecoveryStamina.gameObject.SetActive(recoveryStamina != 0);
+                uiTextRecoveryStamina.text = string.Format(recoveryStaminaFormat, recoveryStamina.ToString("N0"));
             }
 
-            if (textRecoveryFood != null)
+            if (uiTextRecoveryFood != null)
             {
                 var recoveryFood = buff.GetRecoveryFood(level);
-                textRecoveryFood.gameObject.SetActive(recoveryFood != 0);
-                textRecoveryFood.text = string.Format(recoveryFoodFormat, recoveryFood.ToString("N0"));
+                uiTextRecoveryFood.gameObject.SetActive(recoveryFood != 0);
+                uiTextRecoveryFood.text = string.Format(recoveryFoodFormat, recoveryFood.ToString("N0"));
             }
 
-            if (textRecoveryWater != null)
+            if (uiTextRecoveryWater != null)
             {
                 var recoveryWater = buff.GetRecoveryWater(level);
-                textRecoveryWater.gameObject.SetActive(recoveryWater != 0);
-                textRecoveryWater.text = string.Format(recoveryWaterFormat, recoveryWater.ToString("N0"));
+                uiTextRecoveryWater.gameObject.SetActive(recoveryWater != 0);
+                uiTextRecoveryWater.text = string.Format(recoveryWaterFormat, recoveryWater.ToString("N0"));
             }
 
             if (uiBuffStats != null)
@@ -89,6 +97,17 @@ namespace MultiplayerARPG
 
             if (uiBuffDamages != null)
                 uiBuffDamages.Data = GameDataHelpers.MakeDamageAmountsDictionary(buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), level, 1f);
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextDuration = UIWrapperHelpers.SetWrapperToText(textDuration, uiTextDuration);
+            uiTextRecoveryHp = UIWrapperHelpers.SetWrapperToText(textRecoveryHp, uiTextRecoveryHp);
+            uiTextRecoveryMp = UIWrapperHelpers.SetWrapperToText(textRecoveryMp, uiTextRecoveryMp);
+            uiTextRecoveryStamina = UIWrapperHelpers.SetWrapperToText(textRecoveryStamina, uiTextRecoveryStamina);
+            uiTextRecoveryFood = UIWrapperHelpers.SetWrapperToText(textRecoveryFood, uiTextRecoveryFood);
+            uiTextRecoveryWater = UIWrapperHelpers.SetWrapperToText(textRecoveryWater, uiTextRecoveryWater);
         }
     }
 }

@@ -14,22 +14,24 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public Text textAllInfliction;
+        public TextWrapper uiTextAllInflictions;
         public UIDamageElementTextPair[] textInflictions;
 
-        private Dictionary<DamageElement, Text> cacheTextInflictions;
-        public Dictionary<DamageElement, Text> CacheTextInflictions
+        private Dictionary<DamageElement, TextWrapper> cacheTextInflictions;
+        public Dictionary<DamageElement, TextWrapper> CacheTextInflictions
         {
             get
             {
                 if (cacheTextInflictions == null)
                 {
-                    cacheTextInflictions = new Dictionary<DamageElement, Text>();
+                    UpdateUIComponents();
+                    cacheTextInflictions = new Dictionary<DamageElement, TextWrapper>();
                     foreach (var textAmount in textInflictions)
                     {
                         if (textAmount.damageElement == null || textAmount.text == null)
                             continue;
                         var key = textAmount.damageElement;
-                        var textComp = textAmount.text;
+                        var textComp = textAmount.uiText;
                         textComp.text = string.Format(inflictionFormat, key.title, "0");
                         cacheTextInflictions[key] = textComp;
                     }
@@ -42,8 +44,8 @@ namespace MultiplayerARPG
         {
             if (Data == null || Data.Count == 0)
             {
-                if (textAllInfliction != null)
-                    textAllInfliction.gameObject.SetActive(false);
+                if (uiTextAllInflictions != null)
+                    uiTextAllInflictions.gameObject.SetActive(false);
 
                 foreach (var textAmount in CacheTextInflictions)
                 {
@@ -67,16 +69,31 @@ namespace MultiplayerARPG
                     var format = element == GameInstance.Singleton.DefaultDamageElement ? defaultElementInflictionFormat : inflictionFormat;
                     var amountText = string.Format(format, element.title, (rate * 100f).ToString("N0"));
                     text += amountText;
-                    Text textDamages;
+                    TextWrapper textDamages;
                     if (CacheTextInflictions.TryGetValue(dataEntry.Key, out textDamages))
                         textDamages.text = amountText;
                     sumDamage += rate;
                 }
 
-                if (textAllInfliction != null)
+                if (uiTextAllInflictions != null)
                 {
-                    textAllInfliction.gameObject.SetActive(!string.IsNullOrEmpty(text));
-                    textAllInfliction.text = text;
+                    uiTextAllInflictions.gameObject.SetActive(!string.IsNullOrEmpty(text));
+                    uiTextAllInflictions.text = text;
+                }
+            }
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextAllInflictions = UIWrapperHelpers.SetWrapperToText(textAllInfliction, uiTextAllInflictions);
+            if (textInflictions != null && textInflictions.Length > 0)
+            {
+                for (var i = 0; i < textInflictions.Length; ++i)
+                {
+                    var textInfliction = textInflictions[i];
+                    textInfliction.uiText = UIWrapperHelpers.SetWrapperToText(textInfliction.text, textInfliction.uiText);
+                    textInflictions[i] = textInfliction;
                 }
             }
         }

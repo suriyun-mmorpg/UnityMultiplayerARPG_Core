@@ -19,9 +19,12 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public Text taskDescription;
+        public TextWrapper uiTextTaskDescription;
 
         protected override void UpdateData()
         {
+            UpdateUIComponents();
+
             var task = Data.questTask;
             var progress = Data.progress;
             var isComplete = false;
@@ -32,18 +35,24 @@ namespace MultiplayerARPG
                     var monsterTitle = monsterCharacterAmount.monster == null ? "Unknow" : monsterCharacterAmount.monster.title;
                     var monsterKillAmount = monsterCharacterAmount.amount;
                     isComplete = progress >= monsterKillAmount;
-                    if (taskDescription != null)
-                        taskDescription.text = string.Format(isComplete ? killMonsterTaskCompleteFormat : killMonsterTaskFormat, monsterTitle, progress.ToString("N0"), monsterKillAmount.ToString("N0"));
+                    if (uiTextTaskDescription != null)
+                        uiTextTaskDescription.text = string.Format(isComplete ? killMonsterTaskCompleteFormat : killMonsterTaskFormat, monsterTitle, progress.ToString("N0"), monsterKillAmount.ToString("N0"));
                     break;
                 case QuestTaskType.CollectItem:
                     var itemAmount = task.itemAmount;
                     var itemTitle = itemAmount.item == null ? "Unknow" : itemAmount.item.title;
                     var itemCollectAmount = itemAmount.amount;
                     isComplete = progress >= itemCollectAmount;
-                    if (taskDescription != null)
-                        taskDescription.text = string.Format(isComplete ? collectItemTaskCompleteFormat : collectItemTaskFormat, itemTitle, progress.ToString("N0"), itemCollectAmount.ToString("N0"));
+                    if (uiTextTaskDescription != null)
+                        uiTextTaskDescription.text = string.Format(isComplete ? collectItemTaskCompleteFormat : collectItemTaskFormat, itemTitle, progress.ToString("N0"), itemCollectAmount.ToString("N0"));
                     break;
             }
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextTaskDescription = UIWrapperHelpers.SetWrapperToText(taskDescription, uiTextTaskDescription);
         }
     }
 }

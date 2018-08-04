@@ -13,6 +13,7 @@ namespace MultiplayerARPG
         public float visibleDistance = 30f;
         public UIFollowWorldObject rootFollower;
         public Text textTitle;
+        public TextWrapper uiTextTitle;
         public UICharacter uiCharacter;
         private float lastShowTime;
 
@@ -36,6 +37,7 @@ namespace MultiplayerARPG
         protected override void UpdateUI()
         {
             base.UpdateUI();
+            UpdateUIComponents();
 
             if (Data == null || BasePlayerCharacterController.OwningCharacter == null)
             {
@@ -53,11 +55,11 @@ namespace MultiplayerARPG
             else
                 CacheCanvas.enabled = false;
 
-            if (textTitle != null)
+            if (uiTextTitle != null)
             {
                 if (Data != null)
-                    textTitle.text = Data.Title;
-                textTitle.gameObject.SetActive(Data != null);
+                    uiTextTitle.text = Data.Title;
+                uiTextTitle.gameObject.SetActive(Data != null);
             }
 
             if (uiCharacter != null)
@@ -98,6 +100,12 @@ namespace MultiplayerARPG
                     rootFollower.TargetObject = Data.UIElementTransform;
                 rootFollower.gameObject.SetActive(Data != null);
             }
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
         }
     }
 }

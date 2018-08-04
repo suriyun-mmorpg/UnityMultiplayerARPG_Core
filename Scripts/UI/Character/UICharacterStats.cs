@@ -37,22 +37,38 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public Text textStats;
+        public TextWrapper uiTextStats;
         public Text textHp;
+        public TextWrapper uiTextHp;
         public Text textMp;
+        public TextWrapper uiTextMp;
         public Text textArmor;
+        public TextWrapper uiTextArmor;
         public Text textAccuracy;
+        public TextWrapper uiTextAccuracy;
         public Text textEvasion;
+        public TextWrapper uiTextEvasion;
         public Text textCriRate;
+        public TextWrapper uiTextCriRate;
         public Text textCriDmgRate;
+        public TextWrapper uiTextCriDmgRate;
         public Text textBlockRate;
+        public TextWrapper uiTextBlockRate;
         public Text textBlockDmgRate;
+        public TextWrapper uiTextBlockDmgRate;
         public Text textWeightLimit;
+        public TextWrapper uiTextWeightLimit;
         public Text textStamina;
+        public TextWrapper uiTextStamina;
         public Text textFood;
+        public TextWrapper uiTextFood;
         public Text textWater;
+        public TextWrapper uiTextWater;
 
         protected override void UpdateData()
         {
+            UpdateUIComponents();
+
             var statsString = "";
             var statsStringPart = "";
 
@@ -64,8 +80,8 @@ namespace MultiplayerARPG
                     statsString += "\n";
                 statsString += statsStringPart;
             }
-            if (textHp != null)
-                textHp.text = statsStringPart;
+            if (uiTextHp != null)
+                uiTextHp.text = statsStringPart;
 
             // Mp
             statsStringPart = string.Format(mpStatsFormat, Data.mp.ToString("N0"));
@@ -75,8 +91,8 @@ namespace MultiplayerARPG
                     statsString += "\n";
                 statsString += statsStringPart;
             }
-            if (textMp != null)
-                textMp.text = statsStringPart;
+            if (uiTextMp != null)
+                uiTextMp.text = statsStringPart;
 
             // Armor
             statsStringPart = string.Format(armorStatsFormat, Data.armor.ToString("N0"));
@@ -86,8 +102,8 @@ namespace MultiplayerARPG
                     statsString += "\n";
                 statsString += statsStringPart;
             }
-            if (textArmor != null)
-                textArmor.text = statsStringPart;
+            if (uiTextArmor != null)
+                uiTextArmor.text = statsStringPart;
 
             // Accuracy
             statsStringPart = string.Format(accuracyStatsFormat, Data.accuracy.ToString("N0"));
@@ -97,8 +113,8 @@ namespace MultiplayerARPG
                     statsString += "\n";
                 statsString += statsStringPart;
             }
-            if (textAccuracy != null)
-                textAccuracy.text = statsStringPart;
+            if (uiTextAccuracy != null)
+                uiTextAccuracy.text = statsStringPart;
 
             // Evasion
             statsStringPart = string.Format(evasionStatsFormat, Data.evasion.ToString("N0"));
@@ -108,8 +124,8 @@ namespace MultiplayerARPG
                     statsString += "\n";
                 statsString += statsStringPart;
             }
-            if (textEvasion != null)
-                textEvasion.text = statsStringPart;
+            if (uiTextEvasion != null)
+                uiTextEvasion.text = statsStringPart;
 
             // Cri Rate
             statsStringPart = string.Format(criRateStatsFormat, (Data.criRate * 100).ToString("N2"));
@@ -119,8 +135,8 @@ namespace MultiplayerARPG
                     statsString += "\n";
                 statsString += statsStringPart;
             }
-            if (textCriRate != null)
-                textCriRate.text = statsStringPart;
+            if (uiTextCriRate != null)
+                uiTextCriRate.text = statsStringPart;
 
             // Cri Dmg Rate
             statsStringPart = string.Format(criDmgRateStatsFormat, (Data.criDmgRate * 100).ToString("N2"));
@@ -130,8 +146,8 @@ namespace MultiplayerARPG
                     statsString += "\n";
                 statsString += statsStringPart;
             }
-            if (textCriDmgRate != null)
-                textCriDmgRate.text = statsStringPart;
+            if (uiTextCriDmgRate != null)
+                uiTextCriDmgRate.text = statsStringPart;
 
             // Block Rate
             statsStringPart = string.Format(blockRateStatsFormat, (Data.blockRate * 100).ToString("N2"));
@@ -141,8 +157,8 @@ namespace MultiplayerARPG
                     statsString += "\n";
                 statsString += statsStringPart;
             }
-            if (textBlockRate != null)
-                textBlockRate.text = statsStringPart;
+            if (uiTextBlockRate != null)
+                uiTextBlockRate.text = statsStringPart;
 
             // Block Dmg Rate
             statsStringPart = string.Format(blockDmgRateStatsFormat, (Data.blockDmgRate * 100).ToString("N2"));
@@ -152,8 +168,8 @@ namespace MultiplayerARPG
                     statsString += "\n";
                 statsString += statsStringPart;
             }
-            if (textBlockDmgRate != null)
-                textBlockDmgRate.text = statsStringPart;
+            if (uiTextBlockDmgRate != null)
+                uiTextBlockDmgRate.text = statsStringPart;
 
             // Weight
             statsStringPart = string.Format(weightLimitStatsFormat, Data.weightLimit.ToString("N2"));
@@ -163,8 +179,8 @@ namespace MultiplayerARPG
                     statsString += "\n";
                 statsString += statsStringPart;
             }
-            if (textWeightLimit != null)
-                textWeightLimit.text = statsStringPart;
+            if (uiTextWeightLimit != null)
+                uiTextWeightLimit.text = statsStringPart;
 
             // Stamina
             statsStringPart = string.Format(staminaStatsFormat, Data.stamina.ToString("N0"));
@@ -174,8 +190,8 @@ namespace MultiplayerARPG
                     statsString += "\n";
                 statsString += statsStringPart;
             }
-            if (textStamina != null)
-                textStamina.text = statsStringPart;
+            if (uiTextStamina != null)
+                uiTextStamina.text = statsStringPart;
 
             // Food
             statsStringPart = string.Format(foodStatsFormat, Data.food.ToString("N0"));
@@ -185,8 +201,8 @@ namespace MultiplayerARPG
                     statsString += "\n";
                 statsString += statsStringPart;
             }
-            if (textFood != null)
-                textFood.text = statsStringPart;
+            if (uiTextFood != null)
+                uiTextFood.text = statsStringPart;
 
             // Water
             statsStringPart = string.Format(waterStatsFormat, Data.water.ToString("N0"));
@@ -196,15 +212,34 @@ namespace MultiplayerARPG
                     statsString += "\n";
                 statsString += statsStringPart;
             }
-            if (textWater != null)
-                textWater.text = statsStringPart;
+            if (uiTextWater != null)
+                uiTextWater.text = statsStringPart;
 
             // All stats text
-            if (textStats != null)
+            if (uiTextStats != null)
             {
-                textStats.gameObject.SetActive(!string.IsNullOrEmpty(statsString));
-                textStats.text = statsString;
+                uiTextStats.gameObject.SetActive(!string.IsNullOrEmpty(statsString));
+                uiTextStats.text = statsString;
             }
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextStats = UIWrapperHelpers.SetWrapperToText(textStats, uiTextStats);
+            uiTextHp = UIWrapperHelpers.SetWrapperToText(textHp, uiTextHp);
+            uiTextMp = UIWrapperHelpers.SetWrapperToText(textMp, uiTextMp);
+            uiTextArmor = UIWrapperHelpers.SetWrapperToText(textArmor, uiTextArmor);
+            uiTextAccuracy = UIWrapperHelpers.SetWrapperToText(textAccuracy, uiTextAccuracy);
+            uiTextEvasion = UIWrapperHelpers.SetWrapperToText(textEvasion, uiTextEvasion);
+            uiTextCriRate = UIWrapperHelpers.SetWrapperToText(textCriRate, uiTextCriRate);
+            uiTextCriDmgRate = UIWrapperHelpers.SetWrapperToText(textCriDmgRate, uiTextCriDmgRate);
+            uiTextBlockRate = UIWrapperHelpers.SetWrapperToText(textBlockRate, uiTextBlockRate);
+            uiTextBlockDmgRate = UIWrapperHelpers.SetWrapperToText(textBlockDmgRate, uiTextBlockDmgRate);
+            uiTextWeightLimit = UIWrapperHelpers.SetWrapperToText(textWeightLimit, uiTextWeightLimit);
+            uiTextStamina = UIWrapperHelpers.SetWrapperToText(textStamina, uiTextStamina);
+            uiTextFood = UIWrapperHelpers.SetWrapperToText(textFood, uiTextFood);
+            uiTextWater = UIWrapperHelpers.SetWrapperToText(textWater, uiTextWater);
         }
     }
 }

@@ -18,18 +18,23 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public UICashShop uiCashShop;
         public Text textTitle;
+        public TextWrapper uiTextTitle;
         public Text textDescription;
+        public TextWrapper uiTextDescription;
         public Image imageIcon;
         public RawImage rawImageExternalIcon;
         public Text textSellPrice;
+        public TextWrapper uiTextSellPrice;
 
         protected override void UpdateData()
         {
-            if (textTitle != null)
-                textTitle.text = string.Format(titleFormat, Data == null ? "Unknow" : Data.title);
+            UpdateUIComponents();
 
-            if (textDescription != null)
-                textDescription.text = string.Format(descriptionFormat, Data == null ? "N/A" : Data.description);
+            if (uiTextTitle != null)
+                uiTextTitle.text = string.Format(titleFormat, Data == null ? "Unknow" : Data.title);
+
+            if (uiTextDescription != null)
+                uiTextDescription.text = string.Format(descriptionFormat, Data == null ? "N/A" : Data.description);
             
             if (imageIcon != null)
             {
@@ -45,8 +50,8 @@ namespace MultiplayerARPG
                     StartCoroutine(LoadExternalIcon());
             }
 
-            if (textSellPrice != null)
-                textSellPrice.text = string.Format(sellPriceFormat, Data == null ? "0" : Data.sellPrice.ToString("N0"));
+            if (uiTextSellPrice != null)
+                uiTextSellPrice.text = string.Format(sellPriceFormat, Data == null ? "0" : Data.sellPrice.ToString("N0"));
         }
 
         IEnumerator LoadExternalIcon()
@@ -60,6 +65,14 @@ namespace MultiplayerARPG
         {
             if (uiCashShop != null)
                 uiCashShop.Buy(Data.DataId);
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
+            uiTextDescription = UIWrapperHelpers.SetWrapperToText(textDescription, uiTextDescription);
+            uiTextSellPrice = UIWrapperHelpers.SetWrapperToText(textSellPrice, uiTextSellPrice);
         }
     }
 }

@@ -17,6 +17,7 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public UICharacterItem uiCharacterItem;
         public Text textSellPrice;
+        public TextWrapper uiTextSellPrice;
 
         public int indexOfData { get; protected set; }
 
@@ -28,6 +29,8 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            UpdateUIComponents();
+
             if (uiCharacterItem != null)
             {
                 if (Data.item == null)
@@ -39,8 +42,8 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (textSellPrice != null)
-                textSellPrice.text = string.Format(sellPriceFormat, Data.sellPrice.ToString("N0"));
+            if (uiTextSellPrice != null)
+                uiTextSellPrice.text = string.Format(sellPriceFormat, Data.sellPrice.ToString("N0"));
         }
 
         public void OnClickBuy()
@@ -67,6 +70,12 @@ namespace MultiplayerARPG
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
                 owningCharacter.RequestBuyNpcItem(indexOfData, (short)amount);
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextSellPrice = UIWrapperHelpers.SetWrapperToText(textSellPrice, uiTextSellPrice);
         }
     }
 }

@@ -10,15 +10,22 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public Text textAmount;
+        public TextWrapper uiTextAmount;
 
         protected override void UpdateData()
         {
-            if (textAmount != null)
+            if (uiTextAmount != null)
             {
                 var element = Data.damageElement;
                 var amount = Data.amount;
-                textAmount.text = string.Format(amountFormat, element.title, amount.min.ToString("N0"), amount.max.ToString("N0"));
+                uiTextAmount.text = string.Format(amountFormat, element.title, amount.min.ToString("N0"), amount.max.ToString("N0"));
             }
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextAmount = UIWrapperHelpers.SetWrapperToText(textAmount, uiTextAmount);
         }
     }
 }

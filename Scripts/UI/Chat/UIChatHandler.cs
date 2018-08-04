@@ -16,6 +16,7 @@ namespace MultiplayerARPG
         public int chatEntrySize = 30;
         public GameObject[] enterChatActiveObjects;
         public InputField enterChatField;
+        public InputFieldWrapper uiEnterChatField;
         public UIChatMessage uiChatMessagePrefab;
         public Transform uiChatMessageContainer;
         public ScrollRect scrollRect;
@@ -25,8 +26,8 @@ namespace MultiplayerARPG
 
         public string EnterChatMessage
         {
-            get { return enterChatField == null ? string.Empty : enterChatField.text; }
-            set { if (enterChatField != null) enterChatField.text = value; }
+            get { return uiEnterChatField == null ? string.Empty : uiEnterChatField.text; }
+            set { if (uiEnterChatField != null) uiEnterChatField.text = value; }
         }
 
         private UIList cacheList;
@@ -57,13 +58,14 @@ namespace MultiplayerARPG
 
         private void Start()
         {
+            UpdateUIComponents();
             HideEnterChatField();
             if (CacheGameNetworkManager != null)
                 CacheGameNetworkManager.onReceiveChat += OnReceiveChat;
-            if (enterChatField != null)
+            if (uiEnterChatField != null)
             {
-                enterChatField.onValueChanged.RemoveListener(OnInputFieldValueChange);
-                enterChatField.onValueChanged.AddListener(OnInputFieldValueChange);
+                uiEnterChatField.onValueChanged.RemoveListener(OnInputFieldValueChange);
+                uiEnterChatField.onValueChanged.AddListener(OnInputFieldValueChange);
             }
         }
 
@@ -99,10 +101,10 @@ namespace MultiplayerARPG
                 if (enterChatActiveObject != null)
                     enterChatActiveObject.SetActive(true);
             }
-            if (enterChatField != null)
+            if (uiEnterChatField != null)
             {
-                enterChatField.Select();
-                enterChatField.ActivateInputField();
+                uiEnterChatField.Select();
+                uiEnterChatField.ActivateInputField();
             }
             enterChatFieldVisible = true;
         }
@@ -114,8 +116,8 @@ namespace MultiplayerARPG
                 if (enterChatActiveObject != null)
                     enterChatActiveObject.SetActive(false);
             }
-            if (enterChatField != null)
-                enterChatField.DeactivateInputField();
+            if (uiEnterChatField != null)
+                uiEnterChatField.DeactivateInputField();
             enterChatFieldVisible = false;
         }
 
@@ -180,6 +182,12 @@ namespace MultiplayerARPG
                 scrollRect.verticalScrollbar.value = normalize;
                 Canvas.ForceUpdateCanvases();
             }
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiEnterChatField = UIWrapperHelpers.SetWrapperToInputField(enterChatField, uiEnterChatField);
         }
     }
 }

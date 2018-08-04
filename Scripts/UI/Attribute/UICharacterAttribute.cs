@@ -16,8 +16,11 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public Text textTitle;
+        public TextWrapper uiTextTitle;
         public Text textDescription;
+        public TextWrapper uiTextDescription;
         public Text textAmount;
+        public TextWrapper uiTextAmount;
         public Image imageIcon;
 
         [Header("Events")]
@@ -36,19 +39,20 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            UpdateUIComponents();
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             var characterAttribute = Data.characterAttribute;
             var attribute = characterAttribute.GetAttribute();
             var amount = Data.targetAmount;
 
-            if (textTitle != null)
-                textTitle.text = string.Format(titleFormat, attribute == null ? "Unknow" : attribute.title);
+            if (uiTextTitle != null)
+                uiTextTitle.text = string.Format(titleFormat, attribute == null ? "Unknow" : attribute.title);
 
-            if (textDescription != null)
-                textDescription.text = string.Format(descriptionFormat, attribute == null ? "N/A" : attribute.description);
+            if (uiTextDescription != null)
+                uiTextDescription.text = string.Format(descriptionFormat, attribute == null ? "N/A" : attribute.description);
 
-            if (textAmount != null)
-                textAmount.text = string.Format(amountFormat, amount.ToString("N0"));
+            if (uiTextAmount != null)
+                uiTextAmount.text = string.Format(amountFormat, amount.ToString("N0"));
 
             if (imageIcon != null)
             {
@@ -66,6 +70,14 @@ namespace MultiplayerARPG
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
                 owningCharacter.RequestAddAttribute(indexOfData, 1);
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
+            uiTextDescription = UIWrapperHelpers.SetWrapperToText(textDescription, uiTextDescription);
+            uiTextAmount = UIWrapperHelpers.SetWrapperToText(textAmount, uiTextAmount);
         }
     }
 }

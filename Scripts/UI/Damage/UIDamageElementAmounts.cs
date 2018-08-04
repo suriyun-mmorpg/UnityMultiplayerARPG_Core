@@ -14,23 +14,26 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public Text textAllDamages;
+        public TextWrapper uiTextAllDamages;
         public Text textSumDamage;
+        public TextWrapper uiTextSumDamage;
         public UIDamageElementTextPair[] textDamages;
 
-        private Dictionary<DamageElement, Text> cacheTextDamages;
-        public Dictionary<DamageElement, Text> CacheTextDamages
+        private Dictionary<DamageElement, TextWrapper> cacheTextDamages;
+        public Dictionary<DamageElement, TextWrapper> CacheTextDamages
         {
             get
             {
                 if (cacheTextDamages == null)
                 {
-                    cacheTextDamages = new Dictionary<DamageElement, Text>();
+                    UpdateUIComponents();
+                    cacheTextDamages = new Dictionary<DamageElement, TextWrapper>();
                     foreach (var textAmount in textDamages)
                     {
                         if (textAmount.damageElement == null || textAmount.text == null)
                             continue;
                         var key = textAmount.damageElement;
-                        var textComp = textAmount.text;
+                        var textComp = textAmount.uiText;
                         textComp.text = string.Format(damageFormat, key.title, "0", "0");
                         cacheTextDamages[key] = textComp;
                     }
@@ -41,13 +44,14 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            UpdateUIComponents();
             if (Data == null || Data.Count == 0)
             {
-                if (textAllDamages != null)
-                    textAllDamages.gameObject.SetActive(false);
+                if (uiTextAllDamages != null)
+                    uiTextAllDamages.gameObject.SetActive(false);
 
-                if (textSumDamage != null)
-                    textSumDamage.text = string.Format(sumDamageFormat, "0", "0");
+                if (uiTextSumDamage != null)
+                    uiTextSumDamage.text = string.Format(sumDamageFormat, "0", "0");
 
                 foreach (var textAmount in CacheTextDamages)
                 {
@@ -69,20 +73,36 @@ namespace MultiplayerARPG
                         text += "\n";
                     var amountText = string.Format(damageFormat, element.title, amount.min.ToString("N0"), amount.max.ToString("N0"));
                     text += amountText;
-                    Text textDamages;
+                    TextWrapper textDamages;
                     if (CacheTextDamages.TryGetValue(dataEntry.Key, out textDamages))
                         textDamages.text = amountText;
                     sumDamage += amount;
                 }
 
-                if (textAllDamages != null)
+                if (uiTextAllDamages != null)
                 {
-                    textAllDamages.gameObject.SetActive(!string.IsNullOrEmpty(text));
-                    textAllDamages.text = text;
+                    uiTextAllDamages.gameObject.SetActive(!string.IsNullOrEmpty(text));
+                    uiTextAllDamages.text = text;
                 }
 
-                if (textSumDamage != null)
-                    textSumDamage.text = string.Format(sumDamageFormat, sumDamage.min.ToString("N0"), sumDamage.max.ToString("N0"));
+                if (uiTextSumDamage != null)
+                    uiTextSumDamage.text = string.Format(sumDamageFormat, sumDamage.min.ToString("N0"), sumDamage.max.ToString("N0"));
+            }
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextAllDamages = UIWrapperHelpers.SetWrapperToText(textAllDamages, uiTextAllDamages);
+            uiTextSumDamage = UIWrapperHelpers.SetWrapperToText(textSumDamage, uiTextSumDamage);
+            if (textDamages != null && textDamages.Length > 0)
+            {
+                for (var i = 0; i < textDamages.Length; ++i)
+                {
+                    var textDamage = textDamages[i];
+                    textDamage.uiText = UIWrapperHelpers.SetWrapperToText(textDamage.text, textDamage.uiText);
+                    textDamages[i] = textDamage;
+                }
             }
         }
     }

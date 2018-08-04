@@ -9,6 +9,7 @@ namespace MultiplayerARPG
         public static UINetworkSceneLoading Singleton { get; private set; }
         public GameObject rootObject;
         public Text textProgress;
+        public TextWrapper uiTextProgress;
         public Image imageGage;
 
         private void Awake()
@@ -28,18 +29,20 @@ namespace MultiplayerARPG
 
         public void OnLoadSceneStart(string sceneName, bool isOnline, float progress)
         {
+            UpdateUIComponents();
             if (rootObject != null)
                 rootObject.SetActive(true);
-            if (textProgress != null)
-                textProgress.text = "0.00%";
+            if (uiTextProgress != null)
+                uiTextProgress.text = "0.00%";
             if (imageGage != null)
                 imageGage.fillAmount = 0;
         }
 
         public void OnLoadSceneProgress(string sceneName, bool isOnline, float progress)
         {
-            if (textProgress != null)
-                textProgress.text = (progress * 100f).ToString("N2") + "%";
+            UpdateUIComponents();
+            if (uiTextProgress != null)
+                uiTextProgress.text = (progress * 100f).ToString("N2") + "%";
             if (imageGage != null)
                 imageGage.fillAmount = progress;
         }
@@ -51,13 +54,20 @@ namespace MultiplayerARPG
 
         IEnumerator OnLoadSceneFinishRoutine()
         {
-            if (textProgress != null)
-                textProgress.text = "100.00%";
+            UpdateUIComponents();
+            if (uiTextProgress != null)
+                uiTextProgress.text = "100.00%";
             if (imageGage != null)
                 imageGage.fillAmount = 1;
             yield return new WaitForSecondsRealtime(0.25f);
             if (rootObject != null)
                 rootObject.SetActive(false);
+        }
+
+        [ContextMenu("Update UI Components")]
+        public void UpdateUIComponents()
+        {
+            uiTextProgress = UIWrapperHelpers.SetWrapperToText(textProgress, uiTextProgress);
         }
     }
 }
