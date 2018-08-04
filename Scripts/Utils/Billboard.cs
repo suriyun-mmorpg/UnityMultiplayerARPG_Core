@@ -2,36 +2,33 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MultiplayerARPG
+public class Billboard : MonoBehaviour
 {
-    public class Billboard : MonoBehaviour
+    public Camera targetCamera;
+    public Camera CacheTargetCamera
     {
-        public Camera targetCamera;
-        public Camera CacheTargetCamera
+        get
         {
-            get
-            {
-                if (targetCamera == null)
-                    targetCamera = Camera.main;
-                return targetCamera;
-            }
+            if (targetCamera == null)
+                targetCamera = Camera.main;
+            return targetCamera;
         }
+    }
 
-        private Transform cacheTransform;
-        public Transform CacheTransform
+    private Transform cacheTransform;
+    public Transform CacheTransform
+    {
+        get
         {
-            get
-            {
-                if (cacheTransform == null)
-                    cacheTransform = GetComponent<Transform>();
-                return cacheTransform;
-            }
+            if (cacheTransform == null)
+                cacheTransform = GetComponent<Transform>();
+            return cacheTransform;
         }
+    }
 
-        void Update()
-        {
-            if (CacheTargetCamera != null)
-                CacheTransform.rotation = Quaternion.Euler(Quaternion.LookRotation(CacheTargetCamera.transform.forward, CacheTargetCamera.transform.up).eulerAngles);
-        }
+    void Update()
+    {
+        if (CacheTargetCamera != null)
+            CacheTransform.rotation = Quaternion.Euler(Quaternion.LookRotation(CacheTargetCamera.transform.forward, CacheTargetCamera.transform.up).eulerAngles);
     }
 }

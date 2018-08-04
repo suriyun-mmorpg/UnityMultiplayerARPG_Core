@@ -1,80 +1,77 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace MultiplayerARPG
+public static class MemberReflectionUtils
 {
-    public static class MemberReflectionUtils
+    public static string GetMemberName<T>(this T instance, Expression<Func<T, object>> expression)
     {
-        public static string GetMemberName<T>(this T instance, Expression<Func<T, object>> expression)
+        return GetMemberName(expression);
+    }
+
+    public static string GetMemberName<T>(Expression<Func<T, object>> expression)
+    {
+        if (expression == null)
         {
-            return GetMemberName(expression);
+            throw new ArgumentException("The expression cannot be null.");
         }
 
-        public static string GetMemberName<T>(Expression<Func<T, object>> expression)
-        {
-            if (expression == null)
-            {
-                throw new ArgumentException("The expression cannot be null.");
-            }
+        return GetMemberName(expression.Body);
+    }
 
-            return GetMemberName(expression.Body);
+    public static string GetMemberName<T>(this T instance, Expression<Action<T>> expression)
+    {
+        return GetMemberName(expression);
+    }
+
+    public static string GetMemberName<T>(Expression<Action<T>> expression)
+    {
+        if (expression == null)
+        {
+            throw new ArgumentException("The expression cannot be null.");
         }
 
-        public static string GetMemberName<T>(this T instance, Expression<Action<T>> expression)
+        return GetMemberName(expression.Body);
+    }
+
+    private static string GetMemberName(Expression expression)
+    {
+        if (expression == null)
         {
-            return GetMemberName(expression);
+            throw new ArgumentException("The expression cannot be null.");
         }
 
-        public static string GetMemberName<T>(Expression<Action<T>> expression)
+        if (expression is MemberExpression)
         {
-            if (expression == null)
-            {
-                throw new ArgumentException("The expression cannot be null.");
-            }
-
-            return GetMemberName(expression.Body);
+            // Reference type property or field
+            var memberExpression = (MemberExpression)expression;
+            return memberExpression.Member.Name;
         }
 
-        private static string GetMemberName(Expression expression)
+        if (expression is MethodCallExpression)
         {
-            if (expression == null)
-            {
-                throw new ArgumentException("The expression cannot be null.");
-            }
-
-            if (expression is MemberExpression)
-            {
-                // Reference type property or field
-                var memberExpression = (MemberExpression)expression;
-                return memberExpression.Member.Name;
-            }
-
-            if (expression is MethodCallExpression)
-            {
-                // Reference type method
-                var methodCallExpression = (MethodCallExpression)expression;
-                return methodCallExpression.Method.Name;
-            }
-
-            if (expression is UnaryExpression)
-            {
-                // Property, field of method returning value type
-                var unaryExpression = (UnaryExpression)expression;
-                return GetMemberName(unaryExpression);
-            }
-
-            throw new ArgumentException("Invalid expression");
+            // Reference type method
+            var methodCallExpression = (MethodCallExpression)expression;
+            return methodCallExpression.Method.Name;
         }
 
-        private static string GetMemberName(UnaryExpression unaryExpression)
+        if (expression is UnaryExpression)
         {
-            if (unaryExpression.Operand is MethodCallExpression)
-            {
-                var methodExpression = (MethodCallExpression)unaryExpression.Operand;
-                return methodExpression.Method.Name;
-            }
-
-            return ((MemberExpression)unaryExpression.Operand).Member.Name;
+            // Property, field of method returning value type
+            var unaryExpression = (UnaryExpression)expression;
+            return GetMemberName(unaryExpression);
         }
+
+        throw new ArgumentException("Invalid expression");
+    }
+
+    private static string GetMemberName(UnaryExpression unaryExpression)
+    {
+        if (unaryExpression.Operand is MethodCallExpression)
+        {
+            var methodExpression = (MethodCallExpression)unaryExpression.Operand;
+            return methodExpression.Method.Name;
+        }
+
+        return ((MemberExpression)unaryExpression.Operand).Member.Name;
     }
 }
