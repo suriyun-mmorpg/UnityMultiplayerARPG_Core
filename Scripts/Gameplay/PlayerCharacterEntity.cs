@@ -80,6 +80,21 @@ namespace MultiplayerARPG
             if (!IsServer && !IsOwnerClient)
                 return;
 
+            if (HasNavPaths)
+            {
+                var targetPosition = navPaths.Peek();
+                targetPosition.y = 0;
+                var currentPosition = CacheTransform.position;
+                currentPosition.y = 0;
+                moveDirection = (targetPosition - currentPosition).normalized;
+                if (Vector3.Distance(targetPosition, currentPosition) < stoppingDistance)
+                {
+                    navPaths.Dequeue();
+                    if (!HasNavPaths)
+                        StopMove();
+                }
+            }
+
             var velocity = CacheRigidbody.velocity;
             if (!IsDead())
             {
@@ -127,30 +142,6 @@ namespace MultiplayerARPG
 
             // We apply gravity manually for more tuning control
             CacheRigidbody.AddForce(new Vector3(0, Physics.gravity.y * CacheRigidbody.mass * gravityRate, 0));
-        }
-
-        protected override void EntityLateUpdate()
-        {
-            base.EntityLateUpdate();
-
-            if (!IsServer && !IsOwnerClient)
-                return;
-
-            if (navPaths != null)
-            {
-                if (navPaths.Count > 0)
-                {
-                    var target = navPaths.Peek();
-                    target = new Vector3(target.x, 0, target.z);
-                    var currentPosition = CacheTransform.position;
-                    currentPosition = new Vector3(currentPosition.x, 0, currentPosition.z);
-                    moveDirection = (target - currentPosition).normalized;
-                    if (Vector3.Distance(target, currentPosition) < stoppingDistance)
-                        navPaths.Dequeue();
-                }
-                else
-                    StopMove();
-            }
         }
 
         public override void OnSetup()
