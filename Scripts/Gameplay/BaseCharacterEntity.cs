@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
+using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
 {
@@ -58,9 +59,10 @@ namespace MultiplayerARPG
         public int CacheMaxStamina { get; protected set; }
         public int CacheMaxFood { get; protected set; }
         public int CacheMaxWater { get; protected set; }
-        public float CacheBaseMoveSpeed { get; protected set; }
-        public float CacheMoveSpeed { get; protected set; }
+        public float CacheTotalItemWeight { get; protected set; }
         public float CacheAtkSpeed { get; protected set; }
+        public float CacheMoveSpeed { get; protected set; }
+        public float CacheBaseMoveSpeed { get; protected set; }
         #endregion
 
         private CharacterModel characterModel;
@@ -140,7 +142,9 @@ namespace MultiplayerARPG
         protected override void EntityUpdate()
         {
             base.EntityUpdate();
+            Profiler.BeginSample("BaseCharacterEntity - Update");
             MakeCaches();
+            Profiler.EndSample();
         }
 
         public virtual void ValidateRecovery()
@@ -188,7 +192,7 @@ namespace MultiplayerARPG
 
             var weight = itemData.weight;
             // If overwhelming
-            if (this.GetTotalItemWeight() + (amount * weight) > CacheStats.weightLimit)
+            if (CacheTotalItemWeight + (amount * weight) > CacheStats.weightLimit)
                 return true;
 
             return false;
@@ -828,10 +832,11 @@ namespace MultiplayerARPG
             CacheMaxStamina = (int)CacheStats.stamina;
             CacheMaxFood = (int)CacheStats.food;
             CacheMaxWater = (int)CacheStats.water;
+            CacheTotalItemWeight = this.GetTotalItemWeight();
+            CacheAtkSpeed = CacheStats.atkSpeed;
+            CacheMoveSpeed = CacheStats.moveSpeed;
             if (database != null)
                 CacheBaseMoveSpeed = database.stats.baseStats.moveSpeed;
-            CacheMoveSpeed = CacheStats.moveSpeed;
-            CacheAtkSpeed = CacheStats.atkSpeed;
             isRecaching = false;
         }
 

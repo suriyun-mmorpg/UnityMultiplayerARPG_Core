@@ -55,12 +55,12 @@ namespace MultiplayerARPG
         {
             if (!IsServer || IsDead())
                 return;
-            this.InvokeClassDevExtMethods("ReceiveDamage", attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
+            this.InvokeInstanceDevExtMethods("ReceiveDamage", attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
         }
 
         public virtual void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountType combatAmountType, int damage)
         {
-            this.InvokeClassDevExtMethods("ReceivedDamage", attacker, combatAmountType, damage);
+            this.InvokeInstanceDevExtMethods("ReceivedDamage", attacker, combatAmountType, damage);
             RequestCombatAmount(combatAmountType, damage);
         }
     }

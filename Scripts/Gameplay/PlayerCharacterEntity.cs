@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using LiteNetLibManager;
+using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
 {
@@ -65,18 +66,20 @@ namespace MultiplayerARPG
         protected override void EntityUpdate()
         {
             base.EntityUpdate();
-
+            Profiler.BeginSample("PlayerCharacterEntity - Update");
             if (IsDead())
             {
                 StopMove();
                 SetTargetEntity(null);
                 return;
             }
+            Profiler.EndSample();
         }
 
         protected override void EntityFixedUpdate()
         {
             base.EntityFixedUpdate();
+            Profiler.BeginSample("PlayerCharacterEntity - FixedUpdate");
             if (!IsServer && !IsOwnerClient)
                 return;
 
@@ -142,6 +145,7 @@ namespace MultiplayerARPG
 
             // We apply gravity manually for more tuning control
             CacheRigidbody.AddForce(new Vector3(0, Physics.gravity.y * CacheRigidbody.mass * gravityRate, 0));
+            Profiler.EndSample();
         }
 
         public override void OnSetup()

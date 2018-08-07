@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using LiteNetLib;
 using LiteNetLibManager;
+using UnityEngine.Profiling;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -43,35 +44,37 @@ namespace MultiplayerARPG
         private void Awake()
         {
             EntityAwake();
-            this.InvokeClassDevExtMethods("Awake");
+            this.InvokeInstanceDevExtMethods("Awake");
         }
         protected virtual void EntityAwake() { }
 
         private void Start()
         {
             EntityStart();
-            this.InvokeClassDevExtMethods("Start");
+            this.InvokeInstanceDevExtMethods("Start");
         }
         protected virtual void EntityStart() { }
 
         private void OnEnable()
         {
             EntityOnEnable();
-            this.InvokeClassDevExtMethods("OnEnable");
+            this.InvokeInstanceDevExtMethods("OnEnable");
         }
         protected virtual void EntityOnEnable() { }
 
         private void OnDisable()
         {
             EntityOnDisable();
-            this.InvokeClassDevExtMethods("OnDisable");
+            this.InvokeInstanceDevExtMethods("OnDisable");
         }
         protected virtual void EntityOnDisable() { }
 
         private void Update()
         {
             EntityUpdate();
-            this.InvokeClassDevExtMethods("Update");
+            Profiler.BeginSample("RpgNetworkEntity - DevExUpdate");
+            this.InvokeInstanceDevExtMethods("Update");
+            Profiler.EndSample();
         }
         protected virtual void EntityUpdate() { }
 
@@ -80,21 +83,25 @@ namespace MultiplayerARPG
             if (textTitle != null)
                 textTitle.text = Title;
             EntityLateUpdate();
-            this.InvokeClassDevExtMethods("LateUpdate");
+            Profiler.BeginSample("RpgNetworkEntity - DevExLateUpdate");
+            this.InvokeInstanceDevExtMethods("LateUpdate");
+            Profiler.EndSample();
         }
         protected virtual void EntityLateUpdate() { }
         
         private void FixedUpdate()
         {
             EntityFixedUpdate();
-            this.InvokeClassDevExtMethods("FixedUpdate");
+            Profiler.BeginSample("RpgNetworkEntity - DevExFixedUpdate");
+            this.InvokeInstanceDevExtMethods("FixedUpdate");
+            Profiler.EndSample();
         }
         protected virtual void EntityFixedUpdate() { }
 
         private void OnDestroy()
         {
             EntityOnDestroy();
-            this.InvokeClassDevExtMethods("OnDestroy");
+            this.InvokeInstanceDevExtMethods("OnDestroy");
         }
         protected virtual void EntityOnDestroy() { }
 
@@ -110,7 +117,7 @@ namespace MultiplayerARPG
         public override void OnSetup()
         {
             base.OnSetup();
-            this.InvokeClassDevExtMethods("OnSetup");
+            this.InvokeInstanceDevExtMethods("OnSetup");
             SetupNetElements();
             syncTitle.onChange += OnSyncTitleChange;
             if (IsServer)
@@ -119,7 +126,7 @@ namespace MultiplayerARPG
 
         protected virtual void SetupNetElements()
         {
-            this.InvokeClassDevExtMethods("SetupNetElements");
+            this.InvokeInstanceDevExtMethods("SetupNetElements");
             syncTitle.sendOptions = SendOptions.ReliableUnordered;
             syncTitle.forOwnerOnly = false;
         }
@@ -127,7 +134,7 @@ namespace MultiplayerARPG
         public override void OnNetworkDestroy(DestroyObjectReasons reasons)
         {
             base.OnNetworkDestroy(reasons);
-            this.InvokeClassDevExtMethods("OnNetworkDestroy", reasons);
+            this.InvokeInstanceDevExtMethods("OnNetworkDestroy", reasons);
             syncTitle.onChange -= OnSyncTitleChange;
         }
 

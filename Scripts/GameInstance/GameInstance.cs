@@ -251,7 +251,7 @@ namespace MultiplayerARPG
             else
                 LoadDataFromResources();
 
-            this.InvokeClassDevExtMethods("Awake");
+            this.InvokeInstanceDevExtMethods("Awake");
         }
         
         public void LoadDataFromResources()
@@ -317,7 +317,7 @@ namespace MultiplayerARPG
 
         public void LoadedGameData()
         {
-            this.InvokeClassDevExtMethods("LoadedGameData");
+            this.InvokeInstanceDevExtMethods("LoadedGameData");
 
             if (warpPortalDatabase != null)
                 AddMapWarpPortals(warpPortalDatabase.maps);

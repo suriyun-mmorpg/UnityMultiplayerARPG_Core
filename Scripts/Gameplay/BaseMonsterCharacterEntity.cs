@@ -219,7 +219,7 @@ namespace MultiplayerARPG
         {
             base.Killed(lastAttacker);
             DeadTime = Time.unscaledTime;
-            var maxHp = this.GetStats().hp;
+            var maxHp = CacheStats.hp;
             var randomedExp = Random.Range(MonsterDatabase.randomExpMin, MonsterDatabase.randomExpMax);
             var randomedGold = Random.Range(MonsterDatabase.randomGoldMin, MonsterDatabase.randomGoldMax);
             if (receivedDamageRecords.Count > 0)

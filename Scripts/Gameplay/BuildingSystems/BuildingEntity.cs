@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
+using UnityEngine.Profiling;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -119,6 +120,7 @@ namespace MultiplayerARPG
         protected override void EntityUpdate()
         {
             base.EntityUpdate();
+            Profiler.BeginSample("BuildingEntity - Update");
             if (isBuildMode)
             {
                 if (buildingArea != null && buildingArea.snapBuildingObject)
@@ -132,6 +134,7 @@ namespace MultiplayerARPG
                     buildingMaterial.CurrentState = canBuild ? BuildingMaterial.State.CanBuild : BuildingMaterial.State.CannotBuild;
                 }
             }
+            Profiler.EndSample();
         }
 
         public bool CanBuild()

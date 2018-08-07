@@ -37,7 +37,7 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
         info.AddValue("lastUpdate", data.LastUpdate);
         info.AddListValue("hotkeys", data.Hotkeys);
         info.AddListValue("quests", data.Quests);
-        this.InvokeClassDevExtMethods("GetObjectData", obj, info, context);
+        this.InvokeInstanceDevExtMethods("GetObjectData", obj, info, context);
     }
 
     public System.Object SetObjectData(System.Object obj,
@@ -79,7 +79,7 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
         data.LastUpdate = info.GetInt32("lastUpdate");
         data.Hotkeys = info.GetListValue<CharacterHotkey>("hotkeys");
         data.Quests = info.GetListValue<CharacterQuest>("quests");
-        this.InvokeClassDevExtMethods("SetObjectData", obj, info, context, selector);
+        this.InvokeInstanceDevExtMethods("SetObjectData", obj, info, context, selector);
         obj = data;
         return obj;
     }

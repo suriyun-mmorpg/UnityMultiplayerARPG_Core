@@ -127,19 +127,21 @@ public static partial class CharacterDataExtension
         }
         // Weapons
         var equipWeapons = data.EquipWeapons;
-        // Right hand equipment
-        var rightHandItem = equipWeapons.rightHand;
-        tempEquipment = rightHandItem.GetEquipmentItem();
-        if (tempEquipment != null)
-            result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
-                tempEquipment.GetIncreaseAttributes(rightHandItem.level, rightHandItem.GetEquipmentBonusRate()));
-        // Left hand equipment
-        var leftHandItem = equipWeapons.leftHand;
-        tempEquipment = leftHandItem.GetEquipmentItem();
-        if (tempEquipment != null)
-            result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
-                tempEquipment.GetIncreaseAttributes(leftHandItem.level, leftHandItem.GetEquipmentBonusRate()));
-
+        if (equipWeapons != null)
+        {
+            // Right hand equipment
+            var rightHandItem = equipWeapons.rightHand;
+            tempEquipment = rightHandItem.GetEquipmentItem();
+            if (tempEquipment != null)
+                result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
+                    tempEquipment.GetIncreaseAttributes(rightHandItem.level, rightHandItem.GetEquipmentBonusRate()));
+            // Left hand equipment
+            var leftHandItem = equipWeapons.leftHand;
+            tempEquipment = leftHandItem.GetEquipmentItem();
+            if (tempEquipment != null)
+                result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
+                    tempEquipment.GetIncreaseAttributes(leftHandItem.level, leftHandItem.GetEquipmentBonusRate()));
+        }
         return result;
     }
 
@@ -222,18 +224,21 @@ public static partial class CharacterDataExtension
         }
         // Weapons
         var equipWeapons = data.EquipWeapons;
-        // Right hand equipment
-        var rightHandItem = equipWeapons.rightHand;
-        tempEquipment = rightHandItem.GetEquipmentItem();
-        if (tempEquipment != null)
-            result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
-                tempEquipment.GetIncreaseResistances(rightHandItem.level, rightHandItem.GetEquipmentBonusRate()));
-        // Left hand equipment
-        var leftHandItem = equipWeapons.leftHand;
-        tempEquipment = leftHandItem.GetEquipmentItem();
-        if (tempEquipment != null)
-            result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
-                tempEquipment.GetIncreaseResistances(leftHandItem.level, leftHandItem.GetEquipmentBonusRate()));
+        if (equipWeapons != null)
+        {
+            // Right hand equipment
+            var rightHandItem = equipWeapons.rightHand;
+            tempEquipment = rightHandItem.GetEquipmentItem();
+            if (tempEquipment != null)
+                result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
+                    tempEquipment.GetIncreaseResistances(rightHandItem.level, rightHandItem.GetEquipmentBonusRate()));
+            // Left hand equipment
+            var leftHandItem = equipWeapons.leftHand;
+            tempEquipment = leftHandItem.GetEquipmentItem();
+            if (tempEquipment != null)
+                result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
+                    tempEquipment.GetIncreaseResistances(leftHandItem.level, leftHandItem.GetEquipmentBonusRate()));
+        }
         return result;
     }
 
@@ -287,18 +292,21 @@ public static partial class CharacterDataExtension
         }
         // Weapons
         var equipWeapons = data.EquipWeapons;
-        // Right hand equipment
-        var rightHandItem = equipWeapons.rightHand;
-        tempEquipment = rightHandItem.GetEquipmentItem();
-        if (tempEquipment != null)
-            result = GameDataHelpers.CombineDamageAmountsDictionary(result,
-                tempEquipment.GetIncreaseDamages(rightHandItem.level, rightHandItem.GetEquipmentBonusRate()));
-        // Left hand equipment
-        var leftHandItem = equipWeapons.leftHand;
-        tempEquipment = leftHandItem.GetEquipmentItem();
-        if (tempEquipment != null)
-            result = GameDataHelpers.CombineDamageAmountsDictionary(result,
-                tempEquipment.GetIncreaseDamages(leftHandItem.level, leftHandItem.GetEquipmentBonusRate()));
+        if (equipWeapons != null)
+        {
+            // Right hand equipment
+            var rightHandItem = equipWeapons.rightHand;
+            tempEquipment = rightHandItem.GetEquipmentItem();
+            if (tempEquipment != null)
+                result = GameDataHelpers.CombineDamageAmountsDictionary(result,
+                    tempEquipment.GetIncreaseDamages(rightHandItem.level, rightHandItem.GetEquipmentBonusRate()));
+            // Left hand equipment
+            var leftHandItem = equipWeapons.leftHand;
+            tempEquipment = leftHandItem.GetEquipmentItem();
+            if (tempEquipment != null)
+                result = GameDataHelpers.CombineDamageAmountsDictionary(result,
+                    tempEquipment.GetIncreaseDamages(leftHandItem.level, leftHandItem.GetEquipmentBonusRate()));
+        }
         return result;
     }
 
@@ -367,21 +375,24 @@ public static partial class CharacterDataExtension
         }
         // Weapons
         var equipWeapons = data.EquipWeapons;
-        // Right hand equipment
-        var rightHandItem = equipWeapons.rightHand;
-        tempEquipment = rightHandItem.GetEquipmentItem();
-        if (tempEquipment != null)
+        if (equipWeapons != null)
         {
-            result += tempEquipment.GetIncreaseStats(rightHandItem.level, rightHandItem.GetEquipmentBonusRate());
-            result += GameDataHelpers.CaculateStats(tempEquipment.GetIncreaseAttributes(rightHandItem.level, rightHandItem.GetEquipmentBonusRate()));
-        }
-        // Left hand equipment
-        var leftHandItem = equipWeapons.leftHand;
-        tempEquipment = leftHandItem.GetEquipmentItem();
-        if (tempEquipment != null)
-        {
-            result += tempEquipment.GetIncreaseStats(leftHandItem.level, leftHandItem.GetEquipmentBonusRate());
-            result += GameDataHelpers.CaculateStats(tempEquipment.GetIncreaseAttributes(leftHandItem.level, leftHandItem.GetEquipmentBonusRate()));
+            // Right hand equipment
+            var rightHandItem = equipWeapons.rightHand;
+            tempEquipment = rightHandItem.GetEquipmentItem();
+            if (tempEquipment != null)
+            {
+                result += tempEquipment.GetIncreaseStats(rightHandItem.level, rightHandItem.GetEquipmentBonusRate());
+                result += GameDataHelpers.CaculateStats(tempEquipment.GetIncreaseAttributes(rightHandItem.level, rightHandItem.GetEquipmentBonusRate()));
+            }
+            // Left hand equipment
+            var leftHandItem = equipWeapons.leftHand;
+            tempEquipment = leftHandItem.GetEquipmentItem();
+            if (tempEquipment != null)
+            {
+                result += tempEquipment.GetIncreaseStats(leftHandItem.level, leftHandItem.GetEquipmentBonusRate());
+                result += GameDataHelpers.CaculateStats(tempEquipment.GetIncreaseAttributes(leftHandItem.level, leftHandItem.GetEquipmentBonusRate()));
+            }
         }
         return result;
     }

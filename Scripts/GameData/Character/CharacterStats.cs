@@ -41,7 +41,7 @@ namespace MultiplayerARPG
             result.stamina = stamina + b.stamina;
             result.food = food + b.food;
             result.water = water + b.water;
-            this.InvokeClassDevExtMethods("Add", result, b);
+            this.InvokeInstanceDevExtMethods("Add", result, b);
             return result;
         }
 
@@ -63,7 +63,7 @@ namespace MultiplayerARPG
             result.stamina = stamina * multiplier;
             result.food = food * multiplier;
             result.water = water * multiplier;
-            this.InvokeClassDevExtMethods("Multiply", result, multiplier);
+            this.InvokeInstanceDevExtMethods("Multiply", result, multiplier);
             return result;
         }
 
