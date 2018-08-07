@@ -67,7 +67,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
 
             var statsString = "";
             var statsStringPart = "";
@@ -223,8 +223,8 @@ namespace MultiplayerARPG
             }
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextStats = UIWrapperHelpers.SetWrapperToText(textStats, uiTextStats);
             uiTextHp = UIWrapperHelpers.SetWrapperToText(textHp, uiTextHp);

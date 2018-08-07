@@ -78,7 +78,7 @@ namespace MultiplayerARPG
         protected override void Update()
         {
             base.Update();
-            UpdateUIComponents();
+            MigrateUIComponents();
 
             var characterSkill = Data.characterSkill;
             var skill = characterSkill.GetSkill();
@@ -118,7 +118,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
 
             var characterSkill = Data.characterSkill;
             var skill = characterSkill.GetSkill();
@@ -288,8 +288,8 @@ namespace MultiplayerARPG
                 owningCharacter.RequestAddSkill(indexOfData, 1);
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
             uiTextDescription = UIWrapperHelpers.SetWrapperToText(textDescription, uiTextDescription);

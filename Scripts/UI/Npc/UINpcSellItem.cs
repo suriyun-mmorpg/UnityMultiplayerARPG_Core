@@ -29,7 +29,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
 
             if (uiCharacterItem != null)
             {
@@ -72,8 +72,8 @@ namespace MultiplayerARPG
                 owningCharacter.RequestBuyNpcItem(indexOfData, (short)amount);
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextSellPrice = UIWrapperHelpers.SetWrapperToText(textSellPrice, uiTextSellPrice);
         }

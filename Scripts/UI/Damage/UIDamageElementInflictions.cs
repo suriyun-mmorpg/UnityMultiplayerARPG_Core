@@ -24,7 +24,7 @@ namespace MultiplayerARPG
             {
                 if (cacheTextInflictions == null)
                 {
-                    UpdateUIComponents();
+                    MigrateUIComponents();
                     cacheTextInflictions = new Dictionary<DamageElement, TextWrapper>();
                     foreach (var textAmount in textInflictions)
                     {
@@ -83,8 +83,8 @@ namespace MultiplayerARPG
             }
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextAllInflictions = UIWrapperHelpers.SetWrapperToText(textAllInfliction, uiTextAllInflictions);
             if (textInflictions != null && textInflictions.Length > 0)

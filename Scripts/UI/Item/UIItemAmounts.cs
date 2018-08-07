@@ -24,7 +24,7 @@ namespace MultiplayerARPG
             {
                 if (cacheTextLevels == null)
                 {
-                    UpdateUIComponents();
+                    MigrateUIComponents();
                     cacheTextLevels = new Dictionary<Item, TextWrapper>();
                     foreach (var textLevel in textAmounts)
                     {
@@ -83,8 +83,8 @@ namespace MultiplayerARPG
             }
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextAllAmounts = UIWrapperHelpers.SetWrapperToText(textAllAmounts, uiTextAllAmounts);
             if (textAmounts != null && textAmounts.Length > 0)

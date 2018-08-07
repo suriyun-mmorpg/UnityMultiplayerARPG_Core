@@ -20,7 +20,7 @@ namespace MultiplayerARPG
         public UIChatHandler uiChatHandler;
         protected override void UpdateData()
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
 
             var format = string.Empty;
             switch (Data.channel)
@@ -52,8 +52,8 @@ namespace MultiplayerARPG
             }
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextMessage = UIWrapperHelpers.SetWrapperToText(textMessage, uiTextMessage);
         }

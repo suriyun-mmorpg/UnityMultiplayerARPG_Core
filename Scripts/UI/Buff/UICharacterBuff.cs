@@ -34,7 +34,7 @@ namespace MultiplayerARPG
         protected override void Update()
         {
             base.Update();
-            UpdateUIComponents();
+            MigrateUIComponents();
             var characterBuff = Data;
             collectedDeltaTime += Time.deltaTime;
 
@@ -55,7 +55,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
 
             var skill = Data.GetSkill();
             var item = Data.GetItem();
@@ -101,8 +101,8 @@ namespace MultiplayerARPG
             }
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
             uiTextDuration = UIWrapperHelpers.SetWrapperToText(textDuration, uiTextDuration);

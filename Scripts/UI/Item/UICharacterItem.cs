@@ -118,7 +118,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
             var characterItem = Data.characterItem;
             var level = Data.targetLevel;
             var item = characterItem.GetItem();
@@ -562,8 +562,8 @@ namespace MultiplayerARPG
             }
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
             uiTextDescription = UIWrapperHelpers.SetWrapperToText(textDescription, uiTextDescription);

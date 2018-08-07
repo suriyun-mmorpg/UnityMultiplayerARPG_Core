@@ -17,7 +17,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
 
             var craftItemData = Data;
             if (uiCraftingItem != null)
@@ -51,8 +51,8 @@ namespace MultiplayerARPG
             }
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextRequireGold = UIWrapperHelpers.SetWrapperToText(textRequireGold, uiTextRequireGold);
         }

@@ -23,7 +23,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
 
             var task = Data.questTask;
             var progress = Data.progress;
@@ -49,8 +49,8 @@ namespace MultiplayerARPG
             }
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextTaskDescription = UIWrapperHelpers.SetWrapperToText(taskDescription, uiTextTaskDescription);
         }

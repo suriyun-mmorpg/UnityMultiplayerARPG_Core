@@ -39,7 +39,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             var characterAttribute = Data.characterAttribute;
             var attribute = characterAttribute.GetAttribute();
@@ -72,8 +72,8 @@ namespace MultiplayerARPG
                 owningCharacter.RequestAddAttribute(indexOfData, 1);
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
             uiTextDescription = UIWrapperHelpers.SetWrapperToText(textDescription, uiTextDescription);

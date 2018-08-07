@@ -39,7 +39,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
 
             var buff = Data.buff;
             var level = Data.targetLevel;
@@ -99,8 +99,8 @@ namespace MultiplayerARPG
                 uiBuffDamages.Data = GameDataHelpers.MakeDamageAmountsDictionary(buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), level, 1f);
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextDuration = UIWrapperHelpers.SetWrapperToText(textDuration, uiTextDuration);
             uiTextRecoveryHp = UIWrapperHelpers.SetWrapperToText(textRecoveryHp, uiTextRecoveryHp);

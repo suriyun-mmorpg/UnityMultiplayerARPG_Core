@@ -58,7 +58,7 @@ namespace MultiplayerARPG
 
         private void Start()
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
             HideEnterChatField();
             if (CacheGameNetworkManager != null)
                 CacheGameNetworkManager.onReceiveChat += OnReceiveChat;
@@ -184,8 +184,8 @@ namespace MultiplayerARPG
             }
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiEnterChatField = UIWrapperHelpers.SetWrapperToInputField(enterChatField, uiEnterChatField);
         }

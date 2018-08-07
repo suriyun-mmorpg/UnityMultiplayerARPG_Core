@@ -217,7 +217,7 @@ namespace MultiplayerARPG
 
         public void UpdateDealingGold(int gold)
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
             if (uiTextDealingGold != null)
                 uiTextDealingGold.text = string.Format(dealingGoldFormat, gold.ToString("N0"));
             dealingGold = gold;
@@ -225,7 +225,7 @@ namespace MultiplayerARPG
 
         public void UpdateAnotherDealingGold(int gold)
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
             if (uiTextAnotherDealingGold != null)
                 uiTextAnotherDealingGold.text = string.Format(anotherDealingGoldFormat, gold.ToString("N0"));
             anotherDealingGold = gold;
@@ -304,8 +304,8 @@ namespace MultiplayerARPG
             owningCharacter.RequestCancelDealing();
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextDealingGold = UIWrapperHelpers.SetWrapperToText(textDealingGold, uiTextDealingGold);
             uiTextAnotherDealingGold = UIWrapperHelpers.SetWrapperToText(textAnotherDealingGold, uiTextAnotherDealingGold);

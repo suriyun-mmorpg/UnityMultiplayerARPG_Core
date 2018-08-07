@@ -16,7 +16,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
 
             var skill = Data.skill;
             var level = Data.targetLevel;
@@ -44,8 +44,8 @@ namespace MultiplayerARPG
             }
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextRequireLevel = UIWrapperHelpers.SetWrapperToText(textRequireLevel, uiTextRequireLevel);
         }

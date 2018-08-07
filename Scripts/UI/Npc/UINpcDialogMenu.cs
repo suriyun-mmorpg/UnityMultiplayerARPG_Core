@@ -21,7 +21,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
 
             if (uiTextTitle != null)
                 uiTextTitle.text = Data.title;
@@ -33,8 +33,8 @@ namespace MultiplayerARPG
             owningCharacter.RequestSelectNpcDialogMenu(Data.menuIndex);
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextTitle = UIWrapperHelpers.SetWrapperToText(title, uiTextTitle);
         }

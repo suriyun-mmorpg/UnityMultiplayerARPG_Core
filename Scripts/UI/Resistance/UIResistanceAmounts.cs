@@ -39,7 +39,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
             if (Data == null || Data.Count == 0)
             {
                 if (textAllAmounts != null)
@@ -74,8 +74,8 @@ namespace MultiplayerARPG
             }
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextAllAmounts = UIWrapperHelpers.SetWrapperToText(textAllAmounts, uiTextAllAmounts);
             if (textAmounts != null && textAmounts.Length > 0)

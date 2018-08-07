@@ -22,7 +22,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
 
             var equipmentItem = Data;
 
@@ -60,8 +60,8 @@ namespace MultiplayerARPG
             }
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextRequireLevel = UIWrapperHelpers.SetWrapperToText(textRequireLevel, uiTextRequireLevel);
             uiTextRequireClass = UIWrapperHelpers.SetWrapperToText(textRequireClass, uiTextRequireClass);

@@ -128,7 +128,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
 
             if (uiTextName != null)
                 uiTextName.text = string.Format(nameFormat, Data == null ? "Unknow" : Data.CharacterName);
@@ -246,7 +246,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
             cacheStatsWithBuffs = Data.GetStats();
             cacheAttributesWithBuffs = Data.GetAttributes();
             displayingStats = showStatsWithBuffs ? cacheStatsWithBuffs : Data.GetStats(true, false);
@@ -352,8 +352,8 @@ namespace MultiplayerARPG
             }
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextName = UIWrapperHelpers.SetWrapperToText(textName, uiTextName);
             uiTextLevel = UIWrapperHelpers.SetWrapperToText(textLevel, uiTextLevel);

@@ -29,7 +29,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
 
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             CharacterItem characterItem = null;
@@ -109,8 +109,8 @@ namespace MultiplayerARPG
             owningCharacter.RequestRefineItem(Data);
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextRequireGold = UIWrapperHelpers.SetWrapperToText(textRequireGold, uiTextRequireGold);
             uiTextSuccessRate = UIWrapperHelpers.SetWrapperToText(textSuccessRate, uiTextSuccessRate);

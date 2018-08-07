@@ -33,7 +33,7 @@ namespace MultiplayerARPG
         protected override void UpdateUI()
         {
             base.UpdateUI();
-            UpdateUIComponents();
+            MigrateUIComponents();
 
             if (Data == null || BasePlayerCharacterController.OwningCharacter == null)
             {
@@ -66,8 +66,8 @@ namespace MultiplayerARPG
             }
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
         }

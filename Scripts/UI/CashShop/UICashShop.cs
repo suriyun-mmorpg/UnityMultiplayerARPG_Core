@@ -143,7 +143,7 @@ namespace MultiplayerARPG
 
         private void ResponseCashShopBuy(AckResponseCode responseCode, BaseAckMessage message)
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
             var castedMessage = (ResponseCashShopBuyMessage)message;
             switch (responseCode)
             {
@@ -176,8 +176,8 @@ namespace MultiplayerARPG
             }
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextCash = UIWrapperHelpers.SetWrapperToText(textCash, uiTextCash);
         }

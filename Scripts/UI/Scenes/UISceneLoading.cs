@@ -35,7 +35,7 @@ namespace MultiplayerARPG
 
         IEnumerator LoadSceneRoutine(string sceneName)
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
             if (rootObject != null)
                 rootObject.SetActive(true);
             if (uiTextProgress != null)
@@ -62,8 +62,8 @@ namespace MultiplayerARPG
                 rootObject.SetActive(false);
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextProgress = UIWrapperHelpers.SetWrapperToText(textProgress, uiTextProgress);
         }

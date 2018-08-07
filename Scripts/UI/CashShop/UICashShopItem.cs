@@ -28,7 +28,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
 
             if (uiTextTitle != null)
                 uiTextTitle.text = string.Format(titleFormat, Data == null ? "Unknow" : Data.title);
@@ -67,8 +67,8 @@ namespace MultiplayerARPG
                 uiCashShop.Buy(Data.DataId);
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
             uiTextDescription = UIWrapperHelpers.SetWrapperToText(textDescription, uiTextDescription);

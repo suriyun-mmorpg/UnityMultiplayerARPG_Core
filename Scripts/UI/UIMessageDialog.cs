@@ -16,12 +16,12 @@ public class UIMessageDialog : UIBase
     {
         get
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
             return uiTextTitle == null ? "" : uiTextTitle.text;
         }
         set
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
             if (uiTextTitle != null) uiTextTitle.text = value;
         }
     }
@@ -30,12 +30,12 @@ public class UIMessageDialog : UIBase
     {
         get
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
             return uiTextDescription == null ? "" : uiTextDescription.text;
         }
         set
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
             if (uiTextDescription != null) uiTextDescription.text = value;
         }
     }
@@ -147,8 +147,8 @@ public class UIMessageDialog : UIBase
         Hide();
     }
 
-    [ContextMenu("Update UI Components")]
-    public void UpdateUIComponents()
+    [ContextMenu("Migrate UI Components")]
+    public void MigrateUIComponents()
     {
         uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
         uiTextDescription = UIWrapperHelpers.SetWrapperToText(textDescription, uiTextDescription);

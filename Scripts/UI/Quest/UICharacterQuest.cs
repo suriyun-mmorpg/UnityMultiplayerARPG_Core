@@ -94,7 +94,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
 
             var characterQuest = Data;
             var quest = characterQuest.GetQuest();
@@ -144,8 +144,8 @@ namespace MultiplayerARPG
                 questOnGoingStatusObject.SetActive(!isComplete && !isAllTasksDone);
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
             uiTextDescription = UIWrapperHelpers.SetWrapperToText(textDescription, uiTextDescription);

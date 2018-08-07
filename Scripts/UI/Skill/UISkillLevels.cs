@@ -24,7 +24,7 @@ namespace MultiplayerARPG
             {
                 if (cacheTextLevels == null)
                 {
-                    UpdateUIComponents();
+                    MigrateUIComponents();
                     cacheTextLevels = new Dictionary<Skill, TextWrapper>();
                     foreach (var textLevel in textLevels)
                     {
@@ -42,7 +42,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            UpdateUIComponents();
+            MigrateUIComponents();
 
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (Data == null || Data.Count == 0)
@@ -85,8 +85,8 @@ namespace MultiplayerARPG
             }
         }
 
-        [ContextMenu("Update UI Components")]
-        public void UpdateUIComponents()
+        [ContextMenu("Migrate UI Components")]
+        public void MigrateUIComponents()
         {
             uiTextAllLevels = UIWrapperHelpers.SetWrapperToText(textAllLevels, uiTextAllLevels);
             if (textLevels != null && textLevels.Length > 0)
