@@ -73,7 +73,7 @@ namespace MultiplayerARPG
                 uiCharacter.Setup(characterData, dataId);
             // Select trigger when add first entry so deactivate all models is okay beacause first model will active
             var characterModel = characterData.InstantiateModel(characterModelContainer);
-                CharacterModels[characterData.dataId] = characterModel;
+                CharacterModels[characterData.DataId] = characterModel;
                 characterModel.gameObject.SetActive(false);
                 SelectionManager.Add(uiCharacter);
             });

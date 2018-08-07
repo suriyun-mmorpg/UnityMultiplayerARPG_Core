@@ -1,87 +1,345 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using MultiplayerARPG;
 
 [System.Serializable]
 public partial class CharacterData : ICharacterData
 {
-    public string id;
-    public int dataId;
-    public string characterName;
-    public short level;
-    public int exp;
-    public int currentHp;
-    public int currentMp;
-    public int currentStamina;
-    public int currentFood;
-    public int currentWater;
-    public EquipWeapons equipWeapons;
+    private string id;
+    private int dataId;
+    private string characterName;
+    private short level;
+    private int exp;
+    private int currentHp;
+    private int currentMp;
+    private int currentStamina;
+    private int currentFood;
+    private int currentWater;
+    private EquipWeapons equipWeapons;
 
-    public List<CharacterAttribute> attributes = new List<CharacterAttribute>();
-    public List<CharacterSkill> skills = new List<CharacterSkill>();
-    public List<CharacterBuff> buffs = new List<CharacterBuff>();
-    public List<CharacterItem> equipItems = new List<CharacterItem>();
-    public List<CharacterItem> nonEquipItems = new List<CharacterItem>();
+    private ObservableCollection<CharacterAttribute> attributes;
+    private ObservableCollection<CharacterSkill> skills;
+    private ObservableCollection<CharacterBuff> buffs;
+    private ObservableCollection<CharacterItem> equipItems;
+    private ObservableCollection<CharacterItem> nonEquipItems;
+
+    private bool shouldMakeCache = false;
 
     public string Id { get { return id; } set { id = value; } }
-    public int DataId { get { return dataId; } set { dataId = value; } }
+    public int DataId
+    {
+        get { return dataId; }
+        set
+        {
+            dataId = value;
+            shouldMakeCache = true;
+        }
+    }
     public string CharacterName { get { return characterName; } set { characterName = value; } }
-    public short Level { get { return level; } set { level = value; } }
+    public short Level
+    {
+        get { return level; }
+        set
+        {
+            level = value;
+            shouldMakeCache = true;
+        }
+    }
     public int Exp { get { return exp; } set { exp = value; } }
     public int CurrentHp { get { return currentHp; } set { currentHp = value; } }
     public int CurrentMp { get { return currentMp; } set { currentMp = value; } }
     public int CurrentStamina { get { return currentStamina; } set { currentStamina = value; } }
     public int CurrentFood { get { return currentFood; } set { currentFood = value; } }
     public int CurrentWater { get { return currentWater; } set { currentWater = value; } }
-    public EquipWeapons EquipWeapons { get { return equipWeapons; } set { equipWeapons = value; } }
+    public EquipWeapons EquipWeapons
+    {
+        get { return equipWeapons; }
+        set
+        {
+            equipWeapons = value;
+            shouldMakeCache = true;
+        }
+    }
 
     public IList<CharacterAttribute> Attributes
     {
-        get { return attributes; }
+        get
+        {
+            if (attributes == null)
+            {
+                attributes = new ObservableCollection<CharacterAttribute>();
+                attributes.CollectionChanged += List_CollectionChanged;
+            }
+            return attributes;
+        }
         set
         {
-            attributes = new List<CharacterAttribute>();
-            attributes.AddRange(value);
+            if (attributes == null)
+            {
+                attributes = new ObservableCollection<CharacterAttribute>();
+                attributes.CollectionChanged += List_CollectionChanged;
+            }
+            attributes.Clear();
+            foreach (var entry in value)
+                attributes.Add(entry);
+            shouldMakeCache = true;
         }
     }
 
     public IList<CharacterSkill> Skills
     {
-        get { return skills; }
+        get
+        {
+            if (skills == null)
+            {
+                skills = new ObservableCollection<CharacterSkill>();
+                skills.CollectionChanged += List_CollectionChanged;
+            }
+            return skills;
+        }
         set
         {
-            skills = new List<CharacterSkill>();
-            skills.AddRange(value);
+            if (skills == null)
+            {
+                skills = new ObservableCollection<CharacterSkill>();
+                skills.CollectionChanged += List_CollectionChanged;
+            }
+            skills.Clear();
+            foreach (var entry in value)
+                skills.Add(entry);
+            shouldMakeCache = true;
         }
     }
 
     public IList<CharacterBuff> Buffs
     {
-        get { return buffs; }
+        get
+        {
+            if (buffs == null)
+            {
+                buffs = new ObservableCollection<CharacterBuff>();
+                buffs.CollectionChanged += List_CollectionChanged;
+            }
+            return buffs;
+        }
         set
         {
-            buffs = new List<CharacterBuff>();
-            buffs.AddRange(value);
+            if (buffs == null)
+            {
+                buffs = new ObservableCollection<CharacterBuff>();
+                buffs.CollectionChanged += List_CollectionChanged;
+            }
+            buffs.Clear();
+            foreach (var entry in value)
+                buffs.Add(entry);
+            shouldMakeCache = true;
         }
     }
 
     public IList<CharacterItem> EquipItems
     {
-        get { return equipItems; }
+        get
+        {
+            if (equipItems == null)
+            {
+                equipItems = new ObservableCollection<CharacterItem>();
+                equipItems.CollectionChanged += List_CollectionChanged;
+            }
+            return equipItems;
+        }
         set
         {
-            equipItems = new List<CharacterItem>();
-            equipItems.AddRange(value);
+            if (equipItems == null)
+            {
+                equipItems = new ObservableCollection<CharacterItem>();
+                equipItems.CollectionChanged += List_CollectionChanged;
+            }
+            equipItems.Clear();
+            foreach (var entry in value)
+                equipItems.Add(entry);
+            shouldMakeCache = true;
         }
     }
 
     public IList<CharacterItem> NonEquipItems
     {
-        get { return nonEquipItems; }
+        get
+        {
+            if (nonEquipItems == null)
+            {
+                nonEquipItems = new ObservableCollection<CharacterItem>();
+                nonEquipItems.CollectionChanged += List_CollectionChanged;
+            }
+            return nonEquipItems;
+        }
         set
         {
-            nonEquipItems = new List<CharacterItem>();
-            nonEquipItems.AddRange(value);
+            if (nonEquipItems == null)
+            {
+                nonEquipItems = new ObservableCollection<CharacterItem>();
+                nonEquipItems.CollectionChanged += List_CollectionChanged;
+            }
+            nonEquipItems.Clear();
+            foreach (var entry in value)
+                nonEquipItems.Add(entry);
+            shouldMakeCache = true;
         }
+    }
+
+    private CharacterStats cacheStats;
+    public CharacterStats CacheStats
+    {
+        get
+        {
+            MakeCaches();
+            return cacheStats;
+        }
+    }
+
+    private Dictionary<Attribute, short> cacheAttributes;
+    public Dictionary<Attribute, short> CacheAttributes
+    {
+        get
+        {
+            MakeCaches();
+            return cacheAttributes;
+        }
+    }
+
+    private Dictionary<Skill, short> cacheSkills;
+    public Dictionary<Skill, short> CacheSkills
+    {
+        get
+        {
+            MakeCaches();
+            return cacheSkills;
+        }
+    }
+
+    private Dictionary<DamageElement, float> cacheResistances;
+    public Dictionary<DamageElement, float> CacheResistances
+    {
+        get
+        {
+            MakeCaches();
+            return cacheResistances;
+        }
+    }
+
+    private Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages;
+    public Dictionary<DamageElement, MinMaxFloat> CacheIncreaseDamages
+    {
+        get
+        {
+            MakeCaches();
+            return cacheIncreaseDamages;
+        }
+    }
+
+    private int cacheMaxHp;
+    public int CacheMaxHp
+    {
+        get
+        {
+            MakeCaches();
+            return cacheMaxHp;
+        }
+    }
+
+    private int cacheMaxMp;
+    public int CacheMaxMp
+    {
+        get
+        {
+            MakeCaches();
+            return cacheMaxMp;
+        }
+    }
+
+    private int cacheMaxStamina;
+    public int CacheMaxStamina
+    {
+        get
+        {
+            MakeCaches();
+            return cacheMaxStamina;
+        }
+    }
+
+    private int cacheMaxFood;
+    public int CacheMaxFood
+    {
+        get
+        {
+            MakeCaches();
+            return cacheMaxFood;
+        }
+    }
+
+    private int cacheMaxWater;
+    public int CacheMaxWater
+    {
+        get
+        {
+            MakeCaches();
+            return cacheMaxWater;
+        }
+    }
+
+    private float cacheTotalItemWeight;
+    public float CacheTotalItemWeight
+    {
+        get
+        {
+            MakeCaches();
+            return cacheTotalItemWeight;
+        }
+    }
+
+    private float cacheAtkSpeed;
+    public float CacheAtkSpeed
+    {
+        get
+        {
+            MakeCaches();
+            return cacheAtkSpeed;
+        }
+    }
+
+    private float cacheMoveSpeed;
+    public float CacheMoveSpeed
+    {
+        get
+        {
+            MakeCaches();
+            return cacheMoveSpeed;
+        }
+    }
+
+    private void List_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
+        shouldMakeCache = true;
+    }
+
+    private void MakeCaches()
+    {
+        if (!shouldMakeCache)
+            return;
+        cacheStats = this.GetStats();
+        cacheAttributes = this.GetAttributes();
+        cacheSkills = this.GetSkills();
+        cacheResistances = this.GetResistances();
+        cacheIncreaseDamages = this.GetIncreaseDamages();
+        cacheMaxHp = (int)cacheStats.hp;
+        cacheMaxMp = (int)cacheStats.mp;
+        cacheMaxStamina = (int)cacheStats.stamina;
+        cacheMaxFood = (int)cacheStats.food;
+        cacheMaxWater = (int)cacheStats.water;
+        cacheTotalItemWeight = this.GetTotalItemWeight();
+        cacheAtkSpeed = cacheStats.atkSpeed;
+        cacheMoveSpeed = cacheStats.moveSpeed;
+        shouldMakeCache = false;
     }
 }
