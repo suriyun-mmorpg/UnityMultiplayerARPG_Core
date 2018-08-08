@@ -82,13 +82,13 @@ namespace MultiplayerARPG
         {
             Singleton = this;
         }
-        
+
         private void Update()
         {
-            var fields = FindObjectsOfType<InputField>();
+            var fields = ComponentCollector.Get(typeof(InputFieldWrapper));
             foreach (var field in fields)
             {
-                if (field.isFocused)
+                if (((InputFieldWrapper)field).isFocused)
                     return;
             }
 

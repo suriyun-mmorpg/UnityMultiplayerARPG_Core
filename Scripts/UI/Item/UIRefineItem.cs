@@ -112,9 +112,9 @@ namespace MultiplayerARPG
         [ContextMenu("Migrate UI Components")]
         public void MigrateUIComponents()
         {
-            uiTextRequireGold = UIWrapperHelpers.SetWrapperToText(textRequireGold, uiTextRequireGold);
-            uiTextSuccessRate = UIWrapperHelpers.SetWrapperToText(textSuccessRate, uiTextSuccessRate);
-            uiTextRefiningLevel = UIWrapperHelpers.SetWrapperToText(textRefiningLevel, uiTextRefiningLevel);
+            uiTextRequireGold = MigrateUIHelpers.SetWrapperToText(textRequireGold, uiTextRequireGold);
+            uiTextSuccessRate = MigrateUIHelpers.SetWrapperToText(textSuccessRate, uiTextSuccessRate);
+            uiTextRefiningLevel = MigrateUIHelpers.SetWrapperToText(textRefiningLevel, uiTextRefiningLevel);
         }
     }
 }

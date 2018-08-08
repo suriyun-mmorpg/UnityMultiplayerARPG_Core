@@ -32,7 +32,7 @@ namespace MultiplayerARPG
                 if (cacheText == null)
                 {
                     var textComp = GetComponent<Text>();
-                    cacheText = UIWrapperHelpers.SetWrapperToText(textComp, cacheText);
+                    cacheText = MigrateUIHelpers.SetWrapperToText(textComp, cacheText);
                 }
                 return cacheText;
             }

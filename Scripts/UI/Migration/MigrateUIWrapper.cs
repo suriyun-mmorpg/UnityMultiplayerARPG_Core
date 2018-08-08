@@ -14,7 +14,7 @@ public class MigrateUIWrapper : MonoBehaviour
     public void MigrateUIs()
     {
         // Find all components include inactive
-        List<UIBase> objects = new List<UIBase>();
+        List<MonoBehaviour> objects = new List<MonoBehaviour>();
         for (int i = 0; i < SceneManager.sceneCount; i++)
         {
             var s = SceneManager.GetSceneAt(i);
@@ -24,7 +24,7 @@ public class MigrateUIWrapper : MonoBehaviour
                 for (int j = 0; j < allGameObjects.Length; j++)
                 {
                     var go = allGameObjects[j];
-                    objects.AddRange(go.GetComponentsInChildren<UIBase>(true));
+                    objects.AddRange(go.GetComponentsInChildren<MonoBehaviour>(true));
                 }
             }
         }

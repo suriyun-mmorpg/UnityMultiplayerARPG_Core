@@ -291,14 +291,14 @@ namespace MultiplayerARPG
         [ContextMenu("Migrate UI Components")]
         public void MigrateUIComponents()
         {
-            uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
-            uiTextDescription = UIWrapperHelpers.SetWrapperToText(textDescription, uiTextDescription);
-            uiTextLevel = UIWrapperHelpers.SetWrapperToText(textLevel, uiTextLevel);
-            uiTextSkillType = UIWrapperHelpers.SetWrapperToText(textSkillType, uiTextSkillType);
-            uiTextAvailableWeapons = UIWrapperHelpers.SetWrapperToText(textAvailableWeapons, uiTextAvailableWeapons);
-            uiTextConsumeMp = UIWrapperHelpers.SetWrapperToText(textConsumeMp, uiTextConsumeMp);
-            uiTextCoolDownDuration = UIWrapperHelpers.SetWrapperToText(textCoolDownDuration, uiTextCoolDownDuration);
-            uiTextCoolDownRemainsDuration = UIWrapperHelpers.SetWrapperToText(textCoolDownRemainsDuration, uiTextCoolDownRemainsDuration);
+            uiTextTitle = MigrateUIHelpers.SetWrapperToText(textTitle, uiTextTitle);
+            uiTextDescription = MigrateUIHelpers.SetWrapperToText(textDescription, uiTextDescription);
+            uiTextLevel = MigrateUIHelpers.SetWrapperToText(textLevel, uiTextLevel);
+            uiTextSkillType = MigrateUIHelpers.SetWrapperToText(textSkillType, uiTextSkillType);
+            uiTextAvailableWeapons = MigrateUIHelpers.SetWrapperToText(textAvailableWeapons, uiTextAvailableWeapons);
+            uiTextConsumeMp = MigrateUIHelpers.SetWrapperToText(textConsumeMp, uiTextConsumeMp);
+            uiTextCoolDownDuration = MigrateUIHelpers.SetWrapperToText(textCoolDownDuration, uiTextCoolDownDuration);
+            uiTextCoolDownRemainsDuration = MigrateUIHelpers.SetWrapperToText(textCoolDownRemainsDuration, uiTextCoolDownRemainsDuration);
         }
     }
 }

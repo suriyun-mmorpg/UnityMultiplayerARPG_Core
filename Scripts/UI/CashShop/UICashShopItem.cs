@@ -70,9 +70,9 @@ namespace MultiplayerARPG
         [ContextMenu("Migrate UI Components")]
         public void MigrateUIComponents()
         {
-            uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
-            uiTextDescription = UIWrapperHelpers.SetWrapperToText(textDescription, uiTextDescription);
-            uiTextSellPrice = UIWrapperHelpers.SetWrapperToText(textSellPrice, uiTextSellPrice);
+            uiTextTitle = MigrateUIHelpers.SetWrapperToText(textTitle, uiTextTitle);
+            uiTextDescription = MigrateUIHelpers.SetWrapperToText(textDescription, uiTextDescription);
+            uiTextSellPrice = MigrateUIHelpers.SetWrapperToText(textSellPrice, uiTextSellPrice);
         }
     }
 }

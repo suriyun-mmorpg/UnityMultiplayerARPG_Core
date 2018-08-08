@@ -28,7 +28,7 @@ namespace MultiplayerARPG
         [ContextMenu("Migrate UI Components")]
         public void MigrateUIComponents()
         {
-            uiTextInfliction = UIWrapperHelpers.SetWrapperToText(textInfliction, uiTextInfliction);
+            uiTextInfliction = MigrateUIHelpers.SetWrapperToText(textInfliction, uiTextInfliction);
         }
     }
 }

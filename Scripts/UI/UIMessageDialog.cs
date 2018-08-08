@@ -150,7 +150,7 @@ public class UIMessageDialog : UIBase
     [ContextMenu("Migrate UI Components")]
     public void MigrateUIComponents()
     {
-        uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
-        uiTextDescription = UIWrapperHelpers.SetWrapperToText(textDescription, uiTextDescription);
+        uiTextTitle = MigrateUIHelpers.SetWrapperToText(textTitle, uiTextTitle);
+        uiTextDescription = MigrateUIHelpers.SetWrapperToText(textDescription, uiTextDescription);
     }
 }

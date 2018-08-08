@@ -67,7 +67,7 @@ namespace MultiplayerARPG
         [ContextMenu("Migrate UI Components")]
         public void MigrateUIComponents()
         {
-            uiTextProgress = UIWrapperHelpers.SetWrapperToText(textProgress, uiTextProgress);
+            uiTextProgress = MigrateUIHelpers.SetWrapperToText(textProgress, uiTextProgress);
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIWrapperHelpers
+public class MigrateUIHelpers
 {
     public static TextWrapper SetWrapperToText(Text oldComp, TextWrapper newComp)
     {

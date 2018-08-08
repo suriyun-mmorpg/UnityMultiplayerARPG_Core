@@ -565,14 +565,14 @@ namespace MultiplayerARPG
         [ContextMenu("Migrate UI Components")]
         public void MigrateUIComponents()
         {
-            uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
-            uiTextDescription = UIWrapperHelpers.SetWrapperToText(textDescription, uiTextDescription);
-            uiTextLevel = UIWrapperHelpers.SetWrapperToText(textLevel, uiTextLevel);
-            uiTextItemType = UIWrapperHelpers.SetWrapperToText(textItemType, uiTextItemType);
-            uiTextSellPrice = UIWrapperHelpers.SetWrapperToText(textSellPrice, uiTextSellPrice);
-            uiTextStack = UIWrapperHelpers.SetWrapperToText(textStack, uiTextStack);
-            uiTextDurability = UIWrapperHelpers.SetWrapperToText(textDurability, uiTextDurability);
-            uiTextWeight = UIWrapperHelpers.SetWrapperToText(textWeight, uiTextWeight);
+            uiTextTitle = MigrateUIHelpers.SetWrapperToText(textTitle, uiTextTitle);
+            uiTextDescription = MigrateUIHelpers.SetWrapperToText(textDescription, uiTextDescription);
+            uiTextLevel = MigrateUIHelpers.SetWrapperToText(textLevel, uiTextLevel);
+            uiTextItemType = MigrateUIHelpers.SetWrapperToText(textItemType, uiTextItemType);
+            uiTextSellPrice = MigrateUIHelpers.SetWrapperToText(textSellPrice, uiTextSellPrice);
+            uiTextStack = MigrateUIHelpers.SetWrapperToText(textStack, uiTextStack);
+            uiTextDurability = MigrateUIHelpers.SetWrapperToText(textDurability, uiTextDurability);
+            uiTextWeight = MigrateUIHelpers.SetWrapperToText(textWeight, uiTextWeight);
         }
     }
 }

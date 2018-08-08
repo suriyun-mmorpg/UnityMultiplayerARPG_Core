@@ -226,20 +226,20 @@ namespace MultiplayerARPG
         [ContextMenu("Migrate UI Components")]
         public void MigrateUIComponents()
         {
-            uiTextStats = UIWrapperHelpers.SetWrapperToText(textStats, uiTextStats);
-            uiTextHp = UIWrapperHelpers.SetWrapperToText(textHp, uiTextHp);
-            uiTextMp = UIWrapperHelpers.SetWrapperToText(textMp, uiTextMp);
-            uiTextArmor = UIWrapperHelpers.SetWrapperToText(textArmor, uiTextArmor);
-            uiTextAccuracy = UIWrapperHelpers.SetWrapperToText(textAccuracy, uiTextAccuracy);
-            uiTextEvasion = UIWrapperHelpers.SetWrapperToText(textEvasion, uiTextEvasion);
-            uiTextCriRate = UIWrapperHelpers.SetWrapperToText(textCriRate, uiTextCriRate);
-            uiTextCriDmgRate = UIWrapperHelpers.SetWrapperToText(textCriDmgRate, uiTextCriDmgRate);
-            uiTextBlockRate = UIWrapperHelpers.SetWrapperToText(textBlockRate, uiTextBlockRate);
-            uiTextBlockDmgRate = UIWrapperHelpers.SetWrapperToText(textBlockDmgRate, uiTextBlockDmgRate);
-            uiTextWeightLimit = UIWrapperHelpers.SetWrapperToText(textWeightLimit, uiTextWeightLimit);
-            uiTextStamina = UIWrapperHelpers.SetWrapperToText(textStamina, uiTextStamina);
-            uiTextFood = UIWrapperHelpers.SetWrapperToText(textFood, uiTextFood);
-            uiTextWater = UIWrapperHelpers.SetWrapperToText(textWater, uiTextWater);
+            uiTextStats = MigrateUIHelpers.SetWrapperToText(textStats, uiTextStats);
+            uiTextHp = MigrateUIHelpers.SetWrapperToText(textHp, uiTextHp);
+            uiTextMp = MigrateUIHelpers.SetWrapperToText(textMp, uiTextMp);
+            uiTextArmor = MigrateUIHelpers.SetWrapperToText(textArmor, uiTextArmor);
+            uiTextAccuracy = MigrateUIHelpers.SetWrapperToText(textAccuracy, uiTextAccuracy);
+            uiTextEvasion = MigrateUIHelpers.SetWrapperToText(textEvasion, uiTextEvasion);
+            uiTextCriRate = MigrateUIHelpers.SetWrapperToText(textCriRate, uiTextCriRate);
+            uiTextCriDmgRate = MigrateUIHelpers.SetWrapperToText(textCriDmgRate, uiTextCriDmgRate);
+            uiTextBlockRate = MigrateUIHelpers.SetWrapperToText(textBlockRate, uiTextBlockRate);
+            uiTextBlockDmgRate = MigrateUIHelpers.SetWrapperToText(textBlockDmgRate, uiTextBlockDmgRate);
+            uiTextWeightLimit = MigrateUIHelpers.SetWrapperToText(textWeightLimit, uiTextWeightLimit);
+            uiTextStamina = MigrateUIHelpers.SetWrapperToText(textStamina, uiTextStamina);
+            uiTextFood = MigrateUIHelpers.SetWrapperToText(textFood, uiTextFood);
+            uiTextWater = MigrateUIHelpers.SetWrapperToText(textWater, uiTextWater);
         }
     }
 }

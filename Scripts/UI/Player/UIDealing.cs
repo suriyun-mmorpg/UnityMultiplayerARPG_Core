@@ -307,8 +307,8 @@ namespace MultiplayerARPG
         [ContextMenu("Migrate UI Components")]
         public void MigrateUIComponents()
         {
-            uiTextDealingGold = UIWrapperHelpers.SetWrapperToText(textDealingGold, uiTextDealingGold);
-            uiTextAnotherDealingGold = UIWrapperHelpers.SetWrapperToText(textAnotherDealingGold, uiTextAnotherDealingGold);
+            uiTextDealingGold = MigrateUIHelpers.SetWrapperToText(textDealingGold, uiTextDealingGold);
+            uiTextAnotherDealingGold = MigrateUIHelpers.SetWrapperToText(textAnotherDealingGold, uiTextAnotherDealingGold);
         }
     }
 }

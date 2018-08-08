@@ -88,13 +88,13 @@ namespace MultiplayerARPG
         [ContextMenu("Migrate UI Components")]
         public void MigrateUIComponents()
         {
-            uiTextAllLevels = UIWrapperHelpers.SetWrapperToText(textAllLevels, uiTextAllLevels);
+            uiTextAllLevels = MigrateUIHelpers.SetWrapperToText(textAllLevels, uiTextAllLevels);
             if (textLevels != null && textLevels.Length > 0)
             {
                 for (var i = 0; i < textLevels.Length; ++i)
                 {
                     var textLevel = textLevels[i];
-                    textLevel.uiText = UIWrapperHelpers.SetWrapperToText(textLevel.text, textLevel.uiText);
+                    textLevel.uiText = MigrateUIHelpers.SetWrapperToText(textLevel.text, textLevel.uiText);
                     textLevels[i] = textLevel;
                 }
             }

@@ -105,7 +105,7 @@ namespace MultiplayerARPG
         [ContextMenu("Migrate UI Components")]
         public void MigrateUIComponents()
         {
-            uiTextTitle = UIWrapperHelpers.SetWrapperToText(textTitle, uiTextTitle);
+            uiTextTitle = MigrateUIHelpers.SetWrapperToText(textTitle, uiTextTitle);
         }
     }
 }

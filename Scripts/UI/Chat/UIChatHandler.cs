@@ -187,7 +187,7 @@ namespace MultiplayerARPG
         [ContextMenu("Migrate UI Components")]
         public void MigrateUIComponents()
         {
-            uiEnterChatField = UIWrapperHelpers.SetWrapperToInputField(enterChatField, uiEnterChatField);
+            uiEnterChatField = MigrateUIHelpers.SetWrapperToInputField(enterChatField, uiEnterChatField);
         }
     }
 }

@@ -355,21 +355,21 @@ namespace MultiplayerARPG
         [ContextMenu("Migrate UI Components")]
         public void MigrateUIComponents()
         {
-            uiTextName = UIWrapperHelpers.SetWrapperToText(textName, uiTextName);
-            uiTextLevel = UIWrapperHelpers.SetWrapperToText(textLevel, uiTextLevel);
-            uiTextExp = UIWrapperHelpers.SetWrapperToText(textExp, uiTextExp);
-            uiTextHp = UIWrapperHelpers.SetWrapperToText(textHp, uiTextHp);
-            uiTextMp = UIWrapperHelpers.SetWrapperToText(textMp, uiTextMp);
-            uiTextStamina = UIWrapperHelpers.SetWrapperToText(textStamina, uiTextStamina);
-            uiTextFood = UIWrapperHelpers.SetWrapperToText(textFood, uiTextFood);
-            uiTextWater = UIWrapperHelpers.SetWrapperToText(textWater, uiTextWater);
-            uiTextStatPoint = UIWrapperHelpers.SetWrapperToText(textStatPoint, uiTextStatPoint);
-            uiTextSkillPoint = UIWrapperHelpers.SetWrapperToText(textSkillPoint, uiTextSkillPoint);
-            uiTextGold = UIWrapperHelpers.SetWrapperToText(textGold, uiTextGold);
-            uiTextWeightLimit = UIWrapperHelpers.SetWrapperToText(textWeightLimit, uiTextWeightLimit);
-            uiTextWeaponDamages = UIWrapperHelpers.SetWrapperToText(textWeaponDamages, uiTextWeaponDamages);
-            uiTextClassTitle = UIWrapperHelpers.SetWrapperToText(textClassTitle, uiTextClassTitle);
-            uiTextClassDescription = UIWrapperHelpers.SetWrapperToText(textClassDescription, uiTextClassDescription);
+            uiTextName = MigrateUIHelpers.SetWrapperToText(textName, uiTextName);
+            uiTextLevel = MigrateUIHelpers.SetWrapperToText(textLevel, uiTextLevel);
+            uiTextExp = MigrateUIHelpers.SetWrapperToText(textExp, uiTextExp);
+            uiTextHp = MigrateUIHelpers.SetWrapperToText(textHp, uiTextHp);
+            uiTextMp = MigrateUIHelpers.SetWrapperToText(textMp, uiTextMp);
+            uiTextStamina = MigrateUIHelpers.SetWrapperToText(textStamina, uiTextStamina);
+            uiTextFood = MigrateUIHelpers.SetWrapperToText(textFood, uiTextFood);
+            uiTextWater = MigrateUIHelpers.SetWrapperToText(textWater, uiTextWater);
+            uiTextStatPoint = MigrateUIHelpers.SetWrapperToText(textStatPoint, uiTextStatPoint);
+            uiTextSkillPoint = MigrateUIHelpers.SetWrapperToText(textSkillPoint, uiTextSkillPoint);
+            uiTextGold = MigrateUIHelpers.SetWrapperToText(textGold, uiTextGold);
+            uiTextWeightLimit = MigrateUIHelpers.SetWrapperToText(textWeightLimit, uiTextWeightLimit);
+            uiTextWeaponDamages = MigrateUIHelpers.SetWrapperToText(textWeaponDamages, uiTextWeaponDamages);
+            uiTextClassTitle = MigrateUIHelpers.SetWrapperToText(textClassTitle, uiTextClassTitle);
+            uiTextClassDescription = MigrateUIHelpers.SetWrapperToText(textClassDescription, uiTextClassDescription);
         }
     }
 }

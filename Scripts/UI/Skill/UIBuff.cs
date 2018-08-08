@@ -102,12 +102,12 @@ namespace MultiplayerARPG
         [ContextMenu("Migrate UI Components")]
         public void MigrateUIComponents()
         {
-            uiTextDuration = UIWrapperHelpers.SetWrapperToText(textDuration, uiTextDuration);
-            uiTextRecoveryHp = UIWrapperHelpers.SetWrapperToText(textRecoveryHp, uiTextRecoveryHp);
-            uiTextRecoveryMp = UIWrapperHelpers.SetWrapperToText(textRecoveryMp, uiTextRecoveryMp);
-            uiTextRecoveryStamina = UIWrapperHelpers.SetWrapperToText(textRecoveryStamina, uiTextRecoveryStamina);
-            uiTextRecoveryFood = UIWrapperHelpers.SetWrapperToText(textRecoveryFood, uiTextRecoveryFood);
-            uiTextRecoveryWater = UIWrapperHelpers.SetWrapperToText(textRecoveryWater, uiTextRecoveryWater);
+            uiTextDuration = MigrateUIHelpers.SetWrapperToText(textDuration, uiTextDuration);
+            uiTextRecoveryHp = MigrateUIHelpers.SetWrapperToText(textRecoveryHp, uiTextRecoveryHp);
+            uiTextRecoveryMp = MigrateUIHelpers.SetWrapperToText(textRecoveryMp, uiTextRecoveryMp);
+            uiTextRecoveryStamina = MigrateUIHelpers.SetWrapperToText(textRecoveryStamina, uiTextRecoveryStamina);
+            uiTextRecoveryFood = MigrateUIHelpers.SetWrapperToText(textRecoveryFood, uiTextRecoveryFood);
+            uiTextRecoveryWater = MigrateUIHelpers.SetWrapperToText(textRecoveryWater, uiTextRecoveryWater);
         }
     }
 }

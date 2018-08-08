@@ -179,7 +179,7 @@ namespace MultiplayerARPG
         [ContextMenu("Migrate UI Components")]
         public void MigrateUIComponents()
         {
-            uiTextCash = UIWrapperHelpers.SetWrapperToText(textCash, uiTextCash);
+            uiTextCash = MigrateUIHelpers.SetWrapperToText(textCash, uiTextCash);
         }
     }
 }

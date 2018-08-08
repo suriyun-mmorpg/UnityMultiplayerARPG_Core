@@ -47,7 +47,7 @@ namespace MultiplayerARPG
         [ContextMenu("Migrate UI Components")]
         public void MigrateUIComponents()
         {
-            uiTextRequireLevel = UIWrapperHelpers.SetWrapperToText(textRequireLevel, uiTextRequireLevel);
+            uiTextRequireLevel = MigrateUIHelpers.SetWrapperToText(textRequireLevel, uiTextRequireLevel);
         }
     }
 }
