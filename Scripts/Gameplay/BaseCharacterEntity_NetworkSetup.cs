@@ -61,13 +61,13 @@ namespace MultiplayerARPG
             nonEquipItems.onOperation += OnNonEquipItemsOperation;
             // Register Network functions
             RegisterNetFunction("Attack", new LiteNetLibFunction(NetFuncAttack));
-            RegisterNetFunction("UseSkill", new LiteNetLibFunction<NetFieldVector3, NetFieldPackedUInt>((position, skillIndex) => NetFuncUseSkill(position, (int)skillIndex.Value)));
-            RegisterNetFunction("UseItem", new LiteNetLibFunction<NetFieldPackedUInt>((itemIndex) => NetFuncUseItem((int)itemIndex.Value)));
+            RegisterNetFunction("UseSkill", new LiteNetLibFunction<NetFieldVector3, NetFieldInt>((position, skillIndex) => NetFuncUseSkill(position, skillIndex)));
+            RegisterNetFunction("UseItem", new LiteNetLibFunction<NetFieldInt>((itemIndex) => NetFuncUseItem(itemIndex)));
             RegisterNetFunction("PlayActionAnimation", new LiteNetLibFunction<NetFieldInt, NetFieldByte>((actionId, animActionType) => NetFuncPlayActionAnimation(actionId, (AnimActionType)animActionType.Value)));
             RegisterNetFunction("PlayEffect", new LiteNetLibFunction<NetFieldInt>((effectId) => NetFuncPlayEffect(effectId)));
             RegisterNetFunction("PickupItem", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncPickupItem(objectId)));
-            RegisterNetFunction("DropItem", new LiteNetLibFunction<NetFieldPackedUInt, NetFieldShort>((index, amount) => NetFuncDropItem((int)index.Value, amount)));
-            RegisterNetFunction("EquipItem", new LiteNetLibFunction<NetFieldPackedUInt, NetFieldString>((nonEquipIndex, equipPosition) => NetFuncEquipItem((int)nonEquipIndex.Value, equipPosition)));
+            RegisterNetFunction("DropItem", new LiteNetLibFunction<NetFieldInt, NetFieldShort>((index, amount) => NetFuncDropItem(index, amount)));
+            RegisterNetFunction("EquipItem", new LiteNetLibFunction<NetFieldInt, NetFieldString>((nonEquipIndex, equipPosition) => NetFuncEquipItem(nonEquipIndex, equipPosition)));
             RegisterNetFunction("UnEquipItem", new LiteNetLibFunction<NetFieldString>((fromEquipPosition) => NetFuncUnEquipItem(fromEquipPosition)));
             RegisterNetFunction("OnDead", new LiteNetLibFunction(NetFuncOnDead));
             RegisterNetFunction("OnRespawn", new LiteNetLibFunction(NetFuncOnRespawn));
