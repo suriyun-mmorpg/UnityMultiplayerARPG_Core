@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Profiling;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -130,6 +131,7 @@ namespace MultiplayerARPG
         {
             MigrateUIComponents();
 
+            Profiler.BeginSample("UICharacter - Update UI");
             if (uiTextName != null)
                 uiTextName.text = string.Format(nameFormat, Data == null ? "Unknow" : Data.CharacterName);
 
@@ -242,6 +244,8 @@ namespace MultiplayerARPG
 
             if (uiTextGold != null)
                 uiTextGold.text = string.Format(goldFormat, playerCharacter == null ? "N/A" : playerCharacter.Gold.ToString("N0"));
+
+            Profiler.EndSample();
         }
 
         protected override void UpdateData()

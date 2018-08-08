@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Profiling;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -125,15 +126,14 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            var anotherCharacter = Data;
-
+            Profiler.BeginSample("UIDealing - Update UI");
             // In case that another character is exit or move so far hide the dialog
-            if (anotherCharacter == null)
+            if (Data == null)
             {
                 Hide();
                 return;
             }
+            Profiler.EndSample();
         }
 
         protected override void UpdateData()

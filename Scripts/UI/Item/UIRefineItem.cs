@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -31,6 +32,7 @@ namespace MultiplayerARPG
         {
             MigrateUIComponents();
 
+            Profiler.BeginSample("UIRefineItem - Update UI");
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             CharacterItem characterItem = null;
             Item equipmentItem = null;
@@ -88,6 +90,7 @@ namespace MultiplayerARPG
                 else
                     uiTextRefiningLevel.text = string.Format(refiningLevelFormat, level.ToString("N0"));
             }
+            Profiler.EndSample();
         }
 
         public override void Hide()

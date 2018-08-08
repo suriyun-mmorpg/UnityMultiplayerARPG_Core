@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Profiling;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -108,12 +109,14 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
+            Profiler.BeginSample("UICharacterItem - Update UI");
             if (!IsOwningCharacter() || !IsVisible())
                 return;
 
             UpdateShopUIVisibility(false);
             UpdateRefineUIVisibility(false);
             UpdateDealingState(false);
+            Profiler.EndSample();
         }
 
         protected override void UpdateData()

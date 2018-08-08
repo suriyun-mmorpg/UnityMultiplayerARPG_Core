@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -8,6 +9,8 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(Canvas))]
     public class UICharacterEntity : UISelectionEntry<BaseCharacterEntity>
     {
+        public bool placeAsChild;
+        public float placeAsChildScale = 1f;
         [Tooltip("Visible when hit duration for non owning character")]
         public float visibleWhenHitDuration = 2f;
         public float visibleDistance = 30f;
@@ -36,9 +39,9 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            base.UpdateUI();
             MigrateUIComponents();
 
+            Profiler.BeginSample("UICharacterEntity - Update UI");
             if (Data == null || BasePlayerCharacterController.OwningCharacter == null)
             {
                 CacheCanvas.enabled = false;
@@ -75,6 +78,7 @@ namespace MultiplayerARPG
                         uiCharacter.Hide();
                 }
             }
+            Profiler.EndSample();
         }
 
         protected override void UpdateData()
@@ -99,6 +103,13 @@ namespace MultiplayerARPG
                 if (Data != null)
                     rootFollower.TargetObject = Data.UIElementTransform;
                 rootFollower.gameObject.SetActive(Data != null);
+            }
+
+            if (placeAsChild)
+            {
+                transform.parent = Data.UIElementTransform;
+                transform.localPosition = Vector3.zero;
+                transform.localScale = Vector3.one * placeAsChildScale;
             }
         }
 

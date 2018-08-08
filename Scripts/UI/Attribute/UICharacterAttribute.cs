@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Profiling;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -29,12 +30,13 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
+            Profiler.BeginSample("UICharacterAttribute - Update UI");
             var characterAttribute = Data.characterAttribute;
-
             if (IsOwningCharacter() && characterAttribute.CanIncrease(BasePlayerCharacterController.OwningCharacter))
                 onAbleToIncrease.Invoke();
             else
                 onUnableToIncrease.Invoke();
+            Profiler.EndSample();
         }
 
         protected override void UpdateData()

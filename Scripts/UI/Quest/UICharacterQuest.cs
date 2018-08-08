@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Profiling;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -76,8 +77,8 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            var characterQuest = Data;
-            var quest = !characterQuest.IsEmpty() ? characterQuest.GetQuest() : null;
+            Profiler.BeginSample("UICharacterQuest - Update UI");
+            var quest = !Data.IsEmpty() ? Data.GetQuest() : null;
 
             if (quest != null && showQuestTaskList)
             {
@@ -85,11 +86,12 @@ namespace MultiplayerARPG
                 {
                     var uiQuestTask = ui.GetComponent<UIQuestTask>();
                     var isComplete = false;
-                    var progress = characterQuest.GetProgress(character, index, out isComplete);
+                    var progress = Data.GetProgress(character, index, out isComplete);
                     uiQuestTask.Data = new QuestTaskProgressTuple(task, progress);
                     uiQuestTask.Show();
                 });
             }
+            Profiler.EndSample();
         }
 
         protected override void UpdateData()
