@@ -152,10 +152,10 @@ namespace MultiplayerARPG
 
         protected virtual void UpdateInput()
         {
-            var fields = FindObjectsOfType<InputField>();
+            var fields = ComponentCollector.Get(typeof(InputFieldWrapper));
             foreach (var field in fields)
             {
-                if (field.isFocused)
+                if (((InputFieldWrapper)field).isFocused)
                 {
                     destination = null;
                     PlayerCharacterEntity.StopMove();

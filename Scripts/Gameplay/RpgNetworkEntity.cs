@@ -83,18 +83,12 @@ namespace MultiplayerARPG
             if (textTitle != null)
                 textTitle.text = Title;
             EntityLateUpdate();
-            Profiler.BeginSample("RpgNetworkEntity - DevExLateUpdate");
-            this.InvokeInstanceDevExtMethods("LateUpdate");
-            Profiler.EndSample();
         }
         protected virtual void EntityLateUpdate() { }
         
         private void FixedUpdate()
         {
             EntityFixedUpdate();
-            Profiler.BeginSample("RpgNetworkEntity - DevExFixedUpdate");
-            this.InvokeInstanceDevExtMethods("FixedUpdate");
-            Profiler.EndSample();
         }
         protected virtual void EntityFixedUpdate() { }
 
