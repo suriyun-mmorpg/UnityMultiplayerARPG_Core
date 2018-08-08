@@ -53,11 +53,6 @@ public class UIFollowWorldPosition : MonoBehaviour
         }
     }
 
-    private void Awake()
-    {
-        followJobTransforms = new TransformAccessArray(new Transform[] { CacheTransform });
-    }
-
     private void Start()
     {
         CacheTransform.position = RectTransformUtility.WorldToScreenPoint(CacheTargetCamera, targetPosition);
@@ -65,6 +60,7 @@ public class UIFollowWorldPosition : MonoBehaviour
 
     private void OnEnable()
     {
+        followJobTransforms = new TransformAccessArray(new Transform[] { CacheTransform });
         CacheTransform.position = RectTransformUtility.WorldToScreenPoint(CacheTargetCamera, targetPosition);
     }
 
