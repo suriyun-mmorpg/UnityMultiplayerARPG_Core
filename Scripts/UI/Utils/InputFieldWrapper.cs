@@ -102,4 +102,17 @@ public class InputFieldWrapper : MonoBehaviour
         if (textMeshInputField != null) textMeshInputField.ActivateInputField();
 #endif
     }
+
+    public bool isFocused
+    {
+        get
+        {
+            var result = false;
+            if (unityInputField != null) result = unityInputField.isFocused;
+#if USE_TEXT_MESH_PRO
+        if (textMeshInputField != null) result = result || textMeshInputField.isFocused;
+#endif
+            return result;
+        }
+    }
 }
