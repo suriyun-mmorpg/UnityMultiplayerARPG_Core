@@ -19,7 +19,7 @@ namespace MultiplayerARPG
             RegisterNetFunction("PointClickMovement", new LiteNetLibFunction<NetFieldVector3>((position) => NetFuncPointClickMovement(position)));
             RegisterNetFunction("KeyMovement", new LiteNetLibFunction<NetFieldVector3, NetFieldBool>((position, isJump) => NetFuncKeyMovement(position, isJump)));
             RegisterNetFunction("StopMove", new LiteNetLibFunction(StopMove));
-            RegisterNetFunction("SetTargetEntity", new LiteNetLibFunction<NetFieldUInt>((objectId) => NetFuncSetTargetEntity(objectId)));
+            RegisterNetFunction("SetTargetEntity", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncSetTargetEntity(objectId)));
         }
 
         protected void NetFuncPointClickMovement(Vector3 position)
