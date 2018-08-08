@@ -4,6 +4,7 @@ using LiteNetLibManager;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using System.Collections.Generic;
+using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
 {
@@ -54,6 +55,7 @@ namespace MultiplayerARPG
             base.Update();
             if (Time.unscaledTime - lastSaveTime > autoSaveDuration)
             {
+                Profiler.BeginSample("LanRpgNetworkManager - Save Data");
                 var owningCharacter = BasePlayerCharacterController.OwningCharacter;
                 if (owningCharacter != null && IsNetworkActive)
                 {
@@ -61,6 +63,7 @@ namespace MultiplayerARPG
                     if (IsServer)
                         SaveWorld();
                 }
+                Profiler.EndSample();
                 lastSaveTime = Time.unscaledTime;
             }
         }
