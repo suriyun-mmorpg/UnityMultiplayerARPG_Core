@@ -132,7 +132,7 @@ namespace MultiplayerARPG
         public void OnInitializeFailed(InitializationFailureReason error)
         {
             // Purchasing set-up has not succeeded. Check error for reason. Consider sharing this reason with the user.
-            var errorMessage = "[" + TAG_INIT + "]: Fail. InitializationFailureReason:" + error;
+            var errorMessage = "[" + TAG_INIT + "]: Fail. InitializationFailureReason: " + error;
             Debug.LogError(errorMessage);
         }
 
