@@ -17,7 +17,6 @@ namespace MultiplayerARPG
         // -- Subscription product is product such as weekly/monthly promotion
         public const string TAG_INIT = "IAP_INIT";
         public const string TAG_PURCHASE = "IAP_PURCHASE";
-        public const string TAG_RESTORE = "IAP_RESTORE";
 
 #if UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
         public static IStoreController StoreController { get; private set; }
@@ -208,6 +207,36 @@ namespace MultiplayerARPG
 #endif
         #endregion
 
+        #region IAP Actions
+        public void Purchase(string productId)
+        {
+#if UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+            // If Purchasing has not yet been set up ...
+            if (!IsPurchasingInitialized())
+            {
+                // ... report the situation and stop restoring. Consider either waiting longer, or retrying initialization.
+                var errorMessage = "[" + TAG_PURCHASE + "]: FAIL. Not initialized.";
+                PurchaseResult(false, errorMessage);
+                return;
+            }
+
+            var product = StoreController.products.WithID(productId);
+            if (product != null && product.availableToPurchase)
+            {
+                Debug.Log(string.Format("[" + TAG_PURCHASE + "] Purchasing product asychronously: '{0}'", product.definition.id));
+                StoreController.InitiatePurchase(product);
+            }
+            else
+            {
+                var errorMessage = "[" + TAG_PURCHASE + "]: FAIL. Not purchasing product, either is not found or is not available for purchase.";
+                PurchaseResult(false, errorMessage);
+            }
+#else
+            Debug.LogWarning("Cannot purchase product, Unity Purchasing is not enabled.");
+#endif
+        }
+        #endregion
+
         #region Callback Events
         private static void PurchaseResult(bool success, string errorMessage = "")
         {
@@ -217,17 +246,6 @@ namespace MultiplayerARPG
             {
                 PurchaseCallback(success, errorMessage);
                 PurchaseCallback = null;
-            }
-        }
-
-        private static void RestoreResult(bool success, string errorMessage = "")
-        {
-            if (!success)
-                Debug.LogError(errorMessage);
-            if (RestoreCallback != null)
-            {
-                RestoreCallback(success, errorMessage);
-                RestoreCallback = null;
             }
         }
         #endregion

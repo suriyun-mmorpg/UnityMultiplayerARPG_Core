@@ -81,7 +81,7 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public string GetPriceText()
+        public string GetSellPrice()
         {
 #if UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
             if (ProductCatalogItem == null || Metadata == null)

@@ -45,4 +45,10 @@ namespace MultiplayerARPG
 
     [System.Serializable]
     public class UICashShopItemEvent : UnityEvent<UICashShopItem> { }
+
+    [System.Serializable]
+    public class CashPackageEvent : UnityEvent<CashPackage> { }
+
+    [System.Serializable]
+    public class UICashPackageEvent : UnityEvent<UICashPackage> { }
 }
