@@ -325,14 +325,14 @@ namespace MultiplayerARPG
             if (npcDatabase != null)
                 AddMapNpcs(npcDatabase.maps);
 
-            if (!doNotLoadHomeSceneOnLoadedGameData)
-                StartCoroutine(LoadHomeSceneOnLoadedGameDataRoutine());
+            StartCoroutine(LoadHomeSceneOnLoadedGameDataRoutine());
         }
 
         IEnumerator LoadHomeSceneOnLoadedGameDataRoutine()
         {
-            yield return null;
-            UISceneLoading.Singleton.LoadScene(homeScene);
+            yield return new WaitForEndOfFrame();
+            if (!doNotLoadHomeSceneOnLoadedGameData)
+                UISceneLoading.Singleton.LoadScene(homeScene);
         }
 
         public List<string> GetGameScenes()
