@@ -11,7 +11,7 @@ namespace MultiplayerARPG
         public string description;
         public Sprite icon;
 
-        public string Id { get { return name; } }
+        public virtual string Id { get { return name; } }
         public int DataId { get { return Id.GenerateHashId(); } }
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
     }
