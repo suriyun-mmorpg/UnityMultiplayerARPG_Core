@@ -15,14 +15,7 @@ namespace MultiplayerARPG
                 return false;
 
             var isPass = true;
-            var attributeAmountsDict = new Dictionary<Attribute, short>();
-            var attributeAmounts = character.Attributes;
-            foreach (var attributeAmount in attributeAmounts)
-            {
-                if (attributeAmount.GetAttribute() == null)
-                    continue;
-                attributeAmountsDict[attributeAmount.GetAttribute()] = attributeAmount.amount;
-            }
+            var attributeAmountsDict = character.GetAttributes(true, false);
             var requireAttributeAmounts = equipmentItem.CacheRequireAttributeAmounts;
             foreach (var requireAttributeAmount in requireAttributeAmounts)
             {
