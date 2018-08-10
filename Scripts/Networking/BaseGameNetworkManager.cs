@@ -14,6 +14,8 @@ namespace MultiplayerARPG
             public const short Chat = 101;
             public const short CashShopInfo = 102;
             public const short CashShopBuy = 103;
+            public const short CashPackageInfo = 104;
+            public const short CashPackageBuyValidation = 105;
         }
         
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
@@ -32,6 +34,8 @@ namespace MultiplayerARPG
             RegisterClientMessage(MsgTypes.Chat, HandleChatAtClient);
             RegisterClientMessage(MsgTypes.CashShopInfo, HandleResponseCashShopInfo);
             RegisterClientMessage(MsgTypes.CashShopBuy, HandleResponseCashShopBuy);
+            RegisterClientMessage(MsgTypes.CashPackageInfo, HandleResponseCashPackageInfo);
+            RegisterClientMessage(MsgTypes.CashPackageBuyValidation, HandleResponseCashPackageBuyValidation);
         }
 
         protected override void RegisterServerMessages()
@@ -41,6 +45,8 @@ namespace MultiplayerARPG
             RegisterServerMessage(MsgTypes.Chat, HandleChatAtServer);
             RegisterServerMessage(MsgTypes.CashShopInfo, HandleRequestCashShopInfo);
             RegisterServerMessage(MsgTypes.CashShopBuy, HandleRequestCashShopBuy);
+            RegisterServerMessage(MsgTypes.CashPackageInfo, HandleRequestCashPackageInfo);
+            RegisterServerMessage(MsgTypes.CashPackageBuyValidation, HandleRequestCashPackageBuyValidation);
         }
 
         public uint RequestCashShopInfo(AckMessageCallback callback)
@@ -49,11 +55,25 @@ namespace MultiplayerARPG
             return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MsgTypes.CashShopInfo, message, callback);
         }
 
+        public uint RequestCashPackageInfo(AckMessageCallback callback)
+        {
+            var message = new BaseAckMessage();
+            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MsgTypes.CashPackageInfo, message, callback);
+        }
+
         public uint RequestCashShopBuy(int dataId, AckMessageCallback callback)
         {
             var message = new RequestCashShopBuyMessage();
             message.dataId = dataId;
             return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MsgTypes.CashShopBuy, message, callback);
+        }
+
+        public uint RequestCashPackageBuyValidation(int dataId, AckMessageCallback callback)
+        {
+            var message = new RequestCashPackageBuyValidationMessage();
+            message.dataId = dataId;
+            message.platform = Application.platform;
+            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MsgTypes.CashPackageBuyValidation, message, callback);
         }
 
         protected virtual void HandleWarpAtClient(LiteNetLibMessageHandler messageHandler)
@@ -82,6 +102,24 @@ namespace MultiplayerARPG
             var peerHandler = messageHandler.peerHandler;
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<ResponseCashShopBuyMessage>();
+            var ackId = message.ackId;
+            peerHandler.TriggerAck(ackId, message.responseCode, message);
+        }
+
+        protected virtual void HandleResponseCashPackageInfo(LiteNetLibMessageHandler messageHandler)
+        {
+            var peerHandler = messageHandler.peerHandler;
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<ResponseCashShopBuyMessage>();
+            var ackId = message.ackId;
+            peerHandler.TriggerAck(ackId, message.responseCode, message);
+        }
+
+        protected virtual void HandleResponseCashPackageBuyValidation(LiteNetLibMessageHandler messageHandler)
+        {
+            var peerHandler = messageHandler.peerHandler;
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<ResponseCashPackageBuyValidationMessage>();
             var ackId = message.ackId;
             peerHandler.TriggerAck(ackId, message.responseCode, message);
         }
@@ -144,6 +182,31 @@ namespace MultiplayerARPG
             responseMessage.responseCode = error == ResponseCashShopBuyMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
             LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.CashShopBuy, responseMessage);
+        }
+
+        protected virtual void HandleRequestCashPackageInfo(LiteNetLibMessageHandler messageHandler)
+        {
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<BaseAckMessage>();
+            var error = ResponseCashPackageInfoMessage.Error.NotAvailable;
+            var responseMessage = new ResponseCashPackageInfoMessage();
+            responseMessage.ackId = message.ackId;
+            responseMessage.responseCode = error == ResponseCashPackageInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
+            responseMessage.error = error;
+            responseMessage.cashPackageIds = new int[0];
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.CashPackageInfo, responseMessage);
+        }
+
+        protected virtual void HandleRequestCashPackageBuyValidation(LiteNetLibMessageHandler messageHandler)
+        {
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<RequestCashPackageBuyValidationMessage>();
+            var error = ResponseCashPackageBuyValidationMessage.Error.NotAvailable;
+            var responseMessage = new ResponseCashPackageBuyValidationMessage();
+            responseMessage.ackId = message.ackId;
+            responseMessage.responseCode = error == ResponseCashPackageBuyValidationMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
+            responseMessage.error = error;
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.CashPackageBuyValidation, responseMessage);
         }
 
         public override bool StartServer()

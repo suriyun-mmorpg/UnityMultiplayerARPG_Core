@@ -5,17 +5,15 @@ using UnityEngine.Purchasing;
 
 namespace MultiplayerARPG
 {
-    [System.Serializable]
-    public struct CashPackage
+    [CreateAssetMenu(fileName = "CashPackage", menuName = "Create CashShop/CashPackage")]
+    public class CashPackage : BaseGameData
     {
         [HideInInspector]
-        public string id;
-        public Sprite icon;
+        public string productId;
         public string externalIconUrl;
         public int cashAmount;
 
-        public string Id { get { return id; } }
-        public int DataId { get { return Id.GenerateHashId(); } }
+        public override string Id { get { return productId; } }
 
 #if UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
         public ProductCatalogItem ProductCatalogItem
@@ -25,7 +23,7 @@ namespace MultiplayerARPG
                 var catalog = ProductCatalog.LoadDefaultCatalog();
                 foreach (var item in catalog.allProducts)
                 {
-                    if (item.id.Equals(id))
+                    if (item.id.Equals(productId))
                         return item;
                 }
                 return null;
@@ -38,7 +36,7 @@ namespace MultiplayerARPG
             {
                 if (GameInstance.StoreController == null || GameInstance.StoreController.products == null)
                     return null;
-                return GameInstance.StoreController.products.WithID(id);
+                return GameInstance.StoreController.products.WithID(productId);
             }
         }
 

@@ -55,10 +55,6 @@ namespace MultiplayerARPG
         [Tooltip("You can add NPCs here or may add NPCs in the scene directly, so you can leave this empty")]
         public NpcDatabase npcDatabase;
 
-        [Header("Purchasing")]
-        [Tooltip("You can add cash packages / cash shop item here")]
-        public CashShopDatabase cashShopDatabase;
-
         [Header("Gameplay Configs")]
         public UnityTag playerTag;
         public UnityTag monsterTag;
@@ -105,8 +101,6 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, Skill> Skills = new Dictionary<int, Skill>();
         public static readonly Dictionary<int, NpcDialog> NpcDialogs = new Dictionary<int, NpcDialog>();
         public static readonly Dictionary<int, Quest> Quests = new Dictionary<int, Quest>();
-        public static readonly Dictionary<int, CashShopItem> CashShopItems = new Dictionary<int, CashShopItem>();
-        public static readonly Dictionary<int, CashPackage> CashPackages = new Dictionary<int, CashPackage>();
         public static readonly Dictionary<int, BaseDamageEntity> DamageEntities = new Dictionary<int, BaseDamageEntity>();
         public static readonly Dictionary<int, BuildingEntity> BuildingEntities = new Dictionary<int, BuildingEntity>();
         public static readonly Dictionary<int, BasePlayerCharacterEntity> PlayerCharacterEntities = new Dictionary<int, BasePlayerCharacterEntity>();
@@ -254,8 +248,6 @@ namespace MultiplayerARPG
             Skills.Clear();
             NpcDialogs.Clear();
             Quests.Clear();
-            CashShopItems.Clear();
-            CashPackages.Clear();
             DamageEntities.Clear();
             BuildingEntities.Clear();
             PlayerCharacterEntities.Clear();
@@ -347,11 +339,7 @@ namespace MultiplayerARPG
             if (npcDatabase != null)
                 AddMapNpcs(npcDatabase.maps);
 
-            if (cashShopDatabase != null)
-            {
-                AddCashShopItems(cashShopDatabase.cashStopItems);
-                AddCashPackages(cashShopDatabase.cashPackages);
-            }
+            InitializePurchasing();
 
             StartCoroutine(LoadHomeSceneOnLoadedGameDataRoutine());
         }
@@ -544,30 +532,6 @@ namespace MultiplayerARPG
                 if (quest == null || Quests.ContainsKey(quest.DataId))
                     continue;
                 Quests[quest.DataId] = quest;
-            }
-        }
-
-        public static void AddCashShopItems(IEnumerable<CashShopItem> cashShopItems)
-        {
-            if (cashShopItems == null)
-                return;
-            foreach (var cashShopItem in cashShopItems)
-            {
-                if (string.IsNullOrEmpty(cashShopItem.Id) || CashShopItems.ContainsKey(cashShopItem.DataId))
-                    continue;
-                CashShopItems[cashShopItem.DataId] = cashShopItem;
-            }
-        }
-
-        public static void AddCashPackages(IEnumerable<CashPackage> cashPackages)
-        {
-            if (cashPackages == null)
-                return;
-            foreach (var cashPackage in cashPackages)
-            {
-                if (string.IsNullOrEmpty(cashPackage.Id) || CashPackages.ContainsKey(cashPackage.DataId))
-                    continue;
-                CashPackages[cashPackage.DataId] = cashPackage;
             }
         }
 
