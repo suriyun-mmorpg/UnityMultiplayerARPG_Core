@@ -71,7 +71,7 @@ namespace MultiplayerARPG
 
             if (placeAsChild)
             {
-                transform.parent = Data.UIElementTransform;
+                transform.SetParent(Data.UIElementTransform);
                 transform.localPosition = Vector3.zero;
                 transform.localScale = Vector3.one * placeAsChildScale;
             }
