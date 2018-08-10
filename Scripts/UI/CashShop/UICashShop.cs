@@ -81,7 +81,7 @@ namespace MultiplayerARPG
 
         protected void OnSelectCashShopItem(UICashShopItem ui)
         {
-            if (uiCashShopItemDialog != null)
+            if (uiCashShopItemDialog != null && ui.Data != null)
             {
                 uiCashShopItemDialog.selectionManager = SelectionManager;
                 uiCashShopItemDialog.Data = ui.Data;
