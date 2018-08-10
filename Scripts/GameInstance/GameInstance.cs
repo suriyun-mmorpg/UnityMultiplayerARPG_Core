@@ -1,16 +1,24 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+using UnityEngine.Purchasing;
+#endif
 
 namespace MultiplayerARPG
 {
+#if UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+    public partial class GameInstance : MonoBehaviour, IStoreListener
+#else
     public partial class GameInstance : MonoBehaviour
+#endif
     {
         public static GameInstance Singleton { get; protected set; }
         [SerializeField]
         private BaseGameplayRule gameplayRule;
         [SerializeField]
         private NetworkSetting networkSetting;
+
         [Header("Gameplay Objects")]
         public ItemDropEntity itemDropEntityPrefab;
         public WarpPortalEntity warpPortalEntityPrefab;
@@ -46,6 +54,11 @@ namespace MultiplayerARPG
         public WarpPortalDatabase warpPortalDatabase;
         [Tooltip("You can add NPCs here or may add NPCs in the scene directly, so you can leave this empty")]
         public NpcDatabase npcDatabase;
+
+        [Header("Purchasing")]
+        [Tooltip("You can add cash packages / cash shop item here")]
+        public CashShopDatabase cashShopDatabase;
+
         [Header("Gameplay Configs")]
         public UnityTag playerTag;
         public UnityTag monsterTag;
@@ -63,20 +76,27 @@ namespace MultiplayerARPG
         public float dropDistance = 1f;
         public float conversationDistance = 1f;
         public float buildDistance = 10f;
+
         [Header("Game Effects")]
         public GameEffect levelUpEffect;
+
         [Header("New Character")]
         public int startGold = 0;
         public ItemAmount[] startItems;
+
         [Header("Scene/Maps")]
         public UnityScene homeScene;
+
         [Header("Player Configs")]
         public int minCharacterNameLength = 2;
         public int maxCharacterNameLength = 16;
+
         [Header("Other Settings")]
         public bool doNotLoadHomeSceneOnLoadedGameData;
+
         [Header("Playing In Editor")]
         public bool useMobileInEditor;
+
         public static readonly Dictionary<int, Attribute> Attributes = new Dictionary<int, Attribute>();
         public static readonly Dictionary<int, Item> Items = new Dictionary<int, Item>();
         public static readonly Dictionary<int, BaseCharacter> AllCharacters = new Dictionary<int, BaseCharacter>();
@@ -86,6 +106,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, NpcDialog> NpcDialogs = new Dictionary<int, NpcDialog>();
         public static readonly Dictionary<int, Quest> Quests = new Dictionary<int, Quest>();
         public static readonly Dictionary<int, CashShopItem> CashShopItems = new Dictionary<int, CashShopItem>();
+        public static readonly Dictionary<int, CashPackage> CashPackages = new Dictionary<int, CashPackage>();
         public static readonly Dictionary<int, BaseDamageEntity> DamageEntities = new Dictionary<int, BaseDamageEntity>();
         public static readonly Dictionary<int, BuildingEntity> BuildingEntities = new Dictionary<int, BuildingEntity>();
         public static readonly Dictionary<int, BasePlayerCharacterEntity> PlayerCharacterEntities = new Dictionary<int, BasePlayerCharacterEntity>();
@@ -234,6 +255,7 @@ namespace MultiplayerARPG
             NpcDialogs.Clear();
             Quests.Clear();
             CashShopItems.Clear();
+            CashPackages.Clear();
             DamageEntities.Clear();
             BuildingEntities.Clear();
             PlayerCharacterEntities.Clear();
@@ -324,6 +346,12 @@ namespace MultiplayerARPG
 
             if (npcDatabase != null)
                 AddMapNpcs(npcDatabase.maps);
+
+            if (cashShopDatabase != null)
+            {
+                AddCashShopItems(cashShopDatabase.cashStopItems);
+                AddCashPackages(cashShopDatabase.cashPackages);
+            }
 
             StartCoroutine(LoadHomeSceneOnLoadedGameDataRoutine());
         }
@@ -525,9 +553,21 @@ namespace MultiplayerARPG
                 return;
             foreach (var cashShopItem in cashShopItems)
             {
-                if (cashShopItem == null || CashShopItems.ContainsKey(cashShopItem.DataId))
+                if (string.IsNullOrEmpty(cashShopItem.Id) || CashShopItems.ContainsKey(cashShopItem.DataId))
                     continue;
                 CashShopItems[cashShopItem.DataId] = cashShopItem;
+            }
+        }
+
+        public static void AddCashPackages(IEnumerable<CashPackage> cashPackages)
+        {
+            if (cashPackages == null)
+                return;
+            foreach (var cashPackage in cashPackages)
+            {
+                if (string.IsNullOrEmpty(cashPackage.Id) || CashPackages.ContainsKey(cashPackage.DataId))
+                    continue;
+                CashPackages[cashPackage.DataId] = cashPackage;
             }
         }
 

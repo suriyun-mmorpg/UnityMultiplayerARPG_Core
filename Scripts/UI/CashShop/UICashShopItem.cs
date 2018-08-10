@@ -31,27 +31,27 @@ namespace MultiplayerARPG
             MigrateUIComponents();
 
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(titleFormat, Data == null ? "Unknow" : Data.title);
+                uiTextTitle.text = string.Format(titleFormat, Data.title);
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(descriptionFormat, Data == null ? "N/A" : Data.description);
+                uiTextDescription.text = string.Format(descriptionFormat, Data.description);
             
             if (imageIcon != null)
             {
-                var iconSprite = Data == null ? null : Data.icon;
+                var iconSprite = Data.icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
             }
 
             if (rawImageExternalIcon != null)
             {
-                rawImageExternalIcon.gameObject.SetActive(Data != null && !string.IsNullOrEmpty(Data.externalIconUrl));
-                if (Data != null && !string.IsNullOrEmpty(Data.externalIconUrl))
+                rawImageExternalIcon.gameObject.SetActive(!string.IsNullOrEmpty(Data.externalIconUrl));
+                if (!string.IsNullOrEmpty(Data.externalIconUrl))
                     StartCoroutine(LoadExternalIcon());
             }
 
             if (uiTextSellPrice != null)
-                uiTextSellPrice.text = string.Format(sellPriceFormat, Data == null ? "0" : Data.sellPrice.ToString("N0"));
+                uiTextSellPrice.text = string.Format(sellPriceFormat, Data.sellPrice.ToString("N0"));
         }
 
         IEnumerator LoadExternalIcon()
