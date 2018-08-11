@@ -15,7 +15,6 @@ namespace MultiplayerARPG
         public UICashShopItem uiCashShopItemDialog;
         public UICashShopItem uiCashShopItemPrefab;
         public Transform uiCashShopItemContainer;
-        public Text textCash;
         public TextWrapper uiTextCash;
 
         private UIList cacheList;
@@ -131,6 +130,7 @@ namespace MultiplayerARPG
                     CacheList.Generate(cashShopItems, (index, cashShopItem, ui) =>
                     {
                         var uiCashShopItem = ui.GetComponent<UICashShopItem>();
+                        uiCashShopItem.uiCashShop = this;
                         uiCashShopItem.Data = cashShopItem;
                         uiCashShopItem.Show();
                         SelectionManager.Add(uiCashShopItem);
@@ -143,7 +143,6 @@ namespace MultiplayerARPG
 
         private void ResponseCashShopBuy(AckResponseCode responseCode, BaseAckMessage message)
         {
-            MigrateUIComponents();
             var castedMessage = (ResponseCashShopBuyMessage)message;
             switch (responseCode)
             {
@@ -174,12 +173,6 @@ namespace MultiplayerARPG
                     RefreshCashShopInfo();
                     break;
             }
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextCash = MigrateUIHelpers.SetWrapperToText(textCash, uiTextCash);
         }
     }
 }

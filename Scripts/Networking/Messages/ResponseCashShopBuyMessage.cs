@@ -18,15 +18,18 @@ namespace MultiplayerARPG
             NotEnoughCash,
         }
         public Error error;
+        public int cash;
 
         public override void DeserializeData(NetDataReader reader)
         {
             error = (Error)reader.GetByte();
+            cash = reader.GetInt();
         }
 
         public override void SerializeData(NetDataWriter writer)
         {
             writer.Put((byte)error);
+            writer.Put(cash);
         }
     }
 }

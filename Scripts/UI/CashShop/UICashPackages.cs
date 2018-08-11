@@ -10,9 +10,12 @@ namespace MultiplayerARPG
     public class UICashPackages : UIBase
     {
         [Header("Generic Info Format")]
+        [Tooltip("Cash Format => {0} = {Cash amount}")]
+        public string cashFormat = "{0}";
         public UICashPackage uiCashPackageDialog;
         public UICashPackage uiCashPackagePrefab;
         public Transform uiCashPackageContainer;
+        public TextWrapper uiTextCash;
 
         private UIList cacheList;
         public UIList CacheList
@@ -106,6 +109,7 @@ namespace MultiplayerARPG
                 UISceneGlobal.Singleton.ShowMessageDialog("Error", errorMessage);
                 return;
             }
+            RefreshCashPackageInfo();
         }
 
         private void ResponseCashPackageInfo(AckResponseCode responseCode, BaseAckMessage message)
@@ -120,12 +124,16 @@ namespace MultiplayerARPG
                     UISceneGlobal.Singleton.ShowMessageDialog("Error", "Connection timeout");
                     break;
                 default:
+                    if (uiTextCash != null)
+                        uiTextCash.text = string.Format(cashFormat, castedMessage.cash.ToString("N0"));
                     var cashPackages = new List<CashPackage>();
                     foreach (var cashPackageId in castedMessage.cashPackageIds)
                     {
                         CashPackage cashPackage;
                         if (GameInstance.CashPackages.TryGetValue(cashPackageId, out cashPackage))
+                        {
                             cashPackages.Add(cashPackage);
+                        }
                     }
 
                     var selectedIdx = SelectionManager.SelectedUI != null ? SelectionManager.IndexOf(SelectionManager.SelectedUI) : -1;
@@ -135,6 +143,7 @@ namespace MultiplayerARPG
                     CacheList.Generate(cashPackages, (index, cashShopItem, ui) =>
                     {
                         var uiCashPackage = ui.GetComponent<UICashPackage>();
+                        uiCashPackage.uiCashPackages = this;
                         uiCashPackage.Data = cashShopItem;
                         uiCashPackage.Show();
                         SelectionManager.Add(uiCashPackage);

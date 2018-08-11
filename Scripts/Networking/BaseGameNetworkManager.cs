@@ -110,7 +110,7 @@ namespace MultiplayerARPG
         {
             var peerHandler = messageHandler.peerHandler;
             var peer = messageHandler.peer;
-            var message = messageHandler.ReadMessage<ResponseCashShopBuyMessage>();
+            var message = messageHandler.ReadMessage<ResponseCashPackageInfoMessage>();
             var ackId = message.ackId;
             peerHandler.TriggerAck(ackId, message.responseCode, message);
         }
@@ -181,6 +181,7 @@ namespace MultiplayerARPG
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseCashShopBuyMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
+            responseMessage.cash = 0;
             LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.CashShopBuy, responseMessage);
         }
 
@@ -193,6 +194,7 @@ namespace MultiplayerARPG
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseCashPackageInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
+            responseMessage.cash = 0;
             responseMessage.cashPackageIds = new int[0];
             LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.CashPackageInfo, responseMessage);
         }
@@ -206,6 +208,7 @@ namespace MultiplayerARPG
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseCashPackageBuyValidationMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
+            responseMessage.cash = 0;
             LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.CashPackageBuyValidation, responseMessage);
         }
 

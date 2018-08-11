@@ -19,17 +19,20 @@ namespace MultiplayerARPG
         }
         public Error error;
         public int dataId;
+        public int cash;
 
         public override void DeserializeData(NetDataReader reader)
         {
             error = (Error)reader.GetByte();
             dataId = reader.GetInt();
+            cash = reader.GetInt();
         }
 
         public override void SerializeData(NetDataWriter writer)
         {
             writer.Put((byte)error);
             writer.Put(dataId);
+            writer.Put(cash);
         }
     }
 }

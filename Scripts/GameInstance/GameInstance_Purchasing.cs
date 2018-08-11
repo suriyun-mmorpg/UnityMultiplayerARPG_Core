@@ -69,9 +69,8 @@ namespace MultiplayerARPG
                     var productCatalogItem = cashPackage.ProductCatalogItem;
                     if (productCatalogItem == null)
                         continue;
-
-                    var logMessage = "[" + TAG_INIT + "]: Adding product " + productCatalogItem.id + " type " + productCatalogItem.type.ToString();
-                    Debug.Log(logMessage);
+                    
+                    Debug.Log("[" + TAG_INIT + "]: Adding product " + productCatalogItem.id + " type " + productCatalogItem.type.ToString());
                     if (productCatalogItem.allStoreIDs.Count > 0)
                     {
                         var ids = new IDs();
@@ -91,6 +90,7 @@ namespace MultiplayerARPG
             }
 
 #if UNITY_PURCHASING && (UNITY_ANDROID || UNITY_IOS)
+            Debug.Log("[" + TAG_INIT + "]: Initializing Purchasing...");
             // Kick off the remainder of the set-up with an asynchrounous call, passing the configuration 
             // and this class' instance. Expect a response either in OnInitialized or OnInitializeFailed.
             try
@@ -103,6 +103,8 @@ namespace MultiplayerARPG
                 Debug.LogError(errorMessage);
                 Debug.LogException(ex);
             }
+#else
+            Debug.Log("[" + TAG_INIT + "]: Initialized without purchasing");
 #endif
         }
 
