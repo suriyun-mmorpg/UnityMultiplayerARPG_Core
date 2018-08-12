@@ -237,7 +237,7 @@ namespace MultiplayerARPG
             DontDestroyOnLoad(gameObject);
             Singleton = this;
 
-            InputManager.useMobileInputOnNonMobile = useMobileInEditor;
+            InputManager.useMobileInputOnNonMobile = useMobileInEditor && Application.isEditor;
 
             // Load game data
             Attributes.Clear();
