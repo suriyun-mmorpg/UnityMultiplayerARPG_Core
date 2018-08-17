@@ -56,7 +56,7 @@ namespace MultiplayerARPG
                 if (damageElement.hitEffects != null)
                     weaponHitEffects.Add(damageElement.hitEffects);
             }
-            GameInstance.AddGameEffectCollections(GameEffectCollectionType.WeaponHit, weaponHitEffects);
+            GameInstance.AddGameEffectCollections(weaponHitEffects);
 
             // Loaded game data from game database
             gameInstance.LoadedGameData();

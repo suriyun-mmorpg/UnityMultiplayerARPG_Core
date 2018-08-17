@@ -28,7 +28,7 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
             CharacterBuff debuff,
-            int hitEffectsId,
+            uint hitEffectsId,
             float missileDistance,
             float missileSpeed)
         {

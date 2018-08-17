@@ -31,16 +31,16 @@ namespace MultiplayerARPG
             CallNetFunction("UseItem", FunctionReceivers.Server, itemIndex);
         }
 
-        public virtual void RequestPlayActionAnimation(int actionId, AnimActionType animActionType)
+        public virtual void RequestPlayActionAnimation(uint actionId, AnimActionType animActionType)
         {
-            if (IsDead() || actionId < 0)
+            if (IsDead() || actionId <= 0)
                 return;
             CallNetFunction("PlayActionAnimation", FunctionReceivers.All, actionId, animActionType);
         }
 
-        public virtual void RequestPlayEffect(int effectId)
+        public virtual void RequestPlayEffect(uint effectId)
         {
-            if (effectId < 0)
+            if (effectId <= 0)
                 return;
             CallNetFunction("PlayEffect", FunctionReceivers.All, effectId);
         }

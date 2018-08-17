@@ -51,7 +51,7 @@ namespace MultiplayerARPG
             return CurrentHp <= 0;
         }
 
-        public virtual void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId)
+        public virtual void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
         {
             if (!IsServer || IsDead())
                 return;

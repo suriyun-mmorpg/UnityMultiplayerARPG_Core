@@ -9,14 +9,14 @@ namespace MultiplayerARPG
         protected CharacterItem weapon;
         protected Dictionary<DamageElement, MinMaxFloat> allDamageAmounts;
         protected CharacterBuff debuff;
-        protected int hitEffectsId;
+        protected uint hitEffectsId;
 
         public virtual void SetupDamage(
             BaseCharacterEntity attacker,
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
             CharacterBuff debuff,
-            int hitEffectsId)
+            uint hitEffectsId)
         {
             this.attacker = attacker;
             this.weapon = weapon;

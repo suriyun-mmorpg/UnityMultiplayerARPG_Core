@@ -26,7 +26,7 @@ namespace MultiplayerARPG
             gameObject.layer = gameInstance.harvestableLayer;
         }
 
-        public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId)
+        public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
         {
             if (!IsServer || IsDead() || weapon == null)
                 return;

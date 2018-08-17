@@ -119,7 +119,7 @@ namespace MultiplayerARPG
             return characterEntity is BasePlayerCharacterEntity;
         }
 
-        public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId)
+        public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
         {
             if (!IsServer || IsDead() || !CanReceiveDamageFrom(attacker))
                 return;
@@ -158,7 +158,7 @@ namespace MultiplayerARPG
 
         public override void GetAttackingData(
             out CharacterItem weapon,
-            out int actionId,
+            out uint actionId,
             out float triggerDuration,
             out float totalDuration,
             out DamageInfo damageInfo,
@@ -166,7 +166,7 @@ namespace MultiplayerARPG
         {
             // Initialize data
             weapon = null;
-            actionId = -1;
+            actionId = 0;
             triggerDuration = 0f;
             totalDuration = 0f;
 

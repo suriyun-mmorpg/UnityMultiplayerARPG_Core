@@ -2,23 +2,14 @@
 
 namespace MultiplayerARPG
 {
-    public enum GameEffectCollectionType
-    {
-        WeaponHit,
-        SkillHit,
-    }
-
     [System.Serializable]
     public class GameEffectCollection
     {
-        private const int WEAPON_HIT_ID_START = 0;
-        private const int SKILL_HIT_ID_START = 1000;
-        private static int weaponHitEffectIdCount = -1;
-        private static int skillHitEffectIdCount = -1;
-        protected int? id;
-        public int Id
+        private static uint idCount = 0;
+        protected uint? id;
+        public uint Id
         {
-            get { return !id.HasValue ? -1 : id.Value; }
+            get { return !id.HasValue ? 0 : id.Value; }
         }
 
         public GameEffect[] effects;
@@ -28,23 +19,19 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public bool Initialize(GameEffectCollectionType type)
+        public bool Initialize()
         {
             if (effects == null || effects.Length == 0 || id.HasValue)
                 return false;
 
-            switch (type)
-            {
-                case GameEffectCollectionType.WeaponHit:
-                    ++weaponHitEffectIdCount;
-                    id = WEAPON_HIT_ID_START + weaponHitEffectIdCount;
-                    break;
-                case GameEffectCollectionType.SkillHit:
-                    ++skillHitEffectIdCount;
-                    id = SKILL_HIT_ID_START + skillHitEffectIdCount;
-                    break;
-            }
+            ++idCount;
+            id = idCount;
             return true;
+        }
+
+        public static void ResetId()
+        {
+            idCount = 0;
         }
     }
 }

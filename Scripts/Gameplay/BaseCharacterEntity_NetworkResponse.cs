@@ -26,7 +26,7 @@ namespace MultiplayerARPG
 
             // Prepare requires data
             CharacterItem weapon;
-            int actionId;
+            uint actionId;
             float triggerDuration;
             float totalDuration;
             DamageInfo damageInfo;
@@ -72,7 +72,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
             yield return new WaitForSecondsRealtime(triggerDuration);
-            LaunchDamageEntity(position, weapon, damageInfo, allDamageAmounts, CharacterBuff.Empty, -1);
+            LaunchDamageEntity(position, weapon, damageInfo, allDamageAmounts, CharacterBuff.Empty, 0);
             yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
         }
 
@@ -98,7 +98,7 @@ namespace MultiplayerARPG
 
             // Prepare requires data
             CharacterItem weapon;
-            int actionId;
+            uint actionId;
             float triggerDuration;
             float totalDuration;
             bool isAttack;
@@ -180,7 +180,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="actionId"></param>
         /// <param name="animActionType"></param>
-        protected virtual void NetFuncPlayActionAnimation(int actionId, AnimActionType animActionType)
+        protected virtual void NetFuncPlayActionAnimation(uint actionId, AnimActionType animActionType)
         {
             if (IsDead())
                 return;
@@ -188,7 +188,7 @@ namespace MultiplayerARPG
             StartCoroutine(PlayActionAnimationRoutine(actionId, animActionType));
         }
 
-        private IEnumerator PlayActionAnimationRoutine(int actionId, AnimActionType animActionType)
+        private IEnumerator PlayActionAnimationRoutine(uint actionId, AnimActionType animActionType)
         {
             var playSpeedMultiplier = 1f;
             switch (animActionType)
@@ -206,7 +206,7 @@ namespace MultiplayerARPG
         /// This will be called at every clients to play any effect
         /// </summary>
         /// <param name="effectId"></param>
-        protected virtual void NetFuncPlayEffect(int effectId)
+        protected virtual void NetFuncPlayEffect(uint effectId)
         {
             GameEffectCollection gameEffectCollection;
             if (CharacterModel == null || !GameInstance.GameEffectCollections.TryGetValue(effectId, out gameEffectCollection))

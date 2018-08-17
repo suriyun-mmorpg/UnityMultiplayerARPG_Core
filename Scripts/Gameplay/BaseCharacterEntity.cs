@@ -309,7 +309,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, int hitEffectsId)
+        public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
         {
             if (!IsServer || IsDead() || !CanReceiveDamageFrom(attacker))
                 return;
@@ -339,9 +339,9 @@ namespace MultiplayerARPG
                 }
             }
             // Play hit effect
-            if (hitEffectsId < 0)
+            if (hitEffectsId <= 0)
                 hitEffectsId = gameInstance.defaultHitEffects.Id;
-            if (hitEffectsId >= 0)
+            if (hitEffectsId > 0)
                 RequestPlayEffect(hitEffectsId);
             // Calculate chance to critical
             var criticalChance = gameInstance.GameplayRule.GetCriticalChance(attacker, this);
@@ -507,7 +507,7 @@ namespace MultiplayerARPG
 
         public virtual void GetAttackingData(
             out CharacterItem weapon,
-            out int actionId,
+            out uint actionId,
             out float triggerDuration,
             out float totalDuration,
             out DamageInfo damageInfo,
@@ -515,7 +515,7 @@ namespace MultiplayerARPG
         {
             // Initialize data
             weapon = null;
-            actionId = -1;
+            actionId = 0;
             triggerDuration = 0f;
             totalDuration = 0f;
             damageInfo = null;
@@ -549,7 +549,7 @@ namespace MultiplayerARPG
         public virtual void GetUsingSkillData(
             CharacterSkill characterSkill,
             out CharacterItem weapon,
-            out int actionId,
+            out uint actionId,
             out float triggerDuration,
             out float totalDuration,
             out bool isAttack,
@@ -559,7 +559,7 @@ namespace MultiplayerARPG
             // Initialize data
             weapon = null;
             isAttack = false;
-            actionId = -1;
+            actionId = 0;
             triggerDuration = 0f;
             totalDuration = 0f;
             damageInfo = null;
@@ -727,7 +727,7 @@ namespace MultiplayerARPG
             DamageInfo damageInfo,
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
             CharacterBuff debuff,
-            int hitEffectsId)
+            uint hitEffectsId)
         {
             if (!IsServer)
                 return;

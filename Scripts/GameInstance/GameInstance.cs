@@ -107,8 +107,8 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, BaseMonsterCharacterEntity> MonsterCharacterEntities = new Dictionary<int, BaseMonsterCharacterEntity>();
         public static readonly Dictionary<int, WarpPortalEntity> WarpPortalEntities = new Dictionary<int, WarpPortalEntity>();
         public static readonly Dictionary<int, NpcEntity> NpcEntities = new Dictionary<int, NpcEntity>();
-        public static readonly Dictionary<int, ActionAnimation> ActionAnimations = new Dictionary<int, ActionAnimation>();
-        public static readonly Dictionary<int, GameEffectCollection> GameEffectCollections = new Dictionary<int, GameEffectCollection>();
+        public static readonly Dictionary<uint, ActionAnimation> ActionAnimations = new Dictionary<uint, ActionAnimation>();
+        public static readonly Dictionary<uint, GameEffectCollection> GameEffectCollections = new Dictionary<uint, GameEffectCollection>();
         public static readonly Dictionary<string, List<WarpPortal>> MapWarpPortals = new Dictionary<string, List<WarpPortal>>();
         public static readonly Dictionary<string, List<Npc>> MapNpcs = new Dictionary<string, List<Npc>>();
         public static readonly Dictionary<string, MapInfo> MapInfos = new Dictionary<string, MapInfo>();
@@ -260,6 +260,9 @@ namespace MultiplayerARPG
             MapNpcs.Clear();
             MapInfos.Clear();
 
+            ActionAnimation.ResetId();
+            GameEffectCollection.ResetId();
+
             if (gameDatabase != null)
                 gameDatabase.LoadData(this);
             else
@@ -323,7 +326,7 @@ namespace MultiplayerARPG
                 if (damageElement.hitEffects != null)
                     weaponHitEffects.Add(damageElement.hitEffects);
             }
-            AddGameEffectCollections(GameEffectCollectionType.WeaponHit, weaponHitEffects);
+            AddGameEffectCollections(weaponHitEffects);
 
             // Loaded game data from Resources
             LoadedGameData();
@@ -448,8 +451,8 @@ namespace MultiplayerARPG
                 {
                     var weaponType = item.WeaponType;
                     // Initialize animation index
-                    AddActionAnimations(ActionAnimationType.WeaponAttack, weaponType.rightHandAttackAnimations);
-                    AddActionAnimations(ActionAnimationType.WeaponAttack, weaponType.leftHandAttackAnimations);
+                    AddActionAnimations(weaponType.rightHandAttackAnimations);
+                    AddActionAnimations(weaponType.leftHandAttackAnimations);
                     // Add damage entities
                     if (weaponType.damageInfo.missileDamageEntity != null)
                         damageEntities.Add(weaponType.damageInfo.missileDamageEntity);
@@ -485,7 +488,7 @@ namespace MultiplayerARPG
                     var monsterCharacter = character as MonsterCharacter;
                     MonsterCharacters[character.DataId] = monsterCharacter;
                     monsterCharacterEntities.Add(monsterCharacter.entityPrefab as BaseMonsterCharacterEntity);
-                    AddActionAnimations(ActionAnimationType.MonsterAttack, monsterCharacter.attackAnimations);
+                    AddActionAnimations(monsterCharacter.attackAnimations);
                     var missileDamageEntity = monsterCharacter.damageInfo.missileDamageEntity;
                     if (missileDamageEntity != null)
                         damageEntities.Add(missileDamageEntity);
@@ -505,13 +508,13 @@ namespace MultiplayerARPG
                 if (skill == null || Skills.ContainsKey(skill.DataId))
                     continue;
                 Skills[skill.DataId] = skill;
-                AddActionAnimations(ActionAnimationType.SkillCast, skill.castAnimations);
+                AddActionAnimations(skill.castAnimations);
                 skillHitEffects.Add(skill.hitEffects);
                 var missileDamageEntity = skill.damageInfo.missileDamageEntity;
                 if (missileDamageEntity != null)
                     damageEntities.Add(missileDamageEntity);
             }
-            AddGameEffectCollections(GameEffectCollectionType.SkillHit, skillHitEffects);
+            AddGameEffectCollections(skillHitEffects);
             AddDamageEntities(damageEntities);
         }
 
@@ -607,13 +610,13 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void AddActionAnimations(ActionAnimationType type, IEnumerable<ActionAnimation> actionAnimations)
+        public static void AddActionAnimations(IEnumerable<ActionAnimation> actionAnimations)
         {
             if (actionAnimations == null)
                 return;
             foreach (var actionAnimation in actionAnimations)
             {
-                if (!actionAnimation.Initialize(type))
+                if (!actionAnimation.Initialize())
                     continue;
                 if (actionAnimation == null || ActionAnimations.ContainsKey(actionAnimation.Id))
                     continue;
@@ -621,13 +624,13 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void AddGameEffectCollections(GameEffectCollectionType type, IEnumerable<GameEffectCollection> gameEffectCollections)
+        public static void AddGameEffectCollections(IEnumerable<GameEffectCollection> gameEffectCollections)
         {
             if (gameEffectCollections == null)
                 return;
             foreach (var gameEffectCollection in gameEffectCollections)
             {
-                if (!gameEffectCollection.Initialize(type))
+                if (!gameEffectCollection.Initialize())
                     continue;
                 if (gameEffectCollection == null || GameEffectCollections.ContainsKey(gameEffectCollection.Id))
                     continue;

@@ -445,7 +445,7 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        public virtual Coroutine PlayActionAnimation(int actionId, AnimActionType animActionType, float playSpeedMultiplier = 1f)
+        public virtual Coroutine PlayActionAnimation(uint actionId, AnimActionType animActionType, float playSpeedMultiplier = 1f)
         {
             if (animatorType == AnimatorType.LegacyAnimtion)
                 return StartCoroutine(PlayActionAnimation_LegacyAnimation(actionId, animActionType, playSpeedMultiplier));
@@ -453,7 +453,7 @@ namespace MultiplayerARPG
         }
 
         #region Action Animation Functions
-        private IEnumerator PlayActionAnimation_Animator(int actionId, AnimActionType animActionType, float playSpeedMultiplier)
+        private IEnumerator PlayActionAnimation_Animator(uint actionId, AnimActionType animActionType, float playSpeedMultiplier)
         {
             // If animator is not null, play the action animation
             ActionAnimation actionAnimation;
@@ -480,7 +480,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private IEnumerator PlayActionAnimation_LegacyAnimation(int actionId, AnimActionType animActionType, float playSpeedMultiplier)
+        private IEnumerator PlayActionAnimation_LegacyAnimation(uint actionId, AnimActionType animActionType, float playSpeedMultiplier)
         {
             // If animator is not null, play the action animation
             ActionAnimation actionAnimation;
