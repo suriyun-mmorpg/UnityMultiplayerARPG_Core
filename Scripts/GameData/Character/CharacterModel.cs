@@ -7,27 +7,6 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    [System.Serializable]
-    public class LegacyAnimationData
-    {
-        public AnimationClip idleClip;
-        public AnimationClip moveClip;
-        public AnimationClip jumpClip;
-        public AnimationClip fallClip;
-        public AnimationClip hurtClip;
-        public AnimationClip deadClip;
-        public float actionClipFadeLength = 0.1f;
-        public float idleClipFadeLength = 0.1f;
-        public float moveClipFadeLength = 0.1f;
-        public float jumpClipFadeLength = 0.1f;
-        public float fallClipFadeLength = 0.1f;
-        public float hurtClipFadeLength = 0.1f;
-        public float deadClipFadeLength = 0.1f;
-        public float magnitudeToPlayMoveClip = 0.1f;
-        public float ySpeedToPlayJumpClip = 0.25f;
-        public float ySpeedToPlayFallClip = -0.25f;
-    }
-
     public class CharacterModel : MonoBehaviour
     {
         // Animator variables
@@ -403,7 +382,7 @@ namespace MultiplayerARPG
             CreateCacheEffect(buffId, effects);
         }
 
-        public void UpdateAnimation(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier = 1f)
+        public virtual void UpdateAnimation(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier = 1f)
         {
             switch (animatorType)
             {
@@ -416,6 +395,7 @@ namespace MultiplayerARPG
             }
         }
 
+        #region Update Animation Functions
         private void UpdateAnimation_Animator(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier)
         {
             if (!CacheAnimator.gameObject.activeInHierarchy)
@@ -463,14 +443,16 @@ namespace MultiplayerARPG
             if (!CacheAnimation.IsPlaying(clipName))
                 CacheAnimation.CrossFade(clipName, fadeLength);
         }
+        #endregion
 
-        public Coroutine PlayActionAnimation(int actionId, AnimActionType animActionType, float playSpeedMultiplier = 1f)
+        public virtual Coroutine PlayActionAnimation(int actionId, AnimActionType animActionType, float playSpeedMultiplier = 1f)
         {
             if (animatorType == AnimatorType.LegacyAnimtion)
                 return StartCoroutine(PlayActionAnimation_LegacyAnimation(actionId, animActionType, playSpeedMultiplier));
             return StartCoroutine(PlayActionAnimation_Animator(actionId, animActionType, playSpeedMultiplier));
         }
 
+        #region Action Animation Functions
         private IEnumerator PlayActionAnimation_Animator(int actionId, AnimActionType animActionType, float playSpeedMultiplier)
         {
             // If animator is not null, play the action animation
@@ -524,8 +506,9 @@ namespace MultiplayerARPG
                 yield return new WaitForSecondsRealtime(waitDelay);
             }
         }
+        #endregion
 
-        public void PlayHurtAnimation()
+        public virtual void PlayHurtAnimation()
         {
             if (animatorType == AnimatorType.LegacyAnimtion)
             {
@@ -536,7 +519,7 @@ namespace MultiplayerARPG
             CacheAnimator.SetTrigger(ANIM_HURT);
         }
 
-        public void PlayJumpAnimation()
+        public virtual void PlayJumpAnimation()
         {
             if (animatorType == AnimatorType.LegacyAnimtion)
             {
@@ -561,5 +544,26 @@ namespace MultiplayerARPG
     {
         public string effectSocket;
         public Transform transform;
+    }
+
+    [System.Serializable]
+    public class LegacyAnimationData
+    {
+        public AnimationClip idleClip;
+        public AnimationClip moveClip;
+        public AnimationClip jumpClip;
+        public AnimationClip fallClip;
+        public AnimationClip hurtClip;
+        public AnimationClip deadClip;
+        public float actionClipFadeLength = 0.1f;
+        public float idleClipFadeLength = 0.1f;
+        public float moveClipFadeLength = 0.1f;
+        public float jumpClipFadeLength = 0.1f;
+        public float fallClipFadeLength = 0.1f;
+        public float hurtClipFadeLength = 0.1f;
+        public float deadClipFadeLength = 0.1f;
+        public float magnitudeToPlayMoveClip = 0.1f;
+        public float ySpeedToPlayJumpClip = 0.25f;
+        public float ySpeedToPlayFallClip = -0.25f;
     }
 }
