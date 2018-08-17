@@ -26,6 +26,7 @@ namespace MultiplayerARPG
 
             // Prepare requires data
             CharacterItem weapon;
+            bool isLeftHand;
             uint actionId;
             float triggerDuration;
             float totalDuration;
@@ -34,6 +35,7 @@ namespace MultiplayerARPG
 
             GetAttackingData(
                 out weapon,
+                out isLeftHand,
                 out actionId,
                 out triggerDuration,
                 out totalDuration,
@@ -58,7 +60,7 @@ namespace MultiplayerARPG
             }
 
             // Play animation on clients
-            RequestPlayActionAnimation(actionId, AnimActionType.Attack);
+            RequestPlayActionAnimation(actionId, !isLeftHand ? AnimActionType.AttackRightHand : AnimActionType.AttackLeftHand);
             // Start attack routine
             StartCoroutine(AttackRoutine(CacheTransform.position, triggerDuration, totalDuration, weapon, damageInfo, allDamageAmounts));
         }
@@ -97,21 +99,23 @@ namespace MultiplayerARPG
                 return;
 
             // Prepare requires data
+            SkillAttackType skillAttackType;
             CharacterItem weapon;
+            bool isLeftHand;
             uint actionId;
             float triggerDuration;
             float totalDuration;
-            bool isAttack;
             DamageInfo damageInfo;
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts;
 
             GetUsingSkillData(
                 characterSkill,
+                out skillAttackType,
                 out weapon,
+                out isLeftHand,
                 out actionId,
                 out triggerDuration,
                 out totalDuration,
-                out isAttack,
                 out damageInfo,
                 out allDamageAmounts);
 
@@ -119,7 +123,7 @@ namespace MultiplayerARPG
             {
                 var weaponItem = weapon.GetWeaponItem();
                 // Reduce ammo amount
-                if (characterSkill.GetSkill().IsAttack() && weaponItem.WeaponType.requireAmmoType != null)
+                if (skillAttackType != SkillAttackType.None && weaponItem.WeaponType.requireAmmoType != null)
                 {
                     Dictionary<CharacterItem, short> decreaseItems;
                     if (!this.DecreaseAmmos(weaponItem.WeaponType.requireAmmoType, 1, out decreaseItems))
@@ -133,9 +137,12 @@ namespace MultiplayerARPG
             }
 
             // Play animation on clients
-            RequestPlayActionAnimation(actionId, AnimActionType.Skill);
+            if (skillAttackType == SkillAttackType.BasedOnWeapon)
+                RequestPlayActionAnimation(actionId, !isLeftHand ? AnimActionType.AttackRightHand : AnimActionType.AttackLeftHand);
+            else
+                RequestPlayActionAnimation(actionId, AnimActionType.Skill);
             // Start use skill routine
-            StartCoroutine(UseSkillRoutine(skillIndex, position, triggerDuration, totalDuration, isAttack, weapon, damageInfo, allDamageAmounts));
+            StartCoroutine(UseSkillRoutine(skillIndex, position, triggerDuration, totalDuration, skillAttackType, weapon, damageInfo, allDamageAmounts));
         }
 
         private IEnumerator UseSkillRoutine(
@@ -143,7 +150,7 @@ namespace MultiplayerARPG
             Vector3 position,
             float triggerDuration,
             float totalDuration,
-            bool isAttack,
+            SkillAttackType skillAttackType,
             CharacterItem weapon,
             DamageInfo damageInfo,
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
@@ -154,7 +161,7 @@ namespace MultiplayerARPG
             characterSkill.ReduceMp(this);
             skills[skillIndex] = characterSkill;
             yield return new WaitForSecondsRealtime(triggerDuration);
-            ApplySkill(characterSkill, position, isAttack, weapon, damageInfo, allDamageAmounts);
+            ApplySkill(characterSkill, position, skillAttackType, weapon, damageInfo, allDamageAmounts);
             yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
         }
 
@@ -193,7 +200,7 @@ namespace MultiplayerARPG
             var playSpeedMultiplier = 1f;
             switch (animActionType)
             {
-                case AnimActionType.Attack:
+                case AnimActionType.AttackRightHand:
                     playSpeedMultiplier = CacheAtkSpeed;
                     break;
             }

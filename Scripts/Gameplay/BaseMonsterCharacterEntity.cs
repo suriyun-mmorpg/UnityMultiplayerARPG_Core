@@ -158,6 +158,7 @@ namespace MultiplayerARPG
 
         public override void GetAttackingData(
             out CharacterItem weapon,
+            out bool isLeftHand,
             out uint actionId,
             out float triggerDuration,
             out float totalDuration,
@@ -166,6 +167,7 @@ namespace MultiplayerARPG
         {
             // Initialize data
             weapon = null;
+            isLeftHand = false;
             actionId = 0;
             triggerDuration = 0f;
             totalDuration = 0f;

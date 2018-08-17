@@ -10,7 +10,8 @@ namespace MultiplayerARPG
     {
         None,
         Generic,
-        Attack,
+        AttackRightHand,
+        AttackLeftHand,
         Skill,
     }
 
@@ -472,14 +473,14 @@ namespace MultiplayerARPG
                 ApplyBuff(Id, skill.DataId, BuffType.SkillBuff, characterSkill.level);
         }
 
-        protected virtual void ApplySkill(CharacterSkill characterSkill, Vector3 position, bool isAttack, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
+        protected virtual void ApplySkill(CharacterSkill characterSkill, Vector3 position, SkillAttackType skillAttackType, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
             var skill = characterSkill.GetSkill();
             switch (skill.skillType)
             {
                 case SkillType.Active:
                     ApplySkillBuff(characterSkill);
-                    if (isAttack)
+                    if (skillAttackType != SkillAttackType.None)
                     {
                         CharacterBuff debuff = CharacterBuff.Empty;
                         if (skill.isDebuff)
@@ -507,6 +508,7 @@ namespace MultiplayerARPG
 
         public virtual void GetAttackingData(
             out CharacterItem weapon,
+            out bool isLeftHand,
             out uint actionId,
             out float triggerDuration,
             out float totalDuration,
@@ -515,13 +517,14 @@ namespace MultiplayerARPG
         {
             // Initialize data
             weapon = null;
+            isLeftHand = false;
             actionId = 0;
             triggerDuration = 0f;
             totalDuration = 0f;
             damageInfo = null;
             allDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
             // Prepare weapon data
-            var isLeftHand = false;
+            isLeftHand = false;
             weapon = this.GetRandomedWeapon(out isLeftHand);
             var weaponItem = weapon.GetWeaponItem();
             var weaponType = weaponItem.WeaponType;
@@ -548,17 +551,19 @@ namespace MultiplayerARPG
 
         public virtual void GetUsingSkillData(
             CharacterSkill characterSkill,
+            out SkillAttackType skillAttackType,
             out CharacterItem weapon,
+            out bool isLeftHand,
             out uint actionId,
             out float triggerDuration,
             out float totalDuration,
-            out bool isAttack,
             out DamageInfo damageInfo,
             out Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
             // Initialize data
+            skillAttackType = SkillAttackType.None;
             weapon = null;
-            isAttack = false;
+            isLeftHand = false;
             actionId = 0;
             triggerDuration = 0f;
             totalDuration = 0f;
@@ -568,14 +573,13 @@ namespace MultiplayerARPG
             var skill = characterSkill.GetSkill();
             if (skill == null)
                 return;
-            isAttack = skill.IsAttack();
             // Prepare weapon data
-            var isLeftHand = false;
+            skillAttackType = skill.skillAttackType;
             weapon = this.GetRandomedWeapon(out isLeftHand);
             var weaponItem = weapon.GetWeaponItem();
             var weaponType = weaponItem.WeaponType;
             // Prepare animation
-            if ((skill.castAnimations == null || skill.castAnimations.Length == 0) && isAttack)
+            if ((skill.castAnimations == null || skill.castAnimations.Length == 0) && skillAttackType != SkillAttackType.None)
             {
                 // If there is no cast animations
                 // Random attack animation
@@ -599,9 +603,10 @@ namespace MultiplayerARPG
                 actionId = anim.Id;
                 GetActionAnimationDurations(anim, out triggerDuration, out totalDuration);
             }
-            if (isAttack)
+            // If it is attack skill
+            if (skillAttackType != SkillAttackType.None)
             {
-                switch (skill.skillAttackType)
+                switch (skillAttackType)
                 {
                     case SkillAttackType.Normal:
                         // Assign damage data
@@ -852,7 +857,7 @@ namespace MultiplayerARPG
 
         public virtual bool IsPlayingActionAnimation()
         {
-            return animActionType == AnimActionType.Attack || animActionType == AnimActionType.Skill;
+            return animActionType == AnimActionType.AttackRightHand || animActionType == AnimActionType.Skill;
         }
 
         public virtual bool CanMoveOrDoActions()
