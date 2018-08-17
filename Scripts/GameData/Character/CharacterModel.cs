@@ -445,23 +445,51 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        public virtual Coroutine PlayActionAnimation(uint actionId, AnimActionType animActionType, float playSpeedMultiplier = 1f)
+        public virtual Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f)
         {
             if (animatorType == AnimatorType.LegacyAnimtion)
-                return StartCoroutine(PlayActionAnimation_LegacyAnimation(actionId, animActionType, playSpeedMultiplier));
-            return StartCoroutine(PlayActionAnimation_Animator(actionId, animActionType, playSpeedMultiplier));
+                return StartCoroutine(PlayActionAnimation_LegacyAnimation(animActionType, dataId, index, playSpeedMultiplier));
+            return StartCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier));
         }
 
         #region Action Animation Functions
-        private IEnumerator PlayActionAnimation_Animator(uint actionId, AnimActionType animActionType, float playSpeedMultiplier)
+        private ActionAnimation GetActionAnimation(AnimActionType animActionType, int dataId, int index)
+        {
+            WeaponType weaponType;
+            Skill skill;
+            MonsterCharacter monsterCharacter;
+            ActionAnimation actionAnimation = null;
+            switch (animActionType)
+            {
+                case AnimActionType.AttackRightHand:
+                    if (GameInstance.WeaponTypes.TryGetValue(dataId, out weaponType))
+                        actionAnimation = weaponType.rightHandAttackAnimations[index];
+                    break;
+                case AnimActionType.AttackLeftHand:
+                    if (GameInstance.WeaponTypes.TryGetValue(dataId, out weaponType))
+                        actionAnimation = weaponType.leftHandAttackAnimations[index];
+                    break;
+                case AnimActionType.Skill:
+                    if (GameInstance.Skills.TryGetValue(dataId, out skill))
+                        actionAnimation = skill.castAnimations[index];
+                    break;
+                case AnimActionType.MonsterAttack:
+                    if (GameInstance.MonsterCharacters.TryGetValue(dataId, out monsterCharacter))
+                        actionAnimation = monsterCharacter.attackAnimations[index];
+                    break;
+            }
+            return actionAnimation;
+        }
+
+        private IEnumerator PlayActionAnimation_Animator(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
         {
             // If animator is not null, play the action animation
-            ActionAnimation actionAnimation;
             AnimationClip clip;
             float triggerDuration;
             float extraDuration;
             AudioClip audioClip;
-            if (GameInstance.ActionAnimations.TryGetValue(actionId, out actionAnimation) &&
+            var actionAnimation = GetActionAnimation(animActionType, dataId, index);
+            if (actionAnimation != null &&
                 actionAnimation.GetData(this, out clip, out triggerDuration, out extraDuration, out audioClip))
             {
                 CacheAnimator.SetBool(ANIM_DO_ACTION, false);
@@ -480,15 +508,15 @@ namespace MultiplayerARPG
             }
         }
 
-        private IEnumerator PlayActionAnimation_LegacyAnimation(uint actionId, AnimActionType animActionType, float playSpeedMultiplier)
+        private IEnumerator PlayActionAnimation_LegacyAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
         {
             // If animator is not null, play the action animation
-            ActionAnimation actionAnimation;
             AnimationClip clip;
             float triggerDuration;
             float extraDuration;
             AudioClip audioClip;
-            if (GameInstance.ActionAnimations.TryGetValue(actionId, out actionAnimation) &&
+            var actionAnimation = GetActionAnimation(animActionType, dataId, index);
+            if (actionAnimation != null &&
                 actionAnimation.GetData(this, out clip, out triggerDuration, out extraDuration, out audioClip))
             {
                 if (CacheAnimation.GetClip(LEGACY_CLIP_ACTION) != null)

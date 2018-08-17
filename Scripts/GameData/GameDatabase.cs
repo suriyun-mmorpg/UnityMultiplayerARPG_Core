@@ -43,6 +43,7 @@ namespace MultiplayerARPG
 
             GameInstance.AddAttributes(attributes);
             GameInstance.AddItems(items);
+            GameInstance.AddWeaponTypes(new WeaponType[] { gameInstance.DefaultWeaponType });
             GameInstance.AddSkills(skills);
             GameInstance.AddNpcDialogs(npcDialogs);
             GameInstance.AddQuests(quests);

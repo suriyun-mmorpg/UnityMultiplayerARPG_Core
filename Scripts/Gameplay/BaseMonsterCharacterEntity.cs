@@ -157,18 +157,20 @@ namespace MultiplayerARPG
         }
 
         public override void GetAttackingData(
+            out AnimActionType animActionType,
+            out int dataId,
+            out int animationIndex,
             out CharacterItem weapon,
-            out bool isLeftHand,
-            out uint actionId,
             out float triggerDuration,
             out float totalDuration,
             out DamageInfo damageInfo,
             out Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
             // Initialize data
+            animActionType = AnimActionType.MonsterAttack;
+            dataId = MonsterDatabase.DataId;
+            animationIndex = 0;
             weapon = null;
-            isLeftHand = false;
-            actionId = 0;
             triggerDuration = 0f;
             totalDuration = 0f;
 
@@ -177,9 +179,9 @@ namespace MultiplayerARPG
             var animLength = animArray.Length;
             if (animLength > 0)
             {
-                var anim = animArray[Random.Range(0, animLength)];
+                animationIndex = Random.Range(0, animLength);
+                var anim = animArray[animationIndex];
                 // Assign animation data
-                actionId = anim.Id;
                 GetActionAnimationDurations(anim, out triggerDuration, out totalDuration);
             }
 

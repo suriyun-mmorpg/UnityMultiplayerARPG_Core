@@ -31,11 +31,11 @@ namespace MultiplayerARPG
             CallNetFunction("UseItem", FunctionReceivers.Server, itemIndex);
         }
 
-        public virtual void RequestPlayActionAnimation(uint actionId, AnimActionType animActionType)
+        public virtual void RequestPlayActionAnimation(AnimActionType animActionType, int dataId, int index)
         {
-            if (IsDead() || actionId <= 0)
+            if (IsDead() || dataId == 0 || index < 0)
                 return;
-            CallNetFunction("PlayActionAnimation", FunctionReceivers.All, actionId, animActionType);
+            CallNetFunction("PlayActionAnimation", FunctionReceivers.All, animActionType, dataId, (byte)index);
         }
 
         public virtual void RequestPlayEffect(uint effectId)

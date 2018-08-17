@@ -25,31 +25,33 @@ namespace MultiplayerARPG
                 return;
 
             // Prepare requires data
+            AnimActionType animActionType;
+            int dataId;
+            int animationIndex;
             CharacterItem weapon;
-            bool isLeftHand;
-            uint actionId;
             float triggerDuration;
             float totalDuration;
             DamageInfo damageInfo;
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts;
 
             GetAttackingData(
+                out animActionType,
+                out dataId,
+                out animationIndex,
                 out weapon,
-                out isLeftHand,
-                out actionId,
                 out triggerDuration,
                 out totalDuration,
                 out damageInfo,
                 out allDamageAmounts);
-
+            
             // Reduce ammo amount
             if (weapon != null)
             {
-                var weaponItem = weapon.GetWeaponItem();
-                if (weaponItem.WeaponType.requireAmmoType != null)
+                var weaponType = weapon.GetWeaponItem().WeaponType;
+                if (weaponType.requireAmmoType != null)
                 {
                     Dictionary<CharacterItem, short> decreaseItems;
-                    if (!this.DecreaseAmmos(weaponItem.WeaponType.requireAmmoType, 1, out decreaseItems))
+                    if (!this.DecreaseAmmos(weaponType.requireAmmoType, 1, out decreaseItems))
                         return;
                     var firstEntry = decreaseItems.FirstOrDefault();
                     var characterItem = firstEntry.Key;
@@ -60,7 +62,8 @@ namespace MultiplayerARPG
             }
 
             // Play animation on clients
-            RequestPlayActionAnimation(actionId, !isLeftHand ? AnimActionType.AttackRightHand : AnimActionType.AttackLeftHand);
+            RequestPlayActionAnimation(animActionType, dataId, animationIndex);
+
             // Start attack routine
             StartCoroutine(AttackRoutine(CacheTransform.position, triggerDuration, totalDuration, weapon, damageInfo, allDamageAmounts));
         }
@@ -99,10 +102,11 @@ namespace MultiplayerARPG
                 return;
 
             // Prepare requires data
+            AnimActionType animActionType;
+            int dataId;
+            int animationIndex;
             SkillAttackType skillAttackType;
             CharacterItem weapon;
-            bool isLeftHand;
-            uint actionId;
             float triggerDuration;
             float totalDuration;
             DamageInfo damageInfo;
@@ -110,23 +114,24 @@ namespace MultiplayerARPG
 
             GetUsingSkillData(
                 characterSkill,
+                out animActionType,
+                out dataId,
+                out animationIndex,
                 out skillAttackType,
                 out weapon,
-                out isLeftHand,
-                out actionId,
                 out triggerDuration,
                 out totalDuration,
                 out damageInfo,
                 out allDamageAmounts);
-
+            
             if (weapon != null)
             {
-                var weaponItem = weapon.GetWeaponItem();
+                var weaponType = weapon.GetWeaponItem().WeaponType;
                 // Reduce ammo amount
-                if (skillAttackType != SkillAttackType.None && weaponItem.WeaponType.requireAmmoType != null)
+                if (skillAttackType != SkillAttackType.None && weaponType.requireAmmoType != null)
                 {
                     Dictionary<CharacterItem, short> decreaseItems;
-                    if (!this.DecreaseAmmos(weaponItem.WeaponType.requireAmmoType, 1, out decreaseItems))
+                    if (!this.DecreaseAmmos(weaponType.requireAmmoType, 1, out decreaseItems))
                         return;
                     var firstEntry = decreaseItems.FirstOrDefault();
                     var characterItem = firstEntry.Key;
@@ -137,10 +142,8 @@ namespace MultiplayerARPG
             }
 
             // Play animation on clients
-            if (skillAttackType == SkillAttackType.BasedOnWeapon)
-                RequestPlayActionAnimation(actionId, !isLeftHand ? AnimActionType.AttackRightHand : AnimActionType.AttackLeftHand);
-            else
-                RequestPlayActionAnimation(actionId, AnimActionType.Skill);
+            RequestPlayActionAnimation(animActionType, dataId, animationIndex);
+
             // Start use skill routine
             StartCoroutine(UseSkillRoutine(skillIndex, position, triggerDuration, totalDuration, skillAttackType, weapon, damageInfo, allDamageAmounts));
         }
@@ -187,25 +190,26 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="actionId"></param>
         /// <param name="animActionType"></param>
-        protected virtual void NetFuncPlayActionAnimation(uint actionId, AnimActionType animActionType)
+        protected virtual void NetFuncPlayActionAnimation(AnimActionType animActionType, int dataId, int index)
         {
             if (IsDead())
                 return;
             this.animActionType = animActionType;
-            StartCoroutine(PlayActionAnimationRoutine(actionId, animActionType));
+            StartCoroutine(PlayActionAnimationRoutine(animActionType, dataId, index));
         }
 
-        private IEnumerator PlayActionAnimationRoutine(uint actionId, AnimActionType animActionType)
+        private IEnumerator PlayActionAnimationRoutine(AnimActionType animActionType, int dataId, int index)
         {
             var playSpeedMultiplier = 1f;
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
+                case AnimActionType.AttackLeftHand:
                     playSpeedMultiplier = CacheAtkSpeed;
                     break;
             }
             if (CharacterModel != null)
-                yield return CharacterModel.PlayActionAnimation(actionId, animActionType, playSpeedMultiplier);
+                yield return CharacterModel.PlayActionAnimation(animActionType, dataId, index, playSpeedMultiplier);
             this.animActionType = AnimActionType.None;
         }
 

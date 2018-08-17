@@ -95,6 +95,7 @@ namespace MultiplayerARPG
 
         public static readonly Dictionary<int, Attribute> Attributes = new Dictionary<int, Attribute>();
         public static readonly Dictionary<int, Item> Items = new Dictionary<int, Item>();
+        public static readonly Dictionary<int, WeaponType> WeaponTypes = new Dictionary<int, WeaponType>();
         public static readonly Dictionary<int, BaseCharacter> AllCharacters = new Dictionary<int, BaseCharacter>();
         public static readonly Dictionary<int, PlayerCharacter> PlayerCharacters = new Dictionary<int, PlayerCharacter>();
         public static readonly Dictionary<int, MonsterCharacter> MonsterCharacters = new Dictionary<int, MonsterCharacter>();
@@ -107,7 +108,6 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, BaseMonsterCharacterEntity> MonsterCharacterEntities = new Dictionary<int, BaseMonsterCharacterEntity>();
         public static readonly Dictionary<int, WarpPortalEntity> WarpPortalEntities = new Dictionary<int, WarpPortalEntity>();
         public static readonly Dictionary<int, NpcEntity> NpcEntities = new Dictionary<int, NpcEntity>();
-        public static readonly Dictionary<uint, ActionAnimation> ActionAnimations = new Dictionary<uint, ActionAnimation>();
         public static readonly Dictionary<uint, GameEffectCollection> GameEffectCollections = new Dictionary<uint, GameEffectCollection>();
         public static readonly Dictionary<string, List<WarpPortal>> MapWarpPortals = new Dictionary<string, List<WarpPortal>>();
         public static readonly Dictionary<string, List<Npc>> MapNpcs = new Dictionary<string, List<Npc>>();
@@ -242,6 +242,7 @@ namespace MultiplayerARPG
             // Load game data
             Attributes.Clear();
             Items.Clear();
+            WeaponTypes.Clear();
             AllCharacters.Clear();
             PlayerCharacters.Clear();
             MonsterCharacters.Clear();
@@ -254,7 +255,6 @@ namespace MultiplayerARPG
             MonsterCharacterEntities.Clear();
             WarpPortalEntities.Clear();
             NpcEntities.Clear();
-            ActionAnimations.Clear();
             GameEffectCollections.Clear();
             MapWarpPortals.Clear();
             MapNpcs.Clear();
@@ -313,6 +313,7 @@ namespace MultiplayerARPG
 
             AddAttributes(attributes);
             AddItems(items);
+            AddWeaponTypes(new WeaponType[] { DefaultWeaponType });
             AddSkills(skills);
             AddNpcDialogs(npcDialogs);
             AddQuests(quests);
@@ -440,6 +441,7 @@ namespace MultiplayerARPG
 
         public static void AddItems(IEnumerable<Item> items)
         {
+            var weaponTypes = new List<WeaponType>();
             var damageEntities = new List<BaseDamageEntity>();
             var buildingEntities = new List<BuildingEntity>();
             foreach (var item in items)
@@ -450,9 +452,7 @@ namespace MultiplayerARPG
                 if (item.IsWeapon())
                 {
                     var weaponType = item.WeaponType;
-                    // Initialize animation index
-                    AddActionAnimations(weaponType.rightHandAttackAnimations);
-                    AddActionAnimations(weaponType.leftHandAttackAnimations);
+                    weaponTypes.Add(weaponType);
                     // Add damage entities
                     if (weaponType.damageInfo.missileDamageEntity != null)
                         damageEntities.Add(weaponType.damageInfo.missileDamageEntity);
@@ -463,6 +463,7 @@ namespace MultiplayerARPG
                         buildingEntities.Add(item.buildingEntity);
                 }
             }
+            AddWeaponTypes(weaponTypes);
             AddDamageEntities(damageEntities);
             AddBuildingEntities(buildingEntities);
         }
@@ -488,7 +489,6 @@ namespace MultiplayerARPG
                     var monsterCharacter = character as MonsterCharacter;
                     MonsterCharacters[character.DataId] = monsterCharacter;
                     monsterCharacterEntities.Add(monsterCharacter.entityPrefab as BaseMonsterCharacterEntity);
-                    AddActionAnimations(monsterCharacter.attackAnimations);
                     var missileDamageEntity = monsterCharacter.damageInfo.missileDamageEntity;
                     if (missileDamageEntity != null)
                         damageEntities.Add(missileDamageEntity);
@@ -508,7 +508,6 @@ namespace MultiplayerARPG
                 if (skill == null || Skills.ContainsKey(skill.DataId))
                     continue;
                 Skills[skill.DataId] = skill;
-                AddActionAnimations(skill.castAnimations);
                 skillHitEffects.Add(skill.hitEffects);
                 var missileDamageEntity = skill.damageInfo.missileDamageEntity;
                 if (missileDamageEntity != null)
@@ -610,17 +609,15 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void AddActionAnimations(IEnumerable<ActionAnimation> actionAnimations)
+        public static void AddWeaponTypes(IEnumerable<WeaponType> weaponTypes)
         {
-            if (actionAnimations == null)
+            if (weaponTypes == null)
                 return;
-            foreach (var actionAnimation in actionAnimations)
+            foreach (var weaponType in weaponTypes)
             {
-                if (!actionAnimation.Initialize())
+                if (weaponType == null || WeaponTypes.ContainsKey(weaponType.DataId))
                     continue;
-                if (actionAnimation == null || ActionAnimations.ContainsKey(actionAnimation.Id))
-                    continue;
-                ActionAnimations[actionAnimation.Id] = actionAnimation;
+                WeaponTypes[weaponType.DataId] = weaponType;
             }
         }
 
