@@ -263,14 +263,17 @@ namespace MultiplayerARPG
             ActionAnimation.ResetId();
             GameEffectCollection.ResetId();
 
+            this.InvokeInstanceDevExtMethods("Awake");
+        }
+
+        protected virtual void Start()
+        {
             if (gameDatabase != null)
                 gameDatabase.LoadData(this);
             else
                 LoadDataFromResources();
-
-            this.InvokeInstanceDevExtMethods("Awake");
         }
-        
+
         public void LoadDataFromResources()
         {
             // Use Resources Load Async ?
