@@ -31,6 +31,8 @@ public class MigrateUIWrapper : MonoBehaviour
         // Call migrate ui components
         foreach (var obj in objects)
         {
+            if (obj == null)
+                continue;
             var type = obj.GetType();
             var method = type.GetMethod("MigrateUIComponents", BindingFlags.Public | BindingFlags.Instance);
             var args = new object[0];
