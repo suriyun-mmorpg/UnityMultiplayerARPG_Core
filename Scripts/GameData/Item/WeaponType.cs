@@ -17,8 +17,14 @@ namespace MultiplayerARPG
         public WeaponItemEquipType equipType = WeaponItemEquipType.OneHand;
         public DamageInfo damageInfo;
         public DamageEffectivenessAttribute[] effectivenessAttributes;
+        [Header("Animations (DEPRECATED)")]
+        [Tooltip("This will be removed on next version, please move data to your Character Model")]
+        [System.Obsolete("This will be removed on next version, please move data to your Character Model")]
         public ActionAnimation[] rightHandAttackAnimations;
+        [Tooltip("This will be removed on next version, please move data to your Character Model")]
+        [System.Obsolete("This will be removed on next version, please move data to your Character Model")]
         public ActionAnimation[] leftHandAttackAnimations;
+        [Header("Ammo")]
         [Tooltip("Require Ammo, Leave it to null when it is not required")]
         public AmmoType requireAmmoType;
 

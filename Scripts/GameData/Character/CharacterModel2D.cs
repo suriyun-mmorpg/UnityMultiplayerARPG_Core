@@ -6,48 +6,55 @@ namespace MultiplayerARPG
 {
     public class CharacterModel2D : CharacterModel
     {
-        public CharacterAnimation2D idleAnimation;
-        public CharacterAnimation2D moveAnimation;
-        public CharacterAnimation2D deadAnimation;
-        public CharacterAnimation2D defaultAttackAnimation;
-        public CharacterAnimation2D defaultSkillCastAnimation;
-        public WeaponAttack2D[] attackAnimations;
-        public SkillCast2D[] skillCastAnimations;
+        [Header("2D Animations")]
+        [SerializeField]
+        private CharacterAnimation2D idleAnimation2D;
+        [SerializeField]
+        private CharacterAnimation2D moveAnimation2D;
+        [SerializeField]
+        private CharacterAnimation2D deadAnimation2D;
+        [SerializeField]
+        private ActionAnimation2D defaultAttackAnimation2D;
+        [SerializeField]
+        private ActionAnimation2D defaultSkillCastAnimation2D;
+        [SerializeField]
+        private WeaponAnimations2D[] weaponAnimations2D;
+        [SerializeField]
+        private SkillCastAnimations2D[] skillCastAnimations2D;
 
-        private static readonly Dictionary<int, Dictionary<int, CharacterAnimation2D>> cacheAttackAnimations = new Dictionary<int, Dictionary<int, CharacterAnimation2D>>();
-        private static readonly Dictionary<int, Dictionary<int, CharacterAnimation2D>> cacheSkillCastAnimations = new Dictionary<int, Dictionary<int, CharacterAnimation2D>>();
-
-        public Dictionary<int, CharacterAnimation2D> CacheAttackAnimations
+        private Dictionary<int, ActionAnimation2D> cacheWeaponAnimations2D;
+        public Dictionary<int, ActionAnimation2D> CacheWeaponAnimations2D
         {
             get
             {
-                if (!cacheAttackAnimations.ContainsKey(DataId))
+                if (cacheWeaponAnimations2D == null)
                 {
-                    cacheAttackAnimations.Add(DataId, new Dictionary<int, CharacterAnimation2D>());
-                    foreach (var attackAnimation in attackAnimations)
+                    cacheWeaponAnimations2D = new Dictionary<int, ActionAnimation2D>();
+                    foreach (var attackAnimation in weaponAnimations2D)
                     {
                         if (attackAnimation.weaponType == null) continue;
-                        cacheAttackAnimations[DataId][attackAnimation.weaponType.DataId] = attackAnimation.animation;
+                        cacheWeaponAnimations2D[attackAnimation.weaponType.DataId] = attackAnimation.animation;
                     }
                 }
-                return cacheAttackAnimations[DataId];
+                return cacheWeaponAnimations2D;
             }
         }
 
-        public Dictionary<int, CharacterAnimation2D> CacheSkillCastAnimations
+        private Dictionary<int, ActionAnimation2D> cacheSkillCastAnimations2D;
+        public Dictionary<int, ActionAnimation2D> CacheSkillCastAnimations2D
         {
             get
             {
-                if (!cacheSkillCastAnimations.ContainsKey(DataId))
+                if (cacheSkillCastAnimations2D == null)
                 {
-                    cacheSkillCastAnimations.Add(DataId, new Dictionary<int, CharacterAnimation2D>());
-                    foreach (var skillCastAnimation in skillCastAnimations)
+                    cacheSkillCastAnimations2D = new Dictionary<int, ActionAnimation2D>();
+                    foreach (var skillCastAnimation in skillCastAnimations2D)
                     {
                         if (skillCastAnimation.skill == null) continue;
-                        cacheSkillCastAnimations[DataId][skillCastAnimation.skill.DataId] = skillCastAnimation.animation;
+                        cacheSkillCastAnimations2D[skillCastAnimation.skill.DataId] = skillCastAnimation.animation;
                     }
                 }
-                return cacheSkillCastAnimations[DataId];
+                return cacheSkillCastAnimations2D;
             }
         }
 
@@ -106,26 +113,26 @@ namespace MultiplayerARPG
         private void UpdateAnimation_Animator(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier)
         {
             if (isDead)
-                Play2DAnim_Animator(deadAnimation.GetClipByDirection(currentDirection));
+                Play2DAnim_Animator(deadAnimation2D.GetClipByDirection(currentDirection));
             else
             {
                 if (moveVelocity.magnitude > 0)
-                    Play2DAnim_Animator(moveAnimation.GetClipByDirection(currentDirection));
+                    Play2DAnim_Animator(moveAnimation2D.GetClipByDirection(currentDirection));
                 else
-                    Play2DAnim_Animator(idleAnimation.GetClipByDirection(currentDirection));
+                    Play2DAnim_Animator(idleAnimation2D.GetClipByDirection(currentDirection));
             }
         }
 
         private void UpdateAnimation_LegacyAnimation(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier)
         {
             if (isDead)
-                Play2DAnim_Animation(deadAnimation.GetClipByDirection(currentDirection));
+                Play2DAnim_Animation(deadAnimation2D.GetClipByDirection(currentDirection));
             else
             {
                 if (moveVelocity.magnitude > 0)
-                    Play2DAnim_Animation(moveAnimation.GetClipByDirection(currentDirection));
+                    Play2DAnim_Animation(moveAnimation2D.GetClipByDirection(currentDirection));
                 else
-                    Play2DAnim_Animation(idleAnimation.GetClipByDirection(currentDirection));
+                    Play2DAnim_Animation(idleAnimation2D.GetClipByDirection(currentDirection));
             }
         }
 
@@ -136,20 +143,19 @@ namespace MultiplayerARPG
             return StartCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier));
         }
 
-        private CharacterAnimation2D GetActionAnimation(AnimActionType animActionType, int dataId)
+        private ActionAnimation2D GetActionAnimation(AnimActionType animActionType, int dataId)
         {
-            CharacterAnimation2D animation2D = null;
+            ActionAnimation2D animation2D = null;
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
                 case AnimActionType.AttackLeftHand:
-                case AnimActionType.MonsterAttack:
-                    if (!CacheAttackAnimations.TryGetValue(dataId, out animation2D))
-                        animation2D = defaultAttackAnimation;
+                    if (!CacheWeaponAnimations2D.TryGetValue(dataId, out animation2D))
+                        animation2D = defaultAttackAnimation2D;
                     break;
                 case AnimActionType.Skill:
-                    if (!CacheSkillCastAnimations.TryGetValue(dataId, out animation2D))
-                        animation2D = defaultSkillCastAnimation;
+                    if (!CacheSkillCastAnimations2D.TryGetValue(dataId, out animation2D))
+                        animation2D = defaultSkillCastAnimation2D;
                     break;
             }
             return animation2D;
@@ -167,7 +173,7 @@ namespace MultiplayerARPG
                     // Waits by current transition + clip duration before end animation
                     Play2DAnim_Animator(clip);
                     yield return new WaitForSecondsRealtime(clip.length / playSpeedMultiplier);
-                    Play2DAnim_Animator(idleAnimation.GetClipByDirection(currentDirection));
+                    Play2DAnim_Animator(idleAnimation2D.GetClipByDirection(currentDirection));
                     yield return new WaitForSecondsRealtime(animation.extraDuration / playSpeedMultiplier);
                 }
             }
@@ -185,7 +191,7 @@ namespace MultiplayerARPG
                     // Waits by current transition + clip duration before end animation
                     Play2DAnim_Animation(clip);
                     yield return new WaitForSecondsRealtime(clip.length / playSpeedMultiplier);
-                    Play2DAnim_Animation(idleAnimation.GetClipByDirection(currentDirection));
+                    Play2DAnim_Animation(idleAnimation2D.GetClipByDirection(currentDirection));
                     yield return new WaitForSecondsRealtime(animation.extraDuration / playSpeedMultiplier);
                 }
             }

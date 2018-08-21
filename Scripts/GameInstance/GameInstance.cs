@@ -259,8 +259,7 @@ namespace MultiplayerARPG
             MapWarpPortals.Clear();
             MapNpcs.Clear();
             MapInfos.Clear();
-
-            ActionAnimation.ResetId();
+            
             GameEffectCollection.ResetId();
 
             this.InvokeInstanceDevExtMethods("Awake");

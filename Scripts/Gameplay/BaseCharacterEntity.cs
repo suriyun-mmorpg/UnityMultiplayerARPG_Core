@@ -13,7 +13,6 @@ namespace MultiplayerARPG
         AttackRightHand,
         AttackLeftHand,
         Skill,
-        MonsterAttack,
     }
 
     [RequireComponent(typeof(CharacterAnimationComponent))]
@@ -333,7 +332,8 @@ namespace MultiplayerARPG
                 {
                     var damageElement = allDamageAmount.Key;
                     var damageAmount = allDamageAmount.Value;
-                    if (hitEffectsId < 0 && damageElement != gameInstance.DefaultDamageElement)
+                    // Set hit effect by damage element
+                    if (hitEffectsId == 0 && damageElement != gameInstance.DefaultDamageElement)
                         hitEffectsId = damageElement.hitEffects.Id;
                     var receivingDamage = damageElement.GetDamageReducedByResistance(this, damageAmount.Random());
                     if (receivingDamage > 0f)
@@ -341,7 +341,7 @@ namespace MultiplayerARPG
                 }
             }
             // Play hit effect
-            if (hitEffectsId <= 0)
+            if (hitEffectsId == 0)
                 hitEffectsId = gameInstance.defaultHitEffects.Id;
             if (hitEffectsId > 0)
                 RequestPlayEffect(hitEffectsId);
@@ -492,21 +492,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void GetActionAnimationDurations(ActionAnimation anim, out float triggerDuration, out float totalDuration)
-        {
-            triggerDuration = 0f;
-            totalDuration = 0f;
-            AnimationClip animClip;
-            float animTriggerDuration;
-            float animExtraDuration;
-            AudioClip animAudioClip;
-            if (anim.GetData(CharacterModel, out animClip, out animTriggerDuration, out animExtraDuration, out animAudioClip))
-            {
-                triggerDuration = animTriggerDuration / CacheAtkSpeed;
-                totalDuration = (animClip.length + animExtraDuration) / CacheAtkSpeed;
-            }
-        }
-
         public virtual void GetAttackingData(
             out AnimActionType animActionType,
             out int dataId,
@@ -536,15 +521,10 @@ namespace MultiplayerARPG
             // Assign animation action type
             animActionType = !isLeftHand ? AnimActionType.AttackRightHand : AnimActionType.AttackLeftHand;
             // Random animation
-            var animArray = !isLeftHand ? weaponType.rightHandAttackAnimations : weaponType.leftHandAttackAnimations;
-            var animLength = animArray.Length;
-            if (animLength > 0)
-            {
-                animationIndex = Random.Range(0, animLength);
-                var anim = animArray[animationIndex];
-                // Assign animation data
-                GetActionAnimationDurations(anim, out triggerDuration, out totalDuration);
-            }
+            if (!isLeftHand)
+                CharacterModel.GetRandomRightHandAttackAnimation(dataId, out animationIndex, out triggerDuration, out totalDuration);
+            else
+                CharacterModel.GetRandomLeftHandAttackAnimation(dataId, out animationIndex, out triggerDuration, out totalDuration);
             // Assign damage data
             damageInfo = weaponType.damageInfo;
             // Calculate all damages
@@ -588,38 +568,29 @@ namespace MultiplayerARPG
             weapon = this.GetRandomedWeapon(out isLeftHand);
             var weaponItem = weapon.GetWeaponItem();
             var weaponType = weaponItem.WeaponType;
+            var hasSkillCastAnimation = CharacterModel.HasSkillCastAnimations(skill);
             // Prepare animation
-            if ((skill.castAnimations == null || skill.castAnimations.Length == 0) && skillAttackType != SkillAttackType.None)
+            if (!hasSkillCastAnimation && skillAttackType != SkillAttackType.None)
             {
                 // If there is no cast animations
                 // Assign data id
                 dataId = weaponType.DataId;
                 // Assign animation action type
                 animActionType = !isLeftHand ? AnimActionType.AttackRightHand : AnimActionType.AttackLeftHand;
-                // Random attack animation
-                var animArray = !isLeftHand ? weaponType.rightHandAttackAnimations : weaponType.leftHandAttackAnimations;
-                var animLength = animArray.Length;
-                if (animLength > 0)
-                {
-                    animationIndex = Random.Range(0, animLength);
-                    var anim = animArray[animationIndex];
-                    // Assign animation data
-                    GetActionAnimationDurations(anim, out triggerDuration, out totalDuration);
-                }
+                // Random animation
+                if (!isLeftHand)
+                    CharacterModel.GetRandomRightHandAttackAnimation(dataId, out animationIndex, out triggerDuration, out totalDuration);
+                else
+                    CharacterModel.GetRandomLeftHandAttackAnimation(dataId, out animationIndex, out triggerDuration, out totalDuration);
             }
-            else if (skill.castAnimations != null && skill.castAnimations.Length > 0)
+            else if (hasSkillCastAnimation)
             {
                 // Assign data id
                 dataId = skill.DataId;
                 // Assign animation action type
                 animActionType = AnimActionType.Skill;
                 // Random animation
-                var animArray = skill.castAnimations;
-                var animLength = animArray.Length;
-                animationIndex = Random.Range(0, animLength);
-                var anim = animArray[animationIndex];
-                // Assign animation data
-                GetActionAnimationDurations(anim, out triggerDuration, out totalDuration);
+                CharacterModel.GetRandomSkillCastAnimation(dataId, out animationIndex, out triggerDuration, out totalDuration);
             }
             // If it is attack skill
             if (skillAttackType != SkillAttackType.None)
@@ -875,7 +846,7 @@ namespace MultiplayerARPG
 
         public virtual bool IsPlayingActionAnimation()
         {
-            return animActionType == AnimActionType.AttackRightHand || animActionType == AnimActionType.AttackLeftHand || animActionType == AnimActionType.Skill || animActionType == AnimActionType.MonsterAttack;
+            return animActionType == AnimActionType.AttackRightHand || animActionType == AnimActionType.AttackLeftHand || animActionType == AnimActionType.Skill;
         }
 
         public virtual bool CanMoveOrDoActions()

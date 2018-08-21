@@ -48,7 +48,74 @@ namespace MultiplayerARPG
         [Header("Effect Containers")]
         [SerializeField]
         private EffectContainer[] effectContainers;
-        
+        [Header("Animations")]
+        [SerializeField]
+        private ActionAnimation[] defaultAttackAnimations;
+        [SerializeField]
+        private ActionAnimation[] defaultSkillCastAnimations;
+        [SerializeField]
+        private WeaponAnimations[] weaponAnimations;
+        [SerializeField]
+        private SkillCastAnimations[] skillCastAnimations;
+
+        private static Dictionary<int, ActionAnimation[]> cacheRightHandAttackAnimations;
+        public Dictionary<int, ActionAnimation[]> CacheRightHandAttackAnimations
+        {
+            get
+            {
+                if (cacheRightHandAttackAnimations == null)
+                {
+                    cacheRightHandAttackAnimations = new Dictionary<int, ActionAnimation[]>();
+                    foreach (var attackAnimation in weaponAnimations)
+                    {
+                        if (attackAnimation.weaponType == null) continue;
+                        cacheRightHandAttackAnimations[attackAnimation.weaponType.DataId] = attackAnimation.rightHandAttackAnimations;
+                    }
+                }
+                return cacheRightHandAttackAnimations;
+            }
+        }
+
+        private static Dictionary<int, ActionAnimation[]> cacheLeftHandAttackAnimations;
+        public Dictionary<int, ActionAnimation[]> CacheLeftHandAttackAnimations
+        {
+            get
+            {
+                if (cacheLeftHandAttackAnimations == null)
+                {
+                    cacheLeftHandAttackAnimations = new Dictionary<int, ActionAnimation[]>();
+                    foreach (var attackAnimation in weaponAnimations)
+                    {
+                        if (attackAnimation.weaponType == null) continue;
+                        cacheLeftHandAttackAnimations[attackAnimation.weaponType.DataId] = attackAnimation.rightHandAttackAnimations;
+                    }
+                }
+                return cacheLeftHandAttackAnimations;
+            }
+        }
+
+        private static Dictionary<int, ActionAnimation[]> cacheSkillCastAnimations;
+        public Dictionary<int, ActionAnimation[]> CacheSkillCastAnimations
+        {
+            get
+            {
+                if (cacheSkillCastAnimations == null)
+                {
+                    cacheSkillCastAnimations = new Dictionary<int, ActionAnimation[]>();
+                    foreach (var skillCastAnimation in skillCastAnimations)
+                    {
+                        if (skillCastAnimation.skill == null) continue;
+                        cacheSkillCastAnimations[skillCastAnimation.skill.DataId] = skillCastAnimation.castAnimations;
+                    }
+                }
+                return cacheSkillCastAnimations;
+            }
+        }
+
+        // Optimize garbage collection
+        protected ActionAnimation tempActionAnimation;
+        protected ActionAnimation[] tempActionAnimations;
+
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
 
         private Transform cacheTransform;
@@ -453,85 +520,45 @@ namespace MultiplayerARPG
         }
 
         #region Action Animation Functions
-        private ActionAnimation GetActionAnimation(AnimActionType animActionType, int dataId, int index)
-        {
-            WeaponType weaponType;
-            Skill skill;
-            MonsterCharacter monsterCharacter;
-            ActionAnimation actionAnimation = null;
-            switch (animActionType)
-            {
-                case AnimActionType.AttackRightHand:
-                    if (GameInstance.WeaponTypes.TryGetValue(dataId, out weaponType))
-                        actionAnimation = weaponType.rightHandAttackAnimations[index];
-                    break;
-                case AnimActionType.AttackLeftHand:
-                    if (GameInstance.WeaponTypes.TryGetValue(dataId, out weaponType))
-                        actionAnimation = weaponType.leftHandAttackAnimations[index];
-                    break;
-                case AnimActionType.Skill:
-                    if (GameInstance.Skills.TryGetValue(dataId, out skill))
-                        actionAnimation = skill.castAnimations[index];
-                    break;
-                case AnimActionType.MonsterAttack:
-                    if (GameInstance.MonsterCharacters.TryGetValue(dataId, out monsterCharacter))
-                        actionAnimation = monsterCharacter.attackAnimations[index];
-                    break;
-            }
-            return actionAnimation;
-        }
-
         private IEnumerator PlayActionAnimation_Animator(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
         {
             // If animator is not null, play the action animation
-            AnimationClip clip;
-            float triggerDuration;
-            float extraDuration;
-            AudioClip audioClip;
-            var actionAnimation = GetActionAnimation(animActionType, dataId, index);
-            if (actionAnimation != null &&
-                actionAnimation.GetData(this, out clip, out triggerDuration, out extraDuration, out audioClip))
+            tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
+            if (tempActionAnimation != null && tempActionAnimation.clip != null)
             {
                 CacheAnimator.SetBool(ANIM_DO_ACTION, false);
-                CacheAnimatorController[ANIM_STATE_ACTION_CLIP] = clip;
+                CacheAnimatorController[ANIM_STATE_ACTION_CLIP] = tempActionAnimation.clip;
+                var audioClip = tempActionAnimation.GetRandomAudioClip();
                 if (audioClip != null)
                     AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
                 CacheAnimator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
                 CacheAnimator.SetBool(ANIM_DO_ACTION, true);
                 // Waits by current transition + clip duration before end animation
-                var waitDelay = CacheAnimator.GetAnimatorTransitionInfo(0).duration + (clip.length / playSpeedMultiplier);
-                yield return new WaitForSecondsRealtime(waitDelay);
+                yield return new WaitForSecondsRealtime(CacheAnimator.GetAnimatorTransitionInfo(0).duration + (tempActionAnimation.GetClipLength() / playSpeedMultiplier));
                 CacheAnimator.SetBool(ANIM_DO_ACTION, false);
                 // Waits by current transition + extra duration before end playing animation state
-                waitDelay = CacheAnimator.GetAnimatorTransitionInfo(0).duration + (extraDuration / playSpeedMultiplier);
-                yield return new WaitForSecondsRealtime(waitDelay);
+                yield return new WaitForSecondsRealtime(CacheAnimator.GetAnimatorTransitionInfo(0).duration + (tempActionAnimation.GetExtraDuration() / playSpeedMultiplier));
             }
         }
 
         private IEnumerator PlayActionAnimation_LegacyAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
         {
             // If animator is not null, play the action animation
-            AnimationClip clip;
-            float triggerDuration;
-            float extraDuration;
-            AudioClip audioClip;
-            var actionAnimation = GetActionAnimation(animActionType, dataId, index);
-            if (actionAnimation != null &&
-                actionAnimation.GetData(this, out clip, out triggerDuration, out extraDuration, out audioClip))
+            tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
+            if (tempActionAnimation != null && tempActionAnimation.clip != null)
             {
                 if (CacheAnimation.GetClip(LEGACY_CLIP_ACTION) != null)
                     CacheAnimation.RemoveClip(LEGACY_CLIP_ACTION);
-                CacheAnimation.AddClip(clip, LEGACY_CLIP_ACTION);
+                CacheAnimation.AddClip(tempActionAnimation.clip, LEGACY_CLIP_ACTION);
+                var audioClip = tempActionAnimation.GetRandomAudioClip();
                 if (audioClip != null)
                     AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
                 CrossFadeLegacyAnimation(LEGACY_CLIP_ACTION, legacyAnimationData.actionClipFadeLength);
                 // Waits by current transition + clip duration before end animation
-                var waitDelay = clip.length / playSpeedMultiplier;
-                yield return new WaitForSecondsRealtime(waitDelay);
+                yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
                 CrossFadeLegacyAnimation(legacyAnimationData.idleClip, legacyAnimationData.idleClipFadeLength);
                 // Waits by current transition + extra duration before end playing animation state
-                waitDelay = extraDuration / playSpeedMultiplier;
-                yield return new WaitForSecondsRealtime(waitDelay);
+                yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
             }
         }
         #endregion
@@ -557,6 +584,151 @@ namespace MultiplayerARPG
             CacheAnimator.ResetTrigger(ANIM_JUMP);
             CacheAnimator.SetTrigger(ANIM_JUMP);
         }
+
+        #region Animation data helpers
+        public ActionAnimation GetActionAnimation(AnimActionType animActionType, int dataId, int index)
+        {
+            tempActionAnimation = null;
+            switch (animActionType)
+            {
+                case AnimActionType.AttackRightHand:
+                    tempActionAnimation = GetRightHandAttackAnimations(dataId)[index];
+                    break;
+                case AnimActionType.AttackLeftHand:
+                    tempActionAnimation = GetLeftHandAttackAnimations(dataId)[index];
+                    break;
+                case AnimActionType.Skill:
+                    tempActionAnimation = GetSkillCastAnimations(dataId)[index];
+                    break;
+            }
+            return tempActionAnimation;
+        }
+
+        public ActionAnimation[] GetRightHandAttackAnimations(WeaponType weaponType)
+        {
+            return GetRightHandAttackAnimations(weaponType.DataId);
+        }
+
+        public ActionAnimation[] GetRightHandAttackAnimations(int dataId)
+        {
+            if (CacheRightHandAttackAnimations.ContainsKey(dataId))
+                return CacheRightHandAttackAnimations[dataId];
+            return defaultAttackAnimations;
+        }
+
+        public ActionAnimation[] GetLeftHandAttackAnimations(WeaponType weaponType)
+        {
+            return GetLeftHandAttackAnimations(weaponType.DataId);
+        }
+
+        public ActionAnimation[] GetLeftHandAttackAnimations(int dataId)
+        {
+            if (CacheLeftHandAttackAnimations.ContainsKey(dataId))
+                return CacheLeftHandAttackAnimations[dataId];
+            return defaultAttackAnimations;
+        }
+
+        public ActionAnimation[] GetSkillCastAnimations(Skill skill)
+        {
+            return GetSkillCastAnimations(skill.DataId);
+        }
+
+        public ActionAnimation[] GetSkillCastAnimations(int dataId)
+        {
+            if (CacheSkillCastAnimations.ContainsKey(dataId))
+                return CacheSkillCastAnimations[dataId];
+            return defaultSkillCastAnimations;
+        }
+
+        public bool GetRandomRightHandAttackAnimation(
+            WeaponType weaponType,
+            out int animationIndex,
+            out float triggerDuration,
+            out float totalDuration)
+        {
+            return GetRandomRightHandAttackAnimation(weaponType.DataId, out animationIndex, out triggerDuration, out totalDuration);
+        }
+
+        public virtual bool GetRandomRightHandAttackAnimation(
+            int dataId,
+            out int animationIndex,
+            out float triggerDuration,
+            out float totalDuration)
+        {
+            tempActionAnimations = GetRightHandAttackAnimations(dataId);
+            animationIndex = 0;
+            triggerDuration = 0f;
+            totalDuration = 0f;
+            if (tempActionAnimations.Length == 0) return false;
+            animationIndex = Random.Range(0, tempActionAnimations.Length);
+            triggerDuration = tempActionAnimations[animationIndex].GetTriggerDuration();
+            totalDuration = tempActionAnimations[animationIndex].GetTotalDuration();
+            return true;
+        }
+
+        public bool GetRandomLeftHandAttackAnimation(
+            WeaponType weaponType,
+            out int animationIndex,
+            out float triggerDuration,
+            out float totalDuration)
+        {
+            return GetRandomLeftHandAttackAnimation(weaponType.DataId, out animationIndex, out triggerDuration, out totalDuration);
+        }
+
+        public virtual bool GetRandomLeftHandAttackAnimation(
+            int dataId,
+            out int animationIndex,
+            out float triggerDuration,
+            out float totalDuration)
+        {
+            tempActionAnimations = GetLeftHandAttackAnimations(dataId);
+            animationIndex = 0;
+            triggerDuration = 0f;
+            totalDuration = 0f;
+            if (tempActionAnimations.Length == 0) return false;
+            animationIndex = Random.Range(0, tempActionAnimations.Length);
+            triggerDuration = tempActionAnimations[animationIndex].GetTriggerDuration();
+            totalDuration = tempActionAnimations[animationIndex].GetTotalDuration();
+            return true;
+        }
+
+        public bool GetRandomSkillCastAnimation(
+            WeaponType weaponType,
+            out int animationIndex,
+            out float triggerDuration,
+            out float totalDuration)
+        {
+            return GetRandomSkillCastAnimation(weaponType.DataId, out animationIndex, out triggerDuration, out totalDuration);
+        }
+
+        public virtual bool GetRandomSkillCastAnimation(
+            int dataId,
+            out int animationIndex,
+            out float triggerDuration,
+            out float totalDuration)
+        {
+            tempActionAnimations = GetSkillCastAnimations(dataId);
+            animationIndex = 0;
+            triggerDuration = 0f;
+            totalDuration = 0f;
+            if (tempActionAnimations.Length == 0) return false;
+            animationIndex = Random.Range(0, tempActionAnimations.Length);
+            triggerDuration = tempActionAnimations[animationIndex].GetTriggerDuration();
+            totalDuration = tempActionAnimations[animationIndex].GetTotalDuration();
+            return true;
+        }
+
+        public bool HasSkillCastAnimations(Skill skill)
+        {
+            return HasSkillCastAnimations(skill.DataId);
+        }
+
+        public bool HasSkillCastAnimations(int dataId)
+        {
+            tempActionAnimations = GetSkillCastAnimations(dataId);
+            return tempActionAnimations != null && tempActionAnimations.Length > 0;
+        }
+        #endregion
     }
 
     [System.Serializable]

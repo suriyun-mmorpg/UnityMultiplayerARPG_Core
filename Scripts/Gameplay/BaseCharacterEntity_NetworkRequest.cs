@@ -33,7 +33,7 @@ namespace MultiplayerARPG
 
         public virtual void RequestPlayActionAnimation(AnimActionType animActionType, int dataId, int index)
         {
-            if (IsDead() || dataId == 0 || index < 0)
+            if (IsDead() || index < 0)
                 return;
             CallNetFunction("PlayActionAnimation", FunctionReceivers.All, animActionType, dataId, (byte)index);
         }

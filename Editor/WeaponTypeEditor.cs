@@ -13,7 +13,6 @@ namespace MultiplayerARPG
         {
             if (cacheWeaponType == null)
                 cacheWeaponType = CreateInstance<WeaponType>();
-            ShowOnEnum(cacheWeaponType.GetMemberName(a => a.equipType), WeaponItemEquipType.OneHandCanDual.ToString(), cacheWeaponType.GetMemberName(a => a.leftHandAttackAnimations));
         }
     }
 }

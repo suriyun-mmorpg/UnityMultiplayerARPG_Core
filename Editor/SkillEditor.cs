@@ -14,13 +14,11 @@ namespace MultiplayerARPG
             if (cacheSkill == null)
                 cacheSkill = CreateInstance<Skill>();
             // Attack type
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.castAnimations));
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.availableWeapons));
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.consumeMp));
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.coolDownDuration));
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.skillAttackType));
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Active.ToString(), cacheSkill.GetMemberName(a => a.skillBuffType));
-            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.CraftItem.ToString(), cacheSkill.GetMemberName(a => a.castAnimations));
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.CraftItem.ToString(), cacheSkill.GetMemberName(a => a.consumeMp));
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.CraftItem.ToString(), cacheSkill.GetMemberName(a => a.coolDownDuration));
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.CraftItem.ToString(), cacheSkill.GetMemberName(a => a.itemCraft));

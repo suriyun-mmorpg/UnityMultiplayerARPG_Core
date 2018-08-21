@@ -167,23 +167,16 @@ namespace MultiplayerARPG
             out Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
             // Initialize data
-            animActionType = AnimActionType.MonsterAttack;
-            dataId = MonsterDatabase.DataId;
-            animationIndex = 0;
+            animActionType = AnimActionType.AttackRightHand;
+
+            // Monster will not have weapon type so set dataId to `0`, then random attack animation from default attack animtions
+            dataId = 0;
+
+            // Monster will not have weapon data
             weapon = null;
-            triggerDuration = 0f;
-            totalDuration = 0f;
 
             // Random attack animation
-            var animArray = MonsterDatabase.attackAnimations;
-            var animLength = animArray.Length;
-            if (animLength > 0)
-            {
-                animationIndex = Random.Range(0, animLength);
-                var anim = animArray[animationIndex];
-                // Assign animation data
-                GetActionAnimationDurations(anim, out triggerDuration, out totalDuration);
-            }
+            CharacterModel.GetRandomRightHandAttackAnimation(dataId, out animationIndex, out triggerDuration, out totalDuration);
 
             // Assign damage data
             damageInfo = MonsterDatabase.damageInfo;

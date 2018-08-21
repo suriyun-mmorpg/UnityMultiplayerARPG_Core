@@ -13,16 +13,12 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public class CharacterAnimation2D
+    public class CharacterAnimation2D : CharacterAnimation
     {
         public AnimationClip down;
         public AnimationClip up;
         public AnimationClip left;
         public AnimationClip right;
-        [Tooltip("Set it more than zero to override default trigger duration rate")]
-        [Range(0f, 1f)]
-        public float triggerDurationRate;
-        public float extraDuration;
 
         public AnimationClip GetClipByDirection(DirectionType directionType)
         {
@@ -42,16 +38,36 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public struct WeaponAttack2D
+    public class ActionAnimation2D : CharacterAnimation2D
     {
-        public WeaponType weaponType;
-        public CharacterAnimation2D animation;
+        [Tooltip("This will be in use with attack/skill animations, This is rate of total animation duration at when it should hit enemy or apply skill")]
+        [Range(0f, 1f)]
+        public float triggerDurationRate;
+        [Tooltip("This will be in use with attack/skill animations, This is duration after played animation clip to add delay before next animation")]
+        public float extraDuration;
+        [Tooltip("This will be in use with attack/skill animations, These audio clips playing randomly while play this animation (not loop)")]
+        public AudioClip[] audioClips;
+
+        public AudioClip GetRandomAudioClip()
+        {
+            AudioClip clip = null;
+            if (audioClips != null && audioClips.Length > 0)
+                clip = audioClips[Random.Range(0, audioClips.Length)];
+            return clip;
+        }
     }
 
     [System.Serializable]
-    public struct SkillCast2D
+    public struct WeaponAnimations2D
+    {
+        public WeaponType weaponType;
+        public ActionAnimation2D animation;
+    }
+
+    [System.Serializable]
+    public struct SkillCastAnimations2D
     {
         public Skill skill;
-        public CharacterAnimation2D animation;
+        public ActionAnimation2D animation;
     }
 }

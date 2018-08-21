@@ -35,6 +35,7 @@ namespace MultiplayerARPG
         public float deadRespawnDelay = 5f;
 
         [Header("Attack animations")]
+        [System.Obsolete("This will be removed on next version, please move data to your Character Model")]
         public ActionAnimation[] attackAnimations;
 
         [Header("Weapon/Attack Abilities")]
