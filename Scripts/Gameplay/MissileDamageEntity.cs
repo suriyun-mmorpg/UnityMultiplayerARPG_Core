@@ -50,6 +50,16 @@ namespace MultiplayerARPG
 
         private void OnTriggerEnter(Collider other)
         {
+            TriggerEnter(other.gameObject);
+        }
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            TriggerEnter(other.gameObject);
+        }
+
+        private void TriggerEnter(GameObject other)
+        {
             if (!IsServer)
                 return;
 

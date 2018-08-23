@@ -163,13 +163,6 @@ namespace MultiplayerARPG
             return HasNavPaths;
         }
 
-        public override void StopMove()
-        {
-            navPaths = null;
-            moveDirection = Vector3.zero;
-            CacheRigidbody.velocity = new Vector3(0, CacheRigidbody.velocity.y, 0);
-        }
-
         public override void KeyMovement(Vector3 direction, bool isJump)
         {
             if (IsDead())
@@ -186,6 +179,13 @@ namespace MultiplayerARPG
             if (IsDead())
                 return;
             SetMovePaths(position, true);
+        }
+
+        public override void StopMove()
+        {
+            navPaths = null;
+            moveDirection = Vector3.zero;
+            CacheRigidbody.velocity = new Vector3(0, CacheRigidbody.velocity.y, 0);
         }
 
         protected virtual void OnCollisionEnter(Collision collision)

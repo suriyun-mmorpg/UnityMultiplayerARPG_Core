@@ -24,6 +24,26 @@ namespace MultiplayerARPG
 
         private void OnTriggerEnter(Collider other)
         {
+            TriggerEnter(other.gameObject);
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            TriggerExit(other.gameObject);
+        }
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            TriggerEnter(other.gameObject);
+        }
+
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            TriggerExit(other.gameObject);
+        }
+
+        private void TriggerEnter(GameObject other)
+        {
             // Improve performance by tags
             if (!other.CompareTag(GameInstance.Singleton.playerTag))
                 return;
@@ -50,7 +70,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void OnTriggerExit(Collider other)
+        private void TriggerExit(GameObject other)
         {
             // Improve performance by tags
             if (!other.CompareTag(GameInstance.Singleton.playerTag))

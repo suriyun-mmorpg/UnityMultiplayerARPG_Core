@@ -22,6 +22,7 @@ namespace MultiplayerARPG
     public abstract partial class BaseCharacterEntity : DamageableNetworkEntity, ICharacterData
     {
         public const float ACTION_COMMAND_DELAY = 0.2f;
+        public const int OVERLAP_COLLIDER_SIZE = 32;
         [HideInInspector]
         public bool isInSafeArea;
 
@@ -47,6 +48,13 @@ namespace MultiplayerARPG
         protected float lastActionCommandReceivedTime;
         public bool isRecaching { get; protected set; }
         public bool isSprinting { get; protected set; }
+        #endregion
+
+        #region Temp data
+        protected Collider[] overlapColliders = new Collider[OVERLAP_COLLIDER_SIZE];
+        protected int overlapSize;
+        protected int counter;
+        protected GameObject tempGameObject;
         #endregion
 
         #region Caches Data
@@ -730,38 +738,54 @@ namespace MultiplayerARPG
             switch (damageInfo.damageType)
             {
                 case DamageType.Melee:
-                    var halfFov = damageInfo.hitFov * 0.5f;
-                    var hits = Physics.OverlapSphere(damageTransform.position, damageInfo.hitDistance, gameInstance.GetDamageableLayerMask());
-                    foreach (var hit in hits)
+                    overlapSize = OverlapObjects(damageTransform.position, damageInfo.hitDistance, gameInstance.GetDamageableLayerMask());
+                    if (overlapSize == 0)
+                        return;
+                    for (counter = 0; counter < overlapSize; ++counter)
                     {
-                        var damageableEntity = hit.GetComponent<DamageableNetworkEntity>();
+                        GetOverlapObject(counter);
+                        var damageableEntity = tempGameObject.GetComponent<DamageableNetworkEntity>();
                         // Try to find damageable entity by building object materials
                         if (damageableEntity == null)
                         {
-                            var buildingMaterial = hit.GetComponent<BuildingMaterial>();
+                            var buildingMaterial = tempGameObject.GetComponent<BuildingMaterial>();
                             if (buildingMaterial != null && buildingMaterial.buildingEntity != null)
                                 damageableEntity = buildingMaterial.buildingEntity;
                         }
                         if (damageableEntity == null || damageableEntity == this || damageableEntity.IsDead())
                             continue;
-                        var targetDir = (CacheTransform.position - damageableEntity.CacheTransform.position).normalized;
-                        var angle = Vector3.Angle(targetDir, CacheTransform.forward);
-                        // Angle in forward position is 180 so we use this value to determine that target is in hit fov or not
-                        if (angle < 180 + halfFov && angle > 180 - halfFov)
+                        if (IsPositionInFov(damageInfo.hitFov, damageableEntity.CacheTransform.position))
                             damageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId);
                     }
                     break;
                 case DamageType.Missile:
                     if (damageInfo.missileDamageEntity != null)
                     {
-                        var missileDamageIdentity = Manager.Assets.NetworkSpawn(damageInfo.missileDamageEntity.Identity, damageTransform.position, damageTransform.rotation);
-                        var missileDamageEntity = missileDamageIdentity.GetComponent<MissileDamageEntity>();
+                        var missileDamageEntity = Manager.Assets.NetworkSpawn(damageInfo.missileDamageEntity.Identity, damageTransform.position, damageTransform.rotation).GetComponent<MissileDamageEntity>();
                         missileDamageEntity.SetupDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId, damageInfo.missileDistance, damageInfo.missileSpeed);
                     }
                     break;
             }
         }
         #endregion
+
+        protected virtual int OverlapObjects(Vector3 position, float distance, int layerMask)
+        {
+            return Physics.OverlapSphereNonAlloc(position, distance, overlapColliders, layerMask);
+        }
+
+        protected virtual GameObject GetOverlapObject(int index)
+        {
+            return tempGameObject = overlapColliders[index].gameObject;
+        }
+
+        protected virtual bool IsPositionInFov(float fov, Vector3 position)
+        {
+            var halfFov = fov * 0.5f;
+            var angle = Vector3.Angle((CacheTransform.position - position).normalized, CacheTransform.forward);
+            // Angle in forward position is 180 so we use this value to determine that target is in hit fov or not
+            return (angle < 180 + halfFov && angle > 180 - halfFov);
+        }
 
         protected virtual Transform GetDamageTransform(DamageType damageType)
         {
@@ -866,33 +890,31 @@ namespace MultiplayerARPG
 
         public T FindNearestAliveCharacter<T>(float distance, bool findForAlly, bool findForEnemy) where T : BaseCharacterEntity
         {
-            T result = null;
-            var colliders = Physics.OverlapSphere(CacheTransform.position, distance, gameInstance.characterLayer.Mask);
-            if (colliders != null && colliders.Length > 0)
+            overlapSize = OverlapObjects(CacheTransform.position, distance, gameInstance.characterLayer.Mask);
+            if (overlapSize == 0)
+                return null;
+            float tempDistance;
+            T tempEntity;
+            float nearestDistance = float.MaxValue;
+            T nearestEntity = null;
+            for (counter = 0; counter < overlapSize; ++counter)
             {
-                float tempDistance;
-                T tempEntity;
-                float nearestDistance = float.MaxValue;
-                T nearestEntity = null;
-                foreach (var collider in colliders)
+                GetOverlapObject(counter);
+                tempEntity = tempGameObject.GetComponent<T>();
+                if (tempEntity == null || tempEntity == this || tempEntity.IsDead())
+                    continue;
+                if (findForAlly && !tempEntity.IsAlly(this))
+                    continue;
+                if (findForEnemy && !tempEntity.IsEnemy(this))
+                    continue;
+                tempDistance = Vector3.Distance(CacheTransform.position, tempEntity.CacheTransform.position);
+                if (tempDistance < nearestDistance)
                 {
-                    tempEntity = collider.GetComponent<T>();
-                    if (tempEntity == null || tempEntity == this || tempEntity.IsDead())
-                        continue;
-                    if (findForAlly && !tempEntity.IsAlly(this))
-                        continue;
-                    if (findForEnemy && !tempEntity.IsEnemy(this))
-                        continue;
-                    tempDistance = Vector3.Distance(CacheTransform.position, tempEntity.CacheTransform.position);
-                    if (tempDistance < nearestDistance)
-                    {
-                        nearestDistance = tempDistance;
-                        nearestEntity = tempEntity;
-                    }
+                    nearestDistance = tempDistance;
+                    nearestEntity = tempEntity;
                 }
-                result = nearestEntity;
             }
-            return result;
+            return nearestEntity;
         }
 
         public abstract bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity);
