@@ -26,8 +26,7 @@ namespace MultiplayerARPG
 
         protected void Update()
         {
-            var deltaTime = Time.unscaledDeltaTime;
-            UpdateSkillAndBuff(deltaTime, this, CacheCharacterRecovery, CacheCharacterEntity);
+            UpdateSkillAndBuff(Time.unscaledDeltaTime, this, CacheCharacterRecovery, CacheCharacterEntity);
         }
 
         protected static void UpdateSkillAndBuff(float deltaTime, CharacterSkillAndBuffComponent skillAndBuffData, CharacterRecoveryComponent recoveryData, BaseCharacterEntity characterEntity)
