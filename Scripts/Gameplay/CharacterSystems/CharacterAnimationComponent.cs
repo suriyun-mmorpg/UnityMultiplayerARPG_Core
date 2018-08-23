@@ -17,6 +17,8 @@ namespace MultiplayerARPG
         public float velocityCalculationDeltaTime;
         #endregion
 
+        private static CharacterModel tempCharacterModel;
+
         protected void Update()
         {
             var deltaTime = Time.unscaledDeltaTime;
@@ -41,9 +43,9 @@ namespace MultiplayerARPG
                 animationData.velocityCalculationDeltaTime = 0f;
             }
 
-            var model = characterEntity.CharacterModel;
-            if (model != null)
-                model.UpdateAnimation(characterEntity.IsDead(), animationData.currentVelocity, gameplayRule.GetMoveSpeed(characterEntity) / characterEntity.CacheBaseMoveSpeed);
+            tempCharacterModel = characterEntity.CharacterModel;
+            if (tempCharacterModel != null)
+                tempCharacterModel.UpdateAnimation(characterEntity.IsDead(), animationData.currentVelocity, gameplayRule.GetMoveSpeed(characterEntity) / characterEntity.CacheBaseMoveSpeed);
         }
     }
 }
