@@ -21,9 +21,7 @@ namespace MultiplayerARPG
 
         protected void Update()
         {
-            var deltaTime = Time.unscaledDeltaTime;
-            var gameplayRule = GameInstance.Singleton.GameplayRule;
-            UpdateAnimation(deltaTime, gameplayRule, this, CacheCharacterEntity, CacheCharacterEntity.CacheTransform);
+            UpdateAnimation(Time.unscaledDeltaTime, GameInstance.Singleton.GameplayRule, this, CacheCharacterEntity, CacheCharacterEntity.CacheTransform);
         }
 
         protected static void UpdateAnimation(float deltaTime, BaseGameplayRule gameplayRule, CharacterAnimationComponent animationData, BaseCharacterEntity characterEntity, Transform transform)
@@ -37,8 +35,7 @@ namespace MultiplayerARPG
             {
                 if (!animationData.previousPosition.HasValue)
                     animationData.previousPosition = transform.position;
-                var currentMoveDistance = transform.position - animationData.previousPosition.Value;
-                animationData.currentVelocity = currentMoveDistance / animationData.velocityCalculationDeltaTime;
+                animationData.currentVelocity = (transform.position - animationData.previousPosition.Value) / animationData.velocityCalculationDeltaTime;
                 animationData.previousPosition = transform.position;
                 animationData.velocityCalculationDeltaTime = 0f;
             }
