@@ -238,7 +238,7 @@ namespace MultiplayerARPG
                 isMouseDragOrHoldOrOverUI = true;
             if (!isPointerOverUI && (getMouse || getMouseUp))
             {
-                var targetCamera = CacheGameplayCameraControls != null ? CacheGameplayCameraControls.targetCamera : Camera.main;
+                var targetCamera = Camera.main;
                 PlayerCharacterEntity.SetTargetEntity(null);
                 LiteNetLibIdentity targetIdentity = null;
                 Vector3? targetPosition = null;
@@ -346,7 +346,7 @@ namespace MultiplayerARPG
             var jumpInput = InputManager.GetButtonDown("Jump");
 
             var moveDirection = Vector3.zero;
-            var cameraTransform = CacheGameplayCameraControls != null ? CacheGameplayCameraControls.targetCamera.transform : Camera.main.transform;
+            var cameraTransform = Camera.main.transform;
             if (cameraTransform != null)
             {
                 moveDirection += cameraTransform.forward * verticalInput;
@@ -461,7 +461,7 @@ namespace MultiplayerARPG
                 isMouseDragOrHoldOrOverUI = true;
             if (!isPointerOverUI && Input.GetMouseButtonUp(0) && !isMouseDragOrHoldOrOverUI)
             {
-                var targetCamera = CacheGameplayCameraControls != null ? CacheGameplayCameraControls.targetCamera : Camera.main;
+                var targetCamera = Camera.main;
                 RaycastToSetBuildingArea(targetCamera.ScreenPointToRay(Input.mousePosition), 100f);
             }
         }
