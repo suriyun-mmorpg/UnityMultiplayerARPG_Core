@@ -754,7 +754,7 @@ namespace MultiplayerARPG
                         }
                         if (damageableEntity == null || damageableEntity == this || damageableEntity.IsDead())
                             continue;
-                        if (IsPositionInFov(damageInfo.hitFov, damageableEntity.CacheTransform.position))
+                        if (IsPositionInAttackFov(damageInfo.hitFov, damageableEntity.CacheTransform.position))
                             damageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId);
                     }
                     break;
@@ -779,7 +779,7 @@ namespace MultiplayerARPG
             return tempGameObject = overlapColliders[index].gameObject;
         }
 
-        protected virtual bool IsPositionInFov(float fov, Vector3 position)
+        protected virtual bool IsPositionInAttackFov(float fov, Vector3 position)
         {
             var halfFov = fov * 0.5f;
             var angle = Vector3.Angle((CacheTransform.position - position).normalized, CacheTransform.forward);
