@@ -26,9 +26,6 @@ namespace MultiplayerARPG
         [HideInInspector]
         public BasePlayerCharacterEntity coPlayerCharacterEntity;
 
-        public bool isJumping { get; protected set; }
-        public bool isGrounded { get; protected set; }
-
         private LiteNetLibTransform cacheNetTransform;
         public LiteNetLibTransform CacheNetTransform
         {
@@ -163,7 +160,6 @@ namespace MultiplayerARPG
         }
 
         public abstract float StoppingDistance { get; }
-        public abstract bool IsMoving();
         public abstract void StopMove();
         public abstract void KeyMovement(Vector3 direction, bool isJump);
         public abstract void PointClickMovement(Vector3 position);

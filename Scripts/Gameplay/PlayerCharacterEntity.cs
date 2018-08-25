@@ -20,20 +20,22 @@ namespace MultiplayerARPG
         public float gravityRate = 1f;
         public float angularSpeed = 800f;
         #endregion
-        
+
+        public bool isJumping { get; protected set; }
+        public bool isGrounded { get; protected set; }
         public Queue<Vector3> navPaths { get; protected set; }
         public Vector3 moveDirection { get; protected set; }
-
-        public override float StoppingDistance
-        {
-            get { return stoppingDistance; }
-        }
 
         public bool HasNavPaths
         {
             get { return navPaths != null && navPaths.Count > 0; }
         }
 
+        public override float StoppingDistance
+        {
+            get { return stoppingDistance; }
+        }
+        
         private Rigidbody cacheRigidbody;
         public Rigidbody CacheRigidbody
         {
@@ -156,11 +158,6 @@ namespace MultiplayerARPG
             CacheNetTransform.ownerClientNotInterpolate = false;
             // Register Network functions
             RegisterNetFunction("TriggerJump", new LiteNetLibFunction(NetFuncTriggerJump));
-        }
-
-        public override bool IsMoving()
-        {
-            return HasNavPaths;
         }
 
         public override void KeyMovement(Vector3 direction, bool isJump)

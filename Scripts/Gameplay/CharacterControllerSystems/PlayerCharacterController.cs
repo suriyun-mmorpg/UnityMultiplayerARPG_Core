@@ -6,15 +6,15 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public enum PlayerCharacterControllerMode
-    {
-        PointClick,
-        WASD,
-        Both,
-    }
-
     public class PlayerCharacterController : BasePlayerCharacterController
     {
+        public enum PlayerCharacterControllerMode
+        {
+            PointClick,
+            WASD,
+            Both,
+        }
+
         public const float DETECT_MOUSE_DRAG_DISTANCE = 10f;
         public const float DETECT_MOUSE_HOLD_DURATION = 1f;
         public PlayerCharacterControllerMode controllerMode;
@@ -414,8 +414,7 @@ namespace MultiplayerARPG
             {
                 if (moveDirection.magnitude > 0)
                 {
-                    if (PlayerCharacterEntity.IsMoving())
-                        PlayerCharacterEntity.StopMove();
+                    PlayerCharacterEntity.StopMove();
                     destination = null;
                     PlayerCharacterEntity.SetTargetEntity(null);
                 }
