@@ -92,7 +92,7 @@ namespace MultiplayerARPG
                 var currentPosition = CacheTransform.position;
                 currentPosition.y = 0;
                 moveDirection = (targetPosition - currentPosition).normalized;
-                if (Vector3.Distance(targetPosition, currentPosition) < stoppingDistance)
+                if (Vector3.Distance(targetPosition, currentPosition) < StoppingDistance)
                 {
                     navPaths.Dequeue();
                     if (!HasNavPaths)

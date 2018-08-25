@@ -67,7 +67,7 @@ namespace MultiplayerARPG
             {
                 var currentPosition = new Vector2(CacheTransform.position.x, CacheTransform.position.y);
                 moveDirection = (currentDestination.Value - currentPosition).normalized;
-                if (Vector3.Distance(currentDestination.Value, currentPosition) < stoppingDistance)
+                if (Vector3.Distance(currentDestination.Value, currentPosition) < StoppingDistance)
                     StopMove();
             }
 
