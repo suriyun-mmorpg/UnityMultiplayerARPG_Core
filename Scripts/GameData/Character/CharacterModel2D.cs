@@ -8,6 +8,8 @@ namespace MultiplayerARPG
     {
         [Header("2D Animations")]
         [SerializeField]
+        private SpriteRenderer spriteRenderer;
+        [SerializeField]
         private CharacterAnimation2D idleAnimation2D;
         [SerializeField]
         private CharacterAnimation2D moveAnimation2D;
@@ -59,23 +61,48 @@ namespace MultiplayerARPG
         }
 
         private DirectionType currentDirection = DirectionType.Down;
-        private AnimationClip playingClip;
+        private Anim2D playingAnim;
+        private int currentFrame;
+        bool playing;
+        float secsPerFrame;
+        float nextFrameTime;
 
-        public void Play2DAnim_Animator(AnimationClip clip)
+        void Update()
         {
-            if (playingClip == null || playingClip == clip) return;
-            CacheAnimator.enabled = false;
-            CacheAnimatorController[ANIM_STATE_ACTION_CLIP] = clip;
-            CacheAnimator.enabled = true;
+            if (!playing || Time.time < nextFrameTime || spriteRenderer == null) return;
+            currentFrame++;
+            if (currentFrame >= playingAnim.frames.Length)
+            {
+                if (!playingAnim.loop)
+                {
+                    playing = false;
+                    return;
+                }
+                currentFrame = 0;
+            }
+            spriteRenderer.sprite = playingAnim.frames[currentFrame];
+            nextFrameTime += secsPerFrame;
         }
 
-        public void Play2DAnim_Animation(AnimationClip clip)
+        public void Play(Anim2D anim)
         {
-            if (playingClip == null || playingClip == clip) return;
-            if (CacheAnimation.GetClip(LEGACY_CLIP_ACTION) != null)
-                CacheAnimation.RemoveClip(LEGACY_CLIP_ACTION);
-            CacheAnimation.AddClip(clip, LEGACY_CLIP_ACTION);
-            CacheAnimation.Play(LEGACY_CLIP_ACTION);
+            playingAnim = anim;
+
+            secsPerFrame = 1f / anim.framesPerSec;
+            currentFrame = -1;
+            playing = true;
+            nextFrameTime = Time.time;
+        }
+
+        public void Stop()
+        {
+            playing = false;
+        }
+
+        public void Resume()
+        {
+            playing = true;
+            nextFrameTime = Time.time + secsPerFrame;
         }
 
         private void UpdateDirection(Vector3 moveVelocity)
@@ -99,48 +126,20 @@ namespace MultiplayerARPG
         public override void UpdateAnimation(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier = 1)
         {
             UpdateDirection(moveVelocity);
-            switch (animatorType)
-            {
-                case AnimatorType.Animator:
-                    UpdateAnimation_Animator(isDead, moveVelocity, playMoveSpeedMultiplier);
-                    break;
-                case AnimatorType.LegacyAnimtion:
-                    UpdateAnimation_LegacyAnimation(isDead, moveVelocity, playMoveSpeedMultiplier);
-                    break;
-            }
-        }
-
-        private void UpdateAnimation_Animator(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier)
-        {
             if (isDead)
-                Play2DAnim_Animator(deadAnimation2D.GetClipByDirection(currentDirection));
+                Play(deadAnimation2D.GetClipByDirection(currentDirection));
             else
             {
                 if (moveVelocity.magnitude > 0)
-                    Play2DAnim_Animator(moveAnimation2D.GetClipByDirection(currentDirection));
+                    Play(moveAnimation2D.GetClipByDirection(currentDirection));
                 else
-                    Play2DAnim_Animator(idleAnimation2D.GetClipByDirection(currentDirection));
-            }
-        }
-
-        private void UpdateAnimation_LegacyAnimation(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier)
-        {
-            if (isDead)
-                Play2DAnim_Animation(deadAnimation2D.GetClipByDirection(currentDirection));
-            else
-            {
-                if (moveVelocity.magnitude > 0)
-                    Play2DAnim_Animation(moveAnimation2D.GetClipByDirection(currentDirection));
-                else
-                    Play2DAnim_Animation(idleAnimation2D.GetClipByDirection(currentDirection));
+                    Play(idleAnimation2D.GetClipByDirection(currentDirection));
             }
         }
 
         public override Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1)
         {
-            if (animatorType == AnimatorType.LegacyAnimtion)
-                return StartCoroutine(PlayActionAnimation_LegacyAnimation(animActionType, dataId, index, playSpeedMultiplier));
-            return StartCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier));
+            return StartCoroutine(PlayActionAnimationRoutine(animActionType, dataId, index, playSpeedMultiplier));
         }
 
         private ActionAnimation2D GetActionAnimation(AnimActionType animActionType, int dataId)
@@ -161,37 +160,19 @@ namespace MultiplayerARPG
             return animation2D;
         }
 
-        private IEnumerator PlayActionAnimation_Animator(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
+        IEnumerator PlayActionAnimationRoutine(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
         {
             // If animator is not null, play the action animation
             var animation = GetActionAnimation(animActionType, dataId);
             if (animation != null)
             {
-                AnimationClip clip = animation.GetClipByDirection(currentDirection);
-                if (clip != null)
+                var anim = animation.GetClipByDirection(currentDirection);
+                if (anim != null)
                 {
                     // Waits by current transition + clip duration before end animation
-                    Play2DAnim_Animator(clip);
-                    yield return new WaitForSecondsRealtime(clip.length / playSpeedMultiplier);
-                    Play2DAnim_Animator(idleAnimation2D.GetClipByDirection(currentDirection));
-                    yield return new WaitForSecondsRealtime(animation.extraDuration / playSpeedMultiplier);
-                }
-            }
-        }
-
-        private IEnumerator PlayActionAnimation_LegacyAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
-        {
-            // If animator is not null, play the action animation
-            var animation = GetActionAnimation(animActionType, dataId);
-            if (animation != null)
-            {
-                AnimationClip clip = animation.GetClipByDirection(currentDirection);
-                if (clip != null)
-                {
-                    // Waits by current transition + clip duration before end animation
-                    Play2DAnim_Animation(clip);
-                    yield return new WaitForSecondsRealtime(clip.length / playSpeedMultiplier);
-                    Play2DAnim_Animation(idleAnimation2D.GetClipByDirection(currentDirection));
+                    Play(anim);
+                    yield return new WaitForSecondsRealtime(anim.duration / playSpeedMultiplier);
+                    Play(idleAnimation2D.GetClipByDirection(currentDirection));
                     yield return new WaitForSecondsRealtime(animation.extraDuration / playSpeedMultiplier);
                 }
             }
