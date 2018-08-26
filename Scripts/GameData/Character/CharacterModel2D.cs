@@ -86,13 +86,19 @@ namespace MultiplayerARPG
         private SampleAnimation? dirtySampleAnimation;
         private DirectionType? dirtySampleType;
 
-        void OnEnable()
+        private void Start()
+        {
+            Play(idleAnimation2D.GetClipByDirection(DirectionType.Down));
+        }
+
+        private void OnEnable()
         {
 #if UNITY_EDITOR
             EditorApplication.update += EditorUpdate;
 #endif
         }
-        void OnDisable()
+
+        private void OnDisable()
         {
 #if UNITY_EDITOR
             EditorApplication.update -= EditorUpdate;
@@ -101,12 +107,15 @@ namespace MultiplayerARPG
 
         void EditorUpdate()
         {
-            Update();
+            if (!Application.isPlaying)
+            {
+                UpdateSample();
+                Update();
+            }
         }
 
         void Update()
         {
-            UpdateSample();
             if (!playing || Time.realtimeSinceStartup < nextFrameTime || spriteRenderer == null)
                 return;
             currentFrame++;
@@ -125,8 +134,6 @@ namespace MultiplayerARPG
 
         private void UpdateSample()
         {
-            if (!Application.isEditor)
-                return;
             if (dirtySampleAnimation.HasValue &&
                 dirtySampleAnimation.Value == sampleAnimation &&
                 dirtySampleType.HasValue &&
