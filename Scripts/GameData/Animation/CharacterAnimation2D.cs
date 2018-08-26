@@ -13,28 +13,14 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public class Anim2D
+    public class CharacterAnimation2D
     {
-        public Sprite[] frames;
-        public float framesPerSec = 5;
-        public bool loop = true;
+        public AnimationClip2D down;
+        public AnimationClip2D up;
+        public AnimationClip2D left;
+        public AnimationClip2D right;
 
-        public float duration
-        {
-            get { return frames.Length * framesPerSec; }
-            set { framesPerSec = value / frames.Length; }
-        }
-    }
-
-    [System.Serializable]
-    public class CharacterAnimation2D : CharacterAnimation
-    {
-        public Anim2D down;
-        public Anim2D up;
-        public Anim2D left;
-        public Anim2D right;
-
-        public Anim2D GetClipByDirection(DirectionType directionType)
+        public AnimationClip2D GetClipByDirection(DirectionType directionType)
         {
             switch (directionType)
             {

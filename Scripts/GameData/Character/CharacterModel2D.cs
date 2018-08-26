@@ -1,11 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
+    [ExecuteInEditMode]
     public class CharacterModel2D : CharacterModel
     {
+        public enum SampleAnimation
+        {
+            Idle,
+            Move,
+            Dead,
+            DefaultAttack,
+            DefaultSkillCast,
+        }
         [Header("2D Animations")]
         [SerializeField]
         private SpriteRenderer spriteRenderer;
@@ -23,6 +35,11 @@ namespace MultiplayerARPG
         private WeaponAnimations2D[] weaponAnimations2D;
         [SerializeField]
         private SkillCastAnimations2D[] skillCastAnimations2D;
+        [Header("Sample 2D Animations")]
+        [SerializeField]
+        private SampleAnimation sampleAnimation = SampleAnimation.Idle;
+        [SerializeField]
+        private DirectionType sampleDirection = DirectionType.Down;
 
         private Dictionary<int, ActionAnimation2D> cacheWeaponAnimations2D;
         public Dictionary<int, ActionAnimation2D> CacheWeaponAnimations2D
@@ -61,15 +78,37 @@ namespace MultiplayerARPG
         }
 
         private DirectionType currentDirection = DirectionType.Down;
-        private Anim2D playingAnim;
-        private int currentFrame;
-        bool playing;
-        float secsPerFrame;
-        float nextFrameTime;
+        private AnimationClip2D playingAnim = null;
+        private int currentFrame = 0;
+        private bool playing = false;
+        private float secsPerFrame = 0;
+        private float nextFrameTime = 0;
+        private SampleAnimation? dirtySampleAnimation;
+        private DirectionType? dirtySampleType;
+
+        void OnEnable()
+        {
+#if UNITY_EDITOR
+            EditorApplication.update += EditorUpdate;
+#endif
+        }
+        void OnDisable()
+        {
+#if UNITY_EDITOR
+            EditorApplication.update -= EditorUpdate;
+#endif
+        }
+
+        void EditorUpdate()
+        {
+            Update();
+        }
 
         void Update()
         {
-            if (!playing || Time.time < nextFrameTime || spriteRenderer == null) return;
+            UpdateSample();
+            if (!playing || Time.realtimeSinceStartup < nextFrameTime || spriteRenderer == null)
+                return;
             currentFrame++;
             if (currentFrame >= playingAnim.frames.Length)
             {
@@ -84,14 +123,45 @@ namespace MultiplayerARPG
             nextFrameTime += secsPerFrame;
         }
 
-        public void Play(Anim2D anim)
+        private void UpdateSample()
+        {
+            if (!Application.isEditor)
+                return;
+            if (dirtySampleAnimation.HasValue &&
+                dirtySampleAnimation.Value == sampleAnimation &&
+                dirtySampleType.HasValue &&
+                dirtySampleType.Value == sampleDirection)
+                return;
+            dirtySampleAnimation = sampleAnimation;
+            dirtySampleType = sampleDirection;
+            switch (sampleAnimation)
+            {
+                case SampleAnimation.Idle:
+                    Play(idleAnimation2D.GetClipByDirection(sampleDirection));
+                    break;
+                case SampleAnimation.Move:
+                    Play(moveAnimation2D.GetClipByDirection(sampleDirection));
+                    break;
+                case SampleAnimation.Dead:
+                    Play(deadAnimation2D.GetClipByDirection(sampleDirection));
+                    break;
+                case SampleAnimation.DefaultAttack:
+                    Play(defaultAttackAnimation2D.GetClipByDirection(sampleDirection));
+                    break;
+                case SampleAnimation.DefaultSkillCast:
+                    Play(defaultSkillCastAnimation2D.GetClipByDirection(sampleDirection));
+                    break;
+            }
+        }
+
+        public void Play(AnimationClip2D anim)
         {
             playingAnim = anim;
 
             secsPerFrame = 1f / anim.framesPerSec;
             currentFrame = -1;
             playing = true;
-            nextFrameTime = Time.time;
+            nextFrameTime = Time.realtimeSinceStartup;
         }
 
         public void Stop()
@@ -102,7 +172,7 @@ namespace MultiplayerARPG
         public void Resume()
         {
             playing = true;
-            nextFrameTime = Time.time + secsPerFrame;
+            nextFrameTime = Time.realtimeSinceStartup + secsPerFrame;
         }
 
         private void UpdateDirection(Vector3 moveVelocity)
