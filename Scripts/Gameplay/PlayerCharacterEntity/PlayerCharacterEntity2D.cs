@@ -24,7 +24,7 @@ namespace MultiplayerARPG
 
         #region Temp data
         protected Collider2D[] overlapColliders2D = new Collider2D[OVERLAP_COLLIDER_SIZE];
-        protected Vector2 currentDirection;
+        protected Vector2 currentDirection = Vector2.down;
         protected Vector2 dirtyDirection;
         protected Vector2 tempDirection;
         protected Vector2? currentDestination;
@@ -174,6 +174,24 @@ namespace MultiplayerARPG
             var angle = Vector2.Angle((CacheTransform.position - position).normalized, currentDirection);
             // Angle in forward position is 180 so we use this value to determine that target is in hit fov or not
             return (angle < 180 + halfFov && angle > 180 - halfFov);
+        }
+
+        protected override void GetDamagePositionAndRotation(DamageType damageType, out Vector3 position, out Quaternion rotation)
+        {
+            position = CacheTransform.position;
+            if (CharacterModel != null)
+            {
+                switch (damageType)
+                {
+                    case DamageType.Melee:
+                        position = MeleeDamageTransform.position;
+                        break;
+                    case DamageType.Missile:
+                        position = MissileDamageTransform.position;
+                        break;
+                }
+            }
+            rotation = Quaternion.Euler(0, 0, Mathf.Atan2(currentDirection.y, currentDirection.x) * (180 / Mathf.PI));
         }
 
         public void UpdateDirection(Vector2 direction)

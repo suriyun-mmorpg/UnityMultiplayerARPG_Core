@@ -733,11 +733,13 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return;
 
-            Transform damageTransform = GetDamageTransform(damageInfo.damageType);
+            Vector3 damagePosition;
+            Quaternion damageRotation;
+            GetDamagePositionAndRotation(damageInfo.damageType, out damagePosition, out damageRotation);
             switch (damageInfo.damageType)
             {
                 case DamageType.Melee:
-                    overlapSize = OverlapObjects(damageTransform.position, damageInfo.hitDistance, gameInstance.GetDamageableLayerMask());
+                    overlapSize = OverlapObjects(damagePosition, damageInfo.hitDistance, gameInstance.GetDamageableLayerMask());
                     if (overlapSize == 0)
                         return;
                     for (counter = 0; counter < overlapSize; ++counter)
@@ -760,7 +762,7 @@ namespace MultiplayerARPG
                 case DamageType.Missile:
                     if (damageInfo.missileDamageEntity != null)
                     {
-                        var missileDamageEntity = Manager.Assets.NetworkSpawn(damageInfo.missileDamageEntity.Identity, damageTransform.position, damageTransform.rotation).GetComponent<MissileDamageEntity>();
+                        var missileDamageEntity = Manager.Assets.NetworkSpawn(damageInfo.missileDamageEntity.Identity, damagePosition, damageRotation).GetComponent<MissileDamageEntity>();
                         missileDamageEntity.SetupDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId, damageInfo.missileDistance, damageInfo.missileSpeed);
                     }
                     break;
@@ -786,19 +788,24 @@ namespace MultiplayerARPG
             return (angle < 180 + halfFov && angle > 180 - halfFov);
         }
 
-        protected virtual Transform GetDamageTransform(DamageType damageType)
+        protected virtual void GetDamagePositionAndRotation(DamageType damageType, out Vector3 position, out Quaternion rotation)
         {
+            position = CacheTransform.position;
+            rotation = CacheTransform.rotation;
             if (CharacterModel != null)
             {
                 switch (damageType)
                 {
                     case DamageType.Melee:
-                        return MeleeDamageTransform;
+                        position = MeleeDamageTransform.position;
+                        rotation = MeleeDamageTransform.rotation;
+                        break;
                     case DamageType.Missile:
-                        return MissileDamageTransform;
+                        position = MissileDamageTransform.position;
+                        rotation = MissileDamageTransform.rotation;
+                        break;
                 }
             }
-            return CacheTransform;
         }
 
         public override void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountType combatAmountType, int damage)

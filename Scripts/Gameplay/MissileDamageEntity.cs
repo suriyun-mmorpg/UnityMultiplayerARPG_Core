@@ -5,12 +5,18 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(Rigidbody))]
     public class MissileDamageEntity : BaseDamageEntity
     {
-        protected float missileDistance;
+        public enum MissileType
+        {
+            Rigidbody3D,
+            Rigidbody2D,
+        }
+        [SerializeField]
+        protected MissileType missileType;
         [SerializeField]
         protected SyncFieldFloat missileSpeed = new SyncFieldFloat();
+        protected float missileDistance;
 
         private Rigidbody cacheRigidbody;
         public Rigidbody CacheRigidbody
@@ -20,6 +26,17 @@ namespace MultiplayerARPG
                 if (cacheRigidbody == null)
                     cacheRigidbody = GetComponent<Rigidbody>();
                 return cacheRigidbody;
+            }
+        }
+
+        private Rigidbody2D cacheRigidbody2D;
+        public Rigidbody2D CacheRigidbody2D
+        {
+            get
+            {
+                if (cacheRigidbody2D == null)
+                    cacheRigidbody2D = GetComponent<Rigidbody2D>();
+                return cacheRigidbody2D;
             }
         }
 
@@ -37,7 +54,7 @@ namespace MultiplayerARPG
             this.missileSpeed.Value = missileSpeed;
 
             if (missileDistance > 0 && missileSpeed > 0)
-                NetworkDestroy(missileDistance / missileSpeed);
+                NetworkDestroy(100);
             else
                 NetworkDestroy();
         }
@@ -45,7 +62,17 @@ namespace MultiplayerARPG
         protected override void EntityFixedUpdate()
         {
             base.EntityFixedUpdate();
-            CacheRigidbody.velocity = CacheTransform.forward * missileSpeed.Value;
+            switch (missileType)
+            {
+                case MissileType.Rigidbody3D:
+                    if (CacheRigidbody != null)
+                        CacheRigidbody.velocity = CacheTransform.forward * missileSpeed.Value;
+                    break;
+                case MissileType.Rigidbody2D:
+                    if (CacheRigidbody2D != null)
+                        CacheRigidbody2D.velocity = CacheTransform.right * missileSpeed.Value;
+                    break;
+            }
         }
 
         private void OnTriggerEnter(Collider other)
