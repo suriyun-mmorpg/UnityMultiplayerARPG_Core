@@ -26,6 +26,8 @@ namespace MultiplayerARPG
         protected Collider2D[] overlapColliders2D = new Collider2D[OVERLAP_COLLIDER_SIZE];
         protected Vector2 currentDirection;
         protected Vector2? currentDestination;
+        protected DirectionType tempDirectionType = DirectionType.Down;
+        protected DirectionType dirtyDirectionType = DirectionType.Down;
         #endregion
 
         public Vector2 moveDirection { get; protected set; }
@@ -47,6 +49,11 @@ namespace MultiplayerARPG
             }
         }
 
+        public DirectionType CurrentDirectionType
+        {
+            get { return (DirectionType)currentDirectionType.Value; }
+        }
+
         protected override void EntityAwake()
         {
             base.EntityAwake();
@@ -64,7 +71,7 @@ namespace MultiplayerARPG
                 SetTargetEntity(null);
                 return;
             }
-            (CharacterModel as CharacterModel2D).currentDirectionType = (DirectionType)currentDirectionType.Value;
+            (CharacterModel as CharacterModel2D).currentDirectionType = CurrentDirectionType;
             Profiler.EndSample();
         }
 
@@ -100,6 +107,16 @@ namespace MultiplayerARPG
             base.SetupNetElements();
             currentDirectionType.sendOptions = SendOptions.Unreliable;
             currentDirectionType.forOwnerOnly = false;
+        }
+
+        public override void OnSetup()
+        {
+            base.OnSetup();
+            // Setup network components
+            CacheNetTransform.ownerClientCanSendTransform = true;
+            CacheNetTransform.ownerClientNotInterpolate = false;
+            // Register Network functions
+            RegisterNetFunction("UpdateDirectionType", new LiteNetLibFunction<NetFieldByte>((directionType) => NetFuncUpdateDirectionType(directionType)));
         }
 
         public override void KeyMovement(Vector3 direction, bool isJump)
@@ -150,15 +167,30 @@ namespace MultiplayerARPG
                 var normalized = moveVelocity.normalized;
                 if (Mathf.Abs(normalized.x) >= Mathf.Abs(normalized.y))
                 {
-                    if (normalized.x < 0) currentDirectionType.Value = (byte)DirectionType.Left;
-                    if (normalized.x > 0) currentDirectionType.Value = (byte)DirectionType.Right;
+                    if (normalized.x < 0) tempDirectionType = DirectionType.Left;
+                    if (normalized.x > 0) tempDirectionType = DirectionType.Right;
                 }
                 else
                 {
-                    if (normalized.y < 0) currentDirectionType.Value = (byte)DirectionType.Down;
-                    if (normalized.y > 0) currentDirectionType.Value = (byte)DirectionType.Up;
+                    if (normalized.y < 0) tempDirectionType = DirectionType.Down;
+                    if (normalized.y > 0) tempDirectionType = DirectionType.Up;
                 }
             }
+            if (dirtyDirectionType != tempDirectionType)
+            {
+                dirtyDirectionType = tempDirectionType;
+                RequestUpdateDirectionType((byte)tempDirectionType);
+            }
+        }
+
+        private void NetFuncUpdateDirectionType(byte directionType)
+        {
+            currentDirectionType.Value = directionType;
+        }
+        
+        public virtual void RequestUpdateDirectionType(byte directionType)
+        {
+            CallNetFunction("UpdateDirectionType", FunctionReceivers.Server, directionType);
         }
     }
 }

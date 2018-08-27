@@ -11,7 +11,7 @@ public class AnimationClip2D : ScriptableObject
 
     public float duration
     {
-        get { return frames.Length * framesPerSec; }
-        set { framesPerSec = value / frames.Length; }
+        get { return frames.Length / framesPerSec; }
+        set { framesPerSec = frames.Length / value; }
     }
 }

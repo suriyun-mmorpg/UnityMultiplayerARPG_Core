@@ -39,6 +39,7 @@ namespace MultiplayerARPG
         protected bool isPointerOverUI;
         protected bool isMouseDragDetected;
         protected bool isMouseHoldDetected;
+        protected bool isMouseHoldAndNotDrag;
         protected RaycastHit2D[] foundRaycastAll;
         protected Collider2D[] foundOverlapCircleAll;
         protected BaseCharacterEntity targetCharacter;
@@ -219,23 +220,24 @@ namespace MultiplayerARPG
             isPointerOverUI = CacheUISceneGameplay != null && CacheUISceneGameplay.IsPointerOverUIObject();
             isMouseDragDetected = (Input.mousePosition - mouseDownPosition).magnitude > DETECT_MOUSE_DRAG_DISTANCE;
             isMouseHoldDetected = Time.unscaledTime - mouseDownTime > DETECT_MOUSE_HOLD_DURATION;
+            isMouseHoldAndNotDrag = !isMouseDragDetected && isMouseHoldDetected;
             if (!isMouseDragOrHoldOrOverUI && (isMouseDragDetected || isMouseHoldDetected || isPointerOverUI))
                 isMouseDragOrHoldOrOverUI = true;
             if (!isPointerOverUI && (getMouse || getMouseUp))
             {
-                var targetCamera = Camera.main;
                 PlayerCharacterEntity.SetTargetEntity(null);
                 LiteNetLibIdentity targetIdentity = null;
                 Vector3? targetPosition = null;
-                var clickPosition = targetCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, targetCamera.transform.position.z));
+                var mouseUpOnTarget = getMouseUp &&
+                        !isMouseDragOrHoldOrOverUI &&
+                        (controllerMode == PlayerCharacterControllerMode.PointClick || controllerMode == PlayerCharacterControllerMode.Both);
+                var clickPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 foundRaycastAll = Physics2D.LinecastAll(clickPosition, clickPosition, gameInstance.GetTargetLayerMask());
                 foreach (var hit in foundRaycastAll)
                 {
                     var hitTransform = hit.transform;
                     // When clicking on target
-                    if (getMouseUp &&
-                        !isMouseDragOrHoldOrOverUI &&
-                        (controllerMode == PlayerCharacterControllerMode.PointClick || controllerMode == PlayerCharacterControllerMode.Both))
+                    if (mouseUpOnTarget)
                     {
                         targetPlayer = hitTransform.GetComponent<BasePlayerCharacterEntity>();
                         targetMonster = hitTransform.GetComponent<BaseMonsterCharacterEntity>();
@@ -282,7 +284,7 @@ namespace MultiplayerARPG
                         }
                     }
                     // When holding on target
-                    else if (!isMouseDragDetected && isMouseHoldDetected)
+                    else if (isMouseHoldAndNotDrag)
                     {
                         var buildingMaterial = hitTransform.GetComponent<BuildingMaterial>();
                         PlayerCharacterEntity.SetTargetEntity(null);
@@ -295,20 +297,25 @@ namespace MultiplayerARPG
                         }
                     }
                 }
-                if (!targetPosition.HasValue)
+                // When clicking on map (any non-collider position)
+                if (mouseUpOnTarget && !targetPosition.HasValue)
                     targetPosition = clickPosition;
-                // Close NPC dialog, when target changes
-                if (CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
-                    CacheUISceneGameplay.uiNpcDialog.Hide();
-                // Clear queue using skill
-                queueUsingSkill = null;
-                // Move to target, will hide destination when target is object
-                if (targetIdentity != null)
-                    destination = null;
-                else
+                // If Found target, do something
+                if (targetPosition.HasValue)
                 {
-                    destination = targetPosition.Value;
-                    PlayerCharacterEntity.PointClickMovement(targetPosition.Value);
+                    // Close NPC dialog, when target changes
+                    if (CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
+                        CacheUISceneGameplay.uiNpcDialog.Hide();
+                    // Clear queue using skill
+                    queueUsingSkill = null;
+                    // Move to target, will hide destination when target is object
+                    if (targetIdentity != null)
+                        destination = null;
+                    else
+                    {
+                        destination = targetPosition.Value;
+                        PlayerCharacterEntity.PointClickMovement(targetPosition.Value);
+                    }
                 }
             }
         }
@@ -436,10 +443,7 @@ namespace MultiplayerARPG
             if (!isMouseDragOrHoldOrOverUI && (isMouseDragDetected || isMouseHoldDetected || isPointerOverUI))
                 isMouseDragOrHoldOrOverUI = true;
             if (!isPointerOverUI && Input.GetMouseButtonUp(0) && !isMouseDragOrHoldOrOverUI)
-            {
-                var targetCamera = Camera.main;
-                RaycastToSetBuildingArea(targetCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, targetCamera.transform.position.z)), 100f);
-            }
+                RaycastToSetBuildingArea(Camera.main.ScreenToWorldPoint(Input.mousePosition), 100f);
         }
 
         protected void UpdateFollowTarget()

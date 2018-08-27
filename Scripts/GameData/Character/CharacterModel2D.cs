@@ -82,6 +82,7 @@ namespace MultiplayerARPG
         private AnimationClip2D playingAnim = null;
         private int currentFrame = 0;
         private bool playing = false;
+        private bool playingAction = false;
         private float secsPerFrame = 0;
         private float nextFrameTime = 0;
         private SampleAnimation? dirtySampleAnimation;
@@ -195,6 +196,8 @@ namespace MultiplayerARPG
 
         public override void UpdateAnimation(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier = 1)
         {
+            if (playingAction)
+                return;
             if (isDead)
                 Play(deadAnimation2D, currentDirectionType);
             else
@@ -238,9 +241,11 @@ namespace MultiplayerARPG
                 var anim = animation.GetClipByDirection(currentDirectionType);
                 if (anim != null)
                 {
+                    playingAction = true;
                     // Waits by current transition + clip duration before end animation
                     Play(anim);
                     yield return new WaitForSecondsRealtime(anim.duration / playSpeedMultiplier);
+                    playingAction = false;
                     Play(idleAnimation2D, currentDirectionType);
                     yield return new WaitForSecondsRealtime(animation.extraDuration / playSpeedMultiplier);
                 }
