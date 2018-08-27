@@ -25,9 +25,10 @@ namespace MultiplayerARPG
         #region Temp data
         protected Collider2D[] overlapColliders2D = new Collider2D[OVERLAP_COLLIDER_SIZE];
         protected Vector2 currentDirection;
+        protected Vector2 dirtyDirection;
+        protected Vector2 tempDirection;
         protected Vector2? currentDestination;
-        protected DirectionType tempDirectionType = DirectionType.Down;
-        protected DirectionType dirtyDirectionType = DirectionType.Down;
+        protected DirectionType localDirectionType = DirectionType.Down;
         #endregion
 
         public Vector2 moveDirection { get; protected set; }
@@ -51,7 +52,12 @@ namespace MultiplayerARPG
 
         public DirectionType CurrentDirectionType
         {
-            get { return (DirectionType)currentDirectionType.Value; }
+            get
+            {
+                if (IsOwnerClient)
+                    return localDirectionType;
+                return (DirectionType)currentDirectionType.Value;
+            }
         }
 
         protected override void EntityAwake()
@@ -79,6 +85,9 @@ namespace MultiplayerARPG
         {
             base.EntityFixedUpdate();
             Profiler.BeginSample("PlayerCharacterEntity2D - FixedUpdate");
+            if (!IsServer && !IsOwnerClient)
+                return;
+
             if (currentDestination.HasValue)
             {
                 var currentPosition = new Vector2(CacheTransform.position.x, CacheTransform.position.y);
@@ -94,9 +103,16 @@ namespace MultiplayerARPG
                 {
                     if (moveDirectionMagnitude > 1)
                         moveDirection = moveDirection.normalized;
-                    currentDirection = moveDirection;
-                    UpdateDirection(moveDirection);
+                    UpdateCurrentDirection(moveDirection);
                     CacheRigidbody2D.velocity = moveDirection * CacheMoveSpeed;
+                }
+
+                BaseCharacterEntity tempCharacterEntity;
+                if (moveDirectionMagnitude == 0 && TryGetTargetEntity(out tempCharacterEntity))
+                {
+                    var targetDirection = (tempCharacterEntity.CacheTransform.position - CacheTransform.position).normalized;
+                    if (targetDirection.magnitude != 0f)
+                        UpdateCurrentDirection(targetDirection);
                 }
             }
             Profiler.EndSample();
@@ -116,7 +132,7 @@ namespace MultiplayerARPG
             CacheNetTransform.ownerClientCanSendTransform = true;
             CacheNetTransform.ownerClientNotInterpolate = false;
             // Register Network functions
-            RegisterNetFunction("UpdateDirectionType", new LiteNetLibFunction<NetFieldByte>((directionType) => NetFuncUpdateDirectionType(directionType)));
+            RegisterNetFunction("UpdateDirection", new LiteNetLibFunction<NetFieldSByte, NetFieldSByte>((x, y) => NetFuncUpdateDirection(x, y)));
         }
 
         public override void KeyMovement(Vector3 direction, bool isJump)
@@ -160,37 +176,50 @@ namespace MultiplayerARPG
             return (angle < 180 + halfFov && angle > 180 - halfFov);
         }
 
-        public void UpdateDirection(Vector3 moveVelocity)
+        public void UpdateDirection(Vector2 direction)
         {
-            if (moveVelocity.magnitude > 0f)
+            if (direction.magnitude > 0f)
             {
-                var normalized = moveVelocity.normalized;
+                var normalized = direction.normalized;
                 if (Mathf.Abs(normalized.x) >= Mathf.Abs(normalized.y))
                 {
-                    if (normalized.x < 0) tempDirectionType = DirectionType.Left;
-                    if (normalized.x > 0) tempDirectionType = DirectionType.Right;
+                    if (normalized.x < 0) localDirectionType = DirectionType.Left;
+                    if (normalized.x > 0) localDirectionType = DirectionType.Right;
                 }
                 else
                 {
-                    if (normalized.y < 0) tempDirectionType = DirectionType.Down;
-                    if (normalized.y > 0) tempDirectionType = DirectionType.Up;
+                    if (normalized.y < 0) localDirectionType = DirectionType.Down;
+                    if (normalized.y > 0) localDirectionType = DirectionType.Up;
                 }
             }
-            if (dirtyDirectionType != tempDirectionType)
+            if (IsServer)
+                currentDirectionType.Value = (byte)localDirectionType;
+        }
+
+        private void UpdateCurrentDirection(Vector2 direction)
+        {
+            currentDirection = direction;
+            UpdateDirection(currentDirection);
+            if (!currentDirection.Equals(dirtyDirection))
             {
-                dirtyDirectionType = tempDirectionType;
-                RequestUpdateDirectionType((byte)tempDirectionType);
+                dirtyDirection = currentDirection;
+                RequestUpdateDirection();
             }
         }
 
-        private void NetFuncUpdateDirectionType(byte directionType)
+        private void NetFuncUpdateDirection(sbyte x, sbyte y)
         {
-            currentDirectionType.Value = directionType;
+            tempDirection = new Vector2((float)x / 100, (float)y / 100);
+            UpdateDirection(tempDirection);
+            if (!IsOwnerClient)
+                currentDirection = tempDirection;
         }
         
-        public virtual void RequestUpdateDirectionType(byte directionType)
+        public virtual void RequestUpdateDirection()
         {
-            CallNetFunction("UpdateDirectionType", FunctionReceivers.Server, directionType);
+            var x = (sbyte)(currentDirection.x * 100);
+            var y = (sbyte)(currentDirection.y * 100);
+            CallNetFunction("UpdateDirection", FunctionReceivers.Server, x, y);
         }
     }
 }
