@@ -142,17 +142,17 @@ namespace MultiplayerARPG
             CacheRigidbody2D.velocity = Vector2.zero;
         }
 
-        protected override int OverlapObjects(Vector3 position, float distance, int layerMask)
+        public override int OverlapObjects(Vector3 position, float distance, int layerMask)
         {
             return Physics2D.OverlapCircleNonAlloc(position, distance, overlapColliders2D, layerMask);
         }
 
-        protected override GameObject GetOverlapObject(int index)
+        public override GameObject GetOverlapObject(int index)
         {
             return tempGameObject = overlapColliders2D[index].gameObject;
         }
 
-        protected override bool IsPositionInAttackFov(float fov, Vector3 position)
+        public override bool IsPositionInFov(float fov, Vector3 position)
         {
             var halfFov = fov * 0.5f;
             var angle = Vector2.Angle((CacheTransform.position - position).normalized, currentDirection);

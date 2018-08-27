@@ -245,9 +245,9 @@ namespace MultiplayerARPG
                     // Waits by current transition + clip duration before end animation
                     Play(anim);
                     yield return new WaitForSecondsRealtime(anim.duration / playSpeedMultiplier);
-                    playingAction = false;
                     Play(idleAnimation2D, currentDirectionType);
                     yield return new WaitForSecondsRealtime(animation.extraDuration / playSpeedMultiplier);
+                    playingAction = false;
                 }
             }
         }

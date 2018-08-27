@@ -476,10 +476,7 @@ namespace MultiplayerARPG
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
-                    var halfFov = attackFov * 0.5f;
-                    var targetDir = (CharacterTransform.position - targetEnemy.CacheTransform.position).normalized;
-                    var angle = Vector3.Angle(targetDir, CharacterTransform.forward);
-                    if (angle < 180 + halfFov && angle > 180 - halfFov)
+                    if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetEnemy.CacheTransform.position))
                     {
                         // If has queue using skill, attack by the skill
                         if (queueUsingSkill.HasValue)
@@ -602,10 +599,7 @@ namespace MultiplayerARPG
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
-                    var halfFov = attackFov * 0.5f;
-                    var targetDir = (CharacterTransform.position - targetHarvestable.CacheTransform.position).normalized;
-                    var angle = Vector3.Angle(targetDir, CharacterTransform.forward);
-                    if (angle < 180 + halfFov && angle > 180 - halfFov)
+                    if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetEnemy.CacheTransform.position))
                         RequestAttack();
                 }
                 else
