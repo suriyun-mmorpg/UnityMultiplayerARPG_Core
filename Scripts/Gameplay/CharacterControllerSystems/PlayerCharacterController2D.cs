@@ -6,7 +6,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public class PlayerCharacterController : BasePlayerCharacterController
+    public class PlayerCharacterController2D : BasePlayerCharacterController
     {
         public const float DETECT_MOUSE_DRAG_DISTANCE = 10f;
         public const float DETECT_MOUSE_HOLD_DURATION = 1f;
@@ -22,7 +22,7 @@ namespace MultiplayerARPG
         public float buildGridSize = 4f;
         public bool buildRotationSnap;
 
-        protected Vector3? destination;
+        protected Vector2? destination;
         protected UsingSkillData? queueUsingSkill;
         protected Vector3 mouseDownPosition;
         protected float mouseDownTime;
@@ -39,8 +39,8 @@ namespace MultiplayerARPG
         protected bool isPointerOverUI;
         protected bool isMouseDragDetected;
         protected bool isMouseHoldDetected;
-        protected RaycastHit[] foundRaycastAll;
-        protected Collider[] foundOverlapSphere;
+        protected RaycastHit2D[] foundRaycastAll;
+        protected Collider2D[] foundOverlapCircleAll;
         protected BaseCharacterEntity targetCharacter;
         protected BaseCharacterEntity targetEnemy;
         protected BasePlayerCharacterEntity targetPlayer;
@@ -160,10 +160,10 @@ namespace MultiplayerARPG
                 // Activate nearby npcs / players / activable buildings
                 if (InputManager.GetButtonDown("Activate"))
                 {
-                    foundOverlapSphere = Physics.OverlapSphere(CharacterTransform.position, gameInstance.conversationDistance, gameInstance.characterLayer.Mask);
+                    foundOverlapCircleAll = Physics2D.OverlapCircleAll(CharacterTransform.position, gameInstance.conversationDistance, gameInstance.characterLayer.Mask);
                     targetPlayer = null;
                     targetNpc = null;
-                    foreach (var foundEntity in foundOverlapSphere)
+                    foreach (var foundEntity in foundOverlapCircleAll)
                     {
                         if (targetPlayer == null)
                         {
@@ -179,14 +179,14 @@ namespace MultiplayerARPG
                         CacheUISceneGameplay.SetActivePlayerCharacter(targetPlayer);
                     else if (targetNpc != null)
                         PlayerCharacterEntity.RequestNpcActivate(targetNpc.ObjectId);
-                    if (foundOverlapSphere.Length == 0)
+                    if (foundOverlapCircleAll.Length == 0)
                         PlayerCharacterEntity.RequestEnterWarp();
                 }
                 // Pick up nearby items
                 if (InputManager.GetButtonDown("PickUpItem"))
                 {
-                    foundOverlapSphere = Physics.OverlapSphere(CharacterTransform.position, gameInstance.pickUpItemDistance, gameInstance.itemDropLayer.Mask);
-                    foreach (var foundEntity in foundOverlapSphere)
+                    foundOverlapCircleAll = Physics2D.OverlapCircleAll(CharacterTransform.position, gameInstance.pickUpItemDistance, gameInstance.itemDropLayer.Mask);
+                    foreach (var foundEntity in foundOverlapCircleAll)
                     {
                         targetItemDrop = foundEntity.GetComponent<ItemDropEntity>();
                         if (targetItemDrop != null)
@@ -227,7 +227,8 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.SetTargetEntity(null);
                 LiteNetLibIdentity targetIdentity = null;
                 Vector3? targetPosition = null;
-                foundRaycastAll = Physics.RaycastAll(targetCamera.ScreenPointToRay(Input.mousePosition), 100f, gameInstance.GetTargetLayerMask());
+                var clickPosition = targetCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, targetCamera.transform.position.z));
+                foundRaycastAll = Physics2D.LinecastAll(clickPosition, clickPosition, gameInstance.GetTargetLayerMask());
                 foreach (var hit in foundRaycastAll)
                 {
                     var hitTransform = hit.transform;
@@ -294,22 +295,20 @@ namespace MultiplayerARPG
                         }
                     }
                 }
-                // If Found target, do something
-                if (targetPosition.HasValue)
+                if (!targetPosition.HasValue)
+                    targetPosition = clickPosition;
+                // Close NPC dialog, when target changes
+                if (CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
+                    CacheUISceneGameplay.uiNpcDialog.Hide();
+                // Clear queue using skill
+                queueUsingSkill = null;
+                // Move to target, will hide destination when target is object
+                if (targetIdentity != null)
+                    destination = null;
+                else
                 {
-                    // Close NPC dialog, when target changes
-                    if (CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
-                        CacheUISceneGameplay.uiNpcDialog.Hide();
-                    // Clear queue using skill
-                    queueUsingSkill = null;
-                    // Move to target, will hide destination when target is object
-                    if (targetIdentity != null)
-                        destination = null;
-                    else
-                    {
-                        destination = targetPosition.Value;
-                        PlayerCharacterEntity.PointClickMovement(targetPosition.Value);
-                    }
+                    destination = targetPosition.Value;
+                    PlayerCharacterEntity.PointClickMovement(targetPosition.Value);
                 }
             }
         }
@@ -330,14 +329,7 @@ namespace MultiplayerARPG
             var verticalInput = InputManager.GetAxis("Vertical", false);
             var jumpInput = InputManager.GetButtonDown("Jump");
 
-            var moveDirection = Vector3.zero;
-            var cameraTransform = Camera.main.transform;
-            if (cameraTransform != null)
-            {
-                moveDirection += cameraTransform.forward * verticalInput;
-                moveDirection += cameraTransform.right * horizontalInput;
-            }
-            moveDirection.y = 0;
+            var moveDirection = new Vector2(horizontalInput, verticalInput);
             moveDirection = moveDirection.normalized;
 
             if (moveDirection.magnitude > 0.1f)
@@ -446,7 +438,7 @@ namespace MultiplayerARPG
             if (!isPointerOverUI && Input.GetMouseButtonUp(0) && !isMouseDragOrHoldOrOverUI)
             {
                 var targetCamera = Camera.main;
-                RaycastToSetBuildingArea(targetCamera.ScreenPointToRay(Input.mousePosition), 100f);
+                RaycastToSetBuildingArea(targetCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, targetCamera.transform.position.z)), 100f);
             }
         }
 
@@ -666,7 +658,7 @@ namespace MultiplayerARPG
             CancelBuild();
             buildingItemIndex = -1;
             currentBuildingEntity = null;
-            
+
             var hotkey = PlayerCharacterEntity.Hotkeys[hotkeyIndex];
             var skill = hotkey.GetSkill();
             if (skill != null)
@@ -687,7 +679,7 @@ namespace MultiplayerARPG
                         {
                             // If attacking any character, will use skill later
                             queueUsingSkill = new UsingSkillData(null, skillIndex);
-                            var nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance, false, true);                            if (nearestTarget != null)
+                            var nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance, false, true); if (nearestTarget != null)
                                 PlayerCharacterEntity.SetTargetEntity(nearestTarget);
                         }
                         else
@@ -730,7 +722,7 @@ namespace MultiplayerARPG
                 var placePosition = CharacterTransform.position + (CharacterTransform.forward * currentBuildingEntity.characterForwardDistance);
                 currentBuildingEntity.CacheTransform.eulerAngles = GetBuildingPlaceEulerAngles(CharacterTransform.eulerAngles);
                 currentBuildingEntity.buildingArea = null;
-                if (!RaycastToSetBuildingArea(new Ray(placePosition + (Vector3.up * 2.5f), Vector3.down), 5f))
+                if (!RaycastToSetBuildingArea(placePosition, 5f))
                     currentBuildingEntity.CacheTransform.position = GetBuildingPlacePosition(placePosition);
             }
         }
@@ -752,10 +744,10 @@ namespace MultiplayerARPG
             return eulerAngles;
         }
 
-        private bool RaycastToSetBuildingArea(Ray ray, float dist = 5f)
+        private bool RaycastToSetBuildingArea(Vector3 clickPosition, float dist = 5f)
         {
             BuildingArea nonSnapBuildingArea = null;
-            foundRaycastAll = Physics.RaycastAll(ray, dist, gameInstance.GetBuildLayerMask());
+            foundRaycastAll = Physics2D.LinecastAll(clickPosition, clickPosition, gameInstance.GetBuildLayerMask());
             foreach (var hit in foundRaycastAll)
             {
                 if (Vector3.Distance(hit.point, CharacterTransform.position) > gameInstance.buildDistance)
@@ -824,8 +816,8 @@ namespace MultiplayerARPG
 
         public bool FindTarget(Transform target, float actDistance, int layerMask)
         {
-            foundOverlapSphere = Physics.OverlapSphere(CharacterTransform.position, actDistance, layerMask);
-            foreach (var collider in foundOverlapSphere)
+            foundOverlapCircleAll = Physics2D.OverlapCircleAll(CharacterTransform.position, actDistance, layerMask);
+            foreach (var collider in foundOverlapCircleAll)
             {
                 if (collider.transform == target)
                     return true;

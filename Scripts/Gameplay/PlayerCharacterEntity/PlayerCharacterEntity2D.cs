@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
+using LiteNetLibManager;
+using LiteNetLib;
 
 namespace MultiplayerARPG
 {
@@ -15,6 +17,11 @@ namespace MultiplayerARPG
         public float stoppingDistance = 0.1f;
         #endregion
 
+        #region Sync data
+        [SerializeField]
+        protected SyncFieldByte currentDirectionType = new SyncFieldByte();
+        #endregion
+
         #region Temp data
         protected Collider2D[] overlapColliders2D = new Collider2D[OVERLAP_COLLIDER_SIZE];
         protected Vector2 currentDirection;
@@ -22,6 +29,7 @@ namespace MultiplayerARPG
         #endregion
 
         public Vector2 moveDirection { get; protected set; }
+        private Vector2 lastMoveDirection;
 
         public override float StoppingDistance
         {
@@ -56,6 +64,7 @@ namespace MultiplayerARPG
                 SetTargetEntity(null);
                 return;
             }
+            (CharacterModel as CharacterModel2D).currentDirectionType = (DirectionType)currentDirectionType.Value;
             Profiler.EndSample();
         }
 
@@ -78,11 +87,19 @@ namespace MultiplayerARPG
                 {
                     if (moveDirectionMagnitude > 1)
                         moveDirection = moveDirection.normalized;
-                    
+                    currentDirection = moveDirection;
+                    UpdateDirection(moveDirection);
                     CacheRigidbody2D.velocity = moveDirection * CacheMoveSpeed;
                 }
             }
             Profiler.EndSample();
+        }
+
+        protected override void SetupNetElements()
+        {
+            base.SetupNetElements();
+            currentDirectionType.sendOptions = SendOptions.Unreliable;
+            currentDirectionType.forOwnerOnly = false;
         }
 
         public override void KeyMovement(Vector3 direction, bool isJump)
@@ -124,6 +141,24 @@ namespace MultiplayerARPG
             var angle = Vector2.Angle((CacheTransform.position - position).normalized, currentDirection);
             // Angle in forward position is 180 so we use this value to determine that target is in hit fov or not
             return (angle < 180 + halfFov && angle > 180 - halfFov);
+        }
+
+        public void UpdateDirection(Vector3 moveVelocity)
+        {
+            if (moveVelocity.magnitude > 0f)
+            {
+                var normalized = moveVelocity.normalized;
+                if (Mathf.Abs(normalized.x) >= Mathf.Abs(normalized.y))
+                {
+                    if (normalized.x < 0) currentDirectionType.Value = (byte)DirectionType.Left;
+                    if (normalized.x > 0) currentDirectionType.Value = (byte)DirectionType.Right;
+                }
+                else
+                {
+                    if (normalized.y < 0) currentDirectionType.Value = (byte)DirectionType.Down;
+                    if (normalized.y > 0) currentDirectionType.Value = (byte)DirectionType.Up;
+                }
+            }
         }
     }
 }

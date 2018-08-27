@@ -76,8 +76,9 @@ namespace MultiplayerARPG
                 return cacheSkillCastAnimations2D;
             }
         }
-
-        private DirectionType currentDirection = DirectionType.Down;
+        
+        [HideInInspector]
+        public DirectionType currentDirectionType = DirectionType.Down;
         private AnimationClip2D playingAnim = null;
         private int currentFrame = 0;
         private bool playing = false;
@@ -88,7 +89,7 @@ namespace MultiplayerARPG
 
         private void Start()
         {
-            Play(idleAnimation2D.GetClipByDirection(DirectionType.Down));
+            Play(idleAnimation2D, DirectionType.Down);
         }
 
         private void OnEnable()
@@ -144,25 +145,35 @@ namespace MultiplayerARPG
             switch (sampleAnimation)
             {
                 case SampleAnimation.Idle:
-                    Play(idleAnimation2D.GetClipByDirection(sampleDirection));
+                    Play(idleAnimation2D, sampleDirection);
                     break;
                 case SampleAnimation.Move:
-                    Play(moveAnimation2D.GetClipByDirection(sampleDirection));
+                    Play(moveAnimation2D, sampleDirection);
                     break;
                 case SampleAnimation.Dead:
-                    Play(deadAnimation2D.GetClipByDirection(sampleDirection));
+                    Play(deadAnimation2D, sampleDirection);
                     break;
                 case SampleAnimation.DefaultAttack:
-                    Play(defaultAttackAnimation2D.GetClipByDirection(sampleDirection));
+                    Play(defaultAttackAnimation2D, sampleDirection);
                     break;
                 case SampleAnimation.DefaultSkillCast:
-                    Play(defaultSkillCastAnimation2D.GetClipByDirection(sampleDirection));
+                    Play(defaultSkillCastAnimation2D, sampleDirection);
                     break;
             }
         }
 
+        public void Play(CharacterAnimation2D animation, DirectionType directionType)
+        {
+            if (animation == null)
+                return;
+            Play(animation.GetClipByDirection(directionType));
+        }
+
         public void Play(AnimationClip2D anim)
         {
+            if (anim == playingAnim)
+                return;
+
             playingAnim = anim;
 
             secsPerFrame = 1f / anim.framesPerSec;
@@ -182,35 +193,16 @@ namespace MultiplayerARPG
             nextFrameTime = Time.realtimeSinceStartup + secsPerFrame;
         }
 
-        private void UpdateDirection(Vector3 moveVelocity)
-        {
-            if (moveVelocity.magnitude > 0f)
-            {
-                var normalized = moveVelocity.normalized;
-                if (Mathf.Abs(normalized.x) >= Mathf.Abs(normalized.y))
-                {
-                    if (normalized.x < 0) currentDirection = DirectionType.Left;
-                    if (normalized.x > 0) currentDirection = DirectionType.Right;
-                }
-                else
-                {
-                    if (normalized.y < 0) currentDirection = DirectionType.Down;
-                    if (normalized.y > 0) currentDirection = DirectionType.Up;
-                }
-            }
-        }
-
         public override void UpdateAnimation(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier = 1)
         {
-            UpdateDirection(moveVelocity);
             if (isDead)
-                Play(deadAnimation2D.GetClipByDirection(currentDirection));
+                Play(deadAnimation2D, currentDirectionType);
             else
             {
                 if (moveVelocity.magnitude > 0)
-                    Play(moveAnimation2D.GetClipByDirection(currentDirection));
+                    Play(moveAnimation2D, currentDirectionType);
                 else
-                    Play(idleAnimation2D.GetClipByDirection(currentDirection));
+                    Play(idleAnimation2D, currentDirectionType);
             }
         }
 
@@ -243,13 +235,13 @@ namespace MultiplayerARPG
             var animation = GetActionAnimation(animActionType, dataId);
             if (animation != null)
             {
-                var anim = animation.GetClipByDirection(currentDirection);
+                var anim = animation.GetClipByDirection(currentDirectionType);
                 if (anim != null)
                 {
                     // Waits by current transition + clip duration before end animation
                     Play(anim);
                     yield return new WaitForSecondsRealtime(anim.duration / playSpeedMultiplier);
-                    Play(idleAnimation2D.GetClipByDirection(currentDirection));
+                    Play(idleAnimation2D, currentDirectionType);
                     yield return new WaitForSecondsRealtime(animation.extraDuration / playSpeedMultiplier);
                 }
             }

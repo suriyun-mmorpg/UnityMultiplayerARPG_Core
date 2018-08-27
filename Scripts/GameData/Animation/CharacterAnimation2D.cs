@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public enum DirectionType
+    public enum DirectionType : byte
     {
         Down,
         Up,
