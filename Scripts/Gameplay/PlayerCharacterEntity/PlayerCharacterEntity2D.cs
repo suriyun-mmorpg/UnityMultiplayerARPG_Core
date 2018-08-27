@@ -191,7 +191,7 @@ namespace MultiplayerARPG
                         break;
                 }
             }
-            rotation = Quaternion.Euler(0, 0, Mathf.Atan2(currentDirection.y, currentDirection.x) * (180 / Mathf.PI));
+            rotation = Quaternion.Euler(0, 0, (Mathf.Atan2(currentDirection.y, currentDirection.x) * (180 / Mathf.PI)) + 90);
         }
 
         public void UpdateDirection(Vector2 direction)

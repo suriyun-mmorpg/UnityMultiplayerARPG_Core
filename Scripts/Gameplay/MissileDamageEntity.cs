@@ -54,7 +54,7 @@ namespace MultiplayerARPG
             this.missileSpeed.Value = missileSpeed;
 
             if (missileDistance > 0 && missileSpeed > 0)
-                NetworkDestroy(100);
+                NetworkDestroy(missileDistance / missileSpeed);
             else
                 NetworkDestroy();
         }
@@ -70,7 +70,7 @@ namespace MultiplayerARPG
                     break;
                 case MissileType.Rigidbody2D:
                     if (CacheRigidbody2D != null)
-                        CacheRigidbody2D.velocity = CacheTransform.right * missileSpeed.Value;
+                        CacheRigidbody2D.velocity = -CacheTransform.up * missileSpeed.Value;
                     break;
             }
         }
