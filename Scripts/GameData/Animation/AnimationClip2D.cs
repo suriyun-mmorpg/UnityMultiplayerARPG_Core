@@ -8,6 +8,8 @@ public class AnimationClip2D : ScriptableObject
     public Sprite[] frames;
     public float framesPerSec = 5;
     public bool loop = true;
+    public bool flipX;
+    public bool flipY;
 
     public float duration
     {
