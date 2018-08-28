@@ -36,6 +36,8 @@ namespace MultiplayerARPG
         private WeaponAnimations2D[] weaponAnimations2D;
         [SerializeField]
         private SkillCastAnimations2D[] skillCastAnimations2D;
+        [SerializeField]
+        private float magnitudeToPlayMoveClip = 0.1f;
         [Header("Sample 2D Animations")]
         [SerializeField]
         private SampleAnimation sampleAnimation = SampleAnimation.Idle;
@@ -222,7 +224,7 @@ namespace MultiplayerARPG
                 Play(deadAnimation2D, currentDirectionType);
             else
             {
-                if (moveVelocity.magnitude > 0)
+                if (moveVelocity.magnitude > magnitudeToPlayMoveClip)
                     Play(moveAnimation2D, currentDirectionType);
                 else
                     Play(idleAnimation2D, currentDirectionType);

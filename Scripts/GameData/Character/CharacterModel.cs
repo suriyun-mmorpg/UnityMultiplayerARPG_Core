@@ -203,7 +203,7 @@ namespace MultiplayerARPG
                     var moveMagnitude = new Vector3(moveVelocity.x, 0, moveVelocity.z).magnitude;
                     if (moveMagnitude > legacyAnimationData.magnitudeToPlayMoveClip)
                         CrossFadeLegacyAnimation(legacyAnimationData.moveClip, legacyAnimationData.moveClipFadeLength);
-                    else if (moveMagnitude < legacyAnimationData.magnitudeToPlayMoveClip)
+                    else
                         CrossFadeLegacyAnimation(legacyAnimationData.idleClip, legacyAnimationData.idleClipFadeLength);
                 }
             }
