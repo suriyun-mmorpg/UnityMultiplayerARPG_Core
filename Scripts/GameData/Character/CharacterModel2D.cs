@@ -214,7 +214,7 @@ namespace MultiplayerARPG
             nextFrameTime = Time.realtimeSinceStartup + secsPerFrame;
         }
 
-        public override void UpdateAnimation(bool isDead, MoveState moveState, float playMoveSpeedMultiplier = 1)
+        public override void UpdateAnimation(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier = 1)
         {
             if (playingAction)
                 return;
@@ -222,15 +222,10 @@ namespace MultiplayerARPG
                 Play(deadAnimation2D, currentDirectionType);
             else
             {
-                switch (moveState)
-                {
-                    case MoveState.Move:
-                        Play(moveAnimation2D, currentDirectionType);
-                        break;
-                    default:
-                        Play(idleAnimation2D, currentDirectionType);
-                        break;
-                }
+                if (moveVelocity.magnitude > 0)
+                    Play(moveAnimation2D, currentDirectionType);
+                else
+                    Play(idleAnimation2D, currentDirectionType);
             }
         }
 
