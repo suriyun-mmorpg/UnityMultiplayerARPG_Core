@@ -155,28 +155,87 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
             // Setup network components
-            CacheNetTransform.ownerClientCanSendTransform = true;
-            CacheNetTransform.ownerClientNotInterpolate = false;
+            CacheNetTransform.ownerClientCanSendTransform = false;
+            CacheNetTransform.ownerClientNotInterpolate = true;
             // Register Network functions
             RegisterNetFunction("TriggerJump", new LiteNetLibFunction(NetFuncTriggerJump));
+            RegisterNetFunction("PointClickMovement", new LiteNetLibFunction<NetFieldVector3>((position) => NetFuncPointClickMovement(position)));
+            RegisterNetFunction("KeyMovement", new LiteNetLibFunction<NetFieldVector3, NetFieldBool>((position, isJump) => NetFuncKeyMovement(position, isJump)));
+            RegisterNetFunction("StopMove", new LiteNetLibFunction(StopMove));
+            RegisterNetFunction("SetTargetEntity", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncSetTargetEntity(objectId)));
+        }
+
+        protected void NetFuncPointClickMovement(Vector3 position)
+        {
+            if (IsDead())
+                return;
+            SetMovePaths(position, true);
+            currentNpcDialog = null;
+        }
+
+        protected void NetFuncKeyMovement(Vector3 position, bool isJump)
+        {
+            if (IsDead())
+                return;
+            SetMovePaths(position, false);
+            if (!isJumping)
+                isJumping = isGrounded && isJump;
+            currentNpcDialog = null;
+        }
+
+        protected void NetFuncSetTargetEntity(uint objectId)
+        {
+            if (objectId == 0)
+                SetTargetEntity(null);
+            RpgNetworkEntity rpgNetworkEntity;
+            if (!TryGetEntityByObjectId(objectId, out rpgNetworkEntity))
+                return;
+            SetTargetEntity(rpgNetworkEntity);
+        }
+
+        protected virtual void NetFuncTriggerJump()
+        {
+            if (IsDead() || IsOwnerClient)
+                return;
+            // Play jump animation on non owner clients
+            CharacterModel.PlayJumpAnimation();
+        }
+
+        public virtual void RequestTriggerJump()
+        {
+            if (IsDead())
+                return;
+            // Play jump animation immediately on owner client
+            if (IsOwnerClient)
+                CharacterModel.PlayJumpAnimation();
+            // Only server will call for clients to trigger jump animation for secure entity
+            if (IsServer)
+                CallNetFunction("TriggerJump", FunctionReceivers.All);
         }
 
         public override void KeyMovement(Vector3 direction, bool isJump)
         {
             if (IsDead())
                 return;
-            moveDirection = direction;
-            if (moveDirection.magnitude == 0 && isGrounded)
-                CacheRigidbody.velocity = new Vector3(0, CacheRigidbody.velocity.y, 0);
-            if (!isJumping)
-                isJumping = isGrounded && isJump;
+            if (direction.magnitude <= 0.025f && !isJump)
+                return;
+            var position = CacheTransform.position + direction;
+            if (IsOwnerClient && !IsServer && CacheNetTransform.ownerClientNotInterpolate)
+            {
+                SetMovePaths(position, false);
+                if (!isJumping)
+                    isJumping = isGrounded && isJump;
+            }
+            CallNetFunction("KeyMovement", FunctionReceivers.Server, position, isJump);
         }
 
         public override void PointClickMovement(Vector3 position)
         {
             if (IsDead())
                 return;
-            SetMovePaths(position, true);
+            if (IsOwnerClient && !IsServer && CacheNetTransform.ownerClientNotInterpolate)
+                SetMovePaths(position, true);
+            CallNetFunction("PointClickMovement", FunctionReceivers.Server, position);
         }
 
         public override void StopMove()
@@ -184,6 +243,15 @@ namespace MultiplayerARPG
             navPaths = null;
             moveDirection = Vector3.zero;
             CacheRigidbody.velocity = new Vector3(0, CacheRigidbody.velocity.y, 0);
+            if (IsOwnerClient && !IsServer)
+                CallNetFunction("StopMove", FunctionReceivers.Server);
+        }
+
+        public override void SetTargetEntity(RpgNetworkEntity entity)
+        {
+            base.SetTargetEntity(entity);
+            if (IsOwnerClient && !IsServer)
+                CallNetFunction("SetTargetEntity", FunctionReceivers.Server, entity == null ? 0 : entity.ObjectId);
         }
 
         protected virtual void OnCollisionEnter(Collision collision)
@@ -223,24 +291,6 @@ namespace MultiplayerARPG
             // From the jump height and gravity we deduce the upwards speed 
             // for the character to reach at the apex.
             return Mathf.Sqrt(2f * jumpHeight * -Physics.gravity.y * gravityRate);
-        }
-
-        protected virtual void NetFuncTriggerJump()
-        {
-            if (IsDead() || IsOwnerClient)
-                return;
-            // Play jump animation on non owner clients
-            CharacterModel.PlayJumpAnimation();
-        }
-
-        public virtual void RequestTriggerJump()
-        {
-            if (IsDead())
-                return;
-            // Play jump animation immediately on owner client
-            if (IsOwnerClient)
-                CharacterModel.PlayJumpAnimation();
-            CallNetFunction("TriggerJump", FunctionReceivers.All);
         }
     }
 }
