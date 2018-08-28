@@ -61,7 +61,8 @@ namespace MultiplayerARPG
     public struct WeaponAnimations2D
     {
         public WeaponType weaponType;
-        public ActionAnimation2D animation;
+        public ActionAnimation2D rightHandAttackAnimation;
+        public ActionAnimation2D leftHandAttackAnimation;
     }
 
     [System.Serializable]
