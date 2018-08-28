@@ -9,6 +9,7 @@ namespace MultiplayerARPG
     public sealed class ItemDropEntity : RpgNetworkEntity
     {
         public const float GROUND_DETECTION_DISTANCE = 100f;
+        public DimensionType dimensionType;
         public CharacterItem dropData;
         public Transform modelContainer;
 
@@ -101,31 +102,45 @@ namespace MultiplayerARPG
         public static ItemDropEntity DropItem(RpgNetworkEntity dropper, int itemDataId, short level, short amount)
         {
             var gameInstance = GameInstance.Singleton;
-            var dropPosition = dropper.CacheTransform.position + new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, 0, Random.Range(-1f, 1f) * gameInstance.dropDistance);
-            // Raycast to find hit floor
-            Vector3? aboveHitPoint = null;
-            Vector3? underHitPoint = null;
-            var raycastLayerMask = gameInstance.GetItemDropGroundDetectionLayerMask();
-            RaycastHit tempHit;
-            if (Physics.Raycast(dropPosition, Vector3.up, out tempHit, GROUND_DETECTION_DISTANCE, raycastLayerMask))
-                aboveHitPoint = tempHit.point;
-            if (Physics.Raycast(dropPosition, Vector3.down, out tempHit, GROUND_DETECTION_DISTANCE, raycastLayerMask))
-                underHitPoint = tempHit.point;
-            // Set drop position to nearest hit point
-            if (aboveHitPoint.HasValue && underHitPoint.HasValue)
+            if (gameInstance.itemDropEntityPrefab == null)
+                return null;
+
+            var dropPosition = dropper.CacheTransform.position;
+            var dropRotation = Quaternion.identity;
+            switch (gameInstance.itemDropEntityPrefab.dimensionType)
             {
-                if (Vector3.Distance(dropPosition, aboveHitPoint.Value) < Vector3.Distance(dropPosition, underHitPoint.Value))
-                    dropPosition = aboveHitPoint.Value;
-                else
-                    dropPosition = underHitPoint.Value;
+                case DimensionType.Dimension3D:
+                    // Random drop position around character
+                    dropPosition += new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, 0, Random.Range(-1f, 1f) * gameInstance.dropDistance);
+                    // Raycast to find hit floor
+                    Vector3? aboveHitPoint = null;
+                    Vector3? underHitPoint = null;
+                    var raycastLayerMask = gameInstance.GetItemDropGroundDetectionLayerMask();
+                    RaycastHit tempHit;
+                    if (Physics.Raycast(dropPosition, Vector3.up, out tempHit, GROUND_DETECTION_DISTANCE, raycastLayerMask))
+                        aboveHitPoint = tempHit.point;
+                    if (Physics.Raycast(dropPosition, Vector3.down, out tempHit, GROUND_DETECTION_DISTANCE, raycastLayerMask))
+                        underHitPoint = tempHit.point;
+                    // Set drop position to nearest hit point
+                    if (aboveHitPoint.HasValue && underHitPoint.HasValue)
+                    {
+                        if (Vector3.Distance(dropPosition, aboveHitPoint.Value) < Vector3.Distance(dropPosition, underHitPoint.Value))
+                            dropPosition = aboveHitPoint.Value;
+                        else
+                            dropPosition = underHitPoint.Value;
+                    }
+                    else if (aboveHitPoint.HasValue)
+                        dropPosition = aboveHitPoint.Value;
+                    else if (underHitPoint.HasValue)
+                        dropPosition = underHitPoint.Value;
+                    // Random rotation
+                    dropRotation = Quaternion.Euler(Vector3.up * Random.Range(0, 360));
+                    break;
+                case DimensionType.Dimension2D:
+                    dropPosition += new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, Random.Range(-1f, 1f) * gameInstance.dropDistance, 0);
+                    break;
             }
-            else if (aboveHitPoint.HasValue)
-                dropPosition = aboveHitPoint.Value;
-            else if (underHitPoint.HasValue)
-                dropPosition = underHitPoint.Value;
-            // Random rotation
-            var dropRotation = Vector3.up * Random.Range(0, 360);
-            var identity = dropper.Manager.Assets.NetworkSpawn(gameInstance.itemDropEntityPrefab.gameObject, dropPosition, Quaternion.Euler(dropRotation));
+            var identity = dropper.Manager.Assets.NetworkSpawn(gameInstance.itemDropEntityPrefab.Identity, dropPosition, dropRotation);
             var itemDropEntity = identity.GetComponent<ItemDropEntity>();
             var dropData = CharacterItem.Create(itemDataId, level, amount);
             itemDropEntity.dropData = dropData;

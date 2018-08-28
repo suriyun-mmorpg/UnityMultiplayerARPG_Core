@@ -8,12 +8,6 @@ namespace MultiplayerARPG
 {
     public partial class PlayerCharacterController : BasePlayerCharacterController
     {
-        public enum PlayerCharacterControllerType
-        {
-            PlayerChareacterEntity3D,
-            PlayerChareacterEntity2D,
-        }
-
         public enum PlayerCharacterControllerMode
         {
             PointClick,
@@ -34,7 +28,7 @@ namespace MultiplayerARPG
 
         public const float DETECT_MOUSE_DRAG_DISTANCE = 10f;
         public const float DETECT_MOUSE_HOLD_DURATION = 1f;
-        public PlayerCharacterControllerType controllerType;
+        public DimensionType dimensionType;
         public PlayerCharacterControllerMode controllerMode;
         [Tooltip("Set this to TRUE to find nearby enemy and look to it while attacking when `Controller Mode` is `WASD`")]
         public bool wasdLockAttackTarget;
@@ -323,7 +317,7 @@ namespace MultiplayerARPG
                 }
                 // When clicking on map (any non-collider position)
                 // tempWorldPoint is come from FindClickObjects()
-                if (controllerType == PlayerCharacterControllerType.PlayerChareacterEntity2D && mouseUpOnTarget && !targetPosition.HasValue)
+                if (dimensionType == DimensionType.Dimension2D && mouseUpOnTarget && !targetPosition.HasValue)
                 {
                     tempVector3.z = 0;
                     targetPosition = tempVector3;
@@ -807,14 +801,14 @@ namespace MultiplayerARPG
         public Vector3 GetMovePosition(float horizontalInput, float verticalInput)
         {
             var moveDirection = Vector3.zero;
-            switch (controllerType)
+            switch (dimensionType)
             {
-                case PlayerCharacterControllerType.PlayerChareacterEntity3D:
+                case DimensionType.Dimension3D:
                     moveDirection += Camera.main.transform.forward * verticalInput;
                     moveDirection += Camera.main.transform.right * horizontalInput;
                     moveDirection.y = 0;
                     break;
-                case PlayerCharacterControllerType.PlayerChareacterEntity2D:
+                case DimensionType.Dimension2D:
                     moveDirection = new Vector2(horizontalInput, verticalInput);
                     break;
             }

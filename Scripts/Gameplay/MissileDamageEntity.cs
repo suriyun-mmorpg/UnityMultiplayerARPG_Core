@@ -7,13 +7,8 @@ namespace MultiplayerARPG
 {
     public class MissileDamageEntity : BaseDamageEntity
     {
-        public enum MissileType
-        {
-            Rigidbody3D,
-            Rigidbody2D,
-        }
         [SerializeField]
-        protected MissileType missileType;
+        protected DimensionType dimensionType;
         [SerializeField]
         protected SyncFieldFloat missileSpeed = new SyncFieldFloat();
         protected float missileDistance;
@@ -62,13 +57,13 @@ namespace MultiplayerARPG
         protected override void EntityFixedUpdate()
         {
             base.EntityFixedUpdate();
-            switch (missileType)
+            switch (dimensionType)
             {
-                case MissileType.Rigidbody3D:
+                case DimensionType.Dimension3D:
                     if (CacheRigidbody != null)
                         CacheRigidbody.velocity = CacheTransform.forward * missileSpeed.Value;
                     break;
-                case MissileType.Rigidbody2D:
+                case DimensionType.Dimension2D:
                     if (CacheRigidbody2D != null)
                         CacheRigidbody2D.velocity = -CacheTransform.up * missileSpeed.Value;
                     break;

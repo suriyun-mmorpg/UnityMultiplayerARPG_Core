@@ -21,7 +21,7 @@ namespace MultiplayerARPG
         public int FindClickObjects(out Vector3 worldPointFor2D)
         {
             worldPointFor2D = Vector3.zero;
-            if (controllerType == PlayerCharacterControllerType.PlayerChareacterEntity3D)
+            if (dimensionType == DimensionType.Dimension3D)
                 return Physics.RaycastNonAlloc(Camera.main.ScreenPointToRay(Input.mousePosition), raycasts, 100f, gameInstance.GetTargetLayerMask());
             worldPointFor2D = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             return Physics2D.LinecastNonAlloc(worldPointFor2D, worldPointFor2D, raycasts2D, gameInstance.GetTargetLayerMask());
@@ -30,12 +30,12 @@ namespace MultiplayerARPG
         public void FindAndSetBuildingAreaFromMousePosition()
         {
             tempCount = 0;
-            switch (controllerType)
+            switch (dimensionType)
             {
-                case PlayerCharacterControllerType.PlayerChareacterEntity3D:
+                case DimensionType.Dimension3D:
                     tempCount = Physics.RaycastNonAlloc(Camera.main.ScreenPointToRay(Input.mousePosition), raycasts, 100f, gameInstance.GetBuildLayerMask());
                     break;
-                case PlayerCharacterControllerType.PlayerChareacterEntity2D:
+                case DimensionType.Dimension2D:
                     tempVector3 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     tempCount = Physics2D.LinecastNonAlloc(tempVector3, tempVector3, raycasts2D, gameInstance.GetBuildLayerMask());
                     break;
@@ -48,15 +48,15 @@ namespace MultiplayerARPG
             if (currentBuildingEntity == null)
                 return;
             tempCount = 0;
-            switch (controllerType)
+            switch (dimensionType)
             {
-                case PlayerCharacterControllerType.PlayerChareacterEntity3D:
+                case DimensionType.Dimension3D:
                     tempVector3 = CharacterTransform.position + (CharacterTransform.forward * currentBuildingEntity.characterForwardDistance);
                     currentBuildingEntity.CacheTransform.eulerAngles = GetBuildingPlaceEulerAngles(CharacterTransform.eulerAngles);
                     currentBuildingEntity.buildingArea = null;
                     tempCount = Physics.RaycastNonAlloc(new Ray(tempVector3 + (Vector3.up * 2.5f), Vector3.down), raycasts, 5f, gameInstance.GetBuildLayerMask());
                     break;
-                case PlayerCharacterControllerType.PlayerChareacterEntity2D:
+                case DimensionType.Dimension2D:
                     // TODO: implement this
                     break;
             }
@@ -95,28 +95,28 @@ namespace MultiplayerARPG
 
         public Transform GetRaycastTransform(int index)
         {
-            if (controllerType == PlayerCharacterControllerType.PlayerChareacterEntity3D)
+            if (dimensionType == DimensionType.Dimension3D)
                 return raycasts[index].transform;
             return raycasts2D[index].transform;
         }
 
         public Vector3 GetRaycastPoint(int index)
         {
-            if (controllerType == PlayerCharacterControllerType.PlayerChareacterEntity3D)
+            if (dimensionType == DimensionType.Dimension3D)
                 return raycasts[index].point;
             return raycasts2D[index].point;
         }
 
         public int OverlapObjects(Vector3 position, float distance, int layerMask)
         {
-            if (controllerType == PlayerCharacterControllerType.PlayerChareacterEntity3D)
+            if (dimensionType == DimensionType.Dimension3D)
                 return Physics.OverlapSphereNonAlloc(position, distance, overlapColliders, layerMask);
             return Physics2D.OverlapCircleNonAlloc(position, distance, overlapColliders2D, layerMask);
         }
 
         public GameObject GetOverlapObject(int index)
         {
-            if (controllerType == PlayerCharacterControllerType.PlayerChareacterEntity3D)
+            if (dimensionType == DimensionType.Dimension3D)
                 return overlapColliders[index].gameObject;
             return overlapColliders2D[index].gameObject;
         }
