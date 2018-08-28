@@ -209,7 +209,7 @@ namespace MultiplayerARPG
                 newModel.transform.localEulerAngles = Vector3.zero;
                 newModel.transform.localScale = Vector3.one;
                 newModel.gameObject.SetActive(true);
-                newModel.gameObject.layer = gameInstance.characterLayer;
+                newModel.gameObject.SetLayerRecursively(gameInstance.characterLayer.LayerIndex, true);
                 newModel.RemoveComponentsInChildren<Collider>(false);
                 AddingNewModel(newModel);
                 models.Add(equipSocket, newModel);
@@ -289,7 +289,7 @@ namespace MultiplayerARPG
                 newEffect.CacheTransform.position = newEffect.followingTarget.position;
                 newEffect.CacheTransform.rotation = newEffect.followingTarget.rotation;
                 newEffect.gameObject.SetActive(true);
-                newEffect.gameObject.layer = gameInstance.characterLayer;
+                newEffect.gameObject.SetLayerRecursively(gameInstance.characterLayer.LayerIndex, true);
                 AddingNewEffect(newEffect);
                 newEffects.Add(newEffect);
             }
