@@ -743,7 +743,7 @@ namespace MultiplayerARPG
                         return;
                     for (counter = 0; counter < overlapSize; ++counter)
                     {
-                        GetOverlapObject(counter);
+                        tempGameObject = GetOverlapObject(counter);
                         var damageableEntity = tempGameObject.GetComponent<DamageableNetworkEntity>();
                         // Try to find damageable entity by building object materials
                         if (damageableEntity == null)
@@ -776,7 +776,7 @@ namespace MultiplayerARPG
 
         public virtual GameObject GetOverlapObject(int index)
         {
-            return tempGameObject = overlapColliders[index].gameObject;
+            return overlapColliders[index].gameObject;
         }
 
         public virtual bool IsPositionInFov(float fov, Vector3 position)
@@ -904,7 +904,7 @@ namespace MultiplayerARPG
             T nearestEntity = null;
             for (counter = 0; counter < overlapSize; ++counter)
             {
-                GetOverlapObject(counter);
+                tempGameObject = GetOverlapObject(counter);
                 tempEntity = tempGameObject.GetComponent<T>();
                 if (tempEntity == null || tempEntity == this || tempEntity.IsDead())
                     continue;

@@ -165,7 +165,7 @@ namespace MultiplayerARPG
 
         public override GameObject GetOverlapObject(int index)
         {
-            return tempGameObject = overlapColliders2D[index].gameObject;
+            return overlapColliders2D[index].gameObject;
         }
 
         public override bool IsPositionInFov(float fov, Vector3 position)
