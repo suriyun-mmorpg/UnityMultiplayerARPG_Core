@@ -8,7 +8,7 @@ using UnityEditor;
 namespace MultiplayerARPG
 {
     [ExecuteInEditMode]
-    public class CharacterModel2D : CharacterModel
+    public class CharacterModel2D : BaseCharacterModel
     {
         public enum SampleAnimation
         {
@@ -260,6 +260,65 @@ namespace MultiplayerARPG
         public override void PlayJumpAnimation()
         {
             // TODO: 2D may able to jump
+        }
+
+        public override bool GetRandomRightHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration)
+        {
+            ActionAnimation2D animation2D = null;
+            if (!CacheWeaponAnimations2D.TryGetValue(dataId, out animation2D))
+                animation2D = defaultAttackAnimation2D;
+            animationIndex = 0;
+            triggerDuration = 0f;
+            totalDuration = 0f;
+            if (animation2D == null) return false;
+            var clip = animation2D.GetClipByDirection(currentDirectionType);
+            if (clip == null) return false;
+            triggerDuration = clip.duration * animation2D.triggerDurationRate;
+            totalDuration = clip.duration + animation2D.extraDuration;
+            return true;
+        }
+
+        public override bool GetRandomLeftHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration)
+        {
+            ActionAnimation2D animation2D = null;
+            if (!CacheWeaponAnimations2D.TryGetValue(dataId, out animation2D))
+                animation2D = defaultAttackAnimation2D;
+            animationIndex = 0;
+            triggerDuration = 0f;
+            totalDuration = 0f;
+            if (animation2D == null) return false;
+            var clip = animation2D.GetClipByDirection(currentDirectionType);
+            if (clip == null) return false;
+            triggerDuration = clip.duration * animation2D.triggerDurationRate;
+            totalDuration = clip.duration + animation2D.extraDuration;
+            return true;
+        }
+
+        public override bool GetRandomSkillCastAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration)
+        {
+            ActionAnimation2D animation2D = null;
+            if (!CacheSkillCastAnimations2D.TryGetValue(dataId, out animation2D))
+                animation2D = defaultSkillCastAnimation2D;
+            animationIndex = 0;
+            triggerDuration = 0f;
+            totalDuration = 0f;
+            if (animation2D == null) return false;
+            var clip = animation2D.GetClipByDirection(currentDirectionType);
+            if (clip == null) return false;
+            triggerDuration = clip.duration * animation2D.triggerDurationRate;
+            totalDuration = clip.duration + animation2D.extraDuration;
+            return true;
+        }
+
+        public override bool HasSkillCastAnimations(int dataId)
+        {
+            ActionAnimation2D animation2D = null;
+            if (!CacheSkillCastAnimations2D.TryGetValue(dataId, out animation2D))
+                animation2D = defaultSkillCastAnimation2D;
+            if (animation2D == null) return false;
+            var clip = animation2D.GetClipByDirection(currentDirectionType);
+            if (clip == null) return false;
+            return true;
         }
     }
 }

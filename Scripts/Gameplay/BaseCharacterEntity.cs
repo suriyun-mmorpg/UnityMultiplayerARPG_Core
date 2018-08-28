@@ -17,7 +17,6 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(CharacterAnimationComponent))]
     [RequireComponent(typeof(CharacterRecoveryComponent))]
     [RequireComponent(typeof(CharacterSkillAndBuffComponent))]
-    [RequireComponent(typeof(CharacterModel))]
     public abstract partial class BaseCharacterEntity : DamageableNetworkEntity, ICharacterData
     {
         public const float ACTION_COMMAND_DELAY = 0.2f;
@@ -73,13 +72,13 @@ namespace MultiplayerARPG
         public float CacheBaseMoveSpeed { get; protected set; }
         #endregion
 
-        private CharacterModel characterModel;
-        public CharacterModel CharacterModel
+        private BaseCharacterModel characterModel;
+        public BaseCharacterModel CharacterModel
         {
             get
             {
                 if (characterModel == null)
-                    characterModel = GetComponent<CharacterModel>();
+                    characterModel = GetComponent<BaseCharacterModel>();
                 return characterModel;
             }
         }

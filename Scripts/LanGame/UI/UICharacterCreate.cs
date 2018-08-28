@@ -46,7 +46,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private readonly Dictionary<int, CharacterModel> CharacterModels = new Dictionary<int, CharacterModel>();
+        private readonly Dictionary<int, BaseCharacterModel> CharacterModels = new Dictionary<int, BaseCharacterModel>();
 
         public override void Show()
         {
@@ -94,7 +94,7 @@ namespace MultiplayerARPG
 
         private void ShowCharacter(int id)
         {
-            CharacterModel characterModel;
+            BaseCharacterModel characterModel;
             if (!CharacterModels.TryGetValue(id, out characterModel))
                 return;
             characterModel.gameObject.SetActive(true);

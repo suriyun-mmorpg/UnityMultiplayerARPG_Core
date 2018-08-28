@@ -1,11 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
-using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
+    [RequireComponent(typeof(CharacterModel))]
     [RequireComponent(typeof(MonsterActivityComponent))]
     [RequireComponent(typeof(CapsuleCollider))]
     public partial class MonsterCharacterEntity : BaseMonsterCharacterEntity

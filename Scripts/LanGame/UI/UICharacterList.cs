@@ -43,7 +43,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private readonly Dictionary<string, CharacterModel> CharacterModels = new Dictionary<string, CharacterModel>();
+        private readonly Dictionary<string, BaseCharacterModel> CharacterModels = new Dictionary<string, BaseCharacterModel>();
 
         private void LoadCharacters()
         {
@@ -103,7 +103,7 @@ namespace MultiplayerARPG
 
         private void ShowCharacter(string id)
         {
-            CharacterModel characterModel;
+            BaseCharacterModel characterModel;
             if (string.IsNullOrEmpty(id) || !CharacterModels.TryGetValue(id, out characterModel))
                 return;
             characterModel.gameObject.SetActive(true);

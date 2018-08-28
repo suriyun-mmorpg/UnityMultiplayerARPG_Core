@@ -15,7 +15,7 @@ public static partial class CharacterDataExtension
         return database;
     }
 
-    public static CharacterModel InstantiateModel(this ICharacterData data, Transform parent)
+    public static BaseCharacterModel InstantiateModel(this ICharacterData data, Transform parent)
     {
         BaseCharacter character = null;
         if (!GameInstance.AllCharacters.TryGetValue(data.DataId, out character))

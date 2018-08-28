@@ -6,6 +6,7 @@ using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
 {
+    [RequireComponent(typeof(CharacterModel))]
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(CapsuleCollider))]
     public partial class PlayerCharacterEntity : BasePlayerCharacterEntity

@@ -17,7 +17,7 @@ namespace MultiplayerARPG
         public float velocityCalculationDeltaTime;
         #endregion
 
-        private static CharacterModel tempCharacterModel;
+        private static BaseCharacterModel tempCharacterModel;
 
         protected void Update()
         {
