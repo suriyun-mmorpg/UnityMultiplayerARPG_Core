@@ -6,10 +6,35 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public class PlayerCharacterController : BasePlayerCharacterController
+    public partial class PlayerCharacterController : BasePlayerCharacterController
     {
+        public enum PlayerCharacterControllerType
+        {
+            PlayerChareacterEntity3D,
+            PlayerChareacterEntity2D,
+        }
+
+        public enum PlayerCharacterControllerMode
+        {
+            PointClick,
+            WASD,
+            Both,
+        }
+
+        public struct UsingSkillData
+        {
+            public Vector3? position;
+            public int skillIndex;
+            public UsingSkillData(Vector3? position, int skillIndex)
+            {
+                this.position = position;
+                this.skillIndex = skillIndex;
+            }
+        }
+
         public const float DETECT_MOUSE_DRAG_DISTANCE = 10f;
         public const float DETECT_MOUSE_HOLD_DURATION = 1f;
+        public PlayerCharacterControllerType controllerType;
         public PlayerCharacterControllerMode controllerMode;
         [Tooltip("Set this to TRUE to find nearby enemy and look to it while attacking when `Controller Mode` is `WASD`")]
         public bool wasdLockAttackTarget;
@@ -40,8 +65,6 @@ namespace MultiplayerARPG
         protected bool isMouseDragDetected;
         protected bool isMouseHoldDetected;
         protected bool isMouseHoldAndNotDrag;
-        protected RaycastHit[] foundRaycastAll;
-        protected Collider[] foundOverlapSphere;
         protected BaseCharacterEntity targetCharacter;
         protected BaseCharacterEntity targetEnemy;
         protected BasePlayerCharacterEntity targetPlayer;
@@ -161,35 +184,37 @@ namespace MultiplayerARPG
                 // Activate nearby npcs / players / activable buildings
                 if (InputManager.GetButtonDown("Activate"))
                 {
-                    foundOverlapSphere = Physics.OverlapSphere(CharacterTransform.position, gameInstance.conversationDistance, gameInstance.characterLayer.Mask);
                     targetPlayer = null;
                     targetNpc = null;
-                    foreach (var foundEntity in foundOverlapSphere)
+                    tempCount = OverlapObjects(CharacterTransform.position, gameInstance.conversationDistance, gameInstance.characterLayer.Mask);
+                    for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
                     {
+                        tempGameObject = GetOverlapObject(tempCounter);
                         if (targetPlayer == null)
                         {
-                            targetPlayer = foundEntity.GetComponent<BasePlayerCharacterEntity>();
+                            targetPlayer = tempGameObject.GetComponent<BasePlayerCharacterEntity>();
                             if (targetPlayer == PlayerCharacterEntity)
                                 targetPlayer = null;
                         }
                         if (targetNpc == null)
-                            targetNpc = foundEntity.GetComponent<NpcEntity>();
+                            targetNpc = tempGameObject.GetComponent<NpcEntity>();
                     }
                     // Priority Player -> Npc -> Buildings
                     if (targetPlayer != null && CacheUISceneGameplay != null)
                         CacheUISceneGameplay.SetActivePlayerCharacter(targetPlayer);
                     else if (targetNpc != null)
                         PlayerCharacterEntity.RequestNpcActivate(targetNpc.ObjectId);
-                    if (foundOverlapSphere.Length == 0)
+                    if (overlapColliders.Length == 0)
                         PlayerCharacterEntity.RequestEnterWarp();
                 }
                 // Pick up nearby items
                 if (InputManager.GetButtonDown("PickUpItem"))
                 {
-                    foundOverlapSphere = Physics.OverlapSphere(CharacterTransform.position, gameInstance.pickUpItemDistance, gameInstance.itemDropLayer.Mask);
-                    foreach (var foundEntity in foundOverlapSphere)
+                    tempCount = OverlapObjects(CharacterTransform.position, gameInstance.pickUpItemDistance, gameInstance.itemDropLayer.Mask);
+                    for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
                     {
-                        targetItemDrop = foundEntity.GetComponent<ItemDropEntity>();
+                        tempGameObject = GetOverlapObject(tempCounter);
+                        targetItemDrop = tempGameObject.GetComponent<ItemDropEntity>();
                         if (targetItemDrop != null)
                         {
                             PlayerCharacterEntity.RequestPickupItem(targetItemDrop.ObjectId);
@@ -231,19 +256,19 @@ namespace MultiplayerARPG
                 var mouseUpOnTarget = getMouseUp &&
                         !isMouseDragOrHoldOrOverUI &&
                         (controllerMode == PlayerCharacterControllerMode.PointClick || controllerMode == PlayerCharacterControllerMode.Both);
-                foundRaycastAll = Physics.RaycastAll(Camera.main.ScreenPointToRay(Input.mousePosition), 100f, gameInstance.GetTargetLayerMask());
-                foreach (var hit in foundRaycastAll)
+                tempCount = FindClickObjects(out tempVector3);
+                for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
                 {
-                    var hitTransform = hit.transform;
+                    tempTransform = GetRaycastTransform(tempCounter);
                     // When clicking on target
                     if (mouseUpOnTarget)
                     {
-                        targetPlayer = hitTransform.GetComponent<BasePlayerCharacterEntity>();
-                        targetMonster = hitTransform.GetComponent<BaseMonsterCharacterEntity>();
-                        targetNpc = hitTransform.GetComponent<NpcEntity>();
-                        targetItemDrop = hitTransform.GetComponent<ItemDropEntity>();
-                        targetHarvestable = hitTransform.GetComponent<HarvestableEntity>();
-                        targetPosition = hit.point;
+                        targetPlayer = tempTransform.GetComponent<BasePlayerCharacterEntity>();
+                        targetMonster = tempTransform.GetComponent<BaseMonsterCharacterEntity>();
+                        targetNpc = tempTransform.GetComponent<NpcEntity>();
+                        targetItemDrop = tempTransform.GetComponent<ItemDropEntity>();
+                        targetHarvestable = tempTransform.GetComponent<HarvestableEntity>();
+                        targetPosition = GetRaycastPoint(tempCounter);
                         PlayerCharacterEntity.SetTargetEntity(null);
                         lastNpcObjectId = 0;
                         if (targetPlayer != null && !targetPlayer.IsDead())
@@ -285,7 +310,7 @@ namespace MultiplayerARPG
                     // When holding on target
                     else if (isMouseHoldAndNotDrag)
                     {
-                        var buildingMaterial = hitTransform.GetComponent<BuildingMaterial>();
+                        var buildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
                         PlayerCharacterEntity.SetTargetEntity(null);
                         if (buildingMaterial != null && buildingMaterial.buildingEntity != null && !buildingMaterial.buildingEntity.IsDead())
                         {
@@ -295,6 +320,13 @@ namespace MultiplayerARPG
                             break;
                         }
                     }
+                }
+                // When clicking on map (any non-collider position)
+                // tempWorldPoint is come from FindClickObjects()
+                if (controllerType == PlayerCharacterControllerType.PlayerChareacterEntity2D && mouseUpOnTarget && !targetPosition.HasValue)
+                {
+                    tempVector3.z = 0;
+                    targetPosition = tempVector3;
                 }
                 // If Found target, do something
                 if (targetPosition.HasValue)
@@ -327,22 +359,15 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.StopMove();
                 return;
             }
-
-            var horizontalInput = InputManager.GetAxis("Horizontal", false);
-            var verticalInput = InputManager.GetAxis("Vertical", false);
-            var jumpInput = InputManager.GetButtonDown("Jump");
-
-            var moveDirection = Vector3.zero;
-            moveDirection += Camera.main.transform.forward * verticalInput;
-            moveDirection += Camera.main.transform.right * horizontalInput;
-            moveDirection.y = 0;
+            
+            var moveDirection = GetMovePosition(InputManager.GetAxis("Horizontal", false), InputManager.GetAxis("Vertical", false));
             moveDirection = moveDirection.normalized;
 
             if (moveDirection.magnitude > 0.1f)
             {
                 if (CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
                     CacheUISceneGameplay.uiNpcDialog.Hide();
-                SetBuildingObjectByCharacterTransform();
+                FindAndSetBuildingAreaFromCharacterDirection();
             }
 
             // For WASD mode, Using skill when player pressed hotkey
@@ -401,7 +426,7 @@ namespace MultiplayerARPG
                     destination = null;
                     PlayerCharacterEntity.SetTargetEntity(null);
                 }
-                PlayerCharacterEntity.KeyMovement(moveDirection, jumpInput);
+                PlayerCharacterEntity.KeyMovement(moveDirection, InputManager.GetButtonDown("Jump"));
             }
         }
 
@@ -442,7 +467,7 @@ namespace MultiplayerARPG
             if (!isMouseDragOrHoldOrOverUI && (isMouseDragDetected || isMouseHoldDetected || isPointerOverUI))
                 isMouseDragOrHoldOrOverUI = true;
             if (!isPointerOverUI && Input.GetMouseButtonUp(0) && !isMouseDragOrHoldOrOverUI)
-                RaycastToSetBuildingArea(Camera.main.ScreenPointToRay(Input.mousePosition), 100f);
+                FindAndSetBuildingAreaFromMousePosition();
         }
 
         protected void UpdateFollowTarget()
@@ -472,7 +497,7 @@ namespace MultiplayerARPG
                 var actDistance = attackDistance;
                 actDistance -= actDistance * 0.1f;
                 actDistance -= StoppingDistance;
-                if (FindTarget(targetEnemy.CacheTransform, actDistance, gameInstance.characterLayer.Mask))
+                if (FindTarget(targetEnemy.gameObject, actDistance, gameInstance.characterLayer.Mask))
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
@@ -595,7 +620,7 @@ namespace MultiplayerARPG
                 var actDistance = attackDistance;
                 actDistance -= actDistance * 0.1f;
                 actDistance -= StoppingDistance;
-                if (FindTarget(targetHarvestable.CacheTransform, actDistance, gameInstance.harvestableLayer.Mask))
+                if (FindTarget(targetHarvestable.gameObject, actDistance, gameInstance.harvestableLayer.Mask))
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
@@ -706,21 +731,9 @@ namespace MultiplayerARPG
                         currentBuildingEntity = Instantiate(item.buildingEntity);
                         currentBuildingEntity.SetupAsBuildMode();
                         currentBuildingEntity.CacheTransform.parent = null;
-                        SetBuildingObjectByCharacterTransform();
+                        FindAndSetBuildingAreaFromCharacterDirection();
                     }
                 }
-            }
-        }
-
-        private void SetBuildingObjectByCharacterTransform()
-        {
-            if (currentBuildingEntity != null)
-            {
-                var placePosition = CharacterTransform.position + (CharacterTransform.forward * currentBuildingEntity.characterForwardDistance);
-                currentBuildingEntity.CacheTransform.eulerAngles = GetBuildingPlaceEulerAngles(CharacterTransform.eulerAngles);
-                currentBuildingEntity.buildingArea = null;
-                if (!RaycastToSetBuildingArea(new Ray(placePosition + (Vector3.up * 2.5f), Vector3.down), 5f))
-                    currentBuildingEntity.CacheTransform.position = GetBuildingPlacePosition(placePosition);
             }
         }
 
@@ -739,33 +752,6 @@ namespace MultiplayerARPG
             if (buildRotationSnap)
                 eulerAngles.y = Mathf.Round(eulerAngles.y / 90) * 90;
             return eulerAngles;
-        }
-
-        private bool RaycastToSetBuildingArea(Ray ray, float dist = 5f)
-        {
-            BuildingArea nonSnapBuildingArea = null;
-            foundRaycastAll = Physics.RaycastAll(ray, dist, gameInstance.GetBuildLayerMask());
-            foreach (var hit in foundRaycastAll)
-            {
-                if (Vector3.Distance(hit.point, CharacterTransform.position) > gameInstance.buildDistance)
-                    return false;
-
-                var buildingArea = hit.collider.GetComponent<BuildingArea>();
-                if (buildingArea == null || (buildingArea.buildingEntity != null && buildingArea.buildingEntity == currentBuildingEntity))
-                    continue;
-
-                if (currentBuildingEntity.buildingType.Equals(buildingArea.buildingType))
-                {
-                    currentBuildingEntity.CacheTransform.position = GetBuildingPlacePosition(hit.point);
-                    currentBuildingEntity.buildingArea = buildingArea;
-                    if (buildingArea.snapBuildingObject)
-                        return true;
-                    nonSnapBuildingArea = buildingArea;
-                }
-            }
-            if (nonSnapBuildingArea != null)
-                return true;
-            return false;
         }
 
         public bool TryGetAttackingCharacter(out BaseCharacterEntity character)
@@ -811,22 +797,28 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool FindTarget(Transform target, float actDistance, int layerMask)
-        {
-            foundOverlapSphere = Physics.OverlapSphere(CharacterTransform.position, actDistance, layerMask);
-            foreach (var collider in foundOverlapSphere)
-            {
-                if (collider.transform == target)
-                    return true;
-            }
-            return false;
-        }
-
         public bool IsLockTarget()
         {
             return controllerMode == PlayerCharacterControllerMode.Both ||
                 controllerMode == PlayerCharacterControllerMode.PointClick ||
                 (controllerMode == PlayerCharacterControllerMode.WASD && wasdLockAttackTarget);
+        }
+
+        public Vector3 GetMovePosition(float horizontalInput, float verticalInput)
+        {
+            var moveDirection = Vector3.zero;
+            switch (controllerType)
+            {
+                case PlayerCharacterControllerType.PlayerChareacterEntity3D:
+                    moveDirection += Camera.main.transform.forward * verticalInput;
+                    moveDirection += Camera.main.transform.right * horizontalInput;
+                    moveDirection.y = 0;
+                    break;
+                case PlayerCharacterControllerType.PlayerChareacterEntity2D:
+                    moveDirection = new Vector2(horizontalInput, verticalInput);
+                    break;
+            }
+            return moveDirection;
         }
     }
 }
