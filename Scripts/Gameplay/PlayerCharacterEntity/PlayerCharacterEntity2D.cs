@@ -25,7 +25,6 @@ namespace MultiplayerARPG
         #region Temp data
         protected Collider2D[] overlapColliders2D = new Collider2D[OVERLAP_COLLIDER_SIZE];
         protected Vector2 currentDirection = Vector2.down;
-        protected Vector2 dirtyDirection;
         protected Vector2 tempDirection;
         protected Vector2? currentDestination;
         protected DirectionType localDirectionType = DirectionType.Down;
@@ -129,26 +128,49 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
             // Setup network components
-            CacheNetTransform.ownerClientCanSendTransform = true;
-            CacheNetTransform.ownerClientNotInterpolate = false;
+            CacheNetTransform.ownerClientCanSendTransform = false;
+            CacheNetTransform.ownerClientNotInterpolate = true;
             // Register Network functions
-            RegisterNetFunction("UpdateDirection", new LiteNetLibFunction<NetFieldSByte, NetFieldSByte>((x, y) => NetFuncUpdateDirection(x, y)));
+            RegisterNetFunction("PointClickMovement", new LiteNetLibFunction<NetFieldVector3>((position) => NetFuncPointClickMovement(position)));
+            RegisterNetFunction("StopMove", new LiteNetLibFunction(StopMove));
+            RegisterNetFunction("SetTargetEntity", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncSetTargetEntity(objectId)));
+        }
+
+        protected void NetFuncPointClickMovement(Vector3 position)
+        {
+            if (IsDead())
+                return;
+            currentDestination = position;
+            currentNpcDialog = null;
+        }
+
+        protected void NetFuncSetTargetEntity(uint objectId)
+        {
+            if (objectId == 0)
+                SetTargetEntity(null);
+            RpgNetworkEntity rpgNetworkEntity;
+            if (!TryGetEntityByObjectId(objectId, out rpgNetworkEntity))
+                return;
+            SetTargetEntity(rpgNetworkEntity);
         }
 
         public override void KeyMovement(Vector3 direction, bool isJump)
         {
             if (IsDead())
                 return;
-            moveDirection = direction;
-            if (moveDirection.magnitude == 0)
-                CacheRigidbody2D.velocity = Vector2.zero;
+            if (direction.magnitude <= 0.025f && !isJump)
+                return;
+            var position = CacheTransform.position + direction;
+            PointClickMovement(position);
         }
 
         public override void PointClickMovement(Vector3 position)
         {
             if (IsDead())
                 return;
-            currentDestination = position;
+            if (IsOwnerClient && !IsServer && CacheNetTransform.ownerClientNotInterpolate)
+                currentDestination = position;
+            CallNetFunction("PointClickMovement", FunctionReceivers.Server, position);
         }
 
         public override void StopMove()
@@ -156,6 +178,15 @@ namespace MultiplayerARPG
             currentDestination = null;
             moveDirection = Vector3.zero;
             CacheRigidbody2D.velocity = Vector2.zero;
+            if (IsOwnerClient && !IsServer)
+                CallNetFunction("StopMove", FunctionReceivers.Server);
+        }
+
+        public override void SetTargetEntity(RpgNetworkEntity entity)
+        {
+            base.SetTargetEntity(entity);
+            if (IsOwnerClient && !IsServer)
+                CallNetFunction("SetTargetEntity", FunctionReceivers.Server, entity == null ? 0 : entity.ObjectId);
         }
 
         public override int OverlapObjects(Vector3 position, float distance, int layerMask)
@@ -194,6 +225,12 @@ namespace MultiplayerARPG
             rotation = Quaternion.Euler(0, 0, (Mathf.Atan2(currentDirection.y, currentDirection.x) * (180 / Mathf.PI)) + 90);
         }
 
+        private void UpdateCurrentDirection(Vector2 direction)
+        {
+            currentDirection = direction;
+            UpdateDirection(currentDirection);
+        }
+
         public void UpdateDirection(Vector2 direction)
         {
             if (direction.magnitude > 0f)
@@ -212,32 +249,6 @@ namespace MultiplayerARPG
             }
             if (IsServer)
                 currentDirectionType.Value = (byte)localDirectionType;
-        }
-
-        private void UpdateCurrentDirection(Vector2 direction)
-        {
-            currentDirection = direction;
-            UpdateDirection(currentDirection);
-            if (!currentDirection.Equals(dirtyDirection))
-            {
-                dirtyDirection = currentDirection;
-                RequestUpdateDirection();
-            }
-        }
-
-        private void NetFuncUpdateDirection(sbyte x, sbyte y)
-        {
-            tempDirection = new Vector2((float)x / 100, (float)y / 100);
-            UpdateDirection(tempDirection);
-            if (!IsOwnerClient)
-                currentDirection = tempDirection;
-        }
-        
-        public virtual void RequestUpdateDirection()
-        {
-            var x = (sbyte)(currentDirection.x * 100);
-            var y = (sbyte)(currentDirection.y * 100);
-            CallNetFunction("UpdateDirection", FunctionReceivers.Server, x, y);
         }
     }
 }
