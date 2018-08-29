@@ -114,11 +114,11 @@ namespace MultiplayerARPG
         {
             setDestinationTime = time;
             isWandering = true;
-            wanderDestination = destination;
-            CacheNavMeshAgent.speed = gameplayRule.GetMoveSpeed(CacheMonsterCharacterEntity);
+            CacheNavMeshAgent.speed = monsterDatabase.wanderMoveSpeed;
             CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
-            CacheNavMeshAgent.SetDestination(wanderDestination.Value);
+            CacheNavMeshAgent.SetDestination(destination);
             CacheNavMeshAgent.isStopped = false;
+            wanderDestination = destination;
         }
         
         protected void UpdateActivity(float time)
@@ -130,12 +130,7 @@ namespace MultiplayerARPG
             {
                 CacheMonsterCharacterEntity.StopMove();
                 CacheMonsterCharacterEntity.SetTargetEntity(null);
-                if (time - CacheMonsterCharacterEntity.DeadTime >= monsterDatabase.deadHideDelay)
-                {
-                    if (CacheMonsterCharacterEntity.spawnArea != null)
-                        CacheMonsterCharacterEntity.spawnArea.Spawn(monsterDatabase.deadRespawnDelay - monsterDatabase.deadHideDelay);
-                    CacheMonsterCharacterEntity.NetworkDestroy();
-                }
+                CacheMonsterCharacterEntity.DestroyAndRespawn();
                 return;
             }
 

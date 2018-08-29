@@ -267,7 +267,16 @@ namespace MultiplayerARPG
             CacheNetTransform.Teleport(spawnPosition, CacheTransform.rotation);
         }
 
-        public abstract bool IsWandering();
+        public virtual void DestroyAndRespawn()
+        {
+            if (Time.unscaledTime - DeadTime > MonsterDatabase.deadHideDelay)
+            {
+                if (spawnArea != null)
+                    spawnArea.Spawn(MonsterDatabase.deadRespawnDelay - MonsterDatabase.deadHideDelay);
+                NetworkDestroy();
+            }
+        }
+        
         public abstract void StopMove();
     }
 

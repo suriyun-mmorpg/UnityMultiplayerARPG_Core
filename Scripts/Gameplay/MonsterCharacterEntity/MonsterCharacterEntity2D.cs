@@ -202,11 +202,6 @@ namespace MultiplayerARPG
                 currentDirectionType.Value = (byte)localDirectionType;
         }
 
-        public override bool IsWandering()
-        {
-            return CacheMonsterActivityComponent.isWandering;
-        }
-
         public override void StopMove()
         {
             currentDestination = null;

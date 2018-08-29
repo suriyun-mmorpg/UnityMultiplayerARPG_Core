@@ -111,7 +111,7 @@ namespace MultiplayerARPG
             {
                 case DimensionType.Dimension3D:
                     // Random drop position around character
-                    dropPosition += new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, 0, Random.Range(-1f, 1f) * gameInstance.dropDistance);
+                    dropPosition = dropper.CacheTransform.position + new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, 0, Random.Range(-1f, 1f) * gameInstance.dropDistance);
                     // Raycast to find hit floor
                     Vector3? aboveHitPoint = null;
                     Vector3? underHitPoint = null;
@@ -137,7 +137,7 @@ namespace MultiplayerARPG
                     dropRotation = Quaternion.Euler(Vector3.up * Random.Range(0, 360));
                     break;
                 case DimensionType.Dimension2D:
-                    dropPosition += new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, Random.Range(-1f, 1f) * gameInstance.dropDistance, 0);
+                    dropPosition = dropper.CacheTransform.position + new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, Random.Range(-1f, 1f) * gameInstance.dropDistance);
                     break;
             }
             var identity = dropper.Manager.Assets.NetworkSpawn(gameInstance.itemDropEntityPrefab.Identity, dropPosition, dropRotation);

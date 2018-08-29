@@ -100,10 +100,10 @@ namespace MultiplayerARPG
         {
             setDestinationTime = time;
             isWandering = true;
-            wanderDestination = destination;
-            CacheMonsterCharacterEntity.speed = gameplayRule.GetMoveSpeed(CacheMonsterCharacterEntity);
-            CacheMonsterCharacterEntity.SetDestination(wanderDestination.Value);
+            CacheMonsterCharacterEntity.speed = monsterDatabase.wanderMoveSpeed;
+            CacheMonsterCharacterEntity.SetDestination(destination);
             CacheMonsterCharacterEntity.isStopped = false;
+            wanderDestination = destination;
         }
 
         protected void UpdateActivity(float time)
@@ -115,12 +115,7 @@ namespace MultiplayerARPG
             {
                 CacheMonsterCharacterEntity.StopMove();
                 CacheMonsterCharacterEntity.SetTargetEntity(null);
-                if (time - CacheMonsterCharacterEntity.DeadTime >= monsterDatabase.deadHideDelay)
-                {
-                    if (CacheMonsterCharacterEntity.spawnArea != null)
-                        CacheMonsterCharacterEntity.spawnArea.Spawn(monsterDatabase.deadRespawnDelay - monsterDatabase.deadHideDelay);
-                    CacheMonsterCharacterEntity.NetworkDestroy();
-                }
+                CacheMonsterCharacterEntity.DestroyAndRespawn();
                 return;
             }
 
@@ -170,6 +165,9 @@ namespace MultiplayerARPG
                 SetStartFollowTargetTime(time);
                 // Lookat target then do anything when it's in range
                 CacheMonsterCharacterEntity.isStopped = true;
+                var targetDirection = (targetEntity.CacheTransform.position - CacheMonsterCharacterEntity.CacheTransform.position).normalized;
+                if (targetDirection.magnitude != 0f)
+                    CacheMonsterCharacterEntity.UpdateCurrentDirection(targetDirection);
                 CacheMonsterCharacterEntity.RequestAttack();
                 // TODO: Random to use skills
             }

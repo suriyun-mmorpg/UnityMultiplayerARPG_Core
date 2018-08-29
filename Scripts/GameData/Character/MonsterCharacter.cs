@@ -34,7 +34,7 @@ namespace MultiplayerARPG
         public float deadHideDelay = 2f;
         public float deadRespawnDelay = 5f;
 
-        [Header("Attack animations")]
+        [Header("Attack animations (DEPRECATED)")]
         [System.Obsolete("This will be removed on next version, please move data to your Character Model")]
         public ActionAnimation[] attackAnimations;
 

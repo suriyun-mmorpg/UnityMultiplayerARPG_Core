@@ -31,11 +31,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public override bool IsWandering()
-        {
-            return CacheMonsterActivityComponent.isWandering;
-        }
-
         public override void StopMove()
         {
             CacheMonsterActivityComponent.StopMove();
