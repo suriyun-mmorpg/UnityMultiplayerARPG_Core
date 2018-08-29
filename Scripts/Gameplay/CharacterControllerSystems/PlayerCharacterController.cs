@@ -618,7 +618,7 @@ namespace MultiplayerARPG
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
-                    if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetEnemy.CacheTransform.position))
+                    if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetHarvestable.CacheTransform.position))
                         RequestAttack();
                 }
                 else
