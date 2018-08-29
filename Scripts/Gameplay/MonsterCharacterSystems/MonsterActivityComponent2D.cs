@@ -29,6 +29,7 @@ namespace MultiplayerARPG
         public Vector3? wanderDestination { get; private set; }
         public Vector3 oldDestination { get; private set; }
         public bool isWandering { get; private set; }
+        public bool isMovingOutFromWall { get; private set; }
 
         private MonsterCharacterEntity2D cacheMonsterCharacterEntity;
         public MonsterCharacterEntity2D CacheMonsterCharacterEntity
@@ -229,6 +230,23 @@ namespace MultiplayerARPG
         public void StopMove()
         {
             CacheMonsterCharacterEntity.StopMove();
+        }
+
+        private void OnCollisionStay2D(Collision2D collision)
+        {
+            if (isMovingOutFromWall)
+                return;
+            StartCoroutine(SimpleMoveOutFromWallRoutine());
+        }
+
+        IEnumerator SimpleMoveOutFromWallRoutine()
+        {
+            isMovingOutFromWall = true;
+            var oldPosition = CacheMonsterCharacterEntity.CacheTransform.position;
+            yield return new WaitForSeconds(Random.Range(randomWanderDelayMin, randomWanderDelayMax));
+            if (Vector3.Distance(oldPosition, CacheMonsterCharacterEntity.CacheTransform.position) < CacheMonsterCharacterEntity.stoppingDistance)
+                RandomWanderTarget(Time.unscaledTime);
+            isMovingOutFromWall = false;
         }
     }
 }
