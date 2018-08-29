@@ -122,10 +122,10 @@ namespace MultiplayerARPG
                     CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(moveDirection), angularSpeed * Time.fixedDeltaTime);
                 }
 
-                BaseCharacterEntity tempCharacterEntity;
-                if (moveDirectionMagnitude == 0 && TryGetTargetEntity(out tempCharacterEntity))
+                RpgNetworkEntity tempEntity;
+                if (moveDirectionMagnitude == 0 && TryGetTargetEntity(out tempEntity))
                 {
-                    var targetDirection = (tempCharacterEntity.CacheTransform.position - CacheTransform.position).normalized;
+                    var targetDirection = (tempEntity.CacheTransform.position - CacheTransform.position).normalized;
                     if (targetDirection.magnitude != 0f)
                     {
                         var fromRotation = CacheTransform.rotation.eulerAngles;

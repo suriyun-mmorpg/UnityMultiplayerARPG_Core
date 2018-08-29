@@ -8,13 +8,16 @@ using LiteNetLib;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(CharacterModel2D))]
+    [RequireComponent(typeof(MonsterActivityComponent2D))]
     [RequireComponent(typeof(Rigidbody2D))]
-    public class PlayerCharacterEntity2D : BasePlayerCharacterEntity
+    public class MonsterCharacterEntity2D : BaseMonsterCharacterEntity
     {
         #region Settings
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
         public float stoppingDistance = 0.1f;
+        public float speed = 1f;
+        public bool isStopped;
         #endregion
 
         #region Sync data
@@ -33,10 +36,17 @@ namespace MultiplayerARPG
         public Vector2 moveDirection { get; protected set; }
         private Vector2 lastMoveDirection;
 
-        public override float StoppingDistance
+        private MonsterActivityComponent2D cacheMonsterActivityComponent;
+        public MonsterActivityComponent2D CacheMonsterActivityComponent
         {
-            get { return stoppingDistance; }
+            get
+            {
+                if (cacheMonsterActivityComponent == null)
+                    cacheMonsterActivityComponent = GetComponent<MonsterActivityComponent2D>();
+                return cacheMonsterActivityComponent;
+            }
         }
+
 
         private Rigidbody2D cacheRigidbody2D;
         public Rigidbody2D CacheRigidbody2D
@@ -84,14 +94,20 @@ namespace MultiplayerARPG
         {
             base.EntityFixedUpdate();
             Profiler.BeginSample("PlayerCharacterEntity2D - FixedUpdate");
-            if (!IsServer && !IsOwnerClient)
+            if (!IsServer)
                 return;
 
+            if (isStopped && CacheRigidbody2D.velocity.magnitude > 0)
+            {
+                CacheRigidbody2D.velocity = Vector2.zero;
+                return;
+            }
+            
             if (currentDestination.HasValue)
             {
                 var currentPosition = new Vector2(CacheTransform.position.x, CacheTransform.position.y);
                 moveDirection = (currentDestination.Value - currentPosition).normalized;
-                if (Vector3.Distance(currentDestination.Value, currentPosition) < StoppingDistance)
+                if (Vector3.Distance(currentDestination.Value, currentPosition) < stoppingDistance)
                     StopMove();
             }
 
@@ -122,71 +138,6 @@ namespace MultiplayerARPG
             base.SetupNetElements();
             currentDirectionType.sendOptions = SendOptions.Unreliable;
             currentDirectionType.forOwnerOnly = false;
-        }
-
-        public override void OnSetup()
-        {
-            base.OnSetup();
-            // Setup network components
-            CacheNetTransform.ownerClientCanSendTransform = false;
-            CacheNetTransform.ownerClientNotInterpolate = true;
-            // Register Network functions
-            RegisterNetFunction("PointClickMovement", new LiteNetLibFunction<NetFieldVector3>((position) => NetFuncPointClickMovement(position)));
-            RegisterNetFunction("StopMove", new LiteNetLibFunction(StopMove));
-            RegisterNetFunction("SetTargetEntity", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncSetTargetEntity(objectId)));
-        }
-
-        protected void NetFuncPointClickMovement(Vector3 position)
-        {
-            if (IsDead())
-                return;
-            currentDestination = position;
-            currentNpcDialog = null;
-        }
-
-        protected void NetFuncSetTargetEntity(uint objectId)
-        {
-            if (objectId == 0)
-                SetTargetEntity(null);
-            RpgNetworkEntity rpgNetworkEntity;
-            if (!TryGetEntityByObjectId(objectId, out rpgNetworkEntity))
-                return;
-            SetTargetEntity(rpgNetworkEntity);
-        }
-
-        public override void KeyMovement(Vector3 direction, bool isJump)
-        {
-            if (IsDead())
-                return;
-            if (direction.magnitude <= 0.025f && !isJump)
-                return;
-            var position = CacheTransform.position + direction;
-            PointClickMovement(position);
-        }
-
-        public override void PointClickMovement(Vector3 position)
-        {
-            if (IsDead())
-                return;
-            if (IsOwnerClient && !IsServer && CacheNetTransform.ownerClientNotInterpolate)
-                currentDestination = position;
-            CallNetFunction("PointClickMovement", FunctionReceivers.Server, position);
-        }
-
-        public override void StopMove()
-        {
-            currentDestination = null;
-            moveDirection = Vector3.zero;
-            CacheRigidbody2D.velocity = Vector2.zero;
-            if (IsOwnerClient && !IsServer)
-                CallNetFunction("StopMove", FunctionReceivers.Server);
-        }
-
-        public override void SetTargetEntity(RpgNetworkEntity entity)
-        {
-            base.SetTargetEntity(entity);
-            if (IsOwnerClient && !IsServer)
-                CallNetFunction("SetTargetEntity", FunctionReceivers.Server, entity == null ? 0 : entity.ObjectId);
         }
 
         public override int OverlapObjects(Vector3 position, float distance, int layerMask)
@@ -249,6 +200,23 @@ namespace MultiplayerARPG
             }
             if (IsServer)
                 currentDirectionType.Value = (byte)localDirectionType;
+        }
+
+        public override bool IsWandering()
+        {
+            return CacheMonsterActivityComponent.isWandering;
+        }
+
+        public override void StopMove()
+        {
+            currentDestination = null;
+            moveDirection = Vector3.zero;
+            CacheRigidbody2D.velocity = Vector2.zero;
+        }
+
+        public void SetDestination(Vector2 destination)
+        {
+            currentDestination = destination;
         }
     }
 }
