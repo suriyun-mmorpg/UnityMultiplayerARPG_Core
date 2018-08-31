@@ -14,11 +14,9 @@ namespace MultiplayerARPG
         public int DataId { get { return dataId; } }
 
         [Header("Equipment Containers")]
-        [SerializeField]
-        private EquipmentModelContainer[] equipmentContainers;
+        public EquipmentModelContainer[] equipmentContainers;
         [Header("Effect Containers")]
-        [SerializeField]
-        private EffectContainer[] effectContainers;
+        public EffectContainer[] effectContainers;
 
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
 

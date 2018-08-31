@@ -27,23 +27,16 @@ namespace MultiplayerARPG
         [Header("Animation Component Type")]
         public AnimatorType animatorType;
         [Header("Animator")]
-        [SerializeField]
-        private RuntimeAnimatorController animatorController;
+        public RuntimeAnimatorController animatorController;
         [Header("Legacy Animation")]
-        [SerializeField]
-        private LegacyAnimationData legacyAnimationData;
+        public LegacyAnimationData legacyAnimationData;
         [Header("Renderer")]
-        [SerializeField]
-        private SkinnedMeshRenderer skinnedMeshRenderer;
+        public SkinnedMeshRenderer skinnedMeshRenderer;
         [Header("Animations")]
-        [SerializeField]
-        private ActionAnimation[] defaultAttackAnimations;
-        [SerializeField]
-        private ActionAnimation[] defaultSkillCastAnimations;
-        [SerializeField]
-        private WeaponAnimations[] weaponAnimations;
-        [SerializeField]
-        private SkillCastAnimations[] skillCastAnimations;
+        public ActionAnimation[] defaultAttackAnimations;
+        public ActionAnimation[] defaultSkillCastAnimations;
+        public WeaponAnimations[] weaponAnimations;
+        public SkillCastAnimations[] skillCastAnimations;
 
         private static Dictionary<int, ActionAnimation[]> cacheRightHandAttackAnimations;
         public Dictionary<int, ActionAnimation[]> CacheRightHandAttackAnimations

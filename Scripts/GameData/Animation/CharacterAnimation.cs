@@ -13,21 +13,17 @@ namespace MultiplayerARPG
     [System.Serializable]
     public class ActionAnimation : CharacterAnimation
     {
-        [SerializeField]
         [Tooltip("This will be in use with attack/skill animations, This is rate of total animation duration at when it should hit enemy or apply skill")]
         [Range(0f, 1f)]
-        private float triggerDurationRate;
-        [SerializeField]
+        public float triggerDurationRate;
         [Tooltip("This will be in use with attack/skill animations, This is duration after played animation clip to add delay before next animation")]
-        private float extraDuration;
-        [SerializeField]
+        public float extraDuration;
         [Tooltip("This will be in use with attack/skill animations, These audio clips playing randomly while play this animation (not loop)")]
-        private AudioClip[] audioClips;
+        public AudioClip[] audioClips;
         [Header("DEPRECATED")]
         [Tooltip("This will be removed on next version, please move data to your Character Model")]
-        [SerializeField]
         [System.Obsolete("This will be removed on next version, please move data to your Character Model")]
-        private ActionAnimationOverrideData[] overrideData;
+        public ActionAnimationOverrideData[] overrideData;
 
         public AudioClip GetRandomAudioClip()
         {

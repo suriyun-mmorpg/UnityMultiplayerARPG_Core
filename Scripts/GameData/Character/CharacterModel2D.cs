@@ -20,29 +20,18 @@ namespace MultiplayerARPG
 
         }
         [Header("2D Animations")]
-        [SerializeField]
-        private SpriteRenderer spriteRenderer;
-        [SerializeField]
-        private CharacterAnimation2D idleAnimation2D;
-        [SerializeField]
-        private CharacterAnimation2D moveAnimation2D;
-        [SerializeField]
-        private CharacterAnimation2D deadAnimation2D;
-        [SerializeField]
-        private ActionAnimation2D defaultAttackAnimation2D;
-        [SerializeField]
-        private ActionAnimation2D defaultSkillCastAnimation2D;
-        [SerializeField]
-        private WeaponAnimations2D[] weaponAnimations2D;
-        [SerializeField]
-        private SkillCastAnimations2D[] skillCastAnimations2D;
-        [SerializeField]
-        private float magnitudeToPlayMoveClip = 0.1f;
+        public SpriteRenderer spriteRenderer;
+        public CharacterAnimation2D idleAnimation2D;
+        public CharacterAnimation2D moveAnimation2D;
+        public CharacterAnimation2D deadAnimation2D;
+        public ActionAnimation2D defaultAttackAnimation2D;
+        public ActionAnimation2D defaultSkillCastAnimation2D;
+        public WeaponAnimations2D[] weaponAnimations2D;
+        public SkillCastAnimations2D[] skillCastAnimations2D;
+        public float magnitudeToPlayMoveClip = 0.1f;
         [Header("Sample 2D Animations")]
-        [SerializeField]
-        private SampleAnimation sampleAnimation = SampleAnimation.Idle;
-        [SerializeField]
-        private DirectionType sampleDirection = DirectionType.Down;
+        public SampleAnimation sampleAnimation = SampleAnimation.Idle;
+        public DirectionType sampleDirection = DirectionType.Down;
 
         private Dictionary<int, ActionAnimation2D> cacheRightHandAttackAnimations;
         public Dictionary<int, ActionAnimation2D> CacheRightHandAttackAnimations
