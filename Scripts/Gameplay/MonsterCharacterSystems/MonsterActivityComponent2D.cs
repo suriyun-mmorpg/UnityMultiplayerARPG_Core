@@ -243,7 +243,7 @@ namespace MultiplayerARPG
         {
             isMovingOutFromWall = true;
             var oldPosition = CacheMonsterCharacterEntity.CacheTransform.position;
-            yield return new WaitForSeconds(Random.Range(randomWanderDelayMin, randomWanderDelayMax));
+            yield return new WaitForSeconds(0.5f);
             if (Vector3.Distance(oldPosition, CacheMonsterCharacterEntity.CacheTransform.position) < CacheMonsterCharacterEntity.stoppingDistance)
                 RandomWanderTarget(Time.unscaledTime);
             isMovingOutFromWall = false;
