@@ -6,7 +6,6 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(RpgEntityModel))]
     public sealed class HarvestableEntity : DamageableNetworkEntity
     {
         public int maxHp = 100;
