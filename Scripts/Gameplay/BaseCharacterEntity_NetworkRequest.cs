@@ -108,7 +108,7 @@ namespace MultiplayerARPG
 
         public virtual void RequestOnDead()
         {
-            CallNetFunction("OnDead", FunctionReceivers.All);
+            CallNetFunction("OnDead", ConnectId);
         }
 
         public virtual void RequestOnRespawn()
