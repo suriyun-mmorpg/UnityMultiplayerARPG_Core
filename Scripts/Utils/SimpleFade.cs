@@ -4,9 +4,15 @@ using UnityEngine;
 
 public class SimpleFade : MonoBehaviour
 {
+    public enum FadeState
+    {
+        None,
+        FadeIn,
+        FadeOut,
+    }
+    public FadeState currentFadeState = FadeState.None;
     public float fadeSpeed = 0.2f;
     private Texture2D blackTexture;
-    private bool fadeIn;
     private float alpha;
 
     void Awake()
@@ -24,7 +30,7 @@ public class SimpleFade : MonoBehaviour
 
     void Update()
     {
-        if (!fadeIn)
+        if (currentFadeState == FadeState.FadeOut)
         {
             if (alpha > 0)
             {
@@ -34,7 +40,7 @@ public class SimpleFade : MonoBehaviour
                 blackTexture.Apply();
             }
         }
-        if (fadeIn)
+        if (currentFadeState == FadeState.FadeIn)
         {
             if (alpha < 1)
             {
@@ -48,11 +54,11 @@ public class SimpleFade : MonoBehaviour
 
     public void FadeIn()
     {
-        fadeIn = true;
+        currentFadeState = FadeState.FadeIn;
     }
 
     public void FadeOut()
     {
-        fadeIn = false;
+        currentFadeState = FadeState.FadeOut;
     }
 }
