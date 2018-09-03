@@ -229,6 +229,12 @@ namespace MultiplayerARPG
             if (Vector3.Distance(CacheTransform.position, itemDropEntity.CacheTransform.position) > gameInstance.pickUpItemDistance + 5f)
                 return;
 
+            if (!itemDropEntity.IsAbleToLoot(this))
+            {
+                // TODO: Send not able to loot messages
+                return;
+            }
+
             var itemDropData = itemDropEntity.dropData;
             if (!itemDropData.IsValid())
             {
@@ -262,7 +268,7 @@ namespace MultiplayerARPG
             var itemDataId = nonEquipItem.dataId;
             var level = nonEquipItem.level;
             if (this.DecreaseItemsByIndex(index, amount))
-                ItemDropEntity.DropItem(this, itemDataId, level, amount);
+                ItemDropEntity.DropItem(this, itemDataId, level, amount, new uint[] { ObjectId });
         }
 
         /// <summary>

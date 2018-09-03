@@ -68,6 +68,7 @@ namespace MultiplayerARPG
         public UnityLayer harvestableLayer;
         public UnityLayer[] nonTargetingLayers;
         public float itemAppearDuration = 60f;
+        public float itemLootLockDuration = 5f;
         public float pickUpItemDistance = 1f;
         public float dropDistance = 1f;
         public float conversationDistance = 1f;

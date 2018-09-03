@@ -11,7 +11,9 @@ namespace MultiplayerARPG
         public const float GROUND_DETECTION_DISTANCE = 100f;
         public DimensionType dimensionType;
         public CharacterItem dropData;
+        public HashSet<uint> looters;
         public Transform modelContainer;
+        private float dropTime;
 
         [SerializeField]
         private SyncFieldInt itemDataId = new SyncFieldInt();
@@ -60,6 +62,7 @@ namespace MultiplayerARPG
             if (IsServer)
             {
                 var id = dropData.dataId;
+                dropTime = Time.unscaledTime;
                 if (!GameInstance.Items.ContainsKey(id))
                     NetworkDestroy();
                 itemDataId.Value = id;
@@ -93,13 +96,22 @@ namespace MultiplayerARPG
             }
         }
 
+        public bool IsAbleToLoot(BaseCharacterEntity baseCharacterEntity)
+        {
+            if (looters == null || 
+                looters.Contains(baseCharacterEntity.ObjectId) || 
+                Time.unscaledTime - dropTime > gameInstance.itemLootLockDuration)
+                return true;
+            return false;
+        }
+
         protected override void EntityOnDestroy()
         {
             base.EntityOnDestroy();
             itemDataId.onChange -= OnItemDataIdChange;
         }
 
-        public static ItemDropEntity DropItem(RpgNetworkEntity dropper, int itemDataId, short level, short amount)
+        public static ItemDropEntity DropItem(RpgNetworkEntity dropper, int itemDataId, short level, short amount, IEnumerable<uint> looters)
         {
             var gameInstance = GameInstance.Singleton;
             if (gameInstance.itemDropEntityPrefab == null)
@@ -144,6 +156,7 @@ namespace MultiplayerARPG
             var itemDropEntity = identity.GetComponent<ItemDropEntity>();
             var dropData = CharacterItem.Create(itemDataId, level, amount);
             itemDropEntity.dropData = dropData;
+            itemDropEntity.looters = new HashSet<uint>(looters);
             return itemDropEntity;
         }
     }

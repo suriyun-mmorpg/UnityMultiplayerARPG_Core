@@ -217,10 +217,12 @@ namespace MultiplayerARPG
             var maxHp = CacheStats.hp;
             var randomedExp = Random.Range(MonsterDatabase.randomExpMin, MonsterDatabase.randomExpMax);
             var randomedGold = Random.Range(MonsterDatabase.randomGoldMin, MonsterDatabase.randomGoldMax);
+            var looters = new HashSet<uint>();
             if (receivedDamageRecords.Count > 0)
             {
-                var enemies = new List<BaseCharacterEntity>(receivedDamageRecords.Keys);
-                foreach (var enemy in enemies)
+                BasePlayerCharacterEntity topDamagePlayer = null;
+                var tempHighRewardRate = 0f;
+                foreach (var enemy in receivedDamageRecords.Keys)
                 {
                     var receivedDamageRecord = receivedDamageRecords[enemy];
                     var rewardRate = receivedDamageRecord.totalReceivedDamage / maxHp;
@@ -231,7 +233,17 @@ namespace MultiplayerARPG
                     {
                         var enemyPlayer = enemy as BasePlayerCharacterEntity;
                         enemyPlayer.Gold += (int)(randomedGold * rewardRate);
+                        if (rewardRate > tempHighRewardRate)
+                        {
+                            tempHighRewardRate = rewardRate;
+                            topDamagePlayer = enemyPlayer;
+                        }
                     }
+                }
+                if (topDamagePlayer != null)
+                {
+                    // If player is in party, check party share item state
+                    looters.Add(topDamagePlayer.ObjectId);
                 }
             }
             receivedDamageRecords.Clear();
@@ -246,7 +258,7 @@ namespace MultiplayerARPG
                         var itemDataId = item.DataId;
                         if (amount > item.maxStack)
                             amount = item.maxStack;
-                        ItemDropEntity.DropItem(this, itemDataId, 1, amount);
+                        ItemDropEntity.DropItem(this, itemDataId, 1, amount, looters);
                     }
                 }
             }
