@@ -267,7 +267,7 @@ namespace MultiplayerARPG
             CacheNetTransform.Teleport(spawnPosition, CacheTransform.rotation);
         }
 
-        public virtual void DestroyAndRespawn()
+        public void DestroyAndRespawn()
         {
             if (Time.unscaledTime - DeadTime > MonsterDatabase.deadHideDelay)
             {
