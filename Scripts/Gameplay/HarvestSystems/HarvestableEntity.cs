@@ -6,7 +6,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-
+    [RequireComponent(typeof(RpgEntityModel))]
     public sealed class HarvestableEntity : DamageableNetworkEntity
     {
         public int maxHp = 100;
@@ -41,6 +41,12 @@ namespace MultiplayerARPG
                 return;
 
             base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
+            // Play hit effect
+            if (hitEffectsId == 0)
+                hitEffectsId = gameInstance.defaultHitEffects.Id;
+            if (hitEffectsId > 0)
+                RequestPlayEffect(hitEffectsId);
+            // Apply damages
             var totalDamage = 0;
             var weaponItem = weapon.GetWeaponItem();
             HarvestEffectiveness harvestEffectiveness;

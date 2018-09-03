@@ -38,13 +38,6 @@ namespace MultiplayerARPG
             CallNetFunction("PlayActionAnimation", FunctionReceivers.All, animActionType, dataId, (byte)index);
         }
 
-        public virtual void RequestPlayEffect(uint effectId)
-        {
-            if (effectId <= 0)
-                return;
-            CallNetFunction("PlayEffect", FunctionReceivers.All, effectId);
-        }
-
         public virtual void RequestPickupItem(uint objectId)
         {
             if (!CanMoveOrDoActions())

@@ -214,18 +214,6 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// This will be called at every clients to play any effect
-        /// </summary>
-        /// <param name="effectId"></param>
-        protected virtual void NetFuncPlayEffect(uint effectId)
-        {
-            GameEffectCollection gameEffectCollection;
-            if (CharacterModel == null || !GameInstance.GameEffectCollections.TryGetValue(effectId, out gameEffectCollection))
-                return;
-            CharacterModel.InstantiateEffect(gameEffectCollection.effects);
-        }
-
-        /// <summary>
         /// This will be called at server to order character to pickup items
         /// </summary>
         /// <param name="objectId"></param>

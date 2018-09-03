@@ -64,7 +64,6 @@ namespace MultiplayerARPG
             RegisterNetFunction("UseSkill", new LiteNetLibFunction<NetFieldVector3, NetFieldInt>((position, skillIndex) => NetFuncUseSkill(position, skillIndex)));
             RegisterNetFunction("UseItem", new LiteNetLibFunction<NetFieldInt>((itemIndex) => NetFuncUseItem(itemIndex)));
             RegisterNetFunction("PlayActionAnimation", new LiteNetLibFunction<NetFieldByte, NetFieldInt, NetFieldByte>((animActionType, dataId, index) => NetFuncPlayActionAnimation((AnimActionType)animActionType.Value, dataId, index)));
-            RegisterNetFunction("PlayEffect", new LiteNetLibFunction<NetFieldPackedUInt>((effectId) => NetFuncPlayEffect(effectId)));
             RegisterNetFunction("PickupItem", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncPickupItem(objectId)));
             RegisterNetFunction("DropItem", new LiteNetLibFunction<NetFieldInt, NetFieldShort>((index, amount) => NetFuncDropItem(index, amount)));
             RegisterNetFunction("EquipItem", new LiteNetLibFunction<NetFieldInt, NetFieldString>((nonEquipIndex, equipPosition) => NetFuncEquipItem(nonEquipIndex, equipPosition)));

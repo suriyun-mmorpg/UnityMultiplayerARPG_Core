@@ -41,6 +41,17 @@ namespace MultiplayerARPG
             }
         }
 
+        private RpgEntityModel model;
+        public RpgEntityModel Model
+        {
+            get
+            {
+                if (model == null)
+                    model = GetComponent<RpgEntityModel>();
+                return model;
+            }
+        }
+
         private void Awake()
         {
             EntityAwake();
@@ -116,6 +127,7 @@ namespace MultiplayerARPG
             syncTitle.onChange += OnSyncTitleChange;
             if (IsServer)
                 syncTitle.Value = title;
+            RegisterNetFunction("PlayEffect", new LiteNetLibFunction<NetFieldPackedUInt>((effectId) => NetFuncPlayEffect(effectId)));
         }
 
         protected virtual void SetupNetElements()
@@ -124,6 +136,29 @@ namespace MultiplayerARPG
             syncTitle.sendOptions = SendOptions.ReliableUnordered;
             syncTitle.forOwnerOnly = false;
         }
+
+        #region Net Functions
+        /// <summary>
+        /// This will be called at every clients to play any effect
+        /// </summary>
+        /// <param name="effectId"></param>
+        protected virtual void NetFuncPlayEffect(uint effectId)
+        {
+            GameEffectCollection gameEffectCollection;
+            if (Model == null || !GameInstance.GameEffectCollections.TryGetValue(effectId, out gameEffectCollection))
+                return;
+            Model.InstantiateEffect(gameEffectCollection.effects);
+        }
+        #endregion
+
+        #region Net Function Requests
+        public virtual void RequestPlayEffect(uint effectId)
+        {
+            if (effectId <= 0)
+                return;
+            CallNetFunction("PlayEffect", FunctionReceivers.All, effectId);
+        }
+        #endregion
 
         public override void OnNetworkDestroy(DestroyObjectReasons reasons)
         {

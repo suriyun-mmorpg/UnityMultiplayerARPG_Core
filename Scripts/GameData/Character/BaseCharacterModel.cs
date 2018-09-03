@@ -1,24 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseCharacterModel : MonoBehaviour
+    public abstract class BaseCharacterModel : RpgEntityModel
     {
-        [SerializeField]
-        private int dataId;
-        public int DataId { get { return dataId; } }
-
         [Header("Equipment Containers")]
         public EquipmentModelContainer[] equipmentContainers;
-        [Header("Effect Containers")]
-        public EffectContainer[] effectContainers;
-
-        protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
 
         private Transform cacheTransform;
         public Transform CacheTransform
@@ -51,27 +40,6 @@ namespace MultiplayerARPG
             }
         }
 
-        private Dictionary<string, EffectContainer> cacheEffectContainers = null;
-        /// <summary>
-        /// Dictionary[effectSocket(String), container(CharacterModelContainer)]
-        /// </summary>
-        public Dictionary<string, EffectContainer> CacheEffectContainers
-        {
-            get
-            {
-                if (cacheEffectContainers == null)
-                {
-                    cacheEffectContainers = new Dictionary<string, EffectContainer>();
-                    foreach (var effectContainer in effectContainers)
-                    {
-                        if (effectContainer.transform != null && !cacheEffectContainers.ContainsKey(effectContainer.effectSocket))
-                            cacheEffectContainers[effectContainer.effectSocket] = effectContainer;
-                    }
-                }
-                return cacheEffectContainers;
-            }
-        }
-
         /// <summary>
         /// Dictionary[equipPosition(String), Dictionary[equipSocket(String), model(GameObject)]]
         /// </summary>
@@ -81,17 +49,6 @@ namespace MultiplayerARPG
         /// Dictionary[equipPosition(String), List[effect(GameEffect)]]
         /// </summary>
         private readonly Dictionary<string, List<GameEffect>> cacheEffects = new Dictionary<string, List<GameEffect>>();
-
-#if UNITY_EDITOR
-        private void OnValidate()
-        {
-            if (!Application.isPlaying && dataId != name.GenerateHashId())
-            {
-                dataId = name.GenerateHashId();
-                EditorUtility.SetDirty(gameObject);
-            }
-        }
-#endif
 
         private void CreateCacheModel(string equipPosition, Dictionary<string, GameObject> models)
         {
@@ -267,33 +224,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public List<GameEffect> InstantiateEffect(GameEffect[] effects)
-        {
-            if (effects == null || effects.Length == 0)
-                return new List<GameEffect>();
-            var newEffects = new List<GameEffect>();
-            foreach (var effect in effects)
-            {
-                if (effect == null)
-                    continue;
-                var effectSocket = effect.effectSocket;
-                if (string.IsNullOrEmpty(effectSocket))
-                    continue;
-                EffectContainer container;
-                if (!CacheEffectContainers.TryGetValue(effectSocket, out container))
-                    continue;
-                var newEffect = effect.InstantiateTo(null);
-                newEffect.followingTarget = container.transform;
-                newEffect.CacheTransform.position = newEffect.followingTarget.position;
-                newEffect.CacheTransform.rotation = newEffect.followingTarget.rotation;
-                newEffect.gameObject.SetActive(true);
-                newEffect.gameObject.SetLayerRecursively(gameInstance.characterLayer.LayerIndex, true);
-                AddingNewEffect(newEffect);
-                newEffects.Add(newEffect);
-            }
-            return newEffects;
-        }
-
         public void InstantiateBuffEffect(string buffId, GameEffect[] buffEffects)
         {
             if (buffEffects == null || buffEffects.Length == 0)
@@ -335,7 +265,6 @@ namespace MultiplayerARPG
         }
 
         public virtual void AddingNewModel(GameObject newModel) { }
-        public virtual void AddingNewEffect(GameEffect newEffect) { }
         public abstract void UpdateAnimation(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier = 1f);
         public abstract Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f);
         public abstract void PlayHurtAnimation();
@@ -351,13 +280,6 @@ namespace MultiplayerARPG
     {
         public string equipSocket;
         public GameObject defaultModel;
-        public Transform transform;
-    }
-
-    [System.Serializable]
-    public struct EffectContainer
-    {
-        public string effectSocket;
         public Transform transform;
     }
 }
