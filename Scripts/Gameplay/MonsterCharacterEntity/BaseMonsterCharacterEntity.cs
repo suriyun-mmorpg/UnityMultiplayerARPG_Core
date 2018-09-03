@@ -8,10 +8,6 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(LiteNetLibTransform))]
     public abstract partial class BaseMonsterCharacterEntity : BaseCharacterEntity
     {
-        #region Activity System Data
-        public float ReceivedDamageRecordsUpdateTime { get; protected set; }
-        public float DeadTime { get; protected set; }
-        #endregion
         public readonly Dictionary<BaseCharacterEntity, ReceivedDamageRecord> receivedDamageRecords = new Dictionary<BaseCharacterEntity, ReceivedDamageRecord>();
 
         #region Interface implementation
@@ -44,6 +40,9 @@ namespace MultiplayerARPG
                 return cacheNetTransform;
             }
         }
+
+        protected float ReceivedDamageRecordsUpdateTime;
+        protected bool destroyAndRespawnCalled;
 
         protected override void EntityAwake()
         {
@@ -215,7 +214,6 @@ namespace MultiplayerARPG
         public override void Killed(BaseCharacterEntity lastAttacker)
         {
             base.Killed(lastAttacker);
-            DeadTime = Time.unscaledTime;
             var maxHp = CacheStats.hp;
             var randomedExp = Random.Range(MonsterDatabase.randomExpMin, MonsterDatabase.randomExpMax);
             var randomedGold = Random.Range(MonsterDatabase.randomGoldMin, MonsterDatabase.randomGoldMax);
@@ -269,12 +267,12 @@ namespace MultiplayerARPG
 
         public void DestroyAndRespawn()
         {
-            if (Time.unscaledTime - DeadTime > MonsterDatabase.deadHideDelay)
-            {
-                if (spawnArea != null)
-                    spawnArea.Spawn(MonsterDatabase.deadRespawnDelay - MonsterDatabase.deadHideDelay);
-                NetworkDestroy();
-            }
+            if (destroyAndRespawnCalled)
+                return;
+            destroyAndRespawnCalled = true;
+            if (spawnArea != null)
+                spawnArea.Spawn(MonsterDatabase.deadHideDelay + MonsterDatabase.deadRespawnDelay);
+            NetworkDestroy(MonsterDatabase.deadHideDelay);
         }
         
         public abstract void StopMove();
