@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
@@ -11,6 +13,7 @@ namespace MultiplayerARPG
         public Harvestable harvestable;
         public float colliderDetectionRadius = 2f;
         public float respawnDelay = 5f;
+        public UnityEvent onHarvestableDestroy;
 
         #region Public data
         [HideInInspector]
@@ -24,6 +27,12 @@ namespace MultiplayerARPG
             base.EntityAwake();
             gameObject.tag = gameInstance.harvestableTag;
             gameObject.layer = gameInstance.harvestableLayer;
+        }
+
+        public override void OnSetup()
+        {
+            base.OnSetup();
+            RegisterNetFunction("OnHarvestableDestroy", new LiteNetLibFunction(() => { onHarvestableDestroy.Invoke(); }));
         }
 
         public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
@@ -51,6 +60,7 @@ namespace MultiplayerARPG
             if (IsDead())
             {
                 CurrentHp = 0;
+                CallNetFunction("OnHarvestableDestroy", FunctionReceivers.All);
                 if (spawnArea != null)
                     spawnArea.Spawn(respawnDelay);
                 NetworkDestroy();
