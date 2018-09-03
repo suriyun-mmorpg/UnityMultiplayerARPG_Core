@@ -11,8 +11,8 @@ namespace MultiplayerARPG
         public int maxHp = 100;
         public Harvestable harvestable;
         public float colliderDetectionRadius = 2f;
-        public float deadHideDelay = 2f;
-        public float deadRespawnDelay = 5f;
+        public float destroyHideDelay = 2f;
+        public float destroyRespawnDelay = 5f;
         public UnityEvent onHarvestableDestroy;
 
         #region Public data
@@ -68,8 +68,8 @@ namespace MultiplayerARPG
                 CurrentHp = 0;
                 CallNetFunction("OnHarvestableDestroy", FunctionReceivers.All);
                 if (spawnArea != null)
-                    spawnArea.Spawn(deadHideDelay + deadRespawnDelay);
-                NetworkDestroy(deadHideDelay);
+                    spawnArea.Spawn(destroyHideDelay + destroyRespawnDelay);
+                NetworkDestroy(destroyHideDelay);
             }
         }
 
