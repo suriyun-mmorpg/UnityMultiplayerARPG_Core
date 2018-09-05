@@ -11,10 +11,17 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerCharacterEntity2D : BasePlayerCharacterEntity
     {
+        public enum MovementSecure
+        {
+            Secure,
+            NotSecure,
+        }
         #region Settings
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
         public float stoppingDistance = 0.1f;
+        [Header("Network Settings")]
+        public MovementSecure movementSecure;
         #endregion
 
         #region Sync data
@@ -122,16 +129,26 @@ namespace MultiplayerARPG
             base.SetupNetElements();
             currentDirectionType.sendOptions = SendOptions.Unreliable;
             currentDirectionType.forOwnerOnly = false;
+            // Setup network components
+            switch (movementSecure)
+            {
+                case MovementSecure.Secure:
+                    CacheNetTransform.ownerClientCanSendTransform = false;
+                    CacheNetTransform.ownerClientNotInterpolate = false;
+                    break;
+                case MovementSecure.NotSecure:
+                    CacheNetTransform.ownerClientCanSendTransform = true;
+                    CacheNetTransform.ownerClientNotInterpolate = true;
+                    break;
+            }
         }
 
         public override void OnSetup()
         {
             base.OnSetup();
-            // Setup network components
-            CacheNetTransform.ownerClientCanSendTransform = false;
-            CacheNetTransform.ownerClientNotInterpolate = true;
             // Register Network functions
             RegisterNetFunction("PointClickMovement", new LiteNetLibFunction<NetFieldVector3>((position) => NetFuncPointClickMovement(position)));
+            RegisterNetFunction("KeyMovement", new LiteNetLibFunction<NetFieldSByte, NetFieldSByte>((horizontalInput, verticalInput) => NetFuncKeyMovement(horizontalInput, verticalInput)));
             RegisterNetFunction("StopMove", new LiteNetLibFunction(StopMove));
             RegisterNetFunction("SetTargetEntity", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncSetTargetEntity(objectId)));
         }
@@ -141,6 +158,15 @@ namespace MultiplayerARPG
             if (IsDead())
                 return;
             currentDestination = position;
+            currentNpcDialog = null;
+        }
+
+        protected void NetFuncKeyMovement(sbyte horizontalInput, sbyte verticalInput)
+        {
+            if (IsDead())
+                return;
+            // Devide inputs to float value
+            currentDestination = CacheTransform.position + new Vector3((float)horizontalInput / 100f, (float)verticalInput / 100f);
             currentNpcDialog = null;
         }
 
@@ -154,23 +180,41 @@ namespace MultiplayerARPG
             SetTargetEntity(rpgNetworkEntity);
         }
 
+        public override void PointClickMovement(Vector3 position)
+        {
+            if (IsDead())
+                return;
+            switch (movementSecure)
+            {
+                case MovementSecure.Secure:
+                    CallNetFunction("PointClickMovement", FunctionReceivers.Server, position);
+                    break;
+                case MovementSecure.NotSecure:
+                    if (IsOwnerClient && !IsServer && CacheNetTransform.ownerClientNotInterpolate)
+                    currentDestination = position;
+                    break;
+            }
+        }
+
         public override void KeyMovement(Vector3 direction, bool isJump)
         {
             if (IsDead())
                 return;
             if (direction.magnitude <= 0.025f && !isJump)
                 return;
-            var position = CacheTransform.position + direction;
-            PointClickMovement(position);
-        }
-
-        public override void PointClickMovement(Vector3 position)
-        {
-            if (IsDead())
-                return;
-            if (IsOwnerClient && !IsServer && CacheNetTransform.ownerClientNotInterpolate)
-                currentDestination = position;
-            CallNetFunction("PointClickMovement", FunctionReceivers.Server, position);
+            switch (movementSecure)
+            {
+                case MovementSecure.Secure:
+                    // Multiply with 100 and cast to sbyte to reduce packet size
+                    // then it will be devided with 100 later on server side
+                    CallNetFunction("KeyMovement", FunctionReceivers.Server, (sbyte)(direction.x * 100), (sbyte)(direction.y * 100));
+                    break;
+                case MovementSecure.NotSecure:
+                    var position = CacheTransform.position + direction;
+                    if (IsOwnerClient && !IsServer && CacheNetTransform.ownerClientNotInterpolate)
+                        currentDestination = position;
+                    break;
+            }
         }
 
         public override void StopMove()

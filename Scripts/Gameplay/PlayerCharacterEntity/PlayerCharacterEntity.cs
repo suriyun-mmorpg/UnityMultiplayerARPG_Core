@@ -11,6 +11,11 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(CapsuleCollider))]
     public partial class PlayerCharacterEntity : BasePlayerCharacterEntity
     {
+        public enum MovementSecure
+        {
+            Secure,
+            NotSecure,
+        }
         #region Settings
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
@@ -20,6 +25,8 @@ namespace MultiplayerARPG
         public float jumpHeight = 2f;
         public float gravityRate = 1f;
         public float angularSpeed = 800f;
+        [Header("Network Settings")]
+        public MovementSecure movementSecure;
         #endregion
 
         public bool isJumping { get; protected set; }
@@ -110,7 +117,7 @@ namespace MultiplayerARPG
                     if (moveDirectionMagnitude > 1)
                         moveDirection = moveDirection.normalized;
 
-                    var targetVelocity = moveDirection * CacheMoveSpeed;
+                    var targetVelocity = moveDirection * gameInstance.GameplayRule.GetMoveSpeed(this);
 
                     // Apply a force that attempts to reach our target velocity
                     Vector3 velocityChange = (targetVelocity - velocity);
@@ -151,16 +158,30 @@ namespace MultiplayerARPG
             Profiler.EndSample();
         }
 
+        protected override void SetupNetElements()
+        {
+            base.SetupNetElements();
+            // Setup network components
+            switch (movementSecure)
+            {
+                case MovementSecure.Secure:
+                    CacheNetTransform.ownerClientCanSendTransform = false;
+                    CacheNetTransform.ownerClientNotInterpolate = false;
+                    break;
+                case MovementSecure.NotSecure:
+                    CacheNetTransform.ownerClientCanSendTransform = true;
+                    CacheNetTransform.ownerClientNotInterpolate = true;
+                    break;
+            }
+        }
+
         public override void OnSetup()
         {
             base.OnSetup();
-            // Setup network components
-            CacheNetTransform.ownerClientCanSendTransform = false;
-            CacheNetTransform.ownerClientNotInterpolate = true;
             // Register Network functions
             RegisterNetFunction("TriggerJump", new LiteNetLibFunction(NetFuncTriggerJump));
             RegisterNetFunction("PointClickMovement", new LiteNetLibFunction<NetFieldVector3>((position) => NetFuncPointClickMovement(position)));
-            RegisterNetFunction("KeyMovement", new LiteNetLibFunction<NetFieldVector3, NetFieldBool>((position, isJump) => NetFuncKeyMovement(position, isJump)));
+            RegisterNetFunction("KeyMovement", new LiteNetLibFunction<NetFieldSByte, NetFieldSByte, NetFieldBool>((horizontalInput, verticalInput, isJump) => NetFuncKeyMovement(horizontalInput, verticalInput, isJump)));
             RegisterNetFunction("StopMove", new LiteNetLibFunction(StopMove));
             RegisterNetFunction("SetTargetEntity", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncSetTargetEntity(objectId)));
         }
@@ -173,11 +194,14 @@ namespace MultiplayerARPG
             currentNpcDialog = null;
         }
 
-        protected void NetFuncKeyMovement(Vector3 position, bool isJump)
+        protected void NetFuncKeyMovement(sbyte horizontalInput, sbyte verticalInput, bool isJump)
         {
             if (IsDead())
                 return;
-            SetMovePaths(position, false);
+            // Devide inputs to float value
+            var direction = new Vector3((float)horizontalInput / 100f, 0, (float)verticalInput / 100f);
+            if (direction.magnitude > 0)
+                SetMovePaths(CacheTransform.position + direction, false);
             if (!isJumping)
                 isJumping = isGrounded && isJump;
             currentNpcDialog = null;
@@ -195,7 +219,9 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncTriggerJump()
         {
-            if (IsDead() || IsOwnerClient)
+            if (IsDead())
+                return;
+            if (movementSecure == MovementSecure.NotSecure && IsOwnerClient)
                 return;
             // Play jump animation on non owner clients
             CharacterModel.PlayJumpAnimation();
@@ -213,29 +239,38 @@ namespace MultiplayerARPG
                 CallNetFunction("TriggerJump", FunctionReceivers.All);
         }
 
-        public override void KeyMovement(Vector3 direction, bool isJump)
-        {
-            if (IsDead())
-                return;
-            if (direction.magnitude <= 0.025f && !isJump)
-                return;
-            var position = CacheTransform.position + direction;
-            if (IsOwnerClient && !IsServer && CacheNetTransform.ownerClientNotInterpolate)
-            {
-                SetMovePaths(position, false);
-                if (!isJumping)
-                    isJumping = isGrounded && isJump;
-            }
-            CallNetFunction("KeyMovement", FunctionReceivers.Server, position, isJump);
-        }
-
         public override void PointClickMovement(Vector3 position)
         {
             if (IsDead())
                 return;
-            if (IsOwnerClient && !IsServer && CacheNetTransform.ownerClientNotInterpolate)
-                SetMovePaths(position, true);
-            CallNetFunction("PointClickMovement", FunctionReceivers.Server, position);
+            switch (movementSecure)
+            {
+                case MovementSecure.Secure:
+                    CallNetFunction("PointClickMovement", FunctionReceivers.Server, position);
+                    break;
+                case MovementSecure.NotSecure:
+                    SetMovePaths(position, true);
+                    break;
+            }
+        }
+
+        public override void KeyMovement(Vector3 direction, bool isJump)
+        {
+            if (IsDead())
+                return;
+            switch (movementSecure)
+            {
+                case MovementSecure.Secure:
+                    // Multiply with 100 and cast to sbyte to reduce packet size
+                    // then it will be devided with 100 later on server side
+                    CallNetFunction("KeyMovement", FunctionReceivers.Server, (sbyte)(direction.x * 100), (sbyte)(direction.z * 100), isJump);
+                    break;
+                case MovementSecure.NotSecure:
+                    SetMovePaths(CacheTransform.position + direction, false);
+                    if (!isJumping)
+                        isJumping = isGrounded && isJump;
+                    break;
+            }
         }
 
         public override void StopMove()
@@ -249,9 +284,9 @@ namespace MultiplayerARPG
 
         public override void SetTargetEntity(RpgNetworkEntity entity)
         {
-            base.SetTargetEntity(entity);
-            if (IsOwnerClient && !IsServer)
+            if (IsOwnerClient && !IsServer && targetEntity != entity)
                 CallNetFunction("SetTargetEntity", FunctionReceivers.Server, entity == null ? 0 : entity.ObjectId);
+            base.SetTargetEntity(entity);
         }
 
         protected virtual void OnCollisionEnter(Collision collision)
