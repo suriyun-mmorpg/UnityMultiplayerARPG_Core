@@ -10,12 +10,12 @@ namespace MultiplayerARPG
     {
         public class MsgTypes
         {
-            public const short Warp = 100;
-            public const short Chat = 101;
-            public const short CashShopInfo = 102;
-            public const short CashShopBuy = 103;
-            public const short CashPackageInfo = 104;
-            public const short CashPackageBuyValidation = 105;
+            public const ushort Warp = 100;
+            public const ushort Chat = 101;
+            public const ushort CashShopInfo = 102;
+            public const ushort CashShopBuy = 103;
+            public const ushort CashPackageInfo = 104;
+            public const ushort CashPackageBuyValidation = 105;
         }
         
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
