@@ -60,7 +60,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (IsOwnerClient)
+                if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
                     return localDirectionType;
                 return (DirectionType)currentDirectionType.Value;
             }
@@ -198,7 +198,6 @@ namespace MultiplayerARPG
                     CallNetFunction("PointClickMovement", FunctionReceivers.Server, position);
                     break;
                 case MovementSecure.NotSecure:
-                    if (IsOwnerClient && !IsServer && CacheNetTransform.ownerClientNotInterpolate)
                     currentDestination = position;
                     break;
             }
@@ -207,8 +206,6 @@ namespace MultiplayerARPG
         public override void KeyMovement(Vector3 direction, bool isJump)
         {
             if (IsDead())
-                return;
-            if (direction.magnitude <= 0.025f && !isJump)
                 return;
             switch (movementSecure)
             {
@@ -298,7 +295,7 @@ namespace MultiplayerARPG
                     if (normalized.y > 0) localDirectionType = DirectionType.Up;
                 }
             }
-            if (IsServer && movementSecure == MovementSecure.NotSecure)
+            if (IsServer && movementSecure == MovementSecure.Secure)
                 currentDirectionType.Value = (byte)localDirectionType;
             if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
                 CallNetFunction("SetCurrentDirectionType", FunctionReceivers.Server, (byte)localDirectionType);
