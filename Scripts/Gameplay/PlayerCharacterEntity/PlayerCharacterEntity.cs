@@ -13,8 +13,8 @@ namespace MultiplayerARPG
     {
         public enum MovementSecure
         {
-            Secure,
             NotSecure,
+            Secure,
         }
         #region Settings
         [Header("Movement AI")]
@@ -92,7 +92,7 @@ namespace MultiplayerARPG
             Profiler.BeginSample("PlayerCharacterEntity - FixedUpdate");
             if (!IsServer && !IsOwnerClient)
                 return;
-
+            
             if (HasNavPaths)
             {
                 var targetPosition = navPaths.Peek();
@@ -116,7 +116,7 @@ namespace MultiplayerARPG
                 {
                     if (moveDirectionMagnitude > 1)
                         moveDirection = moveDirection.normalized;
-
+                    
                     var targetVelocity = moveDirection * gameInstance.GameplayRule.GetMoveSpeed(this);
 
                     // Apply a force that attempts to reach our target velocity
@@ -266,7 +266,8 @@ namespace MultiplayerARPG
                     CallNetFunction("KeyMovement", FunctionReceivers.Server, (sbyte)(direction.x * 100), (sbyte)(direction.z * 100), isJump);
                     break;
                 case MovementSecure.NotSecure:
-                    SetMovePaths(CacheTransform.position + direction, false);
+                    if (direction.magnitude > 0)
+                        SetMovePaths(CacheTransform.position + direction, false);
                     if (!isJumping)
                         isJumping = isGrounded && isJump;
                     break;

@@ -13,8 +13,8 @@ namespace MultiplayerARPG
     {
         public enum MovementSecure
         {
-            Secure,
             NotSecure,
+            Secure,
         }
         #region Settings
         [Header("Movement AI")]
@@ -151,6 +151,7 @@ namespace MultiplayerARPG
             RegisterNetFunction("KeyMovement", new LiteNetLibFunction<NetFieldSByte, NetFieldSByte>((horizontalInput, verticalInput) => NetFuncKeyMovement(horizontalInput, verticalInput)));
             RegisterNetFunction("StopMove", new LiteNetLibFunction(StopMove));
             RegisterNetFunction("SetTargetEntity", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncSetTargetEntity(objectId)));
+            RegisterNetFunction("SetCurrentDirectionType", new LiteNetLibFunction<NetFieldByte>((byteDirectionType) => NetFuncSetByteDirectionType(byteDirectionType)));
         }
 
         protected void NetFuncPointClickMovement(Vector3 position)
@@ -166,7 +167,9 @@ namespace MultiplayerARPG
             if (IsDead())
                 return;
             // Devide inputs to float value
-            currentDestination = CacheTransform.position + new Vector3((float)horizontalInput / 100f, (float)verticalInput / 100f);
+            var direction = new Vector3((float)horizontalInput / 100f, (float)verticalInput / 100f);
+            if (direction.magnitude > 0)
+                currentDestination = CacheTransform.position + direction;
             currentNpcDialog = null;
         }
 
@@ -178,6 +181,11 @@ namespace MultiplayerARPG
             if (!TryGetEntityByObjectId(objectId, out rpgNetworkEntity))
                 return;
             SetTargetEntity(rpgNetworkEntity);
+        }
+
+        protected void NetFuncSetByteDirectionType(byte directionType)
+        {
+            currentDirectionType.Value = directionType;
         }
 
         public override void PointClickMovement(Vector3 position)
@@ -210,9 +218,8 @@ namespace MultiplayerARPG
                     CallNetFunction("KeyMovement", FunctionReceivers.Server, (sbyte)(direction.x * 100), (sbyte)(direction.y * 100));
                     break;
                 case MovementSecure.NotSecure:
-                    var position = CacheTransform.position + direction;
-                    if (IsOwnerClient && !IsServer && CacheNetTransform.ownerClientNotInterpolate)
-                        currentDestination = position;
+                    if (direction.magnitude > 0)
+                        currentDestination = CacheTransform.position + direction;
                     break;
             }
         }
@@ -291,8 +298,10 @@ namespace MultiplayerARPG
                     if (normalized.y > 0) localDirectionType = DirectionType.Up;
                 }
             }
-            if (IsServer)
+            if (IsServer && movementSecure == MovementSecure.NotSecure)
                 currentDirectionType.Value = (byte)localDirectionType;
+            if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
+                CallNetFunction("SetCurrentDirectionType", FunctionReceivers.Server, (byte)localDirectionType);
         }
     }
 }
