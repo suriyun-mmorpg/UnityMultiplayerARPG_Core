@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using LiteNetLib;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -81,6 +82,33 @@ namespace MultiplayerARPG
                 minAmount,
                 maxAmount,
                 defaultAmount);
+        }
+
+        public void ShowDisconnectDialog(DisconnectInfo disconnectInfo)
+        {
+            var errorMessage = "Unknow";
+            switch (disconnectInfo.Reason)
+            {
+                case DisconnectReason.DisconnectPeerCalled:
+                    errorMessage = "You have been kicked from server";
+                    break;
+                case DisconnectReason.ConnectionFailed:
+                    errorMessage = "Cannot connect to the server";
+                    break;
+                case DisconnectReason.RemoteConnectionClose:
+                    errorMessage = "Server has been closed";
+                    break;
+                case DisconnectReason.SocketReceiveError:
+                    errorMessage = "Cannot receive data";
+                    break;
+                case DisconnectReason.SocketSendError:
+                    errorMessage = "Cannot send data";
+                    break;
+                case DisconnectReason.Timeout:
+                    errorMessage = "Connection timeout";
+                    break;
+            }
+            Singleton.ShowMessageDialog("Disconnected", errorMessage, true, false, false, false);
         }
     }
 }

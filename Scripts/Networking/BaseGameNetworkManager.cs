@@ -295,29 +295,7 @@ namespace MultiplayerARPG
         public override void OnClientDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
         {
             base.OnClientDisconnected(peer, disconnectInfo);
-            var errorMessage = "Unknow";
-            switch (disconnectInfo.Reason)
-            {
-                case DisconnectReason.DisconnectPeerCalled:
-                    errorMessage = "You have been kicked from server";
-                    break;
-                case DisconnectReason.ConnectionFailed:
-                    errorMessage = "Cannot connect to the server";
-                    break;
-                case DisconnectReason.RemoteConnectionClose:
-                    errorMessage = "Server has been closed";
-                    break;
-                case DisconnectReason.SocketReceiveError:
-                    errorMessage = "Cannot receive data";
-                    break;
-                case DisconnectReason.SocketSendError:
-                    errorMessage = "Cannot send data";
-                    break;
-                case DisconnectReason.Timeout:
-                    errorMessage = "Connection timeout";
-                    break;
-            }
-            UISceneGlobal.Singleton.ShowMessageDialog("Disconnected", errorMessage, true, false, false, false);
+            UISceneGlobal.Singleton.ShowDisconnectDialog(disconnectInfo);
         }
 
         private void RegisterEntities()
