@@ -11,11 +11,6 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(CapsuleCollider))]
     public partial class PlayerCharacterEntity : BasePlayerCharacterEntity
     {
-        public enum MovementSecure
-        {
-            NotSecure,
-            Secure,
-        }
         #region Settings
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
@@ -125,8 +120,10 @@ namespace MultiplayerARPG
                     velocityChange.y = 0;
                     velocityChange.z = Mathf.Clamp(velocityChange.z, -CacheMoveSpeed, CacheMoveSpeed);
                     CacheRigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
-                    // Calculate rotation on client only, will send update to server later
-                    CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(moveDirection), angularSpeed * Time.fixedDeltaTime);
+                    var lookAtRotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(moveDirection), angularSpeed * Time.fixedDeltaTime);
+                    lookAtRotation.x = 0;
+                    lookAtRotation.z = 0;
+                    CacheTransform.rotation = lookAtRotation;
                 }
 
                 RpgNetworkEntity tempEntity;
@@ -135,10 +132,10 @@ namespace MultiplayerARPG
                     var targetDirection = (tempEntity.CacheTransform.position - CacheTransform.position).normalized;
                     if (targetDirection.magnitude != 0f)
                     {
-                        var fromRotation = CacheTransform.rotation.eulerAngles;
-                        var lookAtRotation = Quaternion.LookRotation(targetDirection).eulerAngles;
-                        lookAtRotation = new Vector3(fromRotation.x, lookAtRotation.y, fromRotation.z);
-                        CacheTransform.rotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.Euler(lookAtRotation), angularSpeed * Time.fixedDeltaTime);
+                        var lookAtRotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(targetDirection), angularSpeed * Time.fixedDeltaTime);
+                        lookAtRotation.x = 0;
+                        lookAtRotation.z = 0;
+                        CacheTransform.rotation = lookAtRotation;
                     }
                 }
                 // Jump
@@ -164,7 +161,7 @@ namespace MultiplayerARPG
             // Setup network components
             switch (movementSecure)
             {
-                case MovementSecure.Secure:
+                case MovementSecure.ServerAuthoritative:
                     CacheNetTransform.ownerClientCanSendTransform = false;
                     CacheNetTransform.ownerClientNotInterpolate = false;
                     break;
@@ -245,7 +242,7 @@ namespace MultiplayerARPG
                 return;
             switch (movementSecure)
             {
-                case MovementSecure.Secure:
+                case MovementSecure.ServerAuthoritative:
                     CallNetFunction("PointClickMovement", FunctionReceivers.Server, position);
                     break;
                 case MovementSecure.NotSecure:
@@ -260,7 +257,7 @@ namespace MultiplayerARPG
                 return;
             switch (movementSecure)
             {
-                case MovementSecure.Secure:
+                case MovementSecure.ServerAuthoritative:
                     // Multiply with 100 and cast to sbyte to reduce packet size
                     // then it will be devided with 100 later on server side
                     CallNetFunction("KeyMovement", FunctionReceivers.Server, (sbyte)(direction.x * 100), (sbyte)(direction.z * 100), isJump);

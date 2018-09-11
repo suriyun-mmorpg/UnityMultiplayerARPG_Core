@@ -11,11 +11,6 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerCharacterEntity2D : BasePlayerCharacterEntity
     {
-        public enum MovementSecure
-        {
-            NotSecure,
-            Secure,
-        }
         #region Settings
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
@@ -132,7 +127,7 @@ namespace MultiplayerARPG
             // Setup network components
             switch (movementSecure)
             {
-                case MovementSecure.Secure:
+                case MovementSecure.ServerAuthoritative:
                     CacheNetTransform.ownerClientCanSendTransform = false;
                     CacheNetTransform.ownerClientNotInterpolate = false;
                     break;
@@ -194,7 +189,7 @@ namespace MultiplayerARPG
                 return;
             switch (movementSecure)
             {
-                case MovementSecure.Secure:
+                case MovementSecure.ServerAuthoritative:
                     CallNetFunction("PointClickMovement", FunctionReceivers.Server, position);
                     break;
                 case MovementSecure.NotSecure:
@@ -209,7 +204,7 @@ namespace MultiplayerARPG
                 return;
             switch (movementSecure)
             {
-                case MovementSecure.Secure:
+                case MovementSecure.ServerAuthoritative:
                     // Multiply with 100 and cast to sbyte to reduce packet size
                     // then it will be devided with 100 later on server side
                     CallNetFunction("KeyMovement", FunctionReceivers.Server, (sbyte)(direction.x * 100), (sbyte)(direction.y * 100));
@@ -295,7 +290,7 @@ namespace MultiplayerARPG
                     if (normalized.y > 0) localDirectionType = DirectionType.Up;
                 }
             }
-            if (IsServer && movementSecure == MovementSecure.Secure)
+            if (IsServer && movementSecure == MovementSecure.ServerAuthoritative)
                 currentDirectionType.Value = (byte)localDirectionType;
             if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
                 CallNetFunction("SetCurrentDirectionType", FunctionReceivers.Server, (byte)localDirectionType);
