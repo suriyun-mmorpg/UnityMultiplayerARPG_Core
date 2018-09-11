@@ -15,6 +15,10 @@ namespace MultiplayerARPG
         protected SyncFieldShort skillPoint = new SyncFieldShort();
         [SerializeField]
         protected SyncFieldInt gold = new SyncFieldInt();
+        [SerializeField]
+        protected SyncFieldInt partyId = new SyncFieldInt();
+        [SerializeField]
+        protected SyncFieldInt guildId = new SyncFieldInt();
         // List
         [SerializeField]
         protected SyncListCharacterHotkey hotkeys = new SyncListCharacterHotkey();
@@ -65,6 +69,8 @@ namespace MultiplayerARPG
         public System.Action<short> onStatPointChange;
         public System.Action<short> onSkillPointChange;
         public System.Action<int> onGoldChange;
+        public System.Action<int> onPartyIdChange;
+        public System.Action<int> onGuildIdChange;
         // List
         public System.Action<LiteNetLibSyncList.Operation, int> onHotkeysOperation;
         public System.Action<LiteNetLibSyncList.Operation, int> onQuestsOperation;
@@ -74,6 +80,8 @@ namespace MultiplayerARPG
         public short StatPoint { get { return statPoint.Value; } set { statPoint.Value = value; } }
         public short SkillPoint { get { return skillPoint.Value; } set { skillPoint.Value = value; } }
         public int Gold { get { return gold.Value; } set { gold.Value = value; } }
+        public int PartyId { get { return partyId.Value; } set { partyId.Value = value; } }
+        public int GuildId { get { return guildId.Value; } set { guildId.Value = value; } }
         public string CurrentMapName { get { return SceneManager.GetActiveScene().name; } set { } }
         public Vector3 CurrentPosition
         {
@@ -128,6 +136,18 @@ namespace MultiplayerARPG
         {
             if (onGoldChange != null)
                 onGoldChange.Invoke(gold);
+        }
+
+        protected virtual void OnPartyIdChange(int partyId)
+        {
+            if (onPartyIdChange != null)
+                onPartyIdChange.Invoke(partyId);
+        }
+
+        protected virtual void OnGuildIdChange(int guildId)
+        {
+            if (onGuildIdChange != null)
+                onGuildIdChange.Invoke(guildId);
         }
         #endregion
 

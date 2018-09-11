@@ -8,6 +8,8 @@ public partial class PlayerCharacterData : CharacterData, IPlayerCharacterData
     public short statPoint;
     public short skillPoint;
     public int gold;
+    public int partyId;
+    public int guildId;
     public string currentMapName;
     public Vector3 currentPosition;
     public string respawnMapName;
@@ -19,6 +21,8 @@ public partial class PlayerCharacterData : CharacterData, IPlayerCharacterData
     public short StatPoint { get { return statPoint; } set { statPoint = value; } }
     public short SkillPoint { get { return skillPoint; } set { skillPoint = value; } }
     public int Gold { get { return gold; } set { gold = value; } }
+    public int PartyId { get { return partyId; } set { partyId = value; } }
+    public int GuildId { get { return guildId; } set { guildId = value; } }
     public string CurrentMapName { get { return currentMapName; } set { currentMapName = value; } }
     public Vector3 CurrentPosition { get { return currentPosition; } set { currentPosition = value; } }
     public string RespawnMapName { get { return respawnMapName; } set { respawnMapName = value; } }

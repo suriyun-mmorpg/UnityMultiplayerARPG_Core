@@ -29,6 +29,8 @@ namespace MultiplayerARPG
             statPoint.onChange += OnStatPointChange;
             skillPoint.onChange += OnSkillPointChange;
             gold.onChange += OnGoldChange;
+            partyId.onChange += OnPartyIdChange;
+            guildId.onChange += OnGuildIdChange;
             // On list changes events
             hotkeys.onOperation += OnHotkeysOperation;
             quests.onOperation += OnQuestsOperation;

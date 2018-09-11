@@ -34,6 +34,8 @@ public static partial class PlayerCharacterDataExtension
         to.StatPoint = from.StatPoint;
         to.SkillPoint = from.SkillPoint;
         to.Gold = from.Gold;
+        to.PartyId = from.PartyId;
+        to.GuildId = from.GuildId;
         to.EquipWeapons = from.EquipWeapons;
         to.CurrentMapName = from.CurrentMapName;
         to.CurrentPosition = from.CurrentPosition;
