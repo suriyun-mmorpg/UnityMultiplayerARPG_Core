@@ -76,6 +76,11 @@ namespace MultiplayerARPG
                         var controller = Instantiate(controllerPrefab);
                         controller.PlayerCharacterEntity = this;
                     }
+                    else if (gameInstance.defaultControllerPrefab != null)
+                    {
+                        var controller = Instantiate(gameInstance.defaultControllerPrefab);
+                        controller.PlayerCharacterEntity = this;
+                    }
                     else
                         Debug.LogWarning("[BasePlayerCharacterEntity] `controllerPrefab` is empty so it cannot be instantiated");
                 }

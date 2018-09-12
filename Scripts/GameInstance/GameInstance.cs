@@ -24,6 +24,9 @@ namespace MultiplayerARPG
         public WarpPortalEntity warpPortalEntityPrefab;
         public UISceneGameplay uiSceneGameplayPrefab;
         public UISceneGameplay uiSceneGameplayMobilePrefab;
+        [Tooltip("Default controller prefab will be used when controller prefab at player character entity is null")]
+        public BasePlayerCharacterController defaultControllerPrefab;
+        [Tooltip("This is camera controller when start game as server (not start with client as host)")]
         public ServerCharacter serverCharacterPrefab;
         [Tooltip("These objects will be instantiate as owning character's children")]
         public GameObject[] owningCharacterObjects;
