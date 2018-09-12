@@ -379,7 +379,7 @@ namespace MultiplayerARPG
                         BaseCharacterEntity targetEntity;
                         if (wasdLockAttackTarget && !TryGetAttackingCharacter(out targetEntity))
                         {
-                            var nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance, false, true);
+                            var nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance, false, true, false);
                             if (nearestTarget != null)
                                 PlayerCharacterEntity.SetTargetEntity(nearestTarget);
                             else
@@ -402,7 +402,7 @@ namespace MultiplayerARPG
                 BaseCharacterEntity targetEntity;
                 if (wasdLockAttackTarget && !TryGetAttackingCharacter(out targetEntity))
                 {
-                    var nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetAttackDistance() + lockAttackTargetDistance, false, true);
+                    var nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetAttackDistance() + lockAttackTargetDistance, false, true, false);
                     if (nearestTarget != null)
                         PlayerCharacterEntity.SetTargetEntity(nearestTarget);
                     else
@@ -695,7 +695,8 @@ namespace MultiplayerARPG
                         {
                             // If attacking any character, will use skill later
                             queueUsingSkill = new UsingSkillData(null, skillIndex);
-                            var nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance, false, true); if (nearestTarget != null)
+                            var nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance, false, true, false);
+                            if (nearestTarget != null)
                                 PlayerCharacterEntity.SetTargetEntity(nearestTarget);
                         }
                         else

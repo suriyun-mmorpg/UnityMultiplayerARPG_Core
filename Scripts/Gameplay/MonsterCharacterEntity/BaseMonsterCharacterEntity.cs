@@ -138,12 +138,10 @@ namespace MultiplayerARPG
                     // If it's assist character call another character for assist
                     if (MonsterDatabase.characteristic == MonsterCharacteristic.Assist)
                     {
-                        var foundObjects = new List<Collider>(Physics.OverlapSphere(CacheTransform.position, MonsterDatabase.visualRange, gameInstance.characterLayer.Mask));
-                        foreach (var foundObject in foundObjects)
+                        var foundCharacters = FindAliveCharacters<BaseMonsterCharacterEntity>(MonsterDatabase.visualRange, true, false, false);
+                        foreach (var character in foundCharacters)
                         {
-                            var monsterCharacterEntity = foundObject.GetComponent<BaseMonsterCharacterEntity>();
-                            if (monsterCharacterEntity != null && IsAlly(monsterCharacterEntity))
-                                monsterCharacterEntity.SetAttackTarget(attacker);
+                            character.SetAttackTarget(attacker);
                         }
                     }
                 }

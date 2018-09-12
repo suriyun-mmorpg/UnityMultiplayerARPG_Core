@@ -22,6 +22,8 @@ namespace MultiplayerARPG
     {
         None,
         BuffToUser,
+        BuffToNearbyAllies,
+        BuffToNearbyCharacters,
     }
 
     [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill")]
@@ -62,6 +64,7 @@ namespace MultiplayerARPG
 
         [Header("Buffs")]
         public SkillBuffType skillBuffType;
+        public float buffDistance;
         public Buff buff;
 
         [Header("Craft")]

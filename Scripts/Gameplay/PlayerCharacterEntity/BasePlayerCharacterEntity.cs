@@ -77,15 +77,19 @@ namespace MultiplayerARPG
                 return false;
             if (isInSafeArea || characterEntity.isInSafeArea)
                 return false;
-            var manager = Manager as BaseGameNetworkManager;
-            if (!IsAlly(characterEntity) && manager != null && manager.CurrentMapInfo.canPvp)
+            // If not ally while this is Pvp map, assume that it can receive damage
+            if (!IsAlly(characterEntity) && (Manager as BaseGameNetworkManager).CurrentMapInfo.canPvp)
                 return true;
             return false;
         }
 
         public override bool IsAlly(BaseCharacterEntity characterEntity)
         {
-            // TODO: May implement this for party/guild battle purposes
+            if (characterEntity is BasePlayerCharacterEntity)
+            {
+                var playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
+                return playerCharacterEntity.PartyId == PartyId || playerCharacterEntity.GuildId == GuildId;
+            }
             return false;
         }
 
@@ -95,9 +99,9 @@ namespace MultiplayerARPG
                 return false;
             if (characterEntity is BaseMonsterCharacterEntity)
                 return true;
-            if (!IsAlly(characterEntity))
-                return true;
-            return false;
+            // If character can receive damage from another character, assume that another character is enemy
+            // So if this character and another character is in safe area or not ally while this map is pvp map then they are enemy
+            return CanReceiveDamageFrom(characterEntity);
         }
 
         public override void Killed(BaseCharacterEntity lastAttacker)

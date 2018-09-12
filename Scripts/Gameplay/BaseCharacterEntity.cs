@@ -476,8 +476,27 @@ namespace MultiplayerARPG
             var skill = characterSkill.GetSkill();
             if (skill == null)
                 return;
-            if (skill.skillBuffType == SkillBuffType.BuffToUser)
-                ApplyBuff(Id, skill.DataId, BuffType.SkillBuff, characterSkill.level);
+            List<BaseCharacterEntity> tempCharacters;
+            switch (skill.skillBuffType)
+            {
+                case SkillBuffType.BuffToUser:
+                    ApplyBuff(Id, skill.DataId, BuffType.SkillBuff, characterSkill.level);
+                    break;
+                case SkillBuffType.BuffToNearbyAllies:
+                    tempCharacters = FindAliveCharacters<BaseCharacterEntity>(skill.buffDistance, true, false, false);
+                    foreach (var character in tempCharacters)
+                    {
+                        ApplyBuff(character.Id, skill.DataId, BuffType.SkillBuff, characterSkill.level);
+                    }
+                    break;
+                case SkillBuffType.BuffToNearbyCharacters:
+                    tempCharacters = FindAliveCharacters<BaseCharacterEntity>(skill.buffDistance, true, false, true);
+                    foreach (var character in tempCharacters)
+                    {
+                        ApplyBuff(character.Id, skill.DataId, BuffType.SkillBuff, characterSkill.level);
+                    }
+                    break;
+            }
         }
 
         protected virtual void ApplySkill(CharacterSkill characterSkill, Vector3 position, SkillAttackType skillAttackType, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
@@ -893,7 +912,25 @@ namespace MultiplayerARPG
             RequestOnLevelUp();
         }
 
-        public T FindNearestAliveCharacter<T>(float distance, bool findForAlly, bool findForEnemy) where T : BaseCharacterEntity
+        public List<T> FindAliveCharacters<T>(float distance, bool findForAlly, bool findForEnemy, bool findForNeutral) where T : BaseCharacterEntity
+        {
+            var result = new List<T>();
+            overlapSize = OverlapObjects(CacheTransform.position, distance, gameInstance.characterLayer.Mask);
+            if (overlapSize == 0)
+                return null;
+            T tempEntity;
+            for (counter = 0; counter < overlapSize; ++counter)
+            {
+                tempGameObject = GetOverlapObject(counter);
+                tempEntity = tempGameObject.GetComponent<T>();
+                if (!IsCharacterWhichLookingFor(tempEntity, findForAlly, findForEnemy, findForNeutral))
+                    continue;
+                result.Add(tempEntity);
+            }
+            return result;
+        }
+
+        public T FindNearestAliveCharacter<T>(float distance, bool findForAlly, bool findForEnemy, bool findForNeutral) where T : BaseCharacterEntity
         {
             overlapSize = OverlapObjects(CacheTransform.position, distance, gameInstance.characterLayer.Mask);
             if (overlapSize == 0)
@@ -906,11 +943,7 @@ namespace MultiplayerARPG
             {
                 tempGameObject = GetOverlapObject(counter);
                 tempEntity = tempGameObject.GetComponent<T>();
-                if (tempEntity == null || tempEntity == this || tempEntity.IsDead())
-                    continue;
-                if (findForAlly && !tempEntity.IsAlly(this))
-                    continue;
-                if (findForEnemy && !tempEntity.IsEnemy(this))
+                if (!IsCharacterWhichLookingFor(tempEntity, findForAlly, findForEnemy, findForNeutral))
                     continue;
                 tempDistance = Vector3.Distance(CacheTransform.position, tempEntity.CacheTransform.position);
                 if (tempDistance < nearestDistance)
@@ -922,8 +955,22 @@ namespace MultiplayerARPG
             return nearestEntity;
         }
 
+        private bool IsCharacterWhichLookingFor(BaseCharacterEntity characterEntity, bool findForAlly, bool findForEnemy, bool findForNeutral)
+        {
+            if (characterEntity == null || characterEntity == this || characterEntity.IsDead())
+                return false;
+
+            return (findForAlly && characterEntity.IsAlly(this)) ||
+                (findForEnemy && characterEntity.IsEnemy(this)) ||
+                (findForNeutral && characterEntity.IsNeutral(this));
+        }
+
         public abstract bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity);
         public abstract bool IsAlly(BaseCharacterEntity characterEntity);
         public abstract bool IsEnemy(BaseCharacterEntity characterEntity);
+        public bool IsNeutral(BaseCharacterEntity characterEntity)
+        {
+            return !IsAlly(characterEntity) && !IsEnemy(characterEntity);
+        }
     }
 }
