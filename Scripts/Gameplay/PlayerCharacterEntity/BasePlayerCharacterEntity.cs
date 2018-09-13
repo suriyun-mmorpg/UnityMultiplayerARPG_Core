@@ -28,7 +28,12 @@ namespace MultiplayerARPG
         private BasePlayerCharacterEntity coCharacter;
         public BasePlayerCharacterEntity CoCharacter
         {
-            get { return coCharacter; }
+            get
+            {
+                if (Time.unscaledTime - setCoCharacterTime >= gameInstance.coCharacterActionDuration)
+                    coCharacter = null;
+                return coCharacter;
+            }
             set
             {
                 coCharacter = value;
