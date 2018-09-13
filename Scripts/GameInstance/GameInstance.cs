@@ -70,11 +70,19 @@ namespace MultiplayerARPG
         public UnityLayer buildingLayer;
         public UnityLayer harvestableLayer;
         public UnityLayer[] nonTargetingLayers;
+        [Tooltip("This is duration for Item Entities to appears befor destroyed")]
         public float itemAppearDuration = 60f;
+        [Tooltip("This is duration for Item Entities to allow only player who kill monster to pick up item")]
         public float itemLootLockDuration = 5f;
+        [Tooltip("This is duration for players to decides to do any action by another players")]
+        public float coCharacterActionDuration = 5f;
+        [Tooltip("This is a distance that allows a player to pick up an item")]
         public float pickUpItemDistance = 1f;
+        [Tooltip("This is a distance that random drop item around a player")]
         public float dropDistance = 1f;
+        [Tooltip("This is a distance that allows a player to converstion with NPC / send requests to other players")]
         public float conversationDistance = 1f;
+        [Tooltip("This is a distance that allows a player to builds an building")]
         public float buildDistance = 10f;
 
         [Header("Game Effects")]
