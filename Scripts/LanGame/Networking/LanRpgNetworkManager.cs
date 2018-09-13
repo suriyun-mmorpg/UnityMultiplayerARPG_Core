@@ -68,6 +68,13 @@ namespace MultiplayerARPG
             }
         }
 
+        public override void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
+        {
+            var connectId = peer.ConnectId;
+            UnregisterPlayerCharacter(peer);
+            base.OnPeerDisconnected(peer, disconnectInfo);
+        }
+
         public override void SerializeClientReadyExtra(NetDataWriter writer)
         {
             selectedCharacter.SerializeCharacterData(writer);
@@ -93,6 +100,7 @@ namespace MultiplayerARPG
                 playerCharacterEntity.RequestOnRespawn();
             else
                 playerCharacterEntity.RequestOnDead();
+            RegisterPlayerCharacter(peer, playerCharacterEntity);
             // Load world by owner character id
             if (playerCharacterEntity.IsOwnerClient)
             {
