@@ -22,6 +22,7 @@ namespace MultiplayerARPG
         public GameStartType startType;
         public PlayerCharacterData selectedCharacter;
         private float lastSaveTime;
+        private int nextPartyId = 1;
 
         protected override void Awake()
         {
@@ -66,6 +67,12 @@ namespace MultiplayerARPG
                 Profiler.EndSample();
                 lastSaveTime = Time.unscaledTime;
             }
+        }
+
+        public override void OnStopServer()
+        {
+            base.OnStopServer();
+            nextPartyId = 1;
         }
 
         public override void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
@@ -147,5 +154,112 @@ namespace MultiplayerARPG
             }
             worldSaveData.SavePersistentWorldData(playerCharacterEntity.Id, playerCharacterEntity.CurrentMapName);
         }
+
+        #region Implement Abstract Functions
+        public override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        {
+            if (playerCharacterEntity == null || !IsServer)
+                return;
+            // If warping to same map player does not have to reload new map data
+            if (string.IsNullOrEmpty(mapName) || mapName.Equals(playerCharacterEntity.CurrentMapName))
+            {
+                playerCharacterEntity.CacheNetTransform.Teleport(position, Quaternion.identity);
+                return;
+            }
+        }
+
+        public override void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
+        {
+            if (playerCharacterEntity == null || !IsServer)
+                return;
+            var partyId = nextPartyId++;
+            var party = new PartyData(partyId, shareExp, shareItem, playerCharacterEntity);
+            parties[partyId] = party;
+            playerCharacterEntity.PartyId = partyId;
+        }
+
+        public override void PartySetting(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
+        {
+            if (playerCharacterEntity == null || !IsServer)
+                return;
+            var partyId = playerCharacterEntity.PartyId;
+            PartyData party;
+            if (!parties.TryGetValue(partyId, out party))
+                return;
+            if (!party.IsLeader(playerCharacterEntity))
+            {
+                // TODO: May warn that it's not party leader
+                return;
+            }
+            party.Setting(shareExp, shareItem);
+            parties[partyId] = party;
+        }
+
+        public override void AddPartyMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity)
+        {
+            if (inviteCharacterEntity == null || acceptCharacterEntity == null || !IsServer)
+                return;
+            var partyId = inviteCharacterEntity.PartyId;
+            PartyData party;
+            if (!parties.TryGetValue(partyId, out party))
+                return;
+            if (!party.IsLeader(inviteCharacterEntity))
+            {
+                // TODO: May warn that it's not party leader
+                return;
+            }
+            if (party.CountMember() == gameInstance.maxPartyMember)
+            {
+                // TODO: May warn that it's exceeds limit max party member
+                return;
+            }
+            party.AddMember(acceptCharacterEntity);
+            parties[partyId] = party;
+            acceptCharacterEntity.PartyId = partyId;
+        }
+
+        public override void KickFromParty(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
+        {
+            if (playerCharacterEntity == null || !IsServer)
+                return;
+            var partyId = playerCharacterEntity.PartyId;
+            PartyData party;
+            if (!parties.TryGetValue(partyId, out party))
+                return;
+            if (!party.IsLeader(playerCharacterEntity))
+            {
+                // TODO: May warn that it's not party leader
+                return;
+            }
+            // TODO: find character with character id and set party id to 0
+            party.RemoveMember(characterId);
+            parties[partyId] = party;
+        }
+
+        public override void LeaveParty(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            if (playerCharacterEntity == null || !IsServer)
+                return;
+            var partyId = playerCharacterEntity.PartyId;
+            PartyData party;
+            if (!parties.TryGetValue(partyId, out party))
+                return;
+            if (!party.IsLeader(playerCharacterEntity))
+            {
+                foreach (var memberId in party.GetMemberIds())
+                {
+                    BasePlayerCharacterEntity memberCharacterEntity;
+                    if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
+                        memberCharacterEntity.PartyId = 0;
+                }
+                parties.Remove(partyId);
+            }
+            else
+            {
+                party.RemoveMember(playerCharacterEntity.Id);
+                parties[partyId] = party;
+            }
+        }
+        #endregion
     }
 }
