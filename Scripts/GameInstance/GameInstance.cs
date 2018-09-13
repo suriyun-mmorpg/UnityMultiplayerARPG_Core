@@ -91,6 +91,12 @@ namespace MultiplayerARPG
         public int minCharacterNameLength = 2;
         public int maxCharacterNameLength = 16;
 
+        [Header("Party Configs")]
+        public int maxPartyMember = 8;
+
+        [Header("Guild Configs")]
+        public int maxGuildMember = 50;
+
         [Header("Other Settings")]
         public bool doNotLoadHomeSceneOnLoadedGameData;
 

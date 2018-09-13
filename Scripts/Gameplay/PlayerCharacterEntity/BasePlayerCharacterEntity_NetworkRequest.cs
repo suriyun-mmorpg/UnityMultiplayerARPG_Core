@@ -155,12 +155,12 @@ namespace MultiplayerARPG
             CallNetFunction("CancelDealing", FunctionReceivers.Server);
         }
 
-        public virtual void RequestUpdateDealingState(DealingState state)
+        public virtual void RequestUpdateDealingState(CoOpState state)
         {
             CallNetFunction("UpdateDealingState", ConnectId, (byte)state);
         }
 
-        public virtual void RequestUpdateAnotherDealingState(DealingState state)
+        public virtual void RequestUpdateAnotherDealingState(CoOpState state)
         {
             CallNetFunction("UpdateAnotherDealingState", ConnectId, (byte)state);
         }
@@ -215,9 +215,9 @@ namespace MultiplayerARPG
             CallNetFunction("DeclinePartyInvitation", FunctionReceivers.Server);
         }
 
-        public virtual void RequestKickFromParty(string id)
+        public virtual void RequestKickFromParty(string characterId)
         {
-            CallNetFunction("KickFromParty", FunctionReceivers.Server, id);
+            CallNetFunction("KickFromParty", FunctionReceivers.Server, characterId);
         }
 
         public virtual void RequestLeaveParty()

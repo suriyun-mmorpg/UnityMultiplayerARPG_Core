@@ -5,12 +5,12 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public enum DealingState : byte
+    public enum CoOpState : byte
     {
         None,
         Dealing,
-        Lock,
-        Confirm,
+        LockDealing,
+        ConfirmDealing,
     }
 
     [RequireComponent(typeof(LiteNetLibTransform))]
@@ -23,8 +23,18 @@ namespace MultiplayerARPG
         public WarpPortalEntity warpingPortal;
         [HideInInspector]
         public NpcDialog currentNpcDialog;
-        [HideInInspector]
-        public BasePlayerCharacterEntity coPlayerCharacterEntity;
+
+        public float setCoCharacterTime { get; private set; }
+        private BasePlayerCharacterEntity coCharacter;
+        public BasePlayerCharacterEntity CoCharacter
+        {
+            get { return coCharacter; }
+            set
+            {
+                coCharacter = value;
+                setCoCharacterTime = Time.unscaledTime;
+            }
+        }
 
         private LiteNetLibTransform cacheNetTransform;
         public LiteNetLibTransform CacheNetTransform
@@ -66,9 +76,7 @@ namespace MultiplayerARPG
             if (!IsServer || !IsDead())
                 return;
             base.Respawn();
-            var manager = Manager as BaseGameNetworkManager;
-            if (manager != null)
-                manager.WarpCharacter(this, RespawnMapName, RespawnPosition);
+            GameManager.WarpCharacter(this, RespawnMapName, RespawnPosition);
         }
 
         public override bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity)
@@ -78,7 +86,7 @@ namespace MultiplayerARPG
             if (isInSafeArea || characterEntity.isInSafeArea)
                 return false;
             // If not ally while this is Pvp map, assume that it can receive damage
-            if (!IsAlly(characterEntity) && (Manager as BaseGameNetworkManager).CurrentMapInfo.canPvp)
+            if (!IsAlly(characterEntity) && GameManager.CurrentMapInfo.canPvp)
                 return true;
             return false;
         }
@@ -125,7 +133,7 @@ namespace MultiplayerARPG
 
         public virtual void ExchangeDealingItemsAndGold()
         {
-            if (coPlayerCharacterEntity == null)
+            if (CoCharacter == null)
                 return;
             var tempDealingItems = new List<DealingCharacterItem>(DealingItems);
             for (var i = nonEquipItems.Count - 1; i >= 0; --i)
@@ -141,26 +149,26 @@ namespace MultiplayerARPG
                             nonEquipItems.RemoveAt(i);
                         else
                             nonEquipItems[i] = nonEquipItem;
-                        coPlayerCharacterEntity.IncreaseItems(dealingItem.dataId, dealingItem.level, dealingItem.amount, dealingItem.durability);
+                        CoCharacter.IncreaseItems(dealingItem.dataId, dealingItem.level, dealingItem.amount, dealingItem.durability);
                         tempDealingItems.RemoveAt(j);
                         break;
                     }
                 }
             }
             Gold -= DealingGold;
-            coPlayerCharacterEntity.Gold += DealingGold;
+            CoCharacter.Gold += DealingGold;
         }
 
         public virtual void ClearDealingData()
         {
-            DealingState = DealingState.None;
+            CoOpState = CoOpState.None;
             DealingGold = 0;
             DealingItems.Clear();
         }
 
         public override bool CanMoveOrDoActions()
         {
-            return base.CanMoveOrDoActions() && DealingState == DealingState.None;
+            return base.CanMoveOrDoActions() && CoOpState == CoOpState.None;
         }
 
         public abstract float StoppingDistance { get; }

@@ -94,9 +94,7 @@ namespace MultiplayerARPG
 
         public void EnterWarp(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            var manager = Manager as BaseGameNetworkManager;
-            if (manager != null)
-                manager.WarpCharacter(playerCharacterEntity, mapScene, position);
+            GameManager.WarpCharacter(playerCharacterEntity, mapScene, position);
         }
     }
 }

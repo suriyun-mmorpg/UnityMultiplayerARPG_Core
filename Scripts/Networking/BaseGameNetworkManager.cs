@@ -300,6 +300,31 @@ namespace MultiplayerARPG
             }
         }
 
+        public virtual void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
+        {
+
+        }
+
+        public virtual void PartySetting(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
+        {
+
+        }
+
+        public virtual void AddPartyMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity)
+        {
+
+        }
+
+        public virtual void KickFromParty(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
+        {
+
+        }
+
+        public virtual void LeaveParty(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+
+        }
+
         public void Quit()
         {
             Application.Quit();

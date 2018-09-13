@@ -10,12 +10,13 @@ namespace MultiplayerARPG
         public System.Action<int> onShowNpcDialog;
         public System.Action<BasePlayerCharacterEntity> onShowDealingRequestDialog;
         public System.Action<BasePlayerCharacterEntity> onShowDealingDialog;
-        public System.Action<DealingState> onUpdateDealingState;
-        public System.Action<DealingState> onUpdateAnotherDealingState;
+        public System.Action<CoOpState> onUpdateDealingState;
+        public System.Action<CoOpState> onUpdateAnotherDealingState;
         public System.Action<int> onUpdateDealingGold;
         public System.Action<int> onUpdateAnotherDealingGold;
         public System.Action<DealingCharacterItems> onUpdateDealingItems;
         public System.Action<DealingCharacterItems> onUpdateAnotherDealingItems;
+        public System.Action<BasePlayerCharacterEntity> onShowPartyInvitationDialog;
 
         protected virtual void NetFuncSwapOrMergeItem(int fromIndex, int toIndex)
         {
@@ -335,27 +336,24 @@ namespace MultiplayerARPG
                 !this.DecreaseItemsByIndex(index, 1))
                 return;
 
-            var manager = Manager as BaseGameNetworkManager;
-            if (manager != null)
+            var buildingSaveData = new BuildingSaveData();
+            buildingSaveData.Id = GenericUtils.GetUniqueId();
+            buildingSaveData.ParentId = string.Empty;
+            LiteNetLibIdentity entity;
+            if (Manager.Assets.TryGetSpawnedObject(parentObjectId, out entity))
             {
-                var buildingSaveData = new BuildingSaveData();
-                buildingSaveData.Id = GenericUtils.GetUniqueId();
-                buildingSaveData.ParentId = string.Empty;
-                LiteNetLibIdentity entity;
-                if (Manager.Assets.TryGetSpawnedObject(parentObjectId, out entity))
-                {
-                    var parentBuildingEntity = entity.GetComponent<BuildingEntity>();
-                    if (parentBuildingEntity != null)
-                        buildingSaveData.ParentId = parentBuildingEntity.Id;
-                }
-                buildingSaveData.DataId = buildingEntity.DataId;
-                buildingSaveData.CurrentHp = buildingEntity.maxHp;
-                buildingSaveData.Position = position;
-                buildingSaveData.Rotation = rotation;
-                buildingSaveData.CreatorId = Id;
-                buildingSaveData.CreatorName = CharacterName;
-                manager.CreateBuildingEntity(buildingSaveData, false);
+                var parentBuildingEntity = entity.GetComponent<BuildingEntity>();
+                if (parentBuildingEntity != null)
+                    buildingSaveData.ParentId = parentBuildingEntity.Id;
             }
+            buildingSaveData.DataId = buildingEntity.DataId;
+            buildingSaveData.CurrentHp = buildingEntity.maxHp;
+            buildingSaveData.Position = position;
+            buildingSaveData.Rotation = rotation;
+            buildingSaveData.CreatorId = Id;
+            buildingSaveData.CreatorName = CharacterName;
+            GameManager.CreateBuildingEntity(buildingSaveData, false);
+
         }
 
         protected virtual void NetFuncDestroyBuild(uint objectId)
@@ -366,10 +364,9 @@ namespace MultiplayerARPG
             BuildingEntity buildingEntity = null;
             if (!TryGetEntityByObjectId(objectId, out buildingEntity))
                 return;
-
-            var manager = Manager as BaseGameNetworkManager;
-            if (buildingEntity != null && buildingEntity.CreatorId.Equals(Id) && manager != null)
-                manager.DestroyBuildingEntity(buildingEntity.Id);
+            
+            if (buildingEntity != null && buildingEntity.CreatorId.Equals(Id))
+                GameManager.DestroyBuildingEntity(buildingEntity.Id);
         }
 
         protected virtual void NetFuncSellItem(int index, short amount)
@@ -422,17 +419,25 @@ namespace MultiplayerARPG
         protected virtual void NetFuncSendDealingRequest(uint objectId)
         {
             BasePlayerCharacterEntity playerCharacterEntity = null;
-            if (!TryGetEntityByObjectId(objectId, out playerCharacterEntity) || playerCharacterEntity.coPlayerCharacterEntity != null)
+            if (!TryGetEntityByObjectId(objectId, out playerCharacterEntity))
+            {
+                // TODO: May send warn message that character is not found
                 return;
+            }
+            if (playerCharacterEntity.CoCharacter != null)
+            {
+                // TODO: May send warn message that character is not available
+                return;
+            }
             if (Vector3.Distance(CacheTransform.position, playerCharacterEntity.CacheTransform.position) > gameInstance.conversationDistance)
             {
                 // TODO: May send warn message that character is far from other character
                 return;
             }
-            coPlayerCharacterEntity = playerCharacterEntity;
-            coPlayerCharacterEntity.coPlayerCharacterEntity = this;
+            CoCharacter = playerCharacterEntity;
+            CoCharacter.CoCharacter = this;
             // Send receive dealing request to player
-            coPlayerCharacterEntity.RequestReceiveDealingRequest(ObjectId);
+            CoCharacter.RequestReceiveDealingRequest(ObjectId);
         }
 
         protected virtual void NetFuncReceiveDealingRequest(uint objectId)
@@ -446,26 +451,26 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncAcceptDealingRequest()
         {
-            if (coPlayerCharacterEntity == null)
+            if (CoCharacter == null)
             {
                 // TODO: May send warn message that can not accept dealing request
                 StopDealing();
                 return;
             }
-            if (Vector3.Distance(CacheTransform.position, coPlayerCharacterEntity.CacheTransform.position) > gameInstance.conversationDistance)
+            if (Vector3.Distance(CacheTransform.position, CoCharacter.CacheTransform.position) > gameInstance.conversationDistance)
             {
                 // TODO: May send warn message that character is far from other character
                 StopDealing();
                 return;
             }
             // Set dealing state/data for co player character entity
-            coPlayerCharacterEntity.ClearDealingData();
-            coPlayerCharacterEntity.DealingState = DealingState.Dealing;
-            coPlayerCharacterEntity.RequestAcceptedDealingRequest(ObjectId);
+            CoCharacter.ClearDealingData();
+            CoCharacter.CoOpState = CoOpState.Dealing;
+            CoCharacter.RequestAcceptedDealingRequest(ObjectId);
             // Set dealing state/data for player character entity
             ClearDealingData();
-            DealingState = DealingState.Dealing;
-            RequestAcceptedDealingRequest(coPlayerCharacterEntity.ObjectId);
+            CoOpState = CoOpState.Dealing;
+            RequestAcceptedDealingRequest(CoCharacter.ObjectId);
         }
 
         protected virtual void NetFuncDeclineDealingRequest()
@@ -485,7 +490,7 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncSetDealingItem(int itemIndex, short amount)
         {
-            if (DealingState != DealingState.Dealing)
+            if (CoOpState != CoOpState.Dealing)
             {
                 // TODO: May send warn message to start dealing before confirm
                 return;
@@ -517,7 +522,7 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncSetDealingGold(int gold)
         {
-            if (DealingState != DealingState.Dealing)
+            if (CoOpState != CoOpState.Dealing)
             {
                 // TODO: May send warn message to start dealing before doing this
                 return;
@@ -531,26 +536,26 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncLockDealing()
         {
-            if (DealingState != DealingState.Dealing)
+            if (CoOpState != CoOpState.Dealing)
             {
                 // TODO: May send warn message to start dealing before doing this
                 return;
             }
-            DealingState = DealingState.Lock;
+            CoOpState = CoOpState.LockDealing;
         }
 
         protected virtual void NetFuncConfirmDealing()
         {
-            if (DealingState != DealingState.Lock || !(coPlayerCharacterEntity.DealingState == DealingState.Lock || coPlayerCharacterEntity.DealingState == DealingState.Confirm))
+            if (CoOpState != CoOpState.LockDealing || !(CoCharacter.CoOpState == CoOpState.LockDealing || CoCharacter.CoOpState == CoOpState.ConfirmDealing))
             {
                 // TODO: May send warn message to lock before confirm
                 return;
             }
-            DealingState = DealingState.Confirm;
-            if (DealingState == DealingState.Confirm && coPlayerCharacterEntity.DealingState == DealingState.Confirm)
+            CoOpState = CoOpState.ConfirmDealing;
+            if (CoOpState == CoOpState.ConfirmDealing && CoCharacter.CoOpState == CoOpState.ConfirmDealing)
             {
                 ExchangeDealingItemsAndGold();
-                coPlayerCharacterEntity.ExchangeDealingItemsAndGold();
+                CoCharacter.ExchangeDealingItemsAndGold();
                 StopDealing();
             }
         }
@@ -561,13 +566,13 @@ namespace MultiplayerARPG
             StopDealing();
         }
 
-        protected virtual void NetFuncUpdateDealingState(DealingState state)
+        protected virtual void NetFuncUpdateDealingState(CoOpState state)
         {
             if (onUpdateDealingState != null)
                 onUpdateDealingState(state);
         }
 
-        protected virtual void NetFuncUpdateAnotherDealingState(DealingState state)
+        protected virtual void NetFuncUpdateAnotherDealingState(CoOpState state)
         {
             if (onUpdateAnotherDealingState != null)
                 onUpdateAnotherDealingState(state);
@@ -597,59 +602,131 @@ namespace MultiplayerARPG
                 onUpdateAnotherDealingItems(items);
         }
 
+        protected virtual void NetFuncCreateParty(bool shareExp, bool shareItem)
+        {
+            if (PartyId > 0)
+            {
+                // TODO: May send warn message that player already in party
+                return;
+            }
+            GameManager.CreateParty(this, shareExp, shareItem);
+        }
+
+        protected virtual void NetFuncPartySetting(bool shareExp, bool shareItem)
+        {
+            if (PartyId > 0)
+            {
+                // TODO: May send warn message that player already in party
+                return;
+            }
+            GameManager.PartySetting(this, shareExp, shareItem);
+        }
+
+        protected virtual void NetFuncSendPartyInvitation(uint objectId)
+        {
+            if (PartyId <= 0)
+            {
+                // TODO: May send warn message that player is not in party
+                return;
+            }
+            BasePlayerCharacterEntity playerCharacterEntity = null;
+            if (!TryGetEntityByObjectId(objectId, out playerCharacterEntity))
+            {
+                // TODO: May send warn message that character is not found
+                return;
+            }
+            if (playerCharacterEntity.CoCharacter != null)
+            {
+                // TODO: May send warn message that character is not available
+                return;
+            }
+            if (playerCharacterEntity.PartyId > 0)
+            {
+                // TODO: May send warn message that player already in party
+                return;
+            }
+            CoCharacter = playerCharacterEntity;
+            CoCharacter.CoCharacter = this;
+            // Send receive party invitation request to player
+            playerCharacterEntity.RequestReceiveDealingRequest(ObjectId);
+        }
+
+        protected virtual void NetFuncReceivePartyInvitation(uint objectId)
+        {
+            BasePlayerCharacterEntity playerCharacterEntity = null;
+            if (!TryGetEntityByObjectId(objectId, out playerCharacterEntity))
+                return;
+            if (onShowPartyInvitationDialog != null)
+                onShowPartyInvitationDialog(playerCharacterEntity);
+        }
+
+        protected virtual void NetFuncAcceptPartyInvitation()
+        {
+            if (PartyId > 0)
+            {
+                // TODO: May send warn message that player already in party
+                return;
+            }
+            if (CoCharacter == null)
+            {
+                // TODO: May send warn message that can not accept party invitation
+                return;
+            }
+            if (CoCharacter.PartyId <= 0)
+            {
+                // TODO: May send warn message that player is not in party
+                return;
+            }
+            GameManager.AddPartyMember(CoCharacter, this);
+            StopPartyInvitation();
+        }
+
+        protected virtual void NetFuncDeclinePartyInvitation()
+        {
+            StopPartyInvitation();
+            // TODO: May send decline message
+        }
+
+        protected virtual void NetFuncKickFromParty(string characterId)
+        {
+            if (PartyId <= 0)
+            {
+                // TODO: May send warn message that player is not in party
+                return;
+            }
+            GameManager.KickFromParty(this, characterId);
+        }
+
+        protected virtual void NetFuncLeaveParty()
+        {
+            if (PartyId <= 0)
+            {
+                // TODO: May send warn message that player is not in party
+                return;
+            }
+            GameManager.LeaveParty(this);
+        }
+
         protected virtual void StopDealing()
         {
-            if (coPlayerCharacterEntity == null)
+            if (CoCharacter == null)
             {
                 ClearDealingData();
                 return;
             }
             // Set dealing state/data for co player character entity
-            coPlayerCharacterEntity.ClearDealingData();
-            coPlayerCharacterEntity.coPlayerCharacterEntity = null;
+            CoCharacter.ClearDealingData();
+            CoCharacter.CoCharacter = null;
             // Set dealing state/data for player character entity
             ClearDealingData();
-            coPlayerCharacterEntity = null;
+            CoCharacter = null;
         }
 
-        protected virtual void NetFuncCreateParty(bool shareExp, bool shareItem)
+        protected virtual void StopPartyInvitation()
         {
-
-        }
-
-        protected virtual void NetFuncPartySetting(bool shareExp, bool shareItem)
-        {
-
-        }
-
-        protected virtual void NetFuncSendPartyInvitation(uint objectId)
-        {
-
-        }
-
-        protected virtual void NetFuncReceivePartyInvitation(uint objectId)
-        {
-
-        }
-
-        protected virtual void NetFuncAcceptPartyInvitation()
-        {
-
-        }
-
-        protected virtual void NetFuncDeclinePartyInvitation()
-        {
-
-        }
-
-        protected virtual void NetFuncKickFromParty(string id)
-        {
-
-        }
-
-        protected virtual void NetFuncLeaveParty()
-        {
-
+            if (CoCharacter != null)
+                CoCharacter.CoCharacter = null;
+            CoCharacter = null;
         }
     }
 }

@@ -52,6 +52,11 @@ namespace MultiplayerARPG
             }
         }
 
+        public BaseGameNetworkManager GameManager
+        {
+            get { return Manager as BaseGameNetworkManager; }
+        }
+
         private void Awake()
         {
             EntityAwake();

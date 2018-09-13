@@ -27,18 +27,18 @@ namespace MultiplayerARPG
         #endregion
 
         #region Dealing System
-        protected DealingState dealingState = DealingState.None;
+        protected CoOpState dealingState = CoOpState.None;
         protected int dealingGold = 0;
         protected DealingCharacterItems dealingItems = new DealingCharacterItems();
-        public DealingState DealingState
+        public CoOpState CoOpState
         {
             get { return dealingState; }
             set
             {
                 dealingState = value;
                 RequestUpdateDealingState(value);
-                if (coPlayerCharacterEntity != null)
-                    coPlayerCharacterEntity.RequestUpdateAnotherDealingState(value);
+                if (CoCharacter != null)
+                    CoCharacter.RequestUpdateAnotherDealingState(value);
             }
         }
         public int DealingGold
@@ -48,8 +48,8 @@ namespace MultiplayerARPG
             {
                 dealingGold = value;
                 RequestUpdateDealingGold(value);
-                if (coPlayerCharacterEntity != null)
-                    coPlayerCharacterEntity.RequestUpdateAnotherDealingGold(value);
+                if (CoCharacter != null)
+                    CoCharacter.RequestUpdateAnotherDealingGold(value);
             }
         }
         public DealingCharacterItems DealingItems
@@ -59,8 +59,8 @@ namespace MultiplayerARPG
             {
                 dealingItems = value;
                 RequestUpdateDealingItems(value);
-                if (coPlayerCharacterEntity != null)
-                    coPlayerCharacterEntity.RequestUpdateAnotherDealingItems(value);
+                if (CoCharacter != null)
+                    CoCharacter.RequestUpdateAnotherDealingItems(value);
             }
         }
         #endregion

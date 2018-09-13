@@ -42,8 +42,8 @@ namespace MultiplayerARPG
         public UnityEvent onAnotherStateChangeToConfirm;
         public UnityEvent onBothStateChangeToLock;
 
-        public DealingState dealingState { get; private set; }
-        public DealingState anotherDealingState { get; private set; }
+        public CoOpState dealingState { get; private set; }
+        public CoOpState anotherDealingState { get; private set; }
         public int dealingGold { get; private set; }
         public int anotherDealingGold { get; private set; }
         private readonly List<UICharacterItem> tempDealingItemUIs = new List<UICharacterItem>();
@@ -144,10 +144,10 @@ namespace MultiplayerARPG
             if (uiAnotherCharacter != null)
                 uiAnotherCharacter.Data = anotherCharacter;
 
-            dealingState = DealingState.None;
-            anotherDealingState = DealingState.None;
-            UpdateDealingState(DealingState.Dealing);
-            UpdateAnotherDealingState(DealingState.Dealing);
+            dealingState = CoOpState.None;
+            anotherDealingState = CoOpState.None;
+            UpdateDealingState(CoOpState.Dealing);
+            UpdateAnotherDealingState(CoOpState.Dealing);
             UpdateDealingGold(0);
             UpdateAnotherDealingGold(0);
             CacheDealingItemsList.HideAll();
@@ -156,30 +156,30 @@ namespace MultiplayerARPG
             ItemSelectionManager.Clear();
         }
 
-        public void UpdateDealingState(DealingState state)
+        public void UpdateDealingState(CoOpState state)
         {
             if (dealingState != state)
             {
                 dealingState = state;
                 switch (dealingState)
                 {
-                    case DealingState.None:
+                    case CoOpState.None:
                         Hide();
                         break;
-                    case DealingState.Dealing:
+                    case CoOpState.Dealing:
                         if (onStateChangeToDealing != null)
                             onStateChangeToDealing.Invoke();
                         break;
-                    case DealingState.Lock:
+                    case CoOpState.LockDealing:
                         if (onStateChangeToLock != null)
                             onStateChangeToLock.Invoke();
                         break;
-                    case DealingState.Confirm:
+                    case CoOpState.ConfirmDealing:
                         if (onStateChangeToConfirm != null)
                             onStateChangeToConfirm.Invoke();
                         break;
                 }
-                if (dealingState == DealingState.Lock && anotherDealingState == DealingState.Lock)
+                if (dealingState == CoOpState.LockDealing && anotherDealingState == CoOpState.LockDealing)
                 {
                     if (onBothStateChangeToLock != null)
                         onBothStateChangeToLock.Invoke();
@@ -187,27 +187,27 @@ namespace MultiplayerARPG
             }
         }
 
-        public void UpdateAnotherDealingState(DealingState state)
+        public void UpdateAnotherDealingState(CoOpState state)
         {
             if (anotherDealingState != state)
             {
                 anotherDealingState = state;
                 switch (anotherDealingState)
                 {
-                    case DealingState.Dealing:
+                    case CoOpState.Dealing:
                         if (onAnotherStateChangeToDealing != null)
                             onAnotherStateChangeToDealing.Invoke();
                         break;
-                    case DealingState.Lock:
+                    case CoOpState.LockDealing:
                         if (onAnotherStateChangeToLock != null)
                             onAnotherStateChangeToLock.Invoke();
                         break;
-                    case DealingState.Confirm:
+                    case CoOpState.ConfirmDealing:
                         if (onAnotherStateChangeToConfirm != null)
                             onAnotherStateChangeToConfirm.Invoke();
                         break;
                 }
-                if (dealingState == DealingState.Lock && anotherDealingState == DealingState.Lock)
+                if (dealingState == CoOpState.LockDealing && anotherDealingState == CoOpState.LockDealing)
                 {
                     if (onBothStateChangeToLock != null)
                         onBothStateChangeToLock.Invoke();

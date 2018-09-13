@@ -218,14 +218,14 @@ namespace MultiplayerARPG
             uiDealing.Show();
         }
 
-        public void OnUpdateDealingState(DealingState state)
+        public void OnUpdateDealingState(CoOpState state)
         {
             if (uiDealing == null)
                 return;
             uiDealing.UpdateDealingState(state);
         }
 
-        public void OnUpdateAnotherDealingState(DealingState state)
+        public void OnUpdateAnotherDealingState(CoOpState state)
         {
             if (uiDealing == null)
                 return;
