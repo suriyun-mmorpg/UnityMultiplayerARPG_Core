@@ -16,6 +16,7 @@ namespace MultiplayerARPG
             public const ushort CashShopBuy = 103;
             public const ushort CashPackageInfo = 104;
             public const ushort CashPackageBuyValidation = 105;
+            public const ushort PartyInfo = 106;
         }
         
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
@@ -36,6 +37,7 @@ namespace MultiplayerARPG
             RegisterClientMessage(MsgTypes.CashShopBuy, HandleResponseCashShopBuy);
             RegisterClientMessage(MsgTypes.CashPackageInfo, HandleResponseCashPackageInfo);
             RegisterClientMessage(MsgTypes.CashPackageBuyValidation, HandleResponseCashPackageBuyValidation);
+            RegisterClientMessage(MsgTypes.PartyInfo, HandleResponsePartyInfo);
         }
 
         protected override void RegisterServerMessages()
@@ -47,6 +49,7 @@ namespace MultiplayerARPG
             RegisterServerMessage(MsgTypes.CashShopBuy, HandleRequestCashShopBuy);
             RegisterServerMessage(MsgTypes.CashPackageInfo, HandleRequestCashPackageInfo);
             RegisterServerMessage(MsgTypes.CashPackageBuyValidation, HandleRequestCashPackageBuyValidation);
+            RegisterClientMessage(MsgTypes.PartyInfo, HandleRequestPartyInfo);
         }
 
         public uint RequestCashShopInfo(AckMessageCallback callback)
@@ -122,6 +125,11 @@ namespace MultiplayerARPG
             var message = messageHandler.ReadMessage<ResponseCashPackageBuyValidationMessage>();
             var ackId = message.ackId;
             peerHandler.TriggerAck(ackId, message.responseCode, message);
+        }
+
+        protected virtual void HandleResponsePartyInfo(LiteNetLibMessageHandler messageHandler)
+        {
+
         }
 
         protected virtual void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
@@ -210,6 +218,11 @@ namespace MultiplayerARPG
             responseMessage.error = error;
             responseMessage.cash = 0;
             LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.CashPackageBuyValidation, responseMessage);
+        }
+
+        protected virtual void HandleRequestPartyInfo(LiteNetLibMessageHandler messageHandler)
+        {
+
         }
 
         public override bool StartServer()

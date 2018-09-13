@@ -184,5 +184,45 @@ namespace MultiplayerARPG
         {
             CallNetFunction("UpdateAnotherDealingItems", ConnectId, dealingItems);
         }
+
+        public virtual void RequestCreateParty(bool shareExp, bool shareItem)
+        {
+            CallNetFunction("CreateParty", FunctionReceivers.Server, shareExp, shareItem);
+        }
+
+        public virtual void RequestPartySetting(bool shareExp, bool shareItem)
+        {
+            CallNetFunction("PartySetting", FunctionReceivers.Server, shareExp, shareItem);
+        }
+
+        public virtual void RequestSendPartyInvitation(uint objectId)
+        {
+            CallNetFunction("SendPartyInvitation", FunctionReceivers.Server, objectId);
+        }
+
+        public virtual void RequestReceivePartyInvitation(uint objectId)
+        {
+            CallNetFunction("ReceivePartyInvitation", ConnectId, objectId);
+        }
+
+        public virtual void RequestAcceptPartyInvitation()
+        {
+            CallNetFunction("AcceptPartyInvitation", FunctionReceivers.Server);
+        }
+
+        public virtual void RequestDeclinePartyInvitation()
+        {
+            CallNetFunction("DeclinePartyInvitation", FunctionReceivers.Server);
+        }
+
+        public virtual void RequestKickFromParty(string id)
+        {
+            CallNetFunction("KickFromParty", FunctionReceivers.Server, id);
+        }
+
+        public virtual void RequestLeaveParty()
+        {
+            CallNetFunction("LeaveParty", FunctionReceivers.Server);
+        }
     }
 }

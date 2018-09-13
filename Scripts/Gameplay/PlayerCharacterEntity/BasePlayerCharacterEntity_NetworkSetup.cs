@@ -17,6 +17,10 @@ namespace MultiplayerARPG
             skillPoint.forOwnerOnly = true;
             gold.sendOptions = SendOptions.ReliableOrdered;
             gold.forOwnerOnly = true;
+            partyId.sendOptions = SendOptions.ReliableOrdered;
+            partyId.forOwnerOnly = false;
+            guildId.sendOptions = SendOptions.ReliableOrdered;
+            guildId.forOwnerOnly = false;
 
             hotkeys.forOwnerOnly = true;
             quests.forOwnerOnly = true;
@@ -65,6 +69,14 @@ namespace MultiplayerARPG
             RegisterNetFunction("UpdateAnotherDealingGold", new LiteNetLibFunction<NetFieldInt>((gold) => NetFuncUpdateAnotherDealingGold(gold)));
             RegisterNetFunction("UpdateDealingItems", new LiteNetLibFunction<NetFieldDealingCharacterItems>((items) => NetFuncUpdateDealingItems(items)));
             RegisterNetFunction("UpdateAnotherDealingItems", new LiteNetLibFunction<NetFieldDealingCharacterItems>((items) => NetFuncUpdateAnotherDealingItems(items)));
+            RegisterNetFunction("CreateParty", new LiteNetLibFunction<NetFieldBool, NetFieldBool>((shareExp, shareItem) => NetFuncCreateParty(shareExp, shareItem)));
+            RegisterNetFunction("PartySetting", new LiteNetLibFunction<NetFieldBool, NetFieldBool>((shareExp, shareItem) => NetFuncPartySetting(shareExp, shareItem)));
+            RegisterNetFunction("SendPartyInvitation", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncSendPartyInvitation(objectId)));
+            RegisterNetFunction("ReceivePartyInvitation", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncReceivePartyInvitation(objectId)));
+            RegisterNetFunction("AcceptPartyInvitation", new LiteNetLibFunction(NetFuncAcceptPartyInvitation));
+            RegisterNetFunction("DeclinePartyInvitation", new LiteNetLibFunction(NetFuncDeclinePartyInvitation));
+            RegisterNetFunction("KickFromParty", new LiteNetLibFunction<NetFieldString>((id) => NetFuncKickFromParty(id)));
+            RegisterNetFunction("LeaveParty", new LiteNetLibFunction(NetFuncLeaveParty));
 
             // Setup relates elements
             if (IsOwnerClient)

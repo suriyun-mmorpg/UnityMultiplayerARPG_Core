@@ -611,5 +611,45 @@ namespace MultiplayerARPG
             ClearDealingData();
             coPlayerCharacterEntity = null;
         }
+
+        protected virtual void NetFuncCreateParty(bool shareExp, bool shareItem)
+        {
+
+        }
+
+        protected virtual void NetFuncPartySetting(bool shareExp, bool shareItem)
+        {
+
+        }
+
+        protected virtual void NetFuncSendPartyInvitation(uint objectId)
+        {
+
+        }
+
+        protected virtual void NetFuncReceivePartyInvitation(uint objectId)
+        {
+
+        }
+
+        protected virtual void NetFuncAcceptPartyInvitation()
+        {
+
+        }
+
+        protected virtual void NetFuncDeclinePartyInvitation()
+        {
+
+        }
+
+        protected virtual void NetFuncKickFromParty(string id)
+        {
+
+        }
+
+        protected virtual void NetFuncLeaveParty()
+        {
+
+        }
     }
 }
