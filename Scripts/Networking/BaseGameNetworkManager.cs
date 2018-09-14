@@ -32,13 +32,14 @@ namespace MultiplayerARPG
         // Events
         public System.Action<ChatMessage> onReceiveChat;
         private float lastUpdatePartyMemberTime;
+        protected float tempUnscaledTime;
 
         protected override void Update()
         {
             base.Update();
             if (IsServer)
             {
-                var tempUnscaledTime = Time.unscaledTime;
+                tempUnscaledTime = Time.unscaledTime;
                 if (tempUnscaledTime - lastUpdatePartyMemberTime > UPDATE_PARTY_MEMBER_DURATION)
                 {
                     // Update party member data, every seconds
@@ -49,6 +50,8 @@ namespace MultiplayerARPG
                             BasePlayerCharacterEntity playerCharacterEntity;
                             if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
                                 party.SetMember(playerCharacterEntity);
+                            else
+                                party.SetMemberInvisible(memberId);
                         }
                     }
                     lastUpdatePartyMemberTime = tempUnscaledTime;
