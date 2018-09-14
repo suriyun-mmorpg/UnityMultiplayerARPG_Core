@@ -43,18 +43,23 @@ namespace MultiplayerARPG
                 if (tempUnscaledTime - lastUpdatePartyMemberTime > UPDATE_PARTY_MEMBER_DURATION)
                 {
                     // Update party member data, every seconds
-                    foreach (var party in parties.Values)
-                    {
-                        foreach (var memberId in party.GetMemberIds().ToArray())
-                        {
-                            BasePlayerCharacterEntity playerCharacterEntity;
-                            if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
-                                party.SetMember(playerCharacterEntity);
-                            else
-                                party.SetMemberInvisible(memberId);
-                        }
-                    }
+                    UpdatePartyMembers();
                     lastUpdatePartyMemberTime = tempUnscaledTime;
+                }
+            }
+        }
+
+        protected virtual void UpdatePartyMembers()
+        {
+            foreach (var party in parties.Values)
+            {
+                foreach (var memberId in party.GetMemberIds().ToArray())
+                {
+                    BasePlayerCharacterEntity playerCharacterEntity;
+                    if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
+                        party.SetMember(playerCharacterEntity);
+                    else
+                        party.SetMemberInvisible(memberId);
                 }
             }
         }

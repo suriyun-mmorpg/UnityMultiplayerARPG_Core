@@ -20,13 +20,13 @@ namespace MultiplayerARPG
                     var entry = new PartyMemberData();
                     entry.id = reader.GetString();
                     entry.characterName = reader.GetString();
+                    entry.dataId = reader.GetInt();
+                    entry.level = reader.GetInt();
                     entry.isLeader = reader.GetBool();
                     entry.isVisible = reader.GetBool();
                     // Read extra data
                     if (entry.isVisible)
                     {
-                        entry.dataId = reader.GetInt();
-                        entry.level = reader.GetInt();
                         entry.currentHp = reader.GetInt();
                         entry.maxHp = reader.GetInt();
                         entry.currentMp = reader.GetInt();
@@ -49,13 +49,13 @@ namespace MultiplayerARPG
                     var entry = members[i];
                     writer.Put(entry.id);
                     writer.Put(entry.characterName);
+                    writer.Put(entry.dataId);
+                    writer.Put(entry.level);
                     writer.Put(entry.isLeader);
                     writer.Put(entry.isVisible);
                     // Put extra data
                     if (entry.isVisible)
                     {
-                        writer.Put(entry.dataId);
-                        writer.Put(entry.level);
                         writer.Put(entry.currentHp);
                         writer.Put(entry.maxHp);
                         writer.Put(entry.currentMp);
