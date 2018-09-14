@@ -26,13 +26,14 @@ namespace MultiplayerARPG
             tempMemberData = new PartyMemberData();
             tempMemberData.id = playerCharacterEntity.Id;
             tempMemberData.characterName = playerCharacterEntity.CharacterName;
+            tempMemberData.isLeader = isLeader;
+            tempMemberData.isVisible = true;
             tempMemberData.dataId = playerCharacterEntity.DataId;
             tempMemberData.level = playerCharacterEntity.Level;
             tempMemberData.currentHp = playerCharacterEntity.CurrentHp;
             tempMemberData.maxHp = playerCharacterEntity.CacheMaxHp;
             tempMemberData.currentMp = playerCharacterEntity.CurrentMp;
             tempMemberData.maxMp = playerCharacterEntity.CacheMaxMp;
-            tempMemberData.isLeader = isLeader;
             return tempMemberData;
         }
 
@@ -44,6 +45,16 @@ namespace MultiplayerARPG
         public void SetMember(BasePlayerCharacterEntity playerCharacterEntity, bool isLeader)
         {
             members[playerCharacterEntity.Id] = CreatePartyMemberData(playerCharacterEntity, isLeader);
+        }
+
+        public void SetMemberInvisible(string characterId)
+        {
+            PartyMemberData member;
+            if (members.TryGetValue(characterId, out member))
+            {
+                member.isVisible = false;
+                members[characterId] = member;
+            }
         }
 
         public void Setting(bool shareExp, bool shareItem)
