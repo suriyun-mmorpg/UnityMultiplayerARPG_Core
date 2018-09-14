@@ -276,8 +276,14 @@ namespace MultiplayerARPG
             responseMessage.responseCode = AckResponseCode.Success;
             BasePlayerCharacterEntity playerCharacterEntity;
             PartyData partyData;
-            if (playerCharacters.TryGetValue(peer.ConnectId, out playerCharacterEntity) && parties.TryGetValue(playerCharacterEntity.PartyId, out partyData))
-                responseMessage.members = partyData.GetMembers().ToArray();
+            if (playerCharacters.TryGetValue(peer.ConnectId, out playerCharacterEntity))
+            {
+                // Set character party id to 0 if there is no party info with defined Id
+                if (parties.TryGetValue(playerCharacterEntity.PartyId, out partyData))
+                    responseMessage.members = partyData.GetMembers().ToArray();
+                else
+                    playerCharacterEntity.PartyId = 0;
+            }
             LiteNetLibPacketSender.SendPacket(SendOptions.Sequenced, peer, MsgTypes.PartyInfo, responseMessage);
         }
 

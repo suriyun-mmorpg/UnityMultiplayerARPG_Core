@@ -83,6 +83,11 @@ namespace MultiplayerARPG
             return members.Remove(characterId);
         }
 
+        public bool IsMember(string characterId)
+        {
+            return members.ContainsKey(characterId);
+        }
+
         public int CountMember()
         {
             return members.Count;

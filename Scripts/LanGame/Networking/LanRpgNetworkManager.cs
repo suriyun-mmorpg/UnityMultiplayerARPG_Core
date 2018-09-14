@@ -232,7 +232,9 @@ namespace MultiplayerARPG
                 // TODO: May warn that it's not party leader
                 return;
             }
-            // TODO: find character with character id and set party id to 0
+            BasePlayerCharacterEntity memberCharacterEntity;
+            if (playerCharactersById.TryGetValue(characterId, out memberCharacterEntity))
+                memberCharacterEntity.PartyId = 0;
             party.RemoveMember(characterId);
             parties[partyId] = party;
         }
