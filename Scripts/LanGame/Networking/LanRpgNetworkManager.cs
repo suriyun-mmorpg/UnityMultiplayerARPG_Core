@@ -54,7 +54,8 @@ namespace MultiplayerARPG
         protected override void Update()
         {
             base.Update();
-            if (Time.unscaledTime - lastSaveTime > autoSaveDuration)
+            var tempUnscaledTime = Time.unscaledTime;
+            if (tempUnscaledTime - lastSaveTime > autoSaveDuration)
             {
                 Profiler.BeginSample("LanRpgNetworkManager - Save Data");
                 var owningCharacter = BasePlayerCharacterController.OwningCharacter;
@@ -65,7 +66,7 @@ namespace MultiplayerARPG
                         SaveWorld();
                 }
                 Profiler.EndSample();
-                lastSaveTime = Time.unscaledTime;
+                lastSaveTime = tempUnscaledTime;
             }
         }
 
@@ -256,6 +257,7 @@ namespace MultiplayerARPG
             }
             else
             {
+                playerCharacterEntity.PartyId = 0;
                 party.RemoveMember(playerCharacterEntity.Id);
                 parties[partyId] = party;
             }

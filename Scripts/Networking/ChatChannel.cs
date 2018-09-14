@@ -6,5 +6,6 @@
         Whisper,
         Party,
         Guild,
+        System,
     }
 }

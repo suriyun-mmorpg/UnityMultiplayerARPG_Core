@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using LiteNetLib;
@@ -18,6 +19,8 @@ namespace MultiplayerARPG
             public const ushort CashPackageBuyValidation = 105;
             public const ushort PartyInfo = 106;
         }
+
+        public const float UPDATE_PARTY_MEMBER_DURATION = 1f;
         
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
         protected readonly Dictionary<long, BasePlayerCharacterEntity> playerCharacters = new Dictionary<long, BasePlayerCharacterEntity>();
@@ -28,6 +31,30 @@ namespace MultiplayerARPG
         public MapInfo CurrentMapInfo { get; protected set; }
         // Events
         public System.Action<ChatMessage> onReceiveChat;
+        private float lastUpdatePartyMemberTime;
+
+        protected override void Update()
+        {
+            base.Update();
+            if (IsServer)
+            {
+                var tempUnscaledTime = Time.unscaledTime;
+                if (tempUnscaledTime - lastUpdatePartyMemberTime > UPDATE_PARTY_MEMBER_DURATION)
+                {
+                    // Update party member data, every seconds
+                    foreach (var party in parties.Values)
+                    {
+                        foreach (var memberId in party.GetMemberIds().ToArray())
+                        {
+                            BasePlayerCharacterEntity playerCharacterEntity;
+                            if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
+                                party.SetMember(playerCharacterEntity);
+                        }
+                    }
+                    lastUpdatePartyMemberTime = tempUnscaledTime;
+                }
+            }
+        }
 
         protected override void RegisterClientMessages()
         {
@@ -81,6 +108,12 @@ namespace MultiplayerARPG
             return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MsgTypes.CashPackageBuyValidation, message, callback);
         }
 
+        public uint RequestPartyInfo(AckMessageCallback callback)
+        {
+            var message = new BaseAckMessage();
+            return Client.SendAckPacket(SendOptions.Sequenced, Client.Peer, MsgTypes.PartyInfo, message, callback);
+        }
+
         protected virtual void HandleWarpAtClient(LiteNetLibMessageHandler messageHandler)
         {
             // TODO: May fade black when warping
@@ -131,7 +164,11 @@ namespace MultiplayerARPG
 
         protected virtual void HandleResponsePartyInfo(LiteNetLibMessageHandler messageHandler)
         {
-
+            var peerHandler = messageHandler.peerHandler;
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<ResponsePartyInfoMessage>();
+            var ackId = message.ackId;
+            peerHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected virtual void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
@@ -224,7 +261,16 @@ namespace MultiplayerARPG
 
         protected virtual void HandleRequestPartyInfo(LiteNetLibMessageHandler messageHandler)
         {
-
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<BaseAckMessage>();
+            var responseMessage = new ResponsePartyInfoMessage();
+            responseMessage.ackId = message.ackId;
+            responseMessage.responseCode = AckResponseCode.Success;
+            BasePlayerCharacterEntity playerCharacterEntity;
+            PartyData partyData;
+            if (playerCharacters.TryGetValue(peer.ConnectId, out playerCharacterEntity) && parties.TryGetValue(playerCharacterEntity.PartyId, out partyData))
+                responseMessage.members = partyData.GetMembers().ToArray();
+            LiteNetLibPacketSender.SendPacket(SendOptions.Sequenced, peer, MsgTypes.PartyInfo, responseMessage);
         }
 
         public override bool StartServer()
