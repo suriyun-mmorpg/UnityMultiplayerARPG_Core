@@ -10,25 +10,30 @@ namespace MultiplayerARPG
         private string leaderId;
         private Dictionary<string, PartyMemberData> members;
         private PartyMemberData tempMemberData;
-
-        public PartyData(int id, bool shareExp, bool shareItem, BasePlayerCharacterEntity leaderCharacterEntity)
+        
+        public PartyData(int id, bool shareExp, bool shareItem, string leaderId)
         {
             this.id = id;
             this.shareExp = shareExp;
             this.shareItem = shareItem;
+            this.leaderId = leaderId;
             members = new Dictionary<string, PartyMemberData>();
-            members.Add(leaderCharacterEntity.Id, CreatePartyMemberData(leaderCharacterEntity, true));
+        }
+
+        public PartyData(int id, bool shareExp, bool shareItem, BasePlayerCharacterEntity leaderCharacterEntity) : this(id, shareExp, shareItem, string.Empty)
+        {
+            AddMember(leaderCharacterEntity);
             leaderId = leaderCharacterEntity.Id;
         }
 
-        public PartyMemberData CreatePartyMemberData(BasePlayerCharacterEntity playerCharacterEntity, bool isLeader)
+        public PartyMemberData CreatePartyMemberData(BasePlayerCharacterEntity playerCharacterEntity)
         {
             tempMemberData = new PartyMemberData();
             tempMemberData.id = playerCharacterEntity.Id;
             tempMemberData.characterName = playerCharacterEntity.CharacterName;
             tempMemberData.dataId = playerCharacterEntity.DataId;
             tempMemberData.level = playerCharacterEntity.Level;
-            tempMemberData.isLeader = isLeader;
+            tempMemberData.isLeader = IsLeader(tempMemberData.id);
             tempMemberData.isVisible = true;
             tempMemberData.currentHp = playerCharacterEntity.CurrentHp;
             tempMemberData.maxHp = playerCharacterEntity.CacheMaxHp;
@@ -37,22 +42,12 @@ namespace MultiplayerARPG
             return tempMemberData;
         }
 
-        public void SetMember(BasePlayerCharacterEntity playerCharacterEntity)
-        {
-            SetMember(playerCharacterEntity, IsLeader(playerCharacterEntity));
-        }
-
-        public void SetMember(BasePlayerCharacterEntity playerCharacterEntity, bool isLeader)
-        {
-            members[playerCharacterEntity.Id] = CreatePartyMemberData(playerCharacterEntity, isLeader);
-        }
-
-        public void SetMemberInvisible(string characterId)
+        public void UpdateMemberVisible(string characterId, bool isVisible)
         {
             PartyMemberData member;
             if (members.TryGetValue(characterId, out member))
             {
-                member.isVisible = false;
+                member.isVisible = isVisible;
                 members[characterId] = member;
             }
         }
@@ -65,17 +60,51 @@ namespace MultiplayerARPG
 
         public bool IsLeader(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            return playerCharacterEntity.Equals(leaderId);
+            return IsLeader(playerCharacterEntity.Id);
         }
 
-        public bool AddMember(BasePlayerCharacterEntity playerCharacterEntity)
+        public bool IsLeader(string characterId)
         {
-            if (!members.ContainsKey(playerCharacterEntity.Id))
+            return characterId.Equals(leaderId);
+        }
+
+        public void AddMember(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            AddMember(CreatePartyMemberData(playerCharacterEntity));
+        }
+
+        public void AddMember(PartyMemberData partyMemberData)
+        {
+            if (!members.ContainsKey(partyMemberData.id))
             {
-                members.Add(playerCharacterEntity.Id, CreatePartyMemberData(playerCharacterEntity, false));
-                return true;
+                members.Add(partyMemberData.id, partyMemberData);
+                return;
             }
-            return false;
+            var oldPartyMemberData = members[partyMemberData.id];
+            oldPartyMemberData.characterName = partyMemberData.characterName;
+            oldPartyMemberData.dataId = partyMemberData.dataId;
+            oldPartyMemberData.level = partyMemberData.level;
+            members[partyMemberData.id] = oldPartyMemberData;
+        }
+
+        public void UpdateMember(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            UpdateMember(CreatePartyMemberData(playerCharacterEntity));
+        }
+
+        public void UpdateMember(PartyMemberData partyMemberData)
+        {
+            if (!members.ContainsKey(partyMemberData.id))
+                return;
+            var oldPartyMemberData = members[partyMemberData.id];
+            oldPartyMemberData.characterName = partyMemberData.characterName;
+            oldPartyMemberData.dataId = partyMemberData.dataId;
+            oldPartyMemberData.level = partyMemberData.level;
+            oldPartyMemberData.currentHp = partyMemberData.currentHp;
+            oldPartyMemberData.maxHp = partyMemberData.maxHp;
+            oldPartyMemberData.currentMp = partyMemberData.currentMp;
+            oldPartyMemberData.maxMp = partyMemberData.maxMp;
+            members[partyMemberData.id] = oldPartyMemberData;
         }
 
         public bool RemoveMember(string characterId)

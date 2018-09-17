@@ -57,9 +57,12 @@ namespace MultiplayerARPG
                 {
                     BasePlayerCharacterEntity playerCharacterEntity;
                     if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
-                        party.SetMember(playerCharacterEntity);
+                    {
+                        party.UpdateMember(playerCharacterEntity);
+                        party.UpdateMemberVisible(memberId, true);
+                    }
                     else
-                        party.SetMemberInvisible(memberId);
+                        party.UpdateMemberVisible(memberId, false);
                 }
             }
         }
