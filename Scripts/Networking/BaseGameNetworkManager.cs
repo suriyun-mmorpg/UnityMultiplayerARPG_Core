@@ -34,6 +34,21 @@ namespace MultiplayerARPG
         private float lastUpdatePartyMemberTime;
         protected float tempUnscaledTime;
 
+        public bool TryGetPlayerCharacter(long peerId, out BasePlayerCharacterEntity result)
+        {
+            return playerCharacters.TryGetValue(peerId, out result);
+        }
+
+        public bool TryGetPlayerCharacterById(string id, out BasePlayerCharacterEntity result)
+        {
+            return playerCharactersById.TryGetValue(id, out result);
+        }
+
+        public bool TryGetParty(int id, out PartyData result)
+        {
+            return parties.TryGetValue(id, out result);
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -283,7 +298,12 @@ namespace MultiplayerARPG
             {
                 // Set character party id to 0 if there is no party info with defined Id
                 if (parties.TryGetValue(playerCharacterEntity.PartyId, out partyData))
+                {
+                    responseMessage.shareExp = partyData.shareExp;
+                    responseMessage.shareItem = partyData.shareItem;
+                    responseMessage.leaderId = partyData.leaderId;
                     responseMessage.members = partyData.GetMembers().ToArray();
+                }
                 else
                     playerCharacterEntity.PartyId = 0;
             }

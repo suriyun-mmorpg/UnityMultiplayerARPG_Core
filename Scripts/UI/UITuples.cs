@@ -87,4 +87,10 @@
             this.targetLevel = targetLevel;
         }
     }
+
+    public struct PartyMemberEntityTuple
+    {
+        public PartyMemberData partyMember;
+        public BasePlayerCharacterEntity characterEntity;
+    }
 }

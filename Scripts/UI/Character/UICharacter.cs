@@ -245,6 +245,20 @@ namespace MultiplayerARPG
             if (uiTextGold != null)
                 uiTextGold.text = string.Format(goldFormat, playerCharacter == null ? "N/A" : playerCharacter.Gold.ToString("N0"));
 
+            var character = Data == null ? null : Data.GetDatabase();
+            if (uiTextClassTitle != null)
+                uiTextClassTitle.text = string.Format(classTitleFormat, character == null ? "N/A" : character.title);
+
+            if (uiTextClassDescription != null)
+                uiTextClassDescription.text = string.Format(classDescriptionFormat, character == null ? "N/A" : character.description);
+
+            if (imageClassIcon != null)
+            {
+                var iconSprite = character == null ? null : character.icon;
+                imageClassIcon.gameObject.SetActive(iconSprite != null);
+                imageClassIcon.sprite = iconSprite;
+            }
+
             Profiler.EndSample();
         }
 
@@ -340,20 +354,6 @@ namespace MultiplayerARPG
 
             if (uiCharacterBuffs != null)
                 uiCharacterBuffs.UpdateData(Data);
-
-            var character = Data == null ? null : Data.GetDatabase();
-            if (uiTextClassTitle != null)
-                uiTextClassTitle.text = string.Format(classTitleFormat, character == null ? "N/A" : character.title);
-
-            if (uiTextClassDescription != null)
-                uiTextClassDescription.text = string.Format(classDescriptionFormat, character == null ? "N/A" : character.description);
-
-            if (imageClassIcon != null)
-            {
-                var iconSprite = character == null ? null : character.icon;
-                imageClassIcon.gameObject.SetActive(iconSprite != null);
-                imageClassIcon.sprite = iconSprite;
-            }
         }
 
         [ContextMenu("Migrate UI Components")]

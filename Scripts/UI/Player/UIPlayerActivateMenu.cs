@@ -7,6 +7,18 @@ namespace MultiplayerARPG
     public partial class UIPlayerActivateMenu : UISelectionEntry<BasePlayerCharacterEntity>
     {
         public UICharacter uiCharacter;
+        [Tooltip("These objects will be activated when owning character is in party")]
+        public GameObject[] partyObjects;
+
+        protected override void UpdateUI()
+        {
+            base.UpdateUI();
+            foreach (var partyObject in partyObjects)
+            {
+                if (partyObject != null)
+                    partyObject.SetActive(BasePlayerCharacterController.OwningCharacter.PartyId > 0);
+            }
+        }
 
         protected override void UpdateData()
         {
@@ -21,9 +33,11 @@ namespace MultiplayerARPG
             Hide();
         }
 
-        public void OnClickSendDuelRequest()
+        public void OnClickSendPartyInvitation()
         {
-            // TODO: Will implement it soon
+            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            owningCharacter.RequestSendPartyInvitation(Data.ObjectId);
+            Hide();
         }
     }
 }

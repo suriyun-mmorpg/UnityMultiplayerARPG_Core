@@ -6,7 +6,6 @@
         public string characterName;
         public int dataId;
         public int level;
-        public bool isLeader;
         public bool isVisible;
         public int currentHp;
         public int maxHp;

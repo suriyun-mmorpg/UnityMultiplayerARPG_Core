@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using LiteNetLibManager;
 
 namespace MultiplayerARPG
@@ -58,7 +57,6 @@ namespace MultiplayerARPG
         public void RefreshCashShopInfo()
         {
             // Load cash shop item list
-            CacheList.HideAll();
             CacheGameNetworkManager.RequestCashShopInfo(ResponseCashShopInfo);
         }
 

@@ -648,7 +648,7 @@ namespace MultiplayerARPG
             CoCharacter = playerCharacterEntity;
             CoCharacter.CoCharacter = this;
             // Send receive party invitation request to player
-            playerCharacterEntity.RequestReceiveDealingRequest(ObjectId);
+            playerCharacterEntity.RequestReceivePartyInvitation(ObjectId);
         }
 
         protected virtual void NetFuncReceivePartyInvitation(uint objectId)

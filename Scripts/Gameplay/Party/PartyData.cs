@@ -7,7 +7,7 @@ namespace MultiplayerARPG
         public int id { get; private set; }
         public bool shareExp { get; private set; }
         public bool shareItem { get; private set; }
-        private string leaderId;
+        public string leaderId { get; private set; }
         private Dictionary<string, PartyMemberData> members;
         private PartyMemberData tempMemberData;
         
@@ -33,7 +33,6 @@ namespace MultiplayerARPG
             tempMemberData.characterName = playerCharacterEntity.CharacterName;
             tempMemberData.dataId = playerCharacterEntity.DataId;
             tempMemberData.level = playerCharacterEntity.Level;
-            tempMemberData.isLeader = IsLeader(tempMemberData.id);
             tempMemberData.isVisible = true;
             tempMemberData.currentHp = playerCharacterEntity.CurrentHp;
             tempMemberData.maxHp = playerCharacterEntity.CacheMaxHp;

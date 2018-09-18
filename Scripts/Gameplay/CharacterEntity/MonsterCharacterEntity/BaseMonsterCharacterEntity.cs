@@ -216,32 +216,74 @@ namespace MultiplayerARPG
             var randomedExp = Random.Range(MonsterDatabase.randomExpMin, MonsterDatabase.randomExpMax);
             var randomedGold = Random.Range(MonsterDatabase.randomGoldMin, MonsterDatabase.randomGoldMax);
             var looters = new HashSet<uint>();
+            var lastPlayer = lastAttacker as BasePlayerCharacterEntity;
+            PartyData tempPartyData;
+            BasePlayerCharacterEntity tempPlayerCharacter;
             if (receivedDamageRecords.Count > 0)
             {
-                BasePlayerCharacterEntity topDamagePlayer = null;
                 var tempHighRewardRate = 0f;
                 foreach (var enemy in receivedDamageRecords.Keys)
                 {
                     var receivedDamageRecord = receivedDamageRecords[enemy];
                     var rewardRate = receivedDamageRecord.totalReceivedDamage / maxHp;
+                    var rewardExp = (int)(randomedExp * rewardRate);
+                    var rewardGold = (int)(randomedGold * rewardRate);
                     if (rewardRate > 1)
                         rewardRate = 1;
-                    enemy.IncreaseExp((int)(randomedExp * rewardRate));
                     if (enemy is BasePlayerCharacterEntity)
                     {
-                        var enemyPlayer = enemy as BasePlayerCharacterEntity;
-                        enemyPlayer.Gold += (int)(randomedGold * rewardRate);
+                        var makeMostDamage = false;
+                        tempPlayerCharacter = enemy as BasePlayerCharacterEntity;
+                        // Clear looters list when it is found new player character who make most damages
                         if (rewardRate > tempHighRewardRate)
                         {
                             tempHighRewardRate = rewardRate;
-                            topDamagePlayer = enemyPlayer;
+                            looters.Clear();
+                            makeMostDamage = true;
+                        }
+                        // Try find party data from player character
+                        if (GameManager.TryGetParty(tempPlayerCharacter.PartyId, out tempPartyData))
+                        {
+                            // Loop party member to fill looter list / increase gold / increase exp
+                            foreach (var member in tempPartyData.GetMembers())
+                            {
+                                BasePlayerCharacterEntity partyPlayerCharacter;
+                                if (GameManager.TryGetPlayerCharacterById(member.id, out partyPlayerCharacter))
+                                {
+                                    // If share exp, every party member will receive devided exp
+                                    // If not share exp, character who make damage will receive non-devided exp
+                                    if (tempPartyData.shareExp)
+                                        partyPlayerCharacter.IncreaseExp(rewardExp / tempPartyData.CountMember());
+                                    else if (tempPlayerCharacter == partyPlayerCharacter)
+                                        partyPlayerCharacter.IncreaseExp(rewardExp);
+
+                                    // If share item, every party member will receive devided gold
+                                    // If not share item, character who make damage will receive non-devided gold
+                                    if (tempPartyData.shareItem)
+                                    {
+                                        if (makeMostDamage)
+                                            looters.Add(partyPlayerCharacter.ObjectId);
+                                        partyPlayerCharacter.Gold += rewardGold / tempPartyData.CountMember();
+                                    }
+                                    else if (tempPlayerCharacter == partyPlayerCharacter)
+                                    {
+                                        if (makeMostDamage)
+                                            looters.Add(partyPlayerCharacter.ObjectId);
+                                        partyPlayerCharacter.Gold += rewardGold;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            tempPlayerCharacter.IncreaseExp(rewardExp);
+                            if (makeMostDamage)
+                                looters.Add(tempPlayerCharacter.ObjectId);
+                            tempPlayerCharacter.Gold += rewardGold;
                         }
                     }
-                }
-                if (topDamagePlayer != null)
-                {
-                    // If player is in party, check party share item state
-                    looters.Add(topDamagePlayer.ObjectId);
+                    else
+                        enemy.IncreaseExp(rewardExp);
                 }
             }
             receivedDamageRecords.Clear();
@@ -260,7 +302,6 @@ namespace MultiplayerARPG
                     }
                 }
             }
-            var lastPlayer = lastAttacker as BasePlayerCharacterEntity;
             if (lastPlayer != null)
                 lastPlayer.OnKillMonster(this);
         }

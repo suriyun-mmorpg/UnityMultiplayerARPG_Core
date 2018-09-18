@@ -7,10 +7,16 @@ namespace MultiplayerARPG
 {
     public class ResponsePartyInfoMessage : BaseAckMessage
     {
+        public bool shareExp;
+        public bool shareItem;
+        public string leaderId;
         public PartyMemberData[] members;
 
         public override void DeserializeData(NetDataReader reader)
         {
+            shareExp = reader.GetBool();
+            shareItem = reader.GetBool();
+            leaderId = reader.GetString();
             var length = reader.GetInt();
             var members = new PartyMemberData[length];
             if (length > 0)
@@ -22,7 +28,6 @@ namespace MultiplayerARPG
                     entry.characterName = reader.GetString();
                     entry.dataId = reader.GetInt();
                     entry.level = reader.GetInt();
-                    entry.isLeader = reader.GetBool();
                     entry.isVisible = reader.GetBool();
                     // Read extra data
                     if (entry.isVisible)
@@ -40,6 +45,9 @@ namespace MultiplayerARPG
 
         public override void SerializeData(NetDataWriter writer)
         {
+            writer.Put(shareExp);
+            writer.Put(shareItem);
+            writer.Put(leaderId);
             var length = members == null ? 0 : members.Length;
             writer.Put(length);
             if (length > 0)
@@ -51,7 +59,6 @@ namespace MultiplayerARPG
                     writer.Put(entry.characterName);
                     writer.Put(entry.dataId);
                     writer.Put(entry.level);
-                    writer.Put(entry.isLeader);
                     writer.Put(entry.isVisible);
                     // Put extra data
                     if (entry.isVisible)

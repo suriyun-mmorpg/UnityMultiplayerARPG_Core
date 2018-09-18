@@ -44,6 +44,8 @@ namespace MultiplayerARPG
         public UIPlayerActivateMenu uiPlayerActivateMenu;
         public UIDealingRequest uiDealingRequest;
         public UIDealing uiDealing;
+        public UIPartyInvitation uiPartyInvitation;
+        public UIParty[] uiParties;
         public UIToggleUI[] toggleUis;
         public List<GameObject> ignorePointerDetectionUis;
 
@@ -258,6 +260,14 @@ namespace MultiplayerARPG
             if (uiDealing == null)
                 return;
             uiDealing.UpdateAnotherDealingItems(items);
+        }
+
+        public void OnShowPartyInvitation(BasePlayerCharacterEntity playerCharacter)
+        {
+            if (uiPartyInvitation == null)
+                return;
+            uiPartyInvitation.Data = playerCharacter;
+            uiPartyInvitation.Show();
         }
 
         public bool IsPointerOverUIObject()
