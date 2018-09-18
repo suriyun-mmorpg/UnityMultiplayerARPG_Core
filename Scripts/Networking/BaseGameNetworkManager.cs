@@ -104,7 +104,7 @@ namespace MultiplayerARPG
             RegisterServerMessage(MsgTypes.CashShopBuy, HandleRequestCashShopBuy);
             RegisterServerMessage(MsgTypes.CashPackageInfo, HandleRequestCashPackageInfo);
             RegisterServerMessage(MsgTypes.CashPackageBuyValidation, HandleRequestCashPackageBuyValidation);
-            RegisterClientMessage(MsgTypes.PartyInfo, HandleRequestPartyInfo);
+            RegisterServerMessage(MsgTypes.PartyInfo, HandleRequestPartyInfo);
         }
 
         public uint RequestCashShopInfo(AckMessageCallback callback)
