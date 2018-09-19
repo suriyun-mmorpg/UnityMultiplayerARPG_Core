@@ -204,10 +204,7 @@ namespace MultiplayerARPG
                     uiPartyMember.Show();
                     SelectionManager.Add(uiPartyMember);
                     if (selectedIdx == index)
-                    {
-                        Debug.LogError("hre");
                         uiPartyMember.OnClickSelect();
-                    }
                 });
             }
         }
