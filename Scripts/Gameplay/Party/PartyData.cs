@@ -106,9 +106,19 @@ namespace MultiplayerARPG
             members[partyMemberData.id] = oldPartyMemberData;
         }
 
+        public bool RemoveMember(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            return RemoveMember(playerCharacterEntity.Id);
+        }
+
         public bool RemoveMember(string characterId)
         {
             return members.Remove(characterId);
+        }
+
+        public bool IsMember(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            return IsMember(playerCharacterEntity.Id);
         }
 
         public bool IsMember(string characterId)

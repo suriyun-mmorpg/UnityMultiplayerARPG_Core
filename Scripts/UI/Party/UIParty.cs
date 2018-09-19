@@ -138,7 +138,7 @@ namespace MultiplayerARPG
         public void RefreshPartyInfo()
         {
             // Load cash shop item list
-            CacheGameNetworkManager.RequestPartyInfo(ResponsePartyInfo);
+            CacheGameNetworkManager.RequestPartyData(ResponsePartyInfo);
         }
 
         public override void Show()

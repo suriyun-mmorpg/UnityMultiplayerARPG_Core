@@ -68,7 +68,7 @@ namespace MultiplayerARPG
         {
             foreach (var party in parties.Values)
             {
-                foreach (var memberId in party.GetMemberIds().ToArray())
+                foreach (var memberId in party.GetMemberIds())
                 {
                     BasePlayerCharacterEntity playerCharacterEntity;
                     if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
@@ -134,7 +134,7 @@ namespace MultiplayerARPG
             return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MsgTypes.CashPackageBuyValidation, message, callback);
         }
 
-        public uint RequestPartyInfo(AckMessageCallback callback)
+        public uint RequestPartyData(AckMessageCallback callback)
         {
             var message = new BaseAckMessage();
             return Client.SendAckPacket(SendOptions.Sequenced, Client.Peer, MsgTypes.PartyData, message, callback);
@@ -297,7 +297,7 @@ namespace MultiplayerARPG
             if (playerCharacters.TryGetValue(peer.ConnectId, out playerCharacterEntity) && playerCharacterEntity.PartyId > 0)
             {
                 // Set character party id to 0 if there is no party info with defined Id
-                if (parties.TryGetValue(playerCharacterEntity.PartyId, out partyData))
+                if (parties.TryGetValue(playerCharacterEntity.PartyId, out partyData) && partyData.IsMember(playerCharacterEntity))
                 {
                     responseMessage.shareExp = partyData.shareExp;
                     responseMessage.shareItem = partyData.shareItem;
