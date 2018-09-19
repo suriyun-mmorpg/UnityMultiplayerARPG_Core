@@ -66,9 +66,9 @@ namespace MultiplayerARPG
 
         protected virtual void UpdatePartyMembers()
         {
-            foreach (var party in parties.Values)
+            foreach (var party in parties.Values.ToArray())
             {
-                foreach (var memberId in party.GetMemberIds())
+                foreach (var memberId in party.GetMemberIds().ToArray())
                 {
                     BasePlayerCharacterEntity playerCharacterEntity;
                     if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
