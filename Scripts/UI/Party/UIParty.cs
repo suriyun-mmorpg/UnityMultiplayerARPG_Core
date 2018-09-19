@@ -170,8 +170,6 @@ namespace MultiplayerARPG
                 uiPartyMemberDialog.Data = ui.Data;
                 uiPartyMemberDialog.Show();
             }
-            else
-                SelectionManager.Deselect(ui);
         }
 
         protected void OnDeselectPartyMember(UIPartyMember ui)
@@ -206,7 +204,10 @@ namespace MultiplayerARPG
                     uiPartyMember.Show();
                     SelectionManager.Add(uiPartyMember);
                     if (selectedIdx == index)
+                    {
+                        Debug.LogError("hre");
                         uiPartyMember.OnClickSelect();
+                    }
                 });
             }
         }

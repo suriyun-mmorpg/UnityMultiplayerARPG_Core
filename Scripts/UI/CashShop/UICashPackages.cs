@@ -84,8 +84,6 @@ namespace MultiplayerARPG
                 uiCashPackageDialog.Data = ui.Data;
                 uiCashPackageDialog.Show();
             }
-            else
-                SelectionManager.Deselect(ui);
         }
 
         protected void OnDeselectCashPackage(UICashPackage ui)

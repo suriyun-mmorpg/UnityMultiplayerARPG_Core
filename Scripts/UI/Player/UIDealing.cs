@@ -114,8 +114,6 @@ namespace MultiplayerARPG
                 uiItemDialog.Setup(ui.Data, null, -1, string.Empty);
                 uiItemDialog.Show();
             }
-            else
-                ItemSelectionManager.Deselect(ui);
         }
 
         protected void OnDeselectCharacterItem(UICharacterItem ui)
