@@ -694,6 +694,11 @@ namespace MultiplayerARPG
                 // TODO: May send warn message that player is not in party
                 return;
             }
+            if (Id.Equals(characterId))
+            {
+                // TODO: May warn that it's owning character so it's not able to kick
+                return;
+            }
             GameManager.KickFromParty(this, characterId);
         }
 

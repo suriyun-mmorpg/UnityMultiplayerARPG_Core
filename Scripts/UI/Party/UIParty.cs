@@ -154,11 +154,12 @@ namespace MultiplayerARPG
 
         public override void Hide()
         {
-            base.Hide();
+            SelectionManager.DeselectSelectedUI();
             if (uiPartyCreate != null)
                 uiPartyCreate.Hide();
             if (uiPartySetting != null)
                 uiPartySetting.Hide();
+            base.Hide();
         }
 
         protected void OnSelectPartyMember(UIPartyMember ui)

@@ -247,7 +247,7 @@ namespace MultiplayerARPG
             PartyData party;
             if (!parties.TryGetValue(partyId, out party))
                 return;
-            if (!party.IsLeader(playerCharacterEntity))
+            if (party.IsLeader(playerCharacterEntity))
             {
                 foreach (var memberId in party.GetMemberIds())
                 {
