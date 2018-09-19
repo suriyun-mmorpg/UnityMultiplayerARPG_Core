@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using LiteNetLibManager;
 
 namespace MultiplayerARPG
@@ -11,10 +12,22 @@ namespace MultiplayerARPG
         public UIPartyMember uiPartyMemberDialog;
         public UIPartyMember uiPartyMemberPrefab;
         public Transform uiPartyMemberContainer;
+        public Toggle toggleShareExp;
+        public Toggle toggleShareItem;
         public UIPartyCreate uiPartyCreate;
         public UIPartySetting uiPartySetting;
+        [Tooltip("These objects will be activated when owning character is in party")]
+        public GameObject[] owningCharacterIsInPartyObjects;
+        [Tooltip("These objects will be activated when owning character is not in party")]
+        public GameObject[] owningCharacterIsNotInPartyObjects;
+        [Tooltip("These objects will be activated when owning character is leader")]
+        public GameObject[] owningCharacterIsLeaderObjects;
+        [Tooltip("These objects will be activated when owning character is not leader")]
+        public GameObject[] owningCharacterIsNotLeaderObjects;
         public float refreshDuration = 1f;
         private float lastRefreshTime;
+        private string currentCharacterId = string.Empty;
+        private int currentPartyId = 0;
 
         public bool shareExp { get; private set; }
         public bool shareItem { get; private set; }
@@ -60,7 +73,20 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            if (BasePlayerCharacterController.OwningCharacter.PartyId > 0)
+            if (!currentCharacterId.Equals(BasePlayerCharacterController.OwningCharacter.Id) ||
+                currentPartyId != BasePlayerCharacterController.OwningCharacter.PartyId)
+            {
+                currentCharacterId = BasePlayerCharacterController.OwningCharacter.Id;
+                currentPartyId = BasePlayerCharacterController.OwningCharacter.PartyId;
+                UpdateObjects();
+
+                // Refresh party info
+                if (currentPartyId <= 0)
+                    CacheList.HideAll();
+            }
+
+            // Refresh party info
+            if (currentPartyId > 0)
             {
                 if (Time.unscaledTime - lastRefreshTime >= refreshDuration)
                 {
@@ -68,8 +94,45 @@ namespace MultiplayerARPG
                     RefreshPartyInfo();
                 }
             }
-            else
-                CacheList.HideAll();
+        }
+
+        private void UpdateObjects()
+        {
+            if (toggleShareExp != null)
+            {
+                toggleShareExp.interactable = false;
+                toggleShareExp.isOn = shareExp;
+            }
+
+            if (toggleShareItem != null)
+            {
+                toggleShareItem.interactable = false;
+                toggleShareItem.isOn = shareItem;
+            }
+
+            foreach (var obj in owningCharacterIsInPartyObjects)
+            {
+                if (obj != null)
+                    obj.SetActive(currentPartyId > 0);
+            }
+
+            foreach (var obj in owningCharacterIsNotInPartyObjects)
+            {
+                if (obj != null)
+                    obj.SetActive(currentPartyId <= 0);
+            }
+
+            foreach (var obj in owningCharacterIsLeaderObjects)
+            {
+                if (obj != null)
+                    obj.SetActive(currentCharacterId.Equals(leaderId));
+            }
+
+            foreach (var obj in owningCharacterIsNotLeaderObjects)
+            {
+                if (obj != null)
+                    obj.SetActive(!currentCharacterId.Equals(leaderId));
+            }
         }
 
         public void RefreshPartyInfo()
@@ -86,6 +149,7 @@ namespace MultiplayerARPG
             SelectionManager.eventOnDeselect.RemoveListener(OnDeselectPartyMember);
             SelectionManager.eventOnDeselect.AddListener(OnDeselectPartyMember);
             RefreshPartyInfo();
+            UpdateObjects();
         }
 
         public override void Hide()
@@ -123,6 +187,7 @@ namespace MultiplayerARPG
                 shareExp = castedMessage.shareExp;
                 shareItem = castedMessage.shareItem;
                 leaderId = castedMessage.leaderId;
+                UpdateObjects();
 
                 var selectedIdx = SelectionManager.SelectedUI != null ? SelectionManager.IndexOf(SelectionManager.SelectedUI) : -1;
                 SelectionManager.DeselectSelectedUI();
@@ -145,10 +210,15 @@ namespace MultiplayerARPG
             }
         }
 
-        public void OnClickCreateMember()
+        private bool IsLeader()
+        {
+            return currentPartyId > 0 && currentCharacterId.Equals(leaderId);
+        }
+
+        public void OnClickCreateParty()
         {
             // If already in the party, return
-            if (BasePlayerCharacterController.OwningCharacter.PartyId > 0)
+            if (currentPartyId > 0)
                 return;
             // Show create party dialog
             if (uiPartyCreate != null)
@@ -158,11 +228,24 @@ namespace MultiplayerARPG
         public void OnClickSettingParty()
         {
             // If not in the party or not leader, return
-            if (BasePlayerCharacterController.OwningCharacter.PartyId <= 0 || !BasePlayerCharacterController.OwningCharacter.Id.Equals(leaderId))
+            if (!IsLeader())
                 return;
             // Show setup party dialog
             if (uiPartySetting != null)
                 uiPartySetting.Show(shareExp, shareItem);
+        }
+
+        public void OnClickKickFromParty()
+        {
+            // If not in the party or not leader, return
+            if (!IsLeader() || SelectionManager.SelectedUI == null)
+                return;
+
+            var partyMember = SelectionManager.SelectedUI.Data.partyMember;
+            UISceneGlobal.Singleton.ShowMessageDialog("Kick Member", string.Format("You sure you want to kick {0} from party?", partyMember.characterName), false, true, false, false, null, () =>
+            {
+                BasePlayerCharacterController.OwningCharacter.RequestKickFromParty(partyMember.id);
+            });
         }
 
         public void OnClickLeaveParty()

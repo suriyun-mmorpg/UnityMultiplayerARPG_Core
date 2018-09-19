@@ -37,17 +37,17 @@ namespace MultiplayerARPG
         public UICharacterBuffs uiCharacterBuffs;
         [Header("Member states objects")]
         [Tooltip("These objects will be activated when partyMemberData -> isVisible is true")]
-        public GameObject[] visibleObjects;
+        public GameObject[] memberIsVisibleObjects;
         [Tooltip("These objects will be activated when partyMemberData -> isVisible is false")]
-        public GameObject[] invisibleObjects;
+        public GameObject[] memberIsNotInvisibleObjects;
         [Tooltip("These objects will be activated when this party member is leader")]
-        public GameObject[] leaderMemberObjects;
+        public GameObject[] memberIsLeaderObjects;
         [Tooltip("These objects will be activated when this party member is not leader")]
-        public GameObject[] nonLeaderMemberObjects;
+        public GameObject[] memberIsNotLeaderObjects;
         [Tooltip("These objects will be activated when owning character is leader")]
-        public GameObject[] leaderObjects;
+        public GameObject[] owningCharacterIsLeaderObjects;
         [Tooltip("These objects will be activated when owning character is not leader")]
-        public GameObject[] nonLeaderObjects;
+        public GameObject[] owningCharacterIsNotLeaderObjects;
         [Header("Class information")]
         public TextWrapper uiTextClassTitle;
         public TextWrapper uiTextClassDescription;
@@ -86,28 +86,40 @@ namespace MultiplayerARPG
                 uiCharacterBuffs.UpdateData(Data.characterEntity);
 
             // Member status
-            foreach (var visibleObject in visibleObjects)
+            foreach (var obj in memberIsVisibleObjects)
             {
-                if (visibleObject != null)
-                    visibleObject.SetActive(Data.partyMember.isVisible);
+                if (obj != null)
+                    obj.SetActive(Data.partyMember.isVisible);
             }
 
-            foreach (var invisibleObject in invisibleObjects)
+            foreach (var obj in memberIsNotInvisibleObjects)
             {
-                if (invisibleObject != null)
-                    invisibleObject.SetActive(!Data.partyMember.isVisible);
+                if (obj != null)
+                    obj.SetActive(!Data.partyMember.isVisible);
             }
 
-            foreach (var leaderObject in leaderMemberObjects)
+            foreach (var obj in memberIsLeaderObjects)
             {
-                if (leaderObject != null)
-                    leaderObject.SetActive(!string.IsNullOrEmpty(Data.partyMember.id) && Data.partyMember.id.Equals(uiParty.leaderId));
+                if (obj != null)
+                    obj.SetActive(!string.IsNullOrEmpty(Data.partyMember.id) && Data.partyMember.id.Equals(uiParty.leaderId));
             }
 
-            foreach (var nonLeaderObject in nonLeaderMemberObjects)
+            foreach (var obj in memberIsNotLeaderObjects)
             {
-                if (nonLeaderObject != null)
-                    nonLeaderObject.SetActive(string.IsNullOrEmpty(Data.partyMember.id) || !Data.partyMember.id.Equals(uiParty.leaderId));
+                if (obj != null)
+                    obj.SetActive(string.IsNullOrEmpty(Data.partyMember.id) || !Data.partyMember.id.Equals(uiParty.leaderId));
+            }
+
+            foreach (var obj in owningCharacterIsLeaderObjects)
+            {
+                if (obj != null)
+                    obj.SetActive(BasePlayerCharacterController.OwningCharacter.Id.Equals(uiParty.leaderId));
+            }
+
+            foreach (var obj in owningCharacterIsNotLeaderObjects)
+            {
+                if (obj != null)
+                    obj.SetActive(!BasePlayerCharacterController.OwningCharacter.Id.Equals(uiParty.leaderId));
             }
 
             // Character class data
@@ -126,14 +138,6 @@ namespace MultiplayerARPG
                 imageClassIcon.gameObject.SetActive(iconSprite != null);
                 imageClassIcon.sprite = iconSprite;
             }
-        }
-
-        public void OnClickKickMember()
-        {
-            UISceneGlobal.Singleton.ShowMessageDialog("Kick Member", string.Format("You sure you want to kick {0} from party?", Data.partyMember.characterName), false, true, false, false, null, () =>
-            {
-                BasePlayerCharacterController.OwningCharacter.RequestKickFromParty(Data.partyMember.id);
-            });
         }
     }
 }

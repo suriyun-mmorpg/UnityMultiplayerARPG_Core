@@ -614,7 +614,7 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncPartySetting(bool shareExp, bool shareItem)
         {
-            if (PartyId > 0)
+            if (PartyId <= 0)
             {
                 // TODO: May send warn message that player already in party
                 return;
