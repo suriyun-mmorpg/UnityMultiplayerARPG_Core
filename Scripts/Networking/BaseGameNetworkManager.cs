@@ -33,6 +33,8 @@ namespace MultiplayerARPG
         public System.Action<ChatMessage> onReceiveChat;
         private float lastUpdatePartyMemberTime;
         protected float tempUnscaledTime;
+        protected PartyData[] tempPartyDataArray;
+        protected string[] tempPartyMemberIdArray;
 
         public bool TryGetPlayerCharacter(long peerId, out BasePlayerCharacterEntity result)
         {
@@ -66,9 +68,11 @@ namespace MultiplayerARPG
 
         protected virtual void UpdatePartyMembers()
         {
-            foreach (var party in parties.Values.ToArray())
+            tempPartyDataArray = parties.Values.ToArray();
+            foreach (var party in tempPartyDataArray)
             {
-                foreach (var memberId in party.GetMemberIds().ToArray())
+                tempPartyMemberIdArray = party.GetMemberIds().ToArray();
+                foreach (var memberId in tempPartyMemberIdArray)
                 {
                     BasePlayerCharacterEntity playerCharacterEntity;
                     if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
