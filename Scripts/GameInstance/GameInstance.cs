@@ -245,7 +245,7 @@ namespace MultiplayerARPG
 
         protected virtual void Awake()
         {
-            Application.targetFrameRate = 120;
+            Application.targetFrameRate = 60;
             Application.runInBackground = true;
             if (Singleton != null)
             {
