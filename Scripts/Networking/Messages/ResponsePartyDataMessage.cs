@@ -5,7 +5,7 @@ using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
-    public class ResponsePartyInfoMessage : BaseAckMessage
+    public class ResponsePartyDataMessage : BaseAckMessage
     {
         public bool shareExp;
         public bool shareItem;

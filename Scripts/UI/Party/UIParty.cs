@@ -180,7 +180,7 @@ namespace MultiplayerARPG
 
         private void ResponsePartyInfo(AckResponseCode responseCode, BaseAckMessage message)
         {
-            var castedMessage = (ResponsePartyInfoMessage)message;
+            var castedMessage = (ResponsePartyDataMessage)message;
             if (responseCode == AckResponseCode.Success)
             {
                 shareExp = castedMessage.shareExp;

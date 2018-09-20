@@ -196,7 +196,7 @@ namespace MultiplayerARPG
         {
             var peerHandler = messageHandler.peerHandler;
             var peer = messageHandler.peer;
-            var message = messageHandler.ReadMessage<ResponsePartyInfoMessage>();
+            var message = messageHandler.ReadMessage<ResponsePartyDataMessage>();
             var ackId = message.ackId;
             peerHandler.TriggerAck(ackId, message.responseCode, message);
         }
@@ -205,10 +205,10 @@ namespace MultiplayerARPG
         {
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<ChatMessage>();
-            HandleChatAtServer(message);
+            ReadChatMessage(message);
         }
 
-        protected virtual void HandleChatAtServer(ChatMessage message)
+        protected virtual void ReadChatMessage(ChatMessage message)
         {
             switch (message.channel)
             {
@@ -293,7 +293,7 @@ namespace MultiplayerARPG
         {
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<BaseAckMessage>();
-            var responseMessage = new ResponsePartyInfoMessage();
+            var responseMessage = new ResponsePartyDataMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = AckResponseCode.Success;
             BasePlayerCharacterEntity playerCharacterEntity;
