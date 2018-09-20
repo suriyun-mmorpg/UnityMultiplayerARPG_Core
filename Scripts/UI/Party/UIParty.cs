@@ -9,11 +9,17 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(UIPartyMemberSelectionManager))]
     public class UIParty : UIBase
     {
+        [Header("Display Format")]
+        [Tooltip("Member Amount Format => {0} = {current amount}, {1} = {max amount}")]
+        public string memberAmountFormat = "Member Amount: {0}/{1}";
+
+        [Header("UI Elements")]
         public UIPartyMember uiPartyMemberDialog;
         public UIPartyMember uiPartyMemberPrefab;
         public Transform uiPartyMemberContainer;
         public Toggle toggleShareExp;
         public Toggle toggleShareItem;
+        public TextWrapper textMemberAmount;
         public UIPartyCreate uiPartyCreate;
         public UIPartySetting uiPartySetting;
         [Tooltip("These objects will be activated when owning character is in party")]
@@ -31,6 +37,7 @@ namespace MultiplayerARPG
 
         public bool shareExp { get; private set; }
         public bool shareItem { get; private set; }
+        public int memberAmount { get; private set; }
         public string leaderId { get; private set; }
 
         private UIList cacheList;
@@ -78,7 +85,7 @@ namespace MultiplayerARPG
             {
                 currentCharacterId = BasePlayerCharacterController.OwningCharacter.Id;
                 currentPartyId = BasePlayerCharacterController.OwningCharacter.PartyId;
-                UpdateObjects();
+                UpdateUIs();
 
                 // Refresh party info
                 if (currentPartyId <= 0)
@@ -96,7 +103,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void UpdateObjects()
+        private void UpdateUIs()
         {
             if (toggleShareExp != null)
             {
@@ -109,6 +116,9 @@ namespace MultiplayerARPG
                 toggleShareItem.interactable = false;
                 toggleShareItem.isOn = shareItem;
             }
+
+            if (textMemberAmount != null)
+                textMemberAmount.text = string.Format(memberAmountFormat, memberAmount.ToString("N0"), GameInstance.Singleton.maxPartyMember.ToString("N0"));
 
             foreach (var obj in owningCharacterIsInPartyObjects)
             {
@@ -149,7 +159,7 @@ namespace MultiplayerARPG
             SelectionManager.eventOnDeselect.RemoveListener(OnDeselectPartyMember);
             SelectionManager.eventOnDeselect.AddListener(OnDeselectPartyMember);
             RefreshPartyInfo();
-            UpdateObjects();
+            UpdateUIs();
         }
 
         public override void Hide()
@@ -186,7 +196,8 @@ namespace MultiplayerARPG
                 shareExp = castedMessage.shareExp;
                 shareItem = castedMessage.shareItem;
                 leaderId = castedMessage.leaderId;
-                UpdateObjects();
+                memberAmount = castedMessage.members.Length;
+                UpdateUIs();
 
                 var selectedIdx = SelectionManager.SelectedUI != null ? SelectionManager.IndexOf(SelectionManager.SelectedUI) : -1;
                 SelectionManager.DeselectSelectedUI();
