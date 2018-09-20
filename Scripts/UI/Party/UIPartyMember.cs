@@ -52,7 +52,7 @@ namespace MultiplayerARPG
         public TextWrapper uiTextClassTitle;
         public TextWrapper uiTextClassDescription;
         public Image imageClassIcon;
-        
+
         protected override void UpdateData()
         {
             if (uiTextName != null)
@@ -66,20 +66,26 @@ namespace MultiplayerARPG
             var maxHp = Data.partyMember.maxHp;
 
             if (uiTextHp != null)
+            {
                 uiTextHp.text = string.Format(hpFormat, currentHp.ToString("N0"), maxHp.ToString("N0"));
+                uiTextHp.gameObject.SetActive(maxHp > 0);
+            }
 
             if (imageHpGage != null)
-                imageHpGage.fillAmount = maxHp <= 0 ? 1 : (float)currentHp / (float)maxHp;
+                imageHpGage.fillAmount = maxHp <= 0 ? 0 : (float)currentHp / (float)maxHp;
 
             // Mp
             var currentMp = Data.partyMember.currentMp;
             var maxMp = Data.partyMember.maxMp;
 
             if (uiTextMp != null)
+            {
                 uiTextMp.text = string.Format(mpFormat, currentMp.ToString("N0"), maxMp.ToString("N0"));
+                uiTextMp.gameObject.SetActive(maxMp > 0);
+            }
 
             if (imageMpGage != null)
-                imageMpGage.fillAmount = maxMp <= 0 ? 1 : (float)currentMp / (float)maxMp;
+                imageMpGage.fillAmount = maxMp <= 0 ? 0 : (float)currentMp / (float)maxMp;
 
             // Buffs
             if (uiCharacterBuffs != null)

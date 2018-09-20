@@ -172,7 +172,7 @@ namespace MultiplayerARPG
                 uiTextHp.text = string.Format(hpFormat, currentHp.ToString("N0"), maxHp.ToString("N0"));
 
             if (imageHpGage != null)
-                imageHpGage.fillAmount = maxHp <= 0 ? 1 : (float)currentHp / (float)maxHp;
+                imageHpGage.fillAmount = maxHp <= 0 ? 0 : (float)currentHp / (float)maxHp;
 
             // Mp
             var currentMp = 0;
@@ -187,7 +187,7 @@ namespace MultiplayerARPG
                 uiTextMp.text = string.Format(mpFormat, currentMp.ToString("N0"), maxMp.ToString("N0"));
 
             if (imageMpGage != null)
-                imageMpGage.fillAmount = maxMp <= 0 ? 1 : (float)currentMp / (float)maxMp;
+                imageMpGage.fillAmount = maxMp <= 0 ? 0 : (float)currentMp / (float)maxMp;
 
             // Stamina
             var currentStamina = 0;
@@ -202,7 +202,7 @@ namespace MultiplayerARPG
                 uiTextStamina.text = string.Format(staminaFormat, currentStamina.ToString("N0"), maxStamina.ToString("N0"));
 
             if (imageStaminaGage != null)
-                imageStaminaGage.fillAmount = maxStamina <= 0 ? 1 : (float)currentStamina / (float)maxStamina;
+                imageStaminaGage.fillAmount = maxStamina <= 0 ? 0 : (float)currentStamina / (float)maxStamina;
 
             // Food
             var currentFood = 0;
@@ -217,7 +217,7 @@ namespace MultiplayerARPG
                 uiTextFood.text = string.Format(foodFormat, currentFood.ToString("N0"), maxFood.ToString("N0"));
 
             if (imageFoodGage != null)
-                imageFoodGage.fillAmount = maxFood <= 0 ? 1 : (float)currentFood / (float)maxFood;
+                imageFoodGage.fillAmount = maxFood <= 0 ? 0 : (float)currentFood / (float)maxFood;
 
             // Water
             var currentWater = 0;
@@ -232,7 +232,7 @@ namespace MultiplayerARPG
                 uiTextWater.text = string.Format(waterFormat, currentWater.ToString("N0"), maxWater.ToString("N0"));
 
             if (imageWaterGage != null)
-                imageWaterGage.fillAmount = maxWater <= 0 ? 1 : (float)currentWater / (float)maxWater;
+                imageWaterGage.fillAmount = maxWater <= 0 ? 0 : (float)currentWater / (float)maxWater;
 
             // Player character data
             var playerCharacter = Data as IPlayerCharacterData;
