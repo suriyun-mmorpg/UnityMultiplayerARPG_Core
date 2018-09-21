@@ -69,16 +69,16 @@ namespace MultiplayerARPG
         protected virtual void UpdatePartyMembers()
         {
             var time = Time.unscaledTime;
+            BasePlayerCharacterEntity playerCharacter;
             tempPartyDataArray = parties.Values.ToArray();
             foreach (var party in tempPartyDataArray)
             {
                 tempPartyMemberIdArray = party.GetMemberIds().ToArray();
                 foreach (var memberId in tempPartyMemberIdArray)
                 {
-                    BasePlayerCharacterEntity playerCharacterEntity;
-                    if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
+                    if (playerCharactersById.TryGetValue(memberId, out playerCharacter))
                     {
-                        party.UpdateMember(playerCharacterEntity);
+                        party.UpdateMember(playerCharacter);
                         party.NotifyMemberOnline(memberId, time);
                     }
                     party.UpdateMemberOnline(memberId, time);
@@ -203,13 +203,38 @@ namespace MultiplayerARPG
 
         protected virtual void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
         {
-            var peer = messageHandler.peer;
-            var message = messageHandler.ReadMessage<ChatMessage>();
-            ReadChatMessage(message);
+            ReadChatMessage(FillChatChannelId(messageHandler.ReadMessage<ChatMessage>()));
+        }
+
+        protected ChatMessage FillChatChannelId(ChatMessage message)
+        {
+            NetPeer senderPeer;
+            BasePlayerCharacterEntity playerCharacter;
+            if (message.channel == ChatChannel.Party || message.channel == ChatChannel.Guild)
+            {
+                if (!string.IsNullOrEmpty(message.sender) &&
+                    peersByCharacterName.TryGetValue(message.sender, out senderPeer) &&
+                    playerCharacters.TryGetValue(senderPeer.ConnectId, out playerCharacter))
+                {
+                    switch (message.channel)
+                    {
+                        case ChatChannel.Party:
+                            message.channelId = playerCharacter.PartyId;
+                            break;
+                        case ChatChannel.Guild:
+                            message.channelId = playerCharacter.GuildId;
+                            break;
+                    }
+                }
+            }
+            return message;
         }
 
         protected virtual void ReadChatMessage(ChatMessage message)
         {
+            NetPeer senderPeer;
+            NetPeer receiverPeer;
+            BasePlayerCharacterEntity playerCharacter;
             switch (message.channel)
             {
                 case ChatChannel.Global:
@@ -217,8 +242,6 @@ namespace MultiplayerARPG
                     SendPacketToAllPeers(SendOptions.ReliableOrdered, MsgTypes.Chat, message);
                     break;
                 case ChatChannel.Whisper:
-                    NetPeer senderPeer;
-                    NetPeer receiverPeer;
                     if (!string.IsNullOrEmpty(message.sender) &&
                         peersByCharacterName.TryGetValue(message.sender, out senderPeer))
                         LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, senderPeer, MsgTypes.Chat, message);
@@ -227,7 +250,17 @@ namespace MultiplayerARPG
                         LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, receiverPeer, MsgTypes.Chat, message);
                     break;
                 case ChatChannel.Party:
-                    // TODO: Implement this later when party system ready
+                    PartyData party;
+                    if (parties.TryGetValue(message.channelId, out party))
+                    {
+                        tempPartyMemberIdArray = party.GetMemberIds().ToArray();
+                        foreach (var memberId in tempPartyMemberIdArray)
+                        {
+                            if (playerCharactersById.TryGetValue(memberId, out playerCharacter) &&
+                                TryGetPeer(playerCharacter.ConnectId, out receiverPeer))
+                                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, receiverPeer, MsgTypes.Chat, message);
+                        }
+                    }
                     break;
                 case ChatChannel.Guild:
                     // TODO: Implement this later when guild system ready
