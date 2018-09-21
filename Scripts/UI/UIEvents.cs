@@ -53,8 +53,8 @@ namespace MultiplayerARPG
     public class UICashPackageEvent : UnityEvent<UICashPackage> { }
 
     [System.Serializable]
-    public class PartyMemberEvent : UnityEvent<PartyMemberEntityTuple> { }
+    public class SocialCharacterEvent : UnityEvent<SocialCharacterEntityTuple> { }
 
     [System.Serializable]
-    public class UIPartyMemberEvent : UnityEvent<UIPartyMember> { }
+    public class UISocialCharacterEvent : UnityEvent<UISocialCharacter> { }
 }

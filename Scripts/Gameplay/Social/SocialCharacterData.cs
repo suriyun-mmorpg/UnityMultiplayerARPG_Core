@@ -1,12 +1,12 @@
 ﻿namespace MultiplayerARPG
 {
-    public struct PartyMemberData
+    public struct SocialCharacterData
     {
         public string id;
         public string characterName;
         public int dataId;
         public int level;
-        public bool isVisible;
+        public bool isOnline;
         public int currentHp;
         public int maxHp;
         public int currentMp;

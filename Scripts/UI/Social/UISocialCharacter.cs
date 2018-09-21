@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UIPartyMember : UISelectionEntry<PartyMemberEntityTuple>
+    public class UISocialCharacter : UISelectionEntry<SocialCharacterEntityTuple>
     {
         [Header("Display Format")]
         [Tooltip("Name Format => {0} = {Character name}")]
@@ -56,14 +56,14 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             if (uiTextName != null)
-                uiTextName.text = string.Format(nameFormat, string.IsNullOrEmpty(Data.partyMember.characterName) ? "Unknow" : Data.partyMember.characterName);
+                uiTextName.text = string.Format(nameFormat, string.IsNullOrEmpty(Data.socialCharacter.characterName) ? "Unknow" : Data.socialCharacter.characterName);
 
             if (uiTextLevel != null)
-                uiTextLevel.text = string.Format(levelFormat, Data.partyMember.level.ToString("N0"));
+                uiTextLevel.text = string.Format(levelFormat, Data.socialCharacter.level.ToString("N0"));
 
             // Hp
-            var currentHp = Data.partyMember.currentHp;
-            var maxHp = Data.partyMember.maxHp;
+            var currentHp = Data.socialCharacter.currentHp;
+            var maxHp = Data.socialCharacter.maxHp;
 
             if (uiTextHp != null)
             {
@@ -75,8 +75,8 @@ namespace MultiplayerARPG
                 imageHpGage.fillAmount = maxHp <= 0 ? 0 : (float)currentHp / (float)maxHp;
 
             // Mp
-            var currentMp = Data.partyMember.currentMp;
-            var maxMp = Data.partyMember.maxMp;
+            var currentMp = Data.socialCharacter.currentMp;
+            var maxMp = Data.socialCharacter.maxMp;
 
             if (uiTextMp != null)
             {
@@ -95,25 +95,25 @@ namespace MultiplayerARPG
             foreach (var obj in memberIsVisibleObjects)
             {
                 if (obj != null)
-                    obj.SetActive(Data.partyMember.isVisible);
+                    obj.SetActive(Data.socialCharacter.isOnline);
             }
 
             foreach (var obj in memberIsNotInvisibleObjects)
             {
                 if (obj != null)
-                    obj.SetActive(!Data.partyMember.isVisible);
+                    obj.SetActive(!Data.socialCharacter.isOnline);
             }
 
             foreach (var obj in memberIsLeaderObjects)
             {
                 if (obj != null)
-                    obj.SetActive(!string.IsNullOrEmpty(Data.partyMember.id) && Data.partyMember.id.Equals(uiParty.leaderId));
+                    obj.SetActive(!string.IsNullOrEmpty(Data.socialCharacter.id) && Data.socialCharacter.id.Equals(uiParty.leaderId));
             }
 
             foreach (var obj in memberIsNotLeaderObjects)
             {
                 if (obj != null)
-                    obj.SetActive(string.IsNullOrEmpty(Data.partyMember.id) || !Data.partyMember.id.Equals(uiParty.leaderId));
+                    obj.SetActive(string.IsNullOrEmpty(Data.socialCharacter.id) || !Data.socialCharacter.id.Equals(uiParty.leaderId));
             }
 
             foreach (var obj in owningCharacterIsLeaderObjects)
@@ -130,7 +130,7 @@ namespace MultiplayerARPG
 
             // Character class data
             PlayerCharacter character = null;
-            GameInstance.PlayerCharacters.TryGetValue(Data.partyMember.dataId, out character);
+            GameInstance.PlayerCharacters.TryGetValue(Data.socialCharacter.dataId, out character);
 
             if (uiTextClassTitle != null)
                 uiTextClassTitle.text = string.Format(classTitleFormat, character == null ? "N/A" : character.title);

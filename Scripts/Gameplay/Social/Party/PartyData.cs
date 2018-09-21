@@ -8,8 +8,9 @@ namespace MultiplayerARPG
         public bool shareExp { get; private set; }
         public bool shareItem { get; private set; }
         public string leaderId { get; private set; }
-        private Dictionary<string, PartyMemberData> members;
-        private PartyMemberData tempMemberData;
+        private Dictionary<string, SocialCharacterData> members;
+        private Dictionary<string, float> lastOnlineTimes;
+        private SocialCharacterData tempMemberData;
         
         public PartyData(int id, bool shareExp, bool shareItem, string leaderId)
         {
@@ -17,7 +18,8 @@ namespace MultiplayerARPG
             this.shareExp = shareExp;
             this.shareItem = shareItem;
             this.leaderId = leaderId;
-            members = new Dictionary<string, PartyMemberData>();
+            members = new Dictionary<string, SocialCharacterData>();
+            lastOnlineTimes = new Dictionary<string, float>();
         }
 
         public PartyData(int id, bool shareExp, bool shareItem, BasePlayerCharacterEntity leaderCharacterEntity) : this(id, shareExp, shareItem, string.Empty)
@@ -26,14 +28,14 @@ namespace MultiplayerARPG
             leaderId = leaderCharacterEntity.Id;
         }
 
-        public PartyMemberData CreatePartyMemberData(BasePlayerCharacterEntity playerCharacterEntity)
+        public SocialCharacterData CreatePartyMemberData(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            tempMemberData = new PartyMemberData();
+            tempMemberData = new SocialCharacterData();
             tempMemberData.id = playerCharacterEntity.Id;
             tempMemberData.characterName = playerCharacterEntity.CharacterName;
             tempMemberData.dataId = playerCharacterEntity.DataId;
             tempMemberData.level = playerCharacterEntity.Level;
-            tempMemberData.isVisible = true;
+            tempMemberData.isOnline = true;
             tempMemberData.currentHp = playerCharacterEntity.CurrentHp;
             tempMemberData.maxHp = playerCharacterEntity.CacheMaxHp;
             tempMemberData.currentMp = playerCharacterEntity.CurrentMp;
@@ -41,14 +43,20 @@ namespace MultiplayerARPG
             return tempMemberData;
         }
 
-        public void UpdateMemberVisible(string characterId, bool isVisible)
+        public void NotifyMemberOnline(string characterId, float time)
         {
-            PartyMemberData member;
-            if (members.TryGetValue(characterId, out member))
-            {
-                member.isVisible = isVisible;
-                members[characterId] = member;
-            }
+            if (members.ContainsKey(characterId))
+                lastOnlineTimes[characterId] = time;
+        }
+
+        public void UpdateMemberOnline(string characterId, float time)
+        {
+            SocialCharacterData member;
+            float lastOnlineTime;
+            member.isOnline = members.TryGetValue(characterId, out member) &&
+                lastOnlineTimes.TryGetValue(characterId, out lastOnlineTime) &&
+                time - lastOnlineTime <= 2f;
+            members[characterId] = member;
         }
 
         public void Setting(bool shareExp, bool shareItem)
@@ -72,7 +80,7 @@ namespace MultiplayerARPG
             AddMember(CreatePartyMemberData(playerCharacterEntity));
         }
 
-        public void AddMember(PartyMemberData partyMemberData)
+        public void AddMember(SocialCharacterData partyMemberData)
         {
             if (!members.ContainsKey(partyMemberData.id))
             {
@@ -91,7 +99,7 @@ namespace MultiplayerARPG
             UpdateMember(CreatePartyMemberData(playerCharacterEntity));
         }
 
-        public void UpdateMember(PartyMemberData partyMemberData)
+        public void UpdateMember(SocialCharacterData partyMemberData)
         {
             if (!members.ContainsKey(partyMemberData.id))
                 return;
@@ -136,12 +144,12 @@ namespace MultiplayerARPG
             return members.Keys;
         }
 
-        public IEnumerable<PartyMemberData> GetMembers()
+        public IEnumerable<SocialCharacterData> GetMembers()
         {
             return members.Values;
         }
 
-        public PartyMemberData GetMemberById(string characterId)
+        public SocialCharacterData GetMemberById(string characterId)
         {
             return members[characterId];
         }

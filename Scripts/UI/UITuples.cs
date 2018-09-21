@@ -88,9 +88,9 @@
         }
     }
 
-    public struct PartyMemberEntityTuple
+    public struct SocialCharacterEntityTuple
     {
-        public PartyMemberData partyMember;
+        public SocialCharacterData socialCharacter;
         public BasePlayerCharacterEntity characterEntity;
     }
 }

@@ -68,6 +68,7 @@ namespace MultiplayerARPG
 
         protected virtual void UpdatePartyMembers()
         {
+            var time = Time.unscaledTime;
             tempPartyDataArray = parties.Values.ToArray();
             foreach (var party in tempPartyDataArray)
             {
@@ -78,10 +79,9 @@ namespace MultiplayerARPG
                     if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
                     {
                         party.UpdateMember(playerCharacterEntity);
-                        party.UpdateMemberVisible(memberId, true);
+                        party.NotifyMemberOnline(memberId, time);
                     }
-                    else
-                        party.UpdateMemberVisible(memberId, false);
+                    party.UpdateMemberOnline(memberId, time);
                 }
             }
         }

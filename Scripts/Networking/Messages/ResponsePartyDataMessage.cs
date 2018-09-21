@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         public bool shareExp;
         public bool shareItem;
         public string leaderId;
-        public PartyMemberData[] members;
+        public SocialCharacterData[] members;
 
         public override void DeserializeData(NetDataReader reader)
         {
@@ -18,19 +18,19 @@ namespace MultiplayerARPG
             shareItem = reader.GetBool();
             leaderId = reader.GetString();
             var length = reader.GetInt();
-            var members = new PartyMemberData[length];
+            var members = new SocialCharacterData[length];
             if (length > 0)
             {
                 for (var i = 0; i < length; ++i)
                 {
-                    var entry = new PartyMemberData();
+                    var entry = new SocialCharacterData();
                     entry.id = reader.GetString();
                     entry.characterName = reader.GetString();
                     entry.dataId = reader.GetInt();
                     entry.level = reader.GetInt();
-                    entry.isVisible = reader.GetBool();
+                    entry.isOnline = reader.GetBool();
                     // Read extra data
-                    if (entry.isVisible)
+                    if (entry.isOnline)
                     {
                         entry.currentHp = reader.GetInt();
                         entry.maxHp = reader.GetInt();
@@ -59,9 +59,9 @@ namespace MultiplayerARPG
                     writer.Put(entry.characterName);
                     writer.Put(entry.dataId);
                     writer.Put(entry.level);
-                    writer.Put(entry.isVisible);
+                    writer.Put(entry.isOnline);
                     // Put extra data
-                    if (entry.isVisible)
+                    if (entry.isOnline)
                     {
                         writer.Put(entry.currentHp);
                         writer.Put(entry.maxHp);
