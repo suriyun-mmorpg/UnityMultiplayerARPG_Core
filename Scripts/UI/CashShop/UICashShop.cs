@@ -149,9 +149,6 @@ namespace MultiplayerARPG
                         case ResponseCashShopBuyMessage.Error.UserNotFound:
                             errorMessage = "User not found";
                             break;
-                        case ResponseCashShopBuyMessage.Error.CharacterNotFound:
-                            errorMessage = "Character not found";
-                            break;
                         case ResponseCashShopBuyMessage.Error.ItemNotFound:
                             errorMessage = "Item not found";
                             break;

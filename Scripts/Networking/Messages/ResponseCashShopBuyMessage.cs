@@ -13,7 +13,6 @@ namespace MultiplayerARPG
             None,
             NotAvailable,
             UserNotFound,
-            CharacterNotFound,
             ItemNotFound,
             NotEnoughCash,
         }
