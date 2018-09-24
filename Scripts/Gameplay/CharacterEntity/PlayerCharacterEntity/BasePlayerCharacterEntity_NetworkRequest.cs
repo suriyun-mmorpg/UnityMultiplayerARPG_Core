@@ -224,5 +224,45 @@ namespace MultiplayerARPG
         {
             CallNetFunction("LeaveParty", FunctionReceivers.Server);
         }
+
+        public virtual void RequestCreateGuild(string guildName)
+        {
+            CallNetFunction("CreateGuild", FunctionReceivers.Server, guildName);
+        }
+
+        public virtual void RequestSetGuildMessage(string message)
+        {
+            CallNetFunction("SetGuildMessage", FunctionReceivers.Server, message);
+        }
+
+        public virtual void RequestSendGuildInvitation(uint objectId)
+        {
+            CallNetFunction("SendGuildInvitation", FunctionReceivers.Server, objectId);
+        }
+
+        public virtual void RequestReceiveGuildInvitation(uint objectId)
+        {
+            CallNetFunction("ReceiveGuildInvitation", ConnectId, objectId);
+        }
+
+        public virtual void RequestAcceptGuildInvitation()
+        {
+            CallNetFunction("AcceptGuildInvitation", FunctionReceivers.Server);
+        }
+
+        public virtual void RequestDeclineGuildInvitation()
+        {
+            CallNetFunction("DeclineGuildInvitation", FunctionReceivers.Server);
+        }
+
+        public virtual void RequestKickFromGuild(string characterId)
+        {
+            CallNetFunction("KickFromGuild", FunctionReceivers.Server, characterId);
+        }
+
+        public virtual void RequestLeaveGuild()
+        {
+            CallNetFunction("LeaveGuild", FunctionReceivers.Server);
+        }
     }
 }

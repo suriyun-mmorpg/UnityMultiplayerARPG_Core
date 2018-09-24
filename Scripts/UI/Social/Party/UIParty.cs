@@ -7,65 +7,18 @@ using LiteNetLibManager;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(UISocialCharacterSelectionManager))]
-    public class UIParty : UIBase
+    public class UIParty : UISocialGroup
     {
-        [Header("Display Format")]
-        [Tooltip("Member Amount Format => {0} = {current amount}, {1} = {max amount}")]
-        public string memberAmountFormat = "Member Amount: {0}/{1}";
-
         [Header("UI Elements")]
-        public UISocialCharacter uiPartyMemberDialog;
-        public UISocialCharacter uiPartyMemberPrefab;
-        public Transform uiPartyMemberContainer;
         public Toggle toggleShareExp;
         public Toggle toggleShareItem;
-        public TextWrapper textMemberAmount;
         public UIPartyCreate uiPartyCreate;
         public UIPartySetting uiPartySetting;
-        [Tooltip("These objects will be activated when owning character is in party")]
-        public GameObject[] owningCharacterIsInPartyObjects;
-        [Tooltip("These objects will be activated when owning character is not in party")]
-        public GameObject[] owningCharacterIsNotInPartyObjects;
-        [Tooltip("These objects will be activated when owning character is leader")]
-        public GameObject[] owningCharacterIsLeaderObjects;
-        [Tooltip("These objects will be activated when owning character is not leader")]
-        public GameObject[] owningCharacterIsNotLeaderObjects;
         public float refreshDuration = 1f;
         private float lastRefreshTime;
-        private string currentCharacterId = string.Empty;
-        private int currentPartyId = 0;
 
         public bool shareExp { get; private set; }
         public bool shareItem { get; private set; }
-        public int memberAmount { get; private set; }
-        public string leaderId { get; private set; }
-
-        private UIList cacheList;
-        public UIList CacheList
-        {
-            get
-            {
-                if (cacheList == null)
-                {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiPartyMemberPrefab.gameObject;
-                    cacheList.uiContainer = uiPartyMemberContainer;
-                }
-                return cacheList;
-            }
-        }
-
-        private UISocialCharacterSelectionManager selectionManager;
-        public UISocialCharacterSelectionManager SelectionManager
-        {
-            get
-            {
-                if (selectionManager == null)
-                    selectionManager = GetComponent<UISocialCharacterSelectionManager>();
-                selectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return selectionManager;
-            }
-        }
 
         private BaseGameNetworkManager cacheGameNetworkManager;
         public BaseGameNetworkManager CacheGameNetworkManager
@@ -78,22 +31,12 @@ namespace MultiplayerARPG
             }
         }
 
-        private void Update()
+        protected override void Update()
         {
-            if (!currentCharacterId.Equals(BasePlayerCharacterController.OwningCharacter.Id) ||
-                currentPartyId != BasePlayerCharacterController.OwningCharacter.PartyId)
-            {
-                currentCharacterId = BasePlayerCharacterController.OwningCharacter.Id;
-                currentPartyId = BasePlayerCharacterController.OwningCharacter.PartyId;
-                UpdateUIs();
-
-                // Refresh party info
-                if (currentPartyId <= 0)
-                    CacheList.HideAll();
-            }
+            base.Update();
 
             // Refresh party info
-            if (currentPartyId > 0)
+            if (currentSocialId > 0)
             {
                 if (Time.unscaledTime - lastRefreshTime >= refreshDuration)
                 {
@@ -103,7 +46,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void UpdateUIs()
+        protected override void UpdateUIs()
         {
             if (toggleShareExp != null)
             {
@@ -117,32 +60,7 @@ namespace MultiplayerARPG
                 toggleShareItem.isOn = shareItem;
             }
 
-            if (textMemberAmount != null)
-                textMemberAmount.text = string.Format(memberAmountFormat, memberAmount.ToString("N0"), GameInstance.Singleton.maxPartyMember.ToString("N0"));
-
-            foreach (var obj in owningCharacterIsInPartyObjects)
-            {
-                if (obj != null)
-                    obj.SetActive(currentPartyId > 0);
-            }
-
-            foreach (var obj in owningCharacterIsNotInPartyObjects)
-            {
-                if (obj != null)
-                    obj.SetActive(currentPartyId <= 0);
-            }
-
-            foreach (var obj in owningCharacterIsLeaderObjects)
-            {
-                if (obj != null)
-                    obj.SetActive(currentCharacterId.Equals(leaderId));
-            }
-
-            foreach (var obj in owningCharacterIsNotLeaderObjects)
-            {
-                if (obj != null)
-                    obj.SetActive(!currentCharacterId.Equals(leaderId));
-            }
+            base.UpdateUIs();
         }
 
         public void RefreshPartyInfo()
@@ -154,38 +72,16 @@ namespace MultiplayerARPG
         public override void Show()
         {
             base.Show();
-            SelectionManager.eventOnSelect.RemoveListener(OnSelectPartyMember);
-            SelectionManager.eventOnSelect.AddListener(OnSelectPartyMember);
-            SelectionManager.eventOnDeselect.RemoveListener(OnDeselectPartyMember);
-            SelectionManager.eventOnDeselect.AddListener(OnDeselectPartyMember);
             RefreshPartyInfo();
-            UpdateUIs();
         }
 
         public override void Hide()
         {
-            SelectionManager.DeselectSelectedUI();
             if (uiPartyCreate != null)
                 uiPartyCreate.Hide();
             if (uiPartySetting != null)
                 uiPartySetting.Hide();
             base.Hide();
-        }
-
-        protected void OnSelectPartyMember(UISocialCharacter ui)
-        {
-            if (uiPartyMemberDialog != null)
-            {
-                uiPartyMemberDialog.selectionManager = SelectionManager;
-                uiPartyMemberDialog.Data = ui.Data;
-                uiPartyMemberDialog.Show();
-            }
-        }
-
-        protected void OnDeselectPartyMember(UISocialCharacter ui)
-        {
-            if (uiPartyMemberDialog != null)
-                uiPartyMemberDialog.Hide();
         }
 
         private void ResponsePartyInfo(AckResponseCode responseCode, BaseAckMessage message)
@@ -209,7 +105,7 @@ namespace MultiplayerARPG
                     partyMemberEntity.socialCharacter = partyMember;
 
                     var uiPartyMember = ui.GetComponent<UISocialCharacter>();
-                    uiPartyMember.uiParty = this;
+                    uiPartyMember.uiSocialGroup = this;
                     uiPartyMember.Data = partyMemberEntity;
                     uiPartyMember.Show();
                     SelectionManager.Add(uiPartyMember);
@@ -219,15 +115,10 @@ namespace MultiplayerARPG
             }
         }
 
-        private bool IsLeader()
-        {
-            return currentPartyId > 0 && currentCharacterId.Equals(leaderId);
-        }
-
         public void OnClickCreateParty()
         {
             // If already in the party, return
-            if (currentPartyId > 0)
+            if (currentSocialId > 0)
                 return;
             // Show create party dialog
             if (uiPartyCreate != null)
@@ -263,6 +154,11 @@ namespace MultiplayerARPG
             {
                 BasePlayerCharacterController.OwningCharacter.RequestLeaveParty();
             });
+        }
+
+        public override int GetSocialId()
+        {
+            return BasePlayerCharacterController.OwningCharacter.PartyId;
         }
     }
 }

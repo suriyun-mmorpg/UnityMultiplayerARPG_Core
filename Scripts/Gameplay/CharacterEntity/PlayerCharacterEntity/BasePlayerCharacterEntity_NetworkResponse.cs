@@ -17,6 +17,7 @@ namespace MultiplayerARPG
         public System.Action<DealingCharacterItems> onUpdateDealingItems;
         public System.Action<DealingCharacterItems> onUpdateAnotherDealingItems;
         public System.Action<BasePlayerCharacterEntity> onShowPartyInvitationDialog;
+        public System.Action<BasePlayerCharacterEntity> onShowGuildInvitationDialog;
 
         protected virtual void NetFuncSwapOrMergeItem(int fromIndex, int toIndex)
         {
@@ -416,6 +417,7 @@ namespace MultiplayerARPG
             }
         }
 
+        #region Dealing
         protected virtual void NetFuncSendDealingRequest(uint objectId)
         {
             BasePlayerCharacterEntity playerCharacterEntity = null;
@@ -601,7 +603,9 @@ namespace MultiplayerARPG
             if (onUpdateAnotherDealingItems != null)
                 onUpdateAnotherDealingItems(items);
         }
+        #endregion
 
+        #region Party
         protected virtual void NetFuncCreateParty(bool shareExp, bool shareItem)
         {
             if (PartyId > 0)
@@ -711,6 +715,119 @@ namespace MultiplayerARPG
             }
             GameManager.LeaveParty(this);
         }
+        #endregion
+
+        #region Guild
+        protected virtual void NetFuncCreateGuild(string guildName)
+        {
+            if (GuildId > 0)
+            {
+                // TODO: May send warn message that player already in guild
+                return;
+            }
+            GameManager.CreateGuild(this, guildName);
+        }
+
+        protected virtual void NetFuncSetGuildMessage(string message)
+        {
+            if (GuildId <= 0)
+            {
+                // TODO: May send warn message that player already in guild
+                return;
+            }
+            GameManager.SetGuildMessage(this, message);
+        }
+
+        protected virtual void NetFuncSendGuildInvitation(uint objectId)
+        {
+            if (GuildId <= 0)
+            {
+                // TODO: May send warn message that player is not in guild
+                return;
+            }
+            BasePlayerCharacterEntity playerCharacterEntity = null;
+            if (!TryGetEntityByObjectId(objectId, out playerCharacterEntity))
+            {
+                // TODO: May send warn message that character is not found
+                return;
+            }
+            if (playerCharacterEntity.CoCharacter != null)
+            {
+                // TODO: May send warn message that character is not available
+                return;
+            }
+            if (playerCharacterEntity.GuildId > 0)
+            {
+                // TODO: May send warn message that player already in guild
+                return;
+            }
+            CoCharacter = playerCharacterEntity;
+            CoCharacter.CoCharacter = this;
+            // Send receive guild invitation request to player
+            playerCharacterEntity.RequestReceiveGuildInvitation(ObjectId);
+        }
+
+        protected virtual void NetFuncReceiveGuildInvitation(uint objectId)
+        {
+            BasePlayerCharacterEntity playerCharacterEntity = null;
+            if (!TryGetEntityByObjectId(objectId, out playerCharacterEntity))
+                return;
+            if (onShowGuildInvitationDialog != null)
+                onShowGuildInvitationDialog(playerCharacterEntity);
+        }
+
+        protected virtual void NetFuncAcceptGuildInvitation()
+        {
+            if (GuildId > 0)
+            {
+                // TODO: May send warn message that player already in guild
+                return;
+            }
+            if (CoCharacter == null)
+            {
+                // TODO: May send warn message that can not accept guild invitation
+                return;
+            }
+            if (CoCharacter.GuildId <= 0)
+            {
+                // TODO: May send warn message that player is not in guild
+                return;
+            }
+            GameManager.AddGuildMember(CoCharacter, this);
+            StopGuildInvitation();
+        }
+
+        protected virtual void NetFuncDeclineGuildInvitation()
+        {
+            StopGuildInvitation();
+            // TODO: May send decline message
+        }
+
+        protected virtual void NetFuncKickFromGuild(string characterId)
+        {
+            if (GuildId <= 0)
+            {
+                // TODO: May send warn message that player is not in guild
+                return;
+            }
+            if (Id.Equals(characterId))
+            {
+                // TODO: May warn that it's owning character so it's not able to kick
+                return;
+            }
+            GameManager.KickFromGuild(this, characterId);
+        }
+
+        protected virtual void NetFuncLeaveGuild()
+        {
+            if (GuildId <= 0)
+            {
+                // TODO: May send warn message that player is not in guild
+                return;
+            }
+            GameManager.LeaveGuild(this);
+        }
+        #endregion
 
         protected virtual void StopDealing()
         {
@@ -728,6 +845,13 @@ namespace MultiplayerARPG
         }
 
         protected virtual void StopPartyInvitation()
+        {
+            if (CoCharacter != null)
+                CoCharacter.CoCharacter = null;
+            CoCharacter = null;
+        }
+
+        protected virtual void StopGuildInvitation()
         {
             if (CoCharacter != null)
                 CoCharacter.CoCharacter = null;

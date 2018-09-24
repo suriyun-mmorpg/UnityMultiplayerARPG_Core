@@ -4,9 +4,7 @@ namespace MultiplayerARPG
 {
     public class GuildData : SocialGroupData
     {
-        public int id { get; private set; }
         public string guildName { get; private set; }
-        public string leaderId { get; private set; }
         public string leaderName { get; private set; }
         public int level;
         public int exp;
@@ -14,11 +12,9 @@ namespace MultiplayerARPG
         public string message;
 
         public GuildData(int id, string guildName, string leaderId, string leaderName)
-            : base()
+            : base(id, leaderId)
         {
-            this.id = id;
             this.guildName = guildName;
-            this.leaderId = leaderId;
             this.leaderName = leaderName;
             level = 1;
             exp = 0;
@@ -31,16 +27,5 @@ namespace MultiplayerARPG
         {
             AddMember(leaderCharacterEntity);
         }
-
-        public bool IsLeader(BasePlayerCharacterEntity playerCharacterEntity)
-        {
-            return IsLeader(playerCharacterEntity.Id);
-        }
-
-        public bool IsLeader(string characterId)
-        {
-            return characterId.Equals(leaderId);
-        }
-
     }
 }

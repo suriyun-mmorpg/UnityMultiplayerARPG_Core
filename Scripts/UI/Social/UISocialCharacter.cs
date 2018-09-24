@@ -27,7 +27,7 @@ namespace MultiplayerARPG
         public string classDescriptionFormat = "{0}";
 
         [Header("UI Elements")]
-        public UIParty uiParty;
+        public UISocialGroup uiSocialGroup;
         public TextWrapper uiTextName;
         public TextWrapper uiTextLevel;
         public TextWrapper uiTextHp;
@@ -36,13 +36,13 @@ namespace MultiplayerARPG
         public Image imageMpGage;
         public UICharacterBuffs uiCharacterBuffs;
         [Header("Member states objects")]
-        [Tooltip("These objects will be activated when partyMemberData -> isVisible is true")]
-        public GameObject[] memberIsVisibleObjects;
-        [Tooltip("These objects will be activated when partyMemberData -> isVisible is false")]
-        public GameObject[] memberIsNotInvisibleObjects;
-        [Tooltip("These objects will be activated when this party member is leader")]
+        [Tooltip("These objects will be activated when social member -> isOnline is true")]
+        public GameObject[] memberIsOnlineObjects;
+        [Tooltip("These objects will be activated when social member -> isOnline is false")]
+        public GameObject[] memberIsNotOnlineObjects;
+        [Tooltip("These objects will be activated when this social member is leader")]
         public GameObject[] memberIsLeaderObjects;
-        [Tooltip("These objects will be activated when this party member is not leader")]
+        [Tooltip("These objects will be activated when this social member is not leader")]
         public GameObject[] memberIsNotLeaderObjects;
         [Tooltip("These objects will be activated when owning character is leader")]
         public GameObject[] owningCharacterIsLeaderObjects;
@@ -92,13 +92,13 @@ namespace MultiplayerARPG
                 uiCharacterBuffs.UpdateData(Data.characterEntity);
 
             // Member status
-            foreach (var obj in memberIsVisibleObjects)
+            foreach (var obj in memberIsOnlineObjects)
             {
                 if (obj != null)
                     obj.SetActive(Data.socialCharacter.isOnline);
             }
 
-            foreach (var obj in memberIsNotInvisibleObjects)
+            foreach (var obj in memberIsNotOnlineObjects)
             {
                 if (obj != null)
                     obj.SetActive(!Data.socialCharacter.isOnline);
@@ -107,25 +107,25 @@ namespace MultiplayerARPG
             foreach (var obj in memberIsLeaderObjects)
             {
                 if (obj != null)
-                    obj.SetActive(!string.IsNullOrEmpty(Data.socialCharacter.id) && Data.socialCharacter.id.Equals(uiParty.leaderId));
+                    obj.SetActive(!string.IsNullOrEmpty(Data.socialCharacter.id) && Data.socialCharacter.id.Equals(uiSocialGroup.leaderId));
             }
 
             foreach (var obj in memberIsNotLeaderObjects)
             {
                 if (obj != null)
-                    obj.SetActive(string.IsNullOrEmpty(Data.socialCharacter.id) || !Data.socialCharacter.id.Equals(uiParty.leaderId));
+                    obj.SetActive(string.IsNullOrEmpty(Data.socialCharacter.id) || !Data.socialCharacter.id.Equals(uiSocialGroup.leaderId));
             }
 
             foreach (var obj in owningCharacterIsLeaderObjects)
             {
                 if (obj != null)
-                    obj.SetActive(BasePlayerCharacterController.OwningCharacter.Id.Equals(uiParty.leaderId));
+                    obj.SetActive(BasePlayerCharacterController.OwningCharacter.Id.Equals(uiSocialGroup.leaderId));
             }
 
             foreach (var obj in owningCharacterIsNotLeaderObjects)
             {
                 if (obj != null)
-                    obj.SetActive(!BasePlayerCharacterController.OwningCharacter.Id.Equals(uiParty.leaderId));
+                    obj.SetActive(!BasePlayerCharacterController.OwningCharacter.Id.Equals(uiSocialGroup.leaderId));
             }
 
             // Character class data

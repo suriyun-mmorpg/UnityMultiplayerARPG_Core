@@ -8,8 +8,13 @@ namespace MultiplayerARPG
         protected Dictionary<string, float> lastOnlineTimes;
         protected SocialCharacterData tempMemberData;
 
-        public SocialGroupData()
+        public int id { get; private set; }
+        public string leaderId { get; private set; }
+
+        public SocialGroupData(int id, string leaderId)
         {
+            this.id = id;
+            this.leaderId = leaderId;
             members = new Dictionary<string, SocialCharacterData>();
             lastOnlineTimes = new Dictionary<string, float>();
         }
@@ -122,6 +127,16 @@ namespace MultiplayerARPG
         public SocialCharacterData GetMemberById(string characterId)
         {
             return members[characterId];
+        }
+
+        public bool IsLeader(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            return IsLeader(playerCharacterEntity.Id);
+        }
+
+        public bool IsLeader(string characterId)
+        {
+            return characterId.Equals(leaderId);
         }
     }
 }

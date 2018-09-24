@@ -23,6 +23,7 @@ namespace MultiplayerARPG
         public PlayerCharacterData selectedCharacter;
         private float lastSaveTime;
         private int nextPartyId = 1;
+        private int nextGuildId = 1;
 
         protected override void Awake()
         {
@@ -74,6 +75,7 @@ namespace MultiplayerARPG
         {
             base.OnStopServer();
             nextPartyId = 1;
+            nextGuildId = 1;
         }
 
         public override void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
@@ -262,6 +264,102 @@ namespace MultiplayerARPG
                 playerCharacterEntity.PartyId = 0;
                 party.RemoveMember(playerCharacterEntity.Id);
                 parties[partyId] = party;
+            }
+        }
+
+        public override void CreateGuild(BasePlayerCharacterEntity playerCharacterEntity, string guildName)
+        {
+            if (playerCharacterEntity == null || !IsServer)
+                return;
+            var guildId = nextGuildId++;
+            var guild = new GuildData(guildId, guildName, playerCharacterEntity);
+            guilds[guildId] = guild;
+            playerCharacterEntity.GuildId = guildId;
+        }
+
+        public override void SetGuildMessage(BasePlayerCharacterEntity playerCharacterEntity, string message)
+        {
+            if (playerCharacterEntity == null || !IsServer)
+                return;
+            var guildId = playerCharacterEntity.GuildId;
+            GuildData guild;
+            if (!guilds.TryGetValue(guildId, out guild))
+                return;
+            if (!guild.IsLeader(playerCharacterEntity))
+            {
+                // TODO: May warn that it's not guild leader
+                return;
+            }
+            guild.message = message;
+            guilds[guildId] = guild;
+        }
+
+        public override void AddGuildMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity)
+        {
+            if (inviteCharacterEntity == null || acceptCharacterEntity == null || !IsServer)
+                return;
+            var guildId = inviteCharacterEntity.GuildId;
+            GuildData guild;
+            if (!guilds.TryGetValue(guildId, out guild))
+                return;
+            if (!guild.IsLeader(inviteCharacterEntity))
+            {
+                // TODO: May warn that it's not guild leader
+                return;
+            }
+            if (guild.CountMember() == gameInstance.maxGuildMember)
+            {
+                // TODO: May warn that it's exceeds limit max guild member
+                return;
+            }
+            guild.AddMember(acceptCharacterEntity);
+            guilds[guildId] = guild;
+            acceptCharacterEntity.GuildId = guildId;
+        }
+
+        public override void KickFromGuild(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
+        {
+            if (playerCharacterEntity == null || !IsServer)
+                return;
+            var guildId = playerCharacterEntity.GuildId;
+            GuildData guild;
+            if (!guilds.TryGetValue(guildId, out guild))
+                return;
+            if (!guild.IsLeader(playerCharacterEntity))
+            {
+                // TODO: May warn that it's not guild leader
+                return;
+            }
+            BasePlayerCharacterEntity memberCharacterEntity;
+            if (playerCharactersById.TryGetValue(characterId, out memberCharacterEntity))
+                memberCharacterEntity.GuildId = 0;
+            guild.RemoveMember(characterId);
+            guilds[guildId] = guild;
+        }
+
+        public override void LeaveGuild(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            if (playerCharacterEntity == null || !IsServer)
+                return;
+            var guildId = playerCharacterEntity.GuildId;
+            GuildData guild;
+            if (!guilds.TryGetValue(guildId, out guild))
+                return;
+            if (guild.IsLeader(playerCharacterEntity))
+            {
+                foreach (var memberId in guild.GetMemberIds())
+                {
+                    BasePlayerCharacterEntity memberCharacterEntity;
+                    if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
+                        memberCharacterEntity.GuildId = 0;
+                }
+                guilds.Remove(guildId);
+            }
+            else
+            {
+                playerCharacterEntity.GuildId = 0;
+                guild.RemoveMember(playerCharacterEntity.Id);
+                guilds[guildId] = guild;
             }
         }
         #endregion

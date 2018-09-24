@@ -77,6 +77,14 @@ namespace MultiplayerARPG
             RegisterNetFunction("DeclinePartyInvitation", new LiteNetLibFunction(NetFuncDeclinePartyInvitation));
             RegisterNetFunction("KickFromParty", new LiteNetLibFunction<NetFieldString>((characterId) => NetFuncKickFromParty(characterId)));
             RegisterNetFunction("LeaveParty", new LiteNetLibFunction(NetFuncLeaveParty));
+            RegisterNetFunction("CreateGuild", new LiteNetLibFunction<NetFieldString>((guildName) => NetFuncCreateGuild(guildName)));
+            RegisterNetFunction("SetGuildMessage", new LiteNetLibFunction<NetFieldString>((message) => NetFuncSetGuildMessage(message)));
+            RegisterNetFunction("SendGuildInvitation", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncSendGuildInvitation(objectId)));
+            RegisterNetFunction("ReceiveGuildInvitation", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncReceiveGuildInvitation(objectId)));
+            RegisterNetFunction("AcceptGuildInvitation", new LiteNetLibFunction(NetFuncAcceptGuildInvitation));
+            RegisterNetFunction("DeclineGuildInvitation", new LiteNetLibFunction(NetFuncDeclineGuildInvitation));
+            RegisterNetFunction("KickFromGuild", new LiteNetLibFunction<NetFieldString>((characterId) => NetFuncKickFromGuild(characterId)));
+            RegisterNetFunction("LeaveGuild", new LiteNetLibFunction(NetFuncLeaveGuild));
 
             // Setup relates elements
             if (IsOwnerClient)
