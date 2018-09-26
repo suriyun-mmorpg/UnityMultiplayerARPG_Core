@@ -85,6 +85,11 @@ namespace MultiplayerARPG
             RegisterNetFunction("DeclineGuildInvitation", new LiteNetLibFunction(NetFuncDeclineGuildInvitation));
             RegisterNetFunction("KickFromGuild", new LiteNetLibFunction<NetFieldString>((characterId) => NetFuncKickFromGuild(characterId)));
             RegisterNetFunction("LeaveGuild", new LiteNetLibFunction(NetFuncLeaveGuild));
+        }
+
+        protected override void EntityOnSetOwnerClient()
+        {
+            base.EntityOnSetOwnerClient();
 
             // Setup relates elements
             if (IsOwnerClient)

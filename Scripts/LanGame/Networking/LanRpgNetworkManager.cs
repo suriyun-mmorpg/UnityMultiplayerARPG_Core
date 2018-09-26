@@ -109,14 +109,15 @@ namespace MultiplayerARPG
                 playerCharacterEntity.RequestOnRespawn();
             else
                 playerCharacterEntity.RequestOnDead();
-            RegisterPlayerCharacter(connectionId, playerCharacterEntity);
-            // Load world by owner character id
-            if (playerCharacterEntity.IsOwnerClient)
+            // Load world for first character (host)
+            if (playerCharacters.Count == 0)
             {
                 var worldSaveData = new WorldSaveData();
                 worldSaveData.LoadPersistentData(playerCharacterEntity.Id, playerCharacterEntity.CurrentMapName);
                 StartCoroutine(SpawnBuildingsAndHarvestables(worldSaveData));
             }
+            // Register player, will use registered player to send chat / player messages
+            RegisterPlayerCharacter(connectionId, playerCharacterEntity);
         }
 
         IEnumerator SpawnBuildingsAndHarvestables(WorldSaveData worldSaveData)

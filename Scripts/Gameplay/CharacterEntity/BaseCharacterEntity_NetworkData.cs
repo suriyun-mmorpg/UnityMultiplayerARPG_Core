@@ -163,14 +163,6 @@ namespace MultiplayerARPG
             // Get database
             GameInstance.AllCharacters.TryGetValue(dataId, out database);
 
-            // Hidding an object when it's host and character over sight
-            if (IsServer && IsClient)
-            {
-                LiteNetLibPlayer serverPlayer;
-                if (Manager.Players.TryGetValue(Manager.Client.ClientConnectionId, out serverPlayer) && !serverPlayer.SubscribingObjects.Contains(Identity))
-                    Identity.OnServerSubscribingRemoved();
-            }
-
             if (onDataIdChange != null)
                 onDataIdChange.Invoke(dataId);
         }

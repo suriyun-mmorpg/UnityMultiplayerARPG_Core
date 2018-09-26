@@ -71,6 +71,13 @@ namespace MultiplayerARPG
         }
         protected virtual void EntityStart() { }
 
+        public override void OnSetOwnerClient()
+        {
+            EntityOnSetOwnerClient();
+            this.InvokeInstanceDevExtMethods("OnSetOwnerClient");
+        }
+        protected virtual void EntityOnSetOwnerClient() { }
+
         private void OnEnable()
         {
             EntityOnEnable();

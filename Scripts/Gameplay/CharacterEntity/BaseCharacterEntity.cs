@@ -131,9 +131,9 @@ namespace MultiplayerARPG
             isRecaching = true;
         }
 
-        protected override void EntityStart()
+        protected override void EntityOnSetOwnerClient()
         {
-            base.EntityStart();
+            base.EntityOnSetOwnerClient();
             foreach (var ownerObject in ownerObjects)
             {
                 if (ownerObject == null) continue;
