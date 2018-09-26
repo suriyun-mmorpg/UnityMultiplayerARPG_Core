@@ -13,6 +13,8 @@ namespace MultiplayerARPG
     public partial class GameInstance : MonoBehaviour
 #endif
     {
+        // Events
+        private System.Action onGameDataLoaded;
         public static GameInstance Singleton { get; protected set; }
         [SerializeField]
         private BaseGameplayRule gameplayRule;
@@ -104,9 +106,6 @@ namespace MultiplayerARPG
 
         [Header("Guild Configs")]
         public int maxGuildMember = 50;
-
-        [Header("Other Settings")]
-        public bool doNotLoadHomeSceneOnLoadedGameData;
 
         [Header("Playing In Editor")]
         public bool useMobileInEditor;
@@ -365,14 +364,26 @@ namespace MultiplayerARPG
 
             InitializePurchasing();
 
+            if (onGameDataLoaded != null)
+                onGameDataLoaded.Invoke();
+            else
+                OnGameDataLoaded();
+        }
+
+        public void SetOnGameDataLoadedCallback(System.Action callback)
+        {
+            onGameDataLoaded = callback;
+        }
+
+        private void OnGameDataLoaded()
+        {
             StartCoroutine(LoadHomeSceneOnLoadedGameDataRoutine());
         }
 
         IEnumerator LoadHomeSceneOnLoadedGameDataRoutine()
         {
             yield return new WaitForEndOfFrame();
-            if (!doNotLoadHomeSceneOnLoadedGameData)
-                UISceneLoading.Singleton.LoadScene(homeScene);
+            UISceneLoading.Singleton.LoadScene(homeScene);
         }
 
         public List<string> GetGameScenes()

@@ -78,11 +78,10 @@ namespace MultiplayerARPG
             nextGuildId = 1;
         }
 
-        public override void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
+        public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
         {
-            var connectId = peer.ConnectId;
-            UnregisterPlayerCharacter(peer);
-            base.OnPeerDisconnected(peer, disconnectInfo);
+            UnregisterPlayerCharacter(connectionId);
+            base.OnPeerDisconnected(connectionId, disconnectInfo);
         }
 
         public override void SerializeClientReadyExtra(NetDataWriter writer)
@@ -90,7 +89,7 @@ namespace MultiplayerARPG
             selectedCharacter.SerializeCharacterData(writer);
         }
 
-        public override void DeserializeClientReadyExtra(LiteNetLibIdentity playerIdentity, NetPeer peer, NetDataReader reader)
+        public override void DeserializeClientReadyExtra(LiteNetLibIdentity playerIdentity, long connectionId, NetDataReader reader)
         {
             if (LogDev) Debug.Log("[LanRpgNetworkManager] Deserializing client ready extra");
             var playerCharacterData = new PlayerCharacterData().DeserializeCharacterData(reader);
@@ -102,7 +101,7 @@ namespace MultiplayerARPG
                 return;
             }
             var playerCharacterPrefab = playerCharacter.entityPrefab;
-            var identity = Assets.NetworkSpawn(playerCharacterPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, peer.ConnectId);
+            var identity = Assets.NetworkSpawn(playerCharacterPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
             var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterData.CloneTo(playerCharacterEntity);
             // Notify clients that this character is spawn or dead
@@ -110,7 +109,7 @@ namespace MultiplayerARPG
                 playerCharacterEntity.RequestOnRespawn();
             else
                 playerCharacterEntity.RequestOnDead();
-            RegisterPlayerCharacter(peer, playerCharacterEntity);
+            RegisterPlayerCharacter(connectionId, playerCharacterEntity);
             // Load world by owner character id
             if (playerCharacterEntity.IsOwnerClient)
             {

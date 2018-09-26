@@ -167,7 +167,7 @@ namespace MultiplayerARPG
             if (IsServer && IsClient)
             {
                 LiteNetLibPlayer serverPlayer;
-                if (Manager.Players.TryGetValue(Manager.Client.Peer.ConnectId, out serverPlayer) && !serverPlayer.SubscribingObjects.Contains(Identity))
+                if (Manager.Players.TryGetValue(Manager.Client.ClientConnectionId, out serverPlayer) && !serverPlayer.SubscribingObjects.Contains(Identity))
                     Identity.OnServerSubscribingRemoved();
             }
 

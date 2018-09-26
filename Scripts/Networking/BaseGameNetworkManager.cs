@@ -27,7 +27,7 @@ namespace MultiplayerARPG
         protected readonly Dictionary<long, BasePlayerCharacterEntity> playerCharacters = new Dictionary<long, BasePlayerCharacterEntity>();
         protected readonly Dictionary<string, BasePlayerCharacterEntity> playerCharactersById = new Dictionary<string, BasePlayerCharacterEntity>();
         protected readonly Dictionary<string, BuildingEntity> buildingEntities = new Dictionary<string, BuildingEntity>();
-        protected readonly Dictionary<string, NetPeer> peersByCharacterName = new Dictionary<string, NetPeer>();
+        protected readonly Dictionary<string, long> connectionIdsByCharacterName = new Dictionary<string, long>();
         protected readonly Dictionary<int, PartyData> parties = new Dictionary<int, PartyData>();
         protected readonly Dictionary<int, GuildData> guilds = new Dictionary<int, GuildData>();
         public MapInfo CurrentMapInfo { get; protected set; }
@@ -39,9 +39,9 @@ namespace MultiplayerARPG
         protected GuildData[] tempGuildDataArray;
         protected string[] tempCharacterIdArray;
 
-        public bool TryGetPlayerCharacter(long peerId, out BasePlayerCharacterEntity result)
+        public bool TryGetPlayerCharacter(long connectionId, out BasePlayerCharacterEntity result)
         {
-            return playerCharacters.TryGetValue(peerId, out result);
+            return playerCharacters.TryGetValue(connectionId, out result);
         }
 
         public bool TryGetPlayerCharacterById(string id, out BasePlayerCharacterEntity result)
@@ -139,20 +139,20 @@ namespace MultiplayerARPG
         public uint RequestCashShopInfo(AckMessageCallback callback)
         {
             var message = new BaseAckMessage();
-            return Client.SendAckPacket(SendOptions.ReliableOrdered, Client.Peer, MsgTypes.CashShopInfo, message, callback);
+            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MsgTypes.CashShopInfo, message, callback);
         }
 
         public uint RequestCashPackageInfo(AckMessageCallback callback)
         {
             var message = new BaseAckMessage();
-            return Client.SendAckPacket(SendOptions.ReliableOrdered, Client.Peer, MsgTypes.CashPackageInfo, message, callback);
+            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MsgTypes.CashPackageInfo, message, callback);
         }
 
         public uint RequestCashShopBuy(int dataId, AckMessageCallback callback)
         {
             var message = new RequestCashShopBuyMessage();
             message.dataId = dataId;
-            return Client.SendAckPacket(SendOptions.ReliableOrdered, Client.Peer, MsgTypes.CashShopBuy, message, callback);
+            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MsgTypes.CashShopBuy, message, callback);
         }
 
         public uint RequestCashPackageBuyValidation(int dataId, AckMessageCallback callback)
@@ -160,19 +160,19 @@ namespace MultiplayerARPG
             var message = new RequestCashPackageBuyValidationMessage();
             message.dataId = dataId;
             message.platform = Application.platform;
-            return Client.SendAckPacket(SendOptions.ReliableOrdered, Client.Peer, MsgTypes.CashPackageBuyValidation, message, callback);
+            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MsgTypes.CashPackageBuyValidation, message, callback);
         }
 
         public uint RequestPartyData(AckMessageCallback callback)
         {
             var message = new BaseAckMessage();
-            return Client.SendAckPacket(SendOptions.ReliableOrdered, Client.Peer, MsgTypes.PartyData, message, callback);
+            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MsgTypes.PartyData, message, callback);
         }
 
         public uint RequestGuildData(AckMessageCallback callback)
         {
             var message = new BaseAckMessage();
-            return Client.SendAckPacket(SendOptions.ReliableOrdered, Client.Peer, MsgTypes.GuildData, message, callback);
+            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MsgTypes.GuildData, message, callback);
         }
 
         protected virtual void HandleWarpAtClient(LiteNetLibMessageHandler messageHandler)
@@ -189,56 +189,50 @@ namespace MultiplayerARPG
 
         protected virtual void HandleResponseCashShopInfo(LiteNetLibMessageHandler messageHandler)
         {
-            var peerHandler = messageHandler.peerHandler;
-            var peer = messageHandler.peer;
+            var transportHandler = messageHandler.transportHandler;
             var message = messageHandler.ReadMessage<ResponseCashShopInfoMessage>();
             var ackId = message.ackId;
-            peerHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected virtual void HandleResponseCashShopBuy(LiteNetLibMessageHandler messageHandler)
         {
-            var peerHandler = messageHandler.peerHandler;
-            var peer = messageHandler.peer;
+            var transportHandler = messageHandler.transportHandler;
             var message = messageHandler.ReadMessage<ResponseCashShopBuyMessage>();
             var ackId = message.ackId;
-            peerHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected virtual void HandleResponseCashPackageInfo(LiteNetLibMessageHandler messageHandler)
         {
-            var peerHandler = messageHandler.peerHandler;
-            var peer = messageHandler.peer;
+            var transportHandler = messageHandler.transportHandler;
             var message = messageHandler.ReadMessage<ResponseCashPackageInfoMessage>();
             var ackId = message.ackId;
-            peerHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected virtual void HandleResponseCashPackageBuyValidation(LiteNetLibMessageHandler messageHandler)
         {
-            var peerHandler = messageHandler.peerHandler;
-            var peer = messageHandler.peer;
+            var transportHandler = messageHandler.transportHandler;
             var message = messageHandler.ReadMessage<ResponseCashPackageBuyValidationMessage>();
             var ackId = message.ackId;
-            peerHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected virtual void HandleResponsePartyData(LiteNetLibMessageHandler messageHandler)
         {
-            var peerHandler = messageHandler.peerHandler;
-            var peer = messageHandler.peer;
+            var transportHandler = messageHandler.transportHandler;
             var message = messageHandler.ReadMessage<ResponsePartyDataMessage>();
             var ackId = message.ackId;
-            peerHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected virtual void HandleResponseGuildData(LiteNetLibMessageHandler messageHandler)
         {
-            var peerHandler = messageHandler.peerHandler;
-            var peer = messageHandler.peer;
+            var transportHandler = messageHandler.transportHandler;
             var message = messageHandler.ReadMessage<ResponseGuildDataMessage>();
             var ackId = message.ackId;
-            peerHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected virtual void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
@@ -248,13 +242,13 @@ namespace MultiplayerARPG
 
         protected ChatMessage FillChatChannelId(ChatMessage message)
         {
-            NetPeer senderPeer;
+            long senderConnectionId;
             BasePlayerCharacterEntity playerCharacter;
             if (message.channel == ChatChannel.Party || message.channel == ChatChannel.Guild)
             {
                 if (!string.IsNullOrEmpty(message.sender) &&
-                    peersByCharacterName.TryGetValue(message.sender, out senderPeer) &&
-                    playerCharacters.TryGetValue(senderPeer.ConnectId, out playerCharacter))
+                    connectionIdsByCharacterName.TryGetValue(message.sender, out senderConnectionId) &&
+                    playerCharacters.TryGetValue(senderConnectionId, out playerCharacter))
                 {
                     switch (message.channel)
                     {
@@ -272,22 +266,22 @@ namespace MultiplayerARPG
 
         protected virtual void ReadChatMessage(ChatMessage message)
         {
-            NetPeer senderPeer;
-            NetPeer receiverPeer;
+            long senderConnectionId;
+            long receiverConnectionId;
             BasePlayerCharacterEntity playerCharacter;
             switch (message.channel)
             {
                 case ChatChannel.Global:
-                    // Send message to all peers (clients)
-                    SendPacketToAllPeers(SendOptions.ReliableOrdered, MsgTypes.Chat, message);
+                    // Send message to all clients
+                    ServerSendPacketToAllConnections(SendOptions.ReliableOrdered, MsgTypes.Chat, message);
                     break;
                 case ChatChannel.Whisper:
                     if (!string.IsNullOrEmpty(message.sender) &&
-                        peersByCharacterName.TryGetValue(message.sender, out senderPeer))
-                        LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, senderPeer, MsgTypes.Chat, message);
+                        connectionIdsByCharacterName.TryGetValue(message.sender, out senderConnectionId))
+                        ServerSendPacket(senderConnectionId, SendOptions.ReliableOrdered, MsgTypes.Chat, message);
                     if (!string.IsNullOrEmpty(message.receiver) &&
-                        peersByCharacterName.TryGetValue(message.receiver, out receiverPeer))
-                        LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, receiverPeer, MsgTypes.Chat, message);
+                        connectionIdsByCharacterName.TryGetValue(message.receiver, out receiverConnectionId))
+                        ServerSendPacket(receiverConnectionId, SendOptions.ReliableOrdered, MsgTypes.Chat, message);
                     break;
                 case ChatChannel.Party:
                     PartyData party;
@@ -297,8 +291,8 @@ namespace MultiplayerARPG
                         foreach (var memberId in tempCharacterIdArray)
                         {
                             if (playerCharactersById.TryGetValue(memberId, out playerCharacter) &&
-                                TryGetPeer(playerCharacter.ConnectId, out receiverPeer))
-                                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, receiverPeer, MsgTypes.Chat, message);
+                                ContainsConnectionId(playerCharacter.ConnectId))
+                                ServerSendPacket(playerCharacter.ConnectId, SendOptions.ReliableOrdered, MsgTypes.Chat, message);
                         }
                     }
                     break;
@@ -310,8 +304,8 @@ namespace MultiplayerARPG
                         foreach (var memberId in tempCharacterIdArray)
                         {
                             if (playerCharactersById.TryGetValue(memberId, out playerCharacter) &&
-                                TryGetPeer(playerCharacter.ConnectId, out receiverPeer))
-                                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, receiverPeer, MsgTypes.Chat, message);
+                                ContainsConnectionId(playerCharacter.ConnectId))
+                                ServerSendPacket(playerCharacter.ConnectId, SendOptions.ReliableOrdered, MsgTypes.Chat, message);
                         }
                     }
                     break;
@@ -320,7 +314,7 @@ namespace MultiplayerARPG
 
         protected virtual void HandleRequestCashShopInfo(LiteNetLibMessageHandler messageHandler)
         {
-            var peer = messageHandler.peer;
+            var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<BaseAckMessage>();
             var error = ResponseCashShopInfoMessage.Error.NotAvailable;
             var responseMessage = new ResponseCashShopInfoMessage();
@@ -329,12 +323,12 @@ namespace MultiplayerARPG
             responseMessage.error = error;
             responseMessage.cash = 0;
             responseMessage.cashShopItemIds = new int[0];
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, peer, MsgTypes.CashShopInfo, responseMessage);
+            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashShopInfo, responseMessage);
         }
 
         protected virtual void HandleRequestCashShopBuy(LiteNetLibMessageHandler messageHandler)
         {
-            var peer = messageHandler.peer;
+            var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<RequestCashShopBuyMessage>();
             var error = ResponseCashShopBuyMessage.Error.NotAvailable;
             var responseMessage = new ResponseCashShopBuyMessage();
@@ -342,12 +336,12 @@ namespace MultiplayerARPG
             responseMessage.responseCode = error == ResponseCashShopBuyMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
             responseMessage.cash = 0;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, peer, MsgTypes.CashShopBuy, responseMessage);
+            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashShopBuy, responseMessage);
         }
 
         protected virtual void HandleRequestCashPackageInfo(LiteNetLibMessageHandler messageHandler)
         {
-            var peer = messageHandler.peer;
+            var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<BaseAckMessage>();
             var error = ResponseCashPackageInfoMessage.Error.NotAvailable;
             var responseMessage = new ResponseCashPackageInfoMessage();
@@ -356,12 +350,12 @@ namespace MultiplayerARPG
             responseMessage.error = error;
             responseMessage.cash = 0;
             responseMessage.cashPackageIds = new int[0];
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, peer, MsgTypes.CashPackageInfo, responseMessage);
+            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashPackageInfo, responseMessage);
         }
 
         protected virtual void HandleRequestCashPackageBuyValidation(LiteNetLibMessageHandler messageHandler)
         {
-            var peer = messageHandler.peer;
+            var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<RequestCashPackageBuyValidationMessage>();
             var error = ResponseCashPackageBuyValidationMessage.Error.NotAvailable;
             var responseMessage = new ResponseCashPackageBuyValidationMessage();
@@ -369,19 +363,19 @@ namespace MultiplayerARPG
             responseMessage.responseCode = error == ResponseCashPackageBuyValidationMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
             responseMessage.cash = 0;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, peer, MsgTypes.CashPackageBuyValidation, responseMessage);
+            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashPackageBuyValidation, responseMessage);
         }
 
         protected virtual void HandleRequestPartyData(LiteNetLibMessageHandler messageHandler)
         {
-            var peer = messageHandler.peer;
+            var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<BaseAckMessage>();
             var responseMessage = new ResponsePartyDataMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = AckResponseCode.Success;
             BasePlayerCharacterEntity playerCharacterEntity;
             PartyData partyData;
-            if (playerCharacters.TryGetValue(peer.ConnectId, out playerCharacterEntity) && playerCharacterEntity.PartyId > 0)
+            if (playerCharacters.TryGetValue(connectionId, out playerCharacterEntity) && playerCharacterEntity.PartyId > 0)
             {
                 // Set character party id to 0 if there is no party info with defined Id
                 if (parties.TryGetValue(playerCharacterEntity.PartyId, out partyData) && partyData.IsMember(playerCharacterEntity))
@@ -394,19 +388,19 @@ namespace MultiplayerARPG
                 else
                     playerCharacterEntity.PartyId = 0;
             }
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, peer, MsgTypes.PartyData, responseMessage);
+            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.PartyData, responseMessage);
         }
 
         protected virtual void HandleRequestGuildData(LiteNetLibMessageHandler messageHandler)
         {
-            var peer = messageHandler.peer;
+            var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<BaseAckMessage>();
             var responseMessage = new ResponseGuildDataMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = AckResponseCode.Success;
             BasePlayerCharacterEntity playerCharacterEntity;
             GuildData guildData;
-            if (playerCharacters.TryGetValue(peer.ConnectId, out playerCharacterEntity) && playerCharacterEntity.GuildId > 0)
+            if (playerCharacters.TryGetValue(connectionId, out playerCharacterEntity) && playerCharacterEntity.GuildId > 0)
             {
                 // Set character party id to 0 if there is no party info with defined Id
                 if (guilds.TryGetValue(playerCharacterEntity.GuildId, out guildData) && guildData.IsMember(playerCharacterEntity))
@@ -423,7 +417,7 @@ namespace MultiplayerARPG
                 else
                     playerCharacterEntity.GuildId = 0;
             }
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, peer, MsgTypes.GuildData, responseMessage);
+            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.GuildData, responseMessage);
         }
 
         public override bool StartServer()
@@ -486,7 +480,7 @@ namespace MultiplayerARPG
             chatMessage.message = message;
             chatMessage.sender = senderName;
             chatMessage.receiver = receiverName;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MsgTypes.Chat, chatMessage);
+            ClientSendPacket(SendOptions.ReliableOrdered, MsgTypes.Chat, chatMessage);
         }
 
         public void Quit()
@@ -494,9 +488,9 @@ namespace MultiplayerARPG
             Application.Quit();
         }
 
-        public override void OnClientDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
+        public override void OnClientDisconnected(DisconnectInfo disconnectInfo)
         {
-            base.OnClientDisconnected(peer, disconnectInfo);
+            base.OnClientDisconnected(disconnectInfo);
             UISceneGlobal.Singleton.ShowDisconnectDialog(disconnectInfo);
         }
 
@@ -585,23 +579,23 @@ namespace MultiplayerARPG
                 Instantiate(GameInstance.Singleton.serverCharacterPrefab);
         }
 
-        public virtual void RegisterPlayerCharacter(NetPeer peer, BasePlayerCharacterEntity playerCharacterEntity)
+        public virtual void RegisterPlayerCharacter(long connectionId, BasePlayerCharacterEntity playerCharacterEntity)
         {
-            if (playerCharacterEntity == null || !Peers.ContainsKey(peer.ConnectId) || playerCharacters.ContainsKey(peer.ConnectId))
+            if (playerCharacterEntity == null || !ConnectionIds.Contains(connectionId) || playerCharacters.ContainsKey(connectionId))
                 return;
-            playerCharacters[peer.ConnectId] = playerCharacterEntity;
+            playerCharacters[connectionId] = playerCharacterEntity;
             playerCharactersById[playerCharacterEntity.Id] = playerCharacterEntity;
-            peersByCharacterName[playerCharacterEntity.CharacterName] = peer;
+            connectionIdsByCharacterName[playerCharacterEntity.CharacterName] = connectionId;
         }
 
-        public virtual void UnregisterPlayerCharacter(NetPeer peer)
+        public virtual void UnregisterPlayerCharacter(long connectionId)
         {
             BasePlayerCharacterEntity playerCharacter;
-            if (!playerCharacters.TryGetValue(peer.ConnectId, out playerCharacter))
+            if (!playerCharacters.TryGetValue(connectionId, out playerCharacter))
                 return;
-            peersByCharacterName.Remove(playerCharacter.CharacterName);
+            connectionIdsByCharacterName.Remove(playerCharacter.CharacterName);
             playerCharactersById.Remove(playerCharacter.Id);
-            playerCharacters.Remove(peer.ConnectId);
+            playerCharacters.Remove(connectionId);
         }
 
         public virtual void CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
