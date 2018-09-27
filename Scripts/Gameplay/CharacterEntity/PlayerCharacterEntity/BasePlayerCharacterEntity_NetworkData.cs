@@ -19,6 +19,10 @@ namespace MultiplayerARPG
         protected SyncFieldInt partyId = new SyncFieldInt();
         [SerializeField]
         protected SyncFieldInt guildId = new SyncFieldInt();
+        [SerializeField]
+        protected SyncFieldBool isPartyLeader = new SyncFieldBool();
+        [SerializeField]
+        protected SyncFieldBool isGuildLeader = new SyncFieldBool();
         // List
         [SerializeField]
         protected SyncListCharacterHotkey hotkeys = new SyncListCharacterHotkey();
@@ -76,12 +80,14 @@ namespace MultiplayerARPG
         public System.Action<LiteNetLibSyncList.Operation, int> onQuestsOperation;
         #endregion
 
-        #region Fields/Interface implementation
+        #region Fields/Interface/Getter/Setter implementation
         public short StatPoint { get { return statPoint.Value; } set { statPoint.Value = value; } }
         public short SkillPoint { get { return skillPoint.Value; } set { skillPoint.Value = value; } }
         public int Gold { get { return gold.Value; } set { gold.Value = value; } }
         public int PartyId { get { return partyId.Value; } set { partyId.Value = value; } }
         public int GuildId { get { return guildId.Value; } set { guildId.Value = value; } }
+        public bool IsPartyLeader { get { return isPartyLeader.Value; } set { isPartyLeader.Value = value; } }
+        public bool IsGuildLeader { get { return isGuildLeader.Value; } set { isGuildLeader.Value = value; } }
         public string CurrentMapName { get { return SceneManager.GetActiveScene().name; } set { } }
         public Vector3 CurrentPosition
         {

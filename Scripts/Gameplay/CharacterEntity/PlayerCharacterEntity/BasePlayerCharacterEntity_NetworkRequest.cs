@@ -230,9 +230,9 @@ namespace MultiplayerARPG
             CallNetFunction("CreateGuild", FunctionReceivers.Server, guildName);
         }
 
-        public virtual void RequestSetGuildMessage(string message)
+        public virtual void RequestSetGuildMessage(string guildMessage)
         {
-            CallNetFunction("SetGuildMessage", FunctionReceivers.Server, message);
+            CallNetFunction("SetGuildMessage", FunctionReceivers.Server, guildMessage);
         }
 
         public virtual void RequestSendGuildInvitation(uint objectId)

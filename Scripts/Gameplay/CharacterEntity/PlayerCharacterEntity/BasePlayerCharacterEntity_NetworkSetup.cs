@@ -18,9 +18,13 @@ namespace MultiplayerARPG
             gold.sendOptions = SendOptions.ReliableOrdered;
             gold.forOwnerOnly = true;
             partyId.sendOptions = SendOptions.ReliableOrdered;
-            partyId.forOwnerOnly = false;
+            partyId.forOwnerOnly = true;
             guildId.sendOptions = SendOptions.ReliableOrdered;
-            guildId.forOwnerOnly = false;
+            guildId.forOwnerOnly = true;
+            isPartyLeader.sendOptions = SendOptions.ReliableOrdered;
+            isPartyLeader.forOwnerOnly = true;
+            isGuildLeader.sendOptions = SendOptions.ReliableOrdered;
+            isGuildLeader.forOwnerOnly = true;
 
             hotkeys.forOwnerOnly = true;
             quests.forOwnerOnly = true;

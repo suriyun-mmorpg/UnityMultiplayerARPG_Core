@@ -728,14 +728,14 @@ namespace MultiplayerARPG
             GameManager.CreateGuild(this, guildName);
         }
 
-        protected virtual void NetFuncSetGuildMessage(string message)
+        protected virtual void NetFuncSetGuildMessage(string guildMessage)
         {
             if (GuildId <= 0)
             {
                 // TODO: May send warn message that player already in guild
                 return;
             }
-            GameManager.SetGuildMessage(this, message);
+            GameManager.SetGuildMessage(this, guildMessage);
         }
 
         protected virtual void NetFuncSendGuildInvitation(uint objectId)

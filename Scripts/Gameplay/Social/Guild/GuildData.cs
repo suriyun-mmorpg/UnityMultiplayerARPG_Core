@@ -9,7 +9,7 @@ namespace MultiplayerARPG
         public int level;
         public int exp;
         public int skillPoint;
-        public string message;
+        public string guildMessage;
 
         public GuildData(int id, string guildName, string leaderId, string leaderName)
             : base(id, leaderId)
@@ -19,7 +19,7 @@ namespace MultiplayerARPG
             level = 1;
             exp = 0;
             skillPoint = 0;
-            message = string.Empty;
+            guildMessage = string.Empty;
         }
 
         public GuildData(int id, string guildName, BasePlayerCharacterEntity leaderCharacterEntity)

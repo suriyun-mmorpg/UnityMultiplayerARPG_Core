@@ -411,7 +411,7 @@ namespace MultiplayerARPG
                     responseMessage.level = guildData.level;
                     responseMessage.exp = guildData.exp;
                     responseMessage.skillPoint = guildData.skillPoint;
-                    responseMessage.message = guildData.message;
+                    responseMessage.message = guildData.guildMessage;
                     responseMessage.members = guildData.GetMembers().ToArray();
                 }
                 else
@@ -631,7 +631,7 @@ namespace MultiplayerARPG
         public abstract void KickFromParty(BasePlayerCharacterEntity playerCharacterEntity, string characterId);
         public abstract void LeaveParty(BasePlayerCharacterEntity playerCharacterEntity);
         public abstract void CreateGuild(BasePlayerCharacterEntity playerCharacterEntity, string guildName);
-        public abstract void SetGuildMessage(BasePlayerCharacterEntity playerCharacterEntity, string message);
+        public abstract void SetGuildMessage(BasePlayerCharacterEntity playerCharacterEntity, string guildMessage);
         public abstract void AddGuildMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity);
         public abstract void KickFromGuild(BasePlayerCharacterEntity playerCharacterEntity, string characterId);
         public abstract void LeaveGuild(BasePlayerCharacterEntity playerCharacterEntity);
