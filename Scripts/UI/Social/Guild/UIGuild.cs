@@ -194,5 +194,10 @@ namespace MultiplayerARPG
         {
             return BasePlayerCharacterController.OwningCharacter.GuildId;
         }
+
+        public override int GetMaxMemberAmount()
+        {
+            return GameInstance.Singleton.maxGuildMember;
+        }
     }
 }

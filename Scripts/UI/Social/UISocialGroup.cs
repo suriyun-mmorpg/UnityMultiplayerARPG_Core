@@ -10,6 +10,8 @@ namespace MultiplayerARPG
         [Header("Display Format")]
         [Tooltip("Member Amount Format => {0} = {current amount}, {1} = {max amount}")]
         public string memberAmountFormat = "Member Amount: {0}/{1}";
+        [Tooltip("Member Amount Format => {0} = {current amount}")]
+        public string memberAmountNoLimitFormat = "Member Amount: {0}";
 
         [Header("UI Elements")]
         public UISocialCharacter uiMemberDialog;
@@ -75,7 +77,12 @@ namespace MultiplayerARPG
         protected virtual void UpdateUIs()
         {
             if (textMemberAmount != null)
-                textMemberAmount.text = string.Format(memberAmountFormat, memberAmount.ToString("N0"), GameInstance.Singleton.maxGuildMember.ToString("N0"));
+            {
+                if (GetMaxMemberAmount() > 0)
+                    textMemberAmount.text = string.Format(memberAmountFormat, memberAmount.ToString("N0"), GetMaxMemberAmount().ToString("N0"));
+                else
+                    textMemberAmount.text = string.Format(memberAmountNoLimitFormat, memberAmount.ToString("N0"));
+            }
 
 
             foreach (var obj in owningCharacterIsInGroupObjects)
@@ -141,5 +148,6 @@ namespace MultiplayerARPG
         }
 
         public abstract int GetSocialId();
+        public abstract int GetMaxMemberAmount();
     }
 }

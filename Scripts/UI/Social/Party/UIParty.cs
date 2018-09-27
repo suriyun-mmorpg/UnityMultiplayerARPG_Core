@@ -160,5 +160,10 @@ namespace MultiplayerARPG
         {
             return BasePlayerCharacterController.OwningCharacter.PartyId;
         }
+
+        public override int GetMaxMemberAmount()
+        {
+            return GameInstance.Singleton.maxPartyMember;
+        }
     }
 }
