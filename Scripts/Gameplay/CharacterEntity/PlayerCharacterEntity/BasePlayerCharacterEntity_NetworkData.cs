@@ -86,6 +86,7 @@ namespace MultiplayerARPG
         public int Gold { get { return gold.Value; } set { gold.Value = value; } }
         public int PartyId { get { return partyId.Value; } set { partyId.Value = value; } }
         public int GuildId { get { return guildId.Value; } set { guildId.Value = value; } }
+        public int GuildRole { get; set; }
         public PartyMemberFlags PartyMemberFlags { get { return (PartyMemberFlags)partyMemberFlags.Value; } set { partyMemberFlags.Value = (byte)value; } }
         public GuildMemberFlags GuildMemberFlags { get { return (GuildMemberFlags)guildMemberFlags.Value; } set { guildMemberFlags.Value = (byte)value; } }
         public string CurrentMapName { get { return SceneManager.GetActiveScene().name; } set { } }
