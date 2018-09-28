@@ -8,7 +8,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "PlayerCharacter", menuName = "Create GameData/PlayerCharacter")]
+    [CreateAssetMenu(fileName = "Player Character", menuName = "Create GameData/Player Character")]
     public class PlayerCharacter : BaseCharacter
     {
         [Header("Skills")]

@@ -11,7 +11,7 @@ namespace MultiplayerARPG
         TwoHand,
     }
 
-    [CreateAssetMenu(fileName = "WeaponType", menuName = "Create GameData/WeaponType")]
+    [CreateAssetMenu(fileName = "Weapon Type", menuName = "Create GameData/Weapon Type")]
     public partial class WeaponType : BaseGameData
     {
         public WeaponItemEquipType equipType = WeaponItemEquipType.OneHand;

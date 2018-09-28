@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "WarpPortalDatabase", menuName = "Create GameData/WarpPortalDatabase")]
+    [CreateAssetMenu(fileName = "Warp Portal Database", menuName = "Create GameData/Warp Portal Database")]
     public class WarpPortalDatabase : ScriptableObject
     {
         public WarpPortals[] maps;

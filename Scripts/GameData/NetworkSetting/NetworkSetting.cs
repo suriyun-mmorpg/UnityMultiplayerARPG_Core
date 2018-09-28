@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "NetworkSetting", menuName = "Create NetworkSetting/NetworkSetting")]
+    [CreateAssetMenu(fileName = "Network Setting", menuName = "Create NetworkSetting/Network Setting")]
     public class NetworkSetting : ScriptableObject
     {
         public string networkAddress = "127.0.0.1";

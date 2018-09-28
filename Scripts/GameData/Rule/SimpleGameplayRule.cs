@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "SimpleGameplayRule", menuName = "Create GameplayRule/SimpleGameplayRule")]
+    [CreateAssetMenu(fileName = "Simple Gameplay Rule", menuName = "Create GameplayRule/Simple Gameplay Rule")]
     public class SimpleGameplayRule : BaseGameplayRule
     {
         [Header("Levelling/Stat/Skill")]
