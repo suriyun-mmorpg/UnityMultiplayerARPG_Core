@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class SocialGroupData
+    public abstract class SocialGroupData
     {
         protected Dictionary<string, SocialCharacterData> members;
         protected Dictionary<string, float> lastOnlineTimes;
@@ -10,6 +10,8 @@ namespace MultiplayerARPG
 
         public int id { get; private set; }
         public string leaderId { get; private set; }
+
+        public static SocialSystemSetting SystemSetting { get { return GameInstance.Singleton.SocialSystemSetting; } }
 
         public SocialGroupData(int id, string leaderId)
         {
@@ -29,9 +31,18 @@ namespace MultiplayerARPG
         {
             SocialCharacterData member;
             float lastOnlineTime;
-            member.isOnline = members.TryGetValue(characterId, out member) &&
+            if (members.TryGetValue(characterId, out member) &&
                 lastOnlineTimes.TryGetValue(characterId, out lastOnlineTime) &&
-                time - lastOnlineTime <= 2f;
+                time - lastOnlineTime <= 2f)
+            {
+                // Online, add online flag
+                member.memberFlags = (byte)(member.memberFlags | SocialCharacterData.FLAG_ONLINE);
+            }
+            else
+            {
+                // Offline, remove online flag
+                member.memberFlags = (byte)(member.memberFlags & ~SocialCharacterData.FLAG_ONLINE);
+            }
             members[characterId] = member;
         }
 
@@ -42,7 +53,7 @@ namespace MultiplayerARPG
             tempMemberData.characterName = playerCharacterEntity.CharacterName;
             tempMemberData.dataId = playerCharacterEntity.DataId;
             tempMemberData.level = playerCharacterEntity.Level;
-            tempMemberData.isOnline = true;
+            tempMemberData.memberFlags = SocialCharacterData.FLAG_ONLINE;
             tempMemberData.currentHp = playerCharacterEntity.CurrentHp;
             tempMemberData.maxHp = playerCharacterEntity.CacheMaxHp;
             tempMemberData.currentMp = playerCharacterEntity.CurrentMp;
@@ -55,18 +66,19 @@ namespace MultiplayerARPG
             AddMember(CreateMemberData(playerCharacterEntity));
         }
 
-        public void AddMember(SocialCharacterData partyMemberData)
+        public void AddMember(SocialCharacterData memberData)
         {
-            if (!members.ContainsKey(partyMemberData.id))
+            if (!members.ContainsKey(memberData.id))
             {
-                members.Add(partyMemberData.id, partyMemberData);
+                members.Add(memberData.id, memberData);
                 return;
             }
-            var oldPartyMemberData = members[partyMemberData.id];
-            oldPartyMemberData.characterName = partyMemberData.characterName;
-            oldPartyMemberData.dataId = partyMemberData.dataId;
-            oldPartyMemberData.level = partyMemberData.level;
-            members[partyMemberData.id] = oldPartyMemberData;
+            var oldMemberData = members[memberData.id];
+            oldMemberData.characterName = memberData.characterName;
+            oldMemberData.dataId = memberData.dataId;
+            oldMemberData.level = memberData.level;
+            oldMemberData.memberFlags = GetMemberFlags(oldMemberData);
+            members[memberData.id] = oldMemberData;
         }
 
         public void UpdateMember(BasePlayerCharacterEntity playerCharacterEntity)
@@ -74,19 +86,20 @@ namespace MultiplayerARPG
             UpdateMember(CreateMemberData(playerCharacterEntity));
         }
 
-        public void UpdateMember(SocialCharacterData partyMemberData)
+        public void UpdateMember(SocialCharacterData memberData)
         {
-            if (!members.ContainsKey(partyMemberData.id))
+            if (!members.ContainsKey(memberData.id))
                 return;
-            var oldPartyMemberData = members[partyMemberData.id];
-            oldPartyMemberData.characterName = partyMemberData.characterName;
-            oldPartyMemberData.dataId = partyMemberData.dataId;
-            oldPartyMemberData.level = partyMemberData.level;
-            oldPartyMemberData.currentHp = partyMemberData.currentHp;
-            oldPartyMemberData.maxHp = partyMemberData.maxHp;
-            oldPartyMemberData.currentMp = partyMemberData.currentMp;
-            oldPartyMemberData.maxMp = partyMemberData.maxMp;
-            members[partyMemberData.id] = oldPartyMemberData;
+            var oldMemberData = members[memberData.id];
+            oldMemberData.characterName = memberData.characterName;
+            oldMemberData.dataId = memberData.dataId;
+            oldMemberData.level = memberData.level;
+            oldMemberData.memberFlags = GetMemberFlags(oldMemberData);
+            oldMemberData.currentHp = memberData.currentHp;
+            oldMemberData.maxHp = memberData.maxHp;
+            oldMemberData.currentMp = memberData.currentMp;
+            oldMemberData.maxMp = memberData.maxMp;
+            members[memberData.id] = oldMemberData;
         }
 
         public bool RemoveMember(BasePlayerCharacterEntity playerCharacterEntity)
@@ -138,5 +151,7 @@ namespace MultiplayerARPG
         {
             return characterId.Equals(leaderId);
         }
+
+        public abstract byte GetMemberFlags(SocialCharacterData memberData);
     }
 }

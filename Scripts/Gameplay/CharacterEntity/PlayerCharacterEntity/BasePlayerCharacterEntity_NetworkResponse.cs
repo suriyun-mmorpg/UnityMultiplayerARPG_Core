@@ -633,6 +633,11 @@ namespace MultiplayerARPG
                 // TODO: May send warn message that player is not in party
                 return;
             }
+            if (!PartyData.CanInvite(PartyMemberFlags))
+            {
+                // TODO: May send warn message that player can not kick
+                return;
+            }
             BasePlayerCharacterEntity playerCharacterEntity = null;
             if (!TryGetEntityByObjectId(objectId, out playerCharacterEntity))
             {
@@ -698,6 +703,11 @@ namespace MultiplayerARPG
                 // TODO: May send warn message that player is not in party
                 return;
             }
+            if (!PartyData.CanKick(PartyMemberFlags))
+            {
+                // TODO: May send warn message that player can not kick
+                return;
+            }
             if (Id.Equals(characterId))
             {
                 // TODO: May warn that it's owning character so it's not able to kick
@@ -743,6 +753,11 @@ namespace MultiplayerARPG
             if (GuildId <= 0)
             {
                 // TODO: May send warn message that player is not in guild
+                return;
+            }
+            if (!GuildData.CanInvite(GuildMemberFlags))
+            {
+                // TODO: May send warn message that player can not invite
                 return;
             }
             BasePlayerCharacterEntity playerCharacterEntity = null;
@@ -808,6 +823,11 @@ namespace MultiplayerARPG
             if (GuildId <= 0)
             {
                 // TODO: May send warn message that player is not in guild
+                return;
+            }
+            if (!GuildData.CanKick(GuildMemberFlags))
+            {
+                // TODO: May send warn message that player can not kick
                 return;
             }
             if (Id.Equals(characterId))

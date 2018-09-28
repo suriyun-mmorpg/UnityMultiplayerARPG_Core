@@ -7,16 +7,23 @@ namespace MultiplayerARPG
     public partial class UIPlayerActivateMenu : UISelectionEntry<BasePlayerCharacterEntity>
     {
         public UICharacter uiCharacter;
-        [Tooltip("These objects will be activated when owning character is in party")]
-        public GameObject[] partyObjects;
+        [Tooltip("These objects will be activated when owning character can invite to join party")]
+        public GameObject[] partyInviteObjects;
+        [Tooltip("These objects will be activated when owning character can invite to join guild")]
+        public GameObject[] guildInviteObjects;
 
         protected override void UpdateUI()
         {
             base.UpdateUI();
-            foreach (var partyObject in partyObjects)
+            foreach (var obj in partyInviteObjects)
             {
-                if (partyObject != null)
-                    partyObject.SetActive(BasePlayerCharacterController.OwningCharacter.PartyId > 0);
+                if (obj != null)
+                    obj.SetActive(PartyData.CanInvite(BasePlayerCharacterController.OwningCharacter.PartyMemberFlags));
+            }
+            foreach (var obj in guildInviteObjects)
+            {
+                if (obj != null)
+                    obj.SetActive(GuildData.CanInvite(BasePlayerCharacterController.OwningCharacter.GuildMemberFlags));
             }
         }
 
@@ -37,6 +44,13 @@ namespace MultiplayerARPG
         {
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             owningCharacter.RequestSendPartyInvitation(Data.ObjectId);
+            Hide();
+        }
+
+        public void OnClickSendGuildInvitation()
+        {
+            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            owningCharacter.RequestSendGuildInvitation(Data.ObjectId);
             Hide();
         }
     }

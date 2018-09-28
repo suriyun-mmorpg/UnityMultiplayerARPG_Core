@@ -20,9 +20,9 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldInt guildId = new SyncFieldInt();
         [SerializeField]
-        protected SyncFieldBool isPartyLeader = new SyncFieldBool();
+        protected SyncFieldByte partyMemberFlags = new SyncFieldByte();
         [SerializeField]
-        protected SyncFieldBool isGuildLeader = new SyncFieldBool();
+        protected SyncFieldByte guildMemberFlags = new SyncFieldByte();
         // List
         [SerializeField]
         protected SyncListCharacterHotkey hotkeys = new SyncListCharacterHotkey();
@@ -86,8 +86,8 @@ namespace MultiplayerARPG
         public int Gold { get { return gold.Value; } set { gold.Value = value; } }
         public int PartyId { get { return partyId.Value; } set { partyId.Value = value; } }
         public int GuildId { get { return guildId.Value; } set { guildId.Value = value; } }
-        public bool IsPartyLeader { get { return isPartyLeader.Value; } set { isPartyLeader.Value = value; } }
-        public bool IsGuildLeader { get { return isGuildLeader.Value; } set { isGuildLeader.Value = value; } }
+        public PartyMemberFlags PartyMemberFlags { get { return (PartyMemberFlags)partyMemberFlags.Value; } set { partyMemberFlags.Value = (byte)value; } }
+        public GuildMemberFlags GuildMemberFlags { get { return (GuildMemberFlags)guildMemberFlags.Value; } set { guildMemberFlags.Value = (byte)value; } }
         public string CurrentMapName { get { return SceneManager.GetActiveScene().name; } set { } }
         public Vector3 CurrentPosition
         {

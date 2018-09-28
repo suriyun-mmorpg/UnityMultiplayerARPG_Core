@@ -49,6 +49,13 @@ namespace MultiplayerARPG
             return playerCharactersById.TryGetValue(id, out result);
         }
 
+        public bool TryGetPlayerCharacterByCharacterName(string characterName, out BasePlayerCharacterEntity result)
+        {
+            result = null;
+            long connectionId;
+            return connectionIdsByCharacterName.TryGetValue(characterName, out connectionId) && playerCharacters.TryGetValue(connectionId, out result);
+        }
+
         public bool TryGetParty(int id, out PartyData result)
         {
             return parties.TryGetValue(id, out result);
@@ -242,13 +249,11 @@ namespace MultiplayerARPG
 
         protected ChatMessage FillChatChannelId(ChatMessage message)
         {
-            long senderConnectionId;
             BasePlayerCharacterEntity playerCharacter;
             if (message.channel == ChatChannel.Party || message.channel == ChatChannel.Guild)
             {
                 if (!string.IsNullOrEmpty(message.sender) &&
-                    connectionIdsByCharacterName.TryGetValue(message.sender, out senderConnectionId) &&
-                    playerCharacters.TryGetValue(senderConnectionId, out playerCharacter))
+                    TryGetPlayerCharacterByCharacterName(message.sender, out playerCharacter))
                 {
                     switch (message.channel)
                     {
@@ -382,7 +387,6 @@ namespace MultiplayerARPG
                 {
                     responseMessage.shareExp = partyData.shareExp;
                     responseMessage.shareItem = partyData.shareItem;
-                    responseMessage.leaderId = partyData.leaderId;
                     responseMessage.members = partyData.GetMembers().ToArray();
                 }
                 else
@@ -406,7 +410,6 @@ namespace MultiplayerARPG
                 if (guilds.TryGetValue(playerCharacterEntity.GuildId, out guildData) && guildData.IsMember(playerCharacterEntity))
                 {
                     responseMessage.guildName = guildData.guildName;
-                    responseMessage.leaderId = guildData.leaderId;
                     responseMessage.leaderName = guildData.leaderName;
                     responseMessage.level = guildData.level;
                     responseMessage.exp = guildData.exp;

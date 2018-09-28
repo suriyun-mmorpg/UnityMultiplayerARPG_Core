@@ -25,5 +25,48 @@ namespace MultiplayerARPG
             this.shareExp = shareExp;
             this.shareItem = shareItem;
         }
+
+        public override byte GetMemberFlags(SocialCharacterData memberData)
+        {
+            return (byte)GetPartyMemberFlags(memberData.id);
+        }
+
+        private PartyMemberFlags GetPartyLeaderFlags()
+        {
+            return (PartyMemberFlags.IsLeader | PartyMemberFlags.CanInvite | PartyMemberFlags.CanKick);
+        }
+
+        private PartyMemberFlags GetPartyMemberFlags()
+        {
+            return ((SystemSetting.partyMemberCanInvite ? PartyMemberFlags.CanInvite : 0) | (SystemSetting.partyMemberCanKick ? PartyMemberFlags.CanKick : 0));
+        }
+
+        public PartyMemberFlags GetPartyMemberFlags(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            return GetPartyMemberFlags(playerCharacterEntity.Id);
+        }
+
+        public PartyMemberFlags GetPartyMemberFlags(string characterId)
+        {
+            if (IsLeader(characterId))
+                return GetPartyLeaderFlags();
+            else
+                return GetPartyMemberFlags();
+        }
+
+        public static bool IsLeader(PartyMemberFlags flags)
+        {
+            return (flags & PartyMemberFlags.IsLeader) != 0;
+        }
+
+        public static bool CanInvite(PartyMemberFlags flags)
+        {
+            return (flags & PartyMemberFlags.CanInvite) != 0;
+        }
+
+        public static bool CanKick(PartyMemberFlags flags)
+        {
+            return (flags & PartyMemberFlags.CanKick) != 0;
+        }
     }
 }

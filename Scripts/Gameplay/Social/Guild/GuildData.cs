@@ -27,5 +27,61 @@ namespace MultiplayerARPG
         {
             AddMember(leaderCharacterEntity);
         }
+
+        public override byte GetMemberFlags(SocialCharacterData memberData)
+        {
+            return (byte)GetGuildMemberFlags(memberData.id);
+        }
+
+        private GuildMemberFlags GetGuildLeaderFlags()
+        {
+            if (SystemSetting.guildMemberRoles == null || SystemSetting.guildMemberRoles.Length <= 0)
+                return (GuildMemberFlags.IsLeader | GuildMemberFlags.CanInvite | GuildMemberFlags.CanKick);
+            return GuildMemberFlags.IsLeader | GetGuildFlags(0);
+        }
+
+        private GuildMemberFlags GetGuildMemberFlags()
+        {
+            if (SystemSetting.guildMemberRoles == null || SystemSetting.guildMemberRoles.Length <= 1)
+                return 0;
+            return GetGuildFlags(SystemSetting.guildMemberRoles.Length - 1);
+        }
+
+        public GuildMemberFlags GetGuildMemberFlags(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            if (IsLeader(playerCharacterEntity))
+                return GetGuildLeaderFlags();
+            else
+                return GetGuildMemberFlags();
+        }
+
+        public GuildMemberFlags GetGuildMemberFlags(string characterId)
+        {
+            if (IsLeader(characterId))
+                return GetGuildLeaderFlags();
+            else
+                return GetGuildMemberFlags();
+        }
+
+        public GuildMemberFlags GetGuildFlags(int roleIdx)
+        {
+            var role = SystemSetting.guildMemberRoles[roleIdx];
+            return ((role.canInvite ? GuildMemberFlags.CanInvite : 0) | (role.canKick ? GuildMemberFlags.CanKick : 0));
+        }
+
+        public static bool IsLeader(GuildMemberFlags flags)
+        {
+            return (flags & GuildMemberFlags.IsLeader) != 0;
+        }
+
+        public static bool CanInvite(GuildMemberFlags flags)
+        {
+            return (flags & GuildMemberFlags.CanInvite) != 0;
+        }
+
+        public static bool CanKick(GuildMemberFlags flags)
+        {
+            return (flags & GuildMemberFlags.CanKick) != 0;
+        }
     }
 }

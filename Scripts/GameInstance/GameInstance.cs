@@ -47,18 +47,26 @@ namespace MultiplayerARPG
         [Tooltip("This UI will be instaniate as NPC's child to show quest indecator")]
         public NpcQuestIndicator npcQuestIndicator;
 
-        [Header("Gameplay Database")]
+        [Header("Gameplay Database / Settings")]
         [Tooltip("Default weapon item, will be used when character not equip any weapon")]
-        public Item defaultWeaponItem;
+        [SerializeField]
+        private Item defaultWeaponItem;
         [Tooltip("Default hit effect, will be used when attacks to enemies")]
-        public GameEffectCollection defaultHitEffects;
+        [SerializeField]
+        private GameEffectCollection defaultHitEffects;
         public int[] expTree;
         [Tooltip("You can add game data here or leave this empty to let it load data from Resources folders")]
-        public GameDatabase gameDatabase;
+        [SerializeField]
+        private GameDatabase gameDatabase;
         [Tooltip("You can add warp portals here or may add warp portals in the scene directly, So you can leave this empty")]
-        public WarpPortalDatabase warpPortalDatabase;
+        [SerializeField]
+        private WarpPortalDatabase warpPortalDatabase;
         [Tooltip("You can add NPCs here or may add NPCs in the scene directly, so you can leave this empty")]
-        public NpcDatabase npcDatabase;
+        [SerializeField]
+        private NpcDatabase npcDatabase;
+        [Tooltip("You can add social system settings or leave this empty to use default settings")]
+        [SerializeField]
+        private SocialSystemSetting socialSystemSetting;
 
         [Header("Gameplay Configs")]
         public UnityTag playerTag;
@@ -100,12 +108,6 @@ namespace MultiplayerARPG
         [Header("Player Configs")]
         public int minCharacterNameLength = 2;
         public int maxCharacterNameLength = 16;
-
-        [Header("Party Configs")]
-        public int maxPartyMember = 10;
-
-        [Header("Guild Configs")]
-        public int maxGuildMember = 50;
 
         [Header("Playing In Editor")]
         public bool useMobileInEditor;
@@ -171,7 +173,7 @@ namespace MultiplayerARPG
                     cacheDefaultDamageElement = ScriptableObject.CreateInstance<DamageElement>();
                     cacheDefaultDamageElement.name = GameDataConst.DEFAULT_DAMAGE_ID;
                     cacheDefaultDamageElement.title = GameDataConst.DEFAULT_DAMAGE_TITLE;
-                    cacheDefaultDamageElement.hitEffects = defaultHitEffects;
+                    cacheDefaultDamageElement.hitEffects = DefaultHitEffects;
                 }
                 return cacheDefaultDamageElement;
             }
@@ -238,6 +240,26 @@ namespace MultiplayerARPG
                     defaultWeaponItem.harvestDamageAmount = harvestDamageAmount;
                 }
                 return defaultWeaponItem;
+            }
+        }
+
+        public GameEffectCollection DefaultHitEffects
+        {
+            get
+            {
+                if (defaultHitEffects != null)
+                    defaultHitEffects = new GameEffectCollection();
+                return defaultHitEffects;
+            }
+        }
+
+        public SocialSystemSetting SocialSystemSetting
+        {
+            get
+            {
+                if (socialSystemSetting == null)
+                    socialSystemSetting = ScriptableObject.CreateInstance<SocialSystemSetting>();
+                return socialSystemSetting;
             }
         }
         #endregion

@@ -44,10 +44,6 @@ namespace MultiplayerARPG
         public GameObject[] memberIsLeaderObjects;
         [Tooltip("These objects will be activated when this social member is not leader")]
         public GameObject[] memberIsNotLeaderObjects;
-        [Tooltip("These objects will be activated when owning character is leader")]
-        public GameObject[] owningCharacterIsLeaderObjects;
-        [Tooltip("These objects will be activated when owning character is not leader")]
-        public GameObject[] owningCharacterIsNotLeaderObjects;
         [Header("Class information")]
         public TextWrapper uiTextClassTitle;
         public TextWrapper uiTextClassDescription;
@@ -95,37 +91,25 @@ namespace MultiplayerARPG
             foreach (var obj in memberIsOnlineObjects)
             {
                 if (obj != null)
-                    obj.SetActive(Data.socialCharacter.isOnline);
+                    obj.SetActive(Data.socialCharacter.IsOnline());
             }
 
             foreach (var obj in memberIsNotOnlineObjects)
             {
                 if (obj != null)
-                    obj.SetActive(!Data.socialCharacter.isOnline);
+                    obj.SetActive(!Data.socialCharacter.IsOnline());
             }
 
             foreach (var obj in memberIsLeaderObjects)
             {
                 if (obj != null)
-                    obj.SetActive(!string.IsNullOrEmpty(Data.socialCharacter.id) && Data.socialCharacter.id.Equals(uiSocialGroup.leaderId));
+                    obj.SetActive(!string.IsNullOrEmpty(Data.socialCharacter.id) && uiSocialGroup.IsLeader(Data.socialCharacter.memberFlags));
             }
 
             foreach (var obj in memberIsNotLeaderObjects)
             {
                 if (obj != null)
-                    obj.SetActive(string.IsNullOrEmpty(Data.socialCharacter.id) || !Data.socialCharacter.id.Equals(uiSocialGroup.leaderId));
-            }
-
-            foreach (var obj in owningCharacterIsLeaderObjects)
-            {
-                if (obj != null)
-                    obj.SetActive(BasePlayerCharacterController.OwningCharacter.Id.Equals(uiSocialGroup.leaderId));
-            }
-
-            foreach (var obj in owningCharacterIsNotLeaderObjects)
-            {
-                if (obj != null)
-                    obj.SetActive(!BasePlayerCharacterController.OwningCharacter.Id.Equals(uiSocialGroup.leaderId));
+                    obj.SetActive(string.IsNullOrEmpty(Data.socialCharacter.id) || !uiSocialGroup.IsLeader(Data.socialCharacter.memberFlags));
             }
 
             // Character class data

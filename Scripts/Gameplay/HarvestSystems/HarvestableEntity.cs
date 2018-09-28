@@ -43,7 +43,7 @@ namespace MultiplayerARPG
             base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
             // Play hit effect
             if (hitEffectsId == 0)
-                hitEffectsId = gameInstance.defaultHitEffects.Id;
+                hitEffectsId = gameInstance.DefaultHitEffects.Id;
             if (hitEffectsId > 0)
                 RequestPlayEffect(hitEffectsId);
             // Apply damages

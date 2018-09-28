@@ -91,7 +91,6 @@ namespace MultiplayerARPG
             {
                 shareExp = castedMessage.shareExp;
                 shareItem = castedMessage.shareItem;
-                leaderId = castedMessage.leaderId;
                 memberAmount = castedMessage.members.Length;
                 UpdateUIs();
 
@@ -128,8 +127,9 @@ namespace MultiplayerARPG
         public void OnClickSettingParty()
         {
             // If not in the party or not leader, return
-            if (!IsLeader())
+            if (!OwningCharacterIsLeader())
                 return;
+
             // Show setup party dialog
             if (uiPartySetting != null)
                 uiPartySetting.Show(shareExp, shareItem);
@@ -138,7 +138,7 @@ namespace MultiplayerARPG
         public void OnClickKickFromParty()
         {
             // If not in the party or not leader, return
-            if (!IsLeader() || SelectionManager.SelectedUI == null)
+            if (!OwningCharacterCanKick() || SelectionManager.SelectedUI == null)
                 return;
 
             var partyMember = SelectionManager.SelectedUI.Data.socialCharacter;
@@ -163,7 +163,27 @@ namespace MultiplayerARPG
 
         public override int GetMaxMemberAmount()
         {
-            return GameInstance.Singleton.maxPartyMember;
+            return GameInstance.Singleton.SocialSystemSetting.maxPartyMember;
+        }
+
+        public override bool IsLeader(byte flags)
+        {
+            return PartyData.IsLeader((PartyMemberFlags)flags);
+        }
+
+        public override bool CanKick(byte flags)
+        {
+            return PartyData.CanKick((PartyMemberFlags)flags);
+        }
+
+        public override bool OwningCharacterIsLeader()
+        {
+            return PartyData.IsLeader(BasePlayerCharacterController.OwningCharacter.PartyMemberFlags);
+        }
+
+        public override bool OwningCharacterCanKick()
+        {
+            return PartyData.CanKick(BasePlayerCharacterController.OwningCharacter.PartyMemberFlags);
         }
     }
 }

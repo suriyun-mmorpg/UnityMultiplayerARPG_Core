@@ -348,7 +348,7 @@ namespace MultiplayerARPG
             }
             // Play hit effect
             if (hitEffectsId == 0)
-                hitEffectsId = gameInstance.defaultHitEffects.Id;
+                hitEffectsId = gameInstance.DefaultHitEffects.Id;
             if (hitEffectsId > 0)
                 RequestPlayEffect(hitEffectsId);
             // Calculate chance to critical

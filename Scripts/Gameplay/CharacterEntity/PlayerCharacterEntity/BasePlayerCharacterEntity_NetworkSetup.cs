@@ -21,10 +21,10 @@ namespace MultiplayerARPG
             partyId.forOwnerOnly = true;
             guildId.sendOptions = SendOptions.ReliableOrdered;
             guildId.forOwnerOnly = true;
-            isPartyLeader.sendOptions = SendOptions.ReliableOrdered;
-            isPartyLeader.forOwnerOnly = true;
-            isGuildLeader.sendOptions = SendOptions.ReliableOrdered;
-            isGuildLeader.forOwnerOnly = true;
+            partyMemberFlags.sendOptions = SendOptions.ReliableOrdered;
+            partyMemberFlags.forOwnerOnly = true;
+            guildMemberFlags.sendOptions = SendOptions.ReliableOrdered;
+            guildMemberFlags.forOwnerOnly = true;
 
             hotkeys.forOwnerOnly = true;
             quests.forOwnerOnly = true;

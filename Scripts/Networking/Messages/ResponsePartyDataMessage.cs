@@ -6,13 +6,11 @@ namespace MultiplayerARPG
     {
         public bool shareExp;
         public bool shareItem;
-        public string leaderId;
 
         public override void DeserializeData(NetDataReader reader)
         {
             shareExp = reader.GetBool();
             shareItem = reader.GetBool();
-            leaderId = reader.GetString();
             base.DeserializeData(reader);
         }
 
@@ -20,7 +18,6 @@ namespace MultiplayerARPG
         {
             writer.Put(shareExp);
             writer.Put(shareItem);
-            writer.Put(leaderId);
             base.SerializeData(writer);
         }
     }

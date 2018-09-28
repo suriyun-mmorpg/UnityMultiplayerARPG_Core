@@ -26,11 +26,13 @@ namespace MultiplayerARPG
         public GameObject[] owningCharacterIsLeaderObjects;
         [Tooltip("These objects will be activated when owning character is not leader")]
         public GameObject[] owningCharacterIsNotLeaderObjects;
+        [Tooltip("These objects will be activated when owning character can kick")]
+        public GameObject[] owningCharacterCanKickObjects;
+        [Tooltip("These objects will be activated when owning character cannot kick")]
+        public GameObject[] owningCharacterCannotKickObjects;
 
-        protected string currentCharacterId = string.Empty;
         protected int currentSocialId = 0;
         public int memberAmount { get; protected set; }
-        public string leaderId { get; protected set; }
 
         private UIList cacheList;
         public UIList CacheList
@@ -61,10 +63,8 @@ namespace MultiplayerARPG
 
         protected virtual void Update()
         {
-            if (!currentCharacterId.Equals(BasePlayerCharacterController.OwningCharacter.Id) ||
-                currentSocialId != GetSocialId())
+            if (currentSocialId != GetSocialId())
             {
-                currentCharacterId = BasePlayerCharacterController.OwningCharacter.Id;
                 currentSocialId = GetSocialId();
                 UpdateUIs();
 
@@ -100,13 +100,25 @@ namespace MultiplayerARPG
             foreach (var obj in owningCharacterIsLeaderObjects)
             {
                 if (obj != null)
-                    obj.SetActive(currentCharacterId.Equals(leaderId));
+                    obj.SetActive(OwningCharacterIsLeader());
             }
 
             foreach (var obj in owningCharacterIsNotLeaderObjects)
             {
                 if (obj != null)
-                    obj.SetActive(!currentCharacterId.Equals(leaderId));
+                    obj.SetActive(!OwningCharacterIsLeader());
+            }
+
+            foreach (var obj in owningCharacterCanKickObjects)
+            {
+                if (obj != null)
+                    obj.SetActive(OwningCharacterCanKick());
+            }
+
+            foreach (var obj in owningCharacterCannotKickObjects)
+            {
+                if (obj != null)
+                    obj.SetActive(!OwningCharacterCanKick());
             }
         }
 
@@ -141,13 +153,12 @@ namespace MultiplayerARPG
             if (uiMemberDialog != null)
                 uiMemberDialog.Hide();
         }
-
-        protected bool IsLeader()
-        {
-            return currentSocialId > 0 && currentCharacterId.Equals(leaderId);
-        }
-
+        
         public abstract int GetSocialId();
         public abstract int GetMaxMemberAmount();
+        public abstract bool IsLeader(byte flags);
+        public abstract bool CanKick(byte flags);
+        public abstract bool OwningCharacterIsLeader();
+        public abstract bool OwningCharacterCanKick();
     }
 }

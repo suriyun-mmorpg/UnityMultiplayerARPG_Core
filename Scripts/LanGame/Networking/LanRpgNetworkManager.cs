@@ -179,7 +179,7 @@ namespace MultiplayerARPG
             var party = new PartyData(partyId, shareExp, shareItem, playerCharacterEntity);
             parties[partyId] = party;
             playerCharacterEntity.PartyId = partyId;
-            playerCharacterEntity.IsPartyLeader = true;
+            playerCharacterEntity.PartyMemberFlags = party.GetPartyMemberFlags(playerCharacterEntity);
         }
 
         public override void PartySetting(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
@@ -212,7 +212,7 @@ namespace MultiplayerARPG
                 // TODO: May warn that it's not party leader
                 return;
             }
-            if (party.CountMember() == gameInstance.maxPartyMember)
+            if (party.CountMember() == gameInstance.SocialSystemSetting.maxPartyMember)
             {
                 // TODO: May warn that it's exceeds limit max party member
                 return;
@@ -220,7 +220,7 @@ namespace MultiplayerARPG
             party.AddMember(acceptCharacterEntity);
             parties[partyId] = party;
             acceptCharacterEntity.PartyId = partyId;
-            acceptCharacterEntity.IsPartyLeader = false;
+            acceptCharacterEntity.PartyMemberFlags = party.GetPartyMemberFlags(acceptCharacterEntity);
         }
 
         public override void KickFromParty(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
@@ -240,7 +240,7 @@ namespace MultiplayerARPG
             if (playerCharactersById.TryGetValue(characterId, out memberCharacterEntity))
             {
                 memberCharacterEntity.PartyId = 0;
-                memberCharacterEntity.IsPartyLeader = false;
+                memberCharacterEntity.PartyMemberFlags = 0;
             }
             party.RemoveMember(characterId);
             parties[partyId] = party;
@@ -262,7 +262,7 @@ namespace MultiplayerARPG
                     if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
                     {
                         memberCharacterEntity.PartyId = 0;
-                        memberCharacterEntity.IsPartyLeader = false;
+                        memberCharacterEntity.PartyMemberFlags = 0;
                     }
                 }
                 parties.Remove(partyId);
@@ -270,7 +270,7 @@ namespace MultiplayerARPG
             else
             {
                 playerCharacterEntity.PartyId = 0;
-                playerCharacterEntity.IsPartyLeader = false;
+                playerCharacterEntity.PartyMemberFlags = 0;
                 party.RemoveMember(playerCharacterEntity.Id);
                 parties[partyId] = party;
             }
@@ -284,7 +284,7 @@ namespace MultiplayerARPG
             var guild = new GuildData(guildId, guildName, playerCharacterEntity);
             guilds[guildId] = guild;
             playerCharacterEntity.GuildId = guildId;
-            playerCharacterEntity.IsGuildLeader = true;
+            playerCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlags(playerCharacterEntity);
         }
 
         public override void SetGuildMessage(BasePlayerCharacterEntity playerCharacterEntity, string guildMessage)
@@ -317,7 +317,7 @@ namespace MultiplayerARPG
                 // TODO: May warn that it's not guild leader
                 return;
             }
-            if (guild.CountMember() == gameInstance.maxGuildMember)
+            if (guild.CountMember() == gameInstance.SocialSystemSetting.maxGuildMember)
             {
                 // TODO: May warn that it's exceeds limit max guild member
                 return;
@@ -325,7 +325,7 @@ namespace MultiplayerARPG
             guild.AddMember(acceptCharacterEntity);
             guilds[guildId] = guild;
             acceptCharacterEntity.GuildId = guildId;
-            acceptCharacterEntity.IsGuildLeader = false;
+            acceptCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlags(acceptCharacterEntity);
         }
 
         public override void KickFromGuild(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
@@ -345,7 +345,7 @@ namespace MultiplayerARPG
             if (playerCharactersById.TryGetValue(characterId, out memberCharacterEntity))
             {
                 memberCharacterEntity.GuildId = 0;
-                memberCharacterEntity.IsGuildLeader = false;
+                memberCharacterEntity.GuildMemberFlags = 0;
             }
             guild.RemoveMember(characterId);
             guilds[guildId] = guild;
@@ -367,7 +367,7 @@ namespace MultiplayerARPG
                     if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
                     {
                         memberCharacterEntity.GuildId = 0;
-                        memberCharacterEntity.IsGuildLeader = false;
+                        memberCharacterEntity.GuildMemberFlags = 0;
                     }
                 }
                 guilds.Remove(guildId);
@@ -375,7 +375,7 @@ namespace MultiplayerARPG
             else
             {
                 playerCharacterEntity.GuildId = 0;
-                playerCharacterEntity.IsGuildLeader = false;
+                playerCharacterEntity.GuildMemberFlags = 0;
                 guild.RemoveMember(playerCharacterEntity.Id);
                 guilds[guildId] = guild;
             }

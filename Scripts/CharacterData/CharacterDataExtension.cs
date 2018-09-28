@@ -651,7 +651,7 @@ public static partial class CharacterDataExtension
             isLeftHand = true;
             return leftHand;
         }
-        return CharacterItem.Create(GameInstance.Singleton.defaultWeaponItem);
+        return CharacterItem.Create(GameInstance.Singleton.DefaultWeaponItem);
     }
 
     public static bool CanAttack(this ICharacterData data)
@@ -664,7 +664,7 @@ public static partial class CharacterDataExtension
             return rightWeapon.CanAttack(data);
         else if (leftWeapon != null)
             return leftWeapon.CanAttack(data);
-        return GameInstance.Singleton.defaultWeaponItem.CanAttack(data);
+        return GameInstance.Singleton.DefaultWeaponItem.CanAttack(data);
     }
 
     public static int IndexOfAttribute(this ICharacterData data, int dataId)
