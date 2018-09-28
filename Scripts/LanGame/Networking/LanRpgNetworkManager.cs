@@ -3,7 +3,6 @@ using UnityEngine;
 using LiteNetLibManager;
 using LiteNetLib;
 using LiteNetLib.Utils;
-using System.Collections.Generic;
 using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
@@ -282,9 +281,11 @@ namespace MultiplayerARPG
                 return;
             var guildId = nextGuildId++;
             var guild = new GuildData(guildId, guildName, playerCharacterEntity);
+            byte guildRole;
             guilds[guildId] = guild;
             playerCharacterEntity.GuildId = guildId;
-            playerCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlags(playerCharacterEntity);
+            playerCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(playerCharacterEntity, out guildRole);
+            playerCharacterEntity.GuildRole = guildRole;
         }
 
         public override void SetGuildMessage(BasePlayerCharacterEntity playerCharacterEntity, string guildMessage)
@@ -323,9 +324,11 @@ namespace MultiplayerARPG
                 return;
             }
             guild.AddMember(acceptCharacterEntity);
+            byte guildRole;
             guilds[guildId] = guild;
             acceptCharacterEntity.GuildId = guildId;
-            acceptCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlags(acceptCharacterEntity);
+            acceptCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(acceptCharacterEntity, out guildRole);
+            acceptCharacterEntity.GuildRole = guildRole;
         }
 
         public override void KickFromGuild(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
@@ -346,6 +349,7 @@ namespace MultiplayerARPG
             {
                 memberCharacterEntity.GuildId = 0;
                 memberCharacterEntity.GuildMemberFlags = 0;
+                memberCharacterEntity.GuildRole = 0;
             }
             guild.RemoveMember(characterId);
             guilds[guildId] = guild;
@@ -368,6 +372,7 @@ namespace MultiplayerARPG
                     {
                         memberCharacterEntity.GuildId = 0;
                         memberCharacterEntity.GuildMemberFlags = 0;
+                        memberCharacterEntity.GuildRole = 0;
                     }
                 }
                 guilds.Remove(guildId);
@@ -376,6 +381,7 @@ namespace MultiplayerARPG
             {
                 playerCharacterEntity.GuildId = 0;
                 playerCharacterEntity.GuildMemberFlags = 0;
+                playerCharacterEntity.GuildRole = 0;
                 guild.RemoveMember(playerCharacterEntity.Id);
                 guilds[guildId] = guild;
             }

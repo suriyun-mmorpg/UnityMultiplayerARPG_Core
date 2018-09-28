@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         public int exp;
         public int skillPoint;
         public string guildMessage;
+        protected Dictionary<string, byte> roles;
 
         public GuildData(int id, string guildName, string leaderId, string leaderName)
             : base(id, leaderId)
@@ -20,6 +21,7 @@ namespace MultiplayerARPG
             exp = 0;
             skillPoint = 0;
             guildMessage = string.Empty;
+            roles = new Dictionary<string, byte>();
         }
 
         public GuildData(int id, string guildName, BasePlayerCharacterEntity leaderCharacterEntity)
@@ -28,39 +30,55 @@ namespace MultiplayerARPG
             AddMember(leaderCharacterEntity);
         }
 
+        public void AddMember(SocialCharacterData memberData, byte guildRole)
+        {
+            AddMember(memberData);
+            if (members.ContainsKey(memberData.id))
+                roles[memberData.id] = guildRole;
+        }
+
+        public void UpdateMember(SocialCharacterData memberData, byte guildRole)
+        {
+            UpdateMember(memberData);
+            if (members.ContainsKey(memberData.id))
+                roles[memberData.id] = guildRole;
+        }
+
+        public override bool RemoveMember(string characterId)
+        {
+            roles.Remove(characterId);
+            return base.RemoveMember(characterId);
+        }
+
         public override byte GetMemberFlags(SocialCharacterData memberData)
         {
-            return (byte)GetGuildMemberFlags(memberData.id);
+            byte guildRole;
+            return (byte)GetGuildMemberFlagsAndRole(memberData.id, out guildRole);
         }
 
-        private GuildMemberFlags GetGuildLeaderFlags()
+        public GuildMemberFlags GetGuildMemberFlagsAndRole(BasePlayerCharacterEntity playerCharacterEntity, out byte guildRole)
         {
-            if (SystemSetting.guildMemberRoles == null || SystemSetting.guildMemberRoles.Length <= 0)
-                return (GuildMemberFlags.IsLeader | GuildMemberFlags.CanInvite | GuildMemberFlags.CanKick);
-            return GuildMemberFlags.IsLeader | GetGuildFlags(0);
+            return GetGuildMemberFlagsAndRole(playerCharacterEntity.Id, out guildRole);
         }
 
-        private GuildMemberFlags GetGuildMemberFlags()
-        {
-            if (SystemSetting.guildMemberRoles == null || SystemSetting.guildMemberRoles.Length <= 1)
-                return 0;
-            return GetGuildFlags(SystemSetting.guildMemberRoles.Length - 1);
-        }
-
-        public GuildMemberFlags GetGuildMemberFlags(BasePlayerCharacterEntity playerCharacterEntity)
-        {
-            if (IsLeader(playerCharacterEntity))
-                return GetGuildLeaderFlags();
-            else
-                return GetGuildMemberFlags();
-        }
-
-        public GuildMemberFlags GetGuildMemberFlags(string characterId)
+        public GuildMemberFlags GetGuildMemberFlagsAndRole(string characterId, out byte guildRole)
         {
             if (IsLeader(characterId))
-                return GetGuildLeaderFlags();
+            {
+                guildRole = 0;
+                if (SystemSetting.guildMemberRoles == null || SystemSetting.guildMemberRoles.Length <= guildRole)
+                    return (GuildMemberFlags.IsLeader | GuildMemberFlags.CanInvite | GuildMemberFlags.CanKick);
+                return GuildMemberFlags.IsLeader | GetGuildFlags(guildRole);
+            }
             else
-                return GetGuildMemberFlags();
+            {
+                guildRole = 1;
+                if (SystemSetting.guildMemberRoles == null || SystemSetting.guildMemberRoles.Length <= guildRole)
+                    return 0;
+                if (!roles.TryGetValue(characterId, out guildRole) || SystemSetting.guildMemberRoles.Length <= guildRole)
+                    guildRole = (byte)(SystemSetting.guildMemberRoles.Length - 1);
+                return GetGuildFlags(guildRole);
+            }
         }
 
         public GuildMemberFlags GetGuildFlags(int roleIdx)

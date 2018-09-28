@@ -66,7 +66,7 @@ namespace MultiplayerARPG
             AddMember(CreateMemberData(playerCharacterEntity));
         }
 
-        public void AddMember(SocialCharacterData memberData)
+        public virtual void AddMember(SocialCharacterData memberData)
         {
             if (!members.ContainsKey(memberData.id))
             {
@@ -86,7 +86,7 @@ namespace MultiplayerARPG
             UpdateMember(CreateMemberData(playerCharacterEntity));
         }
 
-        public void UpdateMember(SocialCharacterData memberData)
+        public virtual void UpdateMember(SocialCharacterData memberData)
         {
             if (!members.ContainsKey(memberData.id))
                 return;
@@ -107,7 +107,7 @@ namespace MultiplayerARPG
             return RemoveMember(playerCharacterEntity.Id);
         }
 
-        public bool RemoveMember(string characterId)
+        public virtual bool RemoveMember(string characterId)
         {
             return members.Remove(characterId);
         }

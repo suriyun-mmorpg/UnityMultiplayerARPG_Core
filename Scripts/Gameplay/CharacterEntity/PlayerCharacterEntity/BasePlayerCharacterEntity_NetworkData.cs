@@ -20,6 +20,8 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldInt guildId = new SyncFieldInt();
         [SerializeField]
+        protected SyncFieldByte guildRole = new SyncFieldByte();
+        [SerializeField]
         protected SyncFieldByte partyMemberFlags = new SyncFieldByte();
         [SerializeField]
         protected SyncFieldByte guildMemberFlags = new SyncFieldByte();
@@ -86,7 +88,7 @@ namespace MultiplayerARPG
         public int Gold { get { return gold.Value; } set { gold.Value = value; } }
         public int PartyId { get { return partyId.Value; } set { partyId.Value = value; } }
         public int GuildId { get { return guildId.Value; } set { guildId.Value = value; } }
-        public int GuildRole { get; set; }
+        public byte GuildRole { get { return guildRole.Value; } set { guildRole.Value = value; } }
         public PartyMemberFlags PartyMemberFlags { get { return (PartyMemberFlags)partyMemberFlags.Value; } set { partyMemberFlags.Value = (byte)value; } }
         public GuildMemberFlags GuildMemberFlags { get { return (GuildMemberFlags)guildMemberFlags.Value; } set { guildMemberFlags.Value = (byte)value; } }
         public string CurrentMapName { get { return SceneManager.GetActiveScene().name; } set { } }

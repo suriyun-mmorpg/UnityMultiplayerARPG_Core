@@ -8,7 +8,7 @@ public partial interface IPlayerCharacterData : ICharacterData
     int Gold { get; set; }
     int PartyId { get; set; }
     int GuildId { get; set; }
-    int GuildRole { get; set; }
+    byte GuildRole { get; set; }
     /// <summary>
     /// Current Map Name will be work with MMORPG system only
     /// For Lan game it will be scene name which set in game instance

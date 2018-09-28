@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     {
         public bool shareExp { get; private set; }
         public bool shareItem { get; private set; }
-        
+
         public PartyData(int id, bool shareExp, bool shareItem, string leaderId)
             : base(id, leaderId)
         {
@@ -31,16 +31,6 @@ namespace MultiplayerARPG
             return (byte)GetPartyMemberFlags(memberData.id);
         }
 
-        private PartyMemberFlags GetPartyLeaderFlags()
-        {
-            return (PartyMemberFlags.IsLeader | PartyMemberFlags.CanInvite | PartyMemberFlags.CanKick);
-        }
-
-        private PartyMemberFlags GetPartyMemberFlags()
-        {
-            return ((SystemSetting.partyMemberCanInvite ? PartyMemberFlags.CanInvite : 0) | (SystemSetting.partyMemberCanKick ? PartyMemberFlags.CanKick : 0));
-        }
-
         public PartyMemberFlags GetPartyMemberFlags(BasePlayerCharacterEntity playerCharacterEntity)
         {
             return GetPartyMemberFlags(playerCharacterEntity.Id);
@@ -49,9 +39,9 @@ namespace MultiplayerARPG
         public PartyMemberFlags GetPartyMemberFlags(string characterId)
         {
             if (IsLeader(characterId))
-                return GetPartyLeaderFlags();
+                return (PartyMemberFlags.IsLeader | PartyMemberFlags.CanInvite | PartyMemberFlags.CanKick);
             else
-                return GetPartyMemberFlags();
+                return ((SystemSetting.partyMemberCanInvite ? PartyMemberFlags.CanInvite : 0) | (SystemSetting.partyMemberCanKick ? PartyMemberFlags.CanKick : 0));
         }
 
         public static bool IsLeader(PartyMemberFlags flags)
