@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "ItemRefineInfo", menuName = "Create GameData/ItemRefineInfo")]
+    [CreateAssetMenu(fileName = "Item Refine Info", menuName = "Create GameData/Item Refine Info")]
     public partial class ItemRefine : BaseGameData
     {
         public ItemRefineLevel[] levels;

@@ -21,7 +21,7 @@ namespace MultiplayerARPG
         public short amount;
     }
 
-    [CreateAssetMenu(fileName = "MonsterCharacter", menuName = "Create GameData/MonsterCharacter")]
+    [CreateAssetMenu(fileName = "Monster Character", menuName = "Create GameData/Monster Character")]
     public class MonsterCharacter : BaseCharacter
     {
         [Header("Monster Data")]

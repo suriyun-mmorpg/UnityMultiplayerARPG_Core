@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "DamageElement", menuName = "Create GameData/DamageElement")]
+    [CreateAssetMenu(fileName = "Damage Element", menuName = "Create GameData/Damage Element")]
     public partial class DamageElement : BaseGameData
     {
         [Range(0f, 1f)]

@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "CashShopDatabase", menuName = "Create CashShop/CashShopDatabase")]
+    [CreateAssetMenu(fileName = "Cash Shop Database", menuName = "Create CashShop/Cash Shop Database")]
     public class CashShopDatabase : ScriptableObject
     {
         public CashShopItem[] cashStopItems;

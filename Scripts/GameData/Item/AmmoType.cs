@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "AmmoType", menuName = "Create GameData/AmmoType")]
+    [CreateAssetMenu(fileName = "Ammo Type", menuName = "Create GameData/Ammo Type")]
     public partial class AmmoType : BaseGameData
     {
     }

@@ -5,7 +5,7 @@ using UnityEngine.Purchasing;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "CashPackage", menuName = "Create CashShop/CashPackage")]
+    [CreateAssetMenu(fileName = "Cash Package", menuName = "Create CashShop/Cash Package")]
     public class CashPackage : BaseGameData
     {
         [HideInInspector]

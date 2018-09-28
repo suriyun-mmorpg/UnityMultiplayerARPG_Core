@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "MapInfo", menuName = "Create GameData/MapInfo")]
+    [CreateAssetMenu(fileName = "Map Info", menuName = "Create GameData/Map Info")]
     public partial class MapInfo : BaseGameData
     {
         public UnityScene scene;

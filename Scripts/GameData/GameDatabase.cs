@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "GameDatabase", menuName = "Create GameDatabase/GameDatabase")]
+    [CreateAssetMenu(fileName = "Game Database", menuName = "Create GameDatabase/Game Database")]
     public class GameDatabase : ScriptableObject
     {
         public Attribute[] attributes;

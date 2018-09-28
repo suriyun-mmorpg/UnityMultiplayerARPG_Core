@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "CashShopItem", menuName = "Create CashShop/CashShopItem")]
+    [CreateAssetMenu(fileName = "Cash Shop Item", menuName = "Create CashShop/Cash Shop Item")]
     public class CashShopItem : BaseGameData
     {
         public string externalIconUrl;
