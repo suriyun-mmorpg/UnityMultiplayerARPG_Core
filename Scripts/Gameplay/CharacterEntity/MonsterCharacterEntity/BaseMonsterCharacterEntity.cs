@@ -47,6 +47,11 @@ namespace MultiplayerARPG
         protected override void EntityStart()
         {
             base.EntityStart();
+            InitStats();
+        }
+
+        protected void InitStats()
+        {
             if (IsServer)
             {
                 if (spawnArea == null)
@@ -85,18 +90,7 @@ namespace MultiplayerARPG
             if (gameInstance.monsterCharacterUI != null)
                 InstantiateUI(gameInstance.monsterCharacterUI);
 
-            if (IsServer)
-            {
-                if (spawnArea == null)
-                    spawnPosition = CacheTransform.position;
-
-                var stats = this.GetStats();
-                CurrentHp = (int)stats.hp;
-                CurrentMp = (int)stats.mp;
-                CurrentStamina = (int)stats.stamina;
-                CurrentFood = (int)stats.food;
-                CurrentWater = (int)stats.water;
-            }
+            InitStats();
         }
 
         public virtual void SetAttackTarget(BaseCharacterEntity target)

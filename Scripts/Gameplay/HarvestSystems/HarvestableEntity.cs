@@ -28,6 +28,11 @@ namespace MultiplayerARPG
         protected override void EntityStart()
         {
             base.EntityStart();
+            InitStats();
+        }
+
+        private void InitStats()
+        {
             if (IsServer)
             {
                 if (spawnArea == null)
@@ -47,14 +52,7 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
             RegisterNetFunction("OnHarvestableDestroy", new LiteNetLibFunction(() => { onHarvestableDestroy.Invoke(); }));
-
-            if (IsServer)
-            {
-                if (spawnArea == null)
-                    spawnPosition = CacheTransform.position;
-
-                CurrentHp = maxHp;
-            }
+            InitStats();
         }
 
         public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
