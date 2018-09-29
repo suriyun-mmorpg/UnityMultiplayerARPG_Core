@@ -1,14 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
     public class MissileDamageEntity : BaseDamageEntity
     {
-        [SerializeField]
-        protected DimensionType dimensionType;
+        public DimensionType dimensionType;
+        public UnityEvent onDestroy;
         [SerializeField]
         protected SyncFieldFloat missileSpeed = new SyncFieldFloat();
         protected float missileDistance;
@@ -101,6 +102,13 @@ namespace MultiplayerARPG
 
             ApplyDamageTo(damageableEntity);
             NetworkDestroy();
+        }
+
+        public override void OnNetworkDestroy(DestroyObjectReasons reasons)
+        {
+            base.OnNetworkDestroy(reasons);
+            if (reasons == DestroyObjectReasons.RequestedToDestroy && onDestroy != null)
+                onDestroy.Invoke();
         }
     }
 }
