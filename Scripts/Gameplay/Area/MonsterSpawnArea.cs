@@ -60,17 +60,9 @@ namespace MultiplayerARPG
             {
                 var identity = CacheGameNetworkManager.Assets.NetworkSpawn(monsterCharacterPrefab.Identity, spawnPosition, spawnRotation);
                 var entity = identity.GetComponent<BaseMonsterCharacterEntity>();
-                entity.Id = string.Empty;
                 entity.DataId = dataId;
                 entity.Level = level;
-                var stats = entity.GetStats();
-                entity.CurrentHp = (int)stats.hp;
-                entity.CurrentMp = (int)stats.mp;
-                entity.CurrentStamina = (int)stats.stamina;
-                entity.CurrentFood = (int)stats.food;
-                entity.CurrentWater = (int)stats.water;
-                entity.spawnArea = this;
-                entity.spawnPosition = spawnPosition;
+                entity.SetSpawnArea(this, spawnPosition);
             }
         }
 

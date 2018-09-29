@@ -10,18 +10,12 @@ namespace MultiplayerARPG
     {
         public readonly Dictionary<BaseCharacterEntity, ReceivedDamageRecord> receivedDamageRecords = new Dictionary<BaseCharacterEntity, ReceivedDamageRecord>();
 
-        #region Interface implementation
         public override string CharacterName
         {
             get { return MonsterDatabase == null ? "Unknow" : MonsterDatabase.title; }
             set { }
         }
-        #endregion
 
-        [HideInInspector]
-        public MonsterSpawnArea spawnArea;
-        [HideInInspector]
-        public Vector3 spawnPosition;
         [HideInInspector]
         public BaseCharacterEntity spawner;
 
@@ -40,14 +34,37 @@ namespace MultiplayerARPG
                 return cacheNetTransform;
             }
         }
-
-        protected float ReceivedDamageRecordsUpdateTime;
-        protected bool destroyAndRespawnCalled;
+        
+        public MonsterSpawnArea spawnArea { get; private set; }
+        public Vector3 spawnPosition { get; private set; }
 
         protected override void EntityAwake()
         {
             base.EntityAwake();
             gameObject.tag = gameInstance.monsterTag;
+        }
+
+        protected override void EntityStart()
+        {
+            base.EntityStart();
+            if (IsServer)
+            {
+                if (spawnArea == null)
+                    spawnPosition = CacheTransform.position;
+
+                var stats = this.GetStats();
+                CurrentHp = (int)stats.hp;
+                CurrentMp = (int)stats.mp;
+                CurrentStamina = (int)stats.stamina;
+                CurrentFood = (int)stats.food;
+                CurrentWater = (int)stats.water;
+            }
+        }
+
+        public void SetSpawnArea(MonsterSpawnArea spawnArea, Vector3 spawnPosition)
+        {
+            this.spawnArea = spawnArea;
+            this.spawnPosition = spawnPosition;
         }
 
         public override void OnSetup()
@@ -64,8 +81,22 @@ namespace MultiplayerARPG
                     Instantiate(obj, MiniMapElementContainer.position, MiniMapElementContainer.rotation, MiniMapElementContainer);
                 }
             }
+
             if (gameInstance.monsterCharacterUI != null)
                 InstantiateUI(gameInstance.monsterCharacterUI);
+
+            if (IsServer)
+            {
+                if (spawnArea == null)
+                    spawnPosition = CacheTransform.position;
+
+                var stats = this.GetStats();
+                CurrentHp = (int)stats.hp;
+                CurrentMp = (int)stats.mp;
+                CurrentStamina = (int)stats.stamina;
+                CurrentFood = (int)stats.food;
+                CurrentWater = (int)stats.water;
+            }
         }
 
         public virtual void SetAttackTarget(BaseCharacterEntity target)
@@ -207,6 +238,12 @@ namespace MultiplayerARPG
             }
             receivedDamageRecord.lastReceivedDamageTime = Time.unscaledTime;
             receivedDamageRecords[attacker] = receivedDamageRecord;
+
+            if (IsDead())
+            {
+                CurrentHp = 0;
+                DestroyAndRespawn();
+            }
         }
 
         public override void Killed(BaseCharacterEntity lastAttacker)
@@ -318,14 +355,29 @@ namespace MultiplayerARPG
 
         public void DestroyAndRespawn()
         {
-            if (destroyAndRespawnCalled)
+            if (!IsServer)
                 return;
-            destroyAndRespawnCalled = true;
+
             if (spawnArea != null)
                 spawnArea.Spawn(MonsterDatabase.deadHideDelay + MonsterDatabase.deadRespawnDelay);
+            else
+                Manager.StartCoroutine(RespawnRoutine(MonsterDatabase.deadHideDelay + MonsterDatabase.deadRespawnDelay, Manager, Identity.HashAssetId, DataId, Level, spawnPosition));
+
             NetworkDestroy(MonsterDatabase.deadHideDelay);
         }
-        
+
+        private static IEnumerator RespawnRoutine(float delay, LiteNetLibGameManager manager, int hashAssetId, int dataId, short level, Vector3 spawnPosition)
+        {
+            yield return new WaitForSecondsRealtime(delay);
+            var identity = manager.Assets.NetworkSpawn(hashAssetId, spawnPosition, Quaternion.Euler(Vector3.up * Random.Range(0, 360)));
+            if (identity != null)
+            {
+                var entity = identity.GetComponent<BaseMonsterCharacterEntity>();
+                entity.DataId = dataId;
+                entity.Level = level;
+            }
+        }
+
         public abstract void StopMove();
     }
 

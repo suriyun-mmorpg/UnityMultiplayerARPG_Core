@@ -14,13 +14,9 @@ namespace MultiplayerARPG
         public float destroyHideDelay = 2f;
         public float destroyRespawnDelay = 5f;
         public UnityEvent onHarvestableDestroy;
-
-        #region Public data
-        [HideInInspector]
-        public HarvestableSpawnArea spawnArea;
-        [HideInInspector]
-        public Vector3 spawnPosition;
-        #endregion
+        
+        public HarvestableSpawnArea spawnArea { get; private set; }
+        public Vector3 spawnPosition { get; private set; }
 
         protected override void EntityAwake()
         {
@@ -29,10 +25,36 @@ namespace MultiplayerARPG
             gameObject.layer = gameInstance.harvestableLayer;
         }
 
+        protected override void EntityStart()
+        {
+            base.EntityStart();
+            if (IsServer)
+            {
+                if (spawnArea == null)
+                    spawnPosition = CacheTransform.position;
+
+                CurrentHp = maxHp;
+            }
+        }
+
+        public void SetSpawnArea(HarvestableSpawnArea spawnArea, Vector3 spawnPosition)
+        {
+            this.spawnArea = spawnArea;
+            this.spawnPosition = spawnPosition;
+        }
+
         public override void OnSetup()
         {
             base.OnSetup();
             RegisterNetFunction("OnHarvestableDestroy", new LiteNetLibFunction(() => { onHarvestableDestroy.Invoke(); }));
+
+            if (IsServer)
+            {
+                if (spawnArea == null)
+                    spawnPosition = CacheTransform.position;
+
+                CurrentHp = maxHp;
+            }
         }
 
         public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
@@ -63,14 +85,31 @@ namespace MultiplayerARPG
             }
             CurrentHp -= totalDamage;
             ReceivedDamage(attacker, CombatAmountType.NormalDamage, totalDamage);
+
             if (IsDead())
             {
                 CurrentHp = 0;
                 CallNetFunction("OnHarvestableDestroy", FunctionReceivers.All);
-                if (spawnArea != null)
-                    spawnArea.Spawn(destroyHideDelay + destroyRespawnDelay);
-                NetworkDestroy(destroyHideDelay);
+                DestroyAndRespawn();
             }
+        }
+
+        public void DestroyAndRespawn()
+        {
+            if (spawnArea != null)
+                spawnArea.Spawn(destroyHideDelay + destroyRespawnDelay);
+            else
+                Manager.StartCoroutine(RespawnRoutine(destroyHideDelay + destroyRespawnDelay, Manager, Identity.HashAssetId, spawnPosition));
+
+            NetworkDestroy(destroyHideDelay);
+        }
+
+        private static IEnumerator RespawnRoutine(float delay, LiteNetLibGameManager manager, int hashAssetId, Vector3 spawnPosition)
+        {
+            yield return new WaitForSecondsRealtime(delay);
+            var identity = manager.Assets.NetworkSpawn(hashAssetId, spawnPosition, Quaternion.Euler(Vector3.up * Random.Range(0, 360)));
+            if (identity != null)
+                identity.GetComponent<BaseMonsterCharacterEntity>();
         }
 
         public override void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountType combatAmountType, int damage)

@@ -130,7 +130,6 @@ namespace MultiplayerARPG
             {
                 CacheMonsterCharacterEntity.StopMove();
                 CacheMonsterCharacterEntity.SetTargetEntity(null);
-                CacheMonsterCharacterEntity.DestroyAndRespawn();
                 return;
             }
 
