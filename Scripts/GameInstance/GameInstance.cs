@@ -247,7 +247,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (defaultHitEffects != null)
+                if (defaultHitEffects == null)
                     defaultHitEffects = new GameEffectCollection();
                 return defaultHitEffects;
             }
