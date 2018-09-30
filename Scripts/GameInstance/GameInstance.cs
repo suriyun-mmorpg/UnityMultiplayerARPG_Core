@@ -530,6 +530,11 @@ namespace MultiplayerARPG
             {
                 if (character == null || AllCharacters.ContainsKey(character.DataId))
                     continue;
+
+                // Set database to entity
+                if (character.entityPrefab != null)
+                    character.entityPrefab.database = character;
+
                 AllCharacters[character.DataId] = character;
                 if (character is PlayerCharacter)
                 {

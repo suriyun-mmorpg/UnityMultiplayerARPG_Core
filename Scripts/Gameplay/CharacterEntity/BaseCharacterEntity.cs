@@ -25,6 +25,7 @@ namespace MultiplayerARPG
         public bool isInSafeArea;
 
         #region Serialize data
+        public BaseCharacter database;
         [Header("Settings")]
         [Tooltip("These objects will be hidden on non owner objects")]
         public GameObject[] ownerObjects;
@@ -39,7 +40,6 @@ namespace MultiplayerARPG
 
         #region Protected data
         protected UICharacterEntity uiCharacterEntity;
-        protected BaseCharacter database;
         protected RpgNetworkEntity targetEntity;
         protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
         protected AnimActionType animActionType;

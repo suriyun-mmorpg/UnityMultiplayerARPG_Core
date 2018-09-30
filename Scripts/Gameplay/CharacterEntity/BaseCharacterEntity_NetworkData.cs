@@ -12,8 +12,6 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldString id = new SyncFieldString();
         [SerializeField]
-        protected SyncFieldInt dataId = new SyncFieldInt();
-        [SerializeField]
         protected SyncFieldString characterName = new SyncFieldString();
         [SerializeField]
         protected SyncFieldShort level = new SyncFieldShort();
@@ -46,7 +44,6 @@ namespace MultiplayerARPG
 
         #region Sync data actions
         public System.Action<string> onIdChange;
-        public System.Action<int> onDataIdChange;
         public System.Action<string> onCharacterNameChange;
         public System.Action<short> onLevelChange;
         public System.Action<int> onExpChange;
@@ -64,7 +61,7 @@ namespace MultiplayerARPG
 
         #region Fields/Interface implementation
         public virtual string Id { get { return id.Value; } set { id.Value = value; } }
-        public virtual int DataId { get { return dataId.Value; } set { dataId.Value = value; } }
+        public virtual int DataId { get { return database.DataId; } set { } }
         public virtual string CharacterName { get { return characterName.Value; } set { characterName.Value = value; } }
         public virtual short Level { get { return level.Value; } set { level.Value = value; } }
         public virtual int Exp { get { return exp.Value; } set { exp.Value = value; } }
@@ -150,21 +147,6 @@ namespace MultiplayerARPG
         {
             if (onIdChange != null)
                 onIdChange.Invoke(id);
-        }
-
-        /// <summary>
-        /// Override this to do stuffs when data Id changes
-        /// </summary>
-        /// <param name="dataId"></param>
-        protected virtual void OnDataIdChange(int dataId)
-        {
-            isRecaching = true;
-
-            // Get database
-            GameInstance.AllCharacters.TryGetValue(dataId, out database);
-
-            if (onDataIdChange != null)
-                onDataIdChange.Invoke(dataId);
         }
 
         /// <summary>

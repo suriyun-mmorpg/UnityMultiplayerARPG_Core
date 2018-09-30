@@ -16,8 +16,6 @@ namespace MultiplayerARPG
             base.SetupNetElements();
             id.sendOptions = SendOptions.ReliableOrdered;
             id.forOwnerOnly = false;
-            dataId.sendOptions = SendOptions.ReliableOrdered;
-            dataId.forOwnerOnly = false;
             characterName.sendOptions = SendOptions.ReliableOrdered;
             characterName.forOwnerOnly = false;
             level.sendOptions = SendOptions.ReliableOrdered;
@@ -45,7 +43,6 @@ namespace MultiplayerARPG
             base.OnSetup();
             // On data changes events
             id.onChange += OnIdChange;
-            dataId.onChange += OnDataIdChange;
             characterName.onChange += OnCharacterNameChange;
             level.onChange += OnLevelChange;
             exp.onChange += OnExpChange;
@@ -77,7 +74,6 @@ namespace MultiplayerARPG
         {
             base.EntityOnDestroy();
             // On data changes events
-            dataId.onChange -= OnDataIdChange;
             equipWeapons.onChange -= OnEquipWeaponsChange;
             // On list changes events
             attributes.onOperation -= OnAttributesOperation;

@@ -83,7 +83,7 @@ namespace MultiplayerARPG
                 CacheUISceneGameplay.UpdateHotkeys();
                 CacheUISceneGameplay.UpdateQuests();
             }
-            characterEntity.onDataIdChange += OnDataIdChange;
+            characterEntity.onIdChange += OnIdChange;
             characterEntity.onEquipWeaponsChange += OnEquipWeaponsChange;
             characterEntity.onAttributesOperation += OnAttributesOperation;
             characterEntity.onSkillsOperation += OnSkillsOperation;
@@ -102,7 +102,7 @@ namespace MultiplayerARPG
             if (characterEntity == null)
                 return;
 
-            characterEntity.onDataIdChange -= OnDataIdChange;
+            characterEntity.onIdChange -= OnIdChange;
             characterEntity.onEquipWeaponsChange -= OnEquipWeaponsChange;
             characterEntity.onAttributesOperation -= OnAttributesOperation;
             characterEntity.onSkillsOperation -= OnSkillsOperation;
@@ -140,7 +140,7 @@ namespace MultiplayerARPG
         }
 
         #region Sync data changes callback
-        protected void OnDataIdChange(int dataId)
+        protected void OnIdChange(string id)
         {
             if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
             {
