@@ -36,6 +36,7 @@ public static partial class PlayerCharacterDataExtension
         to.Gold = from.Gold;
         to.PartyId = from.PartyId;
         to.GuildId = from.GuildId;
+        to.GuildRole = from.GuildRole;
         to.EquipWeapons = from.EquipWeapons;
         to.CurrentMapName = from.CurrentMapName;
         to.CurrentPosition = from.CurrentPosition;
@@ -82,6 +83,7 @@ public static partial class PlayerCharacterDataExtension
         var attributes = GameInstance.Attributes.Values;
         foreach (var attribute in attributes)
         {
+            // This attribute is valid, so not have to add it
             if (validAttributeIds.Contains(attribute.DataId))
                 continue;
             var characterAttribute = new CharacterAttribute();
@@ -113,7 +115,14 @@ public static partial class PlayerCharacterDataExtension
         var skillLevels = database.skillLevels;
         foreach (var skillLevel in skillLevels)
         {
-            if (skillLevel.skill != null && validSkillIds.Contains(skillLevel.skill.DataId))
+            // Skip empty skill data
+            if (skillLevel.skill == null)
+            {
+                Debug.LogWarning("[ValidateCharacterData] Skill data is empty");
+                continue;
+            }
+            // This skill is valid, so not have to add it
+            if (validSkillIds.Contains(skillLevel.skill.DataId))
                 continue;
             var characterSkill = new CharacterSkill();
             characterSkill.dataId = skillLevel.skill.DataId;
