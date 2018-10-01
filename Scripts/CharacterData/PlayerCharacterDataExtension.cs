@@ -332,6 +332,7 @@ public static partial class PlayerCharacterDataExtension
         Debug.Log("Characters loading from: " + path);
         foreach (var file in files)
         {
+            // If filename is empty or this is not character save, skip it
             if (file.Length <= 4 || file.Contains("_world_"))
                 continue;
             var characterData = new PlayerCharacterData();
@@ -376,6 +377,9 @@ public static partial class PlayerCharacterDataExtension
         writer.Put(characterData.StatPoint);
         writer.Put(characterData.SkillPoint);
         writer.Put(characterData.Gold);
+        writer.Put(characterData.PartyId);
+        writer.Put(characterData.GuildId);
+        writer.Put(characterData.GuildRole);
         writer.Put(characterData.CurrentMapName);
         writer.Put(characterData.CurrentPosition.x);
         writer.Put(characterData.CurrentPosition.y);
@@ -477,6 +481,9 @@ public static partial class PlayerCharacterDataExtension
         tempCharacterData.StatPoint = reader.GetShort();
         tempCharacterData.SkillPoint = reader.GetShort();
         tempCharacterData.Gold = reader.GetInt();
+        tempCharacterData.PartyId = reader.GetInt();
+        tempCharacterData.GuildId = reader.GetInt();
+        tempCharacterData.GuildRole = reader.GetByte();
         tempCharacterData.CurrentMapName = reader.GetString();
         tempCharacterData.CurrentPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
         tempCharacterData.RespawnMapName = reader.GetString();
