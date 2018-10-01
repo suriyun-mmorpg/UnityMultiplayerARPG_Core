@@ -118,7 +118,7 @@ public static partial class PlayerCharacterDataExtension
             // Skip empty skill data
             if (skillLevel.skill == null)
             {
-                Debug.LogWarning("[ValidateCharacterData] Skill data is empty");
+                Debug.LogWarning("[ValidateCharacterData] Character: " + character.CharacterName + "'s Skill data is empty");
                 continue;
             }
             // This skill is valid, so not have to add it
