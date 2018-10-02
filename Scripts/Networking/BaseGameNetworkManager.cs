@@ -49,7 +49,7 @@ namespace MultiplayerARPG
             return playerCharactersById.TryGetValue(id, out result);
         }
 
-        public bool TryGetPlayerCharacterByCharacterName(string characterName, out BasePlayerCharacterEntity result)
+        public bool TryGetPlayerCharacterByName(string characterName, out BasePlayerCharacterEntity result)
         {
             result = null;
             long connectionId;
@@ -253,7 +253,7 @@ namespace MultiplayerARPG
             if (message.channel == ChatChannel.Party || message.channel == ChatChannel.Guild)
             {
                 if (!string.IsNullOrEmpty(message.sender) &&
-                    TryGetPlayerCharacterByCharacterName(message.sender, out playerCharacter))
+                    TryGetPlayerCharacterByName(message.sender, out playerCharacter))
                 {
                     switch (message.channel)
                     {
@@ -889,6 +889,12 @@ namespace MultiplayerARPG
             if (playerCharacterEntity.Id.Equals(characterId))
             {
                 // TODO: May warn that it's owning character so it's not able to kick
+                return false;
+            }
+            byte role;
+            if (!guild.TryGetRole(characterId, out role) && playerCharacterEntity.GuildRole < role)
+            {
+                // TODO: May warn that character rank is lower
                 return false;
             }
             if (!guild.IsLeader(playerCharacterEntity))
