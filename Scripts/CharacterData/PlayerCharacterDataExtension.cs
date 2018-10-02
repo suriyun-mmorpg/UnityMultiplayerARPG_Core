@@ -381,6 +381,7 @@ public static partial class PlayerCharacterDataExtension
         writer.Put(characterData.PartyId);
         writer.Put(characterData.GuildId);
         writer.Put(characterData.GuildRole);
+        writer.Put(characterData.SharedGuildExp);
         writer.Put(characterData.CurrentMapName);
         writer.Put(characterData.CurrentPosition.x);
         writer.Put(characterData.CurrentPosition.y);
@@ -485,6 +486,7 @@ public static partial class PlayerCharacterDataExtension
         tempCharacterData.PartyId = reader.GetInt();
         tempCharacterData.GuildId = reader.GetInt();
         tempCharacterData.GuildRole = reader.GetByte();
+        tempCharacterData.SharedGuildExp = reader.GetInt();
         tempCharacterData.CurrentMapName = reader.GetString();
         tempCharacterData.CurrentPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
         tempCharacterData.RespawnMapName = reader.GetString();
