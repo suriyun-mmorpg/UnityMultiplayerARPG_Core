@@ -87,6 +87,11 @@ namespace MultiplayerARPG
             return ((role.canInvite ? GuildMemberFlags.CanInvite : 0) | (role.canKick ? GuildMemberFlags.CanKick : 0));
         }
 
+        public bool TryGetRole(string characterId, out byte role)
+        {
+            return roles.TryGetValue(characterId, out role);
+        }
+
         public static bool IsLeader(GuildMemberFlags flags)
         {
             return (flags & GuildMemberFlags.IsLeader) != 0;

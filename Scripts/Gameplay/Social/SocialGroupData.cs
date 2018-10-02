@@ -137,9 +137,9 @@ namespace MultiplayerARPG
             return members.Values;
         }
 
-        public SocialCharacterData GetMemberById(string characterId)
+        public bool TryGetMember(string id, out SocialCharacterData result)
         {
-            return members[characterId];
+            return members.TryGetValue(id, out result);
         }
 
         public bool IsLeader(BasePlayerCharacterEntity playerCharacterEntity)
