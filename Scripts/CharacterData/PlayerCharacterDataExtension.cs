@@ -37,6 +37,7 @@ public static partial class PlayerCharacterDataExtension
         to.PartyId = from.PartyId;
         to.GuildId = from.GuildId;
         to.GuildRole = from.GuildRole;
+        to.SharedGuildExp = from.SharedGuildExp;
         to.EquipWeapons = from.EquipWeapons;
         to.CurrentMapName = from.CurrentMapName;
         to.CurrentPosition = from.CurrentPosition;

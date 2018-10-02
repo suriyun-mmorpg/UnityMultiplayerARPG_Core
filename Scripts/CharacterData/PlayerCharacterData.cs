@@ -11,6 +11,7 @@ public partial class PlayerCharacterData : CharacterData, IPlayerCharacterData
     public int partyId;
     public int guildId;
     public byte guildRole;
+    public int sharedGuildExp;
     public string currentMapName;
     public Vector3 currentPosition;
     public string respawnMapName;
@@ -25,6 +26,7 @@ public partial class PlayerCharacterData : CharacterData, IPlayerCharacterData
     public int PartyId { get { return partyId; } set { partyId = value; } }
     public int GuildId { get { return guildId; } set { guildId = value; } }
     public byte GuildRole { get { return guildRole; } set { guildRole = value; } }
+    public int SharedGuildExp { get { return sharedGuildExp; } set { sharedGuildExp = value; } }
     public string CurrentMapName { get { return currentMapName; } set { currentMapName = value; } }
     public Vector3 CurrentPosition { get { return currentPosition; } set { currentPosition = value; } }
     public string RespawnMapName { get { return respawnMapName; } set { respawnMapName = value; } }
