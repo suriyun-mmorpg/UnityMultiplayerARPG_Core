@@ -126,6 +126,20 @@ namespace MultiplayerARPG
             }
         }
         #endregion
+        
+        public void ClearParty()
+        {
+            PartyMemberFlags = PartyMemberFlags.None;
+            PartyId = 0;
+        }
+
+        public void ClearGuild()
+        {
+            GuildMemberFlags = GuildMemberFlags.None;
+            GuildId = 0;
+            GuildRole = 0;
+            SharedGuildExp = 0;
+        }
 
         #region Sync data changes callback
         protected virtual void OnStatPointChange(short statPoint)
