@@ -627,16 +627,328 @@ namespace MultiplayerARPG
             }
         }
         
-        public abstract void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position);
+        public virtual bool CanWarpCharacter(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            if (playerCharacterEntity == null || !IsServer)
+                return false;
+            return true;
+        }
+
+        public virtual bool CanCreateParty(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            if (playerCharacterEntity == null || !IsServer)
+                return false;
+            return true;
+        }
+
+        public virtual bool CanPartySetting(BasePlayerCharacterEntity playerCharacterEntity, out int partyId, out PartyData party)
+        {
+            partyId = 0;
+            party = null;
+            if (playerCharacterEntity == null || !IsServer)
+                return false;
+            partyId = playerCharacterEntity.PartyId;
+            if (!parties.TryGetValue(partyId, out party))
+                return false;
+            if (!party.IsLeader(playerCharacterEntity))
+            {
+                // TODO: May warn that it's not party leader
+                return false;
+            }
+            return true;
+        }
+
+        public virtual bool CanAddPartyMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity, out int partyId, out PartyData party)
+        {
+            partyId = 0;
+            party = null;
+            if (inviteCharacterEntity == null || acceptCharacterEntity == null || !IsServer)
+                return false;
+            partyId = inviteCharacterEntity.PartyId;
+            if (!parties.TryGetValue(partyId, out party))
+                return false;
+            if (!party.IsLeader(inviteCharacterEntity))
+            {
+                // TODO: May warn that it's not party leader
+                return false;
+            }
+            if (party.CountMember() == gameInstance.SocialSystemSetting.maxPartyMember)
+            {
+                // TODO: May warn that it's exceeds limit max party member
+                return false;
+            }
+            return true;
+        }
+
+        public virtual bool CanKickFromParty(BasePlayerCharacterEntity playerCharacterEntity, out int partyId, out PartyData party)
+        {
+            partyId = 0;
+            party = null;
+            if (playerCharacterEntity == null || !IsServer)
+                return false;
+            partyId = playerCharacterEntity.PartyId;
+            if (!parties.TryGetValue(partyId, out party))
+                return false;
+            if (!party.IsLeader(playerCharacterEntity))
+            {
+                // TODO: May warn that it's not party leader
+                return false;
+            }
+            return true;
+        }
+
+        public virtual bool CanLeaveParty(BasePlayerCharacterEntity playerCharacterEntity, out int partyId, out PartyData party)
+        {
+            partyId = 0;
+            party = null;
+            if (playerCharacterEntity == null || !IsServer)
+                return false;
+            partyId = playerCharacterEntity.PartyId;
+            if (!parties.TryGetValue(partyId, out party))
+                return false;
+            return true;
+        }
+
+        public virtual bool CanCreateGuild(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            if (playerCharacterEntity == null || !IsServer)
+                return false;
+            return true;
+        }
+
+        public virtual bool CanSetGuildMessage(BasePlayerCharacterEntity playerCharacterEntity, out int guildId, out GuildData guild)
+        {
+            guildId = 0;
+            guild = null;
+            if (playerCharacterEntity == null || !IsServer)
+                return false;
+            guildId = playerCharacterEntity.GuildId;
+            if (!guilds.TryGetValue(guildId, out guild))
+                return false;
+            if (!guild.IsLeader(playerCharacterEntity))
+            {
+                // TODO: May warn that it's not guild leader
+                return false;
+            }
+            return true;
+        }
+
+        public virtual bool CanAddGuildMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity, out int guildId, out GuildData guild)
+        {
+            guildId = 0;
+            guild = null;
+            if (inviteCharacterEntity == null || acceptCharacterEntity == null || !IsServer)
+                return false;
+            guildId = inviteCharacterEntity.GuildId;
+            if (!guilds.TryGetValue(guildId, out guild))
+                return false;
+            if (!guild.IsLeader(inviteCharacterEntity))
+            {
+                // TODO: May warn that it's not guild leader
+                return false;
+            }
+            if (guild.CountMember() == gameInstance.SocialSystemSetting.maxGuildMember)
+            {
+                // TODO: May warn that it's exceeds limit max guild member
+                return false;
+            }
+            return true;
+        }
+
+        public virtual bool CanKickFromGuild(BasePlayerCharacterEntity playerCharacterEntity, out int guildId, out GuildData guild)
+        {
+            guildId = 0;
+            guild = null;
+            if (playerCharacterEntity == null || !IsServer)
+                return false;
+            guildId = playerCharacterEntity.GuildId;
+            if (!guilds.TryGetValue(guildId, out guild))
+                return false;
+            if (!guild.IsLeader(playerCharacterEntity))
+            {
+                // TODO: May warn that it's not guild leader
+                return false;
+            }
+            return true;
+        }
+
+        public virtual bool CanLeaveGuild(BasePlayerCharacterEntity playerCharacterEntity, out int guildId, out GuildData guild)
+        {
+            guildId = 0;
+            guild = null;
+            if (playerCharacterEntity == null || !IsServer)
+                return false;
+            guildId = playerCharacterEntity.GuildId;
+            if (!guilds.TryGetValue(guildId, out guild))
+                return false;
+            return true;
+        }
+
+        public virtual void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        {
+            if (!CanWarpCharacter(playerCharacterEntity))
+                return;
+
+            // If warping to same map player does not have to reload new map data
+            if (string.IsNullOrEmpty(mapName) || mapName.Equals(playerCharacterEntity.CurrentMapName))
+                playerCharacterEntity.CacheNetTransform.Teleport(position, Quaternion.identity);
+        }
+
+        public virtual void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem, int partyId)
+        {
+            if (!CanCreateParty(playerCharacterEntity))
+                return;
+
+            var party = new PartyData(partyId, shareExp, shareItem, playerCharacterEntity);
+            parties[partyId] = party;
+            playerCharacterEntity.PartyId = partyId;
+            playerCharacterEntity.PartyMemberFlags = party.GetPartyMemberFlags(playerCharacterEntity);
+        }
+
+        public virtual void PartySetting(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
+        {
+            int partyId;
+            PartyData party;
+            if (!CanPartySetting(playerCharacterEntity, out partyId, out party))
+                return;
+
+            party.Setting(shareExp, shareItem);
+            parties[partyId] = party;
+        }
+
+        public virtual void AddPartyMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity)
+        {
+            int partyId;
+            PartyData party;
+            if (!CanAddPartyMember(inviteCharacterEntity, acceptCharacterEntity, out partyId, out party))
+                return;
+
+            party.AddMember(acceptCharacterEntity);
+            parties[partyId] = party;
+            acceptCharacterEntity.PartyId = partyId;
+            acceptCharacterEntity.PartyMemberFlags = party.GetPartyMemberFlags(acceptCharacterEntity);
+        }
+
+        public virtual void KickFromParty(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
+        {
+            int partyId;
+            PartyData party;
+            if (!CanKickFromParty(playerCharacterEntity, out partyId, out party))
+                return;
+
+            BasePlayerCharacterEntity memberCharacterEntity;
+            if (playerCharactersById.TryGetValue(characterId, out memberCharacterEntity))
+                memberCharacterEntity.ClearParty();
+            party.RemoveMember(characterId);
+            parties[partyId] = party;
+        }
+
+        public virtual void LeaveParty(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            int partyId;
+            PartyData party;
+            if (!CanLeaveParty(playerCharacterEntity, out partyId, out party))
+                return;
+
+            if (party.IsLeader(playerCharacterEntity))
+            {
+                foreach (var memberId in party.GetMemberIds())
+                {
+                    BasePlayerCharacterEntity memberCharacterEntity;
+                    if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
+                        memberCharacterEntity.ClearParty();
+                }
+                parties.Remove(partyId);
+            }
+            else
+            {
+                playerCharacterEntity.ClearParty();
+                party.RemoveMember(playerCharacterEntity.Id);
+                parties[partyId] = party;
+            }
+        }
+
+        public virtual void CreateGuild(BasePlayerCharacterEntity playerCharacterEntity, string guildName, int guildId)
+        {
+            if (!CanCreateGuild(playerCharacterEntity))
+                return;
+
+            var guild = new GuildData(guildId, guildName, playerCharacterEntity);
+            byte guildRole;
+            guilds[guildId] = guild;
+            playerCharacterEntity.GuildId = guildId;
+            playerCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(playerCharacterEntity, out guildRole);
+            playerCharacterEntity.GuildRole = guildRole;
+            playerCharacterEntity.SharedGuildExp = 0;
+        }
+
+        public virtual void SetGuildMessage(BasePlayerCharacterEntity playerCharacterEntity, string guildMessage)
+        {
+            int guildId;
+            GuildData guild;
+            if (!CanSetGuildMessage(playerCharacterEntity, out guildId, out guild))
+                return;
+
+            guild.guildMessage = guildMessage;
+            guilds[guildId] = guild;
+        }
+
+        public virtual void AddGuildMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity)
+        {
+            int guildId;
+            GuildData guild;
+            if (!CanAddGuildMember(inviteCharacterEntity, acceptCharacterEntity, out guildId, out guild))
+                return;
+
+            guild.AddMember(acceptCharacterEntity);
+            byte guildRole;
+            guilds[guildId] = guild;
+            acceptCharacterEntity.GuildId = guildId;
+            acceptCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(acceptCharacterEntity, out guildRole);
+            acceptCharacterEntity.GuildRole = guildRole;
+            acceptCharacterEntity.SharedGuildExp = 0;
+        }
+
+        public virtual void KickFromGuild(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
+        {
+            int guildId;
+            GuildData guild;
+            if (!CanKickFromGuild(playerCharacterEntity, out guildId, out guild))
+                return;
+
+            BasePlayerCharacterEntity memberCharacterEntity;
+            if (playerCharactersById.TryGetValue(characterId, out memberCharacterEntity))
+                memberCharacterEntity.ClearGuild();
+            guild.RemoveMember(characterId);
+            guilds[guildId] = guild;
+        }
+
+        public virtual void LeaveGuild(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            int guildId;
+            GuildData guild;
+            if (!CanLeaveGuild(playerCharacterEntity, out guildId, out guild))
+                return;
+
+            if (guild.IsLeader(playerCharacterEntity))
+            {
+                foreach (var memberId in guild.GetMemberIds())
+                {
+                    BasePlayerCharacterEntity memberCharacterEntity;
+                    if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
+                        memberCharacterEntity.ClearGuild();
+                }
+                guilds.Remove(guildId);
+            }
+            else
+            {
+                playerCharacterEntity.ClearGuild();
+                guild.RemoveMember(playerCharacterEntity.Id);
+                guilds[guildId] = guild;
+            }
+        }
+
         public abstract void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem);
-        public abstract void PartySetting(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem);
-        public abstract void AddPartyMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity);
-        public abstract void KickFromParty(BasePlayerCharacterEntity playerCharacterEntity, string characterId);
-        public abstract void LeaveParty(BasePlayerCharacterEntity playerCharacterEntity);
         public abstract void CreateGuild(BasePlayerCharacterEntity playerCharacterEntity, string guildName);
-        public abstract void SetGuildMessage(BasePlayerCharacterEntity playerCharacterEntity, string guildMessage);
-        public abstract void AddGuildMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity);
-        public abstract void KickFromGuild(BasePlayerCharacterEntity playerCharacterEntity, string characterId);
-        public abstract void LeaveGuild(BasePlayerCharacterEntity playerCharacterEntity);
     }
 }
