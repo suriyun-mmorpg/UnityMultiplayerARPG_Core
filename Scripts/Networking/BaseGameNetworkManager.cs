@@ -626,7 +626,7 @@ namespace MultiplayerARPG
                 buildingEntities.Remove(id);
             }
         }
-        
+
         public virtual bool CanWarpCharacter(BasePlayerCharacterEntity playerCharacterEntity)
         {
             if (playerCharacterEntity == null || !IsServer)
@@ -638,6 +638,11 @@ namespace MultiplayerARPG
         {
             if (playerCharacterEntity == null || !IsServer)
                 return false;
+            if (playerCharacterEntity.PartyId > 0)
+            {
+                // TODO: May send warn message that player already in party
+                return false;
+            }
             return true;
         }
 
@@ -648,11 +653,47 @@ namespace MultiplayerARPG
             if (playerCharacterEntity == null || !IsServer)
                 return false;
             partyId = playerCharacterEntity.PartyId;
-            if (!parties.TryGetValue(partyId, out party))
+            if (partyId <= 0 || !parties.TryGetValue(partyId, out party))
+            {
+                // TODO: May send warn message that player not in party
                 return false;
+            }
             if (!party.IsLeader(playerCharacterEntity))
             {
                 // TODO: May warn that it's not party leader
+                return false;
+            }
+            return true;
+        }
+
+        public virtual bool CanSendPartyInvitation(BasePlayerCharacterEntity inviteCharacterEntity, uint objectId, out BasePlayerCharacterEntity targetCharacterEntity)
+        {
+            targetCharacterEntity = null;
+            var partyId = inviteCharacterEntity.PartyId;
+            PartyData party;
+            if (partyId <= 0 || !parties.TryGetValue(partyId, out party))
+            {
+                // TODO: May send warn message that player not in party
+                return false;
+            }
+            if (!PartyData.CanInvite(inviteCharacterEntity.PartyMemberFlags))
+            {
+                // TODO: May send warn message that player can not invite
+                return false;
+            }
+            if (!inviteCharacterEntity.TryGetEntityByObjectId(objectId, out targetCharacterEntity))
+            {
+                // TODO: May send warn message that character is not found
+                return false;
+            }
+            if (targetCharacterEntity.CoCharacter != null)
+            {
+                // TODO: May send warn message that character is not available
+                return false;
+            }
+            if (targetCharacterEntity.PartyId > 0)
+            {
+                // TODO: May send warn message that player already in party
                 return false;
             }
             return true;
@@ -664,9 +705,17 @@ namespace MultiplayerARPG
             party = null;
             if (inviteCharacterEntity == null || acceptCharacterEntity == null || !IsServer)
                 return false;
-            partyId = inviteCharacterEntity.PartyId;
-            if (!parties.TryGetValue(partyId, out party))
+            if (acceptCharacterEntity.PartyId > 0)
+            {
+                // TODO: May send warn message that player already in party
                 return false;
+            }
+            partyId = inviteCharacterEntity.PartyId;
+            if (partyId <= 0 || !parties.TryGetValue(partyId, out party))
+            {
+                // TODO: May send warn message that player not in party
+                return false;
+            }
             if (!party.IsLeader(inviteCharacterEntity))
             {
                 // TODO: May warn that it's not party leader
@@ -680,15 +729,28 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public virtual bool CanKickFromParty(BasePlayerCharacterEntity playerCharacterEntity, out int partyId, out PartyData party)
+        public virtual bool CanKickFromParty(BasePlayerCharacterEntity playerCharacterEntity, string characterId, out int partyId, out PartyData party)
         {
             partyId = 0;
             party = null;
             if (playerCharacterEntity == null || !IsServer)
                 return false;
             partyId = playerCharacterEntity.PartyId;
-            if (!parties.TryGetValue(partyId, out party))
+            if (partyId <= 0 || !parties.TryGetValue(partyId, out party))
+            {
+                // TODO: May send warn message that player is not in party
                 return false;
+            }
+            if (!PartyData.CanKick(playerCharacterEntity.PartyMemberFlags))
+            {
+                // TODO: May send warn message that player can not kick
+                return false;
+            }
+            if (playerCharacterEntity.Id.Equals(characterId))
+            {
+                // TODO: May warn that it's owning character so it's not able to kick
+                return false;
+            }
             if (!party.IsLeader(playerCharacterEntity))
             {
                 // TODO: May warn that it's not party leader
@@ -704,8 +766,11 @@ namespace MultiplayerARPG
             if (playerCharacterEntity == null || !IsServer)
                 return false;
             partyId = playerCharacterEntity.PartyId;
-            if (!parties.TryGetValue(partyId, out party))
+            if (partyId <= 0 || !parties.TryGetValue(partyId, out party))
+            {
+                // TODO: May send warn message that player is not in party
                 return false;
+            }
             return true;
         }
 
@@ -713,6 +778,11 @@ namespace MultiplayerARPG
         {
             if (playerCharacterEntity == null || !IsServer)
                 return false;
+            if (playerCharacterEntity.GuildId > 0)
+            {
+                // TODO: May send warn message that player already in guild
+                return false;
+            }
             return true;
         }
 
@@ -723,11 +793,47 @@ namespace MultiplayerARPG
             if (playerCharacterEntity == null || !IsServer)
                 return false;
             guildId = playerCharacterEntity.GuildId;
-            if (!guilds.TryGetValue(guildId, out guild))
+            if (guildId <= 0 || !guilds.TryGetValue(guildId, out guild))
+            {
+                // TODO: May send warn message that player not in guild
                 return false;
+            }
             if (!guild.IsLeader(playerCharacterEntity))
             {
                 // TODO: May warn that it's not guild leader
+                return false;
+            }
+            return true;
+        }
+
+        public virtual bool CanSendGuildInvitation(BasePlayerCharacterEntity inviteCharacterEntity, uint objectId, out BasePlayerCharacterEntity targetCharacterEntity)
+        {
+            targetCharacterEntity = null;
+            var guildId = inviteCharacterEntity.GuildId;
+            GuildData guild;
+            if (guildId <= 0 || !guilds.TryGetValue(guildId, out guild))
+            {
+                // TODO: May send warn message that player not in guild
+                return false;
+            }
+            if (!GuildData.CanInvite(inviteCharacterEntity.GuildMemberFlags))
+            {
+                // TODO: May send warn message that player can not invite
+                return false;
+            }
+            if (!inviteCharacterEntity.TryGetEntityByObjectId(objectId, out targetCharacterEntity))
+            {
+                // TODO: May send warn message that character is not found
+                return false;
+            }
+            if (targetCharacterEntity.CoCharacter != null)
+            {
+                // TODO: May send warn message that character is not available
+                return false;
+            }
+            if (targetCharacterEntity.GuildId > 0)
+            {
+                // TODO: May send warn message that player already in guild
                 return false;
             }
             return true;
@@ -739,9 +845,17 @@ namespace MultiplayerARPG
             guild = null;
             if (inviteCharacterEntity == null || acceptCharacterEntity == null || !IsServer)
                 return false;
-            guildId = inviteCharacterEntity.GuildId;
-            if (!guilds.TryGetValue(guildId, out guild))
+            if (acceptCharacterEntity.GuildId > 0)
+            {
+                // TODO: May send warn message that player already in guild
                 return false;
+            }
+            guildId = inviteCharacterEntity.GuildId;
+            if (guildId <= 0 || !guilds.TryGetValue(guildId, out guild))
+            {
+                // TODO: May send warn message that player not in guild
+                return false;
+            }
             if (!guild.IsLeader(inviteCharacterEntity))
             {
                 // TODO: May warn that it's not guild leader
@@ -755,15 +869,28 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public virtual bool CanKickFromGuild(BasePlayerCharacterEntity playerCharacterEntity, out int guildId, out GuildData guild)
+        public virtual bool CanKickFromGuild(BasePlayerCharacterEntity playerCharacterEntity, string characterId, out int guildId, out GuildData guild)
         {
             guildId = 0;
             guild = null;
             if (playerCharacterEntity == null || !IsServer)
                 return false;
             guildId = playerCharacterEntity.GuildId;
-            if (!guilds.TryGetValue(guildId, out guild))
+            if (guildId <= 0 || !guilds.TryGetValue(guildId, out guild))
+            {
+                // TODO: May send warn message that player not in guild
                 return false;
+            }
+            if (!GuildData.CanKick(playerCharacterEntity.GuildMemberFlags))
+            {
+                // TODO: May send warn message that player can not kick
+                return false;
+            }
+            if (playerCharacterEntity.Id.Equals(characterId))
+            {
+                // TODO: May warn that it's owning character so it's not able to kick
+                return false;
+            }
             if (!guild.IsLeader(playerCharacterEntity))
             {
                 // TODO: May warn that it's not guild leader
@@ -779,8 +906,11 @@ namespace MultiplayerARPG
             if (playerCharacterEntity == null || !IsServer)
                 return false;
             guildId = playerCharacterEntity.GuildId;
-            if (!guilds.TryGetValue(guildId, out guild))
+            if (guildId <= 0 || !guilds.TryGetValue(guildId, out guild))
+            {
+                // TODO: May send warn message that player not in guild
                 return false;
+            }
             return true;
         }
 
@@ -833,7 +963,7 @@ namespace MultiplayerARPG
         {
             int partyId;
             PartyData party;
-            if (!CanKickFromParty(playerCharacterEntity, out partyId, out party))
+            if (!CanKickFromParty(playerCharacterEntity, characterId, out partyId, out party))
                 return;
 
             BasePlayerCharacterEntity memberCharacterEntity;
@@ -913,7 +1043,7 @@ namespace MultiplayerARPG
         {
             int guildId;
             GuildData guild;
-            if (!CanKickFromGuild(playerCharacterEntity, out guildId, out guild))
+            if (!CanKickFromGuild(playerCharacterEntity, characterId, out guildId, out guild))
                 return;
 
             BasePlayerCharacterEntity memberCharacterEntity;

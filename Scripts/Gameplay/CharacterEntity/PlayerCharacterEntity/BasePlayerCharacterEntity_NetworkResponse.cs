@@ -136,7 +136,7 @@ namespace MultiplayerARPG
         protected virtual void NetFuncShowNpcDialog(int npcDialogDataId)
         {
             if (onShowNpcDialog != null)
-                onShowNpcDialog(npcDialogDataId);
+                onShowNpcDialog.Invoke(npcDialogDataId);
         }
 
         protected virtual void NetFuncSelectNpcDialogMenu(int menuIndex)
@@ -420,24 +420,24 @@ namespace MultiplayerARPG
         #region Dealing
         protected virtual void NetFuncSendDealingRequest(uint objectId)
         {
-            BasePlayerCharacterEntity playerCharacterEntity = null;
-            if (!TryGetEntityByObjectId(objectId, out playerCharacterEntity))
+            BasePlayerCharacterEntity targetCharacterEntity = null;
+            if (!TryGetEntityByObjectId(objectId, out targetCharacterEntity))
             {
                 // TODO: May send warn message that character is not found
                 return;
             }
-            if (playerCharacterEntity.CoCharacter != null)
+            if (targetCharacterEntity.CoCharacter != null)
             {
                 // TODO: May send warn message that character is not available
                 return;
             }
-            if (Vector3.Distance(CacheTransform.position, playerCharacterEntity.CacheTransform.position) > gameInstance.conversationDistance)
+            if (Vector3.Distance(CacheTransform.position, targetCharacterEntity.CacheTransform.position) > gameInstance.conversationDistance)
             {
                 // TODO: May send warn message that character is far from other character
                 return;
             }
-            CoCharacter = playerCharacterEntity;
-            CoCharacter.CoCharacter = this;
+            CoCharacter = targetCharacterEntity;
+            targetCharacterEntity.CoCharacter = this;
             // Send receive dealing request to player
             CoCharacter.RequestReceiveDealingRequest(ObjectId);
         }
@@ -448,7 +448,7 @@ namespace MultiplayerARPG
             if (!TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
             if (onShowDealingRequestDialog != null)
-                onShowDealingRequestDialog(playerCharacterEntity);
+                onShowDealingRequestDialog.Invoke(playerCharacterEntity);
         }
 
         protected virtual void NetFuncAcceptDealingRequest()
@@ -487,7 +487,7 @@ namespace MultiplayerARPG
             if (!TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
             if (onShowDealingDialog != null)
-                onShowDealingDialog(playerCharacterEntity);
+                onShowDealingDialog.Invoke(playerCharacterEntity);
         }
 
         protected virtual void NetFuncSetDealingItem(int itemIndex, short amount)
@@ -571,93 +571,60 @@ namespace MultiplayerARPG
         protected virtual void NetFuncUpdateDealingState(CoOpState state)
         {
             if (onUpdateDealingState != null)
-                onUpdateDealingState(state);
+                onUpdateDealingState.Invoke(state);
         }
 
         protected virtual void NetFuncUpdateAnotherDealingState(CoOpState state)
         {
             if (onUpdateAnotherDealingState != null)
-                onUpdateAnotherDealingState(state);
+                onUpdateAnotherDealingState.Invoke(state);
         }
 
         protected virtual void NetFuncUpdateDealingGold(int gold)
         {
             if (onUpdateDealingGold != null)
-                onUpdateDealingGold(gold);
+                onUpdateDealingGold.Invoke(gold);
         }
 
         protected virtual void NetFuncUpdateAnotherDealingGold(int gold)
         {
             if (onUpdateAnotherDealingGold != null)
-                onUpdateAnotherDealingGold(gold);
+                onUpdateAnotherDealingGold.Invoke(gold);
         }
 
         protected virtual void NetFuncUpdateDealingItems(DealingCharacterItems items)
         {
             if (onUpdateDealingItems != null)
-                onUpdateDealingItems(items);
+                onUpdateDealingItems.Invoke(items);
         }
 
         protected virtual void NetFuncUpdateAnotherDealingItems(DealingCharacterItems items)
         {
             if (onUpdateAnotherDealingItems != null)
-                onUpdateAnotherDealingItems(items);
+                onUpdateAnotherDealingItems.Invoke(items);
         }
         #endregion
 
         #region Party
         protected virtual void NetFuncCreateParty(bool shareExp, bool shareItem)
         {
-            if (PartyId > 0)
-            {
-                // TODO: May send warn message that player already in party
-                return;
-            }
             GameManager.CreateParty(this, shareExp, shareItem);
         }
 
         protected virtual void NetFuncPartySetting(bool shareExp, bool shareItem)
         {
-            if (PartyId <= 0)
-            {
-                // TODO: May send warn message that player already in party
-                return;
-            }
             GameManager.PartySetting(this, shareExp, shareItem);
         }
 
         protected virtual void NetFuncSendPartyInvitation(uint objectId)
         {
-            if (PartyId <= 0)
-            {
-                // TODO: May send warn message that player is not in party
+            BasePlayerCharacterEntity targetCharacterEntity = null;
+            if (!GameManager.CanSendPartyInvitation(this, objectId, out targetCharacterEntity))
                 return;
-            }
-            if (!PartyData.CanInvite(PartyMemberFlags))
-            {
-                // TODO: May send warn message that player can not kick
-                return;
-            }
-            BasePlayerCharacterEntity playerCharacterEntity = null;
-            if (!TryGetEntityByObjectId(objectId, out playerCharacterEntity))
-            {
-                // TODO: May send warn message that character is not found
-                return;
-            }
-            if (playerCharacterEntity.CoCharacter != null)
-            {
-                // TODO: May send warn message that character is not available
-                return;
-            }
-            if (playerCharacterEntity.PartyId > 0)
-            {
-                // TODO: May send warn message that player already in party
-                return;
-            }
-            CoCharacter = playerCharacterEntity;
-            CoCharacter.CoCharacter = this;
+            CoCharacter = targetCharacterEntity;
+            targetCharacterEntity.CoCharacter = this;
             // Send receive party invitation request to player
-            playerCharacterEntity.RequestReceivePartyInvitation(ObjectId);
+            targetCharacterEntity.RequestReceivePartyInvitation(ObjectId);
         }
 
         protected virtual void NetFuncReceivePartyInvitation(uint objectId)
@@ -666,26 +633,11 @@ namespace MultiplayerARPG
             if (!TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
             if (onShowPartyInvitationDialog != null)
-                onShowPartyInvitationDialog(playerCharacterEntity);
+                onShowPartyInvitationDialog.Invoke(playerCharacterEntity);
         }
 
         protected virtual void NetFuncAcceptPartyInvitation()
         {
-            if (PartyId > 0)
-            {
-                // TODO: May send warn message that player already in party
-                return;
-            }
-            if (CoCharacter == null)
-            {
-                // TODO: May send warn message that can not accept party invitation
-                return;
-            }
-            if (CoCharacter.PartyId <= 0)
-            {
-                // TODO: May send warn message that player is not in party
-                return;
-            }
             GameManager.AddPartyMember(CoCharacter, this);
             StopPartyInvitation();
         }
@@ -698,31 +650,11 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncKickFromParty(string characterId)
         {
-            if (PartyId <= 0)
-            {
-                // TODO: May send warn message that player is not in party
-                return;
-            }
-            if (!PartyData.CanKick(PartyMemberFlags))
-            {
-                // TODO: May send warn message that player can not kick
-                return;
-            }
-            if (Id.Equals(characterId))
-            {
-                // TODO: May warn that it's owning character so it's not able to kick
-                return;
-            }
             GameManager.KickFromParty(this, characterId);
         }
 
         protected virtual void NetFuncLeaveParty()
         {
-            if (PartyId <= 0)
-            {
-                // TODO: May send warn message that player is not in party
-                return;
-            }
             GameManager.LeaveParty(this);
         }
         #endregion
@@ -730,56 +662,23 @@ namespace MultiplayerARPG
         #region Guild
         protected virtual void NetFuncCreateGuild(string guildName)
         {
-            if (GuildId > 0)
-            {
-                // TODO: May send warn message that player already in guild
-                return;
-            }
             GameManager.CreateGuild(this, guildName);
         }
 
         protected virtual void NetFuncSetGuildMessage(string guildMessage)
         {
-            if (GuildId <= 0)
-            {
-                // TODO: May send warn message that player already in guild
-                return;
-            }
             GameManager.SetGuildMessage(this, guildMessage);
         }
 
         protected virtual void NetFuncSendGuildInvitation(uint objectId)
         {
-            if (GuildId <= 0)
-            {
-                // TODO: May send warn message that player is not in guild
+            BasePlayerCharacterEntity targetCharacterEntity;
+            if (!GameManager.CanSendGuildInvitation(this, objectId, out targetCharacterEntity))
                 return;
-            }
-            if (!GuildData.CanInvite(GuildMemberFlags))
-            {
-                // TODO: May send warn message that player can not invite
-                return;
-            }
-            BasePlayerCharacterEntity playerCharacterEntity = null;
-            if (!TryGetEntityByObjectId(objectId, out playerCharacterEntity))
-            {
-                // TODO: May send warn message that character is not found
-                return;
-            }
-            if (playerCharacterEntity.CoCharacter != null)
-            {
-                // TODO: May send warn message that character is not available
-                return;
-            }
-            if (playerCharacterEntity.GuildId > 0)
-            {
-                // TODO: May send warn message that player already in guild
-                return;
-            }
-            CoCharacter = playerCharacterEntity;
-            CoCharacter.CoCharacter = this;
+            CoCharacter = targetCharacterEntity;
+            targetCharacterEntity.CoCharacter = this;
             // Send receive guild invitation request to player
-            playerCharacterEntity.RequestReceiveGuildInvitation(ObjectId);
+            targetCharacterEntity.RequestReceiveGuildInvitation(ObjectId);
         }
 
         protected virtual void NetFuncReceiveGuildInvitation(uint objectId)
@@ -788,26 +687,11 @@ namespace MultiplayerARPG
             if (!TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
             if (onShowGuildInvitationDialog != null)
-                onShowGuildInvitationDialog(playerCharacterEntity);
+                onShowGuildInvitationDialog.Invoke(playerCharacterEntity);
         }
 
         protected virtual void NetFuncAcceptGuildInvitation()
         {
-            if (GuildId > 0)
-            {
-                // TODO: May send warn message that player already in guild
-                return;
-            }
-            if (CoCharacter == null)
-            {
-                // TODO: May send warn message that can not accept guild invitation
-                return;
-            }
-            if (CoCharacter.GuildId <= 0)
-            {
-                // TODO: May send warn message that player is not in guild
-                return;
-            }
             GameManager.AddGuildMember(CoCharacter, this);
             StopGuildInvitation();
         }
@@ -820,31 +704,11 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncKickFromGuild(string characterId)
         {
-            if (GuildId <= 0)
-            {
-                // TODO: May send warn message that player is not in guild
-                return;
-            }
-            if (!GuildData.CanKick(GuildMemberFlags))
-            {
-                // TODO: May send warn message that player can not kick
-                return;
-            }
-            if (Id.Equals(characterId))
-            {
-                // TODO: May warn that it's owning character so it's not able to kick
-                return;
-            }
             GameManager.KickFromGuild(this, characterId);
         }
 
         protected virtual void NetFuncLeaveGuild()
         {
-            if (GuildId <= 0)
-            {
-                // TODO: May send warn message that player is not in guild
-                return;
-            }
             GameManager.LeaveGuild(this);
         }
         #endregion
