@@ -31,10 +31,10 @@ namespace MultiplayerARPG
         #endregion
 
         #region Dealing System
-        protected CoOpState dealingState = CoOpState.None;
+        protected DealingState dealingState = DealingState.None;
         protected int dealingGold = 0;
         protected DealingCharacterItems dealingItems = new DealingCharacterItems();
-        public CoOpState CoOpState
+        public DealingState DealingState
         {
             get { return dealingState; }
             set
@@ -45,6 +45,7 @@ namespace MultiplayerARPG
                     CoCharacter.RequestUpdateAnotherDealingState(value);
             }
         }
+
         public int DealingGold
         {
             get { return dealingGold; }
@@ -56,6 +57,7 @@ namespace MultiplayerARPG
                     CoCharacter.RequestUpdateAnotherDealingGold(value);
             }
         }
+
         public DealingCharacterItems DealingItems
         {
             get { return dealingItems; }
@@ -88,6 +90,7 @@ namespace MultiplayerARPG
         public int GuildId { get { return guildId.Value; } set { guildId.Value = value; } }
         public byte GuildRole { get; set; }
         public int SharedGuildExp { get; set; }
+        public int ShareGuildExpRate { get; set; }
         public PartyMemberFlags PartyMemberFlags { get { return (PartyMemberFlags)partyMemberFlags.Value; } set { partyMemberFlags.Value = (byte)value; } }
         public GuildMemberFlags GuildMemberFlags { get { return (GuildMemberFlags)guildMemberFlags.Value; } set { guildMemberFlags.Value = (byte)value; } }
         public string CurrentMapName { get { return SceneManager.GetActiveScene().name; } set { } }

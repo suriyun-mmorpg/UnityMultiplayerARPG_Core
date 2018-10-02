@@ -5,7 +5,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public enum CoOpState : byte
+    public enum DealingState : byte
     {
         None,
         Dealing,
@@ -166,14 +166,14 @@ namespace MultiplayerARPG
 
         public virtual void ClearDealingData()
         {
-            CoOpState = CoOpState.None;
+            DealingState = DealingState.None;
             DealingGold = 0;
             DealingItems.Clear();
         }
 
         public override bool CanMoveOrDoActions()
         {
-            return base.CanMoveOrDoActions() && CoOpState == CoOpState.None;
+            return base.CanMoveOrDoActions() && DealingState == DealingState.None;
         }
 
         public abstract float StoppingDistance { get; }

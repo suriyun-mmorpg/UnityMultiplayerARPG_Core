@@ -721,7 +721,7 @@ namespace MultiplayerARPG
                 // TODO: May warn that it's not party leader
                 return false;
             }
-            if (party.CountMember() == gameInstance.SocialSystemSetting.maxPartyMember)
+            if (party.CountMember() == gameInstance.SocialSystemSetting.MaxPartyMember)
             {
                 // TODO: May warn that it's exceeds limit max party member
                 return false;
@@ -806,6 +806,26 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public virtual bool CanSetGuildMemberRole(BasePlayerCharacterEntity playerCharacterEntity, out int guildId, out GuildData guild)
+        {
+            guildId = 0;
+            guild = null;
+            if (playerCharacterEntity == null || !IsServer)
+                return false;
+            guildId = playerCharacterEntity.GuildId;
+            if (guildId <= 0 || !guilds.TryGetValue(guildId, out guild))
+            {
+                // TODO: May send warn message that player not in guild
+                return false;
+            }
+            if (!guild.IsLeader(playerCharacterEntity))
+            {
+                // TODO: May warn that it's not guild leader
+                return false;
+            }
+            return true;
+        }
+
         public virtual bool CanSendGuildInvitation(BasePlayerCharacterEntity inviteCharacterEntity, uint objectId, out BasePlayerCharacterEntity targetCharacterEntity)
         {
             targetCharacterEntity = null;
@@ -861,7 +881,7 @@ namespace MultiplayerARPG
                 // TODO: May warn that it's not guild leader
                 return false;
             }
-            if (guild.CountMember() == gameInstance.SocialSystemSetting.maxGuildMember)
+            if (guild.CountMember() == gameInstance.SocialSystemSetting.MaxGuildMember)
             {
                 // TODO: May warn that it's exceeds limit max guild member
                 return false;
@@ -1029,6 +1049,22 @@ namespace MultiplayerARPG
             guilds[guildId] = guild;
         }
 
+        public virtual void SetGuildMemberRole(BasePlayerCharacterEntity playerCharacterEntity, string characterId, byte guildRole)
+        {
+            int guildId;
+            GuildData guild;
+            if (!CanSetGuildMemberRole(playerCharacterEntity, out guildId, out guild))
+                return;
+
+            guild.SetRole(characterId, guildRole);
+            guilds[guildId] = guild;
+            if (TryGetPlayerCharacterById(characterId, out playerCharacterEntity))
+            {
+                playerCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(playerCharacterEntity, out guildRole);
+                playerCharacterEntity.GuildRole = guildRole;
+            }
+        }
+
         public virtual void AddGuildMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity)
         {
             int guildId;
@@ -1036,7 +1072,7 @@ namespace MultiplayerARPG
             if (!CanAddGuildMember(inviteCharacterEntity, acceptCharacterEntity, out guildId, out guild))
                 return;
 
-            guild.AddMember(acceptCharacterEntity);
+            guild.AddMember(acceptCharacterEntity, gameInstance.SocialSystemSetting.GetLowestGuildMemberRole());
             byte guildRole;
             guilds[guildId] = guild;
             acceptCharacterEntity.GuildId = guildId;

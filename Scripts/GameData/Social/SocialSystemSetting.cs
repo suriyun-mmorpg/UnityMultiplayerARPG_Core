@@ -8,17 +8,47 @@ namespace MultiplayerARPG
     public partial class SocialSystemSetting : ScriptableObject
     {
         [Header("Party Configs")]
-        public int maxPartyMember = 8;
-        public bool partyMemberCanInvite = false;
-        public bool partyMemberCanKick = false;
+        [SerializeField]
+        private int maxPartyMember = 8;
+        [SerializeField]
+        private bool partyMemberCanInvite = false;
+        [SerializeField]
+        private bool partyMemberCanKick = false;
+
+        public int MaxPartyMember { get { return maxPartyMember; } }
+        public bool PartyMemberCanInvite { get { return partyMemberCanInvite; } }
+        public bool PartyMemberCanKick { get { return partyMemberCanKick; } }
 
         [Header("Guild Configs")]
-        public int maxGuildMember = 50;
+        [SerializeField]
+        private int maxGuildMember = 50;
         [Tooltip("Member roles from high to low priority")]
-        public GuildMemberRole[] guildMemberRoles = new GuildMemberRole[] {
+        [SerializeField]
+        private GuildMemberRole[] guildMemberRoles = new GuildMemberRole[] {
             new GuildMemberRole() { name = "Master", canInvite = true, canKick = true },
             new GuildMemberRole() { name = "Member", canInvite = false, canKick = false }
         };
+
+        public int MaxGuildMember { get { return maxGuildMember; } }
+
+        public bool IsGuildMemberRoleAvailable(byte guildRole)
+        {
+            return guildMemberRoles != null && guildRole < guildMemberRoles.Length;
+        }
+
+        public GuildMemberRole GetGuildMemberRole(byte guildRole)
+        {
+            if (!IsGuildMemberRoleAvailable(guildRole))
+                return new GuildMemberRole() { name = "Member", canInvite = false, canKick = false };
+            return guildMemberRoles[guildRole];
+        }
+
+        public byte GetLowestGuildMemberRole()
+        {
+            if (guildMemberRoles == null || guildMemberRoles.Length < 2)
+                return 1;
+            return (byte)(guildMemberRoles.Length - 1);
+        }
     }
 
     [System.Serializable]

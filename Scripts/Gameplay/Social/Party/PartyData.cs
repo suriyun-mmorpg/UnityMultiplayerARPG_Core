@@ -41,7 +41,7 @@ namespace MultiplayerARPG
             if (IsLeader(characterId))
                 return (PartyMemberFlags.IsLeader | PartyMemberFlags.CanInvite | PartyMemberFlags.CanKick);
             else
-                return ((SystemSetting.partyMemberCanInvite ? PartyMemberFlags.CanInvite : 0) | (SystemSetting.partyMemberCanKick ? PartyMemberFlags.CanKick : 0));
+                return ((SystemSetting.PartyMemberCanInvite ? PartyMemberFlags.CanInvite : 0) | (SystemSetting.PartyMemberCanKick ? PartyMemberFlags.CanKick : 0));
         }
 
         public static bool IsLeader(PartyMemberFlags flags)

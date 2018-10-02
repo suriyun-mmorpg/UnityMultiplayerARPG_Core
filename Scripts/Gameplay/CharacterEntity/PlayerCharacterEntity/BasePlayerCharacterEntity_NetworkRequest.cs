@@ -155,12 +155,12 @@ namespace MultiplayerARPG
             CallNetFunction("CancelDealing", FunctionReceivers.Server);
         }
 
-        public virtual void RequestUpdateDealingState(CoOpState state)
+        public virtual void RequestUpdateDealingState(DealingState state)
         {
             CallNetFunction("UpdateDealingState", ConnectId, (byte)state);
         }
 
-        public virtual void RequestUpdateAnotherDealingState(CoOpState state)
+        public virtual void RequestUpdateAnotherDealingState(DealingState state)
         {
             CallNetFunction("UpdateAnotherDealingState", ConnectId, (byte)state);
         }
@@ -233,6 +233,11 @@ namespace MultiplayerARPG
         public virtual void RequestSetGuildMessage(string guildMessage)
         {
             CallNetFunction("SetGuildMessage", FunctionReceivers.Server, guildMessage);
+        }
+
+        public virtual void RequestSetGuildMemberRole(string characterId, byte role)
+        {
+            CallNetFunction("SetGuildMemberRole", FunctionReceivers.Server, characterId, role);
         }
 
         public virtual void RequestSendGuildInvitation(uint objectId)

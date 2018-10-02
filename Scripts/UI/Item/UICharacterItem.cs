@@ -412,7 +412,7 @@ namespace MultiplayerARPG
             if (uiGameplay.uiDealing != null)
             {
                 if (uiGameplay.uiDealing.IsVisible() &&
-                    uiGameplay.uiDealing.dealingState == CoOpState.Dealing &&
+                    uiGameplay.uiDealing.dealingState == DealingState.Dealing &&
                     string.IsNullOrEmpty(equipPosition))
                 {
                     if (initData || !isDealingStateEntered)

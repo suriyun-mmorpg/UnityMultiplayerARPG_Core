@@ -10,8 +10,8 @@ namespace MultiplayerARPG
         public System.Action<int> onShowNpcDialog;
         public System.Action<BasePlayerCharacterEntity> onShowDealingRequestDialog;
         public System.Action<BasePlayerCharacterEntity> onShowDealingDialog;
-        public System.Action<CoOpState> onUpdateDealingState;
-        public System.Action<CoOpState> onUpdateAnotherDealingState;
+        public System.Action<DealingState> onUpdateDealingState;
+        public System.Action<DealingState> onUpdateAnotherDealingState;
         public System.Action<int> onUpdateDealingGold;
         public System.Action<int> onUpdateAnotherDealingGold;
         public System.Action<DealingCharacterItems> onUpdateDealingItems;
@@ -467,11 +467,11 @@ namespace MultiplayerARPG
             }
             // Set dealing state/data for co player character entity
             CoCharacter.ClearDealingData();
-            CoCharacter.CoOpState = CoOpState.Dealing;
+            CoCharacter.DealingState = DealingState.Dealing;
             CoCharacter.RequestAcceptedDealingRequest(ObjectId);
             // Set dealing state/data for player character entity
             ClearDealingData();
-            CoOpState = CoOpState.Dealing;
+            DealingState = DealingState.Dealing;
             RequestAcceptedDealingRequest(CoCharacter.ObjectId);
         }
 
@@ -492,7 +492,7 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncSetDealingItem(int itemIndex, short amount)
         {
-            if (CoOpState != CoOpState.Dealing)
+            if (DealingState != DealingState.Dealing)
             {
                 // TODO: May send warn message to start dealing before confirm
                 return;
@@ -524,7 +524,7 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncSetDealingGold(int gold)
         {
-            if (CoOpState != CoOpState.Dealing)
+            if (DealingState != DealingState.Dealing)
             {
                 // TODO: May send warn message to start dealing before doing this
                 return;
@@ -538,23 +538,23 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncLockDealing()
         {
-            if (CoOpState != CoOpState.Dealing)
+            if (DealingState != DealingState.Dealing)
             {
                 // TODO: May send warn message to start dealing before doing this
                 return;
             }
-            CoOpState = CoOpState.LockDealing;
+            DealingState = DealingState.LockDealing;
         }
 
         protected virtual void NetFuncConfirmDealing()
         {
-            if (CoOpState != CoOpState.LockDealing || !(CoCharacter.CoOpState == CoOpState.LockDealing || CoCharacter.CoOpState == CoOpState.ConfirmDealing))
+            if (DealingState != DealingState.LockDealing || !(CoCharacter.DealingState == DealingState.LockDealing || CoCharacter.DealingState == DealingState.ConfirmDealing))
             {
                 // TODO: May send warn message to lock before confirm
                 return;
             }
-            CoOpState = CoOpState.ConfirmDealing;
-            if (CoOpState == CoOpState.ConfirmDealing && CoCharacter.CoOpState == CoOpState.ConfirmDealing)
+            DealingState = DealingState.ConfirmDealing;
+            if (DealingState == DealingState.ConfirmDealing && CoCharacter.DealingState == DealingState.ConfirmDealing)
             {
                 ExchangeDealingItemsAndGold();
                 CoCharacter.ExchangeDealingItemsAndGold();
@@ -568,13 +568,13 @@ namespace MultiplayerARPG
             StopDealing();
         }
 
-        protected virtual void NetFuncUpdateDealingState(CoOpState state)
+        protected virtual void NetFuncUpdateDealingState(DealingState state)
         {
             if (onUpdateDealingState != null)
                 onUpdateDealingState.Invoke(state);
         }
 
-        protected virtual void NetFuncUpdateAnotherDealingState(CoOpState state)
+        protected virtual void NetFuncUpdateAnotherDealingState(DealingState state)
         {
             if (onUpdateAnotherDealingState != null)
                 onUpdateAnotherDealingState.Invoke(state);
@@ -668,6 +668,11 @@ namespace MultiplayerARPG
         protected virtual void NetFuncSetGuildMessage(string guildMessage)
         {
             GameManager.SetGuildMessage(this, guildMessage);
+        }
+
+        protected virtual void NetFuncSetGuildMemberRole(string characterId, byte role)
+        {
+            GameManager.SetGuildMemberRole(this, characterId, role);
         }
 
         protected virtual void NetFuncSendGuildInvitation(uint objectId)
