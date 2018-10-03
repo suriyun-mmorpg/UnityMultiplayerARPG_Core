@@ -912,7 +912,7 @@ namespace MultiplayerARPG
                 return false;
             }
             byte role;
-            if (!guild.TryGetRole(characterId, out role) && playerCharacterEntity.GuildRole < role)
+            if (!guild.TryGetMemberRole(characterId, out role) && playerCharacterEntity.GuildRole < role)
             {
                 // TODO: May warn that character rank is lower
                 return false;
@@ -1056,7 +1056,7 @@ namespace MultiplayerARPG
             if (!CanSetGuildMemberRole(playerCharacterEntity, out guildId, out guild))
                 return;
 
-            guild.SetRole(characterId, guildRole);
+            guild.SetMemberRole(characterId, guildRole);
             guilds[guildId] = guild;
             if (TryGetPlayerCharacterById(characterId, out playerCharacterEntity))
             {

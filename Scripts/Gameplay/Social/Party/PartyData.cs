@@ -38,6 +38,9 @@ namespace MultiplayerARPG
 
         public PartyMemberFlags GetPartyMemberFlags(string characterId)
         {
+            if (!members.ContainsKey(characterId))
+                return 0;
+
             if (IsLeader(characterId))
                 return (PartyMemberFlags.IsLeader | PartyMemberFlags.CanInvite | PartyMemberFlags.CanKick);
             else
