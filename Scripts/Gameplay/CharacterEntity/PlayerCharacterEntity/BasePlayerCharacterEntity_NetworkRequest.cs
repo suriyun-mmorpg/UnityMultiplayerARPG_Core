@@ -245,9 +245,14 @@ namespace MultiplayerARPG
             CallNetFunction("SetGuildMessage", FunctionReceivers.Server, guildMessage);
         }
 
-        public virtual void RequestSetGuildMemberRole(string characterId, byte role)
+        public virtual void RequestSetGuildRole(byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
         {
-            CallNetFunction("SetGuildMemberRole", FunctionReceivers.Server, characterId, role);
+            CallNetFunction("SetGuildRole", FunctionReceivers.Server, guildRole, name, canInvite, canKick, shareExpPercentage);
+        }
+
+        public virtual void RequestSetGuildMemberRole(string characterId, byte guildRole)
+        {
+            CallNetFunction("SetGuildMemberRole", FunctionReceivers.Server, characterId, guildRole);
         }
 
         public virtual void RequestSendGuildInvitation(uint objectId)

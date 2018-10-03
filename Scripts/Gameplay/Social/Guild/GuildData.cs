@@ -148,7 +148,7 @@ namespace MultiplayerARPG
             return roles[guildRole];
         }
 
-        public void SetRole(byte guildRole, string name, bool canInvite, bool canKick, int shareExpPercentage)
+        public void SetRole(byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
         {
             SetRole(guildRole, new GuildMemberRole()
             {

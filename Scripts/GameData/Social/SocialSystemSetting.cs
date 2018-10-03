@@ -70,6 +70,6 @@ namespace MultiplayerARPG
         public string name;
         public bool canInvite;
         public bool canKick;
-        public int shareExpPercentage;
+        public byte shareExpPercentage;
     }
 }

@@ -85,6 +85,7 @@ namespace MultiplayerARPG
             RegisterNetFunction("CreateGuild", new LiteNetLibFunction<NetFieldString>((guildName) => NetFuncCreateGuild(guildName)));
             RegisterNetFunction("ChangeGuildLeader", new LiteNetLibFunction<NetFieldString>((characterId) => NetFuncChangeGuildLeader(characterId)));
             RegisterNetFunction("SetGuildMessage", new LiteNetLibFunction<NetFieldString>((message) => NetFuncSetGuildMessage(message)));
+            RegisterNetFunction("SetGuildRole", new LiteNetLibFunction<NetFieldByte, NetFieldString, NetFieldBool, NetFieldBool, NetFieldByte>((guildRole, name, canInvite, canKick, shareExpPercentage) => NetFuncSetGuildRole(guildRole, name, canInvite, canKick, shareExpPercentage)));
             RegisterNetFunction("SetGuildMemberRole", new LiteNetLibFunction<NetFieldString, NetFieldByte>((characterId, role) => NetFuncSetGuildMemberRole(characterId, role)));
             RegisterNetFunction("SendGuildInvitation", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncSendGuildInvitation(objectId)));
             RegisterNetFunction("ReceiveGuildInvitation", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncReceiveGuildInvitation(objectId)));

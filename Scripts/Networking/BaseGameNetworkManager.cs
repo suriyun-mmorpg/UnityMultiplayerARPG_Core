@@ -861,6 +861,31 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public virtual bool CanSetGuildRole(BasePlayerCharacterEntity playerCharacterEntity, byte guildRole, out int guildId, out GuildData guild)
+        {
+            guildId = 0;
+            guild = null;
+            if (playerCharacterEntity == null || !IsServer)
+                return false;
+            guildId = playerCharacterEntity.GuildId;
+            if (guildId <= 0 || !guilds.TryGetValue(guildId, out guild))
+            {
+                // TODO: May send warn message that player not in guild
+                return false;
+            }
+            if (!guild.IsLeader(playerCharacterEntity))
+            {
+                // TODO: May warn that it's not guild leader
+                return false;
+            }
+            if (!guild.IsRoleAvailable(guildRole))
+            {
+                // TODO: May warn that guild role is not available
+                return false;
+            }
+            return true;
+        }
+
         public virtual bool CanSetGuildMemberRole(BasePlayerCharacterEntity playerCharacterEntity, out int guildId, out GuildData guild)
         {
             guildId = 0;
@@ -1139,6 +1164,27 @@ namespace MultiplayerARPG
 
             guild.guildMessage = guildMessage;
             guilds[guildId] = guild;
+        }
+
+        public virtual void SetGuildRole(BasePlayerCharacterEntity playerCharacterEntity, byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
+        {
+            int guildId;
+            GuildData guild;
+            if (!CanSetGuildRole(playerCharacterEntity, guildRole, out guildId, out guild))
+                return;
+
+            guild.SetRole(guildRole, name, canInvite, canKick, shareExpPercentage);
+            guilds[guildId] = guild;
+            // Change characters guild role
+            foreach (var memberId in guild.GetMemberIds())
+            {
+                BasePlayerCharacterEntity memberCharacterEntity;
+                if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
+                {
+                    memberCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(memberCharacterEntity, out guildRole);
+                    memberCharacterEntity.GuildRole = guildRole;
+                }
+            }
         }
 
         public virtual void SetGuildMemberRole(BasePlayerCharacterEntity playerCharacterEntity, string characterId, byte guildRole)

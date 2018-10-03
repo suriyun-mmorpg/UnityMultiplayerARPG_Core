@@ -613,7 +613,7 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncChangePartyLeader(string characterId)
         {
-
+            GameManager.ChangePartyLeader(this, characterId);
         }
 
         protected virtual void NetFuncPartySetting(bool shareExp, bool shareItem)
@@ -672,7 +672,7 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncChangeGuildLeader(string characterId)
         {
-
+            GameManager.ChangeGuildLeader(this, characterId);
         }
 
         protected virtual void NetFuncSetGuildMessage(string guildMessage)
@@ -680,9 +680,14 @@ namespace MultiplayerARPG
             GameManager.SetGuildMessage(this, guildMessage);
         }
 
-        protected virtual void NetFuncSetGuildMemberRole(string characterId, byte role)
+        protected virtual void NetFuncSetGuildRole(byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
         {
-            GameManager.SetGuildMemberRole(this, characterId, role);
+            GameManager.SetGuildRole(this, guildRole, name, canInvite, canKick, shareExpPercentage);
+        }
+
+        protected virtual void NetFuncSetGuildMemberRole(string characterId, byte guildRole)
+        {
+            GameManager.SetGuildMemberRole(this, characterId, guildRole);
         }
 
         protected virtual void NetFuncSendGuildInvitation(uint objectId)
