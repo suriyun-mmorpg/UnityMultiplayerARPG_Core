@@ -124,6 +124,19 @@ namespace MultiplayerARPG
                 uiPartyCreate.Show(false, false);
         }
 
+        public void OnClickChangeLeader()
+        {
+            // If not in the party or not leader, return
+            if (!OwningCharacterIsLeader())
+                return;
+
+            var partyMember = SelectionManager.SelectedUI.Data.socialCharacter;
+            UISceneGlobal.Singleton.ShowMessageDialog("Change Leader", string.Format("You sure you want to promote {0} to party leader?", partyMember.characterName), false, true, false, false, null, () =>
+            {
+                BasePlayerCharacterController.OwningCharacter.RequestChangePartyLeader(partyMember.id);
+            });
+        }
+
         public void OnClickSettingParty()
         {
             // If not in the party or not leader, return

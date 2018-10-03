@@ -158,6 +158,19 @@ namespace MultiplayerARPG
                 uiGuildCreate.Show();
         }
 
+        public void OnClickChangeLeader()
+        {
+            // If not in the party or not leader, return
+            if (!OwningCharacterIsLeader())
+                return;
+
+            var guildMember = SelectionManager.SelectedUI.Data.socialCharacter;
+            UISceneGlobal.Singleton.ShowMessageDialog("Change Leader", string.Format("You sure you want to promote {0} to guild leader?", guildMember.characterName), false, true, false, false, null, () =>
+            {
+                BasePlayerCharacterController.OwningCharacter.RequestChangeGuildLeader(guildMember.id);
+            });
+        }
+
         public void OnClickSetGuildMessage()
         {
             // If not in the guild or not leader, return
