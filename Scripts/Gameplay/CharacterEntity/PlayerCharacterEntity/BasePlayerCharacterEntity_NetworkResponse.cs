@@ -611,6 +611,11 @@ namespace MultiplayerARPG
             GameManager.CreateParty(this, shareExp, shareItem);
         }
 
+        protected virtual void NetFuncChangePartyLeader(string characterId)
+        {
+
+        }
+
         protected virtual void NetFuncPartySetting(bool shareExp, bool shareItem)
         {
             GameManager.PartySetting(this, shareExp, shareItem);
@@ -663,6 +668,11 @@ namespace MultiplayerARPG
         protected virtual void NetFuncCreateGuild(string guildName)
         {
             GameManager.CreateGuild(this, guildName);
+        }
+
+        protected virtual void NetFuncChangeGuildLeader(string characterId)
+        {
+
         }
 
         protected virtual void NetFuncSetGuildMessage(string guildMessage)

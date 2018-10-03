@@ -74,6 +74,7 @@ namespace MultiplayerARPG
             RegisterNetFunction("UpdateDealingItems", new LiteNetLibFunction<NetFieldDealingCharacterItems>((items) => NetFuncUpdateDealingItems(items)));
             RegisterNetFunction("UpdateAnotherDealingItems", new LiteNetLibFunction<NetFieldDealingCharacterItems>((items) => NetFuncUpdateAnotherDealingItems(items)));
             RegisterNetFunction("CreateParty", new LiteNetLibFunction<NetFieldBool, NetFieldBool>((shareExp, shareItem) => NetFuncCreateParty(shareExp, shareItem)));
+            RegisterNetFunction("ChangePartyLeader", new LiteNetLibFunction<NetFieldString>((characterId) => NetFuncChangePartyLeader(characterId)));
             RegisterNetFunction("PartySetting", new LiteNetLibFunction<NetFieldBool, NetFieldBool>((shareExp, shareItem) => NetFuncPartySetting(shareExp, shareItem)));
             RegisterNetFunction("SendPartyInvitation", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncSendPartyInvitation(objectId)));
             RegisterNetFunction("ReceivePartyInvitation", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncReceivePartyInvitation(objectId)));
@@ -82,6 +83,7 @@ namespace MultiplayerARPG
             RegisterNetFunction("KickFromParty", new LiteNetLibFunction<NetFieldString>((characterId) => NetFuncKickFromParty(characterId)));
             RegisterNetFunction("LeaveParty", new LiteNetLibFunction(NetFuncLeaveParty));
             RegisterNetFunction("CreateGuild", new LiteNetLibFunction<NetFieldString>((guildName) => NetFuncCreateGuild(guildName)));
+            RegisterNetFunction("ChangeGuildLeader", new LiteNetLibFunction<NetFieldString>((characterId) => NetFuncChangeGuildLeader(characterId)));
             RegisterNetFunction("SetGuildMessage", new LiteNetLibFunction<NetFieldString>((message) => NetFuncSetGuildMessage(message)));
             RegisterNetFunction("SetGuildMemberRole", new LiteNetLibFunction<NetFieldString, NetFieldByte>((characterId, role) => NetFuncSetGuildMemberRole(characterId, role)));
             RegisterNetFunction("SendGuildInvitation", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncSendGuildInvitation(objectId)));

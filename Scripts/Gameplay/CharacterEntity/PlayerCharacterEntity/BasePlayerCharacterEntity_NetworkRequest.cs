@@ -190,6 +190,11 @@ namespace MultiplayerARPG
             CallNetFunction("CreateParty", FunctionReceivers.Server, shareExp, shareItem);
         }
 
+        public virtual void RequestChangePartyLeader(string characterId)
+        {
+            CallNetFunction("ChangePartyLeader", FunctionReceivers.Server, characterId);
+        }
+
         public virtual void RequestPartySetting(bool shareExp, bool shareItem)
         {
             CallNetFunction("PartySetting", FunctionReceivers.Server, shareExp, shareItem);
@@ -228,6 +233,11 @@ namespace MultiplayerARPG
         public virtual void RequestCreateGuild(string guildName)
         {
             CallNetFunction("CreateGuild", FunctionReceivers.Server, guildName);
+        }
+
+        public virtual void RequestChangeGuildLeader(string characterId)
+        {
+            CallNetFunction("ChangeGuildLeader", FunctionReceivers.Server, characterId);
         }
 
         public virtual void RequestSetGuildMessage(string guildMessage)

@@ -127,6 +127,11 @@ namespace MultiplayerARPG
             return members.Count;
         }
 
+        public bool ContainsMemberId(string characterId)
+        {
+            return members.ContainsKey(characterId);
+        }
+
         public IEnumerable<string> GetMemberIds()
         {
             return members.Keys;
@@ -150,6 +155,12 @@ namespace MultiplayerARPG
         public bool IsLeader(string characterId)
         {
             return characterId.Equals(leaderId);
+        }
+
+        public virtual void SetLeader(string characterId)
+        {
+            if (members.ContainsKey(characterId))
+                leaderId = characterId;
         }
 
         public abstract byte GetMemberFlags(SocialCharacterData memberData);

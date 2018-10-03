@@ -646,6 +646,31 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public virtual bool CanChangePartyLeader(BasePlayerCharacterEntity playerCharacterEntity, string characterId, out int partyId, out PartyData party)
+        {
+            partyId = 0;
+            party = null;
+            if (playerCharacterEntity == null || !IsServer)
+                return false;
+            partyId = playerCharacterEntity.PartyId;
+            if (partyId <= 0 || !parties.TryGetValue(partyId, out party))
+            {
+                // TODO: May send warn message that player not in party
+                return false;
+            }
+            if (!party.IsLeader(playerCharacterEntity))
+            {
+                // TODO: May warn that it's not party leader
+                return false;
+            }
+            if (!party.ContainsMemberId(characterId))
+            {
+                // TODO: May warn that target character is not in party
+                return false;
+            }
+            return true;
+        }
+
         public virtual bool CanPartySetting(BasePlayerCharacterEntity playerCharacterEntity, out int partyId, out PartyData party)
         {
             partyId = 0;
@@ -756,6 +781,11 @@ namespace MultiplayerARPG
                 // TODO: May warn that it's not party leader
                 return false;
             }
+            if (!party.ContainsMemberId(characterId))
+            {
+                // TODO: May warn that target character is not in party
+                return false;
+            }
             return true;
         }
 
@@ -781,6 +811,31 @@ namespace MultiplayerARPG
             if (playerCharacterEntity.GuildId > 0)
             {
                 // TODO: May send warn message that player already in guild
+                return false;
+            }
+            return true;
+        }
+
+        public virtual bool CanChangeGuildLeader(BasePlayerCharacterEntity playerCharacterEntity, string characterId, out int guildId, out GuildData guild)
+        {
+            guildId = 0;
+            guild = null;
+            if (playerCharacterEntity == null || !IsServer)
+                return false;
+            guildId = playerCharacterEntity.GuildId;
+            if (guildId <= 0 || !guilds.TryGetValue(guildId, out guild))
+            {
+                // TODO: May send warn message that player not in guild
+                return false;
+            }
+            if (!guild.IsLeader(playerCharacterEntity))
+            {
+                // TODO: May warn that it's not guild leader
+                return false;
+            }
+            if (!guild.ContainsMemberId(characterId))
+            {
+                // TODO: May warn that target character is not in guild
                 return false;
             }
             return true;
@@ -922,6 +977,11 @@ namespace MultiplayerARPG
                 // TODO: May warn that it's not guild leader
                 return false;
             }
+            if (!guild.ContainsMemberId(characterId))
+            {
+                // TODO: May warn that target character is not in guild
+                return false;
+            }
             return true;
         }
 
@@ -959,6 +1019,20 @@ namespace MultiplayerARPG
             parties[partyId] = party;
             playerCharacterEntity.PartyId = partyId;
             playerCharacterEntity.PartyMemberFlags = party.GetPartyMemberFlags(playerCharacterEntity);
+        }
+
+        public virtual void ChangePartyLeader(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
+        {
+            int partyId;
+            PartyData party;
+            if (!CanChangePartyLeader(playerCharacterEntity, characterId, out partyId, out party))
+                return;
+
+            party.SetLeader(characterId);
+            parties[partyId] = party;
+            BasePlayerCharacterEntity targetCharacterEntity;
+            if (TryGetPlayerCharacterById(characterId, out targetCharacterEntity))
+                targetCharacterEntity.PartyMemberFlags = party.GetPartyMemberFlags(targetCharacterEntity);
         }
 
         public virtual void PartySetting(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
@@ -1036,6 +1110,24 @@ namespace MultiplayerARPG
             playerCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(playerCharacterEntity, out guildRole);
             playerCharacterEntity.GuildRole = guildRole;
             playerCharacterEntity.SharedGuildExp = 0;
+        }
+
+        public virtual void ChangeGuildLeader(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
+        {
+            int guildId;
+            GuildData guild;
+            if (!CanChangeGuildLeader(playerCharacterEntity, characterId, out guildId, out guild))
+                return;
+
+            guild.SetLeader(characterId);
+            guilds[guildId] = guild;
+            BasePlayerCharacterEntity targetCharacterEntity;
+            if (TryGetPlayerCharacterById(characterId, out targetCharacterEntity))
+            {
+                byte role;
+                targetCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(targetCharacterEntity, out role);
+                targetCharacterEntity.GuildRole = role;
+            }
         }
 
         public virtual void SetGuildMessage(BasePlayerCharacterEntity playerCharacterEntity, string guildMessage)
