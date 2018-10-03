@@ -39,15 +39,28 @@ namespace MultiplayerARPG
         public GuildMemberRole GetGuildMemberRole(byte guildRole)
         {
             if (!IsGuildMemberRoleAvailable(guildRole))
-                return new GuildMemberRole() { name = "Member", canInvite = false, canKick = false };
+            {
+                if (guildRole == GuildLeaderRole)
+                    return new GuildMemberRole() { name = "Master", canInvite = true, canKick = true };
+                else
+                    return new GuildMemberRole() { name = "Member", canInvite = false, canKick = false };
+            }
             return guildMemberRoles[guildRole];
         }
 
-        public byte GetLowestGuildMemberRole()
+        public byte GuildLeaderRole
         {
-            if (guildMemberRoles == null || guildMemberRoles.Length < 2)
-                return 1;
-            return (byte)(guildMemberRoles.Length - 1);
+            get { return 0; }
+        }
+
+        public byte LowestGuildMemberRole
+        {
+            get
+            {
+                if (guildMemberRoles == null || guildMemberRoles.Length < 2)
+                    return 1;
+                return (byte)(guildMemberRoles.Length - 1);
+            }
         }
     }
 

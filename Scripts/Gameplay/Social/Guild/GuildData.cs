@@ -27,7 +27,7 @@ namespace MultiplayerARPG
         public GuildData(int id, string guildName, BasePlayerCharacterEntity leaderCharacterEntity)
             : this(id, guildName, leaderCharacterEntity.Id, leaderCharacterEntity.CharacterName)
         {
-            AddMember(leaderCharacterEntity, 0);
+            AddMember(leaderCharacterEntity);
         }
 
         public void AddMember(BasePlayerCharacterEntity playerCharacterEntity, byte guildRole)
@@ -37,14 +37,20 @@ namespace MultiplayerARPG
 
         public void AddMember(SocialCharacterData memberData, byte guildRole)
         {
-            AddMember(memberData);
+            base.AddMember(memberData);
             SetRole(memberData.id, guildRole);
         }
 
         public void UpdateMember(SocialCharacterData memberData, byte guildRole)
         {
-            UpdateMember(memberData);
+            base.UpdateMember(memberData);
             SetRole(memberData.id, guildRole);
+        }
+
+        public override void AddMember(SocialCharacterData memberData)
+        {
+            base.AddMember(memberData);
+            SetRole(memberData.id, IsLeader(memberData.id) ? SystemSetting.GuildLeaderRole : SystemSetting.LowestGuildMemberRole);
         }
 
         public override bool RemoveMember(string characterId)
@@ -68,23 +74,23 @@ namespace MultiplayerARPG
         {
             if (IsLeader(characterId))
             {
-                guildRole = 0;
+                guildRole = SystemSetting.GuildLeaderRole;
                 if (!SystemSetting.IsGuildMemberRoleAvailable(guildRole))
                     return (GuildMemberFlags.IsLeader | GuildMemberFlags.CanInvite | GuildMemberFlags.CanKick);
                 return GuildMemberFlags.IsLeader | GetGuildFlags(guildRole);
             }
             else
             {
-                guildRole = 1;
+                guildRole = SystemSetting.LowestGuildMemberRole;
                 if (!SystemSetting.IsGuildMemberRoleAvailable(guildRole))
                     return 0;
-                if (roles.TryGetValue(characterId, out guildRole) && SystemSetting.IsGuildMemberRoleAvailable(guildRole))
-                    guildRole = SystemSetting.GetLowestGuildMemberRole();
+                if (!roles.TryGetValue(characterId, out guildRole) || !SystemSetting.IsGuildMemberRoleAvailable(guildRole))
+                    guildRole = SystemSetting.LowestGuildMemberRole;
                 return GetGuildFlags(guildRole);
             }
         }
 
-        public GuildMemberFlags GetGuildFlags(byte guildRole)
+        private GuildMemberFlags GetGuildFlags(byte guildRole)
         {
             var role = SystemSetting.GetGuildMemberRole(guildRole);
             return ((role.canInvite ? GuildMemberFlags.CanInvite : 0) | (role.canKick ? GuildMemberFlags.CanKick : 0));
@@ -98,7 +104,11 @@ namespace MultiplayerARPG
         public void SetRole(string characterId, byte guildRole)
         {
             if (members.ContainsKey(characterId))
+            {
+                if (!SystemSetting.IsGuildMemberRoleAvailable(guildRole))
+                    guildRole = IsLeader(characterId) ? SystemSetting.GuildLeaderRole : SystemSetting.LowestGuildMemberRole;
                 roles[characterId] = guildRole;
+            }
         }
 
         public static bool IsLeader(GuildMemberFlags flags)

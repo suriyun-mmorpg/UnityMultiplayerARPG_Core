@@ -1072,7 +1072,7 @@ namespace MultiplayerARPG
             if (!CanAddGuildMember(inviteCharacterEntity, acceptCharacterEntity, out guildId, out guild))
                 return;
 
-            guild.AddMember(acceptCharacterEntity, gameInstance.SocialSystemSetting.GetLowestGuildMemberRole());
+            guild.AddMember(acceptCharacterEntity);
             byte guildRole;
             guilds[guildId] = guild;
             acceptCharacterEntity.GuildId = guildId;
