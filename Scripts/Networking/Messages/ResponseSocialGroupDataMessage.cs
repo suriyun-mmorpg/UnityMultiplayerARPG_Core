@@ -8,7 +8,7 @@ namespace MultiplayerARPG
         public SocialCharacterData[] members;
         public override void DeserializeData(NetDataReader reader)
         {
-            var length = reader.GetInt();
+            var length = reader.GetByte();
             var members = new SocialCharacterData[length];
             if (length > 0)
             {
@@ -36,7 +36,7 @@ namespace MultiplayerARPG
 
         public override void SerializeData(NetDataWriter writer)
         {
-            var length = members == null ? 0 : members.Length;
+            var length = (byte)(members == null ? 0 : members.Length);
             writer.Put(length);
             if (length > 0)
             {
