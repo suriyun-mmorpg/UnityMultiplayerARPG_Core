@@ -7,7 +7,6 @@ namespace MultiplayerARPG
         public const byte LeaderRole = 0;
 
         public string guildName { get; private set; }
-        public string leaderName { get; private set; }
         public int level;
         public int exp;
         public int skillPoint;
@@ -25,11 +24,10 @@ namespace MultiplayerARPG
             }
         }
 
-        public GuildData(int id, string guildName, string leaderId, string leaderName)
+        public GuildData(int id, string guildName, string leaderId)
             : base(id, leaderId)
         {
             this.guildName = guildName;
-            this.leaderName = leaderName;
             level = 1;
             exp = 0;
             skillPoint = 0;
@@ -39,7 +37,7 @@ namespace MultiplayerARPG
         }
 
         public GuildData(int id, string guildName, BasePlayerCharacterEntity leaderCharacterEntity)
-            : this(id, guildName, leaderCharacterEntity.Id, leaderCharacterEntity.CharacterName)
+            : this(id, guildName, leaderCharacterEntity.Id)
         {
             AddMember(leaderCharacterEntity);
         }
