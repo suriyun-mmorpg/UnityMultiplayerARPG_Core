@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         public int exp;
         public int skillPoint;
         public string guildMessage;
-        protected List<GuildMemberRole> roles;
+        protected List<GuildRole> roles;
         protected Dictionary<string, byte> memberRoles;
 
         public byte LowestMemberRole
@@ -34,7 +34,7 @@ namespace MultiplayerARPG
             exp = 0;
             skillPoint = 0;
             guildMessage = string.Empty;
-            roles = new List<GuildMemberRole>(SystemSetting.GuildMemberRoles);
+            roles = new List<GuildRole>(SystemSetting.GuildMemberRoles);
             memberRoles = new Dictionary<string, byte>();
         }
 
@@ -133,35 +133,57 @@ namespace MultiplayerARPG
 
         public bool IsRoleAvailable(byte guildRole)
         {
-            return roles != null && guildRole < roles.Count;
+            return roles != null && guildRole >= 0 && guildRole < roles.Count;
         }
 
-        public GuildMemberRole GetRole(byte guildRole)
+        public IEnumerable<GuildRole> GetRoles()
+        {
+            return roles;
+        }
+
+        public GuildRole GetRole(byte guildRole)
         {
             if (!IsRoleAvailable(guildRole))
             {
                 if (guildRole == LeaderRole)
-                    return new GuildMemberRole() { name = "Master", canInvite = true, canKick = true };
+                    return new GuildRole() { roleName = "Master", canInvite = true, canKick = true };
                 else
-                    return new GuildMemberRole() { name = "Member", canInvite = false, canKick = false };
+                    return new GuildRole() { roleName = "Member", canInvite = false, canKick = false };
             }
             return roles[guildRole];
         }
 
-        public void SetRole(byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
+        public void SetRole(byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
         {
-            SetRole(guildRole, new GuildMemberRole()
+            SetRole(guildRole, new GuildRole()
             {
-                name = name,
+                roleName = roleName,
                 canInvite = canInvite,
                 canKick = canKick,
                 shareExpPercentage = shareExpPercentage,
             });
         }
 
-        public void SetRole(byte guildRole, GuildMemberRole role)
+        public void SetRole(byte guildRole, GuildRole role)
         {
-            roles[guildRole] = role;
+            if (guildRole >= 0 && guildRole < roles.Count)
+                roles[guildRole] = role;
+        }
+
+        public void GetSortedMembers(out SocialCharacterData[] sortedMembers, out byte[] sortedMemberRoles)
+        {
+            var i = 0;
+            sortedMembers = new SocialCharacterData[members.Count];
+            sortedMemberRoles = new byte[members.Count];
+            sortedMembers[i] = members[leaderId];
+            sortedMemberRoles[i++] = LeaderRole;
+            foreach (var memberId in members.Keys)
+            {
+                if (memberId.Equals(leaderId))
+                    continue;
+                sortedMembers[i] = members[memberId];
+                sortedMemberRoles[i++] = memberRoles.ContainsKey(memberId) ? memberRoles[memberId] : LowestMemberRole;
+            }
         }
 
         public static bool IsLeader(GuildMemberFlags flags)

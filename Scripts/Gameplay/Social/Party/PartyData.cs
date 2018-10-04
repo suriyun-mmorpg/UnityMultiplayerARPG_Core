@@ -47,6 +47,19 @@ namespace MultiplayerARPG
                 return ((SystemSetting.PartyMemberCanInvite ? PartyMemberFlags.CanInvite : 0) | (SystemSetting.PartyMemberCanKick ? PartyMemberFlags.CanKick : 0));
         }
 
+        public void GetSortedMembers(out SocialCharacterData[] sortedMembers)
+        {
+            var i = 0;
+            sortedMembers = new SocialCharacterData[members.Count];
+            sortedMembers[i++] = members[leaderId];
+            foreach (var memberId in members.Keys)
+            {
+                if (memberId.Equals(leaderId))
+                    continue;
+                sortedMembers[i++] = members[memberId];
+            }
+        }
+
         public static bool IsLeader(PartyMemberFlags flags)
         {
             return (flags & PartyMemberFlags.IsLeader) != 0;

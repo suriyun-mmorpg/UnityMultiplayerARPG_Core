@@ -27,17 +27,17 @@ namespace MultiplayerARPG
         private int maxGuildMember = 50;
         [Tooltip("Member roles from high to low priority")]
         [SerializeField]
-        private GuildMemberRole[] guildMemberRoles = new GuildMemberRole[] {
-            new GuildMemberRole() { name = "Master", canInvite = true, canKick = true },
-            new GuildMemberRole() { name = "Member 1", canInvite = false, canKick = false },
-            new GuildMemberRole() { name = "Member 2", canInvite = false, canKick = false },
-            new GuildMemberRole() { name = "Member 3", canInvite = false, canKick = false },
-            new GuildMemberRole() { name = "Member 4", canInvite = false, canKick = false },
-            new GuildMemberRole() { name = "Member 5", canInvite = false, canKick = false },
+        private GuildRole[] guildMemberRoles = new GuildRole[] {
+            new GuildRole() { roleName = "Master", canInvite = true, canKick = true },
+            new GuildRole() { roleName = "Member 1", canInvite = false, canKick = false },
+            new GuildRole() { roleName = "Member 2", canInvite = false, canKick = false },
+            new GuildRole() { roleName = "Member 3", canInvite = false, canKick = false },
+            new GuildRole() { roleName = "Member 4", canInvite = false, canKick = false },
+            new GuildRole() { roleName = "Member 5", canInvite = false, canKick = false },
         };
 
         public int MaxGuildMember { get { return maxGuildMember; } }
-        public GuildMemberRole[] GuildMemberRoles { get { return guildMemberRoles; } }
+        public GuildRole[] GuildMemberRoles { get { return guildMemberRoles; } }
 
 #if UNITY_EDITOR
         void OnValidate()
@@ -45,18 +45,18 @@ namespace MultiplayerARPG
             if (guildMemberRoles.Length < 2)
             {
                 Debug.LogWarning("[SocialSystemSetting] `guildMemberRoles` must more or equals to 2");
-                guildMemberRoles = new GuildMemberRole[] {
+                guildMemberRoles = new GuildRole[] {
                     guildMemberRoles[0],
-                    new GuildMemberRole() { name = "Member 1", canInvite = false, canKick = false },
+                    new GuildRole() { roleName = "Member 1", canInvite = false, canKick = false },
                 };
                 EditorUtility.SetDirty(this);
             }
             else if (guildMemberRoles.Length < 1)
             {
                 Debug.LogWarning("[SocialSystemSetting] `guildMemberRoles` must more or equals to 2");
-                guildMemberRoles = new GuildMemberRole[] {
-                    new GuildMemberRole() { name = "Master", canInvite = true, canKick = true },
-                    new GuildMemberRole() { name = "Member 1", canInvite = false, canKick = false },
+                guildMemberRoles = new GuildRole[] {
+                    new GuildRole() { roleName = "Master", canInvite = true, canKick = true },
+                    new GuildRole() { roleName = "Member 1", canInvite = false, canKick = false },
                 };
                 EditorUtility.SetDirty(this);
             }
@@ -65,9 +65,9 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public struct GuildMemberRole
+    public struct GuildRole
     {
-        public string name;
+        public string roleName;
         public bool canInvite;
         public bool canKick;
         public byte shareExpPercentage;
