@@ -410,7 +410,6 @@ namespace MultiplayerARPG
                 if (guilds.TryGetValue(playerCharacterEntity.GuildId, out guildData) && guildData.IsMember(playerCharacterEntity))
                 {
                     responseMessage.guildName = guildData.guildName;
-                    responseMessage.leaderName = guildData.leaderName;
                     responseMessage.level = guildData.level;
                     responseMessage.exp = guildData.exp;
                     responseMessage.skillPoint = guildData.skillPoint;
