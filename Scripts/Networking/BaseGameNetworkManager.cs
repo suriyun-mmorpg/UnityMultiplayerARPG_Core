@@ -387,7 +387,7 @@ namespace MultiplayerARPG
                 {
                     responseMessage.shareExp = partyData.shareExp;
                     responseMessage.shareItem = partyData.shareItem;
-                    responseMessage.members = partyData.GetMembers().ToArray();
+                    partyData.GetSortedMembers(out responseMessage.members);
                 }
                 else
                     playerCharacterEntity.PartyId = 0;
@@ -415,7 +415,8 @@ namespace MultiplayerARPG
                     responseMessage.exp = guildData.exp;
                     responseMessage.skillPoint = guildData.skillPoint;
                     responseMessage.message = guildData.guildMessage;
-                    responseMessage.members = guildData.GetMembers().ToArray();
+                    responseMessage.roles = guildData.GetRoles().ToArray();
+                    guildData.GetSortedMembers(out responseMessage.members, out responseMessage.memberRoles);
                 }
                 else
                     playerCharacterEntity.GuildId = 0;
