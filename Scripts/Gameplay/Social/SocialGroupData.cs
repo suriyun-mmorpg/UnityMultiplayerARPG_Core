@@ -8,8 +8,8 @@ namespace MultiplayerARPG
         protected Dictionary<string, float> lastOnlineTimes;
         protected SocialCharacterData tempMemberData;
 
-        public int id { get; private set; }
-        public string leaderId { get; private set; }
+        public int id { get; protected set; }
+        public string leaderId { get; protected set; }
 
         public static SocialSystemSetting SystemSetting { get { return GameInstance.Singleton.SocialSystemSetting; } }
 
