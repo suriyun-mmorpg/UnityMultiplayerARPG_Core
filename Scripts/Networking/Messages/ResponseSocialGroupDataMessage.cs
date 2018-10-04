@@ -9,7 +9,7 @@ namespace MultiplayerARPG
         public override void DeserializeData(NetDataReader reader)
         {
             var length = reader.GetByte();
-            var members = new SocialCharacterData[length];
+            members = new SocialCharacterData[length];
             if (length > 0)
             {
                 for (var i = 0; i < length; ++i)
@@ -31,7 +31,6 @@ namespace MultiplayerARPG
                     members[i] = entry;
                 }
             }
-            this.members = members;
         }
 
         public override void SerializeData(NetDataWriter writer)

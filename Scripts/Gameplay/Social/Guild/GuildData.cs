@@ -173,16 +173,29 @@ namespace MultiplayerARPG
         public void GetSortedMembers(out SocialCharacterData[] sortedMembers, out byte[] sortedMemberRoles)
         {
             var i = 0;
+            var offlineMembers = new List<SocialCharacterData>();
             sortedMembers = new SocialCharacterData[members.Count];
             sortedMemberRoles = new byte[members.Count];
             sortedMembers[i] = members[leaderId];
             sortedMemberRoles[i++] = LeaderRole;
+            SocialCharacterData tempMember;
             foreach (var memberId in members.Keys)
             {
                 if (memberId.Equals(leaderId))
                     continue;
-                sortedMembers[i] = members[memberId];
-                sortedMemberRoles[i++] = memberRoles.ContainsKey(memberId) ? memberRoles[memberId] : LowestMemberRole;
+                tempMember = members[memberId];
+                if (!tempMember.IsOnline())
+                {
+                    offlineMembers.Add(tempMember);
+                    continue;
+                }
+                sortedMembers[i] = tempMember;
+                sortedMemberRoles[i++] = memberRoles.ContainsKey(tempMember.id) ? memberRoles[tempMember.id] : LowestMemberRole;
+            }
+            foreach (var offlineMember in offlineMembers)
+            {
+                sortedMembers[i] = offlineMember;
+                sortedMemberRoles[i++] = memberRoles.ContainsKey(offlineMember.id) ? memberRoles[offlineMember.id] : LowestMemberRole;
             }
         }
 

@@ -23,7 +23,7 @@ namespace MultiplayerARPG
             message = reader.GetString();
             // Put roles
             var length = reader.GetByte();
-            var roles = new GuildRole[length];
+            roles = new GuildRole[length];
             if (length > 0)
             {
                 for (var i = 0; i < length; ++i)
@@ -36,10 +36,9 @@ namespace MultiplayerARPG
                     roles[i] = entry;
                 }
             }
-            this.roles = roles;
             // Put member roles
             length = reader.GetByte();
-            var memberRoles = new byte[length];
+            memberRoles = new byte[length];
             if (length > 0)
             {
                 for (var i = 0; i < length; ++i)
@@ -47,7 +46,6 @@ namespace MultiplayerARPG
                     memberRoles[i] = reader.GetByte();
                 }
             }
-            this.memberRoles = memberRoles;
 
             base.DeserializeData(reader);
         }
