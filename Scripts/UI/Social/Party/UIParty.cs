@@ -7,7 +7,7 @@ using LiteNetLibManager;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(UISocialCharacterSelectionManager))]
-    public class UIParty : UISocialGroup
+    public class UIParty : UISocialGroup<UISocialCharacter>
     {
         [Header("UI Elements")]
         public Toggle toggleShareExp;
@@ -19,17 +19,6 @@ namespace MultiplayerARPG
 
         public bool shareExp { get; private set; }
         public bool shareItem { get; private set; }
-
-        private BaseGameNetworkManager cacheGameNetworkManager;
-        public BaseGameNetworkManager CacheGameNetworkManager
-        {
-            get
-            {
-                if (cacheGameNetworkManager == null)
-                    cacheGameNetworkManager = FindObjectOfType<BaseGameNetworkManager>();
-                return cacheGameNetworkManager;
-            }
-        }
 
         protected override void Update()
         {
@@ -94,11 +83,11 @@ namespace MultiplayerARPG
                 memberAmount = castedMessage.members.Length;
                 UpdateUIs();
 
-                var selectedIdx = SelectionManager.SelectedUI != null ? SelectionManager.IndexOf(SelectionManager.SelectedUI) : -1;
-                SelectionManager.DeselectSelectedUI();
-                SelectionManager.Clear();
+                var selectedIdx = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI) : -1;
+                MemberSelectionManager.DeselectSelectedUI();
+                MemberSelectionManager.Clear();
 
-                CacheList.Generate(castedMessage.members, (index, partyMember, ui) =>
+                MemberList.Generate(castedMessage.members, (index, partyMember, ui) =>
                 {
                     var partyMemberEntity = new SocialCharacterEntityTuple();
                     partyMemberEntity.socialCharacter = partyMember;
@@ -107,7 +96,7 @@ namespace MultiplayerARPG
                     uiPartyMember.uiSocialGroup = this;
                     uiPartyMember.Data = partyMemberEntity;
                     uiPartyMember.Show();
-                    SelectionManager.Add(uiPartyMember);
+                    MemberSelectionManager.Add(uiPartyMember);
                     if (selectedIdx == index)
                         uiPartyMember.OnClickSelect();
                 });
@@ -130,7 +119,7 @@ namespace MultiplayerARPG
             if (!OwningCharacterIsLeader())
                 return;
 
-            var partyMember = SelectionManager.SelectedUI.Data.socialCharacter;
+            var partyMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
             UISceneGlobal.Singleton.ShowMessageDialog("Change Leader", string.Format("You sure you want to promote {0} to party leader?", partyMember.characterName), false, true, false, false, null, () =>
             {
                 BasePlayerCharacterController.OwningCharacter.RequestChangePartyLeader(partyMember.id);
@@ -151,10 +140,10 @@ namespace MultiplayerARPG
         public void OnClickKickFromParty()
         {
             // If not in the party or not leader, return
-            if (!OwningCharacterCanKick() || SelectionManager.SelectedUI == null)
+            if (!OwningCharacterCanKick() || MemberSelectionManager.SelectedUI == null)
                 return;
 
-            var partyMember = SelectionManager.SelectedUI.Data.socialCharacter;
+            var partyMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
             UISceneGlobal.Singleton.ShowMessageDialog("Kick Member", string.Format("You sure you want to kick {0} from party?", partyMember.characterName), false, true, false, false, null, () =>
             {
                 BasePlayerCharacterController.OwningCharacter.RequestKickFromParty(partyMember.id);

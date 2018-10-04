@@ -4,8 +4,19 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(UISocialCharacterSelectionManager))]
     public abstract class UISocialGroup : UIBase
+    {
+        public abstract int GetSocialId();
+        public abstract int GetMaxMemberAmount();
+        public abstract bool IsLeader(byte flags);
+        public abstract bool CanKick(byte flags);
+        public abstract bool OwningCharacterIsLeader();
+        public abstract bool OwningCharacterCanKick();
+    }
+
+    [RequireComponent(typeof(UISocialCharacterSelectionManager))]
+    public abstract class UISocialGroup<T> : UISocialGroup
+        where T : UISocialCharacter
     {
         [Header("Display Format")]
         [Tooltip("Member Amount Format => {0} = {current amount}, {1} = {max amount}")]
@@ -14,8 +25,8 @@ namespace MultiplayerARPG
         public string memberAmountNoLimitFormat = "Member Amount: {0}";
 
         [Header("UI Elements")]
-        public UISocialCharacter uiMemberDialog;
-        public UISocialCharacter uiMemberPrefab;
+        public T uiMemberDialog;
+        public T uiMemberPrefab;
         public Transform uiMemberContainer;
         public TextWrapper textMemberAmount;
         [Tooltip("These objects will be activated when owning character is in social group")]
@@ -34,30 +45,41 @@ namespace MultiplayerARPG
         protected int currentSocialId = 0;
         public int memberAmount { get; protected set; }
 
-        private UIList cacheList;
-        public UIList CacheList
+        private UIList memberList;
+        public UIList MemberList
         {
             get
             {
-                if (cacheList == null)
+                if (memberList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiMemberPrefab.gameObject;
-                    cacheList.uiContainer = uiMemberContainer;
+                    memberList = gameObject.AddComponent<UIList>();
+                    memberList.uiPrefab = uiMemberPrefab.gameObject;
+                    memberList.uiContainer = uiMemberContainer;
                 }
-                return cacheList;
+                return memberList;
             }
         }
 
-        private UISocialCharacterSelectionManager selectionManager;
-        public UISocialCharacterSelectionManager SelectionManager
+        private UISocialCharacterSelectionManager memberSelectionManager;
+        public UISocialCharacterSelectionManager MemberSelectionManager
         {
             get
             {
-                if (selectionManager == null)
-                    selectionManager = GetComponent<UISocialCharacterSelectionManager>();
-                selectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return selectionManager;
+                if (memberSelectionManager == null)
+                    memberSelectionManager = GetComponent<UISocialCharacterSelectionManager>();
+                memberSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return memberSelectionManager;
+            }
+        }
+
+        private BaseGameNetworkManager cacheGameNetworkManager;
+        public BaseGameNetworkManager CacheGameNetworkManager
+        {
+            get
+            {
+                if (cacheGameNetworkManager == null)
+                    cacheGameNetworkManager = FindObjectOfType<BaseGameNetworkManager>();
+                return cacheGameNetworkManager;
             }
         }
 
@@ -70,7 +92,7 @@ namespace MultiplayerARPG
 
                 // Refresh guild info
                 if (currentSocialId <= 0)
-                    CacheList.HideAll();
+                    MemberList.HideAll();
             }
         }
 
@@ -125,16 +147,16 @@ namespace MultiplayerARPG
         public override void Show()
         {
             base.Show();
-            SelectionManager.eventOnSelect.RemoveListener(OnSelectMember);
-            SelectionManager.eventOnSelect.AddListener(OnSelectMember);
-            SelectionManager.eventOnDeselect.RemoveListener(OnDeselectMember);
-            SelectionManager.eventOnDeselect.AddListener(OnDeselectMember);
+            MemberSelectionManager.eventOnSelect.RemoveListener(OnSelectMember);
+            MemberSelectionManager.eventOnSelect.AddListener(OnSelectMember);
+            MemberSelectionManager.eventOnDeselect.RemoveListener(OnDeselectMember);
+            MemberSelectionManager.eventOnDeselect.AddListener(OnDeselectMember);
             UpdateUIs();
         }
 
         public override void Hide()
         {
-            SelectionManager.DeselectSelectedUI();
+            MemberSelectionManager.DeselectSelectedUI();
             base.Hide();
         }
 
@@ -142,7 +164,7 @@ namespace MultiplayerARPG
         {
             if (uiMemberDialog != null)
             {
-                uiMemberDialog.selectionManager = SelectionManager;
+                uiMemberDialog.selectionManager = MemberSelectionManager;
                 uiMemberDialog.Data = ui.Data;
                 uiMemberDialog.Show();
             }
@@ -153,12 +175,5 @@ namespace MultiplayerARPG
             if (uiMemberDialog != null)
                 uiMemberDialog.Hide();
         }
-        
-        public abstract int GetSocialId();
-        public abstract int GetMaxMemberAmount();
-        public abstract bool IsLeader(byte flags);
-        public abstract bool CanKick(byte flags);
-        public abstract bool OwningCharacterIsLeader();
-        public abstract bool OwningCharacterCanKick();
     }
 }
