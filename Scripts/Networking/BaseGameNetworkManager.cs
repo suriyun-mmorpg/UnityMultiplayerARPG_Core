@@ -17,8 +17,10 @@ namespace MultiplayerARPG
             public const ushort CashShopBuy = 103;
             public const ushort CashPackageInfo = 104;
             public const ushort CashPackageBuyValidation = 105;
-            public const ushort PartyData = 106;
-            public const ushort GuildData = 107;
+            public const ushort UpdatePartyMember = 106;
+            public const ushort UpdateParty = 107;
+            public const ushort UpdateGuildMember = 108;
+            public const ushort UpdateGuild = 109;
         }
 
         public const float UPDATE_ONLINE_CHARACTER_DURATION = 1f;
@@ -30,6 +32,8 @@ namespace MultiplayerARPG
         protected readonly Dictionary<string, long> connectionIdsByCharacterName = new Dictionary<string, long>();
         protected readonly Dictionary<int, PartyData> parties = new Dictionary<int, PartyData>();
         protected readonly Dictionary<int, GuildData> guilds = new Dictionary<int, GuildData>();
+        public PartyData ClientParty { get; protected set; }
+        public GuildData ClientGuild { get; protected set; }
         public MapInfo CurrentMapInfo { get; protected set; }
         // Events
         public System.Action<ChatMessage> onReceiveChat;
@@ -126,8 +130,10 @@ namespace MultiplayerARPG
             RegisterClientMessage(MsgTypes.CashShopBuy, HandleResponseCashShopBuy);
             RegisterClientMessage(MsgTypes.CashPackageInfo, HandleResponseCashPackageInfo);
             RegisterClientMessage(MsgTypes.CashPackageBuyValidation, HandleResponseCashPackageBuyValidation);
-            RegisterClientMessage(MsgTypes.PartyData, HandleResponsePartyData);
-            RegisterClientMessage(MsgTypes.GuildData, HandleResponseGuildData);
+            RegisterClientMessage(MsgTypes.UpdatePartyMember, HandleUpdatePartyMemberAtClient);
+            RegisterClientMessage(MsgTypes.UpdateParty, HandleUpdatePartyAtClient);
+            RegisterClientMessage(MsgTypes.UpdateGuildMember, HandleUpdateGuildMemberAtClient);
+            RegisterClientMessage(MsgTypes.UpdateGuild, HandleUpdateGuildAtClient);
         }
 
         protected override void RegisterServerMessages()
@@ -139,8 +145,6 @@ namespace MultiplayerARPG
             RegisterServerMessage(MsgTypes.CashShopBuy, HandleRequestCashShopBuy);
             RegisterServerMessage(MsgTypes.CashPackageInfo, HandleRequestCashPackageInfo);
             RegisterServerMessage(MsgTypes.CashPackageBuyValidation, HandleRequestCashPackageBuyValidation);
-            RegisterServerMessage(MsgTypes.PartyData, HandleRequestPartyData);
-            RegisterServerMessage(MsgTypes.GuildData, HandleRequestGuildData);
         }
 
         public uint RequestCashShopInfo(AckMessageCallback callback)
@@ -168,18 +172,6 @@ namespace MultiplayerARPG
             message.dataId = dataId;
             message.platform = Application.platform;
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MsgTypes.CashPackageBuyValidation, message, callback);
-        }
-
-        public uint RequestPartyData(AckMessageCallback callback)
-        {
-            var message = new BaseAckMessage();
-            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MsgTypes.PartyData, message, callback);
-        }
-
-        public uint RequestGuildData(AckMessageCallback callback)
-        {
-            var message = new BaseAckMessage();
-            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MsgTypes.GuildData, message, callback);
         }
 
         protected virtual void HandleWarpAtClient(LiteNetLibMessageHandler messageHandler)
@@ -226,20 +218,22 @@ namespace MultiplayerARPG
             transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
-        protected virtual void HandleResponsePartyData(LiteNetLibMessageHandler messageHandler)
+        protected virtual void HandleUpdatePartyMemberAtClient(LiteNetLibMessageHandler messageHandler)
         {
-            var transportHandler = messageHandler.transportHandler;
-            var message = messageHandler.ReadMessage<ResponsePartyDataMessage>();
-            var ackId = message.ackId;
-            transportHandler.TriggerAck(ackId, message.responseCode, message);
+            UpdateSocialGroupMember(ClientParty, messageHandler.ReadMessage<UpdateSocialMemberMessage>());
         }
 
-        protected virtual void HandleResponseGuildData(LiteNetLibMessageHandler messageHandler)
+        protected virtual void HandleUpdatePartyAtClient(LiteNetLibMessageHandler messageHandler)
         {
-            var transportHandler = messageHandler.transportHandler;
-            var message = messageHandler.ReadMessage<ResponseGuildDataMessage>();
-            var ackId = message.ackId;
-            transportHandler.TriggerAck(ackId, message.responseCode, message);
+        }
+
+        protected virtual void HandleUpdateGuildMemberAtClient(LiteNetLibMessageHandler messageHandler)
+        {
+            UpdateSocialGroupMember(ClientGuild, messageHandler.ReadMessage<UpdateSocialMemberMessage>());
+        }
+
+        protected virtual void HandleUpdateGuildAtClient(LiteNetLibMessageHandler messageHandler)
+        {
         }
 
         protected virtual void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
@@ -371,58 +365,6 @@ namespace MultiplayerARPG
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashPackageBuyValidation, responseMessage);
         }
 
-        protected virtual void HandleRequestPartyData(LiteNetLibMessageHandler messageHandler)
-        {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<BaseAckMessage>();
-            var responseMessage = new ResponsePartyDataMessage();
-            responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = AckResponseCode.Success;
-            BasePlayerCharacterEntity playerCharacterEntity;
-            PartyData partyData;
-            if (playerCharacters.TryGetValue(connectionId, out playerCharacterEntity) && playerCharacterEntity.PartyId > 0)
-            {
-                // Set character party id to 0 if there is no party info with defined Id
-                if (parties.TryGetValue(playerCharacterEntity.PartyId, out partyData) && partyData.IsMember(playerCharacterEntity))
-                {
-                    responseMessage.shareExp = partyData.shareExp;
-                    responseMessage.shareItem = partyData.shareItem;
-                    partyData.GetSortedMembers(out responseMessage.members);
-                }
-                else
-                    playerCharacterEntity.PartyId = 0;
-            }
-            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.PartyData, responseMessage);
-        }
-
-        protected virtual void HandleRequestGuildData(LiteNetLibMessageHandler messageHandler)
-        {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<BaseAckMessage>();
-            var responseMessage = new ResponseGuildDataMessage();
-            responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = AckResponseCode.Success;
-            BasePlayerCharacterEntity playerCharacterEntity;
-            GuildData guildData;
-            if (playerCharacters.TryGetValue(connectionId, out playerCharacterEntity) && playerCharacterEntity.GuildId > 0)
-            {
-                // Set character party id to 0 if there is no party info with defined Id
-                if (guilds.TryGetValue(playerCharacterEntity.GuildId, out guildData) && guildData.IsMember(playerCharacterEntity))
-                {
-                    responseMessage.guildName = guildData.guildName;
-                    responseMessage.level = guildData.level;
-                    responseMessage.exp = guildData.exp;
-                    responseMessage.skillPoint = guildData.skillPoint;
-                    responseMessage.message = guildData.guildMessage;
-                    responseMessage.roles = guildData.GetRoles().ToArray();
-                    guildData.GetSortedMembers(out responseMessage.members, out responseMessage.memberRoles);
-                }
-                else
-                    playerCharacterEntity.GuildId = 0;
-            }
-            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.GuildData, responseMessage);
-        }
-
         public override bool StartServer()
         {
             Init();
@@ -513,6 +455,29 @@ namespace MultiplayerARPG
                 CurrentMapInfo = foundMapInfo;
             else
                 CurrentMapInfo = ScriptableObject.CreateInstance<MapInfo>();
+        }
+
+        protected bool UpdateSocialGroupMember(SocialGroupData socialGroupData, UpdateSocialMemberMessage message)
+        {
+            if (socialGroupData == null || socialGroupData.id != message.id)
+                return false;
+
+            SocialCharacterData member;
+            switch (message.type)
+            {
+                case UpdateSocialMemberMessage.UpdateType.Add:
+                    member = new SocialCharacterData();
+                    member.id = message.characterId;
+                    member.characterName = message.characterName;
+                    member.dataId = message.dataId;
+                    member.level = message.level;
+                    socialGroupData.AddMember(member);
+                    break;
+                case UpdateSocialMemberMessage.UpdateType.Remove:
+                    socialGroupData.RemoveMember(message.characterId);
+                    break;
+            }
+            return true;
         }
 
         public override void OnClientOnlineSceneLoaded()
