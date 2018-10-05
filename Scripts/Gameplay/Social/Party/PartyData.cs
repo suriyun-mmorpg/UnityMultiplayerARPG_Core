@@ -26,27 +26,6 @@ namespace MultiplayerARPG
             this.shareItem = shareItem;
         }
 
-        public override byte GetMemberFlags(SocialCharacterData memberData)
-        {
-            return (byte)GetPartyMemberFlags(memberData.id);
-        }
-
-        public PartyMemberFlags GetPartyMemberFlags(BasePlayerCharacterEntity playerCharacterEntity)
-        {
-            return GetPartyMemberFlags(playerCharacterEntity.Id);
-        }
-
-        public PartyMemberFlags GetPartyMemberFlags(string characterId)
-        {
-            if (!members.ContainsKey(characterId))
-                return 0;
-
-            if (IsLeader(characterId))
-                return (PartyMemberFlags.IsLeader | PartyMemberFlags.CanInvite | PartyMemberFlags.CanKick);
-            else
-                return ((SystemSetting.PartyMemberCanInvite ? PartyMemberFlags.CanInvite : 0) | (SystemSetting.PartyMemberCanKick ? PartyMemberFlags.CanKick : 0));
-        }
-
         public void GetSortedMembers(out SocialCharacterData[] sortedMembers)
         {
             var i = 0;
@@ -59,7 +38,7 @@ namespace MultiplayerARPG
                 if (memberId.Equals(leaderId))
                     continue;
                 tempMember = members[memberId];
-                if (!tempMember.IsOnline())
+                if (!tempMember.isOnline)
                 {
                     offlineMembers.Add(tempMember);
                     continue;
@@ -72,19 +51,20 @@ namespace MultiplayerARPG
             }
         }
 
-        public static bool IsLeader(PartyMemberFlags flags)
+        public bool CanInvite(string characterId)
         {
-            return (flags & PartyMemberFlags.IsLeader) != 0;
+            if (IsLeader(characterId))
+                return true;
+            else
+                return SystemSetting.PartyMemberCanInvite;
         }
 
-        public static bool CanInvite(PartyMemberFlags flags)
+        public bool CanKick(string characterId)
         {
-            return (flags & PartyMemberFlags.CanInvite) != 0;
-        }
-
-        public static bool CanKick(PartyMemberFlags flags)
-        {
-            return (flags & PartyMemberFlags.CanKick) != 0;
+            if (IsLeader(characterId))
+                return true;
+            else
+                return SystemSetting.PartyMemberCanKick;
         }
     }
 }

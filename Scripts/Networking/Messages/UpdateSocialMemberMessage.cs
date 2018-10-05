@@ -32,9 +32,9 @@ namespace MultiplayerARPG
                     member.characterName = reader.GetString();
                     member.dataId = reader.GetInt();
                     member.level = reader.GetInt();
-                    member.memberFlags = reader.GetByte();
+                    member.isOnline = reader.GetBool();
                     // Read extra data
-                    if (member.IsOnline())
+                    if (member.isOnline)
                     {
                         member.currentHp = reader.GetInt();
                         member.maxHp = reader.GetInt();
@@ -57,9 +57,9 @@ namespace MultiplayerARPG
                     writer.Put(member.characterName);
                     writer.Put(member.dataId);
                     writer.Put(member.level);
-                    writer.Put(member.memberFlags);
+                    writer.Put(member.isOnline);
                     // Put extra data
-                    if (member.IsOnline())
+                    if (member.isOnline)
                     {
                         writer.Put(member.currentHp);
                         writer.Put(member.maxHp);

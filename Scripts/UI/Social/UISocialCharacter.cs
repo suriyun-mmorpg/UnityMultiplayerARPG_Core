@@ -90,25 +90,25 @@ namespace MultiplayerARPG
             foreach (var obj in memberIsOnlineObjects)
             {
                 if (obj != null)
-                    obj.SetActive(Data.socialCharacter.IsOnline());
+                    obj.SetActive(Data.socialCharacter.isOnline);
             }
 
             foreach (var obj in memberIsNotOnlineObjects)
             {
                 if (obj != null)
-                    obj.SetActive(!Data.socialCharacter.IsOnline());
+                    obj.SetActive(!Data.socialCharacter.isOnline);
             }
 
             foreach (var obj in memberIsLeaderObjects)
             {
                 if (obj != null)
-                    obj.SetActive(!string.IsNullOrEmpty(Data.socialCharacter.id) && uiSocialGroup.IsLeader(Data.socialCharacter.memberFlags));
+                    obj.SetActive(!string.IsNullOrEmpty(Data.socialCharacter.id) && uiSocialGroup.IsLeader(Data.socialCharacter.id));
             }
 
             foreach (var obj in memberIsNotLeaderObjects)
             {
                 if (obj != null)
-                    obj.SetActive(string.IsNullOrEmpty(Data.socialCharacter.id) || !uiSocialGroup.IsLeader(Data.socialCharacter.memberFlags));
+                    obj.SetActive(string.IsNullOrEmpty(Data.socialCharacter.id) || !uiSocialGroup.IsLeader(Data.socialCharacter.id));
             }
 
             // Character class data

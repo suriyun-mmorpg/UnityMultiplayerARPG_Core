@@ -96,6 +96,16 @@ namespace MultiplayerARPG
             base.UpdateUIs();
         }
 
+        private void OnEnable()
+        {
+            CacheGameNetworkManager.onClientUpdateGuild += UpdateGuildUIs;
+        }
+
+        private void OnDisable()
+        {
+            CacheGameNetworkManager.onClientUpdateGuild -= UpdateGuildUIs;
+        }
+
         public override void Show()
         {
             base.Show();
@@ -103,8 +113,6 @@ namespace MultiplayerARPG
             RoleSelectionManager.eventOnSelect.AddListener(OnSelectRole);
             RoleSelectionManager.eventOnDeselect.RemoveListener(OnDeselectRole);
             RoleSelectionManager.eventOnDeselect.AddListener(OnDeselectRole);
-            CacheGameNetworkManager.onClientUpdateGuild -= UpdateGuildUIs;
-            CacheGameNetworkManager.onClientUpdateGuild += UpdateGuildUIs;
             UpdateGuildUIs(Guild);
         }
 
@@ -271,24 +279,24 @@ namespace MultiplayerARPG
             return GameInstance.Singleton.SocialSystemSetting.MaxGuildMember;
         }
 
-        public override bool IsLeader(byte flags)
+        public override bool IsLeader(string characterId)
         {
-            return GuildData.IsLeader((GuildMemberFlags)flags);
+            return CacheGameNetworkManager.ClientGuild != null && CacheGameNetworkManager.ClientGuild.IsLeader(characterId);
         }
 
-        public override bool CanKick(byte flags)
+        public override bool CanKick(string characterId)
         {
-            return GuildData.CanKick((GuildMemberFlags)flags);
+            return CacheGameNetworkManager.ClientGuild != null && CacheGameNetworkManager.ClientGuild.CanKick(characterId);
         }
 
         public override bool OwningCharacterIsLeader()
         {
-            return GuildData.IsLeader(BasePlayerCharacterController.OwningCharacter.GuildMemberFlags);
+            return IsLeader(BasePlayerCharacterController.OwningCharacter.Id);
         }
 
         public override bool OwningCharacterCanKick()
         {
-            return GuildData.CanKick(BasePlayerCharacterController.OwningCharacter.GuildMemberFlags);
+            return CanKick(BasePlayerCharacterController.OwningCharacter.Id);
         }
     }
 }

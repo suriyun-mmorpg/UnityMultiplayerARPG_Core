@@ -36,13 +36,13 @@ namespace MultiplayerARPG
                 lastOnlineTimes.TryGetValue(characterId, out lastOnlineTime) &&
                 time - lastOnlineTime <= 2f)
             {
-                // Online, add online flag
-                member.memberFlags = (byte)(member.memberFlags | SocialCharacterData.FLAG_ONLINE);
+                // Online
+                member.isOnline = true;
             }
             else
             {
-                // Offline, remove online flag
-                member.memberFlags = (byte)(member.memberFlags & ~SocialCharacterData.FLAG_ONLINE);
+                // Offline
+                member.isOnline = false;
             }
             members[characterId] = member;
         }
@@ -54,7 +54,7 @@ namespace MultiplayerARPG
             tempMemberData.characterName = playerCharacterEntity.CharacterName;
             tempMemberData.dataId = playerCharacterEntity.DataId;
             tempMemberData.level = playerCharacterEntity.Level;
-            tempMemberData.memberFlags = SocialCharacterData.FLAG_ONLINE;
+            tempMemberData.isOnline = true;
             tempMemberData.currentHp = playerCharacterEntity.CurrentHp;
             tempMemberData.maxHp = playerCharacterEntity.CacheMaxHp;
             tempMemberData.currentMp = playerCharacterEntity.CurrentMp;
@@ -78,7 +78,6 @@ namespace MultiplayerARPG
             oldMemberData.characterName = memberData.characterName;
             oldMemberData.dataId = memberData.dataId;
             oldMemberData.level = memberData.level;
-            oldMemberData.memberFlags = GetMemberFlags(oldMemberData);
             members[memberData.id] = oldMemberData;
         }
 
@@ -95,7 +94,6 @@ namespace MultiplayerARPG
             oldMemberData.characterName = memberData.characterName;
             oldMemberData.dataId = memberData.dataId;
             oldMemberData.level = memberData.level;
-            oldMemberData.memberFlags = GetMemberFlags(oldMemberData);
             oldMemberData.currentHp = memberData.currentHp;
             oldMemberData.maxHp = memberData.maxHp;
             oldMemberData.currentMp = memberData.currentMp;
@@ -168,7 +166,5 @@ namespace MultiplayerARPG
         {
             return members[leaderId];
         }
-
-        public abstract byte GetMemberFlags(SocialCharacterData memberData);
     }
 }

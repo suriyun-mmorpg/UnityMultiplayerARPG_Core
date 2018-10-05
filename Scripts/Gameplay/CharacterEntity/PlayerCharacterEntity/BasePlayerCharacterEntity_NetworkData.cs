@@ -19,10 +19,6 @@ namespace MultiplayerARPG
         protected SyncFieldInt partyId = new SyncFieldInt();
         [SerializeField]
         protected SyncFieldInt guildId = new SyncFieldInt();
-        [SerializeField]
-        protected SyncFieldByte partyMemberFlags = new SyncFieldByte();
-        [SerializeField]
-        protected SyncFieldByte guildMemberFlags = new SyncFieldByte();
         // List
         [SerializeField]
         protected SyncListCharacterHotkey hotkeys = new SyncListCharacterHotkey();
@@ -90,8 +86,6 @@ namespace MultiplayerARPG
         public int GuildId { get { return guildId.Value; } set { guildId.Value = value; } }
         public byte GuildRole { get; set; }
         public int SharedGuildExp { get; set; }
-        public PartyMemberFlags PartyMemberFlags { get { return (PartyMemberFlags)partyMemberFlags.Value; } set { partyMemberFlags.Value = (byte)value; } }
-        public GuildMemberFlags GuildMemberFlags { get { return (GuildMemberFlags)guildMemberFlags.Value; } set { guildMemberFlags.Value = (byte)value; } }
         public string CurrentMapName { get { return SceneManager.GetActiveScene().name; } set { } }
         public Vector3 CurrentPosition
         {
@@ -131,13 +125,11 @@ namespace MultiplayerARPG
         
         public void ClearParty()
         {
-            PartyMemberFlags = PartyMemberFlags.None;
             PartyId = 0;
         }
 
         public void ClearGuild()
         {
-            GuildMemberFlags = GuildMemberFlags.None;
             GuildId = 0;
             GuildRole = 0;
             SharedGuildExp = 0;

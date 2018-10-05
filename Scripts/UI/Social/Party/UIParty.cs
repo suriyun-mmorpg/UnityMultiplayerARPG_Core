@@ -34,11 +34,19 @@ namespace MultiplayerARPG
             base.UpdateUIs();
         }
 
+        private void OnEnable()
+        {
+            CacheGameNetworkManager.onClientUpdateParty += UpdatePartyUIs;
+        }
+
+        private void OnDisable()
+        {
+            CacheGameNetworkManager.onClientUpdateParty -= UpdatePartyUIs;
+        }
+
         public override void Show()
         {
             base.Show();
-            CacheGameNetworkManager.onClientUpdateParty -= UpdatePartyUIs;
-            CacheGameNetworkManager.onClientUpdateParty += UpdatePartyUIs;
             UpdatePartyUIs(Party);
         }
 
@@ -145,24 +153,24 @@ namespace MultiplayerARPG
             return GameInstance.Singleton.SocialSystemSetting.MaxPartyMember;
         }
 
-        public override bool IsLeader(byte flags)
+        public override bool IsLeader(string characterId)
         {
-            return PartyData.IsLeader((PartyMemberFlags)flags);
+            return CacheGameNetworkManager.ClientParty != null && CacheGameNetworkManager.ClientParty.IsLeader(characterId);
         }
 
-        public override bool CanKick(byte flags)
+        public override bool CanKick(string characterId)
         {
-            return PartyData.CanKick((PartyMemberFlags)flags);
+            return CacheGameNetworkManager.ClientParty != null && CacheGameNetworkManager.ClientParty.CanKick(characterId);
         }
 
         public override bool OwningCharacterIsLeader()
         {
-            return PartyData.IsLeader(BasePlayerCharacterController.OwningCharacter.PartyMemberFlags);
+            return IsLeader(BasePlayerCharacterController.OwningCharacter.Id);
         }
 
         public override bool OwningCharacterCanKick()
         {
-            return PartyData.CanKick(BasePlayerCharacterController.OwningCharacter.PartyMemberFlags);
+            return CanKick(BasePlayerCharacterController.OwningCharacter.Id);
         }
     }
 }

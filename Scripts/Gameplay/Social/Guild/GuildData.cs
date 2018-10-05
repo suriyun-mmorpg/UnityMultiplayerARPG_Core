@@ -71,49 +71,6 @@ namespace MultiplayerARPG
             return base.RemoveMember(characterId);
         }
 
-        public override byte GetMemberFlags(SocialCharacterData memberData)
-        {
-            byte guildRole;
-            return (byte)GetGuildMemberFlagsAndRole(memberData.id, out guildRole);
-        }
-
-        public GuildMemberFlags GetGuildMemberFlagsAndRole(BasePlayerCharacterEntity playerCharacterEntity, out byte guildRole)
-        {
-            return GetGuildMemberFlagsAndRole(playerCharacterEntity.Id, out guildRole);
-        }
-
-        public GuildMemberFlags GetGuildMemberFlagsAndRole(string characterId, out byte guildRole)
-        {
-            if (!members.ContainsKey(characterId))
-            {
-                guildRole = 0;
-                return 0;
-            }
-
-            if (IsLeader(characterId))
-            {
-                guildRole = LeaderRole;
-                if (!IsRoleAvailable(guildRole))
-                    return (GuildMemberFlags.IsLeader | GuildMemberFlags.CanInvite | GuildMemberFlags.CanKick);
-                return GuildMemberFlags.IsLeader | GetGuildFlags(guildRole);
-            }
-            else
-            {
-                guildRole = LowestMemberRole;
-                if (!IsRoleAvailable(guildRole))
-                    return 0;
-                if (!memberRoles.TryGetValue(characterId, out guildRole) || !IsRoleAvailable(guildRole))
-                    guildRole = LowestMemberRole;
-                return GetGuildFlags(guildRole);
-            }
-        }
-
-        private GuildMemberFlags GetGuildFlags(byte guildRole)
-        {
-            var role = roles[guildRole];
-            return ((role.canInvite ? GuildMemberFlags.CanInvite : 0) | (role.canKick ? GuildMemberFlags.CanKick : 0));
-        }
-
         public bool TryGetMemberRole(string characterId, out byte role)
         {
             return memberRoles.TryGetValue(characterId, out role);
@@ -182,7 +139,7 @@ namespace MultiplayerARPG
                 if (memberId.Equals(leaderId))
                     continue;
                 tempMember = members[memberId];
-                if (!tempMember.IsOnline())
+                if (!tempMember.isOnline)
                 {
                     offlineMembers.Add(tempMember);
                     continue;
@@ -197,19 +154,24 @@ namespace MultiplayerARPG
             }
         }
 
-        public static bool IsLeader(GuildMemberFlags flags)
+        public byte GetMemberRole(string characterId)
         {
-            return (flags & GuildMemberFlags.IsLeader) != 0;
+            return memberRoles.ContainsKey(characterId) ? memberRoles[characterId] : (IsLeader(characterId) ? LeaderRole : LowestMemberRole);
         }
 
-        public static bool CanInvite(GuildMemberFlags flags)
+        public bool CanInvite(string characterId)
         {
-            return (flags & GuildMemberFlags.CanInvite) != 0;
+            return GetRole(GetMemberRole(characterId)).canInvite;
         }
 
-        public static bool CanKick(GuildMemberFlags flags)
+        public bool CanKick(string characterId)
         {
-            return (flags & GuildMemberFlags.CanKick) != 0;
+            return GetRole(GetMemberRole(characterId)).canKick;
+        }
+
+        public byte ShareExpPercentage(string characterId)
+        {
+            return GetRole(GetMemberRole(characterId)).shareExpPercentage;
         }
     }
 }
