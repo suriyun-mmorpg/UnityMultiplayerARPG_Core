@@ -8,13 +8,13 @@ public class UIList : MonoBehaviour
     public Transform uiContainer;
     protected readonly List<GameObject> uis = new List<GameObject>();
 
-    public void Generate<T>(IList<T> list, System.Action<int, T, GameObject> onGenerateEntry)
+    public void Generate<T>(IEnumerable<T> list, System.Action<int, T, GameObject> onGenerateEntry)
     {
         if (uiPrefab == null)
             return;
 
         var i = 0;
-        for (; i < list.Count; ++i)
+        foreach (var entry in list)
         {
             GameObject ui;
             if (i < uis.Count)
@@ -29,7 +29,8 @@ public class UIList : MonoBehaviour
             }
             ui.SetActive(true);
             if (onGenerateEntry != null)
-                onGenerateEntry(i, list[i], ui);
+                onGenerateEntry.Invoke(i, entry, ui);
+            ++i;
         }
         for (; i < uis.Count; ++i)
         {

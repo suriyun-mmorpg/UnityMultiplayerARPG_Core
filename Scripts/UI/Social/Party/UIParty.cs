@@ -14,54 +14,32 @@ namespace MultiplayerARPG
         public Toggle toggleShareItem;
         public UIPartyCreate uiPartyCreate;
         public UIPartySetting uiPartySetting;
-        public float refreshDuration = 1f;
-        private float lastRefreshTime;
 
-        public bool shareExp { get; private set; }
-        public bool shareItem { get; private set; }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // Refresh party info
-            if (currentSocialId > 0)
-            {
-                if (Time.unscaledTime - lastRefreshTime >= refreshDuration)
-                {
-                    lastRefreshTime = Time.unscaledTime;
-                    RefreshPartyInfo();
-                }
-            }
-        }
+        public PartyData Party { get { return CacheGameNetworkManager.ClientParty; } }
 
         protected override void UpdateUIs()
         {
             if (toggleShareExp != null)
             {
                 toggleShareExp.interactable = false;
-                toggleShareExp.isOn = shareExp;
+                toggleShareExp.isOn = Party != null && Party.shareExp;
             }
 
             if (toggleShareItem != null)
             {
                 toggleShareItem.interactable = false;
-                toggleShareItem.isOn = shareItem;
+                toggleShareItem.isOn = Party != null && Party.shareItem;
             }
 
             base.UpdateUIs();
         }
 
-        public void RefreshPartyInfo()
-        {
-            // Load cash shop item list
-            CacheGameNetworkManager.RequestPartyData(ResponsePartyInfo);
-        }
-
         public override void Show()
         {
             base.Show();
-            RefreshPartyInfo();
+            CacheGameNetworkManager.onClientUpdateParty -= UpdatePartyUIs;
+            CacheGameNetworkManager.onClientUpdateParty += UpdatePartyUIs;
+            UpdatePartyUIs(Party);
         }
 
         public override void Hide()
@@ -73,34 +51,33 @@ namespace MultiplayerARPG
             base.Hide();
         }
 
-        private void ResponsePartyInfo(AckResponseCode responseCode, BaseAckMessage message)
+        private void UpdatePartyUIs(PartyData party)
         {
-            var castedMessage = (ResponsePartyDataMessage)message;
-            if (responseCode == AckResponseCode.Success)
+            if (party == null)
+                return;
+
+            memberAmount = party.CountMember();
+            UpdateUIs();
+
+            var selectedIdx = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI) : -1;
+            MemberSelectionManager.DeselectSelectedUI();
+            MemberSelectionManager.Clear();
+
+            SocialCharacterData[] members;
+            party.GetSortedMembers(out members);
+            MemberList.Generate(members, (index, partyMember, ui) =>
             {
-                shareExp = castedMessage.shareExp;
-                shareItem = castedMessage.shareItem;
-                memberAmount = castedMessage.members.Length;
-                UpdateUIs();
+                var partyMemberEntity = new SocialCharacterEntityTuple();
+                partyMemberEntity.socialCharacter = partyMember;
 
-                var selectedIdx = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI) : -1;
-                MemberSelectionManager.DeselectSelectedUI();
-                MemberSelectionManager.Clear();
-
-                MemberList.Generate(castedMessage.members, (index, partyMember, ui) =>
-                {
-                    var partyMemberEntity = new SocialCharacterEntityTuple();
-                    partyMemberEntity.socialCharacter = partyMember;
-
-                    var uiPartyMember = ui.GetComponent<UISocialCharacter>();
-                    uiPartyMember.uiSocialGroup = this;
-                    uiPartyMember.Data = partyMemberEntity;
-                    uiPartyMember.Show();
-                    MemberSelectionManager.Add(uiPartyMember);
-                    if (selectedIdx == index)
-                        uiPartyMember.OnClickSelect();
-                });
-            }
+                var uiPartyMember = ui.GetComponent<UISocialCharacter>();
+                uiPartyMember.uiSocialGroup = this;
+                uiPartyMember.Data = partyMemberEntity;
+                uiPartyMember.Show();
+                MemberSelectionManager.Add(uiPartyMember);
+                if (selectedIdx == index)
+                    uiPartyMember.OnClickSelect();
+            });
         }
 
         public void OnClickCreateParty()
@@ -129,12 +106,12 @@ namespace MultiplayerARPG
         public void OnClickSettingParty()
         {
             // If not in the party or not leader, return
-            if (!OwningCharacterIsLeader())
+            if (!OwningCharacterIsLeader() && Party != null)
                 return;
 
             // Show setup party dialog
             if (uiPartySetting != null)
-                uiPartySetting.Show(shareExp, shareItem);
+                uiPartySetting.Show(Party.shareExp, Party.shareItem);
         }
 
         public void OnClickKickFromParty()

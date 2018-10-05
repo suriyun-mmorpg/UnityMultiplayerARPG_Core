@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using LiteNetLibManager;
@@ -39,17 +40,8 @@ namespace MultiplayerARPG
         public UIGuildCreate uiGuildCreate;
         public UIGuildRoleSetting uiGuildRoleSetting;
         public UIGuildMemberRoleSetting uiGuildMemberRoleSetting;
-        public float refreshDuration = 1f;
-        private float lastRefreshTime;
-        
-        public string guildName { get; private set; }
-        public string leaderName { get; private set; }
-        public int level { get; private set; }
-        public int exp { get; private set; }
-        public int skillPoint { get; private set; }
-        public string guildMessage { get; private set; }
-        public GuildRole[] roles { get; private set; }
-        public byte[] memberRoles { get; private set; }
+
+        public GuildData Guild { get { return CacheGameNetworkManager.ClientGuild; } }
 
         private UIList roleList;
         public UIList RoleList
@@ -78,31 +70,16 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            // Refresh guild info
-            if (currentSocialId > 0)
-            {
-                if (Time.unscaledTime - lastRefreshTime >= refreshDuration)
-                {
-                    lastRefreshTime = Time.unscaledTime;
-                    RefreshGuildInfo();
-                }
-            }
-        }
-
         protected override void UpdateUIs()
         {
             if (textGuildName != null)
-                textGuildName.text = string.Format(guildNameFormat, guildName);
+                textGuildName.text = string.Format(guildNameFormat, Guild == null ? "Unknow" : Guild.guildName);
 
             if (textLeaderName != null)
-                textLeaderName.text = string.Format(leaderNameFormat, leaderName);
+                textLeaderName.text = string.Format(leaderNameFormat, Guild == null ? "Unknow" : Guild.GetLeader().characterName);
 
             if (textLevel != null)
-                textLevel.text = string.Format(levelFormat, level.ToString("N0"));
+                textLevel.text = string.Format(levelFormat, Guild == null ? "1" : Guild.level.ToString("N0"));
 
             if (textExp != null)
                 textExp.text = string.Format(expFormat, 0, 0);
@@ -111,18 +88,12 @@ namespace MultiplayerARPG
                 imageExpGage.fillAmount = 1;
 
             if (textSkillPoint != null)
-                textSkillPoint.text = string.Format(skillPointFormat, skillPoint.ToString("N0"));
+                textSkillPoint.text = string.Format(skillPointFormat, Guild == null ? "0" : Guild.skillPoint.ToString("N0"));
 
             if (textMessage != null)
-                textMessage.text = string.Format(messageFormat, guildMessage);
+                textMessage.text = string.Format(messageFormat, Guild == null ? "N/A" : Guild.guildMessage);
 
             base.UpdateUIs();
-        }
-
-        public void RefreshGuildInfo()
-        {
-            // Load cash shop item list
-            CacheGameNetworkManager.RequestGuildData(ResponseGuildInfo);
         }
 
         public override void Show()
@@ -132,7 +103,9 @@ namespace MultiplayerARPG
             RoleSelectionManager.eventOnSelect.AddListener(OnSelectRole);
             RoleSelectionManager.eventOnDeselect.RemoveListener(OnDeselectRole);
             RoleSelectionManager.eventOnDeselect.AddListener(OnDeselectRole);
-            RefreshGuildInfo();
+            CacheGameNetworkManager.onClientUpdateGuild -= UpdateGuildUIs;
+            CacheGameNetworkManager.onClientUpdateGuild += UpdateGuildUIs;
+            UpdateGuildUIs(Guild);
         }
 
         public override void Hide()
@@ -159,71 +132,53 @@ namespace MultiplayerARPG
                 uiRoleDialog.Hide();
         }
 
-        private void ResponseGuildInfo(AckResponseCode responseCode, BaseAckMessage message)
+        private void UpdateGuildUIs(GuildData guild)
         {
-            var castedMessage = (ResponseGuildDataMessage)message;
-            if (responseCode == AckResponseCode.Success)
+            if (guild == null)
+                return;
+
+            memberAmount = guild.CountMember();
+            UpdateUIs();
+
+            var selectedIdx = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI) : -1;
+            MemberSelectionManager.DeselectSelectedUI();
+            MemberSelectionManager.Clear();
+
+            SocialCharacterData[] members;
+            byte[] memberRoles;
+            guild.GetSortedMembers(out members, out memberRoles);
+            MemberList.Generate(members, (index, guildMember, ui) =>
             {
-                guildName = castedMessage.guildName;
-                leaderName = castedMessage.leaderName;
-                level = castedMessage.level;
-                exp = castedMessage.exp;
-                skillPoint = castedMessage.skillPoint;
-                guildMessage = castedMessage.message;
-                roles = castedMessage.roles;
-                memberRoles = castedMessage.memberRoles;
-                memberAmount = castedMessage.members.Length;
-                UpdateUIs();
+                var guildMemberEntity = new SocialCharacterEntityTuple();
+                guildMemberEntity.socialCharacter = guildMember;
 
-                var selectedIdx = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI) : -1;
-                MemberSelectionManager.DeselectSelectedUI();
-                MemberSelectionManager.Clear();
+                var uiGuildMember = ui.GetComponent<UIGuildCharacter>();
+                uiGuildMember.uiSocialGroup = this;
+                uiGuildMember.Setup(guildMemberEntity, memberRoles[index], guild.GetRole(memberRoles[index]));
+                uiGuildMember.Show();
+                MemberSelectionManager.Add(uiGuildMember);
+                if (selectedIdx == index)
+                    uiGuildMember.OnClickSelect();
+            });
 
-                MemberList.Generate(castedMessage.members, (index, guildMember, ui) =>
-                {
-                    var guildMemberEntity = new SocialCharacterEntityTuple();
-                    guildMemberEntity.socialCharacter = guildMember;
+            selectedIdx = RoleSelectionManager.SelectedUI != null ? RoleSelectionManager.IndexOf(RoleSelectionManager.SelectedUI) : -1;
+            RoleSelectionManager.DeselectSelectedUI();
+            RoleSelectionManager.Clear();
 
-                    var uiGuildMember = ui.GetComponent<UIGuildCharacter>();
-                    uiGuildMember.uiSocialGroup = this;
-                    uiGuildMember.Setup(guildMemberEntity, memberRoles[index], GetGuildRole(memberRoles[index]));
-                    uiGuildMember.Show();
-                    MemberSelectionManager.Add(uiGuildMember);
-                    if (selectedIdx == index)
-                        uiGuildMember.OnClickSelect();
-                });
-
-                selectedIdx = RoleSelectionManager.SelectedUI != null ? RoleSelectionManager.IndexOf(RoleSelectionManager.SelectedUI) : -1;
-                RoleSelectionManager.DeselectSelectedUI();
-                RoleSelectionManager.Clear();
-
-                RoleList.Generate(castedMessage.roles, (index, guildRole, ui) =>
-                {
-                    var uiGuildRole = ui.GetComponent<UIGuildRole>();
-                    uiGuildRole.Data = guildRole;
-                    uiGuildRole.Show();
-                    RoleSelectionManager.Add(uiGuildRole);
-                    if (selectedIdx == index)
-                        uiGuildRole.OnClickSelect();
-                });
-            }
-        }
-
-        public GuildRole GetGuildRole(byte guildRole)
-        {
-            if (!IsRoleAvailable(guildRole))
+            RoleList.Generate(guild.GetRoles(), (index, guildRole, ui) =>
             {
-                if (guildRole == GuildData.LeaderRole)
-                    return new GuildRole() { roleName = "Master", canInvite = true, canKick = true };
-                else
-                    return new GuildRole() { roleName = "Member", canInvite = false, canKick = false };
-            }
-            return roles[guildRole];
+                var uiGuildRole = ui.GetComponent<UIGuildRole>();
+                uiGuildRole.Data = guildRole;
+                uiGuildRole.Show();
+                RoleSelectionManager.Add(uiGuildRole);
+                if (selectedIdx == index)
+                    uiGuildRole.OnClickSelect();
+            });
         }
 
         public bool IsRoleAvailable(byte guildRole)
         {
-            return roles != null && guildRole >= 0 && guildRole < roles.Length;
+            return Guild != null ? Guild.IsRoleAvailable(guildRole) : false;
         }
 
         public void OnClickCreateGuild()
@@ -252,13 +207,13 @@ namespace MultiplayerARPG
         public void OnClickSetRole()
         {
             // If not in the guild or not leader, return
-            if (!OwningCharacterIsLeader() || RoleSelectionManager.SelectedUI == null)
+            if (!OwningCharacterIsLeader() || Guild == null || RoleSelectionManager.SelectedUI == null)
                 return;
 
             if (uiGuildRoleSetting != null)
             {
                 var guildRole = (byte)RoleSelectionManager.IndexOf(RoleSelectionManager.SelectedUI);
-                var role = GetGuildRole(guildRole);
+                var role = Guild.GetRole(guildRole);
                 uiGuildRoleSetting.Show(guildRole, role.roleName, role.canInvite, role.canKick, role.shareExpPercentage);
             }
         }
@@ -266,12 +221,12 @@ namespace MultiplayerARPG
         public void OnClickSetMemberRole()
         {
             // If not in the guild or not leader, return
-            if (!OwningCharacterIsLeader() || MemberSelectionManager.SelectedUI == null)
+            if (!OwningCharacterIsLeader() || Guild == null || MemberSelectionManager.SelectedUI == null)
                 return;
 
             var selectedUI = MemberSelectionManager.SelectedUI as UIGuildCharacter;
             if (uiGuildMemberRoleSetting != null && selectedUI != null)
-                uiGuildMemberRoleSetting.Show(roles, selectedUI.Data.socialCharacter, selectedUI.GuildRole);
+                uiGuildMemberRoleSetting.Show(Guild.GetRoles().ToArray(), selectedUI.Data.socialCharacter, selectedUI.GuildRole);
         }
 
         public void OnClickSetGuildMessage()

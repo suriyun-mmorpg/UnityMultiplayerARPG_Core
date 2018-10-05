@@ -36,8 +36,10 @@ namespace MultiplayerARPG
         public GuildData ClientGuild { get; protected set; }
         public MapInfo CurrentMapInfo { get; protected set; }
         // Events
-        public System.Action<ChatMessage> onReceiveChat;
-        private float lastUpdateOnlineCharacterTime;
+        public System.Action<ChatMessage> onClientReceiveChat;
+        public System.Action<PartyData> onClientUpdateParty;
+        public System.Action<GuildData> onClientUpdateGuild;
+        protected float lastUpdateOnlineCharacterTime;
         protected float tempUnscaledTime;
         protected PartyData[] tempPartyDataArray;
         protected GuildData[] tempGuildDataArray;
@@ -182,8 +184,8 @@ namespace MultiplayerARPG
         protected virtual void HandleChatAtClient(LiteNetLibMessageHandler messageHandler)
         {
             var message = messageHandler.ReadMessage<ChatMessage>();
-            if (onReceiveChat != null)
-                onReceiveChat.Invoke(message);
+            if (onClientReceiveChat != null)
+                onClientReceiveChat.Invoke(message);
         }
 
         protected virtual void HandleResponseCashShopInfo(LiteNetLibMessageHandler messageHandler)
@@ -221,19 +223,73 @@ namespace MultiplayerARPG
         protected virtual void HandleUpdatePartyMemberAtClient(LiteNetLibMessageHandler messageHandler)
         {
             UpdateSocialGroupMember(ClientParty, messageHandler.ReadMessage<UpdateSocialMemberMessage>());
+            if (onClientUpdateParty != null)
+                onClientUpdateParty.Invoke(ClientParty);
         }
 
         protected virtual void HandleUpdatePartyAtClient(LiteNetLibMessageHandler messageHandler)
         {
+            var message = messageHandler.ReadMessage<UpdatePartyMessage>();
+            if (message.type == UpdatePartyMessage.UpdateType.Create)
+            {
+                ClientParty = new PartyData(message.id, message.shareExp, message.shareItem, message.characterId);
+            }
+            else if (ClientParty != null && ClientParty.id == message.id)
+            {
+                switch (message.type)
+                {
+                    case UpdatePartyMessage.UpdateType.ChangeLeader:
+                        ClientParty.SetLeader(message.characterId);
+                        break;
+                    case UpdatePartyMessage.UpdateType.Setting:
+                        ClientParty.Setting(message.shareExp, message.shareItem);
+                        break;
+                    case UpdatePartyMessage.UpdateType.Terminate:
+                        ClientParty = null;
+                        break;
+                }
+            }
+            if (onClientUpdateParty != null)
+                onClientUpdateParty.Invoke(ClientParty);
         }
 
         protected virtual void HandleUpdateGuildMemberAtClient(LiteNetLibMessageHandler messageHandler)
         {
             UpdateSocialGroupMember(ClientGuild, messageHandler.ReadMessage<UpdateSocialMemberMessage>());
+            if (onClientUpdateGuild != null)
+                onClientUpdateGuild.Invoke(ClientGuild);
         }
 
         protected virtual void HandleUpdateGuildAtClient(LiteNetLibMessageHandler messageHandler)
         {
+            var message = messageHandler.ReadMessage<UpdateGuildMessage>();
+            if (message.type == UpdateGuildMessage.UpdateType.Create)
+            {
+                ClientGuild = new GuildData(message.id, message.guildName, message.characterId);
+            }
+            else if (ClientGuild != null && ClientGuild.id == message.id)
+            {
+                switch (message.type)
+                {
+                    case UpdateGuildMessage.UpdateType.ChangeLeader:
+                        ClientGuild.SetLeader(message.characterId);
+                        break;
+                    case UpdateGuildMessage.UpdateType.SetGuildMessage:
+                        ClientGuild.guildMessage = message.guildMessage;
+                        break;
+                    case UpdateGuildMessage.UpdateType.SetGuildRole:
+                        ClientGuild.SetRole(message.guildRole, message.roleName, message.canInvite, message.canKick, message.shareExpPercentage);
+                        break;
+                    case UpdateGuildMessage.UpdateType.SetGuildMemberRole:
+                        ClientGuild.SetMemberRole(message.characterId, message.guildRole);
+                        break;
+                    case UpdateGuildMessage.UpdateType.Terminate:
+                        ClientGuild = null;
+                        break;
+                }
+            }
+            if (onClientUpdateGuild != null)
+                onClientUpdateGuild.Invoke(ClientGuild);
         }
 
         protected virtual void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
@@ -461,17 +517,14 @@ namespace MultiplayerARPG
         {
             if (socialGroupData == null || socialGroupData.id != message.id)
                 return false;
-
-            SocialCharacterData member;
+            
             switch (message.type)
             {
                 case UpdateSocialMemberMessage.UpdateType.Add:
-                    member = new SocialCharacterData();
-                    member.id = message.characterId;
-                    member.characterName = message.characterName;
-                    member.dataId = message.dataId;
-                    member.level = message.level;
-                    socialGroupData.AddMember(member);
+                    socialGroupData.AddMember(message.member);
+                    break;
+                case UpdateSocialMemberMessage.UpdateType.Update:
+                    socialGroupData.UpdateMember(message.member);
                     break;
                 case UpdateSocialMemberMessage.UpdateType.Remove:
                     socialGroupData.RemoveMember(message.characterId);

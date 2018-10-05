@@ -19,6 +19,7 @@ namespace MultiplayerARPG
             this.leaderId = leaderId;
             members = new Dictionary<string, SocialCharacterData>();
             lastOnlineTimes = new Dictionary<string, float>();
+            AddMember(new SocialCharacterData() { id = leaderId });
         }
 
         public void NotifyMemberOnline(string characterId, float time)
@@ -161,6 +162,11 @@ namespace MultiplayerARPG
         {
             if (members.ContainsKey(characterId))
                 leaderId = characterId;
+        }
+
+        public SocialCharacterData GetLeader()
+        {
+            return members[leaderId];
         }
 
         public abstract byte GetMemberFlags(SocialCharacterData memberData);
