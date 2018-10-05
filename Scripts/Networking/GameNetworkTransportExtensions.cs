@@ -3,7 +3,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public static class GameNetworkTransportExtensions
+    public static partial class GameNetworkTransportExtensions
     {
         public static void SendEnterChat(this TransportHandler transportHandler, long? connectionId, ushort msgType, ChatChannel channel, string message, string senderName, string receiverName, int channelId)
         {
@@ -19,7 +19,7 @@ namespace MultiplayerARPG
                 transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, chatMessage.Serialize);
         }
 
-        public static void SendUpdatePartyMemberAdd(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId, string characterName, int dataId, int level)
+        public static void SendAddPartyMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId, string characterName, int dataId, int level)
         {
             var updateMessage = new UpdateSocialMemberMessage();
             updateMessage.type = UpdateSocialMemberMessage.UpdateType.Add;
@@ -38,7 +38,7 @@ namespace MultiplayerARPG
                 transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
         }
 
-        public static void SendUpdatePartyMemberRemove(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId)
+        public static void SendRemovePartyMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId)
         {
             var updateMessage = new UpdateSocialMemberMessage();
             updateMessage.type = UpdateSocialMemberMessage.UpdateType.Remove;
@@ -50,7 +50,7 @@ namespace MultiplayerARPG
                 transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
         }
 
-        public static void SendUpdateCreateParty(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, bool shareExp, bool shareItem, string characterId)
+        public static void SendCreateParty(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, bool shareExp, bool shareItem, string characterId)
         {
             var updateMessage = new UpdatePartyMessage();
             updateMessage.type = UpdatePartyMessage.UpdateType.Create;
@@ -64,7 +64,7 @@ namespace MultiplayerARPG
                 transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
         }
 
-        public static void SendUpdateChangePartyLeader(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId)
+        public static void SendChangePartyLeader(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId)
         {
             var updateMessage = new UpdatePartyMessage();
             updateMessage.type = UpdatePartyMessage.UpdateType.ChangeLeader;
@@ -76,7 +76,7 @@ namespace MultiplayerARPG
                 transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
         }
 
-        public static void SendUpdatePartySetting(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, bool shareExp, bool shareItem)
+        public static void SendPartySetting(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, bool shareExp, bool shareItem)
         {
             var updateMessage = new UpdatePartyMessage();
             updateMessage.type = UpdatePartyMessage.UpdateType.Setting;
@@ -89,7 +89,7 @@ namespace MultiplayerARPG
                 transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
         }
 
-        public static void SendUpdatePartyTerminate(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id)
+        public static void SendPartyTerminate(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id)
         {
             var updateMessage = new UpdatePartyMessage();
             updateMessage.type = UpdatePartyMessage.UpdateType.Terminate;
@@ -100,7 +100,7 @@ namespace MultiplayerARPG
                 transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
         }
 
-        public static void SendUpdateGuildMemberAdd(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId, string characterName, int dataId, int level)
+        public static void SendAddGuildMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId, string characterName, int dataId, int level)
         {
             var updateMessage = new UpdateSocialMemberMessage();
             updateMessage.type = UpdateSocialMemberMessage.UpdateType.Add;
@@ -119,7 +119,7 @@ namespace MultiplayerARPG
                 transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
         }
 
-        public static void SendUpdateGuildMemberRemove(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId)
+        public static void SendRemoveGuildMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId)
         {
             var updateMessage = new UpdateSocialMemberMessage();
             updateMessage.type = UpdateSocialMemberMessage.UpdateType.Remove;
@@ -131,7 +131,7 @@ namespace MultiplayerARPG
                 transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
         }
 
-        public static void SendUpdateCreateGuild(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string guildName, string characterId)
+        public static void SendCreateGuild(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string guildName, string characterId)
         {
             var updateMessage = new UpdateGuildMessage();
             updateMessage.type = UpdateGuildMessage.UpdateType.Create;
@@ -144,7 +144,7 @@ namespace MultiplayerARPG
                 transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
         }
 
-        public static void SendUpdateChangeGuildLeader(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId)
+        public static void SendChangeGuildLeader(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId)
         {
             var updateMessage = new UpdateGuildMessage();
             updateMessage.type = UpdateGuildMessage.UpdateType.ChangeLeader;
@@ -156,7 +156,7 @@ namespace MultiplayerARPG
                 transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
         }
 
-        public static void SendUpdateSetGuildMessage(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string message)
+        public static void SendSetGuildMessage(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string message)
         {
             var updateMessage = new UpdateGuildMessage();
             updateMessage.type = UpdateGuildMessage.UpdateType.SetGuildMessage;
@@ -168,7 +168,7 @@ namespace MultiplayerARPG
                 transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
         }
 
-        public static void SendUpdateSetGuildRole(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
+        public static void SendSetGuildRole(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
         {
             var updateMessage = new UpdateGuildMessage();
             updateMessage.type = UpdateGuildMessage.UpdateType.SetGuildMessage;
@@ -184,7 +184,7 @@ namespace MultiplayerARPG
                 transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
         }
 
-        public static void SendUpdateSetGuildMemberRole(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId, byte guildRole)
+        public static void SendSetGuildMemberRole(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId, byte guildRole)
         {
             var updateMessage = new UpdateGuildMessage();
             updateMessage.type = UpdateGuildMessage.UpdateType.SetGuildMemberRole;
@@ -197,7 +197,7 @@ namespace MultiplayerARPG
                 transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
         }
 
-        public static void SendUpdateGuildTerminate(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id)
+        public static void SendGuildTerminate(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id)
         {
             var updateMessage = new UpdateGuildMessage();
             updateMessage.type = UpdateGuildMessage.UpdateType.Terminate;
