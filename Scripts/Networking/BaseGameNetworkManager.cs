@@ -1297,6 +1297,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity targetCharacterEntity;
             if (TryGetPlayerCharacterById(characterId, out targetCharacterEntity))
                 targetCharacterEntity.PartyMemberFlags = party.GetPartyMemberFlags(targetCharacterEntity);
+            playerCharacterEntity.PartyMemberFlags = party.GetPartyMemberFlags(playerCharacterEntity);
             SendChangePartyLeaderToClients(party);
         }
 
@@ -1401,13 +1402,15 @@ namespace MultiplayerARPG
 
             guild.SetLeader(characterId);
             guilds[guildId] = guild;
+            byte role;
             BasePlayerCharacterEntity targetCharacterEntity;
             if (TryGetPlayerCharacterById(characterId, out targetCharacterEntity))
             {
-                byte role;
                 targetCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(targetCharacterEntity, out role);
                 targetCharacterEntity.GuildRole = role;
             }
+            playerCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(playerCharacterEntity, out role);
+            playerCharacterEntity.GuildRole = role;
             SendChangeGuildLeaderToClients(guild);
         }
 
