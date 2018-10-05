@@ -58,8 +58,8 @@ namespace MultiplayerARPG
             
             memberAmount = party.CountMember();
             UpdateUIs();
-
-            var selectedIdx = MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI);
+            
+            var selectedIdx = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI) : -1;
             MemberSelectionManager.DeselectSelectedUI();
             MemberSelectionManager.Clear();
 
