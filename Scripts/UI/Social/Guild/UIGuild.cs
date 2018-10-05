@@ -194,7 +194,7 @@ namespace MultiplayerARPG
         public void OnClickChangeLeader()
         {
             // If not in the guild or not leader, return
-            if (!OwningCharacterIsLeader())
+            if (!OwningCharacterIsLeader() || MemberSelectionManager.SelectedUI == null)
                 return;
 
             var guildMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;

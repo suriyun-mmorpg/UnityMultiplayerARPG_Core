@@ -55,11 +55,11 @@ namespace MultiplayerARPG
         {
             if (party == null)
                 return;
-
+            
             memberAmount = party.CountMember();
             UpdateUIs();
 
-            var selectedIdx = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI) : -1;
+            var selectedIdx = MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI);
             MemberSelectionManager.DeselectSelectedUI();
             MemberSelectionManager.Clear();
 
@@ -93,7 +93,7 @@ namespace MultiplayerARPG
         public void OnClickChangeLeader()
         {
             // If not in the party or not leader, return
-            if (!OwningCharacterIsLeader())
+            if (!OwningCharacterIsLeader() || MemberSelectionManager.SelectedUI == null)
                 return;
 
             var partyMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
