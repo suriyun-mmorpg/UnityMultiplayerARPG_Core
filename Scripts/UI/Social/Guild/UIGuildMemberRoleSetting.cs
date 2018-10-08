@@ -47,8 +47,8 @@ namespace MultiplayerARPG
 
         public void OnClickSetting()
         {
-            byte role = 0;
-            if (role == 0 || dropdownRoles == null)
+            byte role = (byte)(dropdownRoles != null ? dropdownRoles.value : 0);
+            if (role == 0)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog("Warning", "Invalid role");
                 return;
