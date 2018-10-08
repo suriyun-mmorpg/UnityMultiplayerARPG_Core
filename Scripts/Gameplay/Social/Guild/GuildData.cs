@@ -25,7 +25,7 @@ namespace MultiplayerARPG
         }
 
         public GuildData(int id, string guildName, string leaderId)
-            : base(id, leaderId)
+            : base(id)
         {
             this.guildName = guildName;
             level = 1;
@@ -34,6 +34,8 @@ namespace MultiplayerARPG
             guildMessage = string.Empty;
             roles = new List<GuildRole>(SystemSetting.GuildMemberRoles);
             memberRoles = new Dictionary<string, byte>();
+            this.leaderId = leaderId;
+            AddMember(new SocialCharacterData() { id = leaderId });
         }
 
         public GuildData(int id, string guildName, BasePlayerCharacterEntity leaderCharacterEntity)
@@ -71,6 +73,16 @@ namespace MultiplayerARPG
             return base.RemoveMember(characterId);
         }
 
+        public override void SetLeader(string characterId)
+        {
+            if (members.ContainsKey(characterId))
+            {
+                memberRoles[leaderId] = LowestMemberRole;
+                leaderId = characterId;
+                memberRoles[leaderId] = LeaderRole;
+            }
+        }
+
         public bool TryGetMemberRole(string characterId, out byte role)
         {
             return memberRoles.TryGetValue(characterId, out role);
@@ -91,7 +103,7 @@ namespace MultiplayerARPG
             return roles != null && guildRole >= 0 && guildRole < roles.Count;
         }
 
-        public IEnumerable<GuildRole> GetRoles()
+        public List<GuildRole> GetRoles()
         {
             return roles;
         }
