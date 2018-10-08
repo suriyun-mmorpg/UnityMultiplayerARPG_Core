@@ -24,7 +24,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public GuildData(int id, string guildName, string leaderId)
+        public GuildData(int id, string guildName, string leaderId, GuildRole[] roles)
             : base(id)
         {
             this.guildName = guildName;
@@ -32,10 +32,15 @@ namespace MultiplayerARPG
             exp = 0;
             skillPoint = 0;
             guildMessage = string.Empty;
-            roles = new List<GuildRole>(SystemSetting.GuildMemberRoles);
+            this.roles = new List<GuildRole>(roles);
             memberRoles = new Dictionary<string, byte>();
             this.leaderId = leaderId;
             AddMember(new SocialCharacterData() { id = leaderId });
+        }
+
+        public GuildData(int id, string guildName, string leaderId)
+            : this(id, guildName, leaderId, SystemSetting.GuildMemberRoles)
+        {
         }
 
         public GuildData(int id, string guildName, BasePlayerCharacterEntity leaderCharacterEntity)
