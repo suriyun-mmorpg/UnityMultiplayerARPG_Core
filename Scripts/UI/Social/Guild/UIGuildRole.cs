@@ -11,12 +11,16 @@ namespace MultiplayerARPG
         [Tooltip("Role Name Format => {0} = {Role name}")]
         public string roleNameFormat = "{0}";
         [Tooltip("Share Exp Percentage Format => {0} = {Share exp percentage}")]
-        public string shareExpPercentageFormat = "{0}";
+        public string shareExpPercentageFormat = "Share Exp: {0}%";
+        public string messageCanInvite = "Can Invite";
+        public string messageCannotInvite = "Cannot Invite";
+        public string messageCanKick = "Can Kick";
+        public string messageCannotKick = "Cannot Kick";
 
         [Header("UI Elements")]
         public TextWrapper textRoleName;
-        public Toggle toggleCanInvite;
-        public Toggle toggleCanKick;
+        public TextWrapper textCanInvite;
+        public TextWrapper textCanKick;
         public TextWrapper textShareExpPercentage;
 
         protected override void UpdateData()
@@ -24,17 +28,11 @@ namespace MultiplayerARPG
             if (textRoleName != null)
                 textRoleName.text = string.Format(roleNameFormat, Data.roleName);
 
-            if (toggleCanInvite != null)
-            {
-                toggleCanInvite.interactable = false;
-                toggleCanInvite.isOn = Data.canInvite;
-            }
+            if (textCanInvite != null)
+                textCanInvite.text = Data.canInvite ? messageCanInvite : messageCannotInvite;
 
-            if (toggleCanKick != null)
-            {
-                toggleCanKick.interactable = false;
-                toggleCanKick.isOn = Data.canKick;
-            }
+            if (textCanKick != null)
+                textCanKick.text = Data.canKick ? messageCanKick : messageCannotKick;
 
             if (textShareExpPercentage != null)
                 textShareExpPercentage.text = string.Format(shareExpPercentageFormat, Data.shareExpPercentage.ToString("N0"));
