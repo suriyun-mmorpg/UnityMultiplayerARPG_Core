@@ -58,8 +58,6 @@ namespace MultiplayerARPG
         {
             MigrateUIComponents();
             HideEnterChatField();
-            if (CacheGameNetworkManager != null)
-                CacheGameNetworkManager.onClientReceiveChat += OnReceiveChat;
             if (uiEnterChatField != null)
             {
                 uiEnterChatField.onValueChanged.RemoveListener(OnInputFieldValueChange);
@@ -67,7 +65,13 @@ namespace MultiplayerARPG
             }
         }
 
-        private void OnDestroy()
+        private void OnEnable()
+        {
+            if (CacheGameNetworkManager != null)
+                CacheGameNetworkManager.onClientReceiveChat += OnReceiveChat;
+        }
+
+        private void OnDisable()
         {
             if (CacheGameNetworkManager != null)
                 CacheGameNetworkManager.onClientReceiveChat -= OnReceiveChat;
