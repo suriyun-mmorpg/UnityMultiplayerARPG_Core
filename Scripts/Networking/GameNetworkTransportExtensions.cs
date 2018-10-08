@@ -171,7 +171,7 @@ namespace MultiplayerARPG
         public static void SendSetGuildRole(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
         {
             var updateMessage = new UpdateGuildMessage();
-            updateMessage.type = UpdateGuildMessage.UpdateType.SetGuildMessage;
+            updateMessage.type = UpdateGuildMessage.UpdateType.SetGuildRole;
             updateMessage.id = id;
             updateMessage.guildRole = guildRole;
             updateMessage.roleName = roleName;
