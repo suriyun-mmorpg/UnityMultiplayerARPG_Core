@@ -94,7 +94,11 @@ namespace MultiplayerARPG
             {
                 if (!IsRoleAvailable(guildRole))
                     guildRole = IsLeader(characterId) ? LeaderRole : LowestMemberRole;
-                memberRoles[characterId] = guildRole;
+                // Validate role
+                if (guildRole == LeaderRole && !IsLeader(characterId))
+                    memberRoles[characterId] = LowestMemberRole;
+                else
+                    memberRoles[characterId] = guildRole;
             }
         }
 
@@ -168,7 +172,19 @@ namespace MultiplayerARPG
 
         public byte GetMemberRole(string characterId)
         {
-            return memberRoles.ContainsKey(characterId) ? memberRoles[characterId] : (IsLeader(characterId) ? LeaderRole : LowestMemberRole);
+            byte result;
+            if (memberRoles.ContainsKey(characterId))
+            {
+                result = memberRoles[characterId];
+                // Validate member role
+                if (result == LeaderRole && !IsLeader(characterId))
+                    result = memberRoles[characterId] = LowestMemberRole;
+            }
+            else
+            {
+                result = IsLeader(characterId) ? LeaderRole : LowestMemberRole;
+            }
+            return result;
         }
 
         public bool CanInvite(string characterId)
