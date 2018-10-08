@@ -15,7 +15,7 @@ namespace MultiplayerARPG
 
         public byte GuildRole { get; private set; }
 
-        public void Setup(SocialCharacterEntityTuple data, byte guildRole, GuildRole guildRoleData)
+        public void Setup(SocialCharacterEntityTuple data, byte guildRole, GuildRoleData guildRoleData)
         {
             Data = data;
             GuildRole = guildRole;

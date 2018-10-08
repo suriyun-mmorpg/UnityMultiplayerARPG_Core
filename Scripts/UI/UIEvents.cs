@@ -59,7 +59,7 @@ namespace MultiplayerARPG
     public class UISocialCharacterEvent : UnityEvent<UISocialCharacter> { }
 
     [System.Serializable]
-    public class GuildRoleEvent : UnityEvent<GuildRole> { }
+    public class GuildRoleEvent : UnityEvent<GuildRoleData> { }
 
     [System.Serializable]
     public class UIGuildRoleEvent : UnityEvent<UIGuildRole> { }

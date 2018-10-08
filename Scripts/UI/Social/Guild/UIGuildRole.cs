@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UIGuildRole : UISelectionEntry<GuildRole>
+    public class UIGuildRole : UISelectionEntry<GuildRoleData>
     {
         [Header("Display Format")]
         [Tooltip("Role Name Format => {0} = {Role name}")]

@@ -1201,11 +1201,11 @@ namespace MultiplayerARPG
                 return;
 
             var roles = guild.GetRoles();
-            GuildRole roleData;
+            GuildRoleData guildRoleData;
             for (byte role = 0; role < roles.Count; ++role)
             {
-                roleData = roles[role];
-                SendSetGuildRoleToClient(connectionId, guild.id, role, roleData.roleName, roleData.canInvite, roleData.canKick, roleData.shareExpPercentage);
+                guildRoleData = roles[role];
+                SendSetGuildRoleToClient(connectionId, guild.id, role, guildRoleData.roleName, guildRoleData.canInvite, guildRoleData.canKick, guildRoleData.shareExpPercentage);
             }
         }
 

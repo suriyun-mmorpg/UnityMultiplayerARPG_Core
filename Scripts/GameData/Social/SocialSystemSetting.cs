@@ -27,17 +27,32 @@ namespace MultiplayerARPG
         private int maxGuildMember = 50;
         [Tooltip("Member roles from high to low priority")]
         [SerializeField]
-        private GuildRole[] guildMemberRoles = new GuildRole[] {
-            new GuildRole() { roleName = "Master", canInvite = true, canKick = true },
-            new GuildRole() { roleName = "Member 1", canInvite = false, canKick = false },
-            new GuildRole() { roleName = "Member 2", canInvite = false, canKick = false },
-            new GuildRole() { roleName = "Member 3", canInvite = false, canKick = false },
-            new GuildRole() { roleName = "Member 4", canInvite = false, canKick = false },
-            new GuildRole() { roleName = "Member 5", canInvite = false, canKick = false },
+        private GuildRoleData[] guildMemberRoles = new GuildRoleData[] {
+            new GuildRoleData() { roleName = "Master", canInvite = true, canKick = true },
+            new GuildRoleData() { roleName = "Member 1", canInvite = false, canKick = false },
+            new GuildRoleData() { roleName = "Member 2", canInvite = false, canKick = false },
+            new GuildRoleData() { roleName = "Member 3", canInvite = false, canKick = false },
+            new GuildRoleData() { roleName = "Member 4", canInvite = false, canKick = false },
+            new GuildRoleData() { roleName = "Member 5", canInvite = false, canKick = false },
         };
+        [SerializeField]
+        public ItemAmount[] createGuildRequireItems;
+        [SerializeField]
+        private int createGuildRequiredGold;
 
         public int MaxGuildMember { get { return maxGuildMember; } }
-        public GuildRole[] GuildMemberRoles { get { return guildMemberRoles; } }
+        public GuildRoleData[] GuildMemberRoles { get { return guildMemberRoles; } }
+        private Dictionary<Item, short> cacheCreateGuildRequireItems;
+        public Dictionary<Item, short> CreateGuildRequireItems
+        {
+            get
+            {
+                if (cacheCreateGuildRequireItems == null)
+                    cacheCreateGuildRequireItems = GameDataHelpers.MakeItemAmountsDictionary(createGuildRequireItems, new Dictionary<Item, short>());
+                return cacheCreateGuildRequireItems;
+            }
+        }
+        public int CreateGuildRequiredGold { get { return createGuildRequiredGold; } }
 
 #if UNITY_EDITOR
         void OnValidate()
@@ -45,18 +60,18 @@ namespace MultiplayerARPG
             if (guildMemberRoles.Length < 2)
             {
                 Debug.LogWarning("[SocialSystemSetting] `guildMemberRoles` must more or equals to 2");
-                guildMemberRoles = new GuildRole[] {
+                guildMemberRoles = new GuildRoleData[] {
                     guildMemberRoles[0],
-                    new GuildRole() { roleName = "Member 1", canInvite = false, canKick = false },
+                    new GuildRoleData() { roleName = "Member 1", canInvite = false, canKick = false },
                 };
                 EditorUtility.SetDirty(this);
             }
             else if (guildMemberRoles.Length < 1)
             {
                 Debug.LogWarning("[SocialSystemSetting] `guildMemberRoles` must more or equals to 2");
-                guildMemberRoles = new GuildRole[] {
-                    new GuildRole() { roleName = "Master", canInvite = true, canKick = true },
-                    new GuildRole() { roleName = "Member 1", canInvite = false, canKick = false },
+                guildMemberRoles = new GuildRoleData[] {
+                    new GuildRoleData() { roleName = "Master", canInvite = true, canKick = true },
+                    new GuildRoleData() { roleName = "Member 1", canInvite = false, canKick = false },
                 };
                 EditorUtility.SetDirty(this);
             }
@@ -65,7 +80,7 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public struct GuildRole
+    public struct GuildRoleData
     {
         public string roleName;
         public bool canInvite;

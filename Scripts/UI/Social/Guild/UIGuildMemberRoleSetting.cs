@@ -20,7 +20,7 @@ namespace MultiplayerARPG
 
         private string characterId;
 
-        public void Show(GuildRole[] roles, SocialCharacterData member, byte guildRole)
+        public void Show(GuildRoleData[] roles, SocialCharacterData member, byte guildRole)
         {
             base.Show();
 

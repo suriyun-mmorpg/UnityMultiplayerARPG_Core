@@ -11,7 +11,7 @@ namespace MultiplayerARPG
         public int exp;
         public int skillPoint;
         public string guildMessage;
-        protected List<GuildRole> roles;
+        protected List<GuildRoleData> roles;
         protected Dictionary<string, byte> memberRoles;
 
         public byte LowestMemberRole
@@ -24,7 +24,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public GuildData(int id, string guildName, string leaderId, GuildRole[] roles)
+        public GuildData(int id, string guildName, string leaderId, GuildRoleData[] roles)
             : base(id)
         {
             this.guildName = guildName;
@@ -32,7 +32,7 @@ namespace MultiplayerARPG
             exp = 0;
             skillPoint = 0;
             guildMessage = string.Empty;
-            this.roles = new List<GuildRole>(roles);
+            this.roles = new List<GuildRoleData>(roles);
             memberRoles = new Dictionary<string, byte>();
             this.leaderId = leaderId;
             AddMember(new SocialCharacterData() { id = leaderId });
@@ -112,26 +112,26 @@ namespace MultiplayerARPG
             return roles != null && guildRole >= 0 && guildRole < roles.Count;
         }
 
-        public List<GuildRole> GetRoles()
+        public List<GuildRoleData> GetRoles()
         {
             return roles;
         }
 
-        public GuildRole GetRole(byte guildRole)
+        public GuildRoleData GetRole(byte guildRole)
         {
             if (!IsRoleAvailable(guildRole))
             {
                 if (guildRole == LeaderRole)
-                    return new GuildRole() { roleName = "Master", canInvite = true, canKick = true };
+                    return new GuildRoleData() { roleName = "Master", canInvite = true, canKick = true };
                 else
-                    return new GuildRole() { roleName = "Member", canInvite = false, canKick = false };
+                    return new GuildRoleData() { roleName = "Member", canInvite = false, canKick = false };
             }
             return roles[guildRole];
         }
 
         public void SetRole(byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
         {
-            SetRole(guildRole, new GuildRole()
+            SetRole(guildRole, new GuildRoleData()
             {
                 roleName = roleName,
                 canInvite = canInvite,
@@ -140,7 +140,7 @@ namespace MultiplayerARPG
             });
         }
 
-        public void SetRole(byte guildRole, GuildRole role)
+        public void SetRole(byte guildRole, GuildRoleData role)
         {
             if (guildRole >= 0 && guildRole < roles.Count)
                 roles[guildRole] = role;

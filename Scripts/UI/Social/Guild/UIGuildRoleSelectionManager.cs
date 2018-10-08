@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerARPG
 {
-    public class UIGuildRoleSelectionManager : UISelectionManager<GuildRole, UIGuildRole, GuildRoleEvent, UIGuildRoleEvent>
+    public class UIGuildRoleSelectionManager : UISelectionManager<GuildRoleData, UIGuildRole, GuildRoleEvent, UIGuildRoleEvent>
     {
     }
 }
