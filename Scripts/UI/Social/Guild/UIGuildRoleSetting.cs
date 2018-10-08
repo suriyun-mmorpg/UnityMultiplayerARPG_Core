@@ -22,7 +22,7 @@ namespace MultiplayerARPG
             this.guildRole = guildRole;
             if (inputFieldRoleName != null)
             {
-                inputFieldRoleName.unityInputField.contentType = InputField.ContentType.Name;
+                inputFieldRoleName.unityInputField.contentType = InputField.ContentType.Standard;
                 inputFieldRoleName.text = roleName;
             }
             if (toggleCanInvite != null)
