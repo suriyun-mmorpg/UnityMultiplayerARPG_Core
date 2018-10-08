@@ -14,14 +14,22 @@ namespace MultiplayerARPG
     public class ItemRefineLevel
     {
         [Range(0.01f, 1f)]
-        public float successRate = 1;
-        public ItemAmount[] requireItems;
-        public int requireGold;
-        public short refineFailDecreaseLevels;
-        public bool refineFailDestroyItem;
+        [SerializeField]
+        private float successRate = 1;
+        [SerializeField]
+        private ItemAmount[] requireItems;
+        [SerializeField]
+        private int requireGold;
+        [Tooltip("How many levels it will be decreased if refining failed")]
+        [SerializeField]
+        private short refineFailDecreaseLevels;
+        [Tooltip("It will be destroyed if this value is TRUE and refining failed")]
+        [SerializeField]
+        private bool refineFailDestroyItem;
 
+        public float SuccessRate { get { return successRate; } }
         private Dictionary<Item, short> cacheRequireItems;
-        public Dictionary<Item, short> CacheRequireItems
+        public Dictionary<Item, short> RequireItems
         {
             get
             {
@@ -30,7 +38,11 @@ namespace MultiplayerARPG
                 return cacheRequireItems;
             }
         }
-        
+        public float RequireGold { get { return requireGold; } }
+        public short RefineFailDecreaseLevels { get { return refineFailDecreaseLevels; } }
+        public bool RefineFailDestroyItem { get { return refineFailDestroyItem; } }
+
+
         public bool CanRefine(IPlayerCharacterData character)
         {
             if (character.Gold < requireGold)

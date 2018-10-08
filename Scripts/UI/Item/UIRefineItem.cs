@@ -63,7 +63,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiRequireItemAmounts.Show();
-                    uiRequireItemAmounts.Data = refineLevel.CacheRequireItems;
+                    uiRequireItemAmounts.Data = refineLevel.RequireItems;
                 }
             }
 
@@ -72,7 +72,7 @@ namespace MultiplayerARPG
                 if (!canRefine)
                     uiTextRequireGold.text = string.Format(requireGoldFormat, 0.ToString("N0"));
                 else
-                    uiTextRequireGold.text = string.Format(requireGoldFormat, refineLevel.requireGold.ToString("N0"));
+                    uiTextRequireGold.text = string.Format(requireGoldFormat, refineLevel.RequireGold.ToString("N0"));
             }
 
             if (uiTextSuccessRate != null)
@@ -80,7 +80,7 @@ namespace MultiplayerARPG
                 if (!canRefine)
                     uiTextSuccessRate.text = string.Format(successRateFormat, 0.ToString("N2"));
                 else
-                    uiTextSuccessRate.text = string.Format(successRateFormat, refineLevel.successRate.ToString("N2"));
+                    uiTextSuccessRate.text = string.Format(successRateFormat, refineLevel.SuccessRate.ToString("N2"));
             }
 
             if (uiTextRefiningLevel != null)
