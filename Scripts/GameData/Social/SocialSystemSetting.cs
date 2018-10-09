@@ -54,6 +54,30 @@ namespace MultiplayerARPG
         }
         public int CreateGuildRequiredGold { get { return createGuildRequiredGold; } }
 
+        public bool CanCreateGuild(IPlayerCharacterData character)
+        {
+            if (character.Gold < createGuildRequiredGold)
+                return false;
+            if (createGuildRequireItems == null || createGuildRequireItems.Length == 0)
+                return true;
+            foreach (var requireItem in createGuildRequireItems)
+            {
+                if (requireItem.item != null && character.CountNonEquipItems(requireItem.item.DataId) < requireItem.amount)
+                    return false;
+            }
+            return true;
+        }
+
+        public void ReduceCreateGuildResource(IPlayerCharacterData character)
+        {
+            foreach (var requireItem in createGuildRequireItems)
+            {
+                if (requireItem.item != null && requireItem.amount > 0)
+                    character.DecreaseItems(requireItem.item.DataId, requireItem.amount);
+            }
+            character.Gold -= createGuildRequiredGold;
+        }
+
 #if UNITY_EDITOR
         void OnValidate()
         {

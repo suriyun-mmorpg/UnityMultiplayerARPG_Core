@@ -193,6 +193,11 @@ namespace MultiplayerARPG
                 // TODO: May send warn message that player already in guild
                 return false;
             }
+            if (!gameInstance.SocialSystemSetting.CanCreateGuild(playerCharacterEntity))
+            {
+                // TODO: May send warn message that player have not enough gold or items
+                return false;
+            }
             return true;
         }
 
@@ -764,6 +769,7 @@ namespace MultiplayerARPG
             if (!CanCreateGuild(playerCharacterEntity))
                 return;
 
+            gameInstance.SocialSystemSetting.ReduceCreateGuildResource(playerCharacterEntity);
             var guild = new GuildData(guildId, guildName, playerCharacterEntity);
             guilds[guildId] = guild;
             playerCharacterEntity.GuildId = guildId;
