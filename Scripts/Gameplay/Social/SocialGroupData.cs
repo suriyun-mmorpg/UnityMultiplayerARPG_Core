@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace MultiplayerARPG
 {
@@ -26,13 +27,22 @@ namespace MultiplayerARPG
             AddMember(new SocialCharacterData() { id = leaderId });
         }
 
-        public void NotifyMemberOnline(string characterId, float time)
+        public void NotifyOnlineMember(string characterId, float time)
         {
             if (members.ContainsKey(characterId))
                 lastOnlineTimes[characterId] = time;
         }
 
-        public void UpdateMemberOnline(string characterId, float time)
+        public void UpdateOnlineMembers(float time)
+        {
+            var memberIds = GetMemberIds();
+            foreach (var memberId in memberIds)
+            {
+                UpdateOnlineMember(memberId, time);
+            }
+        }
+
+        public void UpdateOnlineMember(string characterId, float time)
         {
             SocialCharacterData member;
             float lastOnlineTime;
@@ -135,14 +145,14 @@ namespace MultiplayerARPG
             return members.ContainsKey(characterId);
         }
 
-        public IEnumerable<string> GetMemberIds()
+        public string[] GetMemberIds()
         {
-            return members.Keys;
+            return members.Keys.ToArray();
         }
 
-        public IEnumerable<SocialCharacterData> GetMembers()
+        public SocialCharacterData[] GetMembers()
         {
-            return members.Values;
+            return members.Values.ToArray();
         }
 
         public bool TryGetMember(string id, out SocialCharacterData result)

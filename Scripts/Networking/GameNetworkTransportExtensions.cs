@@ -19,13 +19,13 @@ namespace MultiplayerARPG
                 transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, chatMessage.Serialize);
         }
 
-        public static void SendAddPartyMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId, string characterName, int dataId, int level)
+        public static void SendAddSocialMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId, string characterName, int dataId, int level)
         {
             var updateMessage = new UpdateSocialMemberMessage();
             updateMessage.type = UpdateSocialMemberMessage.UpdateType.Add;
             updateMessage.id = id;
-            updateMessage.characterId = characterId;
-            updateMessage.member = new SocialCharacterData()
+            updateMessage.CharacterId = characterId;
+            updateMessage.data = new SocialCharacterData()
             {
                 id = characterId,
                 characterName = characterName,
@@ -38,12 +38,36 @@ namespace MultiplayerARPG
                 transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
         }
 
-        public static void SendRemovePartyMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId)
+        public static void SendUpdateSocialMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId, string characterName, int dataId, int level, bool isOnline, int currentHp, int maxHp, int currentMp, int maxMp)
+        {
+            var updateMessage = new UpdateSocialMemberMessage();
+            updateMessage.type = UpdateSocialMemberMessage.UpdateType.Update;
+            updateMessage.id = id;
+            updateMessage.CharacterId = characterId;
+            updateMessage.data = new SocialCharacterData()
+            {
+                id = characterId,
+                characterName = characterName,
+                dataId = dataId,
+                level = level,
+                isOnline = isOnline,
+                currentHp = currentHp,
+                maxHp = maxHp,
+                currentMp = currentMp,
+                maxMp = maxMp,
+            };
+            if (!connectionId.HasValue)
+                transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
+            else
+                transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
+        }
+
+        public static void SendRemoveSocialMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId)
         {
             var updateMessage = new UpdateSocialMemberMessage();
             updateMessage.type = UpdateSocialMemberMessage.UpdateType.Remove;
             updateMessage.id = id;
-            updateMessage.characterId = characterId;
+            updateMessage.CharacterId = characterId;
             if (!connectionId.HasValue)
                 transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
             else
@@ -94,37 +118,6 @@ namespace MultiplayerARPG
             var updateMessage = new UpdatePartyMessage();
             updateMessage.type = UpdatePartyMessage.UpdateType.Terminate;
             updateMessage.id = id;
-            if (!connectionId.HasValue)
-                transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
-            else
-                transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
-        }
-
-        public static void SendAddGuildMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId, string characterName, int dataId, int level)
-        {
-            var updateMessage = new UpdateSocialMemberMessage();
-            updateMessage.type = UpdateSocialMemberMessage.UpdateType.Add;
-            updateMessage.id = id;
-            updateMessage.characterId = characterId;
-            updateMessage.member = new SocialCharacterData()
-            {
-                id = characterId,
-                characterName = characterName,
-                dataId = dataId,
-                level = level,
-            };
-            if (!connectionId.HasValue)
-                transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
-            else
-                transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
-        }
-
-        public static void SendRemoveGuildMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId)
-        {
-            var updateMessage = new UpdateSocialMemberMessage();
-            updateMessage.type = UpdateSocialMemberMessage.UpdateType.Remove;
-            updateMessage.id = id;
-            updateMessage.characterId = characterId;
             if (!connectionId.HasValue)
                 transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
             else

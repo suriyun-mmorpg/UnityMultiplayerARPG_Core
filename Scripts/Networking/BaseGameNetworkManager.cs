@@ -32,6 +32,8 @@ namespace MultiplayerARPG
         protected readonly Dictionary<string, long> connectionIdsByCharacterName = new Dictionary<string, long>();
         protected readonly Dictionary<int, PartyData> parties = new Dictionary<int, PartyData>();
         protected readonly Dictionary<int, GuildData> guilds = new Dictionary<int, GuildData>();
+        protected readonly Dictionary<long, PartyData> updatingPartyMembers = new Dictionary<long, PartyData>();
+        protected readonly Dictionary<long, GuildData> updatingGuildMembers = new Dictionary<long, GuildData>();
         public PartyData ClientParty { get; protected set; }
         public GuildData ClientGuild { get; protected set; }
         public MapInfo CurrentMapInfo { get; protected set; }
@@ -40,10 +42,6 @@ namespace MultiplayerARPG
         public System.Action<PartyData> onClientUpdateParty;
         public System.Action<GuildData> onClientUpdateGuild;
         protected float lastUpdateOnlineCharacterTime;
-        protected float tempUnscaledTime;
-        protected PartyData[] tempPartyDataArray;
-        protected GuildData[] tempGuildDataArray;
-        protected string[] tempCharacterIdArray;
 
         public bool TryGetPlayerCharacter(long connectionId, out BasePlayerCharacterEntity result)
         {
@@ -75,50 +73,67 @@ namespace MultiplayerARPG
         protected override void Update()
         {
             base.Update();
-            if (IsServer)
+            var tempUnscaledTime = Time.unscaledTime;
+            if (tempUnscaledTime - lastUpdateOnlineCharacterTime > UPDATE_ONLINE_CHARACTER_DURATION)
             {
-                tempUnscaledTime = Time.unscaledTime;
-                if (tempUnscaledTime - lastUpdateOnlineCharacterTime > UPDATE_ONLINE_CHARACTER_DURATION)
-                {
-                    // Update online characters, every seconds
+                // Update social members, every seconds
+                // Update at server
+                if (IsServer)
                     UpdateOnlineCharacters(tempUnscaledTime);
-                    lastUpdateOnlineCharacterTime = tempUnscaledTime;
+                // Update at client
+                if (IsClientConnected)
+                {
+                    if (ClientParty != null)
+                        ClientParty.UpdateOnlineMembers(tempUnscaledTime);
+                    if (ClientGuild != null)
+                        ClientGuild.UpdateOnlineMembers(tempUnscaledTime);
                 }
+                lastUpdateOnlineCharacterTime = tempUnscaledTime;
+            }
+        }
+
+        protected virtual void UpdateOnlineCharacter(long connectionId, BasePlayerCharacterEntity playerCharacterEntity, float time)
+        {
+            PartyData tempParty;
+            GuildData tempGuild;
+
+            if (playerCharacterEntity.PartyId > 0 && parties.TryGetValue(playerCharacterEntity.PartyId, out tempParty))
+            {
+                tempParty.UpdateMember(playerCharacterEntity);
+                tempParty.NotifyOnlineMember(playerCharacterEntity.Id, time);
+                tempParty.UpdateOnlineMember(playerCharacterEntity.Id, time);
+                if (!updatingPartyMembers.ContainsKey(connectionId))
+                    updatingPartyMembers.Add(connectionId, tempParty);
+            }
+
+            if (playerCharacterEntity.GuildId > 0 && guilds.TryGetValue(playerCharacterEntity.GuildId, out tempGuild))
+            {
+                tempGuild.UpdateMember(playerCharacterEntity);
+                tempGuild.NotifyOnlineMember(playerCharacterEntity.Id, time);
+                tempGuild.UpdateOnlineMember(playerCharacterEntity.Id, time);
+                if (!updatingGuildMembers.ContainsKey(connectionId))
+                    updatingGuildMembers.Add(connectionId, tempGuild);
             }
         }
 
         protected virtual void UpdateOnlineCharacters(float time)
         {
-            BasePlayerCharacterEntity playerCharacter;
-            // Update online party characters
-            tempPartyDataArray = parties.Values.ToArray();
-            foreach (var party in tempPartyDataArray)
+            updatingPartyMembers.Clear();
+            updatingGuildMembers.Clear();
+
+            foreach (var entry in playerCharacters)
             {
-                tempCharacterIdArray = party.GetMemberIds().ToArray();
-                foreach (var memberId in tempCharacterIdArray)
-                {
-                    if (playerCharactersById.TryGetValue(memberId, out playerCharacter))
-                    {
-                        party.UpdateMember(playerCharacter);
-                        party.NotifyMemberOnline(memberId, time);
-                    }
-                    party.UpdateMemberOnline(memberId, time);
-                }
+                UpdateOnlineCharacter(entry.Key, entry.Value, time);
             }
-            // Update online guild characters
-            tempGuildDataArray = guilds.Values.ToArray();
-            foreach (var guild in tempGuildDataArray)
+
+            foreach (var updatingPartyMember in updatingPartyMembers)
             {
-                tempCharacterIdArray = guild.GetMemberIds().ToArray();
-                foreach (var memberId in tempCharacterIdArray)
-                {
-                    if (playerCharactersById.TryGetValue(memberId, out playerCharacter))
-                    {
-                        guild.UpdateMember(playerCharacter);
-                        guild.NotifyMemberOnline(memberId, time);
-                    }
-                    guild.UpdateMemberOnline(memberId, time);
-                }
+                SendUpdatePartyMembersToClient(updatingPartyMember.Key, updatingPartyMember.Value);
+            }
+
+            foreach (var updatingGuildMember in updatingGuildMembers)
+            {
+                SendUpdateGuildMembersToClient(updatingGuildMember.Key, updatingGuildMember.Value);
             }
         }
 
@@ -342,8 +357,7 @@ namespace MultiplayerARPG
                     PartyData party;
                     if (parties.TryGetValue(message.channelId, out party))
                     {
-                        tempCharacterIdArray = party.GetMemberIds().ToArray();
-                        foreach (var memberId in tempCharacterIdArray)
+                        foreach (var memberId in party.GetMemberIds())
                         {
                             if (playerCharactersById.TryGetValue(memberId, out playerCharacter) &&
                                 ContainsConnectionId(playerCharacter.ConnectId))
@@ -355,8 +369,7 @@ namespace MultiplayerARPG
                     GuildData guild;
                     if (guilds.TryGetValue(message.channelId, out guild))
                     {
-                        tempCharacterIdArray = guild.GetMemberIds().ToArray();
-                        foreach (var memberId in tempCharacterIdArray)
+                        foreach (var memberId in guild.GetMemberIds())
                         {
                             if (playerCharactersById.TryGetValue(memberId, out playerCharacter) &&
                                 ContainsConnectionId(playerCharacter.ConnectId))
@@ -521,13 +534,14 @@ namespace MultiplayerARPG
             switch (message.type)
             {
                 case UpdateSocialMemberMessage.UpdateType.Add:
-                    socialGroupData.AddMember(message.member);
+                    socialGroupData.AddMember(message.data);
                     break;
                 case UpdateSocialMemberMessage.UpdateType.Update:
-                    socialGroupData.UpdateMember(message.member);
+                    socialGroupData.UpdateMember(message.data);
+                    socialGroupData.NotifyOnlineMember(message.data.id, Time.unscaledTime);
                     break;
                 case UpdateSocialMemberMessage.UpdateType.Remove:
-                    socialGroupData.RemoveMember(message.characterId);
+                    socialGroupData.RemoveMember(message.CharacterId);
                     break;
             }
             return true;

@@ -54,7 +54,7 @@ namespace MultiplayerARPG
         protected override void Update()
         {
             base.Update();
-            tempUnscaledTime = Time.unscaledTime;
+            var tempUnscaledTime = Time.unscaledTime;
             if (tempUnscaledTime - lastSaveTime > autoSaveDuration)
             {
                 Profiler.BeginSample("LanRpgNetworkManager - Save Data");

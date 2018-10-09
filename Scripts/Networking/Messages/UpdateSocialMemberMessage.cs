@@ -15,31 +15,28 @@ namespace MultiplayerARPG
         }
         public UpdateType type;
         public int id;
-        public string characterId;
-        public SocialCharacterData member;
+        public SocialCharacterData data = new SocialCharacterData();
 
         public void Deserialize(NetDataReader reader)
         {
             type = (UpdateType)reader.GetByte();
             id = reader.GetInt();
-            characterId = reader.GetString();
             switch (type)
             {
                 case UpdateType.Add:
                 case UpdateType.Update:
-                    member = new SocialCharacterData();
-                    member.id = characterId;
-                    member.characterName = reader.GetString();
-                    member.dataId = reader.GetInt();
-                    member.level = reader.GetInt();
-                    member.isOnline = reader.GetBool();
+                    data.id = reader.GetString();
+                    data.characterName = reader.GetString();
+                    data.dataId = reader.GetInt();
+                    data.level = reader.GetInt();
+                    data.isOnline = reader.GetBool();
                     // Read extra data
-                    if (member.isOnline)
+                    if (data.isOnline)
                     {
-                        member.currentHp = reader.GetInt();
-                        member.maxHp = reader.GetInt();
-                        member.currentMp = reader.GetInt();
-                        member.maxMp = reader.GetInt();
+                        data.currentHp = reader.GetInt();
+                        data.maxHp = reader.GetInt();
+                        data.currentMp = reader.GetInt();
+                        data.maxMp = reader.GetInt();
                     }
                     break;
             }
@@ -49,25 +46,27 @@ namespace MultiplayerARPG
         {
             writer.Put((byte)type);
             writer.Put(id);
-            writer.Put(characterId);
             switch (type)
             {
                 case UpdateType.Add:
                 case UpdateType.Update:
-                    writer.Put(member.characterName);
-                    writer.Put(member.dataId);
-                    writer.Put(member.level);
-                    writer.Put(member.isOnline);
+                    writer.Put(data.id);
+                    writer.Put(data.characterName);
+                    writer.Put(data.dataId);
+                    writer.Put(data.level);
+                    writer.Put(data.isOnline);
                     // Put extra data
-                    if (member.isOnline)
+                    if (data.isOnline)
                     {
-                        writer.Put(member.currentHp);
-                        writer.Put(member.maxHp);
-                        writer.Put(member.currentMp);
-                        writer.Put(member.maxMp);
+                        writer.Put(data.currentHp);
+                        writer.Put(data.maxHp);
+                        writer.Put(data.currentMp);
+                        writer.Put(data.maxMp);
                     }
                     break;
             }
         }
+
+        public string CharacterId { get { return data.id; } set { data.id = value; } }
     }
 }
