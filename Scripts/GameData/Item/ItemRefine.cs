@@ -42,7 +42,6 @@ namespace MultiplayerARPG
         public short RefineFailDecreaseLevels { get { return refineFailDecreaseLevels; } }
         public bool RefineFailDestroyItem { get { return refineFailDestroyItem; } }
 
-
         public bool CanRefine(IPlayerCharacterData character)
         {
             if (character.Gold < requireGold)
