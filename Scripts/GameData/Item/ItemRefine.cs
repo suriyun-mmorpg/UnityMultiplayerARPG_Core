@@ -78,10 +78,13 @@ namespace MultiplayerARPG
                     character.NonEquipItems[nonEquipIndex] = refiningItem;
                 }
             }
-            foreach (var requireItem in requireItems)
+            if (requireItems != null)
             {
-                if (requireItem.item != null && requireItem.amount > 0)
-                    character.DecreaseItems(requireItem.item.DataId, requireItem.amount);
+                foreach (var requireItem in requireItems)
+                {
+                    if (requireItem.item != null && requireItem.amount > 0)
+                        character.DecreaseItems(requireItem.item.DataId, requireItem.amount);
+                }
             }
             character.Gold -= requireGold;
             return isSuccess;
