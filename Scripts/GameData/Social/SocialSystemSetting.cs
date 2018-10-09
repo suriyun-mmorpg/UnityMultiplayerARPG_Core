@@ -70,10 +70,13 @@ namespace MultiplayerARPG
 
         public void ReduceCreateGuildResource(IPlayerCharacterData character)
         {
-            foreach (var requireItem in createGuildRequireItems)
+            if (createGuildRequireItems != null)
             {
-                if (requireItem.item != null && requireItem.amount > 0)
-                    character.DecreaseItems(requireItem.item.DataId, requireItem.amount);
+                foreach (var requireItem in createGuildRequireItems)
+                {
+                    if (requireItem.item != null && requireItem.amount > 0)
+                        character.DecreaseItems(requireItem.item.DataId, requireItem.amount);
+                }
             }
             character.Gold -= createGuildRequiredGold;
         }
