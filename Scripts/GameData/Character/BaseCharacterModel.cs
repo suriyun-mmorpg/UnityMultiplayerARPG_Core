@@ -77,8 +77,7 @@ namespace MultiplayerARPG
                     EquipmentModelContainer container;
                     if (!CacheEquipmentModelContainers.TryGetValue(model.Key, out container))
                         continue;
-                    if (container.defaultModel != null)
-                        container.defaultModel.SetActive(true);
+                    container.ActiveDefaultModel();
                 }
                 cacheModels.Remove(equipPosition);
             }
@@ -281,5 +280,17 @@ namespace MultiplayerARPG
         public string equipSocket;
         public GameObject defaultModel;
         public Transform transform;
+
+        public void ActiveDefaultModel()
+        {
+            if (defaultModel == null)
+                return;
+
+            defaultModel.SetActive(true);
+            foreach (var renderer in defaultModel.GetComponentsInChildren<Renderer>(false))
+            {
+                renderer.enabled = true;
+            }
+        }
     }
 }
