@@ -85,7 +85,7 @@ namespace MultiplayerARPG
 
         public bool isBuildMode { get; private set; }
 
-        private readonly List<RpgNetworkEntity> triggerEntities = new List<RpgNetworkEntity>();
+        private readonly List<BaseGameEntity> triggerEntities = new List<BaseGameEntity>();
         private readonly List<BuildingEntity> triggerBuildings = new List<BuildingEntity>();
         private readonly List<BuildingMaterial> buildingMaterials = new List<BuildingMaterial>();
         private readonly List<BuildingArea> buildingAreas = new List<BuildingArea>();
@@ -182,13 +182,13 @@ namespace MultiplayerARPG
             isBuildMode = true;
         }
 
-        public void TriggerEnterEntity(RpgNetworkEntity networkEntity)
+        public void TriggerEnterEntity(BaseGameEntity networkEntity)
         {
             if (networkEntity != null && !triggerEntities.Contains(networkEntity))
                 triggerEntities.Add(networkEntity);
         }
 
-        public void TriggerExitEntity(RpgNetworkEntity networkEntity)
+        public void TriggerExitEntity(BaseGameEntity networkEntity)
         {
             if (networkEntity != null)
                 triggerEntities.Remove(networkEntity);

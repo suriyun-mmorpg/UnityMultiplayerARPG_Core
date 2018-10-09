@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public sealed class WarpPortalEntity : RpgNetworkEntity
+    public sealed class WarpPortalEntity : BaseGameEntity
     {
         [Tooltip("Signal to tell players that their character can warp")]
         public GameObject[] warpSignals;

@@ -40,7 +40,7 @@ namespace MultiplayerARPG
 
         #region Protected data
         protected UICharacterEntity uiCharacterEntity;
-        protected RpgNetworkEntity targetEntity;
+        protected BaseGameEntity targetEntity;
         protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
         protected AnimActionType animActionType;
         protected float lastActionCommandReceivedTime;
@@ -400,12 +400,12 @@ namespace MultiplayerARPG
         #endregion
 
         #region Target Entity Getter/Setter
-        public virtual void SetTargetEntity(RpgNetworkEntity entity)
+        public virtual void SetTargetEntity(BaseGameEntity entity)
         {
             targetEntity = entity;
         }
 
-        public bool TryGetTargetEntity<T>(out T entity) where T : RpgNetworkEntity
+        public bool TryGetTargetEntity<T>(out T entity) where T : BaseGameEntity
         {
             entity = null;
             if (targetEntity == null)

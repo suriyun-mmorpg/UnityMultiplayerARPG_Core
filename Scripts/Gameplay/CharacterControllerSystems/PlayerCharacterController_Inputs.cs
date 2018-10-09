@@ -480,7 +480,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void UpdateTargetEntityPosition(RpgNetworkEntity entity)
+        protected void UpdateTargetEntityPosition(BaseGameEntity entity)
         {
             if (entity == null)
                 return;

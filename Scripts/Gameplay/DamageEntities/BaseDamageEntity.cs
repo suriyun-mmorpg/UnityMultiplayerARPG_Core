@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseDamageEntity : RpgNetworkEntity
+    public abstract class BaseDamageEntity : BaseGameEntity
     {
         protected BaseCharacterEntity attacker;
         protected CharacterItem weapon;

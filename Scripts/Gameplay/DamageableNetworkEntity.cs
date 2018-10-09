@@ -5,7 +5,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public abstract class DamageableNetworkEntity : RpgNetworkEntity
+    public abstract class DamageableNetworkEntity : BaseGameEntity
     {
         [SerializeField]
         protected SyncFieldInt currentHp = new SyncFieldInt();

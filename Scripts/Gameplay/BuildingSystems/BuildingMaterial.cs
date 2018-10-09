@@ -61,7 +61,7 @@ namespace MultiplayerARPG
         {
             if (buildingEntity != null)
             {
-                buildingEntity.TriggerEnterEntity(other.GetComponent<RpgNetworkEntity>());
+                buildingEntity.TriggerEnterEntity(other.GetComponent<BaseGameEntity>());
                 buildingEntity.TriggerEnterBuildingMaterial(other.GetComponent<BuildingMaterial>());
             }
         }
@@ -70,7 +70,7 @@ namespace MultiplayerARPG
         {
             if (buildingEntity != null)
             {
-                buildingEntity.TriggerExitEntity(other.GetComponent<RpgNetworkEntity>());
+                buildingEntity.TriggerExitEntity(other.GetComponent<BaseGameEntity>());
                 buildingEntity.TriggerExitBuildingMaterial(other.GetComponent<BuildingMaterial>());
             }
         }

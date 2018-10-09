@@ -38,7 +38,7 @@ namespace MultiplayerARPG
         [SerializeField]
         public ItemAmount[] createGuildRequireItems;
         [SerializeField]
-        private int createGuildRequiredGold;
+        private int createGuildRequiredGold = 1000;
 
         public int MaxGuildMember { get { return maxGuildMember; } }
         public GuildRoleData[] GuildMemberRoles { get { return guildMemberRoles; } }

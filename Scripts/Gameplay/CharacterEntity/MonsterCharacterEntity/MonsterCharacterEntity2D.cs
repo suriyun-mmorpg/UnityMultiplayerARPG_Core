@@ -122,7 +122,7 @@ namespace MultiplayerARPG
                     CacheRigidbody2D.velocity = moveDirection * CacheMoveSpeed;
                 }
 
-                RpgNetworkEntity tempEntity;
+                BaseGameEntity tempEntity;
                 if (moveDirectionMagnitude == 0 && TryGetTargetEntity(out tempEntity))
                 {
                     var targetDirection = (tempEntity.CacheTransform.position - CacheTransform.position).normalized;

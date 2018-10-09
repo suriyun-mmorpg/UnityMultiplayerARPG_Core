@@ -126,7 +126,7 @@ namespace MultiplayerARPG
                     CacheTransform.rotation = lookAtRotation;
                 }
 
-                RpgNetworkEntity tempEntity;
+                BaseGameEntity tempEntity;
                 if (moveDirectionMagnitude == 0 && TryGetTargetEntity(out tempEntity))
                 {
                     var targetDirection = (tempEntity.CacheTransform.position - CacheTransform.position).normalized;
@@ -208,10 +208,10 @@ namespace MultiplayerARPG
         {
             if (objectId == 0)
                 SetTargetEntity(null);
-            RpgNetworkEntity rpgNetworkEntity;
-            if (!TryGetEntityByObjectId(objectId, out rpgNetworkEntity))
+            BaseGameEntity tempEntity;
+            if (!TryGetEntityByObjectId(objectId, out tempEntity))
                 return;
-            SetTargetEntity(rpgNetworkEntity);
+            SetTargetEntity(tempEntity);
         }
 
         protected virtual void NetFuncTriggerJump()
@@ -280,7 +280,7 @@ namespace MultiplayerARPG
                 CallNetFunction("StopMove", FunctionReceivers.Server);
         }
 
-        public override void SetTargetEntity(RpgNetworkEntity entity)
+        public override void SetTargetEntity(BaseGameEntity entity)
         {
             if (IsOwnerClient && !IsServer && targetEntity != entity)
                 CallNetFunction("SetTargetEntity", FunctionReceivers.Server, entity == null ? 0 : entity.ObjectId);

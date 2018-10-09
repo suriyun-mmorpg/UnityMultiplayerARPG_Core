@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
-    public sealed class NpcEntity : RpgNetworkEntity
+    public sealed class NpcEntity : BaseGameEntity
     {
         [Tooltip("Set it to force to not change character model by data Id, when set it model container will not be used")]
         [SerializeField]

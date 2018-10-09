@@ -11,7 +11,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public class RpgNetworkEntity : LiteNetLibBehaviour
+    public abstract class BaseGameEntity : LiteNetLibBehaviour
     {
         [SerializeField]
         private string title;

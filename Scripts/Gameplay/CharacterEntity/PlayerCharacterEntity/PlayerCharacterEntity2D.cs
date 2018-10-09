@@ -108,7 +108,7 @@ namespace MultiplayerARPG
                     CacheRigidbody2D.velocity = moveDirection * CacheMoveSpeed;
                 }
 
-                RpgNetworkEntity tempEntity;
+                BaseGameEntity tempEntity;
                 if (moveDirectionMagnitude == 0 && TryGetTargetEntity(out tempEntity))
                 {
                     var targetDirection = (tempEntity.CacheTransform.position - CacheTransform.position).normalized;
@@ -172,10 +172,10 @@ namespace MultiplayerARPG
         {
             if (objectId == 0)
                 SetTargetEntity(null);
-            RpgNetworkEntity rpgNetworkEntity;
-            if (!TryGetEntityByObjectId(objectId, out rpgNetworkEntity))
+            BaseGameEntity tempEntity;
+            if (!TryGetEntityByObjectId(objectId, out tempEntity))
                 return;
-            SetTargetEntity(rpgNetworkEntity);
+            SetTargetEntity(tempEntity);
         }
 
         protected void NetFuncSetByteDirectionType(byte directionType)
@@ -225,7 +225,7 @@ namespace MultiplayerARPG
                 CallNetFunction("StopMove", FunctionReceivers.Server);
         }
 
-        public override void SetTargetEntity(RpgNetworkEntity entity)
+        public override void SetTargetEntity(BaseGameEntity entity)
         {
             base.SetTargetEntity(entity);
             if (IsOwnerClient && !IsServer)

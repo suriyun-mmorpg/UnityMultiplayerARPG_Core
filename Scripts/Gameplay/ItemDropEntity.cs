@@ -6,7 +6,7 @@ using LiteNetLib;
 
 namespace MultiplayerARPG
 {
-    public sealed class ItemDropEntity : RpgNetworkEntity
+    public sealed class ItemDropEntity : BaseGameEntity
     {
         public const float GROUND_DETECTION_DISTANCE = 100f;
         public DimensionType dimensionType;
@@ -111,7 +111,7 @@ namespace MultiplayerARPG
             itemDataId.onChange -= OnItemDataIdChange;
         }
 
-        public static ItemDropEntity DropItem(RpgNetworkEntity dropper, int itemDataId, short level, short amount, IEnumerable<uint> looters)
+        public static ItemDropEntity DropItem(BaseGameEntity dropper, int itemDataId, short level, short amount, IEnumerable<uint> looters)
         {
             var gameInstance = GameInstance.Singleton;
             if (gameInstance.itemDropEntityPrefab == null)
