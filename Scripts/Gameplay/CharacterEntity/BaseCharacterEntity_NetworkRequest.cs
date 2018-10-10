@@ -101,17 +101,17 @@ namespace MultiplayerARPG
 
         public virtual void RequestOnDead()
         {
-            CallNetFunction("OnDead", ConnectId);
+            CallNetFunction("OnDead", ConnectionId);
         }
 
         public virtual void RequestOnRespawn()
         {
-            CallNetFunction("OnRespawn", ConnectId);
+            CallNetFunction("OnRespawn", ConnectionId);
         }
 
         public virtual void RequestOnLevelUp()
         {
-            CallNetFunction("OnLevelUp", ConnectId);
+            CallNetFunction("OnLevelUp", ConnectionId);
         }
     }
 }

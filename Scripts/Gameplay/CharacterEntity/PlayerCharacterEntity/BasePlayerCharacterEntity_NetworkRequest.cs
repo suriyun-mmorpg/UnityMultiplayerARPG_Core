@@ -49,7 +49,7 @@ namespace MultiplayerARPG
         {
             if (IsDead())
                 return;
-            CallNetFunction("ShowNpcDialog", ConnectId, npcDialogDataId);
+            CallNetFunction("ShowNpcDialog", ConnectionId, npcDialogDataId);
         }
 
         public virtual void RequestSelectNpcDialogMenu(int menuIndex)
@@ -112,7 +112,7 @@ namespace MultiplayerARPG
 
         public virtual void RequestReceiveDealingRequest(uint objectId)
         {
-            CallNetFunction("ReceiveDealingRequest", ConnectId, objectId);
+            CallNetFunction("ReceiveDealingRequest", ConnectionId, objectId);
         }
 
         public virtual void RequestAcceptDealingRequest()
@@ -127,7 +127,7 @@ namespace MultiplayerARPG
 
         public virtual void RequestAcceptedDealingRequest(uint objectId)
         {
-            CallNetFunction("AcceptedDealingRequest", ConnectId, objectId);
+            CallNetFunction("AcceptedDealingRequest", ConnectionId, objectId);
         }
 
         public virtual void RequestSetDealingItem(int itemIndex, short amount)
@@ -157,32 +157,32 @@ namespace MultiplayerARPG
 
         public virtual void RequestUpdateDealingState(DealingState state)
         {
-            CallNetFunction("UpdateDealingState", ConnectId, (byte)state);
+            CallNetFunction("UpdateDealingState", ConnectionId, (byte)state);
         }
 
         public virtual void RequestUpdateAnotherDealingState(DealingState state)
         {
-            CallNetFunction("UpdateAnotherDealingState", ConnectId, (byte)state);
+            CallNetFunction("UpdateAnotherDealingState", ConnectionId, (byte)state);
         }
 
         public virtual void RequestUpdateDealingGold(int gold)
         {
-            CallNetFunction("UpdateDealingGold", ConnectId, gold);
+            CallNetFunction("UpdateDealingGold", ConnectionId, gold);
         }
 
         public virtual void RequestUpdateAnotherDealingGold(int gold)
         {
-            CallNetFunction("UpdateAnotherDealingGold", ConnectId, gold);
+            CallNetFunction("UpdateAnotherDealingGold", ConnectionId, gold);
         }
 
         public virtual void RequestUpdateDealingItems(DealingCharacterItems dealingItems)
         {
-            CallNetFunction("UpdateDealingItems", ConnectId, dealingItems);
+            CallNetFunction("UpdateDealingItems", ConnectionId, dealingItems);
         }
 
         public virtual void RequestUpdateAnotherDealingItems(DealingCharacterItems dealingItems)
         {
-            CallNetFunction("UpdateAnotherDealingItems", ConnectId, dealingItems);
+            CallNetFunction("UpdateAnotherDealingItems", ConnectionId, dealingItems);
         }
 
         public virtual void RequestCreateParty(bool shareExp, bool shareItem)
@@ -207,7 +207,7 @@ namespace MultiplayerARPG
 
         public virtual void RequestReceivePartyInvitation(uint objectId)
         {
-            CallNetFunction("ReceivePartyInvitation", ConnectId, objectId);
+            CallNetFunction("ReceivePartyInvitation", ConnectionId, objectId);
         }
 
         public virtual void RequestAcceptPartyInvitation()
@@ -262,7 +262,7 @@ namespace MultiplayerARPG
 
         public virtual void RequestReceiveGuildInvitation(uint objectId)
         {
-            CallNetFunction("ReceiveGuildInvitation", ConnectId, objectId);
+            CallNetFunction("ReceiveGuildInvitation", ConnectionId, objectId);
         }
 
         public virtual void RequestAcceptGuildInvitation()

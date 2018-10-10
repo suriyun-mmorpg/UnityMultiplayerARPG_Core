@@ -350,8 +350,8 @@ namespace MultiplayerARPG
                         foreach (var memberId in party.GetMemberIds())
                         {
                             if (playerCharactersById.TryGetValue(memberId, out playerCharacter) &&
-                                ContainsConnectionId(playerCharacter.ConnectId))
-                                ServerSendPacket(playerCharacter.ConnectId, SendOptions.ReliableOrdered, MsgTypes.Chat, message);
+                                ContainsConnectionId(playerCharacter.ConnectionId))
+                                ServerSendPacket(playerCharacter.ConnectionId, SendOptions.ReliableOrdered, MsgTypes.Chat, message);
                         }
                     }
                     break;
@@ -362,8 +362,8 @@ namespace MultiplayerARPG
                         foreach (var memberId in guild.GetMemberIds())
                         {
                             if (playerCharactersById.TryGetValue(memberId, out playerCharacter) &&
-                                ContainsConnectionId(playerCharacter.ConnectId))
-                                ServerSendPacket(playerCharacter.ConnectId, SendOptions.ReliableOrdered, MsgTypes.Chat, message);
+                                ContainsConnectionId(playerCharacter.ConnectionId))
+                                ServerSendPacket(playerCharacter.ConnectionId, SendOptions.ReliableOrdered, MsgTypes.Chat, message);
                         }
                     }
                     break;
