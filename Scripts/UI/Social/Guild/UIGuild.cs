@@ -39,6 +39,8 @@ namespace MultiplayerARPG
 
         public GuildData Guild { get { return CacheGameNetworkManager.ClientGuild; } }
 
+        private string guildMessage;
+
         private UIList roleList;
         public UIList RoleList
         {
@@ -86,11 +88,25 @@ namespace MultiplayerARPG
             if (textSkillPoint != null)
                 textSkillPoint.text = string.Format(skillPointFormat, Guild == null ? "0" : Guild.skillPoint.ToString("N0"));
 
-            if (textMessage != null)
-                textMessage.text = string.Format(messageFormat, Guild == null ? "N/A" : Guild.guildMessage);
+            if (Guild == null)
+            {
+                if (textMessage != null)
+                    textMessage.text = string.Format(messageFormat, string.Empty);
 
-            if (inputFieldMessage != null)
-                inputFieldMessage.text = string.Format(messageFormat, Guild == null ? "" : Guild.guildMessage);
+                if (inputFieldMessage != null)
+                    inputFieldMessage.text = string.Empty;
+            }
+
+            if (Guild != null && !Guild.guildMessage.Equals(guildMessage))
+            {
+                guildMessage = Guild.guildMessage;
+
+                if (textMessage != null)
+                    textMessage.text = string.Format(messageFormat, guildMessage);
+
+                if (inputFieldMessage != null)
+                    inputFieldMessage.text = guildMessage;
+            }
 
             base.UpdateUIs();
         }
