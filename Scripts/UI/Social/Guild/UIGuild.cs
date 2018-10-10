@@ -89,6 +89,9 @@ namespace MultiplayerARPG
             if (textMessage != null)
                 textMessage.text = string.Format(messageFormat, Guild == null ? "N/A" : Guild.guildMessage);
 
+            if (inputFieldMessage != null)
+                inputFieldMessage.text = string.Format(messageFormat, Guild.guildMessage);
+
             base.UpdateUIs();
         }
 
