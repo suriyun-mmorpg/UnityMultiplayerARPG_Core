@@ -90,13 +90,13 @@ namespace MultiplayerARPG
             foreach (var obj in memberIsOnlineObjects)
             {
                 if (obj != null)
-                    obj.SetActive(Data.socialCharacter.isOnline);
+                    obj.SetActive(uiSocialGroup.IsOnline(Data.socialCharacter.id));
             }
 
             foreach (var obj in memberIsNotOnlineObjects)
             {
                 if (obj != null)
-                    obj.SetActive(!Data.socialCharacter.isOnline);
+                    obj.SetActive(!uiSocialGroup.IsOnline(Data.socialCharacter.id));
             }
 
             foreach (var obj in memberIsLeaderObjects)

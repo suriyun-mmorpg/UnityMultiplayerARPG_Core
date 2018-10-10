@@ -280,6 +280,11 @@ namespace MultiplayerARPG
             return CacheGameNetworkManager.ClientGuild != null && CacheGameNetworkManager.ClientGuild.IsLeader(characterId);
         }
 
+        public override bool IsOnline(string characterId)
+        {
+            return CacheGameNetworkManager.ClientGuild != null && CacheGameNetworkManager.ClientGuild.IsOnline(characterId);
+        }
+
         public override bool CanKick(string characterId)
         {
             return CacheGameNetworkManager.ClientGuild != null && CacheGameNetworkManager.ClientGuild.CanKick(characterId);

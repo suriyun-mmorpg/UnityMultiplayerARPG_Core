@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -27,38 +28,19 @@ namespace MultiplayerARPG
             AddMember(new SocialCharacterData() { id = leaderId });
         }
 
-        public void NotifyOnlineMember(string characterId, float time)
+        public void NotifyOnlineMember(string characterId)
         {
             if (members.ContainsKey(characterId))
-                lastOnlineTimes[characterId] = time;
+                lastOnlineTimes[characterId] = Time.unscaledTime;
         }
 
-        public void UpdateOnlineMembers(float time)
-        {
-            var memberIds = GetMemberIds();
-            foreach (var memberId in memberIds)
-            {
-                UpdateOnlineMember(memberId, time);
-            }
-        }
-
-        public void UpdateOnlineMember(string characterId, float time)
+        public bool IsOnline(string characterId)
         {
             SocialCharacterData member;
             float lastOnlineTime;
-            if (members.TryGetValue(characterId, out member) &&
+            return (members.TryGetValue(characterId, out member) &&
                 lastOnlineTimes.TryGetValue(characterId, out lastOnlineTime) &&
-                time - lastOnlineTime <= 2f)
-            {
-                // Online
-                member.isOnline = true;
-            }
-            else
-            {
-                // Offline
-                member.isOnline = false;
-            }
-            members[characterId] = member;
+                Time.unscaledTime - lastOnlineTime <= 2f);
         }
 
         public SocialCharacterData CreateMemberData(BasePlayerCharacterEntity playerCharacterEntity)
@@ -68,7 +50,6 @@ namespace MultiplayerARPG
             tempMemberData.characterName = playerCharacterEntity.CharacterName;
             tempMemberData.dataId = playerCharacterEntity.DataId;
             tempMemberData.level = playerCharacterEntity.Level;
-            tempMemberData.isOnline = true;
             tempMemberData.currentHp = playerCharacterEntity.CurrentHp;
             tempMemberData.maxHp = playerCharacterEntity.CacheMaxHp;
             tempMemberData.currentMp = playerCharacterEntity.CurrentMp;

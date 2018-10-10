@@ -38,19 +38,19 @@ namespace MultiplayerARPG
                 transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
         }
 
-        public static void SendUpdateSocialMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId, string characterName, int dataId, int level, bool isOnline, int currentHp, int maxHp, int currentMp, int maxMp)
+        public static void SendUpdateSocialMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, bool isOnline, string characterId, string characterName, int dataId, int level, int currentHp, int maxHp, int currentMp, int maxMp)
         {
             var updateMessage = new UpdateSocialMemberMessage();
             updateMessage.type = UpdateSocialMemberMessage.UpdateType.Update;
             updateMessage.id = id;
             updateMessage.CharacterId = characterId;
+            updateMessage.isOnline = isOnline;
             updateMessage.data = new SocialCharacterData()
             {
                 id = characterId,
                 characterName = characterName,
                 dataId = dataId,
                 level = level,
-                isOnline = isOnline,
                 currentHp = currentHp,
                 maxHp = maxHp,
                 currentMp = currentMp,

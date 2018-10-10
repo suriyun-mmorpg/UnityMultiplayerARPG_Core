@@ -487,16 +487,16 @@ namespace MultiplayerARPG
             }
         }
 
-        public void SendUpdatePartyMemberToClient(long connectionId, int id, string characterId, string characterName, int dataId, int level, bool isOnline, int currentHp, int maxHp, int currentMp, int maxMp)
+        public void SendUpdatePartyMemberToClient(long connectionId, int id, bool isOnline, string characterId, string characterName, int dataId, int level, int currentHp, int maxHp, int currentMp, int maxMp)
         {
-            Server.SendUpdateSocialMember(connectionId, MsgTypes.UpdatePartyMember, id, characterId, characterName, dataId, level, isOnline, currentHp, maxHp, currentMp, maxMp);
+            Server.SendUpdateSocialMember(connectionId, MsgTypes.UpdatePartyMember, id, isOnline, characterId, characterName, dataId, level, currentHp, maxHp, currentMp, maxMp);
         }
         
         public void SendUpdatePartyMembersToClient(long connectionId, PartyData party)
         {
             foreach (var member in party.GetMembers())
             {
-                SendUpdatePartyMemberToClient(connectionId, party.id, member.id, member.characterName, member.dataId, member.level, member.isOnline, member.currentHp, member.maxHp, member.currentMp, member.maxMp);
+                SendUpdatePartyMemberToClient(connectionId, party.id, party.IsOnline(member.id), member.id, member.characterName, member.dataId, member.level, member.currentHp, member.maxHp, member.currentMp, member.maxMp);
             }
         }
 
@@ -653,16 +653,16 @@ namespace MultiplayerARPG
             }
         }
 
-        public void SendUpdateGuildMemberToClient(long connectionId, int id, string characterId, string characterName, int dataId, int level, bool isOnline, int currentHp, int maxHp, int currentMp, int maxMp)
+        public void SendUpdateGuildMemberToClient(long connectionId, int id, bool isOnline, string characterId, string characterName, int dataId, int level, int currentHp, int maxHp, int currentMp, int maxMp)
         {
-                Server.SendUpdateSocialMember(connectionId, MsgTypes.UpdateGuildMember, id, characterId, characterName, dataId, level, isOnline, currentHp, maxHp, currentMp, maxMp);
+                Server.SendUpdateSocialMember(connectionId, MsgTypes.UpdateGuildMember, id, isOnline, characterId, characterName, dataId, level, currentHp, maxHp, currentMp, maxMp);
         }
 
         public void SendUpdateGuildMembersToClient(long connectionId, GuildData guild)
         {
             foreach (var member in guild.GetMembers())
             {
-                SendUpdateGuildMemberToClient(connectionId, guild.id, member.id, member.characterName, member.dataId, member.level, member.isOnline, member.currentHp, member.maxHp, member.currentMp, member.maxMp);
+                SendUpdateGuildMemberToClient(connectionId, guild.id, guild.IsOnline(member.id), member.id, member.characterName, member.dataId, member.level, member.currentHp, member.maxHp, member.currentMp, member.maxMp);
             }
         }
 

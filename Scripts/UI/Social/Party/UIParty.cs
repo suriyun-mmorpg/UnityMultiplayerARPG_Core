@@ -155,6 +155,11 @@ namespace MultiplayerARPG
             return CacheGameNetworkManager.ClientParty != null && CacheGameNetworkManager.ClientParty.IsLeader(characterId);
         }
 
+        public override bool IsOnline(string characterId)
+        {
+            return CacheGameNetworkManager.ClientParty != null && CacheGameNetworkManager.ClientParty.IsOnline(characterId);
+        }
+
         public override bool CanKick(string characterId)
         {
             return CacheGameNetworkManager.ClientParty != null && CacheGameNetworkManager.ClientParty.CanKick(characterId);

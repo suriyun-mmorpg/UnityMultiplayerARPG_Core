@@ -15,6 +15,7 @@ namespace MultiplayerARPG
         }
         public UpdateType type;
         public int id;
+        public bool isOnline;
         public SocialCharacterData data = new SocialCharacterData();
 
         public void Deserialize(NetDataReader reader)
@@ -25,13 +26,13 @@ namespace MultiplayerARPG
             {
                 case UpdateType.Add:
                 case UpdateType.Update:
+                    isOnline = reader.GetBool();
                     data.id = reader.GetString();
                     data.characterName = reader.GetString();
                     data.dataId = reader.GetInt();
                     data.level = reader.GetInt();
-                    data.isOnline = reader.GetBool();
                     // Read extra data
-                    if (data.isOnline)
+                    if (isOnline)
                     {
                         data.currentHp = reader.GetInt();
                         data.maxHp = reader.GetInt();
@@ -50,13 +51,13 @@ namespace MultiplayerARPG
             {
                 case UpdateType.Add:
                 case UpdateType.Update:
+                    writer.Put(isOnline);
                     writer.Put(data.id);
                     writer.Put(data.characterName);
                     writer.Put(data.dataId);
                     writer.Put(data.level);
-                    writer.Put(data.isOnline);
                     // Put extra data
-                    if (data.isOnline)
+                    if (isOnline)
                     {
                         writer.Put(data.currentHp);
                         writer.Put(data.maxHp);

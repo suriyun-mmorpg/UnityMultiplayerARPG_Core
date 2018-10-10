@@ -80,14 +80,6 @@ namespace MultiplayerARPG
                 // Update at server
                 if (IsServer)
                     UpdateOnlineCharacters(tempUnscaledTime);
-                // Update at client
-                if (IsClientConnected)
-                {
-                    if (ClientParty != null)
-                        ClientParty.UpdateOnlineMembers(tempUnscaledTime);
-                    if (ClientGuild != null)
-                        ClientGuild.UpdateOnlineMembers(tempUnscaledTime);
-                }
                 lastUpdateOnlineCharacterTime = tempUnscaledTime;
             }
         }
@@ -100,8 +92,7 @@ namespace MultiplayerARPG
             if (playerCharacterEntity.PartyId > 0 && parties.TryGetValue(playerCharacterEntity.PartyId, out tempParty))
             {
                 tempParty.UpdateMember(playerCharacterEntity);
-                tempParty.NotifyOnlineMember(playerCharacterEntity.Id, time);
-                tempParty.UpdateOnlineMember(playerCharacterEntity.Id, time);
+                tempParty.NotifyOnlineMember(playerCharacterEntity.Id);
                 if (!updatingPartyMembers.ContainsKey(connectionId))
                     updatingPartyMembers.Add(connectionId, tempParty);
             }
@@ -109,8 +100,7 @@ namespace MultiplayerARPG
             if (playerCharacterEntity.GuildId > 0 && guilds.TryGetValue(playerCharacterEntity.GuildId, out tempGuild))
             {
                 tempGuild.UpdateMember(playerCharacterEntity);
-                tempGuild.NotifyOnlineMember(playerCharacterEntity.Id, time);
-                tempGuild.UpdateOnlineMember(playerCharacterEntity.Id, time);
+                tempGuild.NotifyOnlineMember(playerCharacterEntity.Id);
                 if (!updatingGuildMembers.ContainsKey(connectionId))
                     updatingGuildMembers.Add(connectionId, tempGuild);
             }
@@ -538,7 +528,8 @@ namespace MultiplayerARPG
                     break;
                 case UpdateSocialMemberMessage.UpdateType.Update:
                     socialGroupData.UpdateMember(message.data);
-                    socialGroupData.NotifyOnlineMember(message.data.id, Time.unscaledTime);
+                    if (message.isOnline)
+                        socialGroupData.NotifyOnlineMember(message.CharacterId);
                     break;
                 case UpdateSocialMemberMessage.UpdateType.Remove:
                     socialGroupData.RemoveMember(message.CharacterId);
