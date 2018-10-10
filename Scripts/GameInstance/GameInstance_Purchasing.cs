@@ -170,9 +170,6 @@ namespace MultiplayerARPG
                         case ResponseCashPackageBuyValidationMessage.Error.UserNotFound:
                             errorMessage = "User not found";
                             break;
-                        case ResponseCashPackageBuyValidationMessage.Error.CharacterNotFound:
-                            errorMessage = "Character not found";
-                            break;
                         case ResponseCashPackageBuyValidationMessage.Error.PackageNotFound:
                             errorMessage = "Package not found";
                             break;
