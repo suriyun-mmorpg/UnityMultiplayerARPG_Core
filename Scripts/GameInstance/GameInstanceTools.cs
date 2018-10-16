@@ -36,7 +36,7 @@ namespace MultiplayerARPG
                 {
                     expTree.Add(expCalculator.Calculate(i, maxLevel));
                 }
-                CacheGameInstance.expTree = expTree.ToArray();
+                CacheGameInstance.ExpTree = expTree.ToArray();
                 EditorUtility.SetDirty(CacheGameInstance);
             }
             calculateExp = false;

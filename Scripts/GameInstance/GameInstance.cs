@@ -54,7 +54,8 @@ namespace MultiplayerARPG
         [Tooltip("Default hit effect, will be used when attacks to enemies")]
         [SerializeField]
         private GameEffectCollection defaultHitEffects;
-        public int[] expTree;
+        [SerializeField]
+        private int[] expTree;
         [Tooltip("You can add game data here or leave this empty to let it load data from Resources folders")]
         [SerializeField]
         private GameDatabase gameDatabase;
@@ -179,6 +180,20 @@ namespace MultiplayerARPG
             }
         }
 
+        public int[] ExpTree
+        {
+            get
+            {
+                if (expTree == null)
+                    expTree = new int[] { 0 };
+                return expTree;
+            }
+            set
+            {
+                if (value != null)
+                    expTree = value;
+            }
+        }
 
         private ArmorType cacheDefaultArmorType;
         public ArmorType DefaultArmorType

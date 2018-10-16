@@ -48,7 +48,7 @@ public static partial class CharacterDataExtension
         var level = data.Level;
         if (level <= 0)
             return 0;
-        var expTree = GameInstance.Singleton.expTree;
+        var expTree = GameInstance.Singleton.ExpTree;
         if (level > expTree.Length)
             return 0;
         return expTree[level - 1];

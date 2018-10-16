@@ -138,7 +138,7 @@ namespace MultiplayerARPG
             if (uiTextLevel != null)
                 uiTextLevel.text = string.Format(levelFormat, Data == null ? "N/A" : Data.Level.ToString("N0"));
             
-            var expTree = GameInstance.Singleton.expTree;
+            var expTree = GameInstance.Singleton.ExpTree;
             var currentExp = 0;
             var nextLevelExp = 0;
             if (Data != null && Data.GetNextLevelExp() > 0)
