@@ -42,6 +42,11 @@ namespace MultiplayerARPG
         [SerializeField]
         private int[] guildExpTree;
 
+        [Header("Exp calculator")]
+        public short guildMaxLevel;
+        public Int32GraphCalculator guildExpCalculator;
+        public bool guildCalculateExp;
+
         public int MaxGuildMember { get { return maxGuildMember; } }
         public GuildRoleData[] GuildMemberRoles { get { return guildMemberRoles; } }
         private Dictionary<Item, short> cacheCreateGuildRequireItems;
@@ -97,6 +102,29 @@ namespace MultiplayerARPG
             character.Gold -= createGuildRequiredGold;
         }
 
+        public int GetNextLevelExp(int level)
+        {
+            if (level <= 0)
+                return 0;
+            if (level > GuildExpTree.Length)
+                return 0;
+            return GuildExpTree[level - 1];
+        }
+
+        public GuildData IncreaseGuildExp(GuildData guild, int exp)
+        {
+            guild.exp += exp;
+            var nextLevelExp = GetNextLevelExp(guild.level);
+            while (nextLevelExp > 0 && guild.exp >= nextLevelExp)
+            {
+                guild.exp = guild.exp - nextLevelExp;
+                ++guild.level;
+                nextLevelExp = GetNextLevelExp(guild.level);
+                guild.skillPoint += 1;
+            }
+            return guild;
+        }
+
 #if UNITY_EDITOR
         void OnValidate()
         {
@@ -116,6 +144,18 @@ namespace MultiplayerARPG
                     new GuildRoleData() { roleName = "Master", canInvite = true, canKick = true },
                     new GuildRoleData() { roleName = "Member 1", canInvite = false, canKick = false },
                 };
+                EditorUtility.SetDirty(this);
+            }
+            // Calculate Exp tool
+            if (guildCalculateExp)
+            {
+                guildCalculateExp = false;
+                var guildExpTree = new int[guildMaxLevel];
+                for (short i = 1; i <= guildMaxLevel; ++i)
+                {
+                    guildExpTree[i - 1] = guildExpCalculator.Calculate(i, guildMaxLevel);
+                }
+                GuildExpTree = guildExpTree;
                 EditorUtility.SetDirty(this);
             }
         }
