@@ -31,15 +31,15 @@ namespace MultiplayerARPG
         {
             if (calculateExp)
             {
-                var expTree = new List<int>();
+                calculateExp = false;
+                var expTree = new int[maxLevel];
                 for (short i = 1; i <= maxLevel; ++i)
                 {
-                    expTree.Add(expCalculator.Calculate(i, maxLevel));
+                    expTree[i - 1] = expCalculator.Calculate(i, maxLevel);
                 }
-                CacheGameInstance.ExpTree = expTree.ToArray();
+                CacheGameInstance.ExpTree = expTree;
                 EditorUtility.SetDirty(CacheGameInstance);
             }
-            calculateExp = false;
         }
 #endif
     }
