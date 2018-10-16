@@ -7,9 +7,9 @@ namespace MultiplayerARPG
         public const byte LeaderRole = 0;
 
         public string guildName { get; private set; }
-        public int level;
+        public short level;
         public int exp;
-        public int skillPoint;
+        public short skillPoint;
         public string guildMessage;
         protected List<GuildRoleData> roles;
         protected Dictionary<string, byte> memberRoles;
@@ -209,12 +209,7 @@ namespace MultiplayerARPG
 
         public int GetNextLevelExp()
         {
-            if (level <= 0)
-                return 0;
-            var expTree = SystemSetting.GuildExpTree;
-            if (level > expTree.Length)
-                return 0;
-            return expTree[level - 1];
+            return SystemSetting.GetNextLevelExp(level);
         }
     }
 }
