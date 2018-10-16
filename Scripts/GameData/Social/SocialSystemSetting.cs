@@ -113,16 +113,38 @@ namespace MultiplayerARPG
 
         public GuildData IncreaseGuildExp(GuildData guild, int exp)
         {
-            guild.exp += exp;
-            var nextLevelExp = GetNextLevelExp(guild.level);
-            while (nextLevelExp > 0 && guild.exp >= nextLevelExp)
-            {
-                guild.exp = guild.exp - nextLevelExp;
-                ++guild.level;
-                nextLevelExp = GetNextLevelExp(guild.level);
-                guild.skillPoint += 1;
-            }
+            CalculateIncreasedGuildExp(
+                guild.level,
+                guild.exp + exp,
+                guild.skillPoint,
+                out guild.level,
+                out guild.exp,
+                out guild.skillPoint);
             return guild;
+        }
+
+        public bool CalculateIncreasedGuildExp(
+            short level, 
+            int exp, 
+            short skillPoint, 
+            out short resultLevel, 
+            out int resultExp, 
+            out short resultSkillPoint)
+        {
+            var isLevelUp = false;
+            var nextLevelExp = GetNextLevelExp(level);
+            while (nextLevelExp > 0 && exp >= nextLevelExp)
+            {
+                exp = exp - nextLevelExp;
+                ++level;
+                nextLevelExp = GetNextLevelExp(level);
+                skillPoint += 1;
+                isLevelUp = true;
+            }
+            resultLevel = level;
+            resultExp = exp;
+            resultSkillPoint = skillPoint;
+            return isLevelUp;
         }
 
 #if UNITY_EDITOR

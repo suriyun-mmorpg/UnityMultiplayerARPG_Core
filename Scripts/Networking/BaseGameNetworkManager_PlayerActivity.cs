@@ -693,9 +693,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public void SendGuildLevelExpSkillPointToClient(long connectionId, int id, short level, int exp, short skillPoint)
+        public void SendGuildLevelExpSkillPointToClient(long connectionId, GuildData guild)
         {
-            Server.SendGuildLevelExpSkillPoint(connectionId, MsgTypes.UpdateGuild, id, level, exp, skillPoint);
+            Server.SendGuildLevelExpSkillPoint(connectionId, MsgTypes.UpdateGuild, guild.id, guild.level, guild.exp, guild.skillPoint);
         }
 
         public void SendGuildLevelExpSkillPointToClients(GuildData guild)
@@ -704,7 +704,7 @@ namespace MultiplayerARPG
             foreach (var member in guild.GetMembers())
             {
                 if (TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
-                    SendGuildLevelExpSkillPointToClient(playerCharacterEntity.ConnectionId, guild.id, guild.level, guild.exp, guild.skillPoint);
+                    SendGuildLevelExpSkillPointToClient(playerCharacterEntity.ConnectionId, guild);
             }
         }
 
