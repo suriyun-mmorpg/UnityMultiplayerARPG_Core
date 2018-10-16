@@ -39,6 +39,8 @@ namespace MultiplayerARPG
         public ItemAmount[] createGuildRequireItems;
         [SerializeField]
         private int createGuildRequiredGold = 1000;
+        [SerializeField]
+        private int[] guildExpTree;
 
         public int MaxGuildMember { get { return maxGuildMember; } }
         public GuildRoleData[] GuildMemberRoles { get { return guildMemberRoles; } }
@@ -53,6 +55,20 @@ namespace MultiplayerARPG
             }
         }
         public int CreateGuildRequiredGold { get { return createGuildRequiredGold; } }
+        public int[] GuildExpTree
+        {
+            get
+            {
+                if (guildExpTree == null)
+                    guildExpTree = new int[] { 0 };
+                return guildExpTree;
+            }
+            set
+            {
+                if (value != null)
+                    guildExpTree = value;
+            }
+        }
 
         public bool CanCreateGuild(IPlayerCharacterData character)
         {

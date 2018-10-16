@@ -248,6 +248,7 @@ namespace MultiplayerARPG
             var randomedGold = Random.Range(MonsterDatabase.randomGoldMin, MonsterDatabase.randomGoldMax);
             var looters = new HashSet<uint>();
             var lastPlayer = lastAttacker as BasePlayerCharacterEntity;
+            GuildData tempGuildData;
             PartyData tempPartyData;
             BasePlayerCharacterEntity tempPlayerCharacter;
             if (receivedDamageRecords.Count > 0)
@@ -272,21 +273,31 @@ namespace MultiplayerARPG
                             looters.Clear();
                             makeMostDamage = true;
                         }
-                        // Try find party data from player character
-                        if (GameManager.TryGetParty(tempPlayerCharacter.PartyId, out tempPartyData))
+                        // Try find guild data from player character
+                        if (tempPlayerCharacter.GuildId > 0 && GameManager.TryGetGuild(tempPlayerCharacter.GuildId, out tempGuildData))
                         {
+                            // Calculation amount of Exp which will be shared to guild
+                            int shareRewardExp = (int)(rewardExp * (float)tempGuildData.ShareExpPercentage(tempPlayerCharacter.Id) / 100f);
+                            // Will share Exp to guild when sharing amount more than 0
+                            if (shareRewardExp > 0)
+                            {
+                                GameManager.IncreaseGuildExp(tempPlayerCharacter, shareRewardExp);
+                                rewardExp -= shareRewardExp;
+                            }
+                        }
+                        // Try find party data from player character
+                        if (tempPlayerCharacter.PartyId > 0 && GameManager.TryGetParty(tempPlayerCharacter.PartyId, out tempPartyData))
+                        {
+                            BasePlayerCharacterEntity partyPlayerCharacter;
                             // Loop party member to fill looter list / increase gold / increase exp
                             foreach (var member in tempPartyData.GetMembers())
                             {
-                                BasePlayerCharacterEntity partyPlayerCharacter;
                                 if (GameManager.TryGetPlayerCharacterById(member.id, out partyPlayerCharacter))
                                 {
                                     // If share exp, every party member will receive devided exp
                                     // If not share exp, character who make damage will receive non-devided exp
                                     if (tempPartyData.shareExp)
                                         partyPlayerCharacter.IncreaseExp(rewardExp / tempPartyData.CountMember());
-                                    else if (tempPlayerCharacter == partyPlayerCharacter)
-                                        partyPlayerCharacter.IncreaseExp(rewardExp);
 
                                     // If share item, every party member will receive devided gold
                                     // If not share item, character who make damage will receive non-devided gold
@@ -296,22 +307,20 @@ namespace MultiplayerARPG
                                             looters.Add(partyPlayerCharacter.ObjectId);
                                         partyPlayerCharacter.Gold += rewardGold / tempPartyData.CountMember();
                                     }
-                                    else if (tempPlayerCharacter == partyPlayerCharacter)
-                                    {
-                                        if (makeMostDamage)
-                                            looters.Add(partyPlayerCharacter.ObjectId);
-                                        partyPlayerCharacter.Gold += rewardGold;
-                                    }
                                 }
                             }
+                            // Shared exp, has increased so do not increase it again
+                            if (tempPartyData.shareExp)
+                                rewardExp = 0;
+                            // Shared gold, has increased so do not increase it again
+                            if (tempPartyData.shareItem)
+                                rewardGold = 0;
                         }
-                        else
-                        {
-                            tempPlayerCharacter.IncreaseExp(rewardExp);
-                            if (makeMostDamage)
-                                looters.Add(tempPlayerCharacter.ObjectId);
-                            tempPlayerCharacter.Gold += rewardGold;
-                        }
+                        // Add reward to current character in damage record list
+                        tempPlayerCharacter.IncreaseExp(rewardExp);
+                        if (makeMostDamage)
+                            looters.Add(tempPlayerCharacter.ObjectId);
+                        tempPlayerCharacter.Gold += rewardGold;
                     }
                     else
                         enemy.IncreaseExp(rewardExp);

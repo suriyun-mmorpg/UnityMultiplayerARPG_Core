@@ -409,6 +409,18 @@ namespace MultiplayerARPG
             }
             return true;
         }
+
+        public virtual bool CanIncreaseGuildExp(BasePlayerCharacterEntity playerCharacterEntity, int exp, out int guildId, out GuildData guild)
+        {
+            guildId = 0;
+            guild = null;
+            if (exp <= 0 || playerCharacterEntity == null || !IsServer)
+                return false;
+            guildId = playerCharacterEntity.GuildId;
+            if (guildId <= 0 || !guilds.TryGetValue(guildId, out guild))
+                return false;
+            return true;
+        }
         #endregion
 
         #region Activity functions
@@ -933,6 +945,26 @@ namespace MultiplayerARPG
                 guilds[guildId] = guild;
                 SendRemoveGuildMemberToClients(guild, playerCharacterEntity.Id);
             }
+        }
+
+        public virtual void IncreaseGuildExp(BasePlayerCharacterEntity playerCharacterEntity, int exp)
+        {
+            int guildId;
+            GuildData guild;
+            if (!CanIncreaseGuildExp(playerCharacterEntity, exp, out guildId, out guild))
+                return;
+
+            var oldLevel = guild.level;
+            guild.exp += exp;
+            var nextLevelExp = guild.GetNextLevelExp();
+            while (nextLevelExp > 0 && guild.exp >= nextLevelExp)
+            {
+                guild.exp = guild.exp - nextLevelExp;
+                ++guild.level;
+                nextLevelExp = guild.GetNextLevelExp();
+                guild.skillPoint += 1;
+            }
+            guilds[guildId] = guild;
         }
         #endregion
 
