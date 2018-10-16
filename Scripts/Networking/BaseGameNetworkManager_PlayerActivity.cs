@@ -693,6 +693,21 @@ namespace MultiplayerARPG
             }
         }
 
+        public void SendGuildLevelExpSkillPointToClient(long connectionId, int id, short level, int exp, short skillPoint)
+        {
+            Server.SendGuildLevelExpSkillPoint(connectionId, MsgTypes.UpdateGuild, id, level, exp, skillPoint);
+        }
+
+        public void SendGuildLevelExpSkillPointToClients(GuildData guild)
+        {
+            BasePlayerCharacterEntity playerCharacterEntity;
+            foreach (var member in guild.GetMembers())
+            {
+                if (TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                    SendGuildLevelExpSkillPointToClient(playerCharacterEntity.ConnectionId, guild.id, guild.level, guild.exp, guild.skillPoint);
+            }
+        }
+
         public virtual void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
         {
             if (!CanWarpCharacter(playerCharacterEntity))
@@ -954,17 +969,9 @@ namespace MultiplayerARPG
             if (!CanIncreaseGuildExp(playerCharacterEntity, exp, out guildId, out guild))
                 return;
 
-            var oldLevel = guild.level;
-            guild.exp += exp;
-            var nextLevelExp = guild.GetNextLevelExp();
-            while (nextLevelExp > 0 && guild.exp >= nextLevelExp)
-            {
-                guild.exp = guild.exp - nextLevelExp;
-                ++guild.level;
-                nextLevelExp = guild.GetNextLevelExp();
-                guild.skillPoint += 1;
-            }
+            guild = gameInstance.SocialSystemSetting.IncreaseGuildExp(guild, exp);
             guilds[guildId] = guild;
+            SendGuildLevelExpSkillPointToClients(guild);
         }
         #endregion
 

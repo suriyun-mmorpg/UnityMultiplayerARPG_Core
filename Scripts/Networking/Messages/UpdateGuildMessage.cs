@@ -14,6 +14,7 @@ namespace MultiplayerARPG
             SetGuildMessage,
             SetGuildRole,
             SetGuildMemberRole,
+            LevelExpSkillPoint,
             Terminate,
         }
         public UpdateType type;
@@ -26,6 +27,9 @@ namespace MultiplayerARPG
         public bool canInvite;
         public bool canKick;
         public byte shareExpPercentage;
+        public short level;
+        public int exp;
+        public short skillPoint;
 
         public void Deserialize(NetDataReader reader)
         {
@@ -53,6 +57,11 @@ namespace MultiplayerARPG
                 case UpdateType.SetGuildMemberRole:
                     characterId = reader.GetString();
                     guildRole = reader.GetByte();
+                    break;
+                case UpdateType.LevelExpSkillPoint:
+                    level = reader.GetShort();
+                    exp = reader.GetInt();
+                    skillPoint = reader.GetShort();
                     break;
             }
         }
@@ -83,6 +92,11 @@ namespace MultiplayerARPG
                 case UpdateType.SetGuildMemberRole:
                     writer.Put(characterId);
                     writer.Put(guildRole);
+                    break;
+                case UpdateType.LevelExpSkillPoint:
+                    writer.Put(level);
+                    writer.Put(exp);
+                    writer.Put(skillPoint);
                     break;
             }
         }
