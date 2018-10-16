@@ -288,6 +288,11 @@ namespace MultiplayerARPG
                     case UpdateGuildMessage.UpdateType.SetGuildMemberRole:
                         ClientGuild.SetMemberRole(message.characterId, message.guildRole);
                         break;
+                    case UpdateGuildMessage.UpdateType.LevelExpSkillPoint:
+                        ClientGuild.level = message.level;
+                        ClientGuild.exp = message.exp;
+                        ClientGuild.skillPoint = message.skillPoint;
+                        break;
                     case UpdateGuildMessage.UpdateType.Terminate:
                         ClientGuild = null;
                         break;
