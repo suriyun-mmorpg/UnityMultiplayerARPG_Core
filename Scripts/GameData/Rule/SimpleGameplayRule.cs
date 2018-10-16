@@ -208,7 +208,6 @@ namespace MultiplayerARPG
         public override bool IncreaseExp(BaseCharacterEntity character, int exp)
         {
             var isLevelUp = false;
-            var oldLevel = character.Level;
             character.Exp += exp;
             var playerCharacter = character as IPlayerCharacterData;
             var nextLevelExp = character.GetNextLevelExp();
