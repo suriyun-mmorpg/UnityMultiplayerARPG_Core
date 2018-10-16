@@ -102,18 +102,15 @@ namespace MultiplayerARPG
             character.Gold -= createGuildRequiredGold;
         }
 
-        public int GetNextLevelExp(int level)
+        public int GetNextLevelExp(short level)
         {
-            if (level <= 0)
-                return 0;
-            if (level > GuildExpTree.Length)
-                return 0;
-            return GuildExpTree[level - 1];
+            return GetNextLevelExp(GuildExpTree, level);
         }
 
         public GuildData IncreaseGuildExp(GuildData guild, int exp)
         {
             CalculateIncreasedGuildExp(
+                GuildExpTree,
                 guild.level,
                 guild.exp + exp,
                 guild.skillPoint,
@@ -123,7 +120,17 @@ namespace MultiplayerARPG
             return guild;
         }
 
-        public bool CalculateIncreasedGuildExp(
+        public static int GetNextLevelExp(int[] expTree, short level)
+        {
+            if (level <= 0)
+                return 0;
+            if (level > expTree.Length)
+                return 0;
+            return expTree[level - 1];
+        }
+
+        public static bool CalculateIncreasedGuildExp(
+            int[] expTree,
             short level, 
             int exp, 
             short skillPoint, 
@@ -132,12 +139,12 @@ namespace MultiplayerARPG
             out short resultSkillPoint)
         {
             var isLevelUp = false;
-            var nextLevelExp = GetNextLevelExp(level);
+            var nextLevelExp = GetNextLevelExp(expTree, level);
             while (nextLevelExp > 0 && exp >= nextLevelExp)
             {
                 exp = exp - nextLevelExp;
                 ++level;
-                nextLevelExp = GetNextLevelExp(level);
+                nextLevelExp = GetNextLevelExp(expTree, level);
                 skillPoint += 1;
                 isLevelUp = true;
             }
