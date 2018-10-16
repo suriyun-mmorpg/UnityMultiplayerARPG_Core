@@ -200,5 +200,19 @@ namespace MultiplayerARPG
             else
                 transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
         }
+
+        public static void SendGuildLevelExpSkillPoint(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, short level, int exp, short skillPoint)
+        {
+            var updateMessage = new UpdateGuildMessage();
+            updateMessage.type = UpdateGuildMessage.UpdateType.LevelExpSkillPoint;
+            updateMessage.id = id;
+            updateMessage.level = level;
+            updateMessage.exp = exp;
+            updateMessage.skillPoint = skillPoint;
+            if (!connectionId.HasValue)
+                transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
+            else
+                transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
+        }
     }
 }
