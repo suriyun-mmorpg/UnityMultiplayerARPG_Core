@@ -79,11 +79,26 @@ namespace MultiplayerARPG
             if (textLevel != null)
                 textLevel.text = string.Format(levelFormat, Guild == null ? "1" : Guild.level.ToString("N0"));
 
+            var expTree = GameInstance.Singleton.SocialSystemSetting.GuildExpTree;
+            var currentExp = 0;
+            var nextLevelExp = 0;
+            if (Guild != null && Guild.GetNextLevelExp() > 0)
+            {
+                currentExp = Guild.exp;
+                nextLevelExp = Guild.GetNextLevelExp();
+            }
+            else if (Guild != null && Guild.level - 2 > 0 && Guild.level - 2 < expTree.Length)
+            {
+                var maxExp = expTree[Guild.level - 2];
+                currentExp = maxExp;
+                nextLevelExp = maxExp;
+            }
+
             if (textExp != null)
-                textExp.text = string.Format(expFormat, 0, 0);
+                textExp.text = string.Format(expFormat, currentExp.ToString("N0"), nextLevelExp.ToString("N0"));
 
             if (imageExpGage != null)
-                imageExpGage.fillAmount = 1;
+                imageExpGage.fillAmount = nextLevelExp <= 0 ? 1 : (float)currentExp / (float)nextLevelExp;
 
             if (textSkillPoint != null)
                 textSkillPoint.text = string.Format(skillPointFormat, Guild == null ? "0" : Guild.skillPoint.ToString("N0"));
