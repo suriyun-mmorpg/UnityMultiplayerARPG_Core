@@ -35,6 +35,7 @@ namespace MultiplayerARPG
             new GuildRoleData() { roleName = "Member 4", canInvite = false, canKick = false },
             new GuildRoleData() { roleName = "Member 5", canInvite = false, canKick = false },
         };
+        [Range(0, 100)]
         [SerializeField]
         private byte maxShareExpPercentage;
         [SerializeField]
