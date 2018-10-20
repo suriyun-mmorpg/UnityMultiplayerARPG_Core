@@ -596,6 +596,17 @@ namespace MultiplayerARPG
             {
                 if (npcDialog == null || NpcDialogs.ContainsKey(npcDialog.DataId))
                     continue;
+                if (npcDialog.menus != null && npcDialog.menus.Length > 0)
+                {
+                    // Add dialogs from menus
+                    var menuDialogs = new List<NpcDialog>();
+                    foreach (var menu in npcDialog.menus)
+                    {
+                        if (menu.dialog != null && !NpcDialogs.ContainsKey(menu.dialog.DataId))
+                            menuDialogs.Add(menu.dialog);
+                    }
+                    AddNpcDialogs(menuDialogs);
+                }
                 NpcDialogs[npcDialog.DataId] = npcDialog;
             }
         }
