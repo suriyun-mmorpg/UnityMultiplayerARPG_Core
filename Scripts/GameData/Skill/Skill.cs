@@ -33,11 +33,6 @@ namespace MultiplayerARPG
         [Range(1, 30)]
         public short maxLevel = 1;
 
-        [Header("Animations (DEPRECATED)")]
-        [Tooltip("This will be removed on next version, please move data to your Character Model")]
-        [System.Obsolete("This will be removed on next version, please move data to your Character Model")]
-        public ActionAnimation[] castAnimations;
-
         [Header("Available Weapons")]
         [Tooltip("An available weapons, if it not set every weapons is available")]
         public WeaponType[] availableWeapons;

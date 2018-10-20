@@ -20,10 +20,6 @@ namespace MultiplayerARPG
         public float extraDuration;
         [Tooltip("This will be in use with attack/skill animations, These audio clips playing randomly while play this animation (not loop)")]
         public AudioClip[] audioClips;
-        [Header("DEPRECATED")]
-        [Tooltip("This will be removed on next version, please move data to your Character Model")]
-        [System.Obsolete("This will be removed on next version, please move data to your Character Model")]
-        public ActionAnimationOverrideData[] overrideData;
 
         public AudioClip GetRandomAudioClip()
         {
