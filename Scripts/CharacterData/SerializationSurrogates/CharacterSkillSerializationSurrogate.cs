@@ -19,14 +19,7 @@ public class CharacterSkillSerializationSurrogate : ISerializationSurrogate
                                        ISurrogateSelector selector)
     {
         CharacterSkill data = (CharacterSkill)obj;
-        // Backward compatible
-        var stringId = string.Empty;
-        try { stringId = info.GetString("skillId"); }
-        catch { }
-        if (!string.IsNullOrEmpty(stringId))
-            data.dataId = stringId.GenerateHashId();
-        else
-            data.dataId = info.GetInt32("dataId");
+        data.dataId = info.GetInt32("dataId");
         data.level = info.GetInt16("level");
         data.coolDownRemainsDuration = info.GetSingle("coolDownRemainsDuration");
         obj = data;

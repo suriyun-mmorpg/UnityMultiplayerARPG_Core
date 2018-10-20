@@ -18,14 +18,7 @@ public class CharacterAttributeSerializationSurrogate : ISerializationSurrogate
                                        ISurrogateSelector selector)
     {
         CharacterAttribute data = (CharacterAttribute)obj;
-        // Backward compatible
-        var stringId = string.Empty;
-        try { stringId = info.GetString("attributeId"); }
-        catch { }
-        if (!string.IsNullOrEmpty(stringId))
-            data.dataId = stringId.GenerateHashId();
-        else
-            data.dataId = info.GetInt32("dataId");
+        data.dataId = info.GetInt32("dataId");
         data.amount = info.GetInt16("amount");
         obj = data;
         return obj;

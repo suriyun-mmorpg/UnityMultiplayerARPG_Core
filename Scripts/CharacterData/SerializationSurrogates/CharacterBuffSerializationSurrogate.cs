@@ -25,14 +25,7 @@ public class CharacterBuffSerializationSurrogate : ISerializationSurrogate
         data.id = info.GetString("id");
         data.characterId = info.GetString("characterId");
         data.type = (BuffType)info.GetByte("type");
-        // Backward compatible
-        var stringId = string.Empty;
-        try { stringId = info.GetString("dataId"); }
-        catch { }
-        if (!string.IsNullOrEmpty(stringId) && !int.TryParse(stringId, out data.dataId))
-            data.dataId = stringId.GenerateHashId();
-        else
-            data.dataId = info.GetInt32("dataId");
+        data.dataId = info.GetInt32("dataId");
         data.level = info.GetInt16("level");
         data.buffRemainsDuration = info.GetSingle("buffRemainsDuration");
         obj = data;

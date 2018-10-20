@@ -19,14 +19,7 @@ public class CharacterQuestSerializationSurrogate : ISerializationSurrogate
                                        ISurrogateSelector selector)
     {
         CharacterQuest data = (CharacterQuest)obj;
-        // Backward compatible
-        var stringId = string.Empty;
-        try { stringId = info.GetString("questId"); }
-        catch { }
-        if (!string.IsNullOrEmpty(stringId))
-            data.dataId = stringId.GenerateHashId();
-        else
-            data.dataId = info.GetInt32("dataId");
+        data.dataId = info.GetInt32("dataId");
         data.isComplete = info.GetBoolean("isComplete");
         data.killedMonsters = (Dictionary<int, int>)info.GetValue("killedMonsters", typeof(Dictionary<int, int>));
         obj = data;

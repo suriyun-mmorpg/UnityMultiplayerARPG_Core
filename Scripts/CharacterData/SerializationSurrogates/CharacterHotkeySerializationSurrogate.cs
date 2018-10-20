@@ -21,14 +21,7 @@ public class CharacterHotkeySerializationSurrogate : ISerializationSurrogate
         CharacterHotkey data = (CharacterHotkey)obj;
         data.hotkeyId = info.GetString("hotkeyId");
         data.type = (HotkeyType)info.GetByte("type");
-        // Backward compatible
-        var stringId = string.Empty;
-        try { stringId = info.GetString("dataId"); }
-        catch { }
-        if (!string.IsNullOrEmpty(stringId) && !int.TryParse(stringId, out data.dataId))
-            data.dataId = stringId.GenerateHashId();
-        else
-            data.dataId = info.GetInt32("dataId");
+        data.dataId = info.GetInt32("dataId");
         obj = data;
         return obj;
     }
