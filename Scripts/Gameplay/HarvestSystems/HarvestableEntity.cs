@@ -97,17 +97,16 @@ namespace MultiplayerARPG
             if (spawnArea != null)
                 spawnArea.Spawn(destroyHideDelay + destroyRespawnDelay);
             else
-                Manager.StartCoroutine(RespawnRoutine(destroyHideDelay + destroyRespawnDelay, Manager, Identity.HashAssetId, spawnPosition));
+                Manager.StartCoroutine(RespawnRoutine());
 
             NetworkDestroy(destroyHideDelay);
         }
 
-        private static IEnumerator RespawnRoutine(float delay, LiteNetLibGameManager manager, int hashAssetId, Vector3 spawnPosition)
+        private IEnumerator RespawnRoutine()
         {
-            yield return new WaitForSecondsRealtime(delay);
-            var identity = manager.Assets.NetworkSpawn(hashAssetId, spawnPosition, Quaternion.Euler(Vector3.up * Random.Range(0, 360)));
-            if (identity != null)
-                identity.GetComponent<BaseMonsterCharacterEntity>();
+            yield return new WaitForSecondsRealtime(destroyHideDelay + destroyRespawnDelay);
+            InitStats();
+            Manager.Assets.NetworkSpawn(Identity.HashAssetId, spawnPosition, Quaternion.Euler(Vector3.up * Random.Range(0, 360)), Identity.ObjectId, Identity.ConnectionId);
         }
 
         public override void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountType combatAmountType, int damage)

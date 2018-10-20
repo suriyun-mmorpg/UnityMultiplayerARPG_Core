@@ -63,6 +63,7 @@ namespace MultiplayerARPG
                 CurrentStamina = (int)stats.stamina;
                 CurrentFood = (int)stats.food;
                 CurrentWater = (int)stats.water;
+                animActionType = AnimActionType.None;
             }
         }
 
@@ -364,21 +365,16 @@ namespace MultiplayerARPG
             if (spawnArea != null)
                 spawnArea.Spawn(MonsterDatabase.deadHideDelay + MonsterDatabase.deadRespawnDelay);
             else
-                Manager.StartCoroutine(RespawnRoutine(MonsterDatabase.deadHideDelay + MonsterDatabase.deadRespawnDelay, Manager, Identity.HashAssetId, DataId, Level, spawnPosition));
+                Manager.StartCoroutine(RespawnRoutine());
 
             NetworkDestroy(MonsterDatabase.deadHideDelay);
         }
 
-        private static IEnumerator RespawnRoutine(float delay, LiteNetLibGameManager manager, int hashAssetId, int dataId, short level, Vector3 spawnPosition)
+        private IEnumerator RespawnRoutine()
         {
-            yield return new WaitForSecondsRealtime(delay);
-            var identity = manager.Assets.NetworkSpawn(hashAssetId, spawnPosition, Quaternion.Euler(Vector3.up * Random.Range(0, 360)));
-            if (identity != null)
-            {
-                var entity = identity.GetComponent<BaseMonsterCharacterEntity>();
-                entity.DataId = dataId;
-                entity.Level = level;
-            }
+            yield return new WaitForSecondsRealtime(MonsterDatabase.deadHideDelay + MonsterDatabase.deadRespawnDelay);
+            InitStats();
+            Manager.Assets.NetworkSpawn(Identity.HashAssetId, spawnPosition, Quaternion.Euler(Vector3.up * Random.Range(0, 360)), Identity.ObjectId, Identity.ConnectionId);
         }
 
         public abstract void StopMove();
