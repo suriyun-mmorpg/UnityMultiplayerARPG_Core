@@ -12,6 +12,7 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
         var data = (PlayerCharacterData)obj;
         info.AddValue("id", data.Id);
         info.AddValue("dataId", data.DataId);
+        info.AddValue("entityId", data.EntityId);
         info.AddValue("characterName", data.CharacterName);
         info.AddValue("level", data.Level);
         info.AddValue("exp", data.Exp);
@@ -46,14 +47,18 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
     {
         var data = (PlayerCharacterData)obj;
         data.Id = info.GetString("id");
+        data.DataId = info.GetInt32("dataId");
         // Backward compatible
-        var stringId = string.Empty;
-        try { stringId = info.GetString("databaseId"); }
-        catch { }
-        if (!string.IsNullOrEmpty(stringId))
-            data.DataId = stringId.GenerateHashId();
-        else
-            data.DataId = info.GetInt32("dataId");
+        try
+        {
+            data.EntityId = info.GetInt32("entityId");
+        }
+        catch
+        {
+            PlayerCharacter database;
+            if (GameInstance.PlayerCharacters.TryGetValue(data.DataId, out database) && database.entityPrefab != null)
+                data.EntityId = database.entityPrefab.EntityId;
+        }
         data.CharacterName = info.GetString("characterName");
         data.Level = info.GetInt16("level");
         data.Exp = info.GetInt32("exp");
