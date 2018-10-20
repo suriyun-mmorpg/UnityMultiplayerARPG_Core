@@ -148,8 +148,10 @@ namespace MultiplayerARPG
             switch (currentNpcDialog.type)
             {
                 case NpcDialogType.Normal:
+                case NpcDialogType.SaveRespawnPoint:
                     if (menuIndex < 0 || menuIndex >= menus.Length)
                         return;
+                    // Changing current npc dialog
                     selectedMenu = menus[menuIndex];
                     if (!selectedMenu.IsPassConditions(this) || selectedMenu.dialog == null || selectedMenu.isCloseMenu)
                     {
@@ -158,6 +160,15 @@ namespace MultiplayerARPG
                         return;
                     }
                     currentNpcDialog = selectedMenu.dialog;
+                    // If dialog is save respawn point, change saved respawn point
+                    if (currentNpcDialog.type == NpcDialogType.SaveRespawnPoint &&
+                        currentNpcDialog.saveRespawnMap != null &&
+                        currentNpcDialog.saveRespawnMap.scene != null)
+                    {
+                        RespawnMapName = currentNpcDialog.saveRespawnMap.scene.SceneName;
+                        RespawnPosition = currentNpcDialog.saveRespawnPosition;
+                    }
+                    // Show Npc dialog on client
                     RequestShowNpcDialog(currentNpcDialog.DataId);
                     break;
                 case NpcDialogType.Quest:
