@@ -37,7 +37,7 @@ namespace MultiplayerARPG
         };
         [Range(0, 100)]
         [SerializeField]
-        private byte maxShareExpPercentage;
+        private byte maxShareExpPercentage = 20;
         [SerializeField]
         private ItemAmount[] createGuildRequireItems;
         [SerializeField]
