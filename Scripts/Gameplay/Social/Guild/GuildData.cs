@@ -131,6 +131,9 @@ namespace MultiplayerARPG
 
         public void SetRole(byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
         {
+            if (shareExpPercentage > SystemSetting.MaxShareExpPercentage)
+                shareExpPercentage = SystemSetting.MaxShareExpPercentage;
+
             SetRole(guildRole, new GuildRoleData()
             {
                 roleName = roleName,

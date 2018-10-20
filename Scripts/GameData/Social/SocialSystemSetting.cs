@@ -36,7 +36,9 @@ namespace MultiplayerARPG
             new GuildRoleData() { roleName = "Member 5", canInvite = false, canKick = false },
         };
         [SerializeField]
-        public ItemAmount[] createGuildRequireItems;
+        private byte maxShareExpPercentage;
+        [SerializeField]
+        private ItemAmount[] createGuildRequireItems;
         [SerializeField]
         private int createGuildRequiredGold = 1000;
         [SerializeField]
@@ -49,6 +51,7 @@ namespace MultiplayerARPG
 
         public int MaxGuildMember { get { return maxGuildMember; } }
         public GuildRoleData[] GuildMemberRoles { get { return guildMemberRoles; } }
+        public byte MaxShareExpPercentage { get { return maxShareExpPercentage; } }
         private Dictionary<Item, short> cacheCreateGuildRequireItems;
         public Dictionary<Item, short> CreateGuildRequireItems
         {
