@@ -88,6 +88,7 @@ namespace MultiplayerARPG
             switch (Data.type)
             {
                 case NpcDialogType.Normal:
+                case NpcDialogType.SaveRespawnPoint:
                     if (onSwitchToNormalDialog == null)
                         onSwitchToNormalDialog.Invoke();
                     var menus = Data.menus;

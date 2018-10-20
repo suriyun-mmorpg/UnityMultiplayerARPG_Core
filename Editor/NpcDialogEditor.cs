@@ -28,6 +28,10 @@ namespace MultiplayerARPG
             ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.CraftItem.ToString(), cacheNpcDialog.GetMemberName(a => a.craftDoneDialog));
             ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.CraftItem.ToString(), cacheNpcDialog.GetMemberName(a => a.craftNotMeetRequirementsDialog));
             ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.CraftItem.ToString(), cacheNpcDialog.GetMemberName(a => a.craftCancelDialog));
+            // Save Spawn Point
+            ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.SaveRespawnPoint.ToString(), cacheNpcDialog.GetMemberName(a => a.menus));
+            ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.SaveRespawnPoint.ToString(), cacheNpcDialog.GetMemberName(a => a.saveRespawnMap));
+            ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.SaveRespawnPoint.ToString(), cacheNpcDialog.GetMemberName(a => a.saveRespawnPosition));
         }
     }
 }

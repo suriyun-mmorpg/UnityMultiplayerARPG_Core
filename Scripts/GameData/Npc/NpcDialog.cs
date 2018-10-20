@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         Quest,
         Shop,
         CraftItem,
+        SaveRespawnPoint,
     }
 
     [CreateAssetMenu(fileName = "Npc Dialog", menuName = "Create GameData/Npc Dialog")]
@@ -37,6 +38,9 @@ namespace MultiplayerARPG
         public NpcDialog craftDoneDialog;
         public NpcDialog craftNotMeetRequirementsDialog;
         public NpcDialog craftCancelDialog;
+        // Save Spawn Point
+        public MapInfo saveRespawnMap;
+        public Vector3 saveRespawnPosition;
     }
 
     public enum NpcDialogConditionType : byte

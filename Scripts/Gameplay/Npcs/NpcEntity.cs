@@ -120,6 +120,7 @@ namespace MultiplayerARPG
             switch (dialog.type)
             {
                 case NpcDialogType.Normal:
+                case NpcDialogType.SaveRespawnPoint:
                     foreach (var menu in dialog.menus)
                     {
                         if (menu.isCloseMenu) continue;
