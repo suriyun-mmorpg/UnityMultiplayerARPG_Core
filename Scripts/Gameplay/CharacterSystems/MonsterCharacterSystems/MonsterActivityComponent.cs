@@ -155,8 +155,8 @@ namespace MultiplayerARPG
             else
             {
                 // Update rotation while wandering
-                if (!CacheNavMeshAgent.updateRotation)
-                    CacheNavMeshAgent.updateRotation = true;
+                CacheNavMeshAgent.updatePosition = true;
+                CacheNavMeshAgent.updateRotation = true;
                 // While character is moving then random next wander time
                 // To let character stop movement some time before random next wander time
                 if ((wanderDestination.HasValue && Vector3.Distance(currentPosition, wanderDestination.Value) > CacheNavMeshAgent.stoppingDistance)
@@ -180,21 +180,26 @@ namespace MultiplayerARPG
             if (Vector3.Distance(currentPosition, targetEntityPosition) <= attackDistance)
             {
                 SetStartFollowTargetTime(time);
-                // Lookat target then do anything when it's in range
+                CacheNavMeshAgent.updatePosition = false;
                 CacheNavMeshAgent.updateRotation = false;
-                CacheNavMeshAgent.isStopped = true;
+                // Lookat target then do anything when it's in range
                 var lookAtDirection = (targetEntityPosition - currentPosition).normalized;
                 // slerp to the desired rotation over time
                 if (lookAtDirection.magnitude > 0)
-                    CacheMonsterCharacterEntity.CacheTransform.rotation = Quaternion.RotateTowards(CacheMonsterCharacterEntity.CacheTransform.rotation, Quaternion.LookRotation(lookAtDirection), CacheNavMeshAgent.angularSpeed * Time.deltaTime);
+                {
+                    var lookRotationEuler = Quaternion.LookRotation(lookAtDirection).eulerAngles;
+                    lookRotationEuler.x = 0;
+                    lookRotationEuler.z = 0;
+                    CacheMonsterCharacterEntity.CacheTransform.rotation = Quaternion.RotateTowards(CacheMonsterCharacterEntity.CacheTransform.rotation, Quaternion.Euler(lookRotationEuler), CacheNavMeshAgent.angularSpeed * Time.deltaTime);
+                }
                 CacheMonsterCharacterEntity.RequestAttack();
                 // TODO: Random to use skills
             }
             else
             {
                 // Following target
-                if (!CacheNavMeshAgent.updateRotation)
-                    CacheNavMeshAgent.updateRotation = true;
+                CacheNavMeshAgent.updatePosition = true;
+                CacheNavMeshAgent.updateRotation = true;
                 if (oldDestination != targetEntityPosition &&
                     time - setDestinationTime >= setTargetDestinationDelay)
                     SetDestination(time, targetEntityPosition);
