@@ -6,7 +6,8 @@ namespace MultiplayerARPG
 {
     public abstract class BaseCharacter : BaseGameData
     {
-        [Header("Entity")]
+        [Header("Entity (Going to be deprecated)")]
+        [System.Obsolete("BaseCharacter -> entityPrefab is going to be deprecated, it will be removed on next version")]
         public BaseCharacterEntity entityPrefab;
 
         [Header("Attributes/Stats")]

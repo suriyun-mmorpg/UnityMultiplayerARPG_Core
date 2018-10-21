@@ -62,6 +62,7 @@ namespace MultiplayerARPG
         #region Fields/Interface implementation
         public virtual string Id { get { return id.Value; } set { id.Value = value; } }
         public virtual int DataId { get { return database.DataId; } set { database = GameInstance.AllCharacters[value]; } }
+        public virtual int EntityId { get { return Identity.HashAssetId; } set { } }
         public virtual string CharacterName { get { return characterName.Value; } set { characterName.Value = value; } }
         public virtual short Level { get { return level.Value; } set { level.Value = value; } }
         public virtual int Exp { get { return exp.Value; } set { exp.Value = value; } }

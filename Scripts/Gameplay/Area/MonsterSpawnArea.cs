@@ -7,7 +7,9 @@ namespace MultiplayerARPG
     public class MonsterSpawnArea : GameArea
     {
         [Header("Spawning Data")]
+        [System.Obsolete("This will be deprecated on next version")]
         public MonsterCharacter database;
+        public BaseMonsterCharacterEntity monsterCharacterEntity;
         public short level = 1;
         public short amount = 1;
         
@@ -24,24 +26,23 @@ namespace MultiplayerARPG
             }
         }
         private GameInstance gameInstance { get { return GameInstance.Singleton; } }
-        private int dataId { get { return database == null ? 0 : database.DataId; } }
+
+        public void RegisterAssets()
+        {
+            if (database != null)
+                monsterCharacterEntity = database.entityPrefab as BaseMonsterCharacterEntity;
+            if (monsterCharacterEntity != null)
+                CacheGameNetworkManager.Assets.RegisterPrefab(monsterCharacterEntity.Identity);
+        }
 
         public void SpawnAll()
         {
-            if (database == null)
+            if (monsterCharacterEntity != null)
             {
-                Debug.LogWarning("Have to set monster database to spawn monster");
-                return;
-            }
-            MonsterCharacter foundDatabase;
-            if (!GameInstance.MonsterCharacters.TryGetValue(dataId, out foundDatabase))
-            {
-                Debug.LogWarning("The monster database have to be added to game instance");
-                return;
-            }
-            for (var i = 0; i < amount; ++i)
-            {
-                Spawn(0);
+                for (var i = 0; i < amount; ++i)
+                {
+                    Spawn(0);
+                }
             }
         }
 
@@ -55,15 +56,10 @@ namespace MultiplayerARPG
             yield return new WaitForSecondsRealtime(delay);
             var spawnPosition = GetRandomPosition();
             var spawnRotation = GetRandomRotation();
-            var monsterCharacterPrefab = database.entityPrefab;
-            if (monsterCharacterPrefab != null)
-            {
-                var identity = CacheGameNetworkManager.Assets.NetworkSpawn(monsterCharacterPrefab.Identity, spawnPosition, spawnRotation);
-                var entity = identity.GetComponent<BaseMonsterCharacterEntity>();
-                entity.DataId = dataId;
-                entity.Level = level;
-                entity.SetSpawnArea(this, spawnPosition);
-            }
+            var identity = CacheGameNetworkManager.Assets.NetworkSpawn(monsterCharacterEntity.Identity, spawnPosition, spawnRotation);
+            var entity = identity.GetComponent<BaseMonsterCharacterEntity>();
+            entity.Level = level;
+            entity.SetSpawnArea(this, spawnPosition);
         }
 
         public override int GroundLayerMask

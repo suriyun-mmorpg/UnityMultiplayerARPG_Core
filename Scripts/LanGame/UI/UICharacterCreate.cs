@@ -62,18 +62,19 @@ namespace MultiplayerARPG
         {
             SelectionManager.Clear();
             // Show list of characters that can be create
-            var selectableCharacters = GameInstance.PlayerCharacters.Values.ToList();
-            CacheList.Generate(selectableCharacters, (index, character, ui) =>
+            var selectableCharacters = GameInstance.PlayerCharacterEntities.Values.ToList();
+            CacheList.Generate(selectableCharacters, (index, characterEntity, ui) =>
             {
-                var dataId = character.DataId;
+                var character = characterEntity.database;
                 var characterData = new PlayerCharacterData();
-                characterData.DataId = dataId;
-                characterData.SetNewCharacterData(character.title, character.DataId);
+                characterData.DataId = characterEntity.DataId;
+                characterData.EntityId = characterEntity.EntityId;
+                characterData.SetNewPlayerCharacterData(character.title, characterEntity.DataId, characterEntity.EntityId);
                 var uiCharacter = ui.GetComponent<UICharacter>();
-                uiCharacter.Setup(characterData, dataId);
-            // Select trigger when add first entry so deactivate all models is okay beacause first model will active
-            var characterModel = characterData.InstantiateModel(characterModelContainer);
-                CharacterModels[characterData.DataId] = characterModel;
+                uiCharacter.Data = characterData;
+                // Select trigger when add first entry so deactivate all models is okay beacause first model will active
+                var characterModel = characterData.InstantiateModel(characterModelContainer);
+                CharacterModels[characterData.EntityId] = characterModel;
                 characterModel.gameObject.SetActive(false);
                 SelectionManager.Add(uiCharacter);
             });
@@ -89,7 +90,7 @@ namespace MultiplayerARPG
         private void OnSelectCharacter(UICharacter ui)
         {
             characterModelContainer.SetChildrenActive(false);
-            ShowCharacter(ui.dataId);
+            ShowCharacter(ui.Data.EntityId);
         }
 
         private void ShowCharacter(int id)
@@ -110,7 +111,6 @@ namespace MultiplayerARPG
                 Debug.LogWarning("Cannot create character, did not selected character class");
                 return;
             }
-            var dataId = selectedUI.dataId;
             var characterName = inputCharacterName.text.Trim();
             var minCharacterNameLength = gameInstance.minCharacterNameLength;
             var maxCharacterNameLength = gameInstance.maxCharacterNameLength;
@@ -130,7 +130,7 @@ namespace MultiplayerARPG
             var characterId = GenericUtils.GetUniqueId();
             var characterData = new PlayerCharacterData();
             characterData.Id = characterId;
-            characterData.SetNewCharacterData(characterName, dataId);
+            characterData.SetNewPlayerCharacterData(characterName, selectedUI.Data.DataId, selectedUI.Data.EntityId);
             characterData.SavePersistentCharacterData();
 
             if (eventOnCreateCharacter != null)

@@ -505,6 +505,12 @@ namespace MultiplayerARPG
 
         private void RegisterEntities()
         {
+            var monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
+            foreach (var monsterSpawnArea in monsterSpawnAreas)
+            {
+                monsterSpawnArea.RegisterAssets();
+            }
+
             var harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
             foreach (var harvestableSpawnArea in harvestableSpawnAreas)
             {

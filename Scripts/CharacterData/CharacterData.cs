@@ -9,6 +9,7 @@ public partial class CharacterData : ICharacterData
 {
     private string id;
     private int dataId;
+    private int entityId;
     private string characterName;
     private short level;
     private int exp;
@@ -34,6 +35,15 @@ public partial class CharacterData : ICharacterData
         set
         {
             dataId = value;
+            shouldMakeCache = true;
+        }
+    }
+    public int EntityId
+    {
+        get { return entityId; }
+        set
+        {
+            entityId = value;
             shouldMakeCache = true;
         }
     }

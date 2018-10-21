@@ -10,18 +10,47 @@ public static partial class CharacterDataExtension
     {
         BaseCharacter database = null;
         if (!GameInstance.AllCharacters.TryGetValue(data.DataId, out database))
+        {
+            Debug.LogWarning("[GetDatabase] Cannot find character database with id: " + data.DataId);
             return null;
+        }
 
         return database;
     }
 
+    public static BaseCharacterEntity GetEntityPrefab(this ICharacterData data)
+    {
+        BaseCharacterEntity entityPrefab = null;
+        if (!GameInstance.AllCharacterEntities.TryGetValue(data.EntityId, out entityPrefab))
+        {
+            Debug.LogWarning("[GetEntityPrefab] Cannot find character entity with id: " + data.EntityId);
+            var database = data.GetDatabase();
+            // Backward compatible
+            if (database == null)
+            {
+                Debug.LogWarning("[GetEntityPrefab] Cannot find character entity with id: " + data.EntityId + " and also cannot find data id: " + data.DataId);
+                return null;
+            }
+            if (database.entityPrefab == null)
+            {
+                Debug.LogWarning("[GetEntityPrefab] Data id: " + data.DataId + " entity prefab is empty");
+                return null;
+            }
+            entityPrefab = database.entityPrefab;
+        }
+        return entityPrefab;
+    }
+
     public static BaseCharacterModel InstantiateModel(this ICharacterData data, Transform parent)
     {
-        BaseCharacter character = null;
-        if (!GameInstance.AllCharacters.TryGetValue(data.DataId, out character))
+        var entityPrefab = data.GetEntityPrefab();
+        if (entityPrefab == null)
+        {
+            Debug.LogWarning("[InstantiateModel] Cannot find character entity with id: " + data.EntityId);
             return null;
+        }
 
-        var result = Object.Instantiate(character.entityPrefab, parent);
+        var result = Object.Instantiate(entityPrefab, parent);
         var networkBehaviours = result.GetComponentsInChildren<LiteNetLibBehaviour>();
         foreach (var networkBehaviour in networkBehaviours)
         {

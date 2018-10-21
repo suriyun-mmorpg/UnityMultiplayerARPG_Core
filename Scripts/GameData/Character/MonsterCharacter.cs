@@ -45,19 +45,7 @@ namespace MultiplayerARPG
         public int randomGoldMax;
         public ItemDrop[] randomItems;
 
-#if UNITY_EDITOR
-        void OnValidate()
-        {
-            if (entityPrefab != null && !(entityPrefab is BaseMonsterCharacterEntity))
-            {
-                Debug.LogWarning(name + "(MonsterCharacter) Entity Prefab MUST be `BaseMonsterCharacterEntity`");
-                entityPrefab = null;
-            }
-            EditorUtility.SetDirty(this);
-        }
-#endif
-
-    public int RandomExp()
+        public int RandomExp()
         {
             var min = randomExpMin;
             var max = randomExpMax;

@@ -92,15 +92,14 @@ namespace MultiplayerARPG
         {
             if (LogDev) Debug.Log("[LanRpgNetworkManager] Deserializing client ready extra");
             var playerCharacterData = new PlayerCharacterData().DeserializeCharacterData(reader);
-            var dataId = playerCharacterData.DataId;
-            PlayerCharacter playerCharacter;
-            if (!GameInstance.PlayerCharacters.TryGetValue(dataId, out playerCharacter) || playerCharacter.entityPrefab == null)
+            BasePlayerCharacterEntity entityPrefab = playerCharacterData.GetEntityPrefab() as BasePlayerCharacterEntity;
+            // If it is not allow this character data, disconnect user
+            if (entityPrefab == null)
             {
-                Debug.LogError("[LanRpgNetworkManager] Cannot find player character with data Id: " + dataId);
+                Debug.LogError("[LanRpgNetworkManager] Cannot find player character with entity Id: " + playerCharacterData.EntityId);
                 return;
             }
-            var playerCharacterPrefab = playerCharacter.entityPrefab;
-            var identity = Assets.NetworkSpawn(playerCharacterPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
+            var identity = Assets.NetworkSpawn(entityPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
             var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterData.CloneTo(playerCharacterEntity);
             // Notify clients that this character is spawn or dead

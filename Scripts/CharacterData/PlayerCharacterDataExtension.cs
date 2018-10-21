@@ -23,6 +23,7 @@ public static partial class PlayerCharacterDataExtension
     {
         to.Id = from.Id;
         to.DataId = from.DataId;
+        to.EntityId = from.EntityId;
         to.CharacterName = from.CharacterName;
         to.Level = from.Level;
         to.Exp = from.Exp;
@@ -178,7 +179,7 @@ public static partial class PlayerCharacterDataExtension
         return character;
     }
 
-    public static T SetNewCharacterData<T>(this T character, string characterName, int dataId) where T : IPlayerCharacterData
+    public static T SetNewPlayerCharacterData<T>(this T character, string characterName, int dataId, int entityId) where T : IPlayerCharacterData
     {
         var gameInstance = GameInstance.Singleton;
         PlayerCharacter database;
@@ -232,7 +233,8 @@ public static partial class PlayerCharacterDataExtension
             character.EquipItems.Add(newItem);
         }
         // General data
-        character.DataId = database.DataId;
+        character.DataId = dataId;
+        character.EntityId = entityId;
         character.CharacterName = characterName;
         character.Level = 1;
         var stats = character.GetStats();
@@ -367,6 +369,7 @@ public static partial class PlayerCharacterDataExtension
     {
         writer.Put(characterData.Id);
         writer.Put(characterData.DataId);
+        writer.Put(characterData.EntityId);
         writer.Put(characterData.CharacterName);
         writer.Put(characterData.Level);
         writer.Put(characterData.Exp);
@@ -472,6 +475,7 @@ public static partial class PlayerCharacterDataExtension
         var tempCharacterData = new PlayerCharacterData();
         tempCharacterData.Id = reader.GetString();
         tempCharacterData.DataId = reader.GetInt();
+        tempCharacterData.EntityId = reader.GetInt();
         tempCharacterData.CharacterName = reader.GetString();
         tempCharacterData.Level = reader.GetShort();
         tempCharacterData.Exp = reader.GetInt();

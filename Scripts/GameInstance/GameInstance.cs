@@ -124,6 +124,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, Quest> Quests = new Dictionary<int, Quest>();
         public static readonly Dictionary<int, BaseDamageEntity> DamageEntities = new Dictionary<int, BaseDamageEntity>();
         public static readonly Dictionary<int, BuildingEntity> BuildingEntities = new Dictionary<int, BuildingEntity>();
+        public static readonly Dictionary<int, BaseCharacterEntity> AllCharacterEntities = new Dictionary<int, BaseCharacterEntity>();
         public static readonly Dictionary<int, BasePlayerCharacterEntity> PlayerCharacterEntities = new Dictionary<int, BasePlayerCharacterEntity>();
         public static readonly Dictionary<int, BaseMonsterCharacterEntity> MonsterCharacterEntities = new Dictionary<int, BaseMonsterCharacterEntity>();
         public static readonly Dictionary<int, WarpPortalEntity> WarpPortalEntities = new Dictionary<int, WarpPortalEntity>();
@@ -305,6 +306,7 @@ namespace MultiplayerARPG
             Quests.Clear();
             DamageEntities.Clear();
             BuildingEntities.Clear();
+            AllCharacterEntities.Clear();
             PlayerCharacterEntities.Clear();
             MonsterCharacterEntities.Clear();
             WarpPortalEntities.Clear();
@@ -331,6 +333,7 @@ namespace MultiplayerARPG
         {
             // Use Resources Load Async ?
             var gameDataList = Resources.LoadAll<BaseGameData>("");
+            var characterEntityList = Resources.LoadAll<BaseCharacterEntity>("");
 
             var attributes = new List<Attribute>();
             var damageElements = new List<DamageElement>();
@@ -338,8 +341,10 @@ namespace MultiplayerARPG
             var skills = new List<Skill>();
             var npcDialogs = new List<NpcDialog>();
             var quests = new List<Quest>();
-            var playerCharacters = new List<BaseCharacter>();
-            var monsterCharacters = new List<BaseCharacter>();
+            var playerCharacters = new List<PlayerCharacter>();
+            var monsterCharacters = new List<MonsterCharacter>();
+            var playerCharacterEntities = new List<BasePlayerCharacterEntity>();
+            var monsterCharacterEntities = new List<BaseMonsterCharacterEntity>();
             var mapInfos = new List<MapInfo>();
 
             // Filtering game data
@@ -364,6 +369,15 @@ namespace MultiplayerARPG
                 if (gameData is MapInfo)
                     mapInfos.Add(gameData as MapInfo);
             }
+
+            // Filtering character entity
+            foreach (var characterEntity in characterEntityList)
+            {
+                if (characterEntity is BasePlayerCharacterEntity)
+                    playerCharacterEntities.Add(characterEntity as BasePlayerCharacterEntity);
+                if (characterEntity is BaseMonsterCharacterEntity)
+                    monsterCharacterEntities.Add(characterEntity as BaseMonsterCharacterEntity);
+            }
             items.Add(DefaultWeaponItem);
             damageElements.Add(DefaultDamageElement);
 
@@ -375,6 +389,8 @@ namespace MultiplayerARPG
             AddQuests(quests);
             AddCharacters(playerCharacters);
             AddCharacters(monsterCharacters);
+            AddCharacterEntities(playerCharacterEntities);
+            AddCharacterEntities(monsterCharacterEntities);
             AddMapInfos(mapInfos);
 
             var weaponHitEffects = new List<GameEffectCollection>();
@@ -538,38 +554,51 @@ namespace MultiplayerARPG
 
         public static void AddCharacters(IEnumerable<BaseCharacter> characters)
         {
-            var playerCharacterEntities = new List<BasePlayerCharacterEntity>();
-            var monsterCharacterEntities = new List<BaseMonsterCharacterEntity>();
             var damageEntities = new List<BaseDamageEntity>();
             foreach (var character in characters)
             {
                 if (character == null || AllCharacters.ContainsKey(character.DataId))
                     continue;
 
-                // Set database to entity
-                if (character.entityPrefab != null)
-                    character.entityPrefab.database = character;
-
                 AllCharacters[character.DataId] = character;
                 if (character is PlayerCharacter)
                 {
                     var playerCharacter = character as PlayerCharacter;
                     PlayerCharacters[character.DataId] = playerCharacter;
-                    playerCharacterEntities.Add(playerCharacter.entityPrefab as BasePlayerCharacterEntity);
                 }
                 else if (character is MonsterCharacter)
                 {
                     var monsterCharacter = character as MonsterCharacter;
                     MonsterCharacters[character.DataId] = monsterCharacter;
-                    monsterCharacterEntities.Add(monsterCharacter.entityPrefab as BaseMonsterCharacterEntity);
                     var missileDamageEntity = monsterCharacter.damageInfo.missileDamageEntity;
                     if (missileDamageEntity != null)
                         damageEntities.Add(missileDamageEntity);
                 }
             }
-            AddPlayerCharacterEntities(playerCharacterEntities);
-            AddMonsterCharacterEntities(monsterCharacterEntities);
             AddDamageEntities(damageEntities);
+        }
+
+        public static void AddCharacterEntities(IEnumerable<BaseCharacterEntity> characterEntities)
+        {
+            if (characterEntities == null)
+                return;
+            foreach (var characterEntity in characterEntities)
+            {
+                if (characterEntity == null || AllCharacterEntities.ContainsKey(characterEntity.Identity.HashAssetId))
+                    continue;
+
+                AllCharacterEntities[characterEntity.Identity.HashAssetId] = characterEntity;
+                if (characterEntity is BasePlayerCharacterEntity)
+                {
+                    var playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
+                    PlayerCharacterEntities[characterEntity.Identity.HashAssetId] = playerCharacterEntity;
+                }
+                else if (characterEntity is BaseMonsterCharacterEntity)
+                {
+                    var monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
+                    MonsterCharacterEntities[characterEntity.Identity.HashAssetId] = monsterCharacterEntity;
+                }
+            }
         }
 
         public static void AddSkills(IEnumerable<Skill> skills)
@@ -642,30 +671,6 @@ namespace MultiplayerARPG
                 if (buildingEntity == null || BuildingEntities.ContainsKey(buildingEntity.DataId))
                     continue;
                 BuildingEntities[buildingEntity.DataId] = buildingEntity;
-            }
-        }
-
-        public static void AddPlayerCharacterEntities(IEnumerable<BasePlayerCharacterEntity> characterEntities)
-        {
-            if (characterEntities == null)
-                return;
-            foreach (var characterEntity in characterEntities)
-            {
-                if (characterEntity == null || PlayerCharacterEntities.ContainsKey(characterEntity.Identity.HashAssetId))
-                    continue;
-                PlayerCharacterEntities[characterEntity.Identity.HashAssetId] = characterEntity;
-            }
-        }
-
-        public static void AddMonsterCharacterEntities(IEnumerable<BaseMonsterCharacterEntity> characterEntities)
-        {
-            if (characterEntities == null)
-                return;
-            foreach (var characterEntity in characterEntities)
-            {
-                if (characterEntity == null || MonsterCharacterEntities.ContainsKey(characterEntity.Identity.HashAssetId))
-                    continue;
-                MonsterCharacterEntities[characterEntity.Identity.HashAssetId] = characterEntity;
             }
         }
 

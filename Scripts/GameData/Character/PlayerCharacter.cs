@@ -53,11 +53,6 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR
         void OnValidate()
         {
-            if (entityPrefab != null && !(entityPrefab is BasePlayerCharacterEntity))
-            {
-                Debug.LogWarning(name + "(PlayerCharacter) Entity Prefab MUST be `BasePlayerCharacterEntity`");
-                entityPrefab = null;
-            }
             Item tempRightHandWeapon = null;
             Item tempLeftHandWeapon = null;
             Item tempLeftHandShield = null;

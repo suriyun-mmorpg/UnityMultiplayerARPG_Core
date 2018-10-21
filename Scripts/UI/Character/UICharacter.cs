@@ -9,8 +9,6 @@ namespace MultiplayerARPG
 {
     public partial class UICharacter : UISelectionEntry<ICharacterData>
     {
-        public int dataId { get; protected set; }
-
         [Header("Display Format")]
         [Tooltip("Name Format => {0} = {Character name}")]
         public string nameFormat = "{0}";
@@ -119,12 +117,6 @@ namespace MultiplayerARPG
                 }
                 return cacheUICharacterAttributes;
             }
-        }
-
-        public void Setup(ICharacterData data, int dataId)
-        {
-            this.dataId = dataId;
-            Data = data;
         }
 
         protected override void UpdateUI()
