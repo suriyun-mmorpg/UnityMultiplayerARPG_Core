@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -49,6 +52,23 @@ namespace MultiplayerARPG
             base.EntityStart();
             InitStats();
         }
+
+#if UNITY_EDITOR
+        public override void OnBehaviourValidate()
+        {
+            base.OnBehaviourValidate();
+            if (database == null)
+            {
+                Debug.LogError("[BaseMonsterCharacterEntity] " + name + "Database is empty");
+            }
+            if (database != null && !(database is MonsterCharacter))
+            {
+                Debug.LogError("[BaseMonsterCharacterEntity] " + name + "Database must be `MonsterCharacter`");
+                database = null;
+                EditorUtility.SetDirty(gameObject);
+            }
+        }
+#endif
 
         protected void InitStats()
         {

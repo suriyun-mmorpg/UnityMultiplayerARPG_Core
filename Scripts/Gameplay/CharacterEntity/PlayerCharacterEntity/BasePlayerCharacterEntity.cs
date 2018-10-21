@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -57,6 +60,23 @@ namespace MultiplayerARPG
             base.EntityAwake();
             gameObject.tag = gameInstance.playerTag;
         }
+
+#if UNITY_EDITOR
+        public override void OnBehaviourValidate()
+        {
+            base.OnBehaviourValidate();
+            if (database == null)
+            {
+                Debug.LogError("[BasePlayerCharacterEntity] " + name + "Database is empty");
+            }
+            if (database != null && !(database is PlayerCharacter))
+            {
+                Debug.LogError("[BasePlayerCharacterEntity] " + name + "Database must be `PlayerCharacter`");
+                database = null;
+                EditorUtility.SetDirty(gameObject);
+            }
+        }
+#endif
 
         protected override void ApplySkill(CharacterSkill characterSkill, Vector3 position, SkillAttackType skillAttackType, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
