@@ -110,6 +110,8 @@ namespace MultiplayerARPG
                 return false;
             if (isInSafeArea || characterEntity.isInSafeArea)
                 return false;
+            if (characterEntity is MonsterCharacterEntity)
+                return true;
             // If not ally while this is Pvp map, assume that it can receive damage
             if (!IsAlly(characterEntity) && GameManager.CurrentMapInfo.canPvp)
                 return true;
