@@ -428,7 +428,7 @@ namespace MultiplayerARPG
             onGameDataLoaded = callback;
         }
 
-        private void OnGameDataLoaded()
+        public void OnGameDataLoaded()
         {
             StartCoroutine(LoadHomeSceneOnLoadedGameDataRoutine());
         }
