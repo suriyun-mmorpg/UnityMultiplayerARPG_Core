@@ -7,6 +7,8 @@ namespace MultiplayerARPG
 {
     public partial class UIChatHandler : UIBase
     {
+        public static readonly List<ChatMessage> ChatMessages = new List<ChatMessage>();
+
         public string whisperCommand = "/w";
         public string partyCommand = "/p";
         public string guildCommand = "/g";
@@ -18,8 +20,7 @@ namespace MultiplayerARPG
         public UIChatMessage uiChatMessagePrefab;
         public Transform uiChatMessageContainer;
         public ScrollRect scrollRect;
-
-        private readonly List<ChatMessage> chatMessages = new List<ChatMessage>();
+        
         private bool enterChatFieldVisible;
 
         public string EnterChatMessage
@@ -56,6 +57,15 @@ namespace MultiplayerARPG
 
         private void Start()
         {
+            CacheList.Generate(ChatMessages, (index, message, ui) =>
+            {
+                var uiChatMessage = ui.GetComponent<UIChatMessage>();
+                uiChatMessage.uiChatHandler = this;
+                uiChatMessage.Data = message;
+                uiChatMessage.Show();
+            });
+            StartCoroutine(VerticalScroll(0f));
+
             MigrateUIComponents();
             HideEnterChatField();
             if (uiEnterChatField != null)
@@ -165,10 +175,10 @@ namespace MultiplayerARPG
 
         private void OnReceiveChat(ChatMessage chatMessage)
         {
-            chatMessages.Add(chatMessage);
-            if (chatMessages.Count > chatEntrySize)
-                chatMessages.RemoveAt(0);
-            CacheList.Generate(chatMessages, (index, message, ui) =>
+            ChatMessages.Add(chatMessage);
+            if (ChatMessages.Count > chatEntrySize)
+                ChatMessages.RemoveAt(0);
+            CacheList.Generate(ChatMessages, (index, message, ui) =>
             {
                 var uiChatMessage = ui.GetComponent<UIChatMessage>();
                 uiChatMessage.uiChatHandler = this;
