@@ -40,6 +40,7 @@ namespace MultiplayerARPG
         public MapInfo CurrentMapInfo { get; protected set; }
         // Events
         public System.Action<ChatMessage> onClientReceiveChat;
+        public System.Action<GameMessage> onClientReceiveGameMessage;
         public System.Action<PartyData> onClientUpdateParty;
         public System.Action<GuildData> onClientUpdateGuild;
         protected float lastUpdateOnlineCharacterTime;
@@ -192,7 +193,9 @@ namespace MultiplayerARPG
 
         protected virtual void HandleGameMessageAtClient(LiteNetLibMessageHandler messageHandler)
         {
-            // TODO: Show warning message
+            var message = messageHandler.ReadMessage<GameMessage>();
+            if (onClientReceiveGameMessage != null)
+                onClientReceiveGameMessage.Invoke(message);
         }
 
         protected virtual void HandleWarpAtClient(LiteNetLibMessageHandler messageHandler)
