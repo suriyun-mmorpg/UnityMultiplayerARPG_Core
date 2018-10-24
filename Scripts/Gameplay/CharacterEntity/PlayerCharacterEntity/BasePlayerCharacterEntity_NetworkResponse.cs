@@ -417,10 +417,10 @@ namespace MultiplayerARPG
                 return;
             }
             var refineLevel = equipmentItem.itemRefineInfo.levels[nonEquipItem.level - 1];
-            GameMessage.Type warningMessageType;
-            if (!refineLevel.CanRefine(this, out warningMessageType))
+            GameMessage.Type gameMessageType;
+            if (!refineLevel.CanRefine(this, out gameMessageType))
             {
-                GameManager.SendServerGameMessage(ConnectionId, warningMessageType);
+                GameManager.SendServerGameMessage(ConnectionId, gameMessageType);
             }
             else
             {

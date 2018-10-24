@@ -86,9 +86,9 @@ namespace MultiplayerARPG
             switch (skill.skillType)
             {
                 case SkillType.CraftItem:
-                    GameMessage.Type warningMessageType;
-                    if (!skill.itemCraft.CanCraft(this, out warningMessageType))
-                        GameManager.SendServerGameMessage(ConnectionId, warningMessageType);
+                    GameMessage.Type gameMessageType;
+                    if (!skill.itemCraft.CanCraft(this, out gameMessageType))
+                        GameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     else
                         skill.itemCraft.CraftItem(this);
                     break;
