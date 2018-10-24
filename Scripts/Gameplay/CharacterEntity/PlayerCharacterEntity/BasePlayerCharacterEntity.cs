@@ -33,7 +33,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (Time.unscaledTime - setCoCharacterTime >= gameInstance.coCharacterActionDuration)
+                if (DealingState == DealingState.None && Time.unscaledTime - setCoCharacterTime >= gameInstance.coCharacterActionDuration)
                     coCharacter = null;
                 return coCharacter;
             }
@@ -67,11 +67,11 @@ namespace MultiplayerARPG
             base.OnBehaviourValidate();
             if (database == null)
             {
-                Debug.LogError("[BasePlayerCharacterEntity] " + name + "Database is empty");
+                Debug.LogError("[BasePlayerCharacterEntity] " + name + " Database is empty");
             }
             if (database != null && !(database is PlayerCharacter))
             {
-                Debug.LogError("[BasePlayerCharacterEntity] " + name + "Database must be `PlayerCharacter`");
+                Debug.LogError("[BasePlayerCharacterEntity] " + name + " Database must be `PlayerCharacter`");
                 database = null;
                 EditorUtility.SetDirty(gameObject);
             }

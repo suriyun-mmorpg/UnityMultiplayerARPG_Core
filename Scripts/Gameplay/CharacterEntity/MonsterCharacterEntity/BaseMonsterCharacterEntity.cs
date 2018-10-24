@@ -59,11 +59,11 @@ namespace MultiplayerARPG
             base.OnBehaviourValidate();
             if (database == null)
             {
-                Debug.LogError("[BaseMonsterCharacterEntity] " + name + "Database is empty");
+                Debug.LogError("[BaseMonsterCharacterEntity] " + name + " Database is empty");
             }
             if (database != null && !(database is MonsterCharacter))
             {
-                Debug.LogError("[BaseMonsterCharacterEntity] " + name + "Database must be `MonsterCharacter`");
+                Debug.LogError("[BaseMonsterCharacterEntity] " + name + " Database must be `MonsterCharacter`");
                 database = null;
                 EditorUtility.SetDirty(gameObject);
             }
