@@ -24,21 +24,21 @@ namespace MultiplayerARPG
 
         public bool CanCraft(IPlayerCharacterData character)
         {
-            GameMessage.Type warningMessageType;
-            return CanCraft(character, out warningMessageType);
+            GameMessage.Type gameMessageType;
+            return CanCraft(character, out gameMessageType);
         }
 
-        public bool CanCraft(IPlayerCharacterData character, out GameMessage.Type warningMessageType)
+        public bool CanCraft(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
         {
-            warningMessageType = GameMessage.Type.None;
+            gameMessageType = GameMessage.Type.None;
             if (craftingItem == null)
             {
-                warningMessageType = GameMessage.Type.InvalidItemData;
+                gameMessageType = GameMessage.Type.InvalidItemData;
                 return false;
             }
             if (character.Gold < requireGold)
             {
-                warningMessageType = GameMessage.Type.NotEnoughGold;
+                gameMessageType = GameMessage.Type.NotEnoughGold;
                 return false;
             }
             if (craftRequirements == null || craftRequirements.Length == 0)
@@ -47,7 +47,7 @@ namespace MultiplayerARPG
             {
                 if (craftRequirement.item != null && character.CountNonEquipItems(craftRequirement.item.DataId) < craftRequirement.amount)
                 {
-                    warningMessageType = GameMessage.Type.NotEnoughItems;
+                    gameMessageType = GameMessage.Type.NotEnoughItems;
                     return false;
                 }
             }

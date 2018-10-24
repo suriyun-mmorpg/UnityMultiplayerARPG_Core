@@ -44,16 +44,16 @@ namespace MultiplayerARPG
 
         public bool CanRefine(IPlayerCharacterData character)
         {
-            GameMessage.Type warningMessageType;
-            return CanRefine(character, out warningMessageType);
+            GameMessage.Type gameMessageType;
+            return CanRefine(character, out gameMessageType);
         }
 
-        public bool CanRefine(IPlayerCharacterData character, out GameMessage.Type warningMessageType)
+        public bool CanRefine(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
         {
-            warningMessageType = GameMessage.Type.None;
+            gameMessageType = GameMessage.Type.None;
             if (character.Gold < requireGold)
             {
-                warningMessageType = GameMessage.Type.NotEnoughGold;
+                gameMessageType = GameMessage.Type.NotEnoughGold;
                 return false;
             }
             if (requireItems == null || requireItems.Length == 0)
@@ -62,7 +62,7 @@ namespace MultiplayerARPG
             {
                 if (requireItem.item != null && character.CountNonEquipItems(requireItem.item.DataId) < requireItem.amount)
                 {
-                    warningMessageType = GameMessage.Type.NotEnoughItems;
+                    gameMessageType = GameMessage.Type.NotEnoughItems;
                     return false;
                 }
             }

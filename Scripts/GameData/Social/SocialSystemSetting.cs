@@ -81,16 +81,16 @@ namespace MultiplayerARPG
 
         public bool CanCreateGuild(IPlayerCharacterData character)
         {
-            GameMessage.Type warningMessageType;
-            return CanCreateGuild(character, out warningMessageType);
+            GameMessage.Type gameMessageType;
+            return CanCreateGuild(character, out gameMessageType);
         }
 
-        public bool CanCreateGuild(IPlayerCharacterData character, out GameMessage.Type warningMessageType)
+        public bool CanCreateGuild(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
         {
-            warningMessageType = GameMessage.Type.None;
+            gameMessageType = GameMessage.Type.None;
             if (character.Gold < createGuildRequiredGold)
             {
-                warningMessageType = GameMessage.Type.NotEnoughGold;
+                gameMessageType = GameMessage.Type.NotEnoughGold;
                 return false;
             }
             if (createGuildRequireItems == null || createGuildRequireItems.Length == 0)
@@ -99,7 +99,7 @@ namespace MultiplayerARPG
             {
                 if (requireItem.item != null && character.CountNonEquipItems(requireItem.item.DataId) < requireItem.amount)
                 {
-                    warningMessageType = GameMessage.Type.NotEnoughItems;
+                    gameMessageType = GameMessage.Type.NotEnoughItems;
                     return false;
                 }
             }
