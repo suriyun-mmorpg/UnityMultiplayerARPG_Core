@@ -231,7 +231,7 @@ namespace MultiplayerARPG
 
             if (!itemDropEntity.IsAbleToLoot(this))
             {
-                // TODO: Send not able to loot messages
+                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotAbleToLoot);
                 return;
             }
 

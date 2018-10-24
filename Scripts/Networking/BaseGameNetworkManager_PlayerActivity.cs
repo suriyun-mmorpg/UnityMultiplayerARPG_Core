@@ -20,7 +20,7 @@ namespace MultiplayerARPG
                 return false;
             if (playerCharacterEntity.PartyId > 0)
             {
-                // TODO: May send warn message that player already in party
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.JoinedAnotherParty);
                 return false;
             }
             return true;
@@ -35,17 +35,17 @@ namespace MultiplayerARPG
             partyId = playerCharacterEntity.PartyId;
             if (partyId <= 0 || !parties.TryGetValue(partyId, out party))
             {
-                // TODO: May send warn message that player not in party
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedParty);
                 return false;
             }
             if (!party.IsLeader(playerCharacterEntity))
             {
-                // TODO: May warn that it's not party leader
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotPartyLeader);
                 return false;
             }
             if (!party.ContainsMemberId(characterId))
             {
-                // TODO: May warn that target character is not in party
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CharacterNotJoinedParty);
                 return false;
             }
             return true;
@@ -60,12 +60,12 @@ namespace MultiplayerARPG
             partyId = playerCharacterEntity.PartyId;
             if (partyId <= 0 || !parties.TryGetValue(partyId, out party))
             {
-                // TODO: May send warn message that player not in party
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedParty);
                 return false;
             }
             if (!party.IsLeader(playerCharacterEntity))
             {
-                // TODO: May warn that it's not party leader
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotPartyLeader);
                 return false;
             }
             return true;
@@ -78,27 +78,27 @@ namespace MultiplayerARPG
             PartyData party;
             if (partyId <= 0 || !parties.TryGetValue(partyId, out party))
             {
-                // TODO: May send warn message that player not in party
+                SendServerGameMessage(inviteCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedParty);
                 return false;
             }
             if (!party.CanInvite(inviteCharacterEntity.Id))
             {
-                // TODO: May send warn message that player can not invite
+                SendServerGameMessage(inviteCharacterEntity.ConnectionId, GameMessage.Type.CannotSendPartyInvitation);
                 return false;
             }
             if (!inviteCharacterEntity.TryGetEntityByObjectId(objectId, out targetCharacterEntity))
             {
-                // TODO: May send warn message that character is not found
+                SendServerGameMessage(inviteCharacterEntity.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 return false;
             }
             if (targetCharacterEntity.CoCharacter != null)
             {
-                // TODO: May send warn message that character is not available
+                SendServerGameMessage(inviteCharacterEntity.ConnectionId, GameMessage.Type.CharacterIsInAnotherDeal);
                 return false;
             }
             if (targetCharacterEntity.PartyId > 0)
             {
-                // TODO: May send warn message that player already in party
+                SendServerGameMessage(inviteCharacterEntity.ConnectionId, GameMessage.Type.CharacterJoinedAnotherParty);
                 return false;
             }
             return true;
@@ -112,23 +112,18 @@ namespace MultiplayerARPG
                 return false;
             if (acceptCharacterEntity.PartyId > 0)
             {
-                // TODO: May send warn message that player already in party
+                SendServerGameMessage(acceptCharacterEntity.ConnectionId, GameMessage.Type.JoinedAnotherParty);
                 return false;
             }
             partyId = inviteCharacterEntity.PartyId;
             if (partyId <= 0 || !parties.TryGetValue(partyId, out party))
             {
-                // TODO: May send warn message that player not in party
-                return false;
-            }
-            if (!party.IsLeader(inviteCharacterEntity))
-            {
-                // TODO: May warn that it's not party leader
+                SendServerGameMessage(acceptCharacterEntity.ConnectionId, GameMessage.Type.CharacterNotJoinedParty);
                 return false;
             }
             if (party.CountMember() == gameInstance.SocialSystemSetting.MaxPartyMember)
             {
-                // TODO: May warn that it's exceeds limit max party member
+                SendServerGameMessage(acceptCharacterEntity.ConnectionId, GameMessage.Type.PartyMemberReachedLimit);
                 return false;
             }
             return true;
@@ -143,27 +138,27 @@ namespace MultiplayerARPG
             partyId = playerCharacterEntity.PartyId;
             if (partyId <= 0 || !parties.TryGetValue(partyId, out party))
             {
-                // TODO: May send warn message that player is not in party
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedParty);
+                return false;
+            }
+            if (party.IsLeader(characterId))
+            {
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotKickPartyLeader);
                 return false;
             }
             if (!party.CanKick(playerCharacterEntity.Id))
             {
-                // TODO: May send warn message that player can not kick
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotKickPartyMember);
                 return false;
             }
             if (playerCharacterEntity.Id.Equals(characterId))
             {
-                // TODO: May warn that it's owning character so it's not able to kick
-                return false;
-            }
-            if (!party.IsLeader(playerCharacterEntity))
-            {
-                // TODO: May warn that it's not party leader
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotKickYourSelfFromParty);
                 return false;
             }
             if (!party.ContainsMemberId(characterId))
             {
-                // TODO: May warn that target character is not in party
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CharacterNotJoinedParty);
                 return false;
             }
             return true;
@@ -178,7 +173,7 @@ namespace MultiplayerARPG
             partyId = playerCharacterEntity.PartyId;
             if (partyId <= 0 || !parties.TryGetValue(partyId, out party))
             {
-                // TODO: May send warn message that player is not in party
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedParty);
                 return false;
             }
             return true;
@@ -190,12 +185,13 @@ namespace MultiplayerARPG
                 return false;
             if (playerCharacterEntity.GuildId > 0)
             {
-                // TODO: May send warn message that player already in guild
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.JoinedAnotherGuild);
                 return false;
             }
-            if (!gameInstance.SocialSystemSetting.CanCreateGuild(playerCharacterEntity))
+            GameMessage.Type warningMessageType;
+            if (!gameInstance.SocialSystemSetting.CanCreateGuild(playerCharacterEntity, out warningMessageType))
             {
-                // TODO: May send warn message that player have not enough gold or items
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, warningMessageType);
                 return false;
             }
             return true;
@@ -210,17 +206,17 @@ namespace MultiplayerARPG
             guildId = playerCharacterEntity.GuildId;
             if (guildId <= 0 || !guilds.TryGetValue(guildId, out guild))
             {
-                // TODO: May send warn message that player not in guild
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
                 return false;
             }
             if (!guild.IsLeader(playerCharacterEntity))
             {
-                // TODO: May warn that it's not guild leader
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotGuildLeader);
                 return false;
             }
             if (!guild.ContainsMemberId(characterId))
             {
-                // TODO: May warn that target character is not in guild
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CharacterNotJoinedGuild);
                 return false;
             }
             return true;
@@ -235,12 +231,12 @@ namespace MultiplayerARPG
             guildId = playerCharacterEntity.GuildId;
             if (guildId <= 0 || !guilds.TryGetValue(guildId, out guild))
             {
-                // TODO: May send warn message that player not in guild
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
                 return false;
             }
             if (!guild.IsLeader(playerCharacterEntity))
             {
-                // TODO: May warn that it's not guild leader
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotGuildLeader);
                 return false;
             }
             return true;
@@ -255,17 +251,17 @@ namespace MultiplayerARPG
             guildId = playerCharacterEntity.GuildId;
             if (guildId <= 0 || !guilds.TryGetValue(guildId, out guild))
             {
-                // TODO: May send warn message that player not in guild
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
                 return false;
             }
             if (!guild.IsLeader(playerCharacterEntity))
             {
-                // TODO: May warn that it's not guild leader
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotGuildLeader);
                 return false;
             }
             if (!guild.IsRoleAvailable(guildRole))
             {
-                // TODO: May warn that guild role is not available
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.GuildRoleNotAvailable);
                 return false;
             }
             return true;
@@ -280,12 +276,12 @@ namespace MultiplayerARPG
             guildId = playerCharacterEntity.GuildId;
             if (guildId <= 0 || !guilds.TryGetValue(guildId, out guild))
             {
-                // TODO: May send warn message that player not in guild
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
                 return false;
             }
             if (!guild.IsLeader(playerCharacterEntity))
             {
-                // TODO: May warn that it's not guild leader
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.GuildRoleNotAvailable);
                 return false;
             }
             return true;
@@ -298,27 +294,27 @@ namespace MultiplayerARPG
             GuildData guild;
             if (guildId <= 0 || !guilds.TryGetValue(guildId, out guild))
             {
-                // TODO: May send warn message that player not in guild
+                SendServerGameMessage(inviteCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
                 return false;
             }
             if (!guild.CanInvite(inviteCharacterEntity.Id))
             {
-                // TODO: May send warn message that player can not invite
+                SendServerGameMessage(inviteCharacterEntity.ConnectionId, GameMessage.Type.CannotSendGuildInvitation);
                 return false;
             }
             if (!inviteCharacterEntity.TryGetEntityByObjectId(objectId, out targetCharacterEntity))
             {
-                // TODO: May send warn message that character is not found
+                SendServerGameMessage(inviteCharacterEntity.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 return false;
             }
             if (targetCharacterEntity.CoCharacter != null)
             {
-                // TODO: May send warn message that character is not available
+                SendServerGameMessage(inviteCharacterEntity.ConnectionId, GameMessage.Type.CharacterIsInAnotherDeal);
                 return false;
             }
             if (targetCharacterEntity.GuildId > 0)
             {
-                // TODO: May send warn message that player already in guild
+                SendServerGameMessage(inviteCharacterEntity.ConnectionId, GameMessage.Type.CharacterJoinedAnotherGuild);
                 return false;
             }
             return true;
@@ -332,23 +328,18 @@ namespace MultiplayerARPG
                 return false;
             if (acceptCharacterEntity.GuildId > 0)
             {
-                // TODO: May send warn message that player already in guild
+                SendServerGameMessage(acceptCharacterEntity.ConnectionId, GameMessage.Type.JoinedAnotherGuild);
                 return false;
             }
             guildId = inviteCharacterEntity.GuildId;
             if (guildId <= 0 || !guilds.TryGetValue(guildId, out guild))
             {
-                // TODO: May send warn message that player not in guild
-                return false;
-            }
-            if (!guild.IsLeader(inviteCharacterEntity))
-            {
-                // TODO: May warn that it's not guild leader
+                SendServerGameMessage(acceptCharacterEntity.ConnectionId, GameMessage.Type.CharacterNotJoinedGuild);
                 return false;
             }
             if (guild.CountMember() == gameInstance.SocialSystemSetting.MaxGuildMember)
             {
-                // TODO: May warn that it's exceeds limit max guild member
+                SendServerGameMessage(acceptCharacterEntity.ConnectionId, GameMessage.Type.GuildMemberReachedLimit);
                 return false;
             }
             return true;
@@ -363,33 +354,33 @@ namespace MultiplayerARPG
             guildId = playerCharacterEntity.GuildId;
             if (guildId <= 0 || !guilds.TryGetValue(guildId, out guild))
             {
-                // TODO: May send warn message that player not in guild
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
+                return false;
+            }
+            if (guild.IsLeader(characterId))
+            {
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotKickGuildLeader);
                 return false;
             }
             if (!guild.CanKick(playerCharacterEntity.Id))
             {
-                // TODO: May send warn message that player can not kick
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotKickGuildMember);
                 return false;
             }
             if (playerCharacterEntity.Id.Equals(characterId))
             {
-                // TODO: May warn that it's owning character so it's not able to kick
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotKickYourSelfFromGuild);
                 return false;
             }
             byte role;
             if (!guild.TryGetMemberRole(characterId, out role) && playerCharacterEntity.GuildRole < role)
             {
-                // TODO: May warn that character rank is lower
-                return false;
-            }
-            if (!guild.IsLeader(playerCharacterEntity))
-            {
-                // TODO: May warn that it's not guild leader
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotKickHigherGuildMember);
                 return false;
             }
             if (!guild.ContainsMemberId(characterId))
             {
-                // TODO: May warn that target character is not in guild
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CharacterNotJoinedGuild);
                 return false;
             }
             return true;
@@ -404,7 +395,7 @@ namespace MultiplayerARPG
             guildId = playerCharacterEntity.GuildId;
             if (guildId <= 0 || !guilds.TryGetValue(guildId, out guild))
             {
-                // TODO: May send warn message that player not in guild
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
                 return false;
             }
             return true;

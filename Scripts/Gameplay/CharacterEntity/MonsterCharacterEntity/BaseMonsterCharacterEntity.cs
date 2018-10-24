@@ -83,7 +83,6 @@ namespace MultiplayerARPG
                 CurrentStamina = (int)stats.stamina;
                 CurrentFood = (int)stats.food;
                 CurrentWater = (int)stats.water;
-                animActionType = AnimActionType.None;
             }
         }
 

@@ -251,13 +251,13 @@ namespace MultiplayerARPG
             var sellItem = sellItems[itemIndex];
             if (Gold < sellItem.sellPrice * amount)
             {
-                // TODO: May send not enough gold message
+                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotEnoughGold);
                 return;
             }
             var dataId = sellItem.item.DataId;
             if (IncreasingItemsWillOverwhelming(dataId, amount))
             {
-                // TODO: May send overwhelming message
+                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
                 return;
             }
             Gold -= sellItem.sellPrice * amount;
@@ -413,18 +413,21 @@ namespace MultiplayerARPG
                 return;
             if (nonEquipItem.level >= equipmentItem.MaxLevel)
             {
-                // TODO: May warn that item already reached max level
+                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.RefineItemReachedMaxLevel);
                 return;
             }
             var refineLevel = equipmentItem.itemRefineInfo.levels[nonEquipItem.level - 1];
-            if (!refineLevel.CanRefine(this))
+            GameMessage.Type warningMessageType;
+            if (!refineLevel.CanRefine(this, out warningMessageType))
             {
-                // TODO: may warn that cannot refine
+                GameManager.SendServerGameMessage(ConnectionId, warningMessageType);
             }
             else
             {
-                // TODO: may send refine success/fail message
-                refineLevel.RefineItem(this, index);
+                if (refineLevel.RefineItem(this, index))
+                    GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.RefineSuccess);
+                else
+                    GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.RefineFail);
             }
         }
 
@@ -434,17 +437,17 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity targetCharacterEntity = null;
             if (!TryGetEntityByObjectId(objectId, out targetCharacterEntity))
             {
-                // TODO: May send warn message that character is not found
+                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotFoundCharacter);
                 return;
             }
             if (targetCharacterEntity.CoCharacter != null)
             {
-                // TODO: May send warn message that character is not available
+                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsInAnotherDeal);
                 return;
             }
             if (Vector3.Distance(CacheTransform.position, targetCharacterEntity.CacheTransform.position) > gameInstance.conversationDistance)
             {
-                // TODO: May send warn message that character is far from other character
+                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 return;
             }
             CoCharacter = targetCharacterEntity;
@@ -466,13 +469,13 @@ namespace MultiplayerARPG
         {
             if (CoCharacter == null)
             {
-                // TODO: May send warn message that can not accept dealing request
+                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotAcceptDealingRequest);
                 StopDealing();
                 return;
             }
             if (Vector3.Distance(CacheTransform.position, CoCharacter.CacheTransform.position) > gameInstance.conversationDistance)
             {
-                // TODO: May send warn message that character is far from other character
+                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 StopDealing();
                 return;
             }
@@ -488,7 +491,9 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncDeclineDealingRequest()
         {
-            // TODO: May send decline message
+            if (CoCharacter != null)
+                GameManager.SendServerGameMessage(CoCharacter.ConnectionId, GameMessage.Type.DealingRequestDeclined);
+            GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.DealingRequestDeclined);
             StopDealing();
         }
 
@@ -505,7 +510,7 @@ namespace MultiplayerARPG
         {
             if (DealingState != DealingState.Dealing)
             {
-                // TODO: May send warn message to start dealing before confirm
+                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.InvalidDealingState);
                 return;
             }
 
@@ -537,7 +542,7 @@ namespace MultiplayerARPG
         {
             if (DealingState != DealingState.Dealing)
             {
-                // TODO: May send warn message to start dealing before doing this
+                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.InvalidDealingState);
                 return;
             }
             if (gold > Gold)
@@ -551,7 +556,7 @@ namespace MultiplayerARPG
         {
             if (DealingState != DealingState.Dealing)
             {
-                // TODO: May send warn message to start dealing before doing this
+                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.InvalidDealingState);
                 return;
             }
             DealingState = DealingState.LockDealing;
@@ -561,7 +566,7 @@ namespace MultiplayerARPG
         {
             if (DealingState != DealingState.LockDealing || !(CoCharacter.DealingState == DealingState.LockDealing || CoCharacter.DealingState == DealingState.ConfirmDealing))
             {
-                // TODO: May send warn message to lock before confirm
+                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.InvalidDealingState);
                 return;
             }
             DealingState = DealingState.ConfirmDealing;
@@ -575,7 +580,9 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncCancelDealing()
         {
-            // TODO: May send cancel message
+            if (CoCharacter != null)
+                GameManager.SendServerGameMessage(CoCharacter.ConnectionId, GameMessage.Type.DealingCanceled);
+            GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.DealingCanceled);
             StopDealing();
         }
 
@@ -660,8 +667,10 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncDeclinePartyInvitation()
         {
+            if (CoCharacter != null)
+                GameManager.SendServerGameMessage(CoCharacter.ConnectionId, GameMessage.Type.PartyInvitationDeclined);
+            GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.PartyInvitationDeclined);
             StopPartyInvitation();
-            // TODO: May send decline message
         }
 
         protected virtual void NetFuncKickFromParty(string characterId)
@@ -729,8 +738,10 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncDeclineGuildInvitation()
         {
+            if (CoCharacter != null)
+                GameManager.SendServerGameMessage(CoCharacter.ConnectionId, GameMessage.Type.GuildInvitationDeclined);
+            GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.GuildInvitationDeclined);
             StopGuildInvitation();
-            // TODO: May send decline message
         }
 
         protected virtual void NetFuncKickFromGuild(string characterId)

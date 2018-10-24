@@ -151,6 +151,8 @@ namespace MultiplayerARPG
             base.EntityUpdate();
             Profiler.BeginSample("BaseCharacterEntity - Update");
             MakeCaches();
+            if (IsDead())
+                animActionType = AnimActionType.None;
             Profiler.EndSample();
         }
 

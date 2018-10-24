@@ -11,6 +11,7 @@ namespace MultiplayerARPG
     {
         public class MsgTypes
         {
+            public const ushort GameMessage = 99;
             public const ushort Warp = 100;
             public const ushort Chat = 101;
             public const ushort CashShopInfo = 102;
@@ -131,6 +132,7 @@ namespace MultiplayerARPG
         {
             base.RegisterClientMessages();
             this.InvokeInstanceDevExtMethods("RegisterClientMessages");
+            RegisterClientMessage(MsgTypes.GameMessage, HandleGameMessageAtClient);
             RegisterClientMessage(MsgTypes.Warp, HandleWarpAtClient);
             RegisterClientMessage(MsgTypes.Chat, HandleChatAtClient);
             RegisterClientMessage(MsgTypes.CashShopInfo, HandleResponseCashShopInfo);
@@ -152,6 +154,13 @@ namespace MultiplayerARPG
             RegisterServerMessage(MsgTypes.CashShopBuy, HandleRequestCashShopBuy);
             RegisterServerMessage(MsgTypes.CashPackageInfo, HandleRequestCashPackageInfo);
             RegisterServerMessage(MsgTypes.CashPackageBuyValidation, HandleRequestCashPackageBuyValidation);
+        }
+
+        public void SendServerGameMessage(long connectionId, GameMessage.Type type)
+        {
+            var message = new GameMessage();
+            message.type = type;
+            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.GameMessage, message);
         }
 
         public uint RequestCashShopInfo(AckMessageCallback callback)
@@ -179,6 +188,11 @@ namespace MultiplayerARPG
             message.dataId = dataId;
             message.platform = Application.platform;
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MsgTypes.CashPackageBuyValidation, message, callback);
+        }
+
+        protected virtual void HandleGameMessageAtClient(LiteNetLibMessageHandler messageHandler)
+        {
+            // TODO: Show warning message
         }
 
         protected virtual void HandleWarpAtClient(LiteNetLibMessageHandler messageHandler)

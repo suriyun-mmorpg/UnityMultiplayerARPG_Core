@@ -44,14 +44,27 @@ namespace MultiplayerARPG
 
         public bool CanRefine(IPlayerCharacterData character)
         {
+            GameMessage.Type warningMessageType;
+            return CanRefine(character, out warningMessageType);
+        }
+
+        public bool CanRefine(IPlayerCharacterData character, out GameMessage.Type warningMessageType)
+        {
+            warningMessageType = GameMessage.Type.None;
             if (character.Gold < requireGold)
+            {
+                warningMessageType = GameMessage.Type.NotEnoughGold;
                 return false;
+            }
             if (requireItems == null || requireItems.Length == 0)
                 return true;
             foreach (var requireItem in requireItems)
             {
                 if (requireItem.item != null && character.CountNonEquipItems(requireItem.item.DataId) < requireItem.amount)
+                {
+                    warningMessageType = GameMessage.Type.NotEnoughItems;
                     return false;
+                }
             }
             return true;
         }
