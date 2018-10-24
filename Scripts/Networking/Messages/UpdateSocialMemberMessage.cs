@@ -22,12 +22,12 @@ namespace MultiplayerARPG
         {
             type = (UpdateType)reader.GetByte();
             id = reader.GetInt();
+            data.id = reader.GetString();
             switch (type)
             {
                 case UpdateType.Add:
                 case UpdateType.Update:
                     isOnline = reader.GetBool();
-                    data.id = reader.GetString();
                     data.characterName = reader.GetString();
                     data.dataId = reader.GetInt();
                     data.level = reader.GetInt();
@@ -47,12 +47,12 @@ namespace MultiplayerARPG
         {
             writer.Put((byte)type);
             writer.Put(id);
+            writer.Put(data.id);
             switch (type)
             {
                 case UpdateType.Add:
                 case UpdateType.Update:
                     writer.Put(isOnline);
-                    writer.Put(data.id);
                     writer.Put(data.characterName);
                     writer.Put(data.dataId);
                     writer.Put(data.level);
