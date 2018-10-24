@@ -188,10 +188,10 @@ namespace MultiplayerARPG
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.JoinedAnotherGuild);
                 return false;
             }
-            GameMessage.Type warningMessageType;
-            if (!gameInstance.SocialSystemSetting.CanCreateGuild(playerCharacterEntity, out warningMessageType))
+            GameMessage.Type gameMessageType;
+            if (!gameInstance.SocialSystemSetting.CanCreateGuild(playerCharacterEntity, out gameMessageType))
             {
-                SendServerGameMessage(playerCharacterEntity.ConnectionId, warningMessageType);
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, gameMessageType);
                 return false;
             }
             return true;
