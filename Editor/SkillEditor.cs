@@ -38,7 +38,11 @@ namespace MultiplayerARPG
             // Debuff
             ShowOnBool(cacheSkill.GetMemberName(a => a.isDebuff), true, cacheSkill.GetMemberName(a => a.debuff));
             // Buff
+            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillBuffType), SkillBuffType.BuffToNearbyAllies.ToString(), cacheSkill.GetMemberName(a => a.buffDistance));
+            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillBuffType), SkillBuffType.BuffToNearbyCharacters.ToString(), cacheSkill.GetMemberName(a => a.buffDistance));
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillBuffType), SkillBuffType.BuffToUser.ToString(), cacheSkill.GetMemberName(a => a.buff));
+            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillBuffType), SkillBuffType.BuffToNearbyAllies.ToString(), cacheSkill.GetMemberName(a => a.buff));
+            ShowOnEnum(cacheSkill.GetMemberName(a => a.skillBuffType), SkillBuffType.BuffToNearbyCharacters.ToString(), cacheSkill.GetMemberName(a => a.buff));
             ShowOnEnum(cacheSkill.GetMemberName(a => a.skillType), SkillType.Passive.ToString(), cacheSkill.GetMemberName(a => a.buff));
         }
     }
