@@ -9,7 +9,6 @@ namespace MultiplayerARPG
 {
     public partial class LanRpgNetworkManager : BaseGameNetworkManager
     {
-        public static LanRpgNetworkManager Singleton { get; protected set; }
         public enum GameStartType
         {
             Client,
@@ -23,13 +22,6 @@ namespace MultiplayerARPG
         private float lastSaveTime;
         private int nextPartyId = 1;
         private int nextGuildId = 1;
-
-        protected override void Awake()
-        {
-            Singleton = this;
-            doNotDestroyOnSceneChanges = true;
-            base.Awake();
-        }
 
         public void StartGame()
         {
