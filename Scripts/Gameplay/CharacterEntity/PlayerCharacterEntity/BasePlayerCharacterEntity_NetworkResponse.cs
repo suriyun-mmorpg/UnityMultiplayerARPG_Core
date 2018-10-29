@@ -351,13 +351,9 @@ namespace MultiplayerARPG
             var buildingSaveData = new BuildingSaveData();
             buildingSaveData.Id = GenericUtils.GetUniqueId();
             buildingSaveData.ParentId = string.Empty;
-            LiteNetLibIdentity entity;
-            if (Manager.Assets.TryGetSpawnedObject(parentObjectId, out entity))
-            {
-                var parentBuildingEntity = entity.GetComponent<BuildingEntity>();
-                if (parentBuildingEntity != null)
-                    buildingSaveData.ParentId = parentBuildingEntity.Id;
-            }
+            BuildingEntity parentBuildingEntity;
+            if (TryGetEntityByObjectId(parentObjectId, out parentBuildingEntity))
+                buildingSaveData.ParentId = parentBuildingEntity.Id;
             buildingSaveData.DataId = buildingEntity.DataId;
             buildingSaveData.CurrentHp = buildingEntity.maxHp;
             buildingSaveData.Position = position;
