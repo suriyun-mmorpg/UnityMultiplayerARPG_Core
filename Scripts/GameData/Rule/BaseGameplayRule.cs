@@ -20,6 +20,7 @@ namespace MultiplayerARPG
         public abstract float GetDecreasingStaminaPerSeconds(BaseCharacterEntity character);
         public abstract float GetDecreasingFoodPerSeconds(BaseCharacterEntity character);
         public abstract float GetDecreasingWaterPerSeconds(BaseCharacterEntity character);
+        public abstract float GetExpLostPercentageWhenDeath(BaseCharacterEntity character);
         public abstract float GetMoveSpeed(BaseCharacterEntity character);
         public abstract bool IsHungry(BaseCharacterEntity character);
         public abstract bool IsThirsty(BaseCharacterEntity character);

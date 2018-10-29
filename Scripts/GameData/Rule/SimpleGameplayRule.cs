@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         [Header("Levelling/Stat/Skill")]
         public short increaseStatPointEachLevel = 5;
         public short increaseSkillPointEachLevel = 1;
+        public float expLostPercentageWhenDeath = 2f;
         [Header("Stamina/Sprint")]
         public float staminaRecoveryPerSeconds = 5;
         public float staminaDecreasePerSeconds = 5;
@@ -188,6 +189,13 @@ namespace MultiplayerARPG
             if (character is BaseMonsterCharacterEntity)
                 return 0f;
             return waterDecreasePerSeconds;
+        }
+
+        public override float GetExpLostPercentageWhenDeath(BaseCharacterEntity character)
+        {
+            if (character is BaseMonsterCharacterEntity)
+                return 0f;
+            return expLostPercentageWhenDeath;
         }
 
         public override float GetMoveSpeed(BaseCharacterEntity character)
