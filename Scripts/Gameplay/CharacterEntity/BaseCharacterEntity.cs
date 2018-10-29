@@ -436,7 +436,7 @@ namespace MultiplayerARPG
                 buffs.RemoveAt(buffIndex);
 
             var newBuff = CharacterBuff.Create(characterId, type, dataId, level);
-            newBuff.Added();
+            newBuff.Apply();
             buffs.Add(newBuff);
 
             var duration = newBuff.GetDuration();
@@ -857,13 +857,7 @@ namespace MultiplayerARPG
         {
             StopAllCoroutines();
             buffs.Clear();
-            var count = skills.Count;
-            for (var i = 0; i < count; ++i)
-            {
-                var skill = skills[i];
-                skill.coolDownRemainsDuration = 0;
-                skills.Dirty(i);
-            }
+            skillUsages.Clear();
             // Send OnDead to owner player only
             RequestOnDead();
         }

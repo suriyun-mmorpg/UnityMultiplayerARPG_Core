@@ -22,6 +22,7 @@ public partial class CharacterData : ICharacterData
 
     private ObservableCollection<CharacterAttribute> attributes;
     private ObservableCollection<CharacterSkill> skills;
+    private List<CharacterSkillUsage> skillUsages;
     private ObservableCollection<CharacterBuff> buffs;
     private ObservableCollection<CharacterItem> equipItems;
     private ObservableCollection<CharacterItem> nonEquipItems;
@@ -120,6 +121,24 @@ public partial class CharacterData : ICharacterData
             foreach (var entry in value)
                 skills.Add(entry);
             shouldMakeCache = true;
+        }
+    }
+
+    public IList<CharacterSkillUsage> SkillUsages
+    {
+        get
+        {
+            if (skillUsages == null)
+                skillUsages = new List<CharacterSkillUsage>();
+            return skillUsages;
+        }
+        set
+        {
+            if (skillUsages == null)
+                skillUsages = new List<CharacterSkillUsage>();
+            skillUsages.Clear();
+            foreach (var entry in value)
+                skillUsages.Add(entry);
         }
     }
 

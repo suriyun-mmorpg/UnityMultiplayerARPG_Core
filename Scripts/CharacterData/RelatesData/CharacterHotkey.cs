@@ -29,7 +29,7 @@ public class CharacterHotkey
 
     private void MakeCache()
     {
-        if (type == HotkeyType.None || (!GameInstance.Skills.ContainsKey(dataId) && !GameInstance.Items.ContainsKey(dataId)))
+        if (type == HotkeyType.None)
         {
             cacheSkill = null;
             cacheItem = null;
@@ -42,9 +42,9 @@ public class CharacterHotkey
             cacheSkill = null;
             cacheItem = null;
             if (type == HotkeyType.Skill)
-                cacheSkill = GameInstance.Skills.TryGetValue(dataId, out cacheSkill) ? cacheSkill : null;
+                GameInstance.Skills.TryGetValue(dataId, out cacheSkill);
             if (type == HotkeyType.Item)
-                cacheItem = GameInstance.Items.TryGetValue(dataId, out cacheItem) ? cacheItem : null;
+                GameInstance.Items.TryGetValue(dataId, out cacheItem);
         }
     }
 

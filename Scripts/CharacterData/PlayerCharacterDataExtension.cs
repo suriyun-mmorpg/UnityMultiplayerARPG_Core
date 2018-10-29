@@ -52,6 +52,7 @@ public static partial class PlayerCharacterDataExtension
         to.EquipItems = new List<CharacterItem>(from.EquipItems);
         to.NonEquipItems = new List<CharacterItem>(from.NonEquipItems);
         to.Skills = new List<CharacterSkill>(from.Skills);
+        to.SkillUsages = new List<CharacterSkillUsage>(from.SkillUsages);
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "CloneTo", from, to);
         return to;
     }
@@ -394,30 +395,35 @@ public static partial class PlayerCharacterDataExtension
         writer.Put(characterData.RespawnPosition.y);
         writer.Put(characterData.RespawnPosition.z);
         writer.Put(characterData.LastUpdate);
-        writer.Put(characterData.Attributes.Count);
+        writer.Put((byte)characterData.Attributes.Count);
         foreach (var entry in characterData.Attributes)
         {
             writer.Put(entry.dataId);
             writer.Put(entry.amount);
         }
-        writer.Put(characterData.Buffs.Count);
+        writer.Put((byte)characterData.Buffs.Count);
         foreach (var entry in characterData.Buffs)
         {
-            writer.Put(entry.id);
             writer.Put(entry.characterId);
             writer.Put(entry.dataId);
             writer.Put((byte)entry.type);
             writer.Put(entry.level);
             writer.Put(entry.buffRemainsDuration);
         }
-        writer.Put(characterData.Skills.Count);
+        writer.Put((byte)characterData.Skills.Count);
         foreach (var entry in characterData.Skills)
         {
             writer.Put(entry.dataId);
             writer.Put(entry.level);
+        }
+        writer.Put((byte)characterData.SkillUsages.Count);
+        foreach (var entry in characterData.SkillUsages)
+        {
+            writer.Put(entry.dataId);
+            writer.Put((byte)entry.type);
             writer.Put(entry.coolDownRemainsDuration);
         }
-        writer.Put(characterData.EquipItems.Count);
+        writer.Put((byte)characterData.EquipItems.Count);
         foreach (var entry in characterData.EquipItems)
         {
             writer.Put(entry.dataId);
@@ -425,7 +431,7 @@ public static partial class PlayerCharacterDataExtension
             writer.Put(entry.amount);
             writer.Put(entry.durability);
         }
-        writer.Put(characterData.NonEquipItems.Count);
+        writer.Put((short)characterData.NonEquipItems.Count);
         foreach (var entry in characterData.NonEquipItems)
         {
             writer.Put(entry.dataId);
@@ -433,14 +439,14 @@ public static partial class PlayerCharacterDataExtension
             writer.Put(entry.amount);
             writer.Put(entry.durability);
         }
-        writer.Put(characterData.Hotkeys.Count);
+        writer.Put((byte)characterData.Hotkeys.Count);
         foreach (var entry in characterData.Hotkeys)
         {
             writer.Put(entry.hotkeyId);
             writer.Put((byte)entry.type);
             writer.Put(entry.dataId);
         }
-        writer.Put(characterData.Quests.Count);
+        writer.Put((byte)characterData.Quests.Count);
         foreach (var entry in characterData.Quests)
         {
             writer.Put(entry.dataId);
@@ -496,8 +502,8 @@ public static partial class PlayerCharacterDataExtension
         tempCharacterData.RespawnMapName = reader.GetString();
         tempCharacterData.RespawnPosition = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
         tempCharacterData.LastUpdate = reader.GetInt();
-        var count = 0;
-        count = reader.GetInt();
+        int count = 0;
+        count = reader.GetByte();
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterAttribute();
@@ -505,11 +511,10 @@ public static partial class PlayerCharacterDataExtension
             entry.amount = reader.GetShort();
             tempCharacterData.Attributes.Add(entry);
         }
-        count = reader.GetInt();
+        count = reader.GetByte();
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterBuff();
-            entry.id = reader.GetString();
             entry.characterId = reader.GetString();
             entry.dataId = reader.GetInt();
             entry.type = (BuffType)reader.GetByte();
@@ -517,16 +522,23 @@ public static partial class PlayerCharacterDataExtension
             entry.buffRemainsDuration = reader.GetFloat();
             tempCharacterData.Buffs.Add(entry);
         }
-        count = reader.GetInt();
+        count = reader.GetByte();
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterSkill();
             entry.dataId = reader.GetInt();
             entry.level = reader.GetShort();
-            entry.coolDownRemainsDuration = reader.GetFloat();
             tempCharacterData.Skills.Add(entry);
         }
-        count = reader.GetInt();
+        count = reader.GetByte();
+        for (var i = 0; i < count; ++i)
+        {
+            var entry = new CharacterSkillUsage();
+            entry.dataId = reader.GetInt();
+            entry.type = (SkillUsageType)reader.GetByte();
+            entry.coolDownRemainsDuration = reader.GetFloat();
+        }
+        count = reader.GetByte();
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterItem();
@@ -536,7 +548,7 @@ public static partial class PlayerCharacterDataExtension
             entry.durability = reader.GetFloat();
             tempCharacterData.EquipItems.Add(entry);
         }
-        count = reader.GetInt();
+        count = reader.GetShort();
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterItem();
@@ -546,7 +558,7 @@ public static partial class PlayerCharacterDataExtension
             entry.durability = reader.GetFloat();
             tempCharacterData.NonEquipItems.Add(entry);
         }
-        count = reader.GetInt();
+        count = reader.GetByte();
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterHotkey();
@@ -555,7 +567,7 @@ public static partial class PlayerCharacterDataExtension
             entry.dataId = reader.GetInt();
             tempCharacterData.Hotkeys.Add(entry);
         }
-        count = reader.GetInt();
+        count = reader.GetByte();
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterQuest();

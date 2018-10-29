@@ -35,6 +35,8 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncListCharacterSkill skills = new SyncListCharacterSkill();
         [SerializeField]
+        protected SyncListCharacterSkillUsage skillUsages = new SyncListCharacterSkillUsage();
+        [SerializeField]
         protected SyncListCharacterBuff buffs = new SyncListCharacterBuff();
         [SerializeField]
         protected SyncListCharacterItem equipItems = new SyncListCharacterItem();
@@ -93,6 +95,17 @@ namespace MultiplayerARPG
                 skills.Clear();
                 foreach (var entry in value)
                     skills.Add(entry);
+            }
+        }
+
+        public IList<CharacterSkillUsage> SkillUsages
+        {
+            get { return skillUsages; }
+            set
+            {
+                skillUsages.Clear();
+                foreach (var entry in value)
+                    skillUsages.Add(entry);
             }
         }
 

@@ -158,11 +158,19 @@ namespace MultiplayerARPG
             DamageInfo damageInfo,
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
-            // Update skill states
+            // Update skill usage states
             var characterSkill = skills[skillIndex];
-            characterSkill.Used();
-            characterSkill.ReduceMp(this);
-            skills[skillIndex] = characterSkill;
+            var dataId = characterSkill.dataId;
+            var type = SkillUsageType.Skill;
+
+            var skillUsageIndex = this.IndexOfSkillUsage(dataId, type);
+            if (skillUsageIndex >= 0)
+                buffs.RemoveAt(skillUsageIndex);
+
+            var newSkillUsage = CharacterSkillUsage.Create(Id, type, dataId);
+            newSkillUsage.Use(this, characterSkill.level);
+            skillUsages.Add(newSkillUsage);
+
             yield return new WaitForSecondsRealtime(triggerDuration);
             ApplySkill(characterSkill, position, skillAttackType, weapon, damageInfo, allDamageAmounts);
             yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);

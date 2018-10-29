@@ -36,19 +36,6 @@ public class CharacterItem
 
     private void MakeCache()
     {
-        if (!GameInstance.Items.ContainsKey(dataId))
-        {
-            cacheItem = null;
-            cacheEquipmentItem = null;
-            cacheDefendItem = null;
-            cacheArmorItem = null;
-            cacheWeaponItem = null;
-            cacheShieldItem = null;
-            cachePotionItem = null;
-            cacheAmmoItem = null;
-            cacheBuildingItem = null;
-            return;
-        }
         if (dirtyDataId != dataId)
         {
             dirtyDataId = dataId;
@@ -61,8 +48,7 @@ public class CharacterItem
             cachePotionItem = null;
             cacheAmmoItem = null;
             cacheBuildingItem = null;
-            cacheItem = GameInstance.Items.TryGetValue(dataId, out cacheItem) ? cacheItem : null;
-            if (cacheItem != null)
+            if (GameInstance.Items.TryGetValue(dataId, out cacheItem) && cacheItem != null)
             {
                 if (cacheItem.IsEquipment())
                     cacheEquipmentItem = cacheItem;

@@ -26,6 +26,7 @@ namespace MultiplayerARPG
 
         public const float UPDATE_ONLINE_CHARACTER_DURATION = 1f;
 
+        public static BaseGameNetworkManager Singleton { get; protected set; }
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
         protected readonly Dictionary<long, BasePlayerCharacterEntity> playerCharacters = new Dictionary<long, BasePlayerCharacterEntity>();
         protected readonly Dictionary<string, BasePlayerCharacterEntity> playerCharactersById = new Dictionary<string, BasePlayerCharacterEntity>();
@@ -70,6 +71,13 @@ namespace MultiplayerARPG
         public bool TryGetGuild(int id, out GuildData result)
         {
             return guilds.TryGetValue(id, out result);
+        }
+
+        protected override void Awake()
+        {
+            Singleton = this;
+            doNotDestroyOnSceneChanges = true;
+            base.Awake();
         }
 
         protected override void Update()

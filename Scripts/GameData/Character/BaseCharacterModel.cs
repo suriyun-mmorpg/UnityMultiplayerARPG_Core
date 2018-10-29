@@ -198,9 +198,9 @@ namespace MultiplayerARPG
             var addingKeys = new List<string>();
             foreach (var buff in buffs)
             {
-                var buffId = buff.id;
-                keepingKeys.Add(buffId);
-                addingKeys.Add(buffId);
+                var key = buff.GetKey();
+                keepingKeys.Add(key);
+                addingKeys.Add(key);
             }
 
             var keys = new List<string>(cacheEffects.Keys);
@@ -214,11 +214,11 @@ namespace MultiplayerARPG
 
             foreach (var buff in buffs)
             {
-                var buffId = buff.id;
-                if (addingKeys.Contains(buffId))
+                var key = buff.GetKey();
+                if (addingKeys.Contains(key))
                 {
                     var buffData = buff.GetBuff();
-                    InstantiateBuffEffect(buffId, buffData.effects);
+                    InstantiateBuffEffect(key, buffData.effects);
                 }
             }
         }

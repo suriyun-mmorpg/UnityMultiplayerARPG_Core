@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
 using MultiplayerARPG;
@@ -17,8 +16,6 @@ public enum BuffType : byte
 public class CharacterBuff
 {
     public static readonly CharacterBuff Empty = new CharacterBuff();
-    // Use id as primary key
-    public string id;
     public string characterId;
     public BuffType type;
     public int dataId;
@@ -28,6 +25,8 @@ public class CharacterBuff
     private BuffType dirtyType;
     [System.NonSerialized]
     private int dirtyDataId;
+    [System.NonSerialized]
+    private short dirtyLevel;
     [System.NonSerialized]
     private Skill cacheSkill;
     [System.NonSerialized]
@@ -59,28 +58,11 @@ public class CharacterBuff
 
     private void MakeCache()
     {
-        if (!GameInstance.Skills.ContainsKey(dataId) && !GameInstance.Items.ContainsKey(dataId))
-        {
-            cacheSkill = null;
-            cacheItem = null;
-            cacheGuildSkill = null;
-            cacheBuff = null;
-            cacheDuration = 0f;
-            cacheRecoveryHp = 0;
-            cacheRecoveryMp = 0;
-            cacheRecoveryStamina = 0;
-            cacheRecoveryFood = 0;
-            cacheRecoveryWater = 0;
-            cacheIncreaseStats = new CharacterStats();
-            cacheIncreaseAttributes = new Dictionary<Attribute, short>();
-            cacheIncreaseResistances = new Dictionary<DamageElement, float>();
-            cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            return;
-        }
-        if (dirtyDataId != dataId || type != dirtyType)
+        if (dirtyDataId != dataId || dirtyType != type || dirtyLevel != level)
         {
             dirtyDataId = dataId;
             dirtyType = type;
+            dirtyLevel = level;
             cacheSkill = null;
             cacheItem = null;
             cacheGuildSkill = null;
@@ -216,7 +198,7 @@ public class CharacterBuff
         return buffRemainsDuration <= 0f;
     }
 
-    public void Added()
+    public void Apply()
     {
         buffRemainsDuration = GetDuration();
     }
@@ -231,10 +213,14 @@ public class CharacterBuff
         buffRemainsDuration = 0;
     }
 
+    public string GetKey()
+    {
+        return characterId + "_" + type + "_" + dataId;
+    }
+
     public static CharacterBuff Create(string characterId, BuffType type, int dataId, short level = 1)
     {
         var newBuff = new CharacterBuff();
-        newBuff.id = GenericUtils.GetUniqueId();
         newBuff.characterId = characterId;
         newBuff.type = type;
         newBuff.dataId = dataId;
@@ -249,7 +235,6 @@ public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>
     public override void Deserialize(NetDataReader reader)
     {
         var newValue = new CharacterBuff();
-        newValue.id = reader.GetString();
         newValue.characterId = reader.GetString();
         newValue.type = (BuffType)reader.GetByte();
         newValue.dataId = reader.GetInt();
@@ -260,7 +245,6 @@ public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>
 
     public override void Serialize(NetDataWriter writer)
     {
-        writer.Put(Value.id);
         writer.Put(Value.characterId);
         writer.Put((byte)Value.type);
         writer.Put(Value.dataId);

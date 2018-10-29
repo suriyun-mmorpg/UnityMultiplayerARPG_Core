@@ -2,23 +2,23 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-public class CharacterSkillSerializationSurrogate : ISerializationSurrogate
+public class CharacterSkillUsageSerializationSurrogate : ISerializationSurrogate
 {
     public void GetObjectData(System.Object obj,
                               SerializationInfo info, StreamingContext context)
     {
-        CharacterSkill data = (CharacterSkill)obj;
+        CharacterSkillUsage data = (CharacterSkillUsage)obj;
         info.AddValue("dataId", data.dataId);
-        info.AddValue("level", data.level);
+        info.AddValue("coolDownRemainsDuration", data.coolDownRemainsDuration);
     }
 
     public System.Object SetObjectData(System.Object obj,
                                        SerializationInfo info, StreamingContext context,
                                        ISurrogateSelector selector)
     {
-        CharacterSkill data = (CharacterSkill)obj;
+        CharacterSkillUsage data = (CharacterSkillUsage)obj;
         data.dataId = info.GetInt32("dataId");
-        data.level = info.GetInt16("level");
+        data.coolDownRemainsDuration = info.GetSingle("coolDownRemainsDuration");
         obj = data;
         return obj;
     }

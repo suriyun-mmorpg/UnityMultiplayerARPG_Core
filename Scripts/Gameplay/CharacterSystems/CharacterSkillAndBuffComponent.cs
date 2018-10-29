@@ -40,11 +40,11 @@ namespace MultiplayerARPG
                 var count = characterEntity.Skills.Count;
                 for (var i = count - 1; i >= 0; --i)
                 {
-                    var skill = characterEntity.Skills[i];
-                    if (skill.ShouldUpdate())
+                    var skillUsage = characterEntity.SkillUsages[i];
+                    if (skillUsage.ShouldUpdate())
                     {
-                        skill.Update(skillAndBuffData.skillBuffUpdateDeltaTime);
-                        characterEntity.Skills[i] = skill;
+                        skillUsage.Update(skillAndBuffData.skillBuffUpdateDeltaTime);
+                        characterEntity.SkillUsages[i] = skillUsage;
                     }
                 }
                 count = characterEntity.Buffs.Count;

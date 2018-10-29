@@ -18,6 +18,7 @@ public partial interface ICharacterData
     // Listing
     IList<CharacterAttribute> Attributes { get; set; }
     IList<CharacterSkill> Skills { get; set; }
+    IList<CharacterSkillUsage> SkillUsages { get; set; }
     IList<CharacterBuff> Buffs { get; set; }
     IList<CharacterItem> EquipItems { get; set; }
     IList<CharacterItem> NonEquipItems { get; set; }

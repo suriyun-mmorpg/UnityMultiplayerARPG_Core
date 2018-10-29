@@ -17,15 +17,11 @@ public class CharacterAttribute
 
     private void MakeCache()
     {
-        if (!GameInstance.Attributes.ContainsKey(dataId))
-        {
-            cacheAttribute = null;
-            return;
-        }
         if (dirtyDataId != dataId)
         {
             dirtyDataId = dataId;
-            cacheAttribute = GameInstance.Attributes.TryGetValue(dataId, out cacheAttribute) ? cacheAttribute : null;
+            cacheAttribute = null;
+            GameInstance.Attributes.TryGetValue(dataId, out cacheAttribute);
         }
     }
 

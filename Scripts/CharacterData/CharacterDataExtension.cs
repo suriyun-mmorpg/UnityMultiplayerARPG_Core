@@ -733,6 +733,23 @@ public static partial class CharacterDataExtension
         return index;
     }
 
+    public static int IndexOfSkillUsage(this ICharacterData data, int dataId, SkillUsageType type)
+    {
+        var list = data.SkillUsages;
+        CharacterSkillUsage tempSkillUsage;
+        var index = -1;
+        for (var i = 0; i < list.Count; ++i)
+        {
+            tempSkillUsage = list[i];
+            if (tempSkillUsage.dataId == dataId && tempSkillUsage.type == type)
+            {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
     public static int IndexOfBuff(this ICharacterData data, string characterId, int dataId, BuffType type)
     {
         var list = data.Buffs;

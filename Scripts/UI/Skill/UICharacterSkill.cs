@@ -91,9 +91,17 @@ namespace MultiplayerARPG
             else
                 onUnableToLevelUp.Invoke();
 
-            var coolDownRemainsDuration = characterSkill.coolDownRemainsDuration - collectedDeltaTime;
-            if (coolDownRemainsDuration < 0)
-                coolDownRemainsDuration = 0;
+            var coolDownRemainsDuration = 0f;
+            if (character != null && skill != null)
+            {
+                var indexOfSkillUsage = character.IndexOfSkillUsage(skill.DataId, SkillUsageType.Skill);
+                if (indexOfSkillUsage >= 0)
+                {
+                    coolDownRemainsDuration = character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+                    if (coolDownRemainsDuration < 0f)
+                        coolDownRemainsDuration = 0f;
+                }
+            }
             var coolDownDuration = skill.GetCoolDownDuration(level);
 
             if (uiTextCoolDownDuration != null)
