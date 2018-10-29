@@ -57,40 +57,36 @@ namespace MultiplayerARPG
         {
             MigrateUIComponents();
 
-            var skill = Data.GetSkill();
-            var item = Data.GetItem();
+            BaseGameData buffData = null;
+            switch (Data.type)
+            {
+                case BuffType.SkillBuff:
+                case BuffType.SkillDebuff:
+                    buffData = Data.GetSkill();
+                    break;
+                case BuffType.PotionBuff:
+                    buffData = Data.GetItem();
+                    break;
+                case BuffType.GuildSkillBuff:
+                    buffData = Data.GetGuildSkill();
+                    break;
+            }
 
             collectedDeltaTime = 0f;
 
-            if (Data.type == BuffType.SkillBuff || Data.type == BuffType.SkillDebuff)
+            if (uiTextTitle != null)
+                uiTextTitle.text = string.Format(titleFormat, buffData == null ? "Unknow" : buffData.title);
+
+            if (imageIcon != null)
             {
-                if (uiTextTitle != null)
-                    uiTextTitle.text = string.Format(titleFormat, skill == null ? "Unknow" : skill.title);
-
-                if (imageIcon != null)
-                {
-                    var iconSprite = skill == null ? null : skill.icon;
-                    imageIcon.gameObject.SetActive(iconSprite != null);
-                    imageIcon.sprite = iconSprite;
-                }
-            }
-
-            if (Data.type == BuffType.PotionBuff)
-            {
-                if (uiTextTitle != null)
-                    uiTextTitle.text = string.Format(titleFormat, item == null ? "Unknow" : item.title);
-
-                if (imageIcon != null)
-                {
-                    var iconSprite = item == null ? null : item.icon;
-                    imageIcon.gameObject.SetActive(iconSprite != null);
-                    imageIcon.sprite = iconSprite;
-                }
+                var iconSprite = buffData == null ? null : buffData.icon;
+                imageIcon.gameObject.SetActive(iconSprite != null);
+                imageIcon.sprite = iconSprite;
             }
 
             if (uiBuff != null)
             {
-                if (skill == null && item == null)
+                if (buffData == null)
                     uiBuff.Hide();
                 else
                 {
