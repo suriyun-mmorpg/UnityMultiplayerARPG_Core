@@ -11,6 +11,7 @@ public enum SkillUsageType : byte
 [System.Serializable]
 public class CharacterSkillUsage
 {
+    public static readonly CharacterSkillUsage Empty = new CharacterSkillUsage();
     public SkillUsageType type;
     public int dataId;
     public float coolDownRemainsDuration;

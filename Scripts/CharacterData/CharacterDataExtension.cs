@@ -750,7 +750,7 @@ public static partial class CharacterDataExtension
         return index;
     }
 
-    public static int IndexOfBuff(this ICharacterData data, string characterId, int dataId, BuffType type)
+    public static int IndexOfBuff(this ICharacterData data, int dataId, BuffType type)
     {
         var list = data.Buffs;
         CharacterBuff tempBuff;
@@ -758,7 +758,7 @@ public static partial class CharacterDataExtension
         for (var i = 0; i < list.Count; ++i)
         {
             tempBuff = list[i];
-            if (tempBuff.characterId.Equals(characterId) && tempBuff.dataId == dataId && tempBuff.type == type)
+            if (tempBuff.dataId == dataId && tempBuff.type == type)
             {
                 index = i;
                 break;

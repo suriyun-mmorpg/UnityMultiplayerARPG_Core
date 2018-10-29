@@ -16,7 +16,6 @@ public enum BuffType : byte
 public class CharacterBuff
 {
     public static readonly CharacterBuff Empty = new CharacterBuff();
-    public string characterId;
     public BuffType type;
     public int dataId;
     public short level;
@@ -215,13 +214,12 @@ public class CharacterBuff
 
     public string GetKey()
     {
-        return characterId + "_" + type + "_" + dataId;
+        return type + "_" + dataId;
     }
 
-    public static CharacterBuff Create(string characterId, BuffType type, int dataId, short level = 1)
+    public static CharacterBuff Create(BuffType type, int dataId, short level = 1)
     {
         var newBuff = new CharacterBuff();
-        newBuff.characterId = characterId;
         newBuff.type = type;
         newBuff.dataId = dataId;
         newBuff.level = level;
@@ -235,7 +233,6 @@ public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>
     public override void Deserialize(NetDataReader reader)
     {
         var newValue = new CharacterBuff();
-        newValue.characterId = reader.GetString();
         newValue.type = (BuffType)reader.GetByte();
         newValue.dataId = reader.GetInt();
         newValue.level = reader.GetShort();
@@ -245,7 +242,6 @@ public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>
 
     public override void Serialize(NetDataWriter writer)
     {
-        writer.Put(Value.characterId);
         writer.Put((byte)Value.type);
         writer.Put(Value.dataId);
         writer.Put(Value.level);

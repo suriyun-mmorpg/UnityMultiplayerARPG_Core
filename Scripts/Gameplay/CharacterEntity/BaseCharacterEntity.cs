@@ -391,7 +391,7 @@ namespace MultiplayerARPG
             if (IsDead())
                 Killed(attacker);
             else if (!debuff.IsEmpty())
-                ApplyBuff(debuff.characterId, debuff.dataId, debuff.type, debuff.level);
+                ApplyBuff(debuff.dataId, debuff.type, debuff.level);
         }
         #endregion
 
@@ -426,16 +426,16 @@ namespace MultiplayerARPG
         #endregion
 
         #region Buffs / Weapons / Damage
-        protected void ApplyBuff(string characterId, int dataId, BuffType type, short level)
+        protected void ApplyBuff(int dataId, BuffType type, short level)
         {
             if (IsDead() || !IsServer)
                 return;
 
-            var buffIndex = this.IndexOfBuff(characterId, dataId, type);
+            var buffIndex = this.IndexOfBuff(dataId, type);
             if (buffIndex >= 0)
                 buffs.RemoveAt(buffIndex);
 
-            var newBuff = CharacterBuff.Create(characterId, type, dataId, level);
+            var newBuff = CharacterBuff.Create(type, dataId, level);
             newBuff.Apply();
             buffs.Add(newBuff);
 
@@ -477,7 +477,7 @@ namespace MultiplayerARPG
         {
             if (item == null || level <= 0)
                 return;
-            ApplyBuff(Id, item.DataId, BuffType.PotionBuff, level);
+            ApplyBuff(item.DataId, BuffType.PotionBuff, level);
         }
 
         protected virtual void ApplySkillBuff(Skill skill, short level)
@@ -488,20 +488,20 @@ namespace MultiplayerARPG
             switch (skill.skillBuffType)
             {
                 case SkillBuffType.BuffToUser:
-                    ApplyBuff(Id, skill.DataId, BuffType.SkillBuff, level);
+                    ApplyBuff(skill.DataId, BuffType.SkillBuff, level);
                     break;
                 case SkillBuffType.BuffToNearbyAllies:
                     tempCharacters = FindAliveCharacters<BaseCharacterEntity>(skill.buffDistance, true, false, false);
                     foreach (var character in tempCharacters)
                     {
-                        ApplyBuff(character.Id, skill.DataId, BuffType.SkillBuff, level);
+                        ApplyBuff(skill.DataId, BuffType.SkillBuff, level);
                     }
                     break;
                 case SkillBuffType.BuffToNearbyCharacters:
                     tempCharacters = FindAliveCharacters<BaseCharacterEntity>(skill.buffDistance, true, false, true);
                     foreach (var character in tempCharacters)
                     {
-                        ApplyBuff(character.Id, skill.DataId, BuffType.SkillBuff, level);
+                        ApplyBuff(skill.DataId, BuffType.SkillBuff, level);
                     }
                     break;
             }
@@ -511,7 +511,7 @@ namespace MultiplayerARPG
         {
             if (guildSkill == null || level <= 0)
                 return;
-            ApplyBuff(Id, guildSkill.DataId, BuffType.GuildSkillBuff, level);
+            ApplyBuff(guildSkill.DataId, BuffType.GuildSkillBuff, level);
         }
 
         protected virtual void ApplySkill(CharacterSkill characterSkill, Vector3 position, SkillAttackType skillAttackType, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
@@ -525,7 +525,7 @@ namespace MultiplayerARPG
                     {
                         CharacterBuff debuff = CharacterBuff.Empty;
                         if (skill.isDebuff)
-                            debuff = CharacterBuff.Create(Id, BuffType.SkillDebuff, skill.DataId, characterSkill.level);
+                            debuff = CharacterBuff.Create(BuffType.SkillDebuff, skill.DataId, characterSkill.level);
                         LaunchDamageEntity(position, weapon, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id);
                     }
                     break;

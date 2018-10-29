@@ -9,7 +9,6 @@ public class CharacterBuffSerializationSurrogate : ISerializationSurrogate
                               SerializationInfo info, StreamingContext context)
     {
         CharacterBuff data = (CharacterBuff)obj;
-        info.AddValue("characterId", data.characterId);
         info.AddValue("type", (byte)data.type);
         info.AddValue("dataId", data.dataId);
         info.AddValue("level", data.level);
@@ -21,7 +20,6 @@ public class CharacterBuffSerializationSurrogate : ISerializationSurrogate
                                        ISurrogateSelector selector)
     {
         CharacterBuff data = (CharacterBuff)obj;
-        data.characterId = info.GetString("characterId");
         data.type = (BuffType)info.GetByte("type");
         data.dataId = info.GetInt32("dataId");
         data.level = info.GetInt16("level");

@@ -404,7 +404,6 @@ public static partial class PlayerCharacterDataExtension
         writer.Put((byte)characterData.Buffs.Count);
         foreach (var entry in characterData.Buffs)
         {
-            writer.Put(entry.characterId);
             writer.Put(entry.dataId);
             writer.Put((byte)entry.type);
             writer.Put(entry.level);
@@ -515,7 +514,6 @@ public static partial class PlayerCharacterDataExtension
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterBuff();
-            entry.characterId = reader.GetString();
             entry.dataId = reader.GetInt();
             entry.type = (BuffType)reader.GetByte();
             entry.level = reader.GetShort();
