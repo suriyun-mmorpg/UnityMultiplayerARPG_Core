@@ -21,10 +21,6 @@ namespace MultiplayerARPG
         public float IncreaseShareExpGainPercentage { get; protected set; }
         public float IncreaseShareGoldGainPercentage { get; protected set; }
         public float DecreaseExpLostPercentage { get; protected set; }
-        public CharacterStats IncreaseStats { get; protected set; }
-        public Dictionary<Attribute, short> IncreaseAttributes { get; protected set; }
-        public Dictionary<DamageElement, float> IncreaseResistances { get; protected set; }
-        public Dictionary<DamageElement, MinMaxFloat> IncreaseDamages { get; protected set; }
 
         public byte LowestMemberRole
         {
