@@ -122,6 +122,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, Skill> Skills = new Dictionary<int, Skill>();
         public static readonly Dictionary<int, NpcDialog> NpcDialogs = new Dictionary<int, NpcDialog>();
         public static readonly Dictionary<int, Quest> Quests = new Dictionary<int, Quest>();
+        public static readonly Dictionary<int, GuildSkill> GuildSkills = new Dictionary<int, GuildSkill>();
         public static readonly Dictionary<int, BaseDamageEntity> DamageEntities = new Dictionary<int, BaseDamageEntity>();
         public static readonly Dictionary<int, BuildingEntity> BuildingEntities = new Dictionary<int, BuildingEntity>();
         public static readonly Dictionary<int, BaseCharacterEntity> AllCharacterEntities = new Dictionary<int, BaseCharacterEntity>();
@@ -304,6 +305,7 @@ namespace MultiplayerARPG
             Skills.Clear();
             NpcDialogs.Clear();
             Quests.Clear();
+            GuildSkills.Clear();
             DamageEntities.Clear();
             BuildingEntities.Clear();
             AllCharacterEntities.Clear();
@@ -341,6 +343,7 @@ namespace MultiplayerARPG
             var skills = new List<Skill>();
             var npcDialogs = new List<NpcDialog>();
             var quests = new List<Quest>();
+            var guildSkills = new List<GuildSkill>();
             var playerCharacters = new List<PlayerCharacter>();
             var monsterCharacters = new List<MonsterCharacter>();
             var playerCharacterEntities = new List<BasePlayerCharacterEntity>();
@@ -362,6 +365,8 @@ namespace MultiplayerARPG
                     npcDialogs.Add(gameData as NpcDialog);
                 if (gameData is Quest)
                     quests.Add(gameData as Quest);
+                if (gameData is GuildSkill)
+                    guildSkills.Add(gameData as GuildSkill);
                 if (gameData is PlayerCharacter)
                     playerCharacters.Add(gameData as PlayerCharacter);
                 if (gameData is MonsterCharacter)
@@ -387,6 +392,7 @@ namespace MultiplayerARPG
             AddSkills(skills);
             AddNpcDialogs(npcDialogs);
             AddQuests(quests);
+            AddGuildSkills(guildSkills);
             AddCharacters(playerCharacters);
             AddCharacters(monsterCharacters);
             AddCharacterEntities(playerCharacterEntities);
@@ -647,6 +653,16 @@ namespace MultiplayerARPG
                 if (quest == null || Quests.ContainsKey(quest.DataId))
                     continue;
                 Quests[quest.DataId] = quest;
+            }
+        }
+
+        public static void AddGuildSkills(IEnumerable<GuildSkill> guildSkills)
+        {
+            foreach (var guildSkill in guildSkills)
+            {
+                if (guildSkill == null || GuildSkills.ContainsKey(guildSkill.DataId))
+                    continue;
+                GuildSkills[guildSkill.DataId] = guildSkill;
             }
         }
 
