@@ -51,6 +51,11 @@ namespace MultiplayerARPG
             }
         }
 
+        public int MaxMember()
+        {
+            return SystemSetting.MaxPartyMember;
+        }
+
         public bool CanInvite(string characterId)
         {
             if (IsLeader(characterId))
