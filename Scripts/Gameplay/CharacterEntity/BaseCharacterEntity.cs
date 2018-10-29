@@ -14,6 +14,14 @@ namespace MultiplayerARPG
         Skill,
     }
 
+    public enum RewardGivenType : byte
+    {
+        None,
+        KillMonster,
+        PartyShare,
+        Quest,
+    }
+
     [RequireComponent(typeof(CharacterAnimationComponent))]
     [RequireComponent(typeof(CharacterRecoveryComponent))]
     [RequireComponent(typeof(CharacterSkillAndBuffComponent))]
@@ -126,7 +134,7 @@ namespace MultiplayerARPG
         protected override void EntityAwake()
         {
             base.EntityAwake();
-            gameObject.layer = gameInstance.characterLayer;
+            gameObject.layer = GameInstance.characterLayer;
             animActionType = AnimActionType.None;
             isRecaching = true;
         }
@@ -325,7 +333,7 @@ namespace MultiplayerARPG
 
             base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
             // Calculate chance to hit
-            var hitChance = gameInstance.GameplayRule.GetHitChance(attacker, this);
+            var hitChance = GameInstance.GameplayRule.GetHitChance(attacker, this);
             // If miss, return don't calculate damages
             if (Random.value > hitChance)
             {
@@ -341,7 +349,7 @@ namespace MultiplayerARPG
                     var damageElement = allDamageAmount.Key;
                     var damageAmount = allDamageAmount.Value;
                     // Set hit effect by damage element
-                    if (hitEffectsId == 0 && damageElement != gameInstance.DefaultDamageElement)
+                    if (hitEffectsId == 0 && damageElement != GameInstance.DefaultDamageElement)
                         hitEffectsId = damageElement.hitEffects.Id;
                     var receivingDamage = damageElement.GetDamageReducedByResistance(this, damageAmount.Random());
                     if (receivingDamage > 0f)
@@ -350,21 +358,21 @@ namespace MultiplayerARPG
             }
             // Play hit effect
             if (hitEffectsId == 0)
-                hitEffectsId = gameInstance.DefaultHitEffects.Id;
+                hitEffectsId = GameInstance.DefaultHitEffects.Id;
             if (hitEffectsId > 0)
                 RequestPlayEffect(hitEffectsId);
             // Calculate chance to critical
-            var criticalChance = gameInstance.GameplayRule.GetCriticalChance(attacker, this);
+            var criticalChance = GameInstance.GameplayRule.GetCriticalChance(attacker, this);
             var isCritical = Random.value <= criticalChance;
             // If critical occurs
             if (isCritical)
-                calculatingTotalDamage = gameInstance.GameplayRule.GetCriticalDamage(attacker, this, calculatingTotalDamage);
+                calculatingTotalDamage = GameInstance.GameplayRule.GetCriticalDamage(attacker, this, calculatingTotalDamage);
             // Calculate chance to block
-            var blockChance = gameInstance.GameplayRule.GetBlockChance(attacker, this);
+            var blockChance = GameInstance.GameplayRule.GetBlockChance(attacker, this);
             var isBlocked = Random.value <= blockChance;
             // If block occurs
             if (isBlocked)
-                calculatingTotalDamage = gameInstance.GameplayRule.GetBlockDamage(attacker, this, calculatingTotalDamage);
+                calculatingTotalDamage = GameInstance.GameplayRule.GetBlockDamage(attacker, this, calculatingTotalDamage);
             // Apply damages
             var totalDamage = (int)calculatingTotalDamage;
             CurrentHp -= totalDamage;
@@ -683,7 +691,7 @@ namespace MultiplayerARPG
             }
             if (rightHandWeapon == null && leftHandWeapon == null)
             {
-                tempDamageInfo = gameInstance.DefaultWeaponItem.WeaponType.damageInfo;
+                tempDamageInfo = GameInstance.DefaultWeaponItem.WeaponType.damageInfo;
                 tempDistance = tempDamageInfo.GetDistance();
                 minDistance = tempDistance;
             }
@@ -715,7 +723,7 @@ namespace MultiplayerARPG
             }
             if (rightHandWeapon == null && leftHandWeapon == null)
             {
-                tempDamageInfo = gameInstance.DefaultWeaponItem.WeaponType.damageInfo;
+                tempDamageInfo = GameInstance.DefaultWeaponItem.WeaponType.damageInfo;
                 tempFov = tempDamageInfo.GetFov();
                 minFov = tempFov;
             }
@@ -759,7 +767,7 @@ namespace MultiplayerARPG
             switch (damageInfo.damageType)
             {
                 case DamageType.Melee:
-                    overlapSize = OverlapObjects(damagePosition, damageInfo.hitDistance, gameInstance.GetDamageableLayerMask());
+                    overlapSize = OverlapObjects(damagePosition, damageInfo.hitDistance, GameInstance.GetDamageableLayerMask());
                     if (overlapSize == 0)
                         return;
                     for (counter = 0; counter < overlapSize; ++counter)
@@ -831,7 +839,7 @@ namespace MultiplayerARPG
         public override void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountType combatAmountType, int damage)
         {
             base.ReceivedDamage(attacker, combatAmountType, damage);
-            gameInstance.GameplayRule.OnCharacterReceivedDamage(attacker, this, combatAmountType, damage);
+            GameInstance.GameplayRule.OnCharacterReceivedDamage(attacker, this, combatAmountType, damage);
         }
 
         public virtual void Killed(BaseCharacterEntity lastAttacker)
@@ -860,6 +868,12 @@ namespace MultiplayerARPG
             CurrentWater = CacheMaxWater;
             // Send OnRespawn to owner player only
             RequestOnRespawn();
+        }
+
+        protected void ForceMakeCaches()
+        {
+            isRecaching = true;
+            MakeCaches();
         }
 
         protected virtual void MakeCaches()
@@ -904,11 +918,11 @@ namespace MultiplayerARPG
             return !IsDead() && !IsPlayingActionAnimation();
         }
 
-        public virtual void IncreaseExp(int exp)
+        public virtual void RewardExp(int exp, RewardGivenType rewardGivenType)
         {
             if (!IsServer)
                 return;
-            if (!gameInstance.GameplayRule.IncreaseExp(this, exp))
+            if (!GameInstance.GameplayRule.IncreaseExp(this, exp))
                 return;
             // Send OnLevelUp to owner player only
             RequestOnLevelUp();
@@ -917,7 +931,7 @@ namespace MultiplayerARPG
         public List<T> FindAliveCharacters<T>(float distance, bool findForAlly, bool findForEnemy, bool findForNeutral) where T : BaseCharacterEntity
         {
             var result = new List<T>();
-            overlapSize = OverlapObjects(CacheTransform.position, distance, gameInstance.characterLayer.Mask);
+            overlapSize = OverlapObjects(CacheTransform.position, distance, GameInstance.characterLayer.Mask);
             if (overlapSize == 0)
                 return null;
             T tempEntity;
@@ -934,7 +948,7 @@ namespace MultiplayerARPG
 
         public T FindNearestAliveCharacter<T>(float distance, bool findForAlly, bool findForEnemy, bool findForNeutral) where T : BaseCharacterEntity
         {
-            overlapSize = OverlapObjects(CacheTransform.position, distance, gameInstance.characterLayer.Mask);
+            overlapSize = OverlapObjects(CacheTransform.position, distance, GameInstance.characterLayer.Mask);
             if (overlapSize == 0)
                 return null;
             float tempDistance;

@@ -44,7 +44,7 @@ namespace MultiplayerARPG
         protected override void EntityAwake()
         {
             base.EntityAwake();
-            gameObject.tag = gameInstance.monsterTag;
+            gameObject.tag = GameInstance.monsterTag;
         }
 
         protected override void EntityStart()
@@ -98,17 +98,17 @@ namespace MultiplayerARPG
             CacheNetTransform.ownerClientCanSendTransform = false;
 
             // Setup relates elements
-            if (gameInstance.monsterCharacterMiniMapObjects != null && gameInstance.monsterCharacterMiniMapObjects.Length > 0)
+            if (GameInstance.monsterCharacterMiniMapObjects != null && GameInstance.monsterCharacterMiniMapObjects.Length > 0)
             {
-                foreach (var obj in gameInstance.monsterCharacterMiniMapObjects)
+                foreach (var obj in GameInstance.monsterCharacterMiniMapObjects)
                 {
                     if (obj == null) continue;
                     Instantiate(obj, MiniMapElementContainer.position, MiniMapElementContainer.rotation, MiniMapElementContainer);
                 }
             }
 
-            if (gameInstance.monsterCharacterUI != null)
-                InstantiateUI(gameInstance.monsterCharacterUI);
+            if (GameInstance.monsterCharacterUI != null)
+                InstantiateUI(GameInstance.monsterCharacterUI);
 
             InitStats();
         }
@@ -228,7 +228,7 @@ namespace MultiplayerARPG
             var damageElement = MonsterDatabase.damageAmount.damageElement;
             var damageAmount = MonsterDatabase.damageAmount.amount.GetAmount(Level);
             if (damageElement == null)
-                damageElement = gameInstance.DefaultDamageElement;
+                damageElement = GameInstance.DefaultDamageElement;
             allDamageAmounts.Add(damageElement, damageAmount);
         }
 
@@ -317,7 +317,7 @@ namespace MultiplayerARPG
                                     // If share exp, every party member will receive devided exp
                                     // If not share exp, character who make damage will receive non-devided exp
                                     if (tempPartyData.shareExp)
-                                        partyPlayerCharacter.IncreaseExp(rewardExp / tempPartyData.CountMember());
+                                        partyPlayerCharacter.RewardExp(rewardExp / tempPartyData.CountMember(), RewardGivenType.PartyShare);
 
                                     // If share item, every party member will receive devided gold
                                     // If not share item, character who make damage will receive non-devided gold
@@ -325,7 +325,7 @@ namespace MultiplayerARPG
                                     {
                                         if (makeMostDamage)
                                             looters.Add(partyPlayerCharacter.ObjectId);
-                                        partyPlayerCharacter.Gold += rewardGold / tempPartyData.CountMember();
+                                        partyPlayerCharacter.RewardGold(rewardGold / tempPartyData.CountMember(), RewardGivenType.PartyShare);
                                     }
                                 }
                             }
@@ -337,13 +337,16 @@ namespace MultiplayerARPG
                                 rewardGold = 0;
                         }
                         // Add reward to current character in damage record list
-                        tempPlayerCharacter.IncreaseExp(rewardExp);
+                        tempPlayerCharacter.RewardExp(rewardExp, RewardGivenType.KillMonster);
                         if (makeMostDamage)
                             looters.Add(tempPlayerCharacter.ObjectId);
-                        tempPlayerCharacter.Gold += rewardGold;
+                        tempPlayerCharacter.RewardGold(rewardGold, RewardGivenType.KillMonster);
                     }
                     else
-                        enemy.IncreaseExp(rewardExp);
+                    {
+                        // TODO: May makes monster can level up
+                        enemy.RewardExp(rewardExp, RewardGivenType.KillMonster);
+                    }
                 }
             }
             receivedDamageRecords.Clear();

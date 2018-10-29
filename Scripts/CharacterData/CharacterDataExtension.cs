@@ -381,7 +381,7 @@ public static partial class CharacterDataExtension
         var result = new CharacterStats();
         if (character != null)
             result += character.GetCharacterStats(level);
-        result += GameDataHelpers.CaculateStats(GetAttributes(data));
+        result += GameDataHelpers.GetStatsFromAttributes(GetAttributes(data));
         return result;
     }
 
@@ -399,7 +399,7 @@ public static partial class CharacterDataExtension
             if (tempEquipment != null)
             {
                 result += tempEquipment.GetIncreaseStats(equipItem.level, equipItem.GetEquipmentBonusRate());
-                result += GameDataHelpers.CaculateStats(tempEquipment.GetIncreaseAttributes(equipItem.level, equipItem.GetEquipmentBonusRate()));
+                result += GameDataHelpers.GetStatsFromAttributes(tempEquipment.GetIncreaseAttributes(equipItem.level, equipItem.GetEquipmentBonusRate()));
             }
         }
         // Weapons
@@ -412,7 +412,7 @@ public static partial class CharacterDataExtension
             if (tempEquipment != null)
             {
                 result += tempEquipment.GetIncreaseStats(rightHandItem.level, rightHandItem.GetEquipmentBonusRate());
-                result += GameDataHelpers.CaculateStats(tempEquipment.GetIncreaseAttributes(rightHandItem.level, rightHandItem.GetEquipmentBonusRate()));
+                result += GameDataHelpers.GetStatsFromAttributes(tempEquipment.GetIncreaseAttributes(rightHandItem.level, rightHandItem.GetEquipmentBonusRate()));
             }
             // Left hand equipment
             var leftHandItem = equipWeapons.leftHand;
@@ -420,7 +420,7 @@ public static partial class CharacterDataExtension
             if (tempEquipment != null)
             {
                 result += tempEquipment.GetIncreaseStats(leftHandItem.level, leftHandItem.GetEquipmentBonusRate());
-                result += GameDataHelpers.CaculateStats(tempEquipment.GetIncreaseAttributes(leftHandItem.level, leftHandItem.GetEquipmentBonusRate()));
+                result += GameDataHelpers.GetStatsFromAttributes(tempEquipment.GetIncreaseAttributes(leftHandItem.level, leftHandItem.GetEquipmentBonusRate()));
             }
         }
         return result;
@@ -435,16 +435,19 @@ public static partial class CharacterDataExtension
         foreach (var buff in buffs)
         {
             result += buff.GetIncreaseStats();
-            result += GameDataHelpers.CaculateStats(buff.GetIncreaseAttributes());
+            result += GameDataHelpers.GetStatsFromAttributes(buff.GetIncreaseAttributes());
         }
 
         // Passive skills
         var skills = data.Skills;
+        Buff tempBuff;
         foreach (var skill in skills)
         {
             if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
                 continue;
-            result += skill.GetSkill().buff.GetIncreaseStats(skill.level);
+            tempBuff = skill.GetSkill().buff;
+            result += tempBuff.GetIncreaseStats(skill.level);
+            result += GameDataHelpers.GetStatsFromAttributes(tempBuff.GetIncreaseAttributes(skill.level));
         }
         return result;
     }

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
 #if UNITY_EDITOR
@@ -33,7 +32,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (DealingState == DealingState.None && Time.unscaledTime - setCoCharacterTime >= gameInstance.coCharacterActionDuration)
+                if (DealingState == DealingState.None && Time.unscaledTime - setCoCharacterTime >= GameInstance.coCharacterActionDuration)
                     coCharacter = null;
                 return coCharacter;
             }
@@ -58,7 +57,7 @@ namespace MultiplayerARPG
         protected override void EntityAwake()
         {
             base.EntityAwake();
-            gameObject.tag = gameInstance.playerTag;
+            gameObject.tag = GameInstance.playerTag;
         }
 
 #if UNITY_EDITOR
@@ -140,8 +139,44 @@ namespace MultiplayerARPG
 
         public override void Killed(BaseCharacterEntity lastAttacker)
         {
+            var expLostPercentage = GameInstance.GameplayRule.GetExpLostPercentageWhenDeath(this);
+            GuildData guildData;
+            if (GameManager.TryGetGuild(GuildId, out guildData))
+                expLostPercentage -= expLostPercentage * guildData.DecreaseExpLostPercentage;
+            var exp = Exp;
+            exp -= (int)(this.GetNextLevelExp() * expLostPercentage);
+            if (exp <= 0)
+                exp = 0;
+            Exp = exp;
+
             base.Killed(lastAttacker);
             currentNpcDialog = null;
+        }
+
+        public override void RewardExp(int exp, RewardGivenType rewardGivenType)
+        {
+            if (!IsServer)
+                return;
+            if (rewardGivenType == RewardGivenType.KillMonster)
+            {
+                GuildData guildData;
+                if (GameManager.TryGetGuild(GuildId, out guildData))
+                    exp += (int)(exp * guildData.IncreaseExpGainPercentage);
+            }
+            base.RewardExp(exp, rewardGivenType);
+        }
+
+        public virtual void RewardGold(int gold, RewardGivenType rewardGivenType)
+        {
+            if (!IsServer)
+                return;
+            if (rewardGivenType == RewardGivenType.KillMonster)
+            {
+                GuildData guildData;
+                if (GameManager.TryGetGuild(GuildId, out guildData))
+                    gold += (int)(gold * guildData.IncreaseGoldGainPercentage);
+            }
+            Gold += gold;
         }
 
         public virtual void OnKillMonster(BaseMonsterCharacterEntity monsterCharacterEntity)
@@ -195,6 +230,38 @@ namespace MultiplayerARPG
         public override bool CanMoveOrDoActions()
         {
             return base.CanMoveOrDoActions() && DealingState == DealingState.None;
+        }
+
+        protected override void MakeCaches()
+        {
+            if (isRecaching)
+            {
+                CacheStats = this.GetStats();
+                CacheAttributes = this.GetAttributes();
+                CacheSkills = this.GetSkills();
+                CacheResistances = this.GetResistances();
+                CacheIncreaseDamages = this.GetIncreaseDamages();
+                GuildData guildData;
+                if (GameManager.TryGetGuild(GuildId, out guildData))
+                {
+                    CacheStats += guildData.IncreaseStats;
+                    CacheStats += GameDataHelpers.GetStatsFromAttributes(guildData.IncreaseAttributes);
+                    CacheAttributes = GameDataHelpers.CombineAttributeAmountsDictionary(CacheAttributes, guildData.IncreaseAttributes);
+                    CacheResistances = GameDataHelpers.CombineResistanceAmountsDictionary(CacheResistances, guildData.IncreaseResistances);
+                    CacheIncreaseDamages = GameDataHelpers.CombineDamageAmountsDictionary(CacheIncreaseDamages, guildData.IncreaseDamages);
+                }
+                CacheMaxHp = (int)CacheStats.hp;
+                CacheMaxMp = (int)CacheStats.mp;
+                CacheMaxStamina = (int)CacheStats.stamina;
+                CacheMaxFood = (int)CacheStats.food;
+                CacheMaxWater = (int)CacheStats.water;
+                CacheTotalItemWeight = this.GetTotalItemWeight();
+                CacheAtkSpeed = CacheStats.atkSpeed;
+                CacheMoveSpeed = CacheStats.moveSpeed;
+                if (database != null)
+                    CacheBaseMoveSpeed = database.stats.baseStats.moveSpeed;
+                isRecaching = false;
+            }
         }
 
         public abstract float StoppingDistance { get; }

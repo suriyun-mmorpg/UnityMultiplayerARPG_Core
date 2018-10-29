@@ -21,8 +21,8 @@ namespace MultiplayerARPG
         protected override void EntityAwake()
         {
             base.EntityAwake();
-            gameObject.tag = gameInstance.harvestableTag;
-            gameObject.layer = gameInstance.harvestableLayer;
+            gameObject.tag = GameInstance.harvestableTag;
+            gameObject.layer = GameInstance.harvestableLayer;
         }
 
         protected override void EntityStart()
@@ -63,7 +63,7 @@ namespace MultiplayerARPG
             base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
             // Play hit effect
             if (hitEffectsId == 0)
-                hitEffectsId = gameInstance.DefaultHitEffects.Id;
+                hitEffectsId = GameInstance.DefaultHitEffects.Id;
             if (hitEffectsId > 0)
                 RequestPlayEffect(hitEffectsId);
             // Apply damages
@@ -112,7 +112,7 @@ namespace MultiplayerARPG
         public override void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountType combatAmountType, int damage)
         {
             base.ReceivedDamage(attacker, combatAmountType, damage);
-            gameInstance.GameplayRule.OnHarvestableReceivedDamage(attacker, this, combatAmountType, damage);
+            GameInstance.GameplayRule.OnHarvestableReceivedDamage(attacker, this, combatAmountType, damage);
         }
 
         private void OnDrawGizmos()

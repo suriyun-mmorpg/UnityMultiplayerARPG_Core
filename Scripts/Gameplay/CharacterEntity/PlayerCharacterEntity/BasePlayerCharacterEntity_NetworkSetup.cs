@@ -105,37 +105,37 @@ namespace MultiplayerARPG
                         var controller = Instantiate(controllerPrefab);
                         controller.PlayerCharacterEntity = this;
                     }
-                    else if (gameInstance.defaultControllerPrefab != null)
+                    else if (GameInstance.defaultControllerPrefab != null)
                     {
-                        var controller = Instantiate(gameInstance.defaultControllerPrefab);
+                        var controller = Instantiate(GameInstance.defaultControllerPrefab);
                         controller.PlayerCharacterEntity = this;
                     }
                     else
                         Debug.LogWarning("[BasePlayerCharacterEntity] `controllerPrefab` is empty so it cannot be instantiated");
                 }
-                if (gameInstance.owningCharacterObjects != null && gameInstance.owningCharacterObjects.Length > 0)
+                if (GameInstance.owningCharacterObjects != null && GameInstance.owningCharacterObjects.Length > 0)
                 {
-                    foreach (var obj in gameInstance.owningCharacterObjects)
+                    foreach (var obj in GameInstance.owningCharacterObjects)
                     {
                         if (obj == null) continue;
                         Instantiate(obj, CacheTransform.position, CacheTransform.rotation, CacheTransform);
                     }
                 }
-                if (gameInstance.owningCharacterMiniMapObjects != null && gameInstance.owningCharacterMiniMapObjects.Length > 0)
+                if (GameInstance.owningCharacterMiniMapObjects != null && GameInstance.owningCharacterMiniMapObjects.Length > 0)
                 {
-                    foreach (var obj in gameInstance.owningCharacterMiniMapObjects)
+                    foreach (var obj in GameInstance.owningCharacterMiniMapObjects)
                     {
                         if (obj == null) continue;
                         Instantiate(obj, MiniMapElementContainer.position, MiniMapElementContainer.rotation, MiniMapElementContainer);
                     }
                 }
-                if (gameInstance.owningCharacterUI != null)
-                    InstantiateUI(gameInstance.owningCharacterUI);
+                if (GameInstance.owningCharacterUI != null)
+                    InstantiateUI(GameInstance.owningCharacterUI);
             }
             else
             {
-                if (gameInstance.nonOwningCharacterUI != null)
-                    InstantiateUI(gameInstance.nonOwningCharacterUI);
+                if (GameInstance.nonOwningCharacterUI != null)
+                    InstantiateUI(GameInstance.nonOwningCharacterUI);
             }
         }
 

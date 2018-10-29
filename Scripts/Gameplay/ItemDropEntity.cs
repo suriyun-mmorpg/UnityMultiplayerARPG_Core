@@ -52,8 +52,8 @@ namespace MultiplayerARPG
         protected override void EntityAwake()
         {
             base.EntityAwake();
-            gameObject.tag = gameInstance.itemDropTag;
-            gameObject.layer = gameInstance.itemDropLayer;
+            gameObject.tag = GameInstance.itemDropTag;
+            gameObject.layer = GameInstance.itemDropLayer;
         }
 
         protected override void EntityStart()
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
                 if (!GameInstance.Items.ContainsKey(id))
                     NetworkDestroy();
                 itemDataId.Value = id;
-                NetworkDestroy(gameInstance.itemAppearDuration);
+                NetworkDestroy(GameInstance.itemAppearDuration);
             }
         }
 
@@ -89,7 +89,7 @@ namespace MultiplayerARPG
             if (GameInstance.Items.TryGetValue(itemDataId, out item) && item.dropModel != null)
             {
                 var model = Instantiate(item.dropModel, CacheModelContainer);
-                model.gameObject.SetLayerRecursively(gameInstance.itemDropLayer, true);
+                model.gameObject.SetLayerRecursively(GameInstance.itemDropLayer, true);
                 model.gameObject.SetActive(true);
                 model.RemoveComponentsInChildren<Collider>(false);
                 model.transform.localPosition = Vector3.zero;
@@ -100,7 +100,7 @@ namespace MultiplayerARPG
         {
             if (looters == null || 
                 looters.Contains(baseCharacterEntity.ObjectId) || 
-                Time.unscaledTime - dropTime > gameInstance.itemLootLockDuration)
+                Time.unscaledTime - dropTime > GameInstance.itemLootLockDuration)
                 return true;
             return false;
         }

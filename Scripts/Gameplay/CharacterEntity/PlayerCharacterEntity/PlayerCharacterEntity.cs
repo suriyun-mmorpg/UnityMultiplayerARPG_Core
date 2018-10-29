@@ -112,7 +112,7 @@ namespace MultiplayerARPG
                     if (moveDirectionMagnitude > 1)
                         moveDirection = moveDirection.normalized;
                     
-                    var targetVelocity = moveDirection * gameInstance.GameplayRule.GetMoveSpeed(this);
+                    var targetVelocity = moveDirection * GameInstance.GameplayRule.GetMoveSpeed(this);
 
                     // Apply a force that attempts to reach our target velocity
                     Vector3 velocityChange = (targetVelocity - velocity);

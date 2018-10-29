@@ -28,7 +28,6 @@ namespace MultiplayerARPG
                     syncTitle.Value = value;
             }
         }
-        protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
 
         private Transform cacheTransform;
         public Transform CacheTransform
@@ -50,6 +49,11 @@ namespace MultiplayerARPG
                     model = GetComponent<RpgEntityModel>();
                 return model;
             }
+        }
+
+        public GameInstance GameInstance
+        {
+            get { return GameInstance.Singleton; }
         }
 
         public BaseGameNetworkManager GameManager

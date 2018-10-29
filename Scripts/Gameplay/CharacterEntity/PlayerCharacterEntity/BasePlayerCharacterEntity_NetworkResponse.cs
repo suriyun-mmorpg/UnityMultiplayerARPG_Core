@@ -125,7 +125,7 @@ namespace MultiplayerARPG
             if (!TryGetEntityByObjectId(objectId, out npcEntity))
                 return;
 
-            if (Vector3.Distance(CacheTransform.position, npcEntity.CacheTransform.position) > gameInstance.conversationDistance + 5f)
+            if (Vector3.Distance(CacheTransform.position, npcEntity.CacheTransform.position) > GameInstance.conversationDistance + 5f)
                 return;
 
             currentNpcDialog = npcEntity.StartDialog;
@@ -307,8 +307,8 @@ namespace MultiplayerARPG
                         break;
                 }
             }
-            IncreaseExp(quest.rewardExp);
-            Gold += quest.rewardGold;
+            RewardExp(quest.rewardExp, RewardGivenType.Quest);
+            RewardGold(quest.rewardGold, RewardGivenType.Quest);
             var rewardItems = quest.rewardItems;
             if (rewardItems != null && rewardItems.Length > 0)
             {
@@ -445,7 +445,7 @@ namespace MultiplayerARPG
                 GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsInAnotherDeal);
                 return;
             }
-            if (Vector3.Distance(CacheTransform.position, targetCharacterEntity.CacheTransform.position) > gameInstance.conversationDistance)
+            if (Vector3.Distance(CacheTransform.position, targetCharacterEntity.CacheTransform.position) > GameInstance.conversationDistance)
             {
                 GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 return;
@@ -473,7 +473,7 @@ namespace MultiplayerARPG
                 StopDealing();
                 return;
             }
-            if (Vector3.Distance(CacheTransform.position, CoCharacter.CacheTransform.position) > gameInstance.conversationDistance)
+            if (Vector3.Distance(CacheTransform.position, CoCharacter.CacheTransform.position) > GameInstance.conversationDistance)
             {
                 GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 StopDealing();

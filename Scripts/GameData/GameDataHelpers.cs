@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
@@ -391,7 +390,8 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        public static float CalculateEffectivenessDamage(Dictionary<Attribute, float> effectivenessAttributes, ICharacterData character)
+        #region Calculate functions
+        public static float GetEffectivenessDamage(Dictionary<Attribute, float> effectivenessAttributes, ICharacterData character)
         {
             var damageEffectiveness = 0f;
             if (effectivenessAttributes != null && character != null)
@@ -407,7 +407,7 @@ namespace MultiplayerARPG
             return damageEffectiveness;
         }
 
-        public static CharacterStats CaculateStats(Dictionary<Attribute, short> attributeAmounts)
+        public static CharacterStats GetStatsFromAttributes(Dictionary<Attribute, short> attributeAmounts)
         {
             var stats = new CharacterStats();
             if (attributeAmounts != null)
@@ -435,5 +435,6 @@ namespace MultiplayerARPG
             }
             return damageAmount;
         }
+        #endregion
     }
 }

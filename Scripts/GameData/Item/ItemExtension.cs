@@ -103,7 +103,7 @@ namespace MultiplayerARPG
                 !weaponItem.IsWeapon() ||
                 character == null)
                 return 0f;
-            return GameDataHelpers.CalculateEffectivenessDamage(weaponItem.WeaponType.CacheEffectivenessAttributes, character);
+            return GameDataHelpers.GetEffectivenessDamage(weaponItem.WeaponType.CacheEffectivenessAttributes, character);
         }
 
         public static bool TryGetWeaponItemEquipType(this Item weaponItem, out WeaponItemEquipType equipType)

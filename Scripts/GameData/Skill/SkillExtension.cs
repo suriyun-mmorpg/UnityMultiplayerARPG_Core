@@ -110,7 +110,7 @@ namespace MultiplayerARPG
         {
             if (skill == null)
                 return 1f;
-            return GameDataHelpers.CalculateEffectivenessDamage(skill.CacheEffectivenessAttributes, character);
+            return GameDataHelpers.GetEffectivenessDamage(skill.CacheEffectivenessAttributes, character);
         }
 
         public static Dictionary<DamageElement, float> GetWeaponDamageInflictions(this Skill skill, short level)
