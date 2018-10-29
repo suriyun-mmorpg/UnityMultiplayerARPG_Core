@@ -30,7 +30,7 @@ namespace MultiplayerARPG
     public partial class Skill : BaseGameData
     {
         public SkillType skillType;
-        [Range(1, 30)]
+        [Range(1, 100)]
         public short maxLevel = 1;
 
         [Header("Available Weapons")]
