@@ -130,7 +130,7 @@ namespace MultiplayerARPG
             var playerCharacter = selectedUI.Data as IPlayerCharacterData;
             playerCharacter.CloneTo(characterData);
             var gameInstance = GameInstance.Singleton;
-            var networkManager = LanRpgNetworkManager.Singleton;
+            var networkManager = BaseGameNetworkManager.Singleton as LanRpgNetworkManager;
             if (!gameInstance.GetGameScenes().Contains(characterData.CurrentMapName))
             {
                 var startMap = (characterData.GetDatabase() as PlayerCharacter).StartMap;
