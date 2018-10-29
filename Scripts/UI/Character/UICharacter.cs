@@ -119,38 +119,11 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void UpdateUI()
+        protected override void Update()
         {
-            MigrateUIComponents();
+            base.Update();
 
-            Profiler.BeginSample("UICharacter - Update UI");
-            if (uiTextName != null)
-                uiTextName.text = string.Format(nameFormat, Data == null ? "Unknow" : Data.CharacterName);
-
-            if (uiTextLevel != null)
-                uiTextLevel.text = string.Format(levelFormat, Data == null ? "N/A" : Data.Level.ToString("N0"));
-            
-            var expTree = GameInstance.Singleton.ExpTree;
-            var currentExp = 0;
-            var nextLevelExp = 0;
-            if (Data != null && Data.GetNextLevelExp() > 0)
-            {
-                currentExp = Data.Exp;
-                nextLevelExp = Data.GetNextLevelExp();
-            }
-            else if (Data != null && Data.Level - 2 > 0 && Data.Level - 2 < expTree.Length)
-            {
-                var maxExp = expTree[Data.Level - 2];
-                currentExp = maxExp;
-                nextLevelExp = maxExp;
-            }
-
-            if (uiTextExp != null)
-                uiTextExp.text = string.Format(expFormat, currentExp.ToString("N0"), nextLevelExp.ToString("N0"));
-
-            if (imageExpGage != null)
-                imageExpGage.fillAmount = nextLevelExp <= 0 ? 1 : (float)currentExp / (float)nextLevelExp;
-
+            Profiler.BeginSample("UICharacter - Update UI (Immediately)");
             // Hp
             var currentHp = 0;
             var maxHp = 0;
@@ -226,6 +199,42 @@ namespace MultiplayerARPG
             if (imageWaterGage != null)
                 imageWaterGage.fillAmount = maxWater <= 0 ? 0 : (float)currentWater / (float)maxWater;
 
+            Profiler.EndSample();
+        }
+
+        protected override void UpdateUI()
+        {
+            MigrateUIComponents();
+
+            Profiler.BeginSample("UICharacter - Update UI");
+
+            if (uiTextName != null)
+                uiTextName.text = string.Format(nameFormat, Data == null ? "Unknow" : Data.CharacterName);
+
+            if (uiTextLevel != null)
+                uiTextLevel.text = string.Format(levelFormat, Data == null ? "N/A" : Data.Level.ToString("N0"));
+            
+            var expTree = GameInstance.Singleton.ExpTree;
+            var currentExp = 0;
+            var nextLevelExp = 0;
+            if (Data != null && Data.GetNextLevelExp() > 0)
+            {
+                currentExp = Data.Exp;
+                nextLevelExp = Data.GetNextLevelExp();
+            }
+            else if (Data != null && Data.Level - 2 > 0 && Data.Level - 2 < expTree.Length)
+            {
+                var maxExp = expTree[Data.Level - 2];
+                currentExp = maxExp;
+                nextLevelExp = maxExp;
+            }
+
+            if (uiTextExp != null)
+                uiTextExp.text = string.Format(expFormat, currentExp.ToString("N0"), nextLevelExp.ToString("N0"));
+
+            if (imageExpGage != null)
+                imageExpGage.fillAmount = nextLevelExp <= 0 ? 1 : (float)currentExp / (float)nextLevelExp;
+            
             // Player character data
             var playerCharacter = Data as IPlayerCharacterData;
             if (uiTextStatPoint != null)
