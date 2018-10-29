@@ -232,38 +232,6 @@ namespace MultiplayerARPG
             return base.CanMoveOrDoActions() && DealingState == DealingState.None;
         }
 
-        protected override void MakeCaches()
-        {
-            if (isRecaching)
-            {
-                CacheStats = this.GetStats();
-                CacheAttributes = this.GetAttributes();
-                CacheSkills = this.GetSkills();
-                CacheResistances = this.GetResistances();
-                CacheIncreaseDamages = this.GetIncreaseDamages();
-                GuildData guildData;
-                if (GameManager.TryGetGuild(GuildId, out guildData))
-                {
-                    CacheStats += guildData.IncreaseStats;
-                    CacheStats += GameDataHelpers.GetStatsFromAttributes(guildData.IncreaseAttributes);
-                    CacheAttributes = GameDataHelpers.CombineAttributeAmountsDictionary(CacheAttributes, guildData.IncreaseAttributes);
-                    CacheResistances = GameDataHelpers.CombineResistanceAmountsDictionary(CacheResistances, guildData.IncreaseResistances);
-                    CacheIncreaseDamages = GameDataHelpers.CombineDamageAmountsDictionary(CacheIncreaseDamages, guildData.IncreaseDamages);
-                }
-                CacheMaxHp = (int)CacheStats.hp;
-                CacheMaxMp = (int)CacheStats.mp;
-                CacheMaxStamina = (int)CacheStats.stamina;
-                CacheMaxFood = (int)CacheStats.food;
-                CacheMaxWater = (int)CacheStats.water;
-                CacheTotalItemWeight = this.GetTotalItemWeight();
-                CacheAtkSpeed = CacheStats.atkSpeed;
-                CacheMoveSpeed = CacheStats.moveSpeed;
-                if (database != null)
-                    CacheBaseMoveSpeed = database.stats.baseStats.moveSpeed;
-                isRecaching = false;
-            }
-        }
-
         public abstract float StoppingDistance { get; }
         public abstract void StopMove();
         public abstract void KeyMovement(Vector3 direction, bool isJump);
