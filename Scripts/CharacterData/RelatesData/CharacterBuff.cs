@@ -9,6 +9,8 @@ public enum BuffType : byte
     SkillBuff,
     SkillDebuff,
     PotionBuff,
+    GuildSkillBuff,
+    SpawnBuff,
 }
 
 [System.Serializable]
@@ -30,6 +32,8 @@ public class CharacterBuff
     private Skill cacheSkill;
     [System.NonSerialized]
     private Item cacheItem;
+    [System.NonSerialized]
+    private GuildSkill cacheGuildSkill;
     [System.NonSerialized]
     private Buff cacheBuff;
     [System.NonSerialized]
@@ -59,6 +63,7 @@ public class CharacterBuff
         {
             cacheSkill = null;
             cacheItem = null;
+            cacheGuildSkill = null;
             cacheBuff = null;
             cacheDuration = 0f;
             cacheRecoveryHp = 0;
@@ -78,6 +83,7 @@ public class CharacterBuff
             dirtyType = type;
             cacheSkill = null;
             cacheItem = null;
+            cacheGuildSkill = null;
             cacheBuff = null;
             cacheDuration = 0;
             cacheRecoveryHp = 0;
@@ -89,17 +95,21 @@ public class CharacterBuff
             cacheIncreaseAttributes = null;
             cacheIncreaseResistances = null;
             cacheIncreaseDamages = null;
-            if (type == BuffType.SkillBuff || type == BuffType.SkillDebuff)
+            switch (type)
             {
-                cacheSkill = GameInstance.Skills.TryGetValue(dataId, out cacheSkill) ? cacheSkill : null;
-                if (cacheSkill != null)
-                    cacheBuff = type == BuffType.SkillBuff ? cacheSkill.buff : cacheSkill.debuff;
-            }
-            if (type == BuffType.PotionBuff)
-            {
-                cacheItem = GameInstance.Items.TryGetValue(dataId, out cacheItem) ? cacheItem : null;
-                if (cacheItem != null)
-                    cacheBuff = cacheItem.buff;
+                case BuffType.SkillBuff:
+                case BuffType.SkillDebuff:
+                    if (GameInstance.Skills.TryGetValue(dataId, out cacheSkill) && cacheSkill != null)
+                        cacheBuff = type == BuffType.SkillBuff ? cacheSkill.buff : cacheSkill.debuff;
+                    break;
+                case BuffType.PotionBuff:
+                    if (GameInstance.Items.TryGetValue(dataId, out cacheItem) && cacheItem != null)
+                        cacheBuff = cacheItem.buff;
+                    break;
+                case BuffType.GuildSkillBuff:
+                    if (GameInstance.GuildSkills.TryGetValue(dataId, out cacheGuildSkill) && cacheGuildSkill != null)
+                        cacheBuff = cacheGuildSkill.buff;
+                    break;
             }
             if (cacheBuff != null)
             {
@@ -127,6 +137,12 @@ public class CharacterBuff
     {
         MakeCache();
         return cacheItem;
+    }
+
+    public GuildSkill GetGuildSkill()
+    {
+        MakeCache();
+        return cacheGuildSkill;
     }
 
     public Buff GetBuff()
