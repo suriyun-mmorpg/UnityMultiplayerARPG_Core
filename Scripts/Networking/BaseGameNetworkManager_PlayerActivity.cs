@@ -121,7 +121,7 @@ namespace MultiplayerARPG
                 SendServerGameMessage(acceptCharacterEntity.ConnectionId, GameMessage.Type.CharacterNotJoinedParty);
                 return false;
             }
-            if (party.CountMember() == gameInstance.SocialSystemSetting.MaxPartyMember)
+            if (party.CountMember() >= party.MaxMember())
             {
                 SendServerGameMessage(acceptCharacterEntity.ConnectionId, GameMessage.Type.PartyMemberReachedLimit);
                 return false;
@@ -337,7 +337,7 @@ namespace MultiplayerARPG
                 SendServerGameMessage(acceptCharacterEntity.ConnectionId, GameMessage.Type.CharacterNotJoinedGuild);
                 return false;
             }
-            if (guild.CountMember() == gameInstance.SocialSystemSetting.MaxGuildMember)
+            if (guild.CountMember() >= guild.MaxMember())
             {
                 SendServerGameMessage(acceptCharacterEntity.ConnectionId, GameMessage.Type.GuildMemberReachedLimit);
                 return false;
