@@ -27,6 +27,8 @@ namespace MultiplayerARPG
         [StringShowConditional(conditionFieldName: "damageType", conditionValue: "Missile")]
         public float missileSpeed = 5f;
         [StringShowConditional(conditionFieldName: "damageType", conditionValue: "Missile")]
+        public bool missileLockOnTarget;
+        [StringShowConditional(conditionFieldName: "damageType", conditionValue: "Missile")]
         public MissileDamageEntity missileDamageEntity;
 
         public float GetDistance()
