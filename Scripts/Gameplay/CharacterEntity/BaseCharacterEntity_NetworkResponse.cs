@@ -179,10 +179,10 @@ namespace MultiplayerARPG
                 itemIndex >= nonEquipItems.Count)
                 return;
 
-            var item = nonEquipItems[itemIndex];
-            var potionItem = item.GetPotionItem();
+            var characterItem = nonEquipItems[itemIndex];
+            var potionItem = characterItem.GetPotionItem();
             if (potionItem != null && this.DecreaseItemsByIndex(itemIndex, 1))
-                ApplyPotionBuff(item);
+                ApplyPotionBuff(potionItem, characterItem.level);
         }
 
         /// <summary>

@@ -473,40 +473,45 @@ namespace MultiplayerARPG
             ValidateRecovery();
         }
 
-        protected void ApplyPotionBuff(CharacterItem characterItem)
+        protected void ApplyPotionBuff(Item item, short level)
         {
-            var item = characterItem.GetPotionItem();
-            if (item == null)
+            if (item == null || level <= 0)
                 return;
-            ApplyBuff(Id, item.DataId, BuffType.PotionBuff, characterItem.level);
+            ApplyBuff(Id, item.DataId, BuffType.PotionBuff, level);
         }
 
-        protected virtual void ApplySkillBuff(CharacterSkill characterSkill)
+        protected virtual void ApplySkillBuff(Skill skill, short level)
         {
-            var skill = characterSkill.GetSkill();
-            if (skill == null)
+            if (skill == null || level <= 0)
                 return;
             List<BaseCharacterEntity> tempCharacters;
             switch (skill.skillBuffType)
             {
                 case SkillBuffType.BuffToUser:
-                    ApplyBuff(Id, skill.DataId, BuffType.SkillBuff, characterSkill.level);
+                    ApplyBuff(Id, skill.DataId, BuffType.SkillBuff, level);
                     break;
                 case SkillBuffType.BuffToNearbyAllies:
                     tempCharacters = FindAliveCharacters<BaseCharacterEntity>(skill.buffDistance, true, false, false);
                     foreach (var character in tempCharacters)
                     {
-                        ApplyBuff(character.Id, skill.DataId, BuffType.SkillBuff, characterSkill.level);
+                        ApplyBuff(character.Id, skill.DataId, BuffType.SkillBuff, level);
                     }
                     break;
                 case SkillBuffType.BuffToNearbyCharacters:
                     tempCharacters = FindAliveCharacters<BaseCharacterEntity>(skill.buffDistance, true, false, true);
                     foreach (var character in tempCharacters)
                     {
-                        ApplyBuff(character.Id, skill.DataId, BuffType.SkillBuff, characterSkill.level);
+                        ApplyBuff(character.Id, skill.DataId, BuffType.SkillBuff, level);
                     }
                     break;
             }
+        }
+
+        protected virtual void ApplyGuildSkillBuff(GuildSkill guildSkill, short level)
+        {
+            if (guildSkill == null || level <= 0)
+                return;
+            ApplyBuff(Id, guildSkill.DataId, BuffType.GuildSkillBuff, level);
         }
 
         protected virtual void ApplySkill(CharacterSkill characterSkill, Vector3 position, SkillAttackType skillAttackType, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
@@ -515,7 +520,7 @@ namespace MultiplayerARPG
             switch (skill.skillType)
             {
                 case SkillType.Active:
-                    ApplySkillBuff(characterSkill);
+                    ApplySkillBuff(skill, characterSkill.level);
                     if (skillAttackType != SkillAttackType.None)
                     {
                         CharacterBuff debuff = CharacterBuff.Empty;
@@ -791,7 +796,13 @@ namespace MultiplayerARPG
                     if (damageInfo.missileDamageEntity != null)
                     {
                         var missileDamageEntity = Manager.Assets.NetworkSpawn(damageInfo.missileDamageEntity.Identity, damagePosition, damageRotation).GetComponent<MissileDamageEntity>();
-                        missileDamageEntity.SetupDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId, damageInfo.missileDistance, damageInfo.missileSpeed);
+                        DamageableNetworkEntity lockingTarget = null;
+                        if (damageInfo.missileLockOnTarget)
+                        {
+                            if (targetEntity != null && targetEntity is DamageableNetworkEntity)
+                                lockingTarget = targetEntity as DamageableNetworkEntity;
+                        }
+                        missileDamageEntity.SetupDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId, damageInfo.missileDistance, damageInfo.missileSpeed, lockingTarget);
                     }
                     break;
             }
