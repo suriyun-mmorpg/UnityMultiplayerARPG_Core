@@ -10,9 +10,29 @@ namespace MultiplayerARPG
     {
         public DimensionType dimensionType;
         public UnityEvent onDestroy;
+        protected float missileDistance;
         [SerializeField]
         protected SyncFieldFloat missileSpeed = new SyncFieldFloat();
-        protected float missileDistance;
+        [SerializeField]
+        protected SyncFieldPackedUInt lockingTargetId;
+
+        protected DamageableNetworkEntity lockingTarget;
+        public DamageableNetworkEntity LockingTarget
+        {
+            get
+            {
+                if (lockingTarget == null && lockingTargetId.Value > 0)
+                    TryGetEntityByObjectId(lockingTargetId.Value, out lockingTarget);
+                return lockingTarget;
+            }
+            set
+            {
+                if (!IsServer)
+                    return;
+                lockingTargetId.Value = value != null ? value.ObjectId : 0;
+                lockingTarget = value;
+            }
+        }
 
         private Rigidbody cacheRigidbody;
         public Rigidbody CacheRigidbody
@@ -43,21 +63,41 @@ namespace MultiplayerARPG
             CharacterBuff debuff,
             uint hitEffectsId,
             float missileDistance,
-            float missileSpeed)
+            float missileSpeed,
+            DamageableNetworkEntity lockingTarget)
         {
             SetupDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
             this.missileDistance = missileDistance;
             this.missileSpeed.Value = missileSpeed;
 
-            if (missileDistance > 0 && missileSpeed > 0)
-                NetworkDestroy(missileDistance / missileSpeed);
-            else
+            if (missileDistance <= 0 && missileSpeed <= 0)
+            {
                 NetworkDestroy();
+                return;
+            }
+
+            LockingTarget = lockingTarget;
+            NetworkDestroy(missileDistance / missileSpeed);
         }
 
         protected override void EntityFixedUpdate()
         {
             base.EntityFixedUpdate();
+            // Turn to locking target position
+            if (LockingTarget != null)
+            {
+                // Lookat target then do anything when it's in range
+                var lookAtDirection = (LockingTarget.CacheTransform.position - CacheTransform.position).normalized;
+                // slerp to the desired rotation over time
+                if (lookAtDirection.magnitude > 0)
+                {
+                    var lookRotationEuler = Quaternion.LookRotation(lookAtDirection).eulerAngles;
+                    lookRotationEuler.x = 0;
+                    lookRotationEuler.z = 0;
+                    CacheTransform.rotation = Quaternion.Euler(lookRotationEuler);
+                }
+            }
+
             switch (dimensionType)
             {
                 case DimensionType.Dimension3D:
