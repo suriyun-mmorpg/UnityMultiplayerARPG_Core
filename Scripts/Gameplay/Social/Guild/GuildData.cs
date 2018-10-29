@@ -13,6 +13,18 @@ namespace MultiplayerARPG
         public string guildMessage;
         protected List<GuildRoleData> roles;
         protected Dictionary<string, byte> memberRoles;
+        protected Dictionary<int, short> skills;
+
+        public int IncreaseMaxMember { get; protected set; }
+        public float IncreaseExpGainPercentage { get; protected set; }
+        public float IncreaseGoldGainPercentage { get; protected set; }
+        public float IncreaseShareExpGainPercentage { get; protected set; }
+        public float IncreaseShareGoldGainPercentage { get; protected set; }
+        public float DecreaseExpLostPercentage { get; protected set; }
+        public CharacterStats IncreaseStats { get; protected set; }
+        public Dictionary<Attribute, short> IncreaseAttributes { get; protected set; }
+        public Dictionary<DamageElement, float> IncreaseResistances { get; protected set; }
+        public Dictionary<DamageElement, MinMaxFloat> IncreaseDamages { get; protected set; }
 
         public byte LowestMemberRole
         {
@@ -34,6 +46,7 @@ namespace MultiplayerARPG
             guildMessage = string.Empty;
             this.roles = new List<GuildRoleData>(roles);
             memberRoles = new Dictionary<string, byte>();
+            skills = new Dictionary<int, short>();
             this.leaderId = leaderId;
             AddMember(new SocialCharacterData() { id = leaderId });
         }
@@ -193,6 +206,11 @@ namespace MultiplayerARPG
                 result = IsLeader(characterId) ? LeaderRole : LowestMemberRole;
             }
             return result;
+        }
+
+        public int MaxMember()
+        {
+            return SystemSetting.MaxGuildMember + IncreaseMaxMember;
         }
 
         public bool CanInvite(string characterId)
