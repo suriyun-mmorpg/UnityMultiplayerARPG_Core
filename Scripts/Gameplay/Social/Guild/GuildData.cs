@@ -120,6 +120,11 @@ namespace MultiplayerARPG
             }
         }
 
+        public void SetSkillLevel(int dataId, short level)
+        {
+
+        }
+
         public bool IsRoleAvailable(byte guildRole)
         {
             return roles != null && guildRole >= 0 && guildRole < roles.Count;

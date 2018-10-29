@@ -305,6 +305,11 @@ namespace MultiplayerARPG
                     case UpdateGuildMessage.UpdateType.SetGuildMemberRole:
                         ClientGuild.SetMemberRole(message.characterId, message.guildRole);
                         break;
+                    case UpdateGuildMessage.UpdateType.SetGuildSkill:
+                        ClientGuild.SetSkillLevel(message.dataId, message.level);
+                        if (BasePlayerCharacterController.OwningCharacter != null)
+                            BasePlayerCharacterController.OwningCharacter.ForceMakeCaches();
+                        break;
                     case UpdateGuildMessage.UpdateType.LevelExpSkillPoint:
                         ClientGuild.level = message.level;
                         ClientGuild.exp = message.exp;
@@ -312,6 +317,8 @@ namespace MultiplayerARPG
                         break;
                     case UpdateGuildMessage.UpdateType.Terminate:
                         ClientGuild = null;
+                        if (BasePlayerCharacterController.OwningCharacter != null)
+                            BasePlayerCharacterController.OwningCharacter.ForceMakeCaches();
                         break;
                 }
             }

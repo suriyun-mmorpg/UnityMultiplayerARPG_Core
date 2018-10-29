@@ -14,6 +14,7 @@ namespace MultiplayerARPG
             SetGuildMessage,
             SetGuildRole,
             SetGuildMemberRole,
+            SetGuildSkill,
             LevelExpSkillPoint,
             Terminate,
         }
@@ -30,6 +31,7 @@ namespace MultiplayerARPG
         public short level;
         public int exp;
         public short skillPoint;
+        public int dataId;
 
         public void Deserialize(NetDataReader reader)
         {
@@ -57,6 +59,10 @@ namespace MultiplayerARPG
                 case UpdateType.SetGuildMemberRole:
                     characterId = reader.GetString();
                     guildRole = reader.GetByte();
+                    break;
+                case UpdateType.SetGuildSkill:
+                    dataId = reader.GetInt();
+                    level = reader.GetShort();
                     break;
                 case UpdateType.LevelExpSkillPoint:
                     level = reader.GetShort();
@@ -92,6 +98,10 @@ namespace MultiplayerARPG
                 case UpdateType.SetGuildMemberRole:
                     writer.Put(characterId);
                     writer.Put(guildRole);
+                    break;
+                case UpdateType.SetGuildSkill:
+                    writer.Put(dataId);
+                    writer.Put(level);
                     break;
                 case UpdateType.LevelExpSkillPoint:
                     writer.Put(level);

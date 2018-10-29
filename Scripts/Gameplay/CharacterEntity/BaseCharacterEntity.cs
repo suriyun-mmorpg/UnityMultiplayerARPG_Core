@@ -870,12 +870,18 @@ namespace MultiplayerARPG
             RequestOnRespawn();
         }
 
-        protected void ForceMakeCaches()
+        /// <summary>
+        /// Make caches for character stats / attributes / skills / resistances / increase damages and so on immdediately
+        /// </summary>
+        public void ForceMakeCaches()
         {
             isRecaching = true;
             MakeCaches();
         }
 
+        /// <summary>
+        /// Make caches for character stats / attributes / skills / resistances / increase damages and so on when update calls
+        /// </summary>
         protected virtual void MakeCaches()
         {
             if (!isRecaching)
