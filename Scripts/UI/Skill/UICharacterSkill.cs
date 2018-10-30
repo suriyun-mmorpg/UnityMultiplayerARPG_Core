@@ -71,9 +71,13 @@ namespace MultiplayerARPG
 
         [Header("Options")]
         public UICharacterSkill uiNextLevelSkill;
-        public bool hideRemainsDurationWhenIsZero;
 
-        protected float collectedDeltaTime;
+        protected float coolDownRemainsDuration;
+
+        private void OnDisable()
+        {
+            coolDownRemainsDuration = 0f;
+        }
 
         protected override void Update()
         {
@@ -83,24 +87,36 @@ namespace MultiplayerARPG
             var characterSkill = Data.characterSkill;
             var skill = characterSkill.GetSkill();
             var level = Data.targetLevel;
-            collectedDeltaTime += Time.deltaTime;
 
             if (IsOwningCharacter() && characterSkill.CanLevelUp(BasePlayerCharacterController.OwningCharacter))
                 onAbleToLevelUp.Invoke();
             else
                 onUnableToLevelUp.Invoke();
 
-            var coolDownRemainsDuration = 0f;
-            if (character != null && skill != null)
+            if (coolDownRemainsDuration <= 0f)
             {
-                var indexOfSkillUsage = character.IndexOfSkillUsage(skill.DataId, SkillUsageType.Skill);
-                if (indexOfSkillUsage >= 0)
+                if (character != null && skill != null)
                 {
-                    coolDownRemainsDuration = character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration - collectedDeltaTime;
-                    if (coolDownRemainsDuration < 0f)
-                        coolDownRemainsDuration = 0f;
+                    var indexOfSkillUsage = character.IndexOfSkillUsage(skill.DataId, SkillUsageType.Skill);
+                    if (indexOfSkillUsage >= 0)
+                    {
+                        coolDownRemainsDuration = character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+                        if (coolDownRemainsDuration <= 1f)
+                            coolDownRemainsDuration = 0f;
+                    }
                 }
             }
+
+            if (coolDownRemainsDuration > 0f)
+            {
+                coolDownRemainsDuration -= Time.deltaTime;
+                if (coolDownRemainsDuration <= 0f)
+                    coolDownRemainsDuration = 0f;
+            }
+            else
+                coolDownRemainsDuration = 0f;
+
+            // Update UIs
             var coolDownDuration = skill.GetCoolDownDuration(level);
 
             if (uiTextCoolDownDuration != null)
@@ -108,15 +124,10 @@ namespace MultiplayerARPG
 
             if (uiTextCoolDownRemainsDuration != null)
             {
-                var remainsDurationString = "";
-                if (!hideRemainsDurationWhenIsZero || coolDownRemainsDuration > 0)
-                {
-                    if (skill == null)
-                        remainsDurationString = string.Format(coolDownRemainsDurationFormat, "0");
-                    else
-                        remainsDurationString = string.Format(coolDownRemainsDurationFormat, Mathf.CeilToInt(coolDownRemainsDuration).ToString("N0"));
-                }
-                uiTextCoolDownRemainsDuration.text = remainsDurationString;
+                if (coolDownRemainsDuration > 0f)
+                    uiTextCoolDownRemainsDuration.text = string.Format(coolDownRemainsDurationFormat, Mathf.CeilToInt(coolDownRemainsDuration).ToString("N0"));
+                else
+                    uiTextCoolDownRemainsDuration.text = "";
             }
 
             if (imageCoolDownGage != null)
@@ -130,8 +141,6 @@ namespace MultiplayerARPG
             var characterSkill = Data.characterSkill;
             var skill = characterSkill.GetSkill();
             short level = Data.targetLevel;
-
-            collectedDeltaTime = 0f;
 
             if (level <= 0)
                 onSetLevelZeroData.Invoke();

@@ -29,25 +29,48 @@ namespace MultiplayerARPG
         public Image imageDurationGage;
         public UIBuff uiBuff;
 
-        protected float collectedDeltaTime;
+        protected float buffRemainsDuration;
+
+        private void OnDisable()
+        {
+            buffRemainsDuration = 0f;
+        }
 
         protected override void Update()
         {
             base.Update();
             MigrateUIComponents();
             var characterBuff = Data;
-            collectedDeltaTime += Time.deltaTime;
 
-            var buffRemainsDuration = characterBuff.buffRemainsDuration - collectedDeltaTime;
-            if (buffRemainsDuration < 0)
-                buffRemainsDuration = 0;
+            if (buffRemainsDuration <= 0f)
+            {
+                buffRemainsDuration = characterBuff.buffRemainsDuration;
+                if (buffRemainsDuration <= 1f)
+                    buffRemainsDuration = 0f;
+            }
+
+            if (buffRemainsDuration > 0f)
+            {
+                buffRemainsDuration -= Time.deltaTime;
+                if (buffRemainsDuration <= 0f)
+                    buffRemainsDuration = 0f;
+            }
+            else
+                buffRemainsDuration = 0f;
+
+            // Update UIs
             var buffDuration = characterBuff.GetDuration();
 
             if (uiTextDuration != null)
                 uiTextDuration.text = string.Format(buffDurationFormat, buffDuration.ToString("N0"));
 
             if (uiTextRemainsDuration != null)
-                uiTextRemainsDuration.text = string.Format(buffRemainsDurationFormat, Mathf.CeilToInt(buffRemainsDuration).ToString("N0"));
+            {
+                if (buffRemainsDuration > 0f)
+                    uiTextRemainsDuration.text = string.Format(buffRemainsDurationFormat, Mathf.CeilToInt(buffRemainsDuration).ToString("N0"));
+                else
+                    uiTextRemainsDuration.text = "";
+            }
 
             if (imageDurationGage != null)
                 imageDurationGage.fillAmount = buffDuration <= 0 ? 0 : buffRemainsDuration / buffDuration;
@@ -71,8 +94,6 @@ namespace MultiplayerARPG
                     buffData = Data.GetGuildSkill();
                     break;
             }
-
-            collectedDeltaTime = 0f;
 
             if (uiTextTitle != null)
                 uiTextTitle.text = string.Format(titleFormat, buffData == null ? "Unknow" : buffData.title);
