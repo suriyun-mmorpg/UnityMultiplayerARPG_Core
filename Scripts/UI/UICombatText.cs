@@ -30,7 +30,14 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheText == null)
+                {
                     cacheText = GetComponent<TextWrapper>();
+                    if (cacheText == null)
+                    {
+                        cacheText = gameObject.AddComponent<TextWrapper>();
+                        cacheText.unityText = GetComponent<Text>();
+                    }
+                }
                 return cacheText;
             }
         }
