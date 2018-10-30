@@ -276,6 +276,7 @@ public static partial class PlayerCharacterDataExtension
         var itemSS = new CharacterItemSerializationSurrogate();
         var questSS = new CharacterQuestSerializationSurrogate();
         var skillSS = new CharacterSkillSerializationSurrogate();
+        var skillUsageSS = new CharacterSkillUsageSerializationSurrogate();
         surrogateSelector.AddSurrogate(typeof(PlayerCharacterData), new StreamingContext(StreamingContextStates.All), playerCharacterDataSS);
         surrogateSelector.AddSurrogate(typeof(CharacterAttribute), new StreamingContext(StreamingContextStates.All), attributeSS);
         surrogateSelector.AddSurrogate(typeof(CharacterBuff), new StreamingContext(StreamingContextStates.All), buffSS);
@@ -283,6 +284,7 @@ public static partial class PlayerCharacterDataExtension
         surrogateSelector.AddSurrogate(typeof(CharacterItem), new StreamingContext(StreamingContextStates.All), itemSS);
         surrogateSelector.AddSurrogate(typeof(CharacterQuest), new StreamingContext(StreamingContextStates.All), questSS);
         surrogateSelector.AddSurrogate(typeof(CharacterSkill), new StreamingContext(StreamingContextStates.All), skillSS);
+        surrogateSelector.AddSurrogate(typeof(CharacterSkillUsage), new StreamingContext(StreamingContextStates.All), skillUsageSS);
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "AddAllCharacterRelatesDataSurrogate", surrogateSelector);
     }
 
@@ -535,6 +537,7 @@ public static partial class PlayerCharacterDataExtension
             entry.dataId = reader.GetInt();
             entry.type = (SkillUsageType)reader.GetByte();
             entry.coolDownRemainsDuration = reader.GetFloat();
+            tempCharacterData.SkillUsages.Add(entry);
         }
         count = reader.GetByte();
         for (var i = 0; i < count; ++i)

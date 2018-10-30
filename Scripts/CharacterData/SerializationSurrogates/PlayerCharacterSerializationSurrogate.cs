@@ -24,6 +24,7 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
         info.AddValue("equipWeapons", data.EquipWeapons);
         info.AddListValue("attributes", data.Attributes);
         info.AddListValue("skills", data.Skills);
+        info.AddListValue("skillUsages", data.SkillUsages);
         info.AddListValue("buffs", data.Buffs);
         info.AddListValue("equipItems", data.EquipItems);
         info.AddListValue("nonEquipItems", data.NonEquipItems);
@@ -70,6 +71,7 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
         data.EquipWeapons = (EquipWeapons)info.GetValue("equipWeapons", typeof(EquipWeapons));
         data.Attributes = info.GetListValue<CharacterAttribute>("attributes");
         data.Skills = info.GetListValue<CharacterSkill>("skills");
+        data.SkillUsages = info.GetListValue<CharacterSkillUsage>("skillUsages");
         data.Buffs = info.GetListValue<CharacterBuff>("buffs");
         data.EquipItems = info.GetListValue<CharacterItem>("equipItems");
         data.NonEquipItems = info.GetListValue<CharacterItem>("nonEquipItems");
@@ -85,6 +87,7 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
         data.Hotkeys = info.GetListValue<CharacterHotkey>("hotkeys");
         data.Quests = info.GetListValue<CharacterQuest>("quests");
         this.InvokeInstanceDevExtMethods("SetObjectData", obj, info, context, selector);
+        
         obj = data;
         return obj;
     }
