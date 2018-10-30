@@ -13,7 +13,6 @@ namespace MultiplayerARPG
         public string amountNotReachTargetFormat = "{0}: <color=red>{1}/{2}</color>";
 
         [Header("UI Elements")]
-        public Text textAllAmounts;
         public TextWrapper uiTextAllAmounts;
         public UIItemTextPair[] textAmounts;
 
@@ -24,11 +23,10 @@ namespace MultiplayerARPG
             {
                 if (cacheTextLevels == null)
                 {
-                    MigrateUIComponents();
                     cacheTextLevels = new Dictionary<Item, TextWrapper>();
                     foreach (var textLevel in textAmounts)
                     {
-                        if (textLevel.item == null || textLevel.text == null)
+                        if (textLevel.item == null || textLevel.uiText == null)
                             continue;
                         var key = textLevel.item;
                         var textComp = textLevel.uiText;
@@ -45,8 +43,8 @@ namespace MultiplayerARPG
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (Data == null || Data.Count == 0)
             {
-                if (textAllAmounts != null)
-                    textAllAmounts.gameObject.SetActive(false);
+                if (uiTextAllAmounts != null)
+                    uiTextAllAmounts.gameObject.SetActive(false);
 
                 foreach (var textLevel in CacheTextLevels)
                 {
@@ -79,21 +77,6 @@ namespace MultiplayerARPG
                 {
                     uiTextAllAmounts.gameObject.SetActive(!string.IsNullOrEmpty(text));
                     uiTextAllAmounts.text = text;
-                }
-            }
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextAllAmounts = MigrateUIHelpers.SetWrapperToText(textAllAmounts, uiTextAllAmounts);
-            if (textAmounts != null && textAmounts.Length > 0)
-            {
-                for (var i = 0; i < textAmounts.Length; ++i)
-                {
-                    var textAmount = textAmounts[i];
-                    textAmount.uiText = MigrateUIHelpers.SetWrapperToText(textAmount.text, textAmount.uiText);
-                    textAmounts[i] = textAmount;
                 }
             }
         }

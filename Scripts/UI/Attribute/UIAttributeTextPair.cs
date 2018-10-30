@@ -6,7 +6,6 @@ namespace MultiplayerARPG
     public struct UIAttributeTextPair
     {
         public Attribute attribute;
-        public Text text;
         public TextWrapper uiText;
     }
 }

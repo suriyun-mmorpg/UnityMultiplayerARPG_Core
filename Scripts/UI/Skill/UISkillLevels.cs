@@ -13,7 +13,6 @@ namespace MultiplayerARPG
         public string levelNotReachTargetFormat = "{0}: <color=red>{1}/{2}</color>";
 
         [Header("UI Elements")]
-        public Text textAllLevels;
         public TextWrapper uiTextAllLevels;
         public UISkillTextPair[] textLevels;
 
@@ -24,11 +23,10 @@ namespace MultiplayerARPG
             {
                 if (cacheTextLevels == null)
                 {
-                    MigrateUIComponents();
                     cacheTextLevels = new Dictionary<Skill, TextWrapper>();
                     foreach (var textLevel in textLevels)
                     {
-                        if (textLevel.skill == null || textLevel.text == null)
+                        if (textLevel.skill == null || textLevel.uiText == null)
                             continue;
                         var key = textLevel.skill;
                         var textComp = textLevel.uiText;
@@ -42,8 +40,6 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            MigrateUIComponents();
-
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (Data == null || Data.Count == 0)
             {
@@ -81,21 +77,6 @@ namespace MultiplayerARPG
                 {
                     uiTextAllLevels.gameObject.SetActive(!string.IsNullOrEmpty(text));
                     uiTextAllLevels.text = text;
-                }
-            }
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextAllLevels = MigrateUIHelpers.SetWrapperToText(textAllLevels, uiTextAllLevels);
-            if (textLevels != null && textLevels.Length > 0)
-            {
-                for (var i = 0; i < textLevels.Length; ++i)
-                {
-                    var textLevel = textLevels[i];
-                    textLevel.uiText = MigrateUIHelpers.SetWrapperToText(textLevel.text, textLevel.uiText);
-                    textLevels[i] = textLevel;
                 }
             }
         }

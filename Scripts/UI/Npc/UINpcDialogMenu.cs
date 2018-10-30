@@ -15,14 +15,11 @@ namespace MultiplayerARPG
     public partial class UINpcDialogMenu : UISelectionEntry<UINpcDialogMenuAction>
     {
         [Header("UI Elements")]
-        public Text title;
         public TextWrapper uiTextTitle;
         public UINpcDialog uiNpcDialog;
 
         protected override void UpdateData()
         {
-            MigrateUIComponents();
-
             if (uiTextTitle != null)
                 uiTextTitle.text = Data.title;
         }
@@ -31,12 +28,6 @@ namespace MultiplayerARPG
         {
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             owningCharacter.RequestSelectNpcDialogMenu((byte)Data.menuIndex);
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextTitle = MigrateUIHelpers.SetWrapperToText(title, uiTextTitle);
         }
     }
 }

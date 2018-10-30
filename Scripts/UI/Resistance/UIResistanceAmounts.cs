@@ -11,7 +11,6 @@ namespace MultiplayerARPG
         public string amountFormat = "{0}: {1}%";
 
         [Header("UI Elements")]
-        public Text textAllAmounts;
         public TextWrapper uiTextAllAmounts;
         public UIResistanceTextPair[] textAmounts;
 
@@ -25,7 +24,7 @@ namespace MultiplayerARPG
                     cacheTextAmounts = new Dictionary<DamageElement, TextWrapper>();
                     foreach (var textAmount in textAmounts)
                     {
-                        if (textAmount.damageElement == null || textAmount.text == null)
+                        if (textAmount.damageElement == null || textAmount.uiText == null)
                             continue;
                         var key = textAmount.damageElement;
                         var textComp = textAmount.uiText;
@@ -39,11 +38,10 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            MigrateUIComponents();
             if (Data == null || Data.Count == 0)
             {
-                if (textAllAmounts != null)
-                    textAllAmounts.gameObject.SetActive(false);
+                if (uiTextAllAmounts != null)
+                    uiTextAllAmounts.gameObject.SetActive(false);
 
                 foreach (var textAmount in CacheTextAmounts)
                 {
@@ -66,25 +64,10 @@ namespace MultiplayerARPG
                     if (CacheTextAmounts.TryGetValue(dataEntry.Key, out cacheTextAmount))
                         cacheTextAmount.text = amountText;
                 }
-                if (textAllAmounts != null)
+                if (uiTextAllAmounts != null)
                 {
-                    textAllAmounts.gameObject.SetActive(!string.IsNullOrEmpty(text));
-                    textAllAmounts.text = text;
-                }
-            }
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextAllAmounts = MigrateUIHelpers.SetWrapperToText(textAllAmounts, uiTextAllAmounts);
-            if (textAmounts != null && textAmounts.Length > 0)
-            {
-                for (var i = 0; i < textAmounts.Length; ++i)
-                {
-                    var textAmount = textAmounts[i];
-                    textAmount.uiText = MigrateUIHelpers.SetWrapperToText(textAmount.text, textAmount.uiText);
-                    textAmounts[i] = textAmount;
+                    uiTextAllAmounts.gameObject.SetActive(!string.IsNullOrEmpty(text));
+                    uiTextAllAmounts.text = text;
                 }
             }
         }

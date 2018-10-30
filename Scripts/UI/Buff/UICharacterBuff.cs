@@ -19,12 +19,9 @@ namespace MultiplayerARPG
         public string buffRemainsDurationFormat = "{0}";
 
         [Header("UI Elements")]
-        public Text textTitle;
         public TextWrapper uiTextTitle;
         public Image imageIcon;
-        public Text textDuration;
         public TextWrapper uiTextDuration;
-        public Text textRemainsDuration;
         public TextWrapper uiTextRemainsDuration;
         public Image imageDurationGage;
         public UIBuff uiBuff;
@@ -39,7 +36,7 @@ namespace MultiplayerARPG
         protected override void Update()
         {
             base.Update();
-            MigrateUIComponents();
+
             var characterBuff = Data;
 
             if (buffRemainsDuration <= 0f)
@@ -78,8 +75,6 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            MigrateUIComponents();
-
             BaseGameData buffData = null;
             switch (Data.type)
             {
@@ -116,14 +111,6 @@ namespace MultiplayerARPG
                     uiBuff.Data = new BuffTuple(buff, Data.level);
                 }
             }
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextTitle = MigrateUIHelpers.SetWrapperToText(textTitle, uiTextTitle);
-            uiTextDuration = MigrateUIHelpers.SetWrapperToText(textDuration, uiTextDuration);
-            uiTextRemainsDuration = MigrateUIHelpers.SetWrapperToText(textRemainsDuration, uiTextRemainsDuration);
         }
     }
 }

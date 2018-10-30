@@ -14,16 +14,12 @@ namespace MultiplayerARPG
         public string requireClassFormat = "Require Class: {0}";
 
         [Header("UI Elements")]
-        public Text textRequireLevel;
         public TextWrapper uiTextRequireLevel;
-        public Text textRequireClass;
         public TextWrapper uiTextRequireClass;
         public UIAttributeAmounts uiRequireAttributeAmounts;
 
         protected override void UpdateData()
         {
-            MigrateUIComponents();
-
             var equipmentItem = Data;
 
             if (uiTextRequireLevel != null)
@@ -58,13 +54,6 @@ namespace MultiplayerARPG
                     uiRequireAttributeAmounts.Data = equipmentItem.CacheRequireAttributeAmounts;
                 }
             }
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextRequireLevel = MigrateUIHelpers.SetWrapperToText(textRequireLevel, uiTextRequireLevel);
-            uiTextRequireClass = MigrateUIHelpers.SetWrapperToText(textRequireClass, uiTextRequireClass);
         }
     }
 }

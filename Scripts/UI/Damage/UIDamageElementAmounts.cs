@@ -13,9 +13,7 @@ namespace MultiplayerARPG
         public string sumDamageFormat = "{0}~{1}";
 
         [Header("UI Elements")]
-        public Text textAllDamages;
         public TextWrapper uiTextAllDamages;
-        public Text textSumDamage;
         public TextWrapper uiTextSumDamage;
         public UIDamageElementTextPair[] textDamages;
 
@@ -26,11 +24,10 @@ namespace MultiplayerARPG
             {
                 if (cacheTextDamages == null)
                 {
-                    MigrateUIComponents();
                     cacheTextDamages = new Dictionary<DamageElement, TextWrapper>();
                     foreach (var textAmount in textDamages)
                     {
-                        if (textAmount.damageElement == null || textAmount.text == null)
+                        if (textAmount.damageElement == null || textAmount.uiText == null)
                             continue;
                         var key = textAmount.damageElement;
                         var textComp = textAmount.uiText;
@@ -44,7 +41,6 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            MigrateUIComponents();
             if (Data == null || Data.Count == 0)
             {
                 if (uiTextAllDamages != null)
@@ -87,22 +83,6 @@ namespace MultiplayerARPG
 
                 if (uiTextSumDamage != null)
                     uiTextSumDamage.text = string.Format(sumDamageFormat, sumDamage.min.ToString("N0"), sumDamage.max.ToString("N0"));
-            }
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextAllDamages = MigrateUIHelpers.SetWrapperToText(textAllDamages, uiTextAllDamages);
-            uiTextSumDamage = MigrateUIHelpers.SetWrapperToText(textSumDamage, uiTextSumDamage);
-            if (textDamages != null && textDamages.Length > 0)
-            {
-                for (var i = 0; i < textDamages.Length; ++i)
-                {
-                    var textDamage = textDamages[i];
-                    textDamage.uiText = MigrateUIHelpers.SetWrapperToText(textDamage.text, textDamage.uiText);
-                    textDamages[i] = textDamage;
-                }
             }
         }
     }

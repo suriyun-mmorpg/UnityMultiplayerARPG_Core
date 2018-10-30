@@ -6,7 +6,6 @@ namespace MultiplayerARPG
     public struct UIItemTextPair
     {
         public Item item;
-        public Text text;
         public TextWrapper uiText;
     }
 }

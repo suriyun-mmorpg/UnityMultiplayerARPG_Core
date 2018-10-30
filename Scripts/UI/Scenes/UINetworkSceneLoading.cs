@@ -8,7 +8,6 @@ namespace MultiplayerARPG
     {
         public static UINetworkSceneLoading Singleton { get; private set; }
         public GameObject rootObject;
-        public Text textProgress;
         public TextWrapper uiTextProgress;
         public Image imageGage;
 
@@ -29,7 +28,6 @@ namespace MultiplayerARPG
 
         public void OnLoadSceneStart(string sceneName, bool isOnline, float progress)
         {
-            MigrateUIComponents();
             if (rootObject != null)
                 rootObject.SetActive(true);
             if (uiTextProgress != null)
@@ -40,7 +38,6 @@ namespace MultiplayerARPG
 
         public void OnLoadSceneProgress(string sceneName, bool isOnline, float progress)
         {
-            MigrateUIComponents();
             if (uiTextProgress != null)
                 uiTextProgress.text = (progress * 100f).ToString("N2") + "%";
             if (imageGage != null)
@@ -54,7 +51,6 @@ namespace MultiplayerARPG
 
         IEnumerator OnLoadSceneFinishRoutine()
         {
-            MigrateUIComponents();
             if (uiTextProgress != null)
                 uiTextProgress.text = "100.00%";
             if (imageGage != null)
@@ -62,12 +58,6 @@ namespace MultiplayerARPG
             yield return new WaitForSecondsRealtime(0.25f);
             if (rootObject != null)
                 rootObject.SetActive(false);
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextProgress = MigrateUIHelpers.SetWrapperToText(textProgress, uiTextProgress);
         }
     }
 }

@@ -15,7 +15,6 @@ namespace MultiplayerARPG
         public float visibleWhenHitDuration = 2f;
         public float visibleDistance = 30f;
         public UIFollowWorldObject rootFollower;
-        public Text textTitle;
         public TextWrapper uiTextTitle;
         public UICharacter uiCharacter;
         private float lastShowTime;
@@ -39,8 +38,6 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            MigrateUIComponents();
-
             Profiler.BeginSample("UICharacterEntity - Update UI");
             if (Data == null || BasePlayerCharacterController.OwningCharacter == null)
             {
@@ -111,12 +108,6 @@ namespace MultiplayerARPG
                 transform.localPosition = Vector3.zero;
                 transform.localScale = Vector3.one * placeAsChildScale;
             }
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextTitle = MigrateUIHelpers.SetWrapperToText(textTitle, uiTextTitle);
         }
     }
 }

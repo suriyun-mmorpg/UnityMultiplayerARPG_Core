@@ -46,37 +46,24 @@ namespace MultiplayerARPG
         public string classDescriptionFormat = "{0}";
 
         [Header("UI Elements")]
-        public Text textName;
         public TextWrapper uiTextName;
-        public Text textLevel;
         public TextWrapper uiTextLevel;
-        public Text textExp;
         public TextWrapper uiTextExp;
         public Image imageExpGage;
-        public Text textHp;
         public TextWrapper uiTextHp;
         public Image imageHpGage;
-        public Text textMp;
         public TextWrapper uiTextMp;
         public Image imageMpGage;
-        public Text textStamina;
         public TextWrapper uiTextStamina;
         public Image imageStaminaGage;
-        public Text textFood;
         public TextWrapper uiTextFood;
         public Image imageFoodGage;
-        public Text textWater;
         public TextWrapper uiTextWater;
         public Image imageWaterGage;
-        public Text textStatPoint;
         public TextWrapper uiTextStatPoint;
-        public Text textSkillPoint;
         public TextWrapper uiTextSkillPoint;
-        public Text textGold;
         public TextWrapper uiTextGold;
-        public Text textWeightLimit;
         public TextWrapper uiTextWeightLimit;
-        public Text textWeaponDamages;
         public TextWrapper uiTextWeaponDamages;
         public UIDamageElementAmounts uiRightHandDamages;
         public UIDamageElementAmounts uiLeftHandDamages;
@@ -84,9 +71,7 @@ namespace MultiplayerARPG
         public UICharacterBuffs uiCharacterBuffs;
         public UICharacterAttributePair[] uiCharacterAttributes;
         [Header("Class information")]
-        public Text textClassTitle;
         public TextWrapper uiTextClassTitle;
-        public Text textClassDescription;
         public TextWrapper uiTextClassDescription;
         public Image imageClassIcon;
         [Header("Options")]
@@ -204,8 +189,6 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            MigrateUIComponents();
-
             Profiler.BeginSample("UICharacter - Update UI");
 
             if (uiTextName != null)
@@ -265,7 +248,6 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            MigrateUIComponents();
             cacheStatsWithBuffs = Data.GetStats();
             cacheAttributesWithBuffs = Data.GetAttributes();
             displayingStats = showStatsWithBuffs ? cacheStatsWithBuffs : Data.GetStats(true, false);
@@ -355,26 +337,6 @@ namespace MultiplayerARPG
 
             if (uiCharacterBuffs != null)
                 uiCharacterBuffs.UpdateData(Data);
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextName = MigrateUIHelpers.SetWrapperToText(textName, uiTextName);
-            uiTextLevel = MigrateUIHelpers.SetWrapperToText(textLevel, uiTextLevel);
-            uiTextExp = MigrateUIHelpers.SetWrapperToText(textExp, uiTextExp);
-            uiTextHp = MigrateUIHelpers.SetWrapperToText(textHp, uiTextHp);
-            uiTextMp = MigrateUIHelpers.SetWrapperToText(textMp, uiTextMp);
-            uiTextStamina = MigrateUIHelpers.SetWrapperToText(textStamina, uiTextStamina);
-            uiTextFood = MigrateUIHelpers.SetWrapperToText(textFood, uiTextFood);
-            uiTextWater = MigrateUIHelpers.SetWrapperToText(textWater, uiTextWater);
-            uiTextStatPoint = MigrateUIHelpers.SetWrapperToText(textStatPoint, uiTextStatPoint);
-            uiTextSkillPoint = MigrateUIHelpers.SetWrapperToText(textSkillPoint, uiTextSkillPoint);
-            uiTextGold = MigrateUIHelpers.SetWrapperToText(textGold, uiTextGold);
-            uiTextWeightLimit = MigrateUIHelpers.SetWrapperToText(textWeightLimit, uiTextWeightLimit);
-            uiTextWeaponDamages = MigrateUIHelpers.SetWrapperToText(textWeaponDamages, uiTextWeaponDamages);
-            uiTextClassTitle = MigrateUIHelpers.SetWrapperToText(textClassTitle, uiTextClassTitle);
-            uiTextClassDescription = MigrateUIHelpers.SetWrapperToText(textClassDescription, uiTextClassDescription);
         }
     }
 }

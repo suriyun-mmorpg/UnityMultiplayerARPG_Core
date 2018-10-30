@@ -30,10 +30,7 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheText == null)
-                {
-                    var textComp = GetComponent<Text>();
-                    cacheText = MigrateUIHelpers.SetWrapperToText(textComp, cacheText);
-                }
+                    cacheText = GetComponent<TextWrapper>();
                 return cacheText;
             }
         }

@@ -6,7 +6,6 @@ namespace MultiplayerARPG
     public struct UIDamageElementTextPair
     {
         public DamageElement damageElement;
-        public Text text;
         public TextWrapper uiText;
     }
 }

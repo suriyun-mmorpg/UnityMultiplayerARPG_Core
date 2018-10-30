@@ -19,19 +19,14 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public UICharacterItem uiRefiningItem;
         public UIItemAmounts uiRequireItemAmounts;
-        public Text textRequireGold;
         public TextWrapper uiTextRequireGold;
-        public Text textSuccessRate;
         public TextWrapper uiTextSuccessRate;
-        public Text textRefiningLevel;
         public TextWrapper uiTextRefiningLevel;
 
         private bool hasSetData;
 
         protected override void UpdateUI()
         {
-            MigrateUIComponents();
-
             Profiler.BeginSample("UIRefineItem - Update UI");
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             CharacterItem characterItem = null;
@@ -109,14 +104,6 @@ namespace MultiplayerARPG
             if (!hasSetData)
                 return;
             BasePlayerCharacterController.OwningCharacter.RequestRefineItem((ushort)Data);
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextRequireGold = MigrateUIHelpers.SetWrapperToText(textRequireGold, uiTextRequireGold);
-            uiTextSuccessRate = MigrateUIHelpers.SetWrapperToText(textSuccessRate, uiTextSuccessRate);
-            uiTextRefiningLevel = MigrateUIHelpers.SetWrapperToText(textRefiningLevel, uiTextRefiningLevel);
         }
     }
 }

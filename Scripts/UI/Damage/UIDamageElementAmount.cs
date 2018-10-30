@@ -9,7 +9,6 @@ namespace MultiplayerARPG
         public string amountFormat = "{0}: {1}~{2}";
 
         [Header("UI Elements")]
-        public Text textAmount;
         public TextWrapper uiTextAmount;
 
         protected override void UpdateData()
@@ -20,12 +19,6 @@ namespace MultiplayerARPG
                 var amount = Data.amount;
                 uiTextAmount.text = string.Format(amountFormat, element.title, amount.min.ToString("N0"), amount.max.ToString("N0"));
             }
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextAmount = MigrateUIHelpers.SetWrapperToText(textAmount, uiTextAmount);
         }
     }
 }

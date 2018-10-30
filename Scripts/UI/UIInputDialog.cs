@@ -5,11 +5,8 @@ using UnityEngine.UI;
 
 public class UIInputDialog : UIBase
 {
-    public Text textTitle;
     public TextWrapper uiTextTitle;
-    public Text textDescription;
     public TextWrapper uiTextDescription;
-    public InputField inputField;
     public InputFieldWrapper uiInputField;
     public Button buttonConfirm;
     private System.Action<string> onConfirmText;
@@ -27,12 +24,10 @@ public class UIInputDialog : UIBase
     {
         get
         {
-            MigrateUIComponents();
             return uiTextTitle == null ? "" : uiTextTitle.text;
         }
         set
         {
-            MigrateUIComponents();
             if (uiTextTitle != null) uiTextTitle.text = value;
         }
     }
@@ -41,12 +36,10 @@ public class UIInputDialog : UIBase
     {
         get
         {
-            MigrateUIComponents();
             return uiTextDescription == null ? "" : uiTextDescription.text;
         }
         set
         {
-            MigrateUIComponents();
             if (uiTextDescription != null) uiTextDescription.text = value;
         }
     }
@@ -55,20 +48,18 @@ public class UIInputDialog : UIBase
     {
         get
         {
-            MigrateUIComponents();
             return uiInputField == null ? "" : uiInputField.text;
         }
         set
         {
-            MigrateUIComponents();
             if (uiInputField != null) uiInputField.text = value;
         }
     }
 
     public override void Show()
     {
-        if (inputField != null)
-            inputField.contentType = contentType;
+        if (uiInputField != null)
+            uiInputField.contentType = contentType;
         if (buttonConfirm != null)
         {
             buttonConfirm.onClick.RemoveListener(OnClickConfirm);
@@ -195,13 +186,5 @@ public class UIInputDialog : UIBase
                 break;
         }
         Hide();
-    }
-
-    [ContextMenu("Migrate UI Components")]
-    public void MigrateUIComponents()
-    {
-        uiTextTitle = MigrateUIHelpers.SetWrapperToText(textTitle, uiTextTitle);
-        uiTextDescription = MigrateUIHelpers.SetWrapperToText(textDescription, uiTextDescription);
-        uiInputField = MigrateUIHelpers.SetWrapperToInputField(inputField, uiInputField);
     }
 }
