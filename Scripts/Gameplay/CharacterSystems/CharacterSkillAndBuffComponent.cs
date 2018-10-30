@@ -37,11 +37,13 @@ namespace MultiplayerARPG
             skillAndBuffData.skillBuffUpdateDeltaTime += deltaTime;
             if (skillAndBuffData.skillBuffUpdateDeltaTime >= SKILL_BUFF_UPDATE_DURATION)
             {
-                var count = characterEntity.Skills.Count;
+                var count = characterEntity.SkillUsages.Count;
                 for (var i = count - 1; i >= 0; --i)
                 {
                     var skillUsage = characterEntity.SkillUsages[i];
-                    if (skillUsage.ShouldUpdate())
+                    if (skillUsage.ShouldRemove())
+                        characterEntity.SkillUsages.RemoveAt(i);
+                    else
                     {
                         skillUsage.Update(skillAndBuffData.skillBuffUpdateDeltaTime);
                         characterEntity.SkillUsages[i] = skillUsage;

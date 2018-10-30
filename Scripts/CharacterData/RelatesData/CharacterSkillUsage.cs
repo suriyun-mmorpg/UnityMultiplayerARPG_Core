@@ -53,7 +53,7 @@ public class CharacterSkillUsage
 
     public void Use(ICharacterData character, short level)
     {
-        coolDownRemainsDuration = 0;
+        coolDownRemainsDuration = 0f;
         switch (type)
         {
             case SkillUsageType.Skill:
@@ -68,9 +68,9 @@ public class CharacterSkillUsage
         }
     }
 
-    public bool ShouldUpdate()
+    public bool ShouldRemove()
     {
-        return coolDownRemainsDuration > 0f;
+        return coolDownRemainsDuration <= 0f;
     }
 
     public void Update(float deltaTime)
