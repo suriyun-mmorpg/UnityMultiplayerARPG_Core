@@ -11,25 +11,29 @@ namespace MultiplayerARPG
         public BaseCharacterEntity entityPrefab;
 
         [Header("Stats/Attributes")]
+        [SerializeField]
         public CharacterStatsIncremental stats;
+        [SerializeField]
         public AttributeIncremental[] attributes;
+        [SerializeField]
         public ResistanceIncremental[] resistances;
 
         [Header("Skills")]
-        public SkillLevel[] skillLevels;
+        [SerializeField]
+        private SkillLevel[] skillLevels;
 
-        private Dictionary<int, SkillLevel> cacheSkillLevels;
-        public Dictionary<int, SkillLevel> CacheSkillLevels
+        private Dictionary<Skill, short> cacheSkillLevels;
+        public Dictionary<Skill, short> CacheSkillLevels
         {
             get
             {
                 if (cacheSkillLevels == null)
                 {
-                    cacheSkillLevels = new Dictionary<int, SkillLevel>();
+                    cacheSkillLevels = new Dictionary<Skill, short>();
                     foreach (var skillLevel in skillLevels)
                     {
                         if (skillLevel.skill != null)
-                            cacheSkillLevels[skillLevel.skill.DataId] = skillLevel;
+                            cacheSkillLevels[skillLevel.skill] = skillLevel.level;
                     }
                 }
                 return cacheSkillLevels;

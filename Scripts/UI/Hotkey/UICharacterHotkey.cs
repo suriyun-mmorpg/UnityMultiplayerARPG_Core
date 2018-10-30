@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -56,7 +55,7 @@ namespace MultiplayerARPG
                     if (index >= 0 && index < owningCharacter.Skills.Count)
                     {
                         var characterSkill = owningCharacter.Skills[index];
-                        uiCharacterSkill.Setup(new CharacterSkillTuple(characterSkill, characterSkill.level), owningCharacter, index);
+                        uiCharacterSkill.Setup(new SkillTuple(characterSkill.GetSkill(), characterSkill.level), owningCharacter, index);
                         uiCharacterSkill.Show();
                     }
                     else

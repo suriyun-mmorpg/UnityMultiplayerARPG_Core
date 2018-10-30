@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.Profiling;
-using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
     public partial class UICharacterQuest : UIDataForCharacter<CharacterQuest>
     {
+        public CharacterQuest CharacterQuest { get { return Data; } }
+        public Quest Quest { get { return CharacterQuest != null ? CharacterQuest.GetQuest() : null; } }
+
         [Header("Generic Info Format")]
         [Tooltip("Title Format => {0} = {Title}")]
         public string questOnGoingTitleFormat = "{0} (Ongoing)";
@@ -92,29 +93,26 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            var characterQuest = Data;
-            var quest = characterQuest.GetQuest();
-
-            var isComplete = characterQuest.isComplete;
-            var isAllTasksDone = characterQuest.IsAllTasksDone(character);
+            var isComplete = CharacterQuest.isComplete;
+            var isAllTasksDone = CharacterQuest.IsAllTasksDone(character);
 
             var titleFormat = isComplete ? questCompleteTitleFormat : (isAllTasksDone ? questTasksCompleteTitleFormat : questOnGoingTitleFormat);
 
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(titleFormat, quest == null ? "Unknow" : quest.title);
+                uiTextTitle.text = string.Format(titleFormat, Quest == null ? "Unknow" : Quest.title);
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(descriptionFormat, quest == null ? "N/A" : quest.description);
+                uiTextDescription.text = string.Format(descriptionFormat, Quest == null ? "N/A" : Quest.description);
 
             if (uiTextRewardExp != null)
-                uiTextRewardExp.text = string.Format(rewardExpFormat, quest == null ? "0" : quest.rewardExp.ToString("N0"));
+                uiTextRewardExp.text = string.Format(rewardExpFormat, Quest == null ? "0" : Quest.rewardExp.ToString("N0"));
 
             if (uiTextRewardGold != null)
-                uiTextRewardGold.text = string.Format(rewardGoldFormat, quest == null ? "0" : quest.rewardGold.ToString("N0"));
+                uiTextRewardGold.text = string.Format(rewardGoldFormat, Quest == null ? "0" : Quest.rewardGold.ToString("N0"));
 
-            if (quest != null && showRewardItemList)
+            if (Quest != null && showRewardItemList)
             {
-                CacheRewardItemList.Generate(quest.rewardItems, (index, rewardItem, ui) =>
+                CacheRewardItemList.Generate(Quest.rewardItems, (index, rewardItem, ui) =>
                 {
                     var characterItem = CharacterItem.Create(rewardItem.item);
                     characterItem.amount = rewardItem.amount;
@@ -125,10 +123,10 @@ namespace MultiplayerARPG
             }
 
             if (uiRewardItemRoot != null)
-                uiRewardItemRoot.SetActive(showRewardItemList && quest.rewardItems.Length > 0);
+                uiRewardItemRoot.SetActive(showRewardItemList && Quest.rewardItems.Length > 0);
 
             if (uiQuestTaskRoot != null)
-                uiQuestTaskRoot.SetActive(showQuestTaskList && quest.tasks.Length > 0);
+                uiQuestTaskRoot.SetActive(showQuestTaskList && Quest.tasks.Length > 0);
 
             if (questCompleteStatusObject != null)
                 questCompleteStatusObject.SetActive(isComplete);

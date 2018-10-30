@@ -209,6 +209,13 @@ namespace MultiplayerARPG
             return result;
         }
 
+        public short GetSkillLevel(int dataId)
+        {
+            if (skills.ContainsKey(dataId))
+                return skills[dataId];
+            return 0;
+        }
+
         public int MaxMember()
         {
             return SystemSetting.MaxGuildMember + IncreaseMaxMember;

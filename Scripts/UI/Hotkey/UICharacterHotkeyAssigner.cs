@@ -117,7 +117,7 @@ namespace MultiplayerARPG
             CacheSkillList.Generate(filterSkills, (index, characterSkill, ui) =>
             {
                 var uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
-                uiCharacterSkill.Setup(new CharacterSkillTuple(characterSkill, characterSkill.level), null, -1);
+                uiCharacterSkill.Setup(new SkillTuple(characterSkill.GetSkill(), characterSkill.level), null, -1);
                 uiCharacterSkill.Show();
                 CacheSkillSelectionManager.Add(uiCharacterSkill);
             });
@@ -142,7 +142,7 @@ namespace MultiplayerARPG
         {
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
-                owningCharacter.RequestAssignHotkey(hotkeyId, HotkeyType.Skill, ui.Data.characterSkill.dataId);
+                owningCharacter.RequestAssignHotkey(hotkeyId, HotkeyType.Skill, ui.Skill.DataId);
             Hide();
         }
 

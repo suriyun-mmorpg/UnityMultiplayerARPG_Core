@@ -4,11 +4,10 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public partial class UICharacterSkill : UIDataForCharacter<CharacterSkillTuple>
+    public partial class UICharacterSkill : UIDataForCharacter<SkillTuple>
     {
-        public CharacterSkill characterSkill { get { return Data.characterSkill; } }
-        public short level { get { return Data.targetLevel; } }
-        public Skill skill { get { return characterSkill != null ? characterSkill.GetSkill() : null; } }
+        public Skill Skill { get { return Data.skill; } }
+        public short Level { get { return Data.targetLevel; } }
 
         [Header("Generic Info Format")]
         [Tooltip("Title Format => {0} = {Title}")]
@@ -77,16 +76,16 @@ namespace MultiplayerARPG
         {
             base.Update();
 
-            if (IsOwningCharacter() && characterSkill.CanLevelUp(BasePlayerCharacterController.OwningCharacter))
+            if (IsOwningCharacter() && Skill.CanLevelUp(BasePlayerCharacterController.OwningCharacter, Level))
                 onAbleToLevelUp.Invoke();
             else
                 onUnableToLevelUp.Invoke();
 
             if (coolDownRemainsDuration <= 0f)
             {
-                if (character != null && skill != null)
+                if (character != null && Skill != null)
                 {
-                    var indexOfSkillUsage = character.IndexOfSkillUsage(skill.DataId, SkillUsageType.Skill);
+                    var indexOfSkillUsage = character.IndexOfSkillUsage(Skill.DataId, SkillUsageType.Skill);
                     if (indexOfSkillUsage >= 0)
                     {
                         coolDownRemainsDuration = character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
@@ -106,7 +105,7 @@ namespace MultiplayerARPG
                 coolDownRemainsDuration = 0f;
 
             // Update UIs
-            var coolDownDuration = skill.GetCoolDownDuration(level);
+            var coolDownDuration = Skill.GetCoolDownDuration(Level);
 
             if (uiTextCoolDownDuration != null)
                 uiTextCoolDownDuration.text = string.Format(coolDownDurationFormat, coolDownDuration.ToString("N0"));
@@ -125,30 +124,30 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            if (level <= 0)
+            if (Level <= 0)
                 onSetLevelZeroData.Invoke();
             else
                 onSetNonLevelZeroData.Invoke();
 
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(titleFormat, skill == null ? "Unknow" : skill.title);
+                uiTextTitle.text = string.Format(titleFormat, Skill == null ? "Unknow" : Skill.title);
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(descriptionFormat, skill == null ? "N/A" : skill.description);
+                uiTextDescription.text = string.Format(descriptionFormat, Skill == null ? "N/A" : Skill.description);
 
             if (uiTextLevel != null)
-                uiTextLevel.text = string.Format(levelFormat, level.ToString("N0"));
+                uiTextLevel.text = string.Format(levelFormat, Level.ToString("N0"));
 
             if (imageIcon != null)
             {
-                var iconSprite = skill == null ? null : skill.icon;
+                var iconSprite = Skill == null ? null : Skill.icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
             }
 
             if (uiTextSkillType != null)
             {
-                switch (skill.skillType)
+                switch (Skill.skillType)
                 {
                     case SkillType.Active:
                         uiTextSkillType.text = string.Format(skillTypeFormat, activeSkillType);
@@ -164,12 +163,12 @@ namespace MultiplayerARPG
 
             if (uiTextAvailableWeapons != null)
             {
-                if (skill.availableWeapons == null || skill.availableWeapons.Length == 0)
+                if (Skill.availableWeapons == null || Skill.availableWeapons.Length == 0)
                     uiTextAvailableWeapons.gameObject.SetActive(false);
                 else
                 {
                     var str = string.Empty;
-                    foreach (var availableWeapon in skill.availableWeapons)
+                    foreach (var availableWeapon in Skill.availableWeapons)
                     {
                         if (!string.IsNullOrEmpty(str))
                             str += "/";
@@ -181,32 +180,32 @@ namespace MultiplayerARPG
             }
 
             if (uiTextConsumeMp != null)
-                uiTextConsumeMp.text = string.Format(consumeMpFormat, skill == null || level <= 0 ? "N/A" : skill.GetConsumeMp(level).ToString("N0"));
+                uiTextConsumeMp.text = string.Format(consumeMpFormat, Skill == null || Level <= 0 ? "N/A" : Skill.GetConsumeMp(Level).ToString("N0"));
 
             if (uiRequirement != null)
             {
-                if (skill == null || (skill.GetRequireCharacterLevel(level) == 0 && skill.CacheRequireSkillLevels.Count == 0))
+                if (Skill == null || (Skill.GetRequireCharacterLevel(Level) == 0 && Skill.CacheRequireSkillLevels.Count == 0))
                     uiRequirement.Hide();
                 else
                 {
                     uiRequirement.Show();
-                    uiRequirement.Data = new SkillTuple(skill, level);
+                    uiRequirement.Data = new SkillTuple(Skill, Level);
                 }
             }
 
             if (uiCraftItem != null)
             {
-                if (skill == null || skill.skillType != SkillType.CraftItem)
+                if (Skill == null || Skill.skillType != SkillType.CraftItem)
                     uiCraftItem.Hide();
                 else
                 {
                     uiCraftItem.Show();
-                    uiCraftItem.Data = skill.itemCraft;
+                    uiCraftItem.Data = Skill.itemCraft;
                 }
             }
 
-            var isAttack = skill != null && skill.IsAttack();
-            var isOverrideWeaponDamage = isAttack && skill.skillAttackType == SkillAttackType.Normal;
+            var isAttack = Skill != null && Skill.IsAttack();
+            var isOverrideWeaponDamage = isAttack && Skill.skillAttackType == SkillAttackType.Normal;
             if (uiDamageAmount != null)
             {
                 if (!isOverrideWeaponDamage)
@@ -214,14 +213,14 @@ namespace MultiplayerARPG
                 else
                 {
                     uiDamageAmount.Show();
-                    var keyValuePair = skill.GetDamageAmount(level, null);
+                    var keyValuePair = Skill.GetDamageAmount(Level, null);
                     uiDamageAmount.Data = new DamageElementAmountTuple(keyValuePair.Key, keyValuePair.Value);
                 }
             }
 
             if (uiDamageInflictions != null)
             {
-                var damageInflictionRates = skill.GetWeaponDamageInflictions(level);
+                var damageInflictionRates = Skill.GetWeaponDamageInflictions(Level);
                 if (!isAttack || damageInflictionRates == null || damageInflictionRates.Count == 0)
                     uiDamageInflictions.Hide();
                 else
@@ -233,7 +232,7 @@ namespace MultiplayerARPG
 
             if (uiAdditionalDamageAmounts != null)
             {
-                var additionalDamageAmounts = skill.GetAdditionalDamageAmounts(level);
+                var additionalDamageAmounts = Skill.GetAdditionalDamageAmounts(Level);
                 if (!isAttack || additionalDamageAmounts == null || additionalDamageAmounts.Count == 0)
                     uiAdditionalDamageAmounts.Hide();
                 else
@@ -245,33 +244,33 @@ namespace MultiplayerARPG
 
             if (uiSkillBuff != null)
             {
-                if (!skill.IsBuff())
+                if (!Skill.IsBuff())
                     uiSkillBuff.Hide();
                 else
                 {
                     uiSkillBuff.Show();
-                    uiSkillBuff.Data = new BuffTuple(skill.buff, level);
+                    uiSkillBuff.Data = new BuffTuple(Skill.buff, Level);
                 }
             }
 
             if (uiSkillDebuff != null)
             {
-                if (!skill.IsDebuff())
+                if (!Skill.IsDebuff())
                     uiSkillDebuff.Hide();
                 else
                 {
                     uiSkillDebuff.Show();
-                    uiSkillDebuff.Data = new BuffTuple(skill.debuff, level);
+                    uiSkillDebuff.Data = new BuffTuple(Skill.debuff, Level);
                 }
             }
 
             if (uiNextLevelSkill != null)
             {
-                if (level + 1 > skill.maxLevel)
+                if (Level + 1 > Skill.maxLevel)
                     uiNextLevelSkill.Hide();
                 else
                 {
-                    uiNextLevelSkill.Setup(new CharacterSkillTuple(characterSkill, (short)(level + 1)), character, indexOfData);
+                    uiNextLevelSkill.Setup(new SkillTuple(Skill, (short)(Level + 1)), character, indexOfData);
                     uiNextLevelSkill.Show();
                 }
             }
@@ -284,7 +283,7 @@ namespace MultiplayerARPG
 
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
-                owningCharacter.RequestAddSkill(skill.DataId);
+                owningCharacter.RequestAddSkill(Skill.DataId);
         }
     }
 }

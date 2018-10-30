@@ -3,8 +3,8 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(UISocialCharacterSelectionManager))]
     [RequireComponent(typeof(UIGuildRoleSelectionManager))]
+    [RequireComponent(typeof(UIGuildSkillSelectionManager))]
     public class UIGuild : UISocialGroup<UIGuildCharacter>
     {
         [Header("Display Format")]
@@ -25,6 +25,9 @@ namespace MultiplayerARPG
         public UIGuildRole uiRoleDialog;
         public UIGuildRole uiRolePrefab;
         public Transform uiRoleContainer;
+        public UIGuildSkill uiSkillDialog;
+        public UIGuildSkill uiSkillPrefab;
+        public Transform uiSkillContainer;
         public TextWrapper textGuildName;
         public TextWrapper textLeaderName;
         public TextWrapper textLevel;
@@ -65,6 +68,33 @@ namespace MultiplayerARPG
                     roleSelectionManager = GetComponent<UIGuildRoleSelectionManager>();
                 roleSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return roleSelectionManager;
+            }
+        }
+
+        private UIList skillList;
+        public UIList SkillList
+        {
+            get
+            {
+                if (skillList == null)
+                {
+                    skillList = gameObject.AddComponent<UIList>();
+                    skillList.uiPrefab = uiSkillPrefab.gameObject;
+                    skillList.uiContainer = uiSkillContainer;
+                }
+                return skillList;
+            }
+        }
+
+        private UIGuildSkillSelectionManager skillSelectionManager;
+        public UIGuildSkillSelectionManager SkillSelectionManager
+        {
+            get
+            {
+                if (skillSelectionManager == null)
+                    skillSelectionManager = GetComponent<UIGuildSkillSelectionManager>();
+                skillSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return skillSelectionManager;
             }
         }
 
@@ -143,6 +173,10 @@ namespace MultiplayerARPG
             RoleSelectionManager.eventOnSelect.AddListener(OnSelectRole);
             RoleSelectionManager.eventOnDeselect.RemoveListener(OnDeselectRole);
             RoleSelectionManager.eventOnDeselect.AddListener(OnDeselectRole);
+            SkillSelectionManager.eventOnSelect.RemoveListener(OnSelectSkill);
+            SkillSelectionManager.eventOnSelect.AddListener(OnSelectSkill);
+            SkillSelectionManager.eventOnSelect.RemoveListener(OnDeselectSkill);
+            SkillSelectionManager.eventOnSelect.AddListener(OnDeselectSkill);
             UpdateGuildUIs(Guild);
         }
 
@@ -151,6 +185,7 @@ namespace MultiplayerARPG
             if (uiGuildCreate != null)
                 uiGuildCreate.Hide();
             RoleSelectionManager.DeselectSelectedUI();
+            SkillSelectionManager.DeselectSelectedUI();
             base.Hide();
         }
 
@@ -168,6 +203,22 @@ namespace MultiplayerARPG
         {
             if (uiRoleDialog != null)
                 uiRoleDialog.Hide();
+        }
+
+        protected void OnSelectSkill(UIGuildSkill ui)
+        {
+            if (uiSkillDialog != null)
+            {
+                uiSkillDialog.selectionManager = SkillSelectionManager;
+                uiSkillDialog.Data = ui.Data;
+                uiSkillDialog.Show();
+            }
+        }
+
+        protected void OnDeselectSkill(UIGuildSkill ui)
+        {
+            if (uiSkillDialog != null)
+                uiSkillDialog.Hide();
         }
 
         private void UpdateGuildUIs(GuildData guild)
@@ -211,6 +262,20 @@ namespace MultiplayerARPG
                 RoleSelectionManager.Add(uiGuildRole);
                 if (selectedIdx == index)
                     uiGuildRole.OnClickSelect();
+            });
+
+            selectedIdx = SkillSelectionManager.SelectedUI != null ? SkillSelectionManager.IndexOf(SkillSelectionManager.SelectedUI) : -1;
+            SkillSelectionManager.DeselectSelectedUI();
+            SkillSelectionManager.Clear();
+
+            SkillList.Generate(GameInstance.GuildSkills.Values, (index, guildSkill, ui) =>
+            {
+                var uiGuildSkill = ui.GetComponent<UIGuildSkill>();
+                uiGuildSkill.Data = new GuildSkillTuple(guildSkill, guild.GetSkillLevel(guildSkill.DataId));
+                uiGuildSkill.Show();
+                SkillSelectionManager.Add(uiGuildSkill);
+                if (selectedIdx == index)
+                    uiGuildSkill.OnClickSelect();
             });
         }
 

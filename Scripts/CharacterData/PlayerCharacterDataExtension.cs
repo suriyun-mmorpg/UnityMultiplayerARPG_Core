@@ -101,35 +101,30 @@ public static partial class PlayerCharacterDataExtension
         for (var i = characterSkills.Count - 1; i >= 0; --i)
         {
             var characterSkill = characterSkills[i];
-            var skillDataId = characterSkill.dataId;
+            var skill = characterSkill.GetSkill();
             // If skill is invalid or this character database does not have skill
             if (characterSkill.GetSkill() == null ||
-                !database.CacheSkillLevels.ContainsKey(skillDataId) ||
-                validSkillIds.Contains(skillDataId))
+                !database.CacheSkillLevels.ContainsKey(skill) ||
+                validSkillIds.Contains(skill.DataId))
             {
                 returningSkillPoint += characterSkill.level;
                 character.Skills.RemoveAt(i);
             }
             else
-                validSkillIds.Add(skillDataId);
+                validSkillIds.Add(skill.DataId);
         }
         character.SkillPoint += returningSkillPoint;
         // Add character's skills
-        var skillLevels = database.skillLevels;
+        var skillLevels = database.CacheSkillLevels;
         foreach (var skillLevel in skillLevels)
         {
-            // Skip empty skill data
-            if (skillLevel.skill == null)
-            {
-                Debug.LogWarning("[ValidateCharacterData] Character: " + character.CharacterName + "'s Skill data is empty");
-                continue;
-            }
+            var skill = skillLevel.Key;
             // This skill is valid, so not have to add it
-            if (validSkillIds.Contains(skillLevel.skill.DataId))
+            if (validSkillIds.Contains(skill.DataId))
                 continue;
             var characterSkill = new CharacterSkill();
-            characterSkill.dataId = skillLevel.skill.DataId;
-            characterSkill.level = skillLevel.level;
+            characterSkill.dataId = skill.DataId;
+            characterSkill.level = skillLevel.Value;
             character.Skills.Add(characterSkill);
         }
         // Validating character equip weapons
@@ -197,14 +192,12 @@ public static partial class PlayerCharacterDataExtension
             characterAttribute.amount = 0;
             character.Attributes.Add(characterAttribute);
         }
-        var skillLevels = playerCharacter.skillLevels;
+        var skillLevels = playerCharacter.CacheSkillLevels;
         foreach (var skillLevel in skillLevels)
         {
-            if (skillLevel.skill == null)
-                continue;
             var characterSkill = new CharacterSkill();
-            characterSkill.dataId = skillLevel.skill.DataId;
-            characterSkill.level = skillLevel.level;
+            characterSkill.dataId = skillLevel.Key.DataId;
+            characterSkill.level = skillLevel.Value;
             character.Skills.Add(characterSkill);
         }
         // Right hand & left hand items

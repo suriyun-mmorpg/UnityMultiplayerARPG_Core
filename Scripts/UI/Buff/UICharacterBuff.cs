@@ -1,13 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Events;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
     public partial class UICharacterBuff : UIDataForCharacter<CharacterBuff>
     {
+        public CharacterBuff CharacterBuff { get { return Data; } }
+
         [Header("Generic Info Format")]
         [Tooltip("Title Format => {0} = {Title}")]
         public string titleFormat = "{0}";
@@ -37,11 +36,9 @@ namespace MultiplayerARPG
         {
             base.Update();
 
-            var characterBuff = Data;
-
             if (buffRemainsDuration <= 0f)
             {
-                buffRemainsDuration = characterBuff.buffRemainsDuration;
+                buffRemainsDuration = CharacterBuff.buffRemainsDuration;
                 if (buffRemainsDuration <= 1f)
                     buffRemainsDuration = 0f;
             }
@@ -56,7 +53,7 @@ namespace MultiplayerARPG
                 buffRemainsDuration = 0f;
 
             // Update UIs
-            var buffDuration = characterBuff.GetDuration();
+            var buffDuration = CharacterBuff.GetDuration();
 
             if (uiTextDuration != null)
                 uiTextDuration.text = string.Format(buffDurationFormat, buffDuration.ToString("N0"));

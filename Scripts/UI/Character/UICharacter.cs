@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.Profiling;
 using UnityEngine.UI;
 
@@ -317,21 +316,21 @@ namespace MultiplayerARPG
 
             if (CacheUICharacterAttributes.Count > 0 && Data != null)
             {
+                Attribute tempAttribute;
+                short tempAmount;
                 var characterAttributes = Data.Attributes;
-                for (var i = 0; i < characterAttributes.Count; ++i)
+                for (var indexOfData = 0; indexOfData < characterAttributes.Count; ++indexOfData)
                 {
-                    var characterAttribute = characterAttributes[i];
-                    var attribute = characterAttribute.GetAttribute();
+                    tempAttribute = characterAttributes[indexOfData].GetAttribute();
                     UICharacterAttribute cacheUICharacterAttribute;
-                    short amount;
-                    if (CacheUICharacterAttributes.TryGetValue(attribute, out cacheUICharacterAttribute) &&
-                        displayingAttributes.TryGetValue(attribute, out amount))
+                    tempAmount = 0;
+                    if (CacheUICharacterAttributes.TryGetValue(tempAttribute, out cacheUICharacterAttribute))
                     {
-                        cacheUICharacterAttribute.Setup(new CharacterAttributeTuple(characterAttribute, amount), Data, i);
+                        if (displayingAttributes.ContainsKey(tempAttribute))
+                            tempAmount = displayingAttributes[tempAttribute];
+                        cacheUICharacterAttribute.Setup(new AttributeTuple(tempAttribute, tempAmount), Data, indexOfData);
                         cacheUICharacterAttribute.Show();
                     }
-                    else
-                        cacheUICharacterAttribute.Hide();
                 }
             }
 

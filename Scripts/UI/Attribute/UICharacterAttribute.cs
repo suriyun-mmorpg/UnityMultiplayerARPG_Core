@@ -5,11 +5,10 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public partial class UICharacterAttribute : UIDataForCharacter<CharacterAttributeTuple>
+    public partial class UICharacterAttribute : UIDataForCharacter<AttributeTuple>
     {
-        public CharacterAttribute characterAttribute { get { return Data.characterAttribute; } }
-        public short amount { get { return Data.targetAmount; } }
-        public Attribute attribute { get { return characterAttribute != null ? characterAttribute.GetAttribute() : null; } }
+        public Attribute Attribute { get { return Data.attribute; } }
+        public short Amount { get { return Data.targetAmount; } }
 
         [Header("Generic Info Format")]
         [Tooltip("Title Format => {0} = {Title}")]
@@ -32,7 +31,7 @@ namespace MultiplayerARPG
         protected override void UpdateUI()
         {
             Profiler.BeginSample("UICharacterAttribute - Update UI");
-            if (IsOwningCharacter() && characterAttribute.CanIncrease(BasePlayerCharacterController.OwningCharacter))
+            if (IsOwningCharacter() && BasePlayerCharacterController.OwningCharacter.StatPoint > 0)
                 onAbleToIncrease.Invoke();
             else
                 onUnableToIncrease.Invoke();
@@ -42,17 +41,17 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(titleFormat, attribute == null ? "Unknow" : attribute.title);
+                uiTextTitle.text = string.Format(titleFormat, Attribute == null ? "Unknow" : Attribute.title);
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(descriptionFormat, attribute == null ? "N/A" : attribute.description);
+                uiTextDescription.text = string.Format(descriptionFormat, Attribute == null ? "N/A" : Attribute.description);
 
             if (uiTextAmount != null)
-                uiTextAmount.text = string.Format(amountFormat, amount.ToString("N0"));
+                uiTextAmount.text = string.Format(amountFormat, Amount.ToString("N0"));
 
             if (imageIcon != null)
             {
-                var iconSprite = attribute == null ? null : attribute.icon;
+                var iconSprite = Attribute == null ? null : Attribute.icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
             }
@@ -65,7 +64,7 @@ namespace MultiplayerARPG
 
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
-                owningCharacter.RequestAddAttribute(attribute.DataId);
+                owningCharacter.RequestAddAttribute(Attribute.DataId);
         }
     }
 }

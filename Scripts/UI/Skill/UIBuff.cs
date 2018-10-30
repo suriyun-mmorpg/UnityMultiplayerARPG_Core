@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
     public partial class UIBuff : UISelectionEntry<BuffTuple>
     {
+        public Buff Buff { get { return Data.buff; } }
+        public short Level { get { return Data.targetLevel; } }
+
         [Tooltip("Duration Format => {0} = {Duration}")]
         public string durationFormat = "Duration: {0}";
         [Tooltip("Recovery Hp Format => {0} = {Recovery amount}")]
@@ -33,62 +35,59 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            var buff = Data.buff;
-            var level = Data.targetLevel;
-
             if (uiTextDuration != null)
             {
-                var duration = buff.GetDuration(level);
+                var duration = Buff.GetDuration(Level);
                 uiTextDuration.gameObject.SetActive(duration != 0);
                 uiTextDuration.text = string.Format(durationFormat, duration.ToString("N0"));
             }
 
             if (uiTextRecoveryHp != null)
             {
-                var recoveryHp = buff.GetRecoveryHp(level);
+                var recoveryHp = Buff.GetRecoveryHp(Level);
                 uiTextRecoveryHp.gameObject.SetActive(recoveryHp != 0);
                 uiTextRecoveryHp.text = string.Format(recoveryHpFormat, recoveryHp.ToString("N0"));
             }
 
             if (uiTextRecoveryMp != null)
             {
-                var recoveryMp = buff.GetRecoveryMp(level);
+                var recoveryMp = Buff.GetRecoveryMp(Level);
                 uiTextRecoveryMp.gameObject.SetActive(recoveryMp != 0);
                 uiTextRecoveryMp.text = string.Format(recoveryMpFormat, recoveryMp.ToString("N0"));
             }
 
             if (uiTextRecoveryStamina != null)
             {
-                var recoveryStamina = buff.GetRecoveryStamina(level);
+                var recoveryStamina = Buff.GetRecoveryStamina(Level);
                 uiTextRecoveryStamina.gameObject.SetActive(recoveryStamina != 0);
                 uiTextRecoveryStamina.text = string.Format(recoveryStaminaFormat, recoveryStamina.ToString("N0"));
             }
 
             if (uiTextRecoveryFood != null)
             {
-                var recoveryFood = buff.GetRecoveryFood(level);
+                var recoveryFood = Buff.GetRecoveryFood(Level);
                 uiTextRecoveryFood.gameObject.SetActive(recoveryFood != 0);
                 uiTextRecoveryFood.text = string.Format(recoveryFoodFormat, recoveryFood.ToString("N0"));
             }
 
             if (uiTextRecoveryWater != null)
             {
-                var recoveryWater = buff.GetRecoveryWater(level);
+                var recoveryWater = Buff.GetRecoveryWater(Level);
                 uiTextRecoveryWater.gameObject.SetActive(recoveryWater != 0);
                 uiTextRecoveryWater.text = string.Format(recoveryWaterFormat, recoveryWater.ToString("N0"));
             }
 
             if (uiBuffStats != null)
-                uiBuffStats.Data = buff.GetIncreaseStats(level);
+                uiBuffStats.Data = Buff.GetIncreaseStats(Level);
 
             if (uiBuffAttributes != null)
-                uiBuffAttributes.Data = GameDataHelpers.MakeAttributeAmountsDictionary(buff.increaseAttributes, new Dictionary<Attribute, short>(), level, 1f);
+                uiBuffAttributes.Data = GameDataHelpers.MakeAttributeAmountsDictionary(Buff.increaseAttributes, new Dictionary<Attribute, short>(), Level, 1f);
 
             if (uiBuffResistances != null)
-                uiBuffResistances.Data = GameDataHelpers.MakeResistanceAmountsDictionary(buff.increaseResistances, new Dictionary<DamageElement, float>(), level, 1f);
+                uiBuffResistances.Data = GameDataHelpers.MakeResistanceAmountsDictionary(Buff.increaseResistances, new Dictionary<DamageElement, float>(), Level, 1f);
 
             if (uiBuffDamages != null)
-                uiBuffDamages.Data = GameDataHelpers.MakeDamageAmountsDictionary(buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), level, 1f);
+                uiBuffDamages.Data = GameDataHelpers.MakeDamageAmountsDictionary(Buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), Level, 1f);
         }
     }
 }
