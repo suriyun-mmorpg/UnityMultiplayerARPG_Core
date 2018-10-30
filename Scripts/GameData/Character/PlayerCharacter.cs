@@ -11,9 +11,6 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Player Character", menuName = "Create GameData/Player Character")]
     public class PlayerCharacter : BaseCharacter
     {
-        [Header("Skills")]
-        public SkillLevel[] skillLevels;
-
         [Header("Start Equipments")]
         public Item rightHandEquipItem;
         public Item leftHandEquipItem;
@@ -21,24 +18,6 @@ namespace MultiplayerARPG
 
         [Header("Start Map")]
         public MapInfo startMap;
-
-        private Dictionary<int, SkillLevel> cacheSkillLevels;
-        public Dictionary<int, SkillLevel> CacheSkillLevels
-        {
-            get
-            {
-                if (cacheSkillLevels == null)
-                {
-                    cacheSkillLevels = new Dictionary<int, SkillLevel>();
-                    foreach (var skillLevel in skillLevels)
-                    {
-                        if (skillLevel.skill != null)
-                            cacheSkillLevels[skillLevel.skill.DataId] = skillLevel;
-                    }
-                }
-                return cacheSkillLevels;
-            }
-        }
 
         public MapInfo StartMap
         {

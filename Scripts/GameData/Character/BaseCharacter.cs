@@ -10,10 +10,31 @@ namespace MultiplayerARPG
         [System.Obsolete("BaseCharacter -> entityPrefab is going to be deprecated, it will be removed on next version")]
         public BaseCharacterEntity entityPrefab;
 
-        [Header("Attributes/Stats")]
-        public AttributeIncremental[] attributes;
+        [Header("Stats/Attributes")]
         public CharacterStatsIncremental stats;
+        public AttributeIncremental[] attributes;
         public ResistanceIncremental[] resistances;
+
+        [Header("Skills")]
+        public SkillLevel[] skillLevels;
+
+        private Dictionary<int, SkillLevel> cacheSkillLevels;
+        public Dictionary<int, SkillLevel> CacheSkillLevels
+        {
+            get
+            {
+                if (cacheSkillLevels == null)
+                {
+                    cacheSkillLevels = new Dictionary<int, SkillLevel>();
+                    foreach (var skillLevel in skillLevels)
+                    {
+                        if (skillLevel.skill != null)
+                            cacheSkillLevels[skillLevel.skill.DataId] = skillLevel;
+                    }
+                }
+                return cacheSkillLevels;
+            }
+        }
 
         public CharacterStats GetCharacterStats(short level)
         {
