@@ -28,14 +28,7 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheSkillLevels == null)
-                {
-                    cacheSkillLevels = new Dictionary<Skill, short>();
-                    foreach (var skillLevel in skillLevels)
-                    {
-                        if (skillLevel.skill != null)
-                            cacheSkillLevels[skillLevel.skill] = skillLevel.level;
-                    }
-                }
+                    cacheSkillLevels = GameDataHelpers.MakeSkillLevelsDictionary(skillLevels, new Dictionary<Skill, short>());
                 return cacheSkillLevels;
             }
         }
