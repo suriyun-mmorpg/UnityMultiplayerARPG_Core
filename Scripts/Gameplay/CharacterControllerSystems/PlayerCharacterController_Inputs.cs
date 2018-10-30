@@ -224,9 +224,8 @@ namespace MultiplayerARPG
                 var queueUsingSkillValue = queueUsingSkill.Value;
                 destination = null;
                 PlayerCharacterEntity.StopMove();
-                var characterSkill = PlayerCharacterEntity.Skills[queueUsingSkillValue.skillIndex];
-                var skill = characterSkill.GetSkill();
-                if (skill != null)
+                Skill skill = null;
+                if (GameInstance.Skills.TryGetValue(queueUsingSkillValue.dataId, out skill) && skill != null)
                 {
                     if (skill.IsAttack())
                     {
@@ -509,7 +508,7 @@ namespace MultiplayerARPG
                     if (TryGetAttackingCharacter(out attackingCharacter))
                     {
                         // If attacking any character, will use skill later
-                        queueUsingSkill = new UsingSkillData(null, skillIndex);
+                        queueUsingSkill = new UsingSkillData(null, skill.DataId);
                     }
                     else if (PlayerCharacterEntity.Skills[skillIndex].CanUse(PlayerCharacterEntity))
                     {
@@ -517,7 +516,7 @@ namespace MultiplayerARPG
                         if (skill.IsAttack() && IsLockTarget())
                         {
                             // If attacking any character, will use skill later
-                            queueUsingSkill = new UsingSkillData(null, skillIndex);
+                            queueUsingSkill = new UsingSkillData(null, skill.DataId);
                             var nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance, false, true, false);
                             if (nearestTarget != null)
                                 PlayerCharacterEntity.SetTargetEntity(nearestTarget);
@@ -526,7 +525,7 @@ namespace MultiplayerARPG
                         {
                             destination = null;
                             PlayerCharacterEntity.StopMove();
-                            RequestUseSkill(CharacterTransform.position, skillIndex);
+                            RequestUseSkill(CharacterTransform.position, skill.DataId);
                         }
                     }
                 }
@@ -538,9 +537,9 @@ namespace MultiplayerARPG
                 if (itemIndex >= 0)
                 {
                     if (item.IsEquipment())
-                        RequestEquipItem(itemIndex);
+                        RequestEquipItem((ushort)itemIndex);
                     else if (item.IsPotion())
-                        RequestUseItem(itemIndex);
+                        RequestUseItem(item.DataId);
                     else if (item.IsBuilding())
                     {
                         destination = null;
