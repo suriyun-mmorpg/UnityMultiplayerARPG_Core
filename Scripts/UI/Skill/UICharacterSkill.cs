@@ -35,22 +35,14 @@ namespace MultiplayerARPG
         public string craftItemSkillType = "Craft Item";
 
         [Header("UI Elements")]
-        public Text textTitle;
         public TextWrapper uiTextTitle;
-        public Text textDescription;
         public TextWrapper uiTextDescription;
-        public Text textLevel;
         public TextWrapper uiTextLevel;
         public Image imageIcon;
-        public Text textSkillType;
         public TextWrapper uiTextSkillType;
-        public Text textAvailableWeapons;
         public TextWrapper uiTextAvailableWeapons;
-        public Text textConsumeMp;
         public TextWrapper uiTextConsumeMp;
-        public Text textCoolDownDuration;
         public TextWrapper uiTextCoolDownDuration;
-        public Text textCoolDownRemainsDuration;
         public TextWrapper uiTextCoolDownRemainsDuration;
         public Image imageCoolDownGage;
         public UISkillRequirement uiRequirement;
@@ -84,7 +76,6 @@ namespace MultiplayerARPG
         protected override void Update()
         {
             base.Update();
-            MigrateUIComponents();
 
             if (IsOwningCharacter() && characterSkill.CanLevelUp(BasePlayerCharacterController.OwningCharacter))
                 onAbleToLevelUp.Invoke();
@@ -134,8 +125,6 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            MigrateUIComponents();
-
             if (level <= 0)
                 onSetLevelZeroData.Invoke();
             else
@@ -296,19 +285,6 @@ namespace MultiplayerARPG
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
                 owningCharacter.RequestAddSkill(skill.DataId);
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextTitle = MigrateUIHelpers.SetWrapperToText(textTitle, uiTextTitle);
-            uiTextDescription = MigrateUIHelpers.SetWrapperToText(textDescription, uiTextDescription);
-            uiTextLevel = MigrateUIHelpers.SetWrapperToText(textLevel, uiTextLevel);
-            uiTextSkillType = MigrateUIHelpers.SetWrapperToText(textSkillType, uiTextSkillType);
-            uiTextAvailableWeapons = MigrateUIHelpers.SetWrapperToText(textAvailableWeapons, uiTextAvailableWeapons);
-            uiTextConsumeMp = MigrateUIHelpers.SetWrapperToText(textConsumeMp, uiTextConsumeMp);
-            uiTextCoolDownDuration = MigrateUIHelpers.SetWrapperToText(textCoolDownDuration, uiTextCoolDownDuration);
-            uiTextCoolDownRemainsDuration = MigrateUIHelpers.SetWrapperToText(textCoolDownRemainsDuration, uiTextCoolDownRemainsDuration);
         }
     }
 }

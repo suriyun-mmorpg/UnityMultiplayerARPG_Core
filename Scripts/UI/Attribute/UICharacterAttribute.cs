@@ -20,11 +20,8 @@ namespace MultiplayerARPG
         public string amountFormat = "{0}";
 
         [Header("UI Elements")]
-        public Text textTitle;
         public TextWrapper uiTextTitle;
-        public Text textDescription;
         public TextWrapper uiTextDescription;
-        public Text textAmount;
         public TextWrapper uiTextAmount;
         public Image imageIcon;
 
@@ -44,8 +41,6 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            MigrateUIComponents();
-
             if (uiTextTitle != null)
                 uiTextTitle.text = string.Format(titleFormat, attribute == null ? "Unknow" : attribute.title);
 
@@ -71,14 +66,6 @@ namespace MultiplayerARPG
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
                 owningCharacter.RequestAddAttribute(attribute.DataId);
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextTitle = MigrateUIHelpers.SetWrapperToText(textTitle, uiTextTitle);
-            uiTextDescription = MigrateUIHelpers.SetWrapperToText(textDescription, uiTextDescription);
-            uiTextAmount = MigrateUIHelpers.SetWrapperToText(textAmount, uiTextAmount);
         }
     }
 }

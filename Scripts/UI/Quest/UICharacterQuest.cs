@@ -22,13 +22,9 @@ namespace MultiplayerARPG
         public string rewardGoldFormat = "Reward Gold: {0}";
 
         [Header("UI Elements")]
-        public Text textTitle;
         public TextWrapper uiTextTitle;
-        public Text textDescription;
         public TextWrapper uiTextDescription;
-        public Text textRewardExp;
         public TextWrapper uiTextRewardExp;
-        public Text textRewardGold;
         public TextWrapper uiTextRewardGold;
         [Header("Reward Items")]
         public bool showRewardItemList;
@@ -96,8 +92,6 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            MigrateUIComponents();
-
             var characterQuest = Data;
             var quest = characterQuest.GetQuest();
 
@@ -144,15 +138,6 @@ namespace MultiplayerARPG
 
             if (questOnGoingStatusObject != null)
                 questOnGoingStatusObject.SetActive(!isComplete && !isAllTasksDone);
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextTitle = MigrateUIHelpers.SetWrapperToText(textTitle, uiTextTitle);
-            uiTextDescription = MigrateUIHelpers.SetWrapperToText(textDescription, uiTextDescription);
-            uiTextRewardExp = MigrateUIHelpers.SetWrapperToText(textRewardExp, uiTextRewardExp);
-            uiTextRewardGold = MigrateUIHelpers.SetWrapperToText(textRewardGold, uiTextRewardGold);
         }
     }
 }

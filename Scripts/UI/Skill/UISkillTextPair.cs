@@ -6,7 +6,6 @@ namespace MultiplayerARPG
     public struct UISkillTextPair
     {
         public Skill skill;
-        public Text text;
         public TextWrapper uiText;
     }
 }

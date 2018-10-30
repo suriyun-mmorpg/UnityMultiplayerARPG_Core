@@ -24,12 +24,10 @@ namespace MultiplayerARPG
         public UICharacterItem uiDealingItemPrefab;
         public UICharacterItem uiItemDialog;
         [Header("Owning Character Elements")]
-        public Text textDealingGold;
         public TextWrapper uiTextDealingGold;
         public Transform uiDealingItemsContainer;
         [Header("Another Character Elements")]
         public UICharacter uiAnotherCharacter;
-        public Text textAnotherDealingGold;
         public TextWrapper uiTextAnotherDealingGold;
         public Transform uiAnotherDealingItemsContainer;
 
@@ -215,7 +213,6 @@ namespace MultiplayerARPG
 
         public void UpdateDealingGold(int gold)
         {
-            MigrateUIComponents();
             if (uiTextDealingGold != null)
                 uiTextDealingGold.text = string.Format(dealingGoldFormat, gold.ToString("N0"));
             dealingGold = gold;
@@ -223,7 +220,6 @@ namespace MultiplayerARPG
 
         public void UpdateAnotherDealingGold(int gold)
         {
-            MigrateUIComponents();
             if (uiTextAnotherDealingGold != null)
                 uiTextAnotherDealingGold.text = string.Format(anotherDealingGoldFormat, gold.ToString("N0"));
             anotherDealingGold = gold;
@@ -300,13 +296,6 @@ namespace MultiplayerARPG
         {
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             owningCharacter.RequestCancelDealing();
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextDealingGold = MigrateUIHelpers.SetWrapperToText(textDealingGold, uiTextDealingGold);
-            uiTextAnotherDealingGold = MigrateUIHelpers.SetWrapperToText(textAnotherDealingGold, uiTextAnotherDealingGold);
         }
     }
 }

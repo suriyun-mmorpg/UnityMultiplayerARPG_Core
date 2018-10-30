@@ -9,7 +9,6 @@ namespace MultiplayerARPG
     {
         public static UISceneLoading Singleton { get; private set; }
         public GameObject rootObject;
-        public Text textProgress;
         public TextWrapper uiTextProgress;
         public Image imageGage;
 
@@ -35,7 +34,6 @@ namespace MultiplayerARPG
 
         IEnumerator LoadSceneRoutine(string sceneName)
         {
-            MigrateUIComponents();
             if (rootObject != null)
                 rootObject.SetActive(true);
             if (uiTextProgress != null)
@@ -60,12 +58,6 @@ namespace MultiplayerARPG
             yield return new WaitForSecondsRealtime(0.25f);
             if (rootObject != null)
                 rootObject.SetActive(false);
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextProgress = MigrateUIHelpers.SetWrapperToText(textProgress, uiTextProgress);
         }
     }
 }

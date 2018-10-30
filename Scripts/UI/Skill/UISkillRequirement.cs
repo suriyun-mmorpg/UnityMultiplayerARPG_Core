@@ -10,14 +10,11 @@ namespace MultiplayerARPG
         public string requireLevelFormat = "Require Level: {0}";
 
         [Header("UI Elements")]
-        public Text textRequireLevel;
         public TextWrapper uiTextRequireLevel;
         public UISkillLevels uiRequireSkillLevels;
 
         protected override void UpdateData()
         {
-            MigrateUIComponents();
-
             var skill = Data.skill;
             var level = Data.targetLevel;
 
@@ -42,12 +39,6 @@ namespace MultiplayerARPG
                     uiRequireSkillLevels.Data = skill.CacheRequireSkillLevels;
                 }
             }
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextRequireLevel = MigrateUIHelpers.SetWrapperToText(textRequireLevel, uiTextRequireLevel);
         }
     }
 }

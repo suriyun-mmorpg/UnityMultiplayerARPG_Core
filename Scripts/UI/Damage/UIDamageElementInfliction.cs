@@ -11,7 +11,6 @@ namespace MultiplayerARPG
         public string inflictionFormat = "Inflict {1}% as {0} damage";
 
         [Header("UI Elements")]
-        public Text textInfliction;
         public TextWrapper uiTextInfliction;
 
         protected override void UpdateData()
@@ -23,12 +22,6 @@ namespace MultiplayerARPG
                 var format = element == GameInstance.Singleton.DefaultDamageElement ? defaultElementInflictionFormat : inflictionFormat;
                 uiTextInfliction.text = string.Format(format, element.title, (rate * 100f).ToString("N0"));
             }
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextInfliction = MigrateUIHelpers.SetWrapperToText(textInfliction, uiTextInfliction);
         }
     }
 }

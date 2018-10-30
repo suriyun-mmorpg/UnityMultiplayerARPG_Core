@@ -20,17 +20,11 @@ namespace MultiplayerARPG
         public string recoveryWaterFormat = "Recovery Water: {0}";
 
         [Header("UI Elements")]
-        public Text textDuration;
         public TextWrapper uiTextDuration;
-        public Text textRecoveryHp;
         public TextWrapper uiTextRecoveryHp;
-        public Text textRecoveryMp;
         public TextWrapper uiTextRecoveryMp;
-        public Text textRecoveryStamina;
         public TextWrapper uiTextRecoveryStamina;
-        public Text textRecoveryFood;
         public TextWrapper uiTextRecoveryFood;
-        public Text textRecoveryWater;
         public TextWrapper uiTextRecoveryWater;
         public UICharacterStats uiBuffStats;
         public UIAttributeAmounts uiBuffAttributes;
@@ -39,8 +33,6 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            MigrateUIComponents();
-
             var buff = Data.buff;
             var level = Data.targetLevel;
 
@@ -97,17 +89,6 @@ namespace MultiplayerARPG
 
             if (uiBuffDamages != null)
                 uiBuffDamages.Data = GameDataHelpers.MakeDamageAmountsDictionary(buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), level, 1f);
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextDuration = MigrateUIHelpers.SetWrapperToText(textDuration, uiTextDuration);
-            uiTextRecoveryHp = MigrateUIHelpers.SetWrapperToText(textRecoveryHp, uiTextRecoveryHp);
-            uiTextRecoveryMp = MigrateUIHelpers.SetWrapperToText(textRecoveryMp, uiTextRecoveryMp);
-            uiTextRecoveryStamina = MigrateUIHelpers.SetWrapperToText(textRecoveryStamina, uiTextRecoveryStamina);
-            uiTextRecoveryFood = MigrateUIHelpers.SetWrapperToText(textRecoveryFood, uiTextRecoveryFood);
-            uiTextRecoveryWater = MigrateUIHelpers.SetWrapperToText(textRecoveryWater, uiTextRecoveryWater);
         }
     }
 }

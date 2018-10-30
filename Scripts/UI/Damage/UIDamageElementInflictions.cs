@@ -13,7 +13,6 @@ namespace MultiplayerARPG
         public string inflictionFormat = "Inflict {1}% as {0} damage";
 
         [Header("UI Elements")]
-        public Text textAllInfliction;
         public TextWrapper uiTextAllInflictions;
         public UIDamageElementTextPair[] textInflictions;
 
@@ -24,11 +23,10 @@ namespace MultiplayerARPG
             {
                 if (cacheTextInflictions == null)
                 {
-                    MigrateUIComponents();
                     cacheTextInflictions = new Dictionary<DamageElement, TextWrapper>();
                     foreach (var textAmount in textInflictions)
                     {
-                        if (textAmount.damageElement == null || textAmount.text == null)
+                        if (textAmount.damageElement == null || textAmount.uiText == null)
                             continue;
                         var key = textAmount.damageElement;
                         var textComp = textAmount.uiText;
@@ -79,21 +77,6 @@ namespace MultiplayerARPG
                 {
                     uiTextAllInflictions.gameObject.SetActive(!string.IsNullOrEmpty(text));
                     uiTextAllInflictions.text = text;
-                }
-            }
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextAllInflictions = MigrateUIHelpers.SetWrapperToText(textAllInfliction, uiTextAllInflictions);
-            if (textInflictions != null && textInflictions.Length > 0)
-            {
-                for (var i = 0; i < textInflictions.Length; ++i)
-                {
-                    var textInfliction = textInflictions[i];
-                    textInfliction.uiText = MigrateUIHelpers.SetWrapperToText(textInfliction.text, textInfliction.uiText);
-                    textInflictions[i] = textInfliction;
                 }
             }
         }

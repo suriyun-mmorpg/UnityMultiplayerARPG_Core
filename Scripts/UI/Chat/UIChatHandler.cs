@@ -15,7 +15,6 @@ namespace MultiplayerARPG
         public KeyCode enterChatKey = KeyCode.Return;
         public int chatEntrySize = 30;
         public GameObject[] enterChatActiveObjects;
-        public InputField enterChatField;
         public InputFieldWrapper uiEnterChatField;
         public UIChatMessage uiChatMessagePrefab;
         public Transform uiChatMessageContainer;
@@ -65,8 +64,7 @@ namespace MultiplayerARPG
                 uiChatMessage.Show();
             });
             StartCoroutine(VerticalScroll(0f));
-
-            MigrateUIComponents();
+            
             HideEnterChatField();
             if (uiEnterChatField != null)
             {
@@ -203,12 +201,6 @@ namespace MultiplayerARPG
                 scrollRect.verticalScrollbar.value = normalize;
                 Canvas.ForceUpdateCanvases();
             }
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiEnterChatField = MigrateUIHelpers.SetWrapperToInputField(enterChatField, uiEnterChatField);
         }
     }
 }

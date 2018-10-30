@@ -12,13 +12,10 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public UICharacterItem uiCraftingItem;
         public UIItemAmounts uiRequireItemAmounts;
-        public Text textRequireGold;
         public TextWrapper uiTextRequireGold;
 
         protected override void UpdateData()
         {
-            MigrateUIComponents();
-
             var craftItemData = Data;
             if (uiCraftingItem != null)
             {
@@ -49,12 +46,6 @@ namespace MultiplayerARPG
                 else
                     uiTextRequireGold.text = string.Format(requireGoldFormat, craftItemData.requireGold.ToString("N0"));
             }
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextRequireGold = MigrateUIHelpers.SetWrapperToText(textRequireGold, uiTextRequireGold);
         }
     }
 }

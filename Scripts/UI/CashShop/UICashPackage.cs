@@ -19,21 +19,15 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public UICashPackages uiCashPackages;
-        public Text textTitle;
         public TextWrapper uiTextTitle;
-        public Text textDescription;
         public TextWrapper uiTextDescription;
         public Image imageIcon;
         public RawImage rawImageExternalIcon;
-        public Text textSellPrice;
         public TextWrapper uiTextSellPrice;
-        public Text textCashAmount;
         public TextWrapper uiTextCashAmount;
 
         protected override void UpdateData()
         {
-            MigrateUIComponents();
-
             if (uiTextTitle != null)
                 uiTextTitle.text = string.Format(titleFormat, Data == null ? "Unknow" : Data.title);
 
@@ -72,15 +66,6 @@ namespace MultiplayerARPG
         {
             if (uiCashPackages != null)
                 uiCashPackages.Buy(Data.Id);
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextTitle = MigrateUIHelpers.SetWrapperToText(textTitle, uiTextTitle);
-            uiTextDescription = MigrateUIHelpers.SetWrapperToText(textDescription, uiTextDescription);
-            uiTextSellPrice = MigrateUIHelpers.SetWrapperToText(textSellPrice, uiTextSellPrice);
-            uiTextCashAmount = MigrateUIHelpers.SetWrapperToText(textCashAmount, uiTextCashAmount);
         }
     }
 }

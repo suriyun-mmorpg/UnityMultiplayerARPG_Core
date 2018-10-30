@@ -15,9 +15,7 @@ namespace MultiplayerARPG
         public string descriptionFormat = "{0}";
 
         [Header("UI Elements")]
-        public Text textTitle;
         public TextWrapper uiTextTitle;
-        public Text textDescription;
         public TextWrapper uiTextDescription;
         public UICharacterQuest uiCharacterQuest;
         public UICraftItem uiCraftItem;
@@ -72,7 +70,6 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            MigrateUIComponents();
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
 
             if (uiTextTitle != null)
@@ -205,13 +202,6 @@ namespace MultiplayerARPG
                 else
                     uiCraftItem.Show();
             }
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextTitle = MigrateUIHelpers.SetWrapperToText(textTitle, uiTextTitle);
-            uiTextDescription = MigrateUIHelpers.SetWrapperToText(textDescription, uiTextDescription);
         }
     }
 }

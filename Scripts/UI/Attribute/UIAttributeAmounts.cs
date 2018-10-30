@@ -13,7 +13,6 @@ namespace MultiplayerARPG
         public string amountNotReachTargetFormat = "{0}: <color=red>{1}/{2}</color>";
 
         [Header("UI Elements")]
-        public Text textAllAmounts;
         public TextWrapper uiTextAllAmounts;
         public UIAttributeTextPair[] textAmounts;
 
@@ -24,7 +23,6 @@ namespace MultiplayerARPG
             {
                 if (cacheTextAmounts == null)
                 {
-                    MigrateUIComponents();
                     cacheTextAmounts = new Dictionary<Attribute, TextWrapper>();
                     foreach (var textAmount in textAmounts)
                     {
@@ -42,7 +40,6 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            MigrateUIComponents();
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (Data == null || Data.Count == 0)
             {
@@ -80,21 +77,6 @@ namespace MultiplayerARPG
                 {
                     uiTextAllAmounts.gameObject.SetActive(!string.IsNullOrEmpty(text));
                     uiTextAllAmounts.text = text;
-                }
-            }
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextAllAmounts = MigrateUIHelpers.SetWrapperToText(textAllAmounts, uiTextAllAmounts);
-            if (textAmounts != null && textAmounts.Length > 0)
-            {
-                for (var i = 0; i < textAmounts.Length; ++i)
-                {
-                    var textAmount = textAmounts[i];
-                    textAmount.uiText = MigrateUIHelpers.SetWrapperToText(textAmount.text, textAmount.uiText);
-                    textAmounts[i] = textAmount;
                 }
             }
         }

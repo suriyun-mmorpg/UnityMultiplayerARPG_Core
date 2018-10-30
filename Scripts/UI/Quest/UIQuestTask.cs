@@ -18,13 +18,10 @@ namespace MultiplayerARPG
         public string collectItemTaskCompleteFormat = "Collects {0}: Completed";
 
         [Header("UI Elements")]
-        public Text taskDescription;
         public TextWrapper uiTextTaskDescription;
 
         protected override void UpdateData()
         {
-            MigrateUIComponents();
-
             var task = Data.questTask;
             var progress = Data.progress;
             var isComplete = false;
@@ -47,12 +44,6 @@ namespace MultiplayerARPG
                         uiTextTaskDescription.text = string.Format(isComplete ? collectItemTaskCompleteFormat : collectItemTaskFormat, itemTitle, progress.ToString("N0"), itemCollectAmount.ToString("N0"));
                     break;
             }
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextTaskDescription = MigrateUIHelpers.SetWrapperToText(taskDescription, uiTextTaskDescription);
         }
     }
 }

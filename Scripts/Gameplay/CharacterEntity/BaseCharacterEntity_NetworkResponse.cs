@@ -146,11 +146,11 @@ namespace MultiplayerARPG
             RequestPlayActionAnimation(animActionType, dataId, (byte)animationIndex);
 
             // Start use skill routine
-            StartCoroutine(UseSkillRoutine(dataId, position, triggerDuration, totalDuration, skillAttackType, weapon, damageInfo, allDamageAmounts));
+            StartCoroutine(UseSkillRoutine(characterSkill, position, triggerDuration, totalDuration, skillAttackType, weapon, damageInfo, allDamageAmounts));
         }
 
         private IEnumerator UseSkillRoutine(
-            int skillIndex,
+            CharacterSkill characterSkill,
             Vector3 position,
             float triggerDuration,
             float totalDuration,
@@ -160,15 +160,11 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
             // Update skill usage states
-            var characterSkill = skills[skillIndex];
-            var dataId = characterSkill.dataId;
-            var type = SkillUsageType.Skill;
-
-            var skillUsageIndex = this.IndexOfSkillUsage(dataId, type);
+            var skillUsageIndex = this.IndexOfSkillUsage(characterSkill.dataId, SkillUsageType.Skill);
             if (skillUsageIndex >= 0)
                 buffs.RemoveAt(skillUsageIndex);
 
-            var newSkillUsage = CharacterSkillUsage.Create(Id, type, dataId);
+            var newSkillUsage = CharacterSkillUsage.Create(Id, SkillUsageType.Skill, characterSkill.dataId);
             newSkillUsage.Use(this, characterSkill.level);
             skillUsages.Add(newSkillUsage);
 

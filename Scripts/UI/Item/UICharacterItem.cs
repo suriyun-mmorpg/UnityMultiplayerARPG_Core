@@ -56,22 +56,14 @@ namespace MultiplayerARPG
         public string setDealingInputDescription = "";
 
         [Header("UI Elements")]
-        public Text textTitle;
         public TextWrapper uiTextTitle;
-        public Text textDescription;
         public TextWrapper uiTextDescription;
-        public Text textLevel;
         public TextWrapper uiTextLevel;
         public Image imageIcon;
-        public Text textItemType;
         public TextWrapper uiTextItemType;
-        public Text textSellPrice;
         public TextWrapper uiTextSellPrice;
-        public Text textStack;
         public TextWrapper uiTextStack;
-        public Text textDurability;
         public TextWrapper uiTextDurability;
-        public Text textWeight;
         public TextWrapper uiTextWeight;
 
         [Header("Equipment - UI Elements")]
@@ -121,8 +113,6 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            MigrateUIComponents();
-
             if (level <= 0)
                 onSetLevelZeroData.Invoke();
             else
@@ -553,19 +543,6 @@ namespace MultiplayerARPG
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
             }
-        }
-
-        [ContextMenu("Migrate UI Components")]
-        public void MigrateUIComponents()
-        {
-            uiTextTitle = MigrateUIHelpers.SetWrapperToText(textTitle, uiTextTitle);
-            uiTextDescription = MigrateUIHelpers.SetWrapperToText(textDescription, uiTextDescription);
-            uiTextLevel = MigrateUIHelpers.SetWrapperToText(textLevel, uiTextLevel);
-            uiTextItemType = MigrateUIHelpers.SetWrapperToText(textItemType, uiTextItemType);
-            uiTextSellPrice = MigrateUIHelpers.SetWrapperToText(textSellPrice, uiTextSellPrice);
-            uiTextStack = MigrateUIHelpers.SetWrapperToText(textStack, uiTextStack);
-            uiTextDurability = MigrateUIHelpers.SetWrapperToText(textDurability, uiTextDurability);
-            uiTextWeight = MigrateUIHelpers.SetWrapperToText(textWeight, uiTextWeight);
         }
     }
 }

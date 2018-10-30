@@ -18,11 +18,11 @@ namespace MultiplayerARPG
         public struct UsingSkillData
         {
             public Vector3? position;
-            public int skillIndex;
-            public UsingSkillData(Vector3? position, int skillIndex)
+            public int dataId;
+            public UsingSkillData(Vector3? position, int dataId)
             {
                 this.position = position;
-                this.skillIndex = skillIndex;
+                this.dataId = dataId;
             }
         }
 
@@ -190,9 +190,8 @@ namespace MultiplayerARPG
             if (queueUsingSkill.HasValue)
             {
                 var queueUsingSkillValue = queueUsingSkill.Value;
-                var characterSkill = PlayerCharacterEntity.Skills[queueUsingSkillValue.skillIndex];
-                var skill = characterSkill.GetSkill();
-                if (skill != null)
+                Skill skill = null;
+                if (GameInstance.Skills.TryGetValue(queueUsingSkillValue.dataId, out skill) && skill != null)
                 {
                     if (skill.IsAttack())
                     {
@@ -242,9 +241,9 @@ namespace MultiplayerARPG
             PlayerCharacterEntity.RequestAttack();
         }
 
-        public void RequestUseSkill(Vector3 position, int skillIndex)
+        public void RequestUseSkill(Vector3 position, int dataId)
         {
-            PlayerCharacterEntity.RequestUseSkill(position, skillIndex);
+            PlayerCharacterEntity.RequestUseSkill(position, dataId);
         }
 
         public void RequestUsePendingSkill()
@@ -253,19 +252,19 @@ namespace MultiplayerARPG
             {
                 var queueUsingSkillValue = queueUsingSkill.Value;
                 var position = queueUsingSkillValue.position.HasValue ? queueUsingSkillValue.position.Value : CharacterTransform.position;
-                RequestUseSkill(position, queueUsingSkillValue.skillIndex);
+                RequestUseSkill(position, queueUsingSkillValue.dataId);
                 queueUsingSkill = null;
             }
         }
 
-        public void RequestEquipItem(int itemIndex)
+        public void RequestEquipItem(ushort itemIndex)
         {
-            PlayerCharacterEntity.RequestEquipItem((ushort)itemIndex);
+            PlayerCharacterEntity.RequestEquipItem(itemIndex);
         }
 
-        public void RequestUseItem(int itemIndex)
+        public void RequestUseItem(int dataId)
         {
-            PlayerCharacterEntity.RequestUseItem((ushort)itemIndex);
+            PlayerCharacterEntity.RequestUseItem(dataId);
         }
     }
 }

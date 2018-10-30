@@ -3,9 +3,7 @@ using UnityEngine.UI;
 
 public class UIMessageDialog : UIBase
 {
-    public Text textTitle;
     public TextWrapper uiTextTitle;
-    public Text textDescription;
     public TextWrapper uiTextDescription;
     public Button buttonOkay;
     public Button buttonYes;
@@ -16,12 +14,10 @@ public class UIMessageDialog : UIBase
     {
         get
         {
-            MigrateUIComponents();
             return uiTextTitle == null ? "" : uiTextTitle.text;
         }
         set
         {
-            MigrateUIComponents();
             if (uiTextTitle != null) uiTextTitle.text = value;
         }
     }
@@ -30,12 +26,10 @@ public class UIMessageDialog : UIBase
     {
         get
         {
-            MigrateUIComponents();
             return uiTextDescription == null ? "" : uiTextDescription.text;
         }
         set
         {
-            MigrateUIComponents();
             if (uiTextDescription != null) uiTextDescription.text = value;
         }
     }
@@ -145,12 +139,5 @@ public class UIMessageDialog : UIBase
         if (onClickCancel != null)
             onClickCancel.Invoke();
         Hide();
-    }
-
-    [ContextMenu("Migrate UI Components")]
-    public void MigrateUIComponents()
-    {
-        uiTextTitle = MigrateUIHelpers.SetWrapperToText(textTitle, uiTextTitle);
-        uiTextDescription = MigrateUIHelpers.SetWrapperToText(textDescription, uiTextDescription);
     }
 }
