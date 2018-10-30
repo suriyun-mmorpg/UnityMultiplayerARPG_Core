@@ -24,14 +24,14 @@ namespace MultiplayerARPG
                     if (rightHandSlot != null)
                     {
                         var equipPosition = GameDataConst.EQUIP_POSITION_RIGHT_HAND;
-                        rightHandSlot.Setup(GetEmptyUIData(), character, -1, equipPosition);
+                        rightHandSlot.Setup(GetEmptyUIData(), character, -1);
                         cacheEquipItemSlots.Add(equipPosition, rightHandSlot);
                         SelectionManager.Add(rightHandSlot);
                     }
                     if (leftHandSlot != null)
                     {
                         var equipPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
-                        leftHandSlot.Setup(GetEmptyUIData(), character, -1, equipPosition);
+                        leftHandSlot.Setup(GetEmptyUIData(), character, -1);
                         cacheEquipItemSlots.Add(equipPosition, leftHandSlot);
                         SelectionManager.Add(leftHandSlot);
                     }
@@ -42,7 +42,7 @@ namespace MultiplayerARPG
                             !cacheEquipItemSlots.ContainsKey(otherEquipSlot.armorType.Id))
                         {
                             var equipPosition = otherEquipSlot.armorType.Id;
-                            otherEquipSlot.ui.Setup(GetEmptyUIData(), character, -1, equipPosition);
+                            otherEquipSlot.ui.Setup(GetEmptyUIData(), character, -1);
                             cacheEquipItemSlots.Add(equipPosition, otherEquipSlot.ui);
                             SelectionManager.Add(otherEquipSlot.ui);
                         }
@@ -84,7 +84,7 @@ namespace MultiplayerARPG
             if (uiItemDialog != null && ui.Data.characterItem.IsValid())
             {
                 uiItemDialog.selectionManager = SelectionManager;
-                uiItemDialog.Setup(ui.Data, character, ui.indexOfData, ui.equipPosition);
+                uiItemDialog.Setup(ui.Data, character, ui.indexOfData);
                 uiItemDialog.Show();
             }
         }
@@ -102,7 +102,7 @@ namespace MultiplayerARPG
             // Clear slots data
             foreach (var slot in slots)
             {
-                slot.Setup(GetEmptyUIData(), this.character, -1, string.Empty);
+                slot.Setup(GetEmptyUIData(), this.character, -1);
                 slot.Show();
             }
 
@@ -121,7 +121,7 @@ namespace MultiplayerARPG
 
                 tempPosition = armorItem.EquipPosition;
                 if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
-                    tempSlot.Setup(new CharacterItemLevelTuple(equipItem, equipItem.level), this.character, -1, tempPosition);
+                    tempSlot.Setup(new CharacterItemTuple(equipItem, equipItem.level, tempPosition), this.character, -1);
             }
 
             var equipWeapons = character.EquipWeapons;
@@ -133,19 +133,19 @@ namespace MultiplayerARPG
             if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
             {
                 if (rightHandEquipment != null)
-                    tempSlot.Setup(new CharacterItemLevelTuple(rightHand, rightHand.level), this.character, -1, tempPosition);
+                    tempSlot.Setup(new CharacterItemTuple(rightHand, rightHand.level, tempPosition), this.character, -1);
             }
             tempPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
             if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
             {
                 if (leftHandEquipment != null)
-                    tempSlot.Setup(new CharacterItemLevelTuple(leftHand, leftHand.level), this.character, -1, tempPosition);
+                    tempSlot.Setup(new CharacterItemTuple(leftHand, leftHand.level, tempPosition), this.character, -1);
             }
         }
 
-        private CharacterItemLevelTuple GetEmptyUIData()
+        private CharacterItemTuple GetEmptyUIData()
         {
-            return new CharacterItemLevelTuple(CharacterItem.Empty, 1);
+            return new CharacterItemTuple(CharacterItem.Empty, 1, string.Empty);
         }
     }
 }

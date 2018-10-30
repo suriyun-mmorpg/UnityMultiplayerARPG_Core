@@ -5,9 +5,15 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public partial class UICharacterItem : UIDataForCharacter<CharacterItemLevelTuple>
+    public partial class UICharacterItem : UIDataForCharacter<CharacterItemTuple>
     {
-        public string equipPosition { get; protected set; }
+        public CharacterItem characterItem { get { return Data.characterItem; } }
+        public short level { get { return Data.targetLevel; } }
+        public string equipPosition { get { return Data.equipPosition; } }
+        public Item item { get { return characterItem != null ? characterItem.GetItem() : null; } }
+        public Item equipmentItem { get { return characterItem != null ? characterItem.GetEquipmentItem() : null; } }
+        public Item armorItem { get { return characterItem != null ? characterItem.GetArmorItem() : null; } }
+        public Item weaponItem { get { return characterItem != null ? characterItem.GetWeaponItem() : null; } }
 
         [Header("Generic Info Format")]
         [Tooltip("Title Format => {0} = {Title}")]
@@ -101,12 +107,6 @@ namespace MultiplayerARPG
         private bool isRefineItemAppeared;
         private bool isDealingStateEntered;
 
-        public void Setup(CharacterItemLevelTuple data, ICharacterData character, int indexOfData, string equipPosition)
-        {
-            this.equipPosition = equipPosition;
-            Setup(data, character, indexOfData);
-        }
-
         protected override void UpdateUI()
         {
             Profiler.BeginSample("UICharacterItem - Update UI");
@@ -122,12 +122,6 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             MigrateUIComponents();
-            var characterItem = Data.characterItem;
-            var level = Data.targetLevel;
-            var item = characterItem.GetItem();
-            var equipmentItem = characterItem.GetEquipmentItem();
-            var armorItem = characterItem.GetArmorItem();
-            var weaponItem = characterItem.GetWeaponItem();
 
             if (level <= 0)
                 onSetLevelZeroData.Invoke();
@@ -303,7 +297,7 @@ namespace MultiplayerARPG
                     uiNextLevelItem.Hide();
                 else
                 {
-                    uiNextLevelItem.Setup(new CharacterItemLevelTuple(characterItem, (short)(level + 1)), character, indexOfData, equipPosition);
+                    uiNextLevelItem.Setup(new CharacterItemTuple(characterItem, (short)(level + 1), equipPosition), character, indexOfData);
                     uiNextLevelItem.Show();
                 }
             }
@@ -467,8 +461,7 @@ namespace MultiplayerARPG
             // Only unequipped equipment can be dropped
             if (!IsOwningCharacter() || !string.IsNullOrEmpty(equipPosition))
                 return;
-
-            var characterItem = Data.characterItem;
+            
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (characterItem.amount == 1)
             {
@@ -495,8 +488,7 @@ namespace MultiplayerARPG
             // Only unequipped equipment can be sell
             if (!IsOwningCharacter() || !string.IsNullOrEmpty(equipPosition))
                 return;
-
-            var characterItem = Data.characterItem;
+            
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (characterItem.amount == 1)
             {
@@ -523,8 +515,7 @@ namespace MultiplayerARPG
             // Only unequipped equipment can be sell
             if (!IsOwningCharacter() || !string.IsNullOrEmpty(equipPosition))
                 return;
-
-            var characterItem = Data.characterItem;
+            
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (characterItem.amount == 1)
             {
@@ -551,8 +542,7 @@ namespace MultiplayerARPG
             // Only unequipped equipment can refining
             if (!IsOwningCharacter() || !string.IsNullOrEmpty(equipPosition))
                 return;
-
-            var characterItem = Data.characterItem;
+            
             var uiGameplay = UISceneGameplay.Singleton;
             if (uiGameplay.uiRefineItem != null &&
                 characterItem.GetEquipmentItem() != null &&

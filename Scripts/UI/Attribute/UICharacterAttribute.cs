@@ -5,8 +5,12 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public partial class UICharacterAttribute : UIDataForCharacter<CharacterAttributeAmountTuple>
+    public partial class UICharacterAttribute : UIDataForCharacter<CharacterAttributeTuple>
     {
+        public CharacterAttribute characterAttribute { get { return Data.characterAttribute; } }
+        public short amount { get { return Data.targetAmount; } }
+        public Attribute attribute { get { return characterAttribute != null ? characterAttribute.GetAttribute() : null; } }
+
         [Header("Generic Info Format")]
         [Tooltip("Title Format => {0} = {Title}")]
         public string titleFormat = "{0}";
@@ -31,7 +35,6 @@ namespace MultiplayerARPG
         protected override void UpdateUI()
         {
             Profiler.BeginSample("UICharacterAttribute - Update UI");
-            var characterAttribute = Data.characterAttribute;
             if (IsOwningCharacter() && characterAttribute.CanIncrease(BasePlayerCharacterController.OwningCharacter))
                 onAbleToIncrease.Invoke();
             else
@@ -42,10 +45,6 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             MigrateUIComponents();
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            var characterAttribute = Data.characterAttribute;
-            var attribute = characterAttribute.GetAttribute();
-            var amount = Data.targetAmount;
 
             if (uiTextTitle != null)
                 uiTextTitle.text = string.Format(titleFormat, attribute == null ? "Unknow" : attribute.title);

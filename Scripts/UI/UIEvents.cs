@@ -23,7 +23,7 @@ namespace MultiplayerARPG
     public class UICharacterHotkeyEvent : UnityEvent<UICharacterHotkey> { }
 
     [System.Serializable]
-    public class CharacterItemEvent : UnityEvent<CharacterItemLevelTuple> { }
+    public class CharacterItemEvent : UnityEvent<CharacterItemTuple> { }
 
     [System.Serializable]
     public class UICharacterItemEvent : UnityEvent<UICharacterItem> { }
@@ -35,7 +35,7 @@ namespace MultiplayerARPG
     public class UICharacterQuestEvent : UnityEvent<UICharacterQuest> { }
 
     [System.Serializable]
-    public class CharacterSkillEvent : UnityEvent<CharacterSkillLevelTuple> { }
+    public class CharacterSkillEvent : UnityEvent<CharacterSkillTuple> { }
 
     [System.Serializable]
     public class UICharacterSkillEvent : UnityEvent<UICharacterSkill> { }
@@ -63,4 +63,10 @@ namespace MultiplayerARPG
 
     [System.Serializable]
     public class UIGuildRoleEvent : UnityEvent<UIGuildRole> { }
+
+    [System.Serializable]
+    public class GuildSkillEvent : UnityEvent<GuildSkillTuple> { }
+
+    [System.Serializable]
+    public class UIGuildSkillEvent : UnityEvent<UIGuildSkill> { }
 }

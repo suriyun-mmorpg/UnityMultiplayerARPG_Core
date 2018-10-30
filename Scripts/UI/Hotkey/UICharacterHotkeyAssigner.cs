@@ -117,14 +117,14 @@ namespace MultiplayerARPG
             CacheSkillList.Generate(filterSkills, (index, characterSkill, ui) =>
             {
                 var uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
-                uiCharacterSkill.Setup(new CharacterSkillLevelTuple(characterSkill, characterSkill.level), null, -1);
+                uiCharacterSkill.Setup(new CharacterSkillTuple(characterSkill, characterSkill.level), null, -1);
                 uiCharacterSkill.Show();
                 CacheSkillSelectionManager.Add(uiCharacterSkill);
             });
             CacheItemList.Generate(filterItems, (index, characterItem, ui) =>
             {
                 var uiCharacterItem = ui.GetComponent<UICharacterItem>();
-                uiCharacterItem.Setup(new CharacterItemLevelTuple(characterItem, characterItem.level), null, -1, string.Empty);
+                uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, string.Empty), null, -1);
                 uiCharacterItem.Show();
                 CacheItemSelectionManager.Add(uiCharacterItem);
             });

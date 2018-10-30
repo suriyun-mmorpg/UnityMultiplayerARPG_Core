@@ -1,13 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public partial class UICharacterSkill : UIDataForCharacter<CharacterSkillLevelTuple>
+    public partial class UICharacterSkill : UIDataForCharacter<CharacterSkillTuple>
     {
+        public CharacterSkill characterSkill { get { return Data.characterSkill; } }
+        public short level { get { return Data.targetLevel; } }
+        public Skill skill { get { return characterSkill != null ? characterSkill.GetSkill() : null; } }
+
         [Header("Generic Info Format")]
         [Tooltip("Title Format => {0} = {Title}")]
         public string titleFormat = "{0}";
@@ -84,10 +86,6 @@ namespace MultiplayerARPG
             base.Update();
             MigrateUIComponents();
 
-            var characterSkill = Data.characterSkill;
-            var skill = characterSkill.GetSkill();
-            var level = Data.targetLevel;
-
             if (IsOwningCharacter() && characterSkill.CanLevelUp(BasePlayerCharacterController.OwningCharacter))
                 onAbleToLevelUp.Invoke();
             else
@@ -137,10 +135,6 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             MigrateUIComponents();
-
-            var characterSkill = Data.characterSkill;
-            var skill = characterSkill.GetSkill();
-            short level = Data.targetLevel;
 
             if (level <= 0)
                 onSetLevelZeroData.Invoke();
@@ -207,7 +201,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiRequirement.Show();
-                    uiRequirement.Data = new SkillLevelTuple(skill, level);
+                    uiRequirement.Data = new SkillTuple(skill, level);
                 }
             }
 
@@ -267,7 +261,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiSkillBuff.Show();
-                    uiSkillBuff.Data = new BuffLevelTuple(skill.buff, level);
+                    uiSkillBuff.Data = new BuffTuple(skill.buff, level);
                 }
             }
 
@@ -278,7 +272,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiSkillDebuff.Show();
-                    uiSkillDebuff.Data = new BuffLevelTuple(skill.debuff, level);
+                    uiSkillDebuff.Data = new BuffTuple(skill.debuff, level);
                 }
             }
 
@@ -288,7 +282,7 @@ namespace MultiplayerARPG
                     uiNextLevelSkill.Hide();
                 else
                 {
-                    uiNextLevelSkill.Setup(new CharacterSkillLevelTuple(characterSkill, (short)(level + 1)), character, indexOfData);
+                    uiNextLevelSkill.Setup(new CharacterSkillTuple(characterSkill, (short)(level + 1)), character, indexOfData);
                     uiNextLevelSkill.Show();
                 }
             }

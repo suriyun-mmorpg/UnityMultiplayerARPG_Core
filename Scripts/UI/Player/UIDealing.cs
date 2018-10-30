@@ -111,7 +111,7 @@ namespace MultiplayerARPG
             if (uiItemDialog != null && ui.Data.characterItem.IsValid())
             {
                 uiItemDialog.selectionManager = ItemSelectionManager;
-                uiItemDialog.Setup(ui.Data, null, -1, string.Empty);
+                uiItemDialog.Setup(ui.Data, null, -1);
                 uiItemDialog.Show();
             }
         }
@@ -256,7 +256,7 @@ namespace MultiplayerARPG
             list.Generate(filterItems, (index, characterItem, ui) =>
             {
                 var uiCharacterItem = ui.GetComponent<UICharacterItem>();
-                uiCharacterItem.Setup(new CharacterItemLevelTuple(characterItem, characterItem.level), null, -1, string.Empty);
+                uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, string.Empty), null, -1);
                 uiCharacterItem.Show();
                 uiList.Add(uiCharacterItem);
             });

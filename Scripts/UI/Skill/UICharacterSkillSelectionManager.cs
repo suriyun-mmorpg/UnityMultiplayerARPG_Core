@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerARPG
 {
-    public class UICharacterSkillSelectionManager : UISelectionManager<CharacterSkillLevelTuple, UICharacterSkill, CharacterSkillEvent, UICharacterSkillEvent>
+    public class UICharacterSkillSelectionManager : UISelectionManager<CharacterSkillTuple, UICharacterSkill, CharacterSkillEvent, UICharacterSkillEvent>
     {
     }
 }

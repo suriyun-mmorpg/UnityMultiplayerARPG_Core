@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public partial class UISkillRequirement : UISelectionEntry<SkillLevelTuple>
+    public partial class UISkillRequirement : UISelectionEntry<SkillTuple>
     {
         [Header("Requirement Format")]
         [Tooltip("Require Level Format => {0} = {Level}")]

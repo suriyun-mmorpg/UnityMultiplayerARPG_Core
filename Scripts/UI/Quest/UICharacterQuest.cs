@@ -125,7 +125,7 @@ namespace MultiplayerARPG
                     var characterItem = CharacterItem.Create(rewardItem.item);
                     characterItem.amount = rewardItem.amount;
                     var uiCharacterItem = ui.GetComponent<UICharacterItem>();
-                    uiCharacterItem.Setup(new CharacterItemLevelTuple(characterItem, characterItem.level), null, -1, string.Empty);
+                    uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, string.Empty), null, -1);
                     uiCharacterItem.Show();
                 });
             }

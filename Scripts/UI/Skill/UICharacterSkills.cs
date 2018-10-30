@@ -121,7 +121,7 @@ namespace MultiplayerARPG
                     CacheList.Generate(characterSkills, (index, characterSkill, ui) =>
                     {
                         var uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
-                        uiCharacterSkill.Setup(new CharacterSkillLevelTuple(characterSkill, characterSkill.level), character, index);
+                        uiCharacterSkill.Setup(new CharacterSkillTuple(characterSkill, characterSkill.level), character, index);
                         uiCharacterSkill.Show();
                         SelectionManager.Add(uiCharacterSkill);
                         if (selectedSkillId.Equals(characterSkill.dataId))
@@ -138,7 +138,7 @@ namespace MultiplayerARPG
                         UICharacterSkill cacheUICharacterSkill;
                         if (CacheUICharacterSkills.TryGetValue(skill, out cacheUICharacterSkill))
                         {
-                            cacheUICharacterSkill.Setup(new CharacterSkillLevelTuple(characterSkill, level), character, i);
+                            cacheUICharacterSkill.Setup(new CharacterSkillTuple(characterSkill, level), character, i);
                             cacheUICharacterSkill.Show();
                             if (selectedSkillId.Equals(characterSkill.dataId))
                                 cacheUICharacterSkill.OnClickSelect();

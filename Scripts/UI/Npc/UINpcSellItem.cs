@@ -37,7 +37,7 @@ namespace MultiplayerARPG
                     uiCharacterItem.Hide();
                 else
                 {
-                    uiCharacterItem.Setup(new CharacterItemLevelTuple(CharacterItem.Create(Data.item), 1), null, -1, string.Empty);
+                    uiCharacterItem.Setup(new CharacterItemTuple(CharacterItem.Create(Data.item), 1, string.Empty), null, -1);
                     uiCharacterItem.Show();
                 }
             }

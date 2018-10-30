@@ -1,45 +1,69 @@
 ﻿namespace MultiplayerARPG
 {
-    public struct BuffLevelTuple
-    {
-        public Buff buff;
-        public short targetLevel;
-        public BuffLevelTuple(Buff buff, short targetLevel)
-        {
-            this.buff = buff;
-            this.targetLevel = targetLevel;
-        }
-    }
-
-    public struct CharacterAttributeAmountTuple
+    public struct CharacterAttributeTuple
     {
         public CharacterAttribute characterAttribute;
-        public int targetAmount;
-        public CharacterAttributeAmountTuple(CharacterAttribute characterAttribute, int targetAmount)
+        public short targetAmount;
+        public CharacterAttributeTuple(CharacterAttribute characterAttribute, short targetAmount)
         {
             this.characterAttribute = characterAttribute;
             this.targetAmount = targetAmount;
         }
     }
 
-    public struct CharacterItemLevelTuple
+    public struct CharacterItemTuple
     {
         public CharacterItem characterItem;
         public short targetLevel;
-        public CharacterItemLevelTuple(CharacterItem characterItem, short targetLevel)
+        public string equipPosition;
+        public CharacterItemTuple(CharacterItem characterItem, short targetLevel, string equipPosition)
         {
             this.characterItem = characterItem;
+            this.targetLevel = targetLevel;
+            this.equipPosition = equipPosition;
+        }
+    }
+
+    public struct CharacterSkillTuple
+    {
+        public CharacterSkill characterSkill;
+        public short targetLevel;
+        public CharacterSkillTuple(CharacterSkill characterSkill, short targetLevel)
+        {
+            this.characterSkill = characterSkill;
             this.targetLevel = targetLevel;
         }
     }
 
-    public struct CharacterSkillLevelTuple
+    public struct BuffTuple
     {
-        public CharacterSkill characterSkill;
+        public Buff buff;
         public short targetLevel;
-        public CharacterSkillLevelTuple(CharacterSkill characterSkill, short targetLevel)
+        public BuffTuple(Buff buff, short targetLevel)
         {
-            this.characterSkill = characterSkill;
+            this.buff = buff;
+            this.targetLevel = targetLevel;
+        }
+    }
+
+    public struct SkillTuple
+    {
+        public Skill skill;
+        public short targetLevel;
+        public SkillTuple(Skill skill, short targetLevel)
+        {
+            this.skill = skill;
+            this.targetLevel = targetLevel;
+        }
+    }
+
+    public struct GuildSkillTuple
+    {
+        public GuildSkill guildSkill;
+        public short targetLevel;
+        public GuildSkillTuple(GuildSkill guildSkill, short targetLevel)
+        {
+            this.guildSkill = guildSkill;
             this.targetLevel = targetLevel;
         }
     }
@@ -74,17 +98,6 @@
         {
             this.questTask = questTask;
             this.progress = progress;
-        }
-    }
-
-    public struct SkillLevelTuple
-    {
-        public Skill skill;
-        public short targetLevel;
-        public SkillLevelTuple(Skill skill, short targetLevel)
-        {
-            this.skill = skill;
-            this.targetLevel = targetLevel;
         }
     }
 

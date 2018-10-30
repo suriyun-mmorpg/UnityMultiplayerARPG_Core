@@ -56,7 +56,7 @@ namespace MultiplayerARPG
                     if (index >= 0 && index < owningCharacter.Skills.Count)
                     {
                         var characterSkill = owningCharacter.Skills[index];
-                        uiCharacterSkill.Setup(new CharacterSkillLevelTuple(characterSkill, characterSkill.level), owningCharacter, index);
+                        uiCharacterSkill.Setup(new CharacterSkillTuple(characterSkill, characterSkill.level), owningCharacter, index);
                         uiCharacterSkill.Show();
                     }
                     else
@@ -74,7 +74,7 @@ namespace MultiplayerARPG
                     if (index >= 0 && index < owningCharacter.NonEquipItems.Count)
                     {
                         var characterItem = owningCharacter.NonEquipItems[index];
-                        uiCharacterItem.Setup(new CharacterItemLevelTuple(characterItem, characterItem.level), owningCharacter, index, string.Empty);
+                        uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, string.Empty), owningCharacter, index);
                         uiCharacterItem.Show();
                     }
                     else

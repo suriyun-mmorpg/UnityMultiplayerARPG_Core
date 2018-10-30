@@ -345,7 +345,7 @@ namespace MultiplayerARPG
                     if (CacheUICharacterAttributes.TryGetValue(attribute, out cacheUICharacterAttribute) &&
                         displayingAttributes.TryGetValue(attribute, out amount))
                     {
-                        cacheUICharacterAttribute.Setup(new CharacterAttributeAmountTuple(characterAttribute, amount), Data, i);
+                        cacheUICharacterAttribute.Setup(new CharacterAttributeTuple(characterAttribute, amount), Data, i);
                         cacheUICharacterAttribute.Show();
                     }
                     else

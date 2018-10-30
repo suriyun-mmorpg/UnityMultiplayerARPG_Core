@@ -51,7 +51,7 @@ namespace MultiplayerARPG
                     uiRefiningItem.Hide();
                 else
                 {
-                    uiRefiningItem.Setup(new CharacterItemLevelTuple(characterItem, level), owningCharacter, Data, string.Empty);
+                    uiRefiningItem.Setup(new CharacterItemTuple(characterItem, level, string.Empty), owningCharacter, Data);
                     uiRefiningItem.Show();
                 }
             }
