@@ -50,10 +50,8 @@ namespace MultiplayerARPG
         [Header("Options")]
         public UIGuildSkill uiNextLevelSkill;
 
-        protected override void Update()
+        protected override void UpdateUI()
         {
-            base.Update();
-
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null &&
                 Level < GuildSkill.GetMaxLevel() &&

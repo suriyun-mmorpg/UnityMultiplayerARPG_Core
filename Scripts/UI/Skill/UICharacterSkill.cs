@@ -76,11 +76,6 @@ namespace MultiplayerARPG
         {
             base.Update();
 
-            if (IsOwningCharacter() && Skill.CanLevelUp(BasePlayerCharacterController.OwningCharacter, Level))
-                onAbleToLevelUp.Invoke();
-            else
-                onUnableToLevelUp.Invoke();
-
             if (coolDownRemainsDuration <= 0f)
             {
                 if (character != null && Skill != null)
@@ -120,6 +115,14 @@ namespace MultiplayerARPG
 
             if (imageCoolDownGage != null)
                 imageCoolDownGage.fillAmount = coolDownDuration <= 0 ? 0 : coolDownRemainsDuration / coolDownDuration;
+        }
+
+        protected override void UpdateUI()
+        {
+            if (IsOwningCharacter() && Skill.CanLevelUp(BasePlayerCharacterController.OwningCharacter, Level))
+                onAbleToLevelUp.Invoke();
+            else
+                onUnableToLevelUp.Invoke();
         }
 
         protected override void UpdateData()
