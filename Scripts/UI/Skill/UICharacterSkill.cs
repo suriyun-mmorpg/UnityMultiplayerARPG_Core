@@ -83,7 +83,6 @@ namespace MultiplayerARPG
             var characterSkill = Data.characterSkill;
             var skill = characterSkill.GetSkill();
             var level = Data.targetLevel;
-
             collectedDeltaTime += Time.deltaTime;
 
             if (IsOwningCharacter() && characterSkill.CanLevelUp(BasePlayerCharacterController.OwningCharacter))
@@ -97,7 +96,7 @@ namespace MultiplayerARPG
                 var indexOfSkillUsage = character.IndexOfSkillUsage(skill.DataId, SkillUsageType.Skill);
                 if (indexOfSkillUsage >= 0)
                 {
-                    coolDownRemainsDuration = character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+                    coolDownRemainsDuration = character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration - collectedDeltaTime;
                     if (coolDownRemainsDuration < 0f)
                         coolDownRemainsDuration = 0f;
                 }

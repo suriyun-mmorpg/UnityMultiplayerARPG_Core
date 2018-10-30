@@ -56,6 +56,7 @@ namespace MultiplayerARPG
         // List
         public System.Action<LiteNetLibSyncList.Operation, int> onAttributesOperation;
         public System.Action<LiteNetLibSyncList.Operation, int> onSkillsOperation;
+        public System.Action<LiteNetLibSyncList.Operation, int> onSkillUsagesOperation;
         public System.Action<LiteNetLibSyncList.Operation, int> onBuffsOperation;
         public System.Action<LiteNetLibSyncList.Operation, int> onEquipItemsOperation;
         public System.Action<LiteNetLibSyncList.Operation, int> onNonEquipItemsOperation;
@@ -275,6 +276,32 @@ namespace MultiplayerARPG
 
             if (onSkillsOperation != null)
                 onSkillsOperation.Invoke(operation, index);
+        }
+
+        /// <summary>
+        /// Override this to do stuffs when skill usages changes
+        /// </summary>
+        /// <param name="operation"></param>
+        /// <param name="index"></param>
+        protected virtual void OnSkillUsagesOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            isRecaching = true;
+
+            if (onSkillUsagesOperation != null)
+                onSkillUsagesOperation.Invoke(operation, index);
+
+            // Call update skill operations to update uis
+            switch (operation)
+            {
+                case LiteNetLibSyncList.Operation.Add:
+                case LiteNetLibSyncList.Operation.Insert:
+                case LiteNetLibSyncList.Operation.Set:
+                case LiteNetLibSyncList.Operation.Dirty:
+                    var skillIndex = this.IndexOfSkill(SkillUsages[index].dataId);
+                    if (skillIndex >= 0 && onSkillsOperation != null)
+                        onSkillsOperation(operation, skillIndex);
+                    break;
+            }
         }
 
         /// <summary>

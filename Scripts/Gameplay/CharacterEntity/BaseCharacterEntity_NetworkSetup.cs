@@ -33,6 +33,7 @@ namespace MultiplayerARPG
 
             attributes.forOwnerOnly = false;
             skills.forOwnerOnly = true;
+            skillUsages.forOwnerOnly = true;
             buffs.forOwnerOnly = false;
             equipItems.forOwnerOnly = false;
             nonEquipItems.forOwnerOnly = true;
@@ -53,6 +54,7 @@ namespace MultiplayerARPG
             // On list changes events
             attributes.onOperation += OnAttributesOperation;
             skills.onOperation += OnSkillsOperation;
+            skillUsages.onOperation += OnSkillUsagesOperation;
             buffs.onOperation += OnBuffsOperation;
             equipItems.onOperation += OnEquipItemsOperation;
             nonEquipItems.onOperation += OnNonEquipItemsOperation;
@@ -78,6 +80,7 @@ namespace MultiplayerARPG
             // On list changes events
             attributes.onOperation -= OnAttributesOperation;
             skills.onOperation -= OnSkillsOperation;
+            skillUsages.onOperation -= OnSkillUsagesOperation;
             buffs.onOperation -= OnBuffsOperation;
             equipItems.onOperation -= OnEquipItemsOperation;
             nonEquipItems.onOperation -= OnNonEquipItemsOperation;
