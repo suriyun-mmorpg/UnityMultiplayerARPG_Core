@@ -44,9 +44,34 @@ namespace MultiplayerARPG
         public UnityEvent onSetNonLevelZeroData;
         public UnityEvent onAbleToLevelUp;
         public UnityEvent onUnableToLevelUp;
+        public UnityEvent onAbleToUse;
+        public UnityEvent onUnableToUse;
 
         [Header("Options")]
         public UIGuildSkill uiNextLevelSkill;
+
+        protected override void Update()
+        {
+            base.Update();
+
+            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            if (owningCharacter != null &&
+                Level < GuildSkill.GetMaxLevel() &&
+                owningCharacter.GameManager != null &&
+                owningCharacter.GameManager.ClientGuild != null &&
+                owningCharacter.GameManager.ClientGuild.IsLeader(owningCharacter) &&
+                owningCharacter.GameManager.ClientGuild.skillPoint > 0)
+                onAbleToLevelUp.Invoke();
+            else
+                onUnableToLevelUp.Invoke();
+
+            if (owningCharacter != null &&
+                Level > 1 &&
+                GuildSkill.skillType == GuildSkillType.Active)
+                onAbleToUse.Invoke();
+            else
+                onUnableToUse.Invoke();
+        }
 
         protected override void UpdateData()
         {
@@ -115,6 +140,15 @@ namespace MultiplayerARPG
 
             if (owningCharacter != null)
                 owningCharacter.RequestAddGuildSkill(GuildSkill.DataId);
+        }
+
+        public void OnClickUse()
+        {
+            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            if (owningCharacter == null || owningCharacter.GuildId <= 0)
+                return;
+
+            owningCharacter.RequestUseGuildSkill(GuildSkill.DataId);
         }
     }
 }

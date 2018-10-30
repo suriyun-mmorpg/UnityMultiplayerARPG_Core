@@ -35,6 +35,13 @@ namespace MultiplayerARPG
             CallNetFunction("AddGuildSkill", FunctionReceivers.Server, dataId);
         }
 
+        public virtual void RequestUseGuildSkill(int dataId)
+        {
+            if (IsDead())
+                return;
+            CallNetFunction("UseGuildSkill", FunctionReceivers.Server, dataId);
+        }
+
         public virtual void RequestRespawn()
         {
             if (!IsDead())

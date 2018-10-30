@@ -43,6 +43,7 @@ namespace MultiplayerARPG
             RegisterNetFunction("AddAttribute", new LiteNetLibFunction<NetFieldInt>((dataId) => NetFuncAddAttribute(dataId)));
             RegisterNetFunction("AddSkill", new LiteNetLibFunction<NetFieldInt>((dataId) => NetFuncAddSkill(dataId)));
             RegisterNetFunction("AddGuildSkill", new LiteNetLibFunction<NetFieldInt>((dataId) => NetFuncAddGuildSkill(dataId)));
+            RegisterNetFunction("UseGuildSkill", new LiteNetLibFunction<NetFieldInt>((dataId) => NetFuncUseGuildSkill(dataId)));
             RegisterNetFunction("Respawn", new LiteNetLibFunction(NetFuncRespawn));
             RegisterNetFunction("AssignHotkey", new LiteNetLibFunction<NetFieldString, NetFieldByte, NetFieldInt>((hotkeyId, type, dataId) => NetFuncAssignHotkey(hotkeyId, type, dataId)));
             RegisterNetFunction("NpcActivate", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncNpcActivate(objectId)));

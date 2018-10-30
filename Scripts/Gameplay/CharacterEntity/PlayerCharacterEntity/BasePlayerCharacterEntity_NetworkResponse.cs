@@ -106,6 +106,14 @@ namespace MultiplayerARPG
             // TODO: Implement this
         }
 
+        protected virtual void NetFuncUseGuildSkill(int dataId)
+        {
+            if (IsDead())
+                return;
+
+            // TODO: Implement this
+        }
+
         protected virtual void NetFuncRespawn()
         {
             Respawn();
