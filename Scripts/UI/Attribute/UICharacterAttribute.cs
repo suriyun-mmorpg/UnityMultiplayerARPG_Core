@@ -59,12 +59,11 @@ namespace MultiplayerARPG
 
         public void OnClickAdd()
         {
-            if (!IsOwningCharacter())
+            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            if (owningCharacter == null)
                 return;
 
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter != null)
-                owningCharacter.RequestAddAttribute(Attribute.DataId);
+            owningCharacter.RequestAddAttribute(Attribute.DataId);
         }
     }
 }
