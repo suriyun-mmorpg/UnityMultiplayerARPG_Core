@@ -6,6 +6,13 @@ namespace MultiplayerARPG
 {
     public static class GuildSkillExtension
     {
+        public static bool IsBuff(this GuildSkill guildSkill)
+        {
+            if (guildSkill == null)
+                return false;
+            return guildSkill.skillType == GuildSkillType.Active;
+        }
+
         public static int GetMaxLevel(this GuildSkill guildSkill)
         {
             if (guildSkill == null)

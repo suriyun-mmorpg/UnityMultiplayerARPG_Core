@@ -108,7 +108,7 @@ namespace MultiplayerARPG
         {
             if (!hasSetData)
                 return;
-            BasePlayerCharacterController.OwningCharacter.RequestRefineItem(Data);
+            BasePlayerCharacterController.OwningCharacter.RequestRefineItem((ushort)Data);
         }
 
         [ContextMenu("Migrate UI Components")]

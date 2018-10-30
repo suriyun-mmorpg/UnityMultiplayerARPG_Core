@@ -295,7 +295,7 @@ namespace MultiplayerARPG
 
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
-                owningCharacter.RequestAddSkill(indexOfData, 1);
+                owningCharacter.RequestAddSkill(skill.DataId);
         }
 
         [ContextMenu("Migrate UI Components")]

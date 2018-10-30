@@ -59,7 +59,7 @@ namespace MultiplayerARPG
             if (item.maxStack == 1)
             {
                 if (owningCharacter != null)
-                    owningCharacter.RequestBuyNpcItem(indexOfData, 1);
+                    owningCharacter.RequestBuyNpcItem((ushort)indexOfData, 1);
             }
             else
                 UISceneGlobal.Singleton.ShowInputDialog(buyInputTitle, buyInputDescription, OnBuyAmountConfirmed, 1, item.maxStack, 1);
@@ -69,7 +69,7 @@ namespace MultiplayerARPG
         {
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
-                owningCharacter.RequestBuyNpcItem(indexOfData, (short)amount);
+                owningCharacter.RequestBuyNpcItem((ushort)indexOfData, (short)amount);
         }
 
         [ContextMenu("Migrate UI Components")]

@@ -70,7 +70,7 @@ namespace MultiplayerARPG
 
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
-                owningCharacter.RequestAddAttribute(indexOfData, 1);
+                owningCharacter.RequestAddAttribute(attribute.DataId);
         }
 
         [ContextMenu("Migrate UI Components")]

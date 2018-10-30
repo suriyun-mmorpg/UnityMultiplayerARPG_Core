@@ -7,29 +7,38 @@ namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
     {
-        public virtual void RequestSwapOrMergeItem(int fromIndex, int toIndex)
+        public virtual void RequestSwapOrMergeItem(ushort fromIndex, ushort toIndex)
         {
             if (IsDead())
                 return;
             CallNetFunction("SwapOrMergeItem", FunctionReceivers.Server, fromIndex, toIndex);
         }
 
-        public virtual void RequestAddAttribute(int attributeIndex, short amount)
+        public virtual void RequestAddAttribute(int dataId)
         {
             if (IsDead())
                 return;
-            CallNetFunction("AddAttribute", FunctionReceivers.Server, attributeIndex, amount);
+            CallNetFunction("AddAttribute", FunctionReceivers.Server, dataId);
         }
 
-        public virtual void RequestAddSkill(int skillIndex, short amount)
+        public virtual void RequestAddSkill(int dataId)
         {
             if (IsDead())
                 return;
-            CallNetFunction("AddSkill", FunctionReceivers.Server, skillIndex, amount);
+            CallNetFunction("AddSkill", FunctionReceivers.Server, dataId);
+        }
+
+        public virtual void RequestAddGuildSkill(int dataId)
+        {
+            if (IsDead())
+                return;
+            CallNetFunction("AddGuildSkill", FunctionReceivers.Server, dataId);
         }
 
         public virtual void RequestRespawn()
         {
+            if (!IsDead())
+                return;
             CallNetFunction("Respawn", FunctionReceivers.Server);
         }
 
@@ -45,21 +54,21 @@ namespace MultiplayerARPG
             CallNetFunction("NpcActivate", FunctionReceivers.Server, objectId);
         }
 
-        public virtual void RequestShowNpcDialog(int npcDialogDataId)
+        public virtual void RequestShowNpcDialog(int dataId)
         {
             if (IsDead())
                 return;
-            CallNetFunction("ShowNpcDialog", ConnectionId, npcDialogDataId);
+            CallNetFunction("ShowNpcDialog", ConnectionId, dataId);
         }
 
-        public virtual void RequestSelectNpcDialogMenu(int menuIndex)
+        public virtual void RequestSelectNpcDialogMenu(byte menuIndex)
         {
             if (IsDead())
                 return;
             CallNetFunction("SelectNpcDialogMenu", FunctionReceivers.Server, menuIndex);
         }
 
-        public virtual void RequestBuyNpcItem(int itemIndex, short amount)
+        public virtual void RequestBuyNpcItem(ushort itemIndex, short amount)
         {
             if (IsDead())
                 return;
@@ -87,19 +96,17 @@ namespace MultiplayerARPG
             CallNetFunction("DestroyBuild", FunctionReceivers.Server, objectId);
         }
 
-        public virtual void RequestSellItem(int nonEquipIndex, short amount)
+        public virtual void RequestSellItem(ushort nonEquipIndex, short amount)
         {
             if (IsDead() ||
-                nonEquipIndex < 0 ||
                 nonEquipIndex >= NonEquipItems.Count)
                 return;
             CallNetFunction("SellItem", FunctionReceivers.Server, nonEquipIndex, amount);
         }
 
-        public virtual void RequestRefineItem(int nonEquipIndex)
+        public virtual void RequestRefineItem(ushort nonEquipIndex)
         {
             if (IsDead() ||
-                nonEquipIndex < 0 ||
                 nonEquipIndex >= NonEquipItems.Count)
                 return;
             CallNetFunction("RefineItem", FunctionReceivers.Server, nonEquipIndex);
@@ -130,7 +137,7 @@ namespace MultiplayerARPG
             CallNetFunction("AcceptedDealingRequest", ConnectionId, objectId);
         }
 
-        public virtual void RequestSetDealingItem(int itemIndex, short amount)
+        public virtual void RequestSetDealingItem(ushort itemIndex, short amount)
         {
             CallNetFunction("SetDealingItem", FunctionReceivers.Server, itemIndex, amount);
         }

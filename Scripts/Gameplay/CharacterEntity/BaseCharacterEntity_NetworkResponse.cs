@@ -62,7 +62,7 @@ namespace MultiplayerARPG
             }
 
             // Play animation on clients
-            RequestPlayActionAnimation(animActionType, dataId, animationIndex);
+            RequestPlayActionAnimation(animActionType, dataId, (byte)animationIndex);
 
             // Start attack routine
             StartCoroutine(AttackRoutine(CacheTransform.position, triggerDuration, totalDuration, weapon, damageInfo, allDamageAmounts));
@@ -85,25 +85,26 @@ namespace MultiplayerARPG
         /// Is function will be called at server to order character to use skill
         /// </summary>
         /// <param name="position">Target position to apply skill at</param>
-        /// <param name="skillIndex">Index in `characterSkills` list which will be used</param>
-        protected virtual void NetFuncUseSkill(Vector3 position, int skillIndex)
+        /// <param name="dataId">Skill's data id which will be used</param>
+        protected virtual void NetFuncUseSkill(Vector3 position, int dataId)
         {
             if (Time.unscaledTime - lastActionCommandReceivedTime < ACTION_COMMAND_DELAY)
                 return;
             lastActionCommandReceivedTime = Time.unscaledTime;
 
-            if (!CanMoveOrDoActions() ||
-                skillIndex < 0 ||
-                skillIndex >= skills.Count)
+            if (!CanMoveOrDoActions())
                 return;
 
-            var characterSkill = skills[skillIndex];
+            var index = this.IndexOfSkill(dataId);
+            if (index < 0)
+                return;
+
+            var characterSkill = skills[index];
             if (!characterSkill.CanUse(this))
                 return;
 
             // Prepare requires data
             AnimActionType animActionType;
-            int dataId;
             int animationIndex;
             SkillAttackType skillAttackType;
             CharacterItem weapon;
@@ -142,10 +143,10 @@ namespace MultiplayerARPG
             }
 
             // Play animation on clients
-            RequestPlayActionAnimation(animActionType, dataId, animationIndex);
+            RequestPlayActionAnimation(animActionType, dataId, (byte)animationIndex);
 
             // Start use skill routine
-            StartCoroutine(UseSkillRoutine(skillIndex, position, triggerDuration, totalDuration, skillAttackType, weapon, damageInfo, allDamageAmounts));
+            StartCoroutine(UseSkillRoutine(dataId, position, triggerDuration, totalDuration, skillAttackType, weapon, damageInfo, allDamageAmounts));
         }
 
         private IEnumerator UseSkillRoutine(
@@ -179,17 +180,19 @@ namespace MultiplayerARPG
         /// <summary>
         /// This will be called on server to use item
         /// </summary>
-        /// <param name="itemIndex"></param>
-        protected virtual void NetFuncUseItem(int itemIndex)
+        /// <param name="dataId">Item's data id which will be used</param>
+        protected virtual void NetFuncUseItem(int dataId)
         {
-            if (IsDead() ||
-                itemIndex < 0 ||
-                itemIndex >= nonEquipItems.Count)
+            if (IsDead())
                 return;
 
-            var characterItem = nonEquipItems[itemIndex];
+            var index = this.IndexOfNonEquipItem(dataId);
+            if (index < 0)
+                return;
+
+            var characterItem = nonEquipItems[index];
             var potionItem = characterItem.GetPotionItem();
-            if (potionItem != null && this.DecreaseItemsByIndex(itemIndex, 1))
+            if (potionItem != null && this.DecreaseItemsByIndex(index, 1))
                 ApplyPotionBuff(potionItem, characterItem.level);
         }
 

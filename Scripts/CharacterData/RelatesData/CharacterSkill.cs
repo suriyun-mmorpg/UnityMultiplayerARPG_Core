@@ -36,11 +36,6 @@ public class CharacterSkill
         return GetSkill().CanLevelUp(character, level);
     }
 
-    public void LevelUp(short level)
-    {
-        this.level += level;
-    }
-
     public bool CanUse(ICharacterData character)
     {
         return GetSkill().CanUse(character, level);

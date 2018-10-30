@@ -60,42 +60,50 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void NetFuncAddAttribute(int attributeIndex, short amount)
+        protected virtual void NetFuncAddAttribute(int dataId)
         {
-            if (IsDead() ||
-                attributeIndex < 0 ||
-                attributeIndex >= Attributes.Count ||
-                amount <= 0 ||
-                amount > StatPoint)
+            if (IsDead())
                 return;
 
-            var attribute = Attributes[attributeIndex];
+            var index = this.IndexOfAttribute(dataId);
+            if (index < 0)
+                return;
+
+            var attribute = Attributes[index];
             if (!attribute.CanIncrease(this))
                 return;
 
-            attribute.Increase(amount);
-            Attributes[attributeIndex] = attribute;
+            attribute.amount += 1;
+            Attributes[index] = attribute;
 
-            StatPoint -= amount;
+            StatPoint -= 1;
         }
 
-        protected virtual void NetFuncAddSkill(int skillIndex, short amount)
+        protected virtual void NetFuncAddSkill(int dataId)
         {
-            if (IsDead() ||
-                skillIndex < 0 ||
-                skillIndex >= Skills.Count ||
-                amount <= 0 ||
-                amount > SkillPoint)
+            if (IsDead())
                 return;
 
-            var skill = Skills[skillIndex];
+            var index = this.IndexOfSkill(dataId);
+            if (index < 0)
+                return;
+
+            var skill = Skills[index];
             if (!skill.CanLevelUp(this))
                 return;
 
-            skill.LevelUp(amount);
-            Skills[skillIndex] = skill;
+            skill.level += 1;
+            Skills[index] = skill;
 
-            SkillPoint -= amount;
+            SkillPoint -= 1;
+        }
+
+        protected virtual void NetFuncAddGuildSkill(int dataId)
+        {
+            if (IsDead())
+                return;
+
+            // TODO: Implement this
         }
 
         protected virtual void NetFuncRespawn()
@@ -133,10 +141,10 @@ namespace MultiplayerARPG
                 RequestShowNpcDialog(currentNpcDialog.DataId);
         }
 
-        protected virtual void NetFuncShowNpcDialog(int npcDialogDataId)
+        protected virtual void NetFuncShowNpcDialog(int dataId)
         {
             if (onShowNpcDialog != null)
-                onShowNpcDialog.Invoke(npcDialogDataId);
+                onShowNpcDialog.Invoke(dataId);
         }
 
         protected virtual void NetFuncSelectNpcDialogMenu(int menuIndex)

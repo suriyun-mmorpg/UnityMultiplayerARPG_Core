@@ -439,7 +439,7 @@ namespace MultiplayerARPG
 
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
-                owningCharacter.RequestEquipItem(indexOfData);
+                owningCharacter.RequestEquipItem((ushort)indexOfData);
         }
 
         public void OnClickUnEquip()
@@ -468,7 +468,7 @@ namespace MultiplayerARPG
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
                 if (owningCharacter != null)
-                    owningCharacter.RequestDropItem(indexOfData, 1);
+                    owningCharacter.RequestDropItem((ushort)indexOfData, 1);
             }
             else
                 UISceneGlobal.Singleton.ShowInputDialog(dropInputTitle, dropInputDescription, OnDropAmountConfirmed, 1, characterItem.amount, characterItem.amount);
@@ -480,7 +480,7 @@ namespace MultiplayerARPG
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
             if (owningCharacter != null)
-                owningCharacter.RequestDropItem(indexOfData, (short)amount);
+                owningCharacter.RequestDropItem((ushort)indexOfData, (short)amount);
         }
 
         public void OnClickSell()
@@ -495,7 +495,7 @@ namespace MultiplayerARPG
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
                 if (owningCharacter != null)
-                    owningCharacter.RequestSellItem(indexOfData, 1);
+                    owningCharacter.RequestSellItem((ushort)indexOfData, 1);
             }
             else
                 UISceneGlobal.Singleton.ShowInputDialog(sellInputTitle, sellInputDescription, OnSellItemAmountConfirmed, 1, characterItem.amount, characterItem.amount);
@@ -507,7 +507,7 @@ namespace MultiplayerARPG
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
             if (owningCharacter != null)
-                owningCharacter.RequestSellItem(indexOfData, (short)amount);
+                owningCharacter.RequestSellItem((ushort)indexOfData, (short)amount);
         }
 
         public void OnClickSetDealingItem()
@@ -522,7 +522,7 @@ namespace MultiplayerARPG
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
                 if (owningCharacter != null)
-                    owningCharacter.RequestSetDealingItem(indexOfData, 1);
+                    owningCharacter.RequestSetDealingItem((ushort)indexOfData, 1);
             }
             else
                 UISceneGlobal.Singleton.ShowInputDialog(setDealingInputTitle, setDealingInputDescription, OnSetDealingItemAmountConfirmed, 1, characterItem.amount, characterItem.amount);
@@ -534,7 +534,7 @@ namespace MultiplayerARPG
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
             if (owningCharacter != null)
-                owningCharacter.RequestSetDealingItem(indexOfData, (short)amount);
+                owningCharacter.RequestSetDealingItem((ushort)indexOfData, (short)amount);
         }
 
         public void OnClickSetRefineItem()

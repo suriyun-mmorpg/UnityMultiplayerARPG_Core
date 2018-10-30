@@ -14,28 +14,25 @@ namespace MultiplayerARPG
             CallNetFunction("Attack", FunctionReceivers.Server);
         }
 
-        public virtual void RequestUseSkill(Vector3 position, int skillIndex)
+        public virtual void RequestUseSkill(Vector3 position, int dataId)
         {
-            if (!CanMoveOrDoActions() ||
-                skillIndex < 0 ||
-                skillIndex >= Skills.Count ||
-                !Skills[skillIndex].CanUse(this))
+            if (!CanMoveOrDoActions())
                 return;
-            CallNetFunction("UseSkill", FunctionReceivers.Server, position, skillIndex);
+            CallNetFunction("UseSkill", FunctionReceivers.Server, position, dataId);
         }
 
-        public virtual void RequestUseItem(int itemIndex)
+        public virtual void RequestUseItem(int dataId)
         {
             if (IsDead())
                 return;
-            CallNetFunction("UseItem", FunctionReceivers.Server, itemIndex);
+            CallNetFunction("UseItem", FunctionReceivers.Server, dataId);
         }
 
-        public virtual void RequestPlayActionAnimation(AnimActionType animActionType, int dataId, int index)
+        public virtual void RequestPlayActionAnimation(AnimActionType animActionType, int dataId, byte index)
         {
-            if (IsDead() || index < 0)
+            if (IsDead())
                 return;
-            CallNetFunction("PlayActionAnimation", FunctionReceivers.All, animActionType, dataId, (byte)index);
+            CallNetFunction("PlayActionAnimation", FunctionReceivers.All, animActionType, dataId, index);
         }
 
         public virtual void RequestPickupItem(uint objectId)
@@ -45,19 +42,17 @@ namespace MultiplayerARPG
             CallNetFunction("PickupItem", FunctionReceivers.Server, objectId);
         }
 
-        public virtual void RequestDropItem(int nonEquipIndex, short amount)
+        public virtual void RequestDropItem(ushort nonEquipIndex, short amount)
         {
             if (!CanMoveOrDoActions() ||
-                nonEquipIndex < 0 ||
                 nonEquipIndex >= NonEquipItems.Count)
                 return;
             CallNetFunction("DropItem", FunctionReceivers.Server, nonEquipIndex, amount);
         }
 
-        public virtual void RequestEquipItem(int nonEquipIndex)
+        public virtual void RequestEquipItem(ushort nonEquipIndex)
         {
             if (!CanMoveOrDoActions() ||
-                nonEquipIndex < 0 ||
                 nonEquipIndex >= NonEquipItems.Count)
                 return;
             var characterItem = NonEquipItems[nonEquipIndex];
@@ -83,10 +78,9 @@ namespace MultiplayerARPG
                 RequestEquipItem(nonEquipIndex, armorItem.EquipPosition);
         }
 
-        public virtual void RequestEquipItem(int nonEquipIndex, string equipPosition)
+        public virtual void RequestEquipItem(ushort nonEquipIndex, string equipPosition)
         {
             if (!CanMoveOrDoActions() ||
-                nonEquipIndex < 0 ||
                 nonEquipIndex >= NonEquipItems.Count)
                 return;
             CallNetFunction("EquipItem", FunctionReceivers.Server, nonEquipIndex, equipPosition);

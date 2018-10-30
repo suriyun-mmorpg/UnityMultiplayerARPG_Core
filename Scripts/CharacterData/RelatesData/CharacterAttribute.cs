@@ -35,11 +35,6 @@ public class CharacterAttribute
     {
         return GetAttribute() != null && character != null && character.StatPoint > 0;
     }
-
-    public void Increase(short amount)
-    {
-        this.amount += amount;
-    }
 }
 
 public class NetFieldCharacterAttribute : LiteNetLibNetField<CharacterAttribute>

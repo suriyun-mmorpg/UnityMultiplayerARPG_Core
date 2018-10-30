@@ -30,7 +30,7 @@ namespace MultiplayerARPG
         public void OnClickMenu()
         {
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            owningCharacter.RequestSelectNpcDialogMenu(Data.menuIndex);
+            owningCharacter.RequestSelectNpcDialogMenu((byte)Data.menuIndex);
         }
 
         [ContextMenu("Migrate UI Components")]
