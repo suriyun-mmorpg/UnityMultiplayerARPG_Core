@@ -1,6 +1,4 @@
-﻿using UnityEngine.UI;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
     [System.Serializable]
     public struct UIAttributeTextPair
