@@ -6,8 +6,8 @@ namespace MultiplayerARPG
 {
     public class UIGuildSkill : UISelectionEntry<GuildSkillTuple>
     {
-        public GuildSkill guildSkill { get { return Data.guildSkill; } }
-        public short level { get { return Data.targetLevel; } }
+        public GuildSkill GuildSkill { get { return Data.guildSkill; } }
+        public short Level { get { return Data.targetLevel; } }
 
         [Header("Display Format")]
         [Tooltip("Title Format => {0} = {Title}")]
@@ -50,30 +50,30 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            if (level <= 0)
+            if (Level <= 0)
                 onSetLevelZeroData.Invoke();
             else
                 onSetNonLevelZeroData.Invoke();
 
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(titleFormat, guildSkill == null ? "Unknow" : guildSkill.title);
+                uiTextTitle.text = string.Format(titleFormat, GuildSkill == null ? "Unknow" : GuildSkill.title);
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(descriptionFormat, guildSkill == null ? "N/A" : guildSkill.description);
+                uiTextDescription.text = string.Format(descriptionFormat, GuildSkill == null ? "N/A" : GuildSkill.description);
 
             if (uiTextLevel != null)
-                uiTextLevel.text = string.Format(levelFormat, level.ToString("N0"));
+                uiTextLevel.text = string.Format(levelFormat, Level.ToString("N0"));
 
             if (imageIcon != null)
             {
-                var iconSprite = guildSkill == null ? null : guildSkill.icon;
+                var iconSprite = GuildSkill == null ? null : GuildSkill.icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
             }
 
             if (uiTextSkillType != null)
             {
-                switch (guildSkill.skillType)
+                switch (GuildSkill.skillType)
                 {
                     case GuildSkillType.Active:
                         uiTextSkillType.text = string.Format(skillTypeFormat, activeSkillType);
@@ -86,22 +86,22 @@ namespace MultiplayerARPG
 
             if (uiSkillBuff != null)
             {
-                if (!guildSkill.IsBuff())
+                if (!GuildSkill.IsBuff())
                     uiSkillBuff.Hide();
                 else
                 {
                     uiSkillBuff.Show();
-                    uiSkillBuff.Data = new BuffTuple(guildSkill.buff, level);
+                    uiSkillBuff.Data = new BuffTuple(GuildSkill.buff, Level);
                 }
             }
 
             if (uiNextLevelSkill != null)
             {
-                if (level + 1 > guildSkill.maxLevel)
+                if (Level + 1 > GuildSkill.maxLevel)
                     uiNextLevelSkill.Hide();
                 else
                 {
-                    uiNextLevelSkill.Data = new GuildSkillTuple(guildSkill, (short)(level + 1));
+                    uiNextLevelSkill.Data = new GuildSkillTuple(GuildSkill, (short)(Level + 1));
                     uiNextLevelSkill.Show();
                 }
             }
@@ -114,7 +114,7 @@ namespace MultiplayerARPG
                 return;
 
             if (owningCharacter != null)
-                owningCharacter.RequestAddGuildSkill(guildSkill.DataId);
+                owningCharacter.RequestAddGuildSkill(GuildSkill.DataId);
         }
     }
 }
