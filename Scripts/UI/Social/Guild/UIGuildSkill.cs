@@ -55,7 +55,6 @@ namespace MultiplayerARPG
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null &&
                 Level < GuildSkill.GetMaxLevel() &&
-                owningCharacter.GameManager != null &&
                 owningCharacter.GameManager.ClientGuild != null &&
                 owningCharacter.GameManager.ClientGuild.IsLeader(owningCharacter) &&
                 owningCharacter.GameManager.ClientGuild.skillPoint > 0)
@@ -133,7 +132,7 @@ namespace MultiplayerARPG
         public void OnClickAdd()
         {
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter == null || owningCharacter.GuildId <= 0)
+            if (owningCharacter == null || owningCharacter.GameManager.ClientGuild == null)
                 return;
 
             if (owningCharacter != null)
@@ -143,7 +142,7 @@ namespace MultiplayerARPG
         public void OnClickUse()
         {
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter == null || owningCharacter.GuildId <= 0)
+            if (owningCharacter == null || owningCharacter.GameManager.ClientGuild == null || owningCharacter.GameManager.ClientGuild.skillPoint <= 0)
                 return;
 
             owningCharacter.RequestUseGuildSkill(GuildSkill.DataId);
