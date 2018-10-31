@@ -164,8 +164,10 @@ namespace MultiplayerARPG
             // Devide inputs to float value
             var direction = new Vector3((float)horizontalInput / 100f, (float)verticalInput / 100f);
             if (direction.magnitude > 0)
+            {
                 currentDestination = CacheTransform.position + direction;
-            currentNpcDialog = null;
+                currentNpcDialog = null;
+            }
         }
 
         protected void NetFuncSetTargetEntity(uint objectId)
