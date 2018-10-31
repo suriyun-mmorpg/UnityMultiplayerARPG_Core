@@ -9,17 +9,8 @@ namespace MultiplayerARPG
 {
     [RequireComponent(typeof(CharacterModel2D))]
     [RequireComponent(typeof(MonsterActivityComponent2D))]
-    [RequireComponent(typeof(Rigidbody2D))]
     public class MonsterCharacterEntity2D : BaseMonsterCharacterEntity
     {
-        #region Settings
-        [Header("Movement AI")]
-        [Range(0.01f, 1f)]
-        public float stoppingDistance = 0.1f;
-        public float speed = 1f;
-        public bool isStopped;
-        #endregion
-
         #region Sync data
         [SerializeField]
         protected SyncFieldByte currentDirectionType = new SyncFieldByte();
@@ -29,12 +20,9 @@ namespace MultiplayerARPG
         protected Collider2D[] overlapColliders2D = new Collider2D[OVERLAP_COLLIDER_SIZE];
         protected Vector2 currentDirection = Vector2.down;
         protected Vector2 tempDirection;
-        protected Vector2? currentDestination;
         protected DirectionType localDirectionType = DirectionType.Down;
         #endregion
 
-        public Vector2 moveDirection { get; protected set; }
-        private Vector2 lastMoveDirection;
 
         private MonsterActivityComponent2D cacheMonsterActivityComponent;
         public MonsterActivityComponent2D CacheMonsterActivityComponent
@@ -44,18 +32,6 @@ namespace MultiplayerARPG
                 if (cacheMonsterActivityComponent == null)
                     cacheMonsterActivityComponent = GetComponent<MonsterActivityComponent2D>();
                 return cacheMonsterActivityComponent;
-            }
-        }
-
-
-        private Rigidbody2D cacheRigidbody2D;
-        public Rigidbody2D CacheRigidbody2D
-        {
-            get
-            {
-                if (cacheRigidbody2D == null)
-                    cacheRigidbody2D = GetComponent<Rigidbody2D>();
-                return cacheRigidbody2D;
             }
         }
 
@@ -69,74 +45,16 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void EntityAwake()
-        {
-            base.EntityAwake();
-            CacheRigidbody2D.gravityScale = 0;
-            StopMove();
-        }
-
         protected override void EntityUpdate()
         {
             base.EntityUpdate();
-            Profiler.BeginSample("PlayerCharacterEntity2D - Update");
-            if (IsDead())
-            {
-                StopMove();
-                SetTargetEntity(null);
-                return;
-            }
             (CharacterModel as CharacterModel2D).currentDirectionType = CurrentDirectionType;
-            Profiler.EndSample();
-        }
-
-        protected override void EntityFixedUpdate()
-        {
-            base.EntityFixedUpdate();
-            Profiler.BeginSample("PlayerCharacterEntity2D - FixedUpdate");
-            if (!IsServer)
-                return;
-
-            if (isStopped && CacheRigidbody2D.velocity.magnitude > 0)
-            {
-                CacheRigidbody2D.velocity = Vector2.zero;
-                return;
-            }
-            
-            if (currentDestination.HasValue)
-            {
-                var currentPosition = new Vector2(CacheTransform.position.x, CacheTransform.position.y);
-                moveDirection = (currentDestination.Value - currentPosition).normalized;
-                if (Vector3.Distance(currentDestination.Value, currentPosition) < stoppingDistance)
-                    StopMove();
-            }
-
-            if (!IsDead())
-            {
-                var moveDirectionMagnitude = moveDirection.magnitude;
-                if (!IsPlayingActionAnimation() && moveDirectionMagnitude != 0)
-                {
-                    if (moveDirectionMagnitude > 1)
-                        moveDirection = moveDirection.normalized;
-                    UpdateCurrentDirection(moveDirection);
-                    CacheRigidbody2D.velocity = moveDirection * CacheMoveSpeed;
-                }
-
-                BaseGameEntity tempEntity;
-                if (moveDirectionMagnitude == 0 && TryGetTargetEntity(out tempEntity))
-                {
-                    var targetDirection = (tempEntity.CacheTransform.position - CacheTransform.position).normalized;
-                    if (targetDirection.magnitude != 0f)
-                        UpdateCurrentDirection(targetDirection);
-                }
-            }
-            Profiler.EndSample();
         }
 
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
-            currentDirectionType.sendOptions = SendOptions.Unreliable;
+            currentDirectionType.sendOptions = SendOptions.Sequenced;
             currentDirectionType.forOwnerOnly = false;
         }
 
@@ -204,14 +122,7 @@ namespace MultiplayerARPG
 
         public override void StopMove()
         {
-            currentDestination = null;
-            moveDirection = Vector3.zero;
-            CacheRigidbody2D.velocity = Vector2.zero;
-        }
-
-        public void SetDestination(Vector2 destination)
-        {
-            currentDestination = destination;
+            CacheMonsterActivityComponent.StopMove();
         }
     }
 }

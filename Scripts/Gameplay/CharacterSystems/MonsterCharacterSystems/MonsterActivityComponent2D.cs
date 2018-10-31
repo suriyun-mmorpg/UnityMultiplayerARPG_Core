@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
 {
+    [RequireComponent(typeof(Rigidbody2D))]
     public class MonsterActivityComponent2D : MonoBehaviour
     {
         [Tooltip("Min random delay for next wander")]
@@ -21,6 +23,10 @@ namespace MultiplayerARPG
         public float setTargetDestinationDelay = 1f;
         [Tooltip("If following target time reached this value it will stop following target")]
         public float followTargetDuration = 5f;
+        [Header("Movement AI")]
+        [Range(0.01f, 1f)]
+        public float stoppingDistance = 0.1f;
+        public float speed = 1f;
 
         public float wanderTime { get; private set; }
         public float findTargetTime { get; private set; }
@@ -31,6 +37,22 @@ namespace MultiplayerARPG
         public bool isWandering { get; private set; }
         public bool isMovingOutFromWall { get; private set; }
 
+        // AI Component
+        protected bool isStopped;
+        protected Vector2? currentDestination;
+        protected Vector2 moveDirection;
+
+        private Transform cacheTransform;
+        public Transform CacheTransform
+        {
+            get
+            {
+                if (cacheTransform == null)
+                    cacheTransform = GetComponent<Transform>();
+                return cacheTransform;
+            }
+        }
+
         private MonsterCharacterEntity2D cacheMonsterCharacterEntity;
         public MonsterCharacterEntity2D CacheMonsterCharacterEntity
         {
@@ -39,6 +61,17 @@ namespace MultiplayerARPG
                 if (cacheMonsterCharacterEntity == null)
                     cacheMonsterCharacterEntity = GetComponent<MonsterCharacterEntity2D>();
                 return cacheMonsterCharacterEntity;
+            }
+        }
+
+        private Rigidbody2D cacheRigidbody2D;
+        public Rigidbody2D CacheRigidbody2D
+        {
+            get
+            {
+                if (cacheRigidbody2D == null)
+                    cacheRigidbody2D = GetComponent<Rigidbody2D>();
+                return cacheRigidbody2D;
             }
         }
 
@@ -59,6 +92,7 @@ namespace MultiplayerARPG
 
         protected void Awake()
         {
+            CacheRigidbody2D.gravityScale = 0;
             var time = Time.unscaledTime;
             RandomNextWanderTime(time);
             SetFindTargetTime(time);
@@ -69,6 +103,53 @@ namespace MultiplayerARPG
         {
             var time = Time.unscaledTime;
             UpdateActivity(time);
+        }
+
+        protected void FixedUpdate()
+        {
+            if (!CacheMonsterCharacterEntity.IsServer)
+                return;
+
+            if (isStopped)
+            {
+                CacheRigidbody2D.velocity = Vector2.zero;
+                return;
+            }
+
+            if (currentDestination.HasValue)
+            {
+                var currentPosition = new Vector2(CacheTransform.position.x, CacheTransform.position.y);
+                moveDirection = (currentDestination.Value - currentPosition).normalized;
+                if (Vector3.Distance(currentDestination.Value, currentPosition) < stoppingDistance)
+                    StopMove();
+                else
+                {
+                    CacheMonsterCharacterEntity.UpdateCurrentDirection(moveDirection);
+                    CacheRigidbody2D.velocity = moveDirection * speed;
+                }
+            }
+        }
+
+        public void SetDestination(Vector2 destination)
+        {
+            currentDestination = destination;
+        }
+
+        private void OnCollisionStay2D(Collision2D collision)
+        {
+            if (isMovingOutFromWall)
+                return;
+            StartCoroutine(SimpleMoveOutFromWallRoutine());
+        }
+
+        IEnumerator SimpleMoveOutFromWallRoutine()
+        {
+            isMovingOutFromWall = true;
+            var oldPosition = CacheMonsterCharacterEntity.CacheTransform.position;
+            yield return new WaitForSeconds(0.5f);
+            if (Vector3.Distance(oldPosition, CacheMonsterCharacterEntity.CacheTransform.position) < stoppingDistance)
+                RandomWanderTarget(Time.unscaledTime);
+            isMovingOutFromWall = false;
         }
 
         public void RandomNextWanderTime(float time)
@@ -91,9 +172,9 @@ namespace MultiplayerARPG
         {
             setDestinationTime = time;
             isWandering = false;
-            CacheMonsterCharacterEntity.speed = gameplayRule.GetMoveSpeed(CacheMonsterCharacterEntity);
-            CacheMonsterCharacterEntity.SetDestination(destination);
-            CacheMonsterCharacterEntity.isStopped = false;
+            ResumeMove();
+            speed = gameplayRule.GetMoveSpeed(CacheMonsterCharacterEntity);
+            SetDestination(destination);
             oldDestination = destination;
         }
 
@@ -101,9 +182,9 @@ namespace MultiplayerARPG
         {
             setDestinationTime = time;
             isWandering = true;
-            CacheMonsterCharacterEntity.speed = monsterDatabase.wanderMoveSpeed;
-            CacheMonsterCharacterEntity.SetDestination(destination);
-            CacheMonsterCharacterEntity.isStopped = false;
+            ResumeMove();
+            speed = monsterDatabase.wanderMoveSpeed;
+            SetDestination(destination);
             wanderDestination = destination;
         }
 
@@ -111,10 +192,10 @@ namespace MultiplayerARPG
         {
             if (!CacheMonsterCharacterEntity.IsServer || monsterDatabase == null)
                 return;
-            
+
             if (CacheMonsterCharacterEntity.IsDead())
             {
-                CacheMonsterCharacterEntity.StopMove();
+                StopMove();
                 CacheMonsterCharacterEntity.SetTargetEntity(null);
                 return;
             }
@@ -125,13 +206,13 @@ namespace MultiplayerARPG
             {
                 if (targetEntity.IsDead())
                 {
-                    CacheMonsterCharacterEntity.StopMove();
+                    StopMove();
                     CacheMonsterCharacterEntity.SetTargetEntity(null);
                     return;
                 }
                 if (CacheMonsterCharacterEntity.isInSafeArea || targetEntity.isInSafeArea)
                 {
-                    CacheMonsterCharacterEntity.StopMove();
+                    StopMove();
                     CacheMonsterCharacterEntity.SetTargetEntity(null);
                     RandomWanderTarget(time);
                     return;
@@ -142,7 +223,7 @@ namespace MultiplayerARPG
             {
                 // While character is moving then random next wander time
                 // To let character stop movement some time before random next wander time
-                if ((wanderDestination.HasValue && Vector3.Distance(currentPosition, wanderDestination.Value) > CacheMonsterCharacterEntity.stoppingDistance)
+                if ((wanderDestination.HasValue && Vector3.Distance(currentPosition, wanderDestination.Value) > stoppingDistance)
                     || oldDestination != currentPosition)
                     RandomNextWanderTime(time);
                 // Wandering when it's time
@@ -159,12 +240,12 @@ namespace MultiplayerARPG
             var targetEntityPosition = targetEntity.CacheTransform.position;
             var attackDistance = CacheMonsterCharacterEntity.GetAttackDistance();
             attackDistance -= attackDistance * 0.1f;
-            attackDistance -= CacheMonsterCharacterEntity.stoppingDistance;
+            attackDistance -= stoppingDistance;
             if (Vector3.Distance(currentPosition, targetEntityPosition) <= attackDistance)
             {
+                StopMove();
                 SetStartFollowTargetTime(time);
                 // Lookat target then do anything when it's in range
-                CacheMonsterCharacterEntity.isStopped = true;
                 var targetDirection = (targetEntity.CacheTransform.position - CacheMonsterCharacterEntity.CacheTransform.position).normalized;
                 if (targetDirection.magnitude != 0f)
                     CacheMonsterCharacterEntity.UpdateCurrentDirection(targetDirection);
@@ -180,7 +261,7 @@ namespace MultiplayerARPG
                 // Stop following target
                 if (time - startFollowTargetTime >= followTargetDuration)
                 {
-                    CacheMonsterCharacterEntity.StopMove();
+                    StopMove();
                     CacheMonsterCharacterEntity.SetTargetEntity(null);
                 }
             }
@@ -226,26 +307,17 @@ namespace MultiplayerARPG
             }
         }
 
+        public void ResumeMove()
+        {
+            isStopped = false;
+        }
+
         public void StopMove()
         {
-            CacheMonsterCharacterEntity.StopMove();
-        }
-
-        private void OnCollisionStay2D(Collision2D collision)
-        {
-            if (isMovingOutFromWall)
-                return;
-            StartCoroutine(SimpleMoveOutFromWallRoutine());
-        }
-
-        IEnumerator SimpleMoveOutFromWallRoutine()
-        {
-            isMovingOutFromWall = true;
-            var oldPosition = CacheMonsterCharacterEntity.CacheTransform.position;
-            yield return new WaitForSeconds(0.5f);
-            if (Vector3.Distance(oldPosition, CacheMonsterCharacterEntity.CacheTransform.position) < CacheMonsterCharacterEntity.stoppingDistance)
-                RandomWanderTarget(Time.unscaledTime);
-            isMovingOutFromWall = false;
+            isStopped = true;
+            currentDestination = null;
+            moveDirection = Vector3.zero;
+            CacheRigidbody2D.velocity = Vector2.zero;
         }
     }
 }
