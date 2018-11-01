@@ -30,7 +30,7 @@ namespace MultiplayerARPG
                     isOnline = reader.GetBool();
                     data.characterName = reader.GetString();
                     data.dataId = reader.GetInt();
-                    data.level = reader.GetInt();
+                    data.level = reader.GetShort();
                     // Read extra data
                     if (isOnline)
                     {

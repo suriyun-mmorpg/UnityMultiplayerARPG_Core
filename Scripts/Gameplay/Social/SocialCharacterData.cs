@@ -5,7 +5,7 @@
         public string id;
         public string characterName;
         public int dataId;
-        public int level;
+        public short level;
         public int currentHp;
         public int maxHp;
         public int currentMp;

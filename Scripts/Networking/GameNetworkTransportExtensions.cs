@@ -24,7 +24,7 @@ namespace MultiplayerARPG
             Send(transportHandler, connectionId, msgType, netMessage);
         }
 
-        public static void SendAddSocialMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId, string characterName, int dataId, int level)
+        public static void SendAddSocialMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId, string characterName, int dataId, short level)
         {
             var netMessage = new UpdateSocialMemberMessage();
             netMessage.type = UpdateSocialMemberMessage.UpdateType.Add;
@@ -40,7 +40,7 @@ namespace MultiplayerARPG
             Send(transportHandler, connectionId, msgType, netMessage);
         }
 
-        public static void SendUpdateSocialMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, bool isOnline, string characterId, string characterName, int dataId, int level, int currentHp, int maxHp, int currentMp, int maxMp)
+        public static void SendUpdateSocialMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, bool isOnline, string characterId, string characterName, int dataId, short level, int currentHp, int maxHp, int currentMp, int maxMp)
         {
             var netMessage = new UpdateSocialMemberMessage();
             netMessage.type = UpdateSocialMemberMessage.UpdateType.Update;
