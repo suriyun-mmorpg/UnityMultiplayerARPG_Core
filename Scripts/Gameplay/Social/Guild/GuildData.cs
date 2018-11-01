@@ -13,7 +13,7 @@ namespace MultiplayerARPG
         public string guildMessage;
         protected List<GuildRoleData> roles;
         protected Dictionary<string, byte> memberRoles;
-        protected Dictionary<int, short> skills;
+        protected Dictionary<int, short> skillLevels;
 
         public int IncreaseMaxMember { get; protected set; }
         public float IncreaseExpGainPercentage { get; protected set; }
@@ -42,7 +42,7 @@ namespace MultiplayerARPG
             guildMessage = string.Empty;
             this.roles = new List<GuildRoleData>(roles);
             memberRoles = new Dictionary<string, byte>();
-            skills = new Dictionary<int, short>();
+            skillLevels = new Dictionary<int, short>();
             this.leaderId = leaderId;
             AddMember(new SocialCharacterData() { id = leaderId });
         }
@@ -204,17 +204,22 @@ namespace MultiplayerARPG
             return result;
         }
 
+        public IEnumerable<KeyValuePair<int, short>> GetSkillLevels()
+        {
+            return skillLevels;
+        }
+
         public short GetSkillLevel(int dataId)
         {
-            if (GameInstance.GuildSkills.ContainsKey(dataId) && skills.ContainsKey(dataId))
-                return skills[dataId];
+            if (GameInstance.GuildSkills.ContainsKey(dataId) && skillLevels.ContainsKey(dataId))
+                return skillLevels[dataId];
             return 0;
         }
 
         public bool IsSkillReachedMaxLevel(int dataId)
         {
-            if (GameInstance.GuildSkills.ContainsKey(dataId) && skills.ContainsKey(dataId))
-                return skills[dataId] < GameInstance.GuildSkills[dataId].maxLevel;
+            if (GameInstance.GuildSkills.ContainsKey(dataId) && skillLevels.ContainsKey(dataId))
+                return skillLevels[dataId] < GameInstance.GuildSkills[dataId].maxLevel;
             return false;
         }
 
@@ -222,9 +227,9 @@ namespace MultiplayerARPG
         {
             if (!GameInstance.GuildSkills.ContainsKey(dataId))
             {
-                var level = (short)(skills.ContainsKey(dataId) ? skills[dataId] : 0);
+                var level = (short)(skillLevels.ContainsKey(dataId) ? skillLevels[dataId] : 0);
                 level += 1;
-                skills[dataId] = level;
+                skillLevels[dataId] = level;
                 MakeCaches();
             }
         }
@@ -233,7 +238,7 @@ namespace MultiplayerARPG
         {
             if (!GameInstance.GuildSkills.ContainsKey(dataId))
             {
-                skills[dataId] = level;
+                skillLevels[dataId] = level;
                 MakeCaches();
             }
         }
@@ -249,7 +254,7 @@ namespace MultiplayerARPG
 
             GuildSkill tempGuildSkill;
             short tempLevel;
-            foreach (var skill in skills)
+            foreach (var skill in skillLevels)
             {
                 tempLevel = skill.Value;
                 if (!GameInstance.GuildSkills.TryGetValue(skill.Key, out tempGuildSkill) || tempLevel <= 0)

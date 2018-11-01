@@ -558,11 +558,17 @@ namespace MultiplayerARPG
 
         public void SendCreateGuildToClient(long connectionId, GuildData guild)
         {
+            if (guild == null)
+                return;
+
             Server.SendCreateGuild(connectionId, MsgTypes.UpdateGuild, guild.id, guild.guildName, guild.leaderId);
         }
 
         public void SendChangeGuildLeaderToClient(long connectionId, GuildData guild)
         {
+            if (guild == null)
+                return;
+
             Server.SendChangeGuildLeader(connectionId, MsgTypes.UpdateGuild, guild.id, guild.leaderId);
         }
 
@@ -581,6 +587,9 @@ namespace MultiplayerARPG
 
         public void SendSetGuildMessageToClient(long connectionId, GuildData guild)
         {
+            if (guild == null)
+                return;
+
             Server.SendSetGuildMessage(connectionId, MsgTypes.UpdateGuild, guild.id, guild.guildMessage);
         }
 
@@ -701,6 +710,9 @@ namespace MultiplayerARPG
 
         public void SendUpdateGuildMembersToClient(long connectionId, GuildData guild)
         {
+            if (guild == null)
+                return;
+
             foreach (var member in guild.GetMembers())
             {
                 SendUpdateGuildMemberToClient(connectionId, guild.id, guild.IsOnline(member.id), member.id, member.characterName, member.dataId, member.level, member.currentHp, member.maxHp, member.currentMp, member.maxMp);
@@ -722,6 +734,36 @@ namespace MultiplayerARPG
             }
         }
 
+        public void SendSetGuildSkillLevelToClient(long connectionId, int id, int dataId, short level)
+        {
+            Server.SendSetGuildSkillLevel(connectionId, MsgTypes.UpdateGuild, id, dataId, level);
+        }
+
+        public void SendSetGuildSkillLevelsToClient(long connectionId, GuildData guild)
+        {
+            if (guild == null)
+                return;
+
+            foreach (var guildSkillLevel in guild.GetSkillLevels())
+            {
+                SendSetGuildSkillLevelToClient(connectionId, guild.id, guildSkillLevel.Key, guildSkillLevel.Value);
+            }
+        }
+
+        public void SendSetGuildSkillLevelToClients(GuildData guild, int dataId)
+        {
+            if (guild == null)
+                return;
+
+            var skillLevel = guild.GetSkillLevel(dataId);
+            BasePlayerCharacterEntity playerCharacterEntity;
+            foreach (var member in guild.GetMembers())
+            {
+                if (TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                    SendSetGuildSkillLevelToClient(playerCharacterEntity.ConnectionId, guild.id, dataId, skillLevel);
+            }
+        }
+
         public void SendGuildLevelExpSkillPointToClient(long connectionId, GuildData guild)
         {
             Server.SendGuildLevelExpSkillPoint(connectionId, MsgTypes.UpdateGuild, guild.id, guild.level, guild.exp, guild.skillPoint);
@@ -729,6 +771,9 @@ namespace MultiplayerARPG
 
         public void SendGuildLevelExpSkillPointToClients(GuildData guild)
         {
+            if (guild == null)
+                return;
+
             BasePlayerCharacterEntity playerCharacterEntity;
             foreach (var member in guild.GetMembers())
             {
@@ -1012,7 +1057,7 @@ namespace MultiplayerARPG
 
             guild.AddSkillLevel(dataId);
             guilds[guildId] = guild;
-            // TODO: Implement this
+            SendSetGuildSkillLevelToClients(guild, dataId);
         }
         #endregion
 

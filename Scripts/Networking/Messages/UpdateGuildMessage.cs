@@ -14,7 +14,7 @@ namespace MultiplayerARPG
             SetGuildMessage,
             SetGuildRole,
             SetGuildMemberRole,
-            SetGuildSkill,
+            SetSkillLevel,
             LevelExpSkillPoint,
             Terminate,
         }
@@ -60,7 +60,7 @@ namespace MultiplayerARPG
                     characterId = reader.GetString();
                     guildRole = reader.GetByte();
                     break;
-                case UpdateType.SetGuildSkill:
+                case UpdateType.SetSkillLevel:
                     dataId = reader.GetInt();
                     level = reader.GetShort();
                     break;
@@ -99,7 +99,7 @@ namespace MultiplayerARPG
                     writer.Put(characterId);
                     writer.Put(guildRole);
                     break;
-                case UpdateType.SetGuildSkill:
+                case UpdateType.SetSkillLevel:
                     writer.Put(dataId);
                     writer.Put(level);
                     break;

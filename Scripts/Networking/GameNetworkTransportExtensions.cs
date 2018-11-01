@@ -5,47 +5,49 @@ namespace MultiplayerARPG
 {
     public static partial class GameNetworkTransportExtensions
     {
+        private static void Send(TransportHandler transportHandler, long? connectionId, ushort msgType, ILiteNetLibMessage message)
+        {
+            if (!connectionId.HasValue)
+                transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, message.Serialize);
+            else
+                transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, message.Serialize);
+        }
+
         public static void SendEnterChat(this TransportHandler transportHandler, long? connectionId, ushort msgType, ChatChannel channel, string message, string senderName, string receiverName, int channelId)
         {
-            var chatMessage = new ChatMessage();
-            chatMessage.channel = channel;
-            chatMessage.message = message;
-            chatMessage.sender = senderName;
-            chatMessage.receiver = receiverName;
-            chatMessage.channelId = channelId;
-            if (!connectionId.HasValue)
-                transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, chatMessage.Serialize);
-            else
-                transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, chatMessage.Serialize);
+            var netMessage = new ChatMessage();
+            netMessage.channel = channel;
+            netMessage.message = message;
+            netMessage.sender = senderName;
+            netMessage.receiver = receiverName;
+            netMessage.channelId = channelId;
+            Send(transportHandler, connectionId, msgType, netMessage);
         }
 
         public static void SendAddSocialMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId, string characterName, int dataId, int level)
         {
-            var updateMessage = new UpdateSocialMemberMessage();
-            updateMessage.type = UpdateSocialMemberMessage.UpdateType.Add;
-            updateMessage.id = id;
-            updateMessage.CharacterId = characterId;
-            updateMessage.data = new SocialCharacterData()
+            var netMessage = new UpdateSocialMemberMessage();
+            netMessage.type = UpdateSocialMemberMessage.UpdateType.Add;
+            netMessage.id = id;
+            netMessage.CharacterId = characterId;
+            netMessage.data = new SocialCharacterData()
             {
                 id = characterId,
                 characterName = characterName,
                 dataId = dataId,
                 level = level,
             };
-            if (!connectionId.HasValue)
-                transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
-            else
-                transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
+            Send(transportHandler, connectionId, msgType, netMessage);
         }
 
         public static void SendUpdateSocialMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, bool isOnline, string characterId, string characterName, int dataId, int level, int currentHp, int maxHp, int currentMp, int maxMp)
         {
-            var updateMessage = new UpdateSocialMemberMessage();
-            updateMessage.type = UpdateSocialMemberMessage.UpdateType.Update;
-            updateMessage.id = id;
-            updateMessage.CharacterId = characterId;
-            updateMessage.isOnline = isOnline;
-            updateMessage.data = new SocialCharacterData()
+            var netMessage = new UpdateSocialMemberMessage();
+            netMessage.type = UpdateSocialMemberMessage.UpdateType.Update;
+            netMessage.id = id;
+            netMessage.CharacterId = characterId;
+            netMessage.isOnline = isOnline;
+            netMessage.data = new SocialCharacterData()
             {
                 id = characterId,
                 characterName = characterName,
@@ -56,163 +58,134 @@ namespace MultiplayerARPG
                 currentMp = currentMp,
                 maxMp = maxMp,
             };
-            if (!connectionId.HasValue)
-                transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
-            else
-                transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
+            Send(transportHandler, connectionId, msgType, netMessage);
         }
 
         public static void SendRemoveSocialMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId)
         {
-            var updateMessage = new UpdateSocialMemberMessage();
-            updateMessage.type = UpdateSocialMemberMessage.UpdateType.Remove;
-            updateMessage.id = id;
-            updateMessage.CharacterId = characterId;
-            if (!connectionId.HasValue)
-                transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
-            else
-                transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
+            var netMessage = new UpdateSocialMemberMessage();
+            netMessage.type = UpdateSocialMemberMessage.UpdateType.Remove;
+            netMessage.id = id;
+            netMessage.CharacterId = characterId;
+            Send(transportHandler, connectionId, msgType, netMessage);
         }
 
         public static void SendCreateParty(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, bool shareExp, bool shareItem, string characterId)
         {
-            var updateMessage = new UpdatePartyMessage();
-            updateMessage.type = UpdatePartyMessage.UpdateType.Create;
-            updateMessage.id = id;
-            updateMessage.shareExp = shareExp;
-            updateMessage.shareItem = shareItem;
-            updateMessage.characterId = characterId;
-            if (!connectionId.HasValue)
-                transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
-            else
-                transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
+            var netMessage = new UpdatePartyMessage();
+            netMessage.type = UpdatePartyMessage.UpdateType.Create;
+            netMessage.id = id;
+            netMessage.shareExp = shareExp;
+            netMessage.shareItem = shareItem;
+            netMessage.characterId = characterId;
+            Send(transportHandler, connectionId, msgType, netMessage);
         }
 
         public static void SendChangePartyLeader(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId)
         {
-            var updateMessage = new UpdatePartyMessage();
-            updateMessage.type = UpdatePartyMessage.UpdateType.ChangeLeader;
-            updateMessage.id = id;
-            updateMessage.characterId = characterId;
-            if (!connectionId.HasValue)
-                transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
-            else
-                transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
+            var netMessage = new UpdatePartyMessage();
+            netMessage.type = UpdatePartyMessage.UpdateType.ChangeLeader;
+            netMessage.id = id;
+            netMessage.characterId = characterId;
+            Send(transportHandler, connectionId, msgType, netMessage);
         }
 
         public static void SendPartySetting(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, bool shareExp, bool shareItem)
         {
-            var updateMessage = new UpdatePartyMessage();
-            updateMessage.type = UpdatePartyMessage.UpdateType.Setting;
-            updateMessage.id = id;
-            updateMessage.shareExp = shareExp;
-            updateMessage.shareItem = shareItem;
-            if (!connectionId.HasValue)
-                transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
-            else
-                transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
+            var netMessage = new UpdatePartyMessage();
+            netMessage.type = UpdatePartyMessage.UpdateType.Setting;
+            netMessage.id = id;
+            netMessage.shareExp = shareExp;
+            netMessage.shareItem = shareItem;
+            Send(transportHandler, connectionId, msgType, netMessage);
         }
 
         public static void SendPartyTerminate(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id)
         {
-            var updateMessage = new UpdatePartyMessage();
-            updateMessage.type = UpdatePartyMessage.UpdateType.Terminate;
-            updateMessage.id = id;
-            if (!connectionId.HasValue)
-                transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
-            else
-                transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
+            var netMessage = new UpdatePartyMessage();
+            netMessage.type = UpdatePartyMessage.UpdateType.Terminate;
+            netMessage.id = id;
+            Send(transportHandler, connectionId, msgType, netMessage);
         }
 
         public static void SendCreateGuild(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string guildName, string characterId)
         {
-            var updateMessage = new UpdateGuildMessage();
-            updateMessage.type = UpdateGuildMessage.UpdateType.Create;
-            updateMessage.id = id;
-            updateMessage.guildName = guildName;
-            updateMessage.characterId = characterId;
-            if (!connectionId.HasValue)
-                transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
-            else
-                transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
+            var netMessage = new UpdateGuildMessage();
+            netMessage.type = UpdateGuildMessage.UpdateType.Create;
+            netMessage.id = id;
+            netMessage.guildName = guildName;
+            netMessage.characterId = characterId;
+            Send(transportHandler, connectionId, msgType, netMessage);
         }
 
         public static void SendChangeGuildLeader(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId)
         {
-            var updateMessage = new UpdateGuildMessage();
-            updateMessage.type = UpdateGuildMessage.UpdateType.ChangeLeader;
-            updateMessage.id = id;
-            updateMessage.characterId = characterId;
-            if (!connectionId.HasValue)
-                transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
-            else
-                transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
+            var netMessage = new UpdateGuildMessage();
+            netMessage.type = UpdateGuildMessage.UpdateType.ChangeLeader;
+            netMessage.id = id;
+            netMessage.characterId = characterId;
+            Send(transportHandler, connectionId, msgType, netMessage);
         }
 
         public static void SendSetGuildMessage(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string message)
         {
-            var updateMessage = new UpdateGuildMessage();
-            updateMessage.type = UpdateGuildMessage.UpdateType.SetGuildMessage;
-            updateMessage.id = id;
-            updateMessage.guildMessage = message;
-            if (!connectionId.HasValue)
-                transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
-            else
-                transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
+            var netMessage = new UpdateGuildMessage();
+            netMessage.type = UpdateGuildMessage.UpdateType.SetGuildMessage;
+            netMessage.id = id;
+            netMessage.guildMessage = message;
+            Send(transportHandler, connectionId, msgType, netMessage);
         }
 
         public static void SendSetGuildRole(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
         {
-            var updateMessage = new UpdateGuildMessage();
-            updateMessage.type = UpdateGuildMessage.UpdateType.SetGuildRole;
-            updateMessage.id = id;
-            updateMessage.guildRole = guildRole;
-            updateMessage.roleName = roleName;
-            updateMessage.canInvite = canInvite;
-            updateMessage.canKick = canKick;
-            updateMessage.shareExpPercentage = shareExpPercentage;
-            if (!connectionId.HasValue)
-                transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
-            else
-                transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
+            var netMessage = new UpdateGuildMessage();
+            netMessage.type = UpdateGuildMessage.UpdateType.SetGuildRole;
+            netMessage.id = id;
+            netMessage.guildRole = guildRole;
+            netMessage.roleName = roleName;
+            netMessage.canInvite = canInvite;
+            netMessage.canKick = canKick;
+            netMessage.shareExpPercentage = shareExpPercentage;
+            Send(transportHandler, connectionId, msgType, netMessage);
         }
 
         public static void SendSetGuildMemberRole(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId, byte guildRole)
         {
-            var updateMessage = new UpdateGuildMessage();
-            updateMessage.type = UpdateGuildMessage.UpdateType.SetGuildMemberRole;
-            updateMessage.id = id;
-            updateMessage.characterId = characterId;
-            updateMessage.guildRole = guildRole;
-            if (!connectionId.HasValue)
-                transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
-            else
-                transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
+            var netMessage = new UpdateGuildMessage();
+            netMessage.type = UpdateGuildMessage.UpdateType.SetGuildMemberRole;
+            netMessage.id = id;
+            netMessage.characterId = characterId;
+            netMessage.guildRole = guildRole;
+            Send(transportHandler, connectionId, msgType, netMessage);
         }
 
         public static void SendGuildTerminate(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id)
         {
-            var updateMessage = new UpdateGuildMessage();
-            updateMessage.type = UpdateGuildMessage.UpdateType.Terminate;
-            updateMessage.id = id;
-            if (!connectionId.HasValue)
-                transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
-            else
-                transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
+            var netMessage = new UpdateGuildMessage();
+            netMessage.type = UpdateGuildMessage.UpdateType.Terminate;
+            netMessage.id = id;
+            Send(transportHandler, connectionId, msgType, netMessage);
         }
 
         public static void SendGuildLevelExpSkillPoint(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, short level, int exp, short skillPoint)
         {
-            var updateMessage = new UpdateGuildMessage();
-            updateMessage.type = UpdateGuildMessage.UpdateType.LevelExpSkillPoint;
-            updateMessage.id = id;
-            updateMessage.level = level;
-            updateMessage.exp = exp;
-            updateMessage.skillPoint = skillPoint;
-            if (!connectionId.HasValue)
-                transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
-            else
-                transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, updateMessage.Serialize);
+            var netMessage = new UpdateGuildMessage();
+            netMessage.type = UpdateGuildMessage.UpdateType.LevelExpSkillPoint;
+            netMessage.id = id;
+            netMessage.level = level;
+            netMessage.exp = exp;
+            netMessage.skillPoint = skillPoint;
+            Send(transportHandler, connectionId, msgType, netMessage);
+        }
+        
+        public static void SendSetGuildSkillLevel(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, int dataId, short level)
+        {
+            var netMessage = new UpdateGuildMessage();
+            netMessage.type = UpdateGuildMessage.UpdateType.SetSkillLevel;
+            netMessage.id = id;
+            netMessage.dataId = dataId;
+            netMessage.level = level;
+            Send(transportHandler, connectionId, msgType, netMessage);
         }
     }
 }

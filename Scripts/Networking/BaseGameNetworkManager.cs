@@ -313,7 +313,7 @@ namespace MultiplayerARPG
                     case UpdateGuildMessage.UpdateType.SetGuildMemberRole:
                         ClientGuild.SetMemberRole(message.characterId, message.guildRole);
                         break;
-                    case UpdateGuildMessage.UpdateType.SetGuildSkill:
+                    case UpdateGuildMessage.UpdateType.SetSkillLevel:
                         ClientGuild.SetSkillLevel(message.dataId, message.level);
                         if (BasePlayerCharacterController.OwningCharacter != null)
                             BasePlayerCharacterController.OwningCharacter.ForceMakeCaches();
