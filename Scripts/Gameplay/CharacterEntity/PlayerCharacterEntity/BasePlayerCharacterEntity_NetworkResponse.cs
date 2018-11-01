@@ -103,7 +103,7 @@ namespace MultiplayerARPG
             if (IsDead())
                 return;
 
-            // TODO: Implement this
+            GameManager.AddGuildSkill(this, dataId);
         }
 
         protected virtual void NetFuncUseGuildSkill(int dataId)
@@ -111,7 +111,26 @@ namespace MultiplayerARPG
             if (IsDead())
                 return;
 
-            // TODO: Implement this
+            GuildSkill guildSkill;
+            if (!GameInstance.GuildSkills.TryGetValue(dataId, out guildSkill) || guildSkill.skillType != GuildSkillType.Active)
+                return;
+
+            GuildData guild;
+            if (GuildId <= 0 || !GameManager.TryGetGuild(GuildId, out guild))
+                return;
+
+            var level = guild.GetSkillLevel(dataId);
+            if (level <= 0)
+                return;
+            
+            if (this.IndexOfSkillUsage(dataId, SkillUsageType.GuildSkill) >= 0)
+                return;
+
+            // Apply guild skill
+            var newSkillUsage = CharacterSkillUsage.Create(Id, SkillUsageType.GuildSkill, dataId);
+            newSkillUsage.Use(this, level);
+            skillUsages.Add(newSkillUsage);
+            ApplyBuff(dataId, BuffType.GuildSkillBuff, level);
         }
 
         protected virtual void NetFuncRespawn()

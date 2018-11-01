@@ -412,6 +412,44 @@ namespace MultiplayerARPG
                 return false;
             return true;
         }
+
+        public virtual bool CanAddGuildSkill(BasePlayerCharacterEntity playerCharacterEntity, int dataId, out int guildId, out GuildData guild)
+        {
+            guildId = 0;
+            guild = null;
+            if (playerCharacterEntity == null || !IsServer || !GameInstance.GuildSkills.ContainsKey(dataId))
+                return false;
+            guildId = playerCharacterEntity.GuildId;
+            if (guildId <= 0 || !guilds.TryGetValue(guildId, out guild))
+                return false;
+            if (!guild.IsLeader(playerCharacterEntity))
+            {
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotGuildLeader);
+                return false;
+            }
+            if (guild.IsSkillReachedMaxLevel(dataId))
+            {
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.GuildSkillReachedMaxLevel);
+                return false;
+            }
+            return true;
+        }
+
+        public virtual bool CanUseGuildSkill(BasePlayerCharacterEntity playerCharacterEntity, int dataId, out int guildId, out GuildData guild)
+        {
+            guildId = 0;
+            guild = null;
+            if (playerCharacterEntity == null || !IsServer || !GameInstance.GuildSkills.ContainsKey(dataId))
+                return false;
+            guildId = playerCharacterEntity.GuildId;
+            if (guildId <= 0 || !guilds.TryGetValue(guildId, out guild))
+                return false;
+            if (guild.GetSkillLevel(dataId) <= 0)
+                return false;
+            if (playerCharacterEntity.IndexOfSkillUsage(dataId, SkillUsageType.GuildSkill) >= 0)
+                return false;
+            return true;
+        }
         #endregion
 
         #region Activity functions
@@ -963,6 +1001,18 @@ namespace MultiplayerARPG
             guild = gameInstance.SocialSystemSetting.IncreaseGuildExp(guild, exp);
             guilds[guildId] = guild;
             SendGuildLevelExpSkillPointToClients(guild);
+        }
+
+        public virtual void AddGuildSkill(BasePlayerCharacterEntity playerCharacterEntity, int dataId)
+        {
+            int guildId;
+            GuildData guild;
+            if (!CanAddGuildSkill(playerCharacterEntity, dataId, out guildId, out guild))
+                return;
+
+            guild.AddSkillLevel(dataId);
+            guilds[guildId] = guild;
+            // TODO: Implement this
         }
         #endregion
 

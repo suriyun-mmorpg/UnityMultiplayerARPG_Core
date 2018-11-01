@@ -116,11 +116,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public void SetSkillLevel(int dataId, short level)
-        {
-
-        }
-
         public bool IsRoleAvailable(byte guildRole)
         {
             return roles != null && guildRole >= 0 && guildRole < roles.Count;
@@ -211,9 +206,62 @@ namespace MultiplayerARPG
 
         public short GetSkillLevel(int dataId)
         {
-            if (skills.ContainsKey(dataId))
+            if (GameInstance.GuildSkills.ContainsKey(dataId) && skills.ContainsKey(dataId))
                 return skills[dataId];
             return 0;
+        }
+
+        public bool IsSkillReachedMaxLevel(int dataId)
+        {
+            if (GameInstance.GuildSkills.ContainsKey(dataId) && skills.ContainsKey(dataId))
+                return skills[dataId] < GameInstance.GuildSkills[dataId].maxLevel;
+            return false;
+        }
+
+        public void AddSkillLevel(int dataId)
+        {
+            if (!GameInstance.GuildSkills.ContainsKey(dataId))
+            {
+                var level = (short)(skills.ContainsKey(dataId) ? skills[dataId] : 0);
+                level += 1;
+                skills[dataId] = level;
+                MakeCaches();
+            }
+        }
+
+        public void SetSkillLevel(int dataId, short level)
+        {
+            if (!GameInstance.GuildSkills.ContainsKey(dataId))
+            {
+                skills[dataId] = level;
+                MakeCaches();
+            }
+        }
+
+        protected void MakeCaches()
+        {
+            IncreaseMaxMember = 0;
+            IncreaseExpGainPercentage = 0;
+            IncreaseGoldGainPercentage = 0;
+            IncreaseShareExpGainPercentage = 0;
+            IncreaseShareGoldGainPercentage = 0;
+            DecreaseExpLostPercentage = 0;
+
+            GuildSkill tempGuildSkill;
+            short tempLevel;
+            foreach (var skill in skills)
+            {
+                tempLevel = skill.Value;
+                if (!GameInstance.GuildSkills.TryGetValue(skill.Key, out tempGuildSkill) || tempLevel <= 0)
+                    continue;
+
+                IncreaseMaxMember += tempGuildSkill.increaseMaxMember.GetAmount(tempLevel);
+                IncreaseExpGainPercentage += tempGuildSkill.increaseExpGainPercentage.GetAmount(tempLevel);
+                IncreaseGoldGainPercentage += tempGuildSkill.increaseGoldGainPercentage.GetAmount(tempLevel);
+                IncreaseShareExpGainPercentage += tempGuildSkill.increaseShareExpGainPercentage.GetAmount(tempLevel);
+                IncreaseShareGoldGainPercentage += tempGuildSkill.increaseShareGoldGainPercentage.GetAmount(tempLevel);
+                DecreaseExpLostPercentage += tempGuildSkill.decreaseExpLostPercentage.GetAmount(tempLevel);
+            }
         }
 
         public int MaxMember()

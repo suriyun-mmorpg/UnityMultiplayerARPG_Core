@@ -52,6 +52,7 @@ namespace MultiplayerARPG
             Texts.Add(GameMessage.Type.CharacterNotJoinedGuild.ToString(), "Character not joined the guild");
             Texts.Add(GameMessage.Type.GuildMemberReachedLimit.ToString(), "Guild member reached limit");
             Texts.Add(GameMessage.Type.GuildRoleNotAvailable.ToString(), "Guild role is not available");
+            Texts.Add(GameMessage.Type.GuildSkillReachedMaxLevel.ToString(), "Guild skill is reached max level");
         }
     }
 
