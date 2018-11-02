@@ -79,8 +79,7 @@ namespace MultiplayerARPG
 
         protected void Update()
         {
-            var time = Time.unscaledTime;
-            UpdateActivity(time);
+            UpdateActivity(Time.unscaledTime);
         }
 
         public void RandomNextWanderTime(float time)
@@ -137,14 +136,11 @@ namespace MultiplayerARPG
             {
                 if (targetEntity.IsDead())
                 {
-                    StopMove();
-                    CacheMonsterCharacterEntity.SetTargetEntity(null);
+                    RandomWanderTarget(time);
                     return;
                 }
                 if (CacheMonsterCharacterEntity.isInSafeArea || targetEntity.isInSafeArea)
                 {
-                    StopMove();
-                    CacheMonsterCharacterEntity.SetTargetEntity(null);
                     RandomWanderTarget(time);
                     return;
                 }
@@ -165,8 +161,10 @@ namespace MultiplayerARPG
             }
         }
 
+        bool attackingOnce;
         public void UpdateAttackTarget(float time, Vector3 currentPosition, BaseCharacterEntity targetEntity)
         {
+            attackingOnce = true;
             // If it has target then go to target
             var targetEntityPosition = targetEntity.CacheTransform.position;
             var attackDistance = CacheMonsterCharacterEntity.GetAttackDistance();
@@ -197,10 +195,7 @@ namespace MultiplayerARPG
                     SetDestination(time, targetEntityPosition);
                 // Stop following target
                 if (time - startFollowTargetTime >= followTargetDuration)
-                {
-                    StopMove();
-                    CacheMonsterCharacterEntity.SetTargetEntity(null);
-                }
+                    RandomWanderTarget(time);
             }
         }
 
@@ -212,7 +207,10 @@ namespace MultiplayerARPG
             var randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(randomX, 0, randomZ);
             NavMeshHit navMeshHit;
             if (NavMesh.SamplePosition(randomPosition, out navMeshHit, randomWanderAreaMax, 1))
+            {
+                CacheMonsterCharacterEntity.SetTargetEntity(null);
                 SetWanderDestination(time, navMeshHit.position);
+            }
         }
 
         public void AggressiveFindTarget(float time, Vector3 currentPosition)

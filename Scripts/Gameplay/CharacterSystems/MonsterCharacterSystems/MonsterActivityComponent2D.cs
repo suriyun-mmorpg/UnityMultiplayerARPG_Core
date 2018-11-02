@@ -101,8 +101,7 @@ namespace MultiplayerARPG
 
         protected void Update()
         {
-            var time = Time.unscaledTime;
-            UpdateActivity(time);
+            UpdateActivity(Time.unscaledTime);
         }
 
         protected void FixedUpdate()
@@ -206,14 +205,11 @@ namespace MultiplayerARPG
             {
                 if (targetEntity.IsDead())
                 {
-                    StopMove();
-                    CacheMonsterCharacterEntity.SetTargetEntity(null);
+                    RandomWanderTarget(time);
                     return;
                 }
                 if (CacheMonsterCharacterEntity.isInSafeArea || targetEntity.isInSafeArea)
                 {
-                    StopMove();
-                    CacheMonsterCharacterEntity.SetTargetEntity(null);
                     RandomWanderTarget(time);
                     return;
                 }
@@ -260,10 +256,7 @@ namespace MultiplayerARPG
                     SetDestination(time, targetEntityPosition);
                 // Stop following target
                 if (time - startFollowTargetTime >= followTargetDuration)
-                {
-                    StopMove();
-                    CacheMonsterCharacterEntity.SetTargetEntity(null);
-                }
+                    RandomWanderTarget(time);
             }
         }
 
@@ -273,6 +266,7 @@ namespace MultiplayerARPG
             var randomX = Random.Range(randomWanderAreaMin, randomWanderAreaMax) * (Random.value > 0.5f ? -1 : 1);
             var randomY = Random.Range(randomWanderAreaMin, randomWanderAreaMax) * (Random.value > 0.5f ? -1 : 1);
             var randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(randomX, randomY);
+            CacheMonsterCharacterEntity.SetTargetEntity(null);
             SetWanderDestination(time, randomPosition);
         }
 
