@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         [Header("Levelling/Stat/Skill")]
         public short increaseStatPointEachLevel = 5;
         public short increaseSkillPointEachLevel = 1;
+        [Range(0f, 100f)]
         public float expLostPercentageWhenDeath = 2f;
         [Header("Stamina/Sprint")]
         public float staminaRecoveryPerSeconds = 5;
