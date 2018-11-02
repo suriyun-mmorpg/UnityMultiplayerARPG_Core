@@ -143,8 +143,10 @@ namespace MultiplayerARPG
             GuildData guildData;
             if (GameManager.TryGetGuild(GuildId, out guildData))
                 expLostPercentage -= expLostPercentage * guildData.DecreaseExpLostPercentage;
+            if (expLostPercentage <= 0f)
+                expLostPercentage = 0f;
             var exp = Exp;
-            exp -= (int)(this.GetNextLevelExp() * expLostPercentage);
+            exp -= (int)(this.GetNextLevelExp() * expLostPercentage / 100f);
             if (exp <= 0)
                 exp = 0;
             Exp = exp;
@@ -157,11 +159,17 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            if (rewardGivenType == RewardGivenType.KillMonster)
+            GuildData guildData;
+            switch (rewardGivenType)
             {
-                GuildData guildData;
-                if (GameManager.TryGetGuild(GuildId, out guildData))
-                    exp += (int)(exp * guildData.IncreaseExpGainPercentage);
+                case RewardGivenType.KillMonster:
+                    if (GameManager.TryGetGuild(GuildId, out guildData))
+                        exp += (int)(exp * guildData.IncreaseExpGainPercentage / 100f);
+                    break;
+                case RewardGivenType.PartyShare:
+                    if (GameManager.TryGetGuild(GuildId, out guildData))
+                        exp += (int)(exp * guildData.IncreaseShareExpGainPercentage / 100f);
+                    break;
             }
             base.RewardExp(exp, rewardGivenType);
         }
@@ -170,11 +178,17 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            if (rewardGivenType == RewardGivenType.KillMonster)
+            GuildData guildData;
+            switch (rewardGivenType)
             {
-                GuildData guildData;
-                if (GameManager.TryGetGuild(GuildId, out guildData))
-                    gold += (int)(gold * guildData.IncreaseGoldGainPercentage);
+                case RewardGivenType.KillMonster:
+                    if (GameManager.TryGetGuild(GuildId, out guildData))
+                        gold += (int)(gold * guildData.IncreaseGoldGainPercentage / 100f);
+                    break;
+                case RewardGivenType.PartyShare:
+                    if (GameManager.TryGetGuild(GuildId, out guildData))
+                        gold += (int)(gold * guildData.IncreaseShareGoldGainPercentage / 100f);
+                    break;
             }
             Gold += gold;
         }
