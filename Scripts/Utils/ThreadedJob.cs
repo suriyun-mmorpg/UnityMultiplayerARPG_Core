@@ -8,7 +8,9 @@ public class ThreadedJob
     private bool m_IsDone = false;
     private bool m_IsError = false;
     private Exception m_Exception = null;
+#if !DISABLE_THREAD
     private Thread m_Thread = null;
+#endif
 
     public bool IsDone
     {
@@ -48,13 +50,19 @@ public class ThreadedJob
 
     public virtual void Start()
     {
+#if !DISABLE_THREAD
         m_Thread = new Thread(Run);
         m_Thread.Start();
+#else
+        Run();
+#endif
     }
 
     public virtual void Abort()
     {
+#if !DISABLE_THREAD
         m_Thread.Abort();
+#endif
     }
 
     protected virtual void ThreadFunction() { }
