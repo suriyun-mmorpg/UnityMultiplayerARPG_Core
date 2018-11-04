@@ -8,26 +8,17 @@ public class ThreadedJob
     private bool m_IsDone = false;
     private bool m_IsError = false;
     private Exception m_Exception = null;
-    private object m_Handle = new object();
     private Thread m_Thread = null;
 
     public bool IsDone
     {
         get
         {
-            bool tmp;
-            lock (m_Handle)
-            {
-                tmp = m_IsDone;
-            }
-            return tmp;
+            return m_IsDone;
         }
         private set
         {
-            lock (m_Handle)
-            {
-                m_IsDone = value;
-            }
+            m_IsDone = value;
         }
     }
 
@@ -35,19 +26,11 @@ public class ThreadedJob
     {
         get
         {
-            bool tmp;
-            lock (m_Handle)
-            {
-                tmp = m_IsError;
-            }
-            return tmp;
+            return m_IsError;
         }
         private set
         {
-            lock (m_Handle)
-            {
-                m_IsError = value;
-            }
+            m_IsError = value;
         }
     }
 
@@ -55,19 +38,11 @@ public class ThreadedJob
     {
         get
         {
-            Exception tmp;
-            lock (m_Handle)
-            {
-                tmp = m_Exception;
-            }
-            return tmp;
+            return m_Exception;
         }
         private set
         {
-            lock (m_Handle)
-            {
-                m_Exception = value;
-            }
+            m_Exception = value;
         }
     }
 
