@@ -52,6 +52,7 @@ namespace MultiplayerARPG
             GuildMemberReachedLimit,
             GuildRoleNotAvailable,
             GuildSkillReachedMaxLevel,
+            NoGuildSkillPoint,
         }
         public Type type;
 
