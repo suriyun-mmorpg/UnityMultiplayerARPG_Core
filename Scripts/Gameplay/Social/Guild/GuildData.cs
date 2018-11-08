@@ -219,16 +219,17 @@ namespace MultiplayerARPG
         public bool IsSkillReachedMaxLevel(int dataId)
         {
             if (GameInstance.GuildSkills.ContainsKey(dataId) && skillLevels.ContainsKey(dataId))
-                return skillLevels[dataId] < GameInstance.GuildSkills[dataId].maxLevel;
+                return skillLevels[dataId] >= GameInstance.GuildSkills[dataId].maxLevel;
             return false;
         }
 
         public void AddSkillLevel(int dataId)
         {
-            if (!GameInstance.GuildSkills.ContainsKey(dataId))
+            if (GameInstance.GuildSkills.ContainsKey(dataId))
             {
                 var level = (short)(skillLevels.ContainsKey(dataId) ? skillLevels[dataId] : 0);
                 level += 1;
+                skillPoint -= 1;
                 skillLevels[dataId] = level;
                 MakeCaches();
             }
@@ -236,7 +237,7 @@ namespace MultiplayerARPG
 
         public void SetSkillLevel(int dataId, short level)
         {
-            if (!GameInstance.GuildSkills.ContainsKey(dataId))
+            if (GameInstance.GuildSkills.ContainsKey(dataId))
             {
                 skillLevels[dataId] = level;
                 MakeCaches();
