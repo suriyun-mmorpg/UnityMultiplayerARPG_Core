@@ -175,8 +175,8 @@ namespace MultiplayerARPG
             RoleSelectionManager.eventOnDeselect.AddListener(OnDeselectRole);
             SkillSelectionManager.eventOnSelect.RemoveListener(OnSelectSkill);
             SkillSelectionManager.eventOnSelect.AddListener(OnSelectSkill);
-            SkillSelectionManager.eventOnSelect.RemoveListener(OnDeselectSkill);
-            SkillSelectionManager.eventOnSelect.AddListener(OnDeselectSkill);
+            SkillSelectionManager.eventOnDeselect.RemoveListener(OnDeselectSkill);
+            SkillSelectionManager.eventOnDeselect.AddListener(OnDeselectSkill);
             UpdateGuildUIs(Guild);
         }
 
