@@ -160,11 +160,9 @@ namespace MultiplayerARPG
                     AggressiveFindTarget(time, currentPosition);
             }
         }
-
-        bool attackingOnce;
+        
         public void UpdateAttackTarget(float time, Vector3 currentPosition, BaseCharacterEntity targetEntity)
         {
-            attackingOnce = true;
             // If it has target then go to target
             var targetEntityPosition = targetEntity.CacheTransform.position;
             var attackDistance = CacheMonsterCharacterEntity.GetAttackDistance();
