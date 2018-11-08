@@ -1,13 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-#if UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
 using UnityEngine.Purchasing;
 #endif
 
 namespace MultiplayerARPG
 {
-#if UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
     public partial class GameInstance : MonoBehaviour, IStoreListener
 #else
     public partial class GameInstance : MonoBehaviour

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-#if UNITY_PURCHASING
+#if ENABLE_PURCHASING && UNITY_PURCHASING
 using UnityEditor.Purchasing;
 using UnityEngine.Purchasing;
 #endif
@@ -15,7 +15,7 @@ namespace MultiplayerARPG
     {
         private const string kNoProduct = "<None>";
 
-#if UNITY_PURCHASING
+#if ENABLE_PURCHASING && UNITY_PURCHASING
         private List<string> m_ValidIDs = new List<string>();
 #endif
         private SerializedProperty m_ProductIDProperty;
@@ -33,7 +33,7 @@ namespace MultiplayerARPG
 
             EditorGUILayout.LabelField(new GUIContent("Product ID:", "Select a product from the IAP catalog"));
 
-#if UNITY_PURCHASING
+#if ENABLE_PURCHASING && UNITY_PURCHASING
             var catalog = ProductCatalog.LoadDefaultCatalog();
 
             m_ValidIDs.Clear();

@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-#if UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
 using UnityEngine.Purchasing;
 #endif
 
@@ -15,7 +15,7 @@ namespace MultiplayerARPG
 
         public override string Id { get { return productId; } }
 
-#if UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
         public ProductCatalogItem ProductCatalogItem
         {
             get
@@ -53,7 +53,7 @@ namespace MultiplayerARPG
 
         public string GetTitle()
         {
-#if UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
             if (ProductCatalogItem == null)
                 return "Unknow";
             var title = ProductCatalogItem.defaultDescription.Title;
@@ -68,7 +68,7 @@ namespace MultiplayerARPG
 
         public string GetDescription()
         {
-#if UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
             if (ProductCatalogItem == null)
                 return "";
             var description = ProductCatalogItem.defaultDescription.Description;
@@ -83,7 +83,7 @@ namespace MultiplayerARPG
 
         public string GetSellPrice()
         {
-#if UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+#if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
             if (ProductCatalogItem == null || Metadata == null)
                 return "N/A";
             return Metadata.localizedPriceString;
