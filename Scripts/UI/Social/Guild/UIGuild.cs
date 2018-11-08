@@ -371,7 +371,7 @@ namespace MultiplayerARPG
 
         public override int GetMaxMemberAmount()
         {
-            return GameInstance.Singleton.SocialSystemSetting.MaxGuildMember;
+            return Guild.MaxMember(); ;
         }
 
         public override bool IsLeader(string characterId)
