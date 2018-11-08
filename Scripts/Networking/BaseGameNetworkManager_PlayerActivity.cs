@@ -432,6 +432,11 @@ namespace MultiplayerARPG
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.GuildSkillReachedMaxLevel);
                 return false;
             }
+            if (guild.skillPoint <= 0)
+            {
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NoGuildSkillPoint);
+                return false;
+            }
             return true;
         }
 
@@ -1054,10 +1059,11 @@ namespace MultiplayerARPG
             GuildData guild;
             if (!CanAddGuildSkill(playerCharacterEntity, dataId, out guildId, out guild))
                 return;
-
+            
             guild.AddSkillLevel(dataId);
             guilds[guildId] = guild;
             SendSetGuildSkillLevelToClients(guild, dataId);
+            SendGuildLevelExpSkillPointToClients(guild);
         }
         #endregion
 
