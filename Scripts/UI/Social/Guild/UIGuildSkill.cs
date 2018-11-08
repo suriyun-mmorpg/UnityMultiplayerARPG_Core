@@ -70,6 +70,59 @@ namespace MultiplayerARPG
         [Header("Options")]
         public UIGuildSkill uiNextLevelSkill;
 
+        protected float coolDownRemainsDuration;
+
+        private void OnDisable()
+        {
+            coolDownRemainsDuration = 0f;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (coolDownRemainsDuration <= 0f)
+            {
+                var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+                if (owningCharacter != null && GuildSkill != null)
+                {
+                    var indexOfSkillUsage = owningCharacter.IndexOfSkillUsage(GuildSkill.DataId, SkillUsageType.GuildSkill);
+                    if (indexOfSkillUsage >= 0)
+                    {
+                        coolDownRemainsDuration = owningCharacter.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+                        if (coolDownRemainsDuration <= 1f)
+                            coolDownRemainsDuration = 0f;
+                    }
+                }
+            }
+
+            if (coolDownRemainsDuration > 0f)
+            {
+                coolDownRemainsDuration -= Time.deltaTime;
+                if (coolDownRemainsDuration <= 0f)
+                    coolDownRemainsDuration = 0f;
+            }
+            else
+                coolDownRemainsDuration = 0f;
+
+            // Update UIs
+            var coolDownDuration = GuildSkill.GetCoolDownDuration(Level);
+
+            if (uiTextCoolDownDuration != null)
+                uiTextCoolDownDuration.text = string.Format(coolDownDurationFormat, coolDownDuration.ToString("N0"));
+
+            if (uiTextCoolDownRemainsDuration != null)
+            {
+                if (coolDownRemainsDuration > 0f)
+                    uiTextCoolDownRemainsDuration.text = string.Format(coolDownRemainsDurationFormat, Mathf.CeilToInt(coolDownRemainsDuration).ToString("N0"));
+                else
+                    uiTextCoolDownRemainsDuration.text = "";
+            }
+
+            if (imageCoolDownGage != null)
+                imageCoolDownGage.fillAmount = coolDownDuration <= 0 ? 0 : coolDownRemainsDuration / coolDownDuration;
+        }
+
         protected override void UpdateUI()
         {
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
