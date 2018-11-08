@@ -204,7 +204,7 @@ namespace MultiplayerARPG
         public void OnClickUse()
         {
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter == null || owningCharacter.GameManager.ClientGuild == null || owningCharacter.GameManager.ClientGuild.skillPoint <= 0)
+            if (owningCharacter == null || owningCharacter.GameManager.ClientGuild == null)
                 return;
 
             owningCharacter.RequestUseGuildSkill(GuildSkill.DataId);
