@@ -165,37 +165,38 @@ namespace MultiplayerARPG
             RegisterServerMessage(MsgTypes.CashPackageBuyValidation, HandleRequestCashPackageBuyValidation);
         }
 
-        public void SendServerGameMessage(long connectionId, GameMessage.Type type)
+        public virtual void SendServerGameMessage(long connectionId, GameMessage.Type type)
         {
             var message = new GameMessage();
             message.type = type;
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.GameMessage, message);
         }
 
-        public uint RequestCashShopInfo(AckMessageCallback callback)
+        public virtual uint RequestCashShopInfo(AckMessageCallback callback)
         {
             var message = new BaseAckMessage();
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MsgTypes.CashShopInfo, message, callback);
         }
 
-        public uint RequestCashPackageInfo(AckMessageCallback callback)
+        public virtual uint RequestCashPackageInfo(AckMessageCallback callback)
         {
             var message = new BaseAckMessage();
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MsgTypes.CashPackageInfo, message, callback);
         }
 
-        public uint RequestCashShopBuy(int dataId, AckMessageCallback callback)
+        public virtual uint RequestCashShopBuy(int dataId, AckMessageCallback callback)
         {
             var message = new RequestCashShopBuyMessage();
             message.dataId = dataId;
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MsgTypes.CashShopBuy, message, callback);
         }
 
-        public uint RequestCashPackageBuyValidation(int dataId, AckMessageCallback callback)
+        public virtual uint RequestCashPackageBuyValidation(int dataId, string receipt, AckMessageCallback callback)
         {
             var message = new RequestCashPackageBuyValidationMessage();
             message.dataId = dataId;
             message.platform = Application.platform;
+            message.receipt = receipt;
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MsgTypes.CashPackageBuyValidation, message, callback);
         }
 
@@ -411,13 +412,10 @@ namespace MultiplayerARPG
         {
             var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<BaseAckMessage>();
-            var error = ResponseCashShopInfoMessage.Error.NotAvailable;
             var responseMessage = new ResponseCashShopInfoMessage();
             responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = error == ResponseCashShopInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
-            responseMessage.error = error;
-            responseMessage.cash = 0;
-            responseMessage.cashShopItemIds = new int[0];
+            responseMessage.responseCode = AckResponseCode.Error;
+            responseMessage.error = ResponseCashShopInfoMessage.Error.NotAvailable;
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashShopInfo, responseMessage);
         }
 
@@ -425,12 +423,10 @@ namespace MultiplayerARPG
         {
             var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<RequestCashShopBuyMessage>();
-            var error = ResponseCashShopBuyMessage.Error.NotAvailable;
             var responseMessage = new ResponseCashShopBuyMessage();
             responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = error == ResponseCashShopBuyMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
-            responseMessage.error = error;
-            responseMessage.cash = 0;
+            responseMessage.responseCode = AckResponseCode.Error;
+            responseMessage.error = ResponseCashShopBuyMessage.Error.NotAvailable;
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashShopBuy, responseMessage);
         }
 
@@ -438,13 +434,10 @@ namespace MultiplayerARPG
         {
             var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<BaseAckMessage>();
-            var error = ResponseCashPackageInfoMessage.Error.NotAvailable;
             var responseMessage = new ResponseCashPackageInfoMessage();
             responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = error == ResponseCashPackageInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
-            responseMessage.error = error;
-            responseMessage.cash = 0;
-            responseMessage.cashPackageIds = new int[0];
+            responseMessage.responseCode = AckResponseCode.Error;
+            responseMessage.error = ResponseCashPackageInfoMessage.Error.NotAvailable;
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashPackageInfo, responseMessage);
         }
 
@@ -452,12 +445,10 @@ namespace MultiplayerARPG
         {
             var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<RequestCashPackageBuyValidationMessage>();
-            var error = ResponseCashPackageBuyValidationMessage.Error.NotAvailable;
             var responseMessage = new ResponseCashPackageBuyValidationMessage();
             responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = error == ResponseCashPackageBuyValidationMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
-            responseMessage.error = error;
-            responseMessage.cash = 0;
+            responseMessage.responseCode = AckResponseCode.Error;
+            responseMessage.error = ResponseCashPackageBuyValidationMessage.Error.NotAvailable;
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashPackageBuyValidation, responseMessage);
         }
 

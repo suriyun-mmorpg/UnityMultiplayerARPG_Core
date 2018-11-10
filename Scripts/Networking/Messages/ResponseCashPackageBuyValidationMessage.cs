@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using LiteNetLibManager;
+﻿using LiteNetLibManager;
 using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
@@ -23,15 +20,21 @@ namespace MultiplayerARPG
         public override void DeserializeData(NetDataReader reader)
         {
             error = (Error)reader.GetByte();
-            dataId = reader.GetInt();
-            cash = reader.GetInt();
+            if (error == Error.None)
+            {
+                dataId = reader.GetInt();
+                cash = reader.GetInt();
+            }
         }
 
         public override void SerializeData(NetDataWriter writer)
         {
             writer.Put((byte)error);
-            writer.Put(dataId);
-            writer.Put(cash);
+            if (error == Error.None)
+            {
+                writer.Put(dataId);
+                writer.Put(cash);
+            }
         }
     }
 }

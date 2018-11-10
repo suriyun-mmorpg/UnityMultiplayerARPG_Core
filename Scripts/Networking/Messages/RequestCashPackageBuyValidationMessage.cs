@@ -10,18 +10,20 @@ namespace MultiplayerARPG
     {
         public int dataId;
         public RuntimePlatform platform;
-        // TODO: Add validation data
+        public string receipt;
 
         public override void DeserializeData(NetDataReader reader)
         {
             dataId = reader.GetInt();
             platform = (RuntimePlatform)reader.GetByte();
+            receipt = reader.GetString();
         }
 
         public override void SerializeData(NetDataWriter writer)
         {
             writer.Put(dataId);
             writer.Put((byte)platform);
+            writer.Put(receipt);
         }
     }
 }
