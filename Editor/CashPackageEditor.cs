@@ -11,7 +11,7 @@ namespace MultiplayerARPG
 {
     [CustomEditor(typeof(CashPackage))]
     [CanEditMultipleObjects]
-    public class IapProductDataEditor : Editor
+    public class CashPackageEditor : Editor
     {
         private const string kNoProduct = "<None>";
 
