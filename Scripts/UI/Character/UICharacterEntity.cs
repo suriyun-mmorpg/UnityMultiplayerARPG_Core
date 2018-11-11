@@ -6,6 +6,13 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(Canvas))]
     public class UICharacterEntity : UISelectionEntry<BaseCharacterEntity>
     {
+        public enum Visibility
+        {
+            VisibleWhenSelected,
+            VisibleWhenNearby,
+            AlwaysVisible,
+        }
+        public Visibility visibility;
         public bool placeAsChild;
         public float placeAsChildScale = 1f;
         [Tooltip("Visible when hit duration for non owning character")]
@@ -15,6 +22,8 @@ namespace MultiplayerARPG
         public TextWrapper uiTextTitle;
         public UICharacter uiCharacter;
         private float lastShowTime;
+        private BasePlayerCharacterEntity tempOwningCharacter;
+        private BaseCharacterEntity tempTargetCharacter;
 
         private Canvas cacheCanvas;
         public Canvas CacheCanvas
@@ -42,15 +51,26 @@ namespace MultiplayerARPG
                 return;
             }
 
-            BaseCharacterEntity targetCharacter;
-            if (BasePlayerCharacterController.OwningCharacter == Data)
-                CacheCanvas.enabled = true;
-            else if (Vector3.Distance(BasePlayerCharacterController.OwningCharacter.CacheTransform.position, Data.CacheTransform.position) > visibleDistance)
-                CacheCanvas.enabled = false;
-            else if (BasePlayerCharacterController.OwningCharacter.TryGetTargetEntity(out targetCharacter) && targetCharacter.ObjectId == Data.ObjectId)
+            tempOwningCharacter = BasePlayerCharacterController.OwningCharacter;
+            if (tempOwningCharacter == Data)
                 CacheCanvas.enabled = true;
             else
-                CacheCanvas.enabled = false;
+            {
+                switch (visibility)
+                {
+                    case Visibility.VisibleWhenSelected:
+                        CacheCanvas.enabled = tempOwningCharacter.TryGetTargetEntity(out tempTargetCharacter) &&
+                            tempTargetCharacter.ObjectId == Data.ObjectId &&
+                            Vector3.Distance(tempOwningCharacter.CacheTransform.position, Data.CacheTransform.position) <= visibleDistance;
+                        break;
+                    case Visibility.VisibleWhenNearby:
+                        CacheCanvas.enabled = Vector3.Distance(tempOwningCharacter.CacheTransform.position, Data.CacheTransform.position) <= visibleDistance;
+                        break;
+                    case Visibility.AlwaysVisible:
+                        CacheCanvas.enabled = true;
+                        break;
+                }
+            }
 
             if (uiTextTitle != null)
             {
