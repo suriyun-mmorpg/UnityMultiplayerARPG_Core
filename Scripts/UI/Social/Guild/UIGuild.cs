@@ -371,7 +371,9 @@ namespace MultiplayerARPG
 
         public override int GetMaxMemberAmount()
         {
-            return Guild.MaxMember(); ;
+            if (Guild == null)
+                return 0;
+            return Guild.MaxMember();
         }
 
         public override bool IsLeader(string characterId)
