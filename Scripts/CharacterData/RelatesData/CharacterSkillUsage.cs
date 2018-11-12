@@ -78,11 +78,6 @@ public class CharacterSkillUsage
         coolDownRemainsDuration -= deltaTime;
     }
 
-    public void ClearCoolDown()
-    {
-        coolDownRemainsDuration = 0;
-    }
-
     public static CharacterSkillUsage Create(string characterId, SkillUsageType type, int dataId)
     {
         var newSkillUsage = new CharacterSkillUsage();

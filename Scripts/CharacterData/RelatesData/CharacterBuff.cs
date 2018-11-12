@@ -207,11 +207,6 @@ public class CharacterBuff
         buffRemainsDuration -= deltaTime;
     }
 
-    public void ClearDuration()
-    {
-        buffRemainsDuration = 0;
-    }
-
     public string GetKey()
     {
         return type + "_" + dataId;
