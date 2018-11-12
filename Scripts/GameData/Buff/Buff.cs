@@ -5,9 +5,9 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public class Buff
+    public partial class Buff
     {
-        [Tooltip("If buff duration less than or equals to 0, buff stats won't applied")]
+        [Tooltip("If buff duration less than or equals to 0, buff stats won't applied only recovery will be applied")]
         public IncrementalFloat duration;
         public IncrementalInt recoveryHp;
         public IncrementalInt recoveryMp;
