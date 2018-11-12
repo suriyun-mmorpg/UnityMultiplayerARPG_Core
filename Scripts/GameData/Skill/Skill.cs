@@ -62,6 +62,12 @@ namespace MultiplayerARPG
         public float buffDistance;
         public Buff buff;
 
+        [Header("Summon")]
+        [Tooltip("Leave `Summon Monster` to NULL to not summon monster")]
+        public MonsterCharacterEntity summonMonster;
+        public IncrementalInt summonAmount;
+        public IncrementalInt summonLevel;
+
         [Header("Craft")]
         public ItemCraft itemCraft;
 

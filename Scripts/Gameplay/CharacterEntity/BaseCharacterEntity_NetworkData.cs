@@ -29,6 +29,8 @@ namespace MultiplayerARPG
         protected SyncFieldEquipWeapons equipWeapons = new SyncFieldEquipWeapons();
         [SerializeField]
         protected SyncFieldBool isHidding = new SyncFieldBool();
+        [SerializeField]
+        protected SyncFieldPackedUInt petEntityId = new SyncFieldPackedUInt();
         [Header("Sync Lists")]
         [SerializeField]
         protected SyncListCharacterAttribute attributes = new SyncListCharacterAttribute();
@@ -42,6 +44,8 @@ namespace MultiplayerARPG
         protected SyncListCharacterItem equipItems = new SyncListCharacterItem();
         [SerializeField]
         protected SyncListCharacterItem nonEquipItems = new SyncListCharacterItem();
+        [SerializeField]
+        protected SyncListPackedUInt summonEntityIds = new SyncListPackedUInt();
         #endregion
 
         #region Sync data actions
@@ -53,6 +57,7 @@ namespace MultiplayerARPG
         public System.Action<int> onCurrentMpChange;
         public System.Action<EquipWeapons> onEquipWeaponsChange;
         public System.Action<bool> onIsHiddingChange;
+        public System.Action<uint> onPetEntityIdChange;
         // List
         public System.Action<LiteNetLibSyncList.Operation, int> onAttributesOperation;
         public System.Action<LiteNetLibSyncList.Operation, int> onSkillsOperation;
@@ -60,6 +65,7 @@ namespace MultiplayerARPG
         public System.Action<LiteNetLibSyncList.Operation, int> onBuffsOperation;
         public System.Action<LiteNetLibSyncList.Operation, int> onEquipItemsOperation;
         public System.Action<LiteNetLibSyncList.Operation, int> onNonEquipItemsOperation;
+        public System.Action<LiteNetLibSyncList.Operation, int> onSummonEntityIdsOperation;
         #endregion
 
         #region Fields/Interface implementation
@@ -75,7 +81,23 @@ namespace MultiplayerARPG
         public virtual int CurrentWater { get { return currentWater.Value; } set { currentWater.Value = value; } }
         public virtual EquipWeapons EquipWeapons { get { return equipWeapons.Value; } set { equipWeapons.Value = value; } }
         public virtual bool IsHidding { get { return isHidding.Value; } set { isHidding.Value = value; } }
+        public virtual uint PetEntityId { get { return petEntityId.Value; } set { petEntityId.Value = value; } }
         public override string Title { get { return CharacterName; } set { } }
+
+        private BaseMonsterCharacterEntity cachePetEntity;
+        public BaseMonsterCharacterEntity PetEntity
+        {
+            get
+            {
+                if (cachePetEntity == null || cachePetEntity.ObjectId != PetEntityId)
+                {
+                    LiteNetLibIdentity identity;
+                    if (Manager.Assets.TryGetSpawnedObject(PetEntityId, out identity))
+                        cachePetEntity = identity.GetComponent<BaseMonsterCharacterEntity>();
+                }
+                return cachePetEntity;
+            }
+        }
 
         public IList<CharacterAttribute> Attributes
         {
@@ -149,6 +171,17 @@ namespace MultiplayerARPG
                 nonEquipItems.Clear();
                 foreach (var entry in value)
                     nonEquipItems.Add(entry);
+            }
+        }
+
+        public IList<uint> SummonEntityIds
+        {
+            get { return summonEntityIds; }
+            set
+            {
+                summonEntityIds.Clear();
+                foreach (var entry in value)
+                    summonEntityIds.Add(entry);
             }
         }
         #endregion
@@ -249,6 +282,16 @@ namespace MultiplayerARPG
             if (onIsHiddingChange != null)
                 onIsHiddingChange.Invoke(isHidding);
         }
+
+        /// <summary>
+        /// Override this to do stuffs when pet entity changes
+        /// </summary>
+        /// <param name="objectId"></param>
+        protected virtual void OnPetEntityIdChange(uint objectId)
+        {
+            if (onPetEntityIdChange != null)
+                onPetEntityIdChange.Invoke(objectId);
+        }
         #endregion
 
         #region Net functions operation callback
@@ -347,6 +390,19 @@ namespace MultiplayerARPG
 
             if (onNonEquipItemsOperation != null)
                 onNonEquipItemsOperation.Invoke(operation, index);
+        }
+
+        /// <summary>
+        /// Override this to do stuffs when summon entity ids changes
+        /// </summary>
+        /// <param name="operation"></param>
+        /// <param name="index"></param>
+        protected virtual void OnSummonEntityIdsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            isRecaching = true;
+
+            if (onSummonEntityIdsOperation != null)
+                onSummonEntityIdsOperation.Invoke(operation, index);
         }
         #endregion
     }

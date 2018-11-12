@@ -20,7 +20,7 @@ namespace MultiplayerARPG
         }
 
         [HideInInspector]
-        public BaseCharacterEntity spawner;
+        public BaseCharacterEntity summoner;
 
         public MonsterCharacter MonsterDatabase
         {
@@ -142,8 +142,8 @@ namespace MultiplayerARPG
             if (characterEntity == null)
                 return false;
             // If spawn by another character, will have same allies with spawner
-            if (spawner != null)
-                return characterEntity == spawner || spawner.IsAlly(characterEntity);
+            if (summoner != null)
+                return characterEntity == summoner || summoner.IsAlly(characterEntity);
             // If this character have been attacked by any character
             // It will tell another ally nearby to help
             var monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
@@ -157,8 +157,8 @@ namespace MultiplayerARPG
             if (characterEntity == null)
                 return false;
             // If spawn by another character, will have same enemies with spawner
-            if (spawner != null)
-                return characterEntity != spawner && spawner.IsEnemy(characterEntity);
+            if (summoner != null)
+                return characterEntity != summoner && summoner.IsEnemy(characterEntity);
             // Attack only player by default
             return characterEntity is BasePlayerCharacterEntity;
         }
