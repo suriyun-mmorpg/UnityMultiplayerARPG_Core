@@ -378,17 +378,17 @@ namespace MultiplayerARPG
 
         public override bool IsLeader(string characterId)
         {
-            return CacheGameNetworkManager.ClientGuild != null && CacheGameNetworkManager.ClientGuild.IsLeader(characterId);
+            return Guild != null && Guild.IsLeader(characterId);
         }
 
         public override bool IsOnline(string characterId)
         {
-            return CacheGameNetworkManager.ClientGuild != null && CacheGameNetworkManager.ClientGuild.IsOnline(characterId);
+            return Guild != null && Guild.IsOnline(characterId);
         }
 
         public override bool CanKick(string characterId)
         {
-            return CacheGameNetworkManager.ClientGuild != null && CacheGameNetworkManager.ClientGuild.CanKick(characterId);
+            return Guild != null && Guild.CanKick(characterId);
         }
 
         public override bool OwningCharacterIsLeader()

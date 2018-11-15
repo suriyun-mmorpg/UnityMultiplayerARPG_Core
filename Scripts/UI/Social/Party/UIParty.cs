@@ -60,10 +60,10 @@ namespace MultiplayerARPG
         {
             if (party == null)
                 return;
-            
+
             memberAmount = party.CountMember();
             UpdateUIs();
-            
+
             var selectedIdx = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI) : -1;
             MemberSelectionManager.DeselectSelectedUI();
             MemberSelectionManager.Clear();
@@ -147,22 +147,24 @@ namespace MultiplayerARPG
 
         public override int GetMaxMemberAmount()
         {
-            return GameInstance.Singleton.SocialSystemSetting.MaxPartyMember;
+            if (Party == null)
+                return 0;
+            return Party.MaxMember();
         }
 
         public override bool IsLeader(string characterId)
         {
-            return CacheGameNetworkManager.ClientParty != null && CacheGameNetworkManager.ClientParty.IsLeader(characterId);
+            return Party != null && Party.IsLeader(characterId);
         }
 
         public override bool IsOnline(string characterId)
         {
-            return CacheGameNetworkManager.ClientParty != null && CacheGameNetworkManager.ClientParty.IsOnline(characterId);
+            return Party != null && Party.IsOnline(characterId);
         }
 
         public override bool CanKick(string characterId)
         {
-            return CacheGameNetworkManager.ClientParty != null && CacheGameNetworkManager.ClientParty.CanKick(characterId);
+            return Party != null && Party.CanKick(characterId);
         }
 
         public override bool OwningCharacterIsLeader()
