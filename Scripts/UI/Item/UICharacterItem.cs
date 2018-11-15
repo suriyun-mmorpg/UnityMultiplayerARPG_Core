@@ -84,8 +84,8 @@ namespace MultiplayerARPG
         public UnityEvent onSetUnEquippableData;
         public UnityEvent onNpcSellItemDialogAppear;
         public UnityEvent onNpcSellItemDialogDisappear;
-        public UnityEvent onRefineItemAppear;
-        public UnityEvent onRefineItemDisappear;
+        public UnityEvent onRefineItemDialogAppear;
+        public UnityEvent onRefineItemDialogDisappear;
         public UnityEvent onEnterDealingState;
         public UnityEvent onExitDealingState;
 
@@ -96,7 +96,7 @@ namespace MultiplayerARPG
         public bool dontAppendRefineLevelToTitle;
 
         private bool isSellItemDialogAppeared;
-        private bool isRefineItemAppeared;
+        private bool isRefineItemDialogAppeared;
         private bool isDealingStateEntered;
 
         protected override void UpdateUI()
@@ -131,7 +131,7 @@ namespace MultiplayerARPG
             if (uiTextTitle != null)
             {
                 var str = string.Format(titleFormat, Item == null ? "Unknow" : Item.title);
-                if (!dontAppendRefineLevelToTitle)
+                if (!dontAppendRefineLevelToTitle && EquipmentItem != null)
                     str += string.Format(titleRefineLevelFormat, (Level - 1).ToString("N0"));
                 uiTextTitle.text = str;
             }
@@ -342,11 +342,11 @@ namespace MultiplayerARPG
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter == null)
             {
-                if (initData || isRefineItemAppeared)
+                if (initData || isRefineItemDialogAppeared)
                 {
-                    isRefineItemAppeared = false;
-                    if (onRefineItemDisappear != null)
-                        onRefineItemDisappear.Invoke();
+                    isRefineItemDialogAppeared = false;
+                    if (onRefineItemDialogDisappear != null)
+                        onRefineItemDialogDisappear.Invoke();
                 }
                 return;
             }
@@ -359,20 +359,20 @@ namespace MultiplayerARPG
                     Data.characterItem.GetEquipmentItem() != null &&
                     string.IsNullOrEmpty(EquipPosition))
                 {
-                    if (initData || !isRefineItemAppeared)
+                    if (initData || !isRefineItemDialogAppeared)
                     {
-                        isRefineItemAppeared = true;
-                        if (onRefineItemAppear != null)
-                            onRefineItemAppear.Invoke();
+                        isRefineItemDialogAppeared = true;
+                        if (onRefineItemDialogAppear != null)
+                            onRefineItemDialogAppear.Invoke();
                     }
                 }
                 else
                 {
-                    if (initData || isRefineItemAppeared)
+                    if (initData || isRefineItemDialogAppeared)
                     {
-                        isRefineItemAppeared = false;
-                        if (onRefineItemDisappear != null)
-                            onRefineItemDisappear.Invoke();
+                        isRefineItemDialogAppeared = false;
+                        if (onRefineItemDialogDisappear != null)
+                            onRefineItemDialogDisappear.Invoke();
                     }
                 }
             }

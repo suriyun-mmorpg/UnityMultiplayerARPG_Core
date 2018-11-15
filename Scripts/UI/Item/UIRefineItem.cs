@@ -5,6 +5,20 @@ namespace MultiplayerARPG
 {
     public partial class UIRefineItem : UISelectionEntry<int>
     {
+        public CharacterItem CharacterItem
+        {
+            get
+            {
+                if (Data >= 0 && Data < BasePlayerCharacterController.OwningCharacter.NonEquipItems.Count)
+                    return BasePlayerCharacterController.OwningCharacter.NonEquipItems[Data];
+                return null;
+            }
+        }
+        public short Level { get { return (short)(CharacterItem != null ? CharacterItem.level : 1); } }
+        public Item EquipmentItem { get { return CharacterItem != null ? CharacterItem.GetEquipmentItem() : null; } }
+        public bool CanRefine { get { return EquipmentItem != null && Level < EquipmentItem.MaxLevel; } }
+        public ItemRefineLevel RefineLevel { get { return !CanRefine ? null : EquipmentItem.itemRefineInfo.levels[Level - 1]; } }
+
         [Header("Generic Info Format")]
         [Tooltip("Require Gold Format => {0} = {Amount}")]
         public string requireGoldFormat = "Require Gold: {0}";
@@ -20,85 +34,73 @@ namespace MultiplayerARPG
         public TextWrapper uiTextSuccessRate;
         public TextWrapper uiTextRefiningLevel;
 
-        private bool hasSetData;
-
         protected override void UpdateUI()
         {
             Profiler.BeginSample("UIRefineItem - Update UI");
             var owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            CharacterItem characterItem = null;
-            Item equipmentItem = null;
-            short level = 1;
-            if (Data >= 0 && Data < owningCharacter.NonEquipItems.Count)
-            {
-                characterItem = owningCharacter.NonEquipItems[Data];
-                equipmentItem = characterItem.GetEquipmentItem();
-                level = characterItem.level;
-            }
-            var canRefine = characterItem != null && equipmentItem != null && level < equipmentItem.MaxLevel;
-            ItemRefineLevel refineLevel = !canRefine ? null : equipmentItem.itemRefineInfo.levels[level - 1];
+
             if (uiRefiningItem != null)
             {
-                if (characterItem == null)
+                if (CharacterItem == null)
                     uiRefiningItem.Hide();
                 else
                 {
-                    uiRefiningItem.Setup(new CharacterItemTuple(characterItem, level, string.Empty), owningCharacter, Data);
+                    uiRefiningItem.Setup(new CharacterItemTuple(CharacterItem, Level, string.Empty), owningCharacter, Data);
                     uiRefiningItem.Show();
                 }
             }
 
             if (uiRequireItemAmounts != null)
             {
-                if (!canRefine)
+                if (!CanRefine)
                     uiRequireItemAmounts.Hide();
                 else
                 {
                     uiRequireItemAmounts.Show();
-                    uiRequireItemAmounts.Data = refineLevel.RequireItems;
+                    uiRequireItemAmounts.Data = RefineLevel.RequireItems;
                 }
             }
 
             if (uiTextRequireGold != null)
             {
-                if (!canRefine)
+                if (!CanRefine)
                     uiTextRequireGold.text = string.Format(requireGoldFormat, 0.ToString("N0"));
                 else
-                    uiTextRequireGold.text = string.Format(requireGoldFormat, refineLevel.RequireGold.ToString("N0"));
+                    uiTextRequireGold.text = string.Format(requireGoldFormat, RefineLevel.RequireGold.ToString("N0"));
             }
 
             if (uiTextSuccessRate != null)
             {
-                if (!canRefine)
+                if (!CanRefine)
                     uiTextSuccessRate.text = string.Format(successRateFormat, 0.ToString("N2"));
                 else
-                    uiTextSuccessRate.text = string.Format(successRateFormat, refineLevel.SuccessRate.ToString("N2"));
+                    uiTextSuccessRate.text = string.Format(successRateFormat, (RefineLevel.SuccessRate * 100f).ToString("N2"));
             }
 
             if (uiTextRefiningLevel != null)
             {
-                if (!canRefine)
-                    uiTextRefiningLevel.text = string.Format(refiningLevelFormat, (level - 1).ToString("N0"));
+                if (!CanRefine)
+                    uiTextRefiningLevel.text = string.Format(refiningLevelFormat, (Level - 1).ToString("N0"));
                 else
-                    uiTextRefiningLevel.text = string.Format(refiningLevelFormat, level.ToString("N0"));
+                    uiTextRefiningLevel.text = string.Format(refiningLevelFormat, Level.ToString("N0"));
             }
             Profiler.EndSample();
         }
 
         public override void Hide()
         {
-            hasSetData = false;
+            Data = -1;
             base.Hide();
         }
 
         protected override void UpdateData()
         {
-            hasSetData = true;
+            // Do nothing
         }
 
         public void OnClickRefine()
         {
-            if (!hasSetData)
+            if (Data < 0)
                 return;
             BasePlayerCharacterController.OwningCharacter.RequestRefineItem((ushort)Data);
         }
