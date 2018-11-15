@@ -26,11 +26,11 @@ namespace MultiplayerARPG
         [Tooltip("Weight Limit Stats Format => {0} = {Weight Limit}")]
         public string weightLimitStatsFormat = "Weight Limit: {0}";
         [Tooltip("Stamina Stats Format => {0} = {Amount}")]
-        public string staminaStatsFormat = "Hp: {0}";
+        public string staminaStatsFormat = "Stamina: {0}";
         [Tooltip("Food Stats Format => {0} = {Amount}")]
-        public string foodStatsFormat = "Mp: {0}";
+        public string foodStatsFormat = "Food: {0}";
         [Tooltip("Water Stats Format => {0} = {Amount}")]
-        public string waterStatsFormat = "Mp: {0}";
+        public string waterStatsFormat = "Water: {0}";
 
         [Header("UI Elements")]
         public TextWrapper uiTextStats;
