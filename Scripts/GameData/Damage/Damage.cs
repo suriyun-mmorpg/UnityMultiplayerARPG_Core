@@ -18,7 +18,7 @@ namespace MultiplayerARPG
         [Tooltip("This will be sum with character's radius before find hitting characters")]
         [StringShowConditional(conditionFieldName: "damageType", conditionValue: "Melee")]
         public float hitDistance = 1f;
-        [Range(0f, 360f)]
+        [Range(10f, 360f)]
         [StringShowConditional(conditionFieldName: "damageType", conditionValue: "Melee")]
         public float hitFov;
 
