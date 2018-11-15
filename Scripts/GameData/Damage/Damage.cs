@@ -15,19 +15,20 @@ namespace MultiplayerARPG
     {
         public DamageType damageType;
 
+        [Tooltip("If this is TRUE, it will hit only selected target, if no selected target it will hit 1 found target")]
+        public bool hitOnlySelectedTarget;
+
+        [StringShowConditional(conditionFieldName: "damageType", conditionValue: "Melee")]
         [Tooltip("This will be sum with character's radius before find hitting characters")]
-        [StringShowConditional(conditionFieldName: "damageType", conditionValue: "Melee")]
         public float hitDistance = 1f;
-        [Range(10f, 360f)]
         [StringShowConditional(conditionFieldName: "damageType", conditionValue: "Melee")]
+        [Range(10f, 360f)]
         public float hitFov;
 
         [StringShowConditional(conditionFieldName: "damageType", conditionValue: "Missile")]
         public float missileDistance = 5f;
         [StringShowConditional(conditionFieldName: "damageType", conditionValue: "Missile")]
         public float missileSpeed = 5f;
-        [StringShowConditional(conditionFieldName: "damageType", conditionValue: "Missile")]
-        public bool missileLockOnTarget;
         [StringShowConditional(conditionFieldName: "damageType", conditionValue: "Missile")]
         public MissileDamageEntity missileDamageEntity;
 

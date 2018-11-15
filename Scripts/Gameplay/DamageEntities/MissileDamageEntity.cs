@@ -134,6 +134,10 @@ namespace MultiplayerARPG
                 if (buildingMaterial != null && buildingMaterial.buildingEntity != null)
                     damageableEntity = buildingMaterial.buildingEntity;
             }
+
+            if (LockingTarget != null && damageableEntity != LockingTarget)
+                return;
+
             if (damageableEntity == null || damageableEntity == attacker || damageableEntity.IsDead())
                 return;
 

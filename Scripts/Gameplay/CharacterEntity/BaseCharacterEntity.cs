@@ -766,43 +766,66 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return;
 
+            DamageableNetworkEntity tempDamageableEntity = null;
             Vector3 damagePosition;
             Quaternion damageRotation;
             GetDamagePositionAndRotation(damageInfo.damageType, out damagePosition, out damageRotation);
             switch (damageInfo.damageType)
             {
                 case DamageType.Melee:
-                    overlapSize = OverlapObjects(damagePosition, damageInfo.hitDistance, GameInstance.GetDamageableLayerMask());
-                    if (overlapSize == 0)
-                        return;
-                    for (counter = 0; counter < overlapSize; ++counter)
+                    if (damageInfo.hitOnlySelectedTarget)
                     {
-                        tempGameObject = GetOverlapObject(counter);
-                        var damageableEntity = tempGameObject.GetComponent<DamageableNetworkEntity>();
-                        // Try to find damageable entity by building object materials
-                        if (damageableEntity == null)
+                        if (!TryGetTargetEntity(out tempDamageableEntity))
                         {
-                            var buildingMaterial = tempGameObject.GetComponent<BuildingMaterial>();
-                            if (buildingMaterial != null && buildingMaterial.buildingEntity != null)
-                                damageableEntity = buildingMaterial.buildingEntity;
+                            overlapSize = OverlapObjects(damagePosition, damageInfo.hitDistance, GameInstance.GetDamageableLayerMask());
+                            if (overlapSize == 0)
+                                return;
+                            // Target entity not set, use overlapped object as target
+                            tempGameObject = GetOverlapObject(0);
+                            tempDamageableEntity = tempGameObject.GetComponent<DamageableNetworkEntity>();
                         }
-                        if (damageableEntity == null || damageableEntity == this || damageableEntity.IsDead())
-                            continue;
-                        if (IsPositionInFov(damageInfo.hitFov, damageableEntity.CacheTransform.position))
-                            damageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId);
+                        // Target receive damage
+                        if (tempDamageableEntity != null &&
+                            tempDamageableEntity != this &&
+                            !tempDamageableEntity.IsDead() &&
+                            IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.CacheTransform.position))
+                            tempDamageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId);
+                    }
+                    else
+                    {
+                        overlapSize = OverlapObjects(damagePosition, damageInfo.hitDistance, GameInstance.GetDamageableLayerMask());
+                        if (overlapSize == 0)
+                            return;
+                        for (counter = 0; counter < overlapSize; ++counter)
+                        {
+                            tempGameObject = GetOverlapObject(counter);
+                            tempDamageableEntity = tempGameObject.GetComponent<DamageableNetworkEntity>();
+                            // Try to find damageable entity by building object materials
+                            if (tempDamageableEntity == null)
+                            {
+                                var buildingMaterial = tempGameObject.GetComponent<BuildingMaterial>();
+                                if (buildingMaterial != null && buildingMaterial.buildingEntity != null)
+                                    tempDamageableEntity = buildingMaterial.buildingEntity;
+                            }
+                            // Target receive damage
+                            if (tempDamageableEntity != null &&
+                                tempDamageableEntity != this &&
+                                !tempDamageableEntity.IsDead() &&
+                                IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.CacheTransform.position))
+                                tempDamageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId);
+                        }
                     }
                     break;
                 case DamageType.Missile:
                     if (damageInfo.missileDamageEntity != null)
                     {
                         var missileDamageEntity = Manager.Assets.NetworkSpawn(damageInfo.missileDamageEntity.Identity, damagePosition, damageRotation).GetComponent<MissileDamageEntity>();
-                        DamageableNetworkEntity lockingTarget = null;
-                        if (damageInfo.missileLockOnTarget)
+                        if (damageInfo.hitOnlySelectedTarget)
                         {
-                            if (targetEntity != null && targetEntity is DamageableNetworkEntity)
-                                lockingTarget = targetEntity as DamageableNetworkEntity;
+                            if (!TryGetTargetEntity(out tempDamageableEntity))
+                                tempDamageableEntity = null;
                         }
-                        missileDamageEntity.SetupDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId, damageInfo.missileDistance, damageInfo.missileSpeed, lockingTarget);
+                        missileDamageEntity.SetupDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId, damageInfo.missileDistance, damageInfo.missileSpeed, tempDamageableEntity);
                     }
                     break;
             }
