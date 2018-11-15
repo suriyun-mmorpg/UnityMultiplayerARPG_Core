@@ -68,6 +68,13 @@ namespace MultiplayerARPG
             CallNetFunction("ShowNpcDialog", ConnectionId, dataId);
         }
 
+        public virtual void RequestShowNpcRefine()
+        {
+            if (IsDead())
+                return;
+            CallNetFunction("ShowNpcRefine", ConnectionId);
+        }
+
         public virtual void RequestSelectNpcDialogMenu(byte menuIndex)
         {
             if (IsDead())

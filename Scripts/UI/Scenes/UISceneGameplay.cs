@@ -204,6 +204,14 @@ namespace MultiplayerARPG
             uiNpcDialog.Show();
         }
 
+        public void OnShowNpcRefine()
+        {
+            if (uiRefineItem == null)
+                return;
+
+            uiRefineItem.Show();
+        }
+
         public void OnShowDealingRequest(BasePlayerCharacterEntity playerCharacter)
         {
             if (uiDealingRequest == null)

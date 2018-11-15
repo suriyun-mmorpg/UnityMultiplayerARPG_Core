@@ -63,6 +63,7 @@ namespace MultiplayerARPG
             if (CacheUISceneGameplay != null)
             {
                 characterEntity.onShowNpcDialog += CacheUISceneGameplay.OnShowNpcDialog;
+                characterEntity.onShowNpcRefine += CacheUISceneGameplay.OnShowNpcRefine;
                 characterEntity.onDead += CacheUISceneGameplay.OnCharacterDead;
                 characterEntity.onRespawn += CacheUISceneGameplay.OnCharacterRespawn;
                 characterEntity.onShowDealingRequestDialog += CacheUISceneGameplay.OnShowDealingRequest;
@@ -115,6 +116,7 @@ namespace MultiplayerARPG
             if (CacheUISceneGameplay != null)
             {
                 characterEntity.onShowNpcDialog -= CacheUISceneGameplay.OnShowNpcDialog;
+                characterEntity.onShowNpcRefine -= CacheUISceneGameplay.OnShowNpcRefine;
                 characterEntity.onDead -= CacheUISceneGameplay.OnCharacterDead;
                 characterEntity.onRespawn -= CacheUISceneGameplay.OnCharacterRespawn;
                 characterEntity.onShowDealingRequestDialog -= CacheUISceneGameplay.OnShowDealingRequest;

@@ -8,6 +8,7 @@ namespace MultiplayerARPG
     public partial class BasePlayerCharacterEntity
     {
         public System.Action<int> onShowNpcDialog;
+        public System.Action onShowNpcRefine;
         public System.Action<BasePlayerCharacterEntity> onShowDealingRequestDialog;
         public System.Action<BasePlayerCharacterEntity> onShowDealingDialog;
         public System.Action<DealingState> onUpdateDealingState;
@@ -170,8 +171,20 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncShowNpcDialog(int dataId)
         {
+            // Show npc dialog by dataId, if dataId = 0 it will hide
             if (onShowNpcDialog != null)
                 onShowNpcDialog.Invoke(dataId);
+        }
+
+        protected virtual void NetFuncShowNpcRefine()
+        {
+            // Hide npc dialog
+            if (onShowNpcDialog != null)
+                onShowNpcDialog.Invoke(0);
+
+            // Show refine dialog
+            if (onShowNpcRefine != null)
+                onShowNpcRefine.Invoke();
         }
 
         protected virtual void NetFuncSelectNpcDialogMenu(int menuIndex)
@@ -195,14 +208,6 @@ namespace MultiplayerARPG
                         return;
                     }
                     currentNpcDialog = selectedMenu.dialog;
-                    // If dialog is save respawn point, change saved respawn point
-                    if (currentNpcDialog.type == NpcDialogType.SaveRespawnPoint &&
-                        currentNpcDialog.saveRespawnMap != null &&
-                        currentNpcDialog.saveRespawnMap.scene != null)
-                    {
-                        RespawnMapName = currentNpcDialog.saveRespawnMap.scene.SceneName;
-                        RespawnPosition = currentNpcDialog.saveRespawnPosition;
-                    }
                     // Show Npc dialog on client
                     RequestShowNpcDialog(currentNpcDialog.DataId);
                     break;
@@ -212,6 +217,28 @@ namespace MultiplayerARPG
                 case NpcDialogType.CraftItem:
                     NetFuncSelectNpcDialogCraftItemMenu(menuIndex);
                     break;
+            }
+
+            // `currentNpcDialog` have changed after select menu, then proceed new dialog activity if needed
+            if (currentNpcDialog != null)
+            {
+                switch (currentNpcDialog.type)
+                {
+                    case NpcDialogType.SaveRespawnPoint:
+                        // If dialog is save respawn point, change saved respawn point
+                        if (currentNpcDialog.saveRespawnMap != null &&
+                            currentNpcDialog.saveRespawnMap.scene != null)
+                        {
+                            RespawnMapName = currentNpcDialog.saveRespawnMap.scene.SceneName;
+                            RespawnPosition = currentNpcDialog.saveRespawnPosition;
+                        }
+                        break;
+                    case NpcDialogType.RefineItem:
+                        // If dialog is refine dialog, show refine dialog at client
+                        RequestShowNpcRefine();
+                        currentNpcDialog = null;
+                        break;
+                }
             }
         }
 

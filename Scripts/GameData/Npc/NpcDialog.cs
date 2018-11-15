@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         Shop,
         CraftItem,
         SaveRespawnPoint,
+        RefineItem,
     }
 
     [CreateAssetMenu(fileName = "Npc Dialog", menuName = "Create GameData/Npc Dialog")]
@@ -22,6 +23,8 @@ namespace MultiplayerARPG
         public const int QUEST_COMPLETE_MENU_INDEX = 3;
         public const int CRAFT_ITEM_START_MENU_INDEX = 0;
         public const int CRAFT_ITEM_CANCEL_MENU_INDEX = 1;
+        public const int REFINE_ITEM_START_MENU_INDEX = 0;
+        public const int REFINE_ITEM_CANCEL_MENU_INDEX = 1;
 
         public NpcDialogType type;
         public NpcDialogMenu[] menus;

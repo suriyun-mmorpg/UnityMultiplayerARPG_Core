@@ -48,9 +48,10 @@ namespace MultiplayerARPG
             RegisterNetFunction("AssignHotkey", new LiteNetLibFunction<NetFieldString, NetFieldByte, NetFieldInt>((hotkeyId, type, dataId) => NetFuncAssignHotkey(hotkeyId, type, dataId)));
             RegisterNetFunction("NpcActivate", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncNpcActivate(objectId)));
             RegisterNetFunction("ShowNpcDialog", new LiteNetLibFunction<NetFieldInt>((dataId) => NetFuncShowNpcDialog(dataId)));
+            RegisterNetFunction("ShowNpcRefine", new LiteNetLibFunction(NetFuncShowNpcRefine));
             RegisterNetFunction("SelectNpcDialogMenu", new LiteNetLibFunction<NetFieldByte>((menuIndex) => NetFuncSelectNpcDialogMenu(menuIndex)));
             RegisterNetFunction("BuyNpcItem", new LiteNetLibFunction<NetFieldUShort, NetFieldShort>((itemIndex, amount) => NetFuncBuyNpcItem(itemIndex, amount)));
-            RegisterNetFunction("EnterWarp", new LiteNetLibFunction(() => NetFuncEnterWarp()));
+            RegisterNetFunction("EnterWarp", new LiteNetLibFunction(NetFuncEnterWarp));
             RegisterNetFunction("Build", new LiteNetLibFunction<NetFieldInt, NetFieldVector3, NetFieldQuaternion, NetFieldPackedUInt>((itemIndex, position, rotation, parentObjectId) => NetFuncBuild(itemIndex, position, rotation, parentObjectId)));
             RegisterNetFunction("DestroyBuild", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncDestroyBuild(objectId)));
             RegisterNetFunction("SellItem", new LiteNetLibFunction<NetFieldUShort, NetFieldShort>((nonEquipIndex, amount) => NetFuncSellItem(nonEquipIndex, amount)));
