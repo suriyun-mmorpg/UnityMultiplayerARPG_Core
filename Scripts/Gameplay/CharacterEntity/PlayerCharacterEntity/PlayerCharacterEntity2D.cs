@@ -86,7 +86,11 @@ namespace MultiplayerARPG
         {
             base.EntityFixedUpdate();
             Profiler.BeginSample("PlayerCharacterEntity2D - FixedUpdate");
-            if (!IsServer && !IsOwnerClient)
+
+            if (movementSecure == MovementSecure.ServerAuthoritative && !IsServer)
+                return;
+
+            if (movementSecure == MovementSecure.NotSecure && !IsOwnerClient)
                 return;
 
             if (currentDestination.HasValue)

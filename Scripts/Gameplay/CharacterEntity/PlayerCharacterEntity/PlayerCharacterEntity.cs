@@ -85,7 +85,11 @@ namespace MultiplayerARPG
         {
             base.EntityFixedUpdate();
             Profiler.BeginSample("PlayerCharacterEntity - FixedUpdate");
-            if (!IsServer && !IsOwnerClient)
+
+            if (movementSecure == MovementSecure.ServerAuthoritative && !IsServer)
+                return;
+
+            if (movementSecure == MovementSecure.NotSecure && !IsOwnerClient)
                 return;
             
             if (HasNavPaths)
@@ -231,7 +235,7 @@ namespace MultiplayerARPG
             if (IsDead())
                 return;
             // Play jump animation immediately on owner client
-            if (IsOwnerClient)
+            if (IsOwnerClient && !IsServer)
                 CharacterModel.PlayJumpAnimation();
             // Only server will call for clients to trigger jump animation for secure entity
             if (IsServer)
