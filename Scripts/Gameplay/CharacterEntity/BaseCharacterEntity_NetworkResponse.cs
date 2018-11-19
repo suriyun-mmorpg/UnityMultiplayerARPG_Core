@@ -160,10 +160,6 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
             // Update skill usage states
-            var skillUsageIndex = this.IndexOfSkillUsage(characterSkill.dataId, SkillUsageType.Skill);
-            if (skillUsageIndex >= 0)
-                buffs.RemoveAt(skillUsageIndex);
-
             var newSkillUsage = CharacterSkillUsage.Create(Id, SkillUsageType.Skill, characterSkill.dataId);
             newSkillUsage.Use(this, characterSkill.level);
             skillUsages.Add(newSkillUsage);
