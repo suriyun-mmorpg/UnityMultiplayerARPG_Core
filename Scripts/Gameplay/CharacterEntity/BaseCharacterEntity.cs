@@ -5,23 +5,6 @@ using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
 {
-    public enum AnimActionType : byte
-    {
-        None,
-        Generic,
-        AttackRightHand,
-        AttackLeftHand,
-        Skill,
-    }
-
-    public enum RewardGivenType : byte
-    {
-        None,
-        KillMonster,
-        PartyShare,
-        Quest,
-    }
-
     [RequireComponent(typeof(CharacterAnimationComponent))]
     [RequireComponent(typeof(CharacterRecoveryComponent))]
     [RequireComponent(typeof(CharacterSkillAndBuffComponent))]
@@ -29,6 +12,7 @@ namespace MultiplayerARPG
     {
         public const float ACTION_COMMAND_DELAY = 0.2f;
         public const int OVERLAP_COLLIDER_SIZE = 32;
+
         [HideInInspector]
         public bool isInSafeArea;
 

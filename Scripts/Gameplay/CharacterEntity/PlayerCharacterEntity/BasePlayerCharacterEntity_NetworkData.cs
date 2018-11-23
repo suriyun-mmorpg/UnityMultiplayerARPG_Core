@@ -9,6 +9,7 @@ namespace MultiplayerARPG
     public partial class BasePlayerCharacterEntity
     {
         #region Sync data
+        [Header("Player Character - Sync Fields")]
         [SerializeField]
         protected SyncFieldShort statPoint = new SyncFieldShort();
         [SerializeField]
@@ -19,7 +20,7 @@ namespace MultiplayerARPG
         protected SyncFieldInt partyId = new SyncFieldInt();
         [SerializeField]
         protected SyncFieldInt guildId = new SyncFieldInt();
-        // List
+        [Header("Player Character - Sync Lists")]
         [SerializeField]
         protected SyncListCharacterHotkey hotkeys = new SyncListCharacterHotkey();
         [SerializeField]

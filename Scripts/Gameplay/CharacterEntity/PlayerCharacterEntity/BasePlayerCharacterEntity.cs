@@ -7,24 +7,16 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public enum DealingState : byte
-    {
-        None,
-        Dealing,
-        LockDealing,
-        ConfirmDealing,
-    }
-
     [RequireComponent(typeof(LiteNetLibTransform))]
     public abstract partial class BasePlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     {
-        [Header("Relates Components")]
-        public BasePlayerCharacterController controllerPrefab;
-
         [HideInInspector]
         public WarpPortalEntity warpingPortal;
         [HideInInspector]
         public NpcDialog currentNpcDialog;
+
+        [Header("Player Character Settings")]
+        public BasePlayerCharacterController controllerPrefab;
 
         public float setCoCharacterTime { get; private set; }
         private BasePlayerCharacterEntity coCharacter;

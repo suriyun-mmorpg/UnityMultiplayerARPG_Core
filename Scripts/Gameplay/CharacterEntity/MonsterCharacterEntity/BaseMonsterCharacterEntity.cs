@@ -19,9 +19,6 @@ namespace MultiplayerARPG
             set { }
         }
 
-        [HideInInspector]
-        public BaseCharacterEntity summoner;
-
         public MonsterCharacter MonsterDatabase
         {
             get { return database as MonsterCharacter; }
@@ -40,6 +37,7 @@ namespace MultiplayerARPG
         
         public MonsterSpawnArea spawnArea { get; private set; }
         public Vector3 spawnPosition { get; private set; }
+        public BaseCharacterEntity summoner { get; protected set; }
 
         protected override void EntityAwake()
         {
@@ -397,6 +395,20 @@ namespace MultiplayerARPG
             yield return new WaitForSecondsRealtime(MonsterDatabase.deadHideDelay + MonsterDatabase.deadRespawnDelay);
             InitStats();
             Manager.Assets.NetworkSpawn(Identity.HashAssetId, spawnPosition, Quaternion.Euler(Vector3.up * Random.Range(0, 360)), Identity.ObjectId, Identity.ConnectionId);
+        }
+
+        public void Summon(BaseCharacterEntity summoner)
+        {
+            this.summoner = summoner;
+            if (summoner != null && !summoner.SummonEntityIds.Contains(ObjectId))
+                summoner.SummonEntityIds.Add(ObjectId);
+        }
+
+        public void SummonAsPet(BaseCharacterEntity summoner)
+        {
+            this.summoner = summoner;
+            if (summoner != null)
+                summoner.PetEntityId = ObjectId;
         }
 
         public abstract void StopMove();
