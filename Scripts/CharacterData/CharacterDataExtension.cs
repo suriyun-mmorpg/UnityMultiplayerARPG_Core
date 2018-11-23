@@ -24,19 +24,7 @@ public static partial class CharacterDataExtension
         if (!GameInstance.AllCharacterEntities.TryGetValue(data.EntityId, out entityPrefab))
         {
             Debug.LogWarning("[GetEntityPrefab] Cannot find character entity with id: " + data.EntityId);
-            var database = data.GetDatabase();
-            // Backward compatible
-            if (database == null)
-            {
-                Debug.LogWarning("[GetEntityPrefab] Cannot find character entity with id: " + data.EntityId + " and also cannot find data id: " + data.DataId);
-                return null;
-            }
-            if (database.entityPrefab == null)
-            {
-                Debug.LogWarning("[GetEntityPrefab] Data id: " + data.DataId + " entity prefab is empty");
-                return null;
-            }
-            entityPrefab = database.entityPrefab;
+            return null;
         }
         return entityPrefab;
     }

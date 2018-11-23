@@ -7,8 +7,6 @@ namespace MultiplayerARPG
     public class MonsterSpawnArea : GameArea
     {
         [Header("Spawning Data")]
-        [System.Obsolete("This will be deprecated on next version")]
-        public MonsterCharacter database;
         public BaseMonsterCharacterEntity monsterCharacterEntity;
         public short level = 1;
         public short amount = 1;
@@ -29,8 +27,6 @@ namespace MultiplayerARPG
 
         public void RegisterAssets()
         {
-            if (database != null)
-                monsterCharacterEntity = database.entityPrefab as BaseMonsterCharacterEntity;
             if (monsterCharacterEntity != null)
                 CacheGameNetworkManager.Assets.RegisterPrefab(monsterCharacterEntity.Identity);
         }
