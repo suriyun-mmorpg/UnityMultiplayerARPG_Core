@@ -256,7 +256,7 @@ public static partial class PlayerCharacterDataExtension
         character.RespawnMapName = startMap.scene.SceneName;
         character.CurrentPosition = startMap.startPosition;
         character.RespawnPosition = startMap.startPosition;
-        DevExtUtils.InvokeStaticDevExtMethods(ClassType, "SetNewCharacterData", character, characterName, dataId);
+        DevExtUtils.InvokeStaticDevExtMethods(ClassType, "SetNewCharacterData", character, characterName, dataId, entityId);
         return character;
     }
 
