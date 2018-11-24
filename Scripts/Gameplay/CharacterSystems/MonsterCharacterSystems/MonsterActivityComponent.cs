@@ -216,6 +216,7 @@ namespace MultiplayerARPG
         {
             // If it's aggressive character, finding attacking target
             if (monsterDatabase.characteristic != MonsterCharacteristic.Aggressive ||
+                CacheMonsterCharacterEntity.summoner != null ||
                 time < findTargetTime)
                 return;
 
