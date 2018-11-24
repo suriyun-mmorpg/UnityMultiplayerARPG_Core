@@ -60,11 +60,11 @@ namespace MultiplayerARPG
                 if (summoner != null)
                 {
                     // Teleport to summoner
-                    if (Vector3.Distance(CacheTransform.position, summoner.CacheTransform.position) > GameInstance.teleportToSummonerDistance)
+                    if (Vector3.Distance(CacheTransform.position, summoner.CacheTransform.position) > GameInstance.maxFollowSummonerDistance)
                     {
                         var randomPosition = summoner.CacheTransform.position;
-                        randomPosition += Vector3.right * Random.Range(-GameInstance.followSummonerDistance, GameInstance.followSummonerDistance);
-                        randomPosition += Vector3.forward * Random.Range(-GameInstance.followSummonerDistance, GameInstance.followSummonerDistance);
+                        randomPosition += Vector3.right * Random.Range(-GameInstance.minFollowSummonerDistance, GameInstance.minFollowSummonerDistance);
+                        randomPosition += Vector3.forward * Random.Range(-GameInstance.minFollowSummonerDistance, GameInstance.minFollowSummonerDistance);
                         var randomRotation = Quaternion.Euler(Vector3.up * Random.Range(0f, 360f));
                         CacheNetTransform.Teleport(randomPosition, randomRotation);
                     }

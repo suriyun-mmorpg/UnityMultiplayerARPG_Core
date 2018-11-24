@@ -100,9 +100,9 @@ namespace MultiplayerARPG
         [Tooltip("Distance to warn character that ally being attacked")]
         public float enemySpottedNotifyDistance = 5f;
         [Tooltip("Min distance to summoner to start follow summoner")]
-        public float followSummonerDistance = 5f;
-        [Tooltip("Min distance to summoner to start teleport to summoner")]
-        public float teleportToSummonerDistance = 10f;
+        public float minFollowSummonerDistance = 5f;
+        [Tooltip("Max distance to summoner to follow summoner, if distance between characters more than this it will teleport to summoner")]
+        public float maxFollowSummonerDistance = 10f;
 
         [Header("Game Effects")]
         public GameEffect levelUpEffect;
