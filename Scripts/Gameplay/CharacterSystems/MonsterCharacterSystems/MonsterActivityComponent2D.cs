@@ -265,7 +265,8 @@ namespace MultiplayerARPG
             // If stopped then random
             var randomX = Random.Range(randomWanderAreaMin, randomWanderAreaMax) * (Random.value > 0.5f ? -1 : 1);
             var randomY = Random.Range(randomWanderAreaMin, randomWanderAreaMax) * (Random.value > 0.5f ? -1 : 1);
-            var randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(randomX, randomY);
+            var randomPosition = CacheMonsterCharacterEntity.summoner != null ? CacheMonsterCharacterEntity.summoner.CacheTransform.position : CacheMonsterCharacterEntity.spawnPosition;
+            randomPosition += new Vector3(randomX, randomY);
             CacheMonsterCharacterEntity.SetTargetEntity(null);
             SetWanderDestination(time, randomPosition);
         }
@@ -273,29 +274,29 @@ namespace MultiplayerARPG
         public void AggressiveFindTarget(float time, Vector3 currentPosition)
         {
             // If it's aggressive character, finding attacking target
-            if (monsterDatabase.characteristic == MonsterCharacteristic.Aggressive &&
-                time >= findTargetTime)
+            if (monsterDatabase.characteristic != MonsterCharacteristic.Aggressive ||
+                time < findTargetTime)
+                return;
+
+            SetFindTargetTime(time);
+            BaseCharacterEntity targetCharacter;
+            // If no target enenmy or target enemy is dead
+            if (!CacheMonsterCharacterEntity.TryGetTargetEntity(out targetCharacter) || targetCharacter.IsDead())
             {
-                SetFindTargetTime(time);
-                BaseCharacterEntity targetCharacter;
-                // If no target enenmy or target enemy is dead
-                if (!CacheMonsterCharacterEntity.TryGetTargetEntity(out targetCharacter) || targetCharacter.IsDead())
+                // Find nearby character by layer mask
+                var foundObjects = new List<Collider2D>(Physics2D.OverlapCircleAll(currentPosition, monsterDatabase.visualRange, gameInstance.characterLayer.Mask));
+                foundObjects = foundObjects.OrderBy(a => System.Guid.NewGuid()).ToList();
+                foreach (var foundObject in foundObjects)
                 {
-                    // Find nearby character by layer mask
-                    var foundObjects = new List<Collider2D>(Physics2D.OverlapCircleAll(currentPosition, monsterDatabase.visualRange, gameInstance.characterLayer.Mask));
-                    foundObjects = foundObjects.OrderBy(a => System.Guid.NewGuid()).ToList();
-                    foreach (var foundObject in foundObjects)
+                    var characterEntity = foundObject.GetComponent<BaseCharacterEntity>();
+                    // Attack target settings
+                    if (characterEntity != null &&
+                        CacheMonsterCharacterEntity.IsEnemy(characterEntity) &&
+                        characterEntity.CanReceiveDamageFrom(CacheMonsterCharacterEntity))
                     {
-                        var characterEntity = foundObject.GetComponent<BaseCharacterEntity>();
-                        // Attack target settings
-                        if (characterEntity != null &&
-                            CacheMonsterCharacterEntity.IsEnemy(characterEntity) &&
-                            characterEntity.CanReceiveDamageFrom(CacheMonsterCharacterEntity))
-                        {
-                            SetStartFollowTargetTime(time);
-                            CacheMonsterCharacterEntity.SetAttackTarget(characterEntity);
-                            return;
-                        }
+                        SetStartFollowTargetTime(time);
+                        CacheMonsterCharacterEntity.SetAttackTarget(characterEntity);
+                        return;
                     }
                 }
             }

@@ -38,6 +38,7 @@ namespace MultiplayerARPG
         public MonsterSpawnArea spawnArea { get; private set; }
         public Vector3 spawnPosition { get; private set; }
         public BaseCharacterEntity summoner { get; protected set; }
+        public bool isSummoned { get; protected set; }
 
         protected override void EntityAwake()
         {
@@ -49,6 +50,32 @@ namespace MultiplayerARPG
         {
             base.EntityStart();
             InitStats();
+        }
+
+        protected override void EntityUpdate()
+        {
+            base.EntityUpdate();
+            if (isSummoned)
+            {
+                if (summoner != null)
+                {
+                    // Teleport to summoner
+                    if (Vector3.Distance(CacheTransform.position, summoner.CacheTransform.position) > GameInstance.teleportToSummonerDistance)
+                    {
+                        var randomPosition = summoner.CacheTransform.position;
+                        randomPosition += Vector3.right * Random.Range(-GameInstance.followSummonerDistance, GameInstance.followSummonerDistance);
+                        randomPosition += Vector3.forward * Random.Range(-GameInstance.followSummonerDistance, GameInstance.followSummonerDistance);
+                        var randomRotation = Quaternion.Euler(Vector3.up * Random.Range(0f, 360f));
+                        CacheNetTransform.Teleport(randomPosition, randomRotation);
+                    }
+                }
+                else
+                {
+                    // If summoner is empty destroy this
+                    // TODO: May play teleport effects
+                    NetworkDestroy();
+                }
+            }
         }
 
 #if UNITY_EDITOR
@@ -141,7 +168,7 @@ namespace MultiplayerARPG
                 return false;
             // If spawn by another character, will have same allies with spawner
             if (summoner != null)
-                return characterEntity == summoner || summoner.IsAlly(characterEntity);
+                return characterEntity == summoner;
             // If this character have been attacked by any character
             // It will tell another ally nearby to help
             var monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
@@ -173,20 +200,11 @@ namespace MultiplayerARPG
             // If character is not dead, try to attack
             if (!IsDead())
             {
-                // If no target enemy and current target is character, try to attack
                 BaseCharacterEntity targetEntity;
                 if (!TryGetTargetEntity(out targetEntity))
                 {
+                    // If no target enemy, set target enemy as attacker
                     SetAttackTarget(attacker);
-                    // If it's assist character call another character for assist
-                    if (MonsterDatabase.characteristic == MonsterCharacteristic.Assist)
-                    {
-                        var foundCharacters = FindAliveCharacters<BaseMonsterCharacterEntity>(MonsterDatabase.visualRange, true, false, false);
-                        foreach (var character in foundCharacters)
-                        {
-                            character.SetAttackTarget(attacker);
-                        }
-                    }
                 }
                 else if (attacker != targetEntity && Random.value >= 0.5f)
                 {
@@ -400,6 +418,7 @@ namespace MultiplayerARPG
         public void Summon(BaseCharacterEntity summoner)
         {
             this.summoner = summoner;
+            isSummoned = true;
             if (summoner != null && !summoner.SummonEntityIds.Contains(ObjectId))
                 summoner.SummonEntityIds.Add(ObjectId);
         }
@@ -407,8 +426,15 @@ namespace MultiplayerARPG
         public void SummonAsPet(BaseCharacterEntity summoner)
         {
             this.summoner = summoner;
+            isSummoned = true;
             if (summoner != null)
                 summoner.PetEntityId = ObjectId;
+        }
+
+        public override void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker)
+        {
+            if ((summoner != null && summoner == ally) || MonsterDatabase.characteristic == MonsterCharacteristic.Assist)
+                SetAttackTarget(attacker);
         }
 
         public abstract void StopMove();

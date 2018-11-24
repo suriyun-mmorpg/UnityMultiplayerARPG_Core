@@ -316,6 +316,13 @@ namespace MultiplayerARPG
                 return;
 
             base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
+
+            // Notify enemy spotted when received damage from enemy
+            NotifyEnemySpottedToAllies(attacker);
+
+            // Notify enemy spotted when damage taken to enemy
+            attacker.NotifyEnemySpottedToAllies(this);
+
             // Calculate chance to hit
             var hitChance = GameInstance.GameplayRule.GetHitChance(attacker, this);
             // If miss, return don't calculate damages
@@ -324,6 +331,7 @@ namespace MultiplayerARPG
                 ReceivedDamage(attacker, CombatAmountType.Miss, 0);
                 return;
             }
+
             // Calculate damages
             var calculatingTotalDamage = 0f;
             if (allDamageAmounts.Count > 0)
@@ -340,27 +348,31 @@ namespace MultiplayerARPG
                         calculatingTotalDamage += receivingDamage;
                 }
             }
+
             // Play hit effect
             if (hitEffectsId == 0)
                 hitEffectsId = GameInstance.DefaultHitEffects.Id;
             if (hitEffectsId > 0)
                 RequestPlayEffect(hitEffectsId);
+
             // Calculate chance to critical
             var criticalChance = GameInstance.GameplayRule.GetCriticalChance(attacker, this);
             var isCritical = Random.value <= criticalChance;
             // If critical occurs
             if (isCritical)
                 calculatingTotalDamage = GameInstance.GameplayRule.GetCriticalDamage(attacker, this, calculatingTotalDamage);
+
             // Calculate chance to block
             var blockChance = GameInstance.GameplayRule.GetBlockChance(attacker, this);
             var isBlocked = Random.value <= blockChance;
             // If block occurs
             if (isBlocked)
                 calculatingTotalDamage = GameInstance.GameplayRule.GetBlockDamage(attacker, this, calculatingTotalDamage);
+
             // Apply damages
             var totalDamage = (int)calculatingTotalDamage;
             CurrentHp -= totalDamage;
-
+            
             if (isBlocked)
                 ReceivedDamage(attacker, CombatAmountType.BlockedDamage, totalDamage);
             else if (isCritical)
@@ -373,9 +385,16 @@ namespace MultiplayerARPG
 
             // If current hp <= 0, character dead
             if (IsDead())
+            {
+                // Call killed function, this should be called only once when dead
                 Killed(attacker);
-            else if (!debuff.IsEmpty())
-                ApplyBuff(debuff.dataId, debuff.type, debuff.level);
+            }
+            else
+            {
+                // Apply debuff if character is not dead
+                if (!debuff.IsEmpty())
+                    ApplyBuff(debuff.dataId, debuff.type, debuff.level);
+            }
         }
         #endregion
 
@@ -999,6 +1018,17 @@ namespace MultiplayerARPG
                 (findForNeutral && characterEntity.IsNeutral(this));
         }
 
+        private void NotifyEnemySpottedToAllies(BaseCharacterEntity enemy)
+        {
+            // Warn that this character received damage to nearby characters
+            var foundCharacters = FindAliveCharacters<BaseCharacterEntity>(GameInstance.enemySpottedNotifyDistance, true, false, false);
+            foreach (var foundCharacter in foundCharacters)
+            {
+                foundCharacter.NotifyEnemySpotted(this, enemy);
+            }
+        }
+
+        public abstract void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker);
         public abstract bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity);
         public abstract bool IsAlly(BaseCharacterEntity characterEntity);
         public abstract bool IsEnemy(BaseCharacterEntity characterEntity);

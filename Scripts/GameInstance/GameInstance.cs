@@ -96,6 +96,14 @@ namespace MultiplayerARPG
         [Tooltip("This is a distance that allows a player to builds an building")]
         public float buildDistance = 10f;
 
+        [Header("Gameplay Configs - Summon Monster")]
+        [Tooltip("Distance to warn character that ally being attacked")]
+        public float enemySpottedNotifyDistance = 5f;
+        [Tooltip("Min distance to summoner to start follow summoner")]
+        public float followSummonerDistance = 5f;
+        [Tooltip("Min distance to summoner to start teleport to summoner")]
+        public float teleportToSummonerDistance = 10f;
+
         [Header("Game Effects")]
         public GameEffect levelUpEffect;
 

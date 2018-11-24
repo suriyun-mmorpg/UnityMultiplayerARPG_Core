@@ -238,6 +238,11 @@ namespace MultiplayerARPG
             return base.CanMoveOrDoActions() && DealingState == DealingState.None;
         }
 
+        public override void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker)
+        {
+            // TODO: May send data to client
+        }
+
         public abstract float StoppingDistance { get; }
         public abstract void StopMove();
         public abstract void KeyMovement(Vector3 direction, bool isJump);
