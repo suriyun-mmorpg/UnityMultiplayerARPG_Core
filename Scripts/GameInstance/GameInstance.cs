@@ -99,9 +99,9 @@ namespace MultiplayerARPG
         [Header("Gameplay Configs - Summon Monster")]
         [Tooltip("Distance to warn character that ally being attacked")]
         public float enemySpottedNotifyDistance = 5f;
-        [Tooltip("Min distance to summoner to start follow summoner")]
+        [Tooltip("Min distance to follow summoner")]
         public float minFollowSummonerDistance = 5f;
-        [Tooltip("Max distance to summoner to follow summoner, if distance between characters more than this it will teleport to summoner")]
+        [Tooltip("Max distance to follow summoner, if distance between characters more than this it will teleport to summoner")]
         public float maxFollowSummonerDistance = 10f;
 
         [Header("Game Effects")]

@@ -163,6 +163,12 @@ namespace MultiplayerARPG
         
         public void UpdateAttackTarget(float time, Vector3 currentPosition, BaseCharacterEntity targetEntity)
         {
+            if (CacheMonsterCharacterEntity.summoner != null &&
+                Vector3.Distance(currentPosition, CacheMonsterCharacterEntity.summoner.CacheTransform.position) > gameInstance.minFollowSummonerDistance)
+            {
+                RandomWanderTarget(time);
+                return;
+            }
             // If it has target then go to target
             var targetEntityPosition = targetEntity.CacheTransform.position;
             var attackDistance = CacheMonsterCharacterEntity.GetAttackDistance();

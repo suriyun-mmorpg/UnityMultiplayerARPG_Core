@@ -272,7 +272,10 @@ namespace MultiplayerARPG
             if (IsDead())
             {
                 CurrentHp = 0;
-                DestroyAndRespawn();
+                if (summoner != null)
+                    NetworkDestroy(MonsterDatabase.deadHideDelay);
+                else
+                    DestroyAndRespawn();
             }
         }
 
@@ -415,17 +418,29 @@ namespace MultiplayerARPG
             Manager.Assets.NetworkSpawn(Identity.HashAssetId, spawnPosition, Quaternion.Euler(Vector3.up * Random.Range(0, 360)), Identity.ObjectId, Identity.ConnectionId);
         }
 
-        public void Summon(BaseCharacterEntity summoner)
+        public void Summon(BaseCharacterEntity summoner, short level, int exp, int currentHp, int currentMp, int currentFood, int currentMana)
         {
             this.summoner = summoner;
+            Level = level;
+            Exp = exp;
+            CurrentHp = currentHp;
+            CurrentMp = currentMp;
+            CurrentFood = currentFood;
+            CurrentWater = currentWater;
             isSummoned = true;
             if (summoner != null && !summoner.SummonEntityIds.Contains(ObjectId))
                 summoner.SummonEntityIds.Add(ObjectId);
         }
 
-        public void SummonAsPet(BaseCharacterEntity summoner)
+        public void SummonAsPet(BaseCharacterEntity summoner, short level, int exp, int currentHp, int currentMp, int currentFood, int currentMana)
         {
             this.summoner = summoner;
+            Level = level;
+            Exp = exp;
+            CurrentHp = currentHp;
+            CurrentMp = currentMp;
+            CurrentFood = currentFood;
+            CurrentWater = currentWater;
             isSummoned = true;
             if (summoner != null)
                 summoner.PetEntityId = ObjectId;
