@@ -256,19 +256,22 @@ namespace MultiplayerARPG
         public override void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountType damageAmountType, int damage)
         {
             base.ReceivedDamage(attacker, damageAmountType, damage);
+
             // Add received damage entry
             if (attacker == null)
-                return;
-            var receivedDamageRecord = new ReceivedDamageRecord();
-            receivedDamageRecord.totalReceivedDamage = damage;
-            if (receivedDamageRecords.ContainsKey(attacker))
             {
-                receivedDamageRecord = receivedDamageRecords[attacker];
-                receivedDamageRecord.totalReceivedDamage += damage;
+                var receivedDamageRecord = new ReceivedDamageRecord();
+                receivedDamageRecord.totalReceivedDamage = damage;
+                if (receivedDamageRecords.ContainsKey(attacker))
+                {
+                    receivedDamageRecord = receivedDamageRecords[attacker];
+                    receivedDamageRecord.totalReceivedDamage += damage;
+                }
+                receivedDamageRecord.lastReceivedDamageTime = Time.unscaledTime;
+                receivedDamageRecords[attacker] = receivedDamageRecord;
             }
-            receivedDamageRecord.lastReceivedDamageTime = Time.unscaledTime;
-            receivedDamageRecords[attacker] = receivedDamageRecord;
 
+            // If dead destroy / respawn
             if (IsDead())
             {
                 CurrentHp = 0;
