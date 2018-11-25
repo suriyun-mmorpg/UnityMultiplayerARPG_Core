@@ -152,28 +152,35 @@ namespace MultiplayerARPG
 
         public override bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity)
         {
-            // For now it can receive damage from players only
             if (characterEntity == null)
                 return false;
+
             if (isInSafeArea || characterEntity.isInSafeArea)
+            {
+                // If this character or another character is in safe area so it cannot receive damage
                 return false;
-            if (!IsAlly(characterEntity))
-                return true;
-            return false;
+            }
+            // If another character is not ally assume that it can receive damage
+            return !IsAlly(characterEntity);
         }
 
         public override bool IsAlly(BaseCharacterEntity characterEntity)
         {
             if (characterEntity == null)
                 return false;
-            // If spawn by another character, will have same allies with spawner
+
             if (summoner != null)
-                return characterEntity == summoner;
-            // If this character have been attacked by any character
-            // It will tell another ally nearby to help
-            var monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
-            if (monsterCharacterEntity != null)
-                return monsterCharacterEntity.MonsterDatabase.allyId == MonsterDatabase.allyId;
+            {
+                // If spawn by another character, will have same allies with spawner
+                return characterEntity == summoner || summoner.IsAlly(characterEntity);
+            }
+            if (characterEntity is BaseMonsterCharacterEntity)
+            {
+                // If another monster has same allyId so it is ally
+                var monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
+                if (monsterCharacterEntity != null)
+                    return monsterCharacterEntity.MonsterDatabase.allyId == MonsterDatabase.allyId;
+            }
             return false;
         }
 
@@ -181,9 +188,12 @@ namespace MultiplayerARPG
         {
             if (characterEntity == null)
                 return false;
-            // If spawn by another character, will have same enemies with spawner
+
             if (summoner != null)
+            {
+                // If spawn by another character, will have same enemies with spawner
                 return characterEntity != summoner && summoner.IsEnemy(characterEntity);
+            }
             // Attack only player by default
             return characterEntity is BasePlayerCharacterEntity;
         }

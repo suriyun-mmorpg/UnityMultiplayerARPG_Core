@@ -98,22 +98,43 @@ namespace MultiplayerARPG
         {
             if (characterEntity == null)
                 return false;
+
             if (isInSafeArea || characterEntity.isInSafeArea)
+            {
+                // If this character or another character is in safe area so it cannot receive damage
                 return false;
-            if (characterEntity is MonsterCharacterEntity)
-                return true;
-            // If not ally while this is Pvp map, assume that it can receive damage
-            if (!IsAlly(characterEntity) && GameManager.CurrentMapInfo.canPvp)
-                return true;
+            }
+            if (characterEntity is BasePlayerCharacterEntity)
+            {
+                // If not ally while this is Pvp map, assume that it can receive damage
+                if (!IsAlly(characterEntity) && GameManager.CurrentMapInfo.canPvp)
+                    return true;
+            }
+            if (characterEntity is BaseMonsterCharacterEntity)
+            {
+                // If this character is not summoner so it is enemy and also can receive damage
+                return !IsAlly(characterEntity);
+            }
             return false;
         }
 
         public override bool IsAlly(BaseCharacterEntity characterEntity)
         {
+            if (characterEntity == null)
+                return false;
+
             if (characterEntity is BasePlayerCharacterEntity)
             {
+                // If this character is in same party or guild with another character so it is ally
                 var playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
-                return playerCharacterEntity.PartyId == PartyId || playerCharacterEntity.GuildId == GuildId;
+                return (PartyId > 0 && PartyId == playerCharacterEntity.PartyId) ||
+                    (GuildId > 0 && GuildId == playerCharacterEntity.GuildId);
+            }
+            if (characterEntity is BaseMonsterCharacterEntity)
+            {
+                // If this character is summoner so it is ally
+                var monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
+                return monsterCharacterEntity.summoner != null && monsterCharacterEntity.summoner == this;
             }
             return false;
         }
@@ -122,11 +143,20 @@ namespace MultiplayerARPG
         {
             if (characterEntity == null)
                 return false;
+
+            if (characterEntity is BasePlayerCharacterEntity)
+            {
+                // If not ally while this is Pvp map, assume that it is enemy while both characters are not in safe zone
+                if (!IsAlly(characterEntity) && GameManager.CurrentMapInfo.canPvp)
+                    return !isInSafeArea && !characterEntity.isInSafeArea;
+            }
             if (characterEntity is BaseMonsterCharacterEntity)
-                return true;
-            // If character can receive damage from another character, assume that another character is enemy
-            // So if this character and another character is in safe area or not ally while this map is pvp map then they are enemy
-            return CanReceiveDamageFrom(characterEntity);
+            {
+                // If this character is not summoner so it is enemy
+                var monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
+                return monsterCharacterEntity.summoner == null || monsterCharacterEntity.summoner != this;
+            }
+            return false;
         }
 
         public override void Killed(BaseCharacterEntity lastAttacker)
