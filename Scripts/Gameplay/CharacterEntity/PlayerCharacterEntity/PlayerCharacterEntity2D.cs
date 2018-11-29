@@ -32,9 +32,6 @@ namespace MultiplayerARPG
         protected DirectionType localDirectionType = DirectionType.Down;
         #endregion
 
-        public Vector2 moveDirection { get; protected set; }
-        private Vector2 lastMoveDirection;
-
         public override float StoppingDistance
         {
             get { return stoppingDistance; }
@@ -60,6 +57,12 @@ namespace MultiplayerARPG
                 return (DirectionType)currentDirectionType.Value;
             }
         }
+
+        private float tempMoveDirectionMagnitude;
+        private Vector2 tempInputDirection;
+        private Vector2 tempMoveDirection;
+        private Vector2 tempCurrentPosition;
+        private Vector2 tempTargetDirection;
 
         protected override void EntityAwake()
         {
@@ -93,31 +96,43 @@ namespace MultiplayerARPG
             if (movementSecure == MovementSecure.NotSecure && !IsOwnerClient)
                 return;
 
+            tempMoveDirection = Vector2.zero;
+
             if (currentDestination.HasValue)
             {
-                var currentPosition = new Vector2(CacheTransform.position.x, CacheTransform.position.y);
-                moveDirection = (currentDestination.Value - currentPosition).normalized;
-                if (Vector3.Distance(currentDestination.Value, currentPosition) < StoppingDistance)
+                tempCurrentPosition = new Vector2(CacheTransform.position.x, CacheTransform.position.y);
+                tempMoveDirection = (currentDestination.Value - tempCurrentPosition).normalized;
+                if (Vector2.Distance(currentDestination.Value, tempCurrentPosition) < StoppingDistance)
                     StopMove();
             }
 
             if (!IsDead())
             {
-                var moveDirectionMagnitude = moveDirection.magnitude;
-                if (!IsPlayingActionAnimation() && moveDirectionMagnitude != 0)
+                // If move by WASD keys, set move direction to input direction
+                if (tempInputDirection.magnitude != 0f)
+                    tempMoveDirection = tempInputDirection;
+
+                tempMoveDirectionMagnitude = tempMoveDirection.magnitude;
+                if (!IsPlayingActionAnimation() && tempMoveDirectionMagnitude != 0f)
                 {
-                    if (moveDirectionMagnitude > 1)
-                        moveDirection = moveDirection.normalized;
-                    UpdateCurrentDirection(moveDirection);
-                    CacheRigidbody2D.velocity = moveDirection * CacheMoveSpeed;
+                    if (tempMoveDirectionMagnitude > 1)
+                        tempMoveDirection = tempMoveDirection.normalized;
+
+                    UpdateCurrentDirection(tempMoveDirection);
+                    CacheRigidbody2D.velocity = tempMoveDirection * CacheMoveSpeed;
+                }
+                else
+                {
+                    // Stop movement
+                    CacheRigidbody2D.velocity = new Vector2(0, 0);
                 }
 
                 BaseGameEntity tempEntity;
-                if (moveDirectionMagnitude == 0 && TryGetTargetEntity(out tempEntity))
+                if (tempMoveDirectionMagnitude == 0f && TryGetTargetEntity(out tempEntity))
                 {
-                    var targetDirection = (tempEntity.CacheTransform.position - CacheTransform.position).normalized;
-                    if (targetDirection.magnitude != 0f)
-                        UpdateCurrentDirection(targetDirection);
+                    tempTargetDirection = (tempEntity.CacheTransform.position - CacheTransform.position).normalized;
+                    if (tempTargetDirection.magnitude != 0f)
+                        UpdateCurrentDirection(tempTargetDirection);
                 }
             }
             Profiler.EndSample();
@@ -166,12 +181,9 @@ namespace MultiplayerARPG
             if (IsDead())
                 return;
             // Devide inputs to float value
-            var direction = new Vector3((float)horizontalInput / 100f, (float)verticalInput / 100f);
-            if (direction.magnitude > 0)
-            {
-                currentDestination = CacheTransform.position + direction;
+            tempInputDirection = new Vector2((float)horizontalInput / 100f, (float)verticalInput / 100f);
+            if (tempInputDirection.magnitude != 0)
                 currentNpcDialog = null;
-            }
         }
 
         protected void NetFuncSetTargetEntity(uint objectId)
@@ -216,8 +228,7 @@ namespace MultiplayerARPG
                     CallNetFunction("KeyMovement", FunctionReceivers.Server, (sbyte)(direction.x * 100), (sbyte)(direction.y * 100));
                     break;
                 case MovementSecure.NotSecure:
-                    if (direction.magnitude > 0)
-                        currentDestination = CacheTransform.position + direction;
+                    tempInputDirection = direction;
                     break;
             }
         }
@@ -225,7 +236,7 @@ namespace MultiplayerARPG
         public override void StopMove()
         {
             currentDestination = null;
-            moveDirection = Vector3.zero;
+            tempMoveDirection = Vector3.zero;
             CacheRigidbody2D.velocity = Vector2.zero;
             if (IsOwnerClient && !IsServer)
                 CallNetFunction("StopMove", FunctionReceivers.Server);

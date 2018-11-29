@@ -219,7 +219,7 @@ namespace MultiplayerARPG
                 (controllerMode == PlayerCharacterControllerMode.WASD && wasdLockAttackTarget);
         }
 
-        public Vector3 GetMovePosition(float horizontalInput, float verticalInput)
+        public Vector3 GetMoveDirection(float horizontalInput, float verticalInput)
         {
             var moveDirection = Vector3.zero;
             switch (dimensionType)

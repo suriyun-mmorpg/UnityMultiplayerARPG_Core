@@ -208,10 +208,10 @@ namespace MultiplayerARPG
                 return;
             }
 
-            var moveDirection = GetMovePosition(InputManager.GetAxis("Horizontal", false), InputManager.GetAxis("Vertical", false));
+            var moveDirection = GetMoveDirection(InputManager.GetAxis("Horizontal", true), InputManager.GetAxis("Vertical", true));
             moveDirection = moveDirection.normalized;
 
-            if (moveDirection.magnitude > 0.1f)
+            if (moveDirection.magnitude != 0f)
             {
                 if (CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
                     CacheUISceneGameplay.uiNpcDialog.Hide();
@@ -267,7 +267,7 @@ namespace MultiplayerARPG
             // Move
             else
             {
-                if (moveDirection.magnitude > 0)
+                if (moveDirection.magnitude != 0f)
                 {
                     PlayerCharacterEntity.StopMove();
                     destination = null;
