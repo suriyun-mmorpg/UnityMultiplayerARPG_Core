@@ -94,6 +94,34 @@ namespace MultiplayerARPG
             }
         }
 
+        protected virtual void Clean()
+        {
+            playerCharacters.Clear();
+            playerCharactersById.Clear();
+            buildingEntities.Clear();
+            connectionIdsByCharacterName.Clear();
+            parties.Clear();
+            guilds.Clear();
+            updatingPartyMembers.Clear();
+            updatingGuildMembers.Clear();
+            ClientParty = null;
+            ClientGuild = null;
+            CurrentMapInfo = null;
+        }
+
+        public override void OnStopServer()
+        {
+            Clean();
+            base.OnStopServer();
+        }
+
+        public override void OnStopClient()
+        {
+            if (!IsServer)
+                Clean();
+            base.OnStopClient();
+        }
+
         protected virtual void UpdateOnlineCharacter(long connectionId, BasePlayerCharacterEntity playerCharacterEntity, float time)
         {
             PartyData tempParty;
