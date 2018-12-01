@@ -131,18 +131,18 @@ namespace MultiplayerARPG
             // Save building entities / Tree / Rocks
             var playerCharacterEntity = BasePlayerCharacterController.OwningCharacter;
             var worldSaveData = new WorldSaveData();
-            foreach (var building in buildingEntities.Values)
+            foreach (var buildingEntity in buildingEntities.Values)
             {
                 worldSaveData.buildings.Add(new BuildingSaveData()
                 {
-                    Id = building.Id,
-                    ParentId = building.ParentId,
-                    DataId = building.DataId,
-                    Position = building.Position,
-                    Rotation = building.Rotation,
-                    CurrentHp = building.CurrentHp,
-                    CreatorId = building.CreatorId,
-                    CreatorName = building.CreatorName,
+                    Id = buildingEntity.Id,
+                    ParentId = buildingEntity.ParentId,
+                    DataId = buildingEntity.DataId,
+                    Position = buildingEntity.Position,
+                    Rotation = buildingEntity.Rotation,
+                    CurrentHp = buildingEntity.CurrentHp,
+                    CreatorId = buildingEntity.CreatorId,
+                    CreatorName = buildingEntity.CreatorName,
                 });
             }
             worldSaveData.SavePersistentWorldData(playerCharacterEntity.Id, playerCharacterEntity.CurrentMapName);
