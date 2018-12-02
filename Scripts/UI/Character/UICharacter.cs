@@ -32,8 +32,8 @@ namespace MultiplayerARPG
         public string skillPointFormat = "Skill Points: {0}";
         [Tooltip("Gold Format => {0} = {Gold}")]
         public string goldFormat = "Gold: {0}";
-        [Tooltip("Weight Limit Stats Format => {0} = {Weight Limit}")]
-        public string weightLimitStatsFormat = "Weight Limit: {0}";
+        [Tooltip("Weight Limit Stats Format => {0} = {Current Total Weight}, {1} = {Weight Limit}")]
+        public string weightLimitStatsFormat = "Weight: {0}/{1}";
         [Tooltip("Weapon Damage => {0} = {Min damage}, {1} = {Max damage}")]
         public string weaponDamageFormat = "{0}~{1}";
 
