@@ -16,35 +16,25 @@ public class EquipWeapons : INetSerializable
     public void Serialize(NetDataWriter writer)
     {
         // Right hand
-        writer.Put(rightHand.dataId);
-        writer.Put(rightHand.level);
-        writer.Put(rightHand.amount);
-        writer.Put(rightHand.durability);
+        writer.PutValue(rightHand);
         // Left hand
-        writer.Put(leftHand.dataId);
-        writer.Put(leftHand.level);
-        writer.Put(leftHand.amount);
-        writer.Put(leftHand.durability);
+        writer.PutValue(leftHand);
     }
 
     public void Deserialize(NetDataReader reader)
     {
         // Right hand
-        rightHand = new CharacterItem();
-        rightHand.dataId = reader.GetInt();
-        rightHand.level = reader.GetShort();
-        rightHand.amount = reader.GetShort();
-        rightHand.durability = reader.GetFloat();
+        rightHand = (CharacterItem)reader.GetValue(typeof(CharacterItem));
         // Left hand
-        leftHand = new CharacterItem();
-        leftHand.dataId = reader.GetInt();
-        leftHand.level = reader.GetShort();
-        leftHand.amount = reader.GetShort();
-        leftHand.durability = reader.GetFloat();
+        leftHand = (CharacterItem)reader.GetValue(typeof(CharacterItem));
     }
 }
 
 [System.Serializable]
 public class SyncFieldEquipWeapons : LiteNetLibSyncField<EquipWeapons>
 {
+    protected override bool IsValueChanged(EquipWeapons newValue)
+    {
+        return true;
+    }
 }
