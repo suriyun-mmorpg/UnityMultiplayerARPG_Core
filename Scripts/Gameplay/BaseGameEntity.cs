@@ -143,7 +143,7 @@ namespace MultiplayerARPG
             syncTitle.onChange += OnSyncTitleChange;
             if (IsServer)
                 syncTitle.Value = title;
-            RegisterNetFunction("PlayEffect", new LiteNetLibFunction<NetFieldPackedUInt>((effectId) => NetFuncPlayEffect(effectId)));
+            RegisterNetFunction<uint>(NetFuncPlayEffect);
         }
 
         protected virtual void SetupNetElements()
@@ -172,7 +172,7 @@ namespace MultiplayerARPG
         {
             if (effectId <= 0)
                 return;
-            CallNetFunction("PlayEffect", FunctionReceivers.All, effectId);
+            CallNetFunction(NetFuncPlayEffect, FunctionReceivers.All, effectId);
         }
         #endregion
 

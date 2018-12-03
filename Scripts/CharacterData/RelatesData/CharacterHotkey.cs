@@ -10,7 +10,7 @@ public enum HotkeyType : byte
 }
 
 [System.Serializable]
-public class CharacterHotkey
+public class CharacterHotkey : INetSerializable
 {
     public static readonly CharacterHotkey Empty = new CharacterHotkey();
     public string hotkeyId;
@@ -57,33 +57,23 @@ public class CharacterHotkey
         MakeCache();
         return cacheItem;
     }
-}
 
-public class NetFieldCharacterHotkey : LiteNetLibNetField<CharacterHotkey>
-{
-    public override void Deserialize(NetDataReader reader)
+    public void Serialize(NetDataWriter writer)
     {
-        var newValue = new CharacterHotkey();
-        newValue.hotkeyId = reader.GetString();
-        newValue.type = (HotkeyType)reader.GetByte();
-        newValue.dataId = reader.GetInt();
-        Value = newValue;
+        writer.Put(hotkeyId);
+        writer.Put((byte)type);
+        writer.Put(dataId);
     }
 
-    public override void Serialize(NetDataWriter writer)
+    public void Deserialize(NetDataReader reader)
     {
-        writer.Put(Value.hotkeyId);
-        writer.Put((byte)Value.type);
-        writer.Put(Value.dataId);
-    }
-
-    public override bool IsValueChanged(CharacterHotkey newValue)
-    {
-        return true;
+        hotkeyId = reader.GetString();
+        type = (HotkeyType)reader.GetByte();
+        dataId = reader.GetInt();
     }
 }
 
 [System.Serializable]
-public class SyncListCharacterHotkey : LiteNetLibSyncList<NetFieldCharacterHotkey, CharacterHotkey>
+public class SyncListCharacterHotkey : LiteNetLibSyncList<CharacterHotkey>
 {
 }

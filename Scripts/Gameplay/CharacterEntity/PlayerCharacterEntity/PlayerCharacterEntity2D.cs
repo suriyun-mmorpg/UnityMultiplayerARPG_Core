@@ -161,11 +161,11 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
             // Register Network functions
-            RegisterNetFunction("PointClickMovement", new LiteNetLibFunction<NetFieldVector3>((position) => NetFuncPointClickMovement(position)));
-            RegisterNetFunction("KeyMovement", new LiteNetLibFunction<NetFieldSByte, NetFieldSByte>((horizontalInput, verticalInput) => NetFuncKeyMovement(horizontalInput, verticalInput)));
-            RegisterNetFunction("StopMove", new LiteNetLibFunction(StopMove));
-            RegisterNetFunction("SetTargetEntity", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncSetTargetEntity(objectId)));
-            RegisterNetFunction("SetCurrentDirectionType", new LiteNetLibFunction<NetFieldByte>((byteDirectionType) => NetFuncSetByteDirectionType(byteDirectionType)));
+            RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
+            RegisterNetFunction<sbyte, sbyte>(NetFuncKeyMovement);
+            RegisterNetFunction(StopMove);
+            RegisterNetFunction<uint>(NetFuncSetTargetEntity);
+            RegisterNetFunction<byte>(NetFuncSetByteDirectionType);
         }
 
         protected void NetFuncPointClickMovement(Vector3 position)
@@ -208,7 +208,7 @@ namespace MultiplayerARPG
             switch (movementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
-                    CallNetFunction("PointClickMovement", FunctionReceivers.Server, position);
+                    CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
                     break;
                 case MovementSecure.NotSecure:
                     currentDestination = position;
@@ -225,7 +225,7 @@ namespace MultiplayerARPG
                 case MovementSecure.ServerAuthoritative:
                     // Multiply with 100 and cast to sbyte to reduce packet size
                     // then it will be devided with 100 later on server side
-                    CallNetFunction("KeyMovement", FunctionReceivers.Server, (sbyte)(direction.x * 100), (sbyte)(direction.y * 100));
+                    CallNetFunction(NetFuncKeyMovement, FunctionReceivers.Server, (sbyte)(direction.x * 100), (sbyte)(direction.y * 100));
                     break;
                 case MovementSecure.NotSecure:
                     tempInputDirection = direction;
@@ -239,14 +239,14 @@ namespace MultiplayerARPG
             tempMoveDirection = Vector3.zero;
             CacheRigidbody2D.velocity = Vector2.zero;
             if (IsOwnerClient && !IsServer)
-                CallNetFunction("StopMove", FunctionReceivers.Server);
+                CallNetFunction(StopMove, FunctionReceivers.Server);
         }
 
         public override void SetTargetEntity(BaseGameEntity entity)
         {
             base.SetTargetEntity(entity);
             if (IsOwnerClient && !IsServer)
-                CallNetFunction("SetTargetEntity", FunctionReceivers.Server, entity == null ? 0 : entity.ObjectId);
+                CallNetFunction(NetFuncSetTargetEntity, FunctionReceivers.Server, entity == null ? 0 : entity.ObjectId);
         }
 
         public override int OverlapObjects(Vector3 position, float distance, int layerMask)
@@ -310,7 +310,7 @@ namespace MultiplayerARPG
             if (IsServer && movementSecure == MovementSecure.ServerAuthoritative)
                 currentDirectionType.Value = (byte)localDirectionType;
             if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
-                CallNetFunction("SetCurrentDirectionType", FunctionReceivers.Server, (byte)localDirectionType);
+                CallNetFunction(NetFuncSetByteDirectionType, FunctionReceivers.Server, (byte)localDirectionType);
         }
     }
 }

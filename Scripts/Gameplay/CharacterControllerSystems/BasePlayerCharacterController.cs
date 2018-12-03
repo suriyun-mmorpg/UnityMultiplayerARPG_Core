@@ -228,7 +228,7 @@ namespace MultiplayerARPG
                     uint parentObjectId = 0;
                     if (currentBuildingEntity.buildingArea != null)
                         parentObjectId = currentBuildingEntity.buildingArea.EntityObjectId;
-                    PlayerCharacterEntity.RequestBuild(buildingItemIndex, currentBuildingEntity.CacheTransform.position, currentBuildingEntity.CacheTransform.rotation, parentObjectId);
+                    PlayerCharacterEntity.RequestBuild((ushort)buildingItemIndex, currentBuildingEntity.CacheTransform.position, currentBuildingEntity.CacheTransform.rotation, parentObjectId);
                 }
                 Destroy(currentBuildingEntity.gameObject);
             }

@@ -174,7 +174,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public IList<uint> SummonEntityIds
+        public IList<PackedUInt> SummonEntityIds
         {
             get { return summonEntityIds; }
             set
@@ -287,7 +287,7 @@ namespace MultiplayerARPG
         /// Override this to do stuffs when pet entity changes
         /// </summary>
         /// <param name="objectId"></param>
-        protected virtual void OnPetEntityIdChange(uint objectId)
+        protected virtual void OnPetEntityIdChange(PackedUInt objectId)
         {
             if (onPetEntityIdChange != null)
                 onPetEntityIdChange.Invoke(objectId);

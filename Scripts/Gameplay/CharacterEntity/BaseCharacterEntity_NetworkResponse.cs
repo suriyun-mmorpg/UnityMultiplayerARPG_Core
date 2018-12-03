@@ -193,11 +193,11 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="actionId"></param>
         /// <param name="animActionType"></param>
-        protected virtual void NetFuncPlayActionAnimation(AnimActionType animActionType, int dataId, int index)
+        protected virtual void NetFuncPlayActionAnimation(byte byteAnimActionType, int dataId, byte index)
         {
             if (IsDead())
                 return;
-            this.animActionType = animActionType;
+            animActionType = (AnimActionType)byteAnimActionType;
             StartCoroutine(PlayActionAnimationRoutine(animActionType, dataId, index));
         }
 
@@ -220,7 +220,7 @@ namespace MultiplayerARPG
         /// This will be called at server to order character to pickup items
         /// </summary>
         /// <param name="objectId"></param>
-        protected virtual void NetFuncPickupItem(uint objectId)
+        protected virtual void NetFuncPickupItem(PackedUInt objectId)
         {
             if (!CanMoveOrDoActions())
                 return;
@@ -257,10 +257,9 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="index"></param>
         /// <param name="amount"></param>
-        protected virtual void NetFuncDropItem(int index, short amount)
+        protected virtual void NetFuncDropItem(ushort index, short amount)
         {
             if (!CanMoveOrDoActions() ||
-                index < 0 ||
                 index >= nonEquipItems.Count)
                 return;
 
@@ -279,7 +278,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="nonEquipIndex"></param>
         /// <param name="equipPosition"></param>
-        protected virtual void NetFuncEquipItem(int nonEquipIndex, string equipPosition)
+        protected virtual void NetFuncEquipItem(ushort nonEquipIndex, string equipPosition)
         {
             if (!CanMoveOrDoActions() ||
                 nonEquipIndex < 0 ||

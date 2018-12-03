@@ -13,7 +13,7 @@ public enum BuffType : byte
 }
 
 [System.Serializable]
-public class CharacterBuff
+public class CharacterBuff : INetSerializable
 {
     public static readonly CharacterBuff Empty = new CharacterBuff();
     public BuffType type;
@@ -221,35 +221,25 @@ public class CharacterBuff
         newBuff.buffRemainsDuration = 0f;
         return newBuff;
     }
-}
 
-public class NetFieldCharacterBuff : LiteNetLibNetField<CharacterBuff>
-{
-    public override void Deserialize(NetDataReader reader)
+    public void Serialize(NetDataWriter writer)
     {
-        var newValue = new CharacterBuff();
-        newValue.type = (BuffType)reader.GetByte();
-        newValue.dataId = reader.GetInt();
-        newValue.level = reader.GetShort();
-        newValue.buffRemainsDuration = reader.GetFloat();
-        Value = newValue;
+        writer.Put((byte)type);
+        writer.Put(dataId);
+        writer.Put(level);
+        writer.Put(buffRemainsDuration);
     }
 
-    public override void Serialize(NetDataWriter writer)
+    public void Deserialize(NetDataReader reader)
     {
-        writer.Put((byte)Value.type);
-        writer.Put(Value.dataId);
-        writer.Put(Value.level);
-        writer.Put(Value.buffRemainsDuration);
-    }
-
-    public override bool IsValueChanged(CharacterBuff newValue)
-    {
-        return true;
+        type = (BuffType)reader.GetByte();
+        dataId = reader.GetInt();
+        level = reader.GetShort();
+        buffRemainsDuration = reader.GetFloat();
     }
 }
 
 [System.Serializable]
-public class SyncListCharacterBuff : LiteNetLibSyncList<NetFieldCharacterBuff, CharacterBuff>
+public class SyncListCharacterBuff : LiteNetLibSyncList<CharacterBuff>
 {
 }

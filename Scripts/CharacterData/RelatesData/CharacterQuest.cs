@@ -5,7 +5,7 @@ using LiteNetLibManager;
 using MultiplayerARPG;
 
 [System.Serializable]
-public class CharacterQuest
+public class CharacterQuest : INetSerializable
 {
     public static readonly CharacterQuest Empty = new CharacterQuest();
     public int dataId;
@@ -116,28 +116,12 @@ public class CharacterQuest
         newQuest.isComplete = false;
         return newQuest;
     }
-}
 
-public class NetFieldCharacterQuest : LiteNetLibNetField<CharacterQuest>
-{
-    public override void Deserialize(NetDataReader reader)
+    public void Serialize(NetDataWriter writer)
     {
-        var newValue = new CharacterQuest();
-        newValue.dataId = reader.GetInt();
-        newValue.isComplete = reader.GetBool();
-        var killMonsterCount = reader.GetInt();
-        for (var i = 0; i < killMonsterCount; ++i)
-        {
-            newValue.KilledMonsters.Add(reader.GetInt(), reader.GetInt());
-        }
-        Value = newValue;
-    }
-
-    public override void Serialize(NetDataWriter writer)
-    {
-        writer.Put(Value.dataId);
-        writer.Put(Value.isComplete);
-        var killedMonsters = Value.KilledMonsters;
+        writer.Put(dataId);
+        writer.Put(isComplete);
+        var killedMonsters = KilledMonsters;
         var killMonsterCount = killedMonsters.Count;
         writer.Put(killMonsterCount);
         if (killMonsterCount > 0)
@@ -150,13 +134,20 @@ public class NetFieldCharacterQuest : LiteNetLibNetField<CharacterQuest>
         }
     }
 
-    public override bool IsValueChanged(CharacterQuest newValue)
+    public void Deserialize(NetDataReader reader)
     {
-        return true;
+        dataId = reader.GetInt();
+        isComplete = reader.GetBool();
+        var killMonsterCount = reader.GetInt();
+        KilledMonsters.Clear();
+        for (var i = 0; i < killMonsterCount; ++i)
+        {
+            KilledMonsters.Add(reader.GetInt(), reader.GetInt());
+        }
     }
 }
 
 [System.Serializable]
-public class SyncListCharacterQuest : LiteNetLibSyncList<NetFieldCharacterQuest, CharacterQuest>
+public class SyncListCharacterQuest : LiteNetLibSyncList<CharacterQuest>
 {
 }

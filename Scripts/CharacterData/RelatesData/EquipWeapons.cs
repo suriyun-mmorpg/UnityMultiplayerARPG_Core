@@ -2,7 +2,7 @@
 using LiteNetLibManager;
 
 [System.Serializable]
-public class EquipWeapons
+public class EquipWeapons : INetSerializable
 {
     public CharacterItem rightHand;
     public CharacterItem leftHand;
@@ -12,52 +12,39 @@ public class EquipWeapons
         rightHand = new CharacterItem();
         leftHand = new CharacterItem();
     }
-}
 
-public class NetFieldEquipWeapons : LiteNetLibNetField<EquipWeapons>
-{
-    public override void Deserialize(NetDataReader reader)
+    public void Serialize(NetDataWriter writer)
     {
         // Right hand
-        var rightHand = new CharacterItem();
+        writer.Put(rightHand.dataId);
+        writer.Put(rightHand.level);
+        writer.Put(rightHand.amount);
+        writer.Put(rightHand.durability);
+        // Left hand
+        writer.Put(leftHand.dataId);
+        writer.Put(leftHand.level);
+        writer.Put(leftHand.amount);
+        writer.Put(leftHand.durability);
+    }
+
+    public void Deserialize(NetDataReader reader)
+    {
+        // Right hand
+        rightHand = new CharacterItem();
         rightHand.dataId = reader.GetInt();
         rightHand.level = reader.GetShort();
         rightHand.amount = reader.GetShort();
         rightHand.durability = reader.GetFloat();
         // Left hand
-        var leftHand = new CharacterItem();
+        leftHand = new CharacterItem();
         leftHand.dataId = reader.GetInt();
         leftHand.level = reader.GetShort();
         leftHand.amount = reader.GetShort();
         leftHand.durability = reader.GetFloat();
-        // Set result
-        var newValue = new EquipWeapons();
-        newValue.rightHand = rightHand;
-        newValue.leftHand = leftHand;
-        Value = newValue;
-    }
-
-    public override void Serialize(NetDataWriter writer)
-    {
-        // Right hand
-        writer.Put(Value.rightHand.dataId);
-        writer.Put(Value.rightHand.level);
-        writer.Put(Value.rightHand.amount);
-        writer.Put(Value.rightHand.durability);
-        // Left hand
-        writer.Put(Value.leftHand.dataId);
-        writer.Put(Value.leftHand.level);
-        writer.Put(Value.leftHand.amount);
-        writer.Put(Value.leftHand.durability);
-    }
-
-    public override bool IsValueChanged(EquipWeapons newValue)
-    {
-        return true;
     }
 }
 
 [System.Serializable]
-public class SyncFieldEquipWeapons : LiteNetLibSyncField<NetFieldEquipWeapons, EquipWeapons>
+public class SyncFieldEquipWeapons : LiteNetLibSyncField<EquipWeapons>
 {
 }

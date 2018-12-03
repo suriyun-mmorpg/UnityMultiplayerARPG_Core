@@ -10,31 +10,12 @@ namespace MultiplayerARPG
         public int nonEquipIndex;
     }
 
-    public class DealingCharacterItems : List<DealingCharacterItem> { }
-
-    public class NetFieldDealingCharacterItems : LiteNetLibNetField<DealingCharacterItems>
+    public class DealingCharacterItems : List<DealingCharacterItem>, INetSerializable
     {
-        public override void Deserialize(NetDataReader reader)
+        public void Serialize(NetDataWriter writer)
         {
-            var newValue = new DealingCharacterItems();
-            var count = reader.GetInt();
-            for (var i = 0; i < count; ++i)
-            {
-                var dealingItem = new DealingCharacterItem();
-                dealingItem.nonEquipIndex = reader.GetInt();
-                dealingItem.dataId = reader.GetInt();
-                dealingItem.level = reader.GetShort();
-                dealingItem.amount = reader.GetShort();
-                dealingItem.durability = reader.GetFloat();
-                newValue.Add(dealingItem);
-            }
-            Value = newValue;
-        }
-
-        public override void Serialize(NetDataWriter writer)
-        {
-            writer.Put(Value.Count);
-            foreach (var dealingItem in Value)
+            writer.Put(Count);
+            foreach (var dealingItem in this)
             {
                 writer.Put(dealingItem.nonEquipIndex);
                 writer.Put(dealingItem.dataId);
@@ -44,9 +25,20 @@ namespace MultiplayerARPG
             }
         }
 
-        public override bool IsValueChanged(DealingCharacterItems newValue)
+        public void Deserialize(NetDataReader reader)
         {
-            return true;
+            var count = reader.GetInt();
+            Clear();
+            for (var i = 0; i < count; ++i)
+            {
+                var dealingItem = new DealingCharacterItem();
+                dealingItem.nonEquipIndex = reader.GetInt();
+                dealingItem.dataId = reader.GetInt();
+                dealingItem.level = reader.GetShort();
+                dealingItem.amount = reader.GetShort();
+                dealingItem.durability = reader.GetFloat();
+                Add(dealingItem);
+            }
         }
     }
 }

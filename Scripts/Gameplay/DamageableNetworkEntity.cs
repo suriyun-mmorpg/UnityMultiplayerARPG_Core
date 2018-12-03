@@ -25,7 +25,7 @@ namespace MultiplayerARPG
         public override void OnSetup()
         {
             base.OnSetup();
-            RegisterNetFunction("CombatAmount", new LiteNetLibFunction<NetFieldByte, NetFieldInt>((combatAmountType, amount) => NetFuncCombatAmount((CombatAmountType)combatAmountType.Value, amount)));
+            RegisterNetFunction<byte, int>(NetFuncCombatAmount);
         }
 
         /// <summary>
@@ -33,17 +33,17 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="combatAmountType"></param>
         /// <param name="amount"></param>
-        protected void NetFuncCombatAmount(CombatAmountType combatAmountType, int amount)
+        protected void NetFuncCombatAmount(byte byteCombatAmountType, int amount)
         {
             var uiSceneGameplay = UISceneGameplay.Singleton;
             if (uiSceneGameplay == null)
                 return;
-            uiSceneGameplay.SpawnCombatText(CombatTextTransform, combatAmountType, amount);
+            uiSceneGameplay.SpawnCombatText(CombatTextTransform, (CombatAmountType)byteCombatAmountType, amount);
         }
 
         public virtual void RequestCombatAmount(CombatAmountType combatAmountType, int amount)
         {
-            CallNetFunction("CombatAmount", FunctionReceivers.All, combatAmountType, amount);
+            CallNetFunction(NetFuncCombatAmount, FunctionReceivers.All, (byte)combatAmountType, amount);
         }
 
         public bool IsDead()

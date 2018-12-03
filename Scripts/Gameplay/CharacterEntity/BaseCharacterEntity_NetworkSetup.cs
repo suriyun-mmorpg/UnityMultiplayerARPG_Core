@@ -64,17 +64,17 @@ namespace MultiplayerARPG
             nonEquipItems.onOperation += OnNonEquipItemsOperation;
             summonEntityIds.onOperation += OnSummonEntityIdsOperation;
             // Register Network functions
-            RegisterNetFunction("Attack", new LiteNetLibFunction(NetFuncAttack));
-            RegisterNetFunction("UseSkill", new LiteNetLibFunction<NetFieldVector3, NetFieldInt>((position, dataId) => NetFuncUseSkill(position, dataId)));
-            RegisterNetFunction("UseItem", new LiteNetLibFunction<NetFieldInt>((dataId) => NetFuncUseItem(dataId)));
-            RegisterNetFunction("PlayActionAnimation", new LiteNetLibFunction<NetFieldByte, NetFieldInt, NetFieldByte>((animActionType, dataId, index) => NetFuncPlayActionAnimation((AnimActionType)animActionType.Value, dataId, index)));
-            RegisterNetFunction("PickupItem", new LiteNetLibFunction<NetFieldPackedUInt>((objectId) => NetFuncPickupItem(objectId)));
-            RegisterNetFunction("DropItem", new LiteNetLibFunction<NetFieldUShort, NetFieldShort>((index, amount) => NetFuncDropItem(index, amount)));
-            RegisterNetFunction("EquipItem", new LiteNetLibFunction<NetFieldUShort, NetFieldString>((nonEquipIndex, equipPosition) => NetFuncEquipItem(nonEquipIndex, equipPosition)));
-            RegisterNetFunction("UnEquipItem", new LiteNetLibFunction<NetFieldString>((fromEquipPosition) => NetFuncUnEquipItem(fromEquipPosition)));
-            RegisterNetFunction("OnDead", new LiteNetLibFunction(NetFuncOnDead));
-            RegisterNetFunction("OnRespawn", new LiteNetLibFunction(NetFuncOnRespawn));
-            RegisterNetFunction("OnLevelUp", new LiteNetLibFunction(NetFuncOnLevelUp));
+            RegisterNetFunction(NetFuncAttack);
+            RegisterNetFunction<Vector3, int>(NetFuncUseSkill);
+            RegisterNetFunction<int>(NetFuncUseItem);
+            RegisterNetFunction<byte, int, byte>(NetFuncPlayActionAnimation);
+            RegisterNetFunction<PackedUInt>(NetFuncPickupItem);
+            RegisterNetFunction<ushort, short>(NetFuncDropItem);
+            RegisterNetFunction<ushort, string>(NetFuncEquipItem);
+            RegisterNetFunction<string>(NetFuncUnEquipItem);
+            RegisterNetFunction(NetFuncOnDead);
+            RegisterNetFunction(NetFuncOnRespawn);
+            RegisterNetFunction(NetFuncOnLevelUp);
         }
 
         protected override void EntityOnDestroy()

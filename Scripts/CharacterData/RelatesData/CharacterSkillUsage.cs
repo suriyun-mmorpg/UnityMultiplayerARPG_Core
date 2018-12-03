@@ -9,7 +9,7 @@ public enum SkillUsageType : byte
 }
 
 [System.Serializable]
-public class CharacterSkillUsage
+public class CharacterSkillUsage : INetSerializable
 {
     public static readonly CharacterSkillUsage Empty = new CharacterSkillUsage();
     public SkillUsageType type;
@@ -86,33 +86,23 @@ public class CharacterSkillUsage
         newSkillUsage.coolDownRemainsDuration = 0f;
         return newSkillUsage;
     }
-}
 
-public class NetFieldCharacterSkillUsage : LiteNetLibNetField<CharacterSkillUsage>
-{
-    public override void Deserialize(NetDataReader reader)
+    public void Serialize(NetDataWriter writer)
     {
-        var newValue = new CharacterSkillUsage();
-        newValue.type = (SkillUsageType)reader.GetByte();
-        newValue.dataId = reader.GetInt();
-        newValue.coolDownRemainsDuration = reader.GetFloat();
-        Value = newValue;
+        writer.Put((byte)type);
+        writer.Put(dataId);
+        writer.Put(coolDownRemainsDuration);
     }
 
-    public override void Serialize(NetDataWriter writer)
+    public void Deserialize(NetDataReader reader)
     {
-        writer.Put((byte)Value.type);
-        writer.Put(Value.dataId);
-        writer.Put(Value.coolDownRemainsDuration);
-    }
-
-    public override bool IsValueChanged(CharacterSkillUsage newValue)
-    {
-        return true;
+        type = (SkillUsageType)reader.GetByte();
+        dataId = reader.GetInt();
+        coolDownRemainsDuration = reader.GetFloat();
     }
 }
 
 [System.Serializable]
-public class SyncListCharacterSkillUsage : LiteNetLibSyncList<NetFieldCharacterSkillUsage, CharacterSkillUsage>
+public class SyncListCharacterSkillUsage : LiteNetLibSyncList<CharacterSkillUsage>
 {
 }

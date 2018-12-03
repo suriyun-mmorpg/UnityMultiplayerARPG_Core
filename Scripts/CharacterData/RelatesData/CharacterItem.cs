@@ -5,7 +5,7 @@ using LiteNetLibManager;
 using MultiplayerARPG;
 
 [System.Serializable]
-public class CharacterItem
+public class CharacterItem : INetSerializable
 {
     public static readonly CharacterItem Empty = new CharacterItem();
     public int dataId;
@@ -176,35 +176,25 @@ public class CharacterItem
         newItem.durability = GameInstance.Items.TryGetValue(dataId, out tempItem) ? tempItem.maxDurability : 0;
         return newItem;
     }
-}
 
-public class NetFieldCharacterItem : LiteNetLibNetField<CharacterItem>
-{
-    public override void Deserialize(NetDataReader reader)
+    public void Serialize(NetDataWriter writer)
     {
-        var newValue = new CharacterItem();
-        newValue.dataId = reader.GetInt();
-        newValue.level = reader.GetShort();
-        newValue.amount = reader.GetShort();
-        newValue.durability = reader.GetFloat();
-        Value = newValue;
+        writer.Put(dataId);
+        writer.Put(level);
+        writer.Put(amount);
+        writer.Put(durability);
     }
 
-    public override void Serialize(NetDataWriter writer)
+    public void Deserialize(NetDataReader reader)
     {
-        writer.Put(Value.dataId);
-        writer.Put(Value.level);
-        writer.Put(Value.amount);
-        writer.Put(Value.durability);
-    }
-
-    public override bool IsValueChanged(CharacterItem newValue)
-    {
-        return true;
+        dataId = reader.GetInt();
+        level = reader.GetShort();
+        amount = reader.GetShort();
+        durability = reader.GetFloat();
     }
 }
 
 [System.Serializable]
-public class SyncListCharacterItem : LiteNetLibSyncList<NetFieldCharacterItem, CharacterItem>
+public class SyncListCharacterItem : LiteNetLibSyncList<CharacterItem>
 {
 }

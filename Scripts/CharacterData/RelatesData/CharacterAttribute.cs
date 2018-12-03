@@ -5,7 +5,7 @@ using LiteNetLibManager;
 using MultiplayerARPG;
 
 [System.Serializable]
-public class CharacterAttribute
+public class CharacterAttribute : INetSerializable
 {
     public static readonly CharacterAttribute Empty = new CharacterAttribute();
     public int dataId;
@@ -35,31 +35,21 @@ public class CharacterAttribute
     {
         return GetAttribute() != null && character != null && character.StatPoint > 0;
     }
-}
 
-public class NetFieldCharacterAttribute : LiteNetLibNetField<CharacterAttribute>
-{
-    public override void Deserialize(NetDataReader reader)
+    public void Serialize(NetDataWriter writer)
     {
-        var newValue = new CharacterAttribute();
-        newValue.dataId = reader.GetInt();
-        newValue.amount = reader.GetShort();
-        Value = newValue;
+        writer.Put(dataId);
+        writer.Put(amount);
     }
 
-    public override void Serialize(NetDataWriter writer)
+    public void Deserialize(NetDataReader reader)
     {
-        writer.Put(Value.dataId);
-        writer.Put(Value.amount);
-    }
-
-    public override bool IsValueChanged(CharacterAttribute newValue)
-    {
-        return true;
+        dataId = reader.GetInt();
+        amount = reader.GetShort();
     }
 }
 
 [System.Serializable]
-public class SyncListCharacterAttribute : LiteNetLibSyncList<NetFieldCharacterAttribute, CharacterAttribute>
+public class SyncListCharacterAttribute : LiteNetLibSyncList<CharacterAttribute>
 {
 }

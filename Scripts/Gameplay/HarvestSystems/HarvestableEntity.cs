@@ -51,8 +51,14 @@ namespace MultiplayerARPG
         public override void OnSetup()
         {
             base.OnSetup();
-            RegisterNetFunction("OnHarvestableDestroy", new LiteNetLibFunction(() => { onHarvestableDestroy.Invoke(); }));
+            RegisterNetFunction(NetFuncOnHarvestableDestroy);
             InitStats();
+        }
+
+        private void NetFuncOnHarvestableDestroy()
+        {
+            if (onHarvestableDestroy != null)
+                onHarvestableDestroy.Invoke();
         }
 
         public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
@@ -87,7 +93,7 @@ namespace MultiplayerARPG
             if (IsDead())
             {
                 CurrentHp = 0;
-                CallNetFunction("OnHarvestableDestroy", FunctionReceivers.All);
+                CallNetFunction(NetFuncOnHarvestableDestroy, FunctionReceivers.All);
                 DestroyAndRespawn();
             }
         }
