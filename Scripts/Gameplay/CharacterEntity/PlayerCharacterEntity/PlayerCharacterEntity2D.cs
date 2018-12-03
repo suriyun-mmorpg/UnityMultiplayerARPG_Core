@@ -21,14 +21,16 @@ namespace MultiplayerARPG
 
         #region Sync data
         [SerializeField]
+        protected SyncFieldVector2 currentDirection = new SyncFieldVector2();
+        [SerializeField]
         protected SyncFieldByte currentDirectionType = new SyncFieldByte();
         #endregion
 
         #region Temp data
         protected Collider2D[] overlapColliders2D = new Collider2D[OVERLAP_COLLIDER_SIZE];
-        protected Vector2 currentDirection = Vector2.down;
         protected Vector2 tempDirection;
         protected Vector2? currentDestination;
+        protected Vector2 localDirection;
         protected DirectionType localDirectionType = DirectionType.Down;
         #endregion
 
@@ -45,6 +47,16 @@ namespace MultiplayerARPG
                 if (cacheRigidbody2D == null)
                     cacheRigidbody2D = GetComponent<Rigidbody2D>();
                 return cacheRigidbody2D;
+            }
+        }
+
+        public Vector2 CurrentDirection
+        {
+            get
+            {
+                if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
+                    return localDirection;
+                return currentDirection.Value;
             }
         }
 
@@ -165,7 +177,7 @@ namespace MultiplayerARPG
             RegisterNetFunction<sbyte, sbyte>(NetFuncKeyMovement);
             RegisterNetFunction(StopMove);
             RegisterNetFunction<PackedUInt>(NetFuncSetTargetEntity);
-            RegisterNetFunction<byte>(NetFuncSetByteDirectionType);
+            RegisterNetFunction<sbyte, sbyte>(NetFuncUpdateDirection);
         }
 
         protected void NetFuncPointClickMovement(Vector3 position)
@@ -196,15 +208,17 @@ namespace MultiplayerARPG
             SetTargetEntity(tempEntity);
         }
 
-        protected void NetFuncSetByteDirectionType(byte directionType)
+        protected void NetFuncUpdateDirection(sbyte x, sbyte y)
         {
-            currentDirectionType.Value = directionType;
+            currentDirection.Value = new Vector2((float)x / 100f, (float)y / 100f);
+            currentDirectionType.Value = (byte)GetDirectionTypeByVector2(currentDirection.Value);
         }
 
         public override void PointClickMovement(Vector3 position)
         {
             if (IsDead())
                 return;
+
             switch (movementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
@@ -220,6 +234,7 @@ namespace MultiplayerARPG
         {
             if (IsDead())
                 return;
+
             switch (movementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
@@ -262,7 +277,7 @@ namespace MultiplayerARPG
         public override bool IsPositionInFov(float fov, Vector3 position)
         {
             var halfFov = fov * 0.5f;
-            var angle = Vector2.Angle((CacheTransform.position - position).normalized, currentDirection);
+            var angle = Vector2.Angle((CacheTransform.position - position).normalized, CurrentDirection);
             // Angle in forward position is 180 so we use this value to determine that target is in hit fov or not
             return (angle < 180 + halfFov && angle > 180 - halfFov);
         }
@@ -282,35 +297,39 @@ namespace MultiplayerARPG
                         break;
                 }
             }
-            rotation = Quaternion.Euler(0, 0, (Mathf.Atan2(currentDirection.y, currentDirection.x) * (180 / Mathf.PI)) + 90);
+            rotation = Quaternion.Euler(0, 0, (Mathf.Atan2(CurrentDirection.y, CurrentDirection.x) * (180 / Mathf.PI)) + 90);
         }
 
         public void UpdateCurrentDirection(Vector2 direction)
         {
-            currentDirection = direction;
-            UpdateDirection(currentDirection);
-        }
-
-        public void UpdateDirection(Vector2 direction)
-        {
             if (direction.magnitude > 0f)
             {
-                var normalized = direction.normalized;
-                if (Mathf.Abs(normalized.x) >= Mathf.Abs(normalized.y))
-                {
-                    if (normalized.x < 0) localDirectionType = DirectionType.Left;
-                    if (normalized.x > 0) localDirectionType = DirectionType.Right;
-                }
-                else
-                {
-                    if (normalized.y < 0) localDirectionType = DirectionType.Down;
-                    if (normalized.y > 0) localDirectionType = DirectionType.Up;
-                }
+                localDirection = direction;
+                localDirectionType = GetDirectionTypeByVector2(direction);
             }
             if (IsServer && movementSecure == MovementSecure.ServerAuthoritative)
+            {
+                currentDirection.Value = localDirection;
                 currentDirectionType.Value = (byte)localDirectionType;
+            }
             if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
-                CallNetFunction(NetFuncSetByteDirectionType, FunctionReceivers.Server, (byte)localDirectionType);
+                CallNetFunction(NetFuncUpdateDirection, FunctionReceivers.Server, (sbyte)(localDirection.x * 100f), (sbyte)(localDirection.y * 100f));
+        }
+
+        public DirectionType GetDirectionTypeByVector2(Vector2 direction)
+        {
+            var normalized = direction.normalized;
+            if (Mathf.Abs(normalized.x) >= Mathf.Abs(normalized.y))
+            {
+                if (normalized.x < 0) return DirectionType.Left;
+                if (normalized.x > 0) return DirectionType.Right;
+            }
+            else
+            {
+                if (normalized.y < 0) return DirectionType.Down;
+                if (normalized.y > 0) return DirectionType.Up;
+            }
+            return DirectionType.Down;
         }
     }
 }
