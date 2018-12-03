@@ -268,7 +268,7 @@ namespace MultiplayerARPG
             base.ReceivedDamage(attacker, damageAmountType, damage);
 
             // Add received damage entry
-            if (attacker == null)
+            if (attacker != null)
             {
                 var receivedDamageRecord = new ReceivedDamageRecord();
                 receivedDamageRecord.totalReceivedDamage = damage;
@@ -295,7 +295,6 @@ namespace MultiplayerARPG
         public override void Killed(BaseCharacterEntity lastAttacker)
         {
             base.Killed(lastAttacker);
-            var maxHp = CacheStats.hp;
             var randomedExp = Random.Range(MonsterDatabase.randomExpMin, MonsterDatabase.randomExpMax);
             var randomedGold = Random.Range(MonsterDatabase.randomGoldMin, MonsterDatabase.randomGoldMax);
             var looters = new HashSet<uint>();
@@ -309,11 +308,11 @@ namespace MultiplayerARPG
                 foreach (var enemy in receivedDamageRecords.Keys)
                 {
                     var receivedDamageRecord = receivedDamageRecords[enemy];
-                    var rewardRate = receivedDamageRecord.totalReceivedDamage / maxHp;
+                    var rewardRate = (float)receivedDamageRecord.totalReceivedDamage / (float)CacheMaxHp;
                     var rewardExp = (int)(randomedExp * rewardRate);
                     var rewardGold = (int)(randomedGold * rewardRate);
-                    if (rewardRate > 1)
-                        rewardRate = 1;
+                    if (rewardRate > 1f)
+                        rewardRate = 1f;
                     if (enemy is BasePlayerCharacterEntity)
                     {
                         var makeMostDamage = false;
