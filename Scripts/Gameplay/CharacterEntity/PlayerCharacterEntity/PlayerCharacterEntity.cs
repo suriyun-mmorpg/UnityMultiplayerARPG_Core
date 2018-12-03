@@ -205,7 +205,7 @@ namespace MultiplayerARPG
             RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
             RegisterNetFunction<sbyte, sbyte, bool>(NetFuncKeyMovement);
             RegisterNetFunction(StopMove);
-            RegisterNetFunction<uint>(NetFuncSetTargetEntity);
+            RegisterNetFunction<PackedUInt>(NetFuncSetTargetEntity);
         }
 
         protected void NetFuncPointClickMovement(Vector3 position)
@@ -228,7 +228,7 @@ namespace MultiplayerARPG
                 isJumping = isGrounded && isJump;
         }
 
-        protected void NetFuncSetTargetEntity(uint objectId)
+        protected void NetFuncSetTargetEntity(PackedUInt objectId)
         {
             if (objectId == 0)
                 SetTargetEntity(null);
@@ -306,7 +306,7 @@ namespace MultiplayerARPG
         public override void SetTargetEntity(BaseGameEntity entity)
         {
             if (IsOwnerClient && !IsServer && targetEntity != entity)
-                CallNetFunction(NetFuncSetTargetEntity, FunctionReceivers.Server, entity == null ? 0 : entity.ObjectId);
+                CallNetFunction(NetFuncSetTargetEntity, FunctionReceivers.Server, new PackedUInt(entity == null ? 0 : entity.ObjectId));
             base.SetTargetEntity(entity);
         }
 

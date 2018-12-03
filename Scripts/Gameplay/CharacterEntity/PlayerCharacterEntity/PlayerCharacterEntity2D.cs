@@ -164,7 +164,7 @@ namespace MultiplayerARPG
             RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
             RegisterNetFunction<sbyte, sbyte>(NetFuncKeyMovement);
             RegisterNetFunction(StopMove);
-            RegisterNetFunction<uint>(NetFuncSetTargetEntity);
+            RegisterNetFunction<PackedUInt>(NetFuncSetTargetEntity);
             RegisterNetFunction<byte>(NetFuncSetByteDirectionType);
         }
 
@@ -186,7 +186,7 @@ namespace MultiplayerARPG
                 currentNpcDialog = null;
         }
 
-        protected void NetFuncSetTargetEntity(uint objectId)
+        protected void NetFuncSetTargetEntity(PackedUInt objectId)
         {
             if (objectId == 0)
                 SetTargetEntity(null);
@@ -246,7 +246,7 @@ namespace MultiplayerARPG
         {
             base.SetTargetEntity(entity);
             if (IsOwnerClient && !IsServer)
-                CallNetFunction(NetFuncSetTargetEntity, FunctionReceivers.Server, entity == null ? 0 : entity.ObjectId);
+                CallNetFunction(NetFuncSetTargetEntity, FunctionReceivers.Server, new PackedUInt(entity == null ? 0 : entity.ObjectId));
         }
 
         public override int OverlapObjects(Vector3 position, float distance, int layerMask)
