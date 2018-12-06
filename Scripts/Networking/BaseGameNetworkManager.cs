@@ -406,7 +406,10 @@ namespace MultiplayerARPG
             {
                 case ChatChannel.Global:
                     // Send message to all clients
-                    ServerSendPacketToAllConnections(SendOptions.ReliableOrdered, MsgTypes.Chat, message);
+                    if (!GMCommands.IsGMCommand(message.message))
+                        ServerSendPacketToAllConnections(SendOptions.ReliableOrdered, MsgTypes.Chat, message);
+                    else
+                        HandleGMCommand(message.sender, message.message);
                     break;
                 case ChatChannel.Whisper:
                     if (!string.IsNullOrEmpty(message.sender) &&
