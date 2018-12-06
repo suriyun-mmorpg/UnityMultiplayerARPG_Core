@@ -16,6 +16,7 @@ namespace MultiplayerARPG
         Potion,
         Ammo,
         Building,
+        Pet,
     }
 
     [CreateAssetMenu(fileName = "Item", menuName = "Create GameData/Item")]
@@ -61,6 +62,9 @@ namespace MultiplayerARPG
         // Building
         public BuildingEntity buildingEntity;
 
+        // Pet
+        public BaseMonsterCharacterEntity petEntity;
+
 #if UNITY_EDITOR
         protected virtual void OnValidate()
         {
@@ -76,6 +80,10 @@ namespace MultiplayerARPG
                 case ItemType.Potion:
                 case ItemType.Ammo:
                 case ItemType.Building:
+                    itemRefineInfo = null;
+                    break;
+                case ItemType.Pet:
+                    maxStack = 1;
                     itemRefineInfo = null;
                     break;
             }
@@ -126,6 +134,11 @@ namespace MultiplayerARPG
         public bool IsBuilding()
         {
             return itemType == ItemType.Building;
+        }
+
+        public bool IsPet()
+        {
+            return itemType == ItemType.Pet;
         }
 
         public int MaxLevel

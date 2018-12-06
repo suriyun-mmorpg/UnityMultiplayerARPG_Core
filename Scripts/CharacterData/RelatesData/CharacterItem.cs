@@ -12,6 +12,10 @@ public class CharacterItem : INetSerializable
     public short level;
     public short amount;
     public float durability;
+    public bool isSummoned;
+    public int currentSummonedHp;
+    public int currentSummonedMp;
+    public int currentSummonedExp;
     // TODO: I want to add random item bonus
     [System.NonSerialized]
     private int dirtyDataId;
@@ -33,6 +37,8 @@ public class CharacterItem : INetSerializable
     private Item cacheAmmoItem;
     [System.NonSerialized]
     private Item cacheBuildingItem;
+    [System.NonSerialized]
+    private Item cachePetItem;
 
     private void MakeCache()
     {
@@ -48,6 +54,7 @@ public class CharacterItem : INetSerializable
             cachePotionItem = null;
             cacheAmmoItem = null;
             cacheBuildingItem = null;
+            cachePetItem = null;
             if (GameInstance.Items.TryGetValue(dataId, out cacheItem) && cacheItem != null)
             {
                 if (cacheItem.IsEquipment())
@@ -66,6 +73,8 @@ public class CharacterItem : INetSerializable
                     cacheAmmoItem = cacheItem;
                 if (cacheItem.IsBuilding())
                     cacheBuildingItem = cacheItem;
+                if (cacheItem.IsPet())
+                    cachePetItem = cacheItem;
             }
         }
     }
@@ -124,16 +133,20 @@ public class CharacterItem : INetSerializable
         return cacheBuildingItem;
     }
 
+    public Item GetPetItem()
+    {
+        MakeCache();
+        return cachePetItem;
+    }
+
     public short GetMaxStack()
     {
-        var item = GetItem();
-        return item == null ? (short)0 : item.maxStack;
+        return GetItem() == null ? (short)0 : GetItem().maxStack;
     }
 
     public float GetMaxDurability()
     {
-        var item = GetItem();
-        return item == null ? 0f : item.maxDurability;
+        return GetItem() == null ? 0f : GetItem().maxDurability;
     }
 
     public bool IsValid()
@@ -183,6 +196,13 @@ public class CharacterItem : INetSerializable
         writer.Put(level);
         writer.Put(amount);
         writer.Put(durability);
+        writer.Put(isSummoned);
+        if (isSummoned)
+        {
+            writer.Put(currentSummonedHp);
+            writer.Put(currentSummonedMp);
+            writer.Put(currentSummonedExp);
+        }
     }
 
     public void Deserialize(NetDataReader reader)
@@ -191,6 +211,13 @@ public class CharacterItem : INetSerializable
         level = reader.GetShort();
         amount = reader.GetShort();
         durability = reader.GetFloat();
+        isSummoned = reader.GetBool();
+        if (isSummoned)
+        {
+            currentSummonedHp = reader.GetInt();
+            currentSummonedMp = reader.GetInt();
+            currentSummonedExp = reader.GetInt();
+        }
     }
 }
 

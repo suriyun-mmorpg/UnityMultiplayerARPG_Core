@@ -15,6 +15,9 @@ public class CharacterSkillUsage : INetSerializable
     public SkillUsageType type;
     public int dataId;
     public float coolDownRemainsDuration;
+    public bool isSummoned;
+    public int currentSummonedHp;
+    public int currentSummonedMp;
     [System.NonSerialized]
     private int dirtyDataId;
     [System.NonSerialized]
@@ -92,6 +95,12 @@ public class CharacterSkillUsage : INetSerializable
         writer.Put((byte)type);
         writer.Put(dataId);
         writer.Put(coolDownRemainsDuration);
+        writer.Put(isSummoned);
+        if (isSummoned)
+        {
+            writer.Put(currentSummonedHp);
+            writer.Put(currentSummonedMp);
+        }
     }
 
     public void Deserialize(NetDataReader reader)
@@ -99,6 +108,12 @@ public class CharacterSkillUsage : INetSerializable
         type = (SkillUsageType)reader.GetByte();
         dataId = reader.GetInt();
         coolDownRemainsDuration = reader.GetFloat();
+        isSummoned = reader.GetBool();
+        if (isSummoned)
+        {
+            currentSummonedHp = reader.GetInt();
+            currentSummonedMp = reader.GetInt();
+        }
     }
 }
 
