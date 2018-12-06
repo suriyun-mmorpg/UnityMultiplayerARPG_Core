@@ -94,8 +94,37 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void RegisterClientMessages()
+        {
+            this.InvokeInstanceDevExtMethods("RegisterClientMessages");
+            base.RegisterClientMessages();
+            RegisterClientMessage(MsgTypes.GameMessage, HandleGameMessageAtClient);
+            RegisterClientMessage(MsgTypes.Warp, HandleWarpAtClient);
+            RegisterClientMessage(MsgTypes.Chat, HandleChatAtClient);
+            RegisterClientMessage(MsgTypes.CashShopInfo, HandleResponseCashShopInfo);
+            RegisterClientMessage(MsgTypes.CashShopBuy, HandleResponseCashShopBuy);
+            RegisterClientMessage(MsgTypes.CashPackageInfo, HandleResponseCashPackageInfo);
+            RegisterClientMessage(MsgTypes.CashPackageBuyValidation, HandleResponseCashPackageBuyValidation);
+            RegisterClientMessage(MsgTypes.UpdatePartyMember, HandleUpdatePartyMemberAtClient);
+            RegisterClientMessage(MsgTypes.UpdateParty, HandleUpdatePartyAtClient);
+            RegisterClientMessage(MsgTypes.UpdateGuildMember, HandleUpdateGuildMemberAtClient);
+            RegisterClientMessage(MsgTypes.UpdateGuild, HandleUpdateGuildAtClient);
+        }
+
+        protected override void RegisterServerMessages()
+        {
+            this.InvokeInstanceDevExtMethods("RegisterServerMessages");
+            base.RegisterServerMessages();
+            RegisterServerMessage(MsgTypes.Chat, HandleChatAtServer);
+            RegisterServerMessage(MsgTypes.CashShopInfo, HandleRequestCashShopInfo);
+            RegisterServerMessage(MsgTypes.CashShopBuy, HandleRequestCashShopBuy);
+            RegisterServerMessage(MsgTypes.CashPackageInfo, HandleRequestCashPackageInfo);
+            RegisterServerMessage(MsgTypes.CashPackageBuyValidation, HandleRequestCashPackageBuyValidation);
+        }
+
         protected virtual void Clean()
         {
+            this.InvokeInstanceDevExtMethods("Clean");
             playerCharacters.Clear();
             playerCharactersById.Clear();
             buildingEntities.Clear();
@@ -107,6 +136,12 @@ namespace MultiplayerARPG
             ClientParty = null;
             ClientGuild = null;
             CurrentMapInfo = null;
+        }
+
+        public override void OnStartServer()
+        {
+            this.InvokeInstanceDevExtMethods("OnStartServer");
+            base.OnStartServer();
         }
 
         public override void OnStopServer()
@@ -163,34 +198,6 @@ namespace MultiplayerARPG
             {
                 SendUpdateGuildMembersToClient(updatingGuildMember.Key, updatingGuildMember.Value);
             }
-        }
-
-        protected override void RegisterClientMessages()
-        {
-            base.RegisterClientMessages();
-            this.InvokeInstanceDevExtMethods("RegisterClientMessages");
-            RegisterClientMessage(MsgTypes.GameMessage, HandleGameMessageAtClient);
-            RegisterClientMessage(MsgTypes.Warp, HandleWarpAtClient);
-            RegisterClientMessage(MsgTypes.Chat, HandleChatAtClient);
-            RegisterClientMessage(MsgTypes.CashShopInfo, HandleResponseCashShopInfo);
-            RegisterClientMessage(MsgTypes.CashShopBuy, HandleResponseCashShopBuy);
-            RegisterClientMessage(MsgTypes.CashPackageInfo, HandleResponseCashPackageInfo);
-            RegisterClientMessage(MsgTypes.CashPackageBuyValidation, HandleResponseCashPackageBuyValidation);
-            RegisterClientMessage(MsgTypes.UpdatePartyMember, HandleUpdatePartyMemberAtClient);
-            RegisterClientMessage(MsgTypes.UpdateParty, HandleUpdatePartyAtClient);
-            RegisterClientMessage(MsgTypes.UpdateGuildMember, HandleUpdateGuildMemberAtClient);
-            RegisterClientMessage(MsgTypes.UpdateGuild, HandleUpdateGuildAtClient);
-        }
-
-        protected override void RegisterServerMessages()
-        {
-            base.RegisterServerMessages();
-            this.InvokeInstanceDevExtMethods("RegisterServerMessages");
-            RegisterServerMessage(MsgTypes.Chat, HandleChatAtServer);
-            RegisterServerMessage(MsgTypes.CashShopInfo, HandleRequestCashShopInfo);
-            RegisterServerMessage(MsgTypes.CashShopBuy, HandleRequestCashShopBuy);
-            RegisterServerMessage(MsgTypes.CashPackageInfo, HandleRequestCashPackageInfo);
-            RegisterServerMessage(MsgTypes.CashPackageBuyValidation, HandleRequestCashPackageBuyValidation);
         }
 
         public virtual void SendServerGameMessage(long connectionId, GameMessage.Type type)
