@@ -54,7 +54,7 @@ namespace MultiplayerARPG
                         amount >= 0)
                         playerCharacter.Gold = amount;
                 }
-                if (commandKey.Equals(GMCommands.Item))
+                if (commandKey.Equals(GMCommands.AddItem))
                 {
                     receiver = sender;
                     Item item;
