@@ -10,6 +10,9 @@ namespace MultiplayerARPG
     {
         public DimensionType dimensionType;
         public UnityEvent onDestroy;
+        [Tooltip("If this value more than 0, when it hit anything or it is out of life, it will explode and apply damage to characters in this distance")]
+        public float explodeDistance;
+
         protected float missileDistance;
         [SerializeField]
         protected SyncFieldFloat missileSpeed = new SyncFieldFloat();
@@ -123,8 +126,14 @@ namespace MultiplayerARPG
 
         private void TriggerEnter(GameObject other)
         {
+            if (FindAndApplyDamage(other))
+                NetworkDestroy();
+        }
+
+        private bool FindAndApplyDamage(GameObject other)
+        {
             if (!IsServer)
-                return;
+                return false;
 
             var damageableEntity = other.GetComponent<DamageableNetworkEntity>();
             // Try to find damageable entity by building object materials
@@ -136,23 +145,47 @@ namespace MultiplayerARPG
             }
 
             if (LockingTarget != null && damageableEntity != LockingTarget)
-                return;
+                return false;
 
             if (damageableEntity == null || damageableEntity == attacker || damageableEntity.IsDead())
-                return;
+                return false;
 
             if (attacker is BaseMonsterCharacterEntity && damageableEntity is BaseMonsterCharacterEntity)
-                return;
+                return false;
 
             ApplyDamageTo(damageableEntity);
-            NetworkDestroy();
+            return true;
         }
 
-        public override void OnNetworkDestroy(DestroyObjectReasons reasons)
+        public override void OnNetworkDestroy(byte reasons)
         {
             base.OnNetworkDestroy(reasons);
-            if (reasons == DestroyObjectReasons.RequestedToDestroy && onDestroy != null)
-                onDestroy.Invoke();
+            if (reasons == LiteNetLibGameManager.DestroyObjectReasons.RequestedToDestroy)
+            {
+                if (onDestroy != null)
+                    onDestroy.Invoke();
+
+                if (explodeDistance > 0)
+                {
+                    switch (dimensionType)
+                    {
+                        case DimensionType.Dimension3D:
+                            var colliders = Physics.OverlapSphere(CacheTransform.position, explodeDistance, GameInstance.Singleton.characterLayer);
+                            foreach (var collider in colliders)
+                            {
+                                FindAndApplyDamage(collider.gameObject);
+                            }
+                            break;
+                        case DimensionType.Dimension2D:
+                            var colliders2D = Physics2D.OverlapCircleAll(CacheTransform.position, explodeDistance, GameInstance.Singleton.characterLayer);
+                            foreach (var collider in colliders2D)
+                            {
+                                FindAndApplyDamage(collider.gameObject);
+                            }
+                            break;
+                    }
+                }
+            }
         }
     }
 }
