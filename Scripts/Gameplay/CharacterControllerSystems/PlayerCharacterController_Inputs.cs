@@ -208,8 +208,9 @@ namespace MultiplayerARPG
                 return;
             }
 
-            var moveDirection = GetMoveDirection(InputManager.GetAxis("Horizontal", true), InputManager.GetAxis("Vertical", true));
-            moveDirection = moveDirection.normalized;
+            // If mobile platforms, don't receive input raw to make it smooth
+            var raw = !InputManager.useMobileInputOnNonMobile && !Application.isMobilePlatform;
+            var moveDirection = GetMoveDirection(InputManager.GetAxis("Horizontal", raw), InputManager.GetAxis("Vertical", raw));
 
             if (moveDirection.magnitude != 0f)
             {
