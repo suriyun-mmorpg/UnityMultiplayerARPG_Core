@@ -150,8 +150,7 @@ namespace MultiplayerARPG
             if (CashPackages.TryGetValue(dataId, out package))
             {
                 // Connect to server to precess purchasing
-                var mapNetworkManager = FindObjectOfType<BaseGameNetworkManager>();
-                mapNetworkManager.RequestCashPackageBuyValidation(dataId, args.purchasedProduct.receipt, ResponseCashPackageBuyValidation);
+                BaseGameNetworkManager.Singleton.RequestCashPackageBuyValidation(dataId, args.purchasedProduct.receipt, ResponseCashPackageBuyValidation);
             }
             else
                 PurchaseResult(false, "Package not found");
