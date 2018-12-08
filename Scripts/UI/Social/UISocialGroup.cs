@@ -71,17 +71,6 @@ namespace MultiplayerARPG
             }
         }
 
-        private BaseGameNetworkManager cacheGameNetworkManager;
-        public BaseGameNetworkManager CacheGameNetworkManager
-        {
-            get
-            {
-                if (cacheGameNetworkManager == null)
-                    cacheGameNetworkManager = FindObjectOfType<BaseGameNetworkManager>();
-                return cacheGameNetworkManager;
-            }
-        }
-
         protected virtual void Update()
         {
             if (currentSocialId != GetSocialId())

@@ -42,21 +42,10 @@ namespace MultiplayerARPG
             }
         }
 
-        private BaseGameNetworkManager cacheGameNetworkManager;
-        public BaseGameNetworkManager CacheGameNetworkManager
-        {
-            get
-            {
-                if (cacheGameNetworkManager == null)
-                    cacheGameNetworkManager = FindObjectOfType<BaseGameNetworkManager>();
-                return cacheGameNetworkManager;
-            }
-        }
-
         public void RefreshCashShopInfo()
         {
             // Load cash shop item list
-            CacheGameNetworkManager.RequestCashShopInfo(ResponseCashShopInfo);
+            BaseGameNetworkManager.Singleton.RequestCashShopInfo(ResponseCashShopInfo);
         }
 
         public override void Show()
@@ -93,7 +82,7 @@ namespace MultiplayerARPG
 
         public void Buy(int dataId)
         {
-            CacheGameNetworkManager.RequestCashShopBuy(dataId, ResponseCashShopBuy);
+            BaseGameNetworkManager.Singleton.RequestCashShopBuy(dataId, ResponseCashShopBuy);
         }
 
         private void ResponseCashShopInfo(AckResponseCode responseCode, BaseAckMessage message)

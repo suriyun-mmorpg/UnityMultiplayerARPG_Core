@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         public UIPartyCreate uiPartyCreate;
         public UIPartySetting uiPartySetting;
 
-        public PartyData Party { get { return CacheGameNetworkManager.ClientParty; } }
+        public PartyData Party { get { return BaseGameNetworkManager.Singleton.ClientParty; } }
 
         protected override void UpdateUIs()
         {
@@ -33,12 +33,12 @@ namespace MultiplayerARPG
 
         private void OnEnable()
         {
-            CacheGameNetworkManager.onClientUpdateParty += UpdatePartyUIs;
+            BaseGameNetworkManager.Singleton.onClientUpdateParty += UpdatePartyUIs;
         }
 
         private void OnDisable()
         {
-            CacheGameNetworkManager.onClientUpdateParty -= UpdatePartyUIs;
+            BaseGameNetworkManager.Singleton.onClientUpdateParty -= UpdatePartyUIs;
         }
 
         public override void Show()

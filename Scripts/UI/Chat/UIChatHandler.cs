@@ -43,17 +43,6 @@ namespace MultiplayerARPG
             }
         }
 
-        private BaseGameNetworkManager cacheGameNetworkManager;
-        public BaseGameNetworkManager CacheGameNetworkManager
-        {
-            get
-            {
-                if (cacheGameNetworkManager == null)
-                    cacheGameNetworkManager = FindObjectOfType<BaseGameNetworkManager>();
-                return cacheGameNetworkManager;
-            }
-        }
-
         private void Start()
         {
             CacheList.Generate(ChatMessages, (index, message, ui) =>
@@ -75,14 +64,12 @@ namespace MultiplayerARPG
 
         private void OnEnable()
         {
-            if (CacheGameNetworkManager != null)
-                CacheGameNetworkManager.onClientReceiveChat += OnReceiveChat;
+            BaseGameNetworkManager.Singleton.onClientReceiveChat += OnReceiveChat;
         }
 
         private void OnDisable()
         {
-            if (CacheGameNetworkManager != null)
-                CacheGameNetworkManager.onClientReceiveChat -= OnReceiveChat;
+            BaseGameNetworkManager.Singleton.onClientReceiveChat -= OnReceiveChat;
         }
 
         private void Update()
@@ -166,8 +153,7 @@ namespace MultiplayerARPG
                     EnterChatMessage = trimText.Substring(0, cmd.Length + 1); // +1 for space
                 }
             }
-            if (CacheGameNetworkManager != null)
-                CacheGameNetworkManager.EnterChat(channel, message, sender, receiver);
+            BaseGameNetworkManager.Singleton.EnterChat(channel, message, sender, receiver);
             HideEnterChatField();
         }
 

@@ -65,21 +65,6 @@ namespace MultiplayerARPG
         public UnityEvent onCharacterDead;
         public UnityEvent onCharacterRespawn;
 
-        #region Cache components
-        private BaseGameNetworkManager cacheGameNetworkManager;
-        public BaseGameNetworkManager CacheGameNetworkManager
-        {
-            get
-            {
-                if (cacheGameNetworkManager == null)
-                    cacheGameNetworkManager = FindObjectOfType<BaseGameNetworkManager>();
-                if (cacheGameNetworkManager == null)
-                    Debug.LogWarning("[UISceneGameplay(" + name + ")] Cannot find `BaseGameNetworkManager`");
-                return cacheGameNetworkManager;
-            }
-        }
-        #endregion
-
         private void Awake()
         {
             Singleton = this;
@@ -176,8 +161,7 @@ namespace MultiplayerARPG
 
         public void OnClickExit()
         {
-            if (CacheGameNetworkManager != null)
-                CacheGameNetworkManager.StopHost();
+            BaseGameNetworkManager.Singleton.StopHost();
         }
 
         public void OnCharacterDead()

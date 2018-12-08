@@ -40,7 +40,7 @@ namespace MultiplayerARPG
         public UIGuildRoleSetting uiGuildRoleSetting;
         public UIGuildMemberRoleSetting uiGuildMemberRoleSetting;
 
-        public GuildData Guild { get { return CacheGameNetworkManager.ClientGuild; } }
+        public GuildData Guild { get { return BaseGameNetworkManager.Singleton.ClientGuild; } }
 
         private string guildMessage;
 
@@ -158,12 +158,12 @@ namespace MultiplayerARPG
 
         private void OnEnable()
         {
-            CacheGameNetworkManager.onClientUpdateGuild += UpdateGuildUIs;
+            BaseGameNetworkManager.Singleton.onClientUpdateGuild += UpdateGuildUIs;
         }
 
         private void OnDisable()
         {
-            CacheGameNetworkManager.onClientUpdateGuild -= UpdateGuildUIs;
+            BaseGameNetworkManager.Singleton.onClientUpdateGuild -= UpdateGuildUIs;
         }
 
         public override void Show()

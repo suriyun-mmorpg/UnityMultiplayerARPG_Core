@@ -8,27 +8,14 @@ namespace MultiplayerARPG
         public Transform messageContainer;
         public float visibleDuration;
 
-        private BaseGameNetworkManager cacheGameNetworkManager;
-        public BaseGameNetworkManager CacheGameNetworkManager
-        {
-            get
-            {
-                if (cacheGameNetworkManager == null)
-                    cacheGameNetworkManager = FindObjectOfType<BaseGameNetworkManager>();
-                return cacheGameNetworkManager;
-            }
-        }
-
         private void OnEnable()
         {
-            if (CacheGameNetworkManager != null)
-                CacheGameNetworkManager.onClientReceiveGameMessage += OnReceiveGameMessage;
+            BaseGameNetworkManager.Singleton.onClientReceiveGameMessage += OnReceiveGameMessage;
         }
 
         private void OnDisable()
         {
-            if (CacheGameNetworkManager != null)
-                CacheGameNetworkManager.onClientReceiveGameMessage -= OnReceiveGameMessage;
+            BaseGameNetworkManager.Singleton.onClientReceiveGameMessage -= OnReceiveGameMessage;
         }
 
         private void OnReceiveGameMessage(GameMessage gameMessage)
