@@ -67,8 +67,7 @@ namespace MultiplayerARPG
                 EquipmentModelContainer container;
                 if (!CacheEquipmentModelContainers.TryGetValue(model.Key, out container))
                     continue;
-                if (container.defaultModel != null)
-                    container.defaultModel.SetActive(false);
+                container.SetActiveDefaultModel(false);
             }
             cacheModels[equipPosition] = models;
         }
@@ -84,7 +83,7 @@ namespace MultiplayerARPG
                     EquipmentModelContainer container;
                     if (!CacheEquipmentModelContainers.TryGetValue(model.Key, out container))
                         continue;
-                    container.ActiveDefaultModel();
+                    container.SetActiveDefaultModel(true);
                 }
                 cacheModels.Remove(equipPosition);
             }
@@ -290,15 +289,15 @@ namespace MultiplayerARPG
         public GameObject defaultModel;
         public Transform transform;
 
-        public void ActiveDefaultModel()
+        public void SetActiveDefaultModel(bool isActive)
         {
             if (defaultModel == null)
                 return;
 
-            defaultModel.SetActive(true);
-            foreach (var renderer in defaultModel.GetComponentsInChildren<Renderer>(false))
+            defaultModel.SetActive(isActive);
+            foreach (var renderer in defaultModel.GetComponentsInChildren<Renderer>(true))
             {
-                renderer.enabled = true;
+                renderer.enabled = isActive;
             }
         }
     }
