@@ -124,7 +124,10 @@ namespace MultiplayerARPG
             EntityOnDestroy();
             this.InvokeInstanceDevExtMethods("OnDestroy");
         }
-        protected virtual void EntityOnDestroy() { }
+        protected virtual void EntityOnDestroy()
+        {
+            syncTitle.onChange -= OnSyncTitleChange;
+        }
 
         public override void OnBehaviourValidate()
         {
@@ -176,11 +179,10 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        public override void OnNetworkDestroy(DestroyObjectReasons reasons)
+        public override void OnNetworkDestroy(byte reasons)
         {
             base.OnNetworkDestroy(reasons);
             this.InvokeInstanceDevExtMethods("OnNetworkDestroy", reasons);
-            syncTitle.onChange -= OnSyncTitleChange;
         }
 
         protected virtual void OnSyncTitleChange(string syncTitle)
