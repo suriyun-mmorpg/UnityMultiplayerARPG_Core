@@ -39,6 +39,10 @@ namespace MultiplayerARPG
             }
         }
 
+        // Optimize garbage collector
+        private readonly List<GameEffect> tempAddingEffects = new List<GameEffect>();
+        private GameEffect tempGameEffect;
+
 #if UNITY_EDITOR
         private void OnValidate()
         {
@@ -54,27 +58,26 @@ namespace MultiplayerARPG
         {
             if (effects == null || effects.Length == 0)
                 return new List<GameEffect>();
-            var newEffects = new List<GameEffect>();
+            tempAddingEffects.Clear();
             foreach (var effect in effects)
             {
                 if (effect == null)
                     continue;
-                var effectSocket = effect.effectSocket;
-                if (string.IsNullOrEmpty(effectSocket))
+                if (string.IsNullOrEmpty(effect.effectSocket))
                     continue;
                 EffectContainer container;
-                if (!CacheEffectContainers.TryGetValue(effectSocket, out container))
+                if (!CacheEffectContainers.TryGetValue(effect.effectSocket, out container))
                     continue;
-                var newEffect = effect.InstantiateTo(null);
-                newEffect.followingTarget = container.transform;
-                newEffect.CacheTransform.position = newEffect.followingTarget.position;
-                newEffect.CacheTransform.rotation = newEffect.followingTarget.rotation;
-                newEffect.gameObject.SetActive(true);
-                newEffect.gameObject.SetLayerRecursively(gameInstance.characterLayer.LayerIndex, true);
-                AddingNewEffect(newEffect);
-                newEffects.Add(newEffect);
+                tempGameEffect = effect.InstantiateTo(null);
+                tempGameEffect.followingTarget = container.transform;
+                tempGameEffect.CacheTransform.position = tempGameEffect.followingTarget.position;
+                tempGameEffect.CacheTransform.rotation = tempGameEffect.followingTarget.rotation;
+                tempGameEffect.gameObject.SetActive(true);
+                tempGameEffect.gameObject.SetLayerRecursively(gameInstance.characterLayer.LayerIndex, true);
+                AddingNewEffect(tempGameEffect);
+                tempAddingEffects.Add(tempGameEffect);
             }
-            return newEffects;
+            return tempAddingEffects;
         }
 
         public virtual void AddingNewEffect(GameEffect newEffect) { }
