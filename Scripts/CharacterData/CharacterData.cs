@@ -18,6 +18,7 @@ public partial class CharacterData : ICharacterData
     private int currentStamina;
     private int currentFood;
     private int currentWater;
+    private CharacterSummon pet;
     private EquipWeapons equipWeapons;
 
     private ObservableCollection<CharacterAttribute> attributes;
@@ -26,6 +27,7 @@ public partial class CharacterData : ICharacterData
     private ObservableCollection<CharacterBuff> buffs;
     private ObservableCollection<CharacterItem> equipItems;
     private ObservableCollection<CharacterItem> nonEquipItems;
+    private ObservableCollection<CharacterSummon> summons;
 
     private bool shouldMakeCache = false;
 
@@ -64,6 +66,7 @@ public partial class CharacterData : ICharacterData
     public int CurrentStamina { get { return currentStamina; } set { currentStamina = value; } }
     public int CurrentFood { get { return currentFood; } set { currentFood = value; } }
     public int CurrentWater { get { return currentWater; } set { currentWater = value; } }
+    public CharacterSummon Pet { get { return pet; } set { pet = value; } }
     public EquipWeapons EquipWeapons
     {
         get { return equipWeapons; }
@@ -213,6 +216,31 @@ public partial class CharacterData : ICharacterData
             nonEquipItems.Clear();
             foreach (var entry in value)
                 nonEquipItems.Add(entry);
+            shouldMakeCache = true;
+        }
+    }
+
+    public IList<CharacterSummon> Summons
+    {
+        get
+        {
+            if (summons == null)
+            {
+                summons = new ObservableCollection<CharacterSummon>();
+                summons.CollectionChanged += List_CollectionChanged;
+            }
+            return summons;
+        }
+        set
+        {
+            if (summons == null)
+            {
+                summons = new ObservableCollection<CharacterSummon>();
+                summons.CollectionChanged += List_CollectionChanged;
+            }
+            summons.Clear();
+            foreach (var entry in value)
+                summons.Add(entry);
             shouldMakeCache = true;
         }
     }

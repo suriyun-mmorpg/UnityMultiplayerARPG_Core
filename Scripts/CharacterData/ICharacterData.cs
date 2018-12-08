@@ -14,6 +14,7 @@ public partial interface ICharacterData
     int CurrentStamina { get; set; }
     int CurrentFood { get; set; }
     int CurrentWater { get; set; }
+    CharacterSummon Pet { get; set; }
     EquipWeapons EquipWeapons { get; set; }
     // Listing
     IList<CharacterAttribute> Attributes { get; set; }
@@ -22,6 +23,7 @@ public partial interface ICharacterData
     IList<CharacterBuff> Buffs { get; set; }
     IList<CharacterItem> EquipItems { get; set; }
     IList<CharacterItem> NonEquipItems { get; set; }
+    IList<CharacterSummon> Summons { get; set; }
     // Caching
     CharacterStats CacheStats { get; }
     Dictionary<Attribute, short> CacheAttributes { get; }

@@ -126,7 +126,7 @@ namespace MultiplayerARPG
                 return;
 
             // Apply guild skill
-            var newSkillUsage = CharacterSkillUsage.Create(Id, SkillUsageType.GuildSkill, dataId);
+            var newSkillUsage = CharacterSkillUsage.Create(SkillUsageType.GuildSkill, dataId);
             newSkillUsage.Use(this, level);
             skillUsages.Add(newSkillUsage);
             ApplyBuff(dataId, BuffType.GuildSkillBuff, level);

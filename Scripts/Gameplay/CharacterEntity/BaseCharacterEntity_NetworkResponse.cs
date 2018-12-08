@@ -160,7 +160,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
             // Update skill usage states
-            var newSkillUsage = CharacterSkillUsage.Create(Id, SkillUsageType.Skill, characterSkill.dataId);
+            var newSkillUsage = CharacterSkillUsage.Create(SkillUsageType.Skill, characterSkill.dataId);
             newSkillUsage.Use(this, characterSkill.level);
             skillUsages.Add(newSkillUsage);
 

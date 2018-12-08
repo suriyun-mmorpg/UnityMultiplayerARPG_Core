@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLib;
-using LiteNetLibManager;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace MultiplayerARPG
 {
@@ -26,12 +22,16 @@ namespace MultiplayerARPG
             currentHp.forOwnerOnly = false;
             currentMp.sendOptions = SendOptions.ReliableOrdered;
             currentMp.forOwnerOnly = false;
+            currentFood.sendOptions = SendOptions.ReliableOrdered;
+            currentFood.forOwnerOnly = false;
+            currentWater.sendOptions = SendOptions.ReliableOrdered;
+            currentWater.forOwnerOnly = false;
+            pet.sendOptions = SendOptions.ReliableOrdered;
+            pet.forOwnerOnly = true;
             equipWeapons.sendOptions = SendOptions.ReliableOrdered;
             equipWeapons.forOwnerOnly = false;
             isHidding.sendOptions = SendOptions.ReliableOrdered;
             isHidding.forOwnerOnly = false;
-            petEntityId.sendOptions = SendOptions.ReliableOrdered;
-            petEntityId.forOwnerOnly = true;
 
             attributes.forOwnerOnly = false;
             skills.forOwnerOnly = true;
@@ -39,7 +39,7 @@ namespace MultiplayerARPG
             buffs.forOwnerOnly = false;
             equipItems.forOwnerOnly = false;
             nonEquipItems.forOwnerOnly = true;
-            summonEntityIds.forOwnerOnly = true;
+            summons.forOwnerOnly = true;
         }
 
         public override void OnSetup()
@@ -52,9 +52,11 @@ namespace MultiplayerARPG
             exp.onChange += OnExpChange;
             currentHp.onChange += OnCurrentHpChange;
             currentMp.onChange += OnCurrentMpChange;
+            currentFood.onChange += OnCurrentFoodChange;
+            currentWater.onChange += OnCurrentWaterChange;
+            pet.onChange += OnPetChange;
             equipWeapons.onChange += OnEquipWeaponsChange;
             isHidding.onChange += OnIsHiddingChange;
-            petEntityId.onChange += OnPetEntityIdChange;
             // On list changes events
             attributes.onOperation += OnAttributesOperation;
             skills.onOperation += OnSkillsOperation;
@@ -62,7 +64,7 @@ namespace MultiplayerARPG
             buffs.onOperation += OnBuffsOperation;
             equipItems.onOperation += OnEquipItemsOperation;
             nonEquipItems.onOperation += OnNonEquipItemsOperation;
-            summonEntityIds.onOperation += OnSummonEntityIdsOperation;
+            summons.onOperation += OnSummonsOperation;
             // Register Network functions
             RegisterNetFunction(NetFuncAttack);
             RegisterNetFunction<Vector3, int>(NetFuncUseSkill);
@@ -87,9 +89,11 @@ namespace MultiplayerARPG
             exp.onChange -= OnExpChange;
             currentHp.onChange -= OnCurrentHpChange;
             currentMp.onChange -= OnCurrentMpChange;
+            currentFood.onChange -= OnCurrentFoodChange;
+            currentWater.onChange -= OnCurrentWaterChange;
+            pet.onChange -= OnPetChange;
             equipWeapons.onChange -= OnEquipWeaponsChange;
             isHidding.onChange -= OnIsHiddingChange;
-            petEntityId.onChange -= OnPetEntityIdChange;
             // On list changes events
             attributes.onOperation -= OnAttributesOperation;
             skills.onOperation -= OnSkillsOperation;
@@ -97,7 +101,7 @@ namespace MultiplayerARPG
             buffs.onOperation -= OnBuffsOperation;
             equipItems.onOperation -= OnEquipItemsOperation;
             nonEquipItems.onOperation -= OnNonEquipItemsOperation;
-            summonEntityIds.onOperation -= OnSummonEntityIdsOperation;
+            summons.onOperation -= OnSummonsOperation;
 
             if (uiCharacterEntity != null)
                 Destroy(uiCharacterEntity.gameObject);

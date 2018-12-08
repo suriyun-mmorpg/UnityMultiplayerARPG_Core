@@ -12,10 +12,6 @@ public class CharacterItem : INetSerializable
     public short level;
     public short amount;
     public float durability;
-    public bool isSummoned;
-    public int currentSummonedHp;
-    public int currentSummonedMp;
-    public int currentSummonedExp;
     // TODO: I want to add random item bonus
     [System.NonSerialized]
     private int dirtyDataId;
@@ -196,13 +192,6 @@ public class CharacterItem : INetSerializable
         writer.Put(level);
         writer.Put(amount);
         writer.Put(durability);
-        writer.Put(isSummoned);
-        if (isSummoned)
-        {
-            writer.Put(currentSummonedHp);
-            writer.Put(currentSummonedMp);
-            writer.Put(currentSummonedExp);
-        }
     }
 
     public void Deserialize(NetDataReader reader)
@@ -211,13 +200,6 @@ public class CharacterItem : INetSerializable
         level = reader.GetShort();
         amount = reader.GetShort();
         durability = reader.GetFloat();
-        isSummoned = reader.GetBool();
-        if (isSummoned)
-        {
-            currentSummonedHp = reader.GetInt();
-            currentSummonedMp = reader.GetInt();
-            currentSummonedExp = reader.GetInt();
-        }
     }
 }
 

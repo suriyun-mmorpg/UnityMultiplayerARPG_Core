@@ -38,7 +38,8 @@ namespace MultiplayerARPG
         public MonsterSpawnArea spawnArea { get; private set; }
         public Vector3 spawnPosition { get; private set; }
         public BaseCharacterEntity summoner { get; protected set; }
-        public bool isSummoned { get; protected set; }
+        public SummonType summonType { get; protected set; }
+        public bool isSummoned { get { return summonType != SummonType.None; } }
 
         protected override void EntityAwake()
         {
@@ -430,32 +431,14 @@ namespace MultiplayerARPG
             Manager.Assets.NetworkSpawn(Identity.HashAssetId, spawnPosition, Quaternion.Euler(Vector3.up * Random.Range(0, 360)), Identity.ObjectId, Identity.ConnectionId);
         }
 
-        public void Summon(BaseCharacterEntity summoner, short level, int exp, int currentHp, int currentMp, int currentFood, int currentMana)
+        public void Summon(BaseCharacterEntity summoner, SummonType summonType, short level, int exp, int currentHp, int currentMp)
         {
             this.summoner = summoner;
+            this.summonType = summonType;
             Level = level;
             Exp = exp;
             CurrentHp = currentHp;
             CurrentMp = currentMp;
-            CurrentFood = currentFood;
-            CurrentWater = currentWater;
-            isSummoned = true;
-            if (summoner != null && !summoner.SummonEntityIds.Contains(ObjectId))
-                summoner.SummonEntityIds.Add(ObjectId);
-        }
-
-        public void SummonAsPet(BaseCharacterEntity summoner, short level, int exp, int currentHp, int currentMp, int currentFood, int currentMana)
-        {
-            this.summoner = summoner;
-            Level = level;
-            Exp = exp;
-            CurrentHp = currentHp;
-            CurrentMp = currentMp;
-            CurrentFood = currentFood;
-            CurrentWater = currentWater;
-            isSummoned = true;
-            if (summoner != null)
-                summoner.PetEntityId = ObjectId;
         }
 
         public override void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker)

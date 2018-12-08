@@ -65,7 +65,7 @@ public class CharacterBuff : INetSerializable
             cacheSkill = null;
             cacheItem = null;
             cacheGuildSkill = null;
-            cacheBuff = null;
+            cacheBuff = new Buff();
             cacheDuration = 0;
             cacheRecoveryHp = 0;
             cacheRecoveryMp = 0;
@@ -92,19 +92,16 @@ public class CharacterBuff : INetSerializable
                         cacheBuff = cacheGuildSkill.buff;
                     break;
             }
-            if (cacheBuff != null)
-            {
-                cacheDuration = cacheBuff.GetDuration(level);
-                cacheRecoveryHp = cacheBuff.GetRecoveryHp(level);
-                cacheRecoveryMp = cacheBuff.GetRecoveryMp(level);
-                cacheRecoveryStamina = cacheBuff.GetRecoveryStamina(level);
-                cacheRecoveryFood = cacheBuff.GetRecoveryFood(level);
-                cacheRecoveryWater = cacheBuff.GetRecoveryWater(level);
-                cacheIncreaseStats = cacheBuff.GetIncreaseStats(level);
-                cacheIncreaseAttributes = cacheBuff.GetIncreaseAttributes(level);
-                cacheIncreaseResistances = cacheBuff.GetIncreaseResistances(level);
-                cacheIncreaseDamages = cacheBuff.GetIncreaseDamages(level);
-            }
+            cacheDuration = cacheBuff.GetDuration(level);
+            cacheRecoveryHp = cacheBuff.GetRecoveryHp(level);
+            cacheRecoveryMp = cacheBuff.GetRecoveryMp(level);
+            cacheRecoveryStamina = cacheBuff.GetRecoveryStamina(level);
+            cacheRecoveryFood = cacheBuff.GetRecoveryFood(level);
+            cacheRecoveryWater = cacheBuff.GetRecoveryWater(level);
+            cacheIncreaseStats = cacheBuff.GetIncreaseStats(level);
+            cacheIncreaseAttributes = cacheBuff.GetIncreaseAttributes(level);
+            cacheIncreaseResistances = cacheBuff.GetIncreaseResistances(level);
+            cacheIncreaseDamages = cacheBuff.GetIncreaseDamages(level);
         }
     }
 

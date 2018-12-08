@@ -53,6 +53,7 @@ public static partial class PlayerCharacterDataExtension
         to.NonEquipItems = new List<CharacterItem>(from.NonEquipItems);
         to.Skills = new List<CharacterSkill>(from.Skills);
         to.SkillUsages = new List<CharacterSkillUsage>(from.SkillUsages);
+        to.Summons = new List<CharacterSummon>(from.Summons);
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "CloneTo", from, to);
         return to;
     }
