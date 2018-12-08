@@ -50,6 +50,13 @@ namespace MultiplayerARPG
         /// </summary>
         private readonly Dictionary<string, List<GameEffect>> cacheEffects = new Dictionary<string, List<GameEffect>>();
 
+        // Optimize garbage collector
+        private readonly List<string> tempKeepingKeys = new List<string>();
+        private readonly List<string> tempAddingKeys = new List<string>();
+        private readonly List<string> tempCachedKeys = new List<string>();
+        private GameObject tempEquipmentObject;
+        private BaseEquipmentModel tempEquipmentModel;
+
         private void CreateCacheModel(string equipPosition, Dictionary<string, GameObject> models)
         {
             DestroyCacheModel(equipPosition);
@@ -90,44 +97,46 @@ namespace MultiplayerARPG
             var leftHandShield = equipWeapons.leftHand.GetShieldItem();
 
             // Clear equipped item models
-            var keepingKeys = new List<string>();
+            tempKeepingKeys.Clear();
             if (rightHandWeapon != null)
-                keepingKeys.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
+                tempKeepingKeys.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
             if (leftHandWeapon != null || leftHandShield != null)
-                keepingKeys.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND);
+                tempKeepingKeys.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND);
 
-            var keys = new List<string>(cacheModels.Keys);
-            foreach (var key in keys)
+            tempCachedKeys.Clear();
+            tempCachedKeys.AddRange(cacheModels.Keys);
+            foreach (var key in tempCachedKeys)
             {
-                if (!keepingKeys.Contains(key) &&
+                if (!tempKeepingKeys.Contains(key) &&
                     (key.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND) ||
                     key.Equals(GameDataConst.EQUIP_POSITION_LEFT_HAND)))
                     DestroyCacheModel(key);
             }
 
             if (rightHandWeapon != null)
-                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandWeapon.equipmentModels);
+                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandWeapon.equipmentModels, equipWeapons.rightHand.level);
             if (leftHandWeapon != null)
-                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandWeapon.subEquipmentModels);
+                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandWeapon.subEquipmentModels, equipWeapons.leftHand.level);
             if (leftHandShield != null)
-                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandShield.equipmentModels);
+                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandShield.equipmentModels, equipWeapons.leftHand.level);
         }
 
         public void SetEquipItems(IList<CharacterItem> equipItems)
         {
             // Clear equipped item models
-            var keepingKeys = new List<string>();
+            tempKeepingKeys.Clear();
             foreach (var equipItem in equipItems)
             {
                 var armorItem = equipItem.GetArmorItem();
                 if (armorItem != null)
-                    keepingKeys.Add(armorItem.EquipPosition);
+                    tempKeepingKeys.Add(armorItem.EquipPosition);
             }
 
-            var keys = new List<string>(cacheModels.Keys);
-            foreach (var key in keys)
+            tempCachedKeys.Clear();
+            tempCachedKeys.AddRange(cacheModels.Keys);
+            foreach (var key in tempCachedKeys)
             {
-                if (!keepingKeys.Contains(key) &&
+                if (!tempKeepingKeys.Contains(key) &&
                     !key.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND) &&
                     !key.Equals(GameDataConst.EQUIP_POSITION_LEFT_HAND))
                     DestroyCacheModel(key);
@@ -138,35 +147,35 @@ namespace MultiplayerARPG
                 var armorItem = equipItem.GetArmorItem();
                 if (armorItem == null)
                     continue;
-                var equipPosition = armorItem.EquipPosition;
-                if (keepingKeys.Contains(equipPosition))
-                    InstantiateEquipModel(equipPosition, armorItem.equipmentModels);
+                if (tempKeepingKeys.Contains(armorItem.EquipPosition))
+                    InstantiateEquipModel(armorItem.EquipPosition, armorItem.equipmentModels, equipItem.level);
             }
         }
 
-        public void InstantiateEquipModel(string equipPosition, EquipmentModel[] equipmentModels)
+        public void InstantiateEquipModel(string equipPosition, EquipmentModel[] equipmentModels, int level)
         {
             if (equipmentModels == null || equipmentModels.Length == 0)
                 return;
             var models = new Dictionary<string, GameObject>();
             foreach (var equipmentModel in equipmentModels)
             {
-                var equipSocket = equipmentModel.equipSocket;
-                var model = equipmentModel.model;
-                if (string.IsNullOrEmpty(equipSocket) || model == null)
+                if (string.IsNullOrEmpty(equipmentModel.equipSocket) || equipmentModel.model == null)
                     continue;
                 EquipmentModelContainer container;
-                if (!CacheEquipmentModelContainers.TryGetValue(equipSocket, out container))
+                if (!CacheEquipmentModelContainers.TryGetValue(equipmentModel.equipSocket, out container))
                     continue;
-                var newModel = Instantiate(model, container.transform);
-                newModel.transform.localPosition = Vector3.zero;
-                newModel.transform.localEulerAngles = Vector3.zero;
-                newModel.transform.localScale = Vector3.one;
-                newModel.gameObject.SetActive(true);
-                newModel.gameObject.SetLayerRecursively(gameInstance.characterLayer.LayerIndex, true);
-                newModel.RemoveComponentsInChildren<Collider>(false);
-                AddingNewModel(newModel);
-                models.Add(equipSocket, newModel);
+                tempEquipmentObject = Instantiate(equipmentModel.model, container.transform);
+                tempEquipmentObject.transform.localPosition = Vector3.zero;
+                tempEquipmentObject.transform.localEulerAngles = Vector3.zero;
+                tempEquipmentObject.transform.localScale = Vector3.one;
+                tempEquipmentObject.gameObject.SetActive(true);
+                tempEquipmentObject.gameObject.SetLayerRecursively(gameInstance.characterLayer.LayerIndex, true);
+                tempEquipmentObject.RemoveComponentsInChildren<Collider>(false);
+                tempEquipmentModel = tempEquipmentObject.GetComponent<BaseEquipmentModel>();
+                if (tempEquipmentModel != null)
+                    tempEquipmentModel.Level = level;
+                AddingNewModel(tempEquipmentObject);
+                models.Add(equipmentModel.equipSocket, tempEquipmentObject);
             }
             CreateCacheModel(equipPosition, models);
         }
@@ -194,28 +203,29 @@ namespace MultiplayerARPG
 
         public void SetBuffs(IList<CharacterBuff> buffs)
         {
-            var keepingKeys = new List<string>();
-            var addingKeys = new List<string>();
+            tempKeepingKeys.Clear();
+            tempAddingKeys.Clear();
             foreach (var buff in buffs)
             {
                 var key = buff.GetKey();
-                keepingKeys.Add(key);
-                addingKeys.Add(key);
+                tempKeepingKeys.Add(key);
+                tempAddingKeys.Add(key);
             }
 
-            var keys = new List<string>(cacheEffects.Keys);
-            foreach (var key in keys)
+            tempCachedKeys.Clear();
+            tempCachedKeys.AddRange(cacheEffects.Keys);
+            foreach (var key in tempCachedKeys)
             {
-                if (!keepingKeys.Contains(key))
+                if (!tempKeepingKeys.Contains(key))
                     DestroyCacheEffect(key);
                 else
-                    addingKeys.Remove(key);
+                    tempAddingKeys.Remove(key);
             }
 
             foreach (var buff in buffs)
             {
                 var key = buff.GetKey();
-                if (addingKeys.Contains(key))
+                if (tempAddingKeys.Contains(key))
                 {
                     var buffData = buff.GetBuff();
                     InstantiateBuffEffect(key, buffData.effects);
@@ -227,8 +237,7 @@ namespace MultiplayerARPG
         {
             if (buffEffects == null || buffEffects.Length == 0)
                 return;
-            var effects = InstantiateEffect(buffEffects);
-            CreateCacheEffect(buffId, effects);
+            CreateCacheEffect(buffId, InstantiateEffect(buffEffects));
         }
 
         public bool GetRandomRightHandAttackAnimation(
