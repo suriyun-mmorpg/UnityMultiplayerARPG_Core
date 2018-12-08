@@ -429,7 +429,7 @@ namespace MultiplayerARPG
         #endregion
 
         #region Buffs / Weapons / Damage
-        protected void ApplyBuff(int dataId, BuffType type, short level)
+        public void ApplyBuff(int dataId, BuffType type, short level)
         {
             if (IsDead() || !IsServer)
                 return;
@@ -494,18 +494,20 @@ namespace MultiplayerARPG
                     ApplyBuff(skill.DataId, BuffType.SkillBuff, level);
                     break;
                 case SkillBuffType.BuffToNearbyAllies:
-                    tempCharacters = FindAliveCharacters<BaseCharacterEntity>(skill.buffDistance, true, false, false);
+                    tempCharacters = FindAliveCharacters<BaseCharacterEntity>(skill.buffDistance.GetAmount(level), true, false, false);
                     foreach (var character in tempCharacters)
                     {
-                        ApplyBuff(skill.DataId, BuffType.SkillBuff, level);
+                        character.ApplyBuff(skill.DataId, BuffType.SkillBuff, level);
                     }
+                    ApplyBuff(skill.DataId, BuffType.SkillBuff, level);
                     break;
                 case SkillBuffType.BuffToNearbyCharacters:
-                    tempCharacters = FindAliveCharacters<BaseCharacterEntity>(skill.buffDistance, true, false, true);
+                    tempCharacters = FindAliveCharacters<BaseCharacterEntity>(skill.buffDistance.GetAmount(level), true, false, true);
                     foreach (var character in tempCharacters)
                     {
-                        ApplyBuff(skill.DataId, BuffType.SkillBuff, level);
+                        character.ApplyBuff(skill.DataId, BuffType.SkillBuff, level);
                     }
+                    ApplyBuff(skill.DataId, BuffType.SkillBuff, level);
                     break;
             }
         }
@@ -1012,7 +1014,6 @@ namespace MultiplayerARPG
         {
             if (characterEntity == null || characterEntity == this || characterEntity.IsDead())
                 return false;
-
             return (findForAlly && characterEntity.IsAlly(this)) ||
                 (findForEnemy && characterEntity.IsEnemy(this)) ||
                 (findForNeutral && characterEntity.IsNeutral(this));
