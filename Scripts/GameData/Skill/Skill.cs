@@ -59,7 +59,7 @@ namespace MultiplayerARPG
 
         [Header("Buffs")]
         public SkillBuffType skillBuffType;
-        public float buffDistance;
+        public IncrementalFloat buffDistance;
         public Buff buff;
 
         [Header("Summon")]
