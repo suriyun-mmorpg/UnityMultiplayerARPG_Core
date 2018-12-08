@@ -11,24 +11,12 @@ namespace MultiplayerARPG
         public short level = 1;
         public short amount = 1;
         
-        private BaseGameNetworkManager cacheGameNetworkManager;
-        public BaseGameNetworkManager CacheGameNetworkManager
-        {
-            get
-            {
-                if (cacheGameNetworkManager == null)
-                    cacheGameNetworkManager = FindObjectOfType<BaseGameNetworkManager>();
-                if (cacheGameNetworkManager == null)
-                    Debug.LogWarning("[MonsterSpawnArea(" + name + ")] Cannot find `BaseGameNetworkManager`");
-                return cacheGameNetworkManager;
-            }
-        }
         private GameInstance gameInstance { get { return GameInstance.Singleton; } }
 
         public void RegisterAssets()
         {
             if (monsterCharacterEntity != null)
-                CacheGameNetworkManager.Assets.RegisterPrefab(monsterCharacterEntity.Identity);
+                BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(monsterCharacterEntity.Identity);
         }
 
         public void SpawnAll()
@@ -52,7 +40,7 @@ namespace MultiplayerARPG
             yield return new WaitForSecondsRealtime(delay);
             var spawnPosition = GetRandomPosition();
             var spawnRotation = GetRandomRotation();
-            var identity = CacheGameNetworkManager.Assets.NetworkSpawn(monsterCharacterEntity.Identity, spawnPosition, spawnRotation);
+            var identity = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(monsterCharacterEntity.Identity, spawnPosition, spawnRotation);
             var entity = identity.GetComponent<BaseMonsterCharacterEntity>();
             entity.Level = level;
             entity.SetSpawnArea(this, spawnPosition);

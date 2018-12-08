@@ -12,25 +12,12 @@ namespace MultiplayerARPG
 
         private int pending;
 
-        private BaseGameNetworkManager cacheGameNetworkManager;
-        public BaseGameNetworkManager CacheGameNetworkManager
-        {
-            get
-            {
-                if (cacheGameNetworkManager == null)
-                    cacheGameNetworkManager = FindObjectOfType<BaseGameNetworkManager>();
-                if (cacheGameNetworkManager == null)
-                    Debug.LogWarning("[HarvestableSpawnArea(" + name + ")] Cannot find `BaseGameNetworkManager`");
-                return cacheGameNetworkManager;
-            }
-        }
-
         private GameInstance gameInstance { get { return GameInstance.Singleton; } }
 
         public void RegisterAssets()
         {
             if (harvestableEntity != null)
-                CacheGameNetworkManager.Assets.RegisterPrefab(harvestableEntity.Identity);
+                BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(harvestableEntity.Identity);
         }
 
         public void SpawnAll()
@@ -71,7 +58,7 @@ namespace MultiplayerARPG
             }
             if (!overlapEntities)
             {
-                var identity = CacheGameNetworkManager.Assets.NetworkSpawn(harvestableEntity.Identity, spawnPosition, spawnRotation);
+                var identity = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(harvestableEntity.Identity, spawnPosition, spawnRotation);
                 if (identity != null)
                 {
                     var entity = identity.GetComponent<HarvestableEntity>();
