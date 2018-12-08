@@ -170,14 +170,14 @@ namespace MultiplayerARPG
                     switch (dimensionType)
                     {
                         case DimensionType.Dimension3D:
-                            var colliders = Physics.OverlapSphere(CacheTransform.position, explodeDistance, GameInstance.Singleton.characterLayer);
+                            var colliders = Physics.OverlapSphere(CacheTransform.position, explodeDistance);
                             foreach (var collider in colliders)
                             {
                                 FindAndApplyDamage(collider.gameObject);
                             }
                             break;
                         case DimensionType.Dimension2D:
-                            var colliders2D = Physics2D.OverlapCircleAll(CacheTransform.position, explodeDistance, GameInstance.Singleton.characterLayer);
+                            var colliders2D = Physics2D.OverlapCircleAll(CacheTransform.position, explodeDistance);
                             foreach (var collider in colliders2D)
                             {
                                 FindAndApplyDamage(collider.gameObject);
