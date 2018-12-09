@@ -60,18 +60,17 @@ namespace MultiplayerARPG
             {
                 if (summoner != null)
                 {
-                    // Teleport to summoner
                     if (Vector3.Distance(CacheTransform.position, summoner.CacheTransform.position) > GameInstance.maxFollowSummonerDistance)
                     {
-                        var randomPosition = summoner.CacheTransform.position;
-                        randomPosition += Vector3.right * Random.Range(-GameInstance.minFollowSummonerDistance, GameInstance.minFollowSummonerDistance);
-                        randomPosition += Vector3.forward * Random.Range(-GameInstance.minFollowSummonerDistance, GameInstance.minFollowSummonerDistance);
-                        var randomRotation = Quaternion.Euler(Vector3.up * Random.Range(0f, 360f));
-                        CacheNetTransform.Teleport(randomPosition, randomRotation);
+                        // Teleport to summoner if too far from summoner
+                        CacheNetTransform.Teleport(summoner.GetSummonPosition(), summoner.GetSummonRotation());
                     }
                 }
                 else
+                {
+                    // Summoner disappear so destroy it
                     DeSummon();
+                }
             }
         }
 
@@ -176,7 +175,11 @@ namespace MultiplayerARPG
                 // If another monster has same allyId so it is ally
                 var monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
                 if (monsterCharacterEntity != null)
+                {
+                    if (monsterCharacterEntity.summoner != null)
+                        return IsAlly(monsterCharacterEntity.summoner);
                     return monsterCharacterEntity.MonsterDatabase.allyId == MonsterDatabase.allyId;
+                }
             }
             return false;
         }
@@ -267,6 +270,9 @@ namespace MultiplayerARPG
             // Add received damage entry
             if (attacker != null)
             {
+                if (attacker is BaseMonsterCharacterEntity && (attacker as BaseMonsterCharacterEntity).summoner != null)
+                    attacker = (attacker as BaseMonsterCharacterEntity).summoner;
+
                 var receivedDamageRecord = new ReceivedDamageRecord();
                 receivedDamageRecord.totalReceivedDamage = damage;
                 if (receivedDamageRecords.ContainsKey(attacker))

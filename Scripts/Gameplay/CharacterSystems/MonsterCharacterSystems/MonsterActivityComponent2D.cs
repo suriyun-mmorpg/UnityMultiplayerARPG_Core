@@ -306,7 +306,6 @@ namespace MultiplayerARPG
                     var characterEntity = foundObject.GetComponent<BaseCharacterEntity>();
                     // Attack target settings
                     if (characterEntity != null &&
-                        CacheMonsterCharacterEntity.IsEnemy(characterEntity) &&
                         characterEntity.CanReceiveDamageFrom(CacheMonsterCharacterEntity))
                     {
                         SetStartFollowTargetTime(time);
