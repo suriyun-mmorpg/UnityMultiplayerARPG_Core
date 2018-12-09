@@ -26,8 +26,6 @@ namespace MultiplayerARPG
             currentFood.forOwnerOnly = false;
             currentWater.sendOptions = SendOptions.ReliableOrdered;
             currentWater.forOwnerOnly = false;
-            pet.sendOptions = SendOptions.ReliableOrdered;
-            pet.forOwnerOnly = true;
             equipWeapons.sendOptions = SendOptions.ReliableOrdered;
             equipWeapons.forOwnerOnly = false;
             isHidding.sendOptions = SendOptions.ReliableOrdered;
@@ -54,7 +52,6 @@ namespace MultiplayerARPG
             currentMp.onChange += OnCurrentMpChange;
             currentFood.onChange += OnCurrentFoodChange;
             currentWater.onChange += OnCurrentWaterChange;
-            pet.onChange += OnPetChange;
             equipWeapons.onChange += OnEquipWeaponsChange;
             isHidding.onChange += OnIsHiddingChange;
             // On list changes events
@@ -91,7 +88,6 @@ namespace MultiplayerARPG
             currentMp.onChange -= OnCurrentMpChange;
             currentFood.onChange -= OnCurrentFoodChange;
             currentWater.onChange -= OnCurrentWaterChange;
-            pet.onChange -= OnPetChange;
             equipWeapons.onChange -= OnEquipWeaponsChange;
             isHidding.onChange -= OnIsHiddingChange;
             // On list changes events

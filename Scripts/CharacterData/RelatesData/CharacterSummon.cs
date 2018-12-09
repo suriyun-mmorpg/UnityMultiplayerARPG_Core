@@ -10,7 +10,7 @@ public enum SummonType : byte
 }
 
 [System.Serializable]
-public class CharacterSummon : INetSerializable
+public struct CharacterSummon : INetSerializable
 {
     public static readonly CharacterSummon Empty = new CharacterSummon();
     public SummonType type;

@@ -26,8 +26,6 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldInt currentWater = new SyncFieldInt();
         [SerializeField]
-        protected SyncFieldCharacterSummon pet = new SyncFieldCharacterSummon();
-        [SerializeField]
         protected SyncFieldEquipWeapons equipWeapons = new SyncFieldEquipWeapons();
         [SerializeField]
         protected SyncFieldBool isHidding = new SyncFieldBool();
@@ -57,7 +55,6 @@ namespace MultiplayerARPG
         public System.Action<int> onCurrentMpChange;
         public System.Action<int> onCurrentFoodChange;
         public System.Action<int> onCurrentWaterChange;
-        public System.Action<CharacterSummon> onPetChange;
         public System.Action<EquipWeapons> onEquipWeaponsChange;
         public System.Action<bool> onIsHiddingChange;
         // List
@@ -81,7 +78,6 @@ namespace MultiplayerARPG
         public virtual int CurrentStamina { get { return currentStamina.Value; } set { currentStamina.Value = value; } }
         public virtual int CurrentFood { get { return currentFood.Value; } set { currentFood.Value = value; } }
         public virtual int CurrentWater { get { return currentWater.Value; } set { currentWater.Value = value; } }
-        public virtual CharacterSummon Pet { get { return pet.Value; } set { pet.Value = value; } }
         public virtual EquipWeapons EquipWeapons { get { return equipWeapons.Value; } set { equipWeapons.Value = value; } }
         public virtual bool IsHidding { get { return isHidding.Value; } set { isHidding.Value = value; } }
         public override string Title { get { return CharacterName; } set { } }
@@ -254,16 +250,6 @@ namespace MultiplayerARPG
         {
             if (onCurrentWaterChange != null)
                 onCurrentWaterChange.Invoke(currentWater);
-        }
-
-        /// <summary>
-        /// Override this to do stuffs when pet changes
-        /// </summary>
-        /// <param name="characterSummon"></param>
-        protected virtual void OnPetChange(CharacterSummon characterSummon)
-        {
-            if (onPetChange != null)
-                onPetChange.Invoke(characterSummon);
         }
 
         /// <summary>

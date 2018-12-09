@@ -14,7 +14,6 @@ public partial interface ICharacterData
     int CurrentStamina { get; set; }
     int CurrentFood { get; set; }
     int CurrentWater { get; set; }
-    CharacterSummon Pet { get; set; }
     EquipWeapons EquipWeapons { get; set; }
     // Listing
     IList<CharacterAttribute> Attributes { get; set; }
