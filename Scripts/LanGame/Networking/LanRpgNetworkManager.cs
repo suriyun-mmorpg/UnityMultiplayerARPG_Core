@@ -94,6 +94,12 @@ namespace MultiplayerARPG
             var identity = Assets.NetworkSpawn(entityPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
             var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterData.CloneTo(playerCharacterEntity);
+            for (var i = 0; i < playerCharacterEntity.Summons.Count; ++i)
+            {
+                var summon = playerCharacterEntity.Summons[i];
+                summon.Summon(playerCharacterEntity, summon.Level, summon.summonRemainsDuration, summon.Exp, summon.CurrentHp, summon.CurrentMp);
+                playerCharacterEntity.Summons[i] = summon;
+            }
             // Notify clients that this character is spawn or dead
             if (!playerCharacterEntity.IsDead())
                 playerCharacterEntity.RequestOnRespawn();

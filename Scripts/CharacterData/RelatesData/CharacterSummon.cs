@@ -15,12 +15,18 @@ public class CharacterSummon : INetSerializable
     public static readonly CharacterSummon Empty = new CharacterSummon();
     public SummonType type;
     public int dataId;
-    public short level;
     public float summonRemainsDuration;
-    public int exp;
-    public int currentHp;
-    public int currentMp;
     public uint objectId;
+    // For save / load
+    public short level;
+    public short Level { get { return level = (CacheEntity != null ? CacheEntity.Level : level); } }
+    public int exp;
+    public int Exp { get { return exp = (CacheEntity != null ? CacheEntity.Exp : exp); } }
+    public int currentHp;
+    public int CurrentHp { get { return currentHp = (CacheEntity != null ? CacheEntity.CurrentHp : currentHp); } }
+    public int currentMp;
+    public int CurrentMp { get { return currentMp = (CacheEntity != null ? CacheEntity.CurrentMp : currentMp); } }
+
     [System.NonSerialized]
     private int dirtyDataId;
     [System.NonSerialized]
@@ -93,10 +99,6 @@ public class CharacterSummon : INetSerializable
         var identity = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(GetPrefab().Identity, summoner.GetSummonPosition(), summoner.GetSummonRotation());
         cacheEntity = identity.GetComponent<BaseMonsterCharacterEntity>();
         CacheEntity.Summon(summoner, type, summonLevel);
-        level = CacheEntity.Level;
-        exp = CacheEntity.Exp;
-        currentHp = CacheEntity.CurrentHp;
-        currentMp = CacheEntity.CurrentMp;
         objectId = CacheEntity.ObjectId;
         summonRemainsDuration = duration;
     }
@@ -107,9 +109,6 @@ public class CharacterSummon : INetSerializable
         CacheEntity.Exp = summonExp;
         CacheEntity.CurrentHp = summonCurrentHp;
         CacheEntity.CurrentMp = summonCurrentMp;
-        exp = CacheEntity.Exp;
-        currentHp = CacheEntity.CurrentHp;
-        currentMp = CacheEntity.CurrentMp;
         objectId = CacheEntity.ObjectId;
     }
 
@@ -128,10 +127,6 @@ public class CharacterSummon : INetSerializable
     {
         if (CacheEntity == null)
             return;
-        level = CacheEntity.Level;
-        exp = CacheEntity.Exp;
-        currentHp = CacheEntity.CurrentHp;
-        currentMp = CacheEntity.CurrentMp;
         summonRemainsDuration -= deltaTime;
     }
 
@@ -149,18 +144,12 @@ public class CharacterSummon : INetSerializable
         if (type != SummonType.None)
         {
             writer.Put(dataId);
-            writer.Put(level);
             switch (type)
             {
-                case SummonType.Pet:
-                    writer.Put(exp);
-                    break;
                 case SummonType.Skill:
                     writer.Put(summonRemainsDuration);
                     break;
             }
-            writer.Put(currentHp);
-            writer.Put(currentMp);
             writer.PutPackedUInt(objectId);
         }
     }
@@ -171,18 +160,12 @@ public class CharacterSummon : INetSerializable
         if (type != SummonType.None)
         {
             dataId = reader.GetInt();
-            level = reader.GetShort();
             switch (type)
             {
-                case SummonType.Pet:
-                    exp = reader.GetInt();
-                    break;
                 case SummonType.Skill:
                     summonRemainsDuration = reader.GetFloat();
                     break;
             }
-            currentHp = reader.GetInt();
-            currentMp = reader.GetInt();
             objectId = reader.GetPackedUInt();
         }
     }

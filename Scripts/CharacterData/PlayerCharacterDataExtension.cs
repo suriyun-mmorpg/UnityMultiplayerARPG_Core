@@ -271,6 +271,7 @@ public static partial class PlayerCharacterDataExtension
         var questSS = new CharacterQuestSerializationSurrogate();
         var skillSS = new CharacterSkillSerializationSurrogate();
         var skillUsageSS = new CharacterSkillUsageSerializationSurrogate();
+        var summonSS = new CharacterSummonSerializationSurrogate();
         surrogateSelector.AddSurrogate(typeof(PlayerCharacterData), new StreamingContext(StreamingContextStates.All), playerCharacterDataSS);
         surrogateSelector.AddSurrogate(typeof(CharacterAttribute), new StreamingContext(StreamingContextStates.All), attributeSS);
         surrogateSelector.AddSurrogate(typeof(CharacterBuff), new StreamingContext(StreamingContextStates.All), buffSS);
@@ -279,6 +280,7 @@ public static partial class PlayerCharacterDataExtension
         surrogateSelector.AddSurrogate(typeof(CharacterQuest), new StreamingContext(StreamingContextStates.All), questSS);
         surrogateSelector.AddSurrogate(typeof(CharacterSkill), new StreamingContext(StreamingContextStates.All), skillSS);
         surrogateSelector.AddSurrogate(typeof(CharacterSkillUsage), new StreamingContext(StreamingContextStates.All), skillUsageSS);
+        surrogateSelector.AddSurrogate(typeof(CharacterSummon), new StreamingContext(StreamingContextStates.All), summonSS);
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "AddAllCharacterRelatesDataSurrogate", surrogateSelector);
     }
 
@@ -394,80 +396,49 @@ public static partial class PlayerCharacterDataExtension
         writer.Put((byte)characterData.Attributes.Count);
         foreach (var entry in characterData.Attributes)
         {
-            writer.Put(entry.dataId);
-            writer.Put(entry.amount);
+            entry.Serialize(writer);
         }
         writer.Put((byte)characterData.Buffs.Count);
         foreach (var entry in characterData.Buffs)
         {
-            writer.Put(entry.dataId);
-            writer.Put((byte)entry.type);
-            writer.Put(entry.level);
-            writer.Put(entry.buffRemainsDuration);
+            entry.Serialize(writer);
         }
         writer.Put((byte)characterData.Skills.Count);
         foreach (var entry in characterData.Skills)
         {
-            writer.Put(entry.dataId);
-            writer.Put(entry.level);
+            entry.Serialize(writer);
         }
         writer.Put((byte)characterData.SkillUsages.Count);
         foreach (var entry in characterData.SkillUsages)
         {
-            writer.Put(entry.dataId);
-            writer.Put((byte)entry.type);
-            writer.Put(entry.coolDownRemainsDuration);
+            entry.Serialize(writer);
+        }
+        writer.Put((byte)characterData.Summons.Count);
+        foreach (var entry in characterData.Summons)
+        {
+            entry.Serialize(writer);
         }
         writer.Put((byte)characterData.EquipItems.Count);
         foreach (var entry in characterData.EquipItems)
         {
-            writer.Put(entry.dataId);
-            writer.Put(entry.level);
-            writer.Put(entry.amount);
-            writer.Put(entry.durability);
+            entry.Serialize(writer);
         }
         writer.Put((short)characterData.NonEquipItems.Count);
         foreach (var entry in characterData.NonEquipItems)
         {
-            writer.Put(entry.dataId);
-            writer.Put(entry.level);
-            writer.Put(entry.amount);
-            writer.Put(entry.durability);
+            entry.Serialize(writer);
         }
         writer.Put((byte)characterData.Hotkeys.Count);
         foreach (var entry in characterData.Hotkeys)
         {
-            writer.Put(entry.hotkeyId);
-            writer.Put((byte)entry.type);
-            writer.Put(entry.dataId);
+            entry.Serialize(writer);
         }
         writer.Put((byte)characterData.Quests.Count);
         foreach (var entry in characterData.Quests)
         {
-            writer.Put(entry.dataId);
-            writer.Put(entry.isComplete);
-            var killedMonsters = entry.killedMonsters;
-            var killMonsterCount = killedMonsters == null ? 0 : killedMonsters.Count;
-            writer.Put(killMonsterCount);
-            if (killMonsterCount > 0)
-            {
-                foreach (var killedMonster in killedMonsters)
-                {
-                    writer.Put(killedMonster.Key);
-                    writer.Put(killedMonster.Value);
-                }
-            }
+            entry.Serialize(writer);
         }
-        var rightHand = characterData.EquipWeapons.rightHand;
-        writer.Put(rightHand.dataId);
-        writer.Put(rightHand.level);
-        writer.Put(rightHand.amount);
-        writer.Put(rightHand.durability);
-        var leftHand = characterData.EquipWeapons.leftHand;
-        writer.Put(leftHand.dataId);
-        writer.Put(leftHand.level);
-        writer.Put(leftHand.amount);
-        writer.Put(leftHand.durability);
+        characterData.EquipWeapons.Serialize(writer);
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "SerializeCharacterData", characterData, writer);
     }
 
@@ -502,98 +473,68 @@ public static partial class PlayerCharacterDataExtension
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterAttribute();
-            entry.dataId = reader.GetInt();
-            entry.amount = reader.GetShort();
+            entry.Deserialize(reader);
             tempCharacterData.Attributes.Add(entry);
         }
         count = reader.GetByte();
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterBuff();
-            entry.dataId = reader.GetInt();
-            entry.type = (BuffType)reader.GetByte();
-            entry.level = reader.GetShort();
-            entry.buffRemainsDuration = reader.GetFloat();
+            entry.Deserialize(reader);
             tempCharacterData.Buffs.Add(entry);
         }
         count = reader.GetByte();
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterSkill();
-            entry.dataId = reader.GetInt();
-            entry.level = reader.GetShort();
+            entry.Deserialize(reader);
             tempCharacterData.Skills.Add(entry);
         }
         count = reader.GetByte();
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterSkillUsage();
-            entry.dataId = reader.GetInt();
-            entry.type = (SkillUsageType)reader.GetByte();
-            entry.coolDownRemainsDuration = reader.GetFloat();
+            entry.Deserialize(reader);
             tempCharacterData.SkillUsages.Add(entry);
         }
         count = reader.GetByte();
         for (var i = 0; i < count; ++i)
         {
+            var entry = new CharacterSummon();
+            entry.Deserialize(reader);
+            tempCharacterData.Summons.Add(entry);
+        }
+        count = reader.GetByte();
+        for (var i = 0; i < count; ++i)
+        {
             var entry = new CharacterItem();
-            entry.dataId = reader.GetInt();
-            entry.level = reader.GetShort();
-            entry.amount = reader.GetShort();
-            entry.durability = reader.GetFloat();
+            entry.Deserialize(reader);
             tempCharacterData.EquipItems.Add(entry);
         }
         count = reader.GetShort();
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterItem();
-            entry.dataId = reader.GetInt();
-            entry.level = reader.GetShort();
-            entry.amount = reader.GetShort();
-            entry.durability = reader.GetFloat();
+            entry.Deserialize(reader);
             tempCharacterData.NonEquipItems.Add(entry);
         }
         count = reader.GetByte();
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterHotkey();
-            entry.hotkeyId = reader.GetString();
-            entry.type = (HotkeyType)reader.GetByte();
-            entry.dataId = reader.GetInt();
+            entry.Deserialize(reader);
             tempCharacterData.Hotkeys.Add(entry);
         }
         count = reader.GetByte();
         for (var i = 0; i < count; ++i)
         {
             var entry = new CharacterQuest();
-            entry.dataId = reader.GetInt();
-            entry.isComplete = reader.GetBool();
-            var killMonsterCount = reader.GetInt();
-            entry.killedMonsters = new Dictionary<int, int>();
-            for (var j = 0; j < killMonsterCount; ++j)
-            {
-                entry.killedMonsters.Add(reader.GetInt(), reader.GetInt());
-            }
+            entry.Deserialize(reader);
             tempCharacterData.Quests.Add(entry);
         }
-
-        var rightWeapon = new CharacterItem();
-        rightWeapon.dataId = reader.GetInt();
-        rightWeapon.level = reader.GetShort();
-        rightWeapon.amount = reader.GetShort();
-        rightWeapon.durability = reader.GetFloat();
-
-        var leftWeapon = new CharacterItem();
-        leftWeapon.dataId = reader.GetInt();
-        leftWeapon.level = reader.GetShort();
-        leftWeapon.amount = reader.GetShort();
-        leftWeapon.durability = reader.GetFloat();
-
         var equipWeapons = new EquipWeapons();
-        equipWeapons.rightHand = rightWeapon;
-        equipWeapons.leftHand = leftWeapon;
+        equipWeapons.Deserialize(reader);
         tempCharacterData.EquipWeapons = equipWeapons;
-
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "DeserializeCharacterData", characterData, reader);
 
         tempCharacterData.ValidateCharacterData();

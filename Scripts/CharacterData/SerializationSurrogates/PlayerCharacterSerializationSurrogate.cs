@@ -28,6 +28,7 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
         info.AddListValue("buffs", data.Buffs);
         info.AddListValue("equipItems", data.EquipItems);
         info.AddListValue("nonEquipItems", data.NonEquipItems);
+        info.AddListValue("summons", data.Summons);
         // Player Character
         info.AddValue("statPoint", data.StatPoint);
         info.AddValue("skillPoint", data.SkillPoint);
@@ -67,6 +68,7 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
         data.Buffs = info.GetListValue<CharacterBuff>("buffs");
         data.EquipItems = info.GetListValue<CharacterItem>("equipItems");
         data.NonEquipItems = info.GetListValue<CharacterItem>("nonEquipItems");
+        data.Summons = info.GetListValue<CharacterSummon>("summons");
         // Player Character
         data.StatPoint = info.GetInt16("statPoint");
         data.SkillPoint = info.GetInt16("skillPoint");
