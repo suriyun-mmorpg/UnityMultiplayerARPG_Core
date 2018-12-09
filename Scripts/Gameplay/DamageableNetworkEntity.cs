@@ -5,7 +5,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public abstract class DamageableNetworkEntity : BaseGameEntity
+    public abstract class DamageableNetworkEntity : BaseGameEntity, IDamageableEntity
     {
         [SerializeField]
         protected SyncFieldInt currentHp = new SyncFieldInt();
@@ -51,17 +51,22 @@ namespace MultiplayerARPG
             return CurrentHp <= 0;
         }
 
-        public virtual void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
+        public virtual void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
         {
             if (!IsServer || IsDead())
                 return;
             this.InvokeInstanceDevExtMethods("ReceiveDamage", attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
         }
 
-        public virtual void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountType combatAmountType, int damage)
+        public virtual void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)
         {
             this.InvokeInstanceDevExtMethods("ReceivedDamage", attacker, combatAmountType, damage);
             RequestCombatAmount(combatAmountType, damage);
+        }
+
+        public virtual bool CanReceiveDamageFrom(IAttackerEntity attacker)
+        {
+            return true;
         }
     }
 }

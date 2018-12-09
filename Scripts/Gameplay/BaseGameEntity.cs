@@ -190,7 +190,7 @@ namespace MultiplayerARPG
             title = syncTitle;
         }
 
-        public bool TryGetEntityByObjectId<T>(uint objectId, out T result) where T : LiteNetLibBehaviour
+        public bool TryGetEntityByObjectId<T>(uint objectId, out T result) where T : class
         {
             result = null;
             LiteNetLibIdentity identity;

@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(CharacterAnimationComponent))]
     [RequireComponent(typeof(CharacterRecoveryComponent))]
     [RequireComponent(typeof(CharacterSkillAndBuffComponent))]
-    public abstract partial class BaseCharacterEntity : DamageableNetworkEntity, ICharacterData
+    public abstract partial class BaseCharacterEntity : DamageableNetworkEntity, ICharacterData, IAttackerEntity
     {
         public const float ACTION_COMMAND_DELAY = 0.2f;
         public const int OVERLAP_COLLIDER_SIZE = 32;
@@ -310,25 +310,26 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
+        public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
         {
             if (!IsServer || IsDead() || !CanReceiveDamageFrom(attacker))
                 return;
 
             base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
+            var attackerCharacter = attacker as BaseCharacterEntity;
 
             // Notify enemy spotted when received damage from enemy
-            NotifyEnemySpottedToAllies(attacker);
+            NotifyEnemySpottedToAllies(attackerCharacter);
 
             // Notify enemy spotted when damage taken to enemy
-            attacker.NotifyEnemySpottedToAllies(this);
+            attackerCharacter.NotifyEnemySpottedToAllies(this);
 
             // Calculate chance to hit
-            var hitChance = GameInstance.GameplayRule.GetHitChance(attacker, this);
+            var hitChance = GameInstance.GameplayRule.GetHitChance(attackerCharacter, this);
             // If miss, return don't calculate damages
             if (Random.value > hitChance)
             {
-                ReceivedDamage(attacker, CombatAmountType.Miss, 0);
+                ReceivedDamage(attackerCharacter, CombatAmountType.Miss, 0);
                 return;
             }
 
@@ -356,29 +357,29 @@ namespace MultiplayerARPG
                 RequestPlayEffect(hitEffectsId);
 
             // Calculate chance to critical
-            var criticalChance = GameInstance.GameplayRule.GetCriticalChance(attacker, this);
+            var criticalChance = GameInstance.GameplayRule.GetCriticalChance(attackerCharacter, this);
             var isCritical = Random.value <= criticalChance;
             // If critical occurs
             if (isCritical)
-                calculatingTotalDamage = GameInstance.GameplayRule.GetCriticalDamage(attacker, this, calculatingTotalDamage);
+                calculatingTotalDamage = GameInstance.GameplayRule.GetCriticalDamage(attackerCharacter, this, calculatingTotalDamage);
 
             // Calculate chance to block
-            var blockChance = GameInstance.GameplayRule.GetBlockChance(attacker, this);
+            var blockChance = GameInstance.GameplayRule.GetBlockChance(attackerCharacter, this);
             var isBlocked = Random.value <= blockChance;
             // If block occurs
             if (isBlocked)
-                calculatingTotalDamage = GameInstance.GameplayRule.GetBlockDamage(attacker, this, calculatingTotalDamage);
+                calculatingTotalDamage = GameInstance.GameplayRule.GetBlockDamage(attackerCharacter, this, calculatingTotalDamage);
 
             // Apply damages
             var totalDamage = (int)calculatingTotalDamage;
             CurrentHp -= totalDamage;
 
             if (isBlocked)
-                ReceivedDamage(attacker, CombatAmountType.BlockedDamage, totalDamage);
+                ReceivedDamage(attackerCharacter, CombatAmountType.BlockedDamage, totalDamage);
             else if (isCritical)
-                ReceivedDamage(attacker, CombatAmountType.CriticalDamage, totalDamage);
+                ReceivedDamage(attackerCharacter, CombatAmountType.CriticalDamage, totalDamage);
             else
-                ReceivedDamage(attacker, CombatAmountType.NormalDamage, totalDamage);
+                ReceivedDamage(attackerCharacter, CombatAmountType.NormalDamage, totalDamage);
 
             if (CharacterModel != null)
                 CharacterModel.PlayHurtAnimation();
@@ -387,7 +388,7 @@ namespace MultiplayerARPG
             if (IsDead())
             {
                 // Call killed function, this should be called only once when dead
-                Killed(attacker);
+                Killed(attackerCharacter);
             }
             else
             {
@@ -418,7 +419,7 @@ namespace MultiplayerARPG
             targetEntity = entity;
         }
 
-        public bool TryGetTargetEntity<T>(out T entity) where T : BaseGameEntity
+        public bool TryGetTargetEntity<T>(out T entity) where T : class
         {
             entity = null;
             if (targetEntity == null)
@@ -803,7 +804,7 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return;
 
-            DamageableNetworkEntity tempDamageableEntity = null;
+            IDamageableEntity tempDamageableEntity = null;
             Vector3 damagePosition;
             Quaternion damageRotation;
             GetDamagePositionAndRotation(damageInfo.damageType, out damagePosition, out damageRotation);
@@ -822,11 +823,13 @@ namespace MultiplayerARPG
                             tempDamageableEntity = tempGameObject.GetComponent<DamageableNetworkEntity>();
                         }
                         // Target receive damage
-                        if (tempDamageableEntity != null &&
-                            tempDamageableEntity != this &&
-                            !tempDamageableEntity.IsDead() &&
-                            IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.CacheTransform.position))
+                        if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() &&
+                            (!(tempDamageableEntity is BaseCharacterEntity) || (BaseCharacterEntity)tempDamageableEntity != this) &&
+                            IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position))
+                        {
+                            // Pass all receive damage condition, then apply damages
                             tempDamageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId);
+                        }
                     }
                     else
                     {
@@ -837,19 +840,14 @@ namespace MultiplayerARPG
                         {
                             tempGameObject = GetOverlapObject(counter);
                             tempDamageableEntity = tempGameObject.GetComponent<DamageableNetworkEntity>();
-                            // Try to find damageable entity by building object materials
-                            if (tempDamageableEntity == null)
-                            {
-                                var buildingMaterial = tempGameObject.GetComponent<BuildingMaterial>();
-                                if (buildingMaterial != null && buildingMaterial.buildingEntity != null)
-                                    tempDamageableEntity = buildingMaterial.buildingEntity;
-                            }
                             // Target receive damage
-                            if (tempDamageableEntity != null &&
-                                tempDamageableEntity != this &&
-                                !tempDamageableEntity.IsDead() &&
-                                IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.CacheTransform.position))
+                            if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() &&
+                                (!(tempDamageableEntity is BaseCharacterEntity) || (BaseCharacterEntity)tempDamageableEntity != this) &&
+                                IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position))
+                            {
+                                // Pass all receive damage condition, then apply damages
                                 tempDamageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId);
+                            }
                         }
                     }
                     break;
@@ -907,10 +905,11 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountType combatAmountType, int damage)
+        public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)
         {
             base.ReceivedDamage(attacker, combatAmountType, damage);
-            GameInstance.GameplayRule.OnCharacterReceivedDamage(attacker, this, combatAmountType, damage);
+            if (attacker is BaseCharacterEntity)
+                GameInstance.GameplayRule.OnCharacterReceivedDamage(attacker as BaseCharacterEntity, this, combatAmountType, damage);
         }
 
         public virtual void Killed(BaseCharacterEntity lastAttacker)
@@ -1072,7 +1071,6 @@ namespace MultiplayerARPG
         }
 
         public abstract void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker);
-        public abstract bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity);
         public abstract bool IsAlly(BaseCharacterEntity characterEntity);
         public abstract bool IsEnemy(BaseCharacterEntity characterEntity);
         public bool IsNeutral(BaseCharacterEntity characterEntity)

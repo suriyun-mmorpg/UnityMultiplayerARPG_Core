@@ -94,8 +94,12 @@ namespace MultiplayerARPG
             GameManager.WarpCharacter(this, RespawnMapName, RespawnPosition);
         }
 
-        public override bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity)
+        public override bool CanReceiveDamageFrom(IAttackerEntity attacker)
         {
+            if (attacker == null)
+                return false;
+
+            var characterEntity = attacker as BaseCharacterEntity;
             if (characterEntity == null)
                 return false;
 

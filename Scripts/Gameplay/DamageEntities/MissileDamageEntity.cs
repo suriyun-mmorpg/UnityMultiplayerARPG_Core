@@ -19,8 +19,8 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldPackedUInt lockingTargetId;
 
-        protected DamageableNetworkEntity lockingTarget;
-        public DamageableNetworkEntity LockingTarget
+        protected IDamageableEntity lockingTarget;
+        public IDamageableEntity LockingTarget
         {
             get
             {
@@ -60,14 +60,14 @@ namespace MultiplayerARPG
         }
 
         public void SetupDamage(
-            BaseCharacterEntity attacker,
+            IAttackerEntity attacker,
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
             CharacterBuff debuff,
             uint hitEffectsId,
             float missileDistance,
             float missileSpeed,
-            DamageableNetworkEntity lockingTarget)
+            IDamageableEntity lockingTarget)
         {
             SetupDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
             this.missileDistance = missileDistance;
@@ -90,7 +90,7 @@ namespace MultiplayerARPG
             if (LockingTarget != null)
             {
                 // Lookat target then do anything when it's in range
-                var lookAtDirection = (LockingTarget.CacheTransform.position - CacheTransform.position).normalized;
+                var lookAtDirection = (LockingTarget.transform.position - CacheTransform.position).normalized;
                 // slerp to the desired rotation over time
                 if (lookAtDirection.magnitude > 0)
                 {
@@ -135,22 +135,15 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return false;
 
-            var damageableEntity = other.GetComponent<DamageableNetworkEntity>();
-            // Try to find damageable entity by building object materials
-            if (damageableEntity == null)
-            {
-                var buildingMaterial = other.GetComponent<BuildingMaterial>();
-                if (buildingMaterial != null && buildingMaterial.buildingEntity != null)
-                    damageableEntity = buildingMaterial.buildingEntity;
-            }
-
+            var damageableEntity = other.GetComponent<IDamageableEntity>();
+            
             if (LockingTarget != null && damageableEntity != LockingTarget)
                 return false;
 
-            if (damageableEntity == null || damageableEntity == attacker || damageableEntity.IsDead())
+            if (damageableEntity == null || damageableEntity.gameObject == attacker.gameObject || damageableEntity.IsDead())
                 return false;
 
-            if (attacker is BaseMonsterCharacterEntity && damageableEntity is BaseMonsterCharacterEntity)
+            if (attacker is BaseCharacterEntity && (attacker as BaseCharacterEntity).CanReceiveDamageFrom(attacker))
                 return false;
 
             ApplyDamageTo(damageableEntity);

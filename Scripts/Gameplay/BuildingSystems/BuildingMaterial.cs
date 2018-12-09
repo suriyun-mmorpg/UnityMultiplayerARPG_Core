@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class BuildingMaterial : MonoBehaviour
+    public class BuildingMaterial : MonoBehaviour, IDamageableEntity
     {
         public enum State
         {
@@ -48,6 +48,10 @@ namespace MultiplayerARPG
             }
         }
 
+        public uint ObjectId { get { return buildingEntity.ObjectId; } }
+        public int CurrentHp { get { return buildingEntity.CurrentHp; } set { buildingEntity.CurrentHp = value; } }
+        public Transform CacheTransform { get { return buildingEntity.CacheTransform; } }
+        
         private void Awake()
         {
             meshRenderer = GetComponent<MeshRenderer>();
@@ -73,6 +77,21 @@ namespace MultiplayerARPG
                 buildingEntity.TriggerExitEntity(other.GetComponent<BaseGameEntity>());
                 buildingEntity.TriggerExitBuildingMaterial(other.GetComponent<BuildingMaterial>());
             }
+        }
+
+        public bool IsDead()
+        {
+            return buildingEntity.IsDead();
+        }
+
+        public void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
+        {
+            buildingEntity.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
+        }
+
+        public bool CanReceiveDamageFrom(IAttackerEntity attacker)
+        {
+            return buildingEntity.CanReceiveDamageFrom(attacker);
         }
     }
 }

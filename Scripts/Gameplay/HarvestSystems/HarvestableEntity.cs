@@ -61,12 +61,13 @@ namespace MultiplayerARPG
                 onHarvestableDestroy.Invoke();
         }
 
-        public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
+        public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
         {
             if (!IsServer || IsDead() || weapon == null)
                 return;
 
             base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
+            var attackerCharacter = attacker as BaseCharacterEntity;
             // Play hit effect
             if (hitEffectsId == 0)
                 hitEffectsId = GameInstance.DefaultHitEffects.Id;
@@ -84,11 +85,11 @@ namespace MultiplayerARPG
                 var receivingItem = itemRandomizer.TakeOne();
                 var dataId = receivingItem.item.DataId;
                 var amount = (short)(receivingItem.amountPerDamage * totalDamage);
-                if (!attacker.IncreasingItemsWillOverwhelming(dataId, amount))
-                    attacker.IncreaseItems(dataId, 1, amount);
+                if (!attackerCharacter.IncreasingItemsWillOverwhelming(dataId, amount))
+                    attackerCharacter.IncreaseItems(dataId, 1, amount);
             }
             CurrentHp -= totalDamage;
-            ReceivedDamage(attacker, CombatAmountType.NormalDamage, totalDamage);
+            ReceivedDamage(attackerCharacter, CombatAmountType.NormalDamage, totalDamage);
 
             if (IsDead())
             {
@@ -115,10 +116,11 @@ namespace MultiplayerARPG
             Manager.Assets.NetworkSpawn(Identity.HashAssetId, spawnPosition, Quaternion.Euler(Vector3.up * Random.Range(0, 360)), Identity.ObjectId, Identity.ConnectionId);
         }
 
-        public override void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountType combatAmountType, int damage)
+        public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)
         {
             base.ReceivedDamage(attacker, combatAmountType, damage);
-            GameInstance.GameplayRule.OnHarvestableReceivedDamage(attacker, this, combatAmountType, damage);
+            if (attacker is BaseCharacterEntity)
+                GameInstance.GameplayRule.OnHarvestableReceivedDamage(attacker as BaseCharacterEntity, this, combatAmountType, damage);
         }
 
         private void OnDrawGizmos()

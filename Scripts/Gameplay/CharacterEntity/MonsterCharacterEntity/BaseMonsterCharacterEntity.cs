@@ -146,8 +146,12 @@ namespace MultiplayerARPG
             SetTargetEntity(target);
         }
 
-        public override bool CanReceiveDamageFrom(BaseCharacterEntity characterEntity)
+        public override bool CanReceiveDamageFrom(IAttackerEntity attacker)
         {
+            if (attacker == null)
+                return false;
+
+            var characterEntity = attacker as BaseCharacterEntity;
             if (characterEntity == null)
                 return false;
 
@@ -198,15 +202,14 @@ namespace MultiplayerARPG
             return characterEntity is BasePlayerCharacterEntity;
         }
 
-        public override void ReceiveDamage(BaseCharacterEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
+        public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
         {
             if (!IsServer || IsDead() || !CanReceiveDamageFrom(attacker))
                 return;
 
             base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
-            // If no attacker, skip next logics
-            if (attacker == null || !IsEnemy(attacker))
-                return;
+            var attackerCharacter = attacker as BaseCharacterEntity;
+
             // If character is not dead, try to attack
             if (!IsDead())
             {
@@ -214,12 +217,12 @@ namespace MultiplayerARPG
                 if (!TryGetTargetEntity(out targetEntity))
                 {
                     // If no target enemy, set target enemy as attacker
-                    SetAttackTarget(attacker);
+                    SetAttackTarget(attackerCharacter);
                 }
-                else if (attacker != targetEntity && Random.value >= 0.5f)
+                else if (attackerCharacter != targetEntity && Random.value >= 0.5f)
                 {
                     // Random 50% to change target when receive damage from anyone
-                    SetAttackTarget(attacker);
+                    SetAttackTarget(attackerCharacter);
                 }
             }
         }
@@ -263,25 +266,26 @@ namespace MultiplayerARPG
             return MonsterDatabase.damageInfo.GetDistance();
         }
 
-        public override void ReceivedDamage(BaseCharacterEntity attacker, CombatAmountType damageAmountType, int damage)
+        public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType damageAmountType, int damage)
         {
-            base.ReceivedDamage(attacker, damageAmountType, damage);
+            var attackerCharacter = attacker as BaseCharacterEntity;
+            base.ReceivedDamage(attackerCharacter, damageAmountType, damage);
 
             // Add received damage entry
-            if (attacker != null)
+            if (attackerCharacter != null)
             {
-                if (attacker is BaseMonsterCharacterEntity && (attacker as BaseMonsterCharacterEntity).summoner != null)
-                    attacker = (attacker as BaseMonsterCharacterEntity).summoner;
+                if (attackerCharacter is BaseMonsterCharacterEntity && (attackerCharacter as BaseMonsterCharacterEntity).summoner != null)
+                    attackerCharacter = (attackerCharacter as BaseMonsterCharacterEntity).summoner;
 
                 var receivedDamageRecord = new ReceivedDamageRecord();
                 receivedDamageRecord.totalReceivedDamage = damage;
-                if (receivedDamageRecords.ContainsKey(attacker))
+                if (receivedDamageRecords.ContainsKey(attackerCharacter))
                 {
-                    receivedDamageRecord = receivedDamageRecords[attacker];
+                    receivedDamageRecord = receivedDamageRecords[attackerCharacter];
                     receivedDamageRecord.totalReceivedDamage += damage;
                 }
                 receivedDamageRecord.lastReceivedDamageTime = Time.unscaledTime;
-                receivedDamageRecords[attacker] = receivedDamageRecord;
+                receivedDamageRecords[attackerCharacter] = receivedDamageRecord;
             }
 
             // If dead destroy / respawn

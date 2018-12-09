@@ -5,14 +5,14 @@ namespace MultiplayerARPG
 {
     public abstract class BaseDamageEntity : BaseGameEntity
     {
-        protected BaseCharacterEntity attacker;
+        protected IAttackerEntity attacker;
         protected CharacterItem weapon;
         protected Dictionary<DamageElement, MinMaxFloat> allDamageAmounts;
         protected CharacterBuff debuff;
         protected uint hitEffectsId;
 
         public virtual void SetupDamage(
-            BaseCharacterEntity attacker,
+            IAttackerEntity attacker,
             CharacterItem weapon,
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
             CharacterBuff debuff,
@@ -25,7 +25,7 @@ namespace MultiplayerARPG
             this.hitEffectsId = hitEffectsId;
         }
 
-        public virtual void ApplyDamageTo(DamageableNetworkEntity target)
+        public virtual void ApplyDamageTo(IDamageableEntity target)
         {
             if (target == null)
                 return;
