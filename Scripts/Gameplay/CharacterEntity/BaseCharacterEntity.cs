@@ -372,7 +372,7 @@ namespace MultiplayerARPG
             // Apply damages
             var totalDamage = (int)calculatingTotalDamage;
             CurrentHp -= totalDamage;
-            
+
             if (isBlocked)
                 ReceivedDamage(attacker, CombatAmountType.BlockedDamage, totalDamage);
             else if (isCritical)
@@ -478,14 +478,14 @@ namespace MultiplayerARPG
 
         protected void ApplyPotionBuff(Item item, short level)
         {
-            if (item == null || level <= 0)
+            if (IsDead() || !IsServer || item == null || level <= 0)
                 return;
             ApplyBuff(item.DataId, BuffType.PotionBuff, level);
         }
 
         protected virtual void ApplySkillBuff(Skill skill, short level)
         {
-            if (skill == null || level <= 0)
+            if (IsDead() || !IsServer || skill == null || level <= 0)
                 return;
             List<BaseCharacterEntity> tempCharacters;
             switch (skill.skillBuffType)
@@ -514,9 +514,40 @@ namespace MultiplayerARPG
 
         protected virtual void ApplyGuildSkillBuff(GuildSkill guildSkill, short level)
         {
-            if (guildSkill == null || level <= 0)
+            if (IsDead() || !IsServer || guildSkill == null || level <= 0)
                 return;
             ApplyBuff(guildSkill.DataId, BuffType.GuildSkillBuff, level);
+        }
+
+        protected virtual void ApplySkillSummon(Skill skill, short level)
+        {
+            if (IsDead() || !IsServer || skill == null || skill.summon.monsterEntity == null || level <= 0)
+                return;
+            var i = 0;
+            var amountEachTime = skill.summon.amountEachTime.GetAmount(level);
+            for (i = 0; i < amountEachTime; ++i)
+            {
+                var newSummon = CharacterSummon.Create(SummonType.Skill, skill.DataId);
+                newSummon.Summon(this, skill.summon.level.GetAmount(level), skill.summon.duration.GetAmount(level));
+                summons.Add(newSummon);
+            }
+            var count = 0;
+            for (i = 0; i < summons.Count; ++i)
+            {
+                if (summons[i].dataId == skill.DataId)
+                    ++count;
+            }
+            var maxStack = skill.summon.maxStack.GetAmount(level);
+            var deSummonAmount = count > maxStack ? count - maxStack : 0;
+            for (i = deSummonAmount; i > 0; --i)
+            {
+                var summonIndex = this.IndexOfSummon(skill.DataId);
+                if (summonIndex >= 0)
+                {
+                    summons[summonIndex].DeSummon();
+                    summons.RemoveAt(summonIndex);
+                }
+            }
         }
 
         protected virtual void ApplySkill(CharacterSkill characterSkill, Vector3 position, SkillAttackType skillAttackType, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
@@ -526,6 +557,7 @@ namespace MultiplayerARPG
             {
                 case SkillType.Active:
                     ApplySkillBuff(skill, characterSkill.level);
+                    ApplySkillSummon(skill, characterSkill.level);
                     if (skillAttackType != SkillAttackType.None)
                     {
                         CharacterBuff debuff = CharacterBuff.Empty;
@@ -1027,6 +1059,16 @@ namespace MultiplayerARPG
             {
                 foundCharacter.NotifyEnemySpotted(this, enemy);
             }
+        }
+
+        public virtual Vector3 GetSummonPosition()
+        {
+            return CacheTransform.position + new Vector3(Random.Range(-1f, 1f) * GameInstance.summonDistance, 0f, Random.Range(-1f, 1f) * GameInstance.summonDistance);
+        }
+
+        public virtual Quaternion GetSummonRotation()
+        {
+            return CacheTransform.rotation;
         }
 
         public abstract void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker);

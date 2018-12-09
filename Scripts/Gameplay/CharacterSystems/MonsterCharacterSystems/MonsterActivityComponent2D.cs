@@ -13,10 +13,8 @@ namespace MultiplayerARPG
         public float randomWanderDelayMin = 2f;
         [Tooltip("Max random delay for next wander")]
         public float randomWanderDelayMax = 5f;
-        [Tooltip("Min random distance around spawn position to wander")]
-        public float randomWanderAreaMin = 0.5f;
-        [Tooltip("Max random distance around spawn position to wander")]
-        public float randomWanderAreaMax = 2f;
+        [Tooltip("Random distance around spawn position to wander")]
+        public float randomWanderDistance = 2f;
         [Tooltip("Delay before find enemy again")]
         public float aggressiveFindTargetDelay = 1f;
         [Tooltip("Delay before set following target position again")]
@@ -201,8 +199,17 @@ namespace MultiplayerARPG
 
             var currentPosition = CacheMonsterCharacterEntity.CacheTransform.position;
             BaseCharacterEntity targetEntity;
+            if (CacheMonsterCharacterEntity.summoner != null &&
+                Vector3.Distance(currentPosition, CacheMonsterCharacterEntity.summoner.CacheTransform.position) > gameInstance.minFollowSummonerDistance)
+            {
+                // Follow summoner with stat's move speed
+                FollowSummoner(time);
+                return;
+            }
+
             if (CacheMonsterCharacterEntity.TryGetTargetEntity(out targetEntity))
             {
+                // Has target then decides to attack or not
                 if (targetEntity.IsDead())
                 {
                     RandomWanderTarget(time);
@@ -232,12 +239,6 @@ namespace MultiplayerARPG
 
         public void UpdateAttackTarget(float time, Vector3 currentPosition, BaseCharacterEntity targetEntity)
         {
-            if (CacheMonsterCharacterEntity.summoner != null &&
-                Vector3.Distance(currentPosition, CacheMonsterCharacterEntity.summoner.CacheTransform.position) > gameInstance.minFollowSummonerDistance)
-            {
-                RandomWanderTarget(time);
-                return;
-            }
             // If it has target then go to target
             var targetEntityPosition = targetEntity.CacheTransform.position;
             var attackDistance = CacheMonsterCharacterEntity.GetAttackDistance();
@@ -269,12 +270,19 @@ namespace MultiplayerARPG
         public void RandomWanderTarget(float time)
         {
             // If stopped then random
-            var randomX = Random.Range(randomWanderAreaMin, randomWanderAreaMax) * (Random.value > 0.5f ? -1 : 1);
-            var randomY = Random.Range(randomWanderAreaMin, randomWanderAreaMax) * (Random.value > 0.5f ? -1 : 1);
             var randomPosition = CacheMonsterCharacterEntity.summoner != null ? CacheMonsterCharacterEntity.summoner.CacheTransform.position : CacheMonsterCharacterEntity.spawnPosition;
-            randomPosition += new Vector3(randomX, randomY);
+            randomPosition += new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
             CacheMonsterCharacterEntity.SetTargetEntity(null);
             SetWanderDestination(time, randomPosition);
+        }
+
+        public void FollowSummoner(float time)
+        {
+            // If stopped then random
+            var randomPosition = CacheMonsterCharacterEntity.summoner != null ? CacheMonsterCharacterEntity.summoner.CacheTransform.position : CacheMonsterCharacterEntity.spawnPosition;
+            randomPosition += new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
+            CacheMonsterCharacterEntity.SetTargetEntity(null);
+            SetDestination(time, randomPosition);
         }
 
         public void AggressiveFindTarget(float time, Vector3 currentPosition)

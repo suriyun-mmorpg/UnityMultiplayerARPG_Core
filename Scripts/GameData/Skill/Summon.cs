@@ -13,6 +13,6 @@ namespace MultiplayerARPG
         public IncrementalFloat duration;
         public IncrementalInt amountEachTime;
         public IncrementalInt maxStack;
-        public IncrementalInt level;
+        public IncrementalShort level;
     }
 }

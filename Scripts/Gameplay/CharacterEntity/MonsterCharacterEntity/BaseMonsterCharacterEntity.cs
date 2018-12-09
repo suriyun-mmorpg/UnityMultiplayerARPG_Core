@@ -71,11 +71,7 @@ namespace MultiplayerARPG
                     }
                 }
                 else
-                {
-                    // If summoner is empty destroy this
-                    // TODO: May play teleport effects
-                    NetworkDestroy();
-                }
+                    DeSummon();
             }
         }
 
@@ -431,14 +427,18 @@ namespace MultiplayerARPG
             Manager.Assets.NetworkSpawn(Identity.HashAssetId, spawnPosition, Quaternion.Euler(Vector3.up * Random.Range(0, 360)), Identity.ObjectId, Identity.ConnectionId);
         }
 
-        public void Summon(BaseCharacterEntity summoner, SummonType summonType, short level, int exp, int currentHp, int currentMp)
+        public void Summon(BaseCharacterEntity summoner, SummonType summonType, short level)
         {
             this.summoner = summoner;
             this.summonType = summonType;
             Level = level;
-            Exp = exp;
-            CurrentHp = currentHp;
-            CurrentMp = currentMp;
+            InitStats();
+        }
+
+        public void DeSummon()
+        {
+            // TODO: May play teleport effects
+            NetworkDestroy();
         }
 
         public override void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker)

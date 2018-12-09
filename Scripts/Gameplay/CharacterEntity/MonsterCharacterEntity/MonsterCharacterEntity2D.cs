@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Profiling;
 using LiteNetLibManager;
 using LiteNetLib;
 
@@ -22,8 +21,7 @@ namespace MultiplayerARPG
         protected Vector2 tempDirection;
         protected DirectionType localDirectionType = DirectionType.Down;
         #endregion
-
-
+        
         private MonsterActivityComponent2D cacheMonsterActivityComponent;
         public MonsterActivityComponent2D CacheMonsterActivityComponent
         {
@@ -123,6 +121,16 @@ namespace MultiplayerARPG
         public override void StopMove()
         {
             CacheMonsterActivityComponent.StopMove();
+        }
+
+        public override Vector3 GetSummonPosition()
+        {
+            return CacheTransform.position + new Vector3(Random.Range(-1f, 1f) * GameInstance.summonDistance, Random.Range(-1f, 1f) * GameInstance.summonDistance);
+        }
+
+        public override Quaternion GetSummonRotation()
+        {
+            return Quaternion.identity;
         }
     }
 }

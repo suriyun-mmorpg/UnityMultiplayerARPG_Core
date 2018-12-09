@@ -789,6 +789,23 @@ public static partial class CharacterDataExtension
         return index;
     }
 
+    public static int IndexOfSummon(this ICharacterData data, int dataId)
+    {
+        var list = data.Summons;
+        CharacterSummon tempSummon;
+        var index = -1;
+        for (var i = 0; i < list.Count; ++i)
+        {
+            tempSummon = list[i];
+            if (tempSummon.dataId == dataId)
+            {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
     public static int IndexOfAmmoItem(this ICharacterData data, AmmoType ammoType)
     {
         var list = data.NonEquipItems;

@@ -29,15 +29,30 @@ namespace MultiplayerARPG
             UpdateSkillAndBuff(Time.unscaledDeltaTime, this, CacheCharacterRecovery, CacheCharacterEntity);
         }
 
-        protected static void UpdateSkillAndBuff(float deltaTime, CharacterSkillAndBuffComponent skillAndBuffData, CharacterRecoveryComponent recoveryData, BaseCharacterEntity characterEntity)
+        protected static void UpdateSkillAndBuff(float deltaTime, CharacterSkillAndBuffComponent component, CharacterRecoveryComponent recoveryData, BaseCharacterEntity characterEntity)
         {
             if (characterEntity.isRecaching || characterEntity.IsDead() || !characterEntity.IsServer)
                 return;
 
-            skillAndBuffData.skillBuffUpdateDeltaTime += deltaTime;
-            if (skillAndBuffData.skillBuffUpdateDeltaTime >= SKILL_BUFF_UPDATE_DURATION)
+            component.skillBuffUpdateDeltaTime += deltaTime;
+            if (component.skillBuffUpdateDeltaTime >= SKILL_BUFF_UPDATE_DURATION)
             {
-                var count = characterEntity.SkillUsages.Count;
+                var count = characterEntity.Summons.Count;
+                for (var i = count - 1; i >= 0; --i)
+                {
+                    var summon = characterEntity.Summons[i];
+                    if (summon.ShouldRemove())
+                    {
+                        summon.DeSummon();
+                        characterEntity.Summons.RemoveAt(i);
+                    }
+                    else
+                    {
+                        summon.Update(component.skillBuffUpdateDeltaTime);
+                        characterEntity.Summons[i] = summon;
+                    }
+                }
+                count = characterEntity.SkillUsages.Count;
                 for (var i = count - 1; i >= 0; --i)
                 {
                     var skillUsage = characterEntity.SkillUsages[i];
@@ -45,7 +60,7 @@ namespace MultiplayerARPG
                         characterEntity.SkillUsages.RemoveAt(i);
                     else
                     {
-                        skillUsage.Update(skillAndBuffData.skillBuffUpdateDeltaTime);
+                        skillUsage.Update(component.skillBuffUpdateDeltaTime);
                         characterEntity.SkillUsages[i] = skillUsage;
                     }
                 }
@@ -58,16 +73,16 @@ namespace MultiplayerARPG
                         characterEntity.Buffs.RemoveAt(i);
                     else
                     {
-                        buff.Update(skillAndBuffData.skillBuffUpdateDeltaTime);
+                        buff.Update(component.skillBuffUpdateDeltaTime);
                         characterEntity.Buffs[i] = buff;
                     }
-                    recoveryData.recoveryingHp += duration > 0f ? (float)buff.GetBuffRecoveryHp() / duration * skillAndBuffData.skillBuffUpdateDeltaTime : 0f;
-                    recoveryData.recoveryingMp += duration > 0f ? (float)buff.GetBuffRecoveryMp() / duration * skillAndBuffData.skillBuffUpdateDeltaTime : 0f;
-                    recoveryData.recoveryingStamina += duration > 0f ? (float)buff.GetBuffRecoveryStamina() / duration * skillAndBuffData.skillBuffUpdateDeltaTime : 0f;
-                    recoveryData.recoveryingFood += duration > 0f ? (float)buff.GetBuffRecoveryFood() / duration * skillAndBuffData.skillBuffUpdateDeltaTime : 0f;
-                    recoveryData.recoveryingWater += duration > 0f ? (float)buff.GetBuffRecoveryWater() / duration * skillAndBuffData.skillBuffUpdateDeltaTime : 0f;
+                    recoveryData.recoveryingHp += duration > 0f ? (float)buff.GetBuffRecoveryHp() / duration * component.skillBuffUpdateDeltaTime : 0f;
+                    recoveryData.recoveryingMp += duration > 0f ? (float)buff.GetBuffRecoveryMp() / duration * component.skillBuffUpdateDeltaTime : 0f;
+                    recoveryData.recoveryingStamina += duration > 0f ? (float)buff.GetBuffRecoveryStamina() / duration * component.skillBuffUpdateDeltaTime : 0f;
+                    recoveryData.recoveryingFood += duration > 0f ? (float)buff.GetBuffRecoveryFood() / duration * component.skillBuffUpdateDeltaTime : 0f;
+                    recoveryData.recoveryingWater += duration > 0f ? (float)buff.GetBuffRecoveryWater() / duration * component.skillBuffUpdateDeltaTime : 0f;
                 }
-                skillAndBuffData.skillBuffUpdateDeltaTime = 0;
+                component.skillBuffUpdateDeltaTime = 0;
             }
         }
     }

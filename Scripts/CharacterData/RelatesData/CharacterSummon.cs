@@ -1,7 +1,6 @@
 ﻿using LiteNetLib.Utils;
 using LiteNetLibManager;
 using MultiplayerARPG;
-using UnityEngine;
 
 public enum SummonType : byte
 {
@@ -17,6 +16,7 @@ public class CharacterSummon : INetSerializable
     public SummonType type;
     public int dataId;
     public short level;
+    public float summonRemainsDuration;
     public int exp;
     public int currentHp;
     public int currentMp;
@@ -27,6 +27,8 @@ public class CharacterSummon : INetSerializable
     private Skill cacheSkill;
     [System.NonSerialized]
     private Item cachePetItem;
+    [System.NonSerialized]
+    private BaseMonsterCharacterEntity cachePrefab;
 
     [System.NonSerialized]
     private BaseMonsterCharacterEntity cacheEntity;
@@ -49,14 +51,18 @@ public class CharacterSummon : INetSerializable
         if (dirtyDataId != dataId)
         {
             dirtyDataId = dataId;
+            cacheSkill = null;
             cachePetItem = null;
+            cachePrefab = null;
             switch (type)
             {
                 case SummonType.Skill:
-                    GameInstance.Skills.TryGetValue(dataId, out cacheSkill);
+                    if (GameInstance.Skills.TryGetValue(dataId, out cacheSkill))
+                        cachePrefab = cacheSkill.summon.monsterEntity;
                     break;
                 case SummonType.Pet:
-                    GameInstance.Items.TryGetValue(dataId, out cachePetItem);
+                    if (GameInstance.Items.TryGetValue(dataId, out cachePetItem))
+                        cachePrefab = cachePetItem.petEntity;
                     break;
             }
         }
@@ -74,36 +80,51 @@ public class CharacterSummon : INetSerializable
         return cachePetItem;
     }
 
-    public void Summon(BaseCharacterEntity summoner, short level, int exp, int currentHp, int currentMp)
+    public BaseMonsterCharacterEntity GetPrefab()
     {
-        BaseMonsterCharacterEntity prefab = null;
-        switch (type)
-        {
-            case SummonType.Skill:
-                prefab = GetSkill().summon.monsterEntity;
-                break;
-            case SummonType.Pet:
-                prefab = GetPetItem().petEntity;
-                break;
-        }
-        if (prefab == null)
+        MakeCache();
+        return cachePrefab;
+    }
+
+    public void Summon(BaseCharacterEntity summoner, short summonLevel, float duration)
+    {
+        if (GetPrefab() == null)
             return;
-        var identity = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(prefab.Identity, summoner.CacheTransform.position, summoner.CacheTransform.rotation);
+        var identity = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(GetPrefab().Identity, summoner.GetSummonPosition(), summoner.GetSummonRotation());
         cacheEntity = identity.GetComponent<BaseMonsterCharacterEntity>();
-        CacheEntity.Summon(summoner, type, level, exp, currentHp, currentMp);
+        CacheEntity.Summon(summoner, type, summonLevel);
         level = CacheEntity.Level;
+        exp = CacheEntity.Exp;
+        currentHp = CacheEntity.CurrentHp;
+        currentMp = CacheEntity.CurrentMp;
+        objectId = CacheEntity.ObjectId;
+        summonRemainsDuration = duration;
+    }
+
+    public void Summon(BaseCharacterEntity summoner, short summonLevel, float duration, int summonExp, int summonCurrentHp, int summonCurrentMp)
+    {
+        Summon(summoner, summonLevel, duration);
+        CacheEntity.Exp = summonExp;
+        CacheEntity.CurrentHp = summonCurrentHp;
+        CacheEntity.CurrentMp = summonCurrentMp;
         exp = CacheEntity.Exp;
         currentHp = CacheEntity.CurrentHp;
         currentMp = CacheEntity.CurrentMp;
         objectId = CacheEntity.ObjectId;
     }
 
-    public bool ShouldRemove()
+    public void DeSummon()
     {
-        return CacheEntity == null || CacheEntity.CurrentHp <= 0;
+        if (CacheEntity != null)
+            CacheEntity.DeSummon();
     }
 
-    public void Update()
+    public bool ShouldRemove()
+    {
+        return CacheEntity == null || CacheEntity.CurrentHp <= 0 || (type == SummonType.Skill && summonRemainsDuration <= 0f);
+    }
+
+    public void Update(float deltaTime)
     {
         if (CacheEntity == null)
             return;
@@ -111,6 +132,7 @@ public class CharacterSummon : INetSerializable
         exp = CacheEntity.Exp;
         currentHp = CacheEntity.CurrentHp;
         currentMp = CacheEntity.CurrentMp;
+        summonRemainsDuration -= deltaTime;
     }
 
     public static CharacterSummon Create(SummonType type, int dataId)
@@ -128,8 +150,15 @@ public class CharacterSummon : INetSerializable
         {
             writer.Put(dataId);
             writer.Put(level);
-            if (type == SummonType.Pet)
-                writer.Put(exp);
+            switch (type)
+            {
+                case SummonType.Pet:
+                    writer.Put(exp);
+                    break;
+                case SummonType.Skill:
+                    writer.Put(summonRemainsDuration);
+                    break;
+            }
             writer.Put(currentHp);
             writer.Put(currentMp);
             writer.PutPackedUInt(objectId);
@@ -143,8 +172,15 @@ public class CharacterSummon : INetSerializable
         {
             dataId = reader.GetInt();
             level = reader.GetShort();
-            if (type == SummonType.Pet)
-                exp = reader.GetInt();
+            switch (type)
+            {
+                case SummonType.Pet:
+                    exp = reader.GetInt();
+                    break;
+                case SummonType.Skill:
+                    summonRemainsDuration = reader.GetFloat();
+                    break;
+            }
             currentHp = reader.GetInt();
             currentMp = reader.GetInt();
             objectId = reader.GetPackedUInt();

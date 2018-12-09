@@ -257,6 +257,16 @@ namespace MultiplayerARPG
                 CallNetFunction(StopMove, FunctionReceivers.Server);
         }
 
+        public override Vector3 GetSummonPosition()
+        {
+            return CacheTransform.position + new Vector3(Random.Range(-1f, 1f) * GameInstance.summonDistance, Random.Range(-1f, 1f) * GameInstance.summonDistance);
+        }
+
+        public override Quaternion GetSummonRotation()
+        {
+            return Quaternion.identity;
+        }
+
         public override void SetTargetEntity(BaseGameEntity entity)
         {
             base.SetTargetEntity(entity);

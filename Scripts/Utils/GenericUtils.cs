@@ -109,13 +109,22 @@ public static class GenericUtils
         return System.BitConverter.ToString(hash).Replace("-", string.Empty).ToLower();
     }
 
-    public static int GenerateHashId(this string value)
+    public static int GenerateHashId(this string id)
     {
-        int hash = 0;
-        for (int i = 0; i < value.Length; i++)
+        unchecked
         {
-            hash += value[i] * 31 ^ ((value.Length - 1) - i);
+            int hash1 = 5381;
+            int hash2 = hash1;
+
+            for (int i = 0; i < id.Length && id[i] != '\0'; i += 2)
+            {
+                hash1 = ((hash1 << 5) + hash1) ^ id[i];
+                if (i == id.Length - 1 || id[i + 1] == '\0')
+                    break;
+                hash2 = ((hash2 << 5) + hash2) ^ id[i + 1];
+            }
+
+            return hash1 + (hash2 * 1566083941);
         }
-        return hash;
     }
 }
