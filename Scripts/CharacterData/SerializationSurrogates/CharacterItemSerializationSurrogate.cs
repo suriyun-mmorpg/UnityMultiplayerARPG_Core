@@ -13,6 +13,8 @@ public class CharacterItemSerializationSurrogate : ISerializationSurrogate
         info.AddValue("level", data.level);
         info.AddValue("amount", data.amount);
         info.AddValue("durability", data.durability);
+        info.AddValue("exp", data.exp);
+        info.AddValue("lockRemainsDuration", data.lockRemainsDuration);
     }
 
     public System.Object SetObjectData(System.Object obj,
@@ -24,10 +26,13 @@ public class CharacterItemSerializationSurrogate : ISerializationSurrogate
         data.level = info.GetInt16("level");
         data.amount = info.GetInt16("amount");
         // Backward compatible
-        var durability = 0f;
-        try { durability = info.GetSingle("durability"); }
+        try
+        {
+            data.durability = info.GetSingle("durability");
+            data.exp = info.GetInt32("exp");
+            data.lockRemainsDuration = info.GetSingle("lockRemainsDuration");
+        }
         catch { }
-        data.durability = durability;
         obj = data;
         return obj;
     }

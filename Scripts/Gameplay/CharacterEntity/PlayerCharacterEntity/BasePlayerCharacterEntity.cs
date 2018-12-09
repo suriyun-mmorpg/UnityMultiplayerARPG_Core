@@ -185,6 +185,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
+
             GuildData guildData;
             switch (rewardGivenType)
             {

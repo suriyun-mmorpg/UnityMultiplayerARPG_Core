@@ -216,9 +216,16 @@ namespace MultiplayerARPG
 
         public override bool IncreaseExp(BaseCharacterEntity character, int exp)
         {
+            var monsterCharacter = character as BaseMonsterCharacterEntity;
+            if (monsterCharacter != null && monsterCharacter.summonType != SummonType.Pet)
+            {
+                // If it's monster and not pet, do not increase exp
+                return false;
+            }
+
             var isLevelUp = false;
             character.Exp += exp;
-            var playerCharacter = character as IPlayerCharacterData;
+            var playerCharacter = character as BasePlayerCharacterEntity;
             var nextLevelExp = character.GetNextLevelExp();
             while (nextLevelExp > 0 && character.Exp >= nextLevelExp)
             {

@@ -296,12 +296,7 @@ namespace MultiplayerARPG
             if (IsDead())
             {
                 CurrentHp = 0;
-                if (isSummoned)
-                {
-                    // If summoned by someone, destroy by desummon function
-                    DeSummon();
-                }
-                else
+                if (!isSummoned)
                 {
                     // If not summoned by someone, destroy and respawn it
                     DestroyAndRespawn();
@@ -324,6 +319,7 @@ namespace MultiplayerARPG
             GuildData tempGuildData;
             PartyData tempPartyData;
             BasePlayerCharacterEntity tempPlayerCharacter;
+            BaseMonsterCharacterEntity tempMonsterCharacter;
             if (receivedDamageRecords.Count > 0)
             {
                 var tempHighRewardRate = 0f;
@@ -390,15 +386,20 @@ namespace MultiplayerARPG
                                 rewardGold = 0;
                         }
                         // Add reward to current character in damage record list
+                        var petIndex = tempPlayerCharacter.IndexOfSummon(SummonType.Pet);
+                        if (petIndex >= 0)
+                        {
+                            tempMonsterCharacter = tempPlayerCharacter.Summons[petIndex].CacheEntity;
+                            if (tempMonsterCharacter != null)
+                            {
+                                // Share exp to pet
+                                tempMonsterCharacter.RewardExp(rewardExp, RewardGivenType.KillMonster);
+                            }
+                        }
                         tempPlayerCharacter.RewardExp(rewardExp, RewardGivenType.KillMonster);
                         if (makeMostDamage)
                             looters.Add(tempPlayerCharacter.ObjectId);
                         tempPlayerCharacter.RewardGold(rewardGold, RewardGivenType.KillMonster);
-                    }
-                    else
-                    {
-                        // TODO: May makes monster can level up
-                        enemy.RewardExp(rewardExp, RewardGivenType.KillMonster);
                     }
                 }
             }

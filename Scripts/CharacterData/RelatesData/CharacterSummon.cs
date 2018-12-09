@@ -19,13 +19,13 @@ public class CharacterSummon : INetSerializable
     public uint objectId;
     // For save / load
     public short level;
-    public short Level { get { return level = (CacheEntity != null ? CacheEntity.Level : level); } }
+    public short Level { get { return CacheEntity != null ? level = CacheEntity.Level : level; } }
     public int exp;
-    public int Exp { get { return exp = (CacheEntity != null ? CacheEntity.Exp : exp); } }
+    public int Exp { get { return CacheEntity != null ? exp = CacheEntity.Exp : exp; } }
     public int currentHp;
-    public int CurrentHp { get { return currentHp = (CacheEntity != null ? CacheEntity.CurrentHp : currentHp); } }
+    public int CurrentHp { get { return CacheEntity != null ? currentHp = CacheEntity.CurrentHp : currentHp; } }
     public int currentMp;
-    public int CurrentMp { get { return currentMp = (CacheEntity != null ? CacheEntity.CurrentMp : currentMp); } }
+    public int CurrentMp { get { return CacheEntity != null ? currentMp = CacheEntity.CurrentMp : currentMp; } }
 
     [System.NonSerialized]
     private int dirtyDataId;
@@ -123,7 +123,11 @@ public class CharacterSummon : INetSerializable
         {
             var newItem = CharacterItem.Create(dataId, Level, 1);
             newItem.exp = Exp;
-            newItem.Lock(GameInstance.Singleton.petDeadLockDuration);
+            if (CacheEntity == null || CacheEntity.CurrentHp <= 0)
+            {
+                // If pet dead, lock the item
+                newItem.Lock(GameInstance.Singleton.petDeadLockDuration);
+            }
             summoner.NonEquipItems.Add(newItem);
         }
 

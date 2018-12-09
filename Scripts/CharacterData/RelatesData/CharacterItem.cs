@@ -193,6 +193,16 @@ public class CharacterItem : INetSerializable
         return GetEquipmentItem().CanEquip(character, level);
     }
 
+    public int GetNextLevelExp()
+    {
+        if (GetPetItem() == null || level <= 0)
+            return 0;
+        var expTree = GameInstance.Singleton.ExpTree;
+        if (level > expTree.Length)
+            return 0;
+        return expTree[level - 1];
+    }
+
     public static CharacterItem Create(Item item, short level = 1, short amount = 1)
     {
         return Create(item.DataId, level, amount);

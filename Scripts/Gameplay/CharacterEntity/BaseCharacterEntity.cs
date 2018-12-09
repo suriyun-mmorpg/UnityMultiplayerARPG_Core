@@ -522,11 +522,13 @@ namespace MultiplayerARPG
 
         protected virtual void ApplyItemPetSummon(Item item, short level, int exp)
         {
-            if (IsDead() || !IsServer || item == null || item.petEntity == null || level <= 0)
+            if (IsDead() || !IsServer || item == null || level <= 0)
                 return;
             // Clear all summoned pets
             for (var i = 0; i < Summons.Count; ++i)
             {
+                if (summons[i].type != SummonType.Pet)
+                    continue;
                 summons[i].DeSummon(this);
                 summons.RemoveAt(i);
             }
@@ -538,7 +540,7 @@ namespace MultiplayerARPG
 
         protected virtual void ApplySkillSummon(Skill skill, short level)
         {
-            if (IsDead() || !IsServer || skill == null || skill.summon.monsterEntity == null || level <= 0)
+            if (IsDead() || !IsServer || skill == null || level <= 0)
                 return;
             var i = 0;
             var amountEachTime = skill.summon.amountEachTime.GetAmount(level);
