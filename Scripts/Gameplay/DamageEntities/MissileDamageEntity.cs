@@ -135,18 +135,15 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return false;
 
-            var damageableEntity = other.GetComponent<IDamageableEntity>();
-            
-            if (LockingTarget != null && damageableEntity != LockingTarget)
+            var target = other.GetComponent<IDamageableEntity>();
+
+            if (target == null || target.IsDead() || attacker.gameObject == target.gameObject || !target.CanReceiveDamageFrom(attacker))
                 return false;
 
-            if (damageableEntity == null || damageableEntity.gameObject == attacker.gameObject || damageableEntity.IsDead())
+            if (LockingTarget != null && LockingTarget != target)
                 return false;
 
-            if (attacker is BaseCharacterEntity && (attacker as BaseCharacterEntity).CanReceiveDamageFrom(attacker))
-                return false;
-
-            ApplyDamageTo(damageableEntity);
+            ApplyDamageTo(target);
             return true;
         }
 

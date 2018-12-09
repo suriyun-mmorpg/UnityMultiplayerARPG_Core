@@ -169,10 +169,10 @@ namespace MultiplayerARPG
             if (characterEntity == null)
                 return false;
 
-            if (summoner != null)
+            if (isSummoned)
             {
-                // If spawn by another character, will have same allies with spawner
-                return characterEntity == summoner || summoner.IsAlly(characterEntity);
+                // If summoned by someone, will have same allies with summoner
+                return characterEntity == summoner || characterEntity.IsAlly(summoner);
             }
             if (characterEntity is BaseMonsterCharacterEntity)
             {
@@ -180,7 +180,7 @@ namespace MultiplayerARPG
                 var monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
                 if (monsterCharacterEntity != null)
                 {
-                    if (monsterCharacterEntity.summoner != null)
+                    if (monsterCharacterEntity.isSummoned)
                         return IsAlly(monsterCharacterEntity.summoner);
                     return monsterCharacterEntity.MonsterDatabase.allyId == MonsterDatabase.allyId;
                 }
@@ -193,10 +193,10 @@ namespace MultiplayerARPG
             if (characterEntity == null)
                 return false;
 
-            if (summoner != null)
+            if (isSummoned)
             {
-                // If spawn by another character, will have same enemies with spawner
-                return characterEntity != summoner && summoner.IsEnemy(characterEntity);
+                // If summoned by someone, will have same enemies with summoner
+                return characterEntity != summoner && characterEntity.IsEnemy(summoner);
             }
             // Attack only player by default
             return characterEntity is BasePlayerCharacterEntity;
@@ -269,14 +269,16 @@ namespace MultiplayerARPG
         public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType damageAmountType, int damage)
         {
             var attackerCharacter = attacker as BaseCharacterEntity;
-            base.ReceivedDamage(attackerCharacter, damageAmountType, damage);
+
+            // If summoned by someone, summoner is attacker
+            if (attackerCharacter != null &&
+                attackerCharacter is BaseMonsterCharacterEntity &&
+                (attackerCharacter as BaseMonsterCharacterEntity).isSummoned)
+                attackerCharacter = (attackerCharacter as BaseMonsterCharacterEntity).summoner;
 
             // Add received damage entry
             if (attackerCharacter != null)
             {
-                if (attackerCharacter is BaseMonsterCharacterEntity && (attackerCharacter as BaseMonsterCharacterEntity).summoner != null)
-                    attackerCharacter = (attackerCharacter as BaseMonsterCharacterEntity).summoner;
-
                 var receivedDamageRecord = new ReceivedDamageRecord();
                 receivedDamageRecord.totalReceivedDamage = damage;
                 if (receivedDamageRecords.ContainsKey(attackerCharacter))
@@ -288,20 +290,33 @@ namespace MultiplayerARPG
                 receivedDamageRecords[attackerCharacter] = receivedDamageRecord;
             }
 
+            base.ReceivedDamage(attackerCharacter, damageAmountType, damage);
+
             // If dead destroy / respawn
             if (IsDead())
             {
                 CurrentHp = 0;
-                if (summoner != null)
-                    NetworkDestroy(MonsterDatabase.deadHideDelay);
+                if (isSummoned)
+                {
+                    // If summoned by someone, destroy by desummon function
+                    DeSummon();
+                }
                 else
+                {
+                    // If not summoned by someone, destroy and respawn it
                     DestroyAndRespawn();
+                }
             }
         }
 
         public override void Killed(BaseCharacterEntity lastAttacker)
         {
             base.Killed(lastAttacker);
+
+            // If this summoned by someone, don't give reward to killer
+            if (isSummoned)
+                return;
+
             var randomedExp = Random.Range(MonsterDatabase.randomExpMin, MonsterDatabase.randomExpMax);
             var randomedGold = Random.Range(MonsterDatabase.randomGoldMin, MonsterDatabase.randomGoldMax);
             var looters = new HashSet<uint>();
