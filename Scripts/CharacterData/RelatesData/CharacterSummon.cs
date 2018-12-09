@@ -10,7 +10,7 @@ public enum SummonType : byte
 }
 
 [System.Serializable]
-public struct CharacterSummon : INetSerializable
+public class CharacterSummon : INetSerializable
 {
     public static readonly CharacterSummon Empty = new CharacterSummon();
     public SummonType type;
@@ -103,17 +103,30 @@ public struct CharacterSummon : INetSerializable
         summonRemainsDuration = duration;
     }
 
+    public void Summon(BaseCharacterEntity summoner, short summonLevel, float duration, int summonExp)
+    {
+        Summon(summoner, summonLevel, duration);
+        CacheEntity.Exp = summonExp;
+    }
+
     public void Summon(BaseCharacterEntity summoner, short summonLevel, float duration, int summonExp, int summonCurrentHp, int summonCurrentMp)
     {
         Summon(summoner, summonLevel, duration);
         CacheEntity.Exp = summonExp;
         CacheEntity.CurrentHp = summonCurrentHp;
         CacheEntity.CurrentMp = summonCurrentMp;
-        objectId = CacheEntity.ObjectId;
     }
 
-    public void DeSummon()
+    public void DeSummon(BaseCharacterEntity summoner)
     {
+        if (type == SummonType.Pet)
+        {
+            var newItem = CharacterItem.Create(dataId, Level, 1);
+            newItem.exp = Exp;
+            newItem.Lock(GameInstance.Singleton.petDeadLockDuration);
+            summoner.NonEquipItems.Add(newItem);
+        }
+
         if (CacheEntity != null)
             CacheEntity.DeSummon();
     }
@@ -125,8 +138,6 @@ public struct CharacterSummon : INetSerializable
 
     public void Update(float deltaTime)
     {
-        if (CacheEntity == null)
-            return;
         summonRemainsDuration -= deltaTime;
     }
 

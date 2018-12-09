@@ -540,7 +540,7 @@ namespace MultiplayerARPG
                     if (item.IsEquipment())
                         RequestEquipItem((ushort)itemIndex);
                     else if (item.IsPotion())
-                        RequestUseItem(item.DataId);
+                        RequestUseItem((ushort)itemIndex);
                     else if (item.IsBuilding())
                     {
                         destination = null;

@@ -36,4 +36,14 @@ public static class CharacterRelatesDataExtension
     {
         return data == null || data.Equals(CharacterSkill.Empty);
     }
+
+    public static bool IsEmpty(this CharacterSkillUsage data)
+    {
+        return data == null || data.Equals(CharacterSkillUsage.Empty);
+    }
+
+    public static bool IsEmpty(this CharacterSummon data)
+    {
+        return data == null || data.Equals(CharacterSummon.Empty);
+    }
 }

@@ -65,7 +65,7 @@ namespace MultiplayerARPG
             // Register Network functions
             RegisterNetFunction(NetFuncAttack);
             RegisterNetFunction<Vector3, int>(NetFuncUseSkill);
-            RegisterNetFunction<int>(NetFuncUseItem);
+            RegisterNetFunction<ushort>(NetFuncUseItem);
             RegisterNetFunction<byte, int, byte>(NetFuncPlayActionAnimation);
             RegisterNetFunction<PackedUInt>(NetFuncPickupItem);
             RegisterNetFunction<ushort, short>(NetFuncDropItem);

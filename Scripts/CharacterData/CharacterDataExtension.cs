@@ -789,7 +789,7 @@ public static partial class CharacterDataExtension
         return index;
     }
 
-    public static int IndexOfSummon(this ICharacterData data, int dataId)
+    public static int IndexOfSummon(this ICharacterData data, int dataId, SummonType type)
     {
         var list = data.Summons;
         CharacterSummon tempSummon;
@@ -797,7 +797,7 @@ public static partial class CharacterDataExtension
         for (var i = 0; i < list.Count; ++i)
         {
             tempSummon = list[i];
-            if (tempSummon.dataId == dataId)
+            if (tempSummon.dataId == dataId && tempSummon.type == type)
             {
                 index = i;
                 break;

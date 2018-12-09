@@ -520,6 +520,22 @@ namespace MultiplayerARPG
             ApplyBuff(guildSkill.DataId, BuffType.GuildSkillBuff, level);
         }
 
+        protected virtual void ApplyItemPetSummon(Item item, short level, int exp)
+        {
+            if (IsDead() || !IsServer || item == null || item.petEntity == null || level <= 0)
+                return;
+            // Clear all summoned pets
+            for (var i = 0; i < Summons.Count; ++i)
+            {
+                summons[i].DeSummon(this);
+                summons.RemoveAt(i);
+            }
+            // Summon new pet
+            var newSummon = CharacterSummon.Create(SummonType.Pet, item.DataId);
+            newSummon.Summon(this, level, 0f, exp);
+            summons.Add(newSummon);
+        }
+
         protected virtual void ApplySkillSummon(Skill skill, short level)
         {
             if (IsDead() || !IsServer || skill == null || skill.summon.monsterEntity == null || level <= 0)
@@ -542,10 +558,10 @@ namespace MultiplayerARPG
             var deSummonAmount = count > maxStack ? count - maxStack : 0;
             for (i = deSummonAmount; i > 0; --i)
             {
-                var summonIndex = this.IndexOfSummon(skill.DataId);
+                var summonIndex = this.IndexOfSummon(skill.DataId, SummonType.Skill);
                 if (summonIndex >= 0)
                 {
-                    summons[summonIndex].DeSummon();
+                    summons[summonIndex].DeSummon(this);
                     summons.RemoveAt(summonIndex);
                 }
             }

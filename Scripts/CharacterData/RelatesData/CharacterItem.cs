@@ -12,6 +12,8 @@ public class CharacterItem : INetSerializable
     public short level;
     public short amount;
     public float durability;
+    public int exp;
+    public float lockRemainsDuration;
     // TODO: I want to add random item bonus
     [System.NonSerialized]
     private int dirtyDataId;
@@ -160,6 +162,27 @@ public class CharacterItem : INetSerializable
         return GetMaxDurability() > 0 && durability <= 0;
     }
 
+    public bool IsLock()
+    {
+        return lockRemainsDuration > 0;
+    }
+
+    public void Lock(float duration)
+    {
+        lockRemainsDuration = duration;
+    }
+
+    public bool ShouldRemove()
+    {
+        // TODO: have expire date to remove
+        return false;
+    }
+
+    public void Update(float deltaTime)
+    {
+        lockRemainsDuration -= deltaTime;
+    }
+
     public float GetEquipmentBonusRate()
     {
         return GameInstance.Singleton.GameplayRule.GetEquipmentBonusRate(this);
@@ -192,6 +215,8 @@ public class CharacterItem : INetSerializable
         writer.Put(level);
         writer.Put(amount);
         writer.Put(durability);
+        writer.Put(exp);
+        writer.Put(lockRemainsDuration);
     }
 
     public void Deserialize(NetDataReader reader)
@@ -200,6 +225,8 @@ public class CharacterItem : INetSerializable
         level = reader.GetShort();
         amount = reader.GetShort();
         durability = reader.GetFloat();
+        exp = reader.GetInt();
+        lockRemainsDuration = reader.GetFloat();
     }
 }
 

@@ -43,13 +43,16 @@ namespace MultiplayerARPG
                     var summon = characterEntity.Summons[i];
                     if (summon.ShouldRemove())
                     {
-                        summon.DeSummon();
+                        summon.DeSummon(characterEntity);
                         characterEntity.Summons.RemoveAt(i);
                     }
                     else
                     {
-                        summon.Update(component.skillBuffUpdateDeltaTime);
-                        characterEntity.Summons[i] = summon;
+                        if (summon.type == SummonType.Skill)
+                        {
+                            summon.Update(component.skillBuffUpdateDeltaTime);
+                            characterEntity.Summons[i] = summon;
+                        }
                     }
                 }
                 count = characterEntity.SkillUsages.Count;
@@ -62,6 +65,21 @@ namespace MultiplayerARPG
                     {
                         skillUsage.Update(component.skillBuffUpdateDeltaTime);
                         characterEntity.SkillUsages[i] = skillUsage;
+                    }
+                }
+                count = characterEntity.NonEquipItems.Count;
+                for (var i = count - 1; i >= 0; --i)
+                {
+                    var nonEquipItem = characterEntity.NonEquipItems[i];
+                    if (nonEquipItem.ShouldRemove())
+                        characterEntity.NonEquipItems.RemoveAt(i);
+                    else
+                    {
+                        if (nonEquipItem.IsLock())
+                        {
+                            nonEquipItem.Update(component.skillBuffUpdateDeltaTime);
+                            characterEntity.NonEquipItems[i] = nonEquipItem;
+                        }
                     }
                 }
                 count = characterEntity.Buffs.Count;

@@ -172,20 +172,25 @@ namespace MultiplayerARPG
         /// <summary>
         /// This will be called on server to use item
         /// </summary>
-        /// <param name="dataId">Item's data id which will be used</param>
-        protected virtual void NetFuncUseItem(int dataId)
+        /// <param name="dataId"></param>
+        protected virtual void NetFuncUseItem(ushort itemIndex)
         {
             if (IsDead())
                 return;
-
-            var index = this.IndexOfNonEquipItem(dataId);
-            if (index < 0)
+            
+            if (itemIndex >= nonEquipItems.Count)
                 return;
 
-            var characterItem = nonEquipItems[index];
+            var characterItem = nonEquipItems[itemIndex];
+            if (characterItem.IsLock())
+                return;
+
             var potionItem = characterItem.GetPotionItem();
-            if (potionItem != null && this.DecreaseItemsByIndex(index, 1))
+            if (potionItem != null && this.DecreaseItemsByIndex(itemIndex, 1))
                 ApplyPotionBuff(potionItem, characterItem.level);
+            var petItem = characterItem.GetPetItem();
+            if (petItem != null && this.DecreaseItemsByIndex(itemIndex, 1))
+                ApplyItemPetSummon(petItem, characterItem.level, characterItem.exp);
         }
 
         /// <summary>
