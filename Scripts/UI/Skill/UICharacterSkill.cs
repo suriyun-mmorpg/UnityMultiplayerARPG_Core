@@ -107,10 +107,8 @@ namespace MultiplayerARPG
 
             if (uiTextCoolDownRemainsDuration != null)
             {
-                if (coolDownRemainsDuration > 0f)
-                    uiTextCoolDownRemainsDuration.text = string.Format(coolDownRemainsDurationFormat, Mathf.CeilToInt(coolDownRemainsDuration).ToString("N0"));
-                else
-                    uiTextCoolDownRemainsDuration.text = "";
+                uiTextCoolDownRemainsDuration.text = string.Format(coolDownRemainsDurationFormat, Mathf.CeilToInt(coolDownRemainsDuration).ToString("N0"));
+                uiTextCoolDownRemainsDuration.gameObject.SetActive(coolDownRemainsDuration > 0);
             }
 
             if (imageCoolDownGage != null)

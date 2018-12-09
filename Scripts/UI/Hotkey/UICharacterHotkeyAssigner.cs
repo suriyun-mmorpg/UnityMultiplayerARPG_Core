@@ -111,7 +111,7 @@ namespace MultiplayerARPG
             {
                 var item = characterItem.GetItem();
                 if (item != null && characterItem.level > 0 && characterItem.amount > 0 &&
-                    (item.IsPotion() || item.IsBuilding()))
+                    (item.IsPotion() || item.IsBuilding() || item.IsPet()))
                     filterItems.Add(characterItem);
             }
             CacheSkillList.Generate(filterSkills, (index, characterSkill, ui) =>

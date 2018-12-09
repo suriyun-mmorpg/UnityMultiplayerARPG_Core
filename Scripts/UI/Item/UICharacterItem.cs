@@ -14,6 +14,7 @@ namespace MultiplayerARPG
         public Item EquipmentItem { get { return CharacterItem != null ? CharacterItem.GetEquipmentItem() : null; } }
         public Item ArmorItem { get { return CharacterItem != null ? CharacterItem.GetArmorItem() : null; } }
         public Item WeaponItem { get { return CharacterItem != null ? CharacterItem.GetWeaponItem() : null; } }
+        public Item PetItem { get { return CharacterItem != null ? CharacterItem.GetPetItem() : null; } }
 
         [Header("Generic Info Format")]
         [Tooltip("Title Format => {0} = {Title}")]
@@ -34,6 +35,10 @@ namespace MultiplayerARPG
         public string durabilityFormat = "{0}/{1}";
         [Tooltip("Weight Format => {0} = {Weight}")]
         public string weightFormat = "{0}";
+        [Tooltip("Exp Format => {0} = {Current exp}, {1} = {Max exp}")]
+        public string expFormat = "Exp: {0}/{1}";
+        [Tooltip("Lock Remains Duration Format => {0} = {Lock Remains duration}")]
+        public string lockRemainsDurationFormat = "{0}";
         [Tooltip("Item Type Format => {0} = {Item Type title}")]
         public string itemTypeFormat = "Item Type: {0}";
         [Tooltip("Junk Item Type")]
@@ -46,6 +51,8 @@ namespace MultiplayerARPG
         public string ammoItemType = "Ammo";
         [Tooltip("Building Item Type")]
         public string buildingItemType = "Building";
+        [Tooltip("Pet Item Type")]
+        public string petItemType = "Pet";
 
         [Header("Input Dialog Settings")]
         public string dropInputTitle = "Drop Item";
@@ -65,6 +72,8 @@ namespace MultiplayerARPG
         public TextWrapper uiTextStack;
         public TextWrapper uiTextDurability;
         public TextWrapper uiTextWeight;
+        public TextWrapper uiTextExp;
+        public TextWrapper uiTextLockRemainsDuration;
 
         [Header("Equipment - UI Elements")]
         public UIEquipmentItemRequirement uiRequirement;
@@ -98,6 +107,40 @@ namespace MultiplayerARPG
         private bool isSellItemDialogAppeared;
         private bool isRefineItemDialogAppeared;
         private bool isDealingStateEntered;
+
+        protected float lockRemainsDuration;
+
+        private void OnDisable()
+        {
+            lockRemainsDuration = 0f;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (lockRemainsDuration <= 0f)
+            {
+                lockRemainsDuration = CharacterItem.lockRemainsDuration;
+                if (lockRemainsDuration <= 1f)
+                    lockRemainsDuration = 0f;
+            }
+
+            if (lockRemainsDuration > 0f)
+            {
+                lockRemainsDuration -= Time.deltaTime;
+                if (lockRemainsDuration <= 0f)
+                    lockRemainsDuration = 0f;
+            }
+            else
+                lockRemainsDuration = 0f;
+
+            if (uiTextLockRemainsDuration != null)
+            {
+                uiTextLockRemainsDuration.text = string.Format(lockRemainsDurationFormat, Mathf.CeilToInt(lockRemainsDuration).ToString("N0"));
+                uiTextLockRemainsDuration.gameObject.SetActive(lockRemainsDuration > 0);
+            }
+        }
 
         protected override void UpdateUI()
         {
@@ -141,10 +184,18 @@ namespace MultiplayerARPG
 
             if (uiTextLevel != null)
             {
-                if (showLevelAsDefault)
+                if (EquipmentItem != null)
+                {
+                    if (showLevelAsDefault)
+                        uiTextLevel.text = string.Format(levelFormat, Level.ToString("N0"));
+                    else
+                        uiTextLevel.text = string.Format(refineLevelFormat, (Level - 1).ToString("N0"));
+                }
+                else if (PetItem != null)
+                {
                     uiTextLevel.text = string.Format(levelFormat, Level.ToString("N0"));
-                else
-                    uiTextLevel.text = string.Format(refineLevelFormat, (Level - 1).ToString("N0"));
+                }
+                uiTextLevel.gameObject.SetActive(EquipmentItem != null || PetItem != null);
             }
 
             if (imageIcon != null)
@@ -178,6 +229,9 @@ namespace MultiplayerARPG
                         break;
                     case ItemType.Building:
                         uiTextItemType.text = string.Format(itemTypeFormat, buildingItemType);
+                        break;
+                    case ItemType.Pet:
+                        uiTextItemType.text = string.Format(itemTypeFormat, petItemType);
                         break;
                 }
             }
@@ -279,6 +333,35 @@ namespace MultiplayerARPG
                     var keyValuePair = WeaponItem.GetDamageAmount(Level, CharacterItem.GetEquipmentBonusRate(), null);
                     uiDamageAmounts.Data = new DamageElementAmountTuple(keyValuePair.Key, keyValuePair.Value);
                 }
+            }
+            
+            if (PetItem != null && PetItem.petEntity != null)
+            {
+                var expTree = GameInstance.Singleton.ExpTree;
+                var currentExp = 0;
+                var nextLevelExp = 0;
+                if (CharacterItem.GetNextLevelExp() > 0)
+                {
+                    currentExp = CharacterItem.exp;
+                    nextLevelExp = CharacterItem.GetNextLevelExp();
+                }
+                else if (Level - 2 > 0 && Level - 2 < expTree.Length)
+                {
+                    var maxExp = expTree[Level - 2];
+                    currentExp = maxExp;
+                    nextLevelExp = maxExp;
+                }
+
+                if (uiTextExp != null)
+                {
+                    uiTextExp.text = string.Format(expFormat, currentExp.ToString("N0"), nextLevelExp.ToString("N0"));
+                    uiTextExp.gameObject.SetActive(true);
+                }
+            }
+            else
+            {
+                if (uiTextExp != null)
+                    uiTextExp.gameObject.SetActive(false);
             }
 
             if (uiNextLevelItem != null)

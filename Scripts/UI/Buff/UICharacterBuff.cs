@@ -60,10 +60,8 @@ namespace MultiplayerARPG
 
             if (uiTextRemainsDuration != null)
             {
-                if (buffRemainsDuration > 0f)
-                    uiTextRemainsDuration.text = string.Format(buffRemainsDurationFormat, Mathf.CeilToInt(buffRemainsDuration).ToString("N0"));
-                else
-                    uiTextRemainsDuration.text = "";
+                uiTextRemainsDuration.text = string.Format(buffRemainsDurationFormat, Mathf.CeilToInt(buffRemainsDuration).ToString("N0"));
+                uiTextRemainsDuration.gameObject.SetActive(buffRemainsDuration > 0);
             }
 
             if (imageDurationGage != null)
