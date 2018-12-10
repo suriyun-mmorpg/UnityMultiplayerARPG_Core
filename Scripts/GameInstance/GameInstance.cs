@@ -105,8 +105,12 @@ namespace MultiplayerARPG
         public float minFollowSummonerDistance = 5f;
         [Tooltip("Max distance to follow summoner, if distance between characters more than this it will teleport to summoner")]
         public float maxFollowSummonerDistance = 10f;
-        [Tooltip("This is duration to lock item before it is able to spawn later")]
+
+        [Header("Gameplay Configs - Summon Pet")]
+        [Tooltip("This is duration to lock item before it is able to spawn later after character dead")]
         public float petDeadLockDuration = 60f;
+        [Tooltip("This is duration to lock item before it is able to spawn later after unsummon")]
+        public float petUnSummonLockDuration = 30f;
 
         [Header("Game Effects")]
         public GameEffect levelUpEffect;

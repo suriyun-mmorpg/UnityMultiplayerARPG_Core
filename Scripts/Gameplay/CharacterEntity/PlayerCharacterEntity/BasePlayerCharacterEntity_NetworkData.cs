@@ -87,6 +87,7 @@ namespace MultiplayerARPG
         public int GuildId { get { return guildId.Value; } set { guildId.Value = value; } }
         public byte GuildRole { get; set; }
         public int SharedGuildExp { get; set; }
+        public byte UserLevel { get; set; }
         public string CurrentMapName { get { return SceneManager.GetActiveScene().name; } set { } }
         public Vector3 CurrentPosition
         {

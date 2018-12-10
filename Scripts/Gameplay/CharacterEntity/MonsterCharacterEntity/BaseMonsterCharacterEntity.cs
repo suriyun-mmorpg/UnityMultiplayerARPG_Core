@@ -69,7 +69,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // Summoner disappear so destroy it
-                    DeSummon();
+                    UnSummon();
                 }
             }
         }
@@ -461,7 +461,7 @@ namespace MultiplayerARPG
             InitStats();
         }
 
-        public void DeSummon()
+        public void UnSummon()
         {
             // TODO: May play teleport effects
             NetworkDestroy();

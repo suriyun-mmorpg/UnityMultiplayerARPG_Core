@@ -529,7 +529,7 @@ namespace MultiplayerARPG
             {
                 if (summons[i].type != SummonType.Pet)
                     continue;
-                summons[i].DeSummon(this);
+                summons[i].UnSummon(this);
                 summons.RemoveAt(i);
             }
             // Summon new pet
@@ -557,13 +557,13 @@ namespace MultiplayerARPG
                     ++count;
             }
             var maxStack = skill.summon.maxStack.GetAmount(level);
-            var deSummonAmount = count > maxStack ? count - maxStack : 0;
-            for (i = deSummonAmount; i > 0; --i)
+            var unSummonAmount = count > maxStack ? count - maxStack : 0;
+            for (i = unSummonAmount; i > 0; --i)
             {
                 var summonIndex = this.IndexOfSummon(skill.DataId, SummonType.Skill);
                 if (summonIndex >= 0)
                 {
-                    summons[summonIndex].DeSummon(this);
+                    summons[summonIndex].UnSummon(this);
                     summons.RemoveAt(summonIndex);
                 }
             }

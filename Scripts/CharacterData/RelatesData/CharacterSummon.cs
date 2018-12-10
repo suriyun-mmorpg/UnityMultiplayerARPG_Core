@@ -117,22 +117,21 @@ public class CharacterSummon : INetSerializable
         CacheEntity.CurrentMp = summonCurrentMp;
     }
 
-    public void DeSummon(BaseCharacterEntity summoner)
+    public void UnSummon(BaseCharacterEntity summoner)
     {
         if (type == SummonType.Pet)
         {
             var newItem = CharacterItem.Create(dataId, Level, 1);
             newItem.exp = Exp;
             if (CacheEntity == null || CacheEntity.CurrentHp <= 0)
-            {
-                // If pet dead, lock the item
                 newItem.Lock(GameInstance.Singleton.petDeadLockDuration);
-            }
+            else
+                newItem.Lock(GameInstance.Singleton.petUnSummonLockDuration);
             summoner.NonEquipItems.Add(newItem);
         }
 
         if (CacheEntity != null)
-            CacheEntity.DeSummon();
+            CacheEntity.UnSummon();
     }
 
     public bool ShouldRemove()

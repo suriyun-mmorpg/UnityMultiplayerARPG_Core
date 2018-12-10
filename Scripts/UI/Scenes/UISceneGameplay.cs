@@ -35,6 +35,7 @@ namespace MultiplayerARPG
         public UIEquipItems uiEquipItems;
         public UINonEquipItems uiNonEquipItems;
         public UICharacterSkills uiSkills;
+        public UICharacterSummons uiSummons;
         public UICharacterHotkeys uiHotkeys;
         public UICharacterQuests uiQuests;
         public UINpcDialog uiNpcDialog;
@@ -114,6 +115,12 @@ namespace MultiplayerARPG
         {
             if (uiSkills != null)
                 uiSkills.UpdateData(BasePlayerCharacterController.OwningCharacter);
+        }
+
+        public void UpdateSummons()
+        {
+            if (uiSummons != null)
+                uiSummons.UpdateData(BasePlayerCharacterController.OwningCharacter);
         }
 
         public void UpdateHotkeys()

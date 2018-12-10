@@ -107,5 +107,10 @@ namespace MultiplayerARPG
         {
             CallNetFunction(NetFuncOnLevelUp, ConnectionId);
         }
+
+        public virtual void RequestUnSummon(PackedUInt objectId)
+        {
+            CallNetFunction(NetFuncUnSummon, FunctionReceivers.Server, objectId);
+        }
     }
 }

@@ -380,5 +380,18 @@ namespace MultiplayerARPG
             if (onLevelUp != null)
                 onLevelUp.Invoke();
         }
+
+        protected virtual void NetFuncUnSummon(PackedUInt objectId)
+        {
+            var index = this.IndexOfSummon(objectId);
+            if (index < 0)
+                return;
+
+            var summon = Summons[index];
+            if (summon.type != SummonType.Pet)
+                return;
+
+            summon.UnSummon(this);
+        }
     }
 }

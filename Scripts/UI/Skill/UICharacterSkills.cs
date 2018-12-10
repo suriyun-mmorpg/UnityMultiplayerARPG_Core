@@ -7,42 +7,9 @@ namespace MultiplayerARPG
     public partial class UICharacterSkills : UIBase
     {
         public ICharacterData character { get; protected set; }
-        public enum ListingMode
-        {
-            DefiningByCharacter,
-            Predefined,
-        }
         public UICharacterSkill uiSkillDialog;
         public UICharacterSkill uiCharacterSkillPrefab;
         public Transform uiCharacterSkillContainer;
-
-        [Tooltip("If listing mode is `Defining By Character` it will make list of skills by `UI List` component, with data from character. If it's `Predefined`, it will showing predefined skills")]
-        public ListingMode listingMode;
-
-        [Header("Predefined Listing Mode")]
-        public UICharacterSkillPair[] uiCharacterSkills;
-
-        private Dictionary<Skill, short> displayingSkills;
-
-        private Dictionary<Skill, UICharacterSkill> cacheUICharacterSkills = null;
-        public Dictionary<Skill, UICharacterSkill> CacheUICharacterSkills
-        {
-            get
-            {
-                if (cacheUICharacterSkills == null)
-                {
-                    cacheUICharacterSkills = new Dictionary<Skill, UICharacterSkill>();
-                    foreach (var uiCharacterSkill in uiCharacterSkills)
-                    {
-                        if (uiCharacterSkill.skill != null &&
-                            uiCharacterSkill.ui != null &&
-                            !cacheUICharacterSkills.ContainsKey(uiCharacterSkill.skill))
-                            cacheUICharacterSkills.Add(uiCharacterSkill.skill, uiCharacterSkill.ui);
-                    }
-                }
-                return cacheUICharacterSkills;
-            }
-        }
 
         private UIList cacheList;
         public UIList CacheList
@@ -116,49 +83,20 @@ namespace MultiplayerARPG
                 return;
             }
 
-            displayingSkills = character.GetSkills();
-
             Skill tempSkill;
             short tempLevel;
             var skillLevels = character.GetDatabase().CacheSkillLevels;
-            switch (listingMode)
+            CacheList.Generate(skillLevels, (index, skillLevel, ui) =>
             {
-                case ListingMode.DefiningByCharacter:
-                    CacheList.Generate(skillLevels, (index, skillLevel, ui) =>
-                    {
-                        var uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
-                        tempSkill = skillLevel.Key;
-                        tempLevel = 0;
-                        if (displayingSkills.ContainsKey(tempSkill))
-                            tempLevel = displayingSkills[tempSkill];
-                        uiCharacterSkill.Setup(new SkillTuple(tempSkill, tempLevel), character, character.IndexOfSkill(tempSkill.DataId));
-                        uiCharacterSkill.Show();
-                        SelectionManager.Add(uiCharacterSkill);
-                        if (selectedSkillId.Equals(skillLevel.Key))
-                            uiCharacterSkill.OnClickSelect();
-                    });
-                    break;
-                case ListingMode.Predefined:
-                    CacheList.HideAll();
-                    foreach (var skillLevel in skillLevels)
-                    {
-                        tempSkill = skillLevel.Key;
-                        UICharacterSkill cacheUICharacterSkill;
-                        if (CacheUICharacterSkills.TryGetValue(tempSkill, out cacheUICharacterSkill))
-                        {
-                            tempLevel = 0;
-                            if (displayingSkills.ContainsKey(tempSkill))
-                                tempLevel = displayingSkills[tempSkill];
-                            cacheUICharacterSkill.Setup(new SkillTuple(tempSkill, tempLevel), character, character.IndexOfSkill(tempSkill.DataId));
-                            cacheUICharacterSkill.Show();
-                            if (selectedSkillId.Equals(skillLevel.Key))
-                                cacheUICharacterSkill.OnClickSelect();
-                        }
-                        else
-                            cacheUICharacterSkill.Hide();
-                    }
-                    break;
-            }
+                var uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
+                tempSkill = skillLevel.Key;
+                tempLevel = skillLevel.Value;
+                uiCharacterSkill.Setup(new SkillTuple(tempSkill, tempLevel), character, character.IndexOfSkill(tempSkill.DataId));
+                uiCharacterSkill.Show();
+                SelectionManager.Add(uiCharacterSkill);
+                if (selectedSkillId.Equals(skillLevel.Key))
+                    uiCharacterSkill.OnClickSelect();
+            });
         }
     }
 }
