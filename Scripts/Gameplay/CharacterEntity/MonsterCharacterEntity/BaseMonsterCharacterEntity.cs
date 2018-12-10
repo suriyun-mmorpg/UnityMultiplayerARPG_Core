@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
+using LiteNetLib;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -12,6 +13,9 @@ namespace MultiplayerARPG
     public abstract partial class BaseMonsterCharacterEntity : BaseCharacterEntity
     {
         public readonly Dictionary<BaseCharacterEntity, ReceivedDamageRecord> receivedDamageRecords = new Dictionary<BaseCharacterEntity, ReceivedDamageRecord>();
+        
+        [SerializeField]
+        protected SyncFieldPackedUInt summonerObjectId = new SyncFieldPackedUInt();
 
         public override string CharacterName
         {
@@ -113,10 +117,19 @@ namespace MultiplayerARPG
             this.spawnPosition = spawnPosition;
         }
 
+        protected override void SetupNetElements()
+        {
+            base.SetupNetElements();
+            CacheNetTransform.ownerClientCanSendTransform = false;
+            summonerObjectId.sendOptions = SendOptions.ReliableOrdered;
+            summonerObjectId.forOwnerOnly = false;
+        }
+
         public override void OnSetup()
         {
             base.OnSetup();
-            CacheNetTransform.ownerClientCanSendTransform = false;
+
+            summonerObjectId.onChange += OnSummonerObjectIdChange;
 
             // Setup relates elements
             if (GameInstance.monsterCharacterMiniMapObjects != null && GameInstance.monsterCharacterMiniMapObjects.Length > 0)
@@ -132,6 +145,18 @@ namespace MultiplayerARPG
                 InstantiateUI(GameInstance.monsterCharacterUI);
 
             InitStats();
+        }
+
+        protected override void EntityOnDestroy()
+        {
+            base.EntityOnDestroy();
+            summonerObjectId.onChange -= OnSummonerObjectIdChange;
+        }
+
+        protected virtual void OnSummonerObjectIdChange(PackedUInt summonerObjectId)
+        {
+            if (Manager.Assets.SpawnedObjects.ContainsKey(summonerObjectId))
+                summoner = Manager.Assets.SpawnedObjects[summonerObjectId].GetComponent<BaseCharacterEntity>();
         }
 
         public virtual void SetAttackTarget(BaseCharacterEntity target)
@@ -457,6 +482,7 @@ namespace MultiplayerARPG
         {
             this.summoner = summoner;
             this.summonType = summonType;
+            summonerObjectId.Value = summoner.ObjectId;
             Level = level;
             InitStats();
         }
