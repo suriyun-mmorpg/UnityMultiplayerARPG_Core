@@ -141,7 +141,8 @@ public class CharacterSummon : INetSerializable
 
     public void Update(float deltaTime)
     {
-        summonRemainsDuration -= deltaTime;
+        if (type == SummonType.Skill)
+            summonRemainsDuration -= deltaTime;
         // Makes update in main thread to collects data to use in other threads (save to database thread)
         level = Level;
         exp = Exp;
