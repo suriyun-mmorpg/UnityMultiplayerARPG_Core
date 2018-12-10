@@ -219,7 +219,7 @@ namespace MultiplayerARPG
                     // If no target enemy, set target enemy as attacker
                     SetAttackTarget(attackerCharacter);
                 }
-                else if (attackerCharacter != targetEntity && Random.value >= 0.5f)
+                else if (attackerCharacter != targetEntity && Random.value > 0.5f)
                 {
                     // Random 50% to change target when receive damage from anyone
                     SetAttackTarget(attackerCharacter);

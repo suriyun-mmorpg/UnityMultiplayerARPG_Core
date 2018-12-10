@@ -98,7 +98,9 @@ namespace MultiplayerARPG
 
         [Header("Gameplay Configs - Summon Monster")]
         [Tooltip("This is a distance that random summon around a character")]
-        public float summonDistance = 3f;
+        public float minSummonDistance = 2f;
+        [Tooltip("This is a distance that random summon around a character")]
+        public float maxSummonDistance = 3f;
         [Tooltip("Distance to warn character that ally being attacked")]
         public float enemySpottedNotifyDistance = 5f;
         [Tooltip("Min distance to follow summoner")]

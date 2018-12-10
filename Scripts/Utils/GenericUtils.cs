@@ -127,4 +127,9 @@ public static class GenericUtils
             return hash1 + (hash2 * 1566083941);
         }
     }
+
+    public static int GetNegativePositive()
+    {
+        return Random.value > 0.5f ? 1 : -1;
+    }
 }

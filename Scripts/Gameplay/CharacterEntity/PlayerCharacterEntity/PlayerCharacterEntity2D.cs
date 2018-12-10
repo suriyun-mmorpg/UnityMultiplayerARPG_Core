@@ -259,7 +259,7 @@ namespace MultiplayerARPG
 
         public override Vector3 GetSummonPosition()
         {
-            return CacheTransform.position + new Vector3(Random.Range(-1f, 1f) * GameInstance.summonDistance, Random.Range(-1f, 1f) * GameInstance.summonDistance);
+            return CacheTransform.position + new Vector3(Random.Range(GameInstance.minSummonDistance, GameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive(), Random.Range(GameInstance.minSummonDistance, GameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive());
         }
 
         public override Quaternion GetSummonRotation()

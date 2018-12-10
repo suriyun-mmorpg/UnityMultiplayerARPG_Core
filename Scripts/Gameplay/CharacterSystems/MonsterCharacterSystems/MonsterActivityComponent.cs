@@ -215,8 +215,9 @@ namespace MultiplayerARPG
         public void RandomWanderTarget(float time)
         {
             // If stopped then random
-            var randomPosition = CacheMonsterCharacterEntity.summoner != null ? CacheMonsterCharacterEntity.summoner.CacheTransform.position : CacheMonsterCharacterEntity.spawnPosition;
-            randomPosition += new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
+            var randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
+            if (CacheMonsterCharacterEntity.summoner != null)
+                randomPosition = CacheMonsterCharacterEntity.summoner.GetSummonPosition();
             CacheMonsterCharacterEntity.SetTargetEntity(null);
             SetWanderDestination(time, randomPosition);
         }
@@ -224,8 +225,9 @@ namespace MultiplayerARPG
         public void FollowSummoner(float time)
         {
             // If stopped then random
-            var randomPosition = CacheMonsterCharacterEntity.summoner != null ? CacheMonsterCharacterEntity.summoner.CacheTransform.position : CacheMonsterCharacterEntity.spawnPosition;
-            randomPosition += new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
+            var randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
+            if (CacheMonsterCharacterEntity.summoner != null)
+                randomPosition = CacheMonsterCharacterEntity.summoner.GetSummonPosition();
             CacheMonsterCharacterEntity.SetTargetEntity(null);
             SetDestination(time, randomPosition);
         }

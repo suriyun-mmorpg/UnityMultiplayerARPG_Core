@@ -43,8 +43,8 @@ namespace MultiplayerARPG
                     var summon = characterEntity.Summons[i];
                     if (summon.ShouldRemove())
                     {
-                        summon.UnSummon(characterEntity);
                         characterEntity.Summons.RemoveAt(i);
+                        summon.UnSummon(characterEntity);
                     }
                     else
                     {

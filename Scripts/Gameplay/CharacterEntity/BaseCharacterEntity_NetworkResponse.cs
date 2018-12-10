@@ -391,6 +391,7 @@ namespace MultiplayerARPG
             if (summon.type != SummonType.Pet)
                 return;
 
+            Summons.RemoveAt(index);
             summon.UnSummon(this);
         }
     }

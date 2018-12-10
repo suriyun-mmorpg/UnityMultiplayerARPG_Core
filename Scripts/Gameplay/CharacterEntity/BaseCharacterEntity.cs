@@ -525,12 +525,14 @@ namespace MultiplayerARPG
             if (IsDead() || !IsServer || item == null || level <= 0)
                 return;
             // Clear all summoned pets
+            CharacterSummon tempSummon;
             for (var i = 0; i < Summons.Count; ++i)
             {
-                if (summons[i].type != SummonType.Pet)
+                tempSummon = summons[i];
+                if (tempSummon.type != SummonType.Pet)
                     continue;
-                summons[i].UnSummon(this);
                 summons.RemoveAt(i);
+                tempSummon.UnSummon(this);
             }
             // Summon new pet
             var newSummon = CharacterSummon.Create(SummonType.Pet, item.DataId);
@@ -558,13 +560,15 @@ namespace MultiplayerARPG
             }
             var maxStack = skill.summon.maxStack.GetAmount(level);
             var unSummonAmount = count > maxStack ? count - maxStack : 0;
+            CharacterSummon tempSummon;
             for (i = unSummonAmount; i > 0; --i)
             {
                 var summonIndex = this.IndexOfSummon(skill.DataId, SummonType.Skill);
+                tempSummon = summons[summonIndex];
                 if (summonIndex >= 0)
                 {
-                    summons[summonIndex].UnSummon(this);
                     summons.RemoveAt(summonIndex);
+                    tempSummon.UnSummon(this);
                 }
             }
         }
@@ -1080,7 +1084,7 @@ namespace MultiplayerARPG
 
         public virtual Vector3 GetSummonPosition()
         {
-            return CacheTransform.position + new Vector3(Random.Range(-1f, 1f) * GameInstance.summonDistance, 0f, Random.Range(-1f, 1f) * GameInstance.summonDistance);
+            return CacheTransform.position + new Vector3(Random.Range(GameInstance.minSummonDistance, GameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive(), 0f, Random.Range(GameInstance.minSummonDistance, GameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive());
         }
 
         public virtual Quaternion GetSummonRotation()
