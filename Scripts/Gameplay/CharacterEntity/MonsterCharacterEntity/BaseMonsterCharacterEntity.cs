@@ -489,8 +489,8 @@ namespace MultiplayerARPG
 
         public void Summon(BaseCharacterEntity summoner, SummonType summonType, short level)
         {
-            this.Summoner = summoner;
-            this.SummonType = summonType;
+            Summoner = summoner;
+            SummonType = summonType;
             Level = level;
             InitStats();
         }
