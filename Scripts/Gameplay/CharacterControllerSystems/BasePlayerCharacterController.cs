@@ -89,7 +89,6 @@ namespace MultiplayerARPG
             characterEntity.onEquipWeaponsChange += OnEquipWeaponsChange;
             characterEntity.onAttributesOperation += OnAttributesOperation;
             characterEntity.onSkillsOperation += OnSkillsOperation;
-            characterEntity.onSkillUsagesOperation += OnSkillUsagesOperation;
             characterEntity.onSummonsOperation += OnSummonsOperation;
             characterEntity.onBuffsOperation += OnBuffsOperation;
             characterEntity.onEquipItemsOperation += OnEquipItemsOperation;
@@ -110,7 +109,6 @@ namespace MultiplayerARPG
             characterEntity.onEquipWeaponsChange -= OnEquipWeaponsChange;
             characterEntity.onAttributesOperation -= OnAttributesOperation;
             characterEntity.onSkillsOperation -= OnSkillsOperation;
-            characterEntity.onSkillUsagesOperation -= OnSkillUsagesOperation;
             characterEntity.onSummonsOperation -= OnSummonsOperation;
             characterEntity.onBuffsOperation -= OnBuffsOperation;
             characterEntity.onEquipItemsOperation -= OnEquipItemsOperation;
@@ -182,40 +180,19 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void OnSkillUsagesOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
-            {
-                if (operation == LiteNetLibSyncList.Operation.Add ||
-                    operation == LiteNetLibSyncList.Operation.RemoveAt ||
-                    operation == LiteNetLibSyncList.Operation.Insert ||
-                    operation == LiteNetLibSyncList.Operation.Clear)
-                {
-                    CacheUISceneGameplay.UpdateCharacter();
-                    CacheUISceneGameplay.UpdateHotkeys();
-                }
-            }
-        }
-
         protected void OnSummonsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
-            {
-                if (operation == LiteNetLibSyncList.Operation.Add ||
-                    operation == LiteNetLibSyncList.Operation.RemoveAt ||
-                    operation == LiteNetLibSyncList.Operation.Insert ||
-                    operation == LiteNetLibSyncList.Operation.Clear)
-                    CacheUISceneGameplay.UpdateSummons();
-            }
+                CacheUISceneGameplay.UpdateSummons();
         }
 
         protected void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
             {
-                if (operation == LiteNetLibSyncList.Operation.Add || 
-                    operation == LiteNetLibSyncList.Operation.RemoveAt || 
-                    operation == LiteNetLibSyncList.Operation.Insert || 
+                if (operation == LiteNetLibSyncList.Operation.Add ||
+                    operation == LiteNetLibSyncList.Operation.RemoveAt ||
+                    operation == LiteNetLibSyncList.Operation.Insert ||
                     operation == LiteNetLibSyncList.Operation.Clear)
                     CacheUISceneGameplay.UpdateCharacter();
             }
