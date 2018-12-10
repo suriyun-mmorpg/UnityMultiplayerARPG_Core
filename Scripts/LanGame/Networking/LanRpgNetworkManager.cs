@@ -94,6 +94,7 @@ namespace MultiplayerARPG
             var identity = Assets.NetworkSpawn(entityPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
             var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterData.CloneTo(playerCharacterEntity);
+            // Summon saved summons
             for (var i = 0; i < playerCharacterEntity.Summons.Count; ++i)
             {
                 var summon = playerCharacterEntity.Summons[i];
