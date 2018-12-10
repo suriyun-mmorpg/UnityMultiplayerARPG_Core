@@ -405,19 +405,35 @@ namespace MultiplayerARPG
             switch (message.channel)
             {
                 case ChatChannel.Global:
-                    // Send message to all clients
-                    if (!GMCommands.IsGMCommand(message.message))
-                        ServerSendPacketToAllConnections(SendOptions.ReliableOrdered, MsgTypes.Chat, message);
-                    else
-                        HandleGMCommand(message.sender, message.message);
+                    if (!string.IsNullOrEmpty(message.sender))
+                    {
+                        if (GMCommands.IsGMCommand(message.message) && 
+                            TryGetPlayerCharacterByName(message.sender, out playerCharacter) &&
+                            playerCharacter.UserLevel > 0)
+                        {
+                            // If it's gm command and sender's user level > 0, handle gm commands
+                            HandleGMCommand(message.sender, message.message);
+                        }
+                        else
+                        {
+                            // Send message to all clients
+                            ServerSendPacketToAllConnections(SendOptions.ReliableOrdered, MsgTypes.Chat, message);
+                        }
+                    }
                     break;
                 case ChatChannel.Whisper:
                     if (!string.IsNullOrEmpty(message.sender) &&
                         connectionIdsByCharacterName.TryGetValue(message.sender, out senderConnectionId))
+                    {
+                        // If found sender send whisper message to sender
                         ServerSendPacket(senderConnectionId, SendOptions.ReliableOrdered, MsgTypes.Chat, message);
+                    }
                     if (!string.IsNullOrEmpty(message.receiver) &&
                         connectionIdsByCharacterName.TryGetValue(message.receiver, out receiverConnectionId))
+                    {
+                        // If found receiver send whisper message to receiver
                         ServerSendPacket(receiverConnectionId, SendOptions.ReliableOrdered, MsgTypes.Chat, message);
+                    }
                     break;
                 case ChatChannel.Party:
                     PartyData party;
@@ -425,9 +441,12 @@ namespace MultiplayerARPG
                     {
                         foreach (var memberId in party.GetMemberIds())
                         {
-                            if (playerCharactersById.TryGetValue(memberId, out playerCharacter) &&
+                            if (TryGetPlayerCharacterById(memberId, out playerCharacter) &&
                                 ContainsConnectionId(playerCharacter.ConnectionId))
+                            {
+                                // If party member is online, send party message to the member
                                 ServerSendPacket(playerCharacter.ConnectionId, SendOptions.ReliableOrdered, MsgTypes.Chat, message);
+                            }
                         }
                     }
                     break;
@@ -437,9 +456,12 @@ namespace MultiplayerARPG
                     {
                         foreach (var memberId in guild.GetMemberIds())
                         {
-                            if (playerCharactersById.TryGetValue(memberId, out playerCharacter) &&
+                            if (TryGetPlayerCharacterById(memberId, out playerCharacter) &&
                                 ContainsConnectionId(playerCharacter.ConnectionId))
+                            {
+                                // If guild member is online, send guild message to the member
                                 ServerSendPacket(playerCharacter.ConnectionId, SendOptions.ReliableOrdered, MsgTypes.Chat, message);
+                            }
                         }
                     }
                     break;
