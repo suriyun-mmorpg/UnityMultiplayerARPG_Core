@@ -19,13 +19,13 @@ public class CharacterSummon : INetSerializable
     public uint objectId;
     // For save / load
     public short level;
-    public short Level { get { return CacheEntity != null ? level = CacheEntity.Level : level; } }
+    public short Level { get { return CacheEntity != null ? CacheEntity.Level : level; } }
     public int exp;
-    public int Exp { get { return CacheEntity != null ? exp = CacheEntity.Exp : exp; } }
+    public int Exp { get { return CacheEntity != null ? CacheEntity.Exp : exp; } }
     public int currentHp;
-    public int CurrentHp { get { return CacheEntity != null ? currentHp = CacheEntity.CurrentHp : currentHp; } }
+    public int CurrentHp { get { return CacheEntity != null ? CacheEntity.CurrentHp : currentHp; } }
     public int currentMp;
-    public int CurrentMp { get { return CacheEntity != null ? currentMp = CacheEntity.CurrentMp : currentMp; } }
+    public int CurrentMp { get { return CacheEntity != null ? CacheEntity.CurrentMp : currentMp; } }
 
     [System.NonSerialized]
     private int dirtyDataId;
@@ -142,6 +142,11 @@ public class CharacterSummon : INetSerializable
     public void Update(float deltaTime)
     {
         summonRemainsDuration -= deltaTime;
+        // Makes update in main thread to collects data to use in other threads (save to database thread)
+        level = Level;
+        exp = Exp;
+        currentHp = CurrentHp;
+        currentMp = CurrentMp;
     }
 
     public static CharacterSummon Create(SummonType type, int dataId)

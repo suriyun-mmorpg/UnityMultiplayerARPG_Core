@@ -48,11 +48,8 @@ namespace MultiplayerARPG
                     }
                     else
                     {
-                        if (summon.type == SummonType.Skill)
-                        {
-                            summon.Update(component.skillBuffUpdateDeltaTime);
-                            characterEntity.Summons[i] = summon;
-                        }
+                        summon.Update(component.skillBuffUpdateDeltaTime);
+                        characterEntity.Summons[i] = summon;
                     }
                 }
                 count = characterEntity.SkillUsages.Count;
