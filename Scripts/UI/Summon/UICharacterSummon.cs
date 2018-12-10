@@ -32,7 +32,7 @@ namespace MultiplayerARPG
         public UnityEvent onStackEntriesEmpty;
         public UnityEvent onStackEntriesNotEmpty;
 
-        protected readonly Dictionary<int, CharacterSummon> stackingEntries = new Dictionary<int, CharacterSummon>();
+        protected readonly Dictionary<uint, CharacterSummon> stackingEntries = new Dictionary<uint, CharacterSummon>();
         protected float summonRemainsDuration;
 
         private void OnDisable()
@@ -123,13 +123,13 @@ namespace MultiplayerARPG
 
         public void AddStackingEntry(CharacterSummon summon)
         {
-            stackingEntries[summon.dataId] = summon;
+            stackingEntries[summon.objectId] = summon;
             OnStackingEntriesUpdate();
         }
 
-        public void RemoveStackingEntry(int dataId)
+        public void RemoveStackingEntry(uint objectId)
         {
-            stackingEntries.Remove(dataId);
+            stackingEntries.Remove(objectId);
             OnStackingEntriesUpdate();
         }
 

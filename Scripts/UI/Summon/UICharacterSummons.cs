@@ -93,13 +93,13 @@ namespace MultiplayerARPG
                 return;
             }
 
-            var stackingSkillSummon = new Dictionary<int, UICharacterSummon>();
+            var stackingSkillSummons = new Dictionary<int, UICharacterSummon>();
             var summons = character.Summons;
             CacheList.Generate(summons, (index, characterSummon, ui) =>
             {
-                if (characterSummon.type == SummonType.Skill && stackingSkillSummon.ContainsKey(characterSummon.dataId))
+                if (characterSummon.type == SummonType.Skill && stackingSkillSummons.ContainsKey(characterSummon.dataId))
                 {
-                    stackingSkillSummon[characterSummon.dataId].AddStackingEntry(characterSummon);
+                    stackingSkillSummons[characterSummon.dataId].AddStackingEntry(characterSummon);
                     ui.gameObject.SetActive(false);
                 }
                 else
@@ -110,7 +110,7 @@ namespace MultiplayerARPG
                     switch (characterSummon.type)
                     {
                         case SummonType.Skill:
-                            stackingSkillSummon.Add(characterSummon.dataId, uiCharacterSummon);
+                            stackingSkillSummons.Add(characterSummon.dataId, uiCharacterSummon);
                             break;
                         case SummonType.Pet:
                             ui.transform.SetAsFirstSibling();
