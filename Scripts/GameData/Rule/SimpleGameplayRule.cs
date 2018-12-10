@@ -217,7 +217,7 @@ namespace MultiplayerARPG
         public override bool IncreaseExp(BaseCharacterEntity character, int exp)
         {
             var monsterCharacter = character as BaseMonsterCharacterEntity;
-            if (monsterCharacter != null && monsterCharacter.summonType != SummonType.Pet)
+            if (monsterCharacter != null && monsterCharacter.SummonType != SummonType.Pet)
             {
                 // If it's monster and not pet, do not increase exp
                 return false;

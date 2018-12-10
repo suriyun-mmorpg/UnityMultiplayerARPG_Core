@@ -16,6 +16,8 @@ namespace MultiplayerARPG
         
         [SerializeField]
         protected SyncFieldPackedUInt summonerObjectId = new SyncFieldPackedUInt();
+        [SerializeField]
+        protected SyncFieldByte summonType = new SyncFieldByte();
 
         public override string CharacterName
         {
@@ -41,6 +43,7 @@ namespace MultiplayerARPG
         
         public MonsterSpawnArea spawnArea { get; private set; }
         public Vector3 spawnPosition { get; private set; }
+
         private BaseCharacterEntity summoner;
         public BaseCharacterEntity Summoner
         {
@@ -60,8 +63,8 @@ namespace MultiplayerARPG
                     summonerObjectId.Value = summoner != null ? summoner.ObjectId : 0;
             }
         }
-        public SummonType summonType { get; protected set; }
-        public bool isSummoned { get { return summonType != SummonType.None; } }
+        public SummonType SummonType { get { return (SummonType)summonType.Value; } protected set { summonType.Value = (byte)value; } }
+        public bool IsSummoned { get { return SummonType != SummonType.None; } }
 
         protected override void EntityAwake()
         {
@@ -78,7 +81,7 @@ namespace MultiplayerARPG
         protected override void EntityUpdate()
         {
             base.EntityUpdate();
-            if (isSummoned)
+            if (IsSummoned)
             {
                 if (Summoner != null)
                 {
@@ -141,6 +144,8 @@ namespace MultiplayerARPG
             CacheNetTransform.ownerClientCanSendTransform = false;
             summonerObjectId.sendOptions = SendOptions.ReliableOrdered;
             summonerObjectId.forOwnerOnly = false;
+            summonType.sendOptions = SendOptions.ReliableOrdered;
+            summonType.forOwnerOnly = false;
         }
 
         public override void OnSetup()
@@ -198,7 +203,7 @@ namespace MultiplayerARPG
             if (characterEntity == null)
                 return false;
 
-            if (isSummoned)
+            if (IsSummoned)
             {
                 // If summoned by someone, will have same allies with summoner
                 return characterEntity == Summoner || characterEntity.IsAlly(Summoner);
@@ -209,7 +214,7 @@ namespace MultiplayerARPG
                 var monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
                 if (monsterCharacterEntity != null)
                 {
-                    if (monsterCharacterEntity.isSummoned)
+                    if (monsterCharacterEntity.IsSummoned)
                         return IsAlly(monsterCharacterEntity.Summoner);
                     return monsterCharacterEntity.MonsterDatabase.allyId == MonsterDatabase.allyId;
                 }
@@ -222,7 +227,7 @@ namespace MultiplayerARPG
             if (characterEntity == null)
                 return false;
 
-            if (isSummoned)
+            if (IsSummoned)
             {
                 // If summoned by someone, will have same enemies with summoner
                 return characterEntity != Summoner && characterEntity.IsEnemy(Summoner);
@@ -302,7 +307,7 @@ namespace MultiplayerARPG
             // If summoned by someone, summoner is attacker
             if (attackerCharacter != null &&
                 attackerCharacter is BaseMonsterCharacterEntity &&
-                (attackerCharacter as BaseMonsterCharacterEntity).isSummoned)
+                (attackerCharacter as BaseMonsterCharacterEntity).IsSummoned)
                 attackerCharacter = (attackerCharacter as BaseMonsterCharacterEntity).Summoner;
 
             // Add received damage entry
@@ -325,7 +330,7 @@ namespace MultiplayerARPG
             if (IsDead())
             {
                 CurrentHp = 0;
-                if (!isSummoned)
+                if (!IsSummoned)
                 {
                     // If not summoned by someone, destroy and respawn it
                     DestroyAndRespawn();
@@ -338,7 +343,7 @@ namespace MultiplayerARPG
             base.Killed(lastAttacker);
 
             // If this summoned by someone, don't give reward to killer
-            if (isSummoned)
+            if (IsSummoned)
                 return;
 
             var randomedExp = Random.Range(MonsterDatabase.randomExpMin, MonsterDatabase.randomExpMax);
@@ -485,7 +490,7 @@ namespace MultiplayerARPG
         public void Summon(BaseCharacterEntity summoner, SummonType summonType, short level)
         {
             this.Summoner = summoner;
-            this.summonType = summonType;
+            this.SummonType = summonType;
             Level = level;
             InitStats();
         }
