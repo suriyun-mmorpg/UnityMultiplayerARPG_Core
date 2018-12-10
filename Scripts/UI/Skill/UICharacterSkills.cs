@@ -38,6 +38,8 @@ namespace MultiplayerARPG
             }
         }
 
+        private Dictionary<Skill, short> displayingSkills;
+
         public override void Show()
         {
             SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterSkill);
@@ -83,6 +85,8 @@ namespace MultiplayerARPG
                 return;
             }
 
+            displayingSkills = character.GetSkills();
+
             Skill tempSkill;
             short tempLevel;
             var skillLevels = character.GetDatabase().CacheSkillLevels;
@@ -90,7 +94,9 @@ namespace MultiplayerARPG
             {
                 var uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
                 tempSkill = skillLevel.Key;
-                tempLevel = skillLevel.Value;
+                tempLevel = 0;
+                if (displayingSkills.ContainsKey(tempSkill))
+                    tempLevel = displayingSkills[tempSkill];
                 uiCharacterSkill.Setup(new SkillTuple(tempSkill, tempLevel), character, character.IndexOfSkill(tempSkill.DataId));
                 uiCharacterSkill.Show();
                 SelectionManager.Add(uiCharacterSkill);
