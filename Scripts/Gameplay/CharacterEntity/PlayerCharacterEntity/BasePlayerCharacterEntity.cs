@@ -138,7 +138,7 @@ namespace MultiplayerARPG
             {
                 // If this character is summoner so it is ally
                 var monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
-                return monsterCharacterEntity.summoner != null && monsterCharacterEntity.summoner == this;
+                return monsterCharacterEntity.Summoner != null && monsterCharacterEntity.Summoner == this;
             }
             return false;
         }
@@ -158,7 +158,7 @@ namespace MultiplayerARPG
             {
                 // If this character is not summoner so it is enemy
                 var monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
-                return monsterCharacterEntity.summoner == null || monsterCharacterEntity.summoner != this;
+                return monsterCharacterEntity.Summoner == null || monsterCharacterEntity.Summoner != this;
             }
             return false;
         }

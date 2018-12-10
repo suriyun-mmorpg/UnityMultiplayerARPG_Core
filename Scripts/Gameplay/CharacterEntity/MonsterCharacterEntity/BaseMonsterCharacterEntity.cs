@@ -41,7 +41,25 @@ namespace MultiplayerARPG
         
         public MonsterSpawnArea spawnArea { get; private set; }
         public Vector3 spawnPosition { get; private set; }
-        public BaseCharacterEntity summoner { get; protected set; }
+        private BaseCharacterEntity summoner;
+        public BaseCharacterEntity Summoner
+        {
+            get
+            {
+                if (summoner == null)
+                {
+                    if (Manager.Assets.SpawnedObjects.ContainsKey(summonerObjectId.Value))
+                        summoner = Manager.Assets.SpawnedObjects[summonerObjectId.Value].GetComponent<BaseCharacterEntity>();
+                }
+                return summoner;
+            }
+            protected set
+            {
+                summoner = value;
+                if (IsServer)
+                    summonerObjectId.Value = summoner != null ? summoner.ObjectId : 0;
+            }
+        }
         public SummonType summonType { get; protected set; }
         public bool isSummoned { get { return summonType != SummonType.None; } }
 
@@ -62,12 +80,12 @@ namespace MultiplayerARPG
             base.EntityUpdate();
             if (isSummoned)
             {
-                if (summoner != null)
+                if (Summoner != null)
                 {
-                    if (Vector3.Distance(CacheTransform.position, summoner.CacheTransform.position) > GameInstance.maxFollowSummonerDistance)
+                    if (Vector3.Distance(CacheTransform.position, Summoner.CacheTransform.position) > GameInstance.maxFollowSummonerDistance)
                     {
                         // Teleport to summoner if too far from summoner
-                        CacheNetTransform.Teleport(summoner.GetSummonPosition(), summoner.GetSummonRotation());
+                        CacheNetTransform.Teleport(Summoner.GetSummonPosition(), Summoner.GetSummonRotation());
                     }
                 }
                 else
@@ -129,8 +147,6 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
 
-            summonerObjectId.onChange += OnSummonerObjectIdChange;
-
             // Setup relates elements
             if (GameInstance.monsterCharacterMiniMapObjects != null && GameInstance.monsterCharacterMiniMapObjects.Length > 0)
             {
@@ -145,18 +161,6 @@ namespace MultiplayerARPG
                 InstantiateUI(GameInstance.monsterCharacterUI);
 
             InitStats();
-        }
-
-        protected override void EntityOnDestroy()
-        {
-            base.EntityOnDestroy();
-            summonerObjectId.onChange -= OnSummonerObjectIdChange;
-        }
-
-        protected virtual void OnSummonerObjectIdChange(PackedUInt summonerObjectId)
-        {
-            if (Manager.Assets.SpawnedObjects.ContainsKey(summonerObjectId))
-                summoner = Manager.Assets.SpawnedObjects[summonerObjectId].GetComponent<BaseCharacterEntity>();
         }
 
         public virtual void SetAttackTarget(BaseCharacterEntity target)
@@ -197,7 +201,7 @@ namespace MultiplayerARPG
             if (isSummoned)
             {
                 // If summoned by someone, will have same allies with summoner
-                return characterEntity == summoner || characterEntity.IsAlly(summoner);
+                return characterEntity == Summoner || characterEntity.IsAlly(Summoner);
             }
             if (characterEntity is BaseMonsterCharacterEntity)
             {
@@ -206,7 +210,7 @@ namespace MultiplayerARPG
                 if (monsterCharacterEntity != null)
                 {
                     if (monsterCharacterEntity.isSummoned)
-                        return IsAlly(monsterCharacterEntity.summoner);
+                        return IsAlly(monsterCharacterEntity.Summoner);
                     return monsterCharacterEntity.MonsterDatabase.allyId == MonsterDatabase.allyId;
                 }
             }
@@ -221,7 +225,7 @@ namespace MultiplayerARPG
             if (isSummoned)
             {
                 // If summoned by someone, will have same enemies with summoner
-                return characterEntity != summoner && characterEntity.IsEnemy(summoner);
+                return characterEntity != Summoner && characterEntity.IsEnemy(Summoner);
             }
             // Attack only player by default
             return characterEntity is BasePlayerCharacterEntity;
@@ -299,7 +303,7 @@ namespace MultiplayerARPG
             if (attackerCharacter != null &&
                 attackerCharacter is BaseMonsterCharacterEntity &&
                 (attackerCharacter as BaseMonsterCharacterEntity).isSummoned)
-                attackerCharacter = (attackerCharacter as BaseMonsterCharacterEntity).summoner;
+                attackerCharacter = (attackerCharacter as BaseMonsterCharacterEntity).Summoner;
 
             // Add received damage entry
             if (attackerCharacter != null)
@@ -480,9 +484,8 @@ namespace MultiplayerARPG
 
         public void Summon(BaseCharacterEntity summoner, SummonType summonType, short level)
         {
-            this.summoner = summoner;
+            this.Summoner = summoner;
             this.summonType = summonType;
-            summonerObjectId.Value = summoner.ObjectId;
             Level = level;
             InitStats();
         }
@@ -495,7 +498,7 @@ namespace MultiplayerARPG
 
         public override void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker)
         {
-            if ((summoner != null && summoner == ally) || MonsterDatabase.characteristic == MonsterCharacteristic.Assist)
+            if ((Summoner != null && Summoner == ally) || MonsterDatabase.characteristic == MonsterCharacteristic.Assist)
                 SetAttackTarget(attacker);
         }
 
