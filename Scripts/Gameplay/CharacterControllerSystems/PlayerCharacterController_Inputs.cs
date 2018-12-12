@@ -81,9 +81,11 @@ namespace MultiplayerARPG
             // If it's building something, not allow point click movement
             if (currentBuildingEntity != null)
                 return;
+
             getMouseDown = Input.GetMouseButtonDown(0);
             getMouseUp = Input.GetMouseButtonUp(0);
             getMouse = Input.GetMouseButton(0);
+
             if (getMouseDown)
             {
                 isMouseDragOrHoldOrOverUI = false;
@@ -178,8 +180,7 @@ namespace MultiplayerARPG
                     // Close NPC dialog, when target changes
                     if (CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
                         CacheUISceneGameplay.uiNpcDialog.Hide();
-                    // Clear queue using skill
-                    queueUsingSkill = null;
+
                     // Move to target, will hide destination when target is object
                     if (targetIdentity != null)
                         destination = null;
