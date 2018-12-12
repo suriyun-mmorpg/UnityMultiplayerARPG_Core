@@ -98,12 +98,9 @@ namespace MultiplayerARPG
                 isMouseDragOrHoldOrOverUI = true;
             if (!isPointerOverUI && (getMouse || getMouseUp))
             {
-                PlayerCharacterEntity.SetTargetEntity(null);
                 LiteNetLibIdentity targetIdentity = null;
                 Vector3? targetPosition = null;
-                var mouseUpOnTarget = getMouseUp &&
-                        !isMouseDragOrHoldOrOverUI &&
-                        (controllerMode == PlayerCharacterControllerMode.PointClick || controllerMode == PlayerCharacterControllerMode.Both);
+                var mouseUpOnTarget = getMouseUp && !isMouseDragOrHoldOrOverUI && (controllerMode == PlayerCharacterControllerMode.PointClick || controllerMode == PlayerCharacterControllerMode.Both);
                 tempCount = FindClickObjects(out tempVector3);
                 for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
                 {
@@ -159,7 +156,6 @@ namespace MultiplayerARPG
                     else if (isMouseHoldAndNotDrag)
                     {
                         var buildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
-                        PlayerCharacterEntity.SetTargetEntity(null);
                         if (buildingMaterial != null && buildingMaterial.buildingEntity != null && !buildingMaterial.buildingEntity.IsDead())
                         {
                             targetPosition = buildingMaterial.buildingEntity.CacheTransform.position;
