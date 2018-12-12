@@ -20,13 +20,13 @@ namespace MultiplayerARPG
         /// <summary>
         /// Use this as reference for entity to interactive while in play mode
         /// </summary>
-        [HideInInspector]
+        [HideInInspector, System.NonSerialized]
         public BuildingEntity buildingEntity;
 
         /// <summary>
         /// Use this as reference for area to build this object while in build mode
         /// </summary>
-        [HideInInspector]
+        [HideInInspector, System.NonSerialized]
         public BuildingArea buildingArea;
 
         [Header("Save Data")]

@@ -10,12 +10,13 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(LiteNetLibTransform))]
     public abstract partial class BasePlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     {
-        [HideInInspector]
+        [HideInInspector, System.NonSerialized]
         public WarpPortalEntity warpingPortal;
-        [HideInInspector]
+        [HideInInspector, System.NonSerialized]
         public NpcDialog currentNpcDialog;
 
         [Header("Player Character Settings")]
+        [Tooltip("Leave this empty to use GameInstance's controller prefab")]
         public BasePlayerCharacterController controllerPrefab;
 
         public float setCoCharacterTime { get; private set; }

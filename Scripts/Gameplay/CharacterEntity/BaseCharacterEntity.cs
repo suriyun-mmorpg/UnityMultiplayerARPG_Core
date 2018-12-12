@@ -14,7 +14,8 @@ namespace MultiplayerARPG
         public const float ACTION_COMMAND_DELAY = 0.2f;
         public const int OVERLAP_COLLIDER_SIZE = 32;
 
-        [HideInInspector]
+        [HideInInspector, System.NonSerialized]
+        // This will be TRUE when this character enter to safe area
         public bool isInSafeArea;
 
         #region Serialize data

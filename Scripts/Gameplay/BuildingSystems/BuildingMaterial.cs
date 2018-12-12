@@ -16,7 +16,7 @@ namespace MultiplayerARPG
         private Material[] defaultMaterials;
         public Material[] canBuildMaterials;
         public Material[] cannotBuildMaterials;
-        [HideInInspector]
+        [HideInInspector, System.NonSerialized]
         public BuildingEntity buildingEntity;
 
         private Renderer meshRenderer;

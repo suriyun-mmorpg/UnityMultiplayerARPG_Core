@@ -87,7 +87,7 @@ namespace MultiplayerARPG
             }
         }
         
-        [HideInInspector]
+        [HideInInspector, System.NonSerialized]
         public DirectionType currentDirectionType = DirectionType.Down;
         private AnimationClip2D playingAnim = null;
         private int currentFrame = 0;

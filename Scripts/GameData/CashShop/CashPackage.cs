@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Cash Package", menuName = "Create CashShop/Cash Package")]
     public class CashPackage : BaseGameData
     {
-        [HideInInspector]
+        [HideInInspector, System.NonSerialized]
         public string productId;
         public string externalIconUrl;
         public int cashAmount;

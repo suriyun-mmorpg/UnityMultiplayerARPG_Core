@@ -9,7 +9,7 @@ namespace MultiplayerARPG
         public string buildingType;
         public bool snapBuildingObject;
 
-        [HideInInspector]
+        [HideInInspector, System.NonSerialized]
         public BuildingEntity buildingEntity;
 
         public uint EntityObjectId
