@@ -253,7 +253,7 @@ namespace MultiplayerARPG
             if (IsDead())
                 return;
             // Play jump animation immediately on owner client
-            if (IsOwnerClient && !IsServer)
+            if (IsOwnerClient)
                 CharacterModel.PlayJumpAnimation();
             // Only server will call for clients to trigger jump animation for secure entity
             if (IsServer)
