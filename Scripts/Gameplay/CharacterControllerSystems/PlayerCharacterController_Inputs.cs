@@ -356,16 +356,6 @@ namespace MultiplayerARPG
                             RequestUsePendingSkill();
                         else
                             RequestAttack();
-
-                        /** Hint: Uncomment these to make it attack one time and stop 
-                        //  when reached target and doesn't pressed on mouse like as diablo
-                        if (CacheUISceneGameplay.IsPointerOverUIObject() || !Input.GetMouseButtonUp(0))
-                        {
-                            queueUsingSkill = null;
-                            CacheCharacterEntity.SetTargetEntity(null);
-                            StopPointClickMove();
-                        }
-                        */
                     }
                 }
                 else
