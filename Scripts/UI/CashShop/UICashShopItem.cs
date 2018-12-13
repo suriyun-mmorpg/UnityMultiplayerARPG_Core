@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -50,9 +51,10 @@ namespace MultiplayerARPG
 
         IEnumerator LoadExternalIcon()
         {
-            var www = new WWW(Data.externalIconUrl);
-            yield return www;
-            rawImageExternalIcon.texture = www.texture;
+            var www = UnityWebRequestTexture.GetTexture(Data.externalIconUrl);
+            yield return www.SendWebRequest();
+            if (!www.isNetworkError && !www.isHttpError)
+                rawImageExternalIcon.texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
         }
 
         public void OnClickBuy()
