@@ -16,3 +16,6 @@
 [submodule "2DExtras"]
 	path = 2DExtras
 	url = https://github.com/Unity-Technologies/2d-extras.git
+[submodule "SerializationSurrogates"]
+	path = SerializationSurrogates
+	url = https://github.com/insthync/unity3d-serialization-surrogates
