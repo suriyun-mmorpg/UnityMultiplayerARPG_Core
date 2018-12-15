@@ -1,9 +1,8 @@
-﻿using LiteNetLibManager;
-using LiteNetLib.Utils;
+﻿using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
-    public class ChatMessage : ILiteNetLibMessage
+    public class ChatMessage : INetSerializable
     {
         public ChatChannel channel;
         public string message;

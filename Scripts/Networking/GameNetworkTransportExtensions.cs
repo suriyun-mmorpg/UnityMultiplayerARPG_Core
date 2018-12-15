@@ -1,11 +1,12 @@
 ﻿using LiteNetLib;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
     public static partial class GameNetworkTransportExtensions
     {
-        private static void Send(TransportHandler transportHandler, long? connectionId, ushort msgType, ILiteNetLibMessage message)
+        private static void Send(TransportHandler transportHandler, long? connectionId, ushort msgType, INetSerializable message)
         {
             if (!connectionId.HasValue)
                 transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, message.Serialize);

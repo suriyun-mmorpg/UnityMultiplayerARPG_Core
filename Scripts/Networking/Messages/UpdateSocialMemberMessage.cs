@@ -1,11 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using LiteNetLibManager;
-using LiteNetLib.Utils;
+﻿using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
-    public class UpdateSocialMemberMessage : ILiteNetLibMessage
+    public class UpdateSocialMemberMessage : INetSerializable
     {
         public enum UpdateType : byte
         {
