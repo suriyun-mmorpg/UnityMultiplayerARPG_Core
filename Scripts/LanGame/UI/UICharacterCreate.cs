@@ -48,11 +48,16 @@ namespace MultiplayerARPG
 
         protected readonly Dictionary<int, BaseCharacterModel> CharacterModels = new Dictionary<int, BaseCharacterModel>();
 
+        protected virtual List<BasePlayerCharacterEntity> GetCreatableCharacters()
+        {
+            return GameInstance.PlayerCharacterEntities.Values.ToList();
+        }
+
         protected virtual void LoadCharacters()
         {
             SelectionManager.Clear();
             // Show list of characters that can be create
-            var selectableCharacters = GameInstance.PlayerCharacterEntities.Values.ToList();
+            var selectableCharacters = GetCreatableCharacters();
             CacheList.Generate(selectableCharacters, (index, characterEntity, ui) =>
             {
                 var character = characterEntity.database;
