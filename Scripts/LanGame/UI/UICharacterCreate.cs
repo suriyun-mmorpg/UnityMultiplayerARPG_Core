@@ -46,19 +46,9 @@ namespace MultiplayerARPG
             }
         }
 
-        private readonly Dictionary<int, BaseCharacterModel> CharacterModels = new Dictionary<int, BaseCharacterModel>();
+        protected readonly Dictionary<int, BaseCharacterModel> CharacterModels = new Dictionary<int, BaseCharacterModel>();
 
-        public override void Show()
-        {
-            buttonCreate.onClick.RemoveListener(OnClickCreate);
-            buttonCreate.onClick.AddListener(OnClickCreate);
-            SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
-            SelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
-            LoadCharacters();
-            base.Show();
-        }
-
-        private void LoadCharacters()
+        protected virtual void LoadCharacters()
         {
             SelectionManager.Clear();
             // Show list of characters that can be create
@@ -80,6 +70,22 @@ namespace MultiplayerARPG
             });
         }
 
+        public override void Show()
+        {
+            buttonCreate.onClick.RemoveListener(OnClickCreate);
+            buttonCreate.onClick.AddListener(OnClickCreate);
+            // Clear selection
+            SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
+            SelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
+            SelectionManager.Clear();
+            CacheList.HideAll();
+            // Remove all models
+            characterModelContainer.RemoveChildren();
+            CharacterModels.Clear();
+            LoadCharacters();
+            base.Show();
+        }
+
         public override void Hide()
         {
             characterModelContainer.RemoveChildren();
@@ -87,13 +93,13 @@ namespace MultiplayerARPG
             base.Hide();
         }
 
-        private void OnSelectCharacter(UICharacter ui)
+        protected virtual void OnSelectCharacter(UICharacter ui)
         {
             characterModelContainer.SetChildrenActive(false);
             ShowCharacter(ui.Data.EntityId);
         }
 
-        private void ShowCharacter(int id)
+        protected virtual void ShowCharacter(int id)
         {
             BaseCharacterModel characterModel;
             if (!CharacterModels.TryGetValue(id, out characterModel))
@@ -101,7 +107,7 @@ namespace MultiplayerARPG
             characterModel.gameObject.SetActive(true);
         }
 
-        private void OnClickCreate()
+        protected virtual void OnClickCreate()
         {
             var gameInstance = GameInstance.Singleton;
             var selectedUI = SelectionManager.SelectedUI;
