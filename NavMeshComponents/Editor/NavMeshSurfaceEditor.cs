@@ -110,9 +110,8 @@ namespace UnityEditor.AI
 
         static NavMeshData GetNavMeshAssetToDelete(NavMeshSurface navSurface)
         {
-            var prefabAssetType = PrefabUtility.GetPrefabAssetType(navSurface);
-            if (prefabAssetType == PrefabAssetType.Regular ||
-                prefabAssetType == PrefabAssetType.Variant)
+            var prefabConnection = PrefabUtility.GetPrefabInstanceStatus(navSurface);
+            if (PrefabUtility.IsPartOfPrefabInstance(navSurface) || prefabConnection == PrefabInstanceStatus.Disconnected)
             {
                 // Don't allow deleting the asset belonging to the prefab parent
                 var parentSurface = PrefabUtility.GetCorrespondingObjectFromSource(navSurface) as NavMeshSurface;
