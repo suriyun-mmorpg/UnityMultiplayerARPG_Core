@@ -92,7 +92,7 @@ namespace MultiplayerARPG
             if (!IsServer || !IsDead())
                 return;
             base.Respawn();
-            GameManager.WarpCharacter(this, RespawnMapName, RespawnPosition);
+            GameManager.RespawnCharacter(this);
         }
 
         public override bool CanReceiveDamageFrom(IAttackerEntity attacker)

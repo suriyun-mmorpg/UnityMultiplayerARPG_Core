@@ -787,6 +787,19 @@ namespace MultiplayerARPG
             }
         }
 
+        public virtual void RespawnCharacter(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            var respawnMapName = playerCharacterEntity.RespawnMapName;
+            var respawnPosition = playerCharacterEntity.RespawnPosition;
+            if (CurrentMapInfo != null && CurrentMapInfo.overrideRespawnPoint)
+            {
+                if (CurrentMapInfo.overrideRespawnPointScene != null)
+                    respawnMapName = CurrentMapInfo.overrideRespawnPointScene.SceneName;
+                respawnPosition = CurrentMapInfo.overrideRespawnPointPosition;
+            }
+            WarpCharacter(playerCharacterEntity, respawnMapName, respawnPosition);
+        }
+
         public virtual void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
         {
             if (!CanWarpCharacter(playerCharacterEntity))
