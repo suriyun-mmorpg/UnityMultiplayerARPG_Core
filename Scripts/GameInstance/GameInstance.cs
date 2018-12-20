@@ -95,6 +95,8 @@ namespace MultiplayerARPG
         public float conversationDistance = 1f;
         [Tooltip("This is a distance that allows a player to builds an building")]
         public float buildDistance = 10f;
+        [Tooltip("This is a distance that other players will receives local chat")]
+        public float localChatDistance = 10f;
 
         [Header("Gameplay Configs - Summon Monster")]
         [Tooltip("This is a distance that random summon around a character")]

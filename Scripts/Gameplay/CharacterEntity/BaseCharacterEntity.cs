@@ -1022,7 +1022,8 @@ namespace MultiplayerARPG
             RequestOnLevelUp();
         }
 
-        public List<T> FindAliveCharacters<T>(float distance, bool findForAlly, bool findForEnemy, bool findForNeutral) where T : BaseCharacterEntity
+        public List<T> FindCharacters<T>(float distance, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral)
+            where T : BaseCharacterEntity
         {
             var result = new List<T>();
             overlapSize = OverlapObjects(CacheTransform.position, distance, GameInstance.characterLayer.Mask);
@@ -1033,14 +1034,21 @@ namespace MultiplayerARPG
             {
                 tempGameObject = GetOverlapObject(counter);
                 tempEntity = tempGameObject.GetComponent<T>();
-                if (!IsCharacterWhichLookingFor(tempEntity, findForAlly, findForEnemy, findForNeutral))
+                if (!IsCharacterWhichLookingFor(tempEntity, findForAliveOnly, findForAlly, findForEnemy, findForNeutral))
                     continue;
                 result.Add(tempEntity);
             }
             return result;
         }
 
-        public T FindNearestAliveCharacter<T>(float distance, bool findForAlly, bool findForEnemy, bool findForNeutral) where T : BaseCharacterEntity
+        public List<T> FindAliveCharacters<T>(float distance, bool findForAlly, bool findForEnemy, bool findForNeutral)
+            where T : BaseCharacterEntity
+        {
+            return FindCharacters<T>(distance, true, findForAlly, findForEnemy, findForNeutral);
+        }
+
+        public T FindNearestCharacter<T>(float distance, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral)
+            where T : BaseCharacterEntity
         {
             overlapSize = OverlapObjects(CacheTransform.position, distance, GameInstance.characterLayer.Mask);
             if (overlapSize == 0)
@@ -1053,7 +1061,7 @@ namespace MultiplayerARPG
             {
                 tempGameObject = GetOverlapObject(counter);
                 tempEntity = tempGameObject.GetComponent<T>();
-                if (!IsCharacterWhichLookingFor(tempEntity, findForAlly, findForEnemy, findForNeutral))
+                if (!IsCharacterWhichLookingFor(tempEntity, findForAliveOnly, findForAlly, findForEnemy, findForNeutral))
                     continue;
                 tempDistance = Vector3.Distance(CacheTransform.position, tempEntity.CacheTransform.position);
                 if (tempDistance < nearestDistance)
@@ -1065,9 +1073,17 @@ namespace MultiplayerARPG
             return nearestEntity;
         }
 
-        private bool IsCharacterWhichLookingFor(BaseCharacterEntity characterEntity, bool findForAlly, bool findForEnemy, bool findForNeutral)
+        public T FindNearestAliveCharacter<T>(float distance, bool findForAlly, bool findForEnemy, bool findForNeutral)
+            where T : BaseCharacterEntity
         {
-            if (characterEntity == null || characterEntity == this || characterEntity.IsDead())
+            return FindNearestCharacter<T>(distance, true, findForAlly, findForEnemy, findForNeutral);
+        }
+
+        private bool IsCharacterWhichLookingFor(BaseCharacterEntity characterEntity, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral)
+        {
+            if (characterEntity == null || characterEntity == this)
+                return false;
+            if (findForAliveOnly && characterEntity.IsDead())
                 return false;
             return (findForAlly && characterEntity.IsAlly(this)) ||
                 (findForEnemy && characterEntity.IsEnemy(this)) ||
