@@ -17,6 +17,8 @@ namespace MultiplayerARPG
         public float characterForwardDistance = 4;
         public int maxHp = 100;
 
+        public override int MaxHp { get { return maxHp; } }
+
         /// <summary>
         /// Use this as reference for entity to interactive while in play mode
         /// </summary>

@@ -66,6 +66,8 @@ namespace MultiplayerARPG
         public float CacheBaseMoveSpeed { get; protected set; }
         #endregion
 
+        public override int MaxHp { get { return CacheMaxHp; } }
+
         private BaseCharacterModel characterModel;
         public BaseCharacterModel CharacterModel
         {
@@ -419,6 +421,11 @@ namespace MultiplayerARPG
         public virtual void SetTargetEntity(BaseGameEntity entity)
         {
             targetEntity = entity;
+        }
+
+        public virtual BaseGameEntity GetTargetEntity()
+        {
+            return targetEntity;
         }
 
         public bool TryGetTargetEntity<T>(out T entity) where T : class

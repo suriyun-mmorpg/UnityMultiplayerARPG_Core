@@ -14,7 +14,8 @@ namespace MultiplayerARPG
         public float destroyHideDelay = 2f;
         public float destroyRespawnDelay = 5f;
         public UnityEvent onHarvestableDestroy;
-        
+
+        public override int MaxHp { get { return maxHp; } }
         public HarvestableSpawnArea spawnArea { get; private set; }
         public Vector3 spawnPosition { get; private set; }
 
