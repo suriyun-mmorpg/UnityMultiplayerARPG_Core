@@ -60,6 +60,8 @@ namespace MultiplayerARPG
             // Building
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Building.ToString(), cacheItem.GetMemberName(a => a.maxStack));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Building.ToString(), cacheItem.GetMemberName(a => a.buildingEntity));
+            // Pet
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Pet.ToString(), cacheItem.GetMemberName(a => a.petEntity));
         }
     }
 }
