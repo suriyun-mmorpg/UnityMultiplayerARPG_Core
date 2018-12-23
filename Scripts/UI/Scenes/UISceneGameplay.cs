@@ -32,6 +32,9 @@ namespace MultiplayerARPG
 
         public UICharacter[] uiCharacters;
         public UICharacter uiTargetCharacter;
+        public UIBaseGameEntity uiTargetNpc;
+        public UIDamageableEntity uiTargetBuilding;
+        public UIDamageableEntity uiTargetHarvestable;
         public UIEquipItems uiEquipItems;
         public UINonEquipItems uiNonEquipItems;
         public UICharacterSkills uiSkills;
@@ -135,12 +138,33 @@ namespace MultiplayerARPG
                 uiQuests.UpdateData(BasePlayerCharacterController.OwningCharacter);
         }
 
-        public void SetTargetCharacter(BaseCharacterEntity character)
+        public void SetTargetEntity(BaseGameEntity entity)
+        {
+            if (entity == null)
+            {
+                SetTargetCharacter(null);
+                SetTargetNpc(null);
+                SetTargetBuilding(null);
+                SetTargetHarvestable(null);
+                return;
+            }
+
+            if (entity is BaseCharacterEntity)
+                SetTargetCharacter(entity as BaseCharacterEntity);
+            if (entity is NpcEntity)
+                SetTargetNpc(entity as NpcEntity);
+            if (entity is BuildingEntity)
+                SetTargetBuilding(entity as BuildingEntity);
+            if (entity is HarvestableEntity)
+                SetTargetHarvestable(entity as HarvestableEntity);
+        }
+
+        protected void SetTargetCharacter(BaseCharacterEntity character)
         {
             if (uiTargetCharacter == null)
                 return;
 
-            if (character == null || character.IsDead())
+            if (character == null)
             {
                 uiTargetCharacter.Hide();
                 return;
@@ -148,6 +172,51 @@ namespace MultiplayerARPG
 
             uiTargetCharacter.Data = character;
             uiTargetCharacter.Show();
+        }
+
+        protected void SetTargetNpc(NpcEntity npc)
+        {
+            if (uiTargetNpc == null)
+                return;
+
+            if (npc == null)
+            {
+                uiTargetNpc.Hide();
+                return;
+            }
+
+            uiTargetNpc.Data = npc;
+            uiTargetNpc.Show();
+        }
+
+        protected void SetTargetBuilding(BuildingEntity building)
+        {
+            if (uiTargetBuilding == null)
+                return;
+
+            if (building == null)
+            {
+                uiTargetBuilding.Hide();
+                return;
+            }
+
+            uiTargetBuilding.Data = building;
+            uiTargetBuilding.Show();
+        }
+
+        protected void SetTargetHarvestable(HarvestableEntity harvestable)
+        {
+            if (uiTargetHarvestable == null)
+                return;
+
+            if (harvestable == null)
+            {
+                uiTargetHarvestable.Hide();
+                return;
+            }
+
+            uiTargetHarvestable.Data = harvestable;
+            uiTargetHarvestable.Show();
         }
 
         public void SetActivePlayerCharacter(BasePlayerCharacterEntity playerCharacter)
