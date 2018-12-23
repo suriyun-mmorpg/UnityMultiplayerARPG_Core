@@ -13,12 +13,9 @@ namespace MultiplayerARPG
             AlwaysVisible,
         }
         public Visibility visibility;
-        public bool placeAsChild;
-        public float placeAsChildScale = 1f;
         [Tooltip("Visible when hit duration for non owning character")]
         public float visibleWhenHitDuration = 2f;
         public float visibleDistance = 30f;
-        public UIFollowWorldObject rootFollower;
         public TextWrapper uiTextTitle;
         public UICharacter uiCharacter;
         private float lastShowTime;
@@ -110,20 +107,6 @@ namespace MultiplayerARPG
                     if (uiCharacter.IsVisible())
                         uiCharacter.Hide();
                 }
-            }
-
-            if (rootFollower != null)
-            {
-                if (Data != null)
-                    rootFollower.TargetObject = Data.UIElementTransform;
-                rootFollower.gameObject.SetActive(Data != null);
-            }
-
-            if (placeAsChild)
-            {
-                transform.SetParent(Data.UIElementTransform);
-                transform.localPosition = Vector3.zero;
-                transform.localScale = Vector3.one * placeAsChildScale;
             }
         }
     }

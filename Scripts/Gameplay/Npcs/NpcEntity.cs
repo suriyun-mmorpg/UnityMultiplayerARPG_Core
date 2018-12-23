@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         private NpcDialog startDialog;
         [Header("Relates Element Containers")]
         public Transform uiElementTransform;
+        public Transform miniMapElementContainer;
         public Transform questIndicatorContainer;
 
         [Header("Sync Lists")]
@@ -43,6 +44,16 @@ namespace MultiplayerARPG
             }
         }
 
+        public Transform MiniMapElementContainer
+        {
+            get
+            {
+                if (miniMapElementContainer == null)
+                    miniMapElementContainer = CacheTransform;
+                return miniMapElementContainer;
+            }
+        }
+
         public Transform QuestIndicatorContainer
         {
             get
@@ -72,8 +83,18 @@ namespace MultiplayerARPG
             SetupQuestIds();
 
             // Setup relates elements
+            if (GameInstance.npcMiniMapObjects != null && GameInstance.npcMiniMapObjects.Length > 0)
+            {
+                foreach (var obj in GameInstance.npcMiniMapObjects)
+                {
+                    if (obj == null) continue;
+                    Instantiate(obj, MiniMapElementContainer.position, MiniMapElementContainer.rotation, MiniMapElementContainer);
+                }
+            }
+
             if (GameInstance.npcUI != null)
                 InstantiateUI(GameInstance.npcUI);
+
             if (GameInstance.npcQuestIndicator != null)
                 InstantiateQuestIndicator(GameInstance.npcQuestIndicator);
         }
@@ -84,7 +105,8 @@ namespace MultiplayerARPG
                 return;
             if (uiNpcEntity != null)
                 Destroy(uiNpcEntity.gameObject);
-            uiNpcEntity = Instantiate(prefab);
+            uiNpcEntity = Instantiate(prefab, UIElementTransform);
+            uiNpcEntity.transform.localPosition = Vector3.zero;
             uiNpcEntity.Data = this;
         }
 

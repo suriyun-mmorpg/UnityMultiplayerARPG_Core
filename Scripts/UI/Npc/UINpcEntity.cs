@@ -6,10 +6,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(Canvas))]
     public class UINpcEntity : UISelectionEntry<NpcEntity>
     {
-        public bool placeAsChild;
-        public float placeAsChildScale = 1f;
         public float visibleDistance = 30f;
-        public UIFollowWorldObject rootFollower;
         public TextWrapper uiTextTitle;
 
         private Canvas cacheCanvas;
@@ -56,19 +53,6 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            if (rootFollower != null)
-            {
-                if (Data != null)
-                    rootFollower.TargetObject = Data.UIElementTransform;
-                rootFollower.gameObject.SetActive(Data != null);
-            }
-
-            if (placeAsChild)
-            {
-                transform.SetParent(Data.UIElementTransform);
-                transform.localPosition = Vector3.zero;
-                transform.localScale = Vector3.one * placeAsChildScale;
-            }
         }
     }
 }

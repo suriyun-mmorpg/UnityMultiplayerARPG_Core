@@ -32,10 +32,14 @@ namespace MultiplayerARPG
         public ServerCharacter serverCharacterPrefab;
         [Tooltip("These objects will be instantiate as owning character's children")]
         public GameObject[] owningCharacterObjects;
-        [Tooltip("These objects will be instantiate as owning character's children")]
+        [Tooltip("These objects will be instantiate as owning character's children to show in minimap")]
         public GameObject[] owningCharacterMiniMapObjects;
-        [Tooltip("These objects will be instantiate as monster character's children")]
+        [Tooltip("These objects will be instantiate as non owning character's children to show in minimap")]
+        public GameObject[] nonOwningCharacterMiniMapObjects;
+        [Tooltip("These objects will be instantiate as monster character's children to show in minimap")]
         public GameObject[] monsterCharacterMiniMapObjects;
+        [Tooltip("These objects will be instantiate as npc's children to show in minimap")]
+        public GameObject[] npcMiniMapObjects;
         [Tooltip("This UI will be instaniate as owning character's child to show character name / HP / MP / Food / Water")]
         public UICharacterEntity owningCharacterUI;
         [Tooltip("This UI will be instaniate as non owning character's child to show character name / HP / MP / Food / Water")]

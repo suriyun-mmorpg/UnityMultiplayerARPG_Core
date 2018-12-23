@@ -97,16 +97,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public Transform MiniMapElementContainer
-        {
-            get
-            {
-                if (miniMapElementContainer == null)
-                    miniMapElementContainer = CacheTransform;
-                return miniMapElementContainer;
-            }
-        }
-
         public Transform UIElementTransform
         {
             get
@@ -114,6 +104,16 @@ namespace MultiplayerARPG
                 if (uiElementTransform == null)
                     uiElementTransform = CacheTransform;
                 return uiElementTransform;
+            }
+        }
+
+        public Transform MiniMapElementContainer
+        {
+            get
+            {
+                if (miniMapElementContainer == null)
+                    miniMapElementContainer = CacheTransform;
+                return miniMapElementContainer;
             }
         }
 
@@ -998,7 +998,8 @@ namespace MultiplayerARPG
                 return;
             if (uiCharacterEntity != null)
                 Destroy(uiCharacterEntity.gameObject);
-            uiCharacterEntity = Instantiate(prefab);
+            uiCharacterEntity = Instantiate(prefab, UIElementTransform);
+            uiCharacterEntity.transform.localPosition = Vector3.zero;
             uiCharacterEntity.Data = this;
         }
 
