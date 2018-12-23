@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(CharacterRecoveryComponent))]
     [RequireComponent(typeof(CharacterSkillAndBuffComponent))]
     [DisallowMultipleComponent]
-    public abstract partial class BaseCharacterEntity : DamageableNetworkEntity, ICharacterData, IAttackerEntity
+    public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData, IAttackerEntity
     {
         public const float ACTION_COMMAND_DELAY = 0.2f;
         public const int OVERLAP_COLLIDER_SIZE = 32;
@@ -844,7 +844,7 @@ namespace MultiplayerARPG
                                 return;
                             // Target entity not set, use overlapped object as target
                             tempGameObject = GetOverlapObject(0);
-                            tempDamageableEntity = tempGameObject.GetComponent<DamageableNetworkEntity>();
+                            tempDamageableEntity = tempGameObject.GetComponent<DamageableEntity>();
                         }
                         // Target receive damage
                         if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() &&
@@ -863,7 +863,7 @@ namespace MultiplayerARPG
                         for (counter = 0; counter < overlapSize; ++counter)
                         {
                             tempGameObject = GetOverlapObject(counter);
-                            tempDamageableEntity = tempGameObject.GetComponent<DamageableNetworkEntity>();
+                            tempDamageableEntity = tempGameObject.GetComponent<DamageableEntity>();
                             // Target receive damage
                             if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() &&
                                 (!(tempDamageableEntity is BaseCharacterEntity) || (BaseCharacterEntity)tempDamageableEntity != this) &&

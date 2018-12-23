@@ -9,7 +9,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public sealed class BuildingEntity : DamageableNetworkEntity, IBuildingSaveData
+    public sealed class BuildingEntity : DamageableEntity, IBuildingSaveData
     {
         [Header("Building Data")]
         [Tooltip("Type of building you can set it as Foundation, Wall, Door anything as you wish")]

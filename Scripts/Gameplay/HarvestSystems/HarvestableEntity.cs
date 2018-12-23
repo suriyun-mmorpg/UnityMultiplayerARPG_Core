@@ -6,7 +6,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public sealed class HarvestableEntity : DamageableNetworkEntity
+    public sealed class HarvestableEntity : DamageableEntity
     {
         public int maxHp = 100;
         public Harvestable harvestable;
