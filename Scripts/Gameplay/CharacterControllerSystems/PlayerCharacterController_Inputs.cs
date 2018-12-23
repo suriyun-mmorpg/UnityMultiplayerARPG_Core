@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
@@ -100,8 +99,8 @@ namespace MultiplayerARPG
                 isMouseDragOrHoldOrOverUI = true;
             if (!isPointerOverUI && (getMouse || getMouseUp))
             {
-                LiteNetLibIdentity targetIdentity = null;
-                Vector3? targetPosition = null;
+                targetEntity = null;
+                targetPosition = null;
                 var mouseUpOnTarget = getMouseUp && !isMouseDragOrHoldOrOverUI && (controllerMode == PlayerCharacterControllerMode.PointClick || controllerMode == PlayerCharacterControllerMode.Both);
                 tempCount = FindClickObjects(out tempVector3);
                 for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
@@ -115,43 +114,42 @@ namespace MultiplayerARPG
                         targetNpc = tempTransform.GetComponent<NpcEntity>();
                         targetItemDrop = tempTransform.GetComponent<ItemDropEntity>();
                         targetHarvestable = tempTransform.GetComponent<HarvestableEntity>();
-                        targetPosition = GetRaycastPoint(tempCounter);
                         PlayerCharacterEntity.SetTargetEntity(null);
                         lastNpcObjectId = 0;
                         if (targetPlayer != null && !targetPlayer.IsDead())
                         {
-                            targetPosition = targetPlayer.CacheTransform.position;
-                            targetIdentity = targetPlayer.Identity;
-                            PlayerCharacterEntity.SetTargetEntity(targetPlayer);
+                            SetTarget(targetPlayer);
                             break;
                         }
                         else if (targetMonster != null && !targetMonster.IsDead())
                         {
-                            targetPosition = targetMonster.CacheTransform.position;
-                            targetIdentity = targetMonster.Identity;
-                            PlayerCharacterEntity.SetTargetEntity(targetMonster);
+                            SetTarget(targetMonster);
                             break;
                         }
                         else if (targetNpc != null)
                         {
-                            targetPosition = targetNpc.CacheTransform.position;
-                            targetIdentity = targetNpc.Identity;
-                            PlayerCharacterEntity.SetTargetEntity(targetNpc);
+                            SetTarget(targetNpc);
                             break;
                         }
                         else if (targetItemDrop != null)
                         {
-                            targetPosition = targetItemDrop.CacheTransform.position;
-                            targetIdentity = targetItemDrop.Identity;
-                            PlayerCharacterEntity.SetTargetEntity(targetItemDrop);
+                            SetTarget(targetItemDrop);
                             break;
                         }
                         else if (targetHarvestable != null && !targetHarvestable.IsDead())
                         {
-                            targetPosition = targetHarvestable.CacheTransform.position;
-                            targetIdentity = targetHarvestable.Identity;
-                            PlayerCharacterEntity.SetTargetEntity(targetHarvestable);
+                            SetTarget(targetHarvestable);
                             break;
+                        }
+                        else
+                        {
+                            if (tempCounter == tempCount - 1)
+                            {
+                                // If it is last entry and not base game entity 
+                                // Assume that player clicked on ground / terrain
+                                selectedTarget = null;
+                                targetPosition = GetRaycastPoint(tempCounter);
+                            }
                         }
                     }
                     // When holding on target
@@ -161,8 +159,9 @@ namespace MultiplayerARPG
                         if (buildingMaterial != null && buildingMaterial.buildingEntity != null && !buildingMaterial.buildingEntity.IsDead())
                         {
                             targetPosition = buildingMaterial.buildingEntity.CacheTransform.position;
-                            targetIdentity = buildingMaterial.buildingEntity.Identity;
+                            targetEntity = buildingMaterial.buildingEntity;
                             PlayerCharacterEntity.SetTargetEntity(buildingMaterial.buildingEntity);
+                            selectedTarget = buildingMaterial.buildingEntity;
                             break;
                         }
                     }
@@ -182,7 +181,7 @@ namespace MultiplayerARPG
                         CacheUISceneGameplay.uiNpcDialog.Hide();
 
                     // Move to target, will hide destination when target is object
-                    if (targetIdentity != null)
+                    if (targetEntity != null)
                         destination = null;
                     else
                     {
@@ -191,6 +190,18 @@ namespace MultiplayerARPG
                     }
                 }
             }
+        }
+
+        protected void SetTarget(BaseGameEntity entity)
+        {
+            targetPosition = null;
+            if (pointClickSetTargetImmediately || selectedTarget == entity)
+            {
+                targetPosition = entity.CacheTransform.position;
+                targetEntity = entity;
+                PlayerCharacterEntity.SetTargetEntity(entity);
+            }
+            selectedTarget = entity;
         }
 
         protected void UpdateWASDInput()
@@ -267,8 +278,8 @@ namespace MultiplayerARPG
             {
                 if (moveDirection.magnitude != 0f)
                 {
-                    PlayerCharacterEntity.StopMove();
                     destination = null;
+                    PlayerCharacterEntity.StopMove();
                     PlayerCharacterEntity.SetTargetEntity(null);
                 }
                 PlayerCharacterEntity.KeyMovement(moveDirection, InputManager.GetButtonDown("Jump"));
@@ -323,8 +334,8 @@ namespace MultiplayerARPG
                 if (targetEnemy.IsDead())
                 {
                     queueUsingSkill = null;
-                    PlayerCharacterEntity.SetTargetEntity(null);
                     PlayerCharacterEntity.StopMove();
+                    PlayerCharacterEntity.SetTargetEntity(null);
                     return;
                 }
 
@@ -363,8 +374,8 @@ namespace MultiplayerARPG
                 if (targetPlayer.IsDead())
                 {
                     queueUsingSkill = null;
-                    PlayerCharacterEntity.SetTargetEntity(null);
                     PlayerCharacterEntity.StopMove();
+                    PlayerCharacterEntity.SetTargetEntity(null);
                     return;
                 }
                 var actDistance = gameInstance.conversationDistance - StoppingDistance;
@@ -381,8 +392,8 @@ namespace MultiplayerARPG
                 if (targetMonster.IsDead())
                 {
                     queueUsingSkill = null;
-                    PlayerCharacterEntity.SetTargetEntity(null);
                     PlayerCharacterEntity.StopMove();
+                    PlayerCharacterEntity.SetTargetEntity(null);
                     return;
                 }
                 var actDistance = gameInstance.conversationDistance - StoppingDistance;
@@ -443,8 +454,8 @@ namespace MultiplayerARPG
                 if (targetHarvestable.IsDead())
                 {
                     queueUsingSkill = null;
-                    PlayerCharacterEntity.SetTargetEntity(null);
                     PlayerCharacterEntity.StopMove();
+                    PlayerCharacterEntity.SetTargetEntity(null);
                     return;
                 }
 
@@ -505,9 +516,18 @@ namespace MultiplayerARPG
                         {
                             // If attacking any character, will use skill later
                             queueUsingSkill = new UsingSkillData(null, skill.DataId);
-                            var nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance, false, true, false);
-                            if (nearestTarget != null)
-                                PlayerCharacterEntity.SetTargetEntity(nearestTarget);
+                            if (selectedTarget != null && selectedTarget is BaseCharacterEntity)
+                            {
+                                // Attacking selected target
+                                PlayerCharacterEntity.SetTargetEntity(selectedTarget);
+                            }
+                            else
+                            {
+                                // Attacking nearest target
+                                var nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance, false, true, false);
+                                if (nearestTarget != null)
+                                    PlayerCharacterEntity.SetTargetEntity(nearestTarget);
+                            }
                         }
                         else
                         {
