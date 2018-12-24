@@ -14,35 +14,35 @@ namespace MultiplayerARPG
         [HideInInspector, System.NonSerialized]
         public Vector3 currentVelocity;
         [HideInInspector, System.NonSerialized]
-        public float velocityCalculationDeltaTime;
+        public float updatingTime;
         #endregion
 
         private static BaseCharacterModel tempCharacterModel;
 
         protected void Update()
         {
-            UpdateAnimation(Time.unscaledDeltaTime, GameInstance.Singleton.GameplayRule, this, CacheCharacterEntity, CacheCharacterEntity.CacheTransform);
+            UpdateAnimation(Time.unscaledDeltaTime, this, CacheCharacterEntity, CacheCharacterEntity.CacheTransform);
         }
 
-        protected static void UpdateAnimation(float deltaTime, BaseGameplayRule gameplayRule, CharacterAnimationComponent animationData, BaseCharacterEntity characterEntity, Transform transform)
+        protected static void UpdateAnimation(float deltaTime, CharacterAnimationComponent animationData, BaseCharacterEntity characterEntity, Transform transform)
         {
             if (characterEntity.isRecaching)
                 return;
 
             // Update current velocity
-            animationData.velocityCalculationDeltaTime += deltaTime;
-            if (animationData.velocityCalculationDeltaTime >= UPDATE_VELOCITY_DURATION)
+            animationData.updatingTime += deltaTime;
+            if (animationData.updatingTime >= UPDATE_VELOCITY_DURATION)
             {
                 if (!animationData.previousPosition.HasValue)
                     animationData.previousPosition = transform.position;
-                animationData.currentVelocity = (transform.position - animationData.previousPosition.Value) / animationData.velocityCalculationDeltaTime;
+                animationData.currentVelocity = (transform.position - animationData.previousPosition.Value) / animationData.updatingTime;
                 animationData.previousPosition = transform.position;
-                animationData.velocityCalculationDeltaTime = 0f;
+                animationData.updatingTime = 0f;
             }
 
             tempCharacterModel = characterEntity.CharacterModel;
             if (tempCharacterModel != null)
-                tempCharacterModel.UpdateAnimation(characterEntity.IsDead(), animationData.currentVelocity, gameplayRule.GetMoveSpeed(characterEntity) / characterEntity.CacheBaseMoveSpeed);
+                tempCharacterModel.UpdateAnimation(characterEntity.IsDead(), animationData.currentVelocity, characterEntity.MoveAnimationSpeedMultiplier);
         }
     }
 }
