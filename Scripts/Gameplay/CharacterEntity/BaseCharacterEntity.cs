@@ -38,7 +38,13 @@ namespace MultiplayerARPG
         protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
         protected AnimActionType animActionType;
         protected float lastActionCommandReceivedTime;
+        /// <summary>
+        /// This variable will be TRUE when cache data have to re-cache
+        /// </summary>
         public bool isRecaching { get; protected set; }
+        /// <summary>
+        /// This variable will be TRUE when player hold sprint key
+        /// </summary>
         public bool isSprinting { get; protected set; }
         #endregion
 
@@ -67,6 +73,7 @@ namespace MultiplayerARPG
         #endregion
 
         public override int MaxHp { get { return CacheMaxHp; } }
+        public float MoveAnimationSpeedMultiplier { get { return GameplayRule.GetMoveSpeed(this) / CacheBaseMoveSpeed; } }
 
         private BaseCharacterModel characterModel;
         public BaseCharacterModel CharacterModel
