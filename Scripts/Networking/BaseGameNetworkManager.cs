@@ -672,7 +672,7 @@ namespace MultiplayerARPG
             if (GameInstance.MapWarpPortals.Count > 0)
             {
                 List<WarpPortal> mapWarpPortals;
-                if (GameInstance.MapWarpPortals.TryGetValue(Assets.onlineScene.SceneName, out mapWarpPortals))
+                if (GameInstance.MapWarpPortals.TryGetValue(SceneManager.GetActiveScene().name, out mapWarpPortals))
                 {
                     foreach (var warpPortal in mapWarpPortals)
                     {
@@ -691,7 +691,7 @@ namespace MultiplayerARPG
             if (GameInstance.MapNpcs.Count > 0)
             {
                 List<Npc> mapNpcs;
-                if (GameInstance.MapNpcs.TryGetValue(Assets.onlineScene.SceneName, out mapNpcs))
+                if (GameInstance.MapNpcs.TryGetValue(SceneManager.GetActiveScene().name, out mapNpcs))
                 {
                     foreach (var npc in mapNpcs)
                     {

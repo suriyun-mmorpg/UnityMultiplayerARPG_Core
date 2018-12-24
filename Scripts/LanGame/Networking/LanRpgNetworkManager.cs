@@ -4,6 +4,7 @@ using LiteNetLibManager;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using UnityEngine.Profiling;
+using UnityEngine.SceneManagement;
 
 namespace MultiplayerARPG
 {
@@ -22,6 +23,7 @@ namespace MultiplayerARPG
         private float lastSaveTime;
         private int nextPartyId = 1;
         private int nextGuildId = 1;
+        private Vector3? teleportPosition;
 
         public void StartGame()
         {
@@ -53,6 +55,7 @@ namespace MultiplayerARPG
                 var owningCharacter = BasePlayerCharacterController.OwningCharacter;
                 if (owningCharacter != null && IsNetworkActive)
                 {
+                    selectedCharacter = owningCharacter.CloneTo(selectedCharacter);
                     owningCharacter.SavePersistentCharacterData();
                     if (IsServer)
                         SaveWorld();
@@ -91,6 +94,8 @@ namespace MultiplayerARPG
                 Debug.LogError("[LanRpgNetworkManager] Cannot find player character with entity Id: " + playerCharacterData.EntityId);
                 return;
             }
+            if (!SceneManager.GetActiveScene().name.Equals(playerCharacterData.CurrentMapName))
+                playerCharacterData.CurrentPosition = teleportPosition.HasValue ? teleportPosition.Value : CurrentMapInfo.startPosition;
             var identity = Assets.NetworkSpawn(entityPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
             var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterData.CloneTo(playerCharacterEntity);
@@ -153,6 +158,23 @@ namespace MultiplayerARPG
                 });
             }
             worldSaveData.SavePersistentWorldData(playerCharacterEntity.Id, playerCharacterEntity.CurrentMapName);
+        }
+
+        public override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        {
+            if (!CanWarpCharacter(playerCharacterEntity))
+                return;
+            base.WarpCharacter(playerCharacterEntity, mapName, position);
+            var connectId = playerCharacterEntity.ConnectionId;
+            if (!string.IsNullOrEmpty(mapName) &&
+                !mapName.Equals(playerCharacterEntity.CurrentMapName) &&
+                playerCharacters.ContainsKey(connectId) &&
+                playerCharacterEntity.IsServer &&
+                playerCharacterEntity.IsOwnerClient)
+            {
+                teleportPosition = position;
+                ServerSceneChange(mapName);
+            }
         }
 
         #region Implement Abstract Functions
