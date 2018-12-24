@@ -166,10 +166,15 @@ namespace MultiplayerARPG
                         }
                     }
                 }
-                // When clicking on map (any non-collider position)
-                // tempWorldPoint is come from FindClickObjects()
-                if (dimensionType == DimensionType.Dimension2D && mouseUpOnTarget && !targetPosition.HasValue)
+                // When clicked on map (any non-collider position)
+                // tempVector3 is come from FindClickObjects()
+                // - Clear character target to make character stop doing actions
+                // - Clear selected target to hide selected entity UIs
+                // - Set target position to position where mouse clicked
+                if (dimensionType == DimensionType.Dimension2D && mouseUpOnTarget && tempCount == 0)
                 {
+                    PlayerCharacterEntity.SetTargetEntity(null);
+                    selectedTarget = null;
                     tempVector3.z = 0;
                     targetPosition = tempVector3;
                 }
