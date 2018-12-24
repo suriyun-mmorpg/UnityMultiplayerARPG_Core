@@ -8,6 +8,7 @@ namespace MultiplayerARPG
 {
     public sealed class HarvestableEntity : DamageableEntity
     {
+        public DimensionType dimensionType;
         public int maxHp = 100;
         public Harvestable harvestable;
         public float colliderDetectionRadius = 2f;
@@ -15,6 +16,7 @@ namespace MultiplayerARPG
         public float destroyRespawnDelay = 5f;
         public UnityEvent onHarvestableDestroy;
 
+        public override string Title { get { return harvestable.title; } set { } }
         public override int MaxHp { get { return maxHp; } }
         public HarvestableSpawnArea spawnArea { get; private set; }
         public Vector3 spawnPosition { get; private set; }
@@ -114,7 +116,11 @@ namespace MultiplayerARPG
         {
             yield return new WaitForSecondsRealtime(destroyHideDelay + destroyRespawnDelay);
             InitStats();
-            Manager.Assets.NetworkSpawn(Identity.HashAssetId, spawnPosition, Quaternion.Euler(Vector3.up * Random.Range(0, 360)), Identity.ObjectId, Identity.ConnectionId);
+            Manager.Assets.NetworkSpawn(Identity.HashAssetId, 
+                spawnPosition, 
+                dimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity, 
+                Identity.ObjectId, 
+                Identity.ConnectionId);
         }
 
         public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)
