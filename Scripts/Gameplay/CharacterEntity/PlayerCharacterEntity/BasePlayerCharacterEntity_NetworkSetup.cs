@@ -136,6 +136,14 @@ namespace MultiplayerARPG
             }
             else
             {
+                if (GameInstance.nonOwningCharacterMiniMapObjects != null && GameInstance.nonOwningCharacterMiniMapObjects.Length > 0)
+                {
+                    foreach (var obj in GameInstance.nonOwningCharacterMiniMapObjects)
+                    {
+                        if (obj == null) continue;
+                        Instantiate(obj, MiniMapElementContainer.position, MiniMapElementContainer.rotation, MiniMapElementContainer);
+                    }
+                }
                 if (GameInstance.nonOwningCharacterUI != null)
                     InstantiateUI(GameInstance.nonOwningCharacterUI);
             }

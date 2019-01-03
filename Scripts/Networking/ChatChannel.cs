@@ -2,6 +2,7 @@
 {
     public enum ChatChannel
     {
+        Local,
         Global,
         Whisper,
         Party,

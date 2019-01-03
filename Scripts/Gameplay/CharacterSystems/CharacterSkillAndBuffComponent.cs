@@ -10,7 +10,7 @@ namespace MultiplayerARPG
 
         #region Buff System Data
         [HideInInspector, System.NonSerialized]
-        public float skillBuffUpdateDeltaTime;
+        public float updatingTime;
         #endregion
 
         private CharacterRecoveryComponent cacheCharacterRecovery;
@@ -34,8 +34,8 @@ namespace MultiplayerARPG
             if (characterEntity.isRecaching || characterEntity.IsDead() || !characterEntity.IsServer)
                 return;
 
-            component.skillBuffUpdateDeltaTime += deltaTime;
-            if (component.skillBuffUpdateDeltaTime >= SKILL_BUFF_UPDATE_DURATION)
+            component.updatingTime += deltaTime;
+            if (component.updatingTime >= SKILL_BUFF_UPDATE_DURATION)
             {
                 var count = characterEntity.Summons.Count;
                 for (var i = count - 1; i >= 0; --i)
@@ -48,7 +48,7 @@ namespace MultiplayerARPG
                     }
                     else
                     {
-                        summon.Update(component.skillBuffUpdateDeltaTime);
+                        summon.Update(component.updatingTime);
                         characterEntity.Summons[i] = summon;
                     }
                 }
@@ -60,7 +60,7 @@ namespace MultiplayerARPG
                         characterEntity.SkillUsages.RemoveAt(i);
                     else
                     {
-                        skillUsage.Update(component.skillBuffUpdateDeltaTime);
+                        skillUsage.Update(component.updatingTime);
                         characterEntity.SkillUsages[i] = skillUsage;
                     }
                 }
@@ -74,7 +74,7 @@ namespace MultiplayerARPG
                     {
                         if (nonEquipItem.IsLock())
                         {
-                            nonEquipItem.Update(component.skillBuffUpdateDeltaTime);
+                            nonEquipItem.Update(component.updatingTime);
                             characterEntity.NonEquipItems[i] = nonEquipItem;
                         }
                     }
@@ -88,16 +88,16 @@ namespace MultiplayerARPG
                         characterEntity.Buffs.RemoveAt(i);
                     else
                     {
-                        buff.Update(component.skillBuffUpdateDeltaTime);
+                        buff.Update(component.updatingTime);
                         characterEntity.Buffs[i] = buff;
                     }
-                    recoveryData.recoveryingHp += duration > 0f ? (float)buff.GetBuffRecoveryHp() / duration * component.skillBuffUpdateDeltaTime : 0f;
-                    recoveryData.recoveryingMp += duration > 0f ? (float)buff.GetBuffRecoveryMp() / duration * component.skillBuffUpdateDeltaTime : 0f;
-                    recoveryData.recoveryingStamina += duration > 0f ? (float)buff.GetBuffRecoveryStamina() / duration * component.skillBuffUpdateDeltaTime : 0f;
-                    recoveryData.recoveryingFood += duration > 0f ? (float)buff.GetBuffRecoveryFood() / duration * component.skillBuffUpdateDeltaTime : 0f;
-                    recoveryData.recoveryingWater += duration > 0f ? (float)buff.GetBuffRecoveryWater() / duration * component.skillBuffUpdateDeltaTime : 0f;
+                    recoveryData.recoveryingHp += duration > 0f ? (float)buff.GetBuffRecoveryHp() / duration * component.updatingTime : 0f;
+                    recoveryData.recoveryingMp += duration > 0f ? (float)buff.GetBuffRecoveryMp() / duration * component.updatingTime : 0f;
+                    recoveryData.recoveryingStamina += duration > 0f ? (float)buff.GetBuffRecoveryStamina() / duration * component.updatingTime : 0f;
+                    recoveryData.recoveryingFood += duration > 0f ? (float)buff.GetBuffRecoveryFood() / duration * component.updatingTime : 0f;
+                    recoveryData.recoveryingWater += duration > 0f ? (float)buff.GetBuffRecoveryWater() / duration * component.updatingTime : 0f;
                 }
-                component.skillBuffUpdateDeltaTime = 0;
+                component.updatingTime = 0;
             }
         }
     }

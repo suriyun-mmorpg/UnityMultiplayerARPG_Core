@@ -30,7 +30,7 @@ namespace MultiplayerARPG
         [HideInInspector, System.NonSerialized]
         public float decreasingWater;
         [HideInInspector, System.NonSerialized]
-        public float recoveryUpdateDeltaTime;
+        public float updatingTime;
         #endregion
 
         protected void Update()
@@ -43,11 +43,11 @@ namespace MultiplayerARPG
             if (characterEntity.isRecaching || characterEntity.IsDead() || !characterEntity.IsServer)
                 return;
 
-            recoveryData.recoveryUpdateDeltaTime += deltaTime;
-            if (recoveryData.recoveryUpdateDeltaTime >= RECOVERY_UPDATE_DURATION)
+            recoveryData.updatingTime += deltaTime;
+            if (recoveryData.updatingTime >= RECOVERY_UPDATE_DURATION)
             {
                 // Hp
-                recoveryData.recoveryingHp += recoveryData.recoveryUpdateDeltaTime * gameplayRule.GetRecoveryHpPerSeconds(characterEntity);
+                recoveryData.recoveryingHp += recoveryData.updatingTime * gameplayRule.GetRecoveryHpPerSeconds(characterEntity);
                 if (characterEntity.CurrentHp < characterEntity.CacheMaxHp)
                 {
                     if (recoveryData.recoveryingHp >= 1)
@@ -62,7 +62,7 @@ namespace MultiplayerARPG
                     recoveryData.recoveryingHp = 0;
 
                 // Decrease Hp
-                recoveryData.decreasingHp += recoveryData.recoveryUpdateDeltaTime * gameplayRule.GetDecreasingHpPerSeconds(characterEntity);
+                recoveryData.decreasingHp += recoveryData.updatingTime * gameplayRule.GetDecreasingHpPerSeconds(characterEntity);
                 if (!characterEntity.IsDead())
                 {
                     if (recoveryData.decreasingHp >= 1)
@@ -76,7 +76,7 @@ namespace MultiplayerARPG
                     recoveryData.decreasingHp = 0;
 
                 // Mp
-                recoveryData.recoveryingMp += recoveryData.recoveryUpdateDeltaTime * gameplayRule.GetRecoveryMpPerSeconds(characterEntity);
+                recoveryData.recoveryingMp += recoveryData.updatingTime * gameplayRule.GetRecoveryMpPerSeconds(characterEntity);
                 if (characterEntity.CurrentMp < characterEntity.CacheMaxMp)
                 {
                     if (recoveryData.recoveryingMp >= 1)
@@ -91,7 +91,7 @@ namespace MultiplayerARPG
                     recoveryData.recoveryingMp = 0;
 
                 // Decrease Mp
-                recoveryData.decreasingMp += recoveryData.recoveryUpdateDeltaTime * gameplayRule.GetDecreasingMpPerSeconds(characterEntity);
+                recoveryData.decreasingMp += recoveryData.updatingTime * gameplayRule.GetDecreasingMpPerSeconds(characterEntity);
                 if (characterEntity.CurrentMp > 0)
                 {
                     if (recoveryData.decreasingMp >= 1)
@@ -105,7 +105,7 @@ namespace MultiplayerARPG
                     recoveryData.decreasingMp = 0;
 
                 // Stamina
-                recoveryData.recoveryingStamina += recoveryData.recoveryUpdateDeltaTime * gameplayRule.GetRecoveryStaminaPerSeconds(characterEntity);
+                recoveryData.recoveryingStamina += recoveryData.updatingTime * gameplayRule.GetRecoveryStaminaPerSeconds(characterEntity);
                 if (characterEntity.CurrentStamina < characterEntity.CacheMaxStamina)
                 {
                     if (recoveryData.recoveryingStamina >= 1)
@@ -120,7 +120,7 @@ namespace MultiplayerARPG
                     recoveryData.recoveryingStamina = 0;
 
                 // Decrease Stamina while sprinting
-                recoveryData.decreasingStamina += recoveryData.recoveryUpdateDeltaTime * gameplayRule.GetDecreasingStaminaPerSeconds(characterEntity);
+                recoveryData.decreasingStamina += recoveryData.updatingTime * gameplayRule.GetDecreasingStaminaPerSeconds(characterEntity);
                 if (characterEntity.isSprinting && characterEntity.CurrentStamina > 0)
                 {
                     if (recoveryData.decreasingStamina >= 1)
@@ -148,7 +148,7 @@ namespace MultiplayerARPG
                     recoveryData.recoveryingFood = 0;
 
                 // Decrease Food
-                recoveryData.decreasingFood += recoveryData.recoveryUpdateDeltaTime * gameplayRule.GetDecreasingFoodPerSeconds(characterEntity);
+                recoveryData.decreasingFood += recoveryData.updatingTime * gameplayRule.GetDecreasingFoodPerSeconds(characterEntity);
                 if (characterEntity.CurrentFood > 0)
                 {
                     if (recoveryData.decreasingFood >= 1)
@@ -176,7 +176,7 @@ namespace MultiplayerARPG
                     recoveryData.recoveryingWater = 0;
 
                 // Decrease Water
-                recoveryData.decreasingWater += recoveryData.recoveryUpdateDeltaTime * gameplayRule.GetDecreasingWaterPerSeconds(characterEntity);
+                recoveryData.decreasingWater += recoveryData.updatingTime * gameplayRule.GetDecreasingWaterPerSeconds(characterEntity);
                 if (characterEntity.CurrentWater > 0)
                 {
                     if (recoveryData.decreasingWater >= 1)
@@ -189,7 +189,7 @@ namespace MultiplayerARPG
                 else
                     recoveryData.decreasingWater = 0;
 
-                recoveryData.recoveryUpdateDeltaTime = 0;
+                recoveryData.updatingTime = 0;
             }
 
             characterEntity.ValidateRecovery();

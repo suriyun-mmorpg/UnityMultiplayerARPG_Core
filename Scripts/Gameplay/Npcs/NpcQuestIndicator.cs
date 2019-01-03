@@ -6,12 +6,20 @@ namespace MultiplayerARPG
 {
     public class NpcQuestIndicator : MonoBehaviour
     {
-        public float visibleDistance = 30f;
+        [Tooltip("This will activate when there are in progress quests")]
         public GameObject haveInProgressQuestIndicator;
+        [Tooltip("This will activate when there are new quests")]
         public GameObject haveNewQuestIndicator;
         public float updateRepeatRate = 0.5f;
+        [HideInInspector, System.NonSerialized]
         public NpcEntity npcEntity;
         private float lastUpdateTime;
+
+        private void Awake()
+        {
+            if (npcEntity == null)
+                npcEntity = GetComponentInParent<NpcEntity>();
+        }
 
         private void Update()
         {
@@ -26,24 +34,21 @@ namespace MultiplayerARPG
 
             if (Time.unscaledTime - lastUpdateTime >= updateRepeatRate)
             {
+                lastUpdateTime = Time.unscaledTime;
                 if (haveInProgressQuestIndicator != null)
                     haveInProgressQuestIndicator.SetActive(false);
                 if (haveNewQuestIndicator != null)
                     haveNewQuestIndicator.SetActive(false);
-                if (Vector3.Distance(BasePlayerCharacterController.OwningCharacter.CacheTransform.position, npcEntity.CacheTransform.position) <= visibleDistance)
+                if (npcEntity.HaveInProgressQuests(BasePlayerCharacterController.OwningCharacter))
                 {
-                    if (npcEntity.HaveInProgressQuests(BasePlayerCharacterController.OwningCharacter))
-                    {
-                        if (haveInProgressQuestIndicator != null)
-                            haveInProgressQuestIndicator.SetActive(true);
-                    }
-                    else if (npcEntity.HaveNewQuests(BasePlayerCharacterController.OwningCharacter))
-                    {
-                        if (haveNewQuestIndicator != null)
-                            haveNewQuestIndicator.SetActive(true);
-                    }
+                    if (haveInProgressQuestIndicator != null)
+                        haveInProgressQuestIndicator.SetActive(true);
                 }
-                lastUpdateTime = Time.unscaledTime;
+                if (npcEntity.HaveNewQuests(BasePlayerCharacterController.OwningCharacter))
+                {
+                    if (haveNewQuestIndicator != null)
+                        haveNewQuestIndicator.SetActive(true);
+                }
             }
         }
     }

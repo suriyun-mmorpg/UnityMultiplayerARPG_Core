@@ -404,21 +404,33 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacter;
             switch (message.channel)
             {
-                case ChatChannel.Global:
-                    if (!string.IsNullOrEmpty(message.sender))
+                case ChatChannel.Local:
+                    if (!string.IsNullOrEmpty(message.sender) &&
+                        TryGetPlayerCharacterByName(message.sender, out playerCharacter))
                     {
-                        if (GMCommands.IsGMCommand(message.message) && 
-                            TryGetPlayerCharacterByName(message.sender, out playerCharacter) &&
-                            playerCharacter.UserLevel > 0)
+                        if (GMCommands.IsGMCommand(message.message) && playerCharacter.UserLevel > 0)
                         {
                             // If it's gm command and sender's user level > 0, handle gm commands
                             HandleGMCommand(message.sender, message.message);
                         }
                         else
                         {
-                            // Send message to all clients
-                            ServerSendPacketToAllConnections(SendOptions.ReliableOrdered, MsgTypes.Chat, message);
+                            // Send messages to nearby characters
+                            var receivers = playerCharacter.FindCharacters<BasePlayerCharacterEntity>(gameInstance.localChatDistance, false, true, true, true);
+                            foreach (var receiver in receivers)
+                            {
+                                ServerSendPacket(receiver.ConnectionId, SendOptions.ReliableOrdered, MsgTypes.Chat, message);
+                            }
+                            // Send messages to sender
+                            ServerSendPacket(playerCharacter.ConnectionId, SendOptions.ReliableOrdered, MsgTypes.Chat, message);
                         }
+                    }
+                    break;
+                case ChatChannel.Global:
+                    if (!string.IsNullOrEmpty(message.sender))
+                    {
+                        // Send message to all clients
+                        ServerSendPacketToAllConnections(SendOptions.ReliableOrdered, MsgTypes.Chat, message);
                     }
                     break;
                 case ChatChannel.Whisper:
@@ -660,7 +672,7 @@ namespace MultiplayerARPG
             if (GameInstance.MapWarpPortals.Count > 0)
             {
                 List<WarpPortal> mapWarpPortals;
-                if (GameInstance.MapWarpPortals.TryGetValue(Assets.onlineScene.SceneName, out mapWarpPortals))
+                if (GameInstance.MapWarpPortals.TryGetValue(SceneManager.GetActiveScene().name, out mapWarpPortals))
                 {
                     foreach (var warpPortal in mapWarpPortals)
                     {
@@ -679,7 +691,7 @@ namespace MultiplayerARPG
             if (GameInstance.MapNpcs.Count > 0)
             {
                 List<Npc> mapNpcs;
-                if (GameInstance.MapNpcs.TryGetValue(Assets.onlineScene.SceneName, out mapNpcs))
+                if (GameInstance.MapNpcs.TryGetValue(SceneManager.GetActiveScene().name, out mapNpcs))
                 {
                     foreach (var npc in mapNpcs)
                     {

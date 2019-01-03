@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(CharacterRecoveryComponent))]
     [RequireComponent(typeof(CharacterSkillAndBuffComponent))]
     [DisallowMultipleComponent]
-    public abstract partial class BaseCharacterEntity : DamageableNetworkEntity, ICharacterData, IAttackerEntity
+    public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData, IAttackerEntity
     {
         public const float ACTION_COMMAND_DELAY = 0.2f;
         public const int OVERLAP_COLLIDER_SIZE = 32;
@@ -38,7 +38,13 @@ namespace MultiplayerARPG
         protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
         protected AnimActionType animActionType;
         protected float lastActionCommandReceivedTime;
+        /// <summary>
+        /// This variable will be TRUE when cache data have to re-cache
+        /// </summary>
         public bool isRecaching { get; protected set; }
+        /// <summary>
+        /// This variable will be TRUE when player hold sprint key
+        /// </summary>
         public bool isSprinting { get; protected set; }
         #endregion
 
@@ -65,6 +71,9 @@ namespace MultiplayerARPG
         public float CacheMoveSpeed { get; protected set; }
         public float CacheBaseMoveSpeed { get; protected set; }
         #endregion
+
+        public override int MaxHp { get { return CacheMaxHp; } }
+        public float MoveAnimationSpeedMultiplier { get { return GameplayRule.GetMoveSpeed(this) / CacheBaseMoveSpeed; } }
 
         private BaseCharacterModel characterModel;
         public BaseCharacterModel CharacterModel
@@ -97,16 +106,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public Transform MiniMapElementContainer
-        {
-            get
-            {
-                if (miniMapElementContainer == null)
-                    miniMapElementContainer = CacheTransform;
-                return miniMapElementContainer;
-            }
-        }
-
         public Transform UIElementTransform
         {
             get
@@ -114,6 +113,16 @@ namespace MultiplayerARPG
                 if (uiElementTransform == null)
                     uiElementTransform = CacheTransform;
                 return uiElementTransform;
+            }
+        }
+
+        public Transform MiniMapElementContainer
+        {
+            get
+            {
+                if (miniMapElementContainer == null)
+                    miniMapElementContainer = CacheTransform;
+                return miniMapElementContainer;
             }
         }
 
@@ -419,6 +428,11 @@ namespace MultiplayerARPG
         public virtual void SetTargetEntity(BaseGameEntity entity)
         {
             targetEntity = entity;
+        }
+
+        public virtual BaseGameEntity GetTargetEntity()
+        {
+            return targetEntity;
         }
 
         public bool TryGetTargetEntity<T>(out T entity) where T : class
@@ -844,7 +858,7 @@ namespace MultiplayerARPG
                                 return;
                             // Target entity not set, use overlapped object as target
                             tempGameObject = GetOverlapObject(0);
-                            tempDamageableEntity = tempGameObject.GetComponent<DamageableNetworkEntity>();
+                            tempDamageableEntity = tempGameObject.GetComponent<DamageableEntity>();
                         }
                         // Target receive damage
                         if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() &&
@@ -863,7 +877,7 @@ namespace MultiplayerARPG
                         for (counter = 0; counter < overlapSize; ++counter)
                         {
                             tempGameObject = GetOverlapObject(counter);
-                            tempDamageableEntity = tempGameObject.GetComponent<DamageableNetworkEntity>();
+                            tempDamageableEntity = tempGameObject.GetComponent<DamageableEntity>();
                             // Target receive damage
                             if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() &&
                                 (!(tempDamageableEntity is BaseCharacterEntity) || (BaseCharacterEntity)tempDamageableEntity != this) &&
@@ -998,7 +1012,8 @@ namespace MultiplayerARPG
                 return;
             if (uiCharacterEntity != null)
                 Destroy(uiCharacterEntity.gameObject);
-            uiCharacterEntity = Instantiate(prefab);
+            uiCharacterEntity = Instantiate(prefab, UIElementTransform);
+            uiCharacterEntity.transform.localPosition = Vector3.zero;
             uiCharacterEntity.Data = this;
         }
 
@@ -1022,7 +1037,8 @@ namespace MultiplayerARPG
             RequestOnLevelUp();
         }
 
-        public List<T> FindAliveCharacters<T>(float distance, bool findForAlly, bool findForEnemy, bool findForNeutral) where T : BaseCharacterEntity
+        public List<T> FindCharacters<T>(float distance, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral)
+            where T : BaseCharacterEntity
         {
             var result = new List<T>();
             overlapSize = OverlapObjects(CacheTransform.position, distance, GameInstance.characterLayer.Mask);
@@ -1033,14 +1049,21 @@ namespace MultiplayerARPG
             {
                 tempGameObject = GetOverlapObject(counter);
                 tempEntity = tempGameObject.GetComponent<T>();
-                if (!IsCharacterWhichLookingFor(tempEntity, findForAlly, findForEnemy, findForNeutral))
+                if (!IsCharacterWhichLookingFor(tempEntity, findForAliveOnly, findForAlly, findForEnemy, findForNeutral))
                     continue;
                 result.Add(tempEntity);
             }
             return result;
         }
 
-        public T FindNearestAliveCharacter<T>(float distance, bool findForAlly, bool findForEnemy, bool findForNeutral) where T : BaseCharacterEntity
+        public List<T> FindAliveCharacters<T>(float distance, bool findForAlly, bool findForEnemy, bool findForNeutral)
+            where T : BaseCharacterEntity
+        {
+            return FindCharacters<T>(distance, true, findForAlly, findForEnemy, findForNeutral);
+        }
+
+        public T FindNearestCharacter<T>(float distance, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral)
+            where T : BaseCharacterEntity
         {
             overlapSize = OverlapObjects(CacheTransform.position, distance, GameInstance.characterLayer.Mask);
             if (overlapSize == 0)
@@ -1053,7 +1076,7 @@ namespace MultiplayerARPG
             {
                 tempGameObject = GetOverlapObject(counter);
                 tempEntity = tempGameObject.GetComponent<T>();
-                if (!IsCharacterWhichLookingFor(tempEntity, findForAlly, findForEnemy, findForNeutral))
+                if (!IsCharacterWhichLookingFor(tempEntity, findForAliveOnly, findForAlly, findForEnemy, findForNeutral))
                     continue;
                 tempDistance = Vector3.Distance(CacheTransform.position, tempEntity.CacheTransform.position);
                 if (tempDistance < nearestDistance)
@@ -1065,9 +1088,17 @@ namespace MultiplayerARPG
             return nearestEntity;
         }
 
-        private bool IsCharacterWhichLookingFor(BaseCharacterEntity characterEntity, bool findForAlly, bool findForEnemy, bool findForNeutral)
+        public T FindNearestAliveCharacter<T>(float distance, bool findForAlly, bool findForEnemy, bool findForNeutral)
+            where T : BaseCharacterEntity
         {
-            if (characterEntity == null || characterEntity == this || characterEntity.IsDead())
+            return FindNearestCharacter<T>(distance, true, findForAlly, findForEnemy, findForNeutral);
+        }
+
+        private bool IsCharacterWhichLookingFor(BaseCharacterEntity characterEntity, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral)
+        {
+            if (characterEntity == null || characterEntity == this)
+                return false;
+            if (findForAliveOnly && characterEntity.IsDead())
                 return false;
             return (findForAlly && characterEntity.IsAlly(this)) ||
                 (findForEnemy && characterEntity.IsEnemy(this)) ||

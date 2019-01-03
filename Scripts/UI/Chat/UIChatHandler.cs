@@ -8,7 +8,8 @@ namespace MultiplayerARPG
     public partial class UIChatHandler : UIBase
     {
         public static readonly List<ChatMessage> ChatMessages = new List<ChatMessage>();
-
+        
+        public string globalCommand = "/a";
         public string whisperCommand = "/w";
         public string partyCommand = "/p";
         public string guildCommand = "/g";
@@ -128,7 +129,7 @@ namespace MultiplayerARPG
                 return;
 
             EnterChatMessage = string.Empty;
-            var channel = ChatChannel.Global;
+            var channel = ChatChannel.Local;
             var message = trimText;
             var sender = BasePlayerCharacterController.OwningCharacter.CharacterName;
             var receiver = string.Empty;
@@ -143,8 +144,10 @@ namespace MultiplayerARPG
                     message = trimText.Substring(cmd.Length + receiver.Length + 1); // +1 for space
                     EnterChatMessage = trimText.Substring(0, cmd.Length + receiver.Length + 1); // +1 for space
                 }
-                if ((cmd == partyCommand || cmd == guildCommand) && splitedText.Length > 1)
+                if ((cmd == globalCommand || cmd == partyCommand || cmd == guildCommand) && splitedText.Length > 1)
                 {
+                    if (cmd == globalCommand)
+                        channel = ChatChannel.Global;
                     if (cmd == partyCommand)
                         channel = ChatChannel.Party;
                     if (cmd == guildCommand)

@@ -32,6 +32,8 @@ namespace MultiplayerARPG
         public bool wasdLockAttackTarget;
         [Tooltip("This will be used to find nearby enemy when `Controller Mode` is `Point Click` or when `Wasd Lock Attack Target` is `TRUE`")]
         public float lockAttackTargetDistance = 10f;
+        [Tooltip("Set this to TRUE to move to target immediately when clicked on target, if this is FALSE it will not move to target immediately")]
+        public bool pointClickSetTargetImmediately;
         public FollowCameraControls gameplayCameraPrefab;
         public GameObject targetObjectPrefab;
         [Header("Building Settings")]
@@ -49,6 +51,8 @@ namespace MultiplayerARPG
         public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
         public GameObject CacheTargetObject { get; protected set; }
 
+        protected BaseGameEntity targetEntity;
+        protected Vector3? targetPosition;
         // Optimizing garbage collection
         protected bool getMouseUp;
         protected bool getMouseDown;
@@ -65,6 +69,7 @@ namespace MultiplayerARPG
         protected ItemDropEntity targetItemDrop;
         protected BuildingEntity targetBuilding;
         protected HarvestableEntity targetHarvestable;
+        protected BaseGameEntity selectedTarget;
 
         protected override void Awake()
         {
@@ -128,15 +133,13 @@ namespace MultiplayerARPG
                 queueUsingSkill = null;
                 destination = null;
                 if (CacheUISceneGameplay != null)
-                    CacheUISceneGameplay.SetTargetCharacter(null);
+                    CacheUISceneGameplay.SetTargetEntity(null);
                 CancelBuild();
             }
             else
             {
-                targetCharacter = null;
-                PlayerCharacterEntity.TryGetTargetEntity(out targetCharacter);
                 if (CacheUISceneGameplay != null)
-                    CacheUISceneGameplay.SetTargetCharacter(targetCharacter);
+                    CacheUISceneGameplay.SetTargetEntity(selectedTarget);
             }
 
             if (destination.HasValue)

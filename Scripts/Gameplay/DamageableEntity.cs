@@ -5,7 +5,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public abstract class DamageableNetworkEntity : BaseGameEntity, IDamageableEntity
+    public abstract class DamageableEntity : BaseGameEntity, IDamageableEntity
     {
         [SerializeField]
         protected SyncFieldInt currentHp = new SyncFieldInt();
@@ -21,6 +21,7 @@ namespace MultiplayerARPG
         }
 
         public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
+        public abstract int MaxHp { get; }
         
         public override void OnSetup()
         {

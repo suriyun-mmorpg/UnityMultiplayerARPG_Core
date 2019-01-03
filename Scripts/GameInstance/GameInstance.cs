@@ -32,10 +32,14 @@ namespace MultiplayerARPG
         public ServerCharacter serverCharacterPrefab;
         [Tooltip("These objects will be instantiate as owning character's children")]
         public GameObject[] owningCharacterObjects;
-        [Tooltip("These objects will be instantiate as owning character's children")]
+        [Tooltip("These objects will be instantiate as owning character's children to show in minimap")]
         public GameObject[] owningCharacterMiniMapObjects;
-        [Tooltip("These objects will be instantiate as monster character's children")]
+        [Tooltip("These objects will be instantiate as non owning character's children to show in minimap")]
+        public GameObject[] nonOwningCharacterMiniMapObjects;
+        [Tooltip("These objects will be instantiate as monster character's children to show in minimap")]
         public GameObject[] monsterCharacterMiniMapObjects;
+        [Tooltip("These objects will be instantiate as npc's children to show in minimap")]
+        public GameObject[] npcMiniMapObjects;
         [Tooltip("This UI will be instaniate as owning character's child to show character name / HP / MP / Food / Water")]
         public UICharacterEntity owningCharacterUI;
         [Tooltip("This UI will be instaniate as non owning character's child to show character name / HP / MP / Food / Water")]
@@ -95,6 +99,8 @@ namespace MultiplayerARPG
         public float conversationDistance = 1f;
         [Tooltip("This is a distance that allows a player to builds an building")]
         public float buildDistance = 10f;
+        [Tooltip("This is a distance that other players will receives local chat")]
+        public float localChatDistance = 10f;
 
         [Header("Gameplay Configs - Summon Monster")]
         [Tooltip("This is a distance that random summon around a character")]

@@ -1,9 +1,8 @@
-﻿using LiteNetLibManager;
-using LiteNetLib.Utils;
+﻿using LiteNetLib.Utils;
 
 namespace MultiplayerARPG
 {
-    public class GameMessage : ILiteNetLibMessage
+    public class GameMessage : INetSerializable
     {
         public enum Type : byte
         {

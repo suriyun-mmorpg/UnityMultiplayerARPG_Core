@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 
 namespace MultiplayerARPG
 {
@@ -43,9 +42,9 @@ namespace MultiplayerARPG
             }
         }
 
-        private readonly Dictionary<string, BaseCharacterModel> CharacterModels = new Dictionary<string, BaseCharacterModel>();
+        protected readonly Dictionary<string, BaseCharacterModel> CharacterModels = new Dictionary<string, BaseCharacterModel>();
 
-        private void LoadCharacters()
+        protected virtual void LoadCharacters()
         {
             SelectionManager.Clear();
             // Unenabled buttons
@@ -86,8 +85,17 @@ namespace MultiplayerARPG
             buttonStart.onClick.AddListener(OnClickStart);
             buttonDelete.onClick.RemoveListener(OnClickDelete);
             buttonDelete.onClick.AddListener(OnClickDelete);
+            // Clear selection
             SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
             SelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
+            SelectionManager.Clear();
+            CacheList.HideAll();
+            // Unenabled buttons
+            buttonStart.gameObject.SetActive(false);
+            buttonDelete.gameObject.SetActive(false);
+            // Remove all models
+            characterModelContainer.RemoveChildren();
+            CharacterModels.Clear();
             LoadCharacters();
             base.Show();
         }
@@ -98,7 +106,7 @@ namespace MultiplayerARPG
             base.Hide();
         }
 
-        private void OnSelectCharacter(UICharacter ui)
+        protected virtual void OnSelectCharacter(UICharacter ui)
         {
             buttonStart.gameObject.SetActive(true);
             buttonDelete.gameObject.SetActive(true);
@@ -107,7 +115,7 @@ namespace MultiplayerARPG
             ShowCharacter(playerCharacter.Id);
         }
 
-        private void ShowCharacter(string id)
+        protected virtual void ShowCharacter(string id)
         {
             BaseCharacterModel characterModel;
             if (string.IsNullOrEmpty(id) || !CharacterModels.TryGetValue(id, out characterModel))
@@ -115,7 +123,7 @@ namespace MultiplayerARPG
             characterModel.gameObject.SetActive(true);
         }
 
-        private void OnClickStart()
+        protected virtual void OnClickStart()
         {
             var selectedUI = SelectionManager.SelectedUI;
             if (selectedUI == null)
@@ -142,7 +150,7 @@ namespace MultiplayerARPG
             networkManager.StartGame();
         }
 
-        private void OnClickDelete()
+        protected virtual void OnClickDelete()
         {
             var selectedUI = SelectionManager.SelectedUI;
             if (selectedUI == null)
