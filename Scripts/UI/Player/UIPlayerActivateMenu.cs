@@ -13,12 +13,12 @@ namespace MultiplayerARPG
         protected override void UpdateUI()
         {
             base.UpdateUI();
-            foreach (var obj in partyInviteObjects)
+            foreach (GameObject obj in partyInviteObjects)
             {
                 if (obj != null)
                     obj.SetActive(BaseGameNetworkManager.Singleton.ClientParty != null && BaseGameNetworkManager.Singleton.ClientParty.CanInvite(BasePlayerCharacterController.OwningCharacter.Id));
             }
-            foreach (var obj in guildInviteObjects)
+            foreach (GameObject obj in guildInviteObjects)
             {
                 if (obj != null)
                     obj.SetActive(BaseGameNetworkManager.Singleton.ClientGuild != null && BaseGameNetworkManager.Singleton.ClientGuild.CanInvite(BasePlayerCharacterController.OwningCharacter.Id));
@@ -33,21 +33,21 @@ namespace MultiplayerARPG
 
         public void OnClickSendDealingRequest()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             owningCharacter.RequestSendDealingRequest(Data.ObjectId);
             Hide();
         }
 
         public void OnClickSendPartyInvitation()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             owningCharacter.RequestSendPartyInvitation(Data.ObjectId);
             Hide();
         }
 
         public void OnClickSendGuildInvitation()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             owningCharacter.RequestSendGuildInvitation(Data.ObjectId);
             Hide();
         }

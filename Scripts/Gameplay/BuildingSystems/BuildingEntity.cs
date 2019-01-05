@@ -98,20 +98,20 @@ namespace MultiplayerARPG
             gameObject.tag = GameInstance.buildingTag;
             gameObject.layer = GameInstance.buildingLayer;
 
-            var materials = GetComponentsInChildren<BuildingMaterial>(true);
+            BuildingMaterial[] materials = GetComponentsInChildren<BuildingMaterial>(true);
             if (materials != null && materials.Length > 0)
             {
-                foreach (var material in materials)
+                foreach (BuildingMaterial material in materials)
                 {
                     material.buildingEntity = this;
                     buildingMaterials.Add(material);
                 }
             }
 
-            var areas = GetComponentsInChildren<BuildingArea>(true);
+            BuildingArea[] areas = GetComponentsInChildren<BuildingArea>(true);
             if (areas != null && areas.Length > 0)
             {
-                foreach (var area in areas)
+                foreach (BuildingArea area in areas)
                 {
                     area.buildingEntity = this;
                     buildingAreas.Add(area);
@@ -130,8 +130,8 @@ namespace MultiplayerARPG
                     CacheTransform.position = buildingArea.transform.position;
                     CacheTransform.rotation = buildingArea.transform.rotation;
                 }
-                var canBuild = CanBuild();
-                foreach (var buildingMaterial in buildingMaterials)
+                bool canBuild = CanBuild();
+                foreach (BuildingMaterial buildingMaterial in buildingMaterials)
                 {
                     buildingMaterial.CurrentState = canBuild ? BuildingMaterial.State.CanBuild : BuildingMaterial.State.CannotBuild;
                 }
@@ -169,12 +169,12 @@ namespace MultiplayerARPG
 
         public void SetupAsBuildMode()
         {
-            var colliders = GetComponentsInChildren<Collider>(true);
-            foreach (var collider in colliders)
+            Collider[] colliders = GetComponentsInChildren<Collider>(true);
+            foreach (Collider collider in colliders)
             {
                 collider.isTrigger = true;
                 // We'll use rigidbody to detect trigger events
-                var rigidbody = collider.GetComponent<Rigidbody>();
+                Rigidbody rigidbody = collider.GetComponent<Rigidbody>();
                 if (rigidbody == null)
                     rigidbody = collider.gameObject.AddComponent<Rigidbody>();
                 rigidbody.useGravity = false;
@@ -214,7 +214,7 @@ namespace MultiplayerARPG
 
         public bool HitNonParentObject()
         {
-            foreach (var triggerBuilding in triggerBuildings)
+            foreach (BuildingEntity triggerBuilding in triggerBuildings)
             {
                 if (buildingArea != null && triggerBuilding != buildingArea.buildingEntity)
                 {

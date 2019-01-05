@@ -16,7 +16,7 @@ namespace MultiplayerARPG
         {
             if (attributeAmount.attribute == null)
                 return new CharacterStats();
-            var attribute = attributeAmount.attribute;
+            Attribute attribute = attributeAmount.attribute;
             return attribute.GetStats(attributeAmount.amount);
         }
 
@@ -24,7 +24,7 @@ namespace MultiplayerARPG
         {
             if (attributeIncremental.attribute == null)
                 return new CharacterStats();
-            var attribute = attributeIncremental.attribute;
+            Attribute attribute = attributeIncremental.attribute;
             return attribute.GetStats(attributeIncremental.amount.GetAmount(level));
         }
     }

@@ -22,12 +22,12 @@ namespace MultiplayerARPG
                 if (cacheTextInflictions == null)
                 {
                     cacheTextInflictions = new Dictionary<DamageElement, TextWrapper>();
-                    foreach (var textAmount in textInflictions)
+                    foreach (UIDamageElementTextPair textAmount in textInflictions)
                     {
                         if (textAmount.damageElement == null || textAmount.uiText == null)
                             continue;
-                        var key = textAmount.damageElement;
-                        var textComp = textAmount.uiText;
+                        DamageElement key = textAmount.damageElement;
+                        TextWrapper textComp = textAmount.uiText;
                         textComp.text = string.Format(inflictionFormat, key.title, "0");
                         cacheTextInflictions[key] = textComp;
                     }
@@ -43,27 +43,27 @@ namespace MultiplayerARPG
                 if (uiTextAllInflictions != null)
                     uiTextAllInflictions.gameObject.SetActive(false);
 
-                foreach (var textAmount in CacheTextInflictions)
+                foreach (KeyValuePair<DamageElement, TextWrapper> textAmount in CacheTextInflictions)
                 {
-                    var element = textAmount.Key;
-                    var format = element == GameInstance.Singleton.DefaultDamageElement ? defaultElementInflictionFormat : inflictionFormat;
+                    DamageElement element = textAmount.Key;
+                    string format = element == GameInstance.Singleton.DefaultDamageElement ? defaultElementInflictionFormat : inflictionFormat;
                     textAmount.Value.text = string.Format(format, element.title, "0");
                 }
             }
             else
             {
-                var text = "";
-                var sumDamage = new MinMaxFloat();
-                foreach (var dataEntry in Data)
+                string text = "";
+                MinMaxFloat sumDamage = new MinMaxFloat();
+                foreach (KeyValuePair<DamageElement, float> dataEntry in Data)
                 {
                     if (dataEntry.Key == null || dataEntry.Value == 0)
                         continue;
-                    var element = dataEntry.Key;
-                    var rate = dataEntry.Value;
+                    DamageElement element = dataEntry.Key;
+                    float rate = dataEntry.Value;
                     if (!string.IsNullOrEmpty(text))
                         text += "\n";
-                    var format = element == GameInstance.Singleton.DefaultDamageElement ? defaultElementInflictionFormat : inflictionFormat;
-                    var amountText = string.Format(format, element.title, (rate * 100f).ToString("N0"));
+                    string format = element == GameInstance.Singleton.DefaultDamageElement ? defaultElementInflictionFormat : inflictionFormat;
+                    string amountText = string.Format(format, element.title, (rate * 100f).ToString("N0"));
                     text += amountText;
                     TextWrapper textDamages;
                     if (CacheTextInflictions.TryGetValue(dataEntry.Key, out textDamages))

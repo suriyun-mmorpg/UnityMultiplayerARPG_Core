@@ -36,7 +36,7 @@ namespace MultiplayerARPG
 
             if (imageIcon != null)
             {
-                var iconSprite = Data == null ? null : Data.icon;
+                Sprite iconSprite = Data == null ? null : Data.icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
             }
@@ -57,7 +57,7 @@ namespace MultiplayerARPG
 
         IEnumerator LoadExternalIcon()
         {
-            var www = UnityWebRequestTexture.GetTexture(Data.externalIconUrl);
+            UnityWebRequest www = UnityWebRequestTexture.GetTexture(Data.externalIconUrl);
             yield return www.SendWebRequest();
             if (!www.isNetworkError && !www.isHttpError)
                 rawImageExternalIcon.texture = ((DownloadHandlerTexture)www.downloadHandler).texture;

@@ -35,13 +35,13 @@ namespace MultiplayerARPG
             {
                 cacheHarvestEffectivenesses = new Dictionary<WeaponType, HarvestEffectiveness>();
                 cacheHarvestItems = new Dictionary<WeaponType, WeightedRandomizer<ItemDropByWeight>>();
-                foreach (var harvestEffectiveness in harvestEffectivenesses)
+                foreach (HarvestEffectiveness harvestEffectiveness in harvestEffectivenesses)
                 {
                     if (harvestEffectiveness.weaponType != null && harvestEffectiveness.damageEffectiveness > 0)
                     {
                         cacheHarvestEffectivenesses[harvestEffectiveness.weaponType] = harvestEffectiveness;
-                        var harvestItems = new Dictionary<ItemDropByWeight, int>();
-                        foreach (var item in harvestEffectiveness.items)
+                        Dictionary<ItemDropByWeight, int> harvestItems = new Dictionary<ItemDropByWeight, int>();
+                        foreach (ItemDropByWeight item in harvestEffectiveness.items)
                         {
                             if (item.item == null || item.amountPerDamage <= 0 || item.randomWeight <= 0)
                                 continue;

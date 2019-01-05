@@ -43,21 +43,21 @@ public static class MemberReflectionUtils
         if (expression is MemberExpression)
         {
             // Reference type property or field
-            var memberExpression = (MemberExpression)expression;
+            MemberExpression memberExpression = (MemberExpression)expression;
             return memberExpression.Member.Name;
         }
 
         if (expression is MethodCallExpression)
         {
             // Reference type method
-            var methodCallExpression = (MethodCallExpression)expression;
+            MethodCallExpression methodCallExpression = (MethodCallExpression)expression;
             return methodCallExpression.Method.Name;
         }
 
         if (expression is UnaryExpression)
         {
             // Property, field of method returning value type
-            var unaryExpression = (UnaryExpression)expression;
+            UnaryExpression unaryExpression = (UnaryExpression)expression;
             return GetMemberName(unaryExpression);
         }
 
@@ -68,7 +68,7 @@ public static class MemberReflectionUtils
     {
         if (unaryExpression.Operand is MethodCallExpression)
         {
-            var methodExpression = (MethodCallExpression)unaryExpression.Operand;
+            MethodCallExpression methodExpression = (MethodCallExpression)unaryExpression.Operand;
             return methodExpression.Method.Name;
         }
 

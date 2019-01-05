@@ -58,7 +58,7 @@ namespace MultiplayerARPG
             }
             if (requireItems == null || requireItems.Length == 0)
                 return true;
-            foreach (var requireItem in requireItems)
+            foreach (ItemAmount requireItem in requireItems)
             {
                 if (requireItem.item != null && character.CountNonEquipItems(requireItem.item.DataId) < requireItem.amount)
                 {
@@ -71,8 +71,8 @@ namespace MultiplayerARPG
 
         public bool RefineItem(IPlayerCharacterData character, int nonEquipIndex)
         {
-            var isSuccess = false;
-            var refiningItem = character.NonEquipItems[nonEquipIndex];
+            bool isSuccess = false;
+            CharacterItem refiningItem = character.NonEquipItems[nonEquipIndex];
             if (Random.value <= successRate)
             {
                 ++refiningItem.level;
@@ -93,7 +93,7 @@ namespace MultiplayerARPG
             }
             if (requireItems != null)
             {
-                foreach (var requireItem in requireItems)
+                foreach (ItemAmount requireItem in requireItems)
                 {
                     if (requireItem.item != null && requireItem.amount > 0)
                         character.DecreaseItems(requireItem.item.DataId, requireItem.amount);

@@ -30,7 +30,7 @@ namespace MultiplayerARPG
                 if (cacheEquipmentModelContainers == null)
                 {
                     cacheEquipmentModelContainers = new Dictionary<string, EquipmentModelContainer>();
-                    foreach (var equipmentContainer in equipmentContainers)
+                    foreach (EquipmentModelContainer equipmentContainer in equipmentContainers)
                     {
                         if (equipmentContainer.transform != null && !cacheEquipmentModelContainers.ContainsKey(equipmentContainer.equipSocket))
                             cacheEquipmentModelContainers[equipmentContainer.equipSocket] = equipmentContainer;
@@ -62,7 +62,7 @@ namespace MultiplayerARPG
             DestroyCacheModel(equipPosition);
             if (models == null)
                 return;
-            foreach (var model in models)
+            foreach (KeyValuePair<string, GameObject> model in models)
             {
                 EquipmentModelContainer container;
                 if (!CacheEquipmentModelContainers.TryGetValue(model.Key, out container))
@@ -77,7 +77,7 @@ namespace MultiplayerARPG
             Dictionary<string, GameObject> oldModels;
             if (!string.IsNullOrEmpty(equipPosition) && cacheModels.TryGetValue(equipPosition, out oldModels) && oldModels != null)
             {
-                foreach (var model in oldModels)
+                foreach (KeyValuePair<string, GameObject> model in oldModels)
                 {
                     Destroy(model.Value);
                     EquipmentModelContainer container;
@@ -91,9 +91,9 @@ namespace MultiplayerARPG
 
         public void SetEquipWeapons(EquipWeapons equipWeapons)
         {
-            var rightHandWeapon = equipWeapons.rightHand.GetWeaponItem();
-            var leftHandWeapon = equipWeapons.leftHand.GetWeaponItem();
-            var leftHandShield = equipWeapons.leftHand.GetShieldItem();
+            Item rightHandWeapon = equipWeapons.rightHand.GetWeaponItem();
+            Item leftHandWeapon = equipWeapons.leftHand.GetWeaponItem();
+            Item leftHandShield = equipWeapons.leftHand.GetShieldItem();
 
             // Clear equipped item models
             tempKeepingKeys.Clear();
@@ -104,7 +104,7 @@ namespace MultiplayerARPG
 
             tempCachedKeys.Clear();
             tempCachedKeys.AddRange(cacheModels.Keys);
-            foreach (var key in tempCachedKeys)
+            foreach (string key in tempCachedKeys)
             {
                 if (!tempKeepingKeys.Contains(key) &&
                     (key.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND) ||
@@ -124,16 +124,16 @@ namespace MultiplayerARPG
         {
             // Clear equipped item models
             tempKeepingKeys.Clear();
-            foreach (var equipItem in equipItems)
+            foreach (CharacterItem equipItem in equipItems)
             {
-                var armorItem = equipItem.GetArmorItem();
+                Item armorItem = equipItem.GetArmorItem();
                 if (armorItem != null)
                     tempKeepingKeys.Add(armorItem.EquipPosition);
             }
 
             tempCachedKeys.Clear();
             tempCachedKeys.AddRange(cacheModels.Keys);
-            foreach (var key in tempCachedKeys)
+            foreach (string key in tempCachedKeys)
             {
                 if (!tempKeepingKeys.Contains(key) &&
                     !key.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND) &&
@@ -141,9 +141,9 @@ namespace MultiplayerARPG
                     DestroyCacheModel(key);
             }
 
-            foreach (var equipItem in equipItems)
+            foreach (CharacterItem equipItem in equipItems)
             {
-                var armorItem = equipItem.GetArmorItem();
+                Item armorItem = equipItem.GetArmorItem();
                 if (armorItem == null)
                     continue;
                 if (tempKeepingKeys.Contains(armorItem.EquipPosition))
@@ -155,8 +155,8 @@ namespace MultiplayerARPG
         {
             if (equipmentModels == null || equipmentModels.Length == 0)
                 return;
-            var models = new Dictionary<string, GameObject>();
-            foreach (var equipmentModel in equipmentModels)
+            Dictionary<string, GameObject> models = new Dictionary<string, GameObject>();
+            foreach (EquipmentModel equipmentModel in equipmentModels)
             {
                 if (string.IsNullOrEmpty(equipmentModel.equipSocket) || equipmentModel.model == null)
                     continue;
@@ -192,7 +192,7 @@ namespace MultiplayerARPG
             List<GameEffect> oldEffects;
             if (!string.IsNullOrEmpty(buffId) && cacheEffects.TryGetValue(buffId, out oldEffects) && oldEffects != null)
             {
-                foreach (var effect in oldEffects)
+                foreach (GameEffect effect in oldEffects)
                 {
                     effect.DestroyEffect();
                 }
@@ -204,16 +204,16 @@ namespace MultiplayerARPG
         {
             tempKeepingKeys.Clear();
             tempAddingKeys.Clear();
-            foreach (var buff in buffs)
+            foreach (CharacterBuff buff in buffs)
             {
-                var key = buff.GetKey();
+                string key = buff.GetKey();
                 tempKeepingKeys.Add(key);
                 tempAddingKeys.Add(key);
             }
 
             tempCachedKeys.Clear();
             tempCachedKeys.AddRange(cacheEffects.Keys);
-            foreach (var key in tempCachedKeys)
+            foreach (string key in tempCachedKeys)
             {
                 if (!tempKeepingKeys.Contains(key))
                     DestroyCacheEffect(key);
@@ -221,12 +221,12 @@ namespace MultiplayerARPG
                     tempAddingKeys.Remove(key);
             }
 
-            foreach (var buff in buffs)
+            foreach (CharacterBuff buff in buffs)
             {
-                var key = buff.GetKey();
+                string key = buff.GetKey();
                 if (tempAddingKeys.Contains(key))
                 {
-                    var buffData = buff.GetBuff();
+                    Buff buffData = buff.GetBuff();
                     InstantiateBuffEffect(key, buffData.effects);
                 }
             }
@@ -295,7 +295,7 @@ namespace MultiplayerARPG
                 return;
 
             defaultModel.SetActive(isActive);
-            foreach (var renderer in defaultModel.GetComponentsInChildren<Renderer>(true))
+            foreach (Renderer renderer in defaultModel.GetComponentsInChildren<Renderer>(true))
             {
                 renderer.enabled = isActive;
             }

@@ -59,8 +59,8 @@
             if (string.IsNullOrEmpty(enterMessage))
                 return false;
 
-            var splited = enterMessage.Split(' ');
-            var commandKey = splited[0];
+            string[] splited = enterMessage.Split(' ');
+            string commandKey = splited[0];
             if (commandKey.Equals(Level))
                 return true;
             if (commandKey.Equals(StatPoint))

@@ -50,8 +50,8 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            var statsString = "";
-            var statsStringPart = "";
+            string statsString = "";
+            string statsStringPart = "";
 
             // Hp
             statsStringPart = string.Format(hpStatsFormat, Data.hp.ToString("N0"));

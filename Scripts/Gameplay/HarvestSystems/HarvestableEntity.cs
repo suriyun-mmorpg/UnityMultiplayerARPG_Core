@@ -70,24 +70,24 @@ namespace MultiplayerARPG
                 return;
 
             base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
-            var attackerCharacter = attacker as BaseCharacterEntity;
+            BaseCharacterEntity attackerCharacter = attacker as BaseCharacterEntity;
             // Play hit effect
             if (hitEffectsId == 0)
                 hitEffectsId = GameInstance.DefaultHitEffects.Id;
             if (hitEffectsId > 0)
                 RequestPlayEffect(hitEffectsId);
             // Apply damages
-            var totalDamage = 0;
-            var weaponItem = weapon.GetWeaponItem();
+            int totalDamage = 0;
+            Item weaponItem = weapon.GetWeaponItem();
             HarvestEffectiveness harvestEffectiveness;
             WeightedRandomizer<ItemDropByWeight> itemRandomizer;
             if (harvestable.CacheHarvestEffectivenesses.TryGetValue(weaponItem.weaponType, out harvestEffectiveness) &&
                 harvestable.CacheHarvestItems.TryGetValue(weaponItem.weaponType, out itemRandomizer))
             {
                 totalDamage = (int)(weaponItem.harvestDamageAmount.GetAmount(weapon.level).Random() * harvestEffectiveness.damageEffectiveness);
-                var receivingItem = itemRandomizer.TakeOne();
-                var dataId = receivingItem.item.DataId;
-                var amount = (short)(receivingItem.amountPerDamage * totalDamage);
+                ItemDropByWeight receivingItem = itemRandomizer.TakeOne();
+                int dataId = receivingItem.item.DataId;
+                short amount = (short)(receivingItem.amountPerDamage * totalDamage);
                 if (!attackerCharacter.IncreasingItemsWillOverwhelming(dataId, amount))
                     attackerCharacter.IncreaseItems(dataId, 1, amount);
             }

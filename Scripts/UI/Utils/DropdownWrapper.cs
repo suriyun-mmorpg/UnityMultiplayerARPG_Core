@@ -59,8 +59,8 @@ public class DropdownWrapper : MonoBehaviour {
             {
                 if (unityDropdown.options == null)
                     return null;
-                var options = new List<OptionData>();
-                foreach (var entry in unityDropdown.options)
+                List<OptionData> options = new List<OptionData>();
+                foreach (Dropdown.OptionData entry in unityDropdown.options)
                 {
                     options.Add(new OptionData(entry.text, entry.image));
                 }
@@ -90,8 +90,8 @@ public class DropdownWrapper : MonoBehaviour {
                     unityDropdown.options = null;
                 else
                 {
-                    var options = new List<Dropdown.OptionData>();
-                    foreach (var entry in value)
+                    List<Dropdown.OptionData> options = new List<Dropdown.OptionData>();
+                    foreach (OptionData entry in value)
                     {
                         options.Add(new Dropdown.OptionData(entry.text, entry.image));
                     }

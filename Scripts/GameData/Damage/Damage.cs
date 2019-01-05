@@ -34,7 +34,7 @@ namespace MultiplayerARPG
 
         public float GetDistance()
         {
-            var distance = 0f;
+            float distance = 0f;
             switch (damageType)
             {
                 case DamageType.Melee:
@@ -49,7 +49,7 @@ namespace MultiplayerARPG
 
         public float GetFov()
         {
-            var fov = 0f;
+            float fov = 0f;
             switch (damageType)
             {
                 case DamageType.Melee:

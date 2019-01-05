@@ -14,7 +14,7 @@ namespace MultiplayerARPG
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(Count);
-            foreach (var dealingItem in this)
+            foreach (DealingCharacterItem dealingItem in this)
             {
                 writer.Put(dealingItem.nonEquipIndex);
                 writer.Put(dealingItem.dataId);
@@ -26,11 +26,11 @@ namespace MultiplayerARPG
 
         public void Deserialize(NetDataReader reader)
         {
-            var count = reader.GetInt();
+            int count = reader.GetInt();
             Clear();
-            for (var i = 0; i < count; ++i)
+            for (int i = 0; i < count; ++i)
             {
-                var dealingItem = new DealingCharacterItem();
+                DealingCharacterItem dealingItem = new DealingCharacterItem();
                 dealingItem.nonEquipIndex = reader.GetInt();
                 dealingItem.dataId = reader.GetInt();
                 dealingItem.level = reader.GetShort();

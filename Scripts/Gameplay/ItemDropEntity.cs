@@ -33,7 +33,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                var item = Item;
+                Item item = Item;
                 return item == null ? "Unknow" : item.title;
             }
             set { }
@@ -61,7 +61,7 @@ namespace MultiplayerARPG
             base.EntityStart();
             if (IsServer)
             {
-                var id = dropData.dataId;
+                int id = dropData.dataId;
                 dropTime = Time.unscaledTime;
                 if (!GameInstance.Items.ContainsKey(id))
                     NetworkDestroy();
@@ -88,7 +88,7 @@ namespace MultiplayerARPG
             Item item;
             if (GameInstance.Items.TryGetValue(itemDataId, out item) && item.dropModel != null)
             {
-                var model = Instantiate(item.dropModel, CacheModelContainer);
+                GameObject model = Instantiate(item.dropModel, CacheModelContainer);
                 model.gameObject.SetLayerRecursively(GameInstance.itemDropLayer, true);
                 model.gameObject.SetActive(true);
                 model.RemoveComponentsInChildren<Collider>(false);
@@ -113,12 +113,12 @@ namespace MultiplayerARPG
 
         public static ItemDropEntity DropItem(BaseGameEntity dropper, int itemDataId, short level, short amount, IEnumerable<uint> looters)
         {
-            var gameInstance = GameInstance.Singleton;
+            GameInstance gameInstance = GameInstance.Singleton;
             if (gameInstance.itemDropEntityPrefab == null)
                 return null;
 
-            var dropPosition = dropper.CacheTransform.position;
-            var dropRotation = Quaternion.identity;
+            Vector3 dropPosition = dropper.CacheTransform.position;
+            Quaternion dropRotation = Quaternion.identity;
             switch (gameInstance.itemDropEntityPrefab.dimensionType)
             {
                 case DimensionType.Dimension3D:
@@ -127,7 +127,7 @@ namespace MultiplayerARPG
                     // Raycast to find hit floor
                     Vector3? aboveHitPoint = null;
                     Vector3? underHitPoint = null;
-                    var raycastLayerMask = gameInstance.GetItemDropGroundDetectionLayerMask();
+                    int raycastLayerMask = gameInstance.GetItemDropGroundDetectionLayerMask();
                     RaycastHit tempHit;
                     if (Physics.Raycast(dropPosition, Vector3.up, out tempHit, GROUND_DETECTION_DISTANCE, raycastLayerMask))
                         aboveHitPoint = tempHit.point;
@@ -152,9 +152,9 @@ namespace MultiplayerARPG
                     dropPosition = dropper.CacheTransform.position + new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, Random.Range(-1f, 1f) * gameInstance.dropDistance);
                     break;
             }
-            var identity = dropper.Manager.Assets.NetworkSpawn(gameInstance.itemDropEntityPrefab.Identity, dropPosition, dropRotation);
-            var itemDropEntity = identity.GetComponent<ItemDropEntity>();
-            var dropData = CharacterItem.Create(itemDataId, level, amount);
+            LiteNetLibIdentity identity = dropper.Manager.Assets.NetworkSpawn(gameInstance.itemDropEntityPrefab.Identity, dropPosition, dropRotation);
+            ItemDropEntity itemDropEntity = identity.GetComponent<ItemDropEntity>();
+            CharacterItem dropData = CharacterItem.Create(itemDataId, level, amount);
             itemDropEntity.dropData = dropData;
             itemDropEntity.looters = new HashSet<uint>(looters);
             return itemDropEntity;

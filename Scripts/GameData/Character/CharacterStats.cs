@@ -22,7 +22,7 @@
 
         public CharacterStats Add(CharacterStats b)
         {
-            var result = new CharacterStats();
+            CharacterStats result = new CharacterStats();
             result.hp = hp + b.hp;
             result.mp = mp + b.mp;
             result.armor = armor + b.armor;
@@ -44,7 +44,7 @@
 
         public CharacterStats Multiply(float multiplier)
         {
-            var result = new CharacterStats();
+            CharacterStats result = new CharacterStats();
             result.hp = hp * multiplier;
             result.mp = mp * multiplier;
             result.armor = armor * multiplier;

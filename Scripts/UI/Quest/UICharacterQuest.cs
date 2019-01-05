@@ -75,15 +75,15 @@ namespace MultiplayerARPG
         protected override void UpdateUI()
         {
             Profiler.BeginSample("UICharacterQuest - Update UI");
-            var quest = !Data.IsEmpty() ? Data.GetQuest() : null;
+            Quest quest = !Data.IsEmpty() ? Data.GetQuest() : null;
 
             if (quest != null && showQuestTaskList)
             {
                 CacheQuestTaskList.Generate(quest.tasks, (index, task, ui) =>
                 {
-                    var uiQuestTask = ui.GetComponent<UIQuestTask>();
-                    var isComplete = false;
-                    var progress = Data.GetProgress(character, index, out isComplete);
+                    UIQuestTask uiQuestTask = ui.GetComponent<UIQuestTask>();
+                    bool isComplete = false;
+                    int progress = Data.GetProgress(character, index, out isComplete);
                     uiQuestTask.Data = new QuestTaskProgressTuple(task, progress);
                     uiQuestTask.Show();
                 });
@@ -93,10 +93,10 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            var isComplete = CharacterQuest.isComplete;
-            var isAllTasksDone = CharacterQuest.IsAllTasksDone(character);
+            bool isComplete = CharacterQuest.isComplete;
+            bool isAllTasksDone = CharacterQuest.IsAllTasksDone(character);
 
-            var titleFormat = isComplete ? questCompleteTitleFormat : (isAllTasksDone ? questTasksCompleteTitleFormat : questOnGoingTitleFormat);
+            string titleFormat = isComplete ? questCompleteTitleFormat : (isAllTasksDone ? questTasksCompleteTitleFormat : questOnGoingTitleFormat);
 
             if (uiTextTitle != null)
                 uiTextTitle.text = string.Format(titleFormat, Quest == null ? "Unknow" : Quest.title);
@@ -114,9 +114,9 @@ namespace MultiplayerARPG
             {
                 CacheRewardItemList.Generate(Quest.rewardItems, (index, rewardItem, ui) =>
                 {
-                    var characterItem = CharacterItem.Create(rewardItem.item);
+                    CharacterItem characterItem = CharacterItem.Create(rewardItem.item);
                     characterItem.amount = rewardItem.amount;
-                    var uiCharacterItem = ui.GetComponent<UICharacterItem>();
+                    UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
                     uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, string.Empty), null, -1);
                     uiCharacterItem.Show();
                 });

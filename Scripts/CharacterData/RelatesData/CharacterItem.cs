@@ -195,7 +195,7 @@ public class CharacterItem : INetSerializable
     {
         if (GetPetItem() == null || level <= 0)
             return 0;
-        var expTree = GameInstance.Singleton.ExpTree;
+        int[] expTree = GameInstance.Singleton.ExpTree;
         if (level > expTree.Length)
             return 0;
         return expTree[level - 1];
@@ -208,7 +208,7 @@ public class CharacterItem : INetSerializable
 
     public static CharacterItem Create(int dataId, short level = 1, short amount = 1)
     {
-        var newItem = new CharacterItem();
+        CharacterItem newItem = new CharacterItem();
         Item tempItem = null;
         newItem.dataId = dataId;
         newItem.level = level;

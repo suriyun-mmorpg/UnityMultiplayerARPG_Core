@@ -64,7 +64,7 @@ namespace MultiplayerARPG
             memberAmount = party.CountMember();
             UpdateUIs();
 
-            var selectedIdx = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI) : -1;
+            int selectedIdx = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI) : -1;
             MemberSelectionManager.DeselectSelectedUI();
             MemberSelectionManager.Clear();
 
@@ -72,10 +72,10 @@ namespace MultiplayerARPG
             party.GetSortedMembers(out members);
             MemberList.Generate(members, (index, partyMember, ui) =>
             {
-                var partyMemberEntity = new SocialCharacterEntityTuple();
+                SocialCharacterEntityTuple partyMemberEntity = new SocialCharacterEntityTuple();
                 partyMemberEntity.socialCharacter = partyMember;
 
-                var uiPartyMember = ui.GetComponent<UISocialCharacter>();
+                UISocialCharacter uiPartyMember = ui.GetComponent<UISocialCharacter>();
                 uiPartyMember.uiSocialGroup = this;
                 uiPartyMember.Data = partyMemberEntity;
                 uiPartyMember.Show();
@@ -101,7 +101,7 @@ namespace MultiplayerARPG
             if (!OwningCharacterIsLeader() || MemberSelectionManager.SelectedUI == null)
                 return;
 
-            var partyMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
+            SocialCharacterData partyMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
             UISceneGlobal.Singleton.ShowMessageDialog("Change Leader", string.Format("You sure you want to promote {0} to party leader?", partyMember.characterName), false, true, false, false, null, () =>
             {
                 BasePlayerCharacterController.OwningCharacter.RequestChangePartyLeader(partyMember.id);
@@ -125,7 +125,7 @@ namespace MultiplayerARPG
             if (!OwningCharacterCanKick() || MemberSelectionManager.SelectedUI == null)
                 return;
 
-            var partyMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
+            SocialCharacterData partyMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
             UISceneGlobal.Singleton.ShowMessageDialog("Kick Member", string.Format("You sure you want to kick {0} from party?", partyMember.characterName), false, true, false, false, null, () =>
             {
                 BasePlayerCharacterController.OwningCharacter.RequestKickFromParty(partyMember.id);

@@ -32,7 +32,7 @@ namespace MultiplayerARPG
             if (calculateExp)
             {
                 calculateExp = false;
-                var expTree = new int[maxLevel];
+                int[] expTree = new int[maxLevel];
                 for (short i = 1; i <= maxLevel; ++i)
                 {
                     expTree[i - 1] = expCalculator.Calculate(i, maxLevel);

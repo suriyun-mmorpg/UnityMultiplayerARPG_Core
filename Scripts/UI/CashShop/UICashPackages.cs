@@ -98,7 +98,7 @@ namespace MultiplayerARPG
 
         private void ResponseCashPackageInfo(AckResponseCode responseCode, BaseAckMessage message)
         {
-            var castedMessage = (ResponseCashPackageInfoMessage)message;
+            ResponseCashPackageInfoMessage castedMessage = (ResponseCashPackageInfoMessage)message;
             switch (responseCode)
             {
                 case AckResponseCode.Error:
@@ -110,8 +110,8 @@ namespace MultiplayerARPG
                 default:
                     if (uiTextCash != null)
                         uiTextCash.text = string.Format(cashFormat, castedMessage.cash.ToString("N0"));
-                    var cashPackages = new List<CashPackage>();
-                    foreach (var cashPackageId in castedMessage.cashPackageIds)
+                    List<CashPackage> cashPackages = new List<CashPackage>();
+                    foreach (int cashPackageId in castedMessage.cashPackageIds)
                     {
                         CashPackage cashPackage;
                         if (GameInstance.CashPackages.TryGetValue(cashPackageId, out cashPackage))
@@ -120,13 +120,13 @@ namespace MultiplayerARPG
                         }
                     }
 
-                    var selectedIdx = SelectionManager.SelectedUI != null ? SelectionManager.IndexOf(SelectionManager.SelectedUI) : -1;
+                    int selectedIdx = SelectionManager.SelectedUI != null ? SelectionManager.IndexOf(SelectionManager.SelectedUI) : -1;
                     SelectionManager.DeselectSelectedUI();
                     SelectionManager.Clear();
 
                     CacheList.Generate(cashPackages, (index, cashShopItem, ui) =>
                     {
-                        var uiCashPackage = ui.GetComponent<UICashPackage>();
+                        UICashPackage uiCashPackage = ui.GetComponent<UICashPackage>();
                         uiCashPackage.uiCashPackages = this;
                         uiCashPackage.Data = cashShopItem;
                         uiCashPackage.Show();

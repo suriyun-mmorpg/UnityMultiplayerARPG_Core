@@ -74,7 +74,7 @@ namespace MultiplayerARPG
         public virtual bool CanSendPartyInvitation(BasePlayerCharacterEntity inviteCharacterEntity, uint objectId, out BasePlayerCharacterEntity targetCharacterEntity)
         {
             targetCharacterEntity = null;
-            var partyId = inviteCharacterEntity.PartyId;
+            int partyId = inviteCharacterEntity.PartyId;
             PartyData party;
             if (partyId <= 0 || !parties.TryGetValue(partyId, out party))
             {
@@ -290,7 +290,7 @@ namespace MultiplayerARPG
         public virtual bool CanSendGuildInvitation(BasePlayerCharacterEntity inviteCharacterEntity, uint objectId, out BasePlayerCharacterEntity targetCharacterEntity)
         {
             targetCharacterEntity = null;
-            var guildId = inviteCharacterEntity.GuildId;
+            int guildId = inviteCharacterEntity.GuildId;
             GuildData guild;
             if (guildId <= 0 || !guilds.TryGetValue(guildId, out guild))
             {
@@ -474,7 +474,7 @@ namespace MultiplayerARPG
                 return;
 
             BasePlayerCharacterEntity playerCharacterEntity;
-            foreach (var member in party.GetMembers())
+            foreach (SocialCharacterData member in party.GetMembers())
             {
                 if (TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendChangePartyLeaderToClient(playerCharacterEntity.ConnectionId, party);
@@ -492,7 +492,7 @@ namespace MultiplayerARPG
                 return;
 
             BasePlayerCharacterEntity playerCharacterEntity;
-            foreach (var member in party.GetMembers())
+            foreach (SocialCharacterData member in party.GetMembers())
             {
                 if (TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendPartySettingToClient(playerCharacterEntity.ConnectionId, party);
@@ -514,7 +514,7 @@ namespace MultiplayerARPG
             if (party == null)
                 return;
 
-            foreach (var member in party.GetMembers())
+            foreach (SocialCharacterData member in party.GetMembers())
             {
                 SendAddPartyMemberToClient(connectionId, party.id, member.id, member.characterName, member.dataId, member.level);
             }
@@ -526,7 +526,7 @@ namespace MultiplayerARPG
                 return;
 
             BasePlayerCharacterEntity playerCharacterEntity;
-            foreach (var member in party.GetMembers())
+            foreach (SocialCharacterData member in party.GetMembers())
             {
                 if (!member.id.Equals(characterId) && TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendAddPartyMemberToClient(playerCharacterEntity.ConnectionId, party.id, characterId, characterName, dataId, level);
@@ -540,7 +540,7 @@ namespace MultiplayerARPG
         
         public void SendUpdatePartyMembersToClient(long connectionId, PartyData party)
         {
-            foreach (var member in party.GetMembers())
+            foreach (SocialCharacterData member in party.GetMembers())
             {
                 SendUpdatePartyMemberToClient(connectionId, party.id, party.IsOnline(member.id), member.id, member.characterName, member.dataId, member.level, member.currentHp, member.maxHp, member.currentMp, member.maxMp);
             }
@@ -554,7 +554,7 @@ namespace MultiplayerARPG
         public void SendRemovePartyMemberToClients(PartyData party, string characterId)
         {
             BasePlayerCharacterEntity playerCharacterEntity;
-            foreach (var member in party.GetMembers())
+            foreach (SocialCharacterData member in party.GetMembers())
             {
                 if (!member.id.Equals(characterId) && TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendRemovePartyMemberToClient(playerCharacterEntity.ConnectionId, party.id, characterId);
@@ -583,7 +583,7 @@ namespace MultiplayerARPG
                 return;
 
             BasePlayerCharacterEntity playerCharacterEntity;
-            foreach (var member in guild.GetMembers())
+            foreach (SocialCharacterData member in guild.GetMembers())
             {
                 if (TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendChangeGuildLeaderToClient(playerCharacterEntity.ConnectionId, guild);
@@ -604,7 +604,7 @@ namespace MultiplayerARPG
                 return;
 
             BasePlayerCharacterEntity playerCharacterEntity;
-            foreach (var member in guild.GetMembers())
+            foreach (SocialCharacterData member in guild.GetMembers())
             {
                 if (TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendSetGuildMessageToClient(playerCharacterEntity.ConnectionId, guild);
@@ -622,7 +622,7 @@ namespace MultiplayerARPG
                 return;
 
             BasePlayerCharacterEntity playerCharacterEntity;
-            foreach (var member in guild.GetMembers())
+            foreach (SocialCharacterData member in guild.GetMembers())
             {
                 if (TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendSetGuildRoleToClient(playerCharacterEntity.ConnectionId, guild.id, guildRole, roleName, canInvite, canKick, shareExpPercentage);
@@ -634,7 +634,7 @@ namespace MultiplayerARPG
             if (guild == null)
                 return;
 
-            var roles = guild.GetRoles();
+            List<GuildRoleData> roles = guild.GetRoles();
             GuildRoleData guildRoleData;
             for (byte role = 0; role < roles.Count; ++role)
             {
@@ -654,7 +654,7 @@ namespace MultiplayerARPG
                 return;
 
             BasePlayerCharacterEntity playerCharacterEntity;
-            foreach (var member in guild.GetMembers())
+            foreach (SocialCharacterData member in guild.GetMembers())
             {
                 if (TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendSetGuildMemberRoleToClient(playerCharacterEntity.ConnectionId, guild.id, characterId, guildRole);
@@ -667,7 +667,7 @@ namespace MultiplayerARPG
                 return;
 
             byte role;
-            foreach (var member in guild.GetMembers())
+            foreach (SocialCharacterData member in guild.GetMembers())
             {
                 if (guild.TryGetMemberRole(member.id, out role))
                     SendSetGuildMemberRoleToClient(connectionId, guild.id, member.id, role);
@@ -689,7 +689,7 @@ namespace MultiplayerARPG
             if (guild == null)
                 return;
 
-            foreach (var member in guild.GetMembers())
+            foreach (SocialCharacterData member in guild.GetMembers())
             {
                 SendAddGuildMemberToClient(connectionId, guild.id, member.id, member.characterName, member.dataId, member.level);
             }
@@ -701,7 +701,7 @@ namespace MultiplayerARPG
                 return;
 
             BasePlayerCharacterEntity playerCharacterEntity;
-            foreach (var member in guild.GetMembers())
+            foreach (SocialCharacterData member in guild.GetMembers())
             {
                 if (!member.id.Equals(characterId) && TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendAddGuildMemberToClient(playerCharacterEntity.ConnectionId, guild.id, characterId, characterName, dataId, level);
@@ -718,7 +718,7 @@ namespace MultiplayerARPG
             if (guild == null)
                 return;
 
-            foreach (var member in guild.GetMembers())
+            foreach (SocialCharacterData member in guild.GetMembers())
             {
                 SendUpdateGuildMemberToClient(connectionId, guild.id, guild.IsOnline(member.id), member.id, member.characterName, member.dataId, member.level, member.currentHp, member.maxHp, member.currentMp, member.maxMp);
             }
@@ -732,7 +732,7 @@ namespace MultiplayerARPG
         public void SendRemoveGuildMemberToClients(GuildData guild, string characterId)
         {
             BasePlayerCharacterEntity playerCharacterEntity;
-            foreach (var member in guild.GetMembers())
+            foreach (SocialCharacterData member in guild.GetMembers())
             {
                 if (!member.id.Equals(characterId) && TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendRemoveGuildMemberToClient(playerCharacterEntity.ConnectionId, guild.id, characterId);
@@ -749,7 +749,7 @@ namespace MultiplayerARPG
             if (guild == null)
                 return;
 
-            foreach (var guildSkillLevel in guild.GetSkillLevels())
+            foreach (KeyValuePair<int, short> guildSkillLevel in guild.GetSkillLevels())
             {
                 SendSetGuildSkillLevelToClient(connectionId, guild.id, guildSkillLevel.Key, guildSkillLevel.Value);
             }
@@ -760,9 +760,9 @@ namespace MultiplayerARPG
             if (guild == null)
                 return;
 
-            var skillLevel = guild.GetSkillLevel(dataId);
+            short skillLevel = guild.GetSkillLevel(dataId);
             BasePlayerCharacterEntity playerCharacterEntity;
-            foreach (var member in guild.GetMembers())
+            foreach (SocialCharacterData member in guild.GetMembers())
             {
                 if (TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendSetGuildSkillLevelToClient(playerCharacterEntity.ConnectionId, guild.id, dataId, skillLevel);
@@ -780,7 +780,7 @@ namespace MultiplayerARPG
                 return;
 
             BasePlayerCharacterEntity playerCharacterEntity;
-            foreach (var member in guild.GetMembers())
+            foreach (SocialCharacterData member in guild.GetMembers())
             {
                 if (TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
                     SendGuildLevelExpSkillPointToClient(playerCharacterEntity.ConnectionId, guild);
@@ -789,8 +789,8 @@ namespace MultiplayerARPG
 
         public virtual void RespawnCharacter(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            var respawnMapName = playerCharacterEntity.RespawnMapName;
-            var respawnPosition = playerCharacterEntity.RespawnPosition;
+            string respawnMapName = playerCharacterEntity.RespawnMapName;
+            Vector3 respawnPosition = playerCharacterEntity.RespawnPosition;
             if (CurrentMapInfo != null && CurrentMapInfo.overrideRespawnPoint)
             {
                 if (CurrentMapInfo.overrideRespawnPointScene != null)
@@ -815,7 +815,7 @@ namespace MultiplayerARPG
             if (!CanCreateParty(playerCharacterEntity))
                 return;
 
-            var party = new PartyData(partyId, shareExp, shareItem, playerCharacterEntity);
+            PartyData party = new PartyData(partyId, shareExp, shareItem, playerCharacterEntity);
             parties[partyId] = party;
             playerCharacterEntity.PartyId = partyId;
             SendCreatePartyToClient(playerCharacterEntity.ConnectionId, party);
@@ -888,7 +888,7 @@ namespace MultiplayerARPG
 
             if (party.IsLeader(playerCharacterEntity))
             {
-                foreach (var memberId in party.GetMemberIds())
+                foreach (string memberId in party.GetMemberIds())
                 {
                     BasePlayerCharacterEntity memberCharacterEntity;
                     if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
@@ -915,7 +915,7 @@ namespace MultiplayerARPG
                 return;
 
             gameInstance.SocialSystemSetting.ReduceCreateGuildResource(playerCharacterEntity);
-            var guild = new GuildData(guildId, guildName, playerCharacterEntity);
+            GuildData guild = new GuildData(guildId, guildName, playerCharacterEntity);
             guilds[guildId] = guild;
             playerCharacterEntity.GuildId = guildId;
             playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
@@ -962,7 +962,7 @@ namespace MultiplayerARPG
             guild.SetRole(guildRole, roleName, canInvite, canKick, shareExpPercentage);
             guilds[guildId] = guild;
             // Change characters guild role
-            foreach (var memberId in guild.GetMemberIds())
+            foreach (string memberId in guild.GetMemberIds())
             {
                 BasePlayerCharacterEntity memberCharacterEntity;
                 if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
@@ -1033,7 +1033,7 @@ namespace MultiplayerARPG
 
             if (guild.IsLeader(playerCharacterEntity))
             {
-                foreach (var memberId in guild.GetMemberIds())
+                foreach (string memberId in guild.GetMemberIds())
                 {
                     BasePlayerCharacterEntity memberCharacterEntity;
                     if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))

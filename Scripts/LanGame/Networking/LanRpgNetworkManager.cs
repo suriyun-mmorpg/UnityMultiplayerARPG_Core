@@ -27,7 +27,7 @@ namespace MultiplayerARPG
 
         public void StartGame()
         {
-            var gameServiceConnection = gameInstance.NetworkSetting;
+            NetworkSetting gameServiceConnection = gameInstance.NetworkSetting;
             switch (startType)
             {
                 case GameStartType.Host:
@@ -48,11 +48,11 @@ namespace MultiplayerARPG
         protected override void Update()
         {
             base.Update();
-            var tempUnscaledTime = Time.unscaledTime;
+            float tempUnscaledTime = Time.unscaledTime;
             if (tempUnscaledTime - lastSaveTime > autoSaveDuration)
             {
                 Profiler.BeginSample("LanRpgNetworkManager - Save Data");
-                var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+                BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
                 if (owningCharacter != null && IsNetworkActive)
                 {
                     selectedCharacter = owningCharacter.CloneTo(selectedCharacter);
@@ -86,7 +86,7 @@ namespace MultiplayerARPG
         public override void DeserializeClientReadyExtra(LiteNetLibIdentity playerIdentity, long connectionId, NetDataReader reader)
         {
             if (LogDev) Debug.Log("[LanRpgNetworkManager] Deserializing client ready extra");
-            var playerCharacterData = new PlayerCharacterData().DeserializeCharacterData(reader);
+            PlayerCharacterData playerCharacterData = new PlayerCharacterData().DeserializeCharacterData(reader);
             BasePlayerCharacterEntity entityPrefab = playerCharacterData.GetEntityPrefab() as BasePlayerCharacterEntity;
             // If it is not allow this character data, disconnect user
             if (entityPrefab == null)
@@ -96,13 +96,13 @@ namespace MultiplayerARPG
             }
             if (!SceneManager.GetActiveScene().name.Equals(playerCharacterData.CurrentMapName))
                 playerCharacterData.CurrentPosition = teleportPosition.HasValue ? teleportPosition.Value : CurrentMapInfo.startPosition;
-            var identity = Assets.NetworkSpawn(entityPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
-            var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
+            LiteNetLibIdentity identity = Assets.NetworkSpawn(entityPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
+            BasePlayerCharacterEntity playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterData.CloneTo(playerCharacterEntity);
             // Summon saved summons
-            for (var i = 0; i < playerCharacterEntity.Summons.Count; ++i)
+            for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
             {
-                var summon = playerCharacterEntity.Summons[i];
+                CharacterSummon summon = playerCharacterEntity.Summons[i];
                 summon.Summon(playerCharacterEntity, summon.Level, summon.summonRemainsDuration, summon.Exp, summon.CurrentHp, summon.CurrentMp);
                 playerCharacterEntity.Summons[i] = summon;
             }
@@ -114,7 +114,7 @@ namespace MultiplayerARPG
             // Load world for first character (host)
             if (playerCharacters.Count == 0)
             {
-                var worldSaveData = new WorldSaveData();
+                WorldSaveData worldSaveData = new WorldSaveData();
                 worldSaveData.LoadPersistentData(playerCharacterEntity.Id, playerCharacterEntity.CurrentMapName);
                 StartCoroutine(SpawnBuildingsAndHarvestables(worldSaveData));
             }
@@ -126,13 +126,13 @@ namespace MultiplayerARPG
         {
             yield return new WaitForSecondsRealtime(0.1f);
             // Spawn buildings
-            foreach (var building in worldSaveData.buildings)
+            foreach (BuildingSaveData building in worldSaveData.buildings)
             {
                 CreateBuildingEntity(building, true);
             }
             // Spawn harvestables
-            var harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
-            foreach (var harvestableSpawnArea in harvestableSpawnAreas)
+            HarvestableSpawnArea[] harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
+            foreach (HarvestableSpawnArea harvestableSpawnArea in harvestableSpawnAreas)
             {
                 harvestableSpawnArea.SpawnAll();
             }
@@ -141,9 +141,9 @@ namespace MultiplayerARPG
         private void SaveWorld()
         {
             // Save building entities / Tree / Rocks
-            var playerCharacterEntity = BasePlayerCharacterController.OwningCharacter;
-            var worldSaveData = new WorldSaveData();
-            foreach (var buildingEntity in buildingEntities.Values)
+            BasePlayerCharacterEntity playerCharacterEntity = BasePlayerCharacterController.OwningCharacter;
+            WorldSaveData worldSaveData = new WorldSaveData();
+            foreach (BuildingEntity buildingEntity in buildingEntities.Values)
             {
                 worldSaveData.buildings.Add(new BuildingSaveData()
                 {
@@ -165,7 +165,7 @@ namespace MultiplayerARPG
             if (!CanWarpCharacter(playerCharacterEntity))
                 return;
             base.WarpCharacter(playerCharacterEntity, mapName, position);
-            var connectId = playerCharacterEntity.ConnectionId;
+            long connectId = playerCharacterEntity.ConnectionId;
             if (!string.IsNullOrEmpty(mapName) &&
                 !mapName.Equals(playerCharacterEntity.CurrentMapName) &&
                 playerCharacters.ContainsKey(connectId) &&

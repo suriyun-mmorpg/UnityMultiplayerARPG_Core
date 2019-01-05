@@ -15,8 +15,8 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            var skill = Data.skill;
-            var level = Data.targetLevel;
+            Skill skill = Data.skill;
+            short level = Data.targetLevel;
 
             if (uiTextRequireLevel != null)
             {

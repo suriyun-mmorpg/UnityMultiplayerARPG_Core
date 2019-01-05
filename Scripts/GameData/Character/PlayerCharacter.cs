@@ -81,10 +81,10 @@ namespace MultiplayerARPG
                     }
                 }
             }
-            var equipedPositions = new List<string>();
-            for (var i = 0; i < armorItems.Length; ++i)
+            List<string> equipedPositions = new List<string>();
+            for (int i = 0; i < armorItems.Length; ++i)
             {
-                var armorItem = armorItems[i];
+                Item armorItem = armorItems[i];
                 if (armorItem == null)
                     continue;
 

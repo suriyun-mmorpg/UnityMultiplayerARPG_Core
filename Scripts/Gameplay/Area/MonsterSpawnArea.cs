@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -23,7 +24,7 @@ namespace MultiplayerARPG
         {
             if (monsterCharacterEntity != null)
             {
-                for (var i = 0; i < amount; ++i)
+                for (int i = 0; i < amount; ++i)
                 {
                     Spawn(0);
                 }
@@ -38,10 +39,10 @@ namespace MultiplayerARPG
         IEnumerator SpawnRoutine(float delay)
         {
             yield return new WaitForSecondsRealtime(delay);
-            var spawnPosition = GetRandomPosition();
-            var spawnRotation = GetRandomRotation();
-            var identity = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(monsterCharacterEntity.Identity, spawnPosition, spawnRotation);
-            var entity = identity.GetComponent<BaseMonsterCharacterEntity>();
+            Vector3 spawnPosition = GetRandomPosition();
+            Quaternion spawnRotation = GetRandomRotation();
+            LiteNetLibIdentity identity = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(monsterCharacterEntity.Identity, spawnPosition, spawnRotation);
+            BaseMonsterCharacterEntity entity = identity.GetComponent<BaseMonsterCharacterEntity>();
             entity.Level = level;
             entity.SetSpawnArea(this, spawnPosition);
         }

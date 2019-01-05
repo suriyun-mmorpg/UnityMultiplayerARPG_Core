@@ -74,7 +74,7 @@ namespace MultiplayerARPG
         {
             base.ApplySkill(characterSkill, position, skillAttackType, weapon, damageInfo, allDamageAmounts);
 
-            var skill = characterSkill.GetSkill();
+            Skill skill = characterSkill.GetSkill();
             switch (skill.skillType)
             {
                 case SkillType.CraftItem:
@@ -100,7 +100,7 @@ namespace MultiplayerARPG
             if (attacker == null)
                 return false;
 
-            var characterEntity = attacker as BaseCharacterEntity;
+            BaseCharacterEntity characterEntity = attacker as BaseCharacterEntity;
             if (characterEntity == null)
                 return false;
 
@@ -131,14 +131,14 @@ namespace MultiplayerARPG
             if (characterEntity is BasePlayerCharacterEntity)
             {
                 // If this character is in same party or guild with another character so it is ally
-                var playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
+                BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
                 return (PartyId > 0 && PartyId == playerCharacterEntity.PartyId) ||
                     (GuildId > 0 && GuildId == playerCharacterEntity.GuildId);
             }
             if (characterEntity is BaseMonsterCharacterEntity)
             {
                 // If this character is summoner so it is ally
-                var monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
+                BaseMonsterCharacterEntity monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
                 return monsterCharacterEntity.Summoner != null && monsterCharacterEntity.Summoner == this;
             }
             return false;
@@ -158,7 +158,7 @@ namespace MultiplayerARPG
             if (characterEntity is BaseMonsterCharacterEntity)
             {
                 // If this character is not summoner so it is enemy
-                var monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
+                BaseMonsterCharacterEntity monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
                 return monsterCharacterEntity.Summoner == null || monsterCharacterEntity.Summoner != this;
             }
             return false;
@@ -166,13 +166,13 @@ namespace MultiplayerARPG
 
         public override void Killed(BaseCharacterEntity lastAttacker)
         {
-            var expLostPercentage = GameInstance.GameplayRule.GetExpLostPercentageWhenDeath(this);
+            float expLostPercentage = GameInstance.GameplayRule.GetExpLostPercentageWhenDeath(this);
             GuildData guildData;
             if (GameManager.TryGetGuild(GuildId, out guildData))
                 expLostPercentage -= expLostPercentage * guildData.DecreaseExpLostPercentage;
             if (expLostPercentage <= 0f)
                 expLostPercentage = 0f;
-            var exp = Exp;
+            int exp = Exp;
             exp -= (int)(this.GetNextLevelExp() * expLostPercentage / 100f);
             if (exp <= 0)
                 exp = 0;
@@ -226,9 +226,9 @@ namespace MultiplayerARPG
             if (!IsServer || monsterCharacterEntity == null)
                 return;
 
-            for (var i = 0; i < Quests.Count; ++i)
+            for (int i = 0; i < Quests.Count; ++i)
             {
-                var quest = Quests[i];
+                CharacterQuest quest = Quests[i];
                 if (quest.AddKillMonster(monsterCharacterEntity, 1))
                     quests[i] = quest;
             }
@@ -238,13 +238,13 @@ namespace MultiplayerARPG
         {
             if (CoCharacter == null)
                 return;
-            var tempDealingItems = new List<DealingCharacterItem>(DealingItems);
-            for (var i = nonEquipItems.Count - 1; i >= 0; --i)
+            List<DealingCharacterItem> tempDealingItems = new List<DealingCharacterItem>(DealingItems);
+            for (int i = nonEquipItems.Count - 1; i >= 0; --i)
             {
-                var nonEquipItem = nonEquipItems[i];
-                for (var j = tempDealingItems.Count - 1; j >= 0; --j)
+                CharacterItem nonEquipItem = nonEquipItems[i];
+                for (int j = tempDealingItems.Count - 1; j >= 0; --j)
                 {
-                    var dealingItem = tempDealingItems[j];
+                    DealingCharacterItem dealingItem = tempDealingItems[j];
                     if (dealingItem.nonEquipIndex == i && nonEquipItem.amount >= dealingItem.amount)
                     {
                         nonEquipItem.amount -= dealingItem.amount;

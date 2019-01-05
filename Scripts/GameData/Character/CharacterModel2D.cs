@@ -41,7 +41,7 @@ namespace MultiplayerARPG
                 if (cacheRightHandAttackAnimations == null)
                 {
                     cacheRightHandAttackAnimations = new Dictionary<int, ActionAnimation2D>();
-                    foreach (var attackAnimation in weaponAnimations2D)
+                    foreach (WeaponAnimations2D attackAnimation in weaponAnimations2D)
                     {
                         if (attackAnimation.weaponType == null) continue;
                         cacheRightHandAttackAnimations[attackAnimation.weaponType.DataId] = attackAnimation.rightHandAttackAnimation;
@@ -59,7 +59,7 @@ namespace MultiplayerARPG
                 if (cacheLeftHandAttackAnimations == null)
                 {
                     cacheLeftHandAttackAnimations = new Dictionary<int, ActionAnimation2D>();
-                    foreach (var attackAnimation in weaponAnimations2D)
+                    foreach (WeaponAnimations2D attackAnimation in weaponAnimations2D)
                     {
                         if (attackAnimation.weaponType == null) continue;
                         cacheLeftHandAttackAnimations[attackAnimation.weaponType.DataId] = attackAnimation.leftHandAttackAnimation;
@@ -77,7 +77,7 @@ namespace MultiplayerARPG
                 if (cacheSkillCastAnimations == null)
                 {
                     cacheSkillCastAnimations = new Dictionary<int, ActionAnimation2D>();
-                    foreach (var skillCastAnimation in skillCastAnimations2D)
+                    foreach (SkillCastAnimations2D skillCastAnimation in skillCastAnimations2D)
                     {
                         if (skillCastAnimation.skill == null) continue;
                         cacheSkillCastAnimations[skillCastAnimation.skill.DataId] = skillCastAnimation.animation;
@@ -249,14 +249,14 @@ namespace MultiplayerARPG
         IEnumerator PlayActionAnimationRoutine(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
         {
             // If animator is not null, play the action animation
-            var animation = GetActionAnimation(animActionType, dataId);
+            ActionAnimation2D animation = GetActionAnimation(animActionType, dataId);
             if (animation != null)
             {
-                var anim = animation.GetClipByDirection(currentDirectionType);
+                AnimationClip2D anim = animation.GetClipByDirection(currentDirectionType);
                 if (anim != null)
                 {
                     playingAction = true;
-                    var audioClip = animation.GetRandomAudioClip();
+                    AudioClip audioClip = animation.GetRandomAudioClip();
                     if (audioClip != null)
                         AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
                     // Waits by current transition + clip duration before end animation
@@ -288,7 +288,7 @@ namespace MultiplayerARPG
             triggerDuration = 0f;
             totalDuration = 0f;
             if (animation2D == null) return false;
-            var clip = animation2D.GetClipByDirection(currentDirectionType);
+            AnimationClip2D clip = animation2D.GetClipByDirection(currentDirectionType);
             if (clip == null) return false;
             triggerDuration = clip.duration * animation2D.triggerDurationRate;
             totalDuration = clip.duration + animation2D.extraDuration;
@@ -304,7 +304,7 @@ namespace MultiplayerARPG
             triggerDuration = 0f;
             totalDuration = 0f;
             if (animation2D == null) return false;
-            var clip = animation2D.GetClipByDirection(currentDirectionType);
+            AnimationClip2D clip = animation2D.GetClipByDirection(currentDirectionType);
             if (clip == null) return false;
             triggerDuration = clip.duration * animation2D.triggerDurationRate;
             totalDuration = clip.duration + animation2D.extraDuration;
@@ -320,7 +320,7 @@ namespace MultiplayerARPG
             triggerDuration = 0f;
             totalDuration = 0f;
             if (animation2D == null) return false;
-            var clip = animation2D.GetClipByDirection(currentDirectionType);
+            AnimationClip2D clip = animation2D.GetClipByDirection(currentDirectionType);
             if (clip == null) return false;
             triggerDuration = clip.duration * animation2D.triggerDurationRate;
             totalDuration = clip.duration + animation2D.extraDuration;
@@ -333,7 +333,7 @@ namespace MultiplayerARPG
             if (!CacheSkillCastAnimations.TryGetValue(dataId, out animation2D))
                 animation2D = defaultSkillCastAnimation2D;
             if (animation2D == null) return false;
-            var clip = animation2D.GetClipByDirection(currentDirectionType);
+            AnimationClip2D clip = animation2D.GetClipByDirection(currentDirectionType);
             if (clip == null) return false;
             return true;
         }

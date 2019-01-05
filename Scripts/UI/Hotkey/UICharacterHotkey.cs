@@ -24,8 +24,8 @@ namespace MultiplayerARPG
             if (Input.GetKeyDown(key))
             {
                 bool canUse = true;
-                var fields = FindObjectsOfType<InputField>();
-                foreach (var field in fields)
+                InputField[] fields = FindObjectsOfType<InputField>();
+                foreach (InputField field in fields)
                 {
                     if (field.isFocused)
                     {
@@ -40,21 +40,21 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            var characterHotkey = Data;
-            var skill = characterHotkey.GetSkill();
-            var item = characterHotkey.GetItem();
+            CharacterHotkey characterHotkey = Data;
+            Skill skill = characterHotkey.GetSkill();
+            Item item = characterHotkey.GetItem();
 
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (uiCharacterSkill != null)
             {
                 if (skill == null)
                     uiCharacterSkill.Hide();
                 else
                 {
-                    var index = owningCharacter.IndexOfSkill(characterHotkey.dataId);
+                    int index = owningCharacter.IndexOfSkill(characterHotkey.dataId);
                     if (index >= 0 && index < owningCharacter.Skills.Count)
                     {
-                        var characterSkill = owningCharacter.Skills[index];
+                        CharacterSkill characterSkill = owningCharacter.Skills[index];
                         uiCharacterSkill.Setup(new SkillTuple(characterSkill.GetSkill(), characterSkill.level), owningCharacter, index);
                         uiCharacterSkill.Show();
                     }
@@ -69,10 +69,10 @@ namespace MultiplayerARPG
                     uiCharacterItem.Hide();
                 else
                 {
-                    var index = owningCharacter.IndexOfNonEquipItem(characterHotkey.dataId);
+                    int index = owningCharacter.IndexOfNonEquipItem(characterHotkey.dataId);
                     if (index >= 0 && index < owningCharacter.NonEquipItems.Count)
                     {
-                        var characterItem = owningCharacter.NonEquipItems[index];
+                        CharacterItem characterItem = owningCharacter.NonEquipItems[index];
                         uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, string.Empty), owningCharacter, index);
                         uiCharacterItem.Show();
                     }
@@ -93,7 +93,7 @@ namespace MultiplayerARPG
 
         public void OnClickUse()
         {
-            var owningCharacterController = BasePlayerCharacterController.Singleton;
+            BasePlayerCharacterController owningCharacterController = BasePlayerCharacterController.Singleton;
             if (owningCharacterController != null)
                 owningCharacterController.UseHotkey(indexOfData);
         }

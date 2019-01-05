@@ -8,8 +8,8 @@ namespace MultiplayerARPG
     {
         protected virtual void UpdateInput()
         {
-            var fields = ComponentCollector.Get(typeof(InputFieldWrapper));
-            foreach (var field in fields)
+            List<object> fields = ComponentCollector.Get(typeof(InputFieldWrapper));
+            foreach (object field in fields)
             {
                 if (((InputFieldWrapper)field).isFocused)
                 {
@@ -101,7 +101,7 @@ namespace MultiplayerARPG
             {
                 targetEntity = null;
                 targetPosition = null;
-                var mouseUpOnTarget = getMouseUp && !isMouseDragOrHoldOrOverUI && (controllerMode == PlayerCharacterControllerMode.PointClick || controllerMode == PlayerCharacterControllerMode.Both);
+                bool mouseUpOnTarget = getMouseUp && !isMouseDragOrHoldOrOverUI && (controllerMode == PlayerCharacterControllerMode.PointClick || controllerMode == PlayerCharacterControllerMode.Both);
                 tempCount = FindClickObjects(out tempVector3);
                 for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
                 {
@@ -155,7 +155,7 @@ namespace MultiplayerARPG
                     // When holding on target
                     else if (isMouseHoldAndNotDrag)
                     {
-                        var buildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
+                        BuildingMaterial buildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
                         if (buildingMaterial != null && buildingMaterial.buildingEntity != null && !buildingMaterial.buildingEntity.IsDead())
                         {
                             targetPosition = buildingMaterial.buildingEntity.CacheTransform.position;
@@ -222,8 +222,8 @@ namespace MultiplayerARPG
             }
 
             // If mobile platforms, don't receive input raw to make it smooth
-            var raw = !InputManager.useMobileInputOnNonMobile && !Application.isMobilePlatform;
-            var moveDirection = GetMoveDirection(InputManager.GetAxis("Horizontal", raw), InputManager.GetAxis("Vertical", raw));
+            bool raw = !InputManager.useMobileInputOnNonMobile && !Application.isMobilePlatform;
+            Vector3 moveDirection = GetMoveDirection(InputManager.GetAxis("Horizontal", raw), InputManager.GetAxis("Vertical", raw));
 
             if (moveDirection.magnitude != 0f)
             {
@@ -235,7 +235,7 @@ namespace MultiplayerARPG
             // For WASD mode, Using skill when player pressed hotkey
             if (queueUsingSkill.HasValue)
             {
-                var queueUsingSkillValue = queueUsingSkill.Value;
+                UsingSkillData queueUsingSkillValue = queueUsingSkill.Value;
                 destination = null;
                 PlayerCharacterEntity.StopMove();
                 Skill skill = null;
@@ -246,7 +246,7 @@ namespace MultiplayerARPG
                         BaseCharacterEntity targetEntity;
                         if (wasdLockAttackTarget && !TryGetAttackingCharacter(out targetEntity))
                         {
-                            var nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance, false, true, false);
+                            BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance, false, true, false);
                             if (nearestTarget != null)
                                 PlayerCharacterEntity.SetTargetEntity(nearestTarget);
                             else
@@ -269,7 +269,7 @@ namespace MultiplayerARPG
                 BaseCharacterEntity targetEntity;
                 if (wasdLockAttackTarget && !TryGetAttackingCharacter(out targetEntity))
                 {
-                    var nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetAttackDistance() + lockAttackTargetDistance, false, true, false);
+                    BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetAttackDistance() + lockAttackTargetDistance, false, true, false);
                     if (nearestTarget != null)
                         PlayerCharacterEntity.SetTargetEntity(nearestTarget);
                     else
@@ -295,7 +295,7 @@ namespace MultiplayerARPG
         {
             // Current building UI
             BuildingEntity currentBuilding;
-            var uiCurrentBuilding = CacheUISceneGameplay.uiCurrentBuilding;
+            UICurrentBuilding uiCurrentBuilding = CacheUISceneGameplay.uiCurrentBuilding;
             if (uiCurrentBuilding != null)
             {
                 if (uiCurrentBuilding.IsVisible() && !PlayerCharacterEntity.TryGetTargetEntity(out currentBuilding))
@@ -303,7 +303,7 @@ namespace MultiplayerARPG
             }
 
             // Construct building UI
-            var uiConstructBuilding = CacheUISceneGameplay.uiConstructBuilding;
+            UIConstructBuilding uiConstructBuilding = CacheUISceneGameplay.uiConstructBuilding;
             if (uiConstructBuilding != null)
             {
                 if (uiConstructBuilding.IsVisible() && currentBuildingEntity == null)
@@ -315,7 +315,7 @@ namespace MultiplayerARPG
             if (currentBuildingEntity == null)
                 return;
 
-            var isPointerOverUI = CacheUISceneGameplay != null && CacheUISceneGameplay.IsPointerOverUIObject();
+            bool isPointerOverUI = CacheUISceneGameplay != null && CacheUISceneGameplay.IsPointerOverUIObject();
             if (Input.GetMouseButtonDown(0))
             {
                 isMouseDragOrHoldOrOverUI = false;
@@ -323,8 +323,8 @@ namespace MultiplayerARPG
                 mouseDownPosition = Input.mousePosition;
             }
 
-            var isMouseDragDetected = (Input.mousePosition - mouseDownPosition).magnitude > DETECT_MOUSE_DRAG_DISTANCE;
-            var isMouseHoldDetected = Time.unscaledTime - mouseDownTime > DETECT_MOUSE_HOLD_DURATION;
+            bool isMouseDragDetected = (Input.mousePosition - mouseDownPosition).magnitude > DETECT_MOUSE_DRAG_DISTANCE;
+            bool isMouseHoldDetected = Time.unscaledTime - mouseDownTime > DETECT_MOUSE_HOLD_DURATION;
             if (!isMouseDragOrHoldOrOverUI && (isMouseDragDetected || isMouseHoldDetected || isPointerOverUI))
                 isMouseDragOrHoldOrOverUI = true;
             if (!isPointerOverUI && Input.GetMouseButtonUp(0) && !isMouseDragOrHoldOrOverUI)
@@ -351,11 +351,11 @@ namespace MultiplayerARPG
                 }
 
                 // Find attack distance and fov, from weapon or skill
-                var attackDistance = 0f;
-                var attackFov = 0f;
+                float attackDistance = 0f;
+                float attackFov = 0f;
                 if (!GetAttackDistanceAndFov(out attackDistance, out attackFov))
                     return;
-                var actDistance = attackDistance;
+                float actDistance = attackDistance;
                 actDistance -= actDistance * 0.1f;
                 actDistance -= StoppingDistance;
                 if (FindTarget(targetEnemy.gameObject, actDistance, gameInstance.characterLayer.Mask))
@@ -383,7 +383,7 @@ namespace MultiplayerARPG
                     PlayerCharacterEntity.SetTargetEntity(null);
                     return;
                 }
-                var actDistance = gameInstance.conversationDistance - StoppingDistance;
+                float actDistance = gameInstance.conversationDistance - StoppingDistance;
                 if (Vector3.Distance(CharacterTransform.position, targetPlayer.CacheTransform.position) <= actDistance)
                 {
                     PlayerCharacterEntity.StopMove();
@@ -401,7 +401,7 @@ namespace MultiplayerARPG
                     PlayerCharacterEntity.SetTargetEntity(null);
                     return;
                 }
-                var actDistance = gameInstance.conversationDistance - StoppingDistance;
+                float actDistance = gameInstance.conversationDistance - StoppingDistance;
                 if (Vector3.Distance(CharacterTransform.position, targetMonster.CacheTransform.position) <= actDistance)
                 {
                     PlayerCharacterEntity.StopMove();
@@ -412,7 +412,7 @@ namespace MultiplayerARPG
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetNpc))
             {
-                var actDistance = gameInstance.conversationDistance - StoppingDistance;
+                float actDistance = gameInstance.conversationDistance - StoppingDistance;
                 if (Vector3.Distance(CharacterTransform.position, targetNpc.CacheTransform.position) <= actDistance)
                 {
                     if (lastNpcObjectId != targetNpc.ObjectId)
@@ -427,7 +427,7 @@ namespace MultiplayerARPG
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetItemDrop))
             {
-                var actDistance = gameInstance.pickUpItemDistance - StoppingDistance;
+                float actDistance = gameInstance.pickUpItemDistance - StoppingDistance;
                 if (Vector3.Distance(CharacterTransform.position, targetItemDrop.CacheTransform.position) <= actDistance)
                 {
                     PlayerCharacterEntity.RequestPickupItem(targetItemDrop.ObjectId);
@@ -439,8 +439,8 @@ namespace MultiplayerARPG
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetBuilding))
             {
-                var uiCurrentBuilding = CacheUISceneGameplay.uiCurrentBuilding;
-                var actDistance = gameInstance.buildDistance - StoppingDistance;
+                UICurrentBuilding uiCurrentBuilding = CacheUISceneGameplay.uiCurrentBuilding;
+                float actDistance = gameInstance.buildDistance - StoppingDistance;
                 if (Vector3.Distance(CharacterTransform.position, targetBuilding.CacheTransform.position) <= actDistance)
                 {
                     if (uiCurrentBuilding != null && !uiCurrentBuilding.IsVisible())
@@ -464,11 +464,11 @@ namespace MultiplayerARPG
                     return;
                 }
 
-                var attackDistance = 0f;
-                var attackFov = 0f;
+                float attackDistance = 0f;
+                float attackFov = 0f;
                 if (!GetAttackDistanceAndFov(out attackDistance, out attackFov))
                     return;
-                var actDistance = attackDistance;
+                float actDistance = attackDistance;
                 actDistance -= actDistance * 0.1f;
                 actDistance -= StoppingDistance;
                 if (FindTarget(targetHarvestable.gameObject, actDistance, gameInstance.harvestableLayer.Mask))
@@ -488,7 +488,7 @@ namespace MultiplayerARPG
             if (entity == null)
                 return;
 
-            var targetPosition = entity.CacheTransform.position;
+            Vector3 targetPosition = entity.CacheTransform.position;
             PlayerCharacterEntity.PointClickMovement(targetPosition);
         }
 
@@ -501,11 +501,11 @@ namespace MultiplayerARPG
             buildingItemIndex = -1;
             currentBuildingEntity = null;
 
-            var hotkey = PlayerCharacterEntity.Hotkeys[hotkeyIndex];
-            var skill = hotkey.GetSkill();
+            CharacterHotkey hotkey = PlayerCharacterEntity.Hotkeys[hotkeyIndex];
+            Skill skill = hotkey.GetSkill();
             if (skill != null)
             {
-                var skillIndex = PlayerCharacterEntity.IndexOfSkill(skill.DataId);
+                int skillIndex = PlayerCharacterEntity.IndexOfSkill(skill.DataId);
                 if (skillIndex >= 0)
                 {
                     BaseCharacterEntity attackingCharacter;
@@ -529,7 +529,7 @@ namespace MultiplayerARPG
                             else
                             {
                                 // Attacking nearest target
-                                var nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance, false, true, false);
+                                BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance, false, true, false);
                                 if (nearestTarget != null)
                                     PlayerCharacterEntity.SetTargetEntity(nearestTarget);
                             }
@@ -543,10 +543,10 @@ namespace MultiplayerARPG
                     }
                 }
             }
-            var item = hotkey.GetItem();
+            Item item = hotkey.GetItem();
             if (item != null)
             {
-                var itemIndex = PlayerCharacterEntity.IndexOfNonEquipItem(item.DataId);
+                int itemIndex = PlayerCharacterEntity.IndexOfNonEquipItem(item.DataId);
                 if (itemIndex >= 0)
                 {
                     if (item.IsEquipment())

@@ -48,7 +48,7 @@ namespace MultiplayerARPG
         {
             CacheList.Generate(ChatMessages, (index, message, ui) =>
             {
-                var uiChatMessage = ui.GetComponent<UIChatMessage>();
+                UIChatMessage uiChatMessage = ui.GetComponent<UIChatMessage>();
                 uiChatMessage.uiChatHandler = this;
                 uiChatMessage.Data = message;
                 uiChatMessage.Show();
@@ -94,7 +94,7 @@ namespace MultiplayerARPG
 
         public void ShowEnterChatField()
         {
-            foreach (var enterChatActiveObject in enterChatActiveObjects)
+            foreach (GameObject enterChatActiveObject in enterChatActiveObjects)
             {
                 if (enterChatActiveObject != null)
                     enterChatActiveObject.SetActive(true);
@@ -109,7 +109,7 @@ namespace MultiplayerARPG
 
         public void HideEnterChatField()
         {
-            foreach (var enterChatActiveObject in enterChatActiveObjects)
+            foreach (GameObject enterChatActiveObject in enterChatActiveObjects)
             {
                 if (enterChatActiveObject != null)
                     enterChatActiveObject.SetActive(false);
@@ -124,19 +124,19 @@ namespace MultiplayerARPG
             if (BasePlayerCharacterController.OwningCharacter == null)
                 return;
 
-            var trimText = EnterChatMessage.Trim();
+            string trimText = EnterChatMessage.Trim();
             if (trimText.Length == 0)
                 return;
 
             EnterChatMessage = string.Empty;
-            var channel = ChatChannel.Local;
-            var message = trimText;
-            var sender = BasePlayerCharacterController.OwningCharacter.CharacterName;
-            var receiver = string.Empty;
-            var splitedText = trimText.Split(' ');
+            ChatChannel channel = ChatChannel.Local;
+            string message = trimText;
+            string sender = BasePlayerCharacterController.OwningCharacter.CharacterName;
+            string receiver = string.Empty;
+            string[] splitedText = trimText.Split(' ');
             if (splitedText.Length > 0)
             {
-                var cmd = splitedText[0];
+                string cmd = splitedText[0];
                 if (cmd == whisperCommand && splitedText.Length > 2)
                 {
                     channel = ChatChannel.Whisper;
@@ -167,7 +167,7 @@ namespace MultiplayerARPG
                 ChatMessages.RemoveAt(0);
             CacheList.Generate(ChatMessages, (index, message, ui) =>
             {
-                var uiChatMessage = ui.GetComponent<UIChatMessage>();
+                UIChatMessage uiChatMessage = ui.GetComponent<UIChatMessage>();
                 uiChatMessage.uiChatHandler = this;
                 uiChatMessage.Data = message;
                 uiChatMessage.Show();

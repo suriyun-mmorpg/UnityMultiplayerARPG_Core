@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
@@ -80,7 +81,7 @@ namespace MultiplayerARPG
             {
                 if (character != null && Skill != null)
                 {
-                    var indexOfSkillUsage = character.IndexOfSkillUsage(Skill.DataId, SkillUsageType.Skill);
+                    int indexOfSkillUsage = character.IndexOfSkillUsage(Skill.DataId, SkillUsageType.Skill);
                     if (indexOfSkillUsage >= 0)
                     {
                         coolDownRemainsDuration = character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
@@ -100,7 +101,7 @@ namespace MultiplayerARPG
                 coolDownRemainsDuration = 0f;
 
             // Update UIs
-            var coolDownDuration = Skill.GetCoolDownDuration(Level);
+            float coolDownDuration = Skill.GetCoolDownDuration(Level);
 
             if (uiTextCoolDownDuration != null)
                 uiTextCoolDownDuration.text = string.Format(coolDownDurationFormat, coolDownDuration.ToString("N0"));
@@ -141,7 +142,7 @@ namespace MultiplayerARPG
 
             if (imageIcon != null)
             {
-                var iconSprite = Skill == null ? null : Skill.icon;
+                Sprite iconSprite = Skill == null ? null : Skill.icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
             }
@@ -168,8 +169,8 @@ namespace MultiplayerARPG
                     uiTextAvailableWeapons.gameObject.SetActive(false);
                 else
                 {
-                    var str = string.Empty;
-                    foreach (var availableWeapon in Skill.availableWeapons)
+                    string str = string.Empty;
+                    foreach (WeaponType availableWeapon in Skill.availableWeapons)
                     {
                         if (!string.IsNullOrEmpty(str))
                             str += "/";
@@ -205,8 +206,8 @@ namespace MultiplayerARPG
                 }
             }
 
-            var isAttack = Skill != null && Skill.IsAttack();
-            var isOverrideWeaponDamage = isAttack && Skill.skillAttackType == SkillAttackType.Normal;
+            bool isAttack = Skill != null && Skill.IsAttack();
+            bool isOverrideWeaponDamage = isAttack && Skill.skillAttackType == SkillAttackType.Normal;
             if (uiDamageAmount != null)
             {
                 if (!isOverrideWeaponDamage)
@@ -214,14 +215,14 @@ namespace MultiplayerARPG
                 else
                 {
                     uiDamageAmount.Show();
-                    var keyValuePair = Skill.GetDamageAmount(Level, null);
+                    KeyValuePair<DamageElement, MinMaxFloat> keyValuePair = Skill.GetDamageAmount(Level, null);
                     uiDamageAmount.Data = new DamageElementAmountTuple(keyValuePair.Key, keyValuePair.Value);
                 }
             }
 
             if (uiDamageInflictions != null)
             {
-                var damageInflictionRates = Skill.GetWeaponDamageInflictions(Level);
+                Dictionary<DamageElement, float> damageInflictionRates = Skill.GetWeaponDamageInflictions(Level);
                 if (!isAttack || damageInflictionRates == null || damageInflictionRates.Count == 0)
                     uiDamageInflictions.Hide();
                 else
@@ -233,7 +234,7 @@ namespace MultiplayerARPG
 
             if (uiAdditionalDamageAmounts != null)
             {
-                var additionalDamageAmounts = Skill.GetAdditionalDamageAmounts(Level);
+                Dictionary<DamageElement, MinMaxFloat> additionalDamageAmounts = Skill.GetAdditionalDamageAmounts(Level);
                 if (!isAttack || additionalDamageAmounts == null || additionalDamageAmounts.Count == 0)
                     uiAdditionalDamageAmounts.Hide();
                 else
@@ -279,7 +280,7 @@ namespace MultiplayerARPG
 
         public void OnClickAdd()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter == null)
                 return;
 

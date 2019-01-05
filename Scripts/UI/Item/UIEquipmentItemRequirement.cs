@@ -17,7 +17,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            var equipmentItem = Data;
+            Item equipmentItem = Data;
 
             if (uiTextRequireLevel != null)
             {

@@ -132,8 +132,8 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            var anotherCharacter = Data;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity anotherCharacter = Data;
 
             if (uiAnotherCharacter != null)
                 uiAnotherCharacter.Data = anotherCharacter;
@@ -236,10 +236,10 @@ namespace MultiplayerARPG
         private void SetupList(UIList list, DealingCharacterItems dealingItems, List<UICharacterItem> uiList)
         {
             ItemSelectionManager.DeselectSelectedUI();
-            var filterItems = new List<CharacterItem>();
-            foreach (var dealingItem in dealingItems)
+            List<CharacterItem> filterItems = new List<CharacterItem>();
+            foreach (DealingCharacterItem dealingItem in dealingItems)
             {
-                var characterItem = new CharacterItem();
+                CharacterItem characterItem = new CharacterItem();
                 characterItem.dataId = dealingItem.dataId;
                 characterItem.level = dealingItem.level;
                 characterItem.amount = dealingItem.amount;
@@ -249,17 +249,17 @@ namespace MultiplayerARPG
             uiList.Clear();
             list.Generate(filterItems, (index, characterItem, ui) =>
             {
-                var uiCharacterItem = ui.GetComponent<UICharacterItem>();
+                UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
                 uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, string.Empty), null, -1);
                 uiCharacterItem.Show();
                 uiList.Add(uiCharacterItem);
             });
             ItemSelectionManager.Clear();
-            foreach (var tempDealingItemUI in tempDealingItemUIs)
+            foreach (UICharacterItem tempDealingItemUI in tempDealingItemUIs)
             {
                 ItemSelectionManager.Add(tempDealingItemUI);
             }
-            foreach (var tempAnotherDealingItemUI in tempAnotherDealingItemUIs)
+            foreach (UICharacterItem tempAnotherDealingItemUI in tempAnotherDealingItemUIs)
             {
                 ItemSelectionManager.Add(tempAnotherDealingItemUI);
             }
@@ -267,32 +267,32 @@ namespace MultiplayerARPG
 
         public void OnClickSetDealingGold()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             UISceneGlobal.Singleton.ShowInputDialog(dealingGoldInputTitle, dealingGoldInputDescription, OnDealingGoldConfirmed, 0, owningCharacter.Gold, owningCharacter.DealingGold);
         }
 
         private void OnDealingGoldConfirmed(int amount)
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
                 owningCharacter.RequestSetDealingGold(amount);
         }
 
         public void OnClickLock()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             owningCharacter.RequestLockDealing();
         }
 
         public void OnClickConfirm()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             owningCharacter.RequestConfirmDealing();
         }
 
         public void OnClickCancel()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             owningCharacter.RequestCancelDealing();
         }
     }

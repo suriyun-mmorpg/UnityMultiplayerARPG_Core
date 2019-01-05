@@ -59,9 +59,9 @@ public class SimpleFadeStandardMaterial : MonoBehaviour
 
     void SetMaterialsAlpha(float alpha)
     {
-        foreach (var renderer in CacheRenderers)
+        foreach (Renderer renderer in CacheRenderers)
         {
-            foreach (var material in renderer.materials)
+            foreach (Material material in renderer.materials)
             {
                 material.color = new Color(material.color.r, material.color.g, material.color.b, alpha);
             }
@@ -78,9 +78,9 @@ public class SimpleFadeStandardMaterial : MonoBehaviour
 
     void SetMeterialsToOpaque()
     {
-        foreach (var renderer in CacheRenderers)
+        foreach (Renderer renderer in CacheRenderers)
         {
-            foreach (var material in renderer.materials)
+            foreach (Material material in renderer.materials)
             {
                 material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
                 material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
@@ -95,9 +95,9 @@ public class SimpleFadeStandardMaterial : MonoBehaviour
 
     void SetMeterialsToFade()
     {
-        foreach (var renderer in CacheRenderers)
+        foreach (Renderer renderer in CacheRenderers)
         {
-            foreach (var material in renderer.materials)
+            foreach (Material material in renderer.materials)
             {
                 material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
                 material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);

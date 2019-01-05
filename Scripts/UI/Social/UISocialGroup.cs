@@ -94,37 +94,37 @@ namespace MultiplayerARPG
                     textMemberAmount.text = string.Format(memberAmountNoLimitFormat, memberAmount.ToString("N0"));
             }
             
-            foreach (var obj in owningCharacterIsInGroupObjects)
+            foreach (GameObject obj in owningCharacterIsInGroupObjects)
             {
                 if (obj != null)
                     obj.SetActive(currentSocialId > 0);
             }
 
-            foreach (var obj in owningCharacterIsNotInGroupObjects)
+            foreach (GameObject obj in owningCharacterIsNotInGroupObjects)
             {
                 if (obj != null)
                     obj.SetActive(currentSocialId <= 0);
             }
 
-            foreach (var obj in owningCharacterIsLeaderObjects)
+            foreach (GameObject obj in owningCharacterIsLeaderObjects)
             {
                 if (obj != null)
                     obj.SetActive(OwningCharacterIsLeader());
             }
 
-            foreach (var obj in owningCharacterIsNotLeaderObjects)
+            foreach (GameObject obj in owningCharacterIsNotLeaderObjects)
             {
                 if (obj != null)
                     obj.SetActive(!OwningCharacterIsLeader());
             }
 
-            foreach (var obj in owningCharacterCanKickObjects)
+            foreach (GameObject obj in owningCharacterCanKickObjects)
             {
                 if (obj != null)
                     obj.SetActive(OwningCharacterCanKick());
             }
 
-            foreach (var obj in owningCharacterCannotKickObjects)
+            foreach (GameObject obj in owningCharacterCannotKickObjects)
             {
                 if (obj != null)
                     obj.SetActive(!OwningCharacterCanKick());

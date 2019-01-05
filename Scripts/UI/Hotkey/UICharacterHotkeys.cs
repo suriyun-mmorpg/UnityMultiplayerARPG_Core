@@ -36,16 +36,16 @@ namespace MultiplayerARPG
             {
                 SelectionManager.DeselectSelectedUI();
                 SelectionManager.Clear();
-                var j = 0;
+                int j = 0;
                 cacheUICharacterHotkeys = new Dictionary<string, List<UICharacterHotkey>>();
-                for (var i = 0; i < uiCharacterHotkeys.Length; ++i)
+                for (int i = 0; i < uiCharacterHotkeys.Length; ++i)
                 {
-                    var uiCharacterHotkey = uiCharacterHotkeys[i];
-                    var id = uiCharacterHotkey.hotkeyId;
-                    var ui = uiCharacterHotkey.ui;
+                    UICharacterHotkeyPair uiCharacterHotkey = uiCharacterHotkeys[i];
+                    string id = uiCharacterHotkey.hotkeyId;
+                    UICharacterHotkey ui = uiCharacterHotkey.ui;
                     if (!string.IsNullOrEmpty(id) && ui != null)
                     {
-                        var characterHotkey = new CharacterHotkey();
+                        CharacterHotkey characterHotkey = new CharacterHotkey();
                         characterHotkey.hotkeyId = id;
                         characterHotkey.type = HotkeyType.None;
                         characterHotkey.dataId = 0;
@@ -72,14 +72,14 @@ namespace MultiplayerARPG
         public void UpdateData(IPlayerCharacterData characterData)
         {
             InitCaches();
-            var characterHotkeys = characterData.Hotkeys;
-            for (var i = 0; i < characterHotkeys.Count; ++i)
+            IList<CharacterHotkey> characterHotkeys = characterData.Hotkeys;
+            for (int i = 0; i < characterHotkeys.Count; ++i)
             {
-                var characterHotkey = characterHotkeys[i];
+                CharacterHotkey characterHotkey = characterHotkeys[i];
                 List<UICharacterHotkey> uis;
                 if (!string.IsNullOrEmpty(characterHotkey.hotkeyId) && CacheUICharacterHotkeys.TryGetValue(characterHotkey.hotkeyId, out uis))
                 {
-                    foreach (var ui in uis)
+                    foreach (UICharacterHotkey ui in uis)
                     {
                         ui.Setup(characterHotkey, i);
                         ui.Show();

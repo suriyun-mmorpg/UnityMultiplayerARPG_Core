@@ -76,18 +76,18 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            var fields = ComponentCollector.Get(typeof(InputFieldWrapper));
-            foreach (var field in fields)
+            List<object> fields = ComponentCollector.Get(typeof(InputFieldWrapper));
+            foreach (object field in fields)
             {
                 if (((InputFieldWrapper)field).isFocused)
                     return;
             }
 
-            foreach (var toggleUi in toggleUis)
+            foreach (UIToggleUI toggleUi in toggleUis)
             {
                 if (Input.GetKeyDown(toggleUi.key))
                 {
-                    var ui = toggleUi.ui;
+                    UIBase ui = toggleUi.ui;
                     ui.Toggle();
                 }
             }
@@ -95,7 +95,7 @@ namespace MultiplayerARPG
 
         public void UpdateCharacter()
         {
-            foreach (var uiCharacter in uiCharacters)
+            foreach (UICharacter uiCharacter in uiCharacters)
             {
                 if (uiCharacter != null)
                     uiCharacter.Data = BasePlayerCharacterController.OwningCharacter;
@@ -230,7 +230,7 @@ namespace MultiplayerARPG
 
         public void OnClickRespawn()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
                 owningCharacter.RequestRespawn();
         }
@@ -353,10 +353,10 @@ namespace MultiplayerARPG
             List<RaycastResult> results = new List<RaycastResult>();
             EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
             // If it's not mobile ui, assume it's over UI
-            var overUI = false;
+            bool overUI = false;
             if (ignorePointerDetectionUis != null && ignorePointerDetectionUis.Count > 0)
             {
-                foreach (var result in results)
+                foreach (RaycastResult result in results)
                 {
                     if (!ignorePointerDetectionUis.Contains(result.gameObject))
                     {
@@ -408,7 +408,7 @@ namespace MultiplayerARPG
         {
             if (combatTextTransform != null && prefab != null)
             {
-                var combatText = Instantiate(prefab, combatTextTransform);
+                UICombatText combatText = Instantiate(prefab, combatTextTransform);
                 combatText.transform.localScale = Vector3.one;
                 combatText.CacheObjectFollower.TargetObject = followingTransform;
                 combatText.Amount = amount;

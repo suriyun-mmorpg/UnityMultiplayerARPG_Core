@@ -47,8 +47,8 @@ namespace MultiplayerARPG
 
         public int RandomExp()
         {
-            var min = randomExpMin;
-            var max = randomExpMax;
+            int min = randomExpMin;
+            int max = randomExpMax;
             if (min > max)
                 min = max;
             return Random.Range(min, max);
@@ -56,8 +56,8 @@ namespace MultiplayerARPG
 
         public int RandomGold()
         {
-            var min = randomGoldMin;
-            var max = randomGoldMax;
+            int min = randomGoldMin;
+            int max = randomGoldMax;
             if (min > max)
                 min = max;
             return Random.Range(min, max);
@@ -65,8 +65,8 @@ namespace MultiplayerARPG
 
         public List<ItemAmount> RandomItems()
         {
-            var rewards = new List<ItemAmount>();
-            foreach (var randomItem in randomItems)
+            List<ItemAmount> rewards = new List<ItemAmount>();
+            foreach (ItemDrop randomItem in randomItems)
             {
                 if (randomItem.item == null ||
                     randomItem.amount == 0 ||

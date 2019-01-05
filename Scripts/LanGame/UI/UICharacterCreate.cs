@@ -57,18 +57,18 @@ namespace MultiplayerARPG
         {
             SelectionManager.Clear();
             // Show list of characters that can be create
-            var selectableCharacters = GetCreatableCharacters();
+            List<BasePlayerCharacterEntity> selectableCharacters = GetCreatableCharacters();
             CacheList.Generate(selectableCharacters, (index, characterEntity, ui) =>
             {
-                var character = characterEntity.database;
-                var characterData = new PlayerCharacterData();
+                BaseCharacter character = characterEntity.database;
+                PlayerCharacterData characterData = new PlayerCharacterData();
                 characterData.DataId = characterEntity.DataId;
                 characterData.EntityId = characterEntity.EntityId;
                 characterData.SetNewPlayerCharacterData(character.title, characterEntity.DataId, characterEntity.EntityId);
-                var uiCharacter = ui.GetComponent<UICharacter>();
+                UICharacter uiCharacter = ui.GetComponent<UICharacter>();
                 uiCharacter.Data = characterData;
                 // Select trigger when add first entry so deactivate all models is okay beacause first model will active
-                var characterModel = characterData.InstantiateModel(characterModelContainer);
+                BaseCharacterModel characterModel = characterData.InstantiateModel(characterModelContainer);
                 CharacterModels[characterData.EntityId] = characterModel;
                 characterModel.gameObject.SetActive(false);
                 SelectionManager.Add(uiCharacter);
@@ -114,17 +114,17 @@ namespace MultiplayerARPG
 
         protected virtual void OnClickCreate()
         {
-            var gameInstance = GameInstance.Singleton;
-            var selectedUI = SelectionManager.SelectedUI;
+            GameInstance gameInstance = GameInstance.Singleton;
+            UICharacter selectedUI = SelectionManager.SelectedUI;
             if (selectedUI == null)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog("Cannot create character", "Please select character class");
                 Debug.LogWarning("Cannot create character, did not selected character class");
                 return;
             }
-            var characterName = inputCharacterName.text.Trim();
-            var minCharacterNameLength = gameInstance.minCharacterNameLength;
-            var maxCharacterNameLength = gameInstance.maxCharacterNameLength;
+            string characterName = inputCharacterName.text.Trim();
+            int minCharacterNameLength = gameInstance.minCharacterNameLength;
+            int maxCharacterNameLength = gameInstance.maxCharacterNameLength;
             if (characterName.Length < minCharacterNameLength)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog("Cannot create character", "Character name is too short");
@@ -138,8 +138,8 @@ namespace MultiplayerARPG
                 return;
             }
 
-            var characterId = GenericUtils.GetUniqueId();
-            var characterData = new PlayerCharacterData();
+            string characterId = GenericUtils.GetUniqueId();
+            PlayerCharacterData characterData = new PlayerCharacterData();
             characterData.Id = characterId;
             characterData.SetNewPlayerCharacterData(characterName, selectedUI.Data.DataId, selectedUI.Data.EntityId);
             characterData.SavePersistentCharacterData();

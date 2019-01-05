@@ -194,7 +194,7 @@ namespace UnityEngine
             if (!m_Tile)
                 return;
 
-            foreach (var originalRule in m_Tile.m_TilingRules)
+            foreach (RuleTile.TilingRule originalRule in m_Tile.m_TilingRules)
             {
                 RuleTile.TilingRule overrideRule = this[originalRule];
                 overrides.Add(new KeyValuePair<RuleTile.TilingRule, RuleTile.TilingRule>(originalRule, overrideRule));
@@ -237,7 +237,7 @@ namespace UnityEngine
         }
         public RuleTile.TilingRule CloneTilingRule(RuleTile.TilingRule from)
         {
-            var clone = new RuleTile.TilingRule();
+            RuleTile.TilingRule clone = new RuleTile.TilingRule();
             CopyTilingRule(from, clone, true);
             return clone;
         }

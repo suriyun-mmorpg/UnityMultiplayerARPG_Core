@@ -8,7 +8,7 @@ public class ComponentCollector
     private static readonly Dictionary<Type, List<object>> cache = new Dictionary<Type, List<object>>();
     public static void Add<T>(T comp) where T : Component
     {
-        var type = comp.GetType();
+        Type type = comp.GetType();
         if (!cache.ContainsKey(type))
             cache[type] = new List<object>();
         cache[type].Add(comp);
@@ -16,7 +16,7 @@ public class ComponentCollector
 
     public static bool Remove<T>(T comp) where T : Component
     {
-        var type = comp.GetType();
+        Type type = comp.GetType();
         if (cache.ContainsKey(type))
             return cache[type].Remove(comp);
         return false;

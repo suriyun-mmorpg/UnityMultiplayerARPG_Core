@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -75,7 +76,7 @@ namespace MultiplayerARPG
         public void UpdateData(IPlayerCharacterData character)
         {
             this.character = character;
-            var selectedQuestId = SelectionManager.SelectedUI != null ? SelectionManager.SelectedUI.Data.dataId : 0;
+            int selectedQuestId = SelectionManager.SelectedUI != null ? SelectionManager.SelectedUI.Data.dataId : 0;
             SelectionManager.DeselectSelectedUI();
             SelectionManager.Clear();
 
@@ -85,10 +86,10 @@ namespace MultiplayerARPG
                 return;
             }
 
-            var characterQuests = character.Quests;
+            IList<CharacterQuest> characterQuests = character.Quests;
             CacheList.Generate(characterQuests, (index, characterQuest, ui) =>
             {
-                var uiCharacterQuest = ui.GetComponent<UICharacterQuest>();
+                UICharacterQuest uiCharacterQuest = ui.GetComponent<UICharacterQuest>();
                 uiCharacterQuest.Setup(characterQuest, character, index);
                 uiCharacterQuest.Show();
                 SelectionManager.Add(uiCharacterQuest);

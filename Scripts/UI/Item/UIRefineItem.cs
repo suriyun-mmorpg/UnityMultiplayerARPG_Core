@@ -37,7 +37,7 @@ namespace MultiplayerARPG
         protected override void UpdateUI()
         {
             Profiler.BeginSample("UIRefineItem - Update UI");
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
 
             if (uiRefiningItem != null)
             {

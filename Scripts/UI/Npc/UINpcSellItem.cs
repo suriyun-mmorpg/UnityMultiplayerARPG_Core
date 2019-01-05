@@ -42,14 +42,14 @@ namespace MultiplayerARPG
 
         public void OnClickBuy()
         {
-            var item = Data.item;
+            Item item = Data.item;
             if (item == null)
             {
                 Debug.LogWarning("Cannot buy item, the item data is empty");
                 return;
             }
 
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (item.maxStack == 1)
             {
                 if (owningCharacter != null)
@@ -61,7 +61,7 @@ namespace MultiplayerARPG
 
         private void OnBuyAmountConfirmed(int amount)
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
                 owningCharacter.RequestBuyNpcItem((ushort)indexOfData, (short)amount);
         }

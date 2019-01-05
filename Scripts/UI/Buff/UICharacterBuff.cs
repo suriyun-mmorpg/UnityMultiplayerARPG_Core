@@ -53,7 +53,7 @@ namespace MultiplayerARPG
                 buffRemainsDuration = 0f;
 
             // Update UIs
-            var buffDuration = CharacterBuff.GetDuration();
+            float buffDuration = CharacterBuff.GetDuration();
 
             if (uiTextDuration != null)
                 uiTextDuration.text = string.Format(buffDurationFormat, buffDuration.ToString("N0"));
@@ -90,7 +90,7 @@ namespace MultiplayerARPG
 
             if (imageIcon != null)
             {
-                var iconSprite = buffData == null ? null : buffData.icon;
+                Sprite iconSprite = buffData == null ? null : buffData.icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
             }
@@ -101,7 +101,7 @@ namespace MultiplayerARPG
                     uiBuff.Hide();
                 else
                 {
-                    var buff = Data.GetBuff();
+                    Buff buff = Data.GetBuff();
                     uiBuff.Show();
                     uiBuff.Data = new BuffTuple(buff, Data.level);
                 }

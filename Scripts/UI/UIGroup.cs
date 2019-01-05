@@ -8,7 +8,7 @@ public class UIGroup : UIBase
 
     public override void Show()
     {
-        foreach (var entry in subSet)
+        foreach (UIBase entry in subSet)
         {
             entry.Show();
         }
@@ -17,7 +17,7 @@ public class UIGroup : UIBase
 
     public override void Hide()
     {
-        foreach (var entry in subSet)
+        foreach (UIBase entry in subSet)
         {
             entry.Hide();
         }

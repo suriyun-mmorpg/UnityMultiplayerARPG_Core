@@ -15,7 +15,7 @@ namespace MultiplayerARPG
 
         public override void Show()
         {
-            var systemSetting = GameInstance.Singleton.SocialSystemSetting;
+            SocialSystemSetting systemSetting = GameInstance.Singleton.SocialSystemSetting;
             if (textRequireGold != null)
                 textRequireGold.text = string.Format(requireGoldFormat, systemSetting.CreateGuildRequiredGold.ToString("N0"));
             if (uiRequireItems != null)

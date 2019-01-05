@@ -89,41 +89,41 @@ namespace MultiplayerARPG
             CacheSkillSelectionManager.eventOnSelect.AddListener(OnSelectCharacterSkill);
             CacheItemSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterItem);
             CacheItemSelectionManager.eventOnSelect.AddListener(OnSelectCharacterItem);
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter == null)
             {
                 CacheSkillList.HideAll();
                 CacheItemList.HideAll();
                 return;
             }
-            var filterSkills = new List<CharacterSkill>();
-            var filterItems = new List<CharacterItem>();
-            var characterSkills = owningCharacter.Skills;
-            var characterItems = owningCharacter.NonEquipItems;
-            foreach (var characterSkill in characterSkills)
+            List<CharacterSkill> filterSkills = new List<CharacterSkill>();
+            List<CharacterItem> filterItems = new List<CharacterItem>();
+            IList<CharacterSkill> characterSkills = owningCharacter.Skills;
+            IList<CharacterItem> characterItems = owningCharacter.NonEquipItems;
+            foreach (CharacterSkill characterSkill in characterSkills)
             {
-                var skill = characterSkill.GetSkill();
+                Skill skill = characterSkill.GetSkill();
                 if (skill != null && characterSkill.level > 0 &&
                     (skill.skillType == SkillType.Active || skill.skillType == SkillType.CraftItem))
                     filterSkills.Add(characterSkill);
             }
-            foreach (var characterItem in characterItems)
+            foreach (CharacterItem characterItem in characterItems)
             {
-                var item = characterItem.GetItem();
+                Item item = characterItem.GetItem();
                 if (item != null && characterItem.level > 0 && characterItem.amount > 0 &&
                     (item.IsPotion() || item.IsBuilding() || item.IsPet()))
                     filterItems.Add(characterItem);
             }
             CacheSkillList.Generate(filterSkills, (index, characterSkill, ui) =>
             {
-                var uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
+                UICharacterSkill uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
                 uiCharacterSkill.Setup(new SkillTuple(characterSkill.GetSkill(), characterSkill.level), null, -1);
                 uiCharacterSkill.Show();
                 CacheSkillSelectionManager.Add(uiCharacterSkill);
             });
             CacheItemList.Generate(filterItems, (index, characterItem, ui) =>
             {
-                var uiCharacterItem = ui.GetComponent<UICharacterItem>();
+                UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
                 uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, string.Empty), null, -1);
                 uiCharacterItem.Show();
                 CacheItemSelectionManager.Add(uiCharacterItem);
@@ -140,7 +140,7 @@ namespace MultiplayerARPG
 
         protected void OnSelectCharacterSkill(UICharacterSkill ui)
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
                 owningCharacter.RequestAssignHotkey(hotkeyId, HotkeyType.Skill, ui.Skill.DataId);
             Hide();
@@ -148,7 +148,7 @@ namespace MultiplayerARPG
 
         protected void OnSelectCharacterItem(UICharacterItem ui)
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
                 owningCharacter.RequestAssignHotkey(hotkeyId, HotkeyType.Item, ui.Data.characterItem.dataId);
             Hide();
@@ -156,7 +156,7 @@ namespace MultiplayerARPG
 
         public void OnClickUnAssign()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
                 owningCharacter.RequestAssignHotkey(hotkeyId, HotkeyType.None, 0);
             Hide();

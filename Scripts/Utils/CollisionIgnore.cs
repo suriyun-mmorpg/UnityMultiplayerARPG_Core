@@ -7,7 +7,7 @@ public class CollisionIgnore : MonoBehaviour
     public CollisionIgnoreOption[] ignoreOptions;
     private void Awake()
     {
-        foreach (var ignoreOption in ignoreOptions)
+        foreach (CollisionIgnoreOption ignoreOption in ignoreOptions)
         {
             Physics.IgnoreLayerCollision(ignoreOption.layer1.LayerIndex, ignoreOption.layer2.LayerIndex, ignoreOption.ignore);
             Physics2D.IgnoreLayerCollision(ignoreOption.layer1.LayerIndex, ignoreOption.layer2.LayerIndex, ignoreOption.ignore);

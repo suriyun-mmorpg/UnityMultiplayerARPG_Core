@@ -104,12 +104,12 @@ namespace MultiplayerARPG
                 {
                     if (controllerPrefab != null)
                     {
-                        var controller = Instantiate(controllerPrefab);
+                        BasePlayerCharacterController controller = Instantiate(controllerPrefab);
                         controller.PlayerCharacterEntity = this;
                     }
                     else if (GameInstance.defaultControllerPrefab != null)
                     {
-                        var controller = Instantiate(GameInstance.defaultControllerPrefab);
+                        BasePlayerCharacterController controller = Instantiate(GameInstance.defaultControllerPrefab);
                         controller.PlayerCharacterEntity = this;
                     }
                     else
@@ -117,7 +117,7 @@ namespace MultiplayerARPG
                 }
                 if (GameInstance.owningCharacterObjects != null && GameInstance.owningCharacterObjects.Length > 0)
                 {
-                    foreach (var obj in GameInstance.owningCharacterObjects)
+                    foreach (GameObject obj in GameInstance.owningCharacterObjects)
                     {
                         if (obj == null) continue;
                         Instantiate(obj, CacheTransform.position, CacheTransform.rotation, CacheTransform);
@@ -125,7 +125,7 @@ namespace MultiplayerARPG
                 }
                 if (GameInstance.owningCharacterMiniMapObjects != null && GameInstance.owningCharacterMiniMapObjects.Length > 0)
                 {
-                    foreach (var obj in GameInstance.owningCharacterMiniMapObjects)
+                    foreach (GameObject obj in GameInstance.owningCharacterMiniMapObjects)
                     {
                         if (obj == null) continue;
                         Instantiate(obj, MiniMapElementContainer.position, MiniMapElementContainer.rotation, MiniMapElementContainer);
@@ -138,7 +138,7 @@ namespace MultiplayerARPG
             {
                 if (GameInstance.nonOwningCharacterMiniMapObjects != null && GameInstance.nonOwningCharacterMiniMapObjects.Length > 0)
                 {
-                    foreach (var obj in GameInstance.nonOwningCharacterMiniMapObjects)
+                    foreach (GameObject obj in GameInstance.nonOwningCharacterMiniMapObjects)
                     {
                         if (obj == null) continue;
                         Instantiate(obj, MiniMapElementContainer.position, MiniMapElementContainer.rotation, MiniMapElementContainer);

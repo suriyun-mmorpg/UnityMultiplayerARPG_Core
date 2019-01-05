@@ -39,7 +39,7 @@ namespace MultiplayerARPG
 
             if (cashShopDatabase != null)
             {
-                foreach (var cashShopItem in cashShopDatabase.cashStopItems)
+                foreach (CashShopItem cashShopItem in cashShopDatabase.cashStopItems)
                 {
                     if (cashShopItem == null || CashShopItems.ContainsKey(cashShopItem.DataId))
                         continue;
@@ -59,7 +59,7 @@ namespace MultiplayerARPG
 
             if (cashShopDatabase != null)
             {
-                foreach (var cashPackage in cashShopDatabase.cashPackages)
+                foreach (CashPackage cashPackage in cashShopDatabase.cashPackages)
                 {
                     if (cashPackage == null || CashPackages.ContainsKey(cashPackage.DataId))
                         continue;

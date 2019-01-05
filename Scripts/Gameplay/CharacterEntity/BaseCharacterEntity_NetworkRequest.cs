@@ -55,15 +55,15 @@ namespace MultiplayerARPG
             if (!CanMoveOrDoActions() ||
                 nonEquipIndex >= NonEquipItems.Count)
                 return;
-            var characterItem = NonEquipItems[nonEquipIndex];
-            var armorItem = characterItem.GetArmorItem();
-            var weaponItem = characterItem.GetWeaponItem();
-            var shieldItem = characterItem.GetShieldItem();
+            CharacterItem characterItem = NonEquipItems[nonEquipIndex];
+            Item armorItem = characterItem.GetArmorItem();
+            Item weaponItem = characterItem.GetWeaponItem();
+            Item shieldItem = characterItem.GetShieldItem();
             if (weaponItem != null)
             {
                 if (weaponItem.EquipType == WeaponItemEquipType.OneHandCanDual)
                 {
-                    var rightWeapon = EquipWeapons.rightHand.GetWeaponItem();
+                    Item rightWeapon = EquipWeapons.rightHand.GetWeaponItem();
                     if (rightWeapon != null && rightWeapon.EquipType == WeaponItemEquipType.OneHandCanDual)
                         RequestEquipItem(nonEquipIndex, GameDataConst.EQUIP_POSITION_LEFT_HAND);
                     else

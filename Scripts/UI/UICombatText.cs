@@ -49,7 +49,7 @@ namespace MultiplayerARPG
             set
             {
                 amount = value;
-                var positiveSign = showPositiveSign && amount > 0 ? "+" : "";
+                string positiveSign = showPositiveSign && amount > 0 ? "+" : "";
                 CacheText.text = string.Format(format, (positiveSign + amount.ToString("N0")));
             }
         }

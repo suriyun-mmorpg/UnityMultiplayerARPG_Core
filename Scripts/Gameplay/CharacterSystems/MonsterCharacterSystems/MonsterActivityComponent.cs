@@ -69,7 +69,7 @@ namespace MultiplayerARPG
 
         protected void Awake()
         {
-            var time = Time.unscaledTime;
+            float time = Time.unscaledTime;
             RandomNextWanderTime(time);
             SetFindTargetTime(time);
             SetStartFollowTargetTime(time);
@@ -128,7 +128,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            var currentPosition = CacheMonsterCharacterEntity.CacheTransform.position;
+            Vector3 currentPosition = CacheMonsterCharacterEntity.CacheTransform.position;
 
             if (CacheMonsterCharacterEntity.Summoner != null &&
                 Vector3.Distance(currentPosition, CacheMonsterCharacterEntity.Summoner.CacheTransform.position) > gameInstance.minFollowSummonerDistance)
@@ -179,8 +179,8 @@ namespace MultiplayerARPG
         public void UpdateAttackTarget(float time, Vector3 currentPosition, BaseCharacterEntity targetEntity)
         {
             // If it has target then go to target
-            var targetEntityPosition = targetEntity.CacheTransform.position;
-            var attackDistance = CacheMonsterCharacterEntity.GetAttackDistance();
+            Vector3 targetEntityPosition = targetEntity.CacheTransform.position;
+            float attackDistance = CacheMonsterCharacterEntity.GetAttackDistance();
             attackDistance -= attackDistance * 0.1f;
             attackDistance -= CacheNavMeshAgent.stoppingDistance;
             if (Vector3.Distance(currentPosition, targetEntityPosition) <= attackDistance)
@@ -188,11 +188,11 @@ namespace MultiplayerARPG
                 StopMove();
                 SetStartFollowTargetTime(time);
                 // Lookat target then do anything when it's in range
-                var lookAtDirection = (targetEntityPosition - currentPosition).normalized;
+                Vector3 lookAtDirection = (targetEntityPosition - currentPosition).normalized;
                 // slerp to the desired rotation over time
                 if (lookAtDirection.magnitude > 0)
                 {
-                    var lookRotationEuler = Quaternion.LookRotation(lookAtDirection).eulerAngles;
+                    Vector3 lookRotationEuler = Quaternion.LookRotation(lookAtDirection).eulerAngles;
                     lookRotationEuler.x = 0;
                     lookRotationEuler.z = 0;
                     CacheMonsterCharacterEntity.CacheTransform.rotation = Quaternion.RotateTowards(CacheMonsterCharacterEntity.CacheTransform.rotation, Quaternion.Euler(lookRotationEuler), CacheNavMeshAgent.angularSpeed * Time.deltaTime);
@@ -215,7 +215,7 @@ namespace MultiplayerARPG
         public void RandomWanderTarget(float time)
         {
             // If stopped then random
-            var randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
+            Vector3 randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
             if (CacheMonsterCharacterEntity.Summoner != null)
                 randomPosition = CacheMonsterCharacterEntity.Summoner.GetSummonPosition();
             CacheMonsterCharacterEntity.SetTargetEntity(null);
@@ -225,7 +225,7 @@ namespace MultiplayerARPG
         public void FollowSummoner(float time)
         {
             // If stopped then random
-            var randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
+            Vector3 randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
             if (CacheMonsterCharacterEntity.Summoner != null)
                 randomPosition = CacheMonsterCharacterEntity.Summoner.GetSummonPosition();
             CacheMonsterCharacterEntity.SetTargetEntity(null);
@@ -243,10 +243,10 @@ namespace MultiplayerARPG
             if (!CacheMonsterCharacterEntity.TryGetTargetEntity(out targetCharacter) || targetCharacter.IsDead())
             {
                 // If no target enenmy or target enemy is dead, Find nearby character by layer mask
-                var foundObjects = new List<Collider>(Physics.OverlapSphere(currentPosition, monsterDatabase.visualRange, gameInstance.characterLayer.Mask));
-                foreach (var foundObject in foundObjects)
+                List<Collider> foundObjects = new List<Collider>(Physics.OverlapSphere(currentPosition, monsterDatabase.visualRange, gameInstance.characterLayer.Mask));
+                foreach (Collider foundObject in foundObjects)
                 {
-                    var characterEntity = foundObject.GetComponent<BaseCharacterEntity>();
+                    BaseCharacterEntity characterEntity = foundObject.GetComponent<BaseCharacterEntity>();
                     // Attack target settings
                     if (characterEntity != null &&
                         characterEntity.CanReceiveDamageFrom(CacheMonsterCharacterEntity))

@@ -23,7 +23,7 @@ namespace MultiplayerARPG
             if (messagePrefab == null)
                 return;
 
-            var newMessage = Instantiate(messagePrefab);
+            TextWrapper newMessage = Instantiate(messagePrefab);
             newMessage.text = LanguageManager.GetText(gameMessage.type.ToString());
             newMessage.transform.SetParent(messageContainer);
             newMessage.transform.localScale = Vector3.one;

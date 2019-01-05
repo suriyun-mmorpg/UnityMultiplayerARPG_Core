@@ -7,7 +7,7 @@ public class WorldSaveDataSerializationSurrogate : ISerializationSurrogate
 {
     public void GetObjectData(object obj, SerializationInfo info, StreamingContext context)
     {
-        var data = (WorldSaveData)obj;
+        WorldSaveData data = (WorldSaveData)obj;
         info.AddListValue("buildings", data.buildings);
     }
 

@@ -22,12 +22,12 @@ namespace MultiplayerARPG
                 if (cacheTextLevels == null)
                 {
                     cacheTextLevels = new Dictionary<Item, TextWrapper>();
-                    foreach (var textLevel in textAmounts)
+                    foreach (UIItemTextPair textLevel in textAmounts)
                     {
                         if (textLevel.item == null || textLevel.uiText == null)
                             continue;
-                        var key = textLevel.item;
-                        var textComp = textLevel.uiText;
+                        Item key = textLevel.item;
+                        TextWrapper textComp = textLevel.uiText;
                         textComp.text = string.Format(amountFormat, key.title, "0", "0");
                         cacheTextLevels[key] = textComp;
                     }
@@ -38,34 +38,34 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (Data == null || Data.Count == 0)
             {
                 if (uiTextAllAmounts != null)
                     uiTextAllAmounts.gameObject.SetActive(false);
 
-                foreach (var textLevel in CacheTextLevels)
+                foreach (KeyValuePair<Item, TextWrapper> textLevel in CacheTextLevels)
                 {
-                    var element = textLevel.Key;
+                    Item element = textLevel.Key;
                     textLevel.Value.text = string.Format(amountFormat, element.title, "0", "0");
                 }
             }
             else
             {
-                var text = "";
-                foreach (var dataEntry in Data)
+                string text = "";
+                foreach (KeyValuePair<Item, short> dataEntry in Data)
                 {
-                    var item = dataEntry.Key;
-                    var targetAmount = dataEntry.Value;
+                    Item item = dataEntry.Key;
+                    short targetAmount = dataEntry.Value;
                     if (dataEntry.Key == null || targetAmount == 0)
                         continue;
                     if (!string.IsNullOrEmpty(text))
                         text += "\n";
-                    var currentAmount = 0;
+                    int currentAmount = 0;
                     if (owningCharacter != null)
                         currentAmount = owningCharacter.CountNonEquipItems(item.DataId);
-                    var format = currentAmount >= targetAmount ? amountFormat : amountNotReachTargetFormat;
-                    var amountText = string.Format(format, dataEntry.Key.title, currentAmount.ToString("N0"), targetAmount.ToString("N0"));
+                    string format = currentAmount >= targetAmount ? amountFormat : amountNotReachTargetFormat;
+                    string amountText = string.Format(format, dataEntry.Key.title, currentAmount.ToString("N0"), targetAmount.ToString("N0"));
                     text += amountText;
                     TextWrapper cacheTextAmount;
                     if (CacheTextLevels.TryGetValue(dataEntry.Key, out cacheTextAmount))

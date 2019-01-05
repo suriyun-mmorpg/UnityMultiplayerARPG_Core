@@ -68,7 +68,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
 
             if (uiTextTitle != null)
                 uiTextTitle.text = string.Format(titleFormat, Data == null ? "Unknow" : Data.title);
@@ -86,13 +86,13 @@ namespace MultiplayerARPG
                 case NpcDialogType.SaveRespawnPoint:
                     if (onSwitchToNormalDialog == null)
                         onSwitchToNormalDialog.Invoke();
-                    var menus = Data.menus;
-                    for (var i = 0; i < menus.Length; ++i)
+                    NpcDialogMenu[] menus = Data.menus;
+                    for (int i = 0; i < menus.Length; ++i)
                     {
-                        var menu = menus[i];
+                        NpcDialogMenu menu = menus[i];
                         if (menu.IsPassConditions(owningCharacter))
                         {
-                            var menuAction = new UINpcDialogMenuAction();
+                            UINpcDialogMenuAction menuAction = new UINpcDialogMenuAction();
                             menuAction.title = menu.title;
                             menuAction.menuIndex = i;
                             menuActions.Add(menuAction);
@@ -107,10 +107,10 @@ namespace MultiplayerARPG
                         quest = Data.quest;
                         if (quest != null)
                         {
-                            var acceptMenuAction = new UINpcDialogMenuAction();
-                            var declineMenuAction = new UINpcDialogMenuAction();
-                            var abandonMenuAction = new UINpcDialogMenuAction();
-                            var completeMenuAction = new UINpcDialogMenuAction();
+                            UINpcDialogMenuAction acceptMenuAction = new UINpcDialogMenuAction();
+                            UINpcDialogMenuAction declineMenuAction = new UINpcDialogMenuAction();
+                            UINpcDialogMenuAction abandonMenuAction = new UINpcDialogMenuAction();
+                            UINpcDialogMenuAction completeMenuAction = new UINpcDialogMenuAction();
                             acceptMenuAction.title = messageQuestAccept;
                             acceptMenuAction.menuIndex = NpcDialog.QUEST_ACCEPT_MENU_INDEX;
                             declineMenuAction.title = messageQuestDecline;
@@ -121,7 +121,7 @@ namespace MultiplayerARPG
                             completeMenuAction.menuIndex = NpcDialog.QUEST_COMPLETE_MENU_INDEX;
 
                             CharacterQuest characterQuest;
-                            var index = owningCharacter.IndexOfQuest(quest.DataId);
+                            int index = owningCharacter.IndexOfQuest(quest.DataId);
                             if (index >= 0)
                             {
                                 characterQuest = owningCharacter.Quests[index];
@@ -153,8 +153,8 @@ namespace MultiplayerARPG
                         itemCraft = Data.itemCraft;
                         if (itemCraft != null)
                         {
-                            var startMenuAction = new UINpcDialogMenuAction();
-                            var cancelMenuAction = new UINpcDialogMenuAction();
+                            UINpcDialogMenuAction startMenuAction = new UINpcDialogMenuAction();
+                            UINpcDialogMenuAction cancelMenuAction = new UINpcDialogMenuAction();
                             startMenuAction.title = messageCraftItemStart;
                             startMenuAction.menuIndex = NpcDialog.CRAFT_ITEM_START_MENU_INDEX;
                             cancelMenuAction.title = messageCraftItemCancel;
@@ -171,7 +171,7 @@ namespace MultiplayerARPG
                 uiMenuRoot.SetActive(menuActions.Count > 0);
             CacheMenuList.Generate(menuActions, (index, menuAction, ui) =>
             {
-                var uiNpcDialogMenu = ui.GetComponent<UINpcDialogMenu>();
+                UINpcDialogMenu uiNpcDialogMenu = ui.GetComponent<UINpcDialogMenu>();
                 uiNpcDialogMenu.Data = menuAction;
                 uiNpcDialogMenu.uiNpcDialog = this;
                 uiNpcDialogMenu.Show();
@@ -189,7 +189,7 @@ namespace MultiplayerARPG
                 uiSellItemRoot.SetActive(sellItems.Count > 0);
             CacheSellItemList.Generate(sellItems, (index, sellItem, ui) =>
             {
-                var uiNpcSellItem = ui.GetComponent<UINpcSellItem>();
+                UINpcSellItem uiNpcSellItem = ui.GetComponent<UINpcSellItem>();
                 uiNpcSellItem.Setup(sellItem, index);
             });
             // Craft Item

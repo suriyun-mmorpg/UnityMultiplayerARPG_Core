@@ -286,8 +286,8 @@ namespace MultiplayerARPG
 
         public override bool IsPositionInFov(float fov, Vector3 position)
         {
-            var halfFov = fov * 0.5f;
-            var angle = Vector2.Angle((CacheTransform.position - position).normalized, CurrentDirection);
+            float halfFov = fov * 0.5f;
+            float angle = Vector2.Angle((CacheTransform.position - position).normalized, CurrentDirection);
             // Angle in forward position is 180 so we use this value to determine that target is in hit fov or not
             return (angle < 180 + halfFov && angle > 180 - halfFov);
         }
@@ -328,7 +328,7 @@ namespace MultiplayerARPG
 
         public DirectionType GetDirectionTypeByVector2(Vector2 direction)
         {
-            var normalized = direction.normalized;
+            Vector2 normalized = direction.normalized;
             if (Mathf.Abs(normalized.x) >= Mathf.Abs(normalized.y))
             {
                 if (normalized.x < 0) return DirectionType.Left;

@@ -111,7 +111,7 @@ public class UIInputDialog : UIBase
 
     protected void ValidateIntAmount(string result)
     {
-        var amount = intDefaultAmount;
+        int amount = intDefaultAmount;
         if (int.TryParse(result, out amount))
         {
             uiInputField.onValueChanged.RemoveAllListeners();
@@ -153,7 +153,7 @@ public class UIInputDialog : UIBase
 
     protected void ValidateFloatAmount(string result)
     {
-        var amount = floatDefaultAmount;
+        float amount = floatDefaultAmount;
         if (float.TryParse(result, out amount))
         {
             uiInputField.onValueChanged.RemoveAllListeners();
@@ -170,17 +170,17 @@ public class UIInputDialog : UIBase
         switch (contentType)
         {
             case InputField.ContentType.Standard:
-                var text = InputFieldText;
+                string text = InputFieldText;
                 if (onConfirmText != null)
                     onConfirmText.Invoke(text);
                 break;
             case InputField.ContentType.IntegerNumber:
-                var intAmount = int.Parse(InputFieldText);
+                int intAmount = int.Parse(InputFieldText);
                 if (onConfirmInteger != null)
                     onConfirmInteger.Invoke(intAmount);
                 break;
             case InputField.ContentType.DecimalNumber:
-                var floatAmount = float.Parse(InputFieldText);
+                float floatAmount = float.Parse(InputFieldText);
                 if (onConfirmDecimal != null)
                     onConfirmDecimal.Invoke(floatAmount);
                 break;

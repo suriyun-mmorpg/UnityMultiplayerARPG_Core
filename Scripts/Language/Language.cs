@@ -65,7 +65,7 @@ namespace MultiplayerARPG
 
         public bool ContainKey(string key)
         {
-            foreach (var entry in dataList)
+            foreach (LanguageData entry in dataList)
             {
                 if (entry.key == key)
                     return true;

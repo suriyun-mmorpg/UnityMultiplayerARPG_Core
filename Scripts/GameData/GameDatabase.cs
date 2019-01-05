@@ -35,10 +35,10 @@ namespace MultiplayerARPG
             GameInstance.AddCharacterEntities(monsterCharacterEntities);
             GameInstance.AddMapInfos(mapInfos);
             
-            var weaponHitEffects = new List<GameEffectCollection>();
+            List<GameEffectCollection> weaponHitEffects = new List<GameEffectCollection>();
             if (gameInstance.DefaultDamageElement.hitEffects != null)
                 weaponHitEffects.Add(gameInstance.DefaultDamageElement.hitEffects);
-            foreach (var damageElement in damageElements)
+            foreach (DamageElement damageElement in damageElements)
             {
                 if (damageElement.hitEffects != null)
                     weaponHitEffects.Add(damageElement.hitEffects);

@@ -9,7 +9,7 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
     public void GetObjectData(System.Object obj,
                               SerializationInfo info, StreamingContext context)
     {
-        var data = (PlayerCharacterData)obj;
+        PlayerCharacterData data = (PlayerCharacterData)obj;
         info.AddValue("id", data.Id);
         info.AddValue("dataId", data.DataId);
         info.AddValue("entityId", data.EntityId);
@@ -47,7 +47,7 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
                                        SerializationInfo info, StreamingContext context,
                                        ISurrogateSelector selector)
     {
-        var data = (PlayerCharacterData)obj;
+        PlayerCharacterData data = (PlayerCharacterData)obj;
         data.Id = info.GetString("id");
         data.DataId = info.GetInt32("dataId");
         // Backward compatible

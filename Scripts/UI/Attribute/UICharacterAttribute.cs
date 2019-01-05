@@ -48,7 +48,7 @@ namespace MultiplayerARPG
 
             if (imageIcon != null)
             {
-                var iconSprite = Attribute == null ? null : Attribute.icon;
+                Sprite iconSprite = Attribute == null ? null : Attribute.icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
             }
@@ -56,7 +56,7 @@ namespace MultiplayerARPG
 
         public void OnClickAdd()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter == null)
                 return;
 

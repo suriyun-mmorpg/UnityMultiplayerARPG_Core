@@ -22,12 +22,12 @@ namespace MultiplayerARPG
                 if (cacheTextLevels == null)
                 {
                     cacheTextLevels = new Dictionary<Skill, TextWrapper>();
-                    foreach (var textLevel in textLevels)
+                    foreach (UISkillTextPair textLevel in textLevels)
                     {
                         if (textLevel.skill == null || textLevel.uiText == null)
                             continue;
-                        var key = textLevel.skill;
-                        var textComp = textLevel.uiText;
+                        Skill key = textLevel.skill;
+                        TextWrapper textComp = textLevel.uiText;
                         textComp.text = string.Format(levelFormat, key.title, "0", "0");
                         cacheTextLevels[key] = textComp;
                     }
@@ -38,25 +38,25 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (Data == null || Data.Count == 0)
             {
                 if (uiTextAllLevels != null)
                     uiTextAllLevels.gameObject.SetActive(false);
 
-                foreach (var textLevel in CacheTextLevels)
+                foreach (KeyValuePair<Skill, TextWrapper> textLevel in CacheTextLevels)
                 {
-                    var element = textLevel.Key;
+                    Skill element = textLevel.Key;
                     textLevel.Value.text = string.Format(levelFormat, element.title, "0", "0");
                 }
             }
             else
             {
-                var text = "";
-                foreach (var dataEntry in Data)
+                string text = "";
+                foreach (KeyValuePair<Skill, short> dataEntry in Data)
                 {
-                    var skill = dataEntry.Key;
-                    var targetLevel = dataEntry.Value;
+                    Skill skill = dataEntry.Key;
+                    short targetLevel = dataEntry.Value;
                     if (skill == null || targetLevel == 0)
                         continue;
                     if (!string.IsNullOrEmpty(text))
@@ -64,8 +64,8 @@ namespace MultiplayerARPG
                     short currentLevel = 0;
                     if (owningCharacter != null)
                         owningCharacter.CacheSkills.TryGetValue(skill, out currentLevel);
-                    var format = currentLevel >= targetLevel ? levelFormat : levelNotReachTargetFormat;
-                    var amountText = string.Format(format, skill.title, currentLevel.ToString("N0"), targetLevel.ToString("N0"));
+                    string format = currentLevel >= targetLevel ? levelFormat : levelNotReachTargetFormat;
+                    string amountText = string.Format(format, skill.title, currentLevel.ToString("N0"), targetLevel.ToString("N0"));
                     text += amountText;
                     TextWrapper cacheTextAmount;
                     if (CacheTextLevels.TryGetValue(dataEntry.Key, out cacheTextAmount))

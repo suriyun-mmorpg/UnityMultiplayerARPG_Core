@@ -66,15 +66,15 @@ namespace MultiplayerARPG
         public int conditionalLevel;
         public bool IsPass(IPlayerCharacterData character)
         {
-            var indexOfQuest = -1;
-            var questTasksCompleted = false;
-            var questCompleted = false;
+            int indexOfQuest = -1;
+            bool questTasksCompleted = false;
+            bool questCompleted = false;
             if (quest != null)
             {
                 indexOfQuest = character.IndexOfQuest(quest.DataId);
                 if (indexOfQuest >= 0)
                 {
-                    var characterQuest = character.Quests[indexOfQuest];
+                    CharacterQuest characterQuest = character.Quests[indexOfQuest];
                     questTasksCompleted = characterQuest.IsAllTasksDone(character);
                     questCompleted = characterQuest.isComplete;
                 }
@@ -113,11 +113,11 @@ namespace MultiplayerARPG
             {
                 if (dialog.quest == null)
                     return false;
-                var indexOfQuest = character.IndexOfQuest(dialog.quest.DataId);
+                int indexOfQuest = character.IndexOfQuest(dialog.quest.DataId);
                 if (indexOfQuest >= 0 && character.Quests[indexOfQuest].isComplete)
                     return false;
             }
-            foreach (var showCondition in showConditions)
+            foreach (NpcDialogCondition showCondition in showConditions)
             {
                 if (!showCondition.IsPass(character))
                     return false;

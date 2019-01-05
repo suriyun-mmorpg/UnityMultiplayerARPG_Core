@@ -32,9 +32,9 @@ namespace MultiplayerARPG
 
             if (dropdownRoles != null)
             {
-                var options = new List<DropdownWrapper.OptionData>();
+                List<DropdownWrapper.OptionData> options = new List<DropdownWrapper.OptionData>();
                 options.Add(new DropdownWrapper.OptionData("None"));
-                for (var i = 1; i < roles.Length; ++i)
+                for (int i = 1; i < roles.Length; ++i)
                 {
                     options.Add(new DropdownWrapper.OptionData(roles[i].roleName));
                 }

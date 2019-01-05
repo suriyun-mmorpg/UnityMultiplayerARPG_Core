@@ -109,9 +109,9 @@ namespace MultiplayerARPG
             if (textLevel != null)
                 textLevel.text = string.Format(levelFormat, Guild == null ? "1" : Guild.level.ToString("N0"));
 
-            var expTree = GameInstance.Singleton.SocialSystemSetting.GuildExpTree;
-            var currentExp = 0;
-            var nextLevelExp = 0;
+            int[] expTree = GameInstance.Singleton.SocialSystemSetting.GuildExpTree;
+            int currentExp = 0;
+            int nextLevelExp = 0;
             if (Guild != null && Guild.GetNextLevelExp() > 0)
             {
                 currentExp = Guild.exp;
@@ -119,7 +119,7 @@ namespace MultiplayerARPG
             }
             else if (Guild != null && Guild.level - 2 > 0 && Guild.level - 2 < expTree.Length)
             {
-                var maxExp = expTree[Guild.level - 2];
+                int maxExp = expTree[Guild.level - 2];
                 currentExp = maxExp;
                 nextLevelExp = maxExp;
             }
@@ -229,7 +229,7 @@ namespace MultiplayerARPG
             memberAmount = guild.CountMember();
             UpdateUIs();
 
-            var selectedIdx = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI) : -1;
+            int selectedIdx = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.IndexOf(MemberSelectionManager.SelectedUI) : -1;
             MemberSelectionManager.DeselectSelectedUI();
             MemberSelectionManager.Clear();
 
@@ -238,10 +238,10 @@ namespace MultiplayerARPG
             guild.GetSortedMembers(out members, out memberRoles);
             MemberList.Generate(members, (index, guildMember, ui) =>
             {
-                var guildMemberEntity = new SocialCharacterEntityTuple();
+                SocialCharacterEntityTuple guildMemberEntity = new SocialCharacterEntityTuple();
                 guildMemberEntity.socialCharacter = guildMember;
 
-                var uiGuildMember = ui.GetComponent<UIGuildCharacter>();
+                UIGuildCharacter uiGuildMember = ui.GetComponent<UIGuildCharacter>();
                 uiGuildMember.uiSocialGroup = this;
                 uiGuildMember.Setup(guildMemberEntity, memberRoles[index], guild.GetRole(memberRoles[index]));
                 uiGuildMember.Show();
@@ -256,7 +256,7 @@ namespace MultiplayerARPG
 
             RoleList.Generate(guild.GetRoles(), (index, guildRole, ui) =>
             {
-                var uiGuildRole = ui.GetComponent<UIGuildRole>();
+                UIGuildRole uiGuildRole = ui.GetComponent<UIGuildRole>();
                 uiGuildRole.Data = guildRole;
                 uiGuildRole.Show();
                 RoleSelectionManager.Add(uiGuildRole);
@@ -270,7 +270,7 @@ namespace MultiplayerARPG
 
             SkillList.Generate(GameInstance.GuildSkills.Values, (index, guildSkill, ui) =>
             {
-                var uiGuildSkill = ui.GetComponent<UIGuildSkill>();
+                UIGuildSkill uiGuildSkill = ui.GetComponent<UIGuildSkill>();
                 uiGuildSkill.Data = new GuildSkillTuple(guildSkill, guild.GetSkillLevel(guildSkill.DataId));
                 uiGuildSkill.Show();
                 SkillSelectionManager.Add(uiGuildSkill);
@@ -300,7 +300,7 @@ namespace MultiplayerARPG
             if (!OwningCharacterIsLeader() || MemberSelectionManager.SelectedUI == null)
                 return;
 
-            var guildMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
+            SocialCharacterData guildMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
             UISceneGlobal.Singleton.ShowMessageDialog("Change Leader", string.Format("You sure you want to promote {0} to guild leader?", guildMember.characterName), false, true, false, false, null, () =>
             {
                 BasePlayerCharacterController.OwningCharacter.RequestChangeGuildLeader(guildMember.id);
@@ -315,8 +315,8 @@ namespace MultiplayerARPG
 
             if (uiGuildRoleSetting != null)
             {
-                var guildRole = (byte)RoleSelectionManager.IndexOf(RoleSelectionManager.SelectedUI);
-                var role = Guild.GetRole(guildRole);
+                byte guildRole = (byte)RoleSelectionManager.IndexOf(RoleSelectionManager.SelectedUI);
+                GuildRoleData role = Guild.GetRole(guildRole);
                 uiGuildRoleSetting.Show(guildRole, role.roleName, role.canInvite, role.canKick, role.shareExpPercentage);
             }
         }
@@ -327,7 +327,7 @@ namespace MultiplayerARPG
             if (!OwningCharacterIsLeader() || Guild == null || MemberSelectionManager.SelectedUI == null)
                 return;
 
-            var selectedUI = MemberSelectionManager.SelectedUI as UIGuildCharacter;
+            UIGuildCharacter selectedUI = MemberSelectionManager.SelectedUI as UIGuildCharacter;
             if (uiGuildMemberRoleSetting != null && selectedUI != null)
                 uiGuildMemberRoleSetting.Show(Guild.GetRoles().ToArray(), selectedUI.Data.socialCharacter, selectedUI.GuildRole);
         }
@@ -349,7 +349,7 @@ namespace MultiplayerARPG
             if (!OwningCharacterCanKick() || MemberSelectionManager.SelectedUI == null)
                 return;
 
-            var guildMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
+            SocialCharacterData guildMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
             UISceneGlobal.Singleton.ShowMessageDialog("Kick Member", string.Format("You sure you want to kick {0} from guild?", guildMember.characterName), false, true, false, false, null, () =>
             {
                 BasePlayerCharacterController.OwningCharacter.RequestKickFromGuild(guildMember.id);

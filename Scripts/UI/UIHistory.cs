@@ -32,7 +32,7 @@ public class UIHistory : MonoBehaviour
         // Remove current ui from stack
         if (uiStack.Count > 0)
         {
-            var ui = uiStack.Pop();
+            UIBase ui = uiStack.Pop();
             ui.Hide();
         }
         // Show recent ui
@@ -46,7 +46,7 @@ public class UIHistory : MonoBehaviour
     {
         while (uiStack.Count > 0)
         {
-            var ui = uiStack.Pop();
+            UIBase ui = uiStack.Pop();
             ui.Hide();
         }
         uiStack.Clear();

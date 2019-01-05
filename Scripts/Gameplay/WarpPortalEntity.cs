@@ -15,7 +15,7 @@ namespace MultiplayerARPG
         protected override void EntityAwake()
         {
             base.EntityAwake();
-            foreach (var warpSignal in warpSignals)
+            foreach (GameObject warpSignal in warpSignals)
             {
                 if (warpSignal != null)
                     warpSignal.SetActive(false);
@@ -48,7 +48,7 @@ namespace MultiplayerARPG
             if (!other.CompareTag(GameInstance.Singleton.playerTag))
                 return;
 
-            var playerCharacterEntity = other.GetComponent<BasePlayerCharacterEntity>();
+            BasePlayerCharacterEntity playerCharacterEntity = other.GetComponent<BasePlayerCharacterEntity>();
             if (playerCharacterEntity == null)
                 return;
 
@@ -61,7 +61,7 @@ namespace MultiplayerARPG
 
                 if (playerCharacterEntity == BasePlayerCharacterController.OwningCharacter)
                 {
-                    foreach (var warpSignal in warpSignals)
+                    foreach (GameObject warpSignal in warpSignals)
                     {
                         if (warpSignal != null)
                             warpSignal.SetActive(true);
@@ -76,7 +76,7 @@ namespace MultiplayerARPG
             if (!other.CompareTag(GameInstance.Singleton.playerTag))
                 return;
 
-            var playerCharacterEntity = other.GetComponent<BasePlayerCharacterEntity>();
+            BasePlayerCharacterEntity playerCharacterEntity = other.GetComponent<BasePlayerCharacterEntity>();
             if (playerCharacterEntity == null)
                 return;
 
@@ -84,7 +84,7 @@ namespace MultiplayerARPG
             {
                 playerCharacterEntity.warpingPortal = null;
 
-                foreach (var warpSignal in warpSignals)
+                foreach (GameObject warpSignal in warpSignals)
                 {
                     if (warpSignal != null)
                         warpSignal.SetActive(false);

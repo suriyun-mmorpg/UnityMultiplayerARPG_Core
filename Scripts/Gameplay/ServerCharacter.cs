@@ -47,12 +47,12 @@ namespace MultiplayerARPG
 
         void Update()
         {
-            var horizontalInput = InputManager.GetAxis("Horizontal", false);
-            var verticalInput = InputManager.GetAxis("Vertical", false);
-            var isJump = InputManager.GetButtonDown("Jump");
+            float horizontalInput = InputManager.GetAxis("Horizontal", false);
+            float verticalInput = InputManager.GetAxis("Vertical", false);
+            bool isJump = InputManager.GetButtonDown("Jump");
 
             moveDirection = Vector3.zero;
-            var cameraTransform = controlCamera.transform;
+            Transform cameraTransform = controlCamera.transform;
             if (cameraTransform != null)
             {
                 moveDirection += cameraTransform.forward * verticalInput;
@@ -81,15 +81,15 @@ namespace MultiplayerARPG
 
         private void FixedUpdate()
         {
-            var gameInstance = GameInstance.Singleton;
-            var velocity = CacheRigidbody.velocity;
-            var moveDirectionMagnitude = moveDirection.magnitude;
+            GameInstance gameInstance = GameInstance.Singleton;
+            Vector3 velocity = CacheRigidbody.velocity;
+            float moveDirectionMagnitude = moveDirection.magnitude;
             if (moveDirectionMagnitude != 0)
             {
                 if (moveDirectionMagnitude > 1)
                     moveDirection = moveDirection.normalized;
 
-                var targetVelocity = moveDirection * moveSpeed;
+                Vector3 targetVelocity = moveDirection * moveSpeed;
 
                 // Apply a force that attempts to reach our target velocity
                 Vector3 velocityChange = (targetVelocity - velocity);

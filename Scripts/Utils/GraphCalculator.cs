@@ -14,7 +14,7 @@ public class Int32GraphCalculator : GraphCalculator<int>
 {
     public Int32GraphCalculator Clone()
     {
-        var result = new Int32GraphCalculator();
+        Int32GraphCalculator result = new Int32GraphCalculator();
         result.minValue = minValue;
         result.maxValue = maxValue;
         result.growth = growth;
@@ -36,7 +36,7 @@ public class Int32GraphCalculator : GraphCalculator<int>
 
     public static Int32GraphCalculator operator *(Int32GraphCalculator a, float multiplier)
     {
-        var result = a.Clone();
+        Int32GraphCalculator result = a.Clone();
         result.minValue = Mathf.RoundToInt(a.minValue * multiplier);
         result.maxValue = Mathf.RoundToInt(a.maxValue * multiplier);
         return result;
@@ -48,7 +48,7 @@ public class SingleGraphCalculator : GraphCalculator<float>
 {
     public SingleGraphCalculator Clone()
     {
-        var result = new SingleGraphCalculator();
+        SingleGraphCalculator result = new SingleGraphCalculator();
         result.minValue = minValue;
         result.maxValue = maxValue;
         result.growth = growth;
@@ -70,7 +70,7 @@ public class SingleGraphCalculator : GraphCalculator<float>
 
     public static SingleGraphCalculator operator *(SingleGraphCalculator a, float multiplier)
     {
-        var result = a.Clone();
+        SingleGraphCalculator result = a.Clone();
         result.minValue = a.minValue * multiplier;
         result.maxValue = a.maxValue * multiplier;
         return result;

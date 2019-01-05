@@ -96,7 +96,7 @@ public class CharacterSummon : INetSerializable
     {
         if (GetPrefab() == null)
             return;
-        var identity = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(GetPrefab().Identity, summoner.GetSummonPosition(), summoner.GetSummonRotation());
+        LiteNetLibIdentity identity = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(GetPrefab().Identity, summoner.GetSummonPosition(), summoner.GetSummonRotation());
         cacheEntity = identity.GetComponent<BaseMonsterCharacterEntity>();
         CacheEntity.Summon(summoner, type, summonLevel);
         objectId = CacheEntity.ObjectId;
@@ -121,7 +121,7 @@ public class CharacterSummon : INetSerializable
     {
         if (type == SummonType.Pet)
         {
-            var newItem = CharacterItem.Create(dataId, Level, 1);
+            CharacterItem newItem = CharacterItem.Create(dataId, Level, 1);
             newItem.exp = Exp;
             if (CacheEntity == null || CacheEntity.CurrentHp <= 0)
                 newItem.Lock(GameInstance.Singleton.petDeadLockDuration);
@@ -152,7 +152,7 @@ public class CharacterSummon : INetSerializable
 
     public static CharacterSummon Create(SummonType type, int dataId)
     {
-        var newSummon = new CharacterSummon();
+        CharacterSummon newSummon = new CharacterSummon();
         newSummon.type = type;
         newSummon.dataId = dataId;
         return newSummon;

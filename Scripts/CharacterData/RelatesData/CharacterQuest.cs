@@ -47,13 +47,13 @@ public class CharacterQuest : INetSerializable
 
     public bool IsAllTasksDone(ICharacterData character)
     {
-        var quest = GetQuest();
+        Quest quest = GetQuest();
         if (character == null || quest == null)
             return false;
-        var tasks = quest.tasks;
-        for (var i = 0; i < tasks.Length; ++i)
+        QuestTask[] tasks = quest.tasks;
+        for (int i = 0; i < tasks.Length; ++i)
         {
-            var isComplete = false;
+            bool isComplete = false;
             GetProgress(character, i, out isComplete);
             if (!isComplete)
                 return false;
@@ -64,20 +64,20 @@ public class CharacterQuest : INetSerializable
     public int GetProgress(ICharacterData character, int taskIndex, out bool isComplete)
     {
         isComplete = false;
-        var quest = GetQuest();
+        Quest quest = GetQuest();
         if (character == null || quest == null || taskIndex < 0 || taskIndex >= quest.tasks.Length)
             return 0;
-        var task = quest.tasks[taskIndex];
-        var progress = 0;
+        QuestTask task = quest.tasks[taskIndex];
+        int progress = 0;
         switch (task.taskType)
         {
             case QuestTaskType.KillMonster:
-                var monsterCharacterAmount = task.monsterCharacterAmount;
+                MonsterCharacterAmount monsterCharacterAmount = task.monsterCharacterAmount;
                 progress = monsterCharacterAmount.monster == null ? 0 : CountKillMonster(monsterCharacterAmount.monster.DataId);
                 isComplete = progress >= monsterCharacterAmount.amount;
                 return progress;
             case QuestTaskType.CollectItem:
-                var itemAmount = task.itemAmount;
+                ItemAmount itemAmount = task.itemAmount;
                 progress = itemAmount.item == null ? 0 : character.CountNonEquipItems(itemAmount.item.DataId);
                 isComplete = progress >= itemAmount.amount;
                 return progress;
@@ -92,7 +92,7 @@ public class CharacterQuest : INetSerializable
 
     public bool AddKillMonster(int monsterDataId, int killCount)
     {
-        var quest = GetQuest();
+        Quest quest = GetQuest();
         if (quest == null || !quest.CacheKillMonsterIds.Contains(monsterDataId))
             return false;
         if (!KilledMonsters.ContainsKey(monsterDataId))
@@ -103,14 +103,14 @@ public class CharacterQuest : INetSerializable
 
     public int CountKillMonster(int monsterDataId)
     {
-        var count = 0;
+        int count = 0;
         KilledMonsters.TryGetValue(monsterDataId, out count);
         return count;
     }
 
     public static CharacterQuest Create(Quest quest)
     {
-        var newQuest = new CharacterQuest();
+        CharacterQuest newQuest = new CharacterQuest();
         newQuest.dataId = quest.DataId;
         newQuest.isComplete = false;
         return newQuest;
@@ -120,12 +120,12 @@ public class CharacterQuest : INetSerializable
     {
         writer.Put(dataId);
         writer.Put(isComplete);
-        var killedMonsters = KilledMonsters;
-        var killMonsterCount = killedMonsters.Count;
+        Dictionary<int, int> killedMonsters = KilledMonsters;
+        int killMonsterCount = killedMonsters.Count;
         writer.Put(killMonsterCount);
         if (killMonsterCount > 0)
         {
-            foreach (var killedMonster in killedMonsters)
+            foreach (KeyValuePair<int, int> killedMonster in killedMonsters)
             {
                 writer.Put(killedMonster.Key);
                 writer.Put(killedMonster.Value);
@@ -137,9 +137,9 @@ public class CharacterQuest : INetSerializable
     {
         dataId = reader.GetInt();
         isComplete = reader.GetBool();
-        var killMonsterCount = reader.GetInt();
+        int killMonsterCount = reader.GetInt();
         KilledMonsters.Clear();
-        for (var i = 0; i < killMonsterCount; ++i)
+        for (int i = 0; i < killMonsterCount; ++i)
         {
             KilledMonsters.Add(reader.GetInt(), reader.GetInt());
         }

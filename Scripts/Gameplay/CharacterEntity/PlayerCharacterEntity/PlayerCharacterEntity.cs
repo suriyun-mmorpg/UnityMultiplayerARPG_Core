@@ -326,7 +326,7 @@ namespace MultiplayerARPG
         {
             if (useNavMesh)
             {
-                var navPath = new NavMeshPath();
+                NavMeshPath navPath = new NavMeshPath();
                 if (NavMesh.CalculatePath(CacheTransform.position, position, NavMesh.AllAreas, navPath))
                 {
                     navPaths = new Queue<Vector3>(navPath.corners);

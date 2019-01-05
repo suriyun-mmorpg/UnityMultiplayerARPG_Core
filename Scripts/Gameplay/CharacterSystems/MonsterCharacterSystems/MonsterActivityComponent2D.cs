@@ -91,7 +91,7 @@ namespace MultiplayerARPG
         protected void Awake()
         {
             CacheRigidbody2D.gravityScale = 0;
-            var time = Time.unscaledTime;
+            float time = Time.unscaledTime;
             RandomNextWanderTime(time);
             SetFindTargetTime(time);
             SetStartFollowTargetTime(time);
@@ -115,7 +115,7 @@ namespace MultiplayerARPG
 
             if (currentDestination.HasValue)
             {
-                var currentPosition = new Vector2(CacheTransform.position.x, CacheTransform.position.y);
+                Vector2 currentPosition = new Vector2(CacheTransform.position.x, CacheTransform.position.y);
                 moveDirection = (currentDestination.Value - currentPosition).normalized;
                 if (Vector3.Distance(currentDestination.Value, currentPosition) < stoppingDistance)
                     StopMove();
@@ -142,7 +142,7 @@ namespace MultiplayerARPG
         IEnumerator SimpleMoveOutFromWallRoutine()
         {
             isMovingOutFromWall = true;
-            var oldPosition = CacheMonsterCharacterEntity.CacheTransform.position;
+            Vector3 oldPosition = CacheMonsterCharacterEntity.CacheTransform.position;
             yield return new WaitForSeconds(0.5f);
             if (Vector3.Distance(oldPosition, CacheMonsterCharacterEntity.CacheTransform.position) < stoppingDistance)
                 RandomWanderTarget(Time.unscaledTime);
@@ -197,7 +197,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            var currentPosition = CacheMonsterCharacterEntity.CacheTransform.position;
+            Vector3 currentPosition = CacheMonsterCharacterEntity.CacheTransform.position;
 
             if (CacheMonsterCharacterEntity.Summoner != null &&
                 Vector3.Distance(currentPosition, CacheMonsterCharacterEntity.Summoner.CacheTransform.position) > gameInstance.minFollowSummonerDistance)
@@ -248,8 +248,8 @@ namespace MultiplayerARPG
         public void UpdateAttackTarget(float time, Vector3 currentPosition, BaseCharacterEntity targetEntity)
         {
             // If it has target then go to target
-            var targetEntityPosition = targetEntity.CacheTransform.position;
-            var attackDistance = CacheMonsterCharacterEntity.GetAttackDistance();
+            Vector3 targetEntityPosition = targetEntity.CacheTransform.position;
+            float attackDistance = CacheMonsterCharacterEntity.GetAttackDistance();
             attackDistance -= attackDistance * 0.1f;
             attackDistance -= stoppingDistance;
             if (Vector3.Distance(currentPosition, targetEntityPosition) <= attackDistance)
@@ -257,7 +257,7 @@ namespace MultiplayerARPG
                 StopMove();
                 SetStartFollowTargetTime(time);
                 // Lookat target then do anything when it's in range
-                var targetDirection = (targetEntity.CacheTransform.position - CacheMonsterCharacterEntity.CacheTransform.position).normalized;
+                Vector3 targetDirection = (targetEntity.CacheTransform.position - CacheMonsterCharacterEntity.CacheTransform.position).normalized;
                 if (targetDirection.magnitude != 0f)
                     CacheMonsterCharacterEntity.UpdateCurrentDirection(targetDirection);
                 CacheMonsterCharacterEntity.RequestAttack();
@@ -278,7 +278,7 @@ namespace MultiplayerARPG
         public void RandomWanderTarget(float time)
         {
             // If stopped then random
-            var randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
+            Vector3 randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
             if (CacheMonsterCharacterEntity.Summoner != null)
                 randomPosition = CacheMonsterCharacterEntity.Summoner.GetSummonPosition();
             CacheMonsterCharacterEntity.SetTargetEntity(null);
@@ -288,7 +288,7 @@ namespace MultiplayerARPG
         public void FollowSummoner(float time)
         {
             // If stopped then random
-            var randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
+            Vector3 randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
             if (CacheMonsterCharacterEntity.Summoner != null)
                 randomPosition = CacheMonsterCharacterEntity.Summoner.GetSummonPosition();
             CacheMonsterCharacterEntity.SetTargetEntity(null);
@@ -306,10 +306,10 @@ namespace MultiplayerARPG
             if (!CacheMonsterCharacterEntity.TryGetTargetEntity(out targetCharacter) || targetCharacter.IsDead())
             {
                 // If no target enenmy or target enemy is dead, Find nearby character by layer mask
-                var foundObjects = new List<Collider2D>(Physics2D.OverlapCircleAll(currentPosition, monsterDatabase.visualRange, gameInstance.characterLayer.Mask));
-                foreach (var foundObject in foundObjects)
+                List<Collider2D> foundObjects = new List<Collider2D>(Physics2D.OverlapCircleAll(currentPosition, monsterDatabase.visualRange, gameInstance.characterLayer.Mask));
+                foreach (Collider2D foundObject in foundObjects)
                 {
-                    var characterEntity = foundObject.GetComponent<BaseCharacterEntity>();
+                    BaseCharacterEntity characterEntity = foundObject.GetComponent<BaseCharacterEntity>();
                     // Attack target settings
                     if (characterEntity != null &&
                         characterEntity.CanReceiveDamageFrom(CacheMonsterCharacterEntity))

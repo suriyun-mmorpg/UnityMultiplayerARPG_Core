@@ -6,8 +6,8 @@ public class BaseComponentRegister<T> : MonoBehaviour where T : Component
 {
     private void Awake()
     {
-        var components = GetComponents<T>();
-        foreach (var component in components)
+        T[] components = GetComponents<T>();
+        foreach (T component in components)
         {
             ComponentCollector.Add(component);
         }

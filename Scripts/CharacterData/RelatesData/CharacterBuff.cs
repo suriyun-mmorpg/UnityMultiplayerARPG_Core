@@ -211,7 +211,7 @@ public class CharacterBuff : INetSerializable
 
     public static CharacterBuff Create(BuffType type, int dataId, short level = 1)
     {
-        var newBuff = new CharacterBuff();
+        CharacterBuff newBuff = new CharacterBuff();
         newBuff.type = type;
         newBuff.dataId = dataId;
         newBuff.level = level;

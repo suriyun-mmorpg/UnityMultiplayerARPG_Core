@@ -89,7 +89,7 @@ public abstract class UISelectionManager<TData, TUI, TDataEvent, TUIEvent> : UIS
         if (ui == null)
             return;
 
-        var castedUI = (TUI)ui;
+        TUI castedUI = (TUI)ui;
         castedUI.Select();
 
         if (eventOnSelect != null)
@@ -99,7 +99,7 @@ public abstract class UISelectionManager<TData, TUI, TDataEvent, TUIEvent> : UIS
             eventOnDataSelect.Invoke(castedUI.Data);
 
         SelectedUI = castedUI;
-        foreach (var deselectUI in uis)
+        foreach (TUI deselectUI in uis)
         {
             if (deselectUI != castedUI)
                 deselectUI.Deselect();
@@ -114,7 +114,7 @@ public abstract class UISelectionManager<TData, TUI, TDataEvent, TUIEvent> : UIS
 
     public override sealed void Deselect(object ui)
     {
-        var castedUI = (TUI)ui;
+        TUI castedUI = (TUI)ui;
 
         if (eventOnDeselect != null)
             eventOnDeselect.Invoke(castedUI);
@@ -135,7 +135,7 @@ public abstract class UISelectionManager<TData, TUI, TDataEvent, TUIEvent> : UIS
     public override sealed void DeselectAll()
     {
         SelectedUI = null;
-        foreach (var deselectUI in uis)
+        foreach (TUI deselectUI in uis)
         {
             deselectUI.Deselect();
         }

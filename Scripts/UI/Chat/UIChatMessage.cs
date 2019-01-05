@@ -16,7 +16,7 @@ namespace MultiplayerARPG
         public UIChatHandler uiChatHandler;
         protected override void UpdateData()
         {
-            var format = string.Empty;
+            string format = string.Empty;
             switch (Data.channel)
             {
                 case ChatChannel.Global:

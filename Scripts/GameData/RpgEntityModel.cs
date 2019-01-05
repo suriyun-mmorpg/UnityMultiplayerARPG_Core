@@ -29,7 +29,7 @@ namespace MultiplayerARPG
                 if (cacheEffectContainers == null)
                 {
                     cacheEffectContainers = new Dictionary<string, EffectContainer>();
-                    foreach (var effectContainer in effectContainers)
+                    foreach (EffectContainer effectContainer in effectContainers)
                     {
                         if (effectContainer.transform != null && !cacheEffectContainers.ContainsKey(effectContainer.effectSocket))
                             cacheEffectContainers[effectContainer.effectSocket] = effectContainer;
@@ -59,7 +59,7 @@ namespace MultiplayerARPG
             if (effects == null || effects.Length == 0)
                 return new List<GameEffect>();
             tempAddingEffects.Clear();
-            foreach (var effect in effects)
+            foreach (GameEffect effect in effects)
             {
                 if (effect == null)
                     continue;

@@ -54,20 +54,20 @@ namespace MultiplayerARPG
             characterModelContainer.RemoveChildren();
             CharacterModels.Clear();
             // Show list of created characters
-            var selectableCharacters = PlayerCharacterDataExtension.LoadAllPersistentCharacterData();
-            for (var i = selectableCharacters.Count - 1; i >= 0; --i)
+            List<PlayerCharacterData> selectableCharacters = PlayerCharacterDataExtension.LoadAllPersistentCharacterData();
+            for (int i = selectableCharacters.Count - 1; i >= 0; --i)
             {
-                var selectableCharacter = selectableCharacters[i];
+                PlayerCharacterData selectableCharacter = selectableCharacters[i];
                 if (selectableCharacter == null || !GameInstance.PlayerCharacters.ContainsKey(selectableCharacter.DataId))
                     selectableCharacters.RemoveAt(i);
             }
             selectableCharacters.Sort(new PlayerCharacterDataLastUpdateComparer().Desc());
             CacheList.Generate(selectableCharacters, (index, character, ui) =>
             {
-                var uiCharacter = ui.GetComponent<UICharacter>();
+                UICharacter uiCharacter = ui.GetComponent<UICharacter>();
                 uiCharacter.Data = character;
                 // Select trigger when add first entry so deactivate all models is okay beacause first model will active
-                var characterModel = character.InstantiateModel(characterModelContainer);
+                BaseCharacterModel characterModel = character.InstantiateModel(characterModelContainer);
                 if (characterModel != null)
                 {
                     CharacterModels[character.Id] = characterModel;
@@ -111,7 +111,7 @@ namespace MultiplayerARPG
             buttonStart.gameObject.SetActive(true);
             buttonDelete.gameObject.SetActive(true);
             characterModelContainer.SetChildrenActive(false);
-            var playerCharacter = ui.Data as IPlayerCharacterData;
+            IPlayerCharacterData playerCharacter = ui.Data as IPlayerCharacterData;
             ShowCharacter(playerCharacter.Id);
         }
 
@@ -125,7 +125,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnClickStart()
         {
-            var selectedUI = SelectionManager.SelectedUI;
+            UICharacter selectedUI = SelectionManager.SelectedUI;
             if (selectedUI == null)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog("Cannot start game", "Please choose character to start game");
@@ -134,14 +134,14 @@ namespace MultiplayerARPG
             }
             // Load gameplay scene, we're going to manage maps in gameplay scene later
             // So we can add gameplay UI just once in gameplay scene
-            var characterData = new PlayerCharacterData();
-            var playerCharacter = selectedUI.Data as IPlayerCharacterData;
+            PlayerCharacterData characterData = new PlayerCharacterData();
+            IPlayerCharacterData playerCharacter = selectedUI.Data as IPlayerCharacterData;
             playerCharacter.CloneTo(characterData);
-            var gameInstance = GameInstance.Singleton;
-            var networkManager = BaseGameNetworkManager.Singleton as LanRpgNetworkManager;
+            GameInstance gameInstance = GameInstance.Singleton;
+            LanRpgNetworkManager networkManager = BaseGameNetworkManager.Singleton as LanRpgNetworkManager;
             if (!gameInstance.GetGameScenes().Contains(characterData.CurrentMapName))
             {
-                var startMap = (characterData.GetDatabase() as PlayerCharacter).StartMap;
+                MapInfo startMap = (characterData.GetDatabase() as PlayerCharacter).StartMap;
                 characterData.CurrentMapName = startMap.scene.SceneName;
                 characterData.CurrentPosition = startMap.startPosition;
             }
@@ -152,7 +152,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnClickDelete()
         {
-            var selectedUI = SelectionManager.SelectedUI;
+            UICharacter selectedUI = SelectionManager.SelectedUI;
             if (selectedUI == null)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog("Cannot delete character", "Please choose character to delete");
@@ -160,7 +160,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            var playerCharacter = selectedUI.Data as IPlayerCharacterData;
+            IPlayerCharacterData playerCharacter = selectedUI.Data as IPlayerCharacterData;
             playerCharacter.DeletePersistentCharacterData();
             // Reload characters
             LoadCharacters();

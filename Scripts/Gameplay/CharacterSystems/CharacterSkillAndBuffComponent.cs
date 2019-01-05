@@ -37,10 +37,10 @@ namespace MultiplayerARPG
             component.updatingTime += deltaTime;
             if (component.updatingTime >= SKILL_BUFF_UPDATE_DURATION)
             {
-                var count = characterEntity.Summons.Count;
-                for (var i = count - 1; i >= 0; --i)
+                int count = characterEntity.Summons.Count;
+                for (int i = count - 1; i >= 0; --i)
                 {
-                    var summon = characterEntity.Summons[i];
+                    CharacterSummon summon = characterEntity.Summons[i];
                     if (summon.ShouldRemove())
                     {
                         characterEntity.Summons.RemoveAt(i);
@@ -53,9 +53,9 @@ namespace MultiplayerARPG
                     }
                 }
                 count = characterEntity.SkillUsages.Count;
-                for (var i = count - 1; i >= 0; --i)
+                for (int i = count - 1; i >= 0; --i)
                 {
-                    var skillUsage = characterEntity.SkillUsages[i];
+                    CharacterSkillUsage skillUsage = characterEntity.SkillUsages[i];
                     if (skillUsage.ShouldRemove())
                         characterEntity.SkillUsages.RemoveAt(i);
                     else
@@ -65,9 +65,9 @@ namespace MultiplayerARPG
                     }
                 }
                 count = characterEntity.NonEquipItems.Count;
-                for (var i = count - 1; i >= 0; --i)
+                for (int i = count - 1; i >= 0; --i)
                 {
-                    var nonEquipItem = characterEntity.NonEquipItems[i];
+                    CharacterItem nonEquipItem = characterEntity.NonEquipItems[i];
                     if (nonEquipItem.ShouldRemove())
                         characterEntity.NonEquipItems.RemoveAt(i);
                     else
@@ -80,10 +80,10 @@ namespace MultiplayerARPG
                     }
                 }
                 count = characterEntity.Buffs.Count;
-                for (var i = count - 1; i >= 0; --i)
+                for (int i = count - 1; i >= 0; --i)
                 {
-                    var buff = characterEntity.Buffs[i];
-                    var duration = buff.GetDuration();
+                    CharacterBuff buff = characterEntity.Buffs[i];
+                    float duration = buff.GetDuration();
                     if (buff.ShouldRemove())
                         characterEntity.Buffs.RemoveAt(i);
                     else

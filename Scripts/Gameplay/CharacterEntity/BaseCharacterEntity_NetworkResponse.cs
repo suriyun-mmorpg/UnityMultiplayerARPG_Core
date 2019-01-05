@@ -47,15 +47,15 @@ namespace MultiplayerARPG
             // Reduce ammo amount
             if (weapon != null)
             {
-                var weaponType = weapon.GetWeaponItem().WeaponType;
+                WeaponType weaponType = weapon.GetWeaponItem().WeaponType;
                 if (weaponType.requireAmmoType != null)
                 {
                     Dictionary<CharacterItem, short> decreaseItems;
                     if (!this.DecreaseAmmos(weaponType.requireAmmoType, 1, out decreaseItems))
                         return;
-                    var firstEntry = decreaseItems.FirstOrDefault();
-                    var characterItem = firstEntry.Key;
-                    var item = characterItem.GetItem();
+                    KeyValuePair<CharacterItem, short> firstEntry = decreaseItems.FirstOrDefault();
+                    CharacterItem characterItem = firstEntry.Key;
+                    Item item = characterItem.GetItem();
                     if (item != null && firstEntry.Value > 0)
                         allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(allDamageAmounts, item.GetIncreaseDamages(characterItem.level, characterItem.GetEquipmentBonusRate()));
                 }
@@ -95,11 +95,11 @@ namespace MultiplayerARPG
             if (!CanMoveOrDoActions())
                 return;
 
-            var index = this.IndexOfSkill(dataId);
+            int index = this.IndexOfSkill(dataId);
             if (index < 0)
                 return;
 
-            var characterSkill = skills[index];
+            CharacterSkill characterSkill = skills[index];
             if (!characterSkill.CanUse(this))
                 return;
 
@@ -127,16 +127,16 @@ namespace MultiplayerARPG
             
             if (weapon != null)
             {
-                var weaponType = weapon.GetWeaponItem().WeaponType;
+                WeaponType weaponType = weapon.GetWeaponItem().WeaponType;
                 // Reduce ammo amount
                 if (skillAttackType != SkillAttackType.None && weaponType.requireAmmoType != null)
                 {
                     Dictionary<CharacterItem, short> decreaseItems;
                     if (!this.DecreaseAmmos(weaponType.requireAmmoType, 1, out decreaseItems))
                         return;
-                    var firstEntry = decreaseItems.FirstOrDefault();
-                    var characterItem = firstEntry.Key;
-                    var item = characterItem.GetItem();
+                    KeyValuePair<CharacterItem, short> firstEntry = decreaseItems.FirstOrDefault();
+                    CharacterItem characterItem = firstEntry.Key;
+                    Item item = characterItem.GetItem();
                     if (item != null && firstEntry.Value > 0)
                         allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(allDamageAmounts, item.GetIncreaseDamages(characterItem.level, characterItem.GetEquipmentBonusRate()));
                 }
@@ -160,7 +160,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
             // Update skill usage states
-            var newSkillUsage = CharacterSkillUsage.Create(SkillUsageType.Skill, characterSkill.dataId);
+            CharacterSkillUsage newSkillUsage = CharacterSkillUsage.Create(SkillUsageType.Skill, characterSkill.dataId);
             newSkillUsage.Use(this, characterSkill.level);
             skillUsages.Add(newSkillUsage);
 
@@ -181,14 +181,14 @@ namespace MultiplayerARPG
             if (itemIndex >= nonEquipItems.Count)
                 return;
 
-            var characterItem = nonEquipItems[itemIndex];
+            CharacterItem characterItem = nonEquipItems[itemIndex];
             if (characterItem.IsLock())
                 return;
 
-            var potionItem = characterItem.GetPotionItem();
+            Item potionItem = characterItem.GetPotionItem();
             if (potionItem != null && this.DecreaseItemsByIndex(itemIndex, 1))
                 ApplyPotionBuff(potionItem, characterItem.level);
-            var petItem = characterItem.GetPetItem();
+            Item petItem = characterItem.GetPetItem();
             if (petItem != null && this.DecreaseItemsByIndex(itemIndex, 1))
                 ApplyItemPetSummon(petItem, characterItem.level, characterItem.exp);
         }
@@ -208,7 +208,7 @@ namespace MultiplayerARPG
 
         private IEnumerator PlayActionAnimationRoutine(AnimActionType animActionType, int dataId, int index)
         {
-            var playSpeedMultiplier = 1f;
+            float playSpeedMultiplier = 1f;
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
@@ -243,16 +243,16 @@ namespace MultiplayerARPG
                 return;
             }
 
-            var itemDropData = itemDropEntity.dropData;
+            CharacterItem itemDropData = itemDropEntity.dropData;
             if (!itemDropData.IsValid())
             {
                 // Destroy item drop entity without item add because this is not valid
                 itemDropEntity.NetworkDestroy();
                 return;
             }
-            var itemDataId = itemDropData.dataId;
-            var level = itemDropData.level;
-            var amount = itemDropData.amount;
+            int itemDataId = itemDropData.dataId;
+            short level = itemDropData.level;
+            short amount = itemDropData.amount;
             if (!IncreasingItemsWillOverwhelming(itemDataId, amount) && this.IncreaseItems(itemDataId, level, amount))
                 itemDropEntity.NetworkDestroy();
         }
@@ -268,12 +268,12 @@ namespace MultiplayerARPG
                 index >= nonEquipItems.Count)
                 return;
 
-            var nonEquipItem = nonEquipItems[index];
+            CharacterItem nonEquipItem = nonEquipItems[index];
             if (!nonEquipItem.IsValid() || amount > nonEquipItem.amount)
                 return;
 
-            var itemDataId = nonEquipItem.dataId;
-            var level = nonEquipItem.level;
+            int itemDataId = nonEquipItem.dataId;
+            short level = nonEquipItem.level;
             if (this.DecreaseItemsByIndex(index, amount))
                 ItemDropEntity.DropItem(this, itemDataId, level, amount, new uint[] { ObjectId });
         }
@@ -290,7 +290,7 @@ namespace MultiplayerARPG
                 nonEquipIndex >= nonEquipItems.Count)
                 return;
 
-            var equippingItem = nonEquipItems[nonEquipIndex];
+            CharacterItem equippingItem = nonEquipItems[nonEquipIndex];
 
             string reasonWhyCannot;
             HashSet<string> shouldUnequipPositions;
@@ -301,12 +301,12 @@ namespace MultiplayerARPG
             }
 
             // Unequip equipped item if exists
-            foreach (var shouldUnequipPosition in shouldUnequipPositions)
+            foreach (string shouldUnequipPosition in shouldUnequipPositions)
             {
                 NetFuncUnEquipItem(shouldUnequipPosition);
             }
             // Equipping items
-            var tempEquipWeapons = EquipWeapons;
+            EquipWeapons tempEquipWeapons = EquipWeapons;
             if (equipPosition.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND))
             {
                 tempEquipWeapons.rightHand = equippingItem;
@@ -334,9 +334,9 @@ namespace MultiplayerARPG
             if (!CanMoveOrDoActions())
                 return;
 
-            var equippedArmorIndex = -1;
-            var tempEquipWeapons = EquipWeapons;
-            var unEquipItem = CharacterItem.Empty;
+            int equippedArmorIndex = -1;
+            EquipWeapons tempEquipWeapons = EquipWeapons;
+            CharacterItem unEquipItem = CharacterItem.Empty;
             if (fromEquipPosition.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND))
             {
                 unEquipItem = tempEquipWeapons.rightHand;
@@ -383,11 +383,11 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncUnSummon(PackedUInt objectId)
         {
-            var index = this.IndexOfSummon(objectId);
+            int index = this.IndexOfSummon(objectId);
             if (index < 0)
                 return;
 
-            var summon = Summons[index];
+            CharacterSummon summon = Summons[index];
             if (summon.type != SummonType.Pet)
                 return;
 

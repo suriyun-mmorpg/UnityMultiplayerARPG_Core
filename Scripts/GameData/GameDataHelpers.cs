@@ -7,11 +7,11 @@ namespace MultiplayerARPG
         #region Combine Dictionary with KeyValuePair functions
         public static Dictionary<DamageElement, MinMaxFloat> CombineDamageAmountsDictionary(Dictionary<DamageElement, MinMaxFloat> sourceDictionary, KeyValuePair<DamageElement, MinMaxFloat> newEntry)
         {
-            var gameInstance = GameInstance.Singleton;
-            var damageElement = newEntry.Key;
+            GameInstance gameInstance = GameInstance.Singleton;
+            DamageElement damageElement = newEntry.Key;
             if (damageElement == null)
                 damageElement = gameInstance.DefaultDamageElement;
-            var value = newEntry.Value;
+            MinMaxFloat value = newEntry.Value;
             if (!sourceDictionary.ContainsKey(damageElement))
                 sourceDictionary[damageElement] = value;
             else
@@ -21,11 +21,11 @@ namespace MultiplayerARPG
 
         public static Dictionary<DamageElement, float> CombineDamageInflictionAmountsDictionary(Dictionary<DamageElement, float> sourceDictionary, KeyValuePair<DamageElement, float> newEntry)
         {
-            var gameInstance = GameInstance.Singleton;
-            var damageElement = newEntry.Key;
+            GameInstance gameInstance = GameInstance.Singleton;
+            DamageElement damageElement = newEntry.Key;
             if (damageElement == null)
                 damageElement = gameInstance.DefaultDamageElement;
-            var value = newEntry.Value;
+            float value = newEntry.Value;
             if (!sourceDictionary.ContainsKey(damageElement))
                 sourceDictionary[damageElement] = value;
             else
@@ -35,10 +35,10 @@ namespace MultiplayerARPG
 
         public static Dictionary<Attribute, short> CombineAttributeAmountsDictionary(Dictionary<Attribute, short> sourceDictionary, KeyValuePair<Attribute, short> newEntry)
         {
-            var attribute = newEntry.Key;
+            Attribute attribute = newEntry.Key;
             if (attribute != null)
             {
-                var value = newEntry.Value;
+                short value = newEntry.Value;
                 if (!sourceDictionary.ContainsKey(attribute))
                     sourceDictionary[attribute] = value;
                 else
@@ -49,10 +49,10 @@ namespace MultiplayerARPG
 
         public static Dictionary<DamageElement, float> CombineResistanceAmountsDictionary(Dictionary<DamageElement, float> sourceDictionary, KeyValuePair<DamageElement, float> newEntry)
         {
-            var damageElement = newEntry.Key;
+            DamageElement damageElement = newEntry.Key;
             if (damageElement != null)
             {
-                var value = newEntry.Value;
+                float value = newEntry.Value;
                 if (!sourceDictionary.ContainsKey(damageElement))
                     sourceDictionary[damageElement] = value;
                 else
@@ -63,10 +63,10 @@ namespace MultiplayerARPG
 
         public static Dictionary<Skill, short> CombineSkillLevelsDictionary(Dictionary<Skill, short> sourceDictionary, KeyValuePair<Skill, short> newEntry)
         {
-            var skill = newEntry.Key;
+            Skill skill = newEntry.Key;
             if (skill != null)
             {
-                var value = newEntry.Value;
+                short value = newEntry.Value;
                 if (!sourceDictionary.ContainsKey(skill))
                     sourceDictionary[skill] = value;
                 else
@@ -77,10 +77,10 @@ namespace MultiplayerARPG
 
         public static Dictionary<Item, short> CombineItemAmountsDictionary(Dictionary<Item, short> sourceDictionary, KeyValuePair<Item, short> newEntry)
         {
-            var item = newEntry.Key;
+            Item item = newEntry.Key;
             if (item != null)
             {
-                var value = newEntry.Value;
+                short value = newEntry.Value;
                 if (!sourceDictionary.ContainsKey(item))
                     sourceDictionary[item] = value;
                 else
@@ -95,7 +95,7 @@ namespace MultiplayerARPG
         {
             if (combineDictionary != null)
             {
-                foreach (var entry in combineDictionary)
+                foreach (KeyValuePair<DamageElement, MinMaxFloat> entry in combineDictionary)
                 {
                     CombineDamageAmountsDictionary(sourceDictionary, entry);
                 }
@@ -107,7 +107,7 @@ namespace MultiplayerARPG
         {
             if (combineDictionary != null)
             {
-                foreach (var entry in combineDictionary)
+                foreach (KeyValuePair<DamageElement, float> entry in combineDictionary)
                 {
                     CombineDamageInflictionAmountsDictionary(sourceDictionary, entry);
                 }
@@ -119,7 +119,7 @@ namespace MultiplayerARPG
         {
             if (combineDictionary != null)
             {
-                foreach (var entry in combineDictionary)
+                foreach (KeyValuePair<Attribute, short> entry in combineDictionary)
                 {
                     CombineAttributeAmountsDictionary(sourceDictionary, entry);
                 }
@@ -131,7 +131,7 @@ namespace MultiplayerARPG
         {
             if (combineDictionary != null)
             {
-                foreach (var entry in combineDictionary)
+                foreach (KeyValuePair<DamageElement, float> entry in combineDictionary)
                 {
                     CombineResistanceAmountsDictionary(sourceDictionary, entry);
                 }
@@ -143,7 +143,7 @@ namespace MultiplayerARPG
         {
             if (combineDictionary != null)
             {
-                foreach (var entry in combineDictionary)
+                foreach (KeyValuePair<Skill, short> entry in combineDictionary)
                 {
                     CombineSkillLevelsDictionary(sourceDictionary, entry);
                 }
@@ -155,8 +155,8 @@ namespace MultiplayerARPG
         #region Make KeyValuePair functions
         public static KeyValuePair<DamageElement, MinMaxFloat> MakeDamageAmountPair(DamageIncremental source, short level, float rate, float effectiveness)
         {
-            var gameInstance = GameInstance.Singleton;
-            var damageElement = source.damageElement;
+            GameInstance gameInstance = GameInstance.Singleton;
+            DamageElement damageElement = source.damageElement;
             if (damageElement == null)
                 damageElement = gameInstance.DefaultDamageElement;
             return new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, (source.amount.GetAmount(level) * rate) + effectiveness);
@@ -164,20 +164,20 @@ namespace MultiplayerARPG
 
         public static Dictionary<DamageElement, MinMaxFloat> MakeDamageAmountWithInflictions(DamageIncremental source, short level, float rate, float effectiveness, Dictionary<DamageElement, float> damageInflictionAmounts)
         {
-            var result = new Dictionary<DamageElement, MinMaxFloat>();
-            var gameInstance = GameInstance.Singleton;
-            var baseDamage = (source.amount.GetAmount(level) * rate) + effectiveness;
+            Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
+            GameInstance gameInstance = GameInstance.Singleton;
+            MinMaxFloat baseDamage = (source.amount.GetAmount(level) * rate) + effectiveness;
             if (damageInflictionAmounts != null && damageInflictionAmounts.Count > 0)
             {
-                foreach (var damageInflictionAmount in damageInflictionAmounts)
+                foreach (KeyValuePair<DamageElement, float> damageInflictionAmount in damageInflictionAmounts)
                 {
-                    var damageElement = damageInflictionAmount.Key;
+                    DamageElement damageElement = damageInflictionAmount.Key;
                     result = CombineDamageAmountsDictionary(result, new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, baseDamage * damageInflictionAmount.Value));
                 }
             }
             else
             {
-                var damageElement = source.damageElement;
+                DamageElement damageElement = source.damageElement;
                 if (damageElement == null)
                     damageElement = gameInstance.DefaultDamageElement;
                 result = CombineDamageAmountsDictionary(result, new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, baseDamage));
@@ -187,8 +187,8 @@ namespace MultiplayerARPG
 
         public static KeyValuePair<DamageElement, float> MakeDamageInflictionPair(DamageInflictionAmount source)
         {
-            var gameInstance = GameInstance.Singleton;
-            var damageElement = source.damageElement;
+            GameInstance gameInstance = GameInstance.Singleton;
+            DamageElement damageElement = source.damageElement;
             if (damageElement == null)
                 damageElement = gameInstance.DefaultDamageElement;
             return new KeyValuePair<DamageElement, float>(damageElement, source.rate);
@@ -196,8 +196,8 @@ namespace MultiplayerARPG
 
         public static KeyValuePair<DamageElement, float> MakeDamageInflictionPair(DamageInflictionIncremental source, short level)
         {
-            var gameInstance = GameInstance.Singleton;
-            var damageElement = source.damageElement;
+            GameInstance gameInstance = GameInstance.Singleton;
+            DamageElement damageElement = source.damageElement;
             if (damageElement == null)
                 damageElement = gameInstance.DefaultDamageElement;
             return new KeyValuePair<DamageElement, float>(damageElement, source.rate.GetAmount(level));
@@ -253,9 +253,9 @@ namespace MultiplayerARPG
                 targetDictionary = new Dictionary<Attribute, float>();
             if (sourceEffectivesses != null)
             {
-                foreach (var sourceEffectivess in sourceEffectivesses)
+                foreach (DamageEffectivenessAttribute sourceEffectivess in sourceEffectivesses)
                 {
-                    var key = sourceEffectivess.attribute;
+                    Attribute key = sourceEffectivess.attribute;
                     if (key == null)
                         continue;
                     if (!targetDictionary.ContainsKey(key))
@@ -273,10 +273,10 @@ namespace MultiplayerARPG
                 targetDictionary = new Dictionary<DamageElement, MinMaxFloat>();
             if (sourceIncrementals != null)
             {
-                var gameInstance = GameInstance.Singleton;
-                foreach (var sourceIncremental in sourceIncrementals)
+                GameInstance gameInstance = GameInstance.Singleton;
+                foreach (DamageIncremental sourceIncremental in sourceIncrementals)
                 {
-                    var pair = MakeDamageAmountPair(sourceIncremental, level, rate, 0f);
+                    KeyValuePair<DamageElement, MinMaxFloat> pair = MakeDamageAmountPair(sourceIncremental, level, rate, 0f);
                     targetDictionary = CombineDamageAmountsDictionary(targetDictionary, pair);
                 }
             }
@@ -289,10 +289,10 @@ namespace MultiplayerARPG
                 targetDictionary = new Dictionary<DamageElement, float>();
             if (sourceIncrementals != null)
             {
-                var gameInstance = GameInstance.Singleton;
-                foreach (var sourceIncremental in sourceIncrementals)
+                GameInstance gameInstance = GameInstance.Singleton;
+                foreach (DamageInflictionIncremental sourceIncremental in sourceIncrementals)
                 {
-                    var pair = MakeDamageInflictionPair(sourceIncremental, level);
+                    KeyValuePair<DamageElement, float> pair = MakeDamageInflictionPair(sourceIncremental, level);
                     targetDictionary = CombineDamageInflictionAmountsDictionary(targetDictionary, pair);
                 }
             }
@@ -305,9 +305,9 @@ namespace MultiplayerARPG
                 targetDictionary = new Dictionary<Attribute, short>();
             if (sourceAmounts != null)
             {
-                foreach (var sourceAmount in sourceAmounts)
+                foreach (AttributeAmount sourceAmount in sourceAmounts)
                 {
-                    var pair = MakeAttributeAmountPair(sourceAmount, rate);
+                    KeyValuePair<Attribute, short> pair = MakeAttributeAmountPair(sourceAmount, rate);
                     targetDictionary = CombineAttributeAmountsDictionary(targetDictionary, pair);
                 }
             }
@@ -320,9 +320,9 @@ namespace MultiplayerARPG
                 targetDictionary = new Dictionary<Attribute, short>();
             if (sourceIncrementals != null)
             {
-                foreach (var sourceIncremental in sourceIncrementals)
+                foreach (AttributeIncremental sourceIncremental in sourceIncrementals)
                 {
-                    var pair = MakeAttributeAmountPair(sourceIncremental, level, rate);
+                    KeyValuePair<Attribute, short> pair = MakeAttributeAmountPair(sourceIncremental, level, rate);
                     targetDictionary = CombineAttributeAmountsDictionary(targetDictionary, pair);
                 }
             }
@@ -335,9 +335,9 @@ namespace MultiplayerARPG
                 targetDictionary = new Dictionary<DamageElement, float>();
             if (sourceAmounts != null)
             {
-                foreach (var sourceAmount in sourceAmounts)
+                foreach (ResistanceAmount sourceAmount in sourceAmounts)
                 {
-                    var pair = MakeResistanceAmountPair(sourceAmount, rate);
+                    KeyValuePair<DamageElement, float> pair = MakeResistanceAmountPair(sourceAmount, rate);
                     targetDictionary = CombineResistanceAmountsDictionary(targetDictionary, pair);
                 }
             }
@@ -350,9 +350,9 @@ namespace MultiplayerARPG
                 targetDictionary = new Dictionary<DamageElement, float>();
             if (sourceIncrementals != null)
             {
-                foreach (var sourceIncremental in sourceIncrementals)
+                foreach (ResistanceIncremental sourceIncremental in sourceIncrementals)
                 {
-                    var pair = MakeResistanceAmountPair(sourceIncremental, level, rate);
+                    KeyValuePair<DamageElement, float> pair = MakeResistanceAmountPair(sourceIncremental, level, rate);
                     targetDictionary = CombineResistanceAmountsDictionary(targetDictionary, pair);
                 }
             }
@@ -365,9 +365,9 @@ namespace MultiplayerARPG
                 targetDictionary = new Dictionary<Skill, short>();
             if (sourceLevels != null)
             {
-                foreach (var sourceLevel in sourceLevels)
+                foreach (SkillLevel sourceLevel in sourceLevels)
                 {
-                    var pair = MakeSkillLevelPair(sourceLevel);
+                    KeyValuePair<Skill, short> pair = MakeSkillLevelPair(sourceLevel);
                     targetDictionary = CombineSkillLevelsDictionary(targetDictionary, pair);
                 }
             }
@@ -380,9 +380,9 @@ namespace MultiplayerARPG
                 targetDictionary = new Dictionary<Item, short>();
             if (sourceAmounts != null)
             {
-                foreach (var sourceAmount in sourceAmounts)
+                foreach (ItemAmount sourceAmount in sourceAmounts)
                 {
-                    var pair = MakeItemAmountPair(sourceAmount);
+                    KeyValuePair<Item, short> pair = MakeItemAmountPair(sourceAmount);
                     targetDictionary = CombineItemAmountsDictionary(targetDictionary, pair);
                 }
             }
@@ -393,13 +393,13 @@ namespace MultiplayerARPG
         #region Calculate functions
         public static float GetEffectivenessDamage(Dictionary<Attribute, float> effectivenessAttributes, ICharacterData character)
         {
-            var damageEffectiveness = 0f;
+            float damageEffectiveness = 0f;
             if (effectivenessAttributes != null && character != null)
             {
-                var characterAttributes = character.GetAttributes();
-                foreach (var characterAttribute in characterAttributes)
+                Dictionary<Attribute, short> characterAttributes = character.GetAttributes();
+                foreach (KeyValuePair<Attribute, short> characterAttribute in characterAttributes)
                 {
-                    var attribute = characterAttribute.Key;
+                    Attribute attribute = characterAttribute.Key;
                     if (attribute != null && effectivenessAttributes.ContainsKey(attribute))
                         damageEffectiveness += effectivenessAttributes[attribute] * characterAttribute.Value;
                 }
@@ -409,12 +409,12 @@ namespace MultiplayerARPG
 
         public static CharacterStats GetStatsFromAttributes(Dictionary<Attribute, short> attributeAmounts)
         {
-            var stats = new CharacterStats();
+            CharacterStats stats = new CharacterStats();
             if (attributeAmounts != null)
             {
-                foreach (var attributeAmount in attributeAmounts)
+                foreach (KeyValuePair<Attribute, short> attributeAmount in attributeAmounts)
                 {
-                    var attribute = attributeAmount.Key;
+                    Attribute attribute = attributeAmount.Key;
                     short level = attributeAmount.Value;
                     stats += attribute.statsIncreaseEachLevel * level;
                 }
@@ -424,12 +424,12 @@ namespace MultiplayerARPG
 
         public static MinMaxFloat GetSumDamages(Dictionary<DamageElement, MinMaxFloat> damages)
         {
-            var damageAmount = new MinMaxFloat();
+            MinMaxFloat damageAmount = new MinMaxFloat();
             damageAmount.min = 0;
             damageAmount.max = 0;
             if (damages == null || damages.Count == 0)
                 return damageAmount;
-            foreach (var damage in damages)
+            foreach (KeyValuePair<DamageElement, MinMaxFloat> damage in damages)
             {
                 damageAmount += damage.Value;
             }

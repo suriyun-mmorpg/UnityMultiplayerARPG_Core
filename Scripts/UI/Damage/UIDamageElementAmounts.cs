@@ -23,12 +23,12 @@ namespace MultiplayerARPG
                 if (cacheTextDamages == null)
                 {
                     cacheTextDamages = new Dictionary<DamageElement, TextWrapper>();
-                    foreach (var textAmount in textDamages)
+                    foreach (UIDamageElementTextPair textAmount in textDamages)
                     {
                         if (textAmount.damageElement == null || textAmount.uiText == null)
                             continue;
-                        var key = textAmount.damageElement;
-                        var textComp = textAmount.uiText;
+                        DamageElement key = textAmount.damageElement;
+                        TextWrapper textComp = textAmount.uiText;
                         textComp.text = string.Format(damageFormat, key.title, "0", "0");
                         cacheTextDamages[key] = textComp;
                     }
@@ -47,25 +47,25 @@ namespace MultiplayerARPG
                 if (uiTextSumDamage != null)
                     uiTextSumDamage.text = string.Format(sumDamageFormat, "0", "0");
 
-                foreach (var textAmount in CacheTextDamages)
+                foreach (KeyValuePair<DamageElement, TextWrapper> textAmount in CacheTextDamages)
                 {
-                    var element = textAmount.Key;
+                    DamageElement element = textAmount.Key;
                     textAmount.Value.text = string.Format(damageFormat, element.title, "0", "0");
                 }
             }
             else
             {
-                var text = "";
-                var sumDamage = new MinMaxFloat();
-                foreach (var dataEntry in Data)
+                string text = "";
+                MinMaxFloat sumDamage = new MinMaxFloat();
+                foreach (KeyValuePair<DamageElement, MinMaxFloat> dataEntry in Data)
                 {
                     if (dataEntry.Key == null || (dataEntry.Value.min == 0 && dataEntry.Value.max == 0))
                         continue;
-                    var element = dataEntry.Key;
-                    var amount = dataEntry.Value;
+                    DamageElement element = dataEntry.Key;
+                    MinMaxFloat amount = dataEntry.Value;
                     if (!string.IsNullOrEmpty(text))
                         text += "\n";
-                    var amountText = string.Format(damageFormat, element.title, amount.min.ToString("N0"), amount.max.ToString("N0"));
+                    string amountText = string.Format(damageFormat, element.title, amount.min.ToString("N0"), amount.max.ToString("N0"));
                     text += amountText;
                     TextWrapper textDamages;
                     if (CacheTextDamages.TryGetValue(dataEntry.Key, out textDamages))

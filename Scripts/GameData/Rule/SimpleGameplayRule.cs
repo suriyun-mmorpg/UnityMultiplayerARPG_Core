@@ -50,15 +50,15 @@ namespace MultiplayerARPG
         public override float GetHitChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {
             // Attacker stats
-            var attackerStats = attacker.CacheStats;
+            CharacterStats attackerStats = attacker.CacheStats;
             // Damage receiver stats
-            var dmgReceiverStats = damageReceiver.CacheStats;
+            CharacterStats dmgReceiverStats = damageReceiver.CacheStats;
             // Calculate chance to hit
-            var attackerAcc = attackerStats.accuracy;
-            var dmgReceiverEva = dmgReceiverStats.evasion;
-            var attackerLvl = attacker.Level;
-            var dmgReceiverLvl = damageReceiver.Level;
-            var hitChance = 2f;
+            float attackerAcc = attackerStats.accuracy;
+            float dmgReceiverEva = dmgReceiverStats.evasion;
+            short attackerLvl = attacker.Level;
+            short dmgReceiverLvl = damageReceiver.Level;
+            float hitChance = 2f;
 
             if (attackerAcc != 0 && dmgReceiverEva != 0)
                 hitChance *= (attackerAcc / (attackerAcc + dmgReceiverEva));
@@ -77,7 +77,7 @@ namespace MultiplayerARPG
 
         public override float GetCriticalChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {
-            var criRate = damageReceiver.CacheStats.criRate;
+            float criRate = damageReceiver.CacheStats.criRate;
             // Minimum critical chance is 5%
             if (criRate < 0.05f)
                 criRate = 0.05f;
@@ -94,7 +94,7 @@ namespace MultiplayerARPG
 
         public override float GetBlockChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {
-            var blockRate = damageReceiver.CacheStats.blockRate;
+            float blockRate = damageReceiver.CacheStats.blockRate;
             // Minimum block chance is 5%
             if (blockRate < 0.05f)
                 blockRate = 0.05f;
@@ -106,7 +106,7 @@ namespace MultiplayerARPG
 
         public override float GetBlockDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, float damage)
         {
-            var blockDmgRate = damageReceiver.CacheStats.blockDmgRate;
+            float blockDmgRate = damageReceiver.CacheStats.blockDmgRate;
             // Minimum block damage is 5%
             if (blockDmgRate < 0.05f)
                 blockDmgRate = 0.05f;
@@ -120,7 +120,7 @@ namespace MultiplayerARPG
         {
             if (damageElement == null)
                 return damageAmount -= damageReceiver.CacheStats.armor; // If armor is minus damage will be increased
-            var resistances = damageReceiver.CacheResistances;
+            Dictionary<DamageElement, float> resistances = damageReceiver.CacheResistances;
             float resistanceAmount = 0f;
             resistances.TryGetValue(damageElement, out resistanceAmount);
             if (resistanceAmount > damageElement.maxResistanceAmount)
@@ -151,7 +151,7 @@ namespace MultiplayerARPG
         {
             if (character is BaseMonsterCharacterEntity)
                 return 0f;
-            var result = 0f;
+            float result = 0f;
             if (IsHungry(character))
                 result += character.CacheMaxHp * hpDecreaseRatePerSecondsWhenHungry;
             if (IsThirsty(character))
@@ -163,7 +163,7 @@ namespace MultiplayerARPG
         {
             if (character is BaseMonsterCharacterEntity)
                 return 0f;
-            var result = 0f;
+            float result = 0f;
             if (IsHungry(character))
                 result += character.CacheMaxMp * mpDecreaseRatePerSecondsWhenHungry;
             if (IsThirsty(character))
@@ -216,17 +216,17 @@ namespace MultiplayerARPG
 
         public override bool IncreaseExp(BaseCharacterEntity character, int exp)
         {
-            var monsterCharacter = character as BaseMonsterCharacterEntity;
+            BaseMonsterCharacterEntity monsterCharacter = character as BaseMonsterCharacterEntity;
             if (monsterCharacter != null && monsterCharacter.SummonType != SummonType.Pet)
             {
                 // If it's monster and not pet, do not increase exp
                 return false;
             }
 
-            var isLevelUp = false;
+            bool isLevelUp = false;
             character.Exp += exp;
-            var playerCharacter = character as BasePlayerCharacterEntity;
-            var nextLevelExp = character.GetNextLevelExp();
+            BasePlayerCharacterEntity playerCharacter = character as BasePlayerCharacterEntity;
+            int nextLevelExp = character.GetNextLevelExp();
             while (nextLevelExp > 0 && character.Exp >= nextLevelExp)
             {
                 character.Exp = character.Exp - nextLevelExp;
@@ -246,7 +246,7 @@ namespace MultiplayerARPG
         {
             if (characterItem.GetMaxDurability() <= 0)
                 return 1;
-            var durabilityRate = (float)characterItem.durability / (float)characterItem.GetMaxDurability();
+            float durabilityRate = (float)characterItem.durability / (float)characterItem.GetMaxDurability();
             if (durabilityRate > 0.5f)
                 return 1f;
             else if (durabilityRate > 0.3f)
@@ -261,9 +261,9 @@ namespace MultiplayerARPG
 
         public override void OnCharacterReceivedDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, CombatAmountType combatAmountType, int damage)
         {
-            var decreaseWeaponDurability = normalDecreaseWeaponDurability;
-            var decreaseShieldDurability = normalDecreaseShieldDurability;
-            var decreaseArmorDurability = normalDecreaseArmorDurability;
+            float decreaseWeaponDurability = normalDecreaseWeaponDurability;
+            float decreaseShieldDurability = normalDecreaseShieldDurability;
+            float decreaseArmorDurability = normalDecreaseArmorDurability;
             GetDecreaseDurabilityAmount(combatAmountType, out decreaseWeaponDurability, out decreaseShieldDurability, out decreaseArmorDurability);
             // Decrease Weapon Durability
             DecreaseEquipWeaponsDurability(attacker, decreaseWeaponDurability);
@@ -275,9 +275,9 @@ namespace MultiplayerARPG
 
         public override void OnHarvestableReceivedDamage(BaseCharacterEntity attacker, HarvestableEntity damageReceiver, CombatAmountType combatAmountType, int damage)
         {
-            var decreaseWeaponDurability = normalDecreaseWeaponDurability;
-            var decreaseShieldDurability = normalDecreaseShieldDurability;
-            var decreaseArmorDurability = normalDecreaseArmorDurability;
+            float decreaseWeaponDurability = normalDecreaseWeaponDurability;
+            float decreaseShieldDurability = normalDecreaseShieldDurability;
+            float decreaseArmorDurability = normalDecreaseArmorDurability;
             GetDecreaseDurabilityAmount(combatAmountType, out decreaseWeaponDurability, out decreaseShieldDurability, out decreaseArmorDurability);
             // Decrease Weapon Durability
             DecreaseEquipWeaponsDurability(attacker, decreaseWeaponDurability);
@@ -310,10 +310,10 @@ namespace MultiplayerARPG
 
         private void DecreaseEquipWeaponsDurability(BaseCharacterEntity entity, float decreaseDurability)
         {
-            var tempDestroy = false;
-            var equipWeapons = entity.EquipWeapons;
-            var rightHand = equipWeapons.rightHand;
-            var leftHand = equipWeapons.leftHand;
+            bool tempDestroy = false;
+            EquipWeapons equipWeapons = entity.EquipWeapons;
+            CharacterItem rightHand = equipWeapons.rightHand;
+            CharacterItem leftHand = equipWeapons.leftHand;
             if (rightHand.GetWeaponItem() != null && rightHand.GetMaxDurability() > 0)
             {
                 rightHand = DecreaseDurability(rightHand, decreaseDurability, out tempDestroy);
@@ -335,10 +335,10 @@ namespace MultiplayerARPG
 
         private void DecreaseEquipShieldsDurability(BaseCharacterEntity entity, float decreaseDurability)
         {
-            var tempDestroy = false;
-            var equipWeapons = entity.EquipWeapons;
-            var rightHand = equipWeapons.rightHand;
-            var leftHand = equipWeapons.leftHand;
+            bool tempDestroy = false;
+            EquipWeapons equipWeapons = entity.EquipWeapons;
+            CharacterItem rightHand = equipWeapons.rightHand;
+            CharacterItem leftHand = equipWeapons.leftHand;
             if (rightHand.GetShieldItem() != null && rightHand.GetMaxDurability() > 0)
             {
                 rightHand = DecreaseDurability(rightHand, decreaseDurability, out tempDestroy);
@@ -360,11 +360,11 @@ namespace MultiplayerARPG
 
         private void DecreaseEquipItemsDurability(BaseCharacterEntity entity, float decreaseDurability)
         {
-            var tempDestroy = false;
-            var count = entity.EquipItems.Count;
-            for (var i = count - 1; i >= 0; --i)
+            bool tempDestroy = false;
+            int count = entity.EquipItems.Count;
+            for (int i = count - 1; i >= 0; --i)
             {
-                var equipItem = entity.EquipItems[i];
+                CharacterItem equipItem = entity.EquipItems[i];
                 if (equipItem.GetMaxDurability() <= 0)
                     continue;
                 equipItem = DecreaseDurability(equipItem, decreaseDurability, out tempDestroy);
@@ -378,7 +378,7 @@ namespace MultiplayerARPG
         private CharacterItem DecreaseDurability(CharacterItem characterItem, float decreaseDurability, out bool destroy)
         {
             destroy = false;
-            var item = characterItem.GetEquipmentItem();
+            Item item = characterItem.GetEquipmentItem();
             if (item != null)
             {
                 if (characterItem.durability - decreaseDurability <= 0 && item.destroyIfBroken)

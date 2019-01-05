@@ -18,7 +18,7 @@ namespace MultiplayerARPG
         private void Awake()
         {
             SetupDefaultTexts();
-            foreach (var language in languageList)
+            foreach (Language language in languageList)
             {
                 LanguageMap[language.languageKey] = language;
             }
@@ -28,7 +28,7 @@ namespace MultiplayerARPG
         private void SetupDefaultTexts()
         {
             Texts.Clear();
-            foreach (var pair in DefaultLocale.Texts)
+            foreach (KeyValuePair<string, string> pair in DefaultLocale.Texts)
             {
                 Texts.Add(pair.Key, pair.Value);
             }
@@ -40,8 +40,8 @@ namespace MultiplayerARPG
                 return;
 
             CurrentLanguageKey = languageKey;
-            var languageDataList = LanguageMap[languageKey].dataList;
-            foreach (var data in languageDataList)
+            List<LanguageData> languageDataList = LanguageMap[languageKey].dataList;
+            foreach (LanguageData data in languageDataList)
             {
                 if (Texts.ContainsKey(data.key))
                     Texts[data.key] = data.value;
@@ -50,7 +50,7 @@ namespace MultiplayerARPG
 
         public Language GetLanguageFromList(string languageKey)
         {
-            foreach (var language in languageList)
+            foreach (Language language in languageList)
             {
                 if (language.languageKey == languageKey)
                     return language;
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
                 Debug.LogWarning("`New Language Key` is null or empty");
                 return;
             }
-            var newLang = GetLanguageFromList(newLanguageKey);
+            Language newLang = GetLanguageFromList(newLanguageKey);
             if (newLang == null)
             {
                 newLang = new Language();
@@ -74,7 +74,7 @@ namespace MultiplayerARPG
                 languageList.Add(newLang);
             }
 
-            foreach (var pair in DefaultLocale.Texts)
+            foreach (KeyValuePair<string, string> pair in DefaultLocale.Texts)
             {
                 if (newLang.ContainKey(pair.Key))
                     continue;

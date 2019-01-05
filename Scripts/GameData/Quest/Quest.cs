@@ -26,7 +26,7 @@ namespace MultiplayerARPG
                 if (cacheKillMonsterIds == null)
                 {
                     cacheKillMonsterIds = new HashSet<int>();
-                    foreach (var task in tasks)
+                    foreach (QuestTask task in tasks)
                     {
                         if (task.taskType == QuestTaskType.KillMonster &&
                             task.monsterCharacterAmount.monster != null &&

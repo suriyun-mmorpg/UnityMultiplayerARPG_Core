@@ -20,12 +20,12 @@ namespace MultiplayerARPG
                 if (cacheTextAmounts == null)
                 {
                     cacheTextAmounts = new Dictionary<DamageElement, TextWrapper>();
-                    foreach (var textAmount in textAmounts)
+                    foreach (UIResistanceTextPair textAmount in textAmounts)
                     {
                         if (textAmount.damageElement == null || textAmount.uiText == null)
                             continue;
-                        var key = textAmount.damageElement;
-                        var textComp = textAmount.uiText;
+                        DamageElement key = textAmount.damageElement;
+                        TextWrapper textComp = textAmount.uiText;
                         textComp.text = string.Format(amountFormat, key.title, "0", "0");
                         cacheTextAmounts[key] = textComp;
                     }
@@ -41,22 +41,22 @@ namespace MultiplayerARPG
                 if (uiTextAllAmounts != null)
                     uiTextAllAmounts.gameObject.SetActive(false);
 
-                foreach (var textAmount in CacheTextAmounts)
+                foreach (KeyValuePair<DamageElement, TextWrapper> textAmount in CacheTextAmounts)
                 {
-                    var element = textAmount.Key;
+                    DamageElement element = textAmount.Key;
                     textAmount.Value.text = string.Format(amountFormat, element.title, "0", "0");
                 }
             }
             else
             {
-                var text = "";
-                foreach (var dataEntry in Data)
+                string text = "";
+                foreach (KeyValuePair<DamageElement, float> dataEntry in Data)
                 {
                     if (dataEntry.Key == null || dataEntry.Value == 0)
                         continue;
                     if (!string.IsNullOrEmpty(text))
                         text += "\n";
-                    var amountText = string.Format(amountFormat, dataEntry.Key.title, (dataEntry.Value * 100f).ToString("N0"));
+                    string amountText = string.Format(amountFormat, dataEntry.Key.title, (dataEntry.Value * 100f).ToString("N0"));
                     text += amountText;
                     TextWrapper cacheTextAmount;
                     if (CacheTextAmounts.TryGetValue(dataEntry.Key, out cacheTextAmount))

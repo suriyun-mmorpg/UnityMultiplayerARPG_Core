@@ -108,7 +108,7 @@ namespace MultiplayerARPG
             set
             {
                 hotkeys.Clear();
-                foreach (var entry in value)
+                foreach (CharacterHotkey entry in value)
                     hotkeys.Add(entry);
             }
         }
@@ -119,7 +119,7 @@ namespace MultiplayerARPG
             set
             {
                 quests.Clear();
-                foreach (var entry in value)
+                foreach (CharacterQuest entry in value)
                     quests.Add(entry);
             }
         }

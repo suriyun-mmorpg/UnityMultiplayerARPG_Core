@@ -41,7 +41,7 @@ public class CharacterSkill : INetSerializable
 
     public static CharacterSkill Create(Skill skill, short level)
     {
-        var newSkill = new CharacterSkill();
+        CharacterSkill newSkill = new CharacterSkill();
         newSkill.dataId = skill.DataId;
         newSkill.level = level;
         return newSkill;

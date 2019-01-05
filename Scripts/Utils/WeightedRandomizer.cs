@@ -47,11 +47,11 @@ public class WeightedRandomizer<T>
     public T TakeOne()
     {
         // Sorts the spawn rate list
-        var sortedSpawnRate = Sort(_weights);
+        List<KeyValuePair<T, int>> sortedSpawnRate = Sort(_weights);
 
         // Sums all spawn rates
         int sum = 0;
-        foreach (var spawn in _weights)
+        foreach (KeyValuePair<T, int> spawn in _weights)
         {
             sum += spawn.Value;
         }
@@ -64,7 +64,7 @@ public class WeightedRandomizer<T>
         // Finds chosen item based on spawn rate
         T selected = sortedSpawnRate[sortedSpawnRate.Count - 1].Key;
 
-        foreach (var spawn in sortedSpawnRate)
+        foreach (KeyValuePair<T, int> spawn in sortedSpawnRate)
         {
             if (roll < spawn.Value)
             {
@@ -80,7 +80,7 @@ public class WeightedRandomizer<T>
 
     private List<KeyValuePair<T, int>> Sort(Dictionary<T, int> weights)
     {
-        var list = new List<KeyValuePair<T, int>>(weights);
+        List<KeyValuePair<T, int>> list = new List<KeyValuePair<T, int>>(weights);
 
         // Sorts the Spawn Rate List for randomization later
         list.Sort(

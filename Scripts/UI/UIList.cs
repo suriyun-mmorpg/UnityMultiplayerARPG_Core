@@ -13,8 +13,8 @@ public class UIList : MonoBehaviour
         if (uiPrefab == null)
             return;
 
-        var i = 0;
-        foreach (var entry in list)
+        int i = 0;
+        foreach (T entry in list)
         {
             GameObject ui;
             if (i < uis.Count)
@@ -34,14 +34,14 @@ public class UIList : MonoBehaviour
         }
         for (; i < uis.Count; ++i)
         {
-            var ui = uis[i];
+            GameObject ui = uis[i];
             ui.SetActive(false);
         }
     }
 
     public void HideAll()
     {
-        for (var i = 0; i < uis.Count; ++i)
+        for (int i = 0; i < uis.Count; ++i)
         {
             GameObject ui = uis[i];
             ui.SetActive(false);

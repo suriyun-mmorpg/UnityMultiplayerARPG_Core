@@ -90,11 +90,11 @@ namespace MultiplayerARPG
             if (LockingTarget != null)
             {
                 // Lookat target then do anything when it's in range
-                var lookAtDirection = (LockingTarget.transform.position - CacheTransform.position).normalized;
+                Vector3 lookAtDirection = (LockingTarget.transform.position - CacheTransform.position).normalized;
                 // slerp to the desired rotation over time
                 if (lookAtDirection.magnitude > 0)
                 {
-                    var lookRotationEuler = Quaternion.LookRotation(lookAtDirection).eulerAngles;
+                    Vector3 lookRotationEuler = Quaternion.LookRotation(lookAtDirection).eulerAngles;
                     lookRotationEuler.x = 0;
                     lookRotationEuler.z = 0;
                     CacheTransform.rotation = Quaternion.Euler(lookRotationEuler);
@@ -135,7 +135,7 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return false;
 
-            var target = other.GetComponent<IDamageableEntity>();
+            IDamageableEntity target = other.GetComponent<IDamageableEntity>();
 
             if (target == null || target.IsDead() || attacker.gameObject == target.gameObject || !target.CanReceiveDamageFrom(attacker))
                 return false;
@@ -160,15 +160,15 @@ namespace MultiplayerARPG
                     switch (dimensionType)
                     {
                         case DimensionType.Dimension3D:
-                            var colliders = Physics.OverlapSphere(CacheTransform.position, explodeDistance);
-                            foreach (var collider in colliders)
+                            Collider[] colliders = Physics.OverlapSphere(CacheTransform.position, explodeDistance);
+                            foreach (Collider collider in colliders)
                             {
                                 FindAndApplyDamage(collider.gameObject);
                             }
                             break;
                         case DimensionType.Dimension2D:
-                            var colliders2D = Physics2D.OverlapCircleAll(CacheTransform.position, explodeDistance);
-                            foreach (var collider in colliders2D)
+                            Collider2D[] colliders2D = Physics2D.OverlapCircleAll(CacheTransform.position, explodeDistance);
+                            foreach (Collider2D collider in colliders2D)
                             {
                                 FindAndApplyDamage(collider.gameObject);
                             }

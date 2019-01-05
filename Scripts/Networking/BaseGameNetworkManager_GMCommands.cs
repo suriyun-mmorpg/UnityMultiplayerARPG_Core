@@ -12,8 +12,8 @@ namespace MultiplayerARPG
             if (string.IsNullOrEmpty(command))
                 return;
 
-            var splited = command.Split(' ');
-            var commandKey = splited[0];
+            string[] splited = command.Split(' ');
+            string commandKey = splited[0];
             string receiver;
             BasePlayerCharacterEntity playerCharacter;
             if (GMCommands.IsSplitedLengthValid(commandKey, splited.Length))
@@ -65,7 +65,7 @@ namespace MultiplayerARPG
                     {
                         if (amount > item.maxStack)
                             amount = item.maxStack;
-                        var newItem = CharacterItem.Create(item, 1, amount);
+                        CharacterItem newItem = CharacterItem.Create(item, 1, amount);
                         playerCharacter.NonEquipItems.Add(newItem);
                     }
                 }
@@ -88,7 +88,7 @@ namespace MultiplayerARPG
                     {
                         if (amount > item.maxStack)
                             amount = item.maxStack;
-                        var newItem = CharacterItem.Create(item, 1, amount);
+                        CharacterItem newItem = CharacterItem.Create(item, 1, amount);
                         playerCharacter.NonEquipItems.Add(newItem);
                     }
                 }

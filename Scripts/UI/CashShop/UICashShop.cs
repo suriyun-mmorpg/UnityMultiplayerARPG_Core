@@ -87,7 +87,7 @@ namespace MultiplayerARPG
 
         private void ResponseCashShopInfo(AckResponseCode responseCode, BaseAckMessage message)
         {
-            var castedMessage = (ResponseCashShopInfoMessage)message;
+            ResponseCashShopInfoMessage castedMessage = (ResponseCashShopInfoMessage)message;
             switch (responseCode)
             {
                 case AckResponseCode.Error:
@@ -99,21 +99,21 @@ namespace MultiplayerARPG
                 default:
                     if (uiTextCash != null)
                         uiTextCash.text = string.Format(cashFormat, castedMessage.cash.ToString("N0"));
-                    var cashShopItems = new List<CashShopItem>();
-                    foreach (var cashShopItemId in castedMessage.cashShopItemIds)
+                    List<CashShopItem> cashShopItems = new List<CashShopItem>();
+                    foreach (int cashShopItemId in castedMessage.cashShopItemIds)
                     {
                         CashShopItem cashShopItem;
                         if (GameInstance.CashShopItems.TryGetValue(cashShopItemId, out cashShopItem))
                             cashShopItems.Add(cashShopItem);
                     }
 
-                    var selectedIdx = SelectionManager.SelectedUI != null ? SelectionManager.IndexOf(SelectionManager.SelectedUI) : -1;
+                    int selectedIdx = SelectionManager.SelectedUI != null ? SelectionManager.IndexOf(SelectionManager.SelectedUI) : -1;
                     SelectionManager.DeselectSelectedUI();
                     SelectionManager.Clear();
 
                     CacheList.Generate(cashShopItems, (index, cashShopItem, ui) =>
                     {
-                        var uiCashShopItem = ui.GetComponent<UICashShopItem>();
+                        UICashShopItem uiCashShopItem = ui.GetComponent<UICashShopItem>();
                         uiCashShopItem.uiCashShop = this;
                         uiCashShopItem.Data = cashShopItem;
                         uiCashShopItem.Show();
@@ -127,11 +127,11 @@ namespace MultiplayerARPG
 
         private void ResponseCashShopBuy(AckResponseCode responseCode, BaseAckMessage message)
         {
-            var castedMessage = (ResponseCashShopBuyMessage)message;
+            ResponseCashShopBuyMessage castedMessage = (ResponseCashShopBuyMessage)message;
             switch (responseCode)
             {
                 case AckResponseCode.Error:
-                    var errorMessage = string.Empty;
+                    string errorMessage = string.Empty;
                     switch (castedMessage.error)
                     {
                         case ResponseCashShopBuyMessage.Error.UserNotFound:

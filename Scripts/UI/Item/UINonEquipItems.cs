@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -71,7 +72,7 @@ namespace MultiplayerARPG
         public void UpdateData(ICharacterData character)
         {
             this.character = character;
-            var selectedIdx = SelectionManager.SelectedUI != null ? SelectionManager.IndexOf(SelectionManager.SelectedUI) : -1;
+            int selectedIdx = SelectionManager.SelectedUI != null ? SelectionManager.IndexOf(SelectionManager.SelectedUI) : -1;
             SelectionManager.DeselectSelectedUI();
             SelectionManager.Clear();
 
@@ -81,10 +82,10 @@ namespace MultiplayerARPG
                 return;
             }
 
-            var nonEquipItems = character.NonEquipItems;
+            IList<CharacterItem> nonEquipItems = character.NonEquipItems;
             CacheList.Generate(nonEquipItems, (index, characterItem, ui) =>
             {
-                var uiCharacterItem = ui.GetComponent<UICharacterItem>();
+                UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
                 uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, string.Empty), this.character, index);
                 uiCharacterItem.Show();
                 SelectionManager.Add(uiCharacterItem);

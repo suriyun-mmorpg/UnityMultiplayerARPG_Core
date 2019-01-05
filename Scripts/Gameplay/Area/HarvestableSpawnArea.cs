@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -24,7 +25,7 @@ namespace MultiplayerARPG
         {
             if (harvestableEntity != null)
             {
-                for (var i = 0; i < amount; ++i)
+                for (int i = 0; i < amount; ++i)
                 {
                     Spawn(0);
                 }
@@ -40,12 +41,12 @@ namespace MultiplayerARPG
         {
             yield return new WaitForSecondsRealtime(delay);
 
-            var colliderDetectionRadius = harvestableEntity.colliderDetectionRadius;
-            var spawnPosition = GetRandomPosition();
-            var spawnRotation = GetRandomRotation();
-            var overlapEntities = false;
-            var overlaps = Physics.OverlapSphere(spawnPosition, colliderDetectionRadius);
-            foreach (var overlap in overlaps)
+            float colliderDetectionRadius = harvestableEntity.colliderDetectionRadius;
+            Vector3 spawnPosition = GetRandomPosition();
+            Quaternion spawnRotation = GetRandomRotation();
+            bool overlapEntities = false;
+            Collider[] overlaps = Physics.OverlapSphere(spawnPosition, colliderDetectionRadius);
+            foreach (Collider overlap in overlaps)
             {
                 if (overlap.gameObject.layer == gameInstance.characterLayer ||
                     overlap.gameObject.layer == gameInstance.itemDropLayer ||
@@ -58,10 +59,10 @@ namespace MultiplayerARPG
             }
             if (!overlapEntities)
             {
-                var identity = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(harvestableEntity.Identity, spawnPosition, spawnRotation);
+                LiteNetLibIdentity identity = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(harvestableEntity.Identity, spawnPosition, spawnRotation);
                 if (identity != null)
                 {
-                    var entity = identity.GetComponent<HarvestableEntity>();
+                    HarvestableEntity entity = identity.GetComponent<HarvestableEntity>();
                     entity.SetSpawnArea(this, spawnPosition);
                 }
             }

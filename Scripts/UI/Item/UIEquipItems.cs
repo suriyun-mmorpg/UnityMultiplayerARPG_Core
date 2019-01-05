@@ -23,25 +23,25 @@ namespace MultiplayerARPG
                     SelectionManager.Clear();
                     if (rightHandSlot != null)
                     {
-                        var equipPosition = GameDataConst.EQUIP_POSITION_RIGHT_HAND;
+                        string equipPosition = GameDataConst.EQUIP_POSITION_RIGHT_HAND;
                         rightHandSlot.Setup(GetEmptyUIData(), character, -1);
                         cacheEquipItemSlots.Add(equipPosition, rightHandSlot);
                         SelectionManager.Add(rightHandSlot);
                     }
                     if (leftHandSlot != null)
                     {
-                        var equipPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
+                        string equipPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
                         leftHandSlot.Setup(GetEmptyUIData(), character, -1);
                         cacheEquipItemSlots.Add(equipPosition, leftHandSlot);
                         SelectionManager.Add(leftHandSlot);
                     }
-                    foreach (var otherEquipSlot in otherEquipSlots)
+                    foreach (UICharacterItemPair otherEquipSlot in otherEquipSlots)
                     {
                         if (!string.IsNullOrEmpty(otherEquipSlot.armorType.Id) &&
                             otherEquipSlot.ui != null &&
                             !cacheEquipItemSlots.ContainsKey(otherEquipSlot.armorType.Id))
                         {
-                            var equipPosition = otherEquipSlot.armorType.Id;
+                            string equipPosition = otherEquipSlot.armorType.Id;
                             otherEquipSlot.ui.Setup(GetEmptyUIData(), character, -1);
                             cacheEquipItemSlots.Add(equipPosition, otherEquipSlot.ui);
                             SelectionManager.Add(otherEquipSlot.ui);
@@ -98,9 +98,9 @@ namespace MultiplayerARPG
         public void UpdateData(ICharacterData character)
         {
             this.character = character;
-            var slots = CacheEquipItemSlots.Values;
+            Dictionary<string, UICharacterItem>.ValueCollection slots = CacheEquipItemSlots.Values;
             // Clear slots data
-            foreach (var slot in slots)
+            foreach (UICharacterItem slot in slots)
             {
                 slot.Setup(GetEmptyUIData(), this.character, -1);
                 slot.Show();
@@ -111,11 +111,11 @@ namespace MultiplayerARPG
 
             string tempPosition;
             UICharacterItem tempSlot;
-            var equipItems = character.EquipItems;
-            for (var i = 0; i < equipItems.Count; ++i)
+            IList<CharacterItem> equipItems = character.EquipItems;
+            for (int i = 0; i < equipItems.Count; ++i)
             {
-                var equipItem = equipItems[i];
-                var armorItem = equipItem.GetArmorItem();
+                CharacterItem equipItem = equipItems[i];
+                Item armorItem = equipItem.GetArmorItem();
                 if (armorItem == null)
                     continue;
 
@@ -124,11 +124,11 @@ namespace MultiplayerARPG
                     tempSlot.Setup(new CharacterItemTuple(equipItem, equipItem.level, tempPosition), this.character, -1);
             }
 
-            var equipWeapons = character.EquipWeapons;
-            var rightHand = equipWeapons.rightHand;
-            var leftHand = equipWeapons.leftHand;
-            var rightHandEquipment = rightHand.GetEquipmentItem();
-            var leftHandEquipment = leftHand.GetEquipmentItem();
+            EquipWeapons equipWeapons = character.EquipWeapons;
+            CharacterItem rightHand = equipWeapons.rightHand;
+            CharacterItem leftHand = equipWeapons.leftHand;
+            Item rightHandEquipment = rightHand.GetEquipmentItem();
+            Item leftHandEquipment = leftHand.GetEquipmentItem();
             tempPosition = GameDataConst.EQUIP_POSITION_RIGHT_HAND;
             if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
             {

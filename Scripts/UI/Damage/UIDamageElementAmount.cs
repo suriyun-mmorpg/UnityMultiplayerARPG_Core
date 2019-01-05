@@ -14,8 +14,8 @@ namespace MultiplayerARPG
         {
             if (uiTextAmount != null)
             {
-                var element = Data.damageElement;
-                var amount = Data.amount;
+                DamageElement element = Data.damageElement;
+                MinMaxFloat amount = Data.amount;
                 uiTextAmount.text = string.Format(amountFormat, element.title, amount.min.ToString("N0"), amount.max.ToString("N0"));
             }
         }

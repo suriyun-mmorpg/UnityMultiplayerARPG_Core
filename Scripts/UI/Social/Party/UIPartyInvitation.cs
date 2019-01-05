@@ -6,7 +6,7 @@
 
         protected override void UpdateData()
         {
-            var anotherCharacter = Data;
+            BasePlayerCharacterEntity anotherCharacter = Data;
 
             if (uiAnotherCharacter != null)
                 uiAnotherCharacter.Data = anotherCharacter;
@@ -14,14 +14,14 @@
 
         public void OnClickAccept()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             owningCharacter.RequestAcceptPartyInvitation();
             Hide();
         }
 
         public void OnClickDecline()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             owningCharacter.RequestDeclinePartyInvitation();
             Hide();
         }

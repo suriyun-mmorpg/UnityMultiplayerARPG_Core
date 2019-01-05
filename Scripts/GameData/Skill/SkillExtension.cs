@@ -46,17 +46,17 @@ namespace MultiplayerARPG
             if (skill == null || character == null)
                 return false;
 
-            var isPass = true;
-            var skillLevelsDict = new Dictionary<Skill, int>();
-            var skillLevels = character.Skills;
-            foreach (var skillLevel in skillLevels)
+            bool isPass = true;
+            Dictionary<Skill, int> skillLevelsDict = new Dictionary<Skill, int>();
+            IList<CharacterSkill> skillLevels = character.Skills;
+            foreach (CharacterSkill skillLevel in skillLevels)
             {
                 if (skillLevel.GetSkill() == null)
                     continue;
                 skillLevelsDict[skillLevel.GetSkill()] = skillLevel.level;
             }
-            var requireSkillLevels = skill.CacheRequireSkillLevels;
-            foreach (var requireSkillLevel in requireSkillLevels)
+            Dictionary<Skill, short> requireSkillLevels = skill.CacheRequireSkillLevels;
+            foreach (KeyValuePair<Skill, short> requireSkillLevel in requireSkillLevels)
             {
                 if (!skillLevelsDict.ContainsKey(requireSkillLevel.Key) ||
                     skillLevelsDict[requireSkillLevel.Key] < requireSkillLevel.Value)
@@ -74,17 +74,17 @@ namespace MultiplayerARPG
             if (skill == null || character == null)
                 return false;
 
-            var available = true;
+            bool available = true;
             switch (skill.skillType)
             {
                 case SkillType.Active:
-                    var availableWeapons = skill.availableWeapons;
+                    WeaponType[] availableWeapons = skill.availableWeapons;
                     available = availableWeapons == null || availableWeapons.Length == 0;
                     if (!available)
                     {
-                        var rightWeaponItem = character.EquipWeapons.rightHand.GetWeaponItem();
-                        var leftWeaponItem = character.EquipWeapons.leftHand.GetWeaponItem();
-                        foreach (var availableWeapon in availableWeapons)
+                        Item rightWeaponItem = character.EquipWeapons.rightHand.GetWeaponItem();
+                        Item leftWeaponItem = character.EquipWeapons.leftHand.GetWeaponItem();
+                        foreach (WeaponType availableWeapon in availableWeapons)
                         {
                             if (rightWeaponItem != null && rightWeaponItem.WeaponType == availableWeapon)
                             {
@@ -117,7 +117,7 @@ namespace MultiplayerARPG
                 return false;
             if (character.CurrentMp < skill.GetConsumeMp(level))
                 return false;
-            var skillUsageIndex = character.IndexOfSkillUsage(skill.DataId, SkillUsageType.Skill);
+            int skillUsageIndex = character.IndexOfSkillUsage(skill.DataId, SkillUsageType.Skill);
             if (skillUsageIndex >= 0 && character.SkillUsages[skillUsageIndex].coolDownRemainsDuration > 0f)
                 return false;
             return true;
@@ -145,7 +145,7 @@ namespace MultiplayerARPG
             if (skill == null)
                 return 0f;
             level = skill.GetAdjustedLevel(level);
-            var duration = skill.coolDownDuration.GetAmount(level);
+            float duration = skill.coolDownDuration.GetAmount(level);
             if (duration < 0f)
                 duration = 0f;
             return duration;

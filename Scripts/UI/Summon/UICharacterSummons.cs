@@ -83,7 +83,7 @@ namespace MultiplayerARPG
         {
             this.character = character;
 
-            var selectedSummonObjectId = SelectionManager.SelectedUI != null ? SelectionManager.SelectedUI.CharacterSummon.objectId : 0;
+            uint selectedSummonObjectId = SelectionManager.SelectedUI != null ? SelectionManager.SelectedUI.CharacterSummon.objectId : 0;
             SelectionManager.DeselectSelectedUI();
             SelectionManager.Clear();
 
@@ -93,8 +93,8 @@ namespace MultiplayerARPG
                 return;
             }
 
-            var stackingSkillSummons = new Dictionary<int, UICharacterSummon>();
-            var summons = character.Summons;
+            Dictionary<int, UICharacterSummon> stackingSkillSummons = new Dictionary<int, UICharacterSummon>();
+            IList<CharacterSummon> summons = character.Summons;
             CacheList.Generate(summons, (index, characterSummon, ui) =>
             {
                 if (characterSummon.type == SummonType.Skill && stackingSkillSummons.ContainsKey(characterSummon.dataId))
@@ -104,7 +104,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    var uiCharacterSummon = ui.GetComponent<UICharacterSummon>();
+                    UICharacterSummon uiCharacterSummon = ui.GetComponent<UICharacterSummon>();
                     uiCharacterSummon.Setup(characterSummon, character, index);
                     uiCharacterSummon.Show();
                     switch (characterSummon.type)

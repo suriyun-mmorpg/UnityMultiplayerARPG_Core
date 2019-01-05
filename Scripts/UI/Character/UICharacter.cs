@@ -90,7 +90,7 @@ namespace MultiplayerARPG
                 if (cacheUICharacterAttributes == null)
                 {
                     cacheUICharacterAttributes = new Dictionary<Attribute, UICharacterAttribute>();
-                    foreach (var uiCharacterAttribute in uiCharacterAttributes)
+                    foreach (UICharacterAttributePair uiCharacterAttribute in uiCharacterAttributes)
                     {
                         if (uiCharacterAttribute.attribute != null &&
                             uiCharacterAttribute.ui != null &&
@@ -108,8 +108,8 @@ namespace MultiplayerARPG
 
             Profiler.BeginSample("UICharacter - Update UI (Immediately)");
             // Hp
-            var currentHp = 0;
-            var maxHp = 0;
+            int currentHp = 0;
+            int maxHp = 0;
             if (Data != null)
             {
                 currentHp = Data.CurrentHp;
@@ -123,8 +123,8 @@ namespace MultiplayerARPG
                 imageHpGage.fillAmount = maxHp <= 0 ? 0 : (float)currentHp / (float)maxHp;
 
             // Mp
-            var currentMp = 0;
-            var maxMp = 0;
+            int currentMp = 0;
+            int maxMp = 0;
             if (Data != null)
             {
                 currentMp = Data.CurrentMp;
@@ -138,8 +138,8 @@ namespace MultiplayerARPG
                 imageMpGage.fillAmount = maxMp <= 0 ? 0 : (float)currentMp / (float)maxMp;
 
             // Stamina
-            var currentStamina = 0;
-            var maxStamina = 0;
+            int currentStamina = 0;
+            int maxStamina = 0;
             if (Data != null)
             {
                 currentStamina = Data.CurrentStamina;
@@ -153,8 +153,8 @@ namespace MultiplayerARPG
                 imageStaminaGage.fillAmount = maxStamina <= 0 ? 0 : (float)currentStamina / (float)maxStamina;
 
             // Food
-            var currentFood = 0;
-            var maxFood = 0;
+            int currentFood = 0;
+            int maxFood = 0;
             if (Data != null)
             {
                 currentFood = Data.CurrentFood;
@@ -168,8 +168,8 @@ namespace MultiplayerARPG
                 imageFoodGage.fillAmount = maxFood <= 0 ? 0 : (float)currentFood / (float)maxFood;
 
             // Water
-            var currentWater = 0;
-            var maxWater = 0;
+            int currentWater = 0;
+            int maxWater = 0;
             if (Data != null)
             {
                 currentWater = Data.CurrentWater;
@@ -195,9 +195,9 @@ namespace MultiplayerARPG
             if (uiTextLevel != null)
                 uiTextLevel.text = string.Format(levelFormat, Data == null ? "N/A" : Data.Level.ToString("N0"));
             
-            var expTree = GameInstance.Singleton.ExpTree;
-            var currentExp = 0;
-            var nextLevelExp = 0;
+            int[] expTree = GameInstance.Singleton.ExpTree;
+            int currentExp = 0;
+            int nextLevelExp = 0;
             if (Data != null && Data.GetNextLevelExp() > 0)
             {
                 currentExp = Data.Exp;
@@ -205,7 +205,7 @@ namespace MultiplayerARPG
             }
             else if (Data != null && Data.Level - 2 > 0 && Data.Level - 2 < expTree.Length)
             {
-                var maxExp = expTree[Data.Level - 2];
+                int maxExp = expTree[Data.Level - 2];
                 currentExp = maxExp;
                 nextLevelExp = maxExp;
             }
@@ -217,7 +217,7 @@ namespace MultiplayerARPG
                 imageExpGage.fillAmount = nextLevelExp <= 0 ? 1 : (float)currentExp / (float)nextLevelExp;
             
             // Player character data
-            var playerCharacter = Data as IPlayerCharacterData;
+            IPlayerCharacterData playerCharacter = Data as IPlayerCharacterData;
             if (uiTextStatPoint != null)
                 uiTextStatPoint.text = string.Format(statPointFormat, playerCharacter == null ? "N/A" : playerCharacter.StatPoint.ToString("N0"));
 
@@ -227,7 +227,7 @@ namespace MultiplayerARPG
             if (uiTextGold != null)
                 uiTextGold.text = string.Format(goldFormat, playerCharacter == null ? "N/A" : playerCharacter.Gold.ToString("N0"));
 
-            var character = Data == null ? null : Data.GetDatabase();
+            BaseCharacter character = Data == null ? null : Data.GetDatabase();
             if (uiTextClassTitle != null)
                 uiTextClassTitle.text = string.Format(classTitleFormat, character == null ? "N/A" : character.title);
 
@@ -236,7 +236,7 @@ namespace MultiplayerARPG
 
             if (imageClassIcon != null)
             {
-                var iconSprite = character == null ? null : character.icon;
+                Sprite iconSprite = character == null ? null : character.icon;
                 imageClassIcon.gameObject.SetActive(iconSprite != null);
                 imageClassIcon.sprite = iconSprite;
             }
@@ -254,35 +254,35 @@ namespace MultiplayerARPG
             if (uiTextWeightLimit != null)
                 uiTextWeightLimit.text = string.Format(weightLimitStatsFormat, Data.GetTotalItemWeight().ToString("N2"), cacheStatsWithBuffs.weightLimit.ToString("N2"));
 
-            var rightHandItem = Data.EquipWeapons.rightHand;
-            var leftHandItem = Data.EquipWeapons.leftHand;
-            var rightHandWeapon = rightHandItem.GetWeaponItem();
-            var leftHandWeapon = leftHandItem.GetWeaponItem();
-            var rightHandDamages = rightHandWeapon != null ? GameDataHelpers.CombineDamageAmountsDictionary(Data.GetIncreaseDamages(), rightHandWeapon.GetDamageAmount(rightHandItem.level, rightHandItem.GetEquipmentBonusRate(), Data)) : null;
-            var leftHandDamages = leftHandWeapon != null ? GameDataHelpers.CombineDamageAmountsDictionary(Data.GetIncreaseDamages(), leftHandWeapon.GetDamageAmount(leftHandItem.level, leftHandItem.GetEquipmentBonusRate(), Data)) : null;
+            CharacterItem rightHandItem = Data.EquipWeapons.rightHand;
+            CharacterItem leftHandItem = Data.EquipWeapons.leftHand;
+            Item rightHandWeapon = rightHandItem.GetWeaponItem();
+            Item leftHandWeapon = leftHandItem.GetWeaponItem();
+            Dictionary<DamageElement, MinMaxFloat> rightHandDamages = rightHandWeapon != null ? GameDataHelpers.CombineDamageAmountsDictionary(Data.GetIncreaseDamages(), rightHandWeapon.GetDamageAmount(rightHandItem.level, rightHandItem.GetEquipmentBonusRate(), Data)) : null;
+            Dictionary<DamageElement, MinMaxFloat> leftHandDamages = leftHandWeapon != null ? GameDataHelpers.CombineDamageAmountsDictionary(Data.GetIncreaseDamages(), leftHandWeapon.GetDamageAmount(leftHandItem.level, leftHandItem.GetEquipmentBonusRate(), Data)) : null;
 
             if (uiTextWeaponDamages != null)
             {
-                var textDamages = "";
+                string textDamages = "";
                 if (rightHandWeapon != null)
                 {
-                    var sumDamages = GameDataHelpers.GetSumDamages(rightHandDamages);
+                    MinMaxFloat sumDamages = GameDataHelpers.GetSumDamages(rightHandDamages);
                     if (!string.IsNullOrEmpty(textDamages))
                         textDamages += "\n";
                     textDamages += string.Format(weaponDamageFormat, sumDamages.min.ToString("N0"), sumDamages.max.ToString("N0"));
                 }
                 if (leftHandWeapon != null)
                 {
-                    var sumDamages = GameDataHelpers.GetSumDamages(leftHandDamages);
+                    MinMaxFloat sumDamages = GameDataHelpers.GetSumDamages(leftHandDamages);
                     if (!string.IsNullOrEmpty(textDamages))
                         textDamages += "\n";
                     textDamages += string.Format(weaponDamageFormat, sumDamages.min.ToString("N0"), sumDamages.max.ToString("N0"));
                 }
                 if (rightHandWeapon == null && leftHandWeapon == null)
                 {
-                    var defaultWeaponItem = GameInstance.Singleton.DefaultWeaponItem;
-                    var defaultWeaponItemType = defaultWeaponItem.EquipType;
-                    var damageAmount = defaultWeaponItem.GetDamageAmount(1, 1f, Data);
+                    Item defaultWeaponItem = GameInstance.Singleton.DefaultWeaponItem;
+                    WeaponItemEquipType defaultWeaponItemType = defaultWeaponItem.EquipType;
+                    KeyValuePair<DamageElement, MinMaxFloat> damageAmount = defaultWeaponItem.GetDamageAmount(1, 1f, Data);
                     textDamages = string.Format(weaponDamageFormat, damageAmount.Value.min.ToString("N0"), damageAmount.Value.max.ToString("N0"));
                 }
                 uiTextWeaponDamages.text = textDamages;
@@ -317,8 +317,8 @@ namespace MultiplayerARPG
             {
                 Attribute tempAttribute;
                 short tempAmount;
-                var characterAttributes = Data.Attributes;
-                for (var indexOfData = 0; indexOfData < characterAttributes.Count; ++indexOfData)
+                IList<CharacterAttribute> characterAttributes = Data.Attributes;
+                for (int indexOfData = 0; indexOfData < characterAttributes.Count; ++indexOfData)
                 {
                     tempAttribute = characterAttributes[indexOfData].GetAttribute();
                     UICharacterAttribute cacheUICharacterAttribute;

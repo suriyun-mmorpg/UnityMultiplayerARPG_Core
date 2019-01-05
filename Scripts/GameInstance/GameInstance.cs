@@ -265,15 +265,15 @@ namespace MultiplayerARPG
                     defaultWeaponItem.itemType = ItemType.Weapon;
                     defaultWeaponItem.weaponType = DefaultWeaponType;
                     // Default damage amount
-                    var damageAmountMinMax = new IncrementalMinMaxFloat();
+                    IncrementalMinMaxFloat damageAmountMinMax = new IncrementalMinMaxFloat();
                     damageAmountMinMax.baseAmount = new MinMaxFloat() { min = 1, max = 1 };
                     damageAmountMinMax.amountIncreaseEachLevel = new MinMaxFloat() { min = 0, max = 0 };
-                    var damageAmount = new DamageIncremental()
+                    DamageIncremental damageAmount = new DamageIncremental()
                     {
                         amount = damageAmountMinMax,
                     };
                     // Default harvest damage amount
-                    var harvestDamageAmount = new IncrementalMinMaxFloat();
+                    IncrementalMinMaxFloat harvestDamageAmount = new IncrementalMinMaxFloat();
                     harvestDamageAmount.baseAmount = new MinMaxFloat() { min = 1, max = 1 };
                     harvestDamageAmount.amountIncreaseEachLevel = new MinMaxFloat() { min = 0, max = 0 };
                     // Set damage amount
@@ -358,24 +358,24 @@ namespace MultiplayerARPG
         public void LoadDataFromResources()
         {
             // Use Resources Load Async ?
-            var gameDataList = Resources.LoadAll<BaseGameData>("");
-            var characterEntityList = Resources.LoadAll<BaseCharacterEntity>("");
+            BaseGameData[] gameDataList = Resources.LoadAll<BaseGameData>("");
+            BaseCharacterEntity[] characterEntityList = Resources.LoadAll<BaseCharacterEntity>("");
 
-            var attributes = new List<Attribute>();
-            var damageElements = new List<DamageElement>();
-            var items = new List<Item>();
-            var skills = new List<Skill>();
-            var npcDialogs = new List<NpcDialog>();
-            var quests = new List<Quest>();
-            var guildSkills = new List<GuildSkill>();
-            var playerCharacters = new List<PlayerCharacter>();
-            var monsterCharacters = new List<MonsterCharacter>();
-            var playerCharacterEntities = new List<BasePlayerCharacterEntity>();
-            var monsterCharacterEntities = new List<BaseMonsterCharacterEntity>();
-            var mapInfos = new List<MapInfo>();
+            List<Attribute> attributes = new List<Attribute>();
+            List<DamageElement> damageElements = new List<DamageElement>();
+            List<Item> items = new List<Item>();
+            List<Skill> skills = new List<Skill>();
+            List<NpcDialog> npcDialogs = new List<NpcDialog>();
+            List<Quest> quests = new List<Quest>();
+            List<GuildSkill> guildSkills = new List<GuildSkill>();
+            List<PlayerCharacter> playerCharacters = new List<PlayerCharacter>();
+            List<MonsterCharacter> monsterCharacters = new List<MonsterCharacter>();
+            List<BasePlayerCharacterEntity> playerCharacterEntities = new List<BasePlayerCharacterEntity>();
+            List<BaseMonsterCharacterEntity> monsterCharacterEntities = new List<BaseMonsterCharacterEntity>();
+            List<MapInfo> mapInfos = new List<MapInfo>();
 
             // Filtering game data
-            foreach (var gameData in gameDataList)
+            foreach (BaseGameData gameData in gameDataList)
             {
                 if (gameData is Attribute)
                     attributes.Add(gameData as Attribute);
@@ -400,7 +400,7 @@ namespace MultiplayerARPG
             }
 
             // Filtering character entity
-            foreach (var characterEntity in characterEntityList)
+            foreach (BaseCharacterEntity characterEntity in characterEntityList)
             {
                 if (characterEntity is BasePlayerCharacterEntity)
                     playerCharacterEntities.Add(characterEntity as BasePlayerCharacterEntity);
@@ -423,8 +423,8 @@ namespace MultiplayerARPG
             AddCharacterEntities(monsterCharacterEntities);
             AddMapInfos(mapInfos);
 
-            var weaponHitEffects = new List<GameEffectCollection>();
-            foreach (var damageElement in damageElements)
+            List<GameEffectCollection> weaponHitEffects = new List<GameEffectCollection>();
+            foreach (DamageElement damageElement in damageElements)
             {
                 if (damageElement.hitEffects != null)
                     weaponHitEffects.Add(damageElement.hitEffects);
@@ -471,8 +471,8 @@ namespace MultiplayerARPG
 
         public List<string> GetGameScenes()
         {
-            var scenes = new List<string>();
-            foreach (var sceneName in MapInfos.Keys)
+            List<string> scenes = new List<string>();
+            foreach (string sceneName in MapInfos.Keys)
             {
                 if (sceneName != null &&
                     !string.IsNullOrEmpty(sceneName) &&
@@ -485,10 +485,10 @@ namespace MultiplayerARPG
         
         public int GetTargetLayerMask()
         {
-            var layerMask = 0;
+            int layerMask = 0;
             if (nonTargetingLayers.Length > 0)
             {
-                foreach (var nonTargetingLayer in nonTargetingLayers)
+                foreach (UnityLayer nonTargetingLayer in nonTargetingLayers)
                 {
                     layerMask = layerMask | ~(nonTargetingLayer.Mask);
                 }
@@ -501,7 +501,7 @@ namespace MultiplayerARPG
 
         public int GetDamageableLayerMask()
         {
-            var layerMask = 0;
+            int layerMask = 0;
             layerMask = layerMask | ~characterLayer.Mask;
             layerMask = layerMask | ~buildingLayer.Mask;
             layerMask = layerMask | ~harvestableLayer.Mask;
@@ -510,7 +510,7 @@ namespace MultiplayerARPG
 
         public int GetBuildLayerMask()
         {
-            var layerMask = -1;
+            int layerMask = -1;
             layerMask = layerMask | ~(characterLayer.Mask);
             layerMask = layerMask | ~(itemDropLayer.Mask);
             layerMask = layerMask | ~(harvestableLayer.Mask);
@@ -519,7 +519,7 @@ namespace MultiplayerARPG
 
         public int GetItemDropGroundDetectionLayerMask()
         {
-            var layerMask = -1;
+            int layerMask = -1;
             layerMask = layerMask | ~(characterLayer.Mask);
             layerMask = layerMask | ~(itemDropLayer.Mask);
             return layerMask;
@@ -527,7 +527,7 @@ namespace MultiplayerARPG
 
         public int GetMonsterSpawnGroundDetectionLayerMask()
         {
-            var layerMask = -1;
+            int layerMask = -1;
             layerMask = layerMask | ~(buildingLayer.Mask);
             layerMask = layerMask | ~(harvestableLayer.Mask);
             return layerMask;
@@ -535,7 +535,7 @@ namespace MultiplayerARPG
 
         public int GetHarvestableSpawnGroundDetectionLayerMask()
         {
-            var layerMask = -1;
+            int layerMask = -1;
             layerMask = layerMask | ~(characterLayer.Mask);
             layerMask = layerMask | ~(itemDropLayer.Mask);
             layerMask = layerMask | ~(buildingLayer.Mask);
@@ -545,7 +545,7 @@ namespace MultiplayerARPG
 
         public static void AddAttributes(IEnumerable<Attribute> attributes)
         {
-            foreach (var attribute in attributes)
+            foreach (Attribute attribute in attributes)
             {
                 if (attribute == null || Attributes.ContainsKey(attribute.DataId))
                     continue;
@@ -555,17 +555,17 @@ namespace MultiplayerARPG
 
         public static void AddItems(IEnumerable<Item> items)
         {
-            var weaponTypes = new List<WeaponType>();
-            var damageEntities = new List<BaseDamageEntity>();
-            var buildingEntities = new List<BuildingEntity>();
-            foreach (var item in items)
+            List<WeaponType> weaponTypes = new List<WeaponType>();
+            List<BaseDamageEntity> damageEntities = new List<BaseDamageEntity>();
+            List<BuildingEntity> buildingEntities = new List<BuildingEntity>();
+            foreach (Item item in items)
             {
                 if (item == null || Items.ContainsKey(item.DataId))
                     continue;
                 Items[item.DataId] = item;
                 if (item.IsWeapon())
                 {
-                    var weaponType = item.WeaponType;
+                    WeaponType weaponType = item.WeaponType;
                     weaponTypes.Add(weaponType);
                     // Add damage entities
                     if (weaponType.damageInfo.missileDamageEntity != null)
@@ -584,8 +584,8 @@ namespace MultiplayerARPG
 
         public static void AddCharacters(IEnumerable<BaseCharacter> characters)
         {
-            var damageEntities = new List<BaseDamageEntity>();
-            foreach (var character in characters)
+            List<BaseDamageEntity> damageEntities = new List<BaseDamageEntity>();
+            foreach (BaseCharacter character in characters)
             {
                 if (character == null || AllCharacters.ContainsKey(character.DataId))
                     continue;
@@ -593,14 +593,14 @@ namespace MultiplayerARPG
                 AllCharacters[character.DataId] = character;
                 if (character is PlayerCharacter)
                 {
-                    var playerCharacter = character as PlayerCharacter;
+                    PlayerCharacter playerCharacter = character as PlayerCharacter;
                     PlayerCharacters[character.DataId] = playerCharacter;
                 }
                 else if (character is MonsterCharacter)
                 {
-                    var monsterCharacter = character as MonsterCharacter;
+                    MonsterCharacter monsterCharacter = character as MonsterCharacter;
                     MonsterCharacters[character.DataId] = monsterCharacter;
-                    var missileDamageEntity = monsterCharacter.damageInfo.missileDamageEntity;
+                    MissileDamageEntity missileDamageEntity = monsterCharacter.damageInfo.missileDamageEntity;
                     if (missileDamageEntity != null)
                         damageEntities.Add(missileDamageEntity);
                 }
@@ -612,7 +612,7 @@ namespace MultiplayerARPG
         {
             if (characterEntities == null)
                 return;
-            foreach (var characterEntity in characterEntities)
+            foreach (BaseCharacterEntity characterEntity in characterEntities)
             {
                 if (characterEntity == null || AllCharacterEntities.ContainsKey(characterEntity.Identity.HashAssetId))
                     continue;
@@ -620,12 +620,12 @@ namespace MultiplayerARPG
                 AllCharacterEntities[characterEntity.Identity.HashAssetId] = characterEntity;
                 if (characterEntity is BasePlayerCharacterEntity)
                 {
-                    var playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
+                    BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
                     PlayerCharacterEntities[characterEntity.Identity.HashAssetId] = playerCharacterEntity;
                 }
                 else if (characterEntity is BaseMonsterCharacterEntity)
                 {
-                    var monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
+                    BaseMonsterCharacterEntity monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
                     MonsterCharacterEntities[characterEntity.Identity.HashAssetId] = monsterCharacterEntity;
                 }
             }
@@ -633,15 +633,15 @@ namespace MultiplayerARPG
 
         public static void AddSkills(IEnumerable<Skill> skills)
         {
-            var skillHitEffects = new List<GameEffectCollection>();
-            var damageEntities = new List<BaseDamageEntity>();
-            foreach (var skill in skills)
+            List<GameEffectCollection> skillHitEffects = new List<GameEffectCollection>();
+            List<BaseDamageEntity> damageEntities = new List<BaseDamageEntity>();
+            foreach (Skill skill in skills)
             {
                 if (skill == null || Skills.ContainsKey(skill.DataId))
                     continue;
                 Skills[skill.DataId] = skill;
                 skillHitEffects.Add(skill.hitEffects);
-                var missileDamageEntity = skill.damageInfo.missileDamageEntity;
+                MissileDamageEntity missileDamageEntity = skill.damageInfo.missileDamageEntity;
                 if (missileDamageEntity != null)
                     damageEntities.Add(missileDamageEntity);
             }
@@ -651,15 +651,15 @@ namespace MultiplayerARPG
 
         public static void AddNpcDialogs(IEnumerable<NpcDialog> npcDialogs)
         {
-            foreach (var npcDialog in npcDialogs)
+            foreach (NpcDialog npcDialog in npcDialogs)
             {
                 if (npcDialog == null || NpcDialogs.ContainsKey(npcDialog.DataId))
                     continue;
                 if (npcDialog.menus != null && npcDialog.menus.Length > 0)
                 {
                     // Add dialogs from menus
-                    var menuDialogs = new List<NpcDialog>();
-                    foreach (var menu in npcDialog.menus)
+                    List<NpcDialog> menuDialogs = new List<NpcDialog>();
+                    foreach (NpcDialogMenu menu in npcDialog.menus)
                     {
                         if (menu.dialog != null && !NpcDialogs.ContainsKey(menu.dialog.DataId))
                             menuDialogs.Add(menu.dialog);
@@ -672,7 +672,7 @@ namespace MultiplayerARPG
 
         public static void AddQuests(IEnumerable<Quest> quests)
         {
-            foreach (var quest in quests)
+            foreach (Quest quest in quests)
             {
                 if (quest == null || Quests.ContainsKey(quest.DataId))
                     continue;
@@ -682,7 +682,7 @@ namespace MultiplayerARPG
 
         public static void AddGuildSkills(IEnumerable<GuildSkill> guildSkills)
         {
-            foreach (var guildSkill in guildSkills)
+            foreach (GuildSkill guildSkill in guildSkills)
             {
                 if (guildSkill == null || GuildSkills.ContainsKey(guildSkill.DataId))
                     continue;
@@ -694,7 +694,7 @@ namespace MultiplayerARPG
         {
             if (damageEntities == null)
                 return;
-            foreach (var damageEntity in damageEntities)
+            foreach (BaseDamageEntity damageEntity in damageEntities)
             {
                 if (damageEntity == null || DamageEntities.ContainsKey(damageEntity.Identity.HashAssetId))
                     continue;
@@ -706,7 +706,7 @@ namespace MultiplayerARPG
         {
             if (buildingEntities == null)
                 return;
-            foreach (var buildingEntity in buildingEntities)
+            foreach (BuildingEntity buildingEntity in buildingEntities)
             {
                 if (buildingEntity == null || BuildingEntities.ContainsKey(buildingEntity.DataId))
                     continue;
@@ -718,7 +718,7 @@ namespace MultiplayerARPG
         {
             if (warpPortalEntities == null)
                 return;
-            foreach (var warpPortalEntity in warpPortalEntities)
+            foreach (WarpPortalEntity warpPortalEntity in warpPortalEntities)
             {
                 if (warpPortalEntity == null || WarpPortalEntities.ContainsKey(warpPortalEntity.Identity.HashAssetId))
                     continue;
@@ -730,7 +730,7 @@ namespace MultiplayerARPG
         {
             if (npcEntities == null)
                 return;
-            foreach (var npcEntity in npcEntities)
+            foreach (NpcEntity npcEntity in npcEntities)
             {
                 if (npcEntity == null || NpcEntities.ContainsKey(npcEntity.Identity.HashAssetId))
                     continue;
@@ -742,7 +742,7 @@ namespace MultiplayerARPG
         {
             if (weaponTypes == null)
                 return;
-            foreach (var weaponType in weaponTypes)
+            foreach (WeaponType weaponType in weaponTypes)
             {
                 if (weaponType == null || WeaponTypes.ContainsKey(weaponType.DataId))
                     continue;
@@ -754,7 +754,7 @@ namespace MultiplayerARPG
         {
             if (gameEffectCollections == null)
                 return;
-            foreach (var gameEffectCollection in gameEffectCollections)
+            foreach (GameEffectCollection gameEffectCollection in gameEffectCollections)
             {
                 if (!gameEffectCollection.Initialize())
                     continue;
@@ -768,8 +768,8 @@ namespace MultiplayerARPG
         {
             if (mapWarpPortals == null)
                 return;
-            var warpPortalEntities = new List<WarpPortalEntity>();
-            foreach (var mapWarpPortal in mapWarpPortals)
+            List<WarpPortalEntity> warpPortalEntities = new List<WarpPortalEntity>();
+            foreach (WarpPortals mapWarpPortal in mapWarpPortals)
             {
                 if (mapWarpPortal.map == null || string.IsNullOrEmpty(mapWarpPortal.map.SceneName))
                     continue;
@@ -777,7 +777,7 @@ namespace MultiplayerARPG
                     MapWarpPortals[mapWarpPortal.map.SceneName].AddRange(mapWarpPortal.warpPortals);
                 else
                     MapWarpPortals[mapWarpPortal.map.SceneName] = new List<WarpPortal>(mapWarpPortal.warpPortals);
-                foreach (var warpPortal in mapWarpPortal.warpPortals)
+                foreach (WarpPortal warpPortal in mapWarpPortal.warpPortals)
                 {
                     if (warpPortal.entityPrefab != null)
                         warpPortalEntities.Add(warpPortal.entityPrefab);
@@ -790,9 +790,9 @@ namespace MultiplayerARPG
         {
             if (mapNpcs == null)
                 return;
-            var npcEntities = new List<NpcEntity>();
-            var npcDialogs = new List<NpcDialog>();
-            foreach (var mapNpc in mapNpcs)
+            List<NpcEntity> npcEntities = new List<NpcEntity>();
+            List<NpcDialog> npcDialogs = new List<NpcDialog>();
+            foreach (Npcs mapNpc in mapNpcs)
             {
                 if (mapNpc.map == null || string.IsNullOrEmpty(mapNpc.map.SceneName))
                     continue;
@@ -800,7 +800,7 @@ namespace MultiplayerARPG
                     MapNpcs[mapNpc.map.SceneName].AddRange(mapNpc.npcs);
                 else
                     MapNpcs[mapNpc.map.SceneName] = new List<Npc>(mapNpc.npcs);
-                foreach (var npc in mapNpc.npcs)
+                foreach (Npc npc in mapNpc.npcs)
                 {
                     if (npc.entityPrefab != null)
                         npcEntities.Add(npc.entityPrefab);
@@ -816,7 +816,7 @@ namespace MultiplayerARPG
         {
             if (mapInfos == null)
                 return;
-            foreach (var mapInfo in mapInfos)
+            foreach (MapInfo mapInfo in mapInfos)
             {
                 if (mapInfo.scene == null || string.IsNullOrEmpty(mapInfo.scene.SceneName))
                     continue;

@@ -37,42 +37,42 @@ namespace MultiplayerARPG
         {
             if (uiTextDuration != null)
             {
-                var duration = Buff.GetDuration(Level);
+                float duration = Buff.GetDuration(Level);
                 uiTextDuration.gameObject.SetActive(duration != 0);
                 uiTextDuration.text = string.Format(durationFormat, duration.ToString("N0"));
             }
 
             if (uiTextRecoveryHp != null)
             {
-                var recoveryHp = Buff.GetRecoveryHp(Level);
+                int recoveryHp = Buff.GetRecoveryHp(Level);
                 uiTextRecoveryHp.gameObject.SetActive(recoveryHp != 0);
                 uiTextRecoveryHp.text = string.Format(recoveryHpFormat, recoveryHp.ToString("N0"));
             }
 
             if (uiTextRecoveryMp != null)
             {
-                var recoveryMp = Buff.GetRecoveryMp(Level);
+                int recoveryMp = Buff.GetRecoveryMp(Level);
                 uiTextRecoveryMp.gameObject.SetActive(recoveryMp != 0);
                 uiTextRecoveryMp.text = string.Format(recoveryMpFormat, recoveryMp.ToString("N0"));
             }
 
             if (uiTextRecoveryStamina != null)
             {
-                var recoveryStamina = Buff.GetRecoveryStamina(Level);
+                int recoveryStamina = Buff.GetRecoveryStamina(Level);
                 uiTextRecoveryStamina.gameObject.SetActive(recoveryStamina != 0);
                 uiTextRecoveryStamina.text = string.Format(recoveryStaminaFormat, recoveryStamina.ToString("N0"));
             }
 
             if (uiTextRecoveryFood != null)
             {
-                var recoveryFood = Buff.GetRecoveryFood(Level);
+                int recoveryFood = Buff.GetRecoveryFood(Level);
                 uiTextRecoveryFood.gameObject.SetActive(recoveryFood != 0);
                 uiTextRecoveryFood.text = string.Format(recoveryFoodFormat, recoveryFood.ToString("N0"));
             }
 
             if (uiTextRecoveryWater != null)
             {
-                var recoveryWater = Buff.GetRecoveryWater(Level);
+                int recoveryWater = Buff.GetRecoveryWater(Level);
                 uiTextRecoveryWater.gameObject.SetActive(recoveryWater != 0);
                 uiTextRecoveryWater.text = string.Format(recoveryWaterFormat, recoveryWater.ToString("N0"));
             }

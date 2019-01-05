@@ -137,12 +137,12 @@ namespace MultiplayerARPG
         protected override void EntityOnSetOwnerClient()
         {
             base.EntityOnSetOwnerClient();
-            foreach (var ownerObject in ownerObjects)
+            foreach (GameObject ownerObject in ownerObjects)
             {
                 if (ownerObject == null) continue;
                 ownerObject.SetActive(IsOwnerClient);
             }
-            foreach (var nonOwnerObject in nonOwnerObjects)
+            foreach (GameObject nonOwnerObject in nonOwnerObjects)
             {
                 if (nonOwnerObject == null) continue;
                 nonOwnerObject.SetActive(!IsOwnerClient);
@@ -202,7 +202,7 @@ namespace MultiplayerARPG
             if (amount <= 0 || !GameInstance.Items.TryGetValue(dataId, out itemData))
                 return false;
 
-            var weight = itemData.weight;
+            float weight = itemData.weight;
             // If overwhelming
             if (CacheTotalItemWeight + (amount * weight) > CacheStats.weightLimit)
                 return true;
@@ -215,7 +215,7 @@ namespace MultiplayerARPG
             reasonWhyCannot = "";
             shouldUnequipPositions = new HashSet<string>();
 
-            var equipmentItem = equippingItem.GetEquipmentItem();
+            Item equipmentItem = equippingItem.GetEquipmentItem();
             if (equipmentItem == null)
             {
                 reasonWhyCannot = "This item is not equipment item";
@@ -234,19 +234,19 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            var weaponItem = equippingItem.GetWeaponItem();
-            var shieldItem = equippingItem.GetShieldItem();
-            var armorItem = equippingItem.GetArmorItem();
+            Item weaponItem = equippingItem.GetWeaponItem();
+            Item shieldItem = equippingItem.GetShieldItem();
+            Item armorItem = equippingItem.GetArmorItem();
 
-            var tempEquipWeapons = EquipWeapons;
-            var rightHandWeapon = tempEquipWeapons.rightHand.GetWeaponItem();
-            var leftHandWeapon = tempEquipWeapons.leftHand.GetWeaponItem();
-            var leftHandShield = tempEquipWeapons.leftHand.GetShieldItem();
+            EquipWeapons tempEquipWeapons = EquipWeapons;
+            Item rightHandWeapon = tempEquipWeapons.rightHand.GetWeaponItem();
+            Item leftHandWeapon = tempEquipWeapons.leftHand.GetWeaponItem();
+            Item leftHandShield = tempEquipWeapons.leftHand.GetShieldItem();
 
             WeaponItemEquipType rightHandEquipType;
-            var hasRightHandItem = rightHandWeapon.TryGetWeaponItemEquipType(out rightHandEquipType);
+            bool hasRightHandItem = rightHandWeapon.TryGetWeaponItemEquipType(out rightHandEquipType);
             WeaponItemEquipType leftHandEquipType;
-            var hasLeftHandItem = leftHandShield != null || leftHandWeapon.TryGetWeaponItemEquipType(out leftHandEquipType);
+            bool hasLeftHandItem = leftHandShield != null || leftHandWeapon.TryGetWeaponItemEquipType(out leftHandEquipType);
 
             if (weaponItem != null)
             {
@@ -327,7 +327,7 @@ namespace MultiplayerARPG
                 return;
 
             base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
-            var attackerCharacter = attacker as BaseCharacterEntity;
+            BaseCharacterEntity attackerCharacter = attacker as BaseCharacterEntity;
 
             // Notify enemy spotted when received damage from enemy
             NotifyEnemySpottedToAllies(attackerCharacter);
@@ -336,7 +336,7 @@ namespace MultiplayerARPG
             attackerCharacter.NotifyEnemySpottedToAllies(this);
 
             // Calculate chance to hit
-            var hitChance = GameInstance.GameplayRule.GetHitChance(attackerCharacter, this);
+            float hitChance = GameInstance.GameplayRule.GetHitChance(attackerCharacter, this);
             // If miss, return don't calculate damages
             if (Random.value > hitChance)
             {
@@ -345,17 +345,17 @@ namespace MultiplayerARPG
             }
 
             // Calculate damages
-            var calculatingTotalDamage = 0f;
+            float calculatingTotalDamage = 0f;
             if (allDamageAmounts.Count > 0)
             {
-                foreach (var allDamageAmount in allDamageAmounts)
+                foreach (KeyValuePair<DamageElement, MinMaxFloat> allDamageAmount in allDamageAmounts)
                 {
-                    var damageElement = allDamageAmount.Key;
-                    var damageAmount = allDamageAmount.Value;
+                    DamageElement damageElement = allDamageAmount.Key;
+                    MinMaxFloat damageAmount = allDamageAmount.Value;
                     // Set hit effect by damage element
                     if (hitEffectsId == 0 && damageElement != GameInstance.DefaultDamageElement)
                         hitEffectsId = damageElement.hitEffects.Id;
-                    var receivingDamage = damageElement.GetDamageReducedByResistance(this, damageAmount.Random());
+                    float receivingDamage = damageElement.GetDamageReducedByResistance(this, damageAmount.Random());
                     if (receivingDamage > 0f)
                         calculatingTotalDamage += receivingDamage;
                 }
@@ -368,21 +368,21 @@ namespace MultiplayerARPG
                 RequestPlayEffect(hitEffectsId);
 
             // Calculate chance to critical
-            var criticalChance = GameInstance.GameplayRule.GetCriticalChance(attackerCharacter, this);
-            var isCritical = Random.value <= criticalChance;
+            float criticalChance = GameInstance.GameplayRule.GetCriticalChance(attackerCharacter, this);
+            bool isCritical = Random.value <= criticalChance;
             // If critical occurs
             if (isCritical)
                 calculatingTotalDamage = GameInstance.GameplayRule.GetCriticalDamage(attackerCharacter, this, calculatingTotalDamage);
 
             // Calculate chance to block
-            var blockChance = GameInstance.GameplayRule.GetBlockChance(attackerCharacter, this);
-            var isBlocked = Random.value <= blockChance;
+            float blockChance = GameInstance.GameplayRule.GetBlockChance(attackerCharacter, this);
+            bool isBlocked = Random.value <= blockChance;
             // If block occurs
             if (isBlocked)
                 calculatingTotalDamage = GameInstance.GameplayRule.GetBlockDamage(attackerCharacter, this, calculatingTotalDamage);
 
             // Apply damages
-            var totalDamage = (int)calculatingTotalDamage;
+            int totalDamage = (int)calculatingTotalDamage;
             CurrentHp -= totalDamage;
 
             if (isBlocked)
@@ -414,10 +414,10 @@ namespace MultiplayerARPG
         protected void UpdateEquipItemIndexes()
         {
             equipItemIndexes.Clear();
-            for (var i = 0; i < equipItems.Count; ++i)
+            for (int i = 0; i < equipItems.Count; ++i)
             {
-                var entry = equipItems[i];
-                var armorItem = entry.GetArmorItem();
+                CharacterItem entry = equipItems[i];
+                Item armorItem = entry.GetArmorItem();
                 if (entry.IsValid() && armorItem != null && !equipItemIndexes.ContainsKey(armorItem.EquipPosition))
                     equipItemIndexes.Add(armorItem.EquipPosition, i);
             }
@@ -451,40 +451,40 @@ namespace MultiplayerARPG
             if (IsDead() || !IsServer)
                 return;
 
-            var buffIndex = this.IndexOfBuff(dataId, type);
+            int buffIndex = this.IndexOfBuff(dataId, type);
             if (buffIndex >= 0)
                 buffs.RemoveAt(buffIndex);
 
-            var newBuff = CharacterBuff.Create(type, dataId, level);
+            CharacterBuff newBuff = CharacterBuff.Create(type, dataId, level);
             newBuff.Apply();
             buffs.Add(newBuff);
 
-            var duration = newBuff.GetDuration();
-            var recoveryHp = duration <= 0f ? newBuff.GetBuffRecoveryHp() : 0;
+            float duration = newBuff.GetDuration();
+            int recoveryHp = duration <= 0f ? newBuff.GetBuffRecoveryHp() : 0;
             if (recoveryHp != 0)
             {
                 CurrentHp += recoveryHp;
                 RequestCombatAmount(CombatAmountType.HpRecovery, recoveryHp);
             }
-            var recoveryMp = duration <= 0f ? newBuff.GetBuffRecoveryMp() : 0;
+            int recoveryMp = duration <= 0f ? newBuff.GetBuffRecoveryMp() : 0;
             if (recoveryMp != 0)
             {
                 CurrentMp += recoveryMp;
                 RequestCombatAmount(CombatAmountType.HpRecovery, recoveryMp);
             }
-            var recoveryStamina = duration <= 0f ? newBuff.GetBuffRecoveryStamina() : 0;
+            int recoveryStamina = duration <= 0f ? newBuff.GetBuffRecoveryStamina() : 0;
             if (recoveryStamina != 0)
             {
                 CurrentStamina += recoveryStamina;
                 RequestCombatAmount(CombatAmountType.HpRecovery, recoveryStamina);
             }
-            var recoveryFood = duration <= 0f ? newBuff.GetBuffRecoveryFood() : 0;
+            int recoveryFood = duration <= 0f ? newBuff.GetBuffRecoveryFood() : 0;
             if (recoveryFood != 0)
             {
                 CurrentFood += recoveryFood;
                 RequestCombatAmount(CombatAmountType.FoodRecovery, recoveryFood);
             }
-            var recoveryWater = duration <= 0f ? newBuff.GetBuffRecoveryWater() : 0;
+            int recoveryWater = duration <= 0f ? newBuff.GetBuffRecoveryWater() : 0;
             if (recoveryWater != 0)
             {
                 CurrentWater += recoveryWater;
@@ -512,7 +512,7 @@ namespace MultiplayerARPG
                     break;
                 case SkillBuffType.BuffToNearbyAllies:
                     tempCharacters = FindAliveCharacters<BaseCharacterEntity>(skill.buffDistance.GetAmount(level), true, false, false);
-                    foreach (var character in tempCharacters)
+                    foreach (BaseCharacterEntity character in tempCharacters)
                     {
                         character.ApplyBuff(skill.DataId, BuffType.SkillBuff, level);
                     }
@@ -520,7 +520,7 @@ namespace MultiplayerARPG
                     break;
                 case SkillBuffType.BuffToNearbyCharacters:
                     tempCharacters = FindAliveCharacters<BaseCharacterEntity>(skill.buffDistance.GetAmount(level), true, false, true);
-                    foreach (var character in tempCharacters)
+                    foreach (BaseCharacterEntity character in tempCharacters)
                     {
                         character.ApplyBuff(skill.DataId, BuffType.SkillBuff, level);
                     }
@@ -542,7 +542,7 @@ namespace MultiplayerARPG
                 return;
             // Clear all summoned pets
             CharacterSummon tempSummon;
-            for (var i = 0; i < Summons.Count; ++i)
+            for (int i = 0; i < Summons.Count; ++i)
             {
                 tempSummon = summons[i];
                 if (tempSummon.type != SummonType.Pet)
@@ -551,7 +551,7 @@ namespace MultiplayerARPG
                 tempSummon.UnSummon(this);
             }
             // Summon new pet
-            var newSummon = CharacterSummon.Create(SummonType.Pet, item.DataId);
+            CharacterSummon newSummon = CharacterSummon.Create(SummonType.Pet, item.DataId);
             newSummon.Summon(this, level, 0f, exp);
             summons.Add(newSummon);
         }
@@ -560,26 +560,26 @@ namespace MultiplayerARPG
         {
             if (IsDead() || !IsServer || skill == null || level <= 0)
                 return;
-            var i = 0;
-            var amountEachTime = skill.summon.amountEachTime.GetAmount(level);
+            int i = 0;
+            int amountEachTime = skill.summon.amountEachTime.GetAmount(level);
             for (i = 0; i < amountEachTime; ++i)
             {
-                var newSummon = CharacterSummon.Create(SummonType.Skill, skill.DataId);
+                CharacterSummon newSummon = CharacterSummon.Create(SummonType.Skill, skill.DataId);
                 newSummon.Summon(this, skill.summon.level.GetAmount(level), skill.summon.duration.GetAmount(level));
                 summons.Add(newSummon);
             }
-            var count = 0;
+            int count = 0;
             for (i = 0; i < summons.Count; ++i)
             {
                 if (summons[i].dataId == skill.DataId)
                     ++count;
             }
-            var maxStack = skill.summon.maxStack.GetAmount(level);
-            var unSummonAmount = count > maxStack ? count - maxStack : 0;
+            int maxStack = skill.summon.maxStack.GetAmount(level);
+            int unSummonAmount = count > maxStack ? count - maxStack : 0;
             CharacterSummon tempSummon;
             for (i = unSummonAmount; i > 0; --i)
             {
-                var summonIndex = this.IndexOfSummon(skill.DataId, SummonType.Skill);
+                int summonIndex = this.IndexOfSummon(skill.DataId, SummonType.Skill);
                 tempSummon = summons[summonIndex];
                 if (summonIndex >= 0)
                 {
@@ -591,7 +591,7 @@ namespace MultiplayerARPG
 
         protected virtual void ApplySkill(CharacterSkill characterSkill, Vector3 position, SkillAttackType skillAttackType, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
-            var skill = characterSkill.GetSkill();
+            Skill skill = characterSkill.GetSkill();
             switch (skill.skillType)
             {
                 case SkillType.Active:
@@ -630,8 +630,8 @@ namespace MultiplayerARPG
             // Prepare weapon data
             bool isLeftHand;
             weapon = this.GetRandomedWeapon(out isLeftHand);
-            var weaponItem = weapon.GetWeaponItem();
-            var weaponType = weaponItem.WeaponType;
+            Item weaponItem = weapon.GetWeaponItem();
+            WeaponType weaponType = weaponItem.WeaponType;
             // Assign data id
             dataId = weaponType.DataId;
             // Assign animation action type
@@ -675,16 +675,16 @@ namespace MultiplayerARPG
             damageInfo = null;
             allDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
             // Prepare skill data
-            var skill = characterSkill.GetSkill();
+            Skill skill = characterSkill.GetSkill();
             if (skill == null)
                 return;
             // Prepare weapon data
             skillAttackType = skill.skillAttackType;
             bool isLeftHand;
             weapon = this.GetRandomedWeapon(out isLeftHand);
-            var weaponItem = weapon.GetWeaponItem();
-            var weaponType = weaponItem.WeaponType;
-            var hasSkillCastAnimation = CharacterModel.HasSkillCastAnimations(skill);
+            Item weaponItem = weapon.GetWeaponItem();
+            WeaponType weaponType = weaponItem.WeaponType;
+            bool hasSkillCastAnimation = CharacterModel.HasSkillCastAnimations(skill);
             // Prepare animation
             if (!hasSkillCastAnimation && skillAttackType != SkillAttackType.None)
             {
@@ -752,10 +752,10 @@ namespace MultiplayerARPG
             float minDistance = float.MaxValue;
             DamageInfo tempDamageInfo;
             float tempDistance = 0f;
-            var rightHand = EquipWeapons.rightHand;
-            var leftHand = EquipWeapons.leftHand;
-            var rightHandWeapon = rightHand.GetWeaponItem();
-            var leftHandWeapon = leftHand.GetWeaponItem();
+            CharacterItem rightHand = EquipWeapons.rightHand;
+            CharacterItem leftHand = EquipWeapons.leftHand;
+            Item rightHandWeapon = rightHand.GetWeaponItem();
+            Item leftHandWeapon = leftHand.GetWeaponItem();
             if (rightHandWeapon != null)
             {
                 tempDamageInfo = rightHandWeapon.WeaponType.damageInfo;
@@ -784,10 +784,10 @@ namespace MultiplayerARPG
             float minFov = float.MaxValue;
             DamageInfo tempDamageInfo;
             float tempFov = 0f;
-            var rightHand = EquipWeapons.rightHand;
-            var leftHand = EquipWeapons.leftHand;
-            var rightHandWeapon = rightHand.GetWeaponItem();
-            var leftHandWeapon = leftHand.GetWeaponItem();
+            CharacterItem rightHand = EquipWeapons.rightHand;
+            CharacterItem leftHand = EquipWeapons.leftHand;
+            Item rightHandWeapon = rightHand.GetWeaponItem();
+            Item leftHandWeapon = leftHand.GetWeaponItem();
             if (rightHandWeapon != null)
             {
                 tempDamageInfo = rightHandWeapon.WeaponType.damageInfo;
@@ -892,7 +892,7 @@ namespace MultiplayerARPG
                 case DamageType.Missile:
                     if (damageInfo.missileDamageEntity != null)
                     {
-                        var missileDamageEntity = Manager.Assets.NetworkSpawn(damageInfo.missileDamageEntity.Identity, damagePosition, damageRotation).GetComponent<MissileDamageEntity>();
+                        MissileDamageEntity missileDamageEntity = Manager.Assets.NetworkSpawn(damageInfo.missileDamageEntity.Identity, damagePosition, damageRotation).GetComponent<MissileDamageEntity>();
                         if (damageInfo.hitOnlySelectedTarget)
                         {
                             if (!TryGetTargetEntity(out tempDamageableEntity))
@@ -917,8 +917,8 @@ namespace MultiplayerARPG
 
         public virtual bool IsPositionInFov(float fov, Vector3 position)
         {
-            var halfFov = fov * 0.5f;
-            var angle = Vector3.Angle((CacheTransform.position - position).normalized, CacheTransform.forward);
+            float halfFov = fov * 0.5f;
+            float angle = Vector3.Angle((CacheTransform.position - position).normalized, CacheTransform.forward);
             // Angle in forward position is 180 so we use this value to determine that target is in hit fov or not
             return (angle < 180 + halfFov && angle > 180 - halfFov);
         }
@@ -1040,7 +1040,7 @@ namespace MultiplayerARPG
         public List<T> FindCharacters<T>(float distance, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral)
             where T : BaseCharacterEntity
         {
-            var result = new List<T>();
+            List<T> result = new List<T>();
             overlapSize = OverlapObjects(CacheTransform.position, distance, GameInstance.characterLayer.Mask);
             if (overlapSize == 0)
                 return null;
@@ -1108,8 +1108,8 @@ namespace MultiplayerARPG
         private void NotifyEnemySpottedToAllies(BaseCharacterEntity enemy)
         {
             // Warn that this character received damage to nearby characters
-            var foundCharacters = FindAliveCharacters<BaseCharacterEntity>(GameInstance.enemySpottedNotifyDistance, true, false, false);
-            foreach (var foundCharacter in foundCharacters)
+            List<BaseCharacterEntity> foundCharacters = FindAliveCharacters<BaseCharacterEntity>(GameInstance.enemySpottedNotifyDistance, true, false, false);
+            foreach (BaseCharacterEntity foundCharacter in foundCharacters)
             {
                 foundCharacter.NotifyEnemySpotted(this, enemy);
             }

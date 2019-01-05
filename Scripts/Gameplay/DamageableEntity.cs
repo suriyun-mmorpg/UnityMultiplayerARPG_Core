@@ -36,7 +36,7 @@ namespace MultiplayerARPG
         /// <param name="amount"></param>
         protected void NetFuncCombatAmount(byte byteCombatAmountType, int amount)
         {
-            var uiSceneGameplay = UISceneGameplay.Singleton;
+            UISceneGameplay uiSceneGameplay = UISceneGameplay.Singleton;
             if (uiSceneGameplay == null)
                 return;
             uiSceneGameplay.SpawnCombatText(CombatTextTransform, (CombatAmountType)byteCombatAmountType, amount);

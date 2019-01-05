@@ -69,7 +69,7 @@ namespace MultiplayerARPG
                 members.Add(memberData.id, memberData);
                 return;
             }
-            var oldMemberData = members[memberData.id];
+            SocialCharacterData oldMemberData = members[memberData.id];
             oldMemberData.characterName = memberData.characterName;
             oldMemberData.dataId = memberData.dataId;
             oldMemberData.level = memberData.level;
@@ -85,7 +85,7 @@ namespace MultiplayerARPG
         {
             if (!members.ContainsKey(memberData.id))
                 return;
-            var oldMemberData = members[memberData.id];
+            SocialCharacterData oldMemberData = members[memberData.id];
             oldMemberData.characterName = memberData.characterName;
             oldMemberData.dataId = memberData.dataId;
             oldMemberData.level = memberData.level;

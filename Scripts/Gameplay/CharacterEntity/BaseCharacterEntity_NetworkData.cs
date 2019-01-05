@@ -88,7 +88,7 @@ namespace MultiplayerARPG
             set
             {
                 attributes.Clear();
-                foreach (var entry in value)
+                foreach (CharacterAttribute entry in value)
                     attributes.Add(entry);
             }
         }
@@ -99,7 +99,7 @@ namespace MultiplayerARPG
             set
             {
                 skills.Clear();
-                foreach (var entry in value)
+                foreach (CharacterSkill entry in value)
                     skills.Add(entry);
             }
         }
@@ -110,7 +110,7 @@ namespace MultiplayerARPG
             set
             {
                 skillUsages.Clear();
-                foreach (var entry in value)
+                foreach (CharacterSkillUsage entry in value)
                     skillUsages.Add(entry);
             }
         }
@@ -121,7 +121,7 @@ namespace MultiplayerARPG
             set
             {
                 buffs.Clear();
-                foreach (var entry in value)
+                foreach (CharacterBuff entry in value)
                     buffs.Add(entry);
             }
         }
@@ -133,10 +133,10 @@ namespace MultiplayerARPG
             {
                 equipItemIndexes.Clear();
                 equipItems.Clear();
-                for (var i = 0; i < value.Count; ++i)
+                for (int i = 0; i < value.Count; ++i)
                 {
-                    var entry = value[i];
-                    var armorItem = entry.GetArmorItem();
+                    CharacterItem entry = value[i];
+                    Item armorItem = entry.GetArmorItem();
                     if (entry.IsValid() && armorItem != null && !equipItemIndexes.ContainsKey(armorItem.EquipPosition))
                     {
                         equipItemIndexes.Add(armorItem.EquipPosition, i);
@@ -152,7 +152,7 @@ namespace MultiplayerARPG
             set
             {
                 nonEquipItems.Clear();
-                foreach (var entry in value)
+                foreach (CharacterItem entry in value)
                     nonEquipItems.Add(entry);
             }
         }
@@ -163,7 +163,7 @@ namespace MultiplayerARPG
             set
             {
                 summons.Clear();
-                foreach (var entry in value)
+                foreach (CharacterSummon entry in value)
                     summons.Add(entry);
             }
         }
@@ -271,13 +271,13 @@ namespace MultiplayerARPG
         /// <param name="isHidding"></param>
         protected virtual void OnIsHiddingChange(bool isHidding)
         {
-            var renderers = GetComponentsInChildren<Renderer>();
-            foreach (var renderer in renderers)
+            Renderer[] renderers = GetComponentsInChildren<Renderer>();
+            foreach (Renderer renderer in renderers)
             {
                 renderer.enabled = !isHidding;
             }
-            var colliders = GetComponentsInChildren<Collider>();
-            foreach (var collider in colliders)
+            Collider[] colliders = GetComponentsInChildren<Collider>();
+            foreach (Collider collider in colliders)
             {
                 collider.enabled = !isHidding;
             }
@@ -333,7 +333,7 @@ namespace MultiplayerARPG
                 case LiteNetLibSyncList.Operation.Insert:
                 case LiteNetLibSyncList.Operation.Set:
                 case LiteNetLibSyncList.Operation.Dirty:
-                    var skillIndex = this.IndexOfSkill(SkillUsages[index].dataId);
+                    int skillIndex = this.IndexOfSkill(SkillUsages[index].dataId);
                     if (skillIndex >= 0 && onSkillsOperation != null)
                         onSkillsOperation(operation, skillIndex);
                     break;

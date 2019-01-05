@@ -27,8 +27,8 @@ namespace MultiplayerARPG
                 toIndex >= NonEquipItems.Count)
                 return;
 
-            var fromItem = NonEquipItems[fromIndex];
-            var toItem = NonEquipItems[toIndex];
+            CharacterItem fromItem = NonEquipItems[fromIndex];
+            CharacterItem toItem = NonEquipItems[toIndex];
             if (!fromItem.IsValid() || !toItem.IsValid())
                 return;
 
@@ -64,11 +64,11 @@ namespace MultiplayerARPG
             if (IsDead())
                 return;
 
-            var index = this.IndexOfAttribute(dataId);
+            int index = this.IndexOfAttribute(dataId);
             if (index < 0)
                 return;
 
-            var attribute = Attributes[index];
+            CharacterAttribute attribute = Attributes[index];
             if (!attribute.CanIncrease(this))
                 return;
 
@@ -83,11 +83,11 @@ namespace MultiplayerARPG
             if (IsDead())
                 return;
 
-            var index = this.IndexOfSkill(dataId);
+            int index = this.IndexOfSkill(dataId);
             if (index < 0)
                 return;
 
-            var skill = Skills[index];
+            CharacterSkill skill = Skills[index];
             if (!skill.CanLevelUp(this))
                 return;
 
@@ -118,7 +118,7 @@ namespace MultiplayerARPG
             if (GuildId <= 0 || !GameManager.TryGetGuild(GuildId, out guild))
                 return;
 
-            var level = guild.GetSkillLevel(dataId);
+            short level = guild.GetSkillLevel(dataId);
             if (level <= 0)
                 return;
             
@@ -126,7 +126,7 @@ namespace MultiplayerARPG
                 return;
 
             // Apply guild skill
-            var newSkillUsage = CharacterSkillUsage.Create(SkillUsageType.GuildSkill, dataId);
+            CharacterSkillUsage newSkillUsage = CharacterSkillUsage.Create(SkillUsageType.GuildSkill, dataId);
             newSkillUsage.Use(this, level);
             skillUsages.Add(newSkillUsage);
             ApplyBuff(dataId, BuffType.GuildSkillBuff, level);
@@ -139,11 +139,11 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncAssignHotkey(string hotkeyId, byte type, int dataId)
         {
-            var characterHotkey = new CharacterHotkey();
+            CharacterHotkey characterHotkey = new CharacterHotkey();
             characterHotkey.hotkeyId = hotkeyId;
             characterHotkey.type = (HotkeyType)type;
             characterHotkey.dataId = dataId;
-            var hotkeyIndex = this.IndexOfHotkey(hotkeyId);
+            int hotkeyIndex = this.IndexOfHotkey(hotkeyId);
             if (hotkeyIndex >= 0)
                 hotkeys[hotkeyIndex] = characterHotkey;
             else
@@ -189,7 +189,7 @@ namespace MultiplayerARPG
         {
             if (currentNpcDialog == null)
                 return;
-            var menus = currentNpcDialog.menus;
+            NpcDialogMenu[] menus = currentNpcDialog.menus;
             NpcDialogMenu selectedMenu;
             switch (currentNpcDialog.type)
             {
@@ -305,16 +305,16 @@ namespace MultiplayerARPG
         {
             if (currentNpcDialog == null)
                 return;
-            var sellItems = currentNpcDialog.sellItems;
+            NpcSellItem[] sellItems = currentNpcDialog.sellItems;
             if (sellItems == null || itemIndex >= sellItems.Length)
                 return;
-            var sellItem = sellItems[itemIndex];
+            NpcSellItem sellItem = sellItems[itemIndex];
             if (Gold < sellItem.sellPrice * amount)
             {
                 GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotEnoughGold);
                 return;
             }
-            var dataId = sellItem.item.DataId;
+            int dataId = sellItem.item.DataId;
             if (IncreasingItemsWillOverwhelming(dataId, amount))
             {
                 GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
@@ -326,21 +326,21 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncAcceptQuest(int questDataId)
         {
-            var indexOfQuest = this.IndexOfQuest(questDataId);
+            int indexOfQuest = this.IndexOfQuest(questDataId);
             Quest quest;
             if (indexOfQuest >= 0 || !GameInstance.Quests.TryGetValue(questDataId, out quest))
                 return;
-            var characterQuest = CharacterQuest.Create(quest);
+            CharacterQuest characterQuest = CharacterQuest.Create(quest);
             quests.Add(characterQuest);
         }
 
         protected virtual void NetFuncAbandonQuest(int questDataId)
         {
-            var indexOfQuest = this.IndexOfQuest(questDataId);
+            int indexOfQuest = this.IndexOfQuest(questDataId);
             Quest quest;
             if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questDataId, out quest))
                 return;
-            var characterQuest = quests[indexOfQuest];
+            CharacterQuest characterQuest = quests[indexOfQuest];
             if (characterQuest.isComplete)
                 return;
             quests.RemoveAt(indexOfQuest);
@@ -348,17 +348,17 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncCompleteQuest(int questDataId)
         {
-            var indexOfQuest = this.IndexOfQuest(questDataId);
+            int indexOfQuest = this.IndexOfQuest(questDataId);
             Quest quest;
             if (indexOfQuest < 0 || !GameInstance.Quests.TryGetValue(questDataId, out quest))
                 return;
-            var characterQuest = quests[indexOfQuest];
+            CharacterQuest characterQuest = quests[indexOfQuest];
             if (!characterQuest.IsAllTasksDone(this))
                 return;
             if (characterQuest.isComplete)
                 return;
-            var tasks = quest.tasks;
-            foreach (var task in tasks)
+            QuestTask[] tasks = quest.tasks;
+            foreach (QuestTask task in tasks)
             {
                 switch (task.taskType)
                 {
@@ -369,10 +369,10 @@ namespace MultiplayerARPG
             }
             RewardExp(quest.rewardExp, RewardGivenType.Quest);
             RewardGold(quest.rewardGold, RewardGivenType.Quest);
-            var rewardItems = quest.rewardItems;
+            ItemAmount[] rewardItems = quest.rewardItems;
             if (rewardItems != null && rewardItems.Length > 0)
             {
-                foreach (var rewardItem in rewardItems)
+                foreach (ItemAmount rewardItem in rewardItems)
                 {
                     if (rewardItem.item != null && rewardItem.amount > 0)
                         this.IncreaseItems(rewardItem.item.DataId, 1, rewardItem.amount);
@@ -399,7 +399,7 @@ namespace MultiplayerARPG
                 return;
 
             BuildingEntity buildingEntity;
-            var nonEquipItem = NonEquipItems[itemIndex];
+            CharacterItem nonEquipItem = NonEquipItems[itemIndex];
             if (!nonEquipItem.IsValid() ||
                 nonEquipItem.GetBuildingItem() == null ||
                 nonEquipItem.GetBuildingItem().buildingEntity == null ||
@@ -407,7 +407,7 @@ namespace MultiplayerARPG
                 !this.DecreaseItemsByIndex(itemIndex, 1))
                 return;
 
-            var buildingSaveData = new BuildingSaveData();
+            BuildingSaveData buildingSaveData = new BuildingSaveData();
             buildingSaveData.Id = GenericUtils.GetUniqueId();
             buildingSaveData.ParentId = string.Empty;
             BuildingEntity parentBuildingEntity;
@@ -445,11 +445,11 @@ namespace MultiplayerARPG
             if (currentNpcDialog == null || currentNpcDialog.type != NpcDialogType.Shop)
                 return;
 
-            var nonEquipItem = nonEquipItems[index];
+            CharacterItem nonEquipItem = nonEquipItems[index];
             if (!nonEquipItem.IsValid() || amount > nonEquipItem.amount)
                 return;
 
-            var item = nonEquipItem.GetItem();
+            Item item = nonEquipItem.GetItem();
             if (this.DecreaseItemsByIndex(index, amount))
                 Gold += item.sellPrice * amount;
         }
@@ -460,8 +460,8 @@ namespace MultiplayerARPG
                 index >= nonEquipItems.Count)
                 return;
 
-            var nonEquipItem = nonEquipItems[index];
-            var equipmentItem = nonEquipItem.GetEquipmentItem();
+            CharacterItem nonEquipItem = nonEquipItems[index];
+            Item equipmentItem = nonEquipItem.GetEquipmentItem();
             if (equipmentItem == null)
                 return;
             if (nonEquipItem.level >= equipmentItem.MaxLevel)
@@ -469,7 +469,7 @@ namespace MultiplayerARPG
                 GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.RefineItemReachedMaxLevel);
                 return;
             }
-            var refineLevel = equipmentItem.itemRefineInfo.levels[nonEquipItem.level - 1];
+            ItemRefineLevel refineLevel = equipmentItem.itemRefineInfo.levels[nonEquipItem.level - 1];
             GameMessage.Type gameMessageType;
             if (!refineLevel.CanRefine(this, out gameMessageType))
             {
@@ -570,8 +570,8 @@ namespace MultiplayerARPG
             if (itemIndex >= nonEquipItems.Count)
                 return;
 
-            var dealingItems = DealingItems;
-            for (var i = dealingItems.Count - 1; i >= 0; --i)
+            DealingCharacterItems dealingItems = DealingItems;
+            for (int i = dealingItems.Count - 1; i >= 0; --i)
             {
                 if (itemIndex == dealingItems[i].nonEquipIndex)
                 {
@@ -579,8 +579,8 @@ namespace MultiplayerARPG
                     break;
                 }
             }
-            var characterItem = nonEquipItems[itemIndex];
-            var dealingItem = new DealingCharacterItem();
+            CharacterItem characterItem = nonEquipItems[itemIndex];
+            DealingCharacterItem dealingItem = new DealingCharacterItem();
             dealingItem.nonEquipIndex = itemIndex;
             dealingItem.dataId = characterItem.dataId;
             dealingItem.level = characterItem.level;

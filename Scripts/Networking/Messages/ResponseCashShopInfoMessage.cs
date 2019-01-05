@@ -21,9 +21,9 @@ namespace MultiplayerARPG
             if (error == Error.None)
             {
                 cash = reader.GetInt();
-                var size = reader.GetInt();
+                int size = reader.GetInt();
                 cashShopItemIds = new int[size];
-                for (var i = 0; i < size; ++i)
+                for (int i = 0; i < size; ++i)
                 {
                     cashShopItemIds[i] = reader.GetInt();
                 }
@@ -37,7 +37,7 @@ namespace MultiplayerARPG
             {
                 writer.Put(cash);
                 writer.Put(cashShopItemIds.Length);
-                foreach (var cashShopItemId in cashShopItemIds)
+                foreach (int cashShopItemId in cashShopItemIds)
                 {
                     writer.Put(cashShopItemId);
                 }

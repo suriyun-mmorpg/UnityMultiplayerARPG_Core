@@ -83,7 +83,7 @@ namespace MultiplayerARPG
         protected override void Update()
         {
             base.Update();
-            var tempUnscaledTime = Time.unscaledTime;
+            float tempUnscaledTime = Time.unscaledTime;
             if (tempUnscaledTime - lastUpdateOnlineCharacterTime > UPDATE_ONLINE_CHARACTER_DURATION)
             {
                 // Update social members, every seconds
@@ -184,17 +184,17 @@ namespace MultiplayerARPG
             updatingPartyMembers.Clear();
             updatingGuildMembers.Clear();
 
-            foreach (var entry in playerCharacters)
+            foreach (KeyValuePair<long, BasePlayerCharacterEntity> entry in playerCharacters)
             {
                 UpdateOnlineCharacter(entry.Key, entry.Value, time);
             }
 
-            foreach (var updatingPartyMember in updatingPartyMembers)
+            foreach (KeyValuePair<long, PartyData> updatingPartyMember in updatingPartyMembers)
             {
                 SendUpdatePartyMembersToClient(updatingPartyMember.Key, updatingPartyMember.Value);
             }
 
-            foreach (var updatingGuildMember in updatingGuildMembers)
+            foreach (KeyValuePair<long, GuildData> updatingGuildMember in updatingGuildMembers)
             {
                 SendUpdateGuildMembersToClient(updatingGuildMember.Key, updatingGuildMember.Value);
             }
@@ -202,33 +202,33 @@ namespace MultiplayerARPG
 
         public virtual void SendServerGameMessage(long connectionId, GameMessage.Type type)
         {
-            var message = new GameMessage();
+            GameMessage message = new GameMessage();
             message.type = type;
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.GameMessage, message);
         }
 
         public virtual uint RequestCashShopInfo(AckMessageCallback callback)
         {
-            var message = new BaseAckMessage();
+            BaseAckMessage message = new BaseAckMessage();
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MsgTypes.CashShopInfo, message, callback);
         }
 
         public virtual uint RequestCashPackageInfo(AckMessageCallback callback)
         {
-            var message = new BaseAckMessage();
+            BaseAckMessage message = new BaseAckMessage();
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MsgTypes.CashPackageInfo, message, callback);
         }
 
         public virtual uint RequestCashShopBuy(int dataId, AckMessageCallback callback)
         {
-            var message = new RequestCashShopBuyMessage();
+            RequestCashShopBuyMessage message = new RequestCashShopBuyMessage();
             message.dataId = dataId;
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MsgTypes.CashShopBuy, message, callback);
         }
 
         public virtual uint RequestCashPackageBuyValidation(int dataId, string receipt, AckMessageCallback callback)
         {
-            var message = new RequestCashPackageBuyValidationMessage();
+            RequestCashPackageBuyValidationMessage message = new RequestCashPackageBuyValidationMessage();
             message.dataId = dataId;
             message.platform = Application.platform;
             message.receipt = receipt;
@@ -237,7 +237,7 @@ namespace MultiplayerARPG
 
         protected virtual void HandleGameMessageAtClient(LiteNetLibMessageHandler messageHandler)
         {
-            var message = messageHandler.ReadMessage<GameMessage>();
+            GameMessage message = messageHandler.ReadMessage<GameMessage>();
             if (onClientReceiveGameMessage != null)
                 onClientReceiveGameMessage.Invoke(message);
         }
@@ -249,40 +249,40 @@ namespace MultiplayerARPG
 
         protected virtual void HandleChatAtClient(LiteNetLibMessageHandler messageHandler)
         {
-            var message = messageHandler.ReadMessage<ChatMessage>();
+            ChatMessage message = messageHandler.ReadMessage<ChatMessage>();
             if (onClientReceiveChat != null)
                 onClientReceiveChat.Invoke(message);
         }
 
         protected virtual void HandleResponseCashShopInfo(LiteNetLibMessageHandler messageHandler)
         {
-            var transportHandler = messageHandler.transportHandler;
-            var message = messageHandler.ReadMessage<ResponseCashShopInfoMessage>();
-            var ackId = message.ackId;
+            TransportHandler transportHandler = messageHandler.transportHandler;
+            ResponseCashShopInfoMessage message = messageHandler.ReadMessage<ResponseCashShopInfoMessage>();
+            uint ackId = message.ackId;
             transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected virtual void HandleResponseCashShopBuy(LiteNetLibMessageHandler messageHandler)
         {
-            var transportHandler = messageHandler.transportHandler;
-            var message = messageHandler.ReadMessage<ResponseCashShopBuyMessage>();
-            var ackId = message.ackId;
+            TransportHandler transportHandler = messageHandler.transportHandler;
+            ResponseCashShopBuyMessage message = messageHandler.ReadMessage<ResponseCashShopBuyMessage>();
+            uint ackId = message.ackId;
             transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected virtual void HandleResponseCashPackageInfo(LiteNetLibMessageHandler messageHandler)
         {
-            var transportHandler = messageHandler.transportHandler;
-            var message = messageHandler.ReadMessage<ResponseCashPackageInfoMessage>();
-            var ackId = message.ackId;
+            TransportHandler transportHandler = messageHandler.transportHandler;
+            ResponseCashPackageInfoMessage message = messageHandler.ReadMessage<ResponseCashPackageInfoMessage>();
+            uint ackId = message.ackId;
             transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected virtual void HandleResponseCashPackageBuyValidation(LiteNetLibMessageHandler messageHandler)
         {
-            var transportHandler = messageHandler.transportHandler;
-            var message = messageHandler.ReadMessage<ResponseCashPackageBuyValidationMessage>();
-            var ackId = message.ackId;
+            TransportHandler transportHandler = messageHandler.transportHandler;
+            ResponseCashPackageBuyValidationMessage message = messageHandler.ReadMessage<ResponseCashPackageBuyValidationMessage>();
+            uint ackId = message.ackId;
             transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
@@ -295,7 +295,7 @@ namespace MultiplayerARPG
 
         protected virtual void HandleUpdatePartyAtClient(LiteNetLibMessageHandler messageHandler)
         {
-            var message = messageHandler.ReadMessage<UpdatePartyMessage>();
+            UpdatePartyMessage message = messageHandler.ReadMessage<UpdatePartyMessage>();
             if (message.type == UpdatePartyMessage.UpdateType.Create)
             {
                 ClientParty = new PartyData(message.id, message.shareExp, message.shareItem, message.characterId);
@@ -328,7 +328,7 @@ namespace MultiplayerARPG
 
         protected virtual void HandleUpdateGuildAtClient(LiteNetLibMessageHandler messageHandler)
         {
-            var message = messageHandler.ReadMessage<UpdateGuildMessage>();
+            UpdateGuildMessage message = messageHandler.ReadMessage<UpdateGuildMessage>();
             if (message.type == UpdateGuildMessage.UpdateType.Create)
             {
                 ClientGuild = new GuildData(message.id, message.guildName, message.characterId);
@@ -416,8 +416,8 @@ namespace MultiplayerARPG
                         else
                         {
                             // Send messages to nearby characters
-                            var receivers = playerCharacter.FindCharacters<BasePlayerCharacterEntity>(gameInstance.localChatDistance, false, true, true, true);
-                            foreach (var receiver in receivers)
+                            List<BasePlayerCharacterEntity> receivers = playerCharacter.FindCharacters<BasePlayerCharacterEntity>(gameInstance.localChatDistance, false, true, true, true);
+                            foreach (BasePlayerCharacterEntity receiver in receivers)
                             {
                                 ServerSendPacket(receiver.ConnectionId, SendOptions.ReliableOrdered, MsgTypes.Chat, message);
                             }
@@ -451,7 +451,7 @@ namespace MultiplayerARPG
                     PartyData party;
                     if (parties.TryGetValue(message.channelId, out party))
                     {
-                        foreach (var memberId in party.GetMemberIds())
+                        foreach (string memberId in party.GetMemberIds())
                         {
                             if (TryGetPlayerCharacterById(memberId, out playerCharacter) &&
                                 ContainsConnectionId(playerCharacter.ConnectionId))
@@ -466,7 +466,7 @@ namespace MultiplayerARPG
                     GuildData guild;
                     if (guilds.TryGetValue(message.channelId, out guild))
                     {
-                        foreach (var memberId in guild.GetMemberIds())
+                        foreach (string memberId in guild.GetMemberIds())
                         {
                             if (TryGetPlayerCharacterById(memberId, out playerCharacter) &&
                                 ContainsConnectionId(playerCharacter.ConnectionId))
@@ -482,9 +482,9 @@ namespace MultiplayerARPG
 
         protected virtual void HandleRequestCashShopInfo(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<BaseAckMessage>();
-            var responseMessage = new ResponseCashShopInfoMessage();
+            long connectionId = messageHandler.connectionId;
+            BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
+            ResponseCashShopInfoMessage responseMessage = new ResponseCashShopInfoMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = AckResponseCode.Error;
             responseMessage.error = ResponseCashShopInfoMessage.Error.NotAvailable;
@@ -493,9 +493,9 @@ namespace MultiplayerARPG
 
         protected virtual void HandleRequestCashShopBuy(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<RequestCashShopBuyMessage>();
-            var responseMessage = new ResponseCashShopBuyMessage();
+            long connectionId = messageHandler.connectionId;
+            RequestCashShopBuyMessage message = messageHandler.ReadMessage<RequestCashShopBuyMessage>();
+            ResponseCashShopBuyMessage responseMessage = new ResponseCashShopBuyMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = AckResponseCode.Error;
             responseMessage.error = ResponseCashShopBuyMessage.Error.NotAvailable;
@@ -504,9 +504,9 @@ namespace MultiplayerARPG
 
         protected virtual void HandleRequestCashPackageInfo(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<BaseAckMessage>();
-            var responseMessage = new ResponseCashPackageInfoMessage();
+            long connectionId = messageHandler.connectionId;
+            BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
+            ResponseCashPackageInfoMessage responseMessage = new ResponseCashPackageInfoMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = AckResponseCode.Error;
             responseMessage.error = ResponseCashPackageInfoMessage.Error.NotAvailable;
@@ -515,9 +515,9 @@ namespace MultiplayerARPG
 
         protected virtual void HandleRequestCashPackageBuyValidation(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<RequestCashPackageBuyValidationMessage>();
-            var responseMessage = new ResponseCashPackageBuyValidationMessage();
+            long connectionId = messageHandler.connectionId;
+            RequestCashPackageBuyValidationMessage message = messageHandler.ReadMessage<RequestCashPackageBuyValidationMessage>();
+            ResponseCashPackageBuyValidationMessage responseMessage = new ResponseCashPackageBuyValidationMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = AckResponseCode.Error;
             responseMessage.error = ResponseCashPackageBuyValidationMessage.Error.NotAvailable;
@@ -541,32 +541,32 @@ namespace MultiplayerARPG
             doNotEnterGameOnConnect = false;
             Assets.offlineScene.SceneName = gameInstance.homeScene;
             Assets.playerPrefab = null;
-            var spawnablePrefabs = new List<LiteNetLibIdentity>(Assets.spawnablePrefabs);
+            List<LiteNetLibIdentity> spawnablePrefabs = new List<LiteNetLibIdentity>(Assets.spawnablePrefabs);
             if (gameInstance.itemDropEntityPrefab != null)
                 spawnablePrefabs.Add(gameInstance.itemDropEntityPrefab.Identity);
             if (gameInstance.warpPortalEntityPrefab != null)
                 spawnablePrefabs.Add(gameInstance.warpPortalEntityPrefab.Identity);
-            foreach (var entry in GameInstance.PlayerCharacterEntities)
+            foreach (KeyValuePair<int, BasePlayerCharacterEntity> entry in GameInstance.PlayerCharacterEntities)
             {
                 spawnablePrefabs.Add(entry.Value.Identity);
             }
-            foreach (var entry in GameInstance.MonsterCharacterEntities)
+            foreach (KeyValuePair<int, BaseMonsterCharacterEntity> entry in GameInstance.MonsterCharacterEntities)
             {
                 spawnablePrefabs.Add(entry.Value.Identity);
             }
-            foreach (var entry in GameInstance.WarpPortalEntities)
+            foreach (KeyValuePair<int, WarpPortalEntity> entry in GameInstance.WarpPortalEntities)
             {
                 spawnablePrefabs.Add(entry.Value.Identity);
             }
-            foreach (var entry in GameInstance.NpcEntities)
+            foreach (KeyValuePair<int, NpcEntity> entry in GameInstance.NpcEntities)
             {
                 spawnablePrefabs.Add(entry.Value.Identity);
             }
-            foreach (var entry in GameInstance.DamageEntities)
+            foreach (KeyValuePair<int, BaseDamageEntity> entry in GameInstance.DamageEntities)
             {
                 spawnablePrefabs.Add(entry.Value.Identity);
             }
-            foreach (var entry in GameInstance.BuildingEntities)
+            foreach (KeyValuePair<int, BuildingEntity> entry in GameInstance.BuildingEntities)
             {
                 spawnablePrefabs.Add(entry.Value.Identity);
             }
@@ -579,7 +579,7 @@ namespace MultiplayerARPG
             if (!IsClientConnected)
                 return;
             // Send chat message to server
-            var chatMessage = new ChatMessage();
+            ChatMessage chatMessage = new ChatMessage();
             chatMessage.channel = channel;
             chatMessage.message = message;
             chatMessage.sender = senderName;
@@ -600,14 +600,14 @@ namespace MultiplayerARPG
 
         private void RegisterEntities()
         {
-            var monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
-            foreach (var monsterSpawnArea in monsterSpawnAreas)
+            MonsterSpawnArea[] monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
+            foreach (MonsterSpawnArea monsterSpawnArea in monsterSpawnAreas)
             {
                 monsterSpawnArea.RegisterAssets();
             }
 
-            var harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
-            foreach (var harvestableSpawnArea in harvestableSpawnAreas)
+            HarvestableSpawnArea[] harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
+            foreach (HarvestableSpawnArea harvestableSpawnArea in harvestableSpawnAreas)
             {
                 harvestableSpawnArea.RegisterAssets();
             }
@@ -663,8 +663,8 @@ namespace MultiplayerARPG
             RegisterEntities();
             SetupMapInfo();
             // Spawn monsters
-            var monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
-            foreach (var monsterSpawnArea in monsterSpawnAreas)
+            MonsterSpawnArea[] monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
+            foreach (MonsterSpawnArea monsterSpawnArea in monsterSpawnAreas)
             {
                 monsterSpawnArea.SpawnAll();
             }
@@ -674,13 +674,13 @@ namespace MultiplayerARPG
                 List<WarpPortal> mapWarpPortals;
                 if (GameInstance.MapWarpPortals.TryGetValue(SceneManager.GetActiveScene().name, out mapWarpPortals))
                 {
-                    foreach (var warpPortal in mapWarpPortals)
+                    foreach (WarpPortal warpPortal in mapWarpPortals)
                     {
-                        var warpPortalPrefab = warpPortal.entityPrefab != null ? warpPortal.entityPrefab : gameInstance.warpPortalEntityPrefab;
+                        WarpPortalEntity warpPortalPrefab = warpPortal.entityPrefab != null ? warpPortal.entityPrefab : gameInstance.warpPortalEntityPrefab;
                         if (warpPortalPrefab != null)
                         {
-                            var warpPortalIdentity = Assets.NetworkSpawn(warpPortalPrefab.Identity, warpPortal.position, Quaternion.identity);
-                            var warpPortalEntity = warpPortalIdentity.GetComponent<WarpPortalEntity>();
+                            LiteNetLibIdentity warpPortalIdentity = Assets.NetworkSpawn(warpPortalPrefab.Identity, warpPortal.position, Quaternion.identity);
+                            WarpPortalEntity warpPortalEntity = warpPortalIdentity.GetComponent<WarpPortalEntity>();
                             warpPortalEntity.mapScene.SceneName = warpPortal.warpToMap.SceneName;
                             warpPortalEntity.position = warpPortal.warpToPosition;
                         }
@@ -693,13 +693,13 @@ namespace MultiplayerARPG
                 List<Npc> mapNpcs;
                 if (GameInstance.MapNpcs.TryGetValue(SceneManager.GetActiveScene().name, out mapNpcs))
                 {
-                    foreach (var npc in mapNpcs)
+                    foreach (Npc npc in mapNpcs)
                     {
-                        var npcPrefab = npc.entityPrefab;
+                        NpcEntity npcPrefab = npc.entityPrefab;
                         if (npcPrefab != null)
                         {
-                            var npcIdentity = Assets.NetworkSpawn(npcPrefab.Identity, npc.position, Quaternion.Euler(npc.rotation));
-                            var npcEntity = npcIdentity.GetComponent<NpcEntity>();
+                            LiteNetLibIdentity npcIdentity = Assets.NetworkSpawn(npcPrefab.Identity, npc.position, Quaternion.Euler(npc.rotation));
+                            NpcEntity npcEntity = npcIdentity.GetComponent<NpcEntity>();
                             npcEntity.StartDialog = npc.startDialog;
                             npcEntity.Title = npc.title;
                         }
@@ -735,8 +735,8 @@ namespace MultiplayerARPG
             BuildingEntity prefab;
             if (GameInstance.BuildingEntities.TryGetValue(saveData.DataId, out prefab))
             {
-                var buildingIdentity = Assets.NetworkSpawn(prefab.Identity, saveData.Position, saveData.Rotation);
-                var buildingEntity = buildingIdentity.GetComponent<BuildingEntity>();
+                LiteNetLibIdentity buildingIdentity = Assets.NetworkSpawn(prefab.Identity, saveData.Position, saveData.Rotation);
+                BuildingEntity buildingEntity = buildingIdentity.GetComponent<BuildingEntity>();
                 buildingEntity.Id = saveData.Id;
                 buildingEntity.ParentId = saveData.ParentId;
                 buildingEntity.CurrentHp = saveData.CurrentHp;

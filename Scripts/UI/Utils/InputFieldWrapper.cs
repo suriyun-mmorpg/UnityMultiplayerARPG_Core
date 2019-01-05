@@ -289,7 +289,7 @@ public class InputFieldWrapper : MonoBehaviour
     {
         get
         {
-            var result = false;
+            bool result = false;
             if (unityInputField != null) result = unityInputField.isFocused;
 #if USE_TEXT_MESH_PRO
         if (textMeshInputField != null) result = result || textMeshInputField.isFocused;

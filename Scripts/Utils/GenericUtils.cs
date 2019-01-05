@@ -6,7 +6,7 @@ public static class GenericUtils
 {
     public static void SetLayerRecursively(this GameObject gameObject, int layerIndex, bool includeInactive)
     {
-        var childrenTransforms = gameObject.GetComponentsInChildren<Transform>(includeInactive);
+        Transform[] childrenTransforms = gameObject.GetComponentsInChildren<Transform>(includeInactive);
         foreach (Transform childTransform in childrenTransforms)
         {
             childTransform.gameObject.layer = layerIndex;
@@ -23,16 +23,16 @@ public static class GenericUtils
 
     public static void RemoveChildren(this Transform transform)
     {
-        for (var i = transform.childCount - 1; i >= 0; --i)
+        for (int i = transform.childCount - 1; i >= 0; --i)
         {
-            var lastChild = transform.GetChild(i);
+            Transform lastChild = transform.GetChild(i);
             Object.Destroy(lastChild.gameObject);
         }
     }
 
     public static void SetChildrenActive(this Transform transform, bool isActive)
     {
-        for (var i = 0; i < transform.childCount; ++i)
+        for (int i = 0; i < transform.childCount; ++i)
         {
             transform.GetChild(i).gameObject.SetActive(isActive);
         }
@@ -40,8 +40,8 @@ public static class GenericUtils
 
     public static void RemoveObjectsByComponentInChildren<T>(this GameObject gameObject, bool includeInactive) where T : Component
     {
-        var components = gameObject.GetComponentsInChildren<T>(includeInactive);
-        foreach (var component in components)
+        T[] components = gameObject.GetComponentsInChildren<T>(includeInactive);
+        foreach (T component in components)
         {
             Object.DestroyImmediate(component.gameObject);
         }
@@ -49,8 +49,8 @@ public static class GenericUtils
 
     public static void RemoveObjectsByComponentInParent<T>(this GameObject gameObject, bool includeInactive) where T : Component
     {
-        var components = gameObject.GetComponentsInParent<T>(includeInactive);
-        foreach (var component in components)
+        T[] components = gameObject.GetComponentsInParent<T>(includeInactive);
+        foreach (T component in components)
         {
             Object.DestroyImmediate(component.gameObject);
         }
@@ -58,8 +58,8 @@ public static class GenericUtils
 
     public static void RemoveComponents<T>(this GameObject gameObject) where T : Component
     {
-        var components = gameObject.GetComponents<T>();
-        foreach (var component in components)
+        T[] components = gameObject.GetComponents<T>();
+        foreach (T component in components)
         {
             Object.DestroyImmediate(component);
         }
@@ -67,8 +67,8 @@ public static class GenericUtils
 
     public static void RemoveComponentsInChildren<T>(this GameObject gameObject, bool includeInactive) where T : Component
     {
-        var components = gameObject.GetComponentsInChildren<T>(includeInactive);
-        foreach (var component in components)
+        T[] components = gameObject.GetComponentsInChildren<T>(includeInactive);
+        foreach (T component in components)
         {
             Object.DestroyImmediate(component);
         }
@@ -76,8 +76,8 @@ public static class GenericUtils
 
     public static void RemoveComponentsInParent<T>(this GameObject gameObject, bool includeInactive) where T : Component
     {
-        var components = gameObject.GetComponentsInParent<T>(includeInactive);
-        foreach (var component in components)
+        T[] components = gameObject.GetComponentsInParent<T>(includeInactive);
+        foreach (T component in components)
         {
             Object.DestroyImmediate(component);
         }
@@ -87,7 +87,7 @@ public static class GenericUtils
     {
         char[] chars = mask.ToCharArray();
         RNGCryptoServiceProvider crypto = new RNGCryptoServiceProvider();
-        var data = new byte[length];
+        byte[] data = new byte[length];
         crypto.GetNonZeroBytes(data);
         StringBuilder result = new StringBuilder(length);
         foreach (byte b in data)

@@ -160,14 +160,14 @@ namespace MultiplayerARPG
 
         public void GetSortedMembers(out SocialCharacterData[] sortedMembers, out byte[] sortedMemberRoles)
         {
-            var i = 0;
-            var offlineMembers = new List<SocialCharacterData>();
+            int i = 0;
+            List<SocialCharacterData> offlineMembers = new List<SocialCharacterData>();
             sortedMembers = new SocialCharacterData[members.Count];
             sortedMemberRoles = new byte[members.Count];
             sortedMembers[i] = members[leaderId];
             sortedMemberRoles[i++] = LeaderRole;
             SocialCharacterData tempMember;
-            foreach (var memberId in members.Keys)
+            foreach (string memberId in members.Keys)
             {
                 if (memberId.Equals(leaderId))
                     continue;
@@ -180,7 +180,7 @@ namespace MultiplayerARPG
                 sortedMembers[i] = tempMember;
                 sortedMemberRoles[i++] = memberRoles.ContainsKey(tempMember.id) ? memberRoles[tempMember.id] : LowestMemberRole;
             }
-            foreach (var offlineMember in offlineMembers)
+            foreach (SocialCharacterData offlineMember in offlineMembers)
             {
                 sortedMembers[i] = offlineMember;
                 sortedMemberRoles[i++] = memberRoles.ContainsKey(offlineMember.id) ? memberRoles[offlineMember.id] : LowestMemberRole;
@@ -227,7 +227,7 @@ namespace MultiplayerARPG
         {
             if (GameInstance.GuildSkills.ContainsKey(dataId))
             {
-                var level = (short)(skillLevels.ContainsKey(dataId) ? skillLevels[dataId] : 0);
+                short level = (short)(skillLevels.ContainsKey(dataId) ? skillLevels[dataId] : 0);
                 level += 1;
                 skillPoint -= 1;
                 skillLevels[dataId] = level;
@@ -255,7 +255,7 @@ namespace MultiplayerARPG
 
             GuildSkill tempGuildSkill;
             short tempLevel;
-            foreach (var skill in skillLevels)
+            foreach (KeyValuePair<int, short> skill in skillLevels)
             {
                 tempLevel = skill.Value;
                 if (!GameInstance.GuildSkills.TryGetValue(skill.Key, out tempGuildSkill) || tempLevel <= 0)

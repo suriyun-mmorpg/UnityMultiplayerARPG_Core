@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Profiling;
 using UnityEngine.UI;
@@ -173,7 +174,7 @@ namespace MultiplayerARPG
 
             if (uiTextTitle != null)
             {
-                var str = string.Format(titleFormat, Item == null ? "Unknow" : Item.title);
+                string str = string.Format(titleFormat, Item == null ? "Unknow" : Item.title);
                 if (!dontAppendRefineLevelToTitle && EquipmentItem != null)
                     str += string.Format(titleRefineLevelFormat, (Level - 1).ToString("N0"));
                 uiTextTitle.text = str;
@@ -200,7 +201,7 @@ namespace MultiplayerARPG
 
             if (imageIcon != null)
             {
-                var iconSprite = Item == null ? null : Item.icon;
+                Sprite iconSprite = Item == null ? null : Item.icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
             }
@@ -241,7 +242,7 @@ namespace MultiplayerARPG
 
             if (uiTextStack != null)
             {
-                var stackString = "";
+                string stackString = "";
                 if (Item == null)
                     stackString = string.Format(stackFormat, "0", "0");
                 else
@@ -252,7 +253,7 @@ namespace MultiplayerARPG
 
             if (uiTextDurability != null)
             {
-                var durabilityString = "";
+                string durabilityString = "";
                 if (Item == null)
                     durabilityString = string.Format(durabilityFormat, "0", "0");
                 else
@@ -277,7 +278,7 @@ namespace MultiplayerARPG
 
             if (uiStats != null)
             {
-                var stats = EquipmentItem.GetIncreaseStats(Level, CharacterItem.GetEquipmentBonusRate());
+                CharacterStats stats = EquipmentItem.GetIncreaseStats(Level, CharacterItem.GetEquipmentBonusRate());
                 if (EquipmentItem == null || stats.IsEmpty())
                     uiStats.Hide();
                 else
@@ -289,7 +290,7 @@ namespace MultiplayerARPG
 
             if (uiIncreaseAttributes != null)
             {
-                var attributes = EquipmentItem.GetIncreaseAttributes(Level, CharacterItem.GetEquipmentBonusRate());
+                Dictionary<Attribute, short> attributes = EquipmentItem.GetIncreaseAttributes(Level, CharacterItem.GetEquipmentBonusRate());
                 if (EquipmentItem == null || attributes == null || attributes.Count == 0)
                     uiIncreaseAttributes.Hide();
                 else
@@ -301,7 +302,7 @@ namespace MultiplayerARPG
 
             if (uiIncreaseResistances != null)
             {
-                var resistances = EquipmentItem.GetIncreaseResistances(Level, CharacterItem.GetEquipmentBonusRate());
+                Dictionary<DamageElement, float> resistances = EquipmentItem.GetIncreaseResistances(Level, CharacterItem.GetEquipmentBonusRate());
                 if (EquipmentItem == null || resistances == null || resistances.Count == 0)
                     uiIncreaseResistances.Hide();
                 else
@@ -313,7 +314,7 @@ namespace MultiplayerARPG
 
             if (uiIncreaseDamageAmounts != null)
             {
-                var damageAmounts = EquipmentItem.GetIncreaseDamages(Level, CharacterItem.GetEquipmentBonusRate());
+                Dictionary<DamageElement, MinMaxFloat> damageAmounts = EquipmentItem.GetIncreaseDamages(Level, CharacterItem.GetEquipmentBonusRate());
                 if (EquipmentItem == null || damageAmounts == null || damageAmounts.Count == 0)
                     uiIncreaseDamageAmounts.Hide();
                 else
@@ -330,16 +331,16 @@ namespace MultiplayerARPG
                 else
                 {
                     uiDamageAmounts.Show();
-                    var keyValuePair = WeaponItem.GetDamageAmount(Level, CharacterItem.GetEquipmentBonusRate(), null);
+                    KeyValuePair<DamageElement, MinMaxFloat> keyValuePair = WeaponItem.GetDamageAmount(Level, CharacterItem.GetEquipmentBonusRate(), null);
                     uiDamageAmounts.Data = new DamageElementAmountTuple(keyValuePair.Key, keyValuePair.Value);
                 }
             }
             
             if (PetItem != null && PetItem.petEntity != null)
             {
-                var expTree = GameInstance.Singleton.ExpTree;
-                var currentExp = 0;
-                var nextLevelExp = 0;
+                int[] expTree = GameInstance.Singleton.ExpTree;
+                int currentExp = 0;
+                int nextLevelExp = 0;
                 if (CharacterItem.GetNextLevelExp() > 0)
                 {
                     currentExp = CharacterItem.exp;
@@ -347,7 +348,7 @@ namespace MultiplayerARPG
                 }
                 else if (Level - 2 > 0 && Level - 2 < expTree.Length)
                 {
-                    var maxExp = expTree[Level - 2];
+                    int maxExp = expTree[Level - 2];
                     currentExp = maxExp;
                     nextLevelExp = maxExp;
                 }
@@ -381,7 +382,7 @@ namespace MultiplayerARPG
 
         private void UpdateShopUIVisibility(bool initData)
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter == null)
             {
                 if (initData || isSellItemDialogAppeared)
@@ -393,7 +394,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Check visible item dialog
-            var uiGameplay = UISceneGameplay.Singleton;
+            UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
             if (uiGameplay.uiNpcDialog != null)
             {
                 if (uiGameplay.uiNpcDialog.IsVisible() &&
@@ -422,7 +423,7 @@ namespace MultiplayerARPG
 
         private void UpdateRefineUIVisibility(bool initData)
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter == null)
             {
                 if (initData || isRefineItemDialogAppeared)
@@ -434,7 +435,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Check visible item dialog
-            var uiGameplay = UISceneGameplay.Singleton;
+            UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
             if (uiGameplay.uiRefineItem != null)
             {
                 if (uiGameplay.uiRefineItem.IsVisible() &&
@@ -463,7 +464,7 @@ namespace MultiplayerARPG
 
         private void UpdateDealingState(bool initData)
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter == null)
             {
                 if (initData || isDealingStateEntered)
@@ -475,7 +476,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Check visible dealing dialog
-            var uiGameplay = UISceneGameplay.Singleton;
+            UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
             if (uiGameplay.uiDealing != null)
             {
                 if (uiGameplay.uiDealing.IsVisible() &&
@@ -510,7 +511,7 @@ namespace MultiplayerARPG
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
 
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
                 owningCharacter.RequestEquipItem((ushort)indexOfData);
         }
@@ -524,7 +525,7 @@ namespace MultiplayerARPG
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
 
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
                 owningCharacter.RequestUnEquipItem(EquipPosition);
         }
@@ -535,7 +536,7 @@ namespace MultiplayerARPG
             if (!IsOwningCharacter() || !string.IsNullOrEmpty(EquipPosition))
                 return;
             
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (CharacterItem.amount == 1)
             {
                 if (selectionManager != null)
@@ -549,7 +550,7 @@ namespace MultiplayerARPG
 
         private void OnDropAmountConfirmed(int amount)
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
             if (owningCharacter != null)
@@ -562,7 +563,7 @@ namespace MultiplayerARPG
             if (!IsOwningCharacter() || !string.IsNullOrEmpty(EquipPosition))
                 return;
             
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (CharacterItem.amount == 1)
             {
                 if (selectionManager != null)
@@ -576,7 +577,7 @@ namespace MultiplayerARPG
 
         private void OnSellItemAmountConfirmed(int amount)
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
             if (owningCharacter != null)
@@ -589,7 +590,7 @@ namespace MultiplayerARPG
             if (!IsOwningCharacter() || !string.IsNullOrEmpty(EquipPosition))
                 return;
             
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (CharacterItem.amount == 1)
             {
                 if (selectionManager != null)
@@ -603,7 +604,7 @@ namespace MultiplayerARPG
 
         private void OnSetDealingItemAmountConfirmed(int amount)
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
             if (owningCharacter != null)
@@ -616,7 +617,7 @@ namespace MultiplayerARPG
             if (!IsOwningCharacter() || !string.IsNullOrEmpty(EquipPosition))
                 return;
             
-            var uiGameplay = UISceneGameplay.Singleton;
+            UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
             if (uiGameplay.uiRefineItem != null &&
                 CharacterItem.GetEquipmentItem() != null &&
                 string.IsNullOrEmpty(EquipPosition))

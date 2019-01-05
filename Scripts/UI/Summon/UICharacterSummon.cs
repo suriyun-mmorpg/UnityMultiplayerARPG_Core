@@ -88,7 +88,7 @@ namespace MultiplayerARPG
 
             if (imageIcon != null)
             {
-                var iconSprite = summonData == null ? null : summonData.icon;
+                Sprite iconSprite = summonData == null ? null : summonData.icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
             }

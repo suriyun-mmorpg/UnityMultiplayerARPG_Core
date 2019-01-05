@@ -43,7 +43,7 @@ namespace MultiplayerARPG
             }
             if (craftRequirements == null || craftRequirements.Length == 0)
                 return true;
-            foreach (var craftRequirement in craftRequirements)
+            foreach (ItemAmount craftRequirement in craftRequirements)
             {
                 if (craftRequirement.item != null && character.CountNonEquipItems(craftRequirement.item.DataId) < craftRequirement.amount)
                 {
@@ -57,7 +57,7 @@ namespace MultiplayerARPG
         public void CraftItem(IPlayerCharacterData character)
         {
             character.IncreaseItems(craftingItem.DataId, 1, 1);
-            foreach (var craftRequirement in craftRequirements)
+            foreach (ItemAmount craftRequirement in craftRequirements)
             {
                 if (craftRequirement.item != null && craftRequirement.amount > 0)
                     character.DecreaseItems(craftRequirement.item.DataId, craftRequirement.amount);

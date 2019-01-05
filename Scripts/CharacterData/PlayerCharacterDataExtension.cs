@@ -60,18 +60,18 @@ public static partial class PlayerCharacterDataExtension
 
     public static T ValidateCharacterData<T>(this T character) where T : IPlayerCharacterData
     {
-        var gameInstance = GameInstance.Singleton;
+        GameInstance gameInstance = GameInstance.Singleton;
         PlayerCharacter database;
         if (!GameInstance.PlayerCharacters.TryGetValue(character.DataId, out database))
             return character;
         // Validating character attributes
         short returningStatPoint = 0;
-        var validAttributeIds = new HashSet<int>();
-        var characterAttributes = character.Attributes;
-        for (var i = characterAttributes.Count - 1; i >= 0; --i)
+        HashSet<int> validAttributeIds = new HashSet<int>();
+        IList<CharacterAttribute> characterAttributes = character.Attributes;
+        for (int i = characterAttributes.Count - 1; i >= 0; --i)
         {
-            var characterAttribute = characterAttributes[i];
-            var attributeDataId = characterAttribute.dataId;
+            CharacterAttribute characterAttribute = characterAttributes[i];
+            int attributeDataId = characterAttribute.dataId;
             // If attribute is invalid
             if (characterAttribute.GetAttribute() == null ||
                 validAttributeIds.Contains(attributeDataId))
@@ -84,25 +84,25 @@ public static partial class PlayerCharacterDataExtension
         }
         character.StatPoint += returningStatPoint;
         // Add character's attributes
-        var attributes = GameInstance.Attributes.Values;
-        foreach (var attribute in attributes)
+        Dictionary<int, Attribute>.ValueCollection attributes = GameInstance.Attributes.Values;
+        foreach (Attribute attribute in attributes)
         {
             // This attribute is valid, so not have to add it
             if (validAttributeIds.Contains(attribute.DataId))
                 continue;
-            var characterAttribute = new CharacterAttribute();
+            CharacterAttribute characterAttribute = new CharacterAttribute();
             characterAttribute.dataId = attribute.DataId;
             characterAttribute.amount = 0;
             character.Attributes.Add(characterAttribute);
         }
         // Validating character skills
         short returningSkillPoint = 0;
-        var validSkillIds = new HashSet<int>();
-        var characterSkills = character.Skills;
-        for (var i = characterSkills.Count - 1; i >= 0; --i)
+        HashSet<int> validSkillIds = new HashSet<int>();
+        IList<CharacterSkill> characterSkills = character.Skills;
+        for (int i = characterSkills.Count - 1; i >= 0; --i)
         {
-            var characterSkill = characterSkills[i];
-            var skill = characterSkill.GetSkill();
+            CharacterSkill characterSkill = characterSkills[i];
+            Skill skill = characterSkill.GetSkill();
             // If skill is invalid or this character database does not have skill
             if (characterSkill.GetSkill() == null ||
                 !database.CacheSkillLevels.ContainsKey(skill) ||
@@ -116,23 +116,23 @@ public static partial class PlayerCharacterDataExtension
         }
         character.SkillPoint += returningSkillPoint;
         // Add character's skills
-        var skillLevels = database.CacheSkillLevels;
-        foreach (var skillLevel in skillLevels)
+        Dictionary<Skill, short> skillLevels = database.CacheSkillLevels;
+        foreach (KeyValuePair<Skill, short> skillLevel in skillLevels)
         {
-            var skill = skillLevel.Key;
+            Skill skill = skillLevel.Key;
             // This skill is valid, so not have to add it
             if (validSkillIds.Contains(skill.DataId))
                 continue;
-            var characterSkill = new CharacterSkill();
+            CharacterSkill characterSkill = new CharacterSkill();
             characterSkill.dataId = skill.DataId;
             characterSkill.level = skillLevel.Value;
             character.Skills.Add(characterSkill);
         }
         // Validating character equip weapons
-        var returningItems = new List<CharacterItem>();
-        var equipWeapons = character.EquipWeapons;
-        var rightHand = equipWeapons.rightHand;
-        var leftHand = equipWeapons.leftHand;
+        List<CharacterItem> returningItems = new List<CharacterItem>();
+        EquipWeapons equipWeapons = character.EquipWeapons;
+        CharacterItem rightHand = equipWeapons.rightHand;
+        CharacterItem leftHand = equipWeapons.leftHand;
         if (rightHand.GetEquipmentItem() == null)
         {
             if (rightHand.IsValid())
@@ -146,10 +146,10 @@ public static partial class PlayerCharacterDataExtension
             equipWeapons.leftHand = CharacterItem.Empty;
         }
         // Validating character equip items
-        var equipItems = character.EquipItems;
-        for (var i = equipItems.Count - 1; i >= 0; --i)
+        IList<CharacterItem> equipItems = character.EquipItems;
+        for (int i = equipItems.Count - 1; i >= 0; --i)
         {
-            var equipItem = equipItems[i];
+            CharacterItem equipItem = equipItems[i];
             // If equipment is invalid
             if (equipItem.GetEquipmentItem() == null)
             {
@@ -159,15 +159,15 @@ public static partial class PlayerCharacterDataExtension
             }
         }
         // Return items to non equip items
-        foreach (var returningItem in returningItems)
+        foreach (CharacterItem returningItem in returningItems)
         {
             character.NonEquipItems.Add(returningItem);
         }
         // Validating character non equip items
-        var nonEquipItems = character.NonEquipItems;
-        for (var i = nonEquipItems.Count - 1; i >= 0; --i)
+        IList<CharacterItem> nonEquipItems = character.NonEquipItems;
+        for (int i = nonEquipItems.Count - 1; i >= 0; --i)
         {
-            var nonEquipItem = nonEquipItems[i];
+            CharacterItem nonEquipItem = nonEquipItems[i];
             // If equipment is invalid
             if (!nonEquipItem.IsValid())
                 character.NonEquipItems.RemoveAt(i);
@@ -178,53 +178,53 @@ public static partial class PlayerCharacterDataExtension
 
     public static T SetNewPlayerCharacterData<T>(this T character, string characterName, int dataId, int entityId) where T : IPlayerCharacterData
     {
-        var gameInstance = GameInstance.Singleton;
+        GameInstance gameInstance = GameInstance.Singleton;
         PlayerCharacter database;
         if (!GameInstance.PlayerCharacters.TryGetValue(dataId, out database))
             return character;
         // Player character database
-        var playerCharacter = database as PlayerCharacter;
+        PlayerCharacter playerCharacter = database as PlayerCharacter;
         // Attributes
-        var attributes = GameInstance.Attributes.Values;
-        foreach (var attribute in attributes)
+        Dictionary<int, Attribute>.ValueCollection attributes = GameInstance.Attributes.Values;
+        foreach (Attribute attribute in attributes)
         {
-            var characterAttribute = new CharacterAttribute();
+            CharacterAttribute characterAttribute = new CharacterAttribute();
             characterAttribute.dataId = attribute.DataId;
             characterAttribute.amount = 0;
             character.Attributes.Add(characterAttribute);
         }
-        var skillLevels = playerCharacter.CacheSkillLevels;
-        foreach (var skillLevel in skillLevels)
+        Dictionary<Skill, short> skillLevels = playerCharacter.CacheSkillLevels;
+        foreach (KeyValuePair<Skill, short> skillLevel in skillLevels)
         {
-            var characterSkill = new CharacterSkill();
+            CharacterSkill characterSkill = new CharacterSkill();
             characterSkill.dataId = skillLevel.Key.DataId;
             characterSkill.level = skillLevel.Value;
             character.Skills.Add(characterSkill);
         }
         // Right hand & left hand items
-        var rightHandEquipItem = playerCharacter.rightHandEquipItem;
-        var leftHandEquipItem = playerCharacter.leftHandEquipItem;
-        var equipWeapons = new EquipWeapons();
+        Item rightHandEquipItem = playerCharacter.rightHandEquipItem;
+        Item leftHandEquipItem = playerCharacter.leftHandEquipItem;
+        EquipWeapons equipWeapons = new EquipWeapons();
         // Right hand equipped item
         if (rightHandEquipItem != null)
         {
-            var newItem = CharacterItem.Create(rightHandEquipItem);
+            CharacterItem newItem = CharacterItem.Create(rightHandEquipItem);
             equipWeapons.rightHand = newItem;
         }
         // Left hand equipped item
         if (leftHandEquipItem != null)
         {
-            var newItem = CharacterItem.Create(leftHandEquipItem);
+            CharacterItem newItem = CharacterItem.Create(leftHandEquipItem);
             equipWeapons.leftHand = newItem;
         }
         character.EquipWeapons = equipWeapons;
         // Armors
-        var armorItems = playerCharacter.armorItems;
-        foreach (var armorItem in armorItems)
+        Item[] armorItems = playerCharacter.armorItems;
+        foreach (Item armorItem in armorItems)
         {
             if (armorItem == null)
                 continue;
-            var newItem = CharacterItem.Create(armorItem);
+            CharacterItem newItem = CharacterItem.Create(armorItem);
             character.EquipItems.Add(newItem);
         }
         // General data
@@ -232,7 +232,7 @@ public static partial class PlayerCharacterDataExtension
         character.EntityId = entityId;
         character.CharacterName = characterName;
         character.Level = 1;
-        var stats = character.GetStats();
+        CharacterStats stats = character.GetStats();
         character.CurrentHp = (int)stats.hp;
         character.CurrentMp = (int)stats.mp;
         character.CurrentStamina = (int)stats.stamina;
@@ -240,19 +240,19 @@ public static partial class PlayerCharacterDataExtension
         character.CurrentWater = (int)stats.water;
         character.Gold = gameInstance.startGold;
         // Inventory
-        var startItems = gameInstance.startItems;
-        foreach (var startItem in startItems)
+        ItemAmount[] startItems = gameInstance.startItems;
+        foreach (ItemAmount startItem in startItems)
         {
             if (startItem.item == null || startItem.amount <= 0)
                 continue;
-            var amount = startItem.amount;
+            short amount = startItem.amount;
             if (amount > startItem.item.maxStack)
                 amount = startItem.item.maxStack;
-            var newItem = CharacterItem.Create(startItem.item, 1, amount);
+            CharacterItem newItem = CharacterItem.Create(startItem.item, 1, amount);
             character.NonEquipItems.Add(newItem);
         }
         // Position
-        var startMap = playerCharacter.StartMap;
+        MapInfo startMap = playerCharacter.StartMap;
         character.CurrentMapName = startMap.scene.SceneName;
         character.RespawnMapName = startMap.scene.SceneName;
         character.CurrentPosition = startMap.startPosition;
@@ -263,15 +263,15 @@ public static partial class PlayerCharacterDataExtension
 
     public static void AddAllCharacterRelatesDataSurrogate(this SurrogateSelector surrogateSelector)
     {
-        var playerCharacterDataSS = new PlayerCharacterSerializationSurrogate();
-        var attributeSS = new CharacterAttributeSerializationSurrogate();
-        var buffSS = new CharacterBuffSerializationSurrogate();
-        var hotkeySS = new CharacterHotkeySerializationSurrogate();
-        var itemSS = new CharacterItemSerializationSurrogate();
-        var questSS = new CharacterQuestSerializationSurrogate();
-        var skillSS = new CharacterSkillSerializationSurrogate();
-        var skillUsageSS = new CharacterSkillUsageSerializationSurrogate();
-        var summonSS = new CharacterSummonSerializationSurrogate();
+        PlayerCharacterSerializationSurrogate playerCharacterDataSS = new PlayerCharacterSerializationSurrogate();
+        CharacterAttributeSerializationSurrogate attributeSS = new CharacterAttributeSerializationSurrogate();
+        CharacterBuffSerializationSurrogate buffSS = new CharacterBuffSerializationSurrogate();
+        CharacterHotkeySerializationSurrogate hotkeySS = new CharacterHotkeySerializationSurrogate();
+        CharacterItemSerializationSurrogate itemSS = new CharacterItemSerializationSurrogate();
+        CharacterQuestSerializationSurrogate questSS = new CharacterQuestSerializationSurrogate();
+        CharacterSkillSerializationSurrogate skillSS = new CharacterSkillSerializationSurrogate();
+        CharacterSkillUsageSerializationSurrogate skillUsageSS = new CharacterSkillUsageSerializationSurrogate();
+        CharacterSummonSerializationSurrogate summonSS = new CharacterSummonSerializationSurrogate();
         surrogateSelector.AddSurrogate(typeof(PlayerCharacterData), new StreamingContext(StreamingContextStates.All), playerCharacterDataSS);
         surrogateSelector.AddSurrogate(typeof(CharacterAttribute), new StreamingContext(StreamingContextStates.All), attributeSS);
         surrogateSelector.AddSurrogate(typeof(CharacterBuff), new StreamingContext(StreamingContextStates.All), buffSS);
@@ -286,19 +286,19 @@ public static partial class PlayerCharacterDataExtension
 
     public static void SavePersistentCharacterData<T>(this T characterData) where T : IPlayerCharacterData
     {
-        var savingData = new PlayerCharacterData();
+        PlayerCharacterData savingData = new PlayerCharacterData();
         characterData.CloneTo(savingData);
         if (string.IsNullOrEmpty(savingData.Id))
             return;
         savingData.LastUpdate = (int)(System.DateTime.Now.Ticks / System.TimeSpan.TicksPerMillisecond);
-        var binaryFormatter = new BinaryFormatter();
-        var surrogateSelector = new SurrogateSelector();
+        BinaryFormatter binaryFormatter = new BinaryFormatter();
+        SurrogateSelector surrogateSelector = new SurrogateSelector();
         surrogateSelector.AddAllUnitySurrogate();
         surrogateSelector.AddAllCharacterRelatesDataSurrogate();
         binaryFormatter.SurrogateSelector = surrogateSelector;
-        var path = Application.persistentDataPath + "/" + savingData.Id + ".sav";
+        string path = Application.persistentDataPath + "/" + savingData.Id + ".sav";
         Debug.Log("Character Saving to: " + path);
-        var file = File.Open(path, FileMode.OpenOrCreate);
+        FileStream file = File.Open(path, FileMode.OpenOrCreate);
         binaryFormatter.Serialize(file, savingData);
         file.Close();
         Debug.Log("Character Saved to: " + path);
@@ -313,12 +313,12 @@ public static partial class PlayerCharacterDataExtension
     {
         if (File.Exists(path))
         {
-            var binaryFormatter = new BinaryFormatter();
-            var surrogateSelector = new SurrogateSelector();
+            BinaryFormatter binaryFormatter = new BinaryFormatter();
+            SurrogateSelector surrogateSelector = new SurrogateSelector();
             surrogateSelector.AddAllUnitySurrogate();
             surrogateSelector.AddAllCharacterRelatesDataSurrogate();
             binaryFormatter.SurrogateSelector = surrogateSelector;
-            var file = File.Open(path, FileMode.Open);
+            FileStream file = File.Open(path, FileMode.Open);
             PlayerCharacterData loadedData = (PlayerCharacterData)binaryFormatter.Deserialize(file);
             file.Close();
             loadedData.CloneTo(characterData);
@@ -328,16 +328,16 @@ public static partial class PlayerCharacterDataExtension
 
     public static List<PlayerCharacterData> LoadAllPersistentCharacterData()
     {
-        var result = new List<PlayerCharacterData>();
-        var path = Application.persistentDataPath;
-        var files = Directory.GetFiles(path, "*.sav");
+        List<PlayerCharacterData> result = new List<PlayerCharacterData>();
+        string path = Application.persistentDataPath;
+        string[] files = Directory.GetFiles(path, "*.sav");
         Debug.Log("Characters loading from: " + path);
-        foreach (var file in files)
+        foreach (string file in files)
         {
             // If filename is empty or this is not character save, skip it
             if (file.Length <= 4 || file.Contains("_world_"))
                 continue;
-            var characterData = new PlayerCharacterData();
+            PlayerCharacterData characterData = new PlayerCharacterData();
             result.Add(characterData.LoadPersistentCharacterData(file));
         }
         Debug.Log("Characters loaded from: " + path);
@@ -394,47 +394,47 @@ public static partial class PlayerCharacterDataExtension
         writer.Put(characterData.RespawnPosition.z);
         writer.Put(characterData.LastUpdate);
         writer.Put((byte)characterData.Attributes.Count);
-        foreach (var entry in characterData.Attributes)
+        foreach (CharacterAttribute entry in characterData.Attributes)
         {
             entry.Serialize(writer);
         }
         writer.Put((byte)characterData.Buffs.Count);
-        foreach (var entry in characterData.Buffs)
+        foreach (CharacterBuff entry in characterData.Buffs)
         {
             entry.Serialize(writer);
         }
         writer.Put((byte)characterData.Skills.Count);
-        foreach (var entry in characterData.Skills)
+        foreach (CharacterSkill entry in characterData.Skills)
         {
             entry.Serialize(writer);
         }
         writer.Put((byte)characterData.SkillUsages.Count);
-        foreach (var entry in characterData.SkillUsages)
+        foreach (CharacterSkillUsage entry in characterData.SkillUsages)
         {
             entry.Serialize(writer);
         }
         writer.Put((byte)characterData.Summons.Count);
-        foreach (var entry in characterData.Summons)
+        foreach (CharacterSummon entry in characterData.Summons)
         {
             entry.Serialize(writer);
         }
         writer.Put((byte)characterData.EquipItems.Count);
-        foreach (var entry in characterData.EquipItems)
+        foreach (CharacterItem entry in characterData.EquipItems)
         {
             entry.Serialize(writer);
         }
         writer.Put((short)characterData.NonEquipItems.Count);
-        foreach (var entry in characterData.NonEquipItems)
+        foreach (CharacterItem entry in characterData.NonEquipItems)
         {
             entry.Serialize(writer);
         }
         writer.Put((byte)characterData.Hotkeys.Count);
-        foreach (var entry in characterData.Hotkeys)
+        foreach (CharacterHotkey entry in characterData.Hotkeys)
         {
             entry.Serialize(writer);
         }
         writer.Put((byte)characterData.Quests.Count);
-        foreach (var entry in characterData.Quests)
+        foreach (CharacterQuest entry in characterData.Quests)
         {
             entry.Serialize(writer);
         }
@@ -444,7 +444,7 @@ public static partial class PlayerCharacterDataExtension
 
     public static T DeserializeCharacterData<T>(this T characterData, NetDataReader reader) where T : IPlayerCharacterData
     {
-        var tempCharacterData = new PlayerCharacterData();
+        PlayerCharacterData tempCharacterData = new PlayerCharacterData();
         tempCharacterData.Id = reader.GetString();
         tempCharacterData.DataId = reader.GetInt();
         tempCharacterData.EntityId = reader.GetInt();
@@ -470,69 +470,69 @@ public static partial class PlayerCharacterDataExtension
         tempCharacterData.LastUpdate = reader.GetInt();
         int count = 0;
         count = reader.GetByte();
-        for (var i = 0; i < count; ++i)
+        for (int i = 0; i < count; ++i)
         {
-            var entry = new CharacterAttribute();
+            CharacterAttribute entry = new CharacterAttribute();
             entry.Deserialize(reader);
             tempCharacterData.Attributes.Add(entry);
         }
         count = reader.GetByte();
-        for (var i = 0; i < count; ++i)
+        for (int i = 0; i < count; ++i)
         {
-            var entry = new CharacterBuff();
+            CharacterBuff entry = new CharacterBuff();
             entry.Deserialize(reader);
             tempCharacterData.Buffs.Add(entry);
         }
         count = reader.GetByte();
-        for (var i = 0; i < count; ++i)
+        for (int i = 0; i < count; ++i)
         {
-            var entry = new CharacterSkill();
+            CharacterSkill entry = new CharacterSkill();
             entry.Deserialize(reader);
             tempCharacterData.Skills.Add(entry);
         }
         count = reader.GetByte();
-        for (var i = 0; i < count; ++i)
+        for (int i = 0; i < count; ++i)
         {
-            var entry = new CharacterSkillUsage();
+            CharacterSkillUsage entry = new CharacterSkillUsage();
             entry.Deserialize(reader);
             tempCharacterData.SkillUsages.Add(entry);
         }
         count = reader.GetByte();
-        for (var i = 0; i < count; ++i)
+        for (int i = 0; i < count; ++i)
         {
-            var entry = new CharacterSummon();
+            CharacterSummon entry = new CharacterSummon();
             entry.Deserialize(reader);
             tempCharacterData.Summons.Add(entry);
         }
         count = reader.GetByte();
-        for (var i = 0; i < count; ++i)
+        for (int i = 0; i < count; ++i)
         {
-            var entry = new CharacterItem();
+            CharacterItem entry = new CharacterItem();
             entry.Deserialize(reader);
             tempCharacterData.EquipItems.Add(entry);
         }
         count = reader.GetShort();
-        for (var i = 0; i < count; ++i)
+        for (int i = 0; i < count; ++i)
         {
-            var entry = new CharacterItem();
+            CharacterItem entry = new CharacterItem();
             entry.Deserialize(reader);
             tempCharacterData.NonEquipItems.Add(entry);
         }
         count = reader.GetByte();
-        for (var i = 0; i < count; ++i)
+        for (int i = 0; i < count; ++i)
         {
-            var entry = new CharacterHotkey();
+            CharacterHotkey entry = new CharacterHotkey();
             entry.Deserialize(reader);
             tempCharacterData.Hotkeys.Add(entry);
         }
         count = reader.GetByte();
-        for (var i = 0; i < count; ++i)
+        for (int i = 0; i < count; ++i)
         {
-            var entry = new CharacterQuest();
+            CharacterQuest entry = new CharacterQuest();
             entry.Deserialize(reader);
             tempCharacterData.Quests.Add(entry);
         }
-        var equipWeapons = new EquipWeapons();
+        EquipWeapons equipWeapons = new EquipWeapons();
         equipWeapons.Deserialize(reader);
         tempCharacterData.EquipWeapons = equipWeapons;
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "DeserializeCharacterData", characterData, reader);
@@ -544,10 +544,10 @@ public static partial class PlayerCharacterDataExtension
 
     public static int IndexOfHotkey(this IPlayerCharacterData data, string hotkeyId)
     {
-        var list = data.Hotkeys;
+        IList<CharacterHotkey> list = data.Hotkeys;
         CharacterHotkey tempHotkey;
-        var index = -1;
-        for (var i = 0; i < list.Count; ++i)
+        int index = -1;
+        for (int i = 0; i < list.Count; ++i)
         {
             tempHotkey = list[i];
             if (!string.IsNullOrEmpty(tempHotkey.hotkeyId) &&
@@ -562,10 +562,10 @@ public static partial class PlayerCharacterDataExtension
 
     public static int IndexOfQuest(this IPlayerCharacterData data, int dataId)
     {
-        var list = data.Quests;
+        IList<CharacterQuest> list = data.Quests;
         CharacterQuest tempQuest;
-        var index = -1;
-        for (var i = 0; i < list.Count; ++i)
+        int index = -1;
+        for (int i = 0; i < list.Count; ++i)
         {
             tempQuest = list[i];
             if (tempQuest.dataId == dataId)

@@ -25,7 +25,7 @@ namespace MultiplayerARPG
             if (guildSkill == null || character == null)
                 return false;
 
-            var gameManager = BaseGameNetworkManager.Singleton;
+            BaseGameNetworkManager gameManager = BaseGameNetworkManager.Singleton;
             if (gameManager == null)
                 return false;
 
@@ -42,7 +42,7 @@ namespace MultiplayerARPG
                 return false;
             if (level <= 0)
                 return false;
-            var skillUsageIndex = character.IndexOfSkillUsage(guildSkill.DataId, SkillUsageType.GuildSkill);
+            int skillUsageIndex = character.IndexOfSkillUsage(guildSkill.DataId, SkillUsageType.GuildSkill);
             if (skillUsageIndex >= 0 && character.SkillUsages[skillUsageIndex].coolDownRemainsDuration > 0f)
                 return false;
             return true;
@@ -62,7 +62,7 @@ namespace MultiplayerARPG
             if (guildSkill == null)
                 return 0f;
             level = guildSkill.GetAdjustedLevel(level);
-            var duration = guildSkill.coolDownDuration.GetAmount(level);
+            float duration = guildSkill.coolDownDuration.GetAmount(level);
             if (duration < 0f)
                 duration = 0f;
             return duration;

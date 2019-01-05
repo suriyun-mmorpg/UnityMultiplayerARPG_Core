@@ -12,7 +12,7 @@ namespace MultiplayerARPG
 
         public void OnClickSinglePlayer()
         {
-            var networkManager = BaseGameNetworkManager.Singleton as LanRpgNetworkManager;
+            LanRpgNetworkManager networkManager = BaseGameNetworkManager.Singleton as LanRpgNetworkManager;
             networkManager.startType = LanRpgNetworkManager.GameStartType.SinglePlayer;
             Next(uiCharacterList);
         }
@@ -24,7 +24,7 @@ namespace MultiplayerARPG
 
         public void OnClickJoin()
         {
-            var networkManager = BaseGameNetworkManager.Singleton as LanRpgNetworkManager;
+            LanRpgNetworkManager networkManager = BaseGameNetworkManager.Singleton as LanRpgNetworkManager;
             networkManager.startType = LanRpgNetworkManager.GameStartType.Client;
             networkManager.networkAddress = uiLanConnection.NetworkAddress;
             Next(uiCharacterList);
@@ -32,7 +32,7 @@ namespace MultiplayerARPG
 
         public void OnClickHost()
         {
-            var networkManager = BaseGameNetworkManager.Singleton as LanRpgNetworkManager;
+            LanRpgNetworkManager networkManager = BaseGameNetworkManager.Singleton as LanRpgNetworkManager;
             networkManager.startType = LanRpgNetworkManager.GameStartType.Host;
             Next(uiCharacterList);
         }

@@ -28,12 +28,12 @@ namespace MultiplayerARPG
 
         public void GetSortedMembers(out SocialCharacterData[] sortedMembers)
         {
-            var i = 0;
-            var offlineMembers = new List<SocialCharacterData>();
+            int i = 0;
+            List<SocialCharacterData> offlineMembers = new List<SocialCharacterData>();
             sortedMembers = new SocialCharacterData[members.Count];
             sortedMembers[i++] = members[leaderId];
             SocialCharacterData tempMember;
-            foreach (var memberId in members.Keys)
+            foreach (string memberId in members.Keys)
             {
                 if (memberId.Equals(leaderId))
                     continue;
@@ -45,7 +45,7 @@ namespace MultiplayerARPG
                 }
                 sortedMembers[i++] = tempMember;
             }
-            foreach (var offlineMember in offlineMembers)
+            foreach (SocialCharacterData offlineMember in offlineMembers)
             {
                 sortedMembers[i++] = offlineMember;
             }

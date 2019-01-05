@@ -36,15 +36,15 @@ namespace MultiplayerARPG
         {
             if (randomSoundEffects.Length > 0)
             {
-                var soundEffect = randomSoundEffects[Random.Range(0, randomSoundEffects.Length)];
+                AudioClip soundEffect = randomSoundEffects[Random.Range(0, randomSoundEffects.Length)];
                 if (soundEffect != null)
                     AudioSource.PlayClipAtPoint(soundEffect, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
             }
-            foreach (var particle in particles)
+            foreach (ParticleSystem particle in particles)
             {
                 particle.Play();
             }
-            foreach (var audioSource in audioSources)
+            foreach (AudioSource audioSource in audioSources)
             {
                 audioSource.Play();
             }
@@ -63,12 +63,12 @@ namespace MultiplayerARPG
 
         public void DestroyEffect()
         {
-            foreach (var particle in particles)
+            foreach (ParticleSystem particle in particles)
             {
-                var mainEmitter = particle.main;
+                ParticleSystem.MainModule mainEmitter = particle.main;
                 mainEmitter.loop = false;
             }
-            foreach (var audioSource in audioSources)
+            foreach (AudioSource audioSource in audioSources)
             {
                 audioSource.loop = false;
             }
@@ -77,7 +77,7 @@ namespace MultiplayerARPG
 
         public GameEffect InstantiateTo(Transform parent)
         {
-            var newEffect = Instantiate(this, parent);
+            GameEffect newEffect = Instantiate(this, parent);
             newEffect.transform.localPosition = Vector3.zero;
             newEffect.transform.localEulerAngles = Vector3.zero;
             newEffect.transform.localScale = Vector3.one;

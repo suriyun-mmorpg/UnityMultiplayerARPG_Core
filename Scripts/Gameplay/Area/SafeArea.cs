@@ -11,7 +11,7 @@ namespace MultiplayerARPG
             if (!other.CompareTag(GameInstance.Singleton.playerTag) && !other.CompareTag(GameInstance.Singleton.monsterTag))
                 return;
             
-            var characterEntity = other.GetComponent<BasePlayerCharacterEntity>();
+            BasePlayerCharacterEntity characterEntity = other.GetComponent<BasePlayerCharacterEntity>();
             if (characterEntity == null)
                 return;
 
@@ -23,7 +23,7 @@ namespace MultiplayerARPG
             if (!other.CompareTag(GameInstance.Singleton.playerTag) && !other.CompareTag(GameInstance.Singleton.monsterTag))
                 return;
 
-            var characterEntity = other.GetComponent<BasePlayerCharacterEntity>();
+            BasePlayerCharacterEntity characterEntity = other.GetComponent<BasePlayerCharacterEntity>();
             if (characterEntity == null)
                 return;
 

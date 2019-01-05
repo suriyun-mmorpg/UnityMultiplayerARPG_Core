@@ -22,21 +22,21 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            var isComplete = false;
+            bool isComplete = false;
             switch (QuestTask.taskType)
             {
                 case QuestTaskType.KillMonster:
-                    var monsterCharacterAmount = QuestTask.monsterCharacterAmount;
-                    var monsterTitle = monsterCharacterAmount.monster == null ? "Unknow" : monsterCharacterAmount.monster.title;
-                    var monsterKillAmount = monsterCharacterAmount.amount;
+                    MonsterCharacterAmount monsterCharacterAmount = QuestTask.monsterCharacterAmount;
+                    string monsterTitle = monsterCharacterAmount.monster == null ? "Unknow" : monsterCharacterAmount.monster.title;
+                    short monsterKillAmount = monsterCharacterAmount.amount;
                     isComplete = Progress >= monsterKillAmount;
                     if (uiTextTaskDescription != null)
                         uiTextTaskDescription.text = string.Format(isComplete ? killMonsterTaskCompleteFormat : killMonsterTaskFormat, monsterTitle, Progress.ToString("N0"), monsterKillAmount.ToString("N0"));
                     break;
                 case QuestTaskType.CollectItem:
-                    var itemAmount = QuestTask.itemAmount;
-                    var itemTitle = itemAmount.item == null ? "Unknow" : itemAmount.item.title;
-                    var itemCollectAmount = itemAmount.amount;
+                    ItemAmount itemAmount = QuestTask.itemAmount;
+                    string itemTitle = itemAmount.item == null ? "Unknow" : itemAmount.item.title;
+                    short itemCollectAmount = itemAmount.amount;
                     isComplete = Progress >= itemCollectAmount;
                     if (uiTextTaskDescription != null)
                         uiTextTaskDescription.text = string.Format(isComplete ? collectItemTaskCompleteFormat : collectItemTaskFormat, itemTitle, Progress.ToString("N0"), itemCollectAmount.ToString("N0"));

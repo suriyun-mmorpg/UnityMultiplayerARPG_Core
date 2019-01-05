@@ -83,10 +83,10 @@ namespace MultiplayerARPG
 
             if (coolDownRemainsDuration <= 0f)
             {
-                var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+                BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
                 if (owningCharacter != null && GuildSkill != null)
                 {
-                    var indexOfSkillUsage = owningCharacter.IndexOfSkillUsage(GuildSkill.DataId, SkillUsageType.GuildSkill);
+                    int indexOfSkillUsage = owningCharacter.IndexOfSkillUsage(GuildSkill.DataId, SkillUsageType.GuildSkill);
                     if (indexOfSkillUsage >= 0)
                     {
                         coolDownRemainsDuration = owningCharacter.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
@@ -106,7 +106,7 @@ namespace MultiplayerARPG
                 coolDownRemainsDuration = 0f;
 
             // Update UIs
-            var coolDownDuration = GuildSkill.GetCoolDownDuration(Level);
+            float coolDownDuration = GuildSkill.GetCoolDownDuration(Level);
 
             if (uiTextCoolDownDuration != null)
                 uiTextCoolDownDuration.text = string.Format(coolDownDurationFormat, coolDownDuration.ToString("N0"));
@@ -123,7 +123,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null &&
                 Level < GuildSkill.GetMaxLevel() &&
                 owningCharacter.GameManager.ClientGuild != null &&
@@ -159,7 +159,7 @@ namespace MultiplayerARPG
 
             if (imageIcon != null)
             {
-                var iconSprite = GuildSkill == null ? null : GuildSkill.icon;
+                Sprite iconSprite = GuildSkill == null ? null : GuildSkill.icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
             }
@@ -179,42 +179,42 @@ namespace MultiplayerARPG
 
             if (uiTextIncreaseMaxMember != null)
             {
-                var amount = GuildSkill.increaseMaxMember.GetAmount(Level);
+                int amount = GuildSkill.increaseMaxMember.GetAmount(Level);
                 uiTextIncreaseMaxMember.text = string.Format(increaseMaxMemberFormat, amount.ToString("N0"));
                 uiTextIncreaseMaxMember.gameObject.SetActive(amount != 0);
             }
 
             if (uiTextIncreaseExpGainPercentage != null)
             {
-                var amount = GuildSkill.increaseExpGainPercentage.GetAmount(Level);
+                float amount = GuildSkill.increaseExpGainPercentage.GetAmount(Level);
                 uiTextIncreaseExpGainPercentage.text = string.Format(increaseExpGainPercentageFormat, amount.ToString("N2"));
                 uiTextIncreaseExpGainPercentage.gameObject.SetActive(amount != 0);
             }
 
             if (uiTextIncreaseGoldGainPercentage != null)
             {
-                var amount = GuildSkill.increaseGoldGainPercentage.GetAmount(Level);
+                float amount = GuildSkill.increaseGoldGainPercentage.GetAmount(Level);
                 uiTextIncreaseGoldGainPercentage.text = string.Format(increaseGoldGainPercentageFormat, amount.ToString("N2"));
                 uiTextIncreaseGoldGainPercentage.gameObject.SetActive(amount != 0);
             }
 
             if (uiTextIncreaseShareExpGainPercentage != null)
             {
-                var amount = GuildSkill.increaseShareExpGainPercentage.GetAmount(Level);
+                float amount = GuildSkill.increaseShareExpGainPercentage.GetAmount(Level);
                 uiTextIncreaseShareExpGainPercentage.text = string.Format(increaseShareExpGainPercentageFormat, amount.ToString("N2"));
                 uiTextIncreaseShareExpGainPercentage.gameObject.SetActive(amount != 0);
             }
 
             if (uiTextIncreaseShareGoldGainPercentage != null)
             {
-                var amount = GuildSkill.increaseShareGoldGainPercentage.GetAmount(Level);
+                float amount = GuildSkill.increaseShareGoldGainPercentage.GetAmount(Level);
                 uiTextIncreaseShareGoldGainPercentage.text = string.Format(increaseShareGoldGainPercentageFormat, amount.ToString("N2"));
                 uiTextIncreaseShareGoldGainPercentage.gameObject.SetActive(amount != 0);
             }
 
             if (uiTextDecreaseExpLostPercentage != null)
             {
-                var amount = GuildSkill.decreaseExpLostPercentage.GetAmount(Level);
+                float amount = GuildSkill.decreaseExpLostPercentage.GetAmount(Level);
                 uiTextDecreaseExpLostPercentage.text = string.Format(decreaseExpLostPercentageFormat, amount.ToString("N2"));
                 uiTextDecreaseExpLostPercentage.gameObject.SetActive(amount != 0);
             }
@@ -244,7 +244,7 @@ namespace MultiplayerARPG
 
         public void OnClickAdd()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter == null || owningCharacter.GameManager.ClientGuild == null)
                 return;
 
@@ -254,7 +254,7 @@ namespace MultiplayerARPG
 
         public void OnClickUse()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter == null || owningCharacter.GameManager.ClientGuild == null)
                 return;
 

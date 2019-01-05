@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -72,7 +73,7 @@ namespace MultiplayerARPG
         {
             this.character = character;
             
-            var selectedBuffKey = SelectionManager.SelectedUI != null ? SelectionManager.SelectedUI.CharacterBuff.GetKey() : string.Empty;
+            string selectedBuffKey = SelectionManager.SelectedUI != null ? SelectionManager.SelectedUI.CharacterBuff.GetKey() : string.Empty;
             SelectionManager.DeselectSelectedUI();
             SelectionManager.Clear();
 
@@ -82,10 +83,10 @@ namespace MultiplayerARPG
                 return;
             }
 
-            var buffs = character.Buffs;
+            IList<CharacterBuff> buffs = character.Buffs;
             CacheList.Generate(buffs, (index, characterBuff, ui) =>
             {
-                var uiCharacterBuff = ui.GetComponent<UICharacterBuff>();
+                UICharacterBuff uiCharacterBuff = ui.GetComponent<UICharacterBuff>();
                 uiCharacterBuff.Setup(characterBuff, character, index);
                 uiCharacterBuff.Show();
                 SelectionManager.Add(uiCharacterBuff);

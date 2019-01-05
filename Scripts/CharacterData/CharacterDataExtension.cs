@@ -31,26 +31,26 @@ public static partial class CharacterDataExtension
 
     public static BaseCharacterModel InstantiateModel(this ICharacterData data, Transform parent)
     {
-        var entityPrefab = data.GetEntityPrefab();
+        BaseCharacterEntity entityPrefab = data.GetEntityPrefab();
         if (entityPrefab == null)
         {
             Debug.LogWarning("[InstantiateModel] Cannot find character entity with id: " + data.EntityId);
             return null;
         }
 
-        var result = Object.Instantiate(entityPrefab, parent);
-        var networkBehaviours = result.GetComponentsInChildren<LiteNetLibBehaviour>();
-        foreach (var networkBehaviour in networkBehaviours)
+        BaseCharacterEntity result = Object.Instantiate(entityPrefab, parent);
+        LiteNetLibBehaviour[] networkBehaviours = result.GetComponentsInChildren<LiteNetLibBehaviour>();
+        foreach (LiteNetLibBehaviour networkBehaviour in networkBehaviours)
         {
             networkBehaviour.enabled = false;
         }
-        var ownerObjects = result.ownerObjects;
-        foreach (var ownerObject in ownerObjects)
+        GameObject[] ownerObjects = result.ownerObjects;
+        foreach (GameObject ownerObject in ownerObjects)
         {
             ownerObject.SetActive(false);
         }
-        var nonOwnerObjects = result.nonOwnerObjects;
-        foreach (var nonOwnerObject in nonOwnerObjects)
+        GameObject[] nonOwnerObjects = result.nonOwnerObjects;
+        foreach (GameObject nonOwnerObject in nonOwnerObjects)
         {
             nonOwnerObject.SetActive(false);
         }
@@ -62,10 +62,10 @@ public static partial class CharacterDataExtension
 
     public static int GetNextLevelExp(this ICharacterData data)
     {
-        var level = data.Level;
+        short level = data.Level;
         if (level <= 0)
             return 0;
-        var expTree = GameInstance.Singleton.ExpTree;
+        int[] expTree = GameInstance.Singleton.ExpTree;
         if (level > expTree.Length)
             return 0;
         return expTree[level - 1];
@@ -74,24 +74,24 @@ public static partial class CharacterDataExtension
     #region Stats calculation, make saperate stats for buffs calculation
     public static float GetTotalItemWeight(this ICharacterData data)
     {
-        var result = 0f;
-        var equipItems = data.EquipItems;
-        foreach (var equipItem in equipItems)
+        float result = 0f;
+        IList<CharacterItem> equipItems = data.EquipItems;
+        foreach (CharacterItem equipItem in equipItems)
         {
             if (!equipItem.IsValid())
                 continue;
             result += equipItem.GetItem().weight;
         }
-        var nonEquipItems = data.NonEquipItems;
-        foreach (var nonEquipItem in nonEquipItems)
+        IList<CharacterItem> nonEquipItems = data.NonEquipItems;
+        foreach (CharacterItem nonEquipItem in nonEquipItems)
         {
             if (!nonEquipItem.IsValid())
                 continue;
             result += nonEquipItem.GetItem().weight * nonEquipItem.amount;
         }
-        var equipWeapons = data.EquipWeapons;
-        var rightHandItem = equipWeapons.rightHand;
-        var leftHandItem = equipWeapons.leftHand;
+        EquipWeapons equipWeapons = data.EquipWeapons;
+        CharacterItem rightHandItem = equipWeapons.rightHand;
+        CharacterItem leftHandItem = equipWeapons.leftHand;
         if (rightHandItem.IsValid())
             result += rightHandItem.GetItem().weight;
         if (leftHandItem.IsValid())
@@ -103,19 +103,19 @@ public static partial class CharacterDataExtension
     {
         if (data == null)
             return new Dictionary<Attribute, short>();
-        var result = new Dictionary<Attribute, short>();
+        Dictionary<Attribute, short> result = new Dictionary<Attribute, short>();
         // Attributes from character database
-        var character = data.GetDatabase();
+        BaseCharacter character = data.GetDatabase();
         if (character != null)
             result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
                 character.GetCharacterAttributes(data.Level));
 
         // Added attributes
-        var characterAttributes = data.Attributes;
-        foreach (var characterAttribute in characterAttributes)
+        IList<CharacterAttribute> characterAttributes = data.Attributes;
+        foreach (CharacterAttribute characterAttribute in characterAttributes)
         {
-            var key = characterAttribute.GetAttribute();
-            var value = characterAttribute.amount;
+            Attribute key = characterAttribute.GetAttribute();
+            short value = characterAttribute.amount;
             if (key == null)
                 continue;
             if (!result.ContainsKey(key))
@@ -131,11 +131,11 @@ public static partial class CharacterDataExtension
     {
         if (data == null)
             return new Dictionary<Attribute, short>();
-        var result = new Dictionary<Attribute, short>();
+        Dictionary<Attribute, short> result = new Dictionary<Attribute, short>();
         // Armors
         Item tempEquipment = null;
-        var equipItems = data.EquipItems;
-        foreach (var equipItem in equipItems)
+        IList<CharacterItem> equipItems = data.EquipItems;
+        foreach (CharacterItem equipItem in equipItems)
         {
             tempEquipment = equipItem.GetEquipmentItem();
             if (tempEquipment != null)
@@ -143,17 +143,17 @@ public static partial class CharacterDataExtension
                     tempEquipment.GetIncreaseAttributes(equipItem.level, equipItem.GetEquipmentBonusRate()));
         }
         // Weapons
-        var equipWeapons = data.EquipWeapons;
+        EquipWeapons equipWeapons = data.EquipWeapons;
         if (equipWeapons != null)
         {
             // Right hand equipment
-            var rightHandItem = equipWeapons.rightHand;
+            CharacterItem rightHandItem = equipWeapons.rightHand;
             tempEquipment = rightHandItem.GetEquipmentItem();
             if (tempEquipment != null)
                 result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
                     tempEquipment.GetIncreaseAttributes(rightHandItem.level, rightHandItem.GetEquipmentBonusRate()));
             // Left hand equipment
-            var leftHandItem = equipWeapons.leftHand;
+            CharacterItem leftHandItem = equipWeapons.leftHand;
             tempEquipment = leftHandItem.GetEquipmentItem();
             if (tempEquipment != null)
                 result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
@@ -164,16 +164,16 @@ public static partial class CharacterDataExtension
 
     public static Dictionary<Attribute, short> GetBuffAttributes(this ICharacterData data)
     {
-        var result = new Dictionary<Attribute, short>();
-        var buffs = data.Buffs;
-        foreach (var buff in buffs)
+        Dictionary<Attribute, short> result = new Dictionary<Attribute, short>();
+        IList<CharacterBuff> buffs = data.Buffs;
+        foreach (CharacterBuff buff in buffs)
         {
             result = GameDataHelpers.CombineAttributeAmountsDictionary(result, buff.GetIncreaseAttributes());
         }
 
         // Passive skills
-        var skills = data.Skills;
-        foreach (var skill in skills)
+        IList<CharacterSkill> skills = data.Skills;
+        foreach (CharacterSkill skill in skills)
         {
             if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
                 continue;
@@ -185,7 +185,7 @@ public static partial class CharacterDataExtension
 
     public static Dictionary<Attribute, short> GetAttributes(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
     {
-        var result = data.GetCharacterAttributes();
+        Dictionary<Attribute, short> result = data.GetCharacterAttributes();
         if (sumWithEquipments)
             result = GameDataHelpers.CombineAttributeAmountsDictionary(result, data.GetEquipmentAttributes());
         if (sumWithBuffs)
@@ -195,13 +195,13 @@ public static partial class CharacterDataExtension
 
     public static Dictionary<Skill, short> GetSkills(this ICharacterData data)
     {
-        var result = new Dictionary<Skill, short>();
+        Dictionary<Skill, short> result = new Dictionary<Skill, short>();
         // Added skills
-        var skills = data.Skills;
-        foreach (var characterSkill in skills)
+        IList<CharacterSkill> skills = data.Skills;
+        foreach (CharacterSkill characterSkill in skills)
         {
-            var key = characterSkill.GetSkill();
-            var value = characterSkill.level;
+            Skill key = characterSkill.GetSkill();
+            short value = characterSkill.level;
             if (key == null)
                 continue;
             if (!result.ContainsKey(key))
@@ -216,8 +216,8 @@ public static partial class CharacterDataExtension
     {
         if (data == null)
             return new Dictionary<DamageElement, float>();
-        var result = new Dictionary<DamageElement, float>();
-        var character = data.GetDatabase();
+        Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
+        BaseCharacter character = data.GetDatabase();
         if (character != null)
             result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
                 character.GetCharacterResistances(data.Level));
@@ -228,11 +228,11 @@ public static partial class CharacterDataExtension
     {
         if (data == null)
             return new Dictionary<DamageElement, float>();
-        var result = new Dictionary<DamageElement, float>();
+        Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
         // Armors
         Item tempEquipment = null;
-        var equipItems = data.EquipItems;
-        foreach (var equipItem in equipItems)
+        IList<CharacterItem> equipItems = data.EquipItems;
+        foreach (CharacterItem equipItem in equipItems)
         {
             tempEquipment = equipItem.GetEquipmentItem();
             if (tempEquipment != null)
@@ -240,17 +240,17 @@ public static partial class CharacterDataExtension
                     tempEquipment.GetIncreaseResistances(equipItem.level, equipItem.GetEquipmentBonusRate()));
         }
         // Weapons
-        var equipWeapons = data.EquipWeapons;
+        EquipWeapons equipWeapons = data.EquipWeapons;
         if (equipWeapons != null)
         {
             // Right hand equipment
-            var rightHandItem = equipWeapons.rightHand;
+            CharacterItem rightHandItem = equipWeapons.rightHand;
             tempEquipment = rightHandItem.GetEquipmentItem();
             if (tempEquipment != null)
                 result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
                     tempEquipment.GetIncreaseResistances(rightHandItem.level, rightHandItem.GetEquipmentBonusRate()));
             // Left hand equipment
-            var leftHandItem = equipWeapons.leftHand;
+            CharacterItem leftHandItem = equipWeapons.leftHand;
             tempEquipment = leftHandItem.GetEquipmentItem();
             if (tempEquipment != null)
                 result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
@@ -263,16 +263,16 @@ public static partial class CharacterDataExtension
     {
         if (data == null)
             return new Dictionary<DamageElement, float>();
-        var result = new Dictionary<DamageElement, float>();
-        var buffs = data.Buffs;
-        foreach (var buff in buffs)
+        Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
+        IList<CharacterBuff> buffs = data.Buffs;
+        foreach (CharacterBuff buff in buffs)
         {
             result = GameDataHelpers.CombineResistanceAmountsDictionary(result, buff.GetIncreaseResistances());
         }
 
         // Passive skills
-        var skills = data.Skills;
-        foreach (var skill in skills)
+        IList<CharacterSkill> skills = data.Skills;
+        foreach (CharacterSkill skill in skills)
         {
             if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
                 continue;
@@ -284,7 +284,7 @@ public static partial class CharacterDataExtension
 
     public static Dictionary<DamageElement, float> GetResistances(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
     {
-        var result = data.GetCharacterResistances();
+        Dictionary<DamageElement, float> result = data.GetCharacterResistances();
         if (sumWithEquipments)
             result = GameDataHelpers.CombineResistanceAmountsDictionary(result, data.GetEquipmentResistances());
         if (sumWithBuffs)
@@ -296,11 +296,11 @@ public static partial class CharacterDataExtension
     {
         if (data == null)
             return new Dictionary<DamageElement, MinMaxFloat>();
-        var result = new Dictionary<DamageElement, MinMaxFloat>();
+        Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
         // Armors
         Item tempEquipment = null;
-        var equipItems = data.EquipItems;
-        foreach (var equipItem in equipItems)
+        IList<CharacterItem> equipItems = data.EquipItems;
+        foreach (CharacterItem equipItem in equipItems)
         {
             tempEquipment = equipItem.GetEquipmentItem();
             if (tempEquipment != null)
@@ -308,17 +308,17 @@ public static partial class CharacterDataExtension
                     tempEquipment.GetIncreaseDamages(equipItem.level, equipItem.GetEquipmentBonusRate()));
         }
         // Weapons
-        var equipWeapons = data.EquipWeapons;
+        EquipWeapons equipWeapons = data.EquipWeapons;
         if (equipWeapons != null)
         {
             // Right hand equipment
-            var rightHandItem = equipWeapons.rightHand;
+            CharacterItem rightHandItem = equipWeapons.rightHand;
             tempEquipment = rightHandItem.GetEquipmentItem();
             if (tempEquipment != null)
                 result = GameDataHelpers.CombineDamageAmountsDictionary(result,
                     tempEquipment.GetIncreaseDamages(rightHandItem.level, rightHandItem.GetEquipmentBonusRate()));
             // Left hand equipment
-            var leftHandItem = equipWeapons.leftHand;
+            CharacterItem leftHandItem = equipWeapons.leftHand;
             tempEquipment = leftHandItem.GetEquipmentItem();
             if (tempEquipment != null)
                 result = GameDataHelpers.CombineDamageAmountsDictionary(result,
@@ -331,16 +331,16 @@ public static partial class CharacterDataExtension
     {
         if (data == null)
             return new Dictionary<DamageElement, MinMaxFloat>();
-        var result = new Dictionary<DamageElement, MinMaxFloat>();
-        var buffs = data.Buffs;
-        foreach (var buff in buffs)
+        Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
+        IList<CharacterBuff> buffs = data.Buffs;
+        foreach (CharacterBuff buff in buffs)
         {
             result = GameDataHelpers.CombineDamageAmountsDictionary(result, buff.GetIncreaseDamages());
         }
 
         // Passive skills
-        var skills = data.Skills;
-        foreach (var skill in skills)
+        IList<CharacterSkill> skills = data.Skills;
+        foreach (CharacterSkill skill in skills)
         {
             if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
                 continue;
@@ -352,7 +352,7 @@ public static partial class CharacterDataExtension
 
     public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
     {
-        var result = new Dictionary<DamageElement, MinMaxFloat>();
+        Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
         if (sumWithEquipments)
             result = GameDataHelpers.CombineDamageAmountsDictionary(result, data.GetEquipmentIncreaseDamages());
         if (sumWithBuffs)
@@ -364,9 +364,9 @@ public static partial class CharacterDataExtension
     {
         if (data == null)
             return new CharacterStats();
-        var level = data.Level;
-        var character = data.GetDatabase();
-        var result = new CharacterStats();
+        short level = data.Level;
+        BaseCharacter character = data.GetDatabase();
+        CharacterStats result = new CharacterStats();
         if (character != null)
             result += character.GetCharacterStats(level);
         result += GameDataHelpers.GetStatsFromAttributes(GetAttributes(data));
@@ -377,11 +377,11 @@ public static partial class CharacterDataExtension
     {
         if (data == null)
             return new CharacterStats();
-        var result = new CharacterStats();
+        CharacterStats result = new CharacterStats();
         // Armors
         Item tempEquipment = null;
-        var equipItems = data.EquipItems;
-        foreach (var equipItem in equipItems)
+        IList<CharacterItem> equipItems = data.EquipItems;
+        foreach (CharacterItem equipItem in equipItems)
         {
             tempEquipment = equipItem.GetEquipmentItem();
             if (tempEquipment != null)
@@ -391,11 +391,11 @@ public static partial class CharacterDataExtension
             }
         }
         // Weapons
-        var equipWeapons = data.EquipWeapons;
+        EquipWeapons equipWeapons = data.EquipWeapons;
         if (equipWeapons != null)
         {
             // Right hand equipment
-            var rightHandItem = equipWeapons.rightHand;
+            CharacterItem rightHandItem = equipWeapons.rightHand;
             tempEquipment = rightHandItem.GetEquipmentItem();
             if (tempEquipment != null)
             {
@@ -403,7 +403,7 @@ public static partial class CharacterDataExtension
                 result += GameDataHelpers.GetStatsFromAttributes(tempEquipment.GetIncreaseAttributes(rightHandItem.level, rightHandItem.GetEquipmentBonusRate()));
             }
             // Left hand equipment
-            var leftHandItem = equipWeapons.leftHand;
+            CharacterItem leftHandItem = equipWeapons.leftHand;
             tempEquipment = leftHandItem.GetEquipmentItem();
             if (tempEquipment != null)
             {
@@ -418,18 +418,18 @@ public static partial class CharacterDataExtension
     {
         if (data == null)
             return new CharacterStats();
-        var result = new CharacterStats();
-        var buffs = data.Buffs;
-        foreach (var buff in buffs)
+        CharacterStats result = new CharacterStats();
+        IList<CharacterBuff> buffs = data.Buffs;
+        foreach (CharacterBuff buff in buffs)
         {
             result += buff.GetIncreaseStats();
             result += GameDataHelpers.GetStatsFromAttributes(buff.GetIncreaseAttributes());
         }
 
         // Passive skills
-        var skills = data.Skills;
+        IList<CharacterSkill> skills = data.Skills;
         Buff tempBuff;
-        foreach (var skill in skills)
+        foreach (CharacterSkill skill in skills)
         {
             if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
                 continue;
@@ -442,7 +442,7 @@ public static partial class CharacterDataExtension
 
     public static CharacterStats GetStats(this ICharacterData data, bool sumWithEquipments = true, bool sumWithBuffs = true)
     {
-        var result = data.GetCharacterStats();
+        CharacterStats result = data.GetCharacterStats();
         if (sumWithEquipments)
             result += data.GetEquipmentStats();
         if (sumWithBuffs)
@@ -453,11 +453,11 @@ public static partial class CharacterDataExtension
 
     public static int CountNonEquipItems(this ICharacterData data, int dataId)
     {
-        var count = 0;
+        int count = 0;
         if (data != null && data.NonEquipItems.Count > 0)
         {
-            var nonEquipItems = data.NonEquipItems;
-            foreach (var nonEquipItem in nonEquipItems)
+            IList<CharacterItem> nonEquipItems = data.NonEquipItems;
+            foreach (CharacterItem nonEquipItem in nonEquipItems)
             {
                 if (nonEquipItem.dataId == dataId)
                     count += nonEquipItem.amount;
@@ -473,13 +473,13 @@ public static partial class CharacterDataExtension
         if (amount <= 0 || !GameInstance.Items.TryGetValue(dataId, out itemData))
             return false;
 
-        var maxStack = itemData.maxStack;
-        var emptySlots = new Dictionary<int, CharacterItem>();
-        var changes = new Dictionary<int, CharacterItem>();
+        short maxStack = itemData.maxStack;
+        Dictionary<int, CharacterItem> emptySlots = new Dictionary<int, CharacterItem>();
+        Dictionary<int, CharacterItem> changes = new Dictionary<int, CharacterItem>();
         // Loop to all slots to add amount to any slots that item amount not max in stack
-        for (var i = 0; i < data.NonEquipItems.Count; ++i)
+        for (int i = 0; i < data.NonEquipItems.Count; ++i)
         {
-            var nonEquipItem = data.NonEquipItems[i];
+            CharacterItem nonEquipItem = data.NonEquipItems[i];
             if (!nonEquipItem.IsValid())
             {
                 // If current entry is not valid, add it to empty list, going to replacing it later
@@ -507,10 +507,10 @@ public static partial class CharacterDataExtension
         if (changes.Count == 0 && emptySlots.Count > 0)
         {
             // If there are no changes and there are an empty entries, fill them
-            foreach (var emptySlot in emptySlots)
+            foreach (KeyValuePair<int, CharacterItem> emptySlot in emptySlots)
             {
-                var value = emptySlot.Value;
-                var newItem = CharacterItem.Create(dataId, level);
+                CharacterItem value = emptySlot.Value;
+                CharacterItem newItem = CharacterItem.Create(dataId, level);
                 short addAmount = 0;
                 if (amount - maxStack >= 0)
                 {
@@ -528,7 +528,7 @@ public static partial class CharacterDataExtension
         }
 
         // Apply all changes
-        foreach (var change in changes)
+        foreach (KeyValuePair<int, CharacterItem> change in changes)
         {
             data.NonEquipItems[change.Key] = change.Value;
         }
@@ -536,7 +536,7 @@ public static partial class CharacterDataExtension
         // Add new items
         while (amount > 0)
         {
-            var newItem = CharacterItem.Create(dataId, level);
+            CharacterItem newItem = CharacterItem.Create(dataId, level);
             short addAmount = 0;
             if (amount - maxStack >= 0)
             {
@@ -565,12 +565,12 @@ public static partial class CharacterDataExtension
     public static bool DecreaseItems(this ICharacterData data, int dataId, short amount, out Dictionary<CharacterItem, short> decreaseItems)
     {
         decreaseItems = new Dictionary<CharacterItem, short>();
-        var decreasingItemIndexes = new Dictionary<int, short>();
-        var nonEquipItems = data.NonEquipItems;
+        Dictionary<int, short> decreasingItemIndexes = new Dictionary<int, short>();
+        IList<CharacterItem> nonEquipItems = data.NonEquipItems;
         short tempDecresingAmount = 0;
-        for (var i = nonEquipItems.Count - 1; i >= 0; --i)
+        for (int i = nonEquipItems.Count - 1; i >= 0; --i)
         {
-            var nonEquipItem = nonEquipItems[i];
+            CharacterItem nonEquipItem = nonEquipItems[i];
             if (nonEquipItem.dataId == dataId)
             {
                 if (amount - nonEquipItem.amount > 0)
@@ -585,7 +585,7 @@ public static partial class CharacterDataExtension
         }
         if (amount > 0)
             return false;
-        foreach (var decreasingItem in decreasingItemIndexes)
+        foreach (KeyValuePair<int, short> decreasingItem in decreasingItemIndexes)
         {
             decreaseItems.Add(data.NonEquipItems[decreasingItem.Key], decreasingItem.Value);
             DecreaseItemsByIndex(data, decreasingItem.Key, decreasingItem.Value);
@@ -602,12 +602,12 @@ public static partial class CharacterDataExtension
     public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, short amount, out Dictionary<CharacterItem, short> decreaseItems)
     {
         decreaseItems = new Dictionary<CharacterItem, short>();
-        var decreasingItemIndexes = new Dictionary<int, short>();
-        var nonEquipItems = data.NonEquipItems;
+        Dictionary<int, short> decreasingItemIndexes = new Dictionary<int, short>();
+        IList<CharacterItem> nonEquipItems = data.NonEquipItems;
         short tempDecresingAmount = 0;
-        for (var i = nonEquipItems.Count - 1; i >= 0; --i)
+        for (int i = nonEquipItems.Count - 1; i >= 0; --i)
         {
-            var nonEquipItem = nonEquipItems[i];
+            CharacterItem nonEquipItem = nonEquipItems[i];
             if (nonEquipItem.GetAmmoItem() != null && nonEquipItem.GetAmmoItem().ammoType == ammoType)
             {
                 if (amount - nonEquipItem.amount > 0)
@@ -622,7 +622,7 @@ public static partial class CharacterDataExtension
         }
         if (amount > 0)
             return false;
-        foreach (var decreasingItem in decreasingItemIndexes)
+        foreach (KeyValuePair<int, short> decreasingItem in decreasingItemIndexes)
         {
             decreaseItems.Add(data.NonEquipItems[decreasingItem.Key], decreasingItem.Value);
             DecreaseItemsByIndex(data, decreasingItem.Key, decreasingItem.Value);
@@ -634,7 +634,7 @@ public static partial class CharacterDataExtension
     {
         if (index < 0 || index >= data.NonEquipItems.Count)
             return false;
-        var nonEquipItem = data.NonEquipItems[index];
+        CharacterItem nonEquipItem = data.NonEquipItems[index];
         if (!nonEquipItem.IsValid() || amount > nonEquipItem.amount)
             return false;
         if (nonEquipItem.amount - amount == 0)
@@ -651,10 +651,10 @@ public static partial class CharacterDataExtension
     {
         isLeftHand = false;
         // Find right hand and left and to set result weapon
-        var rightHand = data.EquipWeapons.rightHand;
-        var leftHand = data.EquipWeapons.leftHand;
-        var rightWeaponItem = rightHand.GetWeaponItem();
-        var leftWeaponItem = leftHand.GetWeaponItem();
+        CharacterItem rightHand = data.EquipWeapons.rightHand;
+        CharacterItem leftHand = data.EquipWeapons.leftHand;
+        Item rightWeaponItem = rightHand.GetWeaponItem();
+        Item leftWeaponItem = leftHand.GetWeaponItem();
         if (rightWeaponItem != null && leftWeaponItem != null)
         {
             // Random right hand or left hand weapon
@@ -676,8 +676,8 @@ public static partial class CharacterDataExtension
 
     public static bool CanAttack(this ICharacterData data)
     {
-        var rightWeapon = data.EquipWeapons.rightHand.GetWeaponItem();
-        var leftWeapon = data.EquipWeapons.leftHand.GetWeaponItem();
+        Item rightWeapon = data.EquipWeapons.rightHand.GetWeaponItem();
+        Item leftWeapon = data.EquipWeapons.leftHand.GetWeaponItem();
         if (rightWeapon != null && leftWeapon != null)
             return leftWeapon.CanAttack(data) && rightWeapon.CanAttack(data);
         else if (rightWeapon != null)
@@ -689,10 +689,10 @@ public static partial class CharacterDataExtension
 
     public static int IndexOfAttribute(this ICharacterData data, int dataId)
     {
-        var list = data.Attributes;
+        IList<CharacterAttribute> list = data.Attributes;
         CharacterAttribute tempAttribute;
-        var index = -1;
-        for (var i = 0; i < list.Count; ++i)
+        int index = -1;
+        for (int i = 0; i < list.Count; ++i)
         {
             tempAttribute = list[i];
             if (tempAttribute.dataId == dataId)
@@ -706,10 +706,10 @@ public static partial class CharacterDataExtension
 
     public static int IndexOfSkill(this ICharacterData data, int dataId)
     {
-        var list = data.Skills;
+        IList<CharacterSkill> list = data.Skills;
         CharacterSkill tempSkill;
-        var index = -1;
-        for (var i = 0; i < list.Count; ++i)
+        int index = -1;
+        for (int i = 0; i < list.Count; ++i)
         {
             tempSkill = list[i];
             if (tempSkill.dataId == dataId)
@@ -723,10 +723,10 @@ public static partial class CharacterDataExtension
 
     public static int IndexOfSkillUsage(this ICharacterData data, int dataId, SkillUsageType type)
     {
-        var list = data.SkillUsages;
+        IList<CharacterSkillUsage> list = data.SkillUsages;
         CharacterSkillUsage tempSkillUsage;
-        var index = -1;
-        for (var i = 0; i < list.Count; ++i)
+        int index = -1;
+        for (int i = 0; i < list.Count; ++i)
         {
             tempSkillUsage = list[i];
             if (tempSkillUsage.dataId == dataId && tempSkillUsage.type == type)
@@ -740,10 +740,10 @@ public static partial class CharacterDataExtension
 
     public static int IndexOfBuff(this ICharacterData data, int dataId, BuffType type)
     {
-        var list = data.Buffs;
+        IList<CharacterBuff> list = data.Buffs;
         CharacterBuff tempBuff;
-        var index = -1;
-        for (var i = 0; i < list.Count; ++i)
+        int index = -1;
+        for (int i = 0; i < list.Count; ++i)
         {
             tempBuff = list[i];
             if (tempBuff.dataId == dataId && tempBuff.type == type)
@@ -757,10 +757,10 @@ public static partial class CharacterDataExtension
 
     public static int IndexOfEquipItem(this ICharacterData data, int dataId)
     {
-        var list = data.EquipItems;
+        IList<CharacterItem> list = data.EquipItems;
         CharacterItem tempItem;
-        var index = -1;
-        for (var i = 0; i < list.Count; ++i)
+        int index = -1;
+        for (int i = 0; i < list.Count; ++i)
         {
             tempItem = list[i];
             if (tempItem.dataId == dataId)
@@ -774,10 +774,10 @@ public static partial class CharacterDataExtension
 
     public static int IndexOfNonEquipItem(this ICharacterData data, int dataId)
     {
-        var list = data.NonEquipItems;
+        IList<CharacterItem> list = data.NonEquipItems;
         CharacterItem tempItem;
-        var index = -1;
-        for (var i = 0; i < list.Count; ++i)
+        int index = -1;
+        for (int i = 0; i < list.Count; ++i)
         {
             tempItem = list[i];
             if (tempItem.dataId == dataId)
@@ -791,10 +791,10 @@ public static partial class CharacterDataExtension
 
     public static int IndexOfSummon(this ICharacterData data, uint objectId)
     {
-        var list = data.Summons;
+        IList<CharacterSummon> list = data.Summons;
         CharacterSummon tempSummon;
-        var index = -1;
-        for (var i = 0; i < list.Count; ++i)
+        int index = -1;
+        for (int i = 0; i < list.Count; ++i)
         {
             tempSummon = list[i];
             if (tempSummon.objectId == objectId)
@@ -808,10 +808,10 @@ public static partial class CharacterDataExtension
 
     public static int IndexOfSummon(this ICharacterData data, SummonType type)
     {
-        var list = data.Summons;
+        IList<CharacterSummon> list = data.Summons;
         CharacterSummon tempSummon;
-        var index = -1;
-        for (var i = 0; i < list.Count; ++i)
+        int index = -1;
+        for (int i = 0; i < list.Count; ++i)
         {
             tempSummon = list[i];
             if (tempSummon.type == type)
@@ -825,10 +825,10 @@ public static partial class CharacterDataExtension
 
     public static int IndexOfSummon(this ICharacterData data, int dataId, SummonType type)
     {
-        var list = data.Summons;
+        IList<CharacterSummon> list = data.Summons;
         CharacterSummon tempSummon;
-        var index = -1;
-        for (var i = 0; i < list.Count; ++i)
+        int index = -1;
+        for (int i = 0; i < list.Count; ++i)
         {
             tempSummon = list[i];
             if (tempSummon.dataId == dataId && tempSummon.type == type)
@@ -842,10 +842,10 @@ public static partial class CharacterDataExtension
 
     public static int IndexOfAmmoItem(this ICharacterData data, AmmoType ammoType)
     {
-        var list = data.NonEquipItems;
+        IList<CharacterItem> list = data.NonEquipItems;
         Item tempAmmoItem;
-        var index = -1;
-        for (var i = 0; i < list.Count; ++i)
+        int index = -1;
+        for (int i = 0; i < list.Count; ++i)
         {
             tempAmmoItem = list[i].GetAmmoItem();
             if (tempAmmoItem != null && tempAmmoItem.ammoType == ammoType)

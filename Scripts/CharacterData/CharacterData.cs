@@ -94,7 +94,7 @@ public partial class CharacterData : ICharacterData
                 attributes.CollectionChanged += List_CollectionChanged;
             }
             attributes.Clear();
-            foreach (var entry in value)
+            foreach (CharacterAttribute entry in value)
                 attributes.Add(entry);
             shouldMakeCache = true;
         }
@@ -119,7 +119,7 @@ public partial class CharacterData : ICharacterData
                 skills.CollectionChanged += List_CollectionChanged;
             }
             skills.Clear();
-            foreach (var entry in value)
+            foreach (CharacterSkill entry in value)
                 skills.Add(entry);
             shouldMakeCache = true;
         }
@@ -138,7 +138,7 @@ public partial class CharacterData : ICharacterData
             if (skillUsages == null)
                 skillUsages = new List<CharacterSkillUsage>();
             skillUsages.Clear();
-            foreach (var entry in value)
+            foreach (CharacterSkillUsage entry in value)
                 skillUsages.Add(entry);
         }
     }
@@ -162,7 +162,7 @@ public partial class CharacterData : ICharacterData
                 buffs.CollectionChanged += List_CollectionChanged;
             }
             buffs.Clear();
-            foreach (var entry in value)
+            foreach (CharacterBuff entry in value)
                 buffs.Add(entry);
             shouldMakeCache = true;
         }
@@ -187,7 +187,7 @@ public partial class CharacterData : ICharacterData
                 equipItems.CollectionChanged += List_CollectionChanged;
             }
             equipItems.Clear();
-            foreach (var entry in value)
+            foreach (CharacterItem entry in value)
                 equipItems.Add(entry);
             shouldMakeCache = true;
         }
@@ -212,7 +212,7 @@ public partial class CharacterData : ICharacterData
                 nonEquipItems.CollectionChanged += List_CollectionChanged;
             }
             nonEquipItems.Clear();
-            foreach (var entry in value)
+            foreach (CharacterItem entry in value)
                 nonEquipItems.Add(entry);
             shouldMakeCache = true;
         }
@@ -237,7 +237,7 @@ public partial class CharacterData : ICharacterData
                 summons.CollectionChanged += List_CollectionChanged;
             }
             summons.Clear();
-            foreach (var entry in value)
+            foreach (CharacterSummon entry in value)
                 summons.Add(entry);
             shouldMakeCache = true;
         }

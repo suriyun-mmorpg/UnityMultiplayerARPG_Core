@@ -106,7 +106,7 @@ namespace UnityEngine.Tilemaps
             m_PositionColorKeys.Clear();
             m_PositionColorValues.Clear();
 
-            foreach (var kvp in m_PositionProperties)
+            foreach (KeyValuePair<GridInformationKey, GridInformationValue> kvp in m_PositionProperties)
             {
                 switch (kvp.Value.type)
                 {

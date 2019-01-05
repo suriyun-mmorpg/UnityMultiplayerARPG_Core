@@ -190,7 +190,7 @@ namespace MultiplayerARPG
             attackFov = PlayerCharacterEntity.GetAttackFov();
             if (queueUsingSkill.HasValue)
             {
-                var queueUsingSkillValue = queueUsingSkill.Value;
+                UsingSkillData queueUsingSkillValue = queueUsingSkill.Value;
                 Skill skill = null;
                 if (GameInstance.Skills.TryGetValue(queueUsingSkillValue.dataId, out skill) && skill != null)
                 {
@@ -222,7 +222,7 @@ namespace MultiplayerARPG
 
         public Vector3 GetMoveDirection(float horizontalInput, float verticalInput)
         {
-            var moveDirection = Vector3.zero;
+            Vector3 moveDirection = Vector3.zero;
             switch (dimensionType)
             {
                 case DimensionType.Dimension3D:
@@ -251,8 +251,8 @@ namespace MultiplayerARPG
         {
             if (queueUsingSkill.HasValue)
             {
-                var queueUsingSkillValue = queueUsingSkill.Value;
-                var position = queueUsingSkillValue.position.HasValue ? queueUsingSkillValue.position.Value : CharacterTransform.position;
+                UsingSkillData queueUsingSkillValue = queueUsingSkill.Value;
+                Vector3 position = queueUsingSkillValue.position.HasValue ? queueUsingSkillValue.position.Value : CharacterTransform.position;
                 RequestUseSkill(position, queueUsingSkillValue.dataId);
                 queueUsingSkill = null;
             }

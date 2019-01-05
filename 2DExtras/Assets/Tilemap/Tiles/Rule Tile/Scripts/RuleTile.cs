@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine.Tilemaps;
 
 namespace UnityEngine
@@ -72,14 +73,14 @@ namespace UnityEngine
                     GUI.DrawTexture(rect, arrows[9]);
                     break;
                 default:
-                    var style = new GUIStyle();
+                    GUIStyle style = new GUIStyle();
                     style.alignment = TextAnchor.MiddleCenter;
                     style.fontSize = 10;
                     GUI.Label(rect, neighbor.ToString(), style);
                     break;
             }
-            var allConsts = m_NeighborType.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.FlattenHierarchy);
-            foreach (var c in allConsts)
+            FieldInfo[] allConsts = m_NeighborType.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.FlattenHierarchy);
+            foreach (FieldInfo c in allConsts)
             {
                 if ((int)c.GetValue(null) == neighbor)
                 {
@@ -173,7 +174,7 @@ namespace UnityEngine
         {
             TileBase[] neighboringTiles = null;
             GetMatchingNeighboringTiles(tilemap, position, ref neighboringTiles);
-            var iden = Matrix4x4.identity;
+            Matrix4x4 iden = Matrix4x4.identity;
 
             tileData.sprite = m_DefaultSprite;
             tileData.gameObject = m_DefaultGameObject;
@@ -218,7 +219,7 @@ namespace UnityEngine
         public override bool GetTileAnimationData(Vector3Int position, ITilemap tilemap, ref TileAnimationData tileAnimationData)
         {
             TileBase[] neighboringTiles = null;
-            var iden = Matrix4x4.identity;
+            Matrix4x4 iden = Matrix4x4.identity;
             foreach (TilingRule rule in m_TilingRules)
             {
                 if (rule.m_Output == TilingRule.OutputSprite.Animation)

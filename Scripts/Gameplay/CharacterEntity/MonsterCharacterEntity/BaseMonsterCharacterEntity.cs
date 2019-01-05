@@ -123,7 +123,7 @@ namespace MultiplayerARPG
                 if (spawnArea == null)
                     spawnPosition = CacheTransform.position;
 
-                var stats = this.GetStats();
+                CharacterStats stats = this.GetStats();
                 CurrentHp = (int)stats.hp;
                 CurrentMp = (int)stats.mp;
                 CurrentStamina = (int)stats.stamina;
@@ -155,7 +155,7 @@ namespace MultiplayerARPG
             // Setup relates elements
             if (GameInstance.monsterCharacterMiniMapObjects != null && GameInstance.monsterCharacterMiniMapObjects.Length > 0)
             {
-                foreach (var obj in GameInstance.monsterCharacterMiniMapObjects)
+                foreach (GameObject obj in GameInstance.monsterCharacterMiniMapObjects)
                 {
                     if (obj == null) continue;
                     Instantiate(obj, MiniMapElementContainer.position, MiniMapElementContainer.rotation, MiniMapElementContainer);
@@ -185,7 +185,7 @@ namespace MultiplayerARPG
             if (attacker == null)
                 return false;
 
-            var characterEntity = attacker as BaseCharacterEntity;
+            BaseCharacterEntity characterEntity = attacker as BaseCharacterEntity;
             if (characterEntity == null)
                 return false;
 
@@ -211,7 +211,7 @@ namespace MultiplayerARPG
             if (characterEntity is BaseMonsterCharacterEntity)
             {
                 // If another monster has same allyId so it is ally
-                var monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
+                BaseMonsterCharacterEntity monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
                 if (monsterCharacterEntity != null)
                 {
                     if (monsterCharacterEntity.IsSummoned)
@@ -242,7 +242,7 @@ namespace MultiplayerARPG
                 return;
 
             base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
-            var attackerCharacter = attacker as BaseCharacterEntity;
+            BaseCharacterEntity attackerCharacter = attacker as BaseCharacterEntity;
 
             // If character is not dead, try to attack
             if (!IsDead())
@@ -288,8 +288,8 @@ namespace MultiplayerARPG
 
             // Assign damage amounts
             allDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
-            var damageElement = MonsterDatabase.damageAmount.damageElement;
-            var damageAmount = MonsterDatabase.damageAmount.amount.GetAmount(Level);
+            DamageElement damageElement = MonsterDatabase.damageAmount.damageElement;
+            MinMaxFloat damageAmount = MonsterDatabase.damageAmount.amount.GetAmount(Level);
             if (damageElement == null)
                 damageElement = GameInstance.DefaultDamageElement;
             allDamageAmounts.Add(damageElement, damageAmount);
@@ -302,7 +302,7 @@ namespace MultiplayerARPG
 
         public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType damageAmountType, int damage)
         {
-            var attackerCharacter = attacker as BaseCharacterEntity;
+            BaseCharacterEntity attackerCharacter = attacker as BaseCharacterEntity;
 
             // If summoned by someone, summoner is attacker
             if (attackerCharacter != null &&
@@ -313,7 +313,7 @@ namespace MultiplayerARPG
             // Add received damage entry
             if (attackerCharacter != null)
             {
-                var receivedDamageRecord = new ReceivedDamageRecord();
+                ReceivedDamageRecord receivedDamageRecord = new ReceivedDamageRecord();
                 receivedDamageRecord.totalReceivedDamage = damage;
                 if (receivedDamageRecords.ContainsKey(attackerCharacter))
                 {
@@ -346,28 +346,28 @@ namespace MultiplayerARPG
             if (IsSummoned)
                 return;
 
-            var randomedExp = Random.Range(MonsterDatabase.randomExpMin, MonsterDatabase.randomExpMax);
-            var randomedGold = Random.Range(MonsterDatabase.randomGoldMin, MonsterDatabase.randomGoldMax);
-            var looters = new HashSet<uint>();
-            var lastPlayer = lastAttacker as BasePlayerCharacterEntity;
+            int randomedExp = Random.Range(MonsterDatabase.randomExpMin, MonsterDatabase.randomExpMax);
+            int randomedGold = Random.Range(MonsterDatabase.randomGoldMin, MonsterDatabase.randomGoldMax);
+            HashSet<uint> looters = new HashSet<uint>();
+            BasePlayerCharacterEntity lastPlayer = lastAttacker as BasePlayerCharacterEntity;
             GuildData tempGuildData;
             PartyData tempPartyData;
             BasePlayerCharacterEntity tempPlayerCharacter;
             BaseMonsterCharacterEntity tempMonsterCharacter;
             if (receivedDamageRecords.Count > 0)
             {
-                var tempHighRewardRate = 0f;
-                foreach (var enemy in receivedDamageRecords.Keys)
+                float tempHighRewardRate = 0f;
+                foreach (BaseCharacterEntity enemy in receivedDamageRecords.Keys)
                 {
-                    var receivedDamageRecord = receivedDamageRecords[enemy];
-                    var rewardRate = (float)receivedDamageRecord.totalReceivedDamage / (float)CacheMaxHp;
-                    var rewardExp = (int)(randomedExp * rewardRate);
-                    var rewardGold = (int)(randomedGold * rewardRate);
+                    ReceivedDamageRecord receivedDamageRecord = receivedDamageRecords[enemy];
+                    float rewardRate = (float)receivedDamageRecord.totalReceivedDamage / (float)CacheMaxHp;
+                    int rewardExp = (int)(randomedExp * rewardRate);
+                    int rewardGold = (int)(randomedGold * rewardRate);
                     if (rewardRate > 1f)
                         rewardRate = 1f;
                     if (enemy is BasePlayerCharacterEntity)
                     {
-                        var makeMostDamage = false;
+                        bool makeMostDamage = false;
                         tempPlayerCharacter = enemy as BasePlayerCharacterEntity;
                         // Clear looters list when it is found new player character who make most damages
                         if (rewardRate > tempHighRewardRate)
@@ -393,7 +393,7 @@ namespace MultiplayerARPG
                         {
                             BasePlayerCharacterEntity partyPlayerCharacter;
                             // Loop party member to fill looter list / increase gold / increase exp
-                            foreach (var member in tempPartyData.GetMembers())
+                            foreach (SocialCharacterData member in tempPartyData.GetMembers())
                             {
                                 if (GameManager.TryGetPlayerCharacterById(member.id, out partyPlayerCharacter))
                                 {
@@ -420,7 +420,7 @@ namespace MultiplayerARPG
                                 rewardGold = 0;
                         }
                         // Add reward to current character in damage record list
-                        var petIndex = tempPlayerCharacter.IndexOfSummon(SummonType.Pet);
+                        int petIndex = tempPlayerCharacter.IndexOfSummon(SummonType.Pet);
                         if (petIndex >= 0)
                         {
                             tempMonsterCharacter = tempPlayerCharacter.Summons[petIndex].CacheEntity;
@@ -438,15 +438,15 @@ namespace MultiplayerARPG
                 }
             }
             receivedDamageRecords.Clear();
-            foreach (var randomItem in MonsterDatabase.randomItems)
+            foreach (ItemDrop randomItem in MonsterDatabase.randomItems)
             {
                 if (Random.value <= randomItem.dropRate)
                 {
-                    var item = randomItem.item;
-                    var amount = randomItem.amount;
+                    Item item = randomItem.item;
+                    short amount = randomItem.amount;
                     if (item != null && GameInstance.Items.ContainsKey(item.DataId))
                     {
-                        var itemDataId = item.DataId;
+                        int itemDataId = item.DataId;
                         if (amount > item.maxStack)
                             amount = item.maxStack;
                         ItemDropEntity.DropItem(this, itemDataId, 1, amount, looters);

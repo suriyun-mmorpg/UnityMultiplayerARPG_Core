@@ -46,7 +46,7 @@ namespace MultiplayerARPG
                 if (cacheRightHandAttackAnimations == null)
                 {
                     cacheRightHandAttackAnimations = new Dictionary<int, ActionAnimation[]>();
-                    foreach (var attackAnimation in weaponAnimations)
+                    foreach (WeaponAnimations attackAnimation in weaponAnimations)
                     {
                         if (attackAnimation.weaponType == null) continue;
                         cacheRightHandAttackAnimations[attackAnimation.weaponType.DataId] = attackAnimation.rightHandAttackAnimations;
@@ -64,7 +64,7 @@ namespace MultiplayerARPG
                 if (cacheLeftHandAttackAnimations == null)
                 {
                     cacheLeftHandAttackAnimations = new Dictionary<int, ActionAnimation[]>();
-                    foreach (var attackAnimation in weaponAnimations)
+                    foreach (WeaponAnimations attackAnimation in weaponAnimations)
                     {
                         if (attackAnimation.weaponType == null) continue;
                         cacheLeftHandAttackAnimations[attackAnimation.weaponType.DataId] = attackAnimation.rightHandAttackAnimations;
@@ -82,7 +82,7 @@ namespace MultiplayerARPG
                 if (cacheSkillCastAnimations == null)
                 {
                     cacheSkillCastAnimations = new Dictionary<int, ActionAnimation[]>();
-                    foreach (var skillCastAnimation in skillCastAnimations)
+                    foreach (SkillCastAnimations skillCastAnimation in skillCastAnimations)
                     {
                         if (skillCastAnimation.skill == null) continue;
                         cacheSkillCastAnimations[skillCastAnimation.skill.DataId] = skillCastAnimation.castAnimations;
@@ -143,7 +143,7 @@ namespace MultiplayerARPG
         public override void AddingNewModel(GameObject newModel)
         {
             base.AddingNewModel(newModel);
-            var skinnedMesh = newModel.GetComponentInChildren<SkinnedMeshRenderer>();
+            SkinnedMeshRenderer skinnedMesh = newModel.GetComponentInChildren<SkinnedMeshRenderer>();
             if (skinnedMesh != null && skinnedMeshRenderer != null)
             {
                 skinnedMesh.bones = skinnedMeshRenderer.bones;
@@ -188,12 +188,12 @@ namespace MultiplayerARPG
             {
                 if (CacheAnimation.IsPlaying(LEGACY_CLIP_ACTION))
                     return;
-                var ySpeed = moveVelocity.y;
+                float ySpeed = moveVelocity.y;
                 if (ySpeed < legacyAnimationData.ySpeedToPlayFallClip)
                     CrossFadeLegacyAnimation(legacyAnimationData.fallClip, legacyAnimationData.fallClipFadeLength);
                 else
                 {
-                    var moveMagnitude = new Vector3(moveVelocity.x, 0, moveVelocity.z).magnitude;
+                    float moveMagnitude = new Vector3(moveVelocity.x, 0, moveVelocity.z).magnitude;
                     if (moveMagnitude > legacyAnimationData.magnitudeToPlayMoveClip)
                         CrossFadeLegacyAnimation(legacyAnimationData.moveClip, legacyAnimationData.moveClipFadeLength);
                     else
@@ -230,7 +230,7 @@ namespace MultiplayerARPG
             {
                 CacheAnimator.SetBool(ANIM_DO_ACTION, false);
                 CacheAnimatorController[ANIM_STATE_ACTION_CLIP] = tempActionAnimation.clip;
-                var audioClip = tempActionAnimation.GetRandomAudioClip();
+                AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
                 if (audioClip != null)
                     AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
                 CacheAnimator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
@@ -252,7 +252,7 @@ namespace MultiplayerARPG
                 if (CacheAnimation.GetClip(LEGACY_CLIP_ACTION) != null)
                     CacheAnimation.RemoveClip(LEGACY_CLIP_ACTION);
                 CacheAnimation.AddClip(tempActionAnimation.clip, LEGACY_CLIP_ACTION);
-                var audioClip = tempActionAnimation.GetRandomAudioClip();
+                AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
                 if (audioClip != null)
                     AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
                 CrossFadeLegacyAnimation(LEGACY_CLIP_ACTION, legacyAnimationData.actionClipFadeLength);

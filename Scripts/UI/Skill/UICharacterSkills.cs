@@ -75,7 +75,7 @@ namespace MultiplayerARPG
         {
             this.character = character;
 
-            var selectedSkillId = SelectionManager.SelectedUI != null ? SelectionManager.SelectedUI.Skill.DataId : 0;
+            int selectedSkillId = SelectionManager.SelectedUI != null ? SelectionManager.SelectedUI.Skill.DataId : 0;
             SelectionManager.DeselectSelectedUI();
             SelectionManager.Clear();
 
@@ -89,10 +89,10 @@ namespace MultiplayerARPG
 
             Skill tempSkill;
             short tempLevel;
-            var skillLevels = character.GetDatabase().CacheSkillLevels;
+            Dictionary<Skill, short> skillLevels = character.GetDatabase().CacheSkillLevels;
             CacheList.Generate(skillLevels, (index, skillLevel, ui) =>
             {
-                var uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
+                UICharacterSkill uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
                 tempSkill = skillLevel.Key;
                 tempLevel = 0;
                 if (displayingSkills.ContainsKey(tempSkill))

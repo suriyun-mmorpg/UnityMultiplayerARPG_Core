@@ -41,7 +41,7 @@ namespace MultiplayerARPG
             if (imageGage != null)
                 imageGage.fillAmount = 0;
             yield return null;
-            var asyncOp = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+            AsyncOperation asyncOp = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
             while (!asyncOp.isDone)
             {
                 if (uiTextProgress != null)

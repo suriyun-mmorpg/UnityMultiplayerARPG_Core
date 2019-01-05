@@ -16,7 +16,7 @@ namespace MultiplayerARPG
 
         public static void SendEnterChat(this TransportHandler transportHandler, long? connectionId, ushort msgType, ChatChannel channel, string message, string senderName, string receiverName, int channelId)
         {
-            var netMessage = new ChatMessage();
+            ChatMessage netMessage = new ChatMessage();
             netMessage.channel = channel;
             netMessage.message = message;
             netMessage.sender = senderName;
@@ -27,7 +27,7 @@ namespace MultiplayerARPG
 
         public static void SendAddSocialMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId, string characterName, int dataId, short level)
         {
-            var netMessage = new UpdateSocialMemberMessage();
+            UpdateSocialMemberMessage netMessage = new UpdateSocialMemberMessage();
             netMessage.type = UpdateSocialMemberMessage.UpdateType.Add;
             netMessage.id = id;
             netMessage.CharacterId = characterId;
@@ -43,7 +43,7 @@ namespace MultiplayerARPG
 
         public static void SendUpdateSocialMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, bool isOnline, string characterId, string characterName, int dataId, short level, int currentHp, int maxHp, int currentMp, int maxMp)
         {
-            var netMessage = new UpdateSocialMemberMessage();
+            UpdateSocialMemberMessage netMessage = new UpdateSocialMemberMessage();
             netMessage.type = UpdateSocialMemberMessage.UpdateType.Update;
             netMessage.id = id;
             netMessage.CharacterId = characterId;
@@ -64,7 +64,7 @@ namespace MultiplayerARPG
 
         public static void SendRemoveSocialMember(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId)
         {
-            var netMessage = new UpdateSocialMemberMessage();
+            UpdateSocialMemberMessage netMessage = new UpdateSocialMemberMessage();
             netMessage.type = UpdateSocialMemberMessage.UpdateType.Remove;
             netMessage.id = id;
             netMessage.CharacterId = characterId;
@@ -73,7 +73,7 @@ namespace MultiplayerARPG
 
         public static void SendCreateParty(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, bool shareExp, bool shareItem, string characterId)
         {
-            var netMessage = new UpdatePartyMessage();
+            UpdatePartyMessage netMessage = new UpdatePartyMessage();
             netMessage.type = UpdatePartyMessage.UpdateType.Create;
             netMessage.id = id;
             netMessage.shareExp = shareExp;
@@ -84,7 +84,7 @@ namespace MultiplayerARPG
 
         public static void SendChangePartyLeader(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId)
         {
-            var netMessage = new UpdatePartyMessage();
+            UpdatePartyMessage netMessage = new UpdatePartyMessage();
             netMessage.type = UpdatePartyMessage.UpdateType.ChangeLeader;
             netMessage.id = id;
             netMessage.characterId = characterId;
@@ -93,7 +93,7 @@ namespace MultiplayerARPG
 
         public static void SendPartySetting(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, bool shareExp, bool shareItem)
         {
-            var netMessage = new UpdatePartyMessage();
+            UpdatePartyMessage netMessage = new UpdatePartyMessage();
             netMessage.type = UpdatePartyMessage.UpdateType.Setting;
             netMessage.id = id;
             netMessage.shareExp = shareExp;
@@ -103,7 +103,7 @@ namespace MultiplayerARPG
 
         public static void SendPartyTerminate(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id)
         {
-            var netMessage = new UpdatePartyMessage();
+            UpdatePartyMessage netMessage = new UpdatePartyMessage();
             netMessage.type = UpdatePartyMessage.UpdateType.Terminate;
             netMessage.id = id;
             Send(transportHandler, connectionId, msgType, netMessage);
@@ -111,7 +111,7 @@ namespace MultiplayerARPG
 
         public static void SendCreateGuild(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string guildName, string characterId)
         {
-            var netMessage = new UpdateGuildMessage();
+            UpdateGuildMessage netMessage = new UpdateGuildMessage();
             netMessage.type = UpdateGuildMessage.UpdateType.Create;
             netMessage.id = id;
             netMessage.guildName = guildName;
@@ -121,7 +121,7 @@ namespace MultiplayerARPG
 
         public static void SendChangeGuildLeader(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId)
         {
-            var netMessage = new UpdateGuildMessage();
+            UpdateGuildMessage netMessage = new UpdateGuildMessage();
             netMessage.type = UpdateGuildMessage.UpdateType.ChangeLeader;
             netMessage.id = id;
             netMessage.characterId = characterId;
@@ -130,7 +130,7 @@ namespace MultiplayerARPG
 
         public static void SendSetGuildMessage(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string message)
         {
-            var netMessage = new UpdateGuildMessage();
+            UpdateGuildMessage netMessage = new UpdateGuildMessage();
             netMessage.type = UpdateGuildMessage.UpdateType.SetGuildMessage;
             netMessage.id = id;
             netMessage.guildMessage = message;
@@ -139,7 +139,7 @@ namespace MultiplayerARPG
 
         public static void SendSetGuildRole(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
         {
-            var netMessage = new UpdateGuildMessage();
+            UpdateGuildMessage netMessage = new UpdateGuildMessage();
             netMessage.type = UpdateGuildMessage.UpdateType.SetGuildRole;
             netMessage.id = id;
             netMessage.guildRole = guildRole;
@@ -152,7 +152,7 @@ namespace MultiplayerARPG
 
         public static void SendSetGuildMemberRole(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, string characterId, byte guildRole)
         {
-            var netMessage = new UpdateGuildMessage();
+            UpdateGuildMessage netMessage = new UpdateGuildMessage();
             netMessage.type = UpdateGuildMessage.UpdateType.SetGuildMemberRole;
             netMessage.id = id;
             netMessage.characterId = characterId;
@@ -162,7 +162,7 @@ namespace MultiplayerARPG
 
         public static void SendGuildTerminate(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id)
         {
-            var netMessage = new UpdateGuildMessage();
+            UpdateGuildMessage netMessage = new UpdateGuildMessage();
             netMessage.type = UpdateGuildMessage.UpdateType.Terminate;
             netMessage.id = id;
             Send(transportHandler, connectionId, msgType, netMessage);
@@ -170,7 +170,7 @@ namespace MultiplayerARPG
 
         public static void SendGuildLevelExpSkillPoint(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, short level, int exp, short skillPoint)
         {
-            var netMessage = new UpdateGuildMessage();
+            UpdateGuildMessage netMessage = new UpdateGuildMessage();
             netMessage.type = UpdateGuildMessage.UpdateType.LevelExpSkillPoint;
             netMessage.id = id;
             netMessage.level = level;
@@ -181,7 +181,7 @@ namespace MultiplayerARPG
         
         public static void SendSetGuildSkillLevel(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, int dataId, short level)
         {
-            var netMessage = new UpdateGuildMessage();
+            UpdateGuildMessage netMessage = new UpdateGuildMessage();
             netMessage.type = UpdateGuildMessage.UpdateType.SetSkillLevel;
             netMessage.id = id;
             netMessage.dataId = dataId;

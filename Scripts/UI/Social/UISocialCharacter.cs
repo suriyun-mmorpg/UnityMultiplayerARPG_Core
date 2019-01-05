@@ -55,8 +55,8 @@ namespace MultiplayerARPG
                 uiTextLevel.text = string.Format(levelFormat, Data.socialCharacter.level.ToString("N0"));
 
             // Hp
-            var currentHp = Data.socialCharacter.currentHp;
-            var maxHp = Data.socialCharacter.maxHp;
+            int currentHp = Data.socialCharacter.currentHp;
+            int maxHp = Data.socialCharacter.maxHp;
 
             if (uiTextHp != null)
             {
@@ -68,8 +68,8 @@ namespace MultiplayerARPG
                 imageHpGage.fillAmount = maxHp <= 0 ? 0 : (float)currentHp / (float)maxHp;
 
             // Mp
-            var currentMp = Data.socialCharacter.currentMp;
-            var maxMp = Data.socialCharacter.maxMp;
+            int currentMp = Data.socialCharacter.currentMp;
+            int maxMp = Data.socialCharacter.maxMp;
 
             if (uiTextMp != null)
             {
@@ -85,25 +85,25 @@ namespace MultiplayerARPG
                 uiCharacterBuffs.UpdateData(Data.characterEntity);
 
             // Member status
-            foreach (var obj in memberIsOnlineObjects)
+            foreach (GameObject obj in memberIsOnlineObjects)
             {
                 if (obj != null)
                     obj.SetActive(uiSocialGroup.IsOnline(Data.socialCharacter.id));
             }
 
-            foreach (var obj in memberIsNotOnlineObjects)
+            foreach (GameObject obj in memberIsNotOnlineObjects)
             {
                 if (obj != null)
                     obj.SetActive(!uiSocialGroup.IsOnline(Data.socialCharacter.id));
             }
 
-            foreach (var obj in memberIsLeaderObjects)
+            foreach (GameObject obj in memberIsLeaderObjects)
             {
                 if (obj != null)
                     obj.SetActive(!string.IsNullOrEmpty(Data.socialCharacter.id) && uiSocialGroup.IsLeader(Data.socialCharacter.id));
             }
 
-            foreach (var obj in memberIsNotLeaderObjects)
+            foreach (GameObject obj in memberIsNotLeaderObjects)
             {
                 if (obj != null)
                     obj.SetActive(string.IsNullOrEmpty(Data.socialCharacter.id) || !uiSocialGroup.IsLeader(Data.socialCharacter.id));
@@ -121,7 +121,7 @@ namespace MultiplayerARPG
 
             if (imageClassIcon != null)
             {
-                var iconSprite = character == null ? null : character.icon;
+                Sprite iconSprite = character == null ? null : character.icon;
                 imageClassIcon.gameObject.SetActive(iconSprite != null);
                 imageClassIcon.sprite = iconSprite;
             }

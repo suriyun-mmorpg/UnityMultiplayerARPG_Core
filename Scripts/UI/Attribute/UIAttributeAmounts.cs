@@ -22,12 +22,12 @@ namespace MultiplayerARPG
                 if (cacheTextAmounts == null)
                 {
                     cacheTextAmounts = new Dictionary<Attribute, TextWrapper>();
-                    foreach (var textAmount in textAmounts)
+                    foreach (UIAttributeTextPair textAmount in textAmounts)
                     {
                         if (textAmount.attribute == null || textAmount.uiText == null)
                             continue;
-                        var key = textAmount.attribute;
-                        var textComp = textAmount.uiText;
+                        Attribute key = textAmount.attribute;
+                        TextWrapper textComp = textAmount.uiText;
                         textComp.text = string.Format(amountFormat, key.title, "0", "0");
                         cacheTextAmounts[key] = textComp;
                     }
@@ -38,25 +38,25 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            var owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (Data == null || Data.Count == 0)
             {
                 if (uiTextAllAmounts != null)
                     uiTextAllAmounts.gameObject.SetActive(false);
 
-                foreach (var textAmount in CacheTextAmounts)
+                foreach (KeyValuePair<Attribute, TextWrapper> textAmount in CacheTextAmounts)
                 {
-                    var element = textAmount.Key;
+                    Attribute element = textAmount.Key;
                     textAmount.Value.text = string.Format(amountFormat, element.title, "0", "0");
                 }
             }
             else
             {
-                var text = "";
-                foreach (var dataEntry in Data)
+                string text = "";
+                foreach (KeyValuePair<Attribute, short> dataEntry in Data)
                 {
-                    var attribute = dataEntry.Key;
-                    var targetAmount = dataEntry.Value;
+                    Attribute attribute = dataEntry.Key;
+                    short targetAmount = dataEntry.Value;
                     if (attribute == null || targetAmount == 0)
                         continue;
                     if (!string.IsNullOrEmpty(text))
@@ -64,8 +64,8 @@ namespace MultiplayerARPG
                     short currentAmount = 0;
                     if (owningCharacter != null)
                         owningCharacter.CacheAttributes.TryGetValue(attribute, out currentAmount);
-                    var format = currentAmount >= targetAmount ? amountFormat : amountNotReachTargetFormat;
-                    var amountText = string.Format(format, attribute.title, currentAmount.ToString("N0"), targetAmount.ToString("N0"));
+                    string format = currentAmount >= targetAmount ? amountFormat : amountNotReachTargetFormat;
+                    string amountText = string.Format(format, attribute.title, currentAmount.ToString("N0"), targetAmount.ToString("N0"));
                     text += amountText;
                     TextWrapper cacheTextAmount;
                     if (CacheTextAmounts.TryGetValue(attribute, out cacheTextAmount))

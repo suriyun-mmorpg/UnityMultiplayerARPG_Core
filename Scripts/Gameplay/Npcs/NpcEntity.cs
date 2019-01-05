@@ -85,7 +85,7 @@ namespace MultiplayerARPG
             // Setup relates elements
             if (GameInstance.npcMiniMapObjects != null && GameInstance.npcMiniMapObjects.Length > 0)
             {
-                foreach (var obj in GameInstance.npcMiniMapObjects)
+                foreach (GameObject obj in GameInstance.npcMiniMapObjects)
                 {
                     if (obj == null) continue;
                     Instantiate(obj, MiniMapElementContainer.position, MiniMapElementContainer.rotation, MiniMapElementContainer);
@@ -143,7 +143,7 @@ namespace MultiplayerARPG
             {
                 case NpcDialogType.Normal:
                 case NpcDialogType.SaveRespawnPoint:
-                    foreach (var menu in dialog.menus)
+                    foreach (NpcDialogMenu menu in dialog.menus)
                     {
                         if (menu.isCloseMenu) continue;
                         FindQuestFromDialog(menu.dialog, foundDialogs);
@@ -169,14 +169,14 @@ namespace MultiplayerARPG
         {
             if (playerCharacterEntity == null)
                 return false;
-            var clearedQuests = new List<int>();
-            foreach (var characterQuest in playerCharacterEntity.Quests)
+            List<int> clearedQuests = new List<int>();
+            foreach (CharacterQuest characterQuest in playerCharacterEntity.Quests)
             {
-                var quest = characterQuest.GetQuest();
+                Quest quest = characterQuest.GetQuest();
                 if (quest != null && characterQuest.isComplete)
                     clearedQuests.Add(quest.DataId);
             }
-            foreach (var questId in questIds)
+            foreach (int questId in questIds)
             {
                 if (!clearedQuests.Contains(questId))
                     return true;
@@ -188,14 +188,14 @@ namespace MultiplayerARPG
         {
             if (playerCharacterEntity == null)
                 return false;
-            var inProgressQuests = new List<int>();
-            foreach (var characterQuest in playerCharacterEntity.Quests)
+            List<int> inProgressQuests = new List<int>();
+            foreach (CharacterQuest characterQuest in playerCharacterEntity.Quests)
             {
-                var quest = characterQuest.GetQuest();
+                Quest quest = characterQuest.GetQuest();
                 if (quest != null && !characterQuest.isComplete)
                     inProgressQuests.Add(quest.DataId);
             }
-            foreach (var questId in questIds)
+            foreach (int questId in questIds)
             {
                 if (inProgressQuests.Contains(questId))
                     return true;

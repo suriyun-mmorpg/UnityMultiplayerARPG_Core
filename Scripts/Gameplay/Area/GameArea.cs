@@ -24,7 +24,7 @@ namespace MultiplayerARPG
 
         public Vector3 GetRandomPosition()
         {
-            var randomedPosition = transform.position;
+            Vector3 randomedPosition = transform.position;
 
             switch (dimensionType)
             {
@@ -43,7 +43,7 @@ namespace MultiplayerARPG
                     // Raycast to find hit floor
                     Vector3? aboveHitPoint = null;
                     Vector3? underHitPoint = null;
-                    var raycastLayerMask = GroundLayerMask;
+                    int raycastLayerMask = GroundLayerMask;
                     RaycastHit tempHit;
                     if (Physics.Raycast(randomedPosition, Vector3.up, out tempHit, GROUND_DETECTION_DISTANCE, raycastLayerMask))
                         aboveHitPoint = tempHit.point;
@@ -95,7 +95,7 @@ namespace MultiplayerARPG
                     Gizmos.DrawWireSphere(transform.position, randomRadius);
                     break;
                 case GameAreaType.Square:
-                    var height = (squareSizeX + squareSizeZ) / 2;
+                    float height = (squareSizeX + squareSizeZ) / 2;
                     Gizmos.DrawWireCube(transform.position, new Vector3(squareSizeX, height, squareSizeZ));
                     break;
             }

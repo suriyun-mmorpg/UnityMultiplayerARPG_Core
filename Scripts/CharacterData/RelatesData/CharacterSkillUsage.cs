@@ -60,7 +60,7 @@ public class CharacterSkillUsage : INetSerializable
         {
             case SkillUsageType.Skill:
                 coolDownRemainsDuration = GetSkill().GetCoolDownDuration(level);
-                var consumeMp = GetSkill().GetConsumeMp(level);
+                int consumeMp = GetSkill().GetConsumeMp(level);
                 if (character.CurrentMp >= consumeMp)
                     character.CurrentMp -= consumeMp;
                 break;
@@ -82,7 +82,7 @@ public class CharacterSkillUsage : INetSerializable
 
     public static CharacterSkillUsage Create(SkillUsageType type, int dataId)
     {
-        var newSkillUsage = new CharacterSkillUsage();
+        CharacterSkillUsage newSkillUsage = new CharacterSkillUsage();
         newSkillUsage.type = type;
         newSkillUsage.dataId = dataId;
         newSkillUsage.coolDownRemainsDuration = 0f;

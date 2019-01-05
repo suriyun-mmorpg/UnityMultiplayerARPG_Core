@@ -42,7 +42,7 @@ namespace MultiplayerARPG
         {
             if (languageKey != LanguageManager.CurrentLanguageKey)
             {
-                var text = "";
+                string text = "";
                 if (LanguageManager.Texts.TryGetValue(dataKey, out text))
                 {
                     UnityText.text = text;

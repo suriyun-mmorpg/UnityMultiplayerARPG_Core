@@ -95,7 +95,7 @@ namespace MultiplayerARPG
             }
             if (createGuildRequireItems == null || createGuildRequireItems.Length == 0)
                 return true;
-            foreach (var requireItem in createGuildRequireItems)
+            foreach (ItemAmount requireItem in createGuildRequireItems)
             {
                 if (requireItem.item != null && character.CountNonEquipItems(requireItem.item.DataId) < requireItem.amount)
                 {
@@ -110,7 +110,7 @@ namespace MultiplayerARPG
         {
             if (createGuildRequireItems != null)
             {
-                foreach (var requireItem in createGuildRequireItems)
+                foreach (ItemAmount requireItem in createGuildRequireItems)
                 {
                     if (requireItem.item != null && requireItem.amount > 0)
                         character.DecreaseItems(requireItem.item.DataId, requireItem.amount);
@@ -155,8 +155,8 @@ namespace MultiplayerARPG
             out int resultExp, 
             out short resultSkillPoint)
         {
-            var isLevelUp = false;
-            var nextLevelExp = GetNextLevelExp(expTree, level);
+            bool isLevelUp = false;
+            int nextLevelExp = GetNextLevelExp(expTree, level);
             while (nextLevelExp > 0 && exp >= nextLevelExp)
             {
                 exp = exp - nextLevelExp;
@@ -196,7 +196,7 @@ namespace MultiplayerARPG
             if (guildCalculateExp)
             {
                 guildCalculateExp = false;
-                var guildExpTree = new int[guildMaxLevel];
+                int[] guildExpTree = new int[guildMaxLevel];
                 for (short i = 1; i <= guildMaxLevel; ++i)
                 {
                     guildExpTree[i - 1] = guildExpCalculator.Calculate(i, guildMaxLevel);
