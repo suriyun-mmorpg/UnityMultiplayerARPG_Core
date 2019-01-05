@@ -1,5 +1,8 @@
 using System.Collections.Generic;
 using System.IO;
+#if UNITY_2018_3_OR_NEWER
+using UnityEditor.Experimental.SceneManagement;
+#endif
 using UnityEditor.SceneManagement;
 using UnityEngine.AI;
 using UnityEngine;
