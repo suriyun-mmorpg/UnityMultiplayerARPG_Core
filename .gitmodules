@@ -16,6 +16,3 @@
 [submodule "SerializationSurrogates"]
 	path = SerializationSurrogates
 	url = https://github.com/insthync/unity3d-serialization-surrogates
-[submodule "ENetTransport"]
-	path = ENetTransport
-	url = https://github.com/insthync/LiteNetLibManager_ENET
