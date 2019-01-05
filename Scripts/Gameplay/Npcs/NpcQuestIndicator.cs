@@ -44,7 +44,7 @@ namespace MultiplayerARPG
                     if (haveInProgressQuestIndicator != null)
                         haveInProgressQuestIndicator.SetActive(true);
                 }
-                if (npcEntity.HaveNewQuests(BasePlayerCharacterController.OwningCharacter))
+                else if (npcEntity.HaveNewQuests(BasePlayerCharacterController.OwningCharacter))
                 {
                     if (haveNewQuestIndicator != null)
                         haveNewQuestIndicator.SetActive(true);
