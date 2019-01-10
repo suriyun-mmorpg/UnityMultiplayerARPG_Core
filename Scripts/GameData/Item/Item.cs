@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -65,29 +64,47 @@ namespace MultiplayerARPG
         // Pet
         public BaseMonsterCharacterEntity petEntity;
 
+        public override string Title
+        {
+            get
+            {
+                if (itemRefineInfo == null)
+                    return base.Title;
+                return "<color=" + ColorUtility.ToHtmlStringRGBA(itemRefineInfo.titleColor) + ">" + base.Title + "</color>";
+            }
+        }
+
+        public string RarityTitle
+        {
+            get
+            {
+                if (itemRefineInfo == null)
+                    return "Normal";
+                return "<color=" + ColorUtility.ToHtmlStringRGBA(itemRefineInfo.titleColor) + ">" + itemRefineInfo.title + "</color>";
+            }
+        }
+
 #if UNITY_EDITOR
         protected virtual void OnValidate()
         {
+            bool hasChanges = false;
             // Equipment max stack always equals to 1
             switch (itemType)
             {
                 case ItemType.Armor:
                 case ItemType.Weapon:
                 case ItemType.Shield:
-                    maxStack = 1;
-                    break;
-                case ItemType.Junk:
-                case ItemType.Potion:
-                case ItemType.Ammo:
-                case ItemType.Building:
-                    itemRefineInfo = null;
-                    break;
                 case ItemType.Pet:
-                    maxStack = 1;
-                    itemRefineInfo = null;
+                    if (maxStack != 1)
+                    {
+                        maxStack = 1;
+                        hasChanges = true;
+                    }
                     break;
             }
-            EditorUtility.SetDirty(this);
+            // Mark asset to be dirty when chagnes occured
+            if (hasChanges)
+                EditorUtility.SetDirty(this);
         }
 #endif
 
