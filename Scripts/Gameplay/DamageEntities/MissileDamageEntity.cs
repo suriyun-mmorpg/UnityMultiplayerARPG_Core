@@ -100,16 +100,15 @@ namespace MultiplayerARPG
                 }
             }
 
-            switch (gameInstance.DimensionType)
+            if (gameInstance.DimensionType == DimensionType.Dimension2D)
             {
-                case DimensionType.Dimension3D:
-                    if (CacheRigidbody != null)
-                        CacheRigidbody.velocity = CacheTransform.forward * missileSpeed.Value;
-                    break;
-                case DimensionType.Dimension2D:
-                    if (CacheRigidbody2D != null)
-                        CacheRigidbody2D.velocity = -CacheTransform.up * missileSpeed.Value;
-                    break;
+                if (CacheRigidbody != null)
+                    CacheRigidbody.velocity = CacheTransform.forward * missileSpeed.Value;
+            }
+            else
+            {
+                if (CacheRigidbody2D != null)
+                    CacheRigidbody2D.velocity = -CacheTransform.up * missileSpeed.Value;
             }
         }
 
@@ -156,22 +155,21 @@ namespace MultiplayerARPG
 
                 if (explodeDistance > 0)
                 {
-                    switch (gameInstance.DimensionType)
+                    if (gameInstance.DimensionType == DimensionType.Dimension2D)
                     {
-                        case DimensionType.Dimension3D:
-                            Collider[] colliders = Physics.OverlapSphere(CacheTransform.position, explodeDistance);
-                            foreach (Collider collider in colliders)
-                            {
-                                FindAndApplyDamage(collider.gameObject);
-                            }
-                            break;
-                        case DimensionType.Dimension2D:
-                            Collider2D[] colliders2D = Physics2D.OverlapCircleAll(CacheTransform.position, explodeDistance);
-                            foreach (Collider2D collider in colliders2D)
-                            {
-                                FindAndApplyDamage(collider.gameObject);
-                            }
-                            break;
+                        Collider2D[] colliders2D = Physics2D.OverlapCircleAll(CacheTransform.position, explodeDistance);
+                        foreach (Collider2D collider in colliders2D)
+                        {
+                            FindAndApplyDamage(collider.gameObject);
+                        }
+                    }
+                    else
+                    {
+                        Collider[] colliders = Physics.OverlapSphere(CacheTransform.position, explodeDistance);
+                        foreach (Collider collider in colliders)
+                        {
+                            FindAndApplyDamage(collider.gameObject);
+                        }
                     }
                 }
             }

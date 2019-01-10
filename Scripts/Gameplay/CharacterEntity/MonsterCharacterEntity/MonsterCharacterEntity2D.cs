@@ -16,7 +16,6 @@ namespace MultiplayerARPG
         #endregion
 
         #region Temp data
-        protected Collider2D[] overlapColliders2D = new Collider2D[OVERLAP_COLLIDER_SIZE];
         protected Vector2 currentDirection = Vector2.down;
         protected Vector2 tempDirection;
         protected DirectionType localDirectionType = DirectionType.Down;
@@ -54,16 +53,6 @@ namespace MultiplayerARPG
             base.SetupNetElements();
             currentDirectionType.sendOptions = SendOptions.Sequenced;
             currentDirectionType.forOwnerOnly = false;
-        }
-
-        public override int OverlapObjects(Vector3 position, float distance, int layerMask)
-        {
-            return Physics2D.OverlapCircleNonAlloc(position, distance, overlapColliders2D, layerMask);
-        }
-
-        public override GameObject GetOverlapObject(int index)
-        {
-            return overlapColliders2D[index].gameObject;
         }
 
         public override bool IsPositionInFov(float fov, Vector3 position)

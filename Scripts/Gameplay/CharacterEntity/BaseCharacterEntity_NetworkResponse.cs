@@ -271,9 +271,14 @@ namespace MultiplayerARPG
             CharacterItem nonEquipItem = nonEquipItems[index];
             if (!nonEquipItem.IsValid() || amount > nonEquipItem.amount)
                 return;
-            
+
             if (this.DecreaseItemsByIndex(index, amount))
-                ItemDropEntity.DropItem(this, nonEquipItem, amount, new uint[] { ObjectId });
+            {
+                // Drop item to the ground
+                CharacterItem dropData = nonEquipItem.Clone();
+                dropData.amount = amount;
+                ItemDropEntity.DropItem(this, dropData, new uint[] { ObjectId });
+            }
         }
 
         /// <summary>
@@ -284,7 +289,6 @@ namespace MultiplayerARPG
         protected virtual void NetFuncEquipItem(ushort nonEquipIndex, string equipPosition)
         {
             if (!CanMoveOrDoActions() ||
-                nonEquipIndex < 0 ||
                 nonEquipIndex >= nonEquipItems.Count)
                 return;
 

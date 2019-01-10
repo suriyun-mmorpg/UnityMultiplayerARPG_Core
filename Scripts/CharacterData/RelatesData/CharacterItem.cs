@@ -201,6 +201,18 @@ public class CharacterItem : INetSerializable
         return expTree[level - 1];
     }
 
+    public CharacterItem Clone()
+    {
+        CharacterItem cloneItem = new CharacterItem();
+        cloneItem.dataId = dataId;
+        cloneItem.level = level;
+        cloneItem.amount = amount;
+        cloneItem.durability = durability;
+        cloneItem.exp = exp;
+        cloneItem.lockRemainsDuration = lockRemainsDuration;
+        return cloneItem;
+    }
+
     public static CharacterItem Create(Item item, short level = 1, short amount = 1)
     {
         return Create(item.DataId, level, amount);

@@ -110,7 +110,7 @@ namespace MultiplayerARPG
             itemDataId.onChange -= OnItemDataIdChange;
         }
 
-        public static ItemDropEntity DropItem(BaseGameEntity dropper, CharacterItem item, short amount, IEnumerable<uint> looters)
+        public static ItemDropEntity DropItem(BaseGameEntity dropper, CharacterItem dropData, IEnumerable<uint> looters)
         {
             GameInstance gameInstance = GameInstance.Singleton;
             if (gameInstance.itemDropEntityPrefab == null)
@@ -118,45 +118,41 @@ namespace MultiplayerARPG
 
             Vector3 dropPosition = dropper.CacheTransform.position;
             Quaternion dropRotation = Quaternion.identity;
-            switch (gameInstance.DimensionType)
+            if (gameInstance.DimensionType == DimensionType.Dimension2D)
             {
-                case DimensionType.Dimension3D:
-                    // Random drop position around character
-                    dropPosition = dropper.CacheTransform.position + new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, 0, Random.Range(-1f, 1f) * gameInstance.dropDistance);
-                    // Raycast to find hit floor
-                    Vector3? aboveHitPoint = null;
-                    Vector3? underHitPoint = null;
-                    int raycastLayerMask = gameInstance.GetItemDropGroundDetectionLayerMask();
-                    RaycastHit tempHit;
-                    if (Physics.Raycast(dropPosition, Vector3.up, out tempHit, GROUND_DETECTION_DISTANCE, raycastLayerMask))
-                        aboveHitPoint = tempHit.point;
-                    if (Physics.Raycast(dropPosition, Vector3.down, out tempHit, GROUND_DETECTION_DISTANCE, raycastLayerMask))
-                        underHitPoint = tempHit.point;
-                    // Set drop position to nearest hit point
-                    if (aboveHitPoint.HasValue && underHitPoint.HasValue)
-                    {
-                        if (Vector3.Distance(dropPosition, aboveHitPoint.Value) < Vector3.Distance(dropPosition, underHitPoint.Value))
-                            dropPosition = aboveHitPoint.Value;
-                        else
-                            dropPosition = underHitPoint.Value;
-                    }
-                    else if (aboveHitPoint.HasValue)
+                // If 2d, just random position around character
+                dropPosition = dropper.CacheTransform.position + new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, Random.Range(-1f, 1f) * gameInstance.dropDistance);
+            }
+            else
+            {
+                // Random drop position around character
+                dropPosition = dropper.CacheTransform.position + new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, 0, Random.Range(-1f, 1f) * gameInstance.dropDistance);
+                // Raycast to find hit floor
+                Vector3? aboveHitPoint = null;
+                Vector3? underHitPoint = null;
+                int raycastLayerMask = gameInstance.GetItemDropGroundDetectionLayerMask();
+                RaycastHit tempHit;
+                if (Physics.Raycast(dropPosition, Vector3.up, out tempHit, GROUND_DETECTION_DISTANCE, raycastLayerMask))
+                    aboveHitPoint = tempHit.point;
+                if (Physics.Raycast(dropPosition, Vector3.down, out tempHit, GROUND_DETECTION_DISTANCE, raycastLayerMask))
+                    underHitPoint = tempHit.point;
+                // Set drop position to nearest hit point
+                if (aboveHitPoint.HasValue && underHitPoint.HasValue)
+                {
+                    if (Vector3.Distance(dropPosition, aboveHitPoint.Value) < Vector3.Distance(dropPosition, underHitPoint.Value))
                         dropPosition = aboveHitPoint.Value;
-                    else if (underHitPoint.HasValue)
+                    else
                         dropPosition = underHitPoint.Value;
-                    // Random rotation
-                    dropRotation = Quaternion.Euler(Vector3.up * Random.Range(0, 360));
-                    break;
-                case DimensionType.Dimension2D:
-                    dropPosition = dropper.CacheTransform.position + new Vector3(Random.Range(-1f, 1f) * gameInstance.dropDistance, Random.Range(-1f, 1f) * gameInstance.dropDistance);
-                    break;
+                }
+                else if (aboveHitPoint.HasValue)
+                    dropPosition = aboveHitPoint.Value;
+                else if (underHitPoint.HasValue)
+                    dropPosition = underHitPoint.Value;
+                // Random rotation
+                dropRotation = Quaternion.Euler(Vector3.up * Random.Range(0, 360));
             }
             LiteNetLibIdentity identity = dropper.Manager.Assets.NetworkSpawn(gameInstance.itemDropEntityPrefab.Identity, dropPosition, dropRotation);
             ItemDropEntity itemDropEntity = identity.GetComponent<ItemDropEntity>();
-            CharacterItem dropData = CharacterItem.Create(item.dataId, item.level, amount);
-            dropData.durability = item.durability;
-            dropData.exp = item.exp;
-            dropData.lockRemainsDuration = item.lockRemainsDuration;
             itemDropEntity.dropData = dropData;
             itemDropEntity.looters = new HashSet<uint>(looters);
             return itemDropEntity;

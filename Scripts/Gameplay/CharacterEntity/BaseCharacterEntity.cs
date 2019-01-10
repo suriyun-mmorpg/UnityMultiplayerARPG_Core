@@ -50,6 +50,7 @@ namespace MultiplayerARPG
 
         #region Temp data
         protected Collider[] overlapColliders = new Collider[OVERLAP_COLLIDER_SIZE];
+        protected Collider2D[] overlapColliders2D = new Collider2D[OVERLAP_COLLIDER_SIZE];
         protected int overlapSize;
         protected int counter;
         protected GameObject tempGameObject;
@@ -905,13 +906,17 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        public virtual int OverlapObjects(Vector3 position, float distance, int layerMask)
+        public int OverlapObjects(Vector3 position, float distance, int layerMask)
         {
+            if (gameInstance.DimensionType == DimensionType.Dimension2D)
+                return Physics2D.OverlapCircleNonAlloc(position, distance, overlapColliders2D, layerMask);
             return Physics.OverlapSphereNonAlloc(position, distance, overlapColliders, layerMask);
         }
 
-        public virtual GameObject GetOverlapObject(int index)
+        public GameObject GetOverlapObject(int index)
         {
+            if (gameInstance.DimensionType == DimensionType.Dimension2D)
+                return overlapColliders2D[index].gameObject;
             return overlapColliders[index].gameObject;
         }
 
