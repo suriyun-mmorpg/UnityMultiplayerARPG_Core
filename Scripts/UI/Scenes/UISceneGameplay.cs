@@ -2,7 +2,9 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -31,16 +33,30 @@ namespace MultiplayerARPG
         public static UISceneGameplay Singleton { get; private set; }
 
         public UICharacter[] uiCharacters;
+        public UIEquipItems[] uiCharacterEquipItems;
+        public UINonEquipItems[] uiCharacterNonEquipItems;
+        public UICharacterSkills[] uiCharacterSkills;
+        public UICharacterSummons[] uiCharacterSummons;
+        public UICharacterHotkeys[] uiCharacterHotkeys;
+        public UICharacterQuests[] uiCharacterQuests;
+
+        [HideInInspector]
+        public UIEquipItems uiEquipItems;
+        [HideInInspector]
+        public UINonEquipItems uiNonEquipItems;
+        [HideInInspector]
+        public UICharacterSkills uiSkills;
+        [HideInInspector]
+        public UICharacterSummons uiSummons;
+        [HideInInspector]
+        public UICharacterHotkeys uiHotkeys;
+        [HideInInspector]
+        public UICharacterQuests uiQuests;
+
         public UICharacter uiTargetCharacter;
         public UIBaseGameEntity uiTargetNpc;
         public UIDamageableEntity uiTargetBuilding;
         public UIDamageableEntity uiTargetHarvestable;
-        public UIEquipItems uiEquipItems;
-        public UINonEquipItems uiNonEquipItems;
-        public UICharacterSkills uiSkills;
-        public UICharacterSummons uiSummons;
-        public UICharacterHotkeys uiHotkeys;
-        public UICharacterQuests uiQuests;
         public UINpcDialog uiNpcDialog;
         public UIRefineItem uiRefineItem;
         public UIConstructBuilding uiConstructBuilding;
@@ -68,10 +84,87 @@ namespace MultiplayerARPG
         [Header("Events")]
         public UnityEvent onCharacterDead;
         public UnityEvent onCharacterRespawn;
+        
+        public System.Action<BasePlayerCharacterEntity> onUpdateCharacter;
+        public System.Action<BasePlayerCharacterEntity> onUpdateEquipItems;
+        public System.Action<BasePlayerCharacterEntity> onUpdateNonEquipItems;
+        public System.Action<BasePlayerCharacterEntity> onUpdateSkills;
+        public System.Action<BasePlayerCharacterEntity> onUpdateSummons;
+        public System.Action<BasePlayerCharacterEntity> onUpdateHotkeys;
+        public System.Action<BasePlayerCharacterEntity> onUpdateQuests;
 
         private void Awake()
         {
             Singleton = this;
+            MigrateNewUIs();
+        }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (MigrateNewUIs())
+                EditorUtility.SetDirty(this);
+        }
+#endif
+
+        private bool MigrateNewUIs()
+        {
+            bool hasChanges = false;
+            if (uiEquipItems != null)
+            {
+                var list = uiCharacterEquipItems == null ? new List<UIEquipItems>() : new List<UIEquipItems>(uiCharacterEquipItems);
+                list.Add(uiEquipItems);
+                uiCharacterEquipItems = list.ToArray();
+                uiEquipItems = null;
+                hasChanges = true;
+            }
+
+            if (uiNonEquipItems != null)
+            {
+                var list = uiCharacterNonEquipItems == null ? new List<UINonEquipItems>() : new List<UINonEquipItems>(uiCharacterNonEquipItems);
+                list.Add(uiNonEquipItems);
+                uiCharacterNonEquipItems = list.ToArray();
+                uiNonEquipItems = null;
+                hasChanges = true;
+            }
+
+            if (uiSkills != null)
+            {
+                var list = uiCharacterSkills == null ? new List<UICharacterSkills>() : new List<UICharacterSkills>(uiCharacterSkills);
+                list.Add(uiSkills);
+                uiCharacterSkills = list.ToArray();
+                uiSkills = null;
+                hasChanges = true;
+            }
+
+            if (uiSummons != null)
+            {
+                var list = uiCharacterSummons == null ? new List<UICharacterSummons>() : new List<UICharacterSummons>(uiCharacterSummons);
+                list.Add(uiSummons);
+                uiCharacterSummons = list.ToArray();
+                uiSummons = null;
+                hasChanges = true;
+            }
+
+            if (uiHotkeys != null)
+            {
+                var list = uiCharacterHotkeys == null ? new List<UICharacterHotkeys>() : new List<UICharacterHotkeys>(uiCharacterHotkeys);
+                list.Add(uiHotkeys);
+                uiCharacterHotkeys = list.ToArray();
+                uiHotkeys = null;
+                hasChanges = true;
+            }
+
+            if (uiQuests != null)
+            {
+                var list = uiCharacterQuests == null ? new List<UICharacterQuests>() : new List<UICharacterQuests>(uiCharacterQuests);
+                list.Add(uiQuests);
+                uiCharacterQuests = list.ToArray();
+                uiQuests = null;
+                hasChanges = true;
+            }
+
+            return hasChanges;
         }
 
         private void Update()
@@ -100,42 +193,56 @@ namespace MultiplayerARPG
                 if (uiCharacter != null)
                     uiCharacter.Data = BasePlayerCharacterController.OwningCharacter;
             }
+            if (onUpdateCharacter != null)
+                onUpdateCharacter.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
 
         public void UpdateEquipItems()
         {
             if (uiEquipItems != null)
                 uiEquipItems.UpdateData(BasePlayerCharacterController.OwningCharacter);
+            if (onUpdateEquipItems != null)
+                onUpdateEquipItems.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
 
         public void UpdateNonEquipItems()
         {
             if (uiNonEquipItems != null)
                 uiNonEquipItems.UpdateData(BasePlayerCharacterController.OwningCharacter);
+            if (onUpdateNonEquipItems != null)
+                onUpdateNonEquipItems.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
 
         public void UpdateSkills()
         {
             if (uiSkills != null)
                 uiSkills.UpdateData(BasePlayerCharacterController.OwningCharacter);
+            if (onUpdateSkills != null)
+                onUpdateSkills.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
 
         public void UpdateSummons()
         {
             if (uiSummons != null)
                 uiSummons.UpdateData(BasePlayerCharacterController.OwningCharacter);
+            if (onUpdateSummons != null)
+                onUpdateSummons.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
 
         public void UpdateHotkeys()
         {
             if (uiHotkeys != null)
                 uiHotkeys.UpdateData(BasePlayerCharacterController.OwningCharacter);
+            if (onUpdateHotkeys != null)
+                onUpdateHotkeys.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
 
         public void UpdateQuests()
         {
             if (uiQuests != null)
                 uiQuests.UpdateData(BasePlayerCharacterController.OwningCharacter);
+            if (onUpdateQuests != null)
+                onUpdateQuests.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
 
         public void SetTargetEntity(BaseGameEntity entity)
