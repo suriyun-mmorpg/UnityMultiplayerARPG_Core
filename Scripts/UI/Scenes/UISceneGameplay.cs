@@ -32,6 +32,7 @@ namespace MultiplayerARPG
 
         public static UISceneGameplay Singleton { get; private set; }
 
+        [Header("Character Releates UIs")]
         public UICharacter[] uiCharacters;
         public UIEquipItems[] uiCharacterEquipItems;
         public UINonEquipItems[] uiCharacterNonEquipItems;
@@ -53,10 +54,13 @@ namespace MultiplayerARPG
         [HideInInspector]
         public UICharacterQuests uiQuests;
 
+        [Header("Selected Target UIs")]
         public UICharacter uiTargetCharacter;
         public UIBaseGameEntity uiTargetNpc;
         public UIDamageableEntity uiTargetBuilding;
         public UIDamageableEntity uiTargetHarvestable;
+
+        [Header("Other UIs")]
         public UINpcDialog uiNpcDialog;
         public UIRefineItem uiRefineItem;
         public UIConstructBuilding uiConstructBuilding;
@@ -67,6 +71,7 @@ namespace MultiplayerARPG
         public UIPartyInvitation uiPartyInvitation;
         public UIGuildInvitation uiGuildInvitation;
         public UIToggleUI[] toggleUis;
+        [Tooltip("These GameObject (s) will ignore click / touch detection when click or touch on screen")]
         public List<GameObject> ignorePointerDetectionUis;
 
         [Header("Combat Text")]
@@ -186,65 +191,116 @@ namespace MultiplayerARPG
             }
         }
 
+        /// <summary>
+        /// This will be called from `BasePlayerCharacterController` class 
+        /// To update character UIs when owning character data updated
+        /// </summary>
         public void UpdateCharacter()
         {
-            foreach (UICharacter uiCharacter in uiCharacters)
+            foreach (UICharacter ui in uiCharacters)
             {
-                if (uiCharacter != null)
-                    uiCharacter.Data = BasePlayerCharacterController.OwningCharacter;
+                if (ui != null)
+                    ui.Data = BasePlayerCharacterController.OwningCharacter;
             }
             if (onUpdateCharacter != null)
                 onUpdateCharacter.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
 
+        /// <summary>
+        /// This will be called from `BasePlayerCharacterController` class 
+        /// To update character equip items UIs when owning character equip items updated
+        /// </summary>
         public void UpdateEquipItems()
         {
-            if (uiEquipItems != null)
-                uiEquipItems.UpdateData(BasePlayerCharacterController.OwningCharacter);
+            foreach (UIEquipItems ui in uiCharacterEquipItems)
+            {
+                if (ui != null)
+                    ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
+            }
             if (onUpdateEquipItems != null)
                 onUpdateEquipItems.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
-
+        
+        /// <summary>
+        /// This will be called from `BasePlayerCharacterController` class 
+        /// To update character non equip items UIs when owning character non equip items updated
+        /// </summary>
         public void UpdateNonEquipItems()
         {
-            if (uiNonEquipItems != null)
-                uiNonEquipItems.UpdateData(BasePlayerCharacterController.OwningCharacter);
+            foreach (UINonEquipItems ui in uiCharacterNonEquipItems)
+            {
+                if (ui != null)
+                    ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
+            }
             if (onUpdateNonEquipItems != null)
                 onUpdateNonEquipItems.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
 
+        /// <summary>
+        /// This will be called from `BasePlayerCharacterController` class 
+        /// To update character skills UIs when owning character skills updated
+        /// </summary>
         public void UpdateSkills()
         {
-            if (uiSkills != null)
-                uiSkills.UpdateData(BasePlayerCharacterController.OwningCharacter);
+            foreach (UICharacterSkills ui in uiCharacterSkills)
+            {
+                if (ui != null)
+                    ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
+            }
             if (onUpdateSkills != null)
                 onUpdateSkills.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
 
+        /// <summary>
+        /// This will be called from `BasePlayerCharacterController` class 
+        /// To update character summons UIs when owning character summons updated
+        /// </summary>
         public void UpdateSummons()
         {
-            if (uiSummons != null)
-                uiSummons.UpdateData(BasePlayerCharacterController.OwningCharacter);
+            foreach (UICharacterSummons ui in uiCharacterSummons)
+            {
+                if (ui != null)
+                    ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
+            }
             if (onUpdateSummons != null)
                 onUpdateSummons.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
 
+        /// <summary>
+        /// This will be called from `BasePlayerCharacterController` class 
+        /// To update character hotkeys UIs when owning character hotkeys updated
+        /// </summary>
         public void UpdateHotkeys()
         {
-            if (uiHotkeys != null)
-                uiHotkeys.UpdateData(BasePlayerCharacterController.OwningCharacter);
+            foreach (UICharacterHotkeys ui in uiCharacterHotkeys)
+            {
+                if (ui != null)
+                    ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
+            }
             if (onUpdateHotkeys != null)
                 onUpdateHotkeys.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
 
+        /// <summary>
+        /// This will be called from `BasePlayerCharacterController` class 
+        /// To update character quests UIs when owning character quests updated
+        /// </summary>
         public void UpdateQuests()
         {
-            if (uiQuests != null)
-                uiQuests.UpdateData(BasePlayerCharacterController.OwningCharacter);
+            foreach (UICharacterQuests ui in uiCharacterQuests)
+            {
+                if (ui != null)
+                    ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
+            }
             if (onUpdateQuests != null)
                 onUpdateQuests.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
 
+        /// <summary>
+        /// This will be called from `BasePlayerCharacterController` class 
+        /// To set selected target entity UIs
+        /// </summary>
+        /// <param name="entity"></param>
         public void SetTargetEntity(BaseGameEntity entity)
         {
             if (entity == null)
