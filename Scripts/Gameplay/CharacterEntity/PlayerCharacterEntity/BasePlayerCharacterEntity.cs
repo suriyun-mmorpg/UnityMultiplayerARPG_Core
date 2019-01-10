@@ -25,7 +25,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (DealingState == DealingState.None && Time.unscaledTime - setCoCharacterTime >= GameInstance.coCharacterActionDuration)
+                if (DealingState == DealingState.None && Time.unscaledTime - setCoCharacterTime >= gameInstance.coCharacterActionDuration)
                     coCharacter = null;
                 return coCharacter;
             }
@@ -50,7 +50,7 @@ namespace MultiplayerARPG
         protected override void EntityAwake()
         {
             base.EntityAwake();
-            gameObject.tag = GameInstance.playerTag;
+            gameObject.tag = gameInstance.playerTag;
         }
 
 #if UNITY_EDITOR
@@ -80,7 +80,7 @@ namespace MultiplayerARPG
                 case SkillType.CraftItem:
                     GameMessage.Type gameMessageType;
                     if (!skill.itemCraft.CanCraft(this, out gameMessageType))
-                        GameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                        gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     else
                         skill.itemCraft.CraftItem(this);
                     break;
@@ -92,7 +92,7 @@ namespace MultiplayerARPG
             if (!IsServer || !IsDead())
                 return;
             base.Respawn();
-            GameManager.RespawnCharacter(this);
+            gameManager.RespawnCharacter(this);
         }
 
         public override bool CanReceiveDamageFrom(IAttackerEntity attacker)
@@ -112,7 +112,7 @@ namespace MultiplayerARPG
             if (characterEntity is BasePlayerCharacterEntity)
             {
                 // If not ally while this is Pvp map, assume that it can receive damage
-                if (!IsAlly(characterEntity) && GameManager.CurrentMapInfo.canPvp)
+                if (!IsAlly(characterEntity) && gameManager.CurrentMapInfo.canPvp)
                     return true;
             }
             if (characterEntity is BaseMonsterCharacterEntity)
@@ -152,7 +152,7 @@ namespace MultiplayerARPG
             if (characterEntity is BasePlayerCharacterEntity)
             {
                 // If not ally while this is Pvp map, assume that it is enemy while both characters are not in safe zone
-                if (!IsAlly(characterEntity) && GameManager.CurrentMapInfo.canPvp)
+                if (!IsAlly(characterEntity) && gameManager.CurrentMapInfo.canPvp)
                     return !isInSafeArea && !characterEntity.isInSafeArea;
             }
             if (characterEntity is BaseMonsterCharacterEntity)
@@ -166,9 +166,9 @@ namespace MultiplayerARPG
 
         public override void Killed(BaseCharacterEntity lastAttacker)
         {
-            float expLostPercentage = GameInstance.GameplayRule.GetExpLostPercentageWhenDeath(this);
+            float expLostPercentage = gameInstance.GameplayRule.GetExpLostPercentageWhenDeath(this);
             GuildData guildData;
-            if (GameManager.TryGetGuild(GuildId, out guildData))
+            if (gameManager.TryGetGuild(GuildId, out guildData))
                 expLostPercentage -= expLostPercentage * guildData.DecreaseExpLostPercentage;
             if (expLostPercentage <= 0f)
                 expLostPercentage = 0f;
@@ -191,11 +191,11 @@ namespace MultiplayerARPG
             switch (rewardGivenType)
             {
                 case RewardGivenType.KillMonster:
-                    if (GameManager.TryGetGuild(GuildId, out guildData))
+                    if (gameManager.TryGetGuild(GuildId, out guildData))
                         exp += (int)(exp * guildData.IncreaseExpGainPercentage / 100f);
                     break;
                 case RewardGivenType.PartyShare:
-                    if (GameManager.TryGetGuild(GuildId, out guildData))
+                    if (gameManager.TryGetGuild(GuildId, out guildData))
                         exp += (int)(exp * guildData.IncreaseShareExpGainPercentage / 100f);
                     break;
             }
@@ -210,11 +210,11 @@ namespace MultiplayerARPG
             switch (rewardGivenType)
             {
                 case RewardGivenType.KillMonster:
-                    if (GameManager.TryGetGuild(GuildId, out guildData))
+                    if (gameManager.TryGetGuild(GuildId, out guildData))
                         gold += (int)(gold * guildData.IncreaseGoldGainPercentage / 100f);
                     break;
                 case RewardGivenType.PartyShare:
-                    if (GameManager.TryGetGuild(GuildId, out guildData))
+                    if (gameManager.TryGetGuild(GuildId, out guildData))
                         gold += (int)(gold * guildData.IncreaseShareGoldGainPercentage / 100f);
                     break;
             }

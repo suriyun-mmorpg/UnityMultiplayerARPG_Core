@@ -234,12 +234,12 @@ namespace MultiplayerARPG
             if (!TryGetEntityByObjectId(objectId, out itemDropEntity))
                 return;
 
-            if (Vector3.Distance(CacheTransform.position, itemDropEntity.CacheTransform.position) > GameInstance.pickUpItemDistance + 5f)
+            if (Vector3.Distance(CacheTransform.position, itemDropEntity.CacheTransform.position) > gameInstance.pickUpItemDistance + 5f)
                 return;
 
             if (!itemDropEntity.IsAbleToLoot(this))
             {
-                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotAbleToLoot);
+                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotAbleToLoot);
                 return;
             }
 
@@ -373,8 +373,8 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncOnLevelUp()
         {
-            if (GameInstance.levelUpEffect != null && CharacterModel != null)
-                CharacterModel.InstantiateEffect(new GameEffect[] { GameInstance.levelUpEffect });
+            if (gameInstance.levelUpEffect != null && CharacterModel != null)
+                CharacterModel.InstantiateEffect(new GameEffect[] { gameInstance.levelUpEffect });
             if (onLevelUp != null)
                 onLevelUp.Invoke();
         }

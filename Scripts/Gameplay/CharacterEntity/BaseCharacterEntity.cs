@@ -73,7 +73,7 @@ namespace MultiplayerARPG
         #endregion
 
         public override int MaxHp { get { return CacheMaxHp; } }
-        public float MoveAnimationSpeedMultiplier { get { return GameplayRule.GetMoveSpeed(this) / CacheBaseMoveSpeed; } }
+        public float MoveAnimationSpeedMultiplier { get { return gameplayRule.GetMoveSpeed(this) / CacheBaseMoveSpeed; } }
 
         private BaseCharacterModel characterModel;
         public BaseCharacterModel CharacterModel
@@ -129,7 +129,7 @@ namespace MultiplayerARPG
         protected override void EntityAwake()
         {
             base.EntityAwake();
-            gameObject.layer = GameInstance.characterLayer;
+            gameObject.layer = gameInstance.characterLayer;
             animActionType = AnimActionType.None;
             isRecaching = true;
         }
@@ -336,7 +336,7 @@ namespace MultiplayerARPG
             attackerCharacter.NotifyEnemySpottedToAllies(this);
 
             // Calculate chance to hit
-            float hitChance = GameInstance.GameplayRule.GetHitChance(attackerCharacter, this);
+            float hitChance = gameInstance.GameplayRule.GetHitChance(attackerCharacter, this);
             // If miss, return don't calculate damages
             if (Random.value > hitChance)
             {
@@ -353,7 +353,7 @@ namespace MultiplayerARPG
                     DamageElement damageElement = allDamageAmount.Key;
                     MinMaxFloat damageAmount = allDamageAmount.Value;
                     // Set hit effect by damage element
-                    if (hitEffectsId == 0 && damageElement != GameInstance.DefaultDamageElement)
+                    if (hitEffectsId == 0 && damageElement != gameInstance.DefaultDamageElement)
                         hitEffectsId = damageElement.hitEffects.Id;
                     float receivingDamage = damageElement.GetDamageReducedByResistance(this, damageAmount.Random());
                     if (receivingDamage > 0f)
@@ -363,23 +363,23 @@ namespace MultiplayerARPG
 
             // Play hit effect
             if (hitEffectsId == 0)
-                hitEffectsId = GameInstance.DefaultHitEffects.Id;
+                hitEffectsId = gameInstance.DefaultHitEffects.Id;
             if (hitEffectsId > 0)
                 RequestPlayEffect(hitEffectsId);
 
             // Calculate chance to critical
-            float criticalChance = GameInstance.GameplayRule.GetCriticalChance(attackerCharacter, this);
+            float criticalChance = gameInstance.GameplayRule.GetCriticalChance(attackerCharacter, this);
             bool isCritical = Random.value <= criticalChance;
             // If critical occurs
             if (isCritical)
-                calculatingTotalDamage = GameInstance.GameplayRule.GetCriticalDamage(attackerCharacter, this, calculatingTotalDamage);
+                calculatingTotalDamage = gameInstance.GameplayRule.GetCriticalDamage(attackerCharacter, this, calculatingTotalDamage);
 
             // Calculate chance to block
-            float blockChance = GameInstance.GameplayRule.GetBlockChance(attackerCharacter, this);
+            float blockChance = gameInstance.GameplayRule.GetBlockChance(attackerCharacter, this);
             bool isBlocked = Random.value <= blockChance;
             // If block occurs
             if (isBlocked)
-                calculatingTotalDamage = GameInstance.GameplayRule.GetBlockDamage(attackerCharacter, this, calculatingTotalDamage);
+                calculatingTotalDamage = gameInstance.GameplayRule.GetBlockDamage(attackerCharacter, this, calculatingTotalDamage);
 
             // Apply damages
             int totalDamage = (int)calculatingTotalDamage;
@@ -772,7 +772,7 @@ namespace MultiplayerARPG
             }
             if (rightHandWeapon == null && leftHandWeapon == null)
             {
-                tempDamageInfo = GameInstance.DefaultWeaponItem.WeaponType.damageInfo;
+                tempDamageInfo = gameInstance.DefaultWeaponItem.WeaponType.damageInfo;
                 tempDistance = tempDamageInfo.GetDistance();
                 minDistance = tempDistance;
             }
@@ -804,7 +804,7 @@ namespace MultiplayerARPG
             }
             if (rightHandWeapon == null && leftHandWeapon == null)
             {
-                tempDamageInfo = GameInstance.DefaultWeaponItem.WeaponType.damageInfo;
+                tempDamageInfo = gameInstance.DefaultWeaponItem.WeaponType.damageInfo;
                 tempFov = tempDamageInfo.GetFov();
                 minFov = tempFov;
             }
@@ -853,7 +853,7 @@ namespace MultiplayerARPG
                     {
                         if (!TryGetTargetEntity(out tempDamageableEntity))
                         {
-                            overlapSize = OverlapObjects(damagePosition, damageInfo.hitDistance, GameInstance.GetDamageableLayerMask());
+                            overlapSize = OverlapObjects(damagePosition, damageInfo.hitDistance, gameInstance.GetDamageableLayerMask());
                             if (overlapSize == 0)
                                 return;
                             // Target entity not set, use overlapped object as target
@@ -871,7 +871,7 @@ namespace MultiplayerARPG
                     }
                     else
                     {
-                        overlapSize = OverlapObjects(damagePosition, damageInfo.hitDistance, GameInstance.GetDamageableLayerMask());
+                        overlapSize = OverlapObjects(damagePosition, damageInfo.hitDistance, gameInstance.GetDamageableLayerMask());
                         if (overlapSize == 0)
                             return;
                         for (counter = 0; counter < overlapSize; ++counter)
@@ -947,7 +947,7 @@ namespace MultiplayerARPG
         {
             base.ReceivedDamage(attacker, combatAmountType, damage);
             if (attacker is BaseCharacterEntity)
-                GameInstance.GameplayRule.OnCharacterReceivedDamage(attacker as BaseCharacterEntity, this, combatAmountType, damage);
+                gameInstance.GameplayRule.OnCharacterReceivedDamage(attacker as BaseCharacterEntity, this, combatAmountType, damage);
         }
 
         public virtual void Killed(BaseCharacterEntity lastAttacker)
@@ -1031,7 +1031,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            if (!GameInstance.GameplayRule.IncreaseExp(this, exp))
+            if (!gameInstance.GameplayRule.IncreaseExp(this, exp))
                 return;
             // Send OnLevelUp to owner player only
             RequestOnLevelUp();
@@ -1041,7 +1041,7 @@ namespace MultiplayerARPG
             where T : BaseCharacterEntity
         {
             List<T> result = new List<T>();
-            overlapSize = OverlapObjects(CacheTransform.position, distance, GameInstance.characterLayer.Mask);
+            overlapSize = OverlapObjects(CacheTransform.position, distance, gameInstance.characterLayer.Mask);
             if (overlapSize == 0)
                 return null;
             T tempEntity;
@@ -1065,7 +1065,7 @@ namespace MultiplayerARPG
         public T FindNearestCharacter<T>(float distance, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral)
             where T : BaseCharacterEntity
         {
-            overlapSize = OverlapObjects(CacheTransform.position, distance, GameInstance.characterLayer.Mask);
+            overlapSize = OverlapObjects(CacheTransform.position, distance, gameInstance.characterLayer.Mask);
             if (overlapSize == 0)
                 return null;
             float tempDistance;
@@ -1108,7 +1108,7 @@ namespace MultiplayerARPG
         private void NotifyEnemySpottedToAllies(BaseCharacterEntity enemy)
         {
             // Warn that this character received damage to nearby characters
-            List<BaseCharacterEntity> foundCharacters = FindAliveCharacters<BaseCharacterEntity>(GameInstance.enemySpottedNotifyDistance, true, false, false);
+            List<BaseCharacterEntity> foundCharacters = FindAliveCharacters<BaseCharacterEntity>(gameInstance.enemySpottedNotifyDistance, true, false, false);
             foreach (BaseCharacterEntity foundCharacter in foundCharacters)
             {
                 foundCharacter.NotifyEnemySpotted(this, enemy);
@@ -1117,7 +1117,7 @@ namespace MultiplayerARPG
 
         public virtual Vector3 GetSummonPosition()
         {
-            return CacheTransform.position + new Vector3(Random.Range(GameInstance.minSummonDistance, GameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive(), 0f, Random.Range(GameInstance.minSummonDistance, GameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive());
+            return CacheTransform.position + new Vector3(Random.Range(gameInstance.minSummonDistance, gameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive(), 0f, Random.Range(gameInstance.minSummonDistance, gameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive());
         }
 
         public virtual Quaternion GetSummonRotation()

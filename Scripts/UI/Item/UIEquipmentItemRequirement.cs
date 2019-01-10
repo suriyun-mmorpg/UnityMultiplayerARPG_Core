@@ -37,7 +37,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextRequireClass.gameObject.SetActive(true);
-                    uiTextRequireClass.text = string.Format(requireClassFormat, equipmentItem.requirement.character.title);
+                    uiTextRequireClass.text = string.Format(requireClassFormat, equipmentItem.requirement.character.Title);
                 }
             }
 

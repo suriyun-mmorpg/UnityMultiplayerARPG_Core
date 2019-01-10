@@ -8,7 +8,6 @@ namespace MultiplayerARPG
 {
     public sealed class HarvestableEntity : DamageableEntity
     {
-        public DimensionType dimensionType;
         public int maxHp = 100;
         public Harvestable harvestable;
         public float colliderDetectionRadius = 2f;
@@ -16,7 +15,7 @@ namespace MultiplayerARPG
         public float destroyRespawnDelay = 5f;
         public UnityEvent onHarvestableDestroy;
 
-        public override string Title { get { return harvestable.title; } set { } }
+        public override string Title { get { return harvestable.Title; } set { } }
         public override int MaxHp { get { return maxHp; } }
         public HarvestableSpawnArea spawnArea { get; private set; }
         public Vector3 spawnPosition { get; private set; }
@@ -24,8 +23,8 @@ namespace MultiplayerARPG
         protected override void EntityAwake()
         {
             base.EntityAwake();
-            gameObject.tag = GameInstance.harvestableTag;
-            gameObject.layer = GameInstance.harvestableLayer;
+            gameObject.tag = gameInstance.harvestableTag;
+            gameObject.layer = gameInstance.harvestableLayer;
         }
 
         protected override void EntityStart()
@@ -73,7 +72,7 @@ namespace MultiplayerARPG
             BaseCharacterEntity attackerCharacter = attacker as BaseCharacterEntity;
             // Play hit effect
             if (hitEffectsId == 0)
-                hitEffectsId = GameInstance.DefaultHitEffects.Id;
+                hitEffectsId = gameInstance.DefaultHitEffects.Id;
             if (hitEffectsId > 0)
                 RequestPlayEffect(hitEffectsId);
             // Apply damages
@@ -117,8 +116,8 @@ namespace MultiplayerARPG
             yield return new WaitForSecondsRealtime(destroyHideDelay + destroyRespawnDelay);
             InitStats();
             Manager.Assets.NetworkSpawn(Identity.HashAssetId, 
-                spawnPosition, 
-                dimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity, 
+                spawnPosition,
+                gameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity, 
                 Identity.ObjectId, 
                 Identity.ConnectionId);
         }
@@ -127,7 +126,7 @@ namespace MultiplayerARPG
         {
             base.ReceivedDamage(attacker, combatAmountType, damage);
             if (attacker is BaseCharacterEntity)
-                GameInstance.GameplayRule.OnHarvestableReceivedDamage(attacker as BaseCharacterEntity, this, combatAmountType, damage);
+                gameInstance.GameplayRule.OnHarvestableReceivedDamage(attacker as BaseCharacterEntity, this, combatAmountType, damage);
         }
 
         private void OnDrawGizmos()

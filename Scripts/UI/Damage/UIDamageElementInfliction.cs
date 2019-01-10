@@ -19,7 +19,7 @@ namespace MultiplayerARPG
                 DamageElement element = Data.damageElement;
                 float rate = Data.infliction;
                 string format = element == GameInstance.Singleton.DefaultDamageElement ? defaultElementInflictionFormat : inflictionFormat;
-                uiTextInfliction.text = string.Format(format, element.title, (rate * 100f).ToString("N0"));
+                uiTextInfliction.text = string.Format(format, element.Title, (rate * 100f).ToString("N0"));
             }
         }
     }

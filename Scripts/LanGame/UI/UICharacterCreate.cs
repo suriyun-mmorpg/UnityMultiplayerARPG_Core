@@ -64,7 +64,7 @@ namespace MultiplayerARPG
                 PlayerCharacterData characterData = new PlayerCharacterData();
                 characterData.DataId = characterEntity.DataId;
                 characterData.EntityId = characterEntity.EntityId;
-                characterData.SetNewPlayerCharacterData(character.title, characterEntity.DataId, characterEntity.EntityId);
+                characterData.SetNewPlayerCharacterData(character.Title, characterEntity.DataId, characterEntity.EntityId);
                 UICharacter uiCharacter = ui.GetComponent<UICharacter>();
                 uiCharacter.Data = characterData;
                 // Select trigger when add first entry so deactivate all models is okay beacause first model will active

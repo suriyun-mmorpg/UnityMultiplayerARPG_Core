@@ -132,10 +132,10 @@ namespace MultiplayerARPG
                 onSetNonLevelZeroData.Invoke();
 
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(titleFormat, Skill == null ? "Unknow" : Skill.title);
+                uiTextTitle.text = string.Format(titleFormat, Skill == null ? "Unknow" : Skill.Title);
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(descriptionFormat, Skill == null ? "N/A" : Skill.description);
+                uiTextDescription.text = string.Format(descriptionFormat, Skill == null ? "N/A" : Skill.Description);
 
             if (uiTextLevel != null)
                 uiTextLevel.text = string.Format(levelFormat, Level.ToString("N0"));
@@ -174,7 +174,7 @@ namespace MultiplayerARPG
                     {
                         if (!string.IsNullOrEmpty(str))
                             str += "/";
-                        str += availableWeapon.title;
+                        str += availableWeapon.Title;
                     }
                     uiTextAvailableWeapons.text = string.Format(availableWeaponsFormat, str);
                     uiTextAvailableWeapons.gameObject.SetActive(true);

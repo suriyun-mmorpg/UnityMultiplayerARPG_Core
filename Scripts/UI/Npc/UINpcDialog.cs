@@ -71,10 +71,10 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
 
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(titleFormat, Data == null ? "Unknow" : Data.title);
+                uiTextTitle.text = string.Format(titleFormat, Data == null ? "Unknow" : Data.Title);
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(descriptionFormat, Data == null ? "N/A" : Data.description);
+                uiTextDescription.text = string.Format(descriptionFormat, Data == null ? "N/A" : Data.Description);
 
             Quest quest = null;
             ItemCraft itemCraft = null;

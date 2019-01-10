@@ -67,8 +67,8 @@ namespace MultiplayerARPG
         protected override void EntityAwake()
         {
             base.EntityAwake();
-            gameObject.tag = GameInstance.npcTag;
-            gameObject.layer = GameInstance.characterLayer;
+            gameObject.tag = gameInstance.npcTag;
+            gameObject.layer = gameInstance.characterLayer;
         }
 
         protected override void SetupNetElements()
@@ -83,20 +83,20 @@ namespace MultiplayerARPG
             SetupQuestIds();
 
             // Setup relates elements
-            if (GameInstance.npcMiniMapObjects != null && GameInstance.npcMiniMapObjects.Length > 0)
+            if (gameInstance.npcMiniMapObjects != null && gameInstance.npcMiniMapObjects.Length > 0)
             {
-                foreach (GameObject obj in GameInstance.npcMiniMapObjects)
+                foreach (GameObject obj in gameInstance.npcMiniMapObjects)
                 {
                     if (obj == null) continue;
                     Instantiate(obj, MiniMapElementContainer.position, MiniMapElementContainer.rotation, MiniMapElementContainer);
                 }
             }
 
-            if (GameInstance.npcUI != null)
-                InstantiateUI(GameInstance.npcUI);
+            if (gameInstance.npcUI != null)
+                InstantiateUI(gameInstance.npcUI);
 
-            if (GameInstance.npcQuestIndicator != null)
-                InstantiateQuestIndicator(GameInstance.npcQuestIndicator);
+            if (gameInstance.npcQuestIndicator != null)
+                InstantiateQuestIndicator(gameInstance.npcQuestIndicator);
         }
 
         public void InstantiateUI(UINpcEntity prefab)

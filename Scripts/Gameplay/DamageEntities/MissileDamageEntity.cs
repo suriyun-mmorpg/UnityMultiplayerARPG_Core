@@ -8,7 +8,6 @@ namespace MultiplayerARPG
 {
     public class MissileDamageEntity : BaseDamageEntity
     {
-        public DimensionType dimensionType;
         public UnityEvent onDestroy;
         [Tooltip("If this value more than 0, when it hit anything or it is out of life, it will explode and apply damage to characters in this distance")]
         public float explodeDistance;
@@ -101,7 +100,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            switch (dimensionType)
+            switch (gameInstance.DimensionType)
             {
                 case DimensionType.Dimension3D:
                     if (CacheRigidbody != null)
@@ -157,7 +156,7 @@ namespace MultiplayerARPG
 
                 if (explodeDistance > 0)
                 {
-                    switch (dimensionType)
+                    switch (gameInstance.DimensionType)
                     {
                         case DimensionType.Dimension3D:
                             Collider[] colliders = Physics.OverlapSphere(CacheTransform.position, explodeDistance);

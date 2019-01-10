@@ -114,10 +114,10 @@ namespace MultiplayerARPG
             GameInstance.PlayerCharacters.TryGetValue(Data.socialCharacter.dataId, out character);
 
             if (uiTextClassTitle != null)
-                uiTextClassTitle.text = string.Format(classTitleFormat, character == null ? "N/A" : character.title);
+                uiTextClassTitle.text = string.Format(classTitleFormat, character == null ? "N/A" : character.Title);
 
             if (uiTextClassDescription != null)
-                uiTextClassDescription.text = string.Format(classDescriptionFormat, character == null ? "N/A" : character.description);
+                uiTextClassDescription.text = string.Format(classDescriptionFormat, character == null ? "N/A" : character.Description);
 
             if (imageClassIcon != null)
             {

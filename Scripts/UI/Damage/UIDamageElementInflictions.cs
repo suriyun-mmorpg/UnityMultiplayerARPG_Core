@@ -28,7 +28,7 @@ namespace MultiplayerARPG
                             continue;
                         DamageElement key = textAmount.damageElement;
                         TextWrapper textComp = textAmount.uiText;
-                        textComp.text = string.Format(inflictionFormat, key.title, "0");
+                        textComp.text = string.Format(inflictionFormat, key.Title, "0");
                         cacheTextInflictions[key] = textComp;
                     }
                 }
@@ -47,7 +47,7 @@ namespace MultiplayerARPG
                 {
                     DamageElement element = textAmount.Key;
                     string format = element == GameInstance.Singleton.DefaultDamageElement ? defaultElementInflictionFormat : inflictionFormat;
-                    textAmount.Value.text = string.Format(format, element.title, "0");
+                    textAmount.Value.text = string.Format(format, element.Title, "0");
                 }
             }
             else
@@ -63,7 +63,7 @@ namespace MultiplayerARPG
                     if (!string.IsNullOrEmpty(text))
                         text += "\n";
                     string format = element == GameInstance.Singleton.DefaultDamageElement ? defaultElementInflictionFormat : inflictionFormat;
-                    string amountText = string.Format(format, element.title, (rate * 100f).ToString("N0"));
+                    string amountText = string.Format(format, element.Title, (rate * 100f).ToString("N0"));
                     text += amountText;
                     TextWrapper textDamages;
                     if (CacheTextInflictions.TryGetValue(dataEntry.Key, out textDamages))

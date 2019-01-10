@@ -95,8 +95,8 @@ namespace MultiplayerARPG
         protected override void EntityAwake()
         {
             base.EntityAwake();
-            gameObject.tag = GameInstance.buildingTag;
-            gameObject.layer = GameInstance.buildingLayer;
+            gameObject.tag = gameInstance.buildingTag;
+            gameObject.layer = gameInstance.buildingLayer;
 
             BuildingMaterial[] materials = GetComponentsInChildren<BuildingMaterial>(true);
             if (materials != null && materials.Length > 0)

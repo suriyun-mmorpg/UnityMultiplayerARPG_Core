@@ -99,10 +99,10 @@ namespace MultiplayerARPG
             string titleFormat = isComplete ? questCompleteTitleFormat : (isAllTasksDone ? questTasksCompleteTitleFormat : questOnGoingTitleFormat);
 
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(titleFormat, Quest == null ? "Unknow" : Quest.title);
+                uiTextTitle.text = string.Format(titleFormat, Quest == null ? "Unknow" : Quest.Title);
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(descriptionFormat, Quest == null ? "N/A" : Quest.description);
+                uiTextDescription.text = string.Format(descriptionFormat, Quest == null ? "N/A" : Quest.Description);
 
             if (uiTextRewardExp != null)
                 uiTextRewardExp.text = string.Format(rewardExpFormat, Quest == null ? "0" : Quest.rewardExp.ToString("N0"));

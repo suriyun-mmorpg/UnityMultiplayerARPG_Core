@@ -174,14 +174,14 @@ namespace MultiplayerARPG
 
             if (uiTextTitle != null)
             {
-                string str = string.Format(titleFormat, Item == null ? "Unknow" : Item.title);
+                string str = string.Format(titleFormat, Item == null ? "Unknow" : Item.Title);
                 if (!dontAppendRefineLevelToTitle && EquipmentItem != null)
                     str += string.Format(titleRefineLevelFormat, (Level - 1).ToString("N0"));
                 uiTextTitle.text = str;
             }
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(descriptionFormat, Item == null ? "N/A" : Item.description);
+                uiTextDescription.text = string.Format(descriptionFormat, Item == null ? "N/A" : Item.Description);
 
             if (uiTextLevel != null)
             {
@@ -214,10 +214,10 @@ namespace MultiplayerARPG
                         uiTextItemType.text = string.Format(itemTypeFormat, junkItemType);
                         break;
                     case ItemType.Armor:
-                        uiTextItemType.text = string.Format(itemTypeFormat, ArmorItem.ArmorType.title);
+                        uiTextItemType.text = string.Format(itemTypeFormat, ArmorItem.ArmorType.Title);
                         break;
                     case ItemType.Weapon:
-                        uiTextItemType.text = string.Format(itemTypeFormat, WeaponItem.WeaponType.title);
+                        uiTextItemType.text = string.Format(itemTypeFormat, WeaponItem.WeaponType.Title);
                         break;
                     case ItemType.Shield:
                         uiTextItemType.text = string.Format(itemTypeFormat, shieldItemType);

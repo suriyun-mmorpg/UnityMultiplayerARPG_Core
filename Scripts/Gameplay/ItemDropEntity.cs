@@ -9,7 +9,6 @@ namespace MultiplayerARPG
     public sealed class ItemDropEntity : BaseGameEntity
     {
         public const float GROUND_DETECTION_DISTANCE = 100f;
-        public DimensionType dimensionType;
         public CharacterItem dropData;
         public HashSet<uint> looters;
         public Transform modelContainer;
@@ -34,7 +33,7 @@ namespace MultiplayerARPG
             get
             {
                 Item item = Item;
-                return item == null ? "Unknow" : item.title;
+                return item == null ? "Unknow" : item.Title;
             }
             set { }
         }
@@ -52,8 +51,8 @@ namespace MultiplayerARPG
         protected override void EntityAwake()
         {
             base.EntityAwake();
-            gameObject.tag = GameInstance.itemDropTag;
-            gameObject.layer = GameInstance.itemDropLayer;
+            gameObject.tag = gameInstance.itemDropTag;
+            gameObject.layer = gameInstance.itemDropLayer;
         }
 
         protected override void EntityStart()
@@ -66,7 +65,7 @@ namespace MultiplayerARPG
                 if (!GameInstance.Items.ContainsKey(id))
                     NetworkDestroy();
                 itemDataId.Value = id;
-                NetworkDestroy(GameInstance.itemAppearDuration);
+                NetworkDestroy(gameInstance.itemAppearDuration);
             }
         }
 
@@ -89,7 +88,7 @@ namespace MultiplayerARPG
             if (GameInstance.Items.TryGetValue(itemDataId, out item) && item.dropModel != null)
             {
                 GameObject model = Instantiate(item.dropModel, CacheModelContainer);
-                model.gameObject.SetLayerRecursively(GameInstance.itemDropLayer, true);
+                model.gameObject.SetLayerRecursively(gameInstance.itemDropLayer, true);
                 model.gameObject.SetActive(true);
                 model.RemoveComponentsInChildren<Collider>(false);
                 model.transform.localPosition = Vector3.zero;
@@ -100,7 +99,7 @@ namespace MultiplayerARPG
         {
             if (looters == null || 
                 looters.Contains(baseCharacterEntity.ObjectId) || 
-                Time.unscaledTime - dropTime > GameInstance.itemLootLockDuration)
+                Time.unscaledTime - dropTime > gameInstance.itemLootLockDuration)
                 return true;
             return false;
         }
@@ -119,7 +118,7 @@ namespace MultiplayerARPG
 
             Vector3 dropPosition = dropper.CacheTransform.position;
             Quaternion dropRotation = Quaternion.identity;
-            switch (gameInstance.itemDropEntityPrefab.dimensionType)
+            switch (gameInstance.DimensionType)
             {
                 case DimensionType.Dimension3D:
                     // Random drop position around character

@@ -94,7 +94,7 @@ namespace MultiplayerARPG
 
         public void EnterWarp(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            GameManager.WarpCharacter(playerCharacterEntity, mapScene, position);
+            gameManager.WarpCharacter(playerCharacterEntity, mapScene, position);
         }
     }
 }

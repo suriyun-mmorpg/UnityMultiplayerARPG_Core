@@ -28,7 +28,7 @@ namespace MultiplayerARPG
                             continue;
                         Skill key = textLevel.skill;
                         TextWrapper textComp = textLevel.uiText;
-                        textComp.text = string.Format(levelFormat, key.title, "0", "0");
+                        textComp.text = string.Format(levelFormat, key.Title, "0", "0");
                         cacheTextLevels[key] = textComp;
                     }
                 }
@@ -47,7 +47,7 @@ namespace MultiplayerARPG
                 foreach (KeyValuePair<Skill, TextWrapper> textLevel in CacheTextLevels)
                 {
                     Skill element = textLevel.Key;
-                    textLevel.Value.text = string.Format(levelFormat, element.title, "0", "0");
+                    textLevel.Value.text = string.Format(levelFormat, element.Title, "0", "0");
                 }
             }
             else
@@ -65,7 +65,7 @@ namespace MultiplayerARPG
                     if (owningCharacter != null)
                         owningCharacter.CacheSkills.TryGetValue(skill, out currentLevel);
                     string format = currentLevel >= targetLevel ? levelFormat : levelNotReachTargetFormat;
-                    string amountText = string.Format(format, skill.title, currentLevel.ToString("N0"), targetLevel.ToString("N0"));
+                    string amountText = string.Format(format, skill.Title, currentLevel.ToString("N0"), targetLevel.ToString("N0"));
                     text += amountText;
                     TextWrapper cacheTextAmount;
                     if (CacheTextLevels.TryGetValue(dataEntry.Key, out cacheTextAmount))

@@ -26,7 +26,7 @@ namespace MultiplayerARPG
                             continue;
                         DamageElement key = textAmount.damageElement;
                         TextWrapper textComp = textAmount.uiText;
-                        textComp.text = string.Format(amountFormat, key.title, "0", "0");
+                        textComp.text = string.Format(amountFormat, key.Title, "0", "0");
                         cacheTextAmounts[key] = textComp;
                     }
                 }
@@ -44,7 +44,7 @@ namespace MultiplayerARPG
                 foreach (KeyValuePair<DamageElement, TextWrapper> textAmount in CacheTextAmounts)
                 {
                     DamageElement element = textAmount.Key;
-                    textAmount.Value.text = string.Format(amountFormat, element.title, "0", "0");
+                    textAmount.Value.text = string.Format(amountFormat, element.Title, "0", "0");
                 }
             }
             else
@@ -56,7 +56,7 @@ namespace MultiplayerARPG
                         continue;
                     if (!string.IsNullOrEmpty(text))
                         text += "\n";
-                    string amountText = string.Format(amountFormat, dataEntry.Key.title, (dataEntry.Value * 100f).ToString("N0"));
+                    string amountText = string.Format(amountFormat, dataEntry.Key.Title, (dataEntry.Value * 100f).ToString("N0"));
                     text += amountText;
                     TextWrapper cacheTextAmount;
                     if (CacheTextAmounts.TryGetValue(dataEntry.Key, out cacheTextAmount))

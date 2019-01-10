@@ -17,6 +17,8 @@ namespace MultiplayerARPG
         private System.Action onGameDataLoaded;
         public static GameInstance Singleton { get; protected set; }
         [SerializeField]
+        private DimensionType dimensionType;
+        [SerializeField]
         private BaseGameplayRule gameplayRule;
         [SerializeField]
         private NetworkSetting networkSetting;
@@ -160,6 +162,11 @@ namespace MultiplayerARPG
         public static readonly Dictionary<string, MapInfo> MapInfos = new Dictionary<string, MapInfo>();
 
         #region Cache Data
+        public DimensionType DimensionType
+        {
+            get { return dimensionType; }
+        }
+
         public BaseGameplayRule GameplayRule
         {
             get

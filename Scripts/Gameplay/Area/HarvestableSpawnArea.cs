@@ -10,10 +10,8 @@ namespace MultiplayerARPG
         [Header("Spawning Data")]
         public HarvestableEntity harvestableEntity;
         public short amount = 1;
-
+        // Private data
         private int pending;
-
-        private GameInstance gameInstance { get { return GameInstance.Singleton; } }
 
         public void RegisterAssets()
         {

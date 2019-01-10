@@ -11,8 +11,6 @@ namespace MultiplayerARPG
         public BaseMonsterCharacterEntity monsterCharacterEntity;
         public short level = 1;
         public short amount = 1;
-        
-        private GameInstance gameInstance { get { return GameInstance.Singleton; } }
 
         public void RegisterAssets()
         {

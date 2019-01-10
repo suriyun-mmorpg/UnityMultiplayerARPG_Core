@@ -13,7 +13,6 @@ namespace MultiplayerARPG
     public class GameArea : MonoBehaviour
     {
         public const float GROUND_DETECTION_DISTANCE = 100f;
-        public DimensionType dimensionType;
         public Color gizmosColor = Color.magenta;
         public GameAreaType type;
         [Header("Radius Area")]
@@ -22,11 +21,13 @@ namespace MultiplayerARPG
         public float squareSizeX;
         public float squareSizeZ;
 
+        protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
+
         public Vector3 GetRandomPosition()
         {
             Vector3 randomedPosition = transform.position;
 
-            switch (dimensionType)
+            switch (GameInstance.Singleton.DimensionType)
             {
                 case DimensionType.Dimension3D:
                     switch (type)
@@ -81,7 +82,7 @@ namespace MultiplayerARPG
 
         public Quaternion GetRandomRotation()
         {
-            if (dimensionType == DimensionType.Dimension3D)
+            if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
                 return Quaternion.Euler(Vector3.up * Random.Range(0, 360));
             return Quaternion.identity;
         }

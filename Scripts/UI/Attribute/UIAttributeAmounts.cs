@@ -28,7 +28,7 @@ namespace MultiplayerARPG
                             continue;
                         Attribute key = textAmount.attribute;
                         TextWrapper textComp = textAmount.uiText;
-                        textComp.text = string.Format(amountFormat, key.title, "0", "0");
+                        textComp.text = string.Format(amountFormat, key.Title, "0", "0");
                         cacheTextAmounts[key] = textComp;
                     }
                 }
@@ -47,7 +47,7 @@ namespace MultiplayerARPG
                 foreach (KeyValuePair<Attribute, TextWrapper> textAmount in CacheTextAmounts)
                 {
                     Attribute element = textAmount.Key;
-                    textAmount.Value.text = string.Format(amountFormat, element.title, "0", "0");
+                    textAmount.Value.text = string.Format(amountFormat, element.Title, "0", "0");
                 }
             }
             else
@@ -65,7 +65,7 @@ namespace MultiplayerARPG
                     if (owningCharacter != null)
                         owningCharacter.CacheAttributes.TryGetValue(attribute, out currentAmount);
                     string format = currentAmount >= targetAmount ? amountFormat : amountNotReachTargetFormat;
-                    string amountText = string.Format(format, attribute.title, currentAmount.ToString("N0"), targetAmount.ToString("N0"));
+                    string amountText = string.Format(format, attribute.Title, currentAmount.ToString("N0"), targetAmount.ToString("N0"));
                     text += amountText;
                     TextWrapper cacheTextAmount;
                     if (CacheTextAmounts.TryGetValue(attribute, out cacheTextAmount))

@@ -51,17 +51,17 @@ namespace MultiplayerARPG
             }
         }
 
-        public GameInstance GameInstance
+        public GameInstance gameInstance
         {
             get { return GameInstance.Singleton; }
         }
 
-        public BaseGameplayRule GameplayRule
+        public BaseGameplayRule gameplayRule
         {
-            get { return GameInstance.GameplayRule; }
+            get { return gameInstance.GameplayRule; }
         }
 
-        public BaseGameNetworkManager GameManager
+        public BaseGameNetworkManager gameManager
         {
             get { return Manager as BaseGameNetworkManager; }
         }

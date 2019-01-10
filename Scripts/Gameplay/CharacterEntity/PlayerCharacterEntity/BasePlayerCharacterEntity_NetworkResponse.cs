@@ -102,7 +102,7 @@ namespace MultiplayerARPG
             if (IsDead())
                 return;
 
-            GameManager.AddGuildSkill(this, dataId);
+            gameManager.AddGuildSkill(this, dataId);
         }
 
         protected virtual void NetFuncUseGuildSkill(int dataId)
@@ -115,7 +115,7 @@ namespace MultiplayerARPG
                 return;
 
             GuildData guild;
-            if (GuildId <= 0 || !GameManager.TryGetGuild(GuildId, out guild))
+            if (GuildId <= 0 || !gameManager.TryGetGuild(GuildId, out guild))
                 return;
 
             short level = guild.GetSkillLevel(dataId);
@@ -159,7 +159,7 @@ namespace MultiplayerARPG
             if (!TryGetEntityByObjectId(objectId, out npcEntity))
                 return;
 
-            if (Vector3.Distance(CacheTransform.position, npcEntity.CacheTransform.position) > GameInstance.conversationDistance + 5f)
+            if (Vector3.Distance(CacheTransform.position, npcEntity.CacheTransform.position) > gameInstance.conversationDistance + 5f)
                 return;
 
             currentNpcDialog = npcEntity.StartDialog;
@@ -311,13 +311,13 @@ namespace MultiplayerARPG
             NpcSellItem sellItem = sellItems[itemIndex];
             if (Gold < sellItem.sellPrice * amount)
             {
-                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotEnoughGold);
+                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotEnoughGold);
                 return;
             }
             int dataId = sellItem.item.DataId;
             if (IncreasingItemsWillOverwhelming(dataId, amount))
             {
-                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
+                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
                 return;
             }
             Gold -= sellItem.sellPrice * amount;
@@ -419,7 +419,7 @@ namespace MultiplayerARPG
             buildingSaveData.Rotation = rotation;
             buildingSaveData.CreatorId = Id;
             buildingSaveData.CreatorName = CharacterName;
-            GameManager.CreateBuildingEntity(buildingSaveData, false);
+            gameManager.CreateBuildingEntity(buildingSaveData, false);
 
         }
 
@@ -433,7 +433,7 @@ namespace MultiplayerARPG
                 return;
             
             if (buildingEntity != null && buildingEntity.CreatorId.Equals(Id))
-                GameManager.DestroyBuildingEntity(buildingEntity.Id);
+                gameManager.DestroyBuildingEntity(buildingEntity.Id);
         }
 
         protected virtual void NetFuncSellItem(ushort index, short amount)
@@ -466,21 +466,21 @@ namespace MultiplayerARPG
                 return;
             if (nonEquipItem.level >= equipmentItem.MaxLevel)
             {
-                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.RefineItemReachedMaxLevel);
+                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.RefineItemReachedMaxLevel);
                 return;
             }
             ItemRefineLevel refineLevel = equipmentItem.itemRefineInfo.levels[nonEquipItem.level - 1];
             GameMessage.Type gameMessageType;
             if (!refineLevel.CanRefine(this, out gameMessageType))
             {
-                GameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
             }
             else
             {
                 if (refineLevel.RefineItem(this, index))
-                    GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.RefineSuccess);
+                    gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.RefineSuccess);
                 else
-                    GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.RefineFail);
+                    gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.RefineFail);
             }
         }
 
@@ -490,17 +490,17 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity targetCharacterEntity = null;
             if (!TryGetEntityByObjectId(objectId, out targetCharacterEntity))
             {
-                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotFoundCharacter);
+                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotFoundCharacter);
                 return;
             }
             if (targetCharacterEntity.CoCharacter != null)
             {
-                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsInAnotherDeal);
+                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsInAnotherDeal);
                 return;
             }
-            if (Vector3.Distance(CacheTransform.position, targetCharacterEntity.CacheTransform.position) > GameInstance.conversationDistance)
+            if (Vector3.Distance(CacheTransform.position, targetCharacterEntity.CacheTransform.position) > gameInstance.conversationDistance)
             {
-                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
+                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 return;
             }
             CoCharacter = targetCharacterEntity;
@@ -522,13 +522,13 @@ namespace MultiplayerARPG
         {
             if (CoCharacter == null)
             {
-                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotAcceptDealingRequest);
+                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotAcceptDealingRequest);
                 StopDealing();
                 return;
             }
-            if (Vector3.Distance(CacheTransform.position, CoCharacter.CacheTransform.position) > GameInstance.conversationDistance)
+            if (Vector3.Distance(CacheTransform.position, CoCharacter.CacheTransform.position) > gameInstance.conversationDistance)
             {
-                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
+                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 StopDealing();
                 return;
             }
@@ -545,8 +545,8 @@ namespace MultiplayerARPG
         protected virtual void NetFuncDeclineDealingRequest()
         {
             if (CoCharacter != null)
-                GameManager.SendServerGameMessage(CoCharacter.ConnectionId, GameMessage.Type.DealingRequestDeclined);
-            GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.DealingRequestDeclined);
+                gameManager.SendServerGameMessage(CoCharacter.ConnectionId, GameMessage.Type.DealingRequestDeclined);
+            gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.DealingRequestDeclined);
             StopDealing();
         }
 
@@ -563,7 +563,7 @@ namespace MultiplayerARPG
         {
             if (DealingState != DealingState.Dealing)
             {
-                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.InvalidDealingState);
+                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.InvalidDealingState);
                 return;
             }
 
@@ -595,7 +595,7 @@ namespace MultiplayerARPG
         {
             if (DealingState != DealingState.Dealing)
             {
-                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.InvalidDealingState);
+                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.InvalidDealingState);
                 return;
             }
             if (gold > Gold)
@@ -609,7 +609,7 @@ namespace MultiplayerARPG
         {
             if (DealingState != DealingState.Dealing)
             {
-                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.InvalidDealingState);
+                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.InvalidDealingState);
                 return;
             }
             DealingState = DealingState.LockDealing;
@@ -619,7 +619,7 @@ namespace MultiplayerARPG
         {
             if (DealingState != DealingState.LockDealing || !(CoCharacter.DealingState == DealingState.LockDealing || CoCharacter.DealingState == DealingState.ConfirmDealing))
             {
-                GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.InvalidDealingState);
+                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.InvalidDealingState);
                 return;
             }
             DealingState = DealingState.ConfirmDealing;
@@ -634,8 +634,8 @@ namespace MultiplayerARPG
         protected virtual void NetFuncCancelDealing()
         {
             if (CoCharacter != null)
-                GameManager.SendServerGameMessage(CoCharacter.ConnectionId, GameMessage.Type.DealingCanceled);
-            GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.DealingCanceled);
+                gameManager.SendServerGameMessage(CoCharacter.ConnectionId, GameMessage.Type.DealingCanceled);
+            gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.DealingCanceled);
             StopDealing();
         }
 
@@ -679,23 +679,23 @@ namespace MultiplayerARPG
         #region Party
         protected virtual void NetFuncCreateParty(bool shareExp, bool shareItem)
         {
-            GameManager.CreateParty(this, shareExp, shareItem);
+            gameManager.CreateParty(this, shareExp, shareItem);
         }
 
         protected virtual void NetFuncChangePartyLeader(string characterId)
         {
-            GameManager.ChangePartyLeader(this, characterId);
+            gameManager.ChangePartyLeader(this, characterId);
         }
 
         protected virtual void NetFuncPartySetting(bool shareExp, bool shareItem)
         {
-            GameManager.PartySetting(this, shareExp, shareItem);
+            gameManager.PartySetting(this, shareExp, shareItem);
         }
 
         protected virtual void NetFuncSendPartyInvitation(PackedUInt objectId)
         {
             BasePlayerCharacterEntity targetCharacterEntity = null;
-            if (!GameManager.CanSendPartyInvitation(this, objectId, out targetCharacterEntity))
+            if (!gameManager.CanSendPartyInvitation(this, objectId, out targetCharacterEntity))
                 return;
             CoCharacter = targetCharacterEntity;
             targetCharacterEntity.CoCharacter = this;
@@ -714,59 +714,59 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncAcceptPartyInvitation()
         {
-            GameManager.AddPartyMember(CoCharacter, this);
+            gameManager.AddPartyMember(CoCharacter, this);
             StopPartyInvitation();
         }
 
         protected virtual void NetFuncDeclinePartyInvitation()
         {
             if (CoCharacter != null)
-                GameManager.SendServerGameMessage(CoCharacter.ConnectionId, GameMessage.Type.PartyInvitationDeclined);
-            GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.PartyInvitationDeclined);
+                gameManager.SendServerGameMessage(CoCharacter.ConnectionId, GameMessage.Type.PartyInvitationDeclined);
+            gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.PartyInvitationDeclined);
             StopPartyInvitation();
         }
 
         protected virtual void NetFuncKickFromParty(string characterId)
         {
-            GameManager.KickFromParty(this, characterId);
+            gameManager.KickFromParty(this, characterId);
         }
 
         protected virtual void NetFuncLeaveParty()
         {
-            GameManager.LeaveParty(this);
+            gameManager.LeaveParty(this);
         }
         #endregion
 
         #region Guild
         protected virtual void NetFuncCreateGuild(string guildName)
         {
-            GameManager.CreateGuild(this, guildName);
+            gameManager.CreateGuild(this, guildName);
         }
 
         protected virtual void NetFuncChangeGuildLeader(string characterId)
         {
-            GameManager.ChangeGuildLeader(this, characterId);
+            gameManager.ChangeGuildLeader(this, characterId);
         }
 
         protected virtual void NetFuncSetGuildMessage(string guildMessage)
         {
-            GameManager.SetGuildMessage(this, guildMessage);
+            gameManager.SetGuildMessage(this, guildMessage);
         }
 
         protected virtual void NetFuncSetGuildRole(byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
         {
-            GameManager.SetGuildRole(this, guildRole, name, canInvite, canKick, shareExpPercentage);
+            gameManager.SetGuildRole(this, guildRole, name, canInvite, canKick, shareExpPercentage);
         }
 
         protected virtual void NetFuncSetGuildMemberRole(string characterId, byte guildRole)
         {
-            GameManager.SetGuildMemberRole(this, characterId, guildRole);
+            gameManager.SetGuildMemberRole(this, characterId, guildRole);
         }
 
         protected virtual void NetFuncSendGuildInvitation(PackedUInt objectId)
         {
             BasePlayerCharacterEntity targetCharacterEntity;
-            if (!GameManager.CanSendGuildInvitation(this, objectId, out targetCharacterEntity))
+            if (!gameManager.CanSendGuildInvitation(this, objectId, out targetCharacterEntity))
                 return;
             CoCharacter = targetCharacterEntity;
             targetCharacterEntity.CoCharacter = this;
@@ -785,26 +785,26 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncAcceptGuildInvitation()
         {
-            GameManager.AddGuildMember(CoCharacter, this);
+            gameManager.AddGuildMember(CoCharacter, this);
             StopGuildInvitation();
         }
 
         protected virtual void NetFuncDeclineGuildInvitation()
         {
             if (CoCharacter != null)
-                GameManager.SendServerGameMessage(CoCharacter.ConnectionId, GameMessage.Type.GuildInvitationDeclined);
-            GameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.GuildInvitationDeclined);
+                gameManager.SendServerGameMessage(CoCharacter.ConnectionId, GameMessage.Type.GuildInvitationDeclined);
+            gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.GuildInvitationDeclined);
             StopGuildInvitation();
         }
 
         protected virtual void NetFuncKickFromGuild(string characterId)
         {
-            GameManager.KickFromGuild(this, characterId);
+            gameManager.KickFromGuild(this, characterId);
         }
 
         protected virtual void NetFuncLeaveGuild()
         {
-            GameManager.LeaveGuild(this);
+            gameManager.LeaveGuild(this);
         }
         #endregion
 
