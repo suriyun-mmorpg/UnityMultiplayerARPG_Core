@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -10,8 +8,7 @@ namespace MultiplayerARPG
         [TextArea]
         public string description;
         public Sprite icon;
-
-
+        
         public virtual string Id { get { return name; } }
         public virtual string Title { get { return title; } }
         public virtual string Description { get { return description; } }
