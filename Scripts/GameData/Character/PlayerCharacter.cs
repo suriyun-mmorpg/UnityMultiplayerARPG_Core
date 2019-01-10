@@ -32,6 +32,7 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR
         void OnValidate()
         {
+            bool hasChanges = false;
             Item tempRightHandWeapon = null;
             Item tempLeftHandWeapon = null;
             Item tempLeftHandShield = null;
@@ -44,6 +45,7 @@ namespace MultiplayerARPG
                 {
                     Debug.LogWarning("Right hand equipment is not weapon");
                     rightHandEquipItem = null;
+                    hasChanges = true;
                 }
             }
             if (leftHandEquipItem != null)
@@ -57,6 +59,7 @@ namespace MultiplayerARPG
                 {
                     Debug.LogWarning("Left hand equipment is not weapon or shield");
                     leftHandEquipItem = null;
+                    hasChanges = true;
                 }
                 else if (tempRightHandWeapon != null)
                 {
@@ -64,11 +67,13 @@ namespace MultiplayerARPG
                     {
                         Debug.LogWarning("Cannot set left hand equipment because it's equipping two hand weapon");
                         leftHandEquipItem = null;
+                        hasChanges = true;
                     }
                     else if (tempLeftHandWeapon != null && tempRightHandWeapon.EquipType != WeaponItemEquipType.OneHandCanDual)
                     {
                         Debug.LogWarning("Cannot set left hand equipment because it's equipping one hand weapon which cannot equip dual");
                         leftHandEquipItem = null;
+                        hasChanges = true;
                     }
                 }
                 if (leftHandEquipItem != null)
@@ -78,6 +83,7 @@ namespace MultiplayerARPG
                     {
                         Debug.LogWarning("Left hand weapon cannot be OneHand or TwoHand");
                         leftHandEquipItem = null;
+                        hasChanges = true;
                     }
                 }
             }
@@ -90,16 +96,24 @@ namespace MultiplayerARPG
 
                 if (armorItem.itemType != ItemType.Armor)
                 {
+                    // Item is not armor, so set it to NULL
                     armorItems[i] = null;
+                    hasChanges = true;
                     continue;
                 }
 
                 if (equipedPositions.Contains(armorItem.EquipPosition))
+                {
+                    // Already equip armor at the position, it cannot equip same position again, So set it to NULL
                     armorItems[i] = null;
+                    hasChanges = true;
+                }
                 else
                     equipedPositions.Add(armorItem.EquipPosition);
             }
-            EditorUtility.SetDirty(this);
+            // Mark asset to be dirty when chagnes occured
+            if (hasChanges)
+                EditorUtility.SetDirty(this);
         }
 #endif
     }
