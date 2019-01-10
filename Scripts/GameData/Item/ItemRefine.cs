@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -7,6 +6,7 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Item Refine Info", menuName = "Create GameData/Item Refine Info")]
     public partial class ItemRefine : BaseGameData
     {
+        public Color titleColor = Color.white;
         public ItemRefineLevel[] levels;
     }
 
