@@ -17,7 +17,7 @@ namespace MultiplayerARPG
         public short Level { get { return (short)(CharacterItem != null ? CharacterItem.level : 1); } }
         public Item EquipmentItem { get { return CharacterItem != null ? CharacterItem.GetEquipmentItem() : null; } }
         public bool CanRefine { get { return EquipmentItem != null && Level < EquipmentItem.MaxLevel; } }
-        public ItemRefineLevel RefineLevel { get { return !CanRefine ? null : EquipmentItem.itemRefineInfo.levels[Level - 1]; } }
+        public ItemRefineLevel RefineLevel { get { return EquipmentItem.itemRefineInfo.levels[Level - 1]; } }
 
         [Header("Generic Info Format")]
         [Tooltip("Require Gold Format => {0} = {Amount}")]

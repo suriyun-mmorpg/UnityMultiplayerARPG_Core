@@ -11,11 +11,11 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public class ItemRefineLevel
+    public struct ItemRefineLevel
     {
         [Range(0.01f, 1f)]
         [SerializeField]
-        private float successRate = 1;
+        private float successRate;
         [SerializeField]
         private ItemAmount[] requireItems;
         [SerializeField]
