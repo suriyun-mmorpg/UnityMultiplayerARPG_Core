@@ -10,6 +10,9 @@ namespace MultiplayerARPG
 
         public FollowCameraControls minimapCameraPrefab;
 
+        public System.Action<BasePlayerCharacterController> onSetup;
+        public System.Action<BasePlayerCharacterController> onDesetup;
+
         private BasePlayerCharacterEntity playerCharacterEntity;
         public BasePlayerCharacterEntity PlayerCharacterEntity
         {
@@ -95,6 +98,9 @@ namespace MultiplayerARPG
             characterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
             characterEntity.onHotkeysOperation += OnHotkeysOperation;
             characterEntity.onQuestsOperation += OnQuestsOperation;
+
+            if (onSetup != null)
+                onSetup.Invoke(this);
         }
 
         protected virtual void Desetup(BasePlayerCharacterEntity characterEntity)
@@ -133,6 +139,9 @@ namespace MultiplayerARPG
                 characterEntity.onShowPartyInvitationDialog -= CacheUISceneGameplay.OnShowPartyInvitation;
                 characterEntity.onShowGuildInvitationDialog -= CacheUISceneGameplay.OnShowGuildInvitation;
             }
+
+            if (onDesetup != null)
+                onDesetup.Invoke(this);
         }
 
         protected virtual void OnDestroy()
