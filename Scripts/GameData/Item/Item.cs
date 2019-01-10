@@ -167,7 +167,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (armorType == null)
+                if (armorType == null && gameInstance != null)
                     armorType = gameInstance.DefaultArmorType;
                 return armorType;
             }
@@ -175,14 +175,14 @@ namespace MultiplayerARPG
 
         public string EquipPosition
         {
-            get { return ArmorType.Id; }
+            get { return ArmorType == null ? string.Empty : ArmorType.Id; }
         }
 
         public WeaponType WeaponType
         {
             get
             {
-                if (weaponType == null)
+                if (weaponType == null && gameInstance != null)
                     weaponType = gameInstance.DefaultWeaponType;
                 return weaponType;
             }
@@ -190,7 +190,7 @@ namespace MultiplayerARPG
 
         public WeaponItemEquipType EquipType
         {
-            get { return WeaponType.equipType; }
+            get { return WeaponType == null ? WeaponItemEquipType.OneHand : WeaponType.equipType; }
         }
         #endregion
     }
