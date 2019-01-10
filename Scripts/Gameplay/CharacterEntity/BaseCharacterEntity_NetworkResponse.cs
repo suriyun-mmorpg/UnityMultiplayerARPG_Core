@@ -271,11 +271,9 @@ namespace MultiplayerARPG
             CharacterItem nonEquipItem = nonEquipItems[index];
             if (!nonEquipItem.IsValid() || amount > nonEquipItem.amount)
                 return;
-
-            int itemDataId = nonEquipItem.dataId;
-            short level = nonEquipItem.level;
+            
             if (this.DecreaseItemsByIndex(index, amount))
-                ItemDropEntity.DropItem(this, itemDataId, level, amount, new uint[] { ObjectId });
+                ItemDropEntity.DropItem(this, nonEquipItem, amount, new uint[] { ObjectId });
         }
 
         /// <summary>

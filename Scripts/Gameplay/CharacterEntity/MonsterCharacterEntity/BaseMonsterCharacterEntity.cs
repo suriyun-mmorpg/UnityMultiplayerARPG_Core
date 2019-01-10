@@ -446,10 +446,9 @@ namespace MultiplayerARPG
                     short amount = randomItem.amount;
                     if (item != null && GameInstance.Items.ContainsKey(item.DataId))
                     {
-                        int itemDataId = item.DataId;
                         if (amount > item.maxStack)
                             amount = item.maxStack;
-                        ItemDropEntity.DropItem(this, itemDataId, 1, amount, looters);
+                        ItemDropEntity.DropItem(this, CharacterItem.Create(item, 1), amount, looters);
                     }
                 }
             }

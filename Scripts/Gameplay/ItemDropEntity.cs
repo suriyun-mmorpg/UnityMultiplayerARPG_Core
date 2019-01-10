@@ -111,7 +111,7 @@ namespace MultiplayerARPG
             itemDataId.onChange -= OnItemDataIdChange;
         }
 
-        public static ItemDropEntity DropItem(BaseGameEntity dropper, int itemDataId, short level, short amount, IEnumerable<uint> looters)
+        public static ItemDropEntity DropItem(BaseGameEntity dropper, CharacterItem item, short amount, IEnumerable<uint> looters)
         {
             GameInstance gameInstance = GameInstance.Singleton;
             if (gameInstance.itemDropEntityPrefab == null)
@@ -154,7 +154,10 @@ namespace MultiplayerARPG
             }
             LiteNetLibIdentity identity = dropper.Manager.Assets.NetworkSpawn(gameInstance.itemDropEntityPrefab.Identity, dropPosition, dropRotation);
             ItemDropEntity itemDropEntity = identity.GetComponent<ItemDropEntity>();
-            CharacterItem dropData = CharacterItem.Create(itemDataId, level, amount);
+            CharacterItem dropData = CharacterItem.Create(item.dataId, item.level, amount);
+            dropData.durability = item.durability;
+            dropData.exp = item.exp;
+            dropData.lockRemainsDuration = item.lockRemainsDuration;
             itemDropEntity.dropData = dropData;
             itemDropEntity.looters = new HashSet<uint>(looters);
             return itemDropEntity;
