@@ -65,7 +65,7 @@ namespace MultiplayerARPG
             {
                 Debug.LogError("[BasePlayerCharacterEntity] " + name + " Database must be `PlayerCharacter`");
                 database = null;
-                EditorUtility.SetDirty(gameObject);
+                EditorUtility.SetDirty(this);
             }
         }
 #endif

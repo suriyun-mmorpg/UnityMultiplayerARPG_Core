@@ -139,7 +139,7 @@ namespace MultiplayerARPG
             base.OnBehaviourValidate();
 #if UNITY_EDITOR
             SetupNetElements();
-            EditorUtility.SetDirty(gameObject);
+            EditorUtility.SetDirty(this);
 #endif
         }
 

@@ -153,7 +153,7 @@ namespace MultiplayerARPG
             if (!Application.isPlaying && dataId != name.GenerateHashId())
             {
                 dataId = name.GenerateHashId();
-                EditorUtility.SetDirty(gameObject);
+                EditorUtility.SetDirty(this);
             }
         }
 #endif
