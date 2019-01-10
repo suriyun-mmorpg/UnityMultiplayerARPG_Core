@@ -22,6 +22,8 @@ namespace MultiplayerARPG
         public string titleFormat = "{0}";
         [Tooltip("Description Format => {0} = {Description}")]
         public string descriptionFormat = "{0}";
+        [Tooltip("Rarity Title Format => {0} = {Rarity Title}")]
+        public string rarityTitleFormat = "{0}";
         [Tooltip("Level Format => {0} = {Level}")]
         public string levelFormat = "Lv: {0}";
         [Tooltip("Refine Level Format => {0} = {Refine Level}")]
@@ -66,6 +68,7 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public TextWrapper uiTextTitle;
         public TextWrapper uiTextDescription;
+        public TextWrapper uiTextRarity;
         public TextWrapper uiTextLevel;
         public Image imageIcon;
         public TextWrapper uiTextItemType;
@@ -182,6 +185,9 @@ namespace MultiplayerARPG
 
             if (uiTextDescription != null)
                 uiTextDescription.text = string.Format(descriptionFormat, Item == null ? "N/A" : Item.Description);
+
+            if (uiTextRarity != null)
+                uiTextRarity.text = string.Format(rarityTitleFormat, Item == null ? "N/A" : Item.RarityTitle);
 
             if (uiTextLevel != null)
             {
