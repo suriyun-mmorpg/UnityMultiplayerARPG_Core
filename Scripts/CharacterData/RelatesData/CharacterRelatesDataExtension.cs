@@ -27,6 +27,11 @@ public static class CharacterRelatesDataExtension
         return data == null || data.Equals(CharacterItem.Empty);
     }
 
+    public static bool IsValid(this CharacterItem data)
+    {
+        return !data.IsEmpty() && data.GetItem() != null && data.amount > 0;
+    }
+
     public static bool IsEmpty(this CharacterQuest data)
     {
         return data == null || data.Equals(CharacterQuest.Empty);

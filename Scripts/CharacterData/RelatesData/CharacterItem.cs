@@ -145,11 +145,6 @@ public class CharacterItem : INetSerializable
         return GetItem() == null ? 0f : GetItem().maxDurability;
     }
 
-    public bool IsValid()
-    {
-        return !this.IsEmpty() && GetItem() != null && amount > 0;
-    }
-
     public bool IsFull()
     {
         return amount == GetMaxStack();
