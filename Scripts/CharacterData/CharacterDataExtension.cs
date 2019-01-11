@@ -906,7 +906,7 @@ public static partial class CharacterDataExtension
         // Armor equipment set
         foreach (CharacterItem equipItem in data.EquipItems)
         {
-            if (!equipItem.IsEmpty() && equipItem.GetItem().equipmentSet != null)
+            if (equipItem.IsValid() && equipItem.GetItem().equipmentSet != null)
             {
                 if (cacheEquipmentSets.ContainsKey(equipItem.GetItem().equipmentSet))
                     ++cacheEquipmentSets[equipItem.GetItem().equipmentSet];
@@ -917,7 +917,7 @@ public static partial class CharacterDataExtension
         if (data.EquipWeapons != null)
         {
             // Right hand equipment set
-            if (!data.EquipWeapons.rightHand.IsEmpty() && data.EquipWeapons.rightHand.GetItem().equipmentSet != null)
+            if (data.EquipWeapons.rightHand.IsValid() && data.EquipWeapons.rightHand.GetItem().equipmentSet != null)
             {
                 if (cacheEquipmentSets.ContainsKey(data.EquipWeapons.rightHand.GetItem().equipmentSet))
                     ++cacheEquipmentSets[data.EquipWeapons.rightHand.GetItem().equipmentSet];
@@ -925,7 +925,7 @@ public static partial class CharacterDataExtension
                     cacheEquipmentSets.Add(data.EquipWeapons.rightHand.GetItem().equipmentSet, 0);
             }
             // Left hand equipment set
-            if (!data.EquipWeapons.leftHand.IsEmpty() && data.EquipWeapons.leftHand.GetItem().equipmentSet != null)
+            if (data.EquipWeapons.leftHand.IsValid() && data.EquipWeapons.leftHand.GetItem().equipmentSet != null)
             {
                 if (cacheEquipmentSets.ContainsKey(data.EquipWeapons.leftHand.GetItem().equipmentSet))
                     ++cacheEquipmentSets[data.EquipWeapons.leftHand.GetItem().equipmentSet];
