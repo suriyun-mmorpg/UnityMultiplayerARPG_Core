@@ -14,23 +14,21 @@ namespace MultiplayerARPG
                 character == null)
                 return false;
 
-            bool isPass = true;
+            // Check is it pass attribute requirement or not
             Dictionary<Attribute, short> attributeAmountsDict = character.GetAttributes(true, false);
             Dictionary<Attribute, short> requireAttributeAmounts = equipmentItem.CacheRequireAttributeAmounts;
             foreach (KeyValuePair<Attribute, short> requireAttributeAmount in requireAttributeAmounts)
             {
                 if (!attributeAmountsDict.ContainsKey(requireAttributeAmount.Key) ||
                     attributeAmountsDict[requireAttributeAmount.Key] < requireAttributeAmount.Value)
-                {
-                    isPass = false;
-                    break;
-                }
+                    return false;
             }
 
+            // Check another requirements
             if (equipmentItem.requirement.character != null && equipmentItem.requirement.character != character.GetDatabase())
-                isPass = false;
+                return false;
 
-            return character.Level >= equipmentItem.requirement.level && isPass;
+            return character.Level >= equipmentItem.requirement.level;
         }
 
         public static bool CanAttack(this Item weaponItem, ICharacterData character)
