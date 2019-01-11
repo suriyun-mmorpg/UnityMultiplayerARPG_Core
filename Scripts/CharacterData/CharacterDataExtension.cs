@@ -190,6 +190,12 @@ public static partial class CharacterDataExtension
             result = GameDataHelpers.CombineAttributeAmountsDictionary(result, data.GetEquipmentAttributes());
         if (sumWithBuffs)
             result = GameDataHelpers.CombineAttributeAmountsDictionary(result, data.GetBuffAttributes());
+        // Validate max amount
+        foreach (Attribute attribute in new List<Attribute>(result.Keys))
+        {
+            if (attribute.maxAmount > 0 && result[attribute] > attribute.maxAmount)
+                result[attribute] = attribute.maxAmount;
+        }
         return result;
     }
 

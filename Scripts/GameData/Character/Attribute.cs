@@ -8,6 +8,8 @@ namespace MultiplayerARPG
     public partial class Attribute : BaseGameData
     {
         public CharacterStats statsIncreaseEachLevel;
+        [Tooltip("If this value more than 0 it will limit max amount of this attribute by this value")]
+        public short maxAmount;
     }
 
     [System.Serializable]
