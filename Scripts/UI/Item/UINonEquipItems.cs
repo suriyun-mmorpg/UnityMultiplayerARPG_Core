@@ -86,7 +86,7 @@ namespace MultiplayerARPG
             CacheList.Generate(nonEquipItems, (index, characterItem, ui) =>
             {
                 UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
-                uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, string.Empty), this.character, index);
+                uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, InventoryType.NonEquipItems), this.character, index);
                 uiCharacterItem.Show();
                 SelectionManager.Add(uiCharacterItem);
                 if (selectedIdx == index)

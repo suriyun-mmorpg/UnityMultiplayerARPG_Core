@@ -211,34 +211,25 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool CanEquipItem(CharacterItem equippingItem, string equipPosition, out string reasonWhyCannot, out HashSet<string> shouldUnequipPositions)
+        public bool CanEquipItem(CharacterItem equippingItem, InventoryType inventoryType, int oldEquipIndex, out GameMessage.Type gameMessageType, out bool shouldUnequipRightHand, out bool shouldUnequipLeftHand)
         {
-            reasonWhyCannot = "";
-            shouldUnequipPositions = new HashSet<string>();
+            gameMessageType = GameMessage.Type.None;
+            shouldUnequipRightHand = false;
+            shouldUnequipLeftHand = false;
 
             Item equipmentItem = equippingItem.GetEquipmentItem();
             if (equipmentItem == null)
             {
-                reasonWhyCannot = "This item is not equipment item";
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(equipPosition))
-            {
-                reasonWhyCannot = "Invalid equip position";
+                gameMessageType = GameMessage.Type.CannotEquip;
                 return false;
             }
 
             if (!equippingItem.CanEquip(this))
             {
-                reasonWhyCannot = "Character level or attributes does not meet requirements";
+                gameMessageType = GameMessage.Type.LevelOrAttributeNotEnough;
                 return false;
             }
-
-            Item weaponItem = equippingItem.GetWeaponItem();
-            Item shieldItem = equippingItem.GetShieldItem();
-            Item armorItem = equippingItem.GetArmorItem();
-
+            
             EquipWeapons tempEquipWeapons = EquipWeapons;
             Item rightHandWeapon = tempEquipWeapons.rightHand.GetWeaponItem();
             Item leftHandWeapon = tempEquipWeapons.leftHand.GetWeaponItem();
@@ -249,77 +240,89 @@ namespace MultiplayerARPG
             WeaponItemEquipType leftHandEquipType;
             bool hasLeftHandItem = leftHandShield != null || leftHandWeapon.TryGetWeaponItemEquipType(out leftHandEquipType);
 
+            // Equipping item is weapon
+            Item weaponItem = equippingItem.GetWeaponItem();
             if (weaponItem != null)
             {
                 switch (weaponItem.EquipType)
                 {
                     case WeaponItemEquipType.OneHand:
                         // If weapon is one hand its equip position must be right hand
-                        if (!equipPosition.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND))
+                        if (inventoryType != InventoryType.EquipWeaponRight)
                         {
-                            reasonWhyCannot = "Can equip to right hand only";
+                            gameMessageType = GameMessage.Type.InvalidEquipPositionRightHand;
                             return false;
                         }
                         // One hand can equip with shield only 
                         // if there are weapons on left hand it should unequip
                         if (hasRightHandItem)
-                            shouldUnequipPositions.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
+                            shouldUnequipRightHand = true;
                         if (hasLeftHandItem)
-                            shouldUnequipPositions.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND);
+                            shouldUnequipLeftHand = true;
                         break;
                     case WeaponItemEquipType.OneHandCanDual:
                         // If weapon is one hand can dual its equip position must be right or left hand
-                        if (!equipPosition.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND) &&
-                            !equipPosition.Equals(GameDataConst.EQUIP_POSITION_LEFT_HAND))
+                        if (inventoryType != InventoryType.EquipWeaponRight &&
+                            inventoryType != InventoryType.EquipWeaponLeft)
                         {
-                            reasonWhyCannot = "Can equip to right hand or left hand only";
+                            gameMessageType = GameMessage.Type.InvalidEquipPositionRightHandOrLeftHand;
                             return false;
                         }
-                        // Unequip item if right hand weapon is one hand or two hand
-                        if (hasRightHandItem)
+                        if (inventoryType == InventoryType.EquipWeaponRight && hasRightHandItem)
+                        {
+                            shouldUnequipRightHand = true;
+                        }
+                        // Unequip item if right hand weapon is one hand or two hand when equipping at left hand
+                        if (inventoryType == InventoryType.EquipWeaponLeft && hasLeftHandItem)
                         {
                             if (rightHandEquipType == WeaponItemEquipType.OneHand ||
                                 rightHandEquipType == WeaponItemEquipType.TwoHand)
-                                shouldUnequipPositions.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
+                                shouldUnequipLeftHand = true;
                         }
                         break;
                     case WeaponItemEquipType.TwoHand:
                         // If weapon is one hand its equip position must be right hand
-                        if (!equipPosition.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND))
+                        if (inventoryType != InventoryType.EquipWeaponRight)
                         {
-                            reasonWhyCannot = "Can equip to right hand or left hand only";
+                            gameMessageType = GameMessage.Type.InvalidEquipPositionRightHand;
                             return false;
                         }
                         // Unequip both left and right hand
                         if (hasRightHandItem)
-                            shouldUnequipPositions.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
+                            shouldUnequipRightHand = true;
                         if (hasLeftHandItem)
-                            shouldUnequipPositions.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND);
+                            shouldUnequipLeftHand = true;
                         break;
                 }
+                return true;
             }
-
+            // Equipping item is shield
+            Item shieldItem = equippingItem.GetShieldItem();
             if (shieldItem != null)
             {
-                if (!equipPosition.Equals(GameDataConst.EQUIP_POSITION_LEFT_HAND))
+                if (inventoryType != InventoryType.EquipWeaponLeft)
                 {
-                    reasonWhyCannot = "Can equip to left hand only";
+                    gameMessageType = GameMessage.Type.InvalidEquipPositionLeftHand;
                     return false;
                 }
                 if (hasRightHandItem && rightHandEquipType == WeaponItemEquipType.TwoHand)
-                    shouldUnequipPositions.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
+                    shouldUnequipRightHand = true;
+                if (hasLeftHandItem)
+                    shouldUnequipLeftHand = true;
+                return true;
             }
-
+            // Equipping item is armor
+            Item armorItem = equippingItem.GetArmorItem();
             if (armorItem != null)
             {
-                if (!equipPosition.Equals(armorItem.EquipPosition))
+                if (oldEquipIndex >= 0 && !armorItem.EquipPosition.Equals(EquipItems[oldEquipIndex].GetArmorItem().EquipPosition))
                 {
-                    reasonWhyCannot = "Can equip to " + armorItem.EquipPosition + " only";
+                    gameMessageType = GameMessage.Type.InvalidEquipPositionArmor;
                     return false;
                 }
+                return true;
             }
-            shouldUnequipPositions.Add(equipPosition);
-            return true;
+            return false;
         }
 
         public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)

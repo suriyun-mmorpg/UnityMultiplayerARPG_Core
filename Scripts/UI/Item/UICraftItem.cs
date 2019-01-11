@@ -24,7 +24,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiCraftingItem.Show();
-                    uiCraftingItem.Data = new CharacterItemTuple(CharacterItem.Create(ItemCraft.craftingItem), 1, string.Empty);
+                    uiCraftingItem.Data = new CharacterItemTuple(CharacterItem.Create(ItemCraft.craftingItem), 1, InventoryType.NonEquipItems);
                 }
             }
 

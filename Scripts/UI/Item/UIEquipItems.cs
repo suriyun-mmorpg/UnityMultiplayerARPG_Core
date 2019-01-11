@@ -121,7 +121,7 @@ namespace MultiplayerARPG
 
                 tempPosition = armorItem.EquipPosition;
                 if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
-                    tempSlot.Setup(new CharacterItemTuple(equipItem, equipItem.level, tempPosition), this.character, -1);
+                    tempSlot.Setup(new CharacterItemTuple(equipItem, equipItem.level, InventoryType.EquipItems), this.character, i);
             }
 
             EquipWeapons equipWeapons = character.EquipWeapons;
@@ -133,19 +133,19 @@ namespace MultiplayerARPG
             if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
             {
                 if (rightHandEquipment != null)
-                    tempSlot.Setup(new CharacterItemTuple(rightHand, rightHand.level, tempPosition), this.character, -1);
+                    tempSlot.Setup(new CharacterItemTuple(rightHand, rightHand.level, InventoryType.EquipWeaponRight), this.character, 0);
             }
             tempPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
             if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
             {
                 if (leftHandEquipment != null)
-                    tempSlot.Setup(new CharacterItemTuple(leftHand, leftHand.level, tempPosition), this.character, -1);
+                    tempSlot.Setup(new CharacterItemTuple(leftHand, leftHand.level, InventoryType.EquipWeaponLeft), this.character, 0);
             }
         }
 
         private CharacterItemTuple GetEmptyUIData()
         {
-            return new CharacterItemTuple(CharacterItem.Empty, 1, string.Empty);
+            return new CharacterItemTuple(CharacterItem.Empty, 1, InventoryType.NonEquipItems);
         }
     }
 }

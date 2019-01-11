@@ -97,34 +97,46 @@ namespace MultiplayerARPG
                 return;
             }
             List<CharacterSkill> filterSkills = new List<CharacterSkill>();
+            List<int> filterSkillsIndexes = new List<int>();
             List<CharacterItem> filterItems = new List<CharacterItem>();
+            List<int> filterItemsIndexes = new List<int>();
             IList<CharacterSkill> characterSkills = owningCharacter.Skills;
             IList<CharacterItem> characterItems = owningCharacter.NonEquipItems;
+            int counter = 0;
             foreach (CharacterSkill characterSkill in characterSkills)
             {
                 Skill skill = characterSkill.GetSkill();
                 if (skill != null && characterSkill.level > 0 &&
                     (skill.skillType == SkillType.Active || skill.skillType == SkillType.CraftItem))
+                {
                     filterSkills.Add(characterSkill);
+                    filterSkillsIndexes.Add(counter);
+                }
+                ++counter;
             }
+            counter = 0;
             foreach (CharacterItem characterItem in characterItems)
             {
                 Item item = characterItem.GetItem();
                 if (item != null && characterItem.level > 0 && characterItem.amount > 0 &&
                     (item.IsPotion() || item.IsBuilding() || item.IsPet()))
+                {
                     filterItems.Add(characterItem);
+                    filterItemsIndexes.Add(counter);
+                }
+                ++counter;
             }
             CacheSkillList.Generate(filterSkills, (index, characterSkill, ui) =>
             {
                 UICharacterSkill uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
-                uiCharacterSkill.Setup(new SkillTuple(characterSkill.GetSkill(), characterSkill.level), null, -1);
+                uiCharacterSkill.Setup(new SkillTuple(characterSkill.GetSkill(), characterSkill.level), null, filterSkillsIndexes[index]);
                 uiCharacterSkill.Show();
                 CacheSkillSelectionManager.Add(uiCharacterSkill);
             });
             CacheItemList.Generate(filterItems, (index, characterItem, ui) =>
             {
                 UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
-                uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, string.Empty), null, -1);
+                uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, InventoryType.NonEquipItems), null, filterItemsIndexes[index]);
                 uiCharacterItem.Show();
                 CacheItemSelectionManager.Add(uiCharacterItem);
             });

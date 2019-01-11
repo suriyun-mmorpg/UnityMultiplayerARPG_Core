@@ -38,7 +38,7 @@ namespace MultiplayerARPG
             hotkeys.onOperation += OnHotkeysOperation;
             quests.onOperation += OnQuestsOperation;
             // Register Network functions
-            RegisterNetFunction<ushort, ushort>(NetFuncSwapOrMergeItem);
+            RegisterNetFunction<short, short>(NetFuncSwapOrMergeItem);
             RegisterNetFunction<int>(NetFuncAddAttribute);
             RegisterNetFunction<int>(NetFuncAddSkill);
             RegisterNetFunction<int>(NetFuncAddGuildSkill);
@@ -49,18 +49,19 @@ namespace MultiplayerARPG
             RegisterNetFunction<int>(NetFuncShowNpcDialog);
             RegisterNetFunction(NetFuncShowNpcRefine);
             RegisterNetFunction<byte>(NetFuncSelectNpcDialogMenu);
-            RegisterNetFunction<ushort, short>(NetFuncBuyNpcItem);
+            RegisterNetFunction<short, short>(NetFuncBuyNpcItem);
             RegisterNetFunction(NetFuncEnterWarp);
-            RegisterNetFunction<ushort, Vector3, Quaternion, PackedUInt>(NetFuncBuild);
+            RegisterNetFunction<short, Vector3, Quaternion, PackedUInt>(NetFuncBuild);
             RegisterNetFunction<PackedUInt>(NetFuncDestroyBuild);
-            RegisterNetFunction<ushort, short>(NetFuncSellItem);
-            RegisterNetFunction<ushort>(NetFuncRefineItem);
+            RegisterNetFunction<short, short>(NetFuncSellItem);
+            RegisterNetFunction<byte, short>(NetFuncRefineItem);
+            RegisterNetFunction<byte, short>(NetFuncRepairItem);
             RegisterNetFunction<PackedUInt>(NetFuncSendDealingRequest);
             RegisterNetFunction<PackedUInt>(NetFuncReceiveDealingRequest);
             RegisterNetFunction(NetFuncAcceptDealingRequest);
             RegisterNetFunction(NetFuncDeclineDealingRequest);
             RegisterNetFunction<PackedUInt>(NetFuncAcceptedDealingRequest);
-            RegisterNetFunction<ushort, short>(NetFuncSetDealingItem);
+            RegisterNetFunction<short, short>(NetFuncSetDealingItem);
             RegisterNetFunction<int>(NetFuncSetDealingGold);
             RegisterNetFunction(NetFuncLockDealing);
             RegisterNetFunction(NetFuncConfirmDealing);

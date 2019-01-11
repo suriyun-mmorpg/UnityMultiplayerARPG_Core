@@ -250,7 +250,7 @@ namespace MultiplayerARPG
             list.Generate(filterItems, (index, characterItem, ui) =>
             {
                 UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
-                uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, string.Empty), null, -1);
+                uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, InventoryType.NonEquipItems), null, -1);
                 uiCharacterItem.Show();
                 uiList.Add(uiCharacterItem);
             });

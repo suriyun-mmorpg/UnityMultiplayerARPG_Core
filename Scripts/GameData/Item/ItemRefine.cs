@@ -7,27 +7,26 @@ namespace MultiplayerARPG
     public partial class ItemRefine : BaseGameData
     {
         public Color titleColor = Color.white;
+        [Tooltip("This is refine level, each level have difference success rate, required items, required gold")]
         public ItemRefineLevel[] levels;
+        [Tooltip("This is repair prices, should order from high to low durability rate")]
+        public ItemRepairPrice[] repairPrices;
     }
 
     [System.Serializable]
     public struct ItemRefineLevel
     {
         [Range(0.01f, 1f)]
-        [SerializeField]
         private float successRate;
-        [SerializeField]
         private ItemAmount[] requireItems;
-        [SerializeField]
         private int requireGold;
         [Tooltip("How many levels it will be decreased if refining failed")]
-        [SerializeField]
         private short refineFailDecreaseLevels;
         [Tooltip("It will be destroyed if this value is TRUE and refining failed")]
-        [SerializeField]
         private bool refineFailDestroyItem;
 
         public float SuccessRate { get { return successRate; } }
+        public ItemAmount[] RequireItemsArray { get { return requireItems; } }
         private Dictionary<Item, short> cacheRequireItems;
         public Dictionary<Item, short> RequireItems
         {
@@ -38,7 +37,7 @@ namespace MultiplayerARPG
                 return cacheRequireItems;
             }
         }
-        public float RequireGold { get { return requireGold; } }
+        public int RequireGold { get { return requireGold; } }
         public short RefineFailDecreaseLevels { get { return refineFailDecreaseLevels; } }
         public bool RefineFailDestroyItem { get { return refineFailDestroyItem; } }
 
@@ -58,6 +57,7 @@ namespace MultiplayerARPG
             }
             if (requireItems == null || requireItems.Length == 0)
                 return true;
+            // Count required items
             foreach (ItemAmount requireItem in requireItems)
             {
                 if (requireItem.item != null && character.CountNonEquipItems(requireItem.item.DataId) < requireItem.amount)
@@ -68,39 +68,35 @@ namespace MultiplayerARPG
             }
             return true;
         }
+    }
 
-        public bool RefineItem(IPlayerCharacterData character, int nonEquipIndex)
+    [System.Serializable]
+    public struct ItemRepairPrice
+    {
+        [Range(0.01f, 1f)]
+        [SerializeField]
+        private float durabilityRate;
+        [SerializeField]
+        private int requireGold;
+
+        public float DurabilityRate { get { return durabilityRate; } }
+        public int RequireGold { get { return requireGold; } }
+
+        public bool CanRepair(IPlayerCharacterData character)
         {
-            bool isSuccess = false;
-            CharacterItem refiningItem = character.NonEquipItems[nonEquipIndex];
-            if (Random.value <= successRate)
+            GameMessage.Type gameMessageType;
+            return CanRepair(character, out gameMessageType);
+        }
+
+        public bool CanRepair(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
+        {
+            gameMessageType = GameMessage.Type.None;
+            if (character.Gold < requireGold)
             {
-                ++refiningItem.level;
-                character.NonEquipItems[nonEquipIndex] = refiningItem;
-                isSuccess = true;
+                gameMessageType = GameMessage.Type.NotEnoughGold;
+                return false;
             }
-            else
-            {
-                if (refineFailDestroyItem)
-                    character.NonEquipItems.RemoveAt(nonEquipIndex);
-                else
-                {
-                    refiningItem.level -= refineFailDecreaseLevels;
-                    if (refiningItem.level < 1)
-                        refiningItem.level = 1;
-                    character.NonEquipItems[nonEquipIndex] = refiningItem;
-                }
-            }
-            if (requireItems != null)
-            {
-                foreach (ItemAmount requireItem in requireItems)
-                {
-                    if (requireItem.item != null && requireItem.amount > 0)
-                        character.DecreaseItems(requireItem.item.DataId, requireItem.amount);
-                }
-            }
-            character.Gold -= requireGold;
-            return isSuccess;
+            return true;
         }
     }
 }

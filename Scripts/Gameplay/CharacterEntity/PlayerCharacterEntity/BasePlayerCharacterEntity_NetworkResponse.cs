@@ -20,7 +20,7 @@ namespace MultiplayerARPG
         public System.Action<BasePlayerCharacterEntity> onShowPartyInvitationDialog;
         public System.Action<BasePlayerCharacterEntity> onShowGuildInvitationDialog;
 
-        protected virtual void NetFuncSwapOrMergeItem(ushort fromIndex, ushort toIndex)
+        protected virtual void NetFuncSwapOrMergeItem(short fromIndex, short toIndex)
         {
             if (!CanMoveOrDoActions() ||
                 fromIndex >= NonEquipItems.Count ||
@@ -301,7 +301,7 @@ namespace MultiplayerARPG
                 RequestShowNpcDialog(currentNpcDialog.DataId);
         }
 
-        protected virtual void NetFuncBuyNpcItem(ushort itemIndex, short amount)
+        protected virtual void NetFuncBuyNpcItem(short itemIndex, short amount)
         {
             if (currentNpcDialog == null)
                 return;
@@ -392,7 +392,7 @@ namespace MultiplayerARPG
             warpingPortal.EnterWarp(this);
         }
 
-        protected virtual void NetFuncBuild(ushort itemIndex, Vector3 position, Quaternion rotation, PackedUInt parentObjectId)
+        protected virtual void NetFuncBuild(short itemIndex, Vector3 position, Quaternion rotation, PackedUInt parentObjectId)
         {
             if (!CanMoveOrDoActions() ||
                 itemIndex >= NonEquipItems.Count)
@@ -436,7 +436,7 @@ namespace MultiplayerARPG
                 gameManager.DestroyBuildingEntity(buildingEntity.Id);
         }
 
-        protected virtual void NetFuncSellItem(ushort index, short amount)
+        protected virtual void NetFuncSellItem(short index, short amount)
         {
             if (IsDead() ||
                 index >= nonEquipItems.Count)
@@ -454,33 +454,59 @@ namespace MultiplayerARPG
                 Gold += item.sellPrice * amount;
         }
 
-        protected virtual void NetFuncRefineItem(ushort index)
+        protected virtual void NetFuncRefineItem(byte byteInventoryType, short index)
         {
             if (IsDead() ||
                 index >= nonEquipItems.Count)
                 return;
 
-            CharacterItem nonEquipItem = nonEquipItems[index];
-            Item equipmentItem = nonEquipItem.GetEquipmentItem();
-            if (equipmentItem == null)
-                return;
-            if (nonEquipItem.level >= equipmentItem.MaxLevel)
-            {
-                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.RefineItemReachedMaxLevel);
-                return;
-            }
-            ItemRefineLevel refineLevel = equipmentItem.itemRefineInfo.levels[nonEquipItem.level - 1];
             GameMessage.Type gameMessageType;
-            if (!refineLevel.CanRefine(this, out gameMessageType))
+            switch ((InventoryType)byteInventoryType)
             {
-                gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                case InventoryType.NonEquipItems:
+                    Item.RefineNonEquipItem(this, index, out gameMessageType);
+                    gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                    break;
+                case InventoryType.EquipItems:
+                    Item.RefineEquipItem(this, index, out gameMessageType);
+                    gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                    break;
+                case InventoryType.EquipWeaponRight:
+                    Item.RefineRightHandItem(this, out gameMessageType);
+                    gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                    break;
+                case InventoryType.EquipWeaponLeft:
+                    Item.RefineLeftHandItem(this, out gameMessageType);
+                    gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                    break;
             }
-            else
+        }
+
+        protected virtual void NetFuncRepairItem(byte byteInventoryType, short index)
+        {
+            if (IsDead() ||
+                index >= nonEquipItems.Count)
+                return;
+
+            GameMessage.Type gameMessageType;
+            switch ((InventoryType)byteInventoryType)
             {
-                if (refineLevel.RefineItem(this, index))
-                    gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.RefineSuccess);
-                else
-                    gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.RefineFail);
+                case InventoryType.NonEquipItems:
+                    Item.RepairNonEquipItem(this, index, out gameMessageType);
+                    gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                    break;
+                case InventoryType.EquipItems:
+                    Item.RepairEquipItem(this, index, out gameMessageType);
+                    gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                    break;
+                case InventoryType.EquipWeaponRight:
+                    Item.RepairRightHandItem(this, out gameMessageType);
+                    gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                    break;
+                case InventoryType.EquipWeaponLeft:
+                    Item.RepairLeftHandItem(this, out gameMessageType);
+                    gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                    break;
             }
         }
 
@@ -559,7 +585,7 @@ namespace MultiplayerARPG
                 onShowDealingDialog.Invoke(playerCharacterEntity);
         }
 
-        protected virtual void NetFuncSetDealingItem(ushort itemIndex, short amount)
+        protected virtual void NetFuncSetDealingItem(short itemIndex, short amount)
         {
             if (DealingState != DealingState.Dealing)
             {

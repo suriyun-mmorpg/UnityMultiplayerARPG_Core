@@ -73,7 +73,7 @@ namespace MultiplayerARPG
                     if (index >= 0 && index < owningCharacter.NonEquipItems.Count)
                     {
                         CharacterItem characterItem = owningCharacter.NonEquipItems[index];
-                        uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, string.Empty), owningCharacter, index);
+                        uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, InventoryType.NonEquipItems), owningCharacter, index);
                         uiCharacterItem.Show();
                     }
                     else

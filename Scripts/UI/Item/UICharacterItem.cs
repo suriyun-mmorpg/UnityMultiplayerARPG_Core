@@ -10,7 +10,7 @@ namespace MultiplayerARPG
     {
         public CharacterItem CharacterItem { get { return Data.characterItem; } }
         public short Level { get { return Data.targetLevel; } }
-        public string EquipPosition { get { return Data.equipPosition; } }
+        public InventoryType InventoryType { get { return Data.inventoryType; } }
         public Item Item { get { return CharacterItem != null ? CharacterItem.GetItem() : null; } }
         public Item EquipmentItem { get { return CharacterItem != null ? CharacterItem.GetEquipmentItem() : null; } }
         public Item ArmorItem { get { return CharacterItem != null ? CharacterItem.GetArmorItem() : null; } }
@@ -167,7 +167,7 @@ namespace MultiplayerARPG
 
             if (EquipmentItem != null)
             {
-                if (!string.IsNullOrEmpty(EquipPosition))
+                if (InventoryType != InventoryType.NonEquipItems)
                     onSetEquippedData.Invoke();
                 else
                     onSetUnEquippedData.Invoke();
@@ -377,7 +377,7 @@ namespace MultiplayerARPG
                     uiNextLevelItem.Hide();
                 else
                 {
-                    uiNextLevelItem.Setup(new CharacterItemTuple(CharacterItem, (short)(Level + 1), EquipPosition), character, indexOfData);
+                    uiNextLevelItem.Setup(new CharacterItemTuple(CharacterItem, (short)(Level + 1), InventoryType), character, indexOfData);
                     uiNextLevelItem.Show();
                 }
             }
@@ -388,8 +388,7 @@ namespace MultiplayerARPG
 
         private void UpdateShopUIVisibility(bool initData)
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter == null)
+            if (!IsOwningCharacter())
             {
                 if (initData || isSellItemDialogAppeared)
                 {
@@ -406,7 +405,7 @@ namespace MultiplayerARPG
                 if (uiGameplay.uiNpcDialog.IsVisible() &&
                     uiGameplay.uiNpcDialog.Data != null &&
                     uiGameplay.uiNpcDialog.Data.type == NpcDialogType.Shop &&
-                    string.IsNullOrEmpty(EquipPosition))
+                    InventoryType == InventoryType.NonEquipItems)
                 {
                     if (initData || !isSellItemDialogAppeared)
                     {
@@ -429,8 +428,7 @@ namespace MultiplayerARPG
 
         private void UpdateRefineUIVisibility(bool initData)
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter == null)
+            if (!IsOwningCharacter())
             {
                 if (initData || isRefineItemDialogAppeared)
                 {
@@ -447,7 +445,7 @@ namespace MultiplayerARPG
                 if (uiGameplay.uiRefineItem.IsVisible() &&
                     Data.characterItem != null &&
                     Data.characterItem.GetEquipmentItem() != null &&
-                    string.IsNullOrEmpty(EquipPosition))
+                    InventoryType == InventoryType.NonEquipItems)
                 {
                     if (initData || !isRefineItemDialogAppeared)
                     {
@@ -470,8 +468,7 @@ namespace MultiplayerARPG
 
         private void UpdateDealingState(bool initData)
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter == null)
+            if (!IsOwningCharacter())
             {
                 if (initData || isDealingStateEntered)
                 {
@@ -487,7 +484,7 @@ namespace MultiplayerARPG
             {
                 if (uiGameplay.uiDealing.IsVisible() &&
                     uiGameplay.uiDealing.dealingState == DealingState.Dealing &&
-                    string.IsNullOrEmpty(EquipPosition))
+                    InventoryType == InventoryType.NonEquipItems)
                 {
                     if (initData || !isDealingStateEntered)
                     {
@@ -511,44 +508,38 @@ namespace MultiplayerARPG
         public void OnClickEquip()
         {
             // Only unequpped equipment can be equipped
-            if (!IsOwningCharacter() || !string.IsNullOrEmpty(EquipPosition))
+            if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
                 return;
 
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
 
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter != null)
-                owningCharacter.RequestEquipItem((ushort)indexOfData);
+            BasePlayerCharacterController.OwningCharacter.RequestEquipItem((short)indexOfData);
         }
 
         public void OnClickUnEquip()
         {
             // Only equipped equipment can be unequipped
-            if (!IsOwningCharacter() || string.IsNullOrEmpty(EquipPosition))
+            if (!IsOwningCharacter() || InventoryType == InventoryType.NonEquipItems)
                 return;
 
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
 
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter != null)
-                owningCharacter.RequestUnEquipItem(EquipPosition);
+            BasePlayerCharacterController.OwningCharacter.RequestUnEquipItem((byte)InventoryType, (short)indexOfData);
         }
 
         public void OnClickDrop()
         {
             // Only unequipped equipment can be dropped
-            if (!IsOwningCharacter() || !string.IsNullOrEmpty(EquipPosition))
+            if (!IsOwningCharacter() || InventoryType == InventoryType.NonEquipItems)
                 return;
-            
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
+
             if (CharacterItem.amount == 1)
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                if (owningCharacter != null)
-                    owningCharacter.RequestDropItem((ushort)indexOfData, 1);
+                BasePlayerCharacterController.OwningCharacter.RequestDropItem((short)indexOfData, 1);
             }
             else
                 UISceneGlobal.Singleton.ShowInputDialog(dropInputTitle, dropInputDescription, OnDropAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
@@ -556,26 +547,22 @@ namespace MultiplayerARPG
 
         private void OnDropAmountConfirmed(int amount)
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            if (owningCharacter != null)
-                owningCharacter.RequestDropItem((ushort)indexOfData, (short)amount);
+            BasePlayerCharacterController.OwningCharacter.RequestDropItem((short)indexOfData, (short)amount);
         }
 
         public void OnClickSell()
         {
             // Only unequipped equipment can be sell
-            if (!IsOwningCharacter() || !string.IsNullOrEmpty(EquipPosition))
+            if (!IsOwningCharacter() || InventoryType == InventoryType.NonEquipItems)
                 return;
             
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (CharacterItem.amount == 1)
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                if (owningCharacter != null)
-                    owningCharacter.RequestSellItem((ushort)indexOfData, 1);
+                BasePlayerCharacterController.OwningCharacter.RequestSellItem((short)indexOfData, 1);
             }
             else
                 UISceneGlobal.Singleton.ShowInputDialog(sellInputTitle, sellInputDescription, OnSellItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
@@ -583,26 +570,22 @@ namespace MultiplayerARPG
 
         private void OnSellItemAmountConfirmed(int amount)
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            if (owningCharacter != null)
-                owningCharacter.RequestSellItem((ushort)indexOfData, (short)amount);
+            BasePlayerCharacterController.OwningCharacter.RequestSellItem((short)indexOfData, (short)amount);
         }
 
         public void OnClickSetDealingItem()
         {
             // Only unequipped equipment can be sell
-            if (!IsOwningCharacter() || !string.IsNullOrEmpty(EquipPosition))
+            if (!IsOwningCharacter() || InventoryType == InventoryType.NonEquipItems)
                 return;
             
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (CharacterItem.amount == 1)
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                if (owningCharacter != null)
-                    owningCharacter.RequestSetDealingItem((ushort)indexOfData, 1);
+                BasePlayerCharacterController.OwningCharacter.RequestSetDealingItem((short)indexOfData, 1);
             }
             else
                 UISceneGlobal.Singleton.ShowInputDialog(setDealingInputTitle, setDealingInputDescription, OnSetDealingItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
@@ -610,25 +593,22 @@ namespace MultiplayerARPG
 
         private void OnSetDealingItemAmountConfirmed(int amount)
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            if (owningCharacter != null)
-                owningCharacter.RequestSetDealingItem((ushort)indexOfData, (short)amount);
+            BasePlayerCharacterController.OwningCharacter.RequestSetDealingItem((short)indexOfData, (short)amount);
         }
 
         public void OnClickSetRefineItem()
         {
             // Only unequipped equipment can refining
-            if (!IsOwningCharacter() || !string.IsNullOrEmpty(EquipPosition))
+            if (!IsOwningCharacter())
                 return;
             
             UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
             if (uiGameplay.uiRefineItem != null &&
-                CharacterItem.GetEquipmentItem() != null &&
-                string.IsNullOrEmpty(EquipPosition))
+                CharacterItem.GetEquipmentItem() != null)
             {
-                uiGameplay.uiRefineItem.Data = indexOfData;
+                uiGameplay.uiRefineItem.Setup(InventoryType, character, indexOfData);
                 uiGameplay.uiRefineItem.Show();
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();

@@ -13,10 +13,21 @@ namespace MultiplayerARPG
             NotEnoughGold,
             NotEnoughItems,
             CannotCarryAnymore,
+            // Equip
+            CannotEquip,
+            LevelOrAttributeNotEnough,
+            InvalidEquipPositionRightHand,
+            InvalidEquipPositionLeftHand,
+            InvalidEquipPositionRightHandOrLeftHand,
+            InvalidEquipPositionArmor,
             // Refine
+            CannotRefine,
             RefineItemReachedMaxLevel,
             RefineSuccess,
             RefineFail,
+            // Repair
+            CannotRepair,
+            RepairSuccess,
             // Dealing
             CharacterIsInAnotherDeal,
             CharacterIsTooFar,

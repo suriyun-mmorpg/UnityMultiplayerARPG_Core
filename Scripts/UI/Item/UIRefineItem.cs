@@ -3,14 +3,27 @@ using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
 {
-    public partial class UIRefineItem : UISelectionEntry<int>
+    public partial class UIRefineItem : UIDataForCharacter<InventoryType>
     {
         public CharacterItem CharacterItem
         {
             get
             {
-                if (Data >= 0 && Data < BasePlayerCharacterController.OwningCharacter.NonEquipItems.Count)
-                    return BasePlayerCharacterController.OwningCharacter.NonEquipItems[Data];
+                switch (Data)
+                {
+                    case InventoryType.NonEquipItems:
+                        if (indexOfData >= 0 && indexOfData < character.NonEquipItems.Count)
+                            return character.NonEquipItems[indexOfData];
+                        break;
+                    case InventoryType.EquipItems:
+                        if (indexOfData >= 0 && indexOfData < character.EquipItems.Count)
+                            return character.EquipItems[indexOfData];
+                        break;
+                    case InventoryType.EquipWeaponRight:
+                        return character.EquipWeapons.rightHand;
+                    case InventoryType.EquipWeaponLeft:
+                        return character.EquipWeapons.leftHand;
+                }
                 return null;
             }
         }
@@ -37,15 +50,13 @@ namespace MultiplayerARPG
         protected override void UpdateUI()
         {
             Profiler.BeginSample("UIRefineItem - Update UI");
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-
             if (uiRefiningItem != null)
             {
                 if (CharacterItem == null)
                     uiRefiningItem.Hide();
                 else
                 {
-                    uiRefiningItem.Setup(new CharacterItemTuple(CharacterItem, Level, string.Empty), owningCharacter, Data);
+                    uiRefiningItem.Setup(new CharacterItemTuple(CharacterItem, Level, Data), character, indexOfData);
                     uiRefiningItem.Show();
                 }
             }
@@ -89,7 +100,7 @@ namespace MultiplayerARPG
 
         public override void Hide()
         {
-            Data = -1;
+            indexOfData = -1;
             base.Hide();
         }
 
@@ -100,9 +111,9 @@ namespace MultiplayerARPG
 
         public void OnClickRefine()
         {
-            if (Data < 0)
+            if (indexOfData < 0)
                 return;
-            BasePlayerCharacterController.OwningCharacter.RequestRefineItem((ushort)Data);
+            BasePlayerCharacterController.OwningCharacter.RequestRefineItem((byte)Data, (short)indexOfData);
         }
     }
 }

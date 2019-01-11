@@ -772,6 +772,29 @@ public static partial class CharacterDataExtension
         return index;
     }
 
+    public static int IndexOfEquipItem(this ICharacterData data, string equipPosition)
+    {
+        if (string.IsNullOrEmpty(equipPosition))
+            return -1;
+
+        IList<CharacterItem> list = data.EquipItems;
+        CharacterItem tempItem;
+        int index = -1;
+        for (int i = 0; i < list.Count; ++i)
+        {
+            tempItem = list[i];
+            if (tempItem.GetEquipmentItem() == null)
+                continue;
+
+            if (equipPosition.Equals(tempItem.GetEquipmentItem().EquipPosition))
+            {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
     public static int IndexOfNonEquipItem(this ICharacterData data, int dataId)
     {
         IList<CharacterItem> list = data.NonEquipItems;

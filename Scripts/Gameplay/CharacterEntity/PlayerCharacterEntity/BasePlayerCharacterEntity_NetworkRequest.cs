@@ -7,7 +7,7 @@ namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
     {
-        public virtual void RequestSwapOrMergeItem(ushort fromIndex, ushort toIndex)
+        public virtual void RequestSwapOrMergeItem(short fromIndex, short toIndex)
         {
             if (IsDead())
                 return;
@@ -82,7 +82,7 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncSelectNpcDialogMenu, FunctionReceivers.Server, menuIndex);
         }
 
-        public virtual void RequestBuyNpcItem(ushort itemIndex, short amount)
+        public virtual void RequestBuyNpcItem(short itemIndex, short amount)
         {
             if (IsDead())
                 return;
@@ -96,7 +96,7 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncEnterWarp, FunctionReceivers.Server);
         }
 
-        public virtual void RequestBuild(ushort itemIndex, Vector3 position, Quaternion rotation, uint parentObjectId)
+        public virtual void RequestBuild(short itemIndex, Vector3 position, Quaternion rotation, uint parentObjectId)
         {
             if (!CanMoveOrDoActions())
                 return;
@@ -110,7 +110,7 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncDestroyBuild, FunctionReceivers.Server, new PackedUInt(objectId));
         }
 
-        public virtual void RequestSellItem(ushort nonEquipIndex, short amount)
+        public virtual void RequestSellItem(short nonEquipIndex, short amount)
         {
             if (IsDead() ||
                 nonEquipIndex >= NonEquipItems.Count)
@@ -118,12 +118,20 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncSellItem, FunctionReceivers.Server, nonEquipIndex, amount);
         }
 
-        public virtual void RequestRefineItem(ushort nonEquipIndex)
+        public virtual void RequestRefineItem(byte byteInventoryType, short index)
         {
             if (IsDead() ||
-                nonEquipIndex >= NonEquipItems.Count)
+                index >= NonEquipItems.Count)
                 return;
-            CallNetFunction(NetFuncRefineItem, FunctionReceivers.Server, nonEquipIndex);
+            CallNetFunction(NetFuncRefineItem, FunctionReceivers.Server, byteInventoryType, index);
+        }
+
+        public virtual void RequestRepairItem(byte byteInventoryType, short index)
+        {
+            if (IsDead() ||
+                index >= NonEquipItems.Count)
+                return;
+            CallNetFunction(NetFuncRepairItem, FunctionReceivers.Server, byteInventoryType, index);
         }
 
         public virtual void RequestSendDealingRequest(uint objectId)
@@ -151,7 +159,7 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncAcceptedDealingRequest, ConnectionId, new PackedUInt(objectId));
         }
 
-        public virtual void RequestSetDealingItem(ushort itemIndex, short amount)
+        public virtual void RequestSetDealingItem(short itemIndex, short amount)
         {
             CallNetFunction(NetFuncSetDealingItem, FunctionReceivers.Server, itemIndex, amount);
         }

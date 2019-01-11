@@ -4,12 +4,12 @@
     {
         public CharacterItem characterItem;
         public short targetLevel;
-        public string equipPosition;
-        public CharacterItemTuple(CharacterItem characterItem, short targetLevel, string equipPosition)
+        public InventoryType inventoryType;
+        public CharacterItemTuple(CharacterItem characterItem, short targetLevel, InventoryType inventoryType)
         {
             this.characterItem = characterItem;
             this.targetLevel = targetLevel;
-            this.equipPosition = equipPosition;
+            this.inventoryType = inventoryType;
         }
     }
 

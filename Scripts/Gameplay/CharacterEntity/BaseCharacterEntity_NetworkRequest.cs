@@ -21,7 +21,7 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncUseSkill, FunctionReceivers.Server, position, dataId);
         }
 
-        public virtual void RequestUseItem(ushort index)
+        public virtual void RequestUseItem(short index)
         {
             if (IsDead())
                 return;
@@ -42,7 +42,7 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncPickupItem, FunctionReceivers.Server, new PackedUInt(objectId));
         }
 
-        public virtual void RequestDropItem(ushort nonEquipIndex, short amount)
+        public virtual void RequestDropItem(short nonEquipIndex, short amount)
         {
             if (!CanMoveOrDoActions() ||
                 nonEquipIndex >= NonEquipItems.Count)
@@ -50,7 +50,7 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncDropItem, FunctionReceivers.Server, nonEquipIndex, amount);
         }
 
-        public virtual void RequestEquipItem(ushort nonEquipIndex)
+        public virtual void RequestEquipItem(short nonEquipIndex)
         {
             if (!CanMoveOrDoActions() ||
                 nonEquipIndex >= NonEquipItems.Count)
@@ -65,32 +65,32 @@ namespace MultiplayerARPG
                 {
                     Item rightWeapon = EquipWeapons.rightHand.GetWeaponItem();
                     if (rightWeapon != null && rightWeapon.EquipType == WeaponItemEquipType.OneHandCanDual)
-                        RequestEquipItem(nonEquipIndex, GameDataConst.EQUIP_POSITION_LEFT_HAND);
+                        RequestEquipItem(nonEquipIndex, (byte)InventoryType.EquipWeaponLeft, 0);
                     else
-                        RequestEquipItem(nonEquipIndex, GameDataConst.EQUIP_POSITION_RIGHT_HAND);
+                        RequestEquipItem(nonEquipIndex, (byte)InventoryType.EquipWeaponRight, 0);
                 }
                 else
-                    RequestEquipItem(nonEquipIndex, GameDataConst.EQUIP_POSITION_RIGHT_HAND);
+                    RequestEquipItem(nonEquipIndex, (byte)InventoryType.EquipWeaponRight, 0);
             }
             else if (shieldItem != null)
-                RequestEquipItem(nonEquipIndex, GameDataConst.EQUIP_POSITION_LEFT_HAND);
+                RequestEquipItem(nonEquipIndex, (byte)InventoryType.EquipWeaponLeft, 0);
             else if (armorItem != null)
-                RequestEquipItem(nonEquipIndex, armorItem.EquipPosition);
+                RequestEquipItem(nonEquipIndex, (byte)InventoryType.EquipItems, (short)this.IndexOfEquipItem(armorItem.DataId));
         }
 
-        public virtual void RequestEquipItem(ushort nonEquipIndex, string equipPosition)
+        public virtual void RequestEquipItem(short nonEquipIndex, byte byteInventoryType, short oldEquipIndex)
         {
             if (!CanMoveOrDoActions() ||
                 nonEquipIndex >= NonEquipItems.Count)
                 return;
-            CallNetFunction(NetFuncEquipItem, FunctionReceivers.Server, nonEquipIndex, equipPosition);
+            CallNetFunction(NetFuncEquipItem, FunctionReceivers.Server, nonEquipIndex, byteInventoryType, oldEquipIndex);
         }
 
-        public virtual void RequestUnEquipItem(string equipPosition)
+        public virtual void RequestUnEquipItem(byte byteInventoryType, short index)
         {
             if (!CanMoveOrDoActions())
                 return;
-            CallNetFunction(NetFuncUnEquipItem, FunctionReceivers.Server, equipPosition);
+            CallNetFunction(NetFuncUnEquipItem, FunctionReceivers.Server, byteInventoryType, index);
         }
 
         public virtual void RequestOnDead()
