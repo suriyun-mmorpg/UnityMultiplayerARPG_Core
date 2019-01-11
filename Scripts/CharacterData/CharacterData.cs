@@ -293,6 +293,16 @@ public partial class CharacterData : ICharacterData
         }
     }
 
+    private Dictionary<EquipmentSet, int> cacheEquipmentSets;
+    public Dictionary<EquipmentSet, int> CacheEquipmentSets
+    {
+        get
+        {
+            MakeCaches();
+            return cacheEquipmentSets;
+        }
+    }
+
     private int cacheMaxHp;
     public int CacheMaxHp
     {
@@ -382,19 +392,21 @@ public partial class CharacterData : ICharacterData
     {
         if (!shouldMakeCache)
             return;
-        cacheStats = this.GetStats();
-        cacheAttributes = this.GetAttributes();
-        cacheSkills = this.GetSkills();
-        cacheResistances = this.GetResistances();
-        cacheIncreaseDamages = this.GetIncreaseDamages();
-        cacheMaxHp = (int)cacheStats.hp;
-        cacheMaxMp = (int)cacheStats.mp;
-        cacheMaxStamina = (int)cacheStats.stamina;
-        cacheMaxFood = (int)cacheStats.food;
-        cacheMaxWater = (int)cacheStats.water;
-        cacheTotalItemWeight = this.GetTotalItemWeight();
-        cacheAtkSpeed = cacheStats.atkSpeed;
-        cacheMoveSpeed = cacheStats.moveSpeed;
+        this.GetAllStats(
+            out cacheStats,
+            out cacheAttributes,
+            out cacheSkills,
+            out cacheResistances,
+            out cacheIncreaseDamages,
+            out cacheEquipmentSets,
+            out cacheMaxHp,
+            out cacheMaxMp,
+            out cacheMaxStamina,
+            out cacheMaxFood,
+            out cacheMaxWater,
+            out cacheTotalItemWeight,
+            out cacheAtkSpeed,
+            out cacheMoveSpeed);
         shouldMakeCache = false;
     }
 }

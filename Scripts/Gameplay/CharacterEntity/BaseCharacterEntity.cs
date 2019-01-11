@@ -57,19 +57,34 @@ namespace MultiplayerARPG
         #endregion
 
         #region Caches Data
-        public CharacterStats CacheStats { get; protected set; }
-        public Dictionary<Attribute, short> CacheAttributes { get; protected set; }
-        public Dictionary<Skill, short> CacheSkills { get; protected set; }
-        public Dictionary<DamageElement, float> CacheResistances { get; protected set; }
-        public Dictionary<DamageElement, MinMaxFloat> CacheIncreaseDamages { get; protected set; }
-        public int CacheMaxHp { get; protected set; }
-        public int CacheMaxMp { get; protected set; }
-        public int CacheMaxStamina { get; protected set; }
-        public int CacheMaxFood { get; protected set; }
-        public int CacheMaxWater { get; protected set; }
-        public float CacheTotalItemWeight { get; protected set; }
-        public float CacheAtkSpeed { get; protected set; }
-        public float CacheMoveSpeed { get; protected set; }
+        protected CharacterStats cacheStats;
+        protected Dictionary<Attribute, short> cacheAttributes;
+        protected Dictionary<Skill, short> cacheSkills;
+        protected Dictionary<DamageElement, float> cacheResistances;
+        protected Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages;
+        protected Dictionary<EquipmentSet, int> cacheEquipmentSets;
+        protected int cacheMaxHp;
+        protected int cacheMaxMp;
+        protected int cacheMaxStamina;
+        protected int cacheMaxFood;
+        protected int cacheMaxWater;
+        protected float cacheTotalItemWeight;
+        protected float cacheAtkSpeed;
+        protected float cacheMoveSpeed;
+        public CharacterStats CacheStats { get { return cacheStats; } }
+        public Dictionary<Attribute, short> CacheAttributes { get { return cacheAttributes; } }
+        public Dictionary<Skill, short> CacheSkills { get { return cacheSkills; } }
+        public Dictionary<DamageElement, float> CacheResistances { get { return cacheResistances; } }
+        public Dictionary<DamageElement, MinMaxFloat> CacheIncreaseDamages { get { return cacheIncreaseDamages; } }
+        public Dictionary<EquipmentSet, int> CacheEquipmentSets { get { return cacheEquipmentSets; } }
+        public int CacheMaxHp { get { return cacheMaxHp; } }
+        public int CacheMaxMp { get { return cacheMaxMp; } }
+        public int CacheMaxStamina { get { return cacheMaxStamina; } }
+        public int CacheMaxFood { get { return cacheMaxFood; } }
+        public int CacheMaxWater { get { return cacheMaxWater; } }
+        public float CacheTotalItemWeight { get { return cacheTotalItemWeight; } }
+        public float CacheAtkSpeed { get { return cacheAtkSpeed; } }
+        public float CacheMoveSpeed { get { return cacheMoveSpeed; } }
         public float CacheBaseMoveSpeed { get; protected set; }
         #endregion
 
@@ -996,19 +1011,21 @@ namespace MultiplayerARPG
         {
             if (!isRecaching)
                 return;
-            CacheStats = this.GetStats();
-            CacheAttributes = this.GetAttributes();
-            CacheSkills = this.GetSkills();
-            CacheResistances = this.GetResistances();
-            CacheIncreaseDamages = this.GetIncreaseDamages();
-            CacheMaxHp = (int)CacheStats.hp;
-            CacheMaxMp = (int)CacheStats.mp;
-            CacheMaxStamina = (int)CacheStats.stamina;
-            CacheMaxFood = (int)CacheStats.food;
-            CacheMaxWater = (int)CacheStats.water;
-            CacheTotalItemWeight = this.GetTotalItemWeight();
-            CacheAtkSpeed = CacheStats.atkSpeed;
-            CacheMoveSpeed = CacheStats.moveSpeed;
+            this.GetAllStats(
+                out cacheStats,
+                out cacheAttributes,
+                out cacheSkills,
+                out cacheResistances,
+                out cacheIncreaseDamages,
+                out cacheEquipmentSets,
+                out cacheMaxHp,
+                out cacheMaxMp,
+                out cacheMaxStamina,
+                out cacheMaxFood,
+                out cacheMaxWater,
+                out cacheTotalItemWeight,
+                out cacheAtkSpeed,
+                out cacheMoveSpeed);
             if (database != null)
                 CacheBaseMoveSpeed = database.stats.baseStats.moveSpeed;
             isRecaching = false;

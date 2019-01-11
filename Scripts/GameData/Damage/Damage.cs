@@ -64,6 +64,14 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
+    public struct DamageAmount
+    {
+        [Tooltip("You can leave Damage to be empty to make it as physical damage which won't calculate with resistance stats")]
+        public DamageElement damageElement;
+        public MinMaxFloat amount;
+    }
+
+    [System.Serializable]
     public struct DamageIncremental
     {
         [Tooltip("You can leave Damage to be empty to make it as physical damage which won't calculate with resistance stats")]

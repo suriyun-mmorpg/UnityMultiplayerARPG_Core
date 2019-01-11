@@ -46,6 +46,7 @@ namespace MultiplayerARPG
         public ResistanceIncremental[] increaseResistances;
         public DamageIncremental[] increaseDamages;
         public CharacterStatsIncremental increaseStats;
+        public EquipmentSet equipmentSet;
         [Tooltip("Equipment durability, If this set to 0 it will not broken")]
         [Range(0f, 1000f)]
         public float maxDurability;

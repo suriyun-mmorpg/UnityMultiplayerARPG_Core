@@ -153,6 +153,15 @@ namespace MultiplayerARPG
         #endregion
 
         #region Make KeyValuePair functions
+        public static KeyValuePair<DamageElement, MinMaxFloat> MakeDamageAmountPair(DamageAmount source, float rate, float effectiveness)
+        {
+            GameInstance gameInstance = GameInstance.Singleton;
+            DamageElement damageElement = source.damageElement;
+            if (damageElement == null)
+                damageElement = gameInstance.DefaultDamageElement;
+            return new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, (source.amount * rate) + effectiveness);
+        }
+
         public static KeyValuePair<DamageElement, MinMaxFloat> MakeDamageAmountPair(DamageIncremental source, short level, float rate, float effectiveness)
         {
             GameInstance gameInstance = GameInstance.Singleton;
@@ -262,6 +271,22 @@ namespace MultiplayerARPG
                         targetDictionary[key] = sourceEffectivess.effectiveness;
                     else
                         targetDictionary[key] += sourceEffectivess.effectiveness;
+                }
+            }
+            return targetDictionary;
+        }
+
+        public static Dictionary<DamageElement, MinMaxFloat> MakeDamageAmountsDictionary(DamageAmount[] sourceAmounts, Dictionary<DamageElement, MinMaxFloat> targetDictionary, float rate)
+        {
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<DamageElement, MinMaxFloat>();
+            if (sourceAmounts != null)
+            {
+                GameInstance gameInstance = GameInstance.Singleton;
+                foreach (DamageAmount sourceAmount in sourceAmounts)
+                {
+                    KeyValuePair<DamageElement, MinMaxFloat> pair = MakeDamageAmountPair(sourceAmount, rate, 0f);
+                    targetDictionary = CombineDamageAmountsDictionary(targetDictionary, pair);
                 }
             }
             return targetDictionary;

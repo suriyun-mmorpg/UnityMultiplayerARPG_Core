@@ -29,6 +29,7 @@ public partial interface ICharacterData
     Dictionary<Skill, short> CacheSkills { get; }
     Dictionary<DamageElement, float> CacheResistances { get; }
     Dictionary<DamageElement, MinMaxFloat> CacheIncreaseDamages { get; }
+    Dictionary<EquipmentSet, int> CacheEquipmentSets { get; }
     int CacheMaxHp { get; }
     int CacheMaxMp { get; }
     int CacheMaxStamina { get; }
