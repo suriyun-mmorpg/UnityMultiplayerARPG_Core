@@ -5,7 +5,13 @@ namespace MultiplayerARPG
     public static class GameDataHelpers
     {
         #region Combine Dictionary with KeyValuePair functions
-        public static Dictionary<DamageElement, MinMaxFloat> CombineDamageAmountsDictionary(Dictionary<DamageElement, MinMaxFloat> sourceDictionary, KeyValuePair<DamageElement, MinMaxFloat> newEntry)
+        /// <summary>
+        /// Combine damage amounts dictionary
+        /// </summary>
+        /// <param name="sourceDictionary"></param>
+        /// <param name="newEntry"></param>
+        /// <returns></returns>
+        public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(Dictionary<DamageElement, MinMaxFloat> sourceDictionary, KeyValuePair<DamageElement, MinMaxFloat> newEntry)
         {
             GameInstance gameInstance = GameInstance.Singleton;
             DamageElement damageElement = newEntry.Key;
@@ -19,7 +25,13 @@ namespace MultiplayerARPG
             return sourceDictionary;
         }
 
-        public static Dictionary<DamageElement, float> CombineDamageInflictionAmountsDictionary(Dictionary<DamageElement, float> sourceDictionary, KeyValuePair<DamageElement, float> newEntry)
+        /// <summary>
+        /// Combine damage infliction amounts dictionary
+        /// </summary>
+        /// <param name="sourceDictionary"></param>
+        /// <param name="newEntry"></param>
+        /// <returns></returns>
+        public static Dictionary<DamageElement, float> CombineDamageInflictions(Dictionary<DamageElement, float> sourceDictionary, KeyValuePair<DamageElement, float> newEntry)
         {
             GameInstance gameInstance = GameInstance.Singleton;
             DamageElement damageElement = newEntry.Key;
@@ -33,7 +45,13 @@ namespace MultiplayerARPG
             return sourceDictionary;
         }
 
-        public static Dictionary<Attribute, short> CombineAttributeAmountsDictionary(Dictionary<Attribute, short> sourceDictionary, KeyValuePair<Attribute, short> newEntry)
+        /// <summary>
+        /// Combine attribute amounts dictionary
+        /// </summary>
+        /// <param name="sourceDictionary"></param>
+        /// <param name="newEntry"></param>
+        /// <returns></returns>
+        public static Dictionary<Attribute, short> CombineAttributes(Dictionary<Attribute, short> sourceDictionary, KeyValuePair<Attribute, short> newEntry)
         {
             Attribute attribute = newEntry.Key;
             if (attribute != null)
@@ -47,7 +65,13 @@ namespace MultiplayerARPG
             return sourceDictionary;
         }
 
-        public static Dictionary<DamageElement, float> CombineResistanceAmountsDictionary(Dictionary<DamageElement, float> sourceDictionary, KeyValuePair<DamageElement, float> newEntry)
+        /// <summary>
+        /// Combine resistance amounts dictionary
+        /// </summary>
+        /// <param name="sourceDictionary"></param>
+        /// <param name="newEntry"></param>
+        /// <returns></returns>
+        public static Dictionary<DamageElement, float> CombineResistances(Dictionary<DamageElement, float> sourceDictionary, KeyValuePair<DamageElement, float> newEntry)
         {
             DamageElement damageElement = newEntry.Key;
             if (damageElement != null)
@@ -61,7 +85,13 @@ namespace MultiplayerARPG
             return sourceDictionary;
         }
 
-        public static Dictionary<Skill, short> CombineSkillLevelsDictionary(Dictionary<Skill, short> sourceDictionary, KeyValuePair<Skill, short> newEntry)
+        /// <summary>
+        /// Combine skill levels dictionary
+        /// </summary>
+        /// <param name="sourceDictionary"></param>
+        /// <param name="newEntry"></param>
+        /// <returns></returns>
+        public static Dictionary<Skill, short> CombineSkills(Dictionary<Skill, short> sourceDictionary, KeyValuePair<Skill, short> newEntry)
         {
             Skill skill = newEntry.Key;
             if (skill != null)
@@ -75,7 +105,13 @@ namespace MultiplayerARPG
             return sourceDictionary;
         }
 
-        public static Dictionary<Item, short> CombineItemAmountsDictionary(Dictionary<Item, short> sourceDictionary, KeyValuePair<Item, short> newEntry)
+        /// <summary>
+        /// Combine item amounts dictionary
+        /// </summary>
+        /// <param name="sourceDictionary"></param>
+        /// <param name="newEntry"></param>
+        /// <returns></returns>
+        public static Dictionary<Item, short> CombineItems(Dictionary<Item, short> sourceDictionary, KeyValuePair<Item, short> newEntry)
         {
             Item item = newEntry.Key;
             if (item != null)
@@ -91,61 +127,109 @@ namespace MultiplayerARPG
         #endregion
 
         #region Combine Dictionary with Dictionary functions
-        public static Dictionary<DamageElement, MinMaxFloat> CombineDamageAmountsDictionary(Dictionary<DamageElement, MinMaxFloat> sourceDictionary, Dictionary<DamageElement, MinMaxFloat> combineDictionary)
+        /// <summary>
+        /// Combine damage amounts dictionary
+        /// </summary>
+        /// <param name="sourceDictionary"></param>
+        /// <param name="combineDictionary"></param>
+        /// <returns></returns>
+        public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(Dictionary<DamageElement, MinMaxFloat> sourceDictionary, Dictionary<DamageElement, MinMaxFloat> combineDictionary)
         {
             if (combineDictionary != null)
             {
                 foreach (KeyValuePair<DamageElement, MinMaxFloat> entry in combineDictionary)
                 {
-                    CombineDamageAmountsDictionary(sourceDictionary, entry);
+                    CombineDamages(sourceDictionary, entry);
                 }
             }
             return sourceDictionary;
         }
 
-        public static Dictionary<DamageElement, float> CombineDamageInflictionAmountsDictionary(Dictionary<DamageElement, float> sourceDictionary, Dictionary<DamageElement, float> combineDictionary)
+        /// <summary>
+        /// Combine damage infliction amounts dictionary
+        /// </summary>
+        /// <param name="sourceDictionary"></param>
+        /// <param name="combineDictionary"></param>
+        /// <returns></returns>
+        public static Dictionary<DamageElement, float> CombineDamageInflictions(Dictionary<DamageElement, float> sourceDictionary, Dictionary<DamageElement, float> combineDictionary)
         {
             if (combineDictionary != null)
             {
                 foreach (KeyValuePair<DamageElement, float> entry in combineDictionary)
                 {
-                    CombineDamageInflictionAmountsDictionary(sourceDictionary, entry);
+                    CombineDamageInflictions(sourceDictionary, entry);
                 }
             }
             return sourceDictionary;
         }
 
-        public static Dictionary<Attribute, short> CombineAttributeAmountsDictionary(Dictionary<Attribute, short> sourceDictionary, Dictionary<Attribute, short> combineDictionary)
+        /// <summary>
+        /// Combine attribute amounts dictionary
+        /// </summary>
+        /// <param name="sourceDictionary"></param>
+        /// <param name="combineDictionary"></param>
+        /// <returns></returns>
+        public static Dictionary<Attribute, short> CombineAttributes(Dictionary<Attribute, short> sourceDictionary, Dictionary<Attribute, short> combineDictionary)
         {
             if (combineDictionary != null)
             {
                 foreach (KeyValuePair<Attribute, short> entry in combineDictionary)
                 {
-                    CombineAttributeAmountsDictionary(sourceDictionary, entry);
+                    CombineAttributes(sourceDictionary, entry);
                 }
             }
             return sourceDictionary;
         }
 
-        public static Dictionary<DamageElement, float> CombineResistanceAmountsDictionary(Dictionary<DamageElement, float> sourceDictionary, Dictionary<DamageElement, float> combineDictionary)
+        /// <summary>
+        /// Combine resistance amounts dictionary
+        /// </summary>
+        /// <param name="sourceDictionary"></param>
+        /// <param name="combineDictionary"></param>
+        /// <returns></returns>
+        public static Dictionary<DamageElement, float> CombineResistances(Dictionary<DamageElement, float> sourceDictionary, Dictionary<DamageElement, float> combineDictionary)
         {
             if (combineDictionary != null)
             {
                 foreach (KeyValuePair<DamageElement, float> entry in combineDictionary)
                 {
-                    CombineResistanceAmountsDictionary(sourceDictionary, entry);
+                    CombineResistances(sourceDictionary, entry);
                 }
             }
             return sourceDictionary;
         }
 
-        public static Dictionary<Skill, short> CombineSkillLevelsDictionary(Dictionary<Skill, short> sourceDictionary, Dictionary<Skill, short> combineDictionary)
+        /// <summary>
+        /// Combine skill levels dictionary
+        /// </summary>
+        /// <param name="sourceDictionary"></param>
+        /// <param name="combineDictionary"></param>
+        /// <returns></returns>
+        public static Dictionary<Skill, short> CombineSkills(Dictionary<Skill, short> sourceDictionary, Dictionary<Skill, short> combineDictionary)
         {
             if (combineDictionary != null)
             {
                 foreach (KeyValuePair<Skill, short> entry in combineDictionary)
                 {
-                    CombineSkillLevelsDictionary(sourceDictionary, entry);
+                    CombineSkills(sourceDictionary, entry);
+                }
+            }
+            return sourceDictionary;
+        }
+
+        /// <summary>
+        /// Combine item amounts dictionary
+        /// </summary>
+        /// <param name="sourceDictionary"></param>
+        /// <param name="newEntry"></param>
+        /// <returns></returns>
+        public static Dictionary<Item, short> CombineItems(Dictionary<Item, short> sourceDictionary, Dictionary<Item, short> combineDictionary)
+        {
+            if (combineDictionary != null)
+            {
+                foreach (KeyValuePair<Item, short> entry in combineDictionary)
+                {
+                    CombineItems(sourceDictionary, entry);
                 }
             }
             return sourceDictionary;
@@ -153,7 +237,14 @@ namespace MultiplayerARPG
         #endregion
 
         #region Make KeyValuePair functions
-        public static KeyValuePair<DamageElement, MinMaxFloat> MakeDamageAmountPair(DamageAmount source, float rate, float effectiveness)
+        /// <summary>
+        /// Make damage - amount key-value pair
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="rate"></param>
+        /// <param name="effectiveness"></param>
+        /// <returns></returns>
+        public static KeyValuePair<DamageElement, MinMaxFloat> MakeDamage(DamageAmount source, float rate, float effectiveness)
         {
             GameInstance gameInstance = GameInstance.Singleton;
             DamageElement damageElement = source.damageElement;
@@ -162,7 +253,15 @@ namespace MultiplayerARPG
             return new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, (source.amount * rate) + effectiveness);
         }
 
-        public static KeyValuePair<DamageElement, MinMaxFloat> MakeDamageAmountPair(DamageIncremental source, short level, float rate, float effectiveness)
+        /// <summary>
+        /// Make damage amount
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="level"></param>
+        /// <param name="rate"></param>
+        /// <param name="effectiveness"></param>
+        /// <returns></returns>
+        public static KeyValuePair<DamageElement, MinMaxFloat> MakeDamage(DamageIncremental source, short level, float rate, float effectiveness)
         {
             GameInstance gameInstance = GameInstance.Singleton;
             DamageElement damageElement = source.damageElement;
@@ -171,17 +270,26 @@ namespace MultiplayerARPG
             return new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, (source.amount.GetAmount(level) * rate) + effectiveness);
         }
 
-        public static Dictionary<DamageElement, MinMaxFloat> MakeDamageAmountWithInflictions(DamageIncremental source, short level, float rate, float effectiveness, Dictionary<DamageElement, float> damageInflictionAmounts)
+        /// <summary>
+        /// Make damage - amount key-value pair which calculates with damage inflictions
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="level"></param>
+        /// <param name="rate"></param>
+        /// <param name="effectiveness"></param>
+        /// <param name="damageInflictions"></param>
+        /// <returns></returns>
+        public static Dictionary<DamageElement, MinMaxFloat> MakeDamageWithInflictions(DamageIncremental source, short level, float rate, float effectiveness, Dictionary<DamageElement, float> damageInflictions)
         {
             Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
             GameInstance gameInstance = GameInstance.Singleton;
             MinMaxFloat baseDamage = (source.amount.GetAmount(level) * rate) + effectiveness;
-            if (damageInflictionAmounts != null && damageInflictionAmounts.Count > 0)
+            if (damageInflictions != null && damageInflictions.Count > 0)
             {
-                foreach (KeyValuePair<DamageElement, float> damageInflictionAmount in damageInflictionAmounts)
+                foreach (KeyValuePair<DamageElement, float> damageInflictionAmount in damageInflictions)
                 {
                     DamageElement damageElement = damageInflictionAmount.Key;
-                    result = CombineDamageAmountsDictionary(result, new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, baseDamage * damageInflictionAmount.Value));
+                    result = CombineDamages(result, new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, baseDamage * damageInflictionAmount.Value));
                 }
             }
             else
@@ -189,12 +297,17 @@ namespace MultiplayerARPG
                 DamageElement damageElement = source.damageElement;
                 if (damageElement == null)
                     damageElement = gameInstance.DefaultDamageElement;
-                result = CombineDamageAmountsDictionary(result, new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, baseDamage));
+                result = CombineDamages(result, new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, baseDamage));
             }
             return result;
         }
 
-        public static KeyValuePair<DamageElement, float> MakeDamageInflictionPair(DamageInflictionAmount source)
+        /// <summary>
+        /// Make damage infliction - amount key-value pair
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static KeyValuePair<DamageElement, float> MakeDamageInfliction(DamageInflictionAmount source)
         {
             GameInstance gameInstance = GameInstance.Singleton;
             DamageElement damageElement = source.damageElement;
@@ -203,7 +316,13 @@ namespace MultiplayerARPG
             return new KeyValuePair<DamageElement, float>(damageElement, source.rate);
         }
 
-        public static KeyValuePair<DamageElement, float> MakeDamageInflictionPair(DamageInflictionIncremental source, short level)
+        /// <summary>
+        /// Make damage infliction - amount key-value pair
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="level"></param>
+        /// <returns></returns>
+        public static KeyValuePair<DamageElement, float> MakeDamageInfliction(DamageInflictionIncremental source, short level)
         {
             GameInstance gameInstance = GameInstance.Singleton;
             DamageElement damageElement = source.damageElement;
@@ -212,42 +331,78 @@ namespace MultiplayerARPG
             return new KeyValuePair<DamageElement, float>(damageElement, source.rate.GetAmount(level));
         }
 
-        public static KeyValuePair<Attribute, short> MakeAttributeAmountPair(AttributeAmount source, float rate)
+        /// <summary>
+        /// Make attribute - amount key-value pair
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static KeyValuePair<Attribute, short> MakeAttribute(AttributeAmount source, float rate)
         {
             if (source.attribute == null)
                 return new KeyValuePair<Attribute, short>();
             return new KeyValuePair<Attribute, short>(source.attribute, (short)(source.amount * rate));
         }
 
-        public static KeyValuePair<Attribute, short> MakeAttributeAmountPair(AttributeIncremental source, short level, float rate)
+        /// <summary>
+        /// Make attribute - amount key-value pair
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="level"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static KeyValuePair<Attribute, short> MakeAttribute(AttributeIncremental source, short level, float rate)
         {
             if (source.attribute == null)
                 return new KeyValuePair<Attribute, short>();
             return new KeyValuePair<Attribute, short>(source.attribute, (short)(source.amount.GetAmount(level) * rate));
         }
 
-        public static KeyValuePair<DamageElement, float> MakeResistanceAmountPair(ResistanceAmount source, float rate)
+        /// <summary>
+        /// Make resistance - amount key-value pair
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static KeyValuePair<DamageElement, float> MakeResistance(ResistanceAmount source, float rate)
         {
             if (source.damageElement == null)
                 return new KeyValuePair<DamageElement, float>();
             return new KeyValuePair<DamageElement, float>(source.damageElement, source.amount * rate);
         }
 
-        public static KeyValuePair<DamageElement, float> MakeResistanceAmountPair(ResistanceIncremental source, short level, float rate)
+        /// <summary>
+        /// Make resistance - amount key-value pair
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="level"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static KeyValuePair<DamageElement, float> MakeResistance(ResistanceIncremental source, short level, float rate)
         {
             if (source.damageElement == null)
                 return new KeyValuePair<DamageElement, float>();
             return new KeyValuePair<DamageElement, float>(source.damageElement, source.amount.GetAmount(level) * rate);
         }
 
-        public static KeyValuePair<Skill, short> MakeSkillLevelPair(SkillLevel source)
+        /// <summary>
+        /// Make skill - level key-value pair
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static KeyValuePair<Skill, short> MakeSkill(SkillLevel source)
         {
             if (source.skill == null)
                 return new KeyValuePair<Skill, short>();
             return new KeyValuePair<Skill, short>(source.skill, source.level);
         }
 
-        public static KeyValuePair<Item, short> MakeItemAmountPair(ItemAmount source)
+        /// <summary>
+        /// Make item - amount key-value pair
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static KeyValuePair<Item, short> MakeItem(ItemAmount source)
         {
             if (source.item == null)
                 return new KeyValuePair<Item, short>();
@@ -256,7 +411,13 @@ namespace MultiplayerARPG
         #endregion
 
         #region Make Dictionary functions
-        public static Dictionary<Attribute, float> MakeDamageEffectivenessAttributesDictionary(DamageEffectivenessAttribute[] sourceEffectivesses, Dictionary<Attribute, float> targetDictionary)
+        /// <summary>
+        /// Make damage effectiveness attribute amounts dictionary
+        /// </summary>
+        /// <param name="sourceEffectivesses"></param>
+        /// <param name="targetDictionary"></param>
+        /// <returns></returns>
+        public static Dictionary<Attribute, float> MakeDamageEffectivenessAttributes(DamageEffectivenessAttribute[] sourceEffectivesses, Dictionary<Attribute, float> targetDictionary)
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<Attribute, float>();
@@ -276,7 +437,14 @@ namespace MultiplayerARPG
             return targetDictionary;
         }
 
-        public static Dictionary<DamageElement, MinMaxFloat> MakeDamageAmountsDictionary(DamageAmount[] sourceAmounts, Dictionary<DamageElement, MinMaxFloat> targetDictionary, float rate)
+        /// <summary>
+        /// Make damage amounts dictionary
+        /// </summary>
+        /// <param name="sourceAmounts"></param>
+        /// <param name="targetDictionary"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static Dictionary<DamageElement, MinMaxFloat> MakeDamages(DamageAmount[] sourceAmounts, Dictionary<DamageElement, MinMaxFloat> targetDictionary, float rate)
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<DamageElement, MinMaxFloat>();
@@ -285,14 +453,22 @@ namespace MultiplayerARPG
                 GameInstance gameInstance = GameInstance.Singleton;
                 foreach (DamageAmount sourceAmount in sourceAmounts)
                 {
-                    KeyValuePair<DamageElement, MinMaxFloat> pair = MakeDamageAmountPair(sourceAmount, rate, 0f);
-                    targetDictionary = CombineDamageAmountsDictionary(targetDictionary, pair);
+                    KeyValuePair<DamageElement, MinMaxFloat> pair = MakeDamage(sourceAmount, rate, 0f);
+                    targetDictionary = CombineDamages(targetDictionary, pair);
                 }
             }
             return targetDictionary;
         }
 
-        public static Dictionary<DamageElement, MinMaxFloat> MakeDamageAmountsDictionary(DamageIncremental[] sourceIncrementals, Dictionary<DamageElement, MinMaxFloat> targetDictionary, short level, float rate)
+        /// <summary>
+        /// Make damage amounts dictionary
+        /// </summary>
+        /// <param name="sourceIncrementals"></param>
+        /// <param name="targetDictionary"></param>
+        /// <param name="level"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static Dictionary<DamageElement, MinMaxFloat> MakeDamages(DamageIncremental[] sourceIncrementals, Dictionary<DamageElement, MinMaxFloat> targetDictionary, short level, float rate)
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<DamageElement, MinMaxFloat>();
@@ -301,14 +477,21 @@ namespace MultiplayerARPG
                 GameInstance gameInstance = GameInstance.Singleton;
                 foreach (DamageIncremental sourceIncremental in sourceIncrementals)
                 {
-                    KeyValuePair<DamageElement, MinMaxFloat> pair = MakeDamageAmountPair(sourceIncremental, level, rate, 0f);
-                    targetDictionary = CombineDamageAmountsDictionary(targetDictionary, pair);
+                    KeyValuePair<DamageElement, MinMaxFloat> pair = MakeDamage(sourceIncremental, level, rate, 0f);
+                    targetDictionary = CombineDamages(targetDictionary, pair);
                 }
             }
             return targetDictionary;
         }
 
-        public static Dictionary<DamageElement, float> MakeDamageInflictionAmountsDictionary(DamageInflictionIncremental[] sourceIncrementals, Dictionary<DamageElement, float> targetDictionary, short level)
+        /// <summary>
+        /// Make damage infliction amounts dictionary
+        /// </summary>
+        /// <param name="sourceIncrementals"></param>
+        /// <param name="targetDictionary"></param>
+        /// <param name="level"></param>
+        /// <returns></returns>
+        public static Dictionary<DamageElement, float> MakeDamageInflictions(DamageInflictionIncremental[] sourceIncrementals, Dictionary<DamageElement, float> targetDictionary, short level)
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<DamageElement, float>();
@@ -317,14 +500,21 @@ namespace MultiplayerARPG
                 GameInstance gameInstance = GameInstance.Singleton;
                 foreach (DamageInflictionIncremental sourceIncremental in sourceIncrementals)
                 {
-                    KeyValuePair<DamageElement, float> pair = MakeDamageInflictionPair(sourceIncremental, level);
-                    targetDictionary = CombineDamageInflictionAmountsDictionary(targetDictionary, pair);
+                    KeyValuePair<DamageElement, float> pair = MakeDamageInfliction(sourceIncremental, level);
+                    targetDictionary = CombineDamageInflictions(targetDictionary, pair);
                 }
             }
             return targetDictionary;
         }
 
-        public static Dictionary<Attribute, short> MakeAttributeAmountsDictionary(AttributeAmount[] sourceAmounts, Dictionary<Attribute, short> targetDictionary, float rate)
+        /// <summary>
+        /// Make attribute amounts dictionary
+        /// </summary>
+        /// <param name="sourceAmounts"></param>
+        /// <param name="targetDictionary"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static Dictionary<Attribute, short> MakeAttributes(AttributeAmount[] sourceAmounts, Dictionary<Attribute, short> targetDictionary, float rate)
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<Attribute, short>();
@@ -332,14 +522,22 @@ namespace MultiplayerARPG
             {
                 foreach (AttributeAmount sourceAmount in sourceAmounts)
                 {
-                    KeyValuePair<Attribute, short> pair = MakeAttributeAmountPair(sourceAmount, rate);
-                    targetDictionary = CombineAttributeAmountsDictionary(targetDictionary, pair);
+                    KeyValuePair<Attribute, short> pair = MakeAttribute(sourceAmount, rate);
+                    targetDictionary = CombineAttributes(targetDictionary, pair);
                 }
             }
             return targetDictionary;
         }
 
-        public static Dictionary<Attribute, short> MakeAttributeAmountsDictionary(AttributeIncremental[] sourceIncrementals, Dictionary<Attribute, short> targetDictionary, short level, float rate)
+        /// <summary>
+        /// Make attribute amounts dictionary
+        /// </summary>
+        /// <param name="sourceIncrementals"></param>
+        /// <param name="targetDictionary"></param>
+        /// <param name="level"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static Dictionary<Attribute, short> MakeAttributes(AttributeIncremental[] sourceIncrementals, Dictionary<Attribute, short> targetDictionary, short level, float rate)
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<Attribute, short>();
@@ -347,14 +545,21 @@ namespace MultiplayerARPG
             {
                 foreach (AttributeIncremental sourceIncremental in sourceIncrementals)
                 {
-                    KeyValuePair<Attribute, short> pair = MakeAttributeAmountPair(sourceIncremental, level, rate);
-                    targetDictionary = CombineAttributeAmountsDictionary(targetDictionary, pair);
+                    KeyValuePair<Attribute, short> pair = MakeAttribute(sourceIncremental, level, rate);
+                    targetDictionary = CombineAttributes(targetDictionary, pair);
                 }
             }
             return targetDictionary;
         }
 
-        public static Dictionary<DamageElement, float> MakeResistanceAmountsDictionary(ResistanceAmount[] sourceAmounts, Dictionary<DamageElement, float> targetDictionary, float rate)
+        /// <summary>
+        /// Make resistance amounts dictionary
+        /// </summary>
+        /// <param name="sourceAmounts"></param>
+        /// <param name="targetDictionary"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static Dictionary<DamageElement, float> MakeResistances(ResistanceAmount[] sourceAmounts, Dictionary<DamageElement, float> targetDictionary, float rate)
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<DamageElement, float>();
@@ -362,14 +567,22 @@ namespace MultiplayerARPG
             {
                 foreach (ResistanceAmount sourceAmount in sourceAmounts)
                 {
-                    KeyValuePair<DamageElement, float> pair = MakeResistanceAmountPair(sourceAmount, rate);
-                    targetDictionary = CombineResistanceAmountsDictionary(targetDictionary, pair);
+                    KeyValuePair<DamageElement, float> pair = MakeResistance(sourceAmount, rate);
+                    targetDictionary = CombineResistances(targetDictionary, pair);
                 }
             }
             return targetDictionary;
         }
 
-        public static Dictionary<DamageElement, float> MakeResistanceAmountsDictionary(ResistanceIncremental[] sourceIncrementals, Dictionary<DamageElement, float> targetDictionary, short level, float rate)
+        /// <summary>
+        /// Make resistance amounts dictionary
+        /// </summary>
+        /// <param name="sourceIncrementals"></param>
+        /// <param name="targetDictionary"></param>
+        /// <param name="level"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static Dictionary<DamageElement, float> MakeResistances(ResistanceIncremental[] sourceIncrementals, Dictionary<DamageElement, float> targetDictionary, short level, float rate)
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<DamageElement, float>();
@@ -377,14 +590,20 @@ namespace MultiplayerARPG
             {
                 foreach (ResistanceIncremental sourceIncremental in sourceIncrementals)
                 {
-                    KeyValuePair<DamageElement, float> pair = MakeResistanceAmountPair(sourceIncremental, level, rate);
-                    targetDictionary = CombineResistanceAmountsDictionary(targetDictionary, pair);
+                    KeyValuePair<DamageElement, float> pair = MakeResistance(sourceIncremental, level, rate);
+                    targetDictionary = CombineResistances(targetDictionary, pair);
                 }
             }
             return targetDictionary;
         }
 
-        public static Dictionary<Skill, short> MakeSkillLevelsDictionary(SkillLevel[] sourceLevels, Dictionary<Skill, short> targetDictionary)
+        /// <summary>
+        /// Make skill levels dictionary
+        /// </summary>
+        /// <param name="sourceLevels"></param>
+        /// <param name="targetDictionary"></param>
+        /// <returns></returns>
+        public static Dictionary<Skill, short> MakeSkills(SkillLevel[] sourceLevels, Dictionary<Skill, short> targetDictionary)
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<Skill, short>();
@@ -392,14 +611,20 @@ namespace MultiplayerARPG
             {
                 foreach (SkillLevel sourceLevel in sourceLevels)
                 {
-                    KeyValuePair<Skill, short> pair = MakeSkillLevelPair(sourceLevel);
-                    targetDictionary = CombineSkillLevelsDictionary(targetDictionary, pair);
+                    KeyValuePair<Skill, short> pair = MakeSkill(sourceLevel);
+                    targetDictionary = CombineSkills(targetDictionary, pair);
                 }
             }
             return targetDictionary;
         }
 
-        public static Dictionary<Item, short> MakeItemAmountsDictionary(ItemAmount[] sourceAmounts, Dictionary<Item, short> targetDictionary)
+        /// <summary>
+        /// Make item amounts dictionary
+        /// </summary>
+        /// <param name="sourceAmounts"></param>
+        /// <param name="targetDictionary"></param>
+        /// <returns></returns>
+        public static Dictionary<Item, short> MakeItems(ItemAmount[] sourceAmounts, Dictionary<Item, short> targetDictionary)
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<Item, short>();
@@ -407,8 +632,8 @@ namespace MultiplayerARPG
             {
                 foreach (ItemAmount sourceAmount in sourceAmounts)
                 {
-                    KeyValuePair<Item, short> pair = MakeItemAmountPair(sourceAmount);
-                    targetDictionary = CombineItemAmountsDictionary(targetDictionary, pair);
+                    KeyValuePair<Item, short> pair = MakeItem(sourceAmount);
+                    targetDictionary = CombineItems(targetDictionary, pair);
                 }
             }
             return targetDictionary;

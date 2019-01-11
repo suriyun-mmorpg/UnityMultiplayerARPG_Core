@@ -74,7 +74,7 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheRequireSkillLevels == null)
-                    cacheRequireSkillLevels = GameDataHelpers.MakeSkillLevelsDictionary(requirement.skillLevels, new Dictionary<Skill, short>());
+                    cacheRequireSkillLevels = GameDataHelpers.MakeSkills(requirement.skillLevels, new Dictionary<Skill, short>());
                 return cacheRequireSkillLevels;
             }
         }
@@ -85,7 +85,7 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheEffectivenessAttributes == null)
-                    cacheEffectivenessAttributes = GameDataHelpers.MakeDamageEffectivenessAttributesDictionary(effectivenessAttributes, new Dictionary<Attribute, float>());
+                    cacheEffectivenessAttributes = GameDataHelpers.MakeDamageEffectivenessAttributes(effectivenessAttributes, new Dictionary<Attribute, float>());
                 return cacheEffectivenessAttributes;
             }
         }

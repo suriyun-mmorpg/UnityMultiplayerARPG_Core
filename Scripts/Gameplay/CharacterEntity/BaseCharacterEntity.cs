@@ -663,10 +663,10 @@ namespace MultiplayerARPG
             // Assign damage data
             damageInfo = weaponType.damageInfo;
             // Calculate all damages
-            allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(
+            allDamageAmounts = GameDataHelpers.CombineDamages(
                 allDamageAmounts,
                 weaponItem.GetDamageAmount(weapon.level, weapon.GetEquipmentBonusRate(), this));
-            allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(
+            allDamageAmounts = GameDataHelpers.CombineDamages(
                 allDamageAmounts,
                 CacheIncreaseDamages);
         }
@@ -738,11 +738,11 @@ namespace MultiplayerARPG
                         // Calculate all damages
                         allDamageAmounts = weaponItem.GetDamageAmountWithInflictions(weapon.level, weapon.GetEquipmentBonusRate(), this, skill.GetWeaponDamageInflictions(characterSkill.level));
                         // Sum damage with additional damage amounts
-                        allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(
+                        allDamageAmounts = GameDataHelpers.CombineDamages(
                             allDamageAmounts,
                             skill.GetDamageAmount(characterSkill.level, this));
                         // Sum damage with skill damage
-                        allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(
+                        allDamageAmounts = GameDataHelpers.CombineDamages(
                             allDamageAmounts,
                             skill.GetAdditionalDamageAmounts(characterSkill.level));
                         break;
@@ -752,12 +752,12 @@ namespace MultiplayerARPG
                         // Calculate all damages
                         allDamageAmounts = weaponItem.GetDamageAmountWithInflictions(weapon.level, weapon.GetEquipmentBonusRate(), this, skill.GetWeaponDamageInflictions(characterSkill.level));
                         // Sum damage with additional damage amounts
-                        allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(
+                        allDamageAmounts = GameDataHelpers.CombineDamages(
                             allDamageAmounts,
                             skill.GetAdditionalDamageAmounts(characterSkill.level));
                         break;
                 }
-                allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(
+                allDamageAmounts = GameDataHelpers.CombineDamages(
                     allDamageAmounts,
                     CacheIncreaseDamages);
             }

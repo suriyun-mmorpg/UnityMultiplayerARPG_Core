@@ -157,7 +157,7 @@ namespace MultiplayerARPG
         {
             if (!skill.IsAttack() || skill.skillAttackType != SkillAttackType.Normal)
                 return new KeyValuePair<DamageElement, MinMaxFloat>();
-            return GameDataHelpers.MakeDamageAmountPair(skill.damageAmount, level, 1f, skill.GetEffectivenessDamage(character));
+            return GameDataHelpers.MakeDamage(skill.damageAmount, level, 1f, skill.GetEffectivenessDamage(character));
         }
 
         public static float GetEffectivenessDamage(this Skill skill, ICharacterData character)
@@ -172,7 +172,7 @@ namespace MultiplayerARPG
             if (!skill.IsAttack())
                 return new Dictionary<DamageElement, float>();
             level = skill.GetAdjustedLevel(level);
-            return GameDataHelpers.MakeDamageInflictionAmountsDictionary(skill.weaponDamageInflictions, new Dictionary<DamageElement, float>(), level);
+            return GameDataHelpers.MakeDamageInflictions(skill.weaponDamageInflictions, new Dictionary<DamageElement, float>(), level);
         }
 
         public static Dictionary<DamageElement, MinMaxFloat> GetAdditionalDamageAmounts(this Skill skill, short level)
@@ -180,7 +180,7 @@ namespace MultiplayerARPG
             if (!skill.IsAttack())
                 return new Dictionary<DamageElement, MinMaxFloat>();
             level = skill.GetAdjustedLevel(level);
-            return GameDataHelpers.MakeDamageAmountsDictionary(skill.additionalDamageAmounts, new Dictionary<DamageElement, MinMaxFloat>(), level, 1f);
+            return GameDataHelpers.MakeDamages(skill.additionalDamageAmounts, new Dictionary<DamageElement, MinMaxFloat>(), level, 1f);
         }
         #endregion
     }

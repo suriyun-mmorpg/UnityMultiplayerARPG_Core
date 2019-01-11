@@ -57,7 +57,7 @@ namespace MultiplayerARPG
             Dictionary<Attribute, short> result = new Dictionary<Attribute, short>();
             if (equipmentItem != null &&
                 equipmentItem.IsEquipment())
-                result = GameDataHelpers.MakeAttributeAmountsDictionary(equipmentItem.increaseAttributes, result, level, rate);
+                result = GameDataHelpers.MakeAttributes(equipmentItem.increaseAttributes, result, level, rate);
             return result;
         }
 
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
             if (equipmentItem != null &&
                 equipmentItem.IsEquipment())
-                result = GameDataHelpers.MakeResistanceAmountsDictionary(equipmentItem.increaseResistances, result, level, rate);
+                result = GameDataHelpers.MakeResistances(equipmentItem.increaseResistances, result, level, rate);
             return result;
         }
 
@@ -75,7 +75,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
             if (equipmentItem != null &&
                 equipmentItem.IsEquipment())
-                result = GameDataHelpers.MakeDamageAmountsDictionary(equipmentItem.increaseDamages, result, level, rate);
+                result = GameDataHelpers.MakeDamages(equipmentItem.increaseDamages, result, level, rate);
             return result;
         }
         #endregion
@@ -86,7 +86,7 @@ namespace MultiplayerARPG
             if (weaponItem == null ||
                 !weaponItem.IsWeapon())
                 return new KeyValuePair<DamageElement, MinMaxFloat>();
-            return GameDataHelpers.MakeDamageAmountPair(weaponItem.damageAmount, level, rate, weaponItem.GetEffectivenessDamage(character));
+            return GameDataHelpers.MakeDamage(weaponItem.damageAmount, level, rate, weaponItem.GetEffectivenessDamage(character));
         }
 
         public static Dictionary<DamageElement, MinMaxFloat> GetDamageAmountWithInflictions(this Item weaponItem, short level, float rate, ICharacterData character, Dictionary<DamageElement, float> damageInflictionAmounts)
@@ -94,7 +94,7 @@ namespace MultiplayerARPG
             if (weaponItem == null ||
                 !weaponItem.IsWeapon())
                 return new Dictionary<DamageElement, MinMaxFloat>();
-            return GameDataHelpers.MakeDamageAmountWithInflictions(weaponItem.damageAmount, level, rate, weaponItem.GetEffectivenessDamage(character), damageInflictionAmounts);
+            return GameDataHelpers.MakeDamageWithInflictions(weaponItem.damageAmount, level, rate, weaponItem.GetEffectivenessDamage(character), damageInflictionAmounts);
         }
 
         public static float GetEffectivenessDamage(this Item weaponItem, ICharacterData character)

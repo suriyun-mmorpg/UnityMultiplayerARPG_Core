@@ -44,17 +44,17 @@ namespace MultiplayerARPG
 
         public static Dictionary<Attribute, short> GetIncreaseAttributes(this Buff buff, short level)
         {
-            return GameDataHelpers.MakeAttributeAmountsDictionary(buff.increaseAttributes, new Dictionary<Attribute, short>(), level, 1f);
+            return GameDataHelpers.MakeAttributes(buff.increaseAttributes, new Dictionary<Attribute, short>(), level, 1f);
         }
 
         public static Dictionary<DamageElement, float> GetIncreaseResistances(this Buff buff, short level)
         {
-            return GameDataHelpers.MakeResistanceAmountsDictionary(buff.increaseResistances, new Dictionary<DamageElement, float>(), level, 1f);
+            return GameDataHelpers.MakeResistances(buff.increaseResistances, new Dictionary<DamageElement, float>(), level, 1f);
         }
 
         public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this Buff buff, short level)
         {
-            return GameDataHelpers.MakeDamageAmountsDictionary(buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), level, 1f);
+            return GameDataHelpers.MakeDamages(buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), level, 1f);
         }
         #endregion
     }

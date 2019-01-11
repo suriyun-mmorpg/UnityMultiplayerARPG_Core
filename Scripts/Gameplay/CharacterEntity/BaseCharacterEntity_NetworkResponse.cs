@@ -57,7 +57,7 @@ namespace MultiplayerARPG
                     CharacterItem characterItem = firstEntry.Key;
                     Item item = characterItem.GetItem();
                     if (item != null && firstEntry.Value > 0)
-                        allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(allDamageAmounts, item.GetIncreaseDamages(characterItem.level, characterItem.GetEquipmentBonusRate()));
+                        allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, item.GetIncreaseDamages(characterItem.level, characterItem.GetEquipmentBonusRate()));
                 }
             }
 
@@ -138,7 +138,7 @@ namespace MultiplayerARPG
                     CharacterItem characterItem = firstEntry.Key;
                     Item item = characterItem.GetItem();
                     if (item != null && firstEntry.Value > 0)
-                        allDamageAmounts = GameDataHelpers.CombineDamageAmountsDictionary(allDamageAmounts, item.GetIncreaseDamages(characterItem.level, characterItem.GetEquipmentBonusRate()));
+                        allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, item.GetIncreaseDamages(characterItem.level, characterItem.GetEquipmentBonusRate()));
                 }
             }
 

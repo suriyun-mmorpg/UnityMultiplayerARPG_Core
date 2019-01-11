@@ -107,7 +107,7 @@ public static partial class CharacterDataExtension
         // Attributes from character database
         BaseCharacter character = data.GetDatabase();
         if (character != null)
-            result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
+            result = GameDataHelpers.CombineAttributes(result,
                 character.GetCharacterAttributes(data.Level));
 
         // Added attributes
@@ -139,7 +139,7 @@ public static partial class CharacterDataExtension
         {
             tempEquipment = equipItem.GetEquipmentItem();
             if (tempEquipment != null)
-                result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
+                result = GameDataHelpers.CombineAttributes(result,
                     tempEquipment.GetIncreaseAttributes(equipItem.level, equipItem.GetEquipmentBonusRate()));
         }
         // Weapons
@@ -150,13 +150,13 @@ public static partial class CharacterDataExtension
             CharacterItem rightHandItem = equipWeapons.rightHand;
             tempEquipment = rightHandItem.GetEquipmentItem();
             if (tempEquipment != null)
-                result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
+                result = GameDataHelpers.CombineAttributes(result,
                     tempEquipment.GetIncreaseAttributes(rightHandItem.level, rightHandItem.GetEquipmentBonusRate()));
             // Left hand equipment
             CharacterItem leftHandItem = equipWeapons.leftHand;
             tempEquipment = leftHandItem.GetEquipmentItem();
             if (tempEquipment != null)
-                result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
+                result = GameDataHelpers.CombineAttributes(result,
                     tempEquipment.GetIncreaseAttributes(leftHandItem.level, leftHandItem.GetEquipmentBonusRate()));
         }
         return result;
@@ -168,7 +168,7 @@ public static partial class CharacterDataExtension
         IList<CharacterBuff> buffs = data.Buffs;
         foreach (CharacterBuff buff in buffs)
         {
-            result = GameDataHelpers.CombineAttributeAmountsDictionary(result, buff.GetIncreaseAttributes());
+            result = GameDataHelpers.CombineAttributes(result, buff.GetIncreaseAttributes());
         }
 
         // Passive skills
@@ -177,7 +177,7 @@ public static partial class CharacterDataExtension
         {
             if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
                 continue;
-            result = GameDataHelpers.CombineAttributeAmountsDictionary(result,
+            result = GameDataHelpers.CombineAttributes(result,
                 skill.GetSkill().buff.GetIncreaseAttributes(skill.level));
         }
         return result;
@@ -187,9 +187,9 @@ public static partial class CharacterDataExtension
     {
         Dictionary<Attribute, short> result = data.GetCharacterAttributes();
         if (sumWithEquipments)
-            result = GameDataHelpers.CombineAttributeAmountsDictionary(result, data.GetEquipmentAttributes());
+            result = GameDataHelpers.CombineAttributes(result, data.GetEquipmentAttributes());
         if (sumWithBuffs)
-            result = GameDataHelpers.CombineAttributeAmountsDictionary(result, data.GetBuffAttributes());
+            result = GameDataHelpers.CombineAttributes(result, data.GetBuffAttributes());
         return result;
     }
 
@@ -219,7 +219,7 @@ public static partial class CharacterDataExtension
         Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
         BaseCharacter character = data.GetDatabase();
         if (character != null)
-            result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
+            result = GameDataHelpers.CombineResistances(result,
                 character.GetCharacterResistances(data.Level));
         return result;
     }
@@ -236,7 +236,7 @@ public static partial class CharacterDataExtension
         {
             tempEquipment = equipItem.GetEquipmentItem();
             if (tempEquipment != null)
-                result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
+                result = GameDataHelpers.CombineResistances(result,
                     tempEquipment.GetIncreaseResistances(equipItem.level, equipItem.GetEquipmentBonusRate()));
         }
         // Weapons
@@ -247,13 +247,13 @@ public static partial class CharacterDataExtension
             CharacterItem rightHandItem = equipWeapons.rightHand;
             tempEquipment = rightHandItem.GetEquipmentItem();
             if (tempEquipment != null)
-                result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
+                result = GameDataHelpers.CombineResistances(result,
                     tempEquipment.GetIncreaseResistances(rightHandItem.level, rightHandItem.GetEquipmentBonusRate()));
             // Left hand equipment
             CharacterItem leftHandItem = equipWeapons.leftHand;
             tempEquipment = leftHandItem.GetEquipmentItem();
             if (tempEquipment != null)
-                result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
+                result = GameDataHelpers.CombineResistances(result,
                     tempEquipment.GetIncreaseResistances(leftHandItem.level, leftHandItem.GetEquipmentBonusRate()));
         }
         return result;
@@ -267,7 +267,7 @@ public static partial class CharacterDataExtension
         IList<CharacterBuff> buffs = data.Buffs;
         foreach (CharacterBuff buff in buffs)
         {
-            result = GameDataHelpers.CombineResistanceAmountsDictionary(result, buff.GetIncreaseResistances());
+            result = GameDataHelpers.CombineResistances(result, buff.GetIncreaseResistances());
         }
 
         // Passive skills
@@ -276,7 +276,7 @@ public static partial class CharacterDataExtension
         {
             if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
                 continue;
-            result = GameDataHelpers.CombineResistanceAmountsDictionary(result,
+            result = GameDataHelpers.CombineResistances(result,
                 skill.GetSkill().buff.GetIncreaseResistances(skill.level));
         }
         return result;
@@ -286,9 +286,9 @@ public static partial class CharacterDataExtension
     {
         Dictionary<DamageElement, float> result = data.GetCharacterResistances();
         if (sumWithEquipments)
-            result = GameDataHelpers.CombineResistanceAmountsDictionary(result, data.GetEquipmentResistances());
+            result = GameDataHelpers.CombineResistances(result, data.GetEquipmentResistances());
         if (sumWithBuffs)
-            result = GameDataHelpers.CombineResistanceAmountsDictionary(result, data.GetBuffResistances());
+            result = GameDataHelpers.CombineResistances(result, data.GetBuffResistances());
         return result;
     }
 
@@ -304,7 +304,7 @@ public static partial class CharacterDataExtension
         {
             tempEquipment = equipItem.GetEquipmentItem();
             if (tempEquipment != null)
-                result = GameDataHelpers.CombineDamageAmountsDictionary(result,
+                result = GameDataHelpers.CombineDamages(result,
                     tempEquipment.GetIncreaseDamages(equipItem.level, equipItem.GetEquipmentBonusRate()));
         }
         // Weapons
@@ -315,13 +315,13 @@ public static partial class CharacterDataExtension
             CharacterItem rightHandItem = equipWeapons.rightHand;
             tempEquipment = rightHandItem.GetEquipmentItem();
             if (tempEquipment != null)
-                result = GameDataHelpers.CombineDamageAmountsDictionary(result,
+                result = GameDataHelpers.CombineDamages(result,
                     tempEquipment.GetIncreaseDamages(rightHandItem.level, rightHandItem.GetEquipmentBonusRate()));
             // Left hand equipment
             CharacterItem leftHandItem = equipWeapons.leftHand;
             tempEquipment = leftHandItem.GetEquipmentItem();
             if (tempEquipment != null)
-                result = GameDataHelpers.CombineDamageAmountsDictionary(result,
+                result = GameDataHelpers.CombineDamages(result,
                     tempEquipment.GetIncreaseDamages(leftHandItem.level, leftHandItem.GetEquipmentBonusRate()));
         }
         return result;
@@ -335,7 +335,7 @@ public static partial class CharacterDataExtension
         IList<CharacterBuff> buffs = data.Buffs;
         foreach (CharacterBuff buff in buffs)
         {
-            result = GameDataHelpers.CombineDamageAmountsDictionary(result, buff.GetIncreaseDamages());
+            result = GameDataHelpers.CombineDamages(result, buff.GetIncreaseDamages());
         }
 
         // Passive skills
@@ -344,7 +344,7 @@ public static partial class CharacterDataExtension
         {
             if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
                 continue;
-            result = GameDataHelpers.CombineDamageAmountsDictionary(result,
+            result = GameDataHelpers.CombineDamages(result,
                 skill.GetSkill().buff.GetIncreaseDamages(skill.level));
         }
         return result;
@@ -354,9 +354,9 @@ public static partial class CharacterDataExtension
     {
         Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
         if (sumWithEquipments)
-            result = GameDataHelpers.CombineDamageAmountsDictionary(result, data.GetEquipmentIncreaseDamages());
+            result = GameDataHelpers.CombineDamages(result, data.GetEquipmentIncreaseDamages());
         if (sumWithBuffs)
-            result = GameDataHelpers.CombineDamageAmountsDictionary(result, data.GetBuffIncreaseDamages());
+            result = GameDataHelpers.CombineDamages(result, data.GetBuffIncreaseDamages());
         return result;
     }
 
@@ -940,12 +940,12 @@ public static partial class CharacterDataExtension
                 if (i < effects.Length)
                 {
                     cacheStats += effects[i].stats;
-                    cacheAttributes = GameDataHelpers.CombineAttributeAmountsDictionary(cacheAttributes, 
-                        GameDataHelpers.MakeAttributeAmountsDictionary(effects[i].attributes, null, 1f));
-                    cacheResistances = GameDataHelpers.CombineResistanceAmountsDictionary(cacheResistances,
-                        GameDataHelpers.MakeResistanceAmountsDictionary(effects[i].resistances, null, 1f));
-                    cacheIncreaseDamages = GameDataHelpers.CombineDamageAmountsDictionary(cacheIncreaseDamages,
-                        GameDataHelpers.MakeDamageAmountsDictionary(effects[i].damages, null, 1f));
+                    cacheAttributes = GameDataHelpers.CombineAttributes(cacheAttributes, 
+                        GameDataHelpers.MakeAttributes(effects[i].attributes, null, 1f));
+                    cacheResistances = GameDataHelpers.CombineResistances(cacheResistances,
+                        GameDataHelpers.MakeResistances(effects[i].resistances, null, 1f));
+                    cacheIncreaseDamages = GameDataHelpers.CombineDamages(cacheIncreaseDamages,
+                        GameDataHelpers.MakeDamages(effects[i].damages, null, 1f));
                 }
                 else
                     break;
