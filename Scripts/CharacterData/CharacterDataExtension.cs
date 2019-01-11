@@ -914,21 +914,24 @@ public static partial class CharacterDataExtension
                     cacheEquipmentSets.Add(equipItem.GetItem().equipmentSet, 0);
             }
         }
-        // Right hand equipment set
-        if (!data.EquipWeapons.rightHand.IsEmpty() && data.EquipWeapons.rightHand.GetItem().equipmentSet != null)
+        if (data.EquipWeapons != null)
         {
-            if (cacheEquipmentSets.ContainsKey(data.EquipWeapons.rightHand.GetItem().equipmentSet))
-                ++cacheEquipmentSets[data.EquipWeapons.rightHand.GetItem().equipmentSet];
-            else
-                cacheEquipmentSets.Add(data.EquipWeapons.rightHand.GetItem().equipmentSet, 0);
-        }
-        // Left hand equipment set
-        if (!data.EquipWeapons.leftHand.IsEmpty() && data.EquipWeapons.leftHand.GetItem().equipmentSet != null)
-        {
-            if (cacheEquipmentSets.ContainsKey(data.EquipWeapons.leftHand.GetItem().equipmentSet))
-                ++cacheEquipmentSets[data.EquipWeapons.leftHand.GetItem().equipmentSet];
-            else
-                cacheEquipmentSets.Add(data.EquipWeapons.leftHand.GetItem().equipmentSet, 0);
+            // Right hand equipment set
+            if (!data.EquipWeapons.rightHand.IsEmpty() && data.EquipWeapons.rightHand.GetItem().equipmentSet != null)
+            {
+                if (cacheEquipmentSets.ContainsKey(data.EquipWeapons.rightHand.GetItem().equipmentSet))
+                    ++cacheEquipmentSets[data.EquipWeapons.rightHand.GetItem().equipmentSet];
+                else
+                    cacheEquipmentSets.Add(data.EquipWeapons.rightHand.GetItem().equipmentSet, 0);
+            }
+            // Left hand equipment set
+            if (!data.EquipWeapons.leftHand.IsEmpty() && data.EquipWeapons.leftHand.GetItem().equipmentSet != null)
+            {
+                if (cacheEquipmentSets.ContainsKey(data.EquipWeapons.leftHand.GetItem().equipmentSet))
+                    ++cacheEquipmentSets[data.EquipWeapons.leftHand.GetItem().equipmentSet];
+                else
+                    cacheEquipmentSets.Add(data.EquipWeapons.leftHand.GetItem().equipmentSet, 0);
+            }
         }
         // Apply set items
         foreach (KeyValuePair<EquipmentSet, int> cacheEquipmentSet in cacheEquipmentSets)
