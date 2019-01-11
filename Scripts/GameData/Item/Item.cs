@@ -90,7 +90,7 @@ namespace MultiplayerARPG
         protected virtual void OnValidate()
         {
             bool hasChanges = false;
-            // Equipment max stack always equals to 1
+            // Equipment / Pet max stack always equals to 1
             switch (itemType)
             {
                 case ItemType.Armor:
@@ -235,7 +235,7 @@ namespace MultiplayerARPG
         private static void RefineItem(IPlayerCharacterData character, CharacterItem refiningItem, System.Action<CharacterItem> onRefine, System.Action onDestroy, out GameMessage.Type gameMessageType)
         {
             gameMessageType = GameMessage.Type.CannotRefine;
-            if (refiningItem.IsEmpty())
+            if (!refiningItem.IsValid())
             {
                 // Cannot refine because character item is empty
                 return;
@@ -361,7 +361,7 @@ namespace MultiplayerARPG
         private static void RepairItem(IPlayerCharacterData character, CharacterItem repairingItem, System.Action<CharacterItem> onRepaired, out GameMessage.Type gameMessageType)
         {
             gameMessageType = GameMessage.Type.CannotRepair;
-            if (repairingItem.IsEmpty())
+            if (!repairingItem.IsValid())
             {
                 // Cannot refine because character item is empty
                 return;
