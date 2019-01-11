@@ -89,7 +89,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void SetEquipWeapons(EquipWeapons equipWeapons)
+        public virtual void SetEquipWeapons(EquipWeapons equipWeapons)
         {
             Item rightHandWeapon = equipWeapons.rightHand.GetWeaponItem();
             Item leftHandWeapon = equipWeapons.leftHand.GetWeaponItem();
@@ -120,7 +120,7 @@ namespace MultiplayerARPG
                 InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandShield.equipmentModels, equipWeapons.leftHand.level);
         }
 
-        public void SetEquipItems(IList<CharacterItem> equipItems)
+        public virtual void SetEquipItems(IList<CharacterItem> equipItems)
         {
             // Clear equipped item models
             tempKeepingKeys.Clear();
@@ -200,7 +200,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void SetBuffs(IList<CharacterBuff> buffs)
+        public virtual void SetBuffs(IList<CharacterBuff> buffs)
         {
             tempKeepingKeys.Clear();
             tempAddingKeys.Clear();
