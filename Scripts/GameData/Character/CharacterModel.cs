@@ -169,7 +169,7 @@ namespace MultiplayerARPG
         public override void SetEquipWeapons(EquipWeapons equipWeapons)
         {
             base.SetEquipWeapons(equipWeapons);
-            if (!equipWeapons.rightHand.IsEmpty() && equipWeapons.rightHand.GetWeaponItem() != null)
+            if (equipWeapons.rightHand.IsValid() && equipWeapons.rightHand.GetWeaponItem() != null)
             {
                 WeaponAnimations weaponAnimations;
                 if (CacheWeaponAnimations.TryGetValue(equipWeapons.rightHand.GetWeaponItem().WeaponType.DataId, out weaponAnimations))
