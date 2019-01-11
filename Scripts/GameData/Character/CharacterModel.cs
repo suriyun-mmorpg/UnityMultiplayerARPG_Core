@@ -7,7 +7,6 @@ namespace MultiplayerARPG
     public class CharacterModel : BaseCharacterModel
     {
         // Animator variables
-        public const string ANIM_STATE_ACTION_CLIP = "_Action";
         public static readonly int ANIM_IS_DEAD = Animator.StringToHash("IsDead");
         public static readonly int ANIM_MOVE_SPEED = Animator.StringToHash("MoveSpeed");
         public static readonly int ANIM_Y_SPEED = Animator.StringToHash("YSpeed");
@@ -28,8 +27,36 @@ namespace MultiplayerARPG
         public AnimatorType animatorType;
         [Header("Animator")]
         public RuntimeAnimatorController animatorController;
+        public DefaultAnimatorData defaultAnimatorData = new DefaultAnimatorData()
+        {
+            idleClip = null,
+            moveClip = null,
+            jumpClip = null,
+            fallClip = null,
+            hurtClip = null,
+            deadClip = null,
+            actionClip = null,
+        };
         [Header("Legacy Animation")]
-        public LegacyAnimationData legacyAnimationData;
+        public LegacyAnimationData legacyAnimationData = new LegacyAnimationData()
+        {
+            idleClip = null,
+            moveClip = null,
+            jumpClip = null,
+            fallClip = null,
+            hurtClip = null,
+            deadClip = null,
+            actionClipFadeLength = 0.1f,
+            idleClipFadeLength = 0.1f,
+            moveClipFadeLength = 0.1f,
+            jumpClipFadeLength = 0.1f,
+            fallClipFadeLength = 0.1f,
+            hurtClipFadeLength = 0.1f,
+            deadClipFadeLength = 0.1f,
+            magnitudeToPlayMoveClip = 0.1f,
+            ySpeedToPlayJumpClip = 0.25f,
+            ySpeedToPlayFallClip = -0.25f,
+        };
         [Header("Renderer")]
         public SkinnedMeshRenderer skinnedMeshRenderer;
         [Header("Animations")]
@@ -38,39 +65,29 @@ namespace MultiplayerARPG
         public WeaponAnimations[] weaponAnimations;
         public SkillCastAnimations[] skillCastAnimations;
 
-        private static Dictionary<int, ActionAnimation[]> cacheRightHandAttackAnimations;
-        public Dictionary<int, ActionAnimation[]> CacheRightHandAttackAnimations
-        {
-            get
-            {
-                if (cacheRightHandAttackAnimations == null)
-                {
-                    cacheRightHandAttackAnimations = new Dictionary<int, ActionAnimation[]>();
-                    foreach (WeaponAnimations attackAnimation in weaponAnimations)
-                    {
-                        if (attackAnimation.weaponType == null) continue;
-                        cacheRightHandAttackAnimations[attackAnimation.weaponType.DataId] = attackAnimation.rightHandAttackAnimations;
-                    }
-                }
-                return cacheRightHandAttackAnimations;
-            }
-        }
+        private string defaultIdleClipName;
+        private string defaultMoveClipName;
+        private string defaultJumpClipName;
+        private string defaultFallClipName;
+        private string defaultHurtClipName;
+        private string defaultDeadClipName;
+        private string defaultActionClipName;
 
-        private static Dictionary<int, ActionAnimation[]> cacheLeftHandAttackAnimations;
-        public Dictionary<int, ActionAnimation[]> CacheLeftHandAttackAnimations
+        private static Dictionary<int, WeaponAnimations> cacheWeaponAnimations;
+        public Dictionary<int, WeaponAnimations> CacheWeaponAnimations
         {
             get
             {
-                if (cacheLeftHandAttackAnimations == null)
+                if (cacheWeaponAnimations == null)
                 {
-                    cacheLeftHandAttackAnimations = new Dictionary<int, ActionAnimation[]>();
-                    foreach (WeaponAnimations attackAnimation in weaponAnimations)
+                    cacheWeaponAnimations = new Dictionary<int, WeaponAnimations>();
+                    foreach (WeaponAnimations weaponAnimation in weaponAnimations)
                     {
-                        if (attackAnimation.weaponType == null) continue;
-                        cacheLeftHandAttackAnimations[attackAnimation.weaponType.DataId] = attackAnimation.rightHandAttackAnimations;
+                        if (weaponAnimation.weaponType == null) continue;
+                        cacheWeaponAnimations[weaponAnimation.weaponType.DataId] = weaponAnimation;
                     }
                 }
-                return cacheLeftHandAttackAnimations;
+                return cacheWeaponAnimations;
             }
         }
 
@@ -116,7 +133,16 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheAnimatorController == null)
+                {
                     cacheAnimatorController = new AnimatorOverrideController(animatorController);
+                    defaultIdleClipName = defaultAnimatorData.idleClip != null ? defaultAnimatorData.idleClip.name : string.Empty;
+                    defaultMoveClipName = defaultAnimatorData.moveClip != null ? defaultAnimatorData.moveClip.name : string.Empty;
+                    defaultJumpClipName = defaultAnimatorData.jumpClip != null ? defaultAnimatorData.jumpClip.name : string.Empty;
+                    defaultFallClipName = defaultAnimatorData.fallClip != null ? defaultAnimatorData.fallClip.name : string.Empty;
+                    defaultHurtClipName = defaultAnimatorData.hurtClip != null ? defaultAnimatorData.hurtClip.name : string.Empty;
+                    defaultDeadClipName = defaultAnimatorData.deadClip != null ? defaultAnimatorData.deadClip.name : string.Empty;
+                    defaultActionClipName = defaultAnimatorData.actionClip != null ? defaultAnimatorData.actionClip.name : string.Empty;
+                }
                 return cacheAnimatorController;
             }
         }
@@ -138,6 +164,122 @@ namespace MultiplayerARPG
                 }
                 return cacheAnimation;
             }
+        }
+
+        public override void SetEquipWeapons(EquipWeapons equipWeapons)
+        {
+            base.SetEquipWeapons(equipWeapons);
+            if (!equipWeapons.rightHand.IsEmpty() && equipWeapons.rightHand.GetWeaponItem() != null)
+            {
+                WeaponAnimations weaponAnimations;
+                if (CacheWeaponAnimations.TryGetValue(equipWeapons.rightHand.GetWeaponItem().WeaponType.DataId, out weaponAnimations))
+                {
+                    switch (animatorType)
+                    {
+                        case AnimatorType.Animator:
+                            SetupGenericClips_Animator(
+                                weaponAnimations.idleClip,
+                                weaponAnimations.moveClip,
+                                weaponAnimations.jumpClip,
+                                weaponAnimations.fallClip,
+                                weaponAnimations.hurtClip,
+                                weaponAnimations.deadClip);
+                            break;
+                        case AnimatorType.LegacyAnimtion:
+                            SetupGenericClips_LegacyAnimation(
+                                weaponAnimations.idleClip,
+                                weaponAnimations.moveClip,
+                                weaponAnimations.jumpClip,
+                                weaponAnimations.fallClip,
+                                weaponAnimations.hurtClip,
+                                weaponAnimations.deadClip);
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (animatorType)
+                    {
+                        case AnimatorType.Animator:
+                            SetupGenericClips_Animator(null, null, null, null, null, null);
+                            break;
+                        case AnimatorType.LegacyAnimtion:
+                            SetupGenericClips_LegacyAnimation(null, null, null, null, null, null);
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void SetupGenericClips_Animator(
+            AnimationClip idleClip,
+            AnimationClip moveClip,
+            AnimationClip jumpClip,
+            AnimationClip fallClip,
+            AnimationClip hurtClip,
+            AnimationClip deadClip)
+        {
+            if (idleClip == null)
+                idleClip = defaultAnimatorData.idleClip;
+            if (moveClip == null)
+                moveClip = defaultAnimatorData.moveClip;
+            if (jumpClip == null)
+                jumpClip = defaultAnimatorData.jumpClip;
+            if (fallClip == null)
+                fallClip = defaultAnimatorData.fallClip;
+            if (hurtClip == null)
+                hurtClip = defaultAnimatorData.hurtClip;
+            if (deadClip == null)
+                deadClip = defaultAnimatorData.deadClip;
+            // Setup generic clips
+            if (!string.IsNullOrEmpty(defaultIdleClipName))
+                CacheAnimatorController[defaultIdleClipName] = idleClip;
+            if (!string.IsNullOrEmpty(defaultMoveClipName))
+                CacheAnimatorController[defaultMoveClipName] = moveClip;
+            if (!string.IsNullOrEmpty(defaultJumpClipName))
+                CacheAnimatorController[defaultJumpClipName] = jumpClip;
+            if (!string.IsNullOrEmpty(defaultFallClipName))
+                CacheAnimatorController[defaultFallClipName] = fallClip;
+            if (!string.IsNullOrEmpty(defaultHurtClipName))
+                CacheAnimatorController[defaultHurtClipName] = hurtClip;
+            if (!string.IsNullOrEmpty(defaultDeadClipName))
+                CacheAnimatorController[defaultDeadClipName] = deadClip;
+        }
+
+        private void SetupGenericClips_LegacyAnimation(
+            AnimationClip idleClip,
+            AnimationClip moveClip,
+            AnimationClip jumpClip,
+            AnimationClip fallClip,
+            AnimationClip hurtClip,
+            AnimationClip deadClip)
+        {
+            if (idleClip == null)
+                idleClip = legacyAnimationData.idleClip;
+            if (moveClip == null)
+                moveClip = legacyAnimationData.moveClip;
+            if (jumpClip == null)
+                jumpClip = legacyAnimationData.jumpClip;
+            if (fallClip == null)
+                fallClip = legacyAnimationData.fallClip;
+            if (hurtClip == null)
+                hurtClip = legacyAnimationData.hurtClip;
+            if (deadClip == null)
+                deadClip = legacyAnimationData.deadClip;
+            // Remove clips
+            cacheAnimation.RemoveClip(legacyAnimationData.idleClip.name);
+            cacheAnimation.RemoveClip(legacyAnimationData.moveClip.name);
+            cacheAnimation.RemoveClip(legacyAnimationData.jumpClip.name);
+            cacheAnimation.RemoveClip(legacyAnimationData.fallClip.name);
+            cacheAnimation.RemoveClip(legacyAnimationData.hurtClip.name);
+            cacheAnimation.RemoveClip(legacyAnimationData.deadClip.name);
+            // Setup generic clips
+            cacheAnimation.AddClip(idleClip, legacyAnimationData.idleClip.name);
+            cacheAnimation.AddClip(moveClip, legacyAnimationData.moveClip.name);
+            cacheAnimation.AddClip(jumpClip, legacyAnimationData.jumpClip.name);
+            cacheAnimation.AddClip(fallClip, legacyAnimationData.fallClip.name);
+            cacheAnimation.AddClip(hurtClip, legacyAnimationData.hurtClip.name);
+            cacheAnimation.AddClip(deadClip, legacyAnimationData.deadClip.name);
         }
 
         public override void AddingNewModel(GameObject newModel)
@@ -226,10 +368,10 @@ namespace MultiplayerARPG
         {
             // If animator is not null, play the action animation
             tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
-            if (tempActionAnimation != null && tempActionAnimation.clip != null)
+            if (tempActionAnimation.clip != null)
             {
                 CacheAnimator.SetBool(ANIM_DO_ACTION, false);
-                CacheAnimatorController[ANIM_STATE_ACTION_CLIP] = tempActionAnimation.clip;
+                CacheAnimatorController[defaultActionClipName] = tempActionAnimation.clip;
                 AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
                 if (audioClip != null)
                     AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
@@ -247,7 +389,7 @@ namespace MultiplayerARPG
         {
             // If animator is not null, play the action animation
             tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
-            if (tempActionAnimation != null && tempActionAnimation.clip != null)
+            if (tempActionAnimation.clip != null)
             {
                 if (CacheAnimation.GetClip(LEGACY_CLIP_ACTION) != null)
                     CacheAnimation.RemoveClip(LEGACY_CLIP_ACTION);
@@ -290,7 +432,7 @@ namespace MultiplayerARPG
         #region Animation data helpers
         public ActionAnimation GetActionAnimation(AnimActionType animActionType, int dataId, int index)
         {
-            tempActionAnimation = null;
+            tempActionAnimation = default(ActionAnimation);
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
@@ -313,8 +455,9 @@ namespace MultiplayerARPG
 
         public ActionAnimation[] GetRightHandAttackAnimations(int dataId)
         {
-            if (CacheRightHandAttackAnimations.ContainsKey(dataId))
-                return CacheRightHandAttackAnimations[dataId];
+            if (CacheWeaponAnimations.ContainsKey(dataId) &&
+                CacheWeaponAnimations[dataId].rightHandAttackAnimations != null)
+                return CacheWeaponAnimations[dataId].rightHandAttackAnimations;
             return defaultAttackAnimations;
         }
 
@@ -325,8 +468,9 @@ namespace MultiplayerARPG
 
         public ActionAnimation[] GetLeftHandAttackAnimations(int dataId)
         {
-            if (CacheLeftHandAttackAnimations.ContainsKey(dataId))
-                return CacheLeftHandAttackAnimations[dataId];
+            if (CacheWeaponAnimations.ContainsKey(dataId) &&
+                CacheWeaponAnimations[dataId].leftHandAttackAnimations != null)
+                return CacheWeaponAnimations[dataId].leftHandAttackAnimations;
             return defaultAttackAnimations;
         }
 
@@ -402,7 +546,7 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public class LegacyAnimationData
+    public struct LegacyAnimationData
     {
         public AnimationClip idleClip;
         public AnimationClip moveClip;
@@ -410,15 +554,27 @@ namespace MultiplayerARPG
         public AnimationClip fallClip;
         public AnimationClip hurtClip;
         public AnimationClip deadClip;
-        public float actionClipFadeLength = 0.1f;
-        public float idleClipFadeLength = 0.1f;
-        public float moveClipFadeLength = 0.1f;
-        public float jumpClipFadeLength = 0.1f;
-        public float fallClipFadeLength = 0.1f;
-        public float hurtClipFadeLength = 0.1f;
-        public float deadClipFadeLength = 0.1f;
-        public float magnitudeToPlayMoveClip = 0.1f;
-        public float ySpeedToPlayJumpClip = 0.25f;
-        public float ySpeedToPlayFallClip = -0.25f;
+        public float actionClipFadeLength;
+        public float idleClipFadeLength;
+        public float moveClipFadeLength;
+        public float jumpClipFadeLength;
+        public float fallClipFadeLength;
+        public float hurtClipFadeLength;
+        public float deadClipFadeLength;
+        public float magnitudeToPlayMoveClip;
+        public float ySpeedToPlayJumpClip;
+        public float ySpeedToPlayFallClip;
+    }
+
+    [System.Serializable]
+    public struct DefaultAnimatorData
+    {
+        public AnimationClip idleClip;
+        public AnimationClip moveClip;
+        public AnimationClip jumpClip;
+        public AnimationClip fallClip;
+        public AnimationClip hurtClip;
+        public AnimationClip deadClip;
+        public AnimationClip actionClip;
     }
 }

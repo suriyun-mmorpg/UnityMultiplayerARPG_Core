@@ -5,14 +5,9 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public class CharacterAnimation
+    public struct ActionAnimation
     {
         public AnimationClip clip;
-    }
-
-    [System.Serializable]
-    public class ActionAnimation : CharacterAnimation
-    {
         [Tooltip("This will be in use with attack/skill animations, This is rate of total animation duration at when it should hit enemy or apply skill")]
         [Range(0f, 1f)]
         public float triggerDurationRate;
@@ -53,23 +48,15 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public class ActionAnimationOverrideData
-    {
-        public CharacterModel target;
-        [Tooltip("Must set it to override default animation data")]
-        public AnimationClip clip;
-        [Tooltip("Set it more than zero to override default trigger duration rate")]
-        [Range(0f, 1f)]
-        public float triggerDurationRate;
-        public float extraDuration;
-        [Tooltip("Set it length more than zero to override default audio clips")]
-        public AudioClip[] audioClips;
-    }
-
-    [System.Serializable]
     public struct WeaponAnimations
     {
         public WeaponType weaponType;
+        public AnimationClip idleClip;
+        public AnimationClip moveClip;
+        public AnimationClip jumpClip;
+        public AnimationClip fallClip;
+        public AnimationClip hurtClip;
+        public AnimationClip deadClip;
         public ActionAnimation[] rightHandAttackAnimations;
         public ActionAnimation[] leftHandAttackAnimations;
     }
