@@ -46,10 +46,18 @@ namespace MultiplayerARPG
             if (skill == null || character == null)
                 return false;
 
-            bool isPass = true;
+            // Check is it pass attribute requirement or not
+            Dictionary<Attribute, short> attributeAmountsDict = character.GetAttributes(false, false);
+            Dictionary<Attribute, short> requireAttributeAmounts = skill.CacheRequireAttributeAmounts;
+            foreach (KeyValuePair<Attribute, short> requireAttributeAmount in requireAttributeAmounts)
+            {
+                if (!attributeAmountsDict.ContainsKey(requireAttributeAmount.Key) ||
+                    attributeAmountsDict[requireAttributeAmount.Key] < requireAttributeAmount.Value)
+                    return false;
+            }
+            // Check is it pass skill level requirement or not
             Dictionary<Skill, int> skillLevelsDict = new Dictionary<Skill, int>();
-            IList<CharacterSkill> skillLevels = character.Skills;
-            foreach (CharacterSkill skillLevel in skillLevels)
+            foreach (CharacterSkill skillLevel in character.Skills)
             {
                 if (skillLevel.GetSkill() == null)
                     continue;
@@ -60,13 +68,10 @@ namespace MultiplayerARPG
             {
                 if (!skillLevelsDict.ContainsKey(requireSkillLevel.Key) ||
                     skillLevelsDict[requireSkillLevel.Key] < requireSkillLevel.Value)
-                {
-                    isPass = false;
-                    break;
-                }
+                    return false;
             }
-
-            return character.SkillPoint > 0 && level < skill.maxLevel && character.Level >= skill.GetRequireCharacterLevel(level) && isPass;
+            // Check another requirements
+            return character.SkillPoint > 0 && level < skill.maxLevel && character.Level >= skill.GetRequireCharacterLevel(level);
         }
 
         public static bool CanUse(this Skill skill, ICharacterData character, short level)

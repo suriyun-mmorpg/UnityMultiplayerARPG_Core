@@ -11,6 +11,7 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public TextWrapper uiTextRequireLevel;
+        public UIAttributeAmounts uiRequireAttributeAmounts;
         public UISkillLevels uiRequireSkillLevels;
 
         protected override void UpdateData()
@@ -26,6 +27,17 @@ namespace MultiplayerARPG
                 {
                     uiTextRequireLevel.gameObject.SetActive(true);
                     uiTextRequireLevel.text = string.Format(requireLevelFormat, skill.GetRequireCharacterLevel(level).ToString("N0"));
+                }
+            }
+
+            if (uiRequireAttributeAmounts != null)
+            {
+                if (skill == null)
+                    uiRequireAttributeAmounts.Hide();
+                else
+                {
+                    uiRequireAttributeAmounts.Show();
+                    uiRequireAttributeAmounts.Data = skill.CacheRequireAttributeAmounts;
                 }
             }
 

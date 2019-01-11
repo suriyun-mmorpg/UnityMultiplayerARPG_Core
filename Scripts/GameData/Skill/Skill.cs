@@ -68,6 +68,17 @@ namespace MultiplayerARPG
         [Header("Craft")]
         public ItemCraft itemCraft;
 
+        private Dictionary<Attribute, short> cacheRequireAttributeAmounts;
+        public Dictionary<Attribute, short> CacheRequireAttributeAmounts
+        {
+            get
+            {
+                if (cacheRequireAttributeAmounts == null)
+                    cacheRequireAttributeAmounts = GameDataHelpers.MakeAttributes(requirement.attributeAmounts, new Dictionary<Attribute, short>(), 1f);
+                return cacheRequireAttributeAmounts;
+            }
+        }
+
         private Dictionary<Skill, short> cacheRequireSkillLevels;
         public Dictionary<Skill, short> CacheRequireSkillLevels
         {
@@ -91,10 +102,11 @@ namespace MultiplayerARPG
         }
     }
 
-[System.Serializable]
+    [System.Serializable]
     public struct SkillRequirement
     {
         public IncrementalShort characterLevel;
+        public AttributeAmount[] attributeAmounts;
         public SkillLevel[] skillLevels;
     }
 
