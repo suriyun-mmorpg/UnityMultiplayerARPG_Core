@@ -1,7 +1,7 @@
 ﻿namespace MultiplayerARPG
 {
     [System.Serializable]
-    public partial class CharacterStats
+    public partial struct CharacterStats
     {
         public static readonly CharacterStats Empty = new CharacterStats();
         public float hp;
@@ -38,7 +38,7 @@
             result.stamina = stamina + b.stamina;
             result.food = food + b.food;
             result.water = water + b.water;
-            this.InvokeInstanceDevExtMethods("Add", result, b);
+            result = this.InvokeInstanceDevExtMethodsLoopItself("Add", result, b);
             return result;
         }
 
@@ -60,7 +60,7 @@
             result.stamina = stamina * multiplier;
             result.food = food * multiplier;
             result.water = water * multiplier;
-            this.InvokeInstanceDevExtMethods("Multiply", result, multiplier);
+            result = this.InvokeInstanceDevExtMethodsLoopItself("Multiply", result, multiplier);
             return result;
         }
 
