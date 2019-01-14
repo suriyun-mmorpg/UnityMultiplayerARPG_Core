@@ -118,11 +118,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (cacheAnimator == null)
-                {
-                    cacheAnimator = GetComponent<Animator>();
-                    cacheAnimator.runtimeAnimatorController = CacheAnimatorController;
-                }
+                SetupComponent();
                 return cacheAnimator;
             }
         }
@@ -132,17 +128,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (cacheAnimatorController == null)
-                {
-                    cacheAnimatorController = new AnimatorOverrideController(animatorController);
-                    defaultIdleClipName = defaultAnimatorData.idleClip != null ? defaultAnimatorData.idleClip.name : string.Empty;
-                    defaultMoveClipName = defaultAnimatorData.moveClip != null ? defaultAnimatorData.moveClip.name : string.Empty;
-                    defaultJumpClipName = defaultAnimatorData.jumpClip != null ? defaultAnimatorData.jumpClip.name : string.Empty;
-                    defaultFallClipName = defaultAnimatorData.fallClip != null ? defaultAnimatorData.fallClip.name : string.Empty;
-                    defaultHurtClipName = defaultAnimatorData.hurtClip != null ? defaultAnimatorData.hurtClip.name : string.Empty;
-                    defaultDeadClipName = defaultAnimatorData.deadClip != null ? defaultAnimatorData.deadClip.name : string.Empty;
-                    defaultActionClipName = defaultAnimatorData.actionClip != null ? defaultAnimatorData.actionClip.name : string.Empty;
-                }
+                SetupComponent();
                 return cacheAnimatorController;
             }
         }
@@ -152,27 +138,64 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (cacheAnimation == null)
-                {
-                    cacheAnimation = GetComponent<Animation>();
-                    cacheAnimation.AddClip(legacyAnimationData.idleClip, legacyAnimationData.idleClip.name);
-                    cacheAnimation.AddClip(legacyAnimationData.moveClip, legacyAnimationData.moveClip.name);
-                    cacheAnimation.AddClip(legacyAnimationData.jumpClip, legacyAnimationData.jumpClip.name);
-                    cacheAnimation.AddClip(legacyAnimationData.fallClip, legacyAnimationData.fallClip.name);
-                    cacheAnimation.AddClip(legacyAnimationData.hurtClip, legacyAnimationData.hurtClip.name);
-                    cacheAnimation.AddClip(legacyAnimationData.deadClip, legacyAnimationData.deadClip.name);
-                }
+                SetupComponent();
                 return cacheAnimation;
+            }
+        }
+
+        private void Awake()
+        {
+            SetupComponent();
+        }
+
+        private void SetupComponent()
+        {
+            switch (animatorType)
+            {
+                case AnimatorType.Animator:
+                    if (cacheAnimatorController == null)
+                    {
+                        cacheAnimatorController = new AnimatorOverrideController(animatorController);
+                        defaultIdleClipName = defaultAnimatorData.idleClip != null ? defaultAnimatorData.idleClip.name : string.Empty;
+                        defaultMoveClipName = defaultAnimatorData.moveClip != null ? defaultAnimatorData.moveClip.name : string.Empty;
+                        defaultJumpClipName = defaultAnimatorData.jumpClip != null ? defaultAnimatorData.jumpClip.name : string.Empty;
+                        defaultFallClipName = defaultAnimatorData.fallClip != null ? defaultAnimatorData.fallClip.name : string.Empty;
+                        defaultHurtClipName = defaultAnimatorData.hurtClip != null ? defaultAnimatorData.hurtClip.name : string.Empty;
+                        defaultDeadClipName = defaultAnimatorData.deadClip != null ? defaultAnimatorData.deadClip.name : string.Empty;
+                        defaultActionClipName = defaultAnimatorData.actionClip != null ? defaultAnimatorData.actionClip.name : string.Empty;
+                    }
+                    // Use override controller as animator
+                    if (cacheAnimator == null)
+                    {
+                        cacheAnimator = GetComponent<Animator>();
+                        cacheAnimator.runtimeAnimatorController = cacheAnimatorController;
+                    }
+                    break;
+                case AnimatorType.LegacyAnimtion:
+                    if (cacheAnimation == null)
+                    {
+                        cacheAnimation = GetComponent<Animation>();
+                        cacheAnimation.AddClip(legacyAnimationData.idleClip, legacyAnimationData.idleClip.name);
+                        cacheAnimation.AddClip(legacyAnimationData.moveClip, legacyAnimationData.moveClip.name);
+                        cacheAnimation.AddClip(legacyAnimationData.jumpClip, legacyAnimationData.jumpClip.name);
+                        cacheAnimation.AddClip(legacyAnimationData.fallClip, legacyAnimationData.fallClip.name);
+                        cacheAnimation.AddClip(legacyAnimationData.hurtClip, legacyAnimationData.hurtClip.name);
+                        cacheAnimation.AddClip(legacyAnimationData.deadClip, legacyAnimationData.deadClip.name);
+                    }
+                    break;
             }
         }
 
         public override void SetEquipWeapons(EquipWeapons equipWeapons)
         {
             base.SetEquipWeapons(equipWeapons);
+            Item weaponItem = GameInstance.Singleton.DefaultWeaponItem;
             if (equipWeapons.rightHand.IsValid() && equipWeapons.rightHand.GetWeaponItem() != null)
+                weaponItem = equipWeapons.rightHand.GetWeaponItem();
+            if (weaponItem != null)
             {
                 WeaponAnimations weaponAnimations;
-                if (CacheWeaponAnimations.TryGetValue(equipWeapons.rightHand.GetWeaponItem().WeaponType.DataId, out weaponAnimations))
+                if (CacheWeaponAnimations.TryGetValue(weaponItem.WeaponType.DataId, out weaponAnimations))
                 {
                     switch (animatorType)
                     {
