@@ -85,6 +85,7 @@ namespace MultiplayerARPG
         public UIAttributeAmounts uiIncreaseAttributes;
         public UIResistanceAmounts uiIncreaseResistances;
         public UIDamageElementAmounts uiIncreaseDamageAmounts;
+        public UIEquipmentSet uiEquipmentSet;
 
         [Header("Weapon - UI Elements")]
         public UIDamageElementAmount uiDamageAmounts;
@@ -327,6 +328,19 @@ namespace MultiplayerARPG
                 {
                     uiIncreaseDamageAmounts.Show();
                     uiIncreaseDamageAmounts.Data = damageAmounts;
+                }
+            }
+
+            if (uiEquipmentSet != null)
+            {
+                if (EquipmentItem == null || EquipmentItem.equipmentSet == null || EquipmentItem.equipmentSet.effects.Length == 0)
+                    uiEquipmentSet.Hide();
+                else
+                {
+                    uiEquipmentSet.Show();
+                    int equippedCount = 0;
+                    character.CacheEquipmentSets.TryGetValue(EquipmentItem.equipmentSet, out equippedCount);
+                    uiEquipmentSet.Data = new EquipmentSetEquippedCountTuple(EquipmentItem.equipmentSet, equippedCount);
                 }
             }
 

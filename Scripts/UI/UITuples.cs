@@ -90,6 +90,17 @@
         }
     }
 
+    public struct EquipmentSetEquippedCountTuple
+    {
+        public EquipmentSet equipmentSet;
+        public int equippedCount;
+        public EquipmentSetEquippedCountTuple(EquipmentSet equipmentSet, int equippedCount)
+        {
+            this.equipmentSet = equipmentSet;
+            this.equippedCount = equippedCount;
+        }
+    }
+
     public struct SocialCharacterEntityTuple
     {
         public SocialCharacterData socialCharacter;
