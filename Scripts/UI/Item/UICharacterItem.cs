@@ -546,7 +546,7 @@ namespace MultiplayerARPG
         public void OnClickDrop()
         {
             // Only unequipped equipment can be dropped
-            if (!IsOwningCharacter() || InventoryType == InventoryType.NonEquipItems)
+            if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
                 return;
 
             if (CharacterItem.amount == 1)
@@ -569,7 +569,7 @@ namespace MultiplayerARPG
         public void OnClickSell()
         {
             // Only unequipped equipment can be sell
-            if (!IsOwningCharacter() || InventoryType == InventoryType.NonEquipItems)
+            if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
                 return;
             
             if (CharacterItem.amount == 1)
@@ -592,7 +592,7 @@ namespace MultiplayerARPG
         public void OnClickSetDealingItem()
         {
             // Only unequipped equipment can be sell
-            if (!IsOwningCharacter() || InventoryType == InventoryType.NonEquipItems)
+            if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
                 return;
             
             if (CharacterItem.amount == 1)
