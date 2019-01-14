@@ -17,12 +17,17 @@ namespace MultiplayerARPG
     public struct ItemRefineLevel
     {
         [Range(0.01f, 1f)]
+        [SerializeField]
         private float successRate;
+        [SerializeField]
         private ItemAmount[] requireItems;
+        [SerializeField]
         private int requireGold;
         [Tooltip("How many levels it will be decreased if refining failed")]
+        [SerializeField]
         private short refineFailDecreaseLevels;
         [Tooltip("It will be destroyed if this value is TRUE and refining failed")]
+        [SerializeField]
         private bool refineFailDestroyItem;
 
         public float SuccessRate { get { return successRate; } }
