@@ -56,13 +56,16 @@ namespace MultiplayerARPG
         
         public void CraftItem(IPlayerCharacterData character)
         {
-            character.IncreaseItems(CharacterItem.Create(craftingItem));
-            foreach (ItemAmount craftRequirement in craftRequirements)
+            if (character.IncreaseItems(CharacterItem.Create(craftingItem)))
             {
-                if (craftRequirement.item != null && craftRequirement.amount > 0)
-                    character.DecreaseItems(craftRequirement.item.DataId, craftRequirement.amount);
+                // Reduce item when able to increase craft item
+                foreach (ItemAmount craftRequirement in craftRequirements)
+                {
+                    if (craftRequirement.item != null && craftRequirement.amount > 0)
+                        character.DecreaseItems(craftRequirement.item.DataId, craftRequirement.amount);
+                }
+                character.Gold -= requireGold;
             }
-            character.Gold -= requireGold;
         }
     }
 }
