@@ -102,13 +102,13 @@ namespace MultiplayerARPG
 
             if (gameInstance.DimensionType == DimensionType.Dimension2D)
             {
-                if (CacheRigidbody != null)
-                    CacheRigidbody.velocity = CacheTransform.forward * missileSpeed.Value;
+                if (CacheRigidbody2D != null)
+                    CacheRigidbody2D.velocity = -CacheTransform.up * missileSpeed.Value;
             }
             else
             {
-                if (CacheRigidbody2D != null)
-                    CacheRigidbody2D.velocity = -CacheTransform.up * missileSpeed.Value;
+                if (CacheRigidbody != null)
+                    CacheRigidbody.velocity = CacheTransform.forward * missileSpeed.Value;
             }
         }
 
