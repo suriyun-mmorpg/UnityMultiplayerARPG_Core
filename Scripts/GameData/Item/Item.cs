@@ -28,6 +28,8 @@ namespace MultiplayerARPG
         [Range(1, 1000)]
         public short maxStack = 1;
         public ItemRefine itemRefineInfo;
+        [Tooltip("This is duration to lock item at first time when pick up dropped item or bought it from NPC or IAP system")]
+        public float lockDuration;
 
         // Armor
         public ArmorType armorType;
@@ -64,7 +66,6 @@ namespace MultiplayerARPG
 
         // Pet
         public BaseMonsterCharacterEntity petEntity;
-        public float petHatchDuration;
 
         public override string Title
         {

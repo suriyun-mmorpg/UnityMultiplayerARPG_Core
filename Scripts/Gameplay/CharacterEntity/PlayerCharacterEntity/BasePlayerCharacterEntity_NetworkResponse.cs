@@ -321,7 +321,7 @@ namespace MultiplayerARPG
                 return;
             }
             Gold -= sellItem.sellPrice * amount;
-            this.IncreaseItems(dataId, 1, amount);
+            this.IncreaseItems(CharacterItem.Create(dataId, 1, amount));
         }
 
         protected virtual void NetFuncAcceptQuest(int questDataId)
@@ -375,7 +375,7 @@ namespace MultiplayerARPG
                 foreach (ItemAmount rewardItem in rewardItems)
                 {
                     if (rewardItem.item != null && rewardItem.amount > 0)
-                        this.IncreaseItems(rewardItem.item.DataId, 1, rewardItem.amount);
+                        this.IncreaseItems(CharacterItem.Create(rewardItem.item, 1, rewardItem.amount));
                 }
             }
             characterQuest.isComplete = true;

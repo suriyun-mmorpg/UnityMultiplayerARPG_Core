@@ -88,7 +88,7 @@ namespace MultiplayerARPG
                 int dataId = receivingItem.item.DataId;
                 short amount = (short)(receivingItem.amountPerDamage * totalDamage);
                 if (!attackerCharacter.IncreasingItemsWillOverwhelming(dataId, amount))
-                    attackerCharacter.IncreaseItems(dataId, 1, amount);
+                    attackerCharacter.IncreaseItems(CharacterItem.Create(dataId, 1, amount));
             }
             CurrentHp -= totalDamage;
             ReceivedDamage(attackerCharacter, CombatAmountType.NormalDamage, totalDamage);

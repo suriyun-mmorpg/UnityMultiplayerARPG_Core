@@ -466,12 +466,14 @@ public static partial class CharacterDataExtension
         return count;
     }
 
-    public static bool IncreaseItems(this ICharacterData data, int dataId, short level, short amount, float? durability = null)
+    public static bool IncreaseItems(this ICharacterData data, CharacterItem dropData)
     {
-        Item itemData;
         // If item not valid
-        if (amount <= 0 || !GameInstance.Items.TryGetValue(dataId, out itemData))
+        if (dropData.IsValid())
             return false;
+
+        Item itemData = dropData.GetItem();
+        short amount = dropData.amount;
 
         short maxStack = itemData.maxStack;
         Dictionary<int, CharacterItem> emptySlots = new Dictionary<int, CharacterItem>();
@@ -485,7 +487,7 @@ public static partial class CharacterDataExtension
                 // If current entry is not valid, add it to empty list, going to replacing it later
                 emptySlots[i] = nonEquipItem;
             }
-            else if (nonEquipItem.dataId == dataId)
+            else if (nonEquipItem.dataId == dropData.dataId)
             {
                 // If same item id, increase its amount
                 if (nonEquipItem.amount + amount <= maxStack)
@@ -510,7 +512,7 @@ public static partial class CharacterDataExtension
             foreach (KeyValuePair<int, CharacterItem> emptySlot in emptySlots)
             {
                 CharacterItem value = emptySlot.Value;
-                CharacterItem newItem = CharacterItem.Create(dataId, level);
+                CharacterItem newItem = dropData.Clone();
                 short addAmount = 0;
                 if (amount - maxStack >= 0)
                 {
@@ -536,7 +538,7 @@ public static partial class CharacterDataExtension
         // Add new items
         while (amount > 0)
         {
-            CharacterItem newItem = CharacterItem.Create(dataId, level);
+            CharacterItem newItem = dropData.Clone();
             short addAmount = 0;
             if (amount - maxStack >= 0)
             {
@@ -549,8 +551,6 @@ public static partial class CharacterDataExtension
                 amount = 0;
             }
             newItem.amount = addAmount;
-            if (durability.HasValue)
-                newItem.durability = durability.Value;
             data.NonEquipItems.Add(newItem);
         }
         return true;

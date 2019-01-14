@@ -252,7 +252,7 @@ namespace MultiplayerARPG
                             nonEquipItems.RemoveAt(i);
                         else
                             nonEquipItems[i] = nonEquipItem;
-                        CoCharacter.IncreaseItems(dealingItem.dataId, dealingItem.level, dealingItem.amount, dealingItem.durability);
+                        CoCharacter.IncreaseItems(dealingItem);
                         tempDealingItems.RemoveAt(j);
                         break;
                     }

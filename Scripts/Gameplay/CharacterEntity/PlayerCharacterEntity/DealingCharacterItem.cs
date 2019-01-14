@@ -21,6 +21,8 @@ namespace MultiplayerARPG
                 writer.Put(dealingItem.level);
                 writer.Put(dealingItem.amount);
                 writer.Put(dealingItem.durability);
+                writer.Put(dealingItem.exp);
+                writer.Put(dealingItem.lockRemainsDuration);
             }
         }
 
@@ -36,6 +38,8 @@ namespace MultiplayerARPG
                 dealingItem.level = reader.GetShort();
                 dealingItem.amount = reader.GetShort();
                 dealingItem.durability = reader.GetFloat();
+                dealingItem.exp = reader.GetInt();
+                dealingItem.lockRemainsDuration = reader.GetFloat();
                 Add(dealingItem);
             }
         }

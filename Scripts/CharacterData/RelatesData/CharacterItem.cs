@@ -216,11 +216,18 @@ public class CharacterItem : INetSerializable
     public static CharacterItem Create(int dataId, short level = 1, short amount = 1)
     {
         CharacterItem newItem = new CharacterItem();
-        Item tempItem = null;
         newItem.dataId = dataId;
         newItem.level = level;
         newItem.amount = amount;
-        newItem.durability = GameInstance.Items.TryGetValue(dataId, out tempItem) ? tempItem.maxDurability : 0;
+        newItem.durability = 0f;
+        newItem.exp = 0;
+        newItem.lockRemainsDuration = 0f;
+        Item tempItem = null;
+        if (GameInstance.Items.TryGetValue(dataId, out tempItem))
+        {
+            newItem.durability = tempItem.maxDurability;
+            newItem.lockRemainsDuration = tempItem.lockDuration;
+        }
         return newItem;
     }
 

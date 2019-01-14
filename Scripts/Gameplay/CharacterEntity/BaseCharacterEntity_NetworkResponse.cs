@@ -250,10 +250,7 @@ namespace MultiplayerARPG
                 itemDropEntity.NetworkDestroy();
                 return;
             }
-            int itemDataId = itemDropData.dataId;
-            short level = itemDropData.level;
-            short amount = itemDropData.amount;
-            if (!IncreasingItemsWillOverwhelming(itemDataId, amount) && this.IncreaseItems(itemDataId, level, amount))
+            if (!IncreasingItemsWillOverwhelming(itemDropData.dataId, itemDropData.amount) && this.IncreaseItems(itemDropData))
                 itemDropEntity.NetworkDestroy();
         }
 

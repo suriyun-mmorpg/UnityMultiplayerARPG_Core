@@ -56,7 +56,7 @@ namespace MultiplayerARPG
         
         public void CraftItem(IPlayerCharacterData character)
         {
-            character.IncreaseItems(craftingItem.DataId, 1, 1);
+            character.IncreaseItems(CharacterItem.Create(craftingItem));
             foreach (ItemAmount craftRequirement in craftRequirements)
             {
                 if (craftRequirement.item != null && craftRequirement.amount > 0)
