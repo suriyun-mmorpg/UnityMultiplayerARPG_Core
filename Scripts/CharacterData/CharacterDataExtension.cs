@@ -469,7 +469,7 @@ public static partial class CharacterDataExtension
     public static bool IncreaseItems(this ICharacterData data, CharacterItem dropData)
     {
         // If item not valid
-        if (dropData.IsValid())
+        if (!dropData.IsValid())
             return false;
 
         Item itemData = dropData.GetItem();
