@@ -192,15 +192,6 @@ public class CharacterSummon : INetSerializable
 }
 
 [System.Serializable]
-public class SyncFieldCharacterSummon : LiteNetLibSyncField<CharacterSummon>
-{
-    protected override bool IsValueChanged(CharacterSummon newValue)
-    {
-        return true;
-    }
-}
-
-[System.Serializable]
 public class SyncListCharacterSummon : LiteNetLibSyncList<CharacterSummon>
 {
 }
