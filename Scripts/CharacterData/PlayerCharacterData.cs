@@ -5,20 +5,20 @@ using UnityEngine;
 [System.Serializable]
 public partial class PlayerCharacterData : CharacterData, IPlayerCharacterData
 {
-    public short statPoint;
-    public short skillPoint;
-    public int gold;
-    public int partyId;
-    public int guildId;
-    public byte guildRole;
-    public int sharedGuildExp;
-    public string currentMapName;
-    public Vector3 currentPosition;
-    public string respawnMapName;
-    public Vector3 respawnPosition;
-    public int lastUpdate;
-    public List<CharacterHotkey> hotkeys = new List<CharacterHotkey>();
-    public List<CharacterQuest> quests = new List<CharacterQuest>();
+    private short statPoint;
+    private short skillPoint;
+    private int gold;
+    private int partyId;
+    private int guildId;
+    private byte guildRole;
+    private int sharedGuildExp;
+    private string currentMapName;
+    private Vector3 currentPosition;
+    private string respawnMapName;
+    private Vector3 respawnPosition;
+    private int lastUpdate;
+    private List<CharacterHotkey> hotkeys = new List<CharacterHotkey>();
+    private List<CharacterQuest> quests = new List<CharacterQuest>();
 
     public short StatPoint { get { return statPoint; } set { statPoint = value; } }
     public short SkillPoint { get { return skillPoint; } set { skillPoint = value; } }
