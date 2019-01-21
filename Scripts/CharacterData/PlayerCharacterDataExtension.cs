@@ -535,7 +535,7 @@ public static partial class PlayerCharacterDataExtension
         EquipWeapons equipWeapons = new EquipWeapons();
         equipWeapons.Deserialize(reader);
         tempCharacterData.EquipWeapons = equipWeapons;
-        DevExtUtils.InvokeStaticDevExtMethods(ClassType, "DeserializeCharacterData", characterData, reader);
+        DevExtUtils.InvokeStaticDevExtMethods(ClassType, "DeserializeCharacterData", tempCharacterData, reader);
 
         tempCharacterData.ValidateCharacterData();
         tempCharacterData.CloneTo(characterData);
