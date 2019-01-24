@@ -242,7 +242,8 @@ namespace MultiplayerARPG
         {
             if (IsDead())
                 return;
-            if (movementSecure == MovementSecure.NotSecure && IsOwnerClient)
+            // Not play jump animation on owner client when running in not secure mode
+            if (movementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
                 return;
             // Play jump animation on non owner clients
             CharacterModel.PlayJumpAnimation();
@@ -252,12 +253,11 @@ namespace MultiplayerARPG
         {
             if (IsDead())
                 return;
-            // Play jump animation immediately on owner client
-            if (IsOwnerClient)
+            // Play jump animation immediately on owner client, if not running in server
+            if (IsOwnerClient && !IsServer)
                 CharacterModel.PlayJumpAnimation();
-            // Only server will call for clients to trigger jump animation for secure entity
-            if (IsServer)
-                CallNetFunction(NetFuncTriggerJump, FunctionReceivers.All);
+            // Play jump animation on other clients
+            CallNetFunction(NetFuncTriggerJump, FunctionReceivers.All);
         }
 
         public override void PointClickMovement(Vector3 position)
