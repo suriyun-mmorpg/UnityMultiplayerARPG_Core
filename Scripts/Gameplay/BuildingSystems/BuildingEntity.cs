@@ -146,17 +146,17 @@ namespace MultiplayerARPG
             return buildingType.Equals(buildingArea.buildingType);
         }
 
-#if UNITY_EDITOR
-        public override void OnBehaviourValidate()
+        protected override void OnValidate()
         {
-            base.OnBehaviourValidate();
+            base.OnValidate();
+#if UNITY_EDITOR
             if (!Application.isPlaying && dataId != name.GenerateHashId())
             {
                 dataId = name.GenerateHashId();
                 EditorUtility.SetDirty(this);
             }
-        }
 #endif
+        }
 
         public override void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
         {

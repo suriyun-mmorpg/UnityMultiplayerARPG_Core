@@ -53,10 +53,10 @@ namespace MultiplayerARPG
             gameObject.tag = gameInstance.playerTag;
         }
 
-#if UNITY_EDITOR
-        public override void OnBehaviourValidate()
+        protected override void OnValidate()
         {
-            base.OnBehaviourValidate();
+            base.OnValidate();
+#if UNITY_EDITOR
             if (database == null)
             {
                 Debug.LogError("[BasePlayerCharacterEntity] " + name + " Database is empty");
@@ -67,8 +67,8 @@ namespace MultiplayerARPG
                 database = null;
                 EditorUtility.SetDirty(this);
             }
-        }
 #endif
+        }
 
         protected override void ApplySkill(CharacterSkill characterSkill, Vector3 position, SkillAttackType skillAttackType, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {

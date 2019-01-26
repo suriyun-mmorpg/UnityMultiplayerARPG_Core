@@ -17,6 +17,7 @@ namespace MultiplayerARPG
         private string title;
         public Text textTitle;
 
+        [SerializeField]
         protected SyncFieldString syncTitle = new SyncFieldString();
         public virtual string Title
         {
@@ -134,12 +135,10 @@ namespace MultiplayerARPG
             syncTitle.onChange -= OnSyncTitleChange;
         }
 
-        public override void OnBehaviourValidate()
+        protected virtual void OnValidate()
         {
-            base.OnBehaviourValidate();
 #if UNITY_EDITOR
             SetupNetElements();
-            EditorUtility.SetDirty(this);
 #endif
         }
 

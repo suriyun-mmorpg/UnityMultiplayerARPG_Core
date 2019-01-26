@@ -99,10 +99,10 @@ namespace MultiplayerARPG
             }
         }
 
-#if UNITY_EDITOR
-        public override void OnBehaviourValidate()
+        protected override void OnValidate()
         {
-            base.OnBehaviourValidate();
+            base.OnValidate();
+#if UNITY_EDITOR
             if (database == null)
             {
                 Debug.LogError("[BaseMonsterCharacterEntity] " + name + " Database is empty");
@@ -113,8 +113,8 @@ namespace MultiplayerARPG
                 database = null;
                 EditorUtility.SetDirty(this);
             }
-        }
 #endif
+        }
 
         protected void InitStats()
         {
