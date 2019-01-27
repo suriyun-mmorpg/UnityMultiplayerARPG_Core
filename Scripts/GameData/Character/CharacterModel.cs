@@ -16,6 +16,12 @@ namespace MultiplayerARPG
         public static readonly int ANIM_MOVE_CLIP_MULTIPLIER = Animator.StringToHash("MoveSpeedMultiplier");
         public static readonly int ANIM_ACTION_CLIP_MULTIPLIER = Animator.StringToHash("ActionSpeedMultiplier");
         // Legacy Animation variables
+        public const string LEGACY_CLIP_IDLE = "_Idle";
+        public const string LEGACY_CLIP_MOVE = "_Move";
+        public const string LEGACY_CLIP_JUMP = "_Jump";
+        public const string LEGACY_CLIP_FALL = "_Fall";
+        public const string LEGACY_CLIP_HURT = "_Hurt";
+        public const string LEGACY_CLIP_DEAD = "_Dead";
         public const string LEGACY_CLIP_ACTION = "_Action";
 
         public enum AnimatorType
@@ -26,6 +32,7 @@ namespace MultiplayerARPG
         [Header("Animation Component Type")]
         public AnimatorType animatorType;
         [Header("Animator")]
+        public Animator animator;
         public RuntimeAnimatorController animatorController;
         public DefaultAnimatorData defaultAnimatorData = new DefaultAnimatorData()
         {
@@ -38,6 +45,7 @@ namespace MultiplayerARPG
             actionClip = null,
         };
         [Header("Legacy Animation")]
+        public Animation legacyAnimation;
         public LegacyAnimationData legacyAnimationData = new LegacyAnimationData()
         {
             idleClip = null,
@@ -72,6 +80,7 @@ namespace MultiplayerARPG
         private string defaultHurtClipName;
         private string defaultDeadClipName;
         private string defaultActionClipName;
+        private string lastFadedLegacyClipName;
 
         private static Dictionary<int, WeaponAnimations> cacheWeaponAnimations;
         public Dictionary<int, WeaponAnimations> CacheWeaponAnimations
@@ -112,17 +121,7 @@ namespace MultiplayerARPG
         // Optimize garbage collection
         protected ActionAnimation tempActionAnimation;
         protected ActionAnimation[] tempActionAnimations;
-
-        private Animator cacheAnimator;
-        public Animator CacheAnimator
-        {
-            get
-            {
-                SetupComponent();
-                return cacheAnimator;
-            }
-        }
-
+        
         private AnimatorOverrideController cacheAnimatorController;
         public AnimatorOverrideController CacheAnimatorController
         {
@@ -133,15 +132,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private Animation cacheAnimation;
-        public Animation CacheAnimation
-        {
-            get
-            {
-                SetupComponent();
-                return cacheAnimation;
-            }
-        }
+        private bool isSetupComponent;
 
         private void Awake()
         {
@@ -150,6 +141,9 @@ namespace MultiplayerARPG
 
         private void SetupComponent()
         {
+            if (isSetupComponent)
+                return;
+            isSetupComponent = true;
             switch (animatorType)
             {
                 case AnimatorType.Animator:
@@ -165,23 +159,23 @@ namespace MultiplayerARPG
                         defaultActionClipName = defaultAnimatorData.actionClip != null ? defaultAnimatorData.actionClip.name : string.Empty;
                     }
                     // Use override controller as animator
-                    if (cacheAnimator == null)
-                    {
-                        cacheAnimator = GetComponent<Animator>();
-                        cacheAnimator.runtimeAnimatorController = cacheAnimatorController;
-                    }
+                    if (animator == null)
+                        animator = GetComponentInChildren<Animator>();
+                    if (animator != null && animator.runtimeAnimatorController != cacheAnimatorController)
+                        animator.runtimeAnimatorController = cacheAnimatorController;
                     break;
                 case AnimatorType.LegacyAnimtion:
-                    if (cacheAnimation == null)
+                    if (legacyAnimation == null)
                     {
-                        cacheAnimation = GetComponent<Animation>();
-                        cacheAnimation.AddClip(legacyAnimationData.idleClip, legacyAnimationData.idleClip.name);
-                        cacheAnimation.AddClip(legacyAnimationData.moveClip, legacyAnimationData.moveClip.name);
-                        cacheAnimation.AddClip(legacyAnimationData.jumpClip, legacyAnimationData.jumpClip.name);
-                        cacheAnimation.AddClip(legacyAnimationData.fallClip, legacyAnimationData.fallClip.name);
-                        cacheAnimation.AddClip(legacyAnimationData.hurtClip, legacyAnimationData.hurtClip.name);
-                        cacheAnimation.AddClip(legacyAnimationData.deadClip, legacyAnimationData.deadClip.name);
+                        legacyAnimation = GetComponentInChildren<Animation>();
+                        legacyAnimation.AddClip(legacyAnimationData.idleClip, LEGACY_CLIP_IDLE);
+                        legacyAnimation.AddClip(legacyAnimationData.moveClip, LEGACY_CLIP_MOVE);
+                        legacyAnimation.AddClip(legacyAnimationData.jumpClip, LEGACY_CLIP_JUMP);
+                        legacyAnimation.AddClip(legacyAnimationData.fallClip, LEGACY_CLIP_FALL);
+                        legacyAnimation.AddClip(legacyAnimationData.hurtClip, LEGACY_CLIP_HURT);
+                        legacyAnimation.AddClip(legacyAnimationData.deadClip, LEGACY_CLIP_DEAD);
                     }
+                    CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
                     break;
             }
         }
@@ -189,6 +183,7 @@ namespace MultiplayerARPG
         public override void SetEquipWeapons(EquipWeapons equipWeapons)
         {
             base.SetEquipWeapons(equipWeapons);
+            SetupComponent();
             Item weaponItem = GameInstance.Singleton.DefaultWeaponItem;
             if (equipWeapons.rightHand.IsValid() && equipWeapons.rightHand.GetWeaponItem() != null)
                 weaponItem = equipWeapons.rightHand.GetWeaponItem();
@@ -290,19 +285,26 @@ namespace MultiplayerARPG
             if (deadClip == null)
                 deadClip = legacyAnimationData.deadClip;
             // Remove clips
-            cacheAnimation.RemoveClip(legacyAnimationData.idleClip.name);
-            cacheAnimation.RemoveClip(legacyAnimationData.moveClip.name);
-            cacheAnimation.RemoveClip(legacyAnimationData.jumpClip.name);
-            cacheAnimation.RemoveClip(legacyAnimationData.fallClip.name);
-            cacheAnimation.RemoveClip(legacyAnimationData.hurtClip.name);
-            cacheAnimation.RemoveClip(legacyAnimationData.deadClip.name);
+            if (legacyAnimation.GetClip(LEGACY_CLIP_IDLE) != null)
+                legacyAnimation.RemoveClip(LEGACY_CLIP_IDLE);
+            if (legacyAnimation.GetClip(LEGACY_CLIP_MOVE) != null)
+                legacyAnimation.RemoveClip(LEGACY_CLIP_MOVE);
+            if (legacyAnimation.GetClip(LEGACY_CLIP_JUMP) != null)
+                legacyAnimation.RemoveClip(LEGACY_CLIP_JUMP);
+            if (legacyAnimation.GetClip(LEGACY_CLIP_FALL) != null)
+                legacyAnimation.RemoveClip(LEGACY_CLIP_FALL);
+            if (legacyAnimation.GetClip(LEGACY_CLIP_HURT) != null)
+                legacyAnimation.RemoveClip(LEGACY_CLIP_HURT);
+            if (legacyAnimation.GetClip(LEGACY_CLIP_DEAD) != null)
+                legacyAnimation.RemoveClip(LEGACY_CLIP_DEAD);
             // Setup generic clips
-            cacheAnimation.AddClip(idleClip, legacyAnimationData.idleClip.name);
-            cacheAnimation.AddClip(moveClip, legacyAnimationData.moveClip.name);
-            cacheAnimation.AddClip(jumpClip, legacyAnimationData.jumpClip.name);
-            cacheAnimation.AddClip(fallClip, legacyAnimationData.fallClip.name);
-            cacheAnimation.AddClip(hurtClip, legacyAnimationData.hurtClip.name);
-            cacheAnimation.AddClip(deadClip, legacyAnimationData.deadClip.name);
+            legacyAnimation.AddClip(idleClip, LEGACY_CLIP_IDLE);
+            legacyAnimation.AddClip(moveClip, LEGACY_CLIP_MOVE);
+            legacyAnimation.AddClip(jumpClip, LEGACY_CLIP_JUMP);
+            legacyAnimation.AddClip(fallClip, LEGACY_CLIP_FALL);
+            legacyAnimation.AddClip(hurtClip, LEGACY_CLIP_HURT);
+            legacyAnimation.AddClip(deadClip, LEGACY_CLIP_DEAD);
+            CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, 0, WrapMode.Loop);
         }
 
         public override void AddingNewModel(GameObject newModel)
@@ -332,50 +334,52 @@ namespace MultiplayerARPG
         #region Update Animation Functions
         private void UpdateAnimation_Animator(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier)
         {
-            if (!CacheAnimator.gameObject.activeInHierarchy)
+            if (!animator.gameObject.activeInHierarchy)
                 return;
-            if (isDead && CacheAnimator.GetBool(ANIM_DO_ACTION))
+            if (isDead && animator.GetBool(ANIM_DO_ACTION))
             {
                 // Force set to none action when dead
-                CacheAnimator.SetBool(ANIM_DO_ACTION, false);
+                animator.SetBool(ANIM_DO_ACTION, false);
             }
-            CacheAnimator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : new Vector3(moveVelocity.x, 0, moveVelocity.z).magnitude);
-            CacheAnimator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, playMoveSpeedMultiplier);
-            CacheAnimator.SetFloat(ANIM_Y_SPEED, moveVelocity.y);
-            CacheAnimator.SetBool(ANIM_IS_DEAD, isDead);
+            animator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : new Vector3(moveVelocity.x, 0, moveVelocity.z).magnitude);
+            animator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, playMoveSpeedMultiplier);
+            animator.SetFloat(ANIM_Y_SPEED, moveVelocity.y);
+            animator.SetBool(ANIM_IS_DEAD, isDead);
         }
 
         private void UpdateAnimation_LegacyAnimation(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier)
         {
             if (isDead)
-                CrossFadeLegacyAnimation(legacyAnimationData.deadClip, legacyAnimationData.deadClipFadeLength);
+                CrossFadeLegacyAnimation(LEGACY_CLIP_DEAD, legacyAnimationData.deadClipFadeLength, WrapMode.Once);
             else
             {
-                if (CacheAnimation.IsPlaying(LEGACY_CLIP_ACTION))
+                if (legacyAnimation.GetClip(LEGACY_CLIP_ACTION) != null && legacyAnimation.IsPlaying(LEGACY_CLIP_ACTION))
                     return;
                 float ySpeed = moveVelocity.y;
                 if (ySpeed < legacyAnimationData.ySpeedToPlayFallClip)
-                    CrossFadeLegacyAnimation(legacyAnimationData.fallClip, legacyAnimationData.fallClipFadeLength);
+                    CrossFadeLegacyAnimation(LEGACY_CLIP_FALL, legacyAnimationData.fallClipFadeLength, WrapMode.Loop);
                 else
                 {
                     float moveMagnitude = new Vector3(moveVelocity.x, 0, moveVelocity.z).magnitude;
                     if (moveMagnitude > legacyAnimationData.magnitudeToPlayMoveClip)
-                        CrossFadeLegacyAnimation(legacyAnimationData.moveClip, legacyAnimationData.moveClipFadeLength);
+                        CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
                     else
-                        CrossFadeLegacyAnimation(legacyAnimationData.idleClip, legacyAnimationData.idleClipFadeLength);
+                        CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
                 }
             }
         }
 
-        private void CrossFadeLegacyAnimation(AnimationClip clip, float fadeLength)
+        private void CrossFadeLegacyAnimation(string clipName, float fadeLength, WrapMode wrapMode)
         {
-            CrossFadeLegacyAnimation(clip.name, fadeLength);
-        }
-
-        private void CrossFadeLegacyAnimation(string clipName, float fadeLength)
-        {
-            if (!CacheAnimation.IsPlaying(clipName))
-                CacheAnimation.CrossFade(clipName, fadeLength);
+            if (!legacyAnimation.IsPlaying(clipName))
+            {
+                // Don't play dead animation looply
+                if (clipName == LEGACY_CLIP_DEAD && lastFadedLegacyClipName == LEGACY_CLIP_DEAD)
+                    return;
+                lastFadedLegacyClipName = clipName;
+                legacyAnimation.wrapMode = wrapMode;
+                legacyAnimation.CrossFade(clipName, fadeLength);
+            }
         }
         #endregion
 
@@ -393,18 +397,18 @@ namespace MultiplayerARPG
             tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
             if (tempActionAnimation.clip != null)
             {
-                CacheAnimator.SetBool(ANIM_DO_ACTION, false);
+                animator.SetBool(ANIM_DO_ACTION, false);
                 CacheAnimatorController[defaultActionClipName] = tempActionAnimation.clip;
                 AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
                 if (audioClip != null)
                     AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
-                CacheAnimator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
-                CacheAnimator.SetBool(ANIM_DO_ACTION, true);
+                animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
+                animator.SetBool(ANIM_DO_ACTION, true);
                 // Waits by current transition + clip duration before end animation
-                yield return new WaitForSecondsRealtime(CacheAnimator.GetAnimatorTransitionInfo(0).duration + (tempActionAnimation.GetClipLength() / playSpeedMultiplier));
-                CacheAnimator.SetBool(ANIM_DO_ACTION, false);
+                yield return new WaitForSecondsRealtime(animator.GetAnimatorTransitionInfo(0).duration + (tempActionAnimation.GetClipLength() / playSpeedMultiplier));
+                animator.SetBool(ANIM_DO_ACTION, false);
                 // Waits by current transition + extra duration before end playing animation state
-                yield return new WaitForSecondsRealtime(CacheAnimator.GetAnimatorTransitionInfo(0).duration + (tempActionAnimation.GetExtraDuration() / playSpeedMultiplier));
+                yield return new WaitForSecondsRealtime(animator.GetAnimatorTransitionInfo(0).duration + (tempActionAnimation.GetExtraDuration() / playSpeedMultiplier));
             }
         }
 
@@ -414,16 +418,16 @@ namespace MultiplayerARPG
             tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
             if (tempActionAnimation.clip != null)
             {
-                if (CacheAnimation.GetClip(LEGACY_CLIP_ACTION) != null)
-                    CacheAnimation.RemoveClip(LEGACY_CLIP_ACTION);
-                CacheAnimation.AddClip(tempActionAnimation.clip, LEGACY_CLIP_ACTION);
+                if (legacyAnimation.GetClip(LEGACY_CLIP_ACTION) != null)
+                    legacyAnimation.RemoveClip(LEGACY_CLIP_ACTION);
+                legacyAnimation.AddClip(tempActionAnimation.clip, LEGACY_CLIP_ACTION);
                 AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
                 if (audioClip != null)
                     AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
-                CrossFadeLegacyAnimation(LEGACY_CLIP_ACTION, legacyAnimationData.actionClipFadeLength);
+                CrossFadeLegacyAnimation(LEGACY_CLIP_ACTION, legacyAnimationData.actionClipFadeLength, WrapMode.Once);
                 // Waits by current transition + clip duration before end animation
                 yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
-                CrossFadeLegacyAnimation(legacyAnimationData.idleClip, legacyAnimationData.idleClipFadeLength);
+                CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
                 // Waits by current transition + extra duration before end playing animation state
                 yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
             }
@@ -434,22 +438,22 @@ namespace MultiplayerARPG
         {
             if (animatorType == AnimatorType.LegacyAnimtion)
             {
-                CrossFadeLegacyAnimation(legacyAnimationData.hurtClip, legacyAnimationData.hurtClipFadeLength);
+                CrossFadeLegacyAnimation(LEGACY_CLIP_HURT, legacyAnimationData.hurtClipFadeLength, WrapMode.Once);
                 return;
             }
-            CacheAnimator.ResetTrigger(ANIM_HURT);
-            CacheAnimator.SetTrigger(ANIM_HURT);
+            animator.ResetTrigger(ANIM_HURT);
+            animator.SetTrigger(ANIM_HURT);
         }
 
         public override void PlayJumpAnimation()
         {
             if (animatorType == AnimatorType.LegacyAnimtion)
             {
-                CrossFadeLegacyAnimation(legacyAnimationData.jumpClip, legacyAnimationData.jumpClipFadeLength);
+                CrossFadeLegacyAnimation(LEGACY_CLIP_JUMP, legacyAnimationData.jumpClipFadeLength, WrapMode.Once);
                 return;
             }
-            CacheAnimator.ResetTrigger(ANIM_JUMP);
-            CacheAnimator.SetTrigger(ANIM_JUMP);
+            animator.ResetTrigger(ANIM_JUMP);
+            animator.SetTrigger(ANIM_JUMP);
         }
 
         #region Animation data helpers
