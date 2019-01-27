@@ -104,20 +104,20 @@ namespace MultiplayerARPG
             MigrateNewUIs();
         }
 
-#if UNITY_EDITOR
         private void OnValidate()
         {
+#if UNITY_EDITOR
             if (MigrateNewUIs())
                 EditorUtility.SetDirty(this);
-        }
 #endif
+        }
 
         private bool MigrateNewUIs()
         {
             bool hasChanges = false;
             if (uiEquipItems != null)
             {
-                var list = uiCharacterEquipItems == null ? new List<UIEquipItems>() : new List<UIEquipItems>(uiCharacterEquipItems);
+                List<UIEquipItems> list = uiCharacterEquipItems == null ? new List<UIEquipItems>() : new List<UIEquipItems>(uiCharacterEquipItems);
                 list.Add(uiEquipItems);
                 uiCharacterEquipItems = list.ToArray();
                 uiEquipItems = null;
