@@ -19,6 +19,8 @@ namespace MultiplayerARPG
         public Button buttonCreate;
         [Header("Event")]
         public UnityEvent eventOnCreateCharacter;
+        public CharacterDataEvent eventOnSelectCharacter;
+        public CharacterClassEvent eventOnSelectCharacterClass;
 
         private UIList cacheCharacterList;
         public UIList CacheCharacterList
@@ -99,9 +101,6 @@ namespace MultiplayerARPG
         public PlayerCharacter SelectedPlayerCharacter { get { return selectedPlayerCharacter; } }
         public PlayerCharacterData CreatingPlayerCharacterData { get; private set; }
 
-        public CharacterDataEvent onSelectCharacter;
-        public CharacterClassEvent onSelectCharacterClass;
-
         protected virtual List<BasePlayerCharacterEntity> GetCreatableCharacters()
         {
             return GameInstance.PlayerCharacterEntities.Values.ToList();
@@ -172,12 +171,12 @@ namespace MultiplayerARPG
 
         protected void OnSelectCharacter(UICharacter uiCharacter)
         {
-            OnSelectCharacter(uiCharacter.Data as PlayerCharacterData);
+            OnSelectCharacter(uiCharacter.Data as IPlayerCharacterData);
         }
 
-        protected virtual void OnSelectCharacter(PlayerCharacterData playerCharacterData)
+        protected virtual void OnSelectCharacter(IPlayerCharacterData playerCharacterData)
         {
-            onSelectCharacter.Invoke(playerCharacterData);
+            eventOnSelectCharacter.Invoke(playerCharacterData);
             characterModelContainer.SetChildrenActive(false);
             if (CreatingPlayerCharacterData == null)
                 CreatingPlayerCharacterData = new PlayerCharacterData();
@@ -221,7 +220,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnSelectCharacterClass(BaseCharacter baseCharacter)
         {
-            onSelectCharacterClass.Invoke(baseCharacter);
+            eventOnSelectCharacterClass.Invoke(baseCharacter);
             PlayerCharacterByDataId.TryGetValue(baseCharacter.DataId, out selectedPlayerCharacter);
             if (SelectedPlayerCharacter != null)
             {

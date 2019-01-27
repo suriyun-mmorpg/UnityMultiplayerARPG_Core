@@ -13,6 +13,8 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public Button buttonStart;
         public Button buttonDelete;
+        [Header("Event")]
+        public CharacterDataEvent eventOnSelectCharacter;
 
         private UIList cacheCharacterList;
         public UIList CacheCharacterList
@@ -45,9 +47,12 @@ namespace MultiplayerARPG
             }
         }
 
-        protected readonly Dictionary<string, BaseCharacterModel> CharacterModels = new Dictionary<string, BaseCharacterModel>();
-        protected readonly Dictionary<string, IPlayerCharacterData> PlayerCharacterDataDict = new Dictionary<string, IPlayerCharacterData>();
-        public IPlayerCharacterData SelectedPlayerCharacterData { get; protected set; }
+        protected readonly Dictionary<string, BaseCharacterModel> CharacterModelById = new Dictionary<string, BaseCharacterModel>();
+        protected BaseCharacterModel selectedModel;
+        public BaseCharacterModel SelectedModel { get { return selectedModel; } }
+        protected readonly Dictionary<string, IPlayerCharacterData> PlayerCharacterDataById = new Dictionary<string, IPlayerCharacterData>();
+        protected IPlayerCharacterData selectedPlayerCharacterData;
+        public IPlayerCharacterData SelectedPlayerCharacterData { get { return selectedPlayerCharacterData; } }
 
         protected virtual void LoadCharacters()
         {
@@ -57,9 +62,9 @@ namespace MultiplayerARPG
             buttonDelete.gameObject.SetActive(false);
             // Remove all models
             characterModelContainer.RemoveChildren();
-            CharacterModels.Clear();
+            CharacterModelById.Clear();
             // Remove all cached data
-            PlayerCharacterDataDict.Clear();
+            PlayerCharacterDataById.Clear();
             // Show list of created characters
             List<PlayerCharacterData> selectableCharacters = PlayerCharacterDataExtension.LoadAllPersistentCharacterData();
             for (int i = selectableCharacters.Count - 1; i >= 0; --i)
@@ -72,7 +77,7 @@ namespace MultiplayerARPG
             CacheCharacterList.Generate(selectableCharacters, (index, characterEntity, ui) =>
             {
                 // Cache player character to dictionary, we will use it later
-                PlayerCharacterDataDict[characterEntity.Id] = characterEntity;
+                PlayerCharacterDataById[characterEntity.Id] = characterEntity;
                 // Setup UIs
                 UICharacter uiCharacter = ui.GetComponent<UICharacter>();
                 uiCharacter.Data = characterEntity;
@@ -80,7 +85,7 @@ namespace MultiplayerARPG
                 BaseCharacterModel characterModel = characterEntity.InstantiateModel(characterModelContainer);
                 if (characterModel != null)
                 {
-                    CharacterModels[characterEntity.Id] = characterModel;
+                    CharacterModelById[characterEntity.Id] = characterModel;
                     characterModel.gameObject.SetActive(false);
                     characterModel.SetEquipWeapons(characterEntity.EquipWeapons);
                     characterModel.SetEquipItems(characterEntity.EquipItems);
@@ -114,22 +119,21 @@ namespace MultiplayerARPG
             base.Hide();
         }
 
-        protected virtual void OnSelectCharacter(UICharacter uiCharacter)
+        protected void OnSelectCharacter(UICharacter uiCharacter)
+        {
+            OnSelectCharacter(uiCharacter.Data as IPlayerCharacterData);
+        }
+
+        protected virtual void OnSelectCharacter(IPlayerCharacterData playerCharacterData)
         {
             buttonStart.gameObject.SetActive(true);
             buttonDelete.gameObject.SetActive(true);
             characterModelContainer.SetChildrenActive(false);
-            IPlayerCharacterData playerCharacter = uiCharacter.Data as IPlayerCharacterData;
-            SelectedPlayerCharacterData = PlayerCharacterDataDict[playerCharacter.Id];
-            ShowCharacter(playerCharacter.Id);
-        }
-
-        protected virtual void ShowCharacter(string id)
-        {
-            BaseCharacterModel characterModel;
-            if (string.IsNullOrEmpty(id) || !CharacterModels.TryGetValue(id, out characterModel))
-                return;
-            characterModel.gameObject.SetActive(true);
+            PlayerCharacterDataById.TryGetValue(playerCharacterData.Id, out selectedPlayerCharacterData);
+            CharacterModelById.TryGetValue(playerCharacterData.Id, out selectedModel);
+            // Show selected model
+            if (SelectedModel != null)
+                SelectedModel.gameObject.SetActive(true);
         }
 
         protected virtual void OnClickStart()
