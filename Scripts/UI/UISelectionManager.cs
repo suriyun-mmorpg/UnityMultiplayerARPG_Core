@@ -13,6 +13,8 @@ public abstract class UISelectionManager : MonoBehaviour
 {
     public UISelectionMode selectionMode;
     public abstract object GetSelectedUI();
+    public abstract void Select(int index);
+    public abstract void Deselect(int index);
     public abstract void Select(object ui);
     public abstract void Deselect(object ui);
     public abstract void DeselectAll();
@@ -60,6 +62,8 @@ public abstract class UISelectionManager<TData, TUI, TDataEvent, TUIEvent> : UIS
 
     public TUI Get(int index)
     {
+        if (index < 0 || index >= uis.Count)
+            return null;
         return uis[index];
     }
 
@@ -84,12 +88,18 @@ public abstract class UISelectionManager<TData, TUI, TDataEvent, TUIEvent> : UIS
         return SelectedUI;
     }
 
+    public override void Select(int index)
+    {
+        TUI ui = Get(index);
+        Select(ui);
+    }
+
     public override sealed void Select(object ui)
     {
         if (ui == null)
             return;
 
-        TUI castedUI = (TUI)ui;
+        TUI castedUI = ui as TUI;
         castedUI.Select();
 
         if (eventOnSelect != null)
@@ -112,8 +122,17 @@ public abstract class UISelectionManager<TData, TUI, TDataEvent, TUIEvent> : UIS
             eventOnDataSelected.Invoke(castedUI.Data);
     }
 
+    public override void Deselect(int index)
+    {
+        TUI ui = Get(index);
+        Deselect(ui);
+    }
+
     public override sealed void Deselect(object ui)
     {
+        if (ui == null)
+            return;
+
         TUI castedUI = (TUI)ui;
 
         if (eventOnDeselect != null)
