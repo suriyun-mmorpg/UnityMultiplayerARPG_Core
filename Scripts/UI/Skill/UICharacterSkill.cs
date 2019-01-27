@@ -132,10 +132,10 @@ namespace MultiplayerARPG
                 onSetNonLevelZeroData.Invoke();
 
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(titleFormat, Skill == null ? "Unknow" : Skill.Title);
+                uiTextTitle.text = string.Format(titleFormat, Skill == null ? LanguageManager.GetUnknowTitle() : Skill.Title);
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(descriptionFormat, Skill == null ? "N/A" : Skill.Description);
+                uiTextDescription.text = string.Format(descriptionFormat, Skill == null ? LanguageManager.GetUnknowDescription() : Skill.Description);
 
             if (uiTextLevel != null)
                 uiTextLevel.text = string.Format(levelFormat, Level.ToString("N0"));
@@ -182,7 +182,7 @@ namespace MultiplayerARPG
             }
 
             if (uiTextConsumeMp != null)
-                uiTextConsumeMp.text = string.Format(consumeMpFormat, Skill == null || Level <= 0 ? "N/A" : Skill.GetConsumeMp(Level).ToString("N0"));
+                uiTextConsumeMp.text = string.Format(consumeMpFormat, Skill == null || Level <= 0 ? LanguageManager.GetUnknowDescription() : Skill.GetConsumeMp(Level).ToString("N0"));
 
             if (uiRequirement != null)
             {

@@ -84,7 +84,7 @@ namespace MultiplayerARPG
             }
 
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(titleFormat, summonData == null ? "Unknow" : summonData.Title);
+                uiTextTitle.text = string.Format(titleFormat, summonData == null ? LanguageManager.GetUnknowTitle() : summonData.Title);
 
             if (imageIcon != null)
             {

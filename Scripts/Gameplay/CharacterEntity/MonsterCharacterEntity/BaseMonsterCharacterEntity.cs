@@ -21,7 +21,7 @@ namespace MultiplayerARPG
 
         public override string CharacterName
         {
-            get { return MonsterDatabase == null ? "Unknow" : MonsterDatabase.Title; }
+            get { return MonsterDatabase == null ? LanguageManager.GetUnknowTitle() : MonsterDatabase.Title; }
             set { }
         }
 

@@ -178,17 +178,17 @@ namespace MultiplayerARPG
 
             if (uiTextTitle != null)
             {
-                string str = string.Format(titleFormat, Item == null ? "Unknow" : Item.Title);
+                string str = string.Format(titleFormat, Item == null ? LanguageManager.GetUnknowTitle() : Item.Title);
                 if (!dontAppendRefineLevelToTitle && EquipmentItem != null)
                     str += string.Format(titleRefineLevelFormat, (Level - 1).ToString("N0"));
                 uiTextTitle.text = str;
             }
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(descriptionFormat, Item == null ? "N/A" : Item.Description);
+                uiTextDescription.text = string.Format(descriptionFormat, Item == null ? LanguageManager.GetUnknowDescription() : Item.Description);
 
             if (uiTextRarity != null)
-                uiTextRarity.text = string.Format(rarityTitleFormat, Item == null ? "N/A" : Item.RarityTitle);
+                uiTextRarity.text = string.Format(rarityTitleFormat, Item == null ? LanguageManager.GetUnknowTitle() : Item.RarityTitle);
 
             if (uiTextLevel != null)
             {

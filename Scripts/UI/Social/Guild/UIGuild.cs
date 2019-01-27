@@ -101,13 +101,13 @@ namespace MultiplayerARPG
         protected override void UpdateUIs()
         {
             if (textGuildName != null)
-                textGuildName.text = string.Format(guildNameFormat, Guild == null ? "Unknow" : Guild.guildName);
+                textGuildName.text = string.Format(guildNameFormat, Guild == null ? LanguageManager.GetUnknowTitle() : Guild.guildName);
 
             if (textLeaderName != null)
-                textLeaderName.text = string.Format(leaderNameFormat, Guild == null ? "Unknow" : Guild.GetLeader().characterName);
+                textLeaderName.text = string.Format(leaderNameFormat, Guild == null ? LanguageManager.GetUnknowTitle() : Guild.GetLeader().characterName);
 
             if (textLevel != null)
-                textLevel.text = string.Format(levelFormat, Guild == null ? "1" : Guild.level.ToString("N0"));
+                textLevel.text = string.Format(levelFormat, Guild == null ? "0" : Guild.level.ToString("N0"));
 
             int[] expTree = GameInstance.Singleton.SocialSystemSetting.GuildExpTree;
             int currentExp = 0;

@@ -33,7 +33,7 @@ namespace MultiplayerARPG
             get
             {
                 Item item = Item;
-                return item == null ? "Unknow" : item.Title;
+                return item == null ? LanguageManager.GetUnknowTitle() : item.Title;
             }
             set { }
         }

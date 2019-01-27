@@ -149,10 +149,10 @@ namespace MultiplayerARPG
                 onSetNonLevelZeroData.Invoke();
 
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(titleFormat, GuildSkill == null ? "Unknow" : GuildSkill.Title);
+                uiTextTitle.text = string.Format(titleFormat, GuildSkill == null ? LanguageManager.GetUnknowTitle() : GuildSkill.Title);
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(descriptionFormat, GuildSkill == null ? "N/A" : GuildSkill.Description);
+                uiTextDescription.text = string.Format(descriptionFormat, GuildSkill == null ? LanguageManager.GetUnknowDescription() : GuildSkill.Description);
 
             if (uiTextLevel != null)
                 uiTextLevel.text = string.Format(levelFormat, Level.ToString("N0"));

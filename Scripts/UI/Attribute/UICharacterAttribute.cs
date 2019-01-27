@@ -38,10 +38,10 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(titleFormat, Attribute == null ? "Unknow" : Attribute.Title);
+                uiTextTitle.text = string.Format(titleFormat, Attribute == null ? LanguageManager.GetUnknowTitle() : Attribute.Title);
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(descriptionFormat, Attribute == null ? "N/A" : Attribute.Description);
+                uiTextDescription.text = string.Format(descriptionFormat, Attribute == null ? LanguageManager.GetUnknowDescription() : Attribute.Description);
 
             if (uiTextAmount != null)
                 uiTextAmount.text = string.Format(amountFormat, Amount.ToString("N0"));

@@ -27,7 +27,7 @@ namespace MultiplayerARPG
             {
                 case QuestTaskType.KillMonster:
                     MonsterCharacterAmount monsterCharacterAmount = QuestTask.monsterCharacterAmount;
-                    string monsterTitle = monsterCharacterAmount.monster == null ? "Unknow" : monsterCharacterAmount.monster.Title;
+                    string monsterTitle = monsterCharacterAmount.monster == null ? LanguageManager.GetUnknowTitle() : monsterCharacterAmount.monster.Title;
                     short monsterKillAmount = monsterCharacterAmount.amount;
                     isComplete = Progress >= monsterKillAmount;
                     if (uiTextTaskDescription != null)
@@ -35,7 +35,7 @@ namespace MultiplayerARPG
                     break;
                 case QuestTaskType.CollectItem:
                     ItemAmount itemAmount = QuestTask.itemAmount;
-                    string itemTitle = itemAmount.item == null ? "Unknow" : itemAmount.item.Title;
+                    string itemTitle = itemAmount.item == null ? LanguageManager.GetUnknowTitle() : itemAmount.item.Title;
                     short itemCollectAmount = itemAmount.amount;
                     isComplete = Progress >= itemCollectAmount;
                     if (uiTextTaskDescription != null)

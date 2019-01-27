@@ -55,14 +55,14 @@ namespace MultiplayerARPG
         {
 #if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
             if (ProductCatalogItem == null)
-                return "Unknow";
+                return LanguageManager.GetUnknowTitle();
             var title = ProductCatalogItem.defaultDescription.Title;
             if (Metadata != null && !string.IsNullOrEmpty(Metadata.localizedTitle))
                 title = Metadata.localizedTitle;
             return title;
 #else
             Debug.LogWarning("Cannot get IAP product title, Unity Purchasing is not enabled.");
-            return "Unknow";
+            return LanguageManager.GetUnknowTitle();
 #endif
         }
 
@@ -85,11 +85,11 @@ namespace MultiplayerARPG
         {
 #if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
             if (ProductCatalogItem == null || Metadata == null)
-                return "N/A";
-            return Metadata.localizedPriceString;
+                return LanguageManager.GetUnknowDescription();
+            return Metadata.localizedPrice.ToString("N0") + " " + Metadata.isoCurrencyCode;
 #else
             Debug.LogWarning("Cannot get IAP product price, Unity Purchasing is not enabled.");
-            return "N/A";
+            return LanguageManager.GetUnknowDescription();
 #endif
         }
     }

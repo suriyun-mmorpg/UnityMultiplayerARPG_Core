@@ -54,6 +54,8 @@ namespace MultiplayerARPG
             Texts.Add(GameMessage.Type.GuildRoleNotAvailable.ToString(), "Guild role is not available");
             Texts.Add(GameMessage.Type.GuildSkillReachedMaxLevel.ToString(), "Guild skill is reached max level");
             Texts.Add(GameMessage.Type.NoGuildSkillPoint.ToString(), "No guild skill point");
+            Texts.Add(GameMessage.Type.UnknowGameDataTitle.ToString(), "Unknow");
+            Texts.Add(GameMessage.Type.UnknowGameDataDescription.ToString(), "N/A");
         }
     }
 
@@ -78,7 +80,7 @@ namespace MultiplayerARPG
     public struct LanguageData
     {
         public string key;
-        [TextArea(1, 30)]
+        [TextArea]
         public string value;
     }
 }

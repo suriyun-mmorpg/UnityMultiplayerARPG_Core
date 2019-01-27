@@ -49,7 +49,7 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             if (uiTextName != null)
-                uiTextName.text = string.Format(nameFormat, string.IsNullOrEmpty(Data.socialCharacter.characterName) ? "Unknow" : Data.socialCharacter.characterName);
+                uiTextName.text = string.Format(nameFormat, string.IsNullOrEmpty(Data.socialCharacter.characterName) ? LanguageManager.GetUnknowTitle() : Data.socialCharacter.characterName);
 
             if (uiTextLevel != null)
                 uiTextLevel.text = string.Format(levelFormat, Data.socialCharacter.level.ToString("N0"));
@@ -114,10 +114,10 @@ namespace MultiplayerARPG
             GameInstance.PlayerCharacters.TryGetValue(Data.socialCharacter.dataId, out character);
 
             if (uiTextClassTitle != null)
-                uiTextClassTitle.text = string.Format(classTitleFormat, character == null ? "N/A" : character.Title);
+                uiTextClassTitle.text = string.Format(classTitleFormat, character == null ? LanguageManager.GetUnknowTitle() : character.Title);
 
             if (uiTextClassDescription != null)
-                uiTextClassDescription.text = string.Format(classDescriptionFormat, character == null ? "N/A" : character.Description);
+                uiTextClassDescription.text = string.Format(classDescriptionFormat, character == null ? LanguageManager.GetUnknowDescription() : character.Description);
 
             if (imageClassIcon != null)
             {

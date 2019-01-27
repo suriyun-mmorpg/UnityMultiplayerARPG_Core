@@ -87,11 +87,21 @@ namespace MultiplayerARPG
             }
         }
 
-        public static string GetText(string key)
+        public static string GetText(string key, string defaultValue = "")
         {
             if (Texts.ContainsKey(key))
                 return Texts[key];
-            return "";
+            return defaultValue;
+        }
+
+        public static string GetUnknowTitle()
+        {
+            return GetText(GameMessage.Type.UnknowGameDataTitle.ToString(), "Unknow");
+        }
+
+        public static string GetUnknowDescription()
+        {
+            return GetText(GameMessage.Type.UnknowGameDataDescription.ToString(), "N/A");
         }
     }
 }

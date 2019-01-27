@@ -25,7 +25,7 @@ namespace MultiplayerARPG
             characterId = member.id;
 
             if (uiTextName != null)
-                uiTextName.text = string.Format(nameFormat, string.IsNullOrEmpty(member.characterName) ? "Unknow" : member.characterName);
+                uiTextName.text = string.Format(nameFormat, string.IsNullOrEmpty(member.characterName) ? LanguageManager.GetUnknowTitle() : member.characterName);
 
             if (uiTextLevel != null)
                 uiTextLevel.text = string.Format(levelFormat, member.level.ToString("N0"));

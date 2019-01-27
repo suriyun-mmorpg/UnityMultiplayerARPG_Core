@@ -12,6 +12,9 @@ namespace MultiplayerARPG
     {
         public UICharacter uiCharacterPrefab;
         public Transform uiCharacterContainer;
+        public UICharacterClass uiCharacterClassPrefab;
+        public Transform uiCharacterClassContainer;
+
         public Transform characterModelContainer;
         [Header("UI Elements")]
         public InputField inputCharacterName;

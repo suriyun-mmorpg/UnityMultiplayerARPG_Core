@@ -86,7 +86,7 @@ namespace MultiplayerARPG
 
         public void ShowDisconnectDialog(DisconnectInfo disconnectInfo)
         {
-            string errorMessage = "Unknow";
+            string errorMessage = LanguageManager.GetUnknowTitle();
             switch (disconnectInfo.Reason)
             {
                 case DisconnectReason.DisconnectPeerCalled:

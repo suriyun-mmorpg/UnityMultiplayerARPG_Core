@@ -67,6 +67,7 @@ namespace MultiplayerARPG
         public UIDamageElementAmounts uiLeftHandDamages;
         public UICharacterStats uiCharacterStats;
         public UICharacterBuffs uiCharacterBuffs;
+        public UIResistanceAmounts uiCharacterResistances;
         public UICharacterAttributePair[] uiCharacterAttributes;
         [Header("Class information")]
         public TextWrapper uiTextClassTitle;
@@ -78,11 +79,13 @@ namespace MultiplayerARPG
 
         // Improve garbage collector
         private CharacterStats cacheStatsWithBuffs;
+        private Dictionary<DamageElement, float> cacheResistancesWithBuffs;
         private Dictionary<Attribute, short> cacheAttributesWithBuffs;
         private CharacterStats displayingStats;
+        private Dictionary<DamageElement, float> displayingResistances;
         private Dictionary<Attribute, short> displayingAttributes;
 
-        private Dictionary<Attribute, UICharacterAttribute> cacheUICharacterAttributes = null;
+        private Dictionary<Attribute, UICharacterAttribute> cacheUICharacterAttributes;
         public Dictionary<Attribute, UICharacterAttribute> CacheUICharacterAttributes
         {
             get
@@ -190,10 +193,10 @@ namespace MultiplayerARPG
             Profiler.BeginSample("UICharacter - Update UI");
 
             if (uiTextName != null)
-                uiTextName.text = string.Format(nameFormat, Data == null ? "Unknow" : Data.CharacterName);
+                uiTextName.text = string.Format(nameFormat, Data == null ? LanguageManager.GetUnknowTitle() : Data.CharacterName);
 
             if (uiTextLevel != null)
-                uiTextLevel.text = string.Format(levelFormat, Data == null ? "N/A" : Data.Level.ToString("N0"));
+                uiTextLevel.text = string.Format(levelFormat, Data == null ? "0" : Data.Level.ToString("N0"));
             
             int[] expTree = GameInstance.Singleton.ExpTree;
             int currentExp = 0;
@@ -219,20 +222,20 @@ namespace MultiplayerARPG
             // Player character data
             IPlayerCharacterData playerCharacter = Data as IPlayerCharacterData;
             if (uiTextStatPoint != null)
-                uiTextStatPoint.text = string.Format(statPointFormat, playerCharacter == null ? "N/A" : playerCharacter.StatPoint.ToString("N0"));
+                uiTextStatPoint.text = string.Format(statPointFormat, playerCharacter == null ? "0" : playerCharacter.StatPoint.ToString("N0"));
 
             if (uiTextSkillPoint != null)
-                uiTextSkillPoint.text = string.Format(skillPointFormat, playerCharacter == null ? "N/A" : playerCharacter.SkillPoint.ToString("N0"));
+                uiTextSkillPoint.text = string.Format(skillPointFormat, playerCharacter == null ? "0" : playerCharacter.SkillPoint.ToString("N0"));
 
             if (uiTextGold != null)
-                uiTextGold.text = string.Format(goldFormat, playerCharacter == null ? "N/A" : playerCharacter.Gold.ToString("N0"));
+                uiTextGold.text = string.Format(goldFormat, playerCharacter == null ? "0" : playerCharacter.Gold.ToString("N0"));
 
             BaseCharacter character = Data == null ? null : Data.GetDatabase();
             if (uiTextClassTitle != null)
-                uiTextClassTitle.text = string.Format(classTitleFormat, character == null ? "N/A" : character.Title);
+                uiTextClassTitle.text = string.Format(classTitleFormat, character == null ? LanguageManager.GetUnknowTitle() : character.Title);
 
             if (uiTextClassDescription != null)
-                uiTextClassDescription.text = string.Format(classDescriptionFormat, character == null ? "N/A" : character.Description);
+                uiTextClassDescription.text = string.Format(classDescriptionFormat, character == null ? LanguageManager.GetUnknowDescription() : character.Description);
 
             if (imageClassIcon != null)
             {
@@ -247,8 +250,10 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             cacheStatsWithBuffs = Data.GetStats();
+            cacheResistancesWithBuffs = Data.GetResistances();
             cacheAttributesWithBuffs = Data.GetAttributes();
             displayingStats = showStatsWithBuffs ? cacheStatsWithBuffs : Data.GetStats(true, false);
+            displayingResistances = showStatsWithBuffs ? cacheResistancesWithBuffs : Data.GetResistances(true, false);
             displayingAttributes = showAttributeWithBuffs ? cacheAttributesWithBuffs : Data.GetAttributes(true, false);
 
             if (uiTextWeightLimit != null)
@@ -312,6 +317,9 @@ namespace MultiplayerARPG
 
             if (uiCharacterStats != null)
                 uiCharacterStats.Data = displayingStats;
+
+            if (uiCharacterResistances != null)
+                uiCharacterResistances.Data = displayingResistances;
 
             if (CacheUICharacterAttributes.Count > 0 && Data != null)
             {

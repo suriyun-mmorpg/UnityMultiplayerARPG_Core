@@ -17,7 +17,7 @@ namespace MultiplayerARPG
             base.Update();
 
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(titleFormat, Data == null ? "Unknow" : Data.Title);
+                uiTextTitle.text = string.Format(titleFormat, Data == null ? LanguageManager.GetUnknowTitle() : Data.Title);
         }
     }
 
