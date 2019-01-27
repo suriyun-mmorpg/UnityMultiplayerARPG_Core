@@ -6,28 +6,34 @@ public class UIList : MonoBehaviour
 {
     public GameObject uiPrefab;
     public Transform uiContainer;
+    public IEnumerable list;
     protected readonly List<GameObject> uis = new List<GameObject>();
 
     public void Generate<T>(IEnumerable<T> list, System.Action<int, T, GameObject> onGenerateEntry)
     {
-        if (uiPrefab == null)
-            return;
-
+        this.list = list;
         int i = 0;
         foreach (T entry in list)
         {
-            GameObject ui;
+            // NOTE: `ui` can be NULL
+            GameObject ui = null;
             if (i < uis.Count)
+            {
                 ui = uis[i];
+                ui.SetActive(true);
+            }
             else
             {
-                ui = Instantiate(uiPrefab);
-                ui.transform.SetParent(uiContainer);
-                ui.transform.localScale = Vector3.one;
-                ui.transform.SetAsLastSibling();
-                uis.Add(ui);
+                if (uiPrefab != null && uiContainer != null)
+                {
+                    ui = Instantiate(uiPrefab);
+                    ui.transform.SetParent(uiContainer);
+                    ui.transform.localScale = Vector3.one;
+                    ui.transform.SetAsLastSibling();
+                    uis.Add(ui);
+                    ui.SetActive(true);
+                }
             }
-            ui.SetActive(true);
             if (onGenerateEntry != null)
                 onGenerateEntry.Invoke(i, entry, ui);
             ++i;
