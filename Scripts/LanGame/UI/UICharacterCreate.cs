@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
@@ -7,7 +6,6 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(UICharacterSelectionManager))]
     public class UICharacterCreate : UIBase
     {
         public UICharacter uiCharacterPrefab;
@@ -22,30 +20,65 @@ namespace MultiplayerARPG
         [Header("Event")]
         public UnityEvent eventOnCreateCharacter;
 
-        private UIList cacheList;
-        public UIList CacheList
+        private UIList cacheCharacterList;
+        public UIList CacheCharacterList
         {
             get
             {
-                if (cacheList == null)
+                if (cacheCharacterList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiCharacterPrefab.gameObject;
-                    cacheList.uiContainer = uiCharacterContainer;
+                    cacheCharacterList = gameObject.AddComponent<UIList>();
+                    cacheCharacterList.uiPrefab = uiCharacterPrefab.gameObject;
+                    cacheCharacterList.uiContainer = uiCharacterContainer;
                 }
-                return cacheList;
+                return cacheCharacterList;
             }
         }
 
-        private UICharacterSelectionManager selectionManager;
-        public UICharacterSelectionManager SelectionManager
+        private UIList cacheCharacterClassList;
+        public UIList CacheCharacterClassList
         {
             get
             {
-                if (selectionManager == null)
-                    selectionManager = GetComponent<UICharacterSelectionManager>();
-                selectionManager.selectionMode = UISelectionMode.Toggle;
-                return selectionManager;
+                if (cacheCharacterClassList == null)
+                {
+                    cacheCharacterClassList = gameObject.AddComponent<UIList>();
+                    cacheCharacterClassList.uiPrefab = uiCharacterClassPrefab.gameObject;
+                    cacheCharacterClassList.uiContainer = uiCharacterClassContainer;
+                }
+                return cacheCharacterClassList;
+            }
+        }
+
+        private UICharacterSelectionManager cacheCharacterSelectionManager;
+        public UICharacterSelectionManager CacheCharacterSelectionManager
+        {
+            get
+            {
+                if (cacheCharacterSelectionManager == null)
+                {
+                    cacheCharacterSelectionManager = GetComponent<UICharacterSelectionManager>();
+                    if (cacheCharacterSelectionManager == null)
+                        cacheCharacterSelectionManager = gameObject.AddComponent<UICharacterSelectionManager>();
+                }
+                cacheCharacterSelectionManager.selectionMode = UISelectionMode.Toggle;
+                return cacheCharacterSelectionManager;
+            }
+        }
+
+        private UICharacterClassSelectionManager cacheCharacterClassSelectionManager;
+        public UICharacterClassSelectionManager CacheCharacterClassSelectionManager
+        {
+            get
+            {
+                if (cacheCharacterClassSelectionManager == null)
+                {
+                    cacheCharacterClassSelectionManager = GetComponent<UICharacterClassSelectionManager>();
+                    if (cacheCharacterClassSelectionManager == null)
+                        cacheCharacterClassSelectionManager = gameObject.AddComponent<UICharacterClassSelectionManager>();
+                }
+                cacheCharacterClassSelectionManager.selectionMode = UISelectionMode.Toggle;
+                return cacheCharacterClassSelectionManager;
             }
         }
 
@@ -58,10 +91,10 @@ namespace MultiplayerARPG
 
         protected virtual void LoadCharacters()
         {
-            SelectionManager.Clear();
+            CacheCharacterSelectionManager.Clear();
             // Show list of characters that can be create
             List<BasePlayerCharacterEntity> selectableCharacters = GetCreatableCharacters();
-            CacheList.Generate(selectableCharacters, (index, characterEntity, ui) =>
+            CacheCharacterList.Generate(selectableCharacters, (index, characterEntity, ui) =>
             {
                 BaseCharacter character = characterEntity.database;
                 PlayerCharacterData characterData = new PlayerCharacterData();
@@ -74,7 +107,7 @@ namespace MultiplayerARPG
                 BaseCharacterModel characterModel = characterData.InstantiateModel(characterModelContainer);
                 CharacterModels[characterData.EntityId] = characterModel;
                 characterModel.gameObject.SetActive(false);
-                SelectionManager.Add(uiCharacter);
+                CacheCharacterSelectionManager.Add(uiCharacter);
             });
         }
 
@@ -82,11 +115,16 @@ namespace MultiplayerARPG
         {
             buttonCreate.onClick.RemoveListener(OnClickCreate);
             buttonCreate.onClick.AddListener(OnClickCreate);
-            // Clear selection
-            SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
-            SelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
-            SelectionManager.Clear();
-            CacheList.HideAll();
+            // Clear character selection
+            CacheCharacterSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
+            CacheCharacterSelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
+            CacheCharacterSelectionManager.Clear();
+            CacheCharacterList.HideAll();
+            // Clear character class selection
+            CacheCharacterClassSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterClass);
+            CacheCharacterClassSelectionManager.eventOnSelect.AddListener(OnSelectCharacterClass);
+            CacheCharacterClassSelectionManager.Clear();
+            CacheCharacterClassList.HideAll();
             // Remove all models
             characterModelContainer.RemoveChildren();
             CharacterModels.Clear();
@@ -115,10 +153,15 @@ namespace MultiplayerARPG
             characterModel.gameObject.SetActive(true);
         }
 
+        protected virtual void OnSelectCharacterClass(UICharacterClass ui)
+        {
+
+        }
+
         protected virtual void OnClickCreate()
         {
             GameInstance gameInstance = GameInstance.Singleton;
-            UICharacter selectedUI = SelectionManager.SelectedUI;
+            UICharacter selectedUI = CacheCharacterSelectionManager.SelectedUI;
             if (selectedUI == null)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog("Cannot create character", "Please select character class");

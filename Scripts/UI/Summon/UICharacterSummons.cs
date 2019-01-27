@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(UICharacterSummonSelectionManager))]
     public partial class UICharacterSummons : UIBase
     {
         public ICharacterData character { get; protected set; }
@@ -11,30 +10,32 @@ namespace MultiplayerARPG
         public UICharacterSummon uiCharacterSummonPrefab;
         public Transform uiCharacterSummonContainer;
 
-        private UIList cacheList;
-        public UIList CacheList
+        private UIList cacheCharacterSummonList;
+        public UIList CacheCharacterSummonList
         {
             get
             {
-                if (cacheList == null)
+                if (cacheCharacterSummonList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiCharacterSummonPrefab.gameObject;
-                    cacheList.uiContainer = uiCharacterSummonContainer;
+                    cacheCharacterSummonList = gameObject.AddComponent<UIList>();
+                    cacheCharacterSummonList.uiPrefab = uiCharacterSummonPrefab.gameObject;
+                    cacheCharacterSummonList.uiContainer = uiCharacterSummonContainer;
                 }
-                return cacheList;
+                return cacheCharacterSummonList;
             }
         }
 
-        private UICharacterSummonSelectionManager selectionManager;
-        public UICharacterSummonSelectionManager SelectionManager
+        private UICharacterSummonSelectionManager cacheCharacterSummonSelectionManager;
+        public UICharacterSummonSelectionManager CacheCharacterSummonSelectionManager
         {
             get
             {
-                if (selectionManager == null)
-                    selectionManager = GetComponent<UICharacterSummonSelectionManager>();
-                selectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return selectionManager;
+                if (cacheCharacterSummonSelectionManager == null)
+                    cacheCharacterSummonSelectionManager = GetComponent<UICharacterSummonSelectionManager>();
+                if (cacheCharacterSummonSelectionManager == null)
+                    cacheCharacterSummonSelectionManager = gameObject.AddComponent<UICharacterSummonSelectionManager>();
+                cacheCharacterSummonSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return cacheCharacterSummonSelectionManager;
             }
         }
 
@@ -50,16 +51,16 @@ namespace MultiplayerARPG
 
         public override void Show()
         {
-            SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterSummon);
-            SelectionManager.eventOnSelect.AddListener(OnSelectCharacterSummon);
-            SelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterSummon);
-            SelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterSummon);
+            CacheCharacterSummonSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterSummon);
+            CacheCharacterSummonSelectionManager.eventOnSelect.AddListener(OnSelectCharacterSummon);
+            CacheCharacterSummonSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterSummon);
+            CacheCharacterSummonSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterSummon);
             base.Show();
         }
 
         public override void Hide()
         {
-            SelectionManager.DeselectSelectedUI();
+            CacheCharacterSummonSelectionManager.DeselectSelectedUI();
             base.Hide();
         }
 
@@ -67,7 +68,7 @@ namespace MultiplayerARPG
         {
             if (uiSummonDialog != null)
             {
-                uiSummonDialog.selectionManager = SelectionManager;
+                uiSummonDialog.selectionManager = CacheCharacterSummonSelectionManager;
                 uiSummonDialog.Setup(ui.Data, character, ui.indexOfData);
                 uiSummonDialog.Show();
             }
@@ -83,19 +84,19 @@ namespace MultiplayerARPG
         {
             this.character = character;
 
-            uint selectedSummonObjectId = SelectionManager.SelectedUI != null ? SelectionManager.SelectedUI.CharacterSummon.objectId : 0;
-            SelectionManager.DeselectSelectedUI();
-            SelectionManager.Clear();
+            uint selectedSummonObjectId = CacheCharacterSummonSelectionManager.SelectedUI != null ? CacheCharacterSummonSelectionManager.SelectedUI.CharacterSummon.objectId : 0;
+            CacheCharacterSummonSelectionManager.DeselectSelectedUI();
+            CacheCharacterSummonSelectionManager.Clear();
 
             if (character == null)
             {
-                CacheList.HideAll();
+                CacheCharacterSummonList.HideAll();
                 return;
             }
 
             Dictionary<int, UICharacterSummon> stackingSkillSummons = new Dictionary<int, UICharacterSummon>();
             IList<CharacterSummon> summons = character.Summons;
-            CacheList.Generate(summons, (index, characterSummon, ui) =>
+            CacheCharacterSummonList.Generate(summons, (index, characterSummon, ui) =>
             {
                 if (characterSummon.type == SummonType.Skill && stackingSkillSummons.ContainsKey(characterSummon.dataId))
                 {
@@ -116,7 +117,7 @@ namespace MultiplayerARPG
                             ui.transform.SetAsFirstSibling();
                             break;
                     }
-                    SelectionManager.Add(uiCharacterSummon);
+                    CacheCharacterSummonSelectionManager.Add(uiCharacterSummon);
                     if (selectedSummonObjectId == characterSummon.objectId)
                         uiCharacterSummon.OnClickSelect();
                 }

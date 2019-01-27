@@ -12,8 +12,7 @@ namespace MultiplayerARPG
         public abstract bool OwningCharacterIsLeader();
         public abstract bool OwningCharacterCanKick();
     }
-
-    [RequireComponent(typeof(UISocialCharacterSelectionManager))]
+    
     public abstract class UISocialGroup<T> : UISocialGroup
         where T : UISocialCharacter
     {
@@ -66,6 +65,8 @@ namespace MultiplayerARPG
             {
                 if (memberSelectionManager == null)
                     memberSelectionManager = GetComponent<UISocialCharacterSelectionManager>();
+                if (memberSelectionManager == null)
+                    memberSelectionManager = gameObject.AddComponent<UISocialCharacterSelectionManager>();
                 memberSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return memberSelectionManager;
             }

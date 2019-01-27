@@ -3,8 +3,6 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(UIGuildRoleSelectionManager))]
-    [RequireComponent(typeof(UIGuildSkillSelectionManager))]
     public class UIGuild : UISocialGroup<UIGuildCharacter>
     {
         [Header("Display Format")]
@@ -66,6 +64,8 @@ namespace MultiplayerARPG
             {
                 if (roleSelectionManager == null)
                     roleSelectionManager = GetComponent<UIGuildRoleSelectionManager>();
+                if (roleSelectionManager == null)
+                    roleSelectionManager = gameObject.AddComponent<UIGuildRoleSelectionManager>();
                 roleSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return roleSelectionManager;
             }
@@ -93,6 +93,8 @@ namespace MultiplayerARPG
             {
                 if (skillSelectionManager == null)
                     skillSelectionManager = GetComponent<UIGuildSkillSelectionManager>();
+                if (skillSelectionManager == null)
+                    skillSelectionManager = gameObject.AddComponent<UIGuildSkillSelectionManager>();
                 skillSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return skillSelectionManager;
             }

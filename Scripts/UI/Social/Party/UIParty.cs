@@ -3,7 +3,6 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(UISocialCharacterSelectionManager))]
     public class UIParty : UISocialGroup<UISocialCharacter>
     {
         [Header("UI Elements")]

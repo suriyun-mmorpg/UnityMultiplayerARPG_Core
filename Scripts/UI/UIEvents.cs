@@ -11,6 +11,12 @@ namespace MultiplayerARPG
     public class UICharacterEvent : UnityEvent<UICharacter> { }
 
     [System.Serializable]
+    public class CharacterClassEvent : UnityEvent<BaseCharacter> { }
+
+    [System.Serializable]
+    public class UICharacterClassEvent : UnityEvent<UICharacterClass> { }
+
+    [System.Serializable]
     public class CharacterBuffEvent : UnityEvent<CharacterBuff> { }
 
     [System.Serializable]

@@ -22,18 +22,18 @@ public abstract class UISelectionManager : MonoBehaviour
 
 public abstract class UISelectionManager<TData, TUI, TDataEvent, TUIEvent> : UISelectionManager
     where TUI : UISelectionEntry<TData>
-    where TDataEvent : UnityEvent<TData>
-    where TUIEvent : UnityEvent<TUI>
+    where TDataEvent : UnityEvent<TData>, new()
+    where TUIEvent : UnityEvent<TUI>, new()
 {
-    public TUIEvent eventOnSelect;
-    public TUIEvent eventOnSelected;
-    public TUIEvent eventOnDeselect;
-    public TUIEvent eventOnDeselected;
+    public TUIEvent eventOnSelect = new TUIEvent();
+    public TUIEvent eventOnSelected = new TUIEvent();
+    public TUIEvent eventOnDeselect = new TUIEvent();
+    public TUIEvent eventOnDeselected = new TUIEvent();
 
-    public TDataEvent eventOnDataSelect;
-    public TDataEvent eventOnDataSelected;
-    public TDataEvent eventOnDataDeselect;
-    public TDataEvent eventOnDataDeselected;
+    public TDataEvent eventOnDataSelect = new TDataEvent();
+    public TDataEvent eventOnDataSelected = new TDataEvent();
+    public TDataEvent eventOnDataDeselect = new TDataEvent();
+    public TDataEvent eventOnDataDeselected = new TDataEvent();
 
     protected readonly List<TUI> uis = new List<TUI>();
     public TUI SelectedUI { get; protected set; }

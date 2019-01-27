@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(UICharacterItemSelectionManager))]
     public partial class UIEquipItems : UIBase
     {
         public ICharacterData character { get; protected set; }
@@ -20,20 +18,20 @@ namespace MultiplayerARPG
                 if (cacheEquipItemSlots == null)
                 {
                     cacheEquipItemSlots = new Dictionary<string, UICharacterItem>();
-                    SelectionManager.Clear();
+                    CacheEquipItemSelectionManager.Clear();
                     if (rightHandSlot != null)
                     {
                         string equipPosition = GameDataConst.EQUIP_POSITION_RIGHT_HAND;
                         rightHandSlot.Setup(GetEmptyUIData(), character, -1);
                         cacheEquipItemSlots.Add(equipPosition, rightHandSlot);
-                        SelectionManager.Add(rightHandSlot);
+                        CacheEquipItemSelectionManager.Add(rightHandSlot);
                     }
                     if (leftHandSlot != null)
                     {
                         string equipPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
                         leftHandSlot.Setup(GetEmptyUIData(), character, -1);
                         cacheEquipItemSlots.Add(equipPosition, leftHandSlot);
-                        SelectionManager.Add(leftHandSlot);
+                        CacheEquipItemSelectionManager.Add(leftHandSlot);
                     }
                     foreach (UICharacterItemPair otherEquipSlot in otherEquipSlots)
                     {
@@ -44,7 +42,7 @@ namespace MultiplayerARPG
                             string equipPosition = otherEquipSlot.armorType.Id;
                             otherEquipSlot.ui.Setup(GetEmptyUIData(), character, -1);
                             cacheEquipItemSlots.Add(equipPosition, otherEquipSlot.ui);
-                            SelectionManager.Add(otherEquipSlot.ui);
+                            CacheEquipItemSelectionManager.Add(otherEquipSlot.ui);
                         }
                     }
                 }
@@ -52,30 +50,32 @@ namespace MultiplayerARPG
             }
         }
 
-        private UICharacterItemSelectionManager selectionManager;
-        public UICharacterItemSelectionManager SelectionManager
+        private UICharacterItemSelectionManager cacheEquipItemSelectionManager;
+        public UICharacterItemSelectionManager CacheEquipItemSelectionManager
         {
             get
             {
-                if (selectionManager == null)
-                    selectionManager = GetComponent<UICharacterItemSelectionManager>();
-                selectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return selectionManager;
+                if (cacheEquipItemSelectionManager == null)
+                    cacheEquipItemSelectionManager = GetComponent<UICharacterItemSelectionManager>();
+                if (cacheEquipItemSelectionManager == null)
+                    cacheEquipItemSelectionManager = gameObject.AddComponent<UICharacterItemSelectionManager>();
+                cacheEquipItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return cacheEquipItemSelectionManager;
             }
         }
 
         public override void Show()
         {
-            SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterItem);
-            SelectionManager.eventOnSelect.AddListener(OnSelectCharacterItem);
-            SelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterItem);
-            SelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterItem);
+            CacheEquipItemSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterItem);
+            CacheEquipItemSelectionManager.eventOnSelect.AddListener(OnSelectCharacterItem);
+            CacheEquipItemSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterItem);
+            CacheEquipItemSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterItem);
             base.Show();
         }
 
         public override void Hide()
         {
-            SelectionManager.DeselectSelectedUI();
+            CacheEquipItemSelectionManager.DeselectSelectedUI();
             base.Hide();
         }
 
@@ -83,7 +83,7 @@ namespace MultiplayerARPG
         {
             if (uiItemDialog != null && ui.Data.characterItem.IsValid())
             {
-                uiItemDialog.selectionManager = SelectionManager;
+                uiItemDialog.selectionManager = CacheEquipItemSelectionManager;
                 uiItemDialog.Setup(ui.Data, character, ui.indexOfData);
                 uiItemDialog.Show();
             }

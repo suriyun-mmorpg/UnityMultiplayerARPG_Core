@@ -4,7 +4,6 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(UICashShopSelectionManager))]
     public partial class UICashShop : UIBase
     {
         [Header("Generic Info Format")]
@@ -15,30 +14,32 @@ namespace MultiplayerARPG
         public Transform uiCashShopItemContainer;
         public TextWrapper uiTextCash;
 
-        private UIList cacheList;
-        public UIList CacheList
+        private UIList cacheCashShopList;
+        public UIList CacheCashShopList
         {
             get
             {
-                if (cacheList == null)
+                if (cacheCashShopList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiCashShopItemPrefab.gameObject;
-                    cacheList.uiContainer = uiCashShopItemContainer;
+                    cacheCashShopList = gameObject.AddComponent<UIList>();
+                    cacheCashShopList.uiPrefab = uiCashShopItemPrefab.gameObject;
+                    cacheCashShopList.uiContainer = uiCashShopItemContainer;
                 }
-                return cacheList;
+                return cacheCashShopList;
             }
         }
 
-        private UICashShopSelectionManager selectionManager;
-        public UICashShopSelectionManager SelectionManager
+        private UICashShopSelectionManager cacheCashShopSelectionManager;
+        public UICashShopSelectionManager CacheCashShopSelectionManager
         {
             get
             {
-                if (selectionManager == null)
-                    selectionManager = GetComponent<UICashShopSelectionManager>();
-                selectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return selectionManager;
+                if (cacheCashShopSelectionManager == null)
+                    cacheCashShopSelectionManager = GetComponent<UICashShopSelectionManager>();
+                if (cacheCashShopSelectionManager == null)
+                    cacheCashShopSelectionManager = gameObject.AddComponent<UICashShopSelectionManager>();
+                cacheCashShopSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return cacheCashShopSelectionManager;
             }
         }
 
@@ -51,16 +52,16 @@ namespace MultiplayerARPG
         public override void Show()
         {
             base.Show();
-            SelectionManager.eventOnSelect.RemoveListener(OnSelectCashShopItem);
-            SelectionManager.eventOnSelect.AddListener(OnSelectCashShopItem);
-            SelectionManager.eventOnDeselect.RemoveListener(OnDeselectCashShopItem);
-            SelectionManager.eventOnDeselect.AddListener(OnDeselectCashShopItem);
+            CacheCashShopSelectionManager.eventOnSelect.RemoveListener(OnSelectCashShopItem);
+            CacheCashShopSelectionManager.eventOnSelect.AddListener(OnSelectCashShopItem);
+            CacheCashShopSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCashShopItem);
+            CacheCashShopSelectionManager.eventOnDeselect.AddListener(OnDeselectCashShopItem);
             RefreshCashShopInfo();
         }
 
         public override void Hide()
         {
-            SelectionManager.DeselectSelectedUI();
+            CacheCashShopSelectionManager.DeselectSelectedUI();
             base.Hide();
         }
 
@@ -68,7 +69,7 @@ namespace MultiplayerARPG
         {
             if (uiCashShopItemDialog != null && ui.Data != null)
             {
-                uiCashShopItemDialog.selectionManager = SelectionManager;
+                uiCashShopItemDialog.selectionManager = CacheCashShopSelectionManager;
                 uiCashShopItemDialog.Data = ui.Data;
                 uiCashShopItemDialog.Show();
             }
@@ -107,17 +108,17 @@ namespace MultiplayerARPG
                             cashShopItems.Add(cashShopItem);
                     }
 
-                    int selectedIdx = SelectionManager.SelectedUI != null ? SelectionManager.IndexOf(SelectionManager.SelectedUI) : -1;
-                    SelectionManager.DeselectSelectedUI();
-                    SelectionManager.Clear();
+                    int selectedIdx = CacheCashShopSelectionManager.SelectedUI != null ? CacheCashShopSelectionManager.IndexOf(CacheCashShopSelectionManager.SelectedUI) : -1;
+                    CacheCashShopSelectionManager.DeselectSelectedUI();
+                    CacheCashShopSelectionManager.Clear();
 
-                    CacheList.Generate(cashShopItems, (index, cashShopItem, ui) =>
+                    CacheCashShopList.Generate(cashShopItems, (index, cashShopItem, ui) =>
                     {
                         UICashShopItem uiCashShopItem = ui.GetComponent<UICashShopItem>();
                         uiCashShopItem.uiCashShop = this;
                         uiCashShopItem.Data = cashShopItem;
                         uiCashShopItem.Show();
-                        SelectionManager.Add(uiCashShopItem);
+                        CacheCashShopSelectionManager.Add(uiCashShopItem);
                         if (selectedIdx == index)
                             uiCashShopItem.OnClickSelect();
                     });

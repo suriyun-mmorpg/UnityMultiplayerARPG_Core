@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(UICharacterSelectionManager))]
     public class UICharacterList : UIBase
     {
         public UICharacter uiCharacterPrefab;
@@ -15,30 +14,34 @@ namespace MultiplayerARPG
         public Button buttonStart;
         public Button buttonDelete;
 
-        private UIList cacheList;
-        public UIList CacheList
+        private UIList cacheCharacterList;
+        public UIList CacheCharacterList
         {
             get
             {
-                if (cacheList == null)
+                if (cacheCharacterList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiCharacterPrefab.gameObject;
-                    cacheList.uiContainer = uiCharacterContainer;
+                    cacheCharacterList = gameObject.AddComponent<UIList>();
+                    cacheCharacterList.uiPrefab = uiCharacterPrefab.gameObject;
+                    cacheCharacterList.uiContainer = uiCharacterContainer;
                 }
-                return cacheList;
+                return cacheCharacterList;
             }
         }
 
-        private UICharacterSelectionManager selectionManager;
-        public UICharacterSelectionManager SelectionManager
+        private UICharacterSelectionManager cacheCharacterSelectionManager;
+        public UICharacterSelectionManager CacheCharacterSelectionManager
         {
             get
             {
-                if (selectionManager == null)
-                    selectionManager = GetComponent<UICharacterSelectionManager>();
-                selectionManager.selectionMode = UISelectionMode.Toggle;
-                return selectionManager;
+                if (cacheCharacterSelectionManager == null)
+                {
+                    cacheCharacterSelectionManager = GetComponent<UICharacterSelectionManager>();
+                    if (cacheCharacterSelectionManager == null)
+                        cacheCharacterSelectionManager = gameObject.AddComponent<UICharacterSelectionManager>();
+                }
+                cacheCharacterSelectionManager.selectionMode = UISelectionMode.Toggle;
+                return cacheCharacterSelectionManager;
             }
         }
 
@@ -46,7 +49,7 @@ namespace MultiplayerARPG
 
         protected virtual void LoadCharacters()
         {
-            SelectionManager.Clear();
+            CacheCharacterSelectionManager.Clear();
             // Unenabled buttons
             buttonStart.gameObject.SetActive(false);
             buttonDelete.gameObject.SetActive(false);
@@ -62,7 +65,7 @@ namespace MultiplayerARPG
                     selectableCharacters.RemoveAt(i);
             }
             selectableCharacters.Sort(new PlayerCharacterDataLastUpdateComparer().Desc());
-            CacheList.Generate(selectableCharacters, (index, character, ui) =>
+            CacheCharacterList.Generate(selectableCharacters, (index, character, ui) =>
             {
                 UICharacter uiCharacter = ui.GetComponent<UICharacter>();
                 uiCharacter.Data = character;
@@ -74,7 +77,7 @@ namespace MultiplayerARPG
                     characterModel.gameObject.SetActive(false);
                     characterModel.SetEquipWeapons(character.EquipWeapons);
                     characterModel.SetEquipItems(character.EquipItems);
-                    SelectionManager.Add(uiCharacter);
+                    CacheCharacterSelectionManager.Add(uiCharacter);
                 }
             });
         }
@@ -86,10 +89,10 @@ namespace MultiplayerARPG
             buttonDelete.onClick.RemoveListener(OnClickDelete);
             buttonDelete.onClick.AddListener(OnClickDelete);
             // Clear selection
-            SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
-            SelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
-            SelectionManager.Clear();
-            CacheList.HideAll();
+            CacheCharacterSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
+            CacheCharacterSelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
+            CacheCharacterSelectionManager.Clear();
+            CacheCharacterList.HideAll();
             // Unenabled buttons
             buttonStart.gameObject.SetActive(false);
             buttonDelete.gameObject.SetActive(false);
@@ -125,7 +128,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnClickStart()
         {
-            UICharacter selectedUI = SelectionManager.SelectedUI;
+            UICharacter selectedUI = CacheCharacterSelectionManager.SelectedUI;
             if (selectedUI == null)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog("Cannot start game", "Please choose character to start game");
@@ -152,7 +155,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnClickDelete()
         {
-            UICharacter selectedUI = SelectionManager.SelectedUI;
+            UICharacter selectedUI = CacheCharacterSelectionManager.SelectedUI;
             if (selectedUI == null)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog("Cannot delete character", "Please choose character to delete");

@@ -5,7 +5,6 @@ using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(UICharacterItemSelectionManager))]
     public partial class UIDealing : UISelectionEntry<BasePlayerCharacterEntity>
     {
         [Header("Display Format")]
@@ -75,30 +74,32 @@ namespace MultiplayerARPG
             }
         }
 
-        private UICharacterItemSelectionManager itemSelectionManager;
-        public UICharacterItemSelectionManager ItemSelectionManager
+        private UICharacterItemSelectionManager cacheItemSelectionManager;
+        public UICharacterItemSelectionManager CacheItemSelectionManager
         {
             get
             {
-                if (itemSelectionManager == null)
-                    itemSelectionManager = GetComponent<UICharacterItemSelectionManager>();
-                itemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return itemSelectionManager;
+                if (cacheItemSelectionManager == null)
+                    cacheItemSelectionManager = GetComponent<UICharacterItemSelectionManager>();
+                if (cacheItemSelectionManager == null)
+                    cacheItemSelectionManager = gameObject.AddComponent<UICharacterItemSelectionManager>();
+                cacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return cacheItemSelectionManager;
             }
         }
 
         public override void Show()
         {
-            ItemSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterItem);
-            ItemSelectionManager.eventOnSelect.AddListener(OnSelectCharacterItem);
-            ItemSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterItem);
-            ItemSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterItem);
+            CacheItemSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterItem);
+            CacheItemSelectionManager.eventOnSelect.AddListener(OnSelectCharacterItem);
+            CacheItemSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterItem);
+            CacheItemSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterItem);
             base.Show();
         }
 
         public override void Hide()
         {
-            ItemSelectionManager.DeselectSelectedUI();
+            CacheItemSelectionManager.DeselectSelectedUI();
             base.Hide();
         }
 
@@ -106,7 +107,7 @@ namespace MultiplayerARPG
         {
             if (uiItemDialog != null && ui.Data.characterItem.IsValid())
             {
-                uiItemDialog.selectionManager = ItemSelectionManager;
+                uiItemDialog.selectionManager = CacheItemSelectionManager;
                 uiItemDialog.Setup(ui.Data, null, -1);
                 uiItemDialog.Show();
             }
@@ -146,8 +147,8 @@ namespace MultiplayerARPG
             UpdateAnotherDealingGold(0);
             CacheDealingItemsList.HideAll();
             CacheAnotherDealingItemsList.HideAll();
-            ItemSelectionManager.DeselectSelectedUI();
-            ItemSelectionManager.Clear();
+            CacheItemSelectionManager.DeselectSelectedUI();
+            CacheItemSelectionManager.Clear();
         }
 
         public void UpdateDealingState(DealingState state)
@@ -235,7 +236,7 @@ namespace MultiplayerARPG
 
         private void SetupList(UIList list, DealingCharacterItems dealingItems, List<UICharacterItem> uiList)
         {
-            ItemSelectionManager.DeselectSelectedUI();
+            CacheItemSelectionManager.DeselectSelectedUI();
             List<CharacterItem> filterItems = new List<CharacterItem>();
             foreach (DealingCharacterItem dealingItem in dealingItems)
             {
@@ -254,14 +255,14 @@ namespace MultiplayerARPG
                 uiCharacterItem.Show();
                 uiList.Add(uiCharacterItem);
             });
-            ItemSelectionManager.Clear();
+            CacheItemSelectionManager.Clear();
             foreach (UICharacterItem tempDealingItemUI in tempDealingItemUIs)
             {
-                ItemSelectionManager.Add(tempDealingItemUI);
+                CacheItemSelectionManager.Add(tempDealingItemUI);
             }
             foreach (UICharacterItem tempAnotherDealingItemUI in tempAnotherDealingItemUIs)
             {
-                ItemSelectionManager.Add(tempAnotherDealingItemUI);
+                CacheItemSelectionManager.Add(tempAnotherDealingItemUI);
             }
         }
 

@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(UICharacterBuffSelectionManager))]
     public partial class UICharacterBuffs : UIBase
     {
         public ICharacterData character { get; protected set; }
@@ -11,45 +10,47 @@ namespace MultiplayerARPG
         public UICharacterBuff uiCharacterBuffPrefab;
         public Transform uiCharacterBuffContainer;
 
-        private UIList cacheList;
-        public UIList CacheList
+        private UIList cacheCharacterBuffList;
+        public UIList CacheCharacterBuffList
         {
             get
             {
-                if (cacheList == null)
+                if (cacheCharacterBuffList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiCharacterBuffPrefab.gameObject;
-                    cacheList.uiContainer = uiCharacterBuffContainer;
+                    cacheCharacterBuffList = gameObject.AddComponent<UIList>();
+                    cacheCharacterBuffList.uiPrefab = uiCharacterBuffPrefab.gameObject;
+                    cacheCharacterBuffList.uiContainer = uiCharacterBuffContainer;
                 }
-                return cacheList;
+                return cacheCharacterBuffList;
             }
         }
 
-        private UICharacterBuffSelectionManager selectionManager;
-        public UICharacterBuffSelectionManager SelectionManager
+        private UICharacterBuffSelectionManager cacheCharacterBuffSelectionManager;
+        public UICharacterBuffSelectionManager CacheCharacterBuffSelectionManager
         {
             get
             {
-                if (selectionManager == null)
-                    selectionManager = GetComponent<UICharacterBuffSelectionManager>();
-                selectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return selectionManager;
+                if (cacheCharacterBuffSelectionManager == null)
+                    cacheCharacterBuffSelectionManager = GetComponent<UICharacterBuffSelectionManager>();
+                if (cacheCharacterBuffSelectionManager == null)
+                    cacheCharacterBuffSelectionManager = gameObject.AddComponent<UICharacterBuffSelectionManager>();
+                cacheCharacterBuffSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return cacheCharacterBuffSelectionManager;
             }
         }
 
         public override void Show()
         {
-            SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterBuff);
-            SelectionManager.eventOnSelect.AddListener(OnSelectCharacterBuff);
-            SelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterBuff);
-            SelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterBuff);
+            CacheCharacterBuffSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterBuff);
+            CacheCharacterBuffSelectionManager.eventOnSelect.AddListener(OnSelectCharacterBuff);
+            CacheCharacterBuffSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterBuff);
+            CacheCharacterBuffSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterBuff);
             base.Show();
         }
 
         public override void Hide()
         {
-            SelectionManager.DeselectSelectedUI();
+            CacheCharacterBuffSelectionManager.DeselectSelectedUI();
             base.Hide();
         }
 
@@ -57,7 +58,7 @@ namespace MultiplayerARPG
         {
             if (uiBuffDialog != null)
             {
-                uiBuffDialog.selectionManager = SelectionManager;
+                uiBuffDialog.selectionManager = CacheCharacterBuffSelectionManager;
                 uiBuffDialog.Setup(ui.Data, character, ui.indexOfData);
                 uiBuffDialog.Show();
             }
@@ -73,23 +74,23 @@ namespace MultiplayerARPG
         {
             this.character = character;
             
-            string selectedBuffKey = SelectionManager.SelectedUI != null ? SelectionManager.SelectedUI.CharacterBuff.GetKey() : string.Empty;
-            SelectionManager.DeselectSelectedUI();
-            SelectionManager.Clear();
+            string selectedBuffKey = CacheCharacterBuffSelectionManager.SelectedUI != null ? CacheCharacterBuffSelectionManager.SelectedUI.CharacterBuff.GetKey() : string.Empty;
+            CacheCharacterBuffSelectionManager.DeselectSelectedUI();
+            CacheCharacterBuffSelectionManager.Clear();
 
             if (character == null)
             {
-                CacheList.HideAll();
+                CacheCharacterBuffList.HideAll();
                 return;
             }
 
             IList<CharacterBuff> buffs = character.Buffs;
-            CacheList.Generate(buffs, (index, characterBuff, ui) =>
+            CacheCharacterBuffList.Generate(buffs, (index, characterBuff, ui) =>
             {
                 UICharacterBuff uiCharacterBuff = ui.GetComponent<UICharacterBuff>();
                 uiCharacterBuff.Setup(characterBuff, character, index);
                 uiCharacterBuff.Show();
-                SelectionManager.Add(uiCharacterBuff);
+                CacheCharacterBuffSelectionManager.Add(uiCharacterBuff);
                 if (selectedBuffKey.Equals(characterBuff.GetKey()))
                     uiCharacterBuff.OnClickSelect();
             });

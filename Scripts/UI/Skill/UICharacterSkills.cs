@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(UICharacterSkillSelectionManager))]
     public partial class UICharacterSkills : UIBase
     {
         public ICharacterData character { get; protected set; }
@@ -11,30 +10,32 @@ namespace MultiplayerARPG
         public UICharacterSkill uiCharacterSkillPrefab;
         public Transform uiCharacterSkillContainer;
 
-        private UIList cacheList;
-        public UIList CacheList
+        private UIList cacheCharacterSkillList;
+        public UIList CacheCharacterSkillList
         {
             get
             {
-                if (cacheList == null)
+                if (cacheCharacterSkillList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiCharacterSkillPrefab.gameObject;
-                    cacheList.uiContainer = uiCharacterSkillContainer;
+                    cacheCharacterSkillList = gameObject.AddComponent<UIList>();
+                    cacheCharacterSkillList.uiPrefab = uiCharacterSkillPrefab.gameObject;
+                    cacheCharacterSkillList.uiContainer = uiCharacterSkillContainer;
                 }
-                return cacheList;
+                return cacheCharacterSkillList;
             }
         }
 
-        private UICharacterSkillSelectionManager selectionManager;
-        public UICharacterSkillSelectionManager SelectionManager
+        private UICharacterSkillSelectionManager cacheCharacterSkillSelectionManager;
+        public UICharacterSkillSelectionManager CacheCharacterSkillSelectionManager
         {
             get
             {
-                if (selectionManager == null)
-                    selectionManager = GetComponent<UICharacterSkillSelectionManager>();
-                selectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return selectionManager;
+                if (cacheCharacterSkillSelectionManager == null)
+                    cacheCharacterSkillSelectionManager = GetComponent<UICharacterSkillSelectionManager>();
+                if (cacheCharacterSkillSelectionManager == null)
+                    cacheCharacterSkillSelectionManager = gameObject.AddComponent<UICharacterSkillSelectionManager>();
+                cacheCharacterSkillSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return cacheCharacterSkillSelectionManager;
             }
         }
 
@@ -42,16 +43,16 @@ namespace MultiplayerARPG
 
         public override void Show()
         {
-            SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterSkill);
-            SelectionManager.eventOnSelect.AddListener(OnSelectCharacterSkill);
-            SelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterSkill);
-            SelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterSkill);
+            CacheCharacterSkillSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterSkill);
+            CacheCharacterSkillSelectionManager.eventOnSelect.AddListener(OnSelectCharacterSkill);
+            CacheCharacterSkillSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterSkill);
+            CacheCharacterSkillSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterSkill);
             base.Show();
         }
 
         public override void Hide()
         {
-            SelectionManager.DeselectSelectedUI();
+            CacheCharacterSkillSelectionManager.DeselectSelectedUI();
             base.Hide();
         }
 
@@ -59,7 +60,7 @@ namespace MultiplayerARPG
         {
             if (uiSkillDialog != null)
             {
-                uiSkillDialog.selectionManager = SelectionManager;
+                uiSkillDialog.selectionManager = CacheCharacterSkillSelectionManager;
                 uiSkillDialog.Setup(ui.Data, character, ui.indexOfData);
                 uiSkillDialog.Show();
             }
@@ -75,13 +76,13 @@ namespace MultiplayerARPG
         {
             this.character = character;
 
-            int selectedSkillId = SelectionManager.SelectedUI != null ? SelectionManager.SelectedUI.Skill.DataId : 0;
-            SelectionManager.DeselectSelectedUI();
-            SelectionManager.Clear();
+            int selectedSkillId = CacheCharacterSkillSelectionManager.SelectedUI != null ? CacheCharacterSkillSelectionManager.SelectedUI.Skill.DataId : 0;
+            CacheCharacterSkillSelectionManager.DeselectSelectedUI();
+            CacheCharacterSkillSelectionManager.Clear();
 
             if (character == null)
             {
-                CacheList.HideAll();
+                CacheCharacterSkillList.HideAll();
                 return;
             }
 
@@ -90,7 +91,7 @@ namespace MultiplayerARPG
             Skill tempSkill;
             short tempLevel;
             Dictionary<Skill, short> skillLevels = character.GetDatabase().CacheSkillLevels;
-            CacheList.Generate(skillLevels, (index, skillLevel, ui) =>
+            CacheCharacterSkillList.Generate(skillLevels, (index, skillLevel, ui) =>
             {
                 UICharacterSkill uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
                 tempSkill = skillLevel.Key;
@@ -99,7 +100,7 @@ namespace MultiplayerARPG
                     tempLevel = displayingSkills[tempSkill];
                 uiCharacterSkill.Setup(new SkillTuple(tempSkill, tempLevel), character, character.IndexOfSkill(tempSkill.DataId));
                 uiCharacterSkill.Show();
-                SelectionManager.Add(uiCharacterSkill);
+                CacheCharacterSkillSelectionManager.Add(uiCharacterSkill);
                 if (selectedSkillId.Equals(skillLevel.Key))
                     uiCharacterSkill.OnClickSelect();
             });

@@ -48,13 +48,9 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheSkillSelectionManager == null)
-                {
+                    cacheSkillSelectionManager = GetComponent<UICharacterSkillSelectionManager>();
+                if (cacheSkillSelectionManager == null)
                     cacheSkillSelectionManager = gameObject.AddComponent<UICharacterSkillSelectionManager>();
-                    cacheSkillSelectionManager.eventOnSelect = new UICharacterSkillEvent();
-                    cacheSkillSelectionManager.eventOnDeselect = new UICharacterSkillEvent();
-                    cacheSkillSelectionManager.eventOnSelected = new UICharacterSkillEvent();
-                    cacheSkillSelectionManager.eventOnDeselected = new UICharacterSkillEvent();
-                }
                 cacheSkillSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return cacheSkillSelectionManager;
             }
@@ -66,13 +62,9 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheItemSelectionManager == null)
-                {
+                    cacheItemSelectionManager = GetComponent<UICharacterItemSelectionManager>();
+                if (cacheItemSelectionManager == null)
                     cacheItemSelectionManager = gameObject.AddComponent<UICharacterItemSelectionManager>();
-                    cacheItemSelectionManager.eventOnSelect = new UICharacterItemEvent();
-                    cacheItemSelectionManager.eventOnDeselect = new UICharacterItemEvent();
-                    cacheItemSelectionManager.eventOnSelected = new UICharacterItemEvent();
-                    cacheItemSelectionManager.eventOnDeselected = new UICharacterItemEvent();
-                }
                 cacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return cacheItemSelectionManager;
             }
