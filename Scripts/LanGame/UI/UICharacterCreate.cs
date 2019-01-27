@@ -28,8 +28,11 @@ namespace MultiplayerARPG
                 if (cacheCharacterList == null)
                 {
                     cacheCharacterList = gameObject.AddComponent<UIList>();
-                    cacheCharacterList.uiPrefab = uiCharacterPrefab.gameObject;
-                    cacheCharacterList.uiContainer = uiCharacterContainer;
+                    if (uiCharacterPrefab != null && uiCharacterContainer != null)
+                    {
+                        cacheCharacterList.uiPrefab = uiCharacterPrefab.gameObject;
+                        cacheCharacterList.uiContainer = uiCharacterContainer;
+                    }
                 }
                 return cacheCharacterList;
             }
@@ -43,8 +46,11 @@ namespace MultiplayerARPG
                 if (cacheCharacterClassList == null)
                 {
                     cacheCharacterClassList = gameObject.AddComponent<UIList>();
-                    cacheCharacterClassList.uiPrefab = uiCharacterClassPrefab.gameObject;
-                    cacheCharacterClassList.uiContainer = uiCharacterClassContainer;
+                    if (uiCharacterClassPrefab != null && uiCharacterClassContainer != null)
+                    {
+                        cacheCharacterClassList.uiPrefab = uiCharacterClassPrefab.gameObject;
+                        cacheCharacterClassList.uiContainer = uiCharacterClassContainer;
+                    }
                 }
                 return cacheCharacterClassList;
             }
@@ -82,16 +88,19 @@ namespace MultiplayerARPG
             }
         }
 
-        protected readonly Dictionary<int, BaseCharacterModel> CharacterModels = new Dictionary<int, BaseCharacterModel>();
+        protected readonly Dictionary<int, BaseCharacterModel> CharacterModelByEntityId = new Dictionary<int, BaseCharacterModel>();
         protected BaseCharacterModel selectedModel;
         public BaseCharacterModel SelectedModel { get { return selectedModel; } }
-        protected readonly Dictionary<int, BasePlayerCharacterEntity> PlayerCharacterEntities = new Dictionary<int, BasePlayerCharacterEntity>();
-        protected BasePlayerCharacterEntity selectedPlayerCharacterEntity;
-        public BasePlayerCharacterEntity SelectedPlayerCharacterEntity { get { return selectedPlayerCharacterEntity; } }
-        protected readonly Dictionary<int, PlayerCharacter> PlayerCharacters = new Dictionary<int, PlayerCharacter>();
+        protected readonly Dictionary<int, PlayerCharacter[]> PlayerCharacterDataByEntityId = new Dictionary<int, PlayerCharacter[]>();
+        protected PlayerCharacter[] selectableCharacterClasses;
+        public PlayerCharacter[] SelectableCharacterClasses { get { return selectableCharacterClasses; } }
+        protected readonly Dictionary<int, PlayerCharacter> PlayerCharacterByDataId = new Dictionary<int, PlayerCharacter>();
         protected PlayerCharacter selectedPlayerCharacter;
         public PlayerCharacter SelectedPlayerCharacter { get { return selectedPlayerCharacter; } }
         public PlayerCharacterData CreatingPlayerCharacterData { get; private set; }
+
+        public CharacterDataEvent onSelectCharacter;
+        public CharacterClassEvent onSelectCharacterClass;
 
         protected virtual List<BasePlayerCharacterEntity> GetCreatableCharacters()
         {
@@ -100,47 +109,55 @@ namespace MultiplayerARPG
 
         protected virtual void LoadCharacters()
         {
-            CacheCharacterSelectionManager.Clear();
             // Remove all models
             characterModelContainer.RemoveChildren();
-            CharacterModels.Clear();
+            CharacterModelByEntityId.Clear();
             // Remove all cached data
-            PlayerCharacterEntities.Clear();
+            PlayerCharacterDataByEntityId.Clear();
+            // Clear character selection
+            CacheCharacterSelectionManager.Clear();
+            CacheCharacterList.HideAll();
             // Show list of characters that can be create
+            PlayerCharacterData firstData = null;
             List<BasePlayerCharacterEntity> selectableCharacters = GetCreatableCharacters();
             CacheCharacterList.Generate(selectableCharacters, (index, characterEntity, ui) =>
             {
                 // Cache player character to dictionary, we will use it later
-                PlayerCharacterEntities[characterEntity.EntityId] = characterEntity;
-                // Setup UIs
+                PlayerCharacterDataByEntityId[characterEntity.EntityId] = characterEntity.playerCharacters;
+                // Prepare data
                 BaseCharacter playerCharacter = characterEntity.playerCharacters[0];
                 PlayerCharacterData playerCharacterData = new PlayerCharacterData();
                 playerCharacterData.SetNewPlayerCharacterData(characterEntity.characterTitle, playerCharacter.DataId, characterEntity.EntityId);
-                UICharacter uiCharacter = ui.GetComponent<UICharacter>();
-                uiCharacter.Data = playerCharacterData;
                 // Hide all model, the first one will be shown later
                 BaseCharacterModel characterModel = playerCharacterData.InstantiateModel(characterModelContainer);
-                CharacterModels[playerCharacterData.EntityId] = characterModel;
+                CharacterModelByEntityId[playerCharacterData.EntityId] = characterModel;
                 characterModel.gameObject.SetActive(false);
-                CacheCharacterSelectionManager.Add(uiCharacter);
+                // Setup UI
+                if (ui != null)
+                {
+                    UICharacter uiCharacter = ui.GetComponent<UICharacter>();
+                    uiCharacter.Data = playerCharacterData;
+                    CacheCharacterSelectionManager.Add(uiCharacter);
+                }
+                if (index == 0)
+                    firstData = playerCharacterData;
             });
-            CacheCharacterSelectionManager.Select(0);
+            // Select first entry
+            if (CacheCharacterSelectionManager.Count > 0)
+                CacheCharacterSelectionManager.Select(0);
+            else
+                OnSelectCharacter(firstData);
         }
 
         public override void Show()
         {
+            // Setup Events
             buttonCreate.onClick.RemoveListener(OnClickCreate);
             buttonCreate.onClick.AddListener(OnClickCreate);
-            // Clear character selection
             CacheCharacterSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
             CacheCharacterSelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
-            CacheCharacterSelectionManager.Clear();
-            CacheCharacterList.HideAll();
-            // Clear character class selection
             CacheCharacterClassSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterClass);
             CacheCharacterClassSelectionManager.eventOnSelect.AddListener(OnSelectCharacterClass);
-            CacheCharacterClassSelectionManager.Clear();
-            CacheCharacterClassList.HideAll();
             // Load characters
             LoadCharacters();
             base.Show();
@@ -153,35 +170,59 @@ namespace MultiplayerARPG
             base.Hide();
         }
 
-        protected virtual void OnSelectCharacter(UICharacter uiCharacter)
+        protected void OnSelectCharacter(UICharacter uiCharacter)
         {
+            OnSelectCharacter(uiCharacter.Data as PlayerCharacterData);
+        }
+
+        protected virtual void OnSelectCharacter(PlayerCharacterData playerCharacterData)
+        {
+            onSelectCharacter.Invoke(playerCharacterData);
             characterModelContainer.SetChildrenActive(false);
-            PlayerCharacterData playerCharacterData = uiCharacter.Data as PlayerCharacterData;
             if (CreatingPlayerCharacterData == null)
                 CreatingPlayerCharacterData = new PlayerCharacterData();
             playerCharacterData.CloneTo(CreatingPlayerCharacterData);
-            CharacterModels.TryGetValue(playerCharacterData.EntityId, out selectedModel);
-            PlayerCharacterEntities.TryGetValue(playerCharacterData.EntityId, out selectedPlayerCharacterEntity);
+            CharacterModelByEntityId.TryGetValue(playerCharacterData.EntityId, out selectedModel);
+            // Clear character class selection
+            CacheCharacterClassSelectionManager.Clear();
+            CacheCharacterClassList.HideAll();
             // Show selected model
             if (SelectedModel != null)
                 SelectedModel.gameObject.SetActive(true);
             // Setup character class list
-            CacheCharacterClassList.Generate(SelectedPlayerCharacterEntity.playerCharacters, (index, playerCharacter, ui) =>
+            PlayerCharacter firstData = null;
+            PlayerCharacterDataByEntityId.TryGetValue(playerCharacterData.EntityId, out selectableCharacterClasses);
+            CacheCharacterClassList.Generate(selectableCharacterClasses, (index, playerCharacter, ui) =>
             {
                 // Cache player character to dictionary, we will use it later
-                PlayerCharacters[playerCharacter.DataId] = playerCharacter;
-                // Setup UIs
-                UICharacterClass uiCharacterClass = ui.GetComponent<UICharacterClass>();
-                uiCharacterClass.Data = playerCharacter;
-                CacheCharacterClassSelectionManager.Add(uiCharacterClass);
+                PlayerCharacterByDataId[playerCharacter.DataId] = playerCharacter;
+                // Setup UI
+                if (ui != null)
+                {
+                    UICharacterClass uiCharacterClass = ui.GetComponent<UICharacterClass>();
+                    uiCharacterClass.Data = playerCharacter;
+                    CacheCharacterClassSelectionManager.Add(uiCharacterClass);
+                }
+                if (index == 0)
+                    firstData = playerCharacter;
             });
-            CacheCharacterClassSelectionManager.Select(0);
+            // Select first entry
+            if (CacheCharacterClassSelectionManager.Count > 0)
+                CacheCharacterClassSelectionManager.Select(0);
+            else
+                OnSelectCharacterClass(firstData);
         }
 
-        protected virtual void OnSelectCharacterClass(UICharacterClass uiCharacterClass)
+
+        protected void OnSelectCharacterClass(UICharacterClass uiCharacterClass)
         {
-            BaseCharacter baseCharacter = uiCharacterClass.Data;
-            PlayerCharacters.TryGetValue(baseCharacter.DataId, out selectedPlayerCharacter);
+            OnSelectCharacterClass(uiCharacterClass.Data);
+        }
+
+        protected virtual void OnSelectCharacterClass(BaseCharacter baseCharacter)
+        {
+            onSelectCharacterClass.Invoke(baseCharacter);
+            PlayerCharacterByDataId.TryGetValue(baseCharacter.DataId, out selectedPlayerCharacter);
             if (SelectedPlayerCharacter != null)
             {
                 // Set creating player character data
@@ -190,14 +231,18 @@ namespace MultiplayerARPG
                 List<CharacterItem> equipItems = new List<CharacterItem>();
                 foreach (Item armorItem in SelectedPlayerCharacter.armorItems)
                 {
+                    if (armorItem == null)
+                        continue;
                     equipItems.Add(CharacterItem.Create(armorItem));
                 }
                 // Set model equip items
                 SelectedModel.SetEquipItems(equipItems);
                 // Prepare equip weapons
                 EquipWeapons equipWeapons = new EquipWeapons();
-                equipWeapons.leftHand = CharacterItem.Create(SelectedPlayerCharacter.leftHandEquipItem);
-                equipWeapons.rightHand = CharacterItem.Create(SelectedPlayerCharacter.rightHandEquipItem);
+                if (SelectedPlayerCharacter.rightHandEquipItem != null)
+                    equipWeapons.rightHand = CharacterItem.Create(SelectedPlayerCharacter.rightHandEquipItem);
+                if (SelectedPlayerCharacter.leftHandEquipItem != null)
+                    equipWeapons.leftHand = CharacterItem.Create(SelectedPlayerCharacter.leftHandEquipItem);
                 // Set model equip weapons
                 SelectedModel.SetEquipWeapons(equipWeapons);
             }
