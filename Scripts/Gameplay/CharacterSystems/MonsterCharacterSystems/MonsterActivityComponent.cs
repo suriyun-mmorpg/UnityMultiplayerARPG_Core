@@ -64,7 +64,7 @@ namespace MultiplayerARPG
 
         public MonsterCharacter monsterDatabase
         {
-            get { return CacheMonsterCharacterEntity.MonsterDatabase; }
+            get { return CacheMonsterCharacterEntity.monsterCharacter; }
         }
 
         protected void Awake()

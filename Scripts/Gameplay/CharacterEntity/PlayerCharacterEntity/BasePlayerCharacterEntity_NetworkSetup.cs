@@ -10,6 +10,8 @@ namespace MultiplayerARPG
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
+            dataId.sendOptions = SendOptions.ReliableOrdered;
+            dataId.forOwnerOnly = false;
             statPoint.sendOptions = SendOptions.ReliableOrdered;
             statPoint.forOwnerOnly = true;
             skillPoint.sendOptions = SendOptions.ReliableOrdered;
@@ -17,9 +19,9 @@ namespace MultiplayerARPG
             gold.sendOptions = SendOptions.ReliableOrdered;
             gold.forOwnerOnly = true;
             partyId.sendOptions = SendOptions.ReliableOrdered;
-            partyId.forOwnerOnly = true;
+            partyId.forOwnerOnly = false;
             guildId.sendOptions = SendOptions.ReliableOrdered;
-            guildId.forOwnerOnly = true;
+            guildId.forOwnerOnly = false;
 
             hotkeys.forOwnerOnly = true;
             quests.forOwnerOnly = true;
@@ -29,6 +31,7 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
             // On data changes events
+            dataId.onChange += OnDataIdChange;
             statPoint.onChange += OnStatPointChange;
             skillPoint.onChange += OnSkillPointChange;
             gold.onChange += OnGoldChange;
@@ -154,9 +157,12 @@ namespace MultiplayerARPG
         {
             base.EntityOnDestroy();
             // On data changes events
+            dataId.onChange -= OnDataIdChange;
             statPoint.onChange -= OnStatPointChange;
             skillPoint.onChange -= OnSkillPointChange;
-            gold.onChange += OnGoldChange;
+            gold.onChange -= OnGoldChange;
+            partyId.onChange -= OnPartyIdChange;
+            guildId.onChange -= OnGuildIdChange;
             // On list changes events
             hotkeys.onOperation -= OnHotkeysOperation;
             quests.onOperation -= OnQuestsOperation;

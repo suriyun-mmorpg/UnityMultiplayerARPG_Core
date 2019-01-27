@@ -519,7 +519,7 @@ namespace MultiplayerARPG
                 gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotFoundCharacter);
                 return;
             }
-            if (targetCharacterEntity.CoCharacter != null)
+            if (targetCharacterEntity.DealingCharacter != null)
             {
                 gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsInAnotherDeal);
                 return;
@@ -529,10 +529,10 @@ namespace MultiplayerARPG
                 gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 return;
             }
-            CoCharacter = targetCharacterEntity;
-            targetCharacterEntity.CoCharacter = this;
+            DealingCharacter = targetCharacterEntity;
+            targetCharacterEntity.DealingCharacter = this;
             // Send receive dealing request to player
-            CoCharacter.RequestReceiveDealingRequest(ObjectId);
+            DealingCharacter.RequestReceiveDealingRequest(ObjectId);
         }
 
         protected virtual void NetFuncReceiveDealingRequest(PackedUInt objectId)
@@ -546,32 +546,32 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncAcceptDealingRequest()
         {
-            if (CoCharacter == null)
+            if (DealingCharacter == null)
             {
                 gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotAcceptDealingRequest);
                 StopDealing();
                 return;
             }
-            if (Vector3.Distance(CacheTransform.position, CoCharacter.CacheTransform.position) > gameInstance.conversationDistance)
+            if (Vector3.Distance(CacheTransform.position, DealingCharacter.CacheTransform.position) > gameInstance.conversationDistance)
             {
                 gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CharacterIsTooFar);
                 StopDealing();
                 return;
             }
             // Set dealing state/data for co player character entity
-            CoCharacter.ClearDealingData();
-            CoCharacter.DealingState = DealingState.Dealing;
-            CoCharacter.RequestAcceptedDealingRequest(ObjectId);
+            DealingCharacter.ClearDealingData();
+            DealingCharacter.DealingState = DealingState.Dealing;
+            DealingCharacter.RequestAcceptedDealingRequest(ObjectId);
             // Set dealing state/data for player character entity
             ClearDealingData();
             DealingState = DealingState.Dealing;
-            RequestAcceptedDealingRequest(CoCharacter.ObjectId);
+            RequestAcceptedDealingRequest(DealingCharacter.ObjectId);
         }
 
         protected virtual void NetFuncDeclineDealingRequest()
         {
-            if (CoCharacter != null)
-                gameManager.SendServerGameMessage(CoCharacter.ConnectionId, GameMessage.Type.DealingRequestDeclined);
+            if (DealingCharacter != null)
+                gameManager.SendServerGameMessage(DealingCharacter.ConnectionId, GameMessage.Type.DealingRequestDeclined);
             gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.DealingRequestDeclined);
             StopDealing();
         }
@@ -643,24 +643,24 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncConfirmDealing()
         {
-            if (DealingState != DealingState.LockDealing || !(CoCharacter.DealingState == DealingState.LockDealing || CoCharacter.DealingState == DealingState.ConfirmDealing))
+            if (DealingState != DealingState.LockDealing || !(DealingCharacter.DealingState == DealingState.LockDealing || DealingCharacter.DealingState == DealingState.ConfirmDealing))
             {
                 gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.InvalidDealingState);
                 return;
             }
             DealingState = DealingState.ConfirmDealing;
-            if (DealingState == DealingState.ConfirmDealing && CoCharacter.DealingState == DealingState.ConfirmDealing)
+            if (DealingState == DealingState.ConfirmDealing && DealingCharacter.DealingState == DealingState.ConfirmDealing)
             {
                 ExchangeDealingItemsAndGold();
-                CoCharacter.ExchangeDealingItemsAndGold();
+                DealingCharacter.ExchangeDealingItemsAndGold();
                 StopDealing();
             }
         }
 
         protected virtual void NetFuncCancelDealing()
         {
-            if (CoCharacter != null)
-                gameManager.SendServerGameMessage(CoCharacter.ConnectionId, GameMessage.Type.DealingCanceled);
+            if (DealingCharacter != null)
+                gameManager.SendServerGameMessage(DealingCharacter.ConnectionId, GameMessage.Type.DealingCanceled);
             gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.DealingCanceled);
             StopDealing();
         }
@@ -723,8 +723,8 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity targetCharacterEntity = null;
             if (!gameManager.CanSendPartyInvitation(this, objectId, out targetCharacterEntity))
                 return;
-            CoCharacter = targetCharacterEntity;
-            targetCharacterEntity.CoCharacter = this;
+            DealingCharacter = targetCharacterEntity;
+            targetCharacterEntity.DealingCharacter = this;
             // Send receive party invitation request to player
             targetCharacterEntity.RequestReceivePartyInvitation(ObjectId);
         }
@@ -740,14 +740,14 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncAcceptPartyInvitation()
         {
-            gameManager.AddPartyMember(CoCharacter, this);
+            gameManager.AddPartyMember(DealingCharacter, this);
             StopPartyInvitation();
         }
 
         protected virtual void NetFuncDeclinePartyInvitation()
         {
-            if (CoCharacter != null)
-                gameManager.SendServerGameMessage(CoCharacter.ConnectionId, GameMessage.Type.PartyInvitationDeclined);
+            if (DealingCharacter != null)
+                gameManager.SendServerGameMessage(DealingCharacter.ConnectionId, GameMessage.Type.PartyInvitationDeclined);
             gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.PartyInvitationDeclined);
             StopPartyInvitation();
         }
@@ -794,8 +794,8 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity targetCharacterEntity;
             if (!gameManager.CanSendGuildInvitation(this, objectId, out targetCharacterEntity))
                 return;
-            CoCharacter = targetCharacterEntity;
-            targetCharacterEntity.CoCharacter = this;
+            DealingCharacter = targetCharacterEntity;
+            targetCharacterEntity.DealingCharacter = this;
             // Send receive guild invitation request to player
             targetCharacterEntity.RequestReceiveGuildInvitation(ObjectId);
         }
@@ -811,14 +811,14 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncAcceptGuildInvitation()
         {
-            gameManager.AddGuildMember(CoCharacter, this);
+            gameManager.AddGuildMember(DealingCharacter, this);
             StopGuildInvitation();
         }
 
         protected virtual void NetFuncDeclineGuildInvitation()
         {
-            if (CoCharacter != null)
-                gameManager.SendServerGameMessage(CoCharacter.ConnectionId, GameMessage.Type.GuildInvitationDeclined);
+            if (DealingCharacter != null)
+                gameManager.SendServerGameMessage(DealingCharacter.ConnectionId, GameMessage.Type.GuildInvitationDeclined);
             gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.GuildInvitationDeclined);
             StopGuildInvitation();
         }
@@ -836,31 +836,31 @@ namespace MultiplayerARPG
 
         protected virtual void StopDealing()
         {
-            if (CoCharacter == null)
+            if (DealingCharacter == null)
             {
                 ClearDealingData();
                 return;
             }
             // Set dealing state/data for co player character entity
-            CoCharacter.ClearDealingData();
-            CoCharacter.CoCharacter = null;
+            DealingCharacter.ClearDealingData();
+            DealingCharacter.DealingCharacter = null;
             // Set dealing state/data for player character entity
             ClearDealingData();
-            CoCharacter = null;
+            DealingCharacter = null;
         }
 
         protected virtual void StopPartyInvitation()
         {
-            if (CoCharacter != null)
-                CoCharacter.CoCharacter = null;
-            CoCharacter = null;
+            if (DealingCharacter != null)
+                DealingCharacter.DealingCharacter = null;
+            DealingCharacter = null;
         }
 
         protected virtual void StopGuildInvitation()
         {
-            if (CoCharacter != null)
-                CoCharacter.CoCharacter = null;
-            CoCharacter = null;
+            if (DealingCharacter != null)
+                DealingCharacter.DealingCharacter = null;
+            DealingCharacter = null;
         }
     }
 }

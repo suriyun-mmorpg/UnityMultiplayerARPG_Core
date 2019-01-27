@@ -19,6 +19,8 @@ namespace MultiplayerARPG
         public bool isInSafeArea;
 
         #region Serialize data
+        [HideInInspector]
+        // TODO: This will be made as private variable later
         public BaseCharacter database;
         [Header("Settings")]
         [Tooltip("These objects will be hidden on non owner objects")]
@@ -90,6 +92,8 @@ namespace MultiplayerARPG
 
         public override int MaxHp { get { return CacheMaxHp; } }
         public float MoveAnimationSpeedMultiplier { get { return gameplayRule.GetMoveSpeed(this) / CacheBaseMoveSpeed; } }
+        public abstract int DataId { get; set; }
+        public abstract BaseCharacter Database { get; }
 
         private BaseCharacterModel characterModel;
         public BaseCharacterModel CharacterModel
@@ -1026,8 +1030,8 @@ namespace MultiplayerARPG
                 out cacheTotalItemWeight,
                 out cacheAtkSpeed,
                 out cacheMoveSpeed);
-            if (database != null)
-                CacheBaseMoveSpeed = database.stats.baseStats.moveSpeed;
+            if (Database != null)
+                CacheBaseMoveSpeed = Database.stats.baseStats.moveSpeed;
             isRecaching = false;
         }
 

@@ -11,6 +11,8 @@ namespace MultiplayerARPG
         #region Sync data
         [Header("Player Character - Sync Fields")]
         [SerializeField]
+        protected SyncFieldInt dataId = new SyncFieldInt();
+        [SerializeField]
         protected SyncFieldShort statPoint = new SyncFieldShort();
         [SerializeField]
         protected SyncFieldShort skillPoint = new SyncFieldShort();
@@ -38,8 +40,8 @@ namespace MultiplayerARPG
             {
                 dealingState = value;
                 RequestUpdateDealingState(value);
-                if (CoCharacter != null)
-                    CoCharacter.RequestUpdateAnotherDealingState(value);
+                if (DealingCharacter != null)
+                    DealingCharacter.RequestUpdateAnotherDealingState(value);
             }
         }
 
@@ -50,8 +52,8 @@ namespace MultiplayerARPG
             {
                 dealingGold = value;
                 RequestUpdateDealingGold(value);
-                if (CoCharacter != null)
-                    CoCharacter.RequestUpdateAnotherDealingGold(value);
+                if (DealingCharacter != null)
+                    DealingCharacter.RequestUpdateAnotherDealingGold(value);
             }
         }
 
@@ -62,13 +64,14 @@ namespace MultiplayerARPG
             {
                 dealingItems = value;
                 RequestUpdateDealingItems(value);
-                if (CoCharacter != null)
-                    CoCharacter.RequestUpdateAnotherDealingItems(value);
+                if (DealingCharacter != null)
+                    DealingCharacter.RequestUpdateAnotherDealingItems(value);
             }
         }
         #endregion
 
         #region Sync data actions
+        public System.Action<int> onDataIdChange;
         public System.Action<short> onStatPointChange;
         public System.Action<short> onSkillPointChange;
         public System.Action<int> onGoldChange;
@@ -80,6 +83,7 @@ namespace MultiplayerARPG
         #endregion
 
         #region Fields/Interface/Getter/Setter implementation
+        public override int DataId { get { return dataId.Value; } set { dataId.Value = value; } }
         public short StatPoint { get { return statPoint.Value; } set { statPoint.Value = value; } }
         public short SkillPoint { get { return skillPoint.Value; } set { skillPoint.Value = value; } }
         public int Gold { get { return gold.Value; } set { gold.Value = value; } }
@@ -138,6 +142,12 @@ namespace MultiplayerARPG
         }
 
         #region Sync data changes callback
+        protected virtual void OnDataIdChange(int dataId)
+        {
+            if (onDataIdChange != null)
+                onDataIdChange.Invoke(dataId);
+        }
+
         protected virtual void OnStatPointChange(short statPoint)
         {
             if (onStatPointChange != null)

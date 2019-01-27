@@ -46,6 +46,8 @@ namespace MultiplayerARPG
         }
 
         protected readonly Dictionary<string, BaseCharacterModel> CharacterModels = new Dictionary<string, BaseCharacterModel>();
+        protected readonly Dictionary<string, IPlayerCharacterData> PlayerCharacterDataDict = new Dictionary<string, IPlayerCharacterData>();
+        public IPlayerCharacterData SelectedPlayerCharacterData { get; protected set; }
 
         protected virtual void LoadCharacters()
         {
@@ -56,6 +58,8 @@ namespace MultiplayerARPG
             // Remove all models
             characterModelContainer.RemoveChildren();
             CharacterModels.Clear();
+            // Remove all cached data
+            PlayerCharacterDataDict.Clear();
             // Show list of created characters
             List<PlayerCharacterData> selectableCharacters = PlayerCharacterDataExtension.LoadAllPersistentCharacterData();
             for (int i = selectableCharacters.Count - 1; i >= 0; --i)
@@ -65,18 +69,21 @@ namespace MultiplayerARPG
                     selectableCharacters.RemoveAt(i);
             }
             selectableCharacters.Sort(new PlayerCharacterDataLastUpdateComparer().Desc());
-            CacheCharacterList.Generate(selectableCharacters, (index, character, ui) =>
+            CacheCharacterList.Generate(selectableCharacters, (index, characterEntity, ui) =>
             {
+                // Cache player character to dictionary, we will use it later
+                PlayerCharacterDataDict[characterEntity.Id] = characterEntity;
+                // Setup UIs
                 UICharacter uiCharacter = ui.GetComponent<UICharacter>();
-                uiCharacter.Data = character;
+                uiCharacter.Data = characterEntity;
                 // Select trigger when add first entry so deactivate all models is okay beacause first model will active
-                BaseCharacterModel characterModel = character.InstantiateModel(characterModelContainer);
+                BaseCharacterModel characterModel = characterEntity.InstantiateModel(characterModelContainer);
                 if (characterModel != null)
                 {
-                    CharacterModels[character.Id] = characterModel;
+                    CharacterModels[characterEntity.Id] = characterModel;
                     characterModel.gameObject.SetActive(false);
-                    characterModel.SetEquipWeapons(character.EquipWeapons);
-                    characterModel.SetEquipItems(character.EquipItems);
+                    characterModel.SetEquipWeapons(characterEntity.EquipWeapons);
+                    characterModel.SetEquipItems(characterEntity.EquipItems);
                     CacheCharacterSelectionManager.Add(uiCharacter);
                 }
             });
@@ -96,9 +103,7 @@ namespace MultiplayerARPG
             // Unenabled buttons
             buttonStart.gameObject.SetActive(false);
             buttonDelete.gameObject.SetActive(false);
-            // Remove all models
-            characterModelContainer.RemoveChildren();
-            CharacterModels.Clear();
+            // Load characters
             LoadCharacters();
             base.Show();
         }
@@ -109,12 +114,13 @@ namespace MultiplayerARPG
             base.Hide();
         }
 
-        protected virtual void OnSelectCharacter(UICharacter ui)
+        protected virtual void OnSelectCharacter(UICharacter uiCharacter)
         {
             buttonStart.gameObject.SetActive(true);
             buttonDelete.gameObject.SetActive(true);
             characterModelContainer.SetChildrenActive(false);
-            IPlayerCharacterData playerCharacter = ui.Data as IPlayerCharacterData;
+            IPlayerCharacterData playerCharacter = uiCharacter.Data as IPlayerCharacterData;
+            SelectedPlayerCharacterData = PlayerCharacterDataDict[playerCharacter.Id];
             ShowCharacter(playerCharacter.Id);
         }
 

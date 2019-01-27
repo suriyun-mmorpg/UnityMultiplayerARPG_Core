@@ -13,7 +13,10 @@ namespace MultiplayerARPG
     public abstract partial class BaseMonsterCharacterEntity : BaseCharacterEntity
     {
         public readonly Dictionary<BaseCharacterEntity, ReceivedDamageRecord> receivedDamageRecords = new Dictionary<BaseCharacterEntity, ReceivedDamageRecord>();
-        
+
+        [Header("Monster Character Settings")]
+        public MonsterCharacter monsterCharacter;
+
         [SerializeField]
         protected SyncFieldPackedUInt summonerObjectId = new SyncFieldPackedUInt();
         [SerializeField]
@@ -21,13 +24,8 @@ namespace MultiplayerARPG
 
         public override string CharacterName
         {
-            get { return MonsterDatabase == null ? LanguageManager.GetUnknowTitle() : MonsterDatabase.Title; }
+            get { return monsterCharacter == null ? LanguageManager.GetUnknowTitle() : monsterCharacter.Title; }
             set { }
-        }
-
-        public MonsterCharacter MonsterDatabase
-        {
-            get { return database as MonsterCharacter; }
         }
 
         private LiteNetLibTransform cacheNetTransform;
@@ -40,9 +38,6 @@ namespace MultiplayerARPG
                 return cacheNetTransform;
             }
         }
-        
-        public MonsterSpawnArea spawnArea { get; private set; }
-        public Vector3 spawnPosition { get; private set; }
 
         private BaseCharacterEntity summoner;
         public BaseCharacterEntity Summoner
@@ -63,13 +58,20 @@ namespace MultiplayerARPG
                     summonerObjectId.Value = summoner != null ? summoner.ObjectId : 0;
             }
         }
+
         public SummonType SummonType { get { return (SummonType)summonType.Value; } protected set { summonType.Value = (byte)value; } }
         public bool IsSummoned { get { return SummonType != SummonType.None; } }
+
+        public MonsterSpawnArea spawnArea { get; private set; }
+        public Vector3 spawnPosition { get; private set; }
+        public override int DataId { get { return monsterCharacter.DataId; } set { } }
+        public override BaseCharacter Database { get { return monsterCharacter; } }
 
         protected override void EntityAwake()
         {
             base.EntityAwake();
             gameObject.tag = gameInstance.monsterTag;
+            MigrateDatabase();
         }
 
         protected override void EntityStart()
@@ -103,17 +105,27 @@ namespace MultiplayerARPG
         {
             base.OnValidate();
 #if UNITY_EDITOR
-            if (database == null)
-            {
-                Debug.LogError("[BaseMonsterCharacterEntity] " + name + " Database is empty");
-            }
             if (database != null && !(database is MonsterCharacter))
             {
                 Debug.LogError("[BaseMonsterCharacterEntity] " + name + " Database must be `MonsterCharacter`");
                 database = null;
                 EditorUtility.SetDirty(this);
             }
+            if (MigrateDatabase())
+                EditorUtility.SetDirty(this);
 #endif
+        }
+
+        private bool MigrateDatabase()
+        {
+            bool hasChanges = false;
+            if (database != null && database is MonsterCharacter)
+            {
+                monsterCharacter = database as MonsterCharacter;
+                database = null;
+                hasChanges = true;
+            }
+            return hasChanges;
         }
 
         protected void InitStats()
@@ -216,7 +228,7 @@ namespace MultiplayerARPG
                 {
                     if (monsterCharacterEntity.IsSummoned)
                         return IsAlly(monsterCharacterEntity.Summoner);
-                    return monsterCharacterEntity.MonsterDatabase.allyId == MonsterDatabase.allyId;
+                    return monsterCharacterEntity.monsterCharacter.allyId == monsterCharacter.allyId;
                 }
             }
             return false;
@@ -284,12 +296,12 @@ namespace MultiplayerARPG
             CharacterModel.GetRandomRightHandAttackAnimation(dataId, out animationIndex, out triggerDuration, out totalDuration);
 
             // Assign damage data
-            damageInfo = MonsterDatabase.damageInfo;
+            damageInfo = monsterCharacter.damageInfo;
 
             // Assign damage amounts
             allDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
-            DamageElement damageElement = MonsterDatabase.damageAmount.damageElement;
-            MinMaxFloat damageAmount = MonsterDatabase.damageAmount.amount.GetAmount(Level);
+            DamageElement damageElement = monsterCharacter.damageAmount.damageElement;
+            MinMaxFloat damageAmount = monsterCharacter.damageAmount.amount.GetAmount(Level);
             if (damageElement == null)
                 damageElement = gameInstance.DefaultDamageElement;
             allDamageAmounts.Add(damageElement, damageAmount);
@@ -297,7 +309,7 @@ namespace MultiplayerARPG
 
         public override float GetAttackDistance()
         {
-            return MonsterDatabase.damageInfo.GetDistance();
+            return monsterCharacter.damageInfo.GetDistance();
         }
 
         public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType damageAmountType, int damage)
@@ -346,8 +358,8 @@ namespace MultiplayerARPG
             if (IsSummoned)
                 return;
 
-            int randomedExp = Random.Range(MonsterDatabase.randomExpMin, MonsterDatabase.randomExpMax);
-            int randomedGold = Random.Range(MonsterDatabase.randomGoldMin, MonsterDatabase.randomGoldMax);
+            int randomedExp = Random.Range(monsterCharacter.randomExpMin, monsterCharacter.randomExpMax);
+            int randomedGold = Random.Range(monsterCharacter.randomGoldMin, monsterCharacter.randomGoldMax);
             HashSet<uint> looters = new HashSet<uint>();
             BasePlayerCharacterEntity lastPlayer = lastAttacker as BasePlayerCharacterEntity;
             GuildData tempGuildData;
@@ -438,7 +450,7 @@ namespace MultiplayerARPG
                 }
             }
             receivedDamageRecords.Clear();
-            foreach (ItemDrop randomItem in MonsterDatabase.randomItems)
+            foreach (ItemDrop randomItem in monsterCharacter.randomItems)
             {
                 if (Random.value <= randomItem.dropRate)
                 {
@@ -475,16 +487,16 @@ namespace MultiplayerARPG
                 return;
 
             if (spawnArea != null)
-                spawnArea.Spawn(MonsterDatabase.deadHideDelay + MonsterDatabase.deadRespawnDelay);
+                spawnArea.Spawn(monsterCharacter.deadHideDelay + monsterCharacter.deadRespawnDelay);
             else
                 Manager.StartCoroutine(RespawnRoutine());
 
-            NetworkDestroy(MonsterDatabase.deadHideDelay);
+            NetworkDestroy(monsterCharacter.deadHideDelay);
         }
 
         private IEnumerator RespawnRoutine()
         {
-            yield return new WaitForSecondsRealtime(MonsterDatabase.deadHideDelay + MonsterDatabase.deadRespawnDelay);
+            yield return new WaitForSecondsRealtime(monsterCharacter.deadHideDelay + monsterCharacter.deadRespawnDelay);
             InitStats();
             Manager.Assets.NetworkSpawn(Identity.HashAssetId, spawnPosition, Quaternion.Euler(Vector3.up * Random.Range(0, 360)), Identity.ObjectId, Identity.ConnectionId);
         }
@@ -505,7 +517,7 @@ namespace MultiplayerARPG
 
         public override void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker)
         {
-            if ((Summoner != null && Summoner == ally) || MonsterDatabase.characteristic == MonsterCharacteristic.Assist)
+            if ((Summoner != null && Summoner == ally) || monsterCharacter.characteristic == MonsterCharacteristic.Assist)
                 SetAttackTarget(attacker);
         }
 

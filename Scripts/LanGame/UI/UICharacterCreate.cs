@@ -83,6 +83,15 @@ namespace MultiplayerARPG
         }
 
         protected readonly Dictionary<int, BaseCharacterModel> CharacterModels = new Dictionary<int, BaseCharacterModel>();
+        protected BaseCharacterModel selectedModel;
+        public BaseCharacterModel SelectedModel { get { return selectedModel; } }
+        protected readonly Dictionary<int, BasePlayerCharacterEntity> PlayerCharacterEntities = new Dictionary<int, BasePlayerCharacterEntity>();
+        protected BasePlayerCharacterEntity selectedPlayerCharacterEntity;
+        public BasePlayerCharacterEntity SelectedPlayerCharacterEntity { get { return selectedPlayerCharacterEntity; } }
+        protected readonly Dictionary<int, PlayerCharacter> PlayerCharacters = new Dictionary<int, PlayerCharacter>();
+        protected PlayerCharacter selectedPlayerCharacter;
+        public PlayerCharacter SelectedPlayerCharacter { get { return selectedPlayerCharacter; } }
+        public PlayerCharacterData CreatingPlayerCharacterData { get; private set; }
 
         protected virtual List<BasePlayerCharacterEntity> GetCreatableCharacters()
         {
@@ -92,23 +101,30 @@ namespace MultiplayerARPG
         protected virtual void LoadCharacters()
         {
             CacheCharacterSelectionManager.Clear();
+            // Remove all models
+            characterModelContainer.RemoveChildren();
+            CharacterModels.Clear();
+            // Remove all cached data
+            PlayerCharacterEntities.Clear();
             // Show list of characters that can be create
             List<BasePlayerCharacterEntity> selectableCharacters = GetCreatableCharacters();
             CacheCharacterList.Generate(selectableCharacters, (index, characterEntity, ui) =>
             {
-                BaseCharacter character = characterEntity.database;
-                PlayerCharacterData characterData = new PlayerCharacterData();
-                characterData.DataId = characterEntity.DataId;
-                characterData.EntityId = characterEntity.EntityId;
-                characterData.SetNewPlayerCharacterData(character.Title, characterEntity.DataId, characterEntity.EntityId);
+                // Cache player character to dictionary, we will use it later
+                PlayerCharacterEntities[characterEntity.EntityId] = characterEntity;
+                // Setup UIs
+                BaseCharacter playerCharacter = characterEntity.playerCharacters[0];
+                PlayerCharacterData playerCharacterData = new PlayerCharacterData();
+                playerCharacterData.SetNewPlayerCharacterData(characterEntity.characterTitle, playerCharacter.DataId, characterEntity.EntityId);
                 UICharacter uiCharacter = ui.GetComponent<UICharacter>();
-                uiCharacter.Data = characterData;
-                // Select trigger when add first entry so deactivate all models is okay beacause first model will active
-                BaseCharacterModel characterModel = characterData.InstantiateModel(characterModelContainer);
-                CharacterModels[characterData.EntityId] = characterModel;
+                uiCharacter.Data = playerCharacterData;
+                // Hide all model, the first one will be shown later
+                BaseCharacterModel characterModel = playerCharacterData.InstantiateModel(characterModelContainer);
+                CharacterModels[playerCharacterData.EntityId] = characterModel;
                 characterModel.gameObject.SetActive(false);
                 CacheCharacterSelectionManager.Add(uiCharacter);
             });
+            CacheCharacterSelectionManager.Select(0);
         }
 
         public override void Show()
@@ -125,9 +141,7 @@ namespace MultiplayerARPG
             CacheCharacterClassSelectionManager.eventOnSelect.AddListener(OnSelectCharacterClass);
             CacheCharacterClassSelectionManager.Clear();
             CacheCharacterClassList.HideAll();
-            // Remove all models
-            characterModelContainer.RemoveChildren();
-            CharacterModels.Clear();
+            // Load characters
             LoadCharacters();
             base.Show();
         }
@@ -139,35 +153,60 @@ namespace MultiplayerARPG
             base.Hide();
         }
 
-        protected virtual void OnSelectCharacter(UICharacter ui)
+        protected virtual void OnSelectCharacter(UICharacter uiCharacter)
         {
             characterModelContainer.SetChildrenActive(false);
-            ShowCharacter(ui.Data.EntityId);
+            PlayerCharacterData playerCharacterData = uiCharacter.Data as PlayerCharacterData;
+            if (CreatingPlayerCharacterData == null)
+                CreatingPlayerCharacterData = new PlayerCharacterData();
+            playerCharacterData.CloneTo(CreatingPlayerCharacterData);
+            CharacterModels.TryGetValue(playerCharacterData.EntityId, out selectedModel);
+            PlayerCharacterEntities.TryGetValue(playerCharacterData.EntityId, out selectedPlayerCharacterEntity);
+            // Show selected model
+            if (SelectedModel != null)
+                SelectedModel.gameObject.SetActive(true);
+            // Setup character class list
+            CacheCharacterClassList.Generate(SelectedPlayerCharacterEntity.playerCharacters, (index, playerCharacter, ui) =>
+            {
+                // Cache player character to dictionary, we will use it later
+                PlayerCharacters[playerCharacter.DataId] = playerCharacter;
+                // Setup UIs
+                UICharacterClass uiCharacterClass = ui.GetComponent<UICharacterClass>();
+                uiCharacterClass.Data = playerCharacter;
+                CacheCharacterClassSelectionManager.Add(uiCharacterClass);
+            });
+            CacheCharacterClassSelectionManager.Select(0);
         }
 
-        protected virtual void ShowCharacter(int id)
+        protected virtual void OnSelectCharacterClass(UICharacterClass uiCharacterClass)
         {
-            BaseCharacterModel characterModel;
-            if (!CharacterModels.TryGetValue(id, out characterModel))
-                return;
-            characterModel.gameObject.SetActive(true);
-        }
-
-        protected virtual void OnSelectCharacterClass(UICharacterClass ui)
-        {
-
+            BaseCharacter baseCharacter = uiCharacterClass.Data;
+            PlayerCharacters.TryGetValue(baseCharacter.DataId, out selectedPlayerCharacter);
+            if (SelectedPlayerCharacter != null)
+            {
+                // Set creating player character data
+                CreatingPlayerCharacterData.SetNewPlayerCharacterData(CreatingPlayerCharacterData.CharacterName, baseCharacter.DataId, CreatingPlayerCharacterData.EntityId);
+                // Prepare equip items
+                List<CharacterItem> equipItems = new List<CharacterItem>();
+                foreach (Item armorItem in SelectedPlayerCharacter.armorItems)
+                {
+                    equipItems.Add(CharacterItem.Create(armorItem));
+                }
+                // Set model equip items
+                SelectedModel.SetEquipItems(equipItems);
+                // Prepare equip weapons
+                EquipWeapons equipWeapons = new EquipWeapons();
+                equipWeapons.leftHand = CharacterItem.Create(SelectedPlayerCharacter.leftHandEquipItem);
+                equipWeapons.rightHand = CharacterItem.Create(SelectedPlayerCharacter.rightHandEquipItem);
+                // Set model equip weapons
+                SelectedModel.SetEquipWeapons(equipWeapons);
+            }
         }
 
         protected virtual void OnClickCreate()
         {
             GameInstance gameInstance = GameInstance.Singleton;
-            UICharacter selectedUI = CacheCharacterSelectionManager.SelectedUI;
-            if (selectedUI == null)
-            {
-                UISceneGlobal.Singleton.ShowMessageDialog("Cannot create character", "Please select character class");
-                Debug.LogWarning("Cannot create character, did not selected character class");
-                return;
-            }
+            // Validate character name
             string characterName = inputCharacterName.text.Trim();
             int minCharacterNameLength = gameInstance.minCharacterNameLength;
             int maxCharacterNameLength = gameInstance.maxCharacterNameLength;
@@ -184,14 +223,18 @@ namespace MultiplayerARPG
                 return;
             }
 
-            string characterId = GenericUtils.GetUniqueId();
-            PlayerCharacterData characterData = new PlayerCharacterData();
-            characterData.Id = characterId;
-            characterData.SetNewPlayerCharacterData(characterName, selectedUI.Data.DataId, selectedUI.Data.EntityId);
-            characterData.SavePersistentCharacterData();
+            SaveCreatingPlayerCharacter(characterName);
 
             if (eventOnCreateCharacter != null)
                 eventOnCreateCharacter.Invoke();
+        }
+
+        protected virtual void SaveCreatingPlayerCharacter(string characterName)
+        {
+            PlayerCharacterData characterData = new PlayerCharacterData();
+            characterData.Id = GenericUtils.GetUniqueId();
+            characterData.SetNewPlayerCharacterData(characterName, CreatingPlayerCharacterData.DataId, CreatingPlayerCharacterData.EntityId);
+            characterData.SavePersistentCharacterData();
         }
     }
 }

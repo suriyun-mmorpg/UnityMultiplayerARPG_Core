@@ -16,23 +16,26 @@ namespace MultiplayerARPG
         public NpcDialog currentNpcDialog;
 
         [Header("Player Character Settings")]
+        [Tooltip("This title will be shown in create scene")]
+        public string characterTitle;
+        [Tooltip("This is list which used as choice of character classes when create character")]
+        public PlayerCharacter[] playerCharacters;
         [Tooltip("Leave this empty to use GameInstance's controller prefab")]
         public BasePlayerCharacterController controllerPrefab;
 
-        public float setCoCharacterTime { get; private set; }
-        private BasePlayerCharacterEntity coCharacter;
-        public BasePlayerCharacterEntity CoCharacter
+        private BasePlayerCharacterEntity dealingCharacter;
+        public BasePlayerCharacterEntity DealingCharacter
         {
             get
             {
-                if (DealingState == DealingState.None && Time.unscaledTime - setCoCharacterTime >= gameInstance.coCharacterActionDuration)
-                    coCharacter = null;
-                return coCharacter;
+                if (DealingState == DealingState.None && Time.unscaledTime - dealingCharacterTime >= gameInstance.coCharacterActionDuration)
+                    dealingCharacter = null;
+                return dealingCharacter;
             }
             set
             {
-                coCharacter = value;
-                setCoCharacterTime = Time.unscaledTime;
+                dealingCharacter = value;
+                dealingCharacterTime = Time.unscaledTime;
             }
         }
 
@@ -47,27 +50,43 @@ namespace MultiplayerARPG
             }
         }
 
+        public float dealingCharacterTime { get; private set; }
+        public override BaseCharacter Database { get { return GameInstance.PlayerCharacters[DataId]; } }
+
         protected override void EntityAwake()
         {
             base.EntityAwake();
             gameObject.tag = gameInstance.playerTag;
+            MigrateDatabase();
         }
 
         protected override void OnValidate()
         {
             base.OnValidate();
 #if UNITY_EDITOR
-            if (database == null)
-            {
-                Debug.LogError("[BasePlayerCharacterEntity] " + name + " Database is empty");
-            }
             if (database != null && !(database is PlayerCharacter))
             {
                 Debug.LogError("[BasePlayerCharacterEntity] " + name + " Database must be `PlayerCharacter`");
                 database = null;
                 EditorUtility.SetDirty(this);
             }
+            if (MigrateDatabase())
+                EditorUtility.SetDirty(this);
 #endif
+        }
+
+        private bool MigrateDatabase()
+        {
+            bool hasChanges = false;
+            if (database != null && database is PlayerCharacter)
+            {
+                List<PlayerCharacter> list = playerCharacters == null ? new List<PlayerCharacter>() : new List<PlayerCharacter>(playerCharacters);
+                list.Add(database as PlayerCharacter);
+                playerCharacters = list.ToArray();
+                database = null;
+                hasChanges = true;
+            }
+            return hasChanges;
         }
 
         protected override void ApplySkill(CharacterSkill characterSkill, Vector3 position, SkillAttackType skillAttackType, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
@@ -236,7 +255,7 @@ namespace MultiplayerARPG
 
         public virtual void ExchangeDealingItemsAndGold()
         {
-            if (CoCharacter == null)
+            if (DealingCharacter == null)
                 return;
             List<DealingCharacterItem> tempDealingItems = new List<DealingCharacterItem>(DealingItems);
             for (int i = nonEquipItems.Count - 1; i >= 0; --i)
@@ -247,7 +266,7 @@ namespace MultiplayerARPG
                     DealingCharacterItem dealingItem = tempDealingItems[j];
                     if (dealingItem.nonEquipIndex == i && nonEquipItem.amount >= dealingItem.amount)
                     {
-                        if (CoCharacter.IncreaseItems(dealingItem))
+                        if (DealingCharacter.IncreaseItems(dealingItem))
                         {
                             // Reduce item amount when able to increase item to co character
                             nonEquipItem.amount -= dealingItem.amount;
@@ -262,7 +281,7 @@ namespace MultiplayerARPG
                 }
             }
             Gold -= DealingGold;
-            CoCharacter.Gold += DealingGold;
+            DealingCharacter.Gold += DealingGold;
         }
 
         public virtual void ClearDealingData()

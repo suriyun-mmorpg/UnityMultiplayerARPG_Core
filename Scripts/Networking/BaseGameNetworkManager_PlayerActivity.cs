@@ -91,7 +91,7 @@ namespace MultiplayerARPG
                 SendServerGameMessage(inviteCharacterEntity.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 return false;
             }
-            if (targetCharacterEntity.CoCharacter != null)
+            if (targetCharacterEntity.DealingCharacter != null)
             {
                 SendServerGameMessage(inviteCharacterEntity.ConnectionId, GameMessage.Type.CharacterIsInAnotherDeal);
                 return false;
@@ -307,7 +307,7 @@ namespace MultiplayerARPG
                 SendServerGameMessage(inviteCharacterEntity.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 return false;
             }
-            if (targetCharacterEntity.CoCharacter != null)
+            if (targetCharacterEntity.DealingCharacter != null)
             {
                 SendServerGameMessage(inviteCharacterEntity.ConnectionId, GameMessage.Type.CharacterIsInAnotherDeal);
                 return false;
