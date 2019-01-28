@@ -88,22 +88,26 @@ namespace MultiplayerARPG
 
             displayingSkills = character.GetSkills();
 
-            Skill tempSkill;
-            short tempLevel;
-            Dictionary<Skill, short> skillLevels = character.GetDatabase().CacheSkillLevels;
-            CacheCharacterSkillList.Generate(skillLevels, (index, skillLevel, ui) =>
+            BaseCharacter database = character.GetDatabase();
+            if (database != null)
             {
-                UICharacterSkill uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
-                tempSkill = skillLevel.Key;
-                tempLevel = 0;
-                if (displayingSkills.ContainsKey(tempSkill))
-                    tempLevel = displayingSkills[tempSkill];
-                uiCharacterSkill.Setup(new SkillTuple(tempSkill, tempLevel), character, character.IndexOfSkill(tempSkill.DataId));
-                uiCharacterSkill.Show();
-                CacheCharacterSkillSelectionManager.Add(uiCharacterSkill);
-                if (selectedSkillId.Equals(skillLevel.Key))
-                    uiCharacterSkill.OnClickSelect();
-            });
+                Skill tempSkill;
+                short tempLevel;
+                Dictionary<Skill, short> skillLevels = database.CacheSkillLevels;
+                CacheCharacterSkillList.Generate(skillLevels, (index, skillLevel, ui) =>
+                {
+                    UICharacterSkill uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
+                    tempSkill = skillLevel.Key;
+                    tempLevel = 0;
+                    if (displayingSkills.ContainsKey(tempSkill))
+                        tempLevel = displayingSkills[tempSkill];
+                    uiCharacterSkill.Setup(new SkillTuple(tempSkill, tempLevel), character, character.IndexOfSkill(tempSkill.DataId));
+                    uiCharacterSkill.Show();
+                    CacheCharacterSkillSelectionManager.Add(uiCharacterSkill);
+                    if (selectedSkillId.Equals(skillLevel.Key))
+                        uiCharacterSkill.OnClickSelect();
+                });
+            }
         }
     }
 }
