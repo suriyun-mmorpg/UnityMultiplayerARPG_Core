@@ -99,7 +99,8 @@ namespace MultiplayerARPG
         protected readonly Dictionary<int, PlayerCharacter> PlayerCharacterByDataId = new Dictionary<int, PlayerCharacter>();
         protected PlayerCharacter selectedPlayerCharacter;
         public PlayerCharacter SelectedPlayerCharacter { get { return selectedPlayerCharacter; } }
-        public PlayerCharacterData CreatingPlayerCharacterData { get; private set; }
+        public int SelectedEntityId { get; protected set; }
+        public int SelectedDataId { get; protected set; }
 
         protected virtual List<BasePlayerCharacterEntity> GetCreatableCharacters()
         {
@@ -178,9 +179,8 @@ namespace MultiplayerARPG
         {
             eventOnSelectCharacter.Invoke(playerCharacterData);
             characterModelContainer.SetChildrenActive(false);
-            if (CreatingPlayerCharacterData == null)
-                CreatingPlayerCharacterData = new PlayerCharacterData();
-            playerCharacterData.CloneTo(CreatingPlayerCharacterData);
+            SelectedDataId = playerCharacterData.DataId;
+            SelectedEntityId = playerCharacterData.EntityId;
             CharacterModelByEntityId.TryGetValue(playerCharacterData.EntityId, out selectedModel);
             // Clear character class selection
             CacheCharacterClassSelectionManager.Clear();
@@ -225,7 +225,7 @@ namespace MultiplayerARPG
             if (SelectedPlayerCharacter != null)
             {
                 // Set creating player character data
-                CreatingPlayerCharacterData.SetNewPlayerCharacterData(CreatingPlayerCharacterData.CharacterName, baseCharacter.DataId, CreatingPlayerCharacterData.EntityId);
+                SelectedDataId = baseCharacter.DataId;
                 // Prepare equip items
                 List<CharacterItem> equipItems = new List<CharacterItem>();
                 foreach (Item armorItem in SelectedPlayerCharacter.armorItems)
@@ -277,7 +277,7 @@ namespace MultiplayerARPG
         {
             PlayerCharacterData characterData = new PlayerCharacterData();
             characterData.Id = GenericUtils.GetUniqueId();
-            characterData.SetNewPlayerCharacterData(characterName, CreatingPlayerCharacterData.DataId, CreatingPlayerCharacterData.EntityId);
+            characterData.SetNewPlayerCharacterData(characterName, SelectedDataId, SelectedEntityId);
             characterData.SavePersistentCharacterData();
         }
     }
