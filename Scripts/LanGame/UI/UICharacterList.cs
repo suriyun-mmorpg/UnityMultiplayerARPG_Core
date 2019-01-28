@@ -74,21 +74,21 @@ namespace MultiplayerARPG
                     selectableCharacters.RemoveAt(i);
             }
             selectableCharacters.Sort(new PlayerCharacterDataLastUpdateComparer().Desc());
-            CacheCharacterList.Generate(selectableCharacters, (index, characterEntity, ui) =>
+            CacheCharacterList.Generate(selectableCharacters, (index, characterData, ui) =>
             {
                 // Cache player character to dictionary, we will use it later
-                PlayerCharacterDataById[characterEntity.Id] = characterEntity;
+                PlayerCharacterDataById[characterData.Id] = characterData;
                 // Setup UIs
                 UICharacter uiCharacter = ui.GetComponent<UICharacter>();
-                uiCharacter.Data = characterEntity;
+                uiCharacter.Data = characterData;
                 // Select trigger when add first entry so deactivate all models is okay beacause first model will active
-                BaseCharacterModel characterModel = characterEntity.InstantiateModel(characterModelContainer);
+                BaseCharacterModel characterModel = characterData.InstantiateModel(characterModelContainer);
                 if (characterModel != null)
                 {
-                    CharacterModelById[characterEntity.Id] = characterModel;
+                    CharacterModelById[characterData.Id] = characterModel;
                     characterModel.gameObject.SetActive(false);
-                    characterModel.SetEquipWeapons(characterEntity.EquipWeapons);
-                    characterModel.SetEquipItems(characterEntity.EquipItems);
+                    characterModel.SetEquipWeapons(characterData.EquipWeapons);
+                    characterModel.SetEquipItems(characterData.EquipItems);
                     CacheCharacterSelectionManager.Add(uiCharacter);
                 }
             });
