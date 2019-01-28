@@ -46,9 +46,12 @@ namespace MultiplayerARPG
                 if (cacheTitles == null)
                 {
                     cacheTitles = new Dictionary<string, string>();
-                    foreach (LanguageData entry in titles)
+                    if (titles != null)
                     {
-                        cacheTitles[entry.key] = entry.value;
+                        foreach (LanguageData entry in titles)
+                        {
+                            cacheTitles[entry.key] = entry.value;
+                        }
                     }
                 }
                 return cacheTitles;
@@ -63,9 +66,12 @@ namespace MultiplayerARPG
                 if (cacheDescriptions == null)
                 {
                     cacheDescriptions = new Dictionary<string, string>();
-                    foreach (LanguageData entry in descriptions)
+                    if (descriptions != null)
                     {
-                        cacheDescriptions[entry.key] = entry.value;
+                        foreach (LanguageData entry in descriptions)
+                        {
+                            cacheDescriptions[entry.key] = entry.value;
+                        }
                     }
                 }
                 return cacheDescriptions;
