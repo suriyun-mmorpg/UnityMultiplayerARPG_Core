@@ -404,6 +404,7 @@ namespace MultiplayerARPG
                     AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
                 animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
                 animator.SetBool(ANIM_DO_ACTION, true);
+                animator.Play(animator.GetCurrentAnimatorStateInfo(0).fullPathHash, 0, 0);
                 // Waits by current transition + clip duration before end animation
                 yield return new WaitForSecondsRealtime(animator.GetAnimatorTransitionInfo(0).duration + (tempActionAnimation.GetClipLength() / playSpeedMultiplier));
                 animator.SetBool(ANIM_DO_ACTION, false);
