@@ -3,8 +3,11 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
+    /// <summary>
+    /// This game database will load and setup game data from data that set in lists
+    /// </summary>
     [CreateAssetMenu(fileName = "Game Database", menuName = "Create GameDatabase/Game Database")]
-    public class GameDatabase : ScriptableObject
+    public class GameDatabase : BaseGameDatabase
     {
         public Attribute[] attributes;
         public DamageElement[] damageElements;
@@ -19,7 +22,7 @@ namespace MultiplayerARPG
         public BaseMonsterCharacterEntity[] monsterCharacterEntities;
         public MapInfo[] mapInfos;
         
-        public virtual void LoadData(GameInstance gameInstance)
+        public override void LoadData(GameInstance gameInstance)
         {
             GameInstance.AddAttributes(attributes);
             GameInstance.AddItems(new Item[] { gameInstance.DefaultWeaponItem });
@@ -34,7 +37,7 @@ namespace MultiplayerARPG
             GameInstance.AddCharacterEntities(playerCharacterEntities);
             GameInstance.AddCharacterEntities(monsterCharacterEntities);
             GameInstance.AddMapInfos(mapInfos);
-            
+            // Add hit effects
             List<GameEffectCollection> weaponHitEffects = new List<GameEffectCollection>();
             if (gameInstance.DefaultDamageElement.hitEffects != null)
                 weaponHitEffects.Add(gameInstance.DefaultDamageElement.hitEffects);
@@ -44,8 +47,7 @@ namespace MultiplayerARPG
                     weaponHitEffects.Add(damageElement.hitEffects);
             }
             GameInstance.AddGameEffectCollections(weaponHitEffects);
-
-            // Loaded game data from game database
+            // Tell game instance that data loaded
             gameInstance.LoadedGameData();
         }
     }

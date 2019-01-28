@@ -64,7 +64,7 @@ namespace MultiplayerARPG
         private int[] expTree;
         [Tooltip("You can add game data here or leave this empty to let it load data from Resources folders")]
         [SerializeField]
-        private GameDatabase gameDatabase;
+        private BaseGameDatabase gameDatabase;
         [Tooltip("You can add warp portals here or may add warp portals in the scene directly, So you can leave this empty")]
         [SerializeField]
         private WarpPortalDatabase warpPortalDatabase;
@@ -174,6 +174,16 @@ namespace MultiplayerARPG
                 if (gameplayRule == null)
                     gameplayRule = ScriptableObject.CreateInstance<SimpleGameplayRule>();
                 return gameplayRule;
+            }
+        }
+
+        public BaseGameDatabase GameDatabase
+        {
+            get
+            {
+                if (gameDatabase == null)
+                    gameDatabase = ScriptableObject.CreateInstance<ResourcesFolderGameDatabase>();
+                return gameDatabase;
             }
         }
 
@@ -356,90 +366,7 @@ namespace MultiplayerARPG
 
         protected virtual void Start()
         {
-            if (gameDatabase != null)
-                gameDatabase.LoadData(this);
-            else
-                LoadDataFromResources();
-        }
-
-        public void LoadDataFromResources()
-        {
-            // Use Resources Load Async ?
-            BaseGameData[] gameDataList = Resources.LoadAll<BaseGameData>("");
-            BaseCharacterEntity[] characterEntityList = Resources.LoadAll<BaseCharacterEntity>("");
-
-            List<Attribute> attributes = new List<Attribute>();
-            List<DamageElement> damageElements = new List<DamageElement>();
-            List<Item> items = new List<Item>();
-            List<Skill> skills = new List<Skill>();
-            List<NpcDialog> npcDialogs = new List<NpcDialog>();
-            List<Quest> quests = new List<Quest>();
-            List<GuildSkill> guildSkills = new List<GuildSkill>();
-            List<PlayerCharacter> playerCharacters = new List<PlayerCharacter>();
-            List<MonsterCharacter> monsterCharacters = new List<MonsterCharacter>();
-            List<BasePlayerCharacterEntity> playerCharacterEntities = new List<BasePlayerCharacterEntity>();
-            List<BaseMonsterCharacterEntity> monsterCharacterEntities = new List<BaseMonsterCharacterEntity>();
-            List<MapInfo> mapInfos = new List<MapInfo>();
-
-            // Filtering game data
-            foreach (BaseGameData gameData in gameDataList)
-            {
-                if (gameData is Attribute)
-                    attributes.Add(gameData as Attribute);
-                if (gameData is DamageElement)
-                    damageElements.Add(gameData as DamageElement);
-                if (gameData is Item)
-                    items.Add(gameData as Item);
-                if (gameData is Skill)
-                    skills.Add(gameData as Skill);
-                if (gameData is NpcDialog)
-                    npcDialogs.Add(gameData as NpcDialog);
-                if (gameData is Quest)
-                    quests.Add(gameData as Quest);
-                if (gameData is GuildSkill)
-                    guildSkills.Add(gameData as GuildSkill);
-                if (gameData is PlayerCharacter)
-                    playerCharacters.Add(gameData as PlayerCharacter);
-                if (gameData is MonsterCharacter)
-                    monsterCharacters.Add(gameData as MonsterCharacter);
-                if (gameData is MapInfo)
-                    mapInfos.Add(gameData as MapInfo);
-            }
-
-            // Filtering character entity
-            foreach (BaseCharacterEntity characterEntity in characterEntityList)
-            {
-                if (characterEntity is BasePlayerCharacterEntity)
-                    playerCharacterEntities.Add(characterEntity as BasePlayerCharacterEntity);
-                if (characterEntity is BaseMonsterCharacterEntity)
-                    monsterCharacterEntities.Add(characterEntity as BaseMonsterCharacterEntity);
-            }
-            items.Add(DefaultWeaponItem);
-            damageElements.Add(DefaultDamageElement);
-
-            AddAttributes(attributes);
-            AddItems(items);
-            AddWeaponTypes(new WeaponType[] { DefaultWeaponType });
-            AddSkills(skills);
-            AddNpcDialogs(npcDialogs);
-            AddQuests(quests);
-            AddGuildSkills(guildSkills);
-            AddCharacters(playerCharacters);
-            AddCharacters(monsterCharacters);
-            AddCharacterEntities(playerCharacterEntities);
-            AddCharacterEntities(monsterCharacterEntities);
-            AddMapInfos(mapInfos);
-
-            List<GameEffectCollection> weaponHitEffects = new List<GameEffectCollection>();
-            foreach (DamageElement damageElement in damageElements)
-            {
-                if (damageElement.hitEffects != null)
-                    weaponHitEffects.Add(damageElement.hitEffects);
-            }
-            AddGameEffectCollections(weaponHitEffects);
-
-            // Loaded game data from Resources
-            LoadedGameData();
+            GameDatabase.LoadData(this);
         }
 
         public void LoadedGameData()
