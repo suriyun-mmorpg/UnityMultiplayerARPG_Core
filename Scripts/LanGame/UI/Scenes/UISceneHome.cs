@@ -8,7 +8,6 @@ namespace MultiplayerARPG
     {
         public UILanConnection uiLanConnection;
         public UICharacterList uiCharacterList;
-        public UICharacterCreate uiCharacterCreate;
 
         public void OnClickSinglePlayer()
         {
