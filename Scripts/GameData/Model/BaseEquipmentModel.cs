@@ -18,7 +18,8 @@ public abstract class BaseEquipmentModel : MonoBehaviour
         }
     }
 
-    public Transform overrideMissileBarrel;
+    [Tooltip("This is overriding missile damage transform, if this is not empty, it will spawn missile damage entity from this transform")]
+    public Transform missileDamageTransform;
 
     public abstract void OnLevelChanged(int level);
 }

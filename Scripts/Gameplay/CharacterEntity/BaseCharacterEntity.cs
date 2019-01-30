@@ -27,19 +27,19 @@ namespace MultiplayerARPG
         public BaseCharacter database;
         [HideInInspector]
         // TODO: This will be removed later
-        public Transform meleeDamageTransform;
-        [HideInInspector]
-        // TODO: This will be removed later
-        public Transform missileDamageTransform;
-        [HideInInspector]
-        // TODO: This will be removed later
         public Transform uiElementTransform;
         [HideInInspector]
         // TODO: This will be removed later
         public Transform miniMapElementContainer;
 
         [Header("Character Settings")]
+        [Tooltip("When character attack with melee weapon, it will cast sphere from this transform to detect hit objects")]
+        public Transform meleeDamageTransform;
+        [Tooltip("When character attack with range weapon, it will spawn missile damage entity from this transform")]
+        public Transform missileDamageTransform;
+        [Tooltip("Character UI will instantiates to this transform")]
         public Transform characterUITransform;
+        [Tooltip("Mini Map UI will instantiates to this transform")]
         public Transform miniMapUITransform;
         #endregion
 
@@ -976,19 +976,16 @@ namespace MultiplayerARPG
         {
             position = CacheTransform.position;
             rotation = CacheTransform.rotation;
-            if (CharacterModel != null)
+            switch (damageType)
             {
-                switch (damageType)
-                {
-                    case DamageType.Melee:
-                        position = MeleeDamageTransform.position;
-                        rotation = MeleeDamageTransform.rotation;
-                        break;
-                    case DamageType.Missile:
-                        position = MissileDamageTransform.position;
-                        rotation = MissileDamageTransform.rotation;
-                        break;
-                }
+                case DamageType.Melee:
+                    position = MeleeDamageTransform.position;
+                    rotation = MeleeDamageTransform.rotation;
+                    break;
+                case DamageType.Missile:
+                    position = MissileDamageTransform.position;
+                    rotation = MissileDamageTransform.rotation;
+                    break;
             }
         }
 
