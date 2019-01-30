@@ -65,6 +65,8 @@ namespace MultiplayerARPG
         protected int tempOverlapSize;
         protected int tempLoopCounter;
         protected GameObject tempGameObject;
+        protected Transform rightHandMissileDamageTransform;
+        protected Transform leftHandMissileDamageTransform;
         #endregion
 
         #region Caches Data
@@ -1165,11 +1167,15 @@ namespace MultiplayerARPG
 
         public virtual Vector3 GetSummonPosition()
         {
+            if (gameInstance.DimensionType == DimensionType.Dimension2D)
+                return CacheTransform.position + new Vector3(Random.Range(gameInstance.minSummonDistance, gameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive(), Random.Range(gameInstance.minSummonDistance, gameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive(), 0f);
             return CacheTransform.position + new Vector3(Random.Range(gameInstance.minSummonDistance, gameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive(), 0f, Random.Range(gameInstance.minSummonDistance, gameInstance.maxSummonDistance) * GenericUtils.GetNegativePositive());
         }
 
         public virtual Quaternion GetSummonRotation()
         {
+            if (gameInstance.DimensionType == DimensionType.Dimension2D)
+                return Quaternion.identity;
             return CacheTransform.rotation;
         }
 
