@@ -12,12 +12,12 @@ namespace MultiplayerARPG
         public System.Action onRespawn;
         public System.Action onLevelUp;
 
-        protected void NetFuncAttack()
+        protected void NetFuncAttackWithoutAimPosition()
         {
             NetFuncAttack(false, Vector3.zero);
         }
 
-        protected void NetFuncAttack(Vector3 aimPosition)
+        protected void NetFuncAttackWithAimPosition(Vector3 aimPosition)
         {
             NetFuncAttack(true, aimPosition);
         }
@@ -92,12 +92,12 @@ namespace MultiplayerARPG
             isAttackingOrUsingSkill = false;
         }
 
-        protected void NetFuncUseSkill(int dataId)
+        protected void NetFuncUseSkillWithoutAimPosition(int dataId)
         {
             NetFuncUseSkill(false, dataId, Vector3.zero);
         }
 
-        protected void NetFuncUseSkill(int dataId, Vector3 aimPosition)
+        protected void NetFuncUseSkillWithAimPosition(int dataId, Vector3 aimPosition)
         {
             NetFuncUseSkill(true, dataId, aimPosition);
         }
