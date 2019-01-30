@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseCharacterModel : RpgEntityModel
+    public abstract class BaseCharacterModel : GameEntityModel
     {
         [Header("Equipment Containers")]
         public EquipmentModelContainer[] equipmentContainers;

@@ -41,13 +41,13 @@ namespace MultiplayerARPG
             }
         }
 
-        private RpgEntityModel model;
-        public RpgEntityModel Model
+        private GameEntityModel model;
+        public GameEntityModel Model
         {
             get
             {
                 if (model == null)
-                    model = GetComponent<RpgEntityModel>();
+                    model = GetComponent<GameEntityModel>();
                 return model;
             }
         }

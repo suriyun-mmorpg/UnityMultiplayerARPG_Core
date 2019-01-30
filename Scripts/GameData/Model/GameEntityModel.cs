@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public class RpgEntityModel : MonoBehaviour
+    public class GameEntityModel : MonoBehaviour
     {
         [SerializeField]
         private int dataId;
