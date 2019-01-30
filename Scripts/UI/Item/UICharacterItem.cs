@@ -255,7 +255,7 @@ namespace MultiplayerARPG
                 else
                     stackString = string.Format(stackFormat, CharacterItem.amount.ToString("N0"), Item.maxStack);
                 uiTextStack.text = stackString;
-                uiTextStack.gameObject.SetActive(showAmountWhenMaxIsOne || Item.maxStack > 1);
+                uiTextStack.gameObject.SetActive(showAmountWhenMaxIsOne || (Item != null && Item.maxStack > 1));
             }
 
             if (uiTextDurability != null)
