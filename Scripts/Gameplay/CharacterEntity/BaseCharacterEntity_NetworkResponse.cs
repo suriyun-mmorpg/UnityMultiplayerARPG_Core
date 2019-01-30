@@ -37,6 +37,7 @@ namespace MultiplayerARPG
             AnimActionType animActionType;
             int dataId;
             int animationIndex;
+            bool isLeftHand;
             CharacterItem weapon;
             float triggerDuration;
             float totalDuration;
@@ -47,6 +48,7 @@ namespace MultiplayerARPG
                 out animActionType,
                 out dataId,
                 out animationIndex,
+                out isLeftHand,
                 out weapon,
                 out triggerDuration,
                 out totalDuration,
@@ -75,19 +77,21 @@ namespace MultiplayerARPG
 
             // Start attack routine
             isAttackingOrUsingSkill = true;
-            StartCoroutine(AttackRoutine(CacheTransform.position, triggerDuration, totalDuration, weapon, damageInfo, allDamageAmounts));
+            StartCoroutine(AttackRoutine(hasAimPosition, aimPosition, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts));
         }
 
         private IEnumerator AttackRoutine(
-            Vector3 position,
+            bool hasAimPosition,
+            Vector3 aimPosition,
             float triggerDuration,
             float totalDuration,
+            bool isLeftHand,
             CharacterItem weapon,
             DamageInfo damageInfo,
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
             yield return new WaitForSecondsRealtime(triggerDuration);
-            LaunchDamageEntity(position, weapon, damageInfo, allDamageAmounts, CharacterBuff.Empty, 0);
+            LaunchDamageEntity(hasAimPosition, aimPosition, isLeftHand, weapon, damageInfo, allDamageAmounts, CharacterBuff.Empty, 0);
             yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
             isAttackingOrUsingSkill = false;
         }
@@ -125,6 +129,7 @@ namespace MultiplayerARPG
             AnimActionType animActionType;
             int animationIndex;
             SkillAttackType skillAttackType;
+            bool isLeftHand;
             CharacterItem weapon;
             float triggerDuration;
             float totalDuration;
@@ -137,6 +142,7 @@ namespace MultiplayerARPG
                 out dataId,
                 out animationIndex,
                 out skillAttackType,
+                out isLeftHand,
                 out weapon,
                 out triggerDuration,
                 out totalDuration,
@@ -165,15 +171,17 @@ namespace MultiplayerARPG
 
             // Start use skill routine
             isAttackingOrUsingSkill = true;
-            StartCoroutine(UseSkillRoutine(characterSkill, aimPosition, triggerDuration, totalDuration, skillAttackType, weapon, damageInfo, allDamageAmounts));
+            StartCoroutine(UseSkillRoutine(characterSkill, hasAimPosition, aimPosition, triggerDuration, totalDuration, skillAttackType, isLeftHand, weapon, damageInfo, allDamageAmounts));
         }
 
         private IEnumerator UseSkillRoutine(
             CharacterSkill characterSkill,
-            Vector3 position,
+            bool hasAimPosition,
+            Vector3 aimPosition,
             float triggerDuration,
             float totalDuration,
             SkillAttackType skillAttackType,
+            bool isLeftHand,
             CharacterItem weapon,
             DamageInfo damageInfo,
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
@@ -184,7 +192,7 @@ namespace MultiplayerARPG
             skillUsages.Add(newSkillUsage);
 
             yield return new WaitForSecondsRealtime(triggerDuration);
-            ApplySkill(characterSkill, position, skillAttackType, weapon, damageInfo, allDamageAmounts);
+            ApplySkill(characterSkill, hasAimPosition, aimPosition, skillAttackType, isLeftHand, weapon, damageInfo, allDamageAmounts);
             yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
             isAttackingOrUsingSkill = false;
         }

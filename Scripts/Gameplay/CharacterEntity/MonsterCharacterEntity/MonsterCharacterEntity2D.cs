@@ -63,7 +63,7 @@ namespace MultiplayerARPG
             return (angle < 180 + halfFov && angle > 180 - halfFov);
         }
 
-        protected override void GetDamagePositionAndRotation(DamageType damageType, out Vector3 position, out Quaternion rotation)
+        protected override void GetDamagePositionAndRotation(DamageType damageType, bool hasAimPosition, Vector3 aimPosition, bool isLeftHand, out Vector3 position, out Quaternion rotation)
         {
             position = CacheTransform.position;
             if (CharacterModel != null)

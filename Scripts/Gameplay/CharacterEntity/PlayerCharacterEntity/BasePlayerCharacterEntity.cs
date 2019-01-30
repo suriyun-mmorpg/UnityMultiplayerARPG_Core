@@ -89,9 +89,9 @@ namespace MultiplayerARPG
             return hasChanges;
         }
 
-        protected override void ApplySkill(CharacterSkill characterSkill, Vector3 position, SkillAttackType skillAttackType, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
+        protected override void ApplySkill(CharacterSkill characterSkill, bool hasAimPosition, Vector3 aimPosition, SkillAttackType skillAttackType, bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
-            base.ApplySkill(characterSkill, position, skillAttackType, weapon, damageInfo, allDamageAmounts);
+            base.ApplySkill(characterSkill, hasAimPosition, aimPosition, skillAttackType, isLeftHand, weapon, damageInfo, allDamageAmounts);
 
             Skill skill = characterSkill.GetSkill();
             switch (skill.skillType)

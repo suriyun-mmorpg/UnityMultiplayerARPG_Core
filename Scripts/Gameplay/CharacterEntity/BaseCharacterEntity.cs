@@ -636,7 +636,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void ApplySkill(CharacterSkill characterSkill, Vector3 position, SkillAttackType skillAttackType, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
+        protected virtual void ApplySkill(CharacterSkill characterSkill, bool hasAimPosition, Vector3 aimPosition, SkillAttackType skillAttackType, bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
             Skill skill = characterSkill.GetSkill();
             switch (skill.skillType)
@@ -649,7 +649,7 @@ namespace MultiplayerARPG
                         CharacterBuff debuff = CharacterBuff.Empty;
                         if (skill.isDebuff)
                             debuff = CharacterBuff.Create(BuffType.SkillDebuff, skill.DataId, characterSkill.level);
-                        LaunchDamageEntity(position, weapon, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id);
+                        LaunchDamageEntity(hasAimPosition, aimPosition, isLeftHand, weapon, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id);
                     }
                     break;
             }
@@ -659,6 +659,7 @@ namespace MultiplayerARPG
             out AnimActionType animActionType,
             out int dataId,
             out int animationIndex,
+            out bool isLeftHand,
             out CharacterItem weapon,
             out float triggerDuration,
             out float totalDuration,
@@ -669,13 +670,13 @@ namespace MultiplayerARPG
             animActionType = AnimActionType.None;
             dataId = 0;
             animationIndex = 0;
+            isLeftHand = false;
             weapon = null;
             triggerDuration = 0f;
             totalDuration = 0f;
             damageInfo = null;
             allDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
             // Prepare weapon data
-            bool isLeftHand;
             weapon = this.GetRandomedWeapon(out isLeftHand);
             Item weaponItem = weapon.GetWeaponItem();
             WeaponType weaponType = weaponItem.WeaponType;
@@ -705,6 +706,7 @@ namespace MultiplayerARPG
             out int dataId,
             out int animationIndex,
             out SkillAttackType skillAttackType,
+            out bool isLeftHand,
             out CharacterItem weapon,
             out float triggerDuration,
             out float totalDuration,
@@ -716,6 +718,7 @@ namespace MultiplayerARPG
             dataId = 0;
             animationIndex = 0;
             skillAttackType = SkillAttackType.None;
+            isLeftHand = false;
             weapon = null;
             triggerDuration = 0f;
             totalDuration = 0f;
@@ -727,7 +730,6 @@ namespace MultiplayerARPG
                 return;
             // Prepare weapon data
             skillAttackType = skill.skillAttackType;
-            bool isLeftHand;
             weapon = this.GetRandomedWeapon(out isLeftHand);
             Item weaponItem = weapon.GetWeaponItem();
             WeaponType weaponType = weaponItem.WeaponType;
@@ -879,7 +881,9 @@ namespace MultiplayerARPG
         }
 
         public virtual void LaunchDamageEntity(
-            Vector3 position,
+            bool hasAimPosition,
+            Vector3 aimPosition,
+            bool isLeftHand,
             CharacterItem weapon,
             DamageInfo damageInfo,
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
@@ -892,7 +896,7 @@ namespace MultiplayerARPG
             IDamageableEntity tempDamageableEntity = null;
             Vector3 damagePosition;
             Quaternion damageRotation;
-            GetDamagePositionAndRotation(damageInfo.damageType, out damagePosition, out damageRotation);
+            GetDamagePositionAndRotation(damageInfo.damageType, hasAimPosition, aimPosition, isLeftHand, out damagePosition, out damageRotation);
             switch (damageInfo.damageType)
             {
                 case DamageType.Melee:
@@ -974,21 +978,33 @@ namespace MultiplayerARPG
             return (angle < 180 + halfFov && angle > 180 - halfFov);
         }
 
-        protected virtual void GetDamagePositionAndRotation(DamageType damageType, out Vector3 position, out Quaternion rotation)
+        protected virtual void GetDamagePositionAndRotation(DamageType damageType, bool hasAimPosition, Vector3 aimPosition, bool isLeftHand, out Vector3 position, out Quaternion rotation)
         {
             position = CacheTransform.position;
-            rotation = CacheTransform.rotation;
             switch (damageType)
             {
                 case DamageType.Melee:
                     position = MeleeDamageTransform.position;
-                    rotation = MeleeDamageTransform.rotation;
                     break;
                 case DamageType.Missile:
-                    position = MissileDamageTransform.position;
-                    rotation = MissileDamageTransform.rotation;
+                    if (rightHandMissileDamageTransform != null && !isLeftHand)
+                    {
+                        // Use position from right hand weapon missile damage transform
+                        position = rightHandMissileDamageTransform.position;
+                    }
+                    else if (leftHandMissileDamageTransform != null && isLeftHand)
+                    {
+                        // Use position from left hand weapon missile damage transform
+                        position = leftHandMissileDamageTransform.position;
+                    }
+                    else
+                    {
+                        // Use position from default missile damage transform
+                        position = MissileDamageTransform.position;
+                    }
                     break;
             }
+            rotation = Quaternion.LookRotation(CacheTransform.forward, CacheTransform.up);
         }
 
         public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)
