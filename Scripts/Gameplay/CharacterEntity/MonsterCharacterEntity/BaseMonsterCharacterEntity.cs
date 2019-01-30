@@ -17,6 +17,7 @@ namespace MultiplayerARPG
         [Header("Monster Character Settings")]
         public MonsterCharacter monsterCharacter;
 
+        [Header("Monster Character - Sync Fields")]
         [SerializeField]
         protected SyncFieldPackedUInt summonerObjectId = new SyncFieldPackedUInt();
         [SerializeField]
@@ -58,7 +59,7 @@ namespace MultiplayerARPG
                     summonerObjectId.Value = summoner != null ? summoner.ObjectId : 0;
             }
         }
-
+        
         public SummonType SummonType { get { return (SummonType)summonType.Value; } protected set { summonType.Value = (byte)value; } }
         public bool IsSummoned { get { return SummonType != SummonType.None; } }
 
@@ -170,7 +171,7 @@ namespace MultiplayerARPG
                 foreach (GameObject obj in gameInstance.monsterCharacterMiniMapObjects)
                 {
                     if (obj == null) continue;
-                    Instantiate(obj, MiniMapElementContainer.position, MiniMapElementContainer.rotation, MiniMapElementContainer);
+                    Instantiate(obj, MiniMapUITransform.position, MiniMapUITransform.rotation, MiniMapUITransform);
                 }
             }
 

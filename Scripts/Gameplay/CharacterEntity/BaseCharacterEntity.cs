@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -22,16 +25,22 @@ namespace MultiplayerARPG
         [HideInInspector]
         // TODO: This will be made as private variable later
         public BaseCharacter database;
-        [Header("Settings")]
-        [Tooltip("These objects will be hidden on non owner objects")]
-        public GameObject[] ownerObjects;
-        [Tooltip("These objects will be hidden on owner objects")]
-        public GameObject[] nonOwnerObjects;
-        [Header("UI / Damage transform")]
+        [HideInInspector]
+        // TODO: This will be removed later
         public Transform meleeDamageTransform;
+        [HideInInspector]
+        // TODO: This will be removed later
         public Transform missileDamageTransform;
+        [HideInInspector]
+        // TODO: This will be removed later
         public Transform uiElementTransform;
+        [HideInInspector]
+        // TODO: This will be removed later
         public Transform miniMapElementContainer;
+
+        [Header("Character Settings")]
+        public Transform characterUITransform;
+        public Transform miniMapUITransform;
         #endregion
 
         #region Protected data
@@ -126,23 +135,23 @@ namespace MultiplayerARPG
             }
         }
 
-        public Transform UIElementTransform
+        public Transform CharacterUITransform
         {
             get
             {
-                if (uiElementTransform == null)
-                    uiElementTransform = CacheTransform;
-                return uiElementTransform;
+                if (characterUITransform == null)
+                    characterUITransform = CacheTransform;
+                return characterUITransform;
             }
         }
 
-        public Transform MiniMapElementContainer
+        public Transform MiniMapUITransform
         {
             get
             {
-                if (miniMapElementContainer == null)
-                    miniMapElementContainer = CacheTransform;
-                return miniMapElementContainer;
+                if (miniMapUITransform == null)
+                    miniMapUITransform = CacheTransform;
+                return miniMapUITransform;
             }
         }
 
@@ -152,21 +161,34 @@ namespace MultiplayerARPG
             gameObject.layer = gameInstance.characterLayer;
             animActionType = AnimActionType.None;
             isRecaching = true;
+            MigrateTransforms();
         }
 
-        protected override void EntityOnSetOwnerClient()
+        protected override void OnValidate()
         {
-            base.EntityOnSetOwnerClient();
-            foreach (GameObject ownerObject in ownerObjects)
+            base.OnValidate();
+#if UNITY_EDITOR
+            if (MigrateTransforms())
+                EditorUtility.SetDirty(this);
+#endif
+        }
+
+        private bool MigrateTransforms()
+        {
+            bool hasChanges = false;
+            if (uiElementTransform != null)
             {
-                if (ownerObject == null) continue;
-                ownerObject.SetActive(IsOwnerClient);
+                characterUITransform = uiElementTransform;
+                uiElementTransform = null;
+                hasChanges = true;
             }
-            foreach (GameObject nonOwnerObject in nonOwnerObjects)
+            if (miniMapElementContainer != null)
             {
-                if (nonOwnerObject == null) continue;
-                nonOwnerObject.SetActive(!IsOwnerClient);
+                miniMapUITransform = miniMapElementContainer;
+                miniMapElementContainer = null;
+                hasChanges = true;
             }
+            return hasChanges;
         }
 
         protected override void EntityUpdate()
@@ -1041,7 +1063,7 @@ namespace MultiplayerARPG
                 return;
             if (uiCharacterEntity != null)
                 Destroy(uiCharacterEntity.gameObject);
-            uiCharacterEntity = Instantiate(prefab, UIElementTransform);
+            uiCharacterEntity = Instantiate(prefab, CharacterUITransform);
             uiCharacterEntity.transform.localPosition = Vector3.zero;
             uiCharacterEntity.Data = this;
         }

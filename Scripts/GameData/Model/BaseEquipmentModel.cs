@@ -18,5 +18,7 @@ public abstract class BaseEquipmentModel : MonoBehaviour
         }
     }
 
+    public Transform overrideMissileBarrel;
+
     public abstract void OnLevelChanged(int level);
 }

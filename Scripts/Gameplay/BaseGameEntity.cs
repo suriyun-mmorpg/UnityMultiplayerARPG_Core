@@ -13,9 +13,14 @@ namespace MultiplayerARPG
 {
     public abstract class BaseGameEntity : LiteNetLibBehaviour
     {
+        [Header("Game Entity Settings")]
         [SerializeField]
         private string title;
         public Text textTitle;
+        [Tooltip("These objects will be hidden on non owner objects")]
+        public GameObject[] ownerObjects;
+        [Tooltip("These objects will be hidden on owner objects")]
+        public GameObject[] nonOwnerObjects;
 
         [SerializeField]
         protected SyncFieldString syncTitle = new SyncFieldString();
@@ -86,7 +91,19 @@ namespace MultiplayerARPG
             EntityOnSetOwnerClient();
             this.InvokeInstanceDevExtMethods("OnSetOwnerClient");
         }
-        protected virtual void EntityOnSetOwnerClient() { }
+        protected virtual void EntityOnSetOwnerClient()
+        {
+            foreach (GameObject ownerObject in ownerObjects)
+            {
+                if (ownerObject == null) continue;
+                ownerObject.SetActive(IsOwnerClient);
+            }
+            foreach (GameObject nonOwnerObject in nonOwnerObjects)
+            {
+                if (nonOwnerObject == null) continue;
+                nonOwnerObject.SetActive(!IsOwnerClient);
+            }
+        }
 
         private void OnEnable()
         {
