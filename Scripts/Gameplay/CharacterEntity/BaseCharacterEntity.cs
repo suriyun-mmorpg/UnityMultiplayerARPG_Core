@@ -16,7 +16,7 @@ namespace MultiplayerARPG
     {
         public const float ACTION_COMMAND_DELAY = 0.2f;
         public const int OVERLAP_COLLIDER_SIZE = 32;
-
+        
         [HideInInspector, System.NonSerialized]
         // This will be TRUE when this character enter to safe area
         public bool isInSafeArea;
@@ -62,8 +62,8 @@ namespace MultiplayerARPG
         #region Temp data
         protected Collider[] overlapColliders = new Collider[OVERLAP_COLLIDER_SIZE];
         protected Collider2D[] overlapColliders2D = new Collider2D[OVERLAP_COLLIDER_SIZE];
-        protected int overlapSize;
-        protected int counter;
+        protected int tempOverlapSize;
+        protected int tempLoopCounter;
         protected GameObject tempGameObject;
         #endregion
 
@@ -898,8 +898,8 @@ namespace MultiplayerARPG
                     {
                         if (!TryGetTargetEntity(out tempDamageableEntity))
                         {
-                            overlapSize = OverlapObjects(damagePosition, damageInfo.hitDistance, gameInstance.GetDamageableLayerMask());
-                            if (overlapSize == 0)
+                            tempOverlapSize = OverlapObjects(damagePosition, damageInfo.hitDistance, gameInstance.GetDamageableLayerMask());
+                            if (tempOverlapSize == 0)
                                 return;
                             // Target entity not set, use overlapped object as target
                             tempGameObject = GetOverlapObject(0);
@@ -916,12 +916,12 @@ namespace MultiplayerARPG
                     }
                     else
                     {
-                        overlapSize = OverlapObjects(damagePosition, damageInfo.hitDistance, gameInstance.GetDamageableLayerMask());
-                        if (overlapSize == 0)
+                        tempOverlapSize = OverlapObjects(damagePosition, damageInfo.hitDistance, gameInstance.GetDamageableLayerMask());
+                        if (tempOverlapSize == 0)
                             return;
-                        for (counter = 0; counter < overlapSize; ++counter)
+                        for (tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
                         {
-                            tempGameObject = GetOverlapObject(counter);
+                            tempGameObject = GetOverlapObject(tempLoopCounter);
                             tempDamageableEntity = tempGameObject.GetComponent<DamageableEntity>();
                             // Target receive damage
                             if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() &&
@@ -1089,13 +1089,13 @@ namespace MultiplayerARPG
             where T : BaseCharacterEntity
         {
             List<T> result = new List<T>();
-            overlapSize = OverlapObjects(CacheTransform.position, distance, gameInstance.characterLayer.Mask);
-            if (overlapSize == 0)
+            tempOverlapSize = OverlapObjects(CacheTransform.position, distance, gameInstance.characterLayer.Mask);
+            if (tempOverlapSize == 0)
                 return null;
             T tempEntity;
-            for (counter = 0; counter < overlapSize; ++counter)
+            for (tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
             {
-                tempGameObject = GetOverlapObject(counter);
+                tempGameObject = GetOverlapObject(tempLoopCounter);
                 tempEntity = tempGameObject.GetComponent<T>();
                 if (!IsCharacterWhichLookingFor(tempEntity, findForAliveOnly, findForAlly, findForEnemy, findForNeutral))
                     continue;
@@ -1113,16 +1113,16 @@ namespace MultiplayerARPG
         public T FindNearestCharacter<T>(float distance, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral)
             where T : BaseCharacterEntity
         {
-            overlapSize = OverlapObjects(CacheTransform.position, distance, gameInstance.characterLayer.Mask);
-            if (overlapSize == 0)
+            tempOverlapSize = OverlapObjects(CacheTransform.position, distance, gameInstance.characterLayer.Mask);
+            if (tempOverlapSize == 0)
                 return null;
             float tempDistance;
             T tempEntity;
             float nearestDistance = float.MaxValue;
             T nearestEntity = null;
-            for (counter = 0; counter < overlapSize; ++counter)
+            for (tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
             {
-                tempGameObject = GetOverlapObject(counter);
+                tempGameObject = GetOverlapObject(tempLoopCounter);
                 tempEntity = tempGameObject.GetComponent<T>();
                 if (!IsCharacterWhichLookingFor(tempEntity, findForAliveOnly, findForAlly, findForEnemy, findForNeutral))
                     continue;
