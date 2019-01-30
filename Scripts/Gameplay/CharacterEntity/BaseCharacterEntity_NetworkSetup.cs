@@ -61,7 +61,9 @@ namespace MultiplayerARPG
             summons.onOperation += OnSummonsOperation;
             // Register Network functions
             RegisterNetFunction(NetFuncAttack);
-            RegisterNetFunction<Vector3, int>(NetFuncUseSkill);
+            RegisterNetFunction<Vector3>(NetFuncAttack);
+            RegisterNetFunction<int>(NetFuncUseSkill);
+            RegisterNetFunction<int, Vector3>(NetFuncUseSkill);
             RegisterNetFunction<short>(NetFuncUseItem);
             RegisterNetFunction<byte, int, byte>(NetFuncPlayActionAnimation);
             RegisterNetFunction<PackedUInt>(NetFuncPickupItem);

@@ -39,7 +39,7 @@ namespace MultiplayerARPG
         protected BaseGameEntity targetEntity;
         protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
         protected AnimActionType animActionType;
-        protected float lastActionCommandReceivedTime;
+        protected bool isAttackingOrUsingSkill;
         /// <summary>
         /// This variable will be TRUE when cache data have to re-cache
         /// </summary>

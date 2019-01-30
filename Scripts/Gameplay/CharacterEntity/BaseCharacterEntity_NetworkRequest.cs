@@ -14,11 +14,25 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncAttack, FunctionReceivers.Server);
         }
 
-        public virtual void RequestUseSkill(Vector3 position, int dataId)
+        public virtual void RequestAttack(Vector3 aimPosition)
         {
             if (!CanMoveOrDoActions())
                 return;
-            CallNetFunction(NetFuncUseSkill, FunctionReceivers.Server, position, dataId);
+            CallNetFunction(NetFuncAttack, FunctionReceivers.Server, aimPosition);
+        }
+
+        public virtual void RequestUseSkill(int dataId)
+        {
+            if (!CanMoveOrDoActions())
+                return;
+            CallNetFunction(NetFuncUseSkill, FunctionReceivers.Server, dataId);
+        }
+
+        public virtual void RequestUseSkill(int dataId, Vector3 aimPosition)
+        {
+            if (!CanMoveOrDoActions())
+                return;
+            CallNetFunction(NetFuncUseSkill, FunctionReceivers.Server, dataId, aimPosition);
         }
 
         public virtual void RequestUseItem(short index)

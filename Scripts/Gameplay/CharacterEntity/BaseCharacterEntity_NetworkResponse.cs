@@ -12,14 +12,23 @@ namespace MultiplayerARPG
         public System.Action onRespawn;
         public System.Action onLevelUp;
 
+        protected void NetFuncAttack()
+        {
+            NetFuncAttack(false, Vector3.zero);
+        }
+
+        protected void NetFuncAttack(Vector3 aimPosition)
+        {
+            NetFuncAttack(true, aimPosition);
+        }
+
         /// <summary>
         /// Is function will be called at server to order character to attack
         /// </summary>
-        protected virtual void NetFuncAttack()
+        protected virtual void NetFuncAttack(bool hasAimPosition, Vector3 aimPosition)
         {
-            if (Time.unscaledTime - lastActionCommandReceivedTime < ACTION_COMMAND_DELAY)
+            if (isAttackingOrUsingSkill)
                 return;
-            lastActionCommandReceivedTime = Time.unscaledTime;
 
             if (!CanMoveOrDoActions())
                 return;
@@ -65,6 +74,7 @@ namespace MultiplayerARPG
             RequestPlayActionAnimation(animActionType, dataId, (byte)animationIndex);
 
             // Start attack routine
+            isAttackingOrUsingSkill = true;
             StartCoroutine(AttackRoutine(CacheTransform.position, triggerDuration, totalDuration, weapon, damageInfo, allDamageAmounts));
         }
 
@@ -79,18 +89,26 @@ namespace MultiplayerARPG
             yield return new WaitForSecondsRealtime(triggerDuration);
             LaunchDamageEntity(position, weapon, damageInfo, allDamageAmounts, CharacterBuff.Empty, 0);
             yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
+            isAttackingOrUsingSkill = false;
+        }
+
+        protected void NetFuncUseSkill(int dataId)
+        {
+            NetFuncUseSkill(false, dataId, Vector3.zero);
+        }
+
+        protected void NetFuncUseSkill(int dataId, Vector3 aimPosition)
+        {
+            NetFuncUseSkill(true, dataId, aimPosition);
         }
 
         /// <summary>
         /// Is function will be called at server to order character to use skill
         /// </summary>
-        /// <param name="position">Target position to apply skill at</param>
-        /// <param name="dataId">Skill's data id which will be used</param>
-        protected virtual void NetFuncUseSkill(Vector3 position, int dataId)
+        protected virtual void NetFuncUseSkill(bool hasAimPosition, int dataId, Vector3 aimPosition)
         {
-            if (Time.unscaledTime - lastActionCommandReceivedTime < ACTION_COMMAND_DELAY)
+            if (isAttackingOrUsingSkill)
                 return;
-            lastActionCommandReceivedTime = Time.unscaledTime;
 
             if (!CanMoveOrDoActions())
                 return;
@@ -146,7 +164,8 @@ namespace MultiplayerARPG
             RequestPlayActionAnimation(animActionType, dataId, (byte)animationIndex);
 
             // Start use skill routine
-            StartCoroutine(UseSkillRoutine(characterSkill, position, triggerDuration, totalDuration, skillAttackType, weapon, damageInfo, allDamageAmounts));
+            isAttackingOrUsingSkill = true;
+            StartCoroutine(UseSkillRoutine(characterSkill, aimPosition, triggerDuration, totalDuration, skillAttackType, weapon, damageInfo, allDamageAmounts));
         }
 
         private IEnumerator UseSkillRoutine(
@@ -167,6 +186,7 @@ namespace MultiplayerARPG
             yield return new WaitForSecondsRealtime(triggerDuration);
             ApplySkill(characterSkill, position, skillAttackType, weapon, damageInfo, allDamageAmounts);
             yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
+            isAttackingOrUsingSkill = false;
         }
 
         /// <summary>
