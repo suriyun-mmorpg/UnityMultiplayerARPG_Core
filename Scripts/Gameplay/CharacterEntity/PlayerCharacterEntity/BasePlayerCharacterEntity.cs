@@ -291,9 +291,9 @@ namespace MultiplayerARPG
             DealingItems.Clear();
         }
 
-        public override bool CanMoveOrDoActions()
+        public override bool CanDoActions()
         {
-            return base.CanMoveOrDoActions() && DealingState == DealingState.None;
+            return base.CanDoActions() && DealingState == DealingState.None;
         }
 
         public override void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker)

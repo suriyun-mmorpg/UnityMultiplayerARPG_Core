@@ -91,21 +91,21 @@ namespace MultiplayerARPG
 
         public virtual void RequestEnterWarp()
         {
-            if (!CanMoveOrDoActions() || warpingPortal == null)
+            if (!CanDoActions() || warpingPortal == null)
                 return;
             CallNetFunction(NetFuncEnterWarp, FunctionReceivers.Server);
         }
 
         public virtual void RequestBuild(short itemIndex, Vector3 position, Quaternion rotation, uint parentObjectId)
         {
-            if (!CanMoveOrDoActions())
+            if (!CanDoActions())
                 return;
             CallNetFunction(NetFuncBuild, FunctionReceivers.Server, itemIndex, position, rotation, new PackedUInt(parentObjectId));
         }
 
         public virtual void RequestDestroyBuilding(uint objectId)
         {
-            if (!CanMoveOrDoActions())
+            if (!CanDoActions())
                 return;
             CallNetFunction(NetFuncDestroyBuild, FunctionReceivers.Server, new PackedUInt(objectId));
         }

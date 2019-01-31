@@ -22,7 +22,7 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncSwapOrMergeItem(short fromIndex, short toIndex)
         {
-            if (!CanMoveOrDoActions() ||
+            if (!CanDoActions() ||
                 fromIndex >= NonEquipItems.Count ||
                 toIndex >= NonEquipItems.Count)
                 return;
@@ -152,7 +152,7 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncNpcActivate(PackedUInt objectId)
         {
-            if (!CanMoveOrDoActions())
+            if (!CanDoActions())
                 return;
 
             NpcEntity npcEntity = null;
@@ -387,14 +387,14 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncEnterWarp()
         {
-            if (!CanMoveOrDoActions() || warpingPortal == null)
+            if (!CanDoActions() || warpingPortal == null)
                 return;
             warpingPortal.EnterWarp(this);
         }
 
         protected virtual void NetFuncBuild(short itemIndex, Vector3 position, Quaternion rotation, PackedUInt parentObjectId)
         {
-            if (!CanMoveOrDoActions() ||
+            if (!CanDoActions() ||
                 itemIndex >= NonEquipItems.Count)
                 return;
 
@@ -425,7 +425,7 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncDestroyBuild(PackedUInt objectId)
         {
-            if (!CanMoveOrDoActions())
+            if (!CanDoActions())
                 return;
 
             BuildingEntity buildingEntity = null;

@@ -28,10 +28,7 @@ namespace MultiplayerARPG
         /// </summary>
         protected virtual void NetFuncAttack()
         {
-            if (isAttackingOrUsingSkill)
-                return;
-
-            if (!CanMoveOrDoActions())
+            if (!CanDoActions())
                 return;
 
             // Prepare requires data
@@ -102,10 +99,7 @@ namespace MultiplayerARPG
         /// </summary>
         protected virtual void NetFuncUseSkill(int dataId)
         {
-            if (isAttackingOrUsingSkill)
-                return;
-
-            if (!CanMoveOrDoActions())
+            if (!CanDoActions())
                 return;
 
             int index = this.IndexOfSkill(dataId);
@@ -244,7 +238,7 @@ namespace MultiplayerARPG
         /// <param name="objectId"></param>
         protected virtual void NetFuncPickupItem(PackedUInt objectId)
         {
-            if (!CanMoveOrDoActions())
+            if (!CanDoActions())
                 return;
 
             ItemDropEntity itemDropEntity = null;
@@ -278,7 +272,7 @@ namespace MultiplayerARPG
         /// <param name="amount"></param>
         protected virtual void NetFuncDropItem(short index, short amount)
         {
-            if (!CanMoveOrDoActions() ||
+            if (!CanDoActions() ||
                 index >= nonEquipItems.Count)
                 return;
 
@@ -302,7 +296,7 @@ namespace MultiplayerARPG
         /// <param name="equipPosition"></param>
         protected virtual void NetFuncEquipItem(short nonEquipIndex, byte byteInventoryType, short oldEquipIndex)
         {
-            if (!CanMoveOrDoActions() ||
+            if (!CanDoActions() ||
                 nonEquipIndex >= nonEquipItems.Count)
                 return;
 
@@ -349,7 +343,7 @@ namespace MultiplayerARPG
         /// <param name="fromEquipPosition"></param>
         protected virtual void NetFuncUnEquipItem(byte byteInventoryType, short index)
         {
-            if (!CanMoveOrDoActions())
+            if (!CanDoActions())
                 return;
             
             EquipWeapons tempEquipWeapons = EquipWeapons;

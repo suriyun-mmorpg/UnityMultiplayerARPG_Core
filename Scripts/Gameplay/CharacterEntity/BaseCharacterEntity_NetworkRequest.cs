@@ -19,14 +19,14 @@ namespace MultiplayerARPG
 
         public virtual void RequestAttack()
         {
-            if (!CanMoveOrDoActions())
+            if (!CanDoActions())
                 return;
             CallNetFunction(NetFuncAttack, FunctionReceivers.Server);
         }
 
         public virtual void RequestUseSkill(int dataId)
         {
-            if (!CanMoveOrDoActions())
+            if (!CanDoActions())
                 return;
             CallNetFunction(NetFuncUseSkill, FunctionReceivers.Server, dataId);
         }
@@ -47,14 +47,14 @@ namespace MultiplayerARPG
 
         public virtual void RequestPickupItem(uint objectId)
         {
-            if (!CanMoveOrDoActions())
+            if (!CanDoActions())
                 return;
             CallNetFunction(NetFuncPickupItem, FunctionReceivers.Server, new PackedUInt(objectId));
         }
 
         public virtual void RequestDropItem(short nonEquipIndex, short amount)
         {
-            if (!CanMoveOrDoActions() ||
+            if (!CanDoActions() ||
                 nonEquipIndex >= NonEquipItems.Count)
                 return;
             CallNetFunction(NetFuncDropItem, FunctionReceivers.Server, nonEquipIndex, amount);
@@ -62,7 +62,7 @@ namespace MultiplayerARPG
 
         public virtual void RequestEquipItem(short nonEquipIndex)
         {
-            if (!CanMoveOrDoActions() ||
+            if (!CanDoActions() ||
                 nonEquipIndex >= NonEquipItems.Count)
                 return;
             CharacterItem characterItem = NonEquipItems[nonEquipIndex];
@@ -90,7 +90,7 @@ namespace MultiplayerARPG
 
         public virtual void RequestEquipItem(short nonEquipIndex, byte byteInventoryType, short oldEquipIndex)
         {
-            if (!CanMoveOrDoActions() ||
+            if (!CanDoActions() ||
                 nonEquipIndex >= NonEquipItems.Count)
                 return;
             CallNetFunction(NetFuncEquipItem, FunctionReceivers.Server, nonEquipIndex, byteInventoryType, oldEquipIndex);
@@ -98,7 +98,7 @@ namespace MultiplayerARPG
 
         public virtual void RequestUnEquipItem(byte byteInventoryType, short index)
         {
-            if (!CanMoveOrDoActions())
+            if (!CanDoActions())
                 return;
             CallNetFunction(NetFuncUnEquipItem, FunctionReceivers.Server, byteInventoryType, index);
         }
