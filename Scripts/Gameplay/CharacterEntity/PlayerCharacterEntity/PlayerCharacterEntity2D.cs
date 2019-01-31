@@ -124,7 +124,7 @@ namespace MultiplayerARPG
                     tempMoveDirection = tempInputDirection;
 
                 tempMoveDirectionMagnitude = tempMoveDirection.magnitude;
-                if (!IsPlayingActionAnimation() && tempMoveDirectionMagnitude != 0f)
+                if (tempMoveDirectionMagnitude != 0f)
                 {
                     if (tempMoveDirectionMagnitude > 1)
                         tempMoveDirection = tempMoveDirection.normalized;

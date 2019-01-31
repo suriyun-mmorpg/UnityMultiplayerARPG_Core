@@ -215,12 +215,6 @@ namespace MultiplayerARPG
                 controllerMode != PlayerCharacterControllerMode.Both)
                 return;
 
-            if (PlayerCharacterEntity.IsPlayingActionAnimation())
-            {
-                PlayerCharacterEntity.StopMove();
-                return;
-            }
-
             // If mobile platforms, don't receive input raw to make it smooth
             bool raw = !InputManager.useMobileInputOnNonMobile && !Application.isMobilePlatform;
             Vector3 moveDirection = GetMoveDirection(InputManager.GetAxis("Horizontal", raw), InputManager.GetAxis("Vertical", raw));
@@ -269,26 +263,42 @@ namespace MultiplayerARPG
                 BaseCharacterEntity targetEntity;
                 if (wasdLockAttackTarget && !TryGetAttackingCharacter(out targetEntity))
                 {
-                    BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetAttackDistance() + lockAttackTargetDistance, false, true, false);
+                    // Find nearest target and move to the target
+                    BaseCharacterEntity nearestTarget = PlayerCharacterEntity
+                        .FindNearestAliveCharacter<BaseCharacterEntity>(
+                        PlayerCharacterEntity.GetAttackDistance() + lockAttackTargetDistance,
+                        false,
+                        true,
+                        false);
+                    selectedTarget = nearestTarget;
                     if (nearestTarget != null)
                         PlayerCharacterEntity.SetTargetEntity(nearestTarget);
                     else
                         RequestAttack();
                 }
                 else if (!wasdLockAttackTarget)
+                {
+                    // Find nearest target and set selected target to show character hp/mp UIs
+                    BaseCharacterEntity nearestTarget = PlayerCharacterEntity
+                        .FindNearestAliveCharacter<BaseCharacterEntity>(
+                        PlayerCharacterEntity.GetAttackDistance(),
+                        false,
+                        true,
+                        false,
+                        true,
+                        PlayerCharacterEntity.GetAttackFov());
+                    selectedTarget = nearestTarget;
                     RequestAttack();
+                }
             }
             // Move
-            else
+            if (moveDirection.magnitude != 0f)
             {
-                if (moveDirection.magnitude != 0f)
-                {
-                    PlayerCharacterEntity.StopMove();
-                    destination = null;
-                    PlayerCharacterEntity.SetTargetEntity(null);
-                }
-                PlayerCharacterEntity.KeyMovement(moveDirection, InputManager.GetButtonDown("Jump"));
+                PlayerCharacterEntity.StopMove();
+                destination = null;
+                PlayerCharacterEntity.SetTargetEntity(null);
             }
+            PlayerCharacterEntity.KeyMovement(moveDirection, InputManager.GetButtonDown("Jump"));
         }
 
         protected virtual void UpdateBuilding()
@@ -341,12 +351,6 @@ namespace MultiplayerARPG
                     queueUsingSkill = null;
                     PlayerCharacterEntity.StopMove();
                     PlayerCharacterEntity.SetTargetEntity(null);
-                    return;
-                }
-
-                if (PlayerCharacterEntity.IsPlayingActionAnimation())
-                {
-                    PlayerCharacterEntity.StopMove();
                     return;
                 }
 
