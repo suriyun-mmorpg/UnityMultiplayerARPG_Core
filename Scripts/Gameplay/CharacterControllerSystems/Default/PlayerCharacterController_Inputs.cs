@@ -75,7 +75,7 @@ namespace MultiplayerARPG
             UpdateBuilding();
         }
 
-        protected void UpdatePointClickInput()
+        protected virtual void UpdatePointClickInput()
         {
             // If it's building something, not allow point click movement
             if (currentBuildingEntity != null)
@@ -197,7 +197,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void SetTarget(BaseGameEntity entity)
+        protected virtual void SetTarget(BaseGameEntity entity)
         {
             targetPosition = null;
             if (pointClickSetTargetImmediately || selectedTarget == entity)
@@ -209,7 +209,7 @@ namespace MultiplayerARPG
             selectedTarget = entity;
         }
 
-        protected void UpdateWASDInput()
+        protected virtual void UpdateWASDInput()
         {
             if (controllerMode != PlayerCharacterControllerMode.WASD &&
                 controllerMode != PlayerCharacterControllerMode.Both)
@@ -283,15 +283,15 @@ namespace MultiplayerARPG
             {
                 if (moveDirection.magnitude != 0f)
                 {
-                    destination = null;
                     PlayerCharacterEntity.StopMove();
+                    destination = null;
                     PlayerCharacterEntity.SetTargetEntity(null);
                 }
                 PlayerCharacterEntity.KeyMovement(moveDirection, InputManager.GetButtonDown("Jump"));
             }
         }
 
-        protected void UpdateBuilding()
+        protected virtual void UpdateBuilding()
         {
             // Current building UI
             BuildingEntity currentBuilding;

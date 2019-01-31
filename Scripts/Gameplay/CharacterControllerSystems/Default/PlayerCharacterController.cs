@@ -17,9 +17,9 @@ namespace MultiplayerARPG
         {
             public Vector3? aimPosition;
             public int dataId;
-            public UsingSkillData(Vector3? position, int dataId)
+            public UsingSkillData(Vector3? aimPosition, int dataId)
             {
-                this.aimPosition = position;
+                this.aimPosition = aimPosition;
                 this.dataId = dataId;
             }
         }
@@ -236,12 +236,12 @@ namespace MultiplayerARPG
             return moveDirection;
         }
 
-        public void RequestAttack()
+        public virtual void RequestAttack()
         {
             PlayerCharacterEntity.RequestAttack();
         }
 
-        public void RequestUseSkill(int dataId)
+        public virtual void RequestUseSkill(int dataId)
         {
             PlayerCharacterEntity.RequestUseSkill(dataId);
         }
