@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace MultiplayerARPG
 {
@@ -28,6 +29,17 @@ namespace MultiplayerARPG
                 if (cacheCapsuleCollider == null)
                     cacheCapsuleCollider = GetComponent<CapsuleCollider>();
                 return cacheCapsuleCollider;
+            }
+        }
+
+        public override void SetSpawnArea(MonsterSpawnArea spawnArea, Vector3 spawnPosition)
+        {
+            NavMeshHit navHit;
+            if (NavMesh.SamplePosition(spawnPosition, out navHit, spawnArea.randomRadius, -1))
+            {
+                this.spawnArea = spawnArea;
+                this.spawnPosition = navHit.position;
+                GetComponent<NavMeshAgent>().Warp(spawnPosition);
             }
         }
 
