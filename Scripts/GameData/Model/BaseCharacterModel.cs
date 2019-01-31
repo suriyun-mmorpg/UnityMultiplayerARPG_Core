@@ -89,8 +89,17 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void SetEquipWeapons(EquipWeapons equipWeapons)
+        public void SetEquipWeapons(EquipWeapons equipWeapons)
         {
+            Transform tempRightHandMissileDamageTransform = null;
+            Transform tempLeftHandMissileDamageTransform = null;
+            SetEquipWeapons(equipWeapons, out tempRightHandMissileDamageTransform, out tempLeftHandMissileDamageTransform);
+        }
+
+        public virtual void SetEquipWeapons(EquipWeapons equipWeapons, out Transform rightHandMissileDamageTransform, out Transform leftHandMissileDamageTransform)
+        {
+            rightHandMissileDamageTransform = null;
+            leftHandMissileDamageTransform = null;
             Item rightHandWeapon = equipWeapons.rightHand.GetWeaponItem();
             Item leftHandWeapon = equipWeapons.leftHand.GetWeaponItem();
             Item leftHandShield = equipWeapons.leftHand.GetShieldItem();
@@ -113,9 +122,9 @@ namespace MultiplayerARPG
             }
 
             if (rightHandWeapon != null)
-                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandWeapon.equipmentModels, equipWeapons.rightHand.level);
+                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandWeapon.equipmentModels, equipWeapons.rightHand.level, out rightHandMissileDamageTransform);
             if (leftHandWeapon != null)
-                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandWeapon.subEquipmentModels, equipWeapons.leftHand.level);
+                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandWeapon.subEquipmentModels, equipWeapons.leftHand.level, out leftHandMissileDamageTransform);
             if (leftHandShield != null)
                 InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandShield.equipmentModels, equipWeapons.leftHand.level);
         }
@@ -151,8 +160,16 @@ namespace MultiplayerARPG
             }
         }
 
+
         public void InstantiateEquipModel(string equipPosition, EquipmentModel[] equipmentModels, int level)
         {
+            Transform tempMissileDamageTransform;
+            InstantiateEquipModel(equipPosition, equipmentModels, level, out tempMissileDamageTransform);
+        }
+
+        public void InstantiateEquipModel(string equipPosition, EquipmentModel[] equipmentModels, int level, out Transform missileDamageTransform)
+        {
+            missileDamageTransform = null;
             if (equipmentModels == null || equipmentModels.Length == 0)
                 return;
             Dictionary<string, GameObject> models = new Dictionary<string, GameObject>();
@@ -172,7 +189,10 @@ namespace MultiplayerARPG
                 tempEquipmentObject.RemoveComponentsInChildren<Collider>(false);
                 tempEquipmentModel = tempEquipmentObject.GetComponent<BaseEquipmentModel>();
                 if (tempEquipmentModel != null)
+                {
                     tempEquipmentModel.Level = level;
+                    missileDamageTransform = tempEquipmentModel.missileDamageTransform;
+                }
                 AddingNewModel(tempEquipmentObject);
                 models.Add(equipmentModel.equipSocket, tempEquipmentObject);
             }

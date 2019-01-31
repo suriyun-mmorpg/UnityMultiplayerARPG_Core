@@ -67,6 +67,8 @@ namespace MultiplayerARPG
         protected GameObject tempGameObject;
         protected Transform rightHandMissileDamageTransform;
         protected Transform leftHandMissileDamageTransform;
+        protected bool hasAimPosition;
+        protected Vector3 aimPosition;
         #endregion
 
         #region Caches Data
@@ -1004,7 +1006,9 @@ namespace MultiplayerARPG
                     }
                     break;
             }
-            rotation = Quaternion.LookRotation(CacheTransform.forward, CacheTransform.up);
+            rotation = Quaternion.LookRotation(CacheTransform.forward);
+            if (hasAimPosition)
+                rotation = Quaternion.LookRotation(aimPosition);
         }
 
         public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)

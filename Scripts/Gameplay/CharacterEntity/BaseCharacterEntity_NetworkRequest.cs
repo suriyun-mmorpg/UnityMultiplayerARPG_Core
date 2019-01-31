@@ -11,7 +11,7 @@ namespace MultiplayerARPG
         {
             if (!CanMoveOrDoActions())
                 return;
-            CallNetFunction(NetFuncAttackWithoutAimPosition, FunctionReceivers.Server);
+            CallNetFunction(NetFuncAttack, FunctionReceivers.Server);
         }
 
         public virtual void RequestAttack(Vector3 aimPosition)
@@ -25,7 +25,7 @@ namespace MultiplayerARPG
         {
             if (!CanMoveOrDoActions())
                 return;
-            CallNetFunction(NetFuncUseSkillWithoutAimPosition, FunctionReceivers.Server, dataId);
+            CallNetFunction(NetFuncUseSkill, FunctionReceivers.Server, dataId);
         }
 
         public virtual void RequestUseSkill(int dataId, Vector3 aimPosition)

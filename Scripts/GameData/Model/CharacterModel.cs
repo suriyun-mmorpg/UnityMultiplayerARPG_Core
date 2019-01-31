@@ -180,9 +180,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void SetEquipWeapons(EquipWeapons equipWeapons)
+        public override void SetEquipWeapons(EquipWeapons equipWeapons, out Transform rightHandMissileDamageTransform, out Transform leftHandMissileDamageTransform)
         {
-            base.SetEquipWeapons(equipWeapons);
+            base.SetEquipWeapons(equipWeapons, out rightHandMissileDamageTransform, out leftHandMissileDamageTransform);
             SetupComponent();
             Item weaponItem = GameInstance.Singleton.DefaultWeaponItem;
             if (equipWeapons.rightHand.IsValid() && equipWeapons.rightHand.GetWeaponItem() != null)

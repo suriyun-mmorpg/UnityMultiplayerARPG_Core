@@ -12,9 +12,20 @@ namespace MultiplayerARPG
         public System.Action onRespawn;
         public System.Action onLevelUp;
 
-        protected void NetFuncAttackWithoutAimPosition()
+        protected virtual void NetFuncUpdateAimPosition(Vector3 position)
         {
-            NetFuncAttack(false, Vector3.zero);
+            hasAimPosition = true;
+            aimPosition = position;
+        }
+
+        protected virtual void NetFuncDismissAimPosition()
+        {
+            hasAimPosition = false;
+        }
+
+        protected void NetFuncAttack()
+        {
+            NetFuncAttack(hasAimPosition, aimPosition);
         }
 
         protected void NetFuncAttackWithAimPosition(Vector3 aimPosition)
@@ -96,20 +107,20 @@ namespace MultiplayerARPG
             isAttackingOrUsingSkill = false;
         }
 
-        protected void NetFuncUseSkillWithoutAimPosition(int dataId)
+        protected void NetFuncUseSkill(int dataId)
         {
-            NetFuncUseSkill(false, dataId, Vector3.zero);
+            NetFuncUseSkill(dataId, hasAimPosition, aimPosition);
         }
 
         protected void NetFuncUseSkillWithAimPosition(int dataId, Vector3 aimPosition)
         {
-            NetFuncUseSkill(true, dataId, aimPosition);
+            NetFuncUseSkill(dataId, true, aimPosition);
         }
 
         /// <summary>
         /// Is function will be called at server to order character to use skill
         /// </summary>
-        protected virtual void NetFuncUseSkill(bool hasAimPosition, int dataId, Vector3 aimPosition)
+        protected virtual void NetFuncUseSkill(int dataId, bool hasAimPosition, Vector3 aimPosition)
         {
             if (isAttackingOrUsingSkill)
                 return;

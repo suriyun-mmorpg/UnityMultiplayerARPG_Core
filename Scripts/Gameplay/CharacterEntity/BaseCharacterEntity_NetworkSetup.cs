@@ -60,9 +60,11 @@ namespace MultiplayerARPG
             nonEquipItems.onOperation += OnNonEquipItemsOperation;
             summons.onOperation += OnSummonsOperation;
             // Register Network functions
-            RegisterNetFunction(NetFuncAttackWithoutAimPosition);
+            RegisterNetFunction<Vector3>(NetFuncUpdateAimPosition);
+            RegisterNetFunction(NetFuncDismissAimPosition);
+            RegisterNetFunction(NetFuncAttack);
             RegisterNetFunction<Vector3>(NetFuncAttackWithAimPosition);
-            RegisterNetFunction<int>(NetFuncUseSkillWithoutAimPosition);
+            RegisterNetFunction<int>(NetFuncUseSkill);
             RegisterNetFunction<int, Vector3>(NetFuncUseSkillWithAimPosition);
             RegisterNetFunction<short>(NetFuncUseItem);
             RegisterNetFunction<byte, int, byte>(NetFuncPlayActionAnimation);
