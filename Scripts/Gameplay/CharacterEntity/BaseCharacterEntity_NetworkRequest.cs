@@ -14,11 +14,11 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncAttack, FunctionReceivers.Server);
         }
 
-        public virtual void RequestAttack(Vector3 aimPosition)
+        public virtual void RequestAttack(Vector3 aimDirection)
         {
             if (!CanMoveOrDoActions())
                 return;
-            CallNetFunction(NetFuncAttackWithAimPosition, FunctionReceivers.Server, aimPosition);
+            CallNetFunction(NetFuncAttackWithAimDirection, FunctionReceivers.Server, aimDirection);
         }
 
         public virtual void RequestUseSkill(int dataId)
@@ -28,11 +28,11 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncUseSkill, FunctionReceivers.Server, dataId);
         }
 
-        public virtual void RequestUseSkill(int dataId, Vector3 aimPosition)
+        public virtual void RequestUseSkill(int dataId, Vector3 aimDirection)
         {
             if (!CanMoveOrDoActions())
                 return;
-            CallNetFunction(NetFuncUseSkillWithAimPosition, FunctionReceivers.Server, dataId, aimPosition);
+            CallNetFunction(NetFuncUseSkillWithAimDirection, FunctionReceivers.Server, dataId, aimDirection);
         }
 
         public virtual void RequestUseItem(short index)
