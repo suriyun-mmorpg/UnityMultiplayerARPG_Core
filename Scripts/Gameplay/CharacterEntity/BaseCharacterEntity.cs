@@ -199,7 +199,11 @@ namespace MultiplayerARPG
             Profiler.BeginSample("BaseCharacterEntity - Update");
             MakeCaches();
             if (IsDead())
+            {
+                // Clear action states when character dead
                 animActionType = AnimActionType.None;
+                isAttackingOrUsingSkill = false;
+            }
             Profiler.EndSample();
         }
 
