@@ -63,8 +63,8 @@ namespace MultiplayerARPG
         public SummonType SummonType { get { return (SummonType)summonType.Value; } protected set { summonType.Value = (byte)value; } }
         public bool IsSummoned { get { return SummonType != SummonType.None; } }
 
-        public MonsterSpawnArea spawnArea { get; private set; }
-        public Vector3 spawnPosition { get; private set; }
+        public MonsterSpawnArea spawnArea { get; protected set; }
+        public Vector3 spawnPosition { get; protected set; }
         public override int DataId { get { return monsterCharacter.DataId; } set { } }
         public override BaseCharacter Database { get { return monsterCharacter; } }
 
@@ -145,7 +145,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void SetSpawnArea(MonsterSpawnArea spawnArea, Vector3 spawnPosition)
+        public virtual void SetSpawnArea(MonsterSpawnArea spawnArea, Vector3 spawnPosition)
         {
             this.spawnArea = spawnArea;
             this.spawnPosition = spawnPosition;
