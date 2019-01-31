@@ -20,7 +20,11 @@ namespace MultiplayerARPG
             }
 
             if (CacheGameplayCameraControls != null)
+            {
+                CacheGameplayCameraControls.updateRotationX = false;
+                CacheGameplayCameraControls.updateRotationY = false;
                 CacheGameplayCameraControls.updateRotation = InputManager.GetButton("CameraRotate");
+            }
 
             if (PlayerCharacterEntity.IsDead())
                 return;
