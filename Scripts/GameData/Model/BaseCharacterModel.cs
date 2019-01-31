@@ -283,14 +283,14 @@ namespace MultiplayerARPG
 
         public Transform GetRightHandEquipmentEntity()
         {
-            if (rightHandMissileDamageTransforms.Count > 0)
+            if (rightHandMissileDamageTransforms.Count == 0)
                 return null;
             return rightHandMissileDamageTransforms[Random.Range(0, rightHandMissileDamageTransforms.Count)];
         }
 
         public Transform GetLeftHandEquipmentEntity()
         {
-            if (leftHandMissileDamageTransforms.Count > 0)
+            if (leftHandMissileDamageTransforms.Count == 0)
                 return null;
             return leftHandMissileDamageTransforms[Random.Range(0, leftHandMissileDamageTransforms.Count)];
         }
