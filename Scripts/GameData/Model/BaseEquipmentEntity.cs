@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BaseEquipmentModel : MonoBehaviour
+public abstract class BaseEquipmentEntity : MonoBehaviour
 {
     private int level;
     public int Level

@@ -256,7 +256,7 @@ namespace MultiplayerARPG
         protected virtual void OnEquipWeaponsChange(EquipWeapons equipWeapons)
         {
             if (CharacterModel != null)
-                CharacterModel.SetEquipWeapons(equipWeapons, out rightHandMissileDamageTransform, out leftHandMissileDamageTransform);
+                CharacterModel.SetEquipWeapons(equipWeapons);
 
             if (onEquipWeaponsChange != null)
                 onEquipWeaponsChange.Invoke(equipWeapons);

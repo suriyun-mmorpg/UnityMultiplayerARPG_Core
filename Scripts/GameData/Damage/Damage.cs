@@ -8,6 +8,11 @@ namespace MultiplayerARPG
     {
         Melee,
         Missile,
+        /*
+         * TODO: Implements later
+        RaycastMelee,
+        RaycastMissile,
+        */
     }
 
     [System.Serializable]
@@ -18,14 +23,14 @@ namespace MultiplayerARPG
         [Tooltip("If this is TRUE, it will hit only selected target, if no selected target it will hit 1 found target")]
         public bool hitOnlySelectedTarget;
 
-        [StringShowConditional(conditionFieldName: "damageType", conditionValue: "Melee")]
+        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Melee", "RaycastMelee" })]
         [Tooltip("This will be sum with character's radius before find hitting characters")]
         public float hitDistance = 1f;
         [StringShowConditional(conditionFieldName: "damageType", conditionValue: "Melee")]
         [Range(10f, 360f)]
         public float hitFov;
 
-        [StringShowConditional(conditionFieldName: "damageType", conditionValue: "Missile")]
+        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Missile", "RaycastMissile" })]
         public float missileDistance = 5f;
         [StringShowConditional(conditionFieldName: "damageType", conditionValue: "Missile")]
         public float missileSpeed = 5f;

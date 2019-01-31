@@ -65,8 +65,6 @@ namespace MultiplayerARPG
         protected int tempOverlapSize;
         protected int tempLoopCounter;
         protected GameObject tempGameObject;
-        protected Transform rightHandMissileDamageTransform;
-        protected Transform leftHandMissileDamageTransform;
         protected bool hasAimPosition;
         protected Vector3 aimPosition;
         #endregion
@@ -989,15 +987,16 @@ namespace MultiplayerARPG
                     position = MeleeDamageTransform.position;
                     break;
                 case DamageType.Missile:
-                    if (rightHandMissileDamageTransform != null && !isLeftHand)
+                    Transform tempMissileDamageTransform = null;
+                    if ((tempMissileDamageTransform = CharacterModel.GetRightHandEquipmentEntity()) != null && !isLeftHand)
                     {
                         // Use position from right hand weapon missile damage transform
-                        position = rightHandMissileDamageTransform.position;
+                        position = tempMissileDamageTransform.position;
                     }
-                    else if (leftHandMissileDamageTransform != null && isLeftHand)
+                    else if ((tempMissileDamageTransform = CharacterModel.GetLeftHandEquipmentEntity()) != null && isLeftHand)
                     {
                         // Use position from left hand weapon missile damage transform
-                        position = leftHandMissileDamageTransform.position;
+                        position = tempMissileDamageTransform.position;
                     }
                     else
                     {
@@ -1008,7 +1007,7 @@ namespace MultiplayerARPG
             }
             rotation = Quaternion.LookRotation(CacheTransform.forward);
             if (hasAimPosition)
-                rotation = Quaternion.LookRotation(aimPosition);
+                rotation = Quaternion.LookRotation((aimPosition - position).normalized);
         }
 
         public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)

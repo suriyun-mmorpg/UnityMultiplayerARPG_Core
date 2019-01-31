@@ -50,12 +50,16 @@ namespace MultiplayerARPG
         /// </summary>
         private readonly Dictionary<string, List<GameEffect>> cacheEffects = new Dictionary<string, List<GameEffect>>();
 
+        // Public fields which may used by Character Entity
+        public readonly List<Transform> rightHandMissileDamageTransforms = new List<Transform>();
+        public readonly List<Transform> leftHandMissileDamageTransforms = new List<Transform>();
+
         // Optimize garbage collector
-        private readonly List<string> tempKeepingKeys = new List<string>();
-        private readonly List<string> tempAddingKeys = new List<string>();
-        private readonly List<string> tempCachedKeys = new List<string>();
-        private GameObject tempEquipmentObject;
-        private BaseEquipmentModel tempEquipmentModel;
+        protected readonly List<string> tempKeepingKeys = new List<string>();
+        protected readonly List<string> tempAddingKeys = new List<string>();
+        protected readonly List<string> tempCachedKeys = new List<string>();
+        protected GameObject tempEquipmentObject;
+        protected BaseEquipmentEntity tempEquipmentEntity;
 
         private void CreateCacheModel(string equipPosition, Dictionary<string, GameObject> models)
         {
@@ -89,17 +93,10 @@ namespace MultiplayerARPG
             }
         }
 
-        public void SetEquipWeapons(EquipWeapons equipWeapons)
+        public virtual void SetEquipWeapons(EquipWeapons equipWeapons)
         {
-            Transform tempRightHandMissileDamageTransform = null;
-            Transform tempLeftHandMissileDamageTransform = null;
-            SetEquipWeapons(equipWeapons, out tempRightHandMissileDamageTransform, out tempLeftHandMissileDamageTransform);
-        }
-
-        public virtual void SetEquipWeapons(EquipWeapons equipWeapons, out Transform rightHandMissileDamageTransform, out Transform leftHandMissileDamageTransform)
-        {
-            rightHandMissileDamageTransform = null;
-            leftHandMissileDamageTransform = null;
+            rightHandMissileDamageTransforms.Clear();
+            leftHandMissileDamageTransforms.Clear();
             Item rightHandWeapon = equipWeapons.rightHand.GetWeaponItem();
             Item leftHandWeapon = equipWeapons.leftHand.GetWeaponItem();
             Item leftHandShield = equipWeapons.leftHand.GetShieldItem();
@@ -122,9 +119,9 @@ namespace MultiplayerARPG
             }
 
             if (rightHandWeapon != null)
-                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandWeapon.equipmentModels, equipWeapons.rightHand.level, out rightHandMissileDamageTransform);
+                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_RIGHT_HAND, rightHandWeapon.equipmentModels, equipWeapons.rightHand.level, rightHandMissileDamageTransforms);
             if (leftHandWeapon != null)
-                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandWeapon.subEquipmentModels, equipWeapons.leftHand.level, out leftHandMissileDamageTransform);
+                InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandWeapon.subEquipmentModels, equipWeapons.leftHand.level, leftHandMissileDamageTransforms);
             if (leftHandShield != null)
                 InstantiateEquipModel(GameDataConst.EQUIP_POSITION_LEFT_HAND, leftHandShield.equipmentModels, equipWeapons.leftHand.level);
         }
@@ -160,16 +157,8 @@ namespace MultiplayerARPG
             }
         }
 
-
-        public void InstantiateEquipModel(string equipPosition, EquipmentModel[] equipmentModels, int level)
+        public void InstantiateEquipModel(string equipPosition, EquipmentModel[] equipmentModels, int level, List<Transform> missileDamageTransforms = null)
         {
-            Transform tempMissileDamageTransform;
-            InstantiateEquipModel(equipPosition, equipmentModels, level, out tempMissileDamageTransform);
-        }
-
-        public void InstantiateEquipModel(string equipPosition, EquipmentModel[] equipmentModels, int level, out Transform missileDamageTransform)
-        {
-            missileDamageTransform = null;
             if (equipmentModels == null || equipmentModels.Length == 0)
                 return;
             Dictionary<string, GameObject> models = new Dictionary<string, GameObject>();
@@ -187,11 +176,12 @@ namespace MultiplayerARPG
                 tempEquipmentObject.gameObject.SetActive(true);
                 tempEquipmentObject.gameObject.SetLayerRecursively(gameInstance.characterLayer.LayerIndex, true);
                 tempEquipmentObject.RemoveComponentsInChildren<Collider>(false);
-                tempEquipmentModel = tempEquipmentObject.GetComponent<BaseEquipmentModel>();
-                if (tempEquipmentModel != null)
+                tempEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
+                if (tempEquipmentEntity != null)
                 {
-                    tempEquipmentModel.Level = level;
-                    missileDamageTransform = tempEquipmentModel.missileDamageTransform;
+                    tempEquipmentEntity.Level = level;
+                    if (missileDamageTransforms != null && tempEquipmentEntity.missileDamageTransform != null)
+                        missileDamageTransforms.Add(tempEquipmentEntity.missileDamageTransform);
                 }
                 AddingNewModel(tempEquipmentObject);
                 models.Add(equipmentModel.equipSocket, tempEquipmentObject);
@@ -289,6 +279,20 @@ namespace MultiplayerARPG
         public bool HasSkillCastAnimations(Skill skill)
         {
             return HasSkillCastAnimations(skill.DataId);
+        }
+
+        public Transform GetRightHandEquipmentEntity()
+        {
+            if (rightHandMissileDamageTransforms.Count > 0)
+                return null;
+            return rightHandMissileDamageTransforms[Random.Range(0, rightHandMissileDamageTransforms.Count)];
+        }
+
+        public Transform GetLeftHandEquipmentEntity()
+        {
+            if (leftHandMissileDamageTransforms.Count > 0)
+                return null;
+            return leftHandMissileDamageTransforms[Random.Range(0, leftHandMissileDamageTransforms.Count)];
         }
 
         public virtual void AddingNewModel(GameObject newModel) { }
