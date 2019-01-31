@@ -65,8 +65,8 @@ namespace MultiplayerARPG
         protected int tempOverlapSize;
         protected int tempLoopCounter;
         protected GameObject tempGameObject;
-        protected bool hasAimPosition;
-        protected Vector3 aimPosition;
+        protected bool hasAimDirection;
+        protected Vector3 aimDirection;
         #endregion
 
         #region Caches Data
@@ -636,7 +636,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void ApplySkill(CharacterSkill characterSkill, bool hasAimPosition, Vector3 aimPosition, SkillAttackType skillAttackType, bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
+        protected virtual void ApplySkill(CharacterSkill characterSkill, SkillAttackType skillAttackType, bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
             Skill skill = characterSkill.GetSkill();
             switch (skill.skillType)
@@ -649,7 +649,7 @@ namespace MultiplayerARPG
                         CharacterBuff debuff = CharacterBuff.Empty;
                         if (skill.isDebuff)
                             debuff = CharacterBuff.Create(BuffType.SkillDebuff, skill.DataId, characterSkill.level);
-                        LaunchDamageEntity(hasAimPosition, aimPosition, isLeftHand, weapon, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id);
+                        LaunchDamageEntity(hasAimDirection, aimDirection, isLeftHand, weapon, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id);
                     }
                     break;
             }
@@ -881,8 +881,8 @@ namespace MultiplayerARPG
         }
 
         public virtual void LaunchDamageEntity(
-            bool hasAimPosition,
-            Vector3 aimPosition,
+            bool hasAimDirection,
+            Vector3 aimDirection,
             bool isLeftHand,
             CharacterItem weapon,
             DamageInfo damageInfo,
@@ -896,7 +896,7 @@ namespace MultiplayerARPG
             IDamageableEntity tempDamageableEntity = null;
             Vector3 damagePosition;
             Quaternion damageRotation;
-            GetDamagePositionAndRotation(damageInfo.damageType, hasAimPosition, aimPosition, isLeftHand, out damagePosition, out damageRotation);
+            GetDamagePositionAndRotation(damageInfo.damageType, isLeftHand, out damagePosition, out damageRotation);
             switch (damageInfo.damageType)
             {
                 case DamageType.Melee:
@@ -978,7 +978,7 @@ namespace MultiplayerARPG
             return (angle < 180 + halfFov && angle > 180 - halfFov);
         }
 
-        protected virtual void GetDamagePositionAndRotation(DamageType damageType, bool hasAimPosition, Vector3 aimPosition, bool isLeftHand, out Vector3 position, out Quaternion rotation)
+        protected virtual void GetDamagePositionAndRotation(DamageType damageType, bool isLeftHand, out Vector3 position, out Quaternion rotation)
         {
             position = CacheTransform.position;
             switch (damageType)
@@ -1006,8 +1006,8 @@ namespace MultiplayerARPG
                     break;
             }
             rotation = Quaternion.LookRotation(CacheTransform.forward);
-            if (hasAimPosition)
-                rotation = Quaternion.LookRotation((aimPosition - position).normalized);
+            if (hasAimDirection)
+                rotation = Quaternion.LookRotation(aimDirection);
         }
 
         public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)
