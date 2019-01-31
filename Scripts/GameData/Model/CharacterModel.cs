@@ -73,6 +73,7 @@ namespace MultiplayerARPG
         public WeaponAnimations[] weaponAnimations;
         public SkillCastAnimations[] skillCastAnimations;
 
+        // Temp data
         private string defaultIdleClipName;
         private string defaultMoveClipName;
         private string defaultJumpClipName;
@@ -81,6 +82,8 @@ namespace MultiplayerARPG
         private string defaultDeadClipName;
         private string defaultActionClipName;
         private string lastFadedLegacyClipName;
+        // Private state validater
+        private bool isSetupComponent;
 
         private static Dictionary<int, WeaponAnimations> cacheWeaponAnimations;
         public Dictionary<int, WeaponAnimations> CacheWeaponAnimations
@@ -131,9 +134,7 @@ namespace MultiplayerARPG
                 return cacheAnimatorController;
             }
         }
-
-        private bool isSetupComponent;
-
+        
         private void Awake()
         {
             SetupComponent();
@@ -404,7 +405,6 @@ namespace MultiplayerARPG
                     AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
                 animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
                 animator.SetBool(ANIM_DO_ACTION, true);
-                animator.Play(animator.GetCurrentAnimatorStateInfo(0).fullPathHash, 0, 0);
                 // Waits by current transition + clip duration before end animation
                 yield return new WaitForSecondsRealtime(animator.GetAnimatorTransitionInfo(0).duration + (tempActionAnimation.GetClipLength() / playSpeedMultiplier));
                 animator.SetBool(ANIM_DO_ACTION, false);
