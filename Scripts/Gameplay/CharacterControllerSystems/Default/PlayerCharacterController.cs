@@ -225,9 +225,17 @@ namespace MultiplayerARPG
             switch (gameInstance.DimensionType)
             {
                 case DimensionType.Dimension3D:
-                    moveDirection += Camera.main.transform.forward * verticalInput;
-                    moveDirection += Camera.main.transform.right * horizontalInput;
-                    moveDirection.y = 0;
+                    Vector3 forward = Camera.main.transform.forward;
+                    Vector3 right = Camera.main.transform.right;
+                    forward.y = 0f;
+                    right.y = 0f;
+                    forward.Normalize();
+                    right.Normalize();
+                    moveDirection += forward * verticalInput;
+                    moveDirection += right * horizontalInput;
+                    // normalize input if it exceeds 1 in combined length:
+                    if (moveDirection.sqrMagnitude > 1)
+                        moveDirection.Normalize();
                     break;
                 case DimensionType.Dimension2D:
                     moveDirection = new Vector2(horizontalInput, verticalInput);
