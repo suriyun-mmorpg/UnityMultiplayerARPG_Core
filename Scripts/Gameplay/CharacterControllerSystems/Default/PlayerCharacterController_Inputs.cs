@@ -303,6 +303,7 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.SetTargetEntity(null);
             }
             PlayerCharacterEntity.KeyMovement(moveDirection, InputManager.GetButtonDown("Jump"));
+            targetLookDirection = moveDirection.normalized;
         }
 
         protected virtual void UpdateBuilding()
@@ -377,6 +378,11 @@ namespace MultiplayerARPG
                             RequestUsePendingSkill();
                         else
                             RequestAttack();
+                    }
+                    else
+                    {
+                        // Turn character to target
+                        targetLookDirection = (targetEnemy.CacheTransform.position - PlayerCharacterEntity.CacheTransform.position).normalized;
                     }
                 }
                 else
@@ -498,6 +504,19 @@ namespace MultiplayerARPG
 
             Vector3 targetPosition = entity.CacheTransform.position;
             PlayerCharacterEntity.PointClickMovement(targetPosition);
+            targetLookDirection = (targetPosition - PlayerCharacterEntity.CacheTransform.position).normalized;
+        }
+
+        protected void UpdateLookAtTarget()
+        {
+            if (destination != null)
+                targetLookDirection = (destination.Value - PlayerCharacterEntity.CacheTransform.position).normalized;
+            if (Vector3.Angle(PlayerCharacterEntity.CacheTransform.forward, targetLookDirection) > 0)
+            {
+                // Update rotation when angle difference more than 1
+                tempLookAt = Quaternion.RotateTowards(PlayerCharacterEntity.CacheTransform.rotation, Quaternion.LookRotation(targetLookDirection), Time.deltaTime * angularSpeed);
+                PlayerCharacterEntity.UpdateYRotation(tempLookAt.eulerAngles.y);
+            }
         }
 
         public override void UseHotkey(int hotkeyIndex)

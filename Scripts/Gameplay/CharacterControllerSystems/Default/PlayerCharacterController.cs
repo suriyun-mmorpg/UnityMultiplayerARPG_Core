@@ -35,6 +35,7 @@ namespace MultiplayerARPG
         public bool pointClickSetTargetImmediately;
         public FollowCameraControls gameplayCameraPrefab;
         public GameObject targetObjectPrefab;
+        public float angularSpeed = 800f;
         [Header("Building Settings")]
         public bool buildGridSnap;
         public float buildGridSize = 4f;
@@ -69,6 +70,8 @@ namespace MultiplayerARPG
         protected BuildingEntity targetBuilding;
         protected HarvestableEntity targetHarvestable;
         protected BaseGameEntity selectedTarget;
+        protected Quaternion tempLookAt;
+        protected Vector3 targetLookDirection;
 
         protected override void Awake()
         {
@@ -151,6 +154,7 @@ namespace MultiplayerARPG
 
             UpdateInput();
             UpdateFollowTarget();
+            UpdateLookAtTarget();
         }
 
         private Vector3 GetBuildingPlacePosition(Vector3 position)

@@ -267,6 +267,17 @@ namespace MultiplayerARPG
             CacheNavMeshAgent.obstacleAvoidanceType = obstacleAvoidanceType;
         }
 
+        public void SetSpawnArea(Vector3 spawnPosition, out Vector3 resultSpawnPosition)
+        {
+            resultSpawnPosition = spawnPosition;
+            NavMeshHit navHit;
+            if (NavMesh.SamplePosition(spawnPosition, out navHit, 100f, -1))
+            {
+                resultSpawnPosition = navHit.position;
+                CacheNavMeshAgent.Warp(spawnPosition);
+            }
+        }
+
         public void StopMove()
         {
             CacheNavMeshAgent.updatePosition = false;

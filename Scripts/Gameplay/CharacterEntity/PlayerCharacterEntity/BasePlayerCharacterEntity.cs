@@ -51,6 +51,8 @@ namespace MultiplayerARPG
         }
 
         public float dealingCharacterTime { get; private set; }
+        public virtual bool IsJumping { get; protected set; }
+        public virtual bool IsGrounded { get; protected set; }
         public override BaseCharacter Database { get { return GameInstance.PlayerCharacters[DataId]; } }
 
         protected override void EntityAwake()
@@ -303,7 +305,8 @@ namespace MultiplayerARPG
 
         public abstract float StoppingDistance { get; }
         public abstract void StopMove();
-        public abstract void KeyMovement(Vector3 direction, bool isJump);
+        public abstract void KeyMovement(Vector3 moveDirection, bool isJump);
+        public abstract void UpdateYRotation(float yRotation);
         public abstract void PointClickMovement(Vector3 position);
     }
 }

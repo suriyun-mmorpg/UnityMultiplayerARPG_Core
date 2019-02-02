@@ -38,6 +38,18 @@ namespace MultiplayerARPG
             get { return stoppingDistance; }
         }
 
+        public override bool IsGrounded
+        {
+            get { return true; }
+            protected set { }
+        }
+
+        public override bool IsJumping
+        {
+            get { return false; }
+            protected set { }
+        }
+
         private Rigidbody2D cacheRigidbody2D;
         public Rigidbody2D CacheRigidbody2D
         {
@@ -245,6 +257,11 @@ namespace MultiplayerARPG
                     tempInputDirection = direction;
                     break;
             }
+        }
+
+        public override void UpdateYRotation(float yRotation)
+        {
+            // Do nothing, 2d characters will not rotates
         }
 
         public override void StopMove()

@@ -19,13 +19,11 @@ namespace MultiplayerARPG
         public float groundingDistance = 0.1f;
         public float jumpHeight = 2f;
         public float gravityRate = 1f;
-        public float angularSpeed = 800f;
+        public float backwardMoveSpeedRate = 0.75f;
         [Header("Network Settings")]
         public MovementSecure movementSecure;
         #endregion
-
-        public bool isJumping { get; protected set; }
-        public bool isGrounded { get; protected set; }
+        
         public Queue<Vector3> navPaths { get; protected set; }
 
         public bool HasNavPaths
@@ -68,8 +66,6 @@ namespace MultiplayerARPG
         private Vector3 tempCurrentPosition;
         private Vector3 tempPreviousVelocity;
         private Vector3 tempTargetVelocity;
-        private Vector3 tempTargetDirection;
-        private Quaternion tempLookAtRotation;
 
         protected override void EntityAwake()
         {
@@ -140,40 +136,23 @@ namespace MultiplayerARPG
                     velocityChange.y = 0;
                     velocityChange.z = Mathf.Clamp(velocityChange.z, -CacheMoveSpeed, CacheMoveSpeed);
                     CacheRigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
-                    tempLookAtRotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(tempMoveDirection), angularSpeed * Time.fixedDeltaTime);
-                    tempLookAtRotation.x = 0;
-                    tempLookAtRotation.z = 0;
-                    CacheTransform.rotation = tempLookAtRotation;
                 }
                 else
                 {
                     // Stop movement
                     CacheRigidbody.velocity = new Vector3(0, CacheRigidbody.velocity.y, 0);
                 }
-
-                BaseGameEntity tempEntity;
-                if (tempMoveDirectionMagnitude == 0f && TryGetTargetEntity(out tempEntity))
-                {
-                    tempTargetDirection = (tempEntity.CacheTransform.position - CacheTransform.position).normalized;
-                    if (tempTargetDirection.magnitude != 0f)
-                    {
-                        tempLookAtRotation = Quaternion.RotateTowards(CacheTransform.rotation, Quaternion.LookRotation(tempTargetDirection), angularSpeed * Time.fixedDeltaTime);
-                        tempLookAtRotation.x = 0f;
-                        tempLookAtRotation.z = 0f;
-                        CacheTransform.rotation = tempLookAtRotation;
-                    }
-                }
                 // Jump
-                if (isGrounded && isJumping)
+                if (IsGrounded && IsJumping)
                 {
                     RequestTriggerJump();
                     CacheRigidbody.velocity = new Vector3(tempPreviousVelocity.x, CalculateJumpVerticalSpeed(), tempPreviousVelocity.z);
-                    isJumping = false;
+                    IsJumping = false;
                 }
             }
 
             if (Mathf.Abs(tempPreviousVelocity.y) > groundingDistance)
-                isGrounded = false;
+                IsGrounded = false;
 
             // We apply gravity manually for more tuning control
             CacheRigidbody.AddForce(new Vector3(0, Physics.gravity.y * CacheRigidbody.mass * gravityRate, 0));
@@ -204,6 +183,7 @@ namespace MultiplayerARPG
             RegisterNetFunction(NetFuncTriggerJump);
             RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
             RegisterNetFunction<sbyte, sbyte, bool>(NetFuncKeyMovement);
+            RegisterNetFunction<short>(NetFuncUpdateYRotation);
             RegisterNetFunction(StopMove);
             RegisterNetFunction<PackedUInt>(NetFuncSetTargetEntity);
         }
@@ -224,8 +204,15 @@ namespace MultiplayerARPG
             tempInputDirection = new Vector3((float)horizontalInput / 100f, 0, (float)verticalInput / 100f);
             if (tempInputDirection.magnitude != 0)
                 currentNpcDialog = null;
-            if (!isJumping)
-                isJumping = isGrounded && isJump;
+            if (!IsJumping)
+                IsJumping = IsGrounded && isJump;
+        }
+
+        protected void NetFuncUpdateYRotation(short yRotation)
+        {
+            if (IsDead())
+                return;
+            CacheTransform.rotation = Quaternion.Euler(0, (float)yRotation / 100f, 0);
         }
 
         protected void NetFuncSetTargetEntity(PackedUInt objectId)
@@ -288,8 +275,25 @@ namespace MultiplayerARPG
                     break;
                 case MovementSecure.NotSecure:
                     tempInputDirection = direction;
-                    if (!isJumping)
-                        isJumping = isGrounded && isJump;
+                    if (!IsJumping)
+                        IsJumping = IsGrounded && isJump;
+                    break;
+            }
+        }
+
+        public override void UpdateYRotation(float yRotation)
+        {
+            if (IsDead())
+                return;
+            switch (movementSecure)
+            {
+                case MovementSecure.ServerAuthoritative:
+                    // Multiply with 100 and cast to short to reduce packet size
+                    // then it will be devided with 100 later on server side
+                    CallNetFunction(NetFuncUpdateYRotation, FunctionReceivers.Server, (short)(yRotation * 100));
+                    break;
+                case MovementSecure.NotSecure:
+                    CacheTransform.rotation = Quaternion.Euler(0, yRotation, 0);
                     break;
             }
         }
@@ -312,14 +316,14 @@ namespace MultiplayerARPG
 
         protected virtual void OnCollisionEnter(Collision collision)
         {
-            if (!isGrounded && collision.impulse.y > 0)
-                isGrounded = true;
+            if (!IsGrounded && collision.impulse.y > 0)
+                IsGrounded = true;
         }
 
         protected virtual void OnCollisionStay(Collision collision)
         {
-            if (!isGrounded && collision.impulse.y > 0)
-                isGrounded = true;
+            if (!IsGrounded && collision.impulse.y > 0)
+                IsGrounded = true;
         }
 
         protected virtual void SetMovePaths(Vector3 position, bool useNavMesh)

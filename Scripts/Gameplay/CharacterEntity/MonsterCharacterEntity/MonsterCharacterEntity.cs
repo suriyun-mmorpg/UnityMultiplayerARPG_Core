@@ -34,13 +34,9 @@ namespace MultiplayerARPG
 
         public override void SetSpawnArea(MonsterSpawnArea spawnArea, Vector3 spawnPosition)
         {
-            NavMeshHit navHit;
-            if (NavMesh.SamplePosition(spawnPosition, out navHit, spawnArea.randomRadius, -1))
-            {
-                this.spawnArea = spawnArea;
-                this.spawnPosition = navHit.position;
-                GetComponent<NavMeshAgent>().Warp(spawnPosition);
-            }
+            this.spawnArea = spawnArea;
+            CacheMonsterActivityComponent.SetSpawnArea(spawnPosition, out spawnPosition);
+            this.spawnPosition = spawnPosition;
         }
 
         public override void StopMove()
