@@ -151,9 +151,6 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (Mathf.Abs(tempPreviousVelocity.y) > groundingDistance)
-                IsGrounded = false;
-
             // We apply gravity manually for more tuning control
             CacheRigidbody.AddForce(new Vector3(0, Physics.gravity.y * CacheRigidbody.mass * gravityRate, 0));
             Profiler.EndSample();

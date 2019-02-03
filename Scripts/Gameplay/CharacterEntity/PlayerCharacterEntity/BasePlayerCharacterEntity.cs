@@ -75,18 +75,6 @@ namespace MultiplayerARPG
 #endif
         }
 
-        protected void OnCollisionEnter(Collision collision)
-        {
-            if (!IsGrounded && collision.impulse.y > 0)
-                IsGrounded = true;
-        }
-
-        protected void OnCollisionStay(Collision collision)
-        {
-            if (!IsGrounded && collision.impulse.y > 0)
-                IsGrounded = true;
-        }
-
         private bool MigrateDatabase()
         {
             bool hasChanges = false;

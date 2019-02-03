@@ -67,6 +67,7 @@ namespace MultiplayerARPG
         protected GameObject tempGameObject;
         protected bool hasAimDirection;
         protected Vector3 aimDirection;
+        protected Collider groundedCollider;
         #endregion
 
         #region Caches Data
@@ -175,6 +176,30 @@ namespace MultiplayerARPG
             if (MigrateTransforms())
                 EditorUtility.SetDirty(this);
 #endif
+        }
+
+        protected void OnCollisionEnter(Collision collision)
+        {
+            if (!IsGrounded && collision.impulse.y > 0)
+            {
+                groundedCollider = collision.collider;
+                IsGrounded = true;
+            }
+        }
+
+        protected void OnCollisionStay(Collision collision)
+        {
+            if (!IsGrounded && collision.impulse.y > 0)
+            {
+                groundedCollider = collision.collider;
+                IsGrounded = true;
+            }
+        }
+
+        protected void OnCollisionExit(Collision collision)
+        {
+            if (IsGrounded && collision.collider == groundedCollider)
+                IsGrounded = false;
         }
 
         private bool MigrateTransforms()
