@@ -130,6 +130,10 @@ namespace MultiplayerARPG
 
                     tempTargetVelocity = tempMoveDirection * gameInstance.GameplayRule.GetMoveSpeed(this);
 
+                    // If character move backward
+                    if (Vector3.Angle(tempMoveDirection, CacheTransform.forward) > 120)
+                        tempTargetVelocity *= backwardMoveSpeedRate;
+
                     // Apply a force that attempts to reach our target velocity
                     Vector3 velocityChange = (tempTargetVelocity - tempPreviousVelocity);
                     velocityChange.x = Mathf.Clamp(velocityChange.x, -CacheMoveSpeed, CacheMoveSpeed);

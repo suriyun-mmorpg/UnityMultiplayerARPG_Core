@@ -8,7 +8,9 @@ namespace MultiplayerARPG
     {
         // Animator variables
         public static readonly int ANIM_IS_DEAD = Animator.StringToHash("IsDead");
+        public static readonly int ANIM_IS_GROUNDED = Animator.StringToHash("IsGrounded");
         public static readonly int ANIM_MOVE_SPEED = Animator.StringToHash("MoveSpeed");
+        public static readonly int ANIM_SIDE_MOVE_SPEED = Animator.StringToHash("SideMoveSpeed");
         public static readonly int ANIM_Y_SPEED = Animator.StringToHash("YSpeed");
         public static readonly int ANIM_DO_ACTION = Animator.StringToHash("DoAction");
         public static readonly int ANIM_HURT = Animator.StringToHash("Hurt");
@@ -18,6 +20,13 @@ namespace MultiplayerARPG
         // Legacy Animation variables
         public const string LEGACY_CLIP_IDLE = "_Idle";
         public const string LEGACY_CLIP_MOVE = "_Move";
+        public const string LEGACY_CLIP_MOVE_BACKWARD = "_MoveBackward";
+        public const string LEGACY_CLIP_MOVE_LEFT = "_MoveLeft";
+        public const string LEGACY_CLIP_MOVE_RIGHT = "_MoveRight";
+        public const string LEGACY_CLIP_MOVE_FORWARD_LEFT = "_MoveForwardLeft";
+        public const string LEGACY_CLIP_MOVE_FORWARD_RIGHT = "_MoveForwardRight";
+        public const string LEGACY_CLIP_MOVE_BACKWARD_LEFT = "_MoveBackwardLeft";
+        public const string LEGACY_CLIP_MOVE_BACKWARD_RIGHT = "_MoveBackwardRight";
         public const string LEGACY_CLIP_JUMP = "_Jump";
         public const string LEGACY_CLIP_FALL = "_Fall";
         public const string LEGACY_CLIP_HURT = "_Hurt";
@@ -38,6 +47,13 @@ namespace MultiplayerARPG
         {
             idleClip = null,
             moveClip = null,
+            moveBackwardClip = null,
+            moveLeftClip = null,
+            moveRightClip = null,
+            moveForwardLeftClip = null,
+            moveForwardRightClip = null,
+            moveBackwardLeftClip = null,
+            moveBackwardRightClip = null,
             jumpClip = null,
             fallClip = null,
             hurtClip = null,
@@ -50,6 +66,13 @@ namespace MultiplayerARPG
         {
             idleClip = null,
             moveClip = null,
+            moveBackwardClip = null,
+            moveLeftClip = null,
+            moveRightClip = null,
+            moveForwardLeftClip = null,
+            moveForwardRightClip = null,
+            moveBackwardLeftClip = null,
+            moveBackwardRightClip = null,
             jumpClip = null,
             fallClip = null,
             hurtClip = null,
@@ -76,12 +99,23 @@ namespace MultiplayerARPG
         // Temp data
         private string defaultIdleClipName;
         private string defaultMoveClipName;
+        private string defaultMoveBackwardClipName;
+        private string defaultMoveLeftClipName;
+        private string defaultMoveRightClipName;
+        private string defaultMoveForwardLeftClipName;
+        private string defaultMoveForwardRightClipName;
+        private string defaultMoveBackwardLeftClipName;
+        private string defaultMoveBackwardRightClipName;
         private string defaultJumpClipName;
         private string defaultFallClipName;
         private string defaultHurtClipName;
         private string defaultDeadClipName;
         private string defaultActionClipName;
         private string lastFadedLegacyClipName;
+        private Vector3 tempNormalizedVelocity;
+        private float tempMovementAngle;
+        private sbyte tempForwardMoveSpeedMultiplier;
+        private sbyte tempSideMoveSpeedMultiplier;
         // Private state validater
         private bool isSetupComponent;
 
@@ -124,7 +158,7 @@ namespace MultiplayerARPG
         // Optimize garbage collection
         protected ActionAnimation tempActionAnimation;
         protected ActionAnimation[] tempActionAnimations;
-        
+
         private AnimatorOverrideController cacheAnimatorController;
         public AnimatorOverrideController CacheAnimatorController
         {
@@ -134,7 +168,7 @@ namespace MultiplayerARPG
                 return cacheAnimatorController;
             }
         }
-        
+
         private void Awake()
         {
             SetupComponent();
@@ -153,6 +187,13 @@ namespace MultiplayerARPG
                         cacheAnimatorController = new AnimatorOverrideController(animatorController);
                         defaultIdleClipName = defaultAnimatorData.idleClip != null ? defaultAnimatorData.idleClip.name : string.Empty;
                         defaultMoveClipName = defaultAnimatorData.moveClip != null ? defaultAnimatorData.moveClip.name : string.Empty;
+                        defaultMoveBackwardClipName = defaultAnimatorData.moveBackwardClip != null ? defaultAnimatorData.moveBackwardClip.name : string.Empty;
+                        defaultMoveLeftClipName = defaultAnimatorData.moveLeftClip != null ? defaultAnimatorData.moveLeftClip.name : string.Empty;
+                        defaultMoveRightClipName = defaultAnimatorData.moveRightClip != null ? defaultAnimatorData.moveRightClip.name : string.Empty;
+                        defaultMoveForwardLeftClipName = defaultAnimatorData.moveForwardLeftClip != null ? defaultAnimatorData.moveForwardLeftClip.name : string.Empty;
+                        defaultMoveForwardRightClipName = defaultAnimatorData.moveForwardRightClip != null ? defaultAnimatorData.moveForwardRightClip.name : string.Empty;
+                        defaultMoveBackwardLeftClipName = defaultAnimatorData.moveBackwardLeftClip != null ? defaultAnimatorData.moveBackwardLeftClip.name : string.Empty;
+                        defaultMoveBackwardRightClipName = defaultAnimatorData.moveBackwardRightClip != null ? defaultAnimatorData.moveBackwardRightClip.name : string.Empty;
                         defaultJumpClipName = defaultAnimatorData.jumpClip != null ? defaultAnimatorData.jumpClip.name : string.Empty;
                         defaultFallClipName = defaultAnimatorData.fallClip != null ? defaultAnimatorData.fallClip.name : string.Empty;
                         defaultHurtClipName = defaultAnimatorData.hurtClip != null ? defaultAnimatorData.hurtClip.name : string.Empty;
@@ -171,6 +212,13 @@ namespace MultiplayerARPG
                         legacyAnimation = GetComponentInChildren<Animation>();
                         legacyAnimation.AddClip(legacyAnimationData.idleClip, LEGACY_CLIP_IDLE);
                         legacyAnimation.AddClip(legacyAnimationData.moveClip, LEGACY_CLIP_MOVE);
+                        legacyAnimation.AddClip(legacyAnimationData.moveBackwardClip, LEGACY_CLIP_MOVE_BACKWARD);
+                        legacyAnimation.AddClip(legacyAnimationData.moveLeftClip, LEGACY_CLIP_MOVE_LEFT);
+                        legacyAnimation.AddClip(legacyAnimationData.moveRightClip, LEGACY_CLIP_MOVE_RIGHT);
+                        legacyAnimation.AddClip(legacyAnimationData.moveForwardLeftClip, LEGACY_CLIP_MOVE_FORWARD_LEFT);
+                        legacyAnimation.AddClip(legacyAnimationData.moveForwardRightClip, LEGACY_CLIP_MOVE_FORWARD_RIGHT);
+                        legacyAnimation.AddClip(legacyAnimationData.moveBackwardLeftClip, LEGACY_CLIP_MOVE_BACKWARD_LEFT);
+                        legacyAnimation.AddClip(legacyAnimationData.moveBackwardRightClip, LEGACY_CLIP_MOVE_BACKWARD_RIGHT);
                         legacyAnimation.AddClip(legacyAnimationData.jumpClip, LEGACY_CLIP_JUMP);
                         legacyAnimation.AddClip(legacyAnimationData.fallClip, LEGACY_CLIP_FALL);
                         legacyAnimation.AddClip(legacyAnimationData.hurtClip, LEGACY_CLIP_HURT);
@@ -199,6 +247,13 @@ namespace MultiplayerARPG
                             SetupGenericClips_Animator(
                                 weaponAnimations.idleClip,
                                 weaponAnimations.moveClip,
+                                weaponAnimations.moveBackwardClip,
+                                weaponAnimations.moveLeftClip,
+                                weaponAnimations.moveRightClip,
+                                weaponAnimations.moveForwardLeftClip,
+                                weaponAnimations.moveForwardRightClip,
+                                weaponAnimations.moveBackwardLeftClip,
+                                weaponAnimations.moveBackwardRightClip,
                                 weaponAnimations.jumpClip,
                                 weaponAnimations.fallClip,
                                 weaponAnimations.hurtClip,
@@ -208,6 +263,13 @@ namespace MultiplayerARPG
                             SetupGenericClips_LegacyAnimation(
                                 weaponAnimations.idleClip,
                                 weaponAnimations.moveClip,
+                                weaponAnimations.moveBackwardClip,
+                                weaponAnimations.moveLeftClip,
+                                weaponAnimations.moveRightClip,
+                                weaponAnimations.moveForwardLeftClip,
+                                weaponAnimations.moveForwardRightClip,
+                                weaponAnimations.moveBackwardLeftClip,
+                                weaponAnimations.moveBackwardRightClip,
                                 weaponAnimations.jumpClip,
                                 weaponAnimations.fallClip,
                                 weaponAnimations.hurtClip,
@@ -220,10 +282,10 @@ namespace MultiplayerARPG
                     switch (animatorType)
                     {
                         case AnimatorType.Animator:
-                            SetupGenericClips_Animator(null, null, null, null, null, null);
+                            SetupGenericClips_Animator(null, null, null, null, null, null, null, null, null, null, null, null, null);
                             break;
                         case AnimatorType.LegacyAnimtion:
-                            SetupGenericClips_LegacyAnimation(null, null, null, null, null, null);
+                            SetupGenericClips_LegacyAnimation(null, null, null, null, null, null, null, null, null, null, null, null, null);
                             break;
                     }
                 }
@@ -233,6 +295,13 @@ namespace MultiplayerARPG
         private void SetupGenericClips_Animator(
             AnimationClip idleClip,
             AnimationClip moveClip,
+            AnimationClip moveBackwardClip,
+            AnimationClip moveLeftClip,
+            AnimationClip moveRightClip,
+            AnimationClip moveForwardLeftClip,
+            AnimationClip moveForwardRightClip,
+            AnimationClip moveBackwardLeftClip,
+            AnimationClip moveBackwardRightClip,
             AnimationClip jumpClip,
             AnimationClip fallClip,
             AnimationClip hurtClip,
@@ -242,6 +311,20 @@ namespace MultiplayerARPG
                 idleClip = defaultAnimatorData.idleClip;
             if (moveClip == null)
                 moveClip = defaultAnimatorData.moveClip;
+            if (moveBackwardClip == null)
+                moveBackwardClip = defaultAnimatorData.moveBackwardClip;
+            if (moveLeftClip == null)
+                moveLeftClip = defaultAnimatorData.moveLeftClip;
+            if (moveRightClip == null)
+                moveRightClip = defaultAnimatorData.moveRightClip;
+            if (moveForwardLeftClip == null)
+                moveForwardLeftClip = defaultAnimatorData.moveForwardLeftClip;
+            if (moveForwardRightClip == null)
+                moveForwardRightClip = defaultAnimatorData.moveForwardRightClip;
+            if (moveBackwardLeftClip == null)
+                moveBackwardLeftClip = defaultAnimatorData.moveBackwardLeftClip;
+            if (moveBackwardRightClip == null)
+                moveBackwardRightClip = defaultAnimatorData.moveBackwardRightClip;
             if (jumpClip == null)
                 jumpClip = defaultAnimatorData.jumpClip;
             if (fallClip == null)
@@ -255,6 +338,20 @@ namespace MultiplayerARPG
                 CacheAnimatorController[defaultIdleClipName] = idleClip;
             if (!string.IsNullOrEmpty(defaultMoveClipName))
                 CacheAnimatorController[defaultMoveClipName] = moveClip;
+            if (!string.IsNullOrEmpty(defaultMoveBackwardClipName))
+                CacheAnimatorController[defaultMoveBackwardClipName] = moveBackwardClip;
+            if (!string.IsNullOrEmpty(defaultMoveLeftClipName))
+                CacheAnimatorController[defaultMoveLeftClipName] = moveLeftClip;
+            if (!string.IsNullOrEmpty(defaultMoveRightClipName))
+                CacheAnimatorController[defaultMoveRightClipName] = moveRightClip;
+            if (!string.IsNullOrEmpty(defaultMoveForwardLeftClipName))
+                CacheAnimatorController[defaultMoveForwardLeftClipName] = moveForwardLeftClip;
+            if (!string.IsNullOrEmpty(defaultMoveForwardRightClipName))
+                CacheAnimatorController[defaultMoveForwardRightClipName] = moveForwardRightClip;
+            if (!string.IsNullOrEmpty(defaultMoveBackwardLeftClipName))
+                CacheAnimatorController[defaultMoveBackwardLeftClipName] = moveBackwardLeftClip;
+            if (!string.IsNullOrEmpty(defaultMoveBackwardRightClipName))
+                CacheAnimatorController[defaultMoveBackwardRightClipName] = moveBackwardRightClip;
             if (!string.IsNullOrEmpty(defaultJumpClipName))
                 CacheAnimatorController[defaultJumpClipName] = jumpClip;
             if (!string.IsNullOrEmpty(defaultFallClipName))
@@ -268,6 +365,13 @@ namespace MultiplayerARPG
         private void SetupGenericClips_LegacyAnimation(
             AnimationClip idleClip,
             AnimationClip moveClip,
+            AnimationClip moveBackwardClip,
+            AnimationClip moveLeftClip,
+            AnimationClip moveRightClip,
+            AnimationClip moveForwardLeftClip,
+            AnimationClip moveForwardRightClip,
+            AnimationClip moveBackwardLeftClip,
+            AnimationClip moveBackwardRightClip,
             AnimationClip jumpClip,
             AnimationClip fallClip,
             AnimationClip hurtClip,
@@ -277,6 +381,20 @@ namespace MultiplayerARPG
                 idleClip = legacyAnimationData.idleClip;
             if (moveClip == null)
                 moveClip = legacyAnimationData.moveClip;
+            if (moveBackwardClip == null)
+                moveBackwardClip = legacyAnimationData.moveBackwardClip;
+            if (moveLeftClip == null)
+                moveLeftClip = legacyAnimationData.moveLeftClip;
+            if (moveRightClip == null)
+                moveRightClip = legacyAnimationData.moveRightClip;
+            if (moveForwardLeftClip == null)
+                moveForwardLeftClip = legacyAnimationData.moveForwardLeftClip;
+            if (moveForwardRightClip == null)
+                moveForwardRightClip = legacyAnimationData.moveForwardRightClip;
+            if (moveBackwardLeftClip == null)
+                moveBackwardLeftClip = legacyAnimationData.moveBackwardLeftClip;
+            if (moveBackwardRightClip == null)
+                moveBackwardRightClip = legacyAnimationData.moveBackwardRightClip;
             if (jumpClip == null)
                 jumpClip = legacyAnimationData.jumpClip;
             if (fallClip == null)
@@ -290,6 +408,20 @@ namespace MultiplayerARPG
                 legacyAnimation.RemoveClip(LEGACY_CLIP_IDLE);
             if (legacyAnimation.GetClip(LEGACY_CLIP_MOVE) != null)
                 legacyAnimation.RemoveClip(LEGACY_CLIP_MOVE);
+            if (legacyAnimation.GetClip(LEGACY_CLIP_MOVE_BACKWARD) != null)
+                legacyAnimation.RemoveClip(LEGACY_CLIP_MOVE_BACKWARD);
+            if (legacyAnimation.GetClip(LEGACY_CLIP_MOVE_LEFT) != null)
+                legacyAnimation.RemoveClip(LEGACY_CLIP_MOVE_LEFT);
+            if (legacyAnimation.GetClip(LEGACY_CLIP_MOVE_RIGHT) != null)
+                legacyAnimation.RemoveClip(LEGACY_CLIP_MOVE_RIGHT);
+            if (legacyAnimation.GetClip(LEGACY_CLIP_MOVE_FORWARD_LEFT) != null)
+                legacyAnimation.RemoveClip(LEGACY_CLIP_MOVE_FORWARD_LEFT);
+            if (legacyAnimation.GetClip(LEGACY_CLIP_MOVE_FORWARD_RIGHT) != null)
+                legacyAnimation.RemoveClip(LEGACY_CLIP_MOVE_FORWARD_RIGHT);
+            if (legacyAnimation.GetClip(LEGACY_CLIP_MOVE_BACKWARD_LEFT) != null)
+                legacyAnimation.RemoveClip(LEGACY_CLIP_MOVE_BACKWARD_LEFT);
+            if (legacyAnimation.GetClip(LEGACY_CLIP_MOVE_BACKWARD_RIGHT) != null)
+                legacyAnimation.RemoveClip(LEGACY_CLIP_MOVE_BACKWARD_RIGHT);
             if (legacyAnimation.GetClip(LEGACY_CLIP_JUMP) != null)
                 legacyAnimation.RemoveClip(LEGACY_CLIP_JUMP);
             if (legacyAnimation.GetClip(LEGACY_CLIP_FALL) != null)
@@ -301,6 +433,13 @@ namespace MultiplayerARPG
             // Setup generic clips
             legacyAnimation.AddClip(idleClip, LEGACY_CLIP_IDLE);
             legacyAnimation.AddClip(moveClip, LEGACY_CLIP_MOVE);
+            legacyAnimation.AddClip(moveBackwardClip, LEGACY_CLIP_MOVE_BACKWARD);
+            legacyAnimation.AddClip(moveLeftClip, LEGACY_CLIP_MOVE_LEFT);
+            legacyAnimation.AddClip(moveRightClip, LEGACY_CLIP_MOVE_RIGHT);
+            legacyAnimation.AddClip(moveForwardLeftClip, LEGACY_CLIP_MOVE_FORWARD_LEFT);
+            legacyAnimation.AddClip(moveForwardRightClip, LEGACY_CLIP_MOVE_FORWARD_RIGHT);
+            legacyAnimation.AddClip(moveBackwardLeftClip, LEGACY_CLIP_MOVE_BACKWARD_LEFT);
+            legacyAnimation.AddClip(moveBackwardRightClip, LEGACY_CLIP_MOVE_BACKWARD_RIGHT);
             legacyAnimation.AddClip(jumpClip, LEGACY_CLIP_JUMP);
             legacyAnimation.AddClip(fallClip, LEGACY_CLIP_FALL);
             legacyAnimation.AddClip(hurtClip, LEGACY_CLIP_HURT);
@@ -319,21 +458,21 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void UpdateAnimation(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier = 1f)
+        public override void UpdateAnimation(bool isDead, bool isGrounded, Vector3 lookDirection, Vector3 moveVelocity, float playMoveSpeedMultiplier = 1f)
         {
             switch (animatorType)
             {
                 case AnimatorType.Animator:
-                    UpdateAnimation_Animator(isDead, moveVelocity, playMoveSpeedMultiplier);
+                    UpdateAnimation_Animator(isDead, isGrounded, lookDirection, moveVelocity, playMoveSpeedMultiplier);
                     break;
                 case AnimatorType.LegacyAnimtion:
-                    UpdateAnimation_LegacyAnimation(isDead, moveVelocity, playMoveSpeedMultiplier);
+                    UpdateAnimation_LegacyAnimation(isDead, isGrounded, lookDirection, moveVelocity, playMoveSpeedMultiplier);
                     break;
             }
         }
 
         #region Update Animation Functions
-        private void UpdateAnimation_Animator(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier)
+        private void UpdateAnimation_Animator(bool isDead, bool isGrounded, Vector3 lookDirection, Vector3 moveVelocity, float playMoveSpeedMultiplier)
         {
             if (!animator.gameObject.activeInHierarchy)
                 return;
@@ -342,13 +481,70 @@ namespace MultiplayerARPG
                 // Force set to none action when dead
                 animator.SetBool(ANIM_DO_ACTION, false);
             }
-            animator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : new Vector3(moveVelocity.x, 0, moveVelocity.z).magnitude);
+
+            tempNormalizedVelocity = new Vector3(moveVelocity.x, 0, moveVelocity.z).normalized;
+            tempMovementAngle = Vector3.SignedAngle(tempNormalizedVelocity, lookDirection, Vector3.up);
+
+            // Forward
+            if (tempMovementAngle > -30 && tempMovementAngle < 30)
+            {
+                tempForwardMoveSpeedMultiplier = 1;
+                tempSideMoveSpeedMultiplier = 0;
+            }
+            // Backward
+            else if (tempMovementAngle > 150 || tempMovementAngle < -150)
+            {
+                tempForwardMoveSpeedMultiplier = -1;
+                tempSideMoveSpeedMultiplier = 0;
+            }
+            // Right
+            else if (tempMovementAngle < -90 && tempMovementAngle > -120)
+            {
+                tempForwardMoveSpeedMultiplier = 0;
+                tempSideMoveSpeedMultiplier = 1;
+            }
+            // Left
+            else if (tempMovementAngle > 90 && tempMovementAngle < 120)
+            {
+                tempForwardMoveSpeedMultiplier = 0;
+                tempSideMoveSpeedMultiplier = -1;
+            }
+            // Forward Right
+            else if (tempMovementAngle < -30 && tempMovementAngle > -90)
+            {
+                tempForwardMoveSpeedMultiplier = 1;
+                tempSideMoveSpeedMultiplier = 1;
+            }
+            // Forward Left
+            else if (tempMovementAngle > 30 && tempMovementAngle < 90)
+            {
+                tempForwardMoveSpeedMultiplier = 1;
+                tempSideMoveSpeedMultiplier = -1;
+            }
+            // Backward Right
+            else if (tempMovementAngle < -120 && tempMovementAngle > -150)
+            {
+                tempForwardMoveSpeedMultiplier = -1;
+                tempSideMoveSpeedMultiplier = 1;
+            }
+            // Backward Left
+            else if (tempMovementAngle > 120 && tempMovementAngle < 150)
+            {
+                tempForwardMoveSpeedMultiplier = -1;
+                tempSideMoveSpeedMultiplier = -1;
+            }
+            if (GetComponent<PlayerCharacterEntity>() != null)
+            Debug.LogError("Fore " + tempForwardMoveSpeedMultiplier + " Side " + tempSideMoveSpeedMultiplier);
+            // Set animator parameters
+            animator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : tempNormalizedVelocity.magnitude * tempForwardMoveSpeedMultiplier);
+            animator.SetFloat(ANIM_SIDE_MOVE_SPEED, isDead ? 0 : tempNormalizedVelocity.magnitude * tempSideMoveSpeedMultiplier);
             animator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, playMoveSpeedMultiplier);
             animator.SetFloat(ANIM_Y_SPEED, moveVelocity.y);
             animator.SetBool(ANIM_IS_DEAD, isDead);
+            animator.SetBool(ANIM_IS_GROUNDED, isGrounded);
         }
 
-        private void UpdateAnimation_LegacyAnimation(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier)
+        private void UpdateAnimation_LegacyAnimation(bool isDead, bool isGrounded, Vector3 lookDirection, Vector3 moveVelocity, float playMoveSpeedMultiplier)
         {
             if (isDead)
                 CrossFadeLegacyAnimation(LEGACY_CLIP_DEAD, legacyAnimationData.deadClipFadeLength, WrapMode.Once);
@@ -361,9 +557,35 @@ namespace MultiplayerARPG
                     CrossFadeLegacyAnimation(LEGACY_CLIP_FALL, legacyAnimationData.fallClipFadeLength, WrapMode.Loop);
                 else
                 {
-                    float moveMagnitude = new Vector3(moveVelocity.x, 0, moveVelocity.z).magnitude;
-                    if (moveMagnitude > legacyAnimationData.magnitudeToPlayMoveClip)
-                        CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                    tempNormalizedVelocity = new Vector3(moveVelocity.x, 0, moveVelocity.z).normalized;
+                    if (tempNormalizedVelocity.magnitude > legacyAnimationData.magnitudeToPlayMoveClip)
+                    {
+                        tempMovementAngle = Vector3.SignedAngle(tempNormalizedVelocity, lookDirection, Vector3.up);
+                        // Forward
+                        if (tempMovementAngle > -30 && tempMovementAngle < 30)
+                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                        // Backward
+                        else if (tempMovementAngle > 150 || tempMovementAngle < -150)
+                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_BACKWARD, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                        // Right
+                        else if (tempMovementAngle < -90 && tempMovementAngle > -120)
+                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_RIGHT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                        // Left
+                        else if (tempMovementAngle > 90 && tempMovementAngle < 120)
+                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_LEFT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                        // Forward Right
+                        else if (tempMovementAngle < -30 && tempMovementAngle > -90)
+                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_FORWARD_RIGHT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                        // Forward Left
+                        else if (tempMovementAngle > 30 && tempMovementAngle < 90)
+                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_FORWARD_LEFT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                        // Backward Right
+                        else if (tempMovementAngle < -120 && tempMovementAngle > -150)
+                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_BACKWARD_RIGHT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                        // Backward Left
+                        else if (tempMovementAngle > 120 && tempMovementAngle < 150)
+                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_BACKWARD_LEFT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                    }
                     else
                         CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
                 }
@@ -578,6 +800,13 @@ namespace MultiplayerARPG
     {
         public AnimationClip idleClip;
         public AnimationClip moveClip;
+        public AnimationClip moveBackwardClip;
+        public AnimationClip moveLeftClip;
+        public AnimationClip moveRightClip;
+        public AnimationClip moveForwardLeftClip;
+        public AnimationClip moveForwardRightClip;
+        public AnimationClip moveBackwardLeftClip;
+        public AnimationClip moveBackwardRightClip;
         public AnimationClip jumpClip;
         public AnimationClip fallClip;
         public AnimationClip hurtClip;
@@ -599,6 +828,13 @@ namespace MultiplayerARPG
     {
         public AnimationClip idleClip;
         public AnimationClip moveClip;
+        public AnimationClip moveBackwardClip;
+        public AnimationClip moveLeftClip;
+        public AnimationClip moveRightClip;
+        public AnimationClip moveForwardLeftClip;
+        public AnimationClip moveForwardRightClip;
+        public AnimationClip moveBackwardLeftClip;
+        public AnimationClip moveBackwardRightClip;
         public AnimationClip jumpClip;
         public AnimationClip fallClip;
         public AnimationClip hurtClip;

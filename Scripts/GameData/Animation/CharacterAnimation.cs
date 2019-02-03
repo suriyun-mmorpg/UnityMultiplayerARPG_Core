@@ -53,6 +53,13 @@ namespace MultiplayerARPG
         public WeaponType weaponType;
         public AnimationClip idleClip;
         public AnimationClip moveClip;
+        public AnimationClip moveBackwardClip;
+        public AnimationClip moveLeftClip;
+        public AnimationClip moveRightClip;
+        public AnimationClip moveForwardLeftClip;
+        public AnimationClip moveForwardRightClip;
+        public AnimationClip moveBackwardLeftClip;
+        public AnimationClip moveBackwardRightClip;
         public AnimationClip jumpClip;
         public AnimationClip fallClip;
         public AnimationClip hurtClip;

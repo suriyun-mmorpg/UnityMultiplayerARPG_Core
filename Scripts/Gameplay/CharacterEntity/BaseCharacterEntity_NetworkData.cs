@@ -395,5 +395,53 @@ namespace MultiplayerARPG
                 onSummonsOperation.Invoke(operation, index);
         }
         #endregion
+
+        public MovementState GetMovementState(Vector3 moveDirection)
+        {
+            MovementState result = MovementState.None;
+            float tempMovementAngle = Vector3.SignedAngle(moveDirection, CacheTransform.forward, Vector3.up);
+
+            // Forward
+            if (tempMovementAngle > -30 && tempMovementAngle < 30)
+            {
+                result = MovementState.Forward;
+            }
+            // Backward
+            else if (tempMovementAngle > 150 || tempMovementAngle < -150)
+            {
+                result = MovementState.Backward;
+            }
+            // Right
+            else if (tempMovementAngle < -90 && tempMovementAngle > -120)
+            {
+                result = MovementState.Right;
+            }
+            // Left
+            else if (tempMovementAngle > 90 && tempMovementAngle < 120)
+            {
+                result = MovementState.Left;
+            }
+            // Forward Right
+            else if (tempMovementAngle < -30 && tempMovementAngle > -90)
+            {
+                result = MovementState.Forward | MovementState.Right;
+            }
+            // Forward Left
+            else if (tempMovementAngle > 30 && tempMovementAngle < 90)
+            {
+                result = MovementState.Forward | MovementState.Left;
+            }
+            // Backward Right
+            else if (tempMovementAngle < -120 && tempMovementAngle > -150)
+            {
+                result = MovementState.Backward | MovementState.Right;
+            }
+            // Backward Left
+            else if (tempMovementAngle > 120 && tempMovementAngle < 150)
+            {
+                result = MovementState.Backward | MovementState.Left;
+            }
+            return result;
+        }
     }
 }

@@ -20,7 +20,19 @@ namespace MultiplayerARPG
         protected Vector2 tempDirection;
         protected DirectionType localDirectionType = DirectionType.Down;
         #endregion
-        
+
+        public override bool IsGrounded
+        {
+            get { return true; }
+            protected set { }
+        }
+
+        public override bool IsJumping
+        {
+            get { return false; }
+            protected set { }
+        }
+
         private MonsterActivityComponent2D cacheMonsterActivityComponent;
         public MonsterActivityComponent2D CacheMonsterActivityComponent
         {

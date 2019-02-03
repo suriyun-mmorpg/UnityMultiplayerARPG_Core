@@ -10,6 +10,18 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(CapsuleCollider))]
     public partial class MonsterCharacterEntity : BaseMonsterCharacterEntity
     {
+        public override bool IsGrounded
+        {
+            get { return true; }
+            protected set { }
+        }
+
+        public override bool IsJumping
+        {
+            get { return false; }
+            protected set { }
+        }
+
         private MonsterActivityComponent cacheMonsterActivityComponent;
         public MonsterActivityComponent CacheMonsterActivityComponent
         {

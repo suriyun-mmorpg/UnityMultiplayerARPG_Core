@@ -205,7 +205,7 @@ namespace MultiplayerARPG
             nextFrameTime = Time.realtimeSinceStartup + secsPerFrame;
         }
 
-        public override void UpdateAnimation(bool isDead, Vector3 moveVelocity, float playMoveSpeedMultiplier = 1)
+        public override void UpdateAnimation(bool isDead, bool isGrounded, Vector3 lookDirection, Vector3 moveVelocity, float playMoveSpeedMultiplier = 1)
         {
             if (playingAction)
                 return;
