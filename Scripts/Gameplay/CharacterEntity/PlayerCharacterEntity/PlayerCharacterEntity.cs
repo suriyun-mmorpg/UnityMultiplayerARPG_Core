@@ -314,18 +314,6 @@ namespace MultiplayerARPG
             base.SetTargetEntity(entity);
         }
 
-        protected virtual void OnCollisionEnter(Collision collision)
-        {
-            if (!IsGrounded && collision.impulse.y > 0)
-                IsGrounded = true;
-        }
-
-        protected virtual void OnCollisionStay(Collision collision)
-        {
-            if (!IsGrounded && collision.impulse.y > 0)
-                IsGrounded = true;
-        }
-
         protected virtual void SetMovePaths(Vector3 position, bool useNavMesh)
         {
             if (useNavMesh)

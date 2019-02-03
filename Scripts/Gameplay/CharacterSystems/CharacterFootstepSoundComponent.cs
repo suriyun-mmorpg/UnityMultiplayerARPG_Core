@@ -20,8 +20,6 @@ namespace MultiplayerARPG
         [Range(-3f, 3f)]
         public float randomPitchMax = 1f;
 
-        public float verticalThresholdToDontPlaySound = 0.1f;
-
         private float delayCounter = 0f;
 
         private CharacterAnimationComponent cacheCharacterAnimationComponent;
@@ -51,7 +49,7 @@ namespace MultiplayerARPG
             delayCounter += Time.deltaTime;
             if (delayCounter >= stepDelay / CacheCharacterEntity.MoveAnimationSpeedMultiplier)
             {
-                if (Mathf.Abs(CacheCharacterAnimationComponent.currentVelocity.y) < verticalThresholdToDontPlaySound)
+                if (CacheCharacterEntity.IsGrounded)
                     PlaySound();
                 delayCounter = 0f;
             }

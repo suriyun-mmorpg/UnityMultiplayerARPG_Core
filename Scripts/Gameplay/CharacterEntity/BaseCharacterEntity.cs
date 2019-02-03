@@ -103,6 +103,8 @@ namespace MultiplayerARPG
 
         public override int MaxHp { get { return CacheMaxHp; } }
         public float MoveAnimationSpeedMultiplier { get { return gameplayRule.GetMoveSpeed(this) / CacheBaseMoveSpeed; } }
+        public virtual bool IsGrounded { get; protected set; }
+        public virtual bool IsJumping { get; protected set; }
         public abstract int DataId { get; set; }
         public abstract BaseCharacter Database { get; }
 

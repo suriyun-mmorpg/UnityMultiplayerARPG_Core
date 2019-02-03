@@ -51,8 +51,6 @@ namespace MultiplayerARPG
         }
 
         public float dealingCharacterTime { get; private set; }
-        public virtual bool IsJumping { get; protected set; }
-        public virtual bool IsGrounded { get; protected set; }
         public override BaseCharacter Database { get { return GameInstance.PlayerCharacters[DataId]; } }
 
         protected override void EntityAwake()
@@ -75,6 +73,18 @@ namespace MultiplayerARPG
             if (MigrateDatabase())
                 EditorUtility.SetDirty(this);
 #endif
+        }
+
+        protected void OnCollisionEnter(Collision collision)
+        {
+            if (!IsGrounded && collision.impulse.y > 0)
+                IsGrounded = true;
+        }
+
+        protected void OnCollisionStay(Collision collision)
+        {
+            if (!IsGrounded && collision.impulse.y > 0)
+                IsGrounded = true;
         }
 
         private bool MigrateDatabase()
