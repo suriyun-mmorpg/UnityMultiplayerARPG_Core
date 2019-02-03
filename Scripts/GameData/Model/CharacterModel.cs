@@ -498,25 +498,25 @@ namespace MultiplayerARPG
                 tempSideMoveSpeedMultiplier = 0;
             }
             // Right
-            else if (tempMovementAngle < -90 && tempMovementAngle > -120)
+            else if (tempMovementAngle < -60 && tempMovementAngle > -120)
             {
                 tempForwardMoveSpeedMultiplier = 0;
                 tempSideMoveSpeedMultiplier = 1;
             }
             // Left
-            else if (tempMovementAngle > 90 && tempMovementAngle < 120)
+            else if (tempMovementAngle > 60 && tempMovementAngle < 120)
             {
                 tempForwardMoveSpeedMultiplier = 0;
                 tempSideMoveSpeedMultiplier = -1;
             }
             // Forward Right
-            else if (tempMovementAngle < -30 && tempMovementAngle > -90)
+            else if (tempMovementAngle < -30 && tempMovementAngle > -60)
             {
                 tempForwardMoveSpeedMultiplier = 1;
                 tempSideMoveSpeedMultiplier = 1;
             }
             // Forward Left
-            else if (tempMovementAngle > 30 && tempMovementAngle < 90)
+            else if (tempMovementAngle > 30 && tempMovementAngle < 60)
             {
                 tempForwardMoveSpeedMultiplier = 1;
                 tempSideMoveSpeedMultiplier = -1;
@@ -566,16 +566,16 @@ namespace MultiplayerARPG
                         else if (tempMovementAngle > 150 || tempMovementAngle < -150)
                             CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_BACKWARD, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
                         // Right
-                        else if (tempMovementAngle < -90 && tempMovementAngle > -120)
+                        else if (tempMovementAngle < -60 && tempMovementAngle > -120)
                             CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_RIGHT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
                         // Left
-                        else if (tempMovementAngle > 90 && tempMovementAngle < 120)
+                        else if (tempMovementAngle > 60 && tempMovementAngle < 120)
                             CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_LEFT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
                         // Forward Right
-                        else if (tempMovementAngle < -30 && tempMovementAngle > -90)
+                        else if (tempMovementAngle < -30 && tempMovementAngle > -60)
                             CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_FORWARD_RIGHT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
                         // Forward Left
-                        else if (tempMovementAngle > 30 && tempMovementAngle < 90)
+                        else if (tempMovementAngle > 30 && tempMovementAngle < 60)
                             CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_FORWARD_LEFT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
                         // Backward Right
                         else if (tempMovementAngle < -120 && tempMovementAngle > -150)
