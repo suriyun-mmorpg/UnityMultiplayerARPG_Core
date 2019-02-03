@@ -85,7 +85,7 @@ namespace MultiplayerARPG
             else if (shieldItem != null)
                 RequestEquipItem(nonEquipIndex, (byte)InventoryType.EquipWeaponLeft, 0);
             else if (armorItem != null)
-                RequestEquipItem(nonEquipIndex, (byte)InventoryType.EquipItems, (short)this.IndexOfEquipItem(armorItem.DataId));
+                RequestEquipItem(nonEquipIndex, (byte)InventoryType.EquipItems, (short)this.IndexOfEquipItem(armorItem.EquipPosition));
         }
 
         public virtual void RequestEquipItem(short nonEquipIndex, byte byteInventoryType, short oldEquipIndex)

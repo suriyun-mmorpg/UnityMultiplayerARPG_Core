@@ -328,6 +328,8 @@ namespace MultiplayerARPG
                     EquipWeapons = tempEquipWeapons;
                     break;
                 case InventoryType.EquipItems:
+                    if (oldEquipIndex < 0)
+                        oldEquipIndex = (short)this.IndexOfEquipItem(equippingItem.GetArmorItem().EquipPosition);
                     if (oldEquipIndex >= 0)
                         NetFuncUnEquipItem((byte)InventoryType.EquipItems, oldEquipIndex);
                     equipItems.Add(equippingItem);
