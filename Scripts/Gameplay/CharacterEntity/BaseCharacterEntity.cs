@@ -319,12 +319,16 @@ namespace MultiplayerARPG
                         {
                             shouldUnequipRightHand = true;
                         }
-                        // Unequip item if right hand weapon is one hand or two hand when equipping at left hand
                         if (inventoryType == InventoryType.EquipWeaponLeft && hasLeftHandItem)
+                        {
+                            shouldUnequipLeftHand = true;
+                        }
+                        // Unequip item if right hand weapon is one hand or two hand when equipping at left hand
+                        if (inventoryType == InventoryType.EquipWeaponLeft && hasRightHandItem)
                         {
                             if (rightHandEquipType == WeaponItemEquipType.OneHand ||
                                 rightHandEquipType == WeaponItemEquipType.TwoHand)
-                                shouldUnequipLeftHand = true;
+                                shouldUnequipRightHand = true;
                         }
                         break;
                     case WeaponItemEquipType.TwoHand:
