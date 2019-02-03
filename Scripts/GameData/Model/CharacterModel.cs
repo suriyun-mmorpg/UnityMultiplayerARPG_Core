@@ -533,8 +533,6 @@ namespace MultiplayerARPG
                 tempForwardMoveSpeedMultiplier = -1;
                 tempSideMoveSpeedMultiplier = -1;
             }
-            if (GetComponent<PlayerCharacterEntity>() != null)
-            Debug.LogError("Fore " + tempForwardMoveSpeedMultiplier + " Side " + tempSideMoveSpeedMultiplier);
             // Set animator parameters
             animator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : tempNormalizedVelocity.magnitude * tempForwardMoveSpeedMultiplier);
             animator.SetFloat(ANIM_SIDE_MOVE_SPEED, isDead ? 0 : tempNormalizedVelocity.magnitude * tempSideMoveSpeedMultiplier);
