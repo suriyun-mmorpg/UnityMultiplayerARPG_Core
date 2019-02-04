@@ -6,14 +6,39 @@ namespace MultiplayerARPG
 {
     public partial class ShooterPlayerCharacterController : BasePlayerCharacterController
     {
+        public const int RAYCAST_COLLIDER_SIZE = 32;
+        public const int OVERLAP_COLLIDER_SIZE = 32;
+
+        public enum TurningState
+        {
+            None,
+            Attack,
+            Activate,
+        }
+        public float angularSpeed = 800f;
+        [Range(0, 1f)]
+        public float turnToTargetDuration = 0.1f;
         public float mouseXSensitivity = 5f;
         public float targetRaycastDistance = 100f;
         public FollowCameraControls gameplayCameraPrefab;
         public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
-        RaycastHit[] tempHitInfos;
+        bool isBlockController;
         DamageableEntity tempEntity;
         DamageableEntity foundEntity;
-        Quaternion updatingCharacterRotation;
+        Vector3 targetLookDirection;
+        Quaternion tempLookAt;
+        TurningState turningState;
+        float turnTimeCounter;
+        float tempCalculateAngle;
+        bool tempPressAttack;
+        bool tempPressActivate;
+        int tempCount;
+        int tempCounter;
+        GameObject tempGameObject;
+        BasePlayerCharacterEntity targetPlayer;
+        NpcEntity targetNpc;
+        RaycastHit[] raycasts = new RaycastHit[RAYCAST_COLLIDER_SIZE];
+        Collider[] overlapColliders = new Collider[OVERLAP_COLLIDER_SIZE];
 
         protected override void Awake()
         {
@@ -37,8 +62,6 @@ namespace MultiplayerARPG
 
             if (CacheGameplayCameraControls != null)
                 CacheGameplayCameraControls.target = characterEntity.CacheTransform;
-
-            updatingCharacterRotation = characterEntity.CacheTransform.rotation;
         }
 
         protected override void Desetup(BasePlayerCharacterEntity characterEntity)
@@ -62,61 +85,132 @@ namespace MultiplayerARPG
                 return;
 
             base.Update();
+            UpdateLookAtTarget();
 
+            isBlockController = CacheUISceneGameplay.IsBlockController();
             // Lock cursor when not show UIs
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            Cursor.lockState = !isBlockController ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = isBlockController;
 
-            CacheGameplayCameraControls.updateRotation = false;
-            CacheGameplayCameraControls.updateRotationY = true;
-            CacheGameplayCameraControls.useTargetYRotation = true;
+            CacheGameplayCameraControls.updateRotation = !isBlockController;
+
+            if (isBlockController)
+                return;
+
+            if (GenericUtils.IsFocusInputField())
+                return;
 
             // Find target character
             Ray ray = CacheGameplayCameraControls.CacheCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
             foundEntity = null;
-            tempHitInfos = Physics.RaycastAll(ray, targetRaycastDistance);
-            foreach (RaycastHit hitInfo in tempHitInfos)
+            tempCount = Physics.RaycastNonAlloc(ray, raycasts, targetRaycastDistance);
+            for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
-                tempEntity = hitInfo.collider.GetComponent<DamageableEntity>();
+                tempGameObject = raycasts[tempCounter].transform.gameObject;
+                tempEntity = tempGameObject.GetComponent<DamageableEntity>();
                 if (tempEntity != PlayerCharacterEntity)
                 {
                     foundEntity = tempEntity;
                     break;
                 }
             }
+            Debug.DrawRay(ray.origin, ray.direction, Color.blue);
             // Set aim target at server
             PlayerCharacterEntity.RequestUpdateAimDirection(ray.direction);
-            float yRot = InputManager.GetAxis("Mouse X", false) * mouseXSensitivity;
-            updatingCharacterRotation *= Quaternion.Euler(0f, yRot, 0f);
 
             // If mobile platforms, don't receive input raw to make it smooth
             bool raw = !InputManager.useMobileInputOnNonMobile && !Application.isMobilePlatform;
-            Vector3 moveDirection = GetMoveDirection(InputManager.GetAxis("Horizontal", raw), InputManager.GetAxis("Vertical", raw));
+            Vector3 moveDirection = Vector3.zero;
+            Vector3 forwardLookDirection = Vector3.zero;
+            Vector3 forward = Camera.main.transform.forward;
+            Vector3 right = Camera.main.transform.right;
+            forward.y = 0f;
+            right.y = 0f;
+            forward.Normalize();
+            right.Normalize();
+            moveDirection += forward * InputManager.GetAxis("Vertical", raw);
+            moveDirection += right * InputManager.GetAxis("Horizontal", raw);
+            forwardLookDirection += forward * 1f;
 
             // normalize input if it exceeds 1 in combined length:
             if (moveDirection.sqrMagnitude > 1)
                 moveDirection.Normalize();
+
+            // normalize input if it exceeds 1 in combined length:
+            if (forwardLookDirection.sqrMagnitude > 1)
+                forwardLookDirection.Normalize();
+
+            tempPressAttack = InputManager.GetButton("Fire1");
+            tempPressActivate = InputManager.GetButtonDown("Activate");
+            if (tempPressAttack || tempPressActivate || PlayerCharacterEntity.IsPlayingActionAnimation())
+            {
+                // Find forward character / npc / building / warp entity from camera center
+                if (tempPressActivate && !tempPressAttack)
+                {
+                    tempCount = Physics.RaycastNonAlloc(ray, raycasts, targetRaycastDistance, gameInstance.GetTargetLayerMask());
+                    for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
+                    {
+                        tempGameObject = raycasts[tempCounter].transform.gameObject;
+                        if (targetPlayer == null)
+                        {
+                            targetPlayer = tempGameObject.GetComponent<BasePlayerCharacterEntity>();
+                            if (targetPlayer == PlayerCharacterEntity)
+                                targetPlayer = null;
+                            else
+                                break;
+                        }
+                        if (targetNpc == null)
+                        {
+                            targetNpc = tempGameObject.GetComponent<NpcEntity>();
+                            break;
+                        }
+                    }
+                }
+                // While attacking turn to camera forward
+                tempCalculateAngle = Vector3.Angle(PlayerCharacterEntity.CacheTransform.forward, forwardLookDirection);
+                if (tempCalculateAngle > 15f)
+                {
+                    if (tempPressAttack)
+                        turningState = TurningState.Attack;
+                    else if (tempPressActivate)
+                        turningState = TurningState.Activate;
+                    turnTimeCounter = ((180f - tempCalculateAngle) / 180f) * turnToTargetDuration;
+                    targetLookDirection = forwardLookDirection;
+                }
+                else
+                {
+                    if (tempPressAttack)
+                    {
+                        Attack();
+                    }
+                    else if (tempPressActivate)
+                    {
+                        Activate();
+                    }
+                }
+            }
+            else
+            {
+                if (moveDirection.magnitude != 0f)
+                    targetLookDirection = moveDirection;
+            }
 
             // Hide Npc UIs when move
             if (moveDirection.magnitude != 0f)
             {
                 if (CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
                     CacheUISceneGameplay.uiNpcDialog.Hide();
-            }
-
-            // Move
-            if (moveDirection.magnitude != 0f)
-            {
                 PlayerCharacterEntity.StopMove();
                 PlayerCharacterEntity.SetTargetEntity(null);
             }
-
             PlayerCharacterEntity.KeyMovement(moveDirection, InputManager.GetButtonDown("Jump"));
-            PlayerCharacterEntity.UpdateYRotation(updatingCharacterRotation.eulerAngles.y);
+
 
             // Show target hp/mp
             if (CacheUISceneGameplay != null)
                 CacheUISceneGameplay.SetTargetEntity(foundEntity);
+
+            turnTimeCounter += Time.deltaTime;
         }
 
         public Vector3 GetMoveDirection(float horizontalInput, float verticalInput)
@@ -133,9 +227,122 @@ namespace MultiplayerARPG
             return moveDirection;
         }
 
+        protected void UpdateLookAtTarget()
+        {
+            tempCalculateAngle = Vector3.Angle(PlayerCharacterEntity.CacheTransform.forward, targetLookDirection);
+            if (turningState != TurningState.None)
+            {
+                if (tempCalculateAngle > 0)
+                {
+                    // Update rotation when angle difference more than 0
+                    tempLookAt = Quaternion.Slerp(PlayerCharacterEntity.CacheTransform.rotation, Quaternion.LookRotation(targetLookDirection), turnTimeCounter / turnToTargetDuration);
+                    PlayerCharacterEntity.UpdateYRotation(tempLookAt.eulerAngles.y);
+                }
+                else
+                {
+                    switch (turningState)
+                    {
+                        case TurningState.Attack:
+                            Attack();
+                            break;
+                        case TurningState.Activate:
+                            Activate();
+                            break;
+                    }
+                    turningState = TurningState.None;
+                }
+            }
+            else
+            {
+                if (tempCalculateAngle > 0)
+                {
+                    // Update rotation when angle difference more than 0
+                    tempLookAt = Quaternion.RotateTowards(PlayerCharacterEntity.CacheTransform.rotation, Quaternion.LookRotation(targetLookDirection), Time.deltaTime * angularSpeed);
+                    PlayerCharacterEntity.UpdateYRotation(tempLookAt.eulerAngles.y);
+                }
+            }
+        }
+
         public override void UseHotkey(int hotkeyIndex)
         {
+            if (hotkeyIndex < 0 || hotkeyIndex >= PlayerCharacterEntity.Hotkeys.Count)
+                return;
 
+            CancelBuild();
+            buildingItemIndex = -1;
+            currentBuildingEntity = null;
+
+            CharacterHotkey hotkey = PlayerCharacterEntity.Hotkeys[hotkeyIndex];
+            Skill skill = hotkey.GetSkill();
+            if (skill != null)
+            {
+                int skillIndex = PlayerCharacterEntity.IndexOfSkill(skill.DataId);
+                if (skillIndex >= 0)
+                {
+                    if (PlayerCharacterEntity.Skills[skillIndex].CanUse(PlayerCharacterEntity))
+                    {
+                        PlayerCharacterEntity.StopMove();
+                        PlayerCharacterEntity.RequestUseSkill(skill.DataId);
+                    }
+                }
+            }
+            Item item = hotkey.GetItem();
+            if (item != null)
+            {
+                int itemIndex = PlayerCharacterEntity.IndexOfNonEquipItem(item.DataId);
+                if (itemIndex >= 0)
+                {
+                    if (item.IsEquipment())
+                        PlayerCharacterEntity.RequestEquipItem((short)itemIndex);
+                    else if (item.IsPotion() || item.IsPet())
+                        PlayerCharacterEntity.RequestUseItem((short)itemIndex);
+                    else if (item.IsBuilding())
+                    {
+                        PlayerCharacterEntity.StopMove();
+                        buildingItemIndex = itemIndex;
+                        currentBuildingEntity = Instantiate(item.buildingEntity);
+                        currentBuildingEntity.SetupAsBuildMode();
+                        currentBuildingEntity.CacheTransform.parent = null;
+                        // TODO: Build character by cursor position
+                    }
+                }
+            }
+        }
+
+        public void Attack()
+        {
+            PlayerCharacterEntity.RequestAttack();
+        }
+
+        public void Activate()
+        {
+            // Priority Player -> Npc -> Buildings
+            if (targetPlayer != null && CacheUISceneGameplay != null)
+                CacheUISceneGameplay.SetActivePlayerCharacter(targetPlayer);
+            else if (targetNpc != null)
+                PlayerCharacterEntity.RequestNpcActivate(targetNpc.ObjectId);
+        }
+
+        public int OverlapObjects(Vector3 position, float distance, int layerMask)
+        {
+            return Physics.OverlapSphereNonAlloc(position, distance, overlapColliders, layerMask);
+        }
+
+        public GameObject GetOverlapObject(int index)
+        {
+            return overlapColliders[index].gameObject;
+        }
+
+        public bool FindTarget(GameObject target, float actDistance, int layerMask)
+        {
+            tempCount = OverlapObjects(CharacterTransform.position, actDistance, layerMask);
+            for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
+            {
+                tempGameObject = GetOverlapObject(tempCounter);
+                if (tempGameObject == target)
+                    return true;
+            }
+            return false;
         }
     }
 }

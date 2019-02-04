@@ -112,10 +112,7 @@ namespace MultiplayerARPG
         private string defaultDeadClipName;
         private string defaultActionClipName;
         private string lastFadedLegacyClipName;
-        private Vector3 tempNormalizedVelocity;
-        private float tempMovementAngle;
-        private sbyte tempForwardMoveSpeedMultiplier;
-        private sbyte tempSideMoveSpeedMultiplier;
+        private Vector3 tempInverseTransformDirection;
         // Private state validater
         private bool isSetupComponent;
 
@@ -458,21 +455,21 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void UpdateAnimation(bool isDead, bool isGrounded, Vector3 lookDirection, Vector3 moveVelocity, float playMoveSpeedMultiplier = 1f)
+        public override void UpdateAnimation(bool isDead, bool isGrounded, Transform transform, Vector3 moveVelocity, float playMoveSpeedMultiplier = 1f)
         {
             switch (animatorType)
             {
                 case AnimatorType.Animator:
-                    UpdateAnimation_Animator(isDead, isGrounded, lookDirection, moveVelocity, playMoveSpeedMultiplier);
+                    UpdateAnimation_Animator(isDead, isGrounded, transform, moveVelocity, playMoveSpeedMultiplier);
                     break;
                 case AnimatorType.LegacyAnimtion:
-                    UpdateAnimation_LegacyAnimation(isDead, isGrounded, lookDirection, moveVelocity, playMoveSpeedMultiplier);
+                    UpdateAnimation_LegacyAnimation(isDead, isGrounded, transform, moveVelocity, playMoveSpeedMultiplier);
                     break;
             }
         }
 
         #region Update Animation Functions
-        private void UpdateAnimation_Animator(bool isDead, bool isGrounded, Vector3 lookDirection, Vector3 moveVelocity, float playMoveSpeedMultiplier)
+        private void UpdateAnimation_Animator(bool isDead, bool isGrounded, Transform transform, Vector3 moveVelocity, float playMoveSpeedMultiplier)
         {
             if (!animator.gameObject.activeInHierarchy)
                 return;
@@ -482,67 +479,17 @@ namespace MultiplayerARPG
                 animator.SetBool(ANIM_DO_ACTION, false);
             }
 
-            tempNormalizedVelocity = new Vector3(moveVelocity.x, 0, moveVelocity.z).normalized;
-            tempMovementAngle = Vector3.SignedAngle(tempNormalizedVelocity, lookDirection, Vector3.up);
-
-            // Forward
-            if (tempMovementAngle > -30 && tempMovementAngle < 30)
-            {
-                tempForwardMoveSpeedMultiplier = 1;
-                tempSideMoveSpeedMultiplier = 0;
-            }
-            // Backward
-            else if (tempMovementAngle > 150 || tempMovementAngle < -150)
-            {
-                tempForwardMoveSpeedMultiplier = -1;
-                tempSideMoveSpeedMultiplier = 0;
-            }
-            // Right
-            else if (tempMovementAngle < -60 && tempMovementAngle > -120)
-            {
-                tempForwardMoveSpeedMultiplier = 0;
-                tempSideMoveSpeedMultiplier = 1;
-            }
-            // Left
-            else if (tempMovementAngle > 60 && tempMovementAngle < 120)
-            {
-                tempForwardMoveSpeedMultiplier = 0;
-                tempSideMoveSpeedMultiplier = -1;
-            }
-            // Forward Right
-            else if (tempMovementAngle < -30 && tempMovementAngle > -60)
-            {
-                tempForwardMoveSpeedMultiplier = 1;
-                tempSideMoveSpeedMultiplier = 1;
-            }
-            // Forward Left
-            else if (tempMovementAngle > 30 && tempMovementAngle < 60)
-            {
-                tempForwardMoveSpeedMultiplier = 1;
-                tempSideMoveSpeedMultiplier = -1;
-            }
-            // Backward Right
-            else if (tempMovementAngle < -120 && tempMovementAngle > -150)
-            {
-                tempForwardMoveSpeedMultiplier = -1;
-                tempSideMoveSpeedMultiplier = 1;
-            }
-            // Backward Left
-            else if (tempMovementAngle > 120 && tempMovementAngle < 150)
-            {
-                tempForwardMoveSpeedMultiplier = -1;
-                tempSideMoveSpeedMultiplier = -1;
-            }
+            tempInverseTransformDirection = transform.InverseTransformDirection(moveVelocity).normalized;
             // Set animator parameters
-            animator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : tempNormalizedVelocity.magnitude * tempForwardMoveSpeedMultiplier);
-            animator.SetFloat(ANIM_SIDE_MOVE_SPEED, isDead ? 0 : tempNormalizedVelocity.magnitude * tempSideMoveSpeedMultiplier);
+            animator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : tempInverseTransformDirection.z);
+            animator.SetFloat(ANIM_SIDE_MOVE_SPEED, isDead ? 0 : tempInverseTransformDirection.x);
             animator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, playMoveSpeedMultiplier);
             animator.SetFloat(ANIM_Y_SPEED, moveVelocity.y);
             animator.SetBool(ANIM_IS_DEAD, isDead);
             animator.SetBool(ANIM_IS_GROUNDED, isGrounded);
         }
 
-        private void UpdateAnimation_LegacyAnimation(bool isDead, bool isGrounded, Vector3 lookDirection, Vector3 moveVelocity, float playMoveSpeedMultiplier)
+        private void UpdateAnimation_LegacyAnimation(bool isDead, bool isGrounded, Transform transform, Vector3 moveVelocity, float playMoveSpeedMultiplier)
         {
             if (isDead)
                 CrossFadeLegacyAnimation(LEGACY_CLIP_DEAD, legacyAnimationData.deadClipFadeLength, WrapMode.Once);
@@ -555,34 +502,34 @@ namespace MultiplayerARPG
                     CrossFadeLegacyAnimation(LEGACY_CLIP_FALL, legacyAnimationData.fallClipFadeLength, WrapMode.Loop);
                 else
                 {
-                    tempNormalizedVelocity = new Vector3(moveVelocity.x, 0, moveVelocity.z).normalized;
-                    if (tempNormalizedVelocity.magnitude > legacyAnimationData.magnitudeToPlayMoveClip)
+                    tempInverseTransformDirection = transform.InverseTransformDirection(moveVelocity).normalized;
+                    if (moveVelocity.magnitude > legacyAnimationData.magnitudeToPlayMoveClip)
                     {
-                        tempMovementAngle = Vector3.SignedAngle(tempNormalizedVelocity, lookDirection, Vector3.up);
-                        // Forward
-                        if (tempMovementAngle > -30 && tempMovementAngle < 30)
-                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
-                        // Backward
-                        else if (tempMovementAngle > 150 || tempMovementAngle < -150)
-                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_BACKWARD, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
-                        // Right
-                        else if (tempMovementAngle < -60 && tempMovementAngle > -120)
-                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_RIGHT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
-                        // Left
-                        else if (tempMovementAngle > 60 && tempMovementAngle < 120)
-                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_LEFT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                        Vector3 lookDirection = transform.forward;
                         // Forward Right
-                        else if (tempMovementAngle < -30 && tempMovementAngle > -60)
+                        if (tempInverseTransformDirection.z > 0.5f && tempInverseTransformDirection.x > 0.5f)
                             CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_FORWARD_RIGHT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
                         // Forward Left
-                        else if (tempMovementAngle > 30 && tempMovementAngle < 60)
+                        else if (tempInverseTransformDirection.z > 0.5f && tempInverseTransformDirection.x < -0.5f)
                             CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_FORWARD_LEFT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
                         // Backward Right
-                        else if (tempMovementAngle < -120 && tempMovementAngle > -150)
+                        else if (tempInverseTransformDirection.z < -0.5f && tempInverseTransformDirection.x > 0.5f)
                             CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_BACKWARD_RIGHT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
                         // Backward Left
-                        else if (tempMovementAngle > 120 && tempMovementAngle < 150)
+                        else if (tempInverseTransformDirection.z < -0.5f && tempInverseTransformDirection.x < -0.5f)
                             CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_BACKWARD_LEFT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                        // Forward
+                        else if (tempInverseTransformDirection.z > 0.5f)
+                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                        // Backward
+                        else if (tempInverseTransformDirection.z < -0.5f)
+                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_BACKWARD, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                        // Right
+                        else if (tempInverseTransformDirection.x > 0.5f)
+                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_RIGHT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                        // Left
+                        else if (tempInverseTransformDirection.x < -0.5f)
+                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_LEFT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
                     }
                     else
                         CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);

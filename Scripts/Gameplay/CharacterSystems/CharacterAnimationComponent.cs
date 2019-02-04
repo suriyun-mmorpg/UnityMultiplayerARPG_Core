@@ -12,8 +12,6 @@ namespace MultiplayerARPG
         [HideInInspector, System.NonSerialized]
         public Vector3? previousPosition;
         [HideInInspector, System.NonSerialized]
-        public Vector3 currentForward;
-        [HideInInspector, System.NonSerialized]
         public Vector3 currentVelocity;
         [HideInInspector, System.NonSerialized]
         public float updatingTime;
@@ -37,15 +35,14 @@ namespace MultiplayerARPG
             {
                 if (!animationData.previousPosition.HasValue)
                     animationData.previousPosition = transform.position;
-                animationData.currentForward = transform.forward;
                 animationData.currentVelocity = (transform.position - animationData.previousPosition.Value) / animationData.updatingTime;
                 animationData.previousPosition = transform.position;
                 animationData.updatingTime = 0f;
-            }
 
-            tempCharacterModel = characterEntity.CharacterModel;
-            if (tempCharacterModel != null)
-                tempCharacterModel.UpdateAnimation(characterEntity.IsDead(), characterEntity.IsGrounded, animationData.currentForward, animationData.currentVelocity, characterEntity.MoveAnimationSpeedMultiplier);
+                tempCharacterModel = characterEntity.CharacterModel;
+                if (tempCharacterModel != null)
+                    tempCharacterModel.UpdateAnimation(characterEntity.IsDead(), characterEntity.IsGrounded, transform, animationData.currentVelocity, characterEntity.MoveAnimationSpeedMultiplier);
+            }
         }
     }
 }
