@@ -8,16 +8,8 @@ namespace MultiplayerARPG
     {
         protected virtual void UpdateInput()
         {
-            List<object> fields = ComponentCollector.Get(typeof(InputFieldWrapper));
-            foreach (object field in fields)
-            {
-                if (((InputFieldWrapper)field).isFocused)
-                {
-                    destination = null;
-                    PlayerCharacterEntity.StopMove();
-                    return;
-                }
-            }
+            if (GenericUtils.IsFocusInputField())
+                return;
 
             if (CacheGameplayCameraControls != null)
             {

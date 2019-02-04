@@ -1,9 +1,50 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public static class GenericUtils
 {
+    private static string findInputFieldScene = string.Empty;
+    private static InputField[] inputFields;
+#if USE_TEXT_MESH_PRO
+    private static TMP_InputField[] textMeshInputFields;
+#endif
+
+    public static bool IsFocusInputField()
+    {
+        if (!findInputFieldScene.Equals(SceneManager.GetActiveScene().name))
+        {
+            inputFields = null;
+#if USE_TEXT_MESH_PRO
+            textMeshInputFields = null;
+#endif
+            findInputFieldScene = SceneManager.GetActiveScene().name;
+        }
+
+        if (inputFields == null)
+            inputFields = Object.FindObjectsOfType<InputField>();
+#if USE_TEXT_MESH_PRO
+        if (textMeshInputFields == null)
+            textMeshInputFields = Object.FindObjectsOfType<TMP_InputField>();
+#endif
+
+        foreach (InputField inputField in inputFields)
+        {
+            if (inputField.isFocused)
+                return true;
+        }
+#if USE_TEXT_MESH_PRO
+        foreach (TMP_InputField inputField in textMeshInputFields)
+        {
+            if (inputField.isFocused)
+                return true;
+        }
+#endif
+        return false;
+    }
+
     public static void SetLayerRecursively(this GameObject gameObject, int layerIndex, bool includeInactive)
     {
         Transform[] childrenTransforms = gameObject.GetComponentsInChildren<Transform>(includeInactive);

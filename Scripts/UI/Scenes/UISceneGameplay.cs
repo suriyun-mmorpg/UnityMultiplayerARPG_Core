@@ -176,12 +176,8 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            List<object> fields = ComponentCollector.Get(typeof(InputFieldWrapper));
-            foreach (object field in fields)
-            {
-                if (((InputFieldWrapper)field).isFocused)
-                    return;
-            }
+            if (GenericUtils.IsFocusInputField())
+                return;
 
             foreach (UIToggleUI toggleUi in toggleUis)
             {
