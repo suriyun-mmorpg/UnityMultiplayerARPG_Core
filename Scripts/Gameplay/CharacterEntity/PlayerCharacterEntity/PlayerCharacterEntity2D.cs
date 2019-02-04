@@ -280,7 +280,7 @@ namespace MultiplayerARPG
                 CallNetFunction(NetFuncSetTargetEntity, FunctionReceivers.Server, new PackedUInt(entity == null ? 0 : entity.ObjectId));
         }
 
-        public override bool IsPositionInFov(float fov, Vector3 position)
+        public override bool IsPositionInFov(float fov, Vector3 position, Vector3 forward)
         {
             float halfFov = fov * 0.5f;
             float angle = Vector2.Angle((CacheTransform.position - position).normalized, CurrentDirection);

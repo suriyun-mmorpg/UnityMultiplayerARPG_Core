@@ -965,7 +965,7 @@ namespace MultiplayerARPG
                             // Target receive damage
                             if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() &&
                                 (!(tempDamageableEntity is BaseCharacterEntity) || (BaseCharacterEntity)tempDamageableEntity != this) &&
-                                IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position))
+                                IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position, damageRotation * Vector3.forward))
                             {
                                 // Pass all receive damage condition, then apply damages
                                 tempDamageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId);
@@ -1003,10 +1003,15 @@ namespace MultiplayerARPG
             return overlapColliders[index].gameObject;
         }
 
-        public virtual bool IsPositionInFov(float fov, Vector3 position)
+        public bool IsPositionInFov(float fov, Vector3 position)
+        {
+            return IsPositionInFov(fov, position, CacheTransform.forward);
+        }
+
+        public virtual bool IsPositionInFov(float fov, Vector3 position, Vector3 forward)
         {
             float halfFov = fov * 0.5f;
-            float angle = Vector3.Angle((CacheTransform.position - position).normalized, CacheTransform.forward);
+            float angle = Vector3.Angle((CacheTransform.position - position).normalized, forward);
             // Angle in forward position is 180 so we use this value to determine that target is in hit fov or not
             return (angle < 180 + halfFov && angle > 180 - halfFov);
         }
