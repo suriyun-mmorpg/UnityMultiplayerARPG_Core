@@ -371,11 +371,8 @@ namespace MultiplayerARPG
                         else
                             RequestAttack();
                     }
-                    else
-                    {
-                        // Turn character to target
-                        targetLookDirection = (targetEnemy.CacheTransform.position - PlayerCharacterEntity.CacheTransform.position).normalized;
-                    }
+                    // Turn character to target
+                    targetLookDirection = (targetEnemy.CacheTransform.position - PlayerCharacterEntity.CacheTransform.position).normalized;
                 }
                 else
                     UpdateTargetEntityPosition(targetEnemy);
