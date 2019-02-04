@@ -65,8 +65,8 @@ namespace MultiplayerARPG
         protected int tempOverlapSize;
         protected int tempLoopCounter;
         protected GameObject tempGameObject;
-        protected bool hasAimDirection;
-        protected Vector3 aimDirection;
+        protected bool hasAimPosition;
+        protected Vector3 aimPosition;
         protected Collider groundedCollider;
         #endregion
 
@@ -684,7 +684,7 @@ namespace MultiplayerARPG
                         CharacterBuff debuff = CharacterBuff.Empty;
                         if (skill.isDebuff)
                             debuff = CharacterBuff.Create(BuffType.SkillDebuff, skill.DataId, characterSkill.level);
-                        LaunchDamageEntity(hasAimDirection, aimDirection, isLeftHand, weapon, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id);
+                        LaunchDamageEntity(isLeftHand, weapon, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id);
                     }
                     break;
             }
@@ -916,8 +916,6 @@ namespace MultiplayerARPG
         }
 
         public virtual void LaunchDamageEntity(
-            bool hasAimDirection,
-            Vector3 aimDirection,
             bool isLeftHand,
             CharacterItem weapon,
             DamageInfo damageInfo,
@@ -1041,8 +1039,8 @@ namespace MultiplayerARPG
                     break;
             }
             rotation = Quaternion.LookRotation(CacheTransform.forward);
-            if (hasAimDirection)
-                rotation = Quaternion.LookRotation(aimDirection);
+            if (hasAimPosition)
+                rotation = Quaternion.LookRotation((aimPosition - position).normalized);
         }
 
         public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)

@@ -12,15 +12,15 @@ namespace MultiplayerARPG
         public System.Action onRespawn;
         public System.Action onLevelUp;
 
-        protected virtual void NetFuncUpdateAimDirection(Vector3 direction)
+        protected virtual void NetFuncUpdateAimPosition(Vector3 position)
         {
-            hasAimDirection = true;
-            aimDirection = direction;
+            hasAimPosition = true;
+            aimPosition = position;
         }
 
-        protected virtual void NetFuncDismissAimDirection()
+        protected virtual void NetFuncDismissAimPosition()
         {
-            hasAimDirection = false;
+            hasAimPosition = false;
         }
 
         /// <summary>
@@ -75,12 +75,10 @@ namespace MultiplayerARPG
 
             // Start attack routine
             isAttackingOrUsingSkill = true;
-            StartCoroutine(AttackRoutine(hasAimDirection, aimDirection, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts));
+            StartCoroutine(AttackRoutine(triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts));
         }
 
         private IEnumerator AttackRoutine(
-            bool hasAimDirection,
-            Vector3 aimDirection,
             float triggerDuration,
             float totalDuration,
             bool isLeftHand,
@@ -89,7 +87,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
             yield return new WaitForSecondsRealtime(triggerDuration);
-            LaunchDamageEntity(hasAimDirection, aimDirection, isLeftHand, weapon, damageInfo, allDamageAmounts, CharacterBuff.Empty, 0);
+            LaunchDamageEntity(isLeftHand, weapon, damageInfo, allDamageAmounts, CharacterBuff.Empty, 0);
             yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
             isAttackingOrUsingSkill = false;
         }

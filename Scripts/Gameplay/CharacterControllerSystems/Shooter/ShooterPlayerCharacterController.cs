@@ -18,7 +18,6 @@ namespace MultiplayerARPG
         public float angularSpeed = 800f;
         [Range(0, 1f)]
         public float turnToTargetDuration = 0.1f;
-        public float targetRaycastDistance = 100f;
         public FollowCameraControls gameplayCameraPrefab;
         public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
         bool isBlockController;
@@ -38,6 +37,7 @@ namespace MultiplayerARPG
         NpcEntity targetNpc;
         RaycastHit[] raycasts = new RaycastHit[RAYCAST_COLLIDER_SIZE];
         Collider[] overlapColliders = new Collider[OVERLAP_COLLIDER_SIZE];
+        RaycastHit tempHitInfo;
 
         protected override void Awake()
         {
@@ -76,6 +76,8 @@ namespace MultiplayerARPG
             base.OnDestroy();
             if (CacheGameplayCameraControls != null)
                 Destroy(CacheGameplayCameraControls.gameObject);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
 
         protected override void Update()
@@ -100,12 +102,18 @@ namespace MultiplayerARPG
                 return;
 
             // Find target character
+            Vector3 forward = CacheGameplayCameraControls.CacheCameraTransform.forward;
+            Vector3 right = CacheGameplayCameraControls.CacheCameraTransform.right;
             Ray ray = CacheGameplayCameraControls.CacheCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+            float distanceFromOrigin = Vector3.Distance(ray.origin, PlayerCharacterEntity.CacheTransform.position);
+            Vector3 aimPosition = ray.origin + ray.direction * (PlayerCharacterEntity.GetAttackDistance() + distanceFromOrigin);
             foundEntity = null;
-            tempCount = Physics.RaycastNonAlloc(ray, raycasts, targetRaycastDistance);
+            tempCount = Physics.RaycastNonAlloc(ray, raycasts, PlayerCharacterEntity.GetAttackDistance() + distanceFromOrigin);
             for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
-                tempEntity = raycasts[tempCounter].collider.GetComponent<BaseGameEntity>();
+                tempHitInfo = raycasts[tempCounter];
+                aimPosition = tempHitInfo.point;
+                tempEntity = tempHitInfo.collider.GetComponent<BaseGameEntity>();
                 if (tempEntity != PlayerCharacterEntity)
                 {
                     foundEntity = tempEntity;
@@ -113,7 +121,7 @@ namespace MultiplayerARPG
                 }
             }
             // Set aim target at server
-            PlayerCharacterEntity.RequestUpdateAimDirection(ray.direction);
+            PlayerCharacterEntity.RequestUpdateAimPosition(aimPosition);
 
             // Show target hp/mp
             CacheUISceneGameplay.SetTargetEntity(foundEntity);
@@ -121,24 +129,22 @@ namespace MultiplayerARPG
             // If mobile platforms, don't receive input raw to make it smooth
             bool raw = !InputManager.useMobileInputOnNonMobile && !Application.isMobilePlatform;
             Vector3 moveDirection = Vector3.zero;
-            Vector3 forwardLookDirection = Vector3.zero;
-            Vector3 forward = Camera.main.transform.forward;
-            Vector3 right = Camera.main.transform.right;
+            Vector3 actionDirection = Vector3.zero;
             forward.y = 0f;
             right.y = 0f;
             forward.Normalize();
             right.Normalize();
             moveDirection += forward * InputManager.GetAxis("Vertical", raw);
             moveDirection += right * InputManager.GetAxis("Horizontal", raw);
-            forwardLookDirection += forward * 1f;
+            actionDirection += forward * 1f;
 
             // normalize input if it exceeds 1 in combined length:
             if (moveDirection.sqrMagnitude > 1)
                 moveDirection.Normalize();
 
             // normalize input if it exceeds 1 in combined length:
-            if (forwardLookDirection.sqrMagnitude > 1)
-                forwardLookDirection.Normalize();
+            if (actionDirection.sqrMagnitude > 1)
+                actionDirection.Normalize();
 
             tempPressAttack = InputManager.GetButton("Fire1");
             tempPressActivate = InputManager.GetButtonDown("Activate");
@@ -155,7 +161,7 @@ namespace MultiplayerARPG
                         targetNpc = foundEntity as NpcEntity;
                 }
                 // While attacking turn to camera forward
-                tempCalculateAngle = Vector3.Angle(PlayerCharacterEntity.CacheTransform.forward, forwardLookDirection);
+                tempCalculateAngle = Vector3.Angle(PlayerCharacterEntity.CacheTransform.forward, actionDirection);
                 if (tempCalculateAngle > 15f)
                 {
                     if (tempPressAttack)
@@ -163,7 +169,7 @@ namespace MultiplayerARPG
                     else if (tempPressActivate)
                         turningState = TurningState.Activate;
                     turnTimeCounter = ((180f - tempCalculateAngle) / 180f) * turnToTargetDuration;
-                    targetLookDirection = forwardLookDirection;
+                    targetLookDirection = actionDirection;
                 }
                 else
                 {

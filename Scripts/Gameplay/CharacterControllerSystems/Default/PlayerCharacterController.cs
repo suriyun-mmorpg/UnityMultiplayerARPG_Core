@@ -15,11 +15,11 @@ namespace MultiplayerARPG
 
         public struct UsingSkillData
         {
-            public Vector3? aimDirection;
+            public Vector3? aimPosition;
             public int dataId;
-            public UsingSkillData(Vector3? aimDirection, int dataId)
+            public UsingSkillData(Vector3? aimPosition, int dataId)
             {
-                this.aimDirection = aimDirection;
+                this.aimPosition = aimPosition;
                 this.dataId = dataId;
             }
         }
@@ -263,7 +263,7 @@ namespace MultiplayerARPG
             if (queueUsingSkill.HasValue)
             {
                 UsingSkillData queueUsingSkillValue = queueUsingSkill.Value;
-                Vector3 aimDirection = queueUsingSkillValue.aimDirection.HasValue ? queueUsingSkillValue.aimDirection.Value : CharacterTransform.position;
+                Vector3 aimPosition = queueUsingSkillValue.aimPosition.HasValue ? queueUsingSkillValue.aimPosition.Value : CharacterTransform.position;
                 RequestUseSkill(queueUsingSkillValue.dataId);
                 queueUsingSkill = null;
             }
