@@ -26,6 +26,7 @@ namespace MultiplayerARPG
 
         public const float DETECT_MOUSE_DRAG_DISTANCE = 10f;
         public const float DETECT_MOUSE_HOLD_DURATION = 1f;
+        public float angularSpeed = 800f;
         public PlayerCharacterControllerMode controllerMode;
         [Tooltip("Set this to TRUE to find nearby enemy and look to it while attacking when `Controller Mode` is `WASD`")]
         public bool wasdLockAttackTarget;
@@ -35,7 +36,6 @@ namespace MultiplayerARPG
         public bool pointClickSetTargetImmediately;
         public FollowCameraControls gameplayCameraPrefab;
         public GameObject targetObjectPrefab;
-        public float angularSpeed = 800f;
         [Header("Building Settings")]
         public bool buildGridSnap;
         public float buildGridSize = 4f;
