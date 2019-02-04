@@ -21,7 +21,7 @@ namespace MultiplayerARPG
         public Transform uiChatMessageContainer;
         public ScrollRect scrollRect;
         
-        private bool enterChatFieldVisible;
+        public bool EnterChatFieldVisible { get; private set; }
 
         public string EnterChatMessage
         {
@@ -77,7 +77,7 @@ namespace MultiplayerARPG
         {
             if (Input.GetKeyDown(enterChatKey))
             {
-                if (!enterChatFieldVisible)
+                if (!EnterChatFieldVisible)
                     ShowEnterChatField();
                 else
                     SendChatMessage();
@@ -86,7 +86,7 @@ namespace MultiplayerARPG
 
         public void ToggleEnterChatField()
         {
-            if (enterChatFieldVisible)
+            if (EnterChatFieldVisible)
                 HideEnterChatField();
             else
                 ShowEnterChatField();
@@ -104,7 +104,7 @@ namespace MultiplayerARPG
                 uiEnterChatField.Select();
                 uiEnterChatField.ActivateInputField();
             }
-            enterChatFieldVisible = true;
+            EnterChatFieldVisible = true;
         }
 
         public void HideEnterChatField()
@@ -116,7 +116,7 @@ namespace MultiplayerARPG
             }
             if (uiEnterChatField != null)
                 uiEnterChatField.DeactivateInputField();
-            enterChatFieldVisible = false;
+            EnterChatFieldVisible = false;
         }
 
         public void SendChatMessage()
@@ -177,7 +177,7 @@ namespace MultiplayerARPG
 
         private void OnInputFieldValueChange(string text)
         {
-            if (text.Length > 0 && !enterChatFieldVisible)
+            if (text.Length > 0 && !EnterChatFieldVisible)
                 ShowEnterChatField();
         }
 
