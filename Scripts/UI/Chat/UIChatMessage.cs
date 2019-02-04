@@ -5,6 +5,8 @@ namespace MultiplayerARPG
     public partial class UIChatMessage : UISelectionEntry<ChatMessage>
     {
         [Tooltip("Chat message format {0} = Character Name, {1} = Message")]
+        public string localFormat = "<color=white>(LOCAL) {0}: {1}</color>";
+        [Tooltip("Chat message format {0} = Character Name, {1} = Message")]
         public string globalFormat = "<color=white>(GLOBAL) {0}: {1}</color>";
         [Tooltip("Chat message format {0} = Character Name, {1} = Message")]
         public string whisperFormat = "<color=green>(WHISPER) {0}: {1}</color>";
@@ -19,6 +21,9 @@ namespace MultiplayerARPG
             string format = string.Empty;
             switch (Data.channel)
             {
+                case ChatChannel.Local:
+                    format = localFormat;
+                    break;
                 case ChatChannel.Global:
                     format = globalFormat;
                     break;
