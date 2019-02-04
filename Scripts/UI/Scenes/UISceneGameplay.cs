@@ -73,6 +73,8 @@ namespace MultiplayerARPG
         public UIToggleUI[] toggleUis;
         [Tooltip("These GameObject (s) will ignore click / touch detection when click or touch on screen")]
         public List<GameObject> ignorePointerDetectionUis;
+        [Tooltip("These UI (s) will block character controller inputs while visible")]
+        public List<UIBase> blockControllerUIs;
 
         [Header("Combat Text")]
         public Transform combatTextTransform;
@@ -516,21 +518,30 @@ namespace MultiplayerARPG
             List<RaycastResult> results = new List<RaycastResult>();
             EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
             // If it's not mobile ui, assume it's over UI
-            bool overUI = false;
             if (ignorePointerDetectionUis != null && ignorePointerDetectionUis.Count > 0)
             {
                 foreach (RaycastResult result in results)
                 {
                     if (!ignorePointerDetectionUis.Contains(result.gameObject))
-                    {
-                        overUI = true;
-                        break;
-                    }
+                        return true;
                 }
             }
             else
-                overUI = results.Count > 0;
-            return overUI;
+                return results.Count > 0;
+            return false;
+        }
+
+        public bool IsBlockController()
+        {
+            if (blockControllerUIs != null && blockControllerUIs.Count > 0)
+            {
+                foreach (UIBase ui in blockControllerUIs)
+                {
+                    if (ui.IsVisible())
+                        return true;
+                }
+            }
+            return false;
         }
 
         public void SpawnCombatText(Transform followingTransform, CombatAmountType combatAmountType, int amount)
