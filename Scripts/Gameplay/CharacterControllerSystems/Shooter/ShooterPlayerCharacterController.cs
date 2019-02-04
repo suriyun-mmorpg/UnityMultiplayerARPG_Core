@@ -18,13 +18,12 @@ namespace MultiplayerARPG
         public float angularSpeed = 800f;
         [Range(0, 1f)]
         public float turnToTargetDuration = 0.1f;
-        public float mouseXSensitivity = 5f;
         public float targetRaycastDistance = 100f;
         public FollowCameraControls gameplayCameraPrefab;
         public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
         bool isBlockController;
-        DamageableEntity tempEntity;
-        DamageableEntity foundEntity;
+        BaseGameEntity tempEntity;
+        BaseGameEntity foundEntity;
         Vector3 targetLookDirection;
         Quaternion tempLookAt;
         TurningState turningState;
@@ -101,22 +100,23 @@ namespace MultiplayerARPG
                 return;
 
             // Find target character
-            Ray ray = CacheGameplayCameraControls.CacheCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
+            Ray ray = CacheGameplayCameraControls.CacheCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             foundEntity = null;
             tempCount = Physics.RaycastNonAlloc(ray, raycasts, targetRaycastDistance);
             for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
-                tempGameObject = raycasts[tempCounter].transform.gameObject;
-                tempEntity = tempGameObject.GetComponent<DamageableEntity>();
+                tempEntity = raycasts[tempCounter].collider.GetComponent<BaseGameEntity>();
                 if (tempEntity != PlayerCharacterEntity)
                 {
                     foundEntity = tempEntity;
                     break;
                 }
             }
-            Debug.DrawRay(ray.origin, ray.direction, Color.blue);
             // Set aim target at server
             PlayerCharacterEntity.RequestUpdateAimDirection(ray.direction);
+
+            // Show target hp/mp
+            CacheUISceneGameplay.SetTargetEntity(foundEntity);
 
             // If mobile platforms, don't receive input raw to make it smooth
             bool raw = !InputManager.useMobileInputOnNonMobile && !Application.isMobilePlatform;
@@ -145,26 +145,14 @@ namespace MultiplayerARPG
             if (tempPressAttack || tempPressActivate || PlayerCharacterEntity.IsPlayingActionAnimation())
             {
                 // Find forward character / npc / building / warp entity from camera center
+                targetPlayer = null;
+                targetNpc = null;
                 if (tempPressActivate && !tempPressAttack)
                 {
-                    tempCount = Physics.RaycastNonAlloc(ray, raycasts, targetRaycastDistance, gameInstance.GetTargetLayerMask());
-                    for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
-                    {
-                        tempGameObject = raycasts[tempCounter].transform.gameObject;
-                        if (targetPlayer == null)
-                        {
-                            targetPlayer = tempGameObject.GetComponent<BasePlayerCharacterEntity>();
-                            if (targetPlayer == PlayerCharacterEntity)
-                                targetPlayer = null;
-                            else
-                                break;
-                        }
-                        if (targetNpc == null)
-                        {
-                            targetNpc = tempGameObject.GetComponent<NpcEntity>();
-                            break;
-                        }
-                    }
+                    if (foundEntity is BasePlayerCharacterEntity)
+                        targetPlayer = foundEntity as BasePlayerCharacterEntity;
+                    if (foundEntity is NpcEntity)
+                        targetNpc = foundEntity as NpcEntity;
                 }
                 // While attacking turn to camera forward
                 tempCalculateAngle = Vector3.Angle(PlayerCharacterEntity.CacheTransform.forward, forwardLookDirection);
@@ -204,11 +192,6 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.SetTargetEntity(null);
             }
             PlayerCharacterEntity.KeyMovement(moveDirection, InputManager.GetButtonDown("Jump"));
-
-
-            // Show target hp/mp
-            if (CacheUISceneGameplay != null)
-                CacheUISceneGameplay.SetTargetEntity(foundEntity);
 
             turnTimeCounter += Time.deltaTime;
         }
@@ -328,17 +311,12 @@ namespace MultiplayerARPG
             return Physics.OverlapSphereNonAlloc(position, distance, overlapColliders, layerMask);
         }
 
-        public GameObject GetOverlapObject(int index)
-        {
-            return overlapColliders[index].gameObject;
-        }
-
         public bool FindTarget(GameObject target, float actDistance, int layerMask)
         {
             tempCount = OverlapObjects(CharacterTransform.position, actDistance, layerMask);
             for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
-                tempGameObject = GetOverlapObject(tempCounter);
+                tempGameObject = overlapColliders[tempCounter].gameObject;
                 if (tempGameObject == target)
                     return true;
             }
