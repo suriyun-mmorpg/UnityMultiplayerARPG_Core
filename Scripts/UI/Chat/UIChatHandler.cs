@@ -75,7 +75,7 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            if (Input.GetKeyDown(enterChatKey))
+            if (Input.GetKeyUp(enterChatKey))
             {
                 if (!EnterChatFieldVisible)
                     ShowEnterChatField();
