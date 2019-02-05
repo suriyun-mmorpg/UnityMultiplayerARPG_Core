@@ -43,6 +43,13 @@ namespace MultiplayerARPG
         public Transform miniMapUITransform;
         #endregion
 
+#if UNITY_EDITOR
+        [Header("Character Attack Debug")]
+        public Vector3? debugDamagePosition;
+        public Quaternion? debugDamageRotation;
+        public Color debugFovColor = new Color(0, 1, 0, 0.04f);
+#endif
+
         #region Protected data
         protected UICharacterEntity uiCharacterEntity;
         protected BaseGameEntity targetEntity;
@@ -65,8 +72,6 @@ namespace MultiplayerARPG
         protected int tempOverlapSize;
         protected int tempLoopCounter;
         protected GameObject tempGameObject;
-        protected bool hasAimPosition;
-        protected Vector3 aimPosition;
         protected Collider groundedCollider;
         #endregion
 
@@ -177,6 +182,39 @@ namespace MultiplayerARPG
                 EditorUtility.SetDirty(this);
 #endif
         }
+
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            if (debugDamagePosition.HasValue && debugDamageRotation.HasValue)
+            {
+                float atkFov = GetAttackFov();
+                float atkDist = GetAttackDistance();
+                Handles.color = debugFovColor;
+                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, -atkFov, atkDist);
+                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, atkFov, atkDist);
+                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, -atkFov, atkDist);
+                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, atkFov, atkDist);
+
+                Handles.color = new Color(1, 0, 0, debugFovColor.a);
+                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, -atkFov, 0);
+                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, atkFov, 0);
+                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, -atkFov, 0);
+                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, atkFov, 0);
+
+                Handles.color = new Color(debugFovColor.r, debugFovColor.g, debugFovColor.b);
+                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, -atkFov, atkDist);
+                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, atkFov, atkDist);
+                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, -atkFov, 0);
+                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, atkFov, 0);
+
+                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, -atkFov, 0);
+                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, atkFov, 0);
+                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, -atkFov, atkDist);
+                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, atkFov, atkDist);
+            }
+        }
+#endif
 
         protected void OnCollisionEnter(Collision collision)
         {
@@ -671,7 +709,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void ApplySkill(CharacterSkill characterSkill, SkillAttackType skillAttackType, bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
+        protected virtual void ApplySkill(CharacterSkill characterSkill, SkillAttackType skillAttackType, bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, bool hasAimPosition, Vector3 aimPosition)
         {
             Skill skill = characterSkill.GetSkill();
             switch (skill.skillType)
@@ -684,7 +722,7 @@ namespace MultiplayerARPG
                         CharacterBuff debuff = CharacterBuff.Empty;
                         if (skill.isDebuff)
                             debuff = CharacterBuff.Create(BuffType.SkillDebuff, skill.DataId, characterSkill.level);
-                        LaunchDamageEntity(isLeftHand, weapon, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id);
+                        LaunchDamageEntity(isLeftHand, weapon, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id, hasAimPosition, aimPosition);
                     }
                     break;
             }
@@ -921,7 +959,9 @@ namespace MultiplayerARPG
             DamageInfo damageInfo,
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
             CharacterBuff debuff,
-            uint hitEffectsId)
+            uint hitEffectsId,
+            bool hasAimPosition,
+            Vector3 aimPosition)
         {
             if (!IsServer)
                 return;
@@ -929,7 +969,11 @@ namespace MultiplayerARPG
             IDamageableEntity tempDamageableEntity = null;
             Vector3 damagePosition;
             Quaternion damageRotation;
-            GetDamagePositionAndRotation(damageInfo.damageType, isLeftHand, out damagePosition, out damageRotation);
+            GetDamagePositionAndRotation(damageInfo.damageType, isLeftHand, hasAimPosition, aimPosition, out damagePosition, out damageRotation);
+#if UNITY_EDITOR
+            debugDamagePosition = damagePosition;
+            debugDamageRotation = damageRotation;
+#endif
             switch (damageInfo.damageType)
             {
                 case DamageType.Melee:
@@ -958,6 +1002,7 @@ namespace MultiplayerARPG
                         tempOverlapSize = OverlapObjects(damagePosition, damageInfo.hitDistance, gameInstance.GetDamageableLayerMask());
                         if (tempOverlapSize == 0)
                             return;
+                        // Find characters that receiving damages
                         for (tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
                         {
                             tempGameObject = GetOverlapObject(tempLoopCounter);
@@ -1016,7 +1061,7 @@ namespace MultiplayerARPG
             return (angle < 180 + halfFov && angle > 180 - halfFov);
         }
 
-        protected virtual void GetDamagePositionAndRotation(DamageType damageType, bool isLeftHand, out Vector3 position, out Quaternion rotation)
+        protected virtual void GetDamagePositionAndRotation(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, out Vector3 position, out Quaternion rotation)
         {
             position = CacheTransform.position;
             switch (damageType)

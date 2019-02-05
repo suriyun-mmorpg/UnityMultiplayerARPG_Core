@@ -7,28 +7,32 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        public virtual void RequestUpdateAimPosition(Vector3 direction)
-        {
-            CallNetFunction(NetFuncUpdateAimPosition, FunctionReceivers.Server, direction);
-        }
-
-        public virtual void RequestDismissAimPosition()
-        {
-            CallNetFunction(NetFuncDismissAimPosition, FunctionReceivers.Server);
-        }
-
         public virtual void RequestAttack()
         {
             if (!CanDoActions())
                 return;
-            CallNetFunction(NetFuncAttack, FunctionReceivers.Server);
+            CallNetFunction(NetFuncAttackWithoutAimPosition, FunctionReceivers.Server);
+        }
+
+        public virtual void RequestAttack(Vector3 aimPosition)
+        {
+            if (!CanDoActions())
+                return;
+            CallNetFunction(NetFuncAttackWithAimPosition, FunctionReceivers.Server, aimPosition);
         }
 
         public virtual void RequestUseSkill(int dataId)
         {
             if (!CanDoActions())
                 return;
-            CallNetFunction(NetFuncUseSkill, FunctionReceivers.Server, dataId);
+            CallNetFunction(NetFuncUseSkillWithoutAimPosition, FunctionReceivers.Server, dataId);
+        }
+
+        public virtual void RequestUseSkill(int dataId, Vector3 aimPosition)
+        {
+            if (!CanDoActions())
+                return;
+            CallNetFunction(NetFuncUseSkillWithAimPosition, FunctionReceivers.Server, dataId, aimPosition);
         }
 
         public virtual void RequestUseItem(short index)

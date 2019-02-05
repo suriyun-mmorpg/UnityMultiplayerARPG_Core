@@ -14,6 +14,7 @@ namespace MultiplayerARPG
             None,
             Attack,
             Activate,
+            UseSkill,
         }
         public float angularSpeed = 800f;
         [Range(0, 1f)]
@@ -38,6 +39,9 @@ namespace MultiplayerARPG
         RaycastHit[] raycasts = new RaycastHit[RAYCAST_COLLIDER_SIZE];
         Collider[] overlapColliders = new Collider[OVERLAP_COLLIDER_SIZE];
         RaycastHit tempHitInfo;
+        Skill queueSkill;
+        Skill usingSkill;
+        Vector3 aimPosition;
 
         protected override void Awake()
         {
@@ -87,6 +91,7 @@ namespace MultiplayerARPG
 
             base.Update();
             UpdateLookAtTarget();
+            turnTimeCounter += Time.deltaTime;
 
             isBlockController = CacheUISceneGameplay.IsBlockController();
             // Lock cursor when not show UIs
@@ -95,20 +100,25 @@ namespace MultiplayerARPG
 
             CacheGameplayCameraControls.updateRotation = !isBlockController;
 
-            if (isBlockController)
+            if (isBlockController || GenericUtils.IsFocusInputField())
+            {
+                PlayerCharacterEntity.KeyMovement(Vector3.zero, false);
                 return;
-
-            if (GenericUtils.IsFocusInputField())
-                return;
+            }
 
             // Find target character
             Vector3 forward = CacheGameplayCameraControls.CacheCameraTransform.forward;
             Vector3 right = CacheGameplayCameraControls.CacheCameraTransform.right;
             Ray ray = CacheGameplayCameraControls.CacheCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             float distanceFromOrigin = Vector3.Distance(ray.origin, PlayerCharacterEntity.CacheTransform.position);
-            Vector3 aimPosition = ray.origin + ray.direction * (PlayerCharacterEntity.GetAttackDistance() + distanceFromOrigin);
+            float aimDistance = distanceFromOrigin;
+            if (queueSkill != null && queueSkill.IsAttack())
+                aimDistance += PlayerCharacterEntity.GetSkillAttackDistance(queueSkill);
+            else
+                aimDistance += PlayerCharacterEntity.GetAttackDistance();
+            aimPosition = ray.origin + ray.direction * aimDistance;
             foundEntity = null;
-            tempCount = Physics.RaycastNonAlloc(ray, raycasts, PlayerCharacterEntity.GetAttackDistance() + distanceFromOrigin);
+            tempCount = Physics.RaycastNonAlloc(ray, raycasts, aimDistance);
             for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
                 tempHitInfo = raycasts[tempCounter];
@@ -120,8 +130,6 @@ namespace MultiplayerARPG
                     break;
                 }
             }
-            // Set aim target at server
-            PlayerCharacterEntity.RequestUpdateAimPosition(aimPosition);
 
             // Show target hp/mp
             CacheUISceneGameplay.SetTargetEntity(foundEntity);
@@ -148,7 +156,7 @@ namespace MultiplayerARPG
 
             tempPressAttack = InputManager.GetButton("Fire1");
             tempPressActivate = InputManager.GetButtonDown("Activate");
-            if (tempPressAttack || tempPressActivate || PlayerCharacterEntity.IsPlayingActionAnimation())
+            if (queueSkill != null || tempPressAttack || tempPressActivate || PlayerCharacterEntity.IsPlayingActionAnimation())
             {
                 // Find forward character / npc / building / warp entity from camera center
                 targetPlayer = null;
@@ -164,7 +172,9 @@ namespace MultiplayerARPG
                 tempCalculateAngle = Vector3.Angle(PlayerCharacterEntity.CacheTransform.forward, actionDirection);
                 if (tempCalculateAngle > 15f)
                 {
-                    if (tempPressAttack)
+                    if (queueSkill != null && queueSkill.IsAttack())
+                        turningState = TurningState.UseSkill;
+                    else if (tempPressAttack)
                         turningState = TurningState.Attack;
                     else if (tempPressActivate)
                         turningState = TurningState.Activate;
@@ -173,15 +183,27 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    if (tempPressAttack)
+                    // Attack immediately if character already look at target
+                    if (queueSkill != null && queueSkill.IsAttack())
                     {
-                        Attack();
+                        UseSkill(aimPosition);
+                    }
+                    else if (tempPressAttack)
+                    {
+                        Attack(aimPosition);
                     }
                     else if (tempPressActivate)
                     {
                         Activate();
                     }
                 }
+
+                if (queueSkill != null && !queueSkill.IsAttack())
+                {
+                    // If it is not attack skill, use it immediately
+                    UseSkill();
+                }
+                queueSkill = null;
             }
             else
             {
@@ -198,8 +220,6 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.SetTargetEntity(null);
             }
             PlayerCharacterEntity.KeyMovement(moveDirection, InputManager.GetButtonDown("Jump"));
-
-            turnTimeCounter += Time.deltaTime;
         }
 
         public Vector3 GetMoveDirection(float horizontalInput, float verticalInput)
@@ -232,10 +252,13 @@ namespace MultiplayerARPG
                     switch (turningState)
                     {
                         case TurningState.Attack:
-                            Attack();
+                            Attack(aimPosition);
                             break;
                         case TurningState.Activate:
                             Activate();
+                            break;
+                        case TurningState.UseSkill:
+                            UseSkill(aimPosition);
                             break;
                     }
                     turningState = TurningState.None;
@@ -271,7 +294,7 @@ namespace MultiplayerARPG
                     if (PlayerCharacterEntity.Skills[skillIndex].CanUse(PlayerCharacterEntity))
                     {
                         PlayerCharacterEntity.StopMove();
-                        PlayerCharacterEntity.RequestUseSkill(skill.DataId);
+                        queueSkill = skill;
                     }
                 }
             }
@@ -298,9 +321,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public void Attack()
+        public void Attack(Vector3 aimPosition)
         {
-            PlayerCharacterEntity.RequestAttack();
+            PlayerCharacterEntity.RequestAttack(aimPosition);
         }
 
         public void Activate()
@@ -310,6 +333,20 @@ namespace MultiplayerARPG
                 CacheUISceneGameplay.SetActivePlayerCharacter(targetPlayer);
             else if (targetNpc != null)
                 PlayerCharacterEntity.RequestNpcActivate(targetNpc.ObjectId);
+        }
+
+        public void UseSkill()
+        {
+            if (queueSkill == null)
+                return;
+            PlayerCharacterEntity.RequestUseSkill(queueSkill.DataId);
+        }
+
+        public void UseSkill(Vector3 aimPosition)
+        {
+            if (queueSkill == null)
+                return;
+            PlayerCharacterEntity.RequestUseSkill(queueSkill.DataId, aimPosition);
         }
 
         public int OverlapObjects(Vector3 position, float distance, int layerMask)

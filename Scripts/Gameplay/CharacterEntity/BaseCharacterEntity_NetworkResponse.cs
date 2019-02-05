@@ -12,21 +12,20 @@ namespace MultiplayerARPG
         public System.Action onRespawn;
         public System.Action onLevelUp;
 
-        protected virtual void NetFuncUpdateAimPosition(Vector3 position)
+        protected void NetFuncAttackWithoutAimPosition()
         {
-            hasAimPosition = true;
-            aimPosition = position;
+            NetFuncAttack(false, Vector3.zero);
         }
 
-        protected virtual void NetFuncDismissAimPosition()
+        protected void NetFuncAttackWithAimPosition(Vector3 aimPosition)
         {
-            hasAimPosition = false;
+            NetFuncAttack(true, aimPosition);
         }
 
         /// <summary>
         /// Is function will be called at server to order character to attack
         /// </summary>
-        protected virtual void NetFuncAttack()
+        protected virtual void NetFuncAttack(bool hasAimPosition, Vector3 aimPosition)
         {
             if (!CanDoActions())
                 return;
@@ -75,7 +74,7 @@ namespace MultiplayerARPG
 
             // Start attack routine
             isAttackingOrUsingSkill = true;
-            StartCoroutine(AttackRoutine(triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts));
+            StartCoroutine(AttackRoutine(triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition));
         }
 
         private IEnumerator AttackRoutine(
@@ -84,18 +83,30 @@ namespace MultiplayerARPG
             bool isLeftHand,
             CharacterItem weapon,
             DamageInfo damageInfo,
-            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
+            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
+            bool hasAimPosition,
+            Vector3 aimPosition)
         {
             yield return new WaitForSecondsRealtime(triggerDuration);
-            LaunchDamageEntity(isLeftHand, weapon, damageInfo, allDamageAmounts, CharacterBuff.Empty, 0);
+            LaunchDamageEntity(isLeftHand, weapon, damageInfo, allDamageAmounts, CharacterBuff.Empty, 0, hasAimPosition, aimPosition);
             yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
             isAttackingOrUsingSkill = false;
+        }
+
+        protected void NetFuncUseSkillWithoutAimPosition(int dataId)
+        {
+            NetFuncUseSkill(dataId, false, Vector3.zero);
+        }
+
+        protected void NetFuncUseSkillWithAimPosition(int dataId, Vector3 aimPosition)
+        {
+            NetFuncUseSkill(dataId, true, aimPosition);
         }
 
         /// <summary>
         /// Is function will be called at server to order character to use skill
         /// </summary>
-        protected virtual void NetFuncUseSkill(int dataId)
+        protected virtual void NetFuncUseSkill(int dataId, bool hasAimPosition, Vector3 aimPosition)
         {
             if (!CanDoActions())
                 return;
@@ -154,7 +165,7 @@ namespace MultiplayerARPG
 
             // Start use skill routine
             isAttackingOrUsingSkill = true;
-            StartCoroutine(UseSkillRoutine(characterSkill, triggerDuration, totalDuration, skillAttackType, isLeftHand, weapon, damageInfo, allDamageAmounts));
+            StartCoroutine(UseSkillRoutine(characterSkill, triggerDuration, totalDuration, skillAttackType, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition));
         }
 
         private IEnumerator UseSkillRoutine(
@@ -165,7 +176,9 @@ namespace MultiplayerARPG
             bool isLeftHand,
             CharacterItem weapon,
             DamageInfo damageInfo,
-            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
+            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
+            bool hasAimPosition,
+            Vector3 aimPosition)
         {
             // Update skill usage states
             CharacterSkillUsage newSkillUsage = CharacterSkillUsage.Create(SkillUsageType.Skill, characterSkill.dataId);
@@ -173,7 +186,7 @@ namespace MultiplayerARPG
             skillUsages.Add(newSkillUsage);
 
             yield return new WaitForSecondsRealtime(triggerDuration);
-            ApplySkill(characterSkill, skillAttackType, isLeftHand, weapon, damageInfo, allDamageAmounts);
+            ApplySkill(characterSkill, skillAttackType, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition);
             yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
             isAttackingOrUsingSkill = false;
         }
