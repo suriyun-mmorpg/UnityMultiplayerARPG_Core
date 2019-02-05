@@ -51,7 +51,6 @@ namespace MultiplayerARPG
         }
 
         public float dealingCharacterTime { get; private set; }
-        public override BaseCharacter Database { get { return GameInstance.PlayerCharacters[DataId]; } }
 
         protected override void EntityAwake()
         {

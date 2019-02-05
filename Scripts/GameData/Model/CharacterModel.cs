@@ -479,7 +479,21 @@ namespace MultiplayerARPG
                 animator.SetBool(ANIM_DO_ACTION, false);
             }
 
-            tempInverseTransformDirection = transform.InverseTransformDirection(moveVelocity).normalized;
+            tempInverseTransformDirection = transform.InverseTransformDirection(moveVelocity);
+            if (moveVelocity.magnitude > 0)
+            {
+                // Try to not play strafing animation too frequently
+                float absZ = Mathf.Abs(tempInverseTransformDirection.z);
+                float absX = Mathf.Abs(tempInverseTransformDirection.x);
+                if (absZ > absX && absX / absZ < 0.9f)
+                {
+                    tempInverseTransformDirection.x = 0f;
+                }
+                else if (absX > absZ && absZ / absX < 0.9f)
+                {
+                    tempInverseTransformDirection.z = 0f;
+                }
+            }
             // Set animator parameters
             animator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : tempInverseTransformDirection.z);
             animator.SetFloat(ANIM_SIDE_MOVE_SPEED, isDead ? 0 : tempInverseTransformDirection.x);

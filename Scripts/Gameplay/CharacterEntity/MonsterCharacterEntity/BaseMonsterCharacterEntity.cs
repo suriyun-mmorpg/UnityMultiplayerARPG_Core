@@ -66,7 +66,6 @@ namespace MultiplayerARPG
         public MonsterSpawnArea spawnArea { get; protected set; }
         public Vector3 spawnPosition { get; protected set; }
         public override int DataId { get { return monsterCharacter.DataId; } set { } }
-        public override BaseCharacter Database { get { return monsterCharacter; } }
 
         protected override void EntityAwake()
         {

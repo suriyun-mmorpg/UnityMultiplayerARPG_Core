@@ -112,7 +112,6 @@ namespace MultiplayerARPG
         public virtual bool IsGrounded { get; protected set; }
         public virtual bool IsJumping { get; protected set; }
         public abstract int DataId { get; set; }
-        public abstract BaseCharacter Database { get; }
 
         private BaseCharacterModel characterModel;
         public BaseCharacterModel CharacterModel
@@ -1153,8 +1152,8 @@ namespace MultiplayerARPG
                 out cacheTotalItemWeight,
                 out cacheAtkSpeed,
                 out cacheMoveSpeed);
-            if (Database != null)
-                CacheBaseMoveSpeed = Database.stats.baseStats.moveSpeed;
+            if (this.GetDatabase() != null)
+                CacheBaseMoveSpeed = this.GetDatabase().stats.baseStats.moveSpeed;
             isRecaching = false;
         }
 

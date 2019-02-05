@@ -7,6 +7,8 @@ namespace MultiplayerARPG
     public class CharacterAnimationComponent : BaseCharacterComponent
     {
         public const float UPDATE_VELOCITY_DURATION = 0.1f;
+        [Tooltip("If velocity.y lower than this value it is grounded")]
+        public float detectGroundedSpeed = 0.1f;
 
         #region Animation System Data
         [HideInInspector, System.NonSerialized]
@@ -41,7 +43,7 @@ namespace MultiplayerARPG
 
                 tempCharacterModel = characterEntity.CharacterModel;
                 if (tempCharacterModel != null)
-                    tempCharacterModel.UpdateAnimation(characterEntity.IsDead(), characterEntity.IsGrounded, transform, animationData.currentVelocity, characterEntity.MoveAnimationSpeedMultiplier);
+                    tempCharacterModel.UpdateAnimation(characterEntity.IsDead(), Mathf.Abs(animationData.currentVelocity.y) <= animationData.detectGroundedSpeed, transform, animationData.currentVelocity, characterEntity.MoveAnimationSpeedMultiplier);
             }
         }
     }
