@@ -9,6 +9,12 @@ public static partial class CharacterDataExtension
     public static BaseCharacter GetDatabase(this ICharacterData data)
     {
         BaseCharacter database = null;
+        if (data.DataId == 0)
+        {
+            // Data has not been set
+            return null;
+        }
+
         if (!GameInstance.AllCharacters.TryGetValue(data.DataId, out database))
         {
             Debug.LogWarning("[GetDatabase] Cannot find character database with id: " + data.DataId);
