@@ -293,9 +293,9 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.StopMove();
                 destination = null;
                 PlayerCharacterEntity.SetTargetEntity(null);
+                targetLookDirection = moveDirection.normalized;
             }
             PlayerCharacterEntity.KeyMovement(moveDirection, InputManager.GetButtonDown("Jump"));
-            targetLookDirection = moveDirection.normalized;
         }
 
         protected virtual void UpdateBuilding()
@@ -500,10 +500,10 @@ namespace MultiplayerARPG
         {
             if (destination != null)
                 targetLookDirection = (destination.Value - PlayerCharacterEntity.CacheTransform.position).normalized;
-            if (Vector3.Angle(PlayerCharacterEntity.CacheTransform.forward, targetLookDirection) > 0)
+            if (Vector3.Angle(tempLookAt * Vector3.forward, targetLookDirection) > 0)
             {
                 // Update rotation when angle difference more than 1
-                tempLookAt = Quaternion.RotateTowards(PlayerCharacterEntity.CacheTransform.rotation, Quaternion.LookRotation(targetLookDirection), Time.deltaTime * angularSpeed);
+                tempLookAt = Quaternion.RotateTowards(tempLookAt, Quaternion.LookRotation(targetLookDirection), Time.deltaTime * angularSpeed);
                 PlayerCharacterEntity.UpdateYRotation(tempLookAt.eulerAngles.y);
             }
         }

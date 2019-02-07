@@ -65,6 +65,8 @@ namespace MultiplayerARPG
 
             if (CacheGameplayCameraControls != null)
                 CacheGameplayCameraControls.target = characterEntity.CacheTransform;
+
+            tempLookAt = characterEntity.CacheTransform.rotation;
         }
 
         protected override void Desetup(BasePlayerCharacterEntity characterEntity)
@@ -238,13 +240,13 @@ namespace MultiplayerARPG
 
         protected void UpdateLookAtTarget()
         {
-            tempCalculateAngle = Vector3.Angle(PlayerCharacterEntity.CacheTransform.forward, targetLookDirection);
+            tempCalculateAngle = Vector3.Angle(tempLookAt * Vector3.forward, targetLookDirection);
             if (turningState != TurningState.None)
             {
                 if (tempCalculateAngle > 0)
                 {
                     // Update rotation when angle difference more than 0
-                    tempLookAt = Quaternion.Slerp(PlayerCharacterEntity.CacheTransform.rotation, Quaternion.LookRotation(targetLookDirection), turnTimeCounter / turnToTargetDuration);
+                    tempLookAt = Quaternion.Slerp(tempLookAt, Quaternion.LookRotation(targetLookDirection), turnTimeCounter / turnToTargetDuration);
                     PlayerCharacterEntity.UpdateYRotation(tempLookAt.eulerAngles.y);
                 }
                 else
@@ -269,7 +271,7 @@ namespace MultiplayerARPG
                 if (tempCalculateAngle > 0)
                 {
                     // Update rotation when angle difference more than 0
-                    tempLookAt = Quaternion.RotateTowards(PlayerCharacterEntity.CacheTransform.rotation, Quaternion.LookRotation(targetLookDirection), Time.deltaTime * angularSpeed);
+                    tempLookAt = Quaternion.RotateTowards(tempLookAt, Quaternion.LookRotation(targetLookDirection), Time.deltaTime * angularSpeed);
                     PlayerCharacterEntity.UpdateYRotation(tempLookAt.eulerAngles.y);
                 }
             }

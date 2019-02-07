@@ -101,6 +101,8 @@ namespace MultiplayerARPG
 
             if (CacheGameplayCameraControls != null)
                 CacheGameplayCameraControls.target = characterEntity.CacheTransform;
+
+            tempLookAt = characterEntity.CacheTransform.rotation;
         }
 
         protected override void Desetup(BasePlayerCharacterEntity characterEntity)

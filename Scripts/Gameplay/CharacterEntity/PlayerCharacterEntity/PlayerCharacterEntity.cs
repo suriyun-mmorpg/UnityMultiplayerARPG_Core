@@ -213,7 +213,7 @@ namespace MultiplayerARPG
         {
             if (IsDead())
                 return;
-            CacheTransform.rotation = Quaternion.Euler(0, (float)yRotation / 100f, 0);
+            CacheTransform.rotation = Quaternion.Euler(0, (float)yRotation, 0);
         }
 
         protected void NetFuncSetTargetEntity(PackedUInt objectId)
@@ -291,7 +291,7 @@ namespace MultiplayerARPG
                 case MovementSecure.ServerAuthoritative:
                     // Multiply with 100 and cast to short to reduce packet size
                     // then it will be devided with 100 later on server side
-                    CallNetFunction(NetFuncUpdateYRotation, FunctionReceivers.Server, (short)(yRotation * 100));
+                    CallNetFunction(NetFuncUpdateYRotation, FunctionReceivers.Server, (short)yRotation);
                     break;
                 case MovementSecure.NotSecure:
                     CacheTransform.rotation = Quaternion.Euler(0, yRotation, 0);
