@@ -31,7 +31,9 @@ namespace MultiplayerARPG
         [Tooltip("This move speed will be applies when it's wandering. if it's going to chase enemy, stats'moveSpeed will be applies")]
         public float wanderMoveSpeed;
         public float visualRange = 5f;
+        [HideInInspector]
         public float deadHideDelay = 2f;
+        [HideInInspector]
         public float deadRespawnDelay = 5f;
 
         [Header("Weapon/Attack Abilities")]

@@ -16,6 +16,8 @@ namespace MultiplayerARPG
 
         [Header("Monster Character Settings")]
         public MonsterCharacter monsterCharacter;
+        public float destroyDelay = 2f;
+        public float destroyRespawnDelay = 5f;
 
         [Header("Monster Character - Sync Fields")]
         [SerializeField]
@@ -72,6 +74,7 @@ namespace MultiplayerARPG
             base.EntityAwake();
             gameObject.tag = gameInstance.monsterTag;
             MigrateDatabase();
+            MigrateFields();
         }
 
         protected override void EntityStart()
@@ -111,7 +114,7 @@ namespace MultiplayerARPG
                 database = null;
                 EditorUtility.SetDirty(this);
             }
-            if (MigrateDatabase())
+            if (MigrateDatabase() || MigrateFields())
                 EditorUtility.SetDirty(this);
 #endif
         }
@@ -124,6 +127,31 @@ namespace MultiplayerARPG
                 monsterCharacter = database as MonsterCharacter;
                 database = null;
                 hasChanges = true;
+            }
+            return hasChanges;
+        }
+
+        private bool MigrateFields()
+        {
+            bool hasChanges = false;
+            if (monsterCharacter != null)
+            {
+                if (monsterCharacter.deadHideDelay > 0)
+                {
+                    destroyDelay = monsterCharacter.deadHideDelay;
+                    monsterCharacter.deadHideDelay = -1;
+                    hasChanges = true;
+                }
+                if (monsterCharacter.deadRespawnDelay > 0)
+                {
+                    destroyRespawnDelay = monsterCharacter.deadRespawnDelay;
+                    monsterCharacter.deadRespawnDelay = -1;
+                    hasChanges = true;
+                }
+#if UNITY_EDITOR
+                if (hasChanges)
+                    EditorUtility.SetDirty(monsterCharacter);
+#endif
             }
             return hasChanges;
         }
@@ -491,16 +519,16 @@ namespace MultiplayerARPG
                 return;
 
             if (spawnArea != null)
-                spawnArea.Spawn(monsterCharacter.deadHideDelay + monsterCharacter.deadRespawnDelay);
+                spawnArea.Spawn(destroyDelay + destroyRespawnDelay);
             else
                 Manager.StartCoroutine(RespawnRoutine());
 
-            NetworkDestroy(monsterCharacter.deadHideDelay);
+            NetworkDestroy(destroyDelay);
         }
 
         private IEnumerator RespawnRoutine()
         {
-            yield return new WaitForSecondsRealtime(monsterCharacter.deadHideDelay + monsterCharacter.deadRespawnDelay);
+            yield return new WaitForSecondsRealtime(destroyDelay + destroyRespawnDelay);
             InitStats();
             Manager.Assets.NetworkSpawn(Identity.HashAssetId, spawnPosition, Quaternion.Euler(Vector3.up * Random.Range(0, 360)), Identity.ObjectId, Identity.ConnectionId);
         }
