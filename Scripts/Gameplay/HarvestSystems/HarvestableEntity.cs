@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using LiteNetLibManager;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -11,7 +14,9 @@ namespace MultiplayerARPG
         public int maxHp = 100;
         public Harvestable harvestable;
         public float colliderDetectionRadius = 2f;
+        [HideInInspector]
         public float destroyHideDelay = 2f;
+        public float destroyDelay = 2f;
         public float destroyRespawnDelay = 5f;
         public UnityEvent onHarvestableDestroy;
 
@@ -25,12 +30,34 @@ namespace MultiplayerARPG
             base.EntityAwake();
             gameObject.tag = gameInstance.harvestableTag;
             gameObject.layer = gameInstance.harvestableLayer;
+            MigrateFields();
         }
 
         protected override void EntityStart()
         {
             base.EntityStart();
             InitStats();
+        }
+
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+#if UNITY_EDITOR
+            if (MigrateFields())
+                EditorUtility.SetDirty(this);
+#endif
+        }
+
+        private bool MigrateFields()
+        {
+            bool hasChanges = false;
+            if (destroyHideDelay > 0)
+            {
+                destroyDelay = destroyHideDelay;
+                destroyHideDelay = -1;
+                hasChanges = true;
+            }
+            return hasChanges;
         }
 
         private void InitStats()
@@ -104,16 +131,16 @@ namespace MultiplayerARPG
         public void DestroyAndRespawn()
         {
             if (spawnArea != null)
-                spawnArea.Spawn(destroyHideDelay + destroyRespawnDelay);
+                spawnArea.Spawn(destroyDelay + destroyRespawnDelay);
             else
                 Manager.StartCoroutine(RespawnRoutine());
 
-            NetworkDestroy(destroyHideDelay);
+            NetworkDestroy(destroyDelay);
         }
 
         private IEnumerator RespawnRoutine()
         {
-            yield return new WaitForSecondsRealtime(destroyHideDelay + destroyRespawnDelay);
+            yield return new WaitForSecondsRealtime(destroyDelay + destroyRespawnDelay);
             InitStats();
             Manager.Assets.NetworkSpawn(Identity.HashAssetId, 
                 spawnPosition,
