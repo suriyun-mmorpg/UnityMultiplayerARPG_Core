@@ -187,30 +187,30 @@ namespace MultiplayerARPG
         {
             if (debugDamagePosition.HasValue && debugDamageRotation.HasValue)
             {
-                float atkFov = GetAttackFov();
+                float atkHalfFov = GetAttackFov() * 0.5f;
                 float atkDist = GetAttackDistance();
                 Handles.color = debugFovColor;
-                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, -atkFov, atkDist);
-                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, atkFov, atkDist);
-                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, -atkFov, atkDist);
-                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, atkFov, atkDist);
+                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, -atkHalfFov, atkDist);
+                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, atkHalfFov, atkDist);
+                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, -atkHalfFov, atkDist);
+                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, atkHalfFov, atkDist);
 
                 Handles.color = new Color(1, 0, 0, debugFovColor.a);
-                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, -atkFov, 0);
-                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, atkFov, 0);
-                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, -atkFov, 0);
-                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, atkFov, 0);
+                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, -atkHalfFov, 0);
+                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, atkHalfFov, 0);
+                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, -atkHalfFov, 0);
+                Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, atkHalfFov, 0);
 
                 Handles.color = new Color(debugFovColor.r, debugFovColor.g, debugFovColor.b);
-                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, -atkFov, atkDist);
-                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, atkFov, atkDist);
-                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, -atkFov, 0);
-                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, atkFov, 0);
+                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, -atkHalfFov, atkDist);
+                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, atkHalfFov, atkDist);
+                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, -atkHalfFov, 0);
+                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, atkHalfFov, 0);
 
-                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, -atkFov, 0);
-                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, atkFov, 0);
-                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, -atkFov, atkDist);
-                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, atkFov, atkDist);
+                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, -atkHalfFov, 0);
+                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, atkHalfFov, 0);
+                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, -atkHalfFov, atkDist);
+                Handles.DrawWireArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.right, debugDamageRotation.Value * Vector3.forward, atkHalfFov, atkDist);
             }
         }
 #endif
@@ -864,7 +864,7 @@ namespace MultiplayerARPG
                     CacheIncreaseDamages);
             }
         }
-
+        
         public virtual float GetAttackDistance()
         {
             // Finding minimum distance of equipped weapons
@@ -938,8 +938,7 @@ namespace MultiplayerARPG
                 return 0f;
             if (skill.skillAttackType == SkillAttackType.Normal)
                 return skill.damageInfo.GetDistance();
-            else
-                return GetAttackDistance();
+            return GetAttackDistance();
         }
 
         public virtual float GetSkillAttackFov(Skill skill)
@@ -984,8 +983,13 @@ namespace MultiplayerARPG
                             if (tempOverlapSize == 0)
                                 return;
                             // Target entity not set, use overlapped object as target
-                            tempGameObject = GetOverlapObject(0);
-                            tempDamageableEntity = tempGameObject.GetComponent<DamageableEntity>();
+                            for (tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
+                            {
+                                tempGameObject = GetOverlapObject(tempLoopCounter);
+                                tempDamageableEntity = tempGameObject.GetComponent<DamageableEntity>();
+                                if (tempDamageableEntity != null && (!(tempDamageableEntity is BaseCharacterEntity) || (BaseCharacterEntity)tempDamageableEntity != this))
+                                    break;
+                            }
                         }
                         // Target receive damage
                         if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() &&
@@ -1009,7 +1013,7 @@ namespace MultiplayerARPG
                             // Target receive damage
                             if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() &&
                                 (!(tempDamageableEntity is BaseCharacterEntity) || (BaseCharacterEntity)tempDamageableEntity != this) &&
-                                IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position, damageRotation * Vector3.forward))
+                                IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position))
                             {
                                 // Pass all receive damage condition, then apply damages
                                 tempDamageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId);
@@ -1055,9 +1059,15 @@ namespace MultiplayerARPG
         public virtual bool IsPositionInFov(float fov, Vector3 position, Vector3 forward)
         {
             float halfFov = fov * 0.5f;
-            float angle = Vector3.Angle((CacheTransform.position - position).normalized, forward);
-            // Angle in forward position is 180 so we use this value to determine that target is in hit fov or not
-            return (angle < 180 + halfFov && angle > 180 - halfFov);
+            // This is unsigned angle, so angle found from this function is 0 - 180
+            // if position forward from character this value will be 180
+            // so just find for angle > 180 - halfFov
+            Vector3 targetDir = (position - CacheTransform.position).normalized;
+            targetDir.y = 0;
+            forward.y = 0;
+            targetDir.Normalize();
+            forward.Normalize();
+            return Vector3.Angle(targetDir, forward) < halfFov;
         }
 
         protected virtual void GetDamagePositionAndRotation(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, out Vector3 position, out Quaternion rotation)

@@ -283,9 +283,10 @@ namespace MultiplayerARPG
         public override bool IsPositionInFov(float fov, Vector3 position, Vector3 forward)
         {
             float halfFov = fov * 0.5f;
-            float angle = Vector2.Angle((CacheTransform.position - position).normalized, CurrentDirection);
+            Vector2 targetDir = (position - CacheTransform.position).normalized;
+            float angle = Vector2.Angle(targetDir, CurrentDirection);
             // Angle in forward position is 180 so we use this value to determine that target is in hit fov or not
-            return (angle < 180 + halfFov && angle > 180 - halfFov);
+            return angle < halfFov;
         }
 
         protected override void GetDamagePositionAndRotation(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, out Vector3 position, out Quaternion rotation)
