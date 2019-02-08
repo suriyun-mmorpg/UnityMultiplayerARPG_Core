@@ -20,12 +20,6 @@ namespace MultiplayerARPG
         public override int MaxHp { get { return maxHp; } }
 
         /// <summary>
-        /// Use this as reference for entity to interactive while in play mode
-        /// </summary>
-        [HideInInspector, System.NonSerialized]
-        public BuildingEntity buildingEntity;
-
-        /// <summary>
         /// Use this as reference for area to build this object while in build mode
         /// </summary>
         [HideInInspector, System.NonSerialized]
@@ -91,6 +85,7 @@ namespace MultiplayerARPG
         private readonly List<BuildingEntity> triggerBuildings = new List<BuildingEntity>();
         private readonly List<BuildingMaterial> buildingMaterials = new List<BuildingMaterial>();
         private readonly List<BuildingArea> buildingAreas = new List<BuildingArea>();
+        private readonly List<BuildingEntity> children = new List<BuildingEntity>();
 
         protected override void EntityAwake()
         {
@@ -117,6 +112,26 @@ namespace MultiplayerARPG
                     buildingAreas.Add(area);
                 }
             }
+        }
+
+        public override void OnSetup()
+        {
+            base.OnSetup();
+            parentId.onChange = (id) =>
+            {
+                if (IsServer)
+                {
+                    BuildingEntity parent;
+                    if (gameManager.TryGetBuildingEntity(id, out parent))
+                        parent.AddChildren(this);
+                }
+            };
+        }
+
+        public void AddChildren(BuildingEntity buildingEntity)
+        {
+            if (!children.Contains(buildingEntity))
+                children.Add(buildingEntity);
         }
 
         protected override void EntityUpdate()
@@ -241,6 +256,20 @@ namespace MultiplayerARPG
                 }
             }
             return false;
+        }
+
+        public override void OnNetworkDestroy(byte reasons)
+        {
+            base.OnNetworkDestroy(reasons);
+            if (reasons == LiteNetLibGameManager.DestroyObjectReasons.RequestedToDestroy)
+            {
+                // Chain destroy
+                foreach (BuildingEntity child in children)
+                {
+                    if (child == null) continue;
+                    child.NetworkDestroy();
+                }
+            }
         }
     }
 }
