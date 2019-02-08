@@ -145,6 +145,7 @@ namespace MultiplayerARPG
             WorldSaveData worldSaveData = new WorldSaveData();
             foreach (BuildingEntity buildingEntity in buildingEntities.Values)
             {
+                if (buildingEntity == null) continue;
                 worldSaveData.buildings.Add(new BuildingSaveData()
                 {
                     Id = buildingEntity.Id,
