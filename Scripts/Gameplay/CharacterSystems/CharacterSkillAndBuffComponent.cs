@@ -38,9 +38,10 @@ namespace MultiplayerARPG
             if (component.updatingTime >= SKILL_BUFF_UPDATE_DURATION)
             {
                 int count = characterEntity.Summons.Count;
+                CharacterSummon summon;
                 for (int i = count - 1; i >= 0; --i)
                 {
-                    CharacterSummon summon = characterEntity.Summons[i];
+                    summon = characterEntity.Summons[i];
                     if (summon.ShouldRemove())
                     {
                         characterEntity.Summons.RemoveAt(i);
@@ -53,9 +54,10 @@ namespace MultiplayerARPG
                     }
                 }
                 count = characterEntity.SkillUsages.Count;
+                CharacterSkillUsage skillUsage;
                 for (int i = count - 1; i >= 0; --i)
                 {
-                    CharacterSkillUsage skillUsage = characterEntity.SkillUsages[i];
+                    skillUsage = characterEntity.SkillUsages[i];
                     if (skillUsage.ShouldRemove())
                         characterEntity.SkillUsages.RemoveAt(i);
                     else
@@ -65,9 +67,10 @@ namespace MultiplayerARPG
                     }
                 }
                 count = characterEntity.NonEquipItems.Count;
+                CharacterItem nonEquipItem;
                 for (int i = count - 1; i >= 0; --i)
                 {
-                    CharacterItem nonEquipItem = characterEntity.NonEquipItems[i];
+                    nonEquipItem = characterEntity.NonEquipItems[i];
                     if (nonEquipItem.ShouldRemove())
                         characterEntity.NonEquipItems.RemoveAt(i);
                     else
@@ -80,9 +83,10 @@ namespace MultiplayerARPG
                     }
                 }
                 count = characterEntity.Buffs.Count;
+                CharacterBuff buff;
                 for (int i = count - 1; i >= 0; --i)
                 {
-                    CharacterBuff buff = characterEntity.Buffs[i];
+                    buff = characterEntity.Buffs[i];
                     float duration = buff.GetDuration();
                     if (buff.ShouldRemove())
                         characterEntity.Buffs.RemoveAt(i);
@@ -91,11 +95,54 @@ namespace MultiplayerARPG
                         buff.Update(component.updatingTime);
                         characterEntity.Buffs[i] = buff;
                     }
-                    recoveryData.recoveryingHp += duration > 0f ? (float)buff.GetBuffRecoveryHp() / duration * component.updatingTime : 0f;
-                    recoveryData.recoveryingMp += duration > 0f ? (float)buff.GetBuffRecoveryMp() / duration * component.updatingTime : 0f;
-                    recoveryData.recoveryingStamina += duration > 0f ? (float)buff.GetBuffRecoveryStamina() / duration * component.updatingTime : 0f;
-                    recoveryData.recoveryingFood += duration > 0f ? (float)buff.GetBuffRecoveryFood() / duration * component.updatingTime : 0f;
-                    recoveryData.recoveryingWater += duration > 0f ? (float)buff.GetBuffRecoveryWater() / duration * component.updatingTime : 0f;
+                    // If duration is 0, damages / recoveries will applied immediately, so don't apply it here
+                    if (duration > 0f)
+                    {
+                        float tempAmount = 0f;
+                        // Damage over time
+                        DamageElement damageElement;
+                        MinMaxFloat damageAmount;
+                        float damage;
+                        foreach (KeyValuePair<DamageElement, MinMaxFloat> damageOverTime in buff.GetDamageOverTimes())
+                        {
+                            damageElement = damageOverTime.Key;
+                            damageAmount = damageOverTime.Value;
+                            damage = damageElement.GetDamageReducedByResistance(characterEntity, damageAmount.Random());
+                            if (damage > 0f)
+                                tempAmount += damage / duration * component.updatingTime;
+                        }
+                        recoveryData.decreasingHp += tempAmount;
+                        // Hp recovery
+                        tempAmount = (float)buff.GetBuffRecoveryHp() / duration * component.updatingTime;
+                        if (tempAmount > 0)
+                            recoveryData.recoveryingHp += tempAmount;
+                        else if (tempAmount < 0)
+                            recoveryData.decreasingHp += tempAmount;
+                        // Mp recovery
+                        tempAmount = (float)buff.GetBuffRecoveryMp() / duration * component.updatingTime;
+                        if (tempAmount > 0)
+                            recoveryData.recoveryingMp += tempAmount;
+                        else if (tempAmount < 0)
+                            recoveryData.decreasingMp += tempAmount;
+                        // Stamina recovery
+                        tempAmount = (float)buff.GetBuffRecoveryStamina() / duration * component.updatingTime;
+                        if (tempAmount > 0)
+                            recoveryData.recoveryingStamina += tempAmount;
+                        else if (tempAmount < 0)
+                            recoveryData.decreasingStamina += tempAmount;
+                        // Food recovery
+                        tempAmount = (float)buff.GetBuffRecoveryFood() / duration * component.updatingTime;
+                        if (tempAmount > 0)
+                            recoveryData.recoveryingFood += tempAmount;
+                        else if (tempAmount < 0)
+                            recoveryData.decreasingFood += tempAmount;
+                        // Water recovery
+                        tempAmount = (float)buff.GetBuffRecoveryWater() / duration * component.updatingTime;
+                        if (tempAmount > 0)
+                            recoveryData.recoveryingWater += tempAmount;
+                        else if (tempAmount < 0)
+                            recoveryData.decreasingWater += tempAmount;
+                    }
                 }
                 component.updatingTime = 0;
             }

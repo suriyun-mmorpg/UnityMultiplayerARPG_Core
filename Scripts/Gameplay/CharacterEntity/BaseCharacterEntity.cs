@@ -467,16 +467,19 @@ namespace MultiplayerARPG
             float calculatingTotalDamage = 0f;
             if (allDamageAmounts.Count > 0)
             {
+                DamageElement damageElement;
+                MinMaxFloat damageAmount;
+                float tempReceivingDamage;
                 foreach (KeyValuePair<DamageElement, MinMaxFloat> allDamageAmount in allDamageAmounts)
                 {
-                    DamageElement damageElement = allDamageAmount.Key;
-                    MinMaxFloat damageAmount = allDamageAmount.Value;
+                    damageElement = allDamageAmount.Key;
+                    damageAmount = allDamageAmount.Value;
                     // Set hit effect by damage element
                     if (hitEffectsId == 0 && damageElement != gameInstance.DefaultDamageElement)
                         hitEffectsId = damageElement.hitEffects.Id;
-                    float receivingDamage = damageElement.GetDamageReducedByResistance(this, damageAmount.Random());
-                    if (receivingDamage > 0f)
-                        calculatingTotalDamage += receivingDamage;
+                    tempReceivingDamage = damageElement.GetDamageReducedByResistance(this, damageAmount.Random());
+                    if (tempReceivingDamage > 0f)
+                        calculatingTotalDamage += tempReceivingDamage;
                 }
             }
 
@@ -578,36 +581,57 @@ namespace MultiplayerARPG
             newBuff.Apply();
             buffs.Add(newBuff);
 
-            float duration = newBuff.GetDuration();
-            int recoveryHp = duration <= 0f ? newBuff.GetBuffRecoveryHp() : 0;
-            if (recoveryHp != 0)
+            if (newBuff.GetDuration() <= 0f)
             {
-                CurrentHp += recoveryHp;
-                RequestCombatAmount(CombatAmountType.HpRecovery, recoveryHp);
-            }
-            int recoveryMp = duration <= 0f ? newBuff.GetBuffRecoveryMp() : 0;
-            if (recoveryMp != 0)
-            {
-                CurrentMp += recoveryMp;
-                RequestCombatAmount(CombatAmountType.HpRecovery, recoveryMp);
-            }
-            int recoveryStamina = duration <= 0f ? newBuff.GetBuffRecoveryStamina() : 0;
-            if (recoveryStamina != 0)
-            {
-                CurrentStamina += recoveryStamina;
-                RequestCombatAmount(CombatAmountType.HpRecovery, recoveryStamina);
-            }
-            int recoveryFood = duration <= 0f ? newBuff.GetBuffRecoveryFood() : 0;
-            if (recoveryFood != 0)
-            {
-                CurrentFood += recoveryFood;
-                RequestCombatAmount(CombatAmountType.FoodRecovery, recoveryFood);
-            }
-            int recoveryWater = duration <= 0f ? newBuff.GetBuffRecoveryWater() : 0;
-            if (recoveryWater != 0)
-            {
-                CurrentWater += recoveryWater;
-                RequestCombatAmount(CombatAmountType.WaterRecovery, recoveryWater);
+                int tempAmount = 0;
+                // Damage over time
+                DamageElement damageElement;
+                MinMaxFloat damageAmount;
+                float tempReceivingDamage;
+                foreach (KeyValuePair<DamageElement, MinMaxFloat> damageOverTime in newBuff.GetDamageOverTimes())
+                {
+                    damageElement = damageOverTime.Key;
+                    damageAmount = damageOverTime.Value;
+                    tempReceivingDamage = (float)damageElement.GetDamageReducedByResistance(this, damageAmount.Random());
+                    if (tempReceivingDamage > 0f)
+                        tempAmount += (int)tempReceivingDamage;
+                }
+                CurrentHp -= tempAmount;
+                // Hp recovery
+                tempAmount = newBuff.GetBuffRecoveryHp();
+                if (tempAmount != 0)
+                {
+                    CurrentHp += tempAmount;
+                    RequestCombatAmount(CombatAmountType.HpRecovery, tempAmount);
+                }
+                // Mp recovery
+                tempAmount = newBuff.GetBuffRecoveryMp();
+                if (tempAmount != 0)
+                {
+                    CurrentMp += tempAmount;
+                    RequestCombatAmount(CombatAmountType.HpRecovery, tempAmount);
+                }
+                // Stamina recovery
+                tempAmount = newBuff.GetBuffRecoveryStamina();
+                if (tempAmount != 0)
+                {
+                    CurrentStamina += tempAmount;
+                    RequestCombatAmount(CombatAmountType.HpRecovery, tempAmount);
+                }
+                // Food recovery
+                tempAmount = newBuff.GetBuffRecoveryFood();
+                if (tempAmount != 0)
+                {
+                    CurrentFood += tempAmount;
+                    RequestCombatAmount(CombatAmountType.FoodRecovery, tempAmount);
+                }
+                // Water recovery
+                tempAmount = newBuff.GetBuffRecoveryWater();
+                if (tempAmount != 0)
+                {
+                    CurrentWater += tempAmount;
+                    RequestCombatAmount(CombatAmountType.WaterRecovery, tempAmount);
+                }
             }
             ValidateRecovery();
         }

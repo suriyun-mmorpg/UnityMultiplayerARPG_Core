@@ -54,6 +54,14 @@ public class CharacterBuff : INetSerializable
     private Dictionary<DamageElement, float> cacheIncreaseResistances;
     [System.NonSerialized]
     private Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages;
+    [System.NonSerialized]
+    private Dictionary<DamageElement, MinMaxFloat> cacheDamageOverTimes;
+    [System.NonSerialized]
+    private bool cacheDisallowMove;
+    [System.NonSerialized]
+    private bool cacheDisallowAttack;
+    [System.NonSerialized]
+    private bool cacheDisallowUseSkill;
 
     private void MakeCache()
     {
@@ -76,6 +84,10 @@ public class CharacterBuff : INetSerializable
             cacheIncreaseAttributes = null;
             cacheIncreaseResistances = null;
             cacheIncreaseDamages = null;
+            cacheDamageOverTimes = null;
+            cacheDisallowMove = false;
+            cacheDisallowAttack = false;
+            cacheDisallowUseSkill = false;
             switch (type)
             {
                 case BuffType.SkillBuff:
@@ -102,6 +114,10 @@ public class CharacterBuff : INetSerializable
             cacheIncreaseAttributes = cacheBuff.GetIncreaseAttributes(level);
             cacheIncreaseResistances = cacheBuff.GetIncreaseResistances(level);
             cacheIncreaseDamages = cacheBuff.GetIncreaseDamages(level);
+            cacheDamageOverTimes = cacheBuff.GetDamageOverTimes(level);
+            cacheDisallowMove = cacheBuff.disallowMove;
+            cacheDisallowAttack = cacheBuff.disallowAttack;
+            cacheDisallowUseSkill = cacheBuff.disallowUseSkill;
         }
     }
 
@@ -187,6 +203,30 @@ public class CharacterBuff : INetSerializable
     {
         MakeCache();
         return cacheIncreaseDamages;
+    }
+
+    public Dictionary<DamageElement, MinMaxFloat> GetDamageOverTimes()
+    {
+        MakeCache();
+        return cacheDamageOverTimes;
+    }
+
+    public bool GetDisallowMove()
+    {
+        MakeCache();
+        return cacheDisallowMove;
+    }
+
+    public bool GetDisallowAttack()
+    {
+        MakeCache();
+        return cacheDisallowAttack;
+    }
+
+    public bool GetDisallowUseSkill()
+    {
+        MakeCache();
+        return cacheDisallowUseSkill;
     }
 
     public bool ShouldRemove()

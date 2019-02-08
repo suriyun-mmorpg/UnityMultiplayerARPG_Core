@@ -56,6 +56,11 @@ namespace MultiplayerARPG
         {
             return GameDataHelpers.MakeDamages(buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), level, 1f);
         }
+
+        public static Dictionary<DamageElement, MinMaxFloat> GetDamageOverTimes(this Buff buff, short level)
+        {
+            return GameDataHelpers.MakeDamages(buff.damageOverTimes, new Dictionary<DamageElement, MinMaxFloat>(), level, 1f);
+        }
         #endregion
     }
 }

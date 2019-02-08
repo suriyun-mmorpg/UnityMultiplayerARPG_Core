@@ -18,6 +18,10 @@ namespace MultiplayerARPG
         public AttributeIncremental[] increaseAttributes;
         public ResistanceIncremental[] increaseResistances;
         public DamageIncremental[] increaseDamages;
+        public DamageIncremental[] damageOverTimes;
+        public bool disallowMove;
+        public bool disallowAttack;
+        public bool disallowUseSkill;
         public GameEffect[] effects;
     }
 }
