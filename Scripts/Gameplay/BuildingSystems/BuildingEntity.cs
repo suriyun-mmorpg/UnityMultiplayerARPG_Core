@@ -164,7 +164,25 @@ namespace MultiplayerARPG
                 return;
 
             base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
-            // TODO: Reduce current hp
+            float calculatingTotalDamage = 0f;
+            if (allDamageAmounts.Count > 0)
+            {
+                foreach (KeyValuePair<DamageElement, MinMaxFloat> allDamageAmount in allDamageAmounts)
+                {
+                    DamageElement damageElement = allDamageAmount.Key;
+                    MinMaxFloat damageAmount = allDamageAmount.Value;
+                    calculatingTotalDamage += damageAmount.Random();
+                }
+            }
+            // Apply damages
+            int totalDamage = (int)calculatingTotalDamage;
+            CurrentHp -= totalDamage;
+
+            ReceivedDamage(attacker, CombatAmountType.NormalDamage, totalDamage);
+
+            // If current hp <= 0, character dead
+            if (IsDead())
+                NetworkDestroy();
         }
 
         public void SetupAsBuildMode()
