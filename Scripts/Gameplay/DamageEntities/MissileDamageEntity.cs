@@ -58,6 +58,10 @@ namespace MultiplayerARPG
             }
         }
 
+        private float launchTime;
+        private float missileDuration;
+        private bool isExploded;
+
         public void SetupDamage(
             IAttackerEntity attacker,
             CharacterItem weapon,
@@ -74,12 +78,25 @@ namespace MultiplayerARPG
 
             if (missileDistance <= 0 && missileSpeed <= 0)
             {
-                NetworkDestroy();
+                // Explode immediately when distance and speed is 0
+                Explode();
+                NetworkDestroy(destroyHideDelay);
                 return;
             }
 
             LockingTarget = lockingTarget;
-            NetworkDestroy(missileDistance / missileSpeed);
+            launchTime = Time.unscaledTime;
+            missileDuration = missileDistance / missileSpeed;
+        }
+
+        protected override void EntityUpdate()
+        {
+            base.EntityUpdate();
+            if (Time.unscaledTime - launchTime > missileDuration)
+            {
+                Explode();
+                NetworkDestroy(destroyHideDelay);
+            }
         }
 
         protected override void EntityFixedUpdate()
@@ -125,7 +142,11 @@ namespace MultiplayerARPG
         private void TriggerEnter(GameObject other)
         {
             if (FindAndApplyDamage(other))
-                NetworkDestroy();
+            {
+                // Explode immediately when hit something
+                Explode();
+                NetworkDestroy(destroyHideDelay);
+            }
         }
 
         private bool FindAndApplyDamage(GameObject other)
@@ -145,6 +166,29 @@ namespace MultiplayerARPG
             return true;
         }
 
+        private void Explode()
+        {
+            if (isExploded)
+                return;
+            isExploded = true;
+            if (gameInstance.DimensionType == DimensionType.Dimension2D)
+            {
+                Collider2D[] colliders2D = Physics2D.OverlapCircleAll(CacheTransform.position, explodeDistance);
+                foreach (Collider2D collider in colliders2D)
+                {
+                    FindAndApplyDamage(collider.gameObject);
+                }
+            }
+            else
+            {
+                Collider[] colliders = Physics.OverlapSphere(CacheTransform.position, explodeDistance);
+                foreach (Collider collider in colliders)
+                {
+                    FindAndApplyDamage(collider.gameObject);
+                }
+            }
+        }
+
         public override void OnNetworkDestroy(byte reasons)
         {
             base.OnNetworkDestroy(reasons);
@@ -152,26 +196,6 @@ namespace MultiplayerARPG
             {
                 if (onDestroy != null)
                     onDestroy.Invoke();
-
-                if (explodeDistance > 0)
-                {
-                    if (gameInstance.DimensionType == DimensionType.Dimension2D)
-                    {
-                        Collider2D[] colliders2D = Physics2D.OverlapCircleAll(CacheTransform.position, explodeDistance);
-                        foreach (Collider2D collider in colliders2D)
-                        {
-                            FindAndApplyDamage(collider.gameObject);
-                        }
-                    }
-                    else
-                    {
-                        Collider[] colliders = Physics.OverlapSphere(CacheTransform.position, explodeDistance);
-                        foreach (Collider collider in colliders)
-                        {
-                            FindAndApplyDamage(collider.gameObject);
-                        }
-                    }
-                }
             }
         }
     }

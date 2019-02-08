@@ -1,10 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public abstract class BaseDamageEntity : BaseGameEntity
     {
+        public float destroyHideDelay;
         protected IAttackerEntity attacker;
         protected CharacterItem weapon;
         protected Dictionary<DamageElement, MinMaxFloat> allDamageAmounts;
