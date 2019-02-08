@@ -301,11 +301,10 @@ namespace MultiplayerARPG
         protected virtual void UpdateBuilding()
         {
             // Current building UI
-            BuildingEntity currentBuilding;
             UICurrentBuilding uiCurrentBuilding = CacheUISceneGameplay.uiCurrentBuilding;
             if (uiCurrentBuilding != null)
             {
-                if (uiCurrentBuilding.IsVisible() && !PlayerCharacterEntity.TryGetTargetEntity(out currentBuilding))
+                if (uiCurrentBuilding.IsVisible() && activeBuildingEntity == null)
                     uiCurrentBuilding.Hide();
             }
 
@@ -446,6 +445,7 @@ namespace MultiplayerARPG
                 float actDistance = gameInstance.buildDistance - StoppingDistance;
                 if (Vector3.Distance(CharacterTransform.position, targetBuilding.CacheTransform.position) <= actDistance)
                 {
+                    activeBuildingEntity = targetBuilding;
                     if (uiCurrentBuilding != null && !uiCurrentBuilding.IsVisible())
                         uiCurrentBuilding.Show();
                     PlayerCharacterEntity.StopMove();

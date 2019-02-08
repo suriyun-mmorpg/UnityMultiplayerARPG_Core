@@ -20,8 +20,10 @@ namespace MultiplayerARPG
         [Range(0, 1f)]
         public float turnToTargetDuration = 0.1f;
         public FollowCameraControls gameplayCameraPrefab;
+        public bool showConfirmConstructionUI;
         public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
         bool isBlockController;
+        BuildingMaterial tempBuildingMaterial;
         BaseGameEntity tempEntity;
         BaseGameEntity foundEntity;
         Vector3 targetLookDirection;
@@ -31,17 +33,20 @@ namespace MultiplayerARPG
         float tempCalculateAngle;
         bool tempPressAttack;
         bool tempPressActivate;
+        bool tempPressPickupItem;
         int tempCount;
         int tempCounter;
         GameObject tempGameObject;
         BasePlayerCharacterEntity targetPlayer;
         NpcEntity targetNpc;
+        BuildingEntity targetBuilding;
         RaycastHit[] raycasts = new RaycastHit[RAYCAST_COLLIDER_SIZE];
         Collider[] overlapColliders = new Collider[OVERLAP_COLLIDER_SIZE];
         RaycastHit tempHitInfo;
         Skill queueSkill;
         Skill usingSkill;
         Vector3 aimPosition;
+        Vector3 actionLookDirection;
 
         protected override void Awake()
         {
@@ -95,6 +100,18 @@ namespace MultiplayerARPG
             UpdateLookAtTarget();
             turnTimeCounter += Time.deltaTime;
 
+            // Hide construction UI
+            if (currentBuildingEntity == null)
+            {
+                if (CacheUISceneGameplay.uiConstructBuilding.IsVisible())
+                    CacheUISceneGameplay.uiConstructBuilding.Hide();
+            }
+            if (activeBuildingEntity == null)
+            {
+                if (CacheUISceneGameplay.uiCurrentBuilding.IsVisible())
+                    CacheUISceneGameplay.uiCurrentBuilding.Hide();
+            }
+
             isBlockController = CacheUISceneGameplay.IsBlockController();
             // Lock cursor when not show UIs
             Cursor.lockState = !isBlockController ? CursorLockMode.Locked : CursorLockMode.None;
@@ -109,108 +126,190 @@ namespace MultiplayerARPG
             }
 
             // Find target character
+            Ray ray = CacheGameplayCameraControls.CacheCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             Vector3 forward = CacheGameplayCameraControls.CacheCameraTransform.forward;
             Vector3 right = CacheGameplayCameraControls.CacheCameraTransform.right;
-            Ray ray = CacheGameplayCameraControls.CacheCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             float distanceFromOrigin = Vector3.Distance(ray.origin, PlayerCharacterEntity.CacheTransform.position);
             float aimDistance = distanceFromOrigin;
+            // Calculate aim distance by skill or weapon
             if (queueSkill != null && queueSkill.IsAttack())
                 aimDistance += PlayerCharacterEntity.GetSkillAttackDistance(queueSkill);
             else
                 aimDistance += PlayerCharacterEntity.GetAttackDistance();
-            aimPosition = ray.origin + ray.direction * aimDistance;
+            actionLookDirection = aimPosition = ray.origin + ray.direction * aimDistance;
+            actionLookDirection.y = PlayerCharacterEntity.CacheTransform.position.y;
+            actionLookDirection = actionLookDirection - PlayerCharacterEntity.CacheTransform.position;
+            actionLookDirection.Normalize();
             foundEntity = null;
-            tempCount = Physics.RaycastNonAlloc(ray, raycasts, aimDistance);
-            for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
+            // Find for enemy character
+            if (currentBuildingEntity == null)
             {
-                tempHitInfo = raycasts[tempCounter];
-                aimPosition = tempHitInfo.point;
-                tempEntity = tempHitInfo.collider.GetComponent<BaseGameEntity>();
-                if (tempEntity != PlayerCharacterEntity)
+                tempCount = Physics.RaycastNonAlloc(ray, raycasts, aimDistance);
+                for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
                 {
-                    foundEntity = tempEntity;
-                    break;
-                }
-            }
+                    tempHitInfo = raycasts[tempCounter];
 
-            // Show target hp/mp
-            CacheUISceneGameplay.SetTargetEntity(foundEntity);
+                    tempEntity = tempHitInfo.collider.GetComponent<BaseGameEntity>();
+                    // Find building entity from building material
+                    if (tempEntity == null)
+                    {
+                        tempBuildingMaterial = tempHitInfo.collider.GetComponent<BuildingMaterial>();
+                        if (tempBuildingMaterial != null)
+                            tempEntity = tempBuildingMaterial.buildingEntity;
+                    }
+                    if (tempEntity != null && tempEntity == PlayerCharacterEntity)
+                        continue;
+                    // Set aim position and found target
+                    aimPosition = tempHitInfo.point;
+                    if (tempEntity != null)
+                        foundEntity = tempEntity;
+                }
+                // Show target hp/mp
+                CacheUISceneGameplay.SetTargetEntity(foundEntity);
+            }
+            else
+            {
+                // Clear area before next find
+                currentBuildingEntity.buildingArea = null;
+                // Find for position to construction building
+                bool foundSnapBuildPosition = false;
+                BuildingArea nonSnapBuildingArea = null;
+                tempCount = Physics.RaycastNonAlloc(ray, raycasts, gameInstance.buildDistance);
+                for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
+                {
+                    tempHitInfo = raycasts[tempCounter];
+                    tempEntity = tempHitInfo.collider.GetComponentInParent<BuildingEntity>();
+                    if (tempEntity != null && tempEntity == currentBuildingEntity)
+                        continue;
+
+                    // Set aim position
+                    aimPosition = tempHitInfo.point;
+
+                    BuildingArea buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
+                    if (buildingArea == null || (buildingArea.buildingEntity != null && buildingArea.buildingEntity == currentBuildingEntity))
+                        continue;
+                    
+                    if (currentBuildingEntity.buildingType.Equals(buildingArea.buildingType))
+                    {
+                        currentBuildingEntity.buildingArea = buildingArea;
+                        if (buildingArea.snapBuildingObject)
+                        {
+                            foundSnapBuildPosition = true;
+                            break;
+                        }
+                        nonSnapBuildingArea = buildingArea;
+                    }
+                }
+                // Update building position
+                if (!foundSnapBuildPosition)
+                    currentBuildingEntity.CacheTransform.position = aimPosition;
+            }
 
             // If mobile platforms, don't receive input raw to make it smooth
             bool raw = !InputManager.useMobileInputOnNonMobile && !Application.isMobilePlatform;
             Vector3 moveDirection = Vector3.zero;
-            Vector3 actionDirection = Vector3.zero;
             forward.y = 0f;
             right.y = 0f;
             forward.Normalize();
             right.Normalize();
             moveDirection += forward * InputManager.GetAxis("Vertical", raw);
             moveDirection += right * InputManager.GetAxis("Horizontal", raw);
-            actionDirection += forward * 1f;
 
             // normalize input if it exceeds 1 in combined length:
             if (moveDirection.sqrMagnitude > 1)
                 moveDirection.Normalize();
 
-            // normalize input if it exceeds 1 in combined length:
-            if (actionDirection.sqrMagnitude > 1)
-                actionDirection.Normalize();
-
-            tempPressAttack = InputManager.GetButton("Fire1");
-            tempPressActivate = InputManager.GetButtonDown("Activate");
-            if (queueSkill != null || tempPressAttack || tempPressActivate || PlayerCharacterEntity.IsPlayingActionAnimation())
+            if (currentBuildingEntity != null)
             {
-                // Find forward character / npc / building / warp entity from camera center
-                targetPlayer = null;
-                targetNpc = null;
-                if (tempPressActivate && !tempPressAttack)
+                tempPressAttack = InputManager.GetButtonUp("Fire1");
+                if (tempPressAttack)
                 {
-                    if (foundEntity is BasePlayerCharacterEntity)
-                        targetPlayer = foundEntity as BasePlayerCharacterEntity;
-                    if (foundEntity is NpcEntity)
-                        targetNpc = foundEntity as NpcEntity;
-                }
-                // While attacking turn to camera forward
-                tempCalculateAngle = Vector3.Angle(PlayerCharacterEntity.CacheTransform.forward, actionDirection);
-                if (tempCalculateAngle > 15f)
-                {
-                    if (queueSkill != null && queueSkill.IsAttack())
-                        turningState = TurningState.UseSkill;
-                    else if (tempPressAttack)
-                        turningState = TurningState.Attack;
-                    else if (tempPressActivate)
-                        turningState = TurningState.Activate;
-                    turnTimeCounter = ((180f - tempCalculateAngle) / 180f) * turnToTargetDuration;
-                    targetLookDirection = actionDirection;
+                    if (showConfirmConstructionUI)
+                    {
+                        // Show confirm UI
+                        if (!CacheUISceneGameplay.uiConstructBuilding.IsVisible())
+                            CacheUISceneGameplay.uiConstructBuilding.Show();
+                    }
+                    else
+                    {
+                        // Build when click
+                        ConfirmBuild();
+                    }
                 }
                 else
                 {
-                    // Attack immediately if character already look at target
-                    if (queueSkill != null && queueSkill.IsAttack())
-                    {
-                        UseSkill(aimPosition);
-                    }
-                    else if (tempPressAttack)
-                    {
-                        Attack(aimPosition);
-                    }
-                    else if (tempPressActivate)
-                    {
-                        Activate();
-                    }
+                    // Update move direction
+                    if (moveDirection.magnitude != 0f)
+                        targetLookDirection = moveDirection;
                 }
-
-                if (queueSkill != null && !queueSkill.IsAttack())
-                {
-                    // If it is not attack skill, use it immediately
-                    UseSkill();
-                }
-                queueSkill = null;
             }
             else
             {
-                if (moveDirection.magnitude != 0f)
-                    targetLookDirection = moveDirection;
+                // Not building / attacking
+                tempPressAttack = InputManager.GetButton("Fire1");
+                tempPressActivate = InputManager.GetButtonUp("Activate");
+                tempPressPickupItem = InputManager.GetButtonUp("PickUpItem");
+                if (queueSkill != null || tempPressAttack || tempPressActivate || PlayerCharacterEntity.IsPlayingActionAnimation())
+                {
+                    // Find forward character / npc / building / warp entity from camera center
+                    targetPlayer = null;
+                    targetNpc = null;
+                    targetBuilding = null;
+                    if (tempPressActivate && !tempPressAttack)
+                    {
+                        if (foundEntity is BasePlayerCharacterEntity)
+                            targetPlayer = foundEntity as BasePlayerCharacterEntity;
+                        if (foundEntity is NpcEntity)
+                            targetNpc = foundEntity as NpcEntity;
+                        if (foundEntity is BuildingEntity)
+                            targetBuilding = foundEntity as BuildingEntity;
+                    }
+                    // While attacking turn to camera forward
+                    tempCalculateAngle = Vector3.Angle(PlayerCharacterEntity.CacheTransform.forward, actionLookDirection);
+                    if (tempCalculateAngle > 15f)
+                    {
+                        if (queueSkill != null && queueSkill.IsAttack())
+                            turningState = TurningState.UseSkill;
+                        else if (tempPressAttack)
+                            turningState = TurningState.Attack;
+                        else if (tempPressActivate)
+                            turningState = TurningState.Activate;
+                        turnTimeCounter = ((180f - tempCalculateAngle) / 180f) * turnToTargetDuration;
+                        targetLookDirection = actionLookDirection;
+                    }
+                    else
+                    {
+                        // Attack immediately if character already look at target
+                        if (queueSkill != null && queueSkill.IsAttack())
+                        {
+                            UseSkill(aimPosition);
+                        }
+                        else if (tempPressAttack)
+                        {
+                            Attack(aimPosition);
+                        }
+                        else if (tempPressActivate)
+                        {
+                            Activate();
+                        }
+                    }
+                    // If skill is not attack skill, use it immediately
+                    if (queueSkill != null && !queueSkill.IsAttack())
+                        UseSkill();
+                    queueSkill = null;
+                }
+                else if (tempPressPickupItem)
+                {
+                    // Find for item to pick up
+                    if (foundEntity != null)
+                        PlayerCharacterEntity.RequestPickupItem((foundEntity as ItemDropEntity).ObjectId);
+                }
+                else
+                {
+                    // Update move direction
+                    if (moveDirection.magnitude != 0f)
+                        targetLookDirection = moveDirection;
+                }
             }
 
             // Hide Npc UIs when move
@@ -335,6 +434,12 @@ namespace MultiplayerARPG
                 CacheUISceneGameplay.SetActivePlayerCharacter(targetPlayer);
             else if (targetNpc != null)
                 PlayerCharacterEntity.RequestNpcActivate(targetNpc.ObjectId);
+            else if (targetBuilding != null)
+            {
+                activeBuildingEntity = targetBuilding;
+                if (!CacheUISceneGameplay.uiCurrentBuilding.IsVisible())
+                    CacheUISceneGameplay.uiCurrentBuilding.Show();
+            }
         }
 
         public void UseSkill()

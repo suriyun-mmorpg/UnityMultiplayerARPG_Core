@@ -43,6 +43,7 @@ namespace MultiplayerARPG
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
         protected int buildingItemIndex;
         protected BuildingEntity currentBuildingEntity;
+        protected BuildingEntity activeBuildingEntity;
 
         protected virtual void Awake()
         {
@@ -265,19 +266,16 @@ namespace MultiplayerARPG
 
         public void DestroyBuilding()
         {
-            BuildingEntity currentBuildingEntity;
-            if (PlayerCharacterEntity.TryGetTargetEntity(out currentBuildingEntity))
+            if (activeBuildingEntity != null)
             {
-                PlayerCharacterEntity.RequestDestroyBuilding(currentBuildingEntity.ObjectId);
-                PlayerCharacterEntity.SetTargetEntity(null);
+                PlayerCharacterEntity.RequestDestroyBuilding(activeBuildingEntity.ObjectId);
+                activeBuildingEntity = null;
             }
         }
 
         public void DeselectBuilding()
         {
-            BuildingEntity currentBuildingEntity;
-            if (PlayerCharacterEntity.TryGetTargetEntity(out currentBuildingEntity))
-                PlayerCharacterEntity.SetTargetEntity(null);
+            activeBuildingEntity = null;
         }
 
         public abstract void UseHotkey(int hotkeyIndex);
