@@ -947,8 +947,7 @@ namespace MultiplayerARPG
                 return 0f;
             if (skill.skillAttackType == SkillAttackType.Normal)
                 return skill.damageInfo.GetFov();
-            else
-                return GetAttackFov();
+            return GetAttackFov();
         }
 
         public virtual void LaunchDamageEntity(
