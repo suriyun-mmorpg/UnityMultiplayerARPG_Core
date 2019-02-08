@@ -44,6 +44,7 @@ namespace MultiplayerARPG
                 return;
 
             recoveryData.updatingTime += deltaTime;
+            int tempAmount;
             if (recoveryData.updatingTime >= RECOVERY_UPDATE_DURATION)
             {
                 // Hp
@@ -52,10 +53,10 @@ namespace MultiplayerARPG
                 {
                     if (recoveryData.recoveryingHp >= 1)
                     {
-                        int intRecoveryingHp = (int)recoveryData.recoveryingHp;
-                        characterEntity.CurrentHp += intRecoveryingHp;
-                        characterEntity.RequestCombatAmount(CombatAmountType.HpRecovery, intRecoveryingHp);
-                        recoveryData.recoveryingHp -= intRecoveryingHp;
+                        tempAmount = (int)recoveryData.recoveryingHp;
+                        characterEntity.CurrentHp += tempAmount;
+                        characterEntity.RequestCombatAmount(CombatAmountType.HpRecovery, tempAmount);
+                        recoveryData.recoveryingHp -= tempAmount;
                     }
                 }
                 else
@@ -67,9 +68,9 @@ namespace MultiplayerARPG
                 {
                     if (recoveryData.decreasingHp >= 1)
                     {
-                        int intDecreasingHp = (int)recoveryData.decreasingHp;
-                        characterEntity.CurrentHp -= intDecreasingHp;
-                        recoveryData.decreasingHp -= intDecreasingHp;
+                        tempAmount = (int)recoveryData.decreasingHp;
+                        characterEntity.CurrentHp -= tempAmount;
+                        recoveryData.decreasingHp -= tempAmount;
                     }
                 }
                 else
@@ -81,10 +82,10 @@ namespace MultiplayerARPG
                 {
                     if (recoveryData.recoveryingMp >= 1)
                     {
-                        int intRecoveryingMp = (int)recoveryData.recoveryingMp;
-                        characterEntity.CurrentMp += intRecoveryingMp;
-                        characterEntity.RequestCombatAmount(CombatAmountType.MpRecovery, intRecoveryingMp);
-                        recoveryData.recoveryingMp -= intRecoveryingMp;
+                        tempAmount = (int)recoveryData.recoveryingMp;
+                        characterEntity.CurrentMp += tempAmount;
+                        characterEntity.RequestCombatAmount(CombatAmountType.MpRecovery, tempAmount);
+                        recoveryData.recoveryingMp -= tempAmount;
                     }
                 }
                 else
@@ -96,9 +97,9 @@ namespace MultiplayerARPG
                 {
                     if (recoveryData.decreasingMp >= 1)
                     {
-                        int intDecreasingMp = (int)recoveryData.decreasingMp;
-                        characterEntity.CurrentMp -= intDecreasingMp;
-                        recoveryData.decreasingMp -= intDecreasingMp;
+                        tempAmount = (int)recoveryData.decreasingMp;
+                        characterEntity.CurrentMp -= tempAmount;
+                        recoveryData.decreasingMp -= tempAmount;
                     }
                 }
                 else
@@ -110,10 +111,10 @@ namespace MultiplayerARPG
                 {
                     if (recoveryData.recoveryingStamina >= 1)
                     {
-                        int intRecoveryingStamina = (int)recoveryData.recoveryingStamina;
-                        characterEntity.CurrentStamina += intRecoveryingStamina;
-                        characterEntity.RequestCombatAmount(CombatAmountType.StaminaRecovery, intRecoveryingStamina);
-                        recoveryData.recoveryingStamina -= intRecoveryingStamina;
+                        tempAmount = (int)recoveryData.recoveryingStamina;
+                        characterEntity.CurrentStamina += tempAmount;
+                        characterEntity.RequestCombatAmount(CombatAmountType.StaminaRecovery, tempAmount);
+                        recoveryData.recoveryingStamina -= tempAmount;
                     }
                 }
                 else
@@ -125,9 +126,9 @@ namespace MultiplayerARPG
                 {
                     if (recoveryData.decreasingStamina >= 1)
                     {
-                        int intDecreasingStamina = (int)recoveryData.decreasingStamina;
-                        characterEntity.CurrentStamina -= intDecreasingStamina;
-                        recoveryData.decreasingStamina -= intDecreasingStamina;
+                        tempAmount = (int)recoveryData.decreasingStamina;
+                        characterEntity.CurrentStamina -= tempAmount;
+                        recoveryData.decreasingStamina -= tempAmount;
                     }
                 }
                 else
@@ -138,10 +139,10 @@ namespace MultiplayerARPG
                 {
                     if (recoveryData.recoveryingFood >= 1)
                     {
-                        int intRecoveryingFood = (int)recoveryData.recoveryingFood;
-                        characterEntity.CurrentFood += intRecoveryingFood;
-                        characterEntity.RequestCombatAmount(CombatAmountType.FoodRecovery, intRecoveryingFood);
-                        recoveryData.recoveryingFood -= intRecoveryingFood;
+                        tempAmount = (int)recoveryData.recoveryingFood;
+                        characterEntity.CurrentFood += tempAmount;
+                        characterEntity.RequestCombatAmount(CombatAmountType.FoodRecovery, tempAmount);
+                        recoveryData.recoveryingFood -= tempAmount;
                     }
                 }
                 else
@@ -153,9 +154,9 @@ namespace MultiplayerARPG
                 {
                     if (recoveryData.decreasingFood >= 1)
                     {
-                        int intDecreasingFood = (int)recoveryData.decreasingFood;
-                        characterEntity.CurrentFood -= intDecreasingFood;
-                        recoveryData.decreasingFood -= intDecreasingFood;
+                        tempAmount = (int)recoveryData.decreasingFood;
+                        characterEntity.CurrentFood -= tempAmount;
+                        recoveryData.decreasingFood -= tempAmount;
                     }
                 }
                 else
@@ -166,10 +167,10 @@ namespace MultiplayerARPG
                 {
                     if (recoveryData.recoveryingWater >= 1)
                     {
-                        int intRecoveryingWater = (int)recoveryData.recoveryingWater;
-                        characterEntity.CurrentWater += intRecoveryingWater;
-                        characterEntity.RequestCombatAmount(CombatAmountType.WaterRecovery, intRecoveryingWater);
-                        recoveryData.recoveryingWater -= intRecoveryingWater;
+                        tempAmount = (int)recoveryData.recoveryingWater;
+                        characterEntity.CurrentWater += tempAmount;
+                        characterEntity.RequestCombatAmount(CombatAmountType.WaterRecovery, tempAmount);
+                        recoveryData.recoveryingWater -= tempAmount;
                     }
                 }
                 else
@@ -181,9 +182,9 @@ namespace MultiplayerARPG
                 {
                     if (recoveryData.decreasingWater >= 1)
                     {
-                        int intDecreasingWater = (int)recoveryData.decreasingWater;
-                        characterEntity.CurrentWater -= intDecreasingWater;
-                        recoveryData.decreasingWater -= intDecreasingWater;
+                        tempAmount = (int)recoveryData.decreasingWater;
+                        characterEntity.CurrentWater -= tempAmount;
+                        recoveryData.decreasingWater -= tempAmount;
                     }
                 }
                 else
