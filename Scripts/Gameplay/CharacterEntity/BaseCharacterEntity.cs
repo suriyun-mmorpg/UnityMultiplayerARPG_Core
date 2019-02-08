@@ -609,14 +609,14 @@ namespace MultiplayerARPG
                 if (tempAmount != 0)
                 {
                     CurrentMp += tempAmount;
-                    RequestCombatAmount(CombatAmountType.HpRecovery, tempAmount);
+                    RequestCombatAmount(CombatAmountType.MpRecovery, tempAmount);
                 }
                 // Stamina recovery
                 tempAmount = newBuff.GetBuffRecoveryStamina();
                 if (tempAmount != 0)
                 {
                     CurrentStamina += tempAmount;
-                    RequestCombatAmount(CombatAmountType.HpRecovery, tempAmount);
+                    RequestCombatAmount(CombatAmountType.StaminaRecovery, tempAmount);
                 }
                 // Food recovery
                 tempAmount = newBuff.GetBuffRecoveryFood();
