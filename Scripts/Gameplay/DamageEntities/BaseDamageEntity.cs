@@ -5,7 +5,7 @@ namespace MultiplayerARPG
 {
     public abstract class BaseDamageEntity : BaseGameEntity
     {
-        public float destroyHideDelay;
+        public float destroyDelay;
         protected IAttackerEntity attacker;
         protected CharacterItem weapon;
         protected Dictionary<DamageElement, MinMaxFloat> allDamageAmounts;
