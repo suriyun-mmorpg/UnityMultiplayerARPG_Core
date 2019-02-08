@@ -755,5 +755,10 @@ namespace MultiplayerARPG
                 buildingEntities.Remove(id);
             }
         }
+
+        public bool TryGetBuildingEntity(string id, out BuildingEntity entity)
+        {
+            return buildingEntities.TryGetValue(id, out entity);
+        }
     }
 }
