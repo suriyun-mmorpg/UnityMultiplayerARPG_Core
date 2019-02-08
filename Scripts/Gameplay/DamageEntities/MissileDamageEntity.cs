@@ -80,7 +80,7 @@ namespace MultiplayerARPG
             {
                 // Explode immediately when distance and speed is 0
                 Explode();
-                NetworkDestroy(destroyHideDelay);
+                NetworkDestroy(destroyDelay);
                 return;
             }
 
@@ -95,13 +95,17 @@ namespace MultiplayerARPG
             if (Time.unscaledTime - launchTime > missileDuration)
             {
                 Explode();
-                NetworkDestroy(destroyHideDelay);
+                NetworkDestroy(destroyDelay);
             }
         }
 
         protected override void EntityFixedUpdate()
         {
             base.EntityFixedUpdate();
+            // Don't move if exploded
+            if (isExploded)
+                return;
+
             // Turn to locking target position
             if (LockingTarget != null)
             {
@@ -145,7 +149,7 @@ namespace MultiplayerARPG
             {
                 // Explode immediately when hit something
                 Explode();
-                NetworkDestroy(destroyHideDelay);
+                NetworkDestroy(destroyDelay);
             }
         }
 
