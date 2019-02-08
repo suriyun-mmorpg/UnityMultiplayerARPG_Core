@@ -986,7 +986,7 @@ namespace MultiplayerARPG
                             for (tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
                             {
                                 tempGameObject = GetOverlapObject(tempLoopCounter);
-                                tempDamageableEntity = tempGameObject.GetComponent<DamageableEntity>();
+                                tempDamageableEntity = tempGameObject.GetComponent<IDamageableEntity>();
                                 if (tempDamageableEntity != null && (!(tempDamageableEntity is BaseCharacterEntity) || (BaseCharacterEntity)tempDamageableEntity != this))
                                     break;
                             }
@@ -1009,7 +1009,7 @@ namespace MultiplayerARPG
                         for (tempLoopCounter = 0; tempLoopCounter < tempOverlapSize; ++tempLoopCounter)
                         {
                             tempGameObject = GetOverlapObject(tempLoopCounter);
-                            tempDamageableEntity = tempGameObject.GetComponent<DamageableEntity>();
+                            tempDamageableEntity = tempGameObject.GetComponent<IDamageableEntity>();
                             // Target receive damage
                             if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() &&
                                 (!(tempDamageableEntity is BaseCharacterEntity) || (BaseCharacterEntity)tempDamageableEntity != this) &&
