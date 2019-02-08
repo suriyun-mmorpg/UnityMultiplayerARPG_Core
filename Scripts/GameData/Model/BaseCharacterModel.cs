@@ -204,6 +204,7 @@ namespace MultiplayerARPG
             {
                 foreach (GameEffect effect in oldEffects)
                 {
+                    if (effect == null) continue;
                     effect.DestroyEffect();
                 }
                 cacheEffects.Remove(buffId);

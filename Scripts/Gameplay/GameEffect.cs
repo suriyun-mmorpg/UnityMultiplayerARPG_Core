@@ -42,10 +42,14 @@ namespace MultiplayerARPG
             }
             foreach (ParticleSystem particle in particles)
             {
+                if (particle == null)
+                    continue;
                 particle.Play();
             }
             foreach (AudioSource audioSource in audioSources)
             {
+                if (audioSource == null)
+                    continue;
                 audioSource.Play();
             }
             if (!isLoop)
@@ -65,11 +69,15 @@ namespace MultiplayerARPG
         {
             foreach (ParticleSystem particle in particles)
             {
+                if (particle == null)
+                    continue;
                 ParticleSystem.MainModule mainEmitter = particle.main;
                 mainEmitter.loop = false;
             }
             foreach (AudioSource audioSource in audioSources)
             {
+                if (audioSource == null)
+                    continue;
                 audioSource.loop = false;
             }
             Destroy(gameObject, lifeTime);
