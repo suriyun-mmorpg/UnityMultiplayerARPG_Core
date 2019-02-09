@@ -36,6 +36,18 @@ namespace MultiplayerARPG
             get { return stoppingDistance; }
         }
 
+        protected MovementFlag localMovementState = MovementFlag.None;
+        public override MovementFlag MovementState
+        {
+            get
+            {
+                if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
+                    return localMovementState;
+                return base.MovementState;
+            }
+            set { base.MovementState = value; }
+        }
+
         private Rigidbody cacheRigidbody;
         public Rigidbody CacheRigidbody
         {
@@ -363,6 +375,9 @@ namespace MultiplayerARPG
         {
             if (IsGrounded)
                 state |= MovementFlag.IsGrounded;
+
+            // Set local movement state which will be used by owner client
+            localMovementState = state;
 
             if (movementSecure == MovementSecure.ServerAuthoritative && IsServer)
                 MovementState = state;

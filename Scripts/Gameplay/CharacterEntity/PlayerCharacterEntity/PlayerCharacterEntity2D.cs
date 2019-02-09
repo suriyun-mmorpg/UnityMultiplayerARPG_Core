@@ -30,7 +30,6 @@ namespace MultiplayerARPG
         protected Vector2 tempDirection;
         protected Vector2? currentDestination;
         protected Vector2 localDirection;
-        protected DirectionType localDirectionType = DirectionType.Down;
         #endregion
 
         public override float StoppingDistance
@@ -71,6 +70,7 @@ namespace MultiplayerARPG
             }
         }
 
+        protected DirectionType localDirectionType = DirectionType.Down;
         public DirectionType CurrentDirectionType
         {
             get
@@ -79,6 +79,18 @@ namespace MultiplayerARPG
                     return localDirectionType;
                 return (DirectionType)currentDirectionType.Value;
             }
+        }
+
+        protected MovementFlag localMovementState = MovementFlag.None;
+        public override MovementFlag MovementState
+        {
+            get
+            {
+                if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
+                    return localMovementState;
+                return base.MovementState;
+            }
+            set { base.MovementState = value; }
         }
 
         private float tempMoveDirectionMagnitude;
@@ -288,6 +300,9 @@ namespace MultiplayerARPG
         {
             if (IsGrounded)
                 state |= MovementFlag.IsGrounded;
+
+            // Set local movement state which will be used by owner client
+            localMovementState = state;
 
             if (movementSecure == MovementSecure.ServerAuthoritative && IsServer)
                 MovementState = state;
