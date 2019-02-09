@@ -55,7 +55,6 @@ namespace MultiplayerARPG
         public readonly List<Transform> leftHandMissileDamageTransforms = new List<Transform>();
 
         // Optimize garbage collector
-        protected readonly List<string> tempKeepingKeys = new List<string>();
         protected readonly List<string> tempAddingKeys = new List<string>();
         protected readonly List<string> tempCachedKeys = new List<string>();
         protected GameObject tempEquipmentObject;
@@ -102,17 +101,17 @@ namespace MultiplayerARPG
             Item leftHandShield = equipWeapons.leftHand.GetShieldItem();
 
             // Clear equipped item models
-            tempKeepingKeys.Clear();
+            tempAddingKeys.Clear();
             if (rightHandWeapon != null)
-                tempKeepingKeys.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
+                tempAddingKeys.Add(GameDataConst.EQUIP_POSITION_RIGHT_HAND);
             if (leftHandWeapon != null || leftHandShield != null)
-                tempKeepingKeys.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND);
+                tempAddingKeys.Add(GameDataConst.EQUIP_POSITION_LEFT_HAND);
 
             tempCachedKeys.Clear();
             tempCachedKeys.AddRange(cacheModels.Keys);
             foreach (string key in tempCachedKeys)
             {
-                if (!tempKeepingKeys.Contains(key) &&
+                if (!tempAddingKeys.Contains(key) &&
                     (key.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND) ||
                     key.Equals(GameDataConst.EQUIP_POSITION_LEFT_HAND)))
                     DestroyCacheModel(key);
@@ -129,19 +128,19 @@ namespace MultiplayerARPG
         public virtual void SetEquipItems(IList<CharacterItem> equipItems)
         {
             // Clear equipped item models
-            tempKeepingKeys.Clear();
+            tempAddingKeys.Clear();
             foreach (CharacterItem equipItem in equipItems)
             {
                 Item armorItem = equipItem.GetArmorItem();
                 if (armorItem != null)
-                    tempKeepingKeys.Add(armorItem.EquipPosition);
+                    tempAddingKeys.Add(armorItem.EquipPosition);
             }
 
             tempCachedKeys.Clear();
             tempCachedKeys.AddRange(cacheModels.Keys);
             foreach (string key in tempCachedKeys)
             {
-                if (!tempKeepingKeys.Contains(key) &&
+                if (!tempAddingKeys.Contains(key) &&
                     !key.Equals(GameDataConst.EQUIP_POSITION_RIGHT_HAND) &&
                     !key.Equals(GameDataConst.EQUIP_POSITION_LEFT_HAND))
                     DestroyCacheModel(key);
@@ -152,7 +151,7 @@ namespace MultiplayerARPG
                 Item armorItem = equipItem.GetArmorItem();
                 if (armorItem == null)
                     continue;
-                if (tempKeepingKeys.Contains(armorItem.EquipPosition))
+                if (tempAddingKeys.Contains(armorItem.EquipPosition))
                     InstantiateEquipModel(armorItem.EquipPosition, armorItem.equipmentModels, equipItem.level);
             }
         }
@@ -191,8 +190,7 @@ namespace MultiplayerARPG
 
         private void CreateCacheEffect(string buffId, List<GameEffect> effects)
         {
-            DestroyCacheEffect(buffId);
-            if (effects == null)
+            if (effects == null || cacheEffects.ContainsKey(buffId))
                 return;
             cacheEffects[buffId] = effects;
         }
@@ -213,32 +211,32 @@ namespace MultiplayerARPG
 
         public virtual void SetBuffs(IList<CharacterBuff> buffs)
         {
-            tempKeepingKeys.Clear();
-            tempAddingKeys.Clear();
-            foreach (CharacterBuff buff in buffs)
-            {
-                string key = buff.GetKey();
-                tempKeepingKeys.Add(key);
-                tempAddingKeys.Add(key);
-            }
-
+            // Temp old keys
             tempCachedKeys.Clear();
             tempCachedKeys.AddRange(cacheEffects.Keys);
-            foreach (string key in tempCachedKeys)
-            {
-                if (!tempKeepingKeys.Contains(key))
-                    DestroyCacheEffect(key);
-                else
-                    tempAddingKeys.Remove(key);
-            }
-
+            // Prepare data
+            tempAddingKeys.Clear();
+            string tempKey;
+            // Loop new buffs to prepare adding keys
             foreach (CharacterBuff buff in buffs)
             {
-                string key = buff.GetKey();
-                if (tempAddingKeys.Contains(key))
+                tempKey = buff.GetKey();
+                if (!tempCachedKeys.Contains(tempKey))
                 {
-                    Buff buffData = buff.GetBuff();
-                    InstantiateBuffEffect(key, buffData.effects);
+                    // If old buffs not contains this buff, add this buff effect
+                    InstantiateBuffEffect(tempKey, buff.GetBuff().effects);
+                }
+                tempAddingKeys.Add(tempKey);
+            }
+
+            // Remove effects which removed from new buffs list
+            // Loop old keys to destroy removed buffs
+            foreach (string key in tempCachedKeys)
+            {
+                if (!tempAddingKeys.Contains(key))
+                {
+                    // New buffs not contains old buff, remove effect
+                    DestroyCacheEffect(key);
                 }
             }
         }
