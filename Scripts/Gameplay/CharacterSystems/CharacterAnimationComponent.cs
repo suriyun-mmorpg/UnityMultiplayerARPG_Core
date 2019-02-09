@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
+    // TODO: This will not be used anymore with v1.40 or above
     public class CharacterAnimationComponent : BaseCharacterComponent
     {
         public const float UPDATE_VELOCITY_DURATION = 0.1f;
@@ -43,7 +44,7 @@ namespace MultiplayerARPG
 
                 tempCharacterModel = characterEntity.CharacterModel;
                 if (tempCharacterModel != null)
-                    tempCharacterModel.UpdateAnimation(characterEntity.IsDead(), Mathf.Abs(animationData.currentVelocity.y) <= animationData.detectGroundedSpeed, transform, animationData.currentVelocity, characterEntity.MoveAnimationSpeedMultiplier);
+                    tempCharacterModel.UpdateAnimation(characterEntity.IsDead(), characterEntity.MovementState, characterEntity.MoveAnimationSpeedMultiplier);
             }
         }
     }

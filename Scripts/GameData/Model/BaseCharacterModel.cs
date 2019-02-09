@@ -295,7 +295,7 @@ namespace MultiplayerARPG
         }
 
         public virtual void AddingNewModel(GameObject newModel) { }
-        public abstract void UpdateAnimation(bool isDead, bool isGrounded, Transform transform, Vector3 moveVelocity, float playMoveSpeedMultiplier = 1f);
+        public abstract void UpdateAnimation(bool isDead, MovementFlag movementState, float playMoveSpeedMultiplier = 1f);
         public abstract Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f);
         public abstract void PlayHurtAnimation();
         public abstract void PlayJumpAnimation();

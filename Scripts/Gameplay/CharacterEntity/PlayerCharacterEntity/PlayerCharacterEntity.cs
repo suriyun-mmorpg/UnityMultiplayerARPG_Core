@@ -23,7 +23,7 @@ namespace MultiplayerARPG
         [Header("Network Settings")]
         public MovementSecure movementSecure;
         #endregion
-        
+
         public Queue<Vector3> navPaths { get; protected set; }
 
         public bool HasNavPaths
@@ -131,7 +131,7 @@ namespace MultiplayerARPG
                     tempTargetVelocity = tempMoveDirection * gameInstance.GameplayRule.GetMoveSpeed(this);
 
                     // If character move backward
-                    if (Vector3.Angle(tempMoveDirection, CacheTransform.forward) > 120)
+                    if (Vector3.Angle(tempMoveDirection, CacheTransform.forward) > 90)
                         tempTargetVelocity *= backwardMoveSpeedRate;
 
                     // Apply a force that attempts to reach our target velocity
@@ -157,6 +157,57 @@ namespace MultiplayerARPG
 
             // We apply gravity manually for more tuning control
             CacheRigidbody.AddForce(new Vector3(0, Physics.gravity.y * CacheRigidbody.mass * gravityRate, 0));
+
+            if (tempMoveDirection.Equals(Vector3.zero))
+            {
+                // No movement so state is none
+                SetMovementState(MovementFlag.None);
+            }
+            else
+            {
+                MovementFlag state = MovementFlag.Forward;
+                // If it is point click it will always forward, so don't find direction
+                if (!HasNavPaths)
+                {
+                    float angle = Vector3.SignedAngle(tempMoveDirection, CacheTransform.forward, Vector3.up);
+                    // Backward
+                    if (angle > 140 || angle < -140)
+                    {
+                        state = MovementFlag.Backward;
+                    }
+                    // Right
+                    else if (angle < -50 && angle > -130)
+                    {
+                        state = MovementFlag.Right;
+                    }
+                    // Left
+                    else if (angle > 50 && angle < 130)
+                    {
+                        state = MovementFlag.Left;
+                    }
+                    // Forward Right
+                    else if (angle < -40 && angle > -50)
+                    {
+                        state = MovementFlag.Forward | MovementFlag.Right;
+                    }
+                    // Forward Left
+                    else if (angle > 40 && angle < 50)
+                    {
+                        state = MovementFlag.Forward | MovementFlag.Left;
+                    }
+                    // Backward Right
+                    else if (angle < -130 && angle > -140)
+                    {
+                        state = MovementFlag.Backward | MovementFlag.Right;
+                    }
+                    // Backward Left
+                    else if (angle > 130 && angle < 140)
+                    {
+                        state = MovementFlag.Backward | MovementFlag.Left;
+                    }
+                }
+                SetMovementState(state);
+            }
             Profiler.EndSample();
         }
 
@@ -187,6 +238,7 @@ namespace MultiplayerARPG
             RegisterNetFunction<short>(NetFuncUpdateYRotation);
             RegisterNetFunction(StopMove);
             RegisterNetFunction<PackedUInt>(NetFuncSetTargetEntity);
+            RegisterNetFunction<byte>(NetFuncSetMovementState);
         }
 
         protected void NetFuncPointClickMovement(Vector3 position)
@@ -224,6 +276,14 @@ namespace MultiplayerARPG
             if (!TryGetEntityByObjectId(objectId, out tempEntity))
                 return;
             SetTargetEntity(tempEntity);
+        }
+
+        protected void NetFuncSetMovementState(byte movementState)
+        {
+            if (!IsServer)
+                return;
+
+            MovementState = (MovementFlag)movementState;
         }
 
         protected virtual void NetFuncTriggerJump()
@@ -297,6 +357,18 @@ namespace MultiplayerARPG
                     CacheTransform.rotation = Quaternion.Euler(0, yRotation, 0);
                     break;
             }
+        }
+
+        public void SetMovementState(MovementFlag state)
+        {
+            if (IsGrounded)
+                state |= MovementFlag.IsGrounded;
+
+            if (movementSecure == MovementSecure.ServerAuthoritative && IsServer)
+                MovementState = state;
+
+            if (movementSecure == MovementSecure.NotSecure && IsOwnerClient)
+                CallNetFunction(NetFuncSetMovementState, FunctionReceivers.Server, (byte)state);
         }
 
         public override void StopMove()

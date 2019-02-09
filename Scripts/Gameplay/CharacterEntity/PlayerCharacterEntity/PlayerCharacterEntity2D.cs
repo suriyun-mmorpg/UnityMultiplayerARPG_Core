@@ -158,6 +158,17 @@ namespace MultiplayerARPG
                         UpdateCurrentDirection(tempTargetDirection);
                 }
             }
+
+            if (tempMoveDirection.Equals(Vector3.zero))
+            {
+                // No movement so state is none
+                SetMovementState(MovementFlag.None);
+            }
+            else
+            {
+                // For 2d, fast define that it is moving so can use any state
+                SetMovementState(MovementFlag.Forward);
+            }
             Profiler.EndSample();
         }
 
@@ -219,6 +230,14 @@ namespace MultiplayerARPG
             SetTargetEntity(tempEntity);
         }
 
+        protected void NetFuncSetMovementState(byte movementState)
+        {
+            if (!IsServer)
+                return;
+
+            MovementState = (MovementFlag)movementState;
+        }
+
         protected void NetFuncUpdateDirection(sbyte x, sbyte y)
         {
             currentDirection.Value = new Vector2((float)x / 100f, (float)y / 100f);
@@ -262,6 +281,18 @@ namespace MultiplayerARPG
         public override void UpdateYRotation(float yRotation)
         {
             // Do nothing, 2d characters will not rotates
+        }
+
+        public void SetMovementState(MovementFlag state)
+        {
+            if (IsGrounded)
+                state |= MovementFlag.IsGrounded;
+
+            if (movementSecure == MovementSecure.ServerAuthoritative && IsServer)
+                MovementState = state;
+
+            if (movementSecure == MovementSecure.NotSecure && IsOwnerClient)
+                CallNetFunction(NetFuncSetMovementState, FunctionReceivers.Server, (byte)state);
         }
 
         public override void StopMove()

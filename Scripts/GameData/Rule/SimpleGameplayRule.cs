@@ -201,7 +201,7 @@ namespace MultiplayerARPG
 
         public override float GetMoveSpeed(BaseCharacterEntity character)
         {
-            return character.CacheMoveSpeed * (character.isSprinting ? moveSpeedRateWhileSprint : 1f);
+            return character.CacheMoveSpeed * (character.MovementState.HasFlag(MovementFlag.IsSprinting) ? moveSpeedRateWhileSprint : 1f);
         }
 
         public override bool IsHungry(BaseCharacterEntity character)

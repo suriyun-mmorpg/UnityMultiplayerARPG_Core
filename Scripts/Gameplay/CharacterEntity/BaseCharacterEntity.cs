@@ -8,7 +8,6 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(CharacterAnimationComponent))]
     [RequireComponent(typeof(CharacterRecoveryComponent))]
     [RequireComponent(typeof(CharacterSkillAndBuffComponent))]
     [DisallowMultipleComponent]
@@ -60,10 +59,6 @@ namespace MultiplayerARPG
         /// This variable will be TRUE when cache data have to re-cache
         /// </summary>
         public bool isRecaching { get; protected set; }
-        /// <summary>
-        /// This variable will be TRUE when player hold sprint key
-        /// </summary>
-        public bool isSprinting { get; protected set; }
         #endregion
 
         #region Temp data
@@ -171,6 +166,7 @@ namespace MultiplayerARPG
             animActionType = AnimActionType.None;
             isRecaching = true;
             MigrateTransforms();
+            MigrateRemoveCharacterAnimationComponent();
         }
 
         protected override void OnValidate()
@@ -179,6 +175,8 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR
             if (MigrateTransforms())
                 EditorUtility.SetDirty(this);
+            if (MigrateRemoveCharacterAnimationComponent())
+                EditorUtility.SetDirty(gameObject);
 #endif
         }
 
@@ -257,6 +255,19 @@ namespace MultiplayerARPG
             return hasChanges;
         }
 
+        private bool MigrateRemoveCharacterAnimationComponent()
+        {
+            bool hasChanges = false;
+            CharacterAnimationComponent comp = GetComponent<CharacterAnimationComponent>();
+            if (comp != null)
+            {
+                comp.enabled = false;
+                Debug.LogWarning("`CharacterAnimationComponent` component will not be used anymore from v1.40 or above, so developer should remove it from character entities");
+                hasChanges = true;
+            }
+            return hasChanges;
+        }
+
         protected override void EntityUpdate()
         {
             base.EntityUpdate();
@@ -268,6 +279,7 @@ namespace MultiplayerARPG
                 animActionType = AnimActionType.None;
                 isAttackingOrUsingSkill = false;
             }
+            CharacterModel.UpdateAnimation(IsDead(), MovementState, MoveAnimationSpeedMultiplier);
             Profiler.EndSample();
         }
 

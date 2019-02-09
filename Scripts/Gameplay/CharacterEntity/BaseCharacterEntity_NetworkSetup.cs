@@ -28,6 +28,8 @@ namespace MultiplayerARPG
             equipWeapons.forOwnerOnly = false;
             isHidding.sendOptions = SendOptions.ReliableOrdered;
             isHidding.forOwnerOnly = false;
+            movementState.sendOptions = SendOptions.Sequenced;
+            movementState.forOwnerOnly = false;
 
             attributes.forOwnerOnly = false;
             skills.forOwnerOnly = true;
@@ -51,6 +53,7 @@ namespace MultiplayerARPG
             currentWater.onChange += OnCurrentWaterChange;
             equipWeapons.onChange += OnEquipWeaponsChange;
             isHidding.onChange += OnIsHiddingChange;
+            movementState.onChange += OnMovementStateChange;
             // On list changes events
             attributes.onOperation += OnAttributesOperation;
             skills.onOperation += OnSkillsOperation;

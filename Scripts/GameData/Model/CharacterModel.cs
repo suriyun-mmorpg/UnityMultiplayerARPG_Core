@@ -11,7 +11,6 @@ namespace MultiplayerARPG
         public static readonly int ANIM_IS_GROUNDED = Animator.StringToHash("IsGrounded");
         public static readonly int ANIM_MOVE_SPEED = Animator.StringToHash("MoveSpeed");
         public static readonly int ANIM_SIDE_MOVE_SPEED = Animator.StringToHash("SideMoveSpeed");
-        public static readonly int ANIM_Y_SPEED = Animator.StringToHash("YSpeed");
         public static readonly int ANIM_DO_ACTION = Animator.StringToHash("DoAction");
         public static readonly int ANIM_HURT = Animator.StringToHash("Hurt");
         public static readonly int ANIM_JUMP = Animator.StringToHash("Jump");
@@ -40,7 +39,7 @@ namespace MultiplayerARPG
         }
         [Header("Animation Component Type")]
         public AnimatorType animatorType;
-        [Header("Animator")]
+        [Header("Animator Settings")]
         public Animator animator;
         public RuntimeAnimatorController animatorController;
         public DefaultAnimatorData defaultAnimatorData = new DefaultAnimatorData()
@@ -60,7 +59,7 @@ namespace MultiplayerARPG
             deadClip = null,
             actionClip = null,
         };
-        [Header("Legacy Animation")]
+        [Header("Legacy Animation Settings")]
         public Animation legacyAnimation;
         public LegacyAnimationData legacyAnimationData = new LegacyAnimationData()
         {
@@ -84,12 +83,10 @@ namespace MultiplayerARPG
             fallClipFadeLength = 0.1f,
             hurtClipFadeLength = 0.1f,
             deadClipFadeLength = 0.1f,
-            magnitudeToPlayMoveClip = 0.1f,
-            ySpeedToPlayJumpClip = 0.25f,
-            ySpeedToPlayFallClip = -0.25f,
         };
         [Header("Renderer")]
         public SkinnedMeshRenderer skinnedMeshRenderer;
+
         [Header("Animations")]
         public ActionAnimation[] defaultAttackAnimations;
         public ActionAnimation[] defaultSkillCastAnimations;
@@ -112,7 +109,6 @@ namespace MultiplayerARPG
         private string defaultDeadClipName;
         private string defaultActionClipName;
         private string lastFadedLegacyClipName;
-        private Vector3 tempInverseTransformDirection;
         // Private state validater
         private bool isSetupComponent;
 
@@ -455,55 +451,50 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void UpdateAnimation(bool isDead, bool isGrounded, Transform transform, Vector3 moveVelocity, float playMoveSpeedMultiplier = 1f)
+        public override void UpdateAnimation(bool isDead, MovementFlag movementState, float playMoveSpeedMultiplier = 1f)
         {
             switch (animatorType)
             {
                 case AnimatorType.Animator:
-                    UpdateAnimation_Animator(isDead, isGrounded, transform, moveVelocity, playMoveSpeedMultiplier);
+                    UpdateAnimation_Animator(isDead, movementState, playMoveSpeedMultiplier);
                     break;
                 case AnimatorType.LegacyAnimtion:
-                    UpdateAnimation_LegacyAnimation(isDead, isGrounded, transform, moveVelocity, playMoveSpeedMultiplier);
+                    UpdateAnimation_LegacyAnimation(isDead, movementState, playMoveSpeedMultiplier);
                     break;
             }
         }
 
         #region Update Animation Functions
-        private void UpdateAnimation_Animator(bool isDead, bool isGrounded, Transform transform, Vector3 moveVelocity, float playMoveSpeedMultiplier)
+        private void UpdateAnimation_Animator(bool isDead, MovementFlag movementState, float playMoveSpeedMultiplier)
         {
             if (!animator.gameObject.activeInHierarchy)
                 return;
+
             if (isDead && animator.GetBool(ANIM_DO_ACTION))
             {
                 // Force set to none action when dead
                 animator.SetBool(ANIM_DO_ACTION, false);
             }
 
-            tempInverseTransformDirection = transform.InverseTransformDirection(moveVelocity);
-            if (moveVelocity.magnitude > 0)
-            {
-                // Try to not play strafing animation too frequently
-                float absZ = Mathf.Abs(tempInverseTransformDirection.z);
-                float absX = Mathf.Abs(tempInverseTransformDirection.x);
-                if (absZ > absX && absX / absZ < 0.9f)
-                {
-                    tempInverseTransformDirection.x = 0f;
-                }
-                else if (absX > absZ && absZ / absX < 0.9f)
-                {
-                    tempInverseTransformDirection.z = 0f;
-                }
-            }
+            float moveSpeed = 0f;
+            float sideMoveSpeed = 0f;
+            if (movementState.HasFlag(MovementFlag.Forward))
+                moveSpeed = 1;
+            else if (movementState.HasFlag(MovementFlag.Backward))
+                moveSpeed = -1;
+            if (movementState.HasFlag(MovementFlag.Right))
+                sideMoveSpeed = 1;
+            else if (movementState.HasFlag(MovementFlag.Left))
+                sideMoveSpeed = -1;
             // Set animator parameters
-            animator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : tempInverseTransformDirection.z);
-            animator.SetFloat(ANIM_SIDE_MOVE_SPEED, isDead ? 0 : tempInverseTransformDirection.x);
+            animator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : moveSpeed);
+            animator.SetFloat(ANIM_SIDE_MOVE_SPEED, isDead ? 0 : sideMoveSpeed);
             animator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, playMoveSpeedMultiplier);
-            animator.SetFloat(ANIM_Y_SPEED, moveVelocity.y);
             animator.SetBool(ANIM_IS_DEAD, isDead);
-            animator.SetBool(ANIM_IS_GROUNDED, isGrounded);
+            animator.SetBool(ANIM_IS_GROUNDED, movementState.HasFlag(MovementFlag.IsGrounded));
         }
 
-        private void UpdateAnimation_LegacyAnimation(bool isDead, bool isGrounded, Transform transform, Vector3 moveVelocity, float playMoveSpeedMultiplier)
+        private void UpdateAnimation_LegacyAnimation(bool isDead, MovementFlag movementState, float playMoveSpeedMultiplier)
         {
             if (isDead)
                 CrossFadeLegacyAnimation(LEGACY_CLIP_DEAD, legacyAnimationData.deadClipFadeLength, WrapMode.Once);
@@ -511,40 +502,35 @@ namespace MultiplayerARPG
             {
                 if (legacyAnimation.GetClip(LEGACY_CLIP_ACTION) != null && legacyAnimation.IsPlaying(LEGACY_CLIP_ACTION))
                     return;
-                float ySpeed = moveVelocity.y;
-                if (ySpeed < legacyAnimationData.ySpeedToPlayFallClip)
+                if (!movementState.HasFlag(MovementFlag.IsGrounded))
                     CrossFadeLegacyAnimation(LEGACY_CLIP_FALL, legacyAnimationData.fallClipFadeLength, WrapMode.Loop);
                 else
                 {
-                    tempInverseTransformDirection = transform.InverseTransformDirection(moveVelocity).normalized;
-                    if (moveVelocity.magnitude > legacyAnimationData.magnitudeToPlayMoveClip)
-                    {
-                        Vector3 lookDirection = transform.forward;
-                        // Forward Right
-                        if (tempInverseTransformDirection.z > 0.5f && tempInverseTransformDirection.x > 0.5f)
-                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_FORWARD_RIGHT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
-                        // Forward Left
-                        else if (tempInverseTransformDirection.z > 0.5f && tempInverseTransformDirection.x < -0.5f)
-                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_FORWARD_LEFT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
-                        // Backward Right
-                        else if (tempInverseTransformDirection.z < -0.5f && tempInverseTransformDirection.x > 0.5f)
-                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_BACKWARD_RIGHT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
-                        // Backward Left
-                        else if (tempInverseTransformDirection.z < -0.5f && tempInverseTransformDirection.x < -0.5f)
-                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_BACKWARD_LEFT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
-                        // Forward
-                        else if (tempInverseTransformDirection.z > 0.5f)
-                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
-                        // Backward
-                        else if (tempInverseTransformDirection.z < -0.5f)
-                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_BACKWARD, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
-                        // Right
-                        else if (tempInverseTransformDirection.x > 0.5f)
-                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_RIGHT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
-                        // Left
-                        else if (tempInverseTransformDirection.x < -0.5f)
-                            CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_LEFT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
-                    }
+                    // Forward Right
+                    if (movementState.HasFlag(MovementFlag.Forward) && movementState.HasFlag(MovementFlag.Right))
+                        CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_FORWARD_RIGHT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                    // Forward Left
+                    else if (movementState.HasFlag(MovementFlag.Forward) && movementState.HasFlag(MovementFlag.Left))
+                        CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_FORWARD_LEFT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                    // Backward Right
+                    else if (movementState.HasFlag(MovementFlag.Backward) && movementState.HasFlag(MovementFlag.Right))
+                        CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_BACKWARD_RIGHT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                    // Backward Left
+                    else if (movementState.HasFlag(MovementFlag.Backward) && movementState.HasFlag(MovementFlag.Left))
+                        CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_BACKWARD_LEFT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                    // Forward
+                    else if (movementState.HasFlag(MovementFlag.Forward))
+                        CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                    // Backward
+                    else if (movementState.HasFlag(MovementFlag.Backward))
+                        CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_BACKWARD, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                    // Right
+                    else if (movementState.HasFlag(MovementFlag.Right))
+                        CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_RIGHT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                    // Left
+                    else if (movementState.HasFlag(MovementFlag.Left))
+                        CrossFadeLegacyAnimation(LEGACY_CLIP_MOVE_LEFT, legacyAnimationData.moveClipFadeLength, WrapMode.Loop);
+                    // Idle
                     else
                         CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
                 }
@@ -777,9 +763,6 @@ namespace MultiplayerARPG
         public float fallClipFadeLength;
         public float hurtClipFadeLength;
         public float deadClipFadeLength;
-        public float magnitudeToPlayMoveClip;
-        public float ySpeedToPlayJumpClip;
-        public float ySpeedToPlayFallClip;
     }
 
     [System.Serializable]

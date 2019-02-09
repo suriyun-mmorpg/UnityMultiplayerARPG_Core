@@ -205,7 +205,7 @@ namespace MultiplayerARPG
             nextFrameTime = Time.realtimeSinceStartup + secsPerFrame;
         }
 
-        public override void UpdateAnimation(bool isDead, bool isGrounded, Transform transform, Vector3 moveVelocity, float playMoveSpeedMultiplier = 1)
+        public override void UpdateAnimation(bool isDead, MovementFlag movementState, float playMoveSpeedMultiplier = 1)
         {
             if (playingAction)
                 return;
@@ -213,7 +213,10 @@ namespace MultiplayerARPG
                 Play(deadAnimation2D, currentDirectionType);
             else
             {
-                if (moveVelocity.magnitude > magnitudeToPlayMoveClip)
+                if (movementState.HasFlag(MovementFlag.Forward) ||
+                    movementState.HasFlag(MovementFlag.Backward) ||
+                    movementState.HasFlag(MovementFlag.Right) ||
+                    movementState.HasFlag(MovementFlag.Left))
                     Play(moveAnimation2D, currentDirectionType);
                 else
                     Play(idleAnimation2D, currentDirectionType);

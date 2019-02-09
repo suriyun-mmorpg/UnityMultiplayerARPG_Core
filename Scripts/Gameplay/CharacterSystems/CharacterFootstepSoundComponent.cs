@@ -2,7 +2,6 @@
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(CharacterAnimationComponent))]
     public class CharacterFootstepSoundComponent : BaseCharacterComponent
     {
         public AudioSource audioSource;
@@ -22,17 +21,6 @@ namespace MultiplayerARPG
 
         private float delayCounter = 0f;
 
-        private CharacterAnimationComponent cacheCharacterAnimationComponent;
-        public CharacterAnimationComponent CacheCharacterAnimationComponent
-        {
-            get
-            {
-                if (cacheCharacterAnimationComponent == null)
-                    cacheCharacterAnimationComponent = GetComponent<CharacterAnimationComponent>();
-                return cacheCharacterAnimationComponent;
-            }
-        }
-
         protected void Update()
         {
             if (audioSource == null)
@@ -40,7 +28,10 @@ namespace MultiplayerARPG
 
             audioSource.mute = !AudioManager.Singleton.sfxVolumeSetting.IsOn;
 
-            if (CacheCharacterAnimationComponent.currentVelocity.magnitude < stepThreshold)
+            if (!CacheCharacterEntity.MovementState.HasFlag(MovementFlag.Forward) &&
+                !CacheCharacterEntity.MovementState.HasFlag(MovementFlag.Backward) &&
+                !CacheCharacterEntity.MovementState.HasFlag(MovementFlag.Right) &&
+                !CacheCharacterEntity.MovementState.HasFlag(MovementFlag.Left))
             {
                 delayCounter = 0f;
                 return;
@@ -49,8 +40,9 @@ namespace MultiplayerARPG
             delayCounter += Time.deltaTime;
             if (delayCounter >= stepDelay / CacheCharacterEntity.MoveAnimationSpeedMultiplier)
             {
-                if (CacheCharacterEntity.IsGrounded)
+                if (CacheCharacterEntity.MovementState.HasFlag(MovementFlag.IsGrounded))
                     PlaySound();
+
                 delayCounter = 0f;
             }
         }

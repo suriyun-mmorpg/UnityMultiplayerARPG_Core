@@ -121,6 +121,11 @@ namespace MultiplayerARPG
             if (!CacheMonsterCharacterEntity.IsServer || monsterDatabase == null)
                 return;
 
+            if (CacheNavMeshAgent.velocity.magnitude > 0)
+                CacheMonsterCharacterEntity.MovementState = MovementFlag.Forward | MovementFlag.IsGrounded;
+            else
+                CacheMonsterCharacterEntity.MovementState = MovementFlag.IsGrounded;
+
             if (CacheMonsterCharacterEntity.IsDead())
             {
                 StopMove();
