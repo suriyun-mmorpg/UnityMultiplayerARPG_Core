@@ -173,7 +173,6 @@ namespace MultiplayerARPG
                 currentBuildingEntity.buildingArea = null;
                 // Find for position to construction building
                 bool foundSnapBuildPosition = false;
-                BuildingArea nonSnapBuildingArea = null;
                 tempCount = Physics.RaycastNonAlloc(ray, raycasts, gameInstance.buildDistance);
                 for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
                 {
@@ -197,7 +196,6 @@ namespace MultiplayerARPG
                             foundSnapBuildPosition = true;
                             break;
                         }
-                        nonSnapBuildingArea = buildingArea;
                     }
                 }
                 // Update building position
