@@ -199,6 +199,7 @@ namespace MultiplayerARPG
             RegisterNetFunction<sbyte, sbyte>(NetFuncKeyMovement);
             RegisterNetFunction(StopMove);
             RegisterNetFunction<PackedUInt>(NetFuncSetTargetEntity);
+            RegisterNetFunction<byte>(NetFuncSetMovementState);
             RegisterNetFunction<sbyte, sbyte>(NetFuncUpdateDirection);
         }
 
