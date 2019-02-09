@@ -369,17 +369,6 @@ namespace MultiplayerARPG
             }
 
             base.ReceivedDamage(attackerCharacter, damageAmountType, damage);
-
-            // If dead destroy / respawn
-            if (IsDead())
-            {
-                CurrentHp = 0;
-                if (!IsSummoned)
-                {
-                    // If not summoned by someone, destroy and respawn it
-                    DestroyAndRespawn();
-                }
-            }
         }
 
         public override void Killed(BaseCharacterEntity lastAttacker)
@@ -501,6 +490,11 @@ namespace MultiplayerARPG
             }
             if (lastPlayer != null)
                 lastPlayer.OnKillMonster(this);
+            if (!IsSummoned)
+            {
+                // If not summoned by someone, destroy and respawn it
+                DestroyAndRespawn();
+            }
         }
 
         public override void Respawn()
