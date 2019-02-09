@@ -40,7 +40,6 @@ namespace MultiplayerARPG
         }
 
         // Optimize garbage collector
-        private readonly List<GameEffect> tempAddingEffects = new List<GameEffect>();
         private GameEffect tempGameEffect;
 
 #if UNITY_EDITOR
@@ -58,7 +57,7 @@ namespace MultiplayerARPG
         {
             if (effects == null || effects.Length == 0)
                 return new List<GameEffect>();
-            tempAddingEffects.Clear();
+            List<GameEffect> tempAddingEffects = new List<GameEffect>();
             foreach (GameEffect effect in effects)
             {
                 if (effect == null)
