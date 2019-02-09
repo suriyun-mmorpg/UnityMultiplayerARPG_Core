@@ -1211,6 +1211,62 @@ namespace MultiplayerARPG
             return !IsDead() && !IsPlayingActionAnimation() && !isAttackingOrUsingSkill;
         }
 
+        public bool CanMove()
+        {
+            if (IsDead())
+                return false;
+            CharacterBuff tempBuff;
+            for (int i = 0; i < Buffs.Count; ++i)
+            {
+                tempBuff = Buffs[i];
+                if (tempBuff.GetDisallowMove())
+                    return false;
+            }
+            return true;
+        }
+
+        public bool CanAttack()
+        {
+            if (!CanDoActions())
+                return false;
+            CharacterBuff tempBuff;
+            for (int i = 0; i < Buffs.Count; ++i)
+            {
+                tempBuff = Buffs[i];
+                if (tempBuff.GetDisallowAttack())
+                    return false;
+            }
+            return true;
+        }
+
+        public bool CanUseSkill()
+        {
+            if (!CanDoActions())
+                return false;
+            CharacterBuff tempBuff;
+            for (int i = 0; i < Buffs.Count; ++i)
+            {
+                tempBuff = Buffs[i];
+                if (tempBuff.GetDisallowUseSkill())
+                    return false;
+            }
+            return true;
+        }
+
+        public bool CanUseItem()
+        {
+            if (IsDead())
+                return false;
+            CharacterBuff tempBuff;
+            for (int i = 0; i < Buffs.Count; ++i)
+            {
+                tempBuff = Buffs[i];
+                if (tempBuff.GetDisallowUseItem())
+                    return false;
+            }
+            return true;
+        }
+
         public virtual void RewardExp(int exp, RewardGivenType rewardGivenType)
         {
             if (!IsServer)

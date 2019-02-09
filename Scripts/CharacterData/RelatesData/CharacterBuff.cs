@@ -56,12 +56,6 @@ public class CharacterBuff : INetSerializable
     private Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages;
     [System.NonSerialized]
     private Dictionary<DamageElement, MinMaxFloat> cacheDamageOverTimes;
-    [System.NonSerialized]
-    private bool cacheDisallowMove;
-    [System.NonSerialized]
-    private bool cacheDisallowAttack;
-    [System.NonSerialized]
-    private bool cacheDisallowUseSkill;
 
     private void MakeCache()
     {
@@ -85,9 +79,6 @@ public class CharacterBuff : INetSerializable
             cacheIncreaseResistances = null;
             cacheIncreaseDamages = null;
             cacheDamageOverTimes = null;
-            cacheDisallowMove = false;
-            cacheDisallowAttack = false;
-            cacheDisallowUseSkill = false;
             switch (type)
             {
                 case BuffType.SkillBuff:
@@ -115,9 +106,6 @@ public class CharacterBuff : INetSerializable
             cacheIncreaseResistances = cacheBuff.GetIncreaseResistances(level);
             cacheIncreaseDamages = cacheBuff.GetIncreaseDamages(level);
             cacheDamageOverTimes = cacheBuff.GetDamageOverTimes(level);
-            cacheDisallowMove = cacheBuff.disallowMove;
-            cacheDisallowAttack = cacheBuff.disallowAttack;
-            cacheDisallowUseSkill = cacheBuff.disallowUseSkill;
         }
     }
 
@@ -214,19 +202,25 @@ public class CharacterBuff : INetSerializable
     public bool GetDisallowMove()
     {
         MakeCache();
-        return cacheDisallowMove;
+        return cacheBuff.disallowMove;
     }
 
     public bool GetDisallowAttack()
     {
         MakeCache();
-        return cacheDisallowAttack;
+        return cacheBuff.disallowAttack;
     }
 
     public bool GetDisallowUseSkill()
     {
         MakeCache();
-        return cacheDisallowUseSkill;
+        return cacheBuff.disallowUseSkill;
+    }
+
+    public bool GetDisallowUseItem()
+    {
+        MakeCache();
+        return cacheBuff.disallowUseItem;
     }
 
     public bool ShouldRemove()

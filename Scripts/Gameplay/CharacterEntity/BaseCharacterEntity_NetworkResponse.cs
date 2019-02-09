@@ -27,7 +27,7 @@ namespace MultiplayerARPG
         /// </summary>
         protected virtual void NetFuncAttack(bool hasAimPosition, Vector3 aimPosition)
         {
-            if (!CanDoActions())
+            if (!CanAttack())
                 return;
 
             // Prepare requires data
@@ -108,7 +108,7 @@ namespace MultiplayerARPG
         /// </summary>
         protected virtual void NetFuncUseSkill(int dataId, bool hasAimPosition, Vector3 aimPosition)
         {
-            if (!CanDoActions())
+            if (!CanUseSkill())
                 return;
 
             int index = this.IndexOfSkill(dataId);
@@ -197,7 +197,7 @@ namespace MultiplayerARPG
         /// <param name="dataId"></param>
         protected virtual void NetFuncUseItem(short itemIndex)
         {
-            if (IsDead())
+            if (!CanUseItem())
                 return;
             
             if (itemIndex >= nonEquipItems.Count)
