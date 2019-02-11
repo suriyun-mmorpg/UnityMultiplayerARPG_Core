@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -239,7 +237,7 @@ namespace MultiplayerARPG
 
         public void AggressiveFindTarget(float time, Vector3 currentPosition)
         {
-            // Aggressive monster or summoned monster will find target to attacker
+            // Aggressive monster or summoned monster will find target to attack
             if (monsterDatabase.characteristic != MonsterCharacteristic.Aggressive &&
                 CacheMonsterCharacterEntity.Summoner == null)
                 return;
@@ -253,13 +251,26 @@ namespace MultiplayerARPG
                 {
                     BaseCharacterEntity characterEntity = foundObject.GetComponent<BaseCharacterEntity>();
                     // Attack target settings
-                    if (characterEntity != null &&
-                        characterEntity.CanReceiveDamageFrom(CacheMonsterCharacterEntity))
+                    if (characterEntity == null || !characterEntity.CanReceiveDamageFrom(CacheMonsterCharacterEntity))
                     {
-                        SetStartFollowTargetTime(time);
-                        CacheMonsterCharacterEntity.SetAttackTarget(characterEntity);
-                        return;
+                        // If character is null or cannot receive damage from monster, skip it
+                        continue;
                     }
+                    if (CacheMonsterCharacterEntity.Summoner != null &&
+                        CacheMonsterCharacterEntity.Summoner != characterEntity.GetTargetEntity())
+                    {
+                        // If character is not attacking summoner, skip it
+                        continue;
+                    }
+                    if (!CacheMonsterCharacterEntity.IsEnemy(characterEntity))
+                    {
+                        // If character is not enemy, skip it
+                        continue;
+                    }
+                    // Found target, attack it
+                    SetStartFollowTargetTime(time);
+                    CacheMonsterCharacterEntity.SetAttackTarget(characterEntity);
+                    break;
                 }
             }
         }
