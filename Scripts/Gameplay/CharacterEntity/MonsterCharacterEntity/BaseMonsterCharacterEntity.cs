@@ -371,14 +371,13 @@ namespace MultiplayerARPG
             base.ReceivedDamage(attackerCharacter, damageAmountType, damage);
         }
 
-        public override void Killed(BaseCharacterEntity lastAttacker)
+        public override sealed void Killed(BaseCharacterEntity lastAttacker)
         {
             base.Killed(lastAttacker);
 
             // If this summoned by someone, don't give reward to killer
             if (IsSummoned)
                 return;
-
             int randomedExp = Random.Range(monsterCharacter.randomExpMin, monsterCharacter.randomExpMax);
             int randomedGold = Random.Range(monsterCharacter.randomGoldMin, monsterCharacter.randomGoldMax);
             HashSet<uint> looters = new HashSet<uint>();

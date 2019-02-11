@@ -54,6 +54,7 @@ namespace MultiplayerARPG
         protected BaseGameEntity targetEntity;
         protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
         protected AnimActionType animActionType;
+        protected float attackOrUseSkillMoveSpeedRate;
         protected bool isAttackingOrUsingSkill;
         /// <summary>
         /// This variable will be TRUE when cache data have to re-cache
@@ -283,7 +284,7 @@ namespace MultiplayerARPG
             Profiler.EndSample();
         }
 
-        public virtual void ValidateRecovery()
+        public void ValidateRecovery(BaseCharacterEntity attacker = null)
         {
             if (!IsServer)
                 return;
@@ -315,7 +316,7 @@ namespace MultiplayerARPG
                 CurrentWater = CacheMaxWater;
 
             if (IsDead())
-                Killed(null);
+                Killed(attacker);
         }
 
         #region Inventory helpers
@@ -533,7 +534,7 @@ namespace MultiplayerARPG
             if (IsDead())
             {
                 // Call killed function, this should be called only once when dead
-                Killed(attackerCharacter);
+                ValidateRecovery(attackerCharacter);
             }
             else
             {

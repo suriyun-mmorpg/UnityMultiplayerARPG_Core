@@ -32,6 +32,9 @@ namespace MultiplayerARPG
         public SkillType skillType;
         [Range(1, 100)]
         public short maxLevel = 1;
+        [Range(0f, 1f)]
+        [Tooltip("This is move speed rate while using this skill")]
+        public float moveSpeedRateWhileUsingSkill = 0f;
 
         [Header("Available Weapons")]
         [Tooltip("An available weapons, if it not set every weapons is available")]

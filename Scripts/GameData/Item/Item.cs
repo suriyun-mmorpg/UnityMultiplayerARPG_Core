@@ -36,6 +36,9 @@ namespace MultiplayerARPG
 
         // Weapon
         public WeaponType weaponType;
+        [Range(0f, 1f)]
+        [Tooltip("This is move speed rate while attacking with this weapon")]
+        public float moveSpeedRateWhileAttacking = 0f;
         public DamageIncremental damageAmount;
         public IncrementalMinMaxFloat harvestDamageAmount;
 

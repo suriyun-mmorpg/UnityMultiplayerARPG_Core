@@ -58,14 +58,14 @@ namespace MultiplayerARPG
                 WeaponType weaponType = weapon.GetWeaponItem().WeaponType;
                 if (weaponType.requireAmmoType != null)
                 {
-                    Dictionary<CharacterItem, short> decreaseItems;
-                    if (!this.DecreaseAmmos(weaponType.requireAmmoType, 1, out decreaseItems))
+                    Dictionary<CharacterItem, short> decreaseAmmoItems;
+                    if (!this.DecreaseAmmos(weaponType.requireAmmoType, 1, out decreaseAmmoItems))
                         return;
-                    KeyValuePair<CharacterItem, short> firstEntry = decreaseItems.FirstOrDefault();
-                    CharacterItem characterItem = firstEntry.Key;
-                    Item item = characterItem.GetItem();
-                    if (item != null && firstEntry.Value > 0)
-                        allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, item.GetIncreaseDamages(characterItem.level, characterItem.GetEquipmentBonusRate()));
+                    KeyValuePair<CharacterItem, short> firstEntry = decreaseAmmoItems.FirstOrDefault();
+                    CharacterItem ammoCharacterItem = firstEntry.Key;
+                    Item ammoItem = ammoCharacterItem.GetItem();
+                    if (ammoItem != null && firstEntry.Value > 0)
+                        allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, ammoItem.GetIncreaseDamages(ammoCharacterItem.level, ammoCharacterItem.GetEquipmentBonusRate()));
                 }
             }
 
@@ -74,6 +74,7 @@ namespace MultiplayerARPG
 
             // Start attack routine
             isAttackingOrUsingSkill = true;
+            attackOrUseSkillMoveSpeedRate = weapon.GetWeaponItem().moveSpeedRateWhileAttacking;
             StartCoroutine(AttackRoutine(triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition));
         }
 
@@ -165,6 +166,7 @@ namespace MultiplayerARPG
 
             // Start use skill routine
             isAttackingOrUsingSkill = true;
+            attackOrUseSkillMoveSpeedRate = characterSkill.GetSkill().moveSpeedRateWhileUsingSkill;
             StartCoroutine(UseSkillRoutine(characterSkill, triggerDuration, totalDuration, skillAttackType, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition));
         }
 

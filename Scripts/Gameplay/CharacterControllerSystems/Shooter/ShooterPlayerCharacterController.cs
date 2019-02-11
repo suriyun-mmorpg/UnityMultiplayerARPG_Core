@@ -9,6 +9,12 @@ namespace MultiplayerARPG
         public const int RAYCAST_COLLIDER_SIZE = 32;
         public const int OVERLAP_COLLIDER_SIZE = 32;
 
+        public enum Mode
+        {
+            Adventure,
+            Combat,
+        }
+
         public enum TurningState
         {
             None,
@@ -16,6 +22,8 @@ namespace MultiplayerARPG
             Activate,
             UseSkill,
         }
+
+        public Mode mode;
         public float angularSpeed = 800f;
         [Range(0, 1f)]
         public float turnToTargetDuration = 0.1f;
@@ -26,6 +34,7 @@ namespace MultiplayerARPG
         BuildingMaterial tempBuildingMaterial;
         BaseGameEntity tempEntity;
         BaseGameEntity foundEntity;
+        Vector3 moveLookDirection;
         Vector3 targetLookDirection;
         Quaternion tempLookAt;
         TurningState turningState;
@@ -121,7 +130,7 @@ namespace MultiplayerARPG
 
             if (isBlockController || GenericUtils.IsFocusInputField())
             {
-                PlayerCharacterEntity.KeyMovement(Vector3.zero, false);
+                PlayerCharacterEntity.KeyMovement(Vector3.zero, MovementFlag.None);
                 return;
             }
 
@@ -204,14 +213,38 @@ namespace MultiplayerARPG
             }
 
             // If mobile platforms, don't receive input raw to make it smooth
+            MovementFlag movementState = MovementFlag.None;
             bool raw = !InputManager.useMobileInputOnNonMobile && !Application.isMobilePlatform;
             Vector3 moveDirection = Vector3.zero;
             forward.y = 0f;
             right.y = 0f;
             forward.Normalize();
             right.Normalize();
-            moveDirection += forward * InputManager.GetAxis("Vertical", raw);
-            moveDirection += right * InputManager.GetAxis("Horizontal", raw);
+            float inputV = InputManager.GetAxis("Vertical", raw);
+            float inputH = InputManager.GetAxis("Horizontal", raw);
+            moveDirection += forward * inputV;
+            moveDirection += right * inputH;
+            // Set movement state by inputs
+            switch (mode)
+            {
+                case Mode.Adventure:
+                    movementState = MovementFlag.Forward;
+                    moveLookDirection = moveDirection;
+                    break;
+                case Mode.Combat:
+                    moveDirection += forward * inputV;
+                    moveDirection += right * inputH;
+                    if (inputV > 0.5f)
+                        movementState |= MovementFlag.Forward;
+                    else if (inputV < -0.5f)
+                        movementState |= MovementFlag.Backward;
+                    if (inputH > 0.5f)
+                        movementState |= MovementFlag.Right;
+                    else if (inputH < -0.5f)
+                        movementState |= MovementFlag.Left;
+                    moveLookDirection = actionLookDirection;
+                    break;
+            }
 
             // normalize input if it exceeds 1 in combined length:
             if (moveDirection.sqrMagnitude > 1)
@@ -238,7 +271,7 @@ namespace MultiplayerARPG
                 {
                     // Update move direction
                     if (moveDirection.magnitude != 0f)
-                        targetLookDirection = moveDirection;
+                        targetLookDirection = moveLookDirection;
                 }
             }
             else
@@ -274,6 +307,15 @@ namespace MultiplayerARPG
                             turningState = TurningState.Activate;
                         turnTimeCounter = ((180f - tempCalculateAngle) / 180f) * turnToTargetDuration;
                         targetLookDirection = actionLookDirection;
+                        // Set movement state by inputs
+                        if (inputV > 0.5f)
+                            movementState |= MovementFlag.Forward;
+                        else if (inputV < -0.5f)
+                            movementState |= MovementFlag.Backward;
+                        if (inputH > 0.5f)
+                            movementState |= MovementFlag.Right;
+                        else if (inputH < -0.5f)
+                            movementState |= MovementFlag.Left;
                     }
                     else
                     {
@@ -306,7 +348,7 @@ namespace MultiplayerARPG
                 {
                     // Update move direction
                     if (moveDirection.magnitude != 0f)
-                        targetLookDirection = moveDirection;
+                        targetLookDirection = moveLookDirection;
                 }
             }
 
@@ -318,7 +360,10 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.StopMove();
                 PlayerCharacterEntity.SetTargetEntity(null);
             }
-            PlayerCharacterEntity.KeyMovement(moveDirection, InputManager.GetButtonDown("Jump"));
+            // If jumping add jump state
+            if (InputManager.GetButtonDown("Jump"))
+                movementState |= MovementFlag.IsJump;
+            PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
         }
 
         public Vector3 GetMoveDirection(float horizontalInput, float verticalInput)

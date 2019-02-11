@@ -36,6 +36,7 @@ namespace MultiplayerARPG
             get { return stoppingDistance; }
         }
 
+        protected MovementFlag tempMovementState = MovementFlag.None;
         protected MovementFlag localMovementState = MovementFlag.None;
         public override MovementFlag MovementState
         {
@@ -143,7 +144,7 @@ namespace MultiplayerARPG
                     tempTargetVelocity = tempMoveDirection * gameInstance.GameplayRule.GetMoveSpeed(this);
 
                     // If character move backward
-                    if (Vector3.Angle(tempMoveDirection, CacheTransform.forward) > 90)
+                    if (Vector3.Angle(tempMoveDirection, CacheTransform.forward) > 120)
                         tempTargetVelocity *= backwardMoveSpeedRate;
 
                     // Apply a force that attempts to reach our target velocity
@@ -177,48 +178,8 @@ namespace MultiplayerARPG
             }
             else
             {
-                MovementFlag state = MovementFlag.Forward;
-                // If it is point click it will always forward, so don't find direction
-                if (!HasNavPaths)
-                {
-                    float angle = Vector3.SignedAngle(tempMoveDirection, CacheTransform.forward, Vector3.up);
-                    // Backward
-                    if (angle > 140 || angle < -140)
-                    {
-                        state = MovementFlag.Backward;
-                    }
-                    // Right
-                    else if (angle < -50 && angle > -130)
-                    {
-                        state = MovementFlag.Right;
-                    }
-                    // Left
-                    else if (angle > 50 && angle < 130)
-                    {
-                        state = MovementFlag.Left;
-                    }
-                    // Forward Right
-                    else if (angle < -40 && angle > -50)
-                    {
-                        state = MovementFlag.Forward | MovementFlag.Right;
-                    }
-                    // Forward Left
-                    else if (angle > 40 && angle < 50)
-                    {
-                        state = MovementFlag.Forward | MovementFlag.Left;
-                    }
-                    // Backward Right
-                    else if (angle < -130 && angle > -140)
-                    {
-                        state = MovementFlag.Backward | MovementFlag.Right;
-                    }
-                    // Backward Left
-                    else if (angle > 130 && angle < 140)
-                    {
-                        state = MovementFlag.Backward | MovementFlag.Left;
-                    }
-                }
-                SetMovementState(state);
+                // Send movement state which received from owning client
+                SetMovementState(tempMovementState);
             }
             Profiler.EndSample();
         }
@@ -246,7 +207,7 @@ namespace MultiplayerARPG
             // Register Network functions
             RegisterNetFunction(NetFuncTriggerJump);
             RegisterNetFunction<Vector3>(NetFuncPointClickMovement);
-            RegisterNetFunction<sbyte, sbyte, bool>(NetFuncKeyMovement);
+            RegisterNetFunction<sbyte, sbyte, byte>(NetFuncKeyMovement);
             RegisterNetFunction<short>(NetFuncUpdateYRotation);
             RegisterNetFunction(StopMove);
             RegisterNetFunction<PackedUInt>(NetFuncSetTargetEntity);
@@ -261,7 +222,7 @@ namespace MultiplayerARPG
             currentNpcDialog = null;
         }
 
-        protected void NetFuncKeyMovement(sbyte horizontalInput, sbyte verticalInput, bool isJump)
+        protected void NetFuncKeyMovement(sbyte horizontalInput, sbyte verticalInput, byte movementState)
         {
             if (IsDead())
                 return;
@@ -269,8 +230,9 @@ namespace MultiplayerARPG
             tempInputDirection = new Vector3((float)horizontalInput / 100f, 0, (float)verticalInput / 100f);
             if (tempInputDirection.magnitude != 0)
                 currentNpcDialog = null;
+            tempMovementState = (MovementFlag)movementState;
             if (!IsJumping)
-                IsJumping = IsGrounded && isJump;
+                IsJumping = IsGrounded && tempMovementState.HasFlag(MovementFlag.IsJump);
         }
 
         protected void NetFuncUpdateYRotation(short yRotation)
@@ -335,7 +297,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void KeyMovement(Vector3 direction, bool isJump)
+        public override void KeyMovement(Vector3 direction, MovementFlag movementState)
         {
             if (IsDead())
                 return;
@@ -344,12 +306,13 @@ namespace MultiplayerARPG
                 case MovementSecure.ServerAuthoritative:
                     // Multiply with 100 and cast to sbyte to reduce packet size
                     // then it will be devided with 100 later on server side
-                    CallNetFunction(NetFuncKeyMovement, FunctionReceivers.Server, (sbyte)(direction.x * 100), (sbyte)(direction.z * 100), isJump);
+                    CallNetFunction(NetFuncKeyMovement, FunctionReceivers.Server, (sbyte)(direction.x * 100), (sbyte)(direction.z * 100), (byte)movementState);
                     break;
                 case MovementSecure.NotSecure:
                     tempInputDirection = direction;
+                    tempMovementState = movementState;
                     if (!IsJumping)
-                        IsJumping = IsGrounded && isJump;
+                        IsJumping = IsGrounded && movementState.HasFlag(MovementFlag.IsJump);
                     break;
             }
         }

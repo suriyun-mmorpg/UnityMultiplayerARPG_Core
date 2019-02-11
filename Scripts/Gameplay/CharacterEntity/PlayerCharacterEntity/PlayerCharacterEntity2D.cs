@@ -273,7 +273,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void KeyMovement(Vector3 direction, bool isJump)
+        public override void KeyMovement(Vector3 direction, MovementFlag movementState)
         {
             if (IsDead())
                 return;

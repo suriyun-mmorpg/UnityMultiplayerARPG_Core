@@ -295,7 +295,11 @@ namespace MultiplayerARPG
                 PlayerCharacterEntity.SetTargetEntity(null);
                 targetLookDirection = moveDirection.normalized;
             }
-            PlayerCharacterEntity.KeyMovement(moveDirection, InputManager.GetButtonDown("Jump"));
+            // Always forward
+            MovementFlag movementState = MovementFlag.Forward;
+            if (InputManager.GetButtonDown("Jump"))
+                movementState |= MovementFlag.IsJump;
+            PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
         }
 
         protected virtual void UpdateBuilding()

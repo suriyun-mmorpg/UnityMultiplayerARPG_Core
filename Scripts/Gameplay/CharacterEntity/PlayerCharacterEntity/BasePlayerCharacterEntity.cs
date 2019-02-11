@@ -182,7 +182,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public override void Killed(BaseCharacterEntity lastAttacker)
+        public override sealed void Killed(BaseCharacterEntity lastAttacker)
         {
             float expLostPercentage = gameInstance.GameplayRule.GetExpLostPercentageWhenDeath(this);
             GuildData guildData;
@@ -302,7 +302,7 @@ namespace MultiplayerARPG
 
         public abstract float StoppingDistance { get; }
         public abstract void StopMove();
-        public abstract void KeyMovement(Vector3 moveDirection, bool isJump);
+        public abstract void KeyMovement(Vector3 moveDirection, MovementFlag moveState);
         public abstract void UpdateYRotation(float yRotation);
         public abstract void PointClickMovement(Vector3 position);
     }
