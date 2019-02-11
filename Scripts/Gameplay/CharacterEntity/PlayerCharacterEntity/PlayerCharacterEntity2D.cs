@@ -178,7 +178,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                // For 2d, fast define that it is moving so can use any state
+                // For 2d, just define that it is moving so can use any state
                 SetMovementState(MovementFlag.Forward);
             }
             Profiler.EndSample();
