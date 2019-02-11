@@ -147,6 +147,9 @@ namespace MultiplayerARPG
                     if (Vector3.Angle(tempMoveDirection, CacheTransform.forward) > 120)
                         tempTargetVelocity *= backwardMoveSpeedRate;
 
+                    if (tempTargetVelocity.magnitude == 0)
+                        tempMoveDirection = Vector3.zero;
+
                     // Apply a force that attempts to reach our target velocity
                     Vector3 velocityChange = (tempTargetVelocity - tempPreviousVelocity);
                     velocityChange.x = Mathf.Clamp(velocityChange.x, -CacheMoveSpeed, CacheMoveSpeed);

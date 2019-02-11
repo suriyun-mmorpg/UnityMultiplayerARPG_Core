@@ -54,12 +54,12 @@ namespace MultiplayerARPG
         protected BaseGameEntity targetEntity;
         protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
         protected AnimActionType animActionType;
-        protected float attackOrUseSkillMoveSpeedRate;
-        protected bool isAttackingOrUsingSkill;
         /// <summary>
         /// This variable will be TRUE when cache data have to re-cache
         /// </summary>
         public bool isRecaching { get; protected set; }
+        public bool isAttackingOrUsingSkill { get; protected set; }
+        public float moveSpeedRateWhileAttackOrUseSkill { get; protected set; }
         #endregion
 
         #region Temp data

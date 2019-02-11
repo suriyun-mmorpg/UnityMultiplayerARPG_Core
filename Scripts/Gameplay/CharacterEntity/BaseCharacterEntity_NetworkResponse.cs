@@ -74,7 +74,7 @@ namespace MultiplayerARPG
 
             // Start attack routine
             isAttackingOrUsingSkill = true;
-            attackOrUseSkillMoveSpeedRate = weapon.GetWeaponItem().moveSpeedRateWhileAttacking;
+            moveSpeedRateWhileAttackOrUseSkill = weapon != null ? weapon.GetWeaponItem().moveSpeedRateWhileAttacking : 0f;
             StartCoroutine(AttackRoutine(triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition));
         }
 
@@ -166,7 +166,7 @@ namespace MultiplayerARPG
 
             // Start use skill routine
             isAttackingOrUsingSkill = true;
-            attackOrUseSkillMoveSpeedRate = characterSkill.GetSkill().moveSpeedRateWhileUsingSkill;
+            moveSpeedRateWhileAttackOrUseSkill = characterSkill.GetSkill().moveSpeedRateWhileUsingSkill;
             StartCoroutine(UseSkillRoutine(characterSkill, triggerDuration, totalDuration, skillAttackType, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition));
         }
 
