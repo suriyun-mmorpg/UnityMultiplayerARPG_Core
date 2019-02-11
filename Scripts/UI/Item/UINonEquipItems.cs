@@ -8,6 +8,7 @@ namespace MultiplayerARPG
         public ICharacterData character { get; protected set; }
         public UICharacterItem uiItemDialog;
         public UICharacterItem uiCharacterItemPrefab;
+        public List<ItemType> filterItemTypes;
         public Transform uiCharacterItemContainer;
 
         private UIList cacheNonEquipItemList;
@@ -84,6 +85,18 @@ namespace MultiplayerARPG
             }
 
             IList<CharacterItem> nonEquipItems = character.NonEquipItems;
+            if (filterItemTypes != null && filterItemTypes.Count > 0)
+            {
+                // Filter items to show by specific item types
+                IList<CharacterItem> filteredItems = new List<CharacterItem>();
+                foreach (CharacterItem nonEquipItem in nonEquipItems)
+                {
+                    if (nonEquipItem.GetItem() == null) continue;
+                    if (filterItemTypes.Contains(nonEquipItem.GetItem().itemType))
+                        filteredItems.Add(nonEquipItem);
+                }
+                nonEquipItems = filteredItems;
+            }
             CacheNonEquipItemList.Generate(nonEquipItems, (index, characterItem, ui) =>
             {
                 UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();

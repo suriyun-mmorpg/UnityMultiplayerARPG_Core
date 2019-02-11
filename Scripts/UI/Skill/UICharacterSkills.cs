@@ -8,6 +8,7 @@ namespace MultiplayerARPG
         public ICharacterData character { get; protected set; }
         public UICharacterSkill uiSkillDialog;
         public UICharacterSkill uiCharacterSkillPrefab;
+        public List<SkillType> filterSkillTypes;
         public Transform uiCharacterSkillContainer;
 
         private UIList cacheCharacterSkillList;
@@ -94,6 +95,17 @@ namespace MultiplayerARPG
                 Skill tempSkill;
                 short tempLevel;
                 Dictionary<Skill, short> skillLevels = database.CacheSkillLevels;
+                if (filterSkillTypes != null && filterSkillTypes.Count > 0)
+                {
+                    // Filter skills to show by specific skill types
+                    Dictionary<Skill, short> filteredSkillLevels = new Dictionary<Skill, short>();
+                    foreach (KeyValuePair<Skill, short> skillLevel in skillLevels)
+                    {
+                        if (filterSkillTypes.Contains(skillLevel.Key.skillType))
+                            filteredSkillLevels.Add(skillLevel.Key, skillLevel.Value);
+                    }
+                    skillLevels = filteredSkillLevels;
+                }
                 CacheCharacterSkillList.Generate(skillLevels, (index, skillLevel, ui) =>
                 {
                     UICharacterSkill uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
