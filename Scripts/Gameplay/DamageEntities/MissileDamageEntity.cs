@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using LiteNetLibManager;
+using LiteNetLib;
 
 namespace MultiplayerARPG
 {
     public class MissileDamageEntity : BaseDamageEntity
     {
+        public UnityEvent onExploded;
         public UnityEvent onDestroy;
         [Tooltip("If this value more than 0, when it hit anything or it is out of life, it will explode and apply damage to characters in this distance")]
         public float explodeDistance;
@@ -15,6 +17,8 @@ namespace MultiplayerARPG
         protected float missileDistance;
         [SerializeField]
         protected SyncFieldFloat missileSpeed = new SyncFieldFloat();
+        [SerializeField]
+        protected SyncFieldBool isExploded = new SyncFieldBool();
         [SerializeField]
         protected SyncFieldPackedUInt lockingTargetId;
 
@@ -60,7 +64,30 @@ namespace MultiplayerARPG
 
         private float launchTime;
         private float missileDuration;
-        private bool isExploded;
+
+        protected override void SetupNetElements()
+        {
+            base.SetupNetElements();
+            missileSpeed.sendOptions = SendOptions.ReliableOrdered;
+            missileSpeed.forOwnerOnly = false;
+            isExploded.sendOptions = SendOptions.ReliableOrdered;
+            isExploded.forOwnerOnly = false;
+        }
+
+        public override void OnSetup()
+        {
+            base.OnSetup();
+            SetupNetElements();
+        }
+
+        private void OnIsExplodedChanged(bool isExploded)
+        {
+            if (isExploded)
+            {
+                if (onExploded != null)
+                    onExploded.Invoke();
+            }
+        }
 
         public void SetupDamage(
             IAttackerEntity attacker,
@@ -103,8 +130,20 @@ namespace MultiplayerARPG
         {
             base.EntityFixedUpdate();
             // Don't move if exploded
-            if (isExploded)
+            if (isExploded.Value)
+            {
+                if (gameInstance.DimensionType == DimensionType.Dimension2D)
+                {
+                    if (CacheRigidbody2D != null)
+                        CacheRigidbody2D.velocity = Vector2.zero;
+                }
+                else
+                {
+                    if (CacheRigidbody != null)
+                        CacheRigidbody.velocity = Vector3.zero;
+                }
                 return;
+            }
 
             // Turn to locking target position
             if (LockingTarget != null)
@@ -172,9 +211,9 @@ namespace MultiplayerARPG
 
         private void Explode()
         {
-            if (isExploded)
+            if (isExploded.Value || !IsServer)
                 return;
-            isExploded = true;
+            isExploded.Value = true;
             if (gameInstance.DimensionType == DimensionType.Dimension2D)
             {
                 Collider2D[] colliders2D = Physics2D.OverlapCircleAll(CacheTransform.position, explodeDistance);
