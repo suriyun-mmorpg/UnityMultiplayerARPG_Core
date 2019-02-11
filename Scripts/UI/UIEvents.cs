@@ -41,7 +41,7 @@ namespace MultiplayerARPG
     public class UICharacterQuestEvent : UnityEvent<UICharacterQuest> { }
 
     [System.Serializable]
-    public class CharacterSkillEvent : UnityEvent<SkillTuple> { }
+    public class CharacterSkillEvent : UnityEvent<CharacterSkillTuple> { }
 
     [System.Serializable]
     public class UICharacterSkillEvent : UnityEvent<UICharacterSkill> { }

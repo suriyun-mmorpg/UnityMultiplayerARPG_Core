@@ -1,5 +1,27 @@
 ﻿namespace MultiplayerARPG
 {
+    public struct CharacterAttributeTuple
+    {
+        public CharacterAttribute characterAttribute;
+        public short targetAmount;
+        public CharacterAttributeTuple(CharacterAttribute characterAttribute, short targetAmount)
+        {
+            this.characterAttribute = characterAttribute;
+            this.targetAmount = targetAmount;
+        }
+    }
+
+    public struct CharacterSkillTuple
+    {
+        public CharacterSkill characterSkill;
+        public short targetLevel;
+        public CharacterSkillTuple(CharacterSkill characterSkill, short targetLevel)
+        {
+            this.characterSkill = characterSkill;
+            this.targetLevel = targetLevel;
+        }
+    }
+
     public struct CharacterItemTuple
     {
         public CharacterItem characterItem;
@@ -13,17 +35,6 @@
         }
     }
 
-    public struct AttributeTuple
-    {
-        public Attribute attribute;
-        public short targetAmount;
-        public AttributeTuple(Attribute attribute, short targetAmount)
-        {
-            this.attribute = attribute;
-            this.targetAmount = targetAmount;
-        }
-    }
-
     public struct BuffTuple
     {
         public Buff buff;
@@ -31,17 +42,6 @@
         public BuffTuple(Buff buff, short targetLevel)
         {
             this.buff = buff;
-            this.targetLevel = targetLevel;
-        }
-    }
-
-    public struct SkillTuple
-    {
-        public Skill skill;
-        public short targetLevel;
-        public SkillTuple(Skill skill, short targetLevel)
-        {
-            this.skill = skill;
             this.targetLevel = targetLevel;
         }
     }

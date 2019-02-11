@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public partial class UISkillRequirement : UISelectionEntry<SkillTuple>
+    public partial class UISkillRequirement : UISelectionEntry<CharacterSkillTuple>
     {
         [Header("Requirement Format")]
         [Tooltip("Require Level Format => {0} = {Level}")]
@@ -16,7 +16,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            Skill skill = Data.skill;
+            Skill skill = Data.characterSkill.GetSkill();
             short level = Data.targetLevel;
 
             if (uiTextRequireLevel != null)

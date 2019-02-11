@@ -4,10 +4,11 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public partial class UICharacterAttribute : UIDataForCharacter<AttributeTuple>
+    public partial class UICharacterAttribute : UIDataForCharacter<CharacterAttributeTuple>
     {
-        public Attribute Attribute { get { return Data.attribute; } }
+        public CharacterAttribute CharacterAttribute { get { return Data.characterAttribute; } }
         public short Amount { get { return Data.targetAmount; } }
+        public Attribute Attribute { get { return CharacterAttribute != null ? CharacterAttribute.GetAttribute() : null; } }
 
         [Header("Generic Info Format")]
         [Tooltip("Title Format => {0} = {Title}")]

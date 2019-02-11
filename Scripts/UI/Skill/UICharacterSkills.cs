@@ -93,6 +93,7 @@ namespace MultiplayerARPG
             if (database != null)
             {
                 Skill tempSkill;
+                int tempIndexOfSkill;
                 short tempLevel;
                 Dictionary<Skill, short> skillLevels = database.CacheSkillLevels;
                 if (filterSkillTypes != null && filterSkillTypes.Count > 0)
@@ -110,10 +111,11 @@ namespace MultiplayerARPG
                 {
                     UICharacterSkill uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
                     tempSkill = skillLevel.Key;
+                    tempIndexOfSkill = character.IndexOfSkill(tempSkill.DataId);
                     tempLevel = 0;
                     if (displayingSkills.ContainsKey(tempSkill))
                         tempLevel = displayingSkills[tempSkill];
-                    uiCharacterSkill.Setup(new SkillTuple(tempSkill, tempLevel), character, character.IndexOfSkill(tempSkill.DataId));
+                    uiCharacterSkill.Setup(new CharacterSkillTuple(character.Skills[tempIndexOfSkill], tempLevel), character, tempIndexOfSkill);
                     uiCharacterSkill.Show();
                     CacheCharacterSkillSelectionManager.Add(uiCharacterSkill);
                     if (selectedSkillId.Equals(skillLevel.Key))

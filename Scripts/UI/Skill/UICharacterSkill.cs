@@ -5,10 +5,11 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public partial class UICharacterSkill : UIDataForCharacter<SkillTuple>
+    public partial class UICharacterSkill : UIDataForCharacter<CharacterSkillTuple>
     {
-        public Skill Skill { get { return Data.skill; } }
+        public CharacterSkill CharacterSkill { get { return Data.characterSkill; } }
         public short Level { get { return Data.targetLevel; } }
+        public Skill Skill { get { return CharacterSkill != null ? CharacterSkill.GetSkill() : null; } }
 
         [Header("Generic Info Format")]
         [Tooltip("Title Format => {0} = {Title}")]
@@ -64,6 +65,8 @@ namespace MultiplayerARPG
         public UnityEvent onUnableToLevelUp;
 
         [Header("Options")]
+        [Tooltip("UIs set here will be cloned by this UI")]
+        public UICharacterSkill[] clones;
         public UICharacterSkill uiNextLevelSkill;
 
         protected float coolDownRemainsDuration;
@@ -191,7 +194,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiRequirement.Show();
-                    uiRequirement.Data = new SkillTuple(Skill, Level);
+                    uiRequirement.Data = new CharacterSkillTuple(CharacterSkill, Level);
                 }
             }
 
@@ -266,13 +269,22 @@ namespace MultiplayerARPG
                 }
             }
 
+            if (clones != null && clones.Length > 0)
+            {
+                for (int i = 0; i < clones.Length; ++i)
+                {
+                    if (clones[i] == null) continue;
+                    clones[i].Data = Data;
+                }
+            }
+
             if (uiNextLevelSkill != null)
             {
                 if (Level + 1 > Skill.maxLevel)
                     uiNextLevelSkill.Hide();
                 else
                 {
-                    uiNextLevelSkill.Setup(new SkillTuple(Skill, (short)(Level + 1)), character, indexOfData);
+                    uiNextLevelSkill.Setup(new CharacterSkillTuple(CharacterSkill, (short)(Level + 1)), character, indexOfData);
                     uiNextLevelSkill.Show();
                 }
             }
