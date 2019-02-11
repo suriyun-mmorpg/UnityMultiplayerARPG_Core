@@ -9,6 +9,7 @@ namespace MultiplayerARPG
         public int indexOfData { get; protected set; }
         public string hotkeyId { get { return Data.hotkeyId; } }
         public KeyCode key;
+        public UICharacterHotkeys uiCharacterHotkeys;
         public UICharacterSkill uiCharacterSkill;
         public UICharacterItem uiCharacterItem;
         public UICharacterHotkeyAssigner uiAssigner;
@@ -24,8 +25,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public void Setup(CharacterHotkey data, int indexOfData)
+        public void Setup(UICharacterHotkeys uiCharacterHotkeys, CharacterHotkey data, int indexOfData)
         {
+            this.uiCharacterHotkeys = uiCharacterHotkeys;
             this.indexOfData = indexOfData;
             Data = data;
         }
@@ -58,6 +60,26 @@ namespace MultiplayerARPG
             Item item = characterHotkey.GetItem();
 
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            if (uiCharacterSkill == null && uiCharacterHotkeys != null && uiCharacterHotkeys.uiCharacterSkillPrefab != null)
+            {
+                uiCharacterSkill = Instantiate(uiCharacterHotkeys.uiCharacterSkillPrefab, transform);
+                RectTransform rectTransform = uiCharacterSkill.transform as RectTransform;
+                rectTransform.localPosition = Vector2.zero + Vector2.right * rectTransform.sizeDelta.x / 2 + Vector2.down * rectTransform.sizeDelta.y / 2;
+                rectTransform.rotation = Quaternion.identity;
+                rectTransform.localScale = Vector3.one;
+                rectTransform.SetAsFirstSibling();
+            }
+
+            if (uiCharacterItem == null && uiCharacterHotkeys != null && uiCharacterHotkeys.uiCharacterItemPrefab != null)
+            {
+                uiCharacterItem = Instantiate(uiCharacterHotkeys.uiCharacterItemPrefab, transform);
+                RectTransform rectTransform = uiCharacterItem.transform as RectTransform;
+                rectTransform.localPosition = Vector2.zero + Vector2.right * rectTransform.sizeDelta.x / 2 + Vector2.down * rectTransform.sizeDelta.y / 2;
+                rectTransform.rotation = Quaternion.identity;
+                rectTransform.localScale = Vector3.one;
+                rectTransform.SetAsFirstSibling();
+            }
+
             if (uiCharacterSkill != null)
             {
                 if (skill == null)
@@ -70,6 +92,12 @@ namespace MultiplayerARPG
                         CharacterSkill characterSkill = owningCharacter.Skills[index];
                         uiCharacterSkill.Setup(new CharacterSkillTuple(characterSkill, characterSkill.level), owningCharacter, index);
                         uiCharacterSkill.Show();
+                        UICharacterSkillDragHandler dragHandler = uiCharacterSkill.GetComponentInChildren<UICharacterSkillDragHandler>();
+                        if (dragHandler != null)
+                        {
+                            dragHandler.sourceLocation = UICharacterSkillDragHandler.SourceLocation.Hotkey;
+                            dragHandler.hotkeyId = hotkeyId;
+                        }
                     }
                     else
                         uiCharacterSkill.Hide();
@@ -88,6 +116,12 @@ namespace MultiplayerARPG
                         CharacterItem characterItem = owningCharacter.NonEquipItems[index];
                         uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, InventoryType.NonEquipItems), owningCharacter, index);
                         uiCharacterItem.Show();
+                        UICharacterItemDragHandler dragHandler = uiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
+                        if (dragHandler != null)
+                        {
+                            dragHandler.sourceLocation = UICharacterItemDragHandler.SourceLocation.Hotkey;
+                            dragHandler.uiCharacterHotkey = this;
+                        }
                     }
                     else
                         uiCharacterItem.Hide();
@@ -115,7 +149,6 @@ namespace MultiplayerARPG
         {
             if (RectTransformUtility.RectangleContainsScreenPoint(DropRect, Input.mousePosition))
             {
-                Debug.LogError("Drop");
                 BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
                 if (owningCharacter == null)
                     return;

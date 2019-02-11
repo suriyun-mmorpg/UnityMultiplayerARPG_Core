@@ -5,6 +5,8 @@ namespace MultiplayerARPG
     public partial class UICharacterHotkeys : UIBase
     {
         public UICharacterHotkeyPair[] uiCharacterHotkeys;
+        public UICharacterSkill uiCharacterSkillPrefab;
+        public UICharacterItem uiCharacterItemPrefab;
 
         private Dictionary<string, List<UICharacterHotkey>> cacheUICharacterHotkeys;
         public Dictionary<string, List<UICharacterHotkey>> CacheUICharacterHotkeys
@@ -49,7 +51,7 @@ namespace MultiplayerARPG
                         characterHotkey.hotkeyId = id;
                         characterHotkey.type = HotkeyType.None;
                         characterHotkey.dataId = 0;
-                        ui.Setup(characterHotkey, -1);
+                        ui.Setup(this, characterHotkey, -1);
                         if (!cacheUICharacterHotkeys.ContainsKey(id))
                             cacheUICharacterHotkeys.Add(id, new List<UICharacterHotkey>());
                         cacheUICharacterHotkeys[id].Add(ui);
@@ -81,7 +83,7 @@ namespace MultiplayerARPG
                 {
                     foreach (UICharacterHotkey ui in uis)
                     {
-                        ui.Setup(characterHotkey, i);
+                        ui.Setup(this, characterHotkey, i);
                         ui.Show();
                     }
                 }

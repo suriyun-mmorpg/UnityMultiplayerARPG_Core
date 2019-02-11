@@ -102,6 +102,9 @@ namespace MultiplayerARPG
                 UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
                 uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, InventoryType.NonEquipItems), this.character, index);
                 uiCharacterItem.Show();
+                UICharacterItemDragHandler dragHandler = uiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
+                if (dragHandler != null)
+                    dragHandler.sourceLocation = UICharacterItemDragHandler.SourceLocation.NonEquipItems;
                 CacheNonEquipItemSelectionManager.Add(uiCharacterItem);
                 if (selectedIdx == index)
                     uiCharacterItem.OnClickSelect();

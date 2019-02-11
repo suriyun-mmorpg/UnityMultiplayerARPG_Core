@@ -23,6 +23,12 @@ namespace MultiplayerARPG
                     {
                         string equipPosition = GameDataConst.EQUIP_POSITION_RIGHT_HAND;
                         rightHandSlot.Setup(GetEmptyUIData(), character, -1);
+                        UICharacterItemDragHandler dragHandler = rightHandSlot.GetComponentInChildren<UICharacterItemDragHandler>();
+                        if (dragHandler != null)
+                        {
+                            dragHandler.sourceLocation = UICharacterItemDragHandler.SourceLocation.EquipItems;
+                            dragHandler.uiCharacterItem = rightHandSlot;
+                        }
                         cacheEquipItemSlots.Add(equipPosition, rightHandSlot);
                         CacheEquipItemSelectionManager.Add(rightHandSlot);
                     }
@@ -30,6 +36,12 @@ namespace MultiplayerARPG
                     {
                         string equipPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
                         leftHandSlot.Setup(GetEmptyUIData(), character, -1);
+                        UICharacterItemDragHandler dragHandler = leftHandSlot.GetComponentInChildren<UICharacterItemDragHandler>();
+                        if (dragHandler != null)
+                        {
+                            dragHandler.sourceLocation = UICharacterItemDragHandler.SourceLocation.EquipItems;
+                            dragHandler.uiCharacterItem = leftHandSlot;
+                        }
                         cacheEquipItemSlots.Add(equipPosition, leftHandSlot);
                         CacheEquipItemSelectionManager.Add(leftHandSlot);
                     }
@@ -41,6 +53,12 @@ namespace MultiplayerARPG
                         {
                             string equipPosition = otherEquipSlot.armorType.Id;
                             otherEquipSlot.ui.Setup(GetEmptyUIData(), character, -1);
+                            UICharacterItemDragHandler dragHandler = otherEquipSlot.ui.GetComponentInChildren<UICharacterItemDragHandler>();
+                            if (dragHandler != null)
+                            {
+                                dragHandler.sourceLocation = UICharacterItemDragHandler.SourceLocation.EquipItems;
+                                dragHandler.uiCharacterItem = otherEquipSlot.ui;
+                            }
                             cacheEquipItemSlots.Add(equipPosition, otherEquipSlot.ui);
                             CacheEquipItemSelectionManager.Add(otherEquipSlot.ui);
                         }

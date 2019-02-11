@@ -117,6 +117,9 @@ namespace MultiplayerARPG
                         tempLevel = displayingSkills[tempSkill];
                     uiCharacterSkill.Setup(new CharacterSkillTuple(character.Skills[tempIndexOfSkill], tempLevel), character, tempIndexOfSkill);
                     uiCharacterSkill.Show();
+                    UICharacterSkillDragHandler dragHandler = uiCharacterSkill.GetComponentInChildren<UICharacterSkillDragHandler>();
+                    if (dragHandler != null)
+                        dragHandler.sourceLocation = UICharacterSkillDragHandler.SourceLocation.Skills;
                     CacheCharacterSkillSelectionManager.Add(uiCharacterSkill);
                     if (selectedSkillId.Equals(skillLevel.Key))
                         uiCharacterSkill.OnClickSelect();
