@@ -47,6 +47,8 @@ namespace MultiplayerARPG
         public override void OnEndDrag(PointerEventData eventData)
         {
             base.OnEndDrag(eventData);
+            if (isDropped || !CanDrag)
+                return;
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter == null)
                 return;
