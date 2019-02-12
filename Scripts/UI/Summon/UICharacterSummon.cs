@@ -142,7 +142,7 @@ namespace MultiplayerARPG
         public void OnClickUnSummon()
         {
             if (CharacterSummon.type == SummonType.Pet)
-                BasePlayerCharacterController.OwningCharacter.RequestUnSummon(CharacterSummon.objectId);
+                OwningCharacter.RequestUnSummon(CharacterSummon.objectId);
         }
     }
 }

@@ -22,26 +22,20 @@ namespace MultiplayerARPG
                     if (rightHandSlot != null)
                     {
                         string equipPosition = GameDataConst.EQUIP_POSITION_RIGHT_HAND;
-                        rightHandSlot.Setup(GetEmptyUIData(), character, -1);
+                        rightHandSlot.Setup(GetEmptyUIData(InventoryType.EquipWeaponRight), character, -1);
                         UICharacterItemDragHandler dragHandler = rightHandSlot.GetComponentInChildren<UICharacterItemDragHandler>();
                         if (dragHandler != null)
-                        {
-                            dragHandler.sourceLocation = UICharacterItemDragHandler.SourceLocation.EquipItems;
-                            dragHandler.uiCharacterItem = rightHandSlot;
-                        }
+                            dragHandler.SetupForEquipItems(rightHandSlot);
                         cacheEquipItemSlots.Add(equipPosition, rightHandSlot);
                         CacheEquipItemSelectionManager.Add(rightHandSlot);
                     }
                     if (leftHandSlot != null)
                     {
                         string equipPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
-                        leftHandSlot.Setup(GetEmptyUIData(), character, -1);
+                        leftHandSlot.Setup(GetEmptyUIData(InventoryType.EquipWeaponLeft), character, -1);
                         UICharacterItemDragHandler dragHandler = leftHandSlot.GetComponentInChildren<UICharacterItemDragHandler>();
                         if (dragHandler != null)
-                        {
-                            dragHandler.sourceLocation = UICharacterItemDragHandler.SourceLocation.EquipItems;
-                            dragHandler.uiCharacterItem = leftHandSlot;
-                        }
+                            dragHandler.SetupForEquipItems(leftHandSlot);
                         cacheEquipItemSlots.Add(equipPosition, leftHandSlot);
                         CacheEquipItemSelectionManager.Add(leftHandSlot);
                     }
@@ -52,13 +46,10 @@ namespace MultiplayerARPG
                             !cacheEquipItemSlots.ContainsKey(otherEquipSlot.armorType.Id))
                         {
                             string equipPosition = otherEquipSlot.armorType.Id;
-                            otherEquipSlot.ui.Setup(GetEmptyUIData(), character, -1);
+                            otherEquipSlot.ui.Setup(GetEmptyUIData(InventoryType.EquipItems), character, -1);
                             UICharacterItemDragHandler dragHandler = otherEquipSlot.ui.GetComponentInChildren<UICharacterItemDragHandler>();
                             if (dragHandler != null)
-                            {
-                                dragHandler.sourceLocation = UICharacterItemDragHandler.SourceLocation.EquipItems;
-                                dragHandler.uiCharacterItem = otherEquipSlot.ui;
-                            }
+                                dragHandler.SetupForEquipItems(otherEquipSlot.ui);
                             cacheEquipItemSlots.Add(equipPosition, otherEquipSlot.ui);
                             CacheEquipItemSelectionManager.Add(otherEquipSlot.ui);
                         }
@@ -102,7 +93,7 @@ namespace MultiplayerARPG
             if (uiItemDialog != null && ui.Data.characterItem.IsValid())
             {
                 uiItemDialog.selectionManager = CacheEquipItemSelectionManager;
-                uiItemDialog.Setup(ui.Data, character, ui.indexOfData);
+                uiItemDialog.Setup(ui.Data, character, ui.IndexOfData);
                 uiItemDialog.Show();
             }
         }
@@ -116,11 +107,10 @@ namespace MultiplayerARPG
         public void UpdateData(ICharacterData character)
         {
             this.character = character;
-            Dictionary<string, UICharacterItem>.ValueCollection slots = CacheEquipItemSlots.Values;
             // Clear slots data
-            foreach (UICharacterItem slot in slots)
+            foreach (UICharacterItem slot in CacheEquipItemSlots.Values)
             {
-                slot.Setup(GetEmptyUIData(), this.character, -1);
+                slot.Setup(GetEmptyUIData(slot.InventoryType), this.character, -1);
                 slot.Show();
             }
 
@@ -161,9 +151,9 @@ namespace MultiplayerARPG
             }
         }
 
-        private CharacterItemTuple GetEmptyUIData()
+        private CharacterItemTuple GetEmptyUIData(InventoryType inventoryType)
         {
-            return new CharacterItemTuple(CharacterItem.Empty, 1, InventoryType.NonEquipItems);
+            return new CharacterItemTuple(CharacterItem.Empty, 1, inventoryType);
         }
     }
 }

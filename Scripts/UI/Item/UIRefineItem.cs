@@ -3,7 +3,7 @@ using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
 {
-    public partial class UIRefineItem : UIDataForCharacter<InventoryType>
+    public partial class UIRefineItem : UISelectionEntry<InventoryType>
     {
         public CharacterItem CharacterItem
         {
@@ -12,21 +12,23 @@ namespace MultiplayerARPG
                 switch (Data)
                 {
                     case InventoryType.NonEquipItems:
-                        if (indexOfData >= 0 && indexOfData < character.NonEquipItems.Count)
-                            return character.NonEquipItems[indexOfData];
+                        if (IndexOfData >= 0 && IndexOfData < OwningCharacter.NonEquipItems.Count)
+                            return OwningCharacter.NonEquipItems[IndexOfData];
                         break;
                     case InventoryType.EquipItems:
-                        if (indexOfData >= 0 && indexOfData < character.EquipItems.Count)
-                            return character.EquipItems[indexOfData];
+                        if (IndexOfData >= 0 && IndexOfData < OwningCharacter.EquipItems.Count)
+                            return OwningCharacter.EquipItems[IndexOfData];
                         break;
                     case InventoryType.EquipWeaponRight:
-                        return character.EquipWeapons.rightHand;
+                        return OwningCharacter.EquipWeapons.rightHand;
                     case InventoryType.EquipWeaponLeft:
-                        return character.EquipWeapons.leftHand;
+                        return OwningCharacter.EquipWeapons.leftHand;
                 }
                 return null;
             }
         }
+        public BasePlayerCharacterEntity OwningCharacter { get { return BasePlayerCharacterController.OwningCharacter; } }
+        public int IndexOfData { get; protected set; }
         public short Level { get { return (short)(CharacterItem != null ? CharacterItem.level : 1); } }
         public Item EquipmentItem { get { return CharacterItem != null ? CharacterItem.GetEquipmentItem() : null; } }
         public bool CanRefine { get { return EquipmentItem != null && Level < EquipmentItem.MaxLevel; } }
@@ -47,6 +49,12 @@ namespace MultiplayerARPG
         public TextWrapper uiTextSuccessRate;
         public TextWrapper uiTextRefiningLevel;
 
+        public void Setup(InventoryType inventoryType, int indexOfData)
+        {
+            IndexOfData = indexOfData;
+            Data = inventoryType;
+        }
+
         protected override void UpdateUI()
         {
             Profiler.BeginSample("UIRefineItem - Update UI");
@@ -56,7 +64,7 @@ namespace MultiplayerARPG
                     uiRefiningItem.Hide();
                 else
                 {
-                    uiRefiningItem.Setup(new CharacterItemTuple(CharacterItem, Level, Data), character, indexOfData);
+                    uiRefiningItem.Setup(new CharacterItemTuple(CharacterItem, Level, Data), OwningCharacter, IndexOfData);
                     uiRefiningItem.Show();
                 }
             }
@@ -100,7 +108,7 @@ namespace MultiplayerARPG
 
         public override void Hide()
         {
-            indexOfData = -1;
+            IndexOfData = -1;
             base.Hide();
         }
 
@@ -111,9 +119,9 @@ namespace MultiplayerARPG
 
         public void OnClickRefine()
         {
-            if (indexOfData < 0)
+            if (IndexOfData < 0)
                 return;
-            BasePlayerCharacterController.OwningCharacter.RequestRefineItem((byte)Data, (short)indexOfData);
+            OwningCharacter.RequestRefineItem((byte)Data, (short)IndexOfData);
         }
     }
 }

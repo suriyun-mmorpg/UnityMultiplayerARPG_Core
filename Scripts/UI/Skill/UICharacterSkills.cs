@@ -62,7 +62,7 @@ namespace MultiplayerARPG
             if (uiSkillDialog != null)
             {
                 uiSkillDialog.selectionManager = CacheCharacterSkillSelectionManager;
-                uiSkillDialog.Setup(ui.Data, character, ui.indexOfData);
+                uiSkillDialog.Setup(ui.Data, character, ui.IndexOfData);
                 uiSkillDialog.Show();
             }
         }
@@ -119,7 +119,7 @@ namespace MultiplayerARPG
                     uiCharacterSkill.Show();
                     UICharacterSkillDragHandler dragHandler = uiCharacterSkill.GetComponentInChildren<UICharacterSkillDragHandler>();
                     if (dragHandler != null)
-                        dragHandler.sourceLocation = UICharacterSkillDragHandler.SourceLocation.Skills;
+                        dragHandler.SetupForSkills(this);
                     CacheCharacterSkillSelectionManager.Add(uiCharacterSkill);
                     if (selectedSkillId.Equals(skillLevel.Key))
                         uiCharacterSkill.OnClickSelect();

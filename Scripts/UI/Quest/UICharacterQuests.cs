@@ -63,7 +63,7 @@ namespace MultiplayerARPG
             if (uiQuestDialog != null)
             {
                 uiQuestDialog.selectionManager = CacheCharacterQuestSelectionManager;
-                uiQuestDialog.Setup(ui.Data, character, ui.indexOfData);
+                uiQuestDialog.Setup(ui.Data, character, ui.IndexOfData);
                 uiQuestDialog.Show();
             }
         }

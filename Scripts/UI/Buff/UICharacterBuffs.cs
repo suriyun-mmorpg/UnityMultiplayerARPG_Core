@@ -59,7 +59,7 @@ namespace MultiplayerARPG
             if (uiBuffDialog != null)
             {
                 uiBuffDialog.selectionManager = CacheCharacterBuffSelectionManager;
-                uiBuffDialog.Setup(ui.Data, character, ui.indexOfData);
+                uiBuffDialog.Setup(ui.Data, character, ui.IndexOfData);
                 uiBuffDialog.Show();
             }
         }

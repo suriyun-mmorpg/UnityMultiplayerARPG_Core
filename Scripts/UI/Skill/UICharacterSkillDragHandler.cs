@@ -10,8 +10,11 @@ namespace MultiplayerARPG
             Hotkey,
         }
 
-        public SourceLocation sourceLocation;
-        public string hotkeyId;
+        public SourceLocation sourceLocation { get; private set; }
+        // Skills data
+        public UICharacterSkills uiCharacterSkills { get; private set; }
+        // Hotkey data
+        public UICharacterHotkey uiCharacterHotkey { get; private set; }
 
         private UICharacterSkill cacheUI;
         public UICharacterSkill CacheUI
@@ -29,6 +32,18 @@ namespace MultiplayerARPG
             rootTransform = CacheUI.CacheRoot.transform;
         }
 
+        public void SetupForSkills(UICharacterSkills uiCharacterSkills)
+        {
+            sourceLocation = SourceLocation.Skills;
+            this.uiCharacterSkills = uiCharacterSkills;
+        }
+
+        public void SetupForHotkey(UICharacterHotkey uiCharacterHotkey)
+        {
+            sourceLocation = SourceLocation.Hotkey;
+            this.uiCharacterHotkey = uiCharacterHotkey;
+        }
+
         public override void OnEndDrag(PointerEventData eventData)
         {
             base.OnEndDrag(eventData);
@@ -36,7 +51,7 @@ namespace MultiplayerARPG
             if (owningCharacter == null)
                 return;
             if (sourceLocation == SourceLocation.Hotkey)
-                owningCharacter.RequestAssignHotkey(hotkeyId, HotkeyType.None, 0);
+                owningCharacter.RequestAssignHotkey(uiCharacterHotkey.hotkeyId, HotkeyType.None, 0);
         }
     }
 }

@@ -45,7 +45,7 @@ public class CharacterSummon : INetSerializable
             if (cacheEntity == null)
             {
                 LiteNetLibIdentity identity;
-                if (BaseGameNetworkManager.Singleton.Assets.SpawnedObjects.TryGetValue(objectId, out identity))
+                if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(objectId, out identity))
                     cacheEntity = identity.GetComponent<BaseMonsterCharacterEntity>();
             }
             return cacheEntity;

@@ -84,8 +84,7 @@ public static partial class PlayerCharacterDataExtension
         }
         character.StatPoint += returningStatPoint;
         // Add character's attributes
-        Dictionary<int, Attribute>.ValueCollection attributes = GameInstance.Attributes.Values;
-        foreach (Attribute attribute in attributes)
+        foreach (Attribute attribute in GameInstance.Attributes.Values)
         {
             // This attribute is valid, so not have to add it
             if (validAttributeIds.Contains(attribute.DataId))
@@ -185,8 +184,7 @@ public static partial class PlayerCharacterDataExtension
         // Player character database
         PlayerCharacter playerCharacter = database as PlayerCharacter;
         // Attributes
-        Dictionary<int, Attribute>.ValueCollection attributes = GameInstance.Attributes.Values;
-        foreach (Attribute attribute in attributes)
+        foreach (Attribute attribute in GameInstance.Attributes.Values)
         {
             CharacterAttribute characterAttribute = new CharacterAttribute();
             characterAttribute.dataId = attribute.DataId;

@@ -342,7 +342,7 @@ namespace MultiplayerARPG
                 {
                     uiEquipmentSet.Show();
                     int equippedCount = 0;
-                    character.CacheEquipmentSets.TryGetValue(EquipmentItem.equipmentSet, out equippedCount);
+                    Character.CacheEquipmentSets.TryGetValue(EquipmentItem.equipmentSet, out equippedCount);
                     uiEquipmentSet.Data = new EquipmentSetEquippedCountTuple(EquipmentItem.equipmentSet, equippedCount);
                 }
             }
@@ -358,7 +358,7 @@ namespace MultiplayerARPG
                     uiDamageAmounts.Data = new DamageElementAmountTuple(keyValuePair.Key, keyValuePair.Value);
                 }
             }
-            
+
             if (PetItem != null && PetItem.petEntity != null)
             {
                 int[] expTree = GameInstance.Singleton.ExpTree;
@@ -403,7 +403,7 @@ namespace MultiplayerARPG
                     uiNextLevelItem.Hide();
                 else
                 {
-                    uiNextLevelItem.Setup(new CharacterItemTuple(CharacterItem, (short)(Level + 1), InventoryType), character, indexOfData);
+                    uiNextLevelItem.Setup(new CharacterItemTuple(CharacterItem, (short)(Level + 1), InventoryType), Character, IndexOfData);
                     uiNextLevelItem.Show();
                 }
             }
@@ -540,7 +540,7 @@ namespace MultiplayerARPG
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
 
-            BasePlayerCharacterController.OwningCharacter.RequestEquipItem((short)indexOfData);
+            OwningCharacter.RequestEquipItem((short)IndexOfData);
         }
 
         public void OnClickUnEquip()
@@ -552,7 +552,7 @@ namespace MultiplayerARPG
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
 
-            BasePlayerCharacterController.OwningCharacter.RequestUnEquipItem((byte)InventoryType, (short)indexOfData);
+            OwningCharacter.RequestUnEquipItem((byte)InventoryType, (short)IndexOfData);
         }
 
         public void OnClickDrop()
@@ -565,7 +565,7 @@ namespace MultiplayerARPG
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                BasePlayerCharacterController.OwningCharacter.RequestDropItem((short)indexOfData, 1);
+                OwningCharacter.RequestDropItem((short)IndexOfData, 1);
             }
             else
                 UISceneGlobal.Singleton.ShowInputDialog(dropInputTitle, dropInputDescription, OnDropAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
@@ -575,7 +575,7 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            BasePlayerCharacterController.OwningCharacter.RequestDropItem((short)indexOfData, (short)amount);
+            OwningCharacter.RequestDropItem((short)IndexOfData, (short)amount);
         }
 
         public void OnClickSell()
@@ -583,12 +583,12 @@ namespace MultiplayerARPG
             // Only unequipped equipment can be sell
             if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
                 return;
-            
+
             if (CharacterItem.amount == 1)
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                BasePlayerCharacterController.OwningCharacter.RequestSellItem((short)indexOfData, 1);
+                OwningCharacter.RequestSellItem((short)IndexOfData, 1);
             }
             else
                 UISceneGlobal.Singleton.ShowInputDialog(sellInputTitle, sellInputDescription, OnSellItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
@@ -598,7 +598,7 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            BasePlayerCharacterController.OwningCharacter.RequestSellItem((short)indexOfData, (short)amount);
+            OwningCharacter.RequestSellItem((short)IndexOfData, (short)amount);
         }
 
         public void OnClickSetDealingItem()
@@ -606,12 +606,12 @@ namespace MultiplayerARPG
             // Only unequipped equipment can be sell
             if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
                 return;
-            
+
             if (CharacterItem.amount == 1)
             {
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
-                BasePlayerCharacterController.OwningCharacter.RequestSetDealingItem((short)indexOfData, 1);
+                OwningCharacter.RequestSetDealingItem((short)IndexOfData, 1);
             }
             else
                 UISceneGlobal.Singleton.ShowInputDialog(setDealingInputTitle, setDealingInputDescription, OnSetDealingItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
@@ -621,7 +621,7 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            BasePlayerCharacterController.OwningCharacter.RequestSetDealingItem((short)indexOfData, (short)amount);
+            OwningCharacter.RequestSetDealingItem((short)IndexOfData, (short)amount);
         }
 
         public void OnClickSetRefineItem()
@@ -629,12 +629,12 @@ namespace MultiplayerARPG
             // Only unequipped equipment can refining
             if (!IsOwningCharacter())
                 return;
-            
+
             UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
             if (uiGameplay.uiRefineItem != null &&
                 CharacterItem.GetEquipmentItem() != null)
             {
-                uiGameplay.uiRefineItem.Setup(InventoryType, character, indexOfData);
+                uiGameplay.uiRefineItem.Setup(InventoryType, IndexOfData);
                 uiGameplay.uiRefineItem.Show();
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();

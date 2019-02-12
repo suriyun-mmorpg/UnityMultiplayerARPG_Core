@@ -82,12 +82,12 @@ namespace MultiplayerARPG
 
             if (coolDownRemainsDuration <= 0f)
             {
-                if (character != null && Skill != null)
+                if (Character != null && Skill != null)
                 {
-                    int indexOfSkillUsage = character.IndexOfSkillUsage(Skill.DataId, SkillUsageType.Skill);
+                    int indexOfSkillUsage = Character.IndexOfSkillUsage(Skill.DataId, SkillUsageType.Skill);
                     if (indexOfSkillUsage >= 0)
                     {
-                        coolDownRemainsDuration = character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
+                        coolDownRemainsDuration = Character.SkillUsages[indexOfSkillUsage].coolDownRemainsDuration;
                         if (coolDownRemainsDuration <= 1f)
                             coolDownRemainsDuration = 0f;
                     }
@@ -121,7 +121,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            if (IsOwningCharacter() && Skill.CanLevelUp(BasePlayerCharacterController.OwningCharacter, Level))
+            if (IsOwningCharacter() && Skill.CanLevelUp(OwningCharacter, Level))
                 onAbleToLevelUp.Invoke();
             else
                 onUnableToLevelUp.Invoke();
@@ -284,7 +284,7 @@ namespace MultiplayerARPG
                     uiNextLevelSkill.Hide();
                 else
                 {
-                    uiNextLevelSkill.Setup(new CharacterSkillTuple(CharacterSkill, (short)(Level + 1)), character, indexOfData);
+                    uiNextLevelSkill.Setup(new CharacterSkillTuple(CharacterSkill, (short)(Level + 1)), Character, IndexOfData);
                     uiNextLevelSkill.Show();
                 }
             }
@@ -292,11 +292,7 @@ namespace MultiplayerARPG
 
         public void OnClickAdd()
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter == null)
-                return;
-
-            owningCharacter.RequestAddSkill(Skill.DataId);
+            OwningCharacter.RequestAddSkill(Skill.DataId);
         }
     }
 }

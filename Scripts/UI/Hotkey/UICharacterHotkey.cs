@@ -1,10 +1,9 @@
 ﻿using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public partial class UICharacterHotkey : UISelectionEntry<CharacterHotkey>, IDropHandler
+    public partial class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
     {
         public int indexOfData { get; protected set; }
         public string hotkeyId { get { return Data.hotkeyId; } }
@@ -13,17 +12,6 @@ namespace MultiplayerARPG
         public UICharacterSkill uiCharacterSkill;
         public UICharacterItem uiCharacterItem;
         public UICharacterHotkeyAssigner uiAssigner;
-
-        private RectTransform dropRect;
-        public RectTransform DropRect
-        {
-            get
-            {
-                if (dropRect == null)
-                    dropRect = transform as RectTransform;
-                return dropRect;
-            }
-        }
 
         public void Setup(UICharacterHotkeys uiCharacterHotkeys, CharacterHotkey data, int indexOfData)
         {
@@ -63,21 +51,15 @@ namespace MultiplayerARPG
             if (uiCharacterSkill == null && uiCharacterHotkeys != null && uiCharacterHotkeys.uiCharacterSkillPrefab != null)
             {
                 uiCharacterSkill = Instantiate(uiCharacterHotkeys.uiCharacterSkillPrefab, transform);
-                RectTransform rectTransform = uiCharacterSkill.transform as RectTransform;
-                rectTransform.localPosition = Vector2.zero + Vector2.right * rectTransform.sizeDelta.x / 2 + Vector2.down * rectTransform.sizeDelta.y / 2;
-                rectTransform.rotation = Quaternion.identity;
-                rectTransform.localScale = Vector3.one;
-                rectTransform.SetAsFirstSibling();
+                GenericUtils.SetAndStretchToParentSize(uiCharacterSkill.transform as RectTransform, transform as RectTransform);
+                uiCharacterSkill.transform.SetAsFirstSibling();
             }
 
             if (uiCharacterItem == null && uiCharacterHotkeys != null && uiCharacterHotkeys.uiCharacterItemPrefab != null)
             {
                 uiCharacterItem = Instantiate(uiCharacterHotkeys.uiCharacterItemPrefab, transform);
-                RectTransform rectTransform = uiCharacterItem.transform as RectTransform;
-                rectTransform.localPosition = Vector2.zero + Vector2.right * rectTransform.sizeDelta.x / 2 + Vector2.down * rectTransform.sizeDelta.y / 2;
-                rectTransform.rotation = Quaternion.identity;
-                rectTransform.localScale = Vector3.one;
-                rectTransform.SetAsFirstSibling();
+                GenericUtils.SetAndStretchToParentSize(uiCharacterItem.transform as RectTransform, transform as RectTransform);
+                uiCharacterItem.transform.SetAsFirstSibling();
             }
 
             if (uiCharacterSkill != null)
@@ -94,10 +76,7 @@ namespace MultiplayerARPG
                         uiCharacterSkill.Show();
                         UICharacterSkillDragHandler dragHandler = uiCharacterSkill.GetComponentInChildren<UICharacterSkillDragHandler>();
                         if (dragHandler != null)
-                        {
-                            dragHandler.sourceLocation = UICharacterSkillDragHandler.SourceLocation.Hotkey;
-                            dragHandler.hotkeyId = hotkeyId;
-                        }
+                            dragHandler.SetupForHotkey(this);
                     }
                     else
                         uiCharacterSkill.Hide();
@@ -118,10 +97,7 @@ namespace MultiplayerARPG
                         uiCharacterItem.Show();
                         UICharacterItemDragHandler dragHandler = uiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
                         if (dragHandler != null)
-                        {
-                            dragHandler.sourceLocation = UICharacterItemDragHandler.SourceLocation.Hotkey;
-                            dragHandler.uiCharacterHotkey = this;
-                        }
+                            dragHandler.SetupForHotkey(this);
                     }
                     else
                         uiCharacterItem.Hide();
@@ -143,38 +119,6 @@ namespace MultiplayerARPG
             BasePlayerCharacterController owningCharacterController = BasePlayerCharacterController.Singleton;
             if (owningCharacterController != null)
                 owningCharacterController.UseHotkey(indexOfData);
-        }
-
-        public void OnDrop(PointerEventData eventData)
-        {
-            if (RectTransformUtility.RectangleContainsScreenPoint(DropRect, Input.mousePosition))
-            {
-                BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-                if (owningCharacter == null)
-                    return;
-                UIDragHandler dragHandler = eventData.pointerDrag.GetComponent<UIDragHandler>();
-                if (dragHandler != null)
-                {
-                    UICharacterItemDragHandler draggedItemUI = dragHandler as UICharacterItemDragHandler;
-                    if (draggedItemUI != null)
-                    {
-                        if (CanAssignCharacterItem(draggedItemUI.CacheUI.Data.characterItem))
-                        {
-                            // Assign item to hotkey
-                            owningCharacter.RequestAssignHotkey(Data.hotkeyId, HotkeyType.Item, draggedItemUI.CacheUI.Data.characterItem.dataId);
-                        }
-                    }
-                    UICharacterSkillDragHandler draggedSkillUI = dragHandler as UICharacterSkillDragHandler;
-                    if (draggedSkillUI != null)
-                    {
-                        if (CanAssignCharacterSkill(draggedSkillUI.CacheUI.Data.characterSkill))
-                        {
-                            // Assign item to hotkey
-                            owningCharacter.RequestAssignHotkey(Data.hotkeyId, HotkeyType.Skill, draggedSkillUI.CacheUI.Data.characterSkill.dataId);
-                        }
-                    }
-                }
-            }
         }
 
         public bool CanAssignCharacterItem(CharacterItem characterItem)

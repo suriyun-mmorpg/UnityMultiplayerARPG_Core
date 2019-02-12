@@ -173,4 +173,15 @@ public static class GenericUtils
     {
         return Random.value > 0.5f ? 1 : -1;
     }
+
+    public static void SetAndStretchToParentSize(this RectTransform rect, RectTransform parentRect)
+    {
+        rect.SetParent(parentRect);
+        rect.anchorMin = new Vector2(0, 0);
+        rect.anchorMax = new Vector2(1, 1);
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.sizeDelta = parentRect.rect.size;
+        rect.anchoredPosition = Vector2.zero;
+        rect.localScale = Vector2.one;
+    }
 }

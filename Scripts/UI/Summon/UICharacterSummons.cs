@@ -69,7 +69,7 @@ namespace MultiplayerARPG
             if (uiSummonDialog != null)
             {
                 uiSummonDialog.selectionManager = CacheCharacterSummonSelectionManager;
-                uiSummonDialog.Setup(ui.Data, character, ui.indexOfData);
+                uiSummonDialog.Setup(ui.Data, character, ui.IndexOfData);
                 uiSummonDialog.Show();
             }
         }

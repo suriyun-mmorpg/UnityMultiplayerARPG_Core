@@ -83,7 +83,7 @@ namespace MultiplayerARPG
                 {
                     UIQuestTask uiQuestTask = ui.GetComponent<UIQuestTask>();
                     bool isComplete = false;
-                    int progress = Data.GetProgress(character, index, out isComplete);
+                    int progress = Data.GetProgress(Character, index, out isComplete);
                     uiQuestTask.Data = new QuestTaskProgressTuple(task, progress);
                     uiQuestTask.Show();
                 });
@@ -94,7 +94,7 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             bool isComplete = CharacterQuest.isComplete;
-            bool isAllTasksDone = CharacterQuest.IsAllTasksDone(character);
+            bool isAllTasksDone = CharacterQuest.IsAllTasksDone(Character);
 
             string titleFormat = isComplete ? questCompleteTitleFormat : (isAllTasksDone ? questTasksCompleteTitleFormat : questOnGoingTitleFormat);
 

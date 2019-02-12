@@ -43,6 +43,11 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         }
     }
 
+    public virtual bool CanDrag { get { return true; } }
+
+    [System.NonSerialized]
+    public bool isDropped;
+
     private int defaultSiblingIndex;
     private Transform defaultParent;
     private Vector3 defaultLocalPosition;
@@ -51,6 +56,9 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     public virtual void OnBeginDrag(PointerEventData eventData)
     {
+        if (!CanDrag)
+            return;
+        isDropped = false;
         defaultSiblingIndex = rootTransform.GetSiblingIndex();
         defaultParent = rootTransform.parent;
         defaultLocalPosition = rootTransform.localPosition;
@@ -73,11 +81,15 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     public virtual void OnDrag(PointerEventData eventData)
     {
+        if (!CanDrag)
+            return;
         rootTransform.position = Input.mousePosition;
     }
 
     public virtual void OnEndDrag(PointerEventData eventData)
     {
+        if (!CanDrag)
+            return;
         rootTransform.SetParent(defaultParent);
         rootTransform.SetSiblingIndex(defaultSiblingIndex);
         rootTransform.localPosition = defaultLocalPosition;

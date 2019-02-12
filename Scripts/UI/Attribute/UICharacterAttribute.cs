@@ -30,7 +30,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            if (IsOwningCharacter() && BasePlayerCharacterController.OwningCharacter.StatPoint > 0)
+            if (IsOwningCharacter() && OwningCharacter.StatPoint > 0)
                 onAbleToIncrease.Invoke();
             else
                 onUnableToIncrease.Invoke();
@@ -57,11 +57,7 @@ namespace MultiplayerARPG
 
         public void OnClickAdd()
         {
-            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (owningCharacter == null)
-                return;
-
-            owningCharacter.RequestAddAttribute(Attribute.DataId);
+            OwningCharacter.RequestAddAttribute(Attribute.DataId);
         }
     }
 }

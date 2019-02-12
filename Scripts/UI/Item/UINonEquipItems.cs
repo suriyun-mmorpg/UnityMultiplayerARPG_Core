@@ -60,7 +60,7 @@ namespace MultiplayerARPG
             if (uiItemDialog != null && ui.Data.characterItem.IsValid())
             {
                 uiItemDialog.selectionManager = CacheNonEquipItemSelectionManager;
-                uiItemDialog.Setup(ui.Data, character, ui.indexOfData);
+                uiItemDialog.Setup(ui.Data, character, ui.IndexOfData);
                 uiItemDialog.Show();
             }
         }
@@ -104,7 +104,7 @@ namespace MultiplayerARPG
                 uiCharacterItem.Show();
                 UICharacterItemDragHandler dragHandler = uiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
                 if (dragHandler != null)
-                    dragHandler.sourceLocation = UICharacterItemDragHandler.SourceLocation.NonEquipItems;
+                    dragHandler.SetupForNonEquipItems(uiCharacterItem);
                 CacheNonEquipItemSelectionManager.Add(uiCharacterItem);
                 if (selectedIdx == index)
                     uiCharacterItem.OnClickSelect();

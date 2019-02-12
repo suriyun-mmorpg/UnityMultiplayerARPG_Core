@@ -49,8 +49,9 @@ namespace MultiplayerARPG
             {
                 if (summoner == null)
                 {
-                    if (Manager.Assets.SpawnedObjects.ContainsKey(summonerObjectId.Value))
-                        summoner = Manager.Assets.SpawnedObjects[summonerObjectId.Value].GetComponent<BaseCharacterEntity>();
+                    LiteNetLibIdentity identity;
+                    if (Manager.Assets.TryGetSpawnedObject(summonerObjectId.Value, out identity))
+                        summoner = identity.GetComponent<BaseCharacterEntity>();
                 }
                 return summoner;
             }
