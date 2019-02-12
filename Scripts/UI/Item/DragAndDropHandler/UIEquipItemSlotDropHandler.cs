@@ -5,7 +5,7 @@ namespace MultiplayerARPG
 {
     public class UIEquipItemSlotDropHandler : MonoBehaviour, IDropHandler
     {
-        public UICharacterItem uicharacterItem;
+        public UICharacterItem uiCharacterItem;
 
         private RectTransform dropRect;
         public RectTransform DropRect
@@ -20,13 +20,13 @@ namespace MultiplayerARPG
 
         private void Start()
         {
-            if (uicharacterItem == null)
-                uicharacterItem = GetComponent<UICharacterItem>();
+            if (uiCharacterItem == null)
+                uiCharacterItem = GetComponent<UICharacterItem>();
         }
 
         public void OnDrop(PointerEventData eventData)
         {
-            if (uicharacterItem == null)
+            if (uiCharacterItem == null)
             {
                 Debug.LogWarning("[UIEquipItemSlotDropHandler] `uicharacterItem` is empty");
                 return;
@@ -50,7 +50,7 @@ namespace MultiplayerARPG
                                 break;
                             case UICharacterItemDragHandler.SourceLocation.NonEquipItems:
                                 // If dropped non equip item to equip slot, equip it
-                                owningCharacter.RequestEquipItem((short)draggedItemUI.uiCharacterItem.IndexOfData, (byte)uicharacterItem.InventoryType, (short)uicharacterItem.IndexOfData);
+                                owningCharacter.RequestEquipItem((short)draggedItemUI.uiCharacterItem.IndexOfData, (byte)uiCharacterItem.InventoryType, (short)uiCharacterItem.IndexOfData);
                                 break;
                         }
                     }
