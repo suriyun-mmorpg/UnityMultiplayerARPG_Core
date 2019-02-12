@@ -41,24 +41,54 @@ namespace MultiplayerARPG
                     BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
                     if (owningCharacter == null)
                         return;
+
+                    string swappingHotkeyId = string.Empty;
+                    HotkeyType swappingType = HotkeyType.None;
+                    int swappingDataId = 0;
                     // If dragged item UI
                     UICharacterItemDragHandler draggedItemUI = dragHandler as UICharacterItemDragHandler;
                     if (draggedItemUI != null)
                     {
+                        if (draggedItemUI.sourceLocation == UICharacterItemDragHandler.SourceLocation.Hotkey)
+                        {
+                            swappingHotkeyId = draggedItemUI.uiCharacterHotkey.Data.hotkeyId;
+                            swappingType = uiCharacterHotkey.Data.type;
+                            swappingDataId = uiCharacterHotkey.Data.dataId;
+                        }
+
                         if (uiCharacterHotkey.CanAssignCharacterItem(draggedItemUI.CacheUI.Data.characterItem))
                         {
                             // Assign item to hotkey
                             owningCharacter.RequestAssignHotkey(uiCharacterHotkey.Data.hotkeyId, HotkeyType.Item, draggedItemUI.CacheUI.Data.characterItem.dataId);
+                        }
+
+                        if (draggedItemUI.sourceLocation == UICharacterItemDragHandler.SourceLocation.Hotkey)
+                        {
+                            // Swap key
+                            owningCharacter.RequestAssignHotkey(swappingHotkeyId, swappingType, swappingDataId);
                         }
                     }
                     // If dragged skill UI
                     UICharacterSkillDragHandler draggedSkillUI = dragHandler as UICharacterSkillDragHandler;
                     if (draggedSkillUI != null)
                     {
+                        if (draggedSkillUI.sourceLocation == UICharacterSkillDragHandler.SourceLocation.Hotkey)
+                        {
+                            swappingHotkeyId = draggedSkillUI.uiCharacterHotkey.Data.hotkeyId;
+                            swappingType = uiCharacterHotkey.Data.type;
+                            swappingDataId = uiCharacterHotkey.Data.dataId;
+                        }
+
                         if (uiCharacterHotkey.CanAssignCharacterSkill(draggedSkillUI.CacheUI.Data.characterSkill))
                         {
                             // Assign item to hotkey
                             owningCharacter.RequestAssignHotkey(uiCharacterHotkey.Data.hotkeyId, HotkeyType.Skill, draggedSkillUI.CacheUI.Data.characterSkill.dataId);
+                        }
+
+                        if (draggedSkillUI.sourceLocation == UICharacterSkillDragHandler.SourceLocation.Hotkey)
+                        {
+                            // Swap key
+                            owningCharacter.RequestAssignHotkey(swappingHotkeyId, swappingType, swappingDataId);
                         }
                     }
                 }
