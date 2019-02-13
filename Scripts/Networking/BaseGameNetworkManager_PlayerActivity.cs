@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace MultiplayerARPG
 {
@@ -797,10 +798,10 @@ namespace MultiplayerARPG
                     respawnMapName = CurrentMapInfo.overrideRespawnPointScene.SceneName;
                 respawnPosition = CurrentMapInfo.overrideRespawnPointPosition;
             }
-            WarpCharacter(playerCharacterEntity, respawnMapName, respawnPosition);
+            WarpCharacter(playerCharacterEntity, respawnMapName, respawnPosition, false);
         }
 
-        public virtual void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        public virtual void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool isInstanceMap)
         {
             if (!CanWarpCharacter(playerCharacterEntity))
                 return;
@@ -1080,9 +1081,26 @@ namespace MultiplayerARPG
         }
         #endregion
 
+        public virtual string GetCurrentMapName(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            return SceneManager.GetActiveScene().name;
+        }
+
+        public virtual Vector3 GetCurrentPosition(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            return playerCharacterEntity.CacheTransform.position;
+        }
+
+        public virtual void SetCurrentPosition(BasePlayerCharacterEntity playerCharacterEntity, Vector3 position)
+        {
+            playerCharacterEntity.CacheNetTransform.Teleport(position, playerCharacterEntity.CacheTransform.rotation);
+            playerCharacterEntity.CacheTransform.position = position;
+        }
+
         public abstract void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem);
         public abstract void CreateGuild(BasePlayerCharacterEntity playerCharacterEntity, string guildName);
         public abstract void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position);
         public abstract void WarpCharacterToInstanceFollowPartyLeader(BasePlayerCharacterEntity playerCharacterEntity);
+        public abstract bool IsInstanceMap();
     }
 }

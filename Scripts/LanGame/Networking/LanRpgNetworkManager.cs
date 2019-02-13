@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 
 namespace MultiplayerARPG
 {
-    public partial class LanRpgNetworkManager : BaseGameNetworkManager
+    public sealed partial class LanRpgNetworkManager : BaseGameNetworkManager
     {
         public enum GameStartType
         {
@@ -166,15 +166,15 @@ namespace MultiplayerARPG
             worldSaveData.SavePersistentWorldData(playerCharacterEntity.Id, playerCharacterEntity.CurrentMapName);
         }
 
-        public override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        public override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool isInstanceMap)
         {
             if (!CanWarpCharacter(playerCharacterEntity))
                 return;
-            base.WarpCharacter(playerCharacterEntity, mapName, position);
-            long connectId = playerCharacterEntity.ConnectionId;
+            base.WarpCharacter(playerCharacterEntity, mapName, position, isInstanceMap);
+            long connectionId = playerCharacterEntity.ConnectionId;
             if (!string.IsNullOrEmpty(mapName) &&
                 !mapName.Equals(playerCharacterEntity.CurrentMapName) &&
-                playerCharacters.ContainsKey(connectId) &&
+                playerCharacters.ContainsKey(connectionId) &&
                 playerCharacterEntity.IsServer &&
                 playerCharacterEntity.IsOwnerClient)
             {
@@ -187,13 +187,18 @@ namespace MultiplayerARPG
         {
             // For now just warp follow host
             // TODO: May add instance by load scene additive and offsets for LAN mode
-            WarpCharacter(playerCharacterEntity, mapName, position);
+            WarpCharacter(playerCharacterEntity, mapName, position, true);
         }
 
         public override void WarpCharacterToInstanceFollowPartyLeader(BasePlayerCharacterEntity playerCharacterEntity)
         {
             // For now just do nothing
             // TODO: May add instance by load scene additive and offsets for LAN mode
+        }
+
+        public override bool IsInstanceMap()
+        {
+            return false;
         }
 
         #region Implement Abstract Functions
