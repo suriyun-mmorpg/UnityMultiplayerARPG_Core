@@ -20,6 +20,8 @@ namespace MultiplayerARPG
         public float autoSaveDuration = 2f;
         public GameStartType startType;
         public PlayerCharacterData selectedCharacter;
+        public bool enableGmCommandsForHost;
+        public bool enableGmCommandsForEveryone;
         private float lastSaveTime;
         private int nextPartyId = 1;
         private int nextGuildId = 1;
@@ -99,6 +101,9 @@ namespace MultiplayerARPG
             LiteNetLibIdentity identity = Assets.NetworkSpawn(entityPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
             BasePlayerCharacterEntity playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterData.CloneTo(playerCharacterEntity);
+            // TODO: Don't use fixed user level
+            if ((enableGmCommandsForHost && identity.IsOwnerClient) || enableGmCommandsForEveryone)
+                playerCharacterEntity.UserLevel = 1;
             // Summon saved summons
             for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
             {
@@ -176,6 +181,19 @@ namespace MultiplayerARPG
                 teleportPosition = position;
                 ServerSceneChange(mapName);
             }
+        }
+
+        public override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        {
+            // For now just warp follow host
+            // TODO: May add instance by load scene additive and offsets for LAN mode
+            WarpCharacter(playerCharacterEntity, mapName, position);
+        }
+
+        public override void WarpCharacterToInstanceFollowPartyLeader(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            // For now just do nothing
+            // TODO: May add instance by load scene additive and offsets for LAN mode
         }
 
         #region Implement Abstract Functions
