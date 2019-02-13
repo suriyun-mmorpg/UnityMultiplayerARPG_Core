@@ -258,32 +258,28 @@ namespace MultiplayerARPG
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseCashShopInfoMessage message = messageHandler.ReadMessage<ResponseCashShopInfoMessage>();
-            uint ackId = message.ackId;
-            transportHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
         }
 
         protected virtual void HandleResponseCashShopBuy(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseCashShopBuyMessage message = messageHandler.ReadMessage<ResponseCashShopBuyMessage>();
-            uint ackId = message.ackId;
-            transportHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
         }
 
         protected virtual void HandleResponseCashPackageInfo(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseCashPackageInfoMessage message = messageHandler.ReadMessage<ResponseCashPackageInfoMessage>();
-            uint ackId = message.ackId;
-            transportHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
         }
 
         protected virtual void HandleResponseCashPackageBuyValidation(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseCashPackageBuyValidationMessage message = messageHandler.ReadMessage<ResponseCashPackageBuyValidationMessage>();
-            uint ackId = message.ackId;
-            transportHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
         }
 
         protected virtual void HandleUpdatePartyMemberAtClient(LiteNetLibMessageHandler messageHandler)
