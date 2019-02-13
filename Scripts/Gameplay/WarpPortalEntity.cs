@@ -9,6 +9,7 @@ namespace MultiplayerARPG
         [Tooltip("Signal to tell players that their character can warp")]
         public GameObject[] warpSignals;
         public bool warpImmediatelyWhenEnter;
+        public WarpPortalType warpPortalType;
         public UnityScene mapScene;
         public Vector3 position;
 
@@ -94,7 +95,15 @@ namespace MultiplayerARPG
 
         public void EnterWarp(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            gameManager.WarpCharacter(playerCharacterEntity, mapScene, position);
+            switch (warpPortalType)
+            {
+                case WarpPortalType.Default:
+                    gameManager.WarpCharacter(playerCharacterEntity, mapScene, position, false);
+                    break;
+                case WarpPortalType.EnterInstance:
+                    gameManager.WarpCharacterToInstance(playerCharacterEntity, mapScene, position);
+                    break;
+            }
         }
     }
 }
