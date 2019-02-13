@@ -76,7 +76,7 @@ namespace MultiplayerARPG
             {
                 if (itemRefineInfo == null)
                     return base.Title;
-                return "<color=" + ColorUtility.ToHtmlStringRGBA(itemRefineInfo.titleColor) + ">" + base.Title + "</color>";
+                return "<color=#" + ColorUtility.ToHtmlStringRGB(itemRefineInfo.titleColor) + ">" + base.Title + "</color>";
             }
         }
 
@@ -86,7 +86,7 @@ namespace MultiplayerARPG
             {
                 if (itemRefineInfo == null)
                     return "Normal";
-                return "<color=" + ColorUtility.ToHtmlStringRGBA(itemRefineInfo.titleColor) + ">" + itemRefineInfo.title + "</color>";
+                return "<color=#" + ColorUtility.ToHtmlStringRGB(itemRefineInfo.titleColor) + ">" + itemRefineInfo.title + "</color>";
             }
         }
 
