@@ -7,23 +7,14 @@ using UnityEngine.SceneManagement;
 
 public static class GenericUtils
 {
-    private static string findInputFieldScene = string.Empty;
     private static List<InputField> inputFields;
 #if USE_TEXT_MESH_PRO
     private static List<TMP_InputField> textMeshInputFields;
 #endif
+    private static bool isSetOnActiveSceneChanged_ResetInputField;
 
     public static bool IsFocusInputField()
     {
-        if (!findInputFieldScene.Equals(SceneManager.GetActiveScene().name))
-        {
-            inputFields = null;
-#if USE_TEXT_MESH_PRO
-            textMeshInputFields = null;
-#endif
-            findInputFieldScene = SceneManager.GetActiveScene().name;
-        }
-
         GameObject[] rootObjects;
 #if USE_TEXT_MESH_PRO
         if (inputFields == null || textMeshInputFields == null)
@@ -61,7 +52,20 @@ public static class GenericUtils
                 return true;
         }
 #endif
+        if (!isSetOnActiveSceneChanged_ResetInputField)
+        {
+            SceneManager.activeSceneChanged += OnActiveSceneChanged_ResetInputField;
+            isSetOnActiveSceneChanged_ResetInputField = true;
+        }
         return false;
+    }
+
+    public static void OnActiveSceneChanged_ResetInputField(Scene scene1, Scene scene2)
+    {
+        inputFields = null;
+#if USE_TEXT_MESH_PRO
+        textMeshInputFields = null;
+#endif
     }
 
     public static void SetLayerRecursively(this GameObject gameObject, int layerIndex, bool includeInactive)
