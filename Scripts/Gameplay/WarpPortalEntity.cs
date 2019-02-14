@@ -8,7 +8,10 @@ namespace MultiplayerARPG
         public GameObject[] warpSignals;
         public bool warpImmediatelyWhenEnter;
         public WarpPortalType type;
-        public MapInfo map;
+        [System.Obsolete("`Map` is deprecated, use `Map Info` instead")]
+        [Tooltip("`Map` is deprecated, use `Map Info` instead")]
+        public UnityScene mapScene;
+        public MapInfo mapInfo;
         public Vector3 position;
 
         protected override void EntityAwake()
@@ -93,10 +96,10 @@ namespace MultiplayerARPG
 
         public void EnterWarp(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            if (map == null)
+            if (mapInfo == null)
                 gameManager.WarpCharacter(type, playerCharacterEntity, playerCharacterEntity.CurrentMapName, position);
             else
-                gameManager.WarpCharacter(type, playerCharacterEntity, map.Id, position);
+                gameManager.WarpCharacter(type, playerCharacterEntity, mapInfo.Id, position);
         }
     }
 }
