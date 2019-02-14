@@ -39,6 +39,7 @@ namespace MultiplayerARPG
             gold.onChange += OnGoldChange;
             partyId.onChange += OnPartyIdChange;
             guildId.onChange += OnGuildIdChange;
+            isWarping.onChange += OnIsWarpingChange;
             // On list changes events
             hotkeys.onOperation += OnHotkeysOperation;
             quests.onOperation += OnQuestsOperation;
@@ -165,6 +166,7 @@ namespace MultiplayerARPG
             gold.onChange -= OnGoldChange;
             partyId.onChange -= OnPartyIdChange;
             guildId.onChange -= OnGuildIdChange;
+            isWarping.onChange -= OnIsWarpingChange;
             // On list changes events
             hotkeys.onOperation -= OnHotkeysOperation;
             quests.onOperation -= OnQuestsOperation;
