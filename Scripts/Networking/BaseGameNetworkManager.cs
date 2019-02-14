@@ -678,8 +678,8 @@ namespace MultiplayerARPG
                         {
                             LiteNetLibIdentity warpPortalIdentity = Assets.NetworkSpawn(warpPortalPrefab.Identity, warpPortal.position, Quaternion.identity);
                             WarpPortalEntity warpPortalEntity = warpPortalIdentity.GetComponent<WarpPortalEntity>();
-                            warpPortalEntity.warpPortalType = warpPortal.warpPortalType;
-                            warpPortalEntity.mapScene.SceneName = warpPortal.warpToMap.SceneName;
+                            warpPortalEntity.type = warpPortal.warpPortalType;
+                            warpPortalEntity.map = warpPortal.warpToMap;
                             warpPortalEntity.position = warpPortal.warpToPosition;
                         }
                     }

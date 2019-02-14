@@ -166,11 +166,11 @@ namespace MultiplayerARPG
             worldSaveData.SavePersistentWorldData(playerCharacterEntity.Id, playerCharacterEntity.CurrentMapName);
         }
 
-        public override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool isInstanceMap)
+        protected override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
         {
             if (!CanWarpCharacter(playerCharacterEntity))
                 return;
-            base.WarpCharacter(playerCharacterEntity, mapName, position, isInstanceMap);
+            base.WarpCharacter(playerCharacterEntity, mapName, position);
             long connectionId = playerCharacterEntity.ConnectionId;
             if (!string.IsNullOrEmpty(mapName) &&
                 !mapName.Equals(playerCharacterEntity.CurrentMapName) &&
@@ -183,20 +183,14 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        protected override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
         {
             // For now just warp follow host
             // TODO: May add instance by load scene additive and offsets for LAN mode
-            WarpCharacter(playerCharacterEntity, mapName, position, true);
+            WarpCharacter(playerCharacterEntity, mapName, position);
         }
 
-        public override void WarpCharacterToInstanceFollowPartyLeader(BasePlayerCharacterEntity playerCharacterEntity)
-        {
-            // For now just do nothing
-            // TODO: May add instance by load scene additive and offsets for LAN mode
-        }
-
-        public override bool IsInstanceMap()
+        protected override bool IsInstanceMap()
         {
             return false;
         }

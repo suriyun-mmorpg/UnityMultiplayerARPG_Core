@@ -3,7 +3,7 @@
     [System.Serializable]
     public struct WarpPortals
     {
-        public UnityScene map;
+        public MapInfo mapInfo;
         public WarpPortal[] warpPortals;
     }
 }

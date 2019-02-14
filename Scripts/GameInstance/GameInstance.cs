@@ -403,20 +403,18 @@ namespace MultiplayerARPG
             UISceneLoading.Singleton.LoadScene(homeScene);
         }
 
-        public List<string> GetGameScenes()
+        public List<string> GetGameMapIds()
         {
-            List<string> scenes = new List<string>();
-            foreach (string sceneName in MapInfos.Keys)
+            List<string> mapIds = new List<string>();
+            foreach (MapInfo mapInfo in MapInfos.Values)
             {
-                if (sceneName != null &&
-                    !string.IsNullOrEmpty(sceneName) &&
-                    !scenes.Contains(sceneName))
-                    scenes.Add(sceneName);
+                if (mapInfo != null && !string.IsNullOrEmpty(mapInfo.Id) && !mapIds.Contains(mapInfo.Id))
+                    mapIds.Add(mapInfo.Id);
             }
 
-            return scenes;
+            return mapIds;
         }
-        
+
         public int GetTargetLayerMask()
         {
             int layerMask = 0;
@@ -705,12 +703,12 @@ namespace MultiplayerARPG
             List<WarpPortalEntity> warpPortalEntities = new List<WarpPortalEntity>();
             foreach (WarpPortals mapWarpPortal in mapWarpPortals)
             {
-                if (mapWarpPortal.map == null || string.IsNullOrEmpty(mapWarpPortal.map.SceneName))
+                if (mapWarpPortal.mapInfo == null)
                     continue;
-                if (MapWarpPortals.ContainsKey(mapWarpPortal.map.SceneName))
-                    MapWarpPortals[mapWarpPortal.map.SceneName].AddRange(mapWarpPortal.warpPortals);
+                if (MapWarpPortals.ContainsKey(mapWarpPortal.mapInfo.Id))
+                    MapWarpPortals[mapWarpPortal.mapInfo.Id].AddRange(mapWarpPortal.warpPortals);
                 else
-                    MapWarpPortals[mapWarpPortal.map.SceneName] = new List<WarpPortal>(mapWarpPortal.warpPortals);
+                    MapWarpPortals[mapWarpPortal.mapInfo.Id] = new List<WarpPortal>(mapWarpPortal.warpPortals);
                 foreach (WarpPortal warpPortal in mapWarpPortal.warpPortals)
                 {
                     if (warpPortal.entityPrefab != null)
@@ -728,12 +726,12 @@ namespace MultiplayerARPG
             List<NpcDialog> npcDialogs = new List<NpcDialog>();
             foreach (Npcs mapNpc in mapNpcs)
             {
-                if (mapNpc.map == null || string.IsNullOrEmpty(mapNpc.map.SceneName))
+                if (mapNpc.mapInfo == null)
                     continue;
-                if (MapNpcs.ContainsKey(mapNpc.map.SceneName))
-                    MapNpcs[mapNpc.map.SceneName].AddRange(mapNpc.npcs);
+                if (MapNpcs.ContainsKey(mapNpc.mapInfo.Id))
+                    MapNpcs[mapNpc.mapInfo.Id].AddRange(mapNpc.npcs);
                 else
-                    MapNpcs[mapNpc.map.SceneName] = new List<Npc>(mapNpc.npcs);
+                    MapNpcs[mapNpc.mapInfo.Id] = new List<Npc>(mapNpc.npcs);
                 foreach (Npc npc in mapNpc.npcs)
                 {
                     if (npc.entityPrefab != null)
@@ -752,9 +750,9 @@ namespace MultiplayerARPG
                 return;
             foreach (MapInfo mapInfo in mapInfos)
             {
-                if (mapInfo.scene == null || string.IsNullOrEmpty(mapInfo.scene.SceneName))
+                if (mapInfo == null)
                     continue;
-                MapInfos[mapInfo.scene.SceneName] = mapInfo;
+                MapInfos[mapInfo.Id] = mapInfo;
             }
         }
     }

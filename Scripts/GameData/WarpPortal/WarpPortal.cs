@@ -8,7 +8,7 @@ namespace MultiplayerARPG
         public WarpPortalEntity entityPrefab;
         public Vector3 position;
         public WarpPortalType warpPortalType;
-        public UnityScene warpToMap;
+        public MapInfo warpToMap;
         public Vector3 warpToPosition;
     }
 }

@@ -152,10 +152,10 @@ namespace MultiplayerARPG
             playerCharacter.CloneTo(characterData);
             GameInstance gameInstance = GameInstance.Singleton;
             LanRpgNetworkManager networkManager = BaseGameNetworkManager.Singleton as LanRpgNetworkManager;
-            if (!gameInstance.GetGameScenes().Contains(characterData.CurrentMapName))
+            if (!gameInstance.GetGameMapIds().Contains(characterData.CurrentMapName))
             {
                 MapInfo startMap = (characterData.GetDatabase() as PlayerCharacter).StartMap;
-                characterData.CurrentMapName = startMap.scene.SceneName;
+                characterData.CurrentMapName = startMap.Id;
                 characterData.CurrentPosition = startMap.startPosition;
             }
             networkManager.Assets.onlineScene.SceneName = characterData.CurrentMapName;

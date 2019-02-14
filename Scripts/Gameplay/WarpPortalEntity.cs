@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -9,8 +7,8 @@ namespace MultiplayerARPG
         [Tooltip("Signal to tell players that their character can warp")]
         public GameObject[] warpSignals;
         public bool warpImmediatelyWhenEnter;
-        public WarpPortalType warpPortalType;
-        public UnityScene mapScene;
+        public WarpPortalType type;
+        public MapInfo map;
         public Vector3 position;
 
         protected override void EntityAwake()
@@ -95,15 +93,10 @@ namespace MultiplayerARPG
 
         public void EnterWarp(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            switch (warpPortalType)
-            {
-                case WarpPortalType.Default:
-                    gameManager.WarpCharacter(playerCharacterEntity, mapScene, position, false);
-                    break;
-                case WarpPortalType.EnterInstance:
-                    gameManager.WarpCharacterToInstance(playerCharacterEntity, mapScene, position);
-                    break;
-            }
+            if (map == null)
+                gameManager.WarpCharacter(type, playerCharacterEntity, playerCharacterEntity.CurrentMapName, position);
+            else
+                gameManager.WarpCharacter(type, playerCharacterEntity, map.Id, position);
         }
     }
 }

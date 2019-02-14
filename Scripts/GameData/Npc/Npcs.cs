@@ -3,7 +3,7 @@
     [System.Serializable]
     public struct Npcs
     {
-        public UnityScene map;
+        public MapInfo mapInfo;
         public Npc[] npcs;
     }
 }
