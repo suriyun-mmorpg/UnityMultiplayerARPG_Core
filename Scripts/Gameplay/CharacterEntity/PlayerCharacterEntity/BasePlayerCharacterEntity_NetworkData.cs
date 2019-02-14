@@ -22,6 +22,8 @@ namespace MultiplayerARPG
         protected SyncFieldInt partyId = new SyncFieldInt();
         [SerializeField]
         protected SyncFieldInt guildId = new SyncFieldInt();
+        [SerializeField]
+        protected SyncFieldBool isWarping = new SyncFieldBool();
         [Header("Player Character - Sync Lists")]
         [SerializeField]
         protected SyncListCharacterHotkey hotkeys = new SyncListCharacterHotkey();
@@ -77,6 +79,7 @@ namespace MultiplayerARPG
         public System.Action<int> onGoldChange;
         public System.Action<int> onPartyIdChange;
         public System.Action<int> onGuildIdChange;
+        public System.Action<bool> onIsWarpingChange;
         // List
         public System.Action<LiteNetLibSyncList.Operation, int> onHotkeysOperation;
         public System.Action<LiteNetLibSyncList.Operation, int> onQuestsOperation;
@@ -89,6 +92,8 @@ namespace MultiplayerARPG
         public int Gold { get { return gold.Value; } set { gold.Value = value; } }
         public int PartyId { get { return partyId.Value; } set { partyId.Value = value; } }
         public int GuildId { get { return guildId.Value; } set { guildId.Value = value; } }
+        public string GuildName { get { return syncTitle2.Value; } set { syncTitle2.Value = value; } }
+        public bool IsWarping { get { return isWarping.Value; } set { isWarping.Value = value; } }
         public byte GuildRole { get; set; }
         public int SharedGuildExp { get; set; }
         public byte UserLevel { get; set; }
@@ -124,7 +129,7 @@ namespace MultiplayerARPG
             }
         }
         #endregion
-        
+
         public void ClearParty()
         {
             PartyId = 0;
@@ -133,6 +138,7 @@ namespace MultiplayerARPG
         public void ClearGuild()
         {
             GuildId = 0;
+            GuildName = string.Empty;
             GuildRole = 0;
             SharedGuildExp = 0;
         }
@@ -172,6 +178,12 @@ namespace MultiplayerARPG
         {
             if (onGuildIdChange != null)
                 onGuildIdChange.Invoke(guildId);
+        }
+
+        protected virtual void OnIsWarpingChange(bool isWarping)
+        {
+            if (onIsWarpingChange != null)
+                onIsWarpingChange.Invoke(isWarping);
         }
         #endregion
 

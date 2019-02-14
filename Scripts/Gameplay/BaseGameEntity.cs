@@ -16,7 +16,10 @@ namespace MultiplayerARPG
         [Header("Game Entity Settings")]
         [SerializeField]
         private string title;
+        [SerializeField]
+        private string title2;
         public Text textTitle;
+        public Text textTitle2;
         [Tooltip("These objects will be hidden on non owner objects")]
         public GameObject[] ownerObjects;
         [Tooltip("These objects will be hidden on owner objects")]
@@ -32,6 +35,19 @@ namespace MultiplayerARPG
                 title = value;
                 if (IsServer)
                     syncTitle.Value = value;
+            }
+        }
+
+        [SerializeField]
+        protected SyncFieldString syncTitle2 = new SyncFieldString();
+        public virtual string Title2
+        {
+            get { return title2; }
+            set
+            {
+                title2 = value;
+                if (IsServer)
+                    syncTitle2.Value = value;
             }
         }
 
@@ -132,6 +148,8 @@ namespace MultiplayerARPG
         {
             if (textTitle != null)
                 textTitle.text = Title;
+            if (textTitle2 != null)
+                textTitle2.text = Title2;
             EntityLateUpdate();
         }
         protected virtual void EntityLateUpdate() { }
@@ -150,6 +168,7 @@ namespace MultiplayerARPG
         protected virtual void EntityOnDestroy()
         {
             syncTitle.onChange -= OnSyncTitleChange;
+            syncTitle2.onChange -= OnSyncTitle2Change;
         }
 
         protected virtual void OnValidate()
@@ -167,6 +186,9 @@ namespace MultiplayerARPG
             syncTitle.onChange += OnSyncTitleChange;
             if (IsServer)
                 syncTitle.Value = title;
+            syncTitle2.onChange += OnSyncTitle2Change;
+            if (IsServer)
+                syncTitle2.Value = title;
             RegisterNetFunction<uint>(NetFuncPlayEffect);
         }
 
@@ -175,6 +197,8 @@ namespace MultiplayerARPG
             this.InvokeInstanceDevExtMethods("SetupNetElements");
             syncTitle.sendOptions = SendOptions.ReliableOrdered;
             syncTitle.forOwnerOnly = false;
+            syncTitle2.sendOptions = SendOptions.ReliableOrdered;
+            syncTitle2.forOwnerOnly = false;
         }
 
         #region Net Functions
@@ -209,6 +233,11 @@ namespace MultiplayerARPG
         protected virtual void OnSyncTitleChange(string syncTitle)
         {
             title = syncTitle;
+        }
+
+        protected virtual void OnSyncTitle2Change(string syncTitle2)
+        {
+            title2 = syncTitle2;
         }
 
         public bool TryGetEntityByObjectId<T>(uint objectId, out T result) where T : class

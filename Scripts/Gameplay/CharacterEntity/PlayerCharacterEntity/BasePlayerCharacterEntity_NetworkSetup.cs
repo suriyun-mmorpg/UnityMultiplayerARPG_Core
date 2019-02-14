@@ -22,6 +22,8 @@ namespace MultiplayerARPG
             partyId.forOwnerOnly = false;
             guildId.sendOptions = SendOptions.ReliableOrdered;
             guildId.forOwnerOnly = false;
+            isWarping.sendOptions = SendOptions.ReliableOrdered;
+            isWarping.forOwnerOnly = true;
 
             hotkeys.forOwnerOnly = true;
             quests.forOwnerOnly = true;

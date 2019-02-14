@@ -919,6 +919,7 @@ namespace MultiplayerARPG
             GuildData guild = new GuildData(guildId, guildName, playerCharacterEntity);
             guilds[guildId] = guild;
             playerCharacterEntity.GuildId = guildId;
+            playerCharacterEntity.GuildName = guildName;
             playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
             playerCharacterEntity.SharedGuildExp = 0;
             SendCreateGuildToClient(playerCharacterEntity.ConnectionId, guild);
@@ -997,6 +998,7 @@ namespace MultiplayerARPG
             guild.AddMember(acceptCharacterEntity);
             guilds[guildId] = guild;
             acceptCharacterEntity.GuildId = guildId;
+            acceptCharacterEntity.GuildName = guild.guildName;
             acceptCharacterEntity.GuildRole = guild.GetMemberRole(acceptCharacterEntity.Id);
             acceptCharacterEntity.SharedGuildExp = 0;
             SendCreateGuildToClient(acceptCharacterEntity.ConnectionId, guild);
