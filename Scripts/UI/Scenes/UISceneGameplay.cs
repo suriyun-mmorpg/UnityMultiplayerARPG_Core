@@ -70,6 +70,7 @@ namespace MultiplayerARPG
         public UIDealing uiDealing;
         public UIPartyInvitation uiPartyInvitation;
         public UIGuildInvitation uiGuildInvitation;
+        public UIBase uiIsWarping;
         public UIToggleUI[] toggleUis;
         [Tooltip("These GameObject (s) will ignore click / touch detection when click or touch on screen")]
         public List<GameObject> ignorePointerDetectionUis;
@@ -128,7 +129,7 @@ namespace MultiplayerARPG
 
             if (uiNonEquipItems != null)
             {
-                var list = uiCharacterNonEquipItems == null ? new List<UINonEquipItems>() : new List<UINonEquipItems>(uiCharacterNonEquipItems);
+                List<UINonEquipItems> list = uiCharacterNonEquipItems == null ? new List<UINonEquipItems>() : new List<UINonEquipItems>(uiCharacterNonEquipItems);
                 list.Add(uiNonEquipItems);
                 uiCharacterNonEquipItems = list.ToArray();
                 uiNonEquipItems = null;
@@ -137,7 +138,7 @@ namespace MultiplayerARPG
 
             if (uiSkills != null)
             {
-                var list = uiCharacterSkills == null ? new List<UICharacterSkills>() : new List<UICharacterSkills>(uiCharacterSkills);
+                List<UICharacterSkills> list = uiCharacterSkills == null ? new List<UICharacterSkills>() : new List<UICharacterSkills>(uiCharacterSkills);
                 list.Add(uiSkills);
                 uiCharacterSkills = list.ToArray();
                 uiSkills = null;
@@ -146,7 +147,7 @@ namespace MultiplayerARPG
 
             if (uiSummons != null)
             {
-                var list = uiCharacterSummons == null ? new List<UICharacterSummons>() : new List<UICharacterSummons>(uiCharacterSummons);
+                List<UICharacterSummons> list = uiCharacterSummons == null ? new List<UICharacterSummons>() : new List<UICharacterSummons>(uiCharacterSummons);
                 list.Add(uiSummons);
                 uiCharacterSummons = list.ToArray();
                 uiSummons = null;
@@ -155,7 +156,7 @@ namespace MultiplayerARPG
 
             if (uiHotkeys != null)
             {
-                var list = uiCharacterHotkeys == null ? new List<UICharacterHotkeys>() : new List<UICharacterHotkeys>(uiCharacterHotkeys);
+                List<UICharacterHotkeys> list = uiCharacterHotkeys == null ? new List<UICharacterHotkeys>() : new List<UICharacterHotkeys>(uiCharacterHotkeys);
                 list.Add(uiHotkeys);
                 uiCharacterHotkeys = list.ToArray();
                 uiHotkeys = null;
@@ -164,7 +165,7 @@ namespace MultiplayerARPG
 
             if (uiQuests != null)
             {
-                var list = uiCharacterQuests == null ? new List<UICharacterQuests>() : new List<UICharacterQuests>(uiCharacterQuests);
+                List<UICharacterQuests> list = uiCharacterQuests == null ? new List<UICharacterQuests>() : new List<UICharacterQuests>(uiCharacterQuests);
                 list.Add(uiQuests);
                 uiCharacterQuests = list.ToArray();
                 uiQuests = null;
@@ -505,6 +506,16 @@ namespace MultiplayerARPG
                 return;
             uiGuildInvitation.Data = playerCharacter;
             uiGuildInvitation.Show();
+        }
+
+        public void OnIsWarpingChange(bool isWarping)
+        {
+            if (uiIsWarping == null)
+                return;
+            if (isWarping)
+                uiIsWarping.Show();
+            else
+                uiIsWarping.Hide();
         }
 
         public bool IsPointerOverUIObject()

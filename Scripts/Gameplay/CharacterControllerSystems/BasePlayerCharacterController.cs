@@ -80,6 +80,7 @@ namespace MultiplayerARPG
                 characterEntity.onUpdateAnotherDealingItems += CacheUISceneGameplay.OnUpdateAnotherDealingItems;
                 characterEntity.onShowPartyInvitationDialog += CacheUISceneGameplay.OnShowPartyInvitation;
                 characterEntity.onShowGuildInvitationDialog += CacheUISceneGameplay.OnShowGuildInvitation;
+                characterEntity.onIsWarpingChange += CacheUISceneGameplay.OnIsWarpingChange;
 
                 CacheUISceneGameplay.UpdateCharacter();
                 CacheUISceneGameplay.UpdateSkills();
@@ -139,6 +140,7 @@ namespace MultiplayerARPG
                 characterEntity.onUpdateAnotherDealingItems -= CacheUISceneGameplay.OnUpdateAnotherDealingItems;
                 characterEntity.onShowPartyInvitationDialog -= CacheUISceneGameplay.OnShowPartyInvitation;
                 characterEntity.onShowGuildInvitationDialog -= CacheUISceneGameplay.OnShowGuildInvitation;
+                characterEntity.onIsWarpingChange -= CacheUISceneGameplay.OnIsWarpingChange;
             }
 
             if (onDesetup != null)

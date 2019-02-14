@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         #region Activity validation functions
         public virtual bool CanWarpCharacter(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            if (playerCharacterEntity == null || !IsServer)
+            if (playerCharacterEntity == null || !IsServer || playerCharacterEntity.IsWarping)
                 return false;
             return true;
         }
