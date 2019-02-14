@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,9 +8,9 @@ using UnityEngine.SceneManagement;
 public static class GenericUtils
 {
     private static string findInputFieldScene = string.Empty;
-    private static InputField[] inputFields;
+    private static List<InputField> inputFields;
 #if USE_TEXT_MESH_PRO
-    private static TMP_InputField[] textMeshInputFields;
+    private static List<TMP_InputField> textMeshInputFields;
 #endif
 
     public static bool IsFocusInputField()
@@ -23,11 +24,29 @@ public static class GenericUtils
             findInputFieldScene = SceneManager.GetActiveScene().name;
         }
 
-        if (inputFields == null)
-            inputFields = Object.FindObjectsOfType<InputField>();
+        GameObject[] rootObjects;
 #if USE_TEXT_MESH_PRO
-        if (textMeshInputFields == null)
-            textMeshInputFields = Object.FindObjectsOfType<TMP_InputField>();
+        if (inputFields == null || textMeshInputFields == null)
+        {
+            inputFields = new List<InputField>();
+            textMeshInputFields = new List<TMP_InputField>();
+            rootObjects = SceneManager.GetActiveScene().GetRootGameObjects();
+            foreach (GameObject rootObject in rootObjects)
+            {
+                inputFields.AddRange(rootObject.GetComponentsInChildren<InputField>(true));
+                textMeshInputFields.AddRange(rootObject.GetComponentsInChildren<TMP_InputField>(true));
+            }
+        }
+#else
+        if (inputFields == null)
+        {
+            inputFields = new List<InputField>();
+            rootObjects = SceneManager.GetActiveScene().GetRootGameObjects();
+            foreach (GameObject rootObject in rootObjects)
+            {
+                inputFields.AddRange(rootObject.GetComponentsInChildren<InputField>(true));
+            }
+        }
 #endif
 
         foreach (InputField inputField in inputFields)
