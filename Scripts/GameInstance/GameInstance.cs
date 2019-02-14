@@ -122,6 +122,10 @@ namespace MultiplayerARPG
         [Tooltip("This is duration to lock item before it is able to spawn later after unsummon")]
         public float petUnSummonLockDuration = 30f;
 
+        [Header("Gameplay Configs - Instance Dungeon")]
+        [Tooltip("Distance from party leader character to join instance dungeon")]
+        public float joinInstanceDungeonDistance = 20f;
+
         [Header("Game Effects")]
         public GameEffect levelUpEffect;
 
