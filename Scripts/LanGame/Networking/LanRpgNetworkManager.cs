@@ -185,6 +185,11 @@ namespace MultiplayerARPG
             {
                 SetMapInfo(mapInfo);
                 teleportPosition = position;
+                // Unregister all players characters to register later after map changed
+                foreach (LiteNetLibPlayer player in GetPlayers())
+                {
+                    UnregisterPlayerCharacter(player.ConnectionId);
+                }
                 ServerSceneChange(mapInfo.scene);
             }
         }
