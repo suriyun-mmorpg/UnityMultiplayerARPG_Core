@@ -92,6 +92,7 @@ namespace MultiplayerARPG
             BaseCharacter database = character.GetDatabase();
             if (database != null)
             {
+                CharacterSkill tempCharacterSkill;
                 Skill tempSkill;
                 int tempIndexOfSkill;
                 short tempLevel;
@@ -112,10 +113,17 @@ namespace MultiplayerARPG
                     UICharacterSkill uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
                     tempSkill = skillLevel.Key;
                     tempIndexOfSkill = character.IndexOfSkill(tempSkill.DataId);
+                    // Set character skill data
+                    if (tempIndexOfSkill >= 0)
+                        tempCharacterSkill = character.Skills[tempIndexOfSkill];
+                    else
+                        tempCharacterSkill = CharacterSkill.Create(tempSkill, 0);
+                    // Set skill level data
                     tempLevel = 0;
                     if (displayingSkills.ContainsKey(tempSkill))
                         tempLevel = displayingSkills[tempSkill];
-                    uiCharacterSkill.Setup(new CharacterSkillTuple(character.Skills[tempIndexOfSkill], tempLevel), character, tempIndexOfSkill);
+                    // Set UI data
+                    uiCharacterSkill.Setup(new CharacterSkillTuple(tempCharacterSkill, tempLevel), character, tempIndexOfSkill);
                     uiCharacterSkill.Show();
                     UICharacterSkillDragHandler dragHandler = uiCharacterSkill.GetComponentInChildren<UICharacterSkillDragHandler>();
                     if (dragHandler != null)
