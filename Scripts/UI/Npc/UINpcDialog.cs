@@ -29,12 +29,18 @@ namespace MultiplayerARPG
         public string messageQuestComplete = "Complete";
         public string messageCraftItemStart = "Craft";
         public string messageCraftItemCancel = "Cancel";
+        public string messageSaveRespawnPointConfirm = "Confirm";
+        public string messageSaveRespawnPointCancel = "Cancel";
+        public string messageWarpConfirm = "Confirm";
+        public string messageWarpCancel = "Cancel";
 
         [Header("Event")]
         public UnityEvent onSwitchToNormalDialog;
         public UnityEvent onSwitchToQuestDialog;
         public UnityEvent onSwitchToSellItemDialog;
         public UnityEvent onSwitchToCraftItemDialog;
+        public UnityEvent onSwitchToSaveRespawnPointDialog;
+        public UnityEvent onSwitchToWarpDialog;
 
         private UIList cacheMenuList;
         public UIList CacheMenuList
@@ -83,7 +89,6 @@ namespace MultiplayerARPG
             switch (Data.type)
             {
                 case NpcDialogType.Normal:
-                case NpcDialogType.SaveRespawnPoint:
                     if (onSwitchToNormalDialog == null)
                         onSwitchToNormalDialog.Invoke();
                     NpcDialogMenu[] menus = Data.menus;
@@ -164,6 +169,30 @@ namespace MultiplayerARPG
                             menuActions.Add(cancelMenuAction);
                         }
                     }
+                    break;
+                case NpcDialogType.SaveRespawnPoint:
+                    if (onSwitchToSaveRespawnPointDialog != null)
+                        onSwitchToSaveRespawnPointDialog.Invoke();
+                    UINpcDialogMenuAction saveRespawnPointConfirmAction = new UINpcDialogMenuAction();
+                    UINpcDialogMenuAction saveRespawnPointCancelAction = new UINpcDialogMenuAction();
+                    saveRespawnPointConfirmAction.title = messageSaveRespawnPointConfirm;
+                    saveRespawnPointConfirmAction.menuIndex = NpcDialog.SAVE_SPAWN_POINT_CONFIRM_MENU_INDEX;
+                    saveRespawnPointCancelAction.title = messageSaveRespawnPointCancel;
+                    saveRespawnPointCancelAction.menuIndex = NpcDialog.SAVE_SPAWN_POINT_CANCEL_MENU_INDEX;
+                    menuActions.Add(saveRespawnPointConfirmAction);
+                    menuActions.Add(saveRespawnPointCancelAction);
+                    break;
+                case NpcDialogType.Warp:
+                    if (onSwitchToWarpDialog != null)
+                        onSwitchToWarpDialog.Invoke();
+                    UINpcDialogMenuAction warpConfirmAction = new UINpcDialogMenuAction();
+                    UINpcDialogMenuAction warpCancelAction = new UINpcDialogMenuAction();
+                    warpConfirmAction.title = messageWarpConfirm;
+                    warpConfirmAction.menuIndex = NpcDialog.WARP_CONFIRM_MENU_INDEX;
+                    warpCancelAction.title = messageWarpCancel;
+                    warpCancelAction.menuIndex = NpcDialog.WARP_CANCEL_MENU_INDEX;
+                    menuActions.Add(warpConfirmAction);
+                    menuActions.Add(warpCancelAction);
                     break;
             }
             // Menu

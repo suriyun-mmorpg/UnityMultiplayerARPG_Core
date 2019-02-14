@@ -142,7 +142,6 @@ namespace MultiplayerARPG
             switch (dialog.type)
             {
                 case NpcDialogType.Normal:
-                case NpcDialogType.SaveRespawnPoint:
                     foreach (NpcDialogMenu menu in dialog.menus)
                     {
                         if (menu.isCloseMenu) continue;
@@ -155,12 +154,19 @@ namespace MultiplayerARPG
                     FindQuestFromDialog(dialog.questAcceptedDialog, foundDialogs);
                     FindQuestFromDialog(dialog.questDeclinedDialog, foundDialogs);
                     FindQuestFromDialog(dialog.questAbandonedDialog, foundDialogs);
-                    FindQuestFromDialog(dialog.questCompletedDailog, foundDialogs);
+                    FindQuestFromDialog(dialog.questCompletedDialog, foundDialogs);
                     break;
                 case NpcDialogType.CraftItem:
                     FindQuestFromDialog(dialog.craftNotMeetRequirementsDialog, foundDialogs);
                     FindQuestFromDialog(dialog.craftDoneDialog, foundDialogs);
                     FindQuestFromDialog(dialog.craftCancelDialog, foundDialogs);
+                    break;
+                case NpcDialogType.SaveRespawnPoint:
+                    FindQuestFromDialog(dialog.saveRespawnConfirmDialog, foundDialogs);
+                    FindQuestFromDialog(dialog.saveRespawnCancelDialog, foundDialogs);
+                    break;
+                case NpcDialogType.Warp:
+                    FindQuestFromDialog(dialog.warpCancelDialog, foundDialogs);
                     break;
             }
         }

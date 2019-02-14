@@ -20,7 +20,7 @@ namespace MultiplayerARPG
             ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.Quest.ToString(), cacheNpcDialog.GetMemberName(a => a.questAcceptedDialog));
             ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.Quest.ToString(), cacheNpcDialog.GetMemberName(a => a.questDeclinedDialog));
             ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.Quest.ToString(), cacheNpcDialog.GetMemberName(a => a.questAbandonedDialog));
-            ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.Quest.ToString(), cacheNpcDialog.GetMemberName(a => a.questCompletedDailog));
+            ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.Quest.ToString(), cacheNpcDialog.GetMemberName(a => a.questCompletedDialog));
             // Shop
             ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.Shop.ToString(), cacheNpcDialog.GetMemberName(a => a.sellItems));
             // Craft Item
@@ -29,9 +29,15 @@ namespace MultiplayerARPG
             ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.CraftItem.ToString(), cacheNpcDialog.GetMemberName(a => a.craftNotMeetRequirementsDialog));
             ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.CraftItem.ToString(), cacheNpcDialog.GetMemberName(a => a.craftCancelDialog));
             // Save Spawn Point
-            ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.SaveRespawnPoint.ToString(), cacheNpcDialog.GetMemberName(a => a.menus));
             ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.SaveRespawnPoint.ToString(), cacheNpcDialog.GetMemberName(a => a.saveRespawnMap));
             ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.SaveRespawnPoint.ToString(), cacheNpcDialog.GetMemberName(a => a.saveRespawnPosition));
+            ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.SaveRespawnPoint.ToString(), cacheNpcDialog.GetMemberName(a => a.saveRespawnConfirmDialog));
+            ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.SaveRespawnPoint.ToString(), cacheNpcDialog.GetMemberName(a => a.saveRespawnCancelDialog));
+            // Warp
+            ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.Warp.ToString(), cacheNpcDialog.GetMemberName(a => a.warpPortalType));
+            ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.Warp.ToString(), cacheNpcDialog.GetMemberName(a => a.warpMap));
+            ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.Warp.ToString(), cacheNpcDialog.GetMemberName(a => a.warpPosition));
+            ShowOnEnum(cacheNpcDialog.GetMemberName(a => a.type), NpcDialogType.Warp.ToString(), cacheNpcDialog.GetMemberName(a => a.warpCancelDialog));
         }
     }
 }

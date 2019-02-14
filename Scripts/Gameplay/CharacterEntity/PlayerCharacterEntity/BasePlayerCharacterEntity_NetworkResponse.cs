@@ -194,7 +194,6 @@ namespace MultiplayerARPG
             switch (currentNpcDialog.type)
             {
                 case NpcDialogType.Normal:
-                case NpcDialogType.SaveRespawnPoint:
                     if (menuIndex >= menus.Length)
                         return;
                     // Changing current npc dialog
@@ -215,6 +214,12 @@ namespace MultiplayerARPG
                 case NpcDialogType.CraftItem:
                     NetFuncSelectNpcDialogCraftItemMenu(menuIndex);
                     break;
+                case NpcDialogType.SaveRespawnPoint:
+                    NetFuncSelectNpcDialogSaveRespawnPointMenu(menuIndex);
+                    break;
+                case NpcDialogType.Warp:
+                    NetFuncSelectNpcDialogWarpMenu(menuIndex);
+                    break;
             }
 
             // `currentNpcDialog` have changed after select menu, then proceed new dialog activity if needed
@@ -222,15 +227,6 @@ namespace MultiplayerARPG
             {
                 switch (currentNpcDialog.type)
                 {
-                    case NpcDialogType.SaveRespawnPoint:
-                        // If dialog is save respawn point, change saved respawn point
-                        if (currentNpcDialog.saveRespawnMap != null &&
-                            currentNpcDialog.saveRespawnMap.scene != null)
-                        {
-                            RespawnMapName = currentNpcDialog.saveRespawnMap.scene.SceneName;
-                            RespawnPosition = currentNpcDialog.saveRespawnPosition;
-                        }
-                        break;
                     case NpcDialogType.RefineItem:
                         // If dialog is refine dialog, show refine dialog at client
                         RequestShowNpcRefine();
@@ -263,7 +259,7 @@ namespace MultiplayerARPG
                     break;
                 case NpcDialog.QUEST_COMPLETE_MENU_INDEX:
                     NetFuncCompleteQuest(currentNpcDialog.quest.DataId);
-                    currentNpcDialog = currentNpcDialog.questCompletedDailog;
+                    currentNpcDialog = currentNpcDialog.questCompletedDialog;
                     break;
             }
             if (currentNpcDialog == null)
@@ -293,6 +289,61 @@ namespace MultiplayerARPG
                     break;
                 case NpcDialog.CRAFT_ITEM_CANCEL_MENU_INDEX:
                     currentNpcDialog = currentNpcDialog.craftCancelDialog;
+                    break;
+            }
+            if (currentNpcDialog == null)
+                RequestShowNpcDialog(0);
+            else
+                RequestShowNpcDialog(currentNpcDialog.DataId);
+        }
+
+        protected virtual void NetFuncSelectNpcDialogSaveRespawnPointMenu(int menuIndex)
+        {
+            if (currentNpcDialog == null ||
+                currentNpcDialog.type != NpcDialogType.SaveRespawnPoint ||
+                currentNpcDialog.saveRespawnMap == null ||
+                currentNpcDialog.saveRespawnMap.scene == null)
+            {
+                currentNpcDialog = null;
+                RequestShowNpcDialog(0);
+                return;
+            }
+            switch (menuIndex)
+            {
+                case NpcDialog.SAVE_SPAWN_POINT_CONFIRM_MENU_INDEX:
+                    RespawnMapName = currentNpcDialog.saveRespawnMap.scene.SceneName;
+                    RespawnPosition = currentNpcDialog.saveRespawnPosition;
+                    currentNpcDialog = currentNpcDialog.saveRespawnConfirmDialog;
+                    break;
+                case NpcDialog.SAVE_SPAWN_POINT_CANCEL_MENU_INDEX:
+                    currentNpcDialog = currentNpcDialog.saveRespawnCancelDialog;
+                    break;
+            }
+            if (currentNpcDialog == null)
+                RequestShowNpcDialog(0);
+            else
+                RequestShowNpcDialog(currentNpcDialog.DataId);
+        }
+
+        protected virtual void NetFuncSelectNpcDialogWarpMenu(int menuIndex)
+        {
+            if (currentNpcDialog == null ||
+                currentNpcDialog.type != NpcDialogType.Warp ||
+                currentNpcDialog.warpMap == null ||
+                currentNpcDialog.warpMap.scene == null)
+            {
+                currentNpcDialog = null;
+                RequestShowNpcDialog(0);
+                return;
+            }
+            switch (menuIndex)
+            {
+                case NpcDialog.WARP_CONFIRM_MENU_INDEX:
+                    gameManager.WarpCharacter(currentNpcDialog.warpPortalType, this, currentNpcDialog.warpMap.scene, currentNpcDialog.warpPosition);
+                    currentNpcDialog = null;
+                    break;
+                case NpcDialog.WARP_CANCEL_MENU_INDEX:
+                    currentNpcDialog = currentNpcDialog.saveRespawnCancelDialog;
                     break;
             }
             if (currentNpcDialog == null)

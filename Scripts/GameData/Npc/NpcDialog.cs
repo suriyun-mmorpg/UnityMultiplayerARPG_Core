@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -11,6 +14,7 @@ namespace MultiplayerARPG
         Shop,
         CraftItem,
         SaveRespawnPoint,
+        Warp,
         RefineItem,
     }
 
@@ -25,6 +29,10 @@ namespace MultiplayerARPG
         public const int CRAFT_ITEM_CANCEL_MENU_INDEX = 1;
         public const int REFINE_ITEM_START_MENU_INDEX = 0;
         public const int REFINE_ITEM_CANCEL_MENU_INDEX = 1;
+        public const int SAVE_SPAWN_POINT_CONFIRM_MENU_INDEX = 0;
+        public const int SAVE_SPAWN_POINT_CANCEL_MENU_INDEX = 1;
+        public const int WARP_CONFIRM_MENU_INDEX = 0;
+        public const int WARP_CANCEL_MENU_INDEX = 1;
 
         public NpcDialogType type;
         public NpcDialogMenu[] menus;
@@ -33,6 +41,8 @@ namespace MultiplayerARPG
         public NpcDialog questAcceptedDialog;
         public NpcDialog questDeclinedDialog;
         public NpcDialog questAbandonedDialog;
+        public NpcDialog questCompletedDialog;
+        [HideInInspector]
         public NpcDialog questCompletedDailog;
         // Shop
         public NpcSellItem[] sellItems;
@@ -44,6 +54,25 @@ namespace MultiplayerARPG
         // Save Spawn Point
         public MapInfo saveRespawnMap;
         public Vector3 saveRespawnPosition;
+        public NpcDialog saveRespawnConfirmDialog;
+        public NpcDialog saveRespawnCancelDialog;
+        // Teleport
+        public WarpPortalType warpPortalType;
+        public MapInfo warpMap;
+        public Vector3 warpPosition;
+        public NpcDialog warpCancelDialog;
+
+        private void OnValidate()
+        {
+#if UNITY_EDITOR
+            if (questCompletedDailog != null)
+            {
+                questCompletedDialog = questCompletedDailog;
+                questCompletedDailog = null;
+                EditorUtility.SetDirty(this);
+            }
+#endif
+        }
     }
 
     public enum NpcDialogConditionType : byte
