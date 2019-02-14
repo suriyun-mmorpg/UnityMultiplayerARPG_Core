@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using LiteNetLib;
@@ -22,6 +21,7 @@ namespace MultiplayerARPG
             public const ushort UpdateParty = 107;
             public const ushort UpdateGuildMember = 108;
             public const ushort UpdateGuild = 109;
+            public const ushort UpdateMapInfo = 110;
         }
 
         public const float UPDATE_ONLINE_CHARACTER_DURATION = 1f;
@@ -109,6 +109,7 @@ namespace MultiplayerARPG
             RegisterClientMessage(MsgTypes.UpdateParty, HandleUpdatePartyAtClient);
             RegisterClientMessage(MsgTypes.UpdateGuildMember, HandleUpdateGuildMemberAtClient);
             RegisterClientMessage(MsgTypes.UpdateGuild, HandleUpdateGuildAtClient);
+            RegisterClientMessage(MsgTypes.UpdateMapInfo, HandleUpdateMapInfoAtClient);
         }
 
         protected override void RegisterServerMessages()
@@ -155,6 +156,12 @@ namespace MultiplayerARPG
             if (!IsServer)
                 Clean();
             base.OnStopClient();
+        }
+
+        public override void OnPeerConnected(long connectionId)
+        {
+            base.OnPeerConnected(connectionId);
+            SendMapInfo(connectionId);
         }
 
         protected virtual void UpdateOnlineCharacter(long connectionId, BasePlayerCharacterEntity playerCharacterEntity, float time)
@@ -364,6 +371,15 @@ namespace MultiplayerARPG
             }
             if (onClientUpdateGuild != null)
                 onClientUpdateGuild.Invoke(ClientGuild);
+        }
+
+        protected virtual void HandleUpdateMapInfoAtClient(LiteNetLibMessageHandler messageHandler)
+        {
+            // Don't set map info again at server
+            if (IsServer)
+                return;
+            UpdateMapInfoMessage message = messageHandler.ReadMessage<UpdateMapInfoMessage>();
+            SetMapInfo(message.mapId);
         }
 
         protected virtual void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
@@ -610,15 +626,6 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void SetupMapInfo()
-        {
-            MapInfo foundMapInfo;
-            if (GameInstance.MapInfos.TryGetValue(SceneManager.GetActiveScene().name, out foundMapInfo))
-                CurrentMapInfo = foundMapInfo;
-            else
-                CurrentMapInfo = ScriptableObject.CreateInstance<MapInfo>();
-        }
-
         protected bool UpdateSocialGroupMember(SocialGroupData socialGroupData, UpdateSocialMemberMessage message)
         {
             if (socialGroupData == null || socialGroupData.id != message.id)
@@ -647,10 +654,7 @@ namespace MultiplayerARPG
             this.InvokeInstanceDevExtMethods("OnClientOnlineSceneLoaded");
             // Server will register entities later, so don't register entities now
             if (!IsServer)
-            {
                 RegisterEntities();
-                SetupMapInfo();
-            }
         }
 
         public override void OnServerOnlineSceneLoaded()
@@ -658,7 +662,6 @@ namespace MultiplayerARPG
             base.OnServerOnlineSceneLoaded();
             this.InvokeInstanceDevExtMethods("OnServerOnlineSceneLoaded");
             RegisterEntities();
-            SetupMapInfo();
             // Spawn monsters
             MonsterSpawnArea[] monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
             foreach (MonsterSpawnArea monsterSpawnArea in monsterSpawnAreas)
@@ -669,7 +672,7 @@ namespace MultiplayerARPG
             if (GameInstance.MapWarpPortals.Count > 0)
             {
                 List<WarpPortal> mapWarpPortals;
-                if (GameInstance.MapWarpPortals.TryGetValue(SceneManager.GetActiveScene().name, out mapWarpPortals))
+                if (GameInstance.MapWarpPortals.TryGetValue(CurrentMapInfo.Id, out mapWarpPortals))
                 {
                     foreach (WarpPortal warpPortal in mapWarpPortals)
                     {
@@ -689,7 +692,7 @@ namespace MultiplayerARPG
             if (GameInstance.MapNpcs.Count > 0)
             {
                 List<Npc> mapNpcs;
-                if (GameInstance.MapNpcs.TryGetValue(SceneManager.GetActiveScene().name, out mapNpcs))
+                if (GameInstance.MapNpcs.TryGetValue(CurrentMapInfo.Id, out mapNpcs))
                 {
                     foreach (Npc npc in mapNpcs)
                     {
@@ -757,6 +760,40 @@ namespace MultiplayerARPG
         public bool TryGetBuildingEntity(string id, out BuildingEntity entity)
         {
             return buildingEntities.TryGetValue(id, out entity);
+        }
+
+        public void SetMapInfo(string mapId)
+        {
+            MapInfo tempMapInfo;
+            if (GameInstance.MapInfos.TryGetValue(mapId, out tempMapInfo))
+                SetMapInfo(tempMapInfo);
+        }
+
+        public void SetMapInfo(MapInfo mapInfo)
+        {
+            if (mapInfo == null)
+                return;
+            CurrentMapInfo = mapInfo;
+            SendMapInfo();
+        }
+
+        public void SendMapInfo()
+        {
+            if (!IsServer)
+                return;
+            foreach (long connectionId in ConnectionIds)
+            {
+                SendMapInfo(connectionId);
+            }
+        }
+
+        public void SendMapInfo(long connectionId)
+        {
+            if (!IsServer || CurrentMapInfo == null)
+                return;
+            UpdateMapInfoMessage message = new UpdateMapInfoMessage();
+            message.mapId = CurrentMapInfo.Id;
+            ServerSendPacketToAllConnections(SendOptions.ReliableOrdered, MsgTypes.UpdateMapInfo, message);
         }
     }
 }

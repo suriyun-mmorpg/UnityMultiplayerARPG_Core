@@ -300,9 +300,7 @@ namespace MultiplayerARPG
         protected virtual void NetFuncSelectNpcDialogSaveRespawnPointMenu(int menuIndex)
         {
             if (currentNpcDialog == null ||
-                currentNpcDialog.type != NpcDialogType.SaveRespawnPoint ||
-                currentNpcDialog.saveRespawnMap == null ||
-                currentNpcDialog.saveRespawnMap.scene == null)
+                currentNpcDialog.type != NpcDialogType.SaveRespawnPoint)
             {
                 currentNpcDialog = null;
                 RequestShowNpcDialog(0);
@@ -311,7 +309,7 @@ namespace MultiplayerARPG
             switch (menuIndex)
             {
                 case NpcDialog.SAVE_SPAWN_POINT_CONFIRM_MENU_INDEX:
-                    RespawnMapName = currentNpcDialog.saveRespawnMap.scene.SceneName;
+                    RespawnMapName = currentNpcDialog.saveRespawnMap.Id;
                     RespawnPosition = currentNpcDialog.saveRespawnPosition;
                     currentNpcDialog = currentNpcDialog.saveRespawnConfirmDialog;
                     break;
@@ -328,9 +326,7 @@ namespace MultiplayerARPG
         protected virtual void NetFuncSelectNpcDialogWarpMenu(int menuIndex)
         {
             if (currentNpcDialog == null ||
-                currentNpcDialog.type != NpcDialogType.Warp ||
-                currentNpcDialog.warpMap == null ||
-                currentNpcDialog.warpMap.scene == null)
+                currentNpcDialog.type != NpcDialogType.Warp)
             {
                 currentNpcDialog = null;
                 RequestShowNpcDialog(0);
@@ -339,7 +335,7 @@ namespace MultiplayerARPG
             switch (menuIndex)
             {
                 case NpcDialog.WARP_CONFIRM_MENU_INDEX:
-                    gameManager.WarpCharacter(currentNpcDialog.warpPortalType, this, currentNpcDialog.warpMap.scene, currentNpcDialog.warpPosition);
+                    gameManager.WarpCharacter(currentNpcDialog.warpPortalType, this, currentNpcDialog.warpMap.Id, currentNpcDialog.warpPosition);
                     currentNpcDialog = null;
                     break;
                 case NpcDialog.WARP_CANCEL_MENU_INDEX:

@@ -750,7 +750,7 @@ namespace MultiplayerARPG
                 return;
             foreach (MapInfo mapInfo in mapInfos)
             {
-                if (mapInfo == null)
+                if (mapInfo == null || !mapInfo.IsSceneSet())
                     continue;
                 MapInfos[mapInfo.Id] = mapInfo;
             }

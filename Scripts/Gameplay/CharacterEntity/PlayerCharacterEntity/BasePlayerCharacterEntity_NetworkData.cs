@@ -92,7 +92,7 @@ namespace MultiplayerARPG
         public byte GuildRole { get; set; }
         public int SharedGuildExp { get; set; }
         public byte UserLevel { get; set; }
-        public string CurrentMapName { get { return gameManager.GetCurrentMapName(this); } set { } }
+        public string CurrentMapName { get { return gameManager.GetCurrentMapId(this); } set { } }
         public Vector3 CurrentPosition
         {
             get { return gameManager.GetCurrentPosition(this); }

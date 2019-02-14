@@ -33,11 +33,13 @@ namespace MultiplayerARPG
             switch (startType)
             {
                 case GameStartType.Host:
+                    SetMapInfo(selectedCharacter.CurrentMapName);
                     networkPort = gameServiceConnection.networkPort;
                     maxConnections = gameServiceConnection.maxConnections;
                     StartHost(false);
                     break;
                 case GameStartType.SinglePlayer:
+                    SetMapInfo(selectedCharacter.CurrentMapName);
                     StartHost(true);
                     break;
                 case GameStartType.Client:
@@ -96,7 +98,7 @@ namespace MultiplayerARPG
                 Debug.LogError("[LanRpgNetworkManager] Cannot find player character with entity Id: " + playerCharacterData.EntityId);
                 return;
             }
-            if (!SceneManager.GetActiveScene().name.Equals(playerCharacterData.CurrentMapName))
+            if (!CurrentMapInfo.Id.Equals(playerCharacterData.CurrentMapName))
                 playerCharacterData.CurrentPosition = teleportPosition.HasValue ? teleportPosition.Value : CurrentMapInfo.startPosition;
             LiteNetLibIdentity identity = Assets.NetworkSpawn(entityPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
             BasePlayerCharacterEntity playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
@@ -172,14 +174,18 @@ namespace MultiplayerARPG
                 return;
             base.WarpCharacter(playerCharacterEntity, mapName, position);
             long connectionId = playerCharacterEntity.ConnectionId;
+            MapInfo mapInfo;
             if (!string.IsNullOrEmpty(mapName) &&
                 !mapName.Equals(playerCharacterEntity.CurrentMapName) &&
                 playerCharacters.ContainsKey(connectionId) &&
                 playerCharacterEntity.IsServer &&
-                playerCharacterEntity.IsOwnerClient)
+                playerCharacterEntity.IsOwnerClient &&
+                GameInstance.MapInfos.TryGetValue(mapName, out mapInfo) &&
+                mapInfo.IsSceneSet())
             {
+                SetMapInfo(mapInfo);
                 teleportPosition = position;
-                ServerSceneChange(mapName);
+                ServerSceneChange(mapInfo.scene);
             }
         }
 

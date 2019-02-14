@@ -16,8 +16,8 @@ namespace MultiplayerARPG
         public bool canReturnToSavePoint;
         [Tooltip("If this is `TRUE`, player will return to `overrideRespawnPointPosition` in the `overrideRespawnPointScene`")]
         public bool overrideRespawnPoint;
-        [Tooltip("Scene which player will returning to, when dead or press `return` key")]
-        public UnityScene overrideRespawnPointScene;
+        [Tooltip("Map which player will returning to, when dead or press `return` key")]
+        public MapInfo overrideRespawnPointMap;
         [Tooltip("Position in the `overrideRespawnPointScene` which player will returning to, when dead or press `return` key")]
         public Vector3 overrideRespawnPointPosition;
     }

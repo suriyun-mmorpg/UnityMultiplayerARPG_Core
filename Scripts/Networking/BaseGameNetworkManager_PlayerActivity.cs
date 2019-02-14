@@ -794,8 +794,8 @@ namespace MultiplayerARPG
             Vector3 respawnPosition = playerCharacterEntity.RespawnPosition;
             if (CurrentMapInfo != null && CurrentMapInfo.overrideRespawnPoint)
             {
-                if (CurrentMapInfo.overrideRespawnPointScene != null)
-                    respawnMapName = CurrentMapInfo.overrideRespawnPointScene.SceneName;
+                if (CurrentMapInfo.overrideRespawnPointMap != null)
+                    respawnMapName = CurrentMapInfo.overrideRespawnPointMap.Id;
                 respawnPosition = CurrentMapInfo.overrideRespawnPointPosition;
             }
             WarpCharacter(playerCharacterEntity, respawnMapName, respawnPosition);
@@ -1081,7 +1081,7 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        public virtual string GetCurrentMapName(BasePlayerCharacterEntity playerCharacterEntity)
+        public virtual string GetCurrentMapId(BasePlayerCharacterEntity playerCharacterEntity)
         {
             return CurrentMapInfo.Id;
         }
