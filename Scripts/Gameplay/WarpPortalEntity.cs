@@ -8,11 +8,12 @@ namespace MultiplayerARPG
         public GameObject[] warpSignals;
         public bool warpImmediatelyWhenEnter;
         public WarpPortalType type;
+        public MapInfo mapInfo;
+        public Vector3 position;
+        [Header("Deprecated")]
         [System.Obsolete("`Map` is deprecated, use `Map Info` instead")]
         [Tooltip("`Map` is deprecated, use `Map Info` instead")]
         public UnityScene mapScene;
-        public MapInfo mapInfo;
-        public Vector3 position;
 
         protected override void EntityAwake()
         {
