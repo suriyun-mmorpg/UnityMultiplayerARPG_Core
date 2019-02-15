@@ -20,8 +20,7 @@ namespace MultiplayerARPG
         public float autoSaveDuration = 2f;
         public GameStartType startType;
         public PlayerCharacterData selectedCharacter;
-        public bool enableGmCommandsForHost;
-        public bool enableGmCommandsForEveryone;
+        public bool enableGmCommands;
         private float lastSaveTime;
         private int nextPartyId = 1;
         private int nextGuildId = 1;
@@ -104,7 +103,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterData.CloneTo(playerCharacterEntity);
             // TODO: Don't use fixed user level
-            if ((enableGmCommandsForHost && identity.IsOwnerClient) || enableGmCommandsForEveryone)
+            if (enableGmCommands)
                 playerCharacterEntity.UserLevel = 1;
             // Summon saved summons
             for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
