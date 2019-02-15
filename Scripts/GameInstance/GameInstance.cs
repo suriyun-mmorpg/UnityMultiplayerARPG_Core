@@ -123,8 +123,8 @@ namespace MultiplayerARPG
         public float petUnSummonLockDuration = 30f;
 
         [Header("Gameplay Configs - Instance Dungeon")]
-        [Tooltip("Distance from party leader character to join instance dungeon")]
-        public float joinInstanceDungeonDistance = 20f;
+        [Tooltip("Distance from party leader character to join instance map")]
+        public float joinInstanceMapDistance = 20f;
 
         [Header("Game Effects")]
         public GameEffect levelUpEffect;
