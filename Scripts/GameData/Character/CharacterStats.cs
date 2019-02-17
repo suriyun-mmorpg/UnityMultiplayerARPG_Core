@@ -22,46 +22,42 @@
 
         public CharacterStats Add(CharacterStats b)
         {
-            CharacterStats result = new CharacterStats();
-            result.hp = hp + b.hp;
-            result.mp = mp + b.mp;
-            result.armor = armor + b.armor;
-            result.accuracy = accuracy + b.accuracy;
-            result.evasion = evasion + b.evasion;
-            result.criRate = criRate + b.criRate;
-            result.criDmgRate = criDmgRate + b.criDmgRate;
-            result.blockRate = blockRate + b.blockRate;
-            result.blockDmgRate = blockDmgRate + b.blockDmgRate;
-            result.moveSpeed = moveSpeed + b.moveSpeed;
-            result.atkSpeed = atkSpeed + b.atkSpeed;
-            result.weightLimit = weightLimit + b.weightLimit;
-            result.stamina = stamina + b.stamina;
-            result.food = food + b.food;
-            result.water = water + b.water;
-            result = this.InvokeInstanceDevExtMethodsLoopItself("Add", result, b);
-            return result;
+            hp = hp + b.hp;
+            mp = mp + b.mp;
+            armor = armor + b.armor;
+            accuracy = accuracy + b.accuracy;
+            evasion = evasion + b.evasion;
+            criRate = criRate + b.criRate;
+            criDmgRate = criDmgRate + b.criDmgRate;
+            blockRate = blockRate + b.blockRate;
+            blockDmgRate = blockDmgRate + b.blockDmgRate;
+            moveSpeed = moveSpeed + b.moveSpeed;
+            atkSpeed = atkSpeed + b.atkSpeed;
+            weightLimit = weightLimit + b.weightLimit;
+            stamina = stamina + b.stamina;
+            food = food + b.food;
+            water = water + b.water;
+            return this.InvokeInstanceDevExtMethodsLoopItself("Add", b);
         }
 
         public CharacterStats Multiply(float multiplier)
         {
-            CharacterStats result = new CharacterStats();
-            result.hp = hp * multiplier;
-            result.mp = mp * multiplier;
-            result.armor = armor * multiplier;
-            result.accuracy = accuracy * multiplier;
-            result.evasion = evasion * multiplier;
-            result.criRate = criRate * multiplier;
-            result.criDmgRate = criDmgRate * multiplier;
-            result.blockRate = blockRate * multiplier;
-            result.blockDmgRate = blockDmgRate * multiplier;
-            result.moveSpeed = moveSpeed * multiplier;
-            result.atkSpeed = atkSpeed * multiplier;
-            result.weightLimit = weightLimit * multiplier;
-            result.stamina = stamina * multiplier;
-            result.food = food * multiplier;
-            result.water = water * multiplier;
-            result = this.InvokeInstanceDevExtMethodsLoopItself("Multiply", result, multiplier);
-            return result;
+            hp = hp * multiplier;
+            mp = mp * multiplier;
+            armor = armor * multiplier;
+            accuracy = accuracy * multiplier;
+            evasion = evasion * multiplier;
+            criRate = criRate * multiplier;
+            criDmgRate = criDmgRate * multiplier;
+            blockRate = blockRate * multiplier;
+            blockDmgRate = blockDmgRate * multiplier;
+            moveSpeed = moveSpeed * multiplier;
+            atkSpeed = atkSpeed * multiplier;
+            weightLimit = weightLimit * multiplier;
+            stamina = stamina * multiplier;
+            food = food * multiplier;
+            water = water * multiplier;
+            return this.InvokeInstanceDevExtMethodsLoopItself("Multiply", multiplier);
         }
 
         public static CharacterStats operator +(CharacterStats a, CharacterStats b)
