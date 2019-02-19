@@ -300,6 +300,20 @@ namespace MultiplayerARPG
             // TODO: May send data to client
         }
 
+        public bool IsStorageDirty(StorageType storageType, int storageDataId, string storageOwnerId)
+        {
+            return (storageType != currentStorageType ||
+                     storageDataId != currentStorageDataId ||
+                     !storageOwnerId.Equals(currentStorageOwnerId));
+        }
+
+        public void SetCurrentStorage(StorageType storageType, int storageDataId, string storageOwnerId)
+        {
+            currentStorageType = storageType;
+            currentStorageDataId = storageDataId;
+            currentStorageOwnerId = storageOwnerId;
+        }
+
         public abstract float StoppingDistance { get; }
         public abstract void StopMove();
         public abstract void KeyMovement(Vector3 moveDirection, MovementFlag moveState);

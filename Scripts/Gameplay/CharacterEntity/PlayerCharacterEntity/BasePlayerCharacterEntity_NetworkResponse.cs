@@ -470,7 +470,7 @@ namespace MultiplayerARPG
 
         }
 
-        protected virtual void NetFuncDestroyBuild(PackedUInt objectId)
+        protected virtual void NetFuncDestroyBuilding(PackedUInt objectId)
         {
             if (!CanDoActions())
                 return;
@@ -478,9 +478,52 @@ namespace MultiplayerARPG
             BuildingEntity buildingEntity = null;
             if (!TryGetEntityByObjectId(objectId, out buildingEntity))
                 return;
-            
+
+            // TODO: For now only creator can destroy building
             if (buildingEntity != null && buildingEntity.CreatorId.Equals(Id))
                 gameManager.DestroyBuildingEntity(buildingEntity.Id);
+        }
+
+        protected virtual void NetFuncOpenBuildingStorage(PackedUInt objectId)
+        {
+            if (!CanDoActions())
+                return;
+
+            BuildingEntity buildingEntity = null;
+            if (!TryGetEntityByObjectId(objectId, out buildingEntity))
+                return;
+
+            // TODO: For now only creator can open storage
+            if (buildingEntity != null &&
+                buildingEntity.CreatorId.Equals(Id) &&
+                buildingEntity.enableStorage)
+            {
+                if (IsStorageDirty(StorageType.Building, buildingEntity.StorageDataId, buildingEntity.Id))
+                {
+                    StorageItems = gameManager.GetStorageItems(StorageType.Building, buildingEntity.StorageDataId, buildingEntity.Id);
+                    SetCurrentStorage(StorageType.Building, buildingEntity.StorageDataId, buildingEntity.Id);
+                }
+                // Show storage on client
+                CallNetFunction(NetFuncShowStorage, ConnectionId);
+            }
+        }
+
+        protected virtual void NetFuncShowStorage()
+        {
+            // TODO: Implement this
+        }
+
+        protected virtual void NetFuncDepositToStorage(short index, short amount)
+        {
+            if (IsDead() ||
+                index >= nonEquipItems.Count)
+                return;
+        }
+
+        protected virtual void NetFuncWithdrawFromStorage(short index, short amount)
+        {
+            if (IsDead())
+                return;
         }
 
         protected virtual void NetFuncSellItem(short index, short amount)

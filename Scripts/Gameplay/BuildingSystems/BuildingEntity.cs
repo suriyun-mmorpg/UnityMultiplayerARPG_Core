@@ -16,6 +16,8 @@ namespace MultiplayerARPG
         public string buildingType;
         public float characterForwardDistance = 4;
         public int maxHp = 100;
+        [Header("Storage System")]
+        public bool enableStorage;
 
         public override int MaxHp { get { return maxHp; } }
 
@@ -77,6 +79,12 @@ namespace MultiplayerARPG
         {
             get { return dataId; }
             set { }
+        }
+
+        // TODO: Implement this
+        public int StorageDataId
+        {
+            get { return 0; }
         }
 
         public bool isBuildMode { get; private set; }

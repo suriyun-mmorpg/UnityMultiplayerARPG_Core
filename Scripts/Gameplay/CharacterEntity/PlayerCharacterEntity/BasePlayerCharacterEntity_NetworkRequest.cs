@@ -105,7 +105,7 @@ namespace MultiplayerARPG
         {
             if (!CanDoActions())
                 return;
-            CallNetFunction(NetFuncDestroyBuild, FunctionReceivers.Server, new PackedUInt(objectId));
+            CallNetFunction(NetFuncDestroyBuilding, FunctionReceivers.Server, new PackedUInt(objectId));
         }
 
         public virtual void RequestSellItem(short nonEquipIndex, short amount)
