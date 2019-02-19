@@ -1,10 +1,10 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using UnityEngine.Profiling;
-using UnityEngine.SceneManagement;
 
 namespace MultiplayerARPG
 {
@@ -25,6 +25,8 @@ namespace MultiplayerARPG
         private int nextPartyId = 1;
         private int nextGuildId = 1;
         private Vector3? teleportPosition;
+        private readonly WorldSaveData worldSaveData = new WorldSaveData();
+        private readonly StorageSaveData storageSaveData = new StorageSaveData();
 
         public void StartGame()
         {
@@ -61,7 +63,10 @@ namespace MultiplayerARPG
                     selectedCharacter = owningCharacter.CloneTo(selectedCharacter);
                     owningCharacter.SavePersistentCharacterData();
                     if (IsServer)
+                    {
                         SaveWorld();
+                        SaveStorage();
+                    }
                 }
                 Profiler.EndSample();
                 lastSaveTime = tempUnscaledTime;
@@ -102,9 +107,6 @@ namespace MultiplayerARPG
             LiteNetLibIdentity identity = Assets.NetworkSpawn(entityPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
             BasePlayerCharacterEntity playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterData.CloneTo(playerCharacterEntity);
-            // TODO: Don't use fixed user level
-            if (enableGmCommands)
-                playerCharacterEntity.UserLevel = 1;
             // Summon saved summons
             for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
             {
@@ -117,13 +119,17 @@ namespace MultiplayerARPG
                 playerCharacterEntity.RequestOnRespawn();
             else
                 playerCharacterEntity.RequestOnDead();
-            // Load world for first character (host)
+            // Load world / storage for first character (host)
             if (playerCharacters.Count == 0)
             {
-                WorldSaveData worldSaveData = new WorldSaveData();
                 worldSaveData.LoadPersistentData(playerCharacterEntity.Id, playerCharacterEntity.CurrentMapName);
+                storageSaveData.LoadPersistentData(playerCharacterEntity.Id);
                 StartCoroutine(SpawnBuildingsAndHarvestables(worldSaveData));
             }
+            // Enable GM commands in Singleplayer / LAN mode
+            // TODO: Don't use fixed user level
+            if (enableGmCommands)
+                playerCharacterEntity.UserLevel = 1;
             // Register player, will use registered player to send chat / player messages
             RegisterPlayerCharacter(connectionId, playerCharacterEntity);
         }
@@ -148,7 +154,7 @@ namespace MultiplayerARPG
         {
             // Save building entities / Tree / Rocks
             BasePlayerCharacterEntity playerCharacterEntity = BasePlayerCharacterController.OwningCharacter;
-            WorldSaveData worldSaveData = new WorldSaveData();
+            worldSaveData.buildings.Clear();
             foreach (BuildingEntity buildingEntity in buildingEntities.Values)
             {
                 if (buildingEntity == null) continue;
@@ -164,7 +170,13 @@ namespace MultiplayerARPG
                     CreatorName = buildingEntity.CreatorName,
                 });
             }
-            worldSaveData.SavePersistentWorldData(playerCharacterEntity.Id, playerCharacterEntity.CurrentMapName);
+            worldSaveData.SavePersistentData(playerCharacterEntity.Id, playerCharacterEntity.CurrentMapName);
+        }
+
+        private void SaveStorage()
+        {
+            BasePlayerCharacterEntity playerCharacterEntity = BasePlayerCharacterController.OwningCharacter;
+            storageSaveData.SavePersistentData(playerCharacterEntity.Id);
         }
 
         protected override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)

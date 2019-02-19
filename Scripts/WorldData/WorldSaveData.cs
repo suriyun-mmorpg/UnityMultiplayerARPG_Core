@@ -9,7 +9,7 @@ public class WorldSaveData
 {
     public List<BuildingSaveData> buildings = new List<BuildingSaveData>();
 
-    public void SavePersistentWorldData(string id, string map)
+    public void SavePersistentData(string id, string map)
     {
         BinaryFormatter binaryFormatter = new BinaryFormatter();
         SurrogateSelector surrogateSelector = new SurrogateSelector();

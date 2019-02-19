@@ -9,25 +9,25 @@ public class StorageSaveData
 {
     public List<StorageCharacterItem> storageItems = new List<StorageCharacterItem>();
 
-    public void SavePersistentWorldData(string id, string map)
+    public void SavePersistentData(string id)
     {
         BinaryFormatter binaryFormatter = new BinaryFormatter();
         SurrogateSelector surrogateSelector = new SurrogateSelector();
         surrogateSelector.AddAllUnitySurrogate();
         StorageCharacterItemSerializationSurrogate storageCharacterItemSS = new StorageCharacterItemSerializationSurrogate();
         StorageSaveDataSerializationSurrogate storageSaveDataSS = new StorageSaveDataSerializationSurrogate();
-        surrogateSelector.AddSurrogate(typeof(BuildingSaveData), new StreamingContext(StreamingContextStates.All), storageCharacterItemSS);
+        surrogateSelector.AddSurrogate(typeof(StorageCharacterItem), new StreamingContext(StreamingContextStates.All), storageCharacterItemSS);
         surrogateSelector.AddSurrogate(typeof(StorageSaveData), new StreamingContext(StreamingContextStates.All), storageSaveDataSS);
         binaryFormatter.SurrogateSelector = surrogateSelector;
-        string path = Application.persistentDataPath + "/" + id + "_storage_" + map + ".sav";
+        string path = Application.persistentDataPath + "/" + id + "_storage.sav";
         FileStream file = File.Open(path, FileMode.OpenOrCreate);
         binaryFormatter.Serialize(file, this);
         file.Close();
     }
 
-    public void LoadPersistentData(string id, string map)
+    public void LoadPersistentData(string id)
     {
-        string path = Application.persistentDataPath + "/" + id + "_storage_" + map + ".sav";
+        string path = Application.persistentDataPath + "/" + id + "_storage.sav";
         if (File.Exists(path))
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();
@@ -35,7 +35,7 @@ public class StorageSaveData
             surrogateSelector.AddAllUnitySurrogate();
             StorageCharacterItemSerializationSurrogate storageCharacterItemSS = new StorageCharacterItemSerializationSurrogate();
             StorageSaveDataSerializationSurrogate storageSaveDataSS = new StorageSaveDataSerializationSurrogate();
-            surrogateSelector.AddSurrogate(typeof(BuildingSaveData), new StreamingContext(StreamingContextStates.All), storageCharacterItemSS);
+            surrogateSelector.AddSurrogate(typeof(StorageCharacterItem), new StreamingContext(StreamingContextStates.All), storageCharacterItemSS);
             surrogateSelector.AddSurrogate(typeof(StorageSaveData), new StreamingContext(StreamingContextStates.All), storageSaveDataSS);
             binaryFormatter.SurrogateSelector = surrogateSelector;
             FileStream file = File.Open(path, FileMode.Open);
