@@ -11,13 +11,16 @@ public enum StorageType
 public sealed class StorageCharacterItem : CharacterItem
 {
     public StorageType storageType;
-    public string storageId;
+    public int storageDataId;
+    // Owner Id, for `Default` it is character Id. `Building` it is building Id
+    public string storageOwnerId;
     public int storageIndex;
 
     public override void Serialize(NetDataWriter writer)
     {
         writer.Put((byte)storageType);
-        writer.Put(storageId);
+        writer.Put(storageDataId);
+        writer.Put(storageOwnerId);
         writer.Put(storageIndex);
         base.Serialize(writer);
     }
@@ -25,7 +28,8 @@ public sealed class StorageCharacterItem : CharacterItem
     public override void Deserialize(NetDataReader reader)
     {
         storageType = (StorageType)reader.GetByte();
-        storageId = reader.GetString();
+        storageDataId = reader.GetInt();
+        storageOwnerId = reader.GetString();
         storageIndex = reader.GetInt();
         base.Deserialize(reader);
     }

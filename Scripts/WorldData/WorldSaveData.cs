@@ -8,7 +8,6 @@ using UnityEngine;
 public class WorldSaveData
 {
     public List<BuildingSaveData> buildings = new List<BuildingSaveData>();
-    public List<StorageCharacterItem> storageItems = new List<StorageCharacterItem>();
 
     public void SavePersistentWorldData(string id, string map)
     {
@@ -16,10 +15,8 @@ public class WorldSaveData
         SurrogateSelector surrogateSelector = new SurrogateSelector();
         surrogateSelector.AddAllUnitySurrogate();
         BuildingSaveDataSerializationSurrogate buildingSaveDataSS = new BuildingSaveDataSerializationSurrogate();
-        StorageCharacterItemSerializationSurrogate storageCharacterItemSS = new StorageCharacterItemSerializationSurrogate();
         WorldSaveDataSerializationSurrogate worldSaveDataSS = new WorldSaveDataSerializationSurrogate();
         surrogateSelector.AddSurrogate(typeof(BuildingSaveData), new StreamingContext(StreamingContextStates.All), buildingSaveDataSS);
-        surrogateSelector.AddSurrogate(typeof(StorageCharacterItem), new StreamingContext(StreamingContextStates.All), storageCharacterItemSS);
         surrogateSelector.AddSurrogate(typeof(WorldSaveData), new StreamingContext(StreamingContextStates.All), worldSaveDataSS);
         binaryFormatter.SurrogateSelector = surrogateSelector;
         string path = Application.persistentDataPath + "/" + id + "_world_" + map + ".sav";
@@ -37,16 +34,13 @@ public class WorldSaveData
             SurrogateSelector surrogateSelector = new SurrogateSelector();
             surrogateSelector.AddAllUnitySurrogate();
             BuildingSaveDataSerializationSurrogate buildingSaveDataSS = new BuildingSaveDataSerializationSurrogate();
-            StorageCharacterItemSerializationSurrogate storageCharacterItemSS = new StorageCharacterItemSerializationSurrogate();
             WorldSaveDataSerializationSurrogate worldSaveDataSS = new WorldSaveDataSerializationSurrogate();
             surrogateSelector.AddSurrogate(typeof(BuildingSaveData), new StreamingContext(StreamingContextStates.All), buildingSaveDataSS);
-            surrogateSelector.AddSurrogate(typeof(StorageCharacterItem), new StreamingContext(StreamingContextStates.All), storageCharacterItemSS);
             surrogateSelector.AddSurrogate(typeof(WorldSaveData), new StreamingContext(StreamingContextStates.All), worldSaveDataSS);
             binaryFormatter.SurrogateSelector = surrogateSelector;
             FileStream file = File.Open(path, FileMode.Open);
             WorldSaveData result = (WorldSaveData)binaryFormatter.Deserialize(file);
             buildings = result.buildings;
-            storageItems = result.storageItems;
             file.Close();
         }
     }

@@ -8,7 +8,7 @@ public class StorageCharacterItemSerializationSurrogate : ISerializationSurrogat
     {
         StorageCharacterItem data = (StorageCharacterItem)obj;
         info.AddValue("storageType", (byte)data.storageType);
-        info.AddValue("storageId", data.storageId);
+        info.AddValue("storageId", data.storageOwnerId);
         info.AddValue("storageIndex", data.storageIndex);
         info.AddValue("dataId", data.dataId);
         info.AddValue("level", data.level);
@@ -22,7 +22,7 @@ public class StorageCharacterItemSerializationSurrogate : ISerializationSurrogat
     {
         StorageCharacterItem data = (StorageCharacterItem)obj;
         data.storageType = (StorageType)info.GetByte("storageType");
-        data.storageId = info.GetString("storageId");
+        data.storageOwnerId = info.GetString("storageId");
         data.storageIndex = info.GetInt32("storageIndex");
         data.dataId = info.GetInt32("dataId");
         data.level = info.GetInt16("level");
