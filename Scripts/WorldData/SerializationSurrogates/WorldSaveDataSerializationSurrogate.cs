@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using UnityEngine;
 
 public class WorldSaveDataSerializationSurrogate : ISerializationSurrogate
 {
@@ -9,12 +8,14 @@ public class WorldSaveDataSerializationSurrogate : ISerializationSurrogate
     {
         WorldSaveData data = (WorldSaveData)obj;
         info.AddListValue("buildings", data.buildings);
+        info.AddListValue("storageItems", data.storageItems);
     }
 
     public object SetObjectData(object obj, SerializationInfo info, StreamingContext context, ISurrogateSelector selector)
     {
         WorldSaveData data = (WorldSaveData)obj;
         data.buildings = new List<BuildingSaveData>(info.GetListValue<BuildingSaveData>("buildings"));
+        data.storageItems = new List<StorageCharacterItem>(info.GetListValue<StorageCharacterItem>("storageItems"));
         obj = data;
         return obj;
     }
