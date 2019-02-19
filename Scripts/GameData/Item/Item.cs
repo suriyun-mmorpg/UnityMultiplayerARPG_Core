@@ -211,7 +211,7 @@ namespace MultiplayerARPG
                 character.EquipWeapons.leftHand = refinedItem;
             }, () =>
             {
-                character.EquipWeapons.rightHand = CharacterItem.Empty;
+                character.EquipWeapons.leftHand = CharacterItem.Empty;
             }, out gameMessageType);
         }
 
