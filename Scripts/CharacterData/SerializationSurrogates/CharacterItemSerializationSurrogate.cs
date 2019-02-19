@@ -25,14 +25,9 @@ public class CharacterItemSerializationSurrogate : ISerializationSurrogate
         data.dataId = info.GetInt32("dataId");
         data.level = info.GetInt16("level");
         data.amount = info.GetInt16("amount");
-        // Backward compatible
-        try
-        {
-            data.durability = info.GetSingle("durability");
-            data.exp = info.GetInt32("exp");
-            data.lockRemainsDuration = info.GetSingle("lockRemainsDuration");
-        }
-        catch { }
+        data.durability = info.GetSingle("durability");
+        data.exp = info.GetInt32("exp");
+        data.lockRemainsDuration = info.GetSingle("lockRemainsDuration");
         obj = data;
         return obj;
     }

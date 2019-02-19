@@ -18,11 +18,7 @@ public class CharacterSkillUsageSerializationSurrogate : ISerializationSurrogate
                                        ISurrogateSelector selector)
     {
         CharacterSkillUsage data = (CharacterSkillUsage)obj;
-        try
-        {
-            data.type = (SkillUsageType)info.GetByte("type");
-        }
-        catch { }
+        data.type = (SkillUsageType)info.GetByte("type");
         data.dataId = info.GetInt32("dataId");
         data.coolDownRemainsDuration = info.GetSingle("coolDownRemainsDuration");
         obj = data;

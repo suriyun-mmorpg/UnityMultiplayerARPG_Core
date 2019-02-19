@@ -50,9 +50,7 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
         PlayerCharacterData data = (PlayerCharacterData)obj;
         data.Id = info.GetString("id");
         data.DataId = info.GetInt32("dataId");
-        // Backward compatible
-        try { data.EntityId = info.GetInt32("entityId"); }
-        catch { }
+        data.EntityId = info.GetInt32("entityId");
         data.CharacterName = info.GetString("characterName");
         data.Level = info.GetInt16("level");
         data.Exp = info.GetInt32("exp");
