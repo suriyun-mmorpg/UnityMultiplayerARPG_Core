@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
+            // Sync fields
             dataId.sendOptions = SendOptions.ReliableOrdered;
             dataId.forOwnerOnly = false;
             statPoint.sendOptions = SendOptions.ReliableOrdered;
@@ -24,9 +25,10 @@ namespace MultiplayerARPG
             guildId.forOwnerOnly = false;
             isWarping.sendOptions = SendOptions.ReliableOrdered;
             isWarping.forOwnerOnly = true;
-
+            // Sync lists
             hotkeys.forOwnerOnly = true;
             quests.forOwnerOnly = true;
+            storageItems.forOwnerOnly = true;
         }
 
         public override void OnSetup()
@@ -43,6 +45,7 @@ namespace MultiplayerARPG
             // On list changes events
             hotkeys.onOperation += OnHotkeysOperation;
             quests.onOperation += OnQuestsOperation;
+            storageItems.onOperation += OnStorageItemsOperation;
             // Register Network functions
             RegisterNetFunction<short, short>(NetFuncSwapOrMergeItem);
             RegisterNetFunction<int>(NetFuncAddAttribute);
@@ -170,6 +173,7 @@ namespace MultiplayerARPG
             // On list changes events
             hotkeys.onOperation -= OnHotkeysOperation;
             quests.onOperation -= OnQuestsOperation;
+            storageItems.onOperation -= OnStorageItemsOperation;
 
             if (IsOwnerClient && BasePlayerCharacterController.Singleton != null)
                 Destroy(BasePlayerCharacterController.Singleton.gameObject);

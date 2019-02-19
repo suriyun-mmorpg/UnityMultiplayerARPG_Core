@@ -205,6 +205,31 @@ namespace MultiplayerARPG
             }
         }
 
+        #region Implement Abstract Functions
+        public override void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
+        {
+            CreateParty(playerCharacterEntity, shareExp, shareItem, nextPartyId++);
+        }
+
+        public override void CreateGuild(BasePlayerCharacterEntity playerCharacterEntity, string guildName)
+        {
+            CreateGuild(playerCharacterEntity, guildName, nextGuildId++);
+        }
+
+        public override IList<StorageCharacterItem> GetStorageItems(StorageType storageType, int storageDataId, string storageOwnerId)
+        {
+            List<StorageCharacterItem> result = new List<StorageCharacterItem>();
+            foreach (StorageCharacterItem storageItem in storageSaveData.storageItems)
+            {
+                if (storageItem.storageType == storageType &&
+                    storageItem.storageDataId == storageDataId &&
+                    !string.IsNullOrEmpty(storageItem.storageOwnerId) &&
+                    storageItem.storageOwnerId.Equals(storageOwnerId))
+                    result.Add(storageItem);
+            }
+            return result;
+        }
+
         protected override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
         {
             // For now just warp follow host
@@ -215,17 +240,6 @@ namespace MultiplayerARPG
         protected override bool IsInstanceMap()
         {
             return false;
-        }
-
-        #region Implement Abstract Functions
-        public override void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
-        {
-            CreateParty(playerCharacterEntity, shareExp, shareItem, nextPartyId++);
-        }
-
-        public override void CreateGuild(BasePlayerCharacterEntity playerCharacterEntity, string guildName)
-        {
-            CreateGuild(playerCharacterEntity, guildName, nextGuildId++);
         }
         #endregion
     }

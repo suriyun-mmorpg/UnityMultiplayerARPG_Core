@@ -72,6 +72,24 @@ namespace MultiplayerARPG
         }
         #endregion
 
+        #region Storage System
+        protected StorageType dirtyStorageType;
+        protected int dirtyStorageDataId;
+        protected string dirtyStorageOwnerId;
+        protected SyncListStorageCharacterItem storageItems = new SyncListStorageCharacterItem();
+        public IList<StorageCharacterItem> StorageItems
+        {
+            get { return storageItems; }
+            set
+            {
+                storageItems.Clear();
+                foreach (StorageCharacterItem entry in value)
+                    storageItems.Add(entry);
+            }
+        }
+        public System.Action<LiteNetLibSyncList.Operation, int> onStorageItemsOperation;
+        #endregion
+
         #region Sync data actions
         public System.Action<int> onDataIdChange;
         public System.Action<short> onStatPointChange;
@@ -198,6 +216,12 @@ namespace MultiplayerARPG
         {
             if (onQuestsOperation != null)
                 onQuestsOperation.Invoke(operation, index);
+        }
+
+        protected virtual void OnStorageItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            if (onStorageItemsOperation != null)
+                onStorageItemsOperation.Invoke(operation, index);
         }
         #endregion
     }
