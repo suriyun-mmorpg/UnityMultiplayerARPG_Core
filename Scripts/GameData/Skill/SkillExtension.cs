@@ -120,7 +120,7 @@ namespace MultiplayerARPG
                 return false;
             if (!available)
                 return false;
-            if (character.CurrentMp < skill.GetConsumeMp(level))
+            if (character.CurrentMp <= skill.GetConsumeMp(level))
                 return false;
             int skillUsageIndex = character.IndexOfSkillUsage(skill.DataId, SkillUsageType.Skill);
             if (skillUsageIndex >= 0 && character.SkillUsages[skillUsageIndex].coolDownRemainsDuration > 0f)
