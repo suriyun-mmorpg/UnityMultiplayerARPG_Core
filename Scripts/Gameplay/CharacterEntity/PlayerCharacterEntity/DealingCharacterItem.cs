@@ -4,9 +4,21 @@ using LiteNetLib.Utils;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public class DealingCharacterItem : CharacterItem
+    public sealed class DealingCharacterItem : CharacterItem
     {
         public int nonEquipIndex;
+
+        public override void Serialize(NetDataWriter writer)
+        {
+            writer.Put(nonEquipIndex);
+            base.Serialize(writer);
+        }
+
+        public override void Deserialize(NetDataReader reader)
+        {
+            nonEquipIndex = reader.GetInt();
+            base.Deserialize(reader);
+        }
     }
 
     public class DealingCharacterItems : List<DealingCharacterItem>, INetSerializable
@@ -16,30 +28,18 @@ namespace MultiplayerARPG
             writer.Put(Count);
             foreach (DealingCharacterItem dealingItem in this)
             {
-                writer.Put(dealingItem.nonEquipIndex);
-                writer.Put(dealingItem.dataId);
-                writer.Put(dealingItem.level);
-                writer.Put(dealingItem.amount);
-                writer.Put(dealingItem.durability);
-                writer.Put(dealingItem.exp);
-                writer.Put(dealingItem.lockRemainsDuration);
+                dealingItem.Serialize(writer);
             }
         }
 
         public void Deserialize(NetDataReader reader)
         {
-            int count = reader.GetInt();
             Clear();
+            int count = reader.GetInt();
             for (int i = 0; i < count; ++i)
             {
                 DealingCharacterItem dealingItem = new DealingCharacterItem();
-                dealingItem.nonEquipIndex = reader.GetInt();
-                dealingItem.dataId = reader.GetInt();
-                dealingItem.level = reader.GetShort();
-                dealingItem.amount = reader.GetShort();
-                dealingItem.durability = reader.GetFloat();
-                dealingItem.exp = reader.GetInt();
-                dealingItem.lockRemainsDuration = reader.GetFloat();
+                dealingItem.Deserialize(reader);
                 Add(dealingItem);
             }
         }
