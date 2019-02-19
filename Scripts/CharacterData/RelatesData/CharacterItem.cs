@@ -231,7 +231,7 @@ public class CharacterItem : INetSerializable
         return newItem;
     }
 
-    public void Serialize(NetDataWriter writer)
+    public virtual void Serialize(NetDataWriter writer)
     {
         writer.Put(dataId);
         writer.Put(level);
@@ -241,7 +241,7 @@ public class CharacterItem : INetSerializable
         writer.Put(lockRemainsDuration);
     }
 
-    public void Deserialize(NetDataReader reader)
+    public virtual void Deserialize(NetDataReader reader)
     {
         dataId = reader.GetInt();
         level = reader.GetShort();
