@@ -500,8 +500,11 @@ namespace MultiplayerARPG
             {
                 if (IsStorageDirty(StorageType.Building, buildingEntity.StorageDataId, buildingEntity.Id))
                 {
-                    StorageItems = gameManager.GetStorageItems(StorageType.Building, buildingEntity.StorageDataId, buildingEntity.Id);
                     SetCurrentStorage(StorageType.Building, buildingEntity.StorageDataId, buildingEntity.Id);
+                    gameManager.GetStorageItems(StorageType.Building, buildingEntity.StorageDataId, buildingEntity.Id, (storageItems) =>
+                    {
+                        StorageItems = storageItems;
+                    });
                 }
                 // Show storage on client
                 CallNetFunction(NetFuncShowStorage, ConnectionId);

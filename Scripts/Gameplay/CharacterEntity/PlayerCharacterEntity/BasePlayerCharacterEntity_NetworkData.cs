@@ -76,14 +76,14 @@ namespace MultiplayerARPG
         protected StorageType currentStorageType;
         protected int currentStorageDataId;
         protected string currentStorageOwnerId;
-        protected SyncListStorageCharacterItem storageItems = new SyncListStorageCharacterItem();
-        public IList<StorageCharacterItem> StorageItems
+        protected SyncListCharacterItem storageItems = new SyncListCharacterItem();
+        public IList<CharacterItem> StorageItems
         {
             get { return storageItems; }
             set
             {
                 storageItems.Clear();
-                foreach (StorageCharacterItem entry in value)
+                foreach (CharacterItem entry in value)
                     storageItems.Add(entry);
             }
         }

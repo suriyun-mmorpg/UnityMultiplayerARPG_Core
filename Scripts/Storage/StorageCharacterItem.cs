@@ -35,9 +35,14 @@ public sealed class StorageCharacterItem : INetSerializable
         tempCharacterItem.Deserialize(reader);
         characterItem = tempCharacterItem;
     }
-}
 
-[System.Serializable]
-public class SyncListStorageCharacterItem : LiteNetLibSyncList<StorageCharacterItem>
-{
+    public static string GetStorageId(StorageType storageType, int storageDataId, string storageOwnerId)
+    {
+        return (byte)storageType + "_" + storageDataId + "_" + storageOwnerId;
+    }
+
+    public static string GetStorageItemId(StorageType storageType, int storageDataId, string storageOwnerId, int indexOfData)
+    {
+        return (byte)storageType + "_" + storageDataId + "_" + storageOwnerId + "_" + indexOfData;
+    }
 }
