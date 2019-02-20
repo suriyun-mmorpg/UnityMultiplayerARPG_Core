@@ -35,13 +35,43 @@ public sealed class StorageCharacterItem : INetSerializable
         tempCharacterItem.Deserialize(reader);
         characterItem = tempCharacterItem;
     }
+}
 
-    public static string GetStorageId(StorageType storageType, int storageDataId, string storageOwnerId)
+public struct StorageId
+{
+    public StorageType storageType;
+    public int storageDataId;
+    public string storageOwnerId;
+
+    public StorageId(StorageType storageType, int storageDataId, string storageOwnerId)
+    {
+        this.storageType = storageType;
+        this.storageDataId = storageDataId;
+        this.storageOwnerId = storageOwnerId;
+    }
+
+    public string GetId()
     {
         return (byte)storageType + "_" + storageDataId + "_" + storageOwnerId;
     }
+}
 
-    public static string GetStorageItemId(StorageType storageType, int storageDataId, string storageOwnerId, int indexOfData)
+public struct StorageItemId
+{
+    public StorageType storageType;
+    public int storageDataId;
+    public string storageOwnerId;
+    public int indexOfData;
+
+    public StorageItemId(StorageType storageType, int storageDataId, string storageOwnerId, int indexOfData)
+    {
+        this.storageType = storageType;
+        this.storageDataId = storageDataId;
+        this.storageOwnerId = storageOwnerId;
+        this.indexOfData = indexOfData;
+    }
+
+    public string GetId()
     {
         return (byte)storageType + "_" + storageDataId + "_" + storageOwnerId + "_" + indexOfData;
     }
