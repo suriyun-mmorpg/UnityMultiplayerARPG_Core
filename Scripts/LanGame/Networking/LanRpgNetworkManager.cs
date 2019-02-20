@@ -216,18 +216,19 @@ namespace MultiplayerARPG
             CreateGuild(playerCharacterEntity, guildName, nextGuildId++);
         }
 
-        public override IList<StorageCharacterItem> GetStorageItems(StorageType storageType, int storageDataId, string storageOwnerId)
+        public override void GetStorageItems(StorageType storageType, int storageDataId, string storageOwnerId, System.Action<IList<CharacterItem>> onGetStorageItems)
         {
-            List<StorageCharacterItem> result = new List<StorageCharacterItem>();
+            List<CharacterItem> result = new List<CharacterItem>();
             foreach (StorageCharacterItem storageItem in storageSaveData.storageItems)
             {
-                if (storageItem.storageType == storageType &&
-                    storageItem.storageDataId == storageDataId &&
-                    !string.IsNullOrEmpty(storageItem.storageOwnerId) &&
-                    storageItem.storageOwnerId.Equals(storageOwnerId))
-                    result.Add(storageItem);
+                if (storageItem.storageType != storageType ||
+                    storageItem.storageDataId != storageDataId ||
+                    storageItem.storageOwnerId != storageOwnerId)
+                    continue;
+                result.Add(storageItem.characterItem);
             }
-            return result;
+            if (onGetStorageItems != null)
+                onGetStorageItems.Invoke(result);
         }
 
         protected override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)

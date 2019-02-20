@@ -730,7 +730,7 @@ namespace MultiplayerARPG
             playerCharacters.Remove(connectionId);
         }
 
-        public virtual void CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
+        public virtual BuildingEntity CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
         {
             BuildingEntity prefab;
             if (GameInstance.BuildingEntities.TryGetValue(saveData.DataId, out prefab))
@@ -743,7 +743,9 @@ namespace MultiplayerARPG
                 buildingEntity.CreatorId = saveData.CreatorId;
                 buildingEntity.CreatorName = saveData.CreatorName;
                 buildingEntities[buildingEntity.Id] = buildingEntity;
+                return buildingEntity;
             }
+            return null;
         }
 
         public virtual void DestroyBuildingEntity(string id)
