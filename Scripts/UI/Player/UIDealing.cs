@@ -240,11 +240,7 @@ namespace MultiplayerARPG
             List<CharacterItem> filterItems = new List<CharacterItem>();
             foreach (DealingCharacterItem dealingItem in dealingItems)
             {
-                CharacterItem characterItem = new CharacterItem();
-                characterItem.dataId = dealingItem.dataId;
-                characterItem.level = dealingItem.level;
-                characterItem.amount = dealingItem.amount;
-                characterItem.durability = dealingItem.durability;
+                CharacterItem characterItem = dealingItem.characterItem;
                 filterItems.Add(characterItem);
             }
             uiList.Clear();

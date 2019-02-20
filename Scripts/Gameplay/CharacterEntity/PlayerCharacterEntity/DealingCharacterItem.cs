@@ -4,20 +4,24 @@ using LiteNetLib.Utils;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public sealed class DealingCharacterItem : CharacterItem
+    public sealed class DealingCharacterItem : INetSerializable
     {
+        public static readonly DealingCharacterItem Empty = new DealingCharacterItem();
         public int nonEquipIndex;
+        public CharacterItem characterItem;
 
-        public override void Serialize(NetDataWriter writer)
+        public void Serialize(NetDataWriter writer)
         {
             writer.Put(nonEquipIndex);
-            base.Serialize(writer);
+            characterItem.Serialize(writer);
         }
 
-        public override void Deserialize(NetDataReader reader)
+        public void Deserialize(NetDataReader reader)
         {
             nonEquipIndex = reader.GetInt();
-            base.Deserialize(reader);
+            CharacterItem tempCharacterItem = new CharacterItem();
+            tempCharacterItem.Deserialize(reader);
+            characterItem = tempCharacterItem;
         }
     }
 

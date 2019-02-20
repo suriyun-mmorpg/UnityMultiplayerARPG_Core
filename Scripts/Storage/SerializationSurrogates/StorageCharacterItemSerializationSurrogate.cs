@@ -10,12 +10,12 @@ public class StorageCharacterItemSerializationSurrogate : ISerializationSurrogat
         info.AddValue("storageType", (byte)data.storageType);
         info.AddValue("storageDataId", data.storageDataId);
         info.AddValue("storageId", data.storageOwnerId);
-        info.AddValue("dataId", data.dataId);
-        info.AddValue("level", data.level);
-        info.AddValue("amount", data.amount);
-        info.AddValue("durability", data.durability);
-        info.AddValue("exp", data.exp);
-        info.AddValue("lockRemainsDuration", data.lockRemainsDuration);
+        info.AddValue("dataId", data.characterItem.dataId);
+        info.AddValue("level", data.characterItem.level);
+        info.AddValue("amount", data.characterItem.amount);
+        info.AddValue("durability", data.characterItem.durability);
+        info.AddValue("exp", data.characterItem.exp);
+        info.AddValue("lockRemainsDuration", data.characterItem.lockRemainsDuration);
     }
 
     public object SetObjectData(object obj, SerializationInfo info, StreamingContext context, ISurrogateSelector selector)
@@ -24,12 +24,14 @@ public class StorageCharacterItemSerializationSurrogate : ISerializationSurrogat
         data.storageType = (StorageType)info.GetByte("storageType");
         data.storageDataId = info.GetInt32("storageDataId");
         data.storageOwnerId = info.GetString("storageId");
-        data.dataId = info.GetInt32("dataId");
-        data.level = info.GetInt16("level");
-        data.amount = info.GetInt16("amount");
-        data.durability = info.GetSingle("durability");
-        data.exp = info.GetInt32("exp");
-        data.lockRemainsDuration = info.GetSingle("lockRemainsDuration");
+        CharacterItem characterItem = new CharacterItem();
+        characterItem.dataId = info.GetInt32("dataId");
+        characterItem.level = info.GetInt16("level");
+        characterItem.amount = info.GetInt16("amount");
+        characterItem.durability = info.GetSingle("durability");
+        characterItem.exp = info.GetInt32("exp");
+        characterItem.lockRemainsDuration = info.GetSingle("lockRemainsDuration");
+        data.characterItem = characterItem;
         obj = data;
         return obj;
     }

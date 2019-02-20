@@ -263,12 +263,12 @@ namespace MultiplayerARPG
                 for (int j = tempDealingItems.Count - 1; j >= 0; --j)
                 {
                     DealingCharacterItem dealingItem = tempDealingItems[j];
-                    if (dealingItem.nonEquipIndex == i && nonEquipItem.amount >= dealingItem.amount)
+                    if (dealingItem.nonEquipIndex == i && nonEquipItem.amount >= dealingItem.characterItem.amount)
                     {
-                        if (DealingCharacter.IncreaseItems(dealingItem))
+                        if (DealingCharacter.IncreaseItems(dealingItem.characterItem))
                         {
                             // Reduce item amount when able to increase item to co character
-                            nonEquipItem.amount -= dealingItem.amount;
+                            nonEquipItem.amount -= dealingItem.characterItem.amount;
                             if (nonEquipItem.amount == 0)
                                 nonEquipItems.RemoveAt(i);
                             else

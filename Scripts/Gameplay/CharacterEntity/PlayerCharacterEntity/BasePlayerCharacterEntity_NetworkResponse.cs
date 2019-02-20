@@ -695,13 +695,11 @@ namespace MultiplayerARPG
                     break;
                 }
             }
-            CharacterItem characterItem = nonEquipItems[itemIndex];
+            CharacterItem characterItem = nonEquipItems[itemIndex].Clone();
+            characterItem.amount = amount;
             DealingCharacterItem dealingItem = new DealingCharacterItem();
             dealingItem.nonEquipIndex = itemIndex;
-            dealingItem.dataId = characterItem.dataId;
-            dealingItem.level = characterItem.level;
-            dealingItem.amount = amount;
-            dealingItem.durability = characterItem.durability;
+            dealingItem.characterItem = characterItem;
             dealingItems.Add(dealingItem);
             // Update to clients
             DealingItems = dealingItems;
