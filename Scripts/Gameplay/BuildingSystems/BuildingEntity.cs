@@ -18,6 +18,7 @@ namespace MultiplayerARPG
         public int maxHp = 100;
         [Header("Storage System")]
         public bool enableStorage;
+        public Storage storage;
 
         public override int MaxHp { get { return maxHp; } }
 
@@ -80,11 +81,10 @@ namespace MultiplayerARPG
             get { return dataId; }
             set { }
         }
-
-        // TODO: Implement this
+        
         public int StorageDataId
         {
-            get { return 0; }
+            get { return storage.DataId; }
         }
 
         public bool isBuildMode { get; private set; }
