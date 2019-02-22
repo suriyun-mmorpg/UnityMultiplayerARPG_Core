@@ -81,11 +81,6 @@ namespace MultiplayerARPG
             get { return dataId; }
             set { }
         }
-        
-        public int StorageDataId
-        {
-            get { return storage.DataId; }
-        }
 
         public bool isBuildMode { get; private set; }
 

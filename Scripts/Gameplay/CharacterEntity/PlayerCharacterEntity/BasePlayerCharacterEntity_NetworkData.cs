@@ -73,9 +73,7 @@ namespace MultiplayerARPG
         #endregion
 
         #region Storage System
-        protected StorageType currentStorageType;
-        protected int currentStorageDataId;
-        protected string currentStorageOwnerId;
+        protected StorageId currentStorageId;
         protected SyncListCharacterItem storageItems = new SyncListCharacterItem();
         public IList<CharacterItem> StorageItems
         {

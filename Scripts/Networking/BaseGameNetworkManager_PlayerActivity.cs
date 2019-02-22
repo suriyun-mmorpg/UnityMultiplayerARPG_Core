@@ -1114,7 +1114,7 @@ namespace MultiplayerARPG
 
         public abstract void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem);
         public abstract void CreateGuild(BasePlayerCharacterEntity playerCharacterEntity, string guildName);
-        public abstract void GetStorageItems(StorageType storageType, int storageDataId, string storageOwnerId, System.Action<IList<CharacterItem>> onGetStorageItems);
+        public abstract void GetStorageItems(StorageId storageId, System.Action<IList<CharacterItem>> onGetStorageItems);
         protected abstract void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position);
         protected abstract bool IsInstanceMap();
     }

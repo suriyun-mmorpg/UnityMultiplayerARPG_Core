@@ -216,14 +216,13 @@ namespace MultiplayerARPG
             CreateGuild(playerCharacterEntity, guildName, nextGuildId++);
         }
 
-        public override void GetStorageItems(StorageType storageType, int storageDataId, string storageOwnerId, System.Action<IList<CharacterItem>> onGetStorageItems)
+        public override void GetStorageItems(StorageId storageId, System.Action<IList<CharacterItem>> onGetStorageItems)
         {
             List<CharacterItem> result = new List<CharacterItem>();
             foreach (StorageCharacterItem storageItem in storageSaveData.storageItems)
             {
-                if (storageItem.storageType != storageType ||
-                    storageItem.storageDataId != storageDataId ||
-                    storageItem.storageOwnerId != storageOwnerId)
+                if (storageItem.storageType != storageId.storageType ||
+                    storageItem.storageOwnerId != storageId.storageOwnerId)
                     continue;
                 result.Add(storageItem.characterItem);
             }

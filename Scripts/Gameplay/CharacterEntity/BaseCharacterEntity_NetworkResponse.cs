@@ -51,7 +51,7 @@ namespace MultiplayerARPG
                 out totalDuration,
                 out damageInfo,
                 out allDamageAmounts);
-            
+
             // Reduce ammo amount
             if (weapon != null)
             {
@@ -143,7 +143,7 @@ namespace MultiplayerARPG
                 out totalDuration,
                 out damageInfo,
                 out allDamageAmounts);
-            
+
             if (weapon != null)
             {
                 WeaponType weaponType = weapon.GetWeaponItem().WeaponType;
@@ -201,7 +201,7 @@ namespace MultiplayerARPG
         {
             if (!CanUseItem())
                 return;
-            
+
             if (itemIndex >= nonEquipItems.Count)
                 return;
 
@@ -274,7 +274,7 @@ namespace MultiplayerARPG
                 itemDropEntity.NetworkDestroy();
                 return;
             }
-            if (!IncreasingItemsWillOverwhelming(itemDropData.dataId, itemDropData.amount) && this.IncreaseItems(itemDropData))
+            if (!this.IncreasingItemsWillOverwhelming(itemDropData.dataId, itemDropData.amount) && this.IncreaseItems(itemDropData))
                 itemDropEntity.NetworkDestroy();
         }
 
@@ -361,7 +361,7 @@ namespace MultiplayerARPG
         {
             if (!CanDoActions())
                 return;
-            
+
             EquipWeapons tempEquipWeapons = EquipWeapons;
             CharacterItem unEquipItem = CharacterItem.Empty;
             switch ((InventoryType)byteInventoryType)
@@ -420,6 +420,56 @@ namespace MultiplayerARPG
 
             Summons.RemoveAt(index);
             summon.UnSummon(this);
+        }
+
+        protected virtual void NetFuncSwapOrMergeNonEquipItems(short index1, short index2)
+        {
+            if (!CanDoActions() ||
+                index1 >= nonEquipItems.Count ||
+                index2 >= nonEquipItems.Count)
+                return;
+
+            CharacterItem nonEquipItem1 = nonEquipItems[index1];
+            CharacterItem nonEquipItem2 = nonEquipItems[index2];
+
+            if (nonEquipItem1.dataId == nonEquipItem2.dataId &&
+                nonEquipItem1.IsValid() && nonEquipItem2.IsValid())
+            {
+                // Merge or swap
+                if (nonEquipItem1.IsFull() || nonEquipItem2.IsFull())
+                {
+                    // Swap
+                    NetFuncSwapNonEquipItems(index1, index2);
+                }
+                else
+                {
+                    // Merge
+                    NetFuncMergeNonEquipItems(index1, index2);
+                }
+            }
+            else
+            {
+                // Swap
+                NetFuncSwapNonEquipItems(index1, index2);
+            }
+        }
+
+        protected void NetFuncMergeNonEquipItems(short index1, short index2)
+        {
+            if (!CanDoActions() ||
+                index1 >= nonEquipItems.Count ||
+                index2 >= nonEquipItems.Count)
+                return;
+
+        }
+
+        protected void NetFuncSwapNonEquipItems(short index1, short index2)
+        {
+            if (!CanDoActions() ||
+                index1 >= nonEquipItems.Count ||
+                index2 >= nonEquipItems.Count)
+                return;
+
         }
     }
 }

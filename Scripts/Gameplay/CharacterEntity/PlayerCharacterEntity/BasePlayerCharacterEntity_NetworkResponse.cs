@@ -362,7 +362,7 @@ namespace MultiplayerARPG
                 return;
             }
             int dataId = sellItem.item.DataId;
-            if (IncreasingItemsWillOverwhelming(dataId, amount))
+            if (this.IncreasingItemsWillOverwhelming(dataId, amount))
             {
                 gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
                 return;
@@ -498,10 +498,11 @@ namespace MultiplayerARPG
                 buildingEntity.CreatorId.Equals(Id) &&
                 buildingEntity.enableStorage)
             {
-                if (IsStorageDirty(StorageType.Building, buildingEntity.StorageDataId, buildingEntity.Id))
+                StorageId storageId = new StorageId(StorageType.Building, buildingEntity.Id);
+                if (IsStorageDirty(storageId))
                 {
-                    SetCurrentStorage(StorageType.Building, buildingEntity.StorageDataId, buildingEntity.Id);
-                    gameManager.GetStorageItems(StorageType.Building, buildingEntity.StorageDataId, buildingEntity.Id, (storageItems) =>
+                    SetCurrentStorage(storageId);
+                    gameManager.GetStorageItems(storageId, (storageItems) =>
                     {
                         StorageItems = storageItems;
                     });

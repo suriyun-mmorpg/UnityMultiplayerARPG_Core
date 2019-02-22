@@ -8,7 +8,6 @@ public class StorageCharacterItemSerializationSurrogate : ISerializationSurrogat
     {
         StorageCharacterItem data = (StorageCharacterItem)obj;
         info.AddValue("storageType", (byte)data.storageType);
-        info.AddValue("storageDataId", data.storageDataId);
         info.AddValue("storageId", data.storageOwnerId);
         info.AddValue("dataId", data.characterItem.dataId);
         info.AddValue("level", data.characterItem.level);
@@ -16,13 +15,13 @@ public class StorageCharacterItemSerializationSurrogate : ISerializationSurrogat
         info.AddValue("durability", data.characterItem.durability);
         info.AddValue("exp", data.characterItem.exp);
         info.AddValue("lockRemainsDuration", data.characterItem.lockRemainsDuration);
+        info.AddValue("ammo", data.characterItem.ammo);
     }
 
     public object SetObjectData(object obj, SerializationInfo info, StreamingContext context, ISurrogateSelector selector)
     {
         StorageCharacterItem data = (StorageCharacterItem)obj;
         data.storageType = (StorageType)info.GetByte("storageType");
-        data.storageDataId = info.GetInt32("storageDataId");
         data.storageOwnerId = info.GetString("storageId");
         CharacterItem characterItem = new CharacterItem();
         characterItem.dataId = info.GetInt32("dataId");
@@ -31,6 +30,7 @@ public class StorageCharacterItemSerializationSurrogate : ISerializationSurrogat
         characterItem.durability = info.GetSingle("durability");
         characterItem.exp = info.GetInt32("exp");
         characterItem.lockRemainsDuration = info.GetSingle("lockRemainsDuration");
+        characterItem.ammo = info.GetInt32("ammo");
         data.characterItem = characterItem;
         obj = data;
         return obj;

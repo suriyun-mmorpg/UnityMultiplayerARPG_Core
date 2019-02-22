@@ -4,11 +4,12 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Storage", menuName = "Create GameData/Storage")]
-    public class Storage : BaseGameData
+    [System.Serializable]
+    public struct Storage
     {
-        public float weightLimit;
-        [Tooltip("If this is 0 it will have no slot limit")]
+        [Tooltip("If weight limit <= 0, assume that it is no limit")]
+        public int weightLimit;
+        [Tooltip("If slot limit <= 0, assume that it is no limit")]
         public int slotLimit;
     }
 }

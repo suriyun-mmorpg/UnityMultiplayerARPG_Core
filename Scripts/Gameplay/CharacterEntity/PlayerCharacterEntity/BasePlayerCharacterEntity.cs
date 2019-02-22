@@ -301,18 +301,14 @@ namespace MultiplayerARPG
             // TODO: May send data to client
         }
 
-        public bool IsStorageDirty(StorageType storageType, int storageDataId, string storageOwnerId)
+        public bool IsStorageDirty(StorageId storageId)
         {
-            return (storageType != currentStorageType ||
-                     storageDataId != currentStorageDataId ||
-                     !storageOwnerId.Equals(currentStorageOwnerId));
+            return !storageId.Equals(currentStorageId);
         }
 
-        public void SetCurrentStorage(StorageType storageType, int storageDataId, string storageOwnerId)
+        public void SetCurrentStorage(StorageId storageId)
         {
-            currentStorageType = storageType;
-            currentStorageDataId = storageDataId;
-            currentStorageOwnerId = storageOwnerId;
+            currentStorageId = storageId;
         }
 
         public abstract float StoppingDistance { get; }

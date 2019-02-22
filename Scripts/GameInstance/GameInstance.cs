@@ -7,6 +7,11 @@ using UnityEngine.Purchasing;
 
 namespace MultiplayerARPG
 {
+    public enum InventorySystem
+    {
+        Simple,
+        LimitSlots,
+    }
 #if ENABLE_PURCHASING && UNITY_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
     public partial class GameInstance : MonoBehaviour, IStoreListener
 #else
@@ -103,8 +108,11 @@ namespace MultiplayerARPG
         public float buildDistance = 10f;
         [Tooltip("This is a distance that other players will receives local chat")]
         public float localChatDistance = 10f;
-        [Tooltip("If this is TRUE, it will limit inventory slots")]
-        public bool isLimitInventorySlot;
+
+        [Header("Gameplay Configs - Inventory and Storage")]
+        public InventorySystem inventorySystem;
+        public Storage playerStorage;
+        public Storage guildStorage;
 
         [Header("Gameplay Configs - Summon Monster")]
         [Tooltip("This is a distance that random summon around a character")]
@@ -171,6 +179,11 @@ namespace MultiplayerARPG
         public DimensionType DimensionType
         {
             get { return dimensionType; }
+        }
+
+        public bool isLimitInventorySlot
+        {
+            get { return inventorySystem == InventorySystem.LimitSlots; }
         }
 
         public BaseGameplayRule GameplayRule
