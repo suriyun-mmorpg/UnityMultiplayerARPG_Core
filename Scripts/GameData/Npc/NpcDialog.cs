@@ -16,6 +16,8 @@ namespace MultiplayerARPG
         SaveRespawnPoint,
         Warp,
         RefineItem,
+        PlayerStorage,
+        GuildStorage,
     }
 
     [CreateAssetMenu(fileName = "Npc Dialog", menuName = "Create GameData/Npc Dialog")]
@@ -33,6 +35,8 @@ namespace MultiplayerARPG
         public const int SAVE_SPAWN_POINT_CANCEL_MENU_INDEX = 1;
         public const int WARP_CONFIRM_MENU_INDEX = 0;
         public const int WARP_CANCEL_MENU_INDEX = 1;
+        public const int STORAGE_CONFIRM_MENU_INDEX = 0;
+        public const int STORAGE_CANCEL_MENU_INDEX = 1;
 
         public NpcDialogType type;
         public NpcDialogMenu[] menus;
@@ -61,6 +65,8 @@ namespace MultiplayerARPG
         public MapInfo warpMap;
         public Vector3 warpPosition;
         public NpcDialog warpCancelDialog;
+        // Teleport
+        public NpcDialog storageCancelDialog;
 
         private void OnValidate()
         {

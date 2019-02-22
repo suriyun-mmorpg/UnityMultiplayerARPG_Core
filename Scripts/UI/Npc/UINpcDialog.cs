@@ -33,6 +33,10 @@ namespace MultiplayerARPG
         public string messageSaveRespawnPointCancel = "Cancel";
         public string messageWarpConfirm = "Confirm";
         public string messageWarpCancel = "Cancel";
+        public string messagePlayerStorageConfirm = "Open Storage";
+        public string messagePlayerStorageCancel = "Cancel";
+        public string messageGuildStorageConfirm = "Open Storage";
+        public string messageGuildStorageCancel = "Cancel";
 
         [Header("Event")]
         public UnityEvent onSwitchToNormalDialog;
@@ -41,6 +45,8 @@ namespace MultiplayerARPG
         public UnityEvent onSwitchToCraftItemDialog;
         public UnityEvent onSwitchToSaveRespawnPointDialog;
         public UnityEvent onSwitchToWarpDialog;
+        public UnityEvent onSwitchToPlayerStorageDialog;
+        public UnityEvent onSwitchToGuildStorageDialog;
 
         private UIList cacheMenuList;
         public UIList CacheMenuList
@@ -193,6 +199,30 @@ namespace MultiplayerARPG
                     warpCancelAction.menuIndex = NpcDialog.WARP_CANCEL_MENU_INDEX;
                     menuActions.Add(warpConfirmAction);
                     menuActions.Add(warpCancelAction);
+                    break;
+                case NpcDialogType.PlayerStorage:
+                    if (onSwitchToPlayerStorageDialog != null)
+                        onSwitchToPlayerStorageDialog.Invoke();
+                    UINpcDialogMenuAction playerStorageConfirmAction = new UINpcDialogMenuAction();
+                    UINpcDialogMenuAction playerStorageCancelAction = new UINpcDialogMenuAction();
+                    playerStorageConfirmAction.title = messagePlayerStorageConfirm;
+                    playerStorageConfirmAction.menuIndex = NpcDialog.STORAGE_CONFIRM_MENU_INDEX;
+                    playerStorageCancelAction.title = messagePlayerStorageCancel;
+                    playerStorageCancelAction.menuIndex = NpcDialog.STORAGE_CANCEL_MENU_INDEX;
+                    menuActions.Add(playerStorageConfirmAction);
+                    menuActions.Add(playerStorageCancelAction);
+                    break;
+                case NpcDialogType.GuildStorage:
+                    if (onSwitchToGuildStorageDialog != null)
+                        onSwitchToGuildStorageDialog.Invoke();
+                    UINpcDialogMenuAction guildStorageConfirmAction = new UINpcDialogMenuAction();
+                    UINpcDialogMenuAction guildStorageCancelAction = new UINpcDialogMenuAction();
+                    guildStorageConfirmAction.title = messageGuildStorageConfirm;
+                    guildStorageConfirmAction.menuIndex = NpcDialog.STORAGE_CONFIRM_MENU_INDEX;
+                    guildStorageCancelAction.title = messageGuildStorageCancel;
+                    guildStorageCancelAction.menuIndex = NpcDialog.STORAGE_CANCEL_MENU_INDEX;
+                    menuActions.Add(guildStorageConfirmAction);
+                    menuActions.Add(guildStorageCancelAction);
                     break;
             }
             // Menu

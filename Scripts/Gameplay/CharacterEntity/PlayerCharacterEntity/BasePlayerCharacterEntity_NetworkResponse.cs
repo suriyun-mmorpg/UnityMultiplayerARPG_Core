@@ -220,6 +220,12 @@ namespace MultiplayerARPG
                 case NpcDialogType.Warp:
                     NetFuncSelectNpcDialogWarpMenu(menuIndex);
                     break;
+                case NpcDialogType.PlayerStorage:
+                    NetFuncSelectNpcDialogPlayerStorageMenu(menuIndex);
+                    break;
+                case NpcDialogType.GuildStorage:
+                    NetFuncSelectNpcDialogGuildStorageMenu(menuIndex);
+                    break;
             }
 
             // `currentNpcDialog` have changed after select menu, then proceed new dialog activity if needed
@@ -339,7 +345,57 @@ namespace MultiplayerARPG
                     currentNpcDialog = null;
                     break;
                 case NpcDialog.WARP_CANCEL_MENU_INDEX:
-                    currentNpcDialog = currentNpcDialog.saveRespawnCancelDialog;
+                    currentNpcDialog = currentNpcDialog.warpCancelDialog;
+                    break;
+            }
+            if (currentNpcDialog == null)
+                RequestShowNpcDialog(0);
+            else
+                RequestShowNpcDialog(currentNpcDialog.DataId);
+        }
+
+        protected virtual void NetFuncSelectNpcDialogPlayerStorageMenu(int menuIndex)
+        {
+            if (currentNpcDialog == null ||
+                currentNpcDialog.type != NpcDialogType.PlayerStorage)
+            {
+                currentNpcDialog = null;
+                RequestShowNpcDialog(0);
+                return;
+            }
+            switch (menuIndex)
+            {
+                case NpcDialog.STORAGE_CONFIRM_MENU_INDEX:
+                    ShowStorage(StorageType.Player, Id);
+                    currentNpcDialog = null;
+                    break;
+                case NpcDialog.STORAGE_CANCEL_MENU_INDEX:
+                    currentNpcDialog = currentNpcDialog.storageCancelDialog;
+                    break;
+            }
+            if (currentNpcDialog == null)
+                RequestShowNpcDialog(0);
+            else
+                RequestShowNpcDialog(currentNpcDialog.DataId);
+        }
+
+        protected virtual void NetFuncSelectNpcDialogGuildStorageMenu(int menuIndex)
+        {
+            if (currentNpcDialog == null ||
+                currentNpcDialog.type != NpcDialogType.GuildStorage)
+            {
+                currentNpcDialog = null;
+                RequestShowNpcDialog(0);
+                return;
+            }
+            switch (menuIndex)
+            {
+                case NpcDialog.STORAGE_CONFIRM_MENU_INDEX:
+                    ShowStorage(StorageType.Guild, GuildId.ToString());
+                    currentNpcDialog = null;
+                    break;
+                case NpcDialog.STORAGE_CANCEL_MENU_INDEX:
+                    currentNpcDialog = currentNpcDialog.storageCancelDialog;
                     break;
             }
             if (currentNpcDialog == null)
@@ -497,16 +553,7 @@ namespace MultiplayerARPG
             if (buildingEntity != null &&
                 buildingEntity.CreatorId.Equals(Id) &&
                 buildingEntity.enableStorage)
-            {
-                StorageId storageId = new StorageId(StorageType.Building, buildingEntity.Id);
-                if (IsStorageDirty(storageId))
-                {
-                    SetCurrentStorage(storageId);
-                    gameManager.GetStorageItems(this, storageId);
-                }
-                // Show storage on client
-                CallNetFunction(NetFuncShowStorage, ConnectionId);
-            }
+                ShowStorage(StorageType.Building, buildingEntity.Id);
         }
 
         protected virtual void NetFuncShowStorage()
@@ -970,6 +1017,18 @@ namespace MultiplayerARPG
             if (DealingCharacter != null)
                 DealingCharacter.DealingCharacter = null;
             DealingCharacter = null;
+        }
+
+        protected virtual void ShowStorage(StorageType storageType, string ownerId)
+        {
+            StorageId storageId = new StorageId(storageType, ownerId);
+            if (IsStorageDirty(storageId))
+            {
+                SetCurrentStorage(storageId);
+                gameManager.GetStorageItems(this, storageId);
+            }
+            // Show storage on client
+            CallNetFunction(NetFuncShowStorage, ConnectionId);
         }
     }
 }
