@@ -1112,6 +1112,26 @@ namespace MultiplayerARPG
             }
         }
 
+        public Storage GetStorage(StorageId storageId)
+        {
+            Storage storage = default(Storage);
+            switch (storageId.storageType)
+            {
+                case StorageType.Player:
+                    storage = gameInstance.playerStorage;
+                    break;
+                case StorageType.Guild:
+                    storage = gameInstance.guildStorage;
+                    break;
+                case StorageType.Building:
+                    BuildingEntity buildingEntity;
+                    if (TryGetBuildingEntity(storageId.storageOwnerId, out buildingEntity))
+                        storage = buildingEntity.storage;
+                    break;
+            }
+            return storage;
+        }
+
         public abstract void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem);
         public abstract void CreateGuild(BasePlayerCharacterEntity playerCharacterEntity, string guildName);
         public abstract void GetStorageItems(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId);
