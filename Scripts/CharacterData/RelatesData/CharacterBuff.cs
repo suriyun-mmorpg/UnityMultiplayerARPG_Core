@@ -67,7 +67,7 @@ public class CharacterBuff : INetSerializable
             cacheSkill = null;
             cacheItem = null;
             cacheGuildSkill = null;
-            cacheBuff = new Buff();
+            cacheBuff = default(Buff);
             cacheDuration = 0;
             cacheRecoveryHp = 0;
             cacheRecoveryMp = 0;
@@ -139,31 +139,31 @@ public class CharacterBuff : INetSerializable
         return cacheDuration;
     }
 
-    public int GetBuffRecoveryHp()
+    public int GetRecoveryHp()
     {
         MakeCache();
         return cacheRecoveryHp;
     }
 
-    public int GetBuffRecoveryMp()
+    public int GetRecoveryMp()
     {
         MakeCache();
         return cacheRecoveryMp;
     }
 
-    public int GetBuffRecoveryStamina()
+    public int GetRecoveryStamina()
     {
         MakeCache();
         return cacheRecoveryStamina;
     }
 
-    public int GetBuffRecoveryFood()
+    public int GetRecoveryFood()
     {
         MakeCache();
         return cacheRecoveryFood;
     }
 
-    public int GetBuffRecoveryWater()
+    public int GetRecoveryWater()
     {
         MakeCache();
         return cacheRecoveryWater;

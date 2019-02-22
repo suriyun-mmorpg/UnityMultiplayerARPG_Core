@@ -16,6 +16,7 @@
         public float moveSpeed;
         public float atkSpeed;
         public float weightLimit;
+        public float slotLimit;
         public float stamina;
         public float food;
         public float water;
@@ -34,6 +35,7 @@
             moveSpeed = moveSpeed + b.moveSpeed;
             atkSpeed = atkSpeed + b.atkSpeed;
             weightLimit = weightLimit + b.weightLimit;
+            slotLimit = slotLimit + b.slotLimit;
             stamina = stamina + b.stamina;
             food = food + b.food;
             water = water + b.water;
@@ -54,6 +56,7 @@
             moveSpeed = moveSpeed * multiplier;
             atkSpeed = atkSpeed * multiplier;
             weightLimit = weightLimit * multiplier;
+            slotLimit = slotLimit * multiplier;
             stamina = stamina * multiplier;
             food = food * multiplier;
             water = water * multiplier;

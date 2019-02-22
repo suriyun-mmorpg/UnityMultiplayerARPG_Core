@@ -183,8 +183,7 @@ public static partial class CharacterDataExtension
         {
             if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
                 continue;
-            result = GameDataHelpers.CombineAttributes(result,
-                skill.GetSkill().buff.GetIncreaseAttributes(skill.level));
+            result = GameDataHelpers.CombineAttributes(result, skill.GetPassiveBuffIncreaseAttributes());
         }
         return result;
     }
@@ -282,8 +281,7 @@ public static partial class CharacterDataExtension
         {
             if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
                 continue;
-            result = GameDataHelpers.CombineResistances(result,
-                skill.GetSkill().buff.GetIncreaseResistances(skill.level));
+            result = GameDataHelpers.CombineResistances(result, skill.GetPassiveBuffIncreaseResistances());
         }
         return result;
     }
@@ -350,8 +348,7 @@ public static partial class CharacterDataExtension
         {
             if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
                 continue;
-            result = GameDataHelpers.CombineDamages(result,
-                skill.GetSkill().buff.GetIncreaseDamages(skill.level));
+            result = GameDataHelpers.CombineDamages(result, skill.GetPassiveBuffIncreaseDamages());
         }
         return result;
     }
@@ -434,14 +431,12 @@ public static partial class CharacterDataExtension
 
         // Passive skills
         IList<CharacterSkill> skills = data.Skills;
-        Buff tempBuff;
         foreach (CharacterSkill skill in skills)
         {
             if (skill.GetSkill() == null || skill.GetSkill().skillType != SkillType.Passive || skill.level <= 0)
                 continue;
-            tempBuff = skill.GetSkill().buff;
-            result += tempBuff.GetIncreaseStats(skill.level);
-            result += GameDataHelpers.GetStatsFromAttributes(tempBuff.GetIncreaseAttributes(skill.level));
+            result += skill.GetPassiveBuffIncreaseStats();
+            result += GameDataHelpers.GetStatsFromAttributes(skill.GetPassiveBuffIncreaseAttributes());
         }
         return result;
     }
@@ -456,6 +451,96 @@ public static partial class CharacterDataExtension
         return result;
     }
     #endregion
+
+    public static void FillEmptySlots(this ICharacterData data)
+    {
+        if (!GameInstance.Singleton.isLimitInventorySlot)
+        {
+            // If it is not limit slots, don't fill it
+            return;
+        }
+
+        // Fill empty slots
+        int slotLimit = (int)data.CacheStats.slotLimit;
+        for (int i = data.NonEquipItems.Count; i < slotLimit; ++i)
+        {
+            data.NonEquipItems.Add(CharacterItem.Empty);
+        }
+    }
+
+    public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, int dataId, short amount)
+    {
+        Item itemData;
+        if (amount <= 0 || !GameInstance.Items.TryGetValue(dataId, out itemData))
+        {
+            // If item not valid
+            return false;
+        }
+
+        if (data.CacheTotalItemWeight + (amount * itemData.weight) > data.CacheStats.weightLimit)
+        {
+            // If overwhelming
+            return true;
+        }
+
+        if (!GameInstance.Singleton.isLimitInventorySlot)
+        {
+            // If not limit slot then don't checking for slot amount
+            return false;
+        }
+
+        short maxStack = itemData.maxStack;
+        // Loop to all slots to add amount to any slots that item amount not max in stack
+        CharacterItem tempNonEquipItem;
+        for (int i = 0; i < data.NonEquipItems.Count; ++i)
+        {
+            tempNonEquipItem = data.NonEquipItems[i];
+            if (!tempNonEquipItem.IsValid())
+            {
+                // If current entry is not valid, assume that it is empty slot, so reduce amount of adding item here
+                if (amount <= maxStack)
+                {
+                    // Can add all items, so assume that it is not overwhelming 
+                    return false;
+                }
+                else
+                    amount -= maxStack;
+            }
+            else if (tempNonEquipItem.dataId == itemData.DataId)
+            {
+                // If same item id, increase its amount
+                if (tempNonEquipItem.amount + amount <= maxStack)
+                {
+                    // Can add all items, so assume that it is not overwhelming 
+                    return false;
+                }
+                else if (maxStack - tempNonEquipItem.amount >= 0)
+                    amount -= (short)(maxStack - tempNonEquipItem.amount);
+            }
+        }
+
+        int slotCount = data.NonEquipItems.Count;
+        int slotLimit = (int)data.CacheStats.slotLimit;
+        // Count adding slot here
+        while (amount > 0)
+        {
+            if (slotCount + 1 > slotLimit)
+            {
+                // If adding slot is more than slot limit, assume that it is overwhelming 
+                return true;
+            }
+            ++slotCount;
+            if (amount <= maxStack)
+            {
+                // Can add all items, so assume that it is not overwhelming 
+                return false;
+            }
+            else
+                amount -= maxStack;
+        }
+
+        return true;
+    }
 
     public static int CountNonEquipItems(this ICharacterData data, int dataId)
     {
@@ -485,40 +570,42 @@ public static partial class CharacterDataExtension
         Dictionary<int, CharacterItem> emptySlots = new Dictionary<int, CharacterItem>();
         Dictionary<int, CharacterItem> changes = new Dictionary<int, CharacterItem>();
         // Loop to all slots to add amount to any slots that item amount not max in stack
+        CharacterItem tempNonEquipItem;
         for (int i = 0; i < data.NonEquipItems.Count; ++i)
         {
-            CharacterItem nonEquipItem = data.NonEquipItems[i];
-            if (!nonEquipItem.IsValid())
+            tempNonEquipItem = data.NonEquipItems[i];
+            if (!tempNonEquipItem.IsValid())
             {
                 // If current entry is not valid, add it to empty list, going to replacing it later
-                emptySlots[i] = nonEquipItem;
+                emptySlots[i] = tempNonEquipItem;
             }
-            else if (nonEquipItem.dataId == dropData.dataId)
+            else if (tempNonEquipItem.dataId == dropData.dataId)
             {
                 // If same item id, increase its amount
-                if (nonEquipItem.amount + amount <= maxStack)
+                if (tempNonEquipItem.amount + amount <= maxStack)
                 {
-                    nonEquipItem.amount += amount;
-                    changes[i] = nonEquipItem;
+                    tempNonEquipItem.amount += amount;
+                    changes[i] = tempNonEquipItem;
                     amount = 0;
                     break;
                 }
-                else if (maxStack - nonEquipItem.amount >= 0)
+                else if (maxStack - tempNonEquipItem.amount >= 0)
                 {
-                    amount = (short)(amount - (maxStack - nonEquipItem.amount));
-                    nonEquipItem.amount = maxStack;
-                    changes[i] = nonEquipItem;
+                    amount -= (short)(maxStack - tempNonEquipItem.amount);
+                    tempNonEquipItem.amount = maxStack;
+                    changes[i] = tempNonEquipItem;
                 }
             }
         }
 
+        // Adding item to new slots or empty slots if needed
+        CharacterItem tempNewItem;
         if (changes.Count == 0 && emptySlots.Count > 0)
         {
             // If there are no changes and there are an empty entries, fill them
-            foreach (KeyValuePair<int, CharacterItem> emptySlot in emptySlots)
+            foreach (int emptySlotIndex in emptySlots.Keys)
             {
-                CharacterItem value = emptySlot.Value;
-                CharacterItem newItem = dropData.Clone();
+                tempNewItem = dropData.Clone();
                 short addAmount = 0;
                 if (amount - maxStack >= 0)
                 {
@@ -530,8 +617,8 @@ public static partial class CharacterDataExtension
                     addAmount = amount;
                     amount = 0;
                 }
-                newItem.amount = addAmount;
-                changes[emptySlot.Key] = newItem;
+                tempNewItem.amount = addAmount;
+                changes[emptySlotIndex] = tempNewItem;
             }
         }
 
@@ -541,10 +628,10 @@ public static partial class CharacterDataExtension
             data.NonEquipItems[change.Key] = change.Value;
         }
 
-        // Add new items
+        // Add new items to new slots
         while (amount > 0)
         {
-            CharacterItem newItem = dropData.Clone();
+            tempNewItem = dropData.Clone();
             short addAmount = 0;
             if (amount - maxStack >= 0)
             {
@@ -556,8 +643,8 @@ public static partial class CharacterDataExtension
                 addAmount = amount;
                 amount = 0;
             }
-            newItem.amount = addAmount;
-            data.NonEquipItems.Add(newItem);
+            tempNewItem.amount = addAmount;
+            data.NonEquipItems.Add(tempNewItem);
         }
         return true;
     }
@@ -644,7 +731,10 @@ public static partial class CharacterDataExtension
         if (!nonEquipItem.IsValid() || amount > nonEquipItem.amount)
             return false;
         if (nonEquipItem.amount - amount == 0)
+        {
             data.NonEquipItems.RemoveAt(index);
+            data.FillEmptySlots();
+        }
         else
         {
             nonEquipItem.amount -= amount;

@@ -162,15 +162,7 @@ public static partial class PlayerCharacterDataExtension
         {
             character.NonEquipItems.Add(returningItem);
         }
-        // Validating character non equip items
-        IList<CharacterItem> nonEquipItems = character.NonEquipItems;
-        for (int i = nonEquipItems.Count - 1; i >= 0; --i)
-        {
-            CharacterItem nonEquipItem = nonEquipItems[i];
-            // If equipment is invalid
-            if (!nonEquipItem.IsValid())
-                character.NonEquipItems.RemoveAt(i);
-        }
+        character.FillEmptySlots();
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "ValidateCharacterData", character);
         return character;
     }

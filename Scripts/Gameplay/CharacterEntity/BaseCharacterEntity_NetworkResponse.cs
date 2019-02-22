@@ -350,6 +350,7 @@ namespace MultiplayerARPG
                     break;
             }
             nonEquipItems.RemoveAt(nonEquipIndex);
+            this.FillEmptySlots();
         }
 
         /// <summary>

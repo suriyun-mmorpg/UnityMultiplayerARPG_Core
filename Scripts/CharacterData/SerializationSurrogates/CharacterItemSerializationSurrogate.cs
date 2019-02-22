@@ -15,6 +15,7 @@ public class CharacterItemSerializationSurrogate : ISerializationSurrogate
         info.AddValue("durability", data.durability);
         info.AddValue("exp", data.exp);
         info.AddValue("lockRemainsDuration", data.lockRemainsDuration);
+        info.AddValue("ammo", data.ammo);
     }
 
     public System.Object SetObjectData(System.Object obj,
@@ -28,6 +29,12 @@ public class CharacterItemSerializationSurrogate : ISerializationSurrogate
         data.durability = info.GetSingle("durability");
         data.exp = info.GetInt32("exp");
         data.lockRemainsDuration = info.GetSingle("lockRemainsDuration");
+        // Backward compatible
+        try
+        {
+            data.ammo = info.GetInt32("ammo");
+        }
+        catch { }
         obj = data;
         return obj;
     }

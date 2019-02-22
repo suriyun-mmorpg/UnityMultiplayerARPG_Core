@@ -101,6 +101,10 @@ namespace MultiplayerARPG
         public float CacheAtkSpeed { get { return cacheAtkSpeed; } }
         public float CacheMoveSpeed { get { return cacheMoveSpeed; } }
         public float CacheBaseMoveSpeed { get; protected set; }
+        public bool CacheDisallowMove { get; protected set; }
+        public bool CacheDisallowAttack { get; protected set; }
+        public bool CacheDisallowUseSkill { get; protected set; }
+        public bool CacheDisallowUseItem { get; protected set; }
         #endregion
 
         public override int MaxHp { get { return CacheMaxHp; } }
@@ -284,6 +288,78 @@ namespace MultiplayerARPG
             Profiler.EndSample();
         }
 
+        #region Caches / Relates Objects
+        /// <summary>
+        /// Make caches for character stats / attributes / skills / resistances / increase damages and so on immdediately
+        /// </summary>
+        public void ForceMakeCaches()
+        {
+            isRecaching = true;
+            MakeCaches();
+        }
+
+        /// <summary>
+        /// Make caches for character stats / attributes / skills / resistances / increase damages and so on when update calls
+        /// </summary>
+        protected virtual void MakeCaches()
+        {
+            if (!isRecaching)
+                return;
+            this.GetAllStats(
+                out cacheStats,
+                out cacheAttributes,
+                out cacheSkills,
+                out cacheResistances,
+                out cacheIncreaseDamages,
+                out cacheEquipmentSets,
+                out cacheMaxHp,
+                out cacheMaxMp,
+                out cacheMaxStamina,
+                out cacheMaxFood,
+                out cacheMaxWater,
+                out cacheTotalItemWeight,
+                out cacheAtkSpeed,
+                out cacheMoveSpeed);
+            if (this.GetDatabase() != null)
+                CacheBaseMoveSpeed = this.GetDatabase().stats.baseStats.moveSpeed;
+            CacheDisallowMove = false;
+            CacheDisallowAttack = false;
+            CacheDisallowUseSkill = false;
+            CacheDisallowUseItem = false;
+            Buff tempBuff;
+            foreach (CharacterBuff characterBuff in Buffs)
+            {
+                tempBuff = characterBuff.GetBuff();
+                if (tempBuff.disallowMove)
+                    CacheDisallowMove = true;
+                if (tempBuff.disallowAttack)
+                    CacheDisallowAttack = true;
+                if (tempBuff.disallowUseSkill)
+                    CacheDisallowUseSkill = true;
+                if (tempBuff.disallowUseItem)
+                    CacheDisallowUseItem = true;
+                if (CacheDisallowMove &&
+                    CacheDisallowAttack &&
+                    CacheDisallowUseSkill &&
+                    CacheDisallowUseItem)
+                    break;
+            }
+            isRecaching = false;
+        }
+
+        public virtual void InstantiateUI(UICharacterEntity prefab)
+        {
+            if (prefab == null)
+                return;
+            if (uiCharacterEntity != null)
+                Destroy(uiCharacterEntity.gameObject);
+            uiCharacterEntity = Instantiate(prefab, CharacterUITransform);
+            uiCharacterEntity.transform.localPosition = Vector3.zero;
+            uiCharacterEntity.Data = this;
+        }
+        #endregion
+
+        #region Attack / Receive Damage / Dead / Spawn
         public void ValidateRecovery(BaseCharacterEntity attacker = null)
         {
             if (!IsServer)
@@ -319,22 +395,79 @@ namespace MultiplayerARPG
                 Killed(attacker);
         }
 
-        #region Inventory helpers
-        public bool IncreasingItemsWillOverwhelming(int dataId, short amount)
+        protected virtual void GetDamagePositionAndRotation(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, out Vector3 position, out Quaternion rotation)
         {
-            Item itemData;
-            // If item not valid
-            if (amount <= 0 || !GameInstance.Items.TryGetValue(dataId, out itemData))
-                return false;
-
-            float weight = itemData.weight;
-            // If overwhelming
-            if (CacheTotalItemWeight + (amount * weight) > CacheStats.weightLimit)
-                return true;
-
-            return false;
+            position = CacheTransform.position;
+            switch (damageType)
+            {
+                case DamageType.Melee:
+                    position = MeleeDamageTransform.position;
+                    break;
+                case DamageType.Missile:
+                    Transform tempMissileDamageTransform = null;
+                    if ((tempMissileDamageTransform = CharacterModel.GetRightHandEquipmentEntity()) != null && !isLeftHand)
+                    {
+                        // Use position from right hand weapon missile damage transform
+                        position = tempMissileDamageTransform.position;
+                    }
+                    else if ((tempMissileDamageTransform = CharacterModel.GetLeftHandEquipmentEntity()) != null && isLeftHand)
+                    {
+                        // Use position from left hand weapon missile damage transform
+                        position = tempMissileDamageTransform.position;
+                    }
+                    else
+                    {
+                        // Use position from default missile damage transform
+                        position = MissileDamageTransform.position;
+                    }
+                    break;
+            }
+            rotation = Quaternion.LookRotation(CacheTransform.forward);
+            if (hasAimPosition)
+                rotation = Quaternion.LookRotation((aimPosition - position).normalized);
         }
 
+        public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)
+        {
+            base.ReceivedDamage(attacker, combatAmountType, damage);
+            if (attacker is BaseCharacterEntity)
+                gameInstance.GameplayRule.OnCharacterReceivedDamage(attacker as BaseCharacterEntity, this, combatAmountType, damage);
+        }
+
+        public virtual void Killed(BaseCharacterEntity lastAttacker)
+        {
+            StopAllCoroutines();
+            buffs.Clear();
+            skillUsages.Clear();
+            // Send OnDead to owner player only
+            RequestOnDead();
+        }
+
+        public virtual void Respawn()
+        {
+            if (!IsServer || !IsDead())
+                return;
+            CurrentHp = CacheMaxHp;
+            CurrentMp = CacheMaxMp;
+            CurrentStamina = CacheMaxStamina;
+            CurrentFood = CacheMaxFood;
+            CurrentWater = CacheMaxWater;
+            // Send OnRespawn to owner player only
+            RequestOnRespawn();
+        }
+
+        public virtual void RewardExp(int exp, RewardGivenType rewardGivenType)
+        {
+            if (!IsServer)
+                return;
+            if (!gameInstance.GameplayRule.IncreaseExp(this, exp))
+                return;
+            // Send OnLevelUp to owner player only
+            RequestOnLevelUp();
+        }
+        #endregion
+
+        #region Inventory Helpers
         public bool CanEquipItem(CharacterItem equippingItem, InventoryType inventoryType, int oldEquipIndex, out GameMessage.Type gameMessageType, out bool shouldUnequipRightHand, out bool shouldUnequipLeftHand)
         {
             gameMessageType = GameMessage.Type.None;
@@ -611,35 +744,35 @@ namespace MultiplayerARPG
                 }
                 CurrentHp -= tempAmount;
                 // Hp recovery
-                tempAmount = newBuff.GetBuffRecoveryHp();
+                tempAmount = newBuff.GetRecoveryHp();
                 if (tempAmount != 0)
                 {
                     CurrentHp += tempAmount;
                     RequestCombatAmount(CombatAmountType.HpRecovery, tempAmount);
                 }
                 // Mp recovery
-                tempAmount = newBuff.GetBuffRecoveryMp();
+                tempAmount = newBuff.GetRecoveryMp();
                 if (tempAmount != 0)
                 {
                     CurrentMp += tempAmount;
                     RequestCombatAmount(CombatAmountType.MpRecovery, tempAmount);
                 }
                 // Stamina recovery
-                tempAmount = newBuff.GetBuffRecoveryStamina();
+                tempAmount = newBuff.GetRecoveryStamina();
                 if (tempAmount != 0)
                 {
                     CurrentStamina += tempAmount;
                     RequestCombatAmount(CombatAmountType.StaminaRecovery, tempAmount);
                 }
                 // Food recovery
-                tempAmount = newBuff.GetBuffRecoveryFood();
+                tempAmount = newBuff.GetRecoveryFood();
                 if (tempAmount != 0)
                 {
                     CurrentFood += tempAmount;
                     RequestCombatAmount(CombatAmountType.FoodRecovery, tempAmount);
                 }
                 // Water recovery
-                tempAmount = newBuff.GetBuffRecoveryWater();
+                tempAmount = newBuff.GetRecoveryWater();
                 if (tempAmount != 0)
                 {
                     CurrentWater += tempAmount;
@@ -1073,6 +1206,55 @@ namespace MultiplayerARPG
         }
         #endregion
 
+        #region Allowed abilities
+        public virtual bool IsPlayingActionAnimation()
+        {
+            return animActionType == AnimActionType.AttackRightHand || animActionType == AnimActionType.AttackLeftHand || animActionType == AnimActionType.Skill;
+        }
+
+        public virtual bool CanDoActions()
+        {
+            return !IsDead() && !IsPlayingActionAnimation() && !isAttackingOrUsingSkill;
+        }
+
+        public bool CanMove()
+        {
+            if (IsDead())
+                return false;
+            if (CacheDisallowMove)
+                return false;
+            return true;
+        }
+
+        public bool CanAttack()
+        {
+            if (!CanDoActions())
+                return false;
+            if (CacheDisallowAttack)
+                return false;
+            return true;
+        }
+
+        public bool CanUseSkill()
+        {
+            if (!CanDoActions())
+                return false;
+            if (CacheDisallowUseSkill)
+                return false;
+            return true;
+        }
+
+        public bool CanUseItem()
+        {
+            if (IsDead())
+                return false;
+            if (CacheDisallowUseItem)
+                return false;
+            return true;
+        }
+        #endregion
+
+        #region Find objects helpers
         public int OverlapObjects(Vector3 position, float distance, int layerMask)
         {
             if (gameInstance.DimensionType == DimensionType.Dimension2D)
@@ -1104,190 +1286,6 @@ namespace MultiplayerARPG
             targetDir.Normalize();
             forward.Normalize();
             return Vector3.Angle(targetDir, forward) < halfFov;
-        }
-
-        protected virtual void GetDamagePositionAndRotation(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, out Vector3 position, out Quaternion rotation)
-        {
-            position = CacheTransform.position;
-            switch (damageType)
-            {
-                case DamageType.Melee:
-                    position = MeleeDamageTransform.position;
-                    break;
-                case DamageType.Missile:
-                    Transform tempMissileDamageTransform = null;
-                    if ((tempMissileDamageTransform = CharacterModel.GetRightHandEquipmentEntity()) != null && !isLeftHand)
-                    {
-                        // Use position from right hand weapon missile damage transform
-                        position = tempMissileDamageTransform.position;
-                    }
-                    else if ((tempMissileDamageTransform = CharacterModel.GetLeftHandEquipmentEntity()) != null && isLeftHand)
-                    {
-                        // Use position from left hand weapon missile damage transform
-                        position = tempMissileDamageTransform.position;
-                    }
-                    else
-                    {
-                        // Use position from default missile damage transform
-                        position = MissileDamageTransform.position;
-                    }
-                    break;
-            }
-            rotation = Quaternion.LookRotation(CacheTransform.forward);
-            if (hasAimPosition)
-                rotation = Quaternion.LookRotation((aimPosition - position).normalized);
-        }
-
-        public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)
-        {
-            base.ReceivedDamage(attacker, combatAmountType, damage);
-            if (attacker is BaseCharacterEntity)
-                gameInstance.GameplayRule.OnCharacterReceivedDamage(attacker as BaseCharacterEntity, this, combatAmountType, damage);
-        }
-
-        public virtual void Killed(BaseCharacterEntity lastAttacker)
-        {
-            StopAllCoroutines();
-            buffs.Clear();
-            skillUsages.Clear();
-            // Send OnDead to owner player only
-            RequestOnDead();
-        }
-
-        public virtual void Respawn()
-        {
-            if (!IsServer || !IsDead())
-                return;
-            CurrentHp = CacheMaxHp;
-            CurrentMp = CacheMaxMp;
-            CurrentStamina = CacheMaxStamina;
-            CurrentFood = CacheMaxFood;
-            CurrentWater = CacheMaxWater;
-            // Send OnRespawn to owner player only
-            RequestOnRespawn();
-        }
-
-        /// <summary>
-        /// Make caches for character stats / attributes / skills / resistances / increase damages and so on immdediately
-        /// </summary>
-        public void ForceMakeCaches()
-        {
-            isRecaching = true;
-            MakeCaches();
-        }
-
-        /// <summary>
-        /// Make caches for character stats / attributes / skills / resistances / increase damages and so on when update calls
-        /// </summary>
-        protected virtual void MakeCaches()
-        {
-            if (!isRecaching)
-                return;
-            this.GetAllStats(
-                out cacheStats,
-                out cacheAttributes,
-                out cacheSkills,
-                out cacheResistances,
-                out cacheIncreaseDamages,
-                out cacheEquipmentSets,
-                out cacheMaxHp,
-                out cacheMaxMp,
-                out cacheMaxStamina,
-                out cacheMaxFood,
-                out cacheMaxWater,
-                out cacheTotalItemWeight,
-                out cacheAtkSpeed,
-                out cacheMoveSpeed);
-            if (this.GetDatabase() != null)
-                CacheBaseMoveSpeed = this.GetDatabase().stats.baseStats.moveSpeed;
-            isRecaching = false;
-        }
-
-        public virtual void InstantiateUI(UICharacterEntity prefab)
-        {
-            if (prefab == null)
-                return;
-            if (uiCharacterEntity != null)
-                Destroy(uiCharacterEntity.gameObject);
-            uiCharacterEntity = Instantiate(prefab, CharacterUITransform);
-            uiCharacterEntity.transform.localPosition = Vector3.zero;
-            uiCharacterEntity.Data = this;
-        }
-
-        public virtual bool IsPlayingActionAnimation()
-        {
-            return animActionType == AnimActionType.AttackRightHand || animActionType == AnimActionType.AttackLeftHand || animActionType == AnimActionType.Skill;
-        }
-
-        public virtual bool CanDoActions()
-        {
-            return !IsDead() && !IsPlayingActionAnimation() && !isAttackingOrUsingSkill;
-        }
-
-        public bool CanMove()
-        {
-            if (IsDead())
-                return false;
-            CharacterBuff tempBuff;
-            for (int i = 0; i < Buffs.Count; ++i)
-            {
-                tempBuff = Buffs[i];
-                if (tempBuff.GetDisallowMove())
-                    return false;
-            }
-            return true;
-        }
-
-        public bool CanAttack()
-        {
-            if (!CanDoActions())
-                return false;
-            CharacterBuff tempBuff;
-            for (int i = 0; i < Buffs.Count; ++i)
-            {
-                tempBuff = Buffs[i];
-                if (tempBuff.GetDisallowAttack())
-                    return false;
-            }
-            return true;
-        }
-
-        public bool CanUseSkill()
-        {
-            if (!CanDoActions())
-                return false;
-            CharacterBuff tempBuff;
-            for (int i = 0; i < Buffs.Count; ++i)
-            {
-                tempBuff = Buffs[i];
-                if (tempBuff.GetDisallowUseSkill())
-                    return false;
-            }
-            return true;
-        }
-
-        public bool CanUseItem()
-        {
-            if (IsDead())
-                return false;
-            CharacterBuff tempBuff;
-            for (int i = 0; i < Buffs.Count; ++i)
-            {
-                tempBuff = Buffs[i];
-                if (tempBuff.GetDisallowUseItem())
-                    return false;
-            }
-            return true;
-        }
-
-        public virtual void RewardExp(int exp, RewardGivenType rewardGivenType)
-        {
-            if (!IsServer)
-                return;
-            if (!gameInstance.GameplayRule.IncreaseExp(this, exp))
-                return;
-            // Send OnLevelUp to owner player only
-            RequestOnLevelUp();
         }
 
         public List<T> FindCharacters<T>(float distance, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
@@ -1359,6 +1357,7 @@ namespace MultiplayerARPG
                 (findForEnemy && characterEntity.IsEnemy(this)) ||
                 (findForNeutral && characterEntity.IsNeutral(this));
         }
+        #endregion
 
         private void NotifyEnemySpottedToAllies(BaseCharacterEntity enemy)
         {
