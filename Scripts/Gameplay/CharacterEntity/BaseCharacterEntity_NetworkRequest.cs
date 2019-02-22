@@ -126,5 +126,10 @@ namespace MultiplayerARPG
         {
             CallNetFunction(NetFuncUnSummon, FunctionReceivers.Server, objectId);
         }
+
+        public virtual void RequestSwapOrMergeNonEquipItems(short index1, short index2)
+        {
+            CallNetFunction(NetFuncSwapOrMergeNonEquipItems, FunctionReceivers.Server, index1, index2);
+        }
     }
 }

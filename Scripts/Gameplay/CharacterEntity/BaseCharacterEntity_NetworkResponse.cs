@@ -461,6 +461,23 @@ namespace MultiplayerARPG
                 index2 >= nonEquipItems.Count)
                 return;
 
+            CharacterItem nonEquipItem1 = nonEquipItems[index1];
+            CharacterItem nonEquipItem2 = nonEquipItems[index2];
+            short maxStack = nonEquipItem2.GetMaxStack();
+            if (nonEquipItem2.amount + nonEquipItem1.amount <= maxStack)
+            {
+                nonEquipItem2.amount += nonEquipItem1.amount;
+                nonEquipItems[index2] = nonEquipItem2;
+                nonEquipItems.RemoveAt(index1);
+            }
+            else
+            {
+                short mergeAmount = (short)(maxStack - nonEquipItem2.amount);
+                nonEquipItem2.amount = maxStack;
+                nonEquipItem1.amount -= mergeAmount;
+                nonEquipItems[index1] = nonEquipItem1;
+                nonEquipItems[index2] = nonEquipItem2;
+            }
         }
 
         protected void NetFuncSwapNonEquipItems(short index1, short index2)
@@ -470,6 +487,11 @@ namespace MultiplayerARPG
                 index2 >= nonEquipItems.Count)
                 return;
 
+            CharacterItem nonEquipItem1 = nonEquipItems[index1];
+            CharacterItem nonEquipItem2 = nonEquipItems[index2];
+
+            nonEquipItems[index2] = nonEquipItem1;
+            nonEquipItems[index1] = nonEquipItem2;
         }
     }
 }
