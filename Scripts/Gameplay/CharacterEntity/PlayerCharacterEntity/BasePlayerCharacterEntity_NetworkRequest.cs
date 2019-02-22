@@ -311,5 +311,15 @@ namespace MultiplayerARPG
         {
             CallNetFunction(NetFuncLeaveGuild, FunctionReceivers.Server);
         }
+
+        public virtual void RequestMoveItemToStorage(short nonEquipIndex, short amount, short storageItemIndex)
+        {
+            CallNetFunction(NetFuncMoveItemToStorage, FunctionReceivers.Server, nonEquipIndex, amount, storageItemIndex);
+        }
+
+        public virtual void RequestMoveItemFromStorage(short storageItemIndex, short amount, short nonEquipIndex)
+        {
+            CallNetFunction(NetFuncMoveItemFromStorage, FunctionReceivers.Server, storageItemIndex, amount, nonEquipIndex);
+        }
     }
 }

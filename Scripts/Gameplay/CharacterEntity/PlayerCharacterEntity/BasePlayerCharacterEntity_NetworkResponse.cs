@@ -29,7 +29,7 @@ namespace MultiplayerARPG
 
             CharacterItem fromItem = NonEquipItems[fromIndex];
             CharacterItem toItem = NonEquipItems[toIndex];
-            if (!fromItem.IsValid() || !toItem.IsValid())
+            if (!fromItem.IsEmptySlot() || !toItem.IsEmptySlot())
                 return;
 
             if (fromItem.dataId.Equals(toItem.dataId) && !fromItem.IsFull() && !toItem.IsFull())
@@ -447,7 +447,7 @@ namespace MultiplayerARPG
 
             BuildingEntity buildingEntity;
             CharacterItem nonEquipItem = NonEquipItems[itemIndex];
-            if (!nonEquipItem.IsValid() ||
+            if (!nonEquipItem.IsEmptySlot() ||
                 nonEquipItem.GetBuildingItem() == null ||
                 nonEquipItem.GetBuildingItem().buildingEntity == null ||
                 !GameInstance.BuildingEntities.TryGetValue(nonEquipItem.GetBuildingItem().buildingEntity.DataId, out buildingEntity) ||
@@ -502,10 +502,7 @@ namespace MultiplayerARPG
                 if (IsStorageDirty(storageId))
                 {
                     SetCurrentStorage(storageId);
-                    gameManager.GetStorageItems(storageId, (storageItems) =>
-                    {
-                        StorageItems = storageItems;
-                    });
+                    gameManager.GetStorageItems(this, storageId);
                 }
                 // Show storage on client
                 CallNetFunction(NetFuncShowStorage, ConnectionId);
@@ -540,7 +537,7 @@ namespace MultiplayerARPG
                 return;
 
             CharacterItem nonEquipItem = nonEquipItems[index];
-            if (!nonEquipItem.IsValid() || amount > nonEquipItem.amount)
+            if (!nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
                 return;
 
             Item item = nonEquipItem.GetItem();
@@ -923,6 +920,26 @@ namespace MultiplayerARPG
         protected virtual void NetFuncLeaveGuild()
         {
             gameManager.LeaveGuild(this);
+        }
+        #endregion
+
+        #region Storage
+        protected virtual void NetFuncMoveItemToStorage(short nonEquipIndex, short amount, short storageItemIndex)
+        {
+            if (IsDead() ||
+                nonEquipIndex >= nonEquipItems.Count)
+                return;
+
+            gameManager.MoveItemToStorage(this, currentStorageId, nonEquipIndex, amount, storageItemIndex);
+        }
+
+        protected virtual void NetFuncMoveItemFromStorage(short storageItemIndex, short amount, short nonEquipIndex)
+        {
+            if (IsDead() ||
+                storageItemIndex >= storageItems.Count)
+                return;
+
+            gameManager.MoveItemFromStorage(this, currentStorageId, storageItemIndex, amount, nonEquipIndex);
         }
         #endregion
 

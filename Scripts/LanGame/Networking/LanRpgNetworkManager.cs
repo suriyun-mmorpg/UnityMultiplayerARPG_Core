@@ -27,6 +27,7 @@ namespace MultiplayerARPG
         private Vector3? teleportPosition;
         private readonly WorldSaveData worldSaveData = new WorldSaveData();
         private readonly StorageSaveData storageSaveData = new StorageSaveData();
+        private readonly Dictionary<StorageId, List<CharacterItem>> storageItems = new Dictionary<StorageId, List<CharacterItem>>();
 
         public void StartGame()
         {
@@ -124,6 +125,13 @@ namespace MultiplayerARPG
             {
                 worldSaveData.LoadPersistentData(playerCharacterEntity.Id, playerCharacterEntity.CurrentMapName);
                 storageSaveData.LoadPersistentData(playerCharacterEntity.Id);
+                foreach (StorageCharacterItem storageItem in storageSaveData.storageItems)
+                {
+                    StorageId storageId = new StorageId(storageItem.storageType, storageItem.storageOwnerId);
+                    if (!storageItems.ContainsKey(storageId))
+                        storageItems[storageId] = new List<CharacterItem>();
+                    storageItems[storageId].Add(storageItem.characterItem);
+                }
                 StartCoroutine(SpawnBuildingsAndHarvestables(worldSaveData));
             }
             // Enable GM commands in Singleplayer / LAN mode
@@ -176,6 +184,19 @@ namespace MultiplayerARPG
         private void SaveStorage()
         {
             BasePlayerCharacterEntity playerCharacterEntity = BasePlayerCharacterController.OwningCharacter;
+            storageSaveData.storageItems.Clear();
+            foreach (StorageId key in storageItems.Keys)
+            {
+                foreach (CharacterItem item in storageItems[key])
+                {
+                    storageSaveData.storageItems.Add(new StorageCharacterItem()
+                    {
+                        storageType = key.storageType,
+                        storageOwnerId = key.storageOwnerId,
+                        characterItem = item,
+                    });
+                }
+            }
             storageSaveData.SavePersistentData(playerCharacterEntity.Id);
         }
 
@@ -216,18 +237,89 @@ namespace MultiplayerARPG
             CreateGuild(playerCharacterEntity, guildName, nextGuildId++);
         }
 
-        public override void GetStorageItems(StorageId storageId, System.Action<IList<CharacterItem>> onGetStorageItems)
+        public override void GetStorageItems(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId)
         {
-            List<CharacterItem> result = new List<CharacterItem>();
-            foreach (StorageCharacterItem storageItem in storageSaveData.storageItems)
+            playerCharacterEntity.StorageItems = storageItems[storageId];
+        }
+
+        public override void MoveItemToStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
+        {
+            if (!storageItems.ContainsKey(storageId))
+                storageItems[storageId] = new List<CharacterItem>();
+            List<CharacterItem> storageItemList = storageItems[storageId];
+            if (nonEquipIndex < 0 || nonEquipIndex >= playerCharacterEntity.NonEquipItems.Count)
             {
-                if (storageItem.storageType != storageId.storageType ||
-                    storageItem.storageOwnerId != storageId.storageOwnerId)
-                    continue;
-                result.Add(storageItem.characterItem);
+                // Don't do anything, if non equip item index is invalid
+                return;
             }
-            if (onGetStorageItems != null)
-                onGetStorageItems.Invoke(result);
+            CharacterItem movingItem = playerCharacterEntity.NonEquipItems[nonEquipIndex].Clone();
+            movingItem.amount = amount;
+            if (storageItemIndex < 0 ||
+                storageItemIndex >= storageItemList.Count ||
+                !storageItemList[storageItemIndex].IsEmptySlot() ||
+                storageItemList[storageItemIndex].dataId == movingItem.dataId)
+            {
+                // Add to storage or merge
+                bool isLimitWeight = false;
+                bool isLimitSlot = false;
+                int weightLimit = 0;
+                int slotLimit = 0;
+                bool isOverwhelming = CharacterDataExtension.IncreasingItemsWillOverwhelming(
+                    storageItemList, movingItem.dataId, movingItem.amount, isLimitWeight, weightLimit, 
+                    CharacterDataExtension.GetTotalItemWeight(storageItemList), isLimitSlot, slotLimit);
+                if (!isOverwhelming && CharacterDataExtension.IncreaseItems(storageItemList, movingItem))
+                {
+                    // Remove from inventory
+                    playerCharacterEntity.DecreaseItemsByIndex(nonEquipIndex, amount);
+                }
+            }
+            else
+            {
+                // Swapping
+                CharacterItem storageItem = storageItemList[storageItemIndex];
+                CharacterItem nonEquipItem = playerCharacterEntity.NonEquipItems[nonEquipIndex];
+
+                storageItemList[storageItemIndex] = nonEquipItem;
+                playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
+            }
+            playerCharacterEntity.StorageItems = storageItemList;
+        }
+
+        public override void MoveItemFromStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
+        {
+            if (!storageItems.ContainsKey(storageId))
+                storageItems[storageId] = new List<CharacterItem>();
+            List<CharacterItem> storageItemList = storageItems[storageId];
+            if (storageItemIndex < 0 || storageItemIndex >= storageItemList.Count)
+            {
+                // Don't do anything, if storage item index is invalid
+                return;
+            }
+            CharacterItem movingItem = storageItemList[storageItemIndex].Clone();
+            movingItem.amount = amount;
+            if (nonEquipIndex < 0 || 
+                nonEquipIndex >= playerCharacterEntity.NonEquipItems.Count ||
+                !playerCharacterEntity.NonEquipItems[nonEquipIndex].IsEmptySlot() ||
+                playerCharacterEntity.NonEquipItems[nonEquipIndex].dataId == movingItem.dataId)
+            {
+                // Add to inventory or merge
+                bool isOverwhelming = playerCharacterEntity.IncreasingItemsWillOverwhelming(movingItem.dataId, movingItem.amount);
+                if (!isOverwhelming && playerCharacterEntity.IncreaseItems(movingItem))
+                {
+                    // Remove from storage
+                    CharacterDataExtension.DecreaseItemsByIndex(storageItemList, storageItemIndex, amount);
+                }
+            }
+            else
+            {
+                // Swapping
+                CharacterItem storageItem = storageItemList[storageItemIndex];
+                CharacterItem nonEquipItem = playerCharacterEntity.NonEquipItems[nonEquipIndex];
+
+                storageItemList[storageItemIndex] = nonEquipItem;
+                playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
+            }
+            playerCharacterEntity.StorageItems = storageItemList;
         }
 
         protected override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)

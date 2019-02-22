@@ -101,6 +101,8 @@ namespace MultiplayerARPG
             RegisterNetFunction(NetFuncDeclineGuildInvitation);
             RegisterNetFunction<string>(NetFuncKickFromGuild);
             RegisterNetFunction(NetFuncLeaveGuild);
+            RegisterNetFunction<short, short, short>(NetFuncMoveItemToStorage);
+            RegisterNetFunction<short, short, short>(NetFuncMoveItemFromStorage);
         }
 
         protected override void EntityOnSetOwnerClient()

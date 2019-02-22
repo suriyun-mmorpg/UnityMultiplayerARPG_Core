@@ -134,13 +134,13 @@ public static partial class PlayerCharacterDataExtension
         CharacterItem leftHand = equipWeapons.leftHand;
         if (rightHand.GetEquipmentItem() == null)
         {
-            if (rightHand.IsValid())
+            if (rightHand.IsEmptySlot())
                 returningItems.Add(rightHand);
             equipWeapons.rightHand = CharacterItem.Empty;
         }
         if (leftHand.GetEquipmentItem() == null)
         {
-            if (leftHand.IsValid())
+            if (leftHand.IsEmptySlot())
                 returningItems.Add(leftHand);
             equipWeapons.leftHand = CharacterItem.Empty;
         }
@@ -152,7 +152,7 @@ public static partial class PlayerCharacterDataExtension
             // If equipment is invalid
             if (equipItem.GetEquipmentItem() == null)
             {
-                if (equipItem.IsValid())
+                if (equipItem.IsEmptySlot())
                     returningItems.Add(equipItem);
                 character.EquipItems.RemoveAt(i);
             }

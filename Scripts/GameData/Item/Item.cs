@@ -239,7 +239,7 @@ namespace MultiplayerARPG
         private static void RefineItem(IPlayerCharacterData character, CharacterItem refiningItem, System.Action<CharacterItem> onRefine, System.Action onDestroy, out GameMessage.Type gameMessageType)
         {
             gameMessageType = GameMessage.Type.CannotRefine;
-            if (!refiningItem.IsValid())
+            if (!refiningItem.IsEmptySlot())
             {
                 // Cannot refine because character item is empty
                 return;
@@ -365,7 +365,7 @@ namespace MultiplayerARPG
         private static void RepairItem(IPlayerCharacterData character, CharacterItem repairingItem, System.Action<CharacterItem> onRepaired, out GameMessage.Type gameMessageType)
         {
             gameMessageType = GameMessage.Type.CannotRepair;
-            if (!repairingItem.IsValid())
+            if (!repairingItem.IsEmptySlot())
             {
                 // Cannot refine because character item is empty
                 return;

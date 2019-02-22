@@ -227,7 +227,7 @@ namespace MultiplayerARPG
             base.SetEquipWeapons(equipWeapons);
             SetupComponent();
             Item weaponItem = GameInstance.Singleton.DefaultWeaponItem;
-            if (equipWeapons.rightHand.IsValid() && equipWeapons.rightHand.GetWeaponItem() != null)
+            if (equipWeapons.rightHand.IsEmptySlot() && equipWeapons.rightHand.GetWeaponItem() != null)
                 weaponItem = equipWeapons.rightHand.GetWeaponItem();
             if (weaponItem != null)
             {

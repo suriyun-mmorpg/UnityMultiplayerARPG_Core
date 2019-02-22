@@ -181,7 +181,7 @@ namespace MultiplayerARPG
             get { return dimensionType; }
         }
 
-        public bool isLimitInventorySlot
+        public bool IsLimitInventorySlot
         {
             get { return inventorySystem == InventorySystem.LimitSlots; }
         }

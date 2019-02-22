@@ -686,7 +686,7 @@ namespace MultiplayerARPG
             {
                 CharacterItem entry = equipItems[i];
                 Item armorItem = entry.GetArmorItem();
-                if (entry.IsValid() && armorItem != null && !equipItemIndexes.ContainsKey(armorItem.EquipPosition))
+                if (entry.IsEmptySlot() && armorItem != null && !equipItemIndexes.ContainsKey(armorItem.EquipPosition))
                     equipItemIndexes.Add(armorItem.EquipPosition, i);
             }
         }

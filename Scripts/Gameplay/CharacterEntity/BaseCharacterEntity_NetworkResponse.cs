@@ -268,7 +268,7 @@ namespace MultiplayerARPG
             }
 
             CharacterItem itemDropData = itemDropEntity.dropData;
-            if (!itemDropData.IsValid())
+            if (!itemDropData.IsEmptySlot())
             {
                 // Destroy item drop entity without item add because this is not valid
                 itemDropEntity.NetworkDestroy();
@@ -290,7 +290,7 @@ namespace MultiplayerARPG
                 return;
 
             CharacterItem nonEquipItem = nonEquipItems[index];
-            if (!nonEquipItem.IsValid() || amount > nonEquipItem.amount)
+            if (!nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
                 return;
 
             if (this.DecreaseItemsByIndex(index, amount))
@@ -382,7 +382,7 @@ namespace MultiplayerARPG
                     UpdateEquipItemIndexes();
                     break;
             }
-            if (unEquipItem.IsValid())
+            if (unEquipItem.IsEmptySlot())
                 nonEquipItems.Add(unEquipItem);
         }
 
@@ -433,7 +433,7 @@ namespace MultiplayerARPG
             CharacterItem nonEquipItem2 = nonEquipItems[index2];
 
             if (nonEquipItem1.dataId == nonEquipItem2.dataId &&
-                nonEquipItem1.IsValid() && nonEquipItem2.IsValid())
+                nonEquipItem1.IsEmptySlot() && nonEquipItem2.IsEmptySlot())
             {
                 // Merge or swap
                 if (nonEquipItem1.IsFull() || nonEquipItem2.IsFull())
