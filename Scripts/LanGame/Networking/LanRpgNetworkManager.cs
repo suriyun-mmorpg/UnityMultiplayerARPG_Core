@@ -28,6 +28,7 @@ namespace MultiplayerARPG
         private readonly WorldSaveData worldSaveData = new WorldSaveData();
         private readonly StorageSaveData storageSaveData = new StorageSaveData();
         private readonly Dictionary<StorageId, List<CharacterItem>> storageItems = new Dictionary<StorageId, List<CharacterItem>>();
+        private readonly Dictionary<StorageId, HashSet<uint>> usingStorageCharacters = new Dictionary<StorageId, HashSet<uint>>();
 
         public void StartGame()
         {
@@ -108,18 +109,15 @@ namespace MultiplayerARPG
             LiteNetLibIdentity identity = Assets.NetworkSpawn(entityPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
             BasePlayerCharacterEntity playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterData.CloneTo(playerCharacterEntity);
-            // Summon saved summons
-            for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
-            {
-                CharacterSummon summon = playerCharacterEntity.Summons[i];
-                summon.Summon(playerCharacterEntity, summon.Level, summon.summonRemainsDuration, summon.Exp, summon.CurrentHp, summon.CurrentMp);
-                playerCharacterEntity.Summons[i] = summon;
-            }
-            // Notify clients that this character is spawn or dead
-            if (!playerCharacterEntity.IsDead())
-                playerCharacterEntity.RequestOnRespawn();
-            else
-                playerCharacterEntity.RequestOnDead();
+
+            // Set user Id
+            playerCharacterEntity.UserId = playerCharacterEntity.Id;
+
+            // Enable GM commands in Singleplayer / LAN mode
+            // TODO: Don't use fixed user level
+            if (enableGmCommands)
+                playerCharacterEntity.UserLevel = 1;
+
             // Load world / storage for first character (host)
             if (playerCharacters.Count == 0)
             {
@@ -134,10 +132,21 @@ namespace MultiplayerARPG
                 }
                 StartCoroutine(SpawnBuildingsAndHarvestables(worldSaveData));
             }
-            // Enable GM commands in Singleplayer / LAN mode
-            // TODO: Don't use fixed user level
-            if (enableGmCommands)
-                playerCharacterEntity.UserLevel = 1;
+
+            // Summon saved summons
+            for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
+            {
+                CharacterSummon summon = playerCharacterEntity.Summons[i];
+                summon.Summon(playerCharacterEntity, summon.Level, summon.summonRemainsDuration, summon.Exp, summon.CurrentHp, summon.CurrentMp);
+                playerCharacterEntity.Summons[i] = summon;
+            }
+
+            // Notify clients that this character is spawn or dead
+            if (!playerCharacterEntity.IsDead())
+                playerCharacterEntity.RequestOnRespawn();
+            else
+                playerCharacterEntity.RequestOnDead();
+
             // Register player, will use registered player to send chat / player messages
             RegisterPlayerCharacter(connectionId, playerCharacterEntity);
         }
@@ -237,9 +246,22 @@ namespace MultiplayerARPG
             CreateGuild(playerCharacterEntity, guildName, nextGuildId++);
         }
 
-        public override void GetStorageItems(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId)
+        public override void OpenStorage(BasePlayerCharacterEntity playerCharacterEntity)
         {
+            StorageId storageId = playerCharacterEntity.CurrentStorageId;
+            if (!storageItems.ContainsKey(storageId))
+                storageItems[storageId] = new List<CharacterItem>();
+            if (!usingStorageCharacters.ContainsKey(storageId))
+                usingStorageCharacters[storageId] = new HashSet<uint>();
+            usingStorageCharacters[storageId].Add(playerCharacterEntity.ObjectId);
             playerCharacterEntity.StorageItems = storageItems[storageId];
+        }
+
+        public override void CloseStorage(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            StorageId storageId = playerCharacterEntity.CurrentStorageId;
+            usingStorageCharacters[storageId].Remove(playerCharacterEntity.ObjectId);
+            playerCharacterEntity.StorageItems.Clear();
         }
 
         public override void MoveItemToStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
@@ -270,7 +292,7 @@ namespace MultiplayerARPG
                     CharacterDataExtension.GetTotalItemWeight(storageItemList), isLimitSlot, slotLimit);
                 if (!isOverwhelming && CharacterDataExtension.IncreaseItems(storageItemList, movingItem))
                 {
-                    // Remove from inventory
+                    // Decrease from inventory
                     playerCharacterEntity.DecreaseItemsByIndex(nonEquipIndex, amount);
                 }
             }
@@ -283,7 +305,7 @@ namespace MultiplayerARPG
                 storageItemList[storageItemIndex] = nonEquipItem;
                 playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
             }
-            playerCharacterEntity.StorageItems = storageItemList;
+            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
         public override void MoveItemFromStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
@@ -307,7 +329,7 @@ namespace MultiplayerARPG
                 bool isOverwhelming = playerCharacterEntity.IncreasingItemsWillOverwhelming(movingItem.dataId, movingItem.amount);
                 if (!isOverwhelming && playerCharacterEntity.IncreaseItems(movingItem))
                 {
-                    // Remove from storage
+                    // Decrease from storage
                     CharacterDataExtension.DecreaseItemsByIndex(storageItemList, storageItemIndex, amount);
                 }
             }
@@ -320,7 +342,20 @@ namespace MultiplayerARPG
                 storageItemList[storageItemIndex] = nonEquipItem;
                 playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
             }
-            playerCharacterEntity.StorageItems = storageItemList;
+            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
+        }
+
+        private void UpdateStorageItemsToCharacters(HashSet<uint> objectIds, List<CharacterItem> storageItems)
+        {
+            PlayerCharacterEntity playerCharacterEntity;
+            foreach (uint objectId in objectIds)
+            {
+                if (Assets.TryGetSpawnedObject(objectId, out playerCharacterEntity))
+                {
+                    // Update storage items
+                    playerCharacterEntity.StorageItems = storageItems;
+                }
+            }
         }
 
         protected override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)

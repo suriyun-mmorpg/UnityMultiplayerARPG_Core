@@ -1025,7 +1025,7 @@ namespace MultiplayerARPG
             if (IsStorageDirty(storageId))
             {
                 SetCurrentStorage(storageId);
-                gameManager.GetStorageItems(this, storageId);
+                gameManager.OpenStorage(this, storageId);
             }
             // Show storage on client
             CallNetFunction(NetFuncShowStorage, ConnectionId);

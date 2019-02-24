@@ -75,6 +75,11 @@ namespace MultiplayerARPG
         #region Storage System
         protected StorageId currentStorageId;
         protected SyncListCharacterItem storageItems = new SyncListCharacterItem();
+        public StorageId CurrentStorageId
+        {
+            get { return currentStorageId; }
+        }
+
         public IList<CharacterItem> StorageItems
         {
             get { return storageItems; }
@@ -112,6 +117,7 @@ namespace MultiplayerARPG
         public bool IsWarping { get { return isWarping.Value; } set { isWarping.Value = value; } }
         public byte GuildRole { get; set; }
         public int SharedGuildExp { get; set; }
+        public string UserId { get; set; }
         public byte UserLevel { get; set; }
         public string CurrentMapName { get { return gameManager.GetCurrentMapId(this); } set { } }
         public Vector3 CurrentPosition
