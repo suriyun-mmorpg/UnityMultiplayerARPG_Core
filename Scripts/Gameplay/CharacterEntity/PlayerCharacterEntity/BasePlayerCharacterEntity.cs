@@ -23,22 +23,6 @@ namespace MultiplayerARPG
         [Tooltip("Leave this empty to use GameInstance's controller prefab")]
         public BasePlayerCharacterController controllerPrefab;
 
-        private BasePlayerCharacterEntity dealingCharacter;
-        public BasePlayerCharacterEntity DealingCharacter
-        {
-            get
-            {
-                if (DealingState == DealingState.None && Time.unscaledTime - dealingCharacterTime >= gameInstance.coCharacterActionDuration)
-                    dealingCharacter = null;
-                return dealingCharacter;
-            }
-            set
-            {
-                dealingCharacter = value;
-                dealingCharacterTime = Time.unscaledTime;
-            }
-        }
-
         private LiteNetLibTransform cacheNetTransform;
         public LiteNetLibTransform CacheNetTransform
         {
@@ -49,8 +33,6 @@ namespace MultiplayerARPG
                 return cacheNetTransform;
             }
         }
-
-        public float dealingCharacterTime { get; private set; }
 
         protected override void EntityAwake()
         {
@@ -300,17 +282,7 @@ namespace MultiplayerARPG
         {
             // TODO: May send data to client
         }
-
-        public bool IsStorageDirty(StorageId storageId)
-        {
-            return !storageId.Equals(currentStorageId);
-        }
-
-        public void SetCurrentStorage(StorageId storageId)
-        {
-            currentStorageId = storageId;
-        }
-
+        
         public abstract float StoppingDistance { get; }
         public abstract void StopMove();
         public abstract void KeyMovement(Vector3 moveDirection, MovementFlag moveState);

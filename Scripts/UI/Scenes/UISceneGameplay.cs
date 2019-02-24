@@ -70,6 +70,9 @@ namespace MultiplayerARPG
         public UIDealing uiDealing;
         public UIPartyInvitation uiPartyInvitation;
         public UIGuildInvitation uiGuildInvitation;
+        public UIStorage uiPlayerStorage;
+        public UIStorage uiGuildStorage;
+        public UIStorage uiBuildingStorage;
         public UIBase uiIsWarping;
         public UIToggleUI[] toggleUis;
         [Tooltip("These GameObject (s) will ignore click / touch detection when click or touch on screen")]
@@ -100,6 +103,7 @@ namespace MultiplayerARPG
         public System.Action<BasePlayerCharacterEntity> onUpdateSummons;
         public System.Action<BasePlayerCharacterEntity> onUpdateHotkeys;
         public System.Action<BasePlayerCharacterEntity> onUpdateQuests;
+        public System.Action<BasePlayerCharacterEntity> onUpdateStorageItems;
 
         private void Awake()
         {
@@ -293,6 +297,22 @@ namespace MultiplayerARPG
             }
             if (onUpdateQuests != null)
                 onUpdateQuests.Invoke(BasePlayerCharacterController.OwningCharacter);
+        }
+
+        /// <summary>
+        /// This will be called from `BasePlayerCharacterController` class 
+        /// To update character storage items UIs when owning character storage items updated
+        /// </summary>
+        public void UpdateStorageItems()
+        {
+            if (uiPlayerStorage != null)
+                uiPlayerStorage.UpdateData();
+            if (uiGuildStorage != null)
+                uiGuildStorage.UpdateData();
+            if (uiBuildingStorage != null)
+                uiBuildingStorage.UpdateData();
+            if (onUpdateStorageItems != null)
+                onUpdateStorageItems.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
 
         /// <summary>
@@ -506,6 +526,33 @@ namespace MultiplayerARPG
                 return;
             uiGuildInvitation.Data = playerCharacter;
             uiGuildInvitation.Show();
+        }
+
+        public void OnShowStorage(StorageType storageType)
+        {
+            // Hide all of storage UIs
+            if (uiPlayerStorage != null)
+                uiPlayerStorage.Hide();
+            if (uiGuildStorage != null)
+                uiGuildStorage.Hide();
+            if (uiBuildingStorage != null)
+                uiBuildingStorage.Hide();
+            // Show only selected storage type
+            switch (storageType)
+            {
+                case StorageType.Player:
+                    if (uiPlayerStorage != null)
+                        uiPlayerStorage.Show();
+                    break;
+                case StorageType.Guild:
+                    if (uiGuildStorage != null)
+                        uiGuildStorage.Show();
+                    break;
+                case StorageType.Building:
+                    if (uiBuildingStorage != null)
+                        uiBuildingStorage.Show();
+                    break;
+            }
         }
 
         public void OnIsWarpingChange(bool isWarping)

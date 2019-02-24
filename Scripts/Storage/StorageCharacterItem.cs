@@ -2,6 +2,7 @@
 
 public enum StorageType
 {
+    None,
     Player,
     Guild,
     Building,

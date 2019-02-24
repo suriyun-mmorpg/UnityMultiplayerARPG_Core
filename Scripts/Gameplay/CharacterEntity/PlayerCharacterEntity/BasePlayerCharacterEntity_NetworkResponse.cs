@@ -19,6 +19,7 @@ namespace MultiplayerARPG
         public System.Action<DealingCharacterItems> onUpdateAnotherDealingItems;
         public System.Action<BasePlayerCharacterEntity> onShowPartyInvitationDialog;
         public System.Action<BasePlayerCharacterEntity> onShowGuildInvitationDialog;
+        public System.Action<StorageType> onShowStorage;
 
         protected virtual void NetFuncSwapOrMergeItem(short fromIndex, short toIndex)
         {
@@ -366,7 +367,7 @@ namespace MultiplayerARPG
             switch (menuIndex)
             {
                 case NpcDialog.STORAGE_CONFIRM_MENU_INDEX:
-                    ShowStorage(StorageType.Player, Id);
+                    OpenStorage(StorageType.Player, Id);
                     currentNpcDialog = null;
                     break;
                 case NpcDialog.STORAGE_CANCEL_MENU_INDEX:
@@ -391,7 +392,7 @@ namespace MultiplayerARPG
             switch (menuIndex)
             {
                 case NpcDialog.STORAGE_CONFIRM_MENU_INDEX:
-                    ShowStorage(StorageType.Guild, GuildId.ToString());
+                    OpenStorage(StorageType.Guild, GuildId.ToString());
                     currentNpcDialog = null;
                     break;
                 case NpcDialog.STORAGE_CANCEL_MENU_INDEX:
@@ -553,12 +554,13 @@ namespace MultiplayerARPG
             if (buildingEntity != null &&
                 buildingEntity.CreatorId.Equals(Id) &&
                 buildingEntity.enableStorage)
-                ShowStorage(StorageType.Building, buildingEntity.Id);
+                OpenStorage(StorageType.Building, buildingEntity.Id);
         }
 
-        protected virtual void NetFuncShowStorage()
+        protected virtual void NetFuncShowStorage(byte byteStorageType)
         {
-            // TODO: Implement this
+            if (onShowStorage != null)
+                onShowStorage.Invoke((StorageType)byteStorageType);
         }
 
         protected virtual void NetFuncDepositToStorage(short index, short amount)
@@ -1019,16 +1021,23 @@ namespace MultiplayerARPG
             DealingCharacter = null;
         }
 
-        protected virtual void ShowStorage(StorageType storageType, string ownerId)
+        protected virtual void OpenStorage(StorageType storageType, string ownerId)
         {
             StorageId storageId = new StorageId(storageType, ownerId);
-            if (IsStorageDirty(storageId))
+            if (!currentStorageId.Equals(storageId))
             {
-                SetCurrentStorage(storageId);
-                gameManager.OpenStorage(this, storageId);
+                currentStorageId = storageId;
+                gameManager.OpenStorage(this);
             }
-            // Show storage on client
-            CallNetFunction(NetFuncShowStorage, ConnectionId);
+            // Show storage on clients
+            CallNetFunction(NetFuncShowStorage, ConnectionId, (byte)storageType);
+        }
+
+        protected virtual void CloseStorage()
+        {
+            gameManager.CloseStorage(this);
+            // Show storage on clients
+            CallNetFunction(NetFuncShowStorage, ConnectionId, (byte)StorageType.None);
         }
     }
 }

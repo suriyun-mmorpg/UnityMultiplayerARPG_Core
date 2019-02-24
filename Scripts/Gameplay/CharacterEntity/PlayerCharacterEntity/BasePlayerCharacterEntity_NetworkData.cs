@@ -70,6 +70,24 @@ namespace MultiplayerARPG
                     DealingCharacter.RequestUpdateAnotherDealingItems(value);
             }
         }
+
+        private BasePlayerCharacterEntity dealingCharacter;
+        public BasePlayerCharacterEntity DealingCharacter
+        {
+            get
+            {
+                if (DealingState == DealingState.None && Time.unscaledTime - dealingCharacterTime >= gameInstance.coCharacterActionDuration)
+                    dealingCharacter = null;
+                return dealingCharacter;
+            }
+            set
+            {
+                dealingCharacter = value;
+                dealingCharacterTime = Time.unscaledTime;
+            }
+        }
+
+        public float dealingCharacterTime { get; private set; }
         #endregion
 
         #region Storage System

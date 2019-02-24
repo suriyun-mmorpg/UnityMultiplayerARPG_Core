@@ -80,6 +80,7 @@ namespace MultiplayerARPG
                 characterEntity.onUpdateAnotherDealingItems += CacheUISceneGameplay.OnUpdateAnotherDealingItems;
                 characterEntity.onShowPartyInvitationDialog += CacheUISceneGameplay.OnShowPartyInvitation;
                 characterEntity.onShowGuildInvitationDialog += CacheUISceneGameplay.OnShowGuildInvitation;
+                characterEntity.onShowStorage += CacheUISceneGameplay.OnShowStorage;
                 characterEntity.onIsWarpingChange += CacheUISceneGameplay.OnIsWarpingChange;
 
                 CacheUISceneGameplay.UpdateCharacter();
@@ -89,6 +90,7 @@ namespace MultiplayerARPG
                 CacheUISceneGameplay.UpdateNonEquipItems();
                 CacheUISceneGameplay.UpdateHotkeys();
                 CacheUISceneGameplay.UpdateQuests();
+                CacheUISceneGameplay.UpdateStorageItems();
             }
             characterEntity.onIdChange += OnIdChange;
             characterEntity.onEquipWeaponsChange += OnEquipWeaponsChange;
@@ -100,6 +102,7 @@ namespace MultiplayerARPG
             characterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
             characterEntity.onHotkeysOperation += OnHotkeysOperation;
             characterEntity.onQuestsOperation += OnQuestsOperation;
+            characterEntity.onStorageItemsOperation += OnStorageItemsOperation;
 
             if (onSetup != null)
                 onSetup.Invoke(this);
@@ -123,6 +126,7 @@ namespace MultiplayerARPG
             characterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
             characterEntity.onHotkeysOperation -= OnHotkeysOperation;
             characterEntity.onQuestsOperation -= OnQuestsOperation;
+            characterEntity.onStorageItemsOperation -= OnStorageItemsOperation;
 
             if (CacheUISceneGameplay != null)
             {
@@ -140,6 +144,7 @@ namespace MultiplayerARPG
                 characterEntity.onUpdateAnotherDealingItems -= CacheUISceneGameplay.OnUpdateAnotherDealingItems;
                 characterEntity.onShowPartyInvitationDialog -= CacheUISceneGameplay.OnShowPartyInvitation;
                 characterEntity.onShowGuildInvitationDialog -= CacheUISceneGameplay.OnShowGuildInvitation;
+                characterEntity.onShowStorage -= CacheUISceneGameplay.OnShowStorage;
                 characterEntity.onIsWarpingChange -= CacheUISceneGameplay.OnIsWarpingChange;
             }
 
@@ -240,6 +245,12 @@ namespace MultiplayerARPG
         {
             if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
                 CacheUISceneGameplay.UpdateQuests();
+        }
+
+        protected void OnStorageItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            if (PlayerCharacterEntity.IsOwnerClient && CacheUISceneGameplay != null)
+                CacheUISceneGameplay.UpdateStorageItems();
         }
         #endregion
 
