@@ -70,9 +70,9 @@ namespace MultiplayerARPG
         public UIDealing uiDealing;
         public UIPartyInvitation uiPartyInvitation;
         public UIGuildInvitation uiGuildInvitation;
-        public UIStorage uiPlayerStorage;
-        public UIStorage uiGuildStorage;
-        public UIStorage uiBuildingStorage;
+        public UIStorageItems uiPlayerStorageItems;
+        public UIStorageItems uiGuildStorageItems;
+        public UIStorageItems uiBuildingStorageItems;
         public UIBase uiIsWarping;
         public UIToggleUI[] toggleUis;
         [Tooltip("These GameObject (s) will ignore click / touch detection when click or touch on screen")]
@@ -263,7 +263,7 @@ namespace MultiplayerARPG
             foreach (UICharacterSummons ui in uiCharacterSummons)
             {
                 if (ui != null)
-                    ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
+                    ui.UpdateData();
             }
             if (onUpdateSummons != null)
                 onUpdateSummons.Invoke(BasePlayerCharacterController.OwningCharacter);
@@ -278,7 +278,7 @@ namespace MultiplayerARPG
             foreach (UICharacterHotkeys ui in uiCharacterHotkeys)
             {
                 if (ui != null)
-                    ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
+                    ui.UpdateData();
             }
             if (onUpdateHotkeys != null)
                 onUpdateHotkeys.Invoke(BasePlayerCharacterController.OwningCharacter);
@@ -293,7 +293,7 @@ namespace MultiplayerARPG
             foreach (UICharacterQuests ui in uiCharacterQuests)
             {
                 if (ui != null)
-                    ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
+                    ui.UpdateData();
             }
             if (onUpdateQuests != null)
                 onUpdateQuests.Invoke(BasePlayerCharacterController.OwningCharacter);
@@ -305,12 +305,12 @@ namespace MultiplayerARPG
         /// </summary>
         public void UpdateStorageItems()
         {
-            if (uiPlayerStorage != null)
-                uiPlayerStorage.UpdateData();
-            if (uiGuildStorage != null)
-                uiGuildStorage.UpdateData();
-            if (uiBuildingStorage != null)
-                uiBuildingStorage.UpdateData();
+            if (uiPlayerStorageItems != null)
+                uiPlayerStorageItems.UpdateData();
+            if (uiGuildStorageItems != null)
+                uiGuildStorageItems.UpdateData();
+            if (uiBuildingStorageItems != null)
+                uiBuildingStorageItems.UpdateData();
             if (onUpdateStorageItems != null)
                 onUpdateStorageItems.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
@@ -531,26 +531,26 @@ namespace MultiplayerARPG
         public void OnShowStorage(StorageType storageType)
         {
             // Hide all of storage UIs
-            if (uiPlayerStorage != null)
-                uiPlayerStorage.Hide();
-            if (uiGuildStorage != null)
-                uiGuildStorage.Hide();
-            if (uiBuildingStorage != null)
-                uiBuildingStorage.Hide();
+            if (uiPlayerStorageItems != null)
+                uiPlayerStorageItems.Hide();
+            if (uiGuildStorageItems != null)
+                uiGuildStorageItems.Hide();
+            if (uiBuildingStorageItems != null)
+                uiBuildingStorageItems.Hide();
             // Show only selected storage type
             switch (storageType)
             {
                 case StorageType.Player:
-                    if (uiPlayerStorage != null)
-                        uiPlayerStorage.Show();
+                    if (uiPlayerStorageItems != null)
+                        uiPlayerStorageItems.Show();
                     break;
                 case StorageType.Guild:
-                    if (uiGuildStorage != null)
-                        uiGuildStorage.Show();
+                    if (uiGuildStorageItems != null)
+                        uiGuildStorageItems.Show();
                     break;
                 case StorageType.Building:
-                    if (uiBuildingStorage != null)
-                        uiBuildingStorage.Show();
+                    if (uiBuildingStorageItems != null)
+                        uiBuildingStorageItems.Show();
                     break;
             }
         }

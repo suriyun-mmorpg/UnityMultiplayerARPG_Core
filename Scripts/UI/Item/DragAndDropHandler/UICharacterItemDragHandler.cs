@@ -61,6 +61,12 @@ namespace MultiplayerARPG
             this.uiCharacterItem = uiCharacterItem;
         }
 
+        public void SetupForStorageItems(UICharacterItem uiCharacterItem)
+        {
+            sourceLocation = SourceLocation.NonEquipItems;
+            this.uiCharacterItem = uiCharacterItem;
+        }
+
         public void SetupForHotkey(UICharacterHotkey uiCharacterHotkey)
         {
             sourceLocation = SourceLocation.Hotkey;

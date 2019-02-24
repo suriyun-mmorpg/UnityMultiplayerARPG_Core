@@ -71,10 +71,10 @@ namespace MultiplayerARPG
             base.Hide();
         }
 
-        public void UpdateData(IPlayerCharacterData characterData)
+        public void UpdateData()
         {
             InitCaches();
-            IList<CharacterHotkey> characterHotkeys = characterData.Hotkeys;
+            IList<CharacterHotkey> characterHotkeys = BasePlayerCharacterController.OwningCharacter.Hotkeys;
             for (int i = 0; i < characterHotkeys.Count; ++i)
             {
                 CharacterHotkey characterHotkey = characterHotkeys[i];

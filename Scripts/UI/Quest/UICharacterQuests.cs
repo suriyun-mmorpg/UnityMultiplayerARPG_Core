@@ -5,7 +5,6 @@ namespace MultiplayerARPG
 {
     public partial class UICharacterQuests : UIBase
     {
-        public ICharacterData character { get; protected set; }
         public UICharacterQuest uiQuestDialog;
         public UICharacterQuest uiCharacterQuestPrefab;
         public Transform uiCharacterQuestContainer;
@@ -63,7 +62,7 @@ namespace MultiplayerARPG
             if (uiQuestDialog != null)
             {
                 uiQuestDialog.selectionManager = CacheCharacterQuestSelectionManager;
-                uiQuestDialog.Setup(ui.Data, character, ui.IndexOfData);
+                uiQuestDialog.Setup(ui.Data, BasePlayerCharacterController.OwningCharacter, ui.IndexOfData);
                 uiQuestDialog.Show();
             }
         }
@@ -74,24 +73,17 @@ namespace MultiplayerARPG
                 uiQuestDialog.Hide();
         }
 
-        public void UpdateData(IPlayerCharacterData character)
+        public void UpdateData()
         {
-            this.character = character;
             int selectedQuestId = CacheCharacterQuestSelectionManager.SelectedUI != null ? CacheCharacterQuestSelectionManager.SelectedUI.Data.dataId : 0;
             CacheCharacterQuestSelectionManager.DeselectSelectedUI();
             CacheCharacterQuestSelectionManager.Clear();
 
-            if (character == null)
-            {
-                CacheCharacterQuestList.HideAll();
-                return;
-            }
-
-            IList<CharacterQuest> characterQuests = character.Quests;
+            IList<CharacterQuest> characterQuests = BasePlayerCharacterController.OwningCharacter.Quests;
             CacheCharacterQuestList.Generate(characterQuests, (index, characterQuest, ui) =>
             {
                 UICharacterQuest uiCharacterQuest = ui.GetComponent<UICharacterQuest>();
-                uiCharacterQuest.Setup(characterQuest, character, index);
+                uiCharacterQuest.Setup(characterQuest, BasePlayerCharacterController.OwningCharacter, index);
                 uiCharacterQuest.Show();
                 CacheCharacterQuestSelectionManager.Add(uiCharacterQuest);
                 if (selectedQuestId.Equals(characterQuest.dataId))

@@ -5,7 +5,6 @@ namespace MultiplayerARPG
 {
     public partial class UICharacterSummons : UIBase
     {
-        public ICharacterData character { get; protected set; }
         public UICharacterSummon uiSummonDialog;
         public UICharacterSummon uiCharacterSummonPrefab;
         public Transform uiCharacterSummonContainer;
@@ -69,7 +68,7 @@ namespace MultiplayerARPG
             if (uiSummonDialog != null)
             {
                 uiSummonDialog.selectionManager = CacheCharacterSummonSelectionManager;
-                uiSummonDialog.Setup(ui.Data, character, ui.IndexOfData);
+                uiSummonDialog.Setup(ui.Data, BasePlayerCharacterController.OwningCharacter, ui.IndexOfData);
                 uiSummonDialog.Show();
             }
         }
@@ -80,22 +79,14 @@ namespace MultiplayerARPG
                 uiSummonDialog.Hide();
         }
 
-        public void UpdateData(ICharacterData character)
+        public void UpdateData()
         {
-            this.character = character;
-
             uint selectedSummonObjectId = CacheCharacterSummonSelectionManager.SelectedUI != null ? CacheCharacterSummonSelectionManager.SelectedUI.CharacterSummon.objectId : 0;
             CacheCharacterSummonSelectionManager.DeselectSelectedUI();
             CacheCharacterSummonSelectionManager.Clear();
 
-            if (character == null)
-            {
-                CacheCharacterSummonList.HideAll();
-                return;
-            }
-
             Dictionary<int, UICharacterSummon> stackingSkillSummons = new Dictionary<int, UICharacterSummon>();
-            IList<CharacterSummon> summons = character.Summons;
+            IList<CharacterSummon> summons = BasePlayerCharacterController.OwningCharacter.Summons;
             CacheCharacterSummonList.Generate(summons, (index, characterSummon, ui) =>
             {
                 if (characterSummon.type == SummonType.Skill && stackingSkillSummons.ContainsKey(characterSummon.dataId))
@@ -106,7 +97,7 @@ namespace MultiplayerARPG
                 else
                 {
                     UICharacterSummon uiCharacterSummon = ui.GetComponent<UICharacterSummon>();
-                    uiCharacterSummon.Setup(characterSummon, character, index);
+                    uiCharacterSummon.Setup(characterSummon, BasePlayerCharacterController.OwningCharacter, index);
                     uiCharacterSummon.Show();
                     switch (characterSummon.type)
                     {
