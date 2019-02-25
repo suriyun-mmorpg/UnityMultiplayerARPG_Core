@@ -325,7 +325,7 @@ public static partial class PlayerCharacterDataExtension
         foreach (string file in files)
         {
             // If filename is empty or this is not character save, skip it
-            if (file.Length <= 4 || file.Contains("_world_"))
+            if (file.Length <= 4 || file.Contains("_world_") || file.Contains("_storage"))
                 continue;
             PlayerCharacterData characterData = new PlayerCharacterData();
             result.Add(characterData.LoadPersistentCharacterData(file));
