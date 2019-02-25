@@ -64,6 +64,10 @@ namespace MultiplayerARPG
         public string sellInputDescription = "";
         public string setDealingInputTitle = "Offer Item";
         public string setDealingInputDescription = "";
+        public string moveToStorageInputTitle = "Move To Storage";
+        public string moveToStorageInputDescription = "";
+        public string moveFromStorageInputTitle = "Move From Storage";
+        public string moveFromStorageInputDescription = "";
 
         [Header("UI Elements")]
         public TextWrapper uiTextTitle;
@@ -555,6 +559,7 @@ namespace MultiplayerARPG
             OwningCharacter.RequestUnEquipItem((byte)InventoryType, (short)IndexOfData);
         }
 
+        #region Drop Item Functions
         public void OnClickDrop()
         {
             // Only unequipped equipment can be dropped
@@ -577,7 +582,9 @@ namespace MultiplayerARPG
                 selectionManager.DeselectSelectedUI();
             OwningCharacter.RequestDropItem((short)IndexOfData, (short)amount);
         }
+        #endregion
 
+        #region Sell Item Functions
         public void OnClickSell()
         {
             // Only unequipped equipment can be sell
@@ -600,10 +607,12 @@ namespace MultiplayerARPG
                 selectionManager.DeselectSelectedUI();
             OwningCharacter.RequestSellItem((short)IndexOfData, (short)amount);
         }
+        #endregion
 
+        #region Set Dealing Item Functions
         public void OnClickSetDealingItem()
         {
-            // Only unequipped equipment can be sell
+            // Only unequipped equipment can be sold
             if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
                 return;
 
@@ -623,7 +632,79 @@ namespace MultiplayerARPG
                 selectionManager.DeselectSelectedUI();
             OwningCharacter.RequestSetDealingItem((short)IndexOfData, (short)amount);
         }
+        #endregion
 
+        #region Move To Storage Functions
+        public void OnClickMoveToStorage()
+        {
+            OnClickMoveToStorage(-1);
+        }
+
+        public void OnClickMoveToStorage(int storageIndex)
+        {
+            // Only unequipped equipment can be moved to storage
+            if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
+                return;
+
+            if (CharacterItem.amount == 1)
+            {
+                if (selectionManager != null)
+                    selectionManager.DeselectSelectedUI();
+                OwningCharacter.RequestMoveItemToStorage((short)IndexOfData, 1, (short)storageIndex);
+            }
+            else
+            {
+                UISceneGlobal.Singleton.ShowInputDialog(moveToStorageInputTitle, moveToStorageInputDescription, (amount) =>
+                {
+                    OnClickMoveToStorage(amount, storageIndex);
+                }, 1, CharacterItem.amount, CharacterItem.amount);
+            }
+        }
+
+        private void OnClickMoveToStorage(int amount, int storageIndex)
+        {
+            if (selectionManager != null)
+                selectionManager.DeselectSelectedUI();
+            OwningCharacter.RequestMoveItemToStorage((short)IndexOfData, (short)amount, (short)storageIndex);
+        }
+        #endregion
+
+        #region Move From Storage Functions
+        public void OnClickMoveFromStorage()
+        {
+            OnClickMoveFromStorage(-1);
+        }
+
+        public void OnClickMoveFromStorage(int nonEquipIndex)
+        {
+            // Only unequipped equipment can be moved from storage
+            if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
+                return;
+
+            if (CharacterItem.amount == 1)
+            {
+                if (selectionManager != null)
+                    selectionManager.DeselectSelectedUI();
+                OwningCharacter.RequestMoveItemFromStorage((short)IndexOfData, 1, (short)nonEquipIndex);
+            }
+            else
+            {
+                UISceneGlobal.Singleton.ShowInputDialog(moveFromStorageInputTitle, moveFromStorageInputDescription, (amount) =>
+                {
+                    OnClickMoveFromStorage(amount, nonEquipIndex);
+                }, 1, CharacterItem.amount, CharacterItem.amount);
+            }
+        }
+
+        private void OnClickMoveFromStorage(int amount, int nonEquipIndex)
+        {
+            if (selectionManager != null)
+                selectionManager.DeselectSelectedUI();
+            OwningCharacter.RequestMoveItemFromStorage((short)IndexOfData, (short)amount, (short)nonEquipIndex);
+        }
+        #endregion
+
+        #region Set Refine Item Functions
         public void OnClickSetRefineItem()
         {
             // Only unequipped equipment can refining
@@ -640,5 +721,6 @@ namespace MultiplayerARPG
                     selectionManager.DeselectSelectedUI();
             }
         }
+        #endregion
     }
 }
