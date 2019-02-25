@@ -100,10 +100,13 @@ namespace MultiplayerARPG
         public UnityEvent onSetEquippedData;
         public UnityEvent onSetUnEquippedData;
         public UnityEvent onSetUnEquippableData;
+        public UnityEvent onSetStorageItemData;
         public UnityEvent onNpcSellItemDialogAppear;
         public UnityEvent onNpcSellItemDialogDisappear;
         public UnityEvent onRefineItemDialogAppear;
         public UnityEvent onRefineItemDialogDisappear;
+        public UnityEvent onStorageDialogAppear;
+        public UnityEvent onStorageDialogDisappear;
         public UnityEvent onEnterDealingState;
         public UnityEvent onExitDealingState;
 
@@ -118,6 +121,7 @@ namespace MultiplayerARPG
 
         private bool isSellItemDialogAppeared;
         private bool isRefineItemDialogAppeared;
+        private bool isStorageDialogAppeared;
         private bool isDealingStateEntered;
 
         protected float lockRemainsDuration;
@@ -162,6 +166,7 @@ namespace MultiplayerARPG
 
             UpdateShopUIVisibility(false);
             UpdateRefineUIVisibility(false);
+            UpdateStorageUIVisibility(false);
             UpdateDealingState(false);
             Profiler.EndSample();
         }
@@ -173,15 +178,20 @@ namespace MultiplayerARPG
             else
                 onSetNonLevelZeroData.Invoke();
 
-            if (EquipmentItem != null)
+            if (InventoryType != InventoryType.StorageItems)
             {
-                if (InventoryType != InventoryType.NonEquipItems)
-                    onSetEquippedData.Invoke();
+                if (EquipmentItem != null)
+                {
+                    if (InventoryType != InventoryType.NonEquipItems)
+                        onSetEquippedData.Invoke();
+                    else
+                        onSetUnEquippedData.Invoke();
+                }
                 else
-                    onSetUnEquippedData.Invoke();
+                    onSetUnEquippableData.Invoke();
             }
             else
-                onSetUnEquippableData.Invoke();
+                onSetStorageItemData.Invoke();
 
             if (uiTextTitle != null)
             {
@@ -413,6 +423,7 @@ namespace MultiplayerARPG
             }
             UpdateShopUIVisibility(true);
             UpdateRefineUIVisibility(true);
+            UpdateStorageUIVisibility(true);
             UpdateDealingState(true);
         }
 
@@ -430,28 +441,25 @@ namespace MultiplayerARPG
             }
             // Check visible item dialog
             UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
-            if (uiGameplay.uiNpcDialog != null)
+            if (uiGameplay.uiNpcDialog.IsVisible() &&
+                uiGameplay.uiNpcDialog.Data != null &&
+                uiGameplay.uiNpcDialog.Data.type == NpcDialogType.Shop &&
+                InventoryType == InventoryType.NonEquipItems)
             {
-                if (uiGameplay.uiNpcDialog.IsVisible() &&
-                    uiGameplay.uiNpcDialog.Data != null &&
-                    uiGameplay.uiNpcDialog.Data.type == NpcDialogType.Shop &&
-                    InventoryType == InventoryType.NonEquipItems)
+                if (initData || !isSellItemDialogAppeared)
                 {
-                    if (initData || !isSellItemDialogAppeared)
-                    {
-                        isSellItemDialogAppeared = true;
-                        if (onNpcSellItemDialogAppear != null)
-                            onNpcSellItemDialogAppear.Invoke();
-                    }
+                    isSellItemDialogAppeared = true;
+                    if (onNpcSellItemDialogAppear != null)
+                        onNpcSellItemDialogAppear.Invoke();
                 }
-                else
+            }
+            else
+            {
+                if (initData || isSellItemDialogAppeared)
                 {
-                    if (initData || isSellItemDialogAppeared)
-                    {
-                        isSellItemDialogAppeared = false;
-                        if (onNpcSellItemDialogDisappear != null)
-                            onNpcSellItemDialogDisappear.Invoke();
-                    }
+                    isSellItemDialogAppeared = false;
+                    if (onNpcSellItemDialogDisappear != null)
+                        onNpcSellItemDialogDisappear.Invoke();
                 }
             }
         }
@@ -470,28 +478,65 @@ namespace MultiplayerARPG
             }
             // Check visible item dialog
             UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
-            if (uiGameplay.uiRefineItem != null)
+            if (uiGameplay.uiRefineItem.IsVisible() &&
+                Data.characterItem != null &&
+                Data.characterItem.GetEquipmentItem() != null &&
+                InventoryType == InventoryType.NonEquipItems)
             {
-                if (uiGameplay.uiRefineItem.IsVisible() &&
-                    Data.characterItem != null &&
-                    Data.characterItem.GetEquipmentItem() != null &&
-                    InventoryType == InventoryType.NonEquipItems)
+                if (initData || !isRefineItemDialogAppeared)
                 {
-                    if (initData || !isRefineItemDialogAppeared)
-                    {
-                        isRefineItemDialogAppeared = true;
-                        if (onRefineItemDialogAppear != null)
-                            onRefineItemDialogAppear.Invoke();
-                    }
+                    isRefineItemDialogAppeared = true;
+                    if (onRefineItemDialogAppear != null)
+                        onRefineItemDialogAppear.Invoke();
                 }
-                else
+            }
+            else
+            {
+                if (initData || isRefineItemDialogAppeared)
                 {
-                    if (initData || isRefineItemDialogAppeared)
-                    {
-                        isRefineItemDialogAppeared = false;
-                        if (onRefineItemDialogDisappear != null)
-                            onRefineItemDialogDisappear.Invoke();
-                    }
+                    isRefineItemDialogAppeared = false;
+                    if (onRefineItemDialogDisappear != null)
+                        onRefineItemDialogDisappear.Invoke();
+                }
+            }
+        }
+
+        private void UpdateStorageUIVisibility(bool initData)
+        {
+            if (!IsOwningCharacter())
+            {
+                if (initData || isStorageDialogAppeared)
+                {
+                    isStorageDialogAppeared = false;
+                    if (onStorageDialogDisappear != null)
+                        onStorageDialogDisappear.Invoke();
+                }
+                return;
+            }
+            // Check visible item dialog
+            UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
+            bool isAnyStorageVisible = uiGameplay.uiPlayerStorageItems.IsVisible() ||
+                uiGameplay.uiGuildStorageItems.IsVisible() ||
+                uiGameplay.uiBuildingStorageItems.IsVisible();
+            if (isAnyStorageVisible &&
+                Data.characterItem != null &&
+                Data.characterItem.GetEquipmentItem() != null &&
+                InventoryType == InventoryType.NonEquipItems)
+            {
+                if (initData || !isStorageDialogAppeared)
+                {
+                    isStorageDialogAppeared = true;
+                    if (onStorageDialogAppear != null)
+                        onStorageDialogAppear.Invoke();
+                }
+            }
+            else
+            {
+                if (initData || isStorageDialogAppeared)
+                {
+                    isStorageDialogAppeared = false;
+                    if (onStorageDialogDisappear != null)
+                        onStorageDialogDisappear.Invoke();
                 }
             }
         }
@@ -510,27 +555,24 @@ namespace MultiplayerARPG
             }
             // Check visible dealing dialog
             UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
-            if (uiGameplay.uiDealing != null)
+            if (uiGameplay.uiDealing.IsVisible() &&
+                uiGameplay.uiDealing.dealingState == DealingState.Dealing &&
+                InventoryType == InventoryType.NonEquipItems)
             {
-                if (uiGameplay.uiDealing.IsVisible() &&
-                    uiGameplay.uiDealing.dealingState == DealingState.Dealing &&
-                    InventoryType == InventoryType.NonEquipItems)
+                if (initData || !isDealingStateEntered)
                 {
-                    if (initData || !isDealingStateEntered)
-                    {
-                        isDealingStateEntered = true;
-                        if (onEnterDealingState != null)
-                            onEnterDealingState.Invoke();
-                    }
+                    isDealingStateEntered = true;
+                    if (onEnterDealingState != null)
+                        onEnterDealingState.Invoke();
                 }
-                else
+            }
+            else
+            {
+                if (initData || isDealingStateEntered)
                 {
-                    if (initData || isDealingStateEntered)
-                    {
-                        isDealingStateEntered = false;
-                        if (onExitDealingState != null)
-                            onExitDealingState.Invoke();
-                    }
+                    isDealingStateEntered = false;
+                    if (onExitDealingState != null)
+                        onExitDealingState.Invoke();
                 }
             }
         }
@@ -677,8 +719,8 @@ namespace MultiplayerARPG
 
         public void OnClickMoveFromStorage(int nonEquipIndex)
         {
-            // Only unequipped equipment can be moved from storage
-            if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
+            // Only storage items can be moved from storage
+            if (!IsOwningCharacter() || InventoryType != InventoryType.StorageItems)
                 return;
 
             if (CharacterItem.amount == 1)

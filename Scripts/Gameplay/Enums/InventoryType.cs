@@ -6,5 +6,6 @@
         EquipItems,
         EquipWeaponRight,
         EquipWeaponLeft,
+        StorageItems,
     }
 }
