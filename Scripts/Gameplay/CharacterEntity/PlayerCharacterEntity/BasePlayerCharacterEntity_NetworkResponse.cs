@@ -367,7 +367,7 @@ namespace MultiplayerARPG
             switch (menuIndex)
             {
                 case NpcDialog.STORAGE_CONFIRM_MENU_INDEX:
-                    OpenStorage(StorageType.Player, Id);
+                    OpenStorage(StorageType.Player, UserId);
                     currentNpcDialog = null;
                     break;
                 case NpcDialog.STORAGE_CANCEL_MENU_INDEX:
