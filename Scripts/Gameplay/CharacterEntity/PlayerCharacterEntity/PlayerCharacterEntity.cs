@@ -223,6 +223,7 @@ namespace MultiplayerARPG
                 return;
             SetMovePaths(position, true);
             currentNpcDialog = null;
+            CloseStorage();
         }
 
         protected void NetFuncKeyMovement(sbyte horizontalInput, sbyte verticalInput, byte movementState)
@@ -232,7 +233,10 @@ namespace MultiplayerARPG
             // Devide inputs to float value
             tempInputDirection = new Vector3((float)horizontalInput / 100f, 0, (float)verticalInput / 100f);
             if (tempInputDirection.magnitude != 0)
+            {
                 currentNpcDialog = null;
+                CloseStorage();
+            }
             tempMovementState = (MovementFlag)movementState;
             if (!IsJumping)
                 IsJumping = IsGrounded && tempMovementState.HasFlag(MovementFlag.IsJump);

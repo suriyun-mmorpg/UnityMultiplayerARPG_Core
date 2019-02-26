@@ -221,6 +221,7 @@ namespace MultiplayerARPG
                 return;
             currentDestination = position;
             currentNpcDialog = null;
+            CloseStorage();
         }
 
         protected void NetFuncKeyMovement(sbyte horizontalInput, sbyte verticalInput)
@@ -230,7 +231,10 @@ namespace MultiplayerARPG
             // Devide inputs to float value
             tempInputDirection = new Vector2((float)horizontalInput / 100f, (float)verticalInput / 100f);
             if (tempInputDirection.magnitude != 0)
+            {
                 currentNpcDialog = null;
+                CloseStorage();
+            }
         }
 
         protected void NetFuncSetTargetEntity(PackedUInt objectId)
