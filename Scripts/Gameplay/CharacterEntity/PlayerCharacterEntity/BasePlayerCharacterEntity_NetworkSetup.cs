@@ -101,7 +101,7 @@ namespace MultiplayerARPG
             RegisterNetFunction(NetFuncDeclineGuildInvitation);
             RegisterNetFunction<string>(NetFuncKickFromGuild);
             RegisterNetFunction(NetFuncLeaveGuild);
-            RegisterNetFunction<byte>(NetFuncShowStorage);
+            RegisterNetFunction<byte, short, short>(NetFuncShowStorage);
             RegisterNetFunction<short, short, short>(NetFuncMoveItemToStorage);
             RegisterNetFunction<short, short, short>(NetFuncMoveItemFromStorage);
         }

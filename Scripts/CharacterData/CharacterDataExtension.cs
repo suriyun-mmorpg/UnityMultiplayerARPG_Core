@@ -83,7 +83,7 @@ public static partial class CharacterDataExtension
         float result = 0f;
         foreach (CharacterItem item in itemList)
         {
-            if (!item.IsEmptySlot())
+            if (!item.NotEmptySlot())
                 continue;
             result += item.GetItem().weight;
         }
@@ -98,9 +98,9 @@ public static partial class CharacterDataExtension
         EquipWeapons equipWeapons = data.EquipWeapons;
         CharacterItem rightHandItem = equipWeapons.rightHand;
         CharacterItem leftHandItem = equipWeapons.leftHand;
-        if (rightHandItem.IsEmptySlot())
+        if (rightHandItem.NotEmptySlot())
             result += rightHandItem.GetItem().weight;
-        if (leftHandItem.IsEmptySlot())
+        if (leftHandItem.NotEmptySlot())
             result += leftHandItem.GetItem().weight;
 
         return result;
@@ -462,7 +462,7 @@ public static partial class CharacterDataExtension
         }
 
         // Fill empty slots
-        int slotLimit = (int)data.CacheStats.slotLimit;
+        short slotLimit = (short)data.CacheStats.slotLimit;
         for (int i = data.NonEquipItems.Count; i < slotLimit; ++i)
         {
             data.NonEquipItems.Add(CharacterItem.Empty);
@@ -470,7 +470,7 @@ public static partial class CharacterDataExtension
     }
 
     #region Increasing Items Will Overwhelming
-    public static bool IncreasingItemsWillOverwhelming(IList<CharacterItem> itemList, int dataId, short amount, bool isLimitWeight, int weightLimit, float totalItemWeight, bool isLimitSlot, int slotLimit)
+    public static bool IncreasingItemsWillOverwhelming(IList<CharacterItem> itemList, int dataId, short amount, bool isLimitWeight, short weightLimit, float totalItemWeight, bool isLimitSlot, short slotLimit)
     {
         Item itemData;
         if (amount <= 0 || !GameInstance.Items.TryGetValue(dataId, out itemData))
@@ -479,13 +479,13 @@ public static partial class CharacterDataExtension
             return false;
         }
 
-        if (totalItemWeight > weightLimit)
+        if (isLimitWeight && totalItemWeight > weightLimit)
         {
             // If overwhelming
             return true;
         }
 
-        if (!GameInstance.Singleton.IsLimitInventorySlot)
+        if (!isLimitSlot)
         {
             // If not limit slot then don't checking for slot amount
             return false;
@@ -497,7 +497,7 @@ public static partial class CharacterDataExtension
         for (int i = 0; i < itemList.Count; ++i)
         {
             tempItem = itemList[i];
-            if (!tempItem.IsEmptySlot())
+            if (!tempItem.NotEmptySlot())
             {
                 // If current entry is not valid, assume that it is empty slot, so reduce amount of adding item here
                 if (amount <= maxStack)
@@ -545,7 +545,7 @@ public static partial class CharacterDataExtension
 
     public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, int dataId, short amount)
     {
-        return IncreasingItemsWillOverwhelming(data.NonEquipItems, dataId, amount, true, (int)data.CacheStats.weightLimit, data.CacheTotalItemWeight, GameInstance.Singleton.IsLimitInventorySlot, (int)data.CacheStats.slotLimit);
+        return IncreasingItemsWillOverwhelming(data.NonEquipItems, dataId, amount, true, (short)data.CacheStats.weightLimit, data.CacheTotalItemWeight, GameInstance.Singleton.IsLimitInventorySlot, (short)data.CacheStats.slotLimit);
     }
     #endregion
 
@@ -553,7 +553,7 @@ public static partial class CharacterDataExtension
     public static bool IncreaseItems(IList<CharacterItem> itemList, CharacterItem addingItem)
     {
         // If item not valid
-        if (!addingItem.IsEmptySlot())
+        if (!addingItem.NotEmptySlot())
             return false;
 
         Item itemData = addingItem.GetItem();
@@ -567,7 +567,7 @@ public static partial class CharacterDataExtension
         for (int i = 0; i < itemList.Count; ++i)
         {
             tempNonEquipItem = itemList[i];
-            if (!tempNonEquipItem.IsEmptySlot())
+            if (!tempNonEquipItem.NotEmptySlot())
             {
                 // If current entry is not valid, add it to empty list, going to replacing it later
                 emptySlots[i] = tempNonEquipItem;
@@ -737,7 +737,7 @@ public static partial class CharacterDataExtension
         if (index < 0 || index >= itemList.Count)
             return false;
         CharacterItem nonEquipItem = itemList[index];
-        if (!nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
+        if (!nonEquipItem.NotEmptySlot() || amount > nonEquipItem.amount)
             return false;
         if (nonEquipItem.amount - amount == 0)
             itemList.RemoveAt(index);
@@ -1034,7 +1034,7 @@ public static partial class CharacterDataExtension
         // Armor equipment set
         foreach (CharacterItem equipItem in data.EquipItems)
         {
-            if (equipItem.IsEmptySlot() && equipItem.GetItem().equipmentSet != null)
+            if (equipItem.NotEmptySlot() && equipItem.GetItem().equipmentSet != null)
             {
                 if (cacheEquipmentSets.ContainsKey(equipItem.GetItem().equipmentSet))
                     ++cacheEquipmentSets[equipItem.GetItem().equipmentSet];
@@ -1045,7 +1045,7 @@ public static partial class CharacterDataExtension
         if (data.EquipWeapons != null)
         {
             // Right hand equipment set
-            if (data.EquipWeapons.rightHand.IsEmptySlot() && data.EquipWeapons.rightHand.GetItem().equipmentSet != null)
+            if (data.EquipWeapons.rightHand.NotEmptySlot() && data.EquipWeapons.rightHand.GetItem().equipmentSet != null)
             {
                 if (cacheEquipmentSets.ContainsKey(data.EquipWeapons.rightHand.GetItem().equipmentSet))
                     ++cacheEquipmentSets[data.EquipWeapons.rightHand.GetItem().equipmentSet];
@@ -1053,7 +1053,7 @@ public static partial class CharacterDataExtension
                     cacheEquipmentSets.Add(data.EquipWeapons.rightHand.GetItem().equipmentSet, 0);
             }
             // Left hand equipment set
-            if (data.EquipWeapons.leftHand.IsEmptySlot() && data.EquipWeapons.leftHand.GetItem().equipmentSet != null)
+            if (data.EquipWeapons.leftHand.NotEmptySlot() && data.EquipWeapons.leftHand.GetItem().equipmentSet != null)
             {
                 if (cacheEquipmentSets.ContainsKey(data.EquipWeapons.leftHand.GetItem().equipmentSet))
                     ++cacheEquipmentSets[data.EquipWeapons.leftHand.GetItem().equipmentSet];

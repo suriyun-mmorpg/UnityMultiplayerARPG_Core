@@ -19,7 +19,7 @@ namespace MultiplayerARPG
         public System.Action<DealingCharacterItems> onUpdateAnotherDealingItems;
         public System.Action<BasePlayerCharacterEntity> onShowPartyInvitationDialog;
         public System.Action<BasePlayerCharacterEntity> onShowGuildInvitationDialog;
-        public System.Action<StorageType> onShowStorage;
+        public System.Action<StorageType, short, short> onShowStorage;
 
         protected virtual void NetFuncSwapOrMergeItem(short fromIndex, short toIndex)
         {
@@ -30,7 +30,7 @@ namespace MultiplayerARPG
 
             CharacterItem fromItem = NonEquipItems[fromIndex];
             CharacterItem toItem = NonEquipItems[toIndex];
-            if (!fromItem.IsEmptySlot() || !toItem.IsEmptySlot())
+            if (!fromItem.NotEmptySlot() || !toItem.NotEmptySlot())
                 return;
 
             if (fromItem.dataId.Equals(toItem.dataId) && !fromItem.IsFull() && !toItem.IsFull())
@@ -504,7 +504,7 @@ namespace MultiplayerARPG
 
             BuildingEntity buildingEntity;
             CharacterItem nonEquipItem = NonEquipItems[itemIndex];
-            if (!nonEquipItem.IsEmptySlot() ||
+            if (!nonEquipItem.NotEmptySlot() ||
                 nonEquipItem.GetBuildingItem() == null ||
                 nonEquipItem.GetBuildingItem().buildingEntity == null ||
                 !GameInstance.BuildingEntities.TryGetValue(nonEquipItem.GetBuildingItem().buildingEntity.DataId, out buildingEntity) ||
@@ -557,10 +557,10 @@ namespace MultiplayerARPG
                 OpenStorage(StorageType.Building, buildingEntity.Id);
         }
 
-        protected virtual void NetFuncShowStorage(byte byteStorageType)
+        protected virtual void NetFuncShowStorage(byte byteStorageType, short weightLimit, short slotLimit)
         {
             if (onShowStorage != null)
-                onShowStorage.Invoke((StorageType)byteStorageType);
+                onShowStorage.Invoke((StorageType)byteStorageType, weightLimit, slotLimit);
         }
 
         protected virtual void NetFuncDepositToStorage(short index, short amount)
@@ -586,7 +586,7 @@ namespace MultiplayerARPG
                 return;
 
             CharacterItem nonEquipItem = nonEquipItems[index];
-            if (!nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
+            if (!nonEquipItem.NotEmptySlot() || amount > nonEquipItem.amount)
                 return;
 
             Item item = nonEquipItem.GetItem();
@@ -1024,20 +1024,21 @@ namespace MultiplayerARPG
         protected virtual void OpenStorage(StorageType storageType, string ownerId)
         {
             StorageId storageId = new StorageId(storageType, ownerId);
+            Storage storage = gameManager.GetStorage(storageId);
             if (!currentStorageId.Equals(storageId))
             {
                 currentStorageId = storageId;
                 gameManager.OpenStorage(this);
             }
             // Show storage on clients
-            CallNetFunction(NetFuncShowStorage, ConnectionId, (byte)storageType);
+            CallNetFunction(NetFuncShowStorage, ConnectionId, (byte)storageType, storage.weightLimit, storage.slotLimit);
         }
 
         protected virtual void CloseStorage()
         {
             gameManager.CloseStorage(this);
             // Show storage on clients
-            CallNetFunction(NetFuncShowStorage, ConnectionId, (byte)StorageType.None);
+            CallNetFunction(NetFuncShowStorage, ConnectionId, (byte)StorageType.None, (short)0, (short)0);
         }
     }
 }
