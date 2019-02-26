@@ -63,8 +63,12 @@ namespace MultiplayerARPG
             GuildRoleNotAvailable,
             GuildSkillReachedMaxLevel,
             NoGuildSkillPoint,
+            // Game Data
             UnknowGameDataTitle,
             UnknowGameDataDescription,
+            // Bank
+            NotEnoughGoldToDeposit,
+            NotEnoughGoldToWithdraw,
         }
         public Type type;
 

@@ -397,6 +397,8 @@ namespace MultiplayerARPG
                 playerCharacterEntity.Gold -= amount;
                 playerCharacterEntity.UserGold += amount;
             }
+            else
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToDeposit);
         }
 
         public override void WithdrawGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
@@ -406,6 +408,8 @@ namespace MultiplayerARPG
                 playerCharacterEntity.UserGold -= amount;
                 playerCharacterEntity.Gold += amount;
             }
+            else
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToWithdraw);
         }
 
         public override void DepositGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
@@ -419,7 +423,11 @@ namespace MultiplayerARPG
                     guild.gold += amount;
                     guilds[playerCharacterEntity.GuildId] = guild;
                 }
+                else
+                    SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToDeposit);
             }
+            else
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
         }
 
         public override void WithdrawGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
@@ -433,7 +441,11 @@ namespace MultiplayerARPG
                     playerCharacterEntity.Gold += amount;
                     guilds[playerCharacterEntity.GuildId] = guild;
                 }
+                else
+                    SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToWithdraw);
             }
+            else
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
         }
 
         protected override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)

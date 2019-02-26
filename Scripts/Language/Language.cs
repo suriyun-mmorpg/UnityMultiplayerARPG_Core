@@ -56,6 +56,8 @@ namespace MultiplayerARPG
             Texts.Add(GameMessage.Type.NoGuildSkillPoint.ToString(), "No guild skill point");
             Texts.Add(GameMessage.Type.UnknowGameDataTitle.ToString(), "Unknow");
             Texts.Add(GameMessage.Type.UnknowGameDataDescription.ToString(), "N/A");
+            Texts.Add(GameMessage.Type.NotEnoughGoldToDeposit.ToString(), "Not enough gold to deposit");
+            Texts.Add(GameMessage.Type.NotEnoughGoldToWithdraw.ToString(), "Not enough gold to withdraw");
         }
     }
 
