@@ -178,8 +178,7 @@ namespace MultiplayerARPG
                 if (targetPosition.HasValue)
                 {
                     // Close NPC dialog, when target changes
-                    if (CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
-                        CacheUISceneGameplay.uiNpcDialog.Hide();
+                    HideNpcDialogs();
 
                     // Move to target, will hide destination when target is object
                     if (targetEntity != null)
@@ -217,8 +216,7 @@ namespace MultiplayerARPG
 
             if (moveDirection.magnitude != 0f)
             {
-                if (CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
-                    CacheUISceneGameplay.uiNpcDialog.Hide();
+                HideNpcDialogs();
                 FindAndSetBuildingAreaFromCharacterDirection();
             }
 

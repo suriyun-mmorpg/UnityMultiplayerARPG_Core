@@ -291,6 +291,28 @@ namespace MultiplayerARPG
             activeBuildingEntity = null;
         }
 
+        protected void HideNpcDialogs()
+        {
+            if (CacheUISceneGameplay != null)
+            {
+                if (CacheUISceneGameplay.uiNpcDialog != null &&
+                    CacheUISceneGameplay.uiNpcDialog.IsVisible())
+                    CacheUISceneGameplay.uiNpcDialog.Hide();
+
+                if (CacheUISceneGameplay.uiPlayerStorageItems != null &&
+                    CacheUISceneGameplay.uiPlayerStorageItems.IsVisible())
+                    CacheUISceneGameplay.uiPlayerStorageItems.Hide();
+
+                if (CacheUISceneGameplay.uiGuildStorageItems != null &&
+                    CacheUISceneGameplay.uiGuildStorageItems.IsVisible())
+                    CacheUISceneGameplay.uiGuildStorageItems.Hide();
+
+                if (CacheUISceneGameplay.uiBuildingStorageItems != null &&
+                    CacheUISceneGameplay.uiBuildingStorageItems.IsVisible())
+                    CacheUISceneGameplay.uiBuildingStorageItems.Hide();
+            }
+        }
+
         public abstract void UseHotkey(int hotkeyIndex);
     }
 }

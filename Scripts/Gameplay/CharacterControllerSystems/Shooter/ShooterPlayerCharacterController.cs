@@ -355,8 +355,7 @@ namespace MultiplayerARPG
             // Hide Npc UIs when move
             if (moveDirection.magnitude != 0f)
             {
-                if (CacheUISceneGameplay != null && CacheUISceneGameplay.uiNpcDialog != null)
-                    CacheUISceneGameplay.uiNpcDialog.Hide();
+                HideNpcDialogs();
                 PlayerCharacterEntity.StopMove();
                 PlayerCharacterEntity.SetTargetEntity(null);
             }
