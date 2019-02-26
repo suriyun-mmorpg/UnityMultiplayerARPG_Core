@@ -479,7 +479,6 @@ namespace MultiplayerARPG
             // Check visible item dialog
             UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
             if (uiGameplay.uiRefineItem.IsVisible() &&
-                Data.characterItem != null &&
                 Data.characterItem.GetEquipmentItem() != null &&
                 InventoryType == InventoryType.NonEquipItems)
             {
@@ -519,8 +518,6 @@ namespace MultiplayerARPG
                 uiGameplay.uiGuildStorageItems.IsVisible() ||
                 uiGameplay.uiBuildingStorageItems.IsVisible();
             if (isAnyStorageVisible &&
-                Data.characterItem != null &&
-                Data.characterItem.GetEquipmentItem() != null &&
                 InventoryType == InventoryType.NonEquipItems)
             {
                 if (initData || !isStorageDialogAppeared)

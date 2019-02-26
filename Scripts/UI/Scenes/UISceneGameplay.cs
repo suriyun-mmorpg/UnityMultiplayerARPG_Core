@@ -528,7 +528,7 @@ namespace MultiplayerARPG
             uiGuildInvitation.Show();
         }
 
-        public void OnShowStorage(StorageType storageType)
+        public void OnShowStorage(StorageType storageType, short weightLimit, short slotLimit)
         {
             // Hide all of storage UIs
             if (uiPlayerStorageItems != null)
@@ -542,15 +542,15 @@ namespace MultiplayerARPG
             {
                 case StorageType.Player:
                     if (uiPlayerStorageItems != null)
-                        uiPlayerStorageItems.Show();
+                        uiPlayerStorageItems.Show(storageType, weightLimit, slotLimit);
                     break;
                 case StorageType.Guild:
                     if (uiGuildStorageItems != null)
-                        uiGuildStorageItems.Show();
+                        uiGuildStorageItems.Show(storageType, weightLimit, slotLimit);
                     break;
                 case StorageType.Building:
                     if (uiBuildingStorageItems != null)
-                        uiBuildingStorageItems.Show();
+                        uiBuildingStorageItems.Show(storageType, weightLimit, slotLimit);
                     break;
             }
         }

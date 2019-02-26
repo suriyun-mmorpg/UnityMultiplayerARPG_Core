@@ -6,9 +6,22 @@ namespace MultiplayerARPG
 {
     public class UIStorageItems : UIBase
     {
+        [Header("Generic Info Format")]
+        [Tooltip("Weight Limit Stats Format => {0} = {Current Total Weights}, {1} = {Weight Limit}")]
+        public string weightLimitFormat = "Weight: {0}/{1}";
+        [Tooltip("Slot Limit Stats Format => {0} = {Current Used Slots}, {1} = {Slot Limit}")]
+        public string slotLimitFormat = "Used Slot: {0}/{1}";
+        [Tooltip("This text will be shown when it is not limit weight")]
+        public string unlimitWeightText = "Unlimit";
+        [Tooltip("This text will be shown when it is not limit slot")]
+        public string unlimitSlotText = "Unlimit";
+
+        [Header("UI Elements")]
         public UICharacterItem uiItemDialog;
         public UICharacterItem uiCharacterItemPrefab;
         public Transform uiCharacterItemContainer;
+        public TextWrapper uiTextWeightLimit;
+        public TextWrapper uiTextSlotLimit;
 
         private UIList cacheCharacterItemList;
         public UIList CacheCharacterItemList
@@ -39,6 +52,12 @@ namespace MultiplayerARPG
             }
         }
 
+        private StorageType storageType = StorageType.None;
+        private short weightLimit = 0;
+        private short slotLimit = 0;
+        private float totalWeight = 0;
+        private short usedSlots = 0;
+
         public override void Show()
         {
             CacheCharacterItemSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterItem);
@@ -50,6 +69,14 @@ namespace MultiplayerARPG
             else if (uiItemDialog != null)
                 uiItemDialog.Hide();
             base.Show();
+        }
+
+        public void Show(StorageType storageType, short weightLimit, short slotLimit)
+        {
+            this.storageType = storageType;
+            this.weightLimit = weightLimit;
+            this.slotLimit = slotLimit;
+            Show();
         }
 
         public override void Hide()
@@ -74,18 +101,43 @@ namespace MultiplayerARPG
                 uiItemDialog.Hide();
         }
 
+        private void Update()
+        {
+            if (uiTextWeightLimit != null)
+            {
+                if (weightLimit <= 0)
+                    uiTextWeightLimit.text = unlimitWeightText;
+                else
+                    uiTextWeightLimit.text = string.Format(weightLimitFormat, totalWeight.ToString("N2"), weightLimit.ToString("N2"));
+            }
+
+            if (uiTextSlotLimit != null)
+            {
+                if (slotLimit <= 0)
+                    uiTextSlotLimit.text = unlimitSlotText;
+                else
+                    uiTextSlotLimit.text = string.Format(slotLimitFormat, usedSlots.ToString("N0"), slotLimit.ToString("N0"));
+            }
+        }
+
         public void UpdateData()
         {
             int selectedIdx = CacheCharacterItemSelectionManager.SelectedUI != null ? CacheCharacterItemSelectionManager.IndexOf(CacheCharacterItemSelectionManager.SelectedUI) : -1;
             CacheCharacterItemSelectionManager.DeselectSelectedUI();
             CacheCharacterItemSelectionManager.Clear();
-
+            totalWeight = 0;
+            usedSlots = 0;
             IList<CharacterItem> characterItems = BasePlayerCharacterController.OwningCharacter.StorageItems;
             CacheCharacterItemList.Generate(characterItems, (index, characterItem, ui) =>
             {
                 UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
                 uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, InventoryType.StorageItems), BasePlayerCharacterController.OwningCharacter, index);
                 uiCharacterItem.Show();
+                if (!characterItem.NotEmptySlot())
+                {
+                    totalWeight += characterItem.GetItem().weight * characterItem.amount;
+                    usedSlots++;
+                }
                 UICharacterItemDragHandler dragHandler = uiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
                 if (dragHandler != null)
                     dragHandler.SetupForStorageItems(uiCharacterItem);

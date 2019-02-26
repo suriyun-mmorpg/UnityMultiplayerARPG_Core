@@ -105,7 +105,7 @@ namespace MultiplayerARPG
 
         protected void OnSelectCharacterItem(UICharacterItem ui)
         {
-            if (uiItemDialog != null && ui.Data.characterItem.IsEmptySlot())
+            if (uiItemDialog != null && ui.Data.characterItem.NotEmptySlot())
             {
                 uiItemDialog.selectionManager = CacheItemSelectionManager;
                 uiItemDialog.Setup(ui.Data, null, -1);

@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         public int exp;
         public short skillPoint;
         public string guildMessage;
+        public int gold;
         protected List<GuildRoleData> roles;
         protected Dictionary<string, byte> memberRoles;
         protected Dictionary<int, short> skillLevels;
