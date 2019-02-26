@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -8,8 +6,8 @@ namespace MultiplayerARPG
     public struct Storage
     {
         [Tooltip("If weight limit <= 0, assume that it is no limit")]
-        public int weightLimit;
+        public short weightLimit;
         [Tooltip("If slot limit <= 0, assume that it is no limit")]
-        public int slotLimit;
+        public short slotLimit;
     }
 }
