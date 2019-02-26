@@ -64,10 +64,6 @@ namespace MultiplayerARPG
             CacheCharacterItemSelectionManager.eventOnSelect.AddListener(OnSelectCharacterItem);
             CacheCharacterItemSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterItem);
             CacheCharacterItemSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterItem);
-            if (CacheCharacterItemSelectionManager.Count > 0)
-                CacheCharacterItemSelectionManager.Get(0).OnClickSelect();
-            else if (uiItemDialog != null)
-                uiItemDialog.Hide();
             base.Show();
         }
 
