@@ -356,6 +356,9 @@ namespace MultiplayerARPG
                         if (BasePlayerCharacterController.OwningCharacter != null)
                             BasePlayerCharacterController.OwningCharacter.ForceMakeCaches();
                         break;
+                    case UpdateGuildMessage.UpdateType.SetGold:
+                        ClientGuild.gold = message.gold;
+                        break;
                     case UpdateGuildMessage.UpdateType.LevelExpSkillPoint:
                         ClientGuild.level = message.level;
                         ClientGuild.exp = message.exp;

@@ -321,5 +321,25 @@ namespace MultiplayerARPG
         {
             CallNetFunction(NetFuncMoveItemFromStorage, FunctionReceivers.Server, storageItemIndex, amount, nonEquipIndex);
         }
+
+        public virtual void RequestDepositGold(int amount)
+        {
+            CallNetFunction(NetFuncDepositGold, FunctionReceivers.Server, amount);
+        }
+
+        public virtual void RequestWithdrawGold(int amount)
+        {
+            CallNetFunction(NetFuncWithdrawGold, FunctionReceivers.Server, amount);
+        }
+
+        public virtual void RequestDepositGuildGold(int amount)
+        {
+            CallNetFunction(NetFuncDepositGuildGold, FunctionReceivers.Server, amount);
+        }
+
+        public virtual void RequestWithdrawGuildGold(int amount)
+        {
+            CallNetFunction(NetFuncWithdrawGuildGold, FunctionReceivers.Server, amount);
+        }
     }
 }

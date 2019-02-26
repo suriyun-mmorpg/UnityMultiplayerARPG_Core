@@ -770,6 +770,32 @@ namespace MultiplayerARPG
             }
         }
 
+        public void SendSetGuildGoldToClient(long connectionId, int id, int gold)
+        {
+            Server.SendSetGuildGold(connectionId, MsgTypes.UpdateGuild, id, gold);
+        }
+
+        public void SendSetGuildGoldToClient(long connectionId, GuildData guild)
+        {
+            if (guild == null)
+                return;
+
+            SendSetGuildGoldToClient(connectionId, guild.id, guild.gold);
+        }
+
+        public void SendSetGuildGoldToClients(GuildData guild)
+        {
+            if (guild == null)
+                return;
+            
+            BasePlayerCharacterEntity playerCharacterEntity;
+            foreach (SocialCharacterData member in guild.GetMembers())
+            {
+                if (TryGetPlayerCharacterById(member.id, out playerCharacterEntity))
+                    SendSetGuildGoldToClient(playerCharacterEntity.ConnectionId, guild.id, guild.gold);
+            }
+        }
+
         public void SendGuildLevelExpSkillPointToClient(long connectionId, GuildData guild)
         {
             Server.SendGuildLevelExpSkillPoint(connectionId, MsgTypes.UpdateGuild, guild.id, guild.level, guild.exp, guild.skillPoint);

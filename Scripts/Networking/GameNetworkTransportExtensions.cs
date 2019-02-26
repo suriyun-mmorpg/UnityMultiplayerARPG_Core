@@ -188,5 +188,14 @@ namespace MultiplayerARPG
             netMessage.level = level;
             Send(transportHandler, connectionId, msgType, netMessage);
         }
+
+        public static void SendSetGuildGold(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, int gold)
+        {
+            UpdateGuildMessage netMessage = new UpdateGuildMessage();
+            netMessage.type = UpdateGuildMessage.UpdateType.SetGold;
+            netMessage.id = id;
+            netMessage.gold = gold;
+            Send(transportHandler, connectionId, msgType, netMessage);
+        }
     }
 }

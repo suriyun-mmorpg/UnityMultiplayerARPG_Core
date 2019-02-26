@@ -14,7 +14,7 @@ namespace MultiplayerARPG
             SetSkillLevel,
             LevelExpSkillPoint,
             Terminate,
-            UpdateGold,
+            SetGold,
             UpdateStorage,
         }
         public UpdateType type;
@@ -64,13 +64,13 @@ namespace MultiplayerARPG
                     dataId = reader.GetInt();
                     level = reader.GetShort();
                     break;
+                case UpdateType.SetGold:
+                    gold = reader.GetInt();
+                    break;
                 case UpdateType.LevelExpSkillPoint:
                     level = reader.GetShort();
                     exp = reader.GetInt();
                     skillPoint = reader.GetShort();
-                    break;
-                case UpdateType.UpdateGold:
-                    gold = reader.GetInt();
                     break;
             }
         }
@@ -106,13 +106,13 @@ namespace MultiplayerARPG
                     writer.Put(dataId);
                     writer.Put(level);
                     break;
+                case UpdateType.SetGold:
+                    writer.Put(gold);
+                    break;
                 case UpdateType.LevelExpSkillPoint:
                     writer.Put(level);
                     writer.Put(exp);
                     writer.Put(skillPoint);
-                    break;
-                case UpdateType.UpdateGold:
-                    writer.Put(gold);
                     break;
             }
         }

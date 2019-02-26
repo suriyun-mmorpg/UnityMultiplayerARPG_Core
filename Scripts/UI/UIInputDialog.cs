@@ -88,9 +88,15 @@ public class UIInputDialog : UIBase
         int? maxAmount = null,
         int defaultAmount = 0)
     {
+        if (!minAmount.HasValue)
+            minAmount = int.MinValue;
+        if (!maxAmount.HasValue)
+            maxAmount = int.MaxValue;
+
         intDefaultAmount = defaultAmount;
         intMinAmount = minAmount;
         intMaxAmount = maxAmount;
+
         Title = title;
         Description = description;
         InputFieldText = defaultAmount.ToString();
@@ -130,6 +136,11 @@ public class UIInputDialog : UIBase
         float? maxAmount = null,
         float defaultAmount = 0f)
     {
+        if (!minAmount.HasValue)
+            minAmount = float.MinValue;
+        if (!maxAmount.HasValue)
+            maxAmount = float.MaxValue;
+
         floatDefaultAmount = defaultAmount;
         floatMinAmount = minAmount;
         floatMaxAmount = maxAmount;

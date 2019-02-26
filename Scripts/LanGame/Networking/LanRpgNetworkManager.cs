@@ -422,6 +422,7 @@ namespace MultiplayerARPG
                     playerCharacterEntity.Gold -= amount;
                     guild.gold += amount;
                     guilds[playerCharacterEntity.GuildId] = guild;
+                    SendSetGuildGoldToClients(guild);
                 }
                 else
                     SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToDeposit);
@@ -440,6 +441,7 @@ namespace MultiplayerARPG
                     guild.gold -= amount;
                     playerCharacterEntity.Gold += amount;
                     guilds[playerCharacterEntity.GuildId] = guild;
+                    SendSetGuildGoldToClients(guild);
                 }
                 else
                     SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToWithdraw);

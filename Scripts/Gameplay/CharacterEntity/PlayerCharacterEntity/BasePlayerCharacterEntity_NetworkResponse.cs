@@ -992,6 +992,28 @@ namespace MultiplayerARPG
         }
         #endregion
 
+        #region Banking
+        protected virtual void NetFuncDepositGold(int amount)
+        {
+            gameManager.DepositGold(this, amount);
+        }
+
+        protected virtual void NetFuncWithdrawGold(int amount)
+        {
+            gameManager.WithdrawGold(this, amount);
+        }
+
+        protected virtual void NetFuncDepositGuildGold(int amount)
+        {
+            gameManager.DepositGuildGold(this, amount);
+        }
+
+        protected virtual void NetFuncWithdrawGuildGold(int amount)
+        {
+            gameManager.WithdrawGuildGold(this, amount);
+        }
+        #endregion
+
         protected virtual void StopDealing()
         {
             if (DealingCharacter == null)
