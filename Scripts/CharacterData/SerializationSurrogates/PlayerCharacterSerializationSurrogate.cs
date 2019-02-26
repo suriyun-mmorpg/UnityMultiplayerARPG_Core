@@ -33,6 +33,8 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
         info.AddValue("statPoint", data.StatPoint);
         info.AddValue("skillPoint", data.SkillPoint);
         info.AddValue("gold", data.Gold);
+        info.AddValue("userGold", data.UserGold);
+        info.AddValue("userCash", data.UserCash);
         info.AddValue("currentMapName", data.CurrentMapName);
         info.AddValue("currentPosition", data.CurrentPosition);
         info.AddValue("respawnMapName", data.RespawnMapName);
@@ -71,6 +73,13 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
         data.StatPoint = info.GetInt16("statPoint");
         data.SkillPoint = info.GetInt16("skillPoint");
         data.Gold = info.GetInt32("gold");
+        // TODO: Backward compatible, this will be removed in future version
+        try
+        {
+            data.UserGold = info.GetInt32("userGold");
+            data.UserCash = info.GetInt32("userCash");
+        }
+        catch { }
         data.CurrentMapName = info.GetString("currentMapName");
         data.CurrentPosition = (Vector3)info.GetValue("currentPosition", typeof(Vector3));
         data.RespawnMapName = info.GetString("respawnMapName");

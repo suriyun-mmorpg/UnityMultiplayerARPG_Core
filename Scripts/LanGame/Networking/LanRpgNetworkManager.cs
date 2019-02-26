@@ -62,7 +62,6 @@ namespace MultiplayerARPG
                 BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
                 if (owningCharacter != null && IsNetworkActive)
                 {
-                    selectedCharacter = owningCharacter.CloneTo(selectedCharacter);
                     owningCharacter.SavePersistentCharacterData();
                     if (IsServer)
                     {
@@ -249,6 +248,12 @@ namespace MultiplayerARPG
         public override void OpenStorage(BasePlayerCharacterEntity playerCharacterEntity)
         {
             StorageId storageId = playerCharacterEntity.CurrentStorageId;
+            if (storageId.storageType == StorageType.Guild &&
+                !guilds.ContainsKey(playerCharacterEntity.GuildId))
+            {
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
+                return;
+            }
             if (!storageItems.ContainsKey(storageId))
                 storageItems[storageId] = new List<CharacterItem>();
             if (!usingStorageCharacters.ContainsKey(storageId))
@@ -266,6 +271,12 @@ namespace MultiplayerARPG
 
         public override void MoveItemToStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
         {
+            if (storageId.storageType == StorageType.Guild &&
+                !guilds.ContainsKey(playerCharacterEntity.GuildId))
+            {
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
+                return;
+            }
             if (!storageItems.ContainsKey(storageId))
                 storageItems[storageId] = new List<CharacterItem>();
             List<CharacterItem> storageItemList = storageItems[storageId];
@@ -288,7 +299,7 @@ namespace MultiplayerARPG
                 short weightLimit = storage.weightLimit;
                 short slotLimit = storage.slotLimit;
                 bool isOverwhelming = CharacterDataExtension.IncreasingItemsWillOverwhelming(
-                    storageItemList, movingItem.dataId, movingItem.amount, isLimitWeight, weightLimit, 
+                    storageItemList, movingItem.dataId, movingItem.amount, isLimitWeight, weightLimit,
                     CharacterDataExtension.GetTotalItemWeight(storageItemList), isLimitSlot, slotLimit);
                 if (!isOverwhelming && CharacterDataExtension.IncreaseItems(storageItemList, movingItem))
                 {
@@ -310,6 +321,12 @@ namespace MultiplayerARPG
 
         public override void MoveItemFromStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
         {
+            if (storageId.storageType == StorageType.Guild &&
+                !guilds.ContainsKey(playerCharacterEntity.GuildId))
+            {
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
+                return;
+            }
             if (!storageItems.ContainsKey(storageId))
                 storageItems[storageId] = new List<CharacterItem>();
             List<CharacterItem> storageItemList = storageItems[storageId];
@@ -320,7 +337,7 @@ namespace MultiplayerARPG
             }
             CharacterItem movingItem = storageItemList[storageItemIndex].Clone();
             movingItem.amount = amount;
-            if (nonEquipIndex < 0 || 
+            if (nonEquipIndex < 0 ||
                 nonEquipIndex >= playerCharacterEntity.NonEquipItems.Count ||
                 !playerCharacterEntity.NonEquipItems[nonEquipIndex].NotEmptySlot() ||
                 playerCharacterEntity.NonEquipItems[nonEquipIndex].dataId == movingItem.dataId)
@@ -354,6 +371,52 @@ namespace MultiplayerARPG
                 {
                     // Update storage items
                     playerCharacterEntity.StorageItems = storageItems;
+                }
+            }
+        }
+
+        public override void DepositGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
+        {
+            if (playerCharacterEntity.Gold - amount >= 0)
+            {
+                playerCharacterEntity.Gold -= amount;
+                playerCharacterEntity.UserGold += amount;
+            }
+        }
+
+        public override void WithdrawGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
+        {
+            if (playerCharacterEntity.UserGold - amount >= 0)
+            {
+                playerCharacterEntity.UserGold -= amount;
+                playerCharacterEntity.Gold += amount;
+            }
+        }
+
+        public override void DepositGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
+        {
+            GuildData guild;
+            if (guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
+            {
+                if (playerCharacterEntity.Gold - amount >= 0)
+                {
+                    playerCharacterEntity.Gold -= amount;
+                    guild.gold += amount;
+                    guilds[playerCharacterEntity.GuildId] = guild;
+                }
+            }
+        }
+
+        public override void WithdrawGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
+        {
+            GuildData guild;
+            if (guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
+            {
+                if (guild.gold - amount >= 0)
+                {
+                    guild.gold -= amount;
+                    playerCharacterEntity.Gold += amount;
+                    guilds[playerCharacterEntity.GuildId] = guild;
                 }
             }
         }

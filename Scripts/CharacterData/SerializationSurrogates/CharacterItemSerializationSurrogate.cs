@@ -29,7 +29,7 @@ public class CharacterItemSerializationSurrogate : ISerializationSurrogate
         data.durability = info.GetSingle("durability");
         data.exp = info.GetInt32("exp");
         data.lockRemainsDuration = info.GetSingle("lockRemainsDuration");
-        // Backward compatible
+        // TODO: Backward compatible, this will be removed in future version
         try
         {
             data.ammo = info.GetInt32("ammo");

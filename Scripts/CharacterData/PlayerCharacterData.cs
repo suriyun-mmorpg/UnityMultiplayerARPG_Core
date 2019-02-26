@@ -8,6 +8,8 @@ public partial class PlayerCharacterData : CharacterData, IPlayerCharacterData
     private short statPoint;
     private short skillPoint;
     private int gold;
+    private int userGold;
+    private int userCash;
     private int partyId;
     private int guildId;
     private byte guildRole;
@@ -23,6 +25,8 @@ public partial class PlayerCharacterData : CharacterData, IPlayerCharacterData
     public short StatPoint { get { return statPoint; } set { statPoint = value; } }
     public short SkillPoint { get { return skillPoint; } set { skillPoint = value; } }
     public int Gold { get { return gold; } set { gold = value; } }
+    public int UserGold { get { return userGold; } set { userGold = value; } }
+    public int UserCash { get { return userCash; } set { userCash = value; } }
     public int PartyId { get { return partyId; } set { partyId = value; } }
     public int GuildId { get { return guildId; } set { guildId = value; } }
     public byte GuildRole { get { return guildRole; } set { guildRole = value; } }

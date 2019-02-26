@@ -6,6 +6,8 @@ public partial interface IPlayerCharacterData : ICharacterData
     short StatPoint { get; set; }
     short SkillPoint { get; set; }
     int Gold { get; set; }
+    int UserGold { get; set; }
+    int UserCash { get; set; }
     int PartyId { get; set; }
     int GuildId { get; set; }
     byte GuildRole { get; set; }

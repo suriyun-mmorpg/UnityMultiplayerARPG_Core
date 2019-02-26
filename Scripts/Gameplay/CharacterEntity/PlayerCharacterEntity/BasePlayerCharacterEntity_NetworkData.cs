@@ -19,6 +19,10 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldInt gold = new SyncFieldInt();
         [SerializeField]
+        protected SyncFieldInt userGold = new SyncFieldInt();
+        [SerializeField]
+        protected SyncFieldInt userCash = new SyncFieldInt();
+        [SerializeField]
         protected SyncFieldInt partyId = new SyncFieldInt();
         [SerializeField]
         protected SyncFieldInt guildId = new SyncFieldInt();
@@ -116,6 +120,8 @@ namespace MultiplayerARPG
         public System.Action<short> onStatPointChange;
         public System.Action<short> onSkillPointChange;
         public System.Action<int> onGoldChange;
+        public System.Action<int> onUserGoldChange;
+        public System.Action<int> onUserCashChange;
         public System.Action<int> onPartyIdChange;
         public System.Action<int> onGuildIdChange;
         public System.Action<bool> onIsWarpingChange;
@@ -129,6 +135,8 @@ namespace MultiplayerARPG
         public short StatPoint { get { return statPoint.Value; } set { statPoint.Value = value; } }
         public short SkillPoint { get { return skillPoint.Value; } set { skillPoint.Value = value; } }
         public int Gold { get { return gold.Value; } set { gold.Value = value; } }
+        public int UserGold { get { return userGold.Value; } set { userGold.Value = value; } }
+        public int UserCash { get { return userCash.Value; } set { userCash.Value = value; } }
         public int PartyId { get { return partyId.Value; } set { partyId.Value = value; } }
         public int GuildId { get { return guildId.Value; } set { guildId.Value = value; } }
         public string GuildName { get { return syncTitle2.Value; } set { syncTitle2.Value = value; } }
@@ -206,6 +214,18 @@ namespace MultiplayerARPG
         {
             if (onGoldChange != null)
                 onGoldChange.Invoke(gold);
+        }
+
+        protected virtual void OnUserGoldChange(int gold)
+        {
+            if (onUserGoldChange != null)
+                onUserGoldChange.Invoke(gold);
+        }
+
+        protected virtual void OnUserCashChange(int gold)
+        {
+            if (onUserCashChange != null)
+                onUserCashChange.Invoke(gold);
         }
 
         protected virtual void OnPartyIdChange(int partyId)

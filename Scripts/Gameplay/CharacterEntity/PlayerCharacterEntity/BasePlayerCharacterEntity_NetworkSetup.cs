@@ -19,6 +19,10 @@ namespace MultiplayerARPG
             skillPoint.forOwnerOnly = true;
             gold.sendOptions = SendOptions.ReliableOrdered;
             gold.forOwnerOnly = true;
+            userGold.sendOptions = SendOptions.ReliableOrdered;
+            userGold.forOwnerOnly = true;
+            userCash.sendOptions = SendOptions.ReliableOrdered;
+            userCash.forOwnerOnly = true;
             partyId.sendOptions = SendOptions.ReliableOrdered;
             partyId.forOwnerOnly = false;
             guildId.sendOptions = SendOptions.ReliableOrdered;
@@ -39,6 +43,8 @@ namespace MultiplayerARPG
             statPoint.onChange += OnStatPointChange;
             skillPoint.onChange += OnSkillPointChange;
             gold.onChange += OnGoldChange;
+            userGold.onChange += OnUserGoldChange;
+            userCash.onChange += OnUserCashChange;
             partyId.onChange += OnPartyIdChange;
             guildId.onChange += OnGuildIdChange;
             isWarping.onChange += OnIsWarpingChange;
@@ -170,6 +176,8 @@ namespace MultiplayerARPG
             statPoint.onChange -= OnStatPointChange;
             skillPoint.onChange -= OnSkillPointChange;
             gold.onChange -= OnGoldChange;
+            userGold.onChange -= OnUserGoldChange;
+            userCash.onChange -= OnUserCashChange;
             partyId.onChange -= OnPartyIdChange;
             guildId.onChange -= OnGuildIdChange;
             isWarping.onChange -= OnIsWarpingChange;
