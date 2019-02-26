@@ -270,8 +270,7 @@ namespace MultiplayerARPG
 
         public override void CloseStorage(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            StorageId storageId = playerCharacterEntity.CurrentStorageId;
-            usingStorageCharacters[storageId].Remove(playerCharacterEntity.ObjectId);
+            usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Remove(playerCharacterEntity.ObjectId);
             playerCharacterEntity.StorageItems.Clear();
         }
 
