@@ -27,7 +27,7 @@ public static class CharacterRelatesDataExtension
         return data == null || data.Equals(CharacterItem.Empty);
     }
 
-    public static bool IsEmptySlot(this CharacterItem data)
+    public static bool NotEmptySlot(this CharacterItem data)
     {
         return !data.IsEmpty() && data.GetItem() != null && data.amount > 0;
     }
