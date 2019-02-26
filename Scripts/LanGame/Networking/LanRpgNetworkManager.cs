@@ -259,6 +259,12 @@ namespace MultiplayerARPG
             if (!usingStorageCharacters.ContainsKey(storageId))
                 usingStorageCharacters[storageId] = new HashSet<uint>();
             usingStorageCharacters[storageId].Add(playerCharacterEntity.ObjectId);
+            // Prepare storage data
+            Storage storage = GetStorage(playerCharacterEntity.CurrentStorageId);
+            bool isLimitSlot = storage.slotLimit > 0;
+            short slotLimit = storage.slotLimit;
+            CharacterDataExtension.FillEmptySlots(storageItems[storageId], isLimitSlot, slotLimit);
+            // Update storage items
             playerCharacterEntity.StorageItems = storageItems[storageId];
         }
 
@@ -285,6 +291,13 @@ namespace MultiplayerARPG
                 // Don't do anything, if non equip item index is invalid
                 return;
             }
+            // Prepare storage data
+            Storage storage = GetStorage(storageId);
+            bool isLimitWeight = storage.weightLimit > 0;
+            bool isLimitSlot = storage.slotLimit > 0;
+            short weightLimit = storage.weightLimit;
+            short slotLimit = storage.slotLimit;
+            // Prepare item data
             CharacterItem movingItem = playerCharacterEntity.NonEquipItems[nonEquipIndex].Clone();
             movingItem.amount = amount;
             if (storageItemIndex < 0 ||
@@ -293,11 +306,6 @@ namespace MultiplayerARPG
                 storageItemList[storageItemIndex].dataId == movingItem.dataId)
             {
                 // Add to storage or merge
-                Storage storage = GetStorage(storageId);
-                bool isLimitWeight = storage.weightLimit > 0;
-                bool isLimitSlot = storage.slotLimit > 0;
-                short weightLimit = storage.weightLimit;
-                short slotLimit = storage.slotLimit;
                 bool isOverwhelming = CharacterDataExtension.IncreasingItemsWillOverwhelming(
                     storageItemList, movingItem.dataId, movingItem.amount, isLimitWeight, weightLimit,
                     CharacterDataExtension.GetTotalItemWeight(storageItemList), isLimitSlot, slotLimit);
@@ -316,6 +324,7 @@ namespace MultiplayerARPG
                 storageItemList[storageItemIndex] = nonEquipItem;
                 playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
             }
+            CharacterDataExtension.FillEmptySlots(storageItemList, isLimitSlot, slotLimit);
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
@@ -335,6 +344,11 @@ namespace MultiplayerARPG
                 // Don't do anything, if storage item index is invalid
                 return;
             }
+            // Prepare storage data
+            Storage storage = GetStorage(storageId);
+            bool isLimitSlot = storage.slotLimit > 0;
+            short slotLimit = storage.slotLimit;
+            // Prepare item data
             CharacterItem movingItem = storageItemList[storageItemIndex].Clone();
             movingItem.amount = amount;
             if (nonEquipIndex < 0 ||
@@ -359,6 +373,7 @@ namespace MultiplayerARPG
                 storageItemList[storageItemIndex] = nonEquipItem;
                 playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
             }
+            CharacterDataExtension.FillEmptySlots(storageItemList, isLimitSlot, slotLimit);
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 

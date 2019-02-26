@@ -453,21 +453,27 @@ public static partial class CharacterDataExtension
     }
     #endregion
 
-    public static void FillEmptySlots(this ICharacterData data)
+    #region Fill Empty Slots
+    public static void FillEmptySlots(IList<CharacterItem> itemList, bool isLimitSlot, short slotLimit)
     {
-        if (!GameInstance.Singleton.IsLimitInventorySlot)
+        if (!isLimitSlot)
         {
             // If it is not limit slots, don't fill it
             return;
         }
 
         // Fill empty slots
-        short slotLimit = (short)data.CacheStats.slotLimit;
-        for (int i = data.NonEquipItems.Count; i < slotLimit; ++i)
+        for (int i = itemList.Count; i < slotLimit; ++i)
         {
-            data.NonEquipItems.Add(CharacterItem.Empty);
+            itemList.Add(CharacterItem.Empty);
         }
     }
+
+    public static void FillEmptySlots(this ICharacterData data)
+    {
+        FillEmptySlots(data.NonEquipItems, GameInstance.Singleton.IsLimitInventorySlot, (short)data.CacheStats.slotLimit);
+    }
+    #endregion
 
     #region Increasing Items Will Overwhelming
     public static bool IncreasingItemsWillOverwhelming(IList<CharacterItem> itemList, int dataId, short amount, bool isLimitWeight, short weightLimit, float totalItemWeight, bool isLimitSlot, short slotLimit)
