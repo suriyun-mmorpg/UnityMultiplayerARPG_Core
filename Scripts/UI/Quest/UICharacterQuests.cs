@@ -86,7 +86,7 @@ namespace MultiplayerARPG
                 uiCharacterQuest.Setup(characterQuest, BasePlayerCharacterController.OwningCharacter, index);
                 uiCharacterQuest.Show();
                 CacheCharacterQuestSelectionManager.Add(uiCharacterQuest);
-                if (selectedQuestId.Equals(characterQuest.dataId))
+                if (selectedQuestId == characterQuest.dataId)
                     uiCharacterQuest.OnClickSelect();
             });
         }
