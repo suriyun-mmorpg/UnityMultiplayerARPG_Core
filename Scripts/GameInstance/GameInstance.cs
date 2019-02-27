@@ -453,9 +453,9 @@ namespace MultiplayerARPG
         public int GetDamageableLayerMask()
         {
             int layerMask = 0;
-            layerMask = layerMask | ~characterLayer.Mask;
-            layerMask = layerMask | ~buildingLayer.Mask;
-            layerMask = layerMask | ~harvestableLayer.Mask;
+            layerMask = layerMask | ~(characterLayer.Mask);
+            layerMask = layerMask | ~(buildingLayer.Mask);
+            layerMask = layerMask | ~(harvestableLayer.Mask);
             return layerMask;
         }
 
