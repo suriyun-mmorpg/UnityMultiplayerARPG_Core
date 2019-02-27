@@ -262,7 +262,7 @@ namespace MultiplayerARPG
 
         public void RequestUsePendingSkill()
         {
-            if (queueUsingSkill.HasValue)
+            if (queueUsingSkill.HasValue && PlayerCharacterEntity.CanUseSkill())
             {
                 UsingSkillData queueUsingSkillValue = queueUsingSkill.Value;
                 Vector3 aimPosition = queueUsingSkillValue.aimPosition.HasValue ? queueUsingSkillValue.aimPosition.Value : CharacterTransform.position;
