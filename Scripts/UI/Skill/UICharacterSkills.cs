@@ -76,7 +76,6 @@ namespace MultiplayerARPG
         public void UpdateData(ICharacterData character)
         {
             this.character = character;
-
             int selectedSkillId = CacheCharacterSkillSelectionManager.SelectedUI != null ? CacheCharacterSkillSelectionManager.SelectedUI.Skill.DataId : 0;
             CacheCharacterSkillSelectionManager.DeselectSelectedUI();
             CacheCharacterSkillSelectionManager.Clear();
@@ -129,7 +128,7 @@ namespace MultiplayerARPG
                     if (dragHandler != null)
                         dragHandler.SetupForSkills(this);
                     CacheCharacterSkillSelectionManager.Add(uiCharacterSkill);
-                    if (selectedSkillId.Equals(skillLevel.Key))
+                    if (selectedSkillId == skillLevel.Key.DataId)
                         uiCharacterSkill.OnClickSelect();
                 });
             }
