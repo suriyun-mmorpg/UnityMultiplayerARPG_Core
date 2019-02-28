@@ -74,11 +74,13 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void OnStopServer()
+        protected override void Clean()
         {
-            base.OnStopServer();
+            base.Clean();
             nextPartyId = 1;
             nextGuildId = 1;
+            storageItems.Clear();
+            usingStorageCharacters.Clear();
         }
 
         public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
