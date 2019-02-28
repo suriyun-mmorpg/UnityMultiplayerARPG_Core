@@ -49,6 +49,16 @@ public struct StorageId
     {
         return (byte)storageType + "_" + storageOwnerId;
     }
+
+    public override int GetHashCode()
+    {
+        return GetId().GetHashCode();
+    }
+
+    public override string ToString()
+    {
+        return GetId();
+    }
 }
 
 public struct StorageItemId
@@ -67,5 +77,15 @@ public struct StorageItemId
     public string GetId()
     {
         return (byte)storageType + "_" + storageOwnerId + "_" + indexOfData;
+    }
+
+    public override int GetHashCode()
+    {
+        return GetId().GetHashCode();
+    }
+
+    public override string ToString()
+    {
+        return GetId();
     }
 }
