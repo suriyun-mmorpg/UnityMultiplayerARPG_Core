@@ -372,6 +372,8 @@ public static partial class PlayerCharacterDataExtension
         writer.Put(characterData.StatPoint);
         writer.Put(characterData.SkillPoint);
         writer.Put(characterData.Gold);
+        writer.Put(characterData.UserGold);
+        writer.Put(characterData.UserCash);
         writer.Put(characterData.PartyId);
         writer.Put(characterData.GuildId);
         writer.Put(characterData.GuildRole);
@@ -451,6 +453,8 @@ public static partial class PlayerCharacterDataExtension
         tempCharacterData.StatPoint = reader.GetShort();
         tempCharacterData.SkillPoint = reader.GetShort();
         tempCharacterData.Gold = reader.GetInt();
+        tempCharacterData.UserGold = reader.GetInt();
+        tempCharacterData.UserCash = reader.GetInt();
         tempCharacterData.PartyId = reader.GetInt();
         tempCharacterData.GuildId = reader.GetInt();
         tempCharacterData.GuildRole = reader.GetByte();
