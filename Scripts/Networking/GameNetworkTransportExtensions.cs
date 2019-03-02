@@ -9,9 +9,9 @@ namespace MultiplayerARPG
         private static void Send(TransportHandler transportHandler, long? connectionId, ushort msgType, INetSerializable message)
         {
             if (!connectionId.HasValue)
-                transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, msgType, message.Serialize);
+                transportHandler.ClientSendPacket(DeliveryMethod.ReliableOrdered, msgType, message.Serialize);
             else
-                transportHandler.ServerSendPacket(connectionId.Value, SendOptions.ReliableOrdered, msgType, message.Serialize);
+                transportHandler.ServerSendPacket(connectionId.Value, DeliveryMethod.ReliableOrdered, msgType, message.Serialize);
         }
 
         public static void SendEnterChat(this TransportHandler transportHandler, long? connectionId, ushort msgType, ChatChannel channel, string message, string senderName, string receiverName, int channelId)

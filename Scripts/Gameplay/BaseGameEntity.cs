@@ -195,9 +195,9 @@ namespace MultiplayerARPG
         protected virtual void SetupNetElements()
         {
             this.InvokeInstanceDevExtMethods("SetupNetElements");
-            syncTitle.sendOptions = SendOptions.ReliableOrdered;
+            syncTitle.deliveryMethod = DeliveryMethod.ReliableSequenced;
             syncTitle.forOwnerOnly = false;
-            syncTitle2.sendOptions = SendOptions.ReliableOrdered;
+            syncTitle2.deliveryMethod = DeliveryMethod.ReliableSequenced;
             syncTitle2.forOwnerOnly = false;
         }
 

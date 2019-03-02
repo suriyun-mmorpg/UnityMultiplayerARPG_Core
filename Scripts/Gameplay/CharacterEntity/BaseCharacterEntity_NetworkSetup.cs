@@ -10,25 +10,25 @@ namespace MultiplayerARPG
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
-            id.sendOptions = SendOptions.ReliableOrdered;
+            id.deliveryMethod = DeliveryMethod.ReliableSequenced;
             id.forOwnerOnly = false;
-            level.sendOptions = SendOptions.ReliableOrdered;
+            level.deliveryMethod = DeliveryMethod.ReliableSequenced;
             level.forOwnerOnly = false;
-            exp.sendOptions = SendOptions.ReliableOrdered;
+            exp.deliveryMethod = DeliveryMethod.ReliableSequenced;
             exp.forOwnerOnly = false;
-            currentHp.sendOptions = SendOptions.ReliableOrdered;
+            currentHp.deliveryMethod = DeliveryMethod.ReliableSequenced;
             currentHp.forOwnerOnly = false;
-            currentMp.sendOptions = SendOptions.ReliableOrdered;
+            currentMp.deliveryMethod = DeliveryMethod.ReliableSequenced;
             currentMp.forOwnerOnly = false;
-            currentFood.sendOptions = SendOptions.ReliableOrdered;
+            currentFood.deliveryMethod = DeliveryMethod.ReliableSequenced;
             currentFood.forOwnerOnly = false;
-            currentWater.sendOptions = SendOptions.ReliableOrdered;
+            currentWater.deliveryMethod = DeliveryMethod.ReliableSequenced;
             currentWater.forOwnerOnly = false;
-            equipWeapons.sendOptions = SendOptions.ReliableOrdered;
+            equipWeapons.deliveryMethod = DeliveryMethod.ReliableSequenced;
             equipWeapons.forOwnerOnly = false;
-            isHidding.sendOptions = SendOptions.ReliableOrdered;
+            isHidding.deliveryMethod = DeliveryMethod.ReliableSequenced;
             isHidding.forOwnerOnly = false;
-            movementState.sendOptions = SendOptions.Sequenced;
+            movementState.deliveryMethod = DeliveryMethod.Sequenced;
             movementState.forOwnerOnly = false;
 
             attributes.forOwnerOnly = false;

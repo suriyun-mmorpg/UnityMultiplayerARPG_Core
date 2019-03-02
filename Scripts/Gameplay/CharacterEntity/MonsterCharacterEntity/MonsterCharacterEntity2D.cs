@@ -63,7 +63,7 @@ namespace MultiplayerARPG
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
-            currentDirectionType.sendOptions = SendOptions.Sequenced;
+            currentDirectionType.deliveryMethod = DeliveryMethod.Sequenced;
             currentDirectionType.forOwnerOnly = false;
         }
 

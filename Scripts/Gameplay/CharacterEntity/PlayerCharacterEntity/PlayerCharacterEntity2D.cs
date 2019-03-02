@@ -187,7 +187,7 @@ namespace MultiplayerARPG
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
-            currentDirectionType.sendOptions = SendOptions.Unreliable;
+            currentDirectionType.deliveryMethod = DeliveryMethod.Sequenced;
             currentDirectionType.forOwnerOnly = false;
             // Setup network components
             switch (movementSecure)

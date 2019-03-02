@@ -210,26 +210,26 @@ namespace MultiplayerARPG
         {
             GameMessage message = new GameMessage();
             message.type = type;
-            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.GameMessage, message);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.GameMessage, message);
         }
 
         public virtual uint RequestCashShopInfo(AckMessageCallback callback)
         {
             BaseAckMessage message = new BaseAckMessage();
-            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MsgTypes.CashShopInfo, message, callback);
+            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MsgTypes.CashShopInfo, message, callback);
         }
 
         public virtual uint RequestCashPackageInfo(AckMessageCallback callback)
         {
             BaseAckMessage message = new BaseAckMessage();
-            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MsgTypes.CashPackageInfo, message, callback);
+            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MsgTypes.CashPackageInfo, message, callback);
         }
 
         public virtual uint RequestCashShopBuy(int dataId, AckMessageCallback callback)
         {
             RequestCashShopBuyMessage message = new RequestCashShopBuyMessage();
             message.dataId = dataId;
-            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MsgTypes.CashShopBuy, message, callback);
+            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MsgTypes.CashShopBuy, message, callback);
         }
 
         public virtual uint RequestCashPackageBuyValidation(int dataId, string receipt, AckMessageCallback callback)
@@ -238,7 +238,7 @@ namespace MultiplayerARPG
             message.dataId = dataId;
             message.platform = Application.platform;
             message.receipt = receipt;
-            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MsgTypes.CashPackageBuyValidation, message, callback);
+            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MsgTypes.CashPackageBuyValidation, message, callback);
         }
 
         protected virtual void HandleGameMessageAtClient(LiteNetLibMessageHandler messageHandler)
@@ -434,10 +434,10 @@ namespace MultiplayerARPG
                             List<BasePlayerCharacterEntity> receivers = playerCharacter.FindCharacters<BasePlayerCharacterEntity>(gameInstance.localChatDistance, false, true, true, true);
                             foreach (BasePlayerCharacterEntity receiver in receivers)
                             {
-                                ServerSendPacket(receiver.ConnectionId, SendOptions.ReliableOrdered, MsgTypes.Chat, message);
+                                ServerSendPacket(receiver.ConnectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
                             }
                             // Send messages to sender
-                            ServerSendPacket(playerCharacter.ConnectionId, SendOptions.ReliableOrdered, MsgTypes.Chat, message);
+                            ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
                         }
                     }
                     break;
@@ -445,7 +445,7 @@ namespace MultiplayerARPG
                     if (!string.IsNullOrEmpty(message.sender))
                     {
                         // Send message to all clients
-                        ServerSendPacketToAllConnections(SendOptions.ReliableOrdered, MsgTypes.Chat, message);
+                        ServerSendPacketToAllConnections(DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
                     }
                     break;
                 case ChatChannel.Whisper:
@@ -453,13 +453,13 @@ namespace MultiplayerARPG
                         connectionIdsByCharacterName.TryGetValue(message.sender, out senderConnectionId))
                     {
                         // If found sender send whisper message to sender
-                        ServerSendPacket(senderConnectionId, SendOptions.ReliableOrdered, MsgTypes.Chat, message);
+                        ServerSendPacket(senderConnectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
                     }
                     if (!string.IsNullOrEmpty(message.receiver) &&
                         connectionIdsByCharacterName.TryGetValue(message.receiver, out receiverConnectionId))
                     {
                         // If found receiver send whisper message to receiver
-                        ServerSendPacket(receiverConnectionId, SendOptions.ReliableOrdered, MsgTypes.Chat, message);
+                        ServerSendPacket(receiverConnectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
                     }
                     break;
                 case ChatChannel.Party:
@@ -472,7 +472,7 @@ namespace MultiplayerARPG
                                 ContainsConnectionId(playerCharacter.ConnectionId))
                             {
                                 // If party member is online, send party message to the member
-                                ServerSendPacket(playerCharacter.ConnectionId, SendOptions.ReliableOrdered, MsgTypes.Chat, message);
+                                ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
                             }
                         }
                     }
@@ -487,7 +487,7 @@ namespace MultiplayerARPG
                                 ContainsConnectionId(playerCharacter.ConnectionId))
                             {
                                 // If guild member is online, send guild message to the member
-                                ServerSendPacket(playerCharacter.ConnectionId, SendOptions.ReliableOrdered, MsgTypes.Chat, message);
+                                ServerSendPacket(playerCharacter.ConnectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Chat, message);
                             }
                         }
                     }
@@ -503,7 +503,7 @@ namespace MultiplayerARPG
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = AckResponseCode.Error;
             responseMessage.error = ResponseCashShopInfoMessage.Error.NotAvailable;
-            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashShopInfo, responseMessage);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashShopInfo, responseMessage);
         }
 
         protected virtual void HandleRequestCashShopBuy(LiteNetLibMessageHandler messageHandler)
@@ -514,7 +514,7 @@ namespace MultiplayerARPG
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = AckResponseCode.Error;
             responseMessage.error = ResponseCashShopBuyMessage.Error.NotAvailable;
-            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashShopBuy, responseMessage);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashShopBuy, responseMessage);
         }
 
         protected virtual void HandleRequestCashPackageInfo(LiteNetLibMessageHandler messageHandler)
@@ -525,7 +525,7 @@ namespace MultiplayerARPG
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = AckResponseCode.Error;
             responseMessage.error = ResponseCashPackageInfoMessage.Error.NotAvailable;
-            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashPackageInfo, responseMessage);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashPackageInfo, responseMessage);
         }
 
         protected virtual void HandleRequestCashPackageBuyValidation(LiteNetLibMessageHandler messageHandler)
@@ -536,7 +536,7 @@ namespace MultiplayerARPG
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = AckResponseCode.Error;
             responseMessage.error = ResponseCashPackageBuyValidationMessage.Error.NotAvailable;
-            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashPackageBuyValidation, responseMessage);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashPackageBuyValidation, responseMessage);
         }
 
         public override bool StartServer()
@@ -599,7 +599,7 @@ namespace MultiplayerARPG
             chatMessage.message = message;
             chatMessage.sender = senderName;
             chatMessage.receiver = receiverName;
-            ClientSendPacket(SendOptions.ReliableOrdered, MsgTypes.Chat, chatMessage);
+            ClientSendPacket(DeliveryMethod.ReliableOrdered, MsgTypes.Chat, chatMessage);
         }
 
         public void Quit()
@@ -797,7 +797,7 @@ namespace MultiplayerARPG
                 return;
             UpdateMapInfoMessage message = new UpdateMapInfoMessage();
             message.mapId = CurrentMapInfo.Id;
-            ServerSendPacketToAllConnections(SendOptions.ReliableOrdered, MsgTypes.UpdateMapInfo, message);
+            ServerSendPacketToAllConnections(DeliveryMethod.ReliableOrdered, MsgTypes.UpdateMapInfo, message);
         }
     }
 }

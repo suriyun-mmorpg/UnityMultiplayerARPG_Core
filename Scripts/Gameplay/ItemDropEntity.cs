@@ -72,7 +72,7 @@ namespace MultiplayerARPG
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
-            itemDataId.sendOptions = SendOptions.ReliableOrdered;
+            itemDataId.deliveryMethod = DeliveryMethod.ReliableSequenced;
             itemDataId.forOwnerOnly = false;
         }
 

@@ -11,23 +11,23 @@ namespace MultiplayerARPG
         {
             base.SetupNetElements();
             // Sync fields
-            dataId.sendOptions = SendOptions.ReliableOrdered;
+            dataId.deliveryMethod = DeliveryMethod.ReliableSequenced;
             dataId.forOwnerOnly = false;
-            statPoint.sendOptions = SendOptions.ReliableOrdered;
+            statPoint.deliveryMethod = DeliveryMethod.ReliableSequenced;
             statPoint.forOwnerOnly = true;
-            skillPoint.sendOptions = SendOptions.ReliableOrdered;
+            skillPoint.deliveryMethod = DeliveryMethod.ReliableSequenced;
             skillPoint.forOwnerOnly = true;
-            gold.sendOptions = SendOptions.ReliableOrdered;
+            gold.deliveryMethod = DeliveryMethod.ReliableSequenced;
             gold.forOwnerOnly = true;
-            userGold.sendOptions = SendOptions.ReliableOrdered;
+            userGold.deliveryMethod = DeliveryMethod.ReliableSequenced;
             userGold.forOwnerOnly = true;
-            userCash.sendOptions = SendOptions.ReliableOrdered;
+            userCash.deliveryMethod = DeliveryMethod.ReliableSequenced;
             userCash.forOwnerOnly = true;
-            partyId.sendOptions = SendOptions.ReliableOrdered;
+            partyId.deliveryMethod = DeliveryMethod.ReliableSequenced;
             partyId.forOwnerOnly = false;
-            guildId.sendOptions = SendOptions.ReliableOrdered;
+            guildId.deliveryMethod = DeliveryMethod.ReliableSequenced;
             guildId.forOwnerOnly = false;
-            isWarping.sendOptions = SendOptions.ReliableOrdered;
+            isWarping.deliveryMethod = DeliveryMethod.ReliableSequenced;
             isWarping.forOwnerOnly = true;
             // Sync lists
             hotkeys.forOwnerOnly = true;

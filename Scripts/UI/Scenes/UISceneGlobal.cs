@@ -95,14 +95,17 @@ namespace MultiplayerARPG
                 case DisconnectReason.ConnectionFailed:
                     errorMessage = "Cannot connect to the server";
                     break;
+                case DisconnectReason.ConnectionRejected:
+                    errorMessage = "Connection rejected by server";
+                    break;
                 case DisconnectReason.RemoteConnectionClose:
                     errorMessage = "Server has been closed";
                     break;
-                case DisconnectReason.SocketReceiveError:
-                    errorMessage = "Cannot receive data";
+                case DisconnectReason.InvalidProtocol:
+                    errorMessage = "Invalid protocol";
                     break;
-                case DisconnectReason.SocketSendError:
-                    errorMessage = "Cannot send data";
+                case DisconnectReason.HostUnreachable:
+                    errorMessage = "Host unreachable";
                     break;
                 case DisconnectReason.Timeout:
                     errorMessage = "Connection timeout";

@@ -183,9 +183,9 @@ namespace MultiplayerARPG
         {
             base.SetupNetElements();
             CacheNetTransform.ownerClientCanSendTransform = false;
-            summonerObjectId.sendOptions = SendOptions.ReliableOrdered;
+            summonerObjectId.deliveryMethod = DeliveryMethod.ReliableSequenced;
             summonerObjectId.forOwnerOnly = false;
-            summonType.sendOptions = SendOptions.ReliableOrdered;
+            summonType.deliveryMethod = DeliveryMethod.ReliableSequenced;
             summonType.forOwnerOnly = false;
         }
 
