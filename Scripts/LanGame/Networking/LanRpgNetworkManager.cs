@@ -107,9 +107,10 @@ namespace MultiplayerARPG
             }
             if (!CurrentMapInfo.Id.Equals(playerCharacterData.CurrentMapName))
                 playerCharacterData.CurrentPosition = teleportPosition.HasValue ? teleportPosition.Value : CurrentMapInfo.startPosition;
-            LiteNetLibIdentity identity = Assets.NetworkSpawn(entityPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
-            BasePlayerCharacterEntity playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
+            GameObject spawnObj = Instantiate(entityPrefab.gameObject, playerCharacterData.CurrentPosition, Quaternion.identity);
+            BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterData.CloneTo(playerCharacterEntity);
+            Assets.NetworkSpawn(spawnObj, 0, connectionId);
 
             // Set user Id
             playerCharacterEntity.UserId = playerCharacterEntity.Id;
