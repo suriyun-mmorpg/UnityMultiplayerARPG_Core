@@ -151,10 +151,11 @@ namespace MultiplayerARPG
                 // Random rotation
                 dropRotation = Quaternion.Euler(Vector3.up * Random.Range(0, 360));
             }
-            LiteNetLibIdentity identity = dropper.Manager.Assets.NetworkSpawn(gameInstance.itemDropEntityPrefab.Identity, dropPosition, dropRotation);
-            ItemDropEntity itemDropEntity = identity.GetComponent<ItemDropEntity>();
+            GameObject spawnObj = Instantiate(gameInstance.itemDropEntityPrefab.gameObject, dropPosition, dropRotation);
+            ItemDropEntity itemDropEntity = spawnObj.GetComponent<ItemDropEntity>();
             itemDropEntity.dropData = dropData;
             itemDropEntity.looters = new HashSet<uint>(looters);
+            BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             return itemDropEntity;
         }
     }
