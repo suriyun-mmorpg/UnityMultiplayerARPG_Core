@@ -308,7 +308,7 @@ namespace MultiplayerARPG
                 MovementState = state;
 
             if (movementSecure == MovementSecure.NotSecure && IsOwnerClient)
-                CallNetFunction(NetFuncSetMovementState, FunctionReceivers.Server, (byte)state);
+                CallNetFunction(NetFuncSetMovementState, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)state);
         }
 
         public override void StopMove()
