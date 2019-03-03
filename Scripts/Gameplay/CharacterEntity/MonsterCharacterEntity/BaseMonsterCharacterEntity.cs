@@ -62,7 +62,7 @@ namespace MultiplayerARPG
                     summonerObjectId.Value = summoner != null ? summoner.ObjectId : 0;
             }
         }
-        
+
         public SummonType SummonType { get { return (SummonType)summonType.Value; } protected set { summonType.Value = (byte)value; } }
         public bool IsSummoned { get { return SummonType != SummonType.None; } }
 
@@ -524,7 +524,11 @@ namespace MultiplayerARPG
         {
             yield return new WaitForSecondsRealtime(destroyDelay + destroyRespawnDelay);
             InitStats();
-            Manager.Assets.NetworkSpawn(Identity.HashAssetId, spawnPosition, Quaternion.Euler(Vector3.up * Random.Range(0, 360)), Identity.ObjectId, Identity.ConnectionId);
+            Manager.Assets.NetworkSpawn(Identity.HashAssetId,
+                spawnPosition,
+                gameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity,
+                Identity.ObjectId,
+                Identity.ConnectionId);
         }
 
         public void Summon(BaseCharacterEntity summoner, SummonType summonType, short level)

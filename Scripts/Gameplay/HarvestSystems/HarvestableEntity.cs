@@ -130,6 +130,9 @@ namespace MultiplayerARPG
 
         public void DestroyAndRespawn()
         {
+            if (!IsServer)
+                return;
+
             if (spawnArea != null)
                 spawnArea.Spawn(destroyDelay + destroyRespawnDelay);
             else
@@ -142,10 +145,10 @@ namespace MultiplayerARPG
         {
             yield return new WaitForSecondsRealtime(destroyDelay + destroyRespawnDelay);
             InitStats();
-            Manager.Assets.NetworkSpawn(Identity.HashAssetId, 
+            Manager.Assets.NetworkSpawn(Identity.HashAssetId,
                 spawnPosition,
-                gameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity, 
-                Identity.ObjectId, 
+                gameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity,
+                Identity.ObjectId,
                 Identity.ConnectionId);
         }
 
