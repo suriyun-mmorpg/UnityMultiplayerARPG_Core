@@ -14,12 +14,8 @@ namespace MultiplayerARPG
     public abstract class BaseGameEntity : LiteNetLibBehaviour
     {
         [Header("Game Entity Settings")]
-        [SerializeField]
-        private string title;
-        [SerializeField]
-        private string title2;
         public Text textTitle;
-        public Text textTitle2;
+        public Text textTitleB;
         [Tooltip("These objects will be hidden on non owner objects")]
         public GameObject[] ownerObjects;
         [Tooltip("These objects will be hidden on owner objects")]
@@ -29,26 +25,16 @@ namespace MultiplayerARPG
         protected SyncFieldString syncTitle = new SyncFieldString();
         public virtual string Title
         {
-            get { return title; }
-            set
-            {
-                title = value;
-                if (IsServer)
-                    syncTitle.Value = value;
-            }
+            get { return syncTitle.Value; }
+            set { syncTitle.Value = value; }
         }
 
         [SerializeField]
-        protected SyncFieldString syncTitle2 = new SyncFieldString();
-        public virtual string Title2
+        protected SyncFieldString syncTitleB = new SyncFieldString();
+        public virtual string TitleB
         {
-            get { return title2; }
-            set
-            {
-                title2 = value;
-                if (IsServer)
-                    syncTitle2.Value = value;
-            }
+            get { return syncTitleB.Value; }
+            set { syncTitleB.Value = value; }
         }
 
         private Transform cacheTransform;
@@ -85,7 +71,7 @@ namespace MultiplayerARPG
 
         public BaseGameNetworkManager gameManager
         {
-            get { return Manager as BaseGameNetworkManager; }
+            get { return BaseGameNetworkManager.Singleton; }
         }
 
         private void Awake()
@@ -148,12 +134,12 @@ namespace MultiplayerARPG
         {
             if (textTitle != null)
                 textTitle.text = Title;
-            if (textTitle2 != null)
-                textTitle2.text = Title2;
+            if (textTitleB != null)
+                textTitleB.text = TitleB;
             EntityLateUpdate();
         }
         protected virtual void EntityLateUpdate() { }
-        
+
         private void FixedUpdate()
         {
             EntityFixedUpdate();
@@ -165,11 +151,7 @@ namespace MultiplayerARPG
             EntityOnDestroy();
             this.InvokeInstanceDevExtMethods("OnDestroy");
         }
-        protected virtual void EntityOnDestroy()
-        {
-            syncTitle.onChange -= OnSyncTitleChange;
-            syncTitle2.onChange -= OnSyncTitle2Change;
-        }
+        protected virtual void EntityOnDestroy() { }
 
         protected virtual void OnValidate()
         {
@@ -183,12 +165,6 @@ namespace MultiplayerARPG
             base.OnSetup();
             this.InvokeInstanceDevExtMethods("OnSetup");
             SetupNetElements();
-            syncTitle.onChange += OnSyncTitleChange;
-            if (IsServer)
-                syncTitle.Value = title;
-            syncTitle2.onChange += OnSyncTitle2Change;
-            if (IsServer)
-                syncTitle2.Value = title;
             RegisterNetFunction<uint>(NetFuncPlayEffect);
         }
 
@@ -197,8 +173,8 @@ namespace MultiplayerARPG
             this.InvokeInstanceDevExtMethods("SetupNetElements");
             syncTitle.deliveryMethod = DeliveryMethod.ReliableSequenced;
             syncTitle.forOwnerOnly = false;
-            syncTitle2.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            syncTitle2.forOwnerOnly = false;
+            syncTitleB.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            syncTitleB.forOwnerOnly = false;
         }
 
         #region Net Functions
@@ -228,16 +204,6 @@ namespace MultiplayerARPG
         {
             base.OnNetworkDestroy(reasons);
             this.InvokeInstanceDevExtMethods("OnNetworkDestroy", reasons);
-        }
-
-        protected virtual void OnSyncTitleChange(string syncTitle)
-        {
-            title = syncTitle;
-        }
-
-        protected virtual void OnSyncTitle2Change(string syncTitle2)
-        {
-            title2 = syncTitle2;
         }
 
         public bool TryGetEntityByObjectId<T>(uint objectId, out T result) where T : class

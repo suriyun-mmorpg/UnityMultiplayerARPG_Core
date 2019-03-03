@@ -139,7 +139,7 @@ namespace MultiplayerARPG
         public int UserCash { get { return userCash.Value; } set { userCash.Value = value; } }
         public int PartyId { get { return partyId.Value; } set { partyId.Value = value; } }
         public int GuildId { get { return guildId.Value; } set { guildId.Value = value; } }
-        public string GuildName { get { return syncTitle2.Value; } set { syncTitle2.Value = value; } }
+        public string GuildName { get { return syncTitleB.Value; } set { syncTitleB.Value = value; } }
         public bool IsWarping { get { return isWarping.Value; } set { isWarping.Value = value; } }
         public byte GuildRole { get; set; }
         public int SharedGuildExp { get; set; }

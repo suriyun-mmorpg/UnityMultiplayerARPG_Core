@@ -13,7 +13,7 @@ namespace MultiplayerARPG
 
         [Header("Base Game Entity - UI Elements")]
         public TextWrapper uiTextTitle;
-        public TextWrapper uiTextTitle2;
+        public TextWrapper uiTextTitleB;
 
         protected override void Update()
         {
@@ -27,11 +27,11 @@ namespace MultiplayerARPG
                 uiTextTitle.gameObject.SetActive(!string.IsNullOrEmpty(tempTitle));
             }
 
-            if (uiTextTitle2 != null)
+            if (uiTextTitleB != null)
             {
-                tempTitle = Data == null ? string.Empty : Data.Title2;
-                uiTextTitle2.text = string.Format(title2Format, tempTitle);
-                uiTextTitle2.gameObject.SetActive(!string.IsNullOrEmpty(tempTitle));
+                tempTitle = Data == null ? string.Empty : Data.TitleB;
+                uiTextTitleB.text = string.Format(title2Format, tempTitle);
+                uiTextTitleB.gameObject.SetActive(!string.IsNullOrEmpty(tempTitle));
             }
         }
     }
