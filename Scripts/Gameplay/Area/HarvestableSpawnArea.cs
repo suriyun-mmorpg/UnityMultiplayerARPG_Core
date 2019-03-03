@@ -57,12 +57,10 @@ namespace MultiplayerARPG
             }
             if (!overlapEntities)
             {
-                LiteNetLibIdentity identity = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(harvestableEntity.Identity, spawnPosition, spawnRotation);
-                if (identity != null)
-                {
-                    HarvestableEntity entity = identity.GetComponent<HarvestableEntity>();
-                    entity.SetSpawnArea(this, spawnPosition);
-                }
+                GameObject spawnObj = Instantiate(harvestableEntity.gameObject, spawnPosition, spawnRotation);
+                HarvestableEntity entity = spawnObj.GetComponent<HarvestableEntity>();
+                entity.SetSpawnArea(this, spawnPosition);
+                BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             }
             else
             {
