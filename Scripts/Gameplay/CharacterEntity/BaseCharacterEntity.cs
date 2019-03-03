@@ -1194,13 +1194,15 @@ namespace MultiplayerARPG
                 case DamageType.Missile:
                     if (damageInfo.missileDamageEntity != null)
                     {
-                        MissileDamageEntity missileDamageEntity = Manager.Assets.NetworkSpawn(damageInfo.missileDamageEntity.Identity, damagePosition, damageRotation).GetComponent<MissileDamageEntity>();
+                        GameObject spawnObj = Instantiate(damageInfo.missileDamageEntity.gameObject, damagePosition, damageRotation);
+                        MissileDamageEntity missileDamageEntity = spawnObj.GetComponent<MissileDamageEntity>();
                         if (damageInfo.hitOnlySelectedTarget)
                         {
                             if (!TryGetTargetEntity(out tempDamageableEntity))
                                 tempDamageableEntity = null;
                         }
                         missileDamageEntity.SetupDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId, damageInfo.missileDistance, damageInfo.missileSpeed, tempDamageableEntity);
+                        Manager.Assets.NetworkSpawn(spawnObj);
                     }
                     break;
             }
