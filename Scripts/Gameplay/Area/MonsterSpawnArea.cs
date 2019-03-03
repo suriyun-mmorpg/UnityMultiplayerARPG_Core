@@ -39,10 +39,11 @@ namespace MultiplayerARPG
             yield return new WaitForSecondsRealtime(delay);
             Vector3 spawnPosition = GetRandomPosition();
             Quaternion spawnRotation = GetRandomRotation();
-            LiteNetLibIdentity identity = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(monsterCharacterEntity.Identity, spawnPosition, spawnRotation);
-            BaseMonsterCharacterEntity entity = identity.GetComponent<BaseMonsterCharacterEntity>();
+            GameObject spawnObj = Instantiate(monsterCharacterEntity.gameObject, spawnPosition, spawnRotation);
+            BaseMonsterCharacterEntity entity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
             entity.Level = level;
             entity.SetSpawnArea(this, spawnPosition);
+            BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
         }
 
         public override int GroundLayerMask
