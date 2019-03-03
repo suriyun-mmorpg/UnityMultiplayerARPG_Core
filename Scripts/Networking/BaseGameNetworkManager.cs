@@ -681,11 +681,12 @@ namespace MultiplayerARPG
                         WarpPortalEntity warpPortalPrefab = warpPortal.entityPrefab != null ? warpPortal.entityPrefab : gameInstance.warpPortalEntityPrefab;
                         if (warpPortalPrefab != null)
                         {
-                            LiteNetLibIdentity warpPortalIdentity = Assets.NetworkSpawn(warpPortalPrefab.Identity, warpPortal.position, Quaternion.identity);
-                            WarpPortalEntity warpPortalEntity = warpPortalIdentity.GetComponent<WarpPortalEntity>();
+                            GameObject spawnObj = Instantiate(warpPortalPrefab.gameObject, warpPortal.position, Quaternion.identity);
+                            WarpPortalEntity warpPortalEntity = spawnObj.GetComponent<WarpPortalEntity>();
                             warpPortalEntity.type = warpPortal.warpPortalType;
                             warpPortalEntity.mapInfo = warpPortal.warpToMapInfo;
                             warpPortalEntity.position = warpPortal.warpToPosition;
+                            Assets.NetworkSpawn(spawnObj);
                         }
                     }
                 }
@@ -701,10 +702,11 @@ namespace MultiplayerARPG
                         NpcEntity npcPrefab = npc.entityPrefab;
                         if (npcPrefab != null)
                         {
-                            LiteNetLibIdentity npcIdentity = Assets.NetworkSpawn(npcPrefab.Identity, npc.position, Quaternion.Euler(npc.rotation));
-                            NpcEntity npcEntity = npcIdentity.GetComponent<NpcEntity>();
+                            GameObject spawnObj = Instantiate(npcPrefab.gameObject, npc.position, Quaternion.Euler(npc.rotation));
+                            NpcEntity npcEntity = spawnObj.GetComponent<NpcEntity>();
                             npcEntity.StartDialog = npc.startDialog;
                             npcEntity.Title = npc.title;
+                            Assets.NetworkSpawn(spawnObj);
                         }
                     }
                 }
@@ -738,13 +740,14 @@ namespace MultiplayerARPG
             BuildingEntity prefab;
             if (GameInstance.BuildingEntities.TryGetValue(saveData.DataId, out prefab))
             {
-                LiteNetLibIdentity buildingIdentity = Assets.NetworkSpawn(prefab.Identity, saveData.Position, saveData.Rotation);
-                BuildingEntity buildingEntity = buildingIdentity.GetComponent<BuildingEntity>();
+                GameObject spawnObj = Instantiate(prefab.gameObject, saveData.position, saveData.Rotation);
+                BuildingEntity buildingEntity = spawnObj.GetComponent<BuildingEntity>();
                 buildingEntity.Id = saveData.Id;
                 buildingEntity.ParentId = saveData.ParentId;
                 buildingEntity.CurrentHp = saveData.CurrentHp;
                 buildingEntity.CreatorId = saveData.CreatorId;
                 buildingEntity.CreatorName = saveData.CreatorName;
+                Assets.NetworkSpawn(spawnObj);
                 buildingEntities[buildingEntity.Id] = buildingEntity;
                 return buildingEntity;
             }
