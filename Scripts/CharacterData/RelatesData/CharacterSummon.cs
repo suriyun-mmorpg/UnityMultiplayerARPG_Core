@@ -1,4 +1,5 @@
-﻿using LiteNetLib.Utils;
+﻿using UnityEngine;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
 using MultiplayerARPG;
 
@@ -96,8 +97,8 @@ public class CharacterSummon : INetSerializable
     {
         if (GetPrefab() == null)
             return;
-        LiteNetLibIdentity identity = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(GetPrefab().Identity, summoner.GetSummonPosition(), summoner.GetSummonRotation());
-        cacheEntity = identity.GetComponent<BaseMonsterCharacterEntity>();
+        GameObject spawnObj = Object.Instantiate(GetPrefab().gameObject, summoner.GetSummonPosition(), summoner.GetSummonRotation());
+        cacheEntity = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj).GetComponent<BaseMonsterCharacterEntity>();
         CacheEntity.Summon(summoner, type, summonLevel);
         objectId = CacheEntity.ObjectId;
         summonRemainsDuration = duration;
