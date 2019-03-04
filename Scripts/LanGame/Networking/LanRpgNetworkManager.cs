@@ -17,10 +17,16 @@ namespace MultiplayerARPG
             SinglePlayer,
         }
 
+        public enum EnableGmCommandType
+        {
+            Everyone,
+            HostOnly,
+        }
+
         public float autoSaveDuration = 2f;
         public GameStartType startType;
         public PlayerCharacterData selectedCharacter;
-        public bool enableGmCommands;
+        public EnableGmCommandType enableGmCommands;
         private float lastSaveTime;
         private int nextPartyId = 1;
         private int nextGuildId = 1;
@@ -117,12 +123,15 @@ namespace MultiplayerARPG
 
             // Enable GM commands in Singleplayer / LAN mode
             // TODO: Don't use fixed user level
-            if (enableGmCommands)
+            if (enableGmCommands == EnableGmCommandType.Everyone)
                 playerCharacterEntity.UserLevel = 1;
 
             // Load world / storage for first character (host)
             if (playerCharacters.Count == 0)
             {
+                if (enableGmCommands == EnableGmCommandType.HostOnly)
+                    playerCharacterEntity.UserLevel = 1;
+
                 worldSaveData.LoadPersistentData(playerCharacterEntity.Id, playerCharacterEntity.CurrentMapName);
                 storageSaveData.LoadPersistentData(playerCharacterEntity.Id);
                 foreach (StorageCharacterItem storageItem in storageSaveData.storageItems)
