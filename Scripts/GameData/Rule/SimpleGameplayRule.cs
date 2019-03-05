@@ -77,7 +77,7 @@ namespace MultiplayerARPG
 
         public override float GetCriticalChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {
-            float criRate = damageReceiver.CacheStats.criRate;
+            float criRate = attacker.CacheStats.criRate;
             // Minimum critical chance is 5%
             if (criRate < 0.05f)
                 criRate = 0.05f;
