@@ -9,16 +9,13 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public sealed class BuildingEntity : DamageableEntity, IBuildingSaveData
+    public class BuildingEntity : DamageableEntity, IBuildingSaveData
     {
         [Header("Building Data")]
         [Tooltip("Type of building you can set it as Foundation, Wall, Door anything as you wish")]
         public string buildingType;
         public float characterForwardDistance = 4;
         public int maxHp = 100;
-        [Header("Storage System")]
-        public bool enableStorage;
-        public Storage storage;
 
         public override int MaxHp { get { return maxHp; } }
 
