@@ -199,7 +199,7 @@ namespace MultiplayerARPG
 
             IDamageableEntity target = other.GetComponent<IDamageableEntity>();
 
-            if (target == null || target.IsDead() || attacker.gameObject == target.gameObject || !target.CanReceiveDamageFrom(attacker))
+            if (target == null || attacker == null || target.IsDead() || attacker.gameObject == target.gameObject || !target.CanReceiveDamageFrom(attacker))
                 return false;
 
             if (LockingTarget != null && LockingTarget != target)
