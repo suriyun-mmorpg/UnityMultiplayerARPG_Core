@@ -128,8 +128,19 @@ namespace MultiplayerARPG
 
         void Update()
         {
-            if (!playing || Time.realtimeSinceStartup < nextFrameTime || spriteRenderer == null)
+            if (spriteRenderer == null)
                 return;
+            // Increase next frame time while pause
+            if (!playing)
+            {
+                nextFrameTime += Time.deltaTime;
+                return;
+            }
+            // Is is time to play next frame?
+            float time = Time.time;
+            if (time < nextFrameTime)
+                return;
+            // Play next frame
             currentFrame++;
             if (currentFrame >= playingAnim.frames.Length)
             {
@@ -141,7 +152,7 @@ namespace MultiplayerARPG
                 currentFrame = 0;
             }
             spriteRenderer.sprite = playingAnim.frames[currentFrame];
-            nextFrameTime += secsPerFrame;
+            nextFrameTime = time + secsPerFrame;
         }
 
         private void UpdateSample()
@@ -191,7 +202,7 @@ namespace MultiplayerARPG
             secsPerFrame = 1f / anim.framesPerSec;
             currentFrame = -1;
             playing = true;
-            nextFrameTime = Time.realtimeSinceStartup;
+            nextFrameTime = Time.time + secsPerFrame;
         }
 
         public void Stop()
@@ -202,7 +213,6 @@ namespace MultiplayerARPG
         public void Resume()
         {
             playing = true;
-            nextFrameTime = Time.realtimeSinceStartup + secsPerFrame;
         }
 
         public override void UpdateAnimation(bool isDead, MovementFlag movementState, float playMoveSpeedMultiplier = 1)
