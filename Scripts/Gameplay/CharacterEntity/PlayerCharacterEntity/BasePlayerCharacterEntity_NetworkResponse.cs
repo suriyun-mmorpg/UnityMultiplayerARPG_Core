@@ -121,7 +121,7 @@ namespace MultiplayerARPG
             short level = guild.GetSkillLevel(dataId);
             if (level <= 0)
                 return;
-            
+
             if (this.IndexOfSkillUsage(dataId, SkillUsageType.GuildSkill) >= 0)
                 return;
 
@@ -552,7 +552,7 @@ namespace MultiplayerARPG
             // TODO: For now only creator can open storage
             if (buildingEntity != null &&
                 buildingEntity.CreatorId.Equals(Id) &&
-                buildingEntity.enableStorage)
+                buildingEntity is StorageEntity)
                 OpenStorage(StorageType.Building, buildingEntity.Id);
         }
 
@@ -1048,6 +1048,7 @@ namespace MultiplayerARPG
             Storage storage = gameManager.GetStorage(storageId);
             if (!currentStorageId.Equals(storageId))
             {
+                gameManager.CloseStorage(this);
                 currentStorageId = storageId;
                 gameManager.OpenStorage(this);
             }

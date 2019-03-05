@@ -1151,8 +1151,9 @@ namespace MultiplayerARPG
                     break;
                 case StorageType.Building:
                     BuildingEntity buildingEntity;
-                    if (TryGetBuildingEntity(storageId.storageOwnerId, out buildingEntity))
-                        storage = buildingEntity.storage;
+                    if (TryGetBuildingEntity(storageId.storageOwnerId, out buildingEntity) &&
+                        buildingEntity is StorageEntity)
+                        storage = (buildingEntity as StorageEntity).storage;
                     break;
             }
             return storage;
@@ -1164,6 +1165,7 @@ namespace MultiplayerARPG
         public abstract void CloseStorage(BasePlayerCharacterEntity playerCharacterEntity);
         public abstract void MoveItemToStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex);
         public abstract void MoveItemFromStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex);
+        public abstract bool IsStorageEntityOpen(StorageEntity storageEntity);
         public abstract void DepositGold(BasePlayerCharacterEntity playerCharacterEntity, int amount);
         public abstract void WithdrawGold(BasePlayerCharacterEntity playerCharacterEntity, int amount);
         public abstract void DepositGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount);

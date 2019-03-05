@@ -730,6 +730,7 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacter;
             if (!playerCharacters.TryGetValue(connectionId, out playerCharacter))
                 return;
+            CloseStorage(playerCharacter);
             connectionIdsByCharacterName.Remove(playerCharacter.CharacterName);
             playerCharactersById.Remove(playerCharacter.Id);
             playerCharacters.Remove(connectionId);
