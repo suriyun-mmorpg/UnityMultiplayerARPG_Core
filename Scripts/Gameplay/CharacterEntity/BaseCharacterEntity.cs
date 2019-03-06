@@ -69,7 +69,7 @@ namespace MultiplayerARPG
         protected Collider[] overlapColliders_ForFindFunctions = new Collider[OVERLAP_COLLIDER_SIZE_FOR_FIND];
         protected Collider2D[] overlapColliders2D_ForFindFunctions = new Collider2D[OVERLAP_COLLIDER_SIZE_FOR_FIND];
         protected GameObject tempGameObject;
-        protected float lastGroundedTime;
+        protected Collider groundedCollider;
         #endregion
 
         #region Caches Data
@@ -221,31 +221,25 @@ namespace MultiplayerARPG
 
         protected void OnCollisionEnter(Collision collision)
         {
-            if (collision.impulse.y > 0)
+            if (!IsGrounded && collision.impulse.y > 0)
             {
+                groundedCollider = collision.collider;
                 IsGrounded = true;
-                lastGroundedTime = Time.unscaledTime;
             }
         }
 
         protected void OnCollisionStay(Collision collision)
         {
-            if (collision.impulse.y > 0)
+            if (!IsGrounded && collision.impulse.y > 0)
             {
+                groundedCollider = collision.collider;
                 IsGrounded = true;
-                lastGroundedTime = Time.unscaledTime;
             }
         }
 
         protected void OnCollisionExit(Collision collision)
         {
-            StartCoroutine(SetIsGoundedFalseRoutine());
-        }
-
-        IEnumerator SetIsGoundedFalseRoutine()
-        {
-            yield return new WaitForSeconds(0.5f);
-            if (Time.unscaledTime - lastGroundedTime > 0.5f)
+            if (IsGrounded && collision.collider == groundedCollider)
                 IsGrounded = false;
         }
 
