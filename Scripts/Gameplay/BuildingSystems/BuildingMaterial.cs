@@ -51,6 +51,7 @@ namespace MultiplayerARPG
         public uint ObjectId { get { return buildingEntity.ObjectId; } }
         public int CurrentHp { get { return buildingEntity.CurrentHp; } set { buildingEntity.CurrentHp = value; } }
         public Transform CacheTransform { get { return buildingEntity.CacheTransform; } }
+        private readonly List<Collider> tempColliders = new List<Collider>();
         
         private void Awake()
         {
@@ -92,6 +93,17 @@ namespace MultiplayerARPG
         public bool CanReceiveDamageFrom(IAttackerEntity attacker)
         {
             return buildingEntity.CanReceiveDamageFrom(attacker);
+        }
+
+        public Bounds GetCollidersBounds()
+        {
+            Bounds bounds = new Bounds(CacheTransform.position, Vector3.zero);
+            GetComponents(tempColliders);
+            foreach (Collider tempCollider in tempColliders)
+            {
+                bounds.Encapsulate(tempCollider.bounds);
+            }
+            return bounds;
         }
     }
 }

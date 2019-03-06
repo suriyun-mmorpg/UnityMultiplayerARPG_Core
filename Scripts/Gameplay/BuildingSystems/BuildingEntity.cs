@@ -82,34 +82,32 @@ namespace MultiplayerARPG
         public bool isBuildMode { get; private set; }
 
         private readonly List<BaseGameEntity> triggerEntities = new List<BaseGameEntity>();
-        private readonly List<BuildingEntity> triggerBuildings = new List<BuildingEntity>();
-        private readonly List<BuildingMaterial> buildingMaterials = new List<BuildingMaterial>();
-        private readonly List<BuildingArea> buildingAreas = new List<BuildingArea>();
+        private readonly List<BuildingMaterial> triggerMaterials = new List<BuildingMaterial>();
         private readonly List<BuildingEntity> children = new List<BuildingEntity>();
+        private BuildingMaterial[] buildingMaterials;
+        private BuildingArea[] buildingAreas;
 
         protected override void EntityAwake()
         {
             base.EntityAwake();
             gameObject.tag = gameInstance.buildingTag;
             gameObject.layer = gameInstance.buildingLayer;
-
-            BuildingMaterial[] materials = GetComponentsInChildren<BuildingMaterial>(true);
-            if (materials != null && materials.Length > 0)
+            
+            buildingMaterials = GetComponentsInChildren<BuildingMaterial>(true);
+            if (buildingMaterials != null && buildingMaterials.Length > 0)
             {
-                foreach (BuildingMaterial material in materials)
+                foreach (BuildingMaterial material in buildingMaterials)
                 {
                     material.buildingEntity = this;
-                    buildingMaterials.Add(material);
                 }
             }
 
-            BuildingArea[] areas = GetComponentsInChildren<BuildingArea>(true);
-            if (areas != null && areas.Length > 0)
+            buildingAreas = GetComponentsInChildren<BuildingArea>(true);
+            if (buildingAreas != null && buildingAreas.Length > 0)
             {
-                foreach (BuildingArea area in areas)
+                foreach (BuildingArea area in buildingAreas)
                 {
                     area.buildingEntity = this;
-                    buildingAreas.Add(area);
                 }
             }
         }
@@ -242,24 +240,30 @@ namespace MultiplayerARPG
             if (buildingMaterial != null &&
                 buildingMaterial.buildingEntity != null &&
                 buildingMaterial.buildingEntity != this &&
-                buildingMaterial.buildingEntity.buildingType == buildingType &&
-                !triggerBuildings.Contains(buildingMaterial.buildingEntity))
-                triggerBuildings.Add(buildingMaterial.buildingEntity);
+                !triggerMaterials.Contains(buildingMaterial))
+                triggerMaterials.Add(buildingMaterial);
         }
 
         public void TriggerExitBuildingMaterial(BuildingMaterial buildingMaterial)
         {
-            if (buildingMaterial != null && buildingMaterial.buildingEntity != null)
-                triggerBuildings.Remove(buildingMaterial.buildingEntity);
+            if (buildingMaterial != null)
+                triggerMaterials.Remove(buildingMaterial);
         }
 
         public bool HitNonParentObject()
         {
-            foreach (BuildingEntity triggerBuilding in triggerBuildings)
+            Bounds currentRegionBounds = new Bounds(CacheTransform.position, Vector3.zero);
+            foreach (BuildingMaterial buildingMaterial in buildingMaterials)
             {
-                if (buildingArea != null && triggerBuilding != buildingArea.buildingEntity)
+                currentRegionBounds.Encapsulate(buildingMaterial.GetCollidersBounds());
+            }
+            foreach (BuildingMaterial triggerMaterial in triggerMaterials)
+            {
+                if (buildingArea != null && triggerMaterial.buildingEntity != buildingArea.buildingEntity)
                 {
-                    if (Vector3.Distance(triggerBuilding.CacheTransform.position, CacheTransform.position) <= 1f)
+                    Bounds currentCollidersBounds = triggerMaterial.GetCollidersBounds();
+                    float containedPercentage = BoundsContainedPercentage(currentCollidersBounds, currentRegionBounds);
+                    if (containedPercentage > 0.1f)
                         return true;
                 }
             }
@@ -278,6 +282,28 @@ namespace MultiplayerARPG
                     child.NetworkDestroy();
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns the percentage of obj contained by region. Both obj and region are calculated as quadralaterals for performance purposes.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="region"></param>
+        /// <returns></returns>
+        private float BoundsContainedPercentage(Bounds obj, Bounds region)
+        {
+            float total = 1f;
+
+            for (int i = 0; i < 3; i++)
+            {
+                float dist = obj.min[i] > region.center[i] ?
+                    obj.max[i] - region.max[i] :
+                    region.min[i] - obj.min[i];
+
+                total *= Mathf.Clamp01(1f - dist / obj.size[i]);
+            }
+
+            return total;
         }
     }
 }
