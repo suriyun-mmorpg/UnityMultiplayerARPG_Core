@@ -82,7 +82,13 @@ namespace MultiplayerARPG
             itemDataId.onChange += OnItemDataIdChange;
         }
 
-        private void OnItemDataIdChange(int itemDataId)
+        protected override void EntityOnDestroy()
+        {
+            base.EntityOnDestroy();
+            itemDataId.onChange -= OnItemDataIdChange;
+        }
+
+        private void OnItemDataIdChange(bool isInitial, int itemDataId)
         {
             Item item;
             if (GameInstance.Items.TryGetValue(itemDataId, out item) && item.dropModel != null)
@@ -102,12 +108,6 @@ namespace MultiplayerARPG
                 Time.unscaledTime - dropTime > gameInstance.itemLootLockDuration)
                 return true;
             return false;
-        }
-
-        protected override void EntityOnDestroy()
-        {
-            base.EntityOnDestroy();
-            itemDataId.onChange -= OnItemDataIdChange;
         }
 
         public static ItemDropEntity DropItem(BaseGameEntity dropper, CharacterItem dropData, IEnumerable<uint> looters)

@@ -192,55 +192,55 @@ namespace MultiplayerARPG
         }
 
         #region Sync data changes callback
-        protected virtual void OnDataIdChange(int dataId)
+        protected virtual void OnDataIdChange(bool isInitial, int dataId)
         {
             if (onDataIdChange != null)
                 onDataIdChange.Invoke(dataId);
         }
 
-        protected virtual void OnStatPointChange(short statPoint)
+        protected virtual void OnStatPointChange(bool isInitial, short statPoint)
         {
             if (onStatPointChange != null)
                 onStatPointChange.Invoke(statPoint);
         }
 
-        protected virtual void OnSkillPointChange(short skillPoint)
+        protected virtual void OnSkillPointChange(bool isInitial, short skillPoint)
         {
             if (onSkillPointChange != null)
                 onSkillPointChange.Invoke(skillPoint);
         }
 
-        protected virtual void OnGoldChange(int gold)
+        protected virtual void OnGoldChange(bool isInitial, int gold)
         {
             if (onGoldChange != null)
                 onGoldChange.Invoke(gold);
         }
 
-        protected virtual void OnUserGoldChange(int gold)
+        protected virtual void OnUserGoldChange(bool isInitial, int gold)
         {
             if (onUserGoldChange != null)
                 onUserGoldChange.Invoke(gold);
         }
 
-        protected virtual void OnUserCashChange(int gold)
+        protected virtual void OnUserCashChange(bool isInitial, int gold)
         {
             if (onUserCashChange != null)
                 onUserCashChange.Invoke(gold);
         }
 
-        protected virtual void OnPartyIdChange(int partyId)
+        protected virtual void OnPartyIdChange(bool isInitial, int partyId)
         {
             if (onPartyIdChange != null)
                 onPartyIdChange.Invoke(partyId);
         }
 
-        protected virtual void OnGuildIdChange(int guildId)
+        protected virtual void OnGuildIdChange(bool isInitial, int guildId)
         {
             if (onGuildIdChange != null)
                 onGuildIdChange.Invoke(guildId);
         }
 
-        protected virtual void OnIsWarpingChange(bool isWarping)
+        protected virtual void OnIsWarpingChange(bool isInitial, bool isWarping)
         {
             if (onIsWarpingChange != null)
                 onIsWarpingChange.Invoke(isWarping);

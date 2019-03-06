@@ -28,7 +28,7 @@ namespace MultiplayerARPG
             isOpen.onChange -= OnIsOpenChange;
         }
 
-        private void OnIsOpenChange(bool isOpen)
+        private void OnIsOpenChange(bool isInitial, bool isOpen)
         {
             if (isOpen)
                 onOpen.Invoke();

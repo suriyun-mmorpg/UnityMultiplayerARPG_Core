@@ -175,7 +175,7 @@ namespace MultiplayerARPG
         /// Override this to do stuffs when id changes
         /// </summary>
         /// <param name="id"></param>
-        protected virtual void OnIdChange(string id)
+        protected virtual void OnIdChange(bool isInitial, string id)
         {
             if (onIdChange != null)
                 onIdChange.Invoke(id);
@@ -185,7 +185,7 @@ namespace MultiplayerARPG
         /// Override this to do stuffs when character name changes
         /// </summary>
         /// <param name="characterName"></param>
-        protected virtual void OnCharacterNameChange(string characterName)
+        protected virtual void OnCharacterNameChange(bool isInitial, string characterName)
         {
             if (onCharacterNameChange != null)
                 onCharacterNameChange.Invoke(characterName);
@@ -195,7 +195,7 @@ namespace MultiplayerARPG
         /// Override this to do stuffs when level changes
         /// </summary>
         /// <param name="level"></param>
-        protected virtual void OnLevelChange(short level)
+        protected virtual void OnLevelChange(bool isInitial, short level)
         {
             isRecaching = true;
 
@@ -207,7 +207,7 @@ namespace MultiplayerARPG
         /// Override this to do stuffs when exp changes
         /// </summary>
         /// <param name="exp"></param>
-        protected virtual void OnExpChange(int exp)
+        protected virtual void OnExpChange(bool isInitial, int exp)
         {
             if (onExpChange != null)
                 onExpChange.Invoke(exp);
@@ -217,7 +217,7 @@ namespace MultiplayerARPG
         /// Override this to do stuffs when current hp changes
         /// </summary>
         /// <param name="currentHp"></param>
-        protected virtual void OnCurrentHpChange(int currentHp)
+        protected virtual void OnCurrentHpChange(bool isInitial, int currentHp)
         {
             if (onCurrentHpChange != null)
                 onCurrentHpChange.Invoke(currentHp);
@@ -227,7 +227,7 @@ namespace MultiplayerARPG
         /// Override this to do stuffs when current mp changes
         /// </summary>
         /// <param name="currentMp"></param>
-        protected virtual void OnCurrentMpChange(int currentMp)
+        protected virtual void OnCurrentMpChange(bool isInitial, int currentMp)
         {
             if (onCurrentMpChange != null)
                 onCurrentMpChange.Invoke(currentMp);
@@ -237,7 +237,7 @@ namespace MultiplayerARPG
         /// Override this to do stuffs when current food changes
         /// </summary>
         /// <param name="currentFood"></param>
-        protected virtual void OnCurrentFoodChange(int currentFood)
+        protected virtual void OnCurrentFoodChange(bool isInitial, int currentFood)
         {
             if (onCurrentFoodChange != null)
                 onCurrentFoodChange.Invoke(currentFood);
@@ -247,7 +247,7 @@ namespace MultiplayerARPG
         /// Override this to do stuffs when current water changes
         /// </summary>
         /// <param name="currentWater"></param>
-        protected virtual void OnCurrentWaterChange(int currentWater)
+        protected virtual void OnCurrentWaterChange(bool isInitial, int currentWater)
         {
             if (onCurrentWaterChange != null)
                 onCurrentWaterChange.Invoke(currentWater);
@@ -257,7 +257,7 @@ namespace MultiplayerARPG
         /// Override this to do stuffs when equip weapons changes
         /// </summary>
         /// <param name="equipWeapons"></param>
-        protected virtual void OnEquipWeaponsChange(EquipWeapons equipWeapons)
+        protected virtual void OnEquipWeaponsChange(bool isInitial, EquipWeapons equipWeapons)
         {
             if (CharacterModel != null)
                 CharacterModel.SetEquipWeapons(equipWeapons);
@@ -270,7 +270,7 @@ namespace MultiplayerARPG
         /// Override this to do stuffs when hidding state changes
         /// </summary>
         /// <param name="isHidding"></param>
-        protected virtual void OnIsHiddingChange(bool isHidding)
+        protected virtual void OnIsHiddingChange(bool isInitial, bool isHidding)
         {
             Renderer[] renderers = GetComponentsInChildren<Renderer>();
             foreach (Renderer renderer in renderers)
@@ -291,7 +291,7 @@ namespace MultiplayerARPG
         /// Override this to do stuffs when movement state changes
         /// </summary>
         /// <param name="movementState"></param>
-        protected virtual void OnMovementStateChange(byte movementState)
+        protected virtual void OnMovementStateChange(bool isInitial, byte movementState)
         {
             if (onMovementStateChange != null)
                 onMovementStateChange.Invoke(movementState);

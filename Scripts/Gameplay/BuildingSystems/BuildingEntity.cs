@@ -117,15 +117,23 @@ namespace MultiplayerARPG
         public override void OnSetup()
         {
             base.OnSetup();
-            parentId.onChange = (id) =>
+            parentId.onChange += OnParentIdChange;
+        }
+
+        protected override void EntityOnDestroy()
+        {
+            base.EntityOnDestroy();
+            parentId.onChange -= OnParentIdChange;
+        }
+
+        private void OnParentIdChange(bool isInitial, string parentId)
+        {
+            if (IsServer)
             {
-                if (IsServer)
-                {
-                    BuildingEntity parent;
-                    if (gameManager.TryGetBuildingEntity(id, out parent))
-                        parent.AddChildren(this);
-                }
-            };
+                BuildingEntity parent;
+                if (gameManager.TryGetBuildingEntity(id, out parent))
+                    parent.AddChildren(this);
+            }
         }
 
         public void AddChildren(BuildingEntity buildingEntity)
