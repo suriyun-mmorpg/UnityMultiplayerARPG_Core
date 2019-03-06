@@ -1011,6 +1011,11 @@ namespace MultiplayerARPG
         {
             gameManager.WithdrawGuildGold(this, amount);
         }
+
+        protected virtual void NetFuncCloseStorage()
+        {
+            gameManager.CloseStorage(this);
+        }
         #endregion
 
         protected virtual void StopDealing()
@@ -1054,13 +1059,6 @@ namespace MultiplayerARPG
             }
             // Show storage on clients
             CallNetFunction(NetFuncShowStorage, ConnectionId, (byte)storageType, storage.weightLimit, storage.slotLimit);
-        }
-
-        protected virtual void CloseStorage()
-        {
-            gameManager.CloseStorage(this);
-            // Show storage on clients
-            CallNetFunction(NetFuncShowStorage, ConnectionId, (byte)StorageType.None, (short)0, (short)0);
         }
     }
 }
