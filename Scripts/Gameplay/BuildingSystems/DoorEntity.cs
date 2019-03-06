@@ -9,6 +9,8 @@ namespace MultiplayerARPG
     public class DoorEntity : BuildingEntity
     {
         [Header("Door data")]
+        public UnityEvent onInitialOpen;
+        public UnityEvent onInitialClose;
         public UnityEvent onOpen;
         public UnityEvent onClose;
         [SerializeField]
@@ -28,10 +30,20 @@ namespace MultiplayerARPG
 
         private void OnIsOpenChange(bool isInitial, bool isOpen)
         {
-            if (isOpen)
-                onOpen.Invoke();
+            if (isInitial)
+            {
+                if (isOpen)
+                    onInitialOpen.Invoke();
+                else
+                    onInitialClose.Invoke();
+            }
             else
-                onClose.Invoke();
+            {
+                if (isOpen)
+                    onOpen.Invoke();
+                else
+                    onClose.Invoke();
+            }
         }
     }
 }
