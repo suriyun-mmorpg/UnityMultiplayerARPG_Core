@@ -66,7 +66,7 @@ namespace MultiplayerARPG
             {
                 Profiler.BeginSample("LanRpgNetworkManager - Save Data");
                 BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-                if (owningCharacter != null && IsNetworkActive)
+                if (owningCharacter != null && IsClientConnected)
                 {
                     owningCharacter.SavePersistentCharacterData();
                     if (IsServer)
@@ -132,7 +132,13 @@ namespace MultiplayerARPG
                 if (enableGmCommands == EnableGmCommandType.HostOnly)
                     playerCharacterEntity.UserLevel = 1;
 
+                // Load and Spawn buildings
                 worldSaveData.LoadPersistentData(playerCharacterEntity.Id, playerCharacterEntity.CurrentMapName);
+                foreach (BuildingSaveData building in worldSaveData.buildings)
+                {
+                    CreateBuildingEntity(building, true);
+                }
+                // Load storage data
                 storageSaveData.LoadPersistentData(playerCharacterEntity.Id);
                 foreach (StorageCharacterItem storageItem in storageSaveData.storageItems)
                 {
@@ -141,7 +147,12 @@ namespace MultiplayerARPG
                         storageItems[storageId] = new List<CharacterItem>();
                     storageItems[storageId].Add(storageItem.characterItem);
                 }
-                StartCoroutine(SpawnBuildingsAndHarvestables(worldSaveData));
+                // Spawn harvestables
+                HarvestableSpawnArea[] harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
+                foreach (HarvestableSpawnArea harvestableSpawnArea in harvestableSpawnAreas)
+                {
+                    harvestableSpawnArea.SpawnAll();
+                }
             }
 
             // Summon saved summons
@@ -160,22 +171,6 @@ namespace MultiplayerARPG
 
             // Register player, will use registered player to send chat / player messages
             RegisterPlayerCharacter(connectionId, playerCharacterEntity);
-        }
-
-        IEnumerator SpawnBuildingsAndHarvestables(WorldSaveData worldSaveData)
-        {
-            yield return new WaitForSecondsRealtime(0.1f);
-            // Spawn buildings
-            foreach (BuildingSaveData building in worldSaveData.buildings)
-            {
-                CreateBuildingEntity(building, true);
-            }
-            // Spawn harvestables
-            HarvestableSpawnArea[] harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
-            foreach (HarvestableSpawnArea harvestableSpawnArea in harvestableSpawnAreas)
-            {
-                harvestableSpawnArea.SpawnAll();
-            }
         }
 
         private void SaveWorld()
