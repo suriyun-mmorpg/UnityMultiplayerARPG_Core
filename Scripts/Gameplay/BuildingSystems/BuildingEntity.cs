@@ -92,13 +92,15 @@ namespace MultiplayerARPG
             base.EntityAwake();
             gameObject.tag = gameInstance.buildingTag;
             gameObject.layer = gameInstance.buildingLayer;
-            
+
             buildingMaterials = GetComponentsInChildren<BuildingMaterial>(true);
             if (buildingMaterials != null && buildingMaterials.Length > 0)
             {
                 foreach (BuildingMaterial material in buildingMaterials)
                 {
                     material.buildingEntity = this;
+                    material.gameObject.tag = gameInstance.buildingTag;
+                    material.gameObject.layer = gameInstance.buildingLayer;
                 }
             }
 
@@ -162,7 +164,7 @@ namespace MultiplayerARPG
 
         public bool CanBuild()
         {
-            if (buildingArea == null || triggerEntities.Count > 0 || HitNonParentObject())
+            if (buildingArea == null || triggerEntities.Count > 0 || triggerMaterials.Count > 0)
                 return false;
             return buildingType.Equals(buildingArea.buildingType);
         }
@@ -250,26 +252,6 @@ namespace MultiplayerARPG
                 triggerMaterials.Remove(buildingMaterial);
         }
 
-        public bool HitNonParentObject()
-        {
-            Bounds currentRegionBounds = new Bounds(CacheTransform.position, Vector3.zero);
-            foreach (BuildingMaterial buildingMaterial in buildingMaterials)
-            {
-                currentRegionBounds.Encapsulate(buildingMaterial.GetCollidersBounds());
-            }
-            foreach (BuildingMaterial triggerMaterial in triggerMaterials)
-            {
-                if (buildingArea != null && triggerMaterial.buildingEntity != buildingArea.buildingEntity)
-                {
-                    Bounds currentCollidersBounds = triggerMaterial.GetCollidersBounds();
-                    float containedPercentage = BoundsContainedPercentage(currentCollidersBounds, currentRegionBounds);
-                    if (containedPercentage > 0.1f)
-                        return true;
-                }
-            }
-            return false;
-        }
-
         public override void OnNetworkDestroy(byte reasons)
         {
             base.OnNetworkDestroy(reasons);
@@ -282,28 +264,6 @@ namespace MultiplayerARPG
                     child.NetworkDestroy();
                 }
             }
-        }
-
-        /// <summary>
-        /// Returns the percentage of obj contained by region. Both obj and region are calculated as quadralaterals for performance purposes.
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="region"></param>
-        /// <returns></returns>
-        private float BoundsContainedPercentage(Bounds obj, Bounds region)
-        {
-            float total = 1f;
-
-            for (int i = 0; i < 3; i++)
-            {
-                float dist = obj.min[i] > region.center[i] ?
-                    obj.max[i] - region.max[i] :
-                    region.min[i] - obj.min[i];
-
-                total *= Mathf.Clamp01(1f - dist / obj.size[i]);
-            }
-
-            return total;
         }
     }
 }

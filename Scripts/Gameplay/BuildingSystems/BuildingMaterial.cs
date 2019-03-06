@@ -94,16 +94,5 @@ namespace MultiplayerARPG
         {
             return buildingEntity.CanReceiveDamageFrom(attacker);
         }
-
-        public Bounds GetCollidersBounds()
-        {
-            Bounds bounds = new Bounds(CacheTransform.position, Vector3.zero);
-            GetComponents(tempColliders);
-            foreach (Collider tempCollider in tempColliders)
-            {
-                bounds.Encapsulate(tempCollider.bounds);
-            }
-            return bounds;
-        }
     }
 }
