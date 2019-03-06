@@ -183,6 +183,7 @@ namespace MultiplayerARPG
                 // Find for position to construction building
                 bool foundSnapBuildPosition = false;
                 tempCount = Physics.RaycastNonAlloc(ray, raycasts, gameInstance.buildDistance);
+                BuildingArea buildingArea = null;
                 for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
                 {
                     tempHitInfo = raycasts[tempCounter];
@@ -190,13 +191,13 @@ namespace MultiplayerARPG
                     if (tempEntity != null && tempEntity == currentBuildingEntity)
                         continue;
 
+                    buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
+                    if (buildingArea == null || (buildingArea.buildingEntity != null && buildingArea.buildingEntity == currentBuildingEntity))
+                        continue;
+
                     // Set aim position
                     aimPosition = tempHitInfo.point;
 
-                    BuildingArea buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
-                    if (buildingArea == null || (buildingArea.buildingEntity != null && buildingArea.buildingEntity == currentBuildingEntity))
-                        continue;
-                    
                     if (currentBuildingEntity.buildingType.Equals(buildingArea.buildingType))
                     {
                         currentBuildingEntity.buildingArea = buildingArea;
@@ -209,7 +210,13 @@ namespace MultiplayerARPG
                 }
                 // Update building position
                 if (!foundSnapBuildPosition)
+                {
                     currentBuildingEntity.CacheTransform.position = aimPosition;
+                    // Rotate to camera
+                    Vector3 direction = (aimPosition - CacheGameplayCameraControls.CacheCameraTransform.position).normalized;
+                    direction.y = 0;
+                    currentBuildingEntity.transform.rotation = Quaternion.LookRotation(direction);
+                }
             }
 
             // If mobile platforms, don't receive input raw to make it smooth
