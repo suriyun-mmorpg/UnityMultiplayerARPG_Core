@@ -43,7 +43,17 @@ namespace MultiplayerARPG
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
         protected int buildingItemIndex;
         public BuildingEntity CurrentBuildingEntity { get; protected set; }
-        public BuildingEntity ActiveBuildingEntity { get; protected set; }
+        public BuildingEntity ActiveBuildingEntity
+        {
+            get
+            {
+                BuildingEntity result;
+                if (PlayerCharacterEntity.TryGetTargetEntity(out result))
+                    return result;
+                return null;
+            }
+            set { PlayerCharacterEntity.SetTargetEntity(value); }
+        }
 
         protected virtual void Awake()
         {
@@ -282,10 +292,6 @@ namespace MultiplayerARPG
             if (ActiveBuildingEntity == null)
                 return;
             PlayerCharacterEntity.RequestDestroyBuilding(ActiveBuildingEntity.ObjectId);
-            if (CacheUISceneGameplay != null &&
-                CacheUISceneGameplay.uiCurrentBuilding != null &&
-                CacheUISceneGameplay.uiCurrentBuilding.IsVisible())
-                CacheUISceneGameplay.uiCurrentBuilding.Hide();
             ActiveBuildingEntity = null;
         }
 
@@ -293,10 +299,6 @@ namespace MultiplayerARPG
         {
             if (ActiveBuildingEntity == null)
                 return;
-            if (CacheUISceneGameplay != null &&
-                CacheUISceneGameplay.uiCurrentBuilding != null &&
-                CacheUISceneGameplay.uiCurrentBuilding.IsVisible())
-                CacheUISceneGameplay.uiCurrentBuilding.Hide();
             ActiveBuildingEntity = null;
         }
 
