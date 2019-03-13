@@ -29,6 +29,7 @@ namespace MultiplayerARPG
                 {
                     targetPlayer = null;
                     targetNpc = null;
+                    targetBuilding = null;
                     tempCount = OverlapObjects(CharacterTransform.position, gameInstance.conversationDistance, gameInstance.characterLayer.Mask);
                     for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
                     {
@@ -38,15 +39,35 @@ namespace MultiplayerARPG
                             targetPlayer = tempGameObject.GetComponent<BasePlayerCharacterEntity>();
                             if (targetPlayer == PlayerCharacterEntity)
                                 targetPlayer = null;
+                            if (targetPlayer != null)
+                                break;
                         }
                         if (targetNpc == null)
+                        {
                             targetNpc = tempGameObject.GetComponent<NpcEntity>();
+                            if (targetNpc != null)
+                                break;
+                        }
+                        if (targetBuilding == null)
+                        {
+                            tempBuildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
+                            if (tempBuildingMaterial != null && 
+                                tempBuildingMaterial.buildingEntity != null && 
+                                !tempBuildingMaterial.buildingEntity.IsDead())
+                            {
+                                targetBuilding = tempBuildingMaterial.buildingEntity;
+                                break;
+                            }
+                        }
                     }
                     // Priority Player -> Npc -> Buildings
                     if (targetPlayer != null && CacheUISceneGameplay != null)
                         CacheUISceneGameplay.SetActivePlayerCharacter(targetPlayer);
                     else if (targetNpc != null)
                         PlayerCharacterEntity.RequestNpcActivate(targetNpc.ObjectId);
+                    else if (targetBuilding != null)
+                        ActivateBuilding(targetBuilding);
+                    // Enter warp, For some warp portals that `warpImmediatelyWhenEnter` is FALSE
                     if (overlapColliders.Length == 0)
                         PlayerCharacterEntity.RequestEnterWarp();
                 }
@@ -151,13 +172,15 @@ namespace MultiplayerARPG
                     // When holding on target
                     else if (isMouseHoldAndNotDrag)
                     {
-                        BuildingMaterial buildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
-                        if (buildingMaterial != null && buildingMaterial.buildingEntity != null && !buildingMaterial.buildingEntity.IsDead())
+                        tempBuildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
+                        if (tempBuildingMaterial != null && 
+                            tempBuildingMaterial.buildingEntity != null && 
+                            !tempBuildingMaterial.buildingEntity.IsDead())
                         {
-                            targetPosition = buildingMaterial.buildingEntity.CacheTransform.position;
-                            targetEntity = buildingMaterial.buildingEntity;
-                            PlayerCharacterEntity.SetTargetEntity(buildingMaterial.buildingEntity);
-                            selectedTarget = buildingMaterial.buildingEntity;
+                            targetPosition = tempBuildingMaterial.buildingEntity.CacheTransform.position;
+                            targetEntity = tempBuildingMaterial.buildingEntity;
+                            PlayerCharacterEntity.SetTargetEntity(tempBuildingMaterial.buildingEntity);
+                            selectedTarget = tempBuildingMaterial.buildingEntity;
                             break;
                         }
                     }
@@ -302,7 +325,21 @@ namespace MultiplayerARPG
             PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
         }
 
-        protected virtual void UpdateBuilding()
+        protected void ActivateBuilding(BuildingEntity buildingEntity)
+        {
+            if (buildingEntity is StorageEntity)
+            {
+                PlayerCharacterEntity.RequestOpenStorage(buildingEntity.ObjectId);
+                return;
+            }
+            if (buildingEntity is WorkbenchEntity)
+            {
+
+                return;
+            }
+        }
+
+        protected void UpdateBuilding()
         {
             // Current building UI
             UICurrentBuilding uiCurrentBuilding = CacheUISceneGameplay.uiCurrentBuilding;

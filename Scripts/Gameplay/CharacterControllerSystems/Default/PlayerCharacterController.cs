@@ -69,6 +69,7 @@ namespace MultiplayerARPG
         protected ItemDropEntity targetItemDrop;
         protected BuildingEntity targetBuilding;
         protected HarvestableEntity targetHarvestable;
+        protected BuildingMaterial tempBuildingMaterial;
         protected BaseGameEntity selectedTarget;
         protected Quaternion tempLookAt;
         protected Vector3 targetLookDirection;
