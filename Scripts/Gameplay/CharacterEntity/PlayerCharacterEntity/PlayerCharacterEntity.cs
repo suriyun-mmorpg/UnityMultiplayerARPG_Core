@@ -127,6 +127,11 @@ namespace MultiplayerARPG
                     if (!HasNavPaths)
                         StopMove();
                 }
+                else
+                {
+                    // Turn character to destination
+                    CacheTransform.rotation = Quaternion.LookRotation(tempMoveDirection);
+                }
             }
 
             tempPreviousVelocity = CacheRigidbody.velocity;
@@ -243,7 +248,8 @@ namespace MultiplayerARPG
         {
             if (IsDead())
                 return;
-            CacheTransform.rotation = Quaternion.Euler(0, (float)yRotation, 0);
+            if (!HasNavPaths)
+                CacheTransform.rotation = Quaternion.Euler(0, (float)yRotation, 0);
         }
 
         protected void NetFuncSetTargetEntity(PackedUInt objectId)
@@ -333,7 +339,8 @@ namespace MultiplayerARPG
                     CallNetFunction(NetFuncUpdateYRotation, FunctionReceivers.Server, (short)yRotation);
                     break;
                 case MovementSecure.NotSecure:
-                    CacheTransform.rotation = Quaternion.Euler(0, yRotation, 0);
+                    if (!HasNavPaths)
+                        CacheTransform.rotation = Quaternion.Euler(0, yRotation, 0);
                     break;
             }
         }
