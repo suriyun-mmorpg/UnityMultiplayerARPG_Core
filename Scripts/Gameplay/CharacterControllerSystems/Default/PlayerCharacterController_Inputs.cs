@@ -96,9 +96,6 @@ namespace MultiplayerARPG
                 for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
                 {
                     tempTransform = GetRaycastTransform(tempCounter);
-                    // If found nearby entity detector, skip it
-                    if (tempTransform.GetComponent<NearbyEntityDetector>() != null)
-                        continue;
                     // When clicking on target
                     if (mouseUpOnTarget)
                     {
@@ -134,7 +131,7 @@ namespace MultiplayerARPG
                             SetTarget(targetHarvestable);
                             break;
                         }
-                        else
+                        else if (!GetRaycastIsTrigger(tempCounter))
                         {
                             selectedTarget = null;
                             tempRaycastPoint = GetRaycastPoint(tempCounter);
@@ -325,19 +322,12 @@ namespace MultiplayerARPG
                 return;
 
             bool isPointerOverUI = CacheUISceneGameplay != null && CacheUISceneGameplay.IsPointerOverUIObject();
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButton(0) && !isPointerOverUI)
             {
-                isMouseDragOrHoldOrOverUI = false;
                 mouseDownTime = Time.unscaledTime;
                 mouseDownPosition = Input.mousePosition;
-            }
-
-            bool isMouseDragDetected = (Input.mousePosition - mouseDownPosition).magnitude > DETECT_MOUSE_DRAG_DISTANCE;
-            bool isMouseHoldDetected = Time.unscaledTime - mouseDownTime > DETECT_MOUSE_HOLD_DURATION;
-            if (!isMouseDragOrHoldOrOverUI && (isMouseDragDetected || isMouseHoldDetected || isPointerOverUI))
-                isMouseDragOrHoldOrOverUI = true;
-            if (!isPointerOverUI && Input.GetMouseButtonUp(0) && !isMouseDragOrHoldOrOverUI)
                 FindAndSetBuildingAreaFromMousePosition();
+            }
         }
 
         protected void UpdateFollowTarget()

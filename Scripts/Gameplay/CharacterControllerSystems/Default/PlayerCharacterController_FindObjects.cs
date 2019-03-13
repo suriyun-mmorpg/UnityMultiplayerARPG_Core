@@ -98,6 +98,13 @@ namespace MultiplayerARPG
             return raycasts2D[index].transform;
         }
 
+        public bool GetRaycastIsTrigger(int index)
+        {
+            if (gameInstance.DimensionType == DimensionType.Dimension3D)
+                return raycasts[index].collider.isTrigger;
+            return raycasts2D[index].collider.isTrigger;
+        }
+
         public Vector3 GetRaycastPoint(int index)
         {
             if (gameInstance.DimensionType == DimensionType.Dimension3D)
