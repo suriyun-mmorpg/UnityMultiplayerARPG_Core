@@ -381,7 +381,9 @@ namespace MultiplayerARPG
             if (useNavMesh)
             {
                 NavMeshPath navPath = new NavMeshPath();
-                if (NavMesh.CalculatePath(CacheTransform.position, position, NavMesh.AllAreas, navPath))
+                NavMeshHit navHit;
+                if (NavMesh.SamplePosition(position, out navHit, 5f, NavMesh.AllAreas) &&
+                    NavMesh.CalculatePath(CacheTransform.position, navHit.position, NavMesh.AllAreas, navPath))
                 {
                     navPaths = new Queue<Vector3>(navPath.corners);
                     // Dequeue first path it's not require for future movement
