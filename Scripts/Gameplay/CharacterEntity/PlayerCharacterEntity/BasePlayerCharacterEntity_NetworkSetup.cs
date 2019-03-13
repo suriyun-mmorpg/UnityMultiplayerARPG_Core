@@ -116,6 +116,7 @@ namespace MultiplayerARPG
             RegisterNetFunction<int>(NetFuncWithdrawGuildGold);
             RegisterNetFunction<PackedUInt>(NetFuncOpenStorage);
             RegisterNetFunction(NetFuncCloseStorage);
+            RegisterNetFunction<PackedUInt>(NetFuncToggleDoor);
         }
 
         protected override void EntityOnSetOwnerClient()

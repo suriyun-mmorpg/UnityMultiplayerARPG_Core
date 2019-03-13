@@ -1033,6 +1033,23 @@ namespace MultiplayerARPG
         }
         #endregion
 
+        #region Building Entities
+        protected virtual void NetFuncToggleDoor(PackedUInt objectId)
+        {
+            if (!CanDoActions())
+                return;
+
+            DoorEntity doorEntity = null;
+            if (!TryGetEntityByObjectId(objectId, out doorEntity))
+                return;
+
+            if (Vector3.Distance(CacheTransform.position, doorEntity.CacheTransform.position) > gameInstance.conversationDistance + 5f)
+                return;
+
+            doorEntity.IsOpen = !doorEntity.IsOpen;
+        }
+        #endregion
+
         protected virtual void StopDealing()
         {
             if (DealingCharacter == null)

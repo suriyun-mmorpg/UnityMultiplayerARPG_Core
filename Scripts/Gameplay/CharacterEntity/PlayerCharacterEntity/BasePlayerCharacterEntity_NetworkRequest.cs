@@ -351,5 +351,10 @@ namespace MultiplayerARPG
         {
             CallNetFunction(NetFuncCloseStorage, FunctionReceivers.Server);
         }
+
+        public virtual void RequestToggleDoor(uint objectId)
+        {
+            CallNetFunction(NetFuncToggleDoor, FunctionReceivers.Server, new PackedUInt(objectId));
+        }
     }
 }
