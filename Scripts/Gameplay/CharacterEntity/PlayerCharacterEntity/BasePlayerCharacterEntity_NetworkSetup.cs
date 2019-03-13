@@ -114,6 +114,7 @@ namespace MultiplayerARPG
             RegisterNetFunction<int>(NetFuncWithdrawGold);
             RegisterNetFunction<int>(NetFuncDepositGuildGold);
             RegisterNetFunction<int>(NetFuncWithdrawGuildGold);
+            RegisterNetFunction<PackedUInt>(NetFuncOpenStorage);
             RegisterNetFunction(NetFuncCloseStorage);
         }
 

@@ -342,6 +342,11 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncWithdrawGuildGold, FunctionReceivers.Server, amount);
         }
 
+        public virtual void RequestOpenStorage(uint objectId)
+        {
+            CallNetFunction(NetFuncOpenStorage, FunctionReceivers.Server, new PackedUInt(objectId));
+        }
+
         public virtual void RequestCloseStorage()
         {
             CallNetFunction(NetFuncCloseStorage, FunctionReceivers.Server);

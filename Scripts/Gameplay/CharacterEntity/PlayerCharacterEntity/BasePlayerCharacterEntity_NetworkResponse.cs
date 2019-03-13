@@ -1012,6 +1012,21 @@ namespace MultiplayerARPG
             gameManager.WithdrawGuildGold(this, amount);
         }
 
+        protected virtual void NetFuncOpenStorage(PackedUInt objectId)
+        {
+            if (!CanDoActions())
+                return;
+
+            StorageEntity storageEntity = null;
+            if (!TryGetEntityByObjectId(objectId, out storageEntity))
+                return;
+
+            if (Vector3.Distance(CacheTransform.position, storageEntity.CacheTransform.position) > gameInstance.conversationDistance + 5f)
+                return;
+
+            OpenStorage(StorageType.Building, storageEntity.Id);
+        }
+
         protected virtual void NetFuncCloseStorage()
         {
             gameManager.CloseStorage(this);
