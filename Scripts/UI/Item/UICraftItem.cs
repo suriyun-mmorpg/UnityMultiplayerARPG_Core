@@ -7,8 +7,10 @@ namespace MultiplayerARPG
         public ItemCraft ItemCraft { get { return Data; } }
 
         [Header("Generic Info Format")]
-        [Tooltip("Require Gold Format => {0} = {Amount}")]
-        public string requireGoldFormat = "Require Gold: {0}";
+        [Tooltip("Require Gold Format => {0} = {Current Amount}, {1} = {Target Amount}")]
+        public string requireGoldFormat = "Require Gold: {0}/{1}";
+        [Tooltip("Require Gold Format => {0} = {Current Amount}, {1} = {Target Amount}")]
+        public string requireGoldNotEnoughFormat = "Require Gold: <color=red>{0}/{1}</color>";
 
         [Header("UI Elements")]
         public UICharacterItem uiCraftingItem;
@@ -17,6 +19,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (uiCraftingItem != null)
             {
                 if (ItemCraft.craftingItem == null)
@@ -42,9 +45,16 @@ namespace MultiplayerARPG
             if (uiTextRequireGold != null)
             {
                 if (ItemCraft.craftingItem == null)
-                    uiTextRequireGold.text = string.Format(requireGoldFormat, 0.ToString("N0"));
+                    uiTextRequireGold.text = string.Format(requireGoldFormat, 0.ToString("N0"), 0.ToString("N0"));
                 else
-                    uiTextRequireGold.text = string.Format(requireGoldFormat, ItemCraft.requireGold.ToString("N0"));
+                {
+                    int currentAmount = 0;
+                    if (owningCharacter != null)
+                        currentAmount = owningCharacter.Gold;
+                    uiTextRequireGold.text = string.Format(
+                        currentAmount >= ItemCraft.requireGold ? requireGoldFormat : requireGoldNotEnoughFormat,
+                        currentAmount.ToString("N0"), ItemCraft.requireGold.ToString("N0"));
+                }
             }
         }
     }
