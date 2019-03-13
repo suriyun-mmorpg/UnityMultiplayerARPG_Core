@@ -52,11 +52,11 @@ namespace MultiplayerARPG
             }
         }
 
-        private StorageType storageType = StorageType.None;
-        private short weightLimit = 0;
-        private short slotLimit = 0;
-        private float totalWeight = 0;
-        private short usedSlots = 0;
+        public StorageType storageType { get; private set; }
+        public short weightLimit { get; private set; }
+        public short slotLimit { get; private set; }
+        public float totalWeight { get; private set; }
+        public short usedSlots { get; private set; }
 
         public override void Show()
         {
