@@ -8,7 +8,7 @@ namespace MultiplayerARPG
         [Tooltip("Skill Level Format => {0} = {Skill title}, {1} = {Current Level}, {2} = {Target Level}")]
         public string levelFormat = "{0}: {1}/{2}";
         [Tooltip("Skill Level Format => {0} = {Skill title}, {1} = {Current Level}, {2} = {Target Level}")]
-        public string levelNotReachTargetFormat = "{0}: <color=red>{1}/{2}</color>";
+        public string levelNotEnoughFormat = "{0}: <color=red>{1}/{2}</color>";
 
         [Header("UI Elements")]
         public TextWrapper uiTextAllLevels;
@@ -64,7 +64,7 @@ namespace MultiplayerARPG
                     short currentLevel = 0;
                     if (owningCharacter != null)
                         owningCharacter.CacheSkills.TryGetValue(skill, out currentLevel);
-                    string format = currentLevel >= targetLevel ? levelFormat : levelNotReachTargetFormat;
+                    string format = currentLevel >= targetLevel ? levelFormat : levelNotEnoughFormat;
                     string amountText = string.Format(format, skill.Title, currentLevel.ToString("N0"), targetLevel.ToString("N0"));
                     text += amountText;
                     TextWrapper cacheTextAmount;

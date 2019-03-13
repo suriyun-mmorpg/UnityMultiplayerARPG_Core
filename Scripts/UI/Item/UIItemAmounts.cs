@@ -8,7 +8,7 @@ namespace MultiplayerARPG
         [Tooltip("Item Level Format => {0} = {Item title}, {1} = {Current Amount}, {2} = {Target Amount}")]
         public string amountFormat = "{0}: {1}/{2}";
         [Tooltip("Item Level Format => {0} = {Item title}, {1} = {Current Amount}, {2} = {Target Amount}")]
-        public string amountNotReachTargetFormat = "{0}: <color=red>{1}/{2}</color>";
+        public string amountNotEnoughFormat = "{0}: <color=red>{1}/{2}</color>";
 
         [Header("UI Elements")]
         public TextWrapper uiTextAllAmounts;
@@ -64,7 +64,7 @@ namespace MultiplayerARPG
                     int currentAmount = 0;
                     if (owningCharacter != null)
                         currentAmount = owningCharacter.CountNonEquipItems(item.DataId);
-                    string format = currentAmount >= targetAmount ? amountFormat : amountNotReachTargetFormat;
+                    string format = currentAmount >= targetAmount ? amountFormat : amountNotEnoughFormat;
                     string amountText = string.Format(format, dataEntry.Key.Title, currentAmount.ToString("N0"), targetAmount.ToString("N0"));
                     text += amountText;
                     TextWrapper cacheTextAmount;
