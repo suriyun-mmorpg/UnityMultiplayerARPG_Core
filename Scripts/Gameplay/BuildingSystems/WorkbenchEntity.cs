@@ -8,5 +8,6 @@ namespace MultiplayerARPG
     {
         [Header("Workbench data")]
         public ItemCraft[] itemCrafts;
+        public override bool Activatable { get { return true; } }
     }
 }

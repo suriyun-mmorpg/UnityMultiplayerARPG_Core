@@ -79,6 +79,7 @@ namespace MultiplayerARPG
             set { }
         }
 
+        public virtual bool Activatable { get { return false; } }
         public bool isBuildMode { get; private set; }
 
         private readonly List<BaseGameEntity> triggerEntities = new List<BaseGameEntity>();

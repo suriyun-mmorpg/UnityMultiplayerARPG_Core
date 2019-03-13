@@ -15,6 +15,13 @@ namespace MultiplayerARPG
         public UnityEvent onClose;
         [SerializeField]
         private SyncFieldBool isOpen = new SyncFieldBool();
+        public override bool Activatable { get { return true; } }
+
+        public bool IsOpen
+        {
+            get { return isOpen.Value; }
+            set { isOpen.Value = value; }
+        }
 
         public override void OnSetup()
         {
