@@ -69,16 +69,16 @@ namespace MultiplayerARPG
         protected ItemDropEntity targetItemDrop;
         protected BuildingEntity targetBuilding;
         protected HarvestableEntity targetHarvestable;
-        protected BuildingMaterial tempBuildingMaterial;
         protected BaseGameEntity selectedTarget;
         protected Quaternion tempLookAt;
         protected Vector3 targetLookDirection;
+        protected NearbyEntityDetector activatingEntityDetector;
 
         protected override void Awake()
         {
             base.Awake();
             buildingItemIndex = -1;
-            currentBuildingEntity = null;
+            CurrentBuildingEntity = null;
 
             if (gameplayCameraPrefab != null)
             {
@@ -91,6 +91,16 @@ namespace MultiplayerARPG
                 CacheTargetObject = Instantiate(targetObjectPrefab);
                 CacheTargetObject.SetActive(false);
             }
+            // This entity detector will be find entities to use when pressed activate key
+            GameObject tempGameObject = new GameObject("_ActivatingEntityDetector");
+            activatingEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
+            activatingEntityDetector.detectingRadius = gameInstance.conversationDistance;
+            activatingEntityDetector.findPlayer = true;
+            activatingEntityDetector.findOnlyAlivePlayers = true;
+            activatingEntityDetector.findNpc = true;
+            activatingEntityDetector.findBuilding = true;
+            activatingEntityDetector.findOnlyAliveBuildings = true;
+            activatingEntityDetector.findOnlyActivatableBuildings = true;
         }
 
         protected override void Setup(BasePlayerCharacterEntity characterEntity)
@@ -121,6 +131,8 @@ namespace MultiplayerARPG
                 Destroy(CacheGameplayCameraControls.gameObject);
             if (CacheTargetObject != null)
                 Destroy(CacheTargetObject.gameObject);
+            if (activatingEntityDetector != null)
+                Destroy(activatingEntityDetector.gameObject);
         }
 
         protected override void Update()

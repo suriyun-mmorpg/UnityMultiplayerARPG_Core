@@ -42,8 +42,8 @@ namespace MultiplayerARPG
         public UISceneGameplay CacheUISceneGameplay { get; protected set; }
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
         protected int buildingItemIndex;
-        protected BuildingEntity currentBuildingEntity;
-        protected BuildingEntity activeBuildingEntity;
+        public BuildingEntity CurrentBuildingEntity { get; protected set; }
+        public BuildingEntity ActiveBuildingEntity { get; protected set; }
 
         protected virtual void Awake()
         {
@@ -258,37 +258,46 @@ namespace MultiplayerARPG
 
         public void ConfirmBuild()
         {
-            if (currentBuildingEntity != null)
+            if (CurrentBuildingEntity != null)
             {
-                if (currentBuildingEntity.CanBuild())
+                if (CurrentBuildingEntity.CanBuild())
                 {
                     uint parentObjectId = 0;
-                    if (currentBuildingEntity.buildingArea != null)
-                        parentObjectId = currentBuildingEntity.buildingArea.EntityObjectId;
-                    PlayerCharacterEntity.RequestBuild((short)buildingItemIndex, currentBuildingEntity.CacheTransform.position, currentBuildingEntity.CacheTransform.rotation, parentObjectId);
+                    if (CurrentBuildingEntity.buildingArea != null)
+                        parentObjectId = CurrentBuildingEntity.buildingArea.EntityObjectId;
+                    PlayerCharacterEntity.RequestBuild((short)buildingItemIndex, CurrentBuildingEntity.CacheTransform.position, CurrentBuildingEntity.CacheTransform.rotation, parentObjectId);
                 }
-                Destroy(currentBuildingEntity.gameObject);
+                Destroy(CurrentBuildingEntity.gameObject);
             }
         }
 
         public void CancelBuild()
         {
-            if (currentBuildingEntity != null)
-                Destroy(currentBuildingEntity.gameObject);
+            if (CurrentBuildingEntity != null)
+                Destroy(CurrentBuildingEntity.gameObject);
         }
 
         public void DestroyBuilding()
         {
-            if (activeBuildingEntity != null)
-            {
-                PlayerCharacterEntity.RequestDestroyBuilding(activeBuildingEntity.ObjectId);
-                activeBuildingEntity = null;
-            }
+            if (ActiveBuildingEntity == null)
+                return;
+            PlayerCharacterEntity.RequestDestroyBuilding(ActiveBuildingEntity.ObjectId);
+            if (CacheUISceneGameplay != null &&
+                CacheUISceneGameplay.uiCurrentBuilding != null &&
+                CacheUISceneGameplay.uiCurrentBuilding.IsVisible())
+                CacheUISceneGameplay.uiCurrentBuilding.Hide();
+            ActiveBuildingEntity = null;
         }
 
         public void DeselectBuilding()
         {
-            activeBuildingEntity = null;
+            if (ActiveBuildingEntity == null)
+                return;
+            if (CacheUISceneGameplay != null &&
+                CacheUISceneGameplay.uiCurrentBuilding != null &&
+                CacheUISceneGameplay.uiCurrentBuilding.IsVisible())
+                CacheUISceneGameplay.uiCurrentBuilding.Hide();
+            ActiveBuildingEntity = null;
         }
 
         protected void HideNpcDialogs()
@@ -310,6 +319,33 @@ namespace MultiplayerARPG
                 if (CacheUISceneGameplay.uiBuildingStorageItems != null &&
                     CacheUISceneGameplay.uiBuildingStorageItems.IsVisible())
                     CacheUISceneGameplay.uiBuildingStorageItems.Hide();
+
+                if (CacheUISceneGameplay.uiBuildingCraftItems != null &&
+                    CacheUISceneGameplay.uiBuildingCraftItems.IsVisible())
+                    CacheUISceneGameplay.uiBuildingCraftItems.Hide();
+            }
+        }
+        
+        protected void ActivateBuilding(BuildingEntity buildingEntity)
+        {
+            if (buildingEntity is DoorEntity)
+            {
+                OwningCharacter.RequestToggleDoor(buildingEntity.ObjectId);
+            }
+
+            if (buildingEntity is StorageEntity)
+            {
+                OwningCharacter.RequestOpenStorage(buildingEntity.ObjectId);
+            }
+
+            if (buildingEntity is WorkbenchEntity)
+            {
+                if (CacheUISceneGameplay != null &&
+                    CacheUISceneGameplay.uiBuildingCraftItems != null)
+                {
+                    CacheUISceneGameplay.uiBuildingCraftItems.UpdateData((buildingEntity as WorkbenchEntity).itemCrafts);
+                    CacheUISceneGameplay.uiBuildingCraftItems.Show();
+                }
             }
         }
 

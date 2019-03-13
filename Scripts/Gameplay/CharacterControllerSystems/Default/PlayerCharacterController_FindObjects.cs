@@ -15,8 +15,6 @@ namespace MultiplayerARPG
         protected GameObject tempGameObject;
         protected Transform tempTransform;
         protected Vector3 tempVector3;
-        protected int tempCount;
-        protected int tempCounter;
 
         public int FindClickObjects(out Vector3 worldPointFor2D)
         {
@@ -29,7 +27,7 @@ namespace MultiplayerARPG
 
         public void FindAndSetBuildingAreaFromMousePosition()
         {
-            tempCount = 0;
+            int tempCount = 0;
             switch (gameInstance.DimensionType)
             {
                 case DimensionType.Dimension3D:
@@ -45,15 +43,15 @@ namespace MultiplayerARPG
 
         public void FindAndSetBuildingAreaFromCharacterDirection()
         {
-            if (currentBuildingEntity == null)
+            if (CurrentBuildingEntity == null)
                 return;
-            tempCount = 0;
+            int tempCount = 0;
             switch (gameInstance.DimensionType)
             {
                 case DimensionType.Dimension3D:
-                    tempVector3 = CharacterTransform.position + (CharacterTransform.forward * currentBuildingEntity.characterForwardDistance);
-                    currentBuildingEntity.CacheTransform.eulerAngles = GetBuildingPlaceEulerAngles(CharacterTransform.eulerAngles);
-                    currentBuildingEntity.buildingArea = null;
+                    tempVector3 = CharacterTransform.position + (CharacterTransform.forward * CurrentBuildingEntity.characterForwardDistance);
+                    CurrentBuildingEntity.CacheTransform.eulerAngles = GetBuildingPlaceEulerAngles(CharacterTransform.eulerAngles);
+                    CurrentBuildingEntity.buildingArea = null;
                     tempCount = Physics.RaycastNonAlloc(new Ray(tempVector3 + (Vector3.up * 2.5f), Vector3.down), raycasts, 5f, gameInstance.GetBuildLayerMask());
                     break;
                 case DimensionType.Dimension2D:
@@ -62,13 +60,13 @@ namespace MultiplayerARPG
             }
 
             if (!LoopSetBuildingArea(tempCount))
-                currentBuildingEntity.CacheTransform.position = GetBuildingPlacePosition(tempVector3);
+                CurrentBuildingEntity.CacheTransform.position = GetBuildingPlacePosition(tempVector3);
         }
 
         private bool LoopSetBuildingArea(int count)
         {
             BuildingArea nonSnapBuildingArea = null;
-            for (tempCounter = 0; tempCounter < count; ++tempCounter)
+            for (int tempCounter = 0; tempCounter < count; ++tempCounter)
             {
                 tempTransform = GetRaycastTransform(tempCounter);
                 tempVector3 = GetRaycastPoint(tempCounter);
@@ -76,13 +74,13 @@ namespace MultiplayerARPG
                     return false;
 
                 BuildingArea buildingArea = tempTransform.GetComponent<BuildingArea>();
-                if (buildingArea == null || (buildingArea.buildingEntity != null && buildingArea.buildingEntity == currentBuildingEntity))
+                if (buildingArea == null || (buildingArea.buildingEntity != null && buildingArea.buildingEntity == CurrentBuildingEntity))
                     continue;
 
-                if (currentBuildingEntity.buildingType.Equals(buildingArea.buildingType))
+                if (CurrentBuildingEntity.buildingType.Equals(buildingArea.buildingType))
                 {
-                    currentBuildingEntity.CacheTransform.position = GetBuildingPlacePosition(tempVector3);
-                    currentBuildingEntity.buildingArea = buildingArea;
+                    CurrentBuildingEntity.CacheTransform.position = GetBuildingPlacePosition(tempVector3);
+                    CurrentBuildingEntity.buildingArea = buildingArea;
                     if (buildingArea.snapBuildingObject)
                         return true;
                     nonSnapBuildingArea = buildingArea;
@@ -123,8 +121,8 @@ namespace MultiplayerARPG
 
         public bool FindTarget(GameObject target, float actDistance, int layerMask)
         {
-            tempCount = OverlapObjects(CharacterTransform.position, actDistance, layerMask);
-            for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
+            int tempCount = OverlapObjects(CharacterTransform.position, actDistance, layerMask);
+            for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
                 tempGameObject = GetOverlapObject(tempCounter);
                 if (tempGameObject == target)

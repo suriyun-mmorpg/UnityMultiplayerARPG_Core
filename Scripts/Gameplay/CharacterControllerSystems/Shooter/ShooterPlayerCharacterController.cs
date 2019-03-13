@@ -61,7 +61,7 @@ namespace MultiplayerARPG
         {
             base.Awake();
             buildingItemIndex = -1;
-            currentBuildingEntity = null;
+            CurrentBuildingEntity = null;
 
             if (gameplayCameraPrefab != null)
             {
@@ -110,12 +110,12 @@ namespace MultiplayerARPG
             turnTimeCounter += Time.deltaTime;
 
             // Hide construction UI
-            if (currentBuildingEntity == null)
+            if (CurrentBuildingEntity == null)
             {
                 if (CacheUISceneGameplay.uiConstructBuilding.IsVisible())
                     CacheUISceneGameplay.uiConstructBuilding.Hide();
             }
-            if (activeBuildingEntity == null)
+            if (ActiveBuildingEntity == null)
             {
                 if (CacheUISceneGameplay.uiCurrentBuilding.IsVisible())
                     CacheUISceneGameplay.uiCurrentBuilding.Hide();
@@ -151,7 +151,7 @@ namespace MultiplayerARPG
             actionLookDirection.Normalize();
             foundEntity = null;
             // Find for enemy character
-            if (currentBuildingEntity == null)
+            if (CurrentBuildingEntity == null)
             {
                 tempCount = Physics.RaycastNonAlloc(ray, raycasts, aimDistance);
                 for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
@@ -179,7 +179,7 @@ namespace MultiplayerARPG
             else
             {
                 // Clear area before next find
-                currentBuildingEntity.buildingArea = null;
+                CurrentBuildingEntity.buildingArea = null;
                 // Find for position to construction building
                 bool foundSnapBuildPosition = false;
                 tempCount = Physics.RaycastNonAlloc(ray, raycasts, gameInstance.buildDistance);
@@ -188,19 +188,19 @@ namespace MultiplayerARPG
                 {
                     tempHitInfo = raycasts[tempCounter];
                     tempEntity = tempHitInfo.collider.GetComponentInParent<BuildingEntity>();
-                    if (tempEntity != null && tempEntity == currentBuildingEntity)
+                    if (tempEntity != null && tempEntity == CurrentBuildingEntity)
                         continue;
 
                     buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
-                    if (buildingArea == null || (buildingArea.buildingEntity != null && buildingArea.buildingEntity == currentBuildingEntity))
+                    if (buildingArea == null || (buildingArea.buildingEntity != null && buildingArea.buildingEntity == CurrentBuildingEntity))
                         continue;
 
                     // Set aim position
                     aimPosition = tempHitInfo.point;
 
-                    if (currentBuildingEntity.buildingType.Equals(buildingArea.buildingType))
+                    if (CurrentBuildingEntity.buildingType.Equals(buildingArea.buildingType))
                     {
-                        currentBuildingEntity.buildingArea = buildingArea;
+                        CurrentBuildingEntity.buildingArea = buildingArea;
                         if (buildingArea.snapBuildingObject)
                         {
                             foundSnapBuildPosition = true;
@@ -211,11 +211,11 @@ namespace MultiplayerARPG
                 // Update building position
                 if (!foundSnapBuildPosition)
                 {
-                    currentBuildingEntity.CacheTransform.position = aimPosition;
+                    CurrentBuildingEntity.CacheTransform.position = aimPosition;
                     // Rotate to camera
                     Vector3 direction = (aimPosition - CacheGameplayCameraControls.CacheCameraTransform.position).normalized;
                     direction.y = 0;
-                    currentBuildingEntity.transform.rotation = Quaternion.LookRotation(direction);
+                    CurrentBuildingEntity.transform.rotation = Quaternion.LookRotation(direction);
                 }
             }
 
@@ -257,7 +257,7 @@ namespace MultiplayerARPG
             if (moveDirection.sqrMagnitude > 1)
                 moveDirection.Normalize();
 
-            if (currentBuildingEntity != null)
+            if (CurrentBuildingEntity != null)
             {
                 tempPressAttack = InputManager.GetButtonUp("Fire1");
                 if (tempPressAttack)
@@ -432,7 +432,7 @@ namespace MultiplayerARPG
 
             CancelBuild();
             buildingItemIndex = -1;
-            currentBuildingEntity = null;
+            CurrentBuildingEntity = null;
 
             CharacterHotkey hotkey = PlayerCharacterEntity.Hotkeys[hotkeyIndex];
             Skill skill = hotkey.GetSkill();
@@ -462,9 +462,9 @@ namespace MultiplayerARPG
                     {
                         PlayerCharacterEntity.StopMove();
                         buildingItemIndex = itemIndex;
-                        currentBuildingEntity = Instantiate(item.buildingEntity);
-                        currentBuildingEntity.SetupAsBuildMode();
-                        currentBuildingEntity.CacheTransform.parent = null;
+                        CurrentBuildingEntity = Instantiate(item.buildingEntity);
+                        CurrentBuildingEntity.SetupAsBuildMode();
+                        CurrentBuildingEntity.CacheTransform.parent = null;
                         // TODO: Build character by cursor position
                     }
                 }
@@ -484,11 +484,7 @@ namespace MultiplayerARPG
             else if (targetNpc != null)
                 PlayerCharacterEntity.RequestNpcActivate(targetNpc.ObjectId);
             else if (targetBuilding != null)
-            {
-                activeBuildingEntity = targetBuilding;
-                if (!CacheUISceneGameplay.uiCurrentBuilding.IsVisible())
-                    CacheUISceneGameplay.uiCurrentBuilding.Show();
-            }
+                ActivateBuilding(targetBuilding);
         }
 
         public void UseSkill()

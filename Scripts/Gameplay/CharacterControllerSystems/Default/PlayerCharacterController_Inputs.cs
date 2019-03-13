@@ -22,44 +22,14 @@ namespace MultiplayerARPG
                 return;
 
             // If it's building something, don't allow to activate NPC/Warp/Pickup Item
-            if (currentBuildingEntity == null)
+            if (CurrentBuildingEntity == null)
             {
                 // Activate nearby npcs / players / activable buildings
                 if (InputManager.GetButtonDown("Activate"))
                 {
-                    targetPlayer = null;
-                    targetNpc = null;
-                    targetBuilding = null;
-                    tempCount = OverlapObjects(CharacterTransform.position, gameInstance.conversationDistance, gameInstance.characterLayer.Mask);
-                    for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
-                    {
-                        tempGameObject = GetOverlapObject(tempCounter);
-                        if (targetPlayer == null)
-                        {
-                            targetPlayer = tempGameObject.GetComponent<BasePlayerCharacterEntity>();
-                            if (targetPlayer == PlayerCharacterEntity)
-                                targetPlayer = null;
-                            if (targetPlayer != null)
-                                break;
-                        }
-                        if (targetNpc == null)
-                        {
-                            targetNpc = tempGameObject.GetComponent<NpcEntity>();
-                            if (targetNpc != null)
-                                break;
-                        }
-                        if (targetBuilding == null)
-                        {
-                            tempBuildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
-                            if (tempBuildingMaterial != null && 
-                                tempBuildingMaterial.buildingEntity != null && 
-                                !tempBuildingMaterial.buildingEntity.IsDead())
-                            {
-                                targetBuilding = tempBuildingMaterial.buildingEntity;
-                                break;
-                            }
-                        }
-                    }
+                    targetPlayer = activatingEntityDetector.nearestPlayer;
+                    targetNpc = activatingEntityDetector.nearestNpc;
+                    targetBuilding = activatingEntityDetector.nearestBuilding;
                     // Priority Player -> Npc -> Buildings
                     if (targetPlayer != null && CacheUISceneGameplay != null)
                         CacheUISceneGameplay.SetActivePlayerCharacter(targetPlayer);
@@ -74,8 +44,8 @@ namespace MultiplayerARPG
                 // Pick up nearby items
                 if (InputManager.GetButtonDown("PickUpItem"))
                 {
-                    tempCount = OverlapObjects(CharacterTransform.position, gameInstance.pickUpItemDistance, gameInstance.itemDropLayer.Mask);
-                    for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
+                    int tempCount = OverlapObjects(CharacterTransform.position, gameInstance.pickUpItemDistance, gameInstance.itemDropLayer.Mask);
+                    for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
                     {
                         tempGameObject = GetOverlapObject(tempCounter);
                         targetItemDrop = tempGameObject.GetComponent<ItemDropEntity>();
@@ -95,7 +65,7 @@ namespace MultiplayerARPG
         protected virtual void UpdatePointClickInput()
         {
             // If it's building something, not allow point click movement
-            if (currentBuildingEntity != null)
+            if (CurrentBuildingEntity != null)
                 return;
 
             getMouseDown = Input.GetMouseButtonDown(0);
@@ -118,11 +88,17 @@ namespace MultiplayerARPG
             {
                 targetEntity = null;
                 targetPosition = null;
+                Vector3 tempRaycastPoint;
+                float tempHighestY = float.MinValue;
+                BuildingMaterial tempBuildingMaterial;
                 bool mouseUpOnTarget = getMouseUp && !isMouseDragOrHoldOrOverUI && (controllerMode == PlayerCharacterControllerMode.PointClick || controllerMode == PlayerCharacterControllerMode.Both);
-                tempCount = FindClickObjects(out tempVector3);
-                for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
+                int tempCount = FindClickObjects(out tempVector3);
+                for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
                 {
                     tempTransform = GetRaycastTransform(tempCounter);
+                    // If found nearby entity detector, skip it
+                    if (tempTransform.GetComponent<NearbyEntityDetector>() != null)
+                        continue;
                     // When clicking on target
                     if (mouseUpOnTarget)
                     {
@@ -160,12 +136,12 @@ namespace MultiplayerARPG
                         }
                         else
                         {
-                            if (tempCounter == tempCount - 1)
+                            selectedTarget = null;
+                            tempRaycastPoint = GetRaycastPoint(tempCounter);
+                            if (tempRaycastPoint.y > tempHighestY)
                             {
-                                // If it is last entry and not base game entity 
-                                // Assume that player clicked on ground / terrain
-                                selectedTarget = null;
-                                targetPosition = GetRaycastPoint(tempCounter);
+                                tempHighestY = tempRaycastPoint.y;
+                                targetPosition = tempRaycastPoint;
                             }
                         }
                     }
@@ -173,8 +149,8 @@ namespace MultiplayerARPG
                     else if (isMouseHoldAndNotDrag)
                     {
                         tempBuildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
-                        if (tempBuildingMaterial != null && 
-                            tempBuildingMaterial.buildingEntity != null && 
+                        if (tempBuildingMaterial != null &&
+                            tempBuildingMaterial.buildingEntity != null &&
                             !tempBuildingMaterial.buildingEntity.IsDead())
                         {
                             targetPosition = tempBuildingMaterial.buildingEntity.CacheTransform.position;
@@ -325,27 +301,13 @@ namespace MultiplayerARPG
             PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
         }
 
-        protected void ActivateBuilding(BuildingEntity buildingEntity)
-        {
-            if (buildingEntity is StorageEntity)
-            {
-                PlayerCharacterEntity.RequestOpenStorage(buildingEntity.ObjectId);
-                return;
-            }
-            if (buildingEntity is WorkbenchEntity)
-            {
-
-                return;
-            }
-        }
-
         protected void UpdateBuilding()
         {
             // Current building UI
             UICurrentBuilding uiCurrentBuilding = CacheUISceneGameplay.uiCurrentBuilding;
             if (uiCurrentBuilding != null)
             {
-                if (uiCurrentBuilding.IsVisible() && activeBuildingEntity == null)
+                if (uiCurrentBuilding.IsVisible() && ActiveBuildingEntity == null)
                     uiCurrentBuilding.Hide();
             }
 
@@ -353,13 +315,13 @@ namespace MultiplayerARPG
             UIConstructBuilding uiConstructBuilding = CacheUISceneGameplay.uiConstructBuilding;
             if (uiConstructBuilding != null)
             {
-                if (uiConstructBuilding.IsVisible() && currentBuildingEntity == null)
+                if (uiConstructBuilding.IsVisible() && CurrentBuildingEntity == null)
                     uiConstructBuilding.Hide();
-                if (!uiConstructBuilding.IsVisible() && currentBuildingEntity != null)
+                if (!uiConstructBuilding.IsVisible() && CurrentBuildingEntity != null)
                     uiConstructBuilding.Show();
             }
 
-            if (currentBuildingEntity == null)
+            if (CurrentBuildingEntity == null)
                 return;
 
             bool isPointerOverUI = CacheUISceneGameplay != null && CacheUISceneGameplay.IsPointerOverUIObject();
@@ -486,7 +448,7 @@ namespace MultiplayerARPG
                 float actDistance = gameInstance.buildDistance - StoppingDistance;
                 if (Vector3.Distance(CharacterTransform.position, targetBuilding.CacheTransform.position) <= actDistance)
                 {
-                    activeBuildingEntity = targetBuilding;
+                    ActiveBuildingEntity = targetBuilding;
                     if (uiCurrentBuilding != null && !uiCurrentBuilding.IsVisible())
                         uiCurrentBuilding.Show();
                     PlayerCharacterEntity.StopMove();
@@ -556,7 +518,7 @@ namespace MultiplayerARPG
 
             CancelBuild();
             buildingItemIndex = -1;
-            currentBuildingEntity = null;
+            CurrentBuildingEntity = null;
 
             CharacterHotkey hotkey = PlayerCharacterEntity.Hotkeys[hotkeyIndex];
             Skill skill = hotkey.GetSkill();
@@ -615,9 +577,9 @@ namespace MultiplayerARPG
                         destination = null;
                         PlayerCharacterEntity.StopMove();
                         buildingItemIndex = itemIndex;
-                        currentBuildingEntity = Instantiate(item.buildingEntity);
-                        currentBuildingEntity.SetupAsBuildMode();
-                        currentBuildingEntity.CacheTransform.parent = null;
+                        CurrentBuildingEntity = Instantiate(item.buildingEntity);
+                        CurrentBuildingEntity.SetupAsBuildMode();
+                        CurrentBuildingEntity.CacheTransform.parent = null;
                         FindAndSetBuildingAreaFromCharacterDirection();
                     }
                 }
