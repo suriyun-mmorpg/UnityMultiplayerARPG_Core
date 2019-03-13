@@ -88,7 +88,7 @@ namespace MultiplayerARPG
             {
                 targetEntity = null;
                 targetPosition = null;
-                Vector3 tempRaycastPoint;
+                Vector3? tempMapPosition = null;
                 float tempHighestY = float.MinValue;
                 BuildingMaterial tempBuildingMaterial;
                 bool mouseUpOnTarget = getMouseUp && !isMouseDragOrHoldOrOverUI && (controllerMode == PlayerCharacterControllerMode.PointClick || controllerMode == PlayerCharacterControllerMode.Both);
@@ -104,59 +104,78 @@ namespace MultiplayerARPG
                         targetNpc = tempTransform.GetComponent<NpcEntity>();
                         targetItemDrop = tempTransform.GetComponent<ItemDropEntity>();
                         targetHarvestable = tempTransform.GetComponent<HarvestableEntity>();
+                        targetBuilding = null;
+                        tempBuildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
+                        if (tempBuildingMaterial != null && tempBuildingMaterial.buildingEntity != null)
+                            targetBuilding = tempBuildingMaterial.buildingEntity;
                         PlayerCharacterEntity.SetTargetEntity(null);
                         lastNpcObjectId = 0;
                         if (targetPlayer != null && !targetPlayer.IsDead())
                         {
                             SetTarget(targetPlayer);
+                            tempMapPosition = null;
                             break;
                         }
                         else if (targetMonster != null && !targetMonster.IsDead())
                         {
                             SetTarget(targetMonster);
+                            tempMapPosition = null;
                             break;
                         }
                         else if (targetNpc != null)
                         {
                             SetTarget(targetNpc);
+                            tempMapPosition = null;
                             break;
                         }
                         else if (targetItemDrop != null)
                         {
                             SetTarget(targetItemDrop);
+                            tempMapPosition = null;
                             break;
                         }
                         else if (targetHarvestable != null && !targetHarvestable.IsDead())
                         {
                             SetTarget(targetHarvestable);
+                            tempMapPosition = null;
+                            break;
+                        }
+                        else if (targetBuilding && !targetBuilding.IsDead() && targetBuilding.Activatable)
+                        {
+                            SetTarget(targetBuilding);
+                            tempMapPosition = null;
                             break;
                         }
                         else if (!GetRaycastIsTrigger(tempCounter))
                         {
-                            selectedTarget = null;
-                            tempRaycastPoint = GetRaycastPoint(tempCounter);
-                            if (tempRaycastPoint.y > tempHighestY)
-                            {
-                                tempHighestY = tempRaycastPoint.y;
-                                targetPosition = tempRaycastPoint;
-                            }
+                            // Set clicked map position, it will be used if no activating entity found
+                            tempMapPosition = GetRaycastPoint(tempCounter);
+                            if (tempMapPosition.Value.y > tempHighestY)
+                                tempHighestY = tempMapPosition.Value.y;
                         }
                     }
                     // When holding on target
                     else if (isMouseHoldAndNotDrag)
                     {
+                        targetBuilding = null;
                         tempBuildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
-                        if (tempBuildingMaterial != null &&
-                            tempBuildingMaterial.buildingEntity != null &&
-                            !tempBuildingMaterial.buildingEntity.IsDead())
+                        if (tempBuildingMaterial != null && tempBuildingMaterial.buildingEntity != null)
+                            targetBuilding = tempBuildingMaterial.buildingEntity;
+                        if (targetBuilding && !targetBuilding.IsDead() && targetBuilding.Activatable)
                         {
-                            targetPosition = tempBuildingMaterial.buildingEntity.CacheTransform.position;
-                            targetEntity = tempBuildingMaterial.buildingEntity;
-                            PlayerCharacterEntity.SetTargetEntity(tempBuildingMaterial.buildingEntity);
-                            selectedTarget = tempBuildingMaterial.buildingEntity;
+                            SetTarget(targetBuilding);
+                            tempMapPosition = null;
                             break;
                         }
                     }
+                }
+                // When clicked on map (Not touch any game entity)
+                // - Clear selected target to hide selected entity UIs
+                // - Set target position to position where mouse clicked
+                if (tempMapPosition.HasValue)
+                {
+                    selectedTarget = null;
+                    targetPosition = tempMapPosition.Value;
                 }
                 // When clicked on map (any non-collider position)
                 // tempVector3 is come from FindClickObjects()
@@ -435,10 +454,9 @@ namespace MultiplayerARPG
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetBuilding))
             {
                 UICurrentBuilding uiCurrentBuilding = CacheUISceneGameplay.uiCurrentBuilding;
-                float actDistance = gameInstance.buildDistance - StoppingDistance;
+                float actDistance = gameInstance.conversationDistance - StoppingDistance;
                 if (Vector3.Distance(CharacterTransform.position, targetBuilding.CacheTransform.position) <= actDistance)
                 {
-                    ActiveBuildingEntity = targetBuilding;
                     if (uiCurrentBuilding != null && !uiCurrentBuilding.IsVisible())
                         uiCurrentBuilding.Show();
                     PlayerCharacterEntity.StopMove();
@@ -483,7 +501,6 @@ namespace MultiplayerARPG
         {
             if (entity == null)
                 return;
-
             Vector3 targetPosition = entity.CacheTransform.position;
             PlayerCharacterEntity.PointClickMovement(targetPosition);
             targetLookDirection = (targetPosition - PlayerCharacterEntity.CacheTransform.position).normalized;
