@@ -73,7 +73,10 @@ namespace MultiplayerARPG
         public UIStorageItems uiPlayerStorageItems;
         public UIStorageItems uiGuildStorageItems;
         public UIStorageItems uiBuildingStorageItems;
+        public UICraftItems uiBuildingCraftItems;
         public UIBase uiIsWarping;
+
+        [Header("Other Settings")]
         public UIToggleUI[] toggleUis;
         [Tooltip("These GameObject (s) will ignore click / touch detection when click or touch on screen")]
         public List<GameObject> ignorePointerDetectionUis;
@@ -95,7 +98,7 @@ namespace MultiplayerARPG
         [Header("Events")]
         public UnityEvent onCharacterDead;
         public UnityEvent onCharacterRespawn;
-        
+
         public System.Action<BasePlayerCharacterEntity> onUpdateCharacter;
         public System.Action<BasePlayerCharacterEntity> onUpdateEquipItems;
         public System.Action<BasePlayerCharacterEntity> onUpdateNonEquipItems;
@@ -223,7 +226,7 @@ namespace MultiplayerARPG
             if (onUpdateEquipItems != null)
                 onUpdateEquipItems.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
-        
+
         /// <summary>
         /// This will be called from `BasePlayerCharacterController` class 
         /// To update character non equip items UIs when owning character non equip items updated
@@ -305,12 +308,13 @@ namespace MultiplayerARPG
         /// </summary>
         public void UpdateStorageItems()
         {
-            if (uiPlayerStorageItems != null)
+            if (uiPlayerStorageItems != null && uiPlayerStorageItems.IsVisible())
                 uiPlayerStorageItems.UpdateData();
-            if (uiGuildStorageItems != null)
+            if (uiGuildStorageItems != null && uiGuildStorageItems.IsVisible())
                 uiGuildStorageItems.UpdateData();
-            if (uiBuildingStorageItems != null)
+            if (uiBuildingStorageItems != null && uiBuildingStorageItems.IsVisible())
                 uiBuildingStorageItems.UpdateData();
+
             if (onUpdateStorageItems != null)
                 onUpdateStorageItems.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
