@@ -58,6 +58,7 @@ namespace MultiplayerARPG
             Texts.Add(GameMessage.Type.UnknowGameDataDescription.ToString(), "N/A");
             Texts.Add(GameMessage.Type.NotEnoughGoldToDeposit.ToString(), "Not enough gold to deposit");
             Texts.Add(GameMessage.Type.NotEnoughGoldToWithdraw.ToString(), "Not enough gold to withdraw");
+            Texts.Add(GameMessage.Type.CannotAccessStorage.ToString(), "Cannot access storage");
         }
     }
 

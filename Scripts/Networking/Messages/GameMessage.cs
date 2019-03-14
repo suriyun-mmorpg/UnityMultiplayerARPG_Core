@@ -69,6 +69,7 @@ namespace MultiplayerARPG
             // Bank
             NotEnoughGoldToDeposit,
             NotEnoughGoldToWithdraw,
+            CannotAccessStorage,
         }
         public Type type;
 
