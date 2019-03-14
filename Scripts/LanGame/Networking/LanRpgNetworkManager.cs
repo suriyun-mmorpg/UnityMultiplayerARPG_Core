@@ -254,25 +254,23 @@ namespace MultiplayerARPG
 
         public override void OpenStorage(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            StorageId storageId = playerCharacterEntity.CurrentStorageId;
-            if (storageId.storageType == StorageType.Guild &&
-                !guilds.ContainsKey(playerCharacterEntity.GuildId))
+            if (!CanAccessStorage(playerCharacterEntity, playerCharacterEntity.CurrentStorageId))
             {
-                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
-            if (!storageItems.ContainsKey(storageId))
-                storageItems[storageId] = new List<CharacterItem>();
-            if (!usingStorageCharacters.ContainsKey(storageId))
-                usingStorageCharacters[storageId] = new HashSet<uint>();
-            usingStorageCharacters[storageId].Add(playerCharacterEntity.ObjectId);
+            if (!storageItems.ContainsKey(playerCharacterEntity.CurrentStorageId))
+                storageItems[playerCharacterEntity.CurrentStorageId] = new List<CharacterItem>();
+            if (!usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
+                usingStorageCharacters[playerCharacterEntity.CurrentStorageId] = new HashSet<uint>();
+            usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Add(playerCharacterEntity.ObjectId);
             // Prepare storage data
             Storage storage = GetStorage(playerCharacterEntity.CurrentStorageId);
             bool isLimitSlot = storage.slotLimit > 0;
             short slotLimit = storage.slotLimit;
-            CharacterDataExtension.FillEmptySlots(storageItems[storageId], isLimitSlot, slotLimit);
+            CharacterDataExtension.FillEmptySlots(storageItems[playerCharacterEntity.CurrentStorageId], isLimitSlot, slotLimit);
             // Update storage items
-            playerCharacterEntity.StorageItems = storageItems[storageId];
+            playerCharacterEntity.StorageItems = storageItems[playerCharacterEntity.CurrentStorageId];
         }
 
         public override void CloseStorage(BasePlayerCharacterEntity playerCharacterEntity)
@@ -284,10 +282,9 @@ namespace MultiplayerARPG
 
         public override void MoveItemToStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
         {
-            if (storageId.storageType == StorageType.Guild &&
-                !guilds.ContainsKey(playerCharacterEntity.GuildId))
+            if (!CanAccessStorage(playerCharacterEntity, playerCharacterEntity.CurrentStorageId))
             {
-                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
             if (!storageItems.ContainsKey(storageId))
@@ -337,10 +334,9 @@ namespace MultiplayerARPG
 
         public override void MoveItemFromStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
         {
-            if (storageId.storageType == StorageType.Guild &&
-                !guilds.ContainsKey(playerCharacterEntity.GuildId))
+            if (!CanAccessStorage(playerCharacterEntity, playerCharacterEntity.CurrentStorageId))
             {
-                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
             if (!storageItems.ContainsKey(storageId))

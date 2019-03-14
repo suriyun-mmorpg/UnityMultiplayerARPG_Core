@@ -1159,6 +1159,35 @@ namespace MultiplayerARPG
             return storage;
         }
 
+        public bool CanAccessStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId)
+        {
+            switch (storageId.storageType)
+            {
+                case StorageType.Player:
+                    if (!playerCharacterEntity.Id.Equals(storageId.storageOwnerId))
+                        return false;
+                    break;
+                case StorageType.Guild:
+                    if (!guilds.ContainsKey(playerCharacterEntity.GuildId) ||
+                        !playerCharacterEntity.GuildId.ToString().Equals(storageId.storageOwnerId))
+                        return false;
+                    break;
+                case StorageType.Building:
+                    BuildingEntity buildingEntity;
+                    StorageEntity storageEntity;
+                    if (TryGetBuildingEntity(storageId.storageOwnerId, out buildingEntity))
+                    {
+                        storageEntity = buildingEntity as StorageEntity;
+                        if (storageEntity == null)
+                            return false;
+                        if (!playerCharacterEntity.Id.Equals(storageEntity.CreatorId))
+                            return false;
+                    }
+                    break;
+            }
+            return true;
+        }
+
         public abstract void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem);
         public abstract void CreateGuild(BasePlayerCharacterEntity playerCharacterEntity, string guildName);
         public abstract void OpenStorage(BasePlayerCharacterEntity playerCharacterEntity);
