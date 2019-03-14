@@ -42,10 +42,10 @@ namespace MultiplayerARPG
 
         public override void Show()
         {
-            CacheNonEquipItemSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterItem);
-            CacheNonEquipItemSelectionManager.eventOnSelect.AddListener(OnSelectCharacterItem);
-            CacheNonEquipItemSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterItem);
-            CacheNonEquipItemSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterItem);
+            CacheNonEquipItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCharacterItem);
+            CacheNonEquipItemSelectionManager.eventOnSelected.AddListener(OnSelectCharacterItem);
+            CacheNonEquipItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectCharacterItem);
+            CacheNonEquipItemSelectionManager.eventOnDeselected.AddListener(OnDeselectCharacterItem);
             base.Show();
         }
 
@@ -57,7 +57,12 @@ namespace MultiplayerARPG
 
         protected void OnSelectCharacterItem(UICharacterItem ui)
         {
-            if (uiItemDialog != null && ui.Data.characterItem.NotEmptySlot())
+            if (!ui.Data.characterItem.NotEmptySlot())
+            {
+                CacheNonEquipItemSelectionManager.DeselectSelectedUI();
+                return;
+            }
+            if (uiItemDialog != null)
             {
                 uiItemDialog.selectionManager = CacheNonEquipItemSelectionManager;
                 uiItemDialog.Setup(ui.Data, character, ui.IndexOfData);

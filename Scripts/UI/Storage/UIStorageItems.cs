@@ -60,10 +60,10 @@ namespace MultiplayerARPG
 
         public override void Show()
         {
-            CacheCharacterItemSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterItem);
-            CacheCharacterItemSelectionManager.eventOnSelect.AddListener(OnSelectCharacterItem);
-            CacheCharacterItemSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterItem);
-            CacheCharacterItemSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterItem);
+            CacheCharacterItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCharacterItem);
+            CacheCharacterItemSelectionManager.eventOnSelected.AddListener(OnSelectCharacterItem);
+            CacheCharacterItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectCharacterItem);
+            CacheCharacterItemSelectionManager.eventOnDeselected.AddListener(OnDeselectCharacterItem);
             base.Show();
         }
 
@@ -91,6 +91,11 @@ namespace MultiplayerARPG
 
         protected void OnSelectCharacterItem(UICharacterItem ui)
         {
+            if (!ui.Data.characterItem.NotEmptySlot())
+            {
+                CacheCharacterItemSelectionManager.DeselectSelectedUI();
+                return;
+            }
             if (uiItemDialog != null)
             {
                 uiItemDialog.selectionManager = CacheCharacterItemSelectionManager;
@@ -126,6 +131,9 @@ namespace MultiplayerARPG
 
         public void UpdateData()
         {
+            if (storageType == StorageType.None)
+                return;
+
             int selectedIdx = CacheCharacterItemSelectionManager.SelectedUI != null ? CacheCharacterItemSelectionManager.IndexOf(CacheCharacterItemSelectionManager.SelectedUI) : -1;
             CacheCharacterItemSelectionManager.DeselectSelectedUI();
             CacheCharacterItemSelectionManager.Clear();
@@ -137,7 +145,7 @@ namespace MultiplayerARPG
                 UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
                 uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, InventoryType.StorageItems), BasePlayerCharacterController.OwningCharacter, index);
                 uiCharacterItem.Show();
-                if (!characterItem.NotEmptySlot())
+                if (characterItem.NotEmptySlot())
                 {
                     totalWeight += characterItem.GetItem().weight * characterItem.amount;
                     usedSlots++;
