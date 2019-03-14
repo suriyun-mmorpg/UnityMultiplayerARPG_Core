@@ -221,19 +221,27 @@ namespace MultiplayerARPG
 
         protected void OnCollisionEnter(Collision collision)
         {
-            if (collision.impulse.y > 0)
+            foreach (ContactPoint contactPoint in collision.contacts)
             {
-                lastGroundedTime = Time.fixedUnscaledTime;
-                IsGrounded = true;
+                if (Mathf.Abs(contactPoint.point.y - CacheTransform.position.y) <= 0.1f)
+                {
+                    lastGroundedTime = Time.fixedUnscaledTime;
+                    IsGrounded = true;
+                    return;
+                }
             }
         }
 
         protected void OnCollisionStay(Collision collision)
         {
-            if (collision.impulse.y > 0)
+            foreach (ContactPoint contactPoint in collision.contacts)
             {
-                lastGroundedTime = Time.fixedUnscaledTime;
-                IsGrounded = true;
+                if (Mathf.Abs(contactPoint.point.y - CacheTransform.position.y) <= 0.1f)
+                {
+                    lastGroundedTime = Time.fixedUnscaledTime;
+                    IsGrounded = true;
+                    return;
+                }
             }
         }
 
