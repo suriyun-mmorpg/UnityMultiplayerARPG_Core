@@ -42,8 +42,6 @@ namespace MultiplayerARPG
         bool tempPressAttack;
         bool tempPressActivate;
         bool tempPressPickupItem;
-        int tempCount;
-        int tempCounter;
         GameObject tempGameObject;
         BasePlayerCharacterEntity targetPlayer;
         NpcEntity targetNpc;
@@ -150,11 +148,14 @@ namespace MultiplayerARPG
             actionLookDirection.y = PlayerCharacterEntity.CacheTransform.position.y;
             actionLookDirection = actionLookDirection - PlayerCharacterEntity.CacheTransform.position;
             actionLookDirection.Normalize();
+            // Prepare variables to find nearest raycasted hit point
+            float tempDistance;
+            float tempNearestDistance = float.MaxValue;
             // Find for enemy character
             if (CurrentBuildingEntity == null)
             {
-                tempCount = Physics.RaycastNonAlloc(ray, raycasts, aimDistance);
-                for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
+                int tempCount = Physics.RaycastNonAlloc(ray, raycasts, aimDistance);
+                for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
                 {
                     tempHitInfo = raycasts[tempCounter];
 
@@ -166,12 +167,17 @@ namespace MultiplayerARPG
                         if (tempBuildingMaterial != null)
                             tempEntity = tempBuildingMaterial.buildingEntity;
                     }
-                    if (tempEntity != null && tempEntity == PlayerCharacterEntity)
+                    if (tempEntity == null || tempEntity == PlayerCharacterEntity)
                         continue;
                     // Set aim position and found target
-                    aimPosition = tempHitInfo.point;
-                    if (tempEntity != null)
-                        SelectedEntity = tempEntity;
+                    tempDistance = Vector3.Distance(CacheGameplayCameraControls.CacheCameraTransform.position, tempHitInfo.point);
+                    if (tempDistance < tempNearestDistance)
+                    {
+                        tempNearestDistance = tempDistance;
+                        aimPosition = tempHitInfo.point;
+                        if (tempEntity != null)
+                            SelectedEntity = tempEntity;
+                    }
                 }
                 // Show target hp/mp
                 CacheUISceneGameplay.SetTargetEntity(SelectedEntity);
@@ -182,24 +188,26 @@ namespace MultiplayerARPG
                 CurrentBuildingEntity.buildingArea = null;
                 // Find for position to construction building
                 bool foundSnapBuildPosition = false;
-                tempCount = Physics.RaycastNonAlloc(ray, raycasts, gameInstance.buildDistance);
+                int tempCount = Physics.RaycastNonAlloc(ray, raycasts, gameInstance.buildDistance);
                 BuildingArea buildingArea = null;
-                for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
+                for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
                 {
                     tempHitInfo = raycasts[tempCounter];
                     tempEntity = tempHitInfo.collider.GetComponentInParent<BuildingEntity>();
-                    if (tempEntity != null && tempEntity == CurrentBuildingEntity)
+                    if (tempEntity == null || tempEntity == CurrentBuildingEntity)
                         continue;
 
                     buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
-                    if (buildingArea == null || (buildingArea.buildingEntity != null && buildingArea.buildingEntity == CurrentBuildingEntity))
+                    if (buildingArea == null || 
+                        (buildingArea.buildingEntity != null && buildingArea.buildingEntity == CurrentBuildingEntity) ||
+                        !CurrentBuildingEntity.buildingType.Equals(buildingArea.buildingType))
                         continue;
 
                     // Set aim position
-                    aimPosition = tempHitInfo.point;
-
-                    if (CurrentBuildingEntity.buildingType.Equals(buildingArea.buildingType))
+                    tempDistance = Vector3.Distance(CacheGameplayCameraControls.CacheCameraTransform.position, tempHitInfo.point);
+                    if (tempDistance < tempNearestDistance)
                     {
+                        aimPosition = tempHitInfo.point;
                         CurrentBuildingEntity.buildingArea = buildingArea;
                         if (buildingArea.snapBuildingObject)
                         {
@@ -508,8 +516,8 @@ namespace MultiplayerARPG
 
         public bool FindTarget(GameObject target, float actDistance, int layerMask)
         {
-            tempCount = OverlapObjects(CharacterTransform.position, actDistance, layerMask);
-            for (tempCounter = 0; tempCounter < tempCount; ++tempCounter)
+            int tempCount = OverlapObjects(CharacterTransform.position, actDistance, layerMask);
+            for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
                 tempGameObject = overlapColliders[tempCounter].gameObject;
                 if (tempGameObject == target)

@@ -74,17 +74,16 @@ namespace MultiplayerARPG
                     return false;
 
                 BuildingArea buildingArea = tempTransform.GetComponent<BuildingArea>();
-                if (buildingArea == null || (buildingArea.buildingEntity != null && buildingArea.buildingEntity == CurrentBuildingEntity))
+                if (buildingArea == null ||
+                    (buildingArea.buildingEntity != null && buildingArea.buildingEntity == CurrentBuildingEntity) ||
+                    !CurrentBuildingEntity.buildingType.Equals(buildingArea.buildingType))
                     continue;
 
-                if (CurrentBuildingEntity.buildingType.Equals(buildingArea.buildingType))
-                {
-                    CurrentBuildingEntity.CacheTransform.position = GetBuildingPlacePosition(tempVector3);
-                    CurrentBuildingEntity.buildingArea = buildingArea;
-                    if (buildingArea.snapBuildingObject)
-                        return true;
-                    nonSnapBuildingArea = buildingArea;
-                }
+                CurrentBuildingEntity.CacheTransform.position = GetBuildingPlacePosition(tempVector3);
+                CurrentBuildingEntity.buildingArea = buildingArea;
+                if (buildingArea.snapBuildingObject)
+                    return true;
+                nonSnapBuildingArea = buildingArea;
             }
             if (nonSnapBuildingArea != null)
                 return true;

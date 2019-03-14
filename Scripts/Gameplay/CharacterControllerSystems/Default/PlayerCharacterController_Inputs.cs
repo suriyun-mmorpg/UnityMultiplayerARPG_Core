@@ -127,8 +127,23 @@ namespace MultiplayerARPG
                 for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
                 {
                     tempTransform = GetRaycastTransform(tempCounter);
+                    // When holding on target, or already enter edit building mode
+                    if (isMouseHoldAndNotDrag || IsEditingBuilding)
+                    {
+                        targetBuilding = null;
+                        tempBuildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
+                        if (tempBuildingMaterial != null && tempBuildingMaterial.buildingEntity != null)
+                            targetBuilding = tempBuildingMaterial.buildingEntity;
+                        if (targetBuilding && !targetBuilding.IsDead() && targetBuilding.Activatable)
+                        {
+                            IsEditingBuilding = true;
+                            SetTarget(targetBuilding);
+                            tempMapPosition = null;
+                            break;
+                        }
+                    }
                     // When clicking on target
-                    if (mouseUpOnTarget)
+                    else if (mouseUpOnTarget)
                     {
                         targetPlayer = tempTransform.GetComponent<BasePlayerCharacterEntity>();
                         targetMonster = tempTransform.GetComponent<BaseMonsterCharacterEntity>();
@@ -173,6 +188,7 @@ namespace MultiplayerARPG
                         }
                         else if (targetBuilding && !targetBuilding.IsDead() && targetBuilding.Activatable)
                         {
+                            IsEditingBuilding = false;
                             SetTarget(targetBuilding);
                             tempMapPosition = null;
                             break;
@@ -183,20 +199,6 @@ namespace MultiplayerARPG
                             tempMapPosition = GetRaycastPoint(tempCounter);
                             if (tempMapPosition.Value.y > tempHighestY)
                                 tempHighestY = tempMapPosition.Value.y;
-                        }
-                    }
-                    // When holding on target
-                    else if (isMouseHoldAndNotDrag)
-                    {
-                        targetBuilding = null;
-                        tempBuildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
-                        if (tempBuildingMaterial != null && tempBuildingMaterial.buildingEntity != null)
-                            targetBuilding = tempBuildingMaterial.buildingEntity;
-                        if (targetBuilding && !targetBuilding.IsDead() && targetBuilding.Activatable)
-                        {
-                            SetTarget(targetBuilding);
-                            tempMapPosition = null;
-                            break;
                         }
                     }
                 }
@@ -488,13 +490,25 @@ namespace MultiplayerARPG
             }
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetBuilding))
             {
-                UICurrentBuilding uiCurrentBuilding = CacheUISceneGameplay.uiCurrentBuilding;
+                UICurrentBuilding uiCurrentBuilding = null;
+                if (CacheUISceneGameplay != null)
+                    uiCurrentBuilding = CacheUISceneGameplay.uiCurrentBuilding;
                 float actDistance = gameInstance.conversationDistance - StoppingDistance;
                 if (Vector3.Distance(CharacterTransform.position, targetBuilding.CacheTransform.position) <= actDistance)
                 {
-                    if (uiCurrentBuilding != null && !uiCurrentBuilding.IsVisible())
-                        uiCurrentBuilding.Show();
                     PlayerCharacterEntity.StopMove();
+                    if (IsEditingBuilding)
+                    {
+                        // If it's build mode, show destroy menu
+                        if (uiCurrentBuilding != null && !uiCurrentBuilding.IsVisible())
+                            uiCurrentBuilding.Show();
+                    }
+                    else
+                    {
+                        // If it's not build mode, try to activate it
+                        ActivateBuilding(targetBuilding);
+                        PlayerCharacterEntity.SetTargetEntity(null);
+                    }
                 }
                 else
                 {

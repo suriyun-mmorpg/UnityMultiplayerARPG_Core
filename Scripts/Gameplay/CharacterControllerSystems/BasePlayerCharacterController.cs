@@ -55,6 +55,7 @@ namespace MultiplayerARPG
             }
             set { PlayerCharacterEntity.SetTargetEntity(value); }
         }
+        public bool IsEditingBuilding { get; protected set; }
 
         protected virtual void Awake()
         {
@@ -294,6 +295,7 @@ namespace MultiplayerARPG
                 return;
             PlayerCharacterEntity.RequestDestroyBuilding(ActiveBuildingEntity.ObjectId);
             ActiveBuildingEntity = null;
+            IsEditingBuilding = false;
         }
 
         public void DeselectBuilding()
@@ -301,6 +303,7 @@ namespace MultiplayerARPG
             if (ActiveBuildingEntity == null)
                 return;
             ActiveBuildingEntity = null;
+            IsEditingBuilding = false;
         }
 
         protected void HideNpcDialogs()
