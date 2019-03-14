@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using LiteNetLibManager;
+using LiteNetLib;
 
 namespace MultiplayerARPG
 {
@@ -15,7 +16,7 @@ namespace MultiplayerARPG
         public UnityEvent onOpen;
         public UnityEvent onClose;
         [SerializeField]
-        private SyncFieldBool isOpen = new SyncFieldBool();
+        protected SyncFieldBool isOpen = new SyncFieldBool();
         private bool dirtyIsOpen;
         public override bool Activatable { get { return true; } }
 
@@ -23,6 +24,12 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
             isOpen.onChange += OnIsOpenChange;
+        }
+
+        protected override void SetupNetElements()
+        {
+            base.SetupNetElements();
+            isOpen.deliveryMethod = DeliveryMethod.ReliableSequenced;
         }
 
         protected override void EntityOnDestroy()
