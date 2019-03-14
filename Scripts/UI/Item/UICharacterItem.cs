@@ -11,11 +11,11 @@ namespace MultiplayerARPG
         public CharacterItem CharacterItem { get { return Data.characterItem; } }
         public short Level { get { return Data.targetLevel; } }
         public InventoryType InventoryType { get { return Data.inventoryType; } }
-        public Item Item { get { return CharacterItem != null ? CharacterItem.GetItem() : null; } }
-        public Item EquipmentItem { get { return CharacterItem != null ? CharacterItem.GetEquipmentItem() : null; } }
-        public Item ArmorItem { get { return CharacterItem != null ? CharacterItem.GetArmorItem() : null; } }
-        public Item WeaponItem { get { return CharacterItem != null ? CharacterItem.GetWeaponItem() : null; } }
-        public Item PetItem { get { return CharacterItem != null ? CharacterItem.GetPetItem() : null; } }
+        public Item Item { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() : null; } }
+        public Item EquipmentItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetEquipmentItem() : null; } }
+        public Item ArmorItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetArmorItem() : null; } }
+        public Item WeaponItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetWeaponItem() : null; } }
+        public Item PetItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetPetItem() : null; } }
 
         [Header("Generic Info Format")]
         [Tooltip("Title Format => {0} = {Title}")]
@@ -232,32 +232,35 @@ namespace MultiplayerARPG
 
             if (uiTextItemType != null)
             {
-                switch (Item.itemType)
+                if (Item != null)
                 {
-                    case ItemType.Junk:
-                        uiTextItemType.text = string.Format(itemTypeFormat, junkItemType);
-                        break;
-                    case ItemType.Armor:
-                        uiTextItemType.text = string.Format(itemTypeFormat, ArmorItem.ArmorType.Title);
-                        break;
-                    case ItemType.Weapon:
-                        uiTextItemType.text = string.Format(itemTypeFormat, WeaponItem.WeaponType.Title);
-                        break;
-                    case ItemType.Shield:
-                        uiTextItemType.text = string.Format(itemTypeFormat, shieldItemType);
-                        break;
-                    case ItemType.Potion:
-                        uiTextItemType.text = string.Format(itemTypeFormat, potionItemType);
-                        break;
-                    case ItemType.Ammo:
-                        uiTextItemType.text = string.Format(itemTypeFormat, ammoItemType);
-                        break;
-                    case ItemType.Building:
-                        uiTextItemType.text = string.Format(itemTypeFormat, buildingItemType);
-                        break;
-                    case ItemType.Pet:
-                        uiTextItemType.text = string.Format(itemTypeFormat, petItemType);
-                        break;
+                    switch (Item.itemType)
+                    {
+                        case ItemType.Junk:
+                            uiTextItemType.text = string.Format(itemTypeFormat, junkItemType);
+                            break;
+                        case ItemType.Armor:
+                            uiTextItemType.text = string.Format(itemTypeFormat, ArmorItem.ArmorType.Title);
+                            break;
+                        case ItemType.Weapon:
+                            uiTextItemType.text = string.Format(itemTypeFormat, WeaponItem.WeaponType.Title);
+                            break;
+                        case ItemType.Shield:
+                            uiTextItemType.text = string.Format(itemTypeFormat, shieldItemType);
+                            break;
+                        case ItemType.Potion:
+                            uiTextItemType.text = string.Format(itemTypeFormat, potionItemType);
+                            break;
+                        case ItemType.Ammo:
+                            uiTextItemType.text = string.Format(itemTypeFormat, ammoItemType);
+                            break;
+                        case ItemType.Building:
+                            uiTextItemType.text = string.Format(itemTypeFormat, buildingItemType);
+                            break;
+                        case ItemType.Pet:
+                            uiTextItemType.text = string.Format(itemTypeFormat, petItemType);
+                            break;
+                    }
                 }
             }
 
