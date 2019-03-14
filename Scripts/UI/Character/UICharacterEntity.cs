@@ -101,7 +101,10 @@ namespace MultiplayerARPG
                 switch (visibility)
                 {
                     case Visibility.VisibleWhenSelected:
-                        CacheCanvas.enabled = tempOwningCharacter.TryGetTargetEntity(out tempTargetCharacter) &&
+                        tempTargetCharacter = null;
+                        if (BasePlayerCharacterController.Singleton.SelectedEntity != null)
+                            tempTargetCharacter = BasePlayerCharacterController.Singleton.SelectedEntity as BaseCharacterEntity;
+                        CacheCanvas.enabled = tempTargetCharacter != null &&
                             tempTargetCharacter.ObjectId == Data.ObjectId &&
                             Vector3.Distance(tempOwningCharacter.CacheTransform.position, Data.CacheTransform.position) <= visibleDistance;
                         break;

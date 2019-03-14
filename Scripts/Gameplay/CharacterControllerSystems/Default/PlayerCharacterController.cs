@@ -69,10 +69,12 @@ namespace MultiplayerARPG
         protected ItemDropEntity targetItemDrop;
         protected BuildingEntity targetBuilding;
         protected HarvestableEntity targetHarvestable;
-        protected BaseGameEntity selectedTarget;
         protected Quaternion tempLookAt;
         protected Vector3 targetLookDirection;
         protected NearbyEntityDetector activatingEntityDetector;
+        protected NearbyEntityDetector itemDropEntityDetector;
+        protected NearbyEntityDetector enemyEntityDetector;
+        protected int findingEnemyIndex = -1;
 
         protected override void Awake()
         {
@@ -101,6 +103,21 @@ namespace MultiplayerARPG
             activatingEntityDetector.findBuilding = true;
             activatingEntityDetector.findOnlyAliveBuildings = true;
             activatingEntityDetector.findOnlyActivatableBuildings = true;
+            // This entity detector will be find item drop entities to use when pressed pickup key
+            tempGameObject = new GameObject("_ItemDropEntityDetector");
+            itemDropEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
+            itemDropEntityDetector.detectingRadius = gameInstance.pickUpItemDistance;
+            itemDropEntityDetector.findItemDrop = true;
+            // This entity detector will be find item drop entities to use when pressed pickup key
+            tempGameObject = new GameObject("_EnemyEntityDetector");
+            enemyEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
+            enemyEntityDetector.detectingRadius = gameInstance.pickUpItemDistance;
+            enemyEntityDetector.findPlayer = true;
+            enemyEntityDetector.findOnlyAlivePlayers = true;
+            enemyEntityDetector.findPlayerToAttack = true;
+            enemyEntityDetector.findMonster = true;
+            enemyEntityDetector.findOnlyAliveMonsters = true;
+            enemyEntityDetector.findMonsterToAttack = true;
         }
 
         protected override void Setup(BasePlayerCharacterEntity characterEntity)
@@ -133,6 +150,10 @@ namespace MultiplayerARPG
                 Destroy(CacheTargetObject.gameObject);
             if (activatingEntityDetector != null)
                 Destroy(activatingEntityDetector.gameObject);
+            if (itemDropEntityDetector != null)
+                Destroy(itemDropEntityDetector.gameObject);
+            if (enemyEntityDetector != null)
+                Destroy(enemyEntityDetector.gameObject);
         }
 
         protected override void Update()
@@ -156,7 +177,7 @@ namespace MultiplayerARPG
             else
             {
                 if (CacheUISceneGameplay != null)
-                    CacheUISceneGameplay.SetTargetEntity(selectedTarget);
+                    CacheUISceneGameplay.SetTargetEntity(SelectedEntity);
             }
 
             if (destination.HasValue)
@@ -189,12 +210,27 @@ namespace MultiplayerARPG
             return eulerAngles;
         }
 
+        public bool TryGetSelectedTargetAsAttackingCharacter(out BaseCharacterEntity character)
+        {
+            character = null;
+            if (SelectedEntity != null)
+            {
+                character = SelectedEntity as BaseCharacterEntity;
+                if (character != null &&
+                    !character.IsAlly(PlayerCharacterEntity))
+                    return true;
+                else
+                    character = null;
+            }
+            return false;
+        }
+
         public bool TryGetAttackingCharacter(out BaseCharacterEntity character)
         {
             character = null;
             if (PlayerCharacterEntity.TryGetTargetEntity(out character))
             {
-                if (character.CanReceiveDamageFrom(PlayerCharacterEntity))
+                if (!character.IsAlly(PlayerCharacterEntity))
                     return true;
                 else
                     character = null;

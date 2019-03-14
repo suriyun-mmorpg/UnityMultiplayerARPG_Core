@@ -33,7 +33,6 @@ namespace MultiplayerARPG
         bool isBlockController;
         BuildingMaterial tempBuildingMaterial;
         BaseGameEntity tempEntity;
-        BaseGameEntity foundEntity;
         Vector3 moveLookDirection;
         Vector3 targetLookDirection;
         Quaternion tempLookAt;
@@ -127,6 +126,8 @@ namespace MultiplayerARPG
             Cursor.visible = isBlockController;
 
             CacheGameplayCameraControls.updateRotation = !isBlockController;
+            // Clear selected entity
+            SelectedEntity = null;
 
             if (isBlockController || GenericUtils.IsFocusInputField())
             {
@@ -149,7 +150,6 @@ namespace MultiplayerARPG
             actionLookDirection.y = PlayerCharacterEntity.CacheTransform.position.y;
             actionLookDirection = actionLookDirection - PlayerCharacterEntity.CacheTransform.position;
             actionLookDirection.Normalize();
-            foundEntity = null;
             // Find for enemy character
             if (CurrentBuildingEntity == null)
             {
@@ -171,10 +171,10 @@ namespace MultiplayerARPG
                     // Set aim position and found target
                     aimPosition = tempHitInfo.point;
                     if (tempEntity != null)
-                        foundEntity = tempEntity;
+                        SelectedEntity = tempEntity;
                 }
                 // Show target hp/mp
-                CacheUISceneGameplay.SetTargetEntity(foundEntity);
+                CacheUISceneGameplay.SetTargetEntity(SelectedEntity);
             }
             else
             {
@@ -295,12 +295,12 @@ namespace MultiplayerARPG
                     targetBuilding = null;
                     if (tempPressActivate && !tempPressAttack)
                     {
-                        if (foundEntity is BasePlayerCharacterEntity)
-                            targetPlayer = foundEntity as BasePlayerCharacterEntity;
-                        if (foundEntity is NpcEntity)
-                            targetNpc = foundEntity as NpcEntity;
-                        if (foundEntity is BuildingEntity)
-                            targetBuilding = foundEntity as BuildingEntity;
+                        if (SelectedEntity is BasePlayerCharacterEntity)
+                            targetPlayer = SelectedEntity as BasePlayerCharacterEntity;
+                        if (SelectedEntity is NpcEntity)
+                            targetNpc = SelectedEntity as NpcEntity;
+                        if (SelectedEntity is BuildingEntity)
+                            targetBuilding = SelectedEntity as BuildingEntity;
                     }
                     // While attacking turn to camera forward
                     tempCalculateAngle = Vector3.Angle(PlayerCharacterEntity.CacheTransform.forward, actionLookDirection);
@@ -348,8 +348,8 @@ namespace MultiplayerARPG
                 else if (tempPressPickupItem)
                 {
                     // Find for item to pick up
-                    if (foundEntity != null)
-                        PlayerCharacterEntity.RequestPickupItem((foundEntity as ItemDropEntity).ObjectId);
+                    if (SelectedEntity != null)
+                        PlayerCharacterEntity.RequestPickupItem((SelectedEntity as ItemDropEntity).ObjectId);
                 }
                 else
                 {

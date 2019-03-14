@@ -42,6 +42,7 @@ namespace MultiplayerARPG
         public UISceneGameplay CacheUISceneGameplay { get; protected set; }
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
         protected int buildingItemIndex;
+        public BaseGameEntity SelectedEntity { get; protected set; }
         public BuildingEntity CurrentBuildingEntity { get; protected set; }
         public BuildingEntity ActiveBuildingEntity
         {

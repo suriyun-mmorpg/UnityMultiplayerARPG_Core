@@ -27,36 +27,67 @@ namespace MultiplayerARPG
                 // Activate nearby npcs / players / activable buildings
                 if (InputManager.GetButtonDown("Activate"))
                 {
-                    targetPlayer = activatingEntityDetector.nearestPlayer;
-                    targetNpc = activatingEntityDetector.nearestNpc;
-                    targetBuilding = activatingEntityDetector.nearestBuilding;
+                    targetPlayer = null;
+                    if (activatingEntityDetector.players.Count > 0)
+                        targetPlayer = activatingEntityDetector.players[0];
+                    targetNpc = null;
+                    if (activatingEntityDetector.npcs.Count > 0)
+                        targetNpc = activatingEntityDetector.npcs[0];
+                    targetBuilding = null;
+                    if (activatingEntityDetector.buildings.Count > 0)
+                        targetBuilding = activatingEntityDetector.buildings[0];
                     // Priority Player -> Npc -> Buildings
                     if (targetPlayer != null && CacheUISceneGameplay != null)
+                    {
+                        // Show dealing, invitation menu
                         CacheUISceneGameplay.SetActivePlayerCharacter(targetPlayer);
+                    }
                     else if (targetNpc != null)
+                    {
+                        // Talk to NPC
                         PlayerCharacterEntity.RequestNpcActivate(targetNpc.ObjectId);
+                    }
                     else if (targetBuilding != null)
+                    {
+                        // Use building
                         ActivateBuilding(targetBuilding);
-                    // Enter warp, For some warp portals that `warpImmediatelyWhenEnter` is FALSE
-                    if (overlapColliders.Length == 0)
+                    }
+                    else
+                    {
+                        // Enter warp, For some warp portals that `warpImmediatelyWhenEnter` is FALSE
                         PlayerCharacterEntity.RequestEnterWarp();
+                    }
                 }
                 // Pick up nearby items
                 if (InputManager.GetButtonDown("PickUpItem"))
                 {
-                    int tempCount = OverlapObjects(CharacterTransform.position, gameInstance.pickUpItemDistance, gameInstance.itemDropLayer.Mask);
-                    for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
+                    targetItemDrop = null;
+                    if (activatingEntityDetector.itemDrops.Count > 0)
+                        targetItemDrop = activatingEntityDetector.itemDrops[0];
+                    if (targetItemDrop != null)
+                        PlayerCharacterEntity.RequestPickupItem(targetItemDrop.ObjectId);
+                }
+                // Find target to attack
+                if (InputManager.GetButtonDown("FindEnemy"))
+                {
+                    ++findingEnemyIndex;
+                    if (findingEnemyIndex < 0 || findingEnemyIndex >= enemyEntityDetector.characters.Count)
+                        findingEnemyIndex = 0;
+                    if (enemyEntityDetector.characters.Count > 0)
                     {
-                        tempGameObject = GetOverlapObject(tempCounter);
-                        targetItemDrop = tempGameObject.GetComponent<ItemDropEntity>();
-                        if (targetItemDrop != null)
+                        SetTarget(null);
+                        if (!enemyEntityDetector.characters[findingEnemyIndex].IsDead())
                         {
-                            PlayerCharacterEntity.RequestPickupItem(targetItemDrop.ObjectId);
-                            break;
+                            SetTarget(enemyEntityDetector.characters[findingEnemyIndex]);
+                            if (SelectedEntity != null)
+                                targetLookDirection = (SelectedEntity.CacheTransform.position - PlayerCharacterEntity.CacheTransform.position).normalized;
                         }
                     }
                 }
             }
+            // Update enemy detecting radius to attack distance
+            enemyEntityDetector.detectingRadius = PlayerCharacterEntity.GetAttackDistance() + lockAttackTargetDistance;
+            // Update inputs
             UpdatePointClickInput();
             UpdateWASDInput();
             UpdateBuilding();
@@ -174,7 +205,7 @@ namespace MultiplayerARPG
                 // - Set target position to position where mouse clicked
                 if (tempMapPosition.HasValue)
                 {
-                    selectedTarget = null;
+                    SelectedEntity = null;
                     targetPosition = tempMapPosition.Value;
                 }
                 // When clicked on map (any non-collider position)
@@ -185,7 +216,7 @@ namespace MultiplayerARPG
                 if (gameInstance.DimensionType == DimensionType.Dimension2D && mouseUpOnTarget && tempCount == 0)
                 {
                     PlayerCharacterEntity.SetTargetEntity(null);
-                    selectedTarget = null;
+                    SelectedEntity = null;
                     tempVector3.z = 0;
                     targetPosition = tempVector3;
                 }
@@ -211,13 +242,13 @@ namespace MultiplayerARPG
         protected virtual void SetTarget(BaseGameEntity entity)
         {
             targetPosition = null;
-            if (pointClickSetTargetImmediately || selectedTarget == entity)
+            if (pointClickSetTargetImmediately || (entity != null && SelectedEntity == entity))
             {
                 targetPosition = entity.CacheTransform.position;
                 targetEntity = entity;
                 PlayerCharacterEntity.SetTargetEntity(entity);
             }
-            selectedTarget = entity;
+            SelectedEntity = entity;
         }
 
         protected virtual void UpdateWASDInput()
@@ -249,6 +280,8 @@ namespace MultiplayerARPG
                     if (skill.IsAttack())
                     {
                         BaseCharacterEntity targetEntity;
+                        if (TryGetSelectedTargetAsAttackingCharacter(out targetEntity))
+                            SetTarget(targetEntity);
                         if (wasdLockAttackTarget && !TryGetAttackingCharacter(out targetEntity))
                         {
                             BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance, false, true, false);
@@ -272,6 +305,8 @@ namespace MultiplayerARPG
                 destination = null;
                 PlayerCharacterEntity.StopMove();
                 BaseCharacterEntity targetEntity;
+                if (TryGetSelectedTargetAsAttackingCharacter(out targetEntity))
+                    SetTarget(targetEntity);
                 if (wasdLockAttackTarget && !TryGetAttackingCharacter(out targetEntity))
                 {
                     // Find nearest target and move to the target
@@ -281,7 +316,7 @@ namespace MultiplayerARPG
                         false,
                         true,
                         false);
-                    selectedTarget = nearestTarget;
+                    SelectedEntity = nearestTarget;
                     if (nearestTarget != null)
                         PlayerCharacterEntity.SetTargetEntity(nearestTarget);
                     else
@@ -298,7 +333,7 @@ namespace MultiplayerARPG
                         false,
                         true,
                         PlayerCharacterEntity.GetAttackFov());
-                    selectedTarget = nearestTarget;
+                    SelectedEntity = nearestTarget;
                     RequestAttack();
                 }
             }
@@ -547,10 +582,10 @@ namespace MultiplayerARPG
                         {
                             // If attacking any character, will use skill later
                             queueUsingSkill = new UsingSkillData(null, skill.DataId);
-                            if (selectedTarget != null && selectedTarget is BaseCharacterEntity)
+                            if (SelectedEntity != null && SelectedEntity is BaseCharacterEntity)
                             {
                                 // Attacking selected target
-                                PlayerCharacterEntity.SetTargetEntity(selectedTarget);
+                                PlayerCharacterEntity.SetTargetEntity(SelectedEntity);
                             }
                             else
                             {

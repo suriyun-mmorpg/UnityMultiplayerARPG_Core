@@ -29,17 +29,12 @@ namespace MultiplayerARPG
         public bool findBuilding;
         public bool findOnlyAliveBuildings;
         public bool findOnlyActivatableBuildings;
-        public BasePlayerCharacterEntity nearestPlayer { get; private set; }
-        public BaseMonsterCharacterEntity nearestMonster { get; private set; }
-        public BaseCharacterEntity nearestCharacter { get; private set; }
-        public NpcEntity nearestNpc { get; private set; }
-        public ItemDropEntity nearestItemDrop { get; private set; }
-        public BuildingEntity nearestBuilding { get; private set; }
-        public readonly HashSet<BasePlayerCharacterEntity> players = new HashSet<BasePlayerCharacterEntity>();
-        public readonly HashSet<BaseMonsterCharacterEntity> monsters = new HashSet<BaseMonsterCharacterEntity>();
-        public readonly HashSet<NpcEntity> npcs = new HashSet<NpcEntity>();
-        public readonly HashSet<BuildingEntity> buildings = new HashSet<BuildingEntity>();
-        public readonly HashSet<ItemDropEntity> itemDrops = new HashSet<ItemDropEntity>();
+        public readonly List<BaseCharacterEntity> characters = new List<BaseCharacterEntity>();
+        public readonly List<BasePlayerCharacterEntity> players = new List<BasePlayerCharacterEntity>();
+        public readonly List<BaseMonsterCharacterEntity> monsters = new List<BaseMonsterCharacterEntity>();
+        public readonly List<NpcEntity> npcs = new List<NpcEntity>();
+        public readonly List<ItemDropEntity> itemDrops = new List<ItemDropEntity>();
+        public readonly List<BuildingEntity> buildings = new List<BuildingEntity>();
         private readonly HashSet<Collider> excludeColliders = new HashSet<Collider>();
         private readonly HashSet<Collider2D> excludeCollider2Ds = new HashSet<Collider2D>();
         private SphereCollider cacheCollider;
@@ -77,24 +72,12 @@ namespace MultiplayerARPG
 
             CacheTransform.position = BasePlayerCharacterController.OwningCharacter.CacheTransform.position;
             // Find nearby entities
-            nearestPlayer = FindNearestEntity(players);
-            nearestMonster = FindNearestEntity(monsters);
-            nearestNpc = FindNearestEntity(npcs);
-            nearestItemDrop = FindNearestEntity(itemDrops);
-            nearestBuilding = FindNearestEntity(buildings);
-            nearestCharacter = nearestPlayer;
-            if (nearestCharacter == null)
-            {
-                // If no nearest player, nearest monster is nearest character
-                nearestCharacter = nearestMonster;
-            }
-            else if (nearestMonster != null &&
-                Vector3.Distance(nearestCharacter.CacheTransform.position, CacheTransform.position) >
-                Vector3.Distance(nearestMonster.CacheTransform.position, CacheTransform.position))
-            {
-                // If monster is nearer, nearest monster is nearest character
-                nearestCharacter = nearestMonster;
-            }
+            SortNearestEntity(characters);
+            SortNearestEntity(players);
+            SortNearestEntity(monsters);
+            SortNearestEntity(npcs);
+            SortNearestEntity(itemDrops);
+            SortNearestEntity(buildings);
         }
 
         private void OnTriggerEnter(Collider other)
@@ -138,27 +121,36 @@ namespace MultiplayerARPG
 
             if (player != null)
             {
-                players.Add(player);
+                if (!characters.Contains(player))
+                    characters.Add(player);
+                if (!players.Contains(player))
+                    players.Add(player);
                 return true;
             }
             if (monster != null)
             {
-                monsters.Add(monster);
+                if (!characters.Contains(monster))
+                    characters.Add(monster);
+                if (!monsters.Contains(monster))
+                    monsters.Add(monster);
                 return true;
             }
             if (npc != null)
             {
-                npcs.Add(npc);
+                if (!npcs.Contains(npc))
+                    npcs.Add(npc);
                 return true;
             }
             if (building != null)
             {
-                buildings.Add(building);
+                if (!buildings.Contains(building))
+                    buildings.Add(building);
                 return true;
             }
             if (itemDrop != null)
             {
-                itemDrops.Add(itemDrop);
+                if (!itemDrops.Contains(itemDrop))
+                    itemDrops.Add(itemDrop);
                 return true;
             }
             return false;
@@ -171,12 +163,12 @@ namespace MultiplayerARPG
             NpcEntity npc = null;
             ItemDropEntity itemDrop = null;
             BuildingEntity building = null;
-            FindEntity(other, out player, out monster, out npc, out itemDrop, out building);
+            FindEntity(other, out player, out monster, out npc, out itemDrop, out building, false);
 
             if (player != null)
-                return players.Remove(player);
+                return characters.Remove(player) && players.Remove(player);
             if (monster != null)
-                return monsters.Remove(monster);
+                return characters.Remove(monster) && monsters.Remove(monster);
             if (npc != null)
                 return npcs.Remove(npc);
             if (itemDrop != null)
@@ -191,7 +183,8 @@ namespace MultiplayerARPG
             out BaseMonsterCharacterEntity monster,
             out NpcEntity npc,
             out ItemDropEntity itemDrop,
-            out BuildingEntity building)
+            out BuildingEntity building,
+            bool findWithAdvanceOptions = true)
         {
             player = null;
             if (findPlayer)
@@ -199,20 +192,26 @@ namespace MultiplayerARPG
                 player = other.GetComponent<BasePlayerCharacterEntity>();
                 if (player == BasePlayerCharacterController.OwningCharacter)
                     player = null;
-                if (findOnlyAlivePlayers && player != null && player.IsDead())
-                    player = null;
-                if (findPlayerToAttack && player != null && player.IsAlly(BasePlayerCharacterController.OwningCharacter))
-                    player = null;
+                if (findWithAdvanceOptions)
+                {
+                    if (findOnlyAlivePlayers && player != null && player.IsDead())
+                        player = null;
+                    if (findPlayerToAttack && player != null && player.IsAlly(BasePlayerCharacterController.OwningCharacter))
+                        player = null;
+                }
             }
 
             monster = null;
             if (findMonster)
             {
                 monster = other.GetComponent<BaseMonsterCharacterEntity>();
-                if (findOnlyAliveMonsters && monster != null && monster.IsDead())
-                    monster = null;
-                if (findMonsterToAttack && monster != null && monster.IsAlly(BasePlayerCharacterController.OwningCharacter))
-                    monster = null;
+                if (findWithAdvanceOptions)
+                {
+                    if (findOnlyAliveMonsters && monster != null && monster.IsDead())
+                        monster = null;
+                    if (findMonsterToAttack && monster != null && monster.IsAlly(BasePlayerCharacterController.OwningCharacter))
+                        monster = null;
+                }
             }
 
             npc = null;
@@ -229,28 +228,37 @@ namespace MultiplayerARPG
                 BuildingMaterial buildingMaterial = other.GetComponent<BuildingMaterial>();
                 if (buildingMaterial != null)
                     building = buildingMaterial.buildingEntity;
-                if (findOnlyAliveBuildings && building != null && building.IsDead())
-                    building = null;
-                if (findOnlyActivatableBuildings && building != null && !building.Activatable)
-                    building = null;
+                if (findWithAdvanceOptions)
+                {
+                    if (findOnlyAliveBuildings && building != null && building.IsDead())
+                        building = null;
+                    if (findOnlyActivatableBuildings && building != null && !building.Activatable)
+                        building = null;
+                }
             }
         }
 
-        private T FindNearestEntity<T>(HashSet<T> entities) where T : BaseGameEntity
+        private void SortNearestEntity<T>(List<T> entities) where T : BaseGameEntity
         {
-            T nearestEntity = null;
-            float nearestDistance = float.MaxValue;
-            float distance;
-            foreach (T entity in entities)
+            T temp;
+            for (int i = entities.Count - 1; i >= 0; i--)
             {
-                distance = Vector3.Distance(entity.CacheTransform.position, CacheTransform.position);
-                if (distance < nearestDistance)
+                if (entities[i] == null)
+                    entities.RemoveAt(i);
+            }
+            for (int i = 0; i < entities.Count; i++)
+            {
+                for (int j = 0; j < entities.Count - 1; j++)
                 {
-                    nearestEntity = entity;
-                    nearestDistance = distance;
+                    if (Vector3.Distance(entities[j].CacheTransform.position, CacheTransform.position) >
+                        Vector3.Distance(entities[j + 1].CacheTransform.position, CacheTransform.position))
+                    {
+                        temp = entities[j + 1];
+                        entities[j + 1] = entities[j];
+                        entities[j] = temp;
+                    }
                 }
             }
-            return nearestEntity;
         }
     }
 }
