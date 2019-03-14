@@ -20,8 +20,10 @@ namespace MultiplayerARPG
         public float detectingRadius;
         public bool findPlayer;
         public bool findOnlyAlivePlayers;
+        public bool findPlayerToAttack;
         public bool findMonster;
         public bool findOnlyAliveMonsters;
+        public bool findMonsterToAttack;
         public bool findNpc;
         public bool findItemDrop;
         public bool findBuilding;
@@ -29,24 +31,27 @@ namespace MultiplayerARPG
         public bool findOnlyActivatableBuildings;
         public BasePlayerCharacterEntity nearestPlayer { get; private set; }
         public BaseMonsterCharacterEntity nearestMonster { get; private set; }
+        public BaseCharacterEntity nearestCharacter { get; private set; }
         public NpcEntity nearestNpc { get; private set; }
         public ItemDropEntity nearestItemDrop { get; private set; }
         public BuildingEntity nearestBuilding { get; private set; }
-        private readonly HashSet<BasePlayerCharacterEntity> players = new HashSet<BasePlayerCharacterEntity>();
-        private readonly HashSet<BaseMonsterCharacterEntity> monsters = new HashSet<BaseMonsterCharacterEntity>();
-        private readonly HashSet<NpcEntity> npcs = new HashSet<NpcEntity>();
-        private readonly HashSet<BuildingEntity> buildings = new HashSet<BuildingEntity>();
-        private readonly HashSet<ItemDropEntity> itemDrops = new HashSet<ItemDropEntity>();
+        public readonly HashSet<BasePlayerCharacterEntity> players = new HashSet<BasePlayerCharacterEntity>();
+        public readonly HashSet<BaseMonsterCharacterEntity> monsters = new HashSet<BaseMonsterCharacterEntity>();
+        public readonly HashSet<NpcEntity> npcs = new HashSet<NpcEntity>();
+        public readonly HashSet<BuildingEntity> buildings = new HashSet<BuildingEntity>();
+        public readonly HashSet<ItemDropEntity> itemDrops = new HashSet<ItemDropEntity>();
         private readonly HashSet<Collider> excludeColliders = new HashSet<Collider>();
         private readonly HashSet<Collider2D> excludeCollider2Ds = new HashSet<Collider2D>();
+        private SphereCollider cacheCollider;
+        private CircleCollider2D cacheCollider2D;
 
         private void Start()
         {
             if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
             {
-                SphereCollider collider = gameObject.AddComponent<SphereCollider>();
-                collider.radius = detectingRadius;
-                collider.isTrigger = true;
+                cacheCollider = gameObject.AddComponent<SphereCollider>();
+                cacheCollider.radius = detectingRadius;
+                cacheCollider.isTrigger = true;
                 Rigidbody rigidbody = gameObject.AddComponent<Rigidbody>();
                 rigidbody.useGravity = false;
                 rigidbody.isKinematic = true;
@@ -54,9 +59,9 @@ namespace MultiplayerARPG
             }
             else
             {
-                CircleCollider2D collider2D = gameObject.AddComponent<CircleCollider2D>();
-                collider2D.radius = detectingRadius;
-                collider2D.isTrigger = true;
+                cacheCollider2D = gameObject.AddComponent<CircleCollider2D>();
+                cacheCollider2D.radius = detectingRadius;
+                cacheCollider2D.isTrigger = true;
                 Rigidbody2D rigidbody2D = gameObject.AddComponent<Rigidbody2D>();
                 rigidbody2D.isKinematic = true;
                 rigidbody2D.constraints = RigidbodyConstraints2D.FreezeAll;
@@ -65,6 +70,11 @@ namespace MultiplayerARPG
 
         private void Update()
         {
+            if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
+                cacheCollider.radius = detectingRadius;
+            else
+                cacheCollider2D.radius = detectingRadius;
+
             CacheTransform.position = BasePlayerCharacterController.OwningCharacter.CacheTransform.position;
             // Find nearby entities
             nearestPlayer = FindNearestEntity(players);
@@ -72,6 +82,19 @@ namespace MultiplayerARPG
             nearestNpc = FindNearestEntity(npcs);
             nearestItemDrop = FindNearestEntity(itemDrops);
             nearestBuilding = FindNearestEntity(buildings);
+            nearestCharacter = nearestPlayer;
+            if (nearestCharacter == null)
+            {
+                // If no nearest player, nearest monster is nearest character
+                nearestCharacter = nearestMonster;
+            }
+            else if (nearestMonster != null &&
+                Vector3.Distance(nearestCharacter.CacheTransform.position, CacheTransform.position) >
+                Vector3.Distance(nearestMonster.CacheTransform.position, CacheTransform.position))
+            {
+                // If monster is nearer, nearest monster is nearest character
+                nearestCharacter = nearestMonster;
+            }
         }
 
         private void OnTriggerEnter(Collider other)
@@ -178,6 +201,8 @@ namespace MultiplayerARPG
                     player = null;
                 if (findOnlyAlivePlayers && player != null && player.IsDead())
                     player = null;
+                if (findPlayerToAttack && player != null && player.IsAlly(BasePlayerCharacterController.OwningCharacter))
+                    player = null;
             }
 
             monster = null;
@@ -185,6 +210,8 @@ namespace MultiplayerARPG
             {
                 monster = other.GetComponent<BaseMonsterCharacterEntity>();
                 if (findOnlyAliveMonsters && monster != null && monster.IsDead())
+                    monster = null;
+                if (findMonsterToAttack && monster != null && monster.IsAlly(BasePlayerCharacterController.OwningCharacter))
                     monster = null;
             }
 
