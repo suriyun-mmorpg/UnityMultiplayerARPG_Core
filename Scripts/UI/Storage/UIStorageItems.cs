@@ -77,7 +77,14 @@ namespace MultiplayerARPG
 
         public override void Hide()
         {
-            BasePlayerCharacterController.OwningCharacter.RequestCloseStorage();
+            // Close storage
+            if (storageType != StorageType.None)
+                BasePlayerCharacterController.OwningCharacter.RequestCloseStorage();
+            // Clear data
+            storageType = StorageType.None;
+            weightLimit = 0;
+            slotLimit = 0;
+            // Hide
             CacheCharacterItemSelectionManager.DeselectSelectedUI();
             base.Hide();
         }
