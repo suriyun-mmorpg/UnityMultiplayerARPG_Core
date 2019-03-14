@@ -8,6 +8,8 @@ namespace MultiplayerARPG
     {
         public override int GetAmount()
         {
+            if (BaseGameNetworkManager.Singleton.ClientGuild == null)
+                return 0;
             return BaseGameNetworkManager.Singleton.ClientGuild.gold;
         }
 
