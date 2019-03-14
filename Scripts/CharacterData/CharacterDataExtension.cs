@@ -463,9 +463,15 @@ public static partial class CharacterDataExtension
         }
 
         // Fill empty slots
-        for (int i = itemList.Count; i < slotLimit; ++i)
+        int i;
+        for (i = itemList.Count; i < slotLimit; ++i)
         {
             itemList.Add(CharacterItem.Empty);
+        }
+        i = itemList.Count - 1;
+        while (itemList.Count > slotLimit)
+        {
+            itemList.RemoveAt(i--);
         }
     }
 
@@ -618,6 +624,8 @@ public static partial class CharacterDataExtension
                 }
                 tempNewItem.amount = addAmount;
                 changes[emptySlotIndex] = tempNewItem;
+                if (amount == 0)
+                    break;
             }
         }
 
@@ -644,6 +652,8 @@ public static partial class CharacterDataExtension
             }
             tempNewItem.amount = addAmount;
             itemList.Add(tempNewItem);
+            if (amount == 0)
+                break;
         }
         return true;
     }
