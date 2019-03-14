@@ -36,6 +36,7 @@ public sealed class StorageCharacterItem : INetSerializable
 
 public struct StorageId
 {
+    public static readonly StorageId Empty = new StorageId(StorageType.None, string.Empty);
     public StorageType storageType;
     public string storageOwnerId;
 
@@ -63,6 +64,7 @@ public struct StorageId
 
 public struct StorageItemId
 {
+    public static readonly StorageItemId Empty = new StorageItemId(StorageType.None, string.Empty, -1);
     public StorageType storageType;
     public string storageOwnerId;
     public int indexOfData;

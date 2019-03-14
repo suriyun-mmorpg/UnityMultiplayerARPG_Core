@@ -1030,6 +1030,7 @@ namespace MultiplayerARPG
         protected virtual void NetFuncCloseStorage()
         {
             gameManager.CloseStorage(this);
+            currentStorageId = StorageId.Empty;
         }
         #endregion
 
@@ -1079,18 +1080,22 @@ namespace MultiplayerARPG
             DealingCharacter = null;
         }
 
-        protected virtual void OpenStorage(StorageType storageType, string ownerId)
+        protected void OpenStorage(StorageType storageType, string ownerId)
         {
             StorageId storageId = new StorageId(storageType, ownerId);
+            if (!gameManager.CanAccessStorage(this, storageId))
+            {
+                gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotAccessStorage);
+                return;
+            }
             Storage storage = gameManager.GetStorage(storageId);
             if (!currentStorageId.Equals(storageId))
             {
                 gameManager.CloseStorage(this);
                 currentStorageId = storageId;
                 gameManager.OpenStorage(this);
+                CallNetFunction(NetFuncShowStorage, ConnectionId, (byte)storageType, storage.weightLimit, storage.slotLimit);
             }
-            // Show storage on clients
-            CallNetFunction(NetFuncShowStorage, ConnectionId, (byte)storageType, storage.weightLimit, storage.slotLimit);
         }
     }
 }

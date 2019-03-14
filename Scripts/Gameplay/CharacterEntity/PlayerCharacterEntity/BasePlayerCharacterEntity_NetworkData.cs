@@ -95,7 +95,7 @@ namespace MultiplayerARPG
         #endregion
 
         #region Storage System
-        protected StorageId currentStorageId;
+        protected StorageId currentStorageId = StorageId.Empty;
         protected SyncListCharacterItem storageItems = new SyncListCharacterItem();
         public StorageId CurrentStorageId
         {
