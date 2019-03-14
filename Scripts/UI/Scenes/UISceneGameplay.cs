@@ -308,11 +308,11 @@ namespace MultiplayerARPG
         /// </summary>
         public void UpdateStorageItems()
         {
-            if (uiPlayerStorageItems != null && uiPlayerStorageItems.IsVisible())
+            if (uiPlayerStorageItems != null)
                 uiPlayerStorageItems.UpdateData();
-            if (uiGuildStorageItems != null && uiGuildStorageItems.IsVisible())
+            if (uiGuildStorageItems != null)
                 uiGuildStorageItems.UpdateData();
-            if (uiBuildingStorageItems != null && uiBuildingStorageItems.IsVisible())
+            if (uiBuildingStorageItems != null)
                 uiBuildingStorageItems.UpdateData();
 
             if (onUpdateStorageItems != null)
@@ -546,15 +546,24 @@ namespace MultiplayerARPG
             {
                 case StorageType.Player:
                     if (uiPlayerStorageItems != null)
+                    {
                         uiPlayerStorageItems.Show(storageType, weightLimit, slotLimit);
+                        uiPlayerStorageItems.UpdateData();
+                    }
                     break;
                 case StorageType.Guild:
                     if (uiGuildStorageItems != null)
+                    {
                         uiGuildStorageItems.Show(storageType, weightLimit, slotLimit);
+                        uiGuildStorageItems.UpdateData();
+                    }
                     break;
                 case StorageType.Building:
                     if (uiBuildingStorageItems != null)
+                    {
                         uiBuildingStorageItems.Show(storageType, weightLimit, slotLimit);
+                        uiBuildingStorageItems.UpdateData();
+                    }
                     break;
             }
         }
