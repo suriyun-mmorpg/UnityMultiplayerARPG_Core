@@ -28,6 +28,7 @@ public class StorageSaveData
     public void LoadPersistentData(string id)
     {
         string path = Application.persistentDataPath + "/" + id + "_storage.sav";
+        storageItems.Clear();
         if (File.Exists(path))
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();

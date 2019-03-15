@@ -28,6 +28,7 @@ public class WorldSaveData
     public void LoadPersistentData(string id, string map)
     {
         string path = Application.persistentDataPath + "/" + id + "_world_" + map + ".sav";
+        buildings.Clear();
         if (File.Exists(path))
         {
             BinaryFormatter binaryFormatter = new BinaryFormatter();

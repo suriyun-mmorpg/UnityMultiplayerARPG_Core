@@ -230,12 +230,30 @@ namespace MultiplayerARPG
                 GameInstance.MapInfos.TryGetValue(mapName, out mapInfo) &&
                 mapInfo.IsSceneSet())
             {
+                // Save data before warp
+                SaveWorld();
+                SaveStorage();
+                buildingEntities.Clear();
+                storageItems.Clear();
                 SetMapInfo(mapInfo);
                 teleportPosition = position;
+                BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
+                if (owningCharacter != null)
+                {
+                    selectedCharacter = owningCharacter.CloneTo(selectedCharacter);
+                    selectedCharacter.CurrentMapName = mapInfo.GetSceneName();
+                    selectedCharacter.CurrentPosition = position;
+                    selectedCharacter.SavePersistentCharacterData();
+                }
                 // Unregister all players characters to register later after map changed
                 foreach (LiteNetLibPlayer player in GetPlayers())
                 {
                     UnregisterPlayerCharacter(player.ConnectionId);
+                }
+                if (owningCharacter != null)
+                {
+                    // Destroy owning character to avoid save while warp
+                    owningCharacter.NetworkDestroy();
                 }
                 ServerSceneChange(mapInfo.scene);
             }
