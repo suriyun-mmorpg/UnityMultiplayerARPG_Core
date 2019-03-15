@@ -38,7 +38,7 @@ namespace MultiplayerARPG
                     case SourceLocation.NonEquipItems:
                     case SourceLocation.EquipItems:
                     case SourceLocation.StorageItems:
-                        return uiCharacterItem.IndexOfData >= 0 && uiCharacterItem.CharacterItem.NotEmptySlot();
+                        return uiCharacterItem != null && uiCharacterItem.IndexOfData >= 0 && uiCharacterItem.CharacterItem.NotEmptySlot();
                     case SourceLocation.Hotkey:
                         return true;
                 }
