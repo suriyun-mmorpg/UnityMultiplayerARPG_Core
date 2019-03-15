@@ -204,8 +204,8 @@ namespace MultiplayerARPG
                     uiCraftItem.Hide();
                 else
                 {
+                    uiCraftItem.SetupForCharacter(Skill.itemCraft);
                     uiCraftItem.Show();
-                    uiCraftItem.Data = Skill.itemCraft;
                 }
             }
 

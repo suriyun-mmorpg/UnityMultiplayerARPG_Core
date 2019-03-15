@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public class ItemCraft
+    public struct ItemCraft
     {
         public Item craftingItem;
         public ItemAmount[] craftRequirements;

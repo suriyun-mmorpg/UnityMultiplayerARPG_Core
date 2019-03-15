@@ -89,7 +89,7 @@ namespace MultiplayerARPG
                 uiTextDescription.text = string.Format(descriptionFormat, Data == null ? LanguageManager.GetUnknowDescription() : Data.Description);
 
             Quest quest = null;
-            ItemCraft itemCraft = null;
+            Item craftingItem = null;
             List<NpcSellItem> sellItems = new List<NpcSellItem>();
             List<UINpcDialogMenuAction> menuActions = new List<UINpcDialogMenuAction>();
             switch (Data.type)
@@ -161,8 +161,8 @@ namespace MultiplayerARPG
                         onSwitchToCraftItemDialog.Invoke();
                     if (uiCraftItem != null)
                     {
-                        itemCraft = Data.itemCraft;
-                        if (itemCraft != null)
+                        craftingItem = Data.itemCraft.craftingItem;
+                        if (craftingItem != null)
                         {
                             UINpcDialogMenuAction startMenuAction = new UINpcDialogMenuAction();
                             UINpcDialogMenuAction cancelMenuAction = new UINpcDialogMenuAction();
@@ -170,7 +170,7 @@ namespace MultiplayerARPG
                             startMenuAction.menuIndex = NpcDialog.CRAFT_ITEM_START_MENU_INDEX;
                             cancelMenuAction.title = messageCraftItemCancel;
                             cancelMenuAction.menuIndex = NpcDialog.CRAFT_ITEM_CANCEL_MENU_INDEX;
-                            uiCraftItem.Data = Data.itemCraft;
+                            uiCraftItem.SetupForNpc(Data.itemCraft);
                             menuActions.Add(startMenuAction);
                             menuActions.Add(cancelMenuAction);
                         }
@@ -254,7 +254,7 @@ namespace MultiplayerARPG
             // Craft Item
             if (uiCraftItem != null)
             {
-                if (itemCraft == null)
+                if (craftingItem == null)
                     uiCraftItem.Hide();
                 else
                     uiCraftItem.Show();

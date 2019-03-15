@@ -349,7 +349,7 @@ namespace MultiplayerARPG
                 if (CacheUISceneGameplay != null &&
                     CacheUISceneGameplay.uiBuildingCraftItems != null)
                 {
-                    CacheUISceneGameplay.uiBuildingCraftItems.UpdateData((buildingEntity as WorkbenchEntity).itemCrafts);
+                    CacheUISceneGameplay.uiBuildingCraftItems.UpdateDataForWorkbench(buildingEntity as WorkbenchEntity);
                     CacheUISceneGameplay.uiBuildingCraftItems.Show();
                 }
             }

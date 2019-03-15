@@ -8,8 +8,8 @@
 
         public virtual void Setup(T data, ICharacterData character, int indexOfData)
         {
-            this.Character = character;
-            this.IndexOfData = indexOfData;
+            Character = character;
+            IndexOfData = indexOfData;
             Data = data;
         }
 

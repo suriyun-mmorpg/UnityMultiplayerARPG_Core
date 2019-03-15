@@ -5,6 +5,7 @@ namespace MultiplayerARPG
     public partial class UICraftItem : UISelectionEntry<ItemCraft>
     {
         public ItemCraft ItemCraft { get { return Data; } }
+        public Item CraftingItem { get { return ItemCraft.craftingItem; } }
 
         [Header("Generic Info Format")]
         [Tooltip("Require Gold Format => {0} = {Current Amount}, {1} = {Target Amount}")]
@@ -17,23 +18,45 @@ namespace MultiplayerARPG
         public UIItemAmounts uiRequireItemAmounts;
         public TextWrapper uiTextRequireGold;
 
+        public CrafterType CrafterType { get; private set; }
+        public uint BuildingObjectId { get; protected set; }
+
+        public void SetupForCharacter(ItemCraft data)
+        {
+            CrafterType = CrafterType.Character;
+            Data = data;
+        }
+
+        public void SetupForNpc(ItemCraft data)
+        {
+            CrafterType = CrafterType.Npc;
+            Data = data;
+        }
+
+        public void SetupForWorkbench(uint objectId, ItemCraft data)
+        {
+            CrafterType = CrafterType.Workbench;
+            BuildingObjectId = objectId;
+            Data = data;
+        }
+
         protected override void UpdateData()
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (uiCraftingItem != null)
             {
-                if (ItemCraft.craftingItem == null)
+                if (CraftingItem == null)
                     uiCraftingItem.Hide();
                 else
                 {
                     uiCraftingItem.Show();
-                    uiCraftingItem.Data = new CharacterItemTuple(CharacterItem.Create(ItemCraft.craftingItem), 1, InventoryType.NonEquipItems);
+                    uiCraftingItem.Data = new CharacterItemTuple(CharacterItem.Create(CraftingItem), 1, InventoryType.NonEquipItems);
                 }
             }
 
             if (uiRequireItemAmounts != null)
             {
-                if (ItemCraft.craftingItem == null)
+                if (CraftingItem == null)
                     uiRequireItemAmounts.Hide();
                 else
                 {
@@ -44,7 +67,7 @@ namespace MultiplayerARPG
 
             if (uiTextRequireGold != null)
             {
-                if (ItemCraft.craftingItem == null)
+                if (CraftingItem == null)
                     uiTextRequireGold.text = string.Format(requireGoldFormat, 0.ToString("N0"), 0.ToString("N0"));
                 else
                 {
@@ -55,6 +78,16 @@ namespace MultiplayerARPG
                         currentAmount >= ItemCraft.requireGold ? requireGoldFormat : requireGoldNotEnoughFormat,
                         currentAmount.ToString("N0"), ItemCraft.requireGold.ToString("N0"));
                 }
+            }
+        }
+
+        public void OnClickCraft()
+        {
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            if (owningCharacter != null && CraftingItem != null)
+            {
+                if (CrafterType == CrafterType.Workbench)
+                    owningCharacter.RequestCraftItemByWorkbench(BuildingObjectId, CraftingItem.DataId);
             }
         }
     }

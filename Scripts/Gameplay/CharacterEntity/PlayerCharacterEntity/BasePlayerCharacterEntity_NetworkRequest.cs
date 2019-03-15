@@ -356,5 +356,10 @@ namespace MultiplayerARPG
         {
             CallNetFunction(NetFuncToggleDoor, FunctionReceivers.Server, new PackedUInt(objectId));
         }
+
+        public virtual void RequestCraftItemByWorkbench(uint objectId, int dataId)
+        {
+            CallNetFunction(NetFuncCraftItemByWorkbench, FunctionReceivers.Server, new PackedUInt(objectId), dataId);
+        }
     }
 }

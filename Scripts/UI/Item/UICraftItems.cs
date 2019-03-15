@@ -6,6 +6,9 @@ namespace MultiplayerARPG
 {
     public partial class UICraftItems : UIBase
     {
+        public CrafterType CrafterType { get; private set; }
+        public uint BuildingObjectId { get; protected set; }
+
         public UICraftItem uiCraftItemDialog;
         public UICraftItem uiCraftItemPrefab;
         public Transform uiCraftItemContainer;
@@ -41,10 +44,10 @@ namespace MultiplayerARPG
 
         public override void Show()
         {
-            CacheCraftItemSelectionManager.eventOnSelect.RemoveListener(OnSelectCraftItem);
-            CacheCraftItemSelectionManager.eventOnSelect.AddListener(OnSelectCraftItem);
-            CacheCraftItemSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCraftItem);
-            CacheCraftItemSelectionManager.eventOnDeselect.AddListener(OnDeselectCraftItem);
+            CacheCraftItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCraftItem);
+            CacheCraftItemSelectionManager.eventOnSelected.AddListener(OnSelectCraftItem);
+            CacheCraftItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectCraftItem);
+            CacheCraftItemSelectionManager.eventOnDeselected.AddListener(OnDeselectCraftItem);
             base.Show();
         }
 
@@ -70,16 +73,50 @@ namespace MultiplayerARPG
                 uiCraftItemDialog.Hide();
         }
 
-        public void UpdateData(IList<ItemCraft> craftItems)
+        public void UpdateDataForCharacter()
+        {
+            CrafterType = CrafterType.Character;
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
+            List<ItemCraft> itemCrafts = new List<ItemCraft>();
+            foreach (CharacterSkill characterSkill in owningCharacter.Skills)
+            {
+                if (characterSkill == null ||
+                    characterSkill.GetSkill() == null ||
+                    characterSkill.GetSkill().skillType != SkillType.CraftItem)
+                    continue;
+                itemCrafts.Add(characterSkill.GetSkill().itemCraft);
+            }
+            UpdateData(itemCrafts);
+        }
+
+        public void UpdateDataForWorkbench(WorkbenchEntity workbenchEntity)
+        {
+            CrafterType = CrafterType.Workbench;
+            BuildingObjectId = workbenchEntity.ObjectId;
+            UpdateData(workbenchEntity.itemCrafts);
+        }
+
+        protected void UpdateData(IList<ItemCraft> itemCrafts)
         {
             int selectedIdx = CacheCraftItemSelectionManager.SelectedUI != null ? CacheCraftItemSelectionManager.IndexOf(CacheCraftItemSelectionManager.SelectedUI) : -1;
             CacheCraftItemSelectionManager.DeselectSelectedUI();
             CacheCraftItemSelectionManager.Clear();
-            
-            CacheCraftItemList.Generate(craftItems, (index, craftItem, ui) =>
+
+            CacheCraftItemList.Generate(itemCrafts, (index, craftItem, ui) =>
             {
                 UICraftItem uiCraftItem = ui.GetComponent<UICraftItem>();
-                uiCraftItem.Data = craftItem;
+                switch (CrafterType)
+                {
+                    case CrafterType.Character:
+                        uiCraftItem.SetupForCharacter(craftItem);
+                        break;
+                    case CrafterType.Npc:
+                        uiCraftItem.SetupForNpc(craftItem);
+                        break;
+                    case CrafterType.Workbench:
+                        uiCraftItem.SetupForWorkbench(BuildingObjectId, craftItem);
+                        break;
+                }
                 uiCraftItem.Show();
                 CacheCraftItemSelectionManager.Add(uiCraftItem);
                 if (selectedIdx == index)

@@ -276,7 +276,7 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncSelectNpcDialogCraftItemMenu(int menuIndex)
         {
-            if (currentNpcDialog == null || currentNpcDialog.type != NpcDialogType.CraftItem || currentNpcDialog.itemCraft == null)
+            if (currentNpcDialog == null || currentNpcDialog.type != NpcDialogType.CraftItem || currentNpcDialog.itemCraft.craftingItem == null)
             {
                 currentNpcDialog = null;
                 RequestShowNpcDialog(0);
@@ -1048,6 +1048,21 @@ namespace MultiplayerARPG
                 return;
 
             doorEntity.IsOpen = !doorEntity.IsOpen;
+        }
+
+        protected virtual void NetFuncCraftItemByWorkbench(PackedUInt objectId, int dataId)
+        {
+            if (!CanDoActions())
+                return;
+
+            WorkbenchEntity workbenchEntity = null;
+            if (!TryGetEntityByObjectId(objectId, out workbenchEntity))
+                return;
+
+            if (Vector3.Distance(CacheTransform.position, workbenchEntity.CacheTransform.position) > gameInstance.conversationDistance + 5f)
+                return;
+
+            workbenchEntity.CraftItem(this, dataId);
         }
         #endregion
 
