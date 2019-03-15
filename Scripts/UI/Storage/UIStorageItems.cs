@@ -12,9 +12,9 @@ namespace MultiplayerARPG
         [Tooltip("Slot Limit Stats Format => {0} = {Current Used Slots}, {1} = {Slot Limit}")]
         public string slotLimitFormat = "Used Slot: {0}/{1}";
         [Tooltip("This text will be shown when it is not limit weight")]
-        public string unlimitWeightText = "Unlimit";
+        public string unlimitWeightText = "Unlimit Weights";
         [Tooltip("This text will be shown when it is not limit slot")]
-        public string unlimitSlotText = "Unlimit";
+        public string unlimitSlotText = "Unlimit Slots";
 
         [Header("UI Elements")]
         public UICharacterItem uiItemDialog;
