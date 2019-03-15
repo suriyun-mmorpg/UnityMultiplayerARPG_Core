@@ -51,7 +51,6 @@ namespace MultiplayerARPG
         public uint ObjectId { get { return buildingEntity.ObjectId; } }
         public int CurrentHp { get { return buildingEntity.CurrentHp; } set { buildingEntity.CurrentHp = value; } }
         public Transform CacheTransform { get { return buildingEntity.CacheTransform; } }
-        private readonly List<Collider> tempColliders = new List<Collider>();
         
         private void Awake()
         {
