@@ -65,6 +65,9 @@ namespace MultiplayerARPG
 
         private void Update()
         {
+            if (BasePlayerCharacterController.OwningCharacter == null)
+                return;
+
             if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
                 cacheCollider.radius = detectingRadius;
             else
