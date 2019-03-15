@@ -1058,6 +1058,7 @@ public static partial class CharacterDataExtension
                     cacheEquipmentSets.Add(equipItem.GetItem().equipmentSet, 0);
             }
         }
+        // Weapon equipment set
         if (data.EquipWeapons != null)
         {
             // Right hand equipment set
@@ -1078,6 +1079,10 @@ public static partial class CharacterDataExtension
             }
         }
         // Apply set items
+        Dictionary<Attribute, short> tempIncreaseAttributes;
+        Dictionary<DamageElement, float> tempIncreaseResistances;
+        Dictionary<DamageElement, MinMaxFloat> tempIncreaseDamages;
+        CharacterStats tempIncreaseStats;
         foreach (KeyValuePair<EquipmentSet, int> cacheEquipmentSet in cacheEquipmentSets)
         {
             EquipmentSetEffect[] effects = cacheEquipmentSet.Key.effects;
@@ -1086,13 +1091,14 @@ public static partial class CharacterDataExtension
             {
                 if (i < effects.Length)
                 {
-                    cacheStats += effects[i].stats;
-                    cacheAttributes = GameDataHelpers.CombineAttributes(cacheAttributes, 
-                        GameDataHelpers.MakeAttributes(effects[i].attributes, null, 1f));
-                    cacheResistances = GameDataHelpers.CombineResistances(cacheResistances,
-                        GameDataHelpers.MakeResistances(effects[i].resistances, null, 1f));
-                    cacheIncreaseDamages = GameDataHelpers.CombineDamages(cacheIncreaseDamages,
-                        GameDataHelpers.MakeDamages(effects[i].damages, null, 1f));
+                    tempIncreaseAttributes = GameDataHelpers.MakeAttributes(effects[i].attributes, null, 1f);
+                    tempIncreaseResistances = GameDataHelpers.MakeResistances(effects[i].resistances, null, 1f);
+                    tempIncreaseDamages = GameDataHelpers.MakeDamages(effects[i].damages, null, 1f);
+                    tempIncreaseStats = effects[i].stats + GameDataHelpers.GetStatsFromAttributes(tempIncreaseAttributes);
+                    cacheAttributes = GameDataHelpers.CombineAttributes(cacheAttributes, tempIncreaseAttributes);
+                    cacheResistances = GameDataHelpers.CombineResistances(cacheResistances, tempIncreaseResistances);
+                    cacheIncreaseDamages = GameDataHelpers.CombineDamages(cacheIncreaseDamages, tempIncreaseDamages);
+                    cacheStats += tempIncreaseStats;
                 }
                 else
                     break;

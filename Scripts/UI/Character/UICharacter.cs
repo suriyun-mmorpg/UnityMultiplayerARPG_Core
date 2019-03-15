@@ -75,15 +75,19 @@ namespace MultiplayerARPG
         public Image imageClassIcon;
         [Header("Options")]
         public bool showStatsWithBuffs;
+        public bool showResistanceWithBuffs;
         public bool showAttributeWithBuffs;
+        public bool showDamageWithBuffs;
 
         // Improve garbage collector
-        private CharacterStats cacheStatsWithBuffs;
-        private Dictionary<DamageElement, float> cacheResistancesWithBuffs;
-        private Dictionary<Attribute, short> cacheAttributesWithBuffs;
-        private CharacterStats displayingStats;
-        private Dictionary<DamageElement, float> displayingResistances;
-        private Dictionary<Attribute, short> displayingAttributes;
+        private float cacheWeightLimit;
+        private CharacterStats cacheAllStats;
+        private CharacterStats cacheStats;
+        private Dictionary<DamageElement, float> cacheResistances;
+        private Dictionary<Attribute, short> cacheAttributes;
+        // Data applies by equipment sets
+        private Dictionary<EquipmentSet, int> cacheEquipmentSets;
+        private Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages;
 
         private Dictionary<Attribute, UICharacterAttribute> cacheUICharacterAttributes;
         public Dictionary<Attribute, UICharacterAttribute> CacheUICharacterAttributes
@@ -197,7 +201,7 @@ namespace MultiplayerARPG
 
             if (uiTextLevel != null)
                 uiTextLevel.text = string.Format(levelFormat, Data == null ? "0" : Data.Level.ToString("N0"));
-            
+
             int[] expTree = GameInstance.Singleton.ExpTree;
             int currentExp = 0;
             int nextLevelExp = 0;
@@ -218,7 +222,7 @@ namespace MultiplayerARPG
 
             if (imageExpGage != null)
                 imageExpGage.fillAmount = nextLevelExp <= 0 ? 1 : (float)currentExp / (float)nextLevelExp;
-            
+
             // Player character data
             IPlayerCharacterData playerCharacter = Data as IPlayerCharacterData;
             if (uiTextStatPoint != null)
@@ -249,23 +253,84 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            cacheStatsWithBuffs = Data.GetStats();
-            cacheResistancesWithBuffs = Data.GetResistances();
-            cacheAttributesWithBuffs = Data.GetAttributes();
-            displayingStats = showStatsWithBuffs ? cacheStatsWithBuffs : Data.GetStats(true, false);
-            displayingResistances = showStatsWithBuffs ? cacheResistancesWithBuffs : Data.GetResistances(true, false);
-            displayingAttributes = showAttributeWithBuffs ? cacheAttributesWithBuffs : Data.GetAttributes(true, false);
+            cacheAllStats = Data.GetStats();
+            cacheWeightLimit = cacheAllStats.weightLimit;
+
+            cacheStats = showStatsWithBuffs ? cacheAllStats : Data.GetStats(true, false);
+            cacheResistances = showResistanceWithBuffs ? Data.GetResistances() : Data.GetResistances(true, false);
+            cacheAttributes = showAttributeWithBuffs? Data.GetAttributes() : Data.GetAttributes(true, false);
+            cacheIncreaseDamages = showDamageWithBuffs ? Data.GetIncreaseDamages() : Data.GetIncreaseDamages(true, false);
+            // Equipment Set
+            cacheEquipmentSets = new Dictionary<EquipmentSet, int>();
+            // Armor equipment set
+            foreach (CharacterItem equipItem in Data.EquipItems)
+            {
+                if (equipItem.NotEmptySlot() && equipItem.GetItem().equipmentSet != null)
+                {
+                    if (cacheEquipmentSets.ContainsKey(equipItem.GetItem().equipmentSet))
+                        ++cacheEquipmentSets[equipItem.GetItem().equipmentSet];
+                    else
+                        cacheEquipmentSets.Add(equipItem.GetItem().equipmentSet, 0);
+                }
+            }
+            // Weapon equipment set
+            if (Data.EquipWeapons != null)
+            {
+                // Right hand equipment set
+                if (Data.EquipWeapons.rightHand.NotEmptySlot() && Data.EquipWeapons.rightHand.GetItem().equipmentSet != null)
+                {
+                    if (cacheEquipmentSets.ContainsKey(Data.EquipWeapons.rightHand.GetItem().equipmentSet))
+                        ++cacheEquipmentSets[Data.EquipWeapons.rightHand.GetItem().equipmentSet];
+                    else
+                        cacheEquipmentSets.Add(Data.EquipWeapons.rightHand.GetItem().equipmentSet, 0);
+                }
+                // Left hand equipment set
+                if (Data.EquipWeapons.leftHand.NotEmptySlot() && Data.EquipWeapons.leftHand.GetItem().equipmentSet != null)
+                {
+                    if (cacheEquipmentSets.ContainsKey(Data.EquipWeapons.leftHand.GetItem().equipmentSet))
+                        ++cacheEquipmentSets[Data.EquipWeapons.leftHand.GetItem().equipmentSet];
+                    else
+                        cacheEquipmentSets.Add(Data.EquipWeapons.leftHand.GetItem().equipmentSet, 0);
+                }
+            }
+            // Apply set items
+            Dictionary<Attribute, short> tempIncreaseAttributes;
+            Dictionary<DamageElement, float> tempIncreaseResistances;
+            Dictionary<DamageElement, MinMaxFloat> tempIncreaseDamages;
+            CharacterStats tempIncreaseStats;
+            foreach (KeyValuePair<EquipmentSet, int> cacheEquipmentSet in cacheEquipmentSets)
+            {
+                EquipmentSetEffect[] effects = cacheEquipmentSet.Key.effects;
+                int setAmount = cacheEquipmentSet.Value;
+                for (int i = 0; i < setAmount; ++i)
+                {
+                    if (i < effects.Length)
+                    {
+                        tempIncreaseAttributes = GameDataHelpers.MakeAttributes(effects[i].attributes, null, 1f);
+                        tempIncreaseResistances = GameDataHelpers.MakeResistances(effects[i].resistances, null, 1f);
+                        tempIncreaseDamages = GameDataHelpers.MakeDamages(effects[i].damages, null, 1f);
+                        tempIncreaseStats = effects[i].stats + GameDataHelpers.GetStatsFromAttributes(tempIncreaseAttributes);
+                        cacheAttributes = GameDataHelpers.CombineAttributes(cacheAttributes, tempIncreaseAttributes);
+                        cacheResistances = GameDataHelpers.CombineResistances(cacheResistances, tempIncreaseResistances);
+                        cacheIncreaseDamages = GameDataHelpers.CombineDamages(cacheIncreaseDamages, tempIncreaseDamages);
+                        cacheStats += tempIncreaseStats;
+                        cacheWeightLimit += tempIncreaseStats.weightLimit;
+                    }
+                    else
+                        break;
+                }
+            }
 
             if (uiTextWeightLimit != null)
-                uiTextWeightLimit.text = string.Format(weightLimitStatsFormat, Data.GetTotalItemWeight().ToString("N2"), cacheStatsWithBuffs.weightLimit.ToString("N2"));
+                uiTextWeightLimit.text = string.Format(weightLimitStatsFormat, Data.GetTotalItemWeight().ToString("N2"), cacheWeightLimit.ToString("N2"));
 
             CharacterItem rightHandItem = Data.EquipWeapons.rightHand;
             CharacterItem leftHandItem = Data.EquipWeapons.leftHand;
             Item rightHandWeapon = rightHandItem.GetWeaponItem();
             Item leftHandWeapon = leftHandItem.GetWeaponItem();
-            Dictionary<DamageElement, MinMaxFloat> rightHandDamages = rightHandWeapon != null ? GameDataHelpers.CombineDamages(Data.GetIncreaseDamages(), rightHandWeapon.GetDamageAmount(rightHandItem.level, rightHandItem.GetEquipmentBonusRate(), Data)) : null;
-            Dictionary<DamageElement, MinMaxFloat> leftHandDamages = leftHandWeapon != null ? GameDataHelpers.CombineDamages(Data.GetIncreaseDamages(), leftHandWeapon.GetDamageAmount(leftHandItem.level, leftHandItem.GetEquipmentBonusRate(), Data)) : null;
-
+            Dictionary<DamageElement, MinMaxFloat> rightHandDamages = rightHandWeapon != null ? GameDataHelpers.CombineDamages(cacheIncreaseDamages, rightHandWeapon.GetDamageAmount(rightHandItem.level, rightHandItem.GetEquipmentBonusRate(), Data)) : null;
+            Dictionary<DamageElement, MinMaxFloat> leftHandDamages = leftHandWeapon != null ? GameDataHelpers.CombineDamages(cacheIncreaseDamages, leftHandWeapon.GetDamageAmount(leftHandItem.level, leftHandItem.GetEquipmentBonusRate(), Data)) : null;
+            
             if (uiTextWeaponDamages != null)
             {
                 string textDamages = "";
@@ -316,10 +381,10 @@ namespace MultiplayerARPG
             }
 
             if (uiCharacterStats != null)
-                uiCharacterStats.Data = displayingStats;
+                uiCharacterStats.Data = cacheStats;
 
             if (uiCharacterResistances != null)
-                uiCharacterResistances.Data = displayingResistances;
+                uiCharacterResistances.Data = cacheResistances;
 
             if (CacheUICharacterAttributes.Count > 0 && Data != null)
             {
@@ -335,8 +400,8 @@ namespace MultiplayerARPG
                     tempAmount = 0;
                     if (CacheUICharacterAttributes.TryGetValue(tempAttribute, out cacheUICharacterAttribute))
                     {
-                        if (displayingAttributes.ContainsKey(tempAttribute))
-                            tempAmount = displayingAttributes[tempAttribute];
+                        if (cacheAttributes.ContainsKey(tempAttribute))
+                            tempAmount = cacheAttributes[tempAttribute];
                         cacheUICharacterAttribute.Setup(new CharacterAttributeTuple(tempCharacterAttribute, tempAmount), Data, indexOfData);
                         cacheUICharacterAttribute.Show();
                     }
