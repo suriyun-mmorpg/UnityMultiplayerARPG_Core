@@ -134,7 +134,7 @@ namespace MultiplayerARPG
                         tempBuildingMaterial = tempTransform.GetComponent<BuildingMaterial>();
                         if (tempBuildingMaterial != null && tempBuildingMaterial.buildingEntity != null)
                             targetBuilding = tempBuildingMaterial.buildingEntity;
-                        if (targetBuilding && !targetBuilding.IsDead() && targetBuilding.Activatable)
+                        if (targetBuilding && !targetBuilding.IsDead())
                         {
                             IsEditingBuilding = true;
                             SetTarget(targetBuilding);
