@@ -57,6 +57,7 @@ namespace MultiplayerARPG
         [Header("Selected Target UIs")]
         public UICharacter uiTargetCharacter;
         public UIBaseGameEntity uiTargetNpc;
+        public UIBaseGameEntity uiTargetItemDrop;
         public UIDamageableEntity uiTargetBuilding;
         public UIDamageableEntity uiTargetHarvestable;
 
@@ -330,6 +331,7 @@ namespace MultiplayerARPG
             {
                 SetTargetCharacter(null);
                 SetTargetNpc(null);
+                SetTargetItemDrop(null);
                 SetTargetBuilding(null);
                 SetTargetHarvestable(null);
                 return;
@@ -339,6 +341,8 @@ namespace MultiplayerARPG
                 SetTargetCharacter(entity as BaseCharacterEntity);
             if (entity is NpcEntity)
                 SetTargetNpc(entity as NpcEntity);
+            if (entity is ItemDropEntity)
+                SetTargetItemDrop(entity as ItemDropEntity);
             if (entity is BuildingEntity)
                 SetTargetBuilding(entity as BuildingEntity);
             if (entity is HarvestableEntity)
@@ -373,6 +377,21 @@ namespace MultiplayerARPG
 
             uiTargetNpc.Data = npc;
             uiTargetNpc.Show();
+        }
+
+        protected void SetTargetItemDrop(ItemDropEntity itemDrop)
+        {
+            if (uiTargetItemDrop == null)
+                return;
+
+            if (itemDrop == null)
+            {
+                uiTargetItemDrop.Hide();
+                return;
+            }
+
+            uiTargetItemDrop.Data = itemDrop;
+            uiTargetItemDrop.Show();
         }
 
         protected void SetTargetBuilding(BuildingEntity building)

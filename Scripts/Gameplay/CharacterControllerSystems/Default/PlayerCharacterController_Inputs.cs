@@ -244,7 +244,9 @@ namespace MultiplayerARPG
         protected virtual void SetTarget(BaseGameEntity entity)
         {
             targetPosition = null;
-            if (pointClickSetTargetImmediately || (entity != null && SelectedEntity == entity))
+            if (pointClickSetTargetImmediately ||
+                (entity != null && SelectedEntity == entity) ||
+                (entity != null && entity is ItemDropEntity))
             {
                 targetPosition = entity.CacheTransform.position;
                 targetEntity = entity;
