@@ -40,7 +40,7 @@ namespace MultiplayerARPG
                     case SourceLocation.StorageItems:
                         return uiCharacterItem != null && uiCharacterItem.IndexOfData >= 0 && uiCharacterItem.CharacterItem.NotEmptySlot();
                     case SourceLocation.Hotkey:
-                        return true;
+                        return uiCharacterHotkey != null;
                 }
                 return false;
             }

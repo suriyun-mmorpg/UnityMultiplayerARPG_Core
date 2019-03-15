@@ -126,7 +126,7 @@ namespace MultiplayerARPG
                     uiCharacterSkill.Show();
                     UICharacterSkillDragHandler dragHandler = uiCharacterSkill.GetComponentInChildren<UICharacterSkillDragHandler>();
                     if (dragHandler != null)
-                        dragHandler.SetupForSkills(this);
+                        dragHandler.SetupForSkills(uiCharacterSkill);
                     CacheCharacterSkillSelectionManager.Add(uiCharacterSkill);
                     if (selectedSkillId == skillLevel.Key.DataId)
                         uiCharacterSkill.OnClickSelect();
