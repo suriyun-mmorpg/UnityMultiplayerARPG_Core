@@ -62,8 +62,8 @@ namespace MultiplayerARPG
                 if (InputManager.GetButtonDown("PickUpItem"))
                 {
                     targetItemDrop = null;
-                    if (activatingEntityDetector.itemDrops.Count > 0)
-                        targetItemDrop = activatingEntityDetector.itemDrops[0];
+                    if (itemDropEntityDetector.itemDrops.Count > 0)
+                        targetItemDrop = itemDropEntityDetector.itemDrops[0];
                     if (targetItemDrop != null)
                         PlayerCharacterEntity.RequestPickupItem(targetItemDrop.ObjectId);
                 }
