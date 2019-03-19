@@ -584,19 +584,20 @@ namespace MultiplayerARPG
 
         public static void AddSkills(IEnumerable<Skill> skills)
         {
-            List<GameEffectCollection> skillHitEffects = new List<GameEffectCollection>();
+            List<GameEffectCollection> effects = new List<GameEffectCollection>();
             List<BaseDamageEntity> damageEntities = new List<BaseDamageEntity>();
             foreach (Skill skill in skills)
             {
                 if (skill == null || Skills.ContainsKey(skill.DataId))
                     continue;
                 Skills[skill.DataId] = skill;
-                skillHitEffects.Add(skill.hitEffects);
+                effects.Add(skill.castingEffects);
+                effects.Add(skill.hitEffects);
                 MissileDamageEntity missileDamageEntity = skill.damageInfo.missileDamageEntity;
                 if (missileDamageEntity != null)
                     damageEntities.Add(missileDamageEntity);
             }
-            AddGameEffectCollections(skillHitEffects);
+            AddGameEffectCollections(effects);
             AddDamageEntities(damageEntities);
         }
 

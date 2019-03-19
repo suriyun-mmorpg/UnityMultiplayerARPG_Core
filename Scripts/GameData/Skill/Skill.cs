@@ -36,6 +36,9 @@ namespace MultiplayerARPG
         [Tooltip("This is move speed rate while using this skill")]
         public float moveSpeedRateWhileUsingSkill = 0f;
 
+        [Header("Casting Effects")]
+        public GameEffectCollection castingEffects;
+
         [Header("Available Weapons")]
         [Tooltip("An available weapons, if it not set every weapons is available")]
         public WeaponType[] availableWeapons;
@@ -102,6 +105,89 @@ namespace MultiplayerARPG
                     cacheEffectivenessAttributes = GameDataHelpers.MakeDamageEffectivenessAttributes(effectivenessAttributes, new Dictionary<Attribute, float>());
                 return cacheEffectivenessAttributes;
             }
+        }
+
+        /// <summary>
+        /// Return TRUE if this will override default cast function
+        /// </summary>
+        /// <param name="character"></param>
+        /// <param name="skillLevel"></param>
+        /// <param name="triggerDuration"></param>
+        /// <param name="totalDuration"></param>
+        /// <param name="isLeftHand"></param>
+        /// <param name="weapon"></param>
+        /// <param name="damageInfo"></param>
+        /// <param name="allDamageAmounts"></param>
+        /// <param name="hasAimPosition"></param>
+        /// <param name="aimPosition"></param>
+        /// <returns></returns>
+        public virtual bool OnCastSkill(
+            BaseCharacterEntity character,
+            short skillLevel,
+            float triggerDuration,
+            float totalDuration,
+            bool isLeftHand,
+            CharacterItem weapon,
+            DamageInfo damageInfo,
+            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
+            bool hasAimPosition,
+            Vector3 aimPosition)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Return TRUE if this will override default apply skill function
+        /// </summary>
+        /// <param name="character"></param>
+        /// <param name="skillLevel"></param>
+        /// <param name="isLeftHand"></param>
+        /// <param name="weapon"></param>
+        /// <param name="damageInfo"></param>
+        /// <param name="allDamageAmounts"></param>
+        /// <param name="hasAimPosition"></param>
+        /// <param name="aimPosition"></param>
+        /// <returns></returns>
+        public virtual bool OnApplySkill(
+            BaseCharacterEntity character,
+            short skillLevel,
+            bool isLeftHand,
+            CharacterItem weapon,
+            DamageInfo damageInfo,
+            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
+            bool hasAimPosition,
+            Vector3 aimPosition)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Return TRUE if this will override default attack function
+        /// </summary>
+        /// <param name="character"></param>
+        /// <param name="skillLevel"></param>
+        /// <param name="triggerDuration"></param>
+        /// <param name="totalDuration"></param>
+        /// <param name="isLeftHand"></param>
+        /// <param name="weapon"></param>
+        /// <param name="damageInfo"></param>
+        /// <param name="allDamageAmounts"></param>
+        /// <param name="hasAimPosition"></param>
+        /// <param name="aimPosition"></param>
+        /// <returns></returns>
+        public virtual bool OnAttack(
+            BaseCharacterEntity character,
+            short skillLevel,
+            float triggerDuration,
+            float totalDuration,
+            bool isLeftHand,
+            CharacterItem weapon,
+            DamageInfo damageInfo,
+            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
+            bool hasAimPosition,
+            Vector3 aimPosition)
+        {
+            return false;
         }
     }
 
