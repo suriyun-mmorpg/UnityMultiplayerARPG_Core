@@ -81,7 +81,6 @@ namespace MultiplayerARPG
 
         // Improve garbage collector
         private float cacheWeightLimit;
-        private CharacterStats cacheAllStats;
         private CharacterStats cacheStats;
         private Dictionary<DamageElement, float> cacheResistances;
         private Dictionary<Attribute, short> cacheAttributes;
@@ -253,73 +252,30 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            cacheAllStats = Data.GetStats();
-            cacheWeightLimit = cacheAllStats.weightLimit;
-
-            cacheStats = showStatsWithBuffs ? cacheAllStats : Data.GetStats(true, false);
+            cacheStats = showStatsWithBuffs ? Data.GetStats() : Data.GetStats(true, false);
+            cacheAttributes = showAttributeWithBuffs ? Data.GetAttributes() : Data.GetAttributes(true, false);
             cacheResistances = showResistanceWithBuffs ? Data.GetResistances() : Data.GetResistances(true, false);
-            cacheAttributes = showAttributeWithBuffs? Data.GetAttributes() : Data.GetAttributes(true, false);
             cacheIncreaseDamages = showDamageWithBuffs ? Data.GetIncreaseDamages() : Data.GetIncreaseDamages(true, false);
-            // Equipment Set
-            cacheEquipmentSets = new Dictionary<EquipmentSet, int>();
-            // Armor equipment set
-            foreach (CharacterItem equipItem in Data.EquipItems)
+            cacheWeightLimit = cacheStats.weightLimit;
+            if (!showStatsWithBuffs)
             {
-                if (equipItem.NotEmptySlot() && equipItem.GetItem().equipmentSet != null)
-                {
-                    if (cacheEquipmentSets.ContainsKey(equipItem.GetItem().equipmentSet))
-                        ++cacheEquipmentSets[equipItem.GetItem().equipmentSet];
-                    else
-                        cacheEquipmentSets.Add(equipItem.GetItem().equipmentSet, 0);
-                }
+                // Always increase weight limit by buff bonus because it should always show real weight limit in UIs
+                cacheWeightLimit += Data.GetBuffStats().weightLimit;
             }
-            // Weapon equipment set
-            if (Data.EquipWeapons != null)
-            {
-                // Right hand equipment set
-                if (Data.EquipWeapons.rightHand.NotEmptySlot() && Data.EquipWeapons.rightHand.GetItem().equipmentSet != null)
-                {
-                    if (cacheEquipmentSets.ContainsKey(Data.EquipWeapons.rightHand.GetItem().equipmentSet))
-                        ++cacheEquipmentSets[Data.EquipWeapons.rightHand.GetItem().equipmentSet];
-                    else
-                        cacheEquipmentSets.Add(Data.EquipWeapons.rightHand.GetItem().equipmentSet, 0);
-                }
-                // Left hand equipment set
-                if (Data.EquipWeapons.leftHand.NotEmptySlot() && Data.EquipWeapons.leftHand.GetItem().equipmentSet != null)
-                {
-                    if (cacheEquipmentSets.ContainsKey(Data.EquipWeapons.leftHand.GetItem().equipmentSet))
-                        ++cacheEquipmentSets[Data.EquipWeapons.leftHand.GetItem().equipmentSet];
-                    else
-                        cacheEquipmentSets.Add(Data.EquipWeapons.leftHand.GetItem().equipmentSet, 0);
-                }
-            }
-            // Apply set items
-            Dictionary<Attribute, short> tempIncreaseAttributes;
-            Dictionary<DamageElement, float> tempIncreaseResistances;
-            Dictionary<DamageElement, MinMaxFloat> tempIncreaseDamages;
-            CharacterStats tempIncreaseStats;
-            foreach (KeyValuePair<EquipmentSet, int> cacheEquipmentSet in cacheEquipmentSets)
-            {
-                EquipmentSetEffect[] effects = cacheEquipmentSet.Key.effects;
-                int setAmount = cacheEquipmentSet.Value;
-                for (int i = 0; i < setAmount; ++i)
-                {
-                    if (i < effects.Length)
-                    {
-                        tempIncreaseAttributes = GameDataHelpers.MakeAttributes(effects[i].attributes, null, 1f);
-                        tempIncreaseResistances = GameDataHelpers.MakeResistances(effects[i].resistances, null, 1f);
-                        tempIncreaseDamages = GameDataHelpers.MakeDamages(effects[i].damages, null, 1f);
-                        tempIncreaseStats = effects[i].stats + GameDataHelpers.GetStatsFromAttributes(tempIncreaseAttributes);
-                        cacheAttributes = GameDataHelpers.CombineAttributes(cacheAttributes, tempIncreaseAttributes);
-                        cacheResistances = GameDataHelpers.CombineResistances(cacheResistances, tempIncreaseResistances);
-                        cacheIncreaseDamages = GameDataHelpers.CombineDamages(cacheIncreaseDamages, tempIncreaseDamages);
-                        cacheStats += tempIncreaseStats;
-                        cacheWeightLimit += tempIncreaseStats.weightLimit;
-                    }
-                    else
-                        break;
-                }
-            }
+
+            CharacterStats bonusStats;
+            Dictionary<Attribute, short> bonusAttributes;
+            Dictionary<DamageElement, float> bonusResistances;
+            Dictionary<DamageElement, MinMaxFloat> bonusIncreaseDamages;
+            Dictionary<Skill, short> bonusSkills;
+            Dictionary<EquipmentSet, int> cacheEquipmentSets;
+            Data.GetEquipmentSetBonus(out bonusStats, out bonusAttributes, out bonusResistances, out bonusIncreaseDamages, out bonusSkills, out cacheEquipmentSets);
+            // Increase stats by equipment set bonus
+            cacheStats += bonusStats;
+            cacheAttributes = GameDataHelpers.CombineAttributes(cacheAttributes, bonusAttributes);
+            cacheResistances = GameDataHelpers.CombineResistances(cacheResistances, bonusResistances);
+            cacheIncreaseDamages = GameDataHelpers.CombineDamages(cacheIncreaseDamages, bonusIncreaseDamages);
+            cacheWeightLimit += bonusStats.weightLimit;
 
             if (uiTextWeightLimit != null)
                 uiTextWeightLimit.text = string.Format(weightLimitStatsFormat, Data.GetTotalItemWeight().ToString("N2"), cacheWeightLimit.ToString("N2"));

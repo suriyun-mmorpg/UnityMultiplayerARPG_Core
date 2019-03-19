@@ -318,9 +318,9 @@ namespace MultiplayerARPG
             this.GetAllStats(
                 out cacheStats,
                 out cacheAttributes,
-                out cacheSkills,
                 out cacheResistances,
                 out cacheIncreaseDamages,
+                out cacheSkills,
                 out cacheEquipmentSets,
                 out cacheMaxHp,
                 out cacheMaxMp,

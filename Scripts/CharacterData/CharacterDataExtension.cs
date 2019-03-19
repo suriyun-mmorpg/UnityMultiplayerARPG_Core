@@ -1024,38 +1024,30 @@ public static partial class CharacterDataExtension
         return index;
     }
 
-    public static void GetAllStats(this ICharacterData data,
-        out CharacterStats cacheStats,
-        out Dictionary<Attribute, short> cacheAttributes,
-        out Dictionary<Skill, short> cacheSkills,
-        out Dictionary<DamageElement, float> cacheResistances,
-        out Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages,
-        out Dictionary<EquipmentSet, int> cacheEquipmentSets,
-        out int cacheMaxHp,
-        out int cacheMaxMp,
-        out int cacheMaxStamina,
-        out int cacheMaxFood,
-        out int cacheMaxWater,
-        out float cacheTotalItemWeight,
-        out float cacheAtkSpeed,
-        out float cacheMoveSpeed)
+    public static void GetEquipmentSetBonus(this ICharacterData data,
+        out CharacterStats bonusStats,
+        out Dictionary<Attribute, short> bonusAttributes,
+        out Dictionary<DamageElement, float> bonusResistances,
+        out Dictionary<DamageElement, MinMaxFloat> bonusIncreaseDamages,
+        out Dictionary<Skill, short> bonusSkills,
+        out Dictionary<EquipmentSet, int> equipmentSets)
     {
-        cacheStats = data.GetStats();
-        cacheAttributes = data.GetAttributes();
-        cacheSkills = data.GetSkills();
-        cacheResistances = data.GetResistances();
-        cacheIncreaseDamages = data.GetIncreaseDamages();
+        bonusStats = new CharacterStats();
+        bonusAttributes = new Dictionary<Attribute, short>();
+        bonusResistances = new Dictionary<DamageElement, float>();
+        bonusIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+        bonusSkills = new Dictionary<Skill, short>();
         // Equipment Set
-        cacheEquipmentSets = new Dictionary<EquipmentSet, int>();
+        equipmentSets = new Dictionary<EquipmentSet, int>();
         // Armor equipment set
         foreach (CharacterItem equipItem in data.EquipItems)
         {
             if (equipItem.NotEmptySlot() && equipItem.GetItem().equipmentSet != null)
             {
-                if (cacheEquipmentSets.ContainsKey(equipItem.GetItem().equipmentSet))
-                    ++cacheEquipmentSets[equipItem.GetItem().equipmentSet];
+                if (equipmentSets.ContainsKey(equipItem.GetItem().equipmentSet))
+                    ++equipmentSets[equipItem.GetItem().equipmentSet];
                 else
-                    cacheEquipmentSets.Add(equipItem.GetItem().equipmentSet, 0);
+                    equipmentSets.Add(equipItem.GetItem().equipmentSet, 0);
             }
         }
         // Weapon equipment set
@@ -1064,18 +1056,18 @@ public static partial class CharacterDataExtension
             // Right hand equipment set
             if (data.EquipWeapons.rightHand.NotEmptySlot() && data.EquipWeapons.rightHand.GetItem().equipmentSet != null)
             {
-                if (cacheEquipmentSets.ContainsKey(data.EquipWeapons.rightHand.GetItem().equipmentSet))
-                    ++cacheEquipmentSets[data.EquipWeapons.rightHand.GetItem().equipmentSet];
+                if (equipmentSets.ContainsKey(data.EquipWeapons.rightHand.GetItem().equipmentSet))
+                    ++equipmentSets[data.EquipWeapons.rightHand.GetItem().equipmentSet];
                 else
-                    cacheEquipmentSets.Add(data.EquipWeapons.rightHand.GetItem().equipmentSet, 0);
+                    equipmentSets.Add(data.EquipWeapons.rightHand.GetItem().equipmentSet, 0);
             }
             // Left hand equipment set
             if (data.EquipWeapons.leftHand.NotEmptySlot() && data.EquipWeapons.leftHand.GetItem().equipmentSet != null)
             {
-                if (cacheEquipmentSets.ContainsKey(data.EquipWeapons.leftHand.GetItem().equipmentSet))
-                    ++cacheEquipmentSets[data.EquipWeapons.leftHand.GetItem().equipmentSet];
+                if (equipmentSets.ContainsKey(data.EquipWeapons.leftHand.GetItem().equipmentSet))
+                    ++equipmentSets[data.EquipWeapons.leftHand.GetItem().equipmentSet];
                 else
-                    cacheEquipmentSets.Add(data.EquipWeapons.leftHand.GetItem().equipmentSet, 0);
+                    equipmentSets.Add(data.EquipWeapons.leftHand.GetItem().equipmentSet, 0);
             }
         }
         // Apply set items
@@ -1083,7 +1075,7 @@ public static partial class CharacterDataExtension
         Dictionary<DamageElement, float> tempIncreaseResistances;
         Dictionary<DamageElement, MinMaxFloat> tempIncreaseDamages;
         CharacterStats tempIncreaseStats;
-        foreach (KeyValuePair<EquipmentSet, int> cacheEquipmentSet in cacheEquipmentSets)
+        foreach (KeyValuePair<EquipmentSet, int> cacheEquipmentSet in equipmentSets)
         {
             EquipmentSetEffect[] effects = cacheEquipmentSet.Key.effects;
             int setAmount = cacheEquipmentSet.Value;
@@ -1095,29 +1087,58 @@ public static partial class CharacterDataExtension
                     tempIncreaseResistances = GameDataHelpers.MakeResistances(effects[i].resistances, null, 1f);
                     tempIncreaseDamages = GameDataHelpers.MakeDamages(effects[i].damages, null, 1f);
                     tempIncreaseStats = effects[i].stats + GameDataHelpers.GetStatsFromAttributes(tempIncreaseAttributes);
-                    cacheAttributes = GameDataHelpers.CombineAttributes(cacheAttributes, tempIncreaseAttributes);
-                    cacheResistances = GameDataHelpers.CombineResistances(cacheResistances, tempIncreaseResistances);
-                    cacheIncreaseDamages = GameDataHelpers.CombineDamages(cacheIncreaseDamages, tempIncreaseDamages);
-                    cacheStats += tempIncreaseStats;
+                    bonusAttributes = GameDataHelpers.CombineAttributes(bonusAttributes, tempIncreaseAttributes);
+                    bonusResistances = GameDataHelpers.CombineResistances(bonusResistances, tempIncreaseResistances);
+                    bonusIncreaseDamages = GameDataHelpers.CombineDamages(bonusIncreaseDamages, tempIncreaseDamages);
+                    bonusStats += tempIncreaseStats;
                 }
                 else
                     break;
             }
         }
+    }
+
+    public static void GetAllStats(this ICharacterData data,
+        out CharacterStats resultStats,
+        out Dictionary<Attribute, short> resultAttributes,
+        out Dictionary<DamageElement, float> resultResistances,
+        out Dictionary<DamageElement, MinMaxFloat> resultIncreaseDamages,
+        out Dictionary<Skill, short> resultSkills,
+        out Dictionary<EquipmentSet, int> resultEquipmentSets,
+        out int resultMaxHp,
+        out int resultMaxMp,
+        out int resultMaxStamina,
+        out int resultMaxFood,
+        out int resultMaxWater,
+        out float resultTotalItemWeight,
+        out float resultAtkSpeed,
+        out float resultMoveSpeed)
+    {
+        CharacterStats bonusStats;
+        Dictionary<Attribute, short> bonusAttributes;
+        Dictionary<DamageElement, float> bonusResistances;
+        Dictionary<DamageElement, MinMaxFloat> bonusIncreaseDamages;
+        Dictionary<Skill, short> bonusSkills;
+        GetEquipmentSetBonus(data, out bonusStats, out bonusAttributes, out bonusResistances, out bonusIncreaseDamages, out bonusSkills, out resultEquipmentSets);
+        resultStats = data.GetStats() + bonusStats;
+        resultAttributes = GameDataHelpers.CombineAttributes(data.GetAttributes(), bonusAttributes);
+        resultResistances = GameDataHelpers.CombineResistances(data.GetResistances(), bonusResistances);
+        resultIncreaseDamages = GameDataHelpers.CombineDamages(data.GetIncreaseDamages(), bonusIncreaseDamages);
+        resultSkills = data.GetSkills();
         // Sum with other stats
-        cacheMaxHp = (int)cacheStats.hp;
-        cacheMaxMp = (int)cacheStats.mp;
-        cacheMaxStamina = (int)cacheStats.stamina;
-        cacheMaxFood = (int)cacheStats.food;
-        cacheMaxWater = (int)cacheStats.water;
-        cacheTotalItemWeight = data.GetTotalItemWeight();
-        cacheAtkSpeed = cacheStats.atkSpeed;
-        cacheMoveSpeed = cacheStats.moveSpeed;
+        resultMaxHp = (int)resultStats.hp;
+        resultMaxMp = (int)resultStats.mp;
+        resultMaxStamina = (int)resultStats.stamina;
+        resultMaxFood = (int)resultStats.food;
+        resultMaxWater = (int)resultStats.water;
+        resultTotalItemWeight = data.GetTotalItemWeight();
+        resultAtkSpeed = resultStats.atkSpeed;
+        resultMoveSpeed = resultStats.moveSpeed;
         // Validate max amount
-        foreach (Attribute attribute in new List<Attribute>(cacheAttributes.Keys))
+        foreach (Attribute attribute in new List<Attribute>(resultAttributes.Keys))
         {
-            if (attribute.maxAmount > 0 && cacheAttributes[attribute] > attribute.maxAmount)
-                cacheAttributes[attribute] = attribute.maxAmount;
+            if (attribute.maxAmount > 0 && resultAttributes[attribute] > attribute.maxAmount)
+                resultAttributes[attribute] = attribute.maxAmount;
         }
     }
 }

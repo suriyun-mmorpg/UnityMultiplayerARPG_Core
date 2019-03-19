@@ -395,9 +395,9 @@ public partial class CharacterData : ICharacterData
         this.GetAllStats(
             out cacheStats,
             out cacheAttributes,
-            out cacheSkills,
             out cacheResistances,
             out cacheIncreaseDamages,
+            out cacheSkills,
             out cacheEquipmentSets,
             out cacheMaxHp,
             out cacheMaxMp,
