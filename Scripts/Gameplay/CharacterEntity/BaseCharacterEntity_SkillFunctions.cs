@@ -161,7 +161,7 @@ namespace MultiplayerARPG
 
             // Call on cast skill to extend skill functionality while casting skills
             // Quit function when on cast skill will override default cast skill functionality
-            if (!skill.OnCastSkill(this, characterSkill.level, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition))
+            if (skill.OnCastSkill(this, characterSkill.level, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition))
                 return;
 
             // Play animation on clients

@@ -70,9 +70,9 @@ namespace MultiplayerARPG
             return hasChanges;
         }
 
-        protected override void ApplySkill(CharacterSkill characterSkill, SkillAttackType skillAttackType, bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, bool hasAimPosition, Vector3 aimPosition)
+        protected override void ApplySkill(CharacterSkill characterSkill, bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, bool hasAimPosition, Vector3 aimPosition)
         {
-            base.ApplySkill(characterSkill, skillAttackType, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition);
+            base.ApplySkill(characterSkill, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition);
 
             Skill skill = characterSkill.GetSkill();
             switch (skill.skillType)
@@ -282,7 +282,7 @@ namespace MultiplayerARPG
         {
             // TODO: May send data to client
         }
-        
+
         public abstract float StoppingDistance { get; }
         public abstract void StopMove();
         public abstract void KeyMovement(Vector3 moveDirection, MovementFlag moveState);
