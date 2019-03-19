@@ -1164,7 +1164,7 @@ namespace MultiplayerARPG
             switch (storageId.storageType)
             {
                 case StorageType.Player:
-                    if (!playerCharacterEntity.Id.Equals(storageId.storageOwnerId))
+                    if (!playerCharacterEntity.UserId.Equals(storageId.storageOwnerId))
                         return false;
                     break;
                 case StorageType.Guild:
