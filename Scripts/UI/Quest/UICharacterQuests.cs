@@ -8,6 +8,20 @@ namespace MultiplayerARPG
         public UICharacterQuest uiQuestDialog;
         public UICharacterQuest uiCharacterQuestPrefab;
         public Transform uiCharacterQuestContainer;
+        private bool hideCompletedQuest;
+        public bool HideCompleteQuest
+        {
+            get { return hideCompletedQuest; }
+            set
+            {
+                if (hideCompletedQuest != value)
+                {
+                    hideCompletedQuest = value;
+                    UpdateData();
+                }
+            }
+        }
+
 
         private UIList cacheCharacterQuestList;
         public UIList CacheCharacterQuestList
@@ -79,7 +93,13 @@ namespace MultiplayerARPG
             CacheCharacterQuestSelectionManager.DeselectSelectedUI();
             CacheCharacterQuestSelectionManager.Clear();
 
-            IList<CharacterQuest> characterQuests = BasePlayerCharacterController.OwningCharacter.Quests;
+            List<CharacterQuest> characterQuests = new List<CharacterQuest>();
+            foreach (CharacterQuest characterQuest in BasePlayerCharacterController.OwningCharacter.Quests)
+            {
+                if (HideCompleteQuest || characterQuest.isComplete)
+                    continue;
+                characterQuests.Add(characterQuest);
+            }
             CacheCharacterQuestList.Generate(characterQuests, (index, characterQuest, ui) =>
             {
                 UICharacterQuest uiCharacterQuest = ui.GetComponent<UICharacterQuest>();
