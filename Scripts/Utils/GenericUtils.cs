@@ -207,4 +207,10 @@ public static class GenericUtils
         rect.anchoredPosition = Vector2.zero;
         rect.localScale = Vector2.one;
     }
+
+    public static Color SetAlpha(this Color color, float alpha)
+    {
+        color.a = alpha;
+        return color;
+    }
 }
