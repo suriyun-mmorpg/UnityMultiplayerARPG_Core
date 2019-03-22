@@ -54,6 +54,12 @@ public class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     private Vector3 defaultLocalScale;
     private Button attachedButton;
 
+    protected virtual void Start()
+    {
+        if (rootTransform == null)
+            rootTransform = transform;
+    }
+
     public virtual void OnBeginDrag(PointerEventData eventData)
     {
         if (!CanDrag)

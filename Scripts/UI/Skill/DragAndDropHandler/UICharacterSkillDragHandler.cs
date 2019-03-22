@@ -42,8 +42,9 @@ namespace MultiplayerARPG
             }
         }
 
-        private void Start()
+        protected override void Start()
         {
+            base.Start();
             rootTransform = CacheUI.CacheRoot.transform;
         }
 
