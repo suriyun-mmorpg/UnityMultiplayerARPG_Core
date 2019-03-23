@@ -38,6 +38,8 @@ namespace MultiplayerARPG
 
         [Header("Casting Effects")]
         public GameEffectCollection castingEffects;
+        public bool canBeInterruptedWhileCasting;
+        public IncrementalFloat castingDuration;
 
         [Header("Available Weapons")]
         [Tooltip("An available weapons, if it not set every weapons is available")]
