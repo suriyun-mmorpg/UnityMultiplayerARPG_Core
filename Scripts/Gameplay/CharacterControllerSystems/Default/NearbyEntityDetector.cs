@@ -40,6 +40,12 @@ namespace MultiplayerARPG
         private SphereCollider cacheCollider;
         private CircleCollider2D cacheCollider2D;
 
+        private void Awake()
+        {
+            // Set layer to ignore raycast
+            gameObject.layer = 2;
+        }
+
         private void Start()
         {
             if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
