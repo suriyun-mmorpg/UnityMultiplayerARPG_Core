@@ -230,7 +230,7 @@ namespace MultiplayerARPG
             character = null;
             if (PlayerCharacterEntity.TryGetTargetEntity(out character))
             {
-                if (!character.IsAlly(PlayerCharacterEntity))
+                if (character != PlayerCharacterEntity && !character.IsAlly(PlayerCharacterEntity))
                     return true;
                 else
                     character = null;
