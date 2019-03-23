@@ -69,6 +69,15 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
+    public struct SkillAnimations
+    {
+        public Skill skill;
+        public AnimationClip castClip;
+        public ActionAnimation activateAnimation;
+    }
+
+    // TODO: This is deprecated, it will be removed later
+    [System.Serializable]
     public struct SkillCastAnimations
     {
         public Skill skill;

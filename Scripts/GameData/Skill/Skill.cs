@@ -37,9 +37,9 @@ namespace MultiplayerARPG
         public float moveSpeedRateWhileUsingSkill = 0f;
 
         [Header("Casting Effects")]
-        public GameEffectCollection castingEffects;
+        public GameEffectCollection castEffects;
         public bool canBeInterruptedWhileCasting;
-        public IncrementalFloat castingDuration;
+        public IncrementalFloat castDuration;
 
         [Header("Available Weapons")]
         [Tooltip("An available weapons, if it not set every weapons is available")]

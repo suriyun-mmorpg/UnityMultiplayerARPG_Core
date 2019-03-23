@@ -40,9 +40,9 @@ namespace MultiplayerARPG
             weapon = this.GetRandomedWeapon(out isLeftHand);
             Item weaponItem = weapon.GetWeaponItem();
             WeaponType weaponType = weaponItem.WeaponType;
-            bool hasSkillCastAnimation = CharacterModel.HasSkillCastAnimations(skill);
+            bool hasSkillAnimation = CharacterModel.HasSkillAnimations(skill);
             // Prepare animation
-            if (!hasSkillCastAnimation && skillAttackType != SkillAttackType.None)
+            if (!hasSkillAnimation && skillAttackType != SkillAttackType.None)
             {
                 // If there is no cast animations
                 // Assign data id
@@ -55,14 +55,14 @@ namespace MultiplayerARPG
                 else
                     CharacterModel.GetRandomLeftHandAttackAnimation(dataId, out animationIndex, out triggerDuration, out totalDuration);
             }
-            else if (hasSkillCastAnimation)
+            else if (hasSkillAnimation)
             {
                 // Assign data id
                 dataId = skill.DataId;
                 // Assign animation action type
                 animActionType = AnimActionType.Skill;
                 // Random animation
-                CharacterModel.GetRandomSkillCastAnimation(dataId, out animationIndex, out triggerDuration, out totalDuration);
+                CharacterModel.GetSkillActivateAnimation(dataId, out triggerDuration, out totalDuration);
             }
             // If it is attack skill
             if (skillAttackType != SkillAttackType.None)
@@ -100,15 +100,24 @@ namespace MultiplayerARPG
             }
         }
 
+        protected void InterruptCastingSkill()
+        {
+            if (isCastingSkillCanBeInterrupted && !isCastingSkillInterrupted)
+            {
+                isCastingSkillInterrupted = true;
+                RequestSkillCastingInterrupted();
+            }
+        }
+
         /// <summary>
         /// Is function will be called at server to order character to use skill
         /// </summary>
-        protected virtual void NetFuncUseSkill(int dataId, bool hasAimPosition, Vector3 aimPosition)
+        protected virtual void NetFuncUseSkill(int skillOrWeaponTypeDataId, bool hasAimPosition, Vector3 aimPosition)
         {
             if (!CanUseSkill())
                 return;
 
-            int index = this.IndexOfSkill(dataId);
+            int index = this.IndexOfSkill(skillOrWeaponTypeDataId);
             if (index < 0)
                 return;
 
@@ -130,7 +139,7 @@ namespace MultiplayerARPG
             GetUsingSkillData(
                 characterSkill,
                 out animActionType,
-                out dataId,
+                out skillOrWeaponTypeDataId,
                 out animationIndex,
                 out skillAttackType,
                 out isLeftHand,
@@ -164,21 +173,17 @@ namespace MultiplayerARPG
             if (skill.OnCastSkill(this, characterSkill.level, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition))
                 return;
 
-            // Play animation on clients
-            RequestPlayActionAnimation(animActionType, dataId, (byte)animationIndex);
-
-            // Play casting effects on clients
-            RequestPlayEffect(skill.castingEffects.Id);
-
             // Start use skill routine
             isAttackingOrUsingSkill = true;
-            moveSpeedRateWhileAttackOrUseSkill = skill.moveSpeedRateWhileUsingSkill;
-            StartCoroutine(UseSkillRoutine(characterSkill, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition));
+            StartCoroutine(UseSkillRoutine(animActionType, skillOrWeaponTypeDataId, animationIndex, characterSkill, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition));
 
             this.InvokeInstanceDevExtMethods("NetFuncUseSkill", characterSkill, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition);
         }
 
         private IEnumerator UseSkillRoutine(
+            AnimActionType animActionType,
+            int skillOrWeaponTypeDataId,
+            int animationIndex,
             CharacterSkill characterSkill,
             float triggerDuration,
             float totalDuration,
@@ -189,15 +194,70 @@ namespace MultiplayerARPG
             bool hasAimPosition,
             Vector3 aimPosition)
         {
-            // Update skill usage states
-            CharacterSkillUsage newSkillUsage = CharacterSkillUsage.Create(SkillUsageType.Skill, characterSkill.dataId);
-            newSkillUsage.Use(this, characterSkill.level);
-            skillUsages.Add(newSkillUsage);
+            Skill skill = characterSkill.GetSkill();
+            float castDuration = skill.GetCastDuration(characterSkill.level);
 
-            yield return new WaitForSecondsRealtime(triggerDuration);
-            ApplySkill(characterSkill, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition);
-            yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
+            // Set doing action data
+            isCastingSkillCanBeInterrupted = skill.canBeInterruptedWhileCasting;
+            isCastingSkillInterrupted = false;
+
+            if (castDuration > 0f)
+            {
+                // Play casting effects on clients
+                RequestPlayEffect(skill.castEffects.Id);
+
+                // Tell clients that character is casting
+                RequestSkillCasting(characterSkill.dataId, castDuration);
+
+                yield return new WaitForSecondsRealtime(castDuration);
+            }
+
+            // If skill casting not interrupted, continue doing action
+            if (!isCastingSkillInterrupted || !isCastingSkillCanBeInterrupted)
+            {
+                // Play animation on clients
+                RequestPlayActionAnimation(animActionType, skillOrWeaponTypeDataId, (byte)animationIndex);
+
+                // Update skill usage states
+                CharacterSkillUsage newSkillUsage = CharacterSkillUsage.Create(SkillUsageType.Skill, characterSkill.dataId);
+                newSkillUsage.Use(this, characterSkill.level);
+                skillUsages.Add(newSkillUsage);
+
+                yield return new WaitForSecondsRealtime(triggerDuration);
+                ApplySkill(characterSkill, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition);
+                yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
+            }
             isAttackingOrUsingSkill = false;
+        }
+
+        /// <summary>
+        /// This will be called at clients to play skill casting state with duration
+        /// </summary>
+        /// <param name="duration"></param>
+        protected virtual void NetFuncSkillCasting(int dataId, float duration)
+        {
+            if (IsDead())
+                return;
+            StartCoroutine(SkillCastingRoutine(dataId, duration));
+        }
+
+        private IEnumerator SkillCastingRoutine(int dataId, float duration)
+        {
+            // Set doing action state at clients and server
+            isAttackingOrUsingSkill = true;
+            // Play casting animation
+            if (CharacterModel != null)
+                yield return CharacterModel.PlaySkillCastClip(dataId, duration);
+        }
+
+        /// <summary>
+        /// This will be called at clients to stop playing skill casting
+        /// </summary>
+        protected virtual void NetFuncSkillCastingInterrupted()
+        {
+            isAttackingOrUsingSkill = false;
+            if (CharacterModel != null)
+                CharacterModel.StopActionAnimation();
         }
 
         protected virtual void ApplySkill(CharacterSkill characterSkill, bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, bool hasAimPosition, Vector3 aimPosition)

@@ -65,23 +65,41 @@ namespace MultiplayerARPG
         {
             if (IsDead())
                 return;
-            animActionType = (AnimActionType)byteAnimActionType;
-            StartCoroutine(PlayActionAnimationRoutine(animActionType, dataId, index));
+            StartCoroutine(PlayActionAnimationRoutine((AnimActionType)byteAnimActionType, dataId, index));
         }
 
-        private IEnumerator PlayActionAnimationRoutine(AnimActionType animActionType, int dataId, int index)
+        private IEnumerator PlayActionAnimationRoutine(AnimActionType animActionType, int skillOrWeaponTypeDataId, int index)
         {
+            this.animActionType = animActionType;
             float playSpeedMultiplier = 1f;
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
+                    playSpeedMultiplier = CacheAtkSpeed;
+                    // Set doing action state at clients and server
+                    isAttackingOrUsingSkill = true;
+                    // Calculate move speed rate while doing action at clients and server
+                    moveSpeedRateWhileAttackOrUseSkill = EquipWeapons.rightHand.GetWeaponItem().moveSpeedRateWhileAttacking;
+                    break;
                 case AnimActionType.AttackLeftHand:
                     playSpeedMultiplier = CacheAtkSpeed;
+                    // Set doing action state at clients and server
+                    isAttackingOrUsingSkill = true;
+                    // Calculate move speed rate while doing action at clients and server
+                    moveSpeedRateWhileAttackOrUseSkill = EquipWeapons.leftHand.GetWeaponItem().moveSpeedRateWhileAttacking;
+                    break;
+                case AnimActionType.Skill:
+                    // Set doing action state at clients and server
+                    isAttackingOrUsingSkill = true;
+                    // Calculate move speed rate while doing action at clients and server
+                    moveSpeedRateWhileAttackOrUseSkill = GameInstance.Skills[skillOrWeaponTypeDataId].moveSpeedRateWhileUsingSkill;
                     break;
             }
             if (CharacterModel != null)
-                yield return CharacterModel.PlayActionAnimation(animActionType, dataId, index, playSpeedMultiplier);
+                yield return CharacterModel.PlayActionAnimation(animActionType, skillOrWeaponTypeDataId, index, playSpeedMultiplier);
+            // Set doing action state at clients and server
             this.animActionType = AnimActionType.None;
+            isAttackingOrUsingSkill = false;
         }
 
         /// <summary>

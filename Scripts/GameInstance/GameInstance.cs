@@ -591,7 +591,7 @@ namespace MultiplayerARPG
                 if (skill == null || Skills.ContainsKey(skill.DataId))
                     continue;
                 Skills[skill.DataId] = skill;
-                effects.Add(skill.castingEffects);
+                effects.Add(skill.castEffects);
                 effects.Add(skill.hitEffects);
                 MissileDamageEntity missileDamageEntity = skill.damageInfo.missileDamageEntity;
                 if (missileDamageEntity != null)

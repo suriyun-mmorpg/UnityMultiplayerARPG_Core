@@ -42,11 +42,25 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncUseItem, FunctionReceivers.Server, index);
         }
 
-        public virtual void RequestPlayActionAnimation(AnimActionType animActionType, int dataId, byte index)
+        public virtual void RequestPlayActionAnimation(AnimActionType animActionType, int dataId, byte animationIndex)
         {
             if (IsDead())
                 return;
-            CallNetFunction(NetFuncPlayActionAnimation, FunctionReceivers.All, (byte)animActionType, dataId, index);
+            CallNetFunction(NetFuncPlayActionAnimation, FunctionReceivers.All, (byte)animActionType, dataId, animationIndex);
+        }
+
+        public virtual void RequestSkillCasting(int dataId, float duration)
+        {
+            if (IsDead())
+                return;
+            CallNetFunction(NetFuncSkillCasting, FunctionReceivers.All, dataId, duration);
+        }
+
+        public virtual void RequestSkillCastingInterrupted()
+        {
+            if (IsDead())
+                return;
+            CallNetFunction(NetFuncSkillCastingInterrupted, FunctionReceivers.All);
         }
 
         public virtual void RequestPickupItem(uint objectId)

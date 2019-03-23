@@ -266,18 +266,17 @@ namespace MultiplayerARPG
             return GetRandomLeftHandAttackAnimation(weaponType.DataId, out animationIndex, out triggerDuration, out totalDuration);
         }
 
-        public bool GetRandomSkillCastAnimation(
-            WeaponType weaponType,
-            out int animationIndex,
+        public bool GetSkillActivateAnimation(
+            Skill skill,
             out float triggerDuration,
             out float totalDuration)
         {
-            return GetRandomSkillCastAnimation(weaponType.DataId, out animationIndex, out triggerDuration, out totalDuration);
+            return GetSkillActivateAnimation(skill.DataId, out triggerDuration, out totalDuration);
         }
 
-        public bool HasSkillCastAnimations(Skill skill)
+        public bool HasSkillAnimations(Skill skill)
         {
-            return HasSkillCastAnimations(skill.DataId);
+            return HasSkillAnimations(skill.DataId);
         }
 
         public Transform GetRightHandEquipmentEntity()
@@ -297,12 +296,14 @@ namespace MultiplayerARPG
         public virtual void AddingNewModel(GameObject newModel) { }
         public abstract void UpdateAnimation(bool isDead, MovementFlag movementState, float playMoveSpeedMultiplier = 1f);
         public abstract Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f);
+        public abstract Coroutine PlaySkillCastClip(int dataId, float duration);
+        public abstract void StopActionAnimation();
         public abstract void PlayHurtAnimation();
         public abstract void PlayJumpAnimation();
         public abstract bool GetRandomRightHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration);
         public abstract bool GetRandomLeftHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration);
-        public abstract bool GetRandomSkillCastAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration);
-        public abstract bool HasSkillCastAnimations(int dataId);
+        public abstract bool GetSkillActivateAnimation(int dataId, out float triggerDuration, out float totalDuration);
+        public abstract bool HasSkillAnimations(int dataId);
     }
 
     [System.Serializable]

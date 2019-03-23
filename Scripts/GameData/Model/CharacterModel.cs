@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -39,9 +42,13 @@ namespace MultiplayerARPG
         }
         [Header("Animation Component Type")]
         public AnimatorType animatorType;
+
         [Header("Animator Settings")]
+        [StringShowConditional("animatorType", "Animator")]
         public Animator animator;
+        [StringShowConditional("animatorType", "Animator")]
         public RuntimeAnimatorController animatorController;
+        [StringShowConditional("animatorType", "Animator")]
         public DefaultAnimatorData defaultAnimatorData = new DefaultAnimatorData()
         {
             idleClip = null,
@@ -59,8 +66,11 @@ namespace MultiplayerARPG
             deadClip = null,
             actionClip = null,
         };
+
         [Header("Legacy Animation Settings")]
+        [StringShowConditional("animatorType", "LegacyAnimtion")]
         public Animation legacyAnimation;
+        [StringShowConditional("animatorType", "LegacyAnimtion")]
         public LegacyAnimationData legacyAnimationData = new LegacyAnimationData()
         {
             idleClip = null,
@@ -84,13 +94,21 @@ namespace MultiplayerARPG
             hurtClipFadeLength = 0.1f,
             deadClipFadeLength = 0.1f,
         };
+
         [Header("Renderer")]
         public SkinnedMeshRenderer skinnedMeshRenderer;
 
         [Header("Animations")]
         public ActionAnimation[] defaultAttackAnimations;
-        public ActionAnimation[] defaultSkillCastAnimations;
+        public AnimationClip defaultSkillCastClip;
+        public ActionAnimation defaultSkillActivateAnimation;
         public WeaponAnimations[] weaponAnimations;
+        public SkillAnimations[] skillAnimations;
+
+        // Deprecated
+        [HideInInspector]
+        public ActionAnimation[] defaultSkillCastAnimations;
+        [HideInInspector]
         public SkillCastAnimations[] skillCastAnimations;
 
         // Temp data
@@ -130,27 +148,23 @@ namespace MultiplayerARPG
             }
         }
 
-        private static Dictionary<int, ActionAnimation[]> cacheSkillCastAnimations;
-        public Dictionary<int, ActionAnimation[]> CacheSkillCastAnimations
+        private static Dictionary<int, SkillAnimations> cacheSkillAnimations;
+        public Dictionary<int, SkillAnimations> CacheSkillAnimations
         {
             get
             {
-                if (cacheSkillCastAnimations == null)
+                if (cacheSkillAnimations == null)
                 {
-                    cacheSkillCastAnimations = new Dictionary<int, ActionAnimation[]>();
-                    foreach (SkillCastAnimations skillCastAnimation in skillCastAnimations)
+                    cacheSkillAnimations = new Dictionary<int, SkillAnimations>();
+                    foreach (SkillAnimations skillAnimation in skillAnimations)
                     {
-                        if (skillCastAnimation.skill == null) continue;
-                        cacheSkillCastAnimations[skillCastAnimation.skill.DataId] = skillCastAnimation.castAnimations;
+                        if (skillAnimation.skill == null) continue;
+                        cacheSkillAnimations[skillAnimation.skill.DataId] = skillAnimation;
                     }
                 }
-                return cacheSkillCastAnimations;
+                return cacheSkillAnimations;
             }
         }
-
-        // Optimize garbage collection
-        protected ActionAnimation tempActionAnimation;
-        protected ActionAnimation[] tempActionAnimations;
 
         private AnimatorOverrideController cacheAnimatorController;
         public AnimatorOverrideController CacheAnimatorController
@@ -164,7 +178,46 @@ namespace MultiplayerARPG
 
         private void Awake()
         {
+            MigrateSkillCastAnimations();
             SetupComponent();
+        }
+
+        private void OnValidate()
+        {
+#if UNITY_EDITOR
+            if (MigrateSkillCastAnimations())
+                EditorUtility.SetDirty(this);
+#endif
+        }
+
+        private bool MigrateSkillCastAnimations()
+        {
+            bool hasChanges = false;
+            if (defaultSkillCastAnimations != null &&
+                defaultSkillCastAnimations.Length > 0)
+            {
+                hasChanges = true;
+                defaultSkillActivateAnimation = defaultSkillCastAnimations[0];
+                defaultSkillCastAnimations = null;
+            }
+
+            if (skillCastAnimations != null &&
+                skillCastAnimations.Length > 0)
+            {
+                hasChanges = true;
+                skillAnimations = new SkillAnimations[skillCastAnimations.Length];
+                for (int i = 0; i < skillCastAnimations.Length; ++i)
+                {
+                    SkillAnimations data = new SkillAnimations();
+                    data.skill = skillCastAnimations[i].skill;
+                    if (skillCastAnimations[i].castAnimations != null &&
+                        skillCastAnimations[i].castAnimations.Length > 0)
+                        data.activateAnimation = skillCastAnimations[i].castAnimations[0];
+                    skillAnimations[i] = data;
+                }
+                skillCastAnimations = null;
+            }
+            return hasChanges;
         }
 
         private void SetupComponent()
@@ -558,11 +611,28 @@ namespace MultiplayerARPG
             return StartCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier));
         }
 
+        public override Coroutine PlaySkillCastClip(int dataId, float duration)
+        {
+            if (animatorType == AnimatorType.LegacyAnimtion)
+                return StartCoroutine(PlaySkillCastClip_LegacyAnimation(dataId, duration));
+            return StartCoroutine(PlaySkillCastClip_Animator(dataId, duration));
+        }
+
+        public override void StopActionAnimation()
+        {
+            if (animatorType == AnimatorType.LegacyAnimtion)
+            {
+                CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
+                return;
+            }
+            animator.SetBool(ANIM_DO_ACTION, false);
+        }
+
         #region Action Animation Functions
         private IEnumerator PlayActionAnimation_Animator(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
         {
             // If animator is not null, play the action animation
-            tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
+            ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
             if (tempActionAnimation.clip != null)
             {
                 animator.SetBool(ANIM_DO_ACTION, false);
@@ -583,7 +653,7 @@ namespace MultiplayerARPG
         private IEnumerator PlayActionAnimation_LegacyAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
         {
             // If animator is not null, play the action animation
-            tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
+            ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
             if (tempActionAnimation.clip != null)
             {
                 if (legacyAnimation.GetClip(LEGACY_CLIP_ACTION) != null)
@@ -600,8 +670,36 @@ namespace MultiplayerARPG
                 yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
             }
         }
-        #endregion
 
+        private IEnumerator PlaySkillCastClip_Animator(int dataId, float duration)
+        {
+            AnimationClip castClip = GetSkillCastClip(dataId);
+            if (castClip != null)
+            {
+                animator.SetBool(ANIM_DO_ACTION, false);
+                yield return new WaitForSecondsRealtime(animator.GetAnimatorTransitionInfo(0).duration);
+                CacheAnimatorController[defaultActionClipName] = castClip;
+                animator.SetBool(ANIM_DO_ACTION, true);
+                yield return new WaitForSecondsRealtime(animator.GetAnimatorTransitionInfo(0).duration + duration);
+                animator.SetBool(ANIM_DO_ACTION, false);
+            }
+        }
+
+        private IEnumerator PlaySkillCastClip_LegacyAnimation(int dataId, float duration)
+        {
+            AnimationClip castClip = GetSkillCastClip(dataId);
+            if (castClip != null)
+            {
+                if (legacyAnimation.GetClip(LEGACY_CLIP_ACTION) != null)
+                    legacyAnimation.RemoveClip(LEGACY_CLIP_ACTION);
+                legacyAnimation.AddClip(castClip, LEGACY_CLIP_ACTION);
+                CrossFadeLegacyAnimation(LEGACY_CLIP_ACTION, legacyAnimationData.actionClipFadeLength, WrapMode.Once);
+                yield return new WaitForSecondsRealtime(duration);
+                CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
+            }
+        }
+        #endregion
+        
         public override void PlayHurtAnimation()
         {
             if (animatorType == AnimatorType.LegacyAnimtion)
@@ -627,7 +725,7 @@ namespace MultiplayerARPG
         #region Animation data helpers
         public ActionAnimation GetActionAnimation(AnimActionType animActionType, int dataId, int index)
         {
-            tempActionAnimation = default(ActionAnimation);
+            ActionAnimation tempActionAnimation = default(ActionAnimation);
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
@@ -637,7 +735,7 @@ namespace MultiplayerARPG
                     tempActionAnimation = GetLeftHandAttackAnimations(dataId)[index];
                     break;
                 case AnimActionType.Skill:
-                    tempActionAnimation = GetSkillCastAnimations(dataId)[index];
+                    tempActionAnimation = GetSkillActivateAnimation(dataId);
                     break;
             }
             return tempActionAnimation;
@@ -669,16 +767,20 @@ namespace MultiplayerARPG
             return defaultAttackAnimations;
         }
 
-        public ActionAnimation[] GetSkillCastAnimations(Skill skill)
+        public AnimationClip GetSkillCastClip(int dataId)
         {
-            return GetSkillCastAnimations(skill.DataId);
+            if (CacheSkillAnimations.ContainsKey(dataId) &&
+                CacheSkillAnimations[dataId].castClip != null)
+                return CacheSkillAnimations[dataId].castClip;
+            return defaultSkillCastClip;
         }
 
-        public ActionAnimation[] GetSkillCastAnimations(int dataId)
+        public ActionAnimation GetSkillActivateAnimation(int dataId)
         {
-            if (CacheSkillCastAnimations.ContainsKey(dataId))
-                return CacheSkillCastAnimations[dataId];
-            return defaultSkillCastAnimations;
+            if (CacheSkillAnimations.ContainsKey(dataId) &&
+                CacheSkillAnimations[dataId].activateAnimation.clip != null)
+                return CacheSkillAnimations[dataId].activateAnimation;
+            return defaultSkillActivateAnimation;
         }
 
         public override bool GetRandomRightHandAttackAnimation(
@@ -687,7 +789,7 @@ namespace MultiplayerARPG
             out float triggerDuration,
             out float totalDuration)
         {
-            tempActionAnimations = GetRightHandAttackAnimations(dataId);
+            ActionAnimation[] tempActionAnimations = GetRightHandAttackAnimations(dataId);
             animationIndex = 0;
             triggerDuration = 0f;
             totalDuration = 0f;
@@ -704,7 +806,7 @@ namespace MultiplayerARPG
             out float triggerDuration,
             out float totalDuration)
         {
-            tempActionAnimations = GetLeftHandAttackAnimations(dataId);
+            ActionAnimation[] tempActionAnimations = GetLeftHandAttackAnimations(dataId);
             animationIndex = 0;
             triggerDuration = 0f;
             totalDuration = 0f;
@@ -715,27 +817,20 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override bool GetRandomSkillCastAnimation(
+        public override bool GetSkillActivateAnimation(
             int dataId,
-            out int animationIndex,
             out float triggerDuration,
             out float totalDuration)
         {
-            tempActionAnimations = GetSkillCastAnimations(dataId);
-            animationIndex = 0;
-            triggerDuration = 0f;
-            totalDuration = 0f;
-            if (tempActionAnimations.Length == 0) return false;
-            animationIndex = Random.Range(0, tempActionAnimations.Length);
-            triggerDuration = tempActionAnimations[animationIndex].GetTriggerDuration();
-            totalDuration = tempActionAnimations[animationIndex].GetTotalDuration();
+            ActionAnimation tempActionAnimation = GetSkillActivateAnimation(dataId);
+            triggerDuration = tempActionAnimation.GetTriggerDuration();
+            totalDuration = tempActionAnimation.GetTotalDuration();
             return true;
         }
 
-        public override bool HasSkillCastAnimations(int dataId)
+        public override bool HasSkillAnimations(int dataId)
         {
-            tempActionAnimations = GetSkillCastAnimations(dataId);
-            return tempActionAnimations != null && tempActionAnimations.Length > 0;
+            return CacheSkillAnimations.ContainsKey(dataId);
         }
         #endregion
     }

@@ -137,12 +137,12 @@ namespace MultiplayerARPG
             return level;
         }
 
-        public static float GetCastingDuration(this Skill skill, short level)
+        public static float GetCastDuration(this Skill skill, short level)
         {
             if (skill == null)
                 return 0;
             level = skill.GetAdjustedLevel(level);
-            return skill.castingDuration.GetAmount(level);
+            return skill.castDuration.GetAmount(level);
         }
 
         public static int GetConsumeMp(this Skill skill, short level)

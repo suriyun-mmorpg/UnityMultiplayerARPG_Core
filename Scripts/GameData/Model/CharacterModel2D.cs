@@ -282,6 +282,23 @@ namespace MultiplayerARPG
             }
         }
 
+        public override Coroutine PlaySkillCastClip(int dataId, float duration)
+        {
+            return StartCoroutine(PlaySkillCastClipRoutine(dataId, duration));
+        }
+
+        IEnumerator PlaySkillCastClipRoutine(int dataId, float duration)
+        {
+            playingAction = true;
+            yield return new WaitForSecondsRealtime(duration);
+            playingAction = false;
+        }
+
+        public override void StopActionAnimation()
+        {
+            playingAction = false;
+        }
+
         public override void PlayHurtAnimation()
         {
             // TODO: 2D may just play blink red color
@@ -324,12 +341,11 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override bool GetRandomSkillCastAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration)
+        public override bool GetSkillActivateAnimation(int dataId, out float triggerDuration, out float totalDuration)
         {
             ActionAnimation2D animation2D = null;
             if (!CacheSkillCastAnimations.TryGetValue(dataId, out animation2D))
                 animation2D = defaultSkillCastAnimation2D;
-            animationIndex = 0;
             triggerDuration = 0f;
             totalDuration = 0f;
             if (animation2D == null) return false;
@@ -340,7 +356,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override bool HasSkillCastAnimations(int dataId)
+        public override bool HasSkillAnimations(int dataId)
         {
             ActionAnimation2D animation2D = null;
             if (!CacheSkillCastAnimations.TryGetValue(dataId, out animation2D))

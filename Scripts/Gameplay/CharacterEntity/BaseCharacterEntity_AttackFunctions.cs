@@ -62,7 +62,7 @@ namespace MultiplayerARPG
 
             // Prepare requires data
             AnimActionType animActionType;
-            int dataId;
+            int weaponTypeDataId;
             int animationIndex;
             bool isLeftHand;
             CharacterItem weapon;
@@ -73,7 +73,7 @@ namespace MultiplayerARPG
 
             GetAttackingData(
                 out animActionType,
-                out dataId,
+                out weaponTypeDataId,
                 out animationIndex,
                 out isLeftHand,
                 out weapon,
@@ -114,18 +114,17 @@ namespace MultiplayerARPG
             if (overrideDefaultAttack)
                 return;
 
-            // Play animation on clients
-            RequestPlayActionAnimation(animActionType, dataId, (byte)animationIndex);
-
             // Start attack routine
             isAttackingOrUsingSkill = true;
-            moveSpeedRateWhileAttackOrUseSkill = weapon != null ? weapon.GetWeaponItem().moveSpeedRateWhileAttacking : 0f;
-            StartCoroutine(AttackRoutine(triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition));
+            StartCoroutine(AttackRoutine(animActionType, weaponTypeDataId, animationIndex, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition));
 
             this.InvokeInstanceDevExtMethods("NetFuncAttack", triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition);
         }
 
         private IEnumerator AttackRoutine(
+            AnimActionType animActionType,
+            int weaponTypeDataId,
+            int animationIndex,
             float triggerDuration,
             float totalDuration,
             bool isLeftHand,
@@ -135,6 +134,9 @@ namespace MultiplayerARPG
             bool hasAimPosition,
             Vector3 aimPosition)
         {
+            // Play animation on clients
+            RequestPlayActionAnimation(animActionType, weaponTypeDataId, (byte)animationIndex);
+
             yield return new WaitForSecondsRealtime(triggerDuration);
             LaunchDamageEntity(isLeftHand, weapon, damageInfo, allDamageAmounts, CharacterBuff.Empty, 0, hasAimPosition, aimPosition);
             yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);

@@ -60,6 +60,8 @@ namespace MultiplayerARPG
         /// </summary>
         public bool isRecaching { get; protected set; }
         public bool isAttackingOrUsingSkill { get; protected set; }
+        public bool isCastingSkillCanBeInterrupted { get; protected set; }
+        public bool isCastingSkillInterrupted { get; protected set; }
         public float moveSpeedRateWhileAttackOrUseSkill { get; protected set; }
         #endregion
 
@@ -286,6 +288,7 @@ namespace MultiplayerARPG
                 // Clear action states when character dead
                 animActionType = AnimActionType.None;
                 isAttackingOrUsingSkill = false;
+                InterruptCastingSkill();
             }
             CharacterModel.UpdateAnimation(IsDead(), MovementState, MoveAnimationSpeedMultiplier);
             Profiler.EndSample();
@@ -440,6 +443,7 @@ namespace MultiplayerARPG
         public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)
         {
             base.ReceivedDamage(attacker, combatAmountType, damage);
+            InterruptCastingSkill();
             if (attacker is BaseCharacterEntity)
                 gameInstance.GameplayRule.OnCharacterReceivedDamage(attacker as BaseCharacterEntity, this, combatAmountType, damage);
         }
