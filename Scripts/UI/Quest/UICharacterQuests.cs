@@ -8,15 +8,16 @@ namespace MultiplayerARPG
         public UICharacterQuest uiQuestDialog;
         public UICharacterQuest uiCharacterQuestPrefab;
         public Transform uiCharacterQuestContainer;
-        private bool hideCompletedQuest;
+        [SerializeField]
+        private bool hideCompleteQuest;
         public bool HideCompleteQuest
         {
-            get { return hideCompletedQuest; }
+            get { return hideCompleteQuest; }
             set
             {
-                if (hideCompletedQuest != value)
+                if (hideCompleteQuest != value)
                 {
-                    hideCompletedQuest = value;
+                    hideCompleteQuest = value;
                     UpdateData();
                 }
             }
