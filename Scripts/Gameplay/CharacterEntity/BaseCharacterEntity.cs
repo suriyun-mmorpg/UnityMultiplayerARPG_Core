@@ -62,6 +62,8 @@ namespace MultiplayerARPG
         public bool isAttackingOrUsingSkill { get; protected set; }
         public bool isCastingSkillCanBeInterrupted { get; protected set; }
         public bool isCastingSkillInterrupted { get; protected set; }
+        public float castingSkillDuration { get; protected set; }
+        public float castingSkillCountDown { get; protected set; }
         public float moveSpeedRateWhileAttackOrUseSkill { get; protected set; }
         #endregion
 
@@ -291,6 +293,12 @@ namespace MultiplayerARPG
                 InterruptCastingSkill();
             }
             CharacterModel.UpdateAnimation(IsDead(), MovementState, MoveAnimationSpeedMultiplier);
+            if (castingSkillCountDown > 0)
+            {
+                castingSkillCountDown -= Time.deltaTime;
+                if (castingSkillCountDown < 0)
+                    castingSkillCountDown = 0;
+            }
             Profiler.EndSample();
         }
 

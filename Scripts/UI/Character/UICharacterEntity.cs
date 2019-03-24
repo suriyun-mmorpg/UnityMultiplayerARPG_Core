@@ -23,11 +23,16 @@ namespace MultiplayerARPG
         public string levelFormat = "Lv: {0}";
         [Tooltip("Mp Format => {0} = {Current mp}, {1} = {Max mp}")]
         public string mpFormat = "Mp: {0}/{1}";
+        [Tooltip("Skill Cast Format => {0} = {Count down duration}")]
+        public string skillCastFormat = "{0}";
 
         [Header("Character Entity - UI Elements")]
         public TextWrapper uiTextLevel;
         public TextWrapper uiTextMp;
         public Image imageMpGage;
+        public GameObject uiSkillCastContainer;
+        public TextWrapper uiTextSkillCast;
+        public Image imageSkillCastGage;
         public UICharacter uiCharacter;
 
         private float lastShowTime;
@@ -35,6 +40,8 @@ namespace MultiplayerARPG
         private BaseCharacterEntity tempTargetCharacter;
         protected int currentMp;
         protected int maxMp;
+        protected float castingSkillCountDown;
+        protected float castingSkillDuration;
 
         private Canvas cacheCanvas;
         public Canvas CacheCanvas
@@ -62,10 +69,14 @@ namespace MultiplayerARPG
 
             currentMp = 0;
             maxMp = 0;
+            castingSkillCountDown = 0;
+            castingSkillDuration = 0;
             if (Data != null)
             {
                 currentMp = Data.CurrentMp;
                 maxMp = Data.CacheMaxMp;
+                castingSkillCountDown = Data.castingSkillCountDown;
+                castingSkillDuration = Data.castingSkillDuration;
             }
 
             if (uiTextMp != null)
@@ -73,6 +84,15 @@ namespace MultiplayerARPG
 
             if (imageMpGage != null)
                 imageMpGage.fillAmount = maxMp <= 0 ? 0 : (float)currentMp / (float)maxMp;
+
+            if (uiSkillCastContainer != null)
+                uiSkillCastContainer.SetActive(castingSkillCountDown > 0 && castingSkillDuration > 0);
+
+            if (uiTextSkillCast != null)
+                uiTextSkillCast.text = string.Format(skillCastFormat, castingSkillCountDown.ToString("N0"));
+
+            if (imageSkillCastGage != null)
+                imageSkillCastGage.fillAmount = castingSkillDuration <= 0 ? 0 : 1 - (castingSkillCountDown / castingSkillDuration);
         }
 
         protected override void UpdateUI()

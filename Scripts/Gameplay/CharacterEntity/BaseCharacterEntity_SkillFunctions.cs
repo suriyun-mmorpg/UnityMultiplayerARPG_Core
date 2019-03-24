@@ -238,6 +238,7 @@ namespace MultiplayerARPG
         {
             if (IsDead())
                 return;
+            castingSkillDuration = castingSkillCountDown = duration;
             StartCoroutine(SkillCastingRoutine(dataId, duration));
         }
 
@@ -256,6 +257,7 @@ namespace MultiplayerARPG
         protected virtual void NetFuncSkillCastingInterrupted()
         {
             isAttackingOrUsingSkill = false;
+            castingSkillDuration = castingSkillCountDown = 0;
             if (CharacterModel != null)
                 CharacterModel.StopActionAnimation();
         }
