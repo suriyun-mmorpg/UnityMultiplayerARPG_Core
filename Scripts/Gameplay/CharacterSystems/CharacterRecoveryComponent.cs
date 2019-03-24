@@ -70,6 +70,7 @@ namespace MultiplayerARPG
                     {
                         tempAmount = (int)recoveryData.decreasingHp;
                         characterEntity.CurrentHp -= tempAmount;
+                        characterEntity.RequestCombatAmount(CombatAmountType.NormalDamage, tempAmount);
                         recoveryData.decreasingHp -= tempAmount;
                     }
                 }
@@ -99,6 +100,7 @@ namespace MultiplayerARPG
                     {
                         tempAmount = (int)recoveryData.decreasingMp;
                         characterEntity.CurrentMp -= tempAmount;
+                        characterEntity.RequestCombatAmount(CombatAmountType.MpRecovery, tempAmount);
                         recoveryData.decreasingMp -= tempAmount;
                     }
                 }
@@ -128,6 +130,7 @@ namespace MultiplayerARPG
                     {
                         tempAmount = (int)recoveryData.decreasingStamina;
                         characterEntity.CurrentStamina -= tempAmount;
+                        characterEntity.RequestCombatAmount(CombatAmountType.StaminaRecovery, tempAmount);
                         recoveryData.decreasingStamina -= tempAmount;
                     }
                 }
@@ -156,6 +159,7 @@ namespace MultiplayerARPG
                     {
                         tempAmount = (int)recoveryData.decreasingFood;
                         characterEntity.CurrentFood -= tempAmount;
+                        characterEntity.RequestCombatAmount(CombatAmountType.FoodRecovery, tempAmount);
                         recoveryData.decreasingFood -= tempAmount;
                     }
                 }
@@ -184,6 +188,7 @@ namespace MultiplayerARPG
                     {
                         tempAmount = (int)recoveryData.decreasingWater;
                         characterEntity.CurrentWater -= tempAmount;
+                        characterEntity.RequestCombatAmount(CombatAmountType.WaterRecovery, tempAmount);
                         recoveryData.decreasingWater -= tempAmount;
                     }
                 }
