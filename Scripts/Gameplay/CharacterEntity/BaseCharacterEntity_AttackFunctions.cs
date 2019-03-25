@@ -7,6 +7,8 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
+        public event AttackRoutineDelegate onAttackRoutine;
+
         public virtual void GetAttackingData(
             out AnimActionType animActionType,
             out int dataId,
@@ -117,8 +119,6 @@ namespace MultiplayerARPG
             // Start attack routine
             isAttackingOrUsingSkill = true;
             StartCoroutine(AttackRoutine(animActionType, weaponTypeDataId, animationIndex, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition));
-
-            this.InvokeInstanceDevExtMethods("NetFuncAttack", triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition);
         }
 
         private IEnumerator AttackRoutine(
@@ -134,6 +134,9 @@ namespace MultiplayerARPG
             bool hasAimPosition,
             Vector3 aimPosition)
         {
+            if (onAttackRoutine != null)
+                onAttackRoutine.Invoke(animActionType, weaponTypeDataId, animationIndex, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition);
+
             // Play animation on clients
             RequestPlayActionAnimation(animActionType, weaponTypeDataId, (byte)animationIndex);
 

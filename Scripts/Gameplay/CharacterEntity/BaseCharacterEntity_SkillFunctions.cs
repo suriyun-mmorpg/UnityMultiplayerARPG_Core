@@ -7,6 +7,8 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
+        public event UseSkillRoutineDelegate onUseSkillRoutine;
+
         public virtual void GetUsingSkillData(
             CharacterSkill characterSkill,
             out AnimActionType animActionType,
@@ -176,8 +178,6 @@ namespace MultiplayerARPG
             // Start use skill routine
             isAttackingOrUsingSkill = true;
             StartCoroutine(UseSkillRoutine(animActionType, skillOrWeaponTypeDataId, animationIndex, characterSkill, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition));
-
-            this.InvokeInstanceDevExtMethods("NetFuncUseSkill", characterSkill, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition);
         }
 
         private IEnumerator UseSkillRoutine(
@@ -194,6 +194,9 @@ namespace MultiplayerARPG
             bool hasAimPosition,
             Vector3 aimPosition)
         {
+            if (onUseSkillRoutine != null)
+                onUseSkillRoutine.Invoke(animActionType, skillOrWeaponTypeDataId, animationIndex, characterSkill, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition);
+
             Skill skill = characterSkill.GetSkill();
             float castDuration = skill.GetCastDuration(characterSkill.level);
 

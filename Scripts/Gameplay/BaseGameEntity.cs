@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using LiteNetLib;
 using LiteNetLibManager;
-using UnityEngine.Profiling;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -20,6 +19,17 @@ namespace MultiplayerARPG
         public GameObject[] ownerObjects;
         [Tooltip("These objects will be hidden on owner objects")]
         public GameObject[] nonOwnerObjects;
+
+        #region Events
+        public event GenericDelegate onStart;
+        public event GenericDelegate onEnable;
+        public event GenericDelegate onDisable;
+        public event GenericDelegate onUpdate;
+        public event GenericDelegate onSetup;
+        public event GenericDelegate onSetupNetElements;
+        public event GenericDelegate onSetOwnerClient;
+        public event NetworkDestroyDelegate onNetworkDestroy;
+        #endregion
 
         [SerializeField]
         protected SyncFieldString syncTitle = new SyncFieldString();
@@ -79,19 +89,22 @@ namespace MultiplayerARPG
             EntityAwake();
             this.InvokeInstanceDevExtMethods("Awake");
         }
+
         protected virtual void EntityAwake() { }
 
         private void Start()
         {
             EntityStart();
-            this.InvokeInstanceDevExtMethods("Start");
+            if (onStart != null)
+                onStart.Invoke();
         }
         protected virtual void EntityStart() { }
 
         public override void OnSetOwnerClient()
         {
             EntityOnSetOwnerClient();
-            this.InvokeInstanceDevExtMethods("OnSetOwnerClient");
+            if (onSetOwnerClient != null)
+                onSetOwnerClient.Invoke();
         }
         protected virtual void EntityOnSetOwnerClient()
         {
@@ -110,23 +123,24 @@ namespace MultiplayerARPG
         private void OnEnable()
         {
             EntityOnEnable();
-            this.InvokeInstanceDevExtMethods("OnEnable");
+            if (onEnable != null)
+                onEnable.Invoke();
         }
         protected virtual void EntityOnEnable() { }
 
         private void OnDisable()
         {
             EntityOnDisable();
-            this.InvokeInstanceDevExtMethods("OnDisable");
+            if (onDisable != null)
+                onDisable.Invoke();
         }
         protected virtual void EntityOnDisable() { }
 
         private void Update()
         {
             EntityUpdate();
-            Profiler.BeginSample("RpgNetworkEntity - DevExUpdate");
-            this.InvokeInstanceDevExtMethods("Update");
-            Profiler.EndSample();
+            if (onUpdate != null)
+                onUpdate.Invoke();
         }
         protected virtual void EntityUpdate() { }
 
@@ -163,14 +177,16 @@ namespace MultiplayerARPG
         public override void OnSetup()
         {
             base.OnSetup();
-            this.InvokeInstanceDevExtMethods("OnSetup");
+            if (onSetup != null)
+                onSetup.Invoke();
             SetupNetElements();
             RegisterNetFunction<uint>(NetFuncPlayEffect);
         }
 
         protected virtual void SetupNetElements()
         {
-            this.InvokeInstanceDevExtMethods("SetupNetElements");
+            if (onSetupNetElements != null)
+                onSetupNetElements.Invoke();
             syncTitle.deliveryMethod = DeliveryMethod.ReliableSequenced;
             syncTitle.forOwnerOnly = false;
             syncTitleB.deliveryMethod = DeliveryMethod.ReliableSequenced;
@@ -203,7 +219,8 @@ namespace MultiplayerARPG
         public override void OnNetworkDestroy(byte reasons)
         {
             base.OnNetworkDestroy(reasons);
-            this.InvokeInstanceDevExtMethods("OnNetworkDestroy", reasons);
+            if (onNetworkDestroy != null)
+                onNetworkDestroy.Invoke(reasons);
         }
 
         public bool TryGetEntityByObjectId<T>(uint objectId, out T result) where T : class

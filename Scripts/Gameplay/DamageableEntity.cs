@@ -9,6 +9,11 @@ namespace MultiplayerARPG
     {
         [SerializeField]
         protected SyncFieldInt currentHp = new SyncFieldInt();
+
+        // Events / delegates
+        public event ReceiveDamageDelegate onReceiveDamage;
+        public event ReceivedDamage onReceivedDamage;
+
         public Transform combatTextTransform;
         public Transform CombatTextTransform
         {
@@ -22,7 +27,7 @@ namespace MultiplayerARPG
 
         public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
         public abstract int MaxHp { get; }
-        
+
         public override void OnSetup()
         {
             base.OnSetup();
@@ -56,13 +61,15 @@ namespace MultiplayerARPG
         {
             if (!IsServer || IsDead())
                 return;
-            this.InvokeInstanceDevExtMethods("ReceiveDamage", attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
+            if (onReceiveDamage != null)
+                onReceiveDamage.Invoke(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
         }
 
         public virtual void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)
         {
-            this.InvokeInstanceDevExtMethods("ReceivedDamage", attacker, combatAmountType, damage);
             RequestCombatAmount(combatAmountType, damage);
+            if (onReceivedDamage != null)
+                onReceivedDamage.Invoke(attacker, combatAmountType, damage);
         }
 
         public virtual bool CanReceiveDamageFrom(IAttackerEntity attacker)

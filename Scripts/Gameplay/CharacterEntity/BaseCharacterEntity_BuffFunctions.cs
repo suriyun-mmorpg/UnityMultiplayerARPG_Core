@@ -7,6 +7,8 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
+        public event ApplyBuffDelegate onApplyBuff;
+
         public void ApplyBuff(int dataId, BuffType type, short level)
         {
             if (IsDead() || !IsServer)
@@ -73,8 +75,8 @@ namespace MultiplayerARPG
                 }
             }
             ValidateRecovery();
-
-            this.InvokeInstanceDevExtMethods("ApplyBuff", dataId, type, level);
+            if (onApplyBuff != null)
+                onApplyBuff.Invoke(dataId, type, level);
         }
 
         protected void ApplyPotionBuff(Item item, short level)
