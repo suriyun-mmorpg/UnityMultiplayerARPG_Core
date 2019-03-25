@@ -79,20 +79,26 @@ namespace MultiplayerARPG
                     // Set doing action state at clients and server
                     isAttackingOrUsingSkill = true;
                     // Calculate move speed rate while doing action at clients and server
-                    moveSpeedRateWhileAttackOrUseSkill = EquipWeapons.rightHand.GetWeaponItem().moveSpeedRateWhileAttacking;
+                    moveSpeedRateWhileAttackOrUseSkill = 1f;
+                    if (EquipWeapons != null && EquipWeapons.rightHand != null && EquipWeapons.rightHand.GetWeaponItem() != null)
+                        moveSpeedRateWhileAttackOrUseSkill = EquipWeapons.rightHand.GetWeaponItem().moveSpeedRateWhileAttacking;
                     break;
                 case AnimActionType.AttackLeftHand:
                     playSpeedMultiplier = CacheAtkSpeed;
                     // Set doing action state at clients and server
                     isAttackingOrUsingSkill = true;
                     // Calculate move speed rate while doing action at clients and server
-                    moveSpeedRateWhileAttackOrUseSkill = EquipWeapons.leftHand.GetWeaponItem().moveSpeedRateWhileAttacking;
+                    moveSpeedRateWhileAttackOrUseSkill = 1f;
+                    if (EquipWeapons != null && EquipWeapons.leftHand != null && EquipWeapons.leftHand.GetWeaponItem() != null)
+                        moveSpeedRateWhileAttackOrUseSkill = EquipWeapons.leftHand.GetWeaponItem().moveSpeedRateWhileAttacking;
                     break;
                 case AnimActionType.Skill:
                     // Set doing action state at clients and server
                     isAttackingOrUsingSkill = true;
                     // Calculate move speed rate while doing action at clients and server
-                    moveSpeedRateWhileAttackOrUseSkill = GameInstance.Skills[skillOrWeaponTypeDataId].moveSpeedRateWhileUsingSkill;
+                    moveSpeedRateWhileAttackOrUseSkill = 1f;
+                    if (GameInstance.Skills.ContainsKey(skillOrWeaponTypeDataId))
+                        moveSpeedRateWhileAttackOrUseSkill = GameInstance.Skills[skillOrWeaponTypeDataId].moveSpeedRateWhileUsingSkill;
                     break;
             }
             if (CharacterModel != null)
