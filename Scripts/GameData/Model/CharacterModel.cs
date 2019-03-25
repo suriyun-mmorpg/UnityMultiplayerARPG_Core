@@ -130,7 +130,7 @@ namespace MultiplayerARPG
         private bool isSetupComponent;
         private bool isPlayingActionAnimation;
 
-        private static Dictionary<int, WeaponAnimations> cacheWeaponAnimations;
+        private Dictionary<int, WeaponAnimations> cacheWeaponAnimations;
         public Dictionary<int, WeaponAnimations> CacheWeaponAnimations
         {
             get
@@ -148,7 +148,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private static Dictionary<int, SkillAnimations> cacheSkillAnimations;
+        private Dictionary<int, SkillAnimations> cacheSkillAnimations;
         public Dictionary<int, SkillAnimations> CacheSkillAnimations
         {
             get
