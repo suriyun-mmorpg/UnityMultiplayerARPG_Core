@@ -73,7 +73,6 @@ namespace MultiplayerARPG
         protected Collider[] overlapColliders_ForFindFunctions = new Collider[OVERLAP_COLLIDER_SIZE_FOR_FIND];
         protected Collider2D[] overlapColliders2D_ForFindFunctions = new Collider2D[OVERLAP_COLLIDER_SIZE_FOR_FIND];
         protected GameObject tempGameObject;
-        protected float lastGroundedTime;
         #endregion
 
         #region Caches Data
@@ -223,32 +222,6 @@ namespace MultiplayerARPG
         }
 #endif
 
-        protected void OnCollisionEnter(Collision collision)
-        {
-            foreach (ContactPoint contactPoint in collision.contacts)
-            {
-                if (Mathf.Abs(contactPoint.point.y - CacheTransform.position.y) <= 0.1f)
-                {
-                    lastGroundedTime = Time.fixedUnscaledTime;
-                    IsGrounded = true;
-                    return;
-                }
-            }
-        }
-
-        protected void OnCollisionStay(Collision collision)
-        {
-            foreach (ContactPoint contactPoint in collision.contacts)
-            {
-                if (Mathf.Abs(contactPoint.point.y - CacheTransform.position.y) <= 0.1f)
-                {
-                    lastGroundedTime = Time.fixedUnscaledTime;
-                    IsGrounded = true;
-                    return;
-                }
-            }
-        }
-
         private bool MigrateTransforms()
         {
             bool hasChanges = false;
@@ -300,13 +273,6 @@ namespace MultiplayerARPG
                     castingSkillCountDown = 0;
             }
             Profiler.EndSample();
-        }
-
-        protected override void EntityFixedUpdate()
-        {
-            base.EntityFixedUpdate();
-            if (Time.fixedUnscaledTime - lastGroundedTime > 0.25f)
-                IsGrounded = false;
         }
 
         #region Caches / Relates Objects

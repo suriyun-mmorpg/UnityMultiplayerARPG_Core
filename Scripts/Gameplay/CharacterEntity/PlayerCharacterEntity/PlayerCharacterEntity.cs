@@ -17,10 +17,14 @@ namespace MultiplayerARPG
         [Range(0.01f, 1f)]
         public float stoppingDistance = 0.1f;
         [Header("Movement Settings")]
-        public float groundingDistance = 0.1f;
         public float jumpHeight = 2f;
         public float gravityRate = 1f;
         public float backwardMoveSpeedRate = 0.75f;
+        public float groundCheckDistance = 0.1f; // distance for checking if the controller is grounded ( 0.01f seems to work best for this )
+        public float groundCheckDistanceWhileJump = 0.01f;
+        public float stickToGroundHelperDistance = 0.5f; // stops the character
+        [Tooltip("set it to 0.1 or more if you get stuck in wall")]
+        public float shellOffset = 0f;
         [Header("Network Settings")]
         public MovementSecure movementSecure;
         #endregion
@@ -73,18 +77,20 @@ namespace MultiplayerARPG
         }
 
         // Optimize garbage collector
-        private float tempMoveDirectionMagnitude;
         private Vector3 tempInputDirection;
         private Vector3 tempMoveDirection;
         private Vector3 tempTargetPosition;
         private Vector3 tempCurrentPosition;
-        private Vector3 tempPreviousVelocity;
-        private Vector3 tempTargetVelocity;
+        private Vector3 groundContactNormal;
+        private float tempTargetDistance;
+        private bool previouslyGrounded;
+        private bool applyingJump;
 
         protected override void EntityAwake()
         {
             base.EntityAwake();
-            CacheRigidbody.useGravity = false;
+            CacheRigidbody.useGravity = true;
+            CacheRigidbody.freezeRotation = true;
             StopMove();
         }
 
@@ -113,6 +119,7 @@ namespace MultiplayerARPG
                 return;
 
             tempMoveDirection = Vector3.zero;
+            tempTargetDistance = -1f;
 
             if (HasNavPaths)
             {
@@ -121,7 +128,8 @@ namespace MultiplayerARPG
                 tempCurrentPosition = CacheTransform.position;
                 tempCurrentPosition.y = 0;
                 tempMoveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
-                if (Vector3.Distance(tempTargetPosition, tempCurrentPosition) < StoppingDistance)
+                tempTargetDistance = Vector3.Distance(tempTargetPosition, tempCurrentPosition);
+                if (tempTargetDistance < StoppingDistance)
                 {
                     navPaths.Dequeue();
                     if (!HasNavPaths)
@@ -134,51 +142,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            tempPreviousVelocity = CacheRigidbody.velocity;
-            if (!IsDead())
-            {
-                // If move by WASD keys, set move direction to input direction
-                if (tempInputDirection.magnitude != 0f)
-                    tempMoveDirection = tempInputDirection;
-
-                tempMoveDirectionMagnitude = tempMoveDirection.magnitude;
-                if (tempMoveDirectionMagnitude != 0f)
-                {
-                    if (tempMoveDirectionMagnitude > 1)
-                        tempMoveDirection = tempMoveDirection.normalized;
-
-                    tempTargetVelocity = tempMoveDirection * gameInstance.GameplayRule.GetMoveSpeed(this);
-
-                    // If character move backward
-                    if (Vector3.Angle(tempMoveDirection, CacheTransform.forward) > 120)
-                        tempTargetVelocity *= backwardMoveSpeedRate;
-
-                    if (tempTargetVelocity.magnitude == 0)
-                        tempMoveDirection = Vector3.zero;
-
-                    // Apply a force that attempts to reach our target velocity
-                    Vector3 velocityChange = (tempTargetVelocity - tempPreviousVelocity);
-                    velocityChange.x = Mathf.Clamp(velocityChange.x, -CacheMoveSpeed, CacheMoveSpeed);
-                    velocityChange.y = 0;
-                    velocityChange.z = Mathf.Clamp(velocityChange.z, -CacheMoveSpeed, CacheMoveSpeed);
-                    CacheRigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
-                }
-                else
-                {
-                    // Stop movement
-                    CacheRigidbody.velocity = new Vector3(0, CacheRigidbody.velocity.y, 0);
-                }
-                // Jump
-                if (IsGrounded && IsJumping)
-                {
-                    RequestTriggerJump();
-                    CacheRigidbody.velocity = new Vector3(tempPreviousVelocity.x, CalculateJumpVerticalSpeed(), tempPreviousVelocity.z);
-                    IsJumping = false;
-                }
-            }
-
-            // We apply gravity manually for more tuning control
-            CacheRigidbody.AddForce(new Vector3(0, Physics.gravity.y * CacheRigidbody.mass * gravityRate, 0));
+            UpdateMovement();
 
             if (tempMoveDirection.Equals(Vector3.zero))
             {
@@ -191,6 +155,126 @@ namespace MultiplayerARPG
                 SetMovementState(tempMovementState);
             }
             Profiler.EndSample();
+        }
+
+        private void StickToGroundHelper()
+        {
+            float radius = CacheCapsuleCollider.radius * (1.0f - shellOffset);
+            radius = radius * transform.localScale.z;
+            float maxDistance = ((CacheCapsuleCollider.height / 2f) - CacheCapsuleCollider.radius) + stickToGroundHelperDistance;
+            maxDistance = maxDistance * transform.localScale.y;
+            float centerY = CacheCapsuleCollider.center.y;
+            centerY = centerY * transform.localScale.y;
+            RaycastHit hitInfo;
+            if (Physics.SphereCast(transform.position + Vector3.up * centerY, radius, Vector3.down, out hitInfo,
+                                   maxDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore))
+            {
+                if (Mathf.Abs(Vector3.Angle(hitInfo.normal, Vector3.up)) < 85f)
+                {
+                    CacheRigidbody.velocity = Vector3.ProjectOnPlane(CacheRigidbody.velocity, hitInfo.normal);
+                }
+            }
+        }
+
+        private void GroundCheck()
+        {
+            previouslyGrounded = IsGrounded;
+            float radius = CacheCapsuleCollider.radius * (1.0f - shellOffset);
+            radius = radius * transform.localScale.z;
+            float maxDistance = ((CacheCapsuleCollider.height / 2f) - CacheCapsuleCollider.radius);
+            if (applyingJump)
+                maxDistance += groundCheckDistanceWhileJump;
+            else
+                maxDistance += groundCheckDistance;
+            maxDistance = maxDistance * transform.localScale.y;
+            float centerY = CacheCapsuleCollider.center.y;
+            centerY = centerY * transform.localScale.y;
+            RaycastHit hitInfo;
+            if (Physics.SphereCast(transform.position + Vector3.up * centerY, radius, Vector3.down, out hitInfo,
+                                   maxDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore))
+            {
+                IsGrounded = true;
+                groundContactNormal = hitInfo.normal;
+            }
+            else
+            {
+                IsGrounded = false;
+                groundContactNormal = Vector3.up;
+            }
+            if (!previouslyGrounded && IsGrounded && applyingJump)
+            {
+                applyingJump = false;
+            }
+        }
+
+        private void UpdateMovement()
+        {
+            GroundCheck();
+
+            // If move by WASD keys, set move direction to input direction
+            if (tempInputDirection.magnitude > 0f)
+                tempMoveDirection = tempInputDirection;
+
+            if (IsDead())
+            {
+                tempMoveDirection = Vector3.zero;
+                IsJumping = false;
+            }
+
+            if (tempMoveDirection.magnitude > 0f)
+            {
+                tempMoveDirection = tempMoveDirection.normalized;
+
+                // always move along the camera forward as it is the direction that it being aimed at
+                tempMoveDirection = Vector3.ProjectOnPlane(tempMoveDirection, groundContactNormal).normalized;
+
+                float currentTargetSpeed = gameInstance.GameplayRule.GetMoveSpeed(this);
+                // If character move backward
+                if (Vector3.Angle(tempMoveDirection, CacheTransform.forward) > 120)
+                    currentTargetSpeed *= backwardMoveSpeedRate;
+
+                tempMoveDirection *= currentTargetSpeed;
+                if (IsGrounded)
+                    CacheRigidbody.velocity = tempMoveDirection;
+                else
+                    CacheRigidbody.velocity = new Vector3(tempMoveDirection.x, CacheRigidbody.velocity.y, tempMoveDirection.z);
+            }
+            else
+            {
+                CacheRigidbody.velocity = new Vector3(0f, CacheRigidbody.velocity.y, 0f);
+            }
+
+            if (IsGrounded)
+            {
+                CacheRigidbody.drag = 5f;
+
+                if (IsJumping)
+                {
+                    RequestTriggerJump();
+                    CacheRigidbody.drag = 0f;
+                    CacheRigidbody.velocity = new Vector3(CacheRigidbody.velocity.x, 0f, CacheRigidbody.velocity.z);
+                    CacheRigidbody.AddForce(new Vector3(0f, CalculateJumpVerticalSpeed(), 0f), ForceMode.Impulse);
+                    applyingJump = true;
+                    IsGrounded = false;
+                }
+
+                if (!applyingJump &&
+                    Mathf.Abs(tempMoveDirection.x) < float.Epsilon &&
+                    Mathf.Abs(tempMoveDirection.z) < float.Epsilon &&
+                    CacheRigidbody.velocity.magnitude < 1f)
+                {
+                    CacheRigidbody.Sleep();
+                }
+            }
+            else
+            {
+                CacheRigidbody.drag = 0f;
+                if (previouslyGrounded && !applyingJump)
+                {
+                    StickToGroundHelper();
+                }
+            }
+            IsJumping = false;
         }
 
         protected override void SetupNetElements()
@@ -402,7 +486,7 @@ namespace MultiplayerARPG
         {
             // From the jump height and gravity we deduce the upwards speed 
             // for the character to reach at the apex.
-            return Mathf.Sqrt(2f * jumpHeight * -Physics.gravity.y * gravityRate);
+            return Mathf.Sqrt(2f * jumpHeight * -Physics.gravity.y);
         }
     }
 }
