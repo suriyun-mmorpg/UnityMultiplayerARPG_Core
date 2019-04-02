@@ -32,6 +32,7 @@ namespace MultiplayerARPG
         [Header("Sample 2D Animations")]
         public SampleAnimation sampleAnimation = SampleAnimation.Idle;
         public DirectionType sampleDirection = DirectionType.Down;
+        public bool sampleAlwaysLoop = true;
 
         private Dictionary<int, ActionAnimation2D> cacheRightHandAttackAnimations;
         public Dictionary<int, ActionAnimation2D> CacheRightHandAttackAnimations
@@ -130,6 +131,10 @@ namespace MultiplayerARPG
         {
             if (spriteRenderer == null)
                 return;
+#if UNITY_EDITOR
+            if (!Application.isPlaying && sampleAlwaysLoop)
+                playing = true;
+#endif
             // Increase next frame time while pause
             if (!playing)
             {
@@ -137,7 +142,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Is is time to play next frame?
-            float time = Time.time;
+            float time = Time.realtimeSinceStartup;
             if (time < nextFrameTime)
                 return;
             // Play next frame
@@ -202,7 +207,7 @@ namespace MultiplayerARPG
             secsPerFrame = 1f / anim.framesPerSec;
             currentFrame = -1;
             playing = true;
-            nextFrameTime = Time.time + secsPerFrame;
+            nextFrameTime = Time.realtimeSinceStartup + secsPerFrame;
         }
 
         public void Stop()
