@@ -184,7 +184,8 @@ namespace MultiplayerARPG
 
         private void TriggerEnter(GameObject other)
         {
-            if (FindAndApplyDamage(other))
+            if ((gameInstance.wallOrGroundLayers.value & other.layer) != 0 ||
+                FindAndApplyDamage(other))
             {
                 // Explode immediately when hit something
                 Explode();
@@ -199,11 +200,7 @@ namespace MultiplayerARPG
 
             IDamageableEntity target = other.GetComponent<IDamageableEntity>();
 
-            // If target is null it maybe a wall, so return TRUE to make it explode and destroy from scene
-            if (target == null)
-                return true;
-
-            if (attacker == null || target.IsDead() || attacker.gameObject == target.gameObject || !target.CanReceiveDamageFrom(attacker))
+            if (target == null || attacker == null || target.IsDead() || attacker.gameObject == target.gameObject || !target.CanReceiveDamageFrom(attacker))
                 return false;
 
             if (LockingTarget != null && LockingTarget != target)
