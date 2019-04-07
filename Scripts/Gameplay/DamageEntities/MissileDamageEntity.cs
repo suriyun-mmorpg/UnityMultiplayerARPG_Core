@@ -199,7 +199,11 @@ namespace MultiplayerARPG
 
             IDamageableEntity target = other.GetComponent<IDamageableEntity>();
 
-            if (target == null || attacker == null || target.IsDead() || attacker.gameObject == target.gameObject || !target.CanReceiveDamageFrom(attacker))
+            // If target is null it maybe a wall, so return TRUE to make it explode and destroy from scene
+            if (target == null)
+                return true;
+
+            if (attacker == null || target.IsDead() || attacker.gameObject == target.gameObject || !target.CanReceiveDamageFrom(attacker))
                 return false;
 
             if (LockingTarget != null && LockingTarget != target)
