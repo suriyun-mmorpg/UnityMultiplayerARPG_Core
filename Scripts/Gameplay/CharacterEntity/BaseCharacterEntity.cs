@@ -386,7 +386,7 @@ namespace MultiplayerARPG
                 Killed(attacker);
         }
 
-        protected virtual void GetDamagePositionAndRotation(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, out Vector3 position, out Quaternion rotation)
+        protected virtual void GetDamagePositionAndRotation(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Quaternion rotation)
         {
             position = CacheTransform.position;
             switch (damageType)
@@ -413,9 +413,15 @@ namespace MultiplayerARPG
                     }
                     break;
             }
-            rotation = Quaternion.LookRotation(CacheTransform.forward);
+            Quaternion forwardRotation = Quaternion.LookRotation(CacheTransform.forward);
+            Vector3 forwardStagger = forwardRotation * stagger;
+            rotation = Quaternion.LookRotation(CacheTransform.forward + forwardStagger);
             if (hasAimPosition)
-                rotation = Quaternion.LookRotation((aimPosition - position).normalized);
+            {
+                forwardRotation = Quaternion.LookRotation(aimPosition - position);
+                forwardStagger = forwardRotation * stagger;
+                rotation = Quaternion.LookRotation(aimPosition + forwardStagger - position);
+            }
         }
 
         public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)
@@ -816,8 +822,7 @@ namespace MultiplayerARPG
             IDamageableEntity tempDamageableEntity = null;
             Vector3 damagePosition;
             Quaternion damageRotation;
-            GetDamagePositionAndRotation(damageInfo.damageType, isLeftHand, hasAimPosition, aimPosition, out damagePosition, out damageRotation);
-            damagePosition += stagger * damageRotation;
+            GetDamagePositionAndRotation(damageInfo.damageType, isLeftHand, hasAimPosition, aimPosition, stagger, out damagePosition, out damageRotation);
 #if UNITY_EDITOR
             debugDamagePosition = damagePosition;
             debugDamageRotation = damageRotation;

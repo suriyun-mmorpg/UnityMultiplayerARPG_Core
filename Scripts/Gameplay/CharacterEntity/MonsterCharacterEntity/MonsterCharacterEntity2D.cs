@@ -76,7 +76,7 @@ namespace MultiplayerARPG
             return angle < halfFov;
         }
 
-        protected override void GetDamagePositionAndRotation(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, out Vector3 position, out Quaternion rotation)
+        protected override void GetDamagePositionAndRotation(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Quaternion rotation)
         {
             position = CacheTransform.position;
             if (CharacterModel != null)

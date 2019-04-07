@@ -92,6 +92,7 @@ namespace MultiplayerARPG
         public UnityLayer buildingLayer;
         public UnityLayer harvestableLayer;
         public UnityLayer[] nonTargetingLayers;
+        public LayerMask wallOrGroundLayers;
         [Tooltip("This is duration for Item Entities to appears befor destroyed")]
         public float itemAppearDuration = 60f;
         [Tooltip("This is duration for Item Entities to allow only player who kill monster to pick up item")]
