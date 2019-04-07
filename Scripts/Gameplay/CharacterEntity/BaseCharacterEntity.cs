@@ -116,6 +116,9 @@ namespace MultiplayerARPG
         public virtual bool IsGrounded { get; protected set; }
         public virtual bool IsJumping { get; protected set; }
         public abstract int DataId { get; set; }
+        public CharacterHitBox[] HitBoxes { get; protected set; }
+        public bool HasAimPosition { get; protected set; }
+        public Vector3 AimPosition { get; protected set; }
 
         private BaseCharacterModel characterModel;
         public BaseCharacterModel CharacterModel
@@ -176,6 +179,7 @@ namespace MultiplayerARPG
             isRecaching = true;
             MigrateTransforms();
             MigrateRemoveCharacterAnimationComponent();
+            HitBoxes = GetComponentsInChildren<CharacterHitBox>();
         }
 
         protected override void OnValidate()
@@ -579,6 +583,14 @@ namespace MultiplayerARPG
             if (!IsServer || IsDead() || !CanReceiveDamageFrom(attacker))
                 return;
 
+            if (HitBoxes != null && HitBoxes.Length > 0)
+                return;
+
+            ReceiveDamageFunction(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
+        }
+
+        internal void ReceiveDamageFunction(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
+        {
             base.ReceiveDamage(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
             BaseCharacterEntity attackerCharacter = attacker as BaseCharacterEntity;
 
