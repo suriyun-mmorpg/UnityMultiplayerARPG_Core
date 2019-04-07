@@ -807,7 +807,8 @@ namespace MultiplayerARPG
             CharacterBuff debuff,
             uint hitEffectsId,
             bool hasAimPosition,
-            Vector3 aimPosition)
+            Vector3 aimPosition,
+            Vector3 stagger)
         {
             if (!IsServer)
                 return;
@@ -816,6 +817,7 @@ namespace MultiplayerARPG
             Vector3 damagePosition;
             Quaternion damageRotation;
             GetDamagePositionAndRotation(damageInfo.damageType, isLeftHand, hasAimPosition, aimPosition, out damagePosition, out damageRotation);
+            damagePosition += stagger * damageRotation;
 #if UNITY_EDITOR
             debugDamagePosition = damagePosition;
             debugDamageRotation = damageRotation;

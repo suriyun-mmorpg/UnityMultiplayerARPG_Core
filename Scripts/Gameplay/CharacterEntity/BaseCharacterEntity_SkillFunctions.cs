@@ -307,7 +307,7 @@ namespace MultiplayerARPG
                             hasAimPosition = true;
                             aimPosition = AimPosition;
                         }
-                        LaunchDamageEntity(isLeftHand, weapon, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id, hasAimPosition, aimPosition);
+                        LaunchDamageEntity(isLeftHand, weapon, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id, hasAimPosition, aimPosition, Vector3.zero);
                     }
                     break;
             }
