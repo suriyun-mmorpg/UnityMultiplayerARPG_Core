@@ -32,7 +32,7 @@ public class CharacterItemSerializationSurrogate : ISerializationSurrogate
         // TODO: Backward compatible, this will be removed in future version
         try
         {
-            data.ammo = info.GetInt32("ammo");
+            data.ammo = info.GetInt16("ammo");
         }
         catch { }
         obj = data;

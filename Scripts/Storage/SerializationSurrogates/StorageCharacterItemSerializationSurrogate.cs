@@ -30,7 +30,7 @@ public class StorageCharacterItemSerializationSurrogate : ISerializationSurrogat
         characterItem.durability = info.GetSingle("durability");
         characterItem.exp = info.GetInt32("exp");
         characterItem.lockRemainsDuration = info.GetSingle("lockRemainsDuration");
-        characterItem.ammo = info.GetInt32("ammo");
+        characterItem.ammo = info.GetInt16("ammo");
         data.characterItem = characterItem;
         obj = data;
         return obj;
