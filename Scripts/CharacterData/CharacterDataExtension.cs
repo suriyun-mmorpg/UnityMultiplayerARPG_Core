@@ -791,6 +791,25 @@ public static partial class CharacterDataExtension
         return count;
     }
 
+    public static int CountAmmos(this ICharacterData data, AmmoType ammoType)
+    {
+        if (ammoType == null)
+            return 0;
+        int count = 0;
+        if (data != null && data.NonEquipItems.Count > 0)
+        {
+            Item ammoItem;
+            IList<CharacterItem> nonEquipItems = data.NonEquipItems;
+            foreach (CharacterItem nonEquipItem in nonEquipItems)
+            {
+                ammoItem = nonEquipItem.GetAmmoItem();
+                if (ammoItem != null && ammoType == ammoItem.ammoType)
+                    count += nonEquipItem.amount;
+            }
+        }
+        return count;
+    }
+
     public static CharacterItem GetRandomedWeapon(this ICharacterData data, out bool isLeftHand)
     {
         isLeftHand = false;

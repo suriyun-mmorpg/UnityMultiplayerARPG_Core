@@ -25,9 +25,7 @@ namespace MultiplayerARPG
         bool isLeftHand,
         CharacterItem weapon,
         DamageInfo damageInfo,
-        Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
-        bool hasAimPosition,
-        Vector3 aimPosition);
+        Dictionary<DamageElement, MinMaxFloat> allDamageAmounts);
     public delegate void UseSkillRoutineDelegate(
         AnimActionType animActionType,
         int skillOrWeaponTypeDataId,

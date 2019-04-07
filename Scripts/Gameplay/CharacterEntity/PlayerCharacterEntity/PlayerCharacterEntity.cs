@@ -25,6 +25,7 @@ namespace MultiplayerARPG
         public float stickToGroundHelperDistance = 0.5f; // stops the character
         [Tooltip("set it to 0.1 or more if you get stuck in wall")]
         public float shellOffset = 0f;
+        public bool useNavMeshForKeyMovement;
         [Header("Network Settings")]
         public MovementSecure movementSecure;
         #endregion
@@ -395,6 +396,11 @@ namespace MultiplayerARPG
         {
             if (IsDead())
                 return;
+            if (useNavMeshForKeyMovement)
+            {
+                PointClickMovement(CacheTransform.position + tempInputDirection);
+                return;
+            }
             switch (movementSecure)
             {
                 case MovementSecure.ServerAuthoritative:

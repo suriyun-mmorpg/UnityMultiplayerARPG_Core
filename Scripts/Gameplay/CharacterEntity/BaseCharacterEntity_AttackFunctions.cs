@@ -54,10 +54,49 @@ namespace MultiplayerARPG
                 CacheIncreaseDamages);
         }
 
+        protected virtual void NetFuncReload(bool isLeftHand)
+        {
+            CharacterItem weapon;
+            Item weaponItem;
+            EquipWeapons equipWeapons = EquipWeapons;
+
+            if (isLeftHand)
+                weapon = equipWeapons.leftHand;
+            else
+                weapon = equipWeapons.rightHand;
+
+            if (weapon.IsEmpty())
+                return;
+
+            weaponItem = weapon.GetWeaponItem();
+
+            if (weaponItem != null &&
+                weaponItem.WeaponType != null &&
+                weaponItem.WeaponType.requireAmmoType != null &&
+                weaponItem.ammoCapacity > 0 &&
+                weapon.ammo < weaponItem.ammoCapacity)
+            {
+                int reloadingAmount = weaponItem.ammoCapacity - weapon.ammo;
+                int inventoryAmount = this.CountAmmos(weaponItem.WeaponType.requireAmmoType);
+                if (inventoryAmount < reloadingAmount)
+                    reloadingAmount = inventoryAmount;
+                Dictionary<CharacterItem, short> decreaseItems;
+                if (this.DecreaseAmmos(weaponItem.WeaponType.requireAmmoType, (short)reloadingAmount, out decreaseItems))
+                {
+                    weapon.ammo += (short)reloadingAmount;
+                    if (isLeftHand)
+                        equipWeapons.leftHand = weapon;
+                    else
+                        equipWeapons.rightHand = weapon;
+                    EquipWeapons = equipWeapons;
+                }
+            }
+        }
+
         /// <summary>
         /// Is function will be called at server to order character to attack
         /// </summary>
-        protected virtual void NetFuncAttack(bool hasAimPosition, Vector3 aimPosition)
+        protected virtual void NetFuncAttack()
         {
             if (!CanAttack())
                 return;
@@ -87,17 +126,35 @@ namespace MultiplayerARPG
             // Reduce ammo amount
             if (weapon != null)
             {
-                WeaponType weaponType = weapon.GetWeaponItem().WeaponType;
+                Item weaponItem = weapon.GetWeaponItem();
+                WeaponType weaponType = weaponItem.WeaponType;
                 if (weaponType.requireAmmoType != null)
                 {
-                    Dictionary<CharacterItem, short> decreaseAmmoItems;
-                    if (!this.DecreaseAmmos(weaponType.requireAmmoType, 1, out decreaseAmmoItems))
-                        return;
-                    KeyValuePair<CharacterItem, short> firstEntry = decreaseAmmoItems.FirstOrDefault();
-                    CharacterItem ammoCharacterItem = firstEntry.Key;
-                    Item ammoItem = ammoCharacterItem.GetItem();
-                    if (ammoItem != null && firstEntry.Value > 0)
-                        allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, ammoItem.GetIncreaseDamages(ammoCharacterItem.level, ammoCharacterItem.GetEquipmentBonusRate()));
+                    if (weaponItem.ammoCapacity <= 0)
+                    {
+                        // Reduce ammo from inventory
+                        Dictionary<CharacterItem, short> decreaseAmmoItems;
+                        if (!this.DecreaseAmmos(weaponType.requireAmmoType, 1, out decreaseAmmoItems))
+                            return;
+                        KeyValuePair<CharacterItem, short> firstEntry = decreaseAmmoItems.FirstOrDefault();
+                        CharacterItem ammoCharacterItem = firstEntry.Key;
+                        Item ammoItem = ammoCharacterItem.GetItem();
+                        if (ammoItem != null && firstEntry.Value > 0)
+                            allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, ammoItem.GetIncreaseDamages(ammoCharacterItem.level, ammoCharacterItem.GetEquipmentBonusRate()));
+                    }
+                    else
+                    {
+                        // Reduce ammo that loaded in magazine
+                        if (weapon.ammo <= 0)
+                            return;
+                        weapon.ammo--;
+                        EquipWeapons equipWeapons = EquipWeapons;
+                        if (isLeftHand)
+                            equipWeapons.leftHand = weapon;
+                        else
+                            equipWeapons.rightHand = weapon;
+                        EquipWeapons = equipWeapons;
+                    }
                 }
             }
 
@@ -107,7 +164,7 @@ namespace MultiplayerARPG
             {
                 if (characterSkill.level > 0)
                 {
-                    if (characterSkill.GetSkill().OnAttack(this, characterSkill.level, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition))
+                    if (characterSkill.GetSkill().OnAttack(this, characterSkill.level, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts))
                         overrideDefaultAttack = true;
                 }
             }
@@ -118,7 +175,7 @@ namespace MultiplayerARPG
 
             // Start attack routine
             isAttackingOrUsingSkill = true;
-            StartCoroutine(AttackRoutine(animActionType, weaponTypeDataId, animationIndex, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition));
+            StartCoroutine(AttackRoutine(animActionType, weaponTypeDataId, animationIndex, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts));
         }
 
         private IEnumerator AttackRoutine(
@@ -130,18 +187,16 @@ namespace MultiplayerARPG
             bool isLeftHand,
             CharacterItem weapon,
             DamageInfo damageInfo,
-            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
-            bool hasAimPosition,
-            Vector3 aimPosition)
+            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
             if (onAttackRoutine != null)
-                onAttackRoutine.Invoke(animActionType, weaponTypeDataId, animationIndex, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition);
+                onAttackRoutine.Invoke(animActionType, weaponTypeDataId, animationIndex, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts);
 
             // Play animation on clients
             RequestPlayActionAnimation(animActionType, weaponTypeDataId, (byte)animationIndex);
 
             yield return new WaitForSecondsRealtime(triggerDuration);
-            LaunchDamageEntity(isLeftHand, weapon, damageInfo, allDamageAmounts, CharacterBuff.Empty, 0, hasAimPosition, aimPosition);
+            LaunchDamageEntity(isLeftHand, weapon, damageInfo, allDamageAmounts, CharacterBuff.Empty, 0, HasAimPosition, AimPosition);
             yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
             isAttackingOrUsingSkill = false;
         }

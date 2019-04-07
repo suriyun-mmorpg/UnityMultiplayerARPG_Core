@@ -188,6 +188,8 @@ namespace MultiplayerARPG
                     destination = null;
             }
 
+            PlayerCharacterEntity.RequestUnsetAimPosition();
+
             UpdateInput();
             UpdateFollowTarget();
             UpdateLookAtTarget();

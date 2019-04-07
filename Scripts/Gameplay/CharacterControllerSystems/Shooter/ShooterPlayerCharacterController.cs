@@ -341,7 +341,7 @@ namespace MultiplayerARPG
                         }
                         else if (tempPressAttack)
                         {
-                            Attack(aimPosition);
+                            Attack();
                         }
                         else if (tempPressActivate)
                         {
@@ -366,6 +366,7 @@ namespace MultiplayerARPG
                         targetLookDirection = moveLookDirection;
                 }
             }
+            SetAimPosition(aimPosition);
 
             // Hide Npc UIs when move
             if (moveDirection.magnitude != 0f)
@@ -410,7 +411,7 @@ namespace MultiplayerARPG
                     switch (turningState)
                     {
                         case TurningState.Attack:
-                            Attack(aimPosition);
+                            Attack();
                             break;
                         case TurningState.Activate:
                             Activate();
@@ -479,9 +480,14 @@ namespace MultiplayerARPG
             }
         }
 
-        public void Attack(Vector3 aimPosition)
+        public void SetAimPosition(Vector3 aimPosition)
         {
-            PlayerCharacterEntity.RequestAttack(aimPosition);
+            PlayerCharacterEntity.RequestSetAimPosition(aimPosition);
+        }
+
+        public void Attack()
+        {
+            PlayerCharacterEntity.RequestAttack();
         }
 
         public void Activate()

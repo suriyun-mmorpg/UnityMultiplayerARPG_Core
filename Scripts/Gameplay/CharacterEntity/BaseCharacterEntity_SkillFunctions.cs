@@ -153,18 +153,36 @@ namespace MultiplayerARPG
 
             if (weapon != null)
             {
-                WeaponType weaponType = weapon.GetWeaponItem().WeaponType;
+                Item weaponItem = weapon.GetWeaponItem();
+                WeaponType weaponType = weaponItem.WeaponType;
                 // Reduce ammo amount
                 if (skillAttackType != SkillAttackType.None && weaponType.requireAmmoType != null)
                 {
-                    Dictionary<CharacterItem, short> decreaseItems;
-                    if (!this.DecreaseAmmos(weaponType.requireAmmoType, 1, out decreaseItems))
-                        return;
-                    KeyValuePair<CharacterItem, short> firstEntry = decreaseItems.FirstOrDefault();
-                    CharacterItem characterItem = firstEntry.Key;
-                    Item item = characterItem.GetItem();
-                    if (item != null && firstEntry.Value > 0)
-                        allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, item.GetIncreaseDamages(characterItem.level, characterItem.GetEquipmentBonusRate()));
+                    if (weaponItem.ammoCapacity <= 0)
+                    {
+                        // Reduce ammo from inventory
+                        Dictionary<CharacterItem, short> decreaseAmmoItems;
+                        if (!this.DecreaseAmmos(weaponType.requireAmmoType, 1, out decreaseAmmoItems))
+                            return;
+                        KeyValuePair<CharacterItem, short> firstEntry = decreaseAmmoItems.FirstOrDefault();
+                        CharacterItem characterItem = firstEntry.Key;
+                        Item item = characterItem.GetItem();
+                        if (item != null && firstEntry.Value > 0)
+                            allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, item.GetIncreaseDamages(characterItem.level, characterItem.GetEquipmentBonusRate()));
+                    }
+                    else
+                    {
+                        // Reduce ammo that loaded in magazine
+                        if (weapon.ammo <= 0)
+                            return;
+                        weapon.ammo--;
+                        EquipWeapons equipWeapons = EquipWeapons;
+                        if (isLeftHand)
+                            equipWeapons.leftHand = weapon;
+                        else
+                            equipWeapons.rightHand = weapon;
+                        EquipWeapons = equipWeapons;
+                    }
                 }
             }
 
@@ -283,6 +301,12 @@ namespace MultiplayerARPG
                         CharacterBuff debuff = CharacterBuff.Empty;
                         if (skill.isDebuff)
                             debuff = CharacterBuff.Create(BuffType.SkillDebuff, skill.DataId, characterSkill.level);
+                        // TODO: some skill type will not able to change aim position by controller
+                        if (!hasAimPosition && HasAimPosition)
+                        {
+                            hasAimPosition = true;
+                            aimPosition = AimPosition;
+                        }
                         LaunchDamageEntity(isLeftHand, weapon, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id, hasAimPosition, aimPosition);
                     }
                     break;

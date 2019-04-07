@@ -174,8 +174,6 @@ namespace MultiplayerARPG
         /// <param name="weapon"></param>
         /// <param name="damageInfo"></param>
         /// <param name="allDamageAmounts"></param>
-        /// <param name="hasAimPosition"></param>
-        /// <param name="aimPosition"></param>
         /// <returns></returns>
         public virtual bool OnAttack(
             BaseCharacterEntity character,
@@ -185,9 +183,7 @@ namespace MultiplayerARPG
             bool isLeftHand,
             CharacterItem weapon,
             DamageInfo damageInfo,
-            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
-            bool hasAimPosition,
-            Vector3 aimPosition)
+            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
             return false;
         }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using LiteNetLib;
 using LiteNetLibManager;
 
 namespace MultiplayerARPG
@@ -11,14 +12,21 @@ namespace MultiplayerARPG
         {
             if (!CanAttack())
                 return;
-            CallNetFunction(NetFuncAttackWithoutAimPosition, FunctionReceivers.Server);
+            CallNetFunction(NetFuncAttack, FunctionReceivers.Server);
         }
 
-        public virtual void RequestAttack(Vector3 aimPosition)
+        public virtual void RequestSetAimPosition(Vector3 aimPosition)
         {
             if (!CanAttack())
                 return;
-            CallNetFunction(NetFuncAttackWithAimPosition, FunctionReceivers.Server, aimPosition);
+            CallNetFunction(NetFuncSetAimPosition, DeliveryMethod.Sequenced, FunctionReceivers.Server, aimPosition);
+        }
+
+        public virtual void RequestUnsetAimPosition()
+        {
+            if (!CanAttack())
+                return;
+            CallNetFunction(NetFuncUnsetAimPosition, FunctionReceivers.Server);
         }
 
         public virtual void RequestUseSkill(int dataId)
@@ -144,6 +152,11 @@ namespace MultiplayerARPG
         public virtual void RequestSwapOrMergeNonEquipItems(short index1, short index2)
         {
             CallNetFunction(NetFuncSwapOrMergeNonEquipItems, FunctionReceivers.Server, index1, index2);
+        }
+
+        public virtual void RequestReload(bool isLeftHand)
+        {
+            CallNetFunction(NetFuncReload, FunctionReceivers.Server, isLeftHand);
         }
     }
 }

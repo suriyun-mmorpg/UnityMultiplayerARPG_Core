@@ -63,8 +63,9 @@ namespace MultiplayerARPG
             nonEquipItems.onOperation += OnNonEquipItemsOperation;
             summons.onOperation += OnSummonsOperation;
             // Register Network functions
-            RegisterNetFunction(NetFuncAttackWithoutAimPosition);
-            RegisterNetFunction<Vector3>(NetFuncAttackWithAimPosition);
+            RegisterNetFunction<Vector3>(NetFuncSetAimPosition);
+            RegisterNetFunction(NetFuncUnsetAimPosition);
+            RegisterNetFunction(NetFuncAttack);
             RegisterNetFunction<int>(NetFuncUseSkillWithoutAimPosition);
             RegisterNetFunction<int, Vector3>(NetFuncUseSkillWithAimPosition);
             RegisterNetFunction<short>(NetFuncUseItem);
@@ -80,6 +81,7 @@ namespace MultiplayerARPG
             RegisterNetFunction(NetFuncOnLevelUp);
             RegisterNetFunction<PackedUInt>(NetFuncUnSummon);
             RegisterNetFunction<short, short>(NetFuncSwapOrMergeNonEquipItems);
+            RegisterNetFunction<bool>(NetFuncReload);
         }
 
         protected override void EntityOnDestroy()

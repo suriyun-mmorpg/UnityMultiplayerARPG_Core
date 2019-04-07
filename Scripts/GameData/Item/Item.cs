@@ -6,7 +6,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public enum ItemType
+    public enum ItemType : byte
     {
         Junk,
         Armor,
@@ -16,6 +16,12 @@ namespace MultiplayerARPG
         Ammo,
         Building,
         Pet,
+    }
+
+    public enum FireType : byte
+    {
+        SingleFire,
+        Automatic,
     }
 
     [CreateAssetMenu(fileName = "Item", menuName = "Create GameData/Item")]
@@ -36,6 +42,9 @@ namespace MultiplayerARPG
 
         // Weapon
         public WeaponType weaponType;
+        public FireType fireType;
+        [Tooltip("Amount of ammo reloading each time, for example macine gun may set this to 30 as magazine capacity, if this is 0 it will not need to have ammo loaded to shoot but still need ammo in inventory")]
+        public short ammoCapacity;
         [Range(0f, 1f)]
         [Tooltip("This is move speed rate while attacking with this weapon")]
         public float moveSpeedRateWhileAttacking = 0f;

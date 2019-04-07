@@ -12,14 +12,16 @@ namespace MultiplayerARPG
         public System.Action onRespawn;
         public System.Action onLevelUp;
 
-        protected void NetFuncAttackWithoutAimPosition()
+        protected void NetFuncSetAimPosition(Vector3 aimPosition)
         {
-            NetFuncAttack(false, Vector3.zero);
+            HasAimPosition = true;
+            AimPosition = aimPosition;
         }
 
-        protected void NetFuncAttackWithAimPosition(Vector3 aimPosition)
+        protected void NetFuncUnsetAimPosition()
         {
-            NetFuncAttack(true, aimPosition);
+            HasAimPosition = false;
+            AimPosition = Vector3.zero;
         }
 
         protected void NetFuncUseSkillWithoutAimPosition(int dataId)

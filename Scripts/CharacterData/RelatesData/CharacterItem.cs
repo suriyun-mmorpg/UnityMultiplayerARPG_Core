@@ -12,7 +12,7 @@ public class CharacterItem : INetSerializable
     public float durability;
     public int exp;
     public float lockRemainsDuration;
-    public int ammo;
+    public short ammo;
     // TODO: I want to add random item bonus
     [System.NonSerialized]
     private int dirtyDataId;
@@ -252,7 +252,7 @@ public class CharacterItem : INetSerializable
         durability = reader.GetFloat();
         exp = reader.GetInt();
         lockRemainsDuration = reader.GetFloat();
-        ammo = reader.GetInt();
+        ammo = reader.GetShort();
     }
 }
 
