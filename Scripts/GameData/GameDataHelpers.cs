@@ -13,6 +13,8 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(Dictionary<DamageElement, MinMaxFloat> sourceDictionary, KeyValuePair<DamageElement, MinMaxFloat> newEntry)
         {
+            if (sourceDictionary == null)
+                sourceDictionary = new Dictionary<DamageElement, MinMaxFloat>();
             GameInstance gameInstance = GameInstance.Singleton;
             DamageElement damageElement = newEntry.Key;
             if (damageElement == null)
@@ -33,6 +35,8 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public static Dictionary<DamageElement, float> CombineDamageInflictions(Dictionary<DamageElement, float> sourceDictionary, KeyValuePair<DamageElement, float> newEntry)
         {
+            if (sourceDictionary == null)
+                sourceDictionary = new Dictionary<DamageElement, float>();
             GameInstance gameInstance = GameInstance.Singleton;
             DamageElement damageElement = newEntry.Key;
             if (damageElement == null)
@@ -53,6 +57,8 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public static Dictionary<Attribute, short> CombineAttributes(Dictionary<Attribute, short> sourceDictionary, KeyValuePair<Attribute, short> newEntry)
         {
+            if (sourceDictionary == null)
+                sourceDictionary = new Dictionary<Attribute, short>();
             Attribute attribute = newEntry.Key;
             if (attribute != null)
             {
@@ -73,6 +79,8 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public static Dictionary<DamageElement, float> CombineResistances(Dictionary<DamageElement, float> sourceDictionary, KeyValuePair<DamageElement, float> newEntry)
         {
+            if (sourceDictionary == null)
+                sourceDictionary = new Dictionary<DamageElement, float>();
             DamageElement damageElement = newEntry.Key;
             if (damageElement != null)
             {
@@ -93,6 +101,8 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public static Dictionary<Skill, short> CombineSkills(Dictionary<Skill, short> sourceDictionary, KeyValuePair<Skill, short> newEntry)
         {
+            if (sourceDictionary == null)
+                sourceDictionary = new Dictionary<Skill, short>();
             Skill skill = newEntry.Key;
             if (skill != null)
             {
@@ -113,6 +123,8 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public static Dictionary<Item, short> CombineItems(Dictionary<Item, short> sourceDictionary, KeyValuePair<Item, short> newEntry)
         {
+            if (sourceDictionary == null)
+                sourceDictionary = new Dictionary<Item, short>();
             Item item = newEntry.Key;
             if (item != null)
             {
@@ -135,6 +147,8 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(Dictionary<DamageElement, MinMaxFloat> sourceDictionary, Dictionary<DamageElement, MinMaxFloat> combineDictionary)
         {
+            if (sourceDictionary == null)
+                sourceDictionary = new Dictionary<DamageElement, MinMaxFloat>();
             if (combineDictionary != null)
             {
                 foreach (KeyValuePair<DamageElement, MinMaxFloat> entry in combineDictionary)
@@ -153,6 +167,8 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public static Dictionary<DamageElement, float> CombineDamageInflictions(Dictionary<DamageElement, float> sourceDictionary, Dictionary<DamageElement, float> combineDictionary)
         {
+            if (sourceDictionary == null)
+                sourceDictionary = new Dictionary<DamageElement, float>();
             if (combineDictionary != null)
             {
                 foreach (KeyValuePair<DamageElement, float> entry in combineDictionary)
@@ -171,6 +187,8 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public static Dictionary<Attribute, short> CombineAttributes(Dictionary<Attribute, short> sourceDictionary, Dictionary<Attribute, short> combineDictionary)
         {
+            if (sourceDictionary == null)
+                sourceDictionary = new Dictionary<Attribute, short>();
             if (combineDictionary != null)
             {
                 foreach (KeyValuePair<Attribute, short> entry in combineDictionary)
@@ -189,6 +207,8 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public static Dictionary<DamageElement, float> CombineResistances(Dictionary<DamageElement, float> sourceDictionary, Dictionary<DamageElement, float> combineDictionary)
         {
+            if (sourceDictionary == null)
+                sourceDictionary = new Dictionary<DamageElement, float>();
             if (combineDictionary != null)
             {
                 foreach (KeyValuePair<DamageElement, float> entry in combineDictionary)
@@ -207,6 +227,8 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public static Dictionary<Skill, short> CombineSkills(Dictionary<Skill, short> sourceDictionary, Dictionary<Skill, short> combineDictionary)
         {
+            if (sourceDictionary == null)
+                sourceDictionary = new Dictionary<Skill, short>();
             if (combineDictionary != null)
             {
                 foreach (KeyValuePair<Skill, short> entry in combineDictionary)
@@ -225,6 +247,8 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public static Dictionary<Item, short> CombineItems(Dictionary<Item, short> sourceDictionary, Dictionary<Item, short> combineDictionary)
         {
+            if (sourceDictionary == null)
+                sourceDictionary = new Dictionary<Item, short>();
             if (combineDictionary != null)
             {
                 foreach (KeyValuePair<Item, short> entry in combineDictionary)
