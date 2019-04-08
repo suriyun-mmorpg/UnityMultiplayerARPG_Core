@@ -43,7 +43,7 @@ namespace MultiplayerARPG
 
         public static bool CanLevelUp(this Skill skill, IPlayerCharacterData character, short level)
         {
-            if (skill == null || character == null)
+            if (skill == null || character == null || !character.GetDatabase().CacheSkillLevels.ContainsKey(skill))
                 return false;
 
             // Check is it pass attribute requirement or not

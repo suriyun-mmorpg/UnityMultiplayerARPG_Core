@@ -8,6 +8,7 @@ namespace MultiplayerARPG
         public ICharacterData character { get; protected set; }
         public UICharacterSkill uiSkillDialog;
         public UICharacterSkill uiCharacterSkillPrefab;
+        public List<string> filterCategories;
         public List<SkillType> filterSkillTypes;
         public Transform uiCharacterSkillContainer;
 
@@ -86,6 +87,7 @@ namespace MultiplayerARPG
                 return;
             }
 
+            // All skills included equipment skill levels
             displayingSkills = character.GetSkills();
 
             BaseCharacter database = character.GetDatabase();
@@ -95,18 +97,25 @@ namespace MultiplayerARPG
                 Skill tempSkill;
                 int tempIndexOfSkill;
                 short tempLevel;
-                Dictionary<Skill, short> skillLevels = database.CacheSkillLevels;
-                if (filterSkillTypes != null && filterSkillTypes.Count > 0)
+                // Combine skills from database (skill that can level up) and equipment skills
+                Dictionary<Skill, short> skillLevels = new Dictionary<Skill, short>();
+                skillLevels = GameDataHelpers.CombineSkills(skillLevels, database.CacheSkillLevels);
+                skillLevels = GameDataHelpers.CombineSkills(skillLevels, character.GetEquipmentSkills());
+                // Filter skills to show by specific skill types / categories
+                Dictionary<Skill, short> filteredSkillLevels = new Dictionary<Skill, short>();
+                foreach (KeyValuePair<Skill, short> skillLevel in skillLevels)
                 {
-                    // Filter skills to show by specific skill types
-                    Dictionary<Skill, short> filteredSkillLevels = new Dictionary<Skill, short>();
-                    foreach (KeyValuePair<Skill, short> skillLevel in skillLevels)
+                    if (string.IsNullOrEmpty(skillLevel.Key.category) ||
+                        filterCategories == null || filterCategories.Count == 0 ||
+                        filterCategories.Contains(skillLevel.Key.category))
                     {
-                        if (filterSkillTypes.Contains(skillLevel.Key.skillType))
+                        if (filterSkillTypes == null || filterSkillTypes.Count == 0 ||
+                            filterSkillTypes.Contains(skillLevel.Key.skillType))
                             filteredSkillLevels.Add(skillLevel.Key, skillLevel.Value);
                     }
-                    skillLevels = filteredSkillLevels;
                 }
+                skillLevels = filteredSkillLevels;
+                // Generate UIs
                 CacheCharacterSkillList.Generate(skillLevels, (index, skillLevel, ui) =>
                 {
                     UICharacterSkill uiCharacterSkill = ui.GetComponent<UICharacterSkill>();

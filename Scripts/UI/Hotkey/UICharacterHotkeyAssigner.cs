@@ -98,11 +98,7 @@ namespace MultiplayerARPG
             CharacterSkill tempCharacterSkill;
             foreach (KeyValuePair<Skill, short> characterSkill in owningCharacter.CacheSkills)
             {
-                tempCharacterSkill = new CharacterSkill()
-                {
-                    dataId = characterSkill.Key.DataId,
-                    level = characterSkill.Value
-                };
+                tempCharacterSkill = CharacterSkill.Create(characterSkill.Key, characterSkill.Value);
                 if (uiCharacterHotkey.CanAssignCharacterSkill(tempCharacterSkill))
                 {
                     filterSkills.Add(tempCharacterSkill);

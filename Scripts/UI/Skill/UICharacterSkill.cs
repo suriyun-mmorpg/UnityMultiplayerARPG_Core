@@ -121,7 +121,7 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            if (IsOwningCharacter() && Skill.CanLevelUp(OwningCharacter, Level))
+            if (IsOwningCharacter() && CharacterSkill.CanLevelUp(OwningCharacter))
                 onAbleToLevelUp.Invoke();
             else
                 onUnableToLevelUp.Invoke();
