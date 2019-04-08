@@ -158,6 +158,15 @@ namespace MultiplayerARPG
             Profiler.EndSample();
         }
 
+        private int GetGroundDetectionLayerMask()
+        {
+            int layerMask = -1;
+            layerMask = layerMask | ~(gameInstance.characterLayer.Mask);
+            layerMask = layerMask | ~(gameInstance.itemDropLayer.Mask);
+            layerMask = layerMask | ~(gameInstance.harvestableLayer.Mask);
+            return layerMask;
+        }
+
         private void StickToGroundHelper()
         {
             float radius = CacheCapsuleCollider.radius * (1.0f - shellOffset);
@@ -168,7 +177,7 @@ namespace MultiplayerARPG
             centerY = centerY * transform.localScale.y;
             RaycastHit hitInfo;
             if (Physics.SphereCast(transform.position + Vector3.up * centerY, radius, Vector3.down, out hitInfo,
-                                   maxDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore))
+                                   maxDistance, GetGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore))
             {
                 if (Mathf.Abs(Vector3.Angle(hitInfo.normal, Vector3.up)) < 85f)
                 {
@@ -192,7 +201,7 @@ namespace MultiplayerARPG
             centerY = centerY * transform.localScale.y;
             RaycastHit hitInfo;
             if (Physics.SphereCast(transform.position + Vector3.up * centerY, radius, Vector3.down, out hitInfo,
-                                   maxDistance, Physics.AllLayers, QueryTriggerInteraction.Ignore))
+                                   maxDistance, GetGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore))
             {
                 IsGrounded = true;
                 groundContactNormal = hitInfo.normal;

@@ -184,13 +184,22 @@ namespace MultiplayerARPG
 
         private void TriggerEnter(GameObject other)
         {
-            if ((gameInstance.wallOrGroundLayers.value & other.layer) != 0 ||
-                FindAndApplyDamage(other))
+            if (IsHitGroundOrWall(other) || FindAndApplyDamage(other))
             {
                 // Explode immediately when hit something
                 Explode();
                 NetworkDestroy(destroyDelay);
             }
+        }
+
+        private bool IsHitGroundOrWall(GameObject other)
+        {
+            foreach (int layer in gameInstance.groundOrWallLayers)
+            {
+                if (other.layer == layer)
+                    return true;
+            }
+            return false;
         }
 
         private bool FindAndApplyDamage(GameObject other)
@@ -199,7 +208,7 @@ namespace MultiplayerARPG
                 return false;
 
             IDamageableEntity target = other.GetComponent<IDamageableEntity>();
-
+            
             if (target == null || attacker == null || target.IsDead() || attacker.gameObject == target.gameObject || !target.CanReceiveDamageFrom(attacker))
                 return false;
 
