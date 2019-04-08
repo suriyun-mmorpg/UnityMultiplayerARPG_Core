@@ -74,6 +74,15 @@ namespace MultiplayerARPG
                 result = GameDataHelpers.CombineDamages(equipmentItem.increaseDamages, result, level, rate);
             return result;
         }
+
+        public static Dictionary<Skill, short> GetIncreaseSkills(this Item equipmentItem)
+        {
+            Dictionary<Skill, short> result = new Dictionary<Skill, short>();
+            if (equipmentItem != null &&
+                equipmentItem.IsEquipment())
+                result = GameDataHelpers.CombineSkills(equipmentItem.increaseSkillLevels, result);
+            return result;
+        }
         #endregion
 
         #region Weapon Extension

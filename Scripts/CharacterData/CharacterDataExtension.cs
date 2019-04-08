@@ -171,6 +171,8 @@ public static partial class CharacterDataExtension
 
     public static Dictionary<Attribute, short> GetBuffAttributes(this ICharacterData data)
     {
+        if (data == null)
+            return new Dictionary<Attribute, short>();
         Dictionary<Attribute, short> result = new Dictionary<Attribute, short>();
         IList<CharacterBuff> buffs = data.Buffs;
         foreach (CharacterBuff buff in buffs)
@@ -199,8 +201,10 @@ public static partial class CharacterDataExtension
         return result;
     }
 
-    public static Dictionary<Skill, short> GetSkills(this ICharacterData data)
+    public static Dictionary<Skill, short> GetCharacterSkills(this ICharacterData data)
     {
+        if (data == null)
+            return new Dictionary<Skill, short>();
         Dictionary<Skill, short> result = new Dictionary<Skill, short>();
         // Added skills
         IList<CharacterSkill> skills = data.Skills;
@@ -215,6 +219,46 @@ public static partial class CharacterDataExtension
             else
                 result[key] += value;
         }
+        return result;
+    }
+
+    public static Dictionary<Skill, short> GetEquipmentSkills(this ICharacterData data)
+    {
+        if (data == null)
+            return new Dictionary<Skill, short>();
+        Dictionary<Skill, short> result = new Dictionary<Skill, short>();
+        // Armors
+        Item tempEquipment = null;
+        IList<CharacterItem> equipItems = data.EquipItems;
+        foreach (CharacterItem equipItem in equipItems)
+        {
+            tempEquipment = equipItem.GetEquipmentItem();
+            if (tempEquipment != null)
+                result = GameDataHelpers.CombineSkills(tempEquipment.GetIncreaseSkills(), result);
+        }
+        // Weapons
+        EquipWeapons equipWeapons = data.EquipWeapons;
+        if (equipWeapons != null)
+        {
+            // Right hand equipment
+            CharacterItem rightHandItem = equipWeapons.rightHand;
+            tempEquipment = rightHandItem.GetEquipmentItem();
+            if (tempEquipment != null)
+                result = GameDataHelpers.CombineSkills(tempEquipment.GetIncreaseSkills(), result);
+            // Left hand equipment
+            CharacterItem leftHandItem = equipWeapons.leftHand;
+            tempEquipment = leftHandItem.GetEquipmentItem();
+            if (tempEquipment != null)
+                result = GameDataHelpers.CombineSkills(tempEquipment.GetIncreaseSkills(), result);
+        }
+        return result;
+    }
+
+    public static Dictionary<Skill, short> GetSkills(this ICharacterData data, bool sumWithEquipments = true)
+    {
+        Dictionary<Skill, short> result = data.GetCharacterSkills();
+        if (sumWithEquipments)
+            result = GameDataHelpers.CombineSkills(result, data.GetEquipmentSkills());
         return result;
     }
 
