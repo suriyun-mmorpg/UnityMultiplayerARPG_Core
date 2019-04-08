@@ -160,11 +160,8 @@ namespace MultiplayerARPG
 
         private int GetGroundDetectionLayerMask()
         {
-            int layerMask = -1;
-            layerMask = layerMask | ~(gameInstance.characterLayer.Mask);
-            layerMask = layerMask | ~(gameInstance.itemDropLayer.Mask);
-            layerMask = layerMask | ~(gameInstance.harvestableLayer.Mask);
-            return layerMask;
+            int layerMask = gameInstance.characterLayer.Mask | gameInstance.itemDropLayer.Mask;
+            return ~layerMask;
         }
 
         private void StickToGroundHelper()
