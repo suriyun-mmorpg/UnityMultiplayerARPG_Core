@@ -120,12 +120,11 @@ public class CharacterQuest : INetSerializable
     {
         writer.Put(dataId);
         writer.Put(isComplete);
-        Dictionary<int, int> killedMonsters = KilledMonsters;
-        int killMonsterCount = killedMonsters.Count;
+        byte killMonsterCount = (byte)KilledMonsters.Count;
         writer.Put(killMonsterCount);
         if (killMonsterCount > 0)
         {
-            foreach (KeyValuePair<int, int> killedMonster in killedMonsters)
+            foreach (KeyValuePair<int, int> killedMonster in KilledMonsters)
             {
                 writer.Put(killedMonster.Key);
                 writer.Put(killedMonster.Value);
@@ -137,7 +136,7 @@ public class CharacterQuest : INetSerializable
     {
         dataId = reader.GetInt();
         isComplete = reader.GetBool();
-        int killMonsterCount = reader.GetInt();
+        int killMonsterCount = reader.GetByte();
         KilledMonsters.Clear();
         for (int i = 0; i < killMonsterCount; ++i)
         {
