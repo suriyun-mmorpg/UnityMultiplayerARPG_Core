@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -68,11 +69,13 @@ namespace MultiplayerARPG
                     uiCharacterSkill.Hide();
                 else
                 {
-                    int index = owningCharacter.IndexOfSkill(characterHotkey.dataId);
-                    if (index >= 0 && index < owningCharacter.Skills.Count)
+                    Dictionary<Skill, short> allSkills = owningCharacter.GetSkills();
+                    short skillLevel = 0;
+                    if (allSkills.TryGetValue(characterHotkey.GetSkill(), out skillLevel))
                     {
-                        CharacterSkill characterSkill = owningCharacter.Skills[index];
-                        uiCharacterSkill.Setup(new CharacterSkillTuple(characterSkill, characterSkill.level), owningCharacter, index);
+                        int index = owningCharacter.IndexOfSkill(characterHotkey.dataId);
+                        CharacterSkill characterSkill = index >= 0 ? owningCharacter.Skills[index] : CharacterSkill.Create(characterHotkey.GetSkill(), skillLevel);
+                        uiCharacterSkill.Setup(new CharacterSkillTuple(characterSkill, skillLevel), owningCharacter, index);
                         uiCharacterSkill.Show();
                         UICharacterSkillDragHandler dragHandler = uiCharacterSkill.GetComponentInChildren<UICharacterSkillDragHandler>();
                         if (dragHandler != null)

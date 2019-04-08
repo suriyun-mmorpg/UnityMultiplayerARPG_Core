@@ -582,8 +582,8 @@ namespace MultiplayerARPG
             Skill skill = hotkey.GetSkill();
             if (skill != null)
             {
-                int skillIndex = PlayerCharacterEntity.IndexOfSkill(skill.DataId);
-                if (skillIndex >= 0)
+                short skillLevel;
+                if (PlayerCharacterEntity.CacheSkills.TryGetValue(skill, out skillLevel))
                 {
                     BaseCharacterEntity attackingCharacter;
                     if (TryGetAttackingCharacter(out attackingCharacter))
@@ -591,7 +591,7 @@ namespace MultiplayerARPG
                         // If attacking any character, will use skill later
                         queueUsingSkill = new UsingSkillData(null, skill.DataId);
                     }
-                    else if (PlayerCharacterEntity.Skills[skillIndex].CanUse(PlayerCharacterEntity))
+                    else if (skill.CanUse(PlayerCharacterEntity, skillLevel))
                     {
                         // If not attacking any character, use skill immediately
                         if (skill.IsAttack() && IsLockTarget())

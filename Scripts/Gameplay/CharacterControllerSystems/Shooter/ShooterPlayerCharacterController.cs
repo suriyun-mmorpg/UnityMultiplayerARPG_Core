@@ -447,10 +447,10 @@ namespace MultiplayerARPG
             Skill skill = hotkey.GetSkill();
             if (skill != null)
             {
-                int skillIndex = PlayerCharacterEntity.IndexOfSkill(skill.DataId);
-                if (skillIndex >= 0)
+                short skillLevel;
+                if (PlayerCharacterEntity.CacheSkills.TryGetValue(skill, out skillLevel))
                 {
-                    if (PlayerCharacterEntity.Skills[skillIndex].CanUse(PlayerCharacterEntity))
+                    if (skill.CanUse(PlayerCharacterEntity, skillLevel))
                     {
                         PlayerCharacterEntity.StopMove();
                         queueSkill = skill;

@@ -114,16 +114,18 @@ namespace MultiplayerARPG
         /// <summary>
         /// Is function will be called at server to order character to use skill
         /// </summary>
-        protected virtual void NetFuncUseSkill(int skillOrWeaponTypeDataId, bool hasAimPosition, Vector3 aimPosition)
+        protected virtual void NetFuncUseSkill(int skillDataId, bool hasAimPosition, Vector3 aimPosition)
         {
             if (!CanUseSkill())
                 return;
 
-            int index = this.IndexOfSkill(skillOrWeaponTypeDataId);
-            if (index < 0)
+            Skill skill;
+            short skillLevel;
+            if (!GameInstance.Skills.TryGetValue(skillDataId, out skill) ||
+                !CacheSkills.TryGetValue(skill, out skillLevel))
                 return;
 
-            CharacterSkill characterSkill = skills[index];
+            CharacterSkill characterSkill = CharacterSkill.Create(skill, skillLevel);
             if (!characterSkill.CanUse(this))
                 return;
 
@@ -141,7 +143,7 @@ namespace MultiplayerARPG
             GetUsingSkillData(
                 characterSkill,
                 out animActionType,
-                out skillOrWeaponTypeDataId,
+                out skillDataId,
                 out animationIndex,
                 out skillAttackType,
                 out isLeftHand,
@@ -186,8 +188,6 @@ namespace MultiplayerARPG
                 }
             }
 
-            Skill skill = characterSkill.GetSkill();
-
             // Call on cast skill to extend skill functionality while casting skills
             // Quit function when on cast skill will override default cast skill functionality
             if (skill.OnCastSkill(this, characterSkill.level, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition))
@@ -195,7 +195,7 @@ namespace MultiplayerARPG
 
             // Start use skill routine
             isAttackingOrUsingSkill = true;
-            StartCoroutine(UseSkillRoutine(animActionType, skillOrWeaponTypeDataId, animationIndex, characterSkill, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition));
+            StartCoroutine(UseSkillRoutine(animActionType, skillDataId, animationIndex, characterSkill, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition));
         }
 
         private IEnumerator UseSkillRoutine(
