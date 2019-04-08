@@ -16,6 +16,7 @@ namespace MultiplayerARPG
         Ammo,
         Building,
         Pet,
+        SocketEnhancer,
     }
 
     public enum FireType : byte
@@ -47,6 +48,7 @@ namespace MultiplayerARPG
         public short ammoCapacity;
         public Vector2 fireStagger;
         public byte fireSpread;
+        public byte socket;
         [Range(0f, 1f)]
         [Tooltip("This is move speed rate while attacking with this weapon")]
         public float moveSpeedRateWhileAttacking = 0f;
@@ -62,6 +64,7 @@ namespace MultiplayerARPG
         public ResistanceIncremental[] increaseResistances;
         public DamageIncremental[] increaseDamages;
         public CharacterStatsIncremental increaseStats;
+        public SkillLevel[] increaseSkillLevels;
         public EquipmentSet equipmentSet;
         [Tooltip("Equipment durability, If this set to 0 it will not broken")]
         [Range(0f, 1000f)]
@@ -173,6 +176,11 @@ namespace MultiplayerARPG
         public bool IsPet()
         {
             return itemType == ItemType.Pet;
+        }
+
+        public bool IsSocketEnhancer()
+        {
+            return itemType == ItemType.SocketEnhancer;
         }
 
         #region Item refining

@@ -1,4 +1,5 @@
-﻿using LiteNetLib.Utils;
+﻿using System.Collections.Generic;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
 using MultiplayerARPG;
 
@@ -13,6 +14,7 @@ public class CharacterItem : INetSerializable
     public int exp;
     public float lockRemainsDuration;
     public short ammo;
+    public List<int> sockets = new List<int>();
     // TODO: I want to add random item bonus
     [System.NonSerialized]
     private int dirtyDataId;
@@ -36,6 +38,18 @@ public class CharacterItem : INetSerializable
     private Item cacheBuildingItem;
     [System.NonSerialized]
     private Item cachePetItem;
+    [System.NonSerialized]
+    private Item cacheSocketEnhancer;
+
+    public List<int> Sockets
+    {
+        get
+        {
+            if (sockets == null)
+                sockets = new List<int>();
+            return sockets;
+        }
+    }
 
     private void MakeCache()
     {
@@ -52,6 +66,7 @@ public class CharacterItem : INetSerializable
             cacheAmmoItem = null;
             cacheBuildingItem = null;
             cachePetItem = null;
+            cacheSocketEnhancer = null;
             if (GameInstance.Items.TryGetValue(dataId, out cacheItem) && cacheItem != null)
             {
                 if (cacheItem.IsEquipment())
@@ -72,6 +87,8 @@ public class CharacterItem : INetSerializable
                     cacheBuildingItem = cacheItem;
                 if (cacheItem.IsPet())
                     cachePetItem = cacheItem;
+                if (cacheItem.IsSocketEnhancer())
+                    cacheSocketEnhancer = cacheItem;
             }
         }
     }
@@ -134,6 +151,12 @@ public class CharacterItem : INetSerializable
     {
         MakeCache();
         return cachePetItem;
+    }
+
+    public Item GetSocketEnhancer()
+    {
+        MakeCache();
+        return cacheSocketEnhancer;
     }
 
     public short GetMaxStack()
@@ -238,10 +261,30 @@ public class CharacterItem : INetSerializable
         writer.Put(dataId);
         writer.Put(level);
         writer.Put(amount);
-        writer.Put(durability);
-        writer.Put(exp);
         writer.Put(lockRemainsDuration);
-        writer.Put(ammo);
+        // Put only needed data
+        if (GetEquipmentItem() != null)
+        {
+            writer.Put(durability);
+            writer.Put(exp);
+            if (GetWeaponItem() != null)
+            {
+                writer.Put(ammo);
+                byte socketCount = (byte)Sockets.Count;
+                writer.Put(socketCount);
+                if (socketCount > 0)
+                {
+                    foreach (int socketDataId in Sockets)
+                    {
+                        writer.Put(socketDataId);
+                    }
+                }
+            }
+        }
+        if (GetPetItem() != null)
+        {
+            writer.Put(exp);
+        }
     }
 
     public void Deserialize(NetDataReader reader)
@@ -249,10 +292,27 @@ public class CharacterItem : INetSerializable
         dataId = reader.GetInt();
         level = reader.GetShort();
         amount = reader.GetShort();
-        durability = reader.GetFloat();
-        exp = reader.GetInt();
         lockRemainsDuration = reader.GetFloat();
-        ammo = reader.GetShort();
+        // Read only needed data
+        if (GetEquipmentItem() != null)
+        {
+            durability = reader.GetFloat();
+            exp = reader.GetInt();
+            if (GetWeaponItem() != null)
+            {
+                ammo = reader.GetShort();
+                int socketCount = reader.GetByte();
+                Sockets.Clear();
+                for (int i = 0; i < socketCount; ++i)
+                {
+                    Sockets.Add(reader.GetInt());
+                }
+            }
+        }
+        if (GetPetItem() != null)
+        {
+            exp = reader.GetInt();
+        }
     }
 }
 

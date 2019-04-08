@@ -16,6 +16,7 @@ public class CharacterItemSerializationSurrogate : ISerializationSurrogate
         info.AddValue("exp", data.exp);
         info.AddValue("lockRemainsDuration", data.lockRemainsDuration);
         info.AddValue("ammo", data.ammo);
+        info.AddValue("sockets", data.sockets);
     }
 
     public System.Object SetObjectData(System.Object obj,
@@ -33,6 +34,11 @@ public class CharacterItemSerializationSurrogate : ISerializationSurrogate
         try
         {
             data.ammo = info.GetInt16("ammo");
+        }
+        catch { }
+        try
+        {
+            data.sockets = (List<int>)info.GetValue("sockets", typeof(List<int>));
         }
         catch { }
         obj = data;

@@ -16,6 +16,7 @@ public class StorageCharacterItemSerializationSurrogate : ISerializationSurrogat
         info.AddValue("exp", data.characterItem.exp);
         info.AddValue("lockRemainsDuration", data.characterItem.lockRemainsDuration);
         info.AddValue("ammo", data.characterItem.ammo);
+        info.AddValue("sockets", data.characterItem.sockets);
     }
 
     public object SetObjectData(object obj, SerializationInfo info, StreamingContext context, ISurrogateSelector selector)
@@ -31,6 +32,11 @@ public class StorageCharacterItemSerializationSurrogate : ISerializationSurrogat
         characterItem.exp = info.GetInt32("exp");
         characterItem.lockRemainsDuration = info.GetSingle("lockRemainsDuration");
         characterItem.ammo = info.GetInt16("ammo");
+        try
+        {
+            characterItem.sockets = (List<int>)info.GetValue("sockets", typeof(List<int>));
+        }
+        catch { }
         data.characterItem = characterItem;
         obj = data;
         return obj;
