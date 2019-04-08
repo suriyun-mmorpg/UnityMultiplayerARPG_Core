@@ -196,11 +196,17 @@ namespace MultiplayerARPG
             RequestPlayActionAnimation(animActionType, weaponTypeDataId, (byte)animationIndex);
 
             yield return new WaitForSecondsRealtime(triggerDuration);
-            Item weaponItem = weapon.GetWeaponItem();
-            Vector3 stagger;
-            for (int i = 0; i < weaponItem.fireSpread + 1; ++i)
+            byte fireSpread = 0;
+            Vector3 fireStagger = Vector3.zero;
+            if (weapon != null && weapon.GetWeaponItem() != null)
             {
-                stagger = new Vector3(Random.Range(-weaponItem.fireStagger.x, weaponItem.fireStagger.x), Random.Range(-weaponItem.fireStagger.y, weaponItem.fireStagger.y));
+                fireSpread = weapon.GetWeaponItem().fireSpread;
+                fireStagger = weapon.GetWeaponItem().fireStagger;
+            }
+            Vector3 stagger;
+            for (int i = 0; i < fireSpread + 1; ++i)
+            {
+                stagger = new Vector3(Random.Range(-fireStagger.x, fireStagger.x), Random.Range(-fireStagger.y, fireStagger.y));
                 LaunchDamageEntity(
                     isLeftHand,
                     weapon,
