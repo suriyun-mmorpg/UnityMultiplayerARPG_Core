@@ -1102,9 +1102,9 @@ public static partial class CharacterDataExtension
             {
                 if (i < effects.Length)
                 {
-                    tempIncreaseAttributes = GameDataHelpers.MakeAttributes(effects[i].attributes, null, 1f);
-                    tempIncreaseResistances = GameDataHelpers.MakeResistances(effects[i].resistances, null, 1f);
-                    tempIncreaseDamages = GameDataHelpers.MakeDamages(effects[i].damages, null, 1f);
+                    tempIncreaseAttributes = GameDataHelpers.CombineAttributes(effects[i].attributes, null, 1f);
+                    tempIncreaseResistances = GameDataHelpers.CombineResistances(effects[i].resistances, null, 1f);
+                    tempIncreaseDamages = GameDataHelpers.CombineDamages(effects[i].damages, null, 1f);
                     tempIncreaseStats = effects[i].stats + GameDataHelpers.GetStatsFromAttributes(tempIncreaseAttributes);
                     bonusAttributes = GameDataHelpers.CombineAttributes(bonusAttributes, tempIncreaseAttributes);
                     bonusResistances = GameDataHelpers.CombineResistances(bonusResistances, tempIncreaseResistances);

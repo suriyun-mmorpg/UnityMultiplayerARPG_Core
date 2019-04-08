@@ -38,7 +38,7 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheRequireItems == null)
-                    cacheRequireItems = GameDataHelpers.MakeItems(requireItems, new Dictionary<Item, short>());
+                    cacheRequireItems = GameDataHelpers.CombineItems(requireItems, new Dictionary<Item, short>());
                 return cacheRequireItems;
             }
         }

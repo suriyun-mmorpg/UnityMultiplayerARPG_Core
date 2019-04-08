@@ -59,7 +59,7 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheCreateGuildRequireItems == null)
-                    cacheCreateGuildRequireItems = GameDataHelpers.MakeItems(createGuildRequireItems, new Dictionary<Item, short>());
+                    cacheCreateGuildRequireItems = GameDataHelpers.CombineItems(createGuildRequireItems, new Dictionary<Item, short>());
                 return cacheCreateGuildRequireItems;
             }
         }

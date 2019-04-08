@@ -87,24 +87,72 @@ namespace MultiplayerARPG
                 CacheItemList.HideAll();
                 return;
             }
+            // Equipment Increase Skill Levels
+            Dictionary<Skill, short> increaseSkillLevels = new Dictionary<Skill, short>();
+            // Skills
             List<CharacterSkill> filterSkills = new List<CharacterSkill>();
             List<int> filterSkillsIndexes = new List<int>();
+            // Items
             List<CharacterItem> filterItems = new List<CharacterItem>();
             List<int> filterItemsIndexes = new List<int>();
-            IList<CharacterSkill> characterSkills = owningCharacter.Skills;
-            IList<CharacterItem> characterItems = owningCharacter.NonEquipItems;
+
+            // Increase skill from equipments
+            foreach (CharacterItem characterItem in owningCharacter.EquipItems)
+            {
+                if (characterItem.GetEquipmentItem() == null)
+                    continue;
+                increaseSkillLevels = GameDataHelpers.CombineSkills(characterItem.GetEquipmentItem().increaseSkillLevels, increaseSkillLevels);
+            }
+
+            // Increase skill from right hand equipment
+            if (owningCharacter.EquipWeapons.rightHand != null &&
+                owningCharacter.EquipWeapons.rightHand.GetEquipmentItem() != null)
+                increaseSkillLevels = GameDataHelpers.CombineSkills(owningCharacter.EquipWeapons.rightHand.GetEquipmentItem().increaseSkillLevels, increaseSkillLevels);
+
+            // Increase skill from left hand equipment
+            if (owningCharacter.EquipWeapons.leftHand != null &&
+                owningCharacter.EquipWeapons.leftHand.GetEquipmentItem() != null)
+                increaseSkillLevels = GameDataHelpers.CombineSkills(owningCharacter.EquipWeapons.leftHand.GetEquipmentItem().increaseSkillLevels, increaseSkillLevels);
+
             int counter = 0;
-            foreach (CharacterSkill characterSkill in characterSkills)
+            List<CharacterSkill> characterSkills = new List<CharacterSkill>();
+            CharacterSkill tempCharacterSkill;
+            short tempIncreaseSkillLevel;
+            foreach (CharacterSkill characterSkill in owningCharacter.Skills)
             {
                 if (uiCharacterHotkey.CanAssignCharacterSkill(characterSkill))
                 {
-                    filterSkills.Add(characterSkill);
+                    tempCharacterSkill = new CharacterSkill()
+                    {
+                        dataId = characterSkill.dataId,
+                        level = characterSkill.level
+                    };
+                    if (increaseSkillLevels.TryGetValue(tempCharacterSkill.GetSkill(), out tempIncreaseSkillLevel))
+                    {
+                        tempCharacterSkill.level += tempIncreaseSkillLevel;
+                        increaseSkillLevels.Remove(tempCharacterSkill.GetSkill());
+                    }
+                    filterSkills.Add(tempCharacterSkill);
                     filterSkillsIndexes.Add(counter);
                 }
                 ++counter;
             }
+            // Remaining increase skill levels from equipment items
+            foreach (KeyValuePair<Skill, short> characterSkill in increaseSkillLevels)
+            {
+                tempCharacterSkill = new CharacterSkill()
+                {
+                    dataId = characterSkill.Key.DataId,
+                    level = characterSkill.Value
+                };
+                filterSkills.Add(tempCharacterSkill);
+                // Set skill indexes to -1 because this skill didn't level up
+                filterSkillsIndexes.Add(-1);
+            }
+
             counter = 0;
-            foreach (CharacterItem characterItem in characterItems)
+            List<CharacterItem> characterItems = new List<CharacterItem>();
+            foreach (CharacterItem characterItem in owningCharacter.NonEquipItems)
             {
                 if (uiCharacterHotkey.CanAssignCharacterItem(characterItem))
                 {
@@ -113,6 +161,7 @@ namespace MultiplayerARPG
                 }
                 ++counter;
             }
+
             CacheSkillList.Generate(filterSkills, (index, characterSkill, ui) =>
             {
                 UICharacterSkill uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
@@ -120,6 +169,7 @@ namespace MultiplayerARPG
                 uiCharacterSkill.Show();
                 CacheSkillSelectionManager.Add(uiCharacterSkill);
             });
+
             CacheItemList.Generate(filterItems, (index, characterItem, ui) =>
             {
                 UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();

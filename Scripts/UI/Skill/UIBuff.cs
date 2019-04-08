@@ -81,13 +81,13 @@ namespace MultiplayerARPG
                 uiBuffStats.Data = Buff.GetIncreaseStats(Level);
 
             if (uiBuffAttributes != null)
-                uiBuffAttributes.Data = GameDataHelpers.MakeAttributes(Buff.increaseAttributes, new Dictionary<Attribute, short>(), Level, 1f);
+                uiBuffAttributes.Data = GameDataHelpers.CombineAttributes(Buff.increaseAttributes, new Dictionary<Attribute, short>(), Level, 1f);
 
             if (uiBuffResistances != null)
-                uiBuffResistances.Data = GameDataHelpers.MakeResistances(Buff.increaseResistances, new Dictionary<DamageElement, float>(), Level, 1f);
+                uiBuffResistances.Data = GameDataHelpers.CombineResistances(Buff.increaseResistances, new Dictionary<DamageElement, float>(), Level, 1f);
 
             if (uiBuffDamages != null)
-                uiBuffDamages.Data = GameDataHelpers.MakeDamages(Buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), Level, 1f);
+                uiBuffDamages.Data = GameDataHelpers.CombineDamages(Buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), Level, 1f);
         }
     }
 }

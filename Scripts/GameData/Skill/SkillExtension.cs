@@ -185,7 +185,7 @@ namespace MultiplayerARPG
             if (!skill.IsAttack())
                 return new Dictionary<DamageElement, float>();
             level = skill.GetAdjustedLevel(level);
-            return GameDataHelpers.MakeDamageInflictions(skill.weaponDamageInflictions, new Dictionary<DamageElement, float>(), level);
+            return GameDataHelpers.CombineDamageInflictions(skill.weaponDamageInflictions, new Dictionary<DamageElement, float>(), level);
         }
 
         public static Dictionary<DamageElement, MinMaxFloat> GetAdditionalDamageAmounts(this Skill skill, short level)
@@ -193,7 +193,7 @@ namespace MultiplayerARPG
             if (!skill.IsAttack())
                 return new Dictionary<DamageElement, MinMaxFloat>();
             level = skill.GetAdjustedLevel(level);
-            return GameDataHelpers.MakeDamages(skill.additionalDamageAmounts, new Dictionary<DamageElement, MinMaxFloat>(), level, 1f);
+            return GameDataHelpers.CombineDamages(skill.additionalDamageAmounts, new Dictionary<DamageElement, MinMaxFloat>(), level, 1f);
         }
         #endregion
     }

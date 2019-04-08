@@ -27,7 +27,7 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheEffectivenessAttributes == null)
-                    cacheEffectivenessAttributes = GameDataHelpers.MakeDamageEffectivenessAttributes(effectivenessAttributes, new Dictionary<Attribute, float>());
+                    cacheEffectivenessAttributes = GameDataHelpers.CombineDamageEffectivenessAttributes(effectivenessAttributes, new Dictionary<Attribute, float>());
                 return cacheEffectivenessAttributes;
             }
         }

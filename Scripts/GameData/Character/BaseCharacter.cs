@@ -24,7 +24,7 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheSkillLevels == null)
-                    cacheSkillLevels = GameDataHelpers.MakeSkills(skillLevels, new Dictionary<Skill, short>());
+                    cacheSkillLevels = GameDataHelpers.CombineSkills(skillLevels, new Dictionary<Skill, short>());
                 return cacheSkillLevels;
             }
         }
@@ -36,12 +36,12 @@ namespace MultiplayerARPG
 
         public Dictionary<Attribute, short> GetCharacterAttributes(short level)
         {
-            return GameDataHelpers.MakeAttributes(attributes, new Dictionary<Attribute, short>(), level, 1f);
+            return GameDataHelpers.CombineAttributes(attributes, new Dictionary<Attribute, short>(), level, 1f);
         }
 
         public Dictionary<DamageElement, float> GetCharacterResistances(short level)
         {
-            return GameDataHelpers.MakeResistances(resistances, new Dictionary<DamageElement, float>(), level, 1f);
+            return GameDataHelpers.CombineResistances(resistances, new Dictionary<DamageElement, float>(), level, 1f);
         }
     }
 }

@@ -410,14 +410,14 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        #region Make Dictionary functions
+        #region Combine Dictionary functions
         /// <summary>
-        /// Make damage effectiveness attribute amounts dictionary
+        /// Combine damage effectiveness attribute amounts dictionary
         /// </summary>
         /// <param name="sourceEffectivesses"></param>
         /// <param name="targetDictionary"></param>
         /// <returns></returns>
-        public static Dictionary<Attribute, float> MakeDamageEffectivenessAttributes(DamageEffectivenessAttribute[] sourceEffectivesses, Dictionary<Attribute, float> targetDictionary)
+        public static Dictionary<Attribute, float> CombineDamageEffectivenessAttributes(DamageEffectivenessAttribute[] sourceEffectivesses, Dictionary<Attribute, float> targetDictionary)
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<Attribute, float>();
@@ -438,13 +438,13 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Make damage amounts dictionary
+        /// Combine damage amounts dictionary
         /// </summary>
         /// <param name="sourceAmounts"></param>
         /// <param name="targetDictionary"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, MinMaxFloat> MakeDamages(DamageAmount[] sourceAmounts, Dictionary<DamageElement, MinMaxFloat> targetDictionary, float rate)
+        public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(DamageAmount[] sourceAmounts, Dictionary<DamageElement, MinMaxFloat> targetDictionary, float rate)
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<DamageElement, MinMaxFloat>();
@@ -461,14 +461,14 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Make damage amounts dictionary
+        /// Combine damage amounts dictionary
         /// </summary>
         /// <param name="sourceIncrementals"></param>
         /// <param name="targetDictionary"></param>
         /// <param name="level"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, MinMaxFloat> MakeDamages(DamageIncremental[] sourceIncrementals, Dictionary<DamageElement, MinMaxFloat> targetDictionary, short level, float rate)
+        public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(DamageIncremental[] sourceIncrementals, Dictionary<DamageElement, MinMaxFloat> targetDictionary, short level, float rate)
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<DamageElement, MinMaxFloat>();
@@ -485,13 +485,13 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Make damage infliction amounts dictionary
+        /// Combine damage infliction amounts dictionary
         /// </summary>
         /// <param name="sourceIncrementals"></param>
         /// <param name="targetDictionary"></param>
         /// <param name="level"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, float> MakeDamageInflictions(DamageInflictionIncremental[] sourceIncrementals, Dictionary<DamageElement, float> targetDictionary, short level)
+        public static Dictionary<DamageElement, float> CombineDamageInflictions(DamageInflictionIncremental[] sourceIncrementals, Dictionary<DamageElement, float> targetDictionary, short level)
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<DamageElement, float>();
@@ -508,13 +508,13 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Make attribute amounts dictionary
+        /// Combine attribute amounts dictionary
         /// </summary>
         /// <param name="sourceAmounts"></param>
         /// <param name="targetDictionary"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static Dictionary<Attribute, short> MakeAttributes(AttributeAmount[] sourceAmounts, Dictionary<Attribute, short> targetDictionary, float rate)
+        public static Dictionary<Attribute, short> CombineAttributes(AttributeAmount[] sourceAmounts, Dictionary<Attribute, short> targetDictionary, float rate)
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<Attribute, short>();
@@ -530,14 +530,14 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Make attribute amounts dictionary
+        /// Combine attribute amounts dictionary
         /// </summary>
         /// <param name="sourceIncrementals"></param>
         /// <param name="targetDictionary"></param>
         /// <param name="level"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static Dictionary<Attribute, short> MakeAttributes(AttributeIncremental[] sourceIncrementals, Dictionary<Attribute, short> targetDictionary, short level, float rate)
+        public static Dictionary<Attribute, short> CombineAttributes(AttributeIncremental[] sourceIncrementals, Dictionary<Attribute, short> targetDictionary, short level, float rate)
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<Attribute, short>();
@@ -553,13 +553,13 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Make resistance amounts dictionary
+        /// Combine resistance amounts dictionary
         /// </summary>
         /// <param name="sourceAmounts"></param>
         /// <param name="targetDictionary"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, float> MakeResistances(ResistanceAmount[] sourceAmounts, Dictionary<DamageElement, float> targetDictionary, float rate)
+        public static Dictionary<DamageElement, float> CombineResistances(ResistanceAmount[] sourceAmounts, Dictionary<DamageElement, float> targetDictionary, float rate)
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<DamageElement, float>();
@@ -575,14 +575,14 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Make resistance amounts dictionary
+        /// Combine resistance amounts dictionary
         /// </summary>
         /// <param name="sourceIncrementals"></param>
         /// <param name="targetDictionary"></param>
         /// <param name="level"></param>
         /// <param name="rate"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, float> MakeResistances(ResistanceIncremental[] sourceIncrementals, Dictionary<DamageElement, float> targetDictionary, short level, float rate)
+        public static Dictionary<DamageElement, float> CombineResistances(ResistanceIncremental[] sourceIncrementals, Dictionary<DamageElement, float> targetDictionary, short level, float rate)
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<DamageElement, float>();
@@ -598,12 +598,12 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Make skill levels dictionary
+        /// Combine skill levels dictionary
         /// </summary>
         /// <param name="sourceLevels"></param>
         /// <param name="targetDictionary"></param>
         /// <returns></returns>
-        public static Dictionary<Skill, short> MakeSkills(SkillLevel[] sourceLevels, Dictionary<Skill, short> targetDictionary)
+        public static Dictionary<Skill, short> CombineSkills(SkillLevel[] sourceLevels, Dictionary<Skill, short> targetDictionary)
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<Skill, short>();
@@ -619,12 +619,12 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// Make item amounts dictionary
+        /// Combine item amounts dictionary
         /// </summary>
         /// <param name="sourceAmounts"></param>
         /// <param name="targetDictionary"></param>
         /// <returns></returns>
-        public static Dictionary<Item, short> MakeItems(ItemAmount[] sourceAmounts, Dictionary<Item, short> targetDictionary)
+        public static Dictionary<Item, short> CombineItems(ItemAmount[] sourceAmounts, Dictionary<Item, short> targetDictionary)
         {
             if (targetDictionary == null)
                 targetDictionary = new Dictionary<Item, short>();

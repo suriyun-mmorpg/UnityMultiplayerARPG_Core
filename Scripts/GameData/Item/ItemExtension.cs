@@ -53,7 +53,7 @@ namespace MultiplayerARPG
             Dictionary<Attribute, short> result = new Dictionary<Attribute, short>();
             if (equipmentItem != null &&
                 equipmentItem.IsEquipment())
-                result = GameDataHelpers.MakeAttributes(equipmentItem.increaseAttributes, result, level, rate);
+                result = GameDataHelpers.CombineAttributes(equipmentItem.increaseAttributes, result, level, rate);
             return result;
         }
 
@@ -62,7 +62,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
             if (equipmentItem != null &&
                 equipmentItem.IsEquipment())
-                result = GameDataHelpers.MakeResistances(equipmentItem.increaseResistances, result, level, rate);
+                result = GameDataHelpers.CombineResistances(equipmentItem.increaseResistances, result, level, rate);
             return result;
         }
 
@@ -71,7 +71,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
             if (equipmentItem != null &&
                 equipmentItem.IsEquipment())
-                result = GameDataHelpers.MakeDamages(equipmentItem.increaseDamages, result, level, rate);
+                result = GameDataHelpers.CombineDamages(equipmentItem.increaseDamages, result, level, rate);
             return result;
         }
         #endregion

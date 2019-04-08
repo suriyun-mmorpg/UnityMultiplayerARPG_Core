@@ -44,22 +44,22 @@ namespace MultiplayerARPG
 
         public static Dictionary<Attribute, short> GetIncreaseAttributes(this Buff buff, short level)
         {
-            return GameDataHelpers.MakeAttributes(buff.increaseAttributes, new Dictionary<Attribute, short>(), level, 1f);
+            return GameDataHelpers.CombineAttributes(buff.increaseAttributes, new Dictionary<Attribute, short>(), level, 1f);
         }
 
         public static Dictionary<DamageElement, float> GetIncreaseResistances(this Buff buff, short level)
         {
-            return GameDataHelpers.MakeResistances(buff.increaseResistances, new Dictionary<DamageElement, float>(), level, 1f);
+            return GameDataHelpers.CombineResistances(buff.increaseResistances, new Dictionary<DamageElement, float>(), level, 1f);
         }
 
         public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this Buff buff, short level)
         {
-            return GameDataHelpers.MakeDamages(buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), level, 1f);
+            return GameDataHelpers.CombineDamages(buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), level, 1f);
         }
 
         public static Dictionary<DamageElement, MinMaxFloat> GetDamageOverTimes(this Buff buff, short level)
         {
-            return GameDataHelpers.MakeDamages(buff.damageOverTimes, new Dictionary<DamageElement, MinMaxFloat>(), level, 1f);
+            return GameDataHelpers.CombineDamages(buff.damageOverTimes, new Dictionary<DamageElement, MinMaxFloat>(), level, 1f);
         }
         #endregion
     }
