@@ -14,6 +14,7 @@ namespace MultiplayerARPG
         public string description;
         [Tooltip("Descriptions by language keys")]
         public LanguageData[] descriptions;
+        public string category;
         public Sprite icon;
         
         public virtual string Id { get { return name; } }
