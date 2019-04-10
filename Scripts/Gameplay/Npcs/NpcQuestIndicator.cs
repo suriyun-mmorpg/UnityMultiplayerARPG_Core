@@ -16,6 +16,8 @@ namespace MultiplayerARPG
         public NpcEntity npcEntity;
         private float lastUpdateTime;
 
+        private bool tempVisibleResult;
+
         private void Awake()
         {
             if (npcEntity == null)
@@ -28,9 +30,9 @@ namespace MultiplayerARPG
                 BasePlayerCharacterController.OwningCharacter == null ||
                 Vector3.Distance(npcEntity.CacheTransform.position, BasePlayerCharacterController.OwningCharacter.CacheTransform.position) > updateWithinRange)
             {
-                if (haveInProgressQuestIndicator != null)
+                if (haveInProgressQuestIndicator != null && haveInProgressQuestIndicator.activeSelf)
                     haveInProgressQuestIndicator.SetActive(false);
-                if (haveNewQuestIndicator != null)
+                if (haveNewQuestIndicator != null && haveNewQuestIndicator.activeSelf)
                     haveNewQuestIndicator.SetActive(false);
                 return;
             }
@@ -38,20 +40,17 @@ namespace MultiplayerARPG
             if (Time.unscaledTime - lastUpdateTime >= updateRepeatRate)
             {
                 lastUpdateTime = Time.unscaledTime;
-                if (haveInProgressQuestIndicator != null)
-                    haveInProgressQuestIndicator.SetActive(false);
-                if (haveNewQuestIndicator != null)
-                    haveNewQuestIndicator.SetActive(false);
-                if (npcEntity.HaveInProgressQuests(BasePlayerCharacterController.OwningCharacter))
-                {
-                    if (haveInProgressQuestIndicator != null)
-                        haveInProgressQuestIndicator.SetActive(true);
-                }
-                else if (npcEntity.HaveNewQuests(BasePlayerCharacterController.OwningCharacter))
-                {
-                    if (haveNewQuestIndicator != null)
-                        haveNewQuestIndicator.SetActive(true);
-                }
+
+                tempVisibleResult = npcEntity.HaveInProgressQuests(BasePlayerCharacterController.OwningCharacter);
+                if (haveInProgressQuestIndicator != null && haveInProgressQuestIndicator.activeSelf != tempVisibleResult)
+                    haveInProgressQuestIndicator.SetActive(tempVisibleResult);
+
+                if (tempVisibleResult)
+                    return;
+
+                tempVisibleResult = npcEntity.HaveNewQuests(BasePlayerCharacterController.OwningCharacter);
+                if (haveNewQuestIndicator != null && haveNewQuestIndicator.activeSelf != tempVisibleResult)
+                    haveNewQuestIndicator.SetActive(tempVisibleResult);
             }
         }
     }

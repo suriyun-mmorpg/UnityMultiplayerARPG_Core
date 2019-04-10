@@ -20,6 +20,8 @@ namespace MultiplayerARPG
         public BaseCharacterEntity characterEntity;
         private float lastUpdateTime;
 
+        private bool tempVisibleResult;
+
         private void Awake()
         {
             if (characterEntity == null)
@@ -32,13 +34,13 @@ namespace MultiplayerARPG
                 BasePlayerCharacterController.OwningCharacter == null ||
                 Vector3.Distance(characterEntity.CacheTransform.position, BasePlayerCharacterController.OwningCharacter.CacheTransform.position) > updateWithinRange)
             {
-                if (owningIndicator != null)
+                if (owningIndicator != null && owningIndicator.activeSelf)
                     owningIndicator.SetActive(false);
-                if (allyIndicator != null)
+                if (allyIndicator != null && allyIndicator.activeSelf)
                     allyIndicator.SetActive(false);
-                if (enemyIndicator != null)
+                if (enemyIndicator != null && enemyIndicator.activeSelf)
                     enemyIndicator.SetActive(false);
-                if (neutralIndicator != null)
+                if (neutralIndicator != null && neutralIndicator.activeSelf)
                     neutralIndicator.SetActive(false);
                 return;
             }
@@ -46,34 +48,31 @@ namespace MultiplayerARPG
             if (Time.unscaledTime - lastUpdateTime >= updateRepeatRate)
             {
                 lastUpdateTime = Time.unscaledTime;
-                if (owningIndicator != null)
-                    owningIndicator.SetActive(false);
-                if (allyIndicator != null)
-                    allyIndicator.SetActive(false);
-                if (enemyIndicator != null)
-                    enemyIndicator.SetActive(false);
-                if (neutralIndicator != null)
-                    neutralIndicator.SetActive(false);
-                if (BasePlayerCharacterController.OwningCharacter == characterEntity)
-                {
-                    if (owningIndicator != null)
-                        owningIndicator.SetActive(true);
-                }
-                if (characterEntity.IsAlly(BasePlayerCharacterController.OwningCharacter))
-                {
-                    if (allyIndicator != null)
-                        allyIndicator.SetActive(true);
-                }
-                if (characterEntity.IsEnemy(BasePlayerCharacterController.OwningCharacter))
-                {
-                    if (enemyIndicator != null)
-                        enemyIndicator.SetActive(true);
-                }
-                if (characterEntity.IsNeutral(BasePlayerCharacterController.OwningCharacter))
-                {
-                    if (neutralIndicator != null)
-                        neutralIndicator.SetActive(true);
-                }
+
+                tempVisibleResult = BasePlayerCharacterController.OwningCharacter == characterEntity;
+                if (owningIndicator != null && owningIndicator.activeSelf != tempVisibleResult)
+                    owningIndicator.SetActive(tempVisibleResult);
+
+                if (tempVisibleResult)
+                    return;
+
+                tempVisibleResult = characterEntity.IsAlly(BasePlayerCharacterController.OwningCharacter);
+                if (allyIndicator != null && allyIndicator.activeSelf != tempVisibleResult)
+                    allyIndicator.SetActive(tempVisibleResult);
+
+                if (tempVisibleResult)
+                    return;
+
+                tempVisibleResult = characterEntity.IsEnemy(BasePlayerCharacterController.OwningCharacter);
+                if (enemyIndicator != null && enemyIndicator.activeSelf != tempVisibleResult)
+                    enemyIndicator.SetActive(tempVisibleResult);
+
+                if (tempVisibleResult)
+                    return;
+
+                tempVisibleResult = characterEntity.IsNeutral(BasePlayerCharacterController.OwningCharacter);
+                if (neutralIndicator != null && neutralIndicator.activeSelf != tempVisibleResult)
+                    neutralIndicator.SetActive(tempVisibleResult);
             }
         }
     }
