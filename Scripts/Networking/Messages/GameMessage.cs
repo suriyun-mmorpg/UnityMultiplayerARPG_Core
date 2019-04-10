@@ -25,6 +25,8 @@ namespace MultiplayerARPG
             RefineItemReachedMaxLevel,
             RefineSuccess,
             RefineFail,
+            // Enhance
+            CannotEnhanceSocket,
             // Repair
             CannotRepair,
             RepairSuccess,
