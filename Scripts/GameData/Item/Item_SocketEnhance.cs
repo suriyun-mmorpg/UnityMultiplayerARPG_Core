@@ -72,6 +72,7 @@ namespace MultiplayerARPG
             if (!character.DecreaseItems(enhancerItem.DataId, 1))
             {
                 // Cannot enhance socket because there is no item
+                gameMessageType = GameMessage.Type.NotEnoughSocketEnchaner;
                 return;
             }
             enhancingItem.Sockets.Add(enhancerId);

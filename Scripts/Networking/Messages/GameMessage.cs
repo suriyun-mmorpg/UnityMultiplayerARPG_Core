@@ -27,6 +27,7 @@ namespace MultiplayerARPG
             RefineFail,
             // Enhance
             CannotEnhanceSocket,
+            NotEnoughSocketEnchaner,
             // Repair
             CannotRepair,
             RepairSuccess,
