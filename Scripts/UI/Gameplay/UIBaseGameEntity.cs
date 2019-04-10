@@ -114,12 +114,9 @@ namespace MultiplayerARPG
             }
             Profiler.EndSample();
         }
+
+        protected override void UpdateData() { }
     }
 
-    public class UIBaseGameEntity : UIBaseGameEntity<BaseGameEntity>
-    {
-        protected override void UpdateData()
-        {
-        }
-    }
+    public class UIBaseGameEntity : UIBaseGameEntity<BaseGameEntity> { }
 }

@@ -48,10 +48,5 @@ namespace MultiplayerARPG
         }
     }
 
-    public class UIDamageableEntity : UIDamageableEntity<DamageableEntity>
-    {
-        protected override void UpdateData()
-        {
-        }
-    }
+    public class UIDamageableEntity : UIDamageableEntity<DamageableEntity> { }
 }

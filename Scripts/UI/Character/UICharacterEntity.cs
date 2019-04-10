@@ -79,9 +79,5 @@ namespace MultiplayerARPG
             if (uiCharacter != null)
                 uiCharacter.Data = Data;
         }
-
-        protected override void UpdateData()
-        {
-        }
     }
 }
