@@ -153,7 +153,7 @@ public class CharacterItem : INetSerializable
         return cachePetItem;
     }
 
-    public Item GetSocketEnhancer()
+    public Item GetSocketEnhancerItem()
     {
         MakeCache();
         return cacheSocketEnhancer;

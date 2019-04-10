@@ -15,7 +15,11 @@ namespace MultiplayerARPG
         public Item EquipmentItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetEquipmentItem() : null; } }
         public Item ArmorItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetArmorItem() : null; } }
         public Item WeaponItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetWeaponItem() : null; } }
+        public Item PotionItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetPotionItem() : null; } }
+        public Item AmmoItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetAmmoItem() : null; } }
+        public Item BuildingItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetBuildingItem() : null; } }
         public Item PetItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetPetItem() : null; } }
+        public Item SocketEnhancerItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetSocketEnhancerItem() : null; } }
 
         [Header("Generic Info Format")]
         [Tooltip("Title Format => {0} = {Title}")]
@@ -56,6 +60,8 @@ namespace MultiplayerARPG
         public string buildingItemType = "Building";
         [Tooltip("Pet Item Type")]
         public string petItemType = "Pet";
+        [Tooltip("Socket Enhancer Type")]
+        public string socketEnhancerType = "Socket Enhancer";
 
         [Header("Input Dialog Settings")]
         public string dropInputTitle = "Drop Item";
@@ -259,6 +265,9 @@ namespace MultiplayerARPG
                             break;
                         case ItemType.Pet:
                             uiTextItemType.text = string.Format(itemTypeFormat, petItemType);
+                            break;
+                        case ItemType.SocketEnhancer:
+                            uiTextItemType.text = string.Format(itemTypeFormat, socketEnhancerType);
                             break;
                     }
                 }
@@ -749,7 +758,7 @@ namespace MultiplayerARPG
         #region Set Refine Item Functions
         public void OnClickSetRefineItem()
         {
-            // Only unequipped equipment can refining
+            // Only owning character can refine item
             if (!IsOwningCharacter())
                 return;
 
@@ -762,6 +771,27 @@ namespace MultiplayerARPG
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
             }
+        }
+        #endregion
+
+        #region Set Enhance Item Functions
+        public void OnClickSetEnhanceItem()
+        {
+            // Only owning character can refine item
+            if (!IsOwningCharacter())
+                return;
+
+            UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
+            /*
+            if (uiGameplay.uiRefineItem != null &&
+                CharacterItem.GetEquipmentItem() != null)
+            {
+                uiGameplay.uiRefineItem.Setup(InventoryType, IndexOfData);
+                uiGameplay.uiRefineItem.Show();
+                if (selectionManager != null)
+                    selectionManager.DeselectSelectedUI();
+            }
+            */
         }
         #endregion
     }
