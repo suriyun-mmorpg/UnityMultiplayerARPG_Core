@@ -8,8 +8,8 @@ namespace MultiplayerARPG
         [Header("Base Game Entity - Display Format")]
         [Tooltip("Title Format => {0} = {Title}")]
         public string titleFormat = "{0}";
-        [Tooltip("Title2 Format => {0} = {Title2}")]
-        public string title2Format = "{0}";
+        [Tooltip("TitleB Format => {0} = {TitleB}")]
+        public string titleBFormat = "{0}";
 
         [Header("Base Game Entity - UI Elements")]
         public TextWrapper uiTextTitle;
@@ -30,7 +30,7 @@ namespace MultiplayerARPG
             if (uiTextTitleB != null)
             {
                 tempTitle = Data == null ? string.Empty : Data.TitleB;
-                uiTextTitleB.text = string.Format(title2Format, tempTitle);
+                uiTextTitleB.text = string.Format(titleBFormat, tempTitle);
                 uiTextTitleB.gameObject.SetActive(!string.IsNullOrEmpty(tempTitle));
             }
         }
