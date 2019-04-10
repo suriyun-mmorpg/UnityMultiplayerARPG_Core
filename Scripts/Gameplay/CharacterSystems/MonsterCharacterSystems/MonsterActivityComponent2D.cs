@@ -185,7 +185,7 @@ namespace MultiplayerARPG
 
         protected void UpdateActivity(float time)
         {
-            if (!CacheMonsterCharacterEntity.IsServer || monsterDatabase == null)
+            if (!CacheMonsterCharacterEntity.IsServer || CacheMonsterCharacterEntity.Identity.CountSubscribers() == 0 || monsterDatabase == null)
                 return;
 
             if (CacheRigidbody2D.velocity.magnitude > 0)
