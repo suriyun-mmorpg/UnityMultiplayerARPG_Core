@@ -50,10 +50,10 @@ namespace MultiplayerARPG
 
         protected override void Update()
         {
+            base.Update();
+
             if (!CacheCanvas.enabled)
                 return;
-
-            base.Update();
 
             string tempTitle;
             if (uiTextTitle != null)
@@ -97,9 +97,7 @@ namespace MultiplayerARPG
                 switch (visibility)
                 {
                     case Visibility.VisibleWhenSelected:
-                        tempTargetEntity = null;
-                        if (BasePlayerCharacterController.Singleton.SelectedEntity != null)
-                            tempTargetEntity = BasePlayerCharacterController.Singleton.SelectedEntity as BaseCharacterEntity;
+                        tempTargetEntity = BasePlayerCharacterController.Singleton.SelectedEntity;
                         CacheCanvas.enabled = tempTargetEntity != null &&
                             tempTargetEntity.ObjectId == Data.ObjectId &&
                             Vector3.Distance(tempOwningCharacter.CacheTransform.position, Data.CacheTransform.position) <= visibleDistance;

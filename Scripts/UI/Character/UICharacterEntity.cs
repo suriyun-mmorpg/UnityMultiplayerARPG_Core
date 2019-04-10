@@ -30,10 +30,10 @@ namespace MultiplayerARPG
 
         protected override void Update()
         {
+            base.Update();
+
             if (!CacheCanvas.enabled)
                 return;
-
-            base.Update();
 
             if (uiTextLevel != null)
                 uiTextLevel.text = string.Format(levelFormat, Data == null ? "0" : Data.Level.ToString("N0"));

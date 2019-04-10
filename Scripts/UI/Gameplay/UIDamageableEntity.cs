@@ -22,10 +22,10 @@ namespace MultiplayerARPG
 
         protected override void Update()
         {
+            base.Update();
+
             if (!CacheCanvas.enabled)
                 return;
-
-            base.Update();
 
             currentHp = 0;
             maxHp = 0;
