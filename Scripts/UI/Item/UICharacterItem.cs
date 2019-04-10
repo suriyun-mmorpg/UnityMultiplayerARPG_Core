@@ -111,6 +111,8 @@ namespace MultiplayerARPG
         public UnityEvent onNpcSellItemDialogDisappear;
         public UnityEvent onRefineItemDialogAppear;
         public UnityEvent onRefineItemDialogDisappear;
+        public UnityEvent onEnhanceSocketItemDialogAppear;
+        public UnityEvent onEnhanceSocketItemDialogDisappear;
         public UnityEvent onStorageDialogAppear;
         public UnityEvent onStorageDialogDisappear;
         public UnityEvent onEnterDealingState;
@@ -127,6 +129,7 @@ namespace MultiplayerARPG
 
         private bool isSellItemDialogAppeared;
         private bool isRefineItemDialogAppeared;
+        private bool isEnhanceSocketItemDialogAppeared;
         private bool isStorageDialogAppeared;
         private bool isDealingStateEntered;
 
@@ -172,6 +175,7 @@ namespace MultiplayerARPG
 
             UpdateShopUIVisibility(false);
             UpdateRefineUIVisibility(false);
+            UpdateEnhanceSocketUIVisibility(false);
             UpdateStorageUIVisibility(false);
             UpdateDealingState(false);
             Profiler.EndSample();
@@ -435,6 +439,7 @@ namespace MultiplayerARPG
             }
             UpdateShopUIVisibility(true);
             UpdateRefineUIVisibility(true);
+            UpdateEnhanceSocketUIVisibility(true);
             UpdateStorageUIVisibility(true);
             UpdateDealingState(true);
         }
@@ -508,6 +513,42 @@ namespace MultiplayerARPG
                     isRefineItemDialogAppeared = false;
                     if (onRefineItemDialogDisappear != null)
                         onRefineItemDialogDisappear.Invoke();
+                }
+            }
+        }
+
+        private void UpdateEnhanceSocketUIVisibility(bool initData)
+        {
+            if (!IsOwningCharacter())
+            {
+                if (initData || isEnhanceSocketItemDialogAppeared)
+                {
+                    isEnhanceSocketItemDialogAppeared = false;
+                    if (onEnhanceSocketItemDialogDisappear != null)
+                        onEnhanceSocketItemDialogDisappear.Invoke();
+                }
+                return;
+            }
+            // Check visible item dialog
+            UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
+            if (uiGameplay.uiEnhanceSocketItem.IsVisible() &&
+                Data.characterItem.GetEquipmentItem() != null &&
+                InventoryType == InventoryType.NonEquipItems)
+            {
+                if (initData || !isEnhanceSocketItemDialogAppeared)
+                {
+                    isEnhanceSocketItemDialogAppeared = true;
+                    if (onEnhanceSocketItemDialogAppear != null)
+                        onEnhanceSocketItemDialogAppear.Invoke();
+                }
+            }
+            else
+            {
+                if (initData || isEnhanceSocketItemDialogAppeared)
+                {
+                    isEnhanceSocketItemDialogAppeared = false;
+                    if (onEnhanceSocketItemDialogDisappear != null)
+                        onEnhanceSocketItemDialogDisappear.Invoke();
                 }
             }
         }
