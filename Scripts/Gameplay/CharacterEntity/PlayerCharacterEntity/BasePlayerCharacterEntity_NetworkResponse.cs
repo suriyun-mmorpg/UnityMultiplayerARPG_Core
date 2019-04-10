@@ -611,29 +611,27 @@ namespace MultiplayerARPG
         {
             if (IsDead())
                 return;
-            // TODO: Implement this
-            /*
+            
             GameMessage.Type gameMessageType;
             switch ((InventoryType)byteInventoryType)
             {
                 case InventoryType.NonEquipItems:
-                    Item.RefineNonEquipItem(this, index, out gameMessageType);
+                    Item.EnhanceSocketNonEquipItem(this, index, enhancerId, out gameMessageType);
                     gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     break;
                 case InventoryType.EquipItems:
-                    Item.RefineEquipItem(this, index, out gameMessageType);
+                    Item.EnhanceSocketEquipItem(this, index, enhancerId, out gameMessageType);
                     gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     break;
                 case InventoryType.EquipWeaponRight:
-                    Item.RefineRightHandItem(this, out gameMessageType);
+                    Item.EnhanceSocketRightHandItem(this, enhancerId, out gameMessageType);
                     gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     break;
                 case InventoryType.EquipWeaponLeft:
-                    Item.RefineLeftHandItem(this, out gameMessageType);
+                    Item.EnhanceSocketLeftHandItem(this, enhancerId, out gameMessageType);
                     gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
                     break;
             }
-            */
         }
 
         protected virtual void NetFuncRepairItem(byte byteInventoryType, short index)
