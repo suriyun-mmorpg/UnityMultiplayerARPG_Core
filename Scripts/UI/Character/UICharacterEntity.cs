@@ -1,23 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(Canvas))]
     public class UICharacterEntity : UIDamageableEntity<BaseCharacterEntity>
     {
-        public enum Visibility
-        {
-            VisibleWhenSelected,
-            VisibleWhenNearby,
-            AlwaysVisible,
-        }
-        public Visibility visibility;
-        [Tooltip("Visible when hit duration for non owning character")]
-        public float visibleWhenHitDuration = 2f;
-        public float visibleDistance = 30f;
-        
         [Header("Character Entity - Display Format")]
         [Tooltip("Level Format => {0} = {Level}")]
         public string levelFormat = "Lv: {0}";
@@ -35,33 +23,16 @@ namespace MultiplayerARPG
         public Image imageSkillCastGage;
         public UICharacter uiCharacter;
 
-        private float lastShowTime;
-        private BasePlayerCharacterEntity tempOwningCharacter;
-        private BaseCharacterEntity tempTargetCharacter;
         protected int currentMp;
         protected int maxMp;
         protected float castingSkillCountDown;
         protected float castingSkillDuration;
 
-        private Canvas cacheCanvas;
-        public Canvas CacheCanvas
-        {
-            get
-            {
-                if (cacheCanvas == null)
-                    cacheCanvas = GetComponent<Canvas>();
-                return cacheCanvas;
-            }
-        }
-
-        protected override void Awake()
-        {
-            base.Awake();
-            CacheCanvas.enabled = false;
-        }
-
         protected override void Update()
         {
+            if (!CacheCanvas.enabled)
+                return;
+
             base.Update();
 
             if (uiTextLevel != null)
@@ -97,51 +68,16 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            Profiler.BeginSample("UICharacterEntity - Update UI");
-            if (Data == null || BasePlayerCharacterController.OwningCharacter == null)
+            if (!ValidateToUpdateUI())
             {
                 CacheCanvas.enabled = false;
                 return;
             }
-
-            if (Data.CurrentHp == 0)
-            {
-                CacheCanvas.enabled = false;
-                return;
-            }
-
-            tempOwningCharacter = BasePlayerCharacterController.OwningCharacter;
-            if (tempOwningCharacter == Data)
-            {
-                // Always show the UI when character is owning character
-                CacheCanvas.enabled = true;
-            }
-            else
-            {
-                switch (visibility)
-                {
-                    case Visibility.VisibleWhenSelected:
-                        tempTargetCharacter = null;
-                        if (BasePlayerCharacterController.Singleton.SelectedEntity != null)
-                            tempTargetCharacter = BasePlayerCharacterController.Singleton.SelectedEntity as BaseCharacterEntity;
-                        CacheCanvas.enabled = tempTargetCharacter != null &&
-                            tempTargetCharacter.ObjectId == Data.ObjectId &&
-                            Vector3.Distance(tempOwningCharacter.CacheTransform.position, Data.CacheTransform.position) <= visibleDistance;
-                        break;
-                    case Visibility.VisibleWhenNearby:
-                        CacheCanvas.enabled = Vector3.Distance(tempOwningCharacter.CacheTransform.position, Data.CacheTransform.position) <= visibleDistance;
-                        break;
-                    case Visibility.AlwaysVisible:
-                        CacheCanvas.enabled = true;
-                        break;
-                }
-            }
+            base.UpdateUI();
 
             // Update character UI every `updateUIRepeatRate` seconds
             if (uiCharacter != null)
                 uiCharacter.Data = Data;
-
-            Profiler.EndSample();
         }
 
         protected override void UpdateData()

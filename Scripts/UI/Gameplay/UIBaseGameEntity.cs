@@ -1,10 +1,18 @@
 ﻿using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
 {
     public abstract class UIBaseGameEntity<T> : UISelectionEntry<T>
         where T : BaseGameEntity
     {
+        public enum Visibility
+        {
+            VisibleWhenSelected,
+            VisibleWhenNearby,
+            AlwaysVisible,
+        }
+
         [Header("Base Game Entity - Display Format")]
         [Tooltip("Title Format => {0} = {Title}")]
         public string titleFormat = "{0}";
@@ -15,8 +23,36 @@ namespace MultiplayerARPG
         public TextWrapper uiTextTitle;
         public TextWrapper uiTextTitleB;
 
+        [Header("Visible Options")]
+        public Visibility visibility;
+        public float visibleDistance = 30f;
+
+        private float lastShowTime;
+        private BasePlayerCharacterEntity tempOwningCharacter;
+        private BaseGameEntity tempTargetEntity;
+
+        private Canvas cacheCanvas;
+        public Canvas CacheCanvas
+        {
+            get
+            {
+                if (cacheCanvas == null)
+                    cacheCanvas = GetComponent<Canvas>();
+                return cacheCanvas;
+            }
+        }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            CacheCanvas.enabled = false;
+        }
+
         protected override void Update()
         {
+            if (!CacheCanvas.enabled)
+                return;
+
             base.Update();
 
             string tempTitle;
@@ -33,6 +69,50 @@ namespace MultiplayerARPG
                 uiTextTitleB.text = string.Format(titleBFormat, tempTitle);
                 uiTextTitleB.gameObject.SetActive(!string.IsNullOrEmpty(tempTitle));
             }
+        }
+
+        protected virtual bool ValidateToUpdateUI()
+        {
+            return Data != null &&
+                BasePlayerCharacterController.OwningCharacter != null;
+        }
+
+        protected override void UpdateUI()
+        {
+            if (!ValidateToUpdateUI())
+            {
+                CacheCanvas.enabled = false;
+                return;
+            }
+
+            Profiler.BeginSample("UIBaseGameEntity - Update UI");
+            tempOwningCharacter = BasePlayerCharacterController.OwningCharacter;
+            if (tempOwningCharacter == Data)
+            {
+                // Always show the UI when character is owning character
+                CacheCanvas.enabled = true;
+            }
+            else
+            {
+                switch (visibility)
+                {
+                    case Visibility.VisibleWhenSelected:
+                        tempTargetEntity = null;
+                        if (BasePlayerCharacterController.Singleton.SelectedEntity != null)
+                            tempTargetEntity = BasePlayerCharacterController.Singleton.SelectedEntity as BaseCharacterEntity;
+                        CacheCanvas.enabled = tempTargetEntity != null &&
+                            tempTargetEntity.ObjectId == Data.ObjectId &&
+                            Vector3.Distance(tempOwningCharacter.CacheTransform.position, Data.CacheTransform.position) <= visibleDistance;
+                        break;
+                    case Visibility.VisibleWhenNearby:
+                        CacheCanvas.enabled = Vector3.Distance(tempOwningCharacter.CacheTransform.position, Data.CacheTransform.position) <= visibleDistance;
+                        break;
+                    case Visibility.AlwaysVisible:
+                        CacheCanvas.enabled = true;
+                        break;
+                }
+            }
+            Profiler.EndSample();
         }
     }
 

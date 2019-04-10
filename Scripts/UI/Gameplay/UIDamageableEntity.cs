@@ -16,8 +16,15 @@ namespace MultiplayerARPG
         protected int currentHp;
         protected int maxHp;
 
+        [Header("Options")]
+        [Tooltip("Visible when hit duration for non owning character")]
+        public float visibleWhenHitDuration = 2f;
+
         protected override void Update()
         {
+            if (!CacheCanvas.enabled)
+                return;
+
             base.Update();
 
             currentHp = 0;
@@ -33,6 +40,11 @@ namespace MultiplayerARPG
 
             if (imageHpGage != null)
                 imageHpGage.fillAmount = maxHp <= 0 ? 0 : (float)currentHp / (float)maxHp;
+        }
+
+        protected override bool ValidateToUpdateUI()
+        {
+            return base.ValidateToUpdateUI() && !Data.IsDead();
         }
     }
 
