@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
 {
@@ -9,7 +8,7 @@ namespace MultiplayerARPG
         public bool CanRefine { get { return EquipmentItem != null && Level < EquipmentItem.MaxLevel; } }
         public ItemRefineLevel RefineLevel { get { return EquipmentItem.itemRefineInfo.levels[Level - 1]; } }
 
-        [Header("Generic Info Format")]
+        [Header("Format for UI Refine Item")]
         [Tooltip("Require Gold Format => {0} = {Amount}")]
         public string requireGoldFormat = "Require Gold: {0}";
         [Tooltip("Success Rate Format => {0} = {Rate}")]
@@ -17,16 +16,34 @@ namespace MultiplayerARPG
         [Tooltip("Refining Level Format => {0} = {Refining Level}")]
         public string refiningLevelFormat = "Refining To: +{0}";
 
-        [Header("UI Elements")]
+        [Header("UI Elements for UI Refine Item")]
+        [HideInInspector]
         public UICharacterItem uiRefiningItem;
         public UIItemAmounts uiRequireItemAmounts;
         public TextWrapper uiTextRequireGold;
         public TextWrapper uiTextSuccessRate;
         public TextWrapper uiTextRefiningLevel;
 
-        protected override void UpdateUI()
+        protected override void Awake()
         {
-            Profiler.BeginSample("UIRefineItem - Update UI");
+            base.Awake();
+            if (uiCharacterItem == null && uiRefiningItem != null)
+                uiCharacterItem = uiRefiningItem;
+        }
+
+        public void OnUpdateCharacterItems()
+        {
+            if (uiCharacterItem != null)
+            {
+                if (CharacterItem == null)
+                    uiCharacterItem.Hide();
+                else
+                {
+                    uiCharacterItem.Setup(new CharacterItemTuple(CharacterItem, Level, InventoryType), OwningCharacter, IndexOfData);
+                    uiCharacterItem.Show();
+                }
+            }
+
             if (uiRequireItemAmounts != null)
             {
                 if (!CanRefine)
@@ -61,7 +78,6 @@ namespace MultiplayerARPG
                 else
                     uiTextRefiningLevel.text = string.Format(refiningLevelFormat, Level.ToString("N0"));
             }
-            Profiler.EndSample();
         }
 
         public override void Hide()
