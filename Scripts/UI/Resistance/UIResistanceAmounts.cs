@@ -41,31 +41,31 @@ namespace MultiplayerARPG
                 if (uiTextAllAmounts != null)
                     uiTextAllAmounts.gameObject.SetActive(false);
 
-                foreach (KeyValuePair<DamageElement, TextWrapper> textAmount in CacheTextAmounts)
+                foreach (KeyValuePair<DamageElement, TextWrapper> entry in CacheTextAmounts)
                 {
-                    DamageElement element = textAmount.Key;
-                    textAmount.Value.text = string.Format(amountFormat, element.Title, "0", "0");
+                    entry.Value.text = string.Format(amountFormat, entry.Key.Title, "0", "0");
                 }
             }
             else
             {
-                string text = "";
+                string tempAllText = string.Empty;
+                string tempAmountText;
+                TextWrapper tempTextWarpper;
                 foreach (KeyValuePair<DamageElement, float> dataEntry in Data)
                 {
                     if (dataEntry.Key == null || dataEntry.Value == 0)
                         continue;
-                    if (!string.IsNullOrEmpty(text))
-                        text += "\n";
-                    string amountText = string.Format(amountFormat, dataEntry.Key.Title, (dataEntry.Value * 100f).ToString("N0"));
-                    text += amountText;
-                    TextWrapper cacheTextAmount;
-                    if (CacheTextAmounts.TryGetValue(dataEntry.Key, out cacheTextAmount))
-                        cacheTextAmount.text = amountText;
+                    if (!string.IsNullOrEmpty(tempAllText))
+                        tempAllText += "\n";
+                    tempAmountText = string.Format(amountFormat, dataEntry.Key.Title, (dataEntry.Value * 100f).ToString("N2"));
+                    tempAllText += tempAmountText;
+                    if (CacheTextAmounts.TryGetValue(dataEntry.Key, out tempTextWarpper))
+                        tempTextWarpper.text = tempAmountText;
                 }
                 if (uiTextAllAmounts != null)
                 {
-                    uiTextAllAmounts.gameObject.SetActive(!string.IsNullOrEmpty(text));
-                    uiTextAllAmounts.text = text;
+                    uiTextAllAmounts.gameObject.SetActive(!string.IsNullOrEmpty(tempAllText));
+                    uiTextAllAmounts.text = tempAllText;
                 }
             }
         }

@@ -36,6 +36,7 @@ namespace MultiplayerARPG
                     uiRequireAttributeAmounts.Hide();
                 else
                 {
+                    uiRequireAttributeAmounts.showAsRequirement = true;
                     uiRequireAttributeAmounts.Show();
                     uiRequireAttributeAmounts.Data = skill.CacheRequireAttributeAmounts;
                 }
@@ -47,6 +48,7 @@ namespace MultiplayerARPG
                     uiRequireSkillLevels.Hide();
                 else
                 {
+                    uiRequireSkillLevels.showAsRequirement = true;
                     uiRequireSkillLevels.Show();
                     uiRequireSkillLevels.Data = skill.CacheRequireSkillLevels;
                 }

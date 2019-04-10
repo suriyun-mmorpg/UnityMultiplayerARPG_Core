@@ -458,7 +458,8 @@ namespace MultiplayerARPG
             }
             // Check visible item dialog
             UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
-            if (uiGameplay.uiNpcDialog.IsVisible() &&
+            if (uiGameplay.uiNpcDialog != null &&
+                uiGameplay.uiNpcDialog.IsVisible() &&
                 uiGameplay.uiNpcDialog.Data != null &&
                 uiGameplay.uiNpcDialog.Data.type == NpcDialogType.Shop &&
                 InventoryType == InventoryType.NonEquipItems)
@@ -495,7 +496,8 @@ namespace MultiplayerARPG
             }
             // Check visible item dialog
             UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
-            if (uiGameplay.uiRefineItem.IsVisible() &&
+            if (uiGameplay.uiRefineItem != null &&
+                uiGameplay.uiRefineItem.IsVisible() &&
                 Data.characterItem.GetEquipmentItem() != null &&
                 InventoryType == InventoryType.NonEquipItems)
             {
@@ -531,7 +533,8 @@ namespace MultiplayerARPG
             }
             // Check visible item dialog
             UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
-            if (uiGameplay.uiEnhanceSocketItem.IsVisible() &&
+            if (uiGameplay.uiEnhanceSocketItem != null &&
+                uiGameplay.uiEnhanceSocketItem.IsVisible() &&
                 Data.characterItem.GetEquipmentItem() != null &&
                 InventoryType == InventoryType.NonEquipItems)
             {
@@ -567,9 +570,10 @@ namespace MultiplayerARPG
             }
             // Check visible item dialog
             UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
-            bool isAnyStorageVisible = uiGameplay.uiPlayerStorageItems.IsVisible() ||
-                uiGameplay.uiGuildStorageItems.IsVisible() ||
-                uiGameplay.uiBuildingStorageItems.IsVisible();
+            bool isAnyStorageVisible = 
+                (uiGameplay.uiPlayerStorageItems != null && uiGameplay.uiPlayerStorageItems.IsVisible()) ||
+                (uiGameplay.uiGuildStorageItems != null && uiGameplay.uiGuildStorageItems.IsVisible()) ||
+                (uiGameplay.uiBuildingStorageItems != null && uiGameplay.uiBuildingStorageItems.IsVisible());
             if (isAnyStorageVisible &&
                 InventoryType == InventoryType.NonEquipItems)
             {

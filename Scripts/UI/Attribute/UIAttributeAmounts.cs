@@ -9,10 +9,13 @@ namespace MultiplayerARPG
         public string amountFormat = "{0}: {1}/{2}";
         [Tooltip("Attribute Amount Format => {0} = {Attribute title}, {1} = {Current Amount}, {2} = {Target Amount}")]
         public string amountNotEnoughFormat = "{0}: <color=red>{1}/{2}</color>";
+        [Tooltip("Attribute Amount Format without Current Amount => {0} = {Attribute title}, {1} = {Target Level}")]
+        public string simpleAmountFormat = "{0}: {1}";
 
         [Header("UI Elements")]
         public TextWrapper uiTextAllAmounts;
         public UIAttributeTextPair[] textAmounts;
+        public bool showAsRequirement;
 
         private Dictionary<Attribute, TextWrapper> cacheTextAmounts;
         public Dictionary<Attribute, TextWrapper> CacheTextAmounts
@@ -44,37 +47,49 @@ namespace MultiplayerARPG
                 if (uiTextAllAmounts != null)
                     uiTextAllAmounts.gameObject.SetActive(false);
 
-                foreach (KeyValuePair<Attribute, TextWrapper> textAmount in CacheTextAmounts)
+                foreach (KeyValuePair<Attribute, TextWrapper> entry in CacheTextAmounts)
                 {
-                    Attribute element = textAmount.Key;
-                    textAmount.Value.text = string.Format(amountFormat, element.Title, "0", "0");
+                    entry.Value.text = string.Format(amountFormat, entry.Key.Title, "0", "0");
                 }
             }
             else
             {
-                string text = "";
+                string tempAllText = string.Empty;
+                Attribute tempAttribute;
+                short tempCurrentAmount;
+                short tempTargetAmount;
+                string tempFormat;
+                string tempAmountText;
+                TextWrapper tempTextWrapper;
                 foreach (KeyValuePair<Attribute, short> dataEntry in Data)
                 {
-                    Attribute attribute = dataEntry.Key;
-                    short targetAmount = dataEntry.Value;
-                    if (attribute == null || targetAmount == 0)
+                    tempAttribute = dataEntry.Key;
+                    tempTargetAmount = dataEntry.Value;
+                    if (tempAttribute == null || tempTargetAmount == 0)
                         continue;
-                    if (!string.IsNullOrEmpty(text))
-                        text += "\n";
-                    short currentAmount = 0;
+                    if (!string.IsNullOrEmpty(tempAllText))
+                        tempAllText += "\n";
+                    tempCurrentAmount = 0;
                     if (owningCharacter != null)
-                        owningCharacter.CacheAttributes.TryGetValue(attribute, out currentAmount);
-                    string format = currentAmount >= targetAmount ? amountFormat : amountNotEnoughFormat;
-                    string amountText = string.Format(format, attribute.Title, currentAmount.ToString("N0"), targetAmount.ToString("N0"));
-                    text += amountText;
-                    TextWrapper cacheTextAmount;
-                    if (CacheTextAmounts.TryGetValue(attribute, out cacheTextAmount))
-                        cacheTextAmount.text = amountText;
+                        owningCharacter.CacheAttributes.TryGetValue(tempAttribute, out tempCurrentAmount);
+                    if (showAsRequirement)
+                    {
+                        tempFormat = tempCurrentAmount >= tempTargetAmount ? amountFormat : amountNotEnoughFormat;
+                        tempAmountText = string.Format(tempFormat, tempAttribute.Title, tempCurrentAmount.ToString("N0"), tempTargetAmount.ToString("N0"));
+                    }
+                    else
+                    {
+                        // This will show only target amount, so current character attribute amount will not be shown
+                        tempAmountText = string.Format(simpleAmountFormat, tempAttribute.Title, tempTargetAmount.ToString("N0"));
+                    }
+                    tempAllText += tempAmountText;
+                    if (CacheTextAmounts.TryGetValue(tempAttribute, out tempTextWrapper))
+                        tempTextWrapper.text = tempAmountText;
                 }
                 if (uiTextAllAmounts != null)
                 {
-                    uiTextAllAmounts.gameObject.SetActive(!string.IsNullOrEmpty(text));
-                    uiTextAllAmounts.text = text;
+                    uiTextAllAmounts.gameObject.SetActive(!string.IsNullOrEmpty(tempAllText));
+                    uiTextAllAmounts.text = tempAllText;
                 }
             }
         }

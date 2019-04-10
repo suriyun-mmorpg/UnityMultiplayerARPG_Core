@@ -47,36 +47,38 @@ namespace MultiplayerARPG
                 if (uiTextSumDamage != null)
                     uiTextSumDamage.text = string.Format(sumDamageFormat, "0", "0");
 
-                foreach (KeyValuePair<DamageElement, TextWrapper> textAmount in CacheTextDamages)
+                foreach (KeyValuePair<DamageElement, TextWrapper> entry in CacheTextDamages)
                 {
-                    DamageElement element = textAmount.Key;
-                    textAmount.Value.text = string.Format(damageFormat, element.Title, "0", "0");
+                    entry.Value.text = string.Format(damageFormat, entry.Key.Title, "0", "0");
                 }
             }
             else
             {
-                string text = "";
+                string tempAllText = string.Empty;
                 MinMaxFloat sumDamage = new MinMaxFloat();
+                DamageElement tempElement;
+                MinMaxFloat tempAmount;
+                string tempAmountText;
+                TextWrapper tempTextWrapper;
                 foreach (KeyValuePair<DamageElement, MinMaxFloat> dataEntry in Data)
                 {
                     if (dataEntry.Key == null || (dataEntry.Value.min == 0 && dataEntry.Value.max == 0))
                         continue;
-                    DamageElement element = dataEntry.Key;
-                    MinMaxFloat amount = dataEntry.Value;
-                    if (!string.IsNullOrEmpty(text))
-                        text += "\n";
-                    string amountText = string.Format(damageFormat, element.Title, amount.min.ToString("N0"), amount.max.ToString("N0"));
-                    text += amountText;
-                    TextWrapper textDamages;
-                    if (CacheTextDamages.TryGetValue(dataEntry.Key, out textDamages))
-                        textDamages.text = amountText;
-                    sumDamage += amount;
+                    tempElement = dataEntry.Key;
+                    tempAmount = dataEntry.Value;
+                    if (!string.IsNullOrEmpty(tempAllText))
+                        tempAllText += "\n";
+                    tempAmountText = string.Format(damageFormat, tempElement.Title, tempAmount.min.ToString("N0"), tempAmount.max.ToString("N0"));
+                    tempAllText += tempAmountText;
+                    if (CacheTextDamages.TryGetValue(dataEntry.Key, out tempTextWrapper))
+                        tempTextWrapper.text = tempAmountText;
+                    sumDamage += tempAmount;
                 }
 
                 if (uiTextAllDamages != null)
                 {
-                    uiTextAllDamages.gameObject.SetActive(!string.IsNullOrEmpty(text));
-                    uiTextAllDamages.text = text;
+                    uiTextAllDamages.gameObject.SetActive(!string.IsNullOrEmpty(tempAllText));
+                    uiTextAllDamages.text = tempAllText;
                 }
 
                 if (uiTextSumDamage != null)

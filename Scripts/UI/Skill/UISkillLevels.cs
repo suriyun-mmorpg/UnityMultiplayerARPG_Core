@@ -9,10 +9,13 @@ namespace MultiplayerARPG
         public string levelFormat = "{0}: {1}/{2}";
         [Tooltip("Skill Level Format => {0} = {Skill title}, {1} = {Current Level}, {2} = {Target Level}")]
         public string levelNotEnoughFormat = "{0}: <color=red>{1}/{2}</color>";
+        [Tooltip("Skill Level Format without Current Level => {0} = {Skill title}, {1} = {Target Level}")]
+        public string simpleLevelFormat = "{0}: {1}";
 
         [Header("UI Elements")]
         public TextWrapper uiTextAllLevels;
         public UISkillTextPair[] textLevels;
+        public bool showAsRequirement;
 
         private Dictionary<Skill, TextWrapper> cacheTextLevels;
         public Dictionary<Skill, TextWrapper> CacheTextLevels
@@ -44,37 +47,49 @@ namespace MultiplayerARPG
                 if (uiTextAllLevels != null)
                     uiTextAllLevels.gameObject.SetActive(false);
 
-                foreach (KeyValuePair<Skill, TextWrapper> textLevel in CacheTextLevels)
+                foreach (KeyValuePair<Skill, TextWrapper> entry in CacheTextLevels)
                 {
-                    Skill element = textLevel.Key;
-                    textLevel.Value.text = string.Format(levelFormat, element.Title, "0", "0");
+                    entry.Value.text = string.Format(levelFormat, entry.Key.Title, "0", "0");
                 }
             }
             else
             {
-                string text = "";
+                string tempAllText = string.Empty;
+                Skill tempSkill;
+                short tempCurrentLevel;
+                short tempTargetLevel;
+                string tempFormat;
+                string tempLevelText;
+                TextWrapper tempTextWrapper;
                 foreach (KeyValuePair<Skill, short> dataEntry in Data)
                 {
-                    Skill skill = dataEntry.Key;
-                    short targetLevel = dataEntry.Value;
-                    if (skill == null || targetLevel == 0)
+                    tempSkill = dataEntry.Key;
+                    tempTargetLevel = dataEntry.Value;
+                    if (tempSkill == null || tempTargetLevel == 0)
                         continue;
-                    if (!string.IsNullOrEmpty(text))
-                        text += "\n";
-                    short currentLevel = 0;
+                    if (!string.IsNullOrEmpty(tempAllText))
+                        tempAllText += "\n";
+                    tempCurrentLevel = 0;
                     if (owningCharacter != null)
-                        owningCharacter.CacheSkills.TryGetValue(skill, out currentLevel);
-                    string format = currentLevel >= targetLevel ? levelFormat : levelNotEnoughFormat;
-                    string amountText = string.Format(format, skill.Title, currentLevel.ToString("N0"), targetLevel.ToString("N0"));
-                    text += amountText;
-                    TextWrapper cacheTextAmount;
-                    if (CacheTextLevels.TryGetValue(dataEntry.Key, out cacheTextAmount))
-                        cacheTextAmount.text = amountText;
+                        owningCharacter.CacheSkills.TryGetValue(tempSkill, out tempCurrentLevel);
+                    if (showAsRequirement)
+                    {
+                        tempFormat = tempCurrentLevel >= tempTargetLevel ? levelFormat : levelNotEnoughFormat;
+                        tempLevelText = string.Format(tempFormat, tempSkill.Title, tempCurrentLevel.ToString("N0"), tempTargetLevel.ToString("N0"));
+                    }
+                    else
+                    {
+                        // This will show only target level, so current character skill level will not be shown
+                        tempLevelText = string.Format(simpleLevelFormat, tempSkill.Title, tempTargetLevel.ToString("N0"));
+                    }
+                    tempAllText += tempLevelText;
+                    if (CacheTextLevels.TryGetValue(dataEntry.Key, out tempTextWrapper))
+                        tempTextWrapper.text = tempLevelText;
                 }
                 if (uiTextAllLevels != null)
                 {
-                    uiTextAllLevels.gameObject.SetActive(!string.IsNullOrEmpty(text));
-                    uiTextAllLevels.text = text;
+                    uiTextAllLevels.gameObject.SetActive(!string.IsNullOrEmpty(tempAllText));
+                    uiTextAllLevels.text = tempAllText;
                 }
             }
         }
