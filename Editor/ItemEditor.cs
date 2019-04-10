@@ -75,6 +75,7 @@ namespace MultiplayerARPG
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.SocketEnhancer.ToString(), cacheItem.GetMemberName(a => a.increaseResistances));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.SocketEnhancer.ToString(), cacheItem.GetMemberName(a => a.increaseDamages));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.SocketEnhancer.ToString(), cacheItem.GetMemberName(a => a.increaseStats));
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.SocketEnhancer.ToString(), cacheItem.GetMemberName(a => a.increaseSkillLevels));
         }
     }
 }

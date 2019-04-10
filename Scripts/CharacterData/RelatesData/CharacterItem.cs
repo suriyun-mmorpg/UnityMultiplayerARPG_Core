@@ -220,6 +220,126 @@ public class CharacterItem : INetSerializable
         return expTree[level - 1];
     }
 
+    public Dictionary<Attribute, short> GetIncreaseAttributes()
+    {
+        if (GetEquipmentItem() == null)
+            return null;
+        return GetEquipmentItem().GetIncreaseAttributes(level, GetEquipmentBonusRate());
+    }
+
+    public Dictionary<DamageElement, float> GetIncreaseResistances()
+    {
+        if (GetEquipmentItem() == null || Sockets.Count == 0)
+            return null;
+        return GetEquipmentItem().GetIncreaseResistances(level, GetEquipmentBonusRate());
+    }
+
+    public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages()
+    {
+        if (GetEquipmentItem() == null || Sockets.Count == 0)
+            return null;
+        return GetEquipmentItem().GetIncreaseDamages(level, GetEquipmentBonusRate());
+    }
+
+    public Dictionary<Skill, short> GetIncreaseSkills()
+    {
+        if (GetEquipmentItem() == null || Sockets.Count == 0)
+            return null;
+        return GetEquipmentItem().GetIncreaseSkills();
+    }
+
+    public CharacterStats GetIncreaseStats()
+    {
+        if (GetEquipmentItem() == null || Sockets.Count == 0)
+            return CharacterStats.Empty;
+        return GetEquipmentItem().GetIncreaseStats(level, GetEquipmentBonusRate());
+    }
+
+    public Dictionary<Attribute, short> GetSocketsIncreaseAttributes()
+    {
+        if (GetEquipmentItem() == null || Sockets.Count == 0)
+            return null;
+        Dictionary<Attribute, short> result = new Dictionary<Attribute, short>();
+        Item tempEnhancer;
+        foreach (int socketId in Sockets)
+        {
+            if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
+            {
+                // Level for increase stats always 1
+                result = GameDataHelpers.CombineAttributes(result, tempEnhancer.GetIncreaseAttributes(1, 1));
+            }
+        }
+        return result;
+    }
+
+    public Dictionary<DamageElement, float> GetSocketsIncreaseResistances()
+    {
+        if (GetEquipmentItem() == null || Sockets.Count == 0)
+            return null;
+        Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
+        Item tempEnhancer;
+        foreach (int socketId in Sockets)
+        {
+            if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
+            {
+                // Level for increase stats always 1
+                result = GameDataHelpers.CombineResistances(result, tempEnhancer.GetIncreaseResistances(1, 1));
+            }
+        }
+        return result;
+    }
+
+    public Dictionary<DamageElement, MinMaxFloat> GetSocketsIncreaseDamages()
+    {
+        if (GetEquipmentItem() == null || Sockets.Count == 0)
+            return null;
+        Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
+        Item tempEnhancer;
+        foreach (int socketId in Sockets)
+        {
+            if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
+            {
+                // Level for increase stats always 1
+                result = GameDataHelpers.CombineDamages(result, tempEnhancer.GetIncreaseDamages(1, 1));
+            }
+        }
+        return result;
+    }
+
+    public Dictionary<Skill, short> GetSocketsIncreaseSkills()
+    {
+        if (GetEquipmentItem() == null || Sockets.Count == 0)
+            return null;
+        Dictionary<Skill, short> result = new Dictionary<Skill, short>();
+        Item tempEnhancer;
+        foreach (int socketId in Sockets)
+        {
+            if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
+            {
+                // Level for increase stats always 1
+                result = GameDataHelpers.CombineSkills(result, tempEnhancer.GetIncreaseSkills());
+            }
+        }
+        return result;
+    }
+
+    public CharacterStats GetSocketsIncreaseStats()
+    {
+        if (GetEquipmentItem() == null || Sockets.Count == 0)
+            return CharacterStats.Empty;
+        CharacterStats result = new CharacterStats();
+        Item tempEnhancer;
+        foreach (int socketId in Sockets)
+        {
+            if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
+            {
+                // Level for increase stats always 1
+                result += tempEnhancer.GetIncreaseStats(1, 1);
+            }
+        }
+        return result;
+    }
+
     public CharacterItem Clone()
     {
         CharacterItem cloneItem = new CharacterItem();
