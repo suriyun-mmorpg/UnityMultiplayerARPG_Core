@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         public GameObject haveInProgressQuestIndicator;
         [Tooltip("This will activate when there are new quests")]
         public GameObject haveNewQuestIndicator;
+        public float updateWithinRange = 30f;
         public float updateRepeatRate = 0.5f;
         [HideInInspector, System.NonSerialized]
         public NpcEntity npcEntity;
@@ -23,7 +24,9 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            if (npcEntity == null || BasePlayerCharacterController.OwningCharacter == null)
+            if (npcEntity == null ||
+                BasePlayerCharacterController.OwningCharacter == null ||
+                Vector3.Distance(npcEntity.CacheTransform.position, BasePlayerCharacterController.OwningCharacter.CacheTransform.position) > updateWithinRange)
             {
                 if (haveInProgressQuestIndicator != null)
                     haveInProgressQuestIndicator.SetActive(false);

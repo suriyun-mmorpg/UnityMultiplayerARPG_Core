@@ -14,6 +14,7 @@ namespace MultiplayerARPG
         public GameObject enemyIndicator;
         [Tooltip("This will activate when character is neutral with owning character")]
         public GameObject neutralIndicator;
+        public float updateWithinRange = 30f;
         public float updateRepeatRate = 0.5f;
         [HideInInspector, System.NonSerialized]
         public BaseCharacterEntity characterEntity;
@@ -27,7 +28,9 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            if (characterEntity == null || BasePlayerCharacterController.OwningCharacter == null)
+            if (characterEntity == null ||
+                BasePlayerCharacterController.OwningCharacter == null ||
+                Vector3.Distance(characterEntity.CacheTransform.position, BasePlayerCharacterController.OwningCharacter.CacheTransform.position) > updateWithinRange)
             {
                 if (owningIndicator != null)
                     owningIndicator.SetActive(false);
