@@ -562,19 +562,6 @@ namespace MultiplayerARPG
                 onShowStorage.Invoke((StorageType)byteStorageType, weightLimit, slotLimit);
         }
 
-        protected virtual void NetFuncDepositToStorage(short index, short amount)
-        {
-            if (IsDead() ||
-                index >= nonEquipItems.Count)
-                return;
-        }
-
-        protected virtual void NetFuncWithdrawFromStorage(short index, short amount)
-        {
-            if (IsDead())
-                return;
-        }
-
         protected virtual void NetFuncSellItem(short index, short amount)
         {
             if (IsDead() ||
@@ -595,8 +582,7 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncRefineItem(byte byteInventoryType, short index)
         {
-            if (IsDead() ||
-                index >= nonEquipItems.Count)
+            if (IsDead())
                 return;
 
             GameMessage.Type gameMessageType;
@@ -621,10 +607,38 @@ namespace MultiplayerARPG
             }
         }
 
+        protected virtual void NetFuncEnhanceSocketItem(byte byteInventoryType, short index, int enhancerId)
+        {
+            if (IsDead())
+                return;
+            // TODO: Implement this
+            /*
+            GameMessage.Type gameMessageType;
+            switch ((InventoryType)byteInventoryType)
+            {
+                case InventoryType.NonEquipItems:
+                    Item.RefineNonEquipItem(this, index, out gameMessageType);
+                    gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                    break;
+                case InventoryType.EquipItems:
+                    Item.RefineEquipItem(this, index, out gameMessageType);
+                    gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                    break;
+                case InventoryType.EquipWeaponRight:
+                    Item.RefineRightHandItem(this, out gameMessageType);
+                    gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                    break;
+                case InventoryType.EquipWeaponLeft:
+                    Item.RefineLeftHandItem(this, out gameMessageType);
+                    gameManager.SendServerGameMessage(ConnectionId, gameMessageType);
+                    break;
+            }
+            */
+        }
+
         protected virtual void NetFuncRepairItem(byte byteInventoryType, short index)
         {
-            if (IsDead() ||
-                index >= nonEquipItems.Count)
+            if (IsDead())
                 return;
 
             GameMessage.Type gameMessageType;

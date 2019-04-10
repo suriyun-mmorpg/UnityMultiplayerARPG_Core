@@ -118,16 +118,21 @@ namespace MultiplayerARPG
 
         public virtual void RequestRefineItem(byte byteInventoryType, short index)
         {
-            if (IsDead() ||
-                index >= NonEquipItems.Count)
+            if (IsDead())
                 return;
             CallNetFunction(NetFuncRefineItem, FunctionReceivers.Server, byteInventoryType, index);
         }
 
+        public virtual void RequestEnhanceSocketItem(byte byteInventoryType, short index, int enhancerId)
+        {
+            if (IsDead())
+                return;
+            CallNetFunction(NetFuncEnhanceSocketItem, FunctionReceivers.Server, byteInventoryType, index, enhancerId);
+        }
+
         public virtual void RequestRepairItem(byte byteInventoryType, short index)
         {
-            if (IsDead() ||
-                index >= NonEquipItems.Count)
+            if (IsDead())
                 return;
             CallNetFunction(NetFuncRepairItem, FunctionReceivers.Server, byteInventoryType, index);
         }

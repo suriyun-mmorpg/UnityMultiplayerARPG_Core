@@ -8,6 +8,7 @@ namespace MultiplayerARPG
         public ICharacterData character { get; protected set; }
         public UICharacterItem uiItemDialog;
         public UICharacterItem uiCharacterItemPrefab;
+        public List<string> filterCategories;
         public List<ItemType> filterItemTypes;
         public Transform uiCharacterItemContainer;
 
@@ -97,8 +98,13 @@ namespace MultiplayerARPG
                 foreach (CharacterItem nonEquipItem in nonEquipItems)
                 {
                     if (nonEquipItem.GetItem() == null) continue;
-                    if (filterItemTypes.Contains(nonEquipItem.GetItem().itemType))
-                        filteredItems.Add(nonEquipItem);
+                    if (string.IsNullOrEmpty(nonEquipItem.GetItem().category) ||
+                        filterCategories == null || filterCategories.Count == 0 ||
+                        filterCategories.Contains(nonEquipItem.GetItem().category))
+                    {
+                        if (filterItemTypes.Contains(nonEquipItem.GetItem().itemType))
+                            filteredItems.Add(nonEquipItem);
+                    }
                 }
                 nonEquipItems = filteredItems;
             }

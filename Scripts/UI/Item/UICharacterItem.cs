@@ -766,7 +766,7 @@ namespace MultiplayerARPG
             if (uiGameplay.uiRefineItem != null &&
                 CharacterItem.GetEquipmentItem() != null)
             {
-                uiGameplay.uiRefineItem.Setup(InventoryType, IndexOfData);
+                uiGameplay.uiRefineItem.Data = new CharacterItemByIndexTuple(InventoryType, IndexOfData);
                 uiGameplay.uiRefineItem.Show();
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
@@ -782,16 +782,14 @@ namespace MultiplayerARPG
                 return;
 
             UISceneGameplay uiGameplay = UISceneGameplay.Singleton;
-            /*
-            if (uiGameplay.uiRefineItem != null &&
+            if (uiGameplay.uiEnhanceSocketItem != null &&
                 CharacterItem.GetEquipmentItem() != null)
             {
-                uiGameplay.uiRefineItem.Setup(InventoryType, IndexOfData);
-                uiGameplay.uiRefineItem.Show();
+                uiGameplay.uiEnhanceSocketItem.Data = new CharacterItemByIndexTuple(InventoryType, IndexOfData);
+                uiGameplay.uiEnhanceSocketItem.Show();
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
             }
-            */
         }
         #endregion
     }

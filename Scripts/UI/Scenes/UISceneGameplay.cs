@@ -64,6 +64,7 @@ namespace MultiplayerARPG
         [Header("Other UIs")]
         public UINpcDialog uiNpcDialog;
         public UIRefineItem uiRefineItem;
+        public UIEnhanceSocketItem uiEnhanceSocketItem;
         public UIConstructBuilding uiConstructBuilding;
         public UICurrentBuilding uiCurrentBuilding;
         public UIPlayerActivateMenu uiPlayerActivateMenu;

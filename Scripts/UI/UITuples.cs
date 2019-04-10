@@ -35,6 +35,17 @@
         }
     }
 
+    public struct CharacterItemByIndexTuple
+    {
+        public InventoryType inventoryType;
+        public int indexOfData;
+        public CharacterItemByIndexTuple(InventoryType inventoryType, int indexOfData)
+        {
+            this.inventoryType = inventoryType;
+            this.indexOfData = indexOfData;
+        }
+    }
+
     public struct BuffTuple
     {
         public Buff buff;

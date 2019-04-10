@@ -70,6 +70,7 @@ namespace MultiplayerARPG
             RegisterNetFunction<PackedUInt>(NetFuncDestroyBuilding);
             RegisterNetFunction<short, short>(NetFuncSellItem);
             RegisterNetFunction<byte, short>(NetFuncRefineItem);
+            RegisterNetFunction<byte, short, int>(NetFuncEnhanceSocketItem);
             RegisterNetFunction<byte, short>(NetFuncRepairItem);
             RegisterNetFunction<PackedUInt>(NetFuncSendDealingRequest);
             RegisterNetFunction<PackedUInt>(NetFuncReceiveDealingRequest);
@@ -108,8 +109,6 @@ namespace MultiplayerARPG
             RegisterNetFunction<string>(NetFuncKickFromGuild);
             RegisterNetFunction(NetFuncLeaveGuild);
             RegisterNetFunction<byte, short, short>(NetFuncShowStorage);
-            RegisterNetFunction<short, short, short>(NetFuncMoveItemToStorage);
-            RegisterNetFunction<short, short, short>(NetFuncMoveItemFromStorage);
             RegisterNetFunction<int>(NetFuncDepositGold);
             RegisterNetFunction<int>(NetFuncWithdrawGold);
             RegisterNetFunction<int>(NetFuncDepositGuildGold);
