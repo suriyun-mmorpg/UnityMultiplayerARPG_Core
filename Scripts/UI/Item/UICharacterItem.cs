@@ -95,7 +95,9 @@ namespace MultiplayerARPG
         public UIAttributeAmounts uiIncreaseAttributes;
         public UIResistanceAmounts uiIncreaseResistances;
         public UIDamageElementAmounts uiIncreaseDamageAmounts;
+        public UISkillLevels uiIncreaseSkillLevels;
         public UIEquipmentSet uiEquipmentSet;
+        public UIEquipmentSockets uiEquipmentSockets;
 
         [Header("Weapon - UI Elements")]
         public UIDamageElementAmount uiDamageAmounts;
@@ -364,6 +366,18 @@ namespace MultiplayerARPG
                 }
             }
 
+            if (uiIncreaseSkillLevels != null)
+            {
+                Dictionary<Skill, short> skillLevels = EquipmentItem.GetIncreaseSkills();
+                if (EquipmentItem == null || skillLevels == null || skillLevels.Count == 0)
+                    uiIncreaseSkillLevels.Hide();
+                else
+                {
+                    uiIncreaseSkillLevels.Show();
+                    uiIncreaseSkillLevels.Data = skillLevels;
+                }
+            }
+
             if (uiEquipmentSet != null)
             {
                 if (EquipmentItem == null || EquipmentItem.equipmentSet == null || EquipmentItem.equipmentSet.effects.Length == 0)
@@ -373,7 +387,18 @@ namespace MultiplayerARPG
                     uiEquipmentSet.Show();
                     int equippedCount = 0;
                     Character.CacheEquipmentSets.TryGetValue(EquipmentItem.equipmentSet, out equippedCount);
-                    uiEquipmentSet.Data = new EquipmentSetEquippedCountTuple(EquipmentItem.equipmentSet, equippedCount);
+                    uiEquipmentSet.Data = new EquipmentSetWithEquippedCountTuple(EquipmentItem.equipmentSet, equippedCount);
+                }
+            }
+
+            if (uiEquipmentSockets != null)
+            {
+                if (EquipmentItem == null || EquipmentItem.maxSocket <= 0)
+                    uiEquipmentSockets.Hide();
+                else
+                {
+                    uiEquipmentSockets.Show();
+                    uiEquipmentSockets.Data = new EnhancedSocketsWithMaxSocketTuple(CharacterItem.Sockets, EquipmentItem.maxSocket);
                 }
             }
 

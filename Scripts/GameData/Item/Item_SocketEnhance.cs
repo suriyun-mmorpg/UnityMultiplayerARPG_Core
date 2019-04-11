@@ -53,12 +53,12 @@ namespace MultiplayerARPG
                 // Cannot enhance socket because it's not equipment item
                 return;
             }
-            if (equipmentItem.socket <= 0)
+            if (equipmentItem.maxSocket <= 0)
             {
                 // Cannot enhance socket because equipment has no socket(s)
                 return;
             }
-            if (enhancingItem.Sockets.Count >= equipmentItem.socket)
+            if (enhancingItem.Sockets.Count >= equipmentItem.maxSocket)
             {
                 // Cannot enhance socket because socket is full
                 return;

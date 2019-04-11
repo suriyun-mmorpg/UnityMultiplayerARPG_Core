@@ -266,7 +266,7 @@ public class CharacterItem : INetSerializable
             if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
             {
                 // Level for increase stats always 1
-                result = GameDataHelpers.CombineAttributes(tempEnhancer.enhanceAttributes, result, 1f);
+                result = GameDataHelpers.CombineAttributes(tempEnhancer.socketEnhanceEffect.attributes, result, 1f);
             }
         }
         return result;
@@ -283,7 +283,7 @@ public class CharacterItem : INetSerializable
             if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
             {
                 // Level for increase stats always 1
-                result = GameDataHelpers.CombineResistances(tempEnhancer.enhanceResistances, result, 1f);
+                result = GameDataHelpers.CombineResistances(tempEnhancer.socketEnhanceEffect.resistances, result, 1f);
             }
         }
         return result;
@@ -300,7 +300,7 @@ public class CharacterItem : INetSerializable
             if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
             {
                 // Level for increase stats always 1
-                result = GameDataHelpers.CombineDamages(tempEnhancer.enhanceDamages, result, 1f);
+                result = GameDataHelpers.CombineDamages(tempEnhancer.socketEnhanceEffect.damages, result, 1f);
             }
         }
         return result;
@@ -317,7 +317,7 @@ public class CharacterItem : INetSerializable
             if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
             {
                 // Level for increase stats always 1
-                result = GameDataHelpers.CombineSkills(tempEnhancer.enhanceSkills, result);
+                result = GameDataHelpers.CombineSkills(tempEnhancer.socketEnhanceEffect.skills, result);
             }
         }
         return result;
@@ -334,7 +334,7 @@ public class CharacterItem : INetSerializable
             if (GameInstance.Items.TryGetValue(socketId, out tempEnhancer))
             {
                 // Level for increase stats always 1
-                result += tempEnhancer.enhanceStats;
+                result += tempEnhancer.socketEnhanceEffect.stats;
             }
         }
         return result;
