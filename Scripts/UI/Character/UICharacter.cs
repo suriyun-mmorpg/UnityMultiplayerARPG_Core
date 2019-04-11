@@ -82,11 +82,16 @@ namespace MultiplayerARPG
         // Improve garbage collector
         private float cacheWeightLimit;
         private CharacterStats cacheStats;
-        private Dictionary<DamageElement, float> cacheResistances;
         private Dictionary<Attribute, short> cacheAttributes;
-        // Data applies by equipment sets
-        private Dictionary<EquipmentSet, int> cacheEquipmentSets;
+        private Dictionary<DamageElement, float> cacheResistances;
         private Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages;
+        private Dictionary<EquipmentSet, int> cacheEquipmentSets;
+        // Cache bonus data
+        private CharacterStats bonusStats;
+        private Dictionary<Attribute, short> bonusAttributes;
+        private Dictionary<DamageElement, float> bonusResistances;
+        private Dictionary<DamageElement, MinMaxFloat> bonusIncreaseDamages;
+        private Dictionary<Skill, short> bonusSkills;
 
         private Dictionary<Attribute, UICharacterAttribute> cacheUICharacterAttributes;
         public Dictionary<Attribute, UICharacterAttribute> CacheUICharacterAttributes
@@ -263,13 +268,18 @@ namespace MultiplayerARPG
                 cacheWeightLimit += Data.GetBuffStats().weightLimit;
             }
 
-            CharacterStats bonusStats;
-            Dictionary<Attribute, short> bonusAttributes;
-            Dictionary<DamageElement, float> bonusResistances;
-            Dictionary<DamageElement, MinMaxFloat> bonusIncreaseDamages;
-            Dictionary<Skill, short> bonusSkills;
-            Dictionary<EquipmentSet, int> cacheEquipmentSets;
-            Data.GetEquipmentSetBonus(out bonusStats, out bonusAttributes, out bonusResistances, out bonusIncreaseDamages, out bonusSkills, out cacheEquipmentSets);
+            if (bonusAttributes == null)
+                bonusAttributes = new Dictionary<Attribute, short>();
+            if (bonusResistances == null)
+                bonusResistances = new Dictionary<DamageElement, float>();
+            if (bonusIncreaseDamages == null)
+                bonusIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+            if (bonusSkills == null)
+                bonusSkills = new Dictionary<Skill, short>();
+            if (cacheEquipmentSets == null)
+                cacheEquipmentSets = new Dictionary<EquipmentSet, int>();
+
+            Data.GetEquipmentSetBonus(out bonusStats, bonusAttributes, bonusResistances, bonusIncreaseDamages, bonusSkills, cacheEquipmentSets);
             // Increase stats by equipment set bonus
             cacheStats += bonusStats;
             cacheAttributes = GameDataHelpers.CombineAttributes(cacheAttributes, bonusAttributes);
@@ -286,7 +296,7 @@ namespace MultiplayerARPG
             Item leftHandWeapon = leftHandItem.GetWeaponItem();
             Dictionary<DamageElement, MinMaxFloat> rightHandDamages = rightHandWeapon != null ? GameDataHelpers.CombineDamages(cacheIncreaseDamages, rightHandWeapon.GetDamageAmount(rightHandItem.level, rightHandItem.GetEquipmentBonusRate(), Data)) : null;
             Dictionary<DamageElement, MinMaxFloat> leftHandDamages = leftHandWeapon != null ? GameDataHelpers.CombineDamages(cacheIncreaseDamages, leftHandWeapon.GetDamageAmount(leftHandItem.level, leftHandItem.GetEquipmentBonusRate(), Data)) : null;
-            
+
             if (uiTextWeaponDamages != null)
             {
                 string textDamages = "";

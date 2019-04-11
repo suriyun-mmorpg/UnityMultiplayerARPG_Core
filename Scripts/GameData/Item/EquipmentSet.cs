@@ -15,5 +15,6 @@ namespace MultiplayerARPG
         public ResistanceAmount[] resistances;
         public DamageAmount[] damages;
         public CharacterStats stats;
+        public SkillLevel[] skills;
     }
 }

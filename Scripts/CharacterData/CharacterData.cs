@@ -392,13 +392,25 @@ public partial class CharacterData : ICharacterData
     {
         if (!shouldMakeCache)
             return;
+
+        if (cacheAttributes == null)
+            cacheAttributes = new Dictionary<Attribute, short>();
+        if (cacheResistances == null)
+            cacheResistances = new Dictionary<DamageElement, float>();
+        if (cacheIncreaseDamages == null)
+            cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+        if (cacheSkills == null)
+            cacheSkills = new Dictionary<Skill, short>();
+        if (cacheEquipmentSets == null)
+            cacheEquipmentSets = new Dictionary<EquipmentSet, int>();
+
         this.GetAllStats(
             out cacheStats,
-            out cacheAttributes,
-            out cacheResistances,
-            out cacheIncreaseDamages,
-            out cacheSkills,
-            out cacheEquipmentSets,
+            cacheAttributes,
+            cacheResistances,
+            cacheIncreaseDamages,
+            cacheSkills,
+            cacheEquipmentSets,
             out cacheMaxHp,
             out cacheMaxMp,
             out cacheMaxStamina,

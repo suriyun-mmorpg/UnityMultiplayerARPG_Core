@@ -1081,19 +1081,19 @@ public static partial class CharacterDataExtension
 
     public static void GetEquipmentSetBonus(this ICharacterData data,
         out CharacterStats bonusStats,
-        out Dictionary<Attribute, short> bonusAttributes,
-        out Dictionary<DamageElement, float> bonusResistances,
-        out Dictionary<DamageElement, MinMaxFloat> bonusIncreaseDamages,
-        out Dictionary<Skill, short> bonusSkills,
-        out Dictionary<EquipmentSet, int> equipmentSets)
+        Dictionary<Attribute, short> bonusAttributes,
+        Dictionary<DamageElement, float> bonusResistances,
+        Dictionary<DamageElement, MinMaxFloat> bonusIncreaseDamages,
+        Dictionary<Skill, short> bonusSkills,
+        Dictionary<EquipmentSet, int> equipmentSets)
     {
         bonusStats = new CharacterStats();
-        bonusAttributes = new Dictionary<Attribute, short>();
-        bonusResistances = new Dictionary<DamageElement, float>();
-        bonusIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-        bonusSkills = new Dictionary<Skill, short>();
+        bonusAttributes.Clear();
+        bonusResistances.Clear();
+        bonusIncreaseDamages.Clear();
+        bonusSkills.Clear();
         // Equipment Set
-        equipmentSets = new Dictionary<EquipmentSet, int>();
+        equipmentSets.Clear();
         // Armor equipment set
         foreach (CharacterItem equipItem in data.EquipItems)
         {
@@ -1130,6 +1130,7 @@ public static partial class CharacterDataExtension
         Dictionary<DamageElement, float> tempIncreaseResistances;
         Dictionary<DamageElement, MinMaxFloat> tempIncreaseDamages;
         CharacterStats tempIncreaseStats;
+        Dictionary<Skill, short> tempIncreaseSkills;
         foreach (KeyValuePair<EquipmentSet, int> cacheEquipmentSet in equipmentSets)
         {
             EquipmentSetEffect[] effects = cacheEquipmentSet.Key.effects;
@@ -1142,10 +1143,12 @@ public static partial class CharacterDataExtension
                     tempIncreaseResistances = GameDataHelpers.CombineResistances(effects[i].resistances, null, 1f);
                     tempIncreaseDamages = GameDataHelpers.CombineDamages(effects[i].damages, null, 1f);
                     tempIncreaseStats = effects[i].stats + GameDataHelpers.GetStatsFromAttributes(tempIncreaseAttributes);
+                    tempIncreaseSkills = GameDataHelpers.CombineSkills(effects[i].skills, null);
                     bonusAttributes = GameDataHelpers.CombineAttributes(bonusAttributes, tempIncreaseAttributes);
                     bonusResistances = GameDataHelpers.CombineResistances(bonusResistances, tempIncreaseResistances);
                     bonusIncreaseDamages = GameDataHelpers.CombineDamages(bonusIncreaseDamages, tempIncreaseDamages);
                     bonusStats += tempIncreaseStats;
+                    bonusSkills = GameDataHelpers.CombineSkills(bonusSkills, tempIncreaseSkills);
                 }
                 else
                     break;
@@ -1155,11 +1158,11 @@ public static partial class CharacterDataExtension
 
     public static void GetAllStats(this ICharacterData data,
         out CharacterStats resultStats,
-        out Dictionary<Attribute, short> resultAttributes,
-        out Dictionary<DamageElement, float> resultResistances,
-        out Dictionary<DamageElement, MinMaxFloat> resultIncreaseDamages,
-        out Dictionary<Skill, short> resultSkills,
-        out Dictionary<EquipmentSet, int> resultEquipmentSets,
+        Dictionary<Attribute, short> resultAttributes,
+        Dictionary<DamageElement, float> resultResistances,
+        Dictionary<DamageElement, MinMaxFloat> resultIncreaseDamages,
+        Dictionary<Skill, short> resultSkills,
+        Dictionary<EquipmentSet, int> resultEquipmentSets,
         out int resultMaxHp,
         out int resultMaxMp,
         out int resultMaxStamina,
@@ -1169,16 +1172,18 @@ public static partial class CharacterDataExtension
         out float resultAtkSpeed,
         out float resultMoveSpeed)
     {
-        CharacterStats bonusStats;
-        Dictionary<Attribute, short> bonusAttributes;
-        Dictionary<DamageElement, float> bonusResistances;
-        Dictionary<DamageElement, MinMaxFloat> bonusIncreaseDamages;
-        Dictionary<Skill, short> bonusSkills;
-        GetEquipmentSetBonus(data, out bonusStats, out bonusAttributes, out bonusResistances, out bonusIncreaseDamages, out bonusSkills, out resultEquipmentSets);
-        resultStats = data.GetStats() + bonusStats;
-        resultAttributes = GameDataHelpers.CombineAttributes(data.GetAttributes(), bonusAttributes);
-        resultResistances = GameDataHelpers.CombineResistances(data.GetResistances(), bonusResistances);
-        resultIncreaseDamages = GameDataHelpers.CombineDamages(data.GetIncreaseDamages(), bonusIncreaseDamages);
+        resultStats = new CharacterStats();
+        resultAttributes.Clear();
+        resultResistances.Clear();
+        resultIncreaseDamages.Clear();
+        resultSkills.Clear();
+        resultEquipmentSets.Clear();
+
+        GetEquipmentSetBonus(data, out resultStats, resultAttributes, resultResistances, resultIncreaseDamages, resultSkills, resultEquipmentSets);
+        resultStats = resultStats + data.GetStats();
+        resultAttributes = GameDataHelpers.CombineAttributes(resultAttributes, data.GetAttributes());
+        resultResistances = GameDataHelpers.CombineResistances(resultResistances, data.GetResistances());
+        resultIncreaseDamages = GameDataHelpers.CombineDamages(resultIncreaseDamages, data.GetIncreaseDamages());
         resultSkills = data.GetSkills();
         // Sum with other stats
         resultMaxHp = (int)resultStats.hp;
