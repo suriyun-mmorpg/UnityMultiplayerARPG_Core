@@ -1,4 +1,6 @@
-﻿namespace MultiplayerARPG
+﻿using System.Collections.Generic;
+
+namespace MultiplayerARPG
 {
     public struct CharacterAttributeTuple
     {
@@ -101,14 +103,25 @@
         }
     }
 
-    public struct EquipmentSetEquippedCountTuple
+    public struct EquipmentSetWithEquippedCountTuple
     {
         public EquipmentSet equipmentSet;
         public int equippedCount;
-        public EquipmentSetEquippedCountTuple(EquipmentSet equipmentSet, int equippedCount)
+        public EquipmentSetWithEquippedCountTuple(EquipmentSet equipmentSet, int equippedCount)
         {
             this.equipmentSet = equipmentSet;
             this.equippedCount = equippedCount;
+        }
+    }
+
+    public struct EnhancedSocketsWithMaxSocketTuple
+    {
+        public List<int> sockets;
+        public int maxSocket;
+        public EnhancedSocketsWithMaxSocketTuple(List<int> sockets, int maxSocket)
+        {
+            this.sockets = sockets;
+            this.maxSocket = maxSocket;
         }
     }
 

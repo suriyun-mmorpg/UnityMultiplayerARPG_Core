@@ -17,6 +17,7 @@ namespace MultiplayerARPG
         public string refiningLevelFormat = "Refining To: +{0}";
 
         [Header("UI Elements for UI Refine Item")]
+        // TODO: This is deprecated
         [HideInInspector]
         public UICharacterItem uiRefiningItem;
         public UIItemAmounts uiRequireItemAmounts;
