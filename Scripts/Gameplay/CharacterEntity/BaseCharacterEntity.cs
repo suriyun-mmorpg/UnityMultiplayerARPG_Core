@@ -116,6 +116,7 @@ namespace MultiplayerARPG
         public virtual bool IsGrounded { get; protected set; }
         public virtual bool IsJumping { get; protected set; }
         public abstract int DataId { get; set; }
+        public abstract Vector3 CenterPosition { get; }
         public CharacterHitBox[] HitBoxes { get; protected set; }
         public bool HasAimPosition { get; protected set; }
         public Vector3 AimPosition { get; protected set; }

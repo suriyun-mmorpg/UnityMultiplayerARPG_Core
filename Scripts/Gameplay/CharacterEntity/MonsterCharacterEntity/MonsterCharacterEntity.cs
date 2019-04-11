@@ -19,6 +19,11 @@ namespace MultiplayerARPG
             protected set { }
         }
 
+        public override Vector3 CenterPosition
+        {
+            get { return CacheTransform.position + Vector3.up * (CacheCapsuleCollider.center.y + CacheTransform.localScale.y); }
+        }
+
         private MonsterActivityComponent cacheMonsterActivityComponent;
         public MonsterActivityComponent CacheMonsterActivityComponent
         {
