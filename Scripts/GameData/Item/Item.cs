@@ -84,6 +84,13 @@ namespace MultiplayerARPG
         // Pet
         public BaseMonsterCharacterEntity petEntity;
 
+        // Socket Enhancer
+        public AttributeAmount[] enhanceAttributes;
+        public ResistanceAmount[] enhanceResistances;
+        public DamageAmount[] enhanceDamages;
+        public CharacterStats enhanceStats;
+        public SkillLevel[] enhanceSkills;
+
         public override string Title
         {
             get

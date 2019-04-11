@@ -71,11 +71,12 @@ namespace MultiplayerARPG
             // Pet
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Pet.ToString(), cacheItem.GetMemberName(a => a.petEntity));
             // Socket Enhancer
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.SocketEnhancer.ToString(), cacheItem.GetMemberName(a => a.increaseAttributes));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.SocketEnhancer.ToString(), cacheItem.GetMemberName(a => a.increaseResistances));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.SocketEnhancer.ToString(), cacheItem.GetMemberName(a => a.increaseDamages));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.SocketEnhancer.ToString(), cacheItem.GetMemberName(a => a.increaseStats));
-            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.SocketEnhancer.ToString(), cacheItem.GetMemberName(a => a.increaseSkillLevels));
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.SocketEnhancer.ToString(), cacheItem.GetMemberName(a => a.maxStack));
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.SocketEnhancer.ToString(), cacheItem.GetMemberName(a => a.enhanceAttributes));
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.SocketEnhancer.ToString(), cacheItem.GetMemberName(a => a.enhanceResistances));
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.SocketEnhancer.ToString(), cacheItem.GetMemberName(a => a.enhanceDamages));
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.SocketEnhancer.ToString(), cacheItem.GetMemberName(a => a.enhanceStats));
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.SocketEnhancer.ToString(), cacheItem.GetMemberName(a => a.enhanceSkills));
         }
     }
 }
