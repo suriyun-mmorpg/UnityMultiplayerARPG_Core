@@ -1133,7 +1133,7 @@ public static partial class CharacterDataExtension
         Dictionary<Skill, short> tempIncreaseSkills;
         foreach (KeyValuePair<EquipmentSet, int> cacheEquipmentSet in equipmentSets)
         {
-            EquipmentSetEffect[] effects = cacheEquipmentSet.Key.effects;
+            EquipmentBonus[] effects = cacheEquipmentSet.Key.effects;
             int setAmount = cacheEquipmentSet.Value;
             for (int i = 0; i < setAmount; ++i)
             {
