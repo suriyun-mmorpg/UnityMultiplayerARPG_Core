@@ -48,6 +48,7 @@ namespace MultiplayerARPG
         public short ammoCapacity;
         public Vector2 fireStagger;
         public byte fireSpread;
+        [Range(0, 6)]
         public byte maxSocket;
         [Range(0f, 1f)]
         [Tooltip("This is move speed rate while attacking with this weapon")]
