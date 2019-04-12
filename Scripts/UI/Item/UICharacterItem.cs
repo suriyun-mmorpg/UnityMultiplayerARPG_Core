@@ -844,8 +844,8 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        #region Set Enhance Item Functions
-        public void OnClickSetEnhanceItem()
+        #region Set Enhance Socket Item Functions
+        public void OnClickSetEnhanceSocketItem()
         {
             // Only owning character can refine item
             if (!IsOwningCharacter())
