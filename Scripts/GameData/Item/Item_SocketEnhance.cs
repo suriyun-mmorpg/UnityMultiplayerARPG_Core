@@ -9,7 +9,9 @@ namespace MultiplayerARPG
         {
             EnhanceSocketItem(character, character.EquipWeapons.rightHand, enhancerId, (enhancedSocketItem) =>
             {
-                character.EquipWeapons.rightHand = enhancedSocketItem;
+                EquipWeapons equipWeapon = character.EquipWeapons;
+                equipWeapon.rightHand = enhancedSocketItem;
+                character.EquipWeapons = equipWeapon;
             }, out gameMessageType);
         }
 
@@ -17,7 +19,9 @@ namespace MultiplayerARPG
         {
             EnhanceSocketItem(character, character.EquipWeapons.leftHand, enhancerId, (enhancedSocketItem) =>
             {
-                character.EquipWeapons.leftHand = enhancedSocketItem;
+                EquipWeapons equipWeapon = character.EquipWeapons;
+                equipWeapon.leftHand = enhancedSocketItem;
+                character.EquipWeapons = equipWeapon;
             }, out gameMessageType);
         }
 
