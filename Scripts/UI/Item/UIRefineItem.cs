@@ -1,4 +1,7 @@
 ﻿using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -30,6 +33,17 @@ namespace MultiplayerARPG
             base.Awake();
             if (uiCharacterItem == null && uiRefiningItem != null)
                 uiCharacterItem = uiRefiningItem;
+        }
+
+        private void OnValidate()
+        {
+#if UNITY_EDITOR
+            if (uiCharacterItem == null && uiRefiningItem != null)
+            {
+                uiCharacterItem = uiRefiningItem;
+                EditorUtility.SetDirty(this);
+            }
+#endif
         }
 
         public void OnUpdateCharacterItems()
