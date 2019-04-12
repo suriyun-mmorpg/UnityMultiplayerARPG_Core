@@ -434,65 +434,107 @@ namespace MultiplayerARPG
 
             return mapIds;
         }
-
+        
+        /// <summary>
+        /// All layers except `nonTargetingLayers`, `TransparentFX`, `IgnoreRaycast`, `Water` will be used for raycasting
+        /// </summary>
+        /// <returns></returns>
         public int GetTargetLayerMask()
         {
+            // 0 = Nothing, -1 = AllLayers
             int layerMask = 0;
             if (nonTargetingLayers.Length > 0)
             {
                 foreach (UnityLayer nonTargetingLayer in nonTargetingLayers)
                 {
-                    layerMask = layerMask | ~(nonTargetingLayer.Mask);
+                    layerMask = layerMask | nonTargetingLayer.Mask;
                 }
             }
-            else
-                layerMask = -1;
-            return layerMask;
+            layerMask = layerMask | 1 << 1;  // TransparentFX
+            layerMask = layerMask | 1 << 2;  // IgnoreRaycast
+            layerMask = layerMask | 1 << 3;  // Water
+            GetDamageableLayerMask();
+            GetBuildLayerMask();
+            GetItemDropGroundDetectionLayerMask();
+            GetMonsterSpawnGroundDetectionLayerMask();
+            GetHarvestableSpawnGroundDetectionLayerMask();
+            return ~layerMask;
         }
 
-
+        /// <summary>
+        /// Only `characterLayer`, `buildingLayer`, `harvestableLayer` will be used for sphere casts
+        /// </summary>
+        /// <returns></returns>
         public int GetDamageableLayerMask()
         {
             int layerMask = 0;
-            layerMask = layerMask | ~(characterLayer.Mask);
-            layerMask = layerMask | ~(buildingLayer.Mask);
-            layerMask = layerMask | ~(harvestableLayer.Mask);
+            layerMask = layerMask | characterLayer.Mask;
+            layerMask = layerMask | buildingLayer.Mask;
+            layerMask = layerMask | harvestableLayer.Mask;
             return layerMask;
         }
 
+        /// <summary>
+        /// All layers except `characterLayer`, `itemDropLayer, `harvestableLayer`, `TransparentFX`, `IgnoreRaycast`, `Water` will be used for raycasting
+        /// </summary>
+        /// <returns></returns>
         public int GetBuildLayerMask()
         {
-            int layerMask = -1;
-            layerMask = layerMask | ~(characterLayer.Mask);
-            layerMask = layerMask | ~(itemDropLayer.Mask);
-            layerMask = layerMask | ~(harvestableLayer.Mask);
-            return layerMask;
+            int layerMask = 0;
+            layerMask = layerMask | 1 << 1;  // TransparentFX
+            layerMask = layerMask | 1 << 2;  // IgnoreRaycast
+            layerMask = layerMask | 1 << 3;  // Water
+            layerMask = layerMask | characterLayer.Mask;
+            layerMask = layerMask | itemDropLayer.Mask;
+            layerMask = layerMask | harvestableLayer.Mask;
+            return ~layerMask;
         }
 
+        /// <summary>
+        /// All layers except `characterLayer`, `itemDropLayer, `TransparentFX`, `IgnoreRaycast`, `Water` will be used for raycasting
+        /// </summary>
+        /// <returns></returns>
         public int GetItemDropGroundDetectionLayerMask()
         {
-            int layerMask = -1;
-            layerMask = layerMask | ~(characterLayer.Mask);
-            layerMask = layerMask | ~(itemDropLayer.Mask);
-            return layerMask;
+            int layerMask = 0;
+            layerMask = layerMask | 1 << 1;  // TransparentFX
+            layerMask = layerMask | 1 << 2;  // IgnoreRaycast
+            layerMask = layerMask | 1 << 3;  // Water
+            layerMask = layerMask | characterLayer.Mask;
+            layerMask = layerMask | itemDropLayer.Mask;
+            return ~layerMask;
         }
 
+        /// <summary>
+        /// All layers except `buildingLayer`, `harvestableLayer, `TransparentFX`, `IgnoreRaycast`, `Water` will be used for raycasting
+        /// </summary>
+        /// <returns></returns>
         public int GetMonsterSpawnGroundDetectionLayerMask()
         {
-            int layerMask = -1;
-            layerMask = layerMask | ~(buildingLayer.Mask);
-            layerMask = layerMask | ~(harvestableLayer.Mask);
-            return layerMask;
+            int layerMask = 0;
+            layerMask = layerMask | 1 << 1;  // TransparentFX
+            layerMask = layerMask | 1 << 2;  // IgnoreRaycast
+            layerMask = layerMask | 1 << 3;  // Water
+            layerMask = layerMask | buildingLayer.Mask;
+            layerMask = layerMask | harvestableLayer.Mask;
+            return ~layerMask;
         }
 
+        /// <summary>
+        /// All layers except `characterLayer`, `itemDropLayer`, `buildingLayer`, `harvestableLayer, `TransparentFX`, `IgnoreRaycast`, `Water` will be used for raycasting
+        /// </summary>
+        /// <returns></returns>
         public int GetHarvestableSpawnGroundDetectionLayerMask()
         {
-            int layerMask = -1;
-            layerMask = layerMask | ~(characterLayer.Mask);
-            layerMask = layerMask | ~(itemDropLayer.Mask);
-            layerMask = layerMask | ~(buildingLayer.Mask);
-            layerMask = layerMask | ~(harvestableLayer.Mask);
-            return layerMask;
+            int layerMask = 0;
+            layerMask = layerMask | 1 << 1;  // TransparentFX
+            layerMask = layerMask | 1 << 2;  // IgnoreRaycast
+            layerMask = layerMask | 1 << 3;  // Water
+            layerMask = layerMask | characterLayer.Mask;
+            layerMask = layerMask | itemDropLayer.Mask;
+            layerMask = layerMask | buildingLayer.Mask;
+            layerMask = layerMask | harvestableLayer.Mask;
+            return ~layerMask;
         }
 
         public static void AddAttributes(IEnumerable<Attribute> attributes)
