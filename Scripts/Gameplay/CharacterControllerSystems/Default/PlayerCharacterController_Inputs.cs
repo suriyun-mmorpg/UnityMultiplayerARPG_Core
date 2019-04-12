@@ -255,6 +255,14 @@ namespace MultiplayerARPG
             SelectedEntity = entity;
         }
 
+        protected virtual void ClearTarget()
+        {
+            targetPosition = null;
+            targetEntity = null;
+            PlayerCharacterEntity.SetTargetEntity(null);
+            SelectedEntity = null;
+        }
+
         protected virtual void UpdateWASDInput()
         {
             if (controllerMode != PlayerCharacterControllerMode.WASD &&
@@ -365,7 +373,7 @@ namespace MultiplayerARPG
             {
                 PlayerCharacterEntity.StopMove();
                 destination = null;
-                PlayerCharacterEntity.SetTargetEntity(null);
+                ClearTarget();
                 targetLookDirection = moveDirection.normalized;
             }
             // Always forward
@@ -416,7 +424,7 @@ namespace MultiplayerARPG
                 {
                     queueUsingSkill = null;
                     PlayerCharacterEntity.StopMove();
-                    PlayerCharacterEntity.SetTargetEntity(null);
+                    ClearTarget();
                     return;
                 }
 
@@ -452,7 +460,7 @@ namespace MultiplayerARPG
                 {
                     queueUsingSkill = null;
                     PlayerCharacterEntity.StopMove();
-                    PlayerCharacterEntity.SetTargetEntity(null);
+                    ClearTarget();
                     return;
                 }
                 float actDistance = gameInstance.conversationDistance - StoppingDistance;
@@ -470,7 +478,7 @@ namespace MultiplayerARPG
                 {
                     queueUsingSkill = null;
                     PlayerCharacterEntity.StopMove();
-                    PlayerCharacterEntity.SetTargetEntity(null);
+                    ClearTarget();
                     return;
                 }
                 float actDistance = gameInstance.conversationDistance - StoppingDistance;
@@ -504,7 +512,7 @@ namespace MultiplayerARPG
                 {
                     PlayerCharacterEntity.RequestPickupItem(targetItemDrop.ObjectId);
                     PlayerCharacterEntity.StopMove();
-                    PlayerCharacterEntity.SetTargetEntity(null);
+                    ClearTarget();
                 }
                 else
                     UpdateTargetEntityPosition(targetItemDrop);
@@ -528,7 +536,7 @@ namespace MultiplayerARPG
                     {
                         // If it's not build mode, try to activate it
                         ActivateBuilding(targetBuilding);
-                        PlayerCharacterEntity.SetTargetEntity(null);
+                        ClearTarget();
                     }
                 }
                 else
@@ -544,7 +552,7 @@ namespace MultiplayerARPG
                 {
                     queueUsingSkill = null;
                     PlayerCharacterEntity.StopMove();
-                    PlayerCharacterEntity.SetTargetEntity(null);
+                    ClearTarget();
                     return;
                 }
 
