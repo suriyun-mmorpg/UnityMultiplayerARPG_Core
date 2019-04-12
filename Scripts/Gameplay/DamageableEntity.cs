@@ -14,6 +14,7 @@ namespace MultiplayerARPG
         public event ReceiveDamageDelegate onReceiveDamage;
         public event ReceivedDamage onReceivedDamage;
 
+        [Tooltip("This is transform where combat texts will be instantiates from")]
         public Transform combatTextTransform;
         public Transform CombatTextTransform
         {
