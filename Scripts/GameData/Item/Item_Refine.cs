@@ -37,10 +37,14 @@ namespace MultiplayerARPG
         {
             RefineItem(character, character.EquipWeapons.rightHand, (refinedItem) =>
             {
-                character.EquipWeapons.rightHand = refinedItem;
+                EquipWeapons equipWeapon = character.EquipWeapons;
+                equipWeapon.rightHand = refinedItem;
+                character.EquipWeapons = equipWeapon;
             }, () =>
             {
-                character.EquipWeapons.rightHand = CharacterItem.Empty;
+                EquipWeapons equipWeapon = character.EquipWeapons;
+                equipWeapon.rightHand = CharacterItem.Empty;
+                character.EquipWeapons = equipWeapon;
             }, out gameMessageType);
         }
 
@@ -48,10 +52,14 @@ namespace MultiplayerARPG
         {
             RefineItem(character, character.EquipWeapons.leftHand, (refinedItem) =>
             {
-                character.EquipWeapons.leftHand = refinedItem;
+                EquipWeapons equipWeapon = character.EquipWeapons;
+                equipWeapon.leftHand = refinedItem;
+                character.EquipWeapons = equipWeapon;
             }, () =>
             {
-                character.EquipWeapons.leftHand = CharacterItem.Empty;
+                EquipWeapons equipWeapon = character.EquipWeapons;
+                equipWeapon.leftHand = CharacterItem.Empty;
+                character.EquipWeapons = equipWeapon;
             }, out gameMessageType);
         }
 

@@ -41,7 +41,9 @@ namespace MultiplayerARPG
         {
             RepairItem(character, character.EquipWeapons.rightHand, (repairedItem) =>
             {
-                character.EquipWeapons.rightHand = repairedItem;
+                EquipWeapons equipWeapon = character.EquipWeapons;
+                equipWeapon.rightHand = repairedItem;
+                character.EquipWeapons = equipWeapon;
             }, out gameMessageType);
         }
 
@@ -49,7 +51,9 @@ namespace MultiplayerARPG
         {
             RepairItem(character, character.EquipWeapons.leftHand, (repairedItem) =>
             {
-                character.EquipWeapons.leftHand = repairedItem;
+                EquipWeapons equipWeapon = character.EquipWeapons;
+                equipWeapon.leftHand = repairedItem;
+                character.EquipWeapons = equipWeapon;
             }, out gameMessageType);
         }
 
