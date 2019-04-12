@@ -524,11 +524,10 @@ namespace MultiplayerARPG
         {
             yield return new WaitForSecondsRealtime(destroyDelay + destroyRespawnDelay);
             InitStats();
-            Manager.Assets.NetworkSpawn(Identity.HashAssetId,
-                spawnPosition,
-                gameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity,
+            Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,
-                Identity.ConnectionId);
+                spawnPosition,
+                gameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
         }
 
         public void Summon(BaseCharacterEntity summoner, SummonType summonType, short level)
