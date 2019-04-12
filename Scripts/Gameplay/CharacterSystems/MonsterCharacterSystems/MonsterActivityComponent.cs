@@ -183,7 +183,6 @@ namespace MultiplayerARPG
         {
             // If it has target then go to target
             Vector3 targetEntityPosition = targetEntity.CacheTransform.position;
-            float attackTransformOffsetY = CacheMonsterCharacterEntity.GetAttackTransformPosition().y - currentPosition.y;
             float attackDistance = CacheMonsterCharacterEntity.GetAttackDistance();
             attackDistance -= attackDistance * 0.1f;
             attackDistance -= CacheNavMeshAgent.stoppingDistance;
@@ -201,7 +200,7 @@ namespace MultiplayerARPG
                     lookRotationEuler.z = 0;
                     CacheMonsterCharacterEntity.CacheTransform.rotation = Quaternion.RotateTowards(CacheMonsterCharacterEntity.CacheTransform.rotation, Quaternion.Euler(lookRotationEuler), CacheNavMeshAgent.angularSpeed * Time.deltaTime);
                 }
-                CacheMonsterCharacterEntity.RequestAttack(targetEntityPosition + Vector3.up * attackTransformOffsetY);
+                CacheMonsterCharacterEntity.RequestAttack(targetEntity.OpponentAimTransform.position);
                 // TODO: Random to use skills
             }
             else

@@ -799,25 +799,6 @@ namespace MultiplayerARPG
             return minFov;
         }
 
-        public virtual Vector3 GetAttackTransformPosition()
-        {
-            CharacterItem rightHand = EquipWeapons.rightHand;
-            CharacterItem leftHand = EquipWeapons.leftHand;
-            Item rightHandWeapon = rightHand.GetWeaponItem();
-            Item leftHandWeapon = leftHand.GetWeaponItem();
-            if (rightHandWeapon != null)
-            {
-                if (rightHandWeapon.WeaponType.damageInfo.damageType == DamageType.Missile)
-                    return MissileDamageTransform.position;
-            }
-            else if (leftHandWeapon != null)
-            {
-                if (leftHandWeapon.WeaponType.damageInfo.damageType == DamageType.Missile)
-                    return MissileDamageTransform.position;
-            }
-            return MeleeDamageTransform.position;
-        }
-
         public virtual float GetSkillAttackDistance(Skill skill)
         {
             if (skill == null || !skill.IsAttack())
@@ -834,16 +815,6 @@ namespace MultiplayerARPG
             if (skill.skillAttackType == SkillAttackType.Normal)
                 return skill.damageInfo.GetFov();
             return GetAttackFov();
-        }
-
-        public virtual Vector3 GetSkillAttackTransformPosition(Skill skill)
-        {
-            if (skill == null || !skill.IsAttack())
-                return MeleeDamageTransform.position;
-            if (skill.skillAttackType == SkillAttackType.Normal &&
-                skill.damageInfo.damageType == DamageType.Missile)
-                return MissileDamageTransform.position;
-            return GetAttackTransformPosition();
         }
 
         public virtual void LaunchDamageEntity(

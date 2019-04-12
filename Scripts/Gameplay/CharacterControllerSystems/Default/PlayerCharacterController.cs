@@ -237,11 +237,10 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool GetAttackDataOrUseNonAttackSkill(out float attackDistance, out float attackFov, out float attackTransformOffsetY)
+        public bool GetAttackDataOrUseNonAttackSkill(out float attackDistance, out float attackFov)
         {
             attackDistance = PlayerCharacterEntity.GetAttackDistance();
             attackFov = PlayerCharacterEntity.GetAttackFov();
-            attackTransformOffsetY = PlayerCharacterEntity.GetAttackTransformPosition().y - PlayerCharacterEntity.CacheTransform.position.y;
             if (queueUsingSkill.HasValue)
             {
                 Skill skill = null;
@@ -251,7 +250,6 @@ namespace MultiplayerARPG
                     {
                         attackDistance = PlayerCharacterEntity.GetSkillAttackDistance(skill);
                         attackFov = PlayerCharacterEntity.GetSkillAttackFov(skill);
-                        attackTransformOffsetY = PlayerCharacterEntity.GetSkillAttackTransformPosition(skill).y - PlayerCharacterEntity.CacheTransform.position.y;
                     }
                     else
                     {

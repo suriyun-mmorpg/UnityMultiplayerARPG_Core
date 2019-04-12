@@ -124,17 +124,5 @@ namespace MultiplayerARPG
                 return overlapColliders[index].gameObject;
             return overlapColliders2D[index].gameObject;
         }
-
-        public bool FindTarget(GameObject target, float actDistance, int layerMask)
-        {
-            int tempCount = OverlapObjects(CharacterTransform.position, actDistance, layerMask);
-            for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
-            {
-                tempGameObject = GetOverlapObject(tempCounter);
-                if (tempGameObject == target)
-                    return true;
-            }
-            return false;
-        }
     }
 }

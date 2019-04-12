@@ -423,26 +423,25 @@ namespace MultiplayerARPG
                 // Find attack distance and fov, from weapon or skill
                 float attackDistance = 0f;
                 float attackFov = 0f;
-                float attackTransformOffsetY = 0f;
-                if (!GetAttackDataOrUseNonAttackSkill(out attackDistance, out attackFov, out attackTransformOffsetY))
+                if (!GetAttackDataOrUseNonAttackSkill(out attackDistance, out attackFov))
                     return;
                 float actDistance = attackDistance;
                 actDistance -= actDistance * 0.1f;
                 actDistance -= StoppingDistance;
-                if (FindTarget(targetEnemy.gameObject, actDistance, gameInstance.characterLayer.Mask))
+                if (Vector3.Distance(targetEnemy.CacheTransform.position, PlayerCharacterEntity.CacheTransform.position) <= actDistance)
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
+                    // Turn character to target
+                    targetLookDirection = (targetEnemy.CacheTransform.position - PlayerCharacterEntity.CacheTransform.position).normalized;
                     if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetEnemy.CacheTransform.position))
                     {
                         // If has queue using skill, attack by the skill
                         if (queueUsingSkill.HasValue)
-                            RequestUsePendingSkill(targetEnemy.CacheTransform.position + Vector3.up * attackTransformOffsetY);
+                            RequestUsePendingSkill(targetEnemy.OpponentAimTransform.position);
                         else
-                            PlayerCharacterEntity.RequestAttack(targetEnemy.CacheTransform.position + Vector3.up * attackTransformOffsetY);
+                            PlayerCharacterEntity.RequestAttack(targetEnemy.OpponentAimTransform.position);
                     }
-                    // Turn character to target
-                    targetLookDirection = (targetEnemy.CacheTransform.position - PlayerCharacterEntity.CacheTransform.position).normalized;
                 }
                 else
                     UpdateTargetEntityPosition(targetEnemy);
@@ -551,18 +550,19 @@ namespace MultiplayerARPG
 
                 float attackDistance = 0f;
                 float attackFov = 0f;
-                float attackTransformOffsetY = 0f;
-                if (!GetAttackDataOrUseNonAttackSkill(out attackDistance, out attackFov, out attackTransformOffsetY))
+                if (!GetAttackDataOrUseNonAttackSkill(out attackDistance, out attackFov))
                     return;
                 float actDistance = attackDistance;
                 actDistance -= actDistance * 0.1f;
                 actDistance -= StoppingDistance;
-                if (FindTarget(targetHarvestable.gameObject, actDistance, gameInstance.harvestableLayer.Mask))
+                if (Vector3.Distance(targetHarvestable.CacheTransform.position, PlayerCharacterEntity.CacheTransform.position) <= actDistance)
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
-                    if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetHarvestable.CacheTransform.position + Vector3.one * attackTransformOffsetY))
-                        PlayerCharacterEntity.RequestAttack();
+                    // Turn character to target
+                    targetLookDirection = (targetHarvestable.CacheTransform.position - PlayerCharacterEntity.CacheTransform.position).normalized;
+                    if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetHarvestable.CacheTransform.position))
+                        PlayerCharacterEntity.RequestAttack(targetHarvestable.OpponentAimTransform.position);
                 }
                 else
                     UpdateTargetEntityPosition(targetHarvestable);

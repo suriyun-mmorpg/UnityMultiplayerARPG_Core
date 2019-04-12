@@ -24,6 +24,18 @@ namespace MultiplayerARPG
                 return combatTextTransform;
             }
         }
+        
+        [Tooltip("This is transform for other entities to aim to this entity")]
+        public Transform opponentAimTransform;
+        public Transform OpponentAimTransform
+        {
+            get
+            {
+                if (opponentAimTransform == null)
+                    opponentAimTransform = CombatTextTransform;
+                return opponentAimTransform;
+            }
+        }
 
         public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
         public abstract int MaxHp { get; }
