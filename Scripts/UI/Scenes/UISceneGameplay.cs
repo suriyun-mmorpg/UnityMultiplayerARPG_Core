@@ -225,6 +225,10 @@ namespace MultiplayerARPG
                 if (ui != null)
                     ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
             }
+            if (uiRefineItem != null)
+                uiRefineItem.OnUpdateCharacterItems();
+            if (uiEnhanceSocketItem != null)
+                uiEnhanceSocketItem.OnUpdateCharacterItems();
             if (onUpdateEquipItems != null)
                 onUpdateEquipItems.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
@@ -240,6 +244,10 @@ namespace MultiplayerARPG
                 if (ui != null)
                     ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
             }
+            if (uiRefineItem != null)
+                uiRefineItem.OnUpdateCharacterItems();
+            if (uiEnhanceSocketItem != null)
+                uiEnhanceSocketItem.OnUpdateCharacterItems();
             if (onUpdateNonEquipItems != null)
                 onUpdateNonEquipItems.Invoke(BasePlayerCharacterController.OwningCharacter);
         }
