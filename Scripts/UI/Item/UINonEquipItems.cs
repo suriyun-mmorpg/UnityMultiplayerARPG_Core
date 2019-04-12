@@ -91,27 +91,30 @@ namespace MultiplayerARPG
             }
 
             IList<CharacterItem> nonEquipItems = character.NonEquipItems;
-            if (filterItemTypes != null && filterItemTypes.Count > 0)
+            IList<CharacterItem> filteredItems = new List<CharacterItem>();
+            List<int> filterIndexes = new List<int>();
+            // Filter items to show by specific item types
+            int counter = 0;
+            foreach (CharacterItem nonEquipItem in nonEquipItems)
             {
-                // Filter items to show by specific item types
-                IList<CharacterItem> filteredItems = new List<CharacterItem>();
-                foreach (CharacterItem nonEquipItem in nonEquipItems)
+                if (nonEquipItem.GetItem() == null) continue;
+                if (string.IsNullOrEmpty(nonEquipItem.GetItem().category) ||
+                    filterCategories == null || filterCategories.Count == 0 ||
+                    filterCategories.Contains(nonEquipItem.GetItem().category))
                 {
-                    if (nonEquipItem.GetItem() == null) continue;
-                    if (string.IsNullOrEmpty(nonEquipItem.GetItem().category) ||
-                        filterCategories == null || filterCategories.Count == 0 ||
-                        filterCategories.Contains(nonEquipItem.GetItem().category))
+                    if (filterItemTypes == null || filterItemTypes.Count == 0 ||
+                        filterItemTypes.Contains(nonEquipItem.GetItem().itemType))
                     {
-                        if (filterItemTypes.Contains(nonEquipItem.GetItem().itemType))
-                            filteredItems.Add(nonEquipItem);
+                        filteredItems.Add(nonEquipItem);
+                        filterIndexes.Add(counter);
                     }
                 }
-                nonEquipItems = filteredItems;
+                ++counter;
             }
-            CacheNonEquipItemList.Generate(nonEquipItems, (index, characterItem, ui) =>
+            CacheNonEquipItemList.Generate(filteredItems, (index, characterItem, ui) =>
             {
                 UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
-                uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, InventoryType.NonEquipItems), this.character, index);
+                uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, InventoryType.NonEquipItems), this.character, filterIndexes[index]);
                 uiCharacterItem.Show();
                 UICharacterItemDragHandler dragHandler = uiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
                 if (dragHandler != null)
