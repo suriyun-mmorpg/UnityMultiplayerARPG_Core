@@ -13,15 +13,16 @@ public abstract class UISelectionEntry<T> : UIBase
         set
         {
             data = value;
-            UpdateData();
-            UpdateUI();
-            this.InvokeInstanceDevExtMethods("UpdateData");
+            if (gameObject.activeInHierarchy)
+                ForceUpdate();
+            hasToUpdateOnEnable = !gameObject.activeInHierarchy;
         }
     }
     public UISelectionManager selectionManager;
     public float updateUIRepeatRate = 0.5f;
     protected float lastUpdateTime;
-
+    private bool hasToUpdateOnEnable;
+    private float tempUpdateTime;
     private bool isSelected;
     public bool IsSelected
     {
@@ -41,13 +42,20 @@ public abstract class UISelectionEntry<T> : UIBase
         lastUpdateTime = Time.unscaledTime;
     }
 
+    protected virtual void OnEnable()
+    {
+        if (hasToUpdateOnEnable)
+            ForceUpdate();
+    }
+
     protected virtual void Update()
     {
-        if (Time.unscaledTime - lastUpdateTime >= updateUIRepeatRate)
+        tempUpdateTime = Time.unscaledTime;
+        if (tempUpdateTime - lastUpdateTime >= updateUIRepeatRate)
         {
             UpdateUI();
             this.InvokeInstanceDevExtMethods("UpdateUI");
-            lastUpdateTime = Time.unscaledTime;
+            lastUpdateTime = tempUpdateTime;
         }
     }
 
@@ -60,6 +68,7 @@ public abstract class UISelectionEntry<T> : UIBase
     public void ForceUpdate()
     {
         UpdateData();
+        UpdateUI();
         this.InvokeInstanceDevExtMethods("UpdateData");
     }
 
@@ -85,7 +94,7 @@ public abstract class UISelectionEntry<T> : UIBase
     {
         IsSelected = false;
     }
-    
+
     protected virtual void UpdateUI() { }
     protected abstract void UpdateData();
 }
