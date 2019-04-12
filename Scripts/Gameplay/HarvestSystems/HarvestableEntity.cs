@@ -13,6 +13,7 @@ namespace MultiplayerARPG
     {
         public int maxHp = 100;
         public Harvestable harvestable;
+        public HarvestableCollectType collectType;
         public float colliderDetectionRadius = 2f;
         [HideInInspector]
         public float destroyHideDelay = 2f;
@@ -114,8 +115,13 @@ namespace MultiplayerARPG
                 ItemDropByWeight receivingItem = itemRandomizer.TakeOne();
                 int dataId = receivingItem.item.DataId;
                 short amount = (short)(receivingItem.amountPerDamage * totalDamage);
-                if (!attackerCharacter.IncreasingItemsWillOverwhelming(dataId, amount))
+                bool droppingToGround = collectType == HarvestableCollectType.DropToGround;
+                if (attackerCharacter.IncreasingItemsWillOverwhelming(dataId, amount))
+                    droppingToGround = true;
+                if (!droppingToGround)
                     attackerCharacter.IncreaseItems(CharacterItem.Create(dataId, 1, amount));
+                else
+                    ItemDropEntity.DropItem(this, CharacterItem.Create(dataId, 1, amount), new uint[0]);
             }
             CurrentHp -= totalDamage;
             ReceivedDamage(attackerCharacter, CombatAmountType.NormalDamage, totalDamage);
