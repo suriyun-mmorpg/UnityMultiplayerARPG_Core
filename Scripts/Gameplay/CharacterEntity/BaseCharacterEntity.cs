@@ -116,7 +116,6 @@ namespace MultiplayerARPG
         public virtual bool IsGrounded { get; protected set; }
         public virtual bool IsJumping { get; protected set; }
         public abstract int DataId { get; set; }
-        public abstract Vector3 CenterPosition { get; }
         public CharacterHitBox[] HitBoxes { get; protected set; }
         public bool HasAimPosition { get; protected set; }
         public Vector3 AimPosition { get; protected set; }
@@ -147,7 +146,7 @@ namespace MultiplayerARPG
             get
             {
                 if (missileDamageTransform == null)
-                    missileDamageTransform = CacheTransform;
+                    missileDamageTransform = MeleeDamageTransform;
                 return missileDamageTransform;
             }
         }
@@ -800,6 +799,25 @@ namespace MultiplayerARPG
             return minFov;
         }
 
+        public virtual Vector3 GetAttackTransformPosition()
+        {
+            CharacterItem rightHand = EquipWeapons.rightHand;
+            CharacterItem leftHand = EquipWeapons.leftHand;
+            Item rightHandWeapon = rightHand.GetWeaponItem();
+            Item leftHandWeapon = leftHand.GetWeaponItem();
+            if (rightHandWeapon != null)
+            {
+                if (rightHandWeapon.WeaponType.damageInfo.damageType == DamageType.Missile)
+                    return MissileDamageTransform.position;
+            }
+            else if (leftHandWeapon != null)
+            {
+                if (leftHandWeapon.WeaponType.damageInfo.damageType == DamageType.Missile)
+                    return MissileDamageTransform.position;
+            }
+            return MeleeDamageTransform.position;
+        }
+
         public virtual float GetSkillAttackDistance(Skill skill)
         {
             if (skill == null || !skill.IsAttack())
@@ -816,6 +834,16 @@ namespace MultiplayerARPG
             if (skill.skillAttackType == SkillAttackType.Normal)
                 return skill.damageInfo.GetFov();
             return GetAttackFov();
+        }
+
+        public virtual Vector3 GetSkillAttackTransformPosition(Skill skill)
+        {
+            if (skill == null || !skill.IsAttack())
+                return MeleeDamageTransform.position;
+            if (skill.skillAttackType == SkillAttackType.Normal &&
+                skill.damageInfo.damageType == DamageType.Missile)
+                return MissileDamageTransform.position;
+            return GetAttackTransformPosition();
         }
 
         public virtual void LaunchDamageEntity(

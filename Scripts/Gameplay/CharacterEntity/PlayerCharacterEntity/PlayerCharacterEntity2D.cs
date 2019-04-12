@@ -49,14 +49,6 @@ namespace MultiplayerARPG
             protected set { }
         }
 
-        public override Vector3 CenterPosition
-        {
-            get
-            {
-                return CacheTransform.position;
-            }
-        }
-
         private Rigidbody2D cacheRigidbody2D;
         public Rigidbody2D CacheRigidbody2D
         {

@@ -42,11 +42,6 @@ namespace MultiplayerARPG
             get { return stoppingDistance; }
         }
 
-        public override Vector3 CenterPosition
-        {
-            get { return CacheTransform.position + Vector3.up * (CacheCapsuleCollider.center.y + CacheTransform.localScale.y); }
-        }
-
         protected MovementFlag tempMovementState = MovementFlag.None;
         protected MovementFlag localMovementState = MovementFlag.None;
         public override MovementFlag MovementState

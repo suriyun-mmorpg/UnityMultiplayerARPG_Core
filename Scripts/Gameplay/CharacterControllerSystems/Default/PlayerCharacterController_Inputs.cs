@@ -290,15 +290,27 @@ namespace MultiplayerARPG
                         {
                             BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill) + lockAttackTargetDistance, false, true, false);
                             if (nearestTarget != null)
+                            {
+                                // Set target, then use skill later when moved nearby target
                                 PlayerCharacterEntity.SetTargetEntity(nearestTarget);
+                            }
                             else
-                                RequestUsePendingSkill();
+                            {
+                                // No nearby target, so use skill immediately
+                                RequestUsePendingSkill(null);
+                            }
                         }
                         else if (!wasdLockAttackTarget)
-                            RequestUsePendingSkill();
+                        {
+                            // Not lock target, so not finding target and use skill immediately
+                            RequestUsePendingSkill(null);
+                        }
                     }
                     else
-                        RequestUsePendingSkill();
+                    {
+                        // Not attack skill, so use skill immediately
+                        RequestUsePendingSkill(null);
+                    }
                 }
                 else
                     queueUsingSkill = null;
@@ -322,9 +334,15 @@ namespace MultiplayerARPG
                         false);
                     SelectedEntity = nearestTarget;
                     if (nearestTarget != null)
+                    {
+                        // Set target, then attack later when moved nearby target
                         PlayerCharacterEntity.SetTargetEntity(nearestTarget);
+                    }
                     else
-                        RequestAttack();
+                    {
+                        // No nearby target, so attack immediately
+                        PlayerCharacterEntity.RequestAttack();
+                    }
                 }
                 else if (!wasdLockAttackTarget)
                 {
@@ -338,7 +356,8 @@ namespace MultiplayerARPG
                         true,
                         PlayerCharacterEntity.GetAttackFov());
                     SelectedEntity = nearestTarget;
-                    RequestAttack();
+                    // Not lock target, so not finding target and attack immediately
+                    PlayerCharacterEntity.RequestAttack();
                 }
             }
             // Move
@@ -404,7 +423,8 @@ namespace MultiplayerARPG
                 // Find attack distance and fov, from weapon or skill
                 float attackDistance = 0f;
                 float attackFov = 0f;
-                if (!GetAttackDistanceAndFov(out attackDistance, out attackFov))
+                float attackTransformOffsetY = 0f;
+                if (!GetAttackDataOrUseNonAttackSkill(out attackDistance, out attackFov, out attackTransformOffsetY))
                     return;
                 float actDistance = attackDistance;
                 actDistance -= actDistance * 0.1f;
@@ -417,9 +437,9 @@ namespace MultiplayerARPG
                     {
                         // If has queue using skill, attack by the skill
                         if (queueUsingSkill.HasValue)
-                            RequestUsePendingSkill();
+                            RequestUsePendingSkill(targetEnemy.CacheTransform.position + Vector3.up * attackTransformOffsetY);
                         else
-                            RequestAttack();
+                            PlayerCharacterEntity.RequestAttack(targetEnemy.CacheTransform.position + Vector3.up * attackTransformOffsetY);
                     }
                     // Turn character to target
                     targetLookDirection = (targetEnemy.CacheTransform.position - PlayerCharacterEntity.CacheTransform.position).normalized;
@@ -531,7 +551,8 @@ namespace MultiplayerARPG
 
                 float attackDistance = 0f;
                 float attackFov = 0f;
-                if (!GetAttackDistanceAndFov(out attackDistance, out attackFov))
+                float attackTransformOffsetY = 0f;
+                if (!GetAttackDataOrUseNonAttackSkill(out attackDistance, out attackFov, out attackTransformOffsetY))
                     return;
                 float actDistance = attackDistance;
                 actDistance -= actDistance * 0.1f;
@@ -540,8 +561,8 @@ namespace MultiplayerARPG
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
-                    if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetHarvestable.CacheTransform.position))
-                        RequestAttack();
+                    if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetHarvestable.CacheTransform.position + Vector3.one * attackTransformOffsetY))
+                        PlayerCharacterEntity.RequestAttack();
                 }
                 else
                     UpdateTargetEntityPosition(targetHarvestable);
@@ -615,7 +636,7 @@ namespace MultiplayerARPG
                         {
                             destination = null;
                             PlayerCharacterEntity.StopMove();
-                            RequestUseSkill(skill.DataId);
+                            PlayerCharacterEntity.RequestUseSkill(skill.DataId);
                         }
                     }
                 }

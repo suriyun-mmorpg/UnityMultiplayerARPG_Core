@@ -33,14 +33,6 @@ namespace MultiplayerARPG
             protected set { }
         }
 
-        public override Vector3 CenterPosition
-        {
-            get
-            {
-                return CacheTransform.position;
-            }
-        }
-
         private MonsterActivityComponent2D cacheMonsterActivityComponent;
         public MonsterActivityComponent2D CacheMonsterActivityComponent
         {

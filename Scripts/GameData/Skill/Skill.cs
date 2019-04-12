@@ -183,7 +183,9 @@ namespace MultiplayerARPG
             bool isLeftHand,
             CharacterItem weapon,
             DamageInfo damageInfo,
-            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
+            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
+            bool hasAimPosition,
+            Vector3 aimPosition)
         {
             return false;
         }

@@ -96,7 +96,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// Is function will be called at server to order character to attack
         /// </summary>
-        protected virtual void NetFuncAttack()
+        protected virtual void NetFuncAttack(bool hasAimPosition, Vector3 aimPosition)
         {
             if (!CanAttack())
                 return;
@@ -164,7 +164,7 @@ namespace MultiplayerARPG
             {
                 if (characterSkill.level > 0)
                 {
-                    if (characterSkill.GetSkill().OnAttack(this, characterSkill.level, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts))
+                    if (characterSkill.GetSkill().OnAttack(this, characterSkill.level, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition))
                         overrideDefaultAttack = true;
                 }
             }
@@ -175,7 +175,7 @@ namespace MultiplayerARPG
 
             // Start attack routine
             isAttackingOrUsingSkill = true;
-            StartCoroutine(AttackRoutine(animActionType, weaponTypeDataId, animationIndex, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts));
+            StartCoroutine(AttackRoutine(animActionType, weaponTypeDataId, animationIndex, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition));
         }
 
         private IEnumerator AttackRoutine(
@@ -187,7 +187,9 @@ namespace MultiplayerARPG
             bool isLeftHand,
             CharacterItem weapon,
             DamageInfo damageInfo,
-            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
+            Dictionary<DamageElement, MinMaxFloat> allDamageAmounts,
+            bool hasAimPosition,
+            Vector3 aimPosition)
         {
             if (onAttackRoutine != null)
                 onAttackRoutine.Invoke(animActionType, weaponTypeDataId, animationIndex, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts);
@@ -196,6 +198,12 @@ namespace MultiplayerARPG
             RequestPlayActionAnimation(animActionType, weaponTypeDataId, (byte)animationIndex);
 
             yield return new WaitForSecondsRealtime(triggerDuration);
+            // If no aim position set with attack function get aim position which set from client-controller if existed
+            if (!hasAimPosition && HasAimPosition)
+            {
+                hasAimPosition = true;
+                aimPosition = AimPosition;
+            }
             byte fireSpread = 0;
             Vector3 fireStagger = Vector3.zero;
             if (weapon != null && weapon.GetWeaponItem() != null)
@@ -214,8 +222,8 @@ namespace MultiplayerARPG
                     allDamageAmounts,
                     CharacterBuff.Empty,
                     0,
-                    HasAimPosition,
-                    AimPosition,
+                    hasAimPosition,
+                    aimPosition,
                     stagger);
             }
             yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);

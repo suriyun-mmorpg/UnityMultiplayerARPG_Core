@@ -111,7 +111,6 @@ namespace MultiplayerARPG
             // This entity detector will be find item drop entities to use when pressed pickup key
             tempGameObject = new GameObject("_EnemyEntityDetector");
             enemyEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
-            enemyEntityDetector.detectingRadius = gameInstance.pickUpItemDistance;
             enemyEntityDetector.findPlayer = true;
             enemyEntityDetector.findOnlyAlivePlayers = true;
             enemyEntityDetector.findPlayerToAttack = true;
@@ -188,8 +187,6 @@ namespace MultiplayerARPG
                     destination = null;
             }
 
-            PlayerCharacterEntity.RequestUnsetAimPosition();
-
             UpdateInput();
             UpdateFollowTarget();
             UpdateLookAtTarget();
@@ -240,32 +237,34 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool GetAttackDistanceAndFov(out float attackDistance, out float attackFov)
+        public bool GetAttackDataOrUseNonAttackSkill(out float attackDistance, out float attackFov, out float attackTransformOffsetY)
         {
             attackDistance = PlayerCharacterEntity.GetAttackDistance();
             attackFov = PlayerCharacterEntity.GetAttackFov();
+            attackTransformOffsetY = PlayerCharacterEntity.GetAttackTransformPosition().y - PlayerCharacterEntity.CacheTransform.position.y;
             if (queueUsingSkill.HasValue)
             {
-                UsingSkillData queueUsingSkillValue = queueUsingSkill.Value;
                 Skill skill = null;
-                if (GameInstance.Skills.TryGetValue(queueUsingSkillValue.dataId, out skill) && skill != null)
+                if (GameInstance.Skills.TryGetValue(queueUsingSkill.Value.dataId, out skill) && skill != null)
                 {
                     if (skill.IsAttack())
                     {
                         attackDistance = PlayerCharacterEntity.GetSkillAttackDistance(skill);
                         attackFov = PlayerCharacterEntity.GetSkillAttackFov(skill);
+                        attackTransformOffsetY = PlayerCharacterEntity.GetSkillAttackTransformPosition(skill).y - PlayerCharacterEntity.CacheTransform.position.y;
                     }
                     else
                     {
                         // Stop movement to use non attack skill
                         PlayerCharacterEntity.StopMove();
-                        RequestUsePendingSkill();
+                        RequestUsePendingSkill(null);
                         return false;
                     }
                 }
                 else
                     queueUsingSkill = null;
             }
+            // Return true if going to attack
             return true;
         }
 
@@ -301,23 +300,17 @@ namespace MultiplayerARPG
             return moveDirection;
         }
 
-        public virtual void RequestAttack()
-        {
-            PlayerCharacterEntity.RequestAttack();
-        }
-
-        public virtual void RequestUseSkill(int dataId)
-        {
-            PlayerCharacterEntity.RequestUseSkill(dataId);
-        }
-
-        public void RequestUsePendingSkill()
+        public void RequestUsePendingSkill(Vector3? aimPosition)
         {
             if (queueUsingSkill.HasValue && PlayerCharacterEntity.CanUseSkill())
             {
                 UsingSkillData queueUsingSkillValue = queueUsingSkill.Value;
-                Vector3 aimPosition = queueUsingSkillValue.aimPosition.HasValue ? queueUsingSkillValue.aimPosition.Value : CharacterTransform.position;
-                RequestUseSkill(queueUsingSkillValue.dataId);
+                if (queueUsingSkillValue.aimPosition.HasValue)
+                    aimPosition = queueUsingSkillValue.aimPosition.Value;
+                if (aimPosition.HasValue)
+                    PlayerCharacterEntity.RequestUseSkill(queueUsingSkillValue.dataId, aimPosition.Value);
+                else
+                    PlayerCharacterEntity.RequestUseSkill(queueUsingSkillValue.dataId);
                 queueUsingSkill = null;
             }
         }

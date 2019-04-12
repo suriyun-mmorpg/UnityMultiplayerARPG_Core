@@ -24,6 +24,16 @@ namespace MultiplayerARPG
             AimPosition = Vector3.zero;
         }
 
+        protected void NetFuncAttackWithoutAimPosition()
+        {
+            NetFuncAttack(false, Vector3.zero);
+        }
+
+        protected void NetFuncAttackWithAimPosition(Vector3 aimPosition)
+        {
+            NetFuncAttack(true, aimPosition);
+        }
+
         protected void NetFuncUseSkillWithoutAimPosition(int dataId)
         {
             NetFuncUseSkill(dataId, false, Vector3.zero);
