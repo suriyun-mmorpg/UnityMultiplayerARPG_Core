@@ -436,7 +436,7 @@ namespace MultiplayerARPG
                 float actDistance = attackDistance;
                 actDistance -= actDistance * 0.1f;
                 actDistance -= StoppingDistance;
-                if (Vector3.Distance(targetEnemy.CacheTransform.position, PlayerCharacterEntity.CacheTransform.position) <= actDistance)
+                if (FindTarget(targetEnemy.gameObject, actDistance, gameInstance.characterLayer.Mask))
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
@@ -563,7 +563,7 @@ namespace MultiplayerARPG
                 float actDistance = attackDistance;
                 actDistance -= actDistance * 0.1f;
                 actDistance -= StoppingDistance;
-                if (Vector3.Distance(targetHarvestable.CacheTransform.position, PlayerCharacterEntity.CacheTransform.position) <= actDistance)
+                if (FindTarget(targetHarvestable.gameObject, actDistance, gameInstance.harvestableLayer.Mask))
                 {
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
