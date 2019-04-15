@@ -320,9 +320,17 @@ namespace MultiplayerARPG
 
             if (uiStats != null)
             {
-                CharacterStats stats = EquipmentItem.GetIncreaseStats(Level, CharacterItem.GetEquipmentBonusRate());
-                if (EquipmentItem == null || stats.IsEmpty())
+                CharacterStats stats = CharacterStats.Empty;
+                if (EquipmentItem != null)
+                    stats = EquipmentItem.GetIncreaseStats(Level, CharacterItem.GetEquipmentBonusRate());
+                else if (SocketEnhancerItem != null)
+                    stats = SocketEnhancerItem.socketEnhanceEffect.stats;
+
+                if (stats.IsEmpty())
+                {
+                    // Hide ui if stats is empty
                     uiStats.Hide();
+                }
                 else
                 {
                     uiStats.Show();
@@ -332,9 +340,17 @@ namespace MultiplayerARPG
 
             if (uiIncreaseAttributes != null)
             {
-                Dictionary<Attribute, short> attributes = EquipmentItem.GetIncreaseAttributes(Level, CharacterItem.GetEquipmentBonusRate());
-                if (EquipmentItem == null || attributes == null || attributes.Count == 0)
+                Dictionary<Attribute, short> attributes = null;
+                if (EquipmentItem != null)
+                    attributes = EquipmentItem.GetIncreaseAttributes(Level, CharacterItem.GetEquipmentBonusRate());
+                else if (SocketEnhancerItem != null)
+                    attributes = GameDataHelpers.CombineAttributes(SocketEnhancerItem.socketEnhanceEffect.attributes, attributes, 1f);
+                
+                if (attributes == null || attributes.Count == 0)
+                {
+                    // Hide ui if attributes is empty
                     uiIncreaseAttributes.Hide();
+                }
                 else
                 {
                     uiIncreaseAttributes.Show();
@@ -344,9 +360,17 @@ namespace MultiplayerARPG
 
             if (uiIncreaseResistances != null)
             {
-                Dictionary<DamageElement, float> resistances = EquipmentItem.GetIncreaseResistances(Level, CharacterItem.GetEquipmentBonusRate());
-                if (EquipmentItem == null || resistances == null || resistances.Count == 0)
+                Dictionary<DamageElement, float> resistances = null;
+                if (EquipmentItem != null)
+                    resistances = EquipmentItem.GetIncreaseResistances(Level, CharacterItem.GetEquipmentBonusRate());
+                else if (SocketEnhancerItem != null)
+                    resistances = GameDataHelpers.CombineResistances(SocketEnhancerItem.socketEnhanceEffect.resistances, resistances, 1f);
+
+                if (resistances == null || resistances.Count == 0)
+                {
+                    // Hide ui if resistances is empty
                     uiIncreaseResistances.Hide();
+                }
                 else
                 {
                     uiIncreaseResistances.Show();
@@ -356,9 +380,17 @@ namespace MultiplayerARPG
 
             if (uiIncreaseDamageAmounts != null)
             {
-                Dictionary<DamageElement, MinMaxFloat> damageAmounts = EquipmentItem.GetIncreaseDamages(Level, CharacterItem.GetEquipmentBonusRate());
-                if (EquipmentItem == null || damageAmounts == null || damageAmounts.Count == 0)
+                Dictionary<DamageElement, MinMaxFloat> damageAmounts = null;
+                if (EquipmentItem != null)
+                    damageAmounts = EquipmentItem.GetIncreaseDamages(Level, CharacterItem.GetEquipmentBonusRate());
+                else
+                    damageAmounts = GameDataHelpers.CombineDamages(SocketEnhancerItem.socketEnhanceEffect.damages, damageAmounts, 1f);
+
+                if (damageAmounts == null || damageAmounts.Count == 0)
+                {
+                    // Hide ui if damage amounts is empty
                     uiIncreaseDamageAmounts.Hide();
+                }
                 else
                 {
                     uiIncreaseDamageAmounts.Show();
@@ -368,9 +400,17 @@ namespace MultiplayerARPG
 
             if (uiIncreaseSkillLevels != null)
             {
-                Dictionary<Skill, short> skillLevels = EquipmentItem.GetIncreaseSkills();
-                if (EquipmentItem == null || skillLevels == null || skillLevels.Count == 0)
+                Dictionary<Skill, short> skillLevels = null;
+                if (EquipmentItem != null)
+                    skillLevels = EquipmentItem.GetIncreaseSkills();
+                else
+                    skillLevels = GameDataHelpers.CombineSkills(SocketEnhancerItem.socketEnhanceEffect.skills, skillLevels);
+
+                if (skillLevels == null || skillLevels.Count == 0)
+                {
+                    // Hide ui if skill levels is empty
                     uiIncreaseSkillLevels.Hide();
+                }
                 else
                 {
                     uiIncreaseSkillLevels.Show();
@@ -381,7 +421,10 @@ namespace MultiplayerARPG
             if (uiEquipmentSet != null)
             {
                 if (EquipmentItem == null || EquipmentItem.equipmentSet == null || EquipmentItem.equipmentSet.effects.Length == 0)
+                {
+                    // Only equipment item has equipment set data
                     uiEquipmentSet.Hide();
+                }
                 else
                 {
                     uiEquipmentSet.Show();
