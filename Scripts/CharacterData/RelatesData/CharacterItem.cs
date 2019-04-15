@@ -346,6 +346,7 @@ public class CharacterItem : INetSerializable
         cloneItem.dataId = dataId;
         cloneItem.level = level;
         cloneItem.amount = amount;
+        cloneItem.sockets = sockets;
         cloneItem.durability = durability;
         cloneItem.exp = exp;
         cloneItem.lockRemainsDuration = lockRemainsDuration;
