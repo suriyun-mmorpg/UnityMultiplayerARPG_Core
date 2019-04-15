@@ -11,14 +11,10 @@ namespace MultiplayerARPG
         {
             get
             {
-                try
-                {
+                if (uiSocketEnhancerItems.CacheNonEquipItemSelectionManager != null &&
+                    uiSocketEnhancerItems.CacheNonEquipItemSelectionManager.SelectedUI != null &&
+                    uiSocketEnhancerItems.CacheNonEquipItemSelectionManager.SelectedUI.SocketEnhancerItem != null)
                     return uiSocketEnhancerItems.CacheNonEquipItemSelectionManager.SelectedUI.SocketEnhancerItem.DataId;
-                }
-                catch (System.Exception ex)
-                {
-                    Debug.LogException(ex);
-                }
                 return 0;
             }
         }
