@@ -24,6 +24,9 @@ namespace MultiplayerARPG
 
         public void OnUpdateCharacterItems()
         {
+            if (!IsVisible())
+                return;
+
             if (uiCharacterItem != null)
             {
                 if (CharacterItem == null)
@@ -43,10 +46,16 @@ namespace MultiplayerARPG
             }
         }
 
+        public override void Show()
+        {
+            base.Show();
+            OnUpdateCharacterItems();
+        }
+
         public override void Hide()
         {
-            Data = new CharacterItemByIndexTuple(InventoryType.NonEquipItems, -1);
             base.Hide();
+            Data = new CharacterItemByIndexTuple(InventoryType.NonEquipItems, -1);
         }
 
         public void OnClickEnhanceSocket()
