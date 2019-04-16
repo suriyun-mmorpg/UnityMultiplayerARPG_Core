@@ -24,43 +24,45 @@ namespace MultiplayerARPG
         }
 
 
-        private UIList cacheCharacterQuestList;
-        public UIList CacheCharacterQuestList
+        private UIList cacheQuestList;
+        public UIList CacheQuestList
         {
             get
             {
-                if (cacheCharacterQuestList == null)
+                if (cacheQuestList == null)
                 {
-                    cacheCharacterQuestList = gameObject.AddComponent<UIList>();
-                    cacheCharacterQuestList.uiPrefab = uiCharacterQuestPrefab.gameObject;
-                    cacheCharacterQuestList.uiContainer = uiCharacterQuestContainer;
+                    cacheQuestList = gameObject.AddComponent<UIList>();
+                    cacheQuestList.uiPrefab = uiCharacterQuestPrefab.gameObject;
+                    cacheQuestList.uiContainer = uiCharacterQuestContainer;
                 }
-                return cacheCharacterQuestList;
+                return cacheQuestList;
             }
         }
 
-        private UICharacterQuestSelectionManager cacheCharacterQuestSelectionManager;
-        public UICharacterQuestSelectionManager CacheCharacterQuestSelectionManager
+        private UICharacterQuestSelectionManager cacheQuestSelectionManager;
+        public UICharacterQuestSelectionManager CacheQuestSelectionManager
         {
             get
             {
-                if (cacheCharacterQuestSelectionManager == null)
-                    cacheCharacterQuestSelectionManager = GetComponent<UICharacterQuestSelectionManager>();
-                if (cacheCharacterQuestSelectionManager == null)
-                    cacheCharacterQuestSelectionManager = gameObject.AddComponent<UICharacterQuestSelectionManager>();
-                cacheCharacterQuestSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheCharacterQuestSelectionManager;
+                if (cacheQuestSelectionManager == null)
+                    cacheQuestSelectionManager = GetComponent<UICharacterQuestSelectionManager>();
+                if (cacheQuestSelectionManager == null)
+                    cacheQuestSelectionManager = gameObject.AddComponent<UICharacterQuestSelectionManager>();
+                cacheQuestSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return cacheQuestSelectionManager;
             }
         }
 
         public override void Show()
         {
-            CacheCharacterQuestSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterQuest);
-            CacheCharacterQuestSelectionManager.eventOnSelect.AddListener(OnSelectCharacterQuest);
-            CacheCharacterQuestSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterQuest);
-            CacheCharacterQuestSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterQuest);
-            if (CacheCharacterQuestSelectionManager.Count > 0)
-                CacheCharacterQuestSelectionManager.Get(0).OnClickSelect();
+            CacheQuestSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterQuest);
+            CacheQuestSelectionManager.eventOnSelect.AddListener(OnSelectCharacterQuest);
+            CacheQuestSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterQuest);
+            CacheQuestSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterQuest);
+            if (uiQuestDialog != null)
+                uiQuestDialog.onHide.AddListener(OnQuestDialogHide);
+            if (CacheQuestSelectionManager.Count > 0)
+                CacheQuestSelectionManager.Get(0).OnClickSelect();
             else if (uiQuestDialog != null)
                 uiQuestDialog.Hide();
             base.Show();
@@ -68,15 +70,22 @@ namespace MultiplayerARPG
 
         public override void Hide()
         {
-            CacheCharacterQuestSelectionManager.DeselectSelectedUI();
+            if (uiQuestDialog != null)
+                uiQuestDialog.onHide.RemoveListener(OnQuestDialogHide);
+            CacheQuestSelectionManager.DeselectSelectedUI();
             base.Hide();
+        }
+
+        protected void OnQuestDialogHide()
+        {
+            CacheQuestSelectionManager.DeselectSelectedUI();
         }
 
         protected void OnSelectCharacterQuest(UICharacterQuest ui)
         {
             if (uiQuestDialog != null)
             {
-                uiQuestDialog.selectionManager = CacheCharacterQuestSelectionManager;
+                uiQuestDialog.selectionManager = CacheQuestSelectionManager;
                 uiQuestDialog.Setup(ui.Data, BasePlayerCharacterController.OwningCharacter, ui.IndexOfData);
                 uiQuestDialog.Show();
             }
@@ -85,14 +94,18 @@ namespace MultiplayerARPG
         protected void OnDeselectCharacterQuest(UICharacterQuest ui)
         {
             if (uiQuestDialog != null)
+            {
+                uiQuestDialog.onHide.RemoveListener(OnQuestDialogHide);
                 uiQuestDialog.Hide();
+                uiQuestDialog.onHide.AddListener(OnQuestDialogHide);
+            }
         }
 
         public void UpdateData()
         {
-            int selectedQuestId = CacheCharacterQuestSelectionManager.SelectedUI != null ? CacheCharacterQuestSelectionManager.SelectedUI.Data.dataId : 0;
-            CacheCharacterQuestSelectionManager.DeselectSelectedUI();
-            CacheCharacterQuestSelectionManager.Clear();
+            int selectedQuestId = CacheQuestSelectionManager.SelectedUI != null ? CacheQuestSelectionManager.SelectedUI.Data.dataId : 0;
+            CacheQuestSelectionManager.DeselectSelectedUI();
+            CacheQuestSelectionManager.Clear();
 
             List<CharacterQuest> characterQuests = new List<CharacterQuest>();
             foreach (CharacterQuest characterQuest in BasePlayerCharacterController.OwningCharacter.Quests)
@@ -101,12 +114,12 @@ namespace MultiplayerARPG
                     continue;
                 characterQuests.Add(characterQuest);
             }
-            CacheCharacterQuestList.Generate(characterQuests, (index, characterQuest, ui) =>
+            CacheQuestList.Generate(characterQuests, (index, characterQuest, ui) =>
             {
                 UICharacterQuest uiCharacterQuest = ui.GetComponent<UICharacterQuest>();
                 uiCharacterQuest.Setup(characterQuest, BasePlayerCharacterController.OwningCharacter, index);
                 uiCharacterQuest.Show();
-                CacheCharacterQuestSelectionManager.Add(uiCharacterQuest);
+                CacheQuestSelectionManager.Add(uiCharacterQuest);
                 if (selectedQuestId == characterQuest.dataId)
                     uiCharacterQuest.OnClickSelect();
             });

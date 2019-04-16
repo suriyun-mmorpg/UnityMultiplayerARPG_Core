@@ -383,7 +383,7 @@ namespace MultiplayerARPG
                 Dictionary<DamageElement, MinMaxFloat> damageAmounts = null;
                 if (EquipmentItem != null)
                     damageAmounts = EquipmentItem.GetIncreaseDamages(Level, CharacterItem.GetEquipmentBonusRate());
-                else
+                else if (SocketEnhancerItem != null)
                     damageAmounts = GameDataHelpers.CombineDamages(SocketEnhancerItem.socketEnhanceEffect.damages, damageAmounts, 1f);
 
                 if (damageAmounts == null || damageAmounts.Count == 0)
@@ -403,7 +403,7 @@ namespace MultiplayerARPG
                 Dictionary<Skill, short> skillLevels = null;
                 if (EquipmentItem != null)
                     skillLevels = EquipmentItem.GetIncreaseSkills();
-                else
+                else if (SocketEnhancerItem != null)
                     skillLevels = GameDataHelpers.CombineSkills(SocketEnhancerItem.socketEnhanceEffect.skills, skillLevels);
 
                 if (skillLevels == null || skillLevels.Count == 0)

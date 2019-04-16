@@ -56,13 +56,22 @@ namespace MultiplayerARPG
             CacheCashShopSelectionManager.eventOnSelect.AddListener(OnSelectCashShopItem);
             CacheCashShopSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCashShopItem);
             CacheCashShopSelectionManager.eventOnDeselect.AddListener(OnDeselectCashShopItem);
+            if (uiCashShopItemDialog != null)
+                uiCashShopItemDialog.onHide.AddListener(OnCashShopItemDialogHide);
             RefreshCashShopInfo();
         }
 
         public override void Hide()
         {
+            if (uiCashShopItemDialog != null)
+                uiCashShopItemDialog.onHide.RemoveListener(OnCashShopItemDialogHide);
             CacheCashShopSelectionManager.DeselectSelectedUI();
             base.Hide();
+        }
+
+        protected void OnCashShopItemDialogHide()
+        {
+            CacheCashShopSelectionManager.DeselectSelectedUI();
         }
 
         protected void OnSelectCashShopItem(UICashShopItem ui)
@@ -78,7 +87,11 @@ namespace MultiplayerARPG
         protected void OnDeselectCashShopItem(UICashShopItem ui)
         {
             if (uiCashShopItemDialog != null)
+            {
+                uiCashShopItemDialog.onHide.RemoveListener(OnCashShopItemDialogHide);
                 uiCashShopItemDialog.Hide();
+                uiCashShopItemDialog.onHide.AddListener(OnCashShopItemDialogHide);
+            }
         }
 
         public void Buy(int dataId)

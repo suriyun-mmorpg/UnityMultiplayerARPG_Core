@@ -18,7 +18,7 @@ namespace MultiplayerARPG
                 if (cacheEquipItemSlots == null)
                 {
                     cacheEquipItemSlots = new Dictionary<string, UICharacterItem>();
-                    CacheEquipItemSelectionManager.Clear();
+                    CacheItemSelectionManager.Clear();
                     if (rightHandSlot != null)
                     {
                         string equipPosition = GameDataConst.EQUIP_POSITION_RIGHT_HAND;
@@ -27,7 +27,7 @@ namespace MultiplayerARPG
                         if (dragHandler != null)
                             dragHandler.SetupForEquipItems(rightHandSlot);
                         cacheEquipItemSlots.Add(equipPosition, rightHandSlot);
-                        CacheEquipItemSelectionManager.Add(rightHandSlot);
+                        CacheItemSelectionManager.Add(rightHandSlot);
                     }
                     if (leftHandSlot != null)
                     {
@@ -37,7 +37,7 @@ namespace MultiplayerARPG
                         if (dragHandler != null)
                             dragHandler.SetupForEquipItems(leftHandSlot);
                         cacheEquipItemSlots.Add(equipPosition, leftHandSlot);
-                        CacheEquipItemSelectionManager.Add(leftHandSlot);
+                        CacheItemSelectionManager.Add(leftHandSlot);
                     }
                     foreach (UICharacterItemPair otherEquipSlot in otherEquipSlots)
                     {
@@ -51,7 +51,7 @@ namespace MultiplayerARPG
                             if (dragHandler != null)
                                 dragHandler.SetupForEquipItems(otherEquipSlot.ui);
                             cacheEquipItemSlots.Add(equipPosition, otherEquipSlot.ui);
-                            CacheEquipItemSelectionManager.Add(otherEquipSlot.ui);
+                            CacheItemSelectionManager.Add(otherEquipSlot.ui);
                         }
                     }
                 }
@@ -59,45 +59,54 @@ namespace MultiplayerARPG
             }
         }
 
-        private UICharacterItemSelectionManager cacheEquipItemSelectionManager;
-        public UICharacterItemSelectionManager CacheEquipItemSelectionManager
+        private UICharacterItemSelectionManager cacheItemSelectionManager;
+        public UICharacterItemSelectionManager CacheItemSelectionManager
         {
             get
             {
-                if (cacheEquipItemSelectionManager == null)
-                    cacheEquipItemSelectionManager = GetComponent<UICharacterItemSelectionManager>();
-                if (cacheEquipItemSelectionManager == null)
-                    cacheEquipItemSelectionManager = gameObject.AddComponent<UICharacterItemSelectionManager>();
-                cacheEquipItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheEquipItemSelectionManager;
+                if (cacheItemSelectionManager == null)
+                    cacheItemSelectionManager = GetComponent<UICharacterItemSelectionManager>();
+                if (cacheItemSelectionManager == null)
+                    cacheItemSelectionManager = gameObject.AddComponent<UICharacterItemSelectionManager>();
+                cacheItemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return cacheItemSelectionManager;
             }
         }
 
         public override void Show()
         {
-            CacheEquipItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCharacterItem);
-            CacheEquipItemSelectionManager.eventOnSelected.AddListener(OnSelectCharacterItem);
-            CacheEquipItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectCharacterItem);
-            CacheEquipItemSelectionManager.eventOnDeselected.AddListener(OnDeselectCharacterItem);
+            CacheItemSelectionManager.eventOnSelected.RemoveListener(OnSelectCharacterItem);
+            CacheItemSelectionManager.eventOnSelected.AddListener(OnSelectCharacterItem);
+            CacheItemSelectionManager.eventOnDeselected.RemoveListener(OnDeselectCharacterItem);
+            CacheItemSelectionManager.eventOnDeselected.AddListener(OnDeselectCharacterItem);
+            if (uiItemDialog != null)
+                uiItemDialog.onHide.AddListener(OnItemDialogHide);
             base.Show();
         }
 
         public override void Hide()
         {
-            CacheEquipItemSelectionManager.DeselectSelectedUI();
+            if (uiItemDialog != null)
+                uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
+            CacheItemSelectionManager.DeselectSelectedUI();
             base.Hide();
+        }
+
+        protected void OnItemDialogHide()
+        {
+            CacheItemSelectionManager.DeselectSelectedUI();
         }
 
         protected void OnSelectCharacterItem(UICharacterItem ui)
         {
             if (!ui.Data.characterItem.NotEmptySlot())
             {
-                CacheEquipItemSelectionManager.DeselectSelectedUI();
+                CacheItemSelectionManager.DeselectSelectedUI();
                 return;
             }
             if (uiItemDialog != null)
             {
-                uiItemDialog.selectionManager = CacheEquipItemSelectionManager;
+                uiItemDialog.selectionManager = CacheItemSelectionManager;
                 uiItemDialog.Setup(ui.Data, character, ui.IndexOfData);
                 uiItemDialog.Show();
             }
@@ -106,7 +115,11 @@ namespace MultiplayerARPG
         protected void OnDeselectCharacterItem(UICharacterItem ui)
         {
             if (uiItemDialog != null)
+            {
+                uiItemDialog.onHide.RemoveListener(OnItemDialogHide);
                 uiItemDialog.Hide();
+                uiItemDialog.onHide.AddListener(OnItemDialogHide);
+            }
         }
 
         public void UpdateData(ICharacterData character)

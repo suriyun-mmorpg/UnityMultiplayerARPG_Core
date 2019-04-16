@@ -179,6 +179,10 @@ namespace MultiplayerARPG
             SkillSelectionManager.eventOnSelect.AddListener(OnSelectSkill);
             SkillSelectionManager.eventOnDeselect.RemoveListener(OnDeselectSkill);
             SkillSelectionManager.eventOnDeselect.AddListener(OnDeselectSkill);
+            if (uiRoleDialog != null)
+                uiRoleDialog.onHide.AddListener(OnRoleDialogHide);
+            if (uiSkillDialog != null)
+                uiSkillDialog.onHide.AddListener(OnSkillDialogHide);
             UpdateGuildUIs(Guild);
         }
 
@@ -186,9 +190,23 @@ namespace MultiplayerARPG
         {
             if (uiGuildCreate != null)
                 uiGuildCreate.Hide();
+            if (uiRoleDialog != null)
+                uiRoleDialog.onHide.RemoveListener(OnRoleDialogHide);
+            if (uiSkillDialog != null)
+                uiSkillDialog.onHide.RemoveListener(OnSkillDialogHide);
             RoleSelectionManager.DeselectSelectedUI();
             SkillSelectionManager.DeselectSelectedUI();
             base.Hide();
+        }
+
+        protected void OnRoleDialogHide()
+        {
+            RoleSelectionManager.DeselectSelectedUI();
+        }
+
+        protected void OnSkillDialogHide()
+        {
+            SkillSelectionManager.DeselectSelectedUI();
         }
 
         protected void OnSelectRole(UIGuildRole ui)
@@ -204,7 +222,11 @@ namespace MultiplayerARPG
         protected void OnDeselectRole(UIGuildRole ui)
         {
             if (uiRoleDialog != null)
+            {
+                uiRoleDialog.onHide.RemoveListener(OnRoleDialogHide);
                 uiRoleDialog.Hide();
+                uiRoleDialog.onHide.AddListener(OnRoleDialogHide);
+            }
         }
 
         protected void OnSelectSkill(UIGuildSkill ui)
@@ -220,7 +242,11 @@ namespace MultiplayerARPG
         protected void OnDeselectSkill(UIGuildSkill ui)
         {
             if (uiSkillDialog != null)
+            {
+                uiSkillDialog.onHide.RemoveListener(OnSkillDialogHide);
                 uiSkillDialog.Hide();
+                uiSkillDialog.onHide.AddListener(OnSkillDialogHide);
+            }
         }
 
         private void UpdateGuildUIs(GuildData guild)

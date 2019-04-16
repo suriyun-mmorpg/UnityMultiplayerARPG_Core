@@ -10,55 +10,64 @@ namespace MultiplayerARPG
         public UICharacterBuff uiCharacterBuffPrefab;
         public Transform uiCharacterBuffContainer;
 
-        private UIList cacheCharacterBuffList;
-        public UIList CacheCharacterBuffList
+        private UIList cacheBuffList;
+        public UIList CacheBuffList
         {
             get
             {
-                if (cacheCharacterBuffList == null)
+                if (cacheBuffList == null)
                 {
-                    cacheCharacterBuffList = gameObject.AddComponent<UIList>();
-                    cacheCharacterBuffList.uiPrefab = uiCharacterBuffPrefab.gameObject;
-                    cacheCharacterBuffList.uiContainer = uiCharacterBuffContainer;
+                    cacheBuffList = gameObject.AddComponent<UIList>();
+                    cacheBuffList.uiPrefab = uiCharacterBuffPrefab.gameObject;
+                    cacheBuffList.uiContainer = uiCharacterBuffContainer;
                 }
-                return cacheCharacterBuffList;
+                return cacheBuffList;
             }
         }
 
-        private UICharacterBuffSelectionManager cacheCharacterBuffSelectionManager;
-        public UICharacterBuffSelectionManager CacheCharacterBuffSelectionManager
+        private UICharacterBuffSelectionManager cacheBuffSelectionManager;
+        public UICharacterBuffSelectionManager CacheBuffSelectionManager
         {
             get
             {
-                if (cacheCharacterBuffSelectionManager == null)
-                    cacheCharacterBuffSelectionManager = GetComponent<UICharacterBuffSelectionManager>();
-                if (cacheCharacterBuffSelectionManager == null)
-                    cacheCharacterBuffSelectionManager = gameObject.AddComponent<UICharacterBuffSelectionManager>();
-                cacheCharacterBuffSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheCharacterBuffSelectionManager;
+                if (cacheBuffSelectionManager == null)
+                    cacheBuffSelectionManager = GetComponent<UICharacterBuffSelectionManager>();
+                if (cacheBuffSelectionManager == null)
+                    cacheBuffSelectionManager = gameObject.AddComponent<UICharacterBuffSelectionManager>();
+                cacheBuffSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return cacheBuffSelectionManager;
             }
         }
 
         public override void Show()
         {
-            CacheCharacterBuffSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterBuff);
-            CacheCharacterBuffSelectionManager.eventOnSelect.AddListener(OnSelectCharacterBuff);
-            CacheCharacterBuffSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterBuff);
-            CacheCharacterBuffSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterBuff);
+            CacheBuffSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterBuff);
+            CacheBuffSelectionManager.eventOnSelect.AddListener(OnSelectCharacterBuff);
+            CacheBuffSelectionManager.eventOnDeselect.RemoveListener(OnDeselectCharacterBuff);
+            CacheBuffSelectionManager.eventOnDeselect.AddListener(OnDeselectCharacterBuff);
+            if (uiBuffDialog != null)
+                uiBuffDialog.onHide.AddListener(OnBuffDialogHide);
             base.Show();
         }
 
         public override void Hide()
         {
-            CacheCharacterBuffSelectionManager.DeselectSelectedUI();
+            if (uiBuffDialog != null)
+                uiBuffDialog.onHide.RemoveListener(OnBuffDialogHide);
+            CacheBuffSelectionManager.DeselectSelectedUI();
             base.Hide();
+        }
+
+        protected void OnBuffDialogHide()
+        {
+            CacheBuffSelectionManager.DeselectSelectedUI();
         }
 
         protected void OnSelectCharacterBuff(UICharacterBuff ui)
         {
             if (uiBuffDialog != null)
             {
-                uiBuffDialog.selectionManager = CacheCharacterBuffSelectionManager;
+                uiBuffDialog.selectionManager = CacheBuffSelectionManager;
                 uiBuffDialog.Setup(ui.Data, character, ui.IndexOfData);
                 uiBuffDialog.Show();
             }
@@ -67,30 +76,33 @@ namespace MultiplayerARPG
         protected void OnDeselectCharacterBuff(UICharacterBuff ui)
         {
             if (uiBuffDialog != null)
+            {
+                uiBuffDialog.onHide.RemoveListener(OnBuffDialogHide);
                 uiBuffDialog.Hide();
+                uiBuffDialog.onHide.AddListener(OnBuffDialogHide);
+            }
         }
 
         public void UpdateData(ICharacterData character)
         {
             this.character = character;
-            
-            string selectedBuffKey = CacheCharacterBuffSelectionManager.SelectedUI != null ? CacheCharacterBuffSelectionManager.SelectedUI.CharacterBuff.GetKey() : string.Empty;
-            CacheCharacterBuffSelectionManager.DeselectSelectedUI();
-            CacheCharacterBuffSelectionManager.Clear();
+            string selectedBuffKey = CacheBuffSelectionManager.SelectedUI != null ? CacheBuffSelectionManager.SelectedUI.CharacterBuff.GetKey() : string.Empty;
+            CacheBuffSelectionManager.DeselectSelectedUI();
+            CacheBuffSelectionManager.Clear();
 
             if (character == null)
             {
-                CacheCharacterBuffList.HideAll();
+                CacheBuffList.HideAll();
                 return;
             }
 
             IList<CharacterBuff> buffs = character.Buffs;
-            CacheCharacterBuffList.Generate(buffs, (index, characterBuff, ui) =>
+            CacheBuffList.Generate(buffs, (index, characterBuff, ui) =>
             {
                 UICharacterBuff uiCharacterBuff = ui.GetComponent<UICharacterBuff>();
                 uiCharacterBuff.Setup(characterBuff, character, index);
                 uiCharacterBuff.Show();
-                CacheCharacterBuffSelectionManager.Add(uiCharacterBuff);
+                CacheBuffSelectionManager.Add(uiCharacterBuff);
                 if (selectedBuffKey.Equals(characterBuff.GetKey()))
                     uiCharacterBuff.OnClickSelect();
             });
