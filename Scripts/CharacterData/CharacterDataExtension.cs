@@ -1129,8 +1129,8 @@ public static partial class CharacterDataExtension
         Dictionary<Attribute, short> tempIncreaseAttributes;
         Dictionary<DamageElement, float> tempIncreaseResistances;
         Dictionary<DamageElement, MinMaxFloat> tempIncreaseDamages;
-        CharacterStats tempIncreaseStats;
         Dictionary<Skill, short> tempIncreaseSkills;
+        CharacterStats tempIncreaseStats;
         foreach (KeyValuePair<EquipmentSet, int> cacheEquipmentSet in equipmentSets)
         {
             EquipmentBonus[] effects = cacheEquipmentSet.Key.effects;
@@ -1139,16 +1139,18 @@ public static partial class CharacterDataExtension
             {
                 if (i < effects.Length)
                 {
+                    // Make temp of data
                     tempIncreaseAttributes = GameDataHelpers.CombineAttributes(effects[i].attributes, null, 1f);
                     tempIncreaseResistances = GameDataHelpers.CombineResistances(effects[i].resistances, null, 1f);
                     tempIncreaseDamages = GameDataHelpers.CombineDamages(effects[i].damages, null, 1f);
-                    tempIncreaseStats = effects[i].stats + GameDataHelpers.GetStatsFromAttributes(tempIncreaseAttributes);
                     tempIncreaseSkills = GameDataHelpers.CombineSkills(effects[i].skills, null);
+                    tempIncreaseStats = effects[i].stats + GameDataHelpers.GetStatsFromAttributes(tempIncreaseAttributes);
+                    // Combine to result dictionaries
                     bonusAttributes = GameDataHelpers.CombineAttributes(bonusAttributes, tempIncreaseAttributes);
                     bonusResistances = GameDataHelpers.CombineResistances(bonusResistances, tempIncreaseResistances);
                     bonusIncreaseDamages = GameDataHelpers.CombineDamages(bonusIncreaseDamages, tempIncreaseDamages);
-                    bonusStats += tempIncreaseStats;
                     bonusSkills = GameDataHelpers.CombineSkills(bonusSkills, tempIncreaseSkills);
+                    bonusStats += tempIncreaseStats;
                 }
                 else
                     break;
@@ -1184,7 +1186,7 @@ public static partial class CharacterDataExtension
         resultAttributes = GameDataHelpers.CombineAttributes(resultAttributes, data.GetAttributes());
         resultResistances = GameDataHelpers.CombineResistances(resultResistances, data.GetResistances());
         resultIncreaseDamages = GameDataHelpers.CombineDamages(resultIncreaseDamages, data.GetIncreaseDamages());
-        resultSkills = data.GetSkills();
+        resultSkills = GameDataHelpers.CombineSkills(resultSkills, data.GetSkills());
         // Sum with other stats
         resultMaxHp = (int)resultStats.hp;
         resultMaxMp = (int)resultStats.mp;

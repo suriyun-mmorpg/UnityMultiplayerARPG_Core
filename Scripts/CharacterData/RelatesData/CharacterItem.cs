@@ -229,28 +229,28 @@ public class CharacterItem : INetSerializable
 
     public Dictionary<DamageElement, float> GetIncreaseResistances()
     {
-        if (GetEquipmentItem() == null || Sockets.Count == 0)
+        if (GetEquipmentItem() == null)
             return null;
         return GetEquipmentItem().GetIncreaseResistances(level, GetEquipmentBonusRate());
     }
 
     public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages()
     {
-        if (GetEquipmentItem() == null || Sockets.Count == 0)
+        if (GetEquipmentItem() == null)
             return null;
         return GetEquipmentItem().GetIncreaseDamages(level, GetEquipmentBonusRate());
     }
 
     public Dictionary<Skill, short> GetIncreaseSkills()
     {
-        if (GetEquipmentItem() == null || Sockets.Count == 0)
+        if (GetEquipmentItem() == null)
             return null;
         return GetEquipmentItem().GetIncreaseSkills();
     }
 
     public CharacterStats GetIncreaseStats()
     {
-        if (GetEquipmentItem() == null || Sockets.Count == 0)
+        if (GetEquipmentItem() == null)
             return CharacterStats.Empty;
         return GetEquipmentItem().GetIncreaseStats(level, GetEquipmentBonusRate());
     }
