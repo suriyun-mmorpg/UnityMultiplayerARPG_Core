@@ -44,7 +44,7 @@ namespace MultiplayerARPG
         // Weapon
         public WeaponType weaponType;
         public FireType fireType;
-        [Tooltip("Amount of ammo reloading each time, for example macine gun may set this to 30 as magazine capacity, if this is 0 it will not need to have ammo loaded to shoot but still need ammo in inventory")]
+        [Tooltip("For macine gun may set this to 30 as magazine capacity, if this is 0 it will not need to have ammo loaded to shoot but still need ammo in inventory")]
         public short ammoCapacity;
         public Vector2 fireStagger;
         public byte fireSpread;
