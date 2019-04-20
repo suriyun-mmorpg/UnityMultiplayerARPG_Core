@@ -125,7 +125,7 @@ namespace MultiplayerARPG
                 return;
 
             SocialCharacterData partyMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
-            UISceneGlobal.Singleton.ShowMessageDialog("Kick Member", string.Format("You sure you want to kick {0} from party?", partyMember.characterName), false, true, false, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog("Kick Member", string.Format("You sure you want to kick {0} from party?", partyMember.characterName), false, true, true, false, null, () =>
             {
                 BasePlayerCharacterController.OwningCharacter.RequestKickFromParty(partyMember.id);
             });
@@ -133,7 +133,7 @@ namespace MultiplayerARPG
 
         public void OnClickLeaveParty()
         {
-            UISceneGlobal.Singleton.ShowMessageDialog("Leave Party", "You sure you want to leave party?", false, true, false, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog("Leave Party", "You sure you want to leave party?", false, true, true, false, null, () =>
             {
                 BasePlayerCharacterController.OwningCharacter.RequestLeaveParty();
             });

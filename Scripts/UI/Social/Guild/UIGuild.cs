@@ -329,7 +329,7 @@ namespace MultiplayerARPG
                 return;
 
             SocialCharacterData guildMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
-            UISceneGlobal.Singleton.ShowMessageDialog("Change Leader", string.Format("You sure you want to promote {0} to guild leader?", guildMember.characterName), false, true, false, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog("Change Leader", string.Format("You sure you want to promote {0} to guild leader?", guildMember.characterName), false, true, true, false, null, () =>
             {
                 BasePlayerCharacterController.OwningCharacter.RequestChangeGuildLeader(guildMember.id);
             });
@@ -378,7 +378,7 @@ namespace MultiplayerARPG
                 return;
 
             SocialCharacterData guildMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
-            UISceneGlobal.Singleton.ShowMessageDialog("Kick Member", string.Format("You sure you want to kick {0} from guild?", guildMember.characterName), false, true, false, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog("Kick Member", string.Format("You sure you want to kick {0} from guild?", guildMember.characterName), false, true, true, false, null, () =>
             {
                 BasePlayerCharacterController.OwningCharacter.RequestKickFromGuild(guildMember.id);
             });
@@ -386,7 +386,7 @@ namespace MultiplayerARPG
 
         public void OnClickLeaveGuild()
         {
-            UISceneGlobal.Singleton.ShowMessageDialog("Leave Guild", "You sure you want to leave guild?", false, true, false, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog("Leave Guild", "You sure you want to leave guild?", false, true, true, false, null, () =>
             {
                 BasePlayerCharacterController.OwningCharacter.RequestLeaveGuild();
             });
