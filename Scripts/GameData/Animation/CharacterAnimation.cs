@@ -83,4 +83,26 @@ namespace MultiplayerARPG
         public Skill skill;
         public ActionAnimation[] castAnimations;
     }
+
+    [System.Serializable]
+    public struct DefaultAnimations
+    {
+        public AnimationClip idleClip;
+        public AnimationClip moveClip;
+        public AnimationClip moveBackwardClip;
+        public AnimationClip moveLeftClip;
+        public AnimationClip moveRightClip;
+        public AnimationClip moveForwardLeftClip;
+        public AnimationClip moveForwardRightClip;
+        public AnimationClip moveBackwardLeftClip;
+        public AnimationClip moveBackwardRightClip;
+        public AnimationClip jumpClip;
+        public AnimationClip fallClip;
+        public AnimationClip hurtClip;
+        public AnimationClip deadClip;
+        public ActionAnimation[] rightHandAttackAnimations;
+        public ActionAnimation[] leftHandAttackAnimations;
+        public AnimationClip skillCastClip;
+        public ActionAnimation skillActivateAnimation;
+    }
 }
