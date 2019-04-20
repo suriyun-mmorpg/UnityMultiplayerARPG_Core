@@ -280,6 +280,11 @@ namespace MultiplayerARPG
         {
             base.SetEquipWeapons(equipWeapons);
             SetupComponent();
+            SetClipBasedOnWeapon(equipWeapons);
+        }
+
+        protected void SetClipBasedOnWeapon(EquipWeapons equipWeapons)
+        {
             Item weaponItem = GameInstance.Singleton.DefaultWeaponItem;
             if (equipWeapons.rightHand.NotEmptySlot() && equipWeapons.rightHand.GetWeaponItem() != null)
                 weaponItem = equipWeapons.rightHand.GetWeaponItem();
@@ -708,7 +713,7 @@ namespace MultiplayerARPG
             }
         }
         #endregion
-        
+
         public override void PlayHurtAnimation()
         {
             if (animatorType == AnimatorType.LegacyAnimtion)
