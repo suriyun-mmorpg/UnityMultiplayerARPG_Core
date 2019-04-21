@@ -743,9 +743,9 @@ namespace MultiplayerARPG
                 // Create new crosshair setting based on weapons
                 return new CrosshairSetting()
                 {
-                    spreadPowerWhileMoving = (rightHandWeapon.crosshairSetting.spreadPowerWhileMoving + leftHandWeapon.crosshairSetting.spreadPowerWhileMoving) / 2f,
-                    spreadPowerWhileAttacking = (rightHandWeapon.crosshairSetting.spreadPowerWhileAttacking + leftHandWeapon.crosshairSetting.spreadPowerWhileAttacking) / 2f,
-                    spreadDecreasePower = (rightHandWeapon.crosshairSetting.spreadDecreasePower + leftHandWeapon.crosshairSetting.spreadDecreasePower) / 2f,
+                    expandPerFrameWhileMoving = (rightHandWeapon.crosshairSetting.expandPerFrameWhileMoving + leftHandWeapon.crosshairSetting.expandPerFrameWhileMoving) / 2f,
+                    expandPerFrameWhileAttacking = (rightHandWeapon.crosshairSetting.expandPerFrameWhileAttacking + leftHandWeapon.crosshairSetting.expandPerFrameWhileAttacking) / 2f,
+                    shrinkPerFrame = (rightHandWeapon.crosshairSetting.shrinkPerFrame + leftHandWeapon.crosshairSetting.shrinkPerFrame) / 2f,
                     minSpread = (rightHandWeapon.crosshairSetting.minSpread + leftHandWeapon.crosshairSetting.minSpread) / 2f,
                     maxSpread = (rightHandWeapon.crosshairSetting.maxSpread + leftHandWeapon.crosshairSetting.maxSpread) / 2f
                 };

@@ -60,9 +60,9 @@ namespace MultiplayerARPG
         public Sprite zoomCrosshair;
         public CrosshairSetting crosshairSetting = new CrosshairSetting()
         {
-            spreadPowerWhileMoving = 3f,
-            spreadPowerWhileAttacking = 5f,
-            spreadDecreasePower = 2f,
+            expandPerFrameWhileMoving = 3f,
+            expandPerFrameWhileAttacking = 5f,
+            shrinkPerFrame = 8f,
             minSpread = 10f,
             maxSpread = 50f
         };
@@ -311,9 +311,9 @@ namespace MultiplayerARPG
     [System.Serializable]
     public struct CrosshairSetting
     {
-        public float spreadPowerWhileMoving;
-        public float spreadPowerWhileAttacking;
-        public float spreadDecreasePower;
+        public float expandPerFrameWhileMoving;
+        public float expandPerFrameWhileAttacking;
+        public float shrinkPerFrame;
         public float minSpread;
         public float maxSpread;
     }

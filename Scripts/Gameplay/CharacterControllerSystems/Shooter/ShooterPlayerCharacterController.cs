@@ -139,7 +139,7 @@ namespace MultiplayerARPG
             currentCrosshairSetting = GetCrosshairSetting();
             if (isAttacking)
             {
-                UpdateCrosshair(currentCrosshairSetting, currentCrosshairSetting.spreadPowerWhileAttacking);
+                UpdateCrosshair(currentCrosshairSetting, currentCrosshairSetting.expandPerFrameWhileAttacking);
             }
             else if (movementState.HasFlag(MovementFlag.Forward) ||
                 movementState.HasFlag(MovementFlag.Backward) ||
@@ -147,11 +147,11 @@ namespace MultiplayerARPG
                 movementState.HasFlag(MovementFlag.Right) ||
                 movementState.HasFlag(MovementFlag.IsJump))
             {
-                UpdateCrosshair(currentCrosshairSetting, currentCrosshairSetting.spreadPowerWhileMoving);
+                UpdateCrosshair(currentCrosshairSetting, currentCrosshairSetting.expandPerFrameWhileMoving);
             }
             else
             {
-                UpdateCrosshair(currentCrosshairSetting, -currentCrosshairSetting.spreadDecreasePower);
+                UpdateCrosshair(currentCrosshairSetting, -currentCrosshairSetting.shrinkPerFrame);
             }
 
             // Clear state from last update
