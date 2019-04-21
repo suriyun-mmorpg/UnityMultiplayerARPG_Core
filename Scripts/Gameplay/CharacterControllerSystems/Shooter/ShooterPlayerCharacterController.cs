@@ -9,6 +9,7 @@ namespace MultiplayerARPG
     {
         public const int RAYCAST_COLLIDER_SIZE = 32;
         public const int OVERLAP_COLLIDER_SIZE = 32;
+        public const float ZOOM_SPEED = 1f;
 
         public enum Mode
         {
@@ -43,6 +44,7 @@ namespace MultiplayerARPG
         float turnTimeCounter;
         float tempCalculateAngle;
         bool tempPressAttack;
+        bool tempPressWeaponAbility;
         bool tempPressActivate;
         bool tempPressPickupItem;
         GameObject tempGameObject;
@@ -58,8 +60,14 @@ namespace MultiplayerARPG
         Vector3 actionLookDirection;
         Vector2 currentCrosshairSize;
         CrosshairSetting currentCrosshairSetting;
-        bool isAttacking;
+        // Controlling states
+        bool isDoingAction;
         MovementFlag movementState;
+        WeaponAbility weaponAbility;
+        bool isDeactivatingWeaponAbility;
+        float fovBeforeZoom;
+        float zoomingFov;
+        float activateWeaponAbilityInterpTime;
 
         protected override void Awake()
         {
@@ -72,6 +80,8 @@ namespace MultiplayerARPG
             {
                 // Set parent transform to root for the best performance
                 CacheGameplayCameraControls = Instantiate(gameplayCameraPrefab);
+                fovBeforeZoom = CacheGameplayCameraControls.CacheCamera.fieldOfView;
+                zoomingFov = 15f;
             }
         }
 
@@ -86,6 +96,9 @@ namespace MultiplayerARPG
                 CacheGameplayCameraControls.target = characterEntity.CacheTransform;
 
             tempLookAt = characterEntity.CacheTransform.rotation;
+
+            characterEntity.onEquipWeaponsChange += SetupCrosshairSetting;
+            SetupCrosshairSetting(characterEntity.EquipWeapons);
         }
 
         protected override void Desetup(BasePlayerCharacterEntity characterEntity)
@@ -94,6 +107,16 @@ namespace MultiplayerARPG
 
             if (CacheGameplayCameraControls != null)
                 CacheGameplayCameraControls.target = null;
+
+            if (characterEntity == null)
+                return;
+
+            characterEntity.onEquipWeaponsChange -= SetupCrosshairSetting;
+        }
+
+        protected void SetupCrosshairSetting(EquipWeapons equipWeapons)
+        {
+            currentCrosshairSetting = PlayerCharacterEntity.GetCrosshairSetting();
         }
 
         protected override void OnDestroy()
@@ -136,8 +159,7 @@ namespace MultiplayerARPG
             SelectedEntity = null;
 
             // Update crosshair (with states from last update)
-            currentCrosshairSetting = GetCrosshairSetting();
-            if (isAttacking)
+            if (isDoingAction)
             {
                 UpdateCrosshair(currentCrosshairSetting, currentCrosshairSetting.expandPerFrameWhileAttacking);
             }
@@ -154,13 +176,15 @@ namespace MultiplayerARPG
                 UpdateCrosshair(currentCrosshairSetting, -currentCrosshairSetting.shrinkPerFrame);
             }
 
-            // Clear state from last update
-            isAttacking = false;
+            // Clear controlling states from last update
+            isDoingAction = false;
             movementState = MovementFlag.None;
+            UpdateActivatedWeaponAbility();
 
             if (isBlockController || GenericUtils.IsFocusInputField())
             {
                 PlayerCharacterEntity.KeyMovement(Vector3.zero, MovementFlag.None);
+                DeactivateWeaponAbility();
                 return;
             }
 
@@ -229,7 +253,7 @@ namespace MultiplayerARPG
                         continue;
 
                     buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
-                    if (buildingArea == null || 
+                    if (buildingArea == null ||
                         (buildingArea.buildingEntity != null && buildingArea.buildingEntity == CurrentBuildingEntity) ||
                         !CurrentBuildingEntity.buildingType.Equals(buildingArea.buildingType))
                         continue;
@@ -325,6 +349,7 @@ namespace MultiplayerARPG
             {
                 // Not building so it is attacking
                 tempPressAttack = InputManager.GetButton("Fire1");
+                tempPressWeaponAbility = InputManager.GetButtonUp("Fire2");
                 tempPressActivate = InputManager.GetButtonUp("Activate");
                 tempPressPickupItem = InputManager.GetButtonUp("PickUpItem");
                 if (queueSkill != null || tempPressAttack || tempPressActivate || PlayerCharacterEntity.IsPlayingActionAnimation())
@@ -370,12 +395,12 @@ namespace MultiplayerARPG
                         if (queueSkill != null && queueSkill.IsAttack())
                         {
                             UseSkill(aimPosition);
-                            isAttacking = true;
+                            isDoingAction = true;
                         }
                         else if (tempPressAttack)
                         {
                             Attack();
-                            isAttacking = true;
+                            isDoingAction = true;
                         }
                         else if (tempPressActivate)
                         {
@@ -386,6 +411,13 @@ namespace MultiplayerARPG
                     if (queueSkill != null && !queueSkill.IsAttack())
                         UseSkill();
                     queueSkill = null;
+                }
+                else if (tempPressWeaponAbility)
+                {
+                    if (weaponAbility != WeaponAbility.None)
+                        DeactivateWeaponAbility();
+                    else
+                        ActivateWeaponAbility();
                 }
                 else if (tempPressPickupItem)
                 {
@@ -424,11 +456,6 @@ namespace MultiplayerARPG
             currentCrosshairSize.y += power;
             // Set crosshair size
             crosshairRect.sizeDelta = new Vector2(Mathf.Clamp(currentCrosshairSize.x, setting.minSpread, setting.maxSpread), Mathf.Clamp(currentCrosshairSize.y, setting.minSpread, setting.maxSpread));
-        }
-
-        private CrosshairSetting GetCrosshairSetting()
-        {
-            return PlayerCharacterEntity.GetCrosshairSetting();
         }
 
         public Vector3 GetMoveDirection(float horizontalInput, float verticalInput)
@@ -524,7 +551,6 @@ namespace MultiplayerARPG
                         CurrentBuildingEntity = Instantiate(item.buildingEntity);
                         CurrentBuildingEntity.SetupAsBuildMode();
                         CurrentBuildingEntity.CacheTransform.parent = null;
-                        // TODO: Build character by cursor position
                     }
                 }
             }
@@ -538,6 +564,58 @@ namespace MultiplayerARPG
         public void Attack()
         {
             PlayerCharacterEntity.RequestAttack();
+        }
+
+        public void ActivateWeaponAbility()
+        {
+            if (weaponAbility == WeaponAbility.None)
+            {
+                // TODO: Change this
+                weaponAbility = WeaponAbility.Zoom;
+                isDeactivatingWeaponAbility = false;
+            }
+        }
+
+        private void UpdateActivatedWeaponAbility()
+        {
+            if (weaponAbility == WeaponAbility.None)
+                return;
+            switch (weaponAbility)
+            {
+                case WeaponAbility.Zoom:
+                    if (isDeactivatingWeaponAbility)
+                    {
+                        // Disbling zoom
+                        activateWeaponAbilityInterpTime += Time.deltaTime * ZOOM_SPEED;
+                        CacheGameplayCameraControls.CacheCamera.fieldOfView = Mathf.Lerp(CacheGameplayCameraControls.CacheCamera.fieldOfView, fovBeforeZoom, activateWeaponAbilityInterpTime);
+                        if (activateWeaponAbilityInterpTime >= 1f)
+                        {
+                            weaponAbility = WeaponAbility.None;
+                            activateWeaponAbilityInterpTime = 0f;
+                            isDeactivatingWeaponAbility = false;
+                        }
+                    }
+                    else
+                    {
+                        // Enabling zoom
+                        activateWeaponAbilityInterpTime += Time.deltaTime * ZOOM_SPEED;
+                        CacheGameplayCameraControls.CacheCamera.fieldOfView = Mathf.Lerp(CacheGameplayCameraControls.CacheCamera.fieldOfView, zoomingFov, activateWeaponAbilityInterpTime);
+                        if (activateWeaponAbilityInterpTime >= 1f)
+                        {
+                            activateWeaponAbilityInterpTime = 0f;
+                            isDeactivatingWeaponAbility = false;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        private void DeactivateWeaponAbility()
+        {
+            if (weaponAbility != WeaponAbility.None)
+            {
+                isDeactivatingWeaponAbility = true;
+            }
         }
 
         public void Activate()
