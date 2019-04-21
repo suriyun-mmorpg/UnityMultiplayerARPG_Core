@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
@@ -29,6 +30,8 @@ namespace MultiplayerARPG
         public float turnToTargetDuration = 0.1f;
         public FollowCameraControls gameplayCameraPrefab;
         public bool showConfirmConstructionUI;
+        public RectTransform crosshairRect;
+        public Image zoomCrosshairImage;
         public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
         bool isBlockController;
         BuildingMaterial tempBuildingMaterial;
@@ -53,12 +56,17 @@ namespace MultiplayerARPG
         Skill usingSkill;
         Vector3 aimPosition;
         Vector3 actionLookDirection;
+        Vector2 currentCrosshairSize;
+        CrosshairSetting currentCrosshairSetting;
+        bool isAttacking;
+        MovementFlag movementState;
 
         protected override void Awake()
         {
             base.Awake();
             buildingItemIndex = -1;
             CurrentBuildingEntity = null;
+            zoomCrosshairImage.preserveAspect = true;
 
             if (gameplayCameraPrefab != null)
             {
@@ -126,6 +134,29 @@ namespace MultiplayerARPG
             CacheGameplayCameraControls.updateRotation = !isBlockController;
             // Clear selected entity
             SelectedEntity = null;
+
+            // Update crosshair (with states from last update)
+            currentCrosshairSetting = GetCrosshairSetting();
+            if (isAttacking)
+            {
+                UpdateCrosshair(currentCrosshairSetting, currentCrosshairSetting.spreadPowerWhileAttacking);
+            }
+            else if (movementState.HasFlag(MovementFlag.Forward) ||
+                movementState.HasFlag(MovementFlag.Backward) ||
+                movementState.HasFlag(MovementFlag.Left) ||
+                movementState.HasFlag(MovementFlag.Right) ||
+                movementState.HasFlag(MovementFlag.IsJump))
+            {
+                UpdateCrosshair(currentCrosshairSetting, currentCrosshairSetting.spreadPowerWhileMoving);
+            }
+            else
+            {
+                UpdateCrosshair(currentCrosshairSetting, -currentCrosshairSetting.spreadDecreasePower);
+            }
+
+            // Clear state from last update
+            isAttacking = false;
+            movementState = MovementFlag.None;
 
             if (isBlockController || GenericUtils.IsFocusInputField())
             {
@@ -228,7 +259,6 @@ namespace MultiplayerARPG
             }
 
             // If mobile platforms, don't receive input raw to make it smooth
-            MovementFlag movementState = MovementFlag.None;
             bool raw = !InputManager.useMobileInputOnNonMobile && !Application.isMobilePlatform;
             Vector3 moveDirection = Vector3.zero;
             forward.y = 0f;
@@ -243,7 +273,8 @@ namespace MultiplayerARPG
             switch (mode)
             {
                 case Mode.Adventure:
-                    movementState = MovementFlag.Forward;
+                    if (inputV > 0.5f || inputV < -0.5f || inputH > 0.5f || inputH < -0.5f)
+                        movementState = MovementFlag.Forward;
                     moveLookDirection = moveDirection;
                     break;
                 case Mode.Combat:
@@ -267,6 +298,7 @@ namespace MultiplayerARPG
 
             if (CurrentBuildingEntity != null)
             {
+                // Building
                 tempPressAttack = InputManager.GetButtonUp("Fire1");
                 if (tempPressAttack)
                 {
@@ -291,7 +323,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                // Not building / attacking
+                // Not building so it is attacking
                 tempPressAttack = InputManager.GetButton("Fire1");
                 tempPressActivate = InputManager.GetButtonUp("Activate");
                 tempPressPickupItem = InputManager.GetButtonUp("PickUpItem");
@@ -338,10 +370,12 @@ namespace MultiplayerARPG
                         if (queueSkill != null && queueSkill.IsAttack())
                         {
                             UseSkill(aimPosition);
+                            isAttacking = true;
                         }
                         else if (tempPressAttack)
                         {
                             Attack();
+                            isAttacking = true;
                         }
                         else if (tempPressActivate)
                         {
@@ -378,7 +412,23 @@ namespace MultiplayerARPG
             // If jumping add jump state
             if (InputManager.GetButtonDown("Jump"))
                 movementState |= MovementFlag.IsJump;
+
             PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
+        }
+
+        private void UpdateCrosshair(CrosshairSetting setting, float power)
+        {
+            currentCrosshairSize = crosshairRect.sizeDelta;
+            // Change crosshair size by power
+            currentCrosshairSize.x += power;
+            currentCrosshairSize.y += power;
+            // Set crosshair size
+            crosshairRect.sizeDelta = new Vector2(Mathf.Clamp(currentCrosshairSize.x, setting.minSpread, setting.maxSpread), Mathf.Clamp(currentCrosshairSize.y, setting.minSpread, setting.maxSpread));
+        }
+
+        private CrosshairSetting GetCrosshairSetting()
+        {
+            return PlayerCharacterEntity.GetCrosshairSetting();
         }
 
         public Vector3 GetMoveDirection(float horizontalInput, float verticalInput)

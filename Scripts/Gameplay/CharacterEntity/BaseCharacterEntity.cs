@@ -732,6 +732,31 @@ namespace MultiplayerARPG
         #endregion
 
         #region Weapons / Damage
+        public virtual CrosshairSetting GetCrosshairSetting()
+        {
+            CharacterItem rightHand = EquipWeapons.rightHand;
+            CharacterItem leftHand = EquipWeapons.leftHand;
+            Item rightHandWeapon = rightHand.GetWeaponItem();
+            Item leftHandWeapon = leftHand.GetWeaponItem();
+            if (rightHandWeapon != null && leftHandWeapon != null)
+            {
+                // Create new crosshair setting based on weapons
+                return new CrosshairSetting()
+                {
+                    spreadPowerWhileMoving = (rightHandWeapon.crosshairSetting.spreadPowerWhileMoving + leftHandWeapon.crosshairSetting.spreadPowerWhileMoving) / 2f,
+                    spreadPowerWhileAttacking = (rightHandWeapon.crosshairSetting.spreadPowerWhileAttacking + leftHandWeapon.crosshairSetting.spreadPowerWhileAttacking) / 2f,
+                    spreadDecreasePower = (rightHandWeapon.crosshairSetting.spreadDecreasePower + leftHandWeapon.crosshairSetting.spreadDecreasePower) / 2f,
+                    minSpread = (rightHandWeapon.crosshairSetting.minSpread + leftHandWeapon.crosshairSetting.minSpread) / 2f,
+                    maxSpread = (rightHandWeapon.crosshairSetting.maxSpread + leftHandWeapon.crosshairSetting.maxSpread) / 2f
+                };
+            }
+            if (rightHandWeapon != null)
+                return rightHandWeapon.crosshairSetting;
+            if (leftHandWeapon != null)
+                return leftHandWeapon.crosshairSetting;
+            return gameInstance.DefaultWeaponItem.crosshairSetting;
+        }
+
         public virtual float GetAttackDistance()
         {
             // Finding minimum distance of equipped weapons

@@ -25,6 +25,12 @@ namespace MultiplayerARPG
         Automatic,
     }
 
+    public enum WeaponAbility : byte
+    {
+        None,
+        CanZoom,
+    }
+
     [CreateAssetMenu(fileName = "Item", menuName = "Create GameData/Item")]
     public partial class Item : BaseGameData
     {
@@ -48,6 +54,18 @@ namespace MultiplayerARPG
         public short ammoCapacity;
         public Vector2 fireStagger;
         public byte fireSpread;
+        public WeaponAbility weaponAbility;
+        public float zoomFov;
+        public bool disableRenderersOnZoom;
+        public Sprite zoomCrosshair;
+        public CrosshairSetting crosshairSetting = new CrosshairSetting()
+        {
+            spreadPowerWhileMoving = 3f,
+            spreadPowerWhileAttacking = 5f,
+            spreadDecreasePower = 2f,
+            minSpread = 10f,
+            maxSpread = 50f
+        };
         [Range(0, 6)]
         public byte maxSocket;
         [Range(0f, 1f)]
@@ -288,5 +306,15 @@ namespace MultiplayerARPG
         public ResistanceAmount[] resistances;
         public DamageAmount[] damages;
         public SkillLevel[] skills;
+    }
+
+    [System.Serializable]
+    public struct CrosshairSetting
+    {
+        public float spreadPowerWhileMoving;
+        public float spreadPowerWhileAttacking;
+        public float spreadDecreasePower;
+        public float minSpread;
+        public float maxSpread;
     }
 }
