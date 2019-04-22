@@ -100,6 +100,7 @@ namespace MultiplayerARPG
         public ActionAnimation[] defaultAttackAnimations;
         public AnimationClip defaultSkillCastClip;
         public ActionAnimation defaultSkillActivateAnimation;
+        public ActionAnimation defaultReloadAnimation;
         public WeaponAnimations[] weaponAnimations;
         public SkillAnimations[] skillAnimations;
 
@@ -751,6 +752,9 @@ namespace MultiplayerARPG
                 case AnimActionType.Skill:
                     tempActionAnimation = GetSkillActivateAnimation(dataId);
                     break;
+                case AnimActionType.Reload:
+                    tempActionAnimation = GetReloadAnimation(dataId);
+                    break;
             }
             return tempActionAnimation;
         }
@@ -797,6 +801,14 @@ namespace MultiplayerARPG
             return defaultSkillActivateAnimation;
         }
 
+        public ActionAnimation GetReloadAnimation(int dataId)
+        {
+            if (CacheWeaponAnimations.ContainsKey(dataId) &&
+                CacheWeaponAnimations[dataId].reloadAnimation.clip != null)
+                return CacheWeaponAnimations[dataId].reloadAnimation;
+            return defaultReloadAnimation;
+        }
+
         public override bool GetRandomRightHandAttackAnimation(
             int dataId,
             out int animationIndex,
@@ -837,6 +849,17 @@ namespace MultiplayerARPG
             out float totalDuration)
         {
             ActionAnimation tempActionAnimation = GetSkillActivateAnimation(dataId);
+            triggerDuration = tempActionAnimation.GetTriggerDuration();
+            totalDuration = tempActionAnimation.GetTotalDuration();
+            return true;
+        }
+
+        public override bool GetReloadAnimation(
+            int dataId,
+            out float triggerDuration,
+            out float totalDuration)
+        {
+            ActionAnimation tempActionAnimation = GetReloadAnimation(dataId);
             triggerDuration = tempActionAnimation.GetTriggerDuration();
             totalDuration = tempActionAnimation.GetTotalDuration();
             return true;

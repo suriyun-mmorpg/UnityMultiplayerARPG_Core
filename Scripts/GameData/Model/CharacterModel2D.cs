@@ -26,6 +26,7 @@ namespace MultiplayerARPG
         public CharacterAnimation2D deadAnimation2D;
         public ActionAnimation2D defaultAttackAnimation2D;
         public ActionAnimation2D defaultSkillCastAnimation2D;
+        public ActionAnimation2D defaultReloadAnimation2D;
         public WeaponAnimations2D[] weaponAnimations2D;
         public SkillCastAnimations2D[] skillCastAnimations2D;
         public float magnitudeToPlayMoveClip = 0.1f;
@@ -67,6 +68,24 @@ namespace MultiplayerARPG
                     }
                 }
                 return cacheLeftHandAttackAnimations;
+            }
+        }
+
+        private Dictionary<int, ActionAnimation2D> cacheReloadAnimations;
+        public Dictionary<int, ActionAnimation2D> CacheReloadAnimations
+        {
+            get
+            {
+                if (cacheReloadAnimations == null)
+                {
+                    cacheReloadAnimations = new Dictionary<int, ActionAnimation2D>();
+                    foreach (WeaponAnimations2D attackAnimation in weaponAnimations2D)
+                    {
+                        if (attackAnimation.weaponType == null) continue;
+                        cacheReloadAnimations[attackAnimation.weaponType.DataId] = attackAnimation.reloadAnimation;
+                    }
+                }
+                return cacheReloadAnimations;
             }
         }
 
@@ -260,6 +279,10 @@ namespace MultiplayerARPG
                     if (!CacheSkillCastAnimations.TryGetValue(dataId, out animation2D))
                         animation2D = defaultSkillCastAnimation2D;
                     break;
+                case AnimActionType.Reload:
+                    if (!CacheReloadAnimations.TryGetValue(dataId, out animation2D))
+                        animation2D = defaultReloadAnimation2D;
+                    break;
             }
             return animation2D;
         }
@@ -351,6 +374,21 @@ namespace MultiplayerARPG
             ActionAnimation2D animation2D = null;
             if (!CacheSkillCastAnimations.TryGetValue(dataId, out animation2D))
                 animation2D = defaultSkillCastAnimation2D;
+            triggerDuration = 0f;
+            totalDuration = 0f;
+            if (animation2D == null) return false;
+            AnimationClip2D clip = animation2D.GetClipByDirection(currentDirectionType);
+            if (clip == null) return false;
+            triggerDuration = clip.duration * animation2D.triggerDurationRate;
+            totalDuration = clip.duration + animation2D.extraDuration;
+            return true;
+        }
+
+        public override bool GetReloadAnimation(int dataId, out float triggerDuration, out float totalDuration)
+        {
+            ActionAnimation2D animation2D = null;
+            if (!CacheReloadAnimations.TryGetValue(dataId, out animation2D))
+                animation2D = defaultReloadAnimation2D;
             triggerDuration = 0f;
             totalDuration = 0f;
             if (animation2D == null) return false;

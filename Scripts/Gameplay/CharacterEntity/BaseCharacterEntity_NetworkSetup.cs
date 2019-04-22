@@ -74,6 +74,7 @@ namespace MultiplayerARPG
             RegisterNetFunction<int, float>(NetFuncSkillCasting);
             RegisterNetFunction(NetFuncSkillCastingInterrupted);
             RegisterNetFunction<PackedUInt>(NetFuncPickupItem);
+            RegisterNetFunction(NetFuncReload);
             RegisterNetFunction<short, short>(NetFuncDropItem);
             RegisterNetFunction<short, byte, short>(NetFuncEquipItem);
             RegisterNetFunction<byte, short>(NetFuncUnEquipItem);

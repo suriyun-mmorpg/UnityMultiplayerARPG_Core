@@ -178,6 +178,17 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
+        /// This will be called at server to reload ammo
+        /// </summary>
+        protected virtual void NetFuncReload()
+        {
+            if (!CanDoActions())
+                return;
+
+            // TODO: Implement this
+        }
+
+        /// <summary>
         /// This will be called at server to order character to equip equipments
         /// </summary>
         /// <param name="nonEquipIndex"></param>

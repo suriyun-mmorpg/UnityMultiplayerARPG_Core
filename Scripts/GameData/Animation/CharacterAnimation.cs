@@ -66,6 +66,7 @@ namespace MultiplayerARPG
         public AnimationClip deadClip;
         public ActionAnimation[] rightHandAttackAnimations;
         public ActionAnimation[] leftHandAttackAnimations;
+        public ActionAnimation reloadAnimation;
     }
 
     [System.Serializable]
@@ -102,6 +103,7 @@ namespace MultiplayerARPG
         public AnimationClip deadClip;
         public ActionAnimation[] rightHandAttackAnimations;
         public ActionAnimation[] leftHandAttackAnimations;
+        public ActionAnimation reloadAnimation;
         public AnimationClip skillCastClip;
         public ActionAnimation skillActivateAnimation;
     }

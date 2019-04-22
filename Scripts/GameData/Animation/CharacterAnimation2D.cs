@@ -63,6 +63,7 @@ namespace MultiplayerARPG
         public WeaponType weaponType;
         public ActionAnimation2D rightHandAttackAnimation;
         public ActionAnimation2D leftHandAttackAnimation;
+        public ActionAnimation2D reloadAnimation;
     }
 
     [System.Serializable]

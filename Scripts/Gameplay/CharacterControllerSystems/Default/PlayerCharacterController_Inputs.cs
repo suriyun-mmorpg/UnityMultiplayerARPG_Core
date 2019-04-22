@@ -67,6 +67,11 @@ namespace MultiplayerARPG
                     if (targetItemDrop != null)
                         PlayerCharacterEntity.RequestPickupItem(targetItemDrop.ObjectId);
                 }
+                // Reload
+                if (InputManager.GetButtonDown("Reload"))
+                {
+                    PlayerCharacterEntity.RequestReload();
+                }
                 // Find target to attack
                 if (InputManager.GetButtonDown("FindEnemy"))
                 {

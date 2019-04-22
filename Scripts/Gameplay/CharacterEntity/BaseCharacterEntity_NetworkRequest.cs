@@ -90,6 +90,13 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncDropItem, FunctionReceivers.Server, nonEquipIndex, amount);
         }
 
+        public virtual void RequestReload()
+        {
+            if (!CanDoActions())
+                return;
+            CallNetFunction(NetFuncReload, FunctionReceivers.Server);
+        }
+
         public virtual void RequestEquipItem(short nonEquipIndex)
         {
             if (!CanDoActions() ||
