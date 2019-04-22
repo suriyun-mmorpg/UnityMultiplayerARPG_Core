@@ -9,7 +9,6 @@ namespace MultiplayerARPG
     {
         public const int RAYCAST_COLLIDER_SIZE = 32;
         public const int OVERLAP_COLLIDER_SIZE = 32;
-        public const float ZOOM_SPEED = 1f;
 
         public enum Mode
         {
@@ -32,21 +31,25 @@ namespace MultiplayerARPG
         public FollowCameraControls gameplayCameraPrefab;
         public bool showConfirmConstructionUI;
         public RectTransform crosshairRect;
-        public Image zoomCrosshairImage;
         public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
-        bool isBlockController;
+        public float DefaultGameplayCameraFOV { get; protected set; }
+        public bool IsBlockController { get; protected set; }
+
+        // Temp data
         BuildingMaterial tempBuildingMaterial;
         BaseGameEntity tempEntity;
         Vector3 moveLookDirection;
         Vector3 targetLookDirection;
         Quaternion tempLookAt;
         TurningState turningState;
+        float tempDeltaTime;
         float turnTimeCounter;
         float tempCalculateAngle;
         bool tempPressAttack;
         bool tempPressWeaponAbility;
         bool tempPressActivate;
         bool tempPressPickupItem;
+        bool tempPressReload;
         GameObject tempGameObject;
         BasePlayerCharacterEntity targetPlayer;
         NpcEntity targetNpc;
@@ -58,30 +61,26 @@ namespace MultiplayerARPG
         Skill usingSkill;
         Vector3 aimPosition;
         Vector3 actionLookDirection;
+        // Crosshair
         Vector2 currentCrosshairSize;
         CrosshairSetting currentCrosshairSetting;
         // Controlling states
         bool isDoingAction;
         MovementFlag movementState;
-        WeaponAbility weaponAbility;
-        bool isDeactivatingWeaponAbility;
-        float fovBeforeZoom;
-        float zoomingFov;
-        float activateWeaponAbilityInterpTime;
+        BaseWeaponAbility weaponAbility;
+        WeaponAbilityState weaponAbilityState;
 
         protected override void Awake()
         {
             base.Awake();
             buildingItemIndex = -1;
             CurrentBuildingEntity = null;
-            zoomCrosshairImage.preserveAspect = true;
 
             if (gameplayCameraPrefab != null)
             {
                 // Set parent transform to root for the best performance
                 CacheGameplayCameraControls = Instantiate(gameplayCameraPrefab);
-                fovBeforeZoom = CacheGameplayCameraControls.CacheCamera.fieldOfView;
-                zoomingFov = 15f;
+                DefaultGameplayCameraFOV = CacheGameplayCameraControls.CacheCamera.fieldOfView;
             }
         }
 
@@ -97,8 +96,11 @@ namespace MultiplayerARPG
 
             tempLookAt = characterEntity.CacheTransform.rotation;
 
-            characterEntity.onEquipWeaponsChange += SetupCrosshairSetting;
             SetupCrosshairSetting(characterEntity.EquipWeapons);
+            SetupWeaponAbility(characterEntity.EquipWeapons);
+
+            characterEntity.onEquipWeaponsChange += SetupCrosshairSetting;
+            characterEntity.onEquipWeaponsChange += SetupWeaponAbility;
         }
 
         protected override void Desetup(BasePlayerCharacterEntity characterEntity)
@@ -112,11 +114,39 @@ namespace MultiplayerARPG
                 return;
 
             characterEntity.onEquipWeaponsChange -= SetupCrosshairSetting;
+            characterEntity.onEquipWeaponsChange -= SetupWeaponAbility;
         }
 
         protected void SetupCrosshairSetting(EquipWeapons equipWeapons)
         {
             currentCrosshairSetting = PlayerCharacterEntity.GetCrosshairSetting();
+        }
+
+        protected void SetupWeaponAbility(EquipWeapons equipWeapons)
+        {
+            CharacterItem rightHand = equipWeapons.rightHand;
+            CharacterItem leftHand = equipWeapons.leftHand;
+            Item rightHandWeapon = rightHand.GetWeaponItem();
+            Item leftHandWeapon = leftHand.GetWeaponItem();
+            // Weapon ability will be able to use when equip weapon at main-hand only
+            if (rightHandWeapon != null && leftHandWeapon == null)
+            {
+                if (rightHandWeapon.weaponAbility != weaponAbility)
+                {
+                    if (weaponAbility != null)
+                        weaponAbility.ForceDeactivated();
+                    weaponAbility = rightHandWeapon.weaponAbility;
+                    weaponAbility.Setup(this);
+                    weaponAbilityState = WeaponAbilityState.Deactivated;
+                }
+            }
+            else
+            {
+                if (weaponAbility != null)
+                    weaponAbility.ForceDeactivated();
+                weaponAbility = null;
+                weaponAbilityState = WeaponAbilityState.Deactivated;
+            }
         }
 
         protected override void OnDestroy()
@@ -135,7 +165,8 @@ namespace MultiplayerARPG
 
             base.Update();
             UpdateLookAtTarget();
-            turnTimeCounter += Time.deltaTime;
+            tempDeltaTime = Time.deltaTime;
+            turnTimeCounter += tempDeltaTime;
 
             // Hide construction UI
             if (CurrentBuildingEntity == null)
@@ -149,12 +180,12 @@ namespace MultiplayerARPG
                     CacheUISceneGameplay.uiCurrentBuilding.Hide();
             }
 
-            isBlockController = CacheUISceneGameplay.IsBlockController();
+            IsBlockController = CacheUISceneGameplay.IsBlockController();
             // Lock cursor when not show UIs
-            Cursor.lockState = !isBlockController ? CursorLockMode.Locked : CursorLockMode.None;
-            Cursor.visible = isBlockController;
+            Cursor.lockState = !IsBlockController ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = IsBlockController;
 
-            CacheGameplayCameraControls.updateRotation = !isBlockController;
+            CacheGameplayCameraControls.updateRotation = !IsBlockController;
             // Clear selected entity
             SelectedEntity = null;
 
@@ -179,9 +210,9 @@ namespace MultiplayerARPG
             // Clear controlling states from last update
             isDoingAction = false;
             movementState = MovementFlag.None;
-            UpdateActivatedWeaponAbility();
+            UpdateActivatedWeaponAbility(tempDeltaTime);
 
-            if (isBlockController || GenericUtils.IsFocusInputField())
+            if (IsBlockController || GenericUtils.IsFocusInputField())
             {
                 PlayerCharacterEntity.KeyMovement(Vector3.zero, MovementFlag.None);
                 DeactivateWeaponAbility();
@@ -349,9 +380,10 @@ namespace MultiplayerARPG
             {
                 // Not building so it is attacking
                 tempPressAttack = InputManager.GetButton("Fire1");
-                tempPressWeaponAbility = InputManager.GetButtonUp("Fire2");
-                tempPressActivate = InputManager.GetButtonUp("Activate");
-                tempPressPickupItem = InputManager.GetButtonUp("PickUpItem");
+                tempPressWeaponAbility = InputManager.GetButtonDown("Fire2");
+                tempPressActivate = InputManager.GetButtonDown("Activate");
+                tempPressPickupItem = InputManager.GetButtonDown("PickUpItem");
+                tempPressReload = InputManager.GetButtonDown("Reload");
                 if (queueSkill != null || tempPressAttack || tempPressActivate || PlayerCharacterEntity.IsPlayingActionAnimation())
                 {
                     // Find forward character / npc / building / warp entity from camera center
@@ -414,16 +446,28 @@ namespace MultiplayerARPG
                 }
                 else if (tempPressWeaponAbility)
                 {
-                    if (weaponAbility != WeaponAbility.None)
-                        DeactivateWeaponAbility();
-                    else
-                        ActivateWeaponAbility();
+                    switch (weaponAbilityState)
+                    {
+                        case WeaponAbilityState.Activated:
+                        case WeaponAbilityState.Activating:
+                            DeactivateWeaponAbility();
+                            break;
+                        case WeaponAbilityState.Deactivated:
+                        case WeaponAbilityState.Deactivating:
+                            ActivateWeaponAbility();
+                            break;
+                    }
                 }
                 else if (tempPressPickupItem)
                 {
                     // Find for item to pick up
                     if (SelectedEntity != null)
                         PlayerCharacterEntity.RequestPickupItem((SelectedEntity as ItemDropEntity).ObjectId);
+                }
+                else if (tempPressReload)
+                {
+                    // Reload ammo at server
+                    PlayerCharacterEntity.RequestReload();
                 }
                 else
                 {
@@ -450,6 +494,9 @@ namespace MultiplayerARPG
 
         private void UpdateCrosshair(CrosshairSetting setting, float power)
         {
+            if (crosshairRect == null)
+                return;
+
             currentCrosshairSize = crosshairRect.sizeDelta;
             // Change crosshair size by power
             currentCrosshairSize.x += power;
@@ -568,54 +615,38 @@ namespace MultiplayerARPG
 
         public void ActivateWeaponAbility()
         {
-            if (weaponAbility == WeaponAbility.None)
-            {
-                // TODO: Change this
-                weaponAbility = WeaponAbility.Zoom;
-                isDeactivatingWeaponAbility = false;
-            }
+            if (weaponAbility == null)
+                return;
+
+            if (weaponAbilityState == WeaponAbilityState.Activated ||
+                weaponAbilityState == WeaponAbilityState.Activating)
+                return;
+
+            weaponAbilityState = WeaponAbilityState.Activating;
         }
 
-        private void UpdateActivatedWeaponAbility()
+        private void UpdateActivatedWeaponAbility(float deltaTime)
         {
-            if (weaponAbility == WeaponAbility.None)
+            if (weaponAbility == null)
                 return;
-            switch (weaponAbility)
-            {
-                case WeaponAbility.Zoom:
-                    if (isDeactivatingWeaponAbility)
-                    {
-                        // Disbling zoom
-                        activateWeaponAbilityInterpTime += Time.deltaTime * ZOOM_SPEED;
-                        CacheGameplayCameraControls.CacheCamera.fieldOfView = Mathf.Lerp(CacheGameplayCameraControls.CacheCamera.fieldOfView, fovBeforeZoom, activateWeaponAbilityInterpTime);
-                        if (activateWeaponAbilityInterpTime >= 1f)
-                        {
-                            weaponAbility = WeaponAbility.None;
-                            activateWeaponAbilityInterpTime = 0f;
-                            isDeactivatingWeaponAbility = false;
-                        }
-                    }
-                    else
-                    {
-                        // Enabling zoom
-                        activateWeaponAbilityInterpTime += Time.deltaTime * ZOOM_SPEED;
-                        CacheGameplayCameraControls.CacheCamera.fieldOfView = Mathf.Lerp(CacheGameplayCameraControls.CacheCamera.fieldOfView, zoomingFov, activateWeaponAbilityInterpTime);
-                        if (activateWeaponAbilityInterpTime >= 1f)
-                        {
-                            activateWeaponAbilityInterpTime = 0f;
-                            isDeactivatingWeaponAbility = false;
-                        }
-                    }
-                    break;
-            }
+
+            if (weaponAbilityState == WeaponAbilityState.Activated ||
+                weaponAbilityState == WeaponAbilityState.Deactivated)
+                return;
+
+            weaponAbilityState = weaponAbility.UpdateActivation(weaponAbilityState, deltaTime);
         }
 
         private void DeactivateWeaponAbility()
         {
-            if (weaponAbility != WeaponAbility.None)
-            {
-                isDeactivatingWeaponAbility = true;
-            }
+            if (weaponAbility == null)
+                return;
+
+            if (weaponAbilityState == WeaponAbilityState.Deactivated ||
+                weaponAbilityState == WeaponAbilityState.Deactivating)
+                return;
+
+            weaponAbilityState = WeaponAbilityState.Deactivating;
         }
 
         public void Activate()

@@ -25,12 +25,6 @@ namespace MultiplayerARPG
         Automatic,
     }
 
-    public enum WeaponAbility : byte
-    {
-        None,
-        CanZoom,
-    }
-
     [CreateAssetMenu(fileName = "Item", menuName = "Create GameData/Item")]
     public partial class Item : BaseGameData
     {
@@ -54,10 +48,7 @@ namespace MultiplayerARPG
         public short ammoCapacity;
         public Vector2 fireStagger;
         public byte fireSpread;
-        public WeaponAbility weaponAbility;
-        public float zoomFov;
-        public bool disableRenderersOnZoom;
-        public Sprite zoomCrosshair;
+        public BaseWeaponAbility weaponAbility;
         public CrosshairSetting crosshairSetting = new CrosshairSetting()
         {
             expandPerFrameWhileMoving = 3f,
