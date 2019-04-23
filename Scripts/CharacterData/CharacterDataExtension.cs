@@ -869,19 +869,6 @@ public static partial class CharacterDataExtension
         return CharacterItem.Create(GameInstance.Singleton.DefaultWeaponItem);
     }
 
-    public static bool CanAttack(this ICharacterData data)
-    {
-        Item rightWeapon = data.EquipWeapons.rightHand.GetWeaponItem();
-        Item leftWeapon = data.EquipWeapons.leftHand.GetWeaponItem();
-        if (rightWeapon != null && leftWeapon != null)
-            return leftWeapon.CanAttack(data) && rightWeapon.CanAttack(data);
-        else if (rightWeapon != null)
-            return rightWeapon.CanAttack(data);
-        else if (leftWeapon != null)
-            return leftWeapon.CanAttack(data);
-        return GameInstance.Singleton.DefaultWeaponItem.CanAttack(data);
-    }
-
     public static int IndexOfAttribute(this ICharacterData data, int dataId)
     {
         IList<CharacterAttribute> list = data.Attributes;
