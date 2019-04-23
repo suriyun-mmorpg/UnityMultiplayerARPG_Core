@@ -303,10 +303,10 @@ namespace MultiplayerARPG
         }
 
         public override void GetAttackingData(
+            bool isLeftHand,
             out AnimActionType animActionType,
             out int dataId,
             out int animationIndex,
-            out bool isLeftHand,
             out CharacterItem weapon,
             out float triggerDuration,
             out float totalDuration,
@@ -318,9 +318,6 @@ namespace MultiplayerARPG
 
             // Monster will not have weapon type so set dataId to `0`, then random attack animation from default attack animtions
             dataId = 0;
-
-            // Monster attack always right hand
-            isLeftHand = false;
 
             // Monster will not have weapon data
             weapon = null;

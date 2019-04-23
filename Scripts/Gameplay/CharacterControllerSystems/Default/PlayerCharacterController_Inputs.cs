@@ -70,7 +70,11 @@ namespace MultiplayerARPG
                 // Reload
                 if (InputManager.GetButtonDown("Reload"))
                 {
-                    PlayerCharacterEntity.RequestReload();
+                    // Reload ammo at server
+                    if (!PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoFull())
+                        PlayerCharacterEntity.RequestReload(false);
+                    else if (!PlayerCharacterEntity.EquipWeapons.leftHand.IsAmmoFull())
+                        PlayerCharacterEntity.RequestReload(true);
                 }
                 // Find target to attack
                 if (InputManager.GetButtonDown("FindEnemy"))
@@ -294,6 +298,7 @@ namespace MultiplayerARPG
                 Skill skill = null;
                 if (GameInstance.Skills.TryGetValue(queueUsingSkillValue.dataId, out skill) && skill != null)
                 {
+                    isLeftHandAttacking = !isLeftHandAttacking;
                     if (skill.IsAttack())
                     {
                         BaseCharacterEntity targetEntity;
@@ -310,19 +315,19 @@ namespace MultiplayerARPG
                             else
                             {
                                 // No nearby target, so use skill immediately
-                                RequestUsePendingSkill(null);
+                                RequestUsePendingSkill(isLeftHandAttacking, null);
                             }
                         }
                         else if (!wasdLockAttackTarget)
                         {
                             // Not lock target, so not finding target and use skill immediately
-                            RequestUsePendingSkill(null);
+                            RequestUsePendingSkill(isLeftHandAttacking, null);
                         }
                     }
                     else
                     {
                         // Not attack skill, so use skill immediately
-                        RequestUsePendingSkill(null);
+                        RequestUsePendingSkill(isLeftHandAttacking, null);
                     }
                 }
                 else
@@ -331,6 +336,7 @@ namespace MultiplayerARPG
             // Attack when player pressed attack button
             else if (InputManager.GetButton("Attack"))
             {
+                isLeftHandAttacking = !isLeftHandAttacking;
                 destination = null;
                 PlayerCharacterEntity.StopMove();
                 BaseCharacterEntity targetEntity;
@@ -354,7 +360,7 @@ namespace MultiplayerARPG
                     else
                     {
                         // No nearby target, so attack immediately
-                        PlayerCharacterEntity.RequestAttack();
+                        PlayerCharacterEntity.RequestAttack(isLeftHandAttacking);
                     }
                 }
                 else if (!wasdLockAttackTarget)
@@ -370,7 +376,7 @@ namespace MultiplayerARPG
                         PlayerCharacterEntity.GetAttackFov());
                     SelectedEntity = nearestTarget;
                     // Not lock target, so not finding target and attack immediately
-                    PlayerCharacterEntity.RequestAttack();
+                    PlayerCharacterEntity.RequestAttack(isLeftHandAttacking);
                 }
             }
             // Move
@@ -449,11 +455,12 @@ namespace MultiplayerARPG
                     targetLookDirection = (targetEnemy.CacheTransform.position - PlayerCharacterEntity.CacheTransform.position).normalized;
                     if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetEnemy.CacheTransform.position))
                     {
+                        isLeftHandAttacking = !isLeftHandAttacking;
                         // If has queue using skill, attack by the skill
                         if (queueUsingSkill.HasValue)
-                            RequestUsePendingSkill(targetEnemy.OpponentAimTransform.position);
+                            RequestUsePendingSkill(isLeftHandAttacking, targetEnemy.OpponentAimTransform.position);
                         else
-                            PlayerCharacterEntity.RequestAttack(targetEnemy.OpponentAimTransform.position);
+                            PlayerCharacterEntity.RequestAttack(isLeftHandAttacking, targetEnemy.OpponentAimTransform.position);
                     }
                 }
                 else
@@ -570,12 +577,13 @@ namespace MultiplayerARPG
                 actDistance -= StoppingDistance;
                 if (FindTarget(targetHarvestable.gameObject, actDistance, gameInstance.harvestableLayer.Mask))
                 {
+                    isLeftHandAttacking = !isLeftHandAttacking;
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
                     // Turn character to target
                     targetLookDirection = (targetHarvestable.CacheTransform.position - PlayerCharacterEntity.CacheTransform.position).normalized;
                     if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetHarvestable.CacheTransform.position))
-                        PlayerCharacterEntity.RequestAttack(targetHarvestable.OpponentAimTransform.position);
+                        PlayerCharacterEntity.RequestAttack(isLeftHandAttacking, targetHarvestable.OpponentAimTransform.position);
                 }
                 else
                     UpdateTargetEntityPosition(targetHarvestable);
@@ -647,9 +655,11 @@ namespace MultiplayerARPG
                         }
                         else
                         {
+                            // Not attack or not lock target, use it immediately
+                            isLeftHandAttacking = !isLeftHandAttacking;
                             destination = null;
                             PlayerCharacterEntity.StopMove();
-                            PlayerCharacterEntity.RequestUseSkill(skill.DataId);
+                            PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHandAttacking);
                         }
                     }
                 }

@@ -10,10 +10,10 @@ namespace MultiplayerARPG
         public event AttackRoutineDelegate onAttackRoutine;
 
         public virtual void GetAttackingData(
+            bool isLeftHand,
             out AnimActionType animActionType,
             out int dataId,
             out int animationIndex,
-            out bool isLeftHand,
             out CharacterItem weapon,
             out float triggerDuration,
             out float totalDuration,
@@ -24,14 +24,13 @@ namespace MultiplayerARPG
             animActionType = AnimActionType.None;
             dataId = 0;
             animationIndex = 0;
-            isLeftHand = false;
             weapon = null;
             triggerDuration = 0f;
             totalDuration = 0f;
             damageInfo = null;
             allDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
             // Prepare weapon data
-            weapon = this.GetRandomedWeapon(out isLeftHand);
+            weapon = this.GetWeapon(isLeftHand);
             Item weaponItem = weapon.GetWeaponItem();
             WeaponType weaponType = weaponItem.WeaponType;
             // Assign data id
@@ -56,6 +55,9 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncReload(bool isLeftHand)
         {
+            if (!CanAttack())
+                return;
+
             CharacterItem weapon;
             Item weaponItem;
             EquipWeapons equipWeapons = EquipWeapons;
@@ -73,10 +75,10 @@ namespace MultiplayerARPG
             if (weaponItem != null &&
                 weaponItem.WeaponType != null &&
                 weaponItem.WeaponType.requireAmmoType != null &&
-                weaponItem.ammoCapacity > 0 &&
-                weapon.ammo < weaponItem.ammoCapacity)
+                weaponItem.WeaponType.ammoCapacity > 0 &&
+                weapon.ammo < weaponItem.WeaponType.ammoCapacity)
             {
-                int reloadingAmount = weaponItem.ammoCapacity - weapon.ammo;
+                int reloadingAmount = weaponItem.WeaponType.ammoCapacity - weapon.ammo;
                 int inventoryAmount = this.CountAmmos(weaponItem.WeaponType.requireAmmoType);
                 if (inventoryAmount < reloadingAmount)
                     reloadingAmount = inventoryAmount;
@@ -96,7 +98,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// Is function will be called at server to order character to attack
         /// </summary>
-        protected virtual void NetFuncAttack(bool hasAimPosition, Vector3 aimPosition)
+        protected virtual void NetFuncAttack(bool isLeftHand, bool hasAimPosition, Vector3 aimPosition)
         {
             if (!CanAttack())
                 return;
@@ -105,7 +107,6 @@ namespace MultiplayerARPG
             AnimActionType animActionType;
             int weaponTypeDataId;
             int animationIndex;
-            bool isLeftHand;
             CharacterItem weapon;
             float triggerDuration;
             float totalDuration;
@@ -113,10 +114,10 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts;
 
             GetAttackingData(
+                isLeftHand,
                 out animActionType,
                 out weaponTypeDataId,
                 out animationIndex,
-                out isLeftHand,
                 out weapon,
                 out triggerDuration,
                 out totalDuration,
@@ -130,7 +131,7 @@ namespace MultiplayerARPG
                 WeaponType weaponType = weaponItem.WeaponType;
                 if (weaponType.requireAmmoType != null)
                 {
-                    if (weaponItem.ammoCapacity <= 0)
+                    if (weaponType.ammoCapacity <= 0)
                     {
                         // Reduce ammo from inventory
                         Dictionary<CharacterItem, short> decreaseAmmoItems;
@@ -208,8 +209,8 @@ namespace MultiplayerARPG
             Vector3 fireStagger = Vector3.zero;
             if (weapon != null && weapon.GetWeaponItem() != null)
             {
-                fireSpread = weapon.GetWeaponItem().fireSpread;
-                fireStagger = weapon.GetWeaponItem().fireStagger;
+                fireSpread = weapon.GetWeaponItem().WeaponType.fireSpread;
+                fireStagger = weapon.GetWeaponItem().WeaponType.fireStagger;
             }
             Vector3 stagger;
             for (int i = 0; i < fireSpread + 1; ++i)

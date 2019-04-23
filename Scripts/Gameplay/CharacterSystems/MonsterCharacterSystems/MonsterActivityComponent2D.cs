@@ -263,7 +263,7 @@ namespace MultiplayerARPG
                 Vector3 targetDirection = (targetEntity.CacheTransform.position - CacheMonsterCharacterEntity.CacheTransform.position).normalized;
                 if (targetDirection.magnitude != 0f)
                     CacheMonsterCharacterEntity.UpdateCurrentDirection(targetDirection);
-                CacheMonsterCharacterEntity.RequestAttack(targetEntity.OpponentAimTransform.position);
+                CacheMonsterCharacterEntity.RequestAttack(false, targetEntity.OpponentAimTransform.position);
                 // TODO: Random to use skills
             }
             else

@@ -74,12 +74,15 @@ namespace MultiplayerARPG
         protected NearbyEntityDetector activatingEntityDetector;
         protected NearbyEntityDetector itemDropEntityDetector;
         protected NearbyEntityDetector enemyEntityDetector;
-        protected int findingEnemyIndex = -1;
+        protected int findingEnemyIndex;
+        protected bool isLeftHandAttacking;
 
         protected override void Awake()
         {
             base.Awake();
             buildingItemIndex = -1;
+            findingEnemyIndex = -1;
+            isLeftHandAttacking = false;
             CurrentBuildingEntity = null;
 
             if (gameplayCameraPrefab != null)
@@ -255,7 +258,7 @@ namespace MultiplayerARPG
                     {
                         // Stop movement to use non attack skill
                         PlayerCharacterEntity.StopMove();
-                        RequestUsePendingSkill(null);
+                        RequestUsePendingSkill(false, null);
                         return false;
                     }
                 }
@@ -298,7 +301,7 @@ namespace MultiplayerARPG
             return moveDirection;
         }
 
-        public void RequestUsePendingSkill(Vector3? aimPosition)
+        public void RequestUsePendingSkill(bool isLeftHand, Vector3? aimPosition)
         {
             if (queueUsingSkill.HasValue && PlayerCharacterEntity.CanUseSkill())
             {
@@ -306,9 +309,9 @@ namespace MultiplayerARPG
                 if (queueUsingSkillValue.aimPosition.HasValue)
                     aimPosition = queueUsingSkillValue.aimPosition.Value;
                 if (aimPosition.HasValue)
-                    PlayerCharacterEntity.RequestUseSkill(queueUsingSkillValue.dataId, aimPosition.Value);
+                    PlayerCharacterEntity.RequestUseSkill(queueUsingSkillValue.dataId, isLeftHand, aimPosition.Value);
                 else
-                    PlayerCharacterEntity.RequestUseSkill(queueUsingSkillValue.dataId);
+                    PlayerCharacterEntity.RequestUseSkill(queueUsingSkillValue.dataId, isLeftHand);
                 queueUsingSkill = null;
             }
         }

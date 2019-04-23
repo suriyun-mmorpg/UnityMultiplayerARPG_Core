@@ -11,11 +11,11 @@ namespace MultiplayerARPG
 
         public virtual void GetUsingSkillData(
             CharacterSkill characterSkill,
+            bool isLeftHand,
             out AnimActionType animActionType,
             out int dataId,
             out int animationIndex,
             out SkillAttackType skillAttackType,
-            out bool isLeftHand,
             out CharacterItem weapon,
             out float triggerDuration,
             out float totalDuration,
@@ -27,7 +27,6 @@ namespace MultiplayerARPG
             dataId = 0;
             animationIndex = 0;
             skillAttackType = SkillAttackType.None;
-            isLeftHand = false;
             weapon = null;
             triggerDuration = 0f;
             totalDuration = 0f;
@@ -39,7 +38,7 @@ namespace MultiplayerARPG
                 return;
             // Prepare weapon data
             skillAttackType = skill.skillAttackType;
-            weapon = this.GetRandomedWeapon(out isLeftHand);
+            weapon = this.GetWeapon(isLeftHand);
             Item weaponItem = weapon.GetWeaponItem();
             WeaponType weaponType = weaponItem.WeaponType;
             bool hasSkillAnimation = CharacterModel.HasSkillAnimations(skill);
@@ -114,7 +113,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// Is function will be called at server to order character to use skill
         /// </summary>
-        protected virtual void NetFuncUseSkill(int skillDataId, bool hasAimPosition, Vector3 aimPosition)
+        protected virtual void NetFuncUseSkill(int skillDataId, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition)
         {
             if (!CanUseSkill())
                 return;
@@ -133,7 +132,6 @@ namespace MultiplayerARPG
             AnimActionType animActionType;
             int animationIndex;
             SkillAttackType skillAttackType;
-            bool isLeftHand;
             CharacterItem weapon;
             float triggerDuration;
             float totalDuration;
@@ -142,11 +140,11 @@ namespace MultiplayerARPG
 
             GetUsingSkillData(
                 characterSkill,
+                isLeftHand,
                 out animActionType,
                 out skillDataId,
                 out animationIndex,
                 out skillAttackType,
-                out isLeftHand,
                 out weapon,
                 out triggerDuration,
                 out totalDuration,
@@ -160,7 +158,7 @@ namespace MultiplayerARPG
                 // Reduce ammo amount
                 if (skillAttackType != SkillAttackType.None && weaponType.requireAmmoType != null)
                 {
-                    if (weaponItem.ammoCapacity <= 0)
+                    if (weaponItem.WeaponType.ammoCapacity <= 0)
                     {
                         // Reduce ammo from inventory
                         Dictionary<CharacterItem, short> decreaseAmmoItems;

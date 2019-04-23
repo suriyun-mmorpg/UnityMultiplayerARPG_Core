@@ -846,29 +846,21 @@ public static partial class CharacterDataExtension
         return count;
     }
 
-    public static CharacterItem GetRandomedWeapon(this ICharacterData data, out bool isLeftHand)
+    public static CharacterItem GetWeapon(this ICharacterData data, bool isLeftHand)
     {
-        isLeftHand = false;
-        // Find right hand and left and to set result weapon
-        CharacterItem rightHand = data.EquipWeapons.rightHand;
-        CharacterItem leftHand = data.EquipWeapons.leftHand;
-        Item rightWeaponItem = rightHand.GetWeaponItem();
-        Item leftWeaponItem = leftHand.GetWeaponItem();
-        if (rightWeaponItem != null && leftWeaponItem != null)
+        if (!isLeftHand)
         {
-            // Random right hand or left hand weapon
-            isLeftHand = Random.Range(0, 1) == 1;
-            return !isLeftHand ? rightHand : leftHand;
+            CharacterItem rightHand = data.EquipWeapons.rightHand;
+            Item rightWeaponItem = rightHand.GetWeaponItem();
+            if (rightWeaponItem != null)
+                return rightHand;
         }
-        else if (rightWeaponItem != null)
+        if (isLeftHand)
         {
-            isLeftHand = false;
-            return rightHand;
-        }
-        else if (leftWeaponItem != null)
-        {
-            isLeftHand = true;
-            return leftHand;
+            CharacterItem leftHand = data.EquipWeapons.leftHand;
+            Item leftWeaponItem = leftHand.GetWeaponItem();
+            if (leftWeaponItem != null)
+                return leftHand;
         }
         return CharacterItem.Create(GameInstance.Singleton.DefaultWeaponItem);
     }

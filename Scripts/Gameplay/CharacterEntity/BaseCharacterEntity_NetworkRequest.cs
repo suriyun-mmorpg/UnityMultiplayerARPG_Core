@@ -19,32 +19,32 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncUnsetAimPosition, FunctionReceivers.Server);
         }
 
-        public virtual void RequestAttack()
+        public virtual void RequestAttack(bool isLeftHand)
         {
             if (!CanAttack())
                 return;
-            CallNetFunction(NetFuncAttackWithoutAimPosition, FunctionReceivers.Server);
+            CallNetFunction(NetFuncAttackWithoutAimPosition, FunctionReceivers.Server, isLeftHand);
         }
 
-        public virtual void RequestAttack(Vector3 aimPosition)
+        public virtual void RequestAttack(bool isLeftHand, Vector3 aimPosition)
         {
             if (!CanAttack())
                 return;
-            CallNetFunction(NetFuncAttackWithAimPosition, FunctionReceivers.Server, aimPosition);
+            CallNetFunction(NetFuncAttackWithAimPosition, FunctionReceivers.Server, isLeftHand, aimPosition);
         }
 
-        public virtual void RequestUseSkill(int dataId)
+        public virtual void RequestUseSkill(int dataId, bool isLeftHand)
         {
             if (!CanUseSkill())
                 return;
-            CallNetFunction(NetFuncUseSkillWithoutAimPosition, FunctionReceivers.Server, dataId);
+            CallNetFunction(NetFuncUseSkillWithoutAimPosition, FunctionReceivers.Server, dataId, isLeftHand);
         }
 
-        public virtual void RequestUseSkill(int dataId, Vector3 aimPosition)
+        public virtual void RequestUseSkill(int dataId, bool isLeftHand, Vector3 aimPosition)
         {
             if (!CanUseSkill())
                 return;
-            CallNetFunction(NetFuncUseSkillWithAimPosition, FunctionReceivers.Server, dataId, aimPosition);
+            CallNetFunction(NetFuncUseSkillWithAimPosition, FunctionReceivers.Server, dataId, isLeftHand, aimPosition);
         }
 
         public virtual void RequestUseItem(short index)
@@ -88,13 +88,6 @@ namespace MultiplayerARPG
                 nonEquipIndex >= NonEquipItems.Count)
                 return;
             CallNetFunction(NetFuncDropItem, FunctionReceivers.Server, nonEquipIndex, amount);
-        }
-
-        public virtual void RequestReload()
-        {
-            if (!CanDoActions())
-                return;
-            CallNetFunction(NetFuncReload, FunctionReceivers.Server);
         }
 
         public virtual void RequestEquipItem(short nonEquipIndex)

@@ -184,6 +184,17 @@ public class CharacterItem : INetSerializable
         return lockRemainsDuration > 0;
     }
 
+    public bool IsAmmoFull()
+    {
+        Item item = GetWeaponItem();
+        if (item != null)
+        {
+            if (item.WeaponType.ammoCapacity > 0)
+                return ammo >= item.WeaponType.ammoCapacity;
+        }
+        return true;
+    }
+
     public void Lock(float duration)
     {
         lockRemainsDuration = duration;

@@ -24,24 +24,24 @@ namespace MultiplayerARPG
             AimPosition = Vector3.zero;
         }
 
-        protected void NetFuncAttackWithoutAimPosition()
+        protected void NetFuncAttackWithoutAimPosition(bool isLeftHand)
         {
-            NetFuncAttack(false, Vector3.zero);
+            NetFuncAttack(isLeftHand, false, Vector3.zero);
         }
 
-        protected void NetFuncAttackWithAimPosition(Vector3 aimPosition)
+        protected void NetFuncAttackWithAimPosition(bool isLeftHand, Vector3 aimPosition)
         {
-            NetFuncAttack(true, aimPosition);
+            NetFuncAttack(isLeftHand, true, aimPosition);
         }
 
-        protected void NetFuncUseSkillWithoutAimPosition(int dataId)
+        protected void NetFuncUseSkillWithoutAimPosition(int dataId, bool isLeftHand)
         {
-            NetFuncUseSkill(dataId, false, Vector3.zero);
+            NetFuncUseSkill(dataId, isLeftHand, false, Vector3.zero);
         }
 
-        protected void NetFuncUseSkillWithAimPosition(int dataId, Vector3 aimPosition)
+        protected void NetFuncUseSkillWithAimPosition(int dataId, bool isLeftHand, Vector3 aimPosition)
         {
-            NetFuncUseSkill(dataId, true, aimPosition);
+            NetFuncUseSkill(dataId, isLeftHand, true, aimPosition);
         }
 
         /// <summary>
@@ -175,17 +175,6 @@ namespace MultiplayerARPG
                 dropData.amount = amount;
                 ItemDropEntity.DropItem(this, dropData, new uint[] { ObjectId });
             }
-        }
-
-        /// <summary>
-        /// This will be called at server to reload ammo
-        /// </summary>
-        protected virtual void NetFuncReload()
-        {
-            if (!CanDoActions())
-                return;
-
-            // TODO: Implement this
         }
 
         /// <summary>

@@ -45,11 +45,13 @@ namespace MultiplayerARPG
         float tempDeltaTime;
         float turnTimeCounter;
         float tempCalculateAngle;
-        bool tempPressAttack;
+        bool tempPressAttackRight;
+        bool tempPressAttackLeft;
         bool tempPressWeaponAbility;
         bool tempPressActivate;
         bool tempPressPickupItem;
         bool tempPressReload;
+        bool isLeftHandAttacking;
         GameObject tempGameObject;
         BasePlayerCharacterEntity targetPlayer;
         NpcEntity targetNpc;
@@ -131,11 +133,11 @@ namespace MultiplayerARPG
             // Weapon ability will be able to use when equip weapon at main-hand only
             if (rightHandWeapon != null && leftHandWeapon == null)
             {
-                if (rightHandWeapon.weaponAbility != weaponAbility)
+                if (rightHandWeapon.WeaponType.weaponAbility != weaponAbility)
                 {
                     if (weaponAbility != null)
                         weaponAbility.ForceDeactivated();
-                    weaponAbility = rightHandWeapon.weaponAbility;
+                    weaponAbility = rightHandWeapon.WeaponType.weaponAbility;
                     weaponAbility.Setup(this);
                     weaponAbilityState = WeaponAbilityState.Deactivated;
                 }
@@ -354,8 +356,8 @@ namespace MultiplayerARPG
             if (CurrentBuildingEntity != null)
             {
                 // Building
-                tempPressAttack = InputManager.GetButtonUp("Fire1");
-                if (tempPressAttack)
+                tempPressAttackRight = InputManager.GetButtonUp("Fire1");
+                if (tempPressAttackRight)
                 {
                     if (showConfirmConstructionUI)
                     {
@@ -379,18 +381,28 @@ namespace MultiplayerARPG
             else
             {
                 // Not building so it is attacking
-                tempPressAttack = InputManager.GetButton("Fire1");
-                tempPressWeaponAbility = InputManager.GetButtonDown("Fire2");
+                // Attack with right hand weapon
+                tempPressAttackRight = InputManager.GetButton("Fire1");
+                if (weaponAbility == null && PlayerCharacterEntity.EquipWeapons.leftHand.GetWeaponItem() != null)
+                {
+                    // Attack with left hand weapon if left hand weapon not empty
+                    tempPressAttackLeft = InputManager.GetButton("Fire2");
+                }
+                else if (weaponAbility != null)
+                {
+                    // Use weapon ability if it can
+                    tempPressWeaponAbility = InputManager.GetButtonDown("Fire2");
+                }
                 tempPressActivate = InputManager.GetButtonDown("Activate");
                 tempPressPickupItem = InputManager.GetButtonDown("PickUpItem");
                 tempPressReload = InputManager.GetButtonDown("Reload");
-                if (queueSkill != null || tempPressAttack || tempPressActivate || PlayerCharacterEntity.IsPlayingActionAnimation())
+                if (queueSkill != null || tempPressAttackRight || tempPressAttackLeft || tempPressActivate || PlayerCharacterEntity.IsPlayingActionAnimation())
                 {
                     // Find forward character / npc / building / warp entity from camera center
                     targetPlayer = null;
                     targetNpc = null;
                     targetBuilding = null;
-                    if (tempPressActivate && !tempPressAttack)
+                    if (tempPressActivate && !tempPressAttackRight && !tempPressAttackLeft)
                     {
                         if (SelectedEntity is BasePlayerCharacterEntity)
                             targetPlayer = SelectedEntity as BasePlayerCharacterEntity;
@@ -404,9 +416,17 @@ namespace MultiplayerARPG
                     if (tempCalculateAngle > 15f)
                     {
                         if (queueSkill != null && queueSkill.IsAttack())
+                        {
                             turningState = TurningState.UseSkill;
-                        else if (tempPressAttack)
+                            // Swap hand attacking hand
+                            isLeftHandAttacking = !isLeftHandAttacking;
+                        }
+                        else if (tempPressAttackRight || tempPressAttackLeft)
+                        {
                             turningState = TurningState.Attack;
+                            // Set attacking hand
+                            isLeftHandAttacking = !tempPressAttackRight;
+                        }
                         else if (tempPressActivate)
                             turningState = TurningState.Activate;
                         turnTimeCounter = ((180f - tempCalculateAngle) / 180f) * turnToTargetDuration;
@@ -426,12 +446,17 @@ namespace MultiplayerARPG
                         // Attack immediately if character already look at target
                         if (queueSkill != null && queueSkill.IsAttack())
                         {
-                            UseSkill(aimPosition);
+                            UseSkill(!isLeftHandAttacking, aimPosition);
                             isDoingAction = true;
                         }
-                        else if (tempPressAttack)
+                        else if (tempPressAttackRight)
                         {
-                            Attack();
+                            Attack(false);
+                            isDoingAction = true;
+                        }
+                        else if (tempPressAttackLeft)
+                        {
+                            Attack(true);
                             isDoingAction = true;
                         }
                         else if (tempPressActivate)
@@ -441,7 +466,7 @@ namespace MultiplayerARPG
                     }
                     // If skill is not attack skill, use it immediately
                     if (queueSkill != null && !queueSkill.IsAttack())
-                        UseSkill();
+                        UseSkill(false);
                     queueSkill = null;
                 }
                 else if (tempPressWeaponAbility)
@@ -467,7 +492,10 @@ namespace MultiplayerARPG
                 else if (tempPressReload)
                 {
                     // Reload ammo at server
-                    PlayerCharacterEntity.RequestReload();
+                    if (!PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoFull())
+                        PlayerCharacterEntity.RequestReload(false);
+                    else if (!PlayerCharacterEntity.EquipWeapons.leftHand.IsAmmoFull())
+                        PlayerCharacterEntity.RequestReload(true);
                 }
                 else
                 {
@@ -535,13 +563,13 @@ namespace MultiplayerARPG
                     switch (turningState)
                     {
                         case TurningState.Attack:
-                            Attack();
+                            Attack(isLeftHandAttacking);
                             break;
                         case TurningState.Activate:
                             Activate();
                             break;
                         case TurningState.UseSkill:
-                            UseSkill(aimPosition);
+                            UseSkill(isLeftHandAttacking, aimPosition);
                             break;
                     }
                     turningState = TurningState.None;
@@ -608,9 +636,9 @@ namespace MultiplayerARPG
             PlayerCharacterEntity.RequestSetAimPosition(aimPosition);
         }
 
-        public void Attack()
+        public void Attack(bool isLeftHand)
         {
-            PlayerCharacterEntity.RequestAttack();
+            PlayerCharacterEntity.RequestAttack(isLeftHand);
         }
 
         public void ActivateWeaponAbility()
@@ -660,18 +688,18 @@ namespace MultiplayerARPG
                 ActivateBuilding(targetBuilding);
         }
 
-        public void UseSkill()
+        public void UseSkill(bool isLeftHand)
         {
             if (queueSkill == null)
                 return;
-            PlayerCharacterEntity.RequestUseSkill(queueSkill.DataId);
+            PlayerCharacterEntity.RequestUseSkill(queueSkill.DataId, isLeftHand);
         }
 
-        public void UseSkill(Vector3 aimPosition)
+        public void UseSkill(bool isLeftHand, Vector3 aimPosition)
         {
             if (queueSkill == null)
                 return;
-            PlayerCharacterEntity.RequestUseSkill(queueSkill.DataId, aimPosition);
+            PlayerCharacterEntity.RequestUseSkill(queueSkill.DataId, isLeftHand, aimPosition);
         }
 
         public int OverlapObjects(Vector3 position, float distance, int layerMask)

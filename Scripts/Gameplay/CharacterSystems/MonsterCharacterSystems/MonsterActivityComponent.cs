@@ -200,7 +200,7 @@ namespace MultiplayerARPG
                     lookRotationEuler.z = 0;
                     CacheMonsterCharacterEntity.CacheTransform.rotation = Quaternion.RotateTowards(CacheMonsterCharacterEntity.CacheTransform.rotation, Quaternion.Euler(lookRotationEuler), CacheNavMeshAgent.angularSpeed * Time.deltaTime);
                 }
-                CacheMonsterCharacterEntity.RequestAttack(targetEntity.OpponentAimTransform.position);
+                CacheMonsterCharacterEntity.RequestAttack(false, targetEntity.OpponentAimTransform.position);
                 // TODO: Random to use skills
             }
             else
