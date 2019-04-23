@@ -93,8 +93,11 @@ namespace MultiplayerARPG
                 case AnimActionType.Skill:
                     tempActionAnimation = GetSkillActivateAnimation(dataId);
                     break;
-                case AnimActionType.Reload:
-                    tempActionAnimation = GetReloadAnimation(dataId);
+                case AnimActionType.ReloadRightHand:
+                    tempActionAnimation = GetRightHandReloadAnimation(dataId);
+                    break;
+                case AnimActionType.ReloadLeftHand:
+                    tempActionAnimation = GetLeftHandReloadAnimation(dataId);
                     break;
             }
             return tempActionAnimation;
@@ -142,12 +145,20 @@ namespace MultiplayerARPG
             return defaultAnimations.skillActivateAnimation;
         }
 
-        public ActionAnimation GetReloadAnimation(int dataId)
+        public ActionAnimation GetRightHandReloadAnimation(int dataId)
         {
             if (CacheWeaponAnimations.ContainsKey(dataId) &&
-                CacheWeaponAnimations[dataId].reloadAnimation.clip != null)
-                return CacheWeaponAnimations[dataId].reloadAnimation;
-            return defaultAnimations.reloadAnimation;
+                CacheWeaponAnimations[dataId].rightHandReloadAnimation.clip != null)
+                return CacheWeaponAnimations[dataId].rightHandReloadAnimation;
+            return defaultAnimations.rightHandReloadAnimation;
+        }
+
+        public ActionAnimation GetLeftHandReloadAnimation(int dataId)
+        {
+            if (CacheWeaponAnimations.ContainsKey(dataId) &&
+                CacheWeaponAnimations[dataId].leftHandReloadAnimation.clip != null)
+                return CacheWeaponAnimations[dataId].leftHandReloadAnimation;
+            return defaultAnimations.leftHandReloadAnimation;
         }
 
         public override bool GetRandomRightHandAttackAnimation(
@@ -195,12 +206,23 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override bool GetReloadAnimation(
+        public override bool GetRightHandReloadAnimation(
             int dataId,
             out float triggerDuration,
             out float totalDuration)
         {
-            ActionAnimation tempActionAnimation = GetReloadAnimation(dataId);
+            ActionAnimation tempActionAnimation = GetRightHandReloadAnimation(dataId);
+            triggerDuration = tempActionAnimation.GetTriggerDuration();
+            totalDuration = tempActionAnimation.GetTotalDuration();
+            return true;
+        }
+
+        public override bool GetLeftHandReloadAnimation(
+            int dataId,
+            out float triggerDuration,
+            out float totalDuration)
+        {
+            ActionAnimation tempActionAnimation = GetLeftHandReloadAnimation(dataId);
             triggerDuration = tempActionAnimation.GetTriggerDuration();
             totalDuration = tempActionAnimation.GetTotalDuration();
             return true;

@@ -71,21 +71,39 @@ namespace MultiplayerARPG
             }
         }
 
-        private Dictionary<int, ActionAnimation2D> cacheReloadAnimations;
-        public Dictionary<int, ActionAnimation2D> CacheReloadAnimations
+        private Dictionary<int, ActionAnimation2D> cacheRightHandReloadAnimations;
+        public Dictionary<int, ActionAnimation2D> CacheRightHandReloadAnimations
         {
             get
             {
-                if (cacheReloadAnimations == null)
+                if (cacheRightHandReloadAnimations == null)
                 {
-                    cacheReloadAnimations = new Dictionary<int, ActionAnimation2D>();
+                    cacheRightHandReloadAnimations = new Dictionary<int, ActionAnimation2D>();
                     foreach (WeaponAnimations2D attackAnimation in weaponAnimations2D)
                     {
                         if (attackAnimation.weaponType == null) continue;
-                        cacheReloadAnimations[attackAnimation.weaponType.DataId] = attackAnimation.reloadAnimation;
+                        cacheRightHandReloadAnimations[attackAnimation.weaponType.DataId] = attackAnimation.rightHandReloadAnimation;
                     }
                 }
-                return cacheReloadAnimations;
+                return cacheRightHandReloadAnimations;
+            }
+        }
+
+        private Dictionary<int, ActionAnimation2D> cacheLeftHandReloadAnimations;
+        public Dictionary<int, ActionAnimation2D> CacheLeftHandReloadAnimations
+        {
+            get
+            {
+                if (cacheLeftHandReloadAnimations == null)
+                {
+                    cacheLeftHandReloadAnimations = new Dictionary<int, ActionAnimation2D>();
+                    foreach (WeaponAnimations2D attackAnimation in weaponAnimations2D)
+                    {
+                        if (attackAnimation.weaponType == null) continue;
+                        cacheLeftHandReloadAnimations[attackAnimation.weaponType.DataId] = attackAnimation.leftHandReloadAnimation;
+                    }
+                }
+                return cacheLeftHandReloadAnimations;
             }
         }
 
@@ -279,8 +297,12 @@ namespace MultiplayerARPG
                     if (!CacheSkillCastAnimations.TryGetValue(dataId, out animation2D))
                         animation2D = defaultSkillCastAnimation2D;
                     break;
-                case AnimActionType.Reload:
-                    if (!CacheReloadAnimations.TryGetValue(dataId, out animation2D))
+                case AnimActionType.ReloadRightHand:
+                    if (!CacheRightHandReloadAnimations.TryGetValue(dataId, out animation2D))
+                        animation2D = defaultReloadAnimation2D;
+                    break;
+                case AnimActionType.ReloadLeftHand:
+                    if (!CacheLeftHandReloadAnimations.TryGetValue(dataId, out animation2D))
                         animation2D = defaultReloadAnimation2D;
                     break;
             }
@@ -384,10 +406,25 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override bool GetReloadAnimation(int dataId, out float triggerDuration, out float totalDuration)
+        public override bool GetRightHandReloadAnimation(int dataId, out float triggerDuration, out float totalDuration)
         {
             ActionAnimation2D animation2D = null;
-            if (!CacheReloadAnimations.TryGetValue(dataId, out animation2D))
+            if (!CacheRightHandReloadAnimations.TryGetValue(dataId, out animation2D))
+                animation2D = defaultReloadAnimation2D;
+            triggerDuration = 0f;
+            totalDuration = 0f;
+            if (animation2D == null) return false;
+            AnimationClip2D clip = animation2D.GetClipByDirection(currentDirectionType);
+            if (clip == null) return false;
+            triggerDuration = clip.duration * animation2D.triggerDurationRate;
+            totalDuration = clip.duration + animation2D.extraDuration;
+            return true;
+        }
+
+        public override bool GetLeftHandReloadAnimation(int dataId, out float triggerDuration, out float totalDuration)
+        {
+            ActionAnimation2D animation2D = null;
+            if (!CacheLeftHandReloadAnimations.TryGetValue(dataId, out animation2D))
                 animation2D = defaultReloadAnimation2D;
             triggerDuration = 0f;
             totalDuration = 0f;

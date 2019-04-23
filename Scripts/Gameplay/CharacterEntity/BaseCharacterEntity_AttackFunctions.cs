@@ -58,18 +58,16 @@ namespace MultiplayerARPG
                 return;
 
             CharacterItem weapon;
-            Item weaponItem;
-            EquipWeapons equipWeapons = EquipWeapons;
 
             if (isLeftHand)
-                weapon = equipWeapons.leftHand;
+                weapon = EquipWeapons.leftHand;
             else
-                weapon = equipWeapons.rightHand;
+                weapon = EquipWeapons.rightHand;
 
             if (weapon.IsEmpty())
                 return;
 
-            weaponItem = weapon.GetWeaponItem();
+            Item weaponItem = weapon.GetWeaponItem();
 
             if (weaponItem != null &&
                 weaponItem.WeaponType != null &&
@@ -77,21 +75,59 @@ namespace MultiplayerARPG
                 weaponItem.WeaponType.ammoCapacity > 0 &&
                 weapon.ammo < weaponItem.WeaponType.ammoCapacity)
             {
+                // Prepare reload data
+                AnimActionType animActionType = isLeftHand ? AnimActionType.ReloadLeftHand : AnimActionType.ReloadRightHand;
+                int weaponTypeDataId = weaponItem.WeaponType.DataId;
+                float triggerDuration = 0f;
+                float totalDuration = 0f;
+                if (!isLeftHand)
+                    CharacterModel.GetRightHandReloadAnimation(weaponTypeDataId, out triggerDuration, out totalDuration);
+                else
+                    CharacterModel.GetLeftHandReloadAnimation(weaponTypeDataId, out triggerDuration, out totalDuration);
+
                 int reloadingAmount = weaponItem.WeaponType.ammoCapacity - weapon.ammo;
                 int inventoryAmount = this.CountAmmos(weaponItem.WeaponType.requireAmmoType);
                 if (inventoryAmount < reloadingAmount)
                     reloadingAmount = inventoryAmount;
-                Dictionary<CharacterItem, short> decreaseItems;
-                if (this.DecreaseAmmos(weaponItem.WeaponType.requireAmmoType, (short)reloadingAmount, out decreaseItems))
+
+                if (reloadingAmount > 0)
                 {
-                    weapon.ammo += (short)reloadingAmount;
-                    if (isLeftHand)
-                        equipWeapons.leftHand = weapon;
-                    else
-                        equipWeapons.rightHand = weapon;
-                    EquipWeapons = equipWeapons;
+                    // Start reload routine
+                    isAttackingOrUsingSkill = true;
+                    StartCoroutine(ReloadRoutine(animActionType, weaponTypeDataId, triggerDuration, totalDuration, isLeftHand, weapon, (short)reloadingAmount));
                 }
             }
+        }
+        
+        private IEnumerator ReloadRoutine(
+            AnimActionType animActionType,
+            int weaponTypeDataId,
+            float triggerDuration,
+            float totalDuration,
+            bool isLeftHand,
+            CharacterItem weapon,
+            short reloadingAmount)
+        {
+            // Play animation on clients
+            RequestPlayActionAnimation(animActionType, weaponTypeDataId, 0);
+
+            yield return new WaitForSecondsRealtime(triggerDuration);
+
+            // Prepare data
+            EquipWeapons equipWeapons = EquipWeapons;
+            Dictionary<CharacterItem, short> decreaseItems;
+            if (this.DecreaseAmmos(weapon.GetWeaponItem().WeaponType.requireAmmoType, reloadingAmount, out decreaseItems))
+            {
+                weapon.ammo += reloadingAmount;
+                if (isLeftHand)
+                    equipWeapons.leftHand = weapon;
+                else
+                    equipWeapons.rightHand = weapon;
+                EquipWeapons = equipWeapons;
+            }
+
+            yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
+            isAttackingOrUsingSkill = false;
         }
 
         /// <summary>
@@ -123,37 +159,31 @@ namespace MultiplayerARPG
                 out damageInfo,
                 out allDamageAmounts);
 
-            // Reduce ammo amount
+            // Validate ammo
             if (weapon != null)
             {
+                // For monsters, their weapon can be null so have to avoid null exception
                 Item weaponItem = weapon.GetWeaponItem();
                 WeaponType weaponType = weaponItem.WeaponType;
                 if (weaponType.requireAmmoType != null)
                 {
                     if (weaponType.ammoCapacity <= 0)
                     {
-                        // Reduce ammo from inventory
-                        Dictionary<CharacterItem, short> decreaseAmmoItems;
-                        if (!this.DecreaseAmmos(weaponType.requireAmmoType, 1, out decreaseAmmoItems))
+                        // Ammo capacity is 0 so reduce ammo from inventory
+                        if (this.CountAmmos(weaponType.requireAmmoType) == 0)
+                        {
+                            // TODO: send no ammo message
                             return;
-                        KeyValuePair<CharacterItem, short> firstEntry = decreaseAmmoItems.FirstOrDefault();
-                        CharacterItem ammoCharacterItem = firstEntry.Key;
-                        Item ammoItem = ammoCharacterItem.GetItem();
-                        if (ammoItem != null && firstEntry.Value > 0)
-                            allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, ammoItem.GetIncreaseDamages(ammoCharacterItem.level, ammoCharacterItem.GetEquipmentBonusRate()));
+                        }
                     }
                     else
                     {
-                        // Reduce ammo that loaded in magazine
+                        // Ammo capacity more than 0 reduce loaded ammo
                         if (weapon.ammo <= 0)
+                        {
+                            // TODO: send no ammo message
                             return;
-                        weapon.ammo--;
-                        EquipWeapons equipWeapons = EquipWeapons;
-                        if (isLeftHand)
-                            equipWeapons.leftHand = weapon;
-                        else
-                            equipWeapons.rightHand = weapon;
-                        EquipWeapons = equipWeapons;
+                        }
                     }
                 }
             }
@@ -198,19 +228,61 @@ namespace MultiplayerARPG
             RequestPlayActionAnimation(animActionType, weaponTypeDataId, (byte)animationIndex);
 
             yield return new WaitForSecondsRealtime(triggerDuration);
+
+            // Reduce ammo amount
+            if (weapon != null)
+            {
+                // For monsters, their weapon can be null so have to avoid null exception
+                Item weaponItem = weapon.GetWeaponItem();
+                WeaponType weaponType = weaponItem.WeaponType;
+                if (weaponType.requireAmmoType != null)
+                {
+                    if (weaponType.ammoCapacity <= 0)
+                    {
+                        // Ammo capacity is 0 so reduce ammo from inventory
+                        Dictionary<CharacterItem, short> decreaseAmmoItems;
+                        if (this.DecreaseAmmos(weaponType.requireAmmoType, 1, out decreaseAmmoItems))
+                        {
+                            KeyValuePair<CharacterItem, short> firstEntry = decreaseAmmoItems.FirstOrDefault();
+                            CharacterItem ammoCharacterItem = firstEntry.Key;
+                            Item ammoItem = ammoCharacterItem.GetItem();
+                            if (ammoItem != null && firstEntry.Value > 0)
+                                allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, ammoItem.GetIncreaseDamages(ammoCharacterItem.level, ammoCharacterItem.GetEquipmentBonusRate()));
+                        }
+                    }
+                    else
+                    {
+                        // Ammo capacity more than 0 reduce loaded ammo
+                        if (weapon.ammo > 0)
+                        {
+                            weapon.ammo--;
+                            EquipWeapons equipWeapons = EquipWeapons;
+                            if (isLeftHand)
+                                equipWeapons.leftHand = weapon;
+                            else
+                                equipWeapons.rightHand = weapon;
+                            EquipWeapons = equipWeapons;
+                        }
+                    }
+                }
+            }
+
             // If no aim position set with attack function get aim position which set from client-controller if existed
             if (!hasAimPosition && HasAimPosition)
             {
                 hasAimPosition = true;
                 aimPosition = AimPosition;
             }
+
             byte fireSpread = 0;
             Vector3 fireStagger = Vector3.zero;
             if (weapon != null && weapon.GetWeaponItem() != null)
             {
+                // For monsters, their weapon can be null so have to avoid null exception
                 fireSpread = weapon.GetWeaponItem().WeaponType.fireSpread;
                 fireStagger = weapon.GetWeaponItem().WeaponType.fireStagger;
             }
+
             Vector3 stagger;
             for (int i = 0; i < fireSpread + 1; ++i)
             {

@@ -274,12 +274,20 @@ namespace MultiplayerARPG
             return GetSkillActivateAnimation(skill.DataId, out triggerDuration, out totalDuration);
         }
 
-        public bool GetReloadAnimation(
+        public bool GetRightHandReloadAnimation(
             WeaponType weaponType,
             out float triggerDuration,
             out float totalDuration)
         {
-            return GetReloadAnimation(weaponType.DataId, out triggerDuration, out totalDuration);
+            return GetRightHandReloadAnimation(weaponType.DataId, out triggerDuration, out totalDuration);
+        }
+
+        public bool GetLeftHandReloadAnimation(
+            WeaponType weaponType,
+            out float triggerDuration,
+            out float totalDuration)
+        {
+            return GetLeftHandReloadAnimation(weaponType.DataId, out triggerDuration, out totalDuration);
         }
 
         public bool HasSkillAnimations(Skill skill)
@@ -311,7 +319,8 @@ namespace MultiplayerARPG
         public abstract bool GetRandomRightHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration);
         public abstract bool GetRandomLeftHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration);
         public abstract bool GetSkillActivateAnimation(int dataId, out float triggerDuration, out float totalDuration);
-        public abstract bool GetReloadAnimation(int dataId, out float triggerDuration, out float totalDuration);
+        public abstract bool GetRightHandReloadAnimation(int dataId, out float triggerDuration, out float totalDuration);
+        public abstract bool GetLeftHandReloadAnimation(int dataId, out float triggerDuration, out float totalDuration);
         public abstract bool HasSkillAnimations(int dataId);
     }
 

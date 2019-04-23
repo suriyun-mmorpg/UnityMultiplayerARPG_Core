@@ -7,6 +7,7 @@
         AttackRightHand,
         AttackLeftHand,
         Skill,
-        Reload,
+        ReloadRightHand,
+        ReloadLeftHand,
     }
 }
