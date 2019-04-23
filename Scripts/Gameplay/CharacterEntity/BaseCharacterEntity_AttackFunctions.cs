@@ -52,6 +52,79 @@ namespace MultiplayerARPG
                 CacheIncreaseDamages);
         }
 
+        public bool ValidateAmmo(CharacterItem weapon)
+        {
+            // Avoid null data
+            if (weapon == null)
+                return true;
+
+            Item weaponItem = weapon.GetWeaponItem();
+            WeaponType weaponType = weaponItem.WeaponType;
+            if (weaponType.requireAmmoType != null)
+            {
+                if (weaponType.ammoCapacity <= 0)
+                {
+                    // Ammo capacity is 0 so reduce ammo from inventory
+                    if (this.CountAmmos(weaponType.requireAmmoType) == 0)
+                    {
+                        // TODO: send no ammo message
+                        return false;
+                    }
+                }
+                else
+                {
+                    // Ammo capacity more than 0 reduce loaded ammo
+                    if (weapon.ammo <= 0)
+                    {
+                        // TODO: send no ammo message
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        public void ReduceAmmo(CharacterItem weapon, bool isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamges)
+        {
+            increaseDamges = null;
+            // Avoid null data
+            if (weapon == null)
+                return;
+
+            Item weaponItem = weapon.GetWeaponItem();
+            WeaponType weaponType = weaponItem.WeaponType;
+            if (weaponType.ammoCapacity <= 0)
+            {
+                // Ammo capacity is 0 so reduce ammo from inventory
+                Dictionary<CharacterItem, short> decreaseAmmoItems;
+                if (this.DecreaseAmmos(weaponType.requireAmmoType, 1, out decreaseAmmoItems))
+                {
+                    KeyValuePair<CharacterItem, short> firstEntry = decreaseAmmoItems.FirstOrDefault();
+                    CharacterItem ammoCharacterItem = firstEntry.Key;
+                    Item ammoItem = ammoCharacterItem.GetItem();
+                    if (ammoItem != null && firstEntry.Value > 0)
+                    {
+                        // Ammo level always 1 and its bonus rate always 1
+                        increaseDamges = ammoItem.GetIncreaseDamages(1, 1f);
+                    }
+                }
+            }
+            else
+            {
+                // Ammo capacity more than 0 reduce loaded ammo
+                if (weapon.ammo > 0)
+                {
+                    weapon.ammo--;
+                    EquipWeapons equipWeapons = EquipWeapons;
+                    if (isLeftHand)
+                        equipWeapons.leftHand = weapon;
+                    else
+                        equipWeapons.rightHand = weapon;
+                    EquipWeapons = equipWeapons;
+                }
+            }
+        }
+
         protected virtual void NetFuncReload(bool isLeftHand)
         {
             if (!CanAttack())
@@ -160,33 +233,8 @@ namespace MultiplayerARPG
                 out allDamageAmounts);
 
             // Validate ammo
-            if (weapon != null)
-            {
-                // For monsters, their weapon can be null so have to avoid null exception
-                Item weaponItem = weapon.GetWeaponItem();
-                WeaponType weaponType = weaponItem.WeaponType;
-                if (weaponType.requireAmmoType != null)
-                {
-                    if (weaponType.ammoCapacity <= 0)
-                    {
-                        // Ammo capacity is 0 so reduce ammo from inventory
-                        if (this.CountAmmos(weaponType.requireAmmoType) == 0)
-                        {
-                            // TODO: send no ammo message
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        // Ammo capacity more than 0 reduce loaded ammo
-                        if (weapon.ammo <= 0)
-                        {
-                            // TODO: send no ammo message
-                            return;
-                        }
-                    }
-                }
-            }
+            if (!ValidateAmmo(weapon))
+                return;
 
             // Call on attack to extend attack functionality while attacking
             bool overrideDefaultAttack = false;
@@ -230,42 +278,10 @@ namespace MultiplayerARPG
             yield return new WaitForSecondsRealtime(triggerDuration);
 
             // Reduce ammo amount
-            if (weapon != null)
-            {
-                // For monsters, their weapon can be null so have to avoid null exception
-                Item weaponItem = weapon.GetWeaponItem();
-                WeaponType weaponType = weaponItem.WeaponType;
-                if (weaponType.requireAmmoType != null)
-                {
-                    if (weaponType.ammoCapacity <= 0)
-                    {
-                        // Ammo capacity is 0 so reduce ammo from inventory
-                        Dictionary<CharacterItem, short> decreaseAmmoItems;
-                        if (this.DecreaseAmmos(weaponType.requireAmmoType, 1, out decreaseAmmoItems))
-                        {
-                            KeyValuePair<CharacterItem, short> firstEntry = decreaseAmmoItems.FirstOrDefault();
-                            CharacterItem ammoCharacterItem = firstEntry.Key;
-                            Item ammoItem = ammoCharacterItem.GetItem();
-                            if (ammoItem != null && firstEntry.Value > 0)
-                                allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, ammoItem.GetIncreaseDamages(ammoCharacterItem.level, ammoCharacterItem.GetEquipmentBonusRate()));
-                        }
-                    }
-                    else
-                    {
-                        // Ammo capacity more than 0 reduce loaded ammo
-                        if (weapon.ammo > 0)
-                        {
-                            weapon.ammo--;
-                            EquipWeapons equipWeapons = EquipWeapons;
-                            if (isLeftHand)
-                                equipWeapons.leftHand = weapon;
-                            else
-                                equipWeapons.rightHand = weapon;
-                            EquipWeapons = equipWeapons;
-                        }
-                    }
-                }
-            }
+            Dictionary<DamageElement, MinMaxFloat> increaseDamages;
+            ReduceAmmo(weapon, isLeftHand, out increaseDamages);
+            if (increaseDamages != null)
+                allDamageAmounts = GameDataHelpers.CombineDamages(allDamageAmounts, increaseDamages);
 
             // If no aim position set with attack function get aim position which set from client-controller if existed
             if (!hasAimPosition && HasAimPosition)

@@ -27,10 +27,11 @@ namespace MultiplayerARPG
         DamageInfo damageInfo,
         Dictionary<DamageElement, MinMaxFloat> allDamageAmounts);
     public delegate void UseSkillRoutineDelegate(
+        Skill skill,
+        short level,
         AnimActionType animActionType,
         int skillOrWeaponTypeDataId,
         int animationIndex,
-        CharacterSkill characterSkill,
         float triggerDuration,
         float totalDuration,
         bool isLeftHand,
