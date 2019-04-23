@@ -70,11 +70,10 @@ namespace MultiplayerARPG
             return hasChanges;
         }
 
-        protected override void ApplySkill(CharacterSkill characterSkill, bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, bool hasAimPosition, Vector3 aimPosition)
+        protected override void ApplySkill(Skill skill, short level, bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, bool hasAimPosition, Vector3 aimPosition)
         {
-            base.ApplySkill(characterSkill, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition);
-
-            Skill skill = characterSkill.GetSkill();
+            base.ApplySkill(skill, level, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition);
+            
             switch (skill.skillType)
             {
                 case SkillType.CraftItem:
