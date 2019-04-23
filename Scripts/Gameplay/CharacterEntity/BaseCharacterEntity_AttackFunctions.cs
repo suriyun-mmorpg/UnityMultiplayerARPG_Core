@@ -24,13 +24,12 @@ namespace MultiplayerARPG
             animActionType = AnimActionType.None;
             dataId = 0;
             animationIndex = 0;
-            weapon = null;
+            weapon = this.GetAvailableWeapon(isLeftHand);
             triggerDuration = 0f;
             totalDuration = 0f;
             damageInfo = null;
             allDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
             // Prepare weapon data
-            weapon = this.GetWeapon(isLeftHand);
             Item weaponItem = weapon.GetWeaponItem();
             WeaponType weaponType = weaponItem.WeaponType;
             // Assign data id

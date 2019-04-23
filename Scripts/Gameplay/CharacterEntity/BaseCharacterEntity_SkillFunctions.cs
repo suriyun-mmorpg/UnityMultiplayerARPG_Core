@@ -27,7 +27,7 @@ namespace MultiplayerARPG
             dataId = 0;
             animationIndex = 0;
             skillAttackType = SkillAttackType.None;
-            weapon = null;
+            weapon = this.GetAvailableWeapon(isLeftHand);
             triggerDuration = 0f;
             totalDuration = 0f;
             damageInfo = null;
@@ -38,7 +38,6 @@ namespace MultiplayerARPG
                 return;
             // Prepare weapon data
             skillAttackType = skill.skillAttackType;
-            weapon = this.GetWeapon(isLeftHand);
             Item weaponItem = weapon.GetWeaponItem();
             WeaponType weaponType = weaponItem.WeaponType;
             bool hasSkillAnimation = CharacterModel.HasSkillAnimations(skill);
