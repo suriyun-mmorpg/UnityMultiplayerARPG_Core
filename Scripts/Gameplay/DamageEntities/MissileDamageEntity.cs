@@ -184,10 +184,19 @@ namespace MultiplayerARPG
 
         private void TriggerEnter(GameObject other)
         {
-            if (IsHitGroundOrWall(other) || FindAndApplyDamage(other))
+            IDamageableEntity target = null;
+            if (IsHitGroundOrWall(other) || FindTargetEntity(other, out target))
             {
-                // Explode immediately when hit something
-                Explode();
+                if (explodeDistance <= 0f)
+                {
+                    // If this is not going to explode, just apply damage to target
+                    ApplyDamageTo(target);
+                }
+                else
+                {
+                    // Explode immediately when hit something
+                    Explode();
+                }
                 NetworkDestroy(destroyDelay);
             }
         }
@@ -202,21 +211,33 @@ namespace MultiplayerARPG
             return false;
         }
 
-        private bool FindAndApplyDamage(GameObject other)
+        private bool FindTargetEntity(GameObject other, out IDamageableEntity target)
         {
+            target = null;
+
             if (!IsServer)
                 return false;
 
-            IDamageableEntity target = other.GetComponent<IDamageableEntity>();
-            
+            target = other.GetComponent<IDamageableEntity>();
+
             if (target == null || attacker == null || target.IsDead() || attacker.gameObject == target.gameObject || !target.CanReceiveDamageFrom(attacker))
                 return false;
 
             if (LockingTarget != null && LockingTarget != target)
                 return false;
 
-            ApplyDamageTo(target);
             return true;
+        }
+
+        private bool FindAndApplyDamage(GameObject other)
+        {
+            IDamageableEntity target;
+            if (FindTargetEntity(other, out target))
+            {
+                ApplyDamageTo(target);
+                return true;
+            }
+            return false;
         }
 
         private void Explode()
@@ -224,6 +245,9 @@ namespace MultiplayerARPG
             if (isExploded.Value || !IsServer)
                 return;
             isExploded.Value = true;
+            // Explode when distance > 0
+            if (explodeDistance <= 0f)
+                return;
             if (gameInstance.DimensionType == DimensionType.Dimension2D)
             {
                 Collider2D[] colliders2D = Physics2D.OverlapCircleAll(CacheTransform.position, explodeDistance);
