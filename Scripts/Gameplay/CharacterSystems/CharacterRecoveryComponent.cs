@@ -40,7 +40,7 @@ namespace MultiplayerARPG
 
         protected static void UpdateRecovery(float deltaTime, BaseGameplayRule gameplayRule, CharacterRecoveryComponent recoveryData, BaseCharacterEntity characterEntity)
         {
-            if (characterEntity.isRecaching || characterEntity.IsDead() || !characterEntity.IsServer)
+            if (characterEntity.IsRecaching || characterEntity.IsDead() || !characterEntity.IsServer)
                 return;
 
             recoveryData.updatingTime += deltaTime;

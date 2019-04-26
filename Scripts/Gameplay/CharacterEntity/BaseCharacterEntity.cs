@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
+using LiteNetLibManager;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -16,6 +17,14 @@ namespace MultiplayerARPG
         public const float ACTION_COMMAND_DELAY = 0.2f;
         public const int OVERLAP_COLLIDER_SIZE_FOR_ATTACK = 256;
         public const int OVERLAP_COLLIDER_SIZE_FOR_FIND = 32;
+
+        protected struct SyncListRecachingState
+        {
+            public static readonly SyncListRecachingState Empty = new SyncListRecachingState();
+            public bool isRecaching;
+            public LiteNetLibSyncList.Operation operation;
+            public int index;
+        }
         
         [HideInInspector, System.NonSerialized]
         // This will be TRUE when this character enter to safe area
@@ -58,7 +67,26 @@ namespace MultiplayerARPG
         /// <summary>
         /// This variable will be TRUE when cache data have to re-cache
         /// </summary>
+        public bool IsRecaching
+        {
+            get
+            {
+                return isRecaching ||
+                    attributesRecachingState.isRecaching ||
+                    skillsRecachingState.isRecaching ||
+                    buffsRecachingState.isRecaching ||
+                    equipItemsRecachingState.isRecaching ||
+                    nonEquipItemsRecachingState.isRecaching ||
+                    summonsRecachingState.isRecaching;
+            }
+        }
         public bool isRecaching { get; protected set; }
+        protected SyncListRecachingState attributesRecachingState;
+        protected SyncListRecachingState skillsRecachingState;
+        protected SyncListRecachingState buffsRecachingState;
+        protected SyncListRecachingState equipItemsRecachingState;
+        protected SyncListRecachingState nonEquipItemsRecachingState;
+        protected SyncListRecachingState summonsRecachingState;
         public bool isAttackingOrUsingSkill { get; protected set; }
         public bool isCastingSkillCanBeInterrupted { get; protected set; }
         public bool isCastingSkillInterrupted { get; protected set; }
@@ -278,7 +306,7 @@ namespace MultiplayerARPG
         /// </summary>
         protected virtual void MakeCaches()
         {
-            if (!isRecaching)
+            if (!IsRecaching)
                 return;
 
             if (cacheAttributes == null)
@@ -307,8 +335,10 @@ namespace MultiplayerARPG
                 out cacheTotalItemWeight,
                 out cacheAtkSpeed,
                 out cacheMoveSpeed);
+
             if (this.GetDatabase() != null)
                 CacheBaseMoveSpeed = this.GetDatabase().stats.baseStats.moveSpeed;
+
             CacheDisallowMove = false;
             CacheDisallowAttack = false;
             CacheDisallowUseSkill = false;
@@ -331,6 +361,49 @@ namespace MultiplayerARPG
                     CacheDisallowUseItem)
                     break;
             }
+
+            if (attributesRecachingState.isRecaching)
+            {
+                if (onAttributesOperation != null)
+                    onAttributesOperation.Invoke(attributesRecachingState.operation, attributesRecachingState.index);
+                attributesRecachingState = SyncListRecachingState.Empty;
+            }
+
+            if (skillsRecachingState.isRecaching)
+            {
+                if (onSkillsOperation != null)
+                    onSkillsOperation.Invoke(skillsRecachingState.operation, skillsRecachingState.index);
+                skillsRecachingState = SyncListRecachingState.Empty;
+            }
+
+            if (buffsRecachingState.isRecaching)
+            {
+                if (onBuffsOperation != null)
+                    onBuffsOperation.Invoke(buffsRecachingState.operation, buffsRecachingState.index);
+                buffsRecachingState = SyncListRecachingState.Empty;
+            }
+
+            if (equipItemsRecachingState.isRecaching)
+            {
+                if (onEquipItemsOperation != null)
+                    onEquipItemsOperation.Invoke(equipItemsRecachingState.operation, equipItemsRecachingState.index);
+                equipItemsRecachingState = SyncListRecachingState.Empty;
+            }
+
+            if (nonEquipItemsRecachingState.isRecaching)
+            {
+                if (onNonEquipItemsOperation != null)
+                    onNonEquipItemsOperation.Invoke(nonEquipItemsRecachingState.operation, nonEquipItemsRecachingState.index);
+                nonEquipItemsRecachingState = SyncListRecachingState.Empty;
+            }
+
+            if (summonsRecachingState.isRecaching)
+            {
+                if (onSummonsOperation != null)
+                    onSummonsOperation.Invoke(summonsRecachingState.operation, summonsRecachingState.index);
+                summonsRecachingState = SyncListRecachingState.Empty;
+            }
+
             isRecaching = false;
         }
 
