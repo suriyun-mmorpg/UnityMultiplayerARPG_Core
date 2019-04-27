@@ -4,6 +4,12 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
+    public enum AnimationDurationType
+    {
+        ByClipLength,
+        ByFixValue,
+    }
+
     [System.Serializable]
     public struct ActionAnimation
     {
@@ -11,6 +17,11 @@ namespace MultiplayerARPG
         [Tooltip("This will be in use with attack/skill animations, This is rate of total animation duration at when it should hit enemy or apply skill")]
         [Range(0f, 1f)]
         public float triggerDurationRate;
+        [Tooltip("How animation duration defined")]
+        public AnimationDurationType durationType;
+        [StringShowConditional("durationType", "ByFixValue")]
+        [Tooltip("This will be used when `durationType` equals to `ByFixValue` to define animation duration")]
+        public float fixDurationValue;
         [Tooltip("This will be in use with attack/skill animations, This is duration after played animation clip to add delay before next animation")]
         public float extraDuration;
         [Tooltip("This will be in use with attack/skill animations, These audio clips playing randomly while play this animation (not loop)")]
@@ -26,9 +37,16 @@ namespace MultiplayerARPG
 
         public float GetClipLength()
         {
-            if (clip == null)
-                return 0f;
-            return clip.length;
+            switch (durationType)
+            {
+                case AnimationDurationType.ByClipLength:
+                    if (clip == null)
+                        return 0f;
+                    return clip.length;
+                case AnimationDurationType.ByFixValue:
+                    return fixDurationValue;
+            }
+            return 0f;
         }
 
         public float GetExtraDuration()
