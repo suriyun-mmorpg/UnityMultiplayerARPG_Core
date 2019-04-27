@@ -40,6 +40,7 @@ namespace MultiplayerARPG
         public UICharacterSummons[] uiCharacterSummons;
         public UICharacterHotkeys[] uiCharacterHotkeys;
         public UICharacterQuests[] uiCharacterQuests;
+        public UIAmmoAmount uiAmmoAmount;
 
         [HideInInspector]
         public UIEquipItems uiEquipItems;
@@ -103,6 +104,7 @@ namespace MultiplayerARPG
 
         public System.Action<BasePlayerCharacterEntity> onUpdateCharacter;
         public System.Action<BasePlayerCharacterEntity> onUpdateEquipItems;
+        public System.Action<BasePlayerCharacterEntity> onUpdateEquipWeapons;
         public System.Action<BasePlayerCharacterEntity> onUpdateNonEquipItems;
         public System.Action<BasePlayerCharacterEntity> onUpdateSkills;
         public System.Action<BasePlayerCharacterEntity> onUpdateSummons;
@@ -235,6 +237,18 @@ namespace MultiplayerARPG
 
         /// <summary>
         /// This will be called from `BasePlayerCharacterController` class 
+        /// To update character equip weapons UIs when owning character equip weapons updated
+        /// </summary>
+        public void UpdateEquipWeapons()
+        {
+            if (uiAmmoAmount != null)
+                uiAmmoAmount.UpdateData(BasePlayerCharacterController.OwningCharacter);
+            if (onUpdateEquipWeapons != null)
+                onUpdateEquipWeapons.Invoke(BasePlayerCharacterController.OwningCharacter);
+        }
+
+        /// <summary>
+        /// This will be called from `BasePlayerCharacterController` class 
         /// To update character non equip items UIs when owning character non equip items updated
         /// </summary>
         public void UpdateNonEquipItems()
@@ -276,7 +290,7 @@ namespace MultiplayerARPG
             foreach (UICharacterSummons ui in uiCharacterSummons)
             {
                 if (ui != null)
-                    ui.UpdateData();
+                    ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
             }
             if (onUpdateSummons != null)
                 onUpdateSummons.Invoke(BasePlayerCharacterController.OwningCharacter);
@@ -291,7 +305,7 @@ namespace MultiplayerARPG
             foreach (UICharacterHotkeys ui in uiCharacterHotkeys)
             {
                 if (ui != null)
-                    ui.UpdateData();
+                    ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
             }
             if (onUpdateHotkeys != null)
                 onUpdateHotkeys.Invoke(BasePlayerCharacterController.OwningCharacter);
@@ -306,7 +320,7 @@ namespace MultiplayerARPG
             foreach (UICharacterQuests ui in uiCharacterQuests)
             {
                 if (ui != null)
-                    ui.UpdateData();
+                    ui.UpdateData(BasePlayerCharacterController.OwningCharacter);
             }
             if (onUpdateQuests != null)
                 onUpdateQuests.Invoke(BasePlayerCharacterController.OwningCharacter);
