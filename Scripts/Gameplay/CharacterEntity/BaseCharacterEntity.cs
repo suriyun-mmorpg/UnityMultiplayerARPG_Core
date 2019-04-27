@@ -223,8 +223,8 @@ namespace MultiplayerARPG
         {
             if (debugDamagePosition.HasValue && debugDamageRotation.HasValue)
             {
-                float atkHalfFov = GetAttackFov() * 0.5f;
-                float atkDist = GetAttackDistance();
+                float atkHalfFov = GetAttackFov(false) * 0.5f;
+                float atkDist = GetAttackDistance(false);
                 Handles.color = debugFovColor;
                 Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, -atkHalfFov, atkDist);
                 Handles.DrawSolidArc(debugDamagePosition.Value, debugDamageRotation.Value * Vector3.up, debugDamageRotation.Value * Vector3.forward, atkHalfFov, atkDist);
@@ -812,89 +812,60 @@ namespace MultiplayerARPG
             return gameInstance.DefaultWeaponItem.WeaponType.crosshairSetting;
         }
 
-        public virtual float GetAttackDistance()
+        public virtual float GetAttackDistance(bool isLeftHand)
         {
-            // Finding minimum distance of equipped weapons
-            // For example, if right hand attack distance is 1m and left hand attack distance is 0.7m
-            // it will return 0.7m. if no equipped weapons, it will return default weapon attack distance
-            float minDistance = float.MaxValue;
-            DamageInfo tempDamageInfo;
-            float tempDistance = 0f;
-            CharacterItem rightHand = EquipWeapons.rightHand;
-            CharacterItem leftHand = EquipWeapons.leftHand;
-            Item rightHandWeapon = rightHand.GetWeaponItem();
-            Item leftHandWeapon = leftHand.GetWeaponItem();
+            Item rightHandWeapon = null;
+            Item leftHandWeapon = null;
+
+            if (!isLeftHand)
+                rightHandWeapon = EquipWeapons.rightHand.GetWeaponItem();
+            else
+                leftHandWeapon = EquipWeapons.leftHand.GetWeaponItem();
+
             if (rightHandWeapon != null)
-            {
-                tempDamageInfo = rightHandWeapon.WeaponType.damageInfo;
-                tempDistance = tempDamageInfo.GetDistance();
-                if (minDistance > tempDistance)
-                    minDistance = tempDistance;
-            }
+                return rightHandWeapon.WeaponType.damageInfo.GetDistance();
+
             if (leftHandWeapon != null)
-            {
-                tempDamageInfo = leftHandWeapon.WeaponType.damageInfo;
-                tempDistance = tempDamageInfo.GetDistance();
-                if (minDistance > tempDistance)
-                    minDistance = tempDistance;
-            }
-            if (rightHandWeapon == null && leftHandWeapon == null)
-            {
-                tempDamageInfo = gameInstance.DefaultWeaponItem.WeaponType.damageInfo;
-                tempDistance = tempDamageInfo.GetDistance();
-                minDistance = tempDistance;
-            }
-            return minDistance;
+                return leftHandWeapon.WeaponType.damageInfo.GetDistance();
+
+            return gameInstance.DefaultWeaponItem.WeaponType.damageInfo.GetDistance();
         }
 
-        public virtual float GetAttackFov()
+        public virtual float GetAttackFov(bool isLeftHand)
         {
-            float minFov = float.MaxValue;
-            DamageInfo tempDamageInfo;
-            float tempFov = 0f;
-            CharacterItem rightHand = EquipWeapons.rightHand;
-            CharacterItem leftHand = EquipWeapons.leftHand;
-            Item rightHandWeapon = rightHand.GetWeaponItem();
-            Item leftHandWeapon = leftHand.GetWeaponItem();
+            Item rightHandWeapon = null;
+            Item leftHandWeapon = null;
+
+            if (!isLeftHand)
+                rightHandWeapon = EquipWeapons.rightHand.GetWeaponItem();
+            else
+                leftHandWeapon = EquipWeapons.leftHand.GetWeaponItem();
+
             if (rightHandWeapon != null)
-            {
-                tempDamageInfo = rightHandWeapon.WeaponType.damageInfo;
-                tempFov = tempDamageInfo.GetFov();
-                if (minFov > tempFov)
-                    minFov = tempFov;
-            }
+                return rightHandWeapon.WeaponType.damageInfo.GetFov();
+
             if (leftHandWeapon != null)
-            {
-                tempDamageInfo = leftHandWeapon.WeaponType.damageInfo;
-                tempFov = tempDamageInfo.GetFov();
-                if (minFov > tempFov)
-                    minFov = tempFov;
-            }
-            if (rightHandWeapon == null && leftHandWeapon == null)
-            {
-                tempDamageInfo = gameInstance.DefaultWeaponItem.WeaponType.damageInfo;
-                tempFov = tempDamageInfo.GetFov();
-                minFov = tempFov;
-            }
-            return minFov;
+                return leftHandWeapon.WeaponType.damageInfo.GetFov();
+
+            return gameInstance.DefaultWeaponItem.WeaponType.damageInfo.GetFov();
         }
 
-        public virtual float GetSkillAttackDistance(Skill skill)
+        public virtual float GetSkillAttackDistance(Skill skill, bool isLeftHand)
         {
             if (skill == null || !skill.IsAttack())
                 return 0f;
             if (skill.skillAttackType == SkillAttackType.Normal)
                 return skill.damageInfo.GetDistance();
-            return GetAttackDistance();
+            return GetAttackDistance(isLeftHand);
         }
 
-        public virtual float GetSkillAttackFov(Skill skill)
+        public virtual float GetSkillAttackFov(Skill skill, bool isLeftHand)
         {
             if (skill == null || !skill.IsAttack())
                 return 0f;
             if (skill.skillAttackType == SkillAttackType.Normal)
                 return skill.damageInfo.GetFov();
-            return GetAttackFov();
+            return GetAttackFov(isLeftHand);
         }
 
         public virtual void LaunchDamageEntity(

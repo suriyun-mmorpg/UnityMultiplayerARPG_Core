@@ -338,9 +338,14 @@ namespace MultiplayerARPG
             allDamageAmounts.Add(damageElement, damageAmount);
         }
 
-        public override float GetAttackDistance()
+        public override float GetAttackDistance(bool isLeftHand)
         {
             return monsterCharacter.damageInfo.GetDistance();
+        }
+
+        public override float GetAttackFov(bool isLeftHand)
+        {
+            return monsterCharacter.damageInfo.GetFov();
         }
 
         public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType damageAmountType, int damage)

@@ -252,7 +252,7 @@ namespace MultiplayerARPG
         {
             // If it has target then go to target
             Vector3 targetEntityPosition = targetEntity.CacheTransform.position;
-            float attackDistance = CacheMonsterCharacterEntity.GetAttackDistance();
+            float attackDistance = CacheMonsterCharacterEntity.GetAttackDistance(false);
             attackDistance -= attackDistance * 0.1f;
             attackDistance -= stoppingDistance;
             if (Vector3.Distance(currentPosition, targetEntityPosition) <= attackDistance)

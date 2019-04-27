@@ -227,11 +227,32 @@ namespace MultiplayerARPG
             Vector3 right = CacheGameplayCameraControls.CacheCameraTransform.right;
             float distanceFromOrigin = Vector3.Distance(ray.origin, PlayerCharacterEntity.CacheTransform.position);
             float aimDistance = distanceFromOrigin;
-            // Calculate aim distance by skill or weapon
-            if (queueSkill != null && queueSkill.IsAttack())
-                aimDistance += PlayerCharacterEntity.GetSkillAttackDistance(queueSkill);
-            else
-                aimDistance += PlayerCharacterEntity.GetAttackDistance();
+            // Calculating aim distance, also read attack inputs here
+            // Attack inputs will be used to calculate attack distance
+            if (CurrentBuildingEntity == null)
+            {
+                // Attack with right hand weapon
+                tempPressAttackRight = InputManager.GetButton("Fire1");
+                if (weaponAbility == null && PlayerCharacterEntity.EquipWeapons.leftHand.GetWeaponItem() != null)
+                {
+                    // Attack with left hand weapon if left hand weapon not empty
+                    tempPressAttackLeft = InputManager.GetButton("Fire2");
+                }
+                else if (weaponAbility != null)
+                {
+                    // Use weapon ability if it can
+                    tempPressWeaponAbility = InputManager.GetButtonDown("Fire2");
+                }
+                // Is left hand attack when not attacking with right hand
+                // So priority is right > left
+                isLeftHandAttacking = !tempPressAttackRight && tempPressAttackLeft;
+
+                // Calculate aim distance by skill or weapon
+                if (queueSkill != null && queueSkill.IsAttack())
+                    aimDistance += PlayerCharacterEntity.GetSkillAttackDistance(queueSkill, isLeftHandAttacking);
+                else
+                    aimDistance += PlayerCharacterEntity.GetAttackDistance(isLeftHandAttacking);
+            }
             actionLookDirection = aimPosition = ray.origin + ray.direction * aimDistance;
             actionLookDirection.y = PlayerCharacterEntity.CacheTransform.position.y;
             actionLookDirection = actionLookDirection - PlayerCharacterEntity.CacheTransform.position;
@@ -381,18 +402,6 @@ namespace MultiplayerARPG
             else
             {
                 // Not building so it is attacking
-                // Attack with right hand weapon
-                tempPressAttackRight = InputManager.GetButton("Fire1");
-                if (weaponAbility == null && PlayerCharacterEntity.EquipWeapons.leftHand.GetWeaponItem() != null)
-                {
-                    // Attack with left hand weapon if left hand weapon not empty
-                    tempPressAttackLeft = InputManager.GetButton("Fire2");
-                }
-                else if (weaponAbility != null)
-                {
-                    // Use weapon ability if it can
-                    tempPressWeaponAbility = InputManager.GetButtonDown("Fire2");
-                }
                 tempPressActivate = InputManager.GetButtonDown("Activate");
                 tempPressPickupItem = InputManager.GetButtonDown("PickUpItem");
                 tempPressReload = InputManager.GetButtonDown("Reload");
@@ -416,17 +425,9 @@ namespace MultiplayerARPG
                     if (tempCalculateAngle > 15f)
                     {
                         if (queueSkill != null && queueSkill.IsAttack())
-                        {
                             turningState = TurningState.UseSkill;
-                            // Swap hand attacking hand
-                            isLeftHandAttacking = !isLeftHandAttacking;
-                        }
                         else if (tempPressAttackRight || tempPressAttackLeft)
-                        {
                             turningState = TurningState.Attack;
-                            // Set attacking hand
-                            isLeftHandAttacking = !tempPressAttackRight;
-                        }
                         else if (tempPressActivate)
                             turningState = TurningState.Activate;
                         turnTimeCounter = ((180f - tempCalculateAngle) / 180f) * turnToTargetDuration;
@@ -446,7 +447,7 @@ namespace MultiplayerARPG
                         // Attack immediately if character already look at target
                         if (queueSkill != null && queueSkill.IsAttack())
                         {
-                            UseSkill(!isLeftHandAttacking, aimPosition);
+                            UseSkill(isLeftHandAttacking, aimPosition);
                             isDoingAction = true;
                         }
                         else if (tempPressAttackRight)

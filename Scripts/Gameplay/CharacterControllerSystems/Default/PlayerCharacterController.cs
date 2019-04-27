@@ -240,10 +240,10 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool GetAttackDataOrUseNonAttackSkill(out float attackDistance, out float attackFov)
+        public bool GetAttackDataOrUseNonAttackSkill(bool isLeftHand, out float attackDistance, out float attackFov)
         {
-            attackDistance = PlayerCharacterEntity.GetAttackDistance();
-            attackFov = PlayerCharacterEntity.GetAttackFov();
+            attackDistance = PlayerCharacterEntity.GetAttackDistance(isLeftHand);
+            attackFov = PlayerCharacterEntity.GetAttackFov(isLeftHand);
             if (queueUsingSkill.HasValue)
             {
                 Skill skill = null;
@@ -251,8 +251,8 @@ namespace MultiplayerARPG
                 {
                     if (skill.IsAttack())
                     {
-                        attackDistance = PlayerCharacterEntity.GetSkillAttackDistance(skill);
-                        attackFov = PlayerCharacterEntity.GetSkillAttackFov(skill);
+                        attackDistance = PlayerCharacterEntity.GetSkillAttackDistance(skill, isLeftHand);
+                        attackFov = PlayerCharacterEntity.GetSkillAttackFov(skill, isLeftHand);
                     }
                     else
                     {
