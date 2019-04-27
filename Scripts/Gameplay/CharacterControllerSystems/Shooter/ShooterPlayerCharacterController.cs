@@ -68,6 +68,9 @@ namespace MultiplayerARPG
         CrosshairSetting currentCrosshairSetting;
         // Controlling states
         bool isDoingAction;
+        bool mustReleaseFireKey;
+        Item rightHandWeapon;
+        Item leftHandWeapon;
         MovementFlag movementState;
         BaseWeaponAbility weaponAbility;
         WeaponAbilityState weaponAbilityState;
@@ -97,12 +100,10 @@ namespace MultiplayerARPG
                 CacheGameplayCameraControls.target = characterEntity.CacheTransform;
 
             tempLookAt = characterEntity.CacheTransform.rotation;
-
-            SetupCrosshairSetting(characterEntity.EquipWeapons);
-            SetupWeaponAbility(characterEntity.EquipWeapons);
-
-            characterEntity.onEquipWeaponsChange += SetupCrosshairSetting;
-            characterEntity.onEquipWeaponsChange += SetupWeaponAbility;
+            
+            SetupEquipWeapons(characterEntity.EquipWeapons);
+            
+            characterEntity.onEquipWeaponsChange += SetupEquipWeapons;
         }
 
         protected override void Desetup(BasePlayerCharacterEntity characterEntity)
@@ -114,22 +115,17 @@ namespace MultiplayerARPG
 
             if (characterEntity == null)
                 return;
-
-            characterEntity.onEquipWeaponsChange -= SetupCrosshairSetting;
-            characterEntity.onEquipWeaponsChange -= SetupWeaponAbility;
+            
+            characterEntity.onEquipWeaponsChange -= SetupEquipWeapons;
         }
 
-        protected void SetupCrosshairSetting(EquipWeapons equipWeapons)
+        protected void SetupEquipWeapons(EquipWeapons equipWeapons)
         {
+            mustReleaseFireKey = false;
             currentCrosshairSetting = PlayerCharacterEntity.GetCrosshairSetting();
-        }
-
-        protected void SetupWeaponAbility(EquipWeapons equipWeapons)
-        {
-            CharacterItem rightHand = equipWeapons.rightHand;
-            CharacterItem leftHand = equipWeapons.leftHand;
-            Item rightHandWeapon = rightHand.GetWeaponItem();
-            Item leftHandWeapon = leftHand.GetWeaponItem();
+            
+            rightHandWeapon = equipWeapons.rightHand.GetWeaponItem();
+            leftHandWeapon = equipWeapons.leftHand.GetWeaponItem();
             // Weapon ability will be able to use when equip weapon at main-hand only
             if (rightHandWeapon != null && leftHandWeapon == null)
             {
@@ -216,6 +212,7 @@ namespace MultiplayerARPG
 
             if (IsBlockController || GenericUtils.IsFocusInputField())
             {
+                mustReleaseFireKey = false;
                 PlayerCharacterEntity.KeyMovement(Vector3.zero, MovementFlag.None);
                 DeactivateWeaponAbility();
                 return;
@@ -233,7 +230,7 @@ namespace MultiplayerARPG
             {
                 // Attack with right hand weapon
                 tempPressAttackRight = InputManager.GetButton("Fire1");
-                if (weaponAbility == null && PlayerCharacterEntity.EquipWeapons.leftHand.GetWeaponItem() != null)
+                if (weaponAbility == null && leftHandWeapon != null)
                 {
                     // Attack with left hand weapon if left hand weapon not empty
                     tempPressAttackLeft = InputManager.GetButton("Fire2");
@@ -376,6 +373,7 @@ namespace MultiplayerARPG
 
             if (CurrentBuildingEntity != null)
             {
+                mustReleaseFireKey = false;
                 // Building
                 tempPressAttackRight = InputManager.GetButtonUp("Fire1");
                 if (tempPressAttackRight)
@@ -401,6 +399,16 @@ namespace MultiplayerARPG
             }
             else
             {
+                // Have to release fire key, then check press fire key later on next frame
+                if (mustReleaseFireKey)
+                {
+                    tempPressAttackRight = false;
+                    tempPressAttackLeft = false;
+                    if (!isLeftHandAttacking && InputManager.GetButtonUp("Fire1"))
+                        mustReleaseFireKey = false;
+                    if (isLeftHandAttacking && InputManager.GetButtonUp("Fire2"))
+                        mustReleaseFireKey = false;
+                }
                 // Not building so it is attacking
                 tempPressActivate = InputManager.GetButtonDown("Activate");
                 tempPressPickupItem = InputManager.GetButtonDown("PickUpItem");
@@ -450,14 +458,9 @@ namespace MultiplayerARPG
                             UseSkill(isLeftHandAttacking, aimPosition);
                             isDoingAction = true;
                         }
-                        else if (tempPressAttackRight)
+                        else if (tempPressAttackRight || tempPressAttackLeft)
                         {
-                            Attack(false);
-                            isDoingAction = true;
-                        }
-                        else if (tempPressAttackLeft)
-                        {
-                            Attack(true);
+                            Attack(isLeftHandAttacking);
                             isDoingAction = true;
                         }
                         else if (tempPressActivate)
@@ -504,6 +507,11 @@ namespace MultiplayerARPG
                     if (moveDirection.magnitude != 0f)
                         targetLookDirection = moveLookDirection;
                 }
+                // Setup releasing state
+                if (tempPressAttackRight && rightHandWeapon != null && rightHandWeapon.WeaponType.fireType == FireType.SingleFire)
+                    mustReleaseFireKey = true;
+                else if (tempPressAttackLeft && leftHandWeapon != null && leftHandWeapon.WeaponType.fireType == FireType.SingleFire)
+                    mustReleaseFireKey = true;
             }
             SetAimPosition(aimPosition);
 
