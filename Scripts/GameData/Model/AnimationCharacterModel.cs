@@ -176,23 +176,20 @@ namespace MultiplayerARPG
         {
             // If animator is not null, play the action animation
             ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
-            if (tempActionAnimation.clip != null)
-            {
-                if (legacyAnimation.GetClip(CLIP_ACTION) != null)
-                    legacyAnimation.RemoveClip(CLIP_ACTION);
-                legacyAnimation.AddClip(tempActionAnimation.clip, CLIP_ACTION);
-                AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
-                if (audioClip != null)
-                    AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
-                isPlayingActionAnimation = true;
-                CrossFadeLegacyAnimation(CLIP_ACTION, actionClipFadeLength, WrapMode.Once);
-                // Waits by current transition + clip duration before end animation
-                yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
-                CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
-                // Waits by current transition + extra duration before end playing animation state
-                yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
-                isPlayingActionAnimation = false;
-            }
+            if (legacyAnimation.GetClip(CLIP_ACTION) != null)
+                legacyAnimation.RemoveClip(CLIP_ACTION);
+            legacyAnimation.AddClip(tempActionAnimation.clip, CLIP_ACTION);
+            AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
+            if (audioClip != null)
+                AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
+            isPlayingActionAnimation = true;
+            CrossFadeLegacyAnimation(CLIP_ACTION, actionClipFadeLength, WrapMode.Once);
+            // Waits by current transition + clip duration before end animation
+            yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
+            CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
+            // Waits by current transition + extra duration before end playing animation state
+            yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
+            isPlayingActionAnimation = false;
         }
 
         public override Coroutine PlaySkillCastClip(int dataId, float duration)
@@ -203,16 +200,13 @@ namespace MultiplayerARPG
         private IEnumerator PlaySkillCastClip_LegacyAnimation(int dataId, float duration)
         {
             AnimationClip castClip = GetSkillCastClip(dataId);
-            if (castClip != null)
-            {
-                if (legacyAnimation.GetClip(CLIP_CAST_SKILL) != null)
-                    legacyAnimation.RemoveClip(CLIP_CAST_SKILL);
-                legacyAnimation.AddClip(castClip, CLIP_CAST_SKILL);
-                CrossFadeLegacyAnimation(CLIP_CAST_SKILL, actionClipFadeLength, WrapMode.Loop);
-                yield return new WaitForSecondsRealtime(duration);
-                if (!isPlayingActionAnimation)
-                    CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
-            }
+            if (legacyAnimation.GetClip(CLIP_CAST_SKILL) != null)
+                legacyAnimation.RemoveClip(CLIP_CAST_SKILL);
+            legacyAnimation.AddClip(castClip, CLIP_CAST_SKILL);
+            CrossFadeLegacyAnimation(CLIP_CAST_SKILL, actionClipFadeLength, WrapMode.Loop);
+            yield return new WaitForSecondsRealtime(duration);
+            if (!isPlayingActionAnimation)
+                CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
         }
 
         public override void StopActionAnimation()

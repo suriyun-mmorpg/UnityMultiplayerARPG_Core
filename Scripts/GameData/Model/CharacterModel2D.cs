@@ -436,15 +436,15 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override bool HasSkillAnimations(int dataId)
+        public override SkillActivateAnimationType UseSkillActivateAnimationType(int dataId)
         {
             ActionAnimation2D animation2D = null;
             if (!CacheSkillCastAnimations.TryGetValue(dataId, out animation2D))
                 animation2D = defaultSkillCastAnimation2D;
-            if (animation2D == null) return false;
+            if (animation2D == null) return SkillActivateAnimationType.UseAttackAnimation;
             AnimationClip2D clip = animation2D.GetClipByDirection(currentDirectionType);
-            if (clip == null) return false;
-            return true;
+            if (clip == null) return SkillActivateAnimationType.UseAttackAnimation;
+            return SkillActivateAnimationType.UseActivateAnimation;
         }
     }
 }

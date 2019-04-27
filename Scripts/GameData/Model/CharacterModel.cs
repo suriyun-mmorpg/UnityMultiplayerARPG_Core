@@ -645,73 +645,61 @@ namespace MultiplayerARPG
         {
             // If animator is not null, play the action animation
             ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
-            if (tempActionAnimation.clip != null)
-            {
-                animator.SetBool(ANIM_DO_ACTION, false);
-                yield return 0;
-                CacheAnimatorController[defaultActionClipName] = tempActionAnimation.clip;
-                AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
-                if (audioClip != null)
-                    AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
-                animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
-                animator.SetBool(ANIM_DO_ACTION, true);
-                // Waits by current transition + clip duration before end animation
-                yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
-                animator.SetBool(ANIM_DO_ACTION, false);
-                // Waits by current transition + extra duration before end playing animation state
-                yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
-            }
+            animator.SetBool(ANIM_DO_ACTION, false);
+            yield return 0;
+            CacheAnimatorController[defaultActionClipName] = tempActionAnimation.clip;
+            AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
+            if (audioClip != null)
+                AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
+            animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
+            animator.SetBool(ANIM_DO_ACTION, true);
+            // Waits by current transition + clip duration before end animation
+            yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
+            animator.SetBool(ANIM_DO_ACTION, false);
+            // Waits by current transition + extra duration before end playing animation state
+            yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
         }
 
         private IEnumerator PlayActionAnimation_LegacyAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
         {
             // If animator is not null, play the action animation
             ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
-            if (tempActionAnimation.clip != null)
-            {
-                if (legacyAnimation.GetClip(LEGACY_CLIP_ACTION) != null)
-                    legacyAnimation.RemoveClip(LEGACY_CLIP_ACTION);
-                legacyAnimation.AddClip(tempActionAnimation.clip, LEGACY_CLIP_ACTION);
-                AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
-                if (audioClip != null)
-                    AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
-                isPlayingActionAnimation = true;
-                CrossFadeLegacyAnimation(LEGACY_CLIP_ACTION, legacyAnimationData.actionClipFadeLength, WrapMode.Once);
-                // Waits by current transition + clip duration before end animation
-                yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
-                CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
-                // Waits by current transition + extra duration before end playing animation state
-                yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
-                isPlayingActionAnimation = false;
-            }
+            if (legacyAnimation.GetClip(LEGACY_CLIP_ACTION) != null)
+                legacyAnimation.RemoveClip(LEGACY_CLIP_ACTION);
+            legacyAnimation.AddClip(tempActionAnimation.clip, LEGACY_CLIP_ACTION);
+            AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
+            if (audioClip != null)
+                AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
+            isPlayingActionAnimation = true;
+            CrossFadeLegacyAnimation(LEGACY_CLIP_ACTION, legacyAnimationData.actionClipFadeLength, WrapMode.Once);
+            // Waits by current transition + clip duration before end animation
+            yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
+            CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
+            // Waits by current transition + extra duration before end playing animation state
+            yield return new WaitForSecondsRealtime(tempActionAnimation.GetExtraDuration() / playSpeedMultiplier);
+            isPlayingActionAnimation = false;
         }
 
         private IEnumerator PlaySkillCastClip_Animator(int dataId, float duration)
         {
             AnimationClip castClip = GetSkillCastClip(dataId);
-            if (castClip != null)
-            {
-                CacheAnimatorController[defaultCastSkillClipName] = castClip;
-                yield return 0;
-                animator.SetBool(ANIM_IS_CASTING_SKILL, true);
-                yield return new WaitForSecondsRealtime(duration);
-                animator.SetBool(ANIM_IS_CASTING_SKILL, false);
-            }
+            CacheAnimatorController[defaultCastSkillClipName] = castClip;
+            yield return 0;
+            animator.SetBool(ANIM_IS_CASTING_SKILL, true);
+            yield return new WaitForSecondsRealtime(duration);
+            animator.SetBool(ANIM_IS_CASTING_SKILL, false);
         }
 
         private IEnumerator PlaySkillCastClip_LegacyAnimation(int dataId, float duration)
         {
             AnimationClip castClip = GetSkillCastClip(dataId);
-            if (castClip != null)
-            {
-                if (legacyAnimation.GetClip(LEGACY_CLIP_CAST_SKILL) != null)
-                    legacyAnimation.RemoveClip(LEGACY_CLIP_CAST_SKILL);
-                legacyAnimation.AddClip(castClip, LEGACY_CLIP_CAST_SKILL);
-                CrossFadeLegacyAnimation(LEGACY_CLIP_CAST_SKILL, legacyAnimationData.actionClipFadeLength, WrapMode.Loop);
-                yield return new WaitForSecondsRealtime(duration);
-                if (!isPlayingActionAnimation)
-                    CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
-            }
+            if (legacyAnimation.GetClip(LEGACY_CLIP_CAST_SKILL) != null)
+                legacyAnimation.RemoveClip(LEGACY_CLIP_CAST_SKILL);
+            legacyAnimation.AddClip(castClip, LEGACY_CLIP_CAST_SKILL);
+            CrossFadeLegacyAnimation(LEGACY_CLIP_CAST_SKILL, legacyAnimationData.actionClipFadeLength, WrapMode.Loop);
+            yield return new WaitForSecondsRealtime(duration);
+            if (!isPlayingActionAnimation)
+                CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
         }
         #endregion
 
@@ -790,32 +778,28 @@ namespace MultiplayerARPG
 
         public AnimationClip GetSkillCastClip(int dataId)
         {
-            if (CacheSkillAnimations.ContainsKey(dataId) &&
-                CacheSkillAnimations[dataId].castClip != null)
+            if (CacheSkillAnimations.ContainsKey(dataId))
                 return CacheSkillAnimations[dataId].castClip;
             return defaultSkillCastClip;
         }
 
         public ActionAnimation GetSkillActivateAnimation(int dataId)
         {
-            if (CacheSkillAnimations.ContainsKey(dataId) &&
-                CacheSkillAnimations[dataId].activateAnimation.clip != null)
+            if (CacheSkillAnimations.ContainsKey(dataId))
                 return CacheSkillAnimations[dataId].activateAnimation;
             return defaultSkillActivateAnimation;
         }
 
         public ActionAnimation GetRightHandReloadAnimation(int dataId)
         {
-            if (CacheWeaponAnimations.ContainsKey(dataId) &&
-                CacheWeaponAnimations[dataId].rightHandReloadAnimation.clip != null)
+            if (CacheWeaponAnimations.ContainsKey(dataId))
                 return CacheWeaponAnimations[dataId].rightHandReloadAnimation;
             return defaultReloadAnimation;
         }
 
         public ActionAnimation GetLeftHandReloadAnimation(int dataId)
         {
-            if (CacheWeaponAnimations.ContainsKey(dataId) &&
-                CacheWeaponAnimations[dataId].leftHandReloadAnimation.clip != null)
+            if (CacheWeaponAnimations.ContainsKey(dataId))
                 return CacheWeaponAnimations[dataId].leftHandReloadAnimation;
             return defaultReloadAnimation;
         }
@@ -887,9 +871,11 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override bool HasSkillAnimations(int dataId)
+        public override SkillActivateAnimationType UseSkillActivateAnimationType(int dataId)
         {
-            return CacheSkillAnimations.ContainsKey(dataId);
+            if (!CacheSkillAnimations.ContainsKey(dataId))
+                return SkillActivateAnimationType.UseAttackAnimation;
+            return CacheSkillAnimations[dataId].activateAnimationType;
         }
         #endregion
     }

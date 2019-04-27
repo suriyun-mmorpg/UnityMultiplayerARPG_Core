@@ -131,32 +131,28 @@ namespace MultiplayerARPG
 
         public AnimationClip GetSkillCastClip(int dataId)
         {
-            if (CacheSkillAnimations.ContainsKey(dataId) &&
-                CacheSkillAnimations[dataId].castClip != null)
+            if (CacheSkillAnimations.ContainsKey(dataId))
                 return CacheSkillAnimations[dataId].castClip;
             return defaultAnimations.skillCastClip;
         }
 
         public ActionAnimation GetSkillActivateAnimation(int dataId)
         {
-            if (CacheSkillAnimations.ContainsKey(dataId) &&
-                CacheSkillAnimations[dataId].activateAnimation.clip != null)
+            if (CacheSkillAnimations.ContainsKey(dataId))
                 return CacheSkillAnimations[dataId].activateAnimation;
             return defaultAnimations.skillActivateAnimation;
         }
 
         public ActionAnimation GetRightHandReloadAnimation(int dataId)
         {
-            if (CacheWeaponAnimations.ContainsKey(dataId) &&
-                CacheWeaponAnimations[dataId].rightHandReloadAnimation.clip != null)
+            if (CacheWeaponAnimations.ContainsKey(dataId))
                 return CacheWeaponAnimations[dataId].rightHandReloadAnimation;
             return defaultAnimations.rightHandReloadAnimation;
         }
 
         public ActionAnimation GetLeftHandReloadAnimation(int dataId)
         {
-            if (CacheWeaponAnimations.ContainsKey(dataId) &&
-                CacheWeaponAnimations[dataId].leftHandReloadAnimation.clip != null)
+            if (CacheWeaponAnimations.ContainsKey(dataId))
                 return CacheWeaponAnimations[dataId].leftHandReloadAnimation;
             return defaultAnimations.leftHandReloadAnimation;
         }
@@ -228,9 +224,11 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override bool HasSkillAnimations(int dataId)
+        public override SkillActivateAnimationType UseSkillActivateAnimationType(int dataId)
         {
-            return CacheSkillAnimations.ContainsKey(dataId);
+            if (!CacheSkillAnimations.ContainsKey(dataId))
+                return SkillActivateAnimationType.UseAttackAnimation;
+            return CacheSkillAnimations[dataId].activateAnimationType;
         }
     }
 }

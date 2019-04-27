@@ -290,9 +290,9 @@ namespace MultiplayerARPG
             return GetLeftHandReloadAnimation(weaponType.DataId, out triggerDuration, out totalDuration);
         }
 
-        public bool HasSkillAnimations(Skill skill)
+        public SkillActivateAnimationType UseSkillActivateAnimationType(Skill skill)
         {
-            return HasSkillAnimations(skill.DataId);
+            return UseSkillActivateAnimationType(skill.DataId);
         }
 
         public Transform GetRightHandEquipmentEntity()
@@ -321,7 +321,7 @@ namespace MultiplayerARPG
         public abstract bool GetSkillActivateAnimation(int dataId, out float triggerDuration, out float totalDuration);
         public abstract bool GetRightHandReloadAnimation(int dataId, out float triggerDuration, out float totalDuration);
         public abstract bool GetLeftHandReloadAnimation(int dataId, out float triggerDuration, out float totalDuration);
-        public abstract bool HasSkillAnimations(int dataId);
+        public abstract SkillActivateAnimationType UseSkillActivateAnimationType(int dataId);
     }
 
     [System.Serializable]

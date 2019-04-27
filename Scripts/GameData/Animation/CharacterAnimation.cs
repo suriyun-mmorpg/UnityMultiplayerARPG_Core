@@ -10,6 +10,12 @@ namespace MultiplayerARPG
         ByFixValue,
     }
 
+    public enum SkillActivateAnimationType
+    {
+        UseActivateAnimation,
+        UseAttackAnimation,
+    }
+
     [System.Serializable]
     public struct ActionAnimation
     {
@@ -93,6 +99,8 @@ namespace MultiplayerARPG
     {
         public Skill skill;
         public AnimationClip castClip;
+        public SkillActivateAnimationType activateAnimationType;
+        [StringShowConditional("activateAnimationType", "UseActivateAnimation")]
         public ActionAnimation activateAnimation;
     }
 

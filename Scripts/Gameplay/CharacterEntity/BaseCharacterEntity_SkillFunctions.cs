@@ -37,9 +37,9 @@ namespace MultiplayerARPG
             // Prepare weapon data
             Item weaponItem = weapon.GetWeaponItem();
             WeaponType weaponType = weaponItem.WeaponType;
-            bool hasSkillAnimation = CharacterModel.HasSkillAnimations(skill);
+            SkillActivateAnimationType useSkillActivateAnimationType = CharacterModel.UseSkillActivateAnimationType(skill);
             // Prepare animation
-            if (!hasSkillAnimation && skill.skillAttackType != SkillAttackType.None)
+            if (useSkillActivateAnimationType == SkillActivateAnimationType.UseAttackAnimation && skill.skillAttackType != SkillAttackType.None)
             {
                 // If there is no cast animations
                 // Assign data id
@@ -52,7 +52,7 @@ namespace MultiplayerARPG
                 else
                     CharacterModel.GetRandomLeftHandAttackAnimation(skillOrWeaponTypeDataId, out animationIndex, out triggerDuration, out totalDuration);
             }
-            else if (hasSkillAnimation)
+            else if (useSkillActivateAnimationType == SkillActivateAnimationType.UseActivateAnimation)
             {
                 // Assign data id
                 skillOrWeaponTypeDataId = skill.DataId;
