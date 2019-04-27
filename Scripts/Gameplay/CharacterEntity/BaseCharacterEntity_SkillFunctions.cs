@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         public virtual void GetUsingSkillData(
             Skill skill,
             short level,
-            bool isLeftHand,
+            ref bool isLeftHand,
             out AnimActionType animActionType,
             out int skillOrWeaponTypeDataId,
             out int animationIndex,
@@ -26,7 +26,7 @@ namespace MultiplayerARPG
             animActionType = AnimActionType.None;
             skillOrWeaponTypeDataId = 0;
             animationIndex = 0;
-            weapon = this.GetAvailableWeapon(isLeftHand);
+            weapon = this.GetAvailableWeapon(ref isLeftHand);
             triggerDuration = 0f;
             totalDuration = 0f;
             damageInfo = null;
@@ -137,7 +137,7 @@ namespace MultiplayerARPG
             GetUsingSkillData(
                 skill,
                 level,
-                isLeftHand,
+                ref isLeftHand,
                 out animActionType,
                 out skillOrWeaponTypeDataId,
                 out animationIndex,

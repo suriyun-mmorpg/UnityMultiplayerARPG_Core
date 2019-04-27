@@ -846,7 +846,7 @@ public static partial class CharacterDataExtension
         return count;
     }
 
-    public static CharacterItem GetAvailableWeapon(this ICharacterData data, bool isLeftHand)
+    public static CharacterItem GetAvailableWeapon(this ICharacterData data, ref bool isLeftHand)
     {
         CharacterItem rightHand = data.EquipWeapons.rightHand;
         Item rightWeaponItem = rightHand.GetWeaponItem();
@@ -857,15 +857,22 @@ public static partial class CharacterDataExtension
             if (rightWeaponItem != null)
                 return rightHand;
             if (rightWeaponItem == null && leftWeaponItem != null)
+            {
+                isLeftHand = true;
                 return leftHand;
+            }
         }
         else
         {
             if (leftWeaponItem != null)
                 return leftHand;
             if (leftWeaponItem == null && rightWeaponItem != null)
+            {
+                isLeftHand = false;
                 return rightHand;
+            }
         }
+        isLeftHand = false;
         return CharacterItem.Create(GameInstance.Singleton.DefaultWeaponItem);
     }
 

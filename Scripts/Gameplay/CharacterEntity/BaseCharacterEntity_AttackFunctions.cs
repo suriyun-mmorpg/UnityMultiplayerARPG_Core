@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         public event AttackRoutineDelegate onAttackRoutine;
 
         public virtual void GetAttackingData(
-            bool isLeftHand,
+            ref bool isLeftHand,
             out AnimActionType animActionType,
             out int dataId,
             out int animationIndex,
@@ -24,7 +24,7 @@ namespace MultiplayerARPG
             animActionType = AnimActionType.None;
             dataId = 0;
             animationIndex = 0;
-            weapon = this.GetAvailableWeapon(isLeftHand);
+            weapon = this.GetAvailableWeapon(ref isLeftHand);
             triggerDuration = 0f;
             totalDuration = 0f;
             damageInfo = null;
@@ -222,7 +222,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> allDamageAmounts;
 
             GetAttackingData(
-                isLeftHand,
+                ref isLeftHand,
                 out animActionType,
                 out weaponTypeDataId,
                 out animationIndex,

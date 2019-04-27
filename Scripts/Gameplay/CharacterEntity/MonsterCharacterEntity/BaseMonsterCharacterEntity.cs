@@ -303,7 +303,7 @@ namespace MultiplayerARPG
         }
 
         public override void GetAttackingData(
-            bool isLeftHand,
+            ref bool isLeftHand,
             out AnimActionType animActionType,
             out int dataId,
             out int animationIndex,
@@ -314,6 +314,7 @@ namespace MultiplayerARPG
             out Dictionary<DamageElement, MinMaxFloat> allDamageAmounts)
         {
             // Initialize data
+            isLeftHand = false;
             animActionType = AnimActionType.AttackRightHand;
 
             // Monster will not have weapon type so set dataId to `0`, then random attack animation from default attack animtions
