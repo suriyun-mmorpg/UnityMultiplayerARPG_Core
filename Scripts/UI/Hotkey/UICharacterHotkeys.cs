@@ -4,6 +4,7 @@ namespace MultiplayerARPG
 {
     public partial class UICharacterHotkeys : UIBase
     {
+        public IPlayerCharacterData character { get; protected set; }
         public UICharacterHotkeyPair[] uiCharacterHotkeys;
         public UICharacterSkill uiCharacterSkillPrefab;
         public UICharacterItem uiCharacterItemPrefab;
@@ -71,10 +72,11 @@ namespace MultiplayerARPG
             base.Hide();
         }
 
-        public void UpdateData()
+        public void UpdateData(IPlayerCharacterData character)
         {
+            this.character = character;
             InitCaches();
-            IList<CharacterHotkey> characterHotkeys = BasePlayerCharacterController.OwningCharacter.Hotkeys;
+            IList<CharacterHotkey> characterHotkeys = character.Hotkeys;
             for (int i = 0; i < characterHotkeys.Count; ++i)
             {
                 CharacterHotkey characterHotkey = characterHotkeys[i];

@@ -128,7 +128,7 @@ namespace MultiplayerARPG
             // Clear slots data
             foreach (UICharacterItem slot in CacheEquipItemSlots.Values)
             {
-                slot.Setup(GetEmptyUIData(slot.InventoryType), this.character, -1);
+                slot.Setup(GetEmptyUIData(slot.InventoryType), character, -1);
                 slot.Show();
             }
 
@@ -147,7 +147,7 @@ namespace MultiplayerARPG
 
                 tempPosition = armorItem.EquipPosition;
                 if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
-                    tempSlot.Setup(new CharacterItemTuple(equipItem, equipItem.level, InventoryType.EquipItems), this.character, i);
+                    tempSlot.Setup(new CharacterItemTuple(equipItem, equipItem.level, InventoryType.EquipItems), character, i);
             }
 
             EquipWeapons equipWeapons = character.EquipWeapons;
@@ -159,13 +159,13 @@ namespace MultiplayerARPG
             if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
             {
                 if (rightHandEquipment != null)
-                    tempSlot.Setup(new CharacterItemTuple(rightHand, rightHand.level, InventoryType.EquipWeaponRight), this.character, 0);
+                    tempSlot.Setup(new CharacterItemTuple(rightHand, rightHand.level, InventoryType.EquipWeaponRight), character, 0);
             }
             tempPosition = GameDataConst.EQUIP_POSITION_LEFT_HAND;
             if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
             {
                 if (leftHandEquipment != null)
-                    tempSlot.Setup(new CharacterItemTuple(leftHand, leftHand.level, InventoryType.EquipWeaponLeft), this.character, 0);
+                    tempSlot.Setup(new CharacterItemTuple(leftHand, leftHand.level, InventoryType.EquipWeaponLeft), character, 0);
             }
         }
 

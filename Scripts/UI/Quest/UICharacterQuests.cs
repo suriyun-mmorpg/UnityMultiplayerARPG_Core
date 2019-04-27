@@ -5,6 +5,7 @@ namespace MultiplayerARPG
 {
     public partial class UICharacterQuests : UIBase
     {
+        public IPlayerCharacterData character { get; protected set; }
         public UICharacterQuest uiQuestDialog;
         public UICharacterQuest uiCharacterQuestPrefab;
         public Transform uiCharacterQuestContainer;
@@ -18,7 +19,7 @@ namespace MultiplayerARPG
                 if (hideCompleteQuest != value)
                 {
                     hideCompleteQuest = value;
-                    UpdateData();
+                    UpdateData(character);
                 }
             }
         }
@@ -86,7 +87,7 @@ namespace MultiplayerARPG
             if (uiQuestDialog != null)
             {
                 uiQuestDialog.selectionManager = CacheQuestSelectionManager;
-                uiQuestDialog.Setup(ui.Data, BasePlayerCharacterController.OwningCharacter, ui.IndexOfData);
+                uiQuestDialog.Setup(ui.Data, character, ui.IndexOfData);
                 uiQuestDialog.Show();
             }
         }
@@ -101,14 +102,15 @@ namespace MultiplayerARPG
             }
         }
 
-        public void UpdateData()
+        public void UpdateData(IPlayerCharacterData character)
         {
+            this.character = character;
             int selectedQuestId = CacheQuestSelectionManager.SelectedUI != null ? CacheQuestSelectionManager.SelectedUI.Data.dataId : 0;
             CacheQuestSelectionManager.DeselectSelectedUI();
             CacheQuestSelectionManager.Clear();
 
             List<CharacterQuest> characterQuests = new List<CharacterQuest>();
-            foreach (CharacterQuest characterQuest in BasePlayerCharacterController.OwningCharacter.Quests)
+            foreach (CharacterQuest characterQuest in character.Quests)
             {
                 if (HideCompleteQuest || characterQuest.isComplete)
                     continue;
@@ -117,7 +119,7 @@ namespace MultiplayerARPG
             CacheQuestList.Generate(characterQuests, (index, characterQuest, ui) =>
             {
                 UICharacterQuest uiCharacterQuest = ui.GetComponent<UICharacterQuest>();
-                uiCharacterQuest.Setup(characterQuest, BasePlayerCharacterController.OwningCharacter, index);
+                uiCharacterQuest.Setup(characterQuest, character, index);
                 uiCharacterQuest.Show();
                 CacheQuestSelectionManager.Add(uiCharacterQuest);
                 if (selectedQuestId == characterQuest.dataId)
