@@ -32,6 +32,7 @@ namespace MultiplayerARPG
         public RectTransform crosshairRect;
         public bool IsBlockController { get; protected set; }
         public float DefaultGameplayCameraFOV { get; protected set; }
+        public Vector3 DefaultGameplayCameraOffset { get; protected set; }
 
         // Temp data
         BuildingMaterial tempBuildingMaterial;
@@ -80,7 +81,10 @@ namespace MultiplayerARPG
             CurrentBuildingEntity = null;
 
             if (CacheGameplayCameraControls != null)
+            {
                 DefaultGameplayCameraFOV = CacheGameplayCameraControls.CacheCamera.fieldOfView;
+                DefaultGameplayCameraOffset = CacheGameplayCameraControls.targetOffset;
+            }
         }
 
         protected override void Setup(BasePlayerCharacterEntity characterEntity)

@@ -75,6 +75,20 @@ namespace MultiplayerARPG
                 shooterController.zoomCrosshairImage.sprite = zoomCrosshair;
             }
 
+            if (tempActiveState)
+            {
+                Vector3 offset = shooterController.CacheGameplayCameraControls.targetOffset;
+                offset.x = 0f;
+                shooterController.CacheGameplayCameraControls.targetOffset = offset;
+            }
+            else
+            {
+                shooterController.CacheGameplayCameraControls.targetOffset = shooterController.DefaultGameplayCameraOffset;
+            }
+
+            // Hidding character model
+            shooterController.PlayerCharacterEntity.CharacterModel.SetHidding(tempActiveState);
+
             return state;
         }
     }

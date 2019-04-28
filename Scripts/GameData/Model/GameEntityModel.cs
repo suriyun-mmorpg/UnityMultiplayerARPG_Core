@@ -13,6 +13,10 @@ namespace MultiplayerARPG
         private int dataId;
         public int DataId { get { return dataId; } }
 
+        [Tooltip("These object will be deactivate while hidding")]
+        public GameObject[] hiddingObjects;
+
+        public bool IsHidding { get; protected set; }
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
 
         [Header("Effect Containers")]
@@ -52,6 +56,16 @@ namespace MultiplayerARPG
             }
         }
 #endif
+
+        public void SetHidding(bool isHidding)
+        {
+            IsHidding = isHidding;
+            foreach (GameObject hiddingObject in hiddingObjects)
+            {
+                if (hiddingObject.activeSelf != !IsHidding)
+                    hiddingObject.SetActive(!IsHidding);
+            }
+        }
 
         public List<GameEffect> InstantiateEffect(GameEffect[] effects)
         {
