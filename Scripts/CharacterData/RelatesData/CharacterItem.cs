@@ -189,7 +189,7 @@ public class CharacterItem : INetSerializable
         Item item = GetWeaponItem();
         if (item != null)
         {
-            if (item.WeaponType.ammoCapacity > 0)
+            if (item.ammoCapacity > 0)
                 return ammo == 0;
         }
         return false;
@@ -200,8 +200,8 @@ public class CharacterItem : INetSerializable
         Item item = GetWeaponItem();
         if (item != null)
         {
-            if (item.WeaponType.ammoCapacity > 0)
-                return ammo >= item.WeaponType.ammoCapacity;
+            if (item.ammoCapacity > 0)
+                return ammo >= item.ammoCapacity;
         }
         return true;
     }

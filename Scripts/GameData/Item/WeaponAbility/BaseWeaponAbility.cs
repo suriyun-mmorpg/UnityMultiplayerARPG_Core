@@ -6,13 +6,11 @@ namespace MultiplayerARPG
 {
     public abstract class BaseWeaponAbility : ScriptableObject
     {
-        protected ShooterPlayerCharacterController playerCharacterController;
-        protected Camera controllerCamera;
+        protected BasePlayerCharacterController playerCharacterController;
 
-        public virtual void Setup(ShooterPlayerCharacterController controller)
+        public virtual void Setup(BasePlayerCharacterController controller)
         {
             playerCharacterController = controller;
-            controllerCamera = controller.CacheGameplayCameraControls.CacheCamera;
         }
 
         // TODO: May add more abstract functions later

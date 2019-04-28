@@ -28,12 +28,10 @@ namespace MultiplayerARPG
         public float angularSpeed = 800f;
         [Range(0, 1f)]
         public float turnToTargetDuration = 0.1f;
-        public FollowCameraControls gameplayCameraPrefab;
         public bool showConfirmConstructionUI;
         public RectTransform crosshairRect;
-        public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
-        public float DefaultGameplayCameraFOV { get; protected set; }
         public bool IsBlockController { get; protected set; }
+        public float DefaultGameplayCameraFOV { get; protected set; }
 
         // Temp data
         BuildingMaterial tempBuildingMaterial;
@@ -81,12 +79,8 @@ namespace MultiplayerARPG
             buildingItemIndex = -1;
             CurrentBuildingEntity = null;
 
-            if (gameplayCameraPrefab != null)
-            {
-                // Set parent transform to root for the best performance
-                CacheGameplayCameraControls = Instantiate(gameplayCameraPrefab);
+            if (CacheGameplayCameraControls != null)
                 DefaultGameplayCameraFOV = CacheGameplayCameraControls.CacheCamera.fieldOfView;
-            }
         }
 
         protected override void Setup(BasePlayerCharacterEntity characterEntity)
@@ -95,9 +89,6 @@ namespace MultiplayerARPG
 
             if (characterEntity == null)
                 return;
-
-            if (CacheGameplayCameraControls != null)
-                CacheGameplayCameraControls.target = characterEntity.CacheTransform;
 
             tempLookAt = characterEntity.CacheTransform.rotation;
             
@@ -109,9 +100,6 @@ namespace MultiplayerARPG
         protected override void Desetup(BasePlayerCharacterEntity characterEntity)
         {
             base.Desetup(characterEntity);
-
-            if (CacheGameplayCameraControls != null)
-                CacheGameplayCameraControls.target = null;
 
             if (characterEntity == null)
                 return;
@@ -129,11 +117,11 @@ namespace MultiplayerARPG
             // Weapon ability will be able to use when equip weapon at main-hand only
             if (rightHandWeapon != null && leftHandWeapon == null)
             {
-                if (rightHandWeapon.WeaponType.weaponAbility != weaponAbility)
+                if (rightHandWeapon.weaponAbility != weaponAbility)
                 {
                     if (weaponAbility != null)
                         weaponAbility.ForceDeactivated();
-                    weaponAbility = rightHandWeapon.WeaponType.weaponAbility;
+                    weaponAbility = rightHandWeapon.weaponAbility;
                     weaponAbility.Setup(this);
                     weaponAbilityState = WeaponAbilityState.Deactivated;
                 }
@@ -150,8 +138,6 @@ namespace MultiplayerARPG
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            if (CacheGameplayCameraControls != null)
-                Destroy(CacheGameplayCameraControls.gameObject);
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
@@ -281,8 +267,11 @@ namespace MultiplayerARPG
                     }
                     if (tempEntity == null || tempEntity == PlayerCharacterEntity)
                         continue;
+                    // Target must be alive
+                    if (tempEntity is IDamageableEntity && (tempEntity as IDamageableEntity).IsDead())
+                        continue;
                     // Target must be in front of player character
-                    if (!PlayerCharacterEntity.IsPositionInFov(120f, tempEntity.CacheTransform.position, forward))
+                    if (!PlayerCharacterEntity.IsPositionInFov(60f, tempEntity.CacheTransform.position, forward))
                         continue;
                     // Set aim position and found target
                     tempDistance = Vector3.Distance(CacheGameplayCameraControls.CacheCameraTransform.position, tempHitInfo.point);
@@ -518,12 +507,12 @@ namespace MultiplayerARPG
                         targetLookDirection = moveLookDirection;
                 }
                 // Setup releasing state
-                if (tempPressAttackRight && rightHandWeapon != null && rightHandWeapon.WeaponType.fireType == FireType.SingleFire)
+                if (tempPressAttackRight && rightHandWeapon != null && rightHandWeapon.fireType == FireType.SingleFire)
                 {
                     // The weapon's fire mode is single fire, so player have to release fire key for next fire
                     mustReleaseFireKey = true;
                 }
-                else if (tempPressAttackLeft && leftHandWeapon != null && leftHandWeapon.WeaponType.fireType == FireType.SingleFire)
+                else if (tempPressAttackLeft && leftHandWeapon != null && leftHandWeapon.fireType == FireType.SingleFire)
                 {
                     // The weapon's fire mode is single fire, so player have to release fire key for next fire
                     mustReleaseFireKey = true;
@@ -567,6 +556,7 @@ namespace MultiplayerARPG
             if (crosshairRect == null)
                 return;
 
+            crosshairRect.gameObject.SetActive(!setting.hidden);
             currentCrosshairSize = crosshairRect.sizeDelta;
             // Change crosshair size by power
             currentCrosshairSize.x += power;

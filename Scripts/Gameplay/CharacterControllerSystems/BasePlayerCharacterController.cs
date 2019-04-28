@@ -8,6 +8,7 @@ namespace MultiplayerARPG
         public static BasePlayerCharacterController Singleton { get; protected set; }
         public static BasePlayerCharacterEntity OwningCharacter { get { return Singleton == null ? null : Singleton.PlayerCharacterEntity; } }
 
+        public FollowCameraControls gameplayCameraPrefab;
         public FollowCameraControls minimapCameraPrefab;
 
         public System.Action<BasePlayerCharacterController> onSetup;
@@ -38,6 +39,7 @@ namespace MultiplayerARPG
             get { return PlayerCharacterEntity.StoppingDistance; }
         }
 
+        public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
         public FollowCameraControls CacheMinimapCameraControls { get; protected set; }
         public UISceneGameplay CacheUISceneGameplay { get; protected set; }
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
@@ -60,6 +62,8 @@ namespace MultiplayerARPG
         protected virtual void Awake()
         {
             Singleton = this;
+            if (gameplayCameraPrefab != null)
+                CacheGameplayCameraControls = Instantiate(gameplayCameraPrefab);
             if (minimapCameraPrefab != null)
                 CacheMinimapCameraControls = Instantiate(minimapCameraPrefab);
             if (gameInstance.UISceneGameplayPrefab != null)
@@ -70,6 +74,10 @@ namespace MultiplayerARPG
         {
             if (characterEntity == null)
                 return;
+
+            // Instantiate Minimap camera, it will render to render texture
+            if (CacheGameplayCameraControls != null)
+                CacheGameplayCameraControls.target = characterEntity.CacheTransform;
 
             // Instantiate Minimap camera, it will render to render texture
             if (CacheMinimapCameraControls != null)
@@ -123,6 +131,9 @@ namespace MultiplayerARPG
 
         protected virtual void Desetup(BasePlayerCharacterEntity characterEntity)
         {
+            if (CacheGameplayCameraControls != null)
+                CacheGameplayCameraControls.target = null;
+
             if (CacheMinimapCameraControls != null)
                 CacheMinimapCameraControls.target = null;
 
@@ -168,6 +179,8 @@ namespace MultiplayerARPG
         protected virtual void OnDestroy()
         {
             Desetup(PlayerCharacterEntity);
+            if (CacheGameplayCameraControls != null)
+                Destroy(CacheGameplayCameraControls.gameObject);
             if (CacheMinimapCameraControls != null)
                 Destroy(CacheMinimapCameraControls.gameObject);
             if (CacheUISceneGameplay != null)

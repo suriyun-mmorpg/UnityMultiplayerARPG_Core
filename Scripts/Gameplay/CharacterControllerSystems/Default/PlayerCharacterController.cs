@@ -34,7 +34,6 @@ namespace MultiplayerARPG
         public float lockAttackTargetDistance = 10f;
         [Tooltip("Set this to TRUE to move to target immediately when clicked on target, if this is FALSE it will not move to target immediately")]
         public bool pointClickSetTargetImmediately;
-        public FollowCameraControls gameplayCameraPrefab;
         public GameObject targetObjectPrefab;
         [Header("Building Settings")]
         public bool buildGridSnap;
@@ -47,8 +46,7 @@ namespace MultiplayerARPG
         protected float mouseDownTime;
         protected bool isMouseDragOrHoldOrOverUI;
         protected uint lastNpcObjectId;
-
-        public FollowCameraControls CacheGameplayCameraControls { get; protected set; }
+        
         public GameObject CacheTargetObject { get; protected set; }
 
         protected BaseGameEntity targetEntity;
@@ -84,12 +82,7 @@ namespace MultiplayerARPG
             findingEnemyIndex = -1;
             isLeftHandAttacking = false;
             CurrentBuildingEntity = null;
-
-            if (gameplayCameraPrefab != null)
-            {
-                // Set parent transform to root for the best performance
-                CacheGameplayCameraControls = Instantiate(gameplayCameraPrefab);
-            }
+            
             if (targetObjectPrefab != null)
             {
                 // Set parent transform to root for the best performance
@@ -129,25 +122,12 @@ namespace MultiplayerARPG
             if (characterEntity == null)
                 return;
 
-            if (CacheGameplayCameraControls != null)
-                CacheGameplayCameraControls.target = characterEntity.CacheTransform;
-
             tempLookAt = characterEntity.CacheTransform.rotation;
-        }
-
-        protected override void Desetup(BasePlayerCharacterEntity characterEntity)
-        {
-            base.Desetup(characterEntity);
-
-            if (CacheGameplayCameraControls != null)
-                CacheGameplayCameraControls.target = null;
         }
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            if (CacheGameplayCameraControls != null)
-                Destroy(CacheGameplayCameraControls.gameObject);
             if (CacheTargetObject != null)
                 Destroy(CacheTargetObject.gameObject);
             if (activatingEntityDetector != null)

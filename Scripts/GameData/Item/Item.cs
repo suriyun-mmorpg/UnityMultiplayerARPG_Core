@@ -19,6 +19,12 @@ namespace MultiplayerARPG
         SocketEnhancer,
     }
 
+    public enum FireType : byte
+    {
+        SingleFire,
+        Automatic,
+    }
+
     [CreateAssetMenu(fileName = "Item", menuName = "Create GameData/Item")]
     public partial class Item : BaseGameData
     {
@@ -44,6 +50,21 @@ namespace MultiplayerARPG
         public float moveSpeedRateWhileAttacking = 0f;
         public DamageIncremental damageAmount;
         public IncrementalMinMaxFloat harvestDamageAmount;
+        [Tooltip("For macine gun may set this to 30 as magazine capacity, if this is 0 it will not need to have ammo loaded to shoot but still need ammo in inventory")]
+        public short ammoCapacity;
+        public BaseWeaponAbility weaponAbility;
+        public CrosshairSetting crosshairSetting = new CrosshairSetting()
+        {
+            expandPerFrameWhileMoving = 3f,
+            expandPerFrameWhileAttacking = 5f,
+            shrinkPerFrame = 8f,
+            minSpread = 10f,
+            maxSpread = 50f
+        };
+        [Header("Fire Options")]
+        public FireType fireType;
+        public Vector2 fireStagger;
+        public byte fireSpread;
 
         // Equipment
         public EquipmentModel[] equipmentModels;
@@ -277,5 +298,16 @@ namespace MultiplayerARPG
         public ResistanceAmount[] resistances;
         public DamageAmount[] damages;
         public SkillLevel[] skills;
+    }
+
+    [System.Serializable]
+    public struct CrosshairSetting
+    {
+        public bool hidden;
+        public float expandPerFrameWhileMoving;
+        public float expandPerFrameWhileAttacking;
+        public float shrinkPerFrame;
+        public float minSpread;
+        public float maxSpread;
     }
 }

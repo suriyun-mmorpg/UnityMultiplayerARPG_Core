@@ -66,6 +66,8 @@ namespace MultiplayerARPG
             actionClip = null,
             castSkillClip = null,
         };
+        public int actionStateLayer;
+        public int castSkillStateLayer;
 
         [Header("Legacy Animation Settings")]
         public Animation legacyAnimation;
@@ -645,7 +647,6 @@ namespace MultiplayerARPG
         {
             // If animator is not null, play the action animation
             ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
-            animator.SetBool(ANIM_DO_ACTION, false);
             yield return 0;
             CacheAnimatorController[defaultActionClipName] = tempActionAnimation.clip;
             AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
@@ -653,6 +654,7 @@ namespace MultiplayerARPG
                 AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
             animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
             animator.SetBool(ANIM_DO_ACTION, true);
+            animator.Play(0, actionStateLayer, 0f);
             // Waits by current transition + clip duration before end animation
             yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
             animator.SetBool(ANIM_DO_ACTION, false);
@@ -686,6 +688,7 @@ namespace MultiplayerARPG
             CacheAnimatorController[defaultCastSkillClipName] = castClip;
             yield return 0;
             animator.SetBool(ANIM_IS_CASTING_SKILL, true);
+            animator.Play(0, castSkillStateLayer, 0f);
             yield return new WaitForSecondsRealtime(duration);
             animator.SetBool(ANIM_IS_CASTING_SKILL, false);
         }

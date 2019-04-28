@@ -15,25 +15,26 @@ namespace MultiplayerARPG
 
         private float zoomInterpTime;
         private bool tempActiveState;
+        private Camera controllerCamera;
+        private ShooterPlayerCharacterController shooterController;
 
-        public override void Setup(ShooterPlayerCharacterController controller)
+        public override void Setup(BasePlayerCharacterController controller)
         {
             base.Setup(controller);
-            if (controller.zoomCrosshairImage != null)
-            {
-                controller.zoomCrosshairImage.preserveAspect = true;
-                controller.zoomCrosshairImage.raycastTarget = false;
-            }
+            shooterController = controller as ShooterPlayerCharacterController;
+            controllerCamera = controller.CacheGameplayCameraControls.CacheCamera;
+            shooterController.zoomCrosshairImage.preserveAspect = true;
+            shooterController.zoomCrosshairImage.raycastTarget = false;
         }
 
         public override void ForceDeactivated()
         {
             if (controllerCamera != null)
-                controllerCamera.fieldOfView = playerCharacterController.DefaultGameplayCameraFOV;
-            if (playerCharacterController.crosshairRect != null)
-                playerCharacterController.crosshairRect.gameObject.SetActive(true);
-            if (playerCharacterController.zoomCrosshairImage != null)
-                playerCharacterController.zoomCrosshairImage.gameObject.SetActive(false);
+                controllerCamera.fieldOfView = shooterController.DefaultGameplayCameraFOV;
+            if (shooterController.crosshairRect != null)
+                shooterController.crosshairRect.gameObject.SetActive(true);
+            if (shooterController.zoomCrosshairImage != null)
+                shooterController.zoomCrosshairImage.gameObject.SetActive(false);
         }
 
         public override WeaponAbilityState UpdateActivation(WeaponAbilityState state, float deltaTime)
@@ -41,7 +42,7 @@ namespace MultiplayerARPG
             if (state == WeaponAbilityState.Deactivating)
             {
                 zoomInterpTime += deltaTime * ZOOM_SPEED;
-                controllerCamera.fieldOfView = Mathf.Lerp(controllerCamera.fieldOfView, playerCharacterController.DefaultGameplayCameraFOV, zoomInterpTime);
+                controllerCamera.fieldOfView = Mathf.Lerp(controllerCamera.fieldOfView, shooterController.DefaultGameplayCameraFOV, zoomInterpTime);
                 if (zoomInterpTime >= 1f)
                 {
                     zoomInterpTime = 0;
@@ -60,18 +61,18 @@ namespace MultiplayerARPG
             }
 
             tempActiveState = state == WeaponAbilityState.Deactivated || state == WeaponAbilityState.Deactivating;
-            if (playerCharacterController.crosshairRect != null &&
-                playerCharacterController.crosshairRect.gameObject.activeSelf != tempActiveState)
+            if (shooterController.crosshairRect != null &&
+                shooterController.crosshairRect.gameObject.activeSelf != tempActiveState)
             {
-                playerCharacterController.crosshairRect.gameObject.SetActive(tempActiveState);
+                shooterController.crosshairRect.gameObject.SetActive(tempActiveState);
             }
 
             tempActiveState = state == WeaponAbilityState.Activated || state == WeaponAbilityState.Activating;
-            if (playerCharacterController.zoomCrosshairImage != null &&
-                playerCharacterController.zoomCrosshairImage.gameObject.activeSelf != tempActiveState)
+            if (shooterController.zoomCrosshairImage != null &&
+                shooterController.zoomCrosshairImage.gameObject.activeSelf != tempActiveState)
             {
-                playerCharacterController.zoomCrosshairImage.gameObject.SetActive(tempActiveState);
-                playerCharacterController.zoomCrosshairImage.sprite = zoomCrosshair;
+                shooterController.zoomCrosshairImage.gameObject.SetActive(tempActiveState);
+                shooterController.zoomCrosshairImage.sprite = zoomCrosshair;
             }
 
             return state;

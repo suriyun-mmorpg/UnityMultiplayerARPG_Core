@@ -64,6 +64,7 @@ namespace MultiplayerARPG
 
         private float launchTime;
         private float missileDuration;
+        private bool destroying;
 
         protected override void SetupNetElements()
         {
@@ -108,6 +109,7 @@ namespace MultiplayerARPG
                 // Explode immediately when distance and speed is 0
                 Explode();
                 NetworkDestroy(destroyDelay);
+                destroying = true;
                 return;
             }
 
@@ -118,11 +120,15 @@ namespace MultiplayerARPG
 
         protected override void EntityUpdate()
         {
+            if (destroying)
+                return;
+
             base.EntityUpdate();
             if (Time.unscaledTime - launchTime > missileDuration)
             {
                 Explode();
                 NetworkDestroy(destroyDelay);
+                destroying = true;
             }
         }
 
@@ -184,6 +190,9 @@ namespace MultiplayerARPG
 
         private void TriggerEnter(GameObject other)
         {
+            if (destroying)
+                return;
+
             IDamageableEntity target = null;
             if (IsHitGroundOrWall(other) || FindTargetEntity(other, out target))
             {
@@ -198,6 +207,7 @@ namespace MultiplayerARPG
                     Explode();
                 }
                 NetworkDestroy(destroyDelay);
+                destroying = true;
             }
         }
 

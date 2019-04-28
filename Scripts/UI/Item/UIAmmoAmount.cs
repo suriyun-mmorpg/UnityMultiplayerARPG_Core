@@ -33,7 +33,7 @@ namespace MultiplayerARPG
 
             if (textCurrentAmmo != null)
             {
-                textCurrentAmmo.gameObject.SetActive(isActive && weaponItem.WeaponType.ammoCapacity > 0);
+                textCurrentAmmo.gameObject.SetActive(isActive && weaponItem.ammoCapacity > 0);
                 if (isActive)
                     textCurrentAmmo.text = characterItem.ammo.ToString("N0");
             }

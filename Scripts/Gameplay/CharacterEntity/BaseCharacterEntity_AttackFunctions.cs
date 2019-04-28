@@ -59,13 +59,12 @@ namespace MultiplayerARPG
                 return true;
 
             Item weaponItem = weapon.GetWeaponItem();
-            WeaponType weaponType = weaponItem.WeaponType;
-            if (weaponType.requireAmmoType != null)
+            if (weaponItem.WeaponType.requireAmmoType != null)
             {
-                if (weaponType.ammoCapacity <= 0)
+                if (weaponItem.ammoCapacity <= 0)
                 {
                     // Ammo capacity is 0 so reduce ammo from inventory
-                    if (this.CountAmmos(weaponType.requireAmmoType) == 0)
+                    if (this.CountAmmos(weaponItem.WeaponType.requireAmmoType) == 0)
                     {
                         // TODO: send no ammo message
                         return false;
@@ -92,12 +91,11 @@ namespace MultiplayerARPG
                 return;
 
             Item weaponItem = weapon.GetWeaponItem();
-            WeaponType weaponType = weaponItem.WeaponType;
-            if (weaponType.ammoCapacity <= 0)
+            if (weaponItem.ammoCapacity <= 0)
             {
                 // Ammo capacity is 0 so reduce ammo from inventory
                 Dictionary<CharacterItem, short> decreaseAmmoItems;
-                if (this.DecreaseAmmos(weaponType.requireAmmoType, 1, out decreaseAmmoItems))
+                if (this.DecreaseAmmos(weaponItem.WeaponType.requireAmmoType, 1, out decreaseAmmoItems))
                 {
                     KeyValuePair<CharacterItem, short> firstEntry = decreaseAmmoItems.FirstOrDefault();
                     CharacterItem ammoCharacterItem = firstEntry.Key;
@@ -145,8 +143,8 @@ namespace MultiplayerARPG
             if (weaponItem != null &&
                 weaponItem.WeaponType != null &&
                 weaponItem.WeaponType.requireAmmoType != null &&
-                weaponItem.WeaponType.ammoCapacity > 0 &&
-                weapon.ammo < weaponItem.WeaponType.ammoCapacity)
+                weaponItem.ammoCapacity > 0 &&
+                weapon.ammo < weaponItem.ammoCapacity)
             {
                 // Prepare reload data
                 AnimActionType animActionType = isLeftHand ? AnimActionType.ReloadLeftHand : AnimActionType.ReloadRightHand;
@@ -158,7 +156,7 @@ namespace MultiplayerARPG
                 else
                     CharacterModel.GetLeftHandReloadAnimation(weaponTypeDataId, out triggerDuration, out totalDuration);
 
-                int reloadingAmount = weaponItem.WeaponType.ammoCapacity - weapon.ammo;
+                int reloadingAmount = weaponItem.ammoCapacity - weapon.ammo;
                 int inventoryAmount = this.CountAmmos(weaponItem.WeaponType.requireAmmoType);
                 if (inventoryAmount < reloadingAmount)
                     reloadingAmount = inventoryAmount;
@@ -188,8 +186,9 @@ namespace MultiplayerARPG
 
             // Prepare data
             EquipWeapons equipWeapons = EquipWeapons;
+            Item weaponItem = weapon.GetWeaponItem();
             Dictionary<CharacterItem, short> decreaseItems;
-            if (this.DecreaseAmmos(weapon.GetWeaponItem().WeaponType.requireAmmoType, reloadingAmount, out decreaseItems))
+            if (this.DecreaseAmmos(weaponItem.WeaponType.requireAmmoType, reloadingAmount, out decreaseItems))
             {
                 weapon.ammo += reloadingAmount;
                 if (isLeftHand)
@@ -208,9 +207,10 @@ namespace MultiplayerARPG
         /// </summary>
         protected virtual void NetFuncAttack(bool isLeftHand, bool hasAimPosition, Vector3 aimPosition)
         {
+            /*
             if (!CanAttack())
                 return;
-
+                */
             // Prepare requires data
             AnimActionType animActionType;
             int weaponTypeDataId;
@@ -294,9 +294,10 @@ namespace MultiplayerARPG
             Vector3 fireStagger = Vector3.zero;
             if (weapon != null && weapon.GetWeaponItem() != null)
             {
+                Item weaponItem = weapon.GetWeaponItem();
                 // For monsters, their weapon can be null so have to avoid null exception
-                fireSpread = weapon.GetWeaponItem().WeaponType.fireSpread;
-                fireStagger = weapon.GetWeaponItem().WeaponType.fireStagger;
+                fireSpread = weaponItem.fireSpread;
+                fireStagger = weaponItem.fireStagger;
             }
 
             Vector3 stagger;
