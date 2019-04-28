@@ -246,9 +246,15 @@ namespace MultiplayerARPG
 
                 // Calculate aim distance by skill or weapon
                 if (queueSkill != null && queueSkill.IsAttack())
+                {
+                    // Increase aim distance by skill attack distance
                     aimDistance += PlayerCharacterEntity.GetSkillAttackDistance(queueSkill, isLeftHandAttacking);
+                }
                 else
+                {
+                    // Increase aim distance by attack distance
                     aimDistance += PlayerCharacterEntity.GetAttackDistance(isLeftHandAttacking);
+                }
             }
             actionLookDirection = aimPosition = ray.origin + ray.direction * aimDistance;
             actionLookDirection.y = PlayerCharacterEntity.CacheTransform.position.y;
@@ -274,6 +280,9 @@ namespace MultiplayerARPG
                             tempEntity = tempBuildingMaterial.buildingEntity;
                     }
                     if (tempEntity == null || tempEntity == PlayerCharacterEntity)
+                        continue;
+                    // Target must be in front of player character
+                    if (!PlayerCharacterEntity.IsPositionInFov(120f, tempEntity.CacheTransform.position, forward))
                         continue;
                     // Set aim position and found target
                     tempDistance = Vector3.Distance(CacheGameplayCameraControls.CacheCameraTransform.position, tempHitInfo.point);
@@ -404,9 +413,13 @@ namespace MultiplayerARPG
                 {
                     tempPressAttackRight = false;
                     tempPressAttackLeft = false;
-                    if (!isLeftHandAttacking && InputManager.GetButtonUp("Fire1"))
+                    if (!isLeftHandAttacking &&
+                        (InputManager.GetButtonUp("Fire1") ||
+                        !InputManager.GetButton("Fire1")))
                         mustReleaseFireKey = false;
-                    if (isLeftHandAttacking && InputManager.GetButtonUp("Fire2"))
+                    if (isLeftHandAttacking &&
+                        (InputManager.GetButtonUp("Fire2") ||
+                        !InputManager.GetButton("Fire2")))
                         mustReleaseFireKey = false;
                 }
                 // Not building so it is attacking
@@ -495,11 +508,8 @@ namespace MultiplayerARPG
                 }
                 else if (tempPressReload)
                 {
-                    // Reload ammo at server
-                    if (!PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoFull())
-                        PlayerCharacterEntity.RequestReload(false);
-                    else if (!PlayerCharacterEntity.EquipWeapons.leftHand.IsAmmoFull())
-                        PlayerCharacterEntity.RequestReload(true);
+                    // Reload ammo when press the button
+                    ReloadAmmo();
                 }
                 else
                 {
@@ -509,9 +519,23 @@ namespace MultiplayerARPG
                 }
                 // Setup releasing state
                 if (tempPressAttackRight && rightHandWeapon != null && rightHandWeapon.WeaponType.fireType == FireType.SingleFire)
+                {
+                    // The weapon's fire mode is single fire, so player have to release fire key for next fire
                     mustReleaseFireKey = true;
+                }
                 else if (tempPressAttackLeft && leftHandWeapon != null && leftHandWeapon.WeaponType.fireType == FireType.SingleFire)
+                {
+                    // The weapon's fire mode is single fire, so player have to release fire key for next fire
                     mustReleaseFireKey = true;
+                }
+                // Auto reload
+                if (!tempPressAttackRight && !tempPressAttackLeft && !tempPressReload &&
+                    (PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoEmpty() ||
+                    PlayerCharacterEntity.EquipWeapons.leftHand.IsAmmoEmpty()))
+                {
+                    // Reload ammo when empty and not press any keys
+                    ReloadAmmo();
+                }
             }
             SetAimPosition(aimPosition);
 
@@ -527,6 +551,15 @@ namespace MultiplayerARPG
                 movementState |= MovementFlag.IsJump;
 
             PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
+        }
+
+        private void ReloadAmmo()
+        {
+            // Reload ammo at server
+            if (!PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoFull())
+                PlayerCharacterEntity.RequestReload(false);
+            else if (!PlayerCharacterEntity.EquipWeapons.leftHand.IsAmmoFull())
+                PlayerCharacterEntity.RequestReload(true);
         }
 
         private void UpdateCrosshair(CrosshairSetting setting, float power)
