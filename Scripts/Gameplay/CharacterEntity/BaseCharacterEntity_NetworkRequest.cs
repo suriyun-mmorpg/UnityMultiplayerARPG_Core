@@ -21,21 +21,29 @@ namespace MultiplayerARPG
 
         public virtual void RequestAttack(bool isLeftHand)
         {
+            if (!CanAttack())
+                return;
             CallNetFunction(NetFuncAttackWithoutAimPosition, FunctionReceivers.Server, isLeftHand);
         }
 
         public virtual void RequestAttack(bool isLeftHand, Vector3 aimPosition)
         {
+            if (!CanAttack())
+                return;
             CallNetFunction(NetFuncAttackWithAimPosition, FunctionReceivers.Server, isLeftHand, aimPosition);
         }
 
         public virtual void RequestUseSkill(int dataId, bool isLeftHand)
         {
+            if (!CanUseSkill())
+                return;
             CallNetFunction(NetFuncUseSkillWithoutAimPosition, FunctionReceivers.Server, dataId, isLeftHand);
         }
 
         public virtual void RequestUseSkill(int dataId, bool isLeftHand, Vector3 aimPosition)
         {
+            if (!CanUseSkill())
+                return;
             CallNetFunction(NetFuncUseSkillWithAimPosition, FunctionReceivers.Server, dataId, isLeftHand, aimPosition);
         }
 
