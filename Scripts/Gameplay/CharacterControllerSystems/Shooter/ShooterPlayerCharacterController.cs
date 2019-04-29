@@ -275,7 +275,7 @@ namespace MultiplayerARPG
                     if (tempEntity is IDamageableEntity && (tempEntity as IDamageableEntity).IsDead())
                         continue;
                     // Target must be in front of player character
-                    if (!PlayerCharacterEntity.IsPositionInFov(60f, tempEntity.CacheTransform.position, forward))
+                    if (!PlayerCharacterEntity.IsPositionInFov(15f, tempEntity.CacheTransform.position, forward))
                         continue;
                     // Set aim position and found target
                     tempDistance = Vector3.Distance(CacheGameplayCameraControls.CacheCameraTransform.position, tempHitInfo.point);
