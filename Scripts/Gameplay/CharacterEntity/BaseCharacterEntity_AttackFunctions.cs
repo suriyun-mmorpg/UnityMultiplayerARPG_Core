@@ -314,8 +314,15 @@ namespace MultiplayerARPG
                     aimPosition,
                     stagger);
             }
+            RequestPlayWeaponLaunchEffect(isLeftHand);
             yield return new WaitForSecondsRealtime(totalDuration - triggerDuration);
             isAttackingOrUsingSkill = false;
+        }
+
+        protected virtual void NetFuncPlayWeaponLaunchEffect(bool isLeftHand)
+        {
+            if (CharacterModel != null)
+                CharacterModel.PlayWeaponLaunchEffect(isLeftHand);
         }
     }
 }

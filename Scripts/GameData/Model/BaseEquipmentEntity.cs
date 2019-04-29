@@ -2,24 +2,38 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BaseEquipmentEntity : MonoBehaviour
+namespace MultiplayerARPG
 {
-    private int level;
-    public int Level
+    public abstract class BaseEquipmentEntity : MonoBehaviour
     {
-        get { return level; }
-        set
+        private int level;
+        public int Level
         {
-            if (level != value)
+            get { return level; }
+            set
             {
-                level = value;
-                OnLevelChanged(level);
+                if (level != value)
+                {
+                    level = value;
+                    OnLevelChanged(level);
+                }
             }
         }
+
+        public ParticleSystem[] weaponLaunchEffects;
+        public AudioClip[] weaponLaunchSoundEffects;
+        [Tooltip("This is overriding missile damage transform, if this is not empty, it will spawn missile damage entity from this transform")]
+        public Transform missileDamageTransform;
+
+        public void PlayWeaponLaunchEffect()
+        {
+            if (weaponLaunchEffects != null && weaponLaunchEffects.Length > 0)
+                weaponLaunchEffects[Random.Range(0, weaponLaunchEffects.Length)].Play();
+
+            if (weaponLaunchSoundEffects != null && weaponLaunchSoundEffects.Length > 0)
+                AudioSource.PlayClipAtPoint(weaponLaunchSoundEffects[Random.Range(0, weaponLaunchEffects.Length)], transform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
+
+        }
+        public abstract void OnLevelChanged(int level);
     }
-
-    [Tooltip("This is overriding missile damage transform, if this is not empty, it will spawn missile damage entity from this transform")]
-    public Transform missileDamageTransform;
-
-    public abstract void OnLevelChanged(int level);
 }

@@ -8,6 +8,10 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
+        public virtual void RequestPlayWeaponLaunchEffect(bool isLeftHand)
+        {
+            CallNetFunction(NetFuncPlayWeaponLaunchEffect, FunctionReceivers.All, isLeftHand);
+        }
 
         public virtual void RequestSetAimPosition(Vector3 aimPosition)
         {

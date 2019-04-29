@@ -465,12 +465,12 @@ namespace MultiplayerARPG
                     break;
                 case DamageType.Missile:
                     Transform tempMissileDamageTransform = null;
-                    if ((tempMissileDamageTransform = CharacterModel.GetRightHandEquipmentEntity()) != null && !isLeftHand)
+                    if ((tempMissileDamageTransform = CharacterModel.GetRightHandMissileDamageTransform()) != null && !isLeftHand)
                     {
                         // Use position from right hand weapon missile damage transform
                         position = tempMissileDamageTransform.position;
                     }
-                    else if ((tempMissileDamageTransform = CharacterModel.GetLeftHandEquipmentEntity()) != null && isLeftHand)
+                    else if ((tempMissileDamageTransform = CharacterModel.GetLeftHandMissileDamageTransform()) != null && isLeftHand)
                     {
                         // Use position from left hand weapon missile damage transform
                         position = tempMissileDamageTransform.position;
