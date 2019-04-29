@@ -637,9 +637,20 @@ namespace MultiplayerARPG
             if (animatorType == AnimatorType.LegacyAnimtion)
             {
                 CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
+                isPlayingActionAnimation = false;
                 return;
             }
             animator.SetBool(ANIM_DO_ACTION, false);
+        }
+
+        public override void StopSkillCastAnimation()
+        {
+            if (animatorType == AnimatorType.LegacyAnimtion)
+            {
+                CrossFadeLegacyAnimation(LEGACY_CLIP_IDLE, legacyAnimationData.idleClipFadeLength, WrapMode.Loop);
+                return;
+            }
+            animator.SetBool(ANIM_IS_CASTING_SKILL, false);
         }
 
         #region Action Animation Functions

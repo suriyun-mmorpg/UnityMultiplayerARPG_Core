@@ -349,6 +349,11 @@ namespace MultiplayerARPG
             playingAction = false;
         }
 
+        public override void StopSkillCastAnimation()
+        {
+            playingAction = false;
+        }
+
         public override void PlayHurtAnimation()
         {
             // TODO: 2D may just play blink red color

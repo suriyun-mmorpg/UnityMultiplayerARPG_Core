@@ -212,6 +212,12 @@ namespace MultiplayerARPG
         public override void StopActionAnimation()
         {
             CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
+            isPlayingActionAnimation = false;
+        }
+
+        public override void StopSkillCastAnimation()
+        {
+            CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
         }
 
         public override void PlayHurtAnimation()

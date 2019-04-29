@@ -252,7 +252,10 @@ namespace MultiplayerARPG
             isAttackingOrUsingSkill = false;
             castingSkillDuration = castingSkillCountDown = 0;
             if (CharacterModel != null)
+            {
                 CharacterModel.StopActionAnimation();
+                CharacterModel.StopSkillCastAnimation();
+            }
         }
 
         protected virtual void ApplySkill(Skill skill, short level, bool isLeftHand, CharacterItem weapon, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, bool hasAimPosition, Vector3 aimPosition)
