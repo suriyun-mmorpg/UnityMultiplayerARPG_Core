@@ -961,7 +961,11 @@ namespace MultiplayerARPG
         #region Allowed abilities
         public virtual bool IsPlayingActionAnimation()
         {
-            return animActionType == AnimActionType.AttackRightHand || animActionType == AnimActionType.AttackLeftHand || animActionType == AnimActionType.Skill;
+            return animActionType == AnimActionType.AttackRightHand || 
+                animActionType == AnimActionType.AttackLeftHand || 
+                animActionType == AnimActionType.Skill ||
+                animActionType == AnimActionType.ReloadRightHand ||
+                animActionType == AnimActionType.ReloadLeftHand;
         }
 
         public virtual bool CanDoActions()

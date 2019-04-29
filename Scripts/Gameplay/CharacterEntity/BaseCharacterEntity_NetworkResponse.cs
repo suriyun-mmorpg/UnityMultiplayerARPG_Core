@@ -112,6 +112,13 @@ namespace MultiplayerARPG
                     if (GameInstance.Skills.ContainsKey(skillOrWeaponTypeDataId))
                         moveSpeedRateWhileAttackOrUseSkill = GameInstance.Skills[skillOrWeaponTypeDataId].moveSpeedRateWhileUsingSkill;
                     break;
+                case AnimActionType.ReloadLeftHand:
+                case AnimActionType.ReloadRightHand:
+                    // Set doing action state at clients and server
+                    isAttackingOrUsingSkill = true;
+                    // Calculate move speed rate while doing action at clients and server
+                    moveSpeedRateWhileAttackOrUseSkill = 1f;
+                    break;
             }
             if (CharacterModel != null)
                 yield return CharacterModel.PlayActionAnimation(animActionType, skillOrWeaponTypeDataId, index, playSpeedMultiplier);
