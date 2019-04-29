@@ -281,19 +281,20 @@ namespace MultiplayerARPG
             return moveDirection;
         }
 
-        public void RequestUsePendingSkill(bool isLeftHand, Vector3? aimPosition)
+        public bool RequestUsePendingSkill(bool isLeftHand, Vector3? aimPosition)
         {
             if (queueUsingSkill.HasValue && PlayerCharacterEntity.CanUseSkill())
             {
                 UsingSkillData queueUsingSkillValue = queueUsingSkill.Value;
                 if (queueUsingSkillValue.aimPosition.HasValue)
                     aimPosition = queueUsingSkillValue.aimPosition.Value;
-                if (aimPosition.HasValue)
-                    PlayerCharacterEntity.RequestUseSkill(queueUsingSkillValue.dataId, isLeftHand, aimPosition.Value);
-                else
-                    PlayerCharacterEntity.RequestUseSkill(queueUsingSkillValue.dataId, isLeftHand);
                 queueUsingSkill = null;
+                if (aimPosition.HasValue)
+                    return PlayerCharacterEntity.RequestUseSkill(queueUsingSkillValue.dataId, isLeftHand, aimPosition.Value);
+                else
+                    return PlayerCharacterEntity.RequestUseSkill(queueUsingSkillValue.dataId, isLeftHand);
             }
+            return false;
         }
 
         public void RequestEquipItem(short itemIndex)

@@ -127,13 +127,22 @@ namespace MultiplayerARPG
 
         public bool FindTarget(GameObject target, float actDistance, int layerMask)
         {
-            int tempCount = OverlapObjects(CharacterTransform.position, actDistance, layerMask);
-            for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
+            Collider tempCollider = target.GetComponent<Collider>();
+            if (tempCollider != null)
             {
-                tempGameObject = GetOverlapObject(tempCounter);
-                if (tempGameObject == target)
-                    return true;
+                Ray ray = new Ray(PlayerCharacterEntity.CacheTransform.position, (target.transform.position - PlayerCharacterEntity.CacheTransform.position).normalized);
+                float intersectDist;
+                return tempCollider.bounds.IntersectRay(ray, out intersectDist) && intersectDist < actDistance;
             }
+
+            Collider2D tempCollider2D = target.GetComponent<Collider2D>();
+            if (tempCollider2D != null)
+            {
+                Ray ray = new Ray(PlayerCharacterEntity.CacheTransform.position, (target.transform.position - PlayerCharacterEntity.CacheTransform.position).normalized);
+                float intersectDist;
+                return tempCollider2D.bounds.IntersectRay(ray, out intersectDist) && intersectDist < actDistance;
+            }
+
             return false;
         }
 

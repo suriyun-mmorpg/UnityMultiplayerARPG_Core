@@ -815,39 +815,43 @@ namespace MultiplayerARPG
 
         public virtual float GetAttackDistance(bool isLeftHand)
         {
-            Item rightHandWeapon = null;
-            Item leftHandWeapon = null;
-
+            Item rightWeaponItem = EquipWeapons.rightHand.GetWeaponItem();
+            Item leftWeaponItem = EquipWeapons.leftHand.GetWeaponItem();
             if (!isLeftHand)
-                rightHandWeapon = EquipWeapons.rightHand.GetWeaponItem();
+            {
+                if (rightWeaponItem != null)
+                    return rightWeaponItem.WeaponType.damageInfo.GetDistance();
+                if (rightWeaponItem == null && leftWeaponItem != null)
+                    return leftWeaponItem.WeaponType.damageInfo.GetDistance();
+            }
             else
-                leftHandWeapon = EquipWeapons.leftHand.GetWeaponItem();
-
-            if (rightHandWeapon != null)
-                return rightHandWeapon.WeaponType.damageInfo.GetDistance();
-
-            if (leftHandWeapon != null)
-                return leftHandWeapon.WeaponType.damageInfo.GetDistance();
-
+            {
+                if (leftWeaponItem != null)
+                    return leftWeaponItem.WeaponType.damageInfo.GetDistance();
+                if (leftWeaponItem == null && rightWeaponItem != null)
+                    return rightWeaponItem.WeaponType.damageInfo.GetDistance();
+            }
             return gameInstance.DefaultWeaponItem.WeaponType.damageInfo.GetDistance();
         }
 
         public virtual float GetAttackFov(bool isLeftHand)
         {
-            Item rightHandWeapon = null;
-            Item leftHandWeapon = null;
-
+            Item rightWeaponItem = EquipWeapons.rightHand.GetWeaponItem();
+            Item leftWeaponItem = EquipWeapons.leftHand.GetWeaponItem();
             if (!isLeftHand)
-                rightHandWeapon = EquipWeapons.rightHand.GetWeaponItem();
+            {
+                if (rightWeaponItem != null)
+                    return rightWeaponItem.WeaponType.damageInfo.GetFov();
+                if (rightWeaponItem == null && leftWeaponItem != null)
+                    return leftWeaponItem.WeaponType.damageInfo.GetFov();
+            }
             else
-                leftHandWeapon = EquipWeapons.leftHand.GetWeaponItem();
-
-            if (rightHandWeapon != null)
-                return rightHandWeapon.WeaponType.damageInfo.GetFov();
-
-            if (leftHandWeapon != null)
-                return leftHandWeapon.WeaponType.damageInfo.GetFov();
-
+            {
+                if (leftWeaponItem != null)
+                    return leftWeaponItem.WeaponType.damageInfo.GetFov();
+                if (leftWeaponItem == null && rightWeaponItem != null)
+                    return rightWeaponItem.WeaponType.damageInfo.GetFov();
+            }
             return gameInstance.DefaultWeaponItem.WeaponType.damageInfo.GetFov();
         }
 

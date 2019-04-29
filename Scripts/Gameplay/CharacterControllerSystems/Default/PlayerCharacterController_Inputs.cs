@@ -70,11 +70,8 @@ namespace MultiplayerARPG
                 // Reload
                 if (InputManager.GetButtonDown("Reload"))
                 {
-                    // Reload ammo at server
-                    if (!PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoFull())
-                        PlayerCharacterEntity.RequestReload(false);
-                    else if (!PlayerCharacterEntity.EquipWeapons.leftHand.IsAmmoFull())
-                        PlayerCharacterEntity.RequestReload(true);
+                    // Reload ammo when press the button
+                    ReloadAmmo();
                 }
                 // Find target to attack
                 if (InputManager.GetButtonDown("FindEnemy"))
@@ -93,6 +90,13 @@ namespace MultiplayerARPG
                         }
                     }
                 }
+                // Auto reload
+                if (PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoEmpty() ||
+                    PlayerCharacterEntity.EquipWeapons.leftHand.IsAmmoEmpty())
+                {
+                    // Reload ammo when empty and not press any keys
+                    ReloadAmmo();
+                }
             }
             // Update enemy detecting radius to attack distance
             enemyEntityDetector.detectingRadius = PlayerCharacterEntity.GetAttackDistance(false) + lockAttackTargetDistance;
@@ -100,6 +104,15 @@ namespace MultiplayerARPG
             UpdatePointClickInput();
             UpdateWASDInput();
             UpdateBuilding();
+        }
+
+        protected void ReloadAmmo()
+        {
+            // Reload ammo at server
+            if (!PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoFull())
+                PlayerCharacterEntity.RequestReload(false);
+            else if (!PlayerCharacterEntity.EquipWeapons.leftHand.IsAmmoFull())
+                PlayerCharacterEntity.RequestReload(true);
         }
 
         protected virtual void UpdatePointClickInput()
@@ -314,15 +327,15 @@ namespace MultiplayerARPG
                             else
                             {
                                 // No nearby target, so use skill immediately
-                                RequestUsePendingSkill(isLeftHandAttacking, null);
-                                isLeftHandAttacking = !isLeftHandAttacking;
+                                if (RequestUsePendingSkill(isLeftHandAttacking, null))
+                                    isLeftHandAttacking = !isLeftHandAttacking;
                             }
                         }
                         else if (!wasdLockAttackTarget)
                         {
                             // Not lock target, so not finding target and use skill immediately
-                            RequestUsePendingSkill(isLeftHandAttacking, null);
-                            isLeftHandAttacking = !isLeftHandAttacking;
+                            if (RequestUsePendingSkill(isLeftHandAttacking, null))
+                                isLeftHandAttacking = !isLeftHandAttacking;
                         }
                     }
                     else
@@ -360,8 +373,8 @@ namespace MultiplayerARPG
                     else
                     {
                         // No nearby target, so attack immediately
-                        PlayerCharacterEntity.RequestAttack(isLeftHandAttacking);
-                        isLeftHandAttacking = !isLeftHandAttacking;
+                        if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking))
+                            isLeftHandAttacking = !isLeftHandAttacking;
                     }
                 }
                 else if (!wasdLockAttackTarget)
@@ -377,8 +390,8 @@ namespace MultiplayerARPG
                         PlayerCharacterEntity.GetAttackFov(isLeftHandAttacking));
                     SelectedEntity = nearestTarget;
                     // Not lock target, so not finding target and attack immediately
-                    PlayerCharacterEntity.RequestAttack(isLeftHandAttacking);
-                    isLeftHandAttacking = !isLeftHandAttacking;
+                    if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking))
+                        isLeftHandAttacking = !isLeftHandAttacking;
                 }
             }
             // Move
@@ -446,6 +459,7 @@ namespace MultiplayerARPG
                 float attackFov = 0f;
                 if (!GetAttackDataOrUseNonAttackSkill(isLeftHandAttacking, out attackDistance, out attackFov))
                     return;
+
                 float actDistance = attackDistance;
                 actDistance -= actDistance * 0.1f;
                 actDistance -= StoppingDistance;
@@ -458,11 +472,11 @@ namespace MultiplayerARPG
                     if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetEnemy.CacheTransform.position))
                     {
                         // If has queue using skill, attack by the skill
-                        if (queueUsingSkill.HasValue)
-                            RequestUsePendingSkill(isLeftHandAttacking, targetEnemy.OpponentAimTransform.position);
-                        else
-                            PlayerCharacterEntity.RequestAttack(isLeftHandAttacking, targetEnemy.OpponentAimTransform.position);
-                        isLeftHandAttacking = !isLeftHandAttacking;
+                        if (queueUsingSkill.HasValue &&
+                            RequestUsePendingSkill(isLeftHandAttacking, targetEnemy.OpponentAimTransform.position))
+                            isLeftHandAttacking = !isLeftHandAttacking;
+                        else if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking, targetEnemy.OpponentAimTransform.position))
+                            isLeftHandAttacking = !isLeftHandAttacking;
                     }
                 }
                 else
@@ -585,8 +599,8 @@ namespace MultiplayerARPG
                     targetLookDirection = (targetHarvestable.CacheTransform.position - PlayerCharacterEntity.CacheTransform.position).normalized;
                     if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetHarvestable.CacheTransform.position))
                     {
-                        PlayerCharacterEntity.RequestAttack(isLeftHandAttacking, targetHarvestable.OpponentAimTransform.position);
-                        isLeftHandAttacking = !isLeftHandAttacking;
+                        if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking, targetHarvestable.OpponentAimTransform.position))
+                            isLeftHandAttacking = !isLeftHandAttacking;
                     }
                 }
                 else

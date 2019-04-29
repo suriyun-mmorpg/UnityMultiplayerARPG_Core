@@ -5,366 +5,431 @@ namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
     {
-        public virtual void RequestSwapOrMergeItem(short fromIndex, short toIndex)
+        public bool RequestSwapOrMergeItem(short fromIndex, short toIndex)
         {
             if (IsDead())
-                return;
+                return false;
             CallNetFunction(NetFuncSwapOrMergeItem, FunctionReceivers.Server, fromIndex, toIndex);
+            return true;
         }
 
-        public virtual void RequestAddAttribute(int dataId)
+        public bool RequestAddAttribute(int dataId)
         {
             if (IsDead())
-                return;
+                return false;
             CallNetFunction(NetFuncAddAttribute, FunctionReceivers.Server, dataId);
+            return true;
         }
 
-        public virtual void RequestAddSkill(int dataId)
+        public bool RequestAddSkill(int dataId)
         {
             if (IsDead())
-                return;
+                return false;
             CallNetFunction(NetFuncAddSkill, FunctionReceivers.Server, dataId);
+            return true;
         }
 
-        public virtual void RequestAddGuildSkill(int dataId)
+        public bool RequestAddGuildSkill(int dataId)
         {
             if (IsDead())
-                return;
+                return false;
             CallNetFunction(NetFuncAddGuildSkill, FunctionReceivers.Server, dataId);
+            return true;
         }
 
-        public virtual void RequestUseGuildSkill(int dataId)
+        public bool RequestUseGuildSkill(int dataId)
         {
             if (IsDead())
-                return;
+                return false;
             CallNetFunction(NetFuncUseGuildSkill, FunctionReceivers.Server, dataId);
+            return true;
         }
 
-        public virtual void RequestRespawn()
+        public bool RequestRespawn()
         {
             if (!IsDead())
-                return;
+                return false;
             CallNetFunction(NetFuncRespawn, FunctionReceivers.Server);
+            return true;
         }
 
-        public virtual void RequestAssignHotkey(string hotkeyId, HotkeyType type, int dataId)
+        public bool RequestAssignHotkey(string hotkeyId, HotkeyType type, int dataId)
         {
             CallNetFunction(NetFuncAssignHotkey, FunctionReceivers.Server, hotkeyId, (byte)type, dataId);
+            return true;
         }
 
-        public virtual void RequestNpcActivate(uint objectId)
+        public bool RequestNpcActivate(uint objectId)
         {
             if (IsDead())
-                return;
+                return false;
             CallNetFunction(NetFuncNpcActivate, FunctionReceivers.Server, new PackedUInt(objectId));
+            return true;
         }
 
-        public virtual void RequestShowNpcDialog(int dataId)
+        public bool RequestShowNpcDialog(int dataId)
         {
             if (IsDead())
-                return;
+                return false;
             CallNetFunction(NetFuncShowNpcDialog, ConnectionId, dataId);
+            return true;
         }
 
-        public virtual void RequestShowNpcRefine()
+        public bool RequestShowNpcRefine()
         {
             if (IsDead())
-                return;
+                return false;
             CallNetFunction(NetFuncShowNpcRefine, ConnectionId);
+            return true;
         }
 
-        public virtual void RequestSelectNpcDialogMenu(byte menuIndex)
+        public bool RequestSelectNpcDialogMenu(byte menuIndex)
         {
             if (IsDead())
-                return;
+                return false;
             CallNetFunction(NetFuncSelectNpcDialogMenu, FunctionReceivers.Server, menuIndex);
+            return true;
         }
 
-        public virtual void RequestBuyNpcItem(short itemIndex, short amount)
+        public bool RequestBuyNpcItem(short itemIndex, short amount)
         {
             if (IsDead())
-                return;
+                return false;
             CallNetFunction(NetFuncBuyNpcItem, FunctionReceivers.Server, itemIndex, amount);
+            return true;
         }
 
-        public virtual void RequestEnterWarp()
+        public bool RequestEnterWarp()
         {
             if (!CanDoActions() || warpingPortal == null)
-                return;
+                return false;
             CallNetFunction(NetFuncEnterWarp, FunctionReceivers.Server);
+            return true;
         }
 
-        public virtual void RequestBuild(short itemIndex, Vector3 position, Quaternion rotation, uint parentObjectId)
+        public bool RequestBuild(short itemIndex, Vector3 position, Quaternion rotation, uint parentObjectId)
         {
             if (!CanDoActions())
-                return;
+                return false;
             CallNetFunction(NetFuncBuild, FunctionReceivers.Server, itemIndex, position, rotation, new PackedUInt(parentObjectId));
+            return true;
         }
 
-        public virtual void RequestDestroyBuilding(uint objectId)
+        public bool RequestDestroyBuilding(uint objectId)
         {
             if (!CanDoActions())
-                return;
+                return false;
             CallNetFunction(NetFuncDestroyBuilding, FunctionReceivers.Server, new PackedUInt(objectId));
+            return true;
         }
 
-        public virtual void RequestSellItem(short nonEquipIndex, short amount)
+        public bool RequestSellItem(short nonEquipIndex, short amount)
         {
             if (IsDead() ||
                 nonEquipIndex >= NonEquipItems.Count)
-                return;
+                return false;
             CallNetFunction(NetFuncSellItem, FunctionReceivers.Server, nonEquipIndex, amount);
+            return true;
         }
 
-        public virtual void RequestRefineItem(byte byteInventoryType, short index)
+        public bool RequestRefineItem(byte byteInventoryType, short index)
         {
             if (IsDead())
-                return;
+                return false;
             CallNetFunction(NetFuncRefineItem, FunctionReceivers.Server, byteInventoryType, index);
+            return true;
         }
 
-        public virtual void RequestEnhanceSocketItem(byte byteInventoryType, short index, int enhancerId)
+        public bool RequestEnhanceSocketItem(byte byteInventoryType, short index, int enhancerId)
         {
             if (IsDead())
-                return;
+                return false;
             CallNetFunction(NetFuncEnhanceSocketItem, FunctionReceivers.Server, byteInventoryType, index, enhancerId);
+            return true;
         }
 
-        public virtual void RequestRepairItem(byte byteInventoryType, short index)
+        public bool RequestRepairItem(byte byteInventoryType, short index)
         {
             if (IsDead())
-                return;
+                return false;
             CallNetFunction(NetFuncRepairItem, FunctionReceivers.Server, byteInventoryType, index);
+            return true;
         }
 
-        public virtual void RequestSendDealingRequest(uint objectId)
+        public bool RequestSendDealingRequest(uint objectId)
         {
             CallNetFunction(NetFuncSendDealingRequest, FunctionReceivers.Server, new PackedUInt(objectId));
+            return true;
         }
 
-        public virtual void RequestReceiveDealingRequest(uint objectId)
+        public bool RequestReceiveDealingRequest(uint objectId)
         {
             CallNetFunction(NetFuncReceiveDealingRequest, ConnectionId, new PackedUInt(objectId));
+            return true;
         }
 
-        public virtual void RequestAcceptDealingRequest()
+        public bool RequestAcceptDealingRequest()
         {
             CallNetFunction(NetFuncAcceptDealingRequest, FunctionReceivers.Server);
+            return true;
         }
 
-        public virtual void RequestDeclineDealingRequest()
+        public bool RequestDeclineDealingRequest()
         {
             CallNetFunction(NetFuncDeclineDealingRequest, FunctionReceivers.Server);
+            return true;
         }
 
-        public virtual void RequestAcceptedDealingRequest(uint objectId)
+        public bool RequestAcceptedDealingRequest(uint objectId)
         {
             CallNetFunction(NetFuncAcceptedDealingRequest, ConnectionId, new PackedUInt(objectId));
+            return true;
         }
 
-        public virtual void RequestSetDealingItem(short itemIndex, short amount)
+        public bool RequestSetDealingItem(short itemIndex, short amount)
         {
             CallNetFunction(NetFuncSetDealingItem, FunctionReceivers.Server, itemIndex, amount);
+            return true;
         }
 
-        public virtual void RequestSetDealingGold(int dealingGold)
+        public bool RequestSetDealingGold(int dealingGold)
         {
             CallNetFunction(NetFuncSetDealingGold, FunctionReceivers.Server, dealingGold);
+            return true;
         }
 
-        public virtual void RequestLockDealing()
+        public bool RequestLockDealing()
         {
             CallNetFunction(NetFuncLockDealing, FunctionReceivers.Server);
+            return true;
         }
 
-        public virtual void RequestConfirmDealing()
+        public bool RequestConfirmDealing()
         {
             CallNetFunction(NetFuncConfirmDealing, FunctionReceivers.Server);
+            return true;
         }
 
-        public virtual void RequestCancelDealing()
+        public bool RequestCancelDealing()
         {
             CallNetFunction(NetFuncCancelDealing, FunctionReceivers.Server);
+            return true;
         }
 
-        public virtual void RequestUpdateDealingState(DealingState state)
+        public bool RequestUpdateDealingState(DealingState state)
         {
             CallNetFunction(NetFuncUpdateDealingState, ConnectionId, (byte)state);
+            return true;
         }
 
-        public virtual void RequestUpdateAnotherDealingState(DealingState state)
+        public bool RequestUpdateAnotherDealingState(DealingState state)
         {
             CallNetFunction(NetFuncUpdateAnotherDealingState, ConnectionId, (byte)state);
+            return true;
         }
 
-        public virtual void RequestUpdateDealingGold(int gold)
+        public bool RequestUpdateDealingGold(int gold)
         {
             CallNetFunction(NetFuncUpdateDealingGold, ConnectionId, gold);
+            return true;
         }
 
-        public virtual void RequestUpdateAnotherDealingGold(int gold)
+        public bool RequestUpdateAnotherDealingGold(int gold)
         {
             CallNetFunction(NetFuncUpdateAnotherDealingGold, ConnectionId, gold);
+            return true;
         }
 
-        public virtual void RequestUpdateDealingItems(DealingCharacterItems dealingItems)
+        public bool RequestUpdateDealingItems(DealingCharacterItems dealingItems)
         {
             CallNetFunction(NetFuncUpdateDealingItems, ConnectionId, dealingItems);
+            return true;
         }
 
-        public virtual void RequestUpdateAnotherDealingItems(DealingCharacterItems dealingItems)
+        public bool RequestUpdateAnotherDealingItems(DealingCharacterItems dealingItems)
         {
             CallNetFunction(NetFuncUpdateAnotherDealingItems, ConnectionId, dealingItems);
+            return true;
         }
 
-        public virtual void RequestCreateParty(bool shareExp, bool shareItem)
+        public bool RequestCreateParty(bool shareExp, bool shareItem)
         {
             CallNetFunction(NetFuncCreateParty, FunctionReceivers.Server, shareExp, shareItem);
+            return true;
         }
 
-        public virtual void RequestChangePartyLeader(string characterId)
+        public bool RequestChangePartyLeader(string characterId)
         {
             CallNetFunction(NetFuncChangePartyLeader, FunctionReceivers.Server, characterId);
+            return true;
         }
 
-        public virtual void RequestPartySetting(bool shareExp, bool shareItem)
+        public bool RequestPartySetting(bool shareExp, bool shareItem)
         {
             CallNetFunction(NetFuncPartySetting, FunctionReceivers.Server, shareExp, shareItem);
+            return true;
         }
 
-        public virtual void RequestSendPartyInvitation(uint objectId)
+        public bool RequestSendPartyInvitation(uint objectId)
         {
             CallNetFunction(NetFuncSendPartyInvitation, FunctionReceivers.Server, new PackedUInt(objectId));
+            return true;
         }
 
-        public virtual void RequestReceivePartyInvitation(uint objectId)
+        public bool RequestReceivePartyInvitation(uint objectId)
         {
             CallNetFunction(NetFuncReceivePartyInvitation, ConnectionId, new PackedUInt(objectId));
+            return true;
         }
 
-        public virtual void RequestAcceptPartyInvitation()
+        public bool RequestAcceptPartyInvitation()
         {
             CallNetFunction(NetFuncAcceptPartyInvitation, FunctionReceivers.Server);
+            return true;
         }
 
-        public virtual void RequestDeclinePartyInvitation()
+        public bool RequestDeclinePartyInvitation()
         {
             CallNetFunction(NetFuncDeclinePartyInvitation, FunctionReceivers.Server);
+            return true;
         }
 
-        public virtual void RequestKickFromParty(string characterId)
+        public bool RequestKickFromParty(string characterId)
         {
             CallNetFunction(NetFuncKickFromParty, FunctionReceivers.Server, characterId);
+            return true;
         }
 
-        public virtual void RequestLeaveParty()
+        public bool RequestLeaveParty()
         {
             CallNetFunction(NetFuncLeaveParty, FunctionReceivers.Server);
+            return true;
         }
 
-        public virtual void RequestCreateGuild(string guildName)
+        public bool RequestCreateGuild(string guildName)
         {
             CallNetFunction(NetFuncCreateGuild, FunctionReceivers.Server, guildName);
+            return true;
         }
 
-        public virtual void RequestChangeGuildLeader(string characterId)
+        public bool RequestChangeGuildLeader(string characterId)
         {
             CallNetFunction(NetFuncChangeGuildLeader, FunctionReceivers.Server, characterId);
+            return true;
         }
 
-        public virtual void RequestSetGuildMessage(string guildMessage)
+        public bool RequestSetGuildMessage(string guildMessage)
         {
             CallNetFunction(NetFuncSetGuildMessage, FunctionReceivers.Server, guildMessage);
+            return true;
         }
 
-        public virtual void RequestSetGuildRole(byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
+        public bool RequestSetGuildRole(byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
         {
             CallNetFunction(NetFuncSetGuildRole, FunctionReceivers.Server, guildRole, name, canInvite, canKick, shareExpPercentage);
+            return true;
         }
 
-        public virtual void RequestSetGuildMemberRole(string characterId, byte guildRole)
+        public bool RequestSetGuildMemberRole(string characterId, byte guildRole)
         {
             CallNetFunction(NetFuncSetGuildMemberRole, FunctionReceivers.Server, characterId, guildRole);
+            return true;
         }
 
-        public virtual void RequestSendGuildInvitation(uint objectId)
+        public bool RequestSendGuildInvitation(uint objectId)
         {
             CallNetFunction(NetFuncSendGuildInvitation, FunctionReceivers.Server, new PackedUInt(objectId));
+            return true;
         }
 
-        public virtual void RequestReceiveGuildInvitation(uint objectId)
+        public bool RequestReceiveGuildInvitation(uint objectId)
         {
             CallNetFunction(NetFuncReceiveGuildInvitation, ConnectionId, new PackedUInt(objectId));
+            return true;
         }
 
-        public virtual void RequestAcceptGuildInvitation()
+        public bool RequestAcceptGuildInvitation()
         {
             CallNetFunction(NetFuncAcceptGuildInvitation, FunctionReceivers.Server);
+            return true;
         }
 
-        public virtual void RequestDeclineGuildInvitation()
+        public bool RequestDeclineGuildInvitation()
         {
             CallNetFunction(NetFuncDeclineGuildInvitation, FunctionReceivers.Server);
+            return true;
         }
 
-        public virtual void RequestKickFromGuild(string characterId)
+        public bool RequestKickFromGuild(string characterId)
         {
             CallNetFunction(NetFuncKickFromGuild, FunctionReceivers.Server, characterId);
+            return true;
         }
 
-        public virtual void RequestLeaveGuild()
+        public bool RequestLeaveGuild()
         {
             CallNetFunction(NetFuncLeaveGuild, FunctionReceivers.Server);
+            return true;
         }
 
-        public virtual void RequestMoveItemToStorage(short nonEquipIndex, short amount, short storageItemIndex)
+        public bool RequestMoveItemToStorage(short nonEquipIndex, short amount, short storageItemIndex)
         {
             CallNetFunction(NetFuncMoveItemToStorage, FunctionReceivers.Server, nonEquipIndex, amount, storageItemIndex);
+            return true;
         }
 
-        public virtual void RequestMoveItemFromStorage(short storageItemIndex, short amount, short nonEquipIndex)
+        public bool RequestMoveItemFromStorage(short storageItemIndex, short amount, short nonEquipIndex)
         {
             CallNetFunction(NetFuncMoveItemFromStorage, FunctionReceivers.Server, storageItemIndex, amount, nonEquipIndex);
+            return true;
         }
 
-        public virtual void RequestDepositGold(int amount)
+        public bool RequestDepositGold(int amount)
         {
             CallNetFunction(NetFuncDepositGold, FunctionReceivers.Server, amount);
+            return true;
         }
 
-        public virtual void RequestWithdrawGold(int amount)
+        public bool RequestWithdrawGold(int amount)
         {
             CallNetFunction(NetFuncWithdrawGold, FunctionReceivers.Server, amount);
+            return true;
         }
 
-        public virtual void RequestDepositGuildGold(int amount)
+        public bool RequestDepositGuildGold(int amount)
         {
             CallNetFunction(NetFuncDepositGuildGold, FunctionReceivers.Server, amount);
+            return true;
         }
 
-        public virtual void RequestWithdrawGuildGold(int amount)
+        public bool RequestWithdrawGuildGold(int amount)
         {
             CallNetFunction(NetFuncWithdrawGuildGold, FunctionReceivers.Server, amount);
+            return true;
         }
 
-        public virtual void RequestOpenStorage(uint objectId)
+        public bool RequestOpenStorage(uint objectId)
         {
             CallNetFunction(NetFuncOpenStorage, FunctionReceivers.Server, new PackedUInt(objectId));
+            return true;
         }
 
-        public virtual void RequestCloseStorage()
+        public bool RequestCloseStorage()
         {
             CallNetFunction(NetFuncCloseStorage, FunctionReceivers.Server);
+            return true;
         }
 
-        public virtual void RequestToggleDoor(uint objectId)
+        public bool RequestToggleDoor(uint objectId)
         {
             CallNetFunction(NetFuncToggleDoor, FunctionReceivers.Server, new PackedUInt(objectId));
+            return true;
         }
 
-        public virtual void RequestCraftItemByWorkbench(uint objectId, int dataId)
+        public bool RequestCraftItemByWorkbench(uint objectId, int dataId)
         {
             CallNetFunction(NetFuncCraftItemByWorkbench, FunctionReceivers.Server, new PackedUInt(objectId), dataId);
+            return true;
         }
     }
 }
