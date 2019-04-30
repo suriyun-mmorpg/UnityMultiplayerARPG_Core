@@ -13,15 +13,12 @@ public abstract class UISelectionEntry<T> : UIBase
         set
         {
             data = value;
-            if (gameObject.activeInHierarchy)
-                ForceUpdate();
-            hasToUpdateOnEnable = !gameObject.activeInHierarchy;
+            ForceUpdate();
         }
     }
     public UISelectionManager selectionManager;
     public float updateUIRepeatRate = 0.5f;
     protected float lastUpdateTime;
-    private bool hasToUpdateOnEnable;
     private float tempUpdateTime;
     private bool isSelected;
     public bool IsSelected
@@ -40,12 +37,6 @@ public abstract class UISelectionEntry<T> : UIBase
         base.Awake();
         IsSelected = false;
         lastUpdateTime = Time.unscaledTime;
-    }
-
-    protected virtual void OnEnable()
-    {
-        if (hasToUpdateOnEnable)
-            ForceUpdate();
     }
 
     protected virtual void Update()
