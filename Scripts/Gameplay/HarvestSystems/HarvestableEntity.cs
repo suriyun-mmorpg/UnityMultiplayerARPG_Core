@@ -14,6 +14,7 @@ namespace MultiplayerARPG
         public int maxHp = 100;
         public Harvestable harvestable;
         public HarvestableCollectType collectType;
+        [Tooltip("Radius to detect other entities to avoid spawn this harvestable nearby other entities")]
         public float colliderDetectionRadius = 2f;
         [HideInInspector]
         public float destroyHideDelay = 2f;
