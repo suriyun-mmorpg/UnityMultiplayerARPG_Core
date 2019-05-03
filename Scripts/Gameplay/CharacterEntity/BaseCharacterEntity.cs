@@ -643,6 +643,11 @@ namespace MultiplayerARPG
             Item armorItem = equippingItem.GetArmorItem();
             if (armorItem != null)
             {
+                if (inventoryType != InventoryType.EquipItems)
+                {
+                    gameMessageType = GameMessage.Type.InvalidEquipPositionArmor;
+                    return false;
+                }
                 if (oldEquipIndex >= 0 && !armorItem.EquipPosition.Equals(EquipItems[oldEquipIndex].GetArmorItem().EquipPosition))
                 {
                     gameMessageType = GameMessage.Type.InvalidEquipPositionArmor;
