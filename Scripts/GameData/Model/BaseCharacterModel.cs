@@ -53,6 +53,7 @@ namespace MultiplayerARPG
         // Equipment entities that will be used to play weapon effects
         protected BaseEquipmentEntity rightHandEquipmentEntity;
         protected BaseEquipmentEntity leftHandEquipmentEntity;
+        protected Dictionary<string, List<BaseEquipmentEntity>> equipmentEntities = new Dictionary<string, List<BaseEquipmentEntity>>();
 
         // Optimize garbage collector
         protected readonly List<string> tempAddingKeys = new List<string>();
@@ -158,8 +159,14 @@ namespace MultiplayerARPG
         public void InstantiateEquipModel(string equipPosition, EquipmentModel[] equipmentModels, int level, out BaseEquipmentEntity equipmentEntity)
         {
             equipmentEntity = null;
+
+            if (!equipmentEntities.ContainsKey(equipPosition))
+                equipmentEntities.Add(equipPosition, new List<BaseEquipmentEntity>());
+            equipmentEntities[equipPosition].Clear();
+
             if (equipmentModels == null || equipmentModels.Length == 0)
                 return;
+
             Dictionary<string, GameObject> models = new Dictionary<string, GameObject>();
             foreach (EquipmentModel equipmentModel in equipmentModels)
             {
@@ -179,6 +186,7 @@ namespace MultiplayerARPG
                 if (tempEquipmentEntity != null)
                 {
                     tempEquipmentEntity.Level = level;
+                    equipmentEntities[equipPosition].Add(tempEquipmentEntity);
                     if (equipmentEntity == null)
                         equipmentEntity = tempEquipmentEntity;
                 }
@@ -293,6 +301,13 @@ namespace MultiplayerARPG
         public SkillActivateAnimationType UseSkillActivateAnimationType(Skill skill)
         {
             return UseSkillActivateAnimationType(skill.DataId);
+        }
+
+        public List<BaseEquipmentEntity> GetEquipmentEntities(string equipPosition)
+        {
+            if (!equipmentEntities.ContainsKey(equipPosition))
+                equipmentEntities.Add(equipPosition, new List<BaseEquipmentEntity>());
+            return equipmentEntities[equipPosition];
         }
 
         public BaseEquipmentEntity GetRightHandEquipmentEntity()
