@@ -153,11 +153,15 @@ namespace MultiplayerARPG
             if (!itemDropData.NotEmptySlot())
             {
                 // Destroy item drop entity without item add because this is not valid
+                itemDropEntity.MarkAsPickedUp();
                 itemDropEntity.NetworkDestroy();
                 return;
             }
             if (!this.IncreasingItemsWillOverwhelming(itemDropData.dataId, itemDropData.amount) && this.IncreaseItems(itemDropData))
+            {
+                itemDropEntity.MarkAsPickedUp();
                 itemDropEntity.NetworkDestroy();
+            }
         }
 
         /// <summary>

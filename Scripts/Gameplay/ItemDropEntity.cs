@@ -13,6 +13,7 @@ namespace MultiplayerARPG
         public HashSet<uint> looters;
         public Transform modelContainer;
         private float dropTime;
+        private bool isPickedUp;
 
         [SerializeField]
         private SyncFieldInt itemDataId = new SyncFieldInt();
@@ -105,9 +106,15 @@ namespace MultiplayerARPG
         {
             if (looters == null || 
                 looters.Contains(baseCharacterEntity.ObjectId) || 
-                Time.unscaledTime - dropTime > gameInstance.itemLootLockDuration)
+                Time.unscaledTime - dropTime > gameInstance.itemLootLockDuration ||
+                isPickedUp)
                 return true;
             return false;
+        }
+
+        public void MarkAsPickedUp()
+        {
+            isPickedUp = true;
         }
 
         public static ItemDropEntity DropItem(BaseGameEntity dropper, CharacterItem dropData, IEnumerable<uint> looters)
