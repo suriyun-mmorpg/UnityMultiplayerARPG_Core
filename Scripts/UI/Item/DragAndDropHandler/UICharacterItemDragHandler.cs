@@ -84,9 +84,9 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter == null)
                 return;
-            if (sourceLocation == SourceLocation.NonEquipItems)
+            if (sourceLocation == SourceLocation.NonEquipItems && !EventSystem.current.IsPointerOverGameObject())
                 uiCharacterItem.OnClickDrop();
-            if (sourceLocation == SourceLocation.EquipItems)
+            if (sourceLocation == SourceLocation.EquipItems && EventSystem.current.IsPointerOverGameObject())
                 uiCharacterItem.OnClickUnEquip();
             if (sourceLocation == SourceLocation.StorageItems)
                 uiCharacterItem.OnClickMoveFromStorage();
