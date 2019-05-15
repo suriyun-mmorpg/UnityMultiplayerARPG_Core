@@ -35,6 +35,10 @@ namespace MultiplayerARPG
         public Animator animator;
         [Tooltip("You can set this when animator controller type is `Custom`")]
         public RuntimeAnimatorController animatorController;
+        [Tooltip("Which layer in Animator controller that you use it to play action animations, You can set this when animator controller type is `Custom`")]
+        public int actionStateLayer;
+        [Tooltip("Which layer in Animator controller that you use it to play cast skill animations, You can set this when animator controller type is `Custom`")]
+        public int castSkillStateLayer;
 
         private AnimatorOverrideController cacheAnimatorController;
         public AnimatorOverrideController CacheAnimatorController
@@ -57,6 +61,7 @@ namespace MultiplayerARPG
         private void OnValidate()
         {
 #if UNITY_EDITOR
+            bool hasChanges = false;
             RuntimeAnimatorController changingAnimatorController;
             switch (controllerType)
             {
@@ -66,7 +71,17 @@ namespace MultiplayerARPG
                         changingAnimatorController != animatorController)
                     {
                         animatorController = changingAnimatorController;
-                        EditorUtility.SetDirty(this);
+                        hasChanges = true;
+                    }
+                    if (actionStateLayer != 0)
+                    {
+                        actionStateLayer = 0;
+                        hasChanges = true;
+                    }
+                    if (castSkillStateLayer != 0)
+                    {
+                        castSkillStateLayer = 0;
+                        hasChanges = true;
                     }
                     break;
                 case AnimatorControllerType.Advance:
@@ -75,10 +90,22 @@ namespace MultiplayerARPG
                         changingAnimatorController != animatorController)
                     {
                         animatorController = changingAnimatorController;
-                        EditorUtility.SetDirty(this);
+                        hasChanges = true;
+                    }
+                    if (actionStateLayer != 1)
+                    {
+                        actionStateLayer = 1;
+                        hasChanges = true;
+                    }
+                    if (castSkillStateLayer != 1)
+                    {
+                        castSkillStateLayer = 1;
+                        hasChanges = true;
                     }
                     break;
             }
+            if (hasChanges)
+                EditorUtility.SetDirty(this);
 #endif
         }
 
@@ -182,7 +209,6 @@ namespace MultiplayerARPG
         {
             // If animator is not null, play the action animation
             ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
-            animator.SetBool(ANIM_DO_ACTION, false);
             yield return 0;
             CacheAnimatorController[CLIP_ACTION] = tempActionAnimation.clip;
             AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
@@ -190,6 +216,7 @@ namespace MultiplayerARPG
                 AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
             animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
             animator.SetBool(ANIM_DO_ACTION, true);
+            animator.Play(0, actionStateLayer, 0f);
             // Waits by current transition + clip duration before end animation
             yield return new WaitForSecondsRealtime(tempActionAnimation.GetClipLength() / playSpeedMultiplier);
             animator.SetBool(ANIM_DO_ACTION, false);
@@ -208,6 +235,7 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_CAST_SKILL] = castClip;
             yield return 0;
             animator.SetBool(ANIM_IS_CASTING_SKILL, true);
+            animator.Play(0, castSkillStateLayer, 0f);
             yield return new WaitForSecondsRealtime(duration);
             animator.SetBool(ANIM_IS_CASTING_SKILL, false);
         }
