@@ -66,7 +66,7 @@ namespace MultiplayerARPG
                     // Ammo capacity is 0 so reduce ammo from inventory
                     if (this.CountAmmos(weaponItem.WeaponType.requireAmmoType) == 0)
                     {
-                        // TODO: send no ammo message
+                        gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NoAmmo);
                         return false;
                     }
                 }
@@ -75,7 +75,7 @@ namespace MultiplayerARPG
                     // Ammo capacity more than 0 reduce loaded ammo
                     if (weapon.ammo <= 0)
                     {
-                        // TODO: send no ammo message
+                        gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NoAmmo);
                         return false;
                     }
                 }

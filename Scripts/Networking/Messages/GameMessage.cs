@@ -73,6 +73,8 @@ namespace MultiplayerARPG
             NotEnoughGoldToDeposit,
             NotEnoughGoldToWithdraw,
             CannotAccessStorage,
+            // Combatant
+            NoAmmo,
         }
         public Type type;
 
