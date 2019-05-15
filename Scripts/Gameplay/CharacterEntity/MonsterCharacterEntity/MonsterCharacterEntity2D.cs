@@ -64,7 +64,7 @@ namespace MultiplayerARPG
         {
             base.SetupNetElements();
             currentDirectionType.deliveryMethod = DeliveryMethod.Sequenced;
-            currentDirectionType.forOwnerOnly = false;
+            currentDirectionType.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
         }
 
         public override bool IsPositionInFov(float fov, Vector3 position, Vector3 forward)

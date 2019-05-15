@@ -70,9 +70,9 @@ namespace MultiplayerARPG
         {
             base.SetupNetElements();
             missileSpeed.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            missileSpeed.forOwnerOnly = false;
+            missileSpeed.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             isExploded.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            isExploded.forOwnerOnly = false;
+            isExploded.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
         }
 
         public override void OnSetup()

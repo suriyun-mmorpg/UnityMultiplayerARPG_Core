@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLib;
+using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
@@ -11,25 +12,25 @@ namespace MultiplayerARPG
         {
             base.SetupNetElements();
             id.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            id.forOwnerOnly = false;
+            id.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             level.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            level.forOwnerOnly = false;
+            level.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             exp.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            exp.forOwnerOnly = false;
+            exp.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             currentHp.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            currentHp.forOwnerOnly = false;
+            currentHp.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             currentMp.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            currentMp.forOwnerOnly = false;
+            currentMp.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             currentFood.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            currentFood.forOwnerOnly = false;
+            currentFood.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             currentWater.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            currentWater.forOwnerOnly = false;
+            currentWater.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             equipWeapons.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            equipWeapons.forOwnerOnly = false;
+            equipWeapons.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             isHidding.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            isHidding.forOwnerOnly = false;
+            isHidding.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             movementState.deliveryMethod = DeliveryMethod.Sequenced;
-            movementState.forOwnerOnly = false;
+            movementState.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
 
             attributes.forOwnerOnly = false;
             skills.forOwnerOnly = true;

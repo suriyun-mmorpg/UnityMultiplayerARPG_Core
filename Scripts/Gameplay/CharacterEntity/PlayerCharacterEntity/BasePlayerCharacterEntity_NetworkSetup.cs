@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLib;
+using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
@@ -12,23 +13,23 @@ namespace MultiplayerARPG
             base.SetupNetElements();
             // Sync fields
             dataId.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            dataId.forOwnerOnly = false;
+            dataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             statPoint.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            statPoint.forOwnerOnly = true;
+            statPoint.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             skillPoint.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            skillPoint.forOwnerOnly = true;
+            skillPoint.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             gold.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            gold.forOwnerOnly = true;
+            gold.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             userGold.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            userGold.forOwnerOnly = true;
+            userGold.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             userCash.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            userCash.forOwnerOnly = true;
+            userCash.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             partyId.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            partyId.forOwnerOnly = false;
+            partyId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             guildId.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            guildId.forOwnerOnly = false;
+            guildId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             isWarping.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            isWarping.forOwnerOnly = true;
+            isWarping.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             // Sync lists
             hotkeys.forOwnerOnly = true;
             quests.forOwnerOnly = true;

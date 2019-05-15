@@ -188,7 +188,7 @@ namespace MultiplayerARPG
         {
             base.SetupNetElements();
             currentDirectionType.deliveryMethod = DeliveryMethod.Sequenced;
-            currentDirectionType.forOwnerOnly = false;
+            currentDirectionType.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             // Setup network components
             switch (movementSecure)
             {

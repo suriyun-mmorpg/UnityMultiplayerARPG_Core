@@ -74,7 +74,7 @@ namespace MultiplayerARPG
         {
             base.SetupNetElements();
             itemDataId.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            itemDataId.forOwnerOnly = false;
+            itemDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
         }
 
         public override void OnSetup()

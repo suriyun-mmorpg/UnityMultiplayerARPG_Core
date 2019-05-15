@@ -188,9 +188,9 @@ namespace MultiplayerARPG
             if (onSetupNetElements != null)
                 onSetupNetElements.Invoke();
             syncTitle.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            syncTitle.forOwnerOnly = false;
+            syncTitle.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             syncTitleB.deliveryMethod = DeliveryMethod.ReliableSequenced;
-            syncTitleB.forOwnerOnly = false;
+            syncTitleB.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
         }
 
         #region Net Functions
