@@ -261,7 +261,7 @@ namespace MultiplayerARPG
         public void OnClickSetDealingGold()
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UILocaleKeys.UI_DEALING_GOLD_OFFER.ToString()), LanguageManager.GetText(UILocaleKeys.UI_DEALING_GOLD_OFFER_DESCRIPTION.ToString()), OnDealingGoldConfirmed, 0, owningCharacter.Gold, owningCharacter.DealingGold);
+            UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UILocaleKeys.UI_OFFER_GOLD.ToString()), LanguageManager.GetText(UILocaleKeys.UI_OFFER_GOLD_DESCRIPTION.ToString()), OnDealingGoldConfirmed, 0, owningCharacter.Gold, owningCharacter.DealingGold);
         }
 
         private void OnDealingGoldConfirmed(int amount)

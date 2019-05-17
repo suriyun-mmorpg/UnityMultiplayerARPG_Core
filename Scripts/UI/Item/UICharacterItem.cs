@@ -49,18 +49,6 @@ namespace MultiplayerARPG
         [Tooltip("Item Type Format => {0} = {Item Type title}, {1} = {Item Type Label}")]
         public string itemTypeFormat = "{1}: {0}";
 
-        [Header("Input Dialog Settings")]
-        public string dropInputTitle = "Drop Item";
-        public string dropInputDescription = "";
-        public string sellInputTitle = "Sell Item";
-        public string sellInputDescription = "";
-        public string setDealingInputTitle = "Offer Item";
-        public string setDealingInputDescription = "";
-        public string moveToStorageInputTitle = "Move To Storage";
-        public string moveToStorageInputDescription = "";
-        public string moveFromStorageInputTitle = "Move From Storage";
-        public string moveFromStorageInputDescription = "";
-
         [Header("UI Elements")]
         public TextWrapper uiTextTitle;
         public TextWrapper uiTextDescription;
@@ -723,7 +711,7 @@ namespace MultiplayerARPG
                 OwningCharacter.RequestDropItem((short)IndexOfData, 1);
             }
             else
-                UISceneGlobal.Singleton.ShowInputDialog(dropInputTitle, dropInputDescription, OnDropAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
+                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UILocaleKeys.UI_DROP_ITEM.ToString()), LanguageManager.GetText(UILocaleKeys.UI_DROP_ITEM_DESCRIPTION.ToString()), OnDropAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
         }
 
         private void OnDropAmountConfirmed(int amount)
@@ -748,7 +736,7 @@ namespace MultiplayerARPG
                 OwningCharacter.RequestSellItem((short)IndexOfData, 1);
             }
             else
-                UISceneGlobal.Singleton.ShowInputDialog(sellInputTitle, sellInputDescription, OnSellItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
+                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UILocaleKeys.UI_SELL_ITEM.ToString()), LanguageManager.GetText(UILocaleKeys.UI_SELL_ITEM_DESCRIPTION.ToString()), OnSellItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
         }
 
         private void OnSellItemAmountConfirmed(int amount)
@@ -773,7 +761,7 @@ namespace MultiplayerARPG
                 OwningCharacter.RequestSetDealingItem((short)IndexOfData, 1);
             }
             else
-                UISceneGlobal.Singleton.ShowInputDialog(setDealingInputTitle, setDealingInputDescription, OnSetDealingItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
+                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UILocaleKeys.UI_OFFER_ITEM.ToString()), LanguageManager.GetText(UILocaleKeys.UI_OFFER_ITEM_DESCRIPTION.ToString()), OnSetDealingItemAmountConfirmed, 1, CharacterItem.amount, CharacterItem.amount);
         }
 
         private void OnSetDealingItemAmountConfirmed(int amount)
@@ -804,7 +792,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                UISceneGlobal.Singleton.ShowInputDialog(moveToStorageInputTitle, moveToStorageInputDescription, (amount) =>
+                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UILocaleKeys.UI_MOVE_ITEM_TO_STORAGE.ToString()), LanguageManager.GetText(UILocaleKeys.UI_MOVE_ITEM_TO_STORAGE_DESCRIPTION.ToString()), (amount) =>
                 {
                     OnClickMoveToStorage(amount, storageIndex);
                 }, 1, CharacterItem.amount, CharacterItem.amount);
@@ -839,7 +827,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                UISceneGlobal.Singleton.ShowInputDialog(moveFromStorageInputTitle, moveFromStorageInputDescription, (amount) =>
+                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UILocaleKeys.UI_MOVE_ITEM_FROM_STORAGE.ToString()), LanguageManager.GetText(UILocaleKeys.UI_MOVE_ITEM_FROM_STORAGE_DESCRIPTION.ToString()), (amount) =>
                 {
                     OnClickMoveFromStorage(amount, nonEquipIndex);
                 }, 1, CharacterItem.amount, CharacterItem.amount);

@@ -21,6 +21,15 @@ namespace MultiplayerARPG
         UI_STAMINA,
         UI_FOOD,
         UI_WATER,
+        UI_ARMOR,
+        UI_ACCURACY,
+        UI_EVASION,
+        UI_CRITICAL_RATE,
+        UI_CRITICAL_DAMAGE_RATE,
+        UI_BLOCK_RATE,
+        UI_BLOCK_DAMAGE_RATE,
+        UI_MOVE_SPEED,
+        UI_ATTACK_SPEED,
         UI_WEIGHT,
         UI_GOLD,
         UI_CASH,
@@ -76,14 +85,25 @@ namespace MultiplayerARPG
         UI_CHARACTER_NAME_TOO_SHORT,
         UI_CHARACTER_NAME_TOO_LONG,
         UI_CHARACTER_NAME_EXISTED,
+        // UI Character Item
+        UI_DROP_ITEM,
+        UI_DROP_ITEM_DESCRIPTION,
+        UI_SELL_ITEM,
+        UI_SELL_ITEM_DESCRIPTION,
+        UI_OFFER_ITEM,
+        UI_OFFER_ITEM_DESCRIPTION,
+        UI_MOVE_ITEM_TO_STORAGE,
+        UI_MOVE_ITEM_TO_STORAGE_DESCRIPTION,
+        UI_MOVE_ITEM_FROM_STORAGE,
+        UI_MOVE_ITEM_FROM_STORAGE_DESCRIPTION,
         // UI Cash Packages
         UI_CANNOT_GET_CASH_PACKAGE_INFO,
         // UI Cash Shop
         UI_CANNOT_GET_CASH_SHOP_INFO,
         UI_CASH_SHOP_BUY_SUCCESS,
         // UI Dealing
-        UI_DEALING_GOLD_OFFER,
-        UI_DEALING_GOLD_OFFER_DESCRIPTION,
+        UI_OFFER_GOLD,
+        UI_OFFER_GOLD_DESCRIPTION,
         // UI Npc Sell Item
         UI_BUY_ITEM,
         UI_BUY_ITEM_DESCRIPTION,
@@ -188,6 +208,15 @@ namespace MultiplayerARPG
             Texts.Add(UILocaleKeys.UI_STAMINA.ToString(), "Stamina");
             Texts.Add(UILocaleKeys.UI_FOOD.ToString(), "Food");
             Texts.Add(UILocaleKeys.UI_WATER.ToString(), "Water");
+            Texts.Add(UILocaleKeys.UI_ARMOR.ToString(), "Armor");
+            Texts.Add(UILocaleKeys.UI_ACCURACY.ToString(), "Accuracy");
+            Texts.Add(UILocaleKeys.UI_EVASION.ToString(), "Evasion");
+            Texts.Add(UILocaleKeys.UI_CRITICAL_RATE.ToString(), "Cri. Rate");
+            Texts.Add(UILocaleKeys.UI_CRITICAL_DAMAGE_RATE.ToString(), "Cri. Damage");
+            Texts.Add(UILocaleKeys.UI_BLOCK_RATE.ToString(), "Block Rate");
+            Texts.Add(UILocaleKeys.UI_BLOCK_DAMAGE_RATE.ToString(), "Block Damage");
+            Texts.Add(UILocaleKeys.UI_MOVE_SPEED.ToString(), "Move Speed");
+            Texts.Add(UILocaleKeys.UI_ATTACK_SPEED.ToString(), "Attack Speed");
             Texts.Add(UILocaleKeys.UI_WEIGHT.ToString(), "Weight");
             Texts.Add(UILocaleKeys.UI_GOLD.ToString(), "Gold");
             Texts.Add(UILocaleKeys.UI_CASH.ToString(), "Cash");
@@ -242,14 +271,25 @@ namespace MultiplayerARPG
             Texts.Add(UILocaleKeys.UI_CHARACTER_NAME_TOO_SHORT.ToString(), "Character name is too short");
             Texts.Add(UILocaleKeys.UI_CHARACTER_NAME_TOO_LONG.ToString(), "Character name is too long");
             Texts.Add(UILocaleKeys.UI_CHARACTER_NAME_EXISTED.ToString(), "Character name is already existed");
+            // UI Character Item
+            Texts.Add(UILocaleKeys.UI_DROP_ITEM.ToString(), "Drop Item");
+            Texts.Add(UILocaleKeys.UI_DROP_ITEM_DESCRIPTION.ToString(), "Enter amount of item");
+            Texts.Add(UILocaleKeys.UI_SELL_ITEM.ToString(), "Sell Item");
+            Texts.Add(UILocaleKeys.UI_SELL_ITEM_DESCRIPTION.ToString(), "Enter amount of item");
+            Texts.Add(UILocaleKeys.UI_OFFER_ITEM.ToString(), "Offer Item");
+            Texts.Add(UILocaleKeys.UI_OFFER_ITEM_DESCRIPTION.ToString(), "Enter amount of item");
+            Texts.Add(UILocaleKeys.UI_MOVE_ITEM_TO_STORAGE.ToString(), "Move To Storage");
+            Texts.Add(UILocaleKeys.UI_MOVE_ITEM_TO_STORAGE_DESCRIPTION.ToString(), "Enter amount of item");
+            Texts.Add(UILocaleKeys.UI_MOVE_ITEM_FROM_STORAGE.ToString(), "Move From Storage");
+            Texts.Add(UILocaleKeys.UI_MOVE_ITEM_FROM_STORAGE_DESCRIPTION.ToString(), "Enter amount of item");
             // UI Cash Packages
             Texts.Add(UILocaleKeys.UI_CANNOT_GET_CASH_PACKAGE_INFO.ToString(), "Cannot retrieve cash package info");
             // UI Cash Shop
             Texts.Add(UILocaleKeys.UI_CANNOT_GET_CASH_SHOP_INFO.ToString(), "Cannot retrieve cash shop info");
             Texts.Add(UILocaleKeys.UI_CASH_SHOP_BUY_SUCCESS.ToString(), "Success, let's check your inventory");
             // UI Dealing
-            Texts.Add(UILocaleKeys.UI_DEALING_GOLD_OFFER.ToString(), "Offer Gold");
-            Texts.Add(UILocaleKeys.UI_DEALING_GOLD_OFFER_DESCRIPTION.ToString(), "Enter amount of gold");
+            Texts.Add(UILocaleKeys.UI_OFFER_GOLD.ToString(), "Offer Gold");
+            Texts.Add(UILocaleKeys.UI_OFFER_GOLD_DESCRIPTION.ToString(), "Enter amount of gold");
             // UI Npc Sell Item
             Texts.Add(UILocaleKeys.UI_BUY_ITEM.ToString(), "Buy Item");
             Texts.Add(UILocaleKeys.UI_BUY_ITEM_DESCRIPTION.ToString(), "Enter amount of item");
