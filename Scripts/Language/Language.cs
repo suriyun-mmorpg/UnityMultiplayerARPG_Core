@@ -4,6 +4,89 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
+    public enum UILocaleKeys : ushort
+    {
+        // UI Generic Title
+        UI_DISCONNECTED,
+        UI_SUCCESS,
+        UI_WARNING,
+        UI_ERROR,
+        UI_NONE,
+        UI_LEVEL,
+        UI_EXP,
+        UI_STAT_POINTS,
+        UI_SKILL_POINTS,
+        UI_HP,
+        UI_MP,
+        UI_STAMINA,
+        UI_FOOD,
+        UI_WATER,
+        UI_WEIGHT,
+        UI_GOLD,
+        UI_CASH,
+        UI_GUILD_LEADER,
+        // Generic Error
+        UI_USER_NOT_FOUND,
+        UI_ITEM_NOT_FOUND,
+        UI_NOT_ENOUGH_GOLD,
+        UI_NOT_ENOUGH_CASH,
+        UI_NOT_LOGGED_IN,
+        UI_INVALID_DATA,
+        UI_INVALID_CHARACTER_DATA,
+        UI_USERNAME_IS_EMPTY,
+        UI_PASSWORD_IS_EMPTY,
+        // UI Login
+        UI_INVALID_USERNAME_OR_PASSWORD,
+        UI_ALREADY_LOGGED_IN,
+        // UI Register
+        UI_INVALID_CONFIRM_PASSWORD,
+        UI_USERNAME_TOO_SHORT,
+        UI_USERNAME_TOO_LONG,
+        UI_PASSWORD_TOO_SHORT,
+        UI_USERNAME_EXISTED,
+        // UI Character List
+        UI_NO_CHOSEN_CHARACTER_TO_START,
+        UI_NO_CHOSEN_CHARACTER_TO_DELETE,
+        UI_ALREADY_SELECT_CHARACTER,
+        UI_MAP_SERVER_NOT_READY,
+        // UI Character Create
+        UI_CHARACTER_NAME_TOO_SHORT,
+        UI_CHARACTER_NAME_TOO_LONG,
+        UI_CHARACTER_NAME_EXISTED,
+        // UI Cash Packages
+        UI_CANNOT_GET_CASH_PACKAGE_INFO,
+        // UI Cash Shop
+        UI_CANNOT_GET_CASH_SHOP_INFO,
+        UI_CASH_SHOP_BUY_SUCCESS,
+        // UI Party
+        UI_PARTY_CHANGE_LEADER,
+        UI_PARTY_CHANGE_LEADER_DESCRIPTION,
+        UI_PARTY_KICK_MEMBER,
+        UI_PARTY_KICK_MEMBER_DESCRIPTION,
+        UI_PARTY_LEAVE,
+        UI_PARTY_LEAVE_DESCRIPTION,
+        // UI Guild
+        UI_GUILD_CHANGE_LEADER,
+        UI_GUILD_CHANGE_LEADER_DESCRIPTION,
+        UI_GUILD_KICK_MEMBER,
+        UI_GUILD_KICK_MEMBER_DESCRIPTION,
+        UI_GUILD_LEAVE,
+        UI_GUILD_LEAVE_DESCRIPTION,
+        // UI Guild Role Setting
+        UI_GUILD_ROLE_NAME_IS_EMPTY,
+        UI_GUILD_ROLE_SHARE_EXP_NOT_NUMBER,
+        // UI Guild Member Role Setting
+        UI_INVALID_GUILD_ROLE,
+        // UI Scene Global
+        UI_KICKED_FROM_SERVER,
+        UI_CONNECTION_FAILED,
+        UI_CONNECTION_REJECTED,
+        UI_REMOTE_CONNECTION_CLOSE,
+        UI_INVALID_PROTOCOL,
+        UI_HOST_UNREACHABLE,
+        UI_CONNECTION_TIMEOUT,
+    }
+
     public static class DefaultLocale
     {
         public static readonly Dictionary<string, string> Texts = new Dictionary<string, string>();
@@ -59,7 +142,86 @@ namespace MultiplayerARPG
             Texts.Add(GameMessage.Type.NotEnoughGoldToDeposit.ToString(), "Not enough gold to deposit");
             Texts.Add(GameMessage.Type.NotEnoughGoldToWithdraw.ToString(), "Not enough gold to withdraw");
             Texts.Add(GameMessage.Type.CannotAccessStorage.ToString(), "Cannot access storage");
+            // Battle
             Texts.Add(GameMessage.Type.NoAmmo.ToString(), "No Ammo");
+            // UI Generic Title
+            Texts.Add(UILocaleKeys.UI_DISCONNECTED.ToString(), "Disconnected");
+            Texts.Add(UILocaleKeys.UI_SUCCESS.ToString(), "Success");
+            Texts.Add(UILocaleKeys.UI_WARNING.ToString(), "Warning");
+            Texts.Add(UILocaleKeys.UI_ERROR.ToString(), "Error");
+            Texts.Add(UILocaleKeys.UI_NONE.ToString(), "None");
+            Texts.Add(UILocaleKeys.UI_LEVEL.ToString(), "Lv.");
+            Texts.Add(UILocaleKeys.UI_EXP.ToString(), "Exp");
+            Texts.Add(UILocaleKeys.UI_STAT_POINTS.ToString(), "Stat Points");
+            Texts.Add(UILocaleKeys.UI_SKILL_POINTS.ToString(), "Skill Points");
+            Texts.Add(UILocaleKeys.UI_HP.ToString(), "Hp");
+            Texts.Add(UILocaleKeys.UI_MP.ToString(), "Mp");
+            Texts.Add(UILocaleKeys.UI_STAMINA.ToString(), "Stamina");
+            Texts.Add(UILocaleKeys.UI_FOOD.ToString(), "Food");
+            Texts.Add(UILocaleKeys.UI_WATER.ToString(), "Water");
+            Texts.Add(UILocaleKeys.UI_WEIGHT.ToString(), "Weight");
+            Texts.Add(UILocaleKeys.UI_GOLD.ToString(), "Gold");
+            Texts.Add(UILocaleKeys.UI_CASH.ToString(), "Cash");
+            Texts.Add(UILocaleKeys.UI_GUILD_LEADER.ToString(), "Leader");
+            // Generic Error
+            Texts.Add(UILocaleKeys.UI_USER_NOT_FOUND.ToString(), "User not found");
+            Texts.Add(UILocaleKeys.UI_ITEM_NOT_FOUND.ToString(), "Item not found");
+            Texts.Add(UILocaleKeys.UI_NOT_ENOUGH_GOLD.ToString(), "Not enough gold");
+            Texts.Add(UILocaleKeys.UI_NOT_ENOUGH_CASH.ToString(), "Not enough cash");
+            Texts.Add(UILocaleKeys.UI_INVALID_DATA.ToString(), "Invalid data");
+            Texts.Add(UILocaleKeys.UI_INVALID_CHARACTER_DATA.ToString(), "Invalid character data");
+            Texts.Add(UILocaleKeys.UI_USERNAME_IS_EMPTY.ToString(), "Username is empty");
+            Texts.Add(UILocaleKeys.UI_PASSWORD_IS_EMPTY.ToString(), "Password is empty");
+            // UI Login
+            Texts.Add(UILocaleKeys.UI_INVALID_USERNAME_OR_PASSWORD.ToString(), "Invalid username or password");
+            Texts.Add(UILocaleKeys.UI_ALREADY_LOGGED_IN.ToString(), "User already logged in");
+            // UI Register
+            Texts.Add(UILocaleKeys.UI_INVALID_CONFIRM_PASSWORD.ToString(), "Invalid confirm password");
+            Texts.Add(UILocaleKeys.UI_USERNAME_TOO_SHORT.ToString(), "Username is too short");
+            Texts.Add(UILocaleKeys.UI_USERNAME_TOO_LONG.ToString(), "Username is too long");
+            Texts.Add(UILocaleKeys.UI_PASSWORD_TOO_SHORT.ToString(), "Password is too short");
+            Texts.Add(UILocaleKeys.UI_USERNAME_EXISTED.ToString(), "Username is already existed");
+            // UI Character List
+            Texts.Add(UILocaleKeys.UI_NO_CHOSEN_CHARACTER_TO_START.ToString(), "Please choose character to start game");
+            Texts.Add(UILocaleKeys.UI_NO_CHOSEN_CHARACTER_TO_DELETE.ToString(), "Please choose character to delete");
+            Texts.Add(UILocaleKeys.UI_ALREADY_SELECT_CHARACTER.ToString(), "Already select character");
+            Texts.Add(UILocaleKeys.UI_MAP_SERVER_NOT_READY.ToString(), "Map server is not ready");
+            // UI Character Create
+            Texts.Add(UILocaleKeys.UI_CHARACTER_NAME_TOO_SHORT.ToString(), "Character name is too short");
+            Texts.Add(UILocaleKeys.UI_CHARACTER_NAME_TOO_LONG.ToString(), "Character name is too long");
+            Texts.Add(UILocaleKeys.UI_CHARACTER_NAME_EXISTED.ToString(), "Character name is already existed");
+            // UI Cash Packages
+            Texts.Add(UILocaleKeys.UI_CANNOT_GET_CASH_PACKAGE_INFO.ToString(), "Cannot retrieve cash package info");
+            // UI Cash Shop
+            Texts.Add(UILocaleKeys.UI_CANNOT_GET_CASH_SHOP_INFO.ToString(), "Cannot retrieve cash shop info");
+            Texts.Add(UILocaleKeys.UI_CASH_SHOP_BUY_SUCCESS.ToString(), "Success, let's check your inventory");
+            // UI Party
+            Texts.Add(UILocaleKeys.UI_PARTY_CHANGE_LEADER.ToString(), "Change Leader");
+            Texts.Add(UILocaleKeys.UI_PARTY_CHANGE_LEADER_DESCRIPTION.ToString(), "You sure you want to promote {0} to party leader?");
+            Texts.Add(UILocaleKeys.UI_PARTY_KICK_MEMBER.ToString(), "Kick Member");
+            Texts.Add(UILocaleKeys.UI_PARTY_KICK_MEMBER_DESCRIPTION.ToString(), "You sure you want to kick {0} from party?");
+            Texts.Add(UILocaleKeys.UI_PARTY_LEAVE.ToString(), "Leave Party");
+            Texts.Add(UILocaleKeys.UI_PARTY_LEAVE_DESCRIPTION.ToString(), "You sure you want to leave party?");
+            // UI Guild
+            Texts.Add(UILocaleKeys.UI_GUILD_CHANGE_LEADER.ToString(), "Change Leader");
+            Texts.Add(UILocaleKeys.UI_GUILD_CHANGE_LEADER_DESCRIPTION.ToString(), "You sure you want to promote {0} to guild leader?");
+            Texts.Add(UILocaleKeys.UI_GUILD_KICK_MEMBER.ToString(), "Kick Member");
+            Texts.Add(UILocaleKeys.UI_GUILD_KICK_MEMBER_DESCRIPTION.ToString(), "You sure you want to kick {0} from guild?");
+            Texts.Add(UILocaleKeys.UI_GUILD_LEAVE.ToString(), "Leave Guild");
+            Texts.Add(UILocaleKeys.UI_GUILD_LEAVE_DESCRIPTION.ToString(), "You sure you want to leave guild?");
+            // UI Guild Role Setting
+            Texts.Add(UILocaleKeys.UI_GUILD_ROLE_NAME_IS_EMPTY.ToString(), "Role name must not empty");
+            Texts.Add(UILocaleKeys.UI_GUILD_ROLE_SHARE_EXP_NOT_NUMBER.ToString(), "Share exp percentage must be number");
+            // UI Guild Member Role Setting
+            Texts.Add(UILocaleKeys.UI_INVALID_GUILD_ROLE.ToString(), "Invalid role");
+            // UI Scene Global
+            Texts.Add(UILocaleKeys.UI_KICKED_FROM_SERVER.ToString(), "You have been kicked from server");
+            Texts.Add(UILocaleKeys.UI_CONNECTION_FAILED.ToString(), "Cannot connect to the server");
+            Texts.Add(UILocaleKeys.UI_CONNECTION_REJECTED.ToString(), "Connection rejected by server");
+            Texts.Add(UILocaleKeys.UI_REMOTE_CONNECTION_CLOSE.ToString(), "Server has been closed");
+            Texts.Add(UILocaleKeys.UI_INVALID_PROTOCOL.ToString(), "Invalid protocol");
+            Texts.Add(UILocaleKeys.UI_HOST_UNREACHABLE.ToString(), "Host unreachable");
+            Texts.Add(UILocaleKeys.UI_CONNECTION_TIMEOUT.ToString(), "Connection timeout");
         }
     }
 

@@ -105,10 +105,10 @@ namespace MultiplayerARPG
             switch (responseCode)
             {
                 case AckResponseCode.Error:
-                    UISceneGlobal.Singleton.ShowMessageDialog("Error", "Cannot retrieve cash shop info");
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_CANNOT_GET_CASH_SHOP_INFO.ToString()));
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog("Error", "Connection timeout");
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
                     if (uiTextCash != null)
@@ -149,22 +149,22 @@ namespace MultiplayerARPG
                     switch (castedMessage.error)
                     {
                         case ResponseCashShopBuyMessage.Error.UserNotFound:
-                            errorMessage = "User not found";
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_USER_NOT_FOUND.ToString());
                             break;
                         case ResponseCashShopBuyMessage.Error.ItemNotFound:
-                            errorMessage = "Item not found";
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ITEM_NOT_FOUND.ToString());
                             break;
                         case ResponseCashShopBuyMessage.Error.NotEnoughCash:
-                            errorMessage = "Not enough cash";
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_NOT_ENOUGH_CASH.ToString());
                             break;
                     }
-                    UISceneGlobal.Singleton.ShowMessageDialog("Error", errorMessage);
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), errorMessage);
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog("Error", "Connection timeout");
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
-                    UISceneGlobal.Singleton.ShowMessageDialog("Success", "Success, let's check your inventory");
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_SUCCESS.ToString()), LanguageManager.GetText(UILocaleKeys.UI_CASH_SHOP_BUY_SUCCESS.ToString()));
                     RefreshCashShopInfo();
                     break;
             }

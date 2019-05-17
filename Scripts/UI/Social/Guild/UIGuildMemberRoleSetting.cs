@@ -8,8 +8,8 @@ namespace MultiplayerARPG
         [Header("Display Format")]
         [Tooltip("Name Format => {0} = {Character name}")]
         public string nameFormat = "{0}";
-        [Tooltip("Level Format => {0} = {Level}")]
-        public string levelFormat = "Lv: {0}";
+        [Tooltip("Level Format => {0} = {Level}, {1} = {Level Title}")]
+        public string levelFormat = "{1}: {0}";
 
         [Header("UI Elements")]
         public TextWrapper uiTextName;
@@ -28,12 +28,12 @@ namespace MultiplayerARPG
                 uiTextName.text = string.Format(nameFormat, string.IsNullOrEmpty(member.characterName) ? LanguageManager.GetUnknowTitle() : member.characterName);
 
             if (uiTextLevel != null)
-                uiTextLevel.text = string.Format(levelFormat, member.level.ToString("N0"));
+                uiTextLevel.text = string.Format(levelFormat, member.level.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LEVEL.ToString()));
 
             if (dropdownRoles != null)
             {
                 List<DropdownWrapper.OptionData> options = new List<DropdownWrapper.OptionData>();
-                options.Add(new DropdownWrapper.OptionData("None"));
+                options.Add(new DropdownWrapper.OptionData(LanguageManager.GetText(UILocaleKeys.UI_NONE.ToString())));
                 for (int i = 1; i < roles.Length; ++i)
                 {
                     options.Add(new DropdownWrapper.OptionData(roles[i].roleName));
@@ -48,7 +48,7 @@ namespace MultiplayerARPG
             byte role = (byte)(dropdownRoles != null ? dropdownRoles.value : 0);
             if (role == 0)
             {
-                UISceneGlobal.Singleton.ShowMessageDialog("Warning", "Invalid role");
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_WARNING.ToString()), LanguageManager.GetText(UILocaleKeys.UI_INVALID_GUILD_ROLE.ToString()));
                 return;
             }
             BasePlayerCharacterController.OwningCharacter.RequestSetGuildMemberRole(characterId, (byte)dropdownRoles.value);

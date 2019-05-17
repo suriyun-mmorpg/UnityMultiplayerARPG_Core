@@ -104,7 +104,7 @@ namespace MultiplayerARPG
         {
             if (!success)
             {
-                UISceneGlobal.Singleton.ShowMessageDialog("Error", errorMessage);
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), errorMessage);
                 return;
             }
             RefreshCashPackageInfo();
@@ -116,10 +116,10 @@ namespace MultiplayerARPG
             switch (responseCode)
             {
                 case AckResponseCode.Error:
-                    UISceneGlobal.Singleton.ShowMessageDialog("Error", "Cannot retrieve cash package info");
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_CANNOT_GET_CASH_PACKAGE_INFO.ToString()));
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog("Error", "Connection timeout");
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
                     if (uiTextCash != null)

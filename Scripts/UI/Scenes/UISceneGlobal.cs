@@ -90,28 +90,28 @@ namespace MultiplayerARPG
             switch (disconnectInfo.Reason)
             {
                 case DisconnectReason.DisconnectPeerCalled:
-                    errorMessage = "You have been kicked from server";
+                    errorMessage = LanguageManager.GetText(UILocaleKeys.UI_KICKED_FROM_SERVER.ToString());
                     break;
                 case DisconnectReason.ConnectionFailed:
-                    errorMessage = "Cannot connect to the server";
+                    errorMessage = LanguageManager.GetText(UILocaleKeys.UI_CONNECTION_FAILED.ToString());
                     break;
                 case DisconnectReason.ConnectionRejected:
-                    errorMessage = "Connection rejected by server";
+                    errorMessage = LanguageManager.GetText(UILocaleKeys.UI_CONNECTION_REJECTED.ToString());
                     break;
                 case DisconnectReason.RemoteConnectionClose:
-                    errorMessage = "Server has been closed";
+                    errorMessage = LanguageManager.GetText(UILocaleKeys.UI_REMOTE_CONNECTION_CLOSE.ToString());
                     break;
                 case DisconnectReason.InvalidProtocol:
-                    errorMessage = "Invalid protocol";
+                    errorMessage = LanguageManager.GetText(UILocaleKeys.UI_INVALID_PROTOCOL.ToString());
                     break;
                 case DisconnectReason.HostUnreachable:
-                    errorMessage = "Host unreachable";
+                    errorMessage = LanguageManager.GetText(UILocaleKeys.UI_HOST_UNREACHABLE.ToString());
                     break;
                 case DisconnectReason.Timeout:
-                    errorMessage = "Connection timeout";
+                    errorMessage = LanguageManager.GetText(UILocaleKeys.UI_CONNECTION_TIMEOUT.ToString());
                     break;
             }
-            Singleton.ShowMessageDialog("Disconnected", errorMessage, true, false, false, false);
+            Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_DISCONNECTED.ToString()), errorMessage, true, false, false, false);
         }
     }
 }

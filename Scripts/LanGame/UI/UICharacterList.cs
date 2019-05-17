@@ -142,7 +142,7 @@ namespace MultiplayerARPG
             UICharacter selectedUI = CacheCharacterSelectionManager.SelectedUI;
             if (selectedUI == null)
             {
-                UISceneGlobal.Singleton.ShowMessageDialog("Cannot start game", "Please choose character to start game");
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_NO_CHOSEN_CHARACTER_TO_START.ToString()));
                 Debug.LogWarning("Cannot start game, No chosen character");
                 return;
             }
@@ -169,7 +169,7 @@ namespace MultiplayerARPG
             UICharacter selectedUI = CacheCharacterSelectionManager.SelectedUI;
             if (selectedUI == null)
             {
-                UISceneGlobal.Singleton.ShowMessageDialog("Cannot delete character", "Please choose character to delete");
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_NO_CHOSEN_CHARACTER_TO_DELETE.ToString()));
                 Debug.LogWarning("Cannot delete character, No chosen character");
                 return;
             }

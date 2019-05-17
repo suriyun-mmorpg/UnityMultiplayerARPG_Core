@@ -8,14 +8,14 @@ namespace MultiplayerARPG
         [Header("Display Format")]
         [Tooltip("Guild Name Format => {0} = {Guild name}")]
         public string guildNameFormat = "{0}";
-        [Tooltip("Leader Name Format => {0} = {Leader name}")]
-        public string leaderNameFormat = "Leader: {0}";
-        [Tooltip("Level Format => {0} = {Level}")]
-        public string levelFormat = "Lv: {0}";
-        [Tooltip("Exp Format => {0} = {Current exp}, {1} = {Max exp}")]
-        public string expFormat = "Exp: {0}/{1}";
-        [Tooltip("Skill Point Format => {0} = {Skill point}")]
-        public string skillPointFormat = "Skill Points: {0}";
+        [Tooltip("Leader Name Format => {0} = {Leader name}, {1} = {Leader Title}")]
+        public string leaderNameFormat = "{1}: {0}";
+        [Tooltip("Level Format => {0} = {Level}, {1} = {Level Title}")]
+        public string levelFormat = "{1}: {0}";
+        [Tooltip("Exp Format => {0} = {Current exp}, {1} = {Max exp}, {2} = {Exp Title}")]
+        public string expFormat = "{2}: {0}/{1}";
+        [Tooltip("Skill Point Format => {0} = {Skill point}, {1} = {Skill Points Title}")]
+        public string skillPointFormat = "{1}: {0}";
         [Tooltip("Message Format => {0} = {Message}")]
         public string messageFormat = "{0}";
 
@@ -106,10 +106,10 @@ namespace MultiplayerARPG
                 textGuildName.text = string.Format(guildNameFormat, Guild == null ? LanguageManager.GetUnknowTitle() : Guild.guildName);
 
             if (textLeaderName != null)
-                textLeaderName.text = string.Format(leaderNameFormat, Guild == null ? LanguageManager.GetUnknowTitle() : Guild.GetLeader().characterName);
+                textLeaderName.text = string.Format(leaderNameFormat, Guild == null ? LanguageManager.GetUnknowTitle() : Guild.GetLeader().characterName, LanguageManager.GetText(UILocaleKeys.UI_GUILD_LEADER.ToString()));
 
             if (textLevel != null)
-                textLevel.text = string.Format(levelFormat, Guild == null ? "0" : Guild.level.ToString("N0"));
+                textLevel.text = string.Format(levelFormat, Guild == null ? "0" : Guild.level.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LEVEL.ToString()));
 
             int[] expTree = GameInstance.Singleton.SocialSystemSetting.GuildExpTree;
             int currentExp = 0;
@@ -127,13 +127,13 @@ namespace MultiplayerARPG
             }
 
             if (textExp != null)
-                textExp.text = string.Format(expFormat, currentExp.ToString("N0"), nextLevelExp.ToString("N0"));
+                textExp.text = string.Format(expFormat, currentExp.ToString("N0"), nextLevelExp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_EXP.ToString()));
 
             if (imageExpGage != null)
                 imageExpGage.fillAmount = nextLevelExp <= 0 ? 1 : (float)currentExp / (float)nextLevelExp;
 
             if (textSkillPoint != null)
-                textSkillPoint.text = string.Format(skillPointFormat, Guild == null ? "0" : Guild.skillPoint.ToString("N0"));
+                textSkillPoint.text = string.Format(skillPointFormat, Guild == null ? "0" : Guild.skillPoint.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_SKILL_POINTS.ToString()));
 
             if (Guild == null)
             {
@@ -329,7 +329,7 @@ namespace MultiplayerARPG
                 return;
 
             SocialCharacterData guildMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
-            UISceneGlobal.Singleton.ShowMessageDialog("Change Leader", string.Format("You sure you want to promote {0} to guild leader?", guildMember.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_GUILD_CHANGE_LEADER.ToString()), string.Format(LanguageManager.GetText(UILocaleKeys.UI_GUILD_CHANGE_LEADER_DESCRIPTION.ToString()), guildMember.characterName), false, true, true, false, null, () =>
             {
                 BasePlayerCharacterController.OwningCharacter.RequestChangeGuildLeader(guildMember.id);
             });
@@ -378,7 +378,7 @@ namespace MultiplayerARPG
                 return;
 
             SocialCharacterData guildMember = MemberSelectionManager.SelectedUI.Data.socialCharacter;
-            UISceneGlobal.Singleton.ShowMessageDialog("Kick Member", string.Format("You sure you want to kick {0} from guild?", guildMember.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_GUILD_KICK_MEMBER.ToString()), string.Format(LanguageManager.GetText(UILocaleKeys.UI_GUILD_KICK_MEMBER_DESCRIPTION.ToString()), guildMember.characterName), false, true, true, false, null, () =>
             {
                 BasePlayerCharacterController.OwningCharacter.RequestKickFromGuild(guildMember.id);
             });
@@ -386,7 +386,7 @@ namespace MultiplayerARPG
 
         public void OnClickLeaveGuild()
         {
-            UISceneGlobal.Singleton.ShowMessageDialog("Leave Guild", "You sure you want to leave guild?", false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_GUILD_LEAVE.ToString()), LanguageManager.GetText(UILocaleKeys.UI_GUILD_LEAVE_DESCRIPTION.ToString()), false, true, true, false, null, () =>
             {
                 BasePlayerCharacterController.OwningCharacter.RequestLeaveGuild();
             });

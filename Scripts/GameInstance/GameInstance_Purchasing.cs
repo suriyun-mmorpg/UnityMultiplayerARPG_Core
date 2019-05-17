@@ -183,7 +183,7 @@ namespace MultiplayerARPG
                     PurchaseResult(false, errorMessage);
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog("Error", "Connection timeout");
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.ERROR), LanguageManager.GetText(UILocaleKeys.CONNECTION_TIMEOUT));
                     PurchaseResult(false, "Connection timeout");
                     break;
                 default:
