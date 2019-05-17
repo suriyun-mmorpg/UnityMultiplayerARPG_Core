@@ -7,45 +7,53 @@ namespace MultiplayerARPG
     public enum UILocaleKeys : ushort
     {
         // UI Generic Title
-        UI_DISCONNECTED,
-        UI_SUCCESS,
-        UI_WARNING,
-        UI_ERROR,
-        UI_NONE,
-        UI_LEVEL,
-        UI_EXP,
-        UI_STAT_POINTS,
-        UI_SKILL_POINTS,
-        UI_HP,
-        UI_MP,
-        UI_STAMINA,
-        UI_FOOD,
-        UI_WATER,
-        UI_ARMOR,
-        UI_ACCURACY,
-        UI_EVASION,
-        UI_CRITICAL_RATE,
-        UI_CRITICAL_DAMAGE_RATE,
-        UI_BLOCK_RATE,
-        UI_BLOCK_DAMAGE_RATE,
-        UI_MOVE_SPEED,
-        UI_ATTACK_SPEED,
-        UI_WEIGHT,
-        UI_GOLD,
-        UI_CASH,
-        UI_SELL_PRICE,
-        UI_REQUIRE_LEVEL,
-        UI_REQUIRE_CLASS,
-        UI_REQUIRE_GOLD,
-        UI_AVAILABLE_WEAPONS,
-        UI_CONSUME_MP,
-        UI_SKILL_COOLDOWN,
-        UI_SKILL_TYPE_LABEL,
+        UI_LABEL_DISCONNECTED,
+        UI_LABEL_SUCCESS,
+        UI_LABEL_WARNING,
+        UI_LABEL_ERROR,
+        UI_LABEL_NONE,
+        UI_LABEL_LEVEL,
+        UI_LABEL_EXP,
+        UI_LABEL_STAT_POINTS,
+        UI_LABEL_SKILL_POINTS,
+        UI_LABEL_HP,
+        UI_LABEL_MP,
+        UI_LABEL_STAMINA,
+        UI_LABEL_FOOD,
+        UI_LABEL_WATER,
+        UI_LABEL_ARMOR,
+        UI_LABEL_ACCURACY,
+        UI_LABEL_EVASION,
+        UI_LABEL_CRITICAL_RATE,
+        UI_LABEL_CRITICAL_DAMAGE_RATE,
+        UI_LABEL_BLOCK_RATE,
+        UI_LABEL_BLOCK_DAMAGE_RATE,
+        UI_LABEL_MOVE_SPEED,
+        UI_LABEL_ATTACK_SPEED,
+        UI_LABEL_WEIGHT,
+        UI_LABEL_SLOT,
+        UI_LABEL_UNLIMIT_WEIGHT,
+        UI_LABEL_UNLIMIT_SLOT,
+        UI_LABEL_GOLD,
+        UI_LABEL_CASH,
+        UI_LABEL_SELL_PRICE,
+        UI_LABEL_REQUIRE_LEVEL,
+        UI_LABEL_REQUIRE_CLASS,
+        UI_LABEL_REQUIRE_GOLD,
+        UI_LABEL_AVAILABLE_WEAPONS,
+        UI_LABEL_CONSUME_MP,
+        UI_LABEL_SKILL_COOLDOWN,
+        UI_LABEL_SKILL_TYPE,
         UI_SKILL_TYPE_ACTIVE,
         UI_SKILL_TYPE_PASSIVE,
         UI_SKILL_TYPE_CRAFT_ITEM,
-        UI_BUFF_DURATION,
-        UI_ITEM_TYPE_LABEL,
+        UI_LABEL_BUFF_DURATION,
+        UI_LABEL_BUFF_RECOVERY_HP,
+        UI_LABEL_BUFF_RECOVERY_MP,
+        UI_LABEL_BUFF_RECOVERY_STAMINA,
+        UI_LABEL_BUFF_RECOVERY_FOOD,
+        UI_LABEL_BUFF_RECOVERY_WATER,
+        UI_LABEL_ITEM_TYPE,
         UI_ITEM_TYPE_JUNK,
         UI_ITEM_TYPE_SHIELD,
         UI_ITEM_TYPE_POTION,
@@ -53,10 +61,21 @@ namespace MultiplayerARPG
         UI_ITEM_TYPE_BUILDING,
         UI_ITEM_TYPE_PET,
         UI_ITEM_TYPE_SOCKET_ENHANCER,
-        UI_ITEM_RARITY,
-        UI_ITEM_AMOUNT,
-        UI_ITEM_DURABILITY,
-        UI_GUILD_LEADER,
+        UI_LABEL_ITEM_RARITY,
+        UI_LABEL_ITEM_AMOUNT,
+        UI_LABEL_ITEM_DURABILITY,
+        UI_LABEL_SOCIAL_LEADER,
+        UI_LABEL_SOCIAL_MEMBER,
+        // Generic Format
+        UI_FORMAT_INCREASE_MAX_MEMBER,
+        UI_FORMAT_INCREASE_EXP_GAIN_PERCENTAGE,
+        UI_FORMAT_INCREASE_GOLD_GAIN_PERCENTAGE,
+        UI_FORMAT_INCREASE_SHARE_EXP_GAIN_PERCENTAGE,
+        UI_FORMAT_INCREASE_SHARE_GOLD_GAIN_PERCENTAGE,
+        UI_FORMAT_DECREASE_EXP_PENALTY_PERCENTAGE,
+        // Damage Format
+        UI_FORMAT_DAMAGE_INFLICTION,
+        UI_FORMAT_DAMAGE_INFLICTION_AS_ELEMENTAL,
         // Generic Error
         UI_USER_NOT_FOUND,
         UI_ITEM_NOT_FOUND,
@@ -96,6 +115,14 @@ namespace MultiplayerARPG
         UI_MOVE_ITEM_TO_STORAGE_DESCRIPTION,
         UI_MOVE_ITEM_FROM_STORAGE,
         UI_MOVE_ITEM_FROM_STORAGE_DESCRIPTION,
+        // UI Refine Item
+        UI_LABEL_REFINE_SUCCESS_RATE,
+        UI_LABEL_REFINING_LEVEL,
+        // UI Bank
+        UI_BANK_DEPOSIT,
+        UI_BANK_DEPOSIT_DESCRIPTION,
+        UI_BANK_WITHDRAW,
+        UI_BANK_WITHDRAW_DESCRIPTION,
         // UI Cash Packages
         UI_CANNOT_GET_CASH_PACKAGE_INFO,
         // UI Cash Shop
@@ -121,11 +148,19 @@ namespace MultiplayerARPG
         UI_GUILD_KICK_MEMBER_DESCRIPTION,
         UI_GUILD_LEAVE,
         UI_GUILD_LEAVE_DESCRIPTION,
+        // UI Guild Role
+        UI_GUILD_ROLE_CAN_INVITE,
+        UI_GUILD_ROLE_CANNOT_INVITE,
+        UI_GUILD_ROLE_CAN_KICK,
+        UI_GUILD_ROLE_CANNOT_KICK,
+        UI_GUILD_ROLE_SHARE_EXP,
         // UI Guild Role Setting
         UI_GUILD_ROLE_NAME_IS_EMPTY,
         UI_GUILD_ROLE_SHARE_EXP_NOT_NUMBER,
         // UI Guild Member Role Setting
         UI_INVALID_GUILD_ROLE,
+        // UI Guild Skill
+
         // UI Scene Global
         UI_KICKED_FROM_SERVER,
         UI_CONNECTION_FAILED,
@@ -194,45 +229,53 @@ namespace MultiplayerARPG
             // Battle
             Texts.Add(GameMessage.Type.NoAmmo.ToString(), "No Ammo");
             // UI Generic Title
-            Texts.Add(UILocaleKeys.UI_DISCONNECTED.ToString(), "Disconnected");
-            Texts.Add(UILocaleKeys.UI_SUCCESS.ToString(), "Success");
-            Texts.Add(UILocaleKeys.UI_WARNING.ToString(), "Warning");
-            Texts.Add(UILocaleKeys.UI_ERROR.ToString(), "Error");
-            Texts.Add(UILocaleKeys.UI_NONE.ToString(), "None");
-            Texts.Add(UILocaleKeys.UI_LEVEL.ToString(), "Lv.");
-            Texts.Add(UILocaleKeys.UI_EXP.ToString(), "Exp");
-            Texts.Add(UILocaleKeys.UI_STAT_POINTS.ToString(), "Stat Points");
-            Texts.Add(UILocaleKeys.UI_SKILL_POINTS.ToString(), "Skill Points");
-            Texts.Add(UILocaleKeys.UI_HP.ToString(), "Hp");
-            Texts.Add(UILocaleKeys.UI_MP.ToString(), "Mp");
-            Texts.Add(UILocaleKeys.UI_STAMINA.ToString(), "Stamina");
-            Texts.Add(UILocaleKeys.UI_FOOD.ToString(), "Food");
-            Texts.Add(UILocaleKeys.UI_WATER.ToString(), "Water");
-            Texts.Add(UILocaleKeys.UI_ARMOR.ToString(), "Armor");
-            Texts.Add(UILocaleKeys.UI_ACCURACY.ToString(), "Accuracy");
-            Texts.Add(UILocaleKeys.UI_EVASION.ToString(), "Evasion");
-            Texts.Add(UILocaleKeys.UI_CRITICAL_RATE.ToString(), "Cri. Rate");
-            Texts.Add(UILocaleKeys.UI_CRITICAL_DAMAGE_RATE.ToString(), "Cri. Damage");
-            Texts.Add(UILocaleKeys.UI_BLOCK_RATE.ToString(), "Block Rate");
-            Texts.Add(UILocaleKeys.UI_BLOCK_DAMAGE_RATE.ToString(), "Block Damage");
-            Texts.Add(UILocaleKeys.UI_MOVE_SPEED.ToString(), "Move Speed");
-            Texts.Add(UILocaleKeys.UI_ATTACK_SPEED.ToString(), "Attack Speed");
-            Texts.Add(UILocaleKeys.UI_WEIGHT.ToString(), "Weight");
-            Texts.Add(UILocaleKeys.UI_GOLD.ToString(), "Gold");
-            Texts.Add(UILocaleKeys.UI_CASH.ToString(), "Cash");
-            Texts.Add(UILocaleKeys.UI_SELL_PRICE.ToString(), "Sell Price");
-            Texts.Add(UILocaleKeys.UI_REQUIRE_LEVEL.ToString(), "Require Level");
-            Texts.Add(UILocaleKeys.UI_REQUIRE_CLASS.ToString(), "Require Class");
-            Texts.Add(UILocaleKeys.UI_REQUIRE_GOLD.ToString(), "Require Gold");
-            Texts.Add(UILocaleKeys.UI_AVAILABLE_WEAPONS.ToString(), "Available Weapons");
-            Texts.Add(UILocaleKeys.UI_CONSUME_MP.ToString(), "Consume Mp");
-            Texts.Add(UILocaleKeys.UI_SKILL_COOLDOWN.ToString(), "Cooldown");
-            Texts.Add(UILocaleKeys.UI_SKILL_TYPE_LABEL.ToString(), "Skill Type");
+            Texts.Add(UILocaleKeys.UI_LABEL_DISCONNECTED.ToString(), "Disconnected");
+            Texts.Add(UILocaleKeys.UI_LABEL_SUCCESS.ToString(), "Success");
+            Texts.Add(UILocaleKeys.UI_LABEL_WARNING.ToString(), "Warning");
+            Texts.Add(UILocaleKeys.UI_LABEL_ERROR.ToString(), "Error");
+            Texts.Add(UILocaleKeys.UI_LABEL_NONE.ToString(), "None");
+            Texts.Add(UILocaleKeys.UI_LABEL_LEVEL.ToString(), "Lv.");
+            Texts.Add(UILocaleKeys.UI_LABEL_EXP.ToString(), "Exp");
+            Texts.Add(UILocaleKeys.UI_LABEL_STAT_POINTS.ToString(), "Stat Points");
+            Texts.Add(UILocaleKeys.UI_LABEL_SKILL_POINTS.ToString(), "Skill Points");
+            Texts.Add(UILocaleKeys.UI_LABEL_HP.ToString(), "Hp");
+            Texts.Add(UILocaleKeys.UI_LABEL_MP.ToString(), "Mp");
+            Texts.Add(UILocaleKeys.UI_LABEL_STAMINA.ToString(), "Stamina");
+            Texts.Add(UILocaleKeys.UI_LABEL_FOOD.ToString(), "Food");
+            Texts.Add(UILocaleKeys.UI_LABEL_WATER.ToString(), "Water");
+            Texts.Add(UILocaleKeys.UI_LABEL_ARMOR.ToString(), "Armor");
+            Texts.Add(UILocaleKeys.UI_LABEL_ACCURACY.ToString(), "Accuracy");
+            Texts.Add(UILocaleKeys.UI_LABEL_EVASION.ToString(), "Evasion");
+            Texts.Add(UILocaleKeys.UI_LABEL_CRITICAL_RATE.ToString(), "Cri. Rate");
+            Texts.Add(UILocaleKeys.UI_LABEL_CRITICAL_DAMAGE_RATE.ToString(), "Cri. Damage");
+            Texts.Add(UILocaleKeys.UI_LABEL_BLOCK_RATE.ToString(), "Block Rate");
+            Texts.Add(UILocaleKeys.UI_LABEL_BLOCK_DAMAGE_RATE.ToString(), "Block Damage");
+            Texts.Add(UILocaleKeys.UI_LABEL_MOVE_SPEED.ToString(), "Move Speed");
+            Texts.Add(UILocaleKeys.UI_LABEL_ATTACK_SPEED.ToString(), "Attack Speed");
+            Texts.Add(UILocaleKeys.UI_LABEL_WEIGHT.ToString(), "Weight");
+            Texts.Add(UILocaleKeys.UI_LABEL_SLOT.ToString(), "Slot");
+            Texts.Add(UILocaleKeys.UI_LABEL_UNLIMIT_WEIGHT.ToString(), "Unlimit Weight");
+            Texts.Add(UILocaleKeys.UI_LABEL_UNLIMIT_SLOT.ToString(), "Unlimit Slot");
+            Texts.Add(UILocaleKeys.UI_LABEL_GOLD.ToString(), "Gold");
+            Texts.Add(UILocaleKeys.UI_LABEL_CASH.ToString(), "Cash");
+            Texts.Add(UILocaleKeys.UI_LABEL_SELL_PRICE.ToString(), "Sell Price");
+            Texts.Add(UILocaleKeys.UI_LABEL_REQUIRE_LEVEL.ToString(), "Require Level");
+            Texts.Add(UILocaleKeys.UI_LABEL_REQUIRE_CLASS.ToString(), "Require Class");
+            Texts.Add(UILocaleKeys.UI_LABEL_REQUIRE_GOLD.ToString(), "Require Gold");
+            Texts.Add(UILocaleKeys.UI_LABEL_AVAILABLE_WEAPONS.ToString(), "Available Weapons");
+            Texts.Add(UILocaleKeys.UI_LABEL_CONSUME_MP.ToString(), "Consume Mp");
+            Texts.Add(UILocaleKeys.UI_LABEL_SKILL_COOLDOWN.ToString(), "Cooldown");
+            Texts.Add(UILocaleKeys.UI_LABEL_SKILL_TYPE.ToString(), "Skill Type");
             Texts.Add(UILocaleKeys.UI_SKILL_TYPE_ACTIVE.ToString(), "Active");
             Texts.Add(UILocaleKeys.UI_SKILL_TYPE_PASSIVE.ToString(), "Passive");
             Texts.Add(UILocaleKeys.UI_SKILL_TYPE_CRAFT_ITEM.ToString(), "Craft Item");
-            Texts.Add(UILocaleKeys.UI_BUFF_DURATION.ToString(), "Duration");
-            Texts.Add(UILocaleKeys.UI_ITEM_TYPE_LABEL.ToString(), "Item Type");
+            Texts.Add(UILocaleKeys.UI_LABEL_BUFF_DURATION.ToString(), "Duration");
+            Texts.Add(UILocaleKeys.UI_LABEL_BUFF_RECOVERY_HP.ToString(), "Recovery Hp");
+            Texts.Add(UILocaleKeys.UI_LABEL_BUFF_RECOVERY_MP.ToString(), "Recovery Mp");
+            Texts.Add(UILocaleKeys.UI_LABEL_BUFF_RECOVERY_STAMINA.ToString(), "Recovery Stamina");
+            Texts.Add(UILocaleKeys.UI_LABEL_BUFF_RECOVERY_FOOD.ToString(), "Recovery Food");
+            Texts.Add(UILocaleKeys.UI_LABEL_BUFF_RECOVERY_WATER.ToString(), "Recovery Water");
+            Texts.Add(UILocaleKeys.UI_LABEL_ITEM_TYPE.ToString(), "Item Type");
             Texts.Add(UILocaleKeys.UI_ITEM_TYPE_JUNK.ToString(), "Junk");
             Texts.Add(UILocaleKeys.UI_ITEM_TYPE_SHIELD.ToString(), "Shield");
             Texts.Add(UILocaleKeys.UI_ITEM_TYPE_POTION.ToString(), "Potion");
@@ -240,10 +283,21 @@ namespace MultiplayerARPG
             Texts.Add(UILocaleKeys.UI_ITEM_TYPE_BUILDING.ToString(), "Building");
             Texts.Add(UILocaleKeys.UI_ITEM_TYPE_PET.ToString(), "Pet");
             Texts.Add(UILocaleKeys.UI_ITEM_TYPE_SOCKET_ENHANCER.ToString(), "Socket Enhancer");
-            Texts.Add(UILocaleKeys.UI_ITEM_RARITY.ToString(), "Rarity");
-            Texts.Add(UILocaleKeys.UI_ITEM_AMOUNT.ToString(), "Amount");
-            Texts.Add(UILocaleKeys.UI_ITEM_DURABILITY.ToString(), "Durability");
-            Texts.Add(UILocaleKeys.UI_GUILD_LEADER.ToString(), "Leader");
+            Texts.Add(UILocaleKeys.UI_LABEL_ITEM_RARITY.ToString(), "Rarity");
+            Texts.Add(UILocaleKeys.UI_LABEL_ITEM_AMOUNT.ToString(), "Amount");
+            Texts.Add(UILocaleKeys.UI_LABEL_ITEM_DURABILITY.ToString(), "Durability");
+            Texts.Add(UILocaleKeys.UI_LABEL_SOCIAL_LEADER.ToString(), "Leader");
+            Texts.Add(UILocaleKeys.UI_LABEL_SOCIAL_MEMBER.ToString(), "Member");
+            // Generic Format
+            Texts.Add(UILocaleKeys.UI_FORMAT_INCREASE_MAX_MEMBER.ToString(), "Max Member +{0}");
+            Texts.Add(UILocaleKeys.UI_FORMAT_INCREASE_EXP_GAIN_PERCENTAGE.ToString(), "Exp Gain +{0}%");
+            Texts.Add(UILocaleKeys.UI_FORMAT_INCREASE_GOLD_GAIN_PERCENTAGE.ToString(), "Gold Gain +{0}%");
+            Texts.Add(UILocaleKeys.UI_FORMAT_INCREASE_SHARE_EXP_GAIN_PERCENTAGE.ToString(), "Party Share Exp +{0}%");
+            Texts.Add(UILocaleKeys.UI_FORMAT_INCREASE_SHARE_GOLD_GAIN_PERCENTAGE.ToString(), "Party Share Gold +{0}%");
+            Texts.Add(UILocaleKeys.UI_FORMAT_DECREASE_EXP_PENALTY_PERCENTAGE.ToString(), "Exp Penalty -{0}%");
+            // Damage Format
+            Texts.Add(UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION.ToString(), "Inflict {0}% damage");
+            Texts.Add(UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION_AS_ELEMENTAL.ToString(), "Inflict {1}% as {0} damage");
             // Generic Error
             Texts.Add(UILocaleKeys.UI_USER_NOT_FOUND.ToString(), "User not found");
             Texts.Add(UILocaleKeys.UI_ITEM_NOT_FOUND.ToString(), "Item not found");
@@ -282,6 +336,14 @@ namespace MultiplayerARPG
             Texts.Add(UILocaleKeys.UI_MOVE_ITEM_TO_STORAGE_DESCRIPTION.ToString(), "Enter amount of item");
             Texts.Add(UILocaleKeys.UI_MOVE_ITEM_FROM_STORAGE.ToString(), "Move From Storage");
             Texts.Add(UILocaleKeys.UI_MOVE_ITEM_FROM_STORAGE_DESCRIPTION.ToString(), "Enter amount of item");
+            // UI Refine Item
+            Texts.Add(UILocaleKeys.UI_LABEL_REFINE_SUCCESS_RATE.ToString(), "Success Rate");
+            Texts.Add(UILocaleKeys.UI_LABEL_REFINING_LEVEL.ToString(), "Refining Level");
+            // UI Bank
+            Texts.Add(UILocaleKeys.UI_BANK_DEPOSIT.ToString(), "Deposit");
+            Texts.Add(UILocaleKeys.UI_BANK_DEPOSIT_DESCRIPTION.ToString(), "Enter amount of gold");
+            Texts.Add(UILocaleKeys.UI_BANK_WITHDRAW.ToString(), "Withdraw");
+            Texts.Add(UILocaleKeys.UI_BANK_WITHDRAW_DESCRIPTION.ToString(), "Enter amount of gold");
             // UI Cash Packages
             Texts.Add(UILocaleKeys.UI_CANNOT_GET_CASH_PACKAGE_INFO.ToString(), "Cannot retrieve cash package info");
             // UI Cash Shop
@@ -307,6 +369,12 @@ namespace MultiplayerARPG
             Texts.Add(UILocaleKeys.UI_GUILD_KICK_MEMBER_DESCRIPTION.ToString(), "You sure you want to kick {0} from guild?");
             Texts.Add(UILocaleKeys.UI_GUILD_LEAVE.ToString(), "Leave Guild");
             Texts.Add(UILocaleKeys.UI_GUILD_LEAVE_DESCRIPTION.ToString(), "You sure you want to leave guild?");
+            // UI Guild Role
+            Texts.Add(UILocaleKeys.UI_GUILD_ROLE_CAN_INVITE.ToString(), "Can invite");
+            Texts.Add(UILocaleKeys.UI_GUILD_ROLE_CANNOT_INVITE.ToString(), "Cannot invite");
+            Texts.Add(UILocaleKeys.UI_GUILD_ROLE_CAN_KICK.ToString(), "Can kick");
+            Texts.Add(UILocaleKeys.UI_GUILD_ROLE_CANNOT_KICK.ToString(), "Cannot kick");
+            Texts.Add(UILocaleKeys.UI_GUILD_ROLE_SHARE_EXP.ToString(), "Share Exp");
             // UI Guild Role Setting
             Texts.Add(UILocaleKeys.UI_GUILD_ROLE_NAME_IS_EMPTY.ToString(), "Role name must not empty");
             Texts.Add(UILocaleKeys.UI_GUILD_ROLE_SHARE_EXP_NOT_NUMBER.ToString(), "Share exp percentage must be number");

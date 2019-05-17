@@ -12,8 +12,8 @@ namespace MultiplayerARPG
         public string titleFormat = "{0}";
         [Tooltip("Description Format => {0} = {Description}")]
         public string descriptionFormat = "{0}";
-        [Tooltip("Sell Price Format => {0} = {Sell price}")]
-        public string sellPriceFormat = "{0}";
+        [Tooltip("Sell Price Format => {0} = {Sell price}, {1} = {Sell price Label}")]
+        public string sellPriceFormat = "{1}: {0}";
 
         [Header("UI Elements")]
         public UICashShop uiCashShop;
@@ -46,7 +46,7 @@ namespace MultiplayerARPG
             }
 
             if (uiTextSellPrice != null)
-                uiTextSellPrice.text = string.Format(sellPriceFormat, Data == null ? "0" : Data.sellPrice.ToString("N0"));
+                uiTextSellPrice.text = string.Format(sellPriceFormat, Data == null ? "0" : Data.sellPrice.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_SELL_PRICE.ToString()));
         }
 
         IEnumerator LoadExternalIcon()

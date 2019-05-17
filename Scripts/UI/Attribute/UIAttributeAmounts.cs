@@ -9,7 +9,7 @@ namespace MultiplayerARPG
         public string amountFormat = "{0}: {1}/{2}";
         [Tooltip("Attribute Amount Format => {0} = {Attribute title}, {1} = {Current Amount}, {2} = {Target Amount}")]
         public string amountNotEnoughFormat = "{0}: <color=red>{1}/{2}</color>";
-        [Tooltip("Attribute Amount Format without Current Amount => {0} = {Attribute title}, {1} = {Target Level}")]
+        [Tooltip("Attribute Amount Format without Current Amount => {0} = {Attribute title}, {1} = {Target Amount}")]
         public string simpleAmountFormat = "{0}: {1}";
 
         [Header("UI Elements")]
@@ -25,14 +25,16 @@ namespace MultiplayerARPG
                 if (cacheTextAmounts == null)
                 {
                     cacheTextAmounts = new Dictionary<Attribute, TextWrapper>();
+                    Attribute tempAttribute;
+                    TextWrapper tempTextComponent;
                     foreach (UIAttributeTextPair textAmount in textAmounts)
                     {
                         if (textAmount.attribute == null || textAmount.uiText == null)
                             continue;
-                        Attribute key = textAmount.attribute;
-                        TextWrapper textComp = textAmount.uiText;
-                        textComp.text = string.Format(amountFormat, key.Title, "0", "0");
-                        cacheTextAmounts[key] = textComp;
+                        tempAttribute = textAmount.attribute;
+                        tempTextComponent = textAmount.uiText;
+                        tempTextComponent.text = string.Format(amountFormat, tempAttribute.Title, "0", "0");
+                        cacheTextAmounts[tempAttribute] = tempTextComponent;
                     }
                 }
                 return cacheTextAmounts;
@@ -63,17 +65,22 @@ namespace MultiplayerARPG
                 TextWrapper tempTextWrapper;
                 foreach (KeyValuePair<Attribute, short> dataEntry in Data)
                 {
+                    if (dataEntry.Key == null || dataEntry.Value == 0)
+                        continue;
+                    // Set temp data
                     tempAttribute = dataEntry.Key;
                     tempTargetAmount = dataEntry.Value;
-                    if (tempAttribute == null || tempTargetAmount == 0)
-                        continue;
+                    tempCurrentAmount = 0;
+                    // Add new line if text is not empty
                     if (!string.IsNullOrEmpty(tempAllText))
                         tempAllText += "\n";
-                    tempCurrentAmount = 0;
+                    // Get attribute amount from character
                     if (owningCharacter != null)
                         owningCharacter.CacheAttributes.TryGetValue(tempAttribute, out tempCurrentAmount);
+                    // Use difference format by option 
                     if (showAsRequirement)
                     {
+                        // This will show both current character attribute amount and target amount
                         tempFormat = tempCurrentAmount >= tempTargetAmount ? amountFormat : amountNotEnoughFormat;
                         tempAmountText = string.Format(tempFormat, tempAttribute.Title, tempCurrentAmount.ToString("N0"), tempTargetAmount.ToString("N0"));
                     }
@@ -82,10 +89,12 @@ namespace MultiplayerARPG
                         // This will show only target amount, so current character attribute amount will not be shown
                         tempAmountText = string.Format(simpleAmountFormat, tempAttribute.Title, tempTargetAmount.ToString("N0"));
                     }
+                    // Append current attribute amount text
                     tempAllText += tempAmountText;
                     if (CacheTextAmounts.TryGetValue(tempAttribute, out tempTextWrapper))
                         tempTextWrapper.text = tempAmountText;
                 }
+
                 if (uiTextAllAmounts != null)
                 {
                     uiTextAllAmounts.gameObject.SetActive(!string.IsNullOrEmpty(tempAllText));

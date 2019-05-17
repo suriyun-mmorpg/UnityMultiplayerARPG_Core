@@ -43,7 +43,7 @@ namespace MultiplayerARPG
                 uiTextName.text = string.Format(nameFormat, string.IsNullOrEmpty(Data.socialCharacter.characterName) ? LanguageManager.GetUnknowTitle() : Data.socialCharacter.characterName);
 
             if (uiTextLevel != null)
-                uiTextLevel.text = string.Format(levelFormat, Data.socialCharacter.level.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LEVEL.ToString()));
+                uiTextLevel.text = string.Format(levelFormat, Data.socialCharacter.level.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()));
 
             // Hp
             int currentHp = Data.socialCharacter.currentHp;
@@ -51,7 +51,7 @@ namespace MultiplayerARPG
 
             if (uiTextHp != null)
             {
-                uiTextHp.text = string.Format(hpFormat, currentHp.ToString("N0"), maxHp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_HP.ToString()));
+                uiTextHp.text = string.Format(hpFormat, currentHp.ToString("N0"), maxHp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_HP.ToString()));
                 uiTextHp.gameObject.SetActive(maxHp > 0);
             }
 
@@ -64,7 +64,7 @@ namespace MultiplayerARPG
 
             if (uiTextMp != null)
             {
-                uiTextMp.text = string.Format(mpFormat, currentMp.ToString("N0"), maxMp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_MP.ToString()));
+                uiTextMp.text = string.Format(mpFormat, currentMp.ToString("N0"), maxMp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_MP.ToString()));
                 uiTextMp.gameObject.SetActive(maxMp > 0);
             }
 

@@ -209,14 +209,14 @@ namespace MultiplayerARPG
         public void UpdateDealingGold(int gold)
         {
             if (uiTextDealingGold != null)
-                uiTextDealingGold.text = string.Format(dealingGoldFormat, gold.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_GOLD.ToString()));
+                uiTextDealingGold.text = string.Format(dealingGoldFormat, gold.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_GOLD.ToString()));
             dealingGold = gold;
         }
 
         public void UpdateAnotherDealingGold(int gold)
         {
             if (uiTextAnotherDealingGold != null)
-                uiTextAnotherDealingGold.text = string.Format(anotherDealingGoldFormat, gold.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_GOLD.ToString()));
+                uiTextAnotherDealingGold.text = string.Format(anotherDealingGoldFormat, gold.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_GOLD.ToString()));
             anotherDealingGold = gold;
         }
 

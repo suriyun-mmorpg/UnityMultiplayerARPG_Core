@@ -119,7 +119,13 @@ namespace MultiplayerARPG
             }
 
             if (uiTextHp != null)
-                uiTextHp.text = string.Format(hpFormat, currentHp.ToString("N0"), maxHp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_HP.ToString()));
+            {
+                uiTextHp.text = string.Format(
+                    hpFormat,
+                    currentHp.ToString("N0"),
+                    maxHp.ToString("N0"),
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_HP.ToString()));
+            }
 
             if (imageHpGage != null)
                 imageHpGage.fillAmount = maxHp <= 0 ? 0 : (float)currentHp / (float)maxHp;
@@ -134,7 +140,13 @@ namespace MultiplayerARPG
             }
 
             if (uiTextMp != null)
-                uiTextMp.text = string.Format(mpFormat, currentMp.ToString("N0"), maxMp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_MP.ToString()));
+            {
+                uiTextMp.text = string.Format(
+                    mpFormat,
+                    currentMp.ToString("N0"),
+                    maxMp.ToString("N0"),
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_MP.ToString()));
+            }
 
             if (imageMpGage != null)
                 imageMpGage.fillAmount = maxMp <= 0 ? 0 : (float)currentMp / (float)maxMp;
@@ -149,7 +161,13 @@ namespace MultiplayerARPG
             }
 
             if (uiTextStamina != null)
-                uiTextStamina.text = string.Format(staminaFormat, currentStamina.ToString("N0"), maxStamina.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_STAMINA.ToString()));
+            {
+                uiTextStamina.text = string.Format(
+                    staminaFormat,
+                    currentStamina.ToString("N0"),
+                    maxStamina.ToString("N0"),
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_STAMINA.ToString()));
+            }
 
             if (imageStaminaGage != null)
                 imageStaminaGage.fillAmount = maxStamina <= 0 ? 0 : (float)currentStamina / (float)maxStamina;
@@ -164,7 +182,13 @@ namespace MultiplayerARPG
             }
 
             if (uiTextFood != null)
-                uiTextFood.text = string.Format(foodFormat, currentFood.ToString("N0"), maxFood.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_FOOD.ToString()));
+            {
+                uiTextFood.text = string.Format(
+                    foodFormat,
+                    currentFood.ToString("N0"),
+                    maxFood.ToString("N0"),
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_FOOD.ToString()));
+            }
 
             if (imageFoodGage != null)
                 imageFoodGage.fillAmount = maxFood <= 0 ? 0 : (float)currentFood / (float)maxFood;
@@ -179,7 +203,13 @@ namespace MultiplayerARPG
             }
 
             if (uiTextWater != null)
-                uiTextWater.text = string.Format(waterFormat, currentWater.ToString("N0"), maxWater.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_WATER.ToString()));
+            {
+                uiTextWater.text = string.Format(
+                    waterFormat,
+                    currentWater.ToString("N0"),
+                    maxWater.ToString("N0"),
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_WATER.ToString()));
+            }
 
             if (imageWaterGage != null)
                 imageWaterGage.fillAmount = maxWater <= 0 ? 0 : (float)currentWater / (float)maxWater;
@@ -195,7 +225,12 @@ namespace MultiplayerARPG
                 uiTextName.text = string.Format(nameFormat, Data == null ? LanguageManager.GetUnknowTitle() : Data.CharacterName);
 
             if (uiTextLevel != null)
-                uiTextLevel.text = string.Format(levelFormat, Data == null ? "0" : Data.Level.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LEVEL.ToString()));
+            {
+                uiTextLevel.text = string.Format(
+                    levelFormat,
+                    Data == null ? "0" : Data.Level.ToString("N0"),
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()));
+            }
 
             int[] expTree = GameInstance.Singleton.ExpTree;
             int currentExp = 0;
@@ -213,7 +248,13 @@ namespace MultiplayerARPG
             }
 
             if (uiTextExp != null)
-                uiTextExp.text = string.Format(expFormat, currentExp.ToString("N0"), nextLevelExp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_EXP.ToString()));
+            {
+                uiTextExp.text = string.Format(
+                    expFormat,
+                    currentExp.ToString("N0"),
+                    nextLevelExp.ToString("N0"),
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_EXP.ToString()));
+            }
 
             if (imageExpGage != null)
                 imageExpGage.fillAmount = nextLevelExp <= 0 ? 1 : (float)currentExp / (float)nextLevelExp;
@@ -221,13 +262,28 @@ namespace MultiplayerARPG
             // Player character data
             IPlayerCharacterData playerCharacter = Data as IPlayerCharacterData;
             if (uiTextStatPoint != null)
-                uiTextStatPoint.text = string.Format(statPointFormat, playerCharacter == null ? "0" : playerCharacter.StatPoint.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_STAT_POINTS.ToString()));
+            {
+                uiTextStatPoint.text = string.Format(
+                    statPointFormat,
+                    playerCharacter == null ? "0" : playerCharacter.StatPoint.ToString("N0"),
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_STAT_POINTS.ToString()));
+            }
 
             if (uiTextSkillPoint != null)
-                uiTextSkillPoint.text = string.Format(skillPointFormat, playerCharacter == null ? "0" : playerCharacter.SkillPoint.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_SKILL_POINTS.ToString()));
+            {
+                uiTextSkillPoint.text = string.Format(
+                    skillPointFormat,
+                    playerCharacter == null ? "0" : playerCharacter.SkillPoint.ToString("N0"),
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_SKILL_POINTS.ToString()));
+            }
 
             if (uiTextGold != null)
-                uiTextGold.text = string.Format(goldFormat, playerCharacter == null ? "0" : playerCharacter.Gold.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_GOLD.ToString()));
+            {
+                uiTextGold.text = string.Format(
+                    goldFormat,
+                    playerCharacter == null ? "0" : playerCharacter.Gold.ToString("N0"),
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_GOLD.ToString()));
+            }
 
             BaseCharacter character = Data == null ? null : Data.GetDatabase();
             if (uiCharacterClass != null)
@@ -269,7 +325,13 @@ namespace MultiplayerARPG
             cacheWeightLimit += bonusStats.weightLimit;
 
             if (uiTextWeightLimit != null)
-                uiTextWeightLimit.text = string.Format(weightLimitStatsFormat, Data.GetTotalItemWeight().ToString("N2"), cacheWeightLimit.ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_WEIGHT.ToString()));
+            {
+                uiTextWeightLimit.text = string.Format(
+                    weightLimitStatsFormat,
+                    Data.GetTotalItemWeight().ToString("N2"),
+                    cacheWeightLimit.ToString("N2"),
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_WEIGHT.ToString()));
+            }
 
             CharacterItem rightHandItem = Data.EquipWeapons.rightHand;
             CharacterItem leftHandItem = Data.EquipWeapons.leftHand;

@@ -1,9 +1,12 @@
-﻿namespace MultiplayerARPG
+﻿using UnityEngine;
+
+namespace MultiplayerARPG
 {
     [System.Serializable]
     public partial struct CharacterStats
     {
         public static readonly CharacterStats Empty = new CharacterStats();
+        [Header("Default Stats")]
         public float hp;
         public float mp;
         public float armor;
@@ -110,7 +113,7 @@
             string statsStringPart = string.Empty;
 
             // Hp
-            statsStringPart = string.Format(hpStatsFormat, data.hp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_HP.ToString()));
+            statsStringPart = string.Format(hpStatsFormat, data.hp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_HP.ToString()));
             if (data.hp != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -121,7 +124,7 @@
                 uiTextHp.text = statsStringPart;
 
             // Mp
-            statsStringPart = string.Format(mpStatsFormat, data.mp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_MP.ToString()));
+            statsStringPart = string.Format(mpStatsFormat, data.mp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_MP.ToString()));
             if (data.mp != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -132,7 +135,7 @@
                 uiTextMp.text = statsStringPart;
 
             // Armor
-            statsStringPart = string.Format(armorStatsFormat, data.armor.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_ARMOR.ToString()));
+            statsStringPart = string.Format(armorStatsFormat, data.armor.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_ARMOR.ToString()));
             if (data.armor != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -143,7 +146,7 @@
                 uiTextArmor.text = statsStringPart;
 
             // Accuracy
-            statsStringPart = string.Format(accuracyStatsFormat, data.accuracy.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_ACCURACY.ToString()));
+            statsStringPart = string.Format(accuracyStatsFormat, data.accuracy.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_ACCURACY.ToString()));
             if (data.accuracy != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -154,7 +157,7 @@
                 uiTextAccuracy.text = statsStringPart;
 
             // Evasion
-            statsStringPart = string.Format(evasionStatsFormat, data.evasion.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_EVASION.ToString()));
+            statsStringPart = string.Format(evasionStatsFormat, data.evasion.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_EVASION.ToString()));
             if (data.evasion != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -165,7 +168,7 @@
                 uiTextEvasion.text = statsStringPart;
 
             // Cri Rate
-            statsStringPart = string.Format(criRateStatsFormat, (data.criRate * 100).ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_CRITICAL_RATE.ToString()));
+            statsStringPart = string.Format(criRateStatsFormat, (data.criRate * 100).ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_CRITICAL_RATE.ToString()));
             if (data.criRate != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -176,7 +179,7 @@
                 uiTextCriRate.text = statsStringPart;
 
             // Cri Dmg Rate
-            statsStringPart = string.Format(criDmgRateStatsFormat, (data.criDmgRate * 100).ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_CRITICAL_DAMAGE_RATE.ToString()));
+            statsStringPart = string.Format(criDmgRateStatsFormat, (data.criDmgRate * 100).ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_CRITICAL_DAMAGE_RATE.ToString()));
             if (data.criDmgRate != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -187,7 +190,7 @@
                 uiTextCriDmgRate.text = statsStringPart;
 
             // Block Rate
-            statsStringPart = string.Format(blockRateStatsFormat, (data.blockRate * 100).ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_BLOCK_RATE.ToString()));
+            statsStringPart = string.Format(blockRateStatsFormat, (data.blockRate * 100).ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_BLOCK_RATE.ToString()));
             if (data.blockRate != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -198,7 +201,7 @@
                 uiTextBlockRate.text = statsStringPart;
 
             // Block Dmg Rate
-            statsStringPart = string.Format(blockDmgRateStatsFormat, (data.blockDmgRate * 100).ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_BLOCK_DAMAGE_RATE.ToString()));
+            statsStringPart = string.Format(blockDmgRateStatsFormat, (data.blockDmgRate * 100).ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_BLOCK_DAMAGE_RATE.ToString()));
             if (data.blockDmgRate != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -209,7 +212,7 @@
                 uiTextBlockDmgRate.text = statsStringPart;
 
             // Weight
-            statsStringPart = string.Format(weightLimitStatsFormat, data.weightLimit.ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_WEIGHT.ToString()));
+            statsStringPart = string.Format(weightLimitStatsFormat, data.weightLimit.ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_WEIGHT.ToString()));
             if (data.weightLimit != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -220,7 +223,7 @@
                 uiTextWeightLimit.text = statsStringPart;
 
             // Move Speed
-            statsStringPart = string.Format(moveSpeedStatsFormat, data.moveSpeed.ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_MOVE_SPEED.ToString()));
+            statsStringPart = string.Format(moveSpeedStatsFormat, data.moveSpeed.ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_MOVE_SPEED.ToString()));
             if (data.moveSpeed != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -231,7 +234,7 @@
                 uiTextMoveSpeed.text = statsStringPart;
 
             // Attack Speed
-            statsStringPart = string.Format(atkSpeedStatsFormat, data.atkSpeed.ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_ATTACK_SPEED.ToString()));
+            statsStringPart = string.Format(atkSpeedStatsFormat, data.atkSpeed.ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_ATTACK_SPEED.ToString()));
             if (data.atkSpeed != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -242,7 +245,7 @@
                 uiTextAtkSpeed.text = statsStringPart;
 
             // Stamina
-            statsStringPart = string.Format(staminaStatsFormat, data.stamina.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_STAMINA.ToString()));
+            statsStringPart = string.Format(staminaStatsFormat, data.stamina.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_STAMINA.ToString()));
             if (data.stamina != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -253,7 +256,7 @@
                 uiTextStamina.text = statsStringPart;
 
             // Food
-            statsStringPart = string.Format(foodStatsFormat, data.food.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_FOOD.ToString()));
+            statsStringPart = string.Format(foodStatsFormat, data.food.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_FOOD.ToString()));
             if (data.food != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -264,7 +267,7 @@
                 uiTextFood.text = statsStringPart;
 
             // Water
-            statsStringPart = string.Format(waterStatsFormat, data.water.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_WATER.ToString()));
+            statsStringPart = string.Format(waterStatsFormat, data.water.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_WATER.ToString()));
             if (data.water != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))

@@ -7,14 +7,8 @@ namespace MultiplayerARPG
     public abstract class UIBaseBank : UIBase
     {
         [Header("Generic Info Format")]
-        [Tooltip("Amount Format => {0} = {Amount}")]
-        public string amountFormat = "{0}";
-
-        [Header("Input Dialog Settings")]
-        public string depositInputTitle = "Deposit";
-        public string depositInputDescription = "";
-        public string withdrawInputTitle = "Withdraw";
-        public string withdrawInputDescription = "";
+        [Tooltip("Amount Format => {0} = {Amount}, {1} = {Gold Label}")]
+        public string amountFormat = "{1}: {0}";
 
         [Header("UI Elements")]
         public TextWrapper uiTextAmount;
@@ -22,17 +16,17 @@ namespace MultiplayerARPG
         private void Update()
         {
             if (uiTextAmount != null)
-                uiTextAmount.text = string.Format(amountFormat, GetAmount().ToString("N0"));
+                uiTextAmount.text = string.Format(amountFormat, GetAmount().ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_GOLD.ToString()));
         }
 
         public void OnClickDeposit()
         {
-            UISceneGlobal.Singleton.ShowInputDialog(depositInputTitle, depositInputDescription, OnDepositConfirm, 0, null, 0);
+            UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UILocaleKeys.UI_BANK_DEPOSIT.ToString()), LanguageManager.GetText(UILocaleKeys.UI_BANK_DEPOSIT_DESCRIPTION.ToString()), OnDepositConfirm, 0, null, 0);
         }
 
         public void OnClickWithdraw()
         {
-            UISceneGlobal.Singleton.ShowInputDialog(withdrawInputTitle, withdrawInputDescription, OnWithdrawConfirm, 0, null, 0);
+            UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UILocaleKeys.UI_BANK_WITHDRAW.ToString()), LanguageManager.GetText(UILocaleKeys.UI_BANK_WITHDRAW_DESCRIPTION.ToString()), OnWithdrawConfirm, 0, null, 0);
         }
 
         public abstract void OnDepositConfirm(int amount);

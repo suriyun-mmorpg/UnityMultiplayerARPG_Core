@@ -7,10 +7,10 @@ namespace MultiplayerARPG
     public class UICharacterEntity : UIDamageableEntity<BaseCharacterEntity>
     {
         [Header("Character Entity - Display Format")]
-        [Tooltip("Level Format => {0} = {Level}")]
-        public string levelFormat = "Lv: {0}";
-        [Tooltip("Mp Format => {0} = {Current mp}, {1} = {Max mp}")]
-        public string mpFormat = "Mp: {0}/{1}";
+        [Tooltip("Level Format => {0} = {Level}, {1} = {Level Label}")]
+        public string levelFormat = "{1}: {0}";
+        [Tooltip("Mp Format => {0} = {Current mp}, {1} = {Max mp}, {2} = {Mp Label}")]
+        public string mpFormat = "{2}: {0}/{1}";
         [Tooltip("Skill Cast Format => {0} = {Count down duration}")]
         public string skillCastFormat = "{0}";
 
@@ -36,7 +36,7 @@ namespace MultiplayerARPG
                 return;
 
             if (uiTextLevel != null)
-                uiTextLevel.text = string.Format(levelFormat, Data == null ? "0" : Data.Level.ToString("N0"));
+                uiTextLevel.text = string.Format(levelFormat, Data == null ? "0" : Data.Level.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()));
 
             currentMp = 0;
             maxMp = 0;
@@ -51,7 +51,7 @@ namespace MultiplayerARPG
             }
 
             if (uiTextMp != null)
-                uiTextMp.text = string.Format(mpFormat, currentMp.ToString("N0"), maxMp.ToString("N0"));
+                uiTextMp.text = string.Format(mpFormat, currentMp.ToString("N0"), maxMp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_MP.ToString()));
 
             if (imageMpGage != null)
                 imageMpGage.fillAmount = maxMp <= 0 ? 0 : (float)currentMp / (float)maxMp;

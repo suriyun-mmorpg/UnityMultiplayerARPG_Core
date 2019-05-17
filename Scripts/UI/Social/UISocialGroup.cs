@@ -17,10 +17,10 @@ namespace MultiplayerARPG
         where T : UISocialCharacter
     {
         [Header("Display Format")]
-        [Tooltip("Member Amount Format => {0} = {current amount}, {1} = {max amount}")]
-        public string memberAmountFormat = "Member Amount: {0}/{1}";
-        [Tooltip("Member Amount Format => {0} = {current amount}")]
-        public string memberAmountNoLimitFormat = "Member Amount: {0}";
+        [Tooltip("Member Amount Format => {0} = {current amount}, {1} = {max amount}, {2} = {Social Member Label}")]
+        public string memberAmountFormat = "{2}: {0}/{1}";
+        [Tooltip("Member Amount Format => {0} = {current amount}, {1} = {Social Member Label}")]
+        public string memberAmountNoLimitFormat = "{1}: {0}";
 
         [Header("UI Elements")]
         public T uiMemberDialog;
@@ -90,9 +90,20 @@ namespace MultiplayerARPG
             if (textMemberAmount != null)
             {
                 if (GetMaxMemberAmount() > 0)
-                    textMemberAmount.text = string.Format(memberAmountFormat, memberAmount.ToString("N0"), GetMaxMemberAmount().ToString("N0"));
+                {
+                    textMemberAmount.text = string.Format(
+                        memberAmountFormat,
+                        memberAmount.ToString("N0"),
+                        GetMaxMemberAmount().ToString("N0"),
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_SOCIAL_MEMBER.ToString()));
+                }
                 else
-                    textMemberAmount.text = string.Format(memberAmountNoLimitFormat, memberAmount.ToString("N0"));
+                {
+                    textMemberAmount.text = string.Format(
+                        memberAmountNoLimitFormat,
+                        memberAmount.ToString("N0"),
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_SOCIAL_MEMBER.ToString()));
+                }
             }
             
             foreach (GameObject obj in owningCharacterIsInGroupObjects)

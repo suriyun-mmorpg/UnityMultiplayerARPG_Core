@@ -56,7 +56,7 @@ namespace MultiplayerARPG
             float buffDuration = CharacterBuff.GetDuration();
 
             if (uiTextDuration != null)
-                uiTextDuration.text = string.Format(buffDurationFormat, buffDuration.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_BUFF_DURATION.ToString()));
+                uiTextDuration.text = string.Format(buffDurationFormat, buffDuration.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_BUFF_DURATION.ToString()));
 
             if (uiTextRemainsDuration != null)
             {

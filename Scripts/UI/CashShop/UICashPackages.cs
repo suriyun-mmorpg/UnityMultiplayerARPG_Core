@@ -7,8 +7,8 @@ namespace MultiplayerARPG
     public partial class UICashPackages : UIBase
     {
         [Header("Generic Info Format")]
-        [Tooltip("Cash Format => {0} = {Cash amount}")]
-        public string cashFormat = "{0}";
+        [Tooltip("Owning Cash Format => {0} = {Cash amount}, {1} = {Cash Label}")]
+        public string cashFormat = "{1}: {0}";
         public UICashPackage uiCashPackageDialog;
         public UICashPackage uiCashPackagePrefab;
         public Transform uiCashPackageContainer;
@@ -104,7 +104,7 @@ namespace MultiplayerARPG
         {
             if (!success)
             {
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), errorMessage);
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), errorMessage);
                 return;
             }
             RefreshCashPackageInfo();
@@ -116,14 +116,14 @@ namespace MultiplayerARPG
             switch (responseCode)
             {
                 case AckResponseCode.Error:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_CANNOT_GET_CASH_PACKAGE_INFO.ToString()));
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_CANNOT_GET_CASH_PACKAGE_INFO.ToString()));
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_CONNECTION_TIMEOUT.ToString()));
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
                     if (uiTextCash != null)
-                        uiTextCash.text = string.Format(cashFormat, castedMessage.cash.ToString("N0"));
+                        uiTextCash.text = string.Format(cashFormat, castedMessage.cash.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_CASH.ToString()));
                     List<CashPackage> cashPackages = new List<CashPackage>();
                     foreach (int cashPackageId in castedMessage.cashPackageIds)
                     {

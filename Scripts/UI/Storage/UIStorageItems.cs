@@ -7,14 +7,10 @@ namespace MultiplayerARPG
     public class UIStorageItems : UIBase
     {
         [Header("Generic Info Format")]
-        [Tooltip("Weight Limit Stats Format => {0} = {Current Total Weights}, {1} = {Weight Limit}")]
-        public string weightLimitFormat = "Weight: {0}/{1}";
-        [Tooltip("Slot Limit Stats Format => {0} = {Current Used Slots}, {1} = {Slot Limit}")]
-        public string slotLimitFormat = "Used Slot: {0}/{1}";
-        [Tooltip("This text will be shown when it is not limit weight")]
-        public string unlimitWeightText = "Unlimit Weights";
-        [Tooltip("This text will be shown when it is not limit slot")]
-        public string unlimitSlotText = "Unlimit Slots";
+        [Tooltip("Weight Limit Stats Format => {0} = {Current Total Weights}, {1} = {Weight Limit}, {2} = {Weight Label}")]
+        public string weightLimitFormat = "{2}: {0}/{1}";
+        [Tooltip("Slot Limit Stats Format => {0} = {Current Used Slots}, {1} = {Slot Limit}, {2} = {Slot Label}")]
+        public string slotLimitFormat = "{2}: {0}/{1}";
 
         [Header("UI Elements")]
         public UICharacterItem uiItemDialog;
@@ -115,17 +111,17 @@ namespace MultiplayerARPG
             if (uiTextWeightLimit != null)
             {
                 if (weightLimit <= 0)
-                    uiTextWeightLimit.text = unlimitWeightText;
+                    uiTextWeightLimit.text = LanguageManager.GetText(UILocaleKeys.UI_LABEL_UNLIMIT_WEIGHT.ToString());
                 else
-                    uiTextWeightLimit.text = string.Format(weightLimitFormat, totalWeight.ToString("N2"), weightLimit.ToString("N2"));
+                    uiTextWeightLimit.text = string.Format(weightLimitFormat, totalWeight.ToString("N2"), weightLimit.ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_WEIGHT.ToString()));
             }
 
             if (uiTextSlotLimit != null)
             {
                 if (slotLimit <= 0)
-                    uiTextSlotLimit.text = unlimitSlotText;
+                    uiTextSlotLimit.text = LanguageManager.GetText(UILocaleKeys.UI_LABEL_UNLIMIT_SLOT.ToString());
                 else
-                    uiTextSlotLimit.text = string.Format(slotLimitFormat, usedSlots.ToString("N0"), slotLimit.ToString("N0"));
+                    uiTextSlotLimit.text = string.Format(slotLimitFormat, usedSlots.ToString("N0"), slotLimit.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_SLOT.ToString()));
             }
         }
 

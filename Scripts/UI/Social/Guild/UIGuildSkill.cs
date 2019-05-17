@@ -20,18 +20,6 @@ namespace MultiplayerARPG
         public string coolDownDurationFormat = "{1}: {0}";
         [Tooltip("Cool Down Remains Duration Format => {0} = {Remains duration}")]
         public string coolDownRemainsDurationFormat = "{0}";
-        [Tooltip("Increase Max Member Format")]
-        public string increaseMaxMemberFormat = "Max Member +{0}";
-        [Tooltip("Increase Exp Gain Percentage Format")]
-        public string increaseExpGainPercentageFormat = "Exp Gain +{0}%";
-        [Tooltip("Increase Gold Gain Percentage Format")]
-        public string increaseGoldGainPercentageFormat = "Gold Gain +{0}%";
-        [Tooltip("Increase Share Exp Gain Percentage Format")]
-        public string increaseShareExpGainPercentageFormat = "Party Share Exp +{0}%";
-        [Tooltip("Increase Share Gold Gain Percentage Format")]
-        public string increaseShareGoldGainPercentageFormat = "Party Share Gold +{0}%";
-        [Tooltip("Decrease Exp Lost Percentage Format")]
-        public string decreaseExpLostPercentageFormat = "Exp Penalty -{0}%";
         [Tooltip("Skill Type Format => {0} = {Skill Type title}, {1} = {Skill Type Label}")]
         public string skillTypeFormat = "{1}: {0}";
 
@@ -105,7 +93,7 @@ namespace MultiplayerARPG
             float coolDownDuration = GuildSkill.GetCoolDownDuration(Level);
 
             if (uiTextCoolDownDuration != null)
-                uiTextCoolDownDuration.text = string.Format(coolDownDurationFormat, coolDownDuration.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_SKILL_COOLDOWN.ToString()));
+                uiTextCoolDownDuration.text = string.Format(coolDownDurationFormat, coolDownDuration.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_SKILL_COOLDOWN.ToString()));
 
             if (uiTextCoolDownRemainsDuration != null)
             {
@@ -151,7 +139,7 @@ namespace MultiplayerARPG
                 uiTextDescription.text = string.Format(descriptionFormat, GuildSkill == null ? LanguageManager.GetUnknowDescription() : GuildSkill.Description);
 
             if (uiTextLevel != null)
-                uiTextLevel.text = string.Format(levelFormat, Level.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LEVEL.ToString()));
+                uiTextLevel.text = string.Format(levelFormat, Level.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()));
 
             if (imageIcon != null)
             {
@@ -165,10 +153,10 @@ namespace MultiplayerARPG
                 switch (GuildSkill.skillType)
                 {
                     case GuildSkillType.Active:
-                        uiTextSkillType.text = string.Format(skillTypeFormat, LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_ACTIVE.ToString()), LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_LABEL.ToString()));
+                        uiTextSkillType.text = string.Format(skillTypeFormat, LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_ACTIVE.ToString()), LanguageManager.GetText(UILocaleKeys.UI_LABEL_SKILL_TYPE.ToString()));
                         break;
                     case GuildSkillType.Passive:
-                        uiTextSkillType.text = string.Format(skillTypeFormat, LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_PASSIVE.ToString()), LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_LABEL.ToString()));
+                        uiTextSkillType.text = string.Format(skillTypeFormat, LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_PASSIVE.ToString()), LanguageManager.GetText(UILocaleKeys.UI_LABEL_SKILL_TYPE.ToString()));
                         break;
                 }
             }
@@ -176,42 +164,54 @@ namespace MultiplayerARPG
             if (uiTextIncreaseMaxMember != null)
             {
                 int amount = GuildSkill.increaseMaxMember.GetAmount(Level);
-                uiTextIncreaseMaxMember.text = string.Format(increaseMaxMemberFormat, amount.ToString("N0"));
+                uiTextIncreaseMaxMember.text = string.Format(
+                    LanguageManager.GetText(UILocaleKeys.UI_FORMAT_INCREASE_MAX_MEMBER.ToString()),
+                    amount.ToString("N0"));
                 uiTextIncreaseMaxMember.gameObject.SetActive(amount != 0);
             }
 
             if (uiTextIncreaseExpGainPercentage != null)
             {
                 float amount = GuildSkill.increaseExpGainPercentage.GetAmount(Level);
-                uiTextIncreaseExpGainPercentage.text = string.Format(increaseExpGainPercentageFormat, amount.ToString("N2"));
+                uiTextIncreaseExpGainPercentage.text = string.Format(
+                    LanguageManager.GetText(UILocaleKeys.UI_FORMAT_INCREASE_EXP_GAIN_PERCENTAGE.ToString()),
+                    amount.ToString("N2"));
                 uiTextIncreaseExpGainPercentage.gameObject.SetActive(amount != 0);
             }
 
             if (uiTextIncreaseGoldGainPercentage != null)
             {
                 float amount = GuildSkill.increaseGoldGainPercentage.GetAmount(Level);
-                uiTextIncreaseGoldGainPercentage.text = string.Format(increaseGoldGainPercentageFormat, amount.ToString("N2"));
+                uiTextIncreaseGoldGainPercentage.text = string.Format(
+                    LanguageManager.GetText(UILocaleKeys.UI_FORMAT_INCREASE_GOLD_GAIN_PERCENTAGE.ToString()),
+                    amount.ToString("N2"));
                 uiTextIncreaseGoldGainPercentage.gameObject.SetActive(amount != 0);
             }
 
             if (uiTextIncreaseShareExpGainPercentage != null)
             {
                 float amount = GuildSkill.increaseShareExpGainPercentage.GetAmount(Level);
-                uiTextIncreaseShareExpGainPercentage.text = string.Format(increaseShareExpGainPercentageFormat, amount.ToString("N2"));
+                uiTextIncreaseShareExpGainPercentage.text = string.Format(
+                    LanguageManager.GetText(UILocaleKeys.UI_FORMAT_INCREASE_SHARE_EXP_GAIN_PERCENTAGE.ToString()),
+                    amount.ToString("N2"));
                 uiTextIncreaseShareExpGainPercentage.gameObject.SetActive(amount != 0);
             }
 
             if (uiTextIncreaseShareGoldGainPercentage != null)
             {
                 float amount = GuildSkill.increaseShareGoldGainPercentage.GetAmount(Level);
-                uiTextIncreaseShareGoldGainPercentage.text = string.Format(increaseShareGoldGainPercentageFormat, amount.ToString("N2"));
+                uiTextIncreaseShareGoldGainPercentage.text = string.Format(
+                    LanguageManager.GetText(UILocaleKeys.UI_FORMAT_INCREASE_SHARE_GOLD_GAIN_PERCENTAGE.ToString()),
+                    amount.ToString("N2"));
                 uiTextIncreaseShareGoldGainPercentage.gameObject.SetActive(amount != 0);
             }
 
             if (uiTextDecreaseExpLostPercentage != null)
             {
                 float amount = GuildSkill.decreaseExpLostPercentage.GetAmount(Level);
-                uiTextDecreaseExpLostPercentage.text = string.Format(decreaseExpLostPercentageFormat, amount.ToString("N2"));
+                uiTextDecreaseExpLostPercentage.text = string.Format(
+                    LanguageManager.GetText(UILocaleKeys.UI_FORMAT_DECREASE_EXP_PENALTY_PERCENTAGE.ToString()),
+                    amount.ToString("N2"));
                 uiTextDecreaseExpLostPercentage.gameObject.SetActive(amount != 0);
             }
 

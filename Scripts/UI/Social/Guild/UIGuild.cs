@@ -106,10 +106,20 @@ namespace MultiplayerARPG
                 textGuildName.text = string.Format(guildNameFormat, Guild == null ? LanguageManager.GetUnknowTitle() : Guild.guildName);
 
             if (textLeaderName != null)
-                textLeaderName.text = string.Format(leaderNameFormat, Guild == null ? LanguageManager.GetUnknowTitle() : Guild.GetLeader().characterName, LanguageManager.GetText(UILocaleKeys.UI_GUILD_LEADER.ToString()));
+            {
+                textLeaderName.text = string.Format(
+                    leaderNameFormat,
+                    Guild == null ? LanguageManager.GetUnknowTitle() : Guild.GetLeader().characterName,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_SOCIAL_LEADER.ToString()));
+            }
 
             if (textLevel != null)
-                textLevel.text = string.Format(levelFormat, Guild == null ? "0" : Guild.level.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LEVEL.ToString()));
+            {
+                textLevel.text = string.Format(
+                    levelFormat,
+                    Guild == null ? "0" : Guild.level.ToString("N0"),
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()));
+            }
 
             int[] expTree = GameInstance.Singleton.SocialSystemSetting.GuildExpTree;
             int currentExp = 0;
@@ -127,13 +137,24 @@ namespace MultiplayerARPG
             }
 
             if (textExp != null)
-                textExp.text = string.Format(expFormat, currentExp.ToString("N0"), nextLevelExp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_EXP.ToString()));
+            {
+                textExp.text = string.Format(
+                    expFormat,
+                    currentExp.ToString("N0"),
+                    nextLevelExp.ToString("N0"),
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_EXP.ToString()));
+            }
 
             if (imageExpGage != null)
                 imageExpGage.fillAmount = nextLevelExp <= 0 ? 1 : (float)currentExp / (float)nextLevelExp;
 
             if (textSkillPoint != null)
-                textSkillPoint.text = string.Format(skillPointFormat, Guild == null ? "0" : Guild.skillPoint.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_SKILL_POINTS.ToString()));
+            {
+                textSkillPoint.text = string.Format(
+                    skillPointFormat,
+                    Guild == null ? "0" : Guild.skillPoint.ToString("N0"),
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_SKILL_POINTS.ToString()));
+            }
 
             if (Guild == null)
             {

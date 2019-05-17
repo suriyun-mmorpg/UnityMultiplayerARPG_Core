@@ -5,11 +5,6 @@ namespace MultiplayerARPG
 {
     public partial class UIDamageElementInflictions : UISelectionEntry<Dictionary<DamageElement, float>>
     {
-        [Tooltip("Default Element Infliction Format => {1} = {Rate}")]
-        public string defaultElementInflictionFormat = "Inflict {1}% damage";
-        [Tooltip("Infliction Format => {0} = {Element title}, {1} = {Rate}")]
-        public string inflictionFormat = "Inflict {1}% as {0} damage";
-
         [Header("UI Elements")]
         public TextWrapper uiTextAllInflictions;
         public UIDamageElementTextPair[] textInflictions;
@@ -22,14 +17,19 @@ namespace MultiplayerARPG
                 if (cacheTextInflictions == null)
                 {
                     cacheTextInflictions = new Dictionary<DamageElement, TextWrapper>();
+                    DamageElement tempElement;
+                    TextWrapper tempTextComponent;
                     foreach (UIDamageElementTextPair textAmount in textInflictions)
                     {
                         if (textAmount.damageElement == null || textAmount.uiText == null)
                             continue;
-                        DamageElement key = textAmount.damageElement;
-                        TextWrapper textComp = textAmount.uiText;
-                        textComp.text = string.Format(inflictionFormat, key.Title, "0");
-                        cacheTextInflictions[key] = textComp;
+                        tempElement = textAmount.damageElement;
+                        tempTextComponent = textAmount.uiText;
+                        tempTextComponent.text = string.Format(
+                            LanguageManager.GetText(UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION_AS_ELEMENTAL.ToString()),
+                            tempElement.Title,
+                            "0");
+                        cacheTextInflictions[tempElement] = tempTextComponent;
                     }
                 }
                 return cacheTextInflictions;
@@ -45,36 +45,49 @@ namespace MultiplayerARPG
 
                 foreach (KeyValuePair<DamageElement, TextWrapper> textAmount in CacheTextInflictions)
                 {
-                    DamageElement element = textAmount.Key;
-                    string format = element == GameInstance.Singleton.DefaultDamageElement ? defaultElementInflictionFormat : inflictionFormat;
-                    textAmount.Value.text = string.Format(format, element.Title, "0");
+                    textAmount.Value.text = string.Format(
+                        textAmount.Key == GameInstance.Singleton.DefaultDamageElement ?
+                            LanguageManager.GetText(UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION.ToString()) :
+                            LanguageManager.GetText(UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION_AS_ELEMENTAL.ToString()),
+                        textAmount.Key.Title,
+                        "0");
                 }
             }
             else
             {
-                string text = "";
-                MinMaxFloat sumDamage = new MinMaxFloat();
+                string tempAllText = string.Empty;
+                DamageElement tempElement;
+                float tempInfliction;
+                string tempAmountText;
                 foreach (KeyValuePair<DamageElement, float> dataEntry in Data)
                 {
                     if (dataEntry.Key == null || dataEntry.Value == 0)
                         continue;
-                    DamageElement element = dataEntry.Key;
-                    float rate = dataEntry.Value;
-                    if (!string.IsNullOrEmpty(text))
-                        text += "\n";
-                    string format = element == GameInstance.Singleton.DefaultDamageElement ? defaultElementInflictionFormat : inflictionFormat;
-                    string amountText = string.Format(format, element.Title, (rate * 100f).ToString("N0"));
-                    text += amountText;
+                    // Set temp data
+                    tempElement = dataEntry.Key;
+                    tempInfliction = dataEntry.Value;
+                    // Add new line if text is not empty
+                    if (!string.IsNullOrEmpty(tempAllText))
+                        tempAllText += "\n";
+                    // Set current elemental damage infliction text
+                    tempAmountText = string.Format(
+                        tempElement == GameInstance.Singleton.DefaultDamageElement ?
+                            LanguageManager.GetText(UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION.ToString()) :
+                            LanguageManager.GetText(UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION_AS_ELEMENTAL.ToString()),
+                        tempElement.Title,
+                        (tempInfliction * 100f).ToString("N0"));
+                    // Append current elemental damage infliction text
+                    tempAllText += tempAmountText;
+                    // Set current elemental damage infliction text to UI
                     TextWrapper textDamages;
                     if (CacheTextInflictions.TryGetValue(dataEntry.Key, out textDamages))
-                        textDamages.text = amountText;
-                    sumDamage += rate;
+                        textDamages.text = tempAmountText;
                 }
 
                 if (uiTextAllInflictions != null)
                 {
-                    uiTextAllInflictions.gameObject.SetActive(!string.IsNullOrEmpty(text));
-                    uiTextAllInflictions.text = text;
+                    uiTextAllInflictions.gameObject.SetActive(!string.IsNullOrEmpty(tempAllText));
+                    uiTextAllInflictions.text = tempAllText;
                 }
             }
         }

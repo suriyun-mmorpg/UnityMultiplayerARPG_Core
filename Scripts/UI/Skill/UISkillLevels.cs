@@ -25,14 +25,16 @@ namespace MultiplayerARPG
                 if (cacheTextLevels == null)
                 {
                     cacheTextLevels = new Dictionary<Skill, TextWrapper>();
+                    Skill tempSkill;
+                    TextWrapper tempTextComponent;
                     foreach (UISkillTextPair textLevel in textLevels)
                     {
                         if (textLevel.skill == null || textLevel.uiText == null)
                             continue;
-                        Skill key = textLevel.skill;
-                        TextWrapper textComp = textLevel.uiText;
-                        textComp.text = string.Format(levelFormat, key.Title, "0", "0");
-                        cacheTextLevels[key] = textComp;
+                        tempSkill = textLevel.skill;
+                        tempTextComponent = textLevel.uiText;
+                        tempTextComponent.text = string.Format(levelFormat, tempSkill.Title, "0", "0");
+                        cacheTextLevels[tempSkill] = tempTextComponent;
                     }
                 }
                 return cacheTextLevels;
@@ -63,17 +65,22 @@ namespace MultiplayerARPG
                 TextWrapper tempTextWrapper;
                 foreach (KeyValuePair<Skill, short> dataEntry in Data)
                 {
+                    if (dataEntry.Key == null || dataEntry.Value == 0)
+                        continue;
+                    // Set temp data
                     tempSkill = dataEntry.Key;
                     tempTargetLevel = dataEntry.Value;
-                    if (tempSkill == null || tempTargetLevel == 0)
-                        continue;
+                    tempCurrentLevel = 0;
+                    // Add new line if text is not empty
                     if (!string.IsNullOrEmpty(tempAllText))
                         tempAllText += "\n";
-                    tempCurrentLevel = 0;
+                    // Get skill level from character
                     if (owningCharacter != null)
                         owningCharacter.CacheSkills.TryGetValue(tempSkill, out tempCurrentLevel);
+                    // Use difference format by option 
                     if (showAsRequirement)
                     {
+                        // This will show both current character skill level and target amount
                         tempFormat = tempCurrentLevel >= tempTargetLevel ? levelFormat : levelNotEnoughFormat;
                         tempLevelText = string.Format(tempFormat, tempSkill.Title, tempCurrentLevel.ToString("N0"), tempTargetLevel.ToString("N0"));
                     }
@@ -82,10 +89,12 @@ namespace MultiplayerARPG
                         // This will show only target level, so current character skill level will not be shown
                         tempLevelText = string.Format(simpleLevelFormat, tempSkill.Title, tempTargetLevel.ToString("N0"));
                     }
+                    // Append current attribute amount text
                     tempAllText += tempLevelText;
                     if (CacheTextLevels.TryGetValue(dataEntry.Key, out tempTextWrapper))
                         tempTextWrapper.text = tempLevelText;
                 }
+
                 if (uiTextAllLevels != null)
                 {
                     uiTextAllLevels.gameObject.SetActive(!string.IsNullOrEmpty(tempAllText));

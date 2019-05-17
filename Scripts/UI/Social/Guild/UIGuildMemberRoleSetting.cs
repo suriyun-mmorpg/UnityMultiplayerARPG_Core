@@ -28,12 +28,17 @@ namespace MultiplayerARPG
                 uiTextName.text = string.Format(nameFormat, string.IsNullOrEmpty(member.characterName) ? LanguageManager.GetUnknowTitle() : member.characterName);
 
             if (uiTextLevel != null)
-                uiTextLevel.text = string.Format(levelFormat, member.level.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LEVEL.ToString()));
+            {
+                uiTextLevel.text = string.Format(
+                    levelFormat,
+                    member.level.ToString("N0"),
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()));
+            }
 
             if (dropdownRoles != null)
             {
                 List<DropdownWrapper.OptionData> options = new List<DropdownWrapper.OptionData>();
-                options.Add(new DropdownWrapper.OptionData(LanguageManager.GetText(UILocaleKeys.UI_NONE.ToString())));
+                options.Add(new DropdownWrapper.OptionData(LanguageManager.GetText(UILocaleKeys.UI_LABEL_NONE.ToString())));
                 for (int i = 1; i < roles.Length; ++i)
                 {
                     options.Add(new DropdownWrapper.OptionData(roles[i].roleName));
@@ -48,7 +53,7 @@ namespace MultiplayerARPG
             byte role = (byte)(dropdownRoles != null ? dropdownRoles.value : 0);
             if (role == 0)
             {
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_WARNING.ToString()), LanguageManager.GetText(UILocaleKeys.UI_INVALID_GUILD_ROLE.ToString()));
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_WARNING.ToString()), LanguageManager.GetText(UILocaleKeys.UI_INVALID_GUILD_ROLE.ToString()));
                 return;
             }
             BasePlayerCharacterController.OwningCharacter.RequestSetGuildMemberRole(characterId, (byte)dropdownRoles.value);

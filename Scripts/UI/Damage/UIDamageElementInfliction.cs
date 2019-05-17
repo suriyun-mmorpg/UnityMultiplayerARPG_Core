@@ -4,11 +4,6 @@ namespace MultiplayerARPG
 {
     public partial class UIDamageElementInfliction : UISelectionEntry<DamageElementInflictionTuple>
     {
-        [Tooltip("Default Element Infliction Format => {1} = {Rate}")]
-        public string defaultElementInflictionFormat = "Inflict {1}% damage";
-        [Tooltip("Infliction Format => {0} = {Element title}, {1} = {Rate}")]
-        public string inflictionFormat = "Inflict {1}% as {0} damage";
-
         [Header("UI Elements")]
         public TextWrapper uiTextInfliction;
 
@@ -17,9 +12,12 @@ namespace MultiplayerARPG
             if (uiTextInfliction != null)
             {
                 DamageElement element = Data.damageElement;
-                float rate = Data.infliction;
-                string format = element == GameInstance.Singleton.DefaultDamageElement ? defaultElementInflictionFormat : inflictionFormat;
-                uiTextInfliction.text = string.Format(format, element.Title, (rate * 100f).ToString("N0"));
+                uiTextInfliction.text = string.Format(
+                    element == GameInstance.Singleton.DefaultDamageElement ?
+                        LanguageManager.GetText(UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION.ToString()) :
+                        LanguageManager.GetText(UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION_AS_ELEMENTAL.ToString()),
+                    element.Title,
+                    (Data.infliction * 100f).ToString("N0"));
             }
         }
     }

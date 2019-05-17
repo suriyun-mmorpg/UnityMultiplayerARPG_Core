@@ -22,18 +22,25 @@ namespace MultiplayerARPG
             if (uiTextRequireLevel != null)
             {
                 if (skill == null)
+                {
                     uiTextRequireLevel.gameObject.SetActive(false);
+                }
                 else
                 {
                     uiTextRequireLevel.gameObject.SetActive(true);
-                    uiTextRequireLevel.text = string.Format(requireLevelFormat, skill.GetRequireCharacterLevel(level).ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_REQUIRE_LEVEL.ToString()));
+                    uiTextRequireLevel.text = string.Format(
+                        requireLevelFormat,
+                        skill.GetRequireCharacterLevel(level).ToString("N0"),
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_LEVEL.ToString()));
                 }
             }
 
             if (uiRequireAttributeAmounts != null)
             {
                 if (skill == null)
+                {
                     uiRequireAttributeAmounts.Hide();
+                }
                 else
                 {
                     uiRequireAttributeAmounts.showAsRequirement = true;

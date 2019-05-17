@@ -23,14 +23,16 @@ namespace MultiplayerARPG
                 if (cacheTextDamages == null)
                 {
                     cacheTextDamages = new Dictionary<DamageElement, TextWrapper>();
+                    DamageElement tempElement;
+                    TextWrapper tempTextComponent;
                     foreach (UIDamageElementTextPair textAmount in textDamages)
                     {
                         if (textAmount.damageElement == null || textAmount.uiText == null)
                             continue;
-                        DamageElement key = textAmount.damageElement;
-                        TextWrapper textComp = textAmount.uiText;
-                        textComp.text = string.Format(damageFormat, key.Title, "0", "0");
-                        cacheTextDamages[key] = textComp;
+                        tempElement = textAmount.damageElement;
+                        tempTextComponent = textAmount.uiText;
+                        tempTextComponent.text = string.Format(damageFormat, tempElement.Title, "0", "0");
+                        cacheTextDamages[tempElement] = tempTextComponent;
                     }
                 }
                 return cacheTextDamages;
@@ -64,12 +66,17 @@ namespace MultiplayerARPG
                 {
                     if (dataEntry.Key == null || (dataEntry.Value.min == 0 && dataEntry.Value.max == 0))
                         continue;
+                    // Set temp data
                     tempElement = dataEntry.Key;
                     tempAmount = dataEntry.Value;
+                    // Add new line if text is not empty
                     if (!string.IsNullOrEmpty(tempAllText))
                         tempAllText += "\n";
+                    // Set current elemental damage text
                     tempAmountText = string.Format(damageFormat, tempElement.Title, tempAmount.min.ToString("N0"), tempAmount.max.ToString("N0"));
+                    // Append current elemental damage text
                     tempAllText += tempAmountText;
+                    // Set current elemental damage text to UI
                     if (CacheTextDamages.TryGetValue(dataEntry.Key, out tempTextWrapper))
                         tempTextWrapper.text = tempAmountText;
                     sumDamage += tempAmount;

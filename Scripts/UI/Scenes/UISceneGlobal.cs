@@ -111,7 +111,7 @@ namespace MultiplayerARPG
                     errorMessage = LanguageManager.GetText(UILocaleKeys.UI_CONNECTION_TIMEOUT.ToString());
                     break;
             }
-            Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_DISCONNECTED.ToString()), errorMessage, true, false, false, false);
+            Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_DISCONNECTED.ToString()), errorMessage, true, false, false, false);
         }
     }
 }

@@ -46,7 +46,10 @@ namespace MultiplayerARPG
             if (uiCraftingItem != null)
             {
                 if (CraftingItem == null)
+                {
+                    // Hide if crafting item is null
                     uiCraftingItem.Hide();
+                }
                 else
                 {
                     uiCraftingItem.Show();
@@ -57,9 +60,13 @@ namespace MultiplayerARPG
             if (uiRequireItemAmounts != null)
             {
                 if (CraftingItem == null)
+                {
+                    // Hide if crafting item is null
                     uiRequireItemAmounts.Hide();
+                }
                 else
                 {
+                    uiRequireItemAmounts.showAsRequirement = true;
                     uiRequireItemAmounts.Show();
                     uiRequireItemAmounts.Data = ItemCraft.CacheCraftRequirements;
                 }
@@ -68,7 +75,13 @@ namespace MultiplayerARPG
             if (uiTextRequireGold != null)
             {
                 if (CraftingItem == null)
-                    uiTextRequireGold.text = string.Format(requireGoldFormat, "0", "0", LanguageManager.GetText(UILocaleKeys.UI_REQUIRE_GOLD.ToString()));
+                {
+                    uiTextRequireGold.text = string.Format(
+                        requireGoldFormat,
+                        "0",
+                        "0",
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_GOLD.ToString()));
+                }
                 else
                 {
                     int currentAmount = 0;
@@ -77,7 +90,7 @@ namespace MultiplayerARPG
                     uiTextRequireGold.text = string.Format(
                         currentAmount >= ItemCraft.requireGold ? requireGoldFormat : requireGoldNotEnoughFormat,
                         currentAmount.ToString("N0"), ItemCraft.requireGold.ToString("N0"),
-                        LanguageManager.GetText(UILocaleKeys.UI_REQUIRE_GOLD.ToString()));
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_GOLD.ToString()));
                 }
             }
         }

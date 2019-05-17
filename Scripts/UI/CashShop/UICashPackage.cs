@@ -12,10 +12,10 @@ namespace MultiplayerARPG
         public string titleFormat = "{0}";
         [Tooltip("Description Format => {0} = {Description}")]
         public string descriptionFormat = "{0}";
-        [Tooltip("Sell Price Format => {0} = {Sell price}")]
-        public string sellPriceFormat = "{0}";
-        [Tooltip("Cash Amount Format => {0} = {Cash Amount}")]
-        public string cashAmountFormat = "{0}";
+        [Tooltip("Sell Price Format => {0} = {Sell price}, {1} = {Sell price Label}")]
+        public string sellPriceFormat = "{1}: {0}";
+        [Tooltip("Cash Amount Format => {0} = {Cash Amount}, {1} = {Cash Label}")]
+        public string cashAmountFormat = "{1}: {0}";
 
         [Header("UI Elements")]
         public UICashPackages uiCashPackages;
@@ -49,10 +49,10 @@ namespace MultiplayerARPG
             }
 
             if (uiTextSellPrice != null)
-                uiTextSellPrice.text = string.Format(sellPriceFormat, Data == null ? "0" : Data.GetSellPrice());
+                uiTextSellPrice.text = string.Format(sellPriceFormat, Data == null ? "0" : Data.GetSellPrice(), LanguageManager.GetText(UILocaleKeys.UI_LABEL_SELL_PRICE.ToString()));
 
             if (uiTextCashAmount != null)
-                uiTextCashAmount.text = string.Format(cashAmountFormat, Data == null ? "0" : Data.cashAmount.ToString("N0"));
+                uiTextCashAmount.text = string.Format(cashAmountFormat, Data == null ? "0" : Data.cashAmount.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_CASH.ToString()));
         }
 
         IEnumerator LoadExternalIcon()

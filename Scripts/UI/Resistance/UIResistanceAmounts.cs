@@ -20,14 +20,16 @@ namespace MultiplayerARPG
                 if (cacheTextAmounts == null)
                 {
                     cacheTextAmounts = new Dictionary<DamageElement, TextWrapper>();
+                    DamageElement tempElement;
+                    TextWrapper tempTextComponent;
                     foreach (UIResistanceTextPair textAmount in textAmounts)
                     {
                         if (textAmount.damageElement == null || textAmount.uiText == null)
                             continue;
-                        DamageElement key = textAmount.damageElement;
-                        TextWrapper textComp = textAmount.uiText;
-                        textComp.text = string.Format(amountFormat, key.Title, "0", "0");
-                        cacheTextAmounts[key] = textComp;
+                        tempElement = textAmount.damageElement;
+                        tempTextComponent = textAmount.uiText;
+                        tempTextComponent.text = string.Format(amountFormat, tempElement.Title, "0", "0");
+                        cacheTextAmounts[tempElement] = tempTextComponent;
                     }
                 }
                 return cacheTextAmounts;
@@ -55,6 +57,7 @@ namespace MultiplayerARPG
                 {
                     if (dataEntry.Key == null || dataEntry.Value == 0)
                         continue;
+
                     if (!string.IsNullOrEmpty(tempAllText))
                         tempAllText += "\n";
                     tempAmountText = string.Format(amountFormat, dataEntry.Key.Title, (dataEntry.Value * 100f).ToString("N2"));
@@ -62,6 +65,7 @@ namespace MultiplayerARPG
                     if (CacheTextAmounts.TryGetValue(dataEntry.Key, out tempTextWarpper))
                         tempTextWarpper.text = tempAmountText;
                 }
+
                 if (uiTextAllAmounts != null)
                 {
                     uiTextAllAmounts.gameObject.SetActive(!string.IsNullOrEmpty(tempAllText));

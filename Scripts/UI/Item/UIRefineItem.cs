@@ -12,12 +12,14 @@ namespace MultiplayerARPG
         public ItemRefineLevel RefineLevel { get { return EquipmentItem.itemRefineInfo.levels[Level - 1]; } }
 
         [Header("Format for UI Refine Item")]
-        [Tooltip("Require Gold Format => {0} = {Amount}")]
-        public string requireGoldFormat = "Require Gold: {0}";
-        [Tooltip("Success Rate Format => {0} = {Rate}")]
-        public string successRateFormat = "Success Rate: {0}%";
-        [Tooltip("Refining Level Format => {0} = {Refining Level}")]
-        public string refiningLevelFormat = "Refining To: +{0}";
+        [Tooltip("Require Gold Format => {0} = {Current Amount}, {1} = {Target Amount}, {2} = {Required Gold Label}")]
+        public string requireGoldFormat = "{2}: {0}/{1}";
+        [Tooltip("Require Gold Format => {0} = {Current Amount}, {1} = {Target Amount}, {2} = {Required Gold Label}")]
+        public string requireGoldNotEnoughFormat = "{2}: <color=red>{0}/{1}</color>";
+        [Tooltip("Success Rate Format => {0} = {Rate}, {1} = {Success Rate Label}")]
+        public string successRateFormat = "{1}: {0}%";
+        [Tooltip("Refining Level Format => {0} = {Refining Level}, {1} = {Refining To Label}")]
+        public string refiningLevelFormat = "{1}: +{0}";
 
         [Header("UI Elements for UI Refine Item")]
         // TODO: This is deprecated
@@ -51,10 +53,15 @@ namespace MultiplayerARPG
             if (!IsVisible())
                 return;
 
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
+
             if (uiCharacterItem != null)
             {
                 if (CharacterItem == null)
+                {
+                    // Hide if item is null
                     uiCharacterItem.Hide();
+                }
                 else
                 {
                     uiCharacterItem.Setup(new CharacterItemTuple(CharacterItem, Level, InventoryType), OwningCharacter, IndexOfData);
@@ -65,9 +72,13 @@ namespace MultiplayerARPG
             if (uiRequireItemAmounts != null)
             {
                 if (!CanRefine)
+                {
+                    // Hide if item is null
                     uiRequireItemAmounts.Hide();
+                }
                 else
                 {
+                    uiRequireItemAmounts.showAsRequirement = true;
                     uiRequireItemAmounts.Show();
                     uiRequireItemAmounts.Data = RefineLevel.RequireItems;
                 }
@@ -76,25 +87,58 @@ namespace MultiplayerARPG
             if (uiTextRequireGold != null)
             {
                 if (!CanRefine)
-                    uiTextRequireGold.text = string.Format(requireGoldFormat, 0.ToString("N0"));
+                {
+                    uiTextRequireGold.text = string.Format(
+                        requireGoldFormat,
+                        "0",
+                        "0",
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_GOLD.ToString()));
+                }
                 else
-                    uiTextRequireGold.text = string.Format(requireGoldFormat, RefineLevel.RequireGold.ToString("N0"));
+                {
+                    int currentAmount = 0;
+                    if (owningCharacter != null)
+                        currentAmount = owningCharacter.Gold;
+                    uiTextRequireGold.text = string.Format(
+                        currentAmount >= RefineLevel.RequireGold ? requireGoldFormat : requireGoldNotEnoughFormat,
+                        currentAmount.ToString("N0"), RefineLevel.RequireGold.ToString("N0"),
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_GOLD.ToString()));
+                }
             }
 
             if (uiTextSuccessRate != null)
             {
                 if (!CanRefine)
-                    uiTextSuccessRate.text = string.Format(successRateFormat, 0.ToString("N2"));
+                {
+                    uiTextSuccessRate.text = string.Format(
+                        successRateFormat,
+                        "0.00",
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REFINE_SUCCESS_RATE.ToString()));
+                }
                 else
-                    uiTextSuccessRate.text = string.Format(successRateFormat, (RefineLevel.SuccessRate * 100f).ToString("N2"));
+                {
+                    uiTextSuccessRate.text = string.Format(
+                        successRateFormat,
+                        (RefineLevel.SuccessRate * 100f).ToString("N2"),
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REFINE_SUCCESS_RATE.ToString()));
+                }
             }
-
             if (uiTextRefiningLevel != null)
             {
                 if (!CanRefine)
-                    uiTextRefiningLevel.text = string.Format(refiningLevelFormat, (Level - 1).ToString("N0"));
+                {
+                    uiTextRefiningLevel.text = string.Format(
+                        refiningLevelFormat,
+                        (Level - 1).ToString("N0"),
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REFINING_LEVEL.ToString()));
+                }
                 else
-                    uiTextRefiningLevel.text = string.Format(refiningLevelFormat, Level.ToString("N0"));
+                {
+                    uiTextRefiningLevel.text = string.Format(
+                        refiningLevelFormat,
+                        Level.ToString("N0"),
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REFINING_LEVEL.ToString()));
+                }
             }
         }
 
