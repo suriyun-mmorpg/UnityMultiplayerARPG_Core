@@ -7,10 +7,6 @@ namespace MultiplayerARPG
         [Tooltip("Sell Price Format => {0} = {Sell price}")]
         public string sellPriceFormat = "{0}";
 
-        [Header("Input Dialog Settings")]
-        public string buyInputTitle = "Buy Item";
-        public string buyInputDescription = "";
-
         [Header("UI Elements")]
         public UICharacterItem uiCharacterItem;
         public TextWrapper uiTextSellPrice;
@@ -56,7 +52,7 @@ namespace MultiplayerARPG
                     owningCharacter.RequestBuyNpcItem((short)indexOfData, 1);
             }
             else
-                UISceneGlobal.Singleton.ShowInputDialog(buyInputTitle, buyInputDescription, OnBuyAmountConfirmed, 1, item.maxStack, 1);
+                UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UILocaleKeys.UI_BUY_ITEM.ToString()), LanguageManager.GetText(UILocaleKeys.UI_BUY_ITEM_DESCRIPTION.ToString()), OnBuyAmountConfirmed, 1, item.maxStack, 1);
         }
 
         private void OnBuyAmountConfirmed(int amount)

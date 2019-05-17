@@ -12,8 +12,8 @@ namespace MultiplayerARPG
         public string titleFormat = "{0}";
 
         [Header("Generic Buff Format")]
-        [Tooltip("Buff Duration Format => {0} = {Duration}")]
-        public string buffDurationFormat = "Duration: {0}";
+        [Tooltip("Buff Duration Format => {0} = {Duration}, {1} = {Buff Duration Label}")]
+        public string buffDurationFormat = "{1}: {0}";
         [Tooltip("Buff Remains Duration Format => {0} = {Remains duration}")]
         public string buffRemainsDurationFormat = "{0}";
 
@@ -56,7 +56,7 @@ namespace MultiplayerARPG
             float buffDuration = CharacterBuff.GetDuration();
 
             if (uiTextDuration != null)
-                uiTextDuration.text = string.Format(buffDurationFormat, buffDuration.ToString("N0"));
+                uiTextDuration.text = string.Format(buffDurationFormat, buffDuration.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_BUFF_DURATION.ToString()));
 
             if (uiTextRemainsDuration != null)
             {

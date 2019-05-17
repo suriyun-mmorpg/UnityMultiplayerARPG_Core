@@ -8,14 +8,10 @@ namespace MultiplayerARPG
     public partial class UIDealing : UISelectionEntry<BasePlayerCharacterEntity>
     {
         [Header("Display Format")]
-        [Tooltip("Gold Format => {0} = {Gold}")]
-        public string dealingGoldFormat = "Gold: {0}";
-        [Tooltip("Gold Format => {0} = {Gold}")]
-        public string anotherDealingGoldFormat = "Gold: {0}";
-
-        [Header("Input Dialog Settings")]
-        public string dealingGoldInputTitle = "Offer Gold";
-        public string dealingGoldInputDescription = "";
+        [Tooltip("Gold Format => {0} = {Gold}, {1} = {Gold Label}")]
+        public string dealingGoldFormat = "{1}: {0}";
+        [Tooltip("Gold Format => {0} = {Gold}, {1} = {Gold Label}")]
+        public string anotherDealingGoldFormat = "{1}: {0}";
 
         [Header("UI Elements")]
         public UICharacterItem uiDealingItemPrefab;
@@ -213,14 +209,14 @@ namespace MultiplayerARPG
         public void UpdateDealingGold(int gold)
         {
             if (uiTextDealingGold != null)
-                uiTextDealingGold.text = string.Format(dealingGoldFormat, gold.ToString("N0"));
+                uiTextDealingGold.text = string.Format(dealingGoldFormat, gold.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_GOLD.ToString()));
             dealingGold = gold;
         }
 
         public void UpdateAnotherDealingGold(int gold)
         {
             if (uiTextAnotherDealingGold != null)
-                uiTextAnotherDealingGold.text = string.Format(anotherDealingGoldFormat, gold.ToString("N0"));
+                uiTextAnotherDealingGold.text = string.Format(anotherDealingGoldFormat, gold.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_GOLD.ToString()));
             anotherDealingGold = gold;
         }
 
@@ -265,7 +261,7 @@ namespace MultiplayerARPG
         public void OnClickSetDealingGold()
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            UISceneGlobal.Singleton.ShowInputDialog(dealingGoldInputTitle, dealingGoldInputDescription, OnDealingGoldConfirmed, 0, owningCharacter.Gold, owningCharacter.DealingGold);
+            UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UILocaleKeys.UI_DEALING_GOLD_OFFER.ToString()), LanguageManager.GetText(UILocaleKeys.UI_DEALING_GOLD_OFFER_DESCRIPTION.ToString()), OnDealingGoldConfirmed, 0, owningCharacter.Gold, owningCharacter.DealingGold);
         }
 
         private void OnDealingGoldConfirmed(int amount)

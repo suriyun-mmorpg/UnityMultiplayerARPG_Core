@@ -10,38 +10,32 @@ namespace MultiplayerARPG
         [Header("Display Format")]
         [Tooltip("Name Format => {0} = {Character name}")]
         public string nameFormat = "{0}";
-        [Tooltip("Level Format => {0} = {Level}, {1} = {Level Title}")]
+        [Tooltip("Level Format => {0} = {Level}, {1} = {Level Label}")]
         public string levelFormat = "{1}: {0}";
-        [Tooltip("Exp Format => {0} = {Current exp}, {1} = {Max exp}, {2} = {Exp Title}")]
+        [Tooltip("Exp Format => {0} = {Current exp}, {1} = {Max exp}, {2} = {Exp Label}")]
         public string expFormat = "{2}: {0}/{1}";
 
         [Header("Stats")]
-        [Tooltip("Hp Format => {0} = {Current hp}, {1} = {Max hp}, {2} = {Hp Title}")]
+        [Tooltip("Hp Format => {0} = {Current hp}, {1} = {Max hp}, {2} = {Hp Label}")]
         public string hpFormat = "{2}: {0}/{1}";
-        [Tooltip("Mp Format => {0} = {Current mp}, {1} = {Max mp}, {2} = {Mp Title}")]
+        [Tooltip("Mp Format => {0} = {Current mp}, {1} = {Max mp}, {2} = {Mp Label}")]
         public string mpFormat = "{2}: {0}/{1}";
-        [Tooltip("Stamina Format => {0} = {Current stamina}, {1} = {Max stamina}, {2} = {Stamina Title}")]
+        [Tooltip("Stamina Format => {0} = {Current stamina}, {1} = {Max stamina}, {2} = {Stamina Label}")]
         public string staminaFormat = "{2}: {0}/{1}";
-        [Tooltip("Food Format => {0} = {Current food}, {1} = {Max food}, {2} = {Food Title}")]
+        [Tooltip("Food Format => {0} = {Current food}, {1} = {Max food}, {2} = {Food Label}")]
         public string foodFormat = "{2}: {0}/{1}";
-        [Tooltip("Water Format => {0} = {Current water}, {1} = {Max water}, {2} = {Water Title}")]
+        [Tooltip("Water Format => {0} = {Current water}, {1} = {Max water}, {2} = {Water Label}")]
         public string waterFormat = "{2}: {0}/{1}";
-        [Tooltip("Stat Point Format => {0} = {Stat point}, {1} = {Stat Points Title}")]
+        [Tooltip("Stat Point Format => {0} = {Stat point}, {1} = {Stat Points Label}")]
         public string statPointFormat = "{1}: {0}";
-        [Tooltip("Skill Point Format => {0} = {Skill point}, {1} = {Skill Points Title}")]
+        [Tooltip("Skill Point Format => {0} = {Skill point}, {1} = {Skill Points Label}")]
         public string skillPointFormat = "{1}: {0}";
-        [Tooltip("Gold Format => {0} = {Gold}, {1} = {Gold Title}")]
+        [Tooltip("Gold Format => {0} = {Gold}, {1} = {Gold Label}")]
         public string goldFormat = "{1}: {0}";
-        [Tooltip("Weight Limit Stats Format => {0} = {Current Total Weights}, {1} = {Weight Limit}, {2} = {Weight Title}")]
+        [Tooltip("Weight Limit Stats Format => {0} = {Current Total Weights}, {1} = {Weight Limit}, {2} = {Weight Label}")]
         public string weightLimitStatsFormat = "{2}: {0}/{1}";
         [Tooltip("Weapon Damage => {0} = {Min damage}, {1} = {Max damage}")]
         public string weaponDamageFormat = "{0}~{1}";
-
-        [Header("Class")]
-        [Tooltip("Class Title Format => {0} = {Class title}")]
-        public string classTitleFormat = "{0}";
-        [Tooltip("Class Description Format => {0} = {Class description}")]
-        public string classDescriptionFormat = "{0}";
 
         [Header("UI Elements")]
         public TextWrapper uiTextName;
@@ -69,10 +63,7 @@ namespace MultiplayerARPG
         public UICharacterBuffs uiCharacterBuffs;
         public UIResistanceAmounts uiCharacterResistances;
         public UICharacterAttributePair[] uiCharacterAttributes;
-        [Header("Class information")]
-        public TextWrapper uiTextClassTitle;
-        public TextWrapper uiTextClassDescription;
-        public Image imageClassIcon;
+        public UICharacterClass uiCharacterClass;
         [Header("Options")]
         public bool showStatsWithBuffs;
         public bool showResistanceWithBuffs;
@@ -239,18 +230,8 @@ namespace MultiplayerARPG
                 uiTextGold.text = string.Format(goldFormat, playerCharacter == null ? "0" : playerCharacter.Gold.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_GOLD.ToString()));
 
             BaseCharacter character = Data == null ? null : Data.GetDatabase();
-            if (uiTextClassTitle != null)
-                uiTextClassTitle.text = string.Format(classTitleFormat, character == null ? LanguageManager.GetUnknowTitle() : character.Title);
-
-            if (uiTextClassDescription != null)
-                uiTextClassDescription.text = string.Format(classDescriptionFormat, character == null ? LanguageManager.GetUnknowDescription() : character.Description);
-
-            if (imageClassIcon != null)
-            {
-                Sprite iconSprite = character == null ? null : character.icon;
-                imageClassIcon.gameObject.SetActive(iconSprite != null);
-                imageClassIcon.sprite = iconSprite;
-            }
+            if (uiCharacterClass != null)
+                uiCharacterClass.Data = character;
 
             Profiler.EndSample();
         }

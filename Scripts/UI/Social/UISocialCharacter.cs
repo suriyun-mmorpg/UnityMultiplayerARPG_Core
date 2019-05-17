@@ -8,20 +8,14 @@ namespace MultiplayerARPG
         [Header("Display Format")]
         [Tooltip("Name Format => {0} = {Character name}")]
         public string nameFormat = "{0}";
-        [Tooltip("Level Format => {0} = {Level}")]
-        public string levelFormat = "Lv: {0}";
+        [Tooltip("Level Format => {0} = {Level}, {1} = {Level Label}")]
+        public string levelFormat = "{1}: {0}";
 
         [Header("Stats")]
-        [Tooltip("Hp Format => {0} = {Current hp}, {1} = {Max hp}")]
-        public string hpFormat = "Hp: {0}/{1}";
-        [Tooltip("Mp Format => {0} = {Current mp}, {1} = {Max mp}")]
-        public string mpFormat = "Mp: {0}/{1}";
-
-        [Header("Class")]
-        [Tooltip("Class Title Format => {0} = {Class title}")]
-        public string classTitleFormat = "Class: {0}";
-        [Tooltip("Class Description Format => {0} = {Class description}")]
-        public string classDescriptionFormat = "{0}";
+        [Tooltip("Hp Format => {0} = {Current hp}, {1} = {Max hp}, {2} = {Hp Label}")]
+        public string hpFormat = "{2}: {0}/{1}";
+        [Tooltip("Mp Format => {0} = {Current mp}, {1} = {Max mp}, {2} = {Mp Label}")]
+        public string mpFormat = "{2}: {0}/{1}";
 
         [Header("UI Elements")]
         public UISocialGroup uiSocialGroup;
@@ -41,10 +35,7 @@ namespace MultiplayerARPG
         public GameObject[] memberIsLeaderObjects;
         [Tooltip("These objects will be activated when this social member is not leader")]
         public GameObject[] memberIsNotLeaderObjects;
-        [Header("Class information")]
-        public TextWrapper uiTextClassTitle;
-        public TextWrapper uiTextClassDescription;
-        public Image imageClassIcon;
+        public UICharacterClass uiCharacterClass;
 
         protected override void UpdateData()
         {
@@ -52,7 +43,7 @@ namespace MultiplayerARPG
                 uiTextName.text = string.Format(nameFormat, string.IsNullOrEmpty(Data.socialCharacter.characterName) ? LanguageManager.GetUnknowTitle() : Data.socialCharacter.characterName);
 
             if (uiTextLevel != null)
-                uiTextLevel.text = string.Format(levelFormat, Data.socialCharacter.level.ToString("N0"));
+                uiTextLevel.text = string.Format(levelFormat, Data.socialCharacter.level.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LEVEL.ToString()));
 
             // Hp
             int currentHp = Data.socialCharacter.currentHp;
@@ -60,7 +51,7 @@ namespace MultiplayerARPG
 
             if (uiTextHp != null)
             {
-                uiTextHp.text = string.Format(hpFormat, currentHp.ToString("N0"), maxHp.ToString("N0"));
+                uiTextHp.text = string.Format(hpFormat, currentHp.ToString("N0"), maxHp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_HP.ToString()));
                 uiTextHp.gameObject.SetActive(maxHp > 0);
             }
 
@@ -73,7 +64,7 @@ namespace MultiplayerARPG
 
             if (uiTextMp != null)
             {
-                uiTextMp.text = string.Format(mpFormat, currentMp.ToString("N0"), maxMp.ToString("N0"));
+                uiTextMp.text = string.Format(mpFormat, currentMp.ToString("N0"), maxMp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_MP.ToString()));
                 uiTextMp.gameObject.SetActive(maxMp > 0);
             }
 
@@ -112,19 +103,8 @@ namespace MultiplayerARPG
             // Character class data
             PlayerCharacter character = null;
             GameInstance.PlayerCharacters.TryGetValue(Data.socialCharacter.dataId, out character);
-
-            if (uiTextClassTitle != null)
-                uiTextClassTitle.text = string.Format(classTitleFormat, character == null ? LanguageManager.GetUnknowTitle() : character.Title);
-
-            if (uiTextClassDescription != null)
-                uiTextClassDescription.text = string.Format(classDescriptionFormat, character == null ? LanguageManager.GetUnknowDescription() : character.Description);
-
-            if (imageClassIcon != null)
-            {
-                Sprite iconSprite = character == null ? null : character.icon;
-                imageClassIcon.gameObject.SetActive(iconSprite != null);
-                imageClassIcon.sprite = iconSprite;
-            }
+            if (uiCharacterClass != null)
+                uiCharacterClass.Data = character;
         }
     }
 }

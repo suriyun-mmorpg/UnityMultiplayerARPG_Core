@@ -8,13 +8,13 @@ namespace MultiplayerARPG
         [Header("Display Format")]
         [Tooltip("Guild Name Format => {0} = {Guild name}")]
         public string guildNameFormat = "{0}";
-        [Tooltip("Leader Name Format => {0} = {Leader name}, {1} = {Leader Title}")]
+        [Tooltip("Leader Name Format => {0} = {Leader name}, {1} = {Leader Label}")]
         public string leaderNameFormat = "{1}: {0}";
-        [Tooltip("Level Format => {0} = {Level}, {1} = {Level Title}")]
+        [Tooltip("Level Format => {0} = {Level}, {1} = {Level Label}")]
         public string levelFormat = "{1}: {0}";
-        [Tooltip("Exp Format => {0} = {Current exp}, {1} = {Max exp}, {2} = {Exp Title}")]
+        [Tooltip("Exp Format => {0} = {Current exp}, {1} = {Max exp}, {2} = {Exp Label}")]
         public string expFormat = "{2}: {0}/{1}";
-        [Tooltip("Skill Point Format => {0} = {Skill point}, {1} = {Skill Points Title}")]
+        [Tooltip("Skill Point Format => {0} = {Skill point}, {1} = {Skill Points Label}")]
         public string skillPointFormat = "{1}: {0}";
         [Tooltip("Message Format => {0} = {Message}")]
         public string messageFormat = "{0}";

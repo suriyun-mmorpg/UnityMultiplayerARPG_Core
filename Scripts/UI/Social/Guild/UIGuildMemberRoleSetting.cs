@@ -8,7 +8,7 @@ namespace MultiplayerARPG
         [Header("Display Format")]
         [Tooltip("Name Format => {0} = {Character name}")]
         public string nameFormat = "{0}";
-        [Tooltip("Level Format => {0} = {Level}, {1} = {Level Title}")]
+        [Tooltip("Level Format => {0} = {Level}, {1} = {Level Label}")]
         public string levelFormat = "{1}: {0}";
 
         [Header("UI Elements")]

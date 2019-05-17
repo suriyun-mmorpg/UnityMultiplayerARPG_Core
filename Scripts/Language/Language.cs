@@ -24,6 +24,29 @@ namespace MultiplayerARPG
         UI_WEIGHT,
         UI_GOLD,
         UI_CASH,
+        UI_SELL_PRICE,
+        UI_REQUIRE_LEVEL,
+        UI_REQUIRE_CLASS,
+        UI_REQUIRE_GOLD,
+        UI_AVAILABLE_WEAPONS,
+        UI_CONSUME_MP,
+        UI_SKILL_COOLDOWN,
+        UI_SKILL_TYPE_LABEL,
+        UI_SKILL_TYPE_ACTIVE,
+        UI_SKILL_TYPE_PASSIVE,
+        UI_SKILL_TYPE_CRAFT_ITEM,
+        UI_BUFF_DURATION,
+        UI_ITEM_TYPE_LABEL,
+        UI_ITEM_TYPE_JUNK,
+        UI_ITEM_TYPE_SHIELD,
+        UI_ITEM_TYPE_POTION,
+        UI_ITEM_TYPE_AMMO,
+        UI_ITEM_TYPE_BUILDING,
+        UI_ITEM_TYPE_PET,
+        UI_ITEM_TYPE_SOCKET_ENHANCER,
+        UI_ITEM_RARITY,
+        UI_ITEM_AMOUNT,
+        UI_ITEM_DURABILITY,
         UI_GUILD_LEADER,
         // Generic Error
         UI_USER_NOT_FOUND,
@@ -58,6 +81,12 @@ namespace MultiplayerARPG
         // UI Cash Shop
         UI_CANNOT_GET_CASH_SHOP_INFO,
         UI_CASH_SHOP_BUY_SUCCESS,
+        // UI Dealing
+        UI_DEALING_GOLD_OFFER,
+        UI_DEALING_GOLD_OFFER_DESCRIPTION,
+        // UI Npc Sell Item
+        UI_BUY_ITEM,
+        UI_BUY_ITEM_DESCRIPTION,
         // UI Party
         UI_PARTY_CHANGE_LEADER,
         UI_PARTY_CHANGE_LEADER_DESCRIPTION,
@@ -162,6 +191,29 @@ namespace MultiplayerARPG
             Texts.Add(UILocaleKeys.UI_WEIGHT.ToString(), "Weight");
             Texts.Add(UILocaleKeys.UI_GOLD.ToString(), "Gold");
             Texts.Add(UILocaleKeys.UI_CASH.ToString(), "Cash");
+            Texts.Add(UILocaleKeys.UI_SELL_PRICE.ToString(), "Sell Price");
+            Texts.Add(UILocaleKeys.UI_REQUIRE_LEVEL.ToString(), "Require Level");
+            Texts.Add(UILocaleKeys.UI_REQUIRE_CLASS.ToString(), "Require Class");
+            Texts.Add(UILocaleKeys.UI_REQUIRE_GOLD.ToString(), "Require Gold");
+            Texts.Add(UILocaleKeys.UI_AVAILABLE_WEAPONS.ToString(), "Available Weapons");
+            Texts.Add(UILocaleKeys.UI_CONSUME_MP.ToString(), "Consume Mp");
+            Texts.Add(UILocaleKeys.UI_SKILL_COOLDOWN.ToString(), "Cooldown");
+            Texts.Add(UILocaleKeys.UI_SKILL_TYPE_LABEL.ToString(), "Skill Type");
+            Texts.Add(UILocaleKeys.UI_SKILL_TYPE_ACTIVE.ToString(), "Active");
+            Texts.Add(UILocaleKeys.UI_SKILL_TYPE_PASSIVE.ToString(), "Passive");
+            Texts.Add(UILocaleKeys.UI_SKILL_TYPE_CRAFT_ITEM.ToString(), "Craft Item");
+            Texts.Add(UILocaleKeys.UI_BUFF_DURATION.ToString(), "Duration");
+            Texts.Add(UILocaleKeys.UI_ITEM_TYPE_LABEL.ToString(), "Item Type");
+            Texts.Add(UILocaleKeys.UI_ITEM_TYPE_JUNK.ToString(), "Junk");
+            Texts.Add(UILocaleKeys.UI_ITEM_TYPE_SHIELD.ToString(), "Shield");
+            Texts.Add(UILocaleKeys.UI_ITEM_TYPE_POTION.ToString(), "Potion");
+            Texts.Add(UILocaleKeys.UI_ITEM_TYPE_AMMO.ToString(), "Ammo");
+            Texts.Add(UILocaleKeys.UI_ITEM_TYPE_BUILDING.ToString(), "Building");
+            Texts.Add(UILocaleKeys.UI_ITEM_TYPE_PET.ToString(), "Pet");
+            Texts.Add(UILocaleKeys.UI_ITEM_TYPE_SOCKET_ENHANCER.ToString(), "Socket Enhancer");
+            Texts.Add(UILocaleKeys.UI_ITEM_RARITY.ToString(), "Rarity");
+            Texts.Add(UILocaleKeys.UI_ITEM_AMOUNT.ToString(), "Amount");
+            Texts.Add(UILocaleKeys.UI_ITEM_DURABILITY.ToString(), "Durability");
             Texts.Add(UILocaleKeys.UI_GUILD_LEADER.ToString(), "Leader");
             // Generic Error
             Texts.Add(UILocaleKeys.UI_USER_NOT_FOUND.ToString(), "User not found");
@@ -195,6 +247,12 @@ namespace MultiplayerARPG
             // UI Cash Shop
             Texts.Add(UILocaleKeys.UI_CANNOT_GET_CASH_SHOP_INFO.ToString(), "Cannot retrieve cash shop info");
             Texts.Add(UILocaleKeys.UI_CASH_SHOP_BUY_SUCCESS.ToString(), "Success, let's check your inventory");
+            // UI Dealing
+            Texts.Add(UILocaleKeys.UI_DEALING_GOLD_OFFER.ToString(), "Offer Gold");
+            Texts.Add(UILocaleKeys.UI_DEALING_GOLD_OFFER_DESCRIPTION.ToString(), "Enter amount of gold");
+            // UI Npc Sell Item
+            Texts.Add(UILocaleKeys.UI_BUY_ITEM.ToString(), "Buy Item");
+            Texts.Add(UILocaleKeys.UI_BUY_ITEM_DESCRIPTION.ToString(), "Enter amount of item");
             // UI Party
             Texts.Add(UILocaleKeys.UI_PARTY_CHANGE_LEADER.ToString(), "Change Leader");
             Texts.Add(UILocaleKeys.UI_PARTY_CHANGE_LEADER_DESCRIPTION.ToString(), "You sure you want to promote {0} to party leader?");

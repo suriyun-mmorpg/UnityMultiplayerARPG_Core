@@ -8,10 +8,10 @@ namespace MultiplayerARPG
         public Item CraftingItem { get { return ItemCraft.craftingItem; } }
 
         [Header("Generic Info Format")]
-        [Tooltip("Require Gold Format => {0} = {Current Amount}, {1} = {Target Amount}")]
-        public string requireGoldFormat = "Require Gold: {0}/{1}";
-        [Tooltip("Require Gold Format => {0} = {Current Amount}, {1} = {Target Amount}")]
-        public string requireGoldNotEnoughFormat = "Require Gold: <color=red>{0}/{1}</color>";
+        [Tooltip("Require Gold Format => {0} = {Current Amount}, {1} = {Target Amount}, {2} = {Required Gold Label}")]
+        public string requireGoldFormat = "{2}: {0}/{1}";
+        [Tooltip("Require Gold Format => {0} = {Current Amount}, {1} = {Target Amount}, {2} = {Required Gold Label}")]
+        public string requireGoldNotEnoughFormat = "{2}: <color=red>{0}/{1}</color>";
 
         [Header("UI Elements")]
         public UICharacterItem uiCraftingItem;
@@ -68,7 +68,7 @@ namespace MultiplayerARPG
             if (uiTextRequireGold != null)
             {
                 if (CraftingItem == null)
-                    uiTextRequireGold.text = string.Format(requireGoldFormat, 0.ToString("N0"), 0.ToString("N0"));
+                    uiTextRequireGold.text = string.Format(requireGoldFormat, "0", "0", LanguageManager.GetText(UILocaleKeys.UI_REQUIRE_GOLD.ToString()));
                 else
                 {
                     int currentAmount = 0;
@@ -76,7 +76,8 @@ namespace MultiplayerARPG
                         currentAmount = owningCharacter.Gold;
                     uiTextRequireGold.text = string.Format(
                         currentAmount >= ItemCraft.requireGold ? requireGoldFormat : requireGoldNotEnoughFormat,
-                        currentAmount.ToString("N0"), ItemCraft.requireGold.ToString("N0"));
+                        currentAmount.ToString("N0"), ItemCraft.requireGold.ToString("N0"),
+                        LanguageManager.GetText(UILocaleKeys.UI_REQUIRE_GOLD.ToString()));
                 }
             }
         }

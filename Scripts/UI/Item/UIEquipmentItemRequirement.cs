@@ -5,10 +5,10 @@ namespace MultiplayerARPG
     public partial class UIEquipmentItemRequirement : UISelectionEntry<Item>
     {
         [Header("Requirement Format")]
-        [Tooltip("Require Level Format => {0} = {Level}")]
-        public string requireLevelFormat = "Require Level: {0}";
-        [Tooltip("Require Class Format => {0} = {Class title}")]
-        public string requireClassFormat = "Require Class: {0}";
+        [Tooltip("Require Level Format => {0} = {Level}, {1} = {Require Level Label}")]
+        public string requireLevelFormat = "{1}: {0}";
+        [Tooltip("Require Class Format => {0} = {Class title}, {1} = {Require Class Label}")]
+        public string requireClassFormat = "{1}: {0}";
 
         [Header("UI Elements")]
         public TextWrapper uiTextRequireLevel;
@@ -26,7 +26,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextRequireLevel.gameObject.SetActive(true);
-                    uiTextRequireLevel.text = string.Format(requireLevelFormat, equipmentItem.requirement.level.ToString("N0"));
+                    uiTextRequireLevel.text = string.Format(requireLevelFormat, equipmentItem.requirement.level.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_REQUIRE_LEVEL.ToString()));
                 }
             }
 
@@ -37,7 +37,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextRequireClass.gameObject.SetActive(true);
-                    uiTextRequireClass.text = string.Format(requireClassFormat, equipmentItem.requirement.character.Title);
+                    uiTextRequireClass.text = string.Format(requireClassFormat, equipmentItem.requirement.character.Title, LanguageManager.GetText(UILocaleKeys.UI_REQUIRE_CLASS.ToString()));
                 }
             }
 

@@ -14,10 +14,10 @@ namespace MultiplayerARPG
         public string titleFormat = "{0}";
         [Tooltip("Description Format => {0} = {Description}")]
         public string descriptionFormat = "{0}";
-        [Tooltip("Level Format => {0} = {Level}")]
-        public string levelFormat = "Lv: {0}";
-        [Tooltip("Cool Down Duration Format => {0} = {Duration}")]
-        public string coolDownDurationFormat = "Cooldown: {0}";
+        [Tooltip("Level Format => {0} = {Level}, {1} = {Level Label}")]
+        public string levelFormat = "{1}: {0}";
+        [Tooltip("Cool Down Duration Format => {0} = {Duration}, {1} = {Cooldown Label}")]
+        public string coolDownDurationFormat = "{1}: {0}";
         [Tooltip("Cool Down Remains Duration Format => {0} = {Remains duration}")]
         public string coolDownRemainsDurationFormat = "{0}";
         [Tooltip("Increase Max Member Format")]
@@ -32,12 +32,8 @@ namespace MultiplayerARPG
         public string increaseShareGoldGainPercentageFormat = "Party Share Gold +{0}%";
         [Tooltip("Decrease Exp Lost Percentage Format")]
         public string decreaseExpLostPercentageFormat = "Exp Penalty -{0}%";
-        [Tooltip("Skill Type Format => {0} = {Skill Type title}")]
-        public string skillTypeFormat = "Skill Type: {0}";
-        [Tooltip("Active Skill Type")]
-        public string activeSkillType = "Active";
-        [Tooltip("Passive Skill Type")]
-        public string passiveSkillType = "Passive";
+        [Tooltip("Skill Type Format => {0} = {Skill Type title}, {1} = {Skill Type Label}")]
+        public string skillTypeFormat = "{1}: {0}";
 
         public TextWrapper uiTextTitle;
         public TextWrapper uiTextDescription;
@@ -109,7 +105,7 @@ namespace MultiplayerARPG
             float coolDownDuration = GuildSkill.GetCoolDownDuration(Level);
 
             if (uiTextCoolDownDuration != null)
-                uiTextCoolDownDuration.text = string.Format(coolDownDurationFormat, coolDownDuration.ToString("N0"));
+                uiTextCoolDownDuration.text = string.Format(coolDownDurationFormat, coolDownDuration.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_SKILL_COOLDOWN.ToString()));
 
             if (uiTextCoolDownRemainsDuration != null)
             {
@@ -155,7 +151,7 @@ namespace MultiplayerARPG
                 uiTextDescription.text = string.Format(descriptionFormat, GuildSkill == null ? LanguageManager.GetUnknowDescription() : GuildSkill.Description);
 
             if (uiTextLevel != null)
-                uiTextLevel.text = string.Format(levelFormat, Level.ToString("N0"));
+                uiTextLevel.text = string.Format(levelFormat, Level.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LEVEL.ToString()));
 
             if (imageIcon != null)
             {
@@ -169,10 +165,10 @@ namespace MultiplayerARPG
                 switch (GuildSkill.skillType)
                 {
                     case GuildSkillType.Active:
-                        uiTextSkillType.text = string.Format(skillTypeFormat, activeSkillType);
+                        uiTextSkillType.text = string.Format(skillTypeFormat, LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_ACTIVE.ToString()), LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_LABEL.ToString()));
                         break;
                     case GuildSkillType.Passive:
-                        uiTextSkillType.text = string.Format(skillTypeFormat, passiveSkillType);
+                        uiTextSkillType.text = string.Format(skillTypeFormat, LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_PASSIVE.ToString()), LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_LABEL.ToString()));
                         break;
                 }
             }
