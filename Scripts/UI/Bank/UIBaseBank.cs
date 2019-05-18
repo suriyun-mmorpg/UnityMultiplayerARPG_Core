@@ -6,9 +6,12 @@ namespace MultiplayerARPG
 {
     public abstract class UIBaseBank : UIBase
     {
-        [Header("Generic Info Format")]
-        [Tooltip("Amount Format => {0} = {Amount}, {1} = {Gold Label}")]
-        public string amountFormat = "{1}: {0}";
+        /// <summary>
+        /// Format => {0} = {Gold Label}, {1} = {Amount}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Gold Label}, {1} = {Amount}")]
+        public string formatAmount = "{0}: {1}";
 
         [Header("UI Elements")]
         public TextWrapper uiTextAmount;
@@ -16,7 +19,11 @@ namespace MultiplayerARPG
         private void Update()
         {
             if (uiTextAmount != null)
-                uiTextAmount.text = string.Format(amountFormat, GetAmount().ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_GOLD.ToString()));
+            {
+                uiTextAmount.text = string.Format(formatAmount,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_GOLD.ToString()),
+                    GetAmount().ToString("N0"));
+            }
         }
 
         public void OnClickDeposit()

@@ -4,8 +4,12 @@ namespace MultiplayerARPG
 {
     public partial class UIDamageElementAmount : UISelectionEntry<DamageElementAmountTuple>
     {
-        [Tooltip("Damage Amount Format => {0} = {Element title}, {1} = {Min damage}, {2} = {Max damage}")]
-        public string amountFormat = "{0}: {1}~{2}";
+        /// <summary>
+        /// Format => {0} = {Element Title}, {1} = {Min Damage}, {2} = {Max Damage}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Element Title}, {1} = {Min Damage}, {2} = {Max Damage}")]
+        public string formatAmount = "{0}: {1}~{2}";
 
         [Header("UI Elements")]
         public TextWrapper uiTextAmount;
@@ -16,7 +20,11 @@ namespace MultiplayerARPG
             {
                 DamageElement element = Data.damageElement;
                 MinMaxFloat amount = Data.amount;
-                uiTextAmount.text = string.Format(amountFormat, element.Title, amount.min.ToString("N0"), amount.max.ToString("N0"));
+                uiTextAmount.text = string.Format(
+                    formatAmount,
+                    element.Title,
+                    amount.min.ToString("N0"),
+                    amount.max.ToString("N0"));
             }
         }
     }

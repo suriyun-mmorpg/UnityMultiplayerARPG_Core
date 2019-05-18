@@ -7,11 +7,17 @@ namespace MultiplayerARPG
 {
     public partial class UIDealing : UISelectionEntry<BasePlayerCharacterEntity>
     {
-        [Header("Display Format")]
-        [Tooltip("Gold Format => {0} = {Gold}, {1} = {Gold Label}")]
-        public string dealingGoldFormat = "{1}: {0}";
-        [Tooltip("Gold Format => {0} = {Gold}, {1} = {Gold Label}")]
-        public string anotherDealingGoldFormat = "{1}: {0}";
+        /// <summary>
+        /// Format => {0} = {Gold Label}, {1} = {Gold Amount}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Gold Label}, {1} = {Gold Amount}")]
+        public string formatDealingGold = "{0}: {1}";
+        /// <summary>
+        /// Format => {0} = {Gold Label}, {1} = {Gold Amount}
+        /// </summary>
+        [Tooltip("Format => {0} = {Gold Label}, {1} = {Gold Amount}")]
+        public string formatAnotherDealingGold = "{0}: {1}";
 
         [Header("UI Elements")]
         public UICharacterItem uiDealingItemPrefab;
@@ -209,14 +215,24 @@ namespace MultiplayerARPG
         public void UpdateDealingGold(int gold)
         {
             if (uiTextDealingGold != null)
-                uiTextDealingGold.text = string.Format(dealingGoldFormat, gold.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_GOLD.ToString()));
+            {
+                uiTextDealingGold.text = string.Format(
+                    formatDealingGold,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_GOLD.ToString()),
+                    gold.ToString("N0"));
+            }
             dealingGold = gold;
         }
 
         public void UpdateAnotherDealingGold(int gold)
         {
             if (uiTextAnotherDealingGold != null)
-                uiTextAnotherDealingGold.text = string.Format(anotherDealingGoldFormat, gold.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_GOLD.ToString()));
+            {
+                uiTextAnotherDealingGold.text = string.Format(
+                    formatAnotherDealingGold,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_GOLD.ToString()),
+                    gold.ToString("N0"));
+            }
             anotherDealingGold = gold;
         }
 

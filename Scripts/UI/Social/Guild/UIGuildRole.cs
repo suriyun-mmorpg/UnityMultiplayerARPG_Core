@@ -4,11 +4,17 @@ namespace MultiplayerARPG
 {
     public class UIGuildRole : UISelectionEntry<GuildRoleData>
     {
-        [Header("Display Format")]
-        [Tooltip("Role Name Format => {0} = {Role name}")]
-        public string roleNameFormat = "{0}";
-        [Tooltip("Share Exp Percentage Format => {0} = {Share exp percentage}, {1} = {Share exp Label}")]
-        public string shareExpPercentageFormat = "{1}: {0}%";
+        /// <summary>
+        /// Format => {0} = {Role Name}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Role Name}")]
+        public string formatRoleName = "{0}";
+        /// <summary>
+        /// Format => {0} = {Share Exp Label}, {1} = {Share Exp Percentage}
+        /// </summary>
+        [Tooltip("Format => {0} = {Share Exp Label}, {1} = {Share Exp Percentage}")]
+        public string formatShareExpPercentage = "{0}: {1}%";
 
         [Header("UI Elements")]
         public TextWrapper textRoleName;
@@ -19,7 +25,7 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             if (textRoleName != null)
-                textRoleName.text = string.Format(roleNameFormat, Data.roleName);
+                textRoleName.text = string.Format(formatRoleName, Data.roleName);
 
             if (textCanInvite != null)
             {
@@ -38,9 +44,9 @@ namespace MultiplayerARPG
             if (textShareExpPercentage != null)
             {
                 textShareExpPercentage.text = string.Format(
-                    shareExpPercentageFormat,
-                    Data.shareExpPercentage.ToString("N0"),
-                     LanguageManager.GetText(UILocaleKeys.UI_GUILD_ROLE_SHARE_EXP.ToString()));
+                    formatShareExpPercentage,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_SHARE_EXP.ToString()),
+                    Data.shareExpPercentage.ToString("N0"));
             }
         }
     }

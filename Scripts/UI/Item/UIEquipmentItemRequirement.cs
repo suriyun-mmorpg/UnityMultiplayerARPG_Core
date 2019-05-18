@@ -4,11 +4,17 @@ namespace MultiplayerARPG
 {
     public partial class UIEquipmentItemRequirement : UISelectionEntry<Item>
     {
-        [Header("Requirement Format")]
-        [Tooltip("Require Level Format => {0} = {Level}, {1} = {Require Level Label}")]
-        public string requireLevelFormat = "{1}: {0}";
-        [Tooltip("Require Class Format => {0} = {Class title}, {1} = {Require Class Label}")]
-        public string requireClassFormat = "{1}: {0}";
+        /// <summary>
+        /// Format => {0} = {Require Level Label}, {1} = {Level}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Require Level Label}, {1} = {Level}")]
+        public string formatRequireLevel = "{0}: {1}";
+        /// <summary>
+        /// Format => {0} = {Require Class Label}, {1} = {Class Title}
+        /// </summary>
+        [Tooltip("Format => {0} = {Require Class Label}, {1} = {Class Title}")]
+        public string formatRequireClass = "{0}: {1}";
 
         [Header("UI Elements")]
         public TextWrapper uiTextRequireLevel;
@@ -30,9 +36,9 @@ namespace MultiplayerARPG
                 {
                     uiTextRequireLevel.gameObject.SetActive(true);
                     uiTextRequireLevel.text = string.Format(
-                        requireLevelFormat,
-                        equipmentItem.requirement.level.ToString("N0"),
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_LEVEL.ToString()));
+                        formatRequireLevel,
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_LEVEL.ToString()),
+                        equipmentItem.requirement.level.ToString("N0"));
                 }
             }
 
@@ -47,9 +53,9 @@ namespace MultiplayerARPG
                 {
                     uiTextRequireClass.gameObject.SetActive(true);
                     uiTextRequireClass.text = string.Format(
-                        requireClassFormat,
-                        equipmentItem.requirement.character.Title,
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_CLASS.ToString()));
+                        formatRequireClass,
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_CLASS.ToString()),
+                        equipmentItem.requirement.character.Title);
                 }
             }
 

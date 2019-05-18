@@ -4,9 +4,12 @@ namespace MultiplayerARPG
 {
     public partial class UIGuildInvitation : UISelectionEntry<BasePlayerCharacterEntity>
     {
-        [Header("Display Format")]
-        [Tooltip("Guild Name Format => {0} = {Guild name}")]
-        public string guildNameFormat = "{0}";
+        /// <summary>
+        /// Format => {0} = {Guild Name}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Guild Name}")]
+        public string formatGuildName = "{0}";
 
         public UICharacter uiAnotherCharacter;
         public TextWrapper uiTextGuildName;
@@ -19,7 +22,7 @@ namespace MultiplayerARPG
                 uiAnotherCharacter.Data = anotherCharacter;
 
             if (uiTextGuildName != null)
-                uiTextGuildName.text = string.Format(guildNameFormat, Data.TitleB);
+                uiTextGuildName.text = string.Format(formatGuildName, Data.TitleB);
         }
 
         public void OnClickAccept()

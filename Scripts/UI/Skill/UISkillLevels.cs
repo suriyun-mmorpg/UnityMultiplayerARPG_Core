@@ -5,12 +5,22 @@ namespace MultiplayerARPG
 {
     public partial class UISkillLevels : UISelectionEntry<Dictionary<Skill, short>>
     {
-        [Tooltip("Skill Level Format => {0} = {Skill title}, {1} = {Current Level}, {2} = {Target Level}")]
-        public string levelFormat = "{0}: {1}/{2}";
-        [Tooltip("Skill Level Format => {0} = {Skill title}, {1} = {Current Level}, {2} = {Target Level}")]
-        public string levelNotEnoughFormat = "{0}: <color=red>{1}/{2}</color>";
-        [Tooltip("Skill Level Format without Current Level => {0} = {Skill title}, {1} = {Target Level}")]
-        public string simpleLevelFormat = "{0}: {1}";
+        /// <summary>
+        /// Format => {0} = {Skill Title}, {1} = {Current Level}, {2} = {Target Level}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Skill Title}, {1} = {Current Level}, {2} = {Target Level}")]
+        public string formatLevel = "{0}: {1}/{2}";
+        /// <summary>
+        /// Format => {0} = {Skill Title}, {1} = {Current Level}, {2} = {Target Level}
+        /// </summary>
+        [Tooltip("Format => {0} = {Skill Title}, {1} = {Current Level}, {2} = {Target Level}")]
+        public string formatLevelNotEnough = "{0}: <color=red>{1}/{2}</color>";
+        /// <summary>
+        /// Format => {0} = {Skill Title}, {1} = {Target Level}
+        /// </summary>
+        [Tooltip("Format => {0} = {Skill Title}, {1} = {Target Level}")]
+        public string formatSimpleLevel = "{0}: {1}";
 
         [Header("UI Elements")]
         public TextWrapper uiTextAllLevels;
@@ -33,7 +43,7 @@ namespace MultiplayerARPG
                             continue;
                         tempSkill = textLevel.skill;
                         tempTextComponent = textLevel.uiText;
-                        tempTextComponent.text = string.Format(levelFormat, tempSkill.Title, "0", "0");
+                        tempTextComponent.text = string.Format(formatLevel, tempSkill.Title, "0", "0");
                         cacheTextLevels[tempSkill] = tempTextComponent;
                     }
                 }
@@ -51,7 +61,7 @@ namespace MultiplayerARPG
 
                 foreach (KeyValuePair<Skill, TextWrapper> entry in CacheTextLevels)
                 {
-                    entry.Value.text = string.Format(levelFormat, entry.Key.Title, "0", "0");
+                    entry.Value.text = string.Format(formatLevel, entry.Key.Title, "0", "0");
                 }
             }
             else
@@ -81,13 +91,13 @@ namespace MultiplayerARPG
                     if (showAsRequirement)
                     {
                         // This will show both current character skill level and target amount
-                        tempFormat = tempCurrentLevel >= tempTargetLevel ? levelFormat : levelNotEnoughFormat;
+                        tempFormat = tempCurrentLevel >= tempTargetLevel ? formatLevel : formatLevelNotEnough;
                         tempLevelText = string.Format(tempFormat, tempSkill.Title, tempCurrentLevel.ToString("N0"), tempTargetLevel.ToString("N0"));
                     }
                     else
                     {
                         // This will show only target level, so current character skill level will not be shown
-                        tempLevelText = string.Format(simpleLevelFormat, tempSkill.Title, tempTargetLevel.ToString("N0"));
+                        tempLevelText = string.Format(formatSimpleLevel, tempSkill.Title, tempTargetLevel.ToString("N0"));
                     }
                     // Append current attribute amount text
                     tempAllText += tempLevelText;

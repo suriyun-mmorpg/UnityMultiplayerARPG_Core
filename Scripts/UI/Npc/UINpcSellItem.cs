@@ -4,8 +4,11 @@ namespace MultiplayerARPG
 {
     public partial class UINpcSellItem : UISelectionEntry<NpcSellItem>
     {
-        [Tooltip("Sell Price Format => {0} = {Sell price}, {1} = {Sell price Label}")]
-        public string sellPriceFormat = "{1}: {0}";
+        /// <summary>
+        /// Format => {0} = {Sell Price Label}, {1} = {Sell Price}
+        /// </summary>
+        [Tooltip("Format => {0} = {Sell Price Label}, {1} = {Sell Price}")]
+        public string formatSellPrice = "{0}: {1}";
 
         [Header("UI Elements")]
         public UICharacterItem uiCharacterItem;
@@ -35,9 +38,9 @@ namespace MultiplayerARPG
             if (uiTextSellPrice != null)
             {
                 uiTextSellPrice.text = string.Format(
-                    sellPriceFormat,
-                    Data.sellPrice.ToString("N0"),
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_SELL_PRICE.ToString()));
+                    formatSellPrice,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_SELL_PRICE.ToString()),
+                    Data.sellPrice.ToString("N0"));
             }
         }
 

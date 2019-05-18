@@ -5,12 +5,18 @@ namespace MultiplayerARPG
 {
     public class UIEquipmentSockets : UIBaseEquipmentBonus<EnhancedSocketsWithMaxSocketTuple>
     {
-        [Header("Equipment Sockets Format")]
-        [Tooltip("Filled socket format => {0} = {Item Index}, {1} = {Item Title}, {2} = {Effects}")]
+        /// <summary>
+        /// Format => {0} = {Item Index}, {1} = {Item Title}, {2} = {Effects}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Item Index}, {1} = {Item Title}, {2} = {Effects}")]
         [Multiline]
-        public string filledSocketFormat = "<color=#800080ff>({0}) - {1}\n{2}</color>";
-        [Tooltip("Empty socket format => {0} = {Item Index}")]
-        public string emptySocketFormat = "<color=#800080ff>({0}) - Empty</color>";
+        public string formatFilledSocket = "<color=#800080ff>({0}) - {1}\n{2}</color>";
+        /// <summary>
+        /// Format => {0} = {Item Index}
+        /// </summary>
+        [Tooltip("Format => {0} = {Item Index}")]
+        public string formatEmptySocket = "<color=#800080ff>({0}) - Empty</color>";
 
         protected override void UpdateData()
         {
@@ -26,14 +32,14 @@ namespace MultiplayerARPG
                     {
                         if (!string.IsNullOrEmpty(allBonusText))
                             allBonusText += "\n";
-                        allBonusText += string.Format(filledSocketFormat, i + 1, tempItem.Title, tempText);
+                        allBonusText += string.Format(formatFilledSocket, i + 1, tempItem.Title, tempText);
                     }
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(allBonusText))
                         allBonusText += "\n";
-                    allBonusText += string.Format(emptySocketFormat, i + 1);
+                    allBonusText += string.Format(formatEmptySocket, i + 1);
                 }
             }
             if (uiTextAllBonus != null)

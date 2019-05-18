@@ -113,7 +113,10 @@ namespace MultiplayerARPG
             string statsStringPart = string.Empty;
 
             // Hp
-            statsStringPart = string.Format(hpStatsFormat, data.hp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_HP.ToString()));
+            statsStringPart = string.Format(
+                hpStatsFormat,
+                LanguageManager.GetText(UILocaleKeys.UI_LABEL_HP.ToString()),
+                data.hp.ToString("N0"));
             if (data.hp != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -124,7 +127,10 @@ namespace MultiplayerARPG
                 uiTextHp.text = statsStringPart;
 
             // Mp
-            statsStringPart = string.Format(mpStatsFormat, data.mp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_MP.ToString()));
+            statsStringPart = string.Format(
+                mpStatsFormat,
+                LanguageManager.GetText(UILocaleKeys.UI_LABEL_MP.ToString()),
+                data.mp.ToString("N0"));
             if (data.mp != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -135,7 +141,10 @@ namespace MultiplayerARPG
                 uiTextMp.text = statsStringPart;
 
             // Armor
-            statsStringPart = string.Format(armorStatsFormat, data.armor.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_ARMOR.ToString()));
+            statsStringPart = string.Format(
+                armorStatsFormat,
+                LanguageManager.GetText(UILocaleKeys.UI_LABEL_ARMOR.ToString()),
+                data.armor.ToString("N0"));
             if (data.armor != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -146,7 +155,10 @@ namespace MultiplayerARPG
                 uiTextArmor.text = statsStringPart;
 
             // Accuracy
-            statsStringPart = string.Format(accuracyStatsFormat, data.accuracy.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_ACCURACY.ToString()));
+            statsStringPart = string.Format(
+                accuracyStatsFormat,
+                LanguageManager.GetText(UILocaleKeys.UI_LABEL_ACCURACY.ToString()),
+                data.accuracy.ToString("N0"));
             if (data.accuracy != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -157,7 +169,10 @@ namespace MultiplayerARPG
                 uiTextAccuracy.text = statsStringPart;
 
             // Evasion
-            statsStringPart = string.Format(evasionStatsFormat, data.evasion.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_EVASION.ToString()));
+            statsStringPart = string.Format(
+                evasionStatsFormat,
+                LanguageManager.GetText(UILocaleKeys.UI_LABEL_EVASION.ToString()),
+                data.evasion.ToString("N0"));
             if (data.evasion != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -168,7 +183,10 @@ namespace MultiplayerARPG
                 uiTextEvasion.text = statsStringPart;
 
             // Cri Rate
-            statsStringPart = string.Format(criRateStatsFormat, (data.criRate * 100).ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_CRITICAL_RATE.ToString()));
+            statsStringPart = string.Format(
+                criRateStatsFormat,
+                LanguageManager.GetText(UILocaleKeys.UI_LABEL_CRITICAL_RATE.ToString()),
+                (data.criRate * 100).ToString("N2"));
             if (data.criRate != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -179,7 +197,10 @@ namespace MultiplayerARPG
                 uiTextCriRate.text = statsStringPart;
 
             // Cri Dmg Rate
-            statsStringPart = string.Format(criDmgRateStatsFormat, (data.criDmgRate * 100).ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_CRITICAL_DAMAGE_RATE.ToString()));
+            statsStringPart = string.Format(
+                criDmgRateStatsFormat,
+                LanguageManager.GetText(UILocaleKeys.UI_LABEL_CRITICAL_DAMAGE_RATE.ToString()),
+                (data.criDmgRate * 100).ToString("N2"));
             if (data.criDmgRate != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -190,7 +211,10 @@ namespace MultiplayerARPG
                 uiTextCriDmgRate.text = statsStringPart;
 
             // Block Rate
-            statsStringPart = string.Format(blockRateStatsFormat, (data.blockRate * 100).ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_BLOCK_RATE.ToString()));
+            statsStringPart = string.Format(
+                blockRateStatsFormat,
+                LanguageManager.GetText(UILocaleKeys.UI_LABEL_BLOCK_RATE.ToString()),
+                (data.blockRate * 100).ToString("N2"));
             if (data.blockRate != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -201,7 +225,10 @@ namespace MultiplayerARPG
                 uiTextBlockRate.text = statsStringPart;
 
             // Block Dmg Rate
-            statsStringPart = string.Format(blockDmgRateStatsFormat, (data.blockDmgRate * 100).ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_BLOCK_DAMAGE_RATE.ToString()));
+            statsStringPart = string.Format(
+                blockDmgRateStatsFormat,
+                LanguageManager.GetText(UILocaleKeys.UI_LABEL_BLOCK_DAMAGE_RATE.ToString()),
+                (data.blockDmgRate * 100).ToString("N2"));
             if (data.blockDmgRate != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -212,7 +239,10 @@ namespace MultiplayerARPG
                 uiTextBlockDmgRate.text = statsStringPart;
 
             // Weight
-            statsStringPart = string.Format(weightLimitStatsFormat, data.weightLimit.ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_WEIGHT.ToString()));
+            statsStringPart = string.Format(
+                weightLimitStatsFormat,
+                LanguageManager.GetText(UILocaleKeys.UI_LABEL_WEIGHT.ToString()),
+                data.weightLimit.ToString("N2"));
             if (data.weightLimit != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -223,7 +253,10 @@ namespace MultiplayerARPG
                 uiTextWeightLimit.text = statsStringPart;
 
             // Move Speed
-            statsStringPart = string.Format(moveSpeedStatsFormat, data.moveSpeed.ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_MOVE_SPEED.ToString()));
+            statsStringPart = string.Format(
+                moveSpeedStatsFormat,
+                LanguageManager.GetText(UILocaleKeys.UI_LABEL_MOVE_SPEED.ToString()),
+                data.moveSpeed.ToString("N2"));
             if (data.moveSpeed != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -234,7 +267,10 @@ namespace MultiplayerARPG
                 uiTextMoveSpeed.text = statsStringPart;
 
             // Attack Speed
-            statsStringPart = string.Format(atkSpeedStatsFormat, data.atkSpeed.ToString("N2"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_ATTACK_SPEED.ToString()));
+            statsStringPart = string.Format(
+                atkSpeedStatsFormat,
+                LanguageManager.GetText(UILocaleKeys.UI_LABEL_ATTACK_SPEED.ToString()),
+                data.atkSpeed.ToString("N2"));
             if (data.atkSpeed != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -245,7 +281,10 @@ namespace MultiplayerARPG
                 uiTextAtkSpeed.text = statsStringPart;
 
             // Stamina
-            statsStringPart = string.Format(staminaStatsFormat, data.stamina.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_STAMINA.ToString()));
+            statsStringPart = string.Format(
+                staminaStatsFormat,
+                LanguageManager.GetText(UILocaleKeys.UI_LABEL_STAMINA.ToString()),
+                data.stamina.ToString("N0"));
             if (data.stamina != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -256,7 +295,10 @@ namespace MultiplayerARPG
                 uiTextStamina.text = statsStringPart;
 
             // Food
-            statsStringPart = string.Format(foodStatsFormat, data.food.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_FOOD.ToString()));
+            statsStringPart = string.Format(
+                foodStatsFormat,
+                LanguageManager.GetText(UILocaleKeys.UI_LABEL_FOOD.ToString()),
+                data.food.ToString("N0"));
             if (data.food != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))
@@ -267,7 +309,10 @@ namespace MultiplayerARPG
                 uiTextFood.text = statsStringPart;
 
             // Water
-            statsStringPart = string.Format(waterStatsFormat, data.water.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_WATER.ToString()));
+            statsStringPart = string.Format(
+                waterStatsFormat,
+                LanguageManager.GetText(UILocaleKeys.UI_LABEL_WATER.ToString()),
+                data.water.ToString("N0"));
             if (data.water != 0)
             {
                 if (!string.IsNullOrEmpty(statsString))

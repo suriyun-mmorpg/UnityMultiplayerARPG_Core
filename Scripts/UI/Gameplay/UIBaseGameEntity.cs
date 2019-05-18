@@ -12,12 +12,17 @@ namespace MultiplayerARPG
             VisibleWhenNearby,
             AlwaysVisible,
         }
-
-        [Header("Base Game Entity - Display Format")]
-        [Tooltip("Title Format => {0} = {Title}")]
-        public string titleFormat = "{0}";
-        [Tooltip("TitleB Format => {0} = {TitleB}")]
-        public string titleBFormat = "{0}";
+        /// <summary>
+        /// Format => {0} = {Title}
+        /// </summary>
+        [Header("Base Game Entity - String Formats")]
+        [Tooltip("Format => {0} = {Title}")]
+        public string formatTitle = "{0}";
+        /// <summary>
+        /// Format => {0} = {TitleB}
+        /// </summary>
+        [Tooltip("Format => {0} = {TitleB}")]
+        public string formatTitleB = "{0}";
 
         [Header("Base Game Entity - UI Elements")]
         public TextWrapper uiTextTitle;
@@ -59,14 +64,14 @@ namespace MultiplayerARPG
             if (uiTextTitle != null)
             {
                 tempTitle = Data == null ? string.Empty : Data.Title;
-                uiTextTitle.text = string.Format(titleFormat, tempTitle);
+                uiTextTitle.text = string.Format(formatTitle, tempTitle);
                 uiTextTitle.gameObject.SetActive(!string.IsNullOrEmpty(tempTitle));
             }
 
             if (uiTextTitleB != null)
             {
                 tempTitle = Data == null ? string.Empty : Data.TitleB;
-                uiTextTitleB.text = string.Format(titleBFormat, tempTitle);
+                uiTextTitleB.text = string.Format(formatTitleB, tempTitle);
                 uiTextTitleB.gameObject.SetActive(!string.IsNullOrEmpty(tempTitle));
             }
         }

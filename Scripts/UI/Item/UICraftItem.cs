@@ -7,11 +7,17 @@ namespace MultiplayerARPG
         public ItemCraft ItemCraft { get { return Data; } }
         public Item CraftingItem { get { return ItemCraft.craftingItem; } }
 
-        [Header("Generic Info Format")]
-        [Tooltip("Require Gold Format => {0} = {Current Amount}, {1} = {Target Amount}, {2} = {Required Gold Label}")]
-        public string requireGoldFormat = "{2}: {0}/{1}";
-        [Tooltip("Require Gold Format => {0} = {Current Amount}, {1} = {Target Amount}, {2} = {Required Gold Label}")]
-        public string requireGoldNotEnoughFormat = "{2}: <color=red>{0}/{1}</color>";
+        /// <summary>
+        /// Format => {0} = {Required Gold Label}, {1} = {Current Amount}, {2} = {Target Amount}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Required Gold Label}, {1} = {Current Amount}, {2} = {Target Amount}")]
+        public string formatRequireGold = "{0}: {1}/{2}";
+        /// <summary>
+        /// Format => {0} = {Required Gold Label}, {1} = {Current Amount}, {2} = {Target Amount}
+        /// </summary>
+        [Tooltip("Format => {0} = {Required Gold Label}, {1} = {Current Amount}, {2} = {Target Amount}")]
+        public string formatRequireGoldNotEnough = "{0}: <color=red>{1}/{2}</color>";
 
         [Header("UI Elements")]
         public UICharacterItem uiCraftingItem;
@@ -77,10 +83,10 @@ namespace MultiplayerARPG
                 if (CraftingItem == null)
                 {
                     uiTextRequireGold.text = string.Format(
-                        requireGoldFormat,
+                        formatRequireGold,
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_GOLD.ToString()),
                         "0",
-                        "0",
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_GOLD.ToString()));
+                        "0");
                 }
                 else
                 {
@@ -88,9 +94,10 @@ namespace MultiplayerARPG
                     if (owningCharacter != null)
                         currentAmount = owningCharacter.Gold;
                     uiTextRequireGold.text = string.Format(
-                        currentAmount >= ItemCraft.requireGold ? requireGoldFormat : requireGoldNotEnoughFormat,
-                        currentAmount.ToString("N0"), ItemCraft.requireGold.ToString("N0"),
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_GOLD.ToString()));
+                        currentAmount >= ItemCraft.requireGold ? formatRequireGold : formatRequireGoldNotEnough,
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_GOLD.ToString()),
+                        currentAmount.ToString("N0"),
+                        ItemCraft.requireGold.ToString("N0"));
                 }
             }
         }

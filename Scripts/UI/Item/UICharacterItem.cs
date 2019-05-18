@@ -21,33 +21,72 @@ namespace MultiplayerARPG
         public Item PetItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetPetItem() : null; } }
         public Item SocketEnhancerItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetSocketEnhancerItem() : null; } }
 
-        [Header("Generic Info Format")]
-        [Tooltip("Title Format => {0} = {Title}")]
-        public string titleFormat = "{0}";
-        [Tooltip("Description Format => {0} = {Description}")]
-        public string descriptionFormat = "{0}";
-        [Tooltip("Rarity Title Format => {0} = {Rarity Title}, {1} = {Rarity Label}")]
-        public string rarityTitleFormat = "{1}: {0}";
-        [Tooltip("Level Format => {0} = {Level}, {1} = {Level Label}")]
-        public string levelFormat = "{1}: {0}";
-        [Tooltip("Refine Level Format => {0} = {Refine Level}, {1} = {Level Label}")]
-        public string refineLevelFormat = "{1}: +{0}";
-        [Tooltip("Title Refine Level Format => {0} = {Refine Level}")]
-        public string titleRefineLevelFormat = " (+{0})";
-        [Tooltip("Sell Price Format => {0} = {Sell price}, {1} = {Sell price Label}")]
-        public string sellPriceFormat = "{1}: {0}";
-        [Tooltip("Stack Format => {0} = {Amount}, {1} = {Max stack}, {2} = {Stack Amount Label}")]
-        public string stackFormat = "{2}: {0}/{1}";
-        [Tooltip("Durability Format => {0} = {Durability}, {1} = {Max durability}, {2} = {Durability Label}")]
-        public string durabilityFormat = "{2}: {0}/{1}";
-        [Tooltip("Weight Format => {0} = {Weight}, {1} = {Weight Label}")]
-        public string weightFormat = "{1}: {0}";
-        [Tooltip("Exp Format => {0} = {Current exp}, {1} = {Max exp}, {2} = {Exp Label}")]
-        public string expFormat = "{2}: {0}/{1}";
-        [Tooltip("Lock Remains Duration Format => {0} = {Lock Remains duration}")]
-        public string lockRemainsDurationFormat = "{0}";
-        [Tooltip("Item Type Format => {0} = {Item Type title}, {1} = {Item Type Label}")]
-        public string itemTypeFormat = "{1}: {0}";
+        /// <summary>
+        /// Format => {0} = {Title}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Title}")]
+        public string formatTitle = "{0}";
+        /// <summary>
+        /// Format => {0} = {Description}
+        /// </summary>
+        [Tooltip("Format => {0} = {Description}")]
+        public string formatDescription = "{0}";
+        /// <summary>
+        /// Format => {0} = {Rarity Label}, {1} = {Rarity Title}
+        /// </summary>
+        [Tooltip("Format => {0} = {Rarity Label}, {1} = {Rarity Title}")]
+        public string formatRarityTitle = "{0}: {1}";
+        /// <summary>
+        /// Format => {0} = {Level Label}, {1} = {Level}
+        /// </summary>
+        [Tooltip("Format => {0} = {Level Label}, {1} = {Level}")]
+        public string formatLevel = "{0}: {1}";
+        /// <summary>
+        /// Format => {0} = {Level Label}, {1} = {Refine Level}
+        /// </summary>
+        [Tooltip("Format => {0} = {Level Label}, {1} = {Refine Level}")]
+        public string formatRefineLevel = "{0}: +{1}";
+        /// <summary>
+        /// Format => {0} = {Refine Level}
+        /// </summary>
+        [Tooltip("Format => {0} = {Refine Level}")]
+        public string formatTitleRefineLevel = " (+{0})";
+        /// <summary>
+        /// Format => {0} = {Sell Price Label}, {1} = {Sell Price}
+        /// </summary>
+        [Tooltip("Format => {0} = {Sell Price Label}, {1} = {Sell Price}")]
+        public string formatSellPrice = "{0}: {1}";
+        /// <summary>
+        /// Format => {0} = {Stack Amount Label}, {1} = {Amount}, {2} = {Max stack}
+        /// </summary>
+        [Tooltip("Format => {0} = {Stack Amount Label}, {1} = {Amount}, {2} = {Max stack}")]
+        public string formatStack = "{0}: {1}/{2}";
+        /// <summary>
+        /// Format => {0} = {Durability Label}, {1} = {Durability}, {2} = {Max Durability}
+        /// </summary>
+        [Tooltip("Format => {0} = {Durability Label}, {1} = {Durability}, {2} = {Max Durability}")]
+        public string formatDurability = "{0}: {1}/{2}";
+        /// <summary>
+        /// Format => {0} = {Weight Label}, {1} = {Weight}
+        /// </summary>
+        [Tooltip("Format => {0} = {Weight Label}, {1} = {Weight}")]
+        public string formatWeight = "{0}: {1}";
+        /// <summary>
+        /// Format => {0} = {Exp Label}, {1} = {Current Exp}, {2} = {Max Exp}
+        /// </summary>
+        [Tooltip("Format => {0} = {Exp Label}, {1} = {Current Exp}, {2} = {Max Exp}")]
+        public string formatExp = "{0}: {1}/{2}";
+        /// <summary>
+        /// Format => {0} = {Lock Remains Duration}
+        /// </summary>
+        [Tooltip("Format => {0} = {Lock Remains Duration}")]
+        public string formatLockRemainsDuration = "{0}";
+        /// <summary>
+        /// Item Type Format => {0} = {Item Type Label}, {1} = {Item Type Title}
+        /// </summary>
+        [Tooltip("Item Type Format => {0} = {Item Type Label}, {1} = {Item Type Title}")]
+        public string formatItemType = "{0}: {1}";
 
         [Header("UI Elements")]
         public TextWrapper uiTextTitle;
@@ -138,7 +177,7 @@ namespace MultiplayerARPG
 
             if (uiTextLockRemainsDuration != null)
             {
-                uiTextLockRemainsDuration.text = string.Format(lockRemainsDurationFormat, Mathf.CeilToInt(lockRemainsDuration).ToString("N0"));
+                uiTextLockRemainsDuration.text = string.Format(formatLockRemainsDuration, Mathf.CeilToInt(lockRemainsDuration).ToString("N0"));
                 uiTextLockRemainsDuration.gameObject.SetActive(lockRemainsDuration > 0);
             }
         }
@@ -181,21 +220,21 @@ namespace MultiplayerARPG
 
             if (uiTextTitle != null)
             {
-                string str = string.Format(titleFormat, Item == null ? LanguageManager.GetUnknowTitle() : Item.Title);
+                string str = string.Format(formatTitle, Item == null ? LanguageManager.GetUnknowTitle() : Item.Title);
                 if (!dontAppendRefineLevelToTitle && EquipmentItem != null)
-                    str += string.Format(titleRefineLevelFormat, (Level - 1).ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()));
+                    str += string.Format(formatTitleRefineLevel, (Level - 1).ToString("N0"));
                 uiTextTitle.text = str;
             }
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(descriptionFormat, Item == null ? LanguageManager.GetUnknowDescription() : Item.Description);
+                uiTextDescription.text = string.Format(formatDescription, Item == null ? LanguageManager.GetUnknowDescription() : Item.Description);
 
             if (uiTextRarity != null)
             {
                 uiTextRarity.text = string.Format(
-                    rarityTitleFormat,
-                    Item == null ? LanguageManager.GetUnknowTitle() : Item.RarityTitle,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_RARITY.ToString()));
+                    formatRarityTitle,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_RARITY.ToString()),
+                    Item == null ? LanguageManager.GetUnknowTitle() : Item.RarityTitle);
             }
 
             if (uiTextLevel != null)
@@ -205,24 +244,24 @@ namespace MultiplayerARPG
                     if (showLevelAsDefault)
                     {
                         uiTextLevel.text = string.Format(
-                            levelFormat,
-                            Level.ToString("N0"),
-                            LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()));
+                            formatLevel,
+                            LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()),
+                            Level.ToString("N0"));
                     }
                     else
                     {
                         uiTextLevel.text = string.Format(
-                            refineLevelFormat,
-                            (Level - 1).ToString("N0"),
-                            LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()));
+                            formatRefineLevel,
+                            LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()),
+                            (Level - 1).ToString("N0"));
                     }
                 }
                 else if (PetItem != null)
                 {
                     uiTextLevel.text = string.Format(
-                        levelFormat,
-                        Level.ToString("N0"),
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()));
+                        formatLevel,
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()),
+                        Level.ToString("N0"));
                 }
                 uiTextLevel.gameObject.SetActive(EquipmentItem != null || PetItem != null);
             }
@@ -242,57 +281,57 @@ namespace MultiplayerARPG
                     {
                         case ItemType.Junk:
                             uiTextItemType.text = string.Format(
-                                itemTypeFormat,
-                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_JUNK.ToString()),
-                                LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_TYPE.ToString()));
+                                formatItemType,
+                                LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_TYPE.ToString()),
+                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_JUNK.ToString()));
                             break;
                         case ItemType.Armor:
                             uiTextItemType.text = string.Format(
-                                itemTypeFormat,
-                                ArmorItem.ArmorType.Title,
-                                LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_TYPE.ToString()));
+                                formatItemType,
+                                LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_TYPE.ToString()),
+                                ArmorItem.ArmorType.Title);
                             break;
                         case ItemType.Weapon:
                             uiTextItemType.text = string.Format(
-                                itemTypeFormat,
-                                WeaponItem.WeaponType.Title,
-                                LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_TYPE.ToString()));
+                                formatItemType,
+                                LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_TYPE.ToString()),
+                                WeaponItem.WeaponType.Title);
                             break;
                         case ItemType.Shield:
                             uiTextItemType.text = string.Format(
-                                itemTypeFormat,
-                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_SHIELD.ToString()),
-                                LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_TYPE.ToString()));
+                                formatItemType,
+                                LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_TYPE.ToString()),
+                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_SHIELD.ToString()));
                             break;
                         case ItemType.Potion:
                             uiTextItemType.text = string.Format(
-                                itemTypeFormat,
-                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_POTION.ToString()),
-                                LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_TYPE.ToString()));
+                                formatItemType,
+                                LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_TYPE.ToString()),
+                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_POTION.ToString()));
                             break;
                         case ItemType.Ammo:
                             uiTextItemType.text = string.Format(
-                                itemTypeFormat,
-                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_AMMO.ToString()),
-                                LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_TYPE.ToString()));
+                                formatItemType,
+                                LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_TYPE.ToString()),
+                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_AMMO.ToString()));
                             break;
                         case ItemType.Building:
                             uiTextItemType.text = string.Format(
-                                itemTypeFormat,
-                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_BUILDING.ToString()),
-                                LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_TYPE.ToString()));
+                                formatItemType,
+                                LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_TYPE.ToString()),
+                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_BUILDING.ToString()));
                             break;
                         case ItemType.Pet:
                             uiTextItemType.text = string.Format(
-                                itemTypeFormat,
-                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_PET.ToString()),
-                                LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_TYPE.ToString()));
+                                formatItemType,
+                                LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_TYPE.ToString()),
+                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_PET.ToString()));
                             break;
                         case ItemType.SocketEnhancer:
                             uiTextItemType.text = string.Format(
-                                itemTypeFormat,
-                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_SOCKET_ENHANCER.ToString()),
-                                LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_TYPE.ToString()));
+                                formatItemType,
+                                LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_TYPE.ToString()),
+                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_SOCKET_ENHANCER.ToString()));
                             break;
                     }
                 }
@@ -301,9 +340,9 @@ namespace MultiplayerARPG
             if (uiTextSellPrice != null)
             {
                 uiTextSellPrice.text = string.Format(
-                    sellPriceFormat,
-                    Item == null ? "0" : Item.sellPrice.ToString("N0"),
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_SELL_PRICE.ToString()));
+                    formatSellPrice,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_SELL_PRICE.ToString()),
+                    Item == null ? "0" : Item.sellPrice.ToString("N0"));
             }
 
             if (uiTextStack != null)
@@ -312,18 +351,18 @@ namespace MultiplayerARPG
                 if (Item == null)
                 {
                     stackString = string.Format(
-                        stackFormat,
+                        formatStack,
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_AMOUNT.ToString()),
                         "0",
-                        "0",
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_AMOUNT.ToString()));
+                        "0");
                 }
                 else
                 {
                     stackString = string.Format(
-                        stackFormat,
+                        formatStack,
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_AMOUNT.ToString()),
                         CharacterItem.amount.ToString("N0"),
-                        Item.maxStack,
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_AMOUNT.ToString()));
+                        Item.maxStack);
                 }
                 uiTextStack.text = stackString;
                 uiTextStack.gameObject.SetActive(showAmountWhenMaxIsOne || (Item != null && Item.maxStack > 1));
@@ -335,18 +374,18 @@ namespace MultiplayerARPG
                 if (Item == null)
                 {
                     durabilityString = string.Format(
-                        durabilityFormat,
+                        formatDurability,
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_DURABILITY.ToString()),
                         "0",
-                        "0",
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_DURABILITY.ToString()));
+                        "0");
                 }
                 else
                 {
                     durabilityString = string.Format(
-                        durabilityFormat,
+                        formatDurability,
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_DURABILITY.ToString()),
                         CharacterItem.durability.ToString("N0"),
-                        Item.maxDurability,
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_ITEM_DURABILITY.ToString()));
+                        Item.maxDurability);
                 }
                 uiTextDurability.text = durabilityString;
                 uiTextDurability.gameObject.SetActive(EquipmentItem != null && Item.maxDurability > 0);
@@ -355,9 +394,9 @@ namespace MultiplayerARPG
             if (uiTextWeight != null)
             {
                 uiTextWeight.text = string.Format(
-                    weightFormat,
-                    Item == null ? "0" : Item.weight.ToString("N2"),
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_WEIGHT.ToString()));
+                    formatWeight,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_WEIGHT.ToString()),
+                    Item == null ? "0" : Item.weight.ToString("N2"));
             }
 
             if (uiRequirement != null)
@@ -530,10 +569,10 @@ namespace MultiplayerARPG
                 if (uiTextExp != null)
                 {
                     uiTextExp.text = string.Format(
-                        expFormat,
+                        formatExp,
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_EXP.ToString()),
                         currentExp.ToString("N0"),
-                        nextLevelExp.ToString("N0"),
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_EXP.ToString()));
+                        nextLevelExp.ToString("N0"));
                     uiTextExp.gameObject.SetActive(true);
                 }
             }

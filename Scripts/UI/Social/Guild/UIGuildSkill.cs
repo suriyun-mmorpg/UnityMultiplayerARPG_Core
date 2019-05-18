@@ -9,19 +9,37 @@ namespace MultiplayerARPG
         public GuildSkill GuildSkill { get { return Data.guildSkill; } }
         public short Level { get { return Data.targetLevel; } }
 
-        [Header("Display Format")]
-        [Tooltip("Title Format => {0} = {Title}")]
-        public string titleFormat = "{0}";
-        [Tooltip("Description Format => {0} = {Description}")]
-        public string descriptionFormat = "{0}";
-        [Tooltip("Level Format => {0} = {Level}, {1} = {Level Label}")]
-        public string levelFormat = "{1}: {0}";
-        [Tooltip("Cool Down Duration Format => {0} = {Duration}, {1} = {Cooldown Label}")]
-        public string coolDownDurationFormat = "{1}: {0}";
-        [Tooltip("Cool Down Remains Duration Format => {0} = {Remains duration}")]
-        public string coolDownRemainsDurationFormat = "{0}";
-        [Tooltip("Skill Type Format => {0} = {Skill Type title}, {1} = {Skill Type Label}")]
-        public string skillTypeFormat = "{1}: {0}";
+        /// <summary>
+        /// Format => {0} = {Title}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Title}")]
+        public string formatTitle = "{0}";
+        /// <summary>
+        /// Format => {0} = {Description}
+        /// </summary>
+        [Tooltip("Format => {0} = {Description}")]
+        public string formatDescription = "{0}";
+        /// <summary>
+        /// Format => {0} = {Level Label}, {1} = {Level}
+        /// </summary>
+        [Tooltip("Format => {0} = {Level Label}, {1} = {Level}")]
+        public string formatLevel = "{0}: {1}";
+        /// <summary>
+        /// Format => {0} = {Cooldown Label}, {1} = {Duration}
+        /// </summary>
+        [Tooltip("Format => {0} = {Cooldown Label}, {1} = {Duration}")]
+        public string formatCoolDownDuration = "{0}: {1}";
+        /// <summary>
+        /// Format => {0} = {Remains Duration}
+        /// </summary>
+        [Tooltip("Format => {0} = {Remains Duration}")]
+        public string formatCoolDownRemainsDuration = "{0}";
+        /// <summary>
+        /// Format => {0} = {Skill Type Label}, {1} = {Skill Type Title}
+        /// </summary>
+        [Tooltip("Format => {0} = {Skill Type Label}, {1} = {Skill Type Title}")]
+        public string formatSkillType = "{0}: {1}";
 
         public TextWrapper uiTextTitle;
         public TextWrapper uiTextDescription;
@@ -93,11 +111,16 @@ namespace MultiplayerARPG
             float coolDownDuration = GuildSkill.GetCoolDownDuration(Level);
 
             if (uiTextCoolDownDuration != null)
-                uiTextCoolDownDuration.text = string.Format(coolDownDurationFormat, coolDownDuration.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_SKILL_COOLDOWN.ToString()));
+            {
+                uiTextCoolDownDuration.text = string.Format(
+                    formatCoolDownDuration,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_SKILL_COOLDOWN.ToString()),
+                    coolDownDuration.ToString("N0"));
+            }
 
             if (uiTextCoolDownRemainsDuration != null)
             {
-                uiTextCoolDownRemainsDuration.text = string.Format(coolDownRemainsDurationFormat, Mathf.CeilToInt(coolDownRemainsDuration).ToString("N0"));
+                uiTextCoolDownRemainsDuration.text = string.Format(formatCoolDownRemainsDuration, Mathf.CeilToInt(coolDownRemainsDuration).ToString("N0"));
                 uiTextCoolDownRemainsDuration.gameObject.SetActive(coolDownRemainsDuration > 0);
             }
 
@@ -133,13 +156,18 @@ namespace MultiplayerARPG
                 onSetNonLevelZeroData.Invoke();
 
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(titleFormat, GuildSkill == null ? LanguageManager.GetUnknowTitle() : GuildSkill.Title);
+                uiTextTitle.text = string.Format(formatTitle, GuildSkill == null ? LanguageManager.GetUnknowTitle() : GuildSkill.Title);
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(descriptionFormat, GuildSkill == null ? LanguageManager.GetUnknowDescription() : GuildSkill.Description);
+                uiTextDescription.text = string.Format(formatDescription, GuildSkill == null ? LanguageManager.GetUnknowDescription() : GuildSkill.Description);
 
             if (uiTextLevel != null)
-                uiTextLevel.text = string.Format(levelFormat, Level.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()));
+            {
+                uiTextLevel.text = string.Format(
+                    formatLevel,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()),
+                    Level.ToString("N0"));
+            }
 
             if (imageIcon != null)
             {
@@ -153,10 +181,16 @@ namespace MultiplayerARPG
                 switch (GuildSkill.skillType)
                 {
                     case GuildSkillType.Active:
-                        uiTextSkillType.text = string.Format(skillTypeFormat, LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_ACTIVE.ToString()), LanguageManager.GetText(UILocaleKeys.UI_LABEL_SKILL_TYPE.ToString()));
+                        uiTextSkillType.text = string.Format(
+                            formatSkillType,
+                            LanguageManager.GetText(UILocaleKeys.UI_LABEL_SKILL_TYPE.ToString()),
+                            LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_ACTIVE.ToString()));
                         break;
                     case GuildSkillType.Passive:
-                        uiTextSkillType.text = string.Format(skillTypeFormat, LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_PASSIVE.ToString()), LanguageManager.GetText(UILocaleKeys.UI_LABEL_SKILL_TYPE.ToString()));
+                        uiTextSkillType.text = string.Format(
+                            formatSkillType,
+                            LanguageManager.GetText(UILocaleKeys.UI_LABEL_SKILL_TYPE.ToString()),
+                            LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_PASSIVE.ToString()));
                         break;
                 }
             }

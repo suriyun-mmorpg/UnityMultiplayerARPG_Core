@@ -6,9 +6,12 @@ namespace MultiplayerARPG
     public abstract class UIDamageableEntity<T> : UIBaseGameEntity<T>
         where T : DamageableEntity
     {
-        [Header("Damageable Entity - Display Format")]
-        [Tooltip("Hp Format => {0} = {Current hp}, {1} = {Max hp}, {2} = {Hp Label}")]
-        public string hpFormat = "{2}: {0}/{1}";
+        /// <summary>
+        /// Format => {0} = {Hp Label}, {1} = {Current Hp}, {2} = {Max Hp}
+        /// </summary>
+        [Header("Damageable Entity - String Formats")]
+        [Tooltip("Format => {0} = {Hp Label}, {1} = {Current Hp}, {2} = {Max Hp}")]
+        public string formatHp = "{0}: {1}/{2}";
 
         [Header("Damageable Entity - UI Elements")]
         public TextWrapper uiTextHp;
@@ -36,7 +39,13 @@ namespace MultiplayerARPG
             }
 
             if (uiTextHp != null)
-                uiTextHp.text = string.Format(hpFormat, currentHp.ToString("N0"), maxHp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_HP.ToString()));
+            {
+                uiTextHp.text = string.Format(
+                    formatHp,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_HP.ToString()),
+                    currentHp.ToString("N0"),
+                    maxHp.ToString("N0"));
+            }
 
             if (imageHpGage != null)
                 imageHpGage.fillAmount = maxHp <= 0 ? 0 : (float)currentHp / (float)maxHp;

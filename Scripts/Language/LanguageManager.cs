@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -9,9 +12,10 @@ namespace MultiplayerARPG
         public static readonly Dictionary<string, string> Texts = new Dictionary<string, string>();
         public static string CurrentLanguageKey { get; private set; }
         public string defaultLanguageKey = "ENG";
-        [Header("Editor")]
+        [Header("Add New Language")]
         [Tooltip("You can add new language by `Add New Language` context menu")]
         public string newLanguageKey;
+        public bool addNewLanguage;
         [Header("Language List")]
         public List<Language> languageList = new List<Language>();
         public readonly Dictionary<string, Language> LanguageMap = new Dictionary<string, Language>();
@@ -24,6 +28,18 @@ namespace MultiplayerARPG
             }
             ChangeLanguage(defaultLanguageKey);
         }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (addNewLanguage)
+            {
+                addNewLanguage = false;
+                AddNewLanguage();
+                EditorUtility.SetDirty(this);
+            }
+        }
+#endif
 
         private void SetupDefaultTexts()
         {

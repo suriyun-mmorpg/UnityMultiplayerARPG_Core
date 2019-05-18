@@ -6,13 +6,22 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(Canvas))]
     public class UICharacterEntity : UIDamageableEntity<BaseCharacterEntity>
     {
-        [Header("Character Entity - Display Format")]
-        [Tooltip("Level Format => {0} = {Level}, {1} = {Level Label}")]
-        public string levelFormat = "{1}: {0}";
-        [Tooltip("Mp Format => {0} = {Current mp}, {1} = {Max mp}, {2} = {Mp Label}")]
-        public string mpFormat = "{2}: {0}/{1}";
-        [Tooltip("Skill Cast Format => {0} = {Count down duration}")]
-        public string skillCastFormat = "{0}";
+        /// <summary>
+        /// Format => {0} = {Level Label}, {1} = {Level}
+        /// </summary>
+        [Header("Character Entity - String Formats")]
+        [Tooltip("Format => {0} = {Level Label}, {1} = {Level}")]
+        public string formatLevel = "{0}: {1}";
+        /// <summary>
+        /// Format => {0} = {Mp Label}, {1} = {Current Mp}, {2} = {Max Mp}
+        /// </summary>
+        [Tooltip("Format => {0} = {Mp Label}, {1} = {Current Mp}, {2} = {Max Mp}")]
+        public string formatMp = "{0}: {1}/{2}";
+        /// <summary>
+        /// Format => {0} = {Count Down Duration}
+        /// </summary>
+        [Tooltip("Format => {0} = {Count Down Duration}")]
+        public string formatSkillCastDuration = "{0}";
 
         [Header("Character Entity - UI Elements")]
         public TextWrapper uiTextLevel;
@@ -36,7 +45,12 @@ namespace MultiplayerARPG
                 return;
 
             if (uiTextLevel != null)
-                uiTextLevel.text = string.Format(levelFormat, Data == null ? "0" : Data.Level.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()));
+            {
+                uiTextLevel.text = string.Format(
+                    formatLevel,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()),
+                    Data == null ? "0" : Data.Level.ToString("N0"));
+            }
 
             currentMp = 0;
             maxMp = 0;
@@ -51,7 +65,13 @@ namespace MultiplayerARPG
             }
 
             if (uiTextMp != null)
-                uiTextMp.text = string.Format(mpFormat, currentMp.ToString("N0"), maxMp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_MP.ToString()));
+            {
+                uiTextMp.text = string.Format(
+                    formatMp,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_MP.ToString()),
+                    currentMp.ToString("N0"),
+                    maxMp.ToString("N0"));
+            }
 
             if (imageMpGage != null)
                 imageMpGage.fillAmount = maxMp <= 0 ? 0 : (float)currentMp / (float)maxMp;
@@ -60,7 +80,7 @@ namespace MultiplayerARPG
                 uiSkillCastContainer.SetActive(castingSkillCountDown > 0 && castingSkillDuration > 0);
 
             if (uiTextSkillCast != null)
-                uiTextSkillCast.text = string.Format(skillCastFormat, castingSkillCountDown.ToString("N0"));
+                uiTextSkillCast.text = string.Format(formatSkillCastDuration, castingSkillCountDown.ToString("N2"));
 
             if (imageSkillCastGage != null)
                 imageSkillCastGage.fillAmount = castingSkillDuration <= 0 ? 0 : 1 - (castingSkillCountDown / castingSkillDuration);

@@ -5,17 +5,27 @@ namespace MultiplayerARPG
 {
     public class UISocialCharacter : UISelectionEntry<SocialCharacterEntityTuple>
     {
-        [Header("Display Format")]
-        [Tooltip("Name Format => {0} = {Character name}")]
-        public string nameFormat = "{0}";
-        [Tooltip("Level Format => {0} = {Level}, {1} = {Level Label}")]
-        public string levelFormat = "{1}: {0}";
-
-        [Header("Stats")]
-        [Tooltip("Hp Format => {0} = {Current hp}, {1} = {Max hp}, {2} = {Hp Label}")]
-        public string hpFormat = "{2}: {0}/{1}";
-        [Tooltip("Mp Format => {0} = {Current mp}, {1} = {Max mp}, {2} = {Mp Label}")]
-        public string mpFormat = "{2}: {0}/{1}";
+        /// <summary>
+        /// Format => {0} = {Character Name}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Character Name}")]
+        public string formatName = "{0}";
+        /// <summary>
+        /// Format => {0} = {Level Label}, {1} = {Level}
+        /// </summary>
+        [Tooltip("Format => {0} = {Level Label}, {1} = {Level}")]
+        public string formatLevel = "{0}: {1}";
+        /// <summary>
+        /// Format => {0} = {Hp Label}, {1} = {Current Hp}, {2} = {Max Hp}
+        /// </summary>
+        [Tooltip("Format => {0} = {Hp Label}, {1} = {Current Hp}, {2} = {Max Hp}")]
+        public string formatHp = "{0}: {1}/{2}";
+        /// <summary>
+        /// Format => {0} = {Mp Label}, {1} = {Current Mp}, {2} = {Max Mp}
+        /// </summary>
+        [Tooltip("Format => {0} = {Mp Label}, {1} = {Current Mp}, {2} = {Max Mp}")]
+        public string formatMp = "{0}: {1}/{2}";
 
         [Header("UI Elements")]
         public UISocialGroup uiSocialGroup;
@@ -40,10 +50,15 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             if (uiTextName != null)
-                uiTextName.text = string.Format(nameFormat, string.IsNullOrEmpty(Data.socialCharacter.characterName) ? LanguageManager.GetUnknowTitle() : Data.socialCharacter.characterName);
+                uiTextName.text = string.Format(formatName, string.IsNullOrEmpty(Data.socialCharacter.characterName) ? LanguageManager.GetUnknowTitle() : Data.socialCharacter.characterName);
 
             if (uiTextLevel != null)
-                uiTextLevel.text = string.Format(levelFormat, Data.socialCharacter.level.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()));
+            {
+                uiTextLevel.text = string.Format(
+                    formatLevel,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()),
+                    Data.socialCharacter.level.ToString("N0"));
+            }
 
             // Hp
             int currentHp = Data.socialCharacter.currentHp;
@@ -51,7 +66,11 @@ namespace MultiplayerARPG
 
             if (uiTextHp != null)
             {
-                uiTextHp.text = string.Format(hpFormat, currentHp.ToString("N0"), maxHp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_HP.ToString()));
+                uiTextHp.text = string.Format(
+                    formatHp,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_HP.ToString()),
+                    currentHp.ToString("N0"),
+                    maxHp.ToString("N0"));
                 uiTextHp.gameObject.SetActive(maxHp > 0);
             }
 
@@ -64,7 +83,11 @@ namespace MultiplayerARPG
 
             if (uiTextMp != null)
             {
-                uiTextMp.text = string.Format(mpFormat, currentMp.ToString("N0"), maxMp.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_MP.ToString()));
+                uiTextMp.text = string.Format(
+                    formatMp,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_MP.ToString()),
+                    currentMp.ToString("N0"),
+                    maxMp.ToString("N0"));
                 uiTextMp.gameObject.SetActive(maxMp > 0);
             }
 

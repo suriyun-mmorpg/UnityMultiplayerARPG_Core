@@ -5,11 +5,17 @@ namespace MultiplayerARPG
 {
     public class UIGuildMemberRoleSetting : UIBase
     {
-        [Header("Display Format")]
-        [Tooltip("Name Format => {0} = {Character name}")]
-        public string nameFormat = "{0}";
-        [Tooltip("Level Format => {0} = {Level}, {1} = {Level Label}")]
-        public string levelFormat = "{1}: {0}";
+        /// <summary>
+        /// Format => {0} = {Character Name}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Character Name}")]
+        public string formatName = "{0}";
+        /// <summary>
+        /// Format => {0} = {Level Label}, {1} = {Level}
+        /// </summary>
+        [Tooltip("Format => {0} = {Level Label}, {1} = {Level}")]
+        public string formatLevel = "{0}: {1}";
 
         [Header("UI Elements")]
         public TextWrapper uiTextName;
@@ -25,14 +31,14 @@ namespace MultiplayerARPG
             characterId = member.id;
 
             if (uiTextName != null)
-                uiTextName.text = string.Format(nameFormat, string.IsNullOrEmpty(member.characterName) ? LanguageManager.GetUnknowTitle() : member.characterName);
+                uiTextName.text = string.Format(formatName, string.IsNullOrEmpty(member.characterName) ? LanguageManager.GetUnknowTitle() : member.characterName);
 
             if (uiTextLevel != null)
             {
                 uiTextLevel.text = string.Format(
-                    levelFormat,
-                    member.level.ToString("N0"),
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()));
+                    formatLevel,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()),
+                    member.level.ToString("N0"));
             }
 
             if (dropdownRoles != null)

@@ -5,8 +5,12 @@ namespace MultiplayerARPG
 {
     public partial class UIResistanceAmounts : UISelectionEntry<Dictionary<DamageElement, float>>
     {
-        [Tooltip("Resistance Amount Format => {0} = {Resistance title}, {1} = {Amount * 100f}")]
-        public string amountFormat = "{0}: {1}%";
+        /// <summary>
+        /// Format => {0} = {Resistance Title}, {1} = {Amount * 100}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Resistance Title}, {1} = {Amount * 100}")]
+        public string formatAmount = "{0}: {1}%";
 
         [Header("UI Elements")]
         public TextWrapper uiTextAllAmounts;
@@ -28,7 +32,7 @@ namespace MultiplayerARPG
                             continue;
                         tempElement = textAmount.damageElement;
                         tempTextComponent = textAmount.uiText;
-                        tempTextComponent.text = string.Format(amountFormat, tempElement.Title, "0", "0");
+                        tempTextComponent.text = string.Format(formatAmount, tempElement.Title, "0", "0");
                         cacheTextAmounts[tempElement] = tempTextComponent;
                     }
                 }
@@ -45,23 +49,34 @@ namespace MultiplayerARPG
 
                 foreach (KeyValuePair<DamageElement, TextWrapper> entry in CacheTextAmounts)
                 {
-                    entry.Value.text = string.Format(amountFormat, entry.Key.Title, "0", "0");
+                    entry.Value.text = string.Format(formatAmount, entry.Key.Title, "0", "0");
                 }
             }
             else
             {
                 string tempAllText = string.Empty;
+                DamageElement tempElement;
+                float tempAmount;
                 string tempAmountText;
                 TextWrapper tempTextWarpper;
                 foreach (KeyValuePair<DamageElement, float> dataEntry in Data)
                 {
                     if (dataEntry.Key == null || dataEntry.Value == 0)
                         continue;
-
+                    // Set temp data
+                    tempElement = dataEntry.Key;
+                    tempAmount = dataEntry.Value;
+                    // Add new line if text is not empty
                     if (!string.IsNullOrEmpty(tempAllText))
                         tempAllText += "\n";
-                    tempAmountText = string.Format(amountFormat, dataEntry.Key.Title, (dataEntry.Value * 100f).ToString("N2"));
+                    // Set current elemental resistance text
+                    tempAmountText = string.Format(
+                        formatAmount,
+                        tempElement.Title,
+                        (tempAmount * 100).ToString("N2"));
+                    // Append current elemental resistance text
                     tempAllText += tempAmountText;
+                    // Set current elemental resistance text to UI
                     if (CacheTextAmounts.TryGetValue(dataEntry.Key, out tempTextWarpper))
                         tempTextWarpper.text = tempAmountText;
                 }

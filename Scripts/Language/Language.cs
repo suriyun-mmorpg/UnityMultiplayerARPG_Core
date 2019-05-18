@@ -66,6 +66,9 @@ namespace MultiplayerARPG
         UI_LABEL_ITEM_DURABILITY,
         UI_LABEL_SOCIAL_LEADER,
         UI_LABEL_SOCIAL_MEMBER,
+        UI_LABEL_SHARE_EXP,
+        UI_LABEL_REWARD_EXP,
+        UI_LABEL_REWARD_GOLD,
         // Generic Format
         UI_FORMAT_INCREASE_MAX_MEMBER,
         UI_FORMAT_INCREASE_EXP_GAIN_PERCENTAGE,
@@ -95,6 +98,12 @@ namespace MultiplayerARPG
         UI_USERNAME_TOO_LONG,
         UI_PASSWORD_TOO_SHORT,
         UI_USERNAME_EXISTED,
+        // UI Chat Message
+        UI_CHAT_FORMAT_LOCAL,
+        UI_CHAT_FORMAT_GLOBAL,
+        UI_CHAT_FORMAT_WHISPER,
+        UI_CHAT_FORMAT_PARTY,
+        UI_CHAT_FORMAT_GUILD,
         // UI Character List
         UI_NO_CHOSEN_CHARACTER_TO_START,
         UI_NO_CHOSEN_CHARACTER_TO_DELETE,
@@ -128,6 +137,15 @@ namespace MultiplayerARPG
         // UI Cash Shop
         UI_CANNOT_GET_CASH_SHOP_INFO,
         UI_CASH_SHOP_BUY_SUCCESS,
+        // UI Character Quest
+        UI_QUEST_FORMAT_TITLE_ON_GOING,
+        UI_QUEST_FORMAT_TITLE_TASKS_COMPLETE,
+        UI_QUEST_FORMAT_TITLE_COMPLETE,
+        // UI Quest Task
+        UI_QUEST_TASK_FORMAT_KILL_MONSTER,
+        UI_QUEST_TASK_FORMAT_COLLECT_ITEM,
+        UI_QUEST_TASK_FORMAT_KILL_MONSTER_COMPLETE,
+        UI_QUEST_TASK_FORMAT_COLLECT_ITEM_COMPLETE,
         // UI Dealing
         UI_OFFER_GOLD,
         UI_OFFER_GOLD_DESCRIPTION,
@@ -153,14 +171,11 @@ namespace MultiplayerARPG
         UI_GUILD_ROLE_CANNOT_INVITE,
         UI_GUILD_ROLE_CAN_KICK,
         UI_GUILD_ROLE_CANNOT_KICK,
-        UI_GUILD_ROLE_SHARE_EXP,
         // UI Guild Role Setting
         UI_GUILD_ROLE_NAME_IS_EMPTY,
         UI_GUILD_ROLE_SHARE_EXP_NOT_NUMBER,
         // UI Guild Member Role Setting
         UI_INVALID_GUILD_ROLE,
-        // UI Guild Skill
-
         // UI Scene Global
         UI_KICKED_FROM_SERVER,
         UI_CONNECTION_FAILED,
@@ -288,6 +303,9 @@ namespace MultiplayerARPG
             Texts.Add(UILocaleKeys.UI_LABEL_ITEM_DURABILITY.ToString(), "Durability");
             Texts.Add(UILocaleKeys.UI_LABEL_SOCIAL_LEADER.ToString(), "Leader");
             Texts.Add(UILocaleKeys.UI_LABEL_SOCIAL_MEMBER.ToString(), "Member");
+            Texts.Add(UILocaleKeys.UI_LABEL_SHARE_EXP.ToString(), "Share Exp");
+            Texts.Add(UILocaleKeys.UI_LABEL_REWARD_EXP.ToString(), "Reward Exp");
+            Texts.Add(UILocaleKeys.UI_LABEL_REWARD_GOLD.ToString(), "Reward Gold");
             // Generic Format
             Texts.Add(UILocaleKeys.UI_FORMAT_INCREASE_MAX_MEMBER.ToString(), "Max Member +{0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_INCREASE_EXP_GAIN_PERCENTAGE.ToString(), "Exp Gain +{0}%");
@@ -316,6 +334,12 @@ namespace MultiplayerARPG
             Texts.Add(UILocaleKeys.UI_USERNAME_TOO_LONG.ToString(), "Username is too long");
             Texts.Add(UILocaleKeys.UI_PASSWORD_TOO_SHORT.ToString(), "Password is too short");
             Texts.Add(UILocaleKeys.UI_USERNAME_EXISTED.ToString(), "Username is already existed");
+            // UI Chat Message
+            Texts.Add(UILocaleKeys.UI_CHAT_FORMAT_LOCAL.ToString(), "<color=white>(LOCAL) {0}: {1}</color>");
+            Texts.Add(UILocaleKeys.UI_CHAT_FORMAT_GLOBAL.ToString(), "<color=white>(GLOBAL) {0}: {1}</color>");
+            Texts.Add(UILocaleKeys.UI_CHAT_FORMAT_WHISPER.ToString(), "<color=green>(WHISPER) {0}: {1}</color>");
+            Texts.Add(UILocaleKeys.UI_CHAT_FORMAT_PARTY.ToString(), "<color=cyan>(PARTY) {0}: {1}</color>");
+            Texts.Add(UILocaleKeys.UI_CHAT_FORMAT_GUILD.ToString(), "<color=blue>(GUILD) {0}: {1}</color>");
             // UI Character List
             Texts.Add(UILocaleKeys.UI_NO_CHOSEN_CHARACTER_TO_START.ToString(), "Please choose character to start game");
             Texts.Add(UILocaleKeys.UI_NO_CHOSEN_CHARACTER_TO_DELETE.ToString(), "Please choose character to delete");
@@ -349,6 +373,15 @@ namespace MultiplayerARPG
             // UI Cash Shop
             Texts.Add(UILocaleKeys.UI_CANNOT_GET_CASH_SHOP_INFO.ToString(), "Cannot retrieve cash shop info");
             Texts.Add(UILocaleKeys.UI_CASH_SHOP_BUY_SUCCESS.ToString(), "Success, let's check your inventory");
+            // UI Character Quest
+            Texts.Add(UILocaleKeys.UI_QUEST_FORMAT_TITLE_ON_GOING.ToString(), "{0} (Ongoing)");
+            Texts.Add(UILocaleKeys.UI_QUEST_FORMAT_TITLE_TASKS_COMPLETE.ToString(), "{0} (Task Completed)");
+            Texts.Add(UILocaleKeys.UI_QUEST_FORMAT_TITLE_COMPLETE.ToString(), "{0} (Completed)");
+            // UI Quest Task
+            Texts.Add(UILocaleKeys.UI_QUEST_TASK_FORMAT_KILL_MONSTER.ToString(), "Kills {0}: {1}/{2}");
+            Texts.Add(UILocaleKeys.UI_QUEST_TASK_FORMAT_COLLECT_ITEM.ToString(), "Collects {0}: {1}/{2}");
+            Texts.Add(UILocaleKeys.UI_QUEST_TASK_FORMAT_KILL_MONSTER_COMPLETE.ToString(), "Kills {0}: Complete");
+            Texts.Add(UILocaleKeys.UI_QUEST_TASK_FORMAT_COLLECT_ITEM_COMPLETE.ToString(), "Collects {0}: Complete");
             // UI Dealing
             Texts.Add(UILocaleKeys.UI_OFFER_GOLD.ToString(), "Offer Gold");
             Texts.Add(UILocaleKeys.UI_OFFER_GOLD_DESCRIPTION.ToString(), "Enter amount of gold");
@@ -374,7 +407,6 @@ namespace MultiplayerARPG
             Texts.Add(UILocaleKeys.UI_GUILD_ROLE_CANNOT_INVITE.ToString(), "Cannot invite");
             Texts.Add(UILocaleKeys.UI_GUILD_ROLE_CAN_KICK.ToString(), "Can kick");
             Texts.Add(UILocaleKeys.UI_GUILD_ROLE_CANNOT_KICK.ToString(), "Cannot kick");
-            Texts.Add(UILocaleKeys.UI_GUILD_ROLE_SHARE_EXP.ToString(), "Share Exp");
             // UI Guild Role Setting
             Texts.Add(UILocaleKeys.UI_GUILD_ROLE_NAME_IS_EMPTY.ToString(), "Role name must not empty");
             Texts.Add(UILocaleKeys.UI_GUILD_ROLE_SHARE_EXP_NOT_NUMBER.ToString(), "Share exp percentage must be number");

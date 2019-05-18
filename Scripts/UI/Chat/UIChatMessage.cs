@@ -4,16 +4,6 @@ namespace MultiplayerARPG
 {
     public partial class UIChatMessage : UISelectionEntry<ChatMessage>
     {
-        [Tooltip("Chat message format {0} = Character Name, {1} = Message")]
-        public string localFormat = "<color=white>(LOCAL) {0}: {1}</color>";
-        [Tooltip("Chat message format {0} = Character Name, {1} = Message")]
-        public string globalFormat = "<color=white>(GLOBAL) {0}: {1}</color>";
-        [Tooltip("Chat message format {0} = Character Name, {1} = Message")]
-        public string whisperFormat = "<color=green>(WHISPER) {0}: {1}</color>";
-        [Tooltip("Chat message format {0} = Character Name, {1} = Message")]
-        public string partyFormat = "<color=cyan>(PARTY) {0}: {1}</color>";
-        [Tooltip("Chat message format {0} = Character Name, {1} = Message")]
-        public string guildFormat = "<color=blue>(GUILD) {0}: {1}</color>";
         public TextWrapper uiTextMessage;
         public UIChatHandler uiChatHandler;
         protected override void UpdateData()
@@ -22,19 +12,19 @@ namespace MultiplayerARPG
             switch (Data.channel)
             {
                 case ChatChannel.Local:
-                    format = localFormat;
+                    format = LanguageManager.GetText(UILocaleKeys.UI_CHAT_FORMAT_LOCAL.ToString());
                     break;
                 case ChatChannel.Global:
-                    format = globalFormat;
+                    format = LanguageManager.GetText(UILocaleKeys.UI_CHAT_FORMAT_GLOBAL.ToString());
                     break;
                 case ChatChannel.Whisper:
-                    format = whisperFormat;
+                    format = LanguageManager.GetText(UILocaleKeys.UI_CHAT_FORMAT_WHISPER.ToString());
                     break;
                 case ChatChannel.Party:
-                    format = partyFormat;
+                    format = LanguageManager.GetText(UILocaleKeys.UI_CHAT_FORMAT_PARTY.ToString());
                     break;
                 case ChatChannel.Guild:
-                    format = guildFormat;
+                    format = LanguageManager.GetText(UILocaleKeys.UI_CHAT_FORMAT_GUILD.ToString());
                     break;
             }
 

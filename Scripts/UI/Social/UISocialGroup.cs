@@ -16,11 +16,17 @@ namespace MultiplayerARPG
     public abstract class UISocialGroup<T> : UISocialGroup
         where T : UISocialCharacter
     {
-        [Header("Display Format")]
-        [Tooltip("Member Amount Format => {0} = {current amount}, {1} = {max amount}, {2} = {Social Member Label}")]
-        public string memberAmountFormat = "{2}: {0}/{1}";
-        [Tooltip("Member Amount Format => {0} = {current amount}, {1} = {Social Member Label}")]
-        public string memberAmountNoLimitFormat = "{1}: {0}";
+        /// <summary>
+        /// Format => {0} = {Social Member Label}, {1} = {Current Amount}, {2} = {Max Amount}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Social Member Label}, {1} = {Current Amount}, {2} = {Max Amount}")]
+        public string formatMemberAmount = "{0}: {1}/{2}";
+        /// <summary>
+        /// Format => {0} = {Social Member Label}, {1} = {Current Amount}
+        /// </summary>
+        [Tooltip("Format => {0} = {Social Member Label}, {1} = {Current Amount}")]
+        public string formatMemberAmountNoLimit = "{0}: {1}";
 
         [Header("UI Elements")]
         public T uiMemberDialog;
@@ -92,17 +98,17 @@ namespace MultiplayerARPG
                 if (GetMaxMemberAmount() > 0)
                 {
                     textMemberAmount.text = string.Format(
-                        memberAmountFormat,
+                        formatMemberAmount,
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_SOCIAL_MEMBER.ToString()),
                         memberAmount.ToString("N0"),
-                        GetMaxMemberAmount().ToString("N0"),
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_SOCIAL_MEMBER.ToString()));
+                        GetMaxMemberAmount().ToString("N0"));
                 }
                 else
                 {
                     textMemberAmount.text = string.Format(
-                        memberAmountNoLimitFormat,
-                        memberAmount.ToString("N0"),
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_SOCIAL_MEMBER.ToString()));
+                        formatMemberAmountNoLimit,
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_SOCIAL_MEMBER.ToString()),
+                        memberAmount.ToString("N0"));
                 }
             }
             

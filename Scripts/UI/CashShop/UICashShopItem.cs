@@ -7,13 +7,22 @@ namespace MultiplayerARPG
 {
     public partial class UICashShopItem : UISelectionEntry<CashShopItem>
     {
-        [Header("Generic Info Format")]
-        [Tooltip("Title Format => {0} = {Title}")]
-        public string titleFormat = "{0}";
-        [Tooltip("Description Format => {0} = {Description}")]
-        public string descriptionFormat = "{0}";
-        [Tooltip("Sell Price Format => {0} = {Sell price}, {1} = {Sell price Label}")]
-        public string sellPriceFormat = "{1}: {0}";
+        /// <summary>
+        /// Format => {0} = {Title}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Title}")]
+        public string formatTitle = "{0}";
+        /// <summary>
+        /// Format => {0} = {Description}
+        /// </summary>
+        [Tooltip("Format => {0} = {Description}")]
+        public string formatDescription = "{0}";
+        /// <summary>
+        /// Format => {0} = {Sell Price Label}, {1} = {Sell Price}
+        /// </summary>
+        [Tooltip("Format => {0} = {Sell Price Label}, {1} = {Sell Price}")]
+        public string formatSellPrice = "{1}: {0}";
 
         [Header("UI Elements")]
         public UICashShop uiCashShop;
@@ -26,11 +35,11 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(titleFormat, Data == null ? LanguageManager.GetUnknowTitle() : Data.Title);
+                uiTextTitle.text = string.Format(formatTitle, Data == null ? LanguageManager.GetUnknowTitle() : Data.Title);
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(descriptionFormat, Data == null ? LanguageManager.GetUnknowDescription() : Data.Description);
-            
+                uiTextDescription.text = string.Format(formatDescription, Data == null ? LanguageManager.GetUnknowDescription() : Data.Description);
+
             if (imageIcon != null)
             {
                 Sprite iconSprite = Data == null ? null : Data.icon;
@@ -46,7 +55,12 @@ namespace MultiplayerARPG
             }
 
             if (uiTextSellPrice != null)
-                uiTextSellPrice.text = string.Format(sellPriceFormat, Data == null ? "0" : Data.sellPrice.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_SELL_PRICE.ToString()));
+            {
+                uiTextSellPrice.text = string.Format(
+                    formatSellPrice,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_SELL_PRICE.ToString()),
+                    Data == null ? "0" : Data.sellPrice.ToString("N0"));
+            }
         }
 
         IEnumerator LoadExternalIcon()

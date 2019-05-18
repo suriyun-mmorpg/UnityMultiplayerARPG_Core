@@ -6,11 +6,17 @@ namespace MultiplayerARPG
 {
     public partial class UINpcDialog : UISelectionEntry<NpcDialog>
     {
-        [Header("Generic Info Format")]
-        [Tooltip("Title Format => {0} = {Title}")]
-        public string titleFormat = "{0}";
-        [Tooltip("Description Format => {0} = {Description}")]
-        public string descriptionFormat = "{0}";
+        /// <summary>
+        /// Format => {0} = {Title}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Title}")]
+        public string formatTitle = "{0}";
+        /// <summary>
+        /// Format => {0} = {Description}
+        /// </summary>
+        [Tooltip("Format => {0} = {Description}")]
+        public string formatDescription = "{0}";
 
         [Header("UI Elements")]
         public TextWrapper uiTextTitle;
@@ -83,10 +89,10 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
 
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(titleFormat, Data == null ? LanguageManager.GetUnknowTitle() : Data.Title);
+                uiTextTitle.text = string.Format(formatTitle, Data == null ? LanguageManager.GetUnknowTitle() : Data.Title);
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(descriptionFormat, Data == null ? LanguageManager.GetUnknowDescription() : Data.Description);
+                uiTextDescription.text = string.Format(formatDescription, Data == null ? LanguageManager.GetUnknowDescription() : Data.Description);
 
             Quest quest = null;
             Item craftingItem = null;

@@ -4,37 +4,37 @@ namespace MultiplayerARPG
 {
     public partial class UICharacterStats : UISelectionEntry<CharacterStats>
     {
-        [Header("Format")]
-        [Tooltip("Hp Stats Format => {0} = {Amount}, {1} = {Label}")]
-        public string hpStatsFormat = "{1}: {0}";
-        [Tooltip("Mp Stats Format => {0} = {Amount}, {1} = {Label}")]
-        public string mpStatsFormat = "{1}: {0}";
-        [Tooltip("Armor Stats Format => {0} = {Amount}, {1} = {Label}")]
-        public string armorStatsFormat = "{1}: {0}";
-        [Tooltip("Accuracy Stats Format => {0} = {Amount}, {1} = {Label}")]
-        public string accuracyStatsFormat = "{1}: {0}";
-        [Tooltip("Evasion Format => {0} = {Amount}, {1} = {Label}")]
-        public string evasionStatsFormat = "{1}: {0}";
-        [Tooltip("Cri Rate Stats Format => {0} = {Amount}, {1} = {Label}")]
-        public string criRateStatsFormat = "{1}: {0}%";
-        [Tooltip("Cri Dmg Rate Stats Format => {0} = {Amount}, {1} = {Label}")]
-        public string criDmgRateStatsFormat = "{1}: {0}%";
-        [Tooltip("Block Rate Stats Format => {0} = {Amount}, {1} = {Label}")]
-        public string blockRateStatsFormat = "{1}: {0}%";
-        [Tooltip("Block Dmg Rate Stats Format => {0} = {Amount}, {1} = {Label}")]
-        public string blockDmgRateStatsFormat = "{1}: {0}%";
-        [Tooltip("Move Speed Stats Format => {0} = {Move Speed}, {1} = {Label}")]
-        public string moveSpeedStatsFormat = "{1}: {0}";
-        [Tooltip("Attack Speed Stats Format => {0} = {Attack Speed}, {1} = {Label}")]
-        public string atkSpeedStatsFormat = "{1}: {0}";
-        [Tooltip("Weight Limit Stats Format => {0} = {Weight Limit}, {1} = {Label}")]
-        public string weightLimitStatsFormat = "{1}: {0}";
-        [Tooltip("Stamina Stats Format => {0} = {Amount}, {1} = {Label}")]
-        public string staminaStatsFormat = "{1}: {0}";
-        [Tooltip("Food Stats Format => {0} = {Amount}, {1} = {Label}")]
-        public string foodStatsFormat = "{1}: {0}";
-        [Tooltip("Water Stats Format => {0} = {Amount}, {1} = {Label}")]
-        public string waterStatsFormat = "{1}: {0}";
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Label}, {1} = {Amount}")]
+        public string formatHpStats = "{0}: {1}";
+        [Tooltip("Format => {0} = {Label}, {1} = {Amount}")]
+        public string formatMpStats = "{0}: {1}";
+        [Tooltip("Format => {0} = {Label}, {1} = {Amount}")]
+        public string formatArmorStats = "{0}: {1}";
+        [Tooltip("Format => {0} = {Label}, {1} = {Amount}")]
+        public string formatAccuracyStats = "{0}: {1}";
+        [Tooltip("Format => {0} = {Label}, {1} = {Amount}")]
+        public string formatEvasionStats = "{0}: {1}";
+        [Tooltip("Format => {0} = {Label}, {1} = {Amount}")]
+        public string formatCriRateStats = "{0}: {1}%";
+        [Tooltip("Format => {0} = {Label}, {1} = {Amount}")]
+        public string formatCriDmgRateStats = "{0}: {1}%";
+        [Tooltip("Format => {0} = {Label}, {1} = {Amount}")]
+        public string formatBlockRateStats = "{0}: {1}%";
+        [Tooltip("Format => {0} = {Label}, {1} = {Amount}")]
+        public string formatBlockDmgRateStats = "{0}: {1}%";
+        [Tooltip("Format => {0} = {Label}, {1} = {Move Speed}")]
+        public string formatMoveSpeedStats = "{0}: {1}";
+        [Tooltip("Format => {0} = {Label}, {1} = {Attack Speed}")]
+        public string formatAtkSpeedStats = "{0}: {1}";
+        [Tooltip("Format => {0} = {Label}, {1} = {Weight Limit}")]
+        public string formatWeightLimitStats = "{0}: {1}";
+        [Tooltip("Format => {0} = {Label}, {1} = {Amount}")]
+        public string formatStaminaStats = "{0}: {1}";
+        [Tooltip("Format => {0} = {Label}, {1} = {Amount}")]
+        public string formatFoodStats = "{0}: {1}";
+        [Tooltip("Format => {0} = {Label}, {1} = {Amount}")]
+        public string formatWaterStats = "{0}: {1}";
 
         [Header("UI Elements")]
         public TextWrapper uiTextStats;
@@ -58,21 +58,21 @@ namespace MultiplayerARPG
         {
             string statsString = CharacterStats.GetText(
                 Data,
-                hpStatsFormat,
-                mpStatsFormat,
-                armorStatsFormat,
-                accuracyStatsFormat,
-                evasionStatsFormat,
-                criRateStatsFormat,
-                criDmgRateStatsFormat,
-                blockRateStatsFormat,
-                blockDmgRateStatsFormat,
-                moveSpeedStatsFormat,
-                atkSpeedStatsFormat,
-                weightLimitStatsFormat,
-                staminaStatsFormat,
-                foodStatsFormat,
-                waterStatsFormat,
+                formatHpStats,
+                formatMpStats,
+                formatArmorStats,
+                formatAccuracyStats,
+                formatEvasionStats,
+                formatCriRateStats,
+                formatCriDmgRateStats,
+                formatBlockRateStats,
+                formatBlockDmgRateStats,
+                formatMoveSpeedStats,
+                formatAtkSpeedStats,
+                formatWeightLimitStats,
+                formatStaminaStats,
+                formatFoodStats,
+                formatWaterStats,
                 uiTextHp,
                 uiTextMp,
                 uiTextArmor,

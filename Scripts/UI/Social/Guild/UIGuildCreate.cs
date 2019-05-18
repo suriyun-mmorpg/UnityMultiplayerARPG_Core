@@ -4,9 +4,12 @@ namespace MultiplayerARPG
 {
     public class UIGuildCreate : UIBase
     {
-        [Header("Display Format")]
-        [Tooltip("Require Gold Format => {0} = {Amount}, {1} = {Require Gold Label}")]
-        public string requireGoldFormat = "{1}: {0}";
+        /// <summary>
+        /// Format => {0} = {Require Gold Label}, {1} = {Amount}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Require Gold Label}, {1} = {Amount}")]
+        public string formatRequireGold = "{0}: {1}";
 
         [Header("UI Elements")]
         public InputFieldWrapper inputFieldGuildName;
@@ -19,9 +22,9 @@ namespace MultiplayerARPG
             if (textRequireGold != null)
             {
                 textRequireGold.text = string.Format(
-                    requireGoldFormat,
-                    systemSetting.CreateGuildRequiredGold.ToString("N0"),
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_GOLD.ToString()));
+                    formatRequireGold,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_GOLD.ToString()),
+                    systemSetting.CreateGuildRequiredGold.ToString("N0"));
             }
 
             if (uiRequireItems != null)

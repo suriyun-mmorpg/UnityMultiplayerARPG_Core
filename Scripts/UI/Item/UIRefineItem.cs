@@ -11,15 +11,27 @@ namespace MultiplayerARPG
         public bool CanRefine { get { return EquipmentItem != null && Level < EquipmentItem.MaxLevel; } }
         public ItemRefineLevel RefineLevel { get { return EquipmentItem.itemRefineInfo.levels[Level - 1]; } }
 
-        [Header("Format for UI Refine Item")]
-        [Tooltip("Require Gold Format => {0} = {Current Amount}, {1} = {Target Amount}, {2} = {Required Gold Label}")]
-        public string requireGoldFormat = "{2}: {0}/{1}";
-        [Tooltip("Require Gold Format => {0} = {Current Amount}, {1} = {Target Amount}, {2} = {Required Gold Label}")]
-        public string requireGoldNotEnoughFormat = "{2}: <color=red>{0}/{1}</color>";
-        [Tooltip("Success Rate Format => {0} = {Rate}, {1} = {Success Rate Label}")]
-        public string successRateFormat = "{1}: {0}%";
-        [Tooltip("Refining Level Format => {0} = {Refining Level}, {1} = {Refining To Label}")]
-        public string refiningLevelFormat = "{1}: +{0}";
+        /// <summary>
+        /// Format => {0} = {Required Gold Label}, {1} = {Current Amount}, {2} = {Target Amount}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Required Gold Label}, {1} = {Current Amount}, {2} = {Target Amount}")]
+        public string formatRequireGold = "{0}: {1}/{2}";
+        /// <summary>
+        /// Format => {0} = {Required Gold Label}, {1} = {Current Amount}, {2} = {Target Amount}
+        /// </summary>
+        [Tooltip("Format => {0} = {Required Gold Label}, {1} = {Current Amount}, {2} = {Target Amount}")]
+        public string formatRequireGoldNotEnough = "{0}: <color=red>{1}/{2}</color>";
+        /// <summary>
+        /// Format => {0} = {Success Rate Label}, {1} = {Rate * 100}
+        /// </summary>
+        [Tooltip("Format => {0} = {Success Rate Label}, {1} = {Rate * 100}")]
+        public string formatSuccessRate = "{0}: {1}%";
+        /// <summary>
+        /// Format => {0} = {Refining Level Label}, {1} = {Refining Level}
+        /// </summary>
+        [Tooltip("Format => {0} = {Refining Level Label}, {1} = {Refining Level}")]
+        public string formatRefiningLevel = "{0}: +{1}";
 
         [Header("UI Elements for UI Refine Item")]
         // TODO: This is deprecated
@@ -89,10 +101,10 @@ namespace MultiplayerARPG
                 if (!CanRefine)
                 {
                     uiTextRequireGold.text = string.Format(
-                        requireGoldFormat,
+                        formatRequireGold,
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_GOLD.ToString()),
                         "0",
-                        "0",
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_GOLD.ToString()));
+                        "0");
                 }
                 else
                 {
@@ -100,9 +112,10 @@ namespace MultiplayerARPG
                     if (owningCharacter != null)
                         currentAmount = owningCharacter.Gold;
                     uiTextRequireGold.text = string.Format(
-                        currentAmount >= RefineLevel.RequireGold ? requireGoldFormat : requireGoldNotEnoughFormat,
-                        currentAmount.ToString("N0"), RefineLevel.RequireGold.ToString("N0"),
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_GOLD.ToString()));
+                        currentAmount >= RefineLevel.RequireGold ? formatRequireGold : formatRequireGoldNotEnough,
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_GOLD.ToString()),
+                        currentAmount.ToString("N0"),
+                        RefineLevel.RequireGold.ToString("N0"));
                 }
             }
 
@@ -111,16 +124,16 @@ namespace MultiplayerARPG
                 if (!CanRefine)
                 {
                     uiTextSuccessRate.text = string.Format(
-                        successRateFormat,
-                        "0.00",
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REFINE_SUCCESS_RATE.ToString()));
+                        formatSuccessRate,
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REFINE_SUCCESS_RATE.ToString()),
+                        "0.00");
                 }
                 else
                 {
                     uiTextSuccessRate.text = string.Format(
-                        successRateFormat,
-                        (RefineLevel.SuccessRate * 100f).ToString("N2"),
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REFINE_SUCCESS_RATE.ToString()));
+                        formatSuccessRate,
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REFINE_SUCCESS_RATE.ToString()),
+                        (RefineLevel.SuccessRate * 100f).ToString("N2"));
                 }
             }
             if (uiTextRefiningLevel != null)
@@ -128,16 +141,16 @@ namespace MultiplayerARPG
                 if (!CanRefine)
                 {
                     uiTextRefiningLevel.text = string.Format(
-                        refiningLevelFormat,
-                        (Level - 1).ToString("N0"),
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REFINING_LEVEL.ToString()));
+                        formatRefiningLevel,
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REFINING_LEVEL.ToString()),
+                        (Level - 1).ToString("N0"));
                 }
                 else
                 {
                     uiTextRefiningLevel.text = string.Format(
-                        refiningLevelFormat,
-                        Level.ToString("N0"),
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REFINING_LEVEL.ToString()));
+                        formatRefiningLevel,
+                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REFINING_LEVEL.ToString()),
+                        Level.ToString("N0"));
                 }
             }
         }

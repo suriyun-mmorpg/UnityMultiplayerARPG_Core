@@ -5,19 +5,37 @@ namespace MultiplayerARPG
 {
     public class UIGuild : UISocialGroup<UIGuildCharacter>
     {
-        [Header("Display Format")]
-        [Tooltip("Guild Name Format => {0} = {Guild name}")]
-        public string guildNameFormat = "{0}";
-        [Tooltip("Leader Name Format => {0} = {Leader name}, {1} = {Leader Label}")]
-        public string leaderNameFormat = "{1}: {0}";
-        [Tooltip("Level Format => {0} = {Level}, {1} = {Level Label}")]
-        public string levelFormat = "{1}: {0}";
-        [Tooltip("Exp Format => {0} = {Current exp}, {1} = {Max exp}, {2} = {Exp Label}")]
-        public string expFormat = "{2}: {0}/{1}";
-        [Tooltip("Skill Point Format => {0} = {Skill point}, {1} = {Skill Points Label}")]
-        public string skillPointFormat = "{1}: {0}";
-        [Tooltip("Message Format => {0} = {Message}")]
-        public string messageFormat = "{0}";
+        /// <summary>
+        /// Format => {0} = {Guild Name}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Guild Name}")]
+        public string formatGuildName = "{0}";
+        /// <summary>
+        /// Format => {0} = {Leader Label}, {1} = {Leader Name}
+        /// </summary>
+        [Tooltip("Format => {0} = {Leader Label}, {1} = {Leader Name}")]
+        public string formatLeaderName = "{0}: {1}";
+        /// <summary>
+        /// Format => {0} = {Level Label}, {1} = {Level}
+        /// </summary>
+        [Tooltip("Format => {0} = {Level Label}, {1} = {Level}")]
+        public string formatLevel = "{0}: {1}";
+        /// <summary>
+        /// Format => {0} = {Exp Label}, {1} = {Current Exp}, {2} = {Max Exp}
+        /// </summary>
+        [Tooltip("Format => {0} = {Exp Label}, {1} = {Current Exp}, {2} = {Max Exp}")]
+        public string formatExp = "{0}: {1}/{2}";
+        /// <summary>
+        /// Format => {0} = {Skill Points Label}, {1} = {Skill Point}
+        /// </summary>
+        [Tooltip("Format => {0} = {Skill Points Label}, {1} = {Skill Point}")]
+        public string formatSkillPoint = "{0}: {1}";
+        /// <summary>
+        /// Format => {0} = {Message}
+        /// </summary>
+        [Tooltip("Format => {0} = {Message}")]
+        public string formatMessage = "{0}";
 
         [Header("UI Elements")]
         public UIGuildRole uiRoleDialog;
@@ -103,22 +121,22 @@ namespace MultiplayerARPG
         protected override void UpdateUIs()
         {
             if (textGuildName != null)
-                textGuildName.text = string.Format(guildNameFormat, Guild == null ? LanguageManager.GetUnknowTitle() : Guild.guildName);
+                textGuildName.text = string.Format(formatGuildName, Guild == null ? LanguageManager.GetUnknowTitle() : Guild.guildName);
 
             if (textLeaderName != null)
             {
                 textLeaderName.text = string.Format(
-                    leaderNameFormat,
-                    Guild == null ? LanguageManager.GetUnknowTitle() : Guild.GetLeader().characterName,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_SOCIAL_LEADER.ToString()));
+                    formatLeaderName,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_SOCIAL_LEADER.ToString()),
+                    Guild == null ? LanguageManager.GetUnknowTitle() : Guild.GetLeader().characterName);
             }
 
             if (textLevel != null)
             {
                 textLevel.text = string.Format(
-                    levelFormat,
-                    Guild == null ? "0" : Guild.level.ToString("N0"),
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()));
+                    formatLevel,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()),
+                    Guild == null ? "0" : Guild.level.ToString("N0"));
             }
 
             int[] expTree = GameInstance.Singleton.SocialSystemSetting.GuildExpTree;
@@ -139,10 +157,10 @@ namespace MultiplayerARPG
             if (textExp != null)
             {
                 textExp.text = string.Format(
-                    expFormat,
+                    formatExp,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_EXP.ToString()),
                     currentExp.ToString("N0"),
-                    nextLevelExp.ToString("N0"),
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_EXP.ToString()));
+                    nextLevelExp.ToString("N0"));
             }
 
             if (imageExpGage != null)
@@ -151,15 +169,15 @@ namespace MultiplayerARPG
             if (textSkillPoint != null)
             {
                 textSkillPoint.text = string.Format(
-                    skillPointFormat,
-                    Guild == null ? "0" : Guild.skillPoint.ToString("N0"),
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_SKILL_POINTS.ToString()));
+                    formatSkillPoint,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_SKILL_POINTS.ToString()),
+                    Guild == null ? "0" : Guild.skillPoint.ToString("N0"));
             }
 
             if (Guild == null)
             {
                 if (textMessage != null)
-                    textMessage.text = string.Format(messageFormat, string.Empty);
+                    textMessage.text = string.Format(formatMessage, string.Empty);
 
                 if (inputFieldMessage != null)
                     inputFieldMessage.text = string.Empty;
@@ -170,7 +188,7 @@ namespace MultiplayerARPG
                 guildMessage = Guild.guildMessage;
 
                 if (textMessage != null)
-                    textMessage.text = string.Format(messageFormat, guildMessage);
+                    textMessage.text = string.Format(formatMessage, guildMessage);
 
                 if (inputFieldMessage != null)
                     inputFieldMessage.text = guildMessage;

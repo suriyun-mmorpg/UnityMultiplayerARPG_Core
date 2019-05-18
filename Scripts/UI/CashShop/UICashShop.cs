@@ -6,9 +6,14 @@ namespace MultiplayerARPG
 {
     public partial class UICashShop : UIBase
     {
-        [Header("Generic Info Format")]
-        [Tooltip("Owning Cash Format => {0} = {Cash amount}, {1} = {Cash Label}")]
-        public string cashFormat = "{1}: {0}";
+        /// <summary>
+        /// Format => {0} = {Cash Label}, {1} = {Cash Amount}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Cash Label}, {1} = {Cash Amount}")]
+        public string formatOwnsCash = "{0}: {1}";
+
+        [Header("UI Elements")]
         public UICashShopItem uiCashShopItemDialog;
         public UICashShopItem uiCashShopItemPrefab;
         public Transform uiCashShopItemContainer;
@@ -112,7 +117,13 @@ namespace MultiplayerARPG
                     break;
                 default:
                     if (uiTextCash != null)
-                        uiTextCash.text = string.Format(cashFormat, castedMessage.cash.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_CASH.ToString()));
+                    {
+                        uiTextCash.text = string.Format(
+                            formatOwnsCash,
+                            LanguageManager.GetText(UILocaleKeys.UI_LABEL_CASH.ToString()),
+                            castedMessage.cash.ToString("N0"));
+                    }
+
                     List<CashShopItem> cashShopItems = new List<CashShopItem>();
                     foreach (int cashShopItemId in castedMessage.cashShopItemIds)
                     {

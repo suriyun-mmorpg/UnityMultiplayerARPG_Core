@@ -7,15 +7,27 @@ namespace MultiplayerARPG
 {
     public partial class UICashPackage : UISelectionEntry<CashPackage>
     {
-        [Header("Generic Info Format")]
-        [Tooltip("Title Format => {0} = {Title}")]
-        public string titleFormat = "{0}";
-        [Tooltip("Description Format => {0} = {Description}")]
-        public string descriptionFormat = "{0}";
-        [Tooltip("Sell Price Format => {0} = {Sell price}, {1} = {Sell price Label}")]
-        public string sellPriceFormat = "{1}: {0}";
-        [Tooltip("Cash Amount Format => {0} = {Cash Amount}, {1} = {Cash Label}")]
-        public string cashAmountFormat = "{1}: {0}";
+        /// <summary>
+        /// Format => {0} = {Title}
+        /// </summary>
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Title}")]
+        public string formatTitle = "{0}";
+        /// <summary>
+        /// Format => {0} = {Description}
+        /// </summary>
+        [Tooltip("Format => {0} = {Description}")]
+        public string formatDescription = "{0}";
+        /// <summary>
+        /// Format => {0} = {Sell Price Label}, {1} = {Sell Price}
+        /// </summary>
+        [Tooltip("Format => {0} = {Sell Price Label}, {1} = {Sell Price}")]
+        public string formatSellPrice = "{0}: {1}";
+        /// <summary>
+        /// Format => {0} = {Cash Label}, {1} = {Cash Amount}
+        /// </summary>
+        [Tooltip("Format => {0} = {Cash Label}, {1} = {Cash Amount}")]
+        public string formatCashAmount = "{0}: {1}";
 
         [Header("UI Elements")]
         public UICashPackages uiCashPackages;
@@ -29,10 +41,10 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(titleFormat, Data == null ? LanguageManager.GetUnknowTitle() : Data.Title);
+                uiTextTitle.text = string.Format(formatTitle, Data == null ? LanguageManager.GetUnknowTitle() : Data.Title);
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(descriptionFormat, Data == null ? LanguageManager.GetUnknowDescription() : Data.Description);
+                uiTextDescription.text = string.Format(formatDescription, Data == null ? LanguageManager.GetUnknowDescription() : Data.Description);
 
             if (imageIcon != null)
             {
@@ -49,10 +61,20 @@ namespace MultiplayerARPG
             }
 
             if (uiTextSellPrice != null)
-                uiTextSellPrice.text = string.Format(sellPriceFormat, Data == null ? "0" : Data.GetSellPrice(), LanguageManager.GetText(UILocaleKeys.UI_LABEL_SELL_PRICE.ToString()));
+            {
+                uiTextSellPrice.text = string.Format(
+                    formatSellPrice,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_SELL_PRICE.ToString()),
+                    Data == null ? "0" : Data.GetSellPrice());
+            }
 
             if (uiTextCashAmount != null)
-                uiTextCashAmount.text = string.Format(cashAmountFormat, Data == null ? "0" : Data.cashAmount.ToString("N0"), LanguageManager.GetText(UILocaleKeys.UI_LABEL_CASH.ToString()));
+            {
+                uiTextCashAmount.text = string.Format(
+                    formatCashAmount,
+                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_CASH.ToString()),
+                    Data == null ? "0" : Data.cashAmount.ToString("N0"));
+            }
         }
 
         IEnumerator LoadExternalIcon()
