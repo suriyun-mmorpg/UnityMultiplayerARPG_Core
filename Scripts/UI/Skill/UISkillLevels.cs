@@ -5,22 +5,13 @@ namespace MultiplayerARPG
 {
     public partial class UISkillLevels : UISelectionEntry<Dictionary<Skill, short>>
     {
-        /// <summary>
-        /// Format => {0} = {Skill Title}, {1} = {Current Level}, {2} = {Target Level}
-        /// </summary>
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Skill Title}, {1} = {Current Level}, {2} = {Target Level}")]
-        public string formatLevel = "{0}: {1}/{2}";
-        /// <summary>
-        /// Format => {0} = {Skill Title}, {1} = {Current Level}, {2} = {Target Level}
-        /// </summary>
+        public string formatKeyLevel = UILocaleKeys.UI_FORMAT_CURRENT_SKILL.ToString();
         [Tooltip("Format => {0} = {Skill Title}, {1} = {Current Level}, {2} = {Target Level}")]
-        public string formatLevelNotEnough = "{0}: <color=red>{1}/{2}</color>";
-        /// <summary>
-        /// Format => {0} = {Skill Title}, {1} = {Target Level}
-        /// </summary>
+        public string formatKeyLevelNotEnough = UILocaleKeys.UI_FORMAT_CURRENT_SKILL_NOT_ENOUGH.ToString();
         [Tooltip("Format => {0} = {Skill Title}, {1} = {Target Level}")]
-        public string formatSimpleLevel = "{0}: {1}";
+        public string formatKeySimpleLevel = UILocaleKeys.UI_FORMAT_SKILL_LEVEL.ToString();
 
         [Header("UI Elements")]
         public TextWrapper uiTextAllLevels;
@@ -43,7 +34,11 @@ namespace MultiplayerARPG
                             continue;
                         tempSkill = textLevel.skill;
                         tempTextComponent = textLevel.uiText;
-                        tempTextComponent.text = string.Format(formatLevel, tempSkill.Title, "0", "0");
+                        tempTextComponent.text = string.Format(
+                            LanguageManager.GetText(formatKeyLevel),
+                            tempSkill.Title,
+                            "0",
+                            "0");
                         cacheTextLevels[tempSkill] = tempTextComponent;
                     }
                 }
@@ -61,7 +56,11 @@ namespace MultiplayerARPG
 
                 foreach (KeyValuePair<Skill, TextWrapper> entry in CacheTextLevels)
                 {
-                    entry.Value.text = string.Format(formatLevel, entry.Key.Title, "0", "0");
+                    entry.Value.text = string.Format(
+                        LanguageManager.GetText(formatKeyLevel),
+                        entry.Key.Title,
+                        "0",
+                        "0");
                 }
             }
             else
@@ -90,17 +89,23 @@ namespace MultiplayerARPG
                     // Use difference format by option 
                     if (showAsRequirement)
                     {
-                        // This will show both current character skill level and target amount
-                        tempFormat = tempCurrentLevel >= tempTargetLevel ? formatLevel : formatLevelNotEnough;
+                        // This will show both current character skill level and target level
+                        tempFormat = tempCurrentLevel >= tempTargetLevel ?
+                            LanguageManager.GetText(formatKeyLevel) :
+                            LanguageManager.GetText(formatKeyLevelNotEnough);
                         tempLevelText = string.Format(tempFormat, tempSkill.Title, tempCurrentLevel.ToString("N0"), tempTargetLevel.ToString("N0"));
                     }
                     else
                     {
                         // This will show only target level, so current character skill level will not be shown
-                        tempLevelText = string.Format(formatSimpleLevel, tempSkill.Title, tempTargetLevel.ToString("N0"));
+                        tempLevelText = string.Format(
+                            LanguageManager.GetText(formatKeySimpleLevel),
+                            tempSkill.Title,
+                            tempTargetLevel.ToString("N0"));
                     }
-                    // Append current attribute amount text
+                    // Append current skill level text
                     tempAllText += tempLevelText;
+                    // Set current skill text to UI
                     if (CacheTextLevels.TryGetValue(dataEntry.Key, out tempTextWrapper))
                         tempTextWrapper.text = tempLevelText;
                 }

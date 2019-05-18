@@ -7,17 +7,11 @@ namespace MultiplayerARPG
 {
     public class UICharacterClass : UISelectionEntry<BaseCharacter>
     {
-        /// <summary>
-        /// Format => {0} = {Title}
-        /// </summary>
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
-        public string formatTitle = "{0}";
-        /// <summary>
-        /// Format => {0} = {Description}
-        /// </summary>
+        public string formatKeyTitle = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
         [Tooltip("Format => {0} = {Description}")]
-        public string formatDescription = "{0}";
+        public string formatKeyDescription = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
 
         [Header("UI Elements")]
         public TextWrapper uiTextTitle;
@@ -31,10 +25,18 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(formatTitle, Data == null ? LanguageManager.GetUnknowTitle() : Data.Title);
+            {
+                uiTextTitle.text = string.Format(
+                    LanguageManager.GetText(formatKeyTitle),
+                    Data == null ? LanguageManager.GetUnknowTitle() : Data.Title);
+            }
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(formatDescription, Data == null ? LanguageManager.GetUnknowDescription() : Data.Description);
+            {
+                uiTextDescription.text = string.Format(
+                    LanguageManager.GetText(formatKeyDescription),
+                    Data == null ? LanguageManager.GetUnknowDescription() : Data.Description);
+            }
 
             if (imageIcon != null)
             {

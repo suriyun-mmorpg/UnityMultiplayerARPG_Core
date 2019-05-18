@@ -6,12 +6,9 @@ namespace MultiplayerARPG
     public abstract class UIDamageableEntity<T> : UIBaseGameEntity<T>
         where T : DamageableEntity
     {
-        /// <summary>
-        /// Format => {0} = {Hp Label}, {1} = {Current Hp}, {2} = {Max Hp}
-        /// </summary>
         [Header("Damageable Entity - String Formats")]
-        [Tooltip("Format => {0} = {Hp Label}, {1} = {Current Hp}, {2} = {Max Hp}")]
-        public string formatHp = "{0}: {1}/{2}";
+        [Tooltip("Format => {0} = {Current Hp}, {1} = {Max Hp}")]
+        public string formatKeyHp = UILocaleKeys.UI_FORMAT_CURRENT_HP.ToString();
 
         [Header("Damageable Entity - UI Elements")]
         public TextWrapper uiTextHp;
@@ -41,8 +38,7 @@ namespace MultiplayerARPG
             if (uiTextHp != null)
             {
                 uiTextHp.text = string.Format(
-                    formatHp,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_HP.ToString()),
+                    LanguageManager.GetText(formatKeyHp),
                     currentHp.ToString("N0"),
                     maxHp.ToString("N0"));
             }

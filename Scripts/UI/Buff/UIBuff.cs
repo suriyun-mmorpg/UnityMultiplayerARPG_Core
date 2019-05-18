@@ -7,38 +7,20 @@ namespace MultiplayerARPG
     {
         public Buff Buff { get { return Data.buff; } }
         public short Level { get { return Data.targetLevel; } }
-
-        /// <summary>
-        /// Format => {0} = {Duration Label}, {1} = {Duration}
-        /// </summary>
+        
         [Header("String Formats")]
-        [Tooltip("Format => {0} = {Duration Label}, {1} = {Duration}")]
-        public string formatDuration = "{0}: {1}";
-        /// <summary>
-        /// Format => {0} = {Recovery Hp Label}, {1} = {Recovery Amount}
-        /// </summary>
-        [Tooltip("Format => {0} = {Recovery Hp Label}, {1} = {Recovery Amount}")]
-        public string formatRecoveryHp = "{0}: {1}";
-        /// <summary>
-        /// Format => {0} = {Recovery Mp Label}, {1} = {Recovery Amount}
-        /// </summary>
-        [Tooltip("Format => {0} = {Recovery Mp Label}, {1} = {Recovery Amount}")]
-        public string formatRecoveryMp = "{0}: {1}";
-        /// <summary>
-        /// Format => {0} = {Recovery Stamina Label}, {1} = {Recovery Amount}
-        /// </summary>
-        [Tooltip("Format => {0} = {Recovery Stamina Label}, {1} = {Recovery Amount}")]
-        public string formatRecoveryStamina = "{0}: {1}";
-        /// <summary>
-        /// Format => {0} = {Recovery Food Label}, {1} = {Recovery Amount}
-        /// </summary>
-        [Tooltip("Format => {0} = {Recovery Food Label}, {1} = {Recovery Amount}")]
-        public string formatRecoveryFood = "{0}: {1}";
-        /// <summary>
-        /// Format => {0} = {Recovery Water Label}, {1} = {Recovery Amount}
-        /// </summary>
-        [Tooltip("Format => {0} = {Recovery Water Label}, {1} = {Recovery Amount}")]
-        public string formatRecoveryWater = "{0}: {1}";
+        [Tooltip("Format => {0} = {Duration}")]
+        public string formatKeyDuration = UILocaleKeys.UI_FORMAT_BUFF_DURATION.ToString();
+        [Tooltip("Format => {0} = {Recovery Amount}")]
+        public string formatKeyRecoveryHp = UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_HP.ToString();
+        [Tooltip("Format => {0} = {Recovery Amount}")]
+        public string formatKeyRecoveryMp = UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_MP.ToString();
+        [Tooltip("Format => {0} = {Recovery Amount}")]
+        public string formatKeyRecoveryStamina = UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_STAMINA.ToString();
+        [Tooltip("Format => {0} = {Recovery Amount}")]
+        public string formatKeyRecoveryFood = UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_FOOD.ToString();
+        [Tooltip("Format => {0} = {Recovery Amount}")]
+        public string formatKeyRecoveryWater = UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_WATER.ToString();
 
         [Header("UI Elements")]
         public TextWrapper uiTextDuration;
@@ -59,8 +41,7 @@ namespace MultiplayerARPG
                 float duration = Buff.GetDuration(Level);
                 uiTextDuration.gameObject.SetActive(duration != 0);
                 uiTextDuration.text = string.Format(
-                    formatDuration,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_BUFF_DURATION.ToString()),
+                    LanguageManager.GetText(formatKeyDuration),
                     duration.ToString("N0"));
             }
 
@@ -69,8 +50,7 @@ namespace MultiplayerARPG
                 int recoveryHp = Buff.GetRecoveryHp(Level);
                 uiTextRecoveryHp.gameObject.SetActive(recoveryHp != 0);
                 uiTextRecoveryHp.text = string.Format(
-                    formatRecoveryHp,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_BUFF_RECOVERY_HP.ToString()),
+                    LanguageManager.GetText(formatKeyRecoveryHp),
                     recoveryHp.ToString("N0"));
             }
 
@@ -79,8 +59,7 @@ namespace MultiplayerARPG
                 int recoveryMp = Buff.GetRecoveryMp(Level);
                 uiTextRecoveryMp.gameObject.SetActive(recoveryMp != 0);
                 uiTextRecoveryMp.text = string.Format(
-                    formatRecoveryMp,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_BUFF_RECOVERY_MP.ToString()),
+                    LanguageManager.GetText(formatKeyRecoveryMp),
                     recoveryMp.ToString("N0"));
             }
 
@@ -89,8 +68,7 @@ namespace MultiplayerARPG
                 int recoveryStamina = Buff.GetRecoveryStamina(Level);
                 uiTextRecoveryStamina.gameObject.SetActive(recoveryStamina != 0);
                 uiTextRecoveryStamina.text = string.Format(
-                    formatRecoveryStamina,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_BUFF_RECOVERY_STAMINA.ToString()),
+                    LanguageManager.GetText(formatKeyRecoveryStamina),
                     recoveryStamina.ToString("N0"));
             }
 
@@ -99,8 +77,7 @@ namespace MultiplayerARPG
                 int recoveryFood = Buff.GetRecoveryFood(Level);
                 uiTextRecoveryFood.gameObject.SetActive(recoveryFood != 0);
                 uiTextRecoveryFood.text = string.Format(
-                    formatRecoveryFood,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_BUFF_RECOVERY_FOOD.ToString()),
+                    LanguageManager.GetText(formatKeyRecoveryFood),
                     recoveryFood.ToString("N0"));
             }
 
@@ -109,8 +86,7 @@ namespace MultiplayerARPG
                 int recoveryWater = Buff.GetRecoveryWater(Level);
                 uiTextRecoveryWater.gameObject.SetActive(recoveryWater != 0);
                 uiTextRecoveryWater.text = string.Format(
-                    formatRecoveryWater,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_BUFF_RECOVERY_WATER.ToString()),
+                    LanguageManager.GetText(formatKeyRecoveryWater),
                     recoveryWater.ToString("N0"));
             }
 

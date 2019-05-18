@@ -5,27 +5,15 @@ namespace MultiplayerARPG
 {
     public class UISocialCharacter : UISelectionEntry<SocialCharacterEntityTuple>
     {
-        /// <summary>
-        /// Format => {0} = {Character Name}
-        /// </summary>
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Character Name}")]
-        public string formatName = "{0}";
-        /// <summary>
-        /// Format => {0} = {Level Label}, {1} = {Level}
-        /// </summary>
-        [Tooltip("Format => {0} = {Level Label}, {1} = {Level}")]
-        public string formatLevel = "{0}: {1}";
-        /// <summary>
-        /// Format => {0} = {Hp Label}, {1} = {Current Hp}, {2} = {Max Hp}
-        /// </summary>
-        [Tooltip("Format => {0} = {Hp Label}, {1} = {Current Hp}, {2} = {Max Hp}")]
-        public string formatHp = "{0}: {1}/{2}";
-        /// <summary>
-        /// Format => {0} = {Mp Label}, {1} = {Current Mp}, {2} = {Max Mp}
-        /// </summary>
-        [Tooltip("Format => {0} = {Mp Label}, {1} = {Current Mp}, {2} = {Max Mp}")]
-        public string formatMp = "{0}: {1}/{2}";
+        public string formatKeyName = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        [Tooltip("Format => {0} = {Level}")]
+        public string formatKeyLevel = UILocaleKeys.UI_FORMAT_LEVEL.ToString();
+        [Tooltip("Format => {0} = {Current Hp}, {1} = {Max Hp}")]
+        public string formatKeyHp = UILocaleKeys.UI_FORMAT_CURRENT_HP.ToString();
+        [Tooltip("Format => {0} = {Current Mp}, {1} = {Max Mp}")]
+        public string formatKeyMp = UILocaleKeys.UI_FORMAT_CURRENT_MP.ToString();
 
         [Header("UI Elements")]
         public UISocialGroup uiSocialGroup;
@@ -50,13 +38,16 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             if (uiTextName != null)
-                uiTextName.text = string.Format(formatName, string.IsNullOrEmpty(Data.socialCharacter.characterName) ? LanguageManager.GetUnknowTitle() : Data.socialCharacter.characterName);
+            {
+                uiTextName.text = string.Format(
+                    LanguageManager.GetText(formatKeyName),
+                    string.IsNullOrEmpty(Data.socialCharacter.characterName) ? LanguageManager.GetUnknowTitle() : Data.socialCharacter.characterName);
+            }
 
             if (uiTextLevel != null)
             {
                 uiTextLevel.text = string.Format(
-                    formatLevel,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()),
+                    LanguageManager.GetText(formatKeyLevel),
                     Data.socialCharacter.level.ToString("N0"));
             }
 
@@ -67,8 +58,7 @@ namespace MultiplayerARPG
             if (uiTextHp != null)
             {
                 uiTextHp.text = string.Format(
-                    formatHp,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_HP.ToString()),
+                    LanguageManager.GetText(formatKeyHp),
                     currentHp.ToString("N0"),
                     maxHp.ToString("N0"));
                 uiTextHp.gameObject.SetActive(maxHp > 0);
@@ -84,8 +74,7 @@ namespace MultiplayerARPG
             if (uiTextMp != null)
             {
                 uiTextMp.text = string.Format(
-                    formatMp,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_MP.ToString()),
+                    LanguageManager.GetText(formatKeyMp),
                     currentMp.ToString("N0"),
                     maxMp.ToString("N0"));
                 uiTextMp.gameObject.SetActive(maxMp > 0);

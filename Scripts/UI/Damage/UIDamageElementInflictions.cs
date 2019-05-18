@@ -5,6 +5,12 @@ namespace MultiplayerARPG
 {
     public partial class UIDamageElementInflictions : UISelectionEntry<Dictionary<DamageElement, float>>
     {
+        [Header("String Formats")]
+        [Tooltip("Format => {1} = {Infliction * 100}")]
+        public string formatKeyInfliction = UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION.ToString();
+        [Tooltip("Format => {0} = {Damage Element Title}, {1} = {Infliction * 100}")]
+        public string formatKeyInflictionAsElemental = UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION_AS_ELEMENTAL.ToString();
+
         [Header("UI Elements")]
         public TextWrapper uiTextAllInflictions;
         public UIDamageElementTextPair[] textInflictions;
@@ -26,7 +32,7 @@ namespace MultiplayerARPG
                         tempElement = textAmount.damageElement;
                         tempTextComponent = textAmount.uiText;
                         tempTextComponent.text = string.Format(
-                            LanguageManager.GetText(UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION_AS_ELEMENTAL.ToString()),
+                            LanguageManager.GetText(formatKeyInflictionAsElemental),
                             tempElement.Title,
                             "0");
                         cacheTextInflictions[tempElement] = tempTextComponent;
@@ -47,8 +53,8 @@ namespace MultiplayerARPG
                 {
                     textAmount.Value.text = string.Format(
                         textAmount.Key == GameInstance.Singleton.DefaultDamageElement ?
-                            LanguageManager.GetText(UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION.ToString()) :
-                            LanguageManager.GetText(UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION_AS_ELEMENTAL.ToString()),
+                            LanguageManager.GetText(formatKeyInfliction) :
+                            LanguageManager.GetText(formatKeyInflictionAsElemental),
                         textAmount.Key.Title,
                         "0");
                 }
@@ -72,8 +78,8 @@ namespace MultiplayerARPG
                     // Set current elemental damage infliction text
                     tempAmountText = string.Format(
                         tempElement == GameInstance.Singleton.DefaultDamageElement ?
-                            LanguageManager.GetText(UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION.ToString()) :
-                            LanguageManager.GetText(UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION_AS_ELEMENTAL.ToString()),
+                            LanguageManager.GetText(formatKeyInfliction) :
+                            LanguageManager.GetText(formatKeyInflictionAsElemental),
                         tempElement.Title,
                         (tempInfliction * 100f).ToString("N0"));
                     // Append current elemental damage infliction text

@@ -5,12 +5,9 @@ namespace MultiplayerARPG
 {
     public partial class UISkillRequirement : UISelectionEntry<CharacterSkillTuple>
     {
-        /// <summary>
-        /// Format => {0} = {Require Level Label}, {1} = {Level}
-        /// </summary>
         [Header("String Formats")]
-        [Tooltip("Format => {0} = {Require Level Label}, {1} = {Level}")]
-        public string formatRequireLevel = "{0}: {1}";
+        [Tooltip("Format => {0} = {Level}")]
+        public string formatKeyRequireLevel = UILocaleKeys.UI_FORMAT_REQUIRE_LEVEL.ToString();
 
         [Header("UI Elements")]
         public TextWrapper uiTextRequireLevel;
@@ -32,8 +29,7 @@ namespace MultiplayerARPG
                 {
                     uiTextRequireLevel.gameObject.SetActive(true);
                     uiTextRequireLevel.text = string.Format(
-                        formatRequireLevel,
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_LEVEL.ToString()),
+                        LanguageManager.GetText(formatKeyRequireLevel),
                         skill.GetRequireCharacterLevel(level).ToString("N0"));
                 }
             }

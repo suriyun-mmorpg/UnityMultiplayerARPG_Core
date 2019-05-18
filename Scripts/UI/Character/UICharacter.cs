@@ -7,72 +7,33 @@ namespace MultiplayerARPG
 {
     public partial class UICharacter : UISelectionEntry<ICharacterData>
     {
-        /// <summary>
-        /// Format => {0} = {Character Name}
-        /// </summary>
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Character Name}")]
-        public string formatName = "{0}";
-        /// <summary>
-        /// Format => {0} = {Level Label}, {1} = {Level}
-        /// </summary>
-        [Tooltip("Format => {0} = {Level Label}, {1} = {Level}")]
-        public string formatLevel = "{0}: {1}";
-        /// <summary>
-        /// Format => {0} = {Exp Label}, {1} = {Current Exp}, {2} = {Max Exp}
-        /// </summary>
-        [Tooltip("Format => {0} = {Exp Label}, {1} = {Current Exp}, {2} = {Max Exp}")]
-        public string formatExp = "{0}: {1}/{2}";
-        /// <summary>
-        /// Format => {0} = {Hp Label}, {1} = {Current Hp}, {2} = {Max Hp}
-        /// </summary>
-        [Tooltip("Format => {0} = {Hp Label}, {1} = {Current Hp}, {2} = {Max Hp}")]
-        public string formatHp = "{0}: {1}/{2}";
-        /// <summary>
-        /// Format => {0} = {Mp Label}, {1} = {Current Mp}, {2} = {Max Mp}
-        /// </summary>
-        [Tooltip("Format => {0} = {Mp Label}, {1} = {Current Mp}, {2} = {Max Mp}")]
-        public string formatMp = "{0}: {1}/{2}";
-        /// <summary>
-        /// Format => {0} = {Stamina Label}, {1} = {Current Stamina}, {2} = {Max Stamina}
-        /// </summary>
-        [Tooltip("Format => {0} = {Stamina Label}, {1} = {Current Stamina}, {2} = {Max Stamina}")]
-        public string formatStamina = "{0}: {1}/{2}";
-        /// <summary>
-        /// Format => {0} = {Food Label}, {1} = {Current Food}, {2} = {Max Food}
-        /// </summary>
-        [Tooltip("Format => {0} = {Food Label}, {1} = {Current Food}, {2} = {Max Food}")]
-        public string formatFood = "{0}: {1}/{2}";
-        /// <summary>
-        /// Format => {0} = {Water Label}, {1} = {Current Water}, {2} = {Max Water}
-        /// </summary>
-        [Tooltip("Format => {0} = {Water Label}, {1} = {Current Water}, {2} = {Max Water}")]
-        public string formatWater = "{0}: {1}/{2}";
-        /// <summary>
-        /// Format => {0} = {Stat Points Label}, {1} = {Stat Points}
-        /// </summary>
-        [Tooltip("Format => {0} = {Stat Points Label}, {1} = {Stat Points}")]
-        public string formatStatPoint = "{0}: {1}";
-        /// <summary>
-        /// Format => {0} = {Skill Points Label}, {1} = {Skill Points}
-        /// </summary>
-        [Tooltip("Format => {0} = {Skill Points Label}, {1} = {Skill Points}")]
-        public string formatSkillPoint = "{0}: {1}";
-        /// <summary>
-        /// Format => {0} = {Gold Label}, {1} = {Gold Amount}
-        /// </summary>
-        [Tooltip("Format => {0} = {Gold Label}, {1} = {Gold Amount}")]
-        public string formatGold = "{0}: {1}";
-        /// <summary>
-        /// Format => {0} = {Weight Label}, {1} = {Current Total Weights}, {2} = {Weight Limit}
-        /// </summary>
-        [Tooltip("Format => {0} = {Weight Label}, {1} = {Current Total Weights}, {2} = {Weight Limit}")]
-        public string formatWeightLimitStats = "{0}: {1}/{2}";
-        /// <summary>
-        /// Format => {0} = {Min Damage}, {1} = {Max Damage}
-        /// </summary>
+        public string formatKeyName = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        [Tooltip("Format => {0} = {Level}")]
+        public string formatKeyLevel = UILocaleKeys.UI_FORMAT_LEVEL.ToString();
+        [Tooltip("Format => {0} = {Current Exp}, {1} = {Max Exp}")]
+        public string formatKeyExp = UILocaleKeys.UI_FORMAT_CURRENT_EXP.ToString();
+        [Tooltip("Format => {0} = {Current Hp}, {1} = {Max Hp}")]
+        public string formatKeyHp = UILocaleKeys.UI_FORMAT_CURRENT_HP.ToString();
+        [Tooltip("Format => {0} = {Current Mp}, {1} = {Max Mp}")]
+        public string formatKeyMp = UILocaleKeys.UI_FORMAT_CURRENT_MP.ToString();
+        [Tooltip("Format => {0} = {Current Stamina}, {1} = {Max Stamina}")]
+        public string formatKeyStamina = UILocaleKeys.UI_FORMAT_CURRENT_STAMINA.ToString();
+        [Tooltip("Format => {0} = {Current Food}, {1} = {Max Food}")]
+        public string formatKeyFood = UILocaleKeys.UI_FORMAT_CURRENT_FOOD.ToString();
+        [Tooltip("Format => {0} = {Current Water}, {1} = {Max Water}")]
+        public string formatKeyWater = UILocaleKeys.UI_FORMAT_CURRENT_WATER.ToString();
+        [Tooltip("Format => {0} = {Stat Points}")]
+        public string formatKeyStatPoint = UILocaleKeys.UI_FORMAT_STAT_POINTS.ToString();
+        [Tooltip("Format => {0} = {Skill Points}")]
+        public string formatKeySkillPoint = UILocaleKeys.UI_FORMAT_SKILL_POINTS.ToString();
+        [Tooltip("Format => {0} = {Gold Amount}")]
+        public string formatKeyGold = UILocaleKeys.UI_FORMAT_GOLD.ToString();
+        [Tooltip("Format => {0} = {Current Total Weights}, {1} = {Weight Limit}")]
+        public string formatKeyWeightLimitStats = UILocaleKeys.UI_FORMAT_CURRENT_WEIGHT.ToString();
         [Tooltip("Format => {0} = {Min Damage}, {1} = {Max Damage}")]
-        public string formatWeaponDamage = "{0}~{1}";
+        public string formatKeyWeaponDamage = UILocaleKeys.UI_FORMAT_DAMAGE_AMOUNT.ToString();
 
         [Header("UI Elements")]
         public TextWrapper uiTextName;
@@ -159,8 +120,7 @@ namespace MultiplayerARPG
             if (uiTextHp != null)
             {
                 uiTextHp.text = string.Format(
-                    formatHp,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_HP.ToString()),
+                    LanguageManager.GetText(formatKeyHp),
                     currentHp.ToString("N0"),
                     maxHp.ToString("N0"));
             }
@@ -180,8 +140,7 @@ namespace MultiplayerARPG
             if (uiTextMp != null)
             {
                 uiTextMp.text = string.Format(
-                    formatMp,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_MP.ToString()),
+                    LanguageManager.GetText(formatKeyMp),
                     currentMp.ToString("N0"),
                     maxMp.ToString("N0"));
             }
@@ -201,8 +160,7 @@ namespace MultiplayerARPG
             if (uiTextStamina != null)
             {
                 uiTextStamina.text = string.Format(
-                    formatStamina,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_STAMINA.ToString()),
+                    LanguageManager.GetText(formatKeyStamina),
                     currentStamina.ToString("N0"),
                     maxStamina.ToString("N0"));
             }
@@ -222,8 +180,7 @@ namespace MultiplayerARPG
             if (uiTextFood != null)
             {
                 uiTextFood.text = string.Format(
-                    formatFood,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_FOOD.ToString()),
+                    LanguageManager.GetText(formatKeyFood),
                     currentFood.ToString("N0"),
                     maxFood.ToString("N0"));
             }
@@ -243,8 +200,7 @@ namespace MultiplayerARPG
             if (uiTextWater != null)
             {
                 uiTextWater.text = string.Format(
-                    formatWater,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_WATER.ToString()),
+                    LanguageManager.GetText(formatKeyWater),
                     currentWater.ToString("N0"),
                     maxWater.ToString("N0"));
             }
@@ -260,13 +216,16 @@ namespace MultiplayerARPG
             Profiler.BeginSample("UICharacter - Update UI");
 
             if (uiTextName != null)
-                uiTextName.text = string.Format(formatName, Data == null ? LanguageManager.GetUnknowTitle() : Data.CharacterName);
+            {
+                uiTextName.text = string.Format(
+                    LanguageManager.GetText(formatKeyName),
+                    Data == null ? LanguageManager.GetUnknowTitle() : Data.CharacterName);
+            }
 
             if (uiTextLevel != null)
             {
                 uiTextLevel.text = string.Format(
-                    formatLevel,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()),
+                    LanguageManager.GetText(formatKeyLevel),
                     Data == null ? "0" : Data.Level.ToString("N0"));
             }
 
@@ -288,8 +247,7 @@ namespace MultiplayerARPG
             if (uiTextExp != null)
             {
                 uiTextExp.text = string.Format(
-                    formatExp,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_EXP.ToString()),
+                    LanguageManager.GetText(formatKeyExp),
                     currentExp.ToString("N0"),
                     nextLevelExp.ToString("N0"));
             }
@@ -302,24 +260,21 @@ namespace MultiplayerARPG
             if (uiTextStatPoint != null)
             {
                 uiTextStatPoint.text = string.Format(
-                    formatStatPoint,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_STAT_POINTS.ToString()),
+                    LanguageManager.GetText(formatKeyStatPoint),
                     playerCharacter == null ? "0" : playerCharacter.StatPoint.ToString("N0"));
             }
 
             if (uiTextSkillPoint != null)
             {
                 uiTextSkillPoint.text = string.Format(
-                    formatSkillPoint,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_SKILL_POINTS.ToString()),
+                    LanguageManager.GetText(formatKeySkillPoint),
                     playerCharacter == null ? "0" : playerCharacter.SkillPoint.ToString("N0"));
             }
 
             if (uiTextGold != null)
             {
                 uiTextGold.text = string.Format(
-                    formatGold,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_GOLD.ToString()),
+                    LanguageManager.GetText(formatKeyGold),
                     playerCharacter == null ? "0" : playerCharacter.Gold.ToString("N0"));
             }
 
@@ -365,8 +320,7 @@ namespace MultiplayerARPG
             if (uiTextWeightLimit != null)
             {
                 uiTextWeightLimit.text = string.Format(
-                    formatWeightLimitStats,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_WEIGHT.ToString()),
+                    LanguageManager.GetText(formatKeyWeightLimitStats),
                     Data.GetTotalItemWeight().ToString("N2"),
                     cacheWeightLimit.ToString("N2"));
             }
@@ -386,21 +340,30 @@ namespace MultiplayerARPG
                     MinMaxFloat sumDamages = GameDataHelpers.GetSumDamages(rightHandDamages);
                     if (!string.IsNullOrEmpty(textDamages))
                         textDamages += "\n";
-                    textDamages += string.Format(formatWeaponDamage, sumDamages.min.ToString("N0"), sumDamages.max.ToString("N0"));
+                    textDamages += string.Format(
+                        LanguageManager.GetText(formatKeyWeaponDamage),
+                        sumDamages.min.ToString("N0"),
+                        sumDamages.max.ToString("N0"));
                 }
                 if (leftHandWeapon != null)
                 {
                     MinMaxFloat sumDamages = GameDataHelpers.GetSumDamages(leftHandDamages);
                     if (!string.IsNullOrEmpty(textDamages))
                         textDamages += "\n";
-                    textDamages += string.Format(formatWeaponDamage, sumDamages.min.ToString("N0"), sumDamages.max.ToString("N0"));
+                    textDamages += string.Format(
+                        LanguageManager.GetText(formatKeyWeaponDamage),
+                        sumDamages.min.ToString("N0"),
+                        sumDamages.max.ToString("N0"));
                 }
                 if (rightHandWeapon == null && leftHandWeapon == null)
                 {
                     Item defaultWeaponItem = GameInstance.Singleton.DefaultWeaponItem;
                     WeaponItemEquipType defaultWeaponItemType = defaultWeaponItem.EquipType;
                     KeyValuePair<DamageElement, MinMaxFloat> damageAmount = defaultWeaponItem.GetDamageAmount(1, 1f, Data);
-                    textDamages = string.Format(formatWeaponDamage, damageAmount.Value.min.ToString("N0"), damageAmount.Value.max.ToString("N0"));
+                    textDamages = string.Format(
+                        LanguageManager.GetText(formatKeyWeaponDamage),
+                        damageAmount.Value.min.ToString("N0"),
+                        damageAmount.Value.max.ToString("N0"));
                 }
                 uiTextWeaponDamages.text = textDamages;
             }

@@ -8,12 +8,19 @@ namespace MultiplayerARPG
         public CharacterQuest CharacterQuest { get { return Data; } }
         public Quest Quest { get { return CharacterQuest != null ? CharacterQuest.GetQuest() : null; } }
         
+        [Header("Generic Info Format")]
+        [Tooltip("Format => {0} = {Title}")]
+        public string formatKeyTitleOnGoing = UILocaleKeys.UI_FORMAT_QUEST_TITLE_ON_GOING.ToString();
+        [Tooltip("Format => {0} = {Title}")]
+        public string formatKeyTitleTasksComplete = UILocaleKeys.UI_FORMAT_QUEST_TITLE_TASKS_COMPLETE.ToString();
+        [Tooltip("Format => {0} = {Title}")]
+        public string formatKeyTitleComplete = UILocaleKeys.UI_FORMAT_QUEST_TITLE_COMPLETE.ToString();
         [Tooltip("Format => {0} = {Description}")]
-        public string formatDescription = "{0}";
-        [Tooltip("Format => {0} = {Reward Exp Label}, {1} = {Exp}")]
-        public string formatRewardExp = "{0}: {1}";
-        [Tooltip("Format => {0} = {Reward Gold Label}, {1} = {Amount}")]
-        public string formatRewardGold = "{0}: {1}";
+        public string formatKeyDescription = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        [Tooltip("Format => {0} = {Exp}")]
+        public string formatKeyRewardExp = UILocaleKeys.UI_FORMAT_REWARD_EXP.ToString();
+        [Tooltip("Format => {0} = {Amount}")]
+        public string formatKeyRewardGold = UILocaleKeys.UI_FORMAT_REWARD_GOLD.ToString();
 
         [Header("UI Elements")]
         public TextWrapper uiTextTitle;
@@ -90,30 +97,32 @@ namespace MultiplayerARPG
             bool isAllTasksDone = CharacterQuest.IsAllTasksDone(Character);
 
             string titleFormat = isComplete ?
-                LanguageManager.GetText(UILocaleKeys.UI_QUEST_FORMAT_TITLE_COMPLETE.ToString()) :
+                LanguageManager.GetText(formatKeyTitleComplete) :
                 (isAllTasksDone ?
-                    LanguageManager.GetText(UILocaleKeys.UI_QUEST_FORMAT_TITLE_TASKS_COMPLETE.ToString()) :
-                    LanguageManager.GetText(UILocaleKeys.UI_QUEST_FORMAT_TITLE_ON_GOING.ToString()));
+                    LanguageManager.GetText(formatKeyTitleTasksComplete) :
+                    LanguageManager.GetText(formatKeyTitleOnGoing));
 
             if (uiTextTitle != null)
                 uiTextTitle.text = string.Format(titleFormat, Quest == null ? LanguageManager.GetUnknowTitle() : Quest.Title);
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(formatDescription, Quest == null ? LanguageManager.GetUnknowDescription() : Quest.Description);
+            {
+                uiTextDescription.text = string.Format(
+                    LanguageManager.GetText(formatKeyDescription),
+                    Quest == null ? LanguageManager.GetUnknowDescription() : Quest.Description);
+            }
 
             if (uiTextRewardExp != null)
             {
                 uiTextRewardExp.text = string.Format(
-                    formatRewardExp,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_REWARD_EXP.ToString()),
+                    LanguageManager.GetText(formatKeyRewardExp),
                     Quest == null ? "0" : Quest.rewardExp.ToString("N0"));
             }
 
             if (uiTextRewardGold != null)
             {
                 uiTextRewardGold.text = string.Format(
-                    formatRewardGold,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_REWARD_GOLD.ToString()),
+                    LanguageManager.GetText(formatKeyRewardGold),
                     Quest == null ? "0" : Quest.rewardGold.ToString("N0"));
             }
 

@@ -4,12 +4,9 @@ namespace MultiplayerARPG
 {
     public class UIGuildCharacter : UISocialCharacter
     {
-        /// <summary>
-        /// Format => {0} = {Role Name}
-        /// </summary>
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Role Name}")]
-        public string formatGuildRole = "{0}";
+        public string formatKeyGuildRole = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
         
         [Header("UI Elements")]
         public TextWrapper uiGuildRole;
@@ -22,7 +19,7 @@ namespace MultiplayerARPG
             GuildRole = guildRole;
 
             if (uiGuildRole != null)
-                uiGuildRole.text = string.Format(formatGuildRole, guildRoleData.roleName);
+                uiGuildRole.text = string.Format(LanguageManager.GetText(formatKeyGuildRole), guildRoleData.roleName);
         }
     }
 }

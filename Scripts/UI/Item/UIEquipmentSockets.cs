@@ -5,18 +5,12 @@ namespace MultiplayerARPG
 {
     public class UIEquipmentSockets : UIBaseEquipmentBonus<EnhancedSocketsWithMaxSocketTuple>
     {
-        /// <summary>
-        /// Format => {0} = {Item Index}, {1} = {Item Title}, {2} = {Effects}
-        /// </summary>
         [Header("String Formats")]
-        [Tooltip("Format => {0} = {Item Index}, {1} = {Item Title}, {2} = {Effects}")]
+        [Tooltip("Format => {0} = {Socket Index}, {1} = {Item Title}, {2} = {List Of Bonus}")]
         [Multiline]
-        public string formatFilledSocket = "<color=#800080ff>({0}) - {1}\n{2}</color>";
-        /// <summary>
-        /// Format => {0} = {Item Index}
-        /// </summary>
-        [Tooltip("Format => {0} = {Item Index}")]
-        public string formatEmptySocket = "<color=#800080ff>({0}) - Empty</color>";
+        public string formatKeySocketFilled = UILocaleKeys.UI_FORMAT_EQUIPMENT_SOCKET_FILLED.ToString();
+        [Tooltip("Format => {0} = {Socket Index}")]
+        public string formatKeySocketEmpty = UILocaleKeys.UI_FORMAT_EQUIPMENT_SOCKET_EMPTY.ToString();
 
         protected override void UpdateData()
         {
@@ -32,16 +26,23 @@ namespace MultiplayerARPG
                     {
                         if (!string.IsNullOrEmpty(allBonusText))
                             allBonusText += "\n";
-                        allBonusText += string.Format(formatFilledSocket, i + 1, tempItem.Title, tempText);
+                        allBonusText += string.Format(
+                            LanguageManager.GetText(formatKeySocketFilled),
+                            i + 1,
+                            tempItem.Title,
+                            tempText);
                     }
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(allBonusText))
                         allBonusText += "\n";
-                    allBonusText += string.Format(formatEmptySocket, i + 1);
+                    allBonusText += string.Format(
+                        LanguageManager.GetText(formatKeySocketEmpty),
+                        i + 1);
                 }
             }
+
             if (uiTextAllBonus != null)
             {
                 uiTextAllBonus.gameObject.SetActive(!string.IsNullOrEmpty(allBonusText));

@@ -7,17 +7,11 @@ namespace MultiplayerARPG
 {
     public partial class UIDealing : UISelectionEntry<BasePlayerCharacterEntity>
     {
-        /// <summary>
-        /// Format => {0} = {Gold Label}, {1} = {Gold Amount}
-        /// </summary>
         [Header("String Formats")]
-        [Tooltip("Format => {0} = {Gold Label}, {1} = {Gold Amount}")]
-        public string formatDealingGold = "{0}: {1}";
-        /// <summary>
-        /// Format => {0} = {Gold Label}, {1} = {Gold Amount}
-        /// </summary>
-        [Tooltip("Format => {0} = {Gold Label}, {1} = {Gold Amount}")]
-        public string formatAnotherDealingGold = "{0}: {1}";
+        [Tooltip("Format => {0} = {Gold Amount}")]
+        public string formatKeyDealingGold = "{0}: {1}";
+        [Tooltip("Format => {0} = {Gold Amount}")]
+        public string formatKeyAnotherDealingGold = "{0}: {1}";
 
         [Header("UI Elements")]
         public UICharacterItem uiDealingItemPrefab;
@@ -217,8 +211,7 @@ namespace MultiplayerARPG
             if (uiTextDealingGold != null)
             {
                 uiTextDealingGold.text = string.Format(
-                    formatDealingGold,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_GOLD.ToString()),
+                    LanguageManager.GetText(formatKeyDealingGold),
                     gold.ToString("N0"));
             }
             dealingGold = gold;
@@ -229,8 +222,7 @@ namespace MultiplayerARPG
             if (uiTextAnotherDealingGold != null)
             {
                 uiTextAnotherDealingGold.text = string.Format(
-                    formatAnotherDealingGold,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_GOLD.ToString()),
+                    LanguageManager.GetText(formatKeyAnotherDealingGold),
                     gold.ToString("N0"));
             }
             anotherDealingGold = gold;

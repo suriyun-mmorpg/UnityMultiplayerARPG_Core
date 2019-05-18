@@ -4,12 +4,9 @@ namespace MultiplayerARPG
 {
     public class UIGuildCreate : UIBase
     {
-        /// <summary>
-        /// Format => {0} = {Require Gold Label}, {1} = {Amount}
-        /// </summary>
         [Header("String Formats")]
-        [Tooltip("Format => {0} = {Require Gold Label}, {1} = {Amount}")]
-        public string formatRequireGold = "{0}: {1}";
+        [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
+        public string formatKeyRequireGold = UILocaleKeys.UI_FORMAT_REQUIRE_GOLD.ToString();
 
         [Header("UI Elements")]
         public InputFieldWrapper inputFieldGuildName;
@@ -18,12 +15,16 @@ namespace MultiplayerARPG
 
         public override void Show()
         {
+            BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             SocialSystemSetting systemSetting = GameInstance.Singleton.SocialSystemSetting;
             if (textRequireGold != null)
             {
+                int currentAmount = 0;
+                if (owningCharacter != null)
+                    currentAmount = owningCharacter.Gold;
                 textRequireGold.text = string.Format(
-                    formatRequireGold,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_GOLD.ToString()),
+                    LanguageManager.GetText(formatKeyRequireGold),
+                    currentAmount,
                     systemSetting.CreateGuildRequiredGold.ToString("N0"));
             }
 

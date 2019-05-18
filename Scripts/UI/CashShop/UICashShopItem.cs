@@ -7,22 +7,13 @@ namespace MultiplayerARPG
 {
     public partial class UICashShopItem : UISelectionEntry<CashShopItem>
     {
-        /// <summary>
-        /// Format => {0} = {Title}
-        /// </summary>
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
-        public string formatTitle = "{0}";
-        /// <summary>
-        /// Format => {0} = {Description}
-        /// </summary>
+        public string formatKeyTitle = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
         [Tooltip("Format => {0} = {Description}")]
-        public string formatDescription = "{0}";
-        /// <summary>
-        /// Format => {0} = {Sell Price Label}, {1} = {Sell Price}
-        /// </summary>
-        [Tooltip("Format => {0} = {Sell Price Label}, {1} = {Sell Price}")]
-        public string formatSellPrice = "{1}: {0}";
+        public string formatKeyDescription = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        [Tooltip("Format => {0} = {Sell Price}")]
+        public string formatKeySellPrice = UILocaleKeys.UI_FORMAT_SELL_PRICE.ToString();
 
         [Header("UI Elements")]
         public UICashShop uiCashShop;
@@ -34,11 +25,18 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(formatTitle, Data == null ? LanguageManager.GetUnknowTitle() : Data.Title);
+            if (uiTextTitle != null) {
+                uiTextTitle.text = string.Format(
+                    LanguageManager.GetText(formatKeyTitle),
+                    Data == null ? LanguageManager.GetUnknowTitle() : Data.Title);
+            }
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(formatDescription, Data == null ? LanguageManager.GetUnknowDescription() : Data.Description);
+            {
+                uiTextDescription.text = string.Format(
+                    LanguageManager.GetText(formatKeyDescription),
+                    Data == null ? LanguageManager.GetUnknowDescription() : Data.Description);
+            }
 
             if (imageIcon != null)
             {
@@ -57,8 +55,7 @@ namespace MultiplayerARPG
             if (uiTextSellPrice != null)
             {
                 uiTextSellPrice.text = string.Format(
-                    formatSellPrice,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_SELL_PRICE.ToString()),
+                    LanguageManager.GetText(formatKeySellPrice),
                     Data == null ? "0" : Data.sellPrice.ToString("N0"));
             }
         }

@@ -9,23 +9,14 @@ namespace MultiplayerARPG
         public CharacterAttribute CharacterAttribute { get { return Data.characterAttribute; } }
         public short Amount { get { return Data.targetAmount; } }
         public Attribute Attribute { get { return CharacterAttribute != null ? CharacterAttribute.GetAttribute() : null; } }
-
-        /// <summary>
-        /// Format => {0} = {Title}
-        /// </summary>
+        
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
-        public string formatTitle = "{0}";
-        /// <summary>
-        /// Format => {0} = {Description}
-        /// </summary>
+        public string formatKeyTitle = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
         [Tooltip("Format => {0} = {Description}")]
-        public string formatDescription = "{0}";
-        /// <summary>
-        /// Format => {0} = {Amount}
-        /// </summary>
+        public string formatKeyDescription = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
         [Tooltip("Format => {0} = {Amount}")]
-        public string formatAmount = "{0}";
+        public string formatKeyAmount = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
 
         [Header("UI Elements")]
         public TextWrapper uiTextTitle;
@@ -48,13 +39,25 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(formatTitle, Attribute == null ? LanguageManager.GetUnknowTitle() : Attribute.Title);
+            {
+                uiTextTitle.text = string.Format(
+                    LanguageManager.GetText(formatKeyTitle),
+                    Attribute == null ? LanguageManager.GetUnknowTitle() : Attribute.Title);
+            }
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(formatDescription, Attribute == null ? LanguageManager.GetUnknowDescription() : Attribute.Description);
+            {
+                uiTextDescription.text = string.Format(
+                    LanguageManager.GetText(formatKeyDescription),
+                    Attribute == null ? LanguageManager.GetUnknowDescription() : Attribute.Description);
+            }
 
             if (uiTextAmount != null)
-                uiTextAmount.text = string.Format(formatAmount, Amount.ToString("N0"));
+            {
+                uiTextAmount.text = string.Format(
+                    LanguageManager.GetText(formatKeyAmount),
+                    Amount.ToString("N0"));
+            }
 
             if (imageIcon != null)
             {

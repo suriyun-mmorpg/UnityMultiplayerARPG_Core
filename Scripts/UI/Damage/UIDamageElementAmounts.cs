@@ -5,17 +5,11 @@ namespace MultiplayerARPG
 {
     public partial class UIDamageElementAmounts : UISelectionEntry<Dictionary<DamageElement, MinMaxFloat>>
     {
-        /// <summary>
-        /// Format => {0} = {Element Title}, {1} = {Min Damage}, {2} = {Max Damage}
-        /// </summary>
         [Header("String Formats")]
-        [Tooltip("Format => {0} = {Element Title}, {1} = {Min Damage}, {2} = {Max Damage}")]
-        public string formatDamage = "{0}: {1}~{2}";
-        /// <summary>
-        /// Format => {0} = {Min Damage}, {1} = {Max Damage}
-        /// </summary>
+        [Tooltip("Format => {0} = {Damage Element Title}, {1} = {Min Damage}, {2} = {Max Damage}")]
+        public string formatKeyDamage = UILocaleKeys.UI_FORMAT_DAMAGE_WITH_ELEMENTAL.ToString();
         [Tooltip("Format => {0} = {Min Damage}, {1} = {Max Damage}")]
-        public string formatSumDamage = "{0}~{1}";
+        public string formatKeySumDamage = UILocaleKeys.UI_FORMAT_DAMAGE_AMOUNT.ToString();
 
         [Header("UI Elements")]
         public TextWrapper uiTextAllDamages;
@@ -38,7 +32,11 @@ namespace MultiplayerARPG
                             continue;
                         tempElement = textAmount.damageElement;
                         tempTextComponent = textAmount.uiText;
-                        tempTextComponent.text = string.Format(formatDamage, tempElement.Title, "0", "0");
+                        tempTextComponent.text = string.Format(
+                            LanguageManager.GetText(formatKeyDamage),
+                            tempElement.Title,
+                            "0",
+                            "0");
                         cacheTextDamages[tempElement] = tempTextComponent;
                     }
                 }
@@ -54,11 +52,20 @@ namespace MultiplayerARPG
                     uiTextAllDamages.gameObject.SetActive(false);
 
                 if (uiTextSumDamage != null)
-                    uiTextSumDamage.text = string.Format(formatSumDamage, "0", "0");
+                {
+                    uiTextSumDamage.text = string.Format(
+                        LanguageManager.GetText(formatKeySumDamage),
+                        "0",
+                        "0");
+                }
 
                 foreach (KeyValuePair<DamageElement, TextWrapper> entry in CacheTextDamages)
                 {
-                    entry.Value.text = string.Format(formatDamage, entry.Key.Title, "0", "0");
+                    entry.Value.text = string.Format(
+                        LanguageManager.GetText(formatKeyDamage),
+                        entry.Key.Title,
+                        "0",
+                        "0");
                 }
             }
             else
@@ -81,7 +88,7 @@ namespace MultiplayerARPG
                         tempAllText += "\n";
                     // Set current elemental damage text
                     tempAmountText = string.Format(
-                        formatDamage,
+                        LanguageManager.GetText(formatKeyDamage),
                         tempElement.Title,
                         tempAmount.min.ToString("N0"),
                         tempAmount.max.ToString("N0"));
@@ -100,7 +107,12 @@ namespace MultiplayerARPG
                 }
 
                 if (uiTextSumDamage != null)
-                    uiTextSumDamage.text = string.Format(formatSumDamage, sumDamage.min.ToString("N0"), sumDamage.max.ToString("N0"));
+                {
+                    uiTextSumDamage.text = string.Format(
+                        LanguageManager.GetText(formatKeySumDamage),
+                        sumDamage.min.ToString("N0"),
+                        sumDamage.max.ToString("N0"));
+                }
             }
         }
     }

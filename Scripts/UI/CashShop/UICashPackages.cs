@@ -6,12 +6,9 @@ namespace MultiplayerARPG
 {
     public partial class UICashPackages : UIBase
     {
-        /// <summary>
-        /// Format => {0} = {Cash Label}, {1} = {Cash Amount}
-        /// </summary>
         [Header("String Formats")]
-        [Tooltip("Format => {0} = {Cash Label}, {1} = {Cash Amount}")]
-        public string formatOwnsCash = "{0}: {1}";
+        [Tooltip("Format => {0} = {Cash Amount}")]
+        public string formatKeyCash = UILocaleKeys.UI_FORMAT_CASH.ToString();
 
         [Header("UI Elements")]
         public UICashPackage uiCashPackageDialog;
@@ -130,8 +127,7 @@ namespace MultiplayerARPG
                     if (uiTextCash != null)
                     {
                         uiTextCash.text = string.Format(
-                            formatOwnsCash,
-                            LanguageManager.GetText(UILocaleKeys.UI_LABEL_CASH.ToString()),
+                            LanguageManager.GetText(formatKeyCash),
                             castedMessage.cash.ToString("N0"));
                     }
 

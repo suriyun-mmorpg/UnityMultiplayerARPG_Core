@@ -11,47 +11,23 @@ namespace MultiplayerARPG
         public short Level { get { return Data.targetLevel; } }
         public Skill Skill { get { return CharacterSkill != null ? CharacterSkill.GetSkill() : null; } }
 
-        /// <summary>
-        /// Format => {0} = {Title}
-        /// </summary>
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
-        public string formatTitle = "{0}";
-        /// <summary>
-        /// Format => {0} = {Description}
-        /// </summary>
+        public string formatKeyTitle = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
         [Tooltip("Format => {0} = {Description}")]
-        public string formatDescription = "{0}";
-        /// <summary>
-        /// Format => {0} = {Level Label}, {1} = {Level}
-        /// </summary>
-        [Tooltip("Format => {0} = {Level Label}, {1} = {Level}")]
-        public string formatLevel = "{0}: {1}";
-        /// <summary>
-        /// Format => {0} = {Available Weapons Label}, {1} = {Weapon Types}
-        /// </summary>
-        [Tooltip("Format => {0} = {Available Weapons Label}, {1} = {Weapon Types}")]
-        public string formatAvailableWeapons = "{0}: {1}";
-        /// <summary>
-        /// Format => {0} = {Consume Mp Label}, {1} = {Consume Mp Amount}
-        /// </summary>
-        [Tooltip("Format => {0} = {Consume Mp Label}, {1} = {Consume Mp Amount}")]
-        public string formatConsumeMp = "{0}: {1}";
-        /// <summary>
-        /// Format => {0} = {Cooldown Label}, {1} = {Duration}
-        /// </summary>
-        [Tooltip("Format => {0} = {Cooldown Label}, {1} = {Duration}")]
-        public string formatCoolDownDuration = "{0}: {1}";
-        /// <summary>
-        /// Format => {0} = {Remains Duration}
-        /// </summary>
+        public string formatKeyDescription = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        [Tooltip("Format => {0} = {Level}")]
+        public string formatKeyLevel = UILocaleKeys.UI_FORMAT_LEVEL.ToString();
+        [Tooltip("Format => {0} = {List Of Weapon Type}")]
+        public string formatKeyAvailableWeapons = UILocaleKeys.UI_FORMAT_AVAILABLE_WEAPONS.ToString();
+        [Tooltip("Format => {0} = {Consume Mp Amount}")]
+        public string formatKeyConsumeMp = UILocaleKeys.UI_FORMAT_CONSUME_MP.ToString();
+        [Tooltip("Format => {0} = {Duration}")]
+        public string formatKeyCoolDownDuration = UILocaleKeys.UI_FORMAT_SKILL_COOLDOWN_DURATION.ToString();
         [Tooltip("Format => {0} = {Remains Duration}")]
-        public string formatCoolDownRemainsDuration = "{0}";
-        /// <summary>
-        /// Format => {0} = {Skill Type Label}, {1} = {Skill Type Title}
-        /// </summary>
-        [Tooltip("Format => {0} = {Skill Type Label}, {1} = {Skill Type Title}")]
-        public string formatSkillType = "{0}: {1}";
+        public string formatKeyCoolDownRemainsDuration = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        [Tooltip("Format => {0} = {Skill Type Title}")]
+        public string formatKeySkillType = UILocaleKeys.UI_FORMAT_SKILL_TYPE.ToString();
 
         [Header("UI Elements")]
         public TextWrapper uiTextTitle;
@@ -127,14 +103,15 @@ namespace MultiplayerARPG
             if (uiTextCoolDownDuration != null)
             {
                 uiTextCoolDownDuration.text = string.Format(
-                    formatCoolDownDuration,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_SKILL_COOLDOWN.ToString()),
+                    LanguageManager.GetText(formatKeyCoolDownDuration),
                     coolDownDuration.ToString("N0"));
             }
 
             if (uiTextCoolDownRemainsDuration != null)
             {
-                uiTextCoolDownRemainsDuration.text = string.Format(formatCoolDownRemainsDuration, Mathf.CeilToInt(coolDownRemainsDuration).ToString("N0"));
+                uiTextCoolDownRemainsDuration.text = string.Format(
+                    LanguageManager.GetText(formatKeyCoolDownRemainsDuration),
+                    coolDownRemainsDuration.ToString("N0"));
                 uiTextCoolDownRemainsDuration.gameObject.SetActive(coolDownRemainsDuration > 0);
             }
 
@@ -158,16 +135,23 @@ namespace MultiplayerARPG
                 onSetNonLevelZeroData.Invoke();
 
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(formatTitle, Skill == null ? LanguageManager.GetUnknowTitle() : Skill.Title);
+            {
+                uiTextTitle.text = string.Format(
+                    LanguageManager.GetText(formatKeyTitle),
+                    Skill == null ? LanguageManager.GetUnknowTitle() : Skill.Title);
+            }
 
             if (uiTextDescription != null)
-                uiTextDescription.text = string.Format(formatDescription, Skill == null ? LanguageManager.GetUnknowDescription() : Skill.Description);
+            {
+                uiTextDescription.text = string.Format(
+                    LanguageManager.GetText(formatKeyDescription),
+                    Skill == null ? LanguageManager.GetUnknowDescription() : Skill.Description);
+            }
 
             if (uiTextLevel != null)
             {
                 uiTextLevel.text = string.Format(
-                    formatLevel,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_LEVEL.ToString()),
+                    LanguageManager.GetText(formatKeyLevel),
                     Level.ToString("N0"));
             }
 
@@ -184,20 +168,17 @@ namespace MultiplayerARPG
                 {
                     case SkillType.Active:
                         uiTextSkillType.text = string.Format(
-                            formatSkillType,
-                            LanguageManager.GetText(UILocaleKeys.UI_LABEL_SKILL_TYPE.ToString()),
+                            LanguageManager.GetText(formatKeySkillType),
                             LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_ACTIVE.ToString()));
                         break;
                     case SkillType.Passive:
                         uiTextSkillType.text = string.Format(
-                            formatSkillType,
-                            LanguageManager.GetText(UILocaleKeys.UI_LABEL_SKILL_TYPE.ToString()),
+                            LanguageManager.GetText(formatKeySkillType),
                             LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_PASSIVE.ToString()));
                         break;
                     case SkillType.CraftItem:
                         uiTextSkillType.text = string.Format(
-                            formatSkillType,
-                            LanguageManager.GetText(UILocaleKeys.UI_LABEL_SKILL_TYPE.ToString()),
+                            LanguageManager.GetText(formatKeySkillType),
                             LanguageManager.GetText(UILocaleKeys.UI_SKILL_TYPE_CRAFT_ITEM.ToString()));
                         break;
                 }
@@ -219,8 +200,7 @@ namespace MultiplayerARPG
                         str += availableWeapon.Title;
                     }
                     uiTextAvailableWeapons.text = string.Format(
-                        formatAvailableWeapons,
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_AVAILABLE_WEAPONS.ToString()),
+                        LanguageManager.GetText(formatKeyAvailableWeapons),
                         str);
                     uiTextAvailableWeapons.gameObject.SetActive(true);
                 }
@@ -229,8 +209,7 @@ namespace MultiplayerARPG
             if (uiTextConsumeMp != null)
             {
                 uiTextConsumeMp.text = string.Format(
-                    formatConsumeMp,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_CONSUME_MP.ToString()),
+                    LanguageManager.GetText(formatKeyConsumeMp),
                     (Skill == null || Level <= 0) ?
                         LanguageManager.GetUnknowDescription() :
                         Skill.GetConsumeMp(Level).ToString("N0"));

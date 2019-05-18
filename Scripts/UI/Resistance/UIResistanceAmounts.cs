@@ -5,12 +5,9 @@ namespace MultiplayerARPG
 {
     public partial class UIResistanceAmounts : UISelectionEntry<Dictionary<DamageElement, float>>
     {
-        /// <summary>
-        /// Format => {0} = {Resistance Title}, {1} = {Amount * 100}
-        /// </summary>
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Resistance Title}, {1} = {Amount * 100}")]
-        public string formatAmount = "{0}: {1}%";
+        public string formatKeyAmount = UILocaleKeys.UI_FORMAT_RESISTANCE_AMOUNT.ToString();
 
         [Header("UI Elements")]
         public TextWrapper uiTextAllAmounts;
@@ -32,7 +29,11 @@ namespace MultiplayerARPG
                             continue;
                         tempElement = textAmount.damageElement;
                         tempTextComponent = textAmount.uiText;
-                        tempTextComponent.text = string.Format(formatAmount, tempElement.Title, "0", "0");
+                        tempTextComponent.text = string.Format(
+                            LanguageManager.GetText(formatKeyAmount),
+                            tempElement.Title,
+                            "0",
+                            "0");
                         cacheTextAmounts[tempElement] = tempTextComponent;
                     }
                 }
@@ -49,7 +50,11 @@ namespace MultiplayerARPG
 
                 foreach (KeyValuePair<DamageElement, TextWrapper> entry in CacheTextAmounts)
                 {
-                    entry.Value.text = string.Format(formatAmount, entry.Key.Title, "0", "0");
+                    entry.Value.text = string.Format(
+                            LanguageManager.GetText(formatKeyAmount),
+                            entry.Key.Title,
+                            "0",
+                            "0");
                 }
             }
             else
@@ -71,7 +76,7 @@ namespace MultiplayerARPG
                         tempAllText += "\n";
                     // Set current elemental resistance text
                     tempAmountText = string.Format(
-                        formatAmount,
+                        LanguageManager.GetText(formatKeyAmount),
                         tempElement.Title,
                         (tempAmount * 100).ToString("N2"));
                     // Append current elemental resistance text

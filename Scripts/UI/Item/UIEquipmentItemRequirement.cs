@@ -4,17 +4,11 @@ namespace MultiplayerARPG
 {
     public partial class UIEquipmentItemRequirement : UISelectionEntry<Item>
     {
-        /// <summary>
-        /// Format => {0} = {Require Level Label}, {1} = {Level}
-        /// </summary>
         [Header("String Formats")]
-        [Tooltip("Format => {0} = {Require Level Label}, {1} = {Level}")]
-        public string formatRequireLevel = "{0}: {1}";
-        /// <summary>
-        /// Format => {0} = {Require Class Label}, {1} = {Class Title}
-        /// </summary>
-        [Tooltip("Format => {0} = {Require Class Label}, {1} = {Class Title}")]
-        public string formatRequireClass = "{0}: {1}";
+        [Tooltip("Format => {0} = {Require Level}")]
+        public string formatKeyRequireLevel = UILocaleKeys.UI_FORMAT_REQUIRE_LEVEL.ToString();
+        [Tooltip("Format => {0} = {Require Class Title}")]
+        public string formatKeyRequireClass = UILocaleKeys.UI_FORMAT_REQUIRE_CLASS.ToString();
 
         [Header("UI Elements")]
         public TextWrapper uiTextRequireLevel;
@@ -36,8 +30,7 @@ namespace MultiplayerARPG
                 {
                     uiTextRequireLevel.gameObject.SetActive(true);
                     uiTextRequireLevel.text = string.Format(
-                        formatRequireLevel,
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_LEVEL.ToString()),
+                        LanguageManager.GetText(formatKeyRequireLevel),
                         equipmentItem.requirement.level.ToString("N0"));
                 }
             }
@@ -53,8 +46,7 @@ namespace MultiplayerARPG
                 {
                     uiTextRequireClass.gameObject.SetActive(true);
                     uiTextRequireClass.text = string.Format(
-                        formatRequireClass,
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_REQUIRE_CLASS.ToString()),
+                        LanguageManager.GetText(formatKeyRequireClass),
                         equipmentItem.requirement.character.Title);
                 }
             }

@@ -6,12 +6,9 @@ namespace MultiplayerARPG
 {
     public abstract class UIBaseBank : UIBase
     {
-        /// <summary>
-        /// Format => {0} = {Gold Label}, {1} = {Amount}
-        /// </summary>
         [Header("String Formats")]
-        [Tooltip("Format => {0} = {Gold Label}, {1} = {Amount}")]
-        public string formatAmount = "{0}: {1}";
+        [Tooltip("Format => {0} = {Amount}")]
+        public string formatKeyAmount = UILocaleKeys.UI_FORMAT_GOLD.ToString();
 
         [Header("UI Elements")]
         public TextWrapper uiTextAmount;
@@ -20,8 +17,8 @@ namespace MultiplayerARPG
         {
             if (uiTextAmount != null)
             {
-                uiTextAmount.text = string.Format(formatAmount,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_GOLD.ToString()),
+                uiTextAmount.text = string.Format(
+                    LanguageManager.GetText(formatKeyAmount),
                     GetAmount().ToString("N0"));
             }
         }

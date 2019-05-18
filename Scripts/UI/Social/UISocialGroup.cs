@@ -16,17 +16,11 @@ namespace MultiplayerARPG
     public abstract class UISocialGroup<T> : UISocialGroup
         where T : UISocialCharacter
     {
-        /// <summary>
-        /// Format => {0} = {Social Member Label}, {1} = {Current Amount}, {2} = {Max Amount}
-        /// </summary>
         [Header("String Formats")]
-        [Tooltip("Format => {0} = {Social Member Label}, {1} = {Current Amount}, {2} = {Max Amount}")]
-        public string formatMemberAmount = "{0}: {1}/{2}";
-        /// <summary>
-        /// Format => {0} = {Social Member Label}, {1} = {Current Amount}
-        /// </summary>
-        [Tooltip("Format => {0} = {Social Member Label}, {1} = {Current Amount}")]
-        public string formatMemberAmountNoLimit = "{0}: {1}";
+        [Tooltip("Format => {0} = {Current Amount}, {1} = {Max Amount}")]
+        public string formatKeyMemberAmount = UILocaleKeys.UI_FORMAT_SOCIAL_MEMBER_AMOUNT.ToString();
+        [Tooltip("Format => {0} = {Current Amount}")]
+        public string formatKeyMemberAmountNoLimit = UILocaleKeys.UI_FORMAT_SOCIAL_MEMBER_AMOUNT_NO_LIMIT.ToString();
 
         [Header("UI Elements")]
         public T uiMemberDialog;
@@ -98,16 +92,14 @@ namespace MultiplayerARPG
                 if (GetMaxMemberAmount() > 0)
                 {
                     textMemberAmount.text = string.Format(
-                        formatMemberAmount,
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_SOCIAL_MEMBER.ToString()),
+                        LanguageManager.GetText(formatKeyMemberAmount),
                         memberAmount.ToString("N0"),
                         GetMaxMemberAmount().ToString("N0"));
                 }
                 else
                 {
                     textMemberAmount.text = string.Format(
-                        formatMemberAmountNoLimit,
-                        LanguageManager.GetText(UILocaleKeys.UI_LABEL_SOCIAL_MEMBER.ToString()),
+                        LanguageManager.GetText(formatKeyMemberAmountNoLimit),
                         memberAmount.ToString("N0"));
                 }
             }

@@ -9,22 +9,13 @@ namespace MultiplayerARPG
     {
         public CharacterSummon CharacterSummon { get { return Data; } }
 
-        /// <summary>
-        /// Format => {0} = {Title}
-        /// </summary>
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
-        public string formatTitle = "{0}";
-        /// <summary>
-        /// Format => {0} = {Remains Duration}
-        /// </summary>
+        public string formatKeyTitle = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
         [Tooltip("Format => {0} = {Remains Duration}")]
-        public string formatSummonRemainsDuration = "{0}";
-        /// <summary>
-        /// Format => {0} = {Stack Amount}
-        /// </summary>
+        public string formatKeySummonRemainsDuration = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
         [Tooltip("Format => {0} = {Stack Amount}")]
-        public string formatSummonStack = "{0}";
+        public string formatKeySummonStack = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
 
         [Header("UI Elements")]
         public TextWrapper uiTextTitle;
@@ -70,7 +61,9 @@ namespace MultiplayerARPG
             // Update UIs
             if (uiTextRemainsDuration != null)
             {
-                uiTextRemainsDuration.text = string.Format(formatSummonRemainsDuration, Mathf.CeilToInt(summonRemainsDuration).ToString("N0"));
+                uiTextRemainsDuration.text = string.Format(
+                    LanguageManager.GetText(formatKeySummonRemainsDuration),
+                    summonRemainsDuration.ToString("N0"));
                 uiTextRemainsDuration.gameObject.SetActive(summonRemainsDuration > 0);
             }
         }
@@ -91,7 +84,11 @@ namespace MultiplayerARPG
             }
 
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(formatTitle, summonData == null ? LanguageManager.GetUnknowTitle() : summonData.Title);
+            {
+                uiTextTitle.text = string.Format(
+                    LanguageManager.GetText(formatKeyTitle),
+                    summonData == null ? LanguageManager.GetUnknowTitle() : summonData.Title);
+            }
 
             if (imageIcon != null)
             {
@@ -121,7 +118,12 @@ namespace MultiplayerARPG
         private void OnStackingEntriesUpdate()
         {
             if (uiTextStack != null)
-                uiTextStack.text = string.Format(formatSummonStack, (stackingEntries.Count + 1));
+            {
+                uiTextStack.text = string.Format(
+                    LanguageManager.GetText(formatKeySummonStack),
+                    stackingEntries.Count + 1);
+            }
+
             if (stackingEntries.Count > 0)
                 onStackEntriesNotEmpty.Invoke();
             else

@@ -5,13 +5,13 @@ namespace MultiplayerARPG
     public partial class UIEquipmentSet : UIBaseEquipmentBonus<EquipmentSetWithEquippedCountTuple>
     {
         [Header("String Formats")]
-        [Tooltip("Format => {0} = {Title}, {1} = {Effects}")]
+        [Tooltip("Format => {0} = {Set Title}, {1} = {List Of Effect}")]
         [Multiline]
-        public string formatTitleWithEffects = "<color=#ffa500ff>{0}</color>\n{1}";
-        [Tooltip("Format => {0} = {Equip Amount}, {1} = {Effects}")]
-        public string formatAppliedEffect = "<color=#ffa500ff>({0}) {1}</color>";
-        [Tooltip("Format => {0} = {Equip Amount}, {1} = {Effects}")]
-        public string formatUnappliedEffect = "({0}) {1}";
+        public string formatKeySet = UILocaleKeys.UI_FORMAT_EQUIPMENT_SET.ToString();
+        [Tooltip("Format => {0} = {Equip Amount}, {1} = {List Of Bonus}")]
+        public string formatKeyAppliedEffect = UILocaleKeys.UI_FORMAT_EQUIPMENT_SET_APPLIED_EFFECT.ToString();
+        [Tooltip("Format => {0} = {Equip Amount}, {1} = {List Of Bonus}")]
+        public string formatKeyUnappliedEffect = UILocaleKeys.UI_FORMAT_EQUIPMENT_SET_UNAPPLIED_EFFECT.ToString();
 
         // TODO: This is deprecated
         [HideInInspector]
@@ -36,14 +36,23 @@ namespace MultiplayerARPG
                 {
                     if (!string.IsNullOrEmpty(allBonusText))
                         allBonusText += "\n";
-                    allBonusText += string.Format(effectCount <= Data.equippedCount ? formatAppliedEffect : formatUnappliedEffect, effectCount.ToString("N0"), tempText);
+                    allBonusText += string.Format(
+                        effectCount <= Data.equippedCount ?
+                            LanguageManager.GetText(formatKeyAppliedEffect) :
+                            LanguageManager.GetText(formatKeyUnappliedEffect),
+                        effectCount.ToString("N0"),
+                        tempText);
                 }
                 ++effectCount;
             }
+
             if (uiTextAllBonus != null)
             {
                 uiTextAllBonus.gameObject.SetActive(!string.IsNullOrEmpty(allBonusText));
-                uiTextAllBonus.text = string.Format(formatTitleWithEffects, Data.equipmentSet.Title, allBonusText);
+                uiTextAllBonus.text = string.Format(
+                    LanguageManager.GetText(formatKeySet),
+                    Data.equipmentSet.Title,
+                    allBonusText);
             }
         }
     }

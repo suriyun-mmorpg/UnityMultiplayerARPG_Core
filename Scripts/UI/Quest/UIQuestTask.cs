@@ -7,33 +7,53 @@ namespace MultiplayerARPG
         public QuestTask QuestTask { get { return Data.questTask; } }
         public int Progress { get { return Data.progress; } }
 
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}")]
+        public string formatKeyTaskKillMonster = UILocaleKeys.UI_FORMAT_QUEST_TASK_KILL_MONSTER.ToString();
+        [Tooltip("Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}")]
+        public string formatKeyTaskKillMonsterComplete = UILocaleKeys.UI_FORMAT_QUEST_TASK_KILL_MONSTER_COMPLETE.ToString();
+        [Tooltip("Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}")]
+        public string formatKeyTaskCollectItem = UILocaleKeys.UI_FORMAT_QUEST_TASK_COLLECT_ITEM.ToString();
+        [Tooltip("Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}")]
+        public string formatKeyTaskCollectItemComplete = UILocaleKeys.UI_FORMAT_QUEST_TASK_COLLECT_ITEM_COMPLETE.ToString();
+
         [Header("UI Elements")]
         public TextWrapper uiTextTaskDescription;
 
         protected override void UpdateData()
         {
-            string tempFormat;
+            bool isComplete = false;
             switch (QuestTask.taskType)
             {
                 case QuestTaskType.KillMonster:
                     MonsterCharacterAmount monsterCharacterAmount = QuestTask.monsterCharacterAmount;
                     string monsterTitle = monsterCharacterAmount.monster == null ? LanguageManager.GetUnknowTitle() : monsterCharacterAmount.monster.Title;
                     short monsterKillAmount = monsterCharacterAmount.amount;
-                    tempFormat = Progress >= monsterCharacterAmount.amount ?
-                        LanguageManager.GetText(UILocaleKeys.UI_QUEST_TASK_FORMAT_KILL_MONSTER_COMPLETE.ToString()) :
-                        LanguageManager.GetText(UILocaleKeys.UI_QUEST_TASK_FORMAT_KILL_MONSTER.ToString());
+                    isComplete = Progress >= monsterKillAmount;
                     if (uiTextTaskDescription != null)
-                        uiTextTaskDescription.text = string.Format(tempFormat, monsterTitle, Progress.ToString("N0"), monsterKillAmount.ToString("N0"));
+                    {
+                        uiTextTaskDescription.text = string.Format(
+                            isComplete ?
+                                LanguageManager.GetText(formatKeyTaskKillMonsterComplete) :
+                                LanguageManager.GetText(formatKeyTaskKillMonster), monsterTitle,
+                            Progress.ToString("N0"),
+                            monsterKillAmount.ToString("N0"));
+                    }
                     break;
                 case QuestTaskType.CollectItem:
                     ItemAmount itemAmount = QuestTask.itemAmount;
                     string itemTitle = itemAmount.item == null ? LanguageManager.GetUnknowTitle() : itemAmount.item.Title;
                     short itemCollectAmount = itemAmount.amount;
-                    tempFormat = Progress >= itemAmount.amount ?
-                        LanguageManager.GetText(UILocaleKeys.UI_QUEST_TASK_FORMAT_COLLECT_ITEM_COMPLETE.ToString()) :
-                        LanguageManager.GetText(UILocaleKeys.UI_QUEST_TASK_FORMAT_COLLECT_ITEM.ToString());
+                    isComplete = Progress >= itemCollectAmount;
                     if (uiTextTaskDescription != null)
-                        uiTextTaskDescription.text = string.Format(tempFormat, itemTitle, Progress.ToString("N0"), itemCollectAmount.ToString("N0"));
+                    {
+                        uiTextTaskDescription.text = string.Format(
+                            isComplete ?
+                                LanguageManager.GetText(formatKeyTaskCollectItemComplete) :
+                                LanguageManager.GetText(formatKeyTaskCollectItem), itemTitle,
+                            Progress.ToString("N0"),
+                            itemCollectAmount.ToString("N0"));
+                    }
                     break;
             }
         }

@@ -7,22 +7,13 @@ namespace MultiplayerARPG
     {
         public CharacterBuff CharacterBuff { get { return Data; } }
 
-        /// <summary>
-        /// Format => {0} = {Title}
-        /// </summary>
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
-        public string formatTitle = "{0}";
-        /// <summary>
-        /// Format => {0} = {Buff Duration Label}, {1} = {Duration}
-        /// </summary>
-        [Tooltip("Format => {0} = {Buff Duration Label}, {1} = {Duration}")]
-        public string formatBuffDuration = "{0}: {1}";
-        /// <summary>
-        /// Format => {0} = {Remains Duration}
-        /// </summary>
+        public string formatKeyTitle = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        [Tooltip("Format => {0} = {Duration}")]
+        public string formatKeyBuffDuration = UILocaleKeys.UI_FORMAT_BUFF_DURATION.ToString();
         [Tooltip("Format => {0} = {Remains Duration}")]
-        public string formatBuffRemainsDuration = "{0}";
+        public string formatKeyBuffRemainsDuration = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
 
         [Header("UI Elements")]
         public TextWrapper uiTextTitle;
@@ -65,16 +56,15 @@ namespace MultiplayerARPG
             if (uiTextDuration != null)
             {
                 uiTextDuration.text = string.Format(
-                    formatBuffDuration,
-                    LanguageManager.GetText(UILocaleKeys.UI_LABEL_BUFF_DURATION.ToString()),
+                    LanguageManager.GetText(formatKeyBuffDuration),
                     buffDuration.ToString("N0"));
             }
 
             if (uiTextRemainsDuration != null)
             {
                 uiTextRemainsDuration.text = string.Format(
-                    formatBuffRemainsDuration,
-                    Mathf.CeilToInt(buffRemainsDuration).ToString("N0"));
+                    LanguageManager.GetText(formatKeyBuffRemainsDuration),
+                    buffRemainsDuration.ToString("N0"));
                 uiTextRemainsDuration.gameObject.SetActive(buffRemainsDuration > 0);
             }
 
@@ -100,7 +90,11 @@ namespace MultiplayerARPG
             }
 
             if (uiTextTitle != null)
-                uiTextTitle.text = string.Format(formatTitle, buffData == null ? LanguageManager.GetUnknowTitle() : buffData.Title);
+            {
+                uiTextTitle.text = string.Format(
+                    LanguageManager.GetText(formatKeyTitle),
+                    buffData == null ? LanguageManager.GetUnknowTitle() : buffData.Title);
+            }
 
             if (imageIcon != null)
             {

@@ -5,22 +5,13 @@ namespace MultiplayerARPG
 {
     public partial class UIItemAmounts : UISelectionEntry<Dictionary<Item, short>>
     {
-        /// <summary>
-        /// Format => {0} = {Item Title}, {1} = {Current Amount}, {2} = {Target Amount}
-        /// </summary>
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Item Title}, {1} = {Current Amount}, {2} = {Target Amount}")]
-        public string formatAmount = "{0}: {1}/{2}";
-        /// <summary>
-        /// Format => {0} = {Item Title}, {1} = {Current Amount}, {2} = {Target Amount}
-        /// </summary>
+        public string formatKeyAmount = UILocaleKeys.UI_FORMAT_CURRENT_ITEM.ToString();
         [Tooltip("Format => {0} = {Item Title}, {1} = {Current Amount}, {2} = {Target Amount}")]
-        public string formatAmountNotEnough = "{0}: <color=red>{1}/{2}</color>";
-        /// <summary>
-        /// Format => {0} = {Item Title}, {1} = {Target Amount}
-        /// </summary>
+        public string formatKeyAmountNotEnough = UILocaleKeys.UI_FORMAT_CURRENT_ITEM_NOT_ENOUGH.ToString();
         [Tooltip("Format => {0} = {Item Title}, {1} = {Target Amount}")]
-        public string formatSimpleAmount = "{0}: {1}";
+        public string formatKeySimpleAmount = UILocaleKeys.UI_FORMAT_ITEM_AMOUNT.ToString();
 
         [Header("UI Elements")]
         public TextWrapper uiTextAllAmounts;
@@ -43,7 +34,11 @@ namespace MultiplayerARPG
                             continue;
                         tempItem = textLevel.item;
                         tempTextComponent = textLevel.uiText;
-                        tempTextComponent.text = string.Format(formatAmount, tempItem.Title, "0", "0");
+                        tempTextComponent.text = string.Format(
+                            LanguageManager.GetText(formatKeyAmount),
+                            tempItem.Title,
+                            "0",
+                            "0");
                         cacheTextLevels[tempItem] = tempTextComponent;
                     }
                 }
@@ -59,9 +54,13 @@ namespace MultiplayerARPG
                 if (uiTextAllAmounts != null)
                     uiTextAllAmounts.gameObject.SetActive(false);
 
-                foreach (KeyValuePair<Item, TextWrapper> textLevel in CacheTextLevels)
+                foreach (KeyValuePair<Item, TextWrapper> entry in CacheTextLevels)
                 {
-                    textLevel.Value.text = string.Format(formatAmount, textLevel.Key.Title, "0", "0");
+                    entry.Value.text = string.Format(
+                        LanguageManager.GetText(formatKeyAmount),
+                        entry.Key.Title,
+                        "0",
+                        "0");
                 }
             }
             else
@@ -91,16 +90,22 @@ namespace MultiplayerARPG
                     if (showAsRequirement)
                     {
                         // This will show both current character item amount and target amount
-                        tempFormat = tempCurrentAmount >= tempTargetAmount ? formatAmount : formatAmountNotEnough;
+                        tempFormat = tempCurrentAmount >= tempTargetAmount ?
+                            LanguageManager.GetText(formatKeyAmount) :
+                            LanguageManager.GetText(formatKeyAmountNotEnough);
                         tempAmountText = string.Format(tempFormat, tempItem.Title, tempCurrentAmount.ToString("N0"), tempTargetAmount.ToString("N0"));
                     }
                     else
                     {
                         // This will show only target amount, so current character item amount will not be shown
-                        tempAmountText = string.Format(formatSimpleAmount, tempItem.Title, tempTargetAmount.ToString("N0"));
+                        tempAmountText = string.Format(
+                            LanguageManager.GetText(formatKeySimpleAmount),
+                            tempItem.Title,
+                            tempTargetAmount.ToString("N0"));
                     }
-                    // Append current attribute amount text
+                    // Append current item amount text
                     tempAllText += tempAmountText;
+                    // Set current item text to UI
                     if (CacheTextLevels.TryGetValue(dataEntry.Key, out tempTextWrapper))
                         tempTextWrapper.text = tempAmountText;
                 }
