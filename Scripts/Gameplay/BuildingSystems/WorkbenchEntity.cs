@@ -20,9 +20,9 @@ namespace MultiplayerARPG
                     cacheItemCrafts = new Dictionary<int, ItemCraft>();
                     foreach (ItemCraft itemCraft in itemCrafts)
                     {
-                        if (itemCraft.craftingItem == null)
+                        if (itemCraft.CraftingItem == null)
                             continue;
-                        cacheItemCrafts[itemCraft.craftingItem.DataId] = itemCraft;
+                        cacheItemCrafts[itemCraft.CraftingItem.DataId] = itemCraft;
                     }
                 }
                 return cacheItemCrafts;

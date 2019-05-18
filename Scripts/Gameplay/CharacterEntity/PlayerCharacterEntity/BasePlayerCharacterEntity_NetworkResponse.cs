@@ -276,7 +276,7 @@ namespace MultiplayerARPG
 
         protected virtual void NetFuncSelectNpcDialogCraftItemMenu(int menuIndex)
         {
-            if (currentNpcDialog == null || currentNpcDialog.type != NpcDialogType.CraftItem || currentNpcDialog.itemCraft.craftingItem == null)
+            if (currentNpcDialog == null || currentNpcDialog.type != NpcDialogType.CraftItem || currentNpcDialog.itemCraft.CraftingItem == null)
             {
                 currentNpcDialog = null;
                 RequestShowNpcDialog(0);

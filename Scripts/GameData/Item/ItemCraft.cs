@@ -7,12 +7,16 @@ namespace MultiplayerARPG
     [System.Serializable]
     public struct ItemCraft
     {
-        public Item craftingItem;
-        public ItemAmount[] craftRequirements;
-        public int requireGold;
+        [SerializeField]
+        private Item craftingItem;
+        [SerializeField]
+        private ItemAmount[] craftRequirements;
+        [SerializeField]
+        private int requireGold;
 
+        public Item CraftingItem { get { return craftingItem; } }
         private Dictionary<Item, short> cacheCraftRequirements;
-        public Dictionary<Item, short> CacheCraftRequirements
+        public Dictionary<Item, short> CraftRequirements
         {
             get
             {
@@ -21,6 +25,7 @@ namespace MultiplayerARPG
                 return cacheCraftRequirements;
             }
         }
+        public int RequireGold { get { return requireGold; } }
 
         public bool CanCraft(IPlayerCharacterData character)
         {
