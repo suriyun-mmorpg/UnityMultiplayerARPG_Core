@@ -10,17 +10,17 @@ namespace MultiplayerARPG
         
         [Header("Generic Info Format")]
         [Tooltip("Format => {0} = {Title}")]
-        public string formatKeyTitleOnGoing = UILocaleKeys.UI_FORMAT_QUEST_TITLE_ON_GOING.ToString();
+        public UILocaleKeySetting formatKeyTitleOnGoing = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_QUEST_TITLE_ON_GOING);
         [Tooltip("Format => {0} = {Title}")]
-        public string formatKeyTitleTasksComplete = UILocaleKeys.UI_FORMAT_QUEST_TITLE_TASKS_COMPLETE.ToString();
+        public UILocaleKeySetting formatKeyTitleTasksComplete = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_QUEST_TITLE_TASKS_COMPLETE);
         [Tooltip("Format => {0} = {Title}")]
-        public string formatKeyTitleComplete = UILocaleKeys.UI_FORMAT_QUEST_TITLE_COMPLETE.ToString();
+        public UILocaleKeySetting formatKeyTitleComplete = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_QUEST_TITLE_COMPLETE);
         [Tooltip("Format => {0} = {Description}")]
-        public string formatKeyDescription = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
-        [Tooltip("Format => {0} = {Exp}")]
-        public string formatKeyRewardExp = UILocaleKeys.UI_FORMAT_REWARD_EXP.ToString();
-        [Tooltip("Format => {0} = {Amount}")]
-        public string formatKeyRewardGold = UILocaleKeys.UI_FORMAT_REWARD_GOLD.ToString();
+        public UILocaleKeySetting formatKeyDescription = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
+        [Tooltip("Format => {0} = {Exp Amount}")]
+        public UILocaleKeySetting formatKeyRewardExp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_REWARD_EXP);
+        [Tooltip("Format => {0} = {Gold Amount}")]
+        public UILocaleKeySetting formatKeyRewardGold = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_REWARD_GOLD);
 
         [Header("UI Elements")]
         public TextWrapper uiTextTitle;

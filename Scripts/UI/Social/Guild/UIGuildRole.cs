@@ -6,9 +6,9 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Role Name}")]
-        public string formatKeyRoleName = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        public UILocaleKeySetting formatKeyRoleName = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Share Exp Percentage}")]
-        public string formatKeyShareExpPercentage = UILocaleKeys.UI_FORMAT_SHARE_EXP_PERCENTAGE.ToString();
+        public UILocaleKeySetting formatKeyShareExpPercentage = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SHARE_EXP_PERCENTAGE);
 
         [Header("UI Elements")]
         public TextWrapper textRoleName;

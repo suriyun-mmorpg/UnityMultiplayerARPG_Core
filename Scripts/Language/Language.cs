@@ -6,17 +6,29 @@ namespace MultiplayerARPG
 {
     public enum UILocaleKeys : ushort
     {
+        UI_CUSTOM,
         // UI Generic Title
         UI_LABEL_DISCONNECTED,
         UI_LABEL_SUCCESS,
-        UI_LABEL_WARNING,
         UI_LABEL_ERROR,
         UI_LABEL_NONE,
-        // Generic Format
+        // Format - Generic
         /// <summary>
         /// Format => {0} = {Value}
         /// </summary>
         UI_FORMAT_SIMPLE,
+        /// <summary>
+        /// Format => {0} = {Value}
+        /// </summary>
+        UI_FORMAT_SIMPLE_PERCENTAGE,
+        /// <summary>
+        /// Format => {0} = {Min Value}, {1} = {Max Value}
+        /// </summary>
+        UI_FORMAT_SIMPLE_MIN_TO_MAX,
+        /// <summary>
+        /// Format => {0} = {Min Value}, {1} = {Max Value}
+        /// </summary>
+        UI_FORMAT_SIMPLE_MIN_BY_MAX,
         /// <summary>
         /// Format => {0} = {Level}
         /// </summary>
@@ -155,6 +167,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Consume Mp}
         /// </summary>
         UI_FORMAT_CONSUME_MP,
+        // Format - Skill
         /// <summary>
         /// Format => {0} = {Skill Cooldown Duration}
         /// </summary>
@@ -166,6 +179,7 @@ namespace MultiplayerARPG
         UI_SKILL_TYPE_ACTIVE,
         UI_SKILL_TYPE_PASSIVE,
         UI_SKILL_TYPE_CRAFT_ITEM,
+        // Format - Buff
         /// <summary>
         /// Format => {0} = {Buff Duration}
         /// </summary>
@@ -190,7 +204,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Buff Recovery Water}
         /// </summary>
         UI_FORMAT_BUFF_RECOVERY_WATER,
-        // Format Item
+        // Format -  Item
         /// <summary>
         /// Format => {0} = {Level - 1}
         /// </summary>
@@ -222,7 +236,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Item Current Durability}, {1} = {Item Max Durability}
         /// </summary>
         UI_FORMAT_ITEM_DURABILITY,
-        // Format Social
+        // Format -  Social
         /// <summary>
         /// Format => {0} = {Character Name}
         /// </summary>
@@ -251,7 +265,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Cash Amount}
         /// </summary>
         UI_FORMAT_REWARD_CASH,
-        // Attribute Amount Format
+        // Format - Attribute Amount
         /// <summary>
         /// Format => {0} = {Attribute Title}, {1} = {Current Amount}, {2} = {Target Amount}
         /// </summary>
@@ -264,12 +278,12 @@ namespace MultiplayerARPG
         /// Format => {0} = {Attribute Title}, {1} = {Target Amount}
         /// </summary>
         UI_FORMAT_ATTRIBUTE_AMOUNT,
-        // Resistance Amount Format
+        // Format - Resistance Amount
         /// <summary>
         /// Format => {0} = {Resistance Title}, {1} = {Target Amount * 100}
         /// </summary>
         UI_FORMAT_RESISTANCE_AMOUNT,
-        // Skill Level Format
+        // Format - Skill Level
         /// <summary>
         /// Format => {0} = {Skill Title}, {1} = {Current Level}, {2} = {Target Level}
         /// </summary>
@@ -282,7 +296,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Skill Title}, {1} = {Target Level}
         /// </summary>
         UI_FORMAT_SKILL_LEVEL,
-        // Item Amount Format
+        // Format - Item Amount
         /// <summary>
         /// Format => {0} = {Item Title}, {1} = {Current Amount}, {2} = {Target Amount}
         /// </summary>
@@ -295,7 +309,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Item Title}, {1} = {Target Amount}
         /// </summary>
         UI_FORMAT_ITEM_AMOUNT,
-        // Damage Format
+        // Format - Damage
         /// <summary>
         /// Format => {0} = {Min Damage}, {1} = {Max Damage}
         /// </summary>
@@ -312,7 +326,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Damage Element Title}, {1} => {Infliction * 100}
         /// </summary>
         UI_FORMAT_DAMAGE_INFLICTION_AS_ELEMENTAL,
-        // Gold Amount Format
+        // Format - Gold Amount
         /// <summary>
         /// Format => {0} = {Current Gold Amount}, {1} = {Target Amount}
         /// </summary>
@@ -321,7 +335,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Current Gold Amount}, {1} = {Target Amount}
         /// </summary>
         UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH,
-        // UI Equipment Set
+        // Format - UI Equipment Set
         /// <summary>
         /// Format => {0} = {Set Title}, {1} = {List Of Effect}
         /// </summary>
@@ -334,7 +348,7 @@ namespace MultiplayerARPG
         /// Format => {0} = {Equip Amount}, {1} = {List Of Bonus}
         /// </summary>
         UI_FORMAT_EQUIPMENT_SET_UNAPPLIED_EFFECT,
-        // UI Equipment Socket
+        // Format - UI Equipment Socket
         /// <summary>
         /// Format => {0} = {Socket Index}, {1} = {Item Title}, {2} = {List Of Bonus}
         /// </summary>
@@ -352,62 +366,110 @@ namespace MultiplayerARPG
         /// Format => {0} = {Refining Level}
         /// </summary>
         UI_FORMAT_REFINING_LEVEL,
-        // Guild Bonus
+        // Format - Guild Bonus
         UI_FORMAT_INCREASE_MAX_MEMBER,
         UI_FORMAT_INCREASE_EXP_GAIN_PERCENTAGE,
         UI_FORMAT_INCREASE_GOLD_GAIN_PERCENTAGE,
         UI_FORMAT_INCREASE_SHARE_EXP_GAIN_PERCENTAGE,
         UI_FORMAT_INCREASE_SHARE_GOLD_GAIN_PERCENTAGE,
         UI_FORMAT_DECREASE_EXP_PENALTY_PERCENTAGE,
-        // Generic Error
-        UI_USER_NOT_FOUND,
-        UI_ITEM_NOT_FOUND,
-        UI_NOT_ENOUGH_GOLD,
-        UI_NOT_ENOUGH_CASH,
-        UI_NOT_LOGGED_IN,
-        UI_INVALID_DATA,
-        UI_INVALID_CHARACTER_DATA,
-        UI_USERNAME_IS_EMPTY,
-        UI_PASSWORD_IS_EMPTY,
-        // UI Login
-        UI_INVALID_USERNAME_OR_PASSWORD,
-        UI_ALREADY_LOGGED_IN,
-        // UI Register
-        UI_INVALID_CONFIRM_PASSWORD,
-        UI_USERNAME_TOO_SHORT,
-        UI_USERNAME_TOO_LONG,
-        UI_PASSWORD_TOO_SHORT,
-        UI_USERNAME_EXISTED,
+        // Format - UI Character Quest
+        /// <summary>
+        /// Format => {0} = {Title}
+        /// </summary>
+        UI_FORMAT_QUEST_TITLE_ON_GOING,
+        /// <summary>
+        /// Format => {0} = {Title}
+        /// </summary>
+        UI_FORMAT_QUEST_TITLE_TASKS_COMPLETE,
+        /// <summary>
+        /// Format => {0} = {Title}
+        /// </summary>
+        UI_FORMAT_QUEST_TITLE_COMPLETE,
+        // Format - UI Quest Task
+        /// <summary>
+        /// Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}
+        /// </summary>
+        UI_FORMAT_QUEST_TASK_KILL_MONSTER,
+        /// <summary>
+        /// Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}
+        /// </summary>
+        UI_FORMAT_QUEST_TASK_COLLECT_ITEM,
+        /// <summary>
+        /// Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}
+        /// </summary>
+        UI_FORMAT_QUEST_TASK_KILL_MONSTER_COMPLETE,
+        /// <summary>
+        /// Format => {0} = {Title}, {1} = {Progress}, {2} = {Amount}
+        /// </summary>
+        UI_FORMAT_QUEST_TASK_COLLECT_ITEM_COMPLETE,
         // UI Chat Message
         /// <summary>
         /// Format => {0} = {Character Name}, {1} = {Message}
         /// </summary>
-        UI_CHAT_FORMAT_LOCAL,
+        UI_FORMAT_CHAT_LOCAL,
         /// <summary>
         /// Format => {0} = {Character Name}, {1} = {Message}
         /// </summary>
-        UI_CHAT_FORMAT_GLOBAL,
+        UI_FORMAT_CHAT_GLOBAL,
         /// <summary>
         /// Format => {0} = {Character Name}, {1} = {Message}
         /// </summary>
-        UI_CHAT_FORMAT_WHISPER,
+        UI_FORMAT_CHAT_WHISPER,
         /// <summary>
         /// Format => {0} = {Character Name}, {1} = {Message}
         /// </summary>
-        UI_CHAT_FORMAT_PARTY,
+        UI_FORMAT_CHAT_PARTY,
         /// <summary>
         /// Format => {0} = {Character Name}, {1} = {Message}
         /// </summary>
-        UI_CHAT_FORMAT_GUILD,
-        // UI Character List
-        UI_NO_CHOSEN_CHARACTER_TO_START,
-        UI_NO_CHOSEN_CHARACTER_TO_DELETE,
-        UI_ALREADY_SELECT_CHARACTER,
-        UI_MAP_SERVER_NOT_READY,
-        // UI Character Create
-        UI_CHARACTER_NAME_TOO_SHORT,
-        UI_CHARACTER_NAME_TOO_LONG,
-        UI_CHARACTER_NAME_EXISTED,
+        UI_FORMAT_CHAT_GUILD,
+        // Error - Generic Error
+        UI_ERROR_KICKED_FROM_SERVER,
+        UI_ERROR_CONNECTION_FAILED,
+        UI_ERROR_CONNECTION_REJECTED,
+        UI_ERROR_REMOTE_CONNECTION_CLOSE,
+        UI_ERROR_INVALID_PROTOCOL,
+        UI_ERROR_HOST_UNREACHABLE,
+        UI_ERROR_CONNECTION_TIMEOUT,
+        UI_ERROR_USER_NOT_FOUND,
+        UI_ERROR_ITEM_NOT_FOUND,
+        UI_ERROR_NOT_ENOUGH_GOLD,
+        UI_ERROR_NOT_ENOUGH_CASH,
+        UI_ERROR_NOT_LOGGED_IN,
+        UI_ERROR_INVALID_DATA,
+        UI_ERROR_INVALID_CHARACTER_DATA,
+        UI_ERROR_USERNAME_IS_EMPTY,
+        UI_ERROR_PASSWORD_IS_EMPTY,
+        // Error - UI Login
+        UI_ERROR_INVALID_USERNAME_OR_PASSWORD,
+        UI_ERROR_ALREADY_LOGGED_IN,
+        // Error - UI Register
+        UI_ERROR_INVALID_CONFIRM_PASSWORD,
+        UI_ERROR_USERNAME_TOO_SHORT,
+        UI_ERROR_USERNAME_TOO_LONG,
+        UI_ERROR_PASSWORD_TOO_SHORT,
+        UI_ERROR_USERNAME_EXISTED,
+        // Error - UI Character List
+        UI_ERROR_NO_CHOSEN_CHARACTER_TO_START,
+        UI_ERROR_NO_CHOSEN_CHARACTER_TO_DELETE,
+        UI_ERROR_ALREADY_SELECT_CHARACTER,
+        UI_ERROR_MAP_SERVER_NOT_READY,
+        // Error - UI Character Create
+        UI_ERROR_CHARACTER_NAME_TOO_SHORT,
+        UI_ERROR_CHARACTER_NAME_TOO_LONG,
+        UI_ERROR_CHARACTER_NAME_EXISTED,
+        // Error - UI Cash Packages
+        UI_ERROR_CANNOT_GET_CASH_PACKAGE_INFO,
+        // Error - UI Cash Shop
+        UI_ERROR_CANNOT_GET_CASH_SHOP_INFO,
+        // Error - UI Guild Role Setting
+        UI_ERROR_GUILD_ROLE_NAME_IS_EMPTY,
+        UI_ERROR_GUILD_ROLE_SHARE_EXP_NOT_NUMBER,
+        // Error - UI Guild Member Role Setting
+        UI_ERROR_INVALID_GUILD_ROLE,
+        // Success - UI Cash Shop
+        UI_SUCCESS_CASH_SHOP_BUY,
         // UI Character Item
         UI_DROP_ITEM,
         UI_DROP_ITEM_DESCRIPTION,
@@ -424,20 +486,6 @@ namespace MultiplayerARPG
         UI_BANK_DEPOSIT_DESCRIPTION,
         UI_BANK_WITHDRAW,
         UI_BANK_WITHDRAW_DESCRIPTION,
-        // UI Cash Packages
-        UI_CANNOT_GET_CASH_PACKAGE_INFO,
-        // UI Cash Shop
-        UI_CANNOT_GET_CASH_SHOP_INFO,
-        UI_CASH_SHOP_BUY_SUCCESS,
-        // UI Character Quest
-        UI_FORMAT_QUEST_TITLE_ON_GOING,
-        UI_FORMAT_QUEST_TITLE_TASKS_COMPLETE,
-        UI_FORMAT_QUEST_TITLE_COMPLETE,
-        // UI Quest Task
-        UI_FORMAT_QUEST_TASK_KILL_MONSTER,
-        UI_FORMAT_QUEST_TASK_COLLECT_ITEM,
-        UI_FORMAT_QUEST_TASK_KILL_MONSTER_COMPLETE,
-        UI_FORMAT_QUEST_TASK_COLLECT_ITEM_COMPLETE,
         // UI Dealing
         UI_OFFER_GOLD,
         UI_OFFER_GOLD_DESCRIPTION,
@@ -463,19 +511,6 @@ namespace MultiplayerARPG
         UI_GUILD_ROLE_CANNOT_INVITE,
         UI_GUILD_ROLE_CAN_KICK,
         UI_GUILD_ROLE_CANNOT_KICK,
-        // UI Guild Role Setting
-        UI_GUILD_ROLE_NAME_IS_EMPTY,
-        UI_GUILD_ROLE_SHARE_EXP_NOT_NUMBER,
-        // UI Guild Member Role Setting
-        UI_INVALID_GUILD_ROLE,
-        // UI Scene Global
-        UI_KICKED_FROM_SERVER,
-        UI_CONNECTION_FAILED,
-        UI_CONNECTION_REJECTED,
-        UI_REMOTE_CONNECTION_CLOSE,
-        UI_INVALID_PROTOCOL,
-        UI_HOST_UNREACHABLE,
-        UI_CONNECTION_TIMEOUT,
     }
 
     public static class DefaultLocale
@@ -538,12 +573,14 @@ namespace MultiplayerARPG
             // UI Generic Title
             Texts.Add(UILocaleKeys.UI_LABEL_DISCONNECTED.ToString(), "Disconnected");
             Texts.Add(UILocaleKeys.UI_LABEL_SUCCESS.ToString(), "Success");
-            Texts.Add(UILocaleKeys.UI_LABEL_WARNING.ToString(), "Warning");
             Texts.Add(UILocaleKeys.UI_LABEL_ERROR.ToString(), "Error");
             Texts.Add(UILocaleKeys.UI_LABEL_NONE.ToString(), "None");
-            // Generic Format
+            // Format - Generic
             Texts.Add(UILocaleKeys.UI_FORMAT_SIMPLE.ToString(), "{0}");
-            Texts.Add(UILocaleKeys.UI_FORMAT_LEVEL.ToString(), "Lv.: {0}");
+            Texts.Add(UILocaleKeys.UI_FORMAT_SIMPLE_PERCENTAGE.ToString(), "{0}%");
+            Texts.Add(UILocaleKeys.UI_FORMAT_SIMPLE_MIN_TO_MAX.ToString(), "{0}~{1}");
+            Texts.Add(UILocaleKeys.UI_FORMAT_SIMPLE_MIN_BY_MAX.ToString(), "{0}/{1}");
+            Texts.Add(UILocaleKeys.UI_FORMAT_LEVEL.ToString(), "Lv: {0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_CURRENT_EXP.ToString(), "Exp: {0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_STAT_POINTS.ToString(), "Stat Points: {0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_SKILL_POINTS.ToString(), "Skill Points: {0}");
@@ -579,17 +616,20 @@ namespace MultiplayerARPG
             Texts.Add(UILocaleKeys.UI_FORMAT_REQUIRE_CLASS.ToString(), "Require Class: {0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_AVAILABLE_WEAPONS.ToString(), "Available Weapons: {0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_CONSUME_MP.ToString(), "Consume Mp: {0}");
+            // Format - Skill
             Texts.Add(UILocaleKeys.UI_FORMAT_SKILL_COOLDOWN_DURATION.ToString(), "Cooldown: {0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_SKILL_TYPE.ToString(), "Skill Type: {0}");
             Texts.Add(UILocaleKeys.UI_SKILL_TYPE_ACTIVE.ToString(), "Active");
             Texts.Add(UILocaleKeys.UI_SKILL_TYPE_PASSIVE.ToString(), "Passive");
             Texts.Add(UILocaleKeys.UI_SKILL_TYPE_CRAFT_ITEM.ToString(), "Craft Item");
+            // Format - Buff
             Texts.Add(UILocaleKeys.UI_FORMAT_BUFF_DURATION.ToString(), "Duration: {0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_HP.ToString(), "Recovery Hp: {0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_MP.ToString(), "Recovery Mp: {0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_STAMINA.ToString(), "Recovery Stamina: {0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_FOOD.ToString(), "Recovery Food: {0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_WATER.ToString(), "Recovery Water: {0}");
+            // Format - Item
             Texts.Add(UILocaleKeys.UI_FORMAT_ITEM_REFINE_LEVEL.ToString(), "+{0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_ITEM_TITLE_WITH_REFINE_LEVEL.ToString(), "{0} +{1}");
             Texts.Add(UILocaleKeys.UI_FORMAT_ITEM_TYPE.ToString(), "Item Type: {0}");
@@ -603,6 +643,7 @@ namespace MultiplayerARPG
             Texts.Add(UILocaleKeys.UI_FORMAT_ITEM_RARITY.ToString(), "Rarity: {0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_ITEM_STACK.ToString(), "{0}/{1}");
             Texts.Add(UILocaleKeys.UI_FORMAT_ITEM_DURABILITY.ToString(), "Durability: {0}");
+            // Format - Social
             Texts.Add(UILocaleKeys.UI_FORMAT_SOCIAL_LEADER.ToString(), "Leader: {0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_SOCIAL_MEMBER_AMOUNT.ToString(), "Member: {0}/{1}");
             Texts.Add(UILocaleKeys.UI_FORMAT_SOCIAL_MEMBER_AMOUNT_NO_LIMIT.ToString(), "Member: {0}");
@@ -610,78 +651,105 @@ namespace MultiplayerARPG
             Texts.Add(UILocaleKeys.UI_FORMAT_REWARD_EXP.ToString(), "Reward Exp: {0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_REWARD_GOLD.ToString(), "Reward Gold: {0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_REWARD_CASH.ToString(), "Reward Cash: {0}");
-            // Attribute Amount Format
+            // Format - Attribute Amount
             Texts.Add(UILocaleKeys.UI_FORMAT_CURRENT_ATTRIBUTE.ToString(), "{0}: {1}/{2}");
             Texts.Add(UILocaleKeys.UI_FORMAT_CURRENT_ATTRIBUTE_NOT_ENOUGH.ToString(), "{0}: <color=red>{1}/{2}</color>");
             Texts.Add(UILocaleKeys.UI_FORMAT_ATTRIBUTE_AMOUNT.ToString(), "{0}: {1}");
-            // Resistance Amount Format
+            // Format - Resistance Amount
             Texts.Add(UILocaleKeys.UI_FORMAT_RESISTANCE_AMOUNT.ToString(), "{0}: {1}");
-            // Skill Level Format
+            // Format - Skill Level
             Texts.Add(UILocaleKeys.UI_FORMAT_CURRENT_SKILL.ToString(), "{0}: {1}/{2}");
             Texts.Add(UILocaleKeys.UI_FORMAT_CURRENT_SKILL_NOT_ENOUGH.ToString(), "{0}: <color=red>{1}/{2}</color>");
             Texts.Add(UILocaleKeys.UI_FORMAT_SKILL_LEVEL.ToString(), "{0}: {1}");
-            // Item Amount Format
+            // Format - Item Amount
             Texts.Add(UILocaleKeys.UI_FORMAT_CURRENT_ITEM.ToString(), "{0}: {1}/{2}");
             Texts.Add(UILocaleKeys.UI_FORMAT_CURRENT_ITEM_NOT_ENOUGH.ToString(), "{0}: <color=red>{1}/{2}</color>");
             Texts.Add(UILocaleKeys.UI_FORMAT_ITEM_AMOUNT.ToString(), "{0}: {1}");
-            // Damage Format
+            // Format - Damage
             Texts.Add(UILocaleKeys.UI_FORMAT_DAMAGE_AMOUNT.ToString(), "{0}~{1}");
             Texts.Add(UILocaleKeys.UI_FORMAT_DAMAGE_WITH_ELEMENTAL.ToString(), "{0}: {1}~{2}");
             Texts.Add(UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION.ToString(), "Inflict {0}% damage");
             Texts.Add(UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION_AS_ELEMENTAL.ToString(), "Inflict {1}% as {0} damage");
-            // Gold Amount Format
+            // Format - Gold Amount
             Texts.Add(UILocaleKeys.UI_FORMAT_REQUIRE_GOLD.ToString(), "Gold: {0}/{1}");
             Texts.Add(UILocaleKeys.UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH.ToString(), "Gold: <color=red>{0}/{1}</color>");
-            // UI Equipment Set
+            // Format - UI Equipment Set
             Texts.Add(UILocaleKeys.UI_FORMAT_EQUIPMENT_SET.ToString(), "<color=#ffa500ff>{0}</color>\n{1}");
             Texts.Add(UILocaleKeys.UI_FORMAT_EQUIPMENT_SET_APPLIED_EFFECT.ToString(), "<color=#ffa500ff>({0}) {1}</color>");
             Texts.Add(UILocaleKeys.UI_FORMAT_EQUIPMENT_SET_UNAPPLIED_EFFECT.ToString(), "({0}) {1}");
-            // UI Equipment Socket
+            // Format - UI Equipment Socket
             Texts.Add(UILocaleKeys.UI_FORMAT_EQUIPMENT_SOCKET_FILLED.ToString(), "<color=#800080ff>({0}) - {1}\n{2}</color>");
             Texts.Add(UILocaleKeys.UI_FORMAT_EQUIPMENT_SOCKET_EMPTY.ToString(), "<color=#800080ff>({0}) - Empty</color>");
-            // Refine Item
+            // Format - Refine Item
             Texts.Add(UILocaleKeys.UI_FORMAT_REFINE_SUCCESS_RATE.ToString(), "Success Rate: {0}%");
             Texts.Add(UILocaleKeys.UI_FORMAT_REFINING_LEVEL.ToString(), "Refining Level: +{0}");
-            // Guild Bonus
+            // Format - Guild Bonus
             Texts.Add(UILocaleKeys.UI_FORMAT_INCREASE_MAX_MEMBER.ToString(), "Max Member +{0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_INCREASE_EXP_GAIN_PERCENTAGE.ToString(), "Exp Gain +{0}%");
             Texts.Add(UILocaleKeys.UI_FORMAT_INCREASE_GOLD_GAIN_PERCENTAGE.ToString(), "Gold Gain +{0}%");
             Texts.Add(UILocaleKeys.UI_FORMAT_INCREASE_SHARE_EXP_GAIN_PERCENTAGE.ToString(), "Party Share Exp +{0}%");
             Texts.Add(UILocaleKeys.UI_FORMAT_INCREASE_SHARE_GOLD_GAIN_PERCENTAGE.ToString(), "Party Share Gold +{0}%");
             Texts.Add(UILocaleKeys.UI_FORMAT_DECREASE_EXP_PENALTY_PERCENTAGE.ToString(), "Exp Penalty -{0}%");
-            // Generic Error
-            Texts.Add(UILocaleKeys.UI_USER_NOT_FOUND.ToString(), "User not found");
-            Texts.Add(UILocaleKeys.UI_ITEM_NOT_FOUND.ToString(), "Item not found");
-            Texts.Add(UILocaleKeys.UI_NOT_ENOUGH_GOLD.ToString(), "Not enough gold");
-            Texts.Add(UILocaleKeys.UI_NOT_ENOUGH_CASH.ToString(), "Not enough cash");
-            Texts.Add(UILocaleKeys.UI_INVALID_DATA.ToString(), "Invalid data");
-            Texts.Add(UILocaleKeys.UI_INVALID_CHARACTER_DATA.ToString(), "Invalid character data");
-            Texts.Add(UILocaleKeys.UI_USERNAME_IS_EMPTY.ToString(), "Username is empty");
-            Texts.Add(UILocaleKeys.UI_PASSWORD_IS_EMPTY.ToString(), "Password is empty");
-            // UI Login
-            Texts.Add(UILocaleKeys.UI_INVALID_USERNAME_OR_PASSWORD.ToString(), "Invalid username or password");
-            Texts.Add(UILocaleKeys.UI_ALREADY_LOGGED_IN.ToString(), "User already logged in");
-            // UI Register
-            Texts.Add(UILocaleKeys.UI_INVALID_CONFIRM_PASSWORD.ToString(), "Invalid confirm password");
-            Texts.Add(UILocaleKeys.UI_USERNAME_TOO_SHORT.ToString(), "Username is too short");
-            Texts.Add(UILocaleKeys.UI_USERNAME_TOO_LONG.ToString(), "Username is too long");
-            Texts.Add(UILocaleKeys.UI_PASSWORD_TOO_SHORT.ToString(), "Password is too short");
-            Texts.Add(UILocaleKeys.UI_USERNAME_EXISTED.ToString(), "Username is already existed");
-            // UI Chat Message
-            Texts.Add(UILocaleKeys.UI_CHAT_FORMAT_LOCAL.ToString(), "<color=white>(LOCAL) {0}: {1}</color>");
-            Texts.Add(UILocaleKeys.UI_CHAT_FORMAT_GLOBAL.ToString(), "<color=white>(GLOBAL) {0}: {1}</color>");
-            Texts.Add(UILocaleKeys.UI_CHAT_FORMAT_WHISPER.ToString(), "<color=green>(WHISPER) {0}: {1}</color>");
-            Texts.Add(UILocaleKeys.UI_CHAT_FORMAT_PARTY.ToString(), "<color=cyan>(PARTY) {0}: {1}</color>");
-            Texts.Add(UILocaleKeys.UI_CHAT_FORMAT_GUILD.ToString(), "<color=blue>(GUILD) {0}: {1}</color>");
-            // UI Character List
-            Texts.Add(UILocaleKeys.UI_NO_CHOSEN_CHARACTER_TO_START.ToString(), "Please choose character to start game");
-            Texts.Add(UILocaleKeys.UI_NO_CHOSEN_CHARACTER_TO_DELETE.ToString(), "Please choose character to delete");
-            Texts.Add(UILocaleKeys.UI_ALREADY_SELECT_CHARACTER.ToString(), "Already select character");
-            Texts.Add(UILocaleKeys.UI_MAP_SERVER_NOT_READY.ToString(), "Map server is not ready");
-            // UI Character Create
-            Texts.Add(UILocaleKeys.UI_CHARACTER_NAME_TOO_SHORT.ToString(), "Character name is too short");
-            Texts.Add(UILocaleKeys.UI_CHARACTER_NAME_TOO_LONG.ToString(), "Character name is too long");
-            Texts.Add(UILocaleKeys.UI_CHARACTER_NAME_EXISTED.ToString(), "Character name is already existed");
+            // Format - UI Character Quest
+            Texts.Add(UILocaleKeys.UI_FORMAT_QUEST_TITLE_ON_GOING.ToString(), "{0} (Ongoing)");
+            Texts.Add(UILocaleKeys.UI_FORMAT_QUEST_TITLE_TASKS_COMPLETE.ToString(), "{0} (Task Completed)");
+            Texts.Add(UILocaleKeys.UI_FORMAT_QUEST_TITLE_COMPLETE.ToString(), "{0} (Completed)");
+            // Format - UI Quest Task
+            Texts.Add(UILocaleKeys.UI_FORMAT_QUEST_TASK_KILL_MONSTER.ToString(), "Kills {0}: {1}/{2}");
+            Texts.Add(UILocaleKeys.UI_FORMAT_QUEST_TASK_COLLECT_ITEM.ToString(), "Collects {0}: {1}/{2}");
+            Texts.Add(UILocaleKeys.UI_FORMAT_QUEST_TASK_KILL_MONSTER_COMPLETE.ToString(), "Kills {0}: Complete");
+            Texts.Add(UILocaleKeys.UI_FORMAT_QUEST_TASK_COLLECT_ITEM_COMPLETE.ToString(), "Collects {0}: Complete");
+            // Format - UI Chat Message
+            Texts.Add(UILocaleKeys.UI_FORMAT_CHAT_LOCAL.ToString(), "<color=white>(LOCAL) {0}: {1}</color>");
+            Texts.Add(UILocaleKeys.UI_FORMAT_CHAT_GLOBAL.ToString(), "<color=white>(GLOBAL) {0}: {1}</color>");
+            Texts.Add(UILocaleKeys.UI_FORMAT_CHAT_WHISPER.ToString(), "<color=green>(WHISPER) {0}: {1}</color>");
+            Texts.Add(UILocaleKeys.UI_FORMAT_CHAT_PARTY.ToString(), "<color=cyan>(PARTY) {0}: {1}</color>");
+            Texts.Add(UILocaleKeys.UI_FORMAT_CHAT_GUILD.ToString(), "<color=blue>(GUILD) {0}: {1}</color>");
+            // Error - Generic Error
+            Texts.Add(UILocaleKeys.UI_ERROR_KICKED_FROM_SERVER.ToString(), "You have been kicked from server");
+            Texts.Add(UILocaleKeys.UI_ERROR_CONNECTION_FAILED.ToString(), "Cannot connect to the server");
+            Texts.Add(UILocaleKeys.UI_ERROR_CONNECTION_REJECTED.ToString(), "Connection rejected by server");
+            Texts.Add(UILocaleKeys.UI_ERROR_REMOTE_CONNECTION_CLOSE.ToString(), "Server has been closed");
+            Texts.Add(UILocaleKeys.UI_ERROR_INVALID_PROTOCOL.ToString(), "Invalid protocol");
+            Texts.Add(UILocaleKeys.UI_ERROR_HOST_UNREACHABLE.ToString(), "Host unreachable");
+            Texts.Add(UILocaleKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString(), "Connection timeout");
+            Texts.Add(UILocaleKeys.UI_ERROR_USER_NOT_FOUND.ToString(), "User not found");
+            Texts.Add(UILocaleKeys.UI_ERROR_ITEM_NOT_FOUND.ToString(), "Item not found");
+            Texts.Add(UILocaleKeys.UI_ERROR_NOT_ENOUGH_GOLD.ToString(), "Not enough gold");
+            Texts.Add(UILocaleKeys.UI_ERROR_NOT_ENOUGH_CASH.ToString(), "Not enough cash");
+            Texts.Add(UILocaleKeys.UI_ERROR_INVALID_DATA.ToString(), "Invalid data");
+            Texts.Add(UILocaleKeys.UI_ERROR_INVALID_CHARACTER_DATA.ToString(), "Invalid character data");
+            Texts.Add(UILocaleKeys.UI_ERROR_USERNAME_IS_EMPTY.ToString(), "Username is empty");
+            Texts.Add(UILocaleKeys.UI_ERROR_PASSWORD_IS_EMPTY.ToString(), "Password is empty");
+            // Error - UI Login
+            Texts.Add(UILocaleKeys.UI_ERROR_INVALID_USERNAME_OR_PASSWORD.ToString(), "Invalid username or password");
+            Texts.Add(UILocaleKeys.UI_ERROR_ALREADY_LOGGED_IN.ToString(), "User already logged in");
+            // Error - UI Register
+            Texts.Add(UILocaleKeys.UI_ERROR_INVALID_CONFIRM_PASSWORD.ToString(), "Invalid confirm password");
+            Texts.Add(UILocaleKeys.UI_ERROR_USERNAME_TOO_SHORT.ToString(), "Username is too short");
+            Texts.Add(UILocaleKeys.UI_ERROR_USERNAME_TOO_LONG.ToString(), "Username is too long");
+            Texts.Add(UILocaleKeys.UI_ERROR_PASSWORD_TOO_SHORT.ToString(), "Password is too short");
+            Texts.Add(UILocaleKeys.UI_ERROR_USERNAME_EXISTED.ToString(), "Username is already existed");
+            // Error - UI Character List
+            Texts.Add(UILocaleKeys.UI_ERROR_NO_CHOSEN_CHARACTER_TO_START.ToString(), "Please choose character to start game");
+            Texts.Add(UILocaleKeys.UI_ERROR_NO_CHOSEN_CHARACTER_TO_DELETE.ToString(), "Please choose character to delete");
+            Texts.Add(UILocaleKeys.UI_ERROR_ALREADY_SELECT_CHARACTER.ToString(), "Already select character");
+            Texts.Add(UILocaleKeys.UI_ERROR_MAP_SERVER_NOT_READY.ToString(), "Map server is not ready");
+            // Error - UI Character Create
+            Texts.Add(UILocaleKeys.UI_ERROR_CHARACTER_NAME_TOO_SHORT.ToString(), "Character name is too short");
+            Texts.Add(UILocaleKeys.UI_ERROR_CHARACTER_NAME_TOO_LONG.ToString(), "Character name is too long");
+            Texts.Add(UILocaleKeys.UI_ERROR_CHARACTER_NAME_EXISTED.ToString(), "Character name is already existed");
+            // Error - UI Cash Packages
+            Texts.Add(UILocaleKeys.UI_ERROR_CANNOT_GET_CASH_PACKAGE_INFO.ToString(), "Cannot retrieve cash package info");
+            // Error - UI Cash Shop
+            Texts.Add(UILocaleKeys.UI_ERROR_CANNOT_GET_CASH_SHOP_INFO.ToString(), "Cannot retrieve cash shop info");
+            // Error - UI Guild Role Setting
+            Texts.Add(UILocaleKeys.UI_ERROR_GUILD_ROLE_NAME_IS_EMPTY.ToString(), "Role name must not empty");
+            Texts.Add(UILocaleKeys.UI_ERROR_GUILD_ROLE_SHARE_EXP_NOT_NUMBER.ToString(), "Share exp percentage must be number");
+            // Error - UI Guild Member Role Setting
+            Texts.Add(UILocaleKeys.UI_ERROR_INVALID_GUILD_ROLE.ToString(), "Invalid role");
+            // Success - UI Cash Shop
+            Texts.Add(UILocaleKeys.UI_SUCCESS_CASH_SHOP_BUY.ToString(), "Success, let's check your inventory");
             // UI Character Item
             Texts.Add(UILocaleKeys.UI_DROP_ITEM.ToString(), "Drop Item");
             Texts.Add(UILocaleKeys.UI_DROP_ITEM_DESCRIPTION.ToString(), "Enter amount of item");
@@ -698,20 +766,6 @@ namespace MultiplayerARPG
             Texts.Add(UILocaleKeys.UI_BANK_DEPOSIT_DESCRIPTION.ToString(), "Enter amount of gold");
             Texts.Add(UILocaleKeys.UI_BANK_WITHDRAW.ToString(), "Withdraw");
             Texts.Add(UILocaleKeys.UI_BANK_WITHDRAW_DESCRIPTION.ToString(), "Enter amount of gold");
-            // UI Cash Packages
-            Texts.Add(UILocaleKeys.UI_CANNOT_GET_CASH_PACKAGE_INFO.ToString(), "Cannot retrieve cash package info");
-            // UI Cash Shop
-            Texts.Add(UILocaleKeys.UI_CANNOT_GET_CASH_SHOP_INFO.ToString(), "Cannot retrieve cash shop info");
-            Texts.Add(UILocaleKeys.UI_CASH_SHOP_BUY_SUCCESS.ToString(), "Success, let's check your inventory");
-            // UI Character Quest
-            Texts.Add(UILocaleKeys.UI_FORMAT_QUEST_TITLE_ON_GOING.ToString(), "{0} (Ongoing)");
-            Texts.Add(UILocaleKeys.UI_FORMAT_QUEST_TITLE_TASKS_COMPLETE.ToString(), "{0} (Task Completed)");
-            Texts.Add(UILocaleKeys.UI_FORMAT_QUEST_TITLE_COMPLETE.ToString(), "{0} (Completed)");
-            // UI Quest Task
-            Texts.Add(UILocaleKeys.UI_FORMAT_QUEST_TASK_KILL_MONSTER.ToString(), "Kills {0}: {1}/{2}");
-            Texts.Add(UILocaleKeys.UI_FORMAT_QUEST_TASK_COLLECT_ITEM.ToString(), "Collects {0}: {1}/{2}");
-            Texts.Add(UILocaleKeys.UI_FORMAT_QUEST_TASK_KILL_MONSTER_COMPLETE.ToString(), "Kills {0}: Complete");
-            Texts.Add(UILocaleKeys.UI_FORMAT_QUEST_TASK_COLLECT_ITEM_COMPLETE.ToString(), "Collects {0}: Complete");
             // UI Dealing
             Texts.Add(UILocaleKeys.UI_OFFER_GOLD.ToString(), "Offer Gold");
             Texts.Add(UILocaleKeys.UI_OFFER_GOLD_DESCRIPTION.ToString(), "Enter amount of gold");
@@ -737,19 +791,6 @@ namespace MultiplayerARPG
             Texts.Add(UILocaleKeys.UI_GUILD_ROLE_CANNOT_INVITE.ToString(), "Cannot invite");
             Texts.Add(UILocaleKeys.UI_GUILD_ROLE_CAN_KICK.ToString(), "Can kick");
             Texts.Add(UILocaleKeys.UI_GUILD_ROLE_CANNOT_KICK.ToString(), "Cannot kick");
-            // UI Guild Role Setting
-            Texts.Add(UILocaleKeys.UI_GUILD_ROLE_NAME_IS_EMPTY.ToString(), "Role name must not empty");
-            Texts.Add(UILocaleKeys.UI_GUILD_ROLE_SHARE_EXP_NOT_NUMBER.ToString(), "Share exp percentage must be number");
-            // UI Guild Member Role Setting
-            Texts.Add(UILocaleKeys.UI_INVALID_GUILD_ROLE.ToString(), "Invalid role");
-            // UI Scene Global
-            Texts.Add(UILocaleKeys.UI_KICKED_FROM_SERVER.ToString(), "You have been kicked from server");
-            Texts.Add(UILocaleKeys.UI_CONNECTION_FAILED.ToString(), "Cannot connect to the server");
-            Texts.Add(UILocaleKeys.UI_CONNECTION_REJECTED.ToString(), "Connection rejected by server");
-            Texts.Add(UILocaleKeys.UI_REMOTE_CONNECTION_CLOSE.ToString(), "Server has been closed");
-            Texts.Add(UILocaleKeys.UI_INVALID_PROTOCOL.ToString(), "Invalid protocol");
-            Texts.Add(UILocaleKeys.UI_HOST_UNREACHABLE.ToString(), "Host unreachable");
-            Texts.Add(UILocaleKeys.UI_CONNECTION_TIMEOUT.ToString(), "Connection timeout");
         }
     }
 

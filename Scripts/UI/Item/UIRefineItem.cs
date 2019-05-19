@@ -13,13 +13,13 @@ namespace MultiplayerARPG
         
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
-        public string formatKeyRequireGold = UILocaleKeys.UI_FORMAT_REQUIRE_GOLD.ToString();
+        public UILocaleKeySetting formatKeyRequireGold = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_REQUIRE_GOLD);
         [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
-        public string formatKeyRequireGoldNotEnough = UILocaleKeys.UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH.ToString();
+        public UILocaleKeySetting formatKeyRequireGoldNotEnough = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH);
         [Tooltip("Format => {0} = {Rate * 100}")]
-        public string formatKeySuccessRate = UILocaleKeys.UI_FORMAT_REFINE_SUCCESS_RATE.ToString();
+        public UILocaleKeySetting formatKeySuccessRate = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_REFINE_SUCCESS_RATE);
         [Tooltip("Format => {0} = {Refining Level}")]
-        public string formatKeyRefiningLevel = UILocaleKeys.UI_FORMAT_REFINING_LEVEL.ToString();
+        public UILocaleKeySetting formatKeyRefiningLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_REFINING_LEVEL);
 
         [Header("UI Elements for UI Refine Item")]
         // TODO: This is deprecated

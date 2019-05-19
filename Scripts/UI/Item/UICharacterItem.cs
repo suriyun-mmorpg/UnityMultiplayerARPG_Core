@@ -23,31 +23,31 @@ namespace MultiplayerARPG
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
-        public string formatKeyTitle = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        public UILocaleKeySetting formatKeyTitle = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Description}")]
-        public string formatKeyDescription = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        public UILocaleKeySetting formatKeyDescription = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Rarity Title}")]
-        public string formatKeyRarityTitle = UILocaleKeys.UI_FORMAT_ITEM_RARITY.ToString();
+        public UILocaleKeySetting formatKeyRarityTitle = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_ITEM_RARITY);
         [Tooltip("Format => {0} = {Level}")]
-        public string formatKeyLevel = UILocaleKeys.UI_FORMAT_LEVEL.ToString();
+        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_LEVEL);
         [Tooltip("Format => {0} = {Refine Level}")]
-        public string formatKeyRefineLevel = UILocaleKeys.UI_FORMAT_ITEM_REFINE_LEVEL.ToString();
+        public UILocaleKeySetting formatKeyRefineLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_ITEM_REFINE_LEVEL);
         [Tooltip("Format => {0} = {Refine Level}")]
-        public string formatKeyTitleWithRefineLevel = UILocaleKeys.UI_FORMAT_ITEM_TITLE_WITH_REFINE_LEVEL.ToString();
+        public UILocaleKeySetting formatKeyTitleWithRefineLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_ITEM_TITLE_WITH_REFINE_LEVEL);
         [Tooltip("Format => {0} = {Sell Price}")]
-        public string formatKeySellPrice = UILocaleKeys.UI_FORMAT_SELL_PRICE.ToString();
+        public UILocaleKeySetting formatKeySellPrice = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SELL_PRICE);
         [Tooltip("Format => {0} = {Amount}, {1} = {Max Stack}")]
-        public string formatKeyStack = UILocaleKeys.UI_FORMAT_ITEM_STACK.ToString();
+        public UILocaleKeySetting formatKeyStack = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_ITEM_STACK);
         [Tooltip("Format => {0} = {Durability}, {1} = {Max Durability}")]
-        public string formatKeyDurability = UILocaleKeys.UI_FORMAT_ITEM_DURABILITY.ToString();
+        public UILocaleKeySetting formatKeyDurability = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_ITEM_DURABILITY);
         [Tooltip("Format => {0} = {Weight}")]
-        public string formatKeyWeight = UILocaleKeys.UI_FORMAT_WEIGHT.ToString();
+        public UILocaleKeySetting formatKeyWeight = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_WEIGHT);
         [Tooltip("Format => {0} = {Current Exp}, {1} = {Max Exp}")]
-        public string formatKeyExp = UILocaleKeys.UI_FORMAT_CURRENT_EXP.ToString();
+        public UILocaleKeySetting formatKeyExp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_EXP);
         [Tooltip("Format => {0} = {Lock Remains Duration}")]
-        public string formatKeyLockRemainsDuration = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        public UILocaleKeySetting formatKeyLockRemainsDuration = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Item Type Title}")]
-        public string formatKeyItemType = UILocaleKeys.UI_FORMAT_ITEM_TYPE.ToString();
+        public UILocaleKeySetting formatKeyItemType = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_ITEM_TYPE);
 
         [Header("UI Elements")]
         public TextWrapper uiTextTitle;

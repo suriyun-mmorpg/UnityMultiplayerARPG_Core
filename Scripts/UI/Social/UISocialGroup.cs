@@ -18,9 +18,9 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Current Amount}, {1} = {Max Amount}")]
-        public string formatKeyMemberAmount = UILocaleKeys.UI_FORMAT_SOCIAL_MEMBER_AMOUNT.ToString();
+        public UILocaleKeySetting formatKeyMemberAmount = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SOCIAL_MEMBER_AMOUNT);
         [Tooltip("Format => {0} = {Current Amount}")]
-        public string formatKeyMemberAmountNoLimit = UILocaleKeys.UI_FORMAT_SOCIAL_MEMBER_AMOUNT_NO_LIMIT.ToString();
+        public UILocaleKeySetting formatKeyMemberAmountNoLimit = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SOCIAL_MEMBER_AMOUNT_NO_LIMIT);
 
         [Header("UI Elements")]
         public T uiMemberDialog;

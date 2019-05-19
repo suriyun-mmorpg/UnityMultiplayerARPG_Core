@@ -8,9 +8,9 @@ namespace MultiplayerARPG
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Socket Index}, {1} = {Item Title}, {2} = {List Of Bonus}")]
         [Multiline]
-        public string formatKeySocketFilled = UILocaleKeys.UI_FORMAT_EQUIPMENT_SOCKET_FILLED.ToString();
+        public UILocaleKeySetting formatKeySocketFilled = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_EQUIPMENT_SOCKET_FILLED);
         [Tooltip("Format => {0} = {Socket Index}")]
-        public string formatKeySocketEmpty = UILocaleKeys.UI_FORMAT_EQUIPMENT_SOCKET_EMPTY.ToString();
+        public UILocaleKeySetting formatKeySocketEmpty = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_EQUIPMENT_SOCKET_EMPTY);
 
         protected override void UpdateData()
         {

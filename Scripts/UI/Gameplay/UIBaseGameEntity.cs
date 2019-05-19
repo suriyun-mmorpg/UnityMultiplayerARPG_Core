@@ -15,9 +15,9 @@ namespace MultiplayerARPG
 
         [Header("Base Game Entity - String Formats")]
         [Tooltip("Format => {0} = {Title}")]
-        public string formatKeyTitle = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        public UILocaleKeySetting formatKeyTitle = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {TitleB}")]
-        public string formatKeyTitleB = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        public UILocaleKeySetting formatKeyTitleB = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
 
         [Header("Base Game Entity - UI Elements")]
         public TextWrapper uiTextTitle;

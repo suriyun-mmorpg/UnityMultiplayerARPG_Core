@@ -7,17 +7,17 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Guild Name}")]
-        public string formatKeyGuildName = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        public UILocaleKeySetting formatKeyGuildName = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Leader Name}")]
-        public string formatKeyLeaderName = UILocaleKeys.UI_FORMAT_SOCIAL_LEADER.ToString();
+        public UILocaleKeySetting formatKeyLeaderName = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SOCIAL_LEADER);
         [Tooltip("Format => {0} = {Level}")]
-        public string formatKeyLevel = UILocaleKeys.UI_FORMAT_LEVEL.ToString();
+        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_LEVEL);
         [Tooltip("Format => {0} = {Current Exp}, {1} = {Max Exp}")]
-        public string formatKeyExp = UILocaleKeys.UI_FORMAT_CURRENT_EXP.ToString();
+        public UILocaleKeySetting formatKeyExp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_EXP);
         [Tooltip("Format => {0} = {Skill Point}")]
-        public string formatKeySkillPoint = UILocaleKeys.UI_FORMAT_SKILL_POINTS.ToString();
+        public UILocaleKeySetting formatKeySkillPoint = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SKILL_POINTS);
         [Tooltip("Format => {0} = {Message}")]
-        public string formatKeyMessage = UILocaleKeys.UI_FORMAT_SOCIAL_LEADER.ToString();
+        public UILocaleKeySetting formatKeyMessage = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SOCIAL_LEADER);
 
         [Header("UI Elements")]
         public UIGuildRole uiRoleDialog;

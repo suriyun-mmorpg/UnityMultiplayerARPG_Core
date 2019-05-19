@@ -9,18 +9,18 @@ namespace MultiplayerARPG
         public short Level { get { return Data.targetLevel; } }
         
         [Header("String Formats")]
-        [Tooltip("Format => {0} = {Duration}")]
-        public string formatKeyDuration = UILocaleKeys.UI_FORMAT_BUFF_DURATION.ToString();
-        [Tooltip("Format => {0} = {Recovery Amount}")]
-        public string formatKeyRecoveryHp = UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_HP.ToString();
-        [Tooltip("Format => {0} = {Recovery Amount}")]
-        public string formatKeyRecoveryMp = UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_MP.ToString();
-        [Tooltip("Format => {0} = {Recovery Amount}")]
-        public string formatKeyRecoveryStamina = UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_STAMINA.ToString();
-        [Tooltip("Format => {0} = {Recovery Amount}")]
-        public string formatKeyRecoveryFood = UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_FOOD.ToString();
-        [Tooltip("Format => {0} = {Recovery Amount}")]
-        public string formatKeyRecoveryWater = UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_WATER.ToString();
+        [Tooltip("Format => {0} = {Buff Duration}")]
+        public UILocaleKeySetting formatKeyDuration = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_BUFF_DURATION);
+        [Tooltip("Format => {0} = {Buff Recovery Hp}")]
+        public UILocaleKeySetting formatKeyRecoveryHp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_HP);
+        [Tooltip("Format => {0} = {Buff Recovery Mp}")]
+        public UILocaleKeySetting formatKeyRecoveryMp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_MP);
+        [Tooltip("Format => {0} = {Buff Recovery Stamina}")]
+        public UILocaleKeySetting formatKeyRecoveryStamina = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_STAMINA);
+        [Tooltip("Format => {0} = {Buff Recovery Food}")]
+        public UILocaleKeySetting formatKeyRecoveryFood = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_FOOD);
+        [Tooltip("Format => {0} = {Buff Recovery Water}")]
+        public UILocaleKeySetting formatKeyRecoveryWater = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_BUFF_RECOVERY_WATER);
 
         [Header("UI Elements")]
         public TextWrapper uiTextDuration;

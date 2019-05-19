@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Guild Name}")]
-        public string formatKeyGuildName = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        public UILocaleKeySetting formatKeyGuildName = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
 
         public UICharacter uiAnotherCharacter;
         public TextWrapper uiTextGuildName;

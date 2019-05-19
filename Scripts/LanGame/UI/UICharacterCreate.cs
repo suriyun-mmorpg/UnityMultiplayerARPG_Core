@@ -257,13 +257,13 @@ namespace MultiplayerARPG
             int maxCharacterNameLength = gameInstance.maxCharacterNameLength;
             if (characterName.Length < minCharacterNameLength)
             {
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_CHARACTER_NAME_TOO_SHORT.ToString()));
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_CHARACTER_NAME_TOO_SHORT.ToString()));
                 Debug.LogWarning("Cannot create character, character name is too short");
                 return;
             }
             if (characterName.Length > maxCharacterNameLength)
             {
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_CHARACTER_NAME_TOO_LONG.ToString()));
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_CHARACTER_NAME_TOO_LONG.ToString()));
                 Debug.LogWarning("Cannot create character, character name is too long");
                 return;
             }

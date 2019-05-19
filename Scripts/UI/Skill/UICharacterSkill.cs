@@ -13,21 +13,21 @@ namespace MultiplayerARPG
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
-        public string formatKeyTitle = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        public UILocaleKeySetting formatKeyTitle = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Description}")]
-        public string formatKeyDescription = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        public UILocaleKeySetting formatKeyDescription = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Level}")]
-        public string formatKeyLevel = UILocaleKeys.UI_FORMAT_LEVEL.ToString();
+        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_LEVEL);
         [Tooltip("Format => {0} = {List Of Weapon Type}")]
-        public string formatKeyAvailableWeapons = UILocaleKeys.UI_FORMAT_AVAILABLE_WEAPONS.ToString();
+        public UILocaleKeySetting formatKeyAvailableWeapons = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_AVAILABLE_WEAPONS);
         [Tooltip("Format => {0} = {Consume Mp Amount}")]
-        public string formatKeyConsumeMp = UILocaleKeys.UI_FORMAT_CONSUME_MP.ToString();
-        [Tooltip("Format => {0} = {Duration}")]
-        public string formatKeyCoolDownDuration = UILocaleKeys.UI_FORMAT_SKILL_COOLDOWN_DURATION.ToString();
-        [Tooltip("Format => {0} = {Remains Duration}")]
-        public string formatKeyCoolDownRemainsDuration = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        public UILocaleKeySetting formatKeyConsumeMp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CONSUME_MP);
+        [Tooltip("Format => {0} = {Cooldown Duration}")]
+        public UILocaleKeySetting formatKeyCoolDownDuration = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SKILL_COOLDOWN_DURATION);
+        [Tooltip("Format => {0} = {Cooldown Remains Duration}")]
+        public UILocaleKeySetting formatKeyCoolDownRemainsDuration = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Skill Type Title}")]
-        public string formatKeySkillType = UILocaleKeys.UI_FORMAT_SKILL_TYPE.ToString();
+        public UILocaleKeySetting formatKeySkillType = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SKILL_TYPE);
 
         [Header("UI Elements")]
         public TextWrapper uiTextTitle;

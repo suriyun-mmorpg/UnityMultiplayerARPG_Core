@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Damage Element Title}, {1} = {Min Damage}, {2} = {Max Damage}")]
-        public string formatKeyAmount = UILocaleKeys.UI_FORMAT_DAMAGE_WITH_ELEMENTAL.ToString();
+        public UILocaleKeySetting formatKeyAmount = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_DAMAGE_WITH_ELEMENTAL);
 
         [Header("UI Elements")]
         public TextWrapper uiTextAmount;

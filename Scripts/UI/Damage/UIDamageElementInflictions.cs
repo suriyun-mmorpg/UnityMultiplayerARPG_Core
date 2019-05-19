@@ -7,9 +7,9 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {1} = {Infliction * 100}")]
-        public string formatKeyInfliction = UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION.ToString();
+        public UILocaleKeySetting formatKeyInfliction = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION);
         [Tooltip("Format => {0} = {Damage Element Title}, {1} = {Infliction * 100}")]
-        public string formatKeyInflictionAsElemental = UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION_AS_ELEMENTAL.ToString();
+        public UILocaleKeySetting formatKeyInflictionAsElemental = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_DAMAGE_INFLICTION_AS_ELEMENTAL);
 
         [Header("UI Elements")]
         public TextWrapper uiTextAllInflictions;

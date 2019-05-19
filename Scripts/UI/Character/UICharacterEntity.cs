@@ -8,11 +8,11 @@ namespace MultiplayerARPG
     {
         [Header("Character Entity - String Formats")]
         [Tooltip("Format => {0} = {Level}")]
-        public string formatKeyLevel = UILocaleKeys.UI_FORMAT_LEVEL.ToString();
+        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_LEVEL);
         [Tooltip("Format => {0} = {Current Mp}, {1} = {Max Mp}")]
-        public string formatKeyMp = UILocaleKeys.UI_FORMAT_CURRENT_MP.ToString();
+        public UILocaleKeySetting formatKeyMp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_MP);
         [Tooltip("Format => {0} = {Count Down Duration}")]
-        public string formatKeySkillCastDuration = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        public UILocaleKeySetting formatKeySkillCastDuration = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
 
         [Header("Character Entity - UI Elements")]
         public TextWrapper uiTextLevel;

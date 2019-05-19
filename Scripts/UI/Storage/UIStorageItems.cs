@@ -8,9 +8,9 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Current Total Weights}, {1} = {Weight Limit}")]
-        public string formatKeyWeightLimit = UILocaleKeys.UI_FORMAT_CURRENT_WEIGHT.ToString();
+        public UILocaleKeySetting formatKeyWeightLimit = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_WEIGHT);
         [Tooltip("Format => {0} = {Current Used Slots}, {1} = {Slot Limit}")]
-        public string formatKeySlotLimit = UILocaleKeys.UI_FORMAT_CURRENT_SLOT.ToString();
+        public UILocaleKeySetting formatKeySlotLimit = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_SLOT);
 
         [Header("UI Elements")]
         public UICharacterItem uiItemDialog;

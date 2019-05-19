@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Sell Price}")]
-        public string formatKeySellPrice = UILocaleKeys.UI_FORMAT_SELL_PRICE.ToString();
+        public UILocaleKeySetting formatKeySellPrice = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SELL_PRICE);
 
         [Header("UI Elements")]
         public UICharacterItem uiCharacterItem;

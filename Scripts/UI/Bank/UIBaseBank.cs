@@ -7,8 +7,8 @@ namespace MultiplayerARPG
     public abstract class UIBaseBank : UIBase
     {
         [Header("String Formats")]
-        [Tooltip("Format => {0} = {Amount}")]
-        public string formatKeyAmount = UILocaleKeys.UI_FORMAT_GOLD.ToString();
+        [Tooltip("Format => {0} = {Gold Amount}")]
+        public UILocaleKeySetting formatKeyAmount = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_GOLD);
 
         [Header("UI Elements")]
         public TextWrapper uiTextAmount;

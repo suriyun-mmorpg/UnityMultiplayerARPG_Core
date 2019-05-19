@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     {
         [Header("Damageable Entity - String Formats")]
         [Tooltip("Format => {0} = {Current Hp}, {1} = {Max Hp}")]
-        public string formatKeyHp = UILocaleKeys.UI_FORMAT_CURRENT_HP.ToString();
+        public UILocaleKeySetting formatKeyHp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_HP);
 
         [Header("Damageable Entity - UI Elements")]
         public TextWrapper uiTextHp;

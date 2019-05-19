@@ -7,11 +7,11 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Attribute Title}, {1} = {Current Amount}, {2} = {Target Amount}")]
-        public string formatKeyAmount = UILocaleKeys.UI_FORMAT_CURRENT_ATTRIBUTE.ToString();
+        public UILocaleKeySetting formatKeyAmount = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_ATTRIBUTE);
         [Tooltip("Format => {0} = {Attribute Title}, {1} = {Current Amount}, {2} = {Target Amount}")]
-        public string formatKeyAmountNotEnough = UILocaleKeys.UI_FORMAT_CURRENT_ATTRIBUTE_NOT_ENOUGH.ToString();
+        public UILocaleKeySetting formatKeyAmountNotEnough = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_ATTRIBUTE_NOT_ENOUGH);
         [Tooltip("Format => {0} = {Attribute Title}, {1} = {Target Amount}")]
-        public string formatKeySimpleAmount = UILocaleKeys.UI_FORMAT_ATTRIBUTE_AMOUNT.ToString();
+        public UILocaleKeySetting formatKeySimpleAmount = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_ATTRIBUTE_AMOUNT);
 
         [Header("UI Elements")]
         public TextWrapper uiTextAllAmounts;

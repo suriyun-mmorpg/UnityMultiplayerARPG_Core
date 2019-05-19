@@ -9,11 +9,11 @@ namespace MultiplayerARPG
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
-        public string formatKeyTitle = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
-        [Tooltip("Format => {0} = {Duration}")]
-        public string formatKeyBuffDuration = UILocaleKeys.UI_FORMAT_BUFF_DURATION.ToString();
-        [Tooltip("Format => {0} = {Remains Duration}")]
-        public string formatKeyBuffRemainsDuration = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        public UILocaleKeySetting formatKeyTitle = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
+        [Tooltip("Format => {0} = {Buff Duration}")]
+        public UILocaleKeySetting formatKeyBuffDuration = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_BUFF_DURATION);
+        [Tooltip("Format => {0} = {Buff Remains Duration}")]
+        public UILocaleKeySetting formatKeyBuffRemainsDuration = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
 
         [Header("UI Elements")]
         public TextWrapper uiTextTitle;

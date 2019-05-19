@@ -7,7 +7,7 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Resistance Title}, {1} = {Amount * 100}")]
-        public string formatKeyAmount = UILocaleKeys.UI_FORMAT_RESISTANCE_AMOUNT.ToString();
+        public UILocaleKeySetting formatKeyAmount = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_RESISTANCE_AMOUNT);
 
         [Header("UI Elements")]
         public TextWrapper uiTextAllAmounts;

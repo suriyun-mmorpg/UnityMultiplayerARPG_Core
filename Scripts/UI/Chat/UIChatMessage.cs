@@ -6,15 +6,15 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format {0} = Character Name, {1} = Message")]
-        public string formatLocal = UILocaleKeys.UI_CHAT_FORMAT_LOCAL.ToString();
+        public string formatLocal = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CHAT_LOCAL);
         [Tooltip("Format {0} = Character Name, {1} = Message")]
-        public string formatGlobal = UILocaleKeys.UI_CHAT_FORMAT_GLOBAL.ToString();
+        public string formatGlobal = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CHAT_GLOBAL);
         [Tooltip("Format {0} = Character Name, {1} = Message")]
-        public string formatWhisper = UILocaleKeys.UI_CHAT_FORMAT_WHISPER.ToString();
+        public string formatWhisper = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CHAT_WHISPER);
         [Tooltip("Format {0} = Character Name, {1} = Message")]
-        public string formatParty = UILocaleKeys.UI_CHAT_FORMAT_PARTY.ToString();
+        public string formatParty = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CHAT_PARTY);
         [Tooltip("Format {0} = Character Name, {1} = Message")]
-        public string formatGuild = UILocaleKeys.UI_CHAT_FORMAT_GUILD.ToString();
+        public string formatGuild = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CHAT_GUILD);
 
         public TextWrapper uiTextMessage;
         public UIChatHandler uiChatHandler;

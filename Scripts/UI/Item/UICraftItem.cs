@@ -9,9 +9,9 @@ namespace MultiplayerARPG
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
-        public string formatKeyRequireGold = UILocaleKeys.UI_FORMAT_REQUIRE_GOLD.ToString();
+        public UILocaleKeySetting formatKeyRequireGold = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_REQUIRE_GOLD);
         [Tooltip("Format => {0} = {Current Gold Amount}, {1} = {Target Amount}")]
-        public string formatKeyRequireGoldNotEnough = UILocaleKeys.UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH.ToString();
+        public UILocaleKeySetting formatKeyRequireGoldNotEnough = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH);
 
         [Header("UI Elements")]
         public UICharacterItem uiCraftingItem;

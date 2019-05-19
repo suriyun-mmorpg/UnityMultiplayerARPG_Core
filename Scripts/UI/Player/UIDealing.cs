@@ -9,9 +9,9 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Gold Amount}")]
-        public string formatKeyDealingGold = "{0}: {1}";
+        public UILocaleKeySetting formatKeyDealingGold = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_GOLD);
         [Tooltip("Format => {0} = {Gold Amount}")]
-        public string formatKeyAnotherDealingGold = "{0}: {1}";
+        public UILocaleKeySetting formatKeyAnotherDealingGold = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_GOLD);
 
         [Header("UI Elements")]
         public UICharacterItem uiDealingItemPrefab;

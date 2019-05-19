@@ -7,13 +7,13 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Character Name}")]
-        public string formatKeyName = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        public UILocaleKeySetting formatKeyName = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Level}")]
-        public string formatKeyLevel = UILocaleKeys.UI_FORMAT_LEVEL.ToString();
+        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_LEVEL);
         [Tooltip("Format => {0} = {Current Hp}, {1} = {Max Hp}")]
-        public string formatKeyHp = UILocaleKeys.UI_FORMAT_CURRENT_HP.ToString();
+        public UILocaleKeySetting formatKeyHp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_HP);
         [Tooltip("Format => {0} = {Current Mp}, {1} = {Max Mp}")]
-        public string formatKeyMp = UILocaleKeys.UI_FORMAT_CURRENT_MP.ToString();
+        public UILocaleKeySetting formatKeyMp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_MP);
 
         [Header("UI Elements")]
         public UISocialGroup uiSocialGroup;

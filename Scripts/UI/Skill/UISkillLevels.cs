@@ -7,11 +7,11 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Skill Title}, {1} = {Current Level}, {2} = {Target Level}")]
-        public string formatKeyLevel = UILocaleKeys.UI_FORMAT_CURRENT_SKILL.ToString();
+        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_SKILL);
         [Tooltip("Format => {0} = {Skill Title}, {1} = {Current Level}, {2} = {Target Level}")]
-        public string formatKeyLevelNotEnough = UILocaleKeys.UI_FORMAT_CURRENT_SKILL_NOT_ENOUGH.ToString();
+        public UILocaleKeySetting formatKeyLevelNotEnough = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_SKILL_NOT_ENOUGH);
         [Tooltip("Format => {0} = {Skill Title}, {1} = {Target Level}")]
-        public string formatKeySimpleLevel = UILocaleKeys.UI_FORMAT_SKILL_LEVEL.ToString();
+        public UILocaleKeySetting formatKeySimpleLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SKILL_LEVEL);
 
         [Header("UI Elements")]
         public TextWrapper uiTextAllLevels;

@@ -7,11 +7,11 @@ namespace MultiplayerARPG
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Set Title}, {1} = {List Of Effect}")]
         [Multiline]
-        public string formatKeySet = UILocaleKeys.UI_FORMAT_EQUIPMENT_SET.ToString();
+        public UILocaleKeySetting formatKeySet = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_EQUIPMENT_SET);
         [Tooltip("Format => {0} = {Equip Amount}, {1} = {List Of Bonus}")]
-        public string formatKeyAppliedEffect = UILocaleKeys.UI_FORMAT_EQUIPMENT_SET_APPLIED_EFFECT.ToString();
+        public UILocaleKeySetting formatKeyAppliedEffect = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_EQUIPMENT_SET_APPLIED_EFFECT);
         [Tooltip("Format => {0} = {Equip Amount}, {1} = {List Of Bonus}")]
-        public string formatKeyUnappliedEffect = UILocaleKeys.UI_FORMAT_EQUIPMENT_SET_UNAPPLIED_EFFECT.ToString();
+        public UILocaleKeySetting formatKeyUnappliedEffect = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_EQUIPMENT_SET_UNAPPLIED_EFFECT);
 
         // TODO: This is deprecated
         [HideInInspector]

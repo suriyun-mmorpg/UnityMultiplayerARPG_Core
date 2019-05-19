@@ -9,31 +9,31 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Character Name}")]
-        public string formatKeyName = UILocaleKeys.UI_FORMAT_SIMPLE.ToString();
+        public UILocaleKeySetting formatKeyName = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Level}")]
-        public string formatKeyLevel = UILocaleKeys.UI_FORMAT_LEVEL.ToString();
+        public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_LEVEL);
         [Tooltip("Format => {0} = {Current Exp}, {1} = {Max Exp}")]
-        public string formatKeyExp = UILocaleKeys.UI_FORMAT_CURRENT_EXP.ToString();
+        public UILocaleKeySetting formatKeyExp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_EXP);
         [Tooltip("Format => {0} = {Current Hp}, {1} = {Max Hp}")]
-        public string formatKeyHp = UILocaleKeys.UI_FORMAT_CURRENT_HP.ToString();
+        public UILocaleKeySetting formatKeyHp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_HP);
         [Tooltip("Format => {0} = {Current Mp}, {1} = {Max Mp}")]
-        public string formatKeyMp = UILocaleKeys.UI_FORMAT_CURRENT_MP.ToString();
+        public UILocaleKeySetting formatKeyMp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_MP);
         [Tooltip("Format => {0} = {Current Stamina}, {1} = {Max Stamina}")]
-        public string formatKeyStamina = UILocaleKeys.UI_FORMAT_CURRENT_STAMINA.ToString();
+        public UILocaleKeySetting formatKeyStamina = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_STAMINA);
         [Tooltip("Format => {0} = {Current Food}, {1} = {Max Food}")]
-        public string formatKeyFood = UILocaleKeys.UI_FORMAT_CURRENT_FOOD.ToString();
+        public UILocaleKeySetting formatKeyFood = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_FOOD);
         [Tooltip("Format => {0} = {Current Water}, {1} = {Max Water}")]
-        public string formatKeyWater = UILocaleKeys.UI_FORMAT_CURRENT_WATER.ToString();
+        public UILocaleKeySetting formatKeyWater = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_WATER);
         [Tooltip("Format => {0} = {Stat Points}")]
-        public string formatKeyStatPoint = UILocaleKeys.UI_FORMAT_STAT_POINTS.ToString();
+        public UILocaleKeySetting formatKeyStatPoint = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_STAT_POINTS);
         [Tooltip("Format => {0} = {Skill Points}")]
-        public string formatKeySkillPoint = UILocaleKeys.UI_FORMAT_SKILL_POINTS.ToString();
+        public UILocaleKeySetting formatKeySkillPoint = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SKILL_POINTS);
         [Tooltip("Format => {0} = {Gold Amount}")]
-        public string formatKeyGold = UILocaleKeys.UI_FORMAT_GOLD.ToString();
+        public UILocaleKeySetting formatKeyGold = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_GOLD);
         [Tooltip("Format => {0} = {Current Total Weights}, {1} = {Weight Limit}")]
-        public string formatKeyWeightLimitStats = UILocaleKeys.UI_FORMAT_CURRENT_WEIGHT.ToString();
+        public UILocaleKeySetting formatKeyWeightLimitStats = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_WEIGHT);
         [Tooltip("Format => {0} = {Min Damage}, {1} = {Max Damage}")]
-        public string formatKeyWeaponDamage = UILocaleKeys.UI_FORMAT_DAMAGE_AMOUNT.ToString();
+        public UILocaleKeySetting formatKeyWeaponDamage = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_DAMAGE_AMOUNT);
 
         [Header("UI Elements")]
         public TextWrapper uiTextName;

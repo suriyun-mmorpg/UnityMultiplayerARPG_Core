@@ -6,9 +6,9 @@ namespace MultiplayerARPG
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Require Level}")]
-        public string formatKeyRequireLevel = UILocaleKeys.UI_FORMAT_REQUIRE_LEVEL.ToString();
+        public UILocaleKeySetting formatKeyRequireLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_REQUIRE_LEVEL);
         [Tooltip("Format => {0} = {Require Class Title}")]
-        public string formatKeyRequireClass = UILocaleKeys.UI_FORMAT_REQUIRE_CLASS.ToString();
+        public UILocaleKeySetting formatKeyRequireClass = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_REQUIRE_CLASS);
 
         [Header("UI Elements")]
         public TextWrapper uiTextRequireLevel;
