@@ -4,21 +4,32 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
+    [System.Flags]
     public enum DirectionType : byte
     {
-        Down,
-        Up,
-        Left,
-        Right,
+        Down = 1 << 0,
+        Up = 1 << 1,
+        Left = 1 << 2,
+        Right = 1 << 3,
+        DownLeft = Down | Left,
+        DownRight = Down | Right,
+        UpLeft = Up | Left,
+        UpRight = Up | Right,
     }
 
     [System.Serializable]
     public class CharacterAnimation2D
     {
+        [Header("4-Directions")]
         public AnimationClip2D down;
         public AnimationClip2D up;
         public AnimationClip2D left;
         public AnimationClip2D right;
+        [Header("8-Directions")]
+        public AnimationClip2D downLeft;
+        public AnimationClip2D downRight;
+        public AnimationClip2D upLeft;
+        public AnimationClip2D upRight;
 
         public AnimationClip2D GetClipByDirection(DirectionType directionType)
         {
@@ -32,7 +43,28 @@ namespace MultiplayerARPG
                     return left;
                 case DirectionType.Right:
                     return right;
+                case DirectionType.DownLeft:
+                    // Return down if it is support 4-direction
+                    if (downLeft == null)
+                        return down;
+                    return downLeft;
+                case DirectionType.DownRight:
+                    // Return down if it is support 4-direction
+                    if (downRight == null)
+                        return down;
+                    return downRight;
+                case DirectionType.UpLeft:
+                    // Return up if it is support 4-direction
+                    if (upLeft == null)
+                        return up;
+                    return upLeft;
+                case DirectionType.UpRight:
+                    // Return up if it is support 4-direction
+                    if (upRight == null)
+                        return up;
+                    return upRight;
             }
+            // Default direction is down
             return down;
         }
     }

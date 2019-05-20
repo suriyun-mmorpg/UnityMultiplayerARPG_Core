@@ -8,7 +8,7 @@ using UnityEditor;
 namespace MultiplayerARPG
 {
     [ExecuteInEditMode]
-    public class CharacterModel2D : BaseCharacterModel
+    public class CharacterModel2D : CharacterModel, ICharacterModel2D
     {
         public enum SampleAnimation
         {
@@ -17,8 +17,8 @@ namespace MultiplayerARPG
             Dead,
             DefaultAttack,
             DefaultSkillCast,
-
         }
+
         [Header("2D Animations")]
         public SpriteRenderer spriteRenderer;
         public CharacterAnimation2D idleAnimation2D;
@@ -124,9 +124,9 @@ namespace MultiplayerARPG
                 return cacheSkillCastAnimations;
             }
         }
-        
-        [HideInInspector, System.NonSerialized]
-        public DirectionType currentDirectionType = DirectionType.Down;
+
+        public DirectionType CurrentDirectionType { get; set; }
+
         private AnimationClip2D playingAnim = null;
         private int currentFrame = 0;
         private bool playing = false;
@@ -261,17 +261,20 @@ namespace MultiplayerARPG
         {
             if (playingAction)
                 return;
+
             if (isDead)
-                Play(deadAnimation2D, currentDirectionType);
+            {
+                Play(deadAnimation2D, CurrentDirectionType);
+            }
             else
             {
                 if (movementState.HasFlag(MovementFlag.Forward) ||
                     movementState.HasFlag(MovementFlag.Backward) ||
                     movementState.HasFlag(MovementFlag.Right) ||
                     movementState.HasFlag(MovementFlag.Left))
-                    Play(moveAnimation2D, currentDirectionType);
+                    Play(moveAnimation2D, CurrentDirectionType);
                 else
-                    Play(idleAnimation2D, currentDirectionType);
+                    Play(idleAnimation2D, CurrentDirectionType);
             }
         }
 
@@ -315,7 +318,7 @@ namespace MultiplayerARPG
             ActionAnimation2D animation = GetActionAnimation(animActionType, dataId);
             if (animation != null)
             {
-                AnimationClip2D anim = animation.GetClipByDirection(currentDirectionType);
+                AnimationClip2D anim = animation.GetClipByDirection(CurrentDirectionType);
                 if (anim != null)
                 {
                     playingAction = true;
@@ -325,7 +328,7 @@ namespace MultiplayerARPG
                     // Waits by current transition + clip duration before end animation
                     Play(anim);
                     yield return new WaitForSecondsRealtime(anim.duration / playSpeedMultiplier);
-                    Play(idleAnimation2D, currentDirectionType);
+                    Play(idleAnimation2D, CurrentDirectionType);
                     yield return new WaitForSecondsRealtime(animation.extraDuration / playSpeedMultiplier);
                     playingAction = false;
                 }
@@ -373,7 +376,7 @@ namespace MultiplayerARPG
             triggerDuration = 0f;
             totalDuration = 0f;
             if (animation2D == null) return false;
-            AnimationClip2D clip = animation2D.GetClipByDirection(currentDirectionType);
+            AnimationClip2D clip = animation2D.GetClipByDirection(CurrentDirectionType);
             if (clip == null) return false;
             triggerDuration = clip.duration * animation2D.triggerDurationRate;
             totalDuration = clip.duration + animation2D.extraDuration;
@@ -389,7 +392,7 @@ namespace MultiplayerARPG
             triggerDuration = 0f;
             totalDuration = 0f;
             if (animation2D == null) return false;
-            AnimationClip2D clip = animation2D.GetClipByDirection(currentDirectionType);
+            AnimationClip2D clip = animation2D.GetClipByDirection(CurrentDirectionType);
             if (clip == null) return false;
             triggerDuration = clip.duration * animation2D.triggerDurationRate;
             totalDuration = clip.duration + animation2D.extraDuration;
@@ -404,7 +407,7 @@ namespace MultiplayerARPG
             triggerDuration = 0f;
             totalDuration = 0f;
             if (animation2D == null) return false;
-            AnimationClip2D clip = animation2D.GetClipByDirection(currentDirectionType);
+            AnimationClip2D clip = animation2D.GetClipByDirection(CurrentDirectionType);
             if (clip == null) return false;
             triggerDuration = clip.duration * animation2D.triggerDurationRate;
             totalDuration = clip.duration + animation2D.extraDuration;
@@ -419,7 +422,7 @@ namespace MultiplayerARPG
             triggerDuration = 0f;
             totalDuration = 0f;
             if (animation2D == null) return false;
-            AnimationClip2D clip = animation2D.GetClipByDirection(currentDirectionType);
+            AnimationClip2D clip = animation2D.GetClipByDirection(CurrentDirectionType);
             if (clip == null) return false;
             triggerDuration = clip.duration * animation2D.triggerDurationRate;
             totalDuration = clip.duration + animation2D.extraDuration;
@@ -434,7 +437,7 @@ namespace MultiplayerARPG
             triggerDuration = 0f;
             totalDuration = 0f;
             if (animation2D == null) return false;
-            AnimationClip2D clip = animation2D.GetClipByDirection(currentDirectionType);
+            AnimationClip2D clip = animation2D.GetClipByDirection(CurrentDirectionType);
             if (clip == null) return false;
             triggerDuration = clip.duration * animation2D.triggerDurationRate;
             totalDuration = clip.duration + animation2D.extraDuration;
@@ -447,7 +450,7 @@ namespace MultiplayerARPG
             if (!CacheSkillCastAnimations.TryGetValue(dataId, out animation2D))
                 animation2D = defaultSkillCastAnimation2D;
             if (animation2D == null) return SkillActivateAnimationType.UseAttackAnimation;
-            AnimationClip2D clip = animation2D.GetClipByDirection(currentDirectionType);
+            AnimationClip2D clip = animation2D.GetClipByDirection(CurrentDirectionType);
             if (clip == null) return SkillActivateAnimationType.UseAttackAnimation;
             return SkillActivateAnimationType.UseActivateAnimation;
         }

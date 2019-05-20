@@ -58,7 +58,7 @@ namespace MultiplayerARPG
             SetupComponent();
         }
         
-        private void OnValidate()
+        protected virtual void OnValidate()
         {
 #if UNITY_EDITOR
             bool hasChanges = false;
