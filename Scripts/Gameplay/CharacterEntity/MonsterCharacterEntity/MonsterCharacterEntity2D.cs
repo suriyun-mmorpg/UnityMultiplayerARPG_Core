@@ -6,8 +6,6 @@ using LiteNetLib;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(CharacterModel2D))]
-    [RequireComponent(typeof(MonsterActivityComponent2D))]
     public class MonsterCharacterEntity2D : BaseMonsterCharacterEntity
     {
         #region Sync data
@@ -57,7 +55,11 @@ namespace MultiplayerARPG
         protected override void EntityUpdate()
         {
             base.EntityUpdate();
-            (CharacterModel as CharacterModel2D).currentDirectionType = CurrentDirectionType;
+            if (CharacterModel is ICharacterModel2D)
+            {
+                // Set current direction to character model 2D
+                (CharacterModel as ICharacterModel2D).CurrentDirectionType = CurrentDirectionType;
+            }
         }
 
         protected override void SetupNetElements()
@@ -94,35 +96,17 @@ namespace MultiplayerARPG
             rotation = Quaternion.Euler(0, 0, (Mathf.Atan2(currentDirection.y, currentDirection.x) * (180 / Mathf.PI)) + 90);
         }
 
-        public void UpdateCurrentDirection(Vector2 direction)
-        {
-            currentDirection = direction;
-            UpdateDirection(currentDirection);
-        }
-
-        public void UpdateDirection(Vector2 direction)
-        {
-            if (direction.magnitude > 0f)
-            {
-                Vector2 normalized = direction.normalized;
-                if (Mathf.Abs(normalized.x) >= Mathf.Abs(normalized.y))
-                {
-                    if (normalized.x < 0) localDirectionType = DirectionType.Left;
-                    if (normalized.x > 0) localDirectionType = DirectionType.Right;
-                }
-                else
-                {
-                    if (normalized.y < 0) localDirectionType = DirectionType.Down;
-                    if (normalized.y > 0) localDirectionType = DirectionType.Up;
-                }
-            }
-            if (IsServer)
-                currentDirectionType.Value = (byte)localDirectionType;
-        }
-
         public override void StopMove()
         {
             CacheMonsterActivityComponent.StopMove();
+        }
+
+        public void UpdateCurrentDirection(Vector2 direction)
+        {
+            currentDirection = direction;
+            localDirectionType = GameplayUtils.GetDirectionTypeByVector2(direction);
+            if (IsServer)
+                currentDirectionType.Value = (byte)localDirectionType;
         }
     }
 }

@@ -7,7 +7,6 @@ using LiteNetLib;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(CharacterModel2D))]
     [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerCharacterEntity2D : BasePlayerCharacterEntity
     {
@@ -116,7 +115,11 @@ namespace MultiplayerARPG
                 SetTargetEntity(null);
                 return;
             }
-            (CharacterModel as CharacterModel2D).currentDirectionType = CurrentDirectionType;
+            if (CharacterModel is ICharacterModel2D)
+            {
+                // Set current direction to character model 2D
+                (CharacterModel as ICharacterModel2D).CurrentDirectionType = CurrentDirectionType;
+            }
             Profiler.EndSample();
         }
 
@@ -254,7 +257,7 @@ namespace MultiplayerARPG
         protected void NetFuncUpdateDirection(sbyte x, sbyte y)
         {
             currentDirection.Value = new Vector2((float)x / 100f, (float)y / 100f);
-            currentDirectionType.Value = (byte)GetDirectionTypeByVector2(currentDirection.Value);
+            currentDirectionType.Value = (byte)GameplayUtils.GetDirectionTypeByVector2(currentDirection.Value);
         }
 
         public override void PointClickMovement(Vector3 position)
@@ -359,7 +362,7 @@ namespace MultiplayerARPG
             if (direction.magnitude > 0f)
             {
                 localDirection = direction;
-                localDirectionType = GetDirectionTypeByVector2(direction);
+                localDirectionType = GameplayUtils.GetDirectionTypeByVector2(direction);
             }
             if (IsServer && movementSecure == MovementSecure.ServerAuthoritative)
             {
@@ -368,22 +371,6 @@ namespace MultiplayerARPG
             }
             if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
                 CallNetFunction(NetFuncUpdateDirection, FunctionReceivers.Server, (sbyte)(localDirection.x * 100f), (sbyte)(localDirection.y * 100f));
-        }
-
-        public DirectionType GetDirectionTypeByVector2(Vector2 direction)
-        {
-            Vector2 normalized = direction.normalized;
-            if (Mathf.Abs(normalized.x) >= Mathf.Abs(normalized.y))
-            {
-                if (normalized.x < 0) return DirectionType.Left;
-                if (normalized.x > 0) return DirectionType.Right;
-            }
-            else
-            {
-                if (normalized.y < 0) return DirectionType.Down;
-                if (normalized.y > 0) return DirectionType.Up;
-            }
-            return DirectionType.Down;
         }
     }
 }
