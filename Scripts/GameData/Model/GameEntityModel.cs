@@ -50,7 +50,6 @@ namespace MultiplayerARPG
 
         protected virtual void Awake()
         {
-            SetEffectContainersBySetters();
         }
 
         protected virtual void OnValidate()

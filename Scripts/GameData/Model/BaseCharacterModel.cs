@@ -63,12 +63,6 @@ namespace MultiplayerARPG
         protected GameObject tempEquipmentObject;
         protected BaseEquipmentEntity tempEquipmentEntity;
 
-        protected override void Awake()
-        {
-            base.Awake();
-            SetEquipmentContainersBySetters();
-        }
-
         [ContextMenu("Set Equipment Containers By Setters")]
         public void SetEquipmentContainersBySetters()
         {
