@@ -9,48 +9,40 @@ namespace MultiplayerARPG
 {
     public class LanguageManager : MonoBehaviour
     {
-        public static readonly Dictionary<string, string> Texts = new Dictionary<string, string>();
+        public static readonly Dictionary<string, Dictionary<string, string>> Languages = new Dictionary<string, Dictionary<string, string>>();
+        public static Dictionary<string, string> texts = new Dictionary<string, string>();
+        public static Dictionary<string, string> Texts { get { return texts; } }
         public static string CurrentLanguageKey { get; private set; }
+
+        [Header("Language Manager Configs")]
         public string defaultLanguageKey = "ENG";
+        public List<Language> languageList = new List<Language>();
+
         [Header("Add New Language")]
         [Tooltip("You can add new language by `Add New Language` context menu")]
         public string newLanguageKey;
         [InspectorButton("AddNewLanguage")]
         public bool addNewLanguage;
-        [Header("Language List")]
-        public List<Language> languageList = new List<Language>();
-        public readonly Dictionary<string, Language> LanguageMap = new Dictionary<string, Language>();
+
         private void Awake()
         {
-            SetupDefaultTexts();
+            Languages.Clear();
+            Dictionary<string, string> tempNewData;
             foreach (Language language in languageList)
             {
-                LanguageMap[language.languageKey] = language;
+                tempNewData = new Dictionary<string, string>();
+                foreach (LanguageData data in language.dataList)
+                {
+                    if (tempNewData.ContainsKey(data.key))
+                    {
+                        Debug.LogWarning("[LanguageManager] Language " + language.languageKey + " already contains " + data.key);
+                        continue;
+                    }
+                    tempNewData.Add(data.key, data.value);
+                }
+                Languages[language.languageKey] = tempNewData;
             }
             ChangeLanguage(defaultLanguageKey);
-        }
-
-        private void SetupDefaultTexts()
-        {
-            Texts.Clear();
-            foreach (KeyValuePair<string, string> pair in DefaultLocale.Texts)
-            {
-                Texts.Add(pair.Key, pair.Value);
-            }
-        }
-
-        private void ChangeLanguage(string languageKey)
-        {
-            if (!LanguageMap.ContainsKey(languageKey))
-                return;
-
-            CurrentLanguageKey = languageKey;
-            List<LanguageData> languageDataList = LanguageMap[languageKey].dataList;
-            foreach (LanguageData data in languageDataList)
-            {
-                if (Texts.ContainsKey(data.key))
-                    Texts[data.key] = data.value;
-            }
         }
 
         public Language GetLanguageFromList(string languageKey)
@@ -71,6 +63,7 @@ namespace MultiplayerARPG
                 Debug.LogWarning("`New Language Key` is null or empty");
                 return;
             }
+
             Language newLang = GetLanguageFromList(newLanguageKey);
             if (newLang == null)
             {
@@ -92,10 +85,21 @@ namespace MultiplayerARPG
             }
         }
 
+        public static void ChangeLanguage(string languageKey)
+        {
+            if (!Languages.ContainsKey(languageKey))
+                return;
+
+            CurrentLanguageKey = languageKey;
+            texts = Languages[languageKey];
+        }
+
         public static string GetText(string key, string defaultValue = "")
         {
             if (Texts.ContainsKey(key))
                 return Texts[key];
+            if (DefaultLocale.Texts.ContainsKey(key))
+                return DefaultLocale.Texts[key];
             return defaultValue;
         }
 
