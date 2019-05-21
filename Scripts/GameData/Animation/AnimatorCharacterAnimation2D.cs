@@ -87,7 +87,7 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public struct SkillCastAnimations2DByClip
+    public struct AnimatorSkillCastAnimations2D
     {
         public Skill skill;
         public AnimatorActionAnimation2D animation;
