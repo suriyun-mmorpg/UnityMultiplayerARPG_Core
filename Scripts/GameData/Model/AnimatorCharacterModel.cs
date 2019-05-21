@@ -109,6 +109,23 @@ namespace MultiplayerARPG
             }
             if (hasChanges)
                 EditorUtility.SetDirty(this);
+            
+            if (isSetupComponent)
+            {
+                CacheAnimatorController[CLIP_IDLE] = defaultAnimations.idleClip;
+                CacheAnimatorController[CLIP_MOVE] = defaultAnimations.moveClip;
+                CacheAnimatorController[CLIP_MOVE_BACKWARD] = defaultAnimations.moveBackwardClip;
+                CacheAnimatorController[CLIP_MOVE_LEFT] = defaultAnimations.moveLeftClip;
+                CacheAnimatorController[CLIP_MOVE_RIGHT] = defaultAnimations.moveRightClip;
+                CacheAnimatorController[CLIP_MOVE_FORWARD_LEFT] = defaultAnimations.moveForwardLeftClip;
+                CacheAnimatorController[CLIP_MOVE_FORWARD_RIGHT] = defaultAnimations.moveForwardRightClip;
+                CacheAnimatorController[CLIP_MOVE_BACKWARD_LEFT] = defaultAnimations.moveBackwardLeftClip;
+                CacheAnimatorController[CLIP_MOVE_BACKWARD_RIGHT] = defaultAnimations.moveBackwardRightClip;
+                CacheAnimatorController[CLIP_JUMP] = defaultAnimations.jumpClip;
+                CacheAnimatorController[CLIP_FALL] = defaultAnimations.fallClip;
+                CacheAnimatorController[CLIP_HURT] = defaultAnimations.hurtClip;
+                CacheAnimatorController[CLIP_DEAD] = defaultAnimations.deadClip;
+            }
 #endif
         }
 

@@ -194,6 +194,23 @@ namespace MultiplayerARPG
             if (MigrateSkillCastAnimations())
                 EditorUtility.SetDirty(this);
 #endif
+            if (isSetupComponent && animatorType == AnimatorType.Animator)
+            {
+                SetupGenericClips_Animator(
+                    defaultAnimatorData.idleClip,
+                    defaultAnimatorData.moveClip,
+                    defaultAnimatorData.moveBackwardClip,
+                    defaultAnimatorData.moveLeftClip,
+                    defaultAnimatorData.moveRightClip,
+                    defaultAnimatorData.moveForwardLeftClip,
+                    defaultAnimatorData.moveForwardRightClip,
+                    defaultAnimatorData.moveBackwardLeftClip,
+                    defaultAnimatorData.moveBackwardRightClip,
+                    defaultAnimatorData.jumpClip,
+                    defaultAnimatorData.fallClip,
+                    defaultAnimatorData.hurtClip,
+                    defaultAnimatorData.deadClip);
+            }
         }
 
         private bool MigrateSkillCastAnimations()
