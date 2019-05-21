@@ -403,9 +403,9 @@ namespace MultiplayerARPG
                 targetLookDirection = moveDirection.normalized;
             }
             // Always forward
-            MovementFlag movementState = MovementFlag.Forward;
+            MovementState movementState = MovementState.Forward;
             if (InputManager.GetButtonDown("Jump"))
-                movementState |= MovementFlag.IsJump;
+                movementState |= MovementState.IsJump;
             PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
         }
 

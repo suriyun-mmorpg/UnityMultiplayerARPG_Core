@@ -124,7 +124,7 @@ namespace MultiplayerARPG
 
                 // Decrease Stamina while sprinting
                 recoveryData.decreasingStamina += recoveryData.updatingTime * gameplayRule.GetDecreasingStaminaPerSeconds(characterEntity);
-                if (!characterEntity.IsDead() && characterEntity.MovementState.HasFlag(MovementFlag.IsSprinting) && characterEntity.CurrentStamina > 0)
+                if (!characterEntity.IsDead() && characterEntity.MovementState.HasFlag(MovementState.IsSprinting) && characterEntity.CurrentStamina > 0)
                 {
                     if (recoveryData.decreasingStamina >= 1)
                     {

@@ -189,9 +189,9 @@ namespace MultiplayerARPG
                 return;
 
             if (CacheRigidbody2D.velocity.magnitude > 0)
-                CacheMonsterCharacterEntity.MovementState = MovementFlag.Forward | MovementFlag.IsGrounded;
+                CacheMonsterCharacterEntity.MovementState = MovementState.Forward | MovementState.IsGrounded;
             else
-                CacheMonsterCharacterEntity.MovementState = MovementFlag.IsGrounded;
+                CacheMonsterCharacterEntity.MovementState = MovementState.IsGrounded;
 
             if (CacheMonsterCharacterEntity.IsDead())
             {

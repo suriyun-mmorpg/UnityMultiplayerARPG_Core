@@ -109,7 +109,7 @@ namespace MultiplayerARPG
             CrossFadeLegacyAnimation(CLIP_IDLE, 0, WrapMode.Loop);
         }
 
-        public override void UpdateAnimation(bool isDead, MovementFlag movementState, float playMoveSpeedMultiplier = 1f)
+        public override void UpdateAnimation(bool isDead, MovementState movementState, float playMoveSpeedMultiplier = 1f)
         {
             if (isDead)
                 CrossFadeLegacyAnimation(CLIP_DEAD, deadClipFadeLength, WrapMode.Once);
@@ -119,33 +119,33 @@ namespace MultiplayerARPG
                     return;
                 if (legacyAnimation.GetClip(CLIP_CAST_SKILL) != null && legacyAnimation.IsPlaying(CLIP_CAST_SKILL))
                     return;
-                if (!movementState.HasFlag(MovementFlag.IsGrounded))
+                if (!movementState.HasFlag(MovementState.IsGrounded))
                     CrossFadeLegacyAnimation(CLIP_FALL, fallClipFadeLength, WrapMode.Loop);
                 else
                 {
                     // Forward Right
-                    if (movementState.HasFlag(MovementFlag.Forward) && movementState.HasFlag(MovementFlag.Right))
+                    if (movementState.HasFlag(MovementState.Forward) && movementState.HasFlag(MovementState.Right))
                         CrossFadeLegacyAnimation(CLIP_MOVE_FORWARD_RIGHT, moveClipFadeLength, WrapMode.Loop);
                     // Forward Left
-                    else if (movementState.HasFlag(MovementFlag.Forward) && movementState.HasFlag(MovementFlag.Left))
+                    else if (movementState.HasFlag(MovementState.Forward) && movementState.HasFlag(MovementState.Left))
                         CrossFadeLegacyAnimation(CLIP_MOVE_FORWARD_LEFT, moveClipFadeLength, WrapMode.Loop);
                     // Backward Right
-                    else if (movementState.HasFlag(MovementFlag.Backward) && movementState.HasFlag(MovementFlag.Right))
+                    else if (movementState.HasFlag(MovementState.Backward) && movementState.HasFlag(MovementState.Right))
                         CrossFadeLegacyAnimation(CLIP_MOVE_BACKWARD_RIGHT, moveClipFadeLength, WrapMode.Loop);
                     // Backward Left
-                    else if (movementState.HasFlag(MovementFlag.Backward) && movementState.HasFlag(MovementFlag.Left))
+                    else if (movementState.HasFlag(MovementState.Backward) && movementState.HasFlag(MovementState.Left))
                         CrossFadeLegacyAnimation(CLIP_MOVE_BACKWARD_LEFT, moveClipFadeLength, WrapMode.Loop);
                     // Forward
-                    else if (movementState.HasFlag(MovementFlag.Forward))
+                    else if (movementState.HasFlag(MovementState.Forward))
                         CrossFadeLegacyAnimation(CLIP_MOVE, moveClipFadeLength, WrapMode.Loop);
                     // Backward
-                    else if (movementState.HasFlag(MovementFlag.Backward))
+                    else if (movementState.HasFlag(MovementState.Backward))
                         CrossFadeLegacyAnimation(CLIP_MOVE_BACKWARD, moveClipFadeLength, WrapMode.Loop);
                     // Right
-                    else if (movementState.HasFlag(MovementFlag.Right))
+                    else if (movementState.HasFlag(MovementState.Right))
                         CrossFadeLegacyAnimation(CLIP_MOVE_RIGHT, moveClipFadeLength, WrapMode.Loop);
                     // Left
-                    else if (movementState.HasFlag(MovementFlag.Left))
+                    else if (movementState.HasFlag(MovementState.Left))
                         CrossFadeLegacyAnimation(CLIP_MOVE_LEFT, moveClipFadeLength, WrapMode.Loop);
                     // Idle
                     else

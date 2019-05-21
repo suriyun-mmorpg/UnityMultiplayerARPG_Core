@@ -16,7 +16,7 @@ namespace MultiplayerARPG
         #region Temp data
         protected Vector2 currentDirection = Vector2.down;
         protected Vector2 tempDirection;
-        protected DirectionType localDirectionType = DirectionType.Down;
+        protected DirectionType2D localDirectionType = DirectionType2D.Down;
         #endregion
 
         public override bool IsGrounded
@@ -42,13 +42,13 @@ namespace MultiplayerARPG
             }
         }
 
-        public DirectionType CurrentDirectionType
+        public DirectionType2D CurrentDirectionType
         {
             get
             {
                 if (IsOwnerClient)
                     return localDirectionType;
-                return (DirectionType)currentDirectionType.Value;
+                return (DirectionType2D)currentDirectionType.Value;
             }
         }
 

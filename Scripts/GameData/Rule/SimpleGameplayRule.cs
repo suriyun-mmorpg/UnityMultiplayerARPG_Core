@@ -202,7 +202,7 @@ namespace MultiplayerARPG
         public override float GetMoveSpeed(BaseCharacterEntity character)
         {
             float moveSpeed = character.CacheMoveSpeed;
-            if (character.MovementState.HasFlag(MovementFlag.IsSprinting))
+            if (character.MovementState.HasFlag(MovementState.IsSprinting))
                 moveSpeed *= moveSpeedRateWhileSprint;
             if (character.isAttackingOrUsingSkill)
                 moveSpeed *= character.moveSpeedRateWhileAttackOrUseSkill;

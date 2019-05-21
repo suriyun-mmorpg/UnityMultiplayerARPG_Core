@@ -69,19 +69,19 @@ namespace MultiplayerARPG
             }
         }
 
-        protected DirectionType localDirectionType = DirectionType.Down;
-        public DirectionType CurrentDirectionType
+        protected DirectionType2D localDirectionType = DirectionType2D.Down;
+        public DirectionType2D CurrentDirectionType
         {
             get
             {
                 if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
                     return localDirectionType;
-                return (DirectionType)currentDirectionType.Value;
+                return (DirectionType2D)currentDirectionType.Value;
             }
         }
 
-        protected MovementFlag localMovementState = MovementFlag.None;
-        public override MovementFlag MovementState
+        protected MovementState localMovementState = MovementState.None;
+        public override MovementState MovementState
         {
             get
             {
@@ -177,12 +177,12 @@ namespace MultiplayerARPG
             if (tempMoveDirection.Equals(Vector3.zero))
             {
                 // No movement so state is none
-                SetMovementState(MovementFlag.None);
+                SetMovementState(MovementState.None);
             }
             else
             {
                 // For 2d, just define that it is moving so can use any state
-                SetMovementState(MovementFlag.Forward);
+                SetMovementState(MovementState.Forward);
             }
             Profiler.EndSample();
         }
@@ -251,7 +251,7 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return;
 
-            MovementState = (MovementFlag)movementState;
+            MovementState = (MovementState)movementState;
         }
 
         protected void NetFuncUpdateDirection(sbyte x, sbyte y)
@@ -276,7 +276,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void KeyMovement(Vector3 direction, MovementFlag movementState)
+        public override void KeyMovement(Vector3 direction, MovementState movementState)
         {
             if (IsDead())
                 return;
@@ -299,10 +299,10 @@ namespace MultiplayerARPG
             // Do nothing, 2d characters will not rotates
         }
 
-        public void SetMovementState(MovementFlag state)
+        public void SetMovementState(MovementState state)
         {
             if (IsGrounded)
-                state |= MovementFlag.IsGrounded;
+                state |= MovementState.IsGrounded;
 
             // Set local movement state which will be used by owner client
             localMovementState = state;

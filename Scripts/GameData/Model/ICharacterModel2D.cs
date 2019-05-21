@@ -2,6 +2,6 @@
 {
     public interface ICharacterModel2D
     {
-        DirectionType CurrentDirectionType { get; set; }
+        DirectionType2D CurrentDirectionType { get; set; }
     }
 }

@@ -284,7 +284,7 @@ namespace MultiplayerARPG
 
         public abstract float StoppingDistance { get; }
         public abstract void StopMove();
-        public abstract void KeyMovement(Vector3 moveDirection, MovementFlag moveState);
+        public abstract void KeyMovement(Vector3 moveDirection, MovementState moveState);
         public abstract void UpdateYRotation(float yRotation);
         public abstract void PointClickMovement(Vector3 position);
     }

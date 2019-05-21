@@ -32,7 +32,7 @@ namespace MultiplayerARPG
         public float magnitudeToPlayMoveClip = 0.1f;
         [Header("Sample 2D Animations")]
         public SampleAnimation sampleAnimation = SampleAnimation.Idle;
-        public DirectionType sampleDirection = DirectionType.Down;
+        public DirectionType2D sampleDirection = DirectionType2D.Down;
         public bool sampleAlwaysLoop = true;
 
         private Dictionary<int, ActionAnimation2D> cacheRightHandAttackAnimations;
@@ -125,7 +125,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public DirectionType CurrentDirectionType { get; set; }
+        public DirectionType2D CurrentDirectionType { get; set; }
 
         private AnimationClip2D playingAnim = null;
         private int currentFrame = 0;
@@ -134,11 +134,11 @@ namespace MultiplayerARPG
         private float secsPerFrame = 0;
         private float nextFrameTime = 0;
         private SampleAnimation? dirtySampleAnimation;
-        private DirectionType? dirtySampleType;
+        private DirectionType2D? dirtySampleType;
 
         private void Start()
         {
-            Play(idleAnimation2D, DirectionType.Down);
+            Play(idleAnimation2D, DirectionType2D.Down);
         }
 
         private void OnEnable()
@@ -226,7 +226,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void Play(CharacterAnimation2D animation, DirectionType directionType)
+        public void Play(CharacterAnimation2D animation, DirectionType2D directionType)
         {
             if (animation == null)
                 return;
@@ -257,7 +257,7 @@ namespace MultiplayerARPG
             playing = true;
         }
 
-        public override void UpdateAnimation(bool isDead, MovementFlag movementState, float playMoveSpeedMultiplier = 1)
+        public override void UpdateAnimation(bool isDead, MovementState movementState, float playMoveSpeedMultiplier = 1)
         {
             if (playingAction)
                 return;
@@ -268,10 +268,10 @@ namespace MultiplayerARPG
             }
             else
             {
-                if (movementState.HasFlag(MovementFlag.Forward) ||
-                    movementState.HasFlag(MovementFlag.Backward) ||
-                    movementState.HasFlag(MovementFlag.Right) ||
-                    movementState.HasFlag(MovementFlag.Left))
+                if (movementState.HasFlag(MovementState.Forward) ||
+                    movementState.HasFlag(MovementState.Backward) ||
+                    movementState.HasFlag(MovementState.Right) ||
+                    movementState.HasFlag(MovementState.Left))
                     Play(moveAnimation2D, CurrentDirectionType);
                 else
                     Play(idleAnimation2D, CurrentDirectionType);

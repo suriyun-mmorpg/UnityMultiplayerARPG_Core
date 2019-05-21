@@ -42,9 +42,9 @@ namespace MultiplayerARPG
             get { return stoppingDistance; }
         }
 
-        protected MovementFlag tempMovementState = MovementFlag.None;
-        protected MovementFlag localMovementState = MovementFlag.None;
-        public override MovementFlag MovementState
+        protected MovementState tempMovementState = MovementState.None;
+        protected MovementState localMovementState = MovementState.None;
+        public override MovementState MovementState
         {
             get
             {
@@ -148,7 +148,7 @@ namespace MultiplayerARPG
             if (tempMoveDirection.Equals(Vector3.zero))
             {
                 // No movement so state is none
-                SetMovementState(MovementFlag.None);
+                SetMovementState(MovementState.None);
             }
             else
             {
@@ -330,9 +330,9 @@ namespace MultiplayerARPG
             tempInputDirection = new Vector3((float)horizontalInput / 100f, 0, (float)verticalInput / 100f);
             if (tempInputDirection.magnitude != 0)
                 currentNpcDialog = null;
-            tempMovementState = (MovementFlag)movementState;
+            tempMovementState = (MovementState)movementState;
             if (!IsJumping)
-                IsJumping = IsGrounded && tempMovementState.HasFlag(MovementFlag.IsJump);
+                IsJumping = IsGrounded && tempMovementState.HasFlag(MovementState.IsJump);
         }
 
         protected void NetFuncUpdateYRotation(short yRotation)
@@ -358,7 +358,7 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return;
 
-            MovementState = (MovementFlag)movementState;
+            MovementState = (MovementState)movementState;
         }
 
         protected virtual void NetFuncTriggerJump()
@@ -398,7 +398,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void KeyMovement(Vector3 direction, MovementFlag movementState)
+        public override void KeyMovement(Vector3 direction, MovementState movementState)
         {
             if (IsDead())
                 return;
@@ -418,7 +418,7 @@ namespace MultiplayerARPG
                     tempInputDirection = direction;
                     tempMovementState = movementState;
                     if (!IsJumping)
-                        IsJumping = IsGrounded && movementState.HasFlag(MovementFlag.IsJump);
+                        IsJumping = IsGrounded && movementState.HasFlag(MovementState.IsJump);
                     break;
             }
         }
@@ -441,10 +441,10 @@ namespace MultiplayerARPG
             }
         }
 
-        public void SetMovementState(MovementFlag state)
+        public void SetMovementState(MovementState state)
         {
             if (IsGrounded)
-                state |= MovementFlag.IsGrounded;
+                state |= MovementState.IsGrounded;
 
             // Set local movement state which will be used by owner client
             localMovementState = state;

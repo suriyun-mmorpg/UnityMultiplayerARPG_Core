@@ -1,7 +1,7 @@
 ﻿namespace MultiplayerARPG
 {
     [System.Flags]
-    public enum MovementFlag : byte
+    public enum MovementState : byte
     {
         None = 0,
         Forward = 1 << 0,

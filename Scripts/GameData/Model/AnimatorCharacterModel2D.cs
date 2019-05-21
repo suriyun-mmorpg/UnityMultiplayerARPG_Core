@@ -13,7 +13,7 @@ namespace MultiplayerARPG
         public static readonly int ANIM_DIRECTION_X = Animator.StringToHash("DirectionX");
         public static readonly int ANIM_DIRECTION_Y = Animator.StringToHash("DirectionY");
 
-        public DirectionType CurrentDirectionType { get; set; }
+        public DirectionType2D CurrentDirectionType { get; set; }
 
         protected override void OnValidate()
         {
@@ -66,21 +66,21 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public override void UpdateAnimation(bool isDead, MovementFlag movementState, float playMoveSpeedMultiplier = 1)
+        public override void UpdateAnimation(bool isDead, MovementState movementState, float playMoveSpeedMultiplier = 1)
         {
             if (!animator.gameObject.activeInHierarchy)
                 return;
 
             // Left/Right
-            if (CurrentDirectionType.HasFlag(DirectionType.Left))
+            if (CurrentDirectionType.HasFlag(DirectionType2D.Left))
                 animator.SetFloat(ANIM_DIRECTION_X, -1);
-            else if (CurrentDirectionType.HasFlag(DirectionType.Right))
+            else if (CurrentDirectionType.HasFlag(DirectionType2D.Right))
                 animator.SetFloat(ANIM_DIRECTION_X, 1);
 
             // Up/Down
-            if (CurrentDirectionType.HasFlag(DirectionType.Down))
+            if (CurrentDirectionType.HasFlag(DirectionType2D.Down))
                 animator.SetFloat(ANIM_DIRECTION_Y, -1);
-            else if (CurrentDirectionType.HasFlag(DirectionType.Up))
+            else if (CurrentDirectionType.HasFlag(DirectionType2D.Up))
                 animator.SetFloat(ANIM_DIRECTION_Y, 1);
 
             base.UpdateAnimation(isDead, movementState, playMoveSpeedMultiplier);

@@ -168,7 +168,7 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_DEAD] = weaponAnimations.deadClip != null ? weaponAnimations.deadClip : defaultAnimations.deadClip;
         }
 
-        public override void UpdateAnimation(bool isDead, MovementFlag movementState, float playMoveSpeedMultiplier = 1f)
+        public override void UpdateAnimation(bool isDead, MovementState movementState, float playMoveSpeedMultiplier = 1f)
         {
             if (!animator.gameObject.activeInHierarchy)
                 return;
@@ -184,20 +184,20 @@ namespace MultiplayerARPG
 
             float moveSpeed = 0f;
             float sideMoveSpeed = 0f;
-            if (movementState.HasFlag(MovementFlag.Forward))
+            if (movementState.HasFlag(MovementState.Forward))
                 moveSpeed = 1;
-            else if (movementState.HasFlag(MovementFlag.Backward))
+            else if (movementState.HasFlag(MovementState.Backward))
                 moveSpeed = -1;
-            if (movementState.HasFlag(MovementFlag.Right))
+            if (movementState.HasFlag(MovementState.Right))
                 sideMoveSpeed = 1;
-            else if (movementState.HasFlag(MovementFlag.Left))
+            else if (movementState.HasFlag(MovementState.Left))
                 sideMoveSpeed = -1;
             // Set animator parameters
             animator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : moveSpeed);
             animator.SetFloat(ANIM_SIDE_MOVE_SPEED, isDead ? 0 : sideMoveSpeed);
             animator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, playMoveSpeedMultiplier);
             animator.SetBool(ANIM_IS_DEAD, isDead);
-            animator.SetBool(ANIM_IS_GROUNDED, movementState.HasFlag(MovementFlag.IsGrounded));
+            animator.SetBool(ANIM_IS_GROUNDED, movementState.HasFlag(MovementState.IsGrounded));
         }
 
         public override Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f)

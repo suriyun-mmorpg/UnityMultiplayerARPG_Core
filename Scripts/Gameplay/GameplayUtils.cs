@@ -6,47 +6,47 @@ namespace MultiplayerARPG
 {
     public static class GameplayUtils
     {
-        public static DirectionType GetDirectionTypeByVector2(Vector2 direction)
+        public static DirectionType2D GetDirectionTypeByVector2(Vector2 direction)
         {
             Vector2 normalized = direction.normalized;
             float absX = Mathf.Abs(normalized.x);
             float absY = Mathf.Abs(normalized.y);
             if (absX / absY > 0.8f)
             {
-                if (normalized.x < 0) return DirectionType.Left;
-                if (normalized.x > 0) return DirectionType.Right;
+                if (normalized.x < 0) return DirectionType2D.Left;
+                if (normalized.x > 0) return DirectionType2D.Right;
             }
             else if (absY / absX > 0.8f)
             {
-                if (normalized.y < 0) return DirectionType.Down;
-                if (normalized.y > 0) return DirectionType.Up;
+                if (normalized.y < 0) return DirectionType2D.Down;
+                if (normalized.y > 0) return DirectionType2D.Up;
             }
             else
             {
-                DirectionType result = DirectionType.Down;
+                DirectionType2D result = DirectionType2D.Down;
                 if (normalized.x > 0.01f)
                 {
-                    result = DirectionType.Left;
+                    result = DirectionType2D.Left;
                     if (normalized.y > 0.01f)
-                        result |= DirectionType.Up;
+                        result |= DirectionType2D.Up;
                     if (normalized.y < -0.01f)
-                        result |= DirectionType.Down;
+                        result |= DirectionType2D.Down;
                 }
                 else if (normalized.x < -0.01f)
                 {
-                    result = DirectionType.Right;
+                    result = DirectionType2D.Right;
                     if (normalized.y > 0.01f)
-                        result |= DirectionType.Up;
+                        result |= DirectionType2D.Up;
                     if (normalized.y < -0.01f)
-                        result |= DirectionType.Down;
+                        result |= DirectionType2D.Down;
                 }
                 else if (normalized.y > 0.01f)
                 {
-                    result = DirectionType.Up;
+                    result = DirectionType2D.Up;
                 }
                 return result;
             }
-            return DirectionType.Down;
+            return DirectionType2D.Down;
         }
     }
 }

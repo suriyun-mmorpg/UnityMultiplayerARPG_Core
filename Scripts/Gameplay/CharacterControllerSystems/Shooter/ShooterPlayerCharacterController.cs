@@ -70,7 +70,7 @@ namespace MultiplayerARPG
         bool mustReleaseFireKey;
         Item rightHandWeapon;
         Item leftHandWeapon;
-        MovementFlag movementState;
+        MovementState movementState;
         BaseWeaponAbility weaponAbility;
         WeaponAbilityState weaponAbilityState;
 
@@ -182,11 +182,11 @@ namespace MultiplayerARPG
             {
                 UpdateCrosshair(currentCrosshairSetting, currentCrosshairSetting.expandPerFrameWhileAttacking);
             }
-            else if (movementState.HasFlag(MovementFlag.Forward) ||
-                movementState.HasFlag(MovementFlag.Backward) ||
-                movementState.HasFlag(MovementFlag.Left) ||
-                movementState.HasFlag(MovementFlag.Right) ||
-                movementState.HasFlag(MovementFlag.IsJump))
+            else if (movementState.HasFlag(MovementState.Forward) ||
+                movementState.HasFlag(MovementState.Backward) ||
+                movementState.HasFlag(MovementState.Left) ||
+                movementState.HasFlag(MovementState.Right) ||
+                movementState.HasFlag(MovementState.IsJump))
             {
                 UpdateCrosshair(currentCrosshairSetting, currentCrosshairSetting.expandPerFrameWhileMoving);
             }
@@ -197,13 +197,13 @@ namespace MultiplayerARPG
 
             // Clear controlling states from last update
             isDoingAction = false;
-            movementState = MovementFlag.None;
+            movementState = MovementState.None;
             UpdateActivatedWeaponAbility(tempDeltaTime);
 
             if (IsBlockController || GenericUtils.IsFocusInputField())
             {
                 mustReleaseFireKey = false;
-                PlayerCharacterEntity.KeyMovement(Vector3.zero, MovementFlag.None);
+                PlayerCharacterEntity.KeyMovement(Vector3.zero, MovementState.None);
                 DeactivateWeaponAbility();
                 return;
             }
@@ -351,20 +351,20 @@ namespace MultiplayerARPG
             {
                 case Mode.Adventure:
                     if (inputV > 0.5f || inputV < -0.5f || inputH > 0.5f || inputH < -0.5f)
-                        movementState = MovementFlag.Forward;
+                        movementState = MovementState.Forward;
                     moveLookDirection = moveDirection;
                     break;
                 case Mode.Combat:
                     moveDirection += forward * inputV;
                     moveDirection += right * inputH;
                     if (inputV > 0.5f)
-                        movementState |= MovementFlag.Forward;
+                        movementState |= MovementState.Forward;
                     else if (inputV < -0.5f)
-                        movementState |= MovementFlag.Backward;
+                        movementState |= MovementState.Backward;
                     if (inputH > 0.5f)
-                        movementState |= MovementFlag.Right;
+                        movementState |= MovementState.Right;
                     else if (inputH < -0.5f)
-                        movementState |= MovementFlag.Left;
+                        movementState |= MovementState.Left;
                     moveLookDirection = actionLookDirection;
                     break;
             }
@@ -448,13 +448,13 @@ namespace MultiplayerARPG
                         targetLookDirection = actionLookDirection;
                         // Set movement state by inputs
                         if (inputV > 0.5f)
-                            movementState |= MovementFlag.Forward;
+                            movementState |= MovementState.Forward;
                         else if (inputV < -0.5f)
-                            movementState |= MovementFlag.Backward;
+                            movementState |= MovementState.Backward;
                         if (inputH > 0.5f)
-                            movementState |= MovementFlag.Right;
+                            movementState |= MovementState.Right;
                         else if (inputH < -0.5f)
-                            movementState |= MovementFlag.Left;
+                            movementState |= MovementState.Left;
                     }
                     else
                     {
@@ -541,7 +541,7 @@ namespace MultiplayerARPG
             }
             // If jumping add jump state
             if (InputManager.GetButtonDown("Jump"))
-                movementState |= MovementFlag.IsJump;
+                movementState |= MovementState.IsJump;
 
             PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
         }

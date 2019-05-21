@@ -5,20 +5,20 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public class CharacterAnimation2D
+    public class AnimatorCharacterAnimation2D
     {
         [Header("4-Directions")]
-        public AnimationClip2D down;
-        public AnimationClip2D up;
-        public AnimationClip2D left;
-        public AnimationClip2D right;
+        public AnimationClip down;
+        public AnimationClip up;
+        public AnimationClip left;
+        public AnimationClip right;
         [Header("8-Directions")]
-        public AnimationClip2D downLeft;
-        public AnimationClip2D downRight;
-        public AnimationClip2D upLeft;
-        public AnimationClip2D upRight;
+        public AnimationClip downLeft;
+        public AnimationClip downRight;
+        public AnimationClip upLeft;
+        public AnimationClip upRight;
 
-        public AnimationClip2D GetClipByDirection(DirectionType2D directionType)
+        public AnimationClip GetClipByDirection(DirectionType2D directionType)
         {
             switch (directionType)
             {
@@ -57,7 +57,7 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public class ActionAnimation2D : CharacterAnimation2D
+    public class AnimatorActionAnimation2D : AnimatorCharacterAnimation2D
     {
         [Tooltip("This will be in use with attack/skill animations, This is rate of total animation duration at when it should hit enemy or apply skill")]
         [Range(0f, 1f)]
@@ -77,19 +77,19 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public struct WeaponAnimations2D
+    public struct AnimatorWeaponAnimations2D
     {
         public WeaponType weaponType;
-        public ActionAnimation2D rightHandAttackAnimation;
-        public ActionAnimation2D leftHandAttackAnimation;
-        public ActionAnimation2D rightHandReloadAnimation;
-        public ActionAnimation2D leftHandReloadAnimation;
+        public AnimatorActionAnimation2D rightHandAttackAnimation;
+        public AnimatorActionAnimation2D leftHandAttackAnimation;
+        public AnimatorActionAnimation2D rightHandReloadAnimation;
+        public AnimatorActionAnimation2D leftHandReloadAnimation;
     }
 
     [System.Serializable]
-    public struct SkillCastAnimations2D
+    public struct SkillCastAnimations2DByClip
     {
         public Skill skill;
-        public ActionAnimation2D animation;
+        public AnimatorActionAnimation2D animation;
     }
 }
