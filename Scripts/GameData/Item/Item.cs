@@ -25,9 +25,10 @@ namespace MultiplayerARPG
         Automatic,
     }
 
-    [CreateAssetMenu(fileName = "Item", menuName = "Create GameData/Item")]
+    [CreateAssetMenu(fileName = "Item", menuName = "Create GameData/Item", order = -4899)]
     public partial class Item : BaseGameData
     {
+        [Header("Item Configs")]
         public ItemType itemType;
         public GameObject dropModel;
         public int sellPrice;
@@ -37,14 +38,31 @@ namespace MultiplayerARPG
         public ItemRefine itemRefineInfo;
         [Tooltip("This is duration to lock item at first time when pick up dropped item or bought it from NPC or IAP system")]
         public float lockDuration;
-
-        // Armor
-        public ArmorType armorType;
-
-        // Weapon
-        public WeaponType weaponType;
+        
+        [Header("Equipment Configs")]
+        public EquipmentModel[] equipmentModels;
+        [Tooltip("This will be available with `Weapon` item, set it in case that it will be equipped at left hand")]
+        public EquipmentModel[] subEquipmentModels;
+        public EquipmentRequirement requirement;
+        public CharacterStatsIncremental increaseStats;
+        public AttributeIncremental[] increaseAttributes;
+        public ResistanceIncremental[] increaseResistances;
+        public DamageIncremental[] increaseDamages;
+        public SkillLevel[] increaseSkillLevels;
+        public EquipmentSet equipmentSet;
+        [Tooltip("Equipment durability, If this set to 0 it will not broken")]
+        [Range(0f, 1000f)]
+        public float maxDurability;
+        [Tooltip("If this is TRUE, your equipment will be destroyed when durability = 0")]
+        public bool destroyIfBroken;
         [Range(0, 6)]
         public byte maxSocket;
+
+        [Header("Armor Configs")]
+        public ArmorType armorType;
+
+        [Header("Weapon Configs")]
+        public WeaponType weaponType;
         [Range(0f, 1f)]
         [Tooltip("This is move speed rate while attacking with this weapon")]
         public float moveSpeedRateWhileAttacking = 0f;
@@ -61,41 +79,24 @@ namespace MultiplayerARPG
             minSpread = 10f,
             maxSpread = 50f
         };
-        [Header("Fire Options")]
+        [Header("Fire Configs")]
         public FireType fireType;
         public Vector2 fireStagger;
         public byte fireSpread;
 
-        // Equipment
-        public EquipmentModel[] equipmentModels;
-        [Tooltip("This will be available with `Weapon` item, set it in case that it will be equipped at left hand")]
-        public EquipmentModel[] subEquipmentModels;
-        public EquipmentRequirement requirement;
-        public CharacterStatsIncremental increaseStats;
-        public AttributeIncremental[] increaseAttributes;
-        public ResistanceIncremental[] increaseResistances;
-        public DamageIncremental[] increaseDamages;
-        public SkillLevel[] increaseSkillLevels;
-        public EquipmentSet equipmentSet;
-        [Tooltip("Equipment durability, If this set to 0 it will not broken")]
-        [Range(0f, 1000f)]
-        public float maxDurability;
-        [Tooltip("If this is TRUE, your equipment will be destroyed when durability = 0")]
-        public bool destroyIfBroken;
-
-        // Potion
+        [Header("Buff Configs")]
         public Buff buff;
 
-        // Ammo
+        [Header("Ammo Configs")]
         public AmmoType ammoType;
 
-        // Building
+        [Header("Building Configs")]
         public BuildingEntity buildingEntity;
 
-        // Pet
+        [Header("Pet Configs")]
         public BaseMonsterCharacterEntity petEntity;
 
-        // Socket Enhancer
+        [Header("Socket Enhancer Configs")]
         public EquipmentBonus socketEnhanceEffect;
 
         public override string Title

@@ -5,6 +5,7 @@ namespace MultiplayerARPG
 {
     public abstract partial class BaseGameData : ScriptableObject
     {
+        [Header("Game Data Configs")]
         [Tooltip("Default title")]
         public string title;
         [Tooltip("Titles by language keys")]

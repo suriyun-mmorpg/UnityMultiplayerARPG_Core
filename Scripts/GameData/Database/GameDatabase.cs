@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     /// <summary>
     /// This game database will load and setup game data from data that set in lists
     /// </summary>
-    [CreateAssetMenu(fileName = "Game Database", menuName = "Create GameDatabase/Game Database")]
+    [CreateAssetMenu(fileName = "Game Database", menuName = "Create GameDatabase/Game Database", order = -5999)]
     public class GameDatabase : BaseGameDatabase
     {
         public Attribute[] attributes;

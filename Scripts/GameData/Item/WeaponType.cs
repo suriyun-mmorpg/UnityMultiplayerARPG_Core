@@ -11,9 +11,10 @@ namespace MultiplayerARPG
         TwoHand,
     }
 
-    [CreateAssetMenu(fileName = "Weapon Type", menuName = "Create GameData/Weapon Type")]
+    [CreateAssetMenu(fileName = "Weapon Type", menuName = "Create GameData/Weapon Type", order = -4895)]
     public partial class WeaponType : BaseGameData
     {
+        [Header("Weapon Type Configs")]
         public WeaponItemEquipType equipType;
         public DamageInfo damageInfo;
         public DamageEffectivenessAttribute[] effectivenessAttributes;

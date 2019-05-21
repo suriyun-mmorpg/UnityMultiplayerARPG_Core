@@ -4,9 +4,10 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Harvestable", menuName = "Create GameData/Harvestable")]
+    [CreateAssetMenu(fileName = "Harvestable", menuName = "Create GameData/Harvestable", order = -4796)]
     public partial class Harvestable : BaseGameData
     {
+        [Header("Harvestable Configs")]
         public HarvestEffectiveness[] harvestEffectivenesses;
 
         private Dictionary<WeaponType, HarvestEffectiveness> cacheHarvestEffectivenesses;

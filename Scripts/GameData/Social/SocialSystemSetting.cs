@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Social System Setting", menuName = "Create GameData/Social System Setting")]
+    [CreateAssetMenu(fileName = "Social System Setting", menuName = "Create GameData/Social System Setting", order = -4698)]
     public partial class SocialSystemSetting : ScriptableObject
     {
         [Header("Party Configs")]

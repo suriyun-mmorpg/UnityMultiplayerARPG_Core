@@ -10,9 +10,10 @@ namespace MultiplayerARPG
         Passive,
     }
 
-    [CreateAssetMenu(fileName = "Guild Skill", menuName = "Create GameData/Guild Skill")]
+    [CreateAssetMenu(fileName = "Guild Skill", menuName = "Create GameData/Guild Skill", order = -4698)]
     public partial class GuildSkill : BaseGameData
     {
+        [Header("Guild Skill Configs")]
         public GuildSkillType skillType;
 
         [Range(1, 100)]

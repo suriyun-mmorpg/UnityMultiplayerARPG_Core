@@ -7,7 +7,7 @@ namespace MultiplayerARPG
     /// <summary>
     /// This game database will load and setup game data from Resources folder
     /// </summary>
-    [CreateAssetMenu(fileName = "Resources Folder Game Database", menuName = "Create GameDatabase/Resources Folder Game Database")]
+    [CreateAssetMenu(fileName = "Resources Folder Game Database", menuName = "Create GameDatabase/Resources Folder Game Database", order = -5998)]
     public class ResourcesFolderGameDatabase : BaseGameDatabase
     {
         public override void LoadData(GameInstance gameInstance)

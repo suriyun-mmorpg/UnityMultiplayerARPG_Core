@@ -4,9 +4,10 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Cash Shop Item", menuName = "Create CashShop/Cash Shop Item")]
+    [CreateAssetMenu(fileName = "Cash Shop Item", menuName = "Create CashShop/Cash Shop Item", order = -3996)]
     public class CashShopItem : BaseGameData
     {
+        [Header("Cash Shop Item Configs")]
         public string externalIconUrl;
         public int sellPrice;
         public int receiveGold;

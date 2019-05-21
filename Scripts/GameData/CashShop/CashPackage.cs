@@ -5,13 +5,14 @@ using UnityEngine.Purchasing;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Cash Package", menuName = "Create CashShop/Cash Package")]
+    [CreateAssetMenu(fileName = "Cash Package", menuName = "Create CashShop/Cash Package", order = -3995)]
     public class CashPackage : BaseGameData
     {
-        [HideInInspector]
-        public string productId;
+        [Header("Cash Package Configs")]
         public string externalIconUrl;
         public int cashAmount;
+        [HideInInspector]
+        public string productId;
 
         public override string Id { get { return productId; } }
 

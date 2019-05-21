@@ -26,9 +26,10 @@ namespace MultiplayerARPG
         BuffToNearbyCharacters,
     }
 
-    [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill")]
+    [CreateAssetMenu(fileName = "Skill", menuName = "Create GameData/Skill", order = -4996)]
     public partial class Skill : BaseGameData
     {
+        [Header("Skill Configs")]
         public SkillType skillType;
         [Range(1, 100)]
         public short maxLevel = 1;

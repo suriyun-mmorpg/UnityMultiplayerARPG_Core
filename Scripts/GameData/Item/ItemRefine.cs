@@ -3,9 +3,10 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Item Refine Info", menuName = "Create GameData/Item Refine Info")]
+    [CreateAssetMenu(fileName = "Item Refine Info", menuName = "Create GameData/Item Refine", order = -4898)]
     public partial class ItemRefine : BaseGameData
     {
+        [Header("Item Refine Configs")]
         public Color titleColor = Color.white;
         [Tooltip("This is refine level, each level have difference success rate, required items, required gold")]
         public ItemRefineLevel[] levels;

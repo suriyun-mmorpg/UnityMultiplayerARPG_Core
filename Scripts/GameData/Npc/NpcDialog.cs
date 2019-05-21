@@ -20,7 +20,7 @@ namespace MultiplayerARPG
         GuildStorage,
     }
 
-    [CreateAssetMenu(fileName = "Npc Dialog", menuName = "Create GameData/Npc Dialog")]
+    [CreateAssetMenu(fileName = "Npc Dialog", menuName = "Create GameData/Npc Dialog", order = -4798)]
     public partial class NpcDialog : BaseGameData
     {
         public const int QUEST_ACCEPT_MENU_INDEX = 0;
@@ -38,6 +38,7 @@ namespace MultiplayerARPG
         public const int STORAGE_CONFIRM_MENU_INDEX = 0;
         public const int STORAGE_CANCEL_MENU_INDEX = 1;
 
+        [Header("NPC Dialog Configs")]
         public NpcDialogType type;
         public NpcDialogMenu[] menus;
         // Quest

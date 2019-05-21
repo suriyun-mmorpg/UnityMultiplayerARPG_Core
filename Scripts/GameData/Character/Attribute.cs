@@ -4,9 +4,10 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "Attribute", menuName = "Create GameData/Attribute")]
+    [CreateAssetMenu(fileName = "Attribute", menuName = "Create GameData/Attribute", order = -4997)]
     public partial class Attribute : BaseGameData
     {
+        [Header("Attribute Configs")]
         public CharacterStats statsIncreaseEachLevel;
         [Tooltip("If this value more than 0 it will limit max amount of this attribute by this value")]
         public short maxAmount;
