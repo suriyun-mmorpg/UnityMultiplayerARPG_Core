@@ -15,6 +15,7 @@ namespace MultiplayerARPG
         [Header("Add New Language")]
         [Tooltip("You can add new language by `Add New Language` context menu")]
         public string newLanguageKey;
+        [InspectorButton("AddNewLanguage")]
         public bool addNewLanguage;
         [Header("Language List")]
         public List<Language> languageList = new List<Language>();
@@ -28,18 +29,6 @@ namespace MultiplayerARPG
             }
             ChangeLanguage(defaultLanguageKey);
         }
-
-#if UNITY_EDITOR
-        private void OnValidate()
-        {
-            if (addNewLanguage)
-            {
-                addNewLanguage = false;
-                AddNewLanguage();
-                EditorUtility.SetDirty(this);
-            }
-        }
-#endif
 
         private void SetupDefaultTexts()
         {
