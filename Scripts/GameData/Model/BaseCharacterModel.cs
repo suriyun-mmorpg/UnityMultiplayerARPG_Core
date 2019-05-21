@@ -7,7 +7,9 @@ namespace MultiplayerARPG
     public abstract class BaseCharacterModel : GameEntityModel
     {
         [Header("Equipment Containers")]
-        public EquipmentModelContainer[] equipmentContainers;
+        public EquipmentContainer[] equipmentContainers;
+        [InspectorButton("SetEquipmentContainersBySetters")]
+        public bool setEquipmentContainersBySetters;
 
         private Transform cacheTransform;
         public Transform CacheTransform
@@ -19,18 +21,18 @@ namespace MultiplayerARPG
                 return cacheTransform;
             }
         }
-        private Dictionary<string, EquipmentModelContainer> cacheEquipmentModelContainers = null;
+        private Dictionary<string, EquipmentContainer> cacheEquipmentModelContainers = null;
         /// <summary>
         /// Dictionary[equipSocket(String), container(EquipmentModelContainer)]
         /// </summary>
-        public Dictionary<string, EquipmentModelContainer> CacheEquipmentModelContainers
+        public Dictionary<string, EquipmentContainer> CacheEquipmentModelContainers
         {
             get
             {
                 if (cacheEquipmentModelContainers == null)
                 {
-                    cacheEquipmentModelContainers = new Dictionary<string, EquipmentModelContainer>();
-                    foreach (EquipmentModelContainer equipmentContainer in equipmentContainers)
+                    cacheEquipmentModelContainers = new Dictionary<string, EquipmentContainer>();
+                    foreach (EquipmentContainer equipmentContainer in equipmentContainers)
                     {
                         if (equipmentContainer.transform != null && !cacheEquipmentModelContainers.ContainsKey(equipmentContainer.equipSocket))
                             cacheEquipmentModelContainers[equipmentContainer.equipSocket] = equipmentContainer;
@@ -61,18 +63,19 @@ namespace MultiplayerARPG
         protected GameObject tempEquipmentObject;
         protected BaseEquipmentEntity tempEquipmentEntity;
 
-        protected virtual void Awake()
+        protected override void Awake()
         {
-            SetupEquipmentContainersBySetters();
+            base.Awake();
+            SetEquipmentContainersBySetters();
         }
 
-        [ContextMenu("SetupEquipmentContainersBySetters")]
-        public void SetupEquipmentContainersBySetters()
+        [ContextMenu("Set Equipment Containers By Setters")]
+        public void SetEquipmentContainersBySetters()
         {
-            EquipmentModelContainerSetter[] setters = GetComponentsInChildren<EquipmentModelContainerSetter>();
+            EquipmentContainerSetter[] setters = GetComponentsInChildren<EquipmentContainerSetter>();
             if (setters != null && setters.Length > 0)
             {
-                foreach (EquipmentModelContainerSetter setter in setters)
+                foreach (EquipmentContainerSetter setter in setters)
                 {
                     setter.ApplyToCharacterModel(this);
                 }
@@ -86,7 +89,7 @@ namespace MultiplayerARPG
                 return;
             foreach (KeyValuePair<string, GameObject> model in models)
             {
-                EquipmentModelContainer container;
+                EquipmentContainer container;
                 if (!CacheEquipmentModelContainers.TryGetValue(model.Key, out container))
                     continue;
                 container.SetActiveDefaultModel(false);
@@ -102,7 +105,7 @@ namespace MultiplayerARPG
                 foreach (KeyValuePair<string, GameObject> model in oldModels)
                 {
                     Destroy(model.Value);
-                    EquipmentModelContainer container;
+                    EquipmentContainer container;
                     if (!CacheEquipmentModelContainers.TryGetValue(model.Key, out container))
                         continue;
                     container.SetActiveDefaultModel(true);
@@ -190,7 +193,7 @@ namespace MultiplayerARPG
             {
                 if (string.IsNullOrEmpty(equipmentModel.equipSocket) || equipmentModel.model == null)
                     continue;
-                EquipmentModelContainer container;
+                EquipmentContainer container;
                 if (!CacheEquipmentModelContainers.TryGetValue(equipmentModel.equipSocket, out container))
                     continue;
                 tempEquipmentObject = Instantiate(equipmentModel.model, container.transform);
@@ -377,7 +380,7 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public struct EquipmentModelContainer
+    public struct EquipmentContainer
     {
         public string equipSocket;
         public GameObject defaultModel;

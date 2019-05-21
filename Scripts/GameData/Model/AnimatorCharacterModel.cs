@@ -7,6 +7,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
+    [ExecuteInEditMode]
     public class AnimatorCharacterModel : BaseRemakeCharacterModel
     {
         public enum AnimatorControllerType
@@ -58,7 +59,7 @@ namespace MultiplayerARPG
             base.Awake();
             SetupComponent();
         }
-        
+
         protected override void OnValidate()
         {
             base.OnValidate();

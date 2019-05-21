@@ -7,6 +7,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
+    [ExecuteInEditMode]
     public class CharacterModel : BaseCharacterModel
     {
         // Animator variables

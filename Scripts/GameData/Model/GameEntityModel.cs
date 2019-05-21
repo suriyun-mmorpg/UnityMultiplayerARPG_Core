@@ -21,6 +21,8 @@ namespace MultiplayerARPG
 
         [Header("Effect Containers")]
         public EffectContainer[] effectContainers;
+        [InspectorButton("SetEffectContainersBySetters")]
+        public bool setEffectContainersBySetters;
 
         private Dictionary<string, EffectContainer> cacheEffectContainers = null;
         /// <summary>
@@ -46,16 +48,34 @@ namespace MultiplayerARPG
         // Optimize garbage collector
         private GameEffect tempGameEffect;
 
-#if UNITY_EDITOR
+        protected virtual void Awake()
+        {
+            SetEffectContainersBySetters();
+        }
+
         protected virtual void OnValidate()
         {
+#if UNITY_EDITOR
             if (!Application.isPlaying && dataId != name.GenerateHashId())
             {
                 dataId = name.GenerateHashId();
                 EditorUtility.SetDirty(this);
             }
-        }
 #endif
+        }
+
+        [ContextMenu("Set Effect Containers By Setters")]
+        public void SetEffectContainersBySetters()
+        {
+            EffectContainerSetter[] setters = GetComponentsInChildren<EffectContainerSetter>();
+            if (setters != null && setters.Length > 0)
+            {
+                foreach (EffectContainerSetter setter in setters)
+                {
+                    setter.ApplyToCharacterModel(this);
+                }
+            }
+        }
 
         public void SetHidding(bool isHidding)
         {

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class EquipmentModelContainerSetter : MonoBehaviour
+    public class EquipmentContainerSetter : MonoBehaviour
     {
         public GameObject defaultModel;
 
@@ -17,10 +17,10 @@ namespace MultiplayerARPG
             }
             bool hasChanges = false;
             bool isFound = false;
-            List<EquipmentModelContainer> equipmentContainers = new List<EquipmentModelContainer>(characterModel.equipmentContainers);
+            List<EquipmentContainer> equipmentContainers = new List<EquipmentContainer>(characterModel.equipmentContainers);
             for (int i = 0; i < equipmentContainers.Count; ++i)
             {
-                EquipmentModelContainer equipmentContainer = equipmentContainers[i];
+                EquipmentContainer equipmentContainer = equipmentContainers[i];
                 if (equipmentContainer.transform == transform)
                 {
                     isFound = true;
@@ -35,7 +35,7 @@ namespace MultiplayerARPG
             if (!isFound)
             {
                 hasChanges = true;
-                EquipmentModelContainer newEquipmentContainer = new EquipmentModelContainer();
+                EquipmentContainer newEquipmentContainer = new EquipmentContainer();
                 newEquipmentContainer.equipSocket = name;
                 newEquipmentContainer.defaultModel = defaultModel;
                 newEquipmentContainer.transform = transform;
