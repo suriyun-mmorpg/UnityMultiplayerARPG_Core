@@ -21,6 +21,7 @@ namespace MultiplayerARPG
         // Events
         private System.Action onGameDataLoaded;
         public static GameInstance Singleton { get; protected set; }
+        [Header("Game Instance Configs")]
         [SerializeField]
         private DimensionType dimensionType;
         [SerializeField]
