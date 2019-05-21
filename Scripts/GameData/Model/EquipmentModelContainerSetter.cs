@@ -1,9 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace MultiplayerARPG
 {
@@ -11,10 +8,8 @@ namespace MultiplayerARPG
     {
         public GameObject defaultModel;
 
-        private void OnValidate()
+        public void ApplyToCharacterModel(BaseCharacterModel characterModel)
         {
-#if UNITY_EDITOR
-            BaseCharacterModel characterModel = GetComponentInParent<BaseCharacterModel>();
             if (characterModel == null)
             {
                 Debug.LogWarning("[EquipmentModelContainerSetter] Cannot find character model");
@@ -26,9 +21,7 @@ namespace MultiplayerARPG
             for (int i = 0; i < equipmentContainers.Count; ++i)
             {
                 EquipmentModelContainer equipmentContainer = equipmentContainers[i];
-                if (equipmentContainer.transform == this &&
-                    (!equipmentContainer.equipSocket.Equals(name) ||
-                    equipmentContainer.defaultModel != defaultModel))
+                if (equipmentContainer.transform == transform)
                 {
                     isFound = true;
                     hasChanges = true;
@@ -51,9 +44,7 @@ namespace MultiplayerARPG
             if (hasChanges)
             {
                 characterModel.equipmentContainers = equipmentContainers.ToArray();
-                EditorUtility.SetDirty(characterModel);
             }
-#endif
         }
     }
 }

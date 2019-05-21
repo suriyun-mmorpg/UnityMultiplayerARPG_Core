@@ -47,7 +47,7 @@ namespace MultiplayerARPG
         private GameEffect tempGameEffect;
 
 #if UNITY_EDITOR
-        private void OnValidate()
+        protected virtual void OnValidate()
         {
             if (!Application.isPlaying && dataId != name.GenerateHashId())
             {

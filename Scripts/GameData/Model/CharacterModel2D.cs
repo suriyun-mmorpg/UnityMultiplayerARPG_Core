@@ -142,18 +142,16 @@ namespace MultiplayerARPG
         private SampleAnimation? dirtySampleAnimation;
         private DirectionType2D? dirtySampleType;
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             MigrateSkillCastAnimations();
-        }
-
-        private void Start()
-        {
             Play(idleAnimation2D, DirectionType2D.Down);
         }
 
-        private void OnValidate()
+        protected override void OnValidate()
         {
+            base.OnValidate();
 #if UNITY_EDITOR
             if (MigrateSkillCastAnimations())
                 EditorUtility.SetDirty(this);

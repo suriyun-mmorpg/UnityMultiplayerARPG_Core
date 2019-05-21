@@ -179,14 +179,16 @@ namespace MultiplayerARPG
             }
         }
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             MigrateSkillCastAnimations();
             SetupComponent();
         }
 
-        private void OnValidate()
+        protected override void OnValidate()
         {
+            base.OnValidate();
 #if UNITY_EDITOR
             if (MigrateSkillCastAnimations())
                 EditorUtility.SetDirty(this);

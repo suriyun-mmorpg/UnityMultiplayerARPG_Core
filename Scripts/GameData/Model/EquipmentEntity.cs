@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         private Renderer equipmentRenderer;
         private Material[] defaultMaterials;
         private List<GameObject> allEffectObjects = new List<GameObject>();
+        private bool isFoundEffect;
         private EquipmentEntityEffect usingEffect;
 
         private void Awake()
@@ -47,12 +48,16 @@ namespace MultiplayerARPG
                 }
             }
 
+            isFoundEffect = false;
             if (effects != null && effects.Count > 0)
             {
                 foreach (EquipmentEntityEffect effect in effects)
                 {
                     if (level >= effect.level)
+                    {
+                        isFoundEffect = true;
                         usingEffect = effect;
+                    }
                     else
                         break;
                 }
@@ -67,6 +72,12 @@ namespace MultiplayerARPG
                         effectObject.SetActive(true);
                     }
                 }
+            }
+            // Not found effect apply default materials
+            if (!isFoundEffect)
+            {
+                if (equipmentRenderer != null)
+                    equipmentRenderer.materials = defaultMaterials;
             }
         }
     }

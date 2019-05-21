@@ -23,8 +23,9 @@ namespace MultiplayerARPG
         private bool isPlayingActionAnimation;
         private string lastFadedLegacyClipName;
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             SetupComponent();
         }
 

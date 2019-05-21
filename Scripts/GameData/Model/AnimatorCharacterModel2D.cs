@@ -197,13 +197,15 @@ namespace MultiplayerARPG
         // Private state validater
         private bool isSetupComponent;
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             SetupComponent();
         }
 
-        protected virtual void OnValidate()
+        protected override void OnValidate()
         {
+            base.OnValidate();
 #if UNITY_EDITOR
             bool hasChanges = false;
             RuntimeAnimatorController changingAnimatorController;

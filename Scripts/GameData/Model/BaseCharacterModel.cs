@@ -61,6 +61,24 @@ namespace MultiplayerARPG
         protected GameObject tempEquipmentObject;
         protected BaseEquipmentEntity tempEquipmentEntity;
 
+        protected virtual void Awake()
+        {
+            SetupEquipmentContainersBySetters();
+        }
+
+        [ContextMenu("SetupEquipmentContainersBySetters")]
+        public void SetupEquipmentContainersBySetters()
+        {
+            EquipmentModelContainerSetter[] setters = GetComponentsInChildren<EquipmentModelContainerSetter>();
+            if (setters != null && setters.Length > 0)
+            {
+                foreach (EquipmentModelContainerSetter setter in setters)
+                {
+                    setter.ApplyToCharacterModel(this);
+                }
+            }
+        }
+
         private void CreateCacheModel(string equipPosition, Dictionary<string, GameObject> models)
         {
             DestroyCacheModel(equipPosition);
