@@ -193,8 +193,9 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR
             if (MigrateSkillCastAnimations())
                 EditorUtility.SetDirty(this);
-#endif
-            if (isSetupComponent && animatorType == AnimatorType.Animator)
+
+            if (animatorType == AnimatorType.Animator &&
+                CacheAnimatorController != null)
             {
                 SetupGenericClips_Animator(
                     defaultAnimatorData.idleClip,
@@ -211,6 +212,7 @@ namespace MultiplayerARPG
                     defaultAnimatorData.hurtClip,
                     defaultAnimatorData.deadClip);
             }
+#endif
         }
 
         private bool MigrateSkillCastAnimations()

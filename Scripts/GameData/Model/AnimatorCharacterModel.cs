@@ -109,8 +109,8 @@ namespace MultiplayerARPG
             }
             if (hasChanges)
                 EditorUtility.SetDirty(this);
-            
-            if (isSetupComponent)
+
+            if (CacheAnimatorController != null)
             {
                 CacheAnimatorController[CLIP_IDLE] = defaultAnimations.idleClip;
                 CacheAnimatorController[CLIP_MOVE] = defaultAnimations.moveClip;
