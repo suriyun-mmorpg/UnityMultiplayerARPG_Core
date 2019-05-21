@@ -87,9 +87,12 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public struct AnimatorSkillCastAnimations2D
+    public struct AnimatorSkillAnimations2D
     {
         public Skill skill;
-        public AnimatorActionAnimation2D animation;
+        public AnimatorCharacterAnimation2D castAnimation;
+        public SkillActivateAnimationType activateAnimationType;
+        [StringShowConditional("activateAnimationType", "UseActivateAnimation")]
+        public AnimatorActionAnimation2D activateAnimation;
     }
 }

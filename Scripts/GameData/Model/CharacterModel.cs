@@ -658,8 +658,8 @@ namespace MultiplayerARPG
         {
             // If animator is not null, play the action animation
             ActionAnimation tempActionAnimation = GetActionAnimation(animActionType, dataId, index);
-            yield return 0;
             CacheAnimatorController[defaultActionClipName] = tempActionAnimation.clip;
+            yield return 0;
             AudioClip audioClip = tempActionAnimation.GetRandomAudioClip();
             if (audioClip != null)
                 AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
@@ -888,7 +888,7 @@ namespace MultiplayerARPG
         public override SkillActivateAnimationType UseSkillActivateAnimationType(int dataId)
         {
             if (!CacheSkillAnimations.ContainsKey(dataId))
-                return SkillActivateAnimationType.UseAttackAnimation;
+                return SkillActivateAnimationType.UseActivateAnimation;
             return CacheSkillAnimations[dataId].activateAnimationType;
         }
         #endregion

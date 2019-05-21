@@ -8,7 +8,7 @@ using UnityEditor;
 namespace MultiplayerARPG
 {
     [ExecuteInEditMode]
-    public class CharacterModel2D : CharacterModel, ICharacterModel2D
+    public class CharacterModel2D : BaseCharacterModel, ICharacterModel2D
     {
         public enum SampleAnimation
         {
@@ -25,10 +25,16 @@ namespace MultiplayerARPG
         public CharacterAnimation2D moveAnimation2D;
         public CharacterAnimation2D deadAnimation2D;
         public ActionAnimation2D defaultAttackAnimation2D;
-        public ActionAnimation2D defaultSkillCastAnimation2D;
+        public CharacterAnimation2D defaultSkillCastClip2D;
+        public ActionAnimation2D defaultSkillActivateAnimation2D;
         public ActionAnimation2D defaultReloadAnimation2D;
         public WeaponAnimations2D[] weaponAnimations2D;
+        public SkillAnimations2D[] skillAnimations2D;
+
+        // Deprecated
+        public ActionAnimation2D defaultSkillCastAnimation2D;
         public SkillCastAnimations2D[] skillCastAnimations2D;
+
         public float magnitudeToPlayMoveClip = 0.1f;
         [Header("Sample 2D Animations")]
         public SampleAnimation sampleAnimation = SampleAnimation.Idle;
@@ -107,21 +113,21 @@ namespace MultiplayerARPG
             }
         }
 
-        private Dictionary<int, ActionAnimation2D> cacheSkillCastAnimations;
-        public Dictionary<int, ActionAnimation2D> CacheSkillCastAnimations
+        private Dictionary<int, SkillAnimations2D> cacheSkillAnimations;
+        public Dictionary<int, SkillAnimations2D> CacheSkillAnimations
         {
             get
             {
-                if (cacheSkillCastAnimations == null)
+                if (cacheSkillAnimations == null)
                 {
-                    cacheSkillCastAnimations = new Dictionary<int, ActionAnimation2D>();
-                    foreach (SkillCastAnimations2D skillCastAnimation in skillCastAnimations2D)
+                    cacheSkillAnimations = new Dictionary<int, SkillAnimations2D>();
+                    foreach (SkillAnimations2D skillAnimation in skillAnimations2D)
                     {
-                        if (skillCastAnimation.skill == null) continue;
-                        cacheSkillCastAnimations[skillCastAnimation.skill.DataId] = skillCastAnimation.animation;
+                        if (skillAnimation.skill == null) continue;
+                        cacheSkillAnimations[skillAnimation.skill.DataId] = skillAnimation;
                     }
                 }
-                return cacheSkillCastAnimations;
+                return cacheSkillAnimations;
             }
         }
 
@@ -136,9 +142,50 @@ namespace MultiplayerARPG
         private SampleAnimation? dirtySampleAnimation;
         private DirectionType2D? dirtySampleType;
 
+        private void Awake()
+        {
+            MigrateSkillCastAnimations();
+        }
+
         private void Start()
         {
             Play(idleAnimation2D, DirectionType2D.Down);
+        }
+
+        private void OnValidate()
+        {
+#if UNITY_EDITOR
+            if (MigrateSkillCastAnimations())
+                EditorUtility.SetDirty(this);
+#endif
+        }
+
+        private bool MigrateSkillCastAnimations()
+        {
+            bool hasChanges = false;
+            if (defaultSkillCastAnimation2D != null)
+            {
+                hasChanges = true;
+                defaultSkillActivateAnimation2D = defaultSkillCastAnimation2D;
+                defaultSkillCastAnimation2D = null;
+            }
+
+            if (skillCastAnimations2D != null &&
+                skillCastAnimations2D.Length > 0)
+            {
+                hasChanges = true;
+                skillAnimations2D = new SkillAnimations2D[skillCastAnimations2D.Length];
+                for (int i = 0; i < skillCastAnimations2D.Length; ++i)
+                {
+                    SkillAnimations2D data = new SkillAnimations2D();
+                    data.skill = skillCastAnimations2D[i].skill;
+                    if (skillCastAnimations2D[i].animation != null)
+                        data.activateAnimation = skillCastAnimations2D[i].animation;
+                    skillAnimations2D[i] = data;
+                }
+                //skillCastAnimations2D = null;
+            }
+            return hasChanges;
         }
 
         private void OnEnable()
@@ -278,14 +325,10 @@ namespace MultiplayerARPG
             }
         }
 
-        public override Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1)
-        {
-            return StartCoroutine(PlayActionAnimationRoutine(animActionType, dataId, index, playSpeedMultiplier));
-        }
-
         private ActionAnimation2D GetActionAnimation(AnimActionType animActionType, int dataId)
         {
             ActionAnimation2D animation2D = null;
+            SkillAnimations2D skillAnimations2D;
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
@@ -297,8 +340,10 @@ namespace MultiplayerARPG
                         animation2D = defaultAttackAnimation2D;
                     break;
                 case AnimActionType.Skill:
-                    if (!CacheSkillCastAnimations.TryGetValue(dataId, out animation2D))
-                        animation2D = defaultSkillCastAnimation2D;
+                    if (!CacheSkillAnimations.TryGetValue(dataId, out skillAnimations2D))
+                        animation2D = defaultSkillActivateAnimation2D;
+                    else
+                        animation2D = skillAnimations2D.activateAnimation;
                     break;
                 case AnimActionType.ReloadRightHand:
                     if (!CacheRightHandReloadAnimations.TryGetValue(dataId, out animation2D))
@@ -312,24 +357,29 @@ namespace MultiplayerARPG
             return animation2D;
         }
 
+        public override Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1)
+        {
+            return StartCoroutine(PlayActionAnimationRoutine(animActionType, dataId, index, playSpeedMultiplier));
+        }
+
         IEnumerator PlayActionAnimationRoutine(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
         {
             // If animator is not null, play the action animation
-            ActionAnimation2D animation = GetActionAnimation(animActionType, dataId);
-            if (animation != null)
+            ActionAnimation2D animation2D = GetActionAnimation(animActionType, dataId);
+            if (animation2D != null)
             {
-                AnimationClip2D anim = animation.GetClipByDirection(CurrentDirectionType);
+                AnimationClip2D anim = animation2D.GetClipByDirection(CurrentDirectionType);
                 if (anim != null)
                 {
                     playingAction = true;
-                    AudioClip audioClip = animation.GetRandomAudioClip();
+                    AudioClip audioClip = animation2D.GetRandomAudioClip();
                     if (audioClip != null)
                         AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
                     // Waits by current transition + clip duration before end animation
                     Play(anim);
                     yield return new WaitForSecondsRealtime(anim.duration / playSpeedMultiplier);
                     Play(idleAnimation2D, CurrentDirectionType);
-                    yield return new WaitForSecondsRealtime(animation.extraDuration / playSpeedMultiplier);
+                    yield return new WaitForSecondsRealtime(animation2D.extraDuration / playSpeedMultiplier);
                     playingAction = false;
                 }
             }
@@ -342,9 +392,25 @@ namespace MultiplayerARPG
 
         IEnumerator PlaySkillCastClipRoutine(int dataId, float duration)
         {
-            playingAction = true;
-            yield return new WaitForSecondsRealtime(duration);
-            playingAction = false;
+            CharacterAnimation2D animation2D;
+            SkillAnimations2D skillAnimations2D;
+            if (!CacheSkillAnimations.TryGetValue(dataId, out skillAnimations2D))
+                animation2D = defaultSkillActivateAnimation2D;
+            else
+                animation2D = skillAnimations2D.castAnimation;
+
+            if (animation2D != null)
+            {
+                AnimationClip2D anim = animation2D.GetClipByDirection(CurrentDirectionType);
+                if (anim != null)
+                {
+                    playingAction = true;
+                    Play(anim);
+                    yield return new WaitForSecondsRealtime(duration);
+                    Play(idleAnimation2D, CurrentDirectionType);
+                    playingAction = false;
+                }
+            }
         }
 
         public override void StopActionAnimation()
@@ -401,9 +467,12 @@ namespace MultiplayerARPG
 
         public override bool GetSkillActivateAnimation(int dataId, out float triggerDuration, out float totalDuration)
         {
-            ActionAnimation2D animation2D = null;
-            if (!CacheSkillCastAnimations.TryGetValue(dataId, out animation2D))
-                animation2D = defaultSkillCastAnimation2D;
+            ActionAnimation2D animation2D;
+            SkillAnimations2D skillAnimations2D;
+            if (!CacheSkillAnimations.TryGetValue(dataId, out skillAnimations2D))
+                animation2D = defaultSkillActivateAnimation2D;
+            else
+                animation2D = skillAnimations2D.activateAnimation;
             triggerDuration = 0f;
             totalDuration = 0f;
             if (animation2D == null) return false;
@@ -446,13 +515,9 @@ namespace MultiplayerARPG
 
         public override SkillActivateAnimationType UseSkillActivateAnimationType(int dataId)
         {
-            ActionAnimation2D animation2D = null;
-            if (!CacheSkillCastAnimations.TryGetValue(dataId, out animation2D))
-                animation2D = defaultSkillCastAnimation2D;
-            if (animation2D == null) return SkillActivateAnimationType.UseAttackAnimation;
-            AnimationClip2D clip = animation2D.GetClipByDirection(CurrentDirectionType);
-            if (clip == null) return SkillActivateAnimationType.UseAttackAnimation;
-            return SkillActivateAnimationType.UseActivateAnimation;
+            if (!CacheSkillAnimations.ContainsKey(dataId))
+                return SkillActivateAnimationType.UseActivateAnimation;
+            return CacheSkillAnimations[dataId].activateAnimationType;
         }
     }
 }

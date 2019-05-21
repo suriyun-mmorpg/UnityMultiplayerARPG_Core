@@ -227,7 +227,7 @@ namespace MultiplayerARPG
         public override SkillActivateAnimationType UseSkillActivateAnimationType(int dataId)
         {
             if (!CacheSkillAnimations.ContainsKey(dataId))
-                return SkillActivateAnimationType.UseAttackAnimation;
+                return SkillActivateAnimationType.UseActivateAnimation;
             return CacheSkillAnimations[dataId].activateAnimationType;
         }
     }

@@ -7,56 +7,223 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public class AnimatorCharacterModel2D : AnimatorCharacterModel, ICharacterModel2D
+    public class AnimatorCharacterModel2D : BaseCharacterModel, ICharacterModel2D
     {
+        public enum AnimatorControllerType
+        {
+            FourDirections,
+            EightDirections,
+            Custom,
+        }
+        // Clip name variables
+        // Idle
+        public const string CLIP_IDLE_DOWN = "__IdleDown";
+        public const string CLIP_IDLE_UP = "__IdleUp";
+        public const string CLIP_IDLE_LEFT = "__IdleLeft";
+        public const string CLIP_IDLE_RIGHT = "__IdleRight";
+        public const string CLIP_IDLE_DOWN_LEFT = "__IdleDownLeft";
+        public const string CLIP_IDLE_DOWN_RIGHT = "__IdleDownRight";
+        public const string CLIP_IDLE_UP_LEFT = "__IdleUpLeft";
+        public const string CLIP_IDLE_UP_RIGHT = "__IdleUpRight";
+        // Move
+        public const string CLIP_MOVE_DOWN = "__MoveDown";
+        public const string CLIP_MOVE_UP = "__MoveUp";
+        public const string CLIP_MOVE_LEFT = "__MoveLeft";
+        public const string CLIP_MOVE_RIGHT = "__MoveRight";
+        public const string CLIP_MOVE_DOWN_LEFT = "__MoveDownLeft";
+        public const string CLIP_MOVE_DOWN_RIGHT = "__MoveDownRight";
+        public const string CLIP_MOVE_UP_LEFT = "__MoveUpLeft";
+        public const string CLIP_MOVE_UP_RIGHT = "__MoveUpRight";
+        // Dead
+        public const string CLIP_DEAD_DOWN = "__DeadDown";
+        public const string CLIP_DEAD_UP = "__DeadUp";
+        public const string CLIP_DEAD_LEFT = "__DeadLeft";
+        public const string CLIP_DEAD_RIGHT = "__DeadRight";
+        public const string CLIP_DEAD_DOWN_LEFT = "__DeadDownLeft";
+        public const string CLIP_DEAD_DOWN_RIGHT = "__DeadDownRight";
+        public const string CLIP_DEAD_UP_LEFT = "__DeadUpLeft";
+        public const string CLIP_DEAD_UP_RIGHT = "__DeadUpRight";
+        // Action
+        public const string CLIP_ACTION_DOWN = "__ActionDown";
+        public const string CLIP_ACTION_UP = "__ActionUp";
+        public const string CLIP_ACTION_LEFT = "__ActionLeft";
+        public const string CLIP_ACTION_RIGHT = "__ActionRight";
+        public const string CLIP_ACTION_DOWN_LEFT = "__ActionDownLeft";
+        public const string CLIP_ACTION_DOWN_RIGHT = "__ActionDownRight";
+        public const string CLIP_ACTION_UP_LEFT = "__ActionUpLeft";
+        public const string CLIP_ACTION_UP_RIGHT = "__ActionUpRight";
+        // Cast Skill
+        public const string CLIP_CAST_SKILL_DOWN = "__CastSkillDown";
+        public const string CLIP_CAST_SKILL_UP = "__CastSkillUp";
+        public const string CLIP_CAST_SKILL_LEFT = "__CastSkillLeft";
+        public const string CLIP_CAST_SKILL_RIGHT = "__CastSkillRight";
+        public const string CLIP_CAST_SKILL_DOWN_LEFT = "__CastSkillDownLeft";
+        public const string CLIP_CAST_SKILL_DOWN_RIGHT = "__CastSkillDownRight";
+        public const string CLIP_CAST_SKILL_UP_LEFT = "__CastSkillUpLeft";
+        public const string CLIP_CAST_SKILL_UP_RIGHT = "__CastSkillUpRight";
         // Animator variables
         public static readonly int ANIM_DIRECTION_X = Animator.StringToHash("DirectionX");
         public static readonly int ANIM_DIRECTION_Y = Animator.StringToHash("DirectionY");
+        public static readonly int ANIM_IS_DEAD = Animator.StringToHash("IsDead");
+        public static readonly int ANIM_MOVE_SPEED = Animator.StringToHash("MoveSpeed");
+        public static readonly int ANIM_DO_ACTION = Animator.StringToHash("DoAction");
+        public static readonly int ANIM_IS_CASTING_SKILL = Animator.StringToHash("IsCastingSkill");
+        public static readonly int ANIM_MOVE_CLIP_MULTIPLIER = Animator.StringToHash("MoveSpeedMultiplier");
+        public static readonly int ANIM_ACTION_CLIP_MULTIPLIER = Animator.StringToHash("ActionSpeedMultiplier");
+
+        [Header("2D Animations")]
+        public AnimatorCharacterAnimation2D idleAnimation2D;
+        public AnimatorCharacterAnimation2D moveAnimation2D;
+        public AnimatorCharacterAnimation2D deadAnimation2D;
+        public AnimatorActionAnimation2D defaultAttackAnimation2D;
+        public AnimatorCharacterAnimation2D defaultSkillCastClip2D;
+        public AnimatorActionAnimation2D defaultSkillActivateAnimation2D;
+        public AnimatorActionAnimation2D defaultReloadAnimation2D;
+        public AnimatorWeaponAnimations2D[] weaponAnimations2D;
+        public AnimatorSkillAnimations2D[] skillAnimations2D;
+        public float magnitudeToPlayMoveClip = 0.1f;
+
+        [Header("Settings")]
+        public AnimatorControllerType controllerType;
+
+        [Header("Relates Components")]
+        [Tooltip("It will find `Animator` component on automatically if this is NULL")]
+        public Animator animator;
+        [Tooltip("You can set this when animator controller type is `Custom`")]
+        public RuntimeAnimatorController animatorController;
 
         public DirectionType2D CurrentDirectionType { get; set; }
 
-        protected override void OnValidate()
+        private Dictionary<int, AnimatorActionAnimation2D> cacheRightHandAttackAnimations;
+        public Dictionary<int, AnimatorActionAnimation2D> CacheRightHandAttackAnimations
+        {
+            get
+            {
+                if (cacheRightHandAttackAnimations == null)
+                {
+                    cacheRightHandAttackAnimations = new Dictionary<int, AnimatorActionAnimation2D>();
+                    foreach (AnimatorWeaponAnimations2D attackAnimation in weaponAnimations2D)
+                    {
+                        if (attackAnimation.weaponType == null) continue;
+                        cacheRightHandAttackAnimations[attackAnimation.weaponType.DataId] = attackAnimation.rightHandAttackAnimation;
+                    }
+                }
+                return cacheRightHandAttackAnimations;
+            }
+        }
+
+        private Dictionary<int, AnimatorActionAnimation2D> cacheLeftHandAttackAnimations;
+        public Dictionary<int, AnimatorActionAnimation2D> CacheLeftHandAttackAnimations
+        {
+            get
+            {
+                if (cacheLeftHandAttackAnimations == null)
+                {
+                    cacheLeftHandAttackAnimations = new Dictionary<int, AnimatorActionAnimation2D>();
+                    foreach (AnimatorWeaponAnimations2D attackAnimation in weaponAnimations2D)
+                    {
+                        if (attackAnimation.weaponType == null) continue;
+                        cacheLeftHandAttackAnimations[attackAnimation.weaponType.DataId] = attackAnimation.leftHandAttackAnimation;
+                    }
+                }
+                return cacheLeftHandAttackAnimations;
+            }
+        }
+
+        private Dictionary<int, AnimatorActionAnimation2D> cacheRightHandReloadAnimations;
+        public Dictionary<int, AnimatorActionAnimation2D> CacheRightHandReloadAnimations
+        {
+            get
+            {
+                if (cacheRightHandReloadAnimations == null)
+                {
+                    cacheRightHandReloadAnimations = new Dictionary<int, AnimatorActionAnimation2D>();
+                    foreach (AnimatorWeaponAnimations2D attackAnimation in weaponAnimations2D)
+                    {
+                        if (attackAnimation.weaponType == null) continue;
+                        cacheRightHandReloadAnimations[attackAnimation.weaponType.DataId] = attackAnimation.rightHandReloadAnimation;
+                    }
+                }
+                return cacheRightHandReloadAnimations;
+            }
+        }
+
+        private Dictionary<int, AnimatorActionAnimation2D> cacheLeftHandReloadAnimations;
+        public Dictionary<int, AnimatorActionAnimation2D> CacheLeftHandReloadAnimations
+        {
+            get
+            {
+                if (cacheLeftHandReloadAnimations == null)
+                {
+                    cacheLeftHandReloadAnimations = new Dictionary<int, AnimatorActionAnimation2D>();
+                    foreach (AnimatorWeaponAnimations2D attackAnimation in weaponAnimations2D)
+                    {
+                        if (attackAnimation.weaponType == null) continue;
+                        cacheLeftHandReloadAnimations[attackAnimation.weaponType.DataId] = attackAnimation.leftHandReloadAnimation;
+                    }
+                }
+                return cacheLeftHandReloadAnimations;
+            }
+        }
+
+        private Dictionary<int, AnimatorSkillAnimations2D> cacheSkillAnimations;
+        public Dictionary<int, AnimatorSkillAnimations2D> CacheSkillAnimations
+        {
+            get
+            {
+                if (cacheSkillAnimations == null)
+                {
+                    cacheSkillAnimations = new Dictionary<int, AnimatorSkillAnimations2D>();
+                    foreach (AnimatorSkillAnimations2D skillAnimation in skillAnimations2D)
+                    {
+                        if (skillAnimation.skill == null) continue;
+                        cacheSkillAnimations[skillAnimation.skill.DataId] = skillAnimation;
+                    }
+                }
+                return cacheSkillAnimations;
+            }
+        }
+
+        private AnimatorOverrideController cacheAnimatorController;
+        public AnimatorOverrideController CacheAnimatorController
+        {
+            get
+            {
+                SetupComponent();
+                return cacheAnimatorController;
+            }
+        }
+
+        // Private state validater
+        private bool isSetupComponent;
+
+        private void Awake()
+        {
+            SetupComponent();
+        }
+
+        protected virtual void OnValidate()
         {
 #if UNITY_EDITOR
             bool hasChanges = false;
             RuntimeAnimatorController changingAnimatorController;
             switch (controllerType)
             {
-                case AnimatorControllerType.Simple:
-                    changingAnimatorController = Resources.Load("__Animator/__4DirCharacter2D") as RuntimeAnimatorController;
+                case AnimatorControllerType.FourDirections:
+                    changingAnimatorController = Resources.Load("__Animator/__2DFourDirectionsCharacter") as RuntimeAnimatorController;
                     if (changingAnimatorController != null &&
                         changingAnimatorController != animatorController)
                     {
                         animatorController = changingAnimatorController;
-                        hasChanges = true;
-                    }
-                    if (actionStateLayer != 0)
-                    {
-                        actionStateLayer = 0;
-                        hasChanges = true;
-                    }
-                    if (castSkillStateLayer != 0)
-                    {
-                        castSkillStateLayer = 0;
                         hasChanges = true;
                     }
                     break;
-                case AnimatorControllerType.Advance:
-                    changingAnimatorController = Resources.Load("__Animator/__8DirCharacter2D") as RuntimeAnimatorController;
+                case AnimatorControllerType.EightDirections:
+                    changingAnimatorController = Resources.Load("__Animator/__2DEightDirectionsCharacter") as RuntimeAnimatorController;
                     if (changingAnimatorController != null &&
                         changingAnimatorController != animatorController)
                     {
                         animatorController = changingAnimatorController;
-                        hasChanges = true;
-                    }
-                    if (actionStateLayer != 0)
-                    {
-                        actionStateLayer = 0;
-                        hasChanges = true;
-                    }
-                    if (castSkillStateLayer != 0)
-                    {
-                        castSkillStateLayer = 0;
                         hasChanges = true;
                     }
                     break;
@@ -66,24 +233,278 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public override void UpdateAnimation(bool isDead, MovementState movementState, float playMoveSpeedMultiplier = 1)
+        private void SetupComponent()
+        {
+            if (isSetupComponent)
+                return;
+            // Set setup state to avoid it trying to setup again later
+            isSetupComponent = true;
+            if (cacheAnimatorController == null)
+                cacheAnimatorController = new AnimatorOverrideController(animatorController);
+            // Use override controller as animator
+            if (animator == null)
+                animator = GetComponentInChildren<Animator>();
+            if (animator != null && animator.runtimeAnimatorController != cacheAnimatorController)
+                animator.runtimeAnimatorController = cacheAnimatorController;
+            // Set default clips
+            // Idle
+            CacheAnimatorController[CLIP_IDLE_DOWN] = idleAnimation2D.down;
+            CacheAnimatorController[CLIP_IDLE_UP] = idleAnimation2D.up;
+            CacheAnimatorController[CLIP_IDLE_LEFT] = idleAnimation2D.left;
+            CacheAnimatorController[CLIP_IDLE_RIGHT] = idleAnimation2D.right;
+            CacheAnimatorController[CLIP_IDLE_DOWN_LEFT] = idleAnimation2D.downLeft;
+            CacheAnimatorController[CLIP_IDLE_DOWN_RIGHT] = idleAnimation2D.downRight;
+            CacheAnimatorController[CLIP_IDLE_UP_LEFT] = idleAnimation2D.upLeft;
+            CacheAnimatorController[CLIP_IDLE_UP_RIGHT] = idleAnimation2D.upRight;
+            // Move
+            CacheAnimatorController[CLIP_MOVE_DOWN] = moveAnimation2D.down;
+            CacheAnimatorController[CLIP_MOVE_UP] = moveAnimation2D.up;
+            CacheAnimatorController[CLIP_MOVE_LEFT] = moveAnimation2D.left;
+            CacheAnimatorController[CLIP_MOVE_RIGHT] = moveAnimation2D.right;
+            CacheAnimatorController[CLIP_MOVE_DOWN_LEFT] = moveAnimation2D.downLeft;
+            CacheAnimatorController[CLIP_MOVE_DOWN_RIGHT] = moveAnimation2D.downRight;
+            CacheAnimatorController[CLIP_MOVE_UP_LEFT] = moveAnimation2D.upLeft;
+            CacheAnimatorController[CLIP_MOVE_UP_RIGHT] = moveAnimation2D.upRight;
+            // Dead
+            CacheAnimatorController[CLIP_DEAD_DOWN] = deadAnimation2D.down;
+            CacheAnimatorController[CLIP_DEAD_UP] = deadAnimation2D.up;
+            CacheAnimatorController[CLIP_DEAD_LEFT] = deadAnimation2D.left;
+            CacheAnimatorController[CLIP_DEAD_RIGHT] = deadAnimation2D.right;
+            CacheAnimatorController[CLIP_DEAD_DOWN_LEFT] = deadAnimation2D.downLeft;
+            CacheAnimatorController[CLIP_DEAD_DOWN_RIGHT] = deadAnimation2D.downRight;
+            CacheAnimatorController[CLIP_DEAD_UP_LEFT] = deadAnimation2D.upLeft;
+            CacheAnimatorController[CLIP_DEAD_UP_RIGHT] = deadAnimation2D.upRight;
+        }
+
+        public override void UpdateAnimation(bool isDead, MovementState movementState, float playMoveSpeedMultiplier = 1f)
         {
             if (!animator.gameObject.activeInHierarchy)
                 return;
 
-            // Left/Right
-            if (CurrentDirectionType.HasFlag(DirectionType2D.Left))
-                animator.SetFloat(ANIM_DIRECTION_X, -1);
-            else if (CurrentDirectionType.HasFlag(DirectionType2D.Right))
-                animator.SetFloat(ANIM_DIRECTION_X, 1);
+            if (isDead)
+            {
+                // Clear action animations when dead
+                if (animator.GetBool(ANIM_DO_ACTION))
+                    animator.SetBool(ANIM_DO_ACTION, false);
+                if (animator.GetBool(ANIM_IS_CASTING_SKILL))
+                    animator.SetBool(ANIM_IS_CASTING_SKILL, false);
+            }
 
-            // Up/Down
-            if (CurrentDirectionType.HasFlag(DirectionType2D.Down))
-                animator.SetFloat(ANIM_DIRECTION_Y, -1);
-            else if (CurrentDirectionType.HasFlag(DirectionType2D.Up))
-                animator.SetFloat(ANIM_DIRECTION_Y, 1);
+            float moveSpeed = 0f;
+            if (movementState.HasFlag(MovementState.Forward) ||
+                movementState.HasFlag(MovementState.Backward) ||
+                movementState.HasFlag(MovementState.Right) ||
+                movementState.HasFlag(MovementState.Left))
+                moveSpeed = 1;
+            // Set animator parameters
+            animator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : moveSpeed);
+            animator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, playMoveSpeedMultiplier);
+            animator.SetBool(ANIM_IS_DEAD, isDead);
+        }
 
-            base.UpdateAnimation(isDead, movementState, playMoveSpeedMultiplier);
+        private AnimatorActionAnimation2D GetActionAnimation(AnimActionType animActionType, int dataId)
+        {
+            AnimatorActionAnimation2D animation2D = null;
+            AnimatorSkillAnimations2D skillAnimations2D;
+            switch (animActionType)
+            {
+                case AnimActionType.AttackRightHand:
+                    if (!CacheRightHandAttackAnimations.TryGetValue(dataId, out animation2D))
+                        animation2D = defaultAttackAnimation2D;
+                    break;
+                case AnimActionType.AttackLeftHand:
+                    if (!CacheLeftHandAttackAnimations.TryGetValue(dataId, out animation2D))
+                        animation2D = defaultAttackAnimation2D;
+                    break;
+                case AnimActionType.Skill:
+                    if (!CacheSkillAnimations.TryGetValue(dataId, out skillAnimations2D))
+                        animation2D = defaultSkillActivateAnimation2D;
+                    else
+                        animation2D = skillAnimations2D.activateAnimation;
+                    break;
+                case AnimActionType.ReloadRightHand:
+                    if (!CacheRightHandReloadAnimations.TryGetValue(dataId, out animation2D))
+                        animation2D = defaultReloadAnimation2D;
+                    break;
+                case AnimActionType.ReloadLeftHand:
+                    if (!CacheLeftHandReloadAnimations.TryGetValue(dataId, out animation2D))
+                        animation2D = defaultReloadAnimation2D;
+                    break;
+            }
+            return animation2D;
+        }
+
+        public override Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f)
+        {
+            return StartCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier));
+        }
+
+        private IEnumerator PlayActionAnimation_Animator(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
+        {
+            // If animator is not null, play the action animation
+            AnimatorActionAnimation2D animation2D = GetActionAnimation(animActionType, dataId);
+            // Action
+            CacheAnimatorController[CLIP_ACTION_DOWN] = animation2D.down;
+            CacheAnimatorController[CLIP_ACTION_UP] = animation2D.up;
+            CacheAnimatorController[CLIP_ACTION_LEFT] = animation2D.left;
+            CacheAnimatorController[CLIP_ACTION_RIGHT] = animation2D.right;
+            CacheAnimatorController[CLIP_ACTION_DOWN_LEFT] = animation2D.downLeft;
+            CacheAnimatorController[CLIP_ACTION_DOWN_RIGHT] = animation2D.downRight;
+            CacheAnimatorController[CLIP_ACTION_UP_LEFT] = animation2D.upLeft;
+            CacheAnimatorController[CLIP_ACTION_UP_RIGHT] = animation2D.upRight;
+            yield return 0;
+            AnimationClip clip = animation2D.GetClipByDirection(CurrentDirectionType);
+            AudioClip audioClip = animation2D.GetRandomAudioClip();
+            if (audioClip != null)
+                AudioSource.PlayClipAtPoint(audioClip, CacheTransform.position, AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
+            animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
+            animator.SetBool(ANIM_DO_ACTION, true);
+            animator.Play(0, 0, 0f);
+            // Waits by current transition + clip duration before end animation
+            yield return new WaitForSecondsRealtime(clip.length / playSpeedMultiplier);
+            animator.SetBool(ANIM_DO_ACTION, false);
+            // Waits by current transition + extra duration before end playing animation state
+            yield return new WaitForSecondsRealtime(animation2D.extraDuration / playSpeedMultiplier);
+        }
+
+        public override Coroutine PlaySkillCastClip(int dataId, float duration)
+        {
+            return StartCoroutine(PlaySkillCastClip_Animator(dataId, duration));
+        }
+
+        private IEnumerator PlaySkillCastClip_Animator(int dataId, float duration)
+        {
+            AnimatorCharacterAnimation2D animation2D;
+            AnimatorSkillAnimations2D skillAnimations2D;
+            if (!CacheSkillAnimations.TryGetValue(dataId, out skillAnimations2D))
+                animation2D = defaultSkillActivateAnimation2D;
+            else
+                animation2D = skillAnimations2D.castAnimation;
+
+            if (animation2D != null)
+            {
+                // Cast Skill
+                CacheAnimatorController[CLIP_CAST_SKILL_DOWN] = animation2D.down;
+                CacheAnimatorController[CLIP_CAST_SKILL_UP] = animation2D.up;
+                CacheAnimatorController[CLIP_CAST_SKILL_LEFT] = animation2D.left;
+                CacheAnimatorController[CLIP_CAST_SKILL_RIGHT] = animation2D.right;
+                CacheAnimatorController[CLIP_CAST_SKILL_DOWN_LEFT] = animation2D.downLeft;
+                CacheAnimatorController[CLIP_CAST_SKILL_DOWN_RIGHT] = animation2D.downRight;
+                CacheAnimatorController[CLIP_CAST_SKILL_UP_LEFT] = animation2D.upLeft;
+                CacheAnimatorController[CLIP_CAST_SKILL_UP_RIGHT] = animation2D.upRight;
+                yield return 0;
+                animator.SetBool(ANIM_IS_CASTING_SKILL, true);
+                animator.Play(0, 0, 0f);
+                yield return new WaitForSecondsRealtime(duration);
+                animator.SetBool(ANIM_IS_CASTING_SKILL, false);
+            }
+        }
+
+        public override void StopActionAnimation()
+        {
+            animator.SetBool(ANIM_DO_ACTION, false);
+        }
+
+        public override void StopSkillCastAnimation()
+        {
+            animator.SetBool(ANIM_IS_CASTING_SKILL, false);
+        }
+
+        public override void PlayHurtAnimation()
+        {
+            // TODO: 2D may just play blink red color
+        }
+
+        public override void PlayJumpAnimation()
+        {
+            // TODO: 2D may able to jump
+        }
+
+        public override bool GetRandomRightHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration)
+        {
+            AnimatorActionAnimation2D animation2D = null;
+            if (!CacheRightHandAttackAnimations.TryGetValue(dataId, out animation2D))
+                animation2D = defaultAttackAnimation2D;
+            animationIndex = 0;
+            triggerDuration = 0f;
+            totalDuration = 0f;
+            if (animation2D == null) return false;
+            AnimationClip clip = animation2D.GetClipByDirection(CurrentDirectionType);
+            if (clip == null) return false;
+            triggerDuration = clip.length * animation2D.triggerDurationRate;
+            totalDuration = clip.length + animation2D.extraDuration;
+            return true;
+        }
+
+        public override bool GetRandomLeftHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration)
+        {
+            AnimatorActionAnimation2D animation2D = null;
+            if (!CacheLeftHandAttackAnimations.TryGetValue(dataId, out animation2D))
+                animation2D = defaultAttackAnimation2D;
+            animationIndex = 0;
+            triggerDuration = 0f;
+            totalDuration = 0f;
+            if (animation2D == null) return false;
+            AnimationClip clip = animation2D.GetClipByDirection(CurrentDirectionType);
+            if (clip == null) return false;
+            triggerDuration = clip.length * animation2D.triggerDurationRate;
+            totalDuration = clip.length + animation2D.extraDuration;
+            return true;
+        }
+
+        public override bool GetSkillActivateAnimation(int dataId, out float triggerDuration, out float totalDuration)
+        {
+            AnimatorActionAnimation2D animation2D;
+            AnimatorSkillAnimations2D skillAnimations2D;
+            if (!CacheSkillAnimations.TryGetValue(dataId, out skillAnimations2D))
+                animation2D = defaultSkillActivateAnimation2D;
+            else
+                animation2D = skillAnimations2D.activateAnimation;
+            triggerDuration = 0f;
+            totalDuration = 0f;
+            if (animation2D == null) return false;
+            AnimationClip clip = animation2D.GetClipByDirection(CurrentDirectionType);
+            if (clip == null) return false;
+            triggerDuration = clip.length * animation2D.triggerDurationRate;
+            totalDuration = clip.length + animation2D.extraDuration;
+            return true;
+        }
+
+        public override bool GetRightHandReloadAnimation(int dataId, out float triggerDuration, out float totalDuration)
+        {
+            AnimatorActionAnimation2D animation2D = null;
+            if (!CacheRightHandReloadAnimations.TryGetValue(dataId, out animation2D))
+                animation2D = defaultReloadAnimation2D;
+            triggerDuration = 0f;
+            totalDuration = 0f;
+            if (animation2D == null) return false;
+            AnimationClip clip = animation2D.GetClipByDirection(CurrentDirectionType);
+            if (clip == null) return false;
+            triggerDuration = clip.length * animation2D.triggerDurationRate;
+            totalDuration = clip.length + animation2D.extraDuration;
+            return true;
+        }
+
+        public override bool GetLeftHandReloadAnimation(int dataId, out float triggerDuration, out float totalDuration)
+        {
+            AnimatorActionAnimation2D animation2D = null;
+            if (!CacheLeftHandReloadAnimations.TryGetValue(dataId, out animation2D))
+                animation2D = defaultReloadAnimation2D;
+            triggerDuration = 0f;
+            totalDuration = 0f;
+            if (animation2D == null) return false;
+            AnimationClip clip = animation2D.GetClipByDirection(CurrentDirectionType);
+            if (clip == null) return false;
+            triggerDuration = clip.length * animation2D.triggerDurationRate;
+            totalDuration = clip.length + animation2D.extraDuration;
+            return true;
+        }
+
+        public override SkillActivateAnimationType UseSkillActivateAnimationType(int dataId)
+        {
+            if (!CacheSkillAnimations.ContainsKey(dataId))
+                return SkillActivateAnimationType.UseActivateAnimation;
+            return CacheSkillAnimations[dataId].activateAnimationType;
         }
     }
 }
