@@ -150,6 +150,12 @@ namespace MultiplayerARPG
             base.OnStopServer();
         }
 
+        public override void OnStartClient(LiteNetLibClient client)
+        {
+            this.InvokeInstanceDevExtMethods("OnStartClient", client);
+            base.OnStartClient(client);
+        }
+
         public override void OnStopClient()
         {
             if (!IsServer)
