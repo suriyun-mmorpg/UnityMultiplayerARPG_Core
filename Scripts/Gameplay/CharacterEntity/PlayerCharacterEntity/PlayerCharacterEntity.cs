@@ -89,7 +89,7 @@ namespace MultiplayerARPG
         protected override void EntityAwake()
         {
             base.EntityAwake();
-            CacheRigidbody.useGravity = true;
+            CacheRigidbody.useGravity = false;
             CacheRigidbody.freezeRotation = true;
             StopMove();
         }
@@ -113,10 +113,22 @@ namespace MultiplayerARPG
             Profiler.BeginSample("PlayerCharacterEntity - FixedUpdate");
 
             if (movementSecure == MovementSecure.ServerAuthoritative && !IsServer)
+            {
+                if (CacheRigidbody.useGravity)
+                    CacheRigidbody.useGravity = false;
                 return;
+            }
 
             if (movementSecure == MovementSecure.NotSecure && !IsOwnerClient)
+            {
+                if (CacheRigidbody.useGravity)
+                    CacheRigidbody.useGravity = false;
                 return;
+            }
+
+            // Turn Use Gravity when this is allowed to update
+            if (!CacheRigidbody.useGravity)
+                CacheRigidbody.useGravity = true;
 
             tempMoveDirection = Vector3.zero;
             tempTargetDistance = -1f;
