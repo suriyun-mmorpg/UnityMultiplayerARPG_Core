@@ -100,7 +100,7 @@ namespace MultiplayerARPG
         }
         protected virtual void EntityStart() { }
 
-        public override void OnSetOwnerClient()
+        public override void OnSetOwnerClient(bool isOwnerClient)
         {
             EntityOnSetOwnerClient();
             if (onSetOwnerClient != null)
