@@ -14,9 +14,11 @@ namespace MultiplayerARPG
         public static Dictionary<string, string> Texts { get { return texts; } }
         private static string currentLanguageKey = string.Empty;
         public static string CurrentLanguageKey { get { return currentLanguageKey; } }
+        private static string currentPlayerPrefsKey = string.Empty;
 
         [Header("Language Manager Configs")]
         public string defaultLanguageKey = "ENG";
+        public string playerPrefsKey = "USER_LANG";
         public List<Language> languageList = new List<Language>();
 
         [Header("Add New Language")]
@@ -27,6 +29,8 @@ namespace MultiplayerARPG
 
         private void Awake()
         {
+            currentPlayerPrefsKey = playerPrefsKey;
+            currentLanguageKey = PlayerPrefs.GetString(currentPlayerPrefsKey, defaultLanguageKey);
             Languages.Clear();
             Dictionary<string, string> tempNewData;
             foreach (Language language in languageList)
@@ -43,7 +47,7 @@ namespace MultiplayerARPG
                 }
                 Languages[language.languageKey] = tempNewData;
             }
-            ChangeLanguage(defaultLanguageKey);
+            ChangeLanguage(currentLanguageKey);
         }
 
         public Language GetLanguageFromList(string languageKey)
@@ -93,6 +97,7 @@ namespace MultiplayerARPG
 
             currentLanguageKey = languageKey;
             texts = Languages[languageKey];
+            PlayerPrefs.SetString(currentPlayerPrefsKey, currentLanguageKey);
         }
 
         public static string GetText(string key, string defaultValue = "")
