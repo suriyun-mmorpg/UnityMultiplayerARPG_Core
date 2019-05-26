@@ -54,7 +54,7 @@ namespace MultiplayerARPG
 
             audioSource.clip = soundData.GetRandomedAudioClip();
             audioSource.pitch = Random.Range(randomPitchMin, randomPitchMax);
-            audioSource.volume = Random.Range(randomVolumeMin, randomVolumeMax);
+            audioSource.volume = Random.Range(randomVolumeMin, randomVolumeMax) * (AudioManager.Singleton == null ? 1f : AudioManager.Singleton.sfxVolumeSetting.Level);
             audioSource.Play();
         }
     }
