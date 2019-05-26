@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -12,8 +15,6 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyLeaderName = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SOCIAL_LEADER);
         [Tooltip("Format => {0} = {Level}")]
         public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_LEVEL);
-        [Tooltip("Format => {0} = {Current Exp}, {1} = {Max Exp}")]
-        public UILocaleKeySetting formatKeyExp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_EXP);
         [Tooltip("Format => {0} = {Skill Point}")]
         public UILocaleKeySetting formatKeySkillPoint = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SKILL_POINTS);
         [Tooltip("Format => {0} = {Message}")]
@@ -29,8 +30,13 @@ namespace MultiplayerARPG
         public TextWrapper textGuildName;
         public TextWrapper textLeaderName;
         public TextWrapper textLevel;
-        public TextWrapper textExp;
+        // EXP
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
+        public TextWrapper uiTextExp;
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public Image imageExpGage;
+        public UIGageValue uiGageExp;
+
         public TextWrapper textSkillPoint;
         public TextWrapper textMessage;
         public InputFieldWrapper inputFieldMessage;
@@ -100,6 +106,25 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void Awake()
+        {
+            base.Awake();
+            MigrateUIGageValue();
+        }
+
+        protected void OnValidate()
+        {
+#if UNITY_EDITOR
+            if (MigrateUIGageValue())
+                EditorUtility.SetDirty(this);
+#endif
+        }
+
+        private bool MigrateUIGageValue()
+        {
+            return UIGageValue.Migrate(ref uiGageExp, ref uiTextExp, ref imageExpGage);
+        }
+
         protected override void UpdateUIs()
         {
             if (textGuildName != null)
@@ -137,17 +162,8 @@ namespace MultiplayerARPG
                 currentExp = maxExp;
                 nextLevelExp = maxExp;
             }
-
-            if (textExp != null)
-            {
-                textExp.text = string.Format(
-                    LanguageManager.GetText(formatKeyExp),
-                    currentExp.ToString("N0"),
-                    nextLevelExp.ToString("N0"));
-            }
-
-            if (imageExpGage != null)
-                imageExpGage.fillAmount = nextLevelExp <= 0 ? 1 : (float)currentExp / (float)nextLevelExp;
+            if (uiGageExp != null)
+                uiGageExp.Update(currentExp, nextLevelExp);
 
             if (textSkillPoint != null)
             {

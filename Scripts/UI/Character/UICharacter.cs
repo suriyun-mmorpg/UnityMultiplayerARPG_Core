@@ -2,6 +2,9 @@
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.UI;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -12,18 +15,6 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyName = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Level}")]
         public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_LEVEL);
-        [Tooltip("Format => {0} = {Current Exp}, {1} = {Max Exp}")]
-        public UILocaleKeySetting formatKeyExp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_EXP);
-        [Tooltip("Format => {0} = {Current Hp}, {1} = {Max Hp}")]
-        public UILocaleKeySetting formatKeyHp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_HP);
-        [Tooltip("Format => {0} = {Current Mp}, {1} = {Max Mp}")]
-        public UILocaleKeySetting formatKeyMp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_MP);
-        [Tooltip("Format => {0} = {Current Stamina}, {1} = {Max Stamina}")]
-        public UILocaleKeySetting formatKeyStamina = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_STAMINA);
-        [Tooltip("Format => {0} = {Current Food}, {1} = {Max Food}")]
-        public UILocaleKeySetting formatKeyFood = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_FOOD);
-        [Tooltip("Format => {0} = {Current Water}, {1} = {Max Water}")]
-        public UILocaleKeySetting formatKeyWater = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_WATER);
         [Tooltip("Format => {0} = {Stat Points}")]
         public UILocaleKeySetting formatKeyStatPoint = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_STAT_POINTS);
         [Tooltip("Format => {0} = {Skill Points}")]
@@ -38,18 +29,43 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public TextWrapper uiTextName;
         public TextWrapper uiTextLevel;
+        // EXP
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public TextWrapper uiTextExp;
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public Image imageExpGage;
+        public UIGageValue uiGageExp;
+        // HP
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public TextWrapper uiTextHp;
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public Image imageHpGage;
+        public UIGageValue uiGageHp;
+        // MP
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public TextWrapper uiTextMp;
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public Image imageMpGage;
+        public UIGageValue uiGageMp;
+        // Stamina
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public TextWrapper uiTextStamina;
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public Image imageStaminaGage;
+        public UIGageValue uiGageStamina;
+        // Food
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public TextWrapper uiTextFood;
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public Image imageFoodGage;
+        public UIGageValue uiGageFood;
+        // Water
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public TextWrapper uiTextWater;
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public Image imageWaterGage;
+        public UIGageValue uiGageWater;
+
         public TextWrapper uiTextStatPoint;
         public TextWrapper uiTextSkillPoint;
         public TextWrapper uiTextGold;
@@ -103,6 +119,30 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void Awake()
+        {
+            base.Awake();
+            MigrateUIGageValue();
+        }
+
+        protected void OnValidate()
+        {
+#if UNITY_EDITOR
+            if (MigrateUIGageValue())
+                EditorUtility.SetDirty(this);
+#endif
+        }
+
+        private bool MigrateUIGageValue()
+        {
+            return UIGageValue.Migrate(ref uiGageExp, ref uiTextExp, ref imageExpGage) ||
+                UIGageValue.Migrate(ref uiGageHp, ref uiTextHp, ref imageHpGage) ||
+                UIGageValue.Migrate(ref uiGageMp, ref uiTextMp, ref imageMpGage) ||
+                UIGageValue.Migrate(ref uiGageStamina, ref uiTextStamina, ref imageStaminaGage) ||
+                UIGageValue.Migrate(ref uiGageFood, ref uiTextFood, ref imageFoodGage) ||
+                UIGageValue.Migrate(ref uiGageWater, ref uiTextWater, ref imageWaterGage);
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -116,17 +156,8 @@ namespace MultiplayerARPG
                 currentHp = Data.CurrentHp;
                 maxHp = Data.CacheMaxHp;
             }
-
-            if (uiTextHp != null)
-            {
-                uiTextHp.text = string.Format(
-                    LanguageManager.GetText(formatKeyHp),
-                    currentHp.ToString("N0"),
-                    maxHp.ToString("N0"));
-            }
-
-            if (imageHpGage != null)
-                imageHpGage.fillAmount = maxHp <= 0 ? 0 : (float)currentHp / (float)maxHp;
+            if (uiGageHp != null)
+                uiGageHp.Update(currentHp, maxHp);
 
             // Mp
             int currentMp = 0;
@@ -136,17 +167,8 @@ namespace MultiplayerARPG
                 currentMp = Data.CurrentMp;
                 maxMp = Data.CacheMaxMp;
             }
-
-            if (uiTextMp != null)
-            {
-                uiTextMp.text = string.Format(
-                    LanguageManager.GetText(formatKeyMp),
-                    currentMp.ToString("N0"),
-                    maxMp.ToString("N0"));
-            }
-
-            if (imageMpGage != null)
-                imageMpGage.fillAmount = maxMp <= 0 ? 0 : (float)currentMp / (float)maxMp;
+            if (uiGageMp != null)
+                uiGageMp.Update(currentMp, maxMp);
 
             // Stamina
             int currentStamina = 0;
@@ -156,17 +178,8 @@ namespace MultiplayerARPG
                 currentStamina = Data.CurrentStamina;
                 maxStamina = Data.CacheMaxStamina;
             }
-
-            if (uiTextStamina != null)
-            {
-                uiTextStamina.text = string.Format(
-                    LanguageManager.GetText(formatKeyStamina),
-                    currentStamina.ToString("N0"),
-                    maxStamina.ToString("N0"));
-            }
-
-            if (imageStaminaGage != null)
-                imageStaminaGage.fillAmount = maxStamina <= 0 ? 0 : (float)currentStamina / (float)maxStamina;
+            if (uiGageStamina != null)
+                uiGageStamina.Update(currentStamina, maxStamina);
 
             // Food
             int currentFood = 0;
@@ -176,17 +189,8 @@ namespace MultiplayerARPG
                 currentFood = Data.CurrentFood;
                 maxFood = Data.CacheMaxFood;
             }
-
-            if (uiTextFood != null)
-            {
-                uiTextFood.text = string.Format(
-                    LanguageManager.GetText(formatKeyFood),
-                    currentFood.ToString("N0"),
-                    maxFood.ToString("N0"));
-            }
-
-            if (imageFoodGage != null)
-                imageFoodGage.fillAmount = maxFood <= 0 ? 0 : (float)currentFood / (float)maxFood;
+            if (uiGageFood != null)
+                uiGageFood.Update(currentFood, maxFood);
 
             // Water
             int currentWater = 0;
@@ -196,17 +200,8 @@ namespace MultiplayerARPG
                 currentWater = Data.CurrentWater;
                 maxWater = Data.CacheMaxWater;
             }
-
-            if (uiTextWater != null)
-            {
-                uiTextWater.text = string.Format(
-                    LanguageManager.GetText(formatKeyWater),
-                    currentWater.ToString("N0"),
-                    maxWater.ToString("N0"));
-            }
-
-            if (imageWaterGage != null)
-                imageWaterGage.fillAmount = maxWater <= 0 ? 0 : (float)currentWater / (float)maxWater;
+            if (uiGageWater != null)
+                uiGageWater.Update(currentWater, maxWater);
 
             Profiler.EndSample();
         }
@@ -243,17 +238,8 @@ namespace MultiplayerARPG
                 currentExp = maxExp;
                 nextLevelExp = maxExp;
             }
-
-            if (uiTextExp != null)
-            {
-                uiTextExp.text = string.Format(
-                    LanguageManager.GetText(formatKeyExp),
-                    currentExp.ToString("N0"),
-                    nextLevelExp.ToString("N0"));
-            }
-
-            if (imageExpGage != null)
-                imageExpGage.fillAmount = nextLevelExp <= 0 ? 1 : (float)currentExp / (float)nextLevelExp;
+            if (uiGageExp != null)
+                uiGageExp.Update(currentExp, nextLevelExp);
 
             // Player character data
             IPlayerCharacterData playerCharacter = Data as IPlayerCharacterData;

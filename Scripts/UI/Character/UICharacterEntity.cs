@@ -9,15 +9,18 @@ namespace MultiplayerARPG
         [Header("Character Entity - String Formats")]
         [Tooltip("Format => {0} = {Level}")]
         public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_LEVEL);
-        [Tooltip("Format => {0} = {Current Mp}, {1} = {Max Mp}")]
-        public UILocaleKeySetting formatKeyMp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_MP);
         [Tooltip("Format => {0} = {Count Down Duration}")]
         public UILocaleKeySetting formatKeySkillCastDuration = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
 
         [Header("Character Entity - UI Elements")]
         public TextWrapper uiTextLevel;
+        // Mp
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public TextWrapper uiTextMp;
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public Image imageMpGage;
+        public UIGageValue uiGageMp;
+        // Skill cast
         public GameObject uiSkillCastContainer;
         public TextWrapper uiTextSkillCast;
         public Image imageSkillCastGage;
@@ -27,6 +30,12 @@ namespace MultiplayerARPG
         protected int maxMp;
         protected float castingSkillCountDown;
         protected float castingSkillDuration;
+
+        protected override bool MigrateUIGageValue()
+        {
+            return UIGageValue.Migrate(ref uiGageHp, ref uiTextHp, ref imageHpGage) ||
+                UIGageValue.Migrate(ref uiGageMp, ref uiTextMp, ref imageMpGage);
+        }
 
         protected override void Update()
         {
@@ -53,17 +62,8 @@ namespace MultiplayerARPG
                 castingSkillCountDown = Data.castingSkillCountDown;
                 castingSkillDuration = Data.castingSkillDuration;
             }
-
-            if (uiTextMp != null)
-            {
-                uiTextMp.text = string.Format(
-                    LanguageManager.GetText(formatKeyMp),
-                    currentMp.ToString("N0"),
-                    maxMp.ToString("N0"));
-            }
-
-            if (imageMpGage != null)
-                imageMpGage.fillAmount = maxMp <= 0 ? 0 : (float)currentMp / (float)maxMp;
+            if (uiGageMp != null)
+                uiGageMp.Update(currentMp, maxMp);
 
             if (uiSkillCastContainer != null)
                 uiSkillCastContainer.SetActive(castingSkillCountDown > 0 && castingSkillDuration > 0);

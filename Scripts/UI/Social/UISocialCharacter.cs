@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -10,19 +13,24 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyName = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Level}")]
         public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_LEVEL);
-        [Tooltip("Format => {0} = {Current Hp}, {1} = {Max Hp}")]
-        public UILocaleKeySetting formatKeyHp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_HP);
-        [Tooltip("Format => {0} = {Current Mp}, {1} = {Max Mp}")]
-        public UILocaleKeySetting formatKeyMp = new UILocaleKeySetting(UILocaleKeys.UI_FORMAT_CURRENT_MP);
 
         [Header("UI Elements")]
         public UISocialGroup uiSocialGroup;
         public TextWrapper uiTextName;
         public TextWrapper uiTextLevel;
+        // HP
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public TextWrapper uiTextHp;
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public Image imageHpGage;
+        public UIGageValue uiGageHp;
+        // MP
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public TextWrapper uiTextMp;
+        [HideInInspector] // TODO: This is deprecated, it will be removed later
         public Image imageMpGage;
+        public UIGageValue uiGageMp;
+
         public UICharacterBuffs uiCharacterBuffs;
         [Header("Member states objects")]
         [Tooltip("These objects will be activated when social member -> isOnline is true")]
@@ -34,6 +42,26 @@ namespace MultiplayerARPG
         [Tooltip("These objects will be activated when this social member is not leader")]
         public GameObject[] memberIsNotLeaderObjects;
         public UICharacterClass uiCharacterClass;
+
+        protected override void Awake()
+        {
+            base.Awake();
+            MigrateUIGageValue();
+        }
+
+        protected void OnValidate()
+        {
+#if UNITY_EDITOR
+            if (MigrateUIGageValue())
+                EditorUtility.SetDirty(this);
+#endif
+        }
+
+        private bool MigrateUIGageValue()
+        {
+            return UIGageValue.Migrate(ref uiGageHp, ref uiTextHp, ref imageHpGage) ||
+                UIGageValue.Migrate(ref uiGageMp, ref uiTextMp, ref imageMpGage);
+        }
 
         protected override void UpdateData()
         {
@@ -54,34 +82,22 @@ namespace MultiplayerARPG
             // Hp
             int currentHp = Data.socialCharacter.currentHp;
             int maxHp = Data.socialCharacter.maxHp;
-
-            if (uiTextHp != null)
+            if (uiGageHp != null)
             {
-                uiTextHp.text = string.Format(
-                    LanguageManager.GetText(formatKeyHp),
-                    currentHp.ToString("N0"),
-                    maxHp.ToString("N0"));
-                uiTextHp.gameObject.SetActive(maxHp > 0);
+                uiGageHp.Update(currentHp, maxHp);
+                if (uiGageHp.textValue != null)
+                    uiGageHp.textValue.gameObject.SetActive(maxHp > 0);
             }
-
-            if (imageHpGage != null)
-                imageHpGage.fillAmount = maxHp <= 0 ? 0 : (float)currentHp / (float)maxHp;
 
             // Mp
             int currentMp = Data.socialCharacter.currentMp;
             int maxMp = Data.socialCharacter.maxMp;
-
-            if (uiTextMp != null)
+            if (uiGageMp != null)
             {
-                uiTextMp.text = string.Format(
-                    LanguageManager.GetText(formatKeyMp),
-                    currentMp.ToString("N0"),
-                    maxMp.ToString("N0"));
-                uiTextMp.gameObject.SetActive(maxMp > 0);
+                uiGageMp.Update(currentMp, maxMp);
+                if (uiGageMp.textValue != null)
+                    uiGageMp.textValue.gameObject.SetActive(maxMp > 0);
             }
-
-            if (imageMpGage != null)
-                imageMpGage.fillAmount = maxMp <= 0 ? 0 : (float)currentMp / (float)maxMp;
 
             // Buffs
             if (uiCharacterBuffs != null)
