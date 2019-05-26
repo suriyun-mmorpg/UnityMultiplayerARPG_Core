@@ -10,11 +10,15 @@ namespace MultiplayerARPG
         public UILocaleKeySetting localeKeySetting;
         public string defaultText;
         public TextWrapper textWrapper;
+        private string currentLanguageKey;
 
         private void Update()
         {
             if (textWrapper == null)
                 return;
+            if (LanguageManager.CurrentLanguageKey.Equals(currentLanguageKey))
+                return;
+            currentLanguageKey = LanguageManager.CurrentLanguageKey;
             textWrapper.text = LanguageManager.GetText(localeKeySetting, defaultText);
         }
     }
