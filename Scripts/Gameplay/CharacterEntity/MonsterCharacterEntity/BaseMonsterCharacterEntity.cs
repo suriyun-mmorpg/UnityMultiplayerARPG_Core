@@ -183,9 +183,9 @@ namespace MultiplayerARPG
         {
             base.SetupNetElements();
             CacheNetTransform.ownerClientCanSendTransform = false;
-            summonerObjectId.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            summonerObjectId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             summonerObjectId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            summonType.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            summonType.deliveryMethod = DeliveryMethod.ReliableOrdered;
             summonType.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
         }
 

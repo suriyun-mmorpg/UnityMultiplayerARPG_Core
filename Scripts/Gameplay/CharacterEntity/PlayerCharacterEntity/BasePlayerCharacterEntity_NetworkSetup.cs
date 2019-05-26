@@ -12,23 +12,23 @@ namespace MultiplayerARPG
         {
             base.SetupNetElements();
             // Sync fields
-            dataId.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            dataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             dataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            statPoint.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            statPoint.deliveryMethod = DeliveryMethod.ReliableOrdered;
             statPoint.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
-            skillPoint.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            skillPoint.deliveryMethod = DeliveryMethod.ReliableOrdered;
             skillPoint.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
-            gold.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            gold.deliveryMethod = DeliveryMethod.ReliableOrdered;
             gold.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
-            userGold.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            userGold.deliveryMethod = DeliveryMethod.ReliableOrdered;
             userGold.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
-            userCash.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            userCash.deliveryMethod = DeliveryMethod.ReliableOrdered;
             userCash.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
-            partyId.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            partyId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             partyId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            guildId.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            guildId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             guildId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            isWarping.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            isWarping.deliveryMethod = DeliveryMethod.ReliableOrdered;
             isWarping.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             // Sync lists
             hotkeys.forOwnerOnly = true;

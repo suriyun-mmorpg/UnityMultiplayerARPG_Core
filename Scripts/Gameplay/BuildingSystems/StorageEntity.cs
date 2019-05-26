@@ -29,7 +29,7 @@ namespace MultiplayerARPG
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
-            isOpen.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            isOpen.deliveryMethod = DeliveryMethod.ReliableOrdered;
         }
 
         protected override void EntityOnDestroy()

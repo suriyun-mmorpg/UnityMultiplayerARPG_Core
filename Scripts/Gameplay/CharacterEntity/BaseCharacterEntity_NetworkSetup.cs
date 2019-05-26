@@ -11,23 +11,23 @@ namespace MultiplayerARPG
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
-            id.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            id.deliveryMethod = DeliveryMethod.ReliableOrdered;
             id.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            level.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            level.deliveryMethod = DeliveryMethod.ReliableOrdered;
             level.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            exp.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            exp.deliveryMethod = DeliveryMethod.ReliableOrdered;
             exp.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            currentHp.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            currentHp.deliveryMethod = DeliveryMethod.ReliableOrdered;
             currentHp.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            currentMp.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            currentMp.deliveryMethod = DeliveryMethod.ReliableOrdered;
             currentMp.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            currentFood.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            currentFood.deliveryMethod = DeliveryMethod.ReliableOrdered;
             currentFood.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            currentWater.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            currentWater.deliveryMethod = DeliveryMethod.ReliableOrdered;
             currentWater.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            equipWeapons.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            equipWeapons.deliveryMethod = DeliveryMethod.ReliableOrdered;
             equipWeapons.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            isHidding.deliveryMethod = DeliveryMethod.ReliableSequenced;
+            isHidding.deliveryMethod = DeliveryMethod.ReliableOrdered;
             isHidding.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             movementState.deliveryMethod = DeliveryMethod.Sequenced;
             movementState.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
