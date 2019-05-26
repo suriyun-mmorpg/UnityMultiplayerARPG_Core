@@ -10,9 +10,10 @@ namespace MultiplayerARPG
     public class LanguageManager : MonoBehaviour
     {
         public static readonly Dictionary<string, Dictionary<string, string>> Languages = new Dictionary<string, Dictionary<string, string>>();
-        public static Dictionary<string, string> texts = new Dictionary<string, string>();
+        private static Dictionary<string, string> texts = new Dictionary<string, string>();
         public static Dictionary<string, string> Texts { get { return texts; } }
-        public static string CurrentLanguageKey { get; private set; }
+        private static string currentLanguageKey = string.Empty;
+        public static string CurrentLanguageKey { get { return currentLanguageKey; } }
 
         [Header("Language Manager Configs")]
         public string defaultLanguageKey = "ENG";
@@ -90,7 +91,7 @@ namespace MultiplayerARPG
             if (!Languages.ContainsKey(languageKey))
                 return;
 
-            CurrentLanguageKey = languageKey;
+            currentLanguageKey = languageKey;
             texts = Languages[languageKey];
         }
 
