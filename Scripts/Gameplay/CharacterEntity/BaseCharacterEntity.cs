@@ -274,9 +274,10 @@ namespace MultiplayerARPG
             base.EntityUpdate();
             Profiler.BeginSample("BaseCharacterEntity - Update");
             MakeCaches();
-            if (!IsDead() && CacheTransform.position.y <= gameManager.CurrentMapInfo.deadY)
+            if (IsServer && !IsDead() && CacheTransform.position.y <= gameManager.CurrentMapInfo.deadY)
             {
                 CurrentHp = 0;
+                Killed(this);
             }
             if (IsDead())
             {

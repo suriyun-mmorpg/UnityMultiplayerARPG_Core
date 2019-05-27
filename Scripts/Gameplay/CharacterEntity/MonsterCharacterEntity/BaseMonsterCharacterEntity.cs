@@ -385,7 +385,9 @@ namespace MultiplayerARPG
 
             Reward reward = gameplayRule.MakeMonsterReward(monsterCharacter);
             HashSet<uint> looters = new HashSet<uint>();
-            BasePlayerCharacterEntity lastPlayer = lastAttacker as BasePlayerCharacterEntity;
+            BasePlayerCharacterEntity lastPlayer = null;
+            if (lastAttacker != null)
+                lastPlayer = lastAttacker as BasePlayerCharacterEntity;
             GuildData tempGuildData;
             PartyData tempPartyData;
             BasePlayerCharacterEntity tempPlayerCharacter;
@@ -520,8 +522,13 @@ namespace MultiplayerARPG
                     }
                 }
             }
+
             if (lastPlayer != null)
+            {
+                // Increase kill progress
                 lastPlayer.OnKillMonster(this);
+            }
+
             if (!IsSummoned)
             {
                 // If not summoned by someone, destroy and respawn it
