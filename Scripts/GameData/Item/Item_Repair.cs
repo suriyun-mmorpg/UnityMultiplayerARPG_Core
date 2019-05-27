@@ -5,34 +5,32 @@ namespace MultiplayerARPG
 {
     public partial class Item
     {
-        public bool CanRepair(IPlayerCharacterData character, float durability, out int requireGold)
+        public bool CanRepair(IPlayerCharacterData character, float durability, out ItemRepairPrice repairPrice)
         {
             GameMessage.Type gameMessageType;
-            return CanRepair(character, durability, out requireGold, out gameMessageType);
+            return CanRepair(character, durability, out repairPrice, out gameMessageType);
         }
 
-        public bool CanRepair(IPlayerCharacterData character, float durability, out int requireGold, out GameMessage.Type gameMessageType)
+        public bool CanRepair(IPlayerCharacterData character, float durability, out ItemRepairPrice repairPrice, out GameMessage.Type gameMessageType)
         {
-            requireGold = 0;
+            repairPrice = default(ItemRepairPrice);
             gameMessageType = GameMessage.Type.CannotRepair;
             if (!IsEquipment())
             {
                 // Cannot repair because it's not equipment item
                 return false;
             }
-            if (itemRefineInfo == null)
+            if (itemRefine == null)
             {
                 // Cannot repair because there is no item refine info
                 return false;
             }
             float durabilityRate = durability / maxDurability;
-            foreach (ItemRepairPrice repairPrice in itemRefineInfo.repairPrices)
+            for (int i = 0; i < itemRefine.repairPrices.Length; ++i)
             {
+                repairPrice = itemRefine.repairPrices[i];
                 if (durabilityRate < repairPrice.DurabilityRate)
-                {
-                    requireGold = repairPrice.RequireGold;
                     return repairPrice.CanRepair(character, out gameMessageType);
-                }
             }
             return true;
         }
@@ -89,15 +87,15 @@ namespace MultiplayerARPG
                 // Cannot refine because it's not equipment item
                 return;
             }
-            int requireGold = 0;
-            if (equipmentItem.CanRepair(character, repairingItem.durability, out requireGold, out gameMessageType))
+            ItemRepairPrice repairPrice;
+            if (equipmentItem.CanRepair(character, repairingItem.durability, out repairPrice, out gameMessageType))
             {
                 gameMessageType = GameMessage.Type.RepairSuccess;
                 // Repair item
                 repairingItem.durability = equipmentItem.maxDurability;
                 onRepaired.Invoke(repairingItem);
                 // Decrease required gold
-                character.Gold -= requireGold;
+                GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenRepairItem(character, repairPrice);
             }
         }
     }

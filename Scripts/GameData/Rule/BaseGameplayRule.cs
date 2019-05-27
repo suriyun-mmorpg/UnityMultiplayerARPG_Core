@@ -22,11 +22,23 @@ namespace MultiplayerARPG
         public abstract float GetDecreasingWaterPerSeconds(BaseCharacterEntity character);
         public abstract float GetExpLostPercentageWhenDeath(BaseCharacterEntity character);
         public abstract float GetMoveSpeed(BaseCharacterEntity character);
+        public abstract float GetTotalWeight(ICharacterData character);
         public abstract bool IsHungry(BaseCharacterEntity character);
         public abstract bool IsThirsty(BaseCharacterEntity character);
         public abstract bool IncreaseExp(BaseCharacterEntity character, int exp);
         public abstract float GetEquipmentBonusRate(CharacterItem characterItem);
         public abstract void OnCharacterReceivedDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, CombatAmountType combatAmountType, int damage);
         public abstract void OnHarvestableReceivedDamage(BaseCharacterEntity attacker, HarvestableEntity damageReceiver, CombatAmountType combatAmountType, int damage);
+        public abstract bool CurrenciesEnoughToBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, short amount);
+        public abstract void DecreaseCurrenciesWhenBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, short amount);
+        public abstract void IncreaseCurrenciesWhenSellItem(IPlayerCharacterData character, Item item, short amount);
+        public abstract bool CurrenciesEnoughToRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel);
+        public abstract void DecreaseCurrenciesWhenRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel);
+        public abstract bool CurrenciesEnoughToRepairItem(IPlayerCharacterData character, ItemRepairPrice repairPrice);
+        public abstract void DecreaseCurrenciesWhenRepairItem(IPlayerCharacterData character, ItemRepairPrice repairPrice);
+        public abstract bool CurrenciesEnoughToCraftItem(IPlayerCharacterData character, ItemCraft itemCraft);
+        public abstract void DecreaseCurrenciesWhenCraftItem(IPlayerCharacterData character, ItemCraft itemCraft);
+        public abstract bool CurrenciesEnoughToCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting);
+        public abstract void DecreaseCurrenciesWhenCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting);
     }
 }

@@ -209,6 +209,19 @@ namespace MultiplayerARPG
             return moveSpeed;
         }
 
+        public override float GetTotalWeight(ICharacterData character)
+        {
+            float result = CharacterDataExtension.GetTotalItemWeight(character.EquipItems) +
+                CharacterDataExtension.GetTotalItemWeight(character.NonEquipItems);
+            // Weight from right hand equipment
+            if (character.EquipWeapons.rightHand.NotEmptySlot())
+                result += character.EquipWeapons.rightHand.GetItem().weight;
+            // Weight from left hand equipment
+            if (character.EquipWeapons.leftHand.NotEmptySlot())
+                result += character.EquipWeapons.leftHand.GetItem().weight;
+            return result;
+        }
+
         public override bool IsHungry(BaseCharacterEntity character)
         {
             return character.CurrentFood < hungryWhenFoodLowerThan;
@@ -393,6 +406,61 @@ namespace MultiplayerARPG
                     characterItem.durability = 0;
             }
             return characterItem;
+        }
+
+        public override bool CurrenciesEnoughToBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, short amount)
+        {
+            return character.Gold >= sellItem.sellPrice * amount;
+        }
+
+        public override void DecreaseCurrenciesWhenBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, short amount)
+        {
+            character.Gold -= sellItem.sellPrice * amount;
+        }
+
+        public override void IncreaseCurrenciesWhenSellItem(IPlayerCharacterData character, Item item, short amount)
+        {
+            character.Gold += item.sellPrice * amount;
+        }
+
+        public override bool CurrenciesEnoughToRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel)
+        {
+            return character.Gold >= refineLevel.RequireGold;
+        }
+
+        public override void DecreaseCurrenciesWhenRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel)
+        {
+            character.Gold -= refineLevel.RequireGold;
+        }
+
+        public override bool CurrenciesEnoughToRepairItem(IPlayerCharacterData character, ItemRepairPrice repairPrice)
+        {
+            return character.Gold >= repairPrice.RequireGold;
+        }
+
+        public override void DecreaseCurrenciesWhenRepairItem(IPlayerCharacterData character, ItemRepairPrice repairPrice)
+        {
+            character.Gold -= repairPrice.RequireGold;
+        }
+
+        public override bool CurrenciesEnoughToCraftItem(IPlayerCharacterData character, ItemCraft itemCraft)
+        {
+            return character.Gold >= itemCraft.RequireGold;
+        }
+
+        public override void DecreaseCurrenciesWhenCraftItem(IPlayerCharacterData character, ItemCraft itemCraft)
+        {
+            character.Gold -= itemCraft.RequireGold;
+        }
+
+        public override bool CurrenciesEnoughToCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting)
+        {
+            return character.Gold >= setting.CreateGuildRequiredGold;
+        }
+
+        public override void DecreaseCurrenciesWhenCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting)
+        {
+            character.Gold -= setting.CreateGuildRequiredGold;
         }
     }
 }

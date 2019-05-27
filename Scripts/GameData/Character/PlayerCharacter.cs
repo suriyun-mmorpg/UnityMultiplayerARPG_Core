@@ -9,7 +9,7 @@ using UnityEditor;
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = "Player Character", menuName = "Create GameData/Player Character", order = -4999)]
-    public class PlayerCharacter : BaseCharacter
+    public partial class PlayerCharacter : BaseCharacter
     {
         [Header("Start Equipments")]
         public Item rightHandEquipItem;

@@ -90,22 +90,6 @@ public static partial class CharacterDataExtension
         return result;
     }
 
-    public static float GetTotalItemWeight(this ICharacterData data)
-    {
-        float result = GetTotalItemWeight(data.EquipItems) +
-            GetTotalItemWeight(data.NonEquipItems);
-
-        EquipWeapons equipWeapons = data.EquipWeapons;
-        CharacterItem rightHandItem = equipWeapons.rightHand;
-        CharacterItem leftHandItem = equipWeapons.leftHand;
-        if (rightHandItem.NotEmptySlot())
-            result += rightHandItem.GetItem().weight;
-        if (leftHandItem.NotEmptySlot())
-            result += leftHandItem.GetItem().weight;
-
-        return result;
-    }
-
     public static Dictionary<Attribute, short> GetCharacterAttributes(this ICharacterData data)
     {
         if (data == null)
@@ -1183,7 +1167,7 @@ public static partial class CharacterDataExtension
         resultMaxStamina = (int)resultStats.stamina;
         resultMaxFood = (int)resultStats.food;
         resultMaxWater = (int)resultStats.water;
-        resultTotalItemWeight = data.GetTotalItemWeight();
+        resultTotalItemWeight = GameInstance.Singleton.GameplayRule.GetTotalWeight(data);
         resultAtkSpeed = resultStats.atkSpeed;
         resultMoveSpeed = resultStats.moveSpeed;
         // Validate max amount

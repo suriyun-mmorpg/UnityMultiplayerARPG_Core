@@ -68,7 +68,7 @@ namespace MultiplayerARPG
                 {
                     uiRequireItemAmounts.showAsRequirement = true;
                     uiRequireItemAmounts.Show();
-                    uiRequireItemAmounts.Data = ItemCraft.CraftRequirements;
+                    uiRequireItemAmounts.Data = ItemCraft.CacheCraftRequirements;
                 }
             }
 

@@ -54,7 +54,7 @@ namespace MultiplayerARPG
         public GuildRoleData[] GuildMemberRoles { get { return guildMemberRoles; } }
         public byte MaxShareExpPercentage { get { return maxShareExpPercentage; } }
         private Dictionary<Item, short> cacheCreateGuildRequireItems;
-        public Dictionary<Item, short> CreateGuildRequireItems
+        public Dictionary<Item, short> CacheCreateGuildRequireItems
         {
             get
             {
@@ -88,13 +88,16 @@ namespace MultiplayerARPG
         public bool CanCreateGuild(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
         {
             gameMessageType = GameMessage.Type.None;
-            if (character.Gold < createGuildRequiredGold)
+            if (!GameInstance.Singleton.GameplayRule.CurrenciesEnoughToCreateGuild(character, this))
             {
                 gameMessageType = GameMessage.Type.NotEnoughGold;
                 return false;
             }
             if (createGuildRequireItems == null || createGuildRequireItems.Length == 0)
+            {
+                // No required items
                 return true;
+            }
             foreach (ItemAmount requireItem in createGuildRequireItems)
             {
                 if (requireItem.item != null && character.CountNonEquipItems(requireItem.item.DataId) < requireItem.amount)
@@ -106,7 +109,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public void ReduceCreateGuildResource(IPlayerCharacterData character)
+        public void DecreaseCreateGuildResource(IPlayerCharacterData character)
         {
             if (createGuildRequireItems != null)
             {
@@ -116,7 +119,8 @@ namespace MultiplayerARPG
                         character.DecreaseItems(requireItem.item.DataId, requireItem.amount);
                 }
             }
-            character.Gold -= createGuildRequiredGold;
+            // Decrease required gold
+            GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenCreateGuild(character, this);
         }
 
         public int GetNextLevelExp(short level)

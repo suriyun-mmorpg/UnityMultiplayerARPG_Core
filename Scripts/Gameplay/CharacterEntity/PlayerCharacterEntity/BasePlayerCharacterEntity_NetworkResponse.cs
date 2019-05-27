@@ -412,7 +412,7 @@ namespace MultiplayerARPG
             if (sellItems == null || itemIndex >= sellItems.Length)
                 return;
             NpcSellItem sellItem = sellItems[itemIndex];
-            if (Gold < sellItem.sellPrice * amount)
+            if (!gameplayRule.CurrenciesEnoughToBuyItem(this, sellItem, amount))
             {
                 gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.NotEnoughGold);
                 return;
@@ -423,7 +423,7 @@ namespace MultiplayerARPG
                 gameManager.SendServerGameMessage(ConnectionId, GameMessage.Type.CannotCarryAnymore);
                 return;
             }
-            Gold -= sellItem.sellPrice * amount;
+            gameplayRule.DecreaseCurrenciesWhenBuyItem(this, sellItem, amount);
             this.IncreaseItems(CharacterItem.Create(dataId, 1, amount));
         }
 
@@ -577,7 +577,7 @@ namespace MultiplayerARPG
 
             Item item = nonEquipItem.GetItem();
             if (this.DecreaseItemsByIndex(index, amount))
-                Gold += item.sellPrice * amount;
+                gameplayRule.IncreaseCurrenciesWhenSellItem(this, item, amount);
         }
 
         protected virtual void NetFuncRefineItem(byte byteInventoryType, short index)

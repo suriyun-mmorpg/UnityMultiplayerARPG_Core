@@ -19,18 +19,18 @@ namespace MultiplayerARPG
                 // Cannot refine because it's not equipment item
                 return false;
             }
-            if (itemRefineInfo == null)
+            if (itemRefine == null)
             {
                 // Cannot refine because there is no item refine info
                 return false;
             }
-            if (level >= itemRefineInfo.levels.Length)
+            if (level >= itemRefine.levels.Length)
             {
                 // Cannot refine because item reached max level
                 gameMessageType = GameMessage.Type.RefineItemReachedMaxLevel;
                 return false;
             }
-            return itemRefineInfo.levels[level - 1].CanRefine(character, out gameMessageType);
+            return itemRefine.levels[level - 1].CanRefine(character, out gameMessageType);
         }
 
         public static void RefineRightHandItem(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
@@ -103,7 +103,7 @@ namespace MultiplayerARPG
                 // Cannot refine because of some reasons
                 return;
             }
-            ItemRefineLevel refineLevel = equipmentItem.itemRefineInfo.levels[refiningItem.level - 1];
+            ItemRefineLevel refineLevel = equipmentItem.itemRefine.levels[refiningItem.level - 1];
             if (Random.value <= refineLevel.SuccessRate)
             {
                 // If success, increase item level
@@ -129,17 +129,17 @@ namespace MultiplayerARPG
                     onRefine.Invoke(refiningItem);
                 }
             }
-            if (refineLevel.RequireItemsArray != null)
+            if (refineLevel.RequireItems != null)
             {
                 // Decrease required items
-                foreach (ItemAmount requireItem in refineLevel.RequireItemsArray)
+                foreach (ItemAmount requireItem in refineLevel.RequireItems)
                 {
                     if (requireItem.item != null && requireItem.amount > 0)
                         character.DecreaseItems(requireItem.item.DataId, requireItem.amount);
                 }
             }
             // Decrease required gold
-            character.Gold -= refineLevel.RequireGold;
+            GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenRefineItem(character, refineLevel);
         }
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseCharacter : BaseGameData
+    public abstract partial class BaseCharacter : BaseGameData
     {
         [Header("Stats/Attributes")]
         [SerializeField]

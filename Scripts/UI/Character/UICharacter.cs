@@ -307,7 +307,7 @@ namespace MultiplayerARPG
             {
                 uiTextWeightLimit.text = string.Format(
                     LanguageManager.GetText(formatKeyWeightLimitStats),
-                    Data.GetTotalItemWeight().ToString("N2"),
+                    GameInstance.Singleton.GameplayRule.GetTotalWeight(Data).ToString("N2"),
                     cacheWeightLimit.ToString("N2"));
             }
 

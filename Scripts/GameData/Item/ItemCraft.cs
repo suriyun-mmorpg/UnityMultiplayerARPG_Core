@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct ItemCraft
+    public partial struct ItemCraft
     {
         [SerializeField]
         private Item craftingItem;
@@ -16,7 +16,7 @@ namespace MultiplayerARPG
 
         public Item CraftingItem { get { return craftingItem; } }
         private Dictionary<Item, short> cacheCraftRequirements;
-        public Dictionary<Item, short> CraftRequirements
+        public Dictionary<Item, short> CacheCraftRequirements
         {
             get
             {
@@ -41,13 +41,16 @@ namespace MultiplayerARPG
                 gameMessageType = GameMessage.Type.InvalidItemData;
                 return false;
             }
-            if (character.Gold < requireGold)
+            if (!GameInstance.Singleton.GameplayRule.CurrenciesEnoughToCraftItem(character, this))
             {
                 gameMessageType = GameMessage.Type.NotEnoughGold;
                 return false;
             }
             if (craftRequirements == null || craftRequirements.Length == 0)
+            {
+                // No required items
                 return true;
+            }
             foreach (ItemAmount craftRequirement in craftRequirements)
             {
                 if (craftRequirement.item != null && character.CountNonEquipItems(craftRequirement.item.DataId) < craftRequirement.amount)
@@ -69,7 +72,8 @@ namespace MultiplayerARPG
                     if (craftRequirement.item != null && craftRequirement.amount > 0)
                         character.DecreaseItems(craftRequirement.item.DataId, craftRequirement.amount);
                 }
-                character.Gold -= requireGold;
+                // Decrease required gold
+                GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenCraftItem(character, this);
             }
         }
     }

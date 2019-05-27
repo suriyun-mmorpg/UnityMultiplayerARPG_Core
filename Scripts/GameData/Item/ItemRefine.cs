@@ -15,7 +15,7 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public struct ItemRefineLevel
+    public partial struct ItemRefineLevel
     {
         [Range(0.01f, 1f)]
         [SerializeField]
@@ -32,9 +32,9 @@ namespace MultiplayerARPG
         private bool refineFailDestroyItem;
 
         public float SuccessRate { get { return successRate; } }
-        public ItemAmount[] RequireItemsArray { get { return requireItems; } }
+        public ItemAmount[] RequireItems { get { return requireItems; } }
         private Dictionary<Item, short> cacheRequireItems;
-        public Dictionary<Item, short> RequireItems
+        public Dictionary<Item, short> CacheRequireItems
         {
             get
             {
@@ -56,7 +56,7 @@ namespace MultiplayerARPG
         public bool CanRefine(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
         {
             gameMessageType = GameMessage.Type.None;
-            if (character.Gold < requireGold)
+            if (!GameInstance.Singleton.GameplayRule.CurrenciesEnoughToRefineItem(character, this))
             {
                 gameMessageType = GameMessage.Type.NotEnoughGold;
                 return false;
@@ -77,7 +77,7 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public struct ItemRepairPrice
+    public partial struct ItemRepairPrice
     {
         [Range(0.01f, 1f)]
         [SerializeField]
@@ -97,7 +97,7 @@ namespace MultiplayerARPG
         public bool CanRepair(IPlayerCharacterData character, out GameMessage.Type gameMessageType)
         {
             gameMessageType = GameMessage.Type.None;
-            if (character.Gold < requireGold)
+            if (!GameInstance.Singleton.GameplayRule.CurrenciesEnoughToRepairItem(character, this))
             {
                 gameMessageType = GameMessage.Type.NotEnoughGold;
                 return false;

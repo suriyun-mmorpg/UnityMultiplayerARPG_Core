@@ -35,7 +35,7 @@ namespace MultiplayerARPG
         public float weight;
         [Range(1, 1000)]
         public short maxStack = 1;
-        public ItemRefine itemRefineInfo;
+        public ItemRefine itemRefine;
         [Tooltip("This is duration to lock item at first time when pick up dropped item or bought it from NPC or IAP system")]
         public float lockDuration;
         
@@ -103,9 +103,9 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (itemRefineInfo == null)
+                if (itemRefine == null)
                     return base.Title;
-                return "<color=#" + ColorUtility.ToHtmlStringRGB(itemRefineInfo.titleColor) + ">" + base.Title + "</color>";
+                return "<color=#" + ColorUtility.ToHtmlStringRGB(itemRefine.titleColor) + ">" + base.Title + "</color>";
             }
         }
 
@@ -113,9 +113,9 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (itemRefineInfo == null)
+                if (itemRefine == null)
                     return "Normal";
-                return "<color=#" + ColorUtility.ToHtmlStringRGB(itemRefineInfo.titleColor) + ">" + itemRefineInfo.title + "</color>";
+                return "<color=#" + ColorUtility.ToHtmlStringRGB(itemRefine.titleColor) + ">" + itemRefine.title + "</color>";
             }
         }
 
@@ -202,9 +202,9 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (itemRefineInfo == null || itemRefineInfo.levels == null || itemRefineInfo.levels.Length == 0)
+                if (itemRefine == null || itemRefine.levels == null || itemRefine.levels.Length == 0)
                     return 1;
-                return itemRefineInfo.levels.Length;
+                return itemRefine.levels.Length;
             }
         }
 

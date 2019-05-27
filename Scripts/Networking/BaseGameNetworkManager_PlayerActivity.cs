@@ -941,7 +941,7 @@ namespace MultiplayerARPG
             if (!CanCreateGuild(playerCharacterEntity))
                 return;
 
-            gameInstance.SocialSystemSetting.ReduceCreateGuildResource(playerCharacterEntity);
+            gameInstance.SocialSystemSetting.DecreaseCreateGuildResource(playerCharacterEntity);
             GuildData guild = new GuildData(guildId, guildName, playerCharacterEntity);
             guilds[guildId] = guild;
             playerCharacterEntity.GuildId = guildId;
