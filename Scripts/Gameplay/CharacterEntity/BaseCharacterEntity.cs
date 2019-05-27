@@ -274,6 +274,10 @@ namespace MultiplayerARPG
             base.EntityUpdate();
             Profiler.BeginSample("BaseCharacterEntity - Update");
             MakeCaches();
+            if (!IsDead() && CacheTransform.position.y <= gameManager.CurrentMapInfo.deadY)
+            {
+                CurrentHp = 0;
+            }
             if (IsDead())
             {
                 // Clear action states when character dead
@@ -523,14 +527,19 @@ namespace MultiplayerARPG
             RequestOnRespawn();
         }
 
-        public virtual void RewardExp(int exp, RewardGivenType rewardGivenType)
+        public void RewardExp(Reward reward, float multiplier, RewardGivenType rewardGivenType)
         {
             if (!IsServer)
                 return;
-            if (!gameInstance.GameplayRule.IncreaseExp(this, exp))
+            if (!gameplayRule.RewardExp(this, reward, multiplier, rewardGivenType))
                 return;
             // Send OnLevelUp to owner player only
             RequestOnLevelUp();
+        }
+
+        public void RewardCurrencies(Reward reward, float multiplier, RewardGivenType rewardGivenType)
+        {
+            gameplayRule.RewardCurrencies(this, reward, multiplier, rewardGivenType);
         }
         #endregion
 

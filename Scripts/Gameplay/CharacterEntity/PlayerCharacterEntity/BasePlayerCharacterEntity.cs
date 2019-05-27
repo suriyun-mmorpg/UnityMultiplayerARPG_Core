@@ -181,45 +181,6 @@ namespace MultiplayerARPG
             currentNpcDialog = null;
         }
 
-        public override void RewardExp(int exp, RewardGivenType rewardGivenType)
-        {
-            if (!IsServer)
-                return;
-
-            GuildData guildData;
-            switch (rewardGivenType)
-            {
-                case RewardGivenType.KillMonster:
-                    if (gameManager.TryGetGuild(GuildId, out guildData))
-                        exp += (int)(exp * guildData.IncreaseExpGainPercentage / 100f);
-                    break;
-                case RewardGivenType.PartyShare:
-                    if (gameManager.TryGetGuild(GuildId, out guildData))
-                        exp += (int)(exp * guildData.IncreaseShareExpGainPercentage / 100f);
-                    break;
-            }
-            base.RewardExp(exp, rewardGivenType);
-        }
-
-        public virtual void RewardGold(int gold, RewardGivenType rewardGivenType)
-        {
-            if (!IsServer)
-                return;
-            GuildData guildData;
-            switch (rewardGivenType)
-            {
-                case RewardGivenType.KillMonster:
-                    if (gameManager.TryGetGuild(GuildId, out guildData))
-                        gold += (int)(gold * guildData.IncreaseGoldGainPercentage / 100f);
-                    break;
-                case RewardGivenType.PartyShare:
-                    if (gameManager.TryGetGuild(GuildId, out guildData))
-                        gold += (int)(gold * guildData.IncreaseShareGoldGainPercentage / 100f);
-                    break;
-            }
-            Gold += gold;
-        }
-
         public virtual void OnKillMonster(BaseMonsterCharacterEntity monsterCharacterEntity)
         {
             if (!IsServer || monsterCharacterEntity == null)

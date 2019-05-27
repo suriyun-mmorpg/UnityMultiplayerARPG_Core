@@ -25,7 +25,8 @@ namespace MultiplayerARPG
         public abstract float GetTotalWeight(ICharacterData character);
         public abstract bool IsHungry(BaseCharacterEntity character);
         public abstract bool IsThirsty(BaseCharacterEntity character);
-        public abstract bool IncreaseExp(BaseCharacterEntity character, int exp);
+        public abstract bool RewardExp(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType);
+        public abstract void RewardCurrencies(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType);
         public abstract float GetEquipmentBonusRate(CharacterItem characterItem);
         public abstract void OnCharacterReceivedDamage(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, CombatAmountType combatAmountType, int damage);
         public abstract void OnHarvestableReceivedDamage(BaseCharacterEntity attacker, HarvestableEntity damageReceiver, CombatAmountType combatAmountType, int damage);
@@ -40,5 +41,7 @@ namespace MultiplayerARPG
         public abstract void DecreaseCurrenciesWhenCraftItem(IPlayerCharacterData character, ItemCraft itemCraft);
         public abstract bool CurrenciesEnoughToCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting);
         public abstract void DecreaseCurrenciesWhenCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting);
+        public abstract Reward MakeMonsterReward(MonsterCharacter monster);
+        public abstract Reward MakeQuestReward(Quest quest);
     }
 }

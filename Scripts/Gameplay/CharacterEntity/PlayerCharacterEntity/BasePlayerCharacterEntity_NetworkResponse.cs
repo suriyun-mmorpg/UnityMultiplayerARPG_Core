@@ -470,8 +470,9 @@ namespace MultiplayerARPG
                         break;
                 }
             }
-            RewardExp(quest.rewardExp, RewardGivenType.Quest);
-            RewardGold(quest.rewardGold, RewardGivenType.Quest);
+            Reward reward = gameplayRule.MakeQuestReward(quest);
+            RewardExp(reward, 1f, RewardGivenType.Quest);
+            RewardCurrencies(reward, 1f, RewardGivenType.Quest);
             ItemAmount[] rewardItems = quest.rewardItems;
             if (rewardItems != null && rewardItems.Length > 0)
             {

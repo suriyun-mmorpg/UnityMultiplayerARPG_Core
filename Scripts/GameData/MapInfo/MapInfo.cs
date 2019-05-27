@@ -21,5 +21,7 @@ namespace MultiplayerARPG
         public MapInfo overrideRespawnPointMap;
         [Tooltip("Position in the `overrideRespawnPointScene` which player will returning to, when dead or press `return` key")]
         public Vector3 overrideRespawnPointPosition;
+        [Tooltip("When character fall to this position, character will dead")]
+        public float deadY;
     }
 }

@@ -232,18 +232,47 @@ namespace MultiplayerARPG
             return character.CurrentWater < thirstyWhenWaterLowerThan;
         }
 
-        public override bool IncreaseExp(BaseCharacterEntity character, int exp)
+        public override bool RewardExp(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType)
         {
-            BaseMonsterCharacterEntity monsterCharacter = character as BaseMonsterCharacterEntity;
-            if (monsterCharacter != null && monsterCharacter.SummonType != SummonType.Pet)
+            if ((character is BaseMonsterCharacterEntity) &&
+                (character as BaseMonsterCharacterEntity).SummonType != SummonType.Pet)
             {
                 // If it's monster and not pet, do not increase exp
                 return false;
             }
 
             bool isLevelUp = false;
-            character.Exp += exp;
+            int exp = Mathf.CeilToInt(reward.exp * multiplier);
             BasePlayerCharacterEntity playerCharacter = character as BasePlayerCharacterEntity;
+            if (playerCharacter != null)
+            {
+                // Increase exp by guild's skills
+                GuildData guildData;
+                switch (rewardGivenType)
+                {
+                    case RewardGivenType.KillMonster:
+                        if (playerCharacter.gameManager.TryGetGuild(playerCharacter.GuildId, out guildData))
+                            exp += (int)(exp * guildData.IncreaseExpGainPercentage * 0.01f);
+                        break;
+                    case RewardGivenType.PartyShare:
+                        if (playerCharacter.gameManager.TryGetGuild(playerCharacter.GuildId, out guildData))
+                            exp += (int)(exp * guildData.IncreaseShareExpGainPercentage * 0.01f);
+                        break;
+                }
+            }
+
+            try
+            {
+                checked
+                {
+                    character.Exp += exp;
+                }
+            }
+            catch (System.OverflowException)
+            {
+                character.Exp = int.MaxValue;
+            }
+
             int nextLevelExp = character.GetNextLevelExp();
             while (nextLevelExp > 0 && character.Exp >= nextLevelExp)
             {
@@ -252,12 +281,73 @@ namespace MultiplayerARPG
                 nextLevelExp = character.GetNextLevelExp();
                 if (playerCharacter != null)
                 {
-                    playerCharacter.StatPoint += increaseStatPointEachLevel;
-                    playerCharacter.SkillPoint += increaseSkillPointEachLevel;
+                    try
+                    {
+                        checked
+                        {
+                            playerCharacter.StatPoint += increaseStatPointEachLevel;
+                        }
+                    }
+                    catch (System.OverflowException)
+                    {
+                        playerCharacter.StatPoint = short.MaxValue;
+                    }
+
+                    try
+                    {
+                        checked
+                        {
+                            playerCharacter.SkillPoint += increaseSkillPointEachLevel;
+                        }
+                    }
+                    catch (System.OverflowException)
+                    {
+                        playerCharacter.SkillPoint = short.MaxValue;
+                    }
                 }
                 isLevelUp = true;
             }
             return isLevelUp;
+        }
+
+        public override void RewardCurrencies(BaseCharacterEntity character, Reward reward, float multiplier, RewardGivenType rewardGivenType)
+        {
+            if (character is BaseMonsterCharacterEntity)
+            {
+                // Don't give reward currencies to monsters
+                return;
+            }
+
+            int gold = Mathf.CeilToInt(reward.gold * multiplier);
+            BasePlayerCharacterEntity playerCharacter = character as BasePlayerCharacterEntity;
+            if (playerCharacter != null)
+            {
+                // Increase exp by guild's skills
+                GuildData guildData;
+                switch (rewardGivenType)
+                {
+                    case RewardGivenType.KillMonster:
+                        if (playerCharacter.gameManager.TryGetGuild(playerCharacter.GuildId, out guildData))
+                            gold += (int)(gold * guildData.IncreaseGoldGainPercentage * 0.01f);
+                        break;
+                    case RewardGivenType.PartyShare:
+                        if (playerCharacter.gameManager.TryGetGuild(playerCharacter.GuildId, out guildData))
+                            gold += (int)(gold * guildData.IncreaseShareGoldGainPercentage * 0.01f);
+                        break;
+                }
+
+                try
+                {
+                    checked
+                    {
+                        playerCharacter.Gold += gold;
+                    }
+                }
+                catch (System.OverflowException)
+                {
+                    playerCharacter.Gold += int.MaxValue;
+                }
+            }
         }
 
         public override float GetEquipmentBonusRate(CharacterItem characterItem)
@@ -461,6 +551,22 @@ namespace MultiplayerARPG
         public override void DecreaseCurrenciesWhenCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting)
         {
             character.Gold -= setting.CreateGuildRequiredGold;
+        }
+
+        public override Reward MakeMonsterReward(MonsterCharacter monster)
+        {
+            Reward result = new Reward();
+            result.exp = monster.RandomExp();
+            result.gold = monster.RandomGold();
+            return result;
+        }
+
+        public override Reward MakeQuestReward(Quest quest)
+        {
+            Reward result = new Reward();
+            result.exp = quest.rewardExp;
+            result.gold = quest.rewardGold;
+            return result;
         }
     }
 }
