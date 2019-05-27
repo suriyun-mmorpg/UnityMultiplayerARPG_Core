@@ -3,14 +3,41 @@ using UnityEngine;
 
 public partial interface IPlayerCharacterData : ICharacterData
 {
+    /// <summary>
+    /// Stat point which uses for increase attribute amount
+    /// </summary>
     short StatPoint { get; set; }
+    /// <summary>
+    /// Skill point which uses for increase skill level
+    /// </summary>
     short SkillPoint { get; set; }
+    /// <summary>
+    /// Gold which uses for buy things
+    /// </summary>
     int Gold { get; set; }
+    /// <summary>
+    /// Gold which store in the bank
+    /// </summary>
     int UserGold { get; set; }
+    /// <summary>
+    /// Cash which uses for buy special items
+    /// </summary>
     int UserCash { get; set; }
+    /// <summary>
+    /// Joined party id
+    /// </summary>
     int PartyId { get; set; }
+    /// <summary>
+    /// Joined guild id
+    /// </summary>
     int GuildId { get; set; }
+    /// <summary>
+    /// Current guild role
+    /// </summary>
     byte GuildRole { get; set; }
+    /// <summary>
+    /// Shared exp to guild
+    /// </summary>
     int SharedGuildExp { get; set; }
     /// <summary>
     /// Current Map Name will be work with MMORPG system only
