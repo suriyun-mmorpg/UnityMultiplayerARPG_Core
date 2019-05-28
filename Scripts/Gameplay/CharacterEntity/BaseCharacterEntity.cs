@@ -11,7 +11,6 @@ namespace MultiplayerARPG
 {
     [RequireComponent(typeof(CharacterRecoveryComponent))]
     [RequireComponent(typeof(CharacterSkillAndBuffComponent))]
-    [DisallowMultipleComponent]
     public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData, IAttackerEntity
     {
         public const float ACTION_COMMAND_DELAY = 0.2f;
