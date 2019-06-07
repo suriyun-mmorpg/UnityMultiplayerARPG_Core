@@ -154,17 +154,24 @@ namespace MultiplayerARPG
             {
                 CacheCharacterEntity.StopMove();
                 SetStartFollowTargetTime(time);
-                // Lookat target then do anything when it's in range
+                // Lookat target then do something when it's in range
                 Vector3 lookAtDirection = (targetEntityPosition - currentPosition).normalized;
-                Quaternion currentLookAtRotation = CacheCharacterEntity.CacheTransform.rotation;
-                // slerp to the desired rotation over time
                 if (lookAtDirection.magnitude > 0)
                 {
-                    Vector3 lookRotationEuler = Quaternion.LookRotation(lookAtDirection).eulerAngles;
-                    lookRotationEuler.x = 0;
-                    lookRotationEuler.z = 0;
-                    currentLookAtRotation = Quaternion.RotateTowards(currentLookAtRotation, Quaternion.Euler(lookRotationEuler), turnToEnemySpeed * Time.deltaTime);
-                    CacheCharacterEntity.UpdateYRotation(currentLookAtRotation.eulerAngles.y);
+                    if (gameInstance.DimensionType == DimensionType.Dimension3D)
+                    {
+                        Quaternion currentLookAtRotation = CacheCharacterEntity.CacheTransform.rotation;
+                        Vector3 lookRotationEuler = Quaternion.LookRotation(lookAtDirection).eulerAngles;
+                        lookRotationEuler.x = 0;
+                        lookRotationEuler.z = 0;
+                        currentLookAtRotation = Quaternion.RotateTowards(currentLookAtRotation, Quaternion.Euler(lookRotationEuler), turnToEnemySpeed * Time.deltaTime);
+                        CacheCharacterEntity.SetLookRotation(currentLookAtRotation.eulerAngles);
+                    }
+                    else
+                    {
+                        // Update 2D direction
+
+                    }
                 }
                 CacheCharacterEntity.RequestAttack(false, targetEntity.OpponentAimTransform.position);
                 // TODO: Random to use skills
@@ -184,7 +191,11 @@ namespace MultiplayerARPG
         public void RandomWanderTarget(float time)
         {
             // If stopped then random
-            Vector3 randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
+            Vector3 randomPosition;
+            if (gameInstance.DimensionType == DimensionType.Dimension3D)
+                randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
+            else
+                randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
             if (CacheMonsterCharacterEntity.Summoner != null)
                 randomPosition = CacheMonsterCharacterEntity.Summoner.GetSummonPosition();
             CacheCharacterEntity.SetTargetEntity(null);
@@ -194,7 +205,11 @@ namespace MultiplayerARPG
         public void FollowSummoner(float time)
         {
             // If stopped then random
-            Vector3 randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
+            Vector3 randomPosition;
+            if (gameInstance.DimensionType == DimensionType.Dimension3D)
+                randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
+            else
+                randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, Random.Range(-1f, 1f) * randomWanderDistance);
             if (CacheMonsterCharacterEntity.Summoner != null)
                 randomPosition = CacheMonsterCharacterEntity.Summoner.GetSummonPosition();
             CacheCharacterEntity.SetTargetEntity(null);

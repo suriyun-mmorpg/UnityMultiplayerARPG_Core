@@ -109,7 +109,7 @@ namespace MultiplayerARPG
         {
             if (IsDead())
                 return;
-            CacheTransform.rotation = Quaternion.Euler(0, (float)yRotation, 0);
+            CacheTransform.eulerAngles = new Vector3(0, (float)yRotation, 0);
         }
 
         protected void NetFuncSetMovementState(byte movementState)
@@ -150,7 +150,7 @@ namespace MultiplayerARPG
             CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
         }
 
-        public override void UpdateYRotation(float yRotation)
+        public override void SetLookRotation(Vector3 eulerAngles)
         {
             if (IsDead())
                 return;
@@ -159,10 +159,12 @@ namespace MultiplayerARPG
             {
                 case MovementSecure.ServerAuthoritative:
                     // Cast to short to reduce packet size
-                    CacheCharacterEntity.CallNetFunction(NetFuncUpdateYRotation, FunctionReceivers.Server, (short)yRotation);
+                    CacheCharacterEntity.CallNetFunction(NetFuncUpdateYRotation, FunctionReceivers.Server, (short)eulerAngles.y);
                     break;
                 case MovementSecure.NotSecure:
-                    CacheTransform.rotation = Quaternion.Euler(0, yRotation, 0);
+                    eulerAngles.x = 0;
+                    eulerAngles.z = 0;
+                    CacheTransform.eulerAngles = eulerAngles;
                     break;
             }
         }

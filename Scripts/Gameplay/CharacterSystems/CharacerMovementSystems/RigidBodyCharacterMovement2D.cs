@@ -214,7 +214,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void UpdateYRotation(float yRotation)
+        public override void SetLookRotation(Vector3 eulerAngles)
         {
             // Do nothing, 2d characters will not rotates
         }

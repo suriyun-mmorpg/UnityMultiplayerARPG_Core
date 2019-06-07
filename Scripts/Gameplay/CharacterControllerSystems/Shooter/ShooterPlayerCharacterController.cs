@@ -592,7 +592,7 @@ namespace MultiplayerARPG
                 {
                     // Update rotation when angle difference more than 0
                     tempLookAt = Quaternion.Slerp(tempLookAt, Quaternion.LookRotation(targetLookDirection), turnTimeCounter / turnToTargetDuration);
-                    PlayerCharacterEntity.UpdateYRotation(tempLookAt.eulerAngles.y);
+                    PlayerCharacterEntity.SetLookRotation(tempLookAt.eulerAngles);
                 }
                 else
                 {
@@ -617,7 +617,7 @@ namespace MultiplayerARPG
                 {
                     // Update rotation when angle difference more than 0
                     tempLookAt = Quaternion.RotateTowards(tempLookAt, Quaternion.LookRotation(targetLookDirection), Time.deltaTime * angularSpeed);
-                    PlayerCharacterEntity.UpdateYRotation(tempLookAt.eulerAngles.y);
+                    PlayerCharacterEntity.SetLookRotation(tempLookAt.eulerAngles);
                 }
             }
         }

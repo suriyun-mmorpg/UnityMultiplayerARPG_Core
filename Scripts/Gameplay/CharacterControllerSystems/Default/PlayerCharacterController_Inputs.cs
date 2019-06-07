@@ -625,7 +625,7 @@ namespace MultiplayerARPG
             {
                 // Update rotation when angle difference more than 1
                 tempLookAt = Quaternion.RotateTowards(tempLookAt, Quaternion.LookRotation(targetLookDirection), Time.deltaTime * angularSpeed);
-                PlayerCharacterEntity.UpdateYRotation(tempLookAt.eulerAngles.y);
+                PlayerCharacterEntity.SetLookRotation(tempLookAt.eulerAngles);
             }
         }
 

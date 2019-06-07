@@ -959,9 +959,9 @@ namespace MultiplayerARPG
             CharacterMovement.PointClickMovement(position);
         }
 
-        public void UpdateYRotation(float yRotation)
+        public void SetLookRotation(Vector3 eulerAngles)
         {
-            CharacterMovement.UpdateYRotation(yRotation);
+            CharacterMovement.SetLookRotation(eulerAngles);
         }
 
         public void Teleport(Vector3 position)

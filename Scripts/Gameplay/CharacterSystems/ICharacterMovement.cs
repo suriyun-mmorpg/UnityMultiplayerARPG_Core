@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -10,7 +8,7 @@ namespace MultiplayerARPG
         void StopMove();
         void KeyMovement(Vector3 moveDirection, MovementState movementState);
         void PointClickMovement(Vector3 position);
-        void UpdateYRotation(float yRotation);
+        void SetLookRotation(Vector3 eulerAngles);
         void Teleport(Vector3 position);
         void FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result);
     }
