@@ -217,6 +217,7 @@ namespace MultiplayerARPG
         public override void SetLookRotation(Vector3 eulerAngles)
         {
             // Do nothing, 2d characters will not rotates
+            UpdateCurrentDirection(Quaternion.Euler(eulerAngles) * Vector3.forward);
         }
 
         public override void Teleport(Vector3 position)

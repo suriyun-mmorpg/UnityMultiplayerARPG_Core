@@ -170,7 +170,7 @@ namespace MultiplayerARPG
                     else
                     {
                         // Update 2D direction
-
+                        CacheCharacterEntity.SetLookRotation(Quaternion.LookRotation(lookAtDirection).eulerAngles);
                     }
                 }
                 CacheCharacterEntity.RequestAttack(false, targetEntity.OpponentAimTransform.position);
