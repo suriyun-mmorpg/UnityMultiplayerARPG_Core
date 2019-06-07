@@ -9,7 +9,6 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(LiteNetLibTransform))]
     public abstract partial class BaseMonsterCharacterEntity : BaseCharacterEntity
     {
         public readonly Dictionary<BaseCharacterEntity, ReceivedDamageRecord> receivedDamageRecords = new Dictionary<BaseCharacterEntity, ReceivedDamageRecord>();
@@ -32,18 +31,7 @@ namespace MultiplayerARPG
             get { return monsterCharacter == null ? LanguageManager.GetUnknowTitle() : monsterCharacter.Title; }
             set { }
         }
-
-        private LiteNetLibTransform cacheNetTransform;
-        public LiteNetLibTransform CacheNetTransform
-        {
-            get
-            {
-                if (cacheNetTransform == null)
-                    cacheNetTransform = GetComponent<LiteNetLibTransform>();
-                return cacheNetTransform;
-            }
-        }
-
+        
         private BaseCharacterEntity summoner;
         public BaseCharacterEntity Summoner
         {
@@ -96,7 +84,7 @@ namespace MultiplayerARPG
                     if (Vector3.Distance(CacheTransform.position, Summoner.CacheTransform.position) > gameInstance.maxFollowSummonerDistance)
                     {
                         // Teleport to summoner if too far from summoner
-                        CacheNetTransform.Teleport(Summoner.GetSummonPosition(), Summoner.GetSummonRotation());
+                        Teleport(Summoner.GetSummonPosition());
                     }
                 }
                 else
@@ -185,7 +173,6 @@ namespace MultiplayerARPG
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
-            CacheNetTransform.ownerClientCanSendTransform = false;
             summonerObjectId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             summonerObjectId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             summonType.deliveryMethod = DeliveryMethod.ReliableOrdered;
