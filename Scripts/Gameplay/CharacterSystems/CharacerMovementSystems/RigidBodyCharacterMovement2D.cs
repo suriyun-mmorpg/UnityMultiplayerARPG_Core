@@ -278,16 +278,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (tempMoveDirection.Equals(Vector3.zero))
-            {
-                // No movement so state is none
-                SetMovementState(MovementState.None);
-            }
-            else
-            {
-                // For 2d, just define that it is moving so can use any state
-                SetMovementState(MovementState.Forward);
-            }
+            SetMovementState(CacheRigidbody2D.velocity.magnitude > 0 ? MovementState.Forward : MovementState.None);
         }
 
         public void SetMovementState(MovementState state)
