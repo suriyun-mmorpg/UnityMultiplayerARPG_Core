@@ -40,7 +40,6 @@ namespace MultiplayerARPG
 
         public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
         public abstract int MaxHp { get; }
-        public bool IsDead { get { return CurrentHp <= 0; } }
 
         public override void OnSetup()
         {
@@ -66,9 +65,14 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncCombatAmount, FunctionReceivers.All, (byte)combatAmountType, amount);
         }
 
+        public bool IsDead()
+        {
+            return CurrentHp <= 0;
+        }
+
         public virtual void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId)
         {
-            if (!IsServer || IsDead)
+            if (!IsServer || IsDead())
                 return;
             if (onReceiveDamage != null)
                 onReceiveDamage.Invoke(attacker, weapon, allDamageAmounts, debuff, hitEffectsId);
