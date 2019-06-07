@@ -28,8 +28,6 @@ namespace MultiplayerARPG
         public string formatPercentageAmount = "N0";
 
         private float percentage;
-        private float current;
-        private float max;
 
         public void Update(int current, int max)
         {
@@ -38,8 +36,6 @@ namespace MultiplayerARPG
 
         public void Update(float current, float max)
         {
-            this.current = current;
-            this.max = max;
             percentage = max == 0 ? 1 : current / max;
 
             if (textValue != null)
