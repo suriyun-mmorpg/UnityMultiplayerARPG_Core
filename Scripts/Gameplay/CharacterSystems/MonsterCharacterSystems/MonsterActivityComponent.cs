@@ -4,8 +4,7 @@ using UnityEngine.AI;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(NavMeshAgent))]
-    public class MonsterActivityComponent : MonoBehaviour
+    public class MonsterActivityComponent : BaseMonsterActivityComponent
     {
         [Tooltip("Min random delay for next wander")]
         public float randomWanderDelayMin = 2f;
@@ -19,6 +18,8 @@ namespace MultiplayerARPG
         public float setTargetDestinationDelay = 1f;
         [Tooltip("If following target time reached this value it will stop following target")]
         public float followTargetDuration = 5f;
+        [Tooltip("Turn to enemy speed")]
+        public float turnToEnemySpeed = 800f;
 
         public float wanderTime { get; private set; }
         public float findTargetTime { get; private set; }
@@ -26,40 +27,12 @@ namespace MultiplayerARPG
         public float startFollowTargetTime { get; private set; }
         public Vector3? wanderDestination { get; private set; }
         public Vector3 oldDestination { get; private set; }
-        public bool isWandering { get; private set; }
-
-        private MonsterCharacterEntity cacheMonsterCharacterEntity;
-        public MonsterCharacterEntity CacheMonsterCharacterEntity
+        
+        public BaseMonsterCharacterEntity CacheMonsterCharacterEntity
         {
-            get
-            {
-                if (cacheMonsterCharacterEntity == null)
-                    cacheMonsterCharacterEntity = GetComponent<MonsterCharacterEntity>();
-                return cacheMonsterCharacterEntity;
-            }
+            get { return CacheCharacterEntity as BaseMonsterCharacterEntity; }
         }
-
-        private NavMeshAgent cacheNavMeshAgent;
-        public NavMeshAgent CacheNavMeshAgent
-        {
-            get
-            {
-                if (cacheNavMeshAgent == null)
-                    cacheNavMeshAgent = GetComponent<NavMeshAgent>();
-                return cacheNavMeshAgent;
-            }
-        }
-
-        public GameInstance gameInstance
-        {
-            get { return GameInstance.Singleton; }
-        }
-
-        public BaseGameplayRule gameplayRule
-        {
-            get { return gameInstance.GameplayRule; }
-        }
-
+        
         public MonsterCharacter monsterDatabase
         {
             get { return CacheMonsterCharacterEntity.monsterCharacter; }
@@ -81,7 +54,7 @@ namespace MultiplayerARPG
         public void RandomNextWanderTime(float time)
         {
             wanderTime = time + Random.Range(randomWanderDelayMin, randomWanderDelayMax);
-            oldDestination = CacheMonsterCharacterEntity.CacheTransform.position;
+            oldDestination = CacheCharacterEntity.CacheTransform.position;
         }
 
         public void SetFindTargetTime(float time)
@@ -97,41 +70,32 @@ namespace MultiplayerARPG
         public void SetDestination(float time, Vector3 destination)
         {
             setDestinationTime = time;
-            isWandering = false;
-            ResumeMove(ObstacleAvoidanceType.GoodQualityObstacleAvoidance);
-            CacheNavMeshAgent.speed = gameplayRule.GetMoveSpeed(CacheMonsterCharacterEntity);
-            CacheNavMeshAgent.SetDestination(destination);
+            CacheMonsterCharacterEntity.isWandering = false;
+            CacheCharacterEntity.PointClickMovement(destination);
             oldDestination = destination;
         }
 
         public void SetWanderDestination(float time, Vector3 destination)
         {
             setDestinationTime = time;
-            isWandering = true;
-            ResumeMove(ObstacleAvoidanceType.NoObstacleAvoidance);
-            CacheNavMeshAgent.speed = monsterDatabase.wanderMoveSpeed;
-            CacheNavMeshAgent.SetDestination(destination);
+            CacheMonsterCharacterEntity.isWandering = true;
+            CacheCharacterEntity.PointClickMovement(destination);
             wanderDestination = destination;
         }
 
         protected void UpdateActivity(float time)
         {
-            if (!CacheMonsterCharacterEntity.IsServer || CacheMonsterCharacterEntity.Identity.CountSubscribers() == 0 || monsterDatabase == null)
+            if (!IsServer || CacheCharacterEntity.Identity.CountSubscribers() == 0 || monsterDatabase == null)
                 return;
 
-            if (CacheNavMeshAgent.velocity.magnitude > 0)
-                CacheMonsterCharacterEntity.MovementState = MovementState.Forward | MovementState.IsGrounded;
-            else
-                CacheMonsterCharacterEntity.MovementState = MovementState.IsGrounded;
-
-            if (CacheMonsterCharacterEntity.IsDead())
+            if (CacheCharacterEntity.IsDead())
             {
-                StopMove();
-                CacheMonsterCharacterEntity.SetTargetEntity(null);
+                CacheCharacterEntity.StopMove();
+                CacheCharacterEntity.SetTargetEntity(null);
                 return;
             }
 
-            Vector3 currentPosition = CacheMonsterCharacterEntity.CacheTransform.position;
+            Vector3 currentPosition = CacheCharacterEntity.CacheTransform.position;
 
             if (CacheMonsterCharacterEntity.Summoner != null &&
                 Vector3.Distance(currentPosition, CacheMonsterCharacterEntity.Summoner.CacheTransform.position) > gameInstance.minFollowSummonerDistance)
@@ -141,7 +105,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (CacheMonsterCharacterEntity.Summoner == null && CacheMonsterCharacterEntity.isInSafeArea)
+            if (CacheMonsterCharacterEntity.Summoner == null && CacheCharacterEntity.isInSafeArea)
             {
                 // If monster move into safe area, wander to another place
                 RandomWanderTarget(time);
@@ -149,12 +113,12 @@ namespace MultiplayerARPG
             }
 
             BaseCharacterEntity targetEntity;
-            if (CacheMonsterCharacterEntity.TryGetTargetEntity(out targetEntity))
+            if (CacheCharacterEntity.TryGetTargetEntity(out targetEntity))
             {
                 if (targetEntity.IsDead() || targetEntity.isInSafeArea)
                 {
                     // If target is dead or in safe area stop attacking
-                    CacheMonsterCharacterEntity.SetTargetEntity(null);
+                    CacheCharacterEntity.SetTargetEntity(null);
                     return;
                 }
                 UpdateAttackTarget(time, currentPosition, targetEntity);
@@ -183,24 +147,26 @@ namespace MultiplayerARPG
         {
             // If it has target then go to target
             Vector3 targetEntityPosition = targetEntity.CacheTransform.position;
-            float attackDistance = CacheMonsterCharacterEntity.GetAttackDistance(false);
+            float attackDistance = CacheCharacterEntity.GetAttackDistance(false);
             attackDistance -= attackDistance * 0.1f;
-            attackDistance -= CacheNavMeshAgent.stoppingDistance;
+            attackDistance -= CacheCharacterEntity.StoppingDistance;
             if (Vector3.Distance(currentPosition, targetEntityPosition) <= attackDistance)
             {
-                StopMove();
+                CacheCharacterEntity.StopMove();
                 SetStartFollowTargetTime(time);
                 // Lookat target then do anything when it's in range
                 Vector3 lookAtDirection = (targetEntityPosition - currentPosition).normalized;
+                Quaternion currentLookAtRotation = CacheCharacterEntity.CacheTransform.rotation;
                 // slerp to the desired rotation over time
                 if (lookAtDirection.magnitude > 0)
                 {
                     Vector3 lookRotationEuler = Quaternion.LookRotation(lookAtDirection).eulerAngles;
                     lookRotationEuler.x = 0;
                     lookRotationEuler.z = 0;
-                    CacheMonsterCharacterEntity.CacheTransform.rotation = Quaternion.RotateTowards(CacheMonsterCharacterEntity.CacheTransform.rotation, Quaternion.Euler(lookRotationEuler), CacheNavMeshAgent.angularSpeed * Time.deltaTime);
+                    currentLookAtRotation = Quaternion.RotateTowards(currentLookAtRotation, Quaternion.Euler(lookRotationEuler), turnToEnemySpeed * Time.deltaTime);
+                    CacheCharacterEntity.UpdateYRotation(currentLookAtRotation.eulerAngles.y);
                 }
-                CacheMonsterCharacterEntity.RequestAttack(false, targetEntity.OpponentAimTransform.position);
+                CacheCharacterEntity.RequestAttack(false, targetEntity.OpponentAimTransform.position);
                 // TODO: Random to use skills
             }
             else
@@ -221,7 +187,7 @@ namespace MultiplayerARPG
             Vector3 randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
             if (CacheMonsterCharacterEntity.Summoner != null)
                 randomPosition = CacheMonsterCharacterEntity.Summoner.GetSummonPosition();
-            CacheMonsterCharacterEntity.SetTargetEntity(null);
+            CacheCharacterEntity.SetTargetEntity(null);
             SetWanderDestination(time, randomPosition);
         }
 
@@ -231,7 +197,7 @@ namespace MultiplayerARPG
             Vector3 randomPosition = CacheMonsterCharacterEntity.spawnPosition + new Vector3(Random.Range(-1f, 1f) * randomWanderDistance, 0, Random.Range(-1f, 1f) * randomWanderDistance);
             if (CacheMonsterCharacterEntity.Summoner != null)
                 randomPosition = CacheMonsterCharacterEntity.Summoner.GetSummonPosition();
-            CacheMonsterCharacterEntity.SetTargetEntity(null);
+            CacheCharacterEntity.SetTargetEntity(null);
             SetDestination(time, randomPosition);
         }
 
@@ -243,15 +209,14 @@ namespace MultiplayerARPG
                 return;
 
             BaseCharacterEntity targetCharacter;
-            if (!CacheMonsterCharacterEntity.TryGetTargetEntity(out targetCharacter) || targetCharacter.IsDead())
+            if (!CacheCharacterEntity.TryGetTargetEntity(out targetCharacter) || targetCharacter.IsDead())
             {
                 // If no target enenmy or target enemy is dead, Find nearby character by layer mask
-                List<Collider> foundObjects = new List<Collider>(Physics.OverlapSphere(currentPosition, monsterDatabase.visualRange, gameInstance.characterLayer.Mask));
-                foreach (Collider foundObject in foundObjects)
+                List<BaseCharacterEntity> characterEntities = CacheCharacterEntity.FindAliveCharacters<BaseCharacterEntity>(monsterDatabase.visualRange, false, true, false);
+                foreach (BaseCharacterEntity characterEntity in characterEntities)
                 {
-                    BaseCharacterEntity characterEntity = foundObject.GetComponent<BaseCharacterEntity>();
                     // Attack target settings
-                    if (characterEntity == null || !characterEntity.CanReceiveDamageFrom(CacheMonsterCharacterEntity))
+                    if (characterEntity == null || !characterEntity.CanReceiveDamageFrom(CacheCharacterEntity))
                     {
                         // If character is null or cannot receive damage from monster, skip it
                         continue;
@@ -262,7 +227,7 @@ namespace MultiplayerARPG
                         // If character is not attacking summoner, skip it
                         continue;
                     }
-                    if (!CacheMonsterCharacterEntity.IsEnemy(characterEntity))
+                    if (!CacheCharacterEntity.IsEnemy(characterEntity))
                     {
                         // If character is not enemy, skip it
                         continue;
@@ -273,33 +238,6 @@ namespace MultiplayerARPG
                     break;
                 }
             }
-        }
-
-        public void ResumeMove(ObstacleAvoidanceType obstacleAvoidanceType)
-        {
-            CacheNavMeshAgent.updatePosition = true;
-            CacheNavMeshAgent.updateRotation = true;
-            CacheNavMeshAgent.isStopped = false;
-            CacheNavMeshAgent.obstacleAvoidanceType = obstacleAvoidanceType;
-        }
-
-        public void SetSpawnArea(Vector3 spawnPosition, out Vector3 resultSpawnPosition)
-        {
-            resultSpawnPosition = spawnPosition;
-            NavMeshHit navHit;
-            if (NavMesh.SamplePosition(spawnPosition, out navHit, 100f, -1))
-            {
-                resultSpawnPosition = navHit.position;
-                CacheNavMeshAgent.Warp(spawnPosition);
-            }
-        }
-
-        public void StopMove()
-        {
-            CacheNavMeshAgent.updatePosition = false;
-            CacheNavMeshAgent.updateRotation = false;
-            CacheNavMeshAgent.isStopped = true;
-            CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
         }
     }
 }

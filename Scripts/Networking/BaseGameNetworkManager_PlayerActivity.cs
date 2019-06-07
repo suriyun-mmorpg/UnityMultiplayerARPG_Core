@@ -834,7 +834,7 @@ namespace MultiplayerARPG
 
             // If warping to same map player does not have to reload new map data
             if (string.IsNullOrEmpty(mapName) || mapName.Equals(playerCharacterEntity.CurrentMapName))
-                playerCharacterEntity.CacheNetTransform.Teleport(position, Quaternion.identity);
+                playerCharacterEntity.Teleport(position);
         }
 
         public virtual void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem, int partyId)
@@ -1121,7 +1121,7 @@ namespace MultiplayerARPG
 
         public virtual void SetCurrentPosition(BasePlayerCharacterEntity playerCharacterEntity, Vector3 position)
         {
-            playerCharacterEntity.CacheNetTransform.Teleport(position, playerCharacterEntity.CacheTransform.rotation);
+            playerCharacterEntity.Teleport(position);
             playerCharacterEntity.CacheTransform.position = position;
         }
 

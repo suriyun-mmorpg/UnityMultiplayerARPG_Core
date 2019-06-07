@@ -1,55 +1,17 @@
-﻿using UnityEngine;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(MonsterActivityComponent))]
-    [RequireComponent(typeof(CapsuleCollider))]
     public partial class MonsterCharacterEntity : BaseMonsterCharacterEntity
     {
-        public override bool IsGrounded
+        public override void InitialRequiredComponents()
         {
-            get { return true; }
-            protected set { }
-        }
-
-        public override bool IsJumping
-        {
-            get { return false; }
-            protected set { }
-        }
-
-        private MonsterActivityComponent cacheMonsterActivityComponent;
-        public MonsterActivityComponent CacheMonsterActivityComponent
-        {
-            get
+            CharacterMovement = GetComponent<BaseCharacterMovement>();
+            if (CharacterMovement == null)
             {
-                if (cacheMonsterActivityComponent == null)
-                    cacheMonsterActivityComponent = GetComponent<MonsterActivityComponent>();
-                return cacheMonsterActivityComponent;
+                if (gameInstance.DimensionType == DimensionType.Dimension3D)
+                    CharacterMovement = gameObject.AddComponent<NavMeshCharacterMovement>();
+                else
+                    CharacterMovement = gameObject.AddComponent<RigidBodyCharacterMovement2D>();
             }
-        }
-
-        private CapsuleCollider cacheCapsuleCollider;
-        public CapsuleCollider CacheCapsuleCollider
-        {
-            get
-            {
-                if (cacheCapsuleCollider == null)
-                    cacheCapsuleCollider = GetComponent<CapsuleCollider>();
-                return cacheCapsuleCollider;
-            }
-        }
-
-        public override void SetSpawnArea(MonsterSpawnArea spawnArea, Vector3 spawnPosition)
-        {
-            this.spawnArea = spawnArea;
-            CacheMonsterActivityComponent.SetSpawnArea(spawnPosition, out spawnPosition);
-            this.spawnPosition = spawnPosition;
-        }
-
-        public override void StopMove()
-        {
-            CacheMonsterActivityComponent.StopMove();
         }
     }
 }

@@ -5,6 +5,13 @@ namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
     {
+        public override void SetTargetEntity(BaseGameEntity entity)
+        {
+            if (IsOwnerClient && !IsServer)
+                CallNetFunction(NetFuncSetTargetEntity, FunctionReceivers.Server, new PackedUInt(entity == null ? 0 : entity.ObjectId));
+            base.SetTargetEntity(entity);
+        }
+
         public bool RequestSwapOrMergeItem(short fromIndex, short toIndex)
         {
             if (IsDead())

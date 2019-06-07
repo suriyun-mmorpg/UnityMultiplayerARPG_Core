@@ -42,8 +42,8 @@ namespace MultiplayerARPG
             GameObject spawnObj = Instantiate(monsterCharacterEntity.gameObject, spawnPosition, spawnRotation);
             BaseMonsterCharacterEntity entity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
             entity.Level = level;
-            entity.SetSpawnArea(this, spawnPosition);
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
+            entity.SetSpawnArea(this, spawnPosition);
         }
 
         public override int GroundLayerMask

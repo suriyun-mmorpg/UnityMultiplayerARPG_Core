@@ -18,6 +18,8 @@ namespace MultiplayerARPG
         public MonsterCharacter monsterCharacter;
         public float destroyDelay = 2f;
         public float destroyRespawnDelay = 5f;
+        [HideInInspector, System.NonSerialized]
+        public bool isWandering;
 
         [Header("Monster Character - Sync Fields")]
         [SerializeField]
@@ -173,9 +175,10 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void SetSpawnArea(MonsterSpawnArea spawnArea, Vector3 spawnPosition)
+        public void SetSpawnArea(MonsterSpawnArea spawnArea, Vector3 spawnPosition)
         {
             this.spawnArea = spawnArea;
+            FindGroundedPosition(spawnPosition, 512f, out spawnPosition);
             this.spawnPosition = spawnPosition;
         }
 
@@ -543,7 +546,7 @@ namespace MultiplayerARPG
 
             base.Respawn();
             StopMove();
-            CacheNetTransform.Teleport(spawnPosition, CacheTransform.rotation);
+            Teleport(spawnPosition);
         }
 
         public void DestroyAndRespawn()
@@ -588,8 +591,6 @@ namespace MultiplayerARPG
             if ((Summoner != null && Summoner == ally) || monsterCharacter.characteristic == MonsterCharacteristic.Assist)
                 SetAttackTarget(attacker);
         }
-
-        public abstract void StopMove();
     }
 
     public struct ReceivedDamageRecord

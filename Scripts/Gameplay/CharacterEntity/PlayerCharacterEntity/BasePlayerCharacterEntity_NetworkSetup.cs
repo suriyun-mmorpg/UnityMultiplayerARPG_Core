@@ -54,6 +54,7 @@ namespace MultiplayerARPG
             quests.onOperation += OnQuestsOperation;
             storageItems.onOperation += OnStorageItemsOperation;
             // Register Network functions
+            RegisterNetFunction<PackedUInt>(NetFuncSetTargetEntity);
             RegisterNetFunction<short, short>(NetFuncSwapOrMergeItem);
             RegisterNetFunction<int>(NetFuncAddAttribute);
             RegisterNetFunction<int>(NetFuncAddSkill);

@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using LiteNetLibManager;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(LiteNetLibTransform))]
     public abstract partial class BasePlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData
     {
         [HideInInspector, System.NonSerialized]
@@ -22,23 +20,24 @@ namespace MultiplayerARPG
         public PlayerCharacter[] playerCharacters;
         [Tooltip("Leave this empty to use GameInstance's controller prefab")]
         public BasePlayerCharacterController controllerPrefab;
-
-        private LiteNetLibTransform cacheNetTransform;
-        public LiteNetLibTransform CacheNetTransform
-        {
-            get
-            {
-                if (cacheNetTransform == null)
-                    cacheNetTransform = GetComponent<LiteNetLibTransform>();
-                return cacheNetTransform;
-            }
-        }
+        
 
         protected override void EntityAwake()
         {
             base.EntityAwake();
             gameObject.tag = gameInstance.playerTag;
             MigrateDatabase();
+        }
+
+        protected override void EntityUpdate()
+        {
+            base.EntityUpdate();
+            if (IsDead())
+            {
+                StopMove();
+                SetTargetEntity(null);
+                return;
+            }
         }
 
         protected override void OnValidate()
@@ -242,11 +241,5 @@ namespace MultiplayerARPG
         {
             // TODO: May send data to client
         }
-
-        public abstract float StoppingDistance { get; }
-        public abstract void StopMove();
-        public abstract void KeyMovement(Vector3 moveDirection, MovementState moveState);
-        public abstract void UpdateYRotation(float yRotation);
-        public abstract void PointClickMovement(Vector3 position);
     }
 }

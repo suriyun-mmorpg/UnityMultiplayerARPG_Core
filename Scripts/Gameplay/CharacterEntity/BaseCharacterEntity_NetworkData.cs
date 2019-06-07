@@ -27,8 +27,6 @@ namespace MultiplayerARPG
         protected SyncFieldEquipWeapons equipWeapons = new SyncFieldEquipWeapons();
         [SerializeField]
         protected SyncFieldBool isHidding = new SyncFieldBool();
-        [SerializeField]
-        protected SyncFieldByte movementState = new SyncFieldByte();
         [Header("Sync Lists")]
         [SerializeField]
         protected SyncListCharacterAttribute attributes = new SyncListCharacterAttribute();
@@ -57,7 +55,6 @@ namespace MultiplayerARPG
         public System.Action<int> onCurrentWaterChange;
         public System.Action<EquipWeapons> onEquipWeaponsChange;
         public System.Action<bool> onIsHiddingChange;
-        public System.Action<byte> onMovementStateChange;
         // List
         public System.Action<LiteNetLibSyncList.Operation, int> onAttributesOperation;
         public System.Action<LiteNetLibSyncList.Operation, int> onSkillsOperation;
@@ -80,7 +77,6 @@ namespace MultiplayerARPG
         public virtual int CurrentWater { get { return currentWater.Value; } set { currentWater.Value = value; } }
         public virtual EquipWeapons EquipWeapons { get { return equipWeapons.Value; } set { equipWeapons.Value = value; } }
         public virtual bool IsHidding { get { return isHidding.Value; } set { isHidding.Value = value; } }
-        public virtual MovementState MovementState { get { return (MovementState)movementState.Value; } set { movementState.Value = (byte)value; } }
         public override string Title { get { return CharacterName; } set { } }
 
         public IList<CharacterAttribute> Attributes
@@ -285,16 +281,6 @@ namespace MultiplayerARPG
 
             if (onIsHiddingChange != null)
                 onIsHiddingChange.Invoke(isHidding);
-        }
-
-        /// <summary>
-        /// Override this to do stuffs when movement state changes
-        /// </summary>
-        /// <param name="movementState"></param>
-        protected virtual void OnMovementStateChange(bool isInitial, byte movementState)
-        {
-            if (onMovementStateChange != null)
-                onMovementStateChange.Invoke(movementState);
         }
         #endregion
 

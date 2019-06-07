@@ -11,7 +11,7 @@ namespace MultiplayerARPG
 {
     [RequireComponent(typeof(CharacterRecoveryComponent))]
     [RequireComponent(typeof(CharacterSkillAndBuffComponent))]
-    public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData, IAttackerEntity
+    public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData, ICharacterMovement, IAttackerEntity
     {
         public const float ACTION_COMMAND_DELAY = 0.2f;
         public const int OVERLAP_COLLIDER_SIZE_FOR_ATTACK = 256;
@@ -63,35 +63,18 @@ namespace MultiplayerARPG
         protected BaseGameEntity targetEntity;
         protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
         protected AnimActionType animActionType;
-        /// <summary>
-        /// This variable will be TRUE when cache data have to re-cache
-        /// </summary>
-        public bool IsRecaching
-        {
-            get
-            {
-                return isRecaching ||
-                    attributesRecachingState.isRecaching ||
-                    skillsRecachingState.isRecaching ||
-                    buffsRecachingState.isRecaching ||
-                    equipItemsRecachingState.isRecaching ||
-                    nonEquipItemsRecachingState.isRecaching ||
-                    summonsRecachingState.isRecaching;
-            }
-        }
-        public bool isRecaching { get; protected set; }
-        protected SyncListRecachingState attributesRecachingState;
-        protected SyncListRecachingState skillsRecachingState;
-        protected SyncListRecachingState buffsRecachingState;
-        protected SyncListRecachingState equipItemsRecachingState;
-        protected SyncListRecachingState nonEquipItemsRecachingState;
-        protected SyncListRecachingState summonsRecachingState;
+        protected Vector3? teleportingPosition;
         public bool isAttackingOrUsingSkill { get; protected set; }
         public bool isCastingSkillCanBeInterrupted { get; protected set; }
         public bool isCastingSkillInterrupted { get; protected set; }
         public float castingSkillDuration { get; protected set; }
         public float castingSkillCountDown { get; protected set; }
         public float moveSpeedRateWhileAttackOrUseSkill { get; protected set; }
+        #endregion
+
+        #region Extend components
+        public BaseCharacterMovement CharacterMovement { get; protected set; }
+        protected readonly List<BaseCharacterComponent> characterComponents = new List<BaseCharacterComponent>();
         #endregion
 
         #region Temp data
@@ -102,46 +85,12 @@ namespace MultiplayerARPG
         protected GameObject tempGameObject;
         #endregion
 
-        #region Caches Data
-        protected CharacterStats cacheStats;
-        protected Dictionary<Attribute, short> cacheAttributes;
-        protected Dictionary<Skill, short> cacheSkills;
-        protected Dictionary<DamageElement, float> cacheResistances;
-        protected Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages;
-        protected Dictionary<EquipmentSet, int> cacheEquipmentSets;
-        protected int cacheMaxHp;
-        protected int cacheMaxMp;
-        protected int cacheMaxStamina;
-        protected int cacheMaxFood;
-        protected int cacheMaxWater;
-        protected float cacheTotalItemWeight;
-        protected float cacheAtkSpeed;
-        protected float cacheMoveSpeed;
-        public CharacterStats CacheStats { get { return cacheStats; } }
-        public Dictionary<Attribute, short> CacheAttributes { get { return cacheAttributes; } }
-        public Dictionary<Skill, short> CacheSkills { get { return cacheSkills; } }
-        public Dictionary<DamageElement, float> CacheResistances { get { return cacheResistances; } }
-        public Dictionary<DamageElement, MinMaxFloat> CacheIncreaseDamages { get { return cacheIncreaseDamages; } }
-        public Dictionary<EquipmentSet, int> CacheEquipmentSets { get { return cacheEquipmentSets; } }
-        public int CacheMaxHp { get { return cacheMaxHp; } }
-        public int CacheMaxMp { get { return cacheMaxMp; } }
-        public int CacheMaxStamina { get { return cacheMaxStamina; } }
-        public int CacheMaxFood { get { return cacheMaxFood; } }
-        public int CacheMaxWater { get { return cacheMaxWater; } }
-        public float CacheTotalItemWeight { get { return cacheTotalItemWeight; } }
-        public float CacheAtkSpeed { get { return cacheAtkSpeed; } }
-        public float CacheMoveSpeed { get { return cacheMoveSpeed; } }
-        public float CacheBaseMoveSpeed { get; protected set; }
-        public bool CacheDisallowMove { get; protected set; }
-        public bool CacheDisallowAttack { get; protected set; }
-        public bool CacheDisallowUseSkill { get; protected set; }
-        public bool CacheDisallowUseItem { get; protected set; }
-        #endregion
-
         public override int MaxHp { get { return CacheMaxHp; } }
         public float MoveAnimationSpeedMultiplier { get { return gameplayRule.GetMoveSpeed(this) / CacheBaseMoveSpeed; } }
-        public virtual bool IsGrounded { get; protected set; }
-        public virtual bool IsJumping { get; protected set; }
+        public bool IsGrounded { get { return CharacterMovement == null ?  true : CharacterMovement.IsGrounded; } }
+        public bool IsJumping { get { return CharacterMovement == null ? false : CharacterMovement.IsJumping; } }
+        public MovementState MovementState { get { return CharacterMovement == null ? MovementState.None | MovementState.IsGrounded : CharacterMovement.MovementState; } }
+        public float StoppingDistance { get { return CharacterMovement == null ? 0.1f : CharacterMovement.StoppingDistance; } }
         public abstract int DataId { get; set; }
         public CharacterHitBox[] HitBoxes { get; protected set; }
         public bool HasAimPosition { get; protected set; }
@@ -273,11 +222,15 @@ namespace MultiplayerARPG
             base.EntityUpdate();
             Profiler.BeginSample("BaseCharacterEntity - Update");
             MakeCaches();
-            if (IsServer && !IsDead() && CacheTransform.position.y <= gameManager.CurrentMapInfo.deadY)
+
+            if (IsServer && !IsDead() && gameInstance.DimensionType == DimensionType.Dimension3D &&
+                CacheTransform.position.y <= gameManager.CurrentMapInfo.deadY)
             {
+                // Character will dead only when dimension type is 3D
                 CurrentHp = 0;
                 Killed(this);
             }
+
             if (IsDead())
             {
                 // Clear action states when character dead
@@ -295,122 +248,7 @@ namespace MultiplayerARPG
             Profiler.EndSample();
         }
 
-        #region Caches / Relates Objects
-        /// <summary>
-        /// Make caches for character stats / attributes / skills / resistances / increase damages and so on immdediately
-        /// </summary>
-        public void ForceMakeCaches()
-        {
-            isRecaching = true;
-            MakeCaches();
-        }
-
-        /// <summary>
-        /// Make caches for character stats / attributes / skills / resistances / increase damages and so on when update calls
-        /// </summary>
-        protected virtual void MakeCaches()
-        {
-            if (!IsRecaching)
-                return;
-
-            if (cacheAttributes == null)
-                cacheAttributes = new Dictionary<Attribute, short>();
-            if (cacheResistances == null)
-                cacheResistances = new Dictionary<DamageElement, float>();
-            if (cacheIncreaseDamages == null)
-                cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            if (cacheSkills == null)
-                cacheSkills = new Dictionary<Skill, short>();
-            if (cacheEquipmentSets == null)
-                cacheEquipmentSets = new Dictionary<EquipmentSet, int>();
-
-            this.GetAllStats(
-                out cacheStats,
-                cacheAttributes,
-                cacheResistances,
-                cacheIncreaseDamages,
-                cacheSkills,
-                cacheEquipmentSets,
-                out cacheMaxHp,
-                out cacheMaxMp,
-                out cacheMaxStamina,
-                out cacheMaxFood,
-                out cacheMaxWater,
-                out cacheTotalItemWeight,
-                out cacheAtkSpeed,
-                out cacheMoveSpeed);
-
-            if (this.GetDatabase() != null)
-                CacheBaseMoveSpeed = this.GetDatabase().stats.baseStats.moveSpeed;
-
-            CacheDisallowMove = false;
-            CacheDisallowAttack = false;
-            CacheDisallowUseSkill = false;
-            CacheDisallowUseItem = false;
-            Buff tempBuff;
-            foreach (CharacterBuff characterBuff in Buffs)
-            {
-                tempBuff = characterBuff.GetBuff();
-                if (tempBuff.disallowMove)
-                    CacheDisallowMove = true;
-                if (tempBuff.disallowAttack)
-                    CacheDisallowAttack = true;
-                if (tempBuff.disallowUseSkill)
-                    CacheDisallowUseSkill = true;
-                if (tempBuff.disallowUseItem)
-                    CacheDisallowUseItem = true;
-                if (CacheDisallowMove &&
-                    CacheDisallowAttack &&
-                    CacheDisallowUseSkill &&
-                    CacheDisallowUseItem)
-                    break;
-            }
-
-            if (attributesRecachingState.isRecaching)
-            {
-                if (onAttributesOperation != null)
-                    onAttributesOperation.Invoke(attributesRecachingState.operation, attributesRecachingState.index);
-                attributesRecachingState = SyncListRecachingState.Empty;
-            }
-
-            if (skillsRecachingState.isRecaching)
-            {
-                if (onSkillsOperation != null)
-                    onSkillsOperation.Invoke(skillsRecachingState.operation, skillsRecachingState.index);
-                skillsRecachingState = SyncListRecachingState.Empty;
-            }
-
-            if (buffsRecachingState.isRecaching)
-            {
-                if (onBuffsOperation != null)
-                    onBuffsOperation.Invoke(buffsRecachingState.operation, buffsRecachingState.index);
-                buffsRecachingState = SyncListRecachingState.Empty;
-            }
-
-            if (equipItemsRecachingState.isRecaching)
-            {
-                if (onEquipItemsOperation != null)
-                    onEquipItemsOperation.Invoke(equipItemsRecachingState.operation, equipItemsRecachingState.index);
-                equipItemsRecachingState = SyncListRecachingState.Empty;
-            }
-
-            if (nonEquipItemsRecachingState.isRecaching)
-            {
-                if (onNonEquipItemsOperation != null)
-                    onNonEquipItemsOperation.Invoke(nonEquipItemsRecachingState.operation, nonEquipItemsRecachingState.index);
-                nonEquipItemsRecachingState = SyncListRecachingState.Empty;
-            }
-
-            if (summonsRecachingState.isRecaching)
-            {
-                if (onSummonsOperation != null)
-                    onSummonsOperation.Invoke(summonsRecachingState.operation, summonsRecachingState.index);
-                summonsRecachingState = SyncListRecachingState.Empty;
-            }
-
-            isRecaching = false;
-        }
-
+        #region Relates Objects
         public virtual void InstantiateUI(UICharacterEntity prefab)
         {
             if (prefab == null)
@@ -459,42 +297,9 @@ namespace MultiplayerARPG
                 Killed(attacker);
         }
 
-        protected virtual void GetDamagePositionAndRotation(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Quaternion rotation)
+        public void GetDamagePositionAndRotation(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Quaternion rotation)
         {
-            position = CacheTransform.position;
-            switch (damageType)
-            {
-                case DamageType.Melee:
-                    position = MeleeDamageTransform.position;
-                    break;
-                case DamageType.Missile:
-                    Transform tempMissileDamageTransform = null;
-                    if ((tempMissileDamageTransform = CharacterModel.GetRightHandMissileDamageTransform()) != null && !isLeftHand)
-                    {
-                        // Use position from right hand weapon missile damage transform
-                        position = tempMissileDamageTransform.position;
-                    }
-                    else if ((tempMissileDamageTransform = CharacterModel.GetLeftHandMissileDamageTransform()) != null && isLeftHand)
-                    {
-                        // Use position from left hand weapon missile damage transform
-                        position = tempMissileDamageTransform.position;
-                    }
-                    else
-                    {
-                        // Use position from default missile damage transform
-                        position = MissileDamageTransform.position;
-                    }
-                    break;
-            }
-            Quaternion forwardRotation = Quaternion.LookRotation(CacheTransform.forward);
-            Vector3 forwardStagger = forwardRotation * stagger;
-            rotation = Quaternion.LookRotation(CacheTransform.forward + forwardStagger);
-            if (hasAimPosition)
-            {
-                forwardRotation = Quaternion.LookRotation(aimPosition - position);
-                forwardStagger = forwardRotation * stagger;
-                rotation = Quaternion.LookRotation(aimPosition + forwardStagger - position);
-            }
+            CharacterMovement.GetDamagePositionAndRotation(damageType, isLeftHand, hasAimPosition, aimPosition, stagger, out position, out rotation);
         }
 
         public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)
@@ -1062,18 +867,9 @@ namespace MultiplayerARPG
             return IsPositionInFov(fov, position, CacheTransform.forward);
         }
 
-        public virtual bool IsPositionInFov(float fov, Vector3 position, Vector3 forward)
+        public bool IsPositionInFov(float fov, Vector3 position, Vector3 forward)
         {
-            float halfFov = fov * 0.5f;
-            // This is unsigned angle, so angle found from this function is 0 - 180
-            // if position forward from character this value will be 180
-            // so just find for angle > 180 - halfFov
-            Vector3 targetDir = (position - CacheTransform.position).normalized;
-            targetDir.y = 0;
-            forward.y = 0;
-            targetDir.Normalize();
-            forward.Normalize();
-            return Vector3.Angle(targetDir, forward) < halfFov;
+            return CharacterMovement.IsPositionInFov(fov, position, forward);
         }
 
         public List<T> FindCharacters<T>(float distance, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
@@ -1147,6 +943,43 @@ namespace MultiplayerARPG
         }
         #endregion
 
+        #region Character Movement
+        public void StopMove()
+        {
+            CharacterMovement.StopMove();
+        }
+
+        public void KeyMovement(Vector3 moveDirection, MovementState moveState)
+        {
+            CharacterMovement.KeyMovement(moveDirection, moveState);
+        }
+
+        public void PointClickMovement(Vector3 position)
+        {
+            CharacterMovement.PointClickMovement(position);
+        }
+
+        public void UpdateYRotation(float yRotation)
+        {
+            CharacterMovement.UpdateYRotation(yRotation);
+        }
+
+        public void Teleport(Vector3 position)
+        {
+            if (CharacterMovement == null)
+            {
+                teleportingPosition = position;
+                return;
+            }
+            CharacterMovement.Teleport(position);
+        }
+
+        public void FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
+        {
+            CharacterMovement.FindGroundedPosition(fromPosition, findDistance, out result);
+        }
+        #endregion
+
         private void NotifyEnemySpottedToAllies(BaseCharacterEntity enemy)
         {
             // Warn that this character received damage to nearby characters
@@ -1171,12 +1004,14 @@ namespace MultiplayerARPG
             return CacheTransform.rotation;
         }
 
-        public abstract void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker);
-        public abstract bool IsAlly(BaseCharacterEntity characterEntity);
-        public abstract bool IsEnemy(BaseCharacterEntity characterEntity);
         public bool IsNeutral(BaseCharacterEntity characterEntity)
         {
             return !IsAlly(characterEntity) && !IsEnemy(characterEntity);
         }
+
+        public abstract void InitialRequiredComponents();
+        public abstract void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker);
+        public abstract bool IsAlly(BaseCharacterEntity characterEntity);
+        public abstract bool IsEnemy(BaseCharacterEntity characterEntity);
     }
 }
