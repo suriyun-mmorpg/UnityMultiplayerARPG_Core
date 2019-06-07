@@ -9,7 +9,7 @@ namespace MultiplayerARPG
         int CurrentHp { get; set; }
         GameObject gameObject { get; }
         Transform transform { get; }
-        bool IsDead();
+        bool IsDead { get; }
         void ReceiveDamage(IAttackerEntity attacker, CharacterItem weapon, Dictionary<DamageElement, MinMaxFloat> allDamageAmounts, CharacterBuff debuff, uint hitEffectsId);
         bool CanReceiveDamageFrom(IAttackerEntity attacker);
     }
