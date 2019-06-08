@@ -198,7 +198,6 @@ namespace MultiplayerARPG
         public override void StopMove()
         {
             navPaths = null;
-            tempMoveDirection = Vector3.zero;
             CacheRigidbody.velocity = new Vector3(0, CacheRigidbody.velocity.y, 0);
             if (IsOwnerClient && !IsServer)
                 CacheCharacterEntity.CallNetFunction(StopMove, FunctionReceivers.Server);

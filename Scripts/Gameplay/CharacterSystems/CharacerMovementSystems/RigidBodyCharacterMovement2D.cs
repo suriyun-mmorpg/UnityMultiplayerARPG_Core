@@ -60,11 +60,8 @@ namespace MultiplayerARPG
             get { return false; }
             protected set { }
         }
-
-        #region Temp data
-        protected Vector2 tempDirection;
+        
         protected Vector2? currentDestination;
-        #endregion
 
         protected Vector2 localDirection;
         public override Vector2 CurrentDirection
@@ -174,7 +171,6 @@ namespace MultiplayerARPG
         public override void StopMove()
         {
             currentDestination = null;
-            tempMoveDirection = Vector3.zero;
             CacheRigidbody2D.velocity = Vector2.zero;
             if (IsOwnerClient && !IsServer)
                 CacheCharacterEntity.CallNetFunction(StopMove, FunctionReceivers.Server);
