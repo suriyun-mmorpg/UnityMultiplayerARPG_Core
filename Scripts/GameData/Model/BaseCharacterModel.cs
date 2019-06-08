@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -62,6 +65,20 @@ namespace MultiplayerARPG
         protected readonly List<string> tempCachedKeys = new List<string>();
         protected GameObject tempEquipmentObject;
         protected BaseEquipmentEntity tempEquipmentEntity;
+
+        protected override void OnDrawGizmos()
+        {
+#if UNITY_EDITOR
+            base.OnDrawGizmos();
+            foreach (EquipmentContainer equipmentContainer in equipmentContainers)
+            {
+                if (equipmentContainer.transform == null) continue;
+                Gizmos.color = Color.green;
+                Gizmos.DrawWireSphere(equipmentContainer.transform.position, 0.1f);
+                Handles.Label(equipmentContainer.transform.position, equipmentContainer.equipSocket + "(Equipment)");
+            }
+#endif
+        }
 
         [ContextMenu("Set Equipment Containers By Setters")]
         public void SetEquipmentContainersBySetters()

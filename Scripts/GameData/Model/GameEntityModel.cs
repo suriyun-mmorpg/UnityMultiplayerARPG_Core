@@ -52,6 +52,19 @@ namespace MultiplayerARPG
         {
         }
 
+        protected virtual void OnDrawGizmos()
+        {
+#if UNITY_EDITOR
+            foreach (EffectContainer effectContainer in effectContainers)
+            {
+                if (effectContainer.transform == null) continue;
+                Gizmos.color = Color.blue;
+                Gizmos.DrawWireSphere(effectContainer.transform.position, 0.1f);
+                Handles.Label(effectContainer.transform.position, effectContainer.effectSocket + "(Effect)");
+            }
+#endif
+        }
+
         protected virtual void OnValidate()
         {
 #if UNITY_EDITOR
