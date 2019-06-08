@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [System.Obsolete("This is deprecated, use `MonsterActivityComponent` instead")]
+    [System.Obsolete("This is deprecated, but still keep it for backward compatibilities. Use `MonsterActivityComponent` instead")]
     /// <summary>
     /// This is deprecated, but still keep it for backward compatibilities.
     /// Use `MonsterActivityComponent` instead

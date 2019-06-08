@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerARPG
 {
-    [System.Obsolete("This is deprecated, use `MonsterCharacterEntity` instead")]
+    [System.Obsolete("This is deprecated, but still keep it for backward compatibilities. Use `MonsterCharacterEntity` instead")]
     /// <summary>
     /// This is deprecated, but still keep it for backward compatibilities.
     /// Use `MonsterCharacterEntity` instead
