@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -12,7 +10,7 @@ namespace MultiplayerARPG
 
     public class GameArea : MonoBehaviour
     {
-        public const float GROUND_DETECTION_DISTANCE = 100f;
+        public const float GROUND_DETECTION_DISTANCE = 512f;
         public Color gizmosColor = Color.magenta;
         public GameAreaType type;
         [Header("Radius Area")]
