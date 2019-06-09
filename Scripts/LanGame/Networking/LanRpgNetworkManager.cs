@@ -126,33 +126,11 @@ namespace MultiplayerARPG
             if (enableGmCommands == EnableGmCommandType.Everyone)
                 playerCharacterEntity.UserLevel = 1;
 
-            // Load world / storage for first character (host)
+            // Load data for first character (host)
             if (playerCharacters.Count == 0)
             {
                 if (enableGmCommands == EnableGmCommandType.HostOnly)
                     playerCharacterEntity.UserLevel = 1;
-
-                // Load and Spawn buildings
-                worldSaveData.LoadPersistentData(playerCharacterEntity.Id, playerCharacterEntity.CurrentMapName);
-                foreach (BuildingSaveData building in worldSaveData.buildings)
-                {
-                    CreateBuildingEntity(building, true);
-                }
-                // Load storage data
-                storageSaveData.LoadPersistentData(playerCharacterEntity.Id);
-                foreach (StorageCharacterItem storageItem in storageSaveData.storageItems)
-                {
-                    StorageId storageId = new StorageId(storageItem.storageType, storageItem.storageOwnerId);
-                    if (!storageItems.ContainsKey(storageId))
-                        storageItems[storageId] = new List<CharacterItem>();
-                    storageItems[storageId].Add(storageItem.characterItem);
-                }
-                // Spawn harvestables
-                HarvestableSpawnArea[] harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
-                foreach (HarvestableSpawnArea harvestableSpawnArea in harvestableSpawnAreas)
-                {
-                    harvestableSpawnArea.SpawnAll();
-                }
             }
 
             // Summon saved summons
@@ -490,6 +468,38 @@ namespace MultiplayerARPG
         protected override bool IsInstanceMap()
         {
             return false;
+        }
+
+        public override void OnServerOnlineSceneLoaded()
+        {
+            base.OnServerOnlineSceneLoaded();
+            StartCoroutine(OnServerOnlineSceneLoadedRoutine());
+        }
+
+        private IEnumerator OnServerOnlineSceneLoadedRoutine()
+        {
+            yield return new WaitForSecondsRealtime(1);
+            // Load and Spawn buildings
+            worldSaveData.LoadPersistentData(selectedCharacter.Id, selectedCharacter.CurrentMapName);
+            foreach (BuildingSaveData building in worldSaveData.buildings)
+            {
+                CreateBuildingEntity(building, true);
+            }
+            // Load storage data
+            storageSaveData.LoadPersistentData(selectedCharacter.Id);
+            foreach (StorageCharacterItem storageItem in storageSaveData.storageItems)
+            {
+                StorageId storageId = new StorageId(storageItem.storageType, storageItem.storageOwnerId);
+                if (!storageItems.ContainsKey(storageId))
+                    storageItems[storageId] = new List<CharacterItem>();
+                storageItems[storageId].Add(storageItem.characterItem);
+            }
+            // Spawn harvestables
+            HarvestableSpawnArea[] harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
+            foreach (HarvestableSpawnArea harvestableSpawnArea in harvestableSpawnAreas)
+            {
+                harvestableSpawnArea.SpawnAll();
+            }
         }
         #endregion
     }
