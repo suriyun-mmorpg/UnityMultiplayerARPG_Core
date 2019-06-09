@@ -58,6 +58,8 @@ namespace MultiplayerARPG
         {
             base.Awake();
             SetupComponent();
+            if (animator != null)
+                animator.SetBool(ANIM_IS_GROUNDED, true);
         }
 
         protected override void OnValidate()
@@ -142,8 +144,6 @@ namespace MultiplayerARPG
                 animator = GetComponentInChildren<Animator>();
             if (animator != null && animator.runtimeAnimatorController != cacheAnimatorController)
                 animator.runtimeAnimatorController = cacheAnimatorController;
-            if (animator != null)
-                animator.SetBool(ANIM_IS_GROUNDED, true);
             // Set default clips
             CacheAnimatorController[CLIP_IDLE] = defaultAnimations.idleClip;
             CacheAnimatorController[CLIP_MOVE] = defaultAnimations.moveClip;

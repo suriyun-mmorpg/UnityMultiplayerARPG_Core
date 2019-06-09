@@ -185,6 +185,9 @@ namespace MultiplayerARPG
             base.Awake();
             MigrateSkillCastAnimations();
             SetupComponent();
+            if (animatorType == AnimatorType.Animator &&
+                animator != null)
+                animator.SetBool(ANIM_IS_GROUNDED, true);
         }
 
         protected override void OnValidate()
@@ -277,8 +280,6 @@ namespace MultiplayerARPG
                         animator = GetComponentInChildren<Animator>();
                     if (animator != null && animator.runtimeAnimatorController != cacheAnimatorController)
                         animator.runtimeAnimatorController = cacheAnimatorController;
-                    if (animator != null)
-                        animator.SetBool(ANIM_IS_GROUNDED, true);
                     break;
                 case AnimatorType.LegacyAnimtion:
                     if (legacyAnimation == null)
