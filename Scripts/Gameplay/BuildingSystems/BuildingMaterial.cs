@@ -50,6 +50,7 @@ namespace MultiplayerARPG
 
         public uint ObjectId { get { return buildingEntity.ObjectId; } }
         public int CurrentHp { get { return buildingEntity.CurrentHp; } set { buildingEntity.CurrentHp = value; } }
+        public BaseGameEntity Entity { get { return buildingEntity; } }
         public Transform CacheTransform { get { return buildingEntity.CacheTransform; } }
         
         private void Awake()

@@ -39,6 +39,7 @@ namespace MultiplayerARPG
         }
 
         public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
+        public BaseGameEntity Entity { get { return this; } }
         public abstract int MaxHp { get; }
 
         public override void OnSetup()

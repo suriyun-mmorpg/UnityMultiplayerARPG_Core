@@ -28,6 +28,7 @@ namespace MultiplayerARPG
         public float angularSpeed = 800f;
         [Range(0, 1f)]
         public float turnToTargetDuration = 0.1f;
+        public float findTargetRaycastDistance = 512f;
         public bool showConfirmConstructionUI;
         public RectTransform crosshairRect;
         public bool IsBlockController { get; protected set; }
@@ -36,6 +37,7 @@ namespace MultiplayerARPG
 
         // Temp data
         BuildingMaterial tempBuildingMaterial;
+        IDamageableEntity tempDamageableEntity;
         BaseGameEntity tempEntity;
         Vector3 moveLookDirection;
         Vector3 targetLookDirection;
@@ -214,6 +216,7 @@ namespace MultiplayerARPG
             Vector3 right = CacheGameplayCameraControls.CacheCameraTransform.right;
             float distanceFromOrigin = Vector3.Distance(ray.origin, PlayerCharacterEntity.CacheTransform.position);
             float aimDistance = distanceFromOrigin;
+            float attackFov = 90f;
             // Calculating aim distance, also read attack inputs here
             // Attack inputs will be used to calculate attack distance
             if (CurrentBuildingEntity == null)
@@ -239,11 +242,13 @@ namespace MultiplayerARPG
                 {
                     // Increase aim distance by skill attack distance
                     aimDistance += PlayerCharacterEntity.GetSkillAttackDistance(queueSkill, isLeftHandAttacking);
+                    attackFov = PlayerCharacterEntity.GetSkillAttackFov(queueSkill, isLeftHandAttacking);
                 }
                 else
                 {
                     // Increase aim distance by attack distance
                     aimDistance += PlayerCharacterEntity.GetAttackDistance(isLeftHandAttacking);
+                    attackFov = PlayerCharacterEntity.GetAttackFov(isLeftHandAttacking);
                 }
             }
             actionLookDirection = aimPosition = ray.origin + ray.direction * aimDistance;
@@ -253,38 +258,71 @@ namespace MultiplayerARPG
             // Prepare variables to find nearest raycasted hit point
             float tempDistance;
             float tempNearestDistance = float.MaxValue;
-            // Find for enemy character
+
             if (CurrentBuildingEntity == null)
             {
-                int tempCount = Physics.RaycastNonAlloc(ray, raycasts, aimDistance);
-                for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
+                // Find for enemy character
+                bool foundDamageableEntity = false;
+                int tempCount = Physics.RaycastNonAlloc(ray, raycasts, findTargetRaycastDistance);
+                int tempCounter = 0;
+                for (; tempCounter < tempCount; ++tempCounter)
                 {
                     tempHitInfo = raycasts[tempCounter];
 
-                    tempEntity = tempHitInfo.collider.GetComponent<BaseGameEntity>();
-                    // Find building entity from building material
-                    if (tempEntity == null)
+                    // Get distance between character and raycast hit point
+                    tempDistance = Vector3.Distance(PlayerCharacterEntity.CacheTransform.position, tempHitInfo.point);
+                    // If this is damageable entity
+                    tempDamageableEntity = tempHitInfo.collider.GetComponent<IDamageableEntity>();
+                    if (tempDamageableEntity != null && tempDistance <= aimDistance)
                     {
-                        tempBuildingMaterial = tempHitInfo.collider.GetComponent<BuildingMaterial>();
-                        if (tempBuildingMaterial != null)
-                            tempEntity = tempBuildingMaterial.buildingEntity;
+                        tempEntity = tempDamageableEntity.Entity;
+                        // Target must be in front of player character
+                        if (!PlayerCharacterEntity.IsPositionInFov(attackFov, tempEntity.CacheTransform.position, forward))
+                            continue;
+                        // Target must be damageable, not player character entity, within aim distance and alive
+                        if (tempDamageableEntity.ObjectId == PlayerCharacterEntity.ObjectId ||
+                            tempDamageableEntity.IsDead())
+                            continue;
+                        // Set aim position and found target
+                        if (tempDistance < tempNearestDistance)
+                        {
+                            tempNearestDistance = tempDistance;
+                            aimPosition = tempHitInfo.point;
+                            if (tempEntity != null)
+                            {
+                                SelectedEntity = tempEntity;
+                                foundDamageableEntity = true;
+                            }
+                        }
                     }
-                    if (tempEntity == null || tempEntity == PlayerCharacterEntity)
+                    // If already found damageable entity don't find for npc / item
+                    if (foundDamageableEntity)
                         continue;
-                    // Target must be alive
-                    if (tempEntity is IDamageableEntity && (tempEntity as IDamageableEntity).IsDead())
-                        continue;
-                    // Target must be in front of player character
-                    if (!PlayerCharacterEntity.IsPositionInFov(15f, tempEntity.CacheTransform.position, forward))
-                        continue;
-                    // Set aim position and found target
-                    tempDistance = Vector3.Distance(CacheGameplayCameraControls.CacheCameraTransform.position, tempHitInfo.point);
-                    if (tempDistance < tempNearestDistance)
+                    // Find item drop entity
+                    tempEntity = tempHitInfo.collider.GetComponent<ItemDropEntity>();
+                    if (tempEntity != null && tempDistance <= gameInstance.pickUpItemDistance)
                     {
-                        tempNearestDistance = tempDistance;
-                        aimPosition = tempHitInfo.point;
-                        if (tempEntity != null)
-                            SelectedEntity = tempEntity;
+                        // Set aim position and found target
+                        if (tempDistance < tempNearestDistance)
+                        {
+                            tempNearestDistance = tempDistance;
+                            aimPosition = tempHitInfo.point;
+                            if (tempEntity != null)
+                                SelectedEntity = tempEntity;
+                        }
+                    }
+                    // Find activatable entity (NPC)
+                    tempEntity = tempHitInfo.collider.GetComponent<BaseGameEntity>();
+                    if (tempEntity != null && tempDistance <= gameInstance.conversationDistance)
+                    {
+                        // Set aim position and found target
+                        if (tempDistance < tempNearestDistance)
+                        {
+                            tempNearestDistance = tempDistance;
+                            aimPosition = tempHitInfo.point;
+                            if (tempEntity != null)
+                                SelectedEntity = tempEntity;
+                        }
                     }
                 }
                 // Show target hp/mp
