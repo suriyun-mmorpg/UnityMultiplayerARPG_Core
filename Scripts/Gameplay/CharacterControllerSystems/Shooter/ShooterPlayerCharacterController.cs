@@ -216,6 +216,7 @@ namespace MultiplayerARPG
             Vector3 right = CacheGameplayCameraControls.CacheCameraTransform.right;
             float distanceFromOrigin = Vector3.Distance(ray.origin, PlayerCharacterEntity.CacheTransform.position);
             float aimDistance = distanceFromOrigin;
+            float attackDistance = 0f;
             float attackFov = 90f;
             // Calculating aim distance, also read attack inputs here
             // Attack inputs will be used to calculate attack distance
@@ -241,15 +242,16 @@ namespace MultiplayerARPG
                 if (queueSkill != null && queueSkill.IsAttack())
                 {
                     // Increase aim distance by skill attack distance
-                    aimDistance += PlayerCharacterEntity.GetSkillAttackDistance(queueSkill, isLeftHandAttacking);
+                    attackDistance = PlayerCharacterEntity.GetSkillAttackDistance(queueSkill, isLeftHandAttacking);
                     attackFov = PlayerCharacterEntity.GetSkillAttackFov(queueSkill, isLeftHandAttacking);
                 }
                 else
                 {
                     // Increase aim distance by attack distance
-                    aimDistance += PlayerCharacterEntity.GetAttackDistance(isLeftHandAttacking);
+                    attackDistance = PlayerCharacterEntity.GetAttackDistance(isLeftHandAttacking);
                     attackFov = PlayerCharacterEntity.GetAttackFov(isLeftHandAttacking);
                 }
+                aimDistance += attackDistance;
             }
             actionLookDirection = aimPosition = ray.origin + ray.direction * aimDistance;
             actionLookDirection.y = PlayerCharacterEntity.CacheTransform.position.y;
@@ -273,7 +275,7 @@ namespace MultiplayerARPG
                     tempDistance = Vector3.Distance(PlayerCharacterEntity.CacheTransform.position, tempHitInfo.point);
                     // If this is damageable entity
                     tempDamageableEntity = tempHitInfo.collider.GetComponent<IDamageableEntity>();
-                    if (tempDamageableEntity != null && tempDistance <= aimDistance)
+                    if (tempDamageableEntity != null && tempDistance <= attackDistance)
                     {
                         tempEntity = tempDamageableEntity.Entity;
                         // Target must be in front of player character
