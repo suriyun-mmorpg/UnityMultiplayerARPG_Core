@@ -52,7 +52,7 @@ namespace MultiplayerARPG
         [Header("Cool Down")]
         public IncrementalFloat coolDownDuration;
 
-        [Header("Requirements")]
+        [Header("Requirements to Levelup")]
         public SkillRequirement requirement;
 
         [Header("Attack")]
