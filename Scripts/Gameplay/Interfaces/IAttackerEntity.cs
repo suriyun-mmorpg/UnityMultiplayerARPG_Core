@@ -1,11 +1,6 @@
-﻿using UnityEngine;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
-    public interface IAttackerEntity
+    public interface IAttackerEntity : IGameEntity
     {
-        uint ObjectId { get; }
-        GameObject gameObject { get; }
-        Transform transform { get; }
     }
 }

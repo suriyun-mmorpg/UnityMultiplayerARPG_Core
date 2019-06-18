@@ -1,16 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using LiteNetLib;
 using LiteNetLibManager;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseGameEntity : LiteNetLibBehaviour
+    public abstract class BaseGameEntity : LiteNetLibBehaviour, IGameEntity
     {
         [Header("Game Entity Settings")]
         public Text textTitle;
@@ -30,6 +25,8 @@ namespace MultiplayerARPG
         public event GenericDelegate onSetOwnerClient;
         public event NetworkDestroyDelegate onNetworkDestroy;
         #endregion
+
+        public BaseGameEntity Entity { get { return this; } }
 
         [SerializeField]
         protected SyncFieldString syncTitle = new SyncFieldString();
