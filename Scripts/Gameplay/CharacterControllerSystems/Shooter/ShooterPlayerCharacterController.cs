@@ -97,9 +97,9 @@ namespace MultiplayerARPG
                 return;
 
             tempLookAt = characterEntity.CacheTransform.rotation;
-            
+
             SetupEquipWeapons(characterEntity.EquipWeapons);
-            
+
             characterEntity.onEquipWeaponsChange += SetupEquipWeapons;
         }
 
@@ -109,15 +109,14 @@ namespace MultiplayerARPG
 
             if (characterEntity == null)
                 return;
-            
+
             characterEntity.onEquipWeaponsChange -= SetupEquipWeapons;
         }
 
         protected void SetupEquipWeapons(EquipWeapons equipWeapons)
         {
-            mustReleaseFireKey = false;
             currentCrosshairSetting = PlayerCharacterEntity.GetCrosshairSetting();
-            
+
             rightHandWeapon = equipWeapons.rightHand.GetWeaponItem();
             leftHandWeapon = equipWeapons.leftHand.GetWeaponItem();
             // Weapon ability will be able to use when equip weapon at main-hand only
