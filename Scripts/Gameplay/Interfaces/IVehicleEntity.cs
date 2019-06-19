@@ -1,9 +1,12 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public interface IVehicleEntity : IGameEntity
+    public interface IVehicleEntity : ICharacterMovement
     {
-        Transform[] Seats { get; set; }
+        VehicleType VehicleType { get; }
+        bool IsDrivable { get; }
+        List<Transform> Seats { get; }
     }
 }
