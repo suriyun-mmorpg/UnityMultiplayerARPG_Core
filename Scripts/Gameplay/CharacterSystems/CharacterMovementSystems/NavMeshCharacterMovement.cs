@@ -71,7 +71,7 @@ namespace MultiplayerARPG
             get { return CacheNavMeshAgent.stoppingDistance; }
         }
 
-        public override void EntityOnSetup(BaseCharacterEntity entity)
+        public override void EntityOnSetup(BaseGameEntity entity)
         {
             base.EntityOnSetup(entity);
             if (entity is BaseMonsterCharacterEntity)
@@ -100,14 +100,14 @@ namespace MultiplayerARPG
 
         protected void NetFuncPointClickMovement(Vector3 position)
         {
-            if (IsDead())
+            if (!CacheEntity.CanMove())
                 return;
             SetMovePaths(position);
         }
 
         protected void NetFuncUpdateYRotation(short yRotation)
         {
-            if (IsDead())
+            if (!CacheEntity.CanMove())
                 return;
             CacheTransform.eulerAngles = new Vector3(0, (float)yRotation, 0);
         }
@@ -128,7 +128,7 @@ namespace MultiplayerARPG
 
         public override void PointClickMovement(Vector3 position)
         {
-            if (IsDead())
+            if (!CacheEntity.CanMove())
                 return;
 
             switch (movementSecure)
@@ -152,7 +152,7 @@ namespace MultiplayerARPG
 
         public override void SetLookRotation(Vector3 eulerAngles)
         {
-            if (IsDead())
+            if (!CacheEntity.CanMove())
                 return;
 
             switch (movementSecure)
@@ -210,12 +210,12 @@ namespace MultiplayerARPG
 
         protected void SetMovePaths(Vector3 position)
         {
-            SetMovePaths(position, gameplayRule.GetMoveSpeed(CacheEntity));
+            SetMovePaths(position, CacheEntity.GetMoveSpeed());
         }
         
         protected void SetMovePaths(Vector3 position, float moveSpeed)
         {
-            if (IsDead() || position.Equals(latestDestination))
+            if (!CacheEntity.CanMove() || position.Equals(latestDestination))
                 return;
             latestDestination = position;
             CacheNavMeshAgent.updatePosition = true;

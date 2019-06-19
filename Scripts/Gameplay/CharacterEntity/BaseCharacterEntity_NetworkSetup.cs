@@ -29,16 +29,6 @@ namespace MultiplayerARPG
             equipWeapons.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             isHidding.deliveryMethod = DeliveryMethod.ReliableOrdered;
             isHidding.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            // Character movement
-            movementState.deliveryMethod = DeliveryMethod.Sequenced;
-            movementState.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            movementState.doNotSyncInitialDataImmediately = true;
-            currentDirection.deliveryMethod = DeliveryMethod.Sequenced;
-            currentDirection.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            currentDirection.doNotSyncInitialDataImmediately = true;
-            currentDirectionType.deliveryMethod = DeliveryMethod.Sequenced;
-            currentDirectionType.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            currentDirectionType.doNotSyncInitialDataImmediately = true;
 
             attributes.forOwnerOnly = false;
             skills.forOwnerOnly = true;

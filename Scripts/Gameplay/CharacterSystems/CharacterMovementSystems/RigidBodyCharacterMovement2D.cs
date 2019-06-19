@@ -111,7 +111,7 @@ namespace MultiplayerARPG
             StopMove();
         }
 
-        public override void EntityOnSetup(BaseCharacterEntity entity)
+        public override void EntityOnSetup(BaseGameEntity entity)
         {
             base.EntityOnSetup(entity);
             if (entity is BaseMonsterCharacterEntity)
@@ -141,14 +141,14 @@ namespace MultiplayerARPG
 
         protected void NetFuncPointClickMovement(Vector3 position)
         {
-            if (IsDead())
+            if (!CacheEntity.CanMove())
                 return;
             currentDestination = position;
         }
 
         protected void NetFuncKeyMovement(sbyte horizontalInput, sbyte verticalInput)
         {
-            if (IsDead())
+            if (!CacheEntity.CanMove())
                 return;
             // Devide inputs to float value
             tempInputDirection = new Vector2((float)horizontalInput / 100f, (float)verticalInput / 100f);
@@ -178,7 +178,7 @@ namespace MultiplayerARPG
 
         public override void KeyMovement(Vector3 moveDirection, MovementState movementState)
         {
-            if (IsDead())
+            if (!CacheEntity.CanMove())
                 return;
 
             switch (movementSecure)
@@ -196,7 +196,7 @@ namespace MultiplayerARPG
 
         public override void PointClickMovement(Vector3 position)
         {
-            if (IsDead())
+            if (!CacheEntity.CanMove())
                 return;
 
             switch (movementSecure)
@@ -244,7 +244,7 @@ namespace MultiplayerARPG
                     StopMove();
             }
 
-            if (!IsDead())
+            if (CacheEntity.CanMove())
             {
                 // If move by WASD keys, set move direction to input direction
                 if (tempInputDirection.magnitude != 0f)
@@ -257,7 +257,7 @@ namespace MultiplayerARPG
                         tempMoveDirection = tempMoveDirection.normalized;
 
                     UpdateCurrentDirection(tempMoveDirection);
-                    CacheRigidbody2D.velocity = tempMoveDirection * gameplayRule.GetMoveSpeed(CacheEntity);
+                    CacheRigidbody2D.velocity = tempMoveDirection * CacheEntity.GetMoveSpeed();
                 }
                 else
                 {

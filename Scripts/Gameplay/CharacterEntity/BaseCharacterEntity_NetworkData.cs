@@ -27,13 +27,6 @@ namespace MultiplayerARPG
         protected SyncFieldEquipWeapons equipWeapons = new SyncFieldEquipWeapons();
         [SerializeField]
         protected SyncFieldBool isHidding = new SyncFieldBool();
-        // Character movement data
-        [SerializeField]
-        protected SyncFieldByte movementState = new SyncFieldByte();
-        [SerializeField]
-        protected SyncFieldVector2 currentDirection = new SyncFieldVector2();
-        [SerializeField]
-        protected SyncFieldByte currentDirectionType = new SyncFieldByte();
         [Header("Sync Lists")]
         [SerializeField]
         protected SyncListCharacterAttribute attributes = new SyncListCharacterAttribute();
@@ -84,10 +77,6 @@ namespace MultiplayerARPG
         public virtual int CurrentWater { get { return currentWater.Value; } set { currentWater.Value = value; } }
         public virtual EquipWeapons EquipWeapons { get { return equipWeapons.Value; } set { equipWeapons.Value = value; } }
         public virtual bool IsHidding { get { return isHidding.Value; } set { isHidding.Value = value; } }
-        // Character movement fields
-        public virtual MovementState MovementState { get { return (MovementState)movementState.Value; } set { movementState.Value = (byte)value; } }
-        public virtual Vector2 CurrentDirection { get { return currentDirection.Value; } set { currentDirection.Value = value; } }
-        public virtual DirectionType2D CurrentDirectionType { get { return (DirectionType2D)currentDirectionType.Value; } set { currentDirectionType.Value = (byte)value; } }
         // Override fields
         public override string Title { get { return CharacterName; } set { } }
 

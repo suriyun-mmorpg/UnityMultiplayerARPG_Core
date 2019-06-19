@@ -44,6 +44,29 @@ namespace MultiplayerARPG
             set { syncTitleB.Value = value; }
         }
 
+        // Movement data
+        [SerializeField]
+        protected SyncFieldByte movementState = new SyncFieldByte();
+        public virtual MovementState MovementState
+        {
+            get { return (MovementState)movementState.Value; }
+            set { movementState.Value = (byte)value; }
+        }
+        [SerializeField]
+        protected SyncFieldVector2 currentDirection = new SyncFieldVector2();
+        public virtual Vector2 CurrentDirection
+        {
+            get { return currentDirection.Value; }
+            set { currentDirection.Value = value; }
+        }
+        [SerializeField]
+        protected SyncFieldByte currentDirectionType = new SyncFieldByte();
+        public virtual DirectionType2D CurrentDirectionType
+        {
+            get { return (DirectionType2D)currentDirectionType.Value; }
+            set { currentDirectionType.Value = (byte)value; }
+        }
+
         private Transform cacheTransform;
         public Transform CacheTransform
         {
@@ -188,6 +211,16 @@ namespace MultiplayerARPG
             syncTitle.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             syncTitleB.deliveryMethod = DeliveryMethod.ReliableOrdered;
             syncTitleB.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            // Movement data
+            movementState.deliveryMethod = DeliveryMethod.Sequenced;
+            movementState.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            movementState.doNotSyncInitialDataImmediately = true;
+            currentDirection.deliveryMethod = DeliveryMethod.Sequenced;
+            currentDirection.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            currentDirection.doNotSyncInitialDataImmediately = true;
+            currentDirectionType.deliveryMethod = DeliveryMethod.Sequenced;
+            currentDirectionType.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            currentDirectionType.doNotSyncInitialDataImmediately = true;
         }
 
         #region Net Functions
@@ -237,6 +270,16 @@ namespace MultiplayerARPG
         public virtual float GetMoveSpeed()
         {
             return 0;
+        }
+
+        public virtual bool CanMove()
+        {
+            return false;
+        }
+
+        public virtual void Jump()
+        {
+
         }
     }
 }

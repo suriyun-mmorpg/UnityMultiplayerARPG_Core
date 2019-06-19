@@ -251,11 +251,6 @@ namespace MultiplayerARPG
             Profiler.EndSample();
         }
 
-        public override float GetMoveSpeed()
-        {
-            return gameplayRule.GetMoveSpeed(this);
-        }
-
         #region Relates Objects
         public virtual void InstantiateUI(UICharacterEntity prefab)
         {
@@ -859,13 +854,23 @@ namespace MultiplayerARPG
             return !IsDead() && !IsPlayingActionAnimation() && !isAttackingOrUsingSkill;
         }
 
-        public bool CanMove()
+        public override sealed float GetMoveSpeed()
+        {
+            return gameplayRule.GetMoveSpeed(this);
+        }
+
+        public override sealed bool CanMove()
         {
             if (IsDead())
                 return false;
             if (CacheDisallowMove)
                 return false;
             return true;
+        }
+
+        public override sealed void Jump()
+        {
+            CharacterModel.PlayJumpAnimation();
         }
 
         public bool CanAttack()

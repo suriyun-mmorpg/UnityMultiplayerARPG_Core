@@ -110,7 +110,7 @@ namespace MultiplayerARPG
             StopMove();
         }
 
-        public override void EntityOnSetup(BaseCharacterEntity entity)
+        public override void EntityOnSetup(BaseGameEntity entity)
         {
             base.EntityOnSetup(entity);
             if (entity is BaseMonsterCharacterEntity)
@@ -141,14 +141,14 @@ namespace MultiplayerARPG
 
         protected void NetFuncPointClickMovement(Vector3 position)
         {
-            if (IsDead())
+            if (!CacheEntity.CanMove())
                 return;
             SetMovePaths(position, true);
         }
 
         protected void NetFuncKeyMovement(sbyte horizontalInput, sbyte verticalInput, byte movementState)
         {
-            if (IsDead())
+            if (!CacheEntity.CanMove())
                 return;
             // Devide inputs to float value
             tempInputDirection = new Vector3((float)horizontalInput / 100f, 0, (float)verticalInput / 100f);
@@ -159,7 +159,7 @@ namespace MultiplayerARPG
 
         protected void NetFuncUpdateYRotation(short yRotation)
         {
-            if (IsDead())
+            if (!CacheEntity.CanMove())
                 return;
             if (!HasNavPaths)
                 CacheTransform.eulerAngles = new Vector3(0, (float)yRotation, 0);
@@ -175,22 +175,22 @@ namespace MultiplayerARPG
 
         protected void NetFuncTriggerJump()
         {
-            if (IsDead())
+            if (!CacheEntity.CanMove())
                 return;
             // Not play jump animation on owner client when running in not secure mode
             if (movementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
                 return;
             // Play jump animation on non owner clients
-            CacheEntity.CharacterModel.PlayJumpAnimation();
+            CacheEntity.Jump();
         }
 
         public void RequestTriggerJump()
         {
-            if (IsDead())
+            if (!CacheEntity.CanMove())
                 return;
             // Play jump animation immediately on owner client, if not running in server
             if (IsOwnerClient && !IsServer)
-                CacheEntity.CharacterModel.PlayJumpAnimation();
+                CacheEntity.Jump();
             // Play jump animation on other clients
             CacheEntity.CallNetFunction(NetFuncTriggerJump, FunctionReceivers.All);
         }
@@ -205,7 +205,7 @@ namespace MultiplayerARPG
 
         public override void KeyMovement(Vector3 moveDirection, MovementState movementState)
         {
-            if (IsDead())
+            if (!CacheEntity.CanMove())
                 return;
 
             if (useNavMeshForKeyMovement && moveDirection.magnitude > 0.5f)
@@ -232,7 +232,7 @@ namespace MultiplayerARPG
 
         public override void PointClickMovement(Vector3 position)
         {
-            if (IsDead())
+            if (!CacheEntity.CanMove())
                 return;
 
             switch (movementSecure)
@@ -248,7 +248,7 @@ namespace MultiplayerARPG
 
         public override void SetLookRotation(Vector3 eulerAngles)
         {
-            if (IsDead())
+            if (!CacheEntity.CanMove())
                 return;
 
             switch (movementSecure)
@@ -399,7 +399,7 @@ namespace MultiplayerARPG
             if (tempInputDirection.magnitude > 0f)
                 tempMoveDirection = tempInputDirection;
 
-            if (IsDead())
+            if (!CacheEntity.CanMove())
             {
                 tempMoveDirection = Vector3.zero;
                 IsJumping = false;
@@ -412,7 +412,7 @@ namespace MultiplayerARPG
                 // always move along the camera forward as it is the direction that it being aimed at
                 tempMoveDirection = Vector3.ProjectOnPlane(tempMoveDirection, groundContactNormal).normalized;
 
-                float currentTargetSpeed = gameInstance.GameplayRule.GetMoveSpeed(CacheEntity);
+                float currentTargetSpeed = CacheEntity.GetMoveSpeed();
                 // If character move backward
                 if (Vector3.Angle(tempMoveDirection, CacheTransform.forward) > 120)
                     currentTargetSpeed *= backwardMoveSpeedRate;

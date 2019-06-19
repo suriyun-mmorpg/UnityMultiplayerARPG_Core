@@ -4,8 +4,13 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseCharacterMovement : BaseCharacterComponent, ICharacterMovement
+    public abstract class BaseCharacterMovement : BaseGameComponent<BaseGameEntity>, ICharacterMovement
     {
+        public bool CanMove()
+        {
+            return CacheEntity.CanMove();
+        }
+
         public virtual bool IsGrounded { get; protected set; }
         public virtual bool IsJumping { get; protected set; }
         public abstract float StoppingDistance { get; }
