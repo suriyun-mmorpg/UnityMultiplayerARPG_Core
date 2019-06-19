@@ -9,7 +9,7 @@ namespace MultiplayerARPG
 {
     [RequireComponent(typeof(NavMeshAgent))]
     [RequireComponent(typeof(LiteNetLibTransform))]
-    public class NavMeshCharacterMovement : BaseCharacterMovement
+    public class NavMeshEntityMovement : BaseEntityMovement
     {
         [Header("Network Settings")]
         public MovementSecure movementSecure;

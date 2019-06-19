@@ -10,7 +10,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(CapsuleCollider))]
     [RequireComponent(typeof(LiteNetLibTransform))]
-    public class RigidBodyCharacterMovement : BaseCharacterMovement
+    public class RigidBodyEntityMovement : BaseEntityMovement
     {
         [Header("Movement AI")]
         [Range(0.01f, 1f)]

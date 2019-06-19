@@ -72,7 +72,7 @@ namespace MultiplayerARPG
         #endregion
 
         #region Extend components
-        public BaseCharacterMovement CharacterMovement { get; protected set; }
+        public BaseEntityMovement CharacterMovement { get; protected set; }
         protected readonly List<BaseCharacterComponent> characterComponents = new List<BaseCharacterComponent>();
         #endregion
 

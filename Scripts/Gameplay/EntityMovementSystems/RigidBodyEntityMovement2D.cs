@@ -8,7 +8,7 @@ namespace MultiplayerARPG
 {
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(LiteNetLibTransform))]
-    public class RigidBodyCharacterMovement2D : BaseCharacterMovement
+    public class RigidBodyEntityMovement2D : BaseEntityMovement
     {
         #region Settings
         [Header("Movement AI")]

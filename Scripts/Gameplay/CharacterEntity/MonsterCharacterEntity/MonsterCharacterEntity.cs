@@ -4,13 +4,13 @@
     {
         public override void InitialRequiredComponents()
         {
-            CharacterMovement = GetComponent<BaseCharacterMovement>();
+            CharacterMovement = GetComponent<BaseEntityMovement>();
             if (CharacterMovement == null)
             {
                 if (gameInstance.DimensionType == DimensionType.Dimension3D)
-                    CharacterMovement = gameObject.AddComponent<NavMeshCharacterMovement>();
+                    CharacterMovement = gameObject.AddComponent<NavMeshEntityMovement>();
                 else
-                    CharacterMovement = gameObject.AddComponent<RigidBodyCharacterMovement2D>();
+                    CharacterMovement = gameObject.AddComponent<RigidBodyEntityMovement2D>();
             }
         }
     }
