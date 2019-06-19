@@ -17,6 +17,7 @@ namespace MultiplayerARPG
         Building,
         Pet,
         SocketEnhancer,
+        Mount,
     }
 
     public enum FireType : byte
@@ -98,6 +99,9 @@ namespace MultiplayerARPG
 
         [Header("Socket Enhancer Configs")]
         public EquipmentBonus socketEnhanceEffect;
+
+        [Header("Mount Configs")]
+        public BaseVehicleEntity mountEntity;
 
         public override string Title
         {
