@@ -264,14 +264,6 @@ namespace MultiplayerARPG
                     // Stop movement
                     CacheRigidbody2D.velocity = new Vector2(0, 0);
                 }
-
-                BaseGameEntity tempEntity;
-                if (tempMoveDirectionMagnitude == 0f && CacheCharacterEntity.TryGetTargetEntity(out tempEntity))
-                {
-                    tempTargetDirection = (tempEntity.CacheTransform.position - CacheTransform.position).normalized;
-                    if (tempTargetDirection.magnitude != 0f)
-                        UpdateCurrentDirection(tempTargetDirection);
-                }
             }
 
             SetMovementState(CacheRigidbody2D.velocity.magnitude > 0 ? MovementState.Forward : MovementState.None);
