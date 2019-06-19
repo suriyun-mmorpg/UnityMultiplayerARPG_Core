@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseRemakeCharacterModel : BaseCharacterModel
+    public abstract class BaseRemakeCharacterModel : BaseCharacterModelWithCacheAnims<WeaponAnimations, SkillAnimations, VehicleAnimations>
     {
         // Clip name variables
         public const string CLIP_IDLE = "__Idle";
@@ -31,42 +31,7 @@ namespace MultiplayerARPG
         public DefaultAnimations defaultAnimations;
         public WeaponAnimations[] weaponAnimations;
         public SkillAnimations[] skillAnimations;
-
-        private Dictionary<int, WeaponAnimations> cacheWeaponAnimations;
-        public Dictionary<int, WeaponAnimations> CacheWeaponAnimations
-        {
-            get
-            {
-                if (cacheWeaponAnimations == null)
-                {
-                    cacheWeaponAnimations = new Dictionary<int, WeaponAnimations>();
-                    foreach (WeaponAnimations weaponAnimation in weaponAnimations)
-                    {
-                        if (weaponAnimation.weaponType == null) continue;
-                        cacheWeaponAnimations[weaponAnimation.weaponType.DataId] = weaponAnimation;
-                    }
-                }
-                return cacheWeaponAnimations;
-            }
-        }
-
-        private Dictionary<int, SkillAnimations> cacheSkillAnimations;
-        public Dictionary<int, SkillAnimations> CacheSkillAnimations
-        {
-            get
-            {
-                if (cacheSkillAnimations == null)
-                {
-                    cacheSkillAnimations = new Dictionary<int, SkillAnimations>();
-                    foreach (SkillAnimations skillAnimation in skillAnimations)
-                    {
-                        if (skillAnimation.skill == null) continue;
-                        cacheSkillAnimations[skillAnimation.skill.DataId] = skillAnimation;
-                    }
-                }
-                return cacheSkillAnimations;
-            }
-        }
+        public VehicleAnimations[] vehicleAnimations;
 
         public override void AddingNewModel(GameObject newModel)
         {
@@ -110,9 +75,9 @@ namespace MultiplayerARPG
 
         public ActionAnimation[] GetRightHandAttackAnimations(int dataId)
         {
-            if (CacheWeaponAnimations.ContainsKey(dataId) &&
-                CacheWeaponAnimations[dataId].rightHandAttackAnimations != null)
-                return CacheWeaponAnimations[dataId].rightHandAttackAnimations;
+            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId) &&
+                GetAnims().CacheWeaponAnimations[dataId].rightHandAttackAnimations != null)
+                return GetAnims().CacheWeaponAnimations[dataId].rightHandAttackAnimations;
             return defaultAnimations.rightHandAttackAnimations;
         }
 
@@ -123,37 +88,37 @@ namespace MultiplayerARPG
 
         public ActionAnimation[] GetLeftHandAttackAnimations(int dataId)
         {
-            if (CacheWeaponAnimations.ContainsKey(dataId) &&
-                CacheWeaponAnimations[dataId].leftHandAttackAnimations != null)
-                return CacheWeaponAnimations[dataId].leftHandAttackAnimations;
+            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId) &&
+                GetAnims().CacheWeaponAnimations[dataId].leftHandAttackAnimations != null)
+                return GetAnims().CacheWeaponAnimations[dataId].leftHandAttackAnimations;
             return defaultAnimations.leftHandAttackAnimations;
         }
 
         public AnimationClip GetSkillCastClip(int dataId)
         {
-            if (CacheSkillAnimations.ContainsKey(dataId))
-                return CacheSkillAnimations[dataId].castClip;
+            if (GetAnims().CacheSkillAnimations.ContainsKey(dataId))
+                return GetAnims().CacheSkillAnimations[dataId].castClip;
             return defaultAnimations.skillCastClip;
         }
 
         public ActionAnimation GetSkillActivateAnimation(int dataId)
         {
-            if (CacheSkillAnimations.ContainsKey(dataId))
-                return CacheSkillAnimations[dataId].activateAnimation;
+            if (GetAnims().CacheSkillAnimations.ContainsKey(dataId))
+                return GetAnims().CacheSkillAnimations[dataId].activateAnimation;
             return defaultAnimations.skillActivateAnimation;
         }
 
         public ActionAnimation GetRightHandReloadAnimation(int dataId)
         {
-            if (CacheWeaponAnimations.ContainsKey(dataId))
-                return CacheWeaponAnimations[dataId].rightHandReloadAnimation;
+            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId))
+                return GetAnims().CacheWeaponAnimations[dataId].rightHandReloadAnimation;
             return defaultAnimations.rightHandReloadAnimation;
         }
 
         public ActionAnimation GetLeftHandReloadAnimation(int dataId)
         {
-            if (CacheWeaponAnimations.ContainsKey(dataId))
-                return CacheWeaponAnimations[dataId].leftHandReloadAnimation;
+            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId))
+                return GetAnims().CacheWeaponAnimations[dataId].leftHandReloadAnimation;
             return defaultAnimations.leftHandReloadAnimation;
         }
 
@@ -226,9 +191,24 @@ namespace MultiplayerARPG
 
         public override SkillActivateAnimationType UseSkillActivateAnimationType(int dataId)
         {
-            if (!CacheSkillAnimations.ContainsKey(dataId))
+            if (!GetAnims().CacheSkillAnimations.ContainsKey(dataId))
                 return SkillActivateAnimationType.UseActivateAnimation;
-            return CacheSkillAnimations[dataId].activateAnimationType;
+            return GetAnims().CacheSkillAnimations[dataId].activateAnimationType;
+        }
+
+        protected override WeaponAnimations[] GetWeaponAnims()
+        {
+            return weaponAnimations;
+        }
+
+        protected override SkillAnimations[] GetSkillAnims()
+        {
+            return skillAnimations;
+        }
+
+        protected override VehicleAnimations[] GetVehicleAnims()
+        {
+            return vehicleAnimations;
         }
     }
 }

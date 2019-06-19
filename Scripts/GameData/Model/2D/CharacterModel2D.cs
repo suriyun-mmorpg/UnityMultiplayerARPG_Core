@@ -8,7 +8,9 @@ using UnityEditor;
 namespace MultiplayerARPG
 {
     [ExecuteInEditMode]
-    public class CharacterModel2D : BaseCharacterModel, ICharacterModel2D
+    public class CharacterModel2D :
+        BaseCharacterModelWithCacheAnims<WeaponAnimations2D, SkillAnimations2D, VehicleAnimations2D>,
+        ICharacterModel2D
     {
         public enum SampleAnimation
         {
@@ -30,106 +32,13 @@ namespace MultiplayerARPG
         public ActionAnimation2D defaultReloadAnimation2D;
         public WeaponAnimations2D[] weaponAnimations2D;
         public SkillAnimations2D[] skillAnimations2D;
-
-        // Deprecated
-        public ActionAnimation2D defaultSkillCastAnimation2D;
-        public SkillCastAnimations2D[] skillCastAnimations2D;
+        public VehicleAnimations2D[] vehicleAnimations2D;
 
         public float magnitudeToPlayMoveClip = 0.1f;
         [Header("Sample 2D Animations")]
         public SampleAnimation sampleAnimation = SampleAnimation.Idle;
         public DirectionType2D sampleDirection = DirectionType2D.Down;
         public bool sampleAlwaysLoop = true;
-
-        private Dictionary<int, ActionAnimation2D> cacheRightHandAttackAnimations;
-        public Dictionary<int, ActionAnimation2D> CacheRightHandAttackAnimations
-        {
-            get
-            {
-                if (cacheRightHandAttackAnimations == null)
-                {
-                    cacheRightHandAttackAnimations = new Dictionary<int, ActionAnimation2D>();
-                    foreach (WeaponAnimations2D attackAnimation in weaponAnimations2D)
-                    {
-                        if (attackAnimation.weaponType == null) continue;
-                        cacheRightHandAttackAnimations[attackAnimation.weaponType.DataId] = attackAnimation.rightHandAttackAnimation;
-                    }
-                }
-                return cacheRightHandAttackAnimations;
-            }
-        }
-
-        private Dictionary<int, ActionAnimation2D> cacheLeftHandAttackAnimations;
-        public Dictionary<int, ActionAnimation2D> CacheLeftHandAttackAnimations
-        {
-            get
-            {
-                if (cacheLeftHandAttackAnimations == null)
-                {
-                    cacheLeftHandAttackAnimations = new Dictionary<int, ActionAnimation2D>();
-                    foreach (WeaponAnimations2D attackAnimation in weaponAnimations2D)
-                    {
-                        if (attackAnimation.weaponType == null) continue;
-                        cacheLeftHandAttackAnimations[attackAnimation.weaponType.DataId] = attackAnimation.leftHandAttackAnimation;
-                    }
-                }
-                return cacheLeftHandAttackAnimations;
-            }
-        }
-
-        private Dictionary<int, ActionAnimation2D> cacheRightHandReloadAnimations;
-        public Dictionary<int, ActionAnimation2D> CacheRightHandReloadAnimations
-        {
-            get
-            {
-                if (cacheRightHandReloadAnimations == null)
-                {
-                    cacheRightHandReloadAnimations = new Dictionary<int, ActionAnimation2D>();
-                    foreach (WeaponAnimations2D attackAnimation in weaponAnimations2D)
-                    {
-                        if (attackAnimation.weaponType == null) continue;
-                        cacheRightHandReloadAnimations[attackAnimation.weaponType.DataId] = attackAnimation.rightHandReloadAnimation;
-                    }
-                }
-                return cacheRightHandReloadAnimations;
-            }
-        }
-
-        private Dictionary<int, ActionAnimation2D> cacheLeftHandReloadAnimations;
-        public Dictionary<int, ActionAnimation2D> CacheLeftHandReloadAnimations
-        {
-            get
-            {
-                if (cacheLeftHandReloadAnimations == null)
-                {
-                    cacheLeftHandReloadAnimations = new Dictionary<int, ActionAnimation2D>();
-                    foreach (WeaponAnimations2D attackAnimation in weaponAnimations2D)
-                    {
-                        if (attackAnimation.weaponType == null) continue;
-                        cacheLeftHandReloadAnimations[attackAnimation.weaponType.DataId] = attackAnimation.leftHandReloadAnimation;
-                    }
-                }
-                return cacheLeftHandReloadAnimations;
-            }
-        }
-
-        private Dictionary<int, SkillAnimations2D> cacheSkillAnimations;
-        public Dictionary<int, SkillAnimations2D> CacheSkillAnimations
-        {
-            get
-            {
-                if (cacheSkillAnimations == null)
-                {
-                    cacheSkillAnimations = new Dictionary<int, SkillAnimations2D>();
-                    foreach (SkillAnimations2D skillAnimation in skillAnimations2D)
-                    {
-                        if (skillAnimation.skill == null) continue;
-                        cacheSkillAnimations[skillAnimation.skill.DataId] = skillAnimation;
-                    }
-                }
-                return cacheSkillAnimations;
-            }
-        }
 
         public DirectionType2D CurrentDirectionType { get; set; }
 
@@ -145,45 +54,7 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
-            MigrateSkillCastAnimations();
             Play(idleAnimation2D, DirectionType2D.Down);
-        }
-
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-#if UNITY_EDITOR
-            if (MigrateSkillCastAnimations())
-                EditorUtility.SetDirty(this);
-#endif
-        }
-
-        private bool MigrateSkillCastAnimations()
-        {
-            bool hasChanges = false;
-            if (defaultSkillCastAnimation2D != null)
-            {
-                hasChanges = true;
-                defaultSkillActivateAnimation2D = defaultSkillCastAnimation2D;
-                defaultSkillCastAnimation2D = null;
-            }
-
-            if (skillCastAnimations2D != null &&
-                skillCastAnimations2D.Length > 0)
-            {
-                hasChanges = true;
-                skillAnimations2D = new SkillAnimations2D[skillCastAnimations2D.Length];
-                for (int i = 0; i < skillCastAnimations2D.Length; ++i)
-                {
-                    SkillAnimations2D data = new SkillAnimations2D();
-                    data.skill = skillCastAnimations2D[i].skill;
-                    if (skillCastAnimations2D[i].animation != null)
-                        data.activateAnimation = skillCastAnimations2D[i].animation;
-                    skillAnimations2D[i] = data;
-                }
-                //skillCastAnimations2D = null;
-            }
-            return hasChanges;
         }
 
         private void OnEnable()
@@ -266,7 +137,7 @@ namespace MultiplayerARPG
                     Play(defaultAttackAnimation2D, sampleDirection);
                     break;
                 case SampleAnimation.DefaultSkillCast:
-                    Play(defaultSkillCastAnimation2D, sampleDirection);
+                    Play(defaultSkillCastClip2D, sampleDirection);
                     break;
             }
         }
@@ -326,30 +197,39 @@ namespace MultiplayerARPG
         private ActionAnimation2D GetActionAnimation(AnimActionType animActionType, int dataId)
         {
             ActionAnimation2D animation2D = null;
+            WeaponAnimations2D weaponAnimations2D;
             SkillAnimations2D skillAnimations2D;
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
-                    if (!CacheRightHandAttackAnimations.TryGetValue(dataId, out animation2D))
+                    if (!GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out weaponAnimations2D))
                         animation2D = defaultAttackAnimation2D;
+                    else
+                        animation2D = weaponAnimations2D.rightHandAttackAnimation;
                     break;
                 case AnimActionType.AttackLeftHand:
-                    if (!CacheLeftHandAttackAnimations.TryGetValue(dataId, out animation2D))
+                    if (!GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out weaponAnimations2D))
                         animation2D = defaultAttackAnimation2D;
+                    else
+                        animation2D = weaponAnimations2D.leftHandAttackAnimation;
                     break;
                 case AnimActionType.Skill:
-                    if (!CacheSkillAnimations.TryGetValue(dataId, out skillAnimations2D))
+                    if (!GetAnims().CacheSkillAnimations.TryGetValue(dataId, out skillAnimations2D))
                         animation2D = defaultSkillActivateAnimation2D;
                     else
                         animation2D = skillAnimations2D.activateAnimation;
                     break;
                 case AnimActionType.ReloadRightHand:
-                    if (!CacheRightHandReloadAnimations.TryGetValue(dataId, out animation2D))
+                    if (!GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out weaponAnimations2D))
                         animation2D = defaultReloadAnimation2D;
+                    else
+                        animation2D = weaponAnimations2D.rightHandReloadAnimation;
                     break;
                 case AnimActionType.ReloadLeftHand:
-                    if (!CacheLeftHandReloadAnimations.TryGetValue(dataId, out animation2D))
+                    if (!GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out weaponAnimations2D))
                         animation2D = defaultReloadAnimation2D;
+                    else
+                        animation2D = weaponAnimations2D.leftHandReloadAnimation;
                     break;
             }
             return animation2D;
@@ -390,12 +270,10 @@ namespace MultiplayerARPG
 
         IEnumerator PlaySkillCastClipRoutine(int dataId, float duration)
         {
-            CharacterAnimation2D animation2D;
-            SkillAnimations2D skillAnimations2D;
-            if (!CacheSkillAnimations.TryGetValue(dataId, out skillAnimations2D))
-                animation2D = defaultSkillActivateAnimation2D;
-            else
-                animation2D = skillAnimations2D.castAnimation;
+            CharacterAnimation2D animation2D = defaultSkillActivateAnimation2D;
+            SkillAnimations2D skillAnims;
+            if (GetAnims().CacheSkillAnimations.TryGetValue(dataId, out skillAnims))
+                animation2D = skillAnims.castAnimation;
 
             if (animation2D != null)
             {
@@ -433,9 +311,10 @@ namespace MultiplayerARPG
 
         public override bool GetRandomRightHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration)
         {
-            ActionAnimation2D animation2D = null;
-            if (!CacheRightHandAttackAnimations.TryGetValue(dataId, out animation2D))
-                animation2D = defaultAttackAnimation2D;
+            ActionAnimation2D animation2D = defaultAttackAnimation2D;
+            WeaponAnimations2D weaponAnims;
+            if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out weaponAnims))
+                animation2D = weaponAnims.rightHandReloadAnimation;
             animationIndex = 0;
             triggerDuration = 0f;
             totalDuration = 0f;
@@ -449,9 +328,10 @@ namespace MultiplayerARPG
 
         public override bool GetRandomLeftHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration)
         {
-            ActionAnimation2D animation2D = null;
-            if (!CacheLeftHandAttackAnimations.TryGetValue(dataId, out animation2D))
-                animation2D = defaultAttackAnimation2D;
+            ActionAnimation2D animation2D = defaultAttackAnimation2D;
+            WeaponAnimations2D weaponAnims;
+            if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out weaponAnims))
+                animation2D = weaponAnims.leftHandAttackAnimation;
             animationIndex = 0;
             triggerDuration = 0f;
             totalDuration = 0f;
@@ -465,12 +345,10 @@ namespace MultiplayerARPG
 
         public override bool GetSkillActivateAnimation(int dataId, out float triggerDuration, out float totalDuration)
         {
-            ActionAnimation2D animation2D;
-            SkillAnimations2D skillAnimations2D;
-            if (!CacheSkillAnimations.TryGetValue(dataId, out skillAnimations2D))
-                animation2D = defaultSkillActivateAnimation2D;
-            else
-                animation2D = skillAnimations2D.activateAnimation;
+            ActionAnimation2D animation2D = defaultSkillActivateAnimation2D;
+            SkillAnimations2D skillAnims;
+            if (GetAnims().CacheSkillAnimations.TryGetValue(dataId, out skillAnims))
+                animation2D = skillAnims.activateAnimation;
             triggerDuration = 0f;
             totalDuration = 0f;
             if (animation2D == null) return false;
@@ -483,9 +361,10 @@ namespace MultiplayerARPG
 
         public override bool GetRightHandReloadAnimation(int dataId, out float triggerDuration, out float totalDuration)
         {
-            ActionAnimation2D animation2D = null;
-            if (!CacheRightHandReloadAnimations.TryGetValue(dataId, out animation2D))
-                animation2D = defaultReloadAnimation2D;
+            ActionAnimation2D animation2D = defaultReloadAnimation2D;
+            WeaponAnimations2D weaponAnims;
+            if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out weaponAnims))
+                animation2D = weaponAnims.rightHandReloadAnimation;
             triggerDuration = 0f;
             totalDuration = 0f;
             if (animation2D == null) return false;
@@ -498,9 +377,10 @@ namespace MultiplayerARPG
 
         public override bool GetLeftHandReloadAnimation(int dataId, out float triggerDuration, out float totalDuration)
         {
-            ActionAnimation2D animation2D = null;
-            if (!CacheLeftHandReloadAnimations.TryGetValue(dataId, out animation2D))
-                animation2D = defaultReloadAnimation2D;
+            ActionAnimation2D animation2D = defaultReloadAnimation2D;
+            WeaponAnimations2D weaponAnims;
+            if (GetAnims().CacheWeaponAnimations.TryGetValue(dataId, out weaponAnims))
+                animation2D = weaponAnims.leftHandReloadAnimation;
             triggerDuration = 0f;
             totalDuration = 0f;
             if (animation2D == null) return false;
@@ -513,9 +393,24 @@ namespace MultiplayerARPG
 
         public override SkillActivateAnimationType UseSkillActivateAnimationType(int dataId)
         {
-            if (!CacheSkillAnimations.ContainsKey(dataId))
+            if (!GetAnims().CacheSkillAnimations.ContainsKey(dataId))
                 return SkillActivateAnimationType.UseActivateAnimation;
-            return CacheSkillAnimations[dataId].activateAnimationType;
+            return GetAnims().CacheSkillAnimations[dataId].activateAnimationType;
+        }
+
+        protected override WeaponAnimations2D[] GetWeaponAnims()
+        {
+            return weaponAnimations2D;
+        }
+
+        protected override SkillAnimations2D[] GetSkillAnims()
+        {
+            return skillAnimations2D;
+        }
+
+        protected override VehicleAnimations2D[] GetVehicleAnims()
+        {
+            return vehicleAnimations2D;
         }
     }
 }

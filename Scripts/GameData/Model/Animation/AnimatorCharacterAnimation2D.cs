@@ -77,22 +77,35 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public struct AnimatorWeaponAnimations2D
+    public struct AnimatorWeaponAnimations2D : IWeaponAnims
     {
         public WeaponType weaponType;
         public AnimatorActionAnimation2D rightHandAttackAnimation;
         public AnimatorActionAnimation2D leftHandAttackAnimation;
         public AnimatorActionAnimation2D rightHandReloadAnimation;
         public AnimatorActionAnimation2D leftHandReloadAnimation;
+        public WeaponType Data { get { return weaponType; } }
     }
 
     [System.Serializable]
-    public struct AnimatorSkillAnimations2D
+    public struct AnimatorSkillAnimations2D : ISkillAnims
     {
         public Skill skill;
         public AnimatorCharacterAnimation2D castAnimation;
         public SkillActivateAnimationType activateAnimationType;
         [StringShowConditional("activateAnimationType", "UseActivateAnimation")]
         public AnimatorActionAnimation2D activateAnimation;
+        public Skill Data { get { return skill; } }
+    }
+
+    [System.Serializable]
+    public struct AnimatorVehicleAnimations2D : IVehicleAnims<AnimatorWeaponAnimations2D, AnimatorSkillAnimations2D>
+    {
+        public VehicleType vehicleType;
+        public AnimatorWeaponAnimations2D[] weaponAnimations;
+        public AnimatorSkillAnimations2D[] skillAnimations;
+        public VehicleType Data { get { return vehicleType; } }
+        public AnimatorWeaponAnimations2D[] WeaponAnims { get { return weaponAnimations; } }
+        public AnimatorSkillAnimations2D[] SkillAnims { get { return skillAnimations; } }
     }
 }

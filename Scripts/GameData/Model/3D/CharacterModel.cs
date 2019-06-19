@@ -1,14 +1,10 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace MultiplayerARPG
 {
     [ExecuteInEditMode]
-    public class CharacterModel : BaseCharacterModel
+    public class CharacterModel : BaseCharacterModelWithCacheAnims<WeaponAnimations, SkillAnimations, VehicleAnimations>
     {
         // Animator variables
         public static readonly int ANIM_IS_DEAD = Animator.StringToHash("IsDead");
@@ -106,12 +102,7 @@ namespace MultiplayerARPG
         public ActionAnimation defaultReloadAnimation;
         public WeaponAnimations[] weaponAnimations;
         public SkillAnimations[] skillAnimations;
-
-        // Deprecated
-        [HideInInspector]
-        public ActionAnimation[] defaultSkillCastAnimations;
-        [HideInInspector]
-        public SkillCastAnimations[] skillCastAnimations;
+        public VehicleAnimations[] vehicleAnimations;
 
         // Temp data
         private string defaultIdleClipName;
@@ -133,43 +124,7 @@ namespace MultiplayerARPG
         // Private state validater
         private bool isSetupComponent;
         private bool isPlayingActionAnimation;
-
-        private Dictionary<int, WeaponAnimations> cacheWeaponAnimations;
-        public Dictionary<int, WeaponAnimations> CacheWeaponAnimations
-        {
-            get
-            {
-                if (cacheWeaponAnimations == null)
-                {
-                    cacheWeaponAnimations = new Dictionary<int, WeaponAnimations>();
-                    foreach (WeaponAnimations weaponAnimation in weaponAnimations)
-                    {
-                        if (weaponAnimation.weaponType == null) continue;
-                        cacheWeaponAnimations[weaponAnimation.weaponType.DataId] = weaponAnimation;
-                    }
-                }
-                return cacheWeaponAnimations;
-            }
-        }
-
-        private Dictionary<int, SkillAnimations> cacheSkillAnimations;
-        public Dictionary<int, SkillAnimations> CacheSkillAnimations
-        {
-            get
-            {
-                if (cacheSkillAnimations == null)
-                {
-                    cacheSkillAnimations = new Dictionary<int, SkillAnimations>();
-                    foreach (SkillAnimations skillAnimation in skillAnimations)
-                    {
-                        if (skillAnimation.skill == null) continue;
-                        cacheSkillAnimations[skillAnimation.skill.DataId] = skillAnimation;
-                    }
-                }
-                return cacheSkillAnimations;
-            }
-        }
-
+        
         private AnimatorOverrideController cacheAnimatorController;
         public AnimatorOverrideController CacheAnimatorController
         {
@@ -183,7 +138,6 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
-            MigrateSkillCastAnimations();
             SetupComponent();
             if (animatorType == AnimatorType.Animator &&
                 animator != null)
@@ -194,9 +148,6 @@ namespace MultiplayerARPG
         {
             base.OnValidate();
 #if UNITY_EDITOR
-            if (MigrateSkillCastAnimations())
-                EditorUtility.SetDirty(this);
-
             if (animatorType == AnimatorType.Animator &&
                 CacheAnimatorController != null)
             {
@@ -216,36 +167,6 @@ namespace MultiplayerARPG
                     defaultAnimatorData.deadClip);
             }
 #endif
-        }
-
-        private bool MigrateSkillCastAnimations()
-        {
-            bool hasChanges = false;
-            if (defaultSkillCastAnimations != null &&
-                defaultSkillCastAnimations.Length > 0)
-            {
-                hasChanges = true;
-                defaultSkillActivateAnimation = defaultSkillCastAnimations[0];
-                defaultSkillCastAnimations = null;
-            }
-
-            if (skillCastAnimations != null &&
-                skillCastAnimations.Length > 0)
-            {
-                hasChanges = true;
-                skillAnimations = new SkillAnimations[skillCastAnimations.Length];
-                for (int i = 0; i < skillCastAnimations.Length; ++i)
-                {
-                    SkillAnimations data = new SkillAnimations();
-                    data.skill = skillCastAnimations[i].skill;
-                    if (skillCastAnimations[i].castAnimations != null &&
-                        skillCastAnimations[i].castAnimations.Length > 0)
-                        data.activateAnimation = skillCastAnimations[i].castAnimations[0];
-                    skillAnimations[i] = data;
-                }
-                skillCastAnimations = null;
-            }
-            return hasChanges;
         }
 
         private void SetupComponent()
@@ -319,7 +240,7 @@ namespace MultiplayerARPG
             if (weaponItem != null)
             {
                 WeaponAnimations weaponAnimations;
-                if (CacheWeaponAnimations.TryGetValue(weaponItem.WeaponType.DataId, out weaponAnimations))
+                if (GetAnims().CacheWeaponAnimations.TryGetValue(weaponItem.WeaponType.DataId, out weaponAnimations))
                 {
                     switch (animatorType)
                     {
@@ -796,9 +717,9 @@ namespace MultiplayerARPG
 
         public ActionAnimation[] GetRightHandAttackAnimations(int dataId)
         {
-            if (CacheWeaponAnimations.ContainsKey(dataId) &&
-                CacheWeaponAnimations[dataId].rightHandAttackAnimations != null)
-                return CacheWeaponAnimations[dataId].rightHandAttackAnimations;
+            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId) &&
+                GetAnims().CacheWeaponAnimations[dataId].rightHandAttackAnimations != null)
+                return GetAnims().CacheWeaponAnimations[dataId].rightHandAttackAnimations;
             return defaultAttackAnimations;
         }
 
@@ -809,37 +730,37 @@ namespace MultiplayerARPG
 
         public ActionAnimation[] GetLeftHandAttackAnimations(int dataId)
         {
-            if (CacheWeaponAnimations.ContainsKey(dataId) &&
-                CacheWeaponAnimations[dataId].leftHandAttackAnimations != null)
-                return CacheWeaponAnimations[dataId].leftHandAttackAnimations;
+            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId) &&
+                GetAnims().CacheWeaponAnimations[dataId].leftHandAttackAnimations != null)
+                return GetAnims().CacheWeaponAnimations[dataId].leftHandAttackAnimations;
             return defaultAttackAnimations;
         }
 
         public AnimationClip GetSkillCastClip(int dataId)
         {
-            if (CacheSkillAnimations.ContainsKey(dataId))
-                return CacheSkillAnimations[dataId].castClip;
+            if (GetAnims().CacheSkillAnimations.ContainsKey(dataId))
+                return GetAnims().CacheSkillAnimations[dataId].castClip;
             return defaultSkillCastClip;
         }
 
         public ActionAnimation GetSkillActivateAnimation(int dataId)
         {
-            if (CacheSkillAnimations.ContainsKey(dataId))
-                return CacheSkillAnimations[dataId].activateAnimation;
+            if (GetAnims().CacheSkillAnimations.ContainsKey(dataId))
+                return GetAnims().CacheSkillAnimations[dataId].activateAnimation;
             return defaultSkillActivateAnimation;
         }
 
         public ActionAnimation GetRightHandReloadAnimation(int dataId)
         {
-            if (CacheWeaponAnimations.ContainsKey(dataId))
-                return CacheWeaponAnimations[dataId].rightHandReloadAnimation;
+            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId))
+                return GetAnims().CacheWeaponAnimations[dataId].rightHandReloadAnimation;
             return defaultReloadAnimation;
         }
 
         public ActionAnimation GetLeftHandReloadAnimation(int dataId)
         {
-            if (CacheWeaponAnimations.ContainsKey(dataId))
-                return CacheWeaponAnimations[dataId].leftHandReloadAnimation;
+            if (GetAnims().CacheWeaponAnimations.ContainsKey(dataId))
+                return GetAnims().CacheWeaponAnimations[dataId].leftHandReloadAnimation;
             return defaultReloadAnimation;
         }
 
@@ -912,9 +833,24 @@ namespace MultiplayerARPG
 
         public override SkillActivateAnimationType UseSkillActivateAnimationType(int dataId)
         {
-            if (!CacheSkillAnimations.ContainsKey(dataId))
+            if (!GetAnims().CacheSkillAnimations.ContainsKey(dataId))
                 return SkillActivateAnimationType.UseActivateAnimation;
-            return CacheSkillAnimations[dataId].activateAnimationType;
+            return GetAnims().CacheSkillAnimations[dataId].activateAnimationType;
+        }
+
+        protected override WeaponAnimations[] GetWeaponAnims()
+        {
+            return weaponAnimations;
+        }
+
+        protected override SkillAnimations[] GetSkillAnims()
+        {
+            return skillAnimations;
+        }
+
+        protected override VehicleAnimations[] GetVehicleAnims()
+        {
+            return vehicleAnimations;
         }
         #endregion
     }

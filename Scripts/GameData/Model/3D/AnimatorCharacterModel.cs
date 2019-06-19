@@ -173,7 +173,7 @@ namespace MultiplayerARPG
             if (equipWeapons.rightHand.NotEmptySlot() && equipWeapons.rightHand.GetWeaponItem() != null)
                 weaponItem = equipWeapons.rightHand.GetWeaponItem();
             WeaponAnimations weaponAnimations = default(WeaponAnimations);
-            CacheWeaponAnimations.TryGetValue(weaponItem.WeaponType.DataId, out weaponAnimations);
+            GetAnims().CacheWeaponAnimations.TryGetValue(weaponItem.WeaponType.DataId, out weaponAnimations);
             // Set override animator clips
             CacheAnimatorController[CLIP_IDLE] = weaponAnimations.idleClip != null ? weaponAnimations.idleClip : defaultAnimations.idleClip;
             CacheAnimatorController[CLIP_MOVE] = weaponAnimations.moveClip != null ? weaponAnimations.moveClip : defaultAnimations.moveClip;

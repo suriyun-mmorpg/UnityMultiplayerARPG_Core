@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -77,30 +75,35 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public struct WeaponAnimations2D
+    public struct WeaponAnimations2D : IWeaponAnims
     {
         public WeaponType weaponType;
         public ActionAnimation2D rightHandAttackAnimation;
         public ActionAnimation2D leftHandAttackAnimation;
         public ActionAnimation2D rightHandReloadAnimation;
         public ActionAnimation2D leftHandReloadAnimation;
+        public WeaponType Data { get { return weaponType; } }
     }
 
     [System.Serializable]
-    public struct SkillAnimations2D
+    public struct SkillAnimations2D : ISkillAnims
     {
         public Skill skill;
         public CharacterAnimation2D castAnimation;
         public SkillActivateAnimationType activateAnimationType;
         [StringShowConditional("activateAnimationType", "UseActivateAnimation")]
         public ActionAnimation2D activateAnimation;
+        public Skill Data { get { return skill; } }
     }
 
-    // TODO: This is deprecated, it will be removed later
     [System.Serializable]
-    public struct SkillCastAnimations2D
+    public struct VehicleAnimations2D : IVehicleAnims<WeaponAnimations2D, SkillAnimations2D>
     {
-        public Skill skill;
-        public ActionAnimation2D animation;
+        public VehicleType vehicleType;
+        public WeaponAnimations2D[] weaponAnimations;
+        public SkillAnimations2D[] skillAnimations;
+        public VehicleType Data { get { return vehicleType; } }
+        public WeaponAnimations2D[] WeaponAnims { get { return weaponAnimations; } }
+        public SkillAnimations2D[] SkillAnims { get { return skillAnimations; } }
     }
 }

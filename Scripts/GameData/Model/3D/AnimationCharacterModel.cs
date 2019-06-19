@@ -65,7 +65,7 @@ namespace MultiplayerARPG
             if (equipWeapons.rightHand.NotEmptySlot() && equipWeapons.rightHand.GetWeaponItem() != null)
                 weaponItem = equipWeapons.rightHand.GetWeaponItem();
             WeaponAnimations weaponAnimations = default(WeaponAnimations);
-            CacheWeaponAnimations.TryGetValue(weaponItem.WeaponType.DataId, out weaponAnimations);
+            GetAnims().CacheWeaponAnimations.TryGetValue(weaponItem.WeaponType.DataId, out weaponAnimations);
             // Remove clips
             if (legacyAnimation.GetClip(CLIP_IDLE) != null)
                 legacyAnimation.RemoveClip(CLIP_IDLE);
