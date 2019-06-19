@@ -251,6 +251,11 @@ namespace MultiplayerARPG
             Profiler.EndSample();
         }
 
+        public override float GetMoveSpeed()
+        {
+            return gameplayRule.GetMoveSpeed(this);
+        }
+
         #region Relates Objects
         public virtual void InstantiateUI(UICharacterEntity prefab)
         {

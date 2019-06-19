@@ -233,5 +233,10 @@ namespace MultiplayerARPG
 
             return true;
         }
+
+        public virtual float GetMoveSpeed()
+        {
+            return 0;
+        }
     }
 }
