@@ -868,7 +868,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override sealed void Jump()
+        public override sealed void PlayJumpAnimation()
         {
             CharacterModel.PlayJumpAnimation();
         }

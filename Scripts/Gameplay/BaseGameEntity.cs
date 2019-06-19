@@ -277,7 +277,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual void Jump()
+        public virtual void PlayJumpAnimation()
         {
 
         }
