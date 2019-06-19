@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 using LiteNetLib;
 using LiteNetLibManager;
@@ -87,6 +88,18 @@ namespace MultiplayerARPG
                     model = GetComponent<GameEntityModel>();
                 return model;
             }
+        }
+
+        private BaseEntityMovement movement;
+        public BaseEntityMovement Movement
+        {
+            get
+            {
+                if (movement == null)
+                    movement = GetComponent<BaseEntityMovement>();
+                return movement;
+            }
+            set { movement = value; }
         }
 
         public GameInstance gameInstance
@@ -185,7 +198,11 @@ namespace MultiplayerARPG
             EntityOnDestroy();
             this.InvokeInstanceDevExtMethods("OnDestroy");
         }
-        protected virtual void EntityOnDestroy() { }
+        protected virtual void EntityOnDestroy()
+        {
+            if (Movement != null)
+                Movement.EntityOnDestroy(this);
+        }
 
         protected virtual void OnValidate()
         {
@@ -201,6 +218,11 @@ namespace MultiplayerARPG
                 onSetup.Invoke();
             SetupNetElements();
             RegisterNetFunction<uint>(NetFuncPlayEffect);
+            // Setup relates component
+            InitialRequiredComponents();
+            // Setup entity movement here to make it able to register net elements / functions
+            if (Movement != null)
+                Movement.EntityOnSetup(this);
         }
 
         protected virtual void SetupNetElements()
@@ -222,6 +244,11 @@ namespace MultiplayerARPG
             currentDirectionType.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             currentDirectionType.doNotSyncInitialDataImmediately = true;
         }
+        
+        /// <summary>
+        /// Override this function to initial required components
+        /// </summary>
+        public virtual void InitialRequiredComponents() { }
 
         #region Net Functions
         /// <summary>
@@ -274,7 +301,7 @@ namespace MultiplayerARPG
 
         public virtual bool CanMove()
         {
-            return false;
+            return Movement != null;
         }
     }
 }

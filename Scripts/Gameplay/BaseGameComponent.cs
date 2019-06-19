@@ -23,8 +23,5 @@ namespace MultiplayerARPG
         public bool IsOwnerClient { get { return CacheEntity.IsOwnerClient; } }
         public bool IsServer { get { return CacheEntity.IsServer; } }
         public bool IsClient { get { return CacheEntity.IsClient; } }
-
-        public virtual void EntityOnSetup(T entity) { }
-        public virtual void EntityOnDestroy(T entity) { }
     }
 }

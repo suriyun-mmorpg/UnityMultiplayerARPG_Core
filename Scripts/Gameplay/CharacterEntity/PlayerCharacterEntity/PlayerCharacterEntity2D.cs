@@ -9,9 +9,8 @@
     {
         public override void InitialRequiredComponents()
         {
-            CharacterMovement = GetComponent<BaseEntityMovement>();
-            if (CharacterMovement == null)
-                CharacterMovement = gameObject.AddComponent<RigidBodyEntityMovement2D>();
+            if (Movement == null)
+                Movement = gameObject.AddComponent<RigidBodyEntityMovement2D>();
         }
     }
 }

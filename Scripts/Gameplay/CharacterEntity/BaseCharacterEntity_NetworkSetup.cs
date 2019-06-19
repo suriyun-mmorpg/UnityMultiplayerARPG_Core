@@ -83,16 +83,6 @@ namespace MultiplayerARPG
             RegisterNetFunction<short, short>(NetFuncSwapOrMergeNonEquipItems);
             RegisterNetFunction<bool>(NetFuncReload);
 
-            // Setup character movement here to make it able to register net elements / functions
-            InitialRequiredComponents();
-            // Get all character components (include character movement)
-            GetComponents(characterComponents);
-            foreach (BaseCharacterComponent characterComponent in characterComponents)
-            {
-                // Register net elements / functions here
-                characterComponent.EntityOnSetup(this);
-            }
-
             if (teleportingPosition.HasValue)
             {
                 Teleport(teleportingPosition.Value);
@@ -121,11 +111,6 @@ namespace MultiplayerARPG
             equipItems.onOperation -= OnEquipItemsOperation;
             nonEquipItems.onOperation -= OnNonEquipItemsOperation;
             summons.onOperation -= OnSummonsOperation;
-
-            foreach (BaseCharacterComponent characterComponent in characterComponents)
-            {
-                characterComponent.EntityOnDestroy(this);
-            }
 
             if (uiCharacterEntity != null)
                 Destroy(uiCharacterEntity.gameObject);

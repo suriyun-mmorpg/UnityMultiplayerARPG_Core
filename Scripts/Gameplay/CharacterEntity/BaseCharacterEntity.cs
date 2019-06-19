@@ -71,11 +71,6 @@ namespace MultiplayerARPG
         public float moveSpeedRateWhileAttackOrUseSkill { get; protected set; }
         #endregion
 
-        #region Extend components
-        public BaseEntityMovement CharacterMovement { get; protected set; }
-        protected readonly List<BaseCharacterComponent> characterComponents = new List<BaseCharacterComponent>();
-        #endregion
-
         #region Temp data
         protected Collider[] overlapColliders_ForAttackFunctions = new Collider[OVERLAP_COLLIDER_SIZE_FOR_ATTACK];
         protected Collider2D[] overlapColliders2D_ForAttackFunctions = new Collider2D[OVERLAP_COLLIDER_SIZE_FOR_ATTACK];
@@ -86,9 +81,9 @@ namespace MultiplayerARPG
 
         public override int MaxHp { get { return CacheMaxHp; } }
         public float MoveAnimationSpeedMultiplier { get { return gameplayRule.GetMoveSpeed(this) / CacheBaseMoveSpeed; } }
-        public bool IsGrounded { get { return CharacterMovement == null ?  true : CharacterMovement.IsGrounded; } }
-        public bool IsJumping { get { return CharacterMovement == null ? false : CharacterMovement.IsJumping; } }
-        public float StoppingDistance { get { return CharacterMovement == null ? 0.1f : CharacterMovement.StoppingDistance; } }
+        public bool IsGrounded { get { return Movement == null ?  true : Movement.IsGrounded; } }
+        public bool IsJumping { get { return Movement == null ? false : Movement.IsJumping; } }
+        public float StoppingDistance { get { return Movement == null ? 0.1f : Movement.StoppingDistance; } }
         public abstract int DataId { get; set; }
         public CharacterHitBox[] HitBoxes { get; protected set; }
         public bool HasAimPosition { get; protected set; }
@@ -1034,37 +1029,37 @@ namespace MultiplayerARPG
         #region Character Movement
         public void StopMove()
         {
-            CharacterMovement.StopMove();
+            Movement.StopMove();
         }
 
         public void KeyMovement(Vector3 moveDirection, MovementState moveState)
         {
-            CharacterMovement.KeyMovement(moveDirection, moveState);
+            Movement.KeyMovement(moveDirection, moveState);
         }
 
         public void PointClickMovement(Vector3 position)
         {
-            CharacterMovement.PointClickMovement(position);
+            Movement.PointClickMovement(position);
         }
 
         public void SetLookRotation(Vector3 eulerAngles)
         {
-            CharacterMovement.SetLookRotation(eulerAngles);
+            Movement.SetLookRotation(eulerAngles);
         }
 
         public void Teleport(Vector3 position)
         {
-            if (CharacterMovement == null)
+            if (Movement == null)
             {
                 teleportingPosition = position;
                 return;
             }
-            CharacterMovement.Teleport(position);
+            Movement.Teleport(position);
         }
 
         public void FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
-            CharacterMovement.FindGroundedPosition(fromPosition, findDistance, out result);
+            Movement.FindGroundedPosition(fromPosition, findDistance, out result);
         }
         #endregion
 
@@ -1097,7 +1092,6 @@ namespace MultiplayerARPG
             return !IsAlly(characterEntity) && !IsEnemy(characterEntity);
         }
 
-        public abstract void InitialRequiredComponents();
         public abstract void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker);
         public abstract bool IsAlly(BaseCharacterEntity characterEntity);
         public abstract bool IsEnemy(BaseCharacterEntity characterEntity);
