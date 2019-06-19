@@ -12,9 +12,9 @@ namespace MultiplayerARPG
 
         protected void Update()
         {
-            if (dirtyIsDead != CacheCharacterEntity.IsDead())
+            if (dirtyIsDead != CacheEntity.IsDead())
             {
-                dirtyIsDead = CacheCharacterEntity.IsDead();
+                dirtyIsDead = CacheEntity.IsDead();
                 if (dirtyIsDead)
                     PlaySound();
             }

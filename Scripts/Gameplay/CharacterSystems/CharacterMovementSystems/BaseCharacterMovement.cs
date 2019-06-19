@@ -52,16 +52,16 @@ namespace MultiplayerARPG
             switch (damageType)
             {
                 case DamageType.Melee:
-                    position = CacheCharacterEntity.MeleeDamageTransform.position;
+                    position = CacheEntity.MeleeDamageTransform.position;
                     break;
                 case DamageType.Missile:
                     Transform tempMissileDamageTransform = null;
-                    if ((tempMissileDamageTransform = CacheCharacterEntity.CharacterModel.GetRightHandMissileDamageTransform()) != null && !isLeftHand)
+                    if ((tempMissileDamageTransform = CacheEntity.CharacterModel.GetRightHandMissileDamageTransform()) != null && !isLeftHand)
                     {
                         // Use position from right hand weapon missile damage transform
                         position = tempMissileDamageTransform.position;
                     }
-                    else if ((tempMissileDamageTransform = CacheCharacterEntity.CharacterModel.GetLeftHandMissileDamageTransform()) != null && isLeftHand)
+                    else if ((tempMissileDamageTransform = CacheEntity.CharacterModel.GetLeftHandMissileDamageTransform()) != null && isLeftHand)
                     {
                         // Use position from left hand weapon missile damage transform
                         position = tempMissileDamageTransform.position;
@@ -69,7 +69,7 @@ namespace MultiplayerARPG
                     else
                     {
                         // Use position from default missile damage transform
-                        position = CacheCharacterEntity.MissileDamageTransform.position;
+                        position = CacheEntity.MissileDamageTransform.position;
                     }
                     break;
             }

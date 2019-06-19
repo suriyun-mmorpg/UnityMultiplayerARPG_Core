@@ -28,19 +28,19 @@ namespace MultiplayerARPG
 
             audioSource.mute = !AudioManager.Singleton.sfxVolumeSetting.IsOn;
 
-            if (!CacheCharacterEntity.MovementState.HasFlag(MovementState.Forward) &&
-                !CacheCharacterEntity.MovementState.HasFlag(MovementState.Backward) &&
-                !CacheCharacterEntity.MovementState.HasFlag(MovementState.Right) &&
-                !CacheCharacterEntity.MovementState.HasFlag(MovementState.Left))
+            if (!CacheEntity.MovementState.HasFlag(MovementState.Forward) &&
+                !CacheEntity.MovementState.HasFlag(MovementState.Backward) &&
+                !CacheEntity.MovementState.HasFlag(MovementState.Right) &&
+                !CacheEntity.MovementState.HasFlag(MovementState.Left))
             {
                 delayCounter = 0f;
                 return;
             }
 
             delayCounter += Time.deltaTime;
-            if (delayCounter >= stepDelay / CacheCharacterEntity.MoveAnimationSpeedMultiplier)
+            if (delayCounter >= stepDelay / CacheEntity.MoveAnimationSpeedMultiplier)
             {
-                if (CacheCharacterEntity.MovementState.HasFlag(MovementState.IsGrounded))
+                if (CacheEntity.MovementState.HasFlag(MovementState.IsGrounded))
                     PlaySound();
 
                 delayCounter = 0f;

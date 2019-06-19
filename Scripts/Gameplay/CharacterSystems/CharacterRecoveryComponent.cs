@@ -35,7 +35,7 @@ namespace MultiplayerARPG
 
         protected void Update()
         {
-            UpdateRecovery(Time.unscaledDeltaTime, GameInstance.Singleton.GameplayRule, this, CacheCharacterEntity);
+            UpdateRecovery(Time.unscaledDeltaTime, GameInstance.Singleton.GameplayRule, this, CacheEntity);
         }
 
         protected static void UpdateRecovery(float deltaTime, BaseGameplayRule gameplayRule, CharacterRecoveryComponent recoveryData, BaseCharacterEntity characterEntity)

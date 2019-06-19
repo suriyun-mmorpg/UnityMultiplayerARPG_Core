@@ -134,7 +134,7 @@ namespace MultiplayerARPG
             switch (movementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
-                    CacheCharacterEntity.CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
+                    CacheEntity.CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
                     break;
                 case MovementSecure.NotSecure:
                     SetMovePaths(position);
@@ -159,7 +159,7 @@ namespace MultiplayerARPG
             {
                 case MovementSecure.ServerAuthoritative:
                     // Cast to short to reduce packet size
-                    CacheCharacterEntity.CallNetFunction(NetFuncUpdateYRotation, FunctionReceivers.Server, (short)eulerAngles.y);
+                    CacheEntity.CallNetFunction(NetFuncUpdateYRotation, FunctionReceivers.Server, (short)eulerAngles.y);
                     break;
                 case MovementSecure.NotSecure:
                     eulerAngles.x = 0;
@@ -205,12 +205,12 @@ namespace MultiplayerARPG
                 MovementState = state;
 
             if (movementSecure == MovementSecure.NotSecure && IsOwnerClient)
-                CacheCharacterEntity.CallNetFunction(NetFuncSetMovementState, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)state);
+                CacheEntity.CallNetFunction(NetFuncSetMovementState, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)state);
         }
 
         protected void SetMovePaths(Vector3 position)
         {
-            SetMovePaths(position, gameplayRule.GetMoveSpeed(CacheCharacterEntity));
+            SetMovePaths(position, gameplayRule.GetMoveSpeed(CacheEntity));
         }
         
         protected void SetMovePaths(Vector3 position, float moveSpeed)

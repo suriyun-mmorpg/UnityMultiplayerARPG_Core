@@ -23,10 +23,10 @@ namespace MultiplayerARPG
 
         protected virtual void Update()
         {
-            if (CacheCharacterEntity.CharacterModel is ICharacterModel2D)
+            if (CacheEntity.CharacterModel is ICharacterModel2D)
             {
                 // Set current direction to character model 2D
-                (CacheCharacterEntity.CharacterModel as ICharacterModel2D).CurrentDirectionType = CurrentDirectionType;
+                (CacheEntity.CharacterModel as ICharacterModel2D).CurrentDirectionType = CurrentDirectionType;
             }
         }
 
@@ -56,10 +56,10 @@ namespace MultiplayerARPG
             switch (damageType)
             {
                 case DamageType.Melee:
-                    position = CacheCharacterEntity.MeleeDamageTransform.position;
+                    position = CacheEntity.MeleeDamageTransform.position;
                     break;
                 case DamageType.Missile:
-                    position = CacheCharacterEntity.MissileDamageTransform.position;
+                    position = CacheEntity.MissileDamageTransform.position;
                     break;
             }
             rotation = Quaternion.Euler(0, 0, (Mathf.Atan2(CurrentDirection.y, CurrentDirection.x) * (180 / Mathf.PI)) + 90);

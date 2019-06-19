@@ -4,7 +4,7 @@
     {
         public bool IsDead()
         {
-            return CacheCharacterEntity.IsDead();
+            return CacheEntity.IsDead();
         }
     }
 }

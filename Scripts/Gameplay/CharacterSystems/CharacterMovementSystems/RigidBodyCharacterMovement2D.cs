@@ -173,7 +173,7 @@ namespace MultiplayerARPG
             currentDestination = null;
             CacheRigidbody2D.velocity = Vector2.zero;
             if (IsOwnerClient && !IsServer)
-                CacheCharacterEntity.CallNetFunction(StopMove, FunctionReceivers.Server);
+                CacheEntity.CallNetFunction(StopMove, FunctionReceivers.Server);
         }
 
         public override void KeyMovement(Vector3 moveDirection, MovementState movementState)
@@ -186,7 +186,7 @@ namespace MultiplayerARPG
                 case MovementSecure.ServerAuthoritative:
                     // Multiply with 100 and cast to sbyte to reduce packet size
                     // then it will be devided with 100 later on server side
-                    CacheCharacterEntity.CallNetFunction(NetFuncKeyMovement, FunctionReceivers.Server, (sbyte)(moveDirection.x * 100), (sbyte)(moveDirection.y * 100));
+                    CacheEntity.CallNetFunction(NetFuncKeyMovement, FunctionReceivers.Server, (sbyte)(moveDirection.x * 100), (sbyte)(moveDirection.y * 100));
                     break;
                 case MovementSecure.NotSecure:
                     tempInputDirection = moveDirection;
@@ -202,7 +202,7 @@ namespace MultiplayerARPG
             switch (movementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
-                    CacheCharacterEntity.CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
+                    CacheEntity.CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
                     break;
                 case MovementSecure.NotSecure:
                     currentDestination = position;
@@ -257,7 +257,7 @@ namespace MultiplayerARPG
                         tempMoveDirection = tempMoveDirection.normalized;
 
                     UpdateCurrentDirection(tempMoveDirection);
-                    CacheRigidbody2D.velocity = tempMoveDirection * gameplayRule.GetMoveSpeed(CacheCharacterEntity);
+                    CacheRigidbody2D.velocity = tempMoveDirection * gameplayRule.GetMoveSpeed(CacheEntity);
                 }
                 else
                 {
@@ -281,7 +281,7 @@ namespace MultiplayerARPG
                 MovementState = state;
 
             if (movementSecure == MovementSecure.NotSecure && IsOwnerClient)
-                CacheCharacterEntity.CallNetFunction(NetFuncSetMovementState, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)state);
+                CacheEntity.CallNetFunction(NetFuncSetMovementState, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)state);
         }
 
         public void UpdateCurrentDirection(Vector2 direction)
@@ -297,7 +297,7 @@ namespace MultiplayerARPG
                 CurrentDirectionType = localDirectionType;
             }
             if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
-                CacheCharacterEntity.CallNetFunction(NetFuncUpdateDirection, FunctionReceivers.Server, (sbyte)(localDirection.x * 100f), (sbyte)(localDirection.y * 100f));
+                CacheEntity.CallNetFunction(NetFuncUpdateDirection, FunctionReceivers.Server, (sbyte)(localDirection.x * 100f), (sbyte)(localDirection.y * 100f));
         }
     }
 }

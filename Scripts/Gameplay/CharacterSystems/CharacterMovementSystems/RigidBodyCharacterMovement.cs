@@ -181,7 +181,7 @@ namespace MultiplayerARPG
             if (movementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
                 return;
             // Play jump animation on non owner clients
-            CacheCharacterEntity.CharacterModel.PlayJumpAnimation();
+            CacheEntity.CharacterModel.PlayJumpAnimation();
         }
 
         public void RequestTriggerJump()
@@ -190,9 +190,9 @@ namespace MultiplayerARPG
                 return;
             // Play jump animation immediately on owner client, if not running in server
             if (IsOwnerClient && !IsServer)
-                CacheCharacterEntity.CharacterModel.PlayJumpAnimation();
+                CacheEntity.CharacterModel.PlayJumpAnimation();
             // Play jump animation on other clients
-            CacheCharacterEntity.CallNetFunction(NetFuncTriggerJump, FunctionReceivers.All);
+            CacheEntity.CallNetFunction(NetFuncTriggerJump, FunctionReceivers.All);
         }
 
         public override void StopMove()
@@ -200,7 +200,7 @@ namespace MultiplayerARPG
             navPaths = null;
             CacheRigidbody.velocity = new Vector3(0, CacheRigidbody.velocity.y, 0);
             if (IsOwnerClient && !IsServer)
-                CacheCharacterEntity.CallNetFunction(StopMove, FunctionReceivers.Server);
+                CacheEntity.CallNetFunction(StopMove, FunctionReceivers.Server);
         }
 
         public override void KeyMovement(Vector3 moveDirection, MovementState movementState)
@@ -219,7 +219,7 @@ namespace MultiplayerARPG
                 case MovementSecure.ServerAuthoritative:
                     // Multiply with 100 and cast to sbyte to reduce packet size
                     // then it will be devided with 100 later on server side
-                    CacheCharacterEntity.CallNetFunction(NetFuncKeyMovement, FunctionReceivers.Server, (sbyte)(moveDirection.x * 100), (sbyte)(moveDirection.z * 100), (byte)movementState);
+                    CacheEntity.CallNetFunction(NetFuncKeyMovement, FunctionReceivers.Server, (sbyte)(moveDirection.x * 100), (sbyte)(moveDirection.z * 100), (byte)movementState);
                     break;
                 case MovementSecure.NotSecure:
                     tempInputDirection = moveDirection;
@@ -238,7 +238,7 @@ namespace MultiplayerARPG
             switch (movementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
-                    CacheCharacterEntity.CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
+                    CacheEntity.CallNetFunction(NetFuncPointClickMovement, FunctionReceivers.Server, position);
                     break;
                 case MovementSecure.NotSecure:
                     SetMovePaths(position, true);
@@ -255,7 +255,7 @@ namespace MultiplayerARPG
             {
                 case MovementSecure.ServerAuthoritative:
                     // Cast to short to reduce packet size
-                    CacheCharacterEntity.CallNetFunction(NetFuncUpdateYRotation, FunctionReceivers.Server, (short)eulerAngles.y);
+                    CacheEntity.CallNetFunction(NetFuncUpdateYRotation, FunctionReceivers.Server, (short)eulerAngles.y);
                     break;
                 case MovementSecure.NotSecure:
                     eulerAngles.x = 0;
@@ -412,7 +412,7 @@ namespace MultiplayerARPG
                 // always move along the camera forward as it is the direction that it being aimed at
                 tempMoveDirection = Vector3.ProjectOnPlane(tempMoveDirection, groundContactNormal).normalized;
 
-                float currentTargetSpeed = gameInstance.GameplayRule.GetMoveSpeed(CacheCharacterEntity);
+                float currentTargetSpeed = gameInstance.GameplayRule.GetMoveSpeed(CacheEntity);
                 // If character move backward
                 if (Vector3.Angle(tempMoveDirection, CacheTransform.forward) > 120)
                     currentTargetSpeed *= backwardMoveSpeedRate;
@@ -473,7 +473,7 @@ namespace MultiplayerARPG
                 MovementState = state;
 
             if (movementSecure == MovementSecure.NotSecure && IsOwnerClient)
-                CacheCharacterEntity.CallNetFunction(NetFuncSetMovementState, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)state);
+                CacheEntity.CallNetFunction(NetFuncSetMovementState, DeliveryMethod.Sequenced, FunctionReceivers.Server, (byte)state);
         }
 
         protected void SetMovePaths(Vector3 position, bool useNavMesh)
