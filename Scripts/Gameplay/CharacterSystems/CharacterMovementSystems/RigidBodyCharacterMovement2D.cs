@@ -8,7 +8,7 @@ namespace MultiplayerARPG
 {
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(LiteNetLibTransform))]
-    public class RigidBodyCharacterMovement2D : BaseCharacterMovement2D
+    public class RigidBodyCharacterMovement2D : BaseCharacterMovement
     {
         #region Settings
         [Header("Movement AI")]
@@ -64,39 +64,39 @@ namespace MultiplayerARPG
         protected Vector2? currentDestination;
 
         protected Vector2 localDirection;
-        public override Vector2 CurrentDirection
+        public Vector2 CurrentDirection
         {
             get
             {
                 if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
                     return localDirection;
-                return base.CurrentDirection;
+                return CacheEntity.CurrentDirection;
             }
-            set { base.CurrentDirection = value; }
+            set { CacheEntity.CurrentDirection = value; }
         }
 
         protected DirectionType2D localDirectionType = DirectionType2D.Down;
-        public override DirectionType2D CurrentDirectionType
+        public DirectionType2D CurrentDirectionType
         {
             get
             {
                 if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
                     return localDirectionType;
-                return base.CurrentDirectionType;
+                return CacheEntity.CurrentDirectionType;
             }
-            set { base.CurrentDirectionType = value; }
+            set { CacheEntity.CurrentDirectionType = value; }
         }
 
         protected MovementState localMovementState = MovementState.None;
-        public override MovementState MovementState
+        public MovementState MovementState
         {
             get
             {
                 if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
                     return localMovementState;
-                return base.MovementState;
+                return CacheEntity.MovementState;
             }
-            set { base.MovementState = value; }
+            set { CacheEntity.MovementState = value; }
         }
 
         private float tempMoveDirectionMagnitude;

@@ -17,15 +17,15 @@ namespace MultiplayerARPG
         protected Vector3 latestDestination;
         
         protected MovementState localMovementState = MovementState.None;
-        public override MovementState MovementState
+        public MovementState MovementState
         {
             get
             {
                 if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
                     return localMovementState;
-                return base.MovementState;
+                return CacheEntity.MovementState;
             }
-            set { base.MovementState = value; }
+            set { CacheEntity.MovementState = value; }
         }
 
         private LiteNetLibTransform cacheNetTransform;

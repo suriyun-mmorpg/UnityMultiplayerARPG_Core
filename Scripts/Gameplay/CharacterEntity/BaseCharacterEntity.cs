@@ -88,7 +88,6 @@ namespace MultiplayerARPG
         public float MoveAnimationSpeedMultiplier { get { return gameplayRule.GetMoveSpeed(this) / CacheBaseMoveSpeed; } }
         public bool IsGrounded { get { return CharacterMovement == null ?  true : CharacterMovement.IsGrounded; } }
         public bool IsJumping { get { return CharacterMovement == null ? false : CharacterMovement.IsJumping; } }
-        public MovementState MovementState { get { return CharacterMovement == null ? MovementState.None | MovementState.IsGrounded : CharacterMovement.MovementState; } }
         public float StoppingDistance { get { return CharacterMovement == null ? 0.1f : CharacterMovement.StoppingDistance; } }
         public abstract int DataId { get; set; }
         public CharacterHitBox[] HitBoxes { get; protected set; }
@@ -244,6 +243,11 @@ namespace MultiplayerARPG
                 if (castingSkillCountDown < 0)
                     castingSkillCountDown = 0;
             }
+            if (CharacterModel is ICharacterModel2D)
+            {
+                // Set current direction to character model 2D
+                (CharacterModel as ICharacterModel2D).CurrentDirectionType = CurrentDirectionType;
+            }
             Profiler.EndSample();
         }
 
@@ -298,7 +302,62 @@ namespace MultiplayerARPG
 
         public void GetDamagePositionAndRotation(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Quaternion rotation)
         {
-            CharacterMovement.GetDamagePositionAndRotation(damageType, isLeftHand, hasAimPosition, aimPosition, stagger, out position, out rotation);
+            if (gameInstance.DimensionType == DimensionType.Dimension2D)
+                GetDamagePositionAndRotation2D(damageType, isLeftHand, hasAimPosition, aimPosition, stagger, out position, out rotation);
+            GetDamagePositionAndRotation3D(damageType, isLeftHand, hasAimPosition, aimPosition, stagger, out position, out rotation);
+        }
+
+        protected void GetDamagePositionAndRotation2D(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Quaternion rotation)
+        {
+            position = CacheTransform.position;
+            switch (damageType)
+            {
+                case DamageType.Melee:
+                    position = MeleeDamageTransform.position;
+                    break;
+                case DamageType.Missile:
+                    position = MissileDamageTransform.position;
+                    break;
+            }
+            rotation = Quaternion.Euler(0, 0, (Mathf.Atan2(CurrentDirection.y, CurrentDirection.x) * (180 / Mathf.PI)) + 90);
+        }
+
+        protected void GetDamagePositionAndRotation3D(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Quaternion rotation)
+        {
+            position = CacheTransform.position;
+            switch (damageType)
+            {
+                case DamageType.Melee:
+                    position = MeleeDamageTransform.position;
+                    break;
+                case DamageType.Missile:
+                    Transform tempMissileDamageTransform = null;
+                    if ((tempMissileDamageTransform = CharacterModel.GetRightHandMissileDamageTransform()) != null && !isLeftHand)
+                    {
+                        // Use position from right hand weapon missile damage transform
+                        position = tempMissileDamageTransform.position;
+                    }
+                    else if ((tempMissileDamageTransform = CharacterModel.GetLeftHandMissileDamageTransform()) != null && isLeftHand)
+                    {
+                        // Use position from left hand weapon missile damage transform
+                        position = tempMissileDamageTransform.position;
+                    }
+                    else
+                    {
+                        // Use position from default missile damage transform
+                        position = MissileDamageTransform.position;
+                    }
+                    break;
+            }
+            Quaternion forwardRotation = Quaternion.LookRotation(CacheTransform.forward);
+            Vector3 forwardStagger = forwardRotation * stagger;
+            rotation = Quaternion.LookRotation(CacheTransform.forward + forwardStagger);
+            if (hasAimPosition)
+            {
+                forwardRotation = Quaternion.LookRotation(aimPosition - position);
+                forwardStagger = forwardRotation * stagger;
+                rotation = Quaternion.LookRotation(aimPosition + forwardStagger - position);
+            }
         }
 
         public override void ReceivedDamage(IAttackerEntity attacker, CombatAmountType combatAmountType, int damage)
@@ -868,7 +927,32 @@ namespace MultiplayerARPG
 
         public bool IsPositionInFov(float fov, Vector3 position, Vector3 forward)
         {
-            return CharacterMovement.IsPositionInFov(fov, position, forward);
+            if (gameInstance.DimensionType == DimensionType.Dimension2D)
+                return IsPositionInFov2D(fov, position, forward);
+            return IsPositionInFov3D(fov, position, forward);
+        }
+
+        protected bool IsPositionInFov2D(float fov, Vector3 position, Vector3 forward)
+        {
+            float halfFov = fov * 0.5f;
+            Vector2 targetDir = (position - CacheTransform.position).normalized;
+            float angle = Vector2.Angle(targetDir, CurrentDirection);
+            // Angle in forward position is 180 so we use this value to determine that target is in hit fov or not
+            return angle < halfFov;
+        }
+
+        protected bool IsPositionInFov3D(float fov, Vector3 position, Vector3 forward)
+        {
+            float halfFov = fov * 0.5f;
+            // This is unsigned angle, so angle found from this function is 0 - 180
+            // if position forward from character this value will be 180
+            // so just find for angle > 180 - halfFov
+            Vector3 targetDir = (position - CacheTransform.position).normalized;
+            targetDir.y = 0;
+            forward.y = 0;
+            targetDir.Normalize();
+            forward.Normalize();
+            return Vector3.Angle(targetDir, forward) < halfFov;
         }
 
         public List<T> FindCharacters<T>(float distance, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral, bool findInFov = false, float fov = 0)
