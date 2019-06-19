@@ -663,7 +663,7 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        public override void PlayHurtAnimation()
+        public override void PlayHitAnimation()
         {
             if (animatorType == AnimatorType.LegacyAnimtion)
             {

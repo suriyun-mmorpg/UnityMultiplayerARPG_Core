@@ -613,7 +613,7 @@ namespace MultiplayerARPG
                 ReceivedDamage(attackerCharacter, CombatAmountType.NormalDamage, totalDamage);
 
             if (CharacterModel != null)
-                CharacterModel.PlayHurtAnimation();
+                CharacterModel.PlayHitAnimation();
 
             // If current hp <= 0, character dead
             if (IsDead())
@@ -866,11 +866,6 @@ namespace MultiplayerARPG
             if (CacheDisallowMove)
                 return false;
             return true;
-        }
-
-        public override sealed void PlayJumpAnimation()
-        {
-            CharacterModel.PlayJumpAnimation();
         }
 
         public bool CanAttack()

@@ -333,17 +333,7 @@ namespace MultiplayerARPG
         {
             animator.SetBool(ANIM_IS_CASTING_SKILL, false);
         }
-
-        public override void PlayHurtAnimation()
-        {
-            // TODO: 2D may just play blink red color
-        }
-
-        public override void PlayJumpAnimation()
-        {
-            // TODO: 2D may able to jump
-        }
-
+        
         public override bool GetRandomRightHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration)
         {
             AnimatorActionAnimation2D animation2D = defaultAttackAnimation2D;

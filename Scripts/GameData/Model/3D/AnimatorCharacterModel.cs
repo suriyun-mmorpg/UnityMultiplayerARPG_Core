@@ -272,7 +272,7 @@ namespace MultiplayerARPG
             animator.SetBool(ANIM_IS_CASTING_SKILL, false);
         }
 
-        public override void PlayHurtAnimation()
+        public override void PlayHitAnimation()
         {
             animator.ResetTrigger(ANIM_HURT);
             animator.SetTrigger(ANIM_HURT);

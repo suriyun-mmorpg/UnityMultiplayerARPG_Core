@@ -221,7 +221,7 @@ namespace MultiplayerARPG
             CrossFadeLegacyAnimation(CLIP_IDLE, idleClipFadeLength, WrapMode.Loop);
         }
 
-        public override void PlayHurtAnimation()
+        public override void PlayHitAnimation()
         {
             CrossFadeLegacyAnimation(CLIP_HURT, hurtClipFadeLength, WrapMode.Once);
         }

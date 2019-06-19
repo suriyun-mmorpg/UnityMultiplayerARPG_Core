@@ -276,10 +276,5 @@ namespace MultiplayerARPG
         {
             return false;
         }
-
-        public virtual void PlayJumpAnimation()
-        {
-
-        }
     }
 }

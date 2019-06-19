@@ -126,6 +126,8 @@ namespace MultiplayerARPG
         }
 
         public virtual void AddingNewEffect(GameEffect newEffect) { }
+        public virtual void PlayHitAnimation() { }
+        public virtual void PlayJumpAnimation() { }
     }
 
     [System.Serializable]

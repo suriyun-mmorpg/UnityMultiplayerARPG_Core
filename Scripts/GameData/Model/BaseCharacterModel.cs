@@ -380,8 +380,6 @@ namespace MultiplayerARPG
         public abstract Coroutine PlaySkillCastClip(int dataId, float duration);
         public abstract void StopActionAnimation();
         public abstract void StopSkillCastAnimation();
-        public abstract void PlayHurtAnimation();
-        public abstract void PlayJumpAnimation();
         public abstract bool GetRandomRightHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration);
         public abstract bool GetRandomLeftHandAttackAnimation(int dataId, out int animationIndex, out float triggerDuration, out float totalDuration);
         public abstract bool GetSkillActivateAnimation(int dataId, out float triggerDuration, out float totalDuration);
