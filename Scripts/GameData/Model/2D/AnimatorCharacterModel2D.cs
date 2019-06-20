@@ -8,7 +8,7 @@ using UnityEditor;
 namespace MultiplayerARPG
 {
     public class AnimatorCharacterModel2D :
-        BaseCharacterModelWithCacheAnims<AnimatorWeaponAnimations2D, AnimatorSkillAnimations2D, AnimatorVehicleAnimations2D>,
+        BaseCharacterModelWithCacheAnims<AnimatorWeaponAnimations2D, AnimatorSkillAnimations2D>,
         ICharacterModel2D
     {
         public enum AnimatorControllerType
@@ -83,7 +83,6 @@ namespace MultiplayerARPG
         public AnimatorActionAnimation2D defaultReloadAnimation2D;
         public AnimatorWeaponAnimations2D[] weaponAnimations2D;
         public AnimatorSkillAnimations2D[] skillAnimations2D;
-        public AnimatorVehicleAnimations2D[] vehicleAnimations2D;
         public float magnitudeToPlayMoveClip = 0.1f;
 
         [Header("Settings")]
@@ -431,11 +430,6 @@ namespace MultiplayerARPG
         protected override AnimatorSkillAnimations2D[] GetSkillAnims()
         {
             return skillAnimations2D;
-        }
-
-        protected override AnimatorVehicleAnimations2D[] GetVehicleAnims()
-        {
-            return vehicleAnimations2D;
         }
     }
 }

@@ -105,17 +105,6 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public struct VehicleAnimations : IVehicleAnims<WeaponAnimations, SkillAnimations>
-    {
-        public VehicleType vehicleType;
-        public WeaponAnimations[] weaponAnimations;
-        public SkillAnimations[] skillAnimations;
-        public VehicleType Data { get { return vehicleType; } }
-        public WeaponAnimations[] WeaponAnims { get { return weaponAnimations; } }
-        public SkillAnimations[] SkillAnims { get { return skillAnimations; } }
-    }
-
-    [System.Serializable]
     public struct DefaultAnimations
     {
         public AnimationClip idleClip;

@@ -95,15 +95,4 @@ namespace MultiplayerARPG
         public ActionAnimation2D activateAnimation;
         public Skill Data { get { return skill; } }
     }
-
-    [System.Serializable]
-    public struct VehicleAnimations2D : IVehicleAnims<WeaponAnimations2D, SkillAnimations2D>
-    {
-        public VehicleType vehicleType;
-        public WeaponAnimations2D[] weaponAnimations;
-        public SkillAnimations2D[] skillAnimations;
-        public VehicleType Data { get { return vehicleType; } }
-        public WeaponAnimations2D[] WeaponAnims { get { return weaponAnimations; } }
-        public SkillAnimations2D[] SkillAnims { get { return skillAnimations; } }
-    }
 }

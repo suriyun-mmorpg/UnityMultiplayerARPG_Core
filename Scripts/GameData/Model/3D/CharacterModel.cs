@@ -4,7 +4,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [ExecuteInEditMode]
-    public class CharacterModel : BaseCharacterModelWithCacheAnims<WeaponAnimations, SkillAnimations, VehicleAnimations>
+    public class CharacterModel : BaseCharacterModelWithCacheAnims<WeaponAnimations, SkillAnimations>
     {
         // Animator variables
         public static readonly int ANIM_IS_DEAD = Animator.StringToHash("IsDead");
@@ -102,7 +102,6 @@ namespace MultiplayerARPG
         public ActionAnimation defaultReloadAnimation;
         public WeaponAnimations[] weaponAnimations;
         public SkillAnimations[] skillAnimations;
-        public VehicleAnimations[] vehicleAnimations;
 
         // Temp data
         private string defaultIdleClipName;
@@ -846,11 +845,6 @@ namespace MultiplayerARPG
         protected override SkillAnimations[] GetSkillAnims()
         {
             return skillAnimations;
-        }
-
-        protected override VehicleAnimations[] GetVehicleAnims()
-        {
-            return vehicleAnimations;
         }
         #endregion
     }

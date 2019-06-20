@@ -9,7 +9,7 @@ namespace MultiplayerARPG
 {
     [ExecuteInEditMode]
     public class CharacterModel2D :
-        BaseCharacterModelWithCacheAnims<WeaponAnimations2D, SkillAnimations2D, VehicleAnimations2D>,
+        BaseCharacterModelWithCacheAnims<WeaponAnimations2D, SkillAnimations2D>,
         ICharacterModel2D
     {
         public enum SampleAnimation
@@ -32,7 +32,6 @@ namespace MultiplayerARPG
         public ActionAnimation2D defaultReloadAnimation2D;
         public WeaponAnimations2D[] weaponAnimations2D;
         public SkillAnimations2D[] skillAnimations2D;
-        public VehicleAnimations2D[] vehicleAnimations2D;
 
         public float magnitudeToPlayMoveClip = 0.1f;
         [Header("Sample 2D Animations")]
@@ -396,11 +395,6 @@ namespace MultiplayerARPG
         protected override SkillAnimations2D[] GetSkillAnims()
         {
             return skillAnimations2D;
-        }
-
-        protected override VehicleAnimations2D[] GetVehicleAnims()
-        {
-            return vehicleAnimations2D;
         }
     }
 }

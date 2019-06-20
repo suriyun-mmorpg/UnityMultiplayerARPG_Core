@@ -11,13 +11,11 @@ namespace MultiplayerARPG
     /// <typeparam name="TWeaponAnims"></typeparam>
     /// <typeparam name="TSkillAnims"></typeparam>
     /// <typeparam name="TVehicleAnims"></typeparam>
-    public abstract class BaseCharacterModelWithCacheAnims<TWeaponAnims, TSkillAnims, TVehicleAnims> : BaseCharacterModel
+    public abstract class BaseCharacterModelWithCacheAnims<TWeaponAnims, TSkillAnims> : BaseCharacterModel
         where TWeaponAnims : IWeaponAnims
         where TSkillAnims : ISkillAnims
-        where TVehicleAnims : IVehicleAnims<TWeaponAnims, TSkillAnims>
     {
         protected static readonly Dictionary<int, CacheAnimations> allCacheAnims = new Dictionary<int, CacheAnimations>();
-        protected static readonly Dictionary<int, Dictionary<int, CacheAnimations>> allCacheVehicleAnims = new Dictionary<int, Dictionary<int, CacheAnimations>>();
         
         private CacheAnimations CacheAnims
         {
@@ -28,36 +26,14 @@ namespace MultiplayerARPG
                 return allCacheAnims[DataId];
             }
         }
-
-        private Dictionary<int, CacheAnimations> CacheVehicleAnims
-        {
-            get
-            {
-                if (!allCacheVehicleAnims.ContainsKey(DataId))
-                {
-                    Dictionary<int, CacheAnimations> vehicleAnims = new Dictionary<int, CacheAnimations>();
-                    foreach (IVehicleAnims<TWeaponAnims, TSkillAnims> vehicleAnimation in GetVehicleAnims())
-                    {
-                        if (vehicleAnimation.Data == null) continue;
-                        vehicleAnims[vehicleAnimation.Data.DataId] = new CacheAnimations(vehicleAnimation.WeaponAnims, vehicleAnimation.SkillAnims);
-                    }
-                    allCacheVehicleAnims.Add(DataId, vehicleAnims);
-                }
-                return allCacheVehicleAnims[DataId];
-            }
-        }
-
-        private int vehicleDataId;
+        
         protected CacheAnimations GetAnims()
         {
-            if (CacheVehicleAnims.ContainsKey(vehicleDataId))
-                return CacheVehicleAnims[vehicleDataId];
             return CacheAnims;
         }
 
         protected abstract TWeaponAnims[] GetWeaponAnims();
         protected abstract TSkillAnims[] GetSkillAnims();
-        protected abstract TVehicleAnims[] GetVehicleAnims();
 
         protected class CacheAnimations
         {

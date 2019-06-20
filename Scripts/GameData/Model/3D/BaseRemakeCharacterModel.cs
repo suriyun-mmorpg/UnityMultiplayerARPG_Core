@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseRemakeCharacterModel : BaseCharacterModelWithCacheAnims<WeaponAnimations, SkillAnimations, VehicleAnimations>
+    public abstract class BaseRemakeCharacterModel : BaseCharacterModelWithCacheAnims<WeaponAnimations, SkillAnimations>
     {
         // Clip name variables
         public const string CLIP_IDLE = "__Idle";
@@ -31,7 +31,6 @@ namespace MultiplayerARPG
         public DefaultAnimations defaultAnimations;
         public WeaponAnimations[] weaponAnimations;
         public SkillAnimations[] skillAnimations;
-        public VehicleAnimations[] vehicleAnimations;
 
         public override void AddingNewModel(GameObject newModel)
         {
@@ -204,11 +203,6 @@ namespace MultiplayerARPG
         protected override SkillAnimations[] GetSkillAnims()
         {
             return skillAnimations;
-        }
-
-        protected override VehicleAnimations[] GetVehicleAnims()
-        {
-            return vehicleAnimations;
         }
     }
 }
