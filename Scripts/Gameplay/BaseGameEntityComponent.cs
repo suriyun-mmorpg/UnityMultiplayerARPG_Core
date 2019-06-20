@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseGameComponent<T> : MonoBehaviour
+    public abstract class BaseGameEntityComponent<T> : MonoBehaviour
         where T : BaseGameEntity
     {
         private T cacheEntity;

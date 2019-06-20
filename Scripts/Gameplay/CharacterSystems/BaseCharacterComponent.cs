@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerARPG
 {
-    public abstract class BaseCharacterComponent : BaseGameComponent<BaseCharacterEntity>
+    public abstract class BaseCharacterComponent : BaseGameEntityComponent<BaseCharacterEntity>
     {
         public bool IsDead()
         {
