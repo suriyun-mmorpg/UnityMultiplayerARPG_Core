@@ -7,6 +7,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
+    [DisallowMultipleComponent]
     public class GameEntityModel : MonoBehaviour
     {
         [SerializeField]

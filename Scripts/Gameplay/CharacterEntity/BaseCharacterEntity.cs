@@ -89,15 +89,27 @@ namespace MultiplayerARPG
         public bool HasAimPosition { get; protected set; }
         public Vector3 AimPosition { get; protected set; }
 
-        private BaseCharacterModel characterModel;
-        public BaseCharacterModel CharacterModel
+        private CharacterModelManager modelManager;
+        public CharacterModelManager ModelManager
         {
             get
             {
-                if (characterModel == null)
-                    characterModel = GetComponent<BaseCharacterModel>();
-                return characterModel;
+                if (modelManager == null)
+                    modelManager = GetComponent<CharacterModelManager>();
+                if (modelManager == null)
+                    modelManager = gameObject.AddComponent<CharacterModelManager>();
+                return modelManager;
             }
+        }
+
+        public override sealed GameEntityModel Model
+        {
+            get { return ModelManager.ActiveModel; }
+        }
+
+        public BaseCharacterModel CharacterModel
+        {
+            get { return ModelManager.ActiveModel; }
         }
 
         public Transform MeleeDamageTransform

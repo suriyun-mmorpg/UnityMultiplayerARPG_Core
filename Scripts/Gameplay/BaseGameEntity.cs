@@ -80,7 +80,7 @@ namespace MultiplayerARPG
         }
 
         private GameEntityModel model;
-        public GameEntityModel Model
+        public virtual GameEntityModel Model
         {
             get
             {
@@ -91,7 +91,7 @@ namespace MultiplayerARPG
         }
 
         private BaseEntityMovement movement;
-        public BaseEntityMovement Movement
+        public virtual BaseEntityMovement Movement
         {
             get
             {

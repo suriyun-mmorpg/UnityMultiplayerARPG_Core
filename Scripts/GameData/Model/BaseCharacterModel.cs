@@ -9,6 +9,10 @@ namespace MultiplayerARPG
 {
     public abstract class BaseCharacterModel : GameEntityModel, IMoveableModel, IHittableModel, IJumppableModel
     {
+        [HideInInspector]
+        public CharacterModelManager modelManager;
+        public bool isMainModel { get { return modelManager != null && modelManager.MainModel == this; } }
+
         [Header("Equipment Containers")]
         public EquipmentContainer[] equipmentContainers;
         [InspectorButton("SetEquipmentContainersBySetters")]
@@ -65,6 +69,18 @@ namespace MultiplayerARPG
         protected readonly List<string> tempCachedKeys = new List<string>();
         protected GameObject tempEquipmentObject;
         protected BaseEquipmentEntity tempEquipmentEntity;
+
+        protected override void Awake()
+        {
+            base.Awake();
+            if (!isMainModel)
+            {
+                // Sub-model will use some data same as main model
+                hiddingObjects = modelManager.MainModel.hiddingObjects;
+                effectContainers = modelManager.MainModel.effectContainers;
+                equipmentContainers = modelManager.MainModel.equipmentContainers;
+            }
+        }
 
         protected override void OnDrawGizmos()
         {
