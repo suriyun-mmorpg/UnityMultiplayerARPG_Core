@@ -10,7 +10,7 @@ namespace MultiplayerARPG
 {
     [RequireComponent(typeof(CharacterRecoveryComponent))]
     [RequireComponent(typeof(CharacterSkillAndBuffComponent))]
-    public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData, ICharacterMovement, IAttackerEntity
+    public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData, IAttackerEntity
     {
         public const float ACTION_COMMAND_DELAY = 0.2f;
         public const int OVERLAP_COLLIDER_SIZE_FOR_ATTACK = 256;
@@ -62,7 +62,6 @@ namespace MultiplayerARPG
         protected BaseGameEntity targetEntity;
         protected readonly Dictionary<string, int> equipItemIndexes = new Dictionary<string, int>();
         protected AnimActionType animActionType;
-        protected Vector3? teleportingPosition;
         public bool isAttackingOrUsingSkill { get; protected set; }
         public bool isCastingSkillCanBeInterrupted { get; protected set; }
         public bool isCastingSkillInterrupted { get; protected set; }
@@ -81,9 +80,6 @@ namespace MultiplayerARPG
 
         public override int MaxHp { get { return CacheMaxHp; } }
         public float MoveAnimationSpeedMultiplier { get { return gameplayRule.GetMoveSpeed(this) / CacheBaseMoveSpeed; } }
-        public bool IsGrounded { get { return Movement == null ?  true : Movement.IsGrounded; } }
-        public bool IsJumping { get { return Movement == null ? false : Movement.IsJumping; } }
-        public float StoppingDistance { get { return Movement == null ? 0.1f : Movement.StoppingDistance; } }
         public abstract int DataId { get; set; }
         public CharacterHitBox[] HitBoxes { get; protected set; }
         public bool HasAimPosition { get; protected set; }
@@ -1037,44 +1033,7 @@ namespace MultiplayerARPG
                 (findForNeutral && characterEntity.IsNeutral(this));
         }
         #endregion
-
-        #region Character Movement
-        public void StopMove()
-        {
-            Movement.StopMove();
-        }
-
-        public void KeyMovement(Vector3 moveDirection, MovementState moveState)
-        {
-            Movement.KeyMovement(moveDirection, moveState);
-        }
-
-        public void PointClickMovement(Vector3 position)
-        {
-            Movement.PointClickMovement(position);
-        }
-
-        public void SetLookRotation(Vector3 eulerAngles)
-        {
-            Movement.SetLookRotation(eulerAngles);
-        }
-
-        public void Teleport(Vector3 position)
-        {
-            if (Movement == null)
-            {
-                teleportingPosition = position;
-                return;
-            }
-            Movement.Teleport(position);
-        }
-
-        public void FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
-        {
-            Movement.FindGroundedPosition(fromPosition, findDistance, out result);
-        }
-        #endregion
-
+        
         private void NotifyEnemySpottedToAllies(BaseCharacterEntity enemy)
         {
             // Warn that this character received damage to nearby characters

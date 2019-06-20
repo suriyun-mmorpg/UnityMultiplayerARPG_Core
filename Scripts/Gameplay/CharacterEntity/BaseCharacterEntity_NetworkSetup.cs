@@ -82,12 +82,6 @@ namespace MultiplayerARPG
             RegisterNetFunction<PackedUInt>(NetFuncUnSummon);
             RegisterNetFunction<short, short>(NetFuncSwapOrMergeNonEquipItems);
             RegisterNetFunction<bool>(NetFuncReload);
-
-            if (teleportingPosition.HasValue)
-            {
-                Teleport(teleportingPosition.Value);
-                teleportingPosition = null;
-            }
         }
 
         protected override void EntityOnDestroy()

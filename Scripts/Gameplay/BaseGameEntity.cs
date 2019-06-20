@@ -6,7 +6,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseGameEntity : LiteNetLibBehaviour, IGameEntity
+    public abstract class BaseGameEntity : LiteNetLibBehaviour, IEntityMovement
     {
         [Header("Game Entity Settings")]
         public Text textTitle;
@@ -67,6 +67,11 @@ namespace MultiplayerARPG
             get { return (DirectionType2D)currentDirectionType.Value; }
             set { currentDirectionType.Value = (byte)value; }
         }
+        protected Vector3? teleportingPosition;
+
+        public bool IsGrounded { get { return Movement == null ? true : Movement.IsGrounded; } }
+        public bool IsJumping { get { return Movement == null ? false : Movement.IsJumping; } }
+        public float StoppingDistance { get { return Movement == null ? 0.1f : Movement.StoppingDistance; } }
 
         private Transform cacheTransform;
         public Transform CacheTransform
@@ -223,6 +228,12 @@ namespace MultiplayerARPG
             // Setup entity movement here to make it able to register net elements / functions
             if (Movement != null)
                 Movement.EntityOnSetup(this);
+
+            if (teleportingPosition.HasValue)
+            {
+                Teleport(teleportingPosition.Value);
+                teleportingPosition = null;
+            }
         }
 
         protected virtual void SetupNetElements()
@@ -302,6 +313,41 @@ namespace MultiplayerARPG
         public virtual bool CanMove()
         {
             return Movement != null;
+        }
+
+        public void StopMove()
+        {
+            Movement.StopMove();
+        }
+
+        public void KeyMovement(Vector3 moveDirection, MovementState moveState)
+        {
+            Movement.KeyMovement(moveDirection, moveState);
+        }
+
+        public void PointClickMovement(Vector3 position)
+        {
+            Movement.PointClickMovement(position);
+        }
+
+        public void SetLookRotation(Vector3 eulerAngles)
+        {
+            Movement.SetLookRotation(eulerAngles);
+        }
+
+        public void Teleport(Vector3 position)
+        {
+            if (Movement == null)
+            {
+                teleportingPosition = position;
+                return;
+            }
+            Movement.Teleport(position);
+        }
+
+        public void FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
+        {
+            Movement.FindGroundedPosition(fromPosition, findDistance, out result);
         }
     }
 }

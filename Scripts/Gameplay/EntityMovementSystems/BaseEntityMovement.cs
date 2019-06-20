@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseEntityMovement : BaseGameEntityComponent<BaseGameEntity>, ICharacterMovement
+    public abstract class BaseEntityMovement : BaseGameEntityComponent<BaseGameEntity>, IEntityMovement
     {
         public bool CanMove()
         {

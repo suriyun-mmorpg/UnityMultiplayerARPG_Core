@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public interface IVehicleEntity : ICharacterMovement
+    public interface IVehicleEntity : IEntityMovement
     {
         VehicleType VehicleType { get; }
         bool IsDrivable { get; }
