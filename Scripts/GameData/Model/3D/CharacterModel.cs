@@ -459,7 +459,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void UpdateAnimation(bool isDead, MovementState movementState, float playMoveSpeedMultiplier = 1f)
+        public override void UpdateMovementAnimation(bool isDead, MovementState movementState, float playMoveSpeedMultiplier = 1f)
         {
             switch (animatorType)
             {

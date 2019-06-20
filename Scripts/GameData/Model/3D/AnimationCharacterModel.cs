@@ -110,7 +110,7 @@ namespace MultiplayerARPG
             CrossFadeLegacyAnimation(CLIP_IDLE, 0, WrapMode.Loop);
         }
 
-        public override void UpdateAnimation(bool isDead, MovementState movementState, float playMoveSpeedMultiplier = 1f)
+        public override void UpdateMovementAnimation(bool isDead, MovementState movementState, float playMoveSpeedMultiplier = 1f)
         {
             if (isDead)
                 CrossFadeLegacyAnimation(CLIP_DEAD, deadClipFadeLength, WrapMode.Once);

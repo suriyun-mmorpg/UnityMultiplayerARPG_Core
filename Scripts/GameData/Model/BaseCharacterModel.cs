@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseCharacterModel : GameEntityModel
+    public abstract class BaseCharacterModel : GameEntityModel, IMoveableModel, IHittableModel, IJumppableModel
     {
         [Header("Equipment Containers")]
         public EquipmentContainer[] equipmentContainers;
@@ -54,7 +54,7 @@ namespace MultiplayerARPG
         /// Dictionary[equipPosition(String), List[effect(GameEffect)]]
         /// </summary>
         private readonly Dictionary<string, List<GameEffect>> cacheEffects = new Dictionary<string, List<GameEffect>>();
-        
+
         // Equipment entities that will be used to play weapon effects
         protected BaseEquipmentEntity rightHandEquipmentEntity;
         protected BaseEquipmentEntity leftHandEquipmentEntity;
@@ -375,7 +375,35 @@ namespace MultiplayerARPG
         }
 
         public virtual void AddingNewModel(GameObject newModel) { }
-        public abstract void UpdateAnimation(bool isDead, MovementState movementState, float playMoveSpeedMultiplier = 1f);
+
+        /// <summary>
+        /// Use this function to play hit animation when receive damage
+        /// </summary>
+        public virtual void PlayHitAnimation() { }
+
+        /// <summary>
+        /// Use this function to play jump animation
+        /// </summary>
+        public virtual void PlayJumpAnimation() { }
+
+        /// <summary>
+        /// Use this function to update movement animation
+        /// </summary>
+        /// <param name="isDead"></param>
+        /// <param name="movementState"></param>
+        /// <param name="playMoveSpeedMultiplier"></param>
+        public void UpdateMovementAnimation(MovementState movementState, float playMoveSpeedMultiplier = 1f)
+        {
+            UpdateMovementAnimation(false, movementState, playMoveSpeedMultiplier);
+        }
+
+        /// <summary>
+        /// Use this function to update movement animation
+        /// </summary>
+        /// <param name="isDead"></param>
+        /// <param name="movementState"></param>
+        /// <param name="playMoveSpeedMultiplier"></param>
+        public abstract void UpdateMovementAnimation(bool isDead, MovementState movementState, float playMoveSpeedMultiplier = 1f);
         public abstract Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f);
         public abstract Coroutine PlaySkillCastClip(int dataId, float duration);
         public abstract void StopActionAnimation();

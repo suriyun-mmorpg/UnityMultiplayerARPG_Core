@@ -231,7 +231,7 @@ namespace MultiplayerARPG
                 isAttackingOrUsingSkill = false;
                 InterruptCastingSkill();
             }
-            CharacterModel.UpdateAnimation(IsDead(), MovementState, MoveAnimationSpeedMultiplier);
+            CharacterModel.UpdateMovementAnimation(IsDead(), MovementState, MoveAnimationSpeedMultiplier);
             if (castingSkillCountDown > 0)
             {
                 castingSkillCountDown -= Time.deltaTime;

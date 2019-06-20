@@ -132,7 +132,7 @@ namespace MultiplayerARPG
                 BaseCharacterModel characterModel = playerCharacterData.InstantiateModel(characterModelContainer);
                 CharacterModelByEntityId[playerCharacterData.EntityId] = characterModel;
                 characterModel.gameObject.SetActive(false);
-                characterModel.UpdateAnimation(false, MovementState.IsGrounded);
+                characterModel.UpdateMovementAnimation(false, MovementState.IsGrounded);
                 // Setup UI
                 if (ui != null)
                 {
