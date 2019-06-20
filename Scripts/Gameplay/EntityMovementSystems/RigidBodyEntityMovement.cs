@@ -181,7 +181,8 @@ namespace MultiplayerARPG
             if (movementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
                 return;
             // Play jump animation on non owner clients
-            CacheEntity.Model.PlayJumpAnimation();
+            if (CacheEntity.Model is IJumppableModel)
+                (CacheEntity.Model as IJumppableModel).PlayJumpAnimation();
         }
 
         public void RequestTriggerJump()
@@ -189,8 +190,8 @@ namespace MultiplayerARPG
             if (!CacheEntity.CanMove())
                 return;
             // Play jump animation immediately on owner client, if not running in server
-            if (IsOwnerClient && !IsServer)
-                CacheEntity.Model.PlayJumpAnimation();
+            if (IsOwnerClient && !IsServer && CacheEntity.Model is IJumppableModel)
+                (CacheEntity.Model as IJumppableModel).PlayJumpAnimation();
             // Play jump animation on other clients
             CacheEntity.CallNetFunction(NetFuncTriggerJump, FunctionReceivers.All);
         }
