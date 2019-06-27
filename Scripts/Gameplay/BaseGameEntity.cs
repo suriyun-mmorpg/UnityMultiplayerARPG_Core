@@ -229,6 +229,12 @@ namespace MultiplayerARPG
                 textTitle.text = Title;
             if (textTitleB != null)
                 textTitleB.text = TitleB;
+            // Snap character to vehicle seat
+            if (ActiveMovement != null)
+            {
+                CacheTransform.position = RidingVehicleSeat.transform.position;
+                CacheTransform.rotation = RidingVehicleSeat.transform.rotation;
+            }
             EntityLateUpdate();
         }
         protected virtual void EntityLateUpdate() { }
@@ -358,22 +364,26 @@ namespace MultiplayerARPG
 
         public void StopMove()
         {
-            ActiveMovement.StopMove();
+            if (ActiveMovement != null)
+                ActiveMovement.StopMove();
         }
 
         public void KeyMovement(Vector3 moveDirection, MovementState moveState)
         {
-            ActiveMovement.KeyMovement(moveDirection, moveState);
+            if (ActiveMovement != null)
+                ActiveMovement.KeyMovement(moveDirection, moveState);
         }
 
         public void PointClickMovement(Vector3 position)
         {
-            ActiveMovement.PointClickMovement(position);
+            if (ActiveMovement != null)
+                ActiveMovement.PointClickMovement(position);
         }
 
         public void SetLookRotation(Vector3 eulerAngles)
         {
-            ActiveMovement.SetLookRotation(eulerAngles);
+            if (ActiveMovement != null)
+                ActiveMovement.SetLookRotation(eulerAngles);
         }
 
         public void Teleport(Vector3 position)
