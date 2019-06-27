@@ -5,10 +5,10 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public partial struct Summon
+    public partial struct SkillSummon
     {
-        [Tooltip("Leave `Summon Monster` to NULL to not summon monster")]
-        public MonsterCharacterEntity monsterEntity;
+        [Tooltip("Leave `Monster Entity` to NULL to not summon monster entity")]
+        public BaseMonsterCharacterEntity monsterEntity;
         [Tooltip("If duration less than or equals to 0, summoned monster will die")]
         public IncrementalFloat duration;
         public IncrementalInt amountEachTime;

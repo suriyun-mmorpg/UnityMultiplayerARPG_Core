@@ -70,8 +70,9 @@ namespace MultiplayerARPG
             if (tempItem != null && this.DecreaseItemsByIndex(itemIndex, 1))
                 ApplyItemPetSummon(tempItem, characterItem.level, characterItem.exp);
             // Use mount item
-            tempItem = characterItem.getMountItem();
-
+            tempItem = characterItem.GetMountItem();
+            if (tempItem != null)
+                ApplyItemMount(tempItem, characterItem.level);
         }
 
         /// <summary>

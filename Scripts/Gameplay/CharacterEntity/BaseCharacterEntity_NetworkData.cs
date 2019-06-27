@@ -80,6 +80,7 @@ namespace MultiplayerARPG
         public virtual int CurrentWater { get { return currentWater.Value; } set { currentWater.Value = value; } }
         public virtual EquipWeapons EquipWeapons { get { return equipWeapons.Value; } set { equipWeapons.Value = value; } }
         public virtual bool IsHidding { get { return isHidding.Value; } set { isHidding.Value = value; } }
+        public virtual RidingVehicle RidingVehicle { get { return ridingVehicle.Value; } set { ridingVehicle.Value = value; } }
         // Override fields
         public override string Title { get { return CharacterName; } set { } }
 

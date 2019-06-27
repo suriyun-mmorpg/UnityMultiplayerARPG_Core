@@ -72,7 +72,10 @@ namespace MultiplayerARPG
         public Buff buff;
 
         [Header("Summon")]
-        public Summon summon;
+        public SkillSummon summon;
+
+        [Header("Mount")]
+        public SkillMount mount;
 
         [Header("Craft")]
         public ItemCraft itemCraft;
