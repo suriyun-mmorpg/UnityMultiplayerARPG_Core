@@ -232,8 +232,8 @@ namespace MultiplayerARPG
             // Snap character to vehicle seat
             if (ActiveMovement != null)
             {
-                CacheTransform.position = RidingVehicleSeat.transform.position;
-                CacheTransform.rotation = RidingVehicleSeat.transform.rotation;
+                CacheTransform.position = RidingVehicleSeat.rideTransform.position;
+                CacheTransform.rotation = RidingVehicleSeat.rideTransform.rotation;
             }
             EntityLateUpdate();
         }
@@ -423,17 +423,33 @@ namespace MultiplayerARPG
         {
             if (!IsServer || RidingVehicle.objectId == 0)
                 return;
+            
+            if (RidingVehicleEntity != null)
+            {
+                Vector3 exitPosition = CacheTransform.position;
+                if (RidingVehicleSeat.exitTransform == null)
+                    exitPosition = RidingVehicleSeat.exitTransform.position;
 
-            // Destroy mount entity
-            LiteNetLibIdentity identity;
-            if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(RidingVehicle.objectId, out identity))
-                identity.NetworkDestroy();
+                // Clear riding vehicle data
+                RidingVehicle ridingVehicle = RidingVehicle;
+                ridingVehicle.objectId = 0;
+                ridingVehicle.seatIndex = 0;
+                RidingVehicle = ridingVehicle;
 
-            // Clear riding vehicle data
-            RidingVehicle ridingVehicle = RidingVehicle;
-            ridingVehicle.objectId = 0;
-            ridingVehicle.seatIndex = 0;
-            RidingVehicle = ridingVehicle;
+                // Clear vehicle entity before teleport
+                ridingVehicleEntity = null;
+
+                // Teleport to exit transform
+                Teleport(exitPosition);
+            }
+            else
+            {
+                // Not riding vehicle, just clear data
+                RidingVehicle ridingVehicle = RidingVehicle;
+                ridingVehicle.objectId = 0;
+                ridingVehicle.seatIndex = 0;
+                RidingVehicle = ridingVehicle;
+            }
         }
     }
 }

@@ -5,7 +5,8 @@ namespace MultiplayerARPG
     [System.Serializable]
     public struct VehicleSeat
     {
-        public Transform transform;
+        public Transform rideTransform;
+        public Transform exitTransform;
         public bool canAttack;
     }
 }

@@ -28,8 +28,24 @@ namespace MultiplayerARPG
             if (!IsServer || mountEntityPrefab == null)
                 return;
             if (RidingVehicle.objectId > 0)
-                ExitVehicle();
+                UnMount();
             EnterVehicle(mountEntityPrefab, 0);
+        }
+
+        protected void UnMount()
+        {
+            if (!IsServer || RidingVehicle.objectId == 0)
+                return;
+
+            uint vehicleObjectId = RidingVehicle.objectId;
+
+            // Exit vehicle before destroy mount entity
+            ExitVehicle();
+
+            // Destroy mount entity
+            LiteNetLibIdentity identity;
+            if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(vehicleObjectId, out identity))
+                identity.NetworkDestroy();
         }
     }
 }
