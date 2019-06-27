@@ -231,7 +231,7 @@ namespace MultiplayerARPG
                 CurrentHp = 0;
                 Killed(this);
             }
-
+            // Clear data when character dead
             if (IsDead())
             {
                 // Clear action states when character dead
@@ -239,13 +239,18 @@ namespace MultiplayerARPG
                 isAttackingOrUsingSkill = false;
                 InterruptCastingSkill();
             }
+            // Update character model handler based on riding vehicle
+            ModelManager.UpdateVehicle(RidingVehicleEntity, RidingVehicle.seatIndex);
+            // Update movement animation
             CharacterModel.UpdateMovementAnimation(IsDead(), MovementState, MoveAnimationSpeedMultiplier);
+            // Update casting skill count down, will show gage at clients
             if (castingSkillCountDown > 0)
             {
                 castingSkillCountDown -= Time.deltaTime;
                 if (castingSkillCountDown < 0)
                     castingSkillCountDown = 0;
             }
+            // Update direction type if character model is character model 2D
             if (CharacterModel is ICharacterModel2D)
             {
                 // Set current direction to character model 2D

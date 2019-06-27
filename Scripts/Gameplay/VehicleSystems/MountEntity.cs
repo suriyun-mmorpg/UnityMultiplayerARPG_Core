@@ -30,14 +30,26 @@ namespace MultiplayerARPG
         [SerializeField]
         private float moveSpeed = 5f;
 
-        /// <summary>
-        /// Mount Entity always drivable
-        /// </summary>
-        public bool IsDrivable { get { return true; } }
-
         public override sealed float GetMoveSpeed()
         {
             return moveSpeed;
+        }
+
+        public bool IsDriveable(byte seatIndex)
+        {
+            // Mount entity always driveable
+            return true;
+        }
+
+        public bool IsAttackable(byte seatIndex)
+        {
+            return seat.canAttack;
+        }
+
+        public bool IsDestroyWhenExit(byte seatIndex)
+        {
+            // Mount entity always destroyed when exit
+            return true;
         }
     }
 }

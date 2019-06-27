@@ -112,15 +112,15 @@ namespace MultiplayerARPG
             set { movement = value; }
         }
 
-        private uint vehicleObjectId;
+        private uint dirtyVehicleObjectId;
         private IVehicleEntity ridingVehicleEntity;
         public IVehicleEntity RidingVehicleEntity
         {
             get
             {
-                if ((ridingVehicleEntity == null || vehicleObjectId != RidingVehicle.objectId) && RidingVehicle.objectId > 0)
+                if ((ridingVehicleEntity == null || dirtyVehicleObjectId != RidingVehicle.objectId) && RidingVehicle.objectId > 0)
                 {
-                    vehicleObjectId = RidingVehicle.objectId;
+                    dirtyVehicleObjectId = RidingVehicle.objectId;
                     ridingVehicleEntity = null;
                     LiteNetLibIdentity identity;
                     if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(RidingVehicle.objectId, out identity))
@@ -421,11 +421,16 @@ namespace MultiplayerARPG
 
         protected void ExitVehicle()
         {
-            if (!IsServer || RidingVehicle.objectId == 0)
+            if (!IsServer || RidingVehicleEntity == null)
                 return;
-            
+
+            uint vehicleObjectId = RidingVehicleEntity.ObjectId;
+            bool isDestroying = false;
+
             if (RidingVehicleEntity != null)
             {
+                isDestroying = RidingVehicleEntity.IsDestroyWhenExit(RidingVehicle.seatIndex);
+
                 Vector3 exitPosition = CacheTransform.position;
                 if (RidingVehicleSeat.exitTransform == null)
                     exitPosition = RidingVehicleSeat.exitTransform.position;
@@ -449,6 +454,14 @@ namespace MultiplayerARPG
                 ridingVehicle.objectId = 0;
                 ridingVehicle.seatIndex = 0;
                 RidingVehicle = ridingVehicle;
+            }
+
+            // Destroy mount entity
+            if (isDestroying)
+            {
+                LiteNetLibIdentity identity;
+                if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(vehicleObjectId, out identity))
+                    identity.NetworkDestroy();
             }
         }
     }
