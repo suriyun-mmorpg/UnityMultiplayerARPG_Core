@@ -400,5 +400,40 @@ namespace MultiplayerARPG
         {
             ActiveMovement.FindGroundedPosition(fromPosition, findDistance, out result);
         }
+
+        protected void EnterVehicle(IVehicleEntity vehiclePrefab, byte seatIndex)
+        {
+            if (!IsServer || vehiclePrefab == null || RidingVehicle.objectId > 0)
+                return;
+
+            // Instantiate new mount entity
+            GameObject spawnObj = Instantiate(vehiclePrefab.gameObject, CacheTransform.position, CacheTransform.rotation);
+            IVehicleEntity vehicle = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj).GetComponent<IVehicleEntity>();
+
+            // Set mount info
+            RidingVehicle ridingVehicle = new RidingVehicle()
+            {
+                objectId = vehicle.ObjectId,
+                seatIndex = seatIndex,
+            };
+            RidingVehicle = ridingVehicle;
+        }
+
+        protected void ExitVehicle()
+        {
+            if (!IsServer || RidingVehicle.objectId == 0)
+                return;
+
+            // Destroy mount entity
+            LiteNetLibIdentity identity;
+            if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(RidingVehicle.objectId, out identity))
+                identity.NetworkDestroy();
+
+            // Clear riding vehicle data
+            RidingVehicle ridingVehicle = RidingVehicle;
+            ridingVehicle.objectId = 0;
+            ridingVehicle.seatIndex = 0;
+            RidingVehicle = ridingVehicle;
+        }
     }
 }

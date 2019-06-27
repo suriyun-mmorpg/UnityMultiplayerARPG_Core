@@ -27,38 +27,9 @@ namespace MultiplayerARPG
         {
             if (!IsServer || mountEntityPrefab == null)
                 return;
-
-            // Unmount
-            UnMount();
-
-            // Instantiate new mount entity
-            GameObject spawnObj = Instantiate(mountEntityPrefab.gameObject, CacheTransform.position, CacheTransform.rotation);
-            MountEntity mountEntity = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj).GetComponent<MountEntity>();
-
-            // Set mount info
-            RidingVehicle ridingVehicle = new RidingVehicle()
-            {
-                objectId = mountEntity.ObjectId,
-                seatIndex = 0   // Seat index for mount entity always 0
-            };
-            RidingVehicle = ridingVehicle;
-        }
-
-        protected void UnMount()
-        {
-            if (!IsServer || RidingVehicle.objectId == 0)
-                return;
-
-            // Destroy mount entity
-            LiteNetLibIdentity identity;
-            if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(RidingVehicle.objectId, out identity))
-                identity.NetworkDestroy();
-
-            // Clear riding vehicle data
-            RidingVehicle ridingVehicle = RidingVehicle;
-            ridingVehicle.objectId = 0;
-            ridingVehicle.seatIndex = 0;
-            RidingVehicle = ridingVehicle;
+            if (RidingVehicle.objectId > 0)
+                ExitVehicle();
+            EnterVehicle(mountEntityPrefab, 0);
         }
     }
 }
