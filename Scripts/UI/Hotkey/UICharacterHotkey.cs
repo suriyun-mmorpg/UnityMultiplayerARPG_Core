@@ -130,7 +130,7 @@ namespace MultiplayerARPG
                 return false;
             Item item = characterItem.GetItem();
             if (item != null && characterItem.level > 0 && characterItem.amount > 0 &&
-                (item.IsPotion() || item.IsBuilding() || item.IsPet()))
+                (item.IsPotion() || item.IsBuilding() || item.IsPet() || item.IsMount()))
                 return true;
             return false;
         }

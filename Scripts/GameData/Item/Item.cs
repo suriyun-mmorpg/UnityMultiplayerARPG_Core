@@ -101,7 +101,7 @@ namespace MultiplayerARPG
         public EquipmentBonus socketEnhanceEffect;
 
         [Header("Mount Configs")]
-        public BaseVehicleEntity mountEntity;
+        public MountEntity mountEntity;
 
         public override string Title
         {
@@ -134,6 +134,7 @@ namespace MultiplayerARPG
                 case ItemType.Weapon:
                 case ItemType.Shield:
                 case ItemType.Pet:
+                case ItemType.Mount:
                     if (maxStack != 1)
                     {
                         maxStack = 1;
@@ -150,6 +151,11 @@ namespace MultiplayerARPG
         public bool IsEquipment()
         {
             return IsArmor() || IsShield() || IsWeapon();
+        }
+
+        public bool IsUsable()
+        {
+            return IsPotion() || IsPet() || IsMount();
         }
 
         public bool IsDefendEquipment()
@@ -200,6 +206,11 @@ namespace MultiplayerARPG
         public bool IsSocketEnhancer()
         {
             return itemType == ItemType.SocketEnhancer;
+        }
+
+        public bool IsMount()
+        {
+            return itemType == ItemType.Mount;
         }
 
         public int MaxLevel

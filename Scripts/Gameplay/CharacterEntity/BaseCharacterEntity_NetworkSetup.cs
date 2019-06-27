@@ -29,6 +29,8 @@ namespace MultiplayerARPG
             equipWeapons.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             isHidding.deliveryMethod = DeliveryMethod.ReliableOrdered;
             isHidding.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            ridingVehicle.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            ridingVehicle.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
 
             attributes.forOwnerOnly = false;
             skills.forOwnerOnly = true;
@@ -52,6 +54,7 @@ namespace MultiplayerARPG
             currentWater.onChange += OnCurrentWaterChange;
             equipWeapons.onChange += OnEquipWeaponsChange;
             isHidding.onChange += OnIsHiddingChange;
+            ridingVehicle.onChange += OnRidingVehicleChange;
             // On list changes events
             attributes.onOperation += OnAttributesOperation;
             skills.onOperation += OnSkillsOperation;
@@ -97,6 +100,7 @@ namespace MultiplayerARPG
             currentWater.onChange -= OnCurrentWaterChange;
             equipWeapons.onChange -= OnEquipWeaponsChange;
             isHidding.onChange -= OnIsHiddingChange;
+            ridingVehicle.onChange -= OnRidingVehicleChange;
             // On list changes events
             attributes.onOperation -= OnAttributesOperation;
             skills.onOperation -= OnSkillsOperation;

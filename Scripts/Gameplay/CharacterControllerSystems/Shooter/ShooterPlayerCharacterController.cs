@@ -692,7 +692,7 @@ namespace MultiplayerARPG
                 {
                     if (item.IsEquipment())
                         PlayerCharacterEntity.RequestEquipItem((short)itemIndex);
-                    else if (item.IsPotion() || item.IsPet())
+                    else if (item.IsUsable())
                         PlayerCharacterEntity.RequestUseItem((short)itemIndex);
                     else if (item.IsBuilding())
                     {

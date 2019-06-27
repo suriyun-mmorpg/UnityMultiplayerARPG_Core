@@ -7,6 +7,6 @@ namespace MultiplayerARPG
     {
         VehicleType VehicleType { get; }
         bool IsDrivable { get; }
-        List<Transform> Seats { get; }
+        List<VehicleSeat> Seats { get; }
     }
 }

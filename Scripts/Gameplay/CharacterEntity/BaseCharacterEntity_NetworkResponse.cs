@@ -60,12 +60,18 @@ namespace MultiplayerARPG
             if (characterItem.IsLock())
                 return;
 
-            Item potionItem = characterItem.GetPotionItem();
-            if (potionItem != null && this.DecreaseItemsByIndex(itemIndex, 1))
-                ApplyPotionBuff(potionItem, characterItem.level);
-            Item petItem = characterItem.GetPetItem();
-            if (petItem != null && this.DecreaseItemsByIndex(itemIndex, 1))
-                ApplyItemPetSummon(petItem, characterItem.level, characterItem.exp);
+            Item tempItem;
+            // Use potion item
+            tempItem = characterItem.GetPotionItem();
+            if (tempItem != null && this.DecreaseItemsByIndex(itemIndex, 1))
+                ApplyPotionBuff(tempItem, characterItem.level);
+            // Use pet item
+            tempItem = characterItem.GetPetItem();
+            if (tempItem != null && this.DecreaseItemsByIndex(itemIndex, 1))
+                ApplyItemPetSummon(tempItem, characterItem.level, characterItem.exp);
+            // Use mount item
+            tempItem = characterItem.getMountItem();
+
         }
 
         /// <summary>

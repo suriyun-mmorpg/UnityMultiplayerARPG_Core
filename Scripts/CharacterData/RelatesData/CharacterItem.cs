@@ -39,7 +39,9 @@ public class CharacterItem : INetSerializable
     [System.NonSerialized]
     private Item cachePetItem;
     [System.NonSerialized]
-    private Item cacheSocketEnhancer;
+    private Item cacheSocketEnhancerItem;
+    [System.NonSerialized]
+    private Item cacheMountItem;
 
     public List<int> Sockets
     {
@@ -66,7 +68,8 @@ public class CharacterItem : INetSerializable
             cacheAmmoItem = null;
             cacheBuildingItem = null;
             cachePetItem = null;
-            cacheSocketEnhancer = null;
+            cacheSocketEnhancerItem = null;
+            cacheMountItem = null;
             if (GameInstance.Items.TryGetValue(dataId, out cacheItem) && cacheItem != null)
             {
                 if (cacheItem.IsEquipment())
@@ -88,7 +91,9 @@ public class CharacterItem : INetSerializable
                 if (cacheItem.IsPet())
                     cachePetItem = cacheItem;
                 if (cacheItem.IsSocketEnhancer())
-                    cacheSocketEnhancer = cacheItem;
+                    cacheSocketEnhancerItem = cacheItem;
+                if (cacheItem.IsMount())
+                    cacheMountItem = cacheItem;
             }
         }
     }
@@ -156,7 +161,13 @@ public class CharacterItem : INetSerializable
     public Item GetSocketEnhancerItem()
     {
         MakeCache();
-        return cacheSocketEnhancer;
+        return cacheSocketEnhancerItem;
+    }
+
+    public Item GetMountItem()
+    {
+        MakeCache();
+        return cacheMountItem;
     }
 
     public short GetMaxStack()
