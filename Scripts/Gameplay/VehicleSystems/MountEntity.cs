@@ -27,9 +27,17 @@ namespace MultiplayerARPG
             }
         }
 
+        [SerializeField]
+        private float moveSpeed = 5f;
+
         /// <summary>
         /// Mount Entity always drivable
         /// </summary>
         public bool IsDrivable { get { return true; } }
+
+        public override sealed float GetMoveSpeed()
+        {
+            return moveSpeed;
+        }
     }
 }

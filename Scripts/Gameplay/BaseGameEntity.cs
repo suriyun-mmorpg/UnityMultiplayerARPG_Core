@@ -120,13 +120,13 @@ namespace MultiplayerARPG
             {
                 if ((ridingVehicleEntity == null || vehicleObjectId != RidingVehicle.objectId) && RidingVehicle.objectId > 0)
                 {
+                    vehicleObjectId = RidingVehicle.objectId;
                     ridingVehicleEntity = null;
                     LiteNetLibIdentity identity;
                     if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(RidingVehicle.objectId, out identity))
                     {
                         ridingVehicleEntity = identity.GetComponent<IVehicleEntity>();
                         RidingVehicleSeat = ridingVehicleEntity.Seats[RidingVehicle.seatIndex];
-                        vehicleObjectId = RidingVehicle.objectId;
                     }
                 }
                 // Clear current vehicle
