@@ -38,7 +38,7 @@ namespace MultiplayerARPG
             // Set mount info
             RidingVehicle ridingVehicle = new RidingVehicle()
             {
-                vehicleObjectId = mountEntity.ObjectId,
+                objectId = mountEntity.ObjectId,
                 seatIndex = 0   // Seat index for mount entity always 0
             };
             RidingVehicle = ridingVehicle;
@@ -46,17 +46,17 @@ namespace MultiplayerARPG
 
         protected void UnMount()
         {
-            if (!IsServer || RidingVehicle.vehicleObjectId == 0)
+            if (!IsServer || RidingVehicle.objectId == 0)
                 return;
 
             // Destroy mount entity
             LiteNetLibIdentity identity;
-            if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(RidingVehicle.vehicleObjectId, out identity))
+            if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(RidingVehicle.objectId, out identity))
                 identity.NetworkDestroy();
 
             // Clear riding vehicle data
             RidingVehicle ridingVehicle = RidingVehicle;
-            ridingVehicle.vehicleObjectId = 0;
+            ridingVehicle.objectId = 0;
             ridingVehicle.seatIndex = 0;
             RidingVehicle = ridingVehicle;
         }

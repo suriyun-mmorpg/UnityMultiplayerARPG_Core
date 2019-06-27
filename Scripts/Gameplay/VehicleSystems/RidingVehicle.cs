@@ -9,18 +9,18 @@ namespace MultiplayerARPG
     [System.Serializable]
     public struct RidingVehicle : INetSerializable
     {
-        public uint vehicleObjectId;
+        public uint objectId;
         public byte seatIndex;
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.PutPackedUInt(vehicleObjectId);
+            writer.PutPackedUInt(objectId);
             writer.Put(seatIndex);
         }
 
         public void Deserialize(NetDataReader reader)
         {
-            vehicleObjectId = reader.GetPackedUInt();
+            objectId = reader.GetPackedUInt();
             seatIndex = reader.GetByte();
         }
     }

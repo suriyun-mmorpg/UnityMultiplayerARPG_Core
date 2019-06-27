@@ -60,7 +60,7 @@ namespace MultiplayerARPG
             get { return false; }
             protected set { }
         }
-        
+
         protected Vector2? currentDestination;
 
         protected Vector2 localDirection;
@@ -75,16 +75,14 @@ namespace MultiplayerARPG
             set { CacheEntity.CurrentDirection = value; }
         }
 
-        protected DirectionType2D localDirectionType = DirectionType2D.Down;
         public DirectionType2D CurrentDirectionType
         {
             get
             {
                 if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
-                    return localDirectionType;
+                    return GameplayUtils.GetDirectionTypeByVector2(localDirection);
                 return CacheEntity.CurrentDirectionType;
             }
-            set { CacheEntity.CurrentDirectionType = value; }
         }
 
         protected MovementState localMovementState = MovementState.None;
@@ -165,7 +163,6 @@ namespace MultiplayerARPG
         protected void NetFuncUpdateDirection(sbyte x, sbyte y)
         {
             CurrentDirection = new Vector2((float)x / 100f, (float)y / 100f);
-            CurrentDirectionType = GameplayUtils.GetDirectionTypeByVector2(CurrentDirection);
         }
 
         public override void StopMove()
@@ -287,15 +284,11 @@ namespace MultiplayerARPG
         public void UpdateCurrentDirection(Vector2 direction)
         {
             if (direction.magnitude > 0f)
-            {
                 localDirection = direction;
-                localDirectionType = GameplayUtils.GetDirectionTypeByVector2(direction);
-            }
+
             if (IsServer && movementSecure == MovementSecure.ServerAuthoritative)
-            {
                 CurrentDirection = localDirection;
-                CurrentDirectionType = localDirectionType;
-            }
+
             if (IsOwnerClient && movementSecure == MovementSecure.NotSecure)
                 CacheEntity.CallNetFunction(NetFuncUpdateDirection, FunctionReceivers.Server, (sbyte)(localDirection.x * 100f), (sbyte)(localDirection.y * 100f));
         }

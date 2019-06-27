@@ -60,18 +60,23 @@ namespace MultiplayerARPG
             get { return currentDirection.Value; }
             set { currentDirection.Value = value; }
         }
-        [SerializeField]
-        protected SyncFieldByte currentDirectionType = new SyncFieldByte();
         public virtual DirectionType2D CurrentDirectionType
         {
-            get { return (DirectionType2D)currentDirectionType.Value; }
-            set { currentDirectionType.Value = (byte)value; }
+            get { return GameplayUtils.GetDirectionTypeByVector2(CurrentDirection); }
         }
+        [SerializeField]
+        protected SyncFieldRidingVehicle ridingVehicle = new SyncFieldRidingVehicle();
+        public virtual RidingVehicle RidingVehicle
+        {
+            get { return ridingVehicle.Value; }
+            set { ridingVehicle.Value = value; }
+        }
+
         protected Vector3? teleportingPosition;
 
-        public bool IsGrounded { get { return Movement == null ? true : Movement.IsGrounded; } }
-        public bool IsJumping { get { return Movement == null ? false : Movement.IsJumping; } }
-        public float StoppingDistance { get { return Movement == null ? 0.1f : Movement.StoppingDistance; } }
+        public bool IsGrounded { get { return ActiveMovement == null ? true : ActiveMovement.IsGrounded; } }
+        public bool IsJumping { get { return ActiveMovement == null ? false : ActiveMovement.IsJumping; } }
+        public float StoppingDistance { get { return ActiveMovement == null ? 0.1f : ActiveMovement.StoppingDistance; } }
 
         private Transform cacheTransform;
         public Transform CacheTransform
@@ -105,6 +110,42 @@ namespace MultiplayerARPG
                 return movement;
             }
             set { movement = value; }
+        }
+
+        private uint vehicleObjectId;
+        private IVehicleEntity ridingVehicleEntity;
+        public IVehicleEntity RidingVehicleEntity
+        {
+            get
+            {
+                if ((ridingVehicleEntity == null || vehicleObjectId != RidingVehicle.objectId) && RidingVehicle.objectId > 0)
+                {
+                    ridingVehicleEntity = null;
+                    LiteNetLibIdentity identity;
+                    if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(RidingVehicle.objectId, out identity))
+                    {
+                        ridingVehicleEntity = identity.GetComponent<IVehicleEntity>();
+                        RidingVehicleSeat = ridingVehicleEntity.Seats[RidingVehicle.seatIndex];
+                        vehicleObjectId = RidingVehicle.objectId;
+                    }
+                }
+                // Clear current vehicle
+                if (RidingVehicle.objectId == 0)
+                    ridingVehicleEntity = null;
+                return ridingVehicleEntity;
+            }
+        }
+
+        public VehicleSeat RidingVehicleSeat { get; protected set; }
+
+        public IEntityMovement ActiveMovement
+        {
+            get
+            {
+                if (RidingVehicleEntity == null)
+                    return RidingVehicleEntity;
+                return Movement;
+            }
         }
 
         public GameInstance gameInstance
@@ -251,11 +292,11 @@ namespace MultiplayerARPG
             currentDirection.deliveryMethod = DeliveryMethod.Sequenced;
             currentDirection.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             currentDirection.doNotSyncInitialDataImmediately = true;
-            currentDirectionType.deliveryMethod = DeliveryMethod.Sequenced;
-            currentDirectionType.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            currentDirectionType.doNotSyncInitialDataImmediately = true;
+            ridingVehicle.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            ridingVehicle.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            ridingVehicle.doNotSyncInitialDataImmediately = true;
         }
-        
+
         /// <summary>
         /// Override this function to initial required components
         /// </summary>
@@ -312,42 +353,42 @@ namespace MultiplayerARPG
 
         public virtual bool CanMove()
         {
-            return Movement != null;
+            return ActiveMovement != null;
         }
 
         public void StopMove()
         {
-            Movement.StopMove();
+            ActiveMovement.StopMove();
         }
 
         public void KeyMovement(Vector3 moveDirection, MovementState moveState)
         {
-            Movement.KeyMovement(moveDirection, moveState);
+            ActiveMovement.KeyMovement(moveDirection, moveState);
         }
 
         public void PointClickMovement(Vector3 position)
         {
-            Movement.PointClickMovement(position);
+            ActiveMovement.PointClickMovement(position);
         }
 
         public void SetLookRotation(Vector3 eulerAngles)
         {
-            Movement.SetLookRotation(eulerAngles);
+            ActiveMovement.SetLookRotation(eulerAngles);
         }
 
         public void Teleport(Vector3 position)
         {
-            if (Movement == null)
+            if (ActiveMovement == null)
             {
                 teleportingPosition = position;
                 return;
             }
-            Movement.Teleport(position);
+            ActiveMovement.Teleport(position);
         }
 
         public void FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
-            Movement.FindGroundedPosition(fromPosition, findDistance, out result);
+            ActiveMovement.FindGroundedPosition(fromPosition, findDistance, out result);
         }
     }
 }

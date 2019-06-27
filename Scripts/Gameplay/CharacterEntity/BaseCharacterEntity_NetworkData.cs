@@ -27,8 +27,6 @@ namespace MultiplayerARPG
         protected SyncFieldEquipWeapons equipWeapons = new SyncFieldEquipWeapons();
         [SerializeField]
         protected SyncFieldBool isHidding = new SyncFieldBool();
-        [SerializeField]
-        protected SyncFieldRidingVehicle ridingVehicle = new SyncFieldRidingVehicle();
         [Header("Sync Lists")]
         [SerializeField]
         protected SyncListCharacterAttribute attributes = new SyncListCharacterAttribute();
@@ -57,7 +55,6 @@ namespace MultiplayerARPG
         public System.Action<int> onCurrentWaterChange;
         public System.Action<EquipWeapons> onEquipWeaponsChange;
         public System.Action<bool> onIsHiddingChange;
-        public System.Action<RidingVehicle> onRidingVehicleChange;
         // List
         public System.Action<LiteNetLibSyncList.Operation, int> onAttributesOperation;
         public System.Action<LiteNetLibSyncList.Operation, int> onSkillsOperation;
@@ -80,7 +77,6 @@ namespace MultiplayerARPG
         public virtual int CurrentWater { get { return currentWater.Value; } set { currentWater.Value = value; } }
         public virtual EquipWeapons EquipWeapons { get { return equipWeapons.Value; } set { equipWeapons.Value = value; } }
         public virtual bool IsHidding { get { return isHidding.Value; } set { isHidding.Value = value; } }
-        public virtual RidingVehicle RidingVehicle { get { return ridingVehicle.Value; } set { ridingVehicle.Value = value; } }
         // Override fields
         public override string Title { get { return CharacterName; } set { } }
 
@@ -286,16 +282,6 @@ namespace MultiplayerARPG
 
             if (onIsHiddingChange != null)
                 onIsHiddingChange.Invoke(isHidding);
-        }
-
-        /// <summary>
-        /// Override this to do stuffs when riding vehicle changes
-        /// </summary>
-        /// <param name="ridingVehicle"></param>
-        protected virtual void OnRidingVehicleChange(bool isInitial, RidingVehicle ridingVehicle)
-        {
-            if (onRidingVehicleChange != null)
-                onRidingVehicleChange.Invoke(ridingVehicle);
         }
         #endregion
 
