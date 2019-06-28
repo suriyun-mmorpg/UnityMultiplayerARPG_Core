@@ -71,6 +71,18 @@ namespace MultiplayerARPG
             get { return CacheNavMeshAgent.stoppingDistance; }
         }
 
+        protected virtual void OnEnable()
+        {
+            CacheNetTransform.enabled = true;
+            CacheNavMeshAgent.enabled = true;
+        }
+
+        protected virtual void OnDisable()
+        {
+            CacheNetTransform.enabled = false;
+            CacheNavMeshAgent.enabled = false;
+        }
+
         public override void EntityOnSetup(BaseGameEntity entity)
         {
             base.EntityOnSetup(entity);

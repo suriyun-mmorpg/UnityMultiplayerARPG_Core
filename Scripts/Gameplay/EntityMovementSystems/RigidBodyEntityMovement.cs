@@ -103,11 +103,22 @@ namespace MultiplayerARPG
         private bool previouslyGrounded;
         private bool applyingJump;
 
-        private void Awake()
+        protected virtual void Awake()
         {
             CacheRigidbody.useGravity = false;
-            CacheRigidbody.freezeRotation = true;
             StopMove();
+        }
+
+        protected virtual void OnEnable()
+        {
+            CacheNetTransform.enabled = true;
+            CacheRigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+        }
+
+        protected virtual void OnDisable()
+        {
+            CacheNetTransform.enabled = false;
+            CacheRigidbody.constraints = RigidbodyConstraints.FreezeAll;
         }
 
         public override void EntityOnSetup(BaseGameEntity entity)

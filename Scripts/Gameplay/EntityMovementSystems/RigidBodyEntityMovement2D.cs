@@ -109,6 +109,18 @@ namespace MultiplayerARPG
             StopMove();
         }
 
+        protected virtual void OnEnable()
+        {
+            CacheNetTransform.enabled = true;
+            CacheRigidbody2D.constraints = RigidbodyConstraints2D.FreezeRotation;
+        }
+
+        protected virtual void OnDisable()
+        {
+            CacheNetTransform.enabled = false;
+            CacheRigidbody2D.constraints = RigidbodyConstraints2D.FreezeAll;
+        }
+
         public override void EntityOnSetup(BaseGameEntity entity)
         {
             base.EntityOnSetup(entity);
