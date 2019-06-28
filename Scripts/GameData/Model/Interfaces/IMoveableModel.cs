@@ -2,6 +2,6 @@
 {
     public interface IMoveableModel
     {
-        void UpdateMovementAnimation(MovementState movementState);
+        void SetMovementState(MovementState movementState);
     }
 }

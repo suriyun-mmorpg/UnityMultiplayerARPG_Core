@@ -190,10 +190,13 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_DEAD_UP_RIGHT] = deadAnimation2D.upRight;
         }
 
-        public override void UpdateMovementAnimation(MovementState movementState)
+        public override void PlayMoveAnimation()
         {
             if (!animator.gameObject.activeInHierarchy)
                 return;
+
+            if (animator.runtimeAnimatorController != cacheAnimatorController)
+                animator.runtimeAnimatorController = cacheAnimatorController;
 
             if (isDead)
             {

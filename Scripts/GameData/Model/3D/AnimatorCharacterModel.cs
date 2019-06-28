@@ -56,7 +56,6 @@ namespace MultiplayerARPG
 
         protected override void Awake()
         {
-            base.Awake();
             SetupComponent();
             if (animator != null)
                 animator.SetBool(ANIM_IS_GROUNDED, true);
@@ -190,10 +189,13 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_DEAD] = weaponAnimations.deadClip != null ? weaponAnimations.deadClip : defaultAnimations.deadClip;
         }
 
-        public override void UpdateMovementAnimation(MovementState movementState)
+        public override void PlayMoveAnimation()
         {
             if (!animator.gameObject.activeInHierarchy)
                 return;
+
+            if (animator.runtimeAnimatorController != cacheAnimatorController)
+                animator.runtimeAnimatorController = cacheAnimatorController;
 
             if (isDead)
             {

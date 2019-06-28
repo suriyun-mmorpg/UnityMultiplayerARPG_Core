@@ -458,24 +458,27 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void UpdateMovementAnimation(MovementState movementState)
+        public override void PlayMoveAnimation()
         {
             switch (animatorType)
             {
                 case AnimatorType.Animator:
-                    UpdateAnimation_Animator(movementState);
+                    UpdateAnimation_Animator();
                     break;
                 case AnimatorType.LegacyAnimtion:
-                    UpdateAnimation_LegacyAnimation(movementState);
+                    UpdateAnimation_LegacyAnimation();
                     break;
             }
         }
 
         #region Update Animation Functions
-        private void UpdateAnimation_Animator(MovementState movementState)
+        private void UpdateAnimation_Animator()
         {
             if (!animator.gameObject.activeInHierarchy)
                 return;
+
+            if (animator.runtimeAnimatorController != cacheAnimatorController)
+                animator.runtimeAnimatorController = cacheAnimatorController;
 
             if (isDead)
             {
@@ -504,7 +507,7 @@ namespace MultiplayerARPG
             animator.SetBool(ANIM_IS_GROUNDED, movementState.HasFlag(MovementState.IsGrounded));
         }
 
-        private void UpdateAnimation_LegacyAnimation(MovementState movementState)
+        private void UpdateAnimation_LegacyAnimation()
         {
             if (isDead)
                 CrossFadeLegacyAnimation(LEGACY_CLIP_DEAD, legacyAnimationData.deadClipFadeLength, WrapMode.Once);

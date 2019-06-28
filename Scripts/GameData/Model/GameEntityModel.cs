@@ -48,9 +48,7 @@ namespace MultiplayerARPG
         // Optimize garbage collector
         private GameEffect tempGameEffect;
 
-        protected virtual void Awake()
-        {
-        }
+        protected virtual void Awake() { }
 
         protected virtual void OnDrawGizmos()
         {

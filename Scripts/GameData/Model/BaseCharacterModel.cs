@@ -64,23 +64,38 @@ namespace MultiplayerARPG
         protected BaseEquipmentEntity leftHandEquipmentEntity;
         protected Dictionary<string, List<BaseEquipmentEntity>> equipmentEntities = new Dictionary<string, List<BaseEquipmentEntity>>();
 
+        // Protected fields
+        public EquipWeapons equipWeapons { get; protected set; }
+        public IList<CharacterItem> equipItems { get; protected set; }
+        public IList<CharacterBuff> buffs { get; protected set; }
+        public bool isDead { get; protected set; }
+        public float moveAnimationSpeedMultiplier { get; protected set; }
+        public MovementState movementState { get; protected set; }
+
         // Optimize garbage collector
         protected readonly List<string> tempAddingKeys = new List<string>();
         protected readonly List<string> tempCachedKeys = new List<string>();
         protected GameObject tempEquipmentObject;
         protected BaseEquipmentEntity tempEquipmentEntity;
-        protected bool isDead;
-        protected float moveAnimationSpeedMultiplier;
 
-        protected override void Awake()
+        internal virtual void SwitchModel(BaseCharacterModel previousModel)
         {
-            base.Awake();
             if (modelManager != null && !isMainModel)
             {
                 // Sub-model will use some data same as main model
                 hiddingObjects = modelManager.MainModel.hiddingObjects;
                 effectContainers = modelManager.MainModel.effectContainers;
                 equipmentContainers = modelManager.MainModel.equipmentContainers;
+            }
+
+            if (previousModel != null)
+            {
+                SetEquipWeapons(previousModel.equipWeapons);
+                SetEquipItems(previousModel.equipItems);
+                SetBuffs(previousModel.buffs);
+                SetIsDead(previousModel.isDead);
+                SetMoveAnimationSpeedMultiplier(previousModel.moveAnimationSpeedMultiplier);
+                SetMovementState(previousModel.movementState);
             }
         }
 
@@ -148,6 +163,7 @@ namespace MultiplayerARPG
 
         public virtual void SetEquipWeapons(EquipWeapons equipWeapons)
         {
+            this.equipWeapons = equipWeapons;
             Item rightHandWeapon = equipWeapons.rightHand.GetWeaponItem();
             Item leftHandWeapon = equipWeapons.leftHand.GetWeaponItem();
             Item leftHandShield = equipWeapons.leftHand.GetShieldItem();
@@ -179,6 +195,7 @@ namespace MultiplayerARPG
 
         public virtual void SetEquipItems(IList<CharacterItem> equipItems)
         {
+            this.equipItems = equipItems;
             // Clear equipped item models
             tempAddingKeys.Clear();
             foreach (CharacterItem equipItem in equipItems)
@@ -272,6 +289,7 @@ namespace MultiplayerARPG
 
         public virtual void SetBuffs(IList<CharacterBuff> buffs)
         {
+            this.buffs = buffs;
             // Temp old keys
             tempCachedKeys.Clear();
             tempCachedKeys.AddRange(cacheEffects.Keys);
@@ -407,6 +425,11 @@ namespace MultiplayerARPG
             this.moveAnimationSpeedMultiplier = moveAnimationSpeedMultiplier;
         }
 
+        public void SetMovementState(MovementState movementState)
+        {
+            this.movementState = movementState;
+        }
+
         /// <summary>
         /// Use this function to play hit animation when receive damage
         /// </summary>
@@ -417,13 +440,7 @@ namespace MultiplayerARPG
         /// </summary>
         public virtual void PlayJumpAnimation() { }
 
-        /// <summary>
-        /// Use this function to update movement animation
-        /// </summary>
-        /// <param name="isDead"></param>
-        /// <param name="movementState"></param>
-        /// <param name="playMoveSpeedMultiplier"></param>
-        public abstract void UpdateMovementAnimation(MovementState movementState);
+        public abstract void PlayMoveAnimation();
         public abstract Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f);
         public abstract Coroutine PlaySkillCastClip(int dataId, float duration);
         public abstract void StopActionAnimation();

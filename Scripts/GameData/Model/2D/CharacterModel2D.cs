@@ -172,7 +172,7 @@ namespace MultiplayerARPG
             playing = true;
         }
 
-        public override void UpdateMovementAnimation(MovementState movementState)
+        public override void PlayMoveAnimation()
         {
             if (playingAction)
                 return;

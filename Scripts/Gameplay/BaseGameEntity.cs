@@ -215,7 +215,7 @@ namespace MultiplayerARPG
         {
             EntityUpdate();
             if (Model != null && Model is IMoveableModel)
-                (Model as IMoveableModel).UpdateMovementAnimation(MovementState);
+                (Model as IMoveableModel).SetMovementState(MovementState);
             if (onUpdate != null)
                 onUpdate.Invoke();
         }
