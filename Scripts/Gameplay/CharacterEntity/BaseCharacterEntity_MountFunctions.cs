@@ -29,7 +29,13 @@ namespace MultiplayerARPG
                 return;
             if (RidingVehicle.objectId > 0)
                 ExitVehicle();
-            EnterVehicle(mountEntityPrefab, 0);
+
+            // Instantiate new mount entity
+            GameObject spawnObj = Instantiate(mountEntityPrefab.gameObject, CacheTransform.position, CacheTransform.rotation);
+            MountEntity vehicle = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj).GetComponent<MountEntity>();
+
+            // Seat index for mount entity always 0
+            EnterVehicle(vehicle, 0);
         }
     }
 }

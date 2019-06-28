@@ -27,7 +27,7 @@ public static partial class CharacterDataExtension
     public static BaseCharacterEntity GetEntityPrefab(this ICharacterData data)
     {
         BaseCharacterEntity entityPrefab = null;
-        if (!GameInstance.AllCharacterEntities.TryGetValue(data.EntityId, out entityPrefab))
+        if (!GameInstance.CharacterEntities.TryGetValue(data.EntityId, out entityPrefab))
         {
             Debug.LogWarning("[GetEntityPrefab] Cannot find character entity with id: " + data.EntityId);
             return null;

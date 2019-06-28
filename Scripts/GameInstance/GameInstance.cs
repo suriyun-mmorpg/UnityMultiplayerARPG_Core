@@ -167,7 +167,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, GuildSkill> GuildSkills = new Dictionary<int, GuildSkill>();
         public static readonly Dictionary<int, BaseDamageEntity> DamageEntities = new Dictionary<int, BaseDamageEntity>();
         public static readonly Dictionary<int, BuildingEntity> BuildingEntities = new Dictionary<int, BuildingEntity>();
-        public static readonly Dictionary<int, BaseCharacterEntity> AllCharacterEntities = new Dictionary<int, BaseCharacterEntity>();
+        public static readonly Dictionary<int, BaseCharacterEntity> CharacterEntities = new Dictionary<int, BaseCharacterEntity>();
         public static readonly Dictionary<int, BasePlayerCharacterEntity> PlayerCharacterEntities = new Dictionary<int, BasePlayerCharacterEntity>();
         public static readonly Dictionary<int, BaseMonsterCharacterEntity> MonsterCharacterEntities = new Dictionary<int, BaseMonsterCharacterEntity>();
         public static readonly Dictionary<int, MountEntity> MountEntities = new Dictionary<int, MountEntity>();
@@ -371,7 +371,7 @@ namespace MultiplayerARPG
             GuildSkills.Clear();
             DamageEntities.Clear();
             BuildingEntities.Clear();
-            AllCharacterEntities.Clear();
+            CharacterEntities.Clear();
             PlayerCharacterEntities.Clear();
             MonsterCharacterEntities.Clear();
             WarpPortalEntities.Clear();
@@ -610,10 +610,10 @@ namespace MultiplayerARPG
                 return;
             foreach (BaseCharacterEntity characterEntity in characterEntities)
             {
-                if (characterEntity == null || AllCharacterEntities.ContainsKey(characterEntity.Identity.HashAssetId))
+                if (characterEntity == null || CharacterEntities.ContainsKey(characterEntity.Identity.HashAssetId))
                     continue;
 
-                AllCharacterEntities[characterEntity.Identity.HashAssetId] = characterEntity;
+                CharacterEntities[characterEntity.Identity.HashAssetId] = characterEntity;
                 if (characterEntity is BasePlayerCharacterEntity)
                 {
                     BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;

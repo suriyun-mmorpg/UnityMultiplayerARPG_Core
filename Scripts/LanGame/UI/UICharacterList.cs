@@ -89,7 +89,8 @@ namespace MultiplayerARPG
                     characterModel.gameObject.SetActive(false);
                     characterModel.SetEquipWeapons(characterData.EquipWeapons);
                     characterModel.SetEquipItems(characterData.EquipItems);
-                    characterModel.UpdateMovementAnimation(false, MovementState.IsGrounded);
+                    characterModel.SetIsDead(false);
+                    characterModel.UpdateMovementAnimation(MovementState.IsGrounded);
                     CacheCharacterSelectionManager.Add(uiCharacter);
                 }
             });

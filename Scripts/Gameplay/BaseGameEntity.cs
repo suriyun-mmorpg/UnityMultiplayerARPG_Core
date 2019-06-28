@@ -89,19 +89,15 @@ namespace MultiplayerARPG
             }
         }
 
-        private GameEntityModel model;
-        public virtual GameEntityModel Model
+        [SerializeField]
+        protected GameEntityModel model;
+        public GameEntityModel Model
         {
-            get
-            {
-                if (model == null)
-                    model = GetComponent<GameEntityModel>();
-                return model;
-            }
+            get { return model; }
         }
 
         private BaseEntityMovement movement;
-        public virtual BaseEntityMovement Movement
+        public BaseEntityMovement Movement
         {
             get
             {
@@ -218,6 +214,8 @@ namespace MultiplayerARPG
         private void Update()
         {
             EntityUpdate();
+            if (Model != null && Model is IMoveableModel)
+                (Model as IMoveableModel).UpdateMovementAnimation(MovementState);
             if (onUpdate != null)
                 onUpdate.Invoke();
         }
@@ -401,14 +399,10 @@ namespace MultiplayerARPG
             ActiveMovement.FindGroundedPosition(fromPosition, findDistance, out result);
         }
 
-        protected void EnterVehicle(IVehicleEntity vehiclePrefab, byte seatIndex)
+        protected void EnterVehicle(IVehicleEntity vehicle, byte seatIndex)
         {
-            if (!IsServer || vehiclePrefab == null || RidingVehicle.objectId > 0)
+            if (!IsServer || vehicle == null || RidingVehicle.objectId > 0)
                 return;
-
-            // Instantiate new mount entity
-            GameObject spawnObj = Instantiate(vehiclePrefab.gameObject, CacheTransform.position, CacheTransform.rotation);
-            IVehicleEntity vehicle = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj).GetComponent<IVehicleEntity>();
 
             // Set mount info
             RidingVehicle ridingVehicle = new RidingVehicle()

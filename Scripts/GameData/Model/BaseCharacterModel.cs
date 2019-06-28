@@ -69,6 +69,8 @@ namespace MultiplayerARPG
         protected readonly List<string> tempCachedKeys = new List<string>();
         protected GameObject tempEquipmentObject;
         protected BaseEquipmentEntity tempEquipmentEntity;
+        protected bool isDead;
+        protected float moveAnimationSpeedMultiplier;
 
         protected override void Awake()
         {
@@ -395,6 +397,16 @@ namespace MultiplayerARPG
 
         public virtual void AddingNewModel(GameObject newModel) { }
 
+        public void SetIsDead(bool isDead)
+        {
+            this.isDead = isDead;
+        }
+
+        public void SetMoveAnimationSpeedMultiplier(float moveAnimationSpeedMultiplier)
+        {
+            this.moveAnimationSpeedMultiplier = moveAnimationSpeedMultiplier;
+        }
+
         /// <summary>
         /// Use this function to play hit animation when receive damage
         /// </summary>
@@ -411,18 +423,7 @@ namespace MultiplayerARPG
         /// <param name="isDead"></param>
         /// <param name="movementState"></param>
         /// <param name="playMoveSpeedMultiplier"></param>
-        public void UpdateMovementAnimation(MovementState movementState, float playMoveSpeedMultiplier = 1f)
-        {
-            UpdateMovementAnimation(false, movementState, playMoveSpeedMultiplier);
-        }
-
-        /// <summary>
-        /// Use this function to update movement animation
-        /// </summary>
-        /// <param name="isDead"></param>
-        /// <param name="movementState"></param>
-        /// <param name="playMoveSpeedMultiplier"></param>
-        public abstract void UpdateMovementAnimation(bool isDead, MovementState movementState, float playMoveSpeedMultiplier = 1f);
+        public abstract void UpdateMovementAnimation(MovementState movementState);
         public abstract Coroutine PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f);
         public abstract Coroutine PlaySkillCastClip(int dataId, float duration);
         public abstract void StopActionAnimation();

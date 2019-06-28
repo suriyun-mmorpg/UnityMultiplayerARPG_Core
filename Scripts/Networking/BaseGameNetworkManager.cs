@@ -567,29 +567,29 @@ namespace MultiplayerARPG
                 spawnablePrefabs.Add(gameInstance.itemDropEntityPrefab.Identity);
             if (gameInstance.warpPortalEntityPrefab != null)
                 spawnablePrefabs.Add(gameInstance.warpPortalEntityPrefab.Identity);
-            foreach (KeyValuePair<int, BasePlayerCharacterEntity> entry in GameInstance.PlayerCharacterEntities)
+            foreach (BasePlayerCharacterEntity entry in GameInstance.CharacterEntities.Values)
             {
-                spawnablePrefabs.Add(entry.Value.Identity);
+                spawnablePrefabs.Add(entry.Identity);
             }
-            foreach (KeyValuePair<int, BaseMonsterCharacterEntity> entry in GameInstance.MonsterCharacterEntities)
+            foreach (MountEntity entry in GameInstance.MountEntities.Values)
             {
-                spawnablePrefabs.Add(entry.Value.Identity);
+                spawnablePrefabs.Add(entry.Identity);
             }
-            foreach (KeyValuePair<int, WarpPortalEntity> entry in GameInstance.WarpPortalEntities)
+            foreach (WarpPortalEntity entry in GameInstance.WarpPortalEntities.Values)
             {
-                spawnablePrefabs.Add(entry.Value.Identity);
+                spawnablePrefabs.Add(entry.Identity);
             }
-            foreach (KeyValuePair<int, NpcEntity> entry in GameInstance.NpcEntities)
+            foreach (NpcEntity entry in GameInstance.NpcEntities.Values)
             {
-                spawnablePrefabs.Add(entry.Value.Identity);
+                spawnablePrefabs.Add(entry.Identity);
             }
-            foreach (KeyValuePair<int, BaseDamageEntity> entry in GameInstance.DamageEntities)
+            foreach (BaseDamageEntity entry in GameInstance.DamageEntities.Values)
             {
-                spawnablePrefabs.Add(entry.Value.Identity);
+                spawnablePrefabs.Add(entry.Identity);
             }
-            foreach (KeyValuePair<int, BuildingEntity> entry in GameInstance.BuildingEntities)
+            foreach (BuildingEntity entry in GameInstance.BuildingEntities.Values)
             {
-                spawnablePrefabs.Add(entry.Value.Identity);
+                spawnablePrefabs.Add(entry.Identity);
             }
             Assets.spawnablePrefabs = spawnablePrefabs.ToArray();
             this.InvokeInstanceDevExtMethods("Init");

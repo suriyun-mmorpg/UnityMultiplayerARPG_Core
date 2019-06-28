@@ -190,7 +190,7 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_DEAD] = weaponAnimations.deadClip != null ? weaponAnimations.deadClip : defaultAnimations.deadClip;
         }
 
-        public override void UpdateMovementAnimation(bool isDead, MovementState movementState, float playMoveSpeedMultiplier = 1f)
+        public override void UpdateMovementAnimation(MovementState movementState)
         {
             if (!animator.gameObject.activeInHierarchy)
                 return;
@@ -217,7 +217,7 @@ namespace MultiplayerARPG
             // Set animator parameters
             animator.SetFloat(ANIM_MOVE_SPEED, isDead ? 0 : moveSpeed);
             animator.SetFloat(ANIM_SIDE_MOVE_SPEED, isDead ? 0 : sideMoveSpeed);
-            animator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, playMoveSpeedMultiplier);
+            animator.SetFloat(ANIM_MOVE_CLIP_MULTIPLIER, moveAnimationSpeedMultiplier);
             animator.SetBool(ANIM_IS_DEAD, isDead);
             animator.SetBool(ANIM_IS_GROUNDED, movementState.HasFlag(MovementState.IsGrounded));
         }

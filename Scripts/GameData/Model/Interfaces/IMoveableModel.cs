@@ -2,6 +2,6 @@
 {
     public interface IMoveableModel
     {
-        void UpdateMovementAnimation(MovementState movementState, float playMoveSpeedMultiplier = 1f);
+        void UpdateMovementAnimation(MovementState movementState);
     }
 }

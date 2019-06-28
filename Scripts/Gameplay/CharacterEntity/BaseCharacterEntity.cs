@@ -99,11 +99,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public override sealed GameEntityModel Model
-        {
-            get { return ModelManager.ActiveModel; }
-        }
-
         public BaseCharacterModel CharacterModel
         {
             get { return ModelManager.ActiveModel; }
@@ -154,6 +149,7 @@ namespace MultiplayerARPG
             base.EntityAwake();
             gameObject.layer = gameInstance.characterLayer;
             animActionType = AnimActionType.None;
+            model = ModelManager.ActiveModel;
             isRecaching = true;
             MigrateTransforms();
             HitBoxes = GetComponentsInChildren<CharacterHitBox>();
@@ -165,6 +161,12 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR
             if (MigrateTransforms())
                 EditorUtility.SetDirty(this);
+
+            if (model != ModelManager.ActiveModel)
+            {
+                model = ModelManager.ActiveModel;
+                EditorUtility.SetDirty(this);
+            }
 #endif
         }
 
@@ -221,7 +223,6 @@ namespace MultiplayerARPG
 
         protected override void EntityUpdate()
         {
-            base.EntityUpdate();
             Profiler.BeginSample("BaseCharacterEntity - Update");
             MakeCaches();
 
@@ -242,8 +243,10 @@ namespace MultiplayerARPG
             }
             // Update character model handler based on riding vehicle
             ModelManager.UpdateVehicle(RidingVehicleEntity, RidingVehicle.seatIndex);
-            // Update movement animation
-            CharacterModel.UpdateMovementAnimation(IsDead(), MovementState, MoveAnimationSpeedMultiplier);
+            // Update is dead state
+            CharacterModel.SetIsDead(IsDead());
+            // Update move speed multiplier
+            CharacterModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
             // Update casting skill count down, will show gage at clients
             if (castingSkillCountDown > 0)
             {
@@ -258,6 +261,7 @@ namespace MultiplayerARPG
                 (CharacterModel as ICharacterModel2D).CurrentDirectionType = CurrentDirectionType;
             }
             Profiler.EndSample();
+            base.EntityUpdate();
         }
 
         #region Relates Objects
