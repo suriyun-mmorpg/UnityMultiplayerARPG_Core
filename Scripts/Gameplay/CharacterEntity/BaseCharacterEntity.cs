@@ -8,6 +8,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
+    [RequireComponent(typeof(CharacterModelManager))]
     [RequireComponent(typeof(CharacterRecoveryComponent))]
     [RequireComponent(typeof(CharacterSkillAndBuffComponent))]
     public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData, IAttackerEntity

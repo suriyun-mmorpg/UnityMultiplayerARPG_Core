@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         private VehicleType vehicleType;
         public VehicleType VehicleType { get { return vehicleType; } }
 
-        [Header("Mount Entity have only 1 seat")]
+        [Tooltip("Mount Entity have only 1 seat")]
         [SerializeField]
         private VehicleSeat seat;
         private List<VehicleSeat> seats;

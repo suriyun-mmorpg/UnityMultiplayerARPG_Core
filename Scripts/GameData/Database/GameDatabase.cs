@@ -20,6 +20,7 @@ namespace MultiplayerARPG
         public MonsterCharacter[] monsterCharacters;
         public BasePlayerCharacterEntity[] playerCharacterEntities;
         public BaseMonsterCharacterEntity[] monsterCharacterEntities;
+        public MountEntity[] mountEntities;
         public MapInfo[] mapInfos;
         
         public override void LoadData(GameInstance gameInstance)
@@ -36,6 +37,7 @@ namespace MultiplayerARPG
             GameInstance.AddCharacters(monsterCharacters);
             GameInstance.AddCharacterEntities(playerCharacterEntities);
             GameInstance.AddCharacterEntities(monsterCharacterEntities);
+            GameInstance.AddMountEntities(mountEntities);
             GameInstance.AddMapInfos(mapInfos);
             // Add hit effects
             List<GameEffectCollection> weaponHitEffects = new List<GameEffectCollection>();

@@ -14,7 +14,8 @@ namespace MultiplayerARPG
         {
             // Use Resources Load Async ?
             BaseGameData[] gameDataList = Resources.LoadAll<BaseGameData>("");
-            BaseCharacterEntity[] characterEntityList = Resources.LoadAll<BaseCharacterEntity>("");
+            BaseCharacterEntity[] characterEntities = Resources.LoadAll<BaseCharacterEntity>("");
+            MountEntity[] mountEntities = Resources.LoadAll<MountEntity>("");
 
             List<Attribute> attributes = new List<Attribute>();
             List<DamageElement> damageElements = new List<DamageElement>();
@@ -25,8 +26,6 @@ namespace MultiplayerARPG
             List<GuildSkill> guildSkills = new List<GuildSkill>();
             List<PlayerCharacter> playerCharacters = new List<PlayerCharacter>();
             List<MonsterCharacter> monsterCharacters = new List<MonsterCharacter>();
-            List<BasePlayerCharacterEntity> playerCharacterEntities = new List<BasePlayerCharacterEntity>();
-            List<BaseMonsterCharacterEntity> monsterCharacterEntities = new List<BaseMonsterCharacterEntity>();
             List<MapInfo> mapInfos = new List<MapInfo>();
 
             // Filtering game data
@@ -54,15 +53,6 @@ namespace MultiplayerARPG
                     mapInfos.Add(gameData as MapInfo);
             }
 
-            // Filtering character entity
-            foreach (BaseCharacterEntity characterEntity in characterEntityList)
-            {
-                if (characterEntity is BasePlayerCharacterEntity)
-                    playerCharacterEntities.Add(characterEntity as BasePlayerCharacterEntity);
-                if (characterEntity is BaseMonsterCharacterEntity)
-                    monsterCharacterEntities.Add(characterEntity as BaseMonsterCharacterEntity);
-            }
-
             GameInstance.AddAttributes(attributes);
             GameInstance.AddItems(new Item[] { gameInstance.DefaultWeaponItem });
             GameInstance.AddItems(items);
@@ -73,8 +63,8 @@ namespace MultiplayerARPG
             GameInstance.AddGuildSkills(guildSkills);
             GameInstance.AddCharacters(playerCharacters);
             GameInstance.AddCharacters(monsterCharacters);
-            GameInstance.AddCharacterEntities(playerCharacterEntities);
-            GameInstance.AddCharacterEntities(monsterCharacterEntities);
+            GameInstance.AddCharacterEntities(characterEntities);
+            GameInstance.AddMountEntities(mountEntities);
             GameInstance.AddMapInfos(mapInfos);
             // Add hit effects
             List<GameEffectCollection> weaponHitEffects = new List<GameEffectCollection>();

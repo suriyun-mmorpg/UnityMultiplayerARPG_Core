@@ -78,6 +78,8 @@ namespace MultiplayerARPG
             // Socket Enhancer
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.SocketEnhancer.ToString(), cacheItem.GetMemberName(a => a.maxStack));
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.SocketEnhancer.ToString(), cacheItem.GetMemberName(a => a.socketEnhanceEffect));
+            // Mount
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Mount.ToString(), cacheItem.GetMemberName(a => a.mountEntity));
         }
     }
 }

@@ -170,6 +170,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, BaseCharacterEntity> AllCharacterEntities = new Dictionary<int, BaseCharacterEntity>();
         public static readonly Dictionary<int, BasePlayerCharacterEntity> PlayerCharacterEntities = new Dictionary<int, BasePlayerCharacterEntity>();
         public static readonly Dictionary<int, BaseMonsterCharacterEntity> MonsterCharacterEntities = new Dictionary<int, BaseMonsterCharacterEntity>();
+        public static readonly Dictionary<int, MountEntity> MountEntities = new Dictionary<int, MountEntity>();
         public static readonly Dictionary<int, WarpPortalEntity> WarpPortalEntities = new Dictionary<int, WarpPortalEntity>();
         public static readonly Dictionary<int, NpcEntity> NpcEntities = new Dictionary<int, NpcEntity>();
         public static readonly Dictionary<uint, GameEffectCollection> GameEffectCollections = new Dictionary<uint, GameEffectCollection>();
@@ -623,6 +624,18 @@ namespace MultiplayerARPG
                     BaseMonsterCharacterEntity monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
                     MonsterCharacterEntities[characterEntity.Identity.HashAssetId] = monsterCharacterEntity;
                 }
+            }
+        }
+
+        public static void AddMountEntities(IEnumerable<MountEntity> mountEntities)
+        {
+            if (mountEntities == null)
+                return;
+            foreach (MountEntity mountEntity in mountEntities)
+            {
+                if (mountEntity == null || MountEntities.ContainsKey(mountEntity.Identity.HashAssetId))
+                    continue;
+                MountEntities[mountEntity.Identity.HashAssetId] = mountEntity;
             }
         }
 

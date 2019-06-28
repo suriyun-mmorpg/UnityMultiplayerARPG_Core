@@ -73,7 +73,7 @@ namespace MultiplayerARPG
         protected override void Awake()
         {
             base.Awake();
-            if (!isMainModel)
+            if (modelManager != null && !isMainModel)
             {
                 // Sub-model will use some data same as main model
                 hiddingObjects = modelManager.MainModel.hiddingObjects;
@@ -86,12 +86,15 @@ namespace MultiplayerARPG
         {
 #if UNITY_EDITOR
             base.OnDrawGizmos();
-            foreach (EquipmentContainer equipmentContainer in equipmentContainers)
+            if (equipmentContainers != null)
             {
-                if (equipmentContainer.transform == null) continue;
-                Gizmos.color = Color.green;
-                Gizmos.DrawWireSphere(equipmentContainer.transform.position, 0.1f);
-                Handles.Label(equipmentContainer.transform.position, equipmentContainer.equipSocket + "(Equipment)");
+                foreach (EquipmentContainer equipmentContainer in equipmentContainers)
+                {
+                    if (equipmentContainer.transform == null) continue;
+                    Gizmos.color = Color.green;
+                    Gizmos.DrawWireSphere(equipmentContainer.transform.position, 0.1f);
+                    Handles.Label(equipmentContainer.transform.position, equipmentContainer.equipSocket + "(Equipment)");
+                }
             }
 #endif
         }

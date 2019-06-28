@@ -7,7 +7,6 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    [DisallowMultipleComponent]
     public class GameEntityModel : MonoBehaviour
     {
         [SerializeField]
@@ -56,12 +55,15 @@ namespace MultiplayerARPG
         protected virtual void OnDrawGizmos()
         {
 #if UNITY_EDITOR
-            foreach (EffectContainer effectContainer in effectContainers)
+            if (effectContainers != null)
             {
-                if (effectContainer.transform == null) continue;
-                Gizmos.color = Color.blue;
-                Gizmos.DrawWireSphere(effectContainer.transform.position, 0.1f);
-                Handles.Label(effectContainer.transform.position, effectContainer.effectSocket + "(Effect)");
+                foreach (EffectContainer effectContainer in effectContainers)
+                {
+                    if (effectContainer.transform == null) continue;
+                    Gizmos.color = Color.blue;
+                    Gizmos.DrawWireSphere(effectContainer.transform.position, 0.1f);
+                    Handles.Label(effectContainer.transform.position, effectContainer.effectSocket + "(Effect)");
+                }
             }
 #endif
         }
