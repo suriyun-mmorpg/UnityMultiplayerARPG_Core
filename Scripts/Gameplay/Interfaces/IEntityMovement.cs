@@ -4,6 +4,7 @@ namespace MultiplayerARPG
 {
     public interface IEntityMovement
     {
+        bool enabled { get; set; }
         bool IsGrounded { get; }
         bool IsJumping { get; }
         float StoppingDistance { get; }

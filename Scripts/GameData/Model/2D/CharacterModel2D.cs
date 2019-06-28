@@ -50,12 +50,6 @@ namespace MultiplayerARPG
         private SampleAnimation? dirtySampleAnimation;
         private DirectionType2D? dirtySampleType;
 
-        protected override void Awake()
-        {
-            base.Awake();
-            Play(idleAnimation2D, DirectionType2D.Down);
-        }
-
         private void OnEnable()
         {
 #if UNITY_EDITOR

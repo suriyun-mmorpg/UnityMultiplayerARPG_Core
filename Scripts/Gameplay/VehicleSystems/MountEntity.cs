@@ -30,6 +30,12 @@ namespace MultiplayerARPG
         [SerializeField]
         private float moveSpeed = 5f;
 
+        protected override sealed void EntityAwake()
+        {
+            base.EntityAwake();
+            gameObject.layer = gameInstance.characterLayer;
+        }
+
         public override sealed float GetMoveSpeed()
         {
             return moveSpeed;

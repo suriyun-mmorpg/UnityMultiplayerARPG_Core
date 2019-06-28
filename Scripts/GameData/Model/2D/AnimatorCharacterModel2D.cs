@@ -111,8 +111,8 @@ namespace MultiplayerARPG
 
         protected override void Awake()
         {
-            base.Awake();
             SetupComponent();
+            base.Awake();
         }
 
         protected override void OnValidate()
@@ -195,8 +195,8 @@ namespace MultiplayerARPG
             if (!animator.gameObject.activeInHierarchy)
                 return;
 
-            if (animator.runtimeAnimatorController != cacheAnimatorController)
-                animator.runtimeAnimatorController = cacheAnimatorController;
+            if (animator.runtimeAnimatorController != CacheAnimatorController)
+                animator.runtimeAnimatorController = CacheAnimatorController;
 
             if (isDead)
             {

@@ -78,8 +78,19 @@ namespace MultiplayerARPG
         protected GameObject tempEquipmentObject;
         protected BaseEquipmentEntity tempEquipmentEntity;
 
+        protected override void Awake()
+        {
+            base.Awake();
+            SetIsDead(false);
+            SetMoveAnimationSpeedMultiplier(1);
+            SetMovementState(MovementState.IsGrounded);
+        }
+
         internal virtual void SwitchModel(BaseCharacterModel previousModel)
         {
+            DestroyCacheModels();
+            DestroyCacheEffects();
+
             if (modelManager != null && !isMainModel)
             {
                 // Sub-model will use some data same as main model
@@ -90,6 +101,8 @@ namespace MultiplayerARPG
 
             if (previousModel != null)
             {
+                previousModel.DestroyCacheModels();
+                previousModel.DestroyCacheEffects();
                 SetEquipWeapons(previousModel.equipWeapons);
                 SetEquipItems(previousModel.equipItems);
                 SetBuffs(previousModel.buffs);
@@ -134,10 +147,10 @@ namespace MultiplayerARPG
             DestroyCacheModel(equipPosition);
             if (models == null)
                 return;
-            foreach (KeyValuePair<string, GameObject> model in models)
+            foreach (string key in models.Keys)
             {
                 EquipmentContainer container;
-                if (!CacheEquipmentModelContainers.TryGetValue(model.Key, out container))
+                if (!CacheEquipmentModelContainers.TryGetValue(key, out container))
                     continue;
                 container.SetActiveDefaultModel(false);
             }
@@ -149,11 +162,11 @@ namespace MultiplayerARPG
             Dictionary<string, GameObject> oldModels;
             if (!string.IsNullOrEmpty(equipPosition) && cacheModels.TryGetValue(equipPosition, out oldModels) && oldModels != null)
             {
-                foreach (KeyValuePair<string, GameObject> model in oldModels)
+                foreach (string key in oldModels.Keys)
                 {
-                    Destroy(model.Value);
+                    Destroy(oldModels[key]);
                     EquipmentContainer container;
-                    if (!CacheEquipmentModelContainers.TryGetValue(model.Key, out container))
+                    if (!CacheEquipmentModelContainers.TryGetValue(key, out container))
                         continue;
                     container.SetActiveDefaultModel(true);
                 }
@@ -161,12 +174,28 @@ namespace MultiplayerARPG
             }
         }
 
+        private void DestroyCacheModels()
+        {
+            List<string> equipPositions = new List<string>(cacheModels.Keys);
+            foreach (string equipPosition in equipPositions)
+            {
+                DestroyCacheModel(equipPosition);
+            }
+        }
+
         public virtual void SetEquipWeapons(EquipWeapons equipWeapons)
         {
             this.equipWeapons = equipWeapons;
-            Item rightHandWeapon = equipWeapons.rightHand.GetWeaponItem();
-            Item leftHandWeapon = equipWeapons.leftHand.GetWeaponItem();
-            Item leftHandShield = equipWeapons.leftHand.GetShieldItem();
+
+            Item rightHandWeapon = null;
+            Item leftHandWeapon = null;
+            Item leftHandShield = null;
+            if (equipWeapons != null)
+            {
+                rightHandWeapon = equipWeapons.rightHand.GetWeaponItem();
+                leftHandWeapon = equipWeapons.leftHand.GetWeaponItem();
+                leftHandShield = equipWeapons.leftHand.GetShieldItem();
+            }
 
             // Clear equipped item models
             tempAddingKeys.Clear();
@@ -198,11 +227,14 @@ namespace MultiplayerARPG
             this.equipItems = equipItems;
             // Clear equipped item models
             tempAddingKeys.Clear();
-            foreach (CharacterItem equipItem in equipItems)
+            if (equipItems != null)
             {
-                Item armorItem = equipItem.GetArmorItem();
-                if (armorItem != null)
-                    tempAddingKeys.Add(armorItem.EquipPosition);
+                foreach (CharacterItem equipItem in equipItems)
+                {
+                    Item armorItem = equipItem.GetArmorItem();
+                    if (armorItem != null)
+                        tempAddingKeys.Add(armorItem.EquipPosition);
+                }
             }
 
             tempCachedKeys.Clear();
@@ -215,14 +247,17 @@ namespace MultiplayerARPG
                     DestroyCacheModel(key);
             }
 
-            foreach (CharacterItem equipItem in equipItems)
+            if (equipItems != null)
             {
-                Item armorItem = equipItem.GetArmorItem();
-                if (armorItem == null)
-                    continue;
-                BaseEquipmentEntity tempEquipmentEntity;
-                if (tempAddingKeys.Contains(armorItem.EquipPosition))
-                    InstantiateEquipModel(armorItem.EquipPosition, armorItem.equipmentModels, equipItem.level, out tempEquipmentEntity);
+                foreach (CharacterItem equipItem in equipItems)
+                {
+                    Item armorItem = equipItem.GetArmorItem();
+                    if (armorItem == null)
+                        continue;
+                    BaseEquipmentEntity tempEquipmentEntity;
+                    if (tempAddingKeys.Contains(armorItem.EquipPosition))
+                        InstantiateEquipModel(armorItem.EquipPosition, armorItem.equipmentModels, equipItem.level, out tempEquipmentEntity);
+                }
             }
         }
 
@@ -287,6 +322,15 @@ namespace MultiplayerARPG
             }
         }
 
+        private void DestroyCacheEffects()
+        {
+            List<string> buffIds = new List<string>(cacheEffects.Keys);
+            foreach (string buffId in buffIds)
+            {
+                DestroyCacheEffect(buffId);
+            }
+        }
+
         public virtual void SetBuffs(IList<CharacterBuff> buffs)
         {
             this.buffs = buffs;
@@ -297,15 +341,18 @@ namespace MultiplayerARPG
             tempAddingKeys.Clear();
             string tempKey;
             // Loop new buffs to prepare adding keys
-            foreach (CharacterBuff buff in buffs)
+            if (buffs != null)
             {
-                tempKey = buff.GetKey();
-                if (!tempCachedKeys.Contains(tempKey))
+                foreach (CharacterBuff buff in buffs)
                 {
-                    // If old buffs not contains this buff, add this buff effect
-                    InstantiateBuffEffect(tempKey, buff.GetBuff().effects);
+                    tempKey = buff.GetKey();
+                    if (!tempCachedKeys.Contains(tempKey))
+                    {
+                        // If old buffs not contains this buff, add this buff effect
+                        InstantiateBuffEffect(tempKey, buff.GetBuff().effects);
+                    }
+                    tempAddingKeys.Add(tempKey);
                 }
-                tempAddingKeys.Add(tempKey);
             }
 
             // Remove effects which removed from new buffs list
@@ -428,6 +475,7 @@ namespace MultiplayerARPG
         public void SetMovementState(MovementState movementState)
         {
             this.movementState = movementState;
+            PlayMoveAnimation();
         }
 
         /// <summary>

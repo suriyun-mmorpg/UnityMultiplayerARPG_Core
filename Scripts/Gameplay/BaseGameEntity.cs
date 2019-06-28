@@ -21,6 +21,8 @@ namespace MultiplayerARPG
         public event GenericDelegate onEnable;
         public event GenericDelegate onDisable;
         public event GenericDelegate onUpdate;
+        public event GenericDelegate onLateUpdate;
+        public event GenericDelegate onFixedUpdate;
         public event GenericDelegate onSetup;
         public event GenericDelegate onSetupNetElements;
         public event GenericDelegate onSetOwnerClient;
@@ -77,6 +79,7 @@ namespace MultiplayerARPG
         public bool IsGrounded { get { return ActiveMovement == null ? true : ActiveMovement.IsGrounded; } }
         public bool IsJumping { get { return ActiveMovement == null ? false : ActiveMovement.IsJumping; } }
         public float StoppingDistance { get { return ActiveMovement == null ? 0.1f : ActiveMovement.StoppingDistance; } }
+        public virtual float MoveAnimationSpeedMultiplier { get { return 1f; } }
 
         private Transform cacheTransform;
         public Transform CacheTransform
@@ -122,7 +125,6 @@ namespace MultiplayerARPG
                     if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(RidingVehicle.objectId, out identity))
                     {
                         ridingVehicleEntity = identity.GetComponent<IVehicleEntity>();
-                        RidingVehicleSeat = ridingVehicleEntity.Seats[RidingVehicle.seatIndex];
                     }
                 }
                 // Clear current vehicle
@@ -132,13 +134,31 @@ namespace MultiplayerARPG
             }
         }
 
-        public VehicleSeat RidingVehicleSeat { get; protected set; }
+        public VehicleType RidingVehicleType
+        {
+            get
+            {
+                if (RidingVehicleEntity == null)
+                    return null;
+                return RidingVehicleEntity.VehicleType;
+            }
+        }
+
+        public VehicleSeat RidingVehicleSeat
+        {
+            get
+            {
+                if (RidingVehicleEntity == null)
+                    return default(VehicleSeat);
+                return RidingVehicleEntity.Seats[RidingVehicle.seatIndex];
+            }
+        }
 
         public IEntityMovement ActiveMovement
         {
             get
             {
-                if (RidingVehicleEntity == null)
+                if (RidingVehicleEntity != null)
                     return RidingVehicleEntity;
                 return Movement;
             }
@@ -214,12 +234,24 @@ namespace MultiplayerARPG
         private void Update()
         {
             EntityUpdate();
-            if (Model != null && Model is IMoveableModel)
-                (Model as IMoveableModel).SetMovementState(MovementState);
             if (onUpdate != null)
                 onUpdate.Invoke();
         }
-        protected virtual void EntityUpdate() { }
+        protected virtual void EntityUpdate()
+        {
+            if (Model != null && Model is IMoveableModel)
+            {
+                // Update movement animation
+                (Model as IMoveableModel).SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
+                (Model as IMoveableModel).SetMovementState(MovementState);
+            }
+
+            if (Movement != null && Movement.enabled != (RidingVehicleEntity == null))
+            {
+                // Enable movement while not riding any vehicle
+                Movement.enabled = RidingVehicleEntity == null;
+            }
+        }
 
         private void LateUpdate()
         {
@@ -227,19 +259,25 @@ namespace MultiplayerARPG
                 textTitle.text = Title;
             if (textTitleB != null)
                 textTitleB.text = TitleB;
-            // Snap character to vehicle seat
-            if (ActiveMovement != null)
+            EntityLateUpdate();
+            if (onLateUpdate != null)
+                onLateUpdate.Invoke();
+        }
+        protected virtual void EntityLateUpdate()
+        {
+            if (RidingVehicleEntity != null)
             {
+                // Snap character to vehicle seat
                 CacheTransform.position = RidingVehicleSeat.rideTransform.position;
                 CacheTransform.rotation = RidingVehicleSeat.rideTransform.rotation;
             }
-            EntityLateUpdate();
         }
-        protected virtual void EntityLateUpdate() { }
 
         private void FixedUpdate()
         {
             EntityFixedUpdate();
+            if (onFixedUpdate != null)
+                onFixedUpdate.Invoke();
         }
         protected virtual void EntityFixedUpdate() { }
 
@@ -396,7 +434,9 @@ namespace MultiplayerARPG
 
         public void FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
-            ActiveMovement.FindGroundedPosition(fromPosition, findDistance, out result);
+            result = CacheTransform.position;
+            if (ActiveMovement != null)
+                ActiveMovement.FindGroundedPosition(fromPosition, findDistance, out result);
         }
 
         protected void EnterVehicle(IVehicleEntity vehicle, byte seatIndex)
@@ -426,7 +466,7 @@ namespace MultiplayerARPG
                 isDestroying = RidingVehicleEntity.IsDestroyWhenExit(RidingVehicle.seatIndex);
 
                 Vector3 exitPosition = CacheTransform.position;
-                if (RidingVehicleSeat.exitTransform == null)
+                if (RidingVehicleSeat.exitTransform != null)
                     exitPosition = RidingVehicleSeat.exitTransform.position;
 
                 // Clear riding vehicle data

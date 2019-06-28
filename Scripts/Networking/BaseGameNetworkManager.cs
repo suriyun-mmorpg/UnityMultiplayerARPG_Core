@@ -567,7 +567,7 @@ namespace MultiplayerARPG
                 spawnablePrefabs.Add(gameInstance.itemDropEntityPrefab.Identity);
             if (gameInstance.warpPortalEntityPrefab != null)
                 spawnablePrefabs.Add(gameInstance.warpPortalEntityPrefab.Identity);
-            foreach (BasePlayerCharacterEntity entry in GameInstance.CharacterEntities.Values)
+            foreach (BaseCharacterEntity entry in GameInstance.CharacterEntities.Values)
             {
                 spawnablePrefabs.Add(entry.Identity);
             }

@@ -62,8 +62,7 @@ namespace MultiplayerARPG
         private void Awake()
         {
             SetupModelManager();
-            activeModel = MainModel;
-            activeModel.SwitchModel(null);
+            SwitchModel(MainModel);
         }
 
         private bool SetupModelManager()
@@ -112,35 +111,43 @@ namespace MultiplayerARPG
         }
 #endif
 
-        public void UpdateVehicle(IVehicleEntity vehicleEntity, byte seatIndex)
+        public void UpdateRidingVehicle(VehicleType vehicleType, byte seatIndex)
         {
-            if (vehicleEntity != null && vehicleEntity.VehicleType != null)
+            if (vehicleType != null)
             {
-                if (dirtyVehicleDataId != vehicleEntity.VehicleType.DataId ||
+                if (dirtyVehicleDataId != vehicleType.DataId ||
                     dirtySeatIndex != seatIndex)
                 {
-                    dirtyVehicleDataId = vehicleEntity.VehicleType.DataId;
+                    dirtyVehicleDataId = vehicleType.DataId;
                     dirtySeatIndex = seatIndex;
                     VehicleCharacterModel tempData;
                     if (CacheVehicleModels.TryGetValue(dirtyVehicleDataId, out tempData) &&
                         seatIndex < tempData.modelsForEachSeats.Length)
                     {
-                        if (activeModel != tempData.modelsForEachSeats[seatIndex])
-                        {
-                            BaseCharacterModel previousModel = activeModel;
-                            activeModel = tempData.modelsForEachSeats[seatIndex];
-                            activeModel.SwitchModel(previousModel);
-                        }
-                        return;
+                        SwitchModel(tempData.modelsForEachSeats[seatIndex]);
+                    }
+                    else
+                    {
+                        SwitchModel(MainModel);
                     }
                 }
+                return;
             }
-            if (activeModel != MainModel)
+
+            if (dirtyVehicleDataId != 0)
             {
-                BaseCharacterModel previousModel = activeModel;
-                activeModel = MainModel;
-                activeModel.SwitchModel(previousModel);
+                dirtyVehicleDataId = 0;
+                dirtySeatIndex = 0;
+                SwitchModel(MainModel);
             }
+        }
+
+        private void SwitchModel(BaseCharacterModel nextModel)
+        {
+            if (nextModel == activeModel) return;
+            BaseCharacterModel previousModel = activeModel;
+            activeModel = nextModel;
+            activeModel.SwitchModel(previousModel);
         }
     }
 

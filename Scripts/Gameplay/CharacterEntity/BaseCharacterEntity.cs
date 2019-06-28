@@ -14,6 +14,7 @@ namespace MultiplayerARPG
     public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData, IAttackerEntity
     {
         public const float ACTION_COMMAND_DELAY = 0.2f;
+        public const float RESPAWN_GROUNDED_CHECK_DURATION = 1f;
         public const int OVERLAP_COLLIDER_SIZE_FOR_ATTACK = 256;
         public const int OVERLAP_COLLIDER_SIZE_FOR_FIND = 32;
 
@@ -69,6 +70,7 @@ namespace MultiplayerARPG
         public float castingSkillDuration { get; protected set; }
         public float castingSkillCountDown { get; protected set; }
         public float moveSpeedRateWhileAttackOrUseSkill { get; protected set; }
+        public float respawnGroundedCheckCountDown { get; protected set; }
         #endregion
 
         #region Temp data
@@ -77,10 +79,11 @@ namespace MultiplayerARPG
         protected Collider[] overlapColliders_ForFindFunctions = new Collider[OVERLAP_COLLIDER_SIZE_FOR_FIND];
         protected Collider2D[] overlapColliders2D_ForFindFunctions = new Collider2D[OVERLAP_COLLIDER_SIZE_FOR_FIND];
         protected GameObject tempGameObject;
+        protected bool tempEnableMovement;
         #endregion
 
-        public override int MaxHp { get { return CacheMaxHp; } }
-        public float MoveAnimationSpeedMultiplier { get { return gameplayRule.GetMoveSpeed(this) / CacheBaseMoveSpeed; } }
+        public override sealed int MaxHp { get { return CacheMaxHp; } }
+        public override sealed float MoveAnimationSpeedMultiplier { get { return gameplayRule.GetMoveSpeed(this) / CacheBaseMoveSpeed; } }
         public abstract int DataId { get; set; }
         public CharacterHitBox[] HitBoxes { get; protected set; }
         public bool HasAimPosition { get; protected set; }
@@ -149,7 +152,6 @@ namespace MultiplayerARPG
             base.EntityAwake();
             gameObject.layer = gameInstance.characterLayer;
             animActionType = AnimActionType.None;
-            model = ModelManager.ActiveModel;
             isRecaching = true;
             MigrateTransforms();
             HitBoxes = GetComponentsInChildren<CharacterHitBox>();
@@ -226,13 +228,31 @@ namespace MultiplayerARPG
             Profiler.BeginSample("BaseCharacterEntity - Update");
             MakeCaches();
 
-            if (IsServer && !IsDead() && gameInstance.DimensionType == DimensionType.Dimension3D &&
-                CacheTransform.position.y <= gameManager.CurrentMapInfo.deadY)
+            tempEnableMovement = true;
+
+            if (RidingVehicleEntity != null)
+                tempEnableMovement = false;
+
+            if (respawnGroundedCheckCountDown <= 0)
             {
-                // Character will dead only when dimension type is 3D
-                CurrentHp = 0;
-                Killed(this);
+                if (gameInstance.DimensionType == DimensionType.Dimension3D &&
+                    CacheTransform.position.y <= gameManager.CurrentMapInfo.deadY)
+                {
+                    if (IsServer && !IsDead())
+                    {
+                        // Character will dead only when dimension type is 3D
+                        CurrentHp = 0;
+                        Killed(this);
+                    }
+                    // Disable movement when character dead
+                    tempEnableMovement = false;
+                }
             }
+            else
+            {
+                respawnGroundedCheckCountDown -= Time.deltaTime;
+            }
+
             // Clear data when character dead
             if (IsDead())
             {
@@ -240,13 +260,22 @@ namespace MultiplayerARPG
                 animActionType = AnimActionType.None;
                 isAttackingOrUsingSkill = false;
                 InterruptCastingSkill();
+                ExitVehicle();
             }
+
+            if (Movement != null && Movement.enabled != tempEnableMovement)
+                Movement.enabled = tempEnableMovement;
+
             // Update character model handler based on riding vehicle
-            ModelManager.UpdateVehicle(RidingVehicleEntity, RidingVehicle.seatIndex);
+            ModelManager.UpdateRidingVehicle(RidingVehicleType, RidingVehicle.seatIndex);
+            // Update current model
+            model = ModelManager.ActiveModel;
             // Update is dead state
             CharacterModel.SetIsDead(IsDead());
             // Update move speed multiplier
             CharacterModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
+            // Update movement animation
+            CharacterModel.SetMovementState(MovementState);
             // Update casting skill count down, will show gage at clients
             if (castingSkillCountDown > 0)
             {
@@ -261,7 +290,6 @@ namespace MultiplayerARPG
                 (CharacterModel as ICharacterModel2D).CurrentDirectionType = CurrentDirectionType;
             }
             Profiler.EndSample();
-            base.EntityUpdate();
         }
 
         #region Relates Objects
@@ -399,6 +427,7 @@ namespace MultiplayerARPG
             CurrentStamina = CacheMaxStamina;
             CurrentFood = CacheMaxFood;
             CurrentWater = CacheMaxWater;
+            respawnGroundedCheckCountDown = RESPAWN_GROUNDED_CHECK_DURATION;
             // Send OnRespawn to owner player only
             RequestOnRespawn();
         }
@@ -1048,6 +1077,7 @@ namespace MultiplayerARPG
         {
             // Warn that this character received damage to nearby characters
             List<BaseCharacterEntity> foundCharacters = FindAliveCharacters<BaseCharacterEntity>(gameInstance.enemySpottedNotifyDistance, true, false, false);
+            if (foundCharacters == null || foundCharacters.Count == 0) return;
             foreach (BaseCharacterEntity foundCharacter in foundCharacters)
             {
                 foundCharacter.NotifyEnemySpotted(this, enemy);
