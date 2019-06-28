@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class CharacterFootstepSoundComponent : BaseCharacterComponent
+    public class CharacterFootstepSoundComponent : BaseGameEntityComponent<BaseGameEntity>
     {
         public AudioSource audioSource;
         public FootstepSoundData soundData;
