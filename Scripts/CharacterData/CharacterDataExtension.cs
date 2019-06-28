@@ -50,6 +50,11 @@ public static partial class CharacterDataExtension
         {
             networkBehaviour.enabled = false;
         }
+        IEntityMovement[] movements = result.GetComponentsInChildren<IEntityMovement>();
+        foreach (IEntityMovement movement in movements)
+        {
+            movement.enabled = false;
+        }
         GameObject[] ownerObjects = result.ownerObjects;
         foreach (GameObject ownerObject in ownerObjects)
         {
