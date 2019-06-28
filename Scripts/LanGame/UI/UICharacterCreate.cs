@@ -132,8 +132,6 @@ namespace MultiplayerARPG
                 BaseCharacterModel characterModel = playerCharacterData.InstantiateModel(characterModelContainer);
                 CharacterModelByEntityId[playerCharacterData.EntityId] = characterModel;
                 characterModel.gameObject.SetActive(false);
-                characterModel.SetIsDead(false);
-                characterModel.UpdateMovementAnimation(MovementState.IsGrounded);
                 // Setup UI
                 if (ui != null)
                 {
@@ -149,6 +147,17 @@ namespace MultiplayerARPG
                 CacheCharacterSelectionManager.Select(0);
             else
                 OnSelectCharacter(firstData);
+        }
+
+        private void Update()
+        {
+            // Update model animation
+            if (SelectedModel != null)
+            {
+                SelectedModel.SetIsDead(false);
+                SelectedModel.SetMoveAnimationSpeedMultiplier(1);
+                SelectedModel.SetMovementState(MovementState.IsGrounded);
+            }
         }
 
         public override void Show()
