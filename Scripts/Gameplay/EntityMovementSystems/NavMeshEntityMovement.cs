@@ -183,7 +183,7 @@ namespace MultiplayerARPG
 
         public override void Teleport(Vector3 position)
         {
-            CacheNetTransform.Teleport(position, Quaternion.identity);
+            CacheNetTransform.Teleport(position, Quaternion.Euler(0, CacheEntity.MovementTransform.eulerAngles.y, 0));
         }
 
         public override void FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
