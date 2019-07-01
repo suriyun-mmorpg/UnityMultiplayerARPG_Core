@@ -15,13 +15,5 @@ namespace MultiplayerARPG
                 return true;
             }
         }
-
-        [SerializeField]
-        private float moveSpeed = 5f;
-
-        public override sealed float GetMoveSpeed()
-        {
-            return moveSpeed;
-        }
     }
 }

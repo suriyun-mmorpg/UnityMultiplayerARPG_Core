@@ -8,7 +8,7 @@ namespace MultiplayerARPG
         List<VehicleSeat> Seats { get; }
         bool IsDestroyWhenDriverExit { get; }
         bool IsAttackable(byte seatIndex);
-        void SetPassenger(byte seatIndex, IGameEntity gameEntity);
+        void SetPassenger(byte seatIndex, BaseGameEntity gameEntity);
         bool RemovePassenger(byte seatIndex);
         bool IsSeatAvailable(byte seatIndex);
         bool GetAvailableSeat(out byte seatIndex);

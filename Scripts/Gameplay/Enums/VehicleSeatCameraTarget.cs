@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerARPG
 {
-    public enum VehicleSeatCameraTarget
+    public enum VehicleSeatCameraTarget : byte
     {
         Vehicle,
         Passenger,
