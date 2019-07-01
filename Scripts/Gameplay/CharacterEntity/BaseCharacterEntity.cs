@@ -916,6 +916,9 @@ namespace MultiplayerARPG
                 return false;
             if (CacheDisallowAttack)
                 return false;
+            if (PassengingVehicleEntity != null &&
+                !PassengingVehicleSeat.canAttack)
+                return false;
             return true;
         }
 
@@ -924,6 +927,9 @@ namespace MultiplayerARPG
             if (!CanDoActions())
                 return false;
             if (CacheDisallowUseSkill)
+                return false;
+            if (PassengingVehicleEntity != null &&
+                !PassengingVehicleSeat.canUseSkill)
                 return false;
             return true;
         }
