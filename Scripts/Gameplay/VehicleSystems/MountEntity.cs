@@ -4,58 +4,24 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class MountEntity : BaseGameEntity, IVehicleEntity
+    public class MountEntity : BaseVehicleEntity
     {
-        [SerializeField]
-        private VehicleType vehicleType;
-        public VehicleType VehicleType { get { return vehicleType; } }
 
-        [Tooltip("Mount Entity have only 1 seat")]
-        [SerializeField]
-        private VehicleSeat seat;
-        private List<VehicleSeat> seats;
-        public List<VehicleSeat> Seats
+        public override sealed bool IsDestroyWhenDriverExit
         {
             get
             {
-                if (seats == null)
-                {
-                    seats = new List<VehicleSeat>();
-                    seats.Add(seat);
-                }
-                return seats;
+                // Mount always destroyed when driver exit
+                return true;
             }
         }
 
         [SerializeField]
         private float moveSpeed = 5f;
 
-        protected override sealed void EntityAwake()
-        {
-            base.EntityAwake();
-            gameObject.layer = gameInstance.characterLayer;
-        }
-
         public override sealed float GetMoveSpeed()
         {
             return moveSpeed;
-        }
-
-        public bool IsDriveable(byte seatIndex)
-        {
-            // Mount entity always driveable
-            return true;
-        }
-
-        public bool IsAttackable(byte seatIndex)
-        {
-            return seat.canAttack;
-        }
-
-        public bool IsDestroyWhenExit(byte seatIndex)
-        {
-            // Mount entity always destroyed when exit
-            return true;
         }
     }
 }

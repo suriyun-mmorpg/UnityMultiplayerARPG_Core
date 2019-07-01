@@ -27,7 +27,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer || mountEntityPrefab == null)
                 return;
-            if (RidingVehicle.objectId > 0)
+            if (PassengingVehicle.objectId > 0)
                 ExitVehicle();
 
             // Instantiate new mount entity

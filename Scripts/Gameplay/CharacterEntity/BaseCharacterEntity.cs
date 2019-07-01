@@ -230,7 +230,7 @@ namespace MultiplayerARPG
 
             tempEnableMovement = true;
 
-            if (RidingVehicleEntity != null)
+            if (PassengingVehicleEntity != null)
                 tempEnableMovement = false;
 
             if (respawnGroundedCheckCountDown <= 0)
@@ -266,8 +266,8 @@ namespace MultiplayerARPG
             if (Movement != null && Movement.enabled != tempEnableMovement)
                 Movement.enabled = tempEnableMovement;
 
-            // Update character model handler based on riding vehicle
-            ModelManager.UpdateRidingVehicle(RidingVehicleType, RidingVehicle.seatIndex);
+            // Update character model handler based on passenging vehicle
+            ModelManager.UpdatePassengingVehicle(PassengingVehicleType, PassengingVehicle.seatIndex);
             // Update current model
             model = ModelManager.ActiveModel;
             // Update is dead state

@@ -111,7 +111,7 @@ namespace MultiplayerARPG
         }
 #endif
 
-        public void UpdateRidingVehicle(VehicleType vehicleType, byte seatIndex)
+        public void UpdatePassengingVehicle(VehicleType vehicleType, byte seatIndex)
         {
             if (vehicleType != null)
             {

@@ -7,7 +7,7 @@ namespace MultiplayerARPG
     {
         public Transform rideTransform;
         public Transform exitTransform;
-        public bool canDrive;
         public bool canAttack;
+        public VehicleSeatCameraTarget cameraTarget;
     }
 }

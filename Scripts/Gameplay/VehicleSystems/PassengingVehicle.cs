@@ -7,7 +7,7 @@ using LiteNetLibManager;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct RidingVehicle : INetSerializable
+    public struct PassengingVehicle : INetSerializable
     {
         public uint objectId;
         public byte seatIndex;
@@ -26,9 +26,9 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public class SyncFieldRidingVehicle : LiteNetLibSyncField<RidingVehicle>
+    public class SyncFieldPassengingVehicle : LiteNetLibSyncField<PassengingVehicle>
     {
-        protected override bool IsValueChanged(RidingVehicle newValue)
+        protected override bool IsValueChanged(PassengingVehicle newValue)
         {
             return true;
         }

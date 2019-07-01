@@ -6,8 +6,11 @@ namespace MultiplayerARPG
     {
         VehicleType VehicleType { get; }
         List<VehicleSeat> Seats { get; }
-        bool IsDriveable(byte seatIndex);
+        bool IsDestroyWhenDriverExit { get; }
         bool IsAttackable(byte seatIndex);
-        bool IsDestroyWhenExit(byte seatIndex);
+        void SetPassenger(byte seatIndex, IGameEntity gameEntity);
+        bool RemovePassenger(byte seatIndex);
+        bool IsSeatAvailable(byte seatIndex);
+        bool GetAvailableSeat(out byte seatIndex);
     }
 }

@@ -50,28 +50,28 @@ namespace MultiplayerARPG
         // Movement data
         [SerializeField]
         protected SyncFieldByte movementState = new SyncFieldByte();
-        public virtual MovementState MovementState
+        public MovementState MovementState
         {
             get { return (MovementState)movementState.Value; }
             set { movementState.Value = (byte)value; }
         }
         [SerializeField]
         protected SyncFieldVector2 currentDirection = new SyncFieldVector2();
-        public virtual Vector2 CurrentDirection
+        public Vector2 CurrentDirection
         {
             get { return currentDirection.Value; }
             set { currentDirection.Value = value; }
         }
-        public virtual DirectionType2D CurrentDirectionType
+        public DirectionType2D CurrentDirectionType
         {
             get { return GameplayUtils.GetDirectionTypeByVector2(CurrentDirection); }
         }
         [SerializeField]
-        protected SyncFieldRidingVehicle ridingVehicle = new SyncFieldRidingVehicle();
-        public virtual RidingVehicle RidingVehicle
+        protected SyncFieldPassengingVehicle passengingVehicle = new SyncFieldPassengingVehicle();
+        public PassengingVehicle PassengingVehicle
         {
-            get { return ridingVehicle.Value; }
-            set { ridingVehicle.Value = value; }
+            get { return passengingVehicle.Value; }
+            set { passengingVehicle.Value = value; }
         }
 
         protected Vector3? teleportingPosition;
@@ -89,6 +89,29 @@ namespace MultiplayerARPG
                 if (cacheTransform == null)
                     cacheTransform = GetComponent<Transform>();
                 return cacheTransform;
+            }
+        }
+
+        [Tooltip("Transform for position which camera will look at")]
+        [SerializeField]
+        private Transform cameraTargetTransform;
+        public Transform CameraTargetTransform
+        {
+            get
+            {
+                if (cameraTargetTransform == null)
+                    cameraTargetTransform = CacheTransform;
+                if (PassengingVehicleEntity != null)
+                {
+                    if (PassengingVehicleSeat.cameraTarget == VehicleSeatCameraTarget.Vehicle)
+                    {
+                        if (PassengingVehicleEntity is BaseGameEntity)
+                            return (PassengingVehicleEntity as BaseGameEntity).CameraTargetTransform;
+                        else
+                            return PassengingVehicleEntity.transform;
+                    }
+                }
+                return cameraTargetTransform;
             }
         }
 
@@ -110,47 +133,60 @@ namespace MultiplayerARPG
             }
             set { movement = value; }
         }
-
-        private uint dirtyVehicleObjectId;
-        private IVehicleEntity ridingVehicleEntity;
-        public IVehicleEntity RidingVehicleEntity
+        
+        public Transform MovementTransform
         {
             get
             {
-                if ((ridingVehicleEntity == null || dirtyVehicleObjectId != RidingVehicle.objectId) && RidingVehicle.objectId > 0)
+                if (PassengingVehicleEntity != null)
                 {
-                    dirtyVehicleObjectId = RidingVehicle.objectId;
-                    ridingVehicleEntity = null;
+                    // Track movement position by vehicle entity
+                    return PassengingVehicleEntity.transform;
+                }
+                return CacheTransform;
+            }
+        }
+
+        private uint dirtyVehicleObjectId;
+        private IVehicleEntity passengingVehicleEntity;
+        public IVehicleEntity PassengingVehicleEntity
+        {
+            get
+            {
+                if ((passengingVehicleEntity == null || dirtyVehicleObjectId != PassengingVehicle.objectId) && PassengingVehicle.objectId > 0)
+                {
+                    dirtyVehicleObjectId = PassengingVehicle.objectId;
+                    passengingVehicleEntity = null;
                     LiteNetLibIdentity identity;
-                    if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(RidingVehicle.objectId, out identity))
+                    if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(PassengingVehicle.objectId, out identity))
                     {
-                        ridingVehicleEntity = identity.GetComponent<IVehicleEntity>();
+                        passengingVehicleEntity = identity.GetComponent<IVehicleEntity>();
                     }
                 }
                 // Clear current vehicle
-                if (RidingVehicle.objectId == 0)
-                    ridingVehicleEntity = null;
-                return ridingVehicleEntity;
+                if (PassengingVehicle.objectId == 0)
+                    passengingVehicleEntity = null;
+                return passengingVehicleEntity;
             }
         }
 
-        public VehicleType RidingVehicleType
+        public VehicleType PassengingVehicleType
         {
             get
             {
-                if (RidingVehicleEntity == null)
+                if (PassengingVehicleEntity == null)
                     return null;
-                return RidingVehicleEntity.VehicleType;
+                return PassengingVehicleEntity.VehicleType;
             }
         }
 
-        public VehicleSeat RidingVehicleSeat
+        public VehicleSeat PassengingVehicleSeat
         {
             get
             {
-                if (RidingVehicleEntity == null)
+                if (PassengingVehicleEntity == null)
                     return default(VehicleSeat);
-                return RidingVehicleEntity.Seats[RidingVehicle.seatIndex];
+                return PassengingVehicleEntity.Seats[PassengingVehicle.seatIndex];
             }
         }
 
@@ -158,8 +194,8 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (RidingVehicleEntity != null)
-                    return RidingVehicleEntity;
+                if (PassengingVehicleEntity != null)
+                    return PassengingVehicleEntity;
                 return Movement;
             }
         }
@@ -246,10 +282,10 @@ namespace MultiplayerARPG
                 (Model as IMoveableModel).SetMovementState(MovementState);
             }
 
-            if (Movement != null && Movement.enabled != (RidingVehicleEntity == null))
+            if (Movement != null && Movement.enabled != (PassengingVehicleEntity == null))
             {
-                // Enable movement while not riding any vehicle
-                Movement.enabled = RidingVehicleEntity == null;
+                // Enable movement while not passenging any vehicle
+                Movement.enabled = PassengingVehicleEntity == null;
             }
         }
 
@@ -265,11 +301,11 @@ namespace MultiplayerARPG
         }
         protected virtual void EntityLateUpdate()
         {
-            if (RidingVehicleEntity != null)
+            if (PassengingVehicleEntity != null)
             {
                 // Snap character to vehicle seat
-                CacheTransform.position = RidingVehicleSeat.rideTransform.position;
-                CacheTransform.rotation = RidingVehicleSeat.rideTransform.rotation;
+                CacheTransform.position = PassengingVehicleSeat.rideTransform.position;
+                CacheTransform.rotation = PassengingVehicleSeat.rideTransform.rotation;
             }
         }
 
@@ -305,9 +341,14 @@ namespace MultiplayerARPG
             if (onSetup != null)
                 onSetup.Invoke();
             SetupNetElements();
-            RegisterNetFunction<uint>(NetFuncPlayEffect);
+            RegisterNetFunction<PackedUInt>(NetFuncPlayEffect);
+            RegisterNetFunction<PackedUInt>(NetFuncEnterVehicle);
+            RegisterNetFunction<PackedUInt, byte>(NetFuncEnterVehicleToSeat);
+            RegisterNetFunction(NetFuncExitVehicle);
+
             // Setup relates component
             InitialRequiredComponents();
+
             // Setup entity movement here to make it able to register net elements / functions
             if (Movement != null)
                 Movement.EntityOnSetup(this);
@@ -334,9 +375,9 @@ namespace MultiplayerARPG
             currentDirection.deliveryMethod = DeliveryMethod.Sequenced;
             currentDirection.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             currentDirection.doNotSyncInitialDataImmediately = true;
-            ridingVehicle.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            ridingVehicle.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            ridingVehicle.doNotSyncInitialDataImmediately = true;
+            passengingVehicle.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            passengingVehicle.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            passengingVehicle.doNotSyncInitialDataImmediately = true;
         }
 
         /// <summary>
@@ -349,21 +390,65 @@ namespace MultiplayerARPG
         /// This will be called at every clients to play any effect
         /// </summary>
         /// <param name="effectId"></param>
-        protected virtual void NetFuncPlayEffect(uint effectId)
+        protected void NetFuncPlayEffect(PackedUInt effectId)
         {
             GameEffectCollection gameEffectCollection;
             if (Model == null || !GameInstance.GameEffectCollections.TryGetValue(effectId, out gameEffectCollection))
                 return;
             Model.InstantiateEffect(gameEffectCollection.effects);
         }
+
+        protected void NetFuncEnterVehicle(PackedUInt objectId)
+        {
+            LiteNetLibIdentity identity;
+            if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(objectId, out identity))
+            {
+                IVehicleEntity vehicleEntity = identity.GetComponent<IVehicleEntity>();
+                byte seatIndex;
+                if (vehicleEntity != null && 
+                    vehicleEntity.GetAvailableSeat(out seatIndex))
+                    EnterVehicle(vehicleEntity, seatIndex);
+            }
+        }
+
+        protected void NetFuncEnterVehicleToSeat(PackedUInt objectId, byte seatIndex)
+        {
+            LiteNetLibIdentity identity;
+            if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(objectId, out identity))
+            {
+                IVehicleEntity vehicleEntity = identity.GetComponent<IVehicleEntity>();
+                if (vehicleEntity != null)
+                    EnterVehicle(vehicleEntity, seatIndex);
+            }
+        }
+
+        protected void NetFuncExitVehicle()
+        {
+            ExitVehicle();
+        }
         #endregion
 
         #region Net Function Requests
-        public virtual void RequestPlayEffect(uint effectId)
+        public void RequestPlayEffect(uint effectId)
         {
             if (effectId <= 0)
                 return;
-            CallNetFunction(NetFuncPlayEffect, FunctionReceivers.All, effectId);
+            CallNetFunction(NetFuncPlayEffect, FunctionReceivers.All, new PackedUInt(effectId));
+        }
+
+        public void RequestEnterVehicle(uint objectId)
+        {
+            CallNetFunction(NetFuncEnterVehicle, FunctionReceivers.Server, new PackedUInt(objectId));
+        }
+
+        public void RequestEnterVehicleToSeat(uint objectId, byte seatIndex)
+        {
+            CallNetFunction(NetFuncEnterVehicleToSeat, FunctionReceivers.Server, new PackedUInt(objectId), seatIndex);
+        }
+
+        public void RequestExitVehicle()
+        {
+            CallNetFunction(NetFuncExitVehicle, FunctionReceivers.Server);
         }
         #endregion
 
@@ -439,55 +524,62 @@ namespace MultiplayerARPG
                 ActiveMovement.FindGroundedPosition(fromPosition, findDistance, out result);
         }
 
-        protected void EnterVehicle(IVehicleEntity vehicle, byte seatIndex)
+        protected bool EnterVehicle(IVehicleEntity vehicle, byte seatIndex)
         {
-            if (!IsServer || vehicle == null || RidingVehicle.objectId > 0)
-                return;
+            if (!IsServer || vehicle == null || PassengingVehicle.objectId > 0 || !vehicle.IsSeatAvailable(seatIndex))
+                return false;
+
+            // Set passenger to vehicle
+            vehicle.SetPassenger(seatIndex, this);
 
             // Set mount info
-            RidingVehicle ridingVehicle = new RidingVehicle()
+            PassengingVehicle passengingVehicle = new PassengingVehicle()
             {
                 objectId = vehicle.ObjectId,
                 seatIndex = seatIndex,
             };
-            RidingVehicle = ridingVehicle;
+            PassengingVehicle = passengingVehicle;
+
+            return true;
         }
 
         protected void ExitVehicle()
         {
-            if (!IsServer || RidingVehicleEntity == null)
+            if (!IsServer || PassengingVehicleEntity == null)
                 return;
 
-            uint vehicleObjectId = RidingVehicleEntity.ObjectId;
+            uint vehicleObjectId = PassengingVehicleEntity.ObjectId;
             bool isDestroying = false;
 
-            if (RidingVehicleEntity != null)
+            if (PassengingVehicleEntity != null)
             {
-                isDestroying = RidingVehicleEntity.IsDestroyWhenExit(RidingVehicle.seatIndex);
+                // Remove this from vehicle
+                PassengingVehicleEntity.RemovePassenger(PassengingVehicle.seatIndex);
+                isDestroying = PassengingVehicleEntity.IsDestroyWhenExit(PassengingVehicle.seatIndex);
 
                 Vector3 exitPosition = CacheTransform.position;
-                if (RidingVehicleSeat.exitTransform != null)
-                    exitPosition = RidingVehicleSeat.exitTransform.position;
+                if (PassengingVehicleSeat.exitTransform != null)
+                    exitPosition = PassengingVehicleSeat.exitTransform.position;
 
-                // Clear riding vehicle data
-                RidingVehicle ridingVehicle = RidingVehicle;
-                ridingVehicle.objectId = 0;
-                ridingVehicle.seatIndex = 0;
-                RidingVehicle = ridingVehicle;
+                // Clear passenging vehicle data
+                PassengingVehicle passengingVehicle = PassengingVehicle;
+                passengingVehicle.objectId = 0;
+                passengingVehicle.seatIndex = 0;
+                PassengingVehicle = passengingVehicle;
 
                 // Clear vehicle entity before teleport
-                ridingVehicleEntity = null;
+                passengingVehicleEntity = null;
 
                 // Teleport to exit transform
                 Teleport(exitPosition);
             }
             else
             {
-                // Not riding vehicle, just clear data
-                RidingVehicle ridingVehicle = RidingVehicle;
-                ridingVehicle.objectId = 0;
-                ridingVehicle.seatIndex = 0;
-                RidingVehicle = ridingVehicle;
+                // Not passenging vehicle, just clear data
+                PassengingVehicle passengingVehicle = PassengingVehicle;
+                passengingVehicle.objectId = 0;
+                passengingVehicle.seatIndex = 0;
+                PassengingVehicle = passengingVehicle;
             }
 
             // Destroy mount entity
