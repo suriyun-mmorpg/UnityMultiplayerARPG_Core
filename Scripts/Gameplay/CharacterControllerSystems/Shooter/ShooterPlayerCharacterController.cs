@@ -52,6 +52,7 @@ namespace MultiplayerARPG
         bool tempPressActivate;
         bool tempPressPickupItem;
         bool tempPressReload;
+        bool tempPressExitVehicle;
         bool isLeftHandAttacking;
         GameObject tempGameObject;
         BasePlayerCharacterEntity targetPlayer;
@@ -458,6 +459,7 @@ namespace MultiplayerARPG
                 tempPressActivate = InputManager.GetButtonDown("Activate");
                 tempPressPickupItem = InputManager.GetButtonDown("PickUpItem");
                 tempPressReload = InputManager.GetButtonDown("Reload");
+                tempPressExitVehicle = InputManager.GetButtonDown("ExitVehicle");
                 if (queueSkill != null || tempPressAttackRight || tempPressAttackLeft || tempPressActivate || PlayerCharacterEntity.IsPlayingActionAnimation())
                 {
                     // Find forward character / npc / building / warp entity from camera center
@@ -542,6 +544,11 @@ namespace MultiplayerARPG
                 {
                     // Reload ammo when press the button
                     ReloadAmmo();
+                }
+                else if (tempPressExitVehicle)
+                {
+                    // Exit vehicle
+                    PlayerCharacterEntity.RequestExitVehicle();
                 }
                 else
                 {

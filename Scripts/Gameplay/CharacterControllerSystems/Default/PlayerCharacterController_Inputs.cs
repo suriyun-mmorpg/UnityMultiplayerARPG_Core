@@ -90,6 +90,11 @@ namespace MultiplayerARPG
                         }
                     }
                 }
+                // Exit vehicle
+                if (InputManager.GetButtonDown("ExitVehicle"))
+                {
+                    PlayerCharacterEntity.RequestExitVehicle();
+                }
                 // Auto reload
                 if (PlayerCharacterEntity.EquipWeapons.rightHand.IsAmmoEmpty() ||
                     PlayerCharacterEntity.EquipWeapons.leftHand.IsAmmoEmpty())
