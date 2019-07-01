@@ -557,7 +557,7 @@ namespace MultiplayerARPG
                 PassengingVehicleEntity.RemovePassenger(PassengingVehicle.seatIndex);
                 isDestroying = PassengingVehicleEntity.IsDestroyWhenExit(PassengingVehicle.seatIndex);
 
-                Vector3 exitPosition = CacheTransform.position;
+                Vector3 exitPosition = PassengingVehicleEntity.transform.position;
                 if (PassengingVehicleSeat.exitTransform != null)
                     exitPosition = PassengingVehicleSeat.exitTransform.position;
 

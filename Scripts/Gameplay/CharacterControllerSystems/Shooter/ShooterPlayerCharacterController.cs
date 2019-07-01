@@ -96,7 +96,7 @@ namespace MultiplayerARPG
             if (characterEntity == null)
                 return;
 
-            tempLookAt = characterEntity.CacheTransform.rotation;
+            tempLookAt = MovementTransform.rotation;
 
             SetupEquipWeapons(characterEntity.EquipWeapons);
 
@@ -213,7 +213,7 @@ namespace MultiplayerARPG
             Ray ray = CacheGameplayCameraControls.CacheCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
             Vector3 forward = CacheGameplayCameraControls.CacheCameraTransform.forward;
             Vector3 right = CacheGameplayCameraControls.CacheCameraTransform.right;
-            float distanceFromOrigin = Vector3.Distance(ray.origin, PlayerCharacterEntity.CacheTransform.position);
+            float distanceFromOrigin = Vector3.Distance(ray.origin, MovementTransform.position);
             float aimDistance = distanceFromOrigin;
             float attackDistance = 0f;
             float attackFov = 90f;
@@ -253,8 +253,8 @@ namespace MultiplayerARPG
                 aimDistance += attackDistance;
             }
             actionLookDirection = aimPosition = ray.origin + ray.direction * aimDistance;
-            actionLookDirection.y = PlayerCharacterEntity.CacheTransform.position.y;
-            actionLookDirection = actionLookDirection - PlayerCharacterEntity.CacheTransform.position;
+            actionLookDirection.y = MovementTransform.position.y;
+            actionLookDirection = actionLookDirection - MovementTransform.position;
             actionLookDirection.Normalize();
             // Prepare variables to find nearest raycasted hit point
             float tempDistance;
@@ -271,7 +271,7 @@ namespace MultiplayerARPG
                     tempHitInfo = raycasts[tempCounter];
 
                     // Get distance between character and raycast hit point
-                    tempDistance = Vector3.Distance(PlayerCharacterEntity.CacheTransform.position, tempHitInfo.point);
+                    tempDistance = Vector3.Distance(MovementTransform.position, tempHitInfo.point);
                     // If this is damageable entity
                     tempDamageableEntity = tempHitInfo.collider.GetComponent<IDamageableEntity>();
                     if (tempDamageableEntity != null && tempDistance <= attackDistance)
@@ -474,7 +474,7 @@ namespace MultiplayerARPG
                             targetBuilding = SelectedEntity as BuildingEntity;
                     }
                     // While attacking turn to camera forward
-                    tempCalculateAngle = Vector3.Angle(PlayerCharacterEntity.CacheTransform.forward, actionLookDirection);
+                    tempCalculateAngle = Vector3.Angle(MovementTransform.forward, actionLookDirection);
                     if (tempCalculateAngle > 15f)
                     {
                         if (queueSkill != null && queueSkill.IsAttack())
@@ -784,7 +784,7 @@ namespace MultiplayerARPG
 
         public bool FindTarget(GameObject target, float actDistance, int layerMask)
         {
-            int tempCount = OverlapObjects(CharacterTransform.position, actDistance, layerMask);
+            int tempCount = OverlapObjects(MovementTransform.position, actDistance, layerMask);
             for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
                 tempGameObject = overlapColliders[tempCounter].gameObject;

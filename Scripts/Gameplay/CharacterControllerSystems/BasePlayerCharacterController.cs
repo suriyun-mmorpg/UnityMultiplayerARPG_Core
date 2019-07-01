@@ -29,9 +29,14 @@ namespace MultiplayerARPG
             }
         }
 
-        public Transform CharacterTransform
+        public Transform CameraTargetTransform
         {
-            get { return PlayerCharacterEntity.CacheTransform; }
+            get { return PlayerCharacterEntity.CameraTargetTransform; }
+        }
+
+        public Transform MovementTransform
+        {
+            get { return PlayerCharacterEntity.MovementTransform; }
         }
 
         public float StoppingDistance
@@ -70,18 +75,21 @@ namespace MultiplayerARPG
                 CacheUISceneGameplay = Instantiate(gameInstance.UISceneGameplayPrefab);
         }
 
+        protected virtual void Update()
+        {
+            // Instantiate Minimap camera, it will render to render texture
+            if (CacheGameplayCameraControls != null)
+                CacheGameplayCameraControls.target = CameraTargetTransform;
+
+            // Instantiate Minimap camera, it will render to render texture
+            if (CacheMinimapCameraControls != null)
+                CacheMinimapCameraControls.target = CameraTargetTransform;
+        }
+
         protected virtual void Setup(BasePlayerCharacterEntity characterEntity)
         {
             if (characterEntity == null)
                 return;
-
-            // Instantiate Minimap camera, it will render to render texture
-            if (CacheGameplayCameraControls != null)
-                CacheGameplayCameraControls.target = characterEntity.CacheTransform;
-
-            // Instantiate Minimap camera, it will render to render texture
-            if (CacheMinimapCameraControls != null)
-                CacheMinimapCameraControls.target = characterEntity.CacheTransform;
 
             // Instantiate gameplay UI
             if (CacheUISceneGameplay != null)
@@ -280,9 +288,7 @@ namespace MultiplayerARPG
                 CacheUISceneGameplay.UpdateStorageItems();
         }
         #endregion
-
-        protected virtual void Update() { }
-
+        
         public void ConfirmBuild()
         {
             if (CurrentBuildingEntity != null)

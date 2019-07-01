@@ -49,8 +49,8 @@ namespace MultiplayerARPG
             switch (gameInstance.DimensionType)
             {
                 case DimensionType.Dimension3D:
-                    tempVector3 = CharacterTransform.position + (CharacterTransform.forward * CurrentBuildingEntity.characterForwardDistance);
-                    CurrentBuildingEntity.CacheTransform.eulerAngles = GetBuildingPlaceEulerAngles(CharacterTransform.eulerAngles);
+                    tempVector3 = MovementTransform.position + (MovementTransform.forward * CurrentBuildingEntity.characterForwardDistance);
+                    CurrentBuildingEntity.CacheTransform.eulerAngles = GetBuildingPlaceEulerAngles(MovementTransform.eulerAngles);
                     CurrentBuildingEntity.buildingArea = null;
                     tempCount = Physics.RaycastNonAlloc(new Ray(tempVector3 + (Vector3.up * 2.5f), Vector3.down), raycasts, 5f, gameInstance.GetBuildLayerMask());
                     break;
@@ -70,7 +70,7 @@ namespace MultiplayerARPG
             {
                 tempTransform = GetRaycastTransform(tempCounter);
                 tempVector3 = GetRaycastPoint(tempCounter);
-                if (Vector3.Distance(tempVector3, CharacterTransform.position) > gameInstance.buildDistance)
+                if (Vector3.Distance(tempVector3, MovementTransform.position) > gameInstance.buildDistance)
                     return false;
 
                 BuildingArea buildingArea = tempTransform.GetComponent<BuildingArea>();
@@ -130,7 +130,7 @@ namespace MultiplayerARPG
             Collider tempCollider = target.GetComponent<Collider>();
             if (tempCollider != null)
             {
-                Ray ray = new Ray(PlayerCharacterEntity.CacheTransform.position, (target.transform.position - PlayerCharacterEntity.CacheTransform.position).normalized);
+                Ray ray = new Ray(MovementTransform.position, (target.transform.position - MovementTransform.position).normalized);
                 float intersectDist;
                 return tempCollider.bounds.IntersectRay(ray, out intersectDist) && intersectDist < actDistance;
             }
@@ -138,7 +138,7 @@ namespace MultiplayerARPG
             Collider2D tempCollider2D = target.GetComponent<Collider2D>();
             if (tempCollider2D != null)
             {
-                Ray ray = new Ray(PlayerCharacterEntity.CacheTransform.position, (target.transform.position - PlayerCharacterEntity.CacheTransform.position).normalized);
+                Ray ray = new Ray(MovementTransform.position, (target.transform.position - MovementTransform.position).normalized);
                 float intersectDist;
                 return tempCollider2D.bounds.IntersectRay(ray, out intersectDist) && intersectDist < actDistance;
             }

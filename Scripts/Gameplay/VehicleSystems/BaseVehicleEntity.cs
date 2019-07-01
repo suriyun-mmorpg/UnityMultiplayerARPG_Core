@@ -21,7 +21,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private readonly Dictionary<byte, IGameEntity> riders = new Dictionary<byte, IGameEntity>();
+        private readonly Dictionary<byte, IGameEntity> passengers = new Dictionary<byte, IGameEntity>();
 
         public abstract bool IsDestroyWhenDriverExit { get; }
 
@@ -38,18 +38,18 @@ namespace MultiplayerARPG
 
         public void SetPassenger(byte seatIndex, IGameEntity gameEntity)
         {
-            if (!riders.ContainsKey(seatIndex))
-                riders.Add(seatIndex, gameEntity);
+            if (!passengers.ContainsKey(seatIndex))
+                passengers.Add(seatIndex, gameEntity);
         }
 
         public bool RemovePassenger(byte seatIndex)
         {
-            return riders.Remove(seatIndex);
+            return passengers.Remove(seatIndex);
         }
 
         public bool IsSeatAvailable(byte seatIndex)
         {
-            return riders.ContainsKey(seatIndex);
+            return !passengers.ContainsKey(seatIndex);
         }
 
         public bool GetAvailableSeat(out byte seatIndex)

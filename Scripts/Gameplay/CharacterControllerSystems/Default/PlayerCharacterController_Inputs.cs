@@ -86,7 +86,7 @@ namespace MultiplayerARPG
                         {
                             SetTarget(enemyEntityDetector.characters[findingEnemyIndex]);
                             if (SelectedEntity != null)
-                                targetLookDirection = (SelectedEntity.CacheTransform.position - PlayerCharacterEntity.CacheTransform.position).normalized;
+                                targetLookDirection = (SelectedEntity.CacheTransform.position - MovementTransform.position).normalized;
                         }
                     }
                 }
@@ -468,7 +468,7 @@ namespace MultiplayerARPG
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
                     // Turn character to target
-                    targetLookDirection = (targetEnemy.CacheTransform.position - PlayerCharacterEntity.CacheTransform.position).normalized;
+                    targetLookDirection = (targetEnemy.CacheTransform.position - MovementTransform.position).normalized;
                     if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetEnemy.CacheTransform.position))
                     {
                         // If has queue using skill, attack by the skill
@@ -492,7 +492,7 @@ namespace MultiplayerARPG
                     return;
                 }
                 float actDistance = gameInstance.conversationDistance - StoppingDistance;
-                if (Vector3.Distance(CharacterTransform.position, targetPlayer.CacheTransform.position) <= actDistance)
+                if (Vector3.Distance(MovementTransform.position, targetPlayer.CacheTransform.position) <= actDistance)
                 {
                     PlayerCharacterEntity.StopMove();
                     // TODO: do something
@@ -510,7 +510,7 @@ namespace MultiplayerARPG
                     return;
                 }
                 float actDistance = gameInstance.conversationDistance - StoppingDistance;
-                if (Vector3.Distance(CharacterTransform.position, targetMonster.CacheTransform.position) <= actDistance)
+                if (Vector3.Distance(MovementTransform.position, targetMonster.CacheTransform.position) <= actDistance)
                 {
                     PlayerCharacterEntity.StopMove();
                     // TODO: do something
@@ -521,7 +521,7 @@ namespace MultiplayerARPG
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetNpc))
             {
                 float actDistance = gameInstance.conversationDistance - StoppingDistance;
-                if (Vector3.Distance(CharacterTransform.position, targetNpc.CacheTransform.position) <= actDistance)
+                if (Vector3.Distance(MovementTransform.position, targetNpc.CacheTransform.position) <= actDistance)
                 {
                     if (lastNpcObjectId != targetNpc.ObjectId)
                     {
@@ -536,7 +536,7 @@ namespace MultiplayerARPG
             else if (PlayerCharacterEntity.TryGetTargetEntity(out targetItemDrop))
             {
                 float actDistance = gameInstance.pickUpItemDistance - StoppingDistance;
-                if (Vector3.Distance(CharacterTransform.position, targetItemDrop.CacheTransform.position) <= actDistance)
+                if (Vector3.Distance(MovementTransform.position, targetItemDrop.CacheTransform.position) <= actDistance)
                 {
                     PlayerCharacterEntity.RequestPickupItem(targetItemDrop.ObjectId);
                     PlayerCharacterEntity.StopMove();
@@ -551,7 +551,7 @@ namespace MultiplayerARPG
                 if (CacheUISceneGameplay != null)
                     uiCurrentBuilding = CacheUISceneGameplay.uiCurrentBuilding;
                 float actDistance = gameInstance.conversationDistance - StoppingDistance;
-                if (Vector3.Distance(CharacterTransform.position, targetBuilding.CacheTransform.position) <= actDistance)
+                if (Vector3.Distance(MovementTransform.position, targetBuilding.CacheTransform.position) <= actDistance)
                 {
                     PlayerCharacterEntity.StopMove();
                     if (IsEditingBuilding)
@@ -596,7 +596,7 @@ namespace MultiplayerARPG
                     // Stop movement to attack
                     PlayerCharacterEntity.StopMove();
                     // Turn character to target
-                    targetLookDirection = (targetHarvestable.CacheTransform.position - PlayerCharacterEntity.CacheTransform.position).normalized;
+                    targetLookDirection = (targetHarvestable.CacheTransform.position - MovementTransform.position).normalized;
                     if (PlayerCharacterEntity.IsPositionInFov(attackFov, targetHarvestable.CacheTransform.position))
                     {
                         if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking, targetHarvestable.OpponentAimTransform.position))
@@ -614,13 +614,13 @@ namespace MultiplayerARPG
                 return;
             Vector3 targetPosition = entity.CacheTransform.position;
             PlayerCharacterEntity.PointClickMovement(targetPosition);
-            targetLookDirection = (targetPosition - PlayerCharacterEntity.CacheTransform.position).normalized;
+            targetLookDirection = (targetPosition - MovementTransform.position).normalized;
         }
 
         protected void UpdateLookAtTarget()
         {
             if (destination != null)
-                targetLookDirection = (destination.Value - PlayerCharacterEntity.CacheTransform.position).normalized;
+                targetLookDirection = (destination.Value - MovementTransform.position).normalized;
             if (Vector3.Angle(tempLookAt * Vector3.forward, targetLookDirection) > 0)
             {
                 // Update rotation when angle difference more than 1
