@@ -305,8 +305,8 @@ namespace MultiplayerARPG
             if (PassengingVehicleEntity != null)
             {
                 // Snap character to vehicle seat
-                CacheTransform.position = PassengingVehicleSeat.rideTransform.position;
-                CacheTransform.rotation = PassengingVehicleSeat.rideTransform.rotation;
+                CacheTransform.position = PassengingVehicleSeat.passengingTransform.position;
+                CacheTransform.rotation = PassengingVehicleSeat.passengingTransform.rotation;
             }
         }
 
