@@ -291,16 +291,17 @@ namespace MultiplayerARPG
 
         private void LateUpdate()
         {
-            if (textTitle != null)
-                textTitle.text = Title;
-            if (textTitleB != null)
-                textTitleB.text = TitleB;
             EntityLateUpdate();
             if (onLateUpdate != null)
                 onLateUpdate.Invoke();
         }
         protected virtual void EntityLateUpdate()
         {
+            if (textTitle != null)
+                textTitle.text = Title;
+            if (textTitleB != null)
+                textTitleB.text = TitleB;
+
             if (PassengingVehicleEntity != null)
             {
                 // Snap character to vehicle seat
@@ -324,6 +325,8 @@ namespace MultiplayerARPG
         }
         protected virtual void EntityOnDestroy()
         {
+            // Exit vehicle when destroy
+            ExitVehicle();
             if (Movement != null)
                 Movement.EntityOnDestroy(this);
         }
