@@ -9,10 +9,6 @@ namespace MultiplayerARPG
 {
     public class GameEntityModel : MonoBehaviour
     {
-        [SerializeField]
-        private int dataId;
-        public int DataId { get { return dataId; } }
-
         [Tooltip("These object will be deactivate while hidding")]
         public GameObject[] hiddingObjects;
 
@@ -50,6 +46,8 @@ namespace MultiplayerARPG
 
         protected virtual void Awake() { }
 
+        protected virtual void OnValidate() { }
+
         protected virtual void OnDrawGizmos()
         {
 #if UNITY_EDITOR
@@ -62,17 +60,6 @@ namespace MultiplayerARPG
                     Gizmos.DrawWireSphere(effectContainer.transform.position, 0.1f);
                     Handles.Label(effectContainer.transform.position, effectContainer.effectSocket + "(Effect)");
                 }
-            }
-#endif
-        }
-
-        protected virtual void OnValidate()
-        {
-#if UNITY_EDITOR
-            if (!Application.isPlaying && dataId != name.GenerateHashId())
-            {
-                dataId = name.GenerateHashId();
-                EditorUtility.SetDirty(this);
             }
 #endif
         }

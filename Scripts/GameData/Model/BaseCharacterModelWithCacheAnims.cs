@@ -10,7 +10,6 @@ namespace MultiplayerARPG
     /// </summary>
     /// <typeparam name="TWeaponAnims"></typeparam>
     /// <typeparam name="TSkillAnims"></typeparam>
-    /// <typeparam name="TVehicleAnims"></typeparam>
     public abstract class BaseCharacterModelWithCacheAnims<TWeaponAnims, TSkillAnims> : BaseCharacterModel
         where TWeaponAnims : IWeaponAnims
         where TSkillAnims : ISkillAnims
@@ -21,9 +20,10 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (!allCacheAnims.ContainsKey(DataId))
-                    allCacheAnims.Add(DataId, new CacheAnimations(GetWeaponAnims(), GetSkillAnims()));
-                return allCacheAnims[DataId];
+                int instanceId = gameObject.GetInstanceID();
+                if (!allCacheAnims.ContainsKey(instanceId))
+                    allCacheAnims.Add(instanceId, new CacheAnimations(GetWeaponAnims(), GetSkillAnims()));
+                return allCacheAnims[instanceId];
             }
         }
         

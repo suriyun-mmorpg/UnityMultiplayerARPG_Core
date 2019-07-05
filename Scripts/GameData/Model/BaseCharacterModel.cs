@@ -12,6 +12,7 @@ namespace MultiplayerARPG
         [HideInInspector]
         public CharacterModelManager modelManager;
         public bool isMainModel { get { return modelManager != null && modelManager.MainModel == this; } }
+        public string modelId;
 
         [Header("Equipment Containers")]
         public EquipmentContainer[] equipmentContainers;
