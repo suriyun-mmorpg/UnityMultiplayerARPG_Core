@@ -269,6 +269,7 @@ namespace MultiplayerARPG
                 case SkillType.Active:
                     ApplySkillBuff(skill, level);
                     ApplySkillSummon(skill, level);
+                    ApplySkillMount(skill, level);
                     if (skill.skillAttackType != SkillAttackType.None)
                     {
                         CharacterBuff debuff = CharacterBuff.Empty;
