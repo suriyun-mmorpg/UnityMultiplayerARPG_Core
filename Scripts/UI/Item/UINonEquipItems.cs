@@ -110,7 +110,11 @@ namespace MultiplayerARPG
             int counter = 0;
             foreach (CharacterItem nonEquipItem in nonEquipItems)
             {
-                if (nonEquipItem.GetItem() == null) continue;
+                if (nonEquipItem.GetItem() == null)
+                {
+                    ++counter;
+                    continue;
+                }
                 if (string.IsNullOrEmpty(nonEquipItem.GetItem().category) ||
                     filterCategories == null || filterCategories.Count == 0 ||
                     filterCategories.Contains(nonEquipItem.GetItem().category))
