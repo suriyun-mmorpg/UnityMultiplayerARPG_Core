@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -7,6 +8,7 @@ namespace MultiplayerARPG
     public class UISceneHome : UIHistory
     {
         public UILanConnection uiLanConnection;
+        public UIDiscoveryList uiDiscoveryList;
         public UICharacterList uiCharacterList;
 
         public void OnClickSinglePlayer()
@@ -26,6 +28,17 @@ namespace MultiplayerARPG
             LanRpgNetworkManager networkManager = BaseGameNetworkManager.Singleton as LanRpgNetworkManager;
             networkManager.startType = LanRpgNetworkManager.GameStartType.Client;
             networkManager.networkAddress = uiLanConnection.NetworkAddress;
+            Next(uiCharacterList);
+        }
+
+        public void OnClickJoinDiscovery()
+        {
+            LanRpgNetworkManager networkManager = BaseGameNetworkManager.Singleton as LanRpgNetworkManager;
+            networkManager.startType = LanRpgNetworkManager.GameStartType.Client;
+
+            IPEndPoint remoteEndPoint = uiDiscoveryList.GetSelectedRemoteEndPoint();
+            networkManager.networkAddress = remoteEndPoint.Address.ToString();
+            networkManager.networkPort = remoteEndPoint.Port;
             Next(uiCharacterList);
         }
 
