@@ -60,6 +60,8 @@ namespace MultiplayerARPG
         public Vector3 spawnPosition { get; protected set; }
         public override int DataId { get { return monsterCharacter.DataId; } set { } }
 
+        private readonly HashSet<uint> looters = new HashSet<uint>();
+
         protected override void EntityAwake()
         {
             base.EntityAwake();
@@ -374,7 +376,6 @@ namespace MultiplayerARPG
                 return;
 
             Reward reward = gameplayRule.MakeMonsterReward(monsterCharacter);
-            HashSet<uint> looters = new HashSet<uint>();
             BasePlayerCharacterEntity lastPlayer = null;
             if (lastAttacker != null)
                 lastPlayer = lastAttacker as BasePlayerCharacterEntity;
@@ -495,23 +496,10 @@ namespace MultiplayerARPG
                 }   // End for-loop
             }   // End count recived damage record count
             receivedDamageRecords.Clear();
-            foreach (ItemDrop randomItem in monsterCharacter.randomItems)
-            {
-                if (Random.value <= randomItem.dropRate)
-                {
-                    Item item = randomItem.item;
-                    short amount = randomItem.amount;
-                    if (item != null && GameInstance.Items.ContainsKey(item.DataId))
-                    {
-                        // Drop item to the ground
-                        if (amount > item.maxStack)
-                            amount = item.maxStack;
-                        CharacterItem dropData = CharacterItem.Create(item, 1);
-                        dropData.amount = amount;
-                        ItemDropEntity.DropItem(this, dropData, looters);
-                    }
-                }
-            }
+            // Drop items
+            monsterCharacter.RandomItems(OnRandomDropItem);
+            // Clear looters because they are already set to dropped items
+            looters.Clear();
 
             if (lastPlayer != null)
             {
@@ -524,6 +512,16 @@ namespace MultiplayerARPG
                 // If not summoned by someone, destroy and respawn it
                 DestroyAndRespawn();
             }
+        }
+
+        private void OnRandomDropItem(Item item, short amount)
+        {
+            // Drop item to the ground
+            if (amount > item.maxStack)
+                amount = item.maxStack;
+            CharacterItem dropData = CharacterItem.Create(item, 1);
+            dropData.amount = amount;
+            ItemDropEntity.DropItem(this, dropData, looters);
         }
 
         public override void Respawn()

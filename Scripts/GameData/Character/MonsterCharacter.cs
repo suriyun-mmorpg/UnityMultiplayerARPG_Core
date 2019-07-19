@@ -1,9 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace MultiplayerARPG
 {
@@ -45,7 +42,9 @@ namespace MultiplayerARPG
         public int randomExpMax;
         public int randomGoldMin;
         public int randomGoldMax;
+        public byte maxDropItems = 5;
         public ItemDrop[] randomItems;
+        public ItemDropTable itemDropTable;
 
         public int RandomExp()
         {
@@ -65,23 +64,41 @@ namespace MultiplayerARPG
             return Random.Range(min, max);
         }
 
-        public List<ItemAmount> RandomItems()
+        public void RandomItems(System.Action<Item, short> onRandomItem)
         {
-            List<ItemAmount> rewards = new List<ItemAmount>();
-            foreach (ItemDrop randomItem in randomItems)
+            int countDrops = 0;
+            ItemDrop randomItem;
+            int loopCounter;
+
+            for (loopCounter = 0; loopCounter < randomItems.Length && countDrops < maxDropItems; ++loopCounter)
             {
+                ++countDrops;
+                randomItem = randomItems[loopCounter];
                 if (randomItem.item == null ||
                     randomItem.amount == 0 ||
                     !GameInstance.Items.ContainsKey(randomItem.item.DataId) ||
                     Random.value > randomItem.dropRate)
                     continue;
-                rewards.Add(new ItemAmount()
-                {
-                    item = randomItem.item,
-                    amount = randomItem.amount,
-                });
+
+                onRandomItem.Invoke(randomItem.item, randomItem.amount);
             }
-            return rewards;
+
+            // Random drop item from table
+            if (itemDropTable != null && countDrops < maxDropItems)
+            {
+                for (loopCounter = 0; loopCounter < itemDropTable.randomItems.Length && countDrops < maxDropItems; ++loopCounter)
+                {
+                    ++countDrops;
+                    randomItem = itemDropTable.randomItems[loopCounter];
+                    if (randomItem.item == null ||
+                        randomItem.amount == 0 ||
+                        !GameInstance.Items.ContainsKey(randomItem.item.DataId) ||
+                        Random.value > randomItem.dropRate)
+                        continue;
+
+                    onRandomItem.Invoke(randomItem.item, randomItem.amount);
+                }
+            }
         }
     }
 }
