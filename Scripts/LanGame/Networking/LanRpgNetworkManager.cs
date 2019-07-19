@@ -36,6 +36,19 @@ namespace MultiplayerARPG
         private readonly Dictionary<StorageId, List<CharacterItem>> storageItems = new Dictionary<StorageId, List<CharacterItem>>();
         private readonly Dictionary<StorageId, HashSet<uint>> usingStorageCharacters = new Dictionary<StorageId, HashSet<uint>>();
 
+        private LiteNetLibDiscovery cacheDiscovery;
+        public LiteNetLibDiscovery CacheDiscovery
+        {
+            get
+            {
+                if (cacheDiscovery == null)
+                    cacheDiscovery = GetComponent<LiteNetLibDiscovery>();
+                if (cacheDiscovery == null)
+                    cacheDiscovery = gameObject.AddComponent<LiteNetLibDiscovery>();
+                return cacheDiscovery;
+            }
+        }
+
         public void StartGame()
         {
             NetworkSetting gameServiceConnection = gameInstance.NetworkSetting;
@@ -46,16 +59,39 @@ namespace MultiplayerARPG
                     networkPort = gameServiceConnection.networkPort;
                     maxConnections = gameServiceConnection.maxConnections;
                     StartHost(false);
+                    // Set discovery data by selected character
+                    CacheDiscovery.data = JsonUtility.ToJson(new DiscoveryData()
+                    {
+                        id = selectedCharacter.Id,
+                        characterName = selectedCharacter.CharacterName,
+                        level = selectedCharacter.Level
+                    });
+                    // Stop discovery client because game started
+                    CacheDiscovery.StopClient();
+                    // Start discovery server to allow clients to connect
+                    CacheDiscovery.StartServer();
                     break;
                 case GameStartType.SinglePlayer:
                     SetMapInfo(selectedCharacter.CurrentMapName);
                     StartHost(true);
+                    // Stop discovery client because game started
+                    CacheDiscovery.StopClient();
                     break;
                 case GameStartType.Client:
                     networkPort = gameServiceConnection.networkPort;
                     StartClient();
+                    // Stop discovery client because game started
+                    CacheDiscovery.StopClient();
                     break;
             }
+        }
+
+        public override void OnStopHost()
+        {
+            base.OnStopHost();
+            // Stop both client and server
+            CacheDiscovery.StopClient();
+            CacheDiscovery.StopServer();
         }
 
         protected override void Update()

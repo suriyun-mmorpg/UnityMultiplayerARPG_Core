@@ -8,7 +8,6 @@ namespace MultiplayerARPG
     public class UISceneHome : UIHistory
     {
         public UILanConnection uiLanConnection;
-        public UIDiscoveryList uiDiscoveryList;
         public UICharacterList uiCharacterList;
 
         public void OnClickSinglePlayer()
@@ -36,7 +35,7 @@ namespace MultiplayerARPG
             LanRpgNetworkManager networkManager = BaseGameNetworkManager.Singleton as LanRpgNetworkManager;
             networkManager.startType = LanRpgNetworkManager.GameStartType.Client;
 
-            IPEndPoint remoteEndPoint = uiDiscoveryList.GetSelectedRemoteEndPoint();
+            IPEndPoint remoteEndPoint = uiLanConnection.GetSelectedRemoteEndPoint();
             networkManager.networkAddress = remoteEndPoint.Address.ToString();
             networkManager.networkPort = remoteEndPoint.Port;
             Next(uiCharacterList);
