@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -14,7 +15,7 @@ namespace MultiplayerARPG
         public Button buttonStart;
         public Button buttonDelete;
         [Header("Event")]
-        public CharacterDataEvent eventOnSelectCharacter;
+        public UnityEvent eventOnNoCharacter;
 
         private UIList cacheCharacterList;
         public UIList CacheCharacterList
@@ -73,25 +74,34 @@ namespace MultiplayerARPG
                 if (selectableCharacter == null || !GameInstance.PlayerCharacters.ContainsKey(selectableCharacter.DataId))
                     selectableCharacters.RemoveAt(i);
             }
-            selectableCharacters.Sort(new PlayerCharacterDataLastUpdateComparer().Desc());
-            CacheCharacterList.Generate(selectableCharacters, (index, characterData, ui) =>
+
+            if (selectableCharacters.Count > 0)
             {
-                // Cache player character to dictionary, we will use it later
-                PlayerCharacterDataById[characterData.Id] = characterData;
-                // Setup UIs
-                UICharacter uiCharacter = ui.GetComponent<UICharacter>();
-                uiCharacter.Data = characterData;
-                // Select trigger when add first entry so deactivate all models is okay beacause first model will active
-                BaseCharacterModel characterModel = characterData.InstantiateModel(characterModelContainer);
-                if (characterModel != null)
+                selectableCharacters.Sort(new PlayerCharacterDataLastUpdateComparer().Desc());
+                CacheCharacterList.Generate(selectableCharacters, (index, characterData, ui) =>
                 {
-                    CharacterModelById[characterData.Id] = characterModel;
-                    characterModel.gameObject.SetActive(false);
-                    characterModel.SetEquipWeapons(characterData.EquipWeapons);
-                    characterModel.SetEquipItems(characterData.EquipItems);
-                    CacheCharacterSelectionManager.Add(uiCharacter);
-                }
-            });
+                    // Cache player character to dictionary, we will use it later
+                    PlayerCharacterDataById[characterData.Id] = characterData;
+                    // Setup UIs
+                    UICharacter uiCharacter = ui.GetComponent<UICharacter>();
+                    uiCharacter.Data = characterData;
+                    // Select trigger when add first entry so deactivate all models is okay beacause first model will active
+                    BaseCharacterModel characterModel = characterData.InstantiateModel(characterModelContainer);
+                    if (characterModel != null)
+                    {
+                        CharacterModelById[characterData.Id] = characterModel;
+                        characterModel.gameObject.SetActive(false);
+                        characterModel.SetEquipWeapons(characterData.EquipWeapons);
+                        characterModel.SetEquipItems(characterData.EquipItems);
+                        CacheCharacterSelectionManager.Add(uiCharacter);
+                    }
+                });
+            }
+            else
+            {
+                if (eventOnNoCharacter != null)
+                    eventOnNoCharacter.Invoke();
+            }
         }
 
         private void Update()
