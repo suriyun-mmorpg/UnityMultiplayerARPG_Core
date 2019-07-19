@@ -66,19 +66,19 @@ namespace MultiplayerARPG
         #endregion
 
         #region Fields/Interface implementation
-        public virtual string Id { get { return id.Value; } set { id.Value = value; } }
-        public virtual int EntityId { get { return Identity.HashAssetId; } set { } }
-        public virtual string CharacterName { get { return syncTitle.Value; } set { syncTitle.Value = value; } }
-        public virtual short Level { get { return level.Value; } set { level.Value = value; } }
-        public virtual int Exp { get { return exp.Value; } set { exp.Value = value; } }
-        public virtual int CurrentMp { get { return currentMp.Value; } set { currentMp.Value = value; } }
-        public virtual int CurrentStamina { get { return currentStamina.Value; } set { currentStamina.Value = value; } }
-        public virtual int CurrentFood { get { return currentFood.Value; } set { currentFood.Value = value; } }
-        public virtual int CurrentWater { get { return currentWater.Value; } set { currentWater.Value = value; } }
-        public virtual EquipWeapons EquipWeapons { get { return equipWeapons.Value; } set { equipWeapons.Value = value; } }
-        public virtual bool IsHidding { get { return isHidding.Value; } set { isHidding.Value = value; } }
-        // Override fields
-        public override string Title { get { return CharacterName; } set { } }
+        public string Id { get { return id.Value; } set { id.Value = value; } }
+        public int EntityId { get { return Identity.HashAssetId; } set { } }
+        public string CharacterName { get { return syncTitle.Value; } set { syncTitle.Value = value; } }
+        public virtual string DisplayCharacterName { get { return CharacterName; } }
+        public short Level { get { return level.Value; } set { level.Value = value; } }
+        public virtual short DisplayLevel { get { return Level; } }
+        public int Exp { get { return exp.Value; } set { exp.Value = value; } }
+        public int CurrentMp { get { return currentMp.Value; } set { currentMp.Value = value; } }
+        public int CurrentStamina { get { return currentStamina.Value; } set { currentStamina.Value = value; } }
+        public int CurrentFood { get { return currentFood.Value; } set { currentFood.Value = value; } }
+        public int CurrentWater { get { return currentWater.Value; } set { currentWater.Value = value; } }
+        public EquipWeapons EquipWeapons { get { return equipWeapons.Value; } set { equipWeapons.Value = value; } }
+        public bool IsHidding { get { return isHidding.Value; } set { isHidding.Value = value; } }
 
         public IList<CharacterAttribute> Attributes
         {

@@ -214,14 +214,14 @@ namespace MultiplayerARPG
             {
                 uiTextName.text = string.Format(
                     LanguageManager.GetText(formatKeyName),
-                    Data == null ? LanguageManager.GetUnknowTitle() : Data.CharacterName);
+                    Data == null ? LanguageManager.GetUnknowTitle() : Data.DisplayCharacterName);
             }
 
             if (uiTextLevel != null)
             {
                 uiTextLevel.text = string.Format(
                     LanguageManager.GetText(formatKeyLevel),
-                    Data == null ? "0" : Data.Level.ToString("N0"));
+                    Data == null ? "1" : Data.DisplayLevel.ToString("N0"));
             }
 
             int[] expTree = GameInstance.Singleton.ExpTree;

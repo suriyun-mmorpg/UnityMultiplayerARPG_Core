@@ -49,7 +49,15 @@ public partial class CharacterData : ICharacterData
             shouldMakeCache = true;
         }
     }
-    public string CharacterName { get { return characterName; } set { characterName = value; } }
+    public string CharacterName
+    {
+        get { return characterName; }
+        set { characterName = value; }
+    }
+    public string DisplayCharacterName
+    {
+        get { return CharacterName; }
+    }
     public short Level
     {
         get { return level; }
@@ -58,6 +66,10 @@ public partial class CharacterData : ICharacterData
             level = value;
             shouldMakeCache = true;
         }
+    }
+    public short DisplayLevel
+    {
+        get { return Level; }
     }
     public int Exp { get { return exp; } set { exp = value; } }
     public int CurrentHp { get { return currentHp; } set { currentHp = value; } }

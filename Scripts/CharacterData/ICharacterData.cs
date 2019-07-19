@@ -7,7 +7,9 @@ public partial interface ICharacterData
     int DataId { get; set; }
     int EntityId { get; set; }
     string CharacterName { get; set; }
+    string DisplayCharacterName { get; }
     short Level { get; set; }
+    short DisplayLevel { get; }
     int Exp { get; set; }
     int CurrentHp { get; set; }
     int CurrentMp { get; set; }
