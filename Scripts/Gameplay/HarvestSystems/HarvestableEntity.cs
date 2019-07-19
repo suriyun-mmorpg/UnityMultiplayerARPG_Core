@@ -123,6 +123,7 @@ namespace MultiplayerARPG
                     attackerCharacter.IncreaseItems(CharacterItem.Create(dataId, 1, amount));
                 else
                     ItemDropEntity.DropItem(this, CharacterItem.Create(dataId, 1, amount), new uint[0]);
+                attackerCharacter.Exp += totalDamage * harvestable.expPerDamage;
             }
             CurrentHp -= totalDamage;
             ReceivedDamage(attackerCharacter, CombatAmountType.NormalDamage, totalDamage);

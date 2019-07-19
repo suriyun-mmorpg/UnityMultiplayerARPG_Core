@@ -9,6 +9,8 @@ namespace MultiplayerARPG
     {
         [Header("Harvestable Configs")]
         public HarvestEffectiveness[] harvestEffectivenesses;
+        [Tooltip("Ex. if this is 10 when damage to harvestable entity = 2, character will receives 20 exp")]
+        public int expPerDamage;
 
         private Dictionary<WeaponType, HarvestEffectiveness> cacheHarvestEffectivenesses;
         public Dictionary<WeaponType, HarvestEffectiveness> CacheHarvestEffectivenesses
