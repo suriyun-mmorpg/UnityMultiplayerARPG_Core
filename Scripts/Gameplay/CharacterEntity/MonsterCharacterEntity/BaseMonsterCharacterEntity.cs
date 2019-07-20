@@ -15,8 +15,6 @@ namespace MultiplayerARPG
 
         [Header("Monster Character Settings")]
         public MonsterCharacter monsterCharacter;
-        [Tooltip("If this is more than 0, it will be shown this in UI, If less than or equals, it will show its level (1 for all monster, can more than that for pet)")]
-        public short displayLevel;
         public float destroyDelay = 2f;
         public float destroyRespawnDelay = 5f;
         [HideInInspector, System.NonSerialized]
@@ -41,12 +39,7 @@ namespace MultiplayerARPG
 
         public override short DisplayLevel
         {
-            get
-            {
-                if (displayLevel > 0)
-                    return displayLevel;
-                return Level;
-            }
+            get { return Level; }
         }
 
         private BaseCharacterEntity summoner;
