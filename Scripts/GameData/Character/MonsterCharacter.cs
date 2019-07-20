@@ -22,11 +22,13 @@ namespace MultiplayerARPG
     public partial class MonsterCharacter : BaseCharacter
     {
         [Header("Monster Data")]
+        [Tooltip("`Normal` will attack when being attacked, `Aggressive` will attack when enemy nearby, `Assist` will attack when other with same `Ally Id` being attacked.")]
         public MonsterCharacteristic characteristic;
         [Tooltip("This will work with assist characteristic only, to detect ally")]
         public ushort allyId;
         [Tooltip("This move speed will be applies when it's wandering. if it's going to chase enemy, stats'moveSpeed will be applies")]
         public float wanderMoveSpeed;
+        [Tooltip("Range to see an enemy")]
         public float visualRange = 5f;
         [HideInInspector]
         public float deadHideDelay = 2f;
