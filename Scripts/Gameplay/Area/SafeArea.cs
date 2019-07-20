@@ -6,6 +6,12 @@ namespace MultiplayerARPG
 {
     public class SafeArea : MonoBehaviour
     {
+        private void Awake()
+        {
+            // Set layer to ignore raycast
+            gameObject.layer = 2;
+        }
+
         private void OnTriggerEnter(Collider other)
         {
             if (!other.CompareTag(GameInstance.Singleton.playerTag) && !other.CompareTag(GameInstance.Singleton.monsterTag))
