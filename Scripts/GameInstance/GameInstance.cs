@@ -454,10 +454,6 @@ namespace MultiplayerARPG
             layerMask = layerMask | 1 << 1;  // TransparentFX
             layerMask = layerMask | 1 << 2;  // IgnoreRaycast
             layerMask = layerMask | 1 << 3;  // Water
-            layerMask = layerMask | characterLayer.Mask;
-            layerMask = layerMask | itemDropLayer.Mask;
-            layerMask = layerMask | buildingLayer.Mask;
-            layerMask = layerMask | harvestableLayer.Mask;
             return ~layerMask;
         }
 
