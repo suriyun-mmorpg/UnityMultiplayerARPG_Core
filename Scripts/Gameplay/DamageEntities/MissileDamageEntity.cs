@@ -193,32 +193,40 @@ namespace MultiplayerARPG
             if (destroying)
                 return;
 
+            if (attacker == null || attacker.gameObject == other)
+                return;
+
             IDamageableEntity target = null;
-            if (IsHitGroundOrWall(other) || FindTargetEntity(other, out target))
+            if (FindTargetEntity(other, out target))
             {
-                if (explodeDistance <= 0f)
+                if (explodeDistance > 0f)
+                {
+                    // Explode immediately when hit something
+                    Explode();
+                }
+                else
                 {
                     // If this is not going to explode, just apply damage to target
                     ApplyDamageTo(target);
                 }
-                else
+                NetworkDestroy(destroyDelay);
+                destroying = true;
+                return;
+            }
+
+            // Don't hits: TransparentFX, IgnoreRaycast
+            if (other.layer != 1 &&
+                other.layer != 2)
+            {
+                if (explodeDistance > 0f)
                 {
                     // Explode immediately when hit something
                     Explode();
                 }
                 NetworkDestroy(destroyDelay);
                 destroying = true;
+                return;
             }
-        }
-
-        private bool IsHitGroundOrWall(GameObject other)
-        {
-            foreach (int layer in gameInstance.groundOrWallLayers)
-            {
-                if (other.layer == layer)
-                    return true;
-            }
-            return false;
         }
 
         private bool FindTargetEntity(GameObject other, out IDamageableEntity target)
@@ -228,9 +236,12 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return false;
 
+            if (attacker == null || attacker.gameObject == other)
+                return false;
+
             target = other.GetComponent<IDamageableEntity>();
 
-            if (target == null || attacker == null || target.IsDead() || attacker.gameObject == target.gameObject || !target.CanReceiveDamageFrom(attacker))
+            if (target == null || target.IsDead() || !target.CanReceiveDamageFrom(attacker))
                 return false;
 
             if (LockingTarget != null && LockingTarget != target)
