@@ -8,15 +8,35 @@ namespace MultiplayerARPG
     {
         [Header("Stats/Attributes")]
         [SerializeField]
-        public CharacterStatsIncremental stats;
+        private CharacterStatsIncremental stats;
         [SerializeField]
-        public AttributeIncremental[] attributes;
+        private AttributeIncremental[] attributes;
         [SerializeField]
-        public ResistanceIncremental[] resistances;
+        private ResistanceIncremental[] resistances;
 
         [Header("Skills")]
         [SerializeField]
         private SkillLevel[] skillLevels;
+
+        public virtual CharacterStatsIncremental Stats
+        {
+            get { return stats; }
+        }
+
+        public virtual AttributeIncremental[] Attributes
+        {
+            get { return attributes; }
+        }
+
+        public virtual ResistanceIncremental[] Resistances
+        {
+            get { return resistances; }
+        }
+
+        public virtual SkillLevel[] SkillLevels
+        {
+            get { return skillLevels; }
+        }
 
         private Dictionary<Skill, short> cacheSkillLevels;
         public Dictionary<Skill, short> CacheSkillLevels
@@ -24,24 +44,24 @@ namespace MultiplayerARPG
             get
             {
                 if (cacheSkillLevels == null)
-                    cacheSkillLevels = GameDataHelpers.CombineSkills(skillLevels, new Dictionary<Skill, short>());
+                    cacheSkillLevels = GameDataHelpers.CombineSkills(SkillLevels, new Dictionary<Skill, short>());
                 return cacheSkillLevels;
             }
         }
 
         public CharacterStats GetCharacterStats(short level)
         {
-            return stats.GetCharacterStats(level);
+            return Stats.GetCharacterStats(level);
         }
 
         public Dictionary<Attribute, short> GetCharacterAttributes(short level)
         {
-            return GameDataHelpers.CombineAttributes(attributes, new Dictionary<Attribute, short>(), level, 1f);
+            return GameDataHelpers.CombineAttributes(Attributes, new Dictionary<Attribute, short>(), level, 1f);
         }
 
         public Dictionary<DamageElement, float> GetCharacterResistances(short level)
         {
-            return GameDataHelpers.CombineResistances(resistances, new Dictionary<DamageElement, float>(), level, 1f);
+            return GameDataHelpers.CombineResistances(Resistances, new Dictionary<DamageElement, float>(), level, 1f);
         }
     }
 }

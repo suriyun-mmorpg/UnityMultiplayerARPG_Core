@@ -19,9 +19,10 @@ namespace MultiplayerARPG
     }
 
     [CreateAssetMenu(fileName = "Monster Character", menuName = "Create GameData/Monster Character", order = -4998)]
-    public partial class MonsterCharacter : BaseCharacter
+    public sealed partial class MonsterCharacter : BaseCharacter
     {
         [Header("Monster Data")]
+        public short defaultLevel = 1;
         [Tooltip("`Normal` will attack when being attacked, `Aggressive` will attack when enemy nearby, `Assist` will attack when other with same `Ally Id` being attacked.")]
         public MonsterCharacteristic characteristic;
         [Tooltip("This will work with assist characteristic only, to detect ally")]
@@ -47,6 +48,102 @@ namespace MultiplayerARPG
         public byte maxDropItems = 5;
         public ItemDrop[] randomItems;
         public ItemDropTable itemDropTable;
+
+        private CharacterStatsIncremental? adjustStats;
+        private AttributeIncremental[] adjustAttributes;
+        private ResistanceIncremental[] adjustResistances;
+
+        public override sealed CharacterStatsIncremental Stats
+        {
+            get
+            {
+                // Adjust base stats by default level
+                if (defaultLevel <= 1)
+                {
+                    return base.Stats;
+                }
+                else
+                {
+                    if (adjustStats.HasValue)
+                    {
+                        adjustStats = new CharacterStatsIncremental()
+                        {
+                            baseStats = base.Stats.baseStats + (base.Stats.statsIncreaseEachLevel * -(defaultLevel - 1)),
+                            statsIncreaseEachLevel = base.Stats.statsIncreaseEachLevel,
+                        };
+                    }
+                    return adjustStats.Value;
+                }
+            }
+        }
+
+        public override sealed AttributeIncremental[] Attributes
+        {
+            get
+            {
+                // Adjust base attributes by default level
+                if (defaultLevel <= 1)
+                {
+                    return base.Attributes;
+                }
+                else
+                {
+                    if (adjustAttributes == null)
+                    {
+                        adjustAttributes = new AttributeIncremental[base.Attributes.Length];
+                        AttributeIncremental tempValue;
+                        for (int i = 0; i < base.Attributes.Length; ++i)
+                        {
+                            tempValue = base.Attributes[i];
+                            adjustAttributes[i] = new AttributeIncremental()
+                            {
+                                attribute = tempValue.attribute,
+                                amount = new IncrementalShort()
+                                {
+                                    baseAmount = (short)(tempValue.amount.baseAmount + (tempValue.amount.amountIncreaseEachLevel * -(defaultLevel - 1))),
+                                    amountIncreaseEachLevel = tempValue.amount.amountIncreaseEachLevel,
+                                }
+                            };
+                        }
+                    }
+                    return adjustAttributes;
+                }
+            }
+        }
+
+        public override sealed ResistanceIncremental[] Resistances
+        {
+            get
+            {
+                // Adjust base resistances by default level
+                if (defaultLevel <= 1)
+                {
+                    return base.Resistances;
+                }
+                else
+                {
+                    if (adjustResistances == null)
+                    {
+                        adjustResistances = new ResistanceIncremental[base.Resistances.Length];
+                        ResistanceIncremental tempValue;
+                        for (int i = 0; i < base.Resistances.Length; ++i)
+                        {
+                            tempValue = base.Resistances[i];
+                            adjustResistances[i] = new ResistanceIncremental()
+                            {
+                                damageElement = tempValue.damageElement,
+                                amount = new IncrementalFloat()
+                                {
+                                    baseAmount = (short)(tempValue.amount.baseAmount + (tempValue.amount.amountIncreaseEachLevel * -(defaultLevel - 1))),
+                                    amountIncreaseEachLevel = tempValue.amount.amountIncreaseEachLevel,
+                                }
+                            };
+                        }
+                    }
+                    return adjustResistances;
+                }
+            }
+        }
 
         public int RandomExp()
         {

@@ -110,7 +110,7 @@ namespace MultiplayerARPG
                 out cacheMoveSpeed);
 
             if (this.GetDatabase() != null)
-                CacheBaseMoveSpeed = this.GetDatabase().stats.baseStats.moveSpeed;
+                CacheBaseMoveSpeed = this.GetDatabase().Stats.baseStats.moveSpeed;
 
             CacheDisallowMove = false;
             CacheDisallowAttack = false;
