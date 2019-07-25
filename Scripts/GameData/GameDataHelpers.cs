@@ -422,6 +422,18 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
+        /// Make skill - level key-value pair
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static KeyValuePair<Skill, short> MakeSkill(MonsterSkill source)
+        {
+            if (source.skill == null)
+                return new KeyValuePair<Skill, short>();
+            return new KeyValuePair<Skill, short>(source.skill, source.level);
+        }
+
+        /// <summary>
         /// Make item - amount key-value pair
         /// </summary>
         /// <param name="source"></param>
@@ -640,6 +652,28 @@ namespace MultiplayerARPG
                 foreach (SkillLevel sourceLevel in sourceLevels)
                 {
                     pair = MakeSkill(sourceLevel);
+                    targetDictionary = CombineSkills(targetDictionary, pair);
+                }
+            }
+            return targetDictionary;
+        }
+
+        /// <summary>
+        /// Combine monster skills dictionary
+        /// </summary>
+        /// <param name="sourceMonsterSkills"></param>
+        /// <param name="targetDictionary"></param>
+        /// <returns></returns>
+        public static Dictionary<Skill, short> CombineSkills(MonsterSkill[] sourceMonsterSkills, Dictionary<Skill, short> targetDictionary)
+        {
+            if (targetDictionary == null)
+                targetDictionary = new Dictionary<Skill, short>();
+            if (sourceMonsterSkills != null)
+            {
+                KeyValuePair<Skill, short> pair;
+                foreach (MonsterSkill sourceMonsterSkill in sourceMonsterSkills)
+                {
+                    pair = MakeSkill(sourceMonsterSkill);
                     targetDictionary = CombineSkills(targetDictionary, pair);
                 }
             }

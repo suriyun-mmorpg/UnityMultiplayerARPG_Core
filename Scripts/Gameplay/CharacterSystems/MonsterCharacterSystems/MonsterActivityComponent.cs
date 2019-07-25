@@ -33,7 +33,7 @@ namespace MultiplayerARPG
             get { return CacheEntity as BaseMonsterCharacterEntity; }
         }
         
-        public MonsterCharacter monsterDatabase
+        public MonsterCharacter MonsterDatabase
         {
             get { return CacheMonsterCharacterEntity.monsterCharacter; }
         }
@@ -85,7 +85,7 @@ namespace MultiplayerARPG
 
         protected void UpdateActivity(float time)
         {
-            if (!IsServer || CacheEntity.Identity.CountSubscribers() == 0 || monsterDatabase == null)
+            if (!IsServer || CacheEntity.Identity.CountSubscribers() == 0 || MonsterDatabase == null)
                 return;
 
             if (CacheEntity.IsDead())
@@ -173,8 +173,17 @@ namespace MultiplayerARPG
                         CacheEntity.SetLookRotation(Quaternion.LookRotation(lookAtDirection).eulerAngles);
                     }
                 }
-                CacheEntity.RequestAttack(false, targetEntity.OpponentAimTransform.position);
-                // TODO: Random to use skills
+                Skill usingSkill = null;
+                short usingSkillLevel = 1;
+                if (MonsterDatabase.RandomSkill(CacheMonsterCharacterEntity, out usingSkill, out usingSkillLevel) && 
+                    usingSkill != null && usingSkill.CanUse(CacheEntity, usingSkillLevel))
+                {
+                    CacheEntity.RequestUseSkill(usingSkill.DataId, false, targetEntity.OpponentAimTransform.position);
+                }
+                else
+                {
+                    CacheEntity.RequestAttack(false, targetEntity.OpponentAimTransform.position);
+                }
             }
             else
             {
@@ -219,7 +228,7 @@ namespace MultiplayerARPG
         public void AggressiveFindTarget(float time, Vector3 currentPosition)
         {
             // Aggressive monster or summoned monster will find target to attack
-            if (monsterDatabase.characteristic != MonsterCharacteristic.Aggressive &&
+            if (MonsterDatabase.characteristic != MonsterCharacteristic.Aggressive &&
                 CacheMonsterCharacterEntity.Summoner == null)
                 return;
 
@@ -227,7 +236,7 @@ namespace MultiplayerARPG
             if (!CacheEntity.TryGetTargetEntity(out targetCharacter) || targetCharacter.IsDead())
             {
                 // If no target enenmy or target enemy is dead, Find nearby character by layer mask
-                List<BaseCharacterEntity> characterEntities = CacheEntity.FindAliveCharacters<BaseCharacterEntity>(monsterDatabase.visualRange, false, true, false);
+                List<BaseCharacterEntity> characterEntities = CacheEntity.FindAliveCharacters<BaseCharacterEntity>(MonsterDatabase.visualRange, false, true, false);
                 foreach (BaseCharacterEntity characterEntity in characterEntities)
                 {
                     // Attack target settings

@@ -31,6 +31,8 @@ namespace MultiplayerARPG
         public float wanderMoveSpeed;
         [Tooltip("Range to see an enemy")]
         public float visualRange = 5f;
+        [SerializeField]
+        private MonsterSkill[] monsterSkills;
         [HideInInspector]
         public float deadHideDelay = 2f;
         [HideInInspector]
@@ -145,6 +147,17 @@ namespace MultiplayerARPG
             }
         }
 
+        private Dictionary<Skill, short> cacheSkillLevels;
+        public override Dictionary<Skill, short> CacheSkillLevels
+        {
+            get
+            {
+                if (cacheSkillLevels == null)
+                    cacheSkillLevels = GameDataHelpers.CombineSkills(monsterSkills, new Dictionary<Skill, short>());
+                return cacheSkillLevels;
+            }
+        }
+
         public int RandomExp()
         {
             int min = randomExpMin;
@@ -198,6 +211,26 @@ namespace MultiplayerARPG
                     onRandomItem.Invoke(randomItem.item, randomItem.amount);
                 }
             }
+        }
+
+        public bool RandomSkill(BaseMonsterCharacterEntity entity, out Skill skill, out short level)
+        {
+            skill = null;
+            level = 1;
+            float random = Random.value;
+            foreach (MonsterSkill monsterSkill in monsterSkills)
+            {
+                if (monsterSkill.skill == null)
+                    continue;
+
+                if (random < monsterSkill.useRate && entity.HpRate < monsterSkill.useWhenHpRate)
+                {
+                    skill = monsterSkill.skill;
+                    level = monsterSkill.level;
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

@@ -209,4 +209,17 @@ namespace MultiplayerARPG
         public Skill skill;
         public short level;
     }
+
+    [System.Serializable]
+    public struct MonsterSkill
+    {
+        public Skill skill;
+        public short level;
+        [Range(0.01f, 1f)]
+        [Tooltip("Monster will random to use skill by this rate")]
+        public float useRate;
+        [Range(0.01f, 1f)]
+        [Tooltip("Monster will use skill only when its Hp lower than this rate")]
+        public float useWhenHpRate;
+    }
 }

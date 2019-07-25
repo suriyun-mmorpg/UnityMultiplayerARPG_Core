@@ -14,10 +14,6 @@ namespace MultiplayerARPG
         [SerializeField]
         private ResistanceIncremental[] resistances;
 
-        [Header("Skills")]
-        [SerializeField]
-        private SkillLevel[] skillLevels;
-
         public virtual CharacterStatsIncremental Stats
         {
             get { return stats; }
@@ -33,21 +29,7 @@ namespace MultiplayerARPG
             get { return resistances; }
         }
 
-        public virtual SkillLevel[] SkillLevels
-        {
-            get { return skillLevels; }
-        }
-
-        private Dictionary<Skill, short> cacheSkillLevels;
-        public Dictionary<Skill, short> CacheSkillLevels
-        {
-            get
-            {
-                if (cacheSkillLevels == null)
-                    cacheSkillLevels = GameDataHelpers.CombineSkills(SkillLevels, new Dictionary<Skill, short>());
-                return cacheSkillLevels;
-            }
-        }
+        public abstract Dictionary<Skill, short> CacheSkillLevels { get; }
 
         public CharacterStats GetCharacterStats(short level)
         {

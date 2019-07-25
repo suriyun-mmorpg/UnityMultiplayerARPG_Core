@@ -11,6 +11,10 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = "Player Character", menuName = "Create GameData/Player Character", order = -4999)]
     public sealed partial class PlayerCharacter : BaseCharacter
     {
+        [Header("Skills")]
+        [SerializeField]
+        private SkillLevel[] skillLevels;
+
         [Header("Start Equipments")]
         public Item rightHandEquipItem;
         public Item leftHandEquipItem;
@@ -26,6 +30,22 @@ namespace MultiplayerARPG
                 if (startMap == null)
                     return GameInstance.MapInfos.FirstOrDefault().Value;
                 return startMap;
+            }
+        }
+
+        public SkillLevel[] SkillLevels
+        {
+            get { return skillLevels; }
+        }
+
+        private Dictionary<Skill, short> cacheSkillLevels;
+        public override Dictionary<Skill, short> CacheSkillLevels
+        {
+            get
+            {
+                if (cacheSkillLevels == null)
+                    cacheSkillLevels = GameDataHelpers.CombineSkills(SkillLevels, new Dictionary<Skill, short>());
+                return cacheSkillLevels;
             }
         }
 
