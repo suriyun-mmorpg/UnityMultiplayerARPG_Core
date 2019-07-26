@@ -40,8 +40,6 @@ namespace MultiplayerARPG
                 return cacheSkillSelectionManager;
             }
         }
-
-        private Dictionary<Skill, short> displayingSkills;
         
         public override void Show()
         {
@@ -100,20 +98,16 @@ namespace MultiplayerARPG
                 return;
             }
 
-            // All skills included equipment skill levels
-            displayingSkills = character.GetSkills();
-
             BaseCharacter database = character.GetDatabase();
             if (database != null)
             {
                 CharacterSkill tempCharacterSkill;
                 Skill tempSkill;
                 int tempIndexOfSkill;
-                short tempLevel;
-                // Combine skills from database (skill that can level up) and equipment skills
+                // Combine skills from database (skill that can level up) with increased skill and equipment skill
                 Dictionary<Skill, short> skillLevels = new Dictionary<Skill, short>();
                 skillLevels = GameDataHelpers.CombineSkills(skillLevels, database.CacheSkillLevels);
-                skillLevels = GameDataHelpers.CombineSkills(skillLevels, character.GetEquipmentSkills());
+                skillLevels = GameDataHelpers.CombineSkills(skillLevels, character.GetSkills());
                 // Filter skills to show by specific skill types / categories
                 Dictionary<Skill, short> filteredSkillLevels = new Dictionary<Skill, short>();
                 foreach (KeyValuePair<Skill, short> skillLevel in skillLevels)
@@ -135,16 +129,9 @@ namespace MultiplayerARPG
                     tempSkill = skillLevel.Key;
                     tempIndexOfSkill = character.IndexOfSkill(tempSkill.DataId);
                     // Set character skill data
-                    if (tempIndexOfSkill >= 0)
-                        tempCharacterSkill = character.Skills[tempIndexOfSkill];
-                    else
-                        tempCharacterSkill = CharacterSkill.Create(tempSkill, 0);
-                    // Set skill level data
-                    tempLevel = 0;
-                    if (displayingSkills.ContainsKey(tempSkill))
-                        tempLevel = displayingSkills[tempSkill];
+                    tempCharacterSkill = CharacterSkill.Create(tempSkill, skillLevel.Value);
                     // Set UI data
-                    uiCharacterSkill.Setup(new CharacterSkillTuple(tempCharacterSkill, tempLevel), character, tempIndexOfSkill);
+                    uiCharacterSkill.Setup(new CharacterSkillTuple(tempCharacterSkill, skillLevel.Value), character, tempIndexOfSkill);
                     uiCharacterSkill.Show();
                     UICharacterSkillDragHandler dragHandler = uiCharacterSkill.GetComponentInChildren<UICharacterSkillDragHandler>();
                     if (dragHandler != null)

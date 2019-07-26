@@ -51,7 +51,7 @@ namespace MultiplayerARPG
                         CharacterHotkey characterHotkey = new CharacterHotkey();
                         characterHotkey.hotkeyId = id;
                         characterHotkey.type = HotkeyType.None;
-                        characterHotkey.dataId = 0;
+                        characterHotkey.id = string.Empty;
                         ui.Setup(this, characterHotkey, -1);
                         if (!cacheUICharacterHotkeys.ContainsKey(id))
                             cacheUICharacterHotkeys.Add(id, new List<UICharacterHotkey>());

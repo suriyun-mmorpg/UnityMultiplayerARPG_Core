@@ -34,7 +34,7 @@ namespace MultiplayerARPG
                 switch (sourceLocation)
                 {
                     case SourceLocation.Skills:
-                        return uiCharacterSkill != null && uiCharacterSkill.IndexOfData >= 0;
+                        return uiCharacterSkill != null;
                     case SourceLocation.Hotkey:
                         return uiCharacterHotkey != null;
                 }
@@ -69,7 +69,7 @@ namespace MultiplayerARPG
             if (owningCharacter == null)
                 return;
             if (sourceLocation == SourceLocation.Hotkey)
-                owningCharacter.RequestAssignHotkey(uiCharacterHotkey.hotkeyId, HotkeyType.None, 0);
+                owningCharacter.RequestAssignHotkey(uiCharacterHotkey.hotkeyId, HotkeyType.None, string.Empty);
         }
     }
 }

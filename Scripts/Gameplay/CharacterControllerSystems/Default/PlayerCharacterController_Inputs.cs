@@ -254,7 +254,7 @@ namespace MultiplayerARPG
                 {
                     // Close NPC dialog, when target changes
                     HideNpcDialogs();
-                    queueUsingSkill = null;
+                    ClearQueueUsingSkill();
 
                     // Move to target, will hide destination when target is object
                     if (targetEntity != null)
@@ -303,57 +303,14 @@ namespace MultiplayerARPG
             if (moveDirection.magnitude != 0f)
             {
                 HideNpcDialogs();
-                queueUsingSkill = null;
+                ClearQueueUsingSkill();
                 FindAndSetBuildingAreaFromCharacterDirection();
             }
 
-            // For WASD mode, Using skill when player pressed hotkey
-            if (queueUsingSkill.HasValue)
-            {
-                UsingSkillData queueUsingSkillValue = queueUsingSkill.Value;
-                destination = null;
-                PlayerCharacterEntity.StopMove();
-                Skill skill = null;
-                if (GameInstance.Skills.TryGetValue(queueUsingSkillValue.dataId, out skill) && skill != null)
-                {
-                    if (skill.IsAttack())
-                    {
-                        BaseCharacterEntity targetEntity;
-                        if (TryGetSelectedTargetAsAttackingCharacter(out targetEntity))
-                            SetTarget(targetEntity);
-                        if (wasdLockAttackTarget && !TryGetAttackingCharacter(out targetEntity))
-                        {
-                            BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill, isLeftHandAttacking) + lockAttackTargetDistance, false, true, false);
-                            if (nearestTarget != null)
-                            {
-                                // Set target, then use skill later when moved nearby target
-                                PlayerCharacterEntity.SetTargetEntity(nearestTarget);
-                            }
-                            else
-                            {
-                                // No nearby target, so use skill immediately
-                                if (RequestUsePendingSkill(isLeftHandAttacking, null))
-                                    isLeftHandAttacking = !isLeftHandAttacking;
-                            }
-                        }
-                        else if (!wasdLockAttackTarget)
-                        {
-                            // Not lock target, so not finding target and use skill immediately
-                            if (RequestUsePendingSkill(isLeftHandAttacking, null))
-                                isLeftHandAttacking = !isLeftHandAttacking;
-                        }
-                    }
-                    else
-                    {
-                        // Not attack skill, so use skill immediately
-                        RequestUsePendingSkill(isLeftHandAttacking, null);
-                    }
-                }
-                else
-                    queueUsingSkill = null;
-            }
             // Attack when player pressed attack button
-            else if (InputManager.GetButton("Attack"))
+            if (!UpdateWASDPendingSkill() &&
+                !UpdateWASDPendingSkillItem() &&
+                InputManager.GetButton("Attack"))
             {
                 destination = null;
                 PlayerCharacterEntity.StopMove();
@@ -414,6 +371,108 @@ namespace MultiplayerARPG
             PlayerCharacterEntity.KeyMovement(moveDirection, movementState);
         }
 
+        protected bool UpdateWASDPendingSkill()
+        {
+            if (!queueUsingSkill.HasValue)
+                return false;
+
+            UsingSkillData queueUsingSkillValue = queueUsingSkill.Value;
+            destination = null;
+            PlayerCharacterEntity.StopMove();
+            Skill skill = null;
+            if (GameInstance.Skills.TryGetValue(queueUsingSkillValue.dataId, out skill) && skill != null)
+            {
+                if (skill.IsAttack())
+                {
+                    BaseCharacterEntity targetEntity;
+                    if (TryGetSelectedTargetAsAttackingCharacter(out targetEntity))
+                        SetTarget(targetEntity);
+
+                    if (wasdLockAttackTarget && !TryGetAttackingCharacter(out targetEntity))
+                    {
+                        BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill, isLeftHandAttacking) + lockAttackTargetDistance, false, true, false);
+                        if (nearestTarget != null)
+                        {
+                            // Set target, then use skill later when moved nearby target
+                            PlayerCharacterEntity.SetTargetEntity(nearestTarget);
+                        }
+                        else
+                        {
+                            // No nearby target, so use skill immediately
+                            if (RequestUsePendingSkill(isLeftHandAttacking, null))
+                                isLeftHandAttacking = !isLeftHandAttacking;
+                        }
+                    }
+                    else if (!wasdLockAttackTarget)
+                    {
+                        // Not lock target, so not finding target and use skill immediately
+                        if (RequestUsePendingSkill(isLeftHandAttacking, null))
+                            isLeftHandAttacking = !isLeftHandAttacking;
+                    }
+                }
+                else
+                {
+                    // Not attack skill, so use skill immediately
+                    RequestUsePendingSkill(isLeftHandAttacking, null);
+                }
+            }
+            else
+                queueUsingSkill = null;
+
+            return true;
+        }
+
+        protected bool UpdateWASDPendingSkillItem()
+        {
+            if (!queueUsingSkillItem.HasValue)
+                return false;
+
+            UsingSkillItemData queueUsingSkillItemValue = queueUsingSkillItem.Value;
+            destination = null;
+            PlayerCharacterEntity.StopMove();
+            Skill skill = null;
+            if (GameInstance.Skills.TryGetValue(queueUsingSkillItemValue.skillDataId, out skill) && skill != null)
+            {
+                if (skill.IsAttack())
+                {
+                    BaseCharacterEntity targetEntity;
+                    if (TryGetSelectedTargetAsAttackingCharacter(out targetEntity))
+                        SetTarget(targetEntity);
+
+                    if (wasdLockAttackTarget && !TryGetAttackingCharacter(out targetEntity))
+                    {
+                        BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill, isLeftHandAttacking) + lockAttackTargetDistance, false, true, false);
+                        if (nearestTarget != null)
+                        {
+                            // Set target, then use skill later when moved nearby target
+                            PlayerCharacterEntity.SetTargetEntity(nearestTarget);
+                        }
+                        else
+                        {
+                            // No nearby target, so use skill immediately
+                            if (RequestUsePendingSkillItem(isLeftHandAttacking, null))
+                                isLeftHandAttacking = !isLeftHandAttacking;
+                        }
+                    }
+                    else if (!wasdLockAttackTarget)
+                    {
+                        // Not lock target, so not finding target and use skill immediately
+                        if (RequestUsePendingSkillItem(isLeftHandAttacking, null))
+                            isLeftHandAttacking = !isLeftHandAttacking;
+                    }
+                }
+                else
+                {
+                    // Not attack skill, so use skill immediately
+                    RequestUsePendingSkillItem(isLeftHandAttacking, null);
+                }
+            }
+            else
+                queueUsingSkillItem = null;
+
+            return true;
+        }
+
         protected void UpdateBuilding()
         {
             // Current building UI
@@ -453,7 +512,7 @@ namespace MultiplayerARPG
             {
                 if (targetEnemy.IsDead())
                 {
-                    queueUsingSkill = null;
+                    ClearQueueUsingSkill();
                     PlayerCharacterEntity.StopMove();
                     ClearTarget();
                     return;
@@ -479,9 +538,21 @@ namespace MultiplayerARPG
                         // If has queue using skill, attack by the skill
                         if (queueUsingSkill.HasValue &&
                             RequestUsePendingSkill(isLeftHandAttacking, targetEnemy.OpponentAimTransform.position))
+                        {
+                            // Change attacking hand after attack requested
                             isLeftHandAttacking = !isLeftHandAttacking;
+                        }
+                        else if (queueUsingSkillItem.HasValue &&
+                            RequestUsePendingSkillItem(isLeftHandAttacking, targetEnemy.OpponentAimTransform.position))
+                        {
+                            // Change attacking hand after attack requested
+                            isLeftHandAttacking = !isLeftHandAttacking;
+                        }
                         else if (PlayerCharacterEntity.RequestAttack(isLeftHandAttacking, targetEnemy.OpponentAimTransform.position))
+                        {
+                            // Change attacking hand after attack requested
                             isLeftHandAttacking = !isLeftHandAttacking;
+                        }
                     }
                 }
                 else
@@ -491,7 +562,7 @@ namespace MultiplayerARPG
             {
                 if (targetPlayer.IsDead())
                 {
-                    queueUsingSkill = null;
+                    ClearQueueUsingSkill();
                     PlayerCharacterEntity.StopMove();
                     ClearTarget();
                     return;
@@ -509,7 +580,7 @@ namespace MultiplayerARPG
             {
                 if (targetMonster.IsDead())
                 {
-                    queueUsingSkill = null;
+                    ClearQueueUsingSkill();
                     PlayerCharacterEntity.StopMove();
                     ClearTarget();
                     return;
@@ -583,7 +654,7 @@ namespace MultiplayerARPG
             {
                 if (targetHarvestable.IsDead())
                 {
-                    queueUsingSkill = null;
+                    ClearQueueUsingSkill();
                     PlayerCharacterEntity.StopMove();
                     ClearTarget();
                     return;
@@ -642,81 +713,157 @@ namespace MultiplayerARPG
             CancelBuild();
             buildingItemIndex = -1;
             CurrentBuildingEntity = null;
+            ClearQueueUsingSkill();
 
             CharacterHotkey hotkey = PlayerCharacterEntity.Hotkeys[hotkeyIndex];
-            Skill skill = hotkey.GetSkill();
-            if (skill != null)
+            switch (hotkey.type)
             {
-                short skillLevel;
-                if (PlayerCharacterEntity.CacheSkills.TryGetValue(skill, out skillLevel))
+                case HotkeyType.Skill:
+                    UseSkill(hotkey.id);
+                    break;
+                case HotkeyType.Item:
+                    UseItem(hotkey.id);
+                    break;
+            }
+        }
+
+        protected void UseSkill(string id)
+        {
+            Skill skill = null;
+            if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(id), out skill) || skill == null ||
+                PlayerCharacterEntity.CacheSkills == null || !PlayerCharacterEntity.CacheSkills.ContainsKey(skill))
+                return;
+
+            BaseCharacterEntity attackingCharacter;
+            if (TryGetAttackingCharacter(out attackingCharacter))
+            {
+                // If attacking any character, will use skill later
+                queueUsingSkill = new UsingSkillData(null, skill.DataId);
+            }
+            else
+            {
+                // If not attacking any character, use skill immediately
+                if (skill.IsAttack())
                 {
-                    BaseCharacterEntity attackingCharacter;
-                    if (TryGetAttackingCharacter(out attackingCharacter))
+                    if (IsLockTarget())
                     {
                         // If attacking any character, will use skill later
                         queueUsingSkill = new UsingSkillData(null, skill.DataId);
-                    }
-                    else if (skill.CanUse(PlayerCharacterEntity, skillLevel))
-                    {
-                        // If not attacking any character, use skill immediately
-                        if (skill.IsAttack())
+                        if (SelectedEntity != null && SelectedEntity is BaseCharacterEntity)
                         {
-                            if (IsLockTarget())
-                            {
-                                // If attacking any character, will use skill later
-                                queueUsingSkill = new UsingSkillData(null, skill.DataId);
-                                if (SelectedEntity != null && SelectedEntity is BaseCharacterEntity)
-                                {
-                                    // Attacking selected target
-                                    PlayerCharacterEntity.SetTargetEntity(SelectedEntity);
-                                }
-                                else
-                                {
-                                    // Attacking nearest target
-                                    BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill, isLeftHandAttacking) + lockAttackTargetDistance, false, true, false);
-                                    if (nearestTarget != null)
-                                        PlayerCharacterEntity.SetTargetEntity(nearestTarget);
-                                }
-                            }
-                            else
-                            {
-                                // Not lock target, use it immediately
-                                destination = null;
-                                PlayerCharacterEntity.StopMove();
-                                PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHandAttacking);
-                                isLeftHandAttacking = !isLeftHandAttacking;
-                            }
+                            // Attacking selected target
+                            PlayerCharacterEntity.SetTargetEntity(SelectedEntity);
                         }
                         else
                         {
-                            // This is not attack skill, use it immediately
-                            destination = null;
-                            PlayerCharacterEntity.StopMove();
-                            PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHandAttacking);
+                            // Attacking nearest target
+                            BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill, isLeftHandAttacking) + lockAttackTargetDistance, false, true, false);
+                            if (nearestTarget != null)
+                                PlayerCharacterEntity.SetTargetEntity(nearestTarget);
                         }
                     }
-                }
-            }
-            Item item = hotkey.GetItem();
-            if (item != null)
-            {
-                int itemIndex = PlayerCharacterEntity.IndexOfNonEquipItem(item.DataId);
-                if (itemIndex >= 0)
-                {
-                    if (item.IsEquipment())
-                        RequestEquipItem((short)itemIndex);
-                    else if (item.IsUsable())
-                        RequestUseItem((short)itemIndex);
-                    else if (item.IsBuilding())
+                    else
                     {
+                        // Not lock target, use it immediately
                         destination = null;
                         PlayerCharacterEntity.StopMove();
-                        buildingItemIndex = itemIndex;
-                        CurrentBuildingEntity = Instantiate(item.buildingEntity);
-                        CurrentBuildingEntity.SetupAsBuildMode();
-                        CurrentBuildingEntity.CacheTransform.parent = null;
-                        FindAndSetBuildingAreaFromCharacterDirection();
+                        PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHandAttacking);
+                        isLeftHandAttacking = !isLeftHandAttacking;
                     }
+                }
+                else
+                {
+                    // This is not attack skill, use it immediately
+                    destination = null;
+                    PlayerCharacterEntity.StopMove();
+                    PlayerCharacterEntity.RequestUseSkill(skill.DataId, isLeftHandAttacking);
+                }
+            }
+        }
+
+        protected void UseItem(string id)
+        {
+            int itemIndex = PlayerCharacterEntity.IndexOfNonEquipItem(id);
+            if (itemIndex < 0)
+                return;
+
+            Item item = PlayerCharacterEntity.NonEquipItems[itemIndex].GetItem();
+            if (item == null)
+                return;
+
+            if (item.IsEquipment())
+            {
+                RequestEquipItem((short)itemIndex);
+            }
+            else if (item.IsUsable())
+            {
+                if (item.IsSkill())
+                {
+                    UseSkillItem(item, (short)itemIndex);
+                }
+                else
+                {
+                    RequestUseItem((short)itemIndex, null);
+                }
+            }
+            else if (item.IsBuilding())
+            {
+                destination = null;
+                PlayerCharacterEntity.StopMove();
+                buildingItemIndex = itemIndex;
+                CurrentBuildingEntity = Instantiate(item.buildingEntity);
+                CurrentBuildingEntity.SetupAsBuildMode();
+                CurrentBuildingEntity.CacheTransform.parent = null;
+                FindAndSetBuildingAreaFromCharacterDirection();
+            }
+        }
+
+        protected void UseSkillItem(Item item, short itemIndex)
+        {
+            Skill skill = item.skillLevel.skill;
+            BaseCharacterEntity attackingCharacter;
+            if (TryGetAttackingCharacter(out attackingCharacter))
+            {
+                // If attacking any character, will use skill later
+                queueUsingSkillItem = new UsingSkillItemData(null, itemIndex, skill.DataId);
+            }
+            else
+            {
+                // If not attacking any character, use skill immediately
+                if (skill.IsAttack())
+                {
+                    if (IsLockTarget())
+                    {
+                        // If attacking any character, will use skill later
+                        queueUsingSkillItem = new UsingSkillItemData(null, itemIndex, skill.DataId);
+                        if (SelectedEntity != null && SelectedEntity is BaseCharacterEntity)
+                        {
+                            // Attacking selected target
+                            PlayerCharacterEntity.SetTargetEntity(SelectedEntity);
+                        }
+                        else
+                        {
+                            // Attacking nearest target
+                            BaseCharacterEntity nearestTarget = PlayerCharacterEntity.FindNearestAliveCharacter<BaseCharacterEntity>(PlayerCharacterEntity.GetSkillAttackDistance(skill, isLeftHandAttacking) + lockAttackTargetDistance, false, true, false);
+                            if (nearestTarget != null)
+                                PlayerCharacterEntity.SetTargetEntity(nearestTarget);
+                        }
+                    }
+                    else
+                    {
+                        // Not lock target, use it immediately
+                        destination = null;
+                        PlayerCharacterEntity.StopMove();
+                        PlayerCharacterEntity.RequestUseSkillItem(itemIndex, isLeftHandAttacking);
+                        isLeftHandAttacking = !isLeftHandAttacking;
+                    }
+                }
+                else
+                {
+                    // This is not attack skill, use it immediately
+                    destination = null;
+                    PlayerCharacterEntity.StopMove();
+                    PlayerCharacterEntity.RequestUseSkillItem(itemIndex, isLeftHandAttacking);
                 }
             }
         }

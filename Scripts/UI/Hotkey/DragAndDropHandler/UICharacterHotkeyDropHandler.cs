@@ -44,7 +44,7 @@ namespace MultiplayerARPG
 
                     string swappingHotkeyId = string.Empty;
                     HotkeyType swappingType = HotkeyType.None;
-                    int swappingDataId = 0;
+                    string swappingDataId = string.Empty;
                     // If dragged item UI
                     UICharacterItemDragHandler draggedItemUI = dragHandler as UICharacterItemDragHandler;
                     if (draggedItemUI != null)
@@ -53,13 +53,13 @@ namespace MultiplayerARPG
                         {
                             swappingHotkeyId = draggedItemUI.uiCharacterHotkey.Data.hotkeyId;
                             swappingType = uiCharacterHotkey.Data.type;
-                            swappingDataId = uiCharacterHotkey.Data.dataId;
+                            swappingDataId = uiCharacterHotkey.Data.id;
                         }
 
                         if (uiCharacterHotkey.CanAssignCharacterItem(draggedItemUI.CacheUI.Data.characterItem))
                         {
                             // Assign item to hotkey
-                            owningCharacter.RequestAssignHotkey(uiCharacterHotkey.Data.hotkeyId, HotkeyType.Item, draggedItemUI.CacheUI.Data.characterItem.dataId);
+                            owningCharacter.RequestAssignHotkey(uiCharacterHotkey.Data.hotkeyId, HotkeyType.Item, draggedItemUI.CacheUI.Data.characterItem.id);
                         }
 
                         if (draggedItemUI.sourceLocation == UICharacterItemDragHandler.SourceLocation.Hotkey)
@@ -76,13 +76,13 @@ namespace MultiplayerARPG
                         {
                             swappingHotkeyId = draggedSkillUI.uiCharacterHotkey.Data.hotkeyId;
                             swappingType = uiCharacterHotkey.Data.type;
-                            swappingDataId = uiCharacterHotkey.Data.dataId;
+                            swappingDataId = uiCharacterHotkey.Data.id;
                         }
 
                         if (uiCharacterHotkey.CanAssignCharacterSkill(draggedSkillUI.CacheUI.Data.characterSkill))
                         {
                             // Assign item to hotkey
-                            owningCharacter.RequestAssignHotkey(uiCharacterHotkey.Data.hotkeyId, HotkeyType.Skill, draggedSkillUI.CacheUI.Data.characterSkill.dataId);
+                            owningCharacter.RequestAssignHotkey(uiCharacterHotkey.Data.hotkeyId, HotkeyType.Skill, draggedSkillUI.CacheUI.Skill.Id);
                         }
 
                         if (draggedSkillUI.sourceLocation == UICharacterSkillDragHandler.SourceLocation.Hotkey)
