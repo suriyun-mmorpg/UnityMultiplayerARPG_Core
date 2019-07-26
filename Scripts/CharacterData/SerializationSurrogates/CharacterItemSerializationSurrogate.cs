@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using MultiplayerARPG;
 
 public class CharacterItemSerializationSurrogate : ISerializationSurrogate
 {
@@ -9,6 +8,7 @@ public class CharacterItemSerializationSurrogate : ISerializationSurrogate
                               SerializationInfo info, StreamingContext context)
     {
         CharacterItem data = (CharacterItem)obj;
+        info.AddValue("id", data.id);
         info.AddValue("dataId", data.dataId);
         info.AddValue("level", data.level);
         info.AddValue("amount", data.amount);
@@ -33,6 +33,14 @@ public class CharacterItemSerializationSurrogate : ISerializationSurrogate
         // TODO: Backward compatible, this will be removed in future version
         try
         {
+            data.id = info.GetString("id");
+        }
+        catch
+        {
+            data.id = GenericUtils.GetUniqueId();
+        }
+        try
+        {
             data.ammo = info.GetInt16("ammo");
         }
         catch { }
@@ -41,6 +49,8 @@ public class CharacterItemSerializationSurrogate : ISerializationSurrogate
             data.sockets = (List<int>)info.GetValue("sockets", typeof(List<int>));
         }
         catch { }
+        if (string.IsNullOrEmpty(data.id))
+            data.id = GenericUtils.GetUniqueId();
         obj = data;
         return obj;
     }
