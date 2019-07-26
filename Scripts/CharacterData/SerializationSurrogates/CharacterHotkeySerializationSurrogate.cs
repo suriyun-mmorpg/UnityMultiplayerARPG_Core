@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using MultiplayerARPG;
 
 public class CharacterHotkeySerializationSurrogate : ISerializationSurrogate
 {
@@ -11,7 +10,7 @@ public class CharacterHotkeySerializationSurrogate : ISerializationSurrogate
         CharacterHotkey data = (CharacterHotkey)obj;
         info.AddValue("hotkeyId", data.hotkeyId);
         info.AddValue("type", (byte)data.type);
-        info.AddValue("dataId", data.dataId);
+        info.AddValue("id", data.id);
     }
 
     public System.Object SetObjectData(System.Object obj,
@@ -21,7 +20,15 @@ public class CharacterHotkeySerializationSurrogate : ISerializationSurrogate
         CharacterHotkey data = (CharacterHotkey)obj;
         data.hotkeyId = info.GetString("hotkeyId");
         data.type = (HotkeyType)info.GetByte("type");
-        data.dataId = info.GetInt32("dataId");
+        // TODO: Backward compatible, this will be removed in future version
+        try
+        {
+            data.id = info.GetString("id");
+        }
+        catch
+        {
+            data.id = GenericUtils.GetUniqueId();
+        }
         obj = data;
         return obj;
     }
