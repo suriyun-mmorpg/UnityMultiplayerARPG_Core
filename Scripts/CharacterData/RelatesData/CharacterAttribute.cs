@@ -34,6 +34,14 @@ public class CharacterAttribute : INetSerializable
         return GetAttribute() != null && character != null && character.StatPoint > 0;
     }
 
+    public static CharacterAttribute Create(Attribute attribute, short amount)
+    {
+        CharacterAttribute newAttribute = new CharacterAttribute();
+        newAttribute.dataId = attribute.DataId;
+        newAttribute.amount = amount;
+        return newAttribute;
+    }
+
     public void Serialize(NetDataWriter writer)
     {
         writer.Put(dataId);
