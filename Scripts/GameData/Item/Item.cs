@@ -18,6 +18,11 @@ namespace MultiplayerARPG
         Pet,
         SocketEnhancer,
         Mount,
+        AttributeIncrease,
+        AttributeReset,
+        Skill,
+        SkillLearn,
+        SkillReset,
     }
 
     public enum FireType : byte
@@ -103,6 +108,12 @@ namespace MultiplayerARPG
         [Header("Mount Configs")]
         public MountEntity mountEntity;
 
+        [Header("Attribute Configs")]
+        public AttributeAmount attributeAmount;
+
+        [Header("Skill Configs")]
+        public SkillLevel skillLevel;
+
         public override string Title
         {
             get
@@ -155,7 +166,7 @@ namespace MultiplayerARPG
 
         public bool IsUsable()
         {
-            return IsPotion() || IsPet() || IsMount();
+            return IsPotion() || IsPet() || IsMount() || IsAttributeIncrease() || IsAttributeReset() || IsSkill() || IsSkillLearn() || IsSkillReset();
         }
 
         public bool IsDefendEquipment()
@@ -211,6 +222,31 @@ namespace MultiplayerARPG
         public bool IsMount()
         {
             return itemType == ItemType.Mount;
+        }
+
+        public bool IsAttributeIncrease()
+        {
+            return itemType == ItemType.AttributeIncrease;
+        }
+
+        public bool IsAttributeReset()
+        {
+            return itemType == ItemType.AttributeReset;
+        }
+
+        public bool IsSkill()
+        {
+            return itemType == ItemType.Skill;
+        }
+
+        public bool IsSkillLearn()
+        {
+            return itemType == ItemType.SkillLearn;
+        }
+
+        public bool IsSkillReset()
+        {
+            return itemType == ItemType.SkillReset;
         }
 
         public int MaxLevel

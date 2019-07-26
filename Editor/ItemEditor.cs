@@ -80,6 +80,19 @@ namespace MultiplayerARPG
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.SocketEnhancer.ToString(), cacheItem.GetMemberName(a => a.socketEnhanceEffect));
             // Mount
             ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Mount.ToString(), cacheItem.GetMemberName(a => a.mountEntity));
+            // Attribute Increase
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.AttributeIncrease.ToString(), cacheItem.GetMemberName(a => a.maxStack));
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.AttributeIncrease.ToString(), cacheItem.GetMemberName(a => a.attributeAmount));
+            // Attribute Reset
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.AttributeReset.ToString(), cacheItem.GetMemberName(a => a.maxStack));
+            // Skill Use
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Skill.ToString(), cacheItem.GetMemberName(a => a.maxStack));
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.Skill.ToString(), cacheItem.GetMemberName(a => a.skillLevel));
+            // Skill Learn
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.SkillLearn.ToString(), cacheItem.GetMemberName(a => a.maxStack));
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.SkillLearn.ToString(), cacheItem.GetMemberName(a => a.skillLevel));
+            // Skill Reset
+            ShowOnEnum(cacheItem.GetMemberName(a => a.itemType), ItemType.SkillReset.ToString(), cacheItem.GetMemberName(a => a.maxStack));
         }
     }
 }
