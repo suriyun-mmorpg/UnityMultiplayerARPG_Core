@@ -78,13 +78,6 @@ namespace MultiplayerARPG
                 onApplyBuff.Invoke(dataId, type, level);
         }
 
-        protected void ApplyPotionBuff(Item item, short level)
-        {
-            if (IsDead() || !IsServer || item == null || level <= 0)
-                return;
-            ApplyBuff(item.DataId, BuffType.PotionBuff, level);
-        }
-
         protected virtual void ApplySkillBuff(Skill skill, short level)
         {
             if (IsDead() || !IsServer || skill == null || level <= 0)

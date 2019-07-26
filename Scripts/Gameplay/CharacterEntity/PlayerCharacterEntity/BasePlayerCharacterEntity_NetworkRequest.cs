@@ -12,6 +12,30 @@ namespace MultiplayerARPG
             base.SetTargetEntity(entity);
         }
 
+        public bool RequestUseItem(short index)
+        {
+            if (!CanUseItem())
+                return false;
+            CallNetFunction(NetFuncUseItem, FunctionReceivers.Server, index);
+            return true;
+        }
+
+        public bool RequestUseSkillItem(short index, bool isLeftHand)
+        {
+            if (!CanUseItem() || !CanUseSkill())
+                return false;
+            CallNetFunction(NetFuncUseSkillItemWithoutAimPosition, FunctionReceivers.Server, index, isLeftHand);
+            return true;
+        }
+
+        public bool RequestUseSkillItem(short index, bool isLeftHand, Vector3 aimPosition)
+        {
+            if (!CanUseItem() || !CanUseSkill())
+                return false;
+            CallNetFunction(NetFuncUseSkillItemWithAimPosition, FunctionReceivers.Server, index, isLeftHand, aimPosition);
+            return true;
+        }
+
         public bool RequestSwapOrMergeItem(short fromIndex, short toIndex)
         {
             if (IsDead())
@@ -60,9 +84,9 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestAssignHotkey(string hotkeyId, HotkeyType type, int dataId)
+        public bool RequestAssignHotkey(string hotkeyId, HotkeyType type, string id)
         {
-            CallNetFunction(NetFuncAssignHotkey, FunctionReceivers.Server, hotkeyId, (byte)type, dataId);
+            CallNetFunction(NetFuncAssignHotkey, FunctionReceivers.Server, hotkeyId, (byte)type, id);
             return true;
         }
 

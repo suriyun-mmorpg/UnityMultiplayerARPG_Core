@@ -7,14 +7,6 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        protected virtual void ApplyItemMount(Item item, short level)
-        {
-            if (IsDead() || !IsServer || item == null || level <= 0)
-                return;
-
-            Mount(item.mountEntity);
-        }
-
         protected virtual void ApplySkillMount(Skill skill, short level)
         {
             if (IsDead() || !IsServer || skill == null || level <= 0)

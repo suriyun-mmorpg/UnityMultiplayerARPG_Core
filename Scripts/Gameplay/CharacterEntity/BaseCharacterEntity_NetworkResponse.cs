@@ -45,37 +45,6 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// This will be called on server to use item
-        /// </summary>
-        /// <param name="dataId"></param>
-        protected virtual void NetFuncUseItem(short itemIndex)
-        {
-            if (!CanUseItem())
-                return;
-
-            if (itemIndex >= nonEquipItems.Count)
-                return;
-
-            CharacterItem characterItem = nonEquipItems[itemIndex];
-            if (characterItem.IsLock())
-                return;
-
-            Item tempItem;
-            // Use potion item
-            tempItem = characterItem.GetPotionItem();
-            if (tempItem != null && this.DecreaseItemsByIndex(itemIndex, 1))
-                ApplyPotionBuff(tempItem, characterItem.level);
-            // Use pet item
-            tempItem = characterItem.GetPetItem();
-            if (tempItem != null && this.DecreaseItemsByIndex(itemIndex, 1))
-                ApplyItemPetSummon(tempItem, characterItem.level, characterItem.exp);
-            // Use mount item
-            tempItem = characterItem.GetMountItem();
-            if (tempItem != null)
-                ApplyItemMount(tempItem, characterItem.level);
-        }
-
-        /// <summary>
         /// This will be called at every clients to play any action animation
         /// </summary>
         /// <param name="actionId"></param>
@@ -235,7 +204,7 @@ namespace MultiplayerARPG
                     break;
                 case InventoryType.EquipItems:
                     if (oldEquipIndex < 0)
-                        oldEquipIndex = (short)this.IndexOfEquipItem(equippingItem.GetArmorItem().EquipPosition);
+                        oldEquipIndex = (short)this.IndexOfEquipItemByEquipPosition(equippingItem.GetArmorItem().EquipPosition);
                     if (oldEquipIndex >= 0)
                         NetFuncUnEquipItem((byte)InventoryType.EquipItems, oldEquipIndex);
                     equipItems.Add(equippingItem);

@@ -58,14 +58,6 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestUseItem(short index)
-        {
-            if (!CanUseItem())
-                return false;
-            CallNetFunction(NetFuncUseItem, FunctionReceivers.Server, index);
-            return true;
-        }
-
         public bool RequestPlayActionAnimation(AnimActionType animActionType, int dataId, byte animationIndex)
         {
             if (IsDead())
@@ -132,7 +124,7 @@ namespace MultiplayerARPG
             else if (shieldItem != null)
                 return RequestEquipItem(nonEquipIndex, (byte)InventoryType.EquipWeaponLeft, 0);
             else if (armorItem != null)
-                return RequestEquipItem(nonEquipIndex, (byte)InventoryType.EquipItems, (short)this.IndexOfEquipItem(armorItem.EquipPosition));
+                return RequestEquipItem(nonEquipIndex, (byte)InventoryType.EquipItems, (short)this.IndexOfEquipItemByEquipPosition(armorItem.EquipPosition));
             return false;
         }
 

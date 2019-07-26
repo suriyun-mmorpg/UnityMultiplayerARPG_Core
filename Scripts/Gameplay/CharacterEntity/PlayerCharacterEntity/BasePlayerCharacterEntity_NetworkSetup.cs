@@ -55,13 +55,16 @@ namespace MultiplayerARPG
             storageItems.onOperation += OnStorageItemsOperation;
             // Register Network functions
             RegisterNetFunction<PackedUInt>(NetFuncSetTargetEntity);
+            RegisterNetFunction<short>(NetFuncUseItem);
+            RegisterNetFunction<short, bool>(NetFuncUseSkillItemWithoutAimPosition);
+            RegisterNetFunction<short, bool, Vector3>(NetFuncUseSkillItemWithAimPosition);
             RegisterNetFunction<short, short>(NetFuncSwapOrMergeItem);
             RegisterNetFunction<int>(NetFuncAddAttribute);
             RegisterNetFunction<int>(NetFuncAddSkill);
             RegisterNetFunction<int>(NetFuncAddGuildSkill);
             RegisterNetFunction<int>(NetFuncUseGuildSkill);
             RegisterNetFunction(NetFuncRespawn);
-            RegisterNetFunction<string, byte, int>(NetFuncAssignHotkey);
+            RegisterNetFunction<string, byte, string>(NetFuncAssignHotkey);
             RegisterNetFunction<PackedUInt>(NetFuncNpcActivate);
             RegisterNetFunction<int>(NetFuncShowNpcDialog);
             RegisterNetFunction(NetFuncShowNpcRefine);
