@@ -181,12 +181,12 @@ namespace MultiplayerARPG
             Respawn();
         }
 
-        protected void NetFuncAssignHotkey(string hotkeyId, byte type, string id)
+        protected void NetFuncAssignHotkey(string hotkeyId, byte type, string relateId)
         {
             CharacterHotkey characterHotkey = new CharacterHotkey();
             characterHotkey.hotkeyId = hotkeyId;
             characterHotkey.type = (HotkeyType)type;
-            characterHotkey.id = id;
+            characterHotkey.relateId = relateId;
             int hotkeyIndex = this.IndexOfHotkey(hotkeyId);
             if (hotkeyIndex >= 0)
                 hotkeys[hotkeyIndex] = characterHotkey;

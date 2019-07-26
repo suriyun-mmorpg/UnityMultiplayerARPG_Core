@@ -719,10 +719,10 @@ namespace MultiplayerARPG
             switch (hotkey.type)
             {
                 case HotkeyType.Skill:
-                    UseSkill(hotkey.id);
+                    UseSkill(hotkey.relateId);
                     break;
-                case HotkeyType.Item:
-                    UseItem(hotkey.id);
+                case HotkeyType.NonEquipItem:
+                    UseItem(hotkey.relateId);
                     break;
             }
         }

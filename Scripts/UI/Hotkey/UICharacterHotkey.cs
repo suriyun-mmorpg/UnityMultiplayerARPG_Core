@@ -68,7 +68,7 @@ namespace MultiplayerARPG
                 // All skills included equipment skills
                 Dictionary<Skill, short> skills = owningCharacter.GetSkills();
 
-                if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(Data.id), out skill) ||
+                if (!GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(Data.relateId), out skill) ||
                     skill == null || !skills.TryGetValue(skill, out skillLevel))
                 {
                     uiCharacterSkill.Hide();
@@ -76,7 +76,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // Found skill, so create new skill entry if it's not existed in learn skill list
-                    int skillIndex = owningCharacter.IndexOfSkill(BaseGameData.MakeDataId(Data.id));
+                    int skillIndex = owningCharacter.IndexOfSkill(BaseGameData.MakeDataId(Data.relateId));
                     CharacterSkill characterSkill = skillIndex >= 0 ? owningCharacter.Skills[skillIndex] : CharacterSkill.Create(skill, skillLevel);
                     uiCharacterSkill.Setup(new CharacterSkillTuple(characterSkill, skillLevel), owningCharacter, skillIndex);
                     uiCharacterSkill.Show();
@@ -89,7 +89,7 @@ namespace MultiplayerARPG
             if (uiCharacterItem != null)
             {
                 // Prepare item data
-                int itemIndex = owningCharacter.IndexOfNonEquipItem(Data.id);
+                int itemIndex = owningCharacter.IndexOfNonEquipItem(Data.relateId);
                 if (itemIndex < 0)
                 {
                     uiCharacterItem.Hide();

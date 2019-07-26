@@ -714,7 +714,7 @@ namespace MultiplayerARPG
             CharacterHotkey hotkey = PlayerCharacterEntity.Hotkeys[hotkeyIndex];
 
             Skill skill = null;
-            if (GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(hotkey.id), out skill) && skill != null &&
+            if (GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(hotkey.relateId), out skill) && skill != null &&
                 PlayerCharacterEntity.CacheSkills != null && PlayerCharacterEntity.CacheSkills.ContainsKey(skill))
             {
                 PlayerCharacterEntity.StopMove();
@@ -722,7 +722,7 @@ namespace MultiplayerARPG
             }
 
             Item item = null;
-            int itemIndex = PlayerCharacterEntity.IndexOfNonEquipItem(hotkey.id);
+            int itemIndex = PlayerCharacterEntity.IndexOfNonEquipItem(hotkey.relateId);
             if (itemIndex >= 0)
             {
                 item = PlayerCharacterEntity.NonEquipItems[itemIndex].GetItem();

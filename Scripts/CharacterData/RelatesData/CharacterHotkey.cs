@@ -6,8 +6,8 @@ public enum HotkeyType : byte
 {
     None,
     Skill,
-    Item,
-    SystemKey,
+    NonEquipItem,
+    EquipItem,
 }
 
 [System.Serializable]
@@ -16,20 +16,20 @@ public class CharacterHotkey : INetSerializable
     public static readonly CharacterHotkey Empty = new CharacterHotkey();
     public string hotkeyId;
     public HotkeyType type;
-    public string id;
+    public string relateId;
 
     public void Serialize(NetDataWriter writer)
     {
         writer.Put(hotkeyId);
         writer.Put((byte)type);
-        writer.Put(id);
+        writer.Put(relateId);
     }
 
     public void Deserialize(NetDataReader reader)
     {
         hotkeyId = reader.GetString();
         type = (HotkeyType)reader.GetByte();
-        id = reader.GetString();
+        relateId = reader.GetString();
     }
 }
 

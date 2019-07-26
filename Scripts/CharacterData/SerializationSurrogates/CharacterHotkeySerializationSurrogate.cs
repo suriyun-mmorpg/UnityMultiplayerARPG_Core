@@ -10,7 +10,7 @@ public class CharacterHotkeySerializationSurrogate : ISerializationSurrogate
         CharacterHotkey data = (CharacterHotkey)obj;
         info.AddValue("hotkeyId", data.hotkeyId);
         info.AddValue("type", (byte)data.type);
-        info.AddValue("id", data.id);
+        info.AddValue("relateId", data.relateId);
     }
 
     public System.Object SetObjectData(System.Object obj,
@@ -23,12 +23,9 @@ public class CharacterHotkeySerializationSurrogate : ISerializationSurrogate
         // TODO: Backward compatible, this will be removed in future version
         try
         {
-            data.id = info.GetString("id");
+            data.relateId = info.GetString("relateId");
         }
-        catch
-        {
-            data.id = GenericUtils.GetUniqueId();
-        }
+        catch { }
         obj = data;
         return obj;
     }
