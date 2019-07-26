@@ -20,6 +20,12 @@ namespace MultiplayerARPG
         public Item BuildingItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetBuildingItem() : null; } }
         public Item PetItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetPetItem() : null; } }
         public Item SocketEnhancerItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetSocketEnhancerItem() : null; } }
+        public Item MountItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetMountItem() : null; } }
+        public Item AttributeIncreaseItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetAttributeIncreaseItem() : null; } }
+        public Item AttributeResetItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetAttributeResetItem() : null; } }
+        public Item SkillItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetSkillItem() : null; } }
+        public Item SkillLearnItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetSkillLearnItem() : null; } }
+        public Item SkillResetItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetSkillResetItem() : null; } }
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
@@ -292,6 +298,36 @@ namespace MultiplayerARPG
                             uiTextItemType.text = string.Format(
                                 LanguageManager.GetText(formatKeyItemType),
                                 LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_SOCKET_ENHANCER.ToString()));
+                            break;
+                        case ItemType.Mount:
+                            uiTextItemType.text = string.Format(
+                                LanguageManager.GetText(formatKeyItemType),
+                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_MOUNT.ToString()));
+                            break;
+                        case ItemType.AttributeIncrease:
+                            uiTextItemType.text = string.Format(
+                                LanguageManager.GetText(formatKeyItemType),
+                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_ATTRIBUTE_INCREASE.ToString()));
+                            break;
+                        case ItemType.AttributeReset:
+                            uiTextItemType.text = string.Format(
+                                LanguageManager.GetText(formatKeyItemType),
+                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_ATTRIBUTE_RESET.ToString()));
+                            break;
+                        case ItemType.Skill:
+                            uiTextItemType.text = string.Format(
+                                LanguageManager.GetText(formatKeyItemType),
+                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_SKILL.ToString()));
+                            break;
+                        case ItemType.SkillLearn:
+                            uiTextItemType.text = string.Format(
+                                LanguageManager.GetText(formatKeyItemType),
+                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_SKILL_LEARN.ToString()));
+                            break;
+                        case ItemType.SkillReset:
+                            uiTextItemType.text = string.Format(
+                                LanguageManager.GetText(formatKeyItemType),
+                                LanguageManager.GetText(UILocaleKeys.UI_ITEM_TYPE_SKILL_LEARN.ToString()));
                             break;
                     }
                 }

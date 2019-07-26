@@ -511,6 +511,13 @@ namespace MultiplayerARPG
         UI_GUILD_ROLE_CANNOT_INVITE,
         UI_GUILD_ROLE_CAN_KICK,
         UI_GUILD_ROLE_CANNOT_KICK,
+        // New Item Types
+        UI_ITEM_TYPE_MOUNT,
+        UI_ITEM_TYPE_ATTRIBUTE_INCREASE,
+        UI_ITEM_TYPE_ATTRIBUTE_RESET,
+        UI_ITEM_TYPE_SKILL,
+        UI_ITEM_TYPE_SKILL_LEARN,
+        UI_ITEM_TYPE_SKILL_RESET,
     }
 
     public static class DefaultLocale
@@ -640,6 +647,12 @@ namespace MultiplayerARPG
             Texts.Add(UILocaleKeys.UI_ITEM_TYPE_BUILDING.ToString(), "Building");
             Texts.Add(UILocaleKeys.UI_ITEM_TYPE_PET.ToString(), "Pet");
             Texts.Add(UILocaleKeys.UI_ITEM_TYPE_SOCKET_ENHANCER.ToString(), "Socket Enhancer");
+            Texts.Add(UILocaleKeys.UI_ITEM_TYPE_MOUNT.ToString(), "Mount");
+            Texts.Add(UILocaleKeys.UI_ITEM_TYPE_ATTRIBUTE_INCREASE.ToString(), "Attribute Increase");
+            Texts.Add(UILocaleKeys.UI_ITEM_TYPE_ATTRIBUTE_RESET.ToString(), "Attribute Reset");
+            Texts.Add(UILocaleKeys.UI_ITEM_TYPE_SKILL.ToString(), "Skill");
+            Texts.Add(UILocaleKeys.UI_ITEM_TYPE_SKILL_LEARN.ToString(), "Skill Learn");
+            Texts.Add(UILocaleKeys.UI_ITEM_TYPE_SKILL_RESET.ToString(), "Skill Reset");
             Texts.Add(UILocaleKeys.UI_FORMAT_ITEM_RARITY.ToString(), "Rarity: {0}");
             Texts.Add(UILocaleKeys.UI_FORMAT_ITEM_STACK.ToString(), "{0}/{1}");
             Texts.Add(UILocaleKeys.UI_FORMAT_ITEM_DURABILITY.ToString(), "Durability: {0}");
