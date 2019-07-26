@@ -7,6 +7,7 @@ using MultiplayerARPG;
 public class CharacterItem : INetSerializable
 {
     public static readonly CharacterItem Empty = new CharacterItem();
+    public string id;
     public int dataId;
     public short level;
     public short amount;
@@ -42,6 +43,16 @@ public class CharacterItem : INetSerializable
     private Item cacheSocketEnhancerItem;
     [System.NonSerialized]
     private Item cacheMountItem;
+    [System.NonSerialized]
+    private Item cacheAttributeIncreaseItem;
+    [System.NonSerialized]
+    private Item cacheAttributeResetItem;
+    [System.NonSerialized]
+    private Item cacheSkillItem;
+    [System.NonSerialized]
+    private Item cacheSkillLearnItem;
+    [System.NonSerialized]
+    private Item cacheSkillResetItem;
 
     public List<int> Sockets
     {
@@ -70,6 +81,11 @@ public class CharacterItem : INetSerializable
             cachePetItem = null;
             cacheSocketEnhancerItem = null;
             cacheMountItem = null;
+            cacheAttributeIncreaseItem = null;
+            cacheAttributeResetItem = null;
+            cacheSkillItem = null;
+            cacheSkillLearnItem = null;
+            cacheSkillResetItem = null;
             if (GameInstance.Items.TryGetValue(dataId, out cacheItem) && cacheItem != null)
             {
                 if (cacheItem.IsEquipment())
@@ -94,6 +110,16 @@ public class CharacterItem : INetSerializable
                     cacheSocketEnhancerItem = cacheItem;
                 if (cacheItem.IsMount())
                     cacheMountItem = cacheItem;
+                if (cacheItem.IsAttributeIncrease())
+                    cacheAttributeIncreaseItem = cacheItem;
+                if (cacheItem.IsAttributeReset())
+                    cacheAttributeResetItem = cacheItem;
+                if (cacheItem.IsSkill())
+                    cacheSkillItem = cacheItem;
+                if (cacheItem.IsSkillLearn())
+                    cacheSkillLearnItem = cacheItem;
+                if (cacheItem.IsSkillReset())
+                    cacheSkillResetItem = cacheItem;
             }
         }
     }
@@ -168,6 +194,36 @@ public class CharacterItem : INetSerializable
     {
         MakeCache();
         return cacheMountItem;
+    }
+
+    public Item GetAttributeIncreaseItem()
+    {
+        MakeCache();
+        return cacheAttributeIncreaseItem;
+    }
+
+    public Item GetAttributeResetItem()
+    {
+        MakeCache();
+        return cacheAttributeResetItem;
+    }
+
+    public Item GetSkillItem()
+    {
+        MakeCache();
+        return cacheSkillItem;
+    }
+
+    public Item GetSkillLearnItem()
+    {
+        MakeCache();
+        return cacheSkillLearnItem;
+    }
+
+    public Item GetSkillResetItem()
+    {
+        MakeCache();
+        return cacheSkillResetItem;
     }
 
     public short GetMaxStack()
@@ -376,6 +432,7 @@ public class CharacterItem : INetSerializable
     public CharacterItem Clone()
     {
         CharacterItem cloneItem = new CharacterItem();
+        cloneItem.id = id;
         cloneItem.dataId = dataId;
         cloneItem.level = level;
         cloneItem.amount = amount;
@@ -394,6 +451,7 @@ public class CharacterItem : INetSerializable
     public static CharacterItem Create(int dataId, short level = 1, short amount = 1)
     {
         CharacterItem newItem = new CharacterItem();
+        newItem.id = GenericUtils.GetUniqueId();
         newItem.dataId = dataId;
         newItem.level = level;
         newItem.amount = amount;
@@ -412,6 +470,7 @@ public class CharacterItem : INetSerializable
 
     public void Serialize(NetDataWriter writer)
     {
+        writer.Put(id);
         writer.Put(dataId);
         writer.Put(level);
         writer.Put(amount);
@@ -443,6 +502,7 @@ public class CharacterItem : INetSerializable
 
     public void Deserialize(NetDataReader reader)
     {
+        id = reader.GetString();
         dataId = reader.GetInt();
         level = reader.GetShort();
         amount = reader.GetShort();
