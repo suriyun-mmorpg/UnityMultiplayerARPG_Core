@@ -80,48 +80,56 @@ namespace MultiplayerARPG
                 return false;
 
             bool available = true;
-            switch (skill.skillType)
+            if (character is IPlayerCharacterData)
             {
-                case SkillType.Active:
-                    WeaponType[] availableWeapons = skill.availableWeapons;
-                    available = availableWeapons == null || availableWeapons.Length == 0;
-                    if (!available)
-                    {
-                        Item rightWeaponItem = character.EquipWeapons.rightHand.GetWeaponItem();
-                        Item leftWeaponItem = character.EquipWeapons.leftHand.GetWeaponItem();
-                        foreach (WeaponType availableWeapon in availableWeapons)
+                // Only player character will check for available weapons
+                switch (skill.skillType)
+                {
+                    case SkillType.Active:
+                        WeaponType[] availableWeapons = skill.availableWeapons;
+                        available = availableWeapons == null || availableWeapons.Length == 0;
+                        if (!available)
                         {
-                            if (rightWeaponItem != null && rightWeaponItem.WeaponType == availableWeapon)
+                            Item rightWeaponItem = character.EquipWeapons.rightHand.GetWeaponItem();
+                            Item leftWeaponItem = character.EquipWeapons.leftHand.GetWeaponItem();
+                            foreach (WeaponType availableWeapon in availableWeapons)
                             {
-                                available = true;
-                                break;
-                            }
-                            else if (leftWeaponItem != null && leftWeaponItem.WeaponType == availableWeapon)
-                            {
-                                available = true;
-                                break;
-                            }
-                            else if (rightWeaponItem == null && leftWeaponItem == null && GameInstance.Singleton.DefaultWeaponItem.WeaponType == availableWeapon)
-                            {
-                                available = true;
-                                break;
+                                if (rightWeaponItem != null && rightWeaponItem.WeaponType == availableWeapon)
+                                {
+                                    available = true;
+                                    break;
+                                }
+                                else if (leftWeaponItem != null && leftWeaponItem.WeaponType == availableWeapon)
+                                {
+                                    available = true;
+                                    break;
+                                }
+                                else if (rightWeaponItem == null && leftWeaponItem == null && GameInstance.Singleton.DefaultWeaponItem.WeaponType == availableWeapon)
+                                {
+                                    available = true;
+                                    break;
+                                }
                             }
                         }
-                    }
-                    break;
-                case SkillType.CraftItem:
-                    if (!(character is BasePlayerCharacterEntity) || !skill.itemCraft.CanCraft(character as BasePlayerCharacterEntity))
+                        break;
+                    case SkillType.CraftItem:
+                        if (!(character is BasePlayerCharacterEntity) || !skill.itemCraft.CanCraft(character as BasePlayerCharacterEntity))
+                            return false;
+                        break;
+                    default:
                         return false;
-                    break;
-                default:
-                    return false;
+                }
             }
+
             if (level <= 0)
                 return false;
+
             if (!available)
                 return false;
+
             if (character.CurrentMp < skill.GetConsumeMp(level))
                 return false;
+
             int skillUsageIndex = character.IndexOfSkillUsage(skill.DataId, SkillUsageType.Skill);
             if (skillUsageIndex >= 0 && character.SkillUsages[skillUsageIndex].coolDownRemainsDuration > 0f)
                 return false;
