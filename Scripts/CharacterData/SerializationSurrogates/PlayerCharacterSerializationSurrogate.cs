@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using UnityEngine;
-using MultiplayerARPG;
 
 public partial class PlayerCharacterSerializationSurrogate : ISerializationSurrogate
 {
