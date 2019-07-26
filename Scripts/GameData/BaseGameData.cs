@@ -37,8 +37,13 @@ namespace MultiplayerARPG
                 return description;
             }
         }
-        public int DataId { get { return Id.GenerateHashId(); } }
+        public int DataId { get { return MakeDataId(Id); } }
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
+
+        public static int MakeDataId(string id)
+        {
+            return id.GenerateHashId();
+        }
 
         private Dictionary<string, string> cacheTitles;
         public Dictionary<string, string> CacheTitles
