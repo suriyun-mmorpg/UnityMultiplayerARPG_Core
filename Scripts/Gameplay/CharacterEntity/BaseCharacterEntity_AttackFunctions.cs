@@ -170,7 +170,7 @@ namespace MultiplayerARPG
             }
         }
         
-        private IEnumerator ReloadRoutine(
+        protected IEnumerator ReloadRoutine(
             AnimActionType animActionType,
             int weaponTypeDataId,
             float triggerDuration,
@@ -255,7 +255,7 @@ namespace MultiplayerARPG
             StartCoroutine(AttackRoutine(animActionType, weaponTypeDataId, animationIndex, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition));
         }
 
-        private IEnumerator AttackRoutine(
+        protected IEnumerator AttackRoutine(
             AnimActionType animActionType,
             int weaponTypeDataId,
             int animationIndex,

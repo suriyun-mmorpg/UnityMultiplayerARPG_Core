@@ -109,6 +109,10 @@ namespace MultiplayerARPG
         /// <summary>
         /// Is function will be called at server to order character to use skill
         /// </summary>
+        /// <param name="dataId"></param>
+        /// <param name="isLeftHand"></param>
+        /// <param name="hasAimPosition"></param>
+        /// <param name="aimPosition"></param>
         protected virtual void NetFuncUseSkill(int dataId, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition)
         {
             if (!CanUseSkill())
@@ -161,7 +165,7 @@ namespace MultiplayerARPG
             StartCoroutine(UseSkillRoutine(skill, level, animActionType, skillOrWeaponTypeDataId, animationIndex, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition));
         }
 
-        private IEnumerator UseSkillRoutine(
+        protected IEnumerator UseSkillRoutine(
             Skill skill,
             short level,
             AnimActionType animActionType,
@@ -235,7 +239,7 @@ namespace MultiplayerARPG
             StartCoroutine(SkillCastingRoutine(dataId, duration));
         }
 
-        private IEnumerator SkillCastingRoutine(int dataId, float duration)
+        protected IEnumerator SkillCastingRoutine(int dataId, float duration)
         {
             // Set doing action state at clients and server
             isAttackingOrUsingSkill = true;
