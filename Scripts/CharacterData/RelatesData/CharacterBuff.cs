@@ -283,4 +283,15 @@ public class CharacterBuff : INetSerializableWithElement
 [System.Serializable]
 public class SyncListCharacterBuff : LiteNetLibSyncList<CharacterBuff>
 {
+    protected override CharacterBuff DeserializeValueForSetOrDirty(int index, NetDataReader reader)
+    {
+        CharacterBuff result = this[index];
+        result.buffRemainsDuration = reader.GetFloat();
+        return result;
+    }
+
+    protected override void SerializeValueForSetOrDirty(int index, NetDataWriter writer, CharacterBuff value)
+    {
+        writer.Put(value.buffRemainsDuration);
+    }
 }

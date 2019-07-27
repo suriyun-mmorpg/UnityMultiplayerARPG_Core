@@ -114,6 +114,17 @@ public class CharacterSkillUsage : INetSerializableWithElement
 }
 
 [System.Serializable]
-public class SyncListCharacterSkillUsage : LiteNetLibSyncList<CharacterSkillUsage>
+public sealed class SyncListCharacterSkillUsage : LiteNetLibSyncList<CharacterSkillUsage>
 {
+    protected override CharacterSkillUsage DeserializeValueForSetOrDirty(int index, NetDataReader reader)
+    {
+        CharacterSkillUsage result = this[index];
+        result.coolDownRemainsDuration = reader.GetFloat();
+        return result;
+    }
+
+    protected override void SerializeValueForSetOrDirty(int index, NetDataWriter writer, CharacterSkillUsage value)
+    {
+        writer.Put(value.coolDownRemainsDuration);
+    }
 }

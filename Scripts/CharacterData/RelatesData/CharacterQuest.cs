@@ -158,4 +158,29 @@ public class CharacterQuest : INetSerializableWithElement
 [System.Serializable]
 public class SyncListCharacterQuest : LiteNetLibSyncList<CharacterQuest>
 {
+    protected override CharacterQuest DeserializeValueForSetOrDirty(int index, NetDataReader reader)
+    {
+        CharacterQuest result = this[index];
+        int killMonsterCount = reader.GetByte();
+        result.KilledMonsters.Clear();
+        for (int i = 0; i < killMonsterCount; ++i)
+        {
+            result.KilledMonsters.Add(reader.GetInt(), reader.GetInt());
+        }
+        return result;
+    }
+
+    protected override void SerializeValueForSetOrDirty(int index, NetDataWriter writer, CharacterQuest value)
+    {
+        byte killMonsterCount = (byte)value.KilledMonsters.Count;
+        writer.Put(killMonsterCount);
+        if (killMonsterCount > 0)
+        {
+            foreach (KeyValuePair<int, int> killedMonster in value.KilledMonsters)
+            {
+                writer.Put(killedMonster.Key);
+                writer.Put(killedMonster.Value);
+            }
+        }
+    }
 }

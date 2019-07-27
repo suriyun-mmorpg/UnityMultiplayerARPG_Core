@@ -204,4 +204,15 @@ public class CharacterSummon : INetSerializableWithElement
 [System.Serializable]
 public class SyncListCharacterSummon : LiteNetLibSyncList<CharacterSummon>
 {
+    protected override CharacterSummon DeserializeValueForSetOrDirty(int index, NetDataReader reader)
+    {
+        CharacterSummon result = this[index];
+        result.summonRemainsDuration = reader.GetFloat();
+        return result;
+    }
+
+    protected override void SerializeValueForSetOrDirty(int index, NetDataWriter writer, CharacterSummon value)
+    {
+        writer.Put(value.summonRemainsDuration);
+    }
 }
