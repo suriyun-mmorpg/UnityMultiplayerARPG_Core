@@ -480,11 +480,11 @@ public class CharacterItem : INetSerializableWithElement
 
     public void Serialize(NetDataWriter writer)
     {
-        if (Element == null || Element.IsOwnerClient)
+        if (Element == null || Element.SendingConnectionId == Element.ConnectionId)
             writer.Put(id);
         writer.Put(dataId);
         writer.Put(level);
-        if (Element == null || Element.IsOwnerClient)
+        if (Element == null || Element.SendingConnectionId == Element.ConnectionId)
         {
             writer.Put(amount);
             writer.Put(lockRemainsDuration);
