@@ -88,7 +88,6 @@ namespace MultiplayerARPG
             {
                 CacheDiscovery.onReceivedBroadcast += OnReceivedBroadcast;
                 CacheDiscovery.StartClient();
-                Debug.LogError("Start");
             }
         }
 
@@ -103,7 +102,6 @@ namespace MultiplayerARPG
 
         private void OnReceivedBroadcast(IPEndPoint remoteEndPoint, string data)
         {
-            Debug.LogError("Receive something");
             DiscoveryData characterData = JsonUtility.FromJson<DiscoveryData>(data);
             discoveries[characterData.id] = characterData;
             remoteEndPoints[characterData.id] = remoteEndPoint;
