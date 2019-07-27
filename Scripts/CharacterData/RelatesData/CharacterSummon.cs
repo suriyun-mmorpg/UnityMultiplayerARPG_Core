@@ -11,7 +11,7 @@ public enum SummonType : byte
 }
 
 [System.Serializable]
-public class CharacterSummon : INetSerializable
+public class CharacterSummon : INetSerializableWithElement
 {
     public static readonly CharacterSummon Empty = new CharacterSummon();
     public SummonType type;
@@ -30,6 +30,7 @@ public class CharacterSummon : INetSerializable
 
     [System.NonSerialized]
     private int dirtyDataId;
+
     [System.NonSerialized]
     private Skill cacheSkill;
     [System.NonSerialized]
@@ -51,6 +52,14 @@ public class CharacterSummon : INetSerializable
             }
             return cacheEntity;
         }
+    }
+
+    [System.NonSerialized]
+    private LiteNetLibElement element;
+    public LiteNetLibElement Element
+    {
+        get { return element; }
+        set { element = value; }
     }
 
     private void MakeCache()

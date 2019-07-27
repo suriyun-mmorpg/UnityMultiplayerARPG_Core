@@ -13,19 +13,21 @@ public enum BuffType : byte
 }
 
 [System.Serializable]
-public class CharacterBuff : INetSerializable
+public class CharacterBuff : INetSerializableWithElement
 {
     public static readonly CharacterBuff Empty = new CharacterBuff();
     public BuffType type;
     public int dataId;
     public short level;
     public float buffRemainsDuration;
+
     [System.NonSerialized]
     private BuffType dirtyType;
     [System.NonSerialized]
     private int dirtyDataId;
     [System.NonSerialized]
     private short dirtyLevel;
+
     [System.NonSerialized]
     private Skill cacheSkill;
     [System.NonSerialized]
@@ -56,6 +58,14 @@ public class CharacterBuff : INetSerializable
     private Dictionary<DamageElement, MinMaxFloat> cacheIncreaseDamages;
     [System.NonSerialized]
     private Dictionary<DamageElement, MinMaxFloat> cacheDamageOverTimes;
+
+    [System.NonSerialized]
+    private LiteNetLibElement element;
+    public LiteNetLibElement Element
+    {
+        get { return element; }
+        set { element = value; }
+    }
 
     private void MakeCache()
     {

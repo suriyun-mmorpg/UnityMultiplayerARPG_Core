@@ -3,15 +3,25 @@ using LiteNetLibManager;
 using MultiplayerARPG;
 
 [System.Serializable]
-public class CharacterAttribute : INetSerializable
+public class CharacterAttribute : INetSerializableWithElement
 {
     public static readonly CharacterAttribute Empty = new CharacterAttribute();
     public int dataId;
     public short amount;
+
     [System.NonSerialized]
     private int dirtyDataId;
+
     [System.NonSerialized]
     private Attribute cacheAttribute;
+
+    [System.NonSerialized]
+    private LiteNetLibElement element;
+    public LiteNetLibElement Element
+    {
+        get { return element; }
+        set { element = value; }
+    }
 
     private void MakeCache()
     {

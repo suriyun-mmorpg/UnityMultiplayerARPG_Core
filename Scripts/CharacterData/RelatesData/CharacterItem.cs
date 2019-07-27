@@ -4,7 +4,7 @@ using LiteNetLibManager;
 using MultiplayerARPG;
 
 [System.Serializable]
-public class CharacterItem : INetSerializable
+public class CharacterItem : INetSerializableWithElement
 {
     public static readonly CharacterItem Empty = new CharacterItem();
     public string id;
@@ -16,9 +16,11 @@ public class CharacterItem : INetSerializable
     public float lockRemainsDuration;
     public short ammo;
     public List<int> sockets = new List<int>();
+
     // TODO: I want to add random item bonus
     [System.NonSerialized]
     private int dirtyDataId;
+
     [System.NonSerialized]
     private Item cacheItem;
     [System.NonSerialized]
@@ -53,6 +55,14 @@ public class CharacterItem : INetSerializable
     private Item cacheSkillLearnItem;
     [System.NonSerialized]
     private Item cacheSkillResetItem;
+
+    [System.NonSerialized]
+    private LiteNetLibElement element;
+    public LiteNetLibElement Element
+    {
+        get { return element; }
+        set { element = value; }
+    }
 
     public List<int> Sockets
     {
@@ -470,62 +480,70 @@ public class CharacterItem : INetSerializable
 
     public void Serialize(NetDataWriter writer)
     {
-        writer.Put(id);
+        if (Element == null || Element.IsOwnerClient)
+            writer.Put(id);
         writer.Put(dataId);
         writer.Put(level);
-        writer.Put(amount);
-        writer.Put(lockRemainsDuration);
-        // Put only needed data
-        if (GetEquipmentItem() != null)
+        if (Element == null || Element.IsOwnerClient)
         {
-            writer.Put(durability);
-            writer.Put(exp);
-            if (GetWeaponItem() != null)
+            writer.Put(amount);
+            writer.Put(lockRemainsDuration);
+            // Put only needed data
+            if (GetEquipmentItem() != null)
             {
-                writer.Put(ammo);
-                byte socketCount = (byte)Sockets.Count;
-                writer.Put(socketCount);
-                if (socketCount > 0)
+                writer.Put(durability);
+                writer.Put(exp);
+                if (GetWeaponItem() != null)
                 {
-                    foreach (int socketDataId in Sockets)
+                    writer.Put(ammo);
+                    byte socketCount = (byte)Sockets.Count;
+                    writer.Put(socketCount);
+                    if (socketCount > 0)
                     {
-                        writer.Put(socketDataId);
+                        foreach (int socketDataId in Sockets)
+                        {
+                            writer.Put(socketDataId);
+                        }
                     }
                 }
             }
-        }
-        if (GetPetItem() != null)
-        {
-            writer.Put(exp);
+            if (GetPetItem() != null)
+            {
+                writer.Put(exp);
+            }
         }
     }
 
     public void Deserialize(NetDataReader reader)
     {
-        id = reader.GetString();
+        if (Element == null || Element.IsOwnerClient)
+            id = reader.GetString();
         dataId = reader.GetInt();
         level = reader.GetShort();
-        amount = reader.GetShort();
-        lockRemainsDuration = reader.GetFloat();
-        // Read only needed data
-        if (GetEquipmentItem() != null)
+        if (Element == null || Element.IsOwnerClient)
         {
-            durability = reader.GetFloat();
-            exp = reader.GetInt();
-            if (GetWeaponItem() != null)
+            amount = reader.GetShort();
+            lockRemainsDuration = reader.GetFloat();
+            // Read only needed data
+            if (GetEquipmentItem() != null)
             {
-                ammo = reader.GetShort();
-                int socketCount = reader.GetByte();
-                Sockets.Clear();
-                for (int i = 0; i < socketCount; ++i)
+                durability = reader.GetFloat();
+                exp = reader.GetInt();
+                if (GetWeaponItem() != null)
                 {
-                    Sockets.Add(reader.GetInt());
+                    ammo = reader.GetShort();
+                    int socketCount = reader.GetByte();
+                    Sockets.Clear();
+                    for (int i = 0; i < socketCount; ++i)
+                    {
+                        Sockets.Add(reader.GetInt());
+                    }
                 }
             }
-        }
-        if (GetPetItem() != null)
-        {
-            exp = reader.GetInt();
+            if (GetPetItem() != null)
+            {
+                exp = reader.GetInt();
+            }
         }
     }
 }

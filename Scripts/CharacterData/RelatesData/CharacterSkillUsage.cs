@@ -9,18 +9,27 @@ public enum SkillUsageType : byte
 }
 
 [System.Serializable]
-public class CharacterSkillUsage : INetSerializable
+public class CharacterSkillUsage : INetSerializableWithElement
 {
     public static readonly CharacterSkillUsage Empty = new CharacterSkillUsage();
     public SkillUsageType type;
     public int dataId;
     public float coolDownRemainsDuration;
+
     [System.NonSerialized]
     private int dirtyDataId;
     [System.NonSerialized]
     private Skill cacheSkill;
     [System.NonSerialized]
     private GuildSkill cacheGuildSkill;
+
+    [System.NonSerialized]
+    private LiteNetLibElement element;
+    public LiteNetLibElement Element
+    {
+        get { return element; }
+        set { element = value; }
+    }
 
     private void MakeCache()
     {

@@ -4,17 +4,19 @@ using LiteNetLibManager;
 using MultiplayerARPG;
 
 [System.Serializable]
-public class CharacterSkill : INetSerializable
+public class CharacterSkill : INetSerializableWithElement
 {
     public static readonly CharacterSkill Empty = new CharacterSkill();
     public int dataId;
     public short level;
+
     [System.NonSerialized]
     private int dirtyDataId;
     [System.NonSerialized]
-    private Skill cacheSkill;
-    [System.NonSerialized]
     private short dirtyLevel;
+
+    [System.NonSerialized]
+    private Skill cacheSkill;
     [System.NonSerialized]
     private Buff cachePassiveBuff;
     [System.NonSerialized]
@@ -37,6 +39,14 @@ public class CharacterSkill : INetSerializable
     private Dictionary<DamageElement, float> cachePassiveBuffIncreaseResistances;
     [System.NonSerialized]
     private Dictionary<DamageElement, MinMaxFloat> cachePassiveBuffIncreaseDamages;
+
+    [System.NonSerialized]
+    private LiteNetLibElement element;
+    public LiteNetLibElement Element
+    {
+        get { return element; }
+        set { element = value; }
+    }
 
     private void MakeCache()
     {
