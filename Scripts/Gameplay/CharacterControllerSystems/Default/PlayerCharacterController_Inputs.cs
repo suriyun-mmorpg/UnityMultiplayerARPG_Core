@@ -721,7 +721,7 @@ namespace MultiplayerARPG
                 case HotkeyType.Skill:
                     UseSkill(hotkey.relateId);
                     break;
-                case HotkeyType.NonEquipItem:
+                case HotkeyType.Item:
                     UseItem(hotkey.relateId);
                     break;
             }
@@ -783,11 +783,19 @@ namespace MultiplayerARPG
 
         protected void UseItem(string id)
         {
-            int itemIndex = PlayerCharacterEntity.IndexOfNonEquipItem(id);
+            int itemIndex = -1;
+            CharacterItem characterItem;
+            InventoryType inventoryType;
+            if (PlayerCharacterEntity.IsEquipped(id, out itemIndex, out characterItem, out inventoryType))
+            {
+                RequestUnEquipItem(inventoryType, (short)itemIndex);
+                return;
+            }
+
             if (itemIndex < 0)
                 return;
 
-            Item item = PlayerCharacterEntity.NonEquipItems[itemIndex].GetItem();
+            Item item = characterItem.GetItem();
             if (item == null)
                 return;
 
@@ -803,7 +811,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    RequestUseItem((short)itemIndex, null);
+                    RequestUseItem((short)itemIndex);
                 }
             }
             else if (item.IsBuilding())

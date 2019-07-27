@@ -154,7 +154,7 @@ namespace MultiplayerARPG
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
             if (owningCharacter != null)
-                owningCharacter.RequestAssignHotkey(uiCharacterHotkey.hotkeyId, HotkeyType.NonEquipItem, ui.Data.characterItem.id);
+                owningCharacter.RequestAssignHotkey(uiCharacterHotkey.hotkeyId, HotkeyType.Item, ui.Data.characterItem.id);
             Hide();
         }
 

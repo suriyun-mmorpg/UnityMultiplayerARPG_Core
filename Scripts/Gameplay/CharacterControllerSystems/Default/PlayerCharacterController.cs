@@ -350,7 +350,12 @@ namespace MultiplayerARPG
             PlayerCharacterEntity.RequestEquipItem(itemIndex);
         }
 
-        public void RequestUseItem(short itemIndex, Vector3? aimPosition)
+        public void RequestUnEquipItem(InventoryType inventoryType, short itemIndex)
+        {
+            PlayerCharacterEntity.RequestUnEquipItem((byte)inventoryType, itemIndex);
+        }
+
+        public void RequestUseItem(short itemIndex)
         {
             PlayerCharacterEntity.RequestUseItem(itemIndex);
         }

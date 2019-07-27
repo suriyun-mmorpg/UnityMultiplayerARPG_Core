@@ -958,7 +958,7 @@ public static partial class CharacterDataExtension
         for (int i = 0; i < list.Count; ++i)
         {
             tempItem = list[i];
-            if (tempItem.id == id)
+            if (!string.IsNullOrEmpty(tempItem.id) && tempItem.id.Equals(id))
             {
                 index = i;
                 break;
@@ -990,6 +990,47 @@ public static partial class CharacterDataExtension
         return index;
     }
 
+    public static bool IsEquipped(this ICharacterData data, string id, out int itemIndex, out CharacterItem characterItem, out InventoryType inventoryType)
+    {
+        itemIndex = -1;
+        characterItem = CharacterItem.Empty;
+        inventoryType = InventoryType.NonEquipItems;
+
+        itemIndex = data.IndexOfEquipItem(id);
+        if (itemIndex >= 0)
+        {
+            characterItem = data.EquipItems[itemIndex];
+            inventoryType = InventoryType.EquipItems;
+            return true;
+        }
+
+        if (!string.IsNullOrEmpty(data.EquipWeapons.rightHand.id) && 
+            data.EquipWeapons.rightHand.id.Equals(id))
+        {
+            characterItem = data.EquipWeapons.rightHand;
+            inventoryType = InventoryType.EquipWeaponRight;
+            return true;
+        }
+
+        if (!string.IsNullOrEmpty(data.EquipWeapons.leftHand.id) &&
+            data.EquipWeapons.leftHand.id.Equals(id))
+        {
+            characterItem = data.EquipWeapons.leftHand;
+            inventoryType = InventoryType.EquipWeaponLeft;
+            return true;
+        }
+
+        itemIndex = data.IndexOfNonEquipItem(id);
+        if (itemIndex >= 0)
+        {
+            characterItem = data.NonEquipItems[itemIndex];
+            inventoryType = InventoryType.NonEquipItems;
+            return false;
+        }
+
+        return false;
+    }
+
     public static int IndexOfNonEquipItem(this ICharacterData data, int dataId)
     {
         IList<CharacterItem> list = data.NonEquipItems;
@@ -1015,7 +1056,7 @@ public static partial class CharacterDataExtension
         for (int i = 0; i < list.Count; ++i)
         {
             tempItem = list[i];
-            if (tempItem.id == id)
+            if (!string.IsNullOrEmpty(tempItem.id) && tempItem.id.Equals(id))
             {
                 index = i;
                 break;

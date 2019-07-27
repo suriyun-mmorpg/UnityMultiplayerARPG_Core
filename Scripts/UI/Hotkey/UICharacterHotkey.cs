@@ -45,7 +45,7 @@ namespace MultiplayerARPG
         protected override void UpdateData()
         {
             BasePlayerCharacterEntity owningCharacter = BasePlayerCharacterController.OwningCharacter;
-            
+
             if (uiCharacterSkill == null && uiCharacterHotkeys != null && uiCharacterHotkeys.uiCharacterSkillPrefab != null)
             {
                 uiCharacterSkill = Instantiate(uiCharacterHotkeys.uiCharacterSkillPrefab, transform);
@@ -89,15 +89,31 @@ namespace MultiplayerARPG
             if (uiCharacterItem != null)
             {
                 // Prepare item data
-                int itemIndex = owningCharacter.IndexOfNonEquipItem(Data.relateId);
-                if (itemIndex < 0)
+                int itemIndex = -1;
+                CharacterItem characterItem;
+                InventoryType inventoryType;
+                owningCharacter.IsEquipped(Data.relateId, out itemIndex, out characterItem, out inventoryType);
+
+                bool isFound = false;
+                switch (inventoryType)
+                {
+                    case InventoryType.EquipItems:
+                    case InventoryType.NonEquipItems:
+                        isFound = itemIndex >= 0;
+                        break;
+                    case InventoryType.EquipWeaponRight:
+                    case InventoryType.EquipWeaponLeft:
+                        isFound = true;
+                        break;
+                }
+
+                if (!isFound)
                 {
                     uiCharacterItem.Hide();
                 }
                 else
                 {
                     // Show only existed items
-                    CharacterItem characterItem = owningCharacter.NonEquipItems[itemIndex];
                     uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, InventoryType.NonEquipItems), owningCharacter, itemIndex);
                     uiCharacterItem.Show();
                     UICharacterItemDragHandler dragHandler = uiCharacterItem.GetComponentInChildren<UICharacterItemDragHandler>();
@@ -129,7 +145,7 @@ namespace MultiplayerARPG
                 return false;
             Item item = characterItem.GetItem();
             if (item != null && characterItem.level > 0 && characterItem.amount > 0 &&
-                (item.IsUsable() || item.IsBuilding()))
+                (item.IsEquipment() || item.IsUsable() || item.IsBuilding()))
                 return true;
             return false;
         }

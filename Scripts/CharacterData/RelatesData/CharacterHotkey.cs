@@ -6,8 +6,7 @@ public enum HotkeyType : byte
 {
     None,
     Skill,
-    NonEquipItem,
-    EquipItem,
+    Item,
 }
 
 [System.Serializable]

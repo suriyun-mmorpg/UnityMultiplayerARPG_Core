@@ -712,42 +712,70 @@ namespace MultiplayerARPG
             ClearQueueSkill();
 
             CharacterHotkey hotkey = PlayerCharacterEntity.Hotkeys[hotkeyIndex];
+            switch (hotkey.type)
+            {
+                case HotkeyType.Skill:
+                    UseSkill(hotkey.relateId);
+                    break;
+                case HotkeyType.Item:
+                    UseItem(hotkey.relateId);
+                    break;
+            }
+        }
 
+        protected void UseSkill(string id)
+        {
             Skill skill = null;
-            if (GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(hotkey.relateId), out skill) && skill != null &&
+            if (GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(id), out skill) && skill != null &&
                 PlayerCharacterEntity.CacheSkills != null && PlayerCharacterEntity.CacheSkills.ContainsKey(skill))
             {
                 PlayerCharacterEntity.StopMove();
                 queueSkill = skill;
             }
+        }
 
-            Item item = null;
-            int itemIndex = PlayerCharacterEntity.IndexOfNonEquipItem(hotkey.relateId);
-            if (itemIndex >= 0)
+        protected void UseItem(string id)
+        {
+            int itemIndex = -1;
+            CharacterItem characterItem;
+            InventoryType inventoryType;
+            if (PlayerCharacterEntity.IsEquipped(id, out itemIndex, out characterItem, out inventoryType))
             {
-                item = PlayerCharacterEntity.NonEquipItems[itemIndex].GetItem();
+                PlayerCharacterEntity.RequestUnEquipItem((byte)inventoryType, (short)itemIndex);
+                return;
+            }
+
+            if (itemIndex < 0)
+                return;
+
+            Item item = characterItem.GetItem();
+            if (item == null)
+                return;
+
+            if (item.IsEquipment())
+            {
+                PlayerCharacterEntity.RequestEquipItem((short)itemIndex);
+            }
+            else if (item.IsUsable())
+            {
                 if (item.IsSkill())
                 {
                     PlayerCharacterEntity.StopMove();
                     queueSkillByItem = item.skillLevel.skill;
                     queueSkillItemIndex = itemIndex;
                 }
-                else if (item.IsEquipment())
-                {
-                    PlayerCharacterEntity.RequestEquipItem((short)itemIndex);
-                }
-                else if (item.IsUsable())
+                else
                 {
                     PlayerCharacterEntity.RequestUseItem((short)itemIndex);
                 }
-                else if (item.IsBuilding())
-                {
-                    PlayerCharacterEntity.StopMove();
-                    buildingItemIndex = itemIndex;
-                    CurrentBuildingEntity = Instantiate(item.buildingEntity);
-                    CurrentBuildingEntity.SetupAsBuildMode();
-                    CurrentBuildingEntity.CacheTransform.parent = null;
-                }
+            }
+            else if (item.IsBuilding())
+            {
+                PlayerCharacterEntity.StopMove();
+                buildingItemIndex = itemIndex;
+                CurrentBuildingEntity = Instantiate(item.buildingEntity);
+                CurrentBuildingEntity.SetupAsBuildMode();
+                CurrentBuildingEntity.CacheTransform.parent = null;
             }
         }
 

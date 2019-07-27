@@ -59,7 +59,7 @@ namespace MultiplayerARPG
                         if (uiCharacterHotkey.CanAssignCharacterItem(draggedItemUI.CacheUI.Data.characterItem))
                         {
                             // Assign item to hotkey
-                            owningCharacter.RequestAssignHotkey(uiCharacterHotkey.Data.hotkeyId, HotkeyType.NonEquipItem, draggedItemUI.CacheUI.Data.characterItem.id);
+                            owningCharacter.RequestAssignHotkey(uiCharacterHotkey.Data.hotkeyId, HotkeyType.Item, draggedItemUI.CacheUI.Data.characterItem.id);
                         }
 
                         if (draggedItemUI.sourceLocation == UICharacterItemDragHandler.SourceLocation.Hotkey)
