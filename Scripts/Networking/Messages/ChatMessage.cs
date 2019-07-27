@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class ChatMessage : INetSerializable
+    public struct ChatMessage : INetSerializable
     {
         public ChatChannel channel;
         public string message;

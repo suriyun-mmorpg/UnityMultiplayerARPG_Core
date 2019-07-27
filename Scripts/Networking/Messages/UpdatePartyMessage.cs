@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class UpdatePartyMessage : INetSerializable
+    public struct UpdatePartyMessage : INetSerializable
     {
         public enum UpdateType : byte
         {

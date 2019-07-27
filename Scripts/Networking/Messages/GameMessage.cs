@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class GameMessage : INetSerializable
+    public struct GameMessage : INetSerializable
     {
         public enum Type : byte
         {

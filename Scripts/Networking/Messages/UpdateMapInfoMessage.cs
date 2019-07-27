@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class UpdateMapInfoMessage : INetSerializable
+    public struct UpdateMapInfoMessage : INetSerializable
     {
         public string mapId;
 

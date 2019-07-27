@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class UpdateSocialMemberMessage : INetSerializable
+    public struct UpdateSocialMemberMessage : INetSerializable
     {
         public enum UpdateType : byte
         {
@@ -13,7 +13,7 @@ namespace MultiplayerARPG
         public UpdateType type;
         public int id;
         public bool isOnline;
-        public SocialCharacterData data = new SocialCharacterData();
+        public SocialCharacterData data;
 
         public void Deserialize(NetDataReader reader)
         {
