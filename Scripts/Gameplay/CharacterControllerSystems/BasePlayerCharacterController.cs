@@ -244,6 +244,8 @@ namespace MultiplayerARPG
             {
                 if (operation == LiteNetLibSyncList.Operation.Add ||
                     operation == LiteNetLibSyncList.Operation.RemoveAt ||
+                    operation == LiteNetLibSyncList.Operation.RemoveFirst ||
+                    operation == LiteNetLibSyncList.Operation.RemoveLast ||
                     operation == LiteNetLibSyncList.Operation.Insert ||
                     operation == LiteNetLibSyncList.Operation.Clear)
                     CacheUISceneGameplay.UpdateCharacter();

@@ -339,7 +339,7 @@ namespace MultiplayerARPG
                         skillsRecachingState = new SyncListRecachingState()
                         {
                             isRecaching = true,
-                            operation = LiteNetLibSyncList.Operation.Dirty,
+                            operation = operation,
                             index = skillIndex
                         };
                     }
