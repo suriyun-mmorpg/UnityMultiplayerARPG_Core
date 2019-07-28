@@ -152,6 +152,20 @@ namespace MultiplayerARPG
                         hasChanges = true;
                     }
                     break;
+                case ItemType.AttributeIncrease:
+                    if (attributeAmount.amount > 1)
+                    {
+                        attributeAmount.amount = 1;
+                        hasChanges = true;
+                    }
+                    break;
+                case ItemType.SkillLearn:
+                    if (skillLevel.level > 1)
+                    {
+                        skillLevel.level = 1;
+                        hasChanges = true;
+                    }
+                    break;
             }
             // Mark asset to be dirty when chagnes occured
             if (hasChanges)
