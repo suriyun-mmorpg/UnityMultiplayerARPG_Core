@@ -345,7 +345,8 @@ namespace MultiplayerARPG
         {
             if (gameInstance.DimensionType == DimensionType.Dimension2D)
                 GetDamagePositionAndRotation2D(damageType, isLeftHand, hasAimPosition, aimPosition, stagger, out position, out rotation);
-            GetDamagePositionAndRotation3D(damageType, isLeftHand, hasAimPosition, aimPosition, stagger, out position, out rotation);
+            else
+                GetDamagePositionAndRotation3D(damageType, isLeftHand, hasAimPosition, aimPosition, stagger, out position, out rotation);
         }
 
         protected void GetDamagePositionAndRotation2D(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Quaternion rotation)
