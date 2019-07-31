@@ -66,6 +66,12 @@ namespace MultiplayerARPG
         private float missileDuration;
         private bool destroying;
 
+        protected override void EntityAwake()
+        {
+            base.EntityAwake();
+            gameObject.layer = 2;   // Ignore raycast
+        }
+
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
@@ -214,9 +220,11 @@ namespace MultiplayerARPG
                 return;
             }
 
-            // Don't hits: TransparentFX, IgnoreRaycast
+            // Don't hits: TransparentFX, IgnoreRaycast, character, item
             if (other.layer != 1 &&
-                other.layer != 2)
+                other.layer != 2 &&
+                other.layer != gameInstance.characterLayer &&
+                other.layer != gameInstance.itemDropLayer)
             {
                 if (explodeDistance > 0f)
                 {
