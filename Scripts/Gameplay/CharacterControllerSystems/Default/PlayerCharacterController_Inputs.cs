@@ -517,13 +517,13 @@ namespace MultiplayerARPG
                     ClearTarget();
                     return;
                 }
-
+                
                 // Find attack distance and fov, from weapon or skill
                 float attackDistance = 0f;
                 float attackFov = 0f;
                 if (!GetAttackDataOrUseNonAttackSkill(isLeftHandAttacking, out attackDistance, out attackFov))
                     return;
-
+                
                 float actDistance = attackDistance;
                 actDistance -= actDistance * 0.1f;
                 actDistance -= StoppingDistance;

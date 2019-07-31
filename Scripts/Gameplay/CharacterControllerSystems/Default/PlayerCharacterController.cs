@@ -246,7 +246,6 @@ namespace MultiplayerARPG
                 if (!GameInstance.Skills.TryGetValue(queueUsingSkill.Value.dataId, out skill) || skill == null)
                 {
                     queueUsingSkill = null;
-                    return false;
                 }
             }
 
@@ -255,8 +254,13 @@ namespace MultiplayerARPG
                 if (!GameInstance.Skills.TryGetValue(queueUsingSkillItem.Value.skillDataId, out skill) || skill == null)
                 {
                     queueUsingSkillItem = null;
-                    return false;
                 }
+            }
+
+            if (skill == null)
+            {
+                // No skill, use weapon attack data
+                return true;
             }
 
             if (skill.IsAttack())
@@ -277,7 +281,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            // Return true if going to attack
+            // Return true if it's going to attack
             return true;
         }
 
