@@ -196,6 +196,7 @@ namespace MultiplayerARPG
                 {
                     str = string.Format(
                         LanguageManager.GetText(formatKeyTitleWithRefineLevel),
+                        Item == null ? LanguageManager.GetUnknowTitle() : Item.Title,
                         (Level - 1).ToString("N0"));
                 }
                 uiTextTitle.text = str;
