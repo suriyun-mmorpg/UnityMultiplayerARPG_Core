@@ -450,6 +450,8 @@ public class CharacterItem : INetSerializableWithElement
         cloneItem.durability = durability;
         cloneItem.exp = exp;
         cloneItem.lockRemainsDuration = lockRemainsDuration;
+        cloneItem.ammo = ammo;
+        cloneItem.sockets = new List<int>(sockets);
         return cloneItem;
     }
 
@@ -493,20 +495,24 @@ public class CharacterItem : INetSerializableWithElement
             {
                 writer.Put(durability);
                 writer.Put(exp);
+                
                 if (GetWeaponItem() != null)
                 {
+                    // Only weapons have an ammo
                     writer.Put(ammo);
-                    byte socketCount = (byte)Sockets.Count;
-                    writer.Put(socketCount);
-                    if (socketCount > 0)
+                }
+
+                byte socketCount = (byte)Sockets.Count;
+                writer.Put(socketCount);
+                if (socketCount > 0)
+                {
+                    foreach (int socketDataId in Sockets)
                     {
-                        foreach (int socketDataId in Sockets)
-                        {
-                            writer.Put(socketDataId);
-                        }
+                        writer.Put(socketDataId);
                     }
                 }
             }
+
             if (GetPetItem() != null)
             {
                 writer.Put(exp);
@@ -529,17 +535,21 @@ public class CharacterItem : INetSerializableWithElement
             {
                 durability = reader.GetFloat();
                 exp = reader.GetInt();
+
                 if (GetWeaponItem() != null)
                 {
+                    // Only weapons have an ammo
                     ammo = reader.GetShort();
-                    int socketCount = reader.GetByte();
-                    Sockets.Clear();
-                    for (int i = 0; i < socketCount; ++i)
-                    {
-                        Sockets.Add(reader.GetInt());
-                    }
+                }
+
+                int socketCount = reader.GetByte();
+                Sockets.Clear();
+                for (int i = 0; i < socketCount; ++i)
+                {
+                    Sockets.Add(reader.GetInt());
                 }
             }
+
             if (GetPetItem() != null)
             {
                 exp = reader.GetInt();
