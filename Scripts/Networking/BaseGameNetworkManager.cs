@@ -250,6 +250,11 @@ namespace MultiplayerARPG
         protected virtual void HandleGameMessageAtClient(LiteNetLibMessageHandler messageHandler)
         {
             GameMessage message = messageHandler.ReadMessage<GameMessage>();
+            ClientReceiveGameMessage(message);
+        }
+
+        public void ClientReceiveGameMessage(GameMessage message)
+        {
             if (onClientReceiveGameMessage != null)
                 onClientReceiveGameMessage.Invoke(message);
         }
