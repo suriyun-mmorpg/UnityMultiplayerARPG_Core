@@ -223,10 +223,10 @@ namespace MultiplayerARPG
                 if (monsterSkill.skill == null)
                     continue;
 
-                if (random < monsterSkill.useRate && entity.HpRate < monsterSkill.useWhenHpRate)
+                if (random < monsterSkill.useRate && (monsterSkill.useWhenHpRate <= 0 || entity.HpRate <= monsterSkill.useWhenHpRate))
                 {
                     skill = monsterSkill.skill;
-                    level = monsterSkill.level;
+                    level = CacheSkillLevels[skill];
                     return true;
                 }
             }

@@ -27,6 +27,9 @@ namespace MultiplayerARPG
         public float startFollowTargetTime { get; private set; }
         public Vector3? wanderDestination { get; private set; }
         public Vector3 oldDestination { get; private set; }
+
+        protected Skill queueSkill;
+        protected short queueSkillLevel;
         
         public BaseMonsterCharacterEntity CacheMonsterCharacterEntity
         {
@@ -173,15 +176,25 @@ namespace MultiplayerARPG
                         CacheEntity.SetLookRotation(Quaternion.LookRotation(lookAtDirection).eulerAngles);
                     }
                 }
-                Skill usingSkill = null;
-                short usingSkillLevel = 1;
-                if (MonsterDatabase.RandomSkill(CacheMonsterCharacterEntity, out usingSkill, out usingSkillLevel) && 
-                    usingSkill != null && usingSkill.CanUse(CacheEntity, usingSkillLevel))
+
+                if (queueSkill != null || MonsterDatabase.RandomSkill(CacheMonsterCharacterEntity, out queueSkill, out queueSkillLevel))
                 {
-                    CacheEntity.RequestUseSkill(usingSkill.DataId, false, targetEntity.OpponentAimTransform.position);
+                    // Use skill when there is queue skill or randomed skill that can be used
+                    if (CacheMonsterCharacterEntity.CurrentMp < queueSkill.GetConsumeMp(queueSkillLevel))
+                    {
+                        // Clear queue skill when there is no enough mp
+                        queueSkill = null;
+                    }
+                    else if (CacheEntity.RequestUseSkill(queueSkill.DataId, false, targetEntity.OpponentAimTransform.position))
+                    {
+                        // Clear queue skill to random using skill later
+                        queueSkill = null;
+                    }
                 }
-                else
+
+                if (queueSkill == null)
                 {
+                    // Attack when no queue skill
                     CacheEntity.RequestAttack(false, targetEntity.OpponentAimTransform.position);
                 }
             }
