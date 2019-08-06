@@ -577,6 +577,7 @@ namespace MultiplayerARPG
             Texts.Add(GameMessage.Type.CannotAccessStorage.ToString(), "Cannot access storage");
             // Battle
             Texts.Add(GameMessage.Type.NoAmmo.ToString(), "No Ammo");
+            Texts.Add(GameMessage.Type.NotEnoughMp.ToString(), "Have not enough Mp");
             // UI Generic Title
             Texts.Add(UILocaleKeys.UI_LABEL_DISCONNECTED.ToString(), "Disconnected");
             Texts.Add(UILocaleKeys.UI_LABEL_SUCCESS.ToString(), "Success");

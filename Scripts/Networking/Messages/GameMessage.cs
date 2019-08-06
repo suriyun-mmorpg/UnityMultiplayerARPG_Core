@@ -75,6 +75,7 @@ namespace MultiplayerARPG
             CannotAccessStorage,
             // Combatant
             NoAmmo,
+            NotEnoughMp,
         }
         public Type type;
 
