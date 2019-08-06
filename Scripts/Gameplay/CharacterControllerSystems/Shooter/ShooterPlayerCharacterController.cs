@@ -217,60 +217,62 @@ namespace MultiplayerARPG
             Vector3 forward = CacheGameplayCameraControls.CacheCameraTransform.forward;
             Vector3 right = CacheGameplayCameraControls.CacheCameraTransform.right;
             float distanceFromOrigin = Vector3.Distance(ray.origin, MovementTransform.position);
-            float aimDistance = distanceFromOrigin;
-            float attackDistance = 0f;
-            float attackFov = 90f;
-            // Calculating aim distance, also read attack inputs here
-            // Attack inputs will be used to calculate attack distance
-            if (CurrentBuildingEntity == null)
-            {
-                // Attack with right hand weapon
-                tempPressAttackRight = InputManager.GetButton("Fire1");
-                if (weaponAbility == null && leftHandWeapon != null)
-                {
-                    // Attack with left hand weapon if left hand weapon not empty
-                    tempPressAttackLeft = InputManager.GetButton("Fire2");
-                }
-                else if (weaponAbility != null)
-                {
-                    // Use weapon ability if it can
-                    tempPressWeaponAbility = InputManager.GetButtonDown("Fire2");
-                }
-                // Is left hand attack when not attacking with right hand
-                // So priority is right > left
-                isLeftHandAttacking = !tempPressAttackRight && tempPressAttackLeft;
 
-                // Calculate aim distance by skill or weapon
-                if (queueSkill != null && queueSkill.IsAttack())
-                {
-                    // Increase aim distance by skill attack distance
-                    attackDistance = PlayerCharacterEntity.GetSkillAttackDistance(queueSkill, isLeftHandAttacking);
-                    attackFov = PlayerCharacterEntity.GetSkillAttackFov(queueSkill, isLeftHandAttacking);
-                }
-                else if (queueSkillByItem != null && queueSkillByItem.IsAttack())
-                {
-                    // Increase aim distance by skill attack distance
-                    attackDistance = PlayerCharacterEntity.GetSkillAttackDistance(queueSkillByItem, isLeftHandAttacking);
-                    attackFov = PlayerCharacterEntity.GetSkillAttackFov(queueSkillByItem, isLeftHandAttacking);
-                }
-                else
-                {
-                    // Increase aim distance by attack distance
-                    attackDistance = PlayerCharacterEntity.GetAttackDistance(isLeftHandAttacking);
-                    attackFov = PlayerCharacterEntity.GetAttackFov(isLeftHandAttacking);
-                }
-                aimDistance += attackDistance;
-            }
-            actionLookDirection = aimPosition = ray.origin + ray.direction * aimDistance;
-            actionLookDirection.y = MovementTransform.position.y;
-            actionLookDirection = actionLookDirection - MovementTransform.position;
-            actionLookDirection.Normalize();
             // Prepare variables to find nearest raycasted hit point
             float tempDistance;
             float tempNearestDistance = float.MaxValue;
 
             if (CurrentBuildingEntity == null)
             {
+                // Prepare raycast distance / fov
+                float aimDistance = distanceFromOrigin;
+                float attackDistance = 0f;
+                float attackFov = 90f;
+                // Calculating aim distance, also read attack inputs here
+                // Attack inputs will be used to calculate attack distance
+                if (CurrentBuildingEntity == null)
+                {
+                    // Attack with right hand weapon
+                    tempPressAttackRight = InputManager.GetButton("Fire1");
+                    if (weaponAbility == null && leftHandWeapon != null)
+                    {
+                        // Attack with left hand weapon if left hand weapon not empty
+                        tempPressAttackLeft = InputManager.GetButton("Fire2");
+                    }
+                    else if (weaponAbility != null)
+                    {
+                        // Use weapon ability if it can
+                        tempPressWeaponAbility = InputManager.GetButtonDown("Fire2");
+                    }
+                    // Is left hand attack when not attacking with right hand
+                    // So priority is right > left
+                    isLeftHandAttacking = !tempPressAttackRight && tempPressAttackLeft;
+
+                    // Calculate aim distance by skill or weapon
+                    if (queueSkill != null && queueSkill.IsAttack())
+                    {
+                        // Increase aim distance by skill attack distance
+                        attackDistance = PlayerCharacterEntity.GetSkillAttackDistance(queueSkill, isLeftHandAttacking);
+                        attackFov = PlayerCharacterEntity.GetSkillAttackFov(queueSkill, isLeftHandAttacking);
+                    }
+                    else if (queueSkillByItem != null && queueSkillByItem.IsAttack())
+                    {
+                        // Increase aim distance by skill attack distance
+                        attackDistance = PlayerCharacterEntity.GetSkillAttackDistance(queueSkillByItem, isLeftHandAttacking);
+                        attackFov = PlayerCharacterEntity.GetSkillAttackFov(queueSkillByItem, isLeftHandAttacking);
+                    }
+                    else
+                    {
+                        // Increase aim distance by attack distance
+                        attackDistance = PlayerCharacterEntity.GetAttackDistance(isLeftHandAttacking);
+                        attackFov = PlayerCharacterEntity.GetAttackFov(isLeftHandAttacking);
+                    }
+                    aimDistance += attackDistance;
+                }
+                actionLookDirection = aimPosition = ray.origin + ray.direction * aimDistance;
+                actionLookDirection.y = MovementTransform.position.y;
+                actionLookDirection = actionLookDirection - MovementTransform.position;
+                actionLookDirection.Normalize();
                 // Find for enemy character
                 bool foundDamageableEntity = false;
                 int tempCount = Physics.RaycastNonAlloc(ray, raycasts, findTargetRaycastDistance);
@@ -344,26 +346,33 @@ namespace MultiplayerARPG
                 CurrentBuildingEntity.buildingArea = null;
                 // Find for position to construction building
                 bool foundSnapBuildPosition = false;
-                int tempCount = Physics.RaycastNonAlloc(ray, raycasts, gameInstance.buildDistance);
+                int tempCount = Physics.RaycastNonAlloc(ray, raycasts, findTargetRaycastDistance);
+                int tempCounter = 0;
                 BuildingArea buildingArea = null;
-                for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
+                for (; tempCounter < tempCount; ++tempCounter)
                 {
                     tempHitInfo = raycasts[tempCounter];
                     tempEntity = tempHitInfo.collider.GetComponentInParent<BuildingEntity>();
-                    if (tempEntity == null || tempEntity == CurrentBuildingEntity)
+                    if (tempEntity != null && tempEntity == CurrentBuildingEntity)
+                    {
+                        // Skip because it's raycast to the building that you are going to build
                         continue;
-
-                    buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
-                    if (buildingArea == null ||
-                        (buildingArea.buildingEntity != null && buildingArea.buildingEntity == CurrentBuildingEntity) ||
-                        !CurrentBuildingEntity.buildingType.Equals(buildingArea.buildingType))
-                        continue;
+                    }
 
                     // Set aim position
                     tempDistance = Vector3.Distance(CacheGameplayCameraControls.CacheCameraTransform.position, tempHitInfo.point);
                     if (tempDistance < tempNearestDistance)
                     {
                         aimPosition = tempHitInfo.point;
+                        buildingArea = tempHitInfo.transform.GetComponent<BuildingArea>();
+                        if (buildingArea == null ||
+                            (buildingArea.buildingEntity != null && buildingArea.buildingEntity == CurrentBuildingEntity) ||
+                            !CurrentBuildingEntity.buildingType.Equals(buildingArea.buildingType))
+                        {
+                            // Skip because this area is not allowed to build the building that you are going to build
+                            continue;
+                        }
+
                         CurrentBuildingEntity.buildingArea = buildingArea;
                         if (buildingArea.snapBuildingObject)
                         {
@@ -372,9 +381,22 @@ namespace MultiplayerARPG
                         }
                     }
                 }
-                // Update building position
+
+                if (tempCount <= 0)
+                {
+                    // Not hit anything (player may look at the sky)
+                    aimPosition = ray.origin + ray.direction * (distanceFromOrigin + gameInstance.buildDistance);
+                }
+
+                if (Vector3.Distance(PlayerCharacterEntity.CacheTransform.position, aimPosition) > gameInstance.buildDistance)
+                {
+                    // Mark as unable to build when the building is far from character
+                    CurrentBuildingEntity.buildingArea = null;
+                }
+
                 if (!foundSnapBuildPosition)
                 {
+                    // Update building position when the building is not snapping to build area
                     CurrentBuildingEntity.CacheTransform.position = aimPosition;
                     // Rotate to camera
                     Vector3 direction = (aimPosition - CacheGameplayCameraControls.CacheCameraTransform.position).normalized;
@@ -567,7 +589,7 @@ namespace MultiplayerARPG
                 else if (tempPressPickupItem)
                 {
                     // Find for item to pick up
-                    if (SelectedEntity != null)
+                    if (SelectedEntity != null && SelectedEntity is ItemDropEntity)
                         PlayerCharacterEntity.RequestPickupItem((SelectedEntity as ItemDropEntity).ObjectId);
                 }
                 else if (tempPressReload)
