@@ -20,9 +20,65 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public bool ValidateRequestUseSKillItem(short index, bool isLeftHand)
+        {
+            if (!CanUseItem())
+                return false;
+
+            if (index >= nonEquipItems.Count)
+                return false;
+
+            CharacterItem characterItem = nonEquipItems[index];
+            if (characterItem.IsLock())
+                return false;
+
+            Item item = characterItem.GetSkillItem();
+            if (item == null)
+                return false;
+
+            Skill skill = item.skillLevel.skill;
+            short level = item.skillLevel.level;
+            if (skill == null)
+                return false;
+
+            int dataId = skill.DataId;
+            float currentTime = Time.unscaledTime;
+            if (!requestUseSkillErrorTime.ContainsKey(dataId))
+                requestUseSkillErrorTime[dataId] = currentTime;
+
+            if (CurrentMp < skill.GetConsumeMp(level))
+            {
+                if (!IsOwnerClient)
+                    return false;
+
+                if (Time.unscaledTime - requestUseSkillErrorTime[dataId] >= COMBATANT_MESSAGE_DELAY)
+                {
+                    requestUseSkillErrorTime[dataId] = Time.unscaledTime;
+                    gameManager.ClientReceiveGameMessage(new GameMessage() { type = GameMessage.Type.NotEnoughMp });
+                }
+                return false;
+            }
+
+            CharacterItem weapon = this.GetAvailableWeapon(ref isLeftHand);
+            if (skill.skillAttackType != SkillAttackType.None && !ValidateAmmo(weapon))
+            {
+                if (!IsOwnerClient)
+                    return false;
+
+                if (Time.unscaledTime - requestUseSkillErrorTime[dataId] >= COMBATANT_MESSAGE_DELAY)
+                {
+                    requestUseSkillErrorTime[dataId] = Time.unscaledTime;
+                    gameManager.ClientReceiveGameMessage(new GameMessage() { type = GameMessage.Type.NoAmmo });
+                }
+                return false;
+            }
+
+            return true;
+        }
+
         public bool RequestUseSkillItem(short index, bool isLeftHand)
         {
-            if (!CanUseItem() || !CanUseSkill())
+            if (!ValidateRequestUseSKillItem(index, isLeftHand))
                 return false;
             CallNetFunction(NetFuncUseSkillItemWithoutAimPosition, FunctionReceivers.Server, index, isLeftHand);
             return true;
@@ -30,7 +86,7 @@ namespace MultiplayerARPG
 
         public bool RequestUseSkillItem(short index, bool isLeftHand, Vector3 aimPosition)
         {
-            if (!CanUseItem() || !CanUseSkill())
+            if (!ValidateRequestUseSKillItem(index, isLeftHand))
                 return false;
             CallNetFunction(NetFuncUseSkillItemWithAimPosition, FunctionReceivers.Server, index, isLeftHand, aimPosition);
             return true;

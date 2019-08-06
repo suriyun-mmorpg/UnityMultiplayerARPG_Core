@@ -26,9 +26,31 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool RequestAttack(bool isLeftHand)
+        public bool ValidateRequestAttack(bool isLeftHand)
         {
             if (!CanAttack())
+                return false;
+            
+            CharacterItem weapon = this.GetAvailableWeapon(ref isLeftHand);
+            if (!ValidateAmmo(weapon))
+            {
+                if (Time.unscaledTime - requestAttackErrorTime >= COMBATANT_MESSAGE_DELAY)
+                {
+                    if (!IsOwnerClient)
+                        return false;
+
+                    requestAttackErrorTime = Time.unscaledTime;
+                    gameManager.ClientReceiveGameMessage(new GameMessage() { type = GameMessage.Type.NoAmmo });
+                }
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool RequestAttack(bool isLeftHand)
+        {
+            if (!ValidateRequestAttack(isLeftHand))
                 return false;
             CallNetFunction(NetFuncAttackWithoutAimPosition, FunctionReceivers.Server, isLeftHand);
             return true;
@@ -36,15 +58,60 @@ namespace MultiplayerARPG
 
         public bool RequestAttack(bool isLeftHand, Vector3 aimPosition)
         {
-            if (!CanAttack())
+            if (!ValidateRequestAttack(isLeftHand))
                 return false;
             CallNetFunction(NetFuncAttackWithAimPosition, FunctionReceivers.Server, isLeftHand, aimPosition);
             return true;
         }
 
-        public bool RequestUseSkill(int dataId, bool isLeftHand)
+        public bool ValidateRequestUseSKill(int dataId, bool isLeftHand)
         {
             if (!CanUseSkill())
+                return false;
+
+            Skill skill;
+            short level;
+            if (!GameInstance.Skills.TryGetValue(dataId, out skill) ||
+                !CacheSkills.TryGetValue(skill, out level))
+                return false;
+
+            float currentTime = Time.unscaledTime;
+            if (!requestUseSkillErrorTime.ContainsKey(dataId))
+                requestUseSkillErrorTime[dataId] = currentTime;
+
+            if (CurrentMp < skill.GetConsumeMp(level))
+            {
+                if (!IsOwnerClient)
+                    return false;
+
+                if (Time.unscaledTime - requestUseSkillErrorTime[dataId] >= COMBATANT_MESSAGE_DELAY)
+                {
+                    requestUseSkillErrorTime[dataId] = Time.unscaledTime;
+                    gameManager.ClientReceiveGameMessage(new GameMessage() { type = GameMessage.Type.NotEnoughMp });
+                }
+                return false;
+            }
+
+            CharacterItem weapon = this.GetAvailableWeapon(ref isLeftHand);
+            if (skill.skillAttackType != SkillAttackType.None && !ValidateAmmo(weapon))
+            {
+                if (!IsOwnerClient)
+                    return false;
+
+                if (Time.unscaledTime - requestUseSkillErrorTime[dataId] >= COMBATANT_MESSAGE_DELAY)
+                {
+                    requestUseSkillErrorTime[dataId] = Time.unscaledTime;
+                    gameManager.ClientReceiveGameMessage(new GameMessage() { type = GameMessage.Type.NoAmmo });
+                }
+                return false;
+            }
+            
+            return true;
+        }
+
+        public bool RequestUseSkill(int dataId, bool isLeftHand)
+        {
+            if (!ValidateRequestUseSKill(dataId, isLeftHand))
                 return false;
             CallNetFunction(NetFuncUseSkillWithoutAimPosition, FunctionReceivers.Server, dataId, isLeftHand);
             return true;
@@ -52,7 +119,7 @@ namespace MultiplayerARPG
 
         public bool RequestUseSkill(int dataId, bool isLeftHand, Vector3 aimPosition)
         {
-            if (!CanUseSkill())
+            if (!ValidateRequestUseSKill(dataId, isLeftHand))
                 return false;
             CallNetFunction(NetFuncUseSkillWithAimPosition, FunctionReceivers.Server, dataId, isLeftHand, aimPosition);
             return true;

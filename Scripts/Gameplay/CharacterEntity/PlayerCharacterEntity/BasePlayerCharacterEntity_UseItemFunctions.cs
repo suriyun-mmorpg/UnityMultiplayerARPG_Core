@@ -63,7 +63,7 @@ namespace MultiplayerARPG
         /// <param name="aimPosition"></param>
         protected void NetFuncUseSkillItem(short itemIndex, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition)
         {
-            if (!CanUseItem())
+            if (!CanUseItem() || !CanUseSkill())
                 return;
 
             if (itemIndex >= nonEquipItems.Count)

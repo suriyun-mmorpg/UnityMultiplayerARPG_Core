@@ -14,6 +14,7 @@ namespace MultiplayerARPG
     public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData, IAttackerEntity
     {
         public const float ACTION_COMMAND_DELAY = 0.2f;
+        public const float COMBATANT_MESSAGE_DELAY = 1f;
         public const float RESPAWN_GROUNDED_CHECK_DURATION = 1f;
         public const int OVERLAP_COLLIDER_SIZE_FOR_ATTACK = 256;
         public const int OVERLAP_COLLIDER_SIZE_FOR_FIND = 32;
@@ -71,6 +72,8 @@ namespace MultiplayerARPG
         public float castingSkillCountDown { get; protected set; }
         public float moveSpeedRateWhileAttackOrUseSkill { get; protected set; }
         public float respawnGroundedCheckCountDown { get; protected set; }
+        protected float requestAttackErrorTime;
+        protected readonly Dictionary<int, float> requestUseSkillErrorTime = new Dictionary<int, float>();
         #endregion
 
         #region Temp data
