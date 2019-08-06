@@ -156,9 +156,8 @@ namespace MultiplayerARPG
             {
                 attribute = Attributes[i];
                 countStatPoint += attribute.amount;
-                attribute.amount = 0;
-                Attributes[i] = attribute;
             }
+            Attributes.Clear();
             StatPoint += countStatPoint;
         }
 
@@ -204,9 +203,8 @@ namespace MultiplayerARPG
             {
                 skill = Skills[i];
                 countSkillPoint += skill.level;
-                skill.level = 0;
-                Skills[i] = skill;
             }
+            Skills.Clear();
             SkillPoint += countSkillPoint;
         }
 

@@ -192,19 +192,22 @@ public static partial class CharacterDataExtension
     {
         if (data == null)
             return new Dictionary<Skill, short>();
-        Dictionary<Skill, short> result = new Dictionary<Skill, short>();
-        // Added skills
+        // Make dictionary of skills which set in `PlayerCharacter` or `MonsterCharacter`
+        Dictionary<Skill, short> result = new Dictionary<Skill, short>(data.GetDatabase().CacheSkillLevels);
+        // Combine with skills that character learnt
         IList<CharacterSkill> skills = data.Skills;
+        Skill learntSkill;
+        short learntSkillLevel;
         foreach (CharacterSkill characterSkill in skills)
         {
-            Skill key = characterSkill.GetSkill();
-            short value = characterSkill.level;
-            if (key == null)
+            learntSkill = characterSkill.GetSkill();
+            learntSkillLevel = characterSkill.level;
+            if (learntSkill == null)
                 continue;
-            if (!result.ContainsKey(key))
-                result[key] = value;
+            if (!result.ContainsKey(learntSkill))
+                result[learntSkill] = learntSkillLevel;
             else
-                result[key] += value;
+                result[learntSkill] += learntSkillLevel;
         }
         return result;
     }

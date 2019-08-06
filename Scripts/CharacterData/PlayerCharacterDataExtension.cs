@@ -117,16 +117,14 @@ public static partial class PlayerCharacterDataExtension
         }
         character.SkillPoint += returningSkillPoint;
         // Add character's skills
-        Dictionary<Skill, short> skillLevels = database.CacheSkillLevels;
-        foreach (KeyValuePair<Skill, short> skillLevel in skillLevels)
+        foreach (Skill skill in database.CacheSkillLevels.Keys)
         {
-            Skill skill = skillLevel.Key;
             // This skill is valid, so not have to add it
             if (validSkillIds.Contains(skill.DataId))
                 continue;
             CharacterSkill characterSkill = new CharacterSkill();
             characterSkill.dataId = skill.DataId;
-            characterSkill.level = skillLevel.Value;
+            characterSkill.level = 0;
             character.Skills.Add(characterSkill);
         }
         // Validating character equip weapons
@@ -186,11 +184,11 @@ public static partial class PlayerCharacterDataExtension
             character.Attributes.Add(characterAttribute);
         }
         Dictionary<Skill, short> skillLevels = playerCharacter.CacheSkillLevels;
-        foreach (KeyValuePair<Skill, short> skillLevel in skillLevels)
+        foreach (Skill skill in playerCharacter.CacheSkillLevels.Keys)
         {
             CharacterSkill characterSkill = new CharacterSkill();
-            characterSkill.dataId = skillLevel.Key.DataId;
-            characterSkill.level = skillLevel.Value;
+            characterSkill.dataId = skill.DataId;
+            characterSkill.level = 0;
             character.Skills.Add(characterSkill);
         }
         // Right hand & left hand items
