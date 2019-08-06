@@ -16,7 +16,8 @@ namespace MultiplayerARPG
         public const float ACTION_COMMAND_DELAY = 0.2f;
         public const float COMBATANT_MESSAGE_DELAY = 1f;
         public const float RESPAWN_GROUNDED_CHECK_DURATION = 1f;
-        public const int OVERLAP_COLLIDER_SIZE_FOR_ATTACK = 256;
+        public const int OVERLAP_COLLIDER_SIZE_FOR_ATTACK = 64;
+        public const int RAYCAST_SIZE_FOR_ATTACK = 64;
         public const int OVERLAP_COLLIDER_SIZE_FOR_FIND = 32;
 
         protected struct SyncListRecachingState
@@ -79,6 +80,8 @@ namespace MultiplayerARPG
         #region Temp data
         protected Collider[] overlapColliders_ForAttackFunctions = new Collider[OVERLAP_COLLIDER_SIZE_FOR_ATTACK];
         protected Collider2D[] overlapColliders2D_ForAttackFunctions = new Collider2D[OVERLAP_COLLIDER_SIZE_FOR_ATTACK];
+        protected RaycastHit[] raycasts_ForAttackFunctions = new RaycastHit[RAYCAST_SIZE_FOR_ATTACK];
+        protected RaycastHit2D[] raycasts2D_ForAttackFunctions = new RaycastHit2D[RAYCAST_SIZE_FOR_ATTACK];
         protected Collider[] overlapColliders_ForFindFunctions = new Collider[OVERLAP_COLLIDER_SIZE_FOR_FIND];
         protected Collider2D[] overlapColliders2D_ForFindFunctions = new Collider2D[OVERLAP_COLLIDER_SIZE_FOR_FIND];
         protected GameObject tempGameObject;
@@ -361,6 +364,7 @@ namespace MultiplayerARPG
                     position = MeleeDamageTransform.position;
                     break;
                 case DamageType.Missile:
+                case DamageType.Raycast:
                     position = MissileDamageTransform.position;
                     break;
             }
@@ -376,6 +380,7 @@ namespace MultiplayerARPG
                     position = MeleeDamageTransform.position;
                     break;
                 case DamageType.Missile:
+                case DamageType.Raycast:
                     Transform tempMissileDamageTransform = null;
                     if ((tempMissileDamageTransform = CharacterModel.GetRightHandMissileDamageTransform()) != null && !isLeftHand)
                     {
@@ -823,6 +828,7 @@ namespace MultiplayerARPG
                 case DamageType.Melee:
                     if (damageInfo.hitOnlySelectedTarget)
                     {
+                        // If hit only selected target, find selected character (only 1 character) to apply damage
                         if (!TryGetTargetEntity(out tempDamageableEntity))
                         {
                             int tempOverlapSize = OverlapObjects_ForAttackFunctions(damagePosition, damageInfo.hitDistance, gameInstance.GetDamageableLayerMask());
@@ -848,6 +854,7 @@ namespace MultiplayerARPG
                     }
                     else
                     {
+                        // If not hit only selected target, find characters within hit fov to applies damages
                         int tempOverlapSize = OverlapObjects_ForAttackFunctions(damagePosition, damageInfo.hitDistance, gameInstance.GetDamageableLayerMask());
                         if (tempOverlapSize == 0)
                             return;
@@ -868,6 +875,7 @@ namespace MultiplayerARPG
                     }
                     break;
                 case DamageType.Missile:
+                    // Spawn missile damage entity, it will move to target then apply damage when hit
                     if (damageInfo.missileDamageEntity != null)
                     {
                         GameObject spawnObj = Instantiate(damageInfo.missileDamageEntity.gameObject, damagePosition, damageRotation);
@@ -879,6 +887,32 @@ namespace MultiplayerARPG
                         }
                         missileDamageEntity.SetupDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId, damageInfo.missileDistance, damageInfo.missileSpeed, tempDamageableEntity);
                         Manager.Assets.NetworkSpawn(spawnObj);
+                    }
+                    break;
+                case DamageType.Raycast:
+                    // Just raycast to any characters to apply damage
+                    int tempRaycastSize = RaycastObjects_ForAttackFunctions(CacheTransform.position, (damagePosition - CacheTransform.position).normalized, (damagePosition - CacheTransform.position).magnitude, ~0);
+                    if (tempRaycastSize == 0)
+                        return;
+                    // Find characters that receiving damages
+                    Vector3 point;
+                    Vector3 normal;
+                    Transform hitTransform;
+                    for (int tempLoopCounter = 0; tempLoopCounter < tempRaycastSize; ++tempLoopCounter)
+                    {
+                        hitTransform = GetRaycastObject_ForAttackFunctions(tempLoopCounter, out point, out normal);
+                        if (hitTransform != null)
+                        {
+                            tempDamageableEntity = tempGameObject.GetComponent<IDamageableEntity>();
+                            // Target receive damage
+                            if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() &&
+                                (!(tempDamageableEntity is BaseCharacterEntity) || (BaseCharacterEntity)tempDamageableEntity != this) &&
+                                IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position))
+                            {
+                                // Pass all receive damage condition, then apply damages
+                                tempDamageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId);
+                            }
+                        }
                     }
                     break;
             }
@@ -949,6 +983,26 @@ namespace MultiplayerARPG
         #endregion
 
         #region Find objects helpers
+        public int RaycastObjects_ForAttackFunctions(Vector3 origin, Vector3 direction, float distance, int layerMask)
+        {
+            if (gameInstance.DimensionType == DimensionType.Dimension2D)
+                return Physics2D.RaycastNonAlloc(origin, direction, raycasts2D_ForAttackFunctions, distance, layerMask);
+            return Physics.RaycastNonAlloc(origin, direction, raycasts_ForAttackFunctions, distance, layerMask);
+        }
+
+        public Transform GetRaycastObject_ForAttackFunctions(int index, out Vector3 point, out Vector3 normal)
+        {
+            if (gameInstance.DimensionType == DimensionType.Dimension2D)
+            {
+                point = raycasts2D_ForAttackFunctions[index].point;
+                normal = raycasts2D_ForAttackFunctions[index].normal;
+                return raycasts2D_ForAttackFunctions[index].transform;
+            }
+            point = raycasts_ForAttackFunctions[index].point;
+            normal = raycasts_ForAttackFunctions[index].normal;
+            return raycasts_ForAttackFunctions[index].transform;
+        }
+
         public int OverlapObjects_ForAttackFunctions(Vector3 position, float distance, int layerMask)
         {
             if (gameInstance.DimensionType == DimensionType.Dimension2D)

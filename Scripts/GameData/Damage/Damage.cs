@@ -8,11 +8,7 @@ namespace MultiplayerARPG
     {
         Melee,
         Missile,
-        /*
-         * TODO: Implements later
-        RaycastMelee,
-        RaycastMissile,
-        */
+        Raycast,
     }
 
     [System.Serializable]
@@ -20,21 +16,21 @@ namespace MultiplayerARPG
     {
         public DamageType damageType;
 
+        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Melee", "Missile" })]
         [Tooltip("If this is TRUE, it will hit only selected target, if no selected target it will hit 1 found target")]
         public bool hitOnlySelectedTarget;
 
-        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Melee", "RaycastMelee" })]
-        [Tooltip("This will be sum with character's radius before find hitting characters")]
+        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Melee" })]
         public float hitDistance = 1f;
-        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Melee", "RaycastMelee" })]
+        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Melee" })]
         [Range(10f, 360f)]
         public float hitFov;
 
-        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Missile", "RaycastMissile" })]
+        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Missile", "Raycast" })]
         public float missileDistance = 5f;
-        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Missile", "RaycastMissile" })]
+        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Missile" })]
         public float missileSpeed = 5f;
-        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Missile", "RaycastMissile" })]
+        [StringShowConditional(conditionFieldName: "damageType", conditionValues: new string[] { "Missile" })]
         public MissileDamageEntity missileDamageEntity;
 
         public float GetDistance()
@@ -46,6 +42,7 @@ namespace MultiplayerARPG
                     distance = hitDistance;
                     break;
                 case DamageType.Missile:
+                case DamageType.Raycast:
                     distance = missileDistance;
                     break;
             }
@@ -61,7 +58,8 @@ namespace MultiplayerARPG
                     fov = hitFov;
                     break;
                 case DamageType.Missile:
-                    fov = 15f;
+                case DamageType.Raycast:
+                    fov = 5f;
                     break;
             }
             return fov;
