@@ -347,15 +347,15 @@ namespace MultiplayerARPG
                 Killed(attacker);
         }
 
-        public void GetDamagePositionAndRotation(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Quaternion rotation)
+        public void GetDamagePositionAndRotation(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
         {
             if (gameInstance.DimensionType == DimensionType.Dimension2D)
-                GetDamagePositionAndRotation2D(damageType, isLeftHand, hasAimPosition, aimPosition, stagger, out position, out rotation);
+                GetDamagePositionAndRotation2D(damageType, isLeftHand, hasAimPosition, aimPosition, stagger, out position, out direction, out rotation);
             else
-                GetDamagePositionAndRotation3D(damageType, isLeftHand, hasAimPosition, aimPosition, stagger, out position, out rotation);
+                GetDamagePositionAndRotation3D(damageType, isLeftHand, hasAimPosition, aimPosition, stagger, out position, out direction, out rotation);
         }
 
-        protected void GetDamagePositionAndRotation2D(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Quaternion rotation)
+        protected void GetDamagePositionAndRotation2D(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
         {
             position = CacheTransform.position;
             switch (damageType)
@@ -368,10 +368,11 @@ namespace MultiplayerARPG
                     position = MissileDamageTransform.position;
                     break;
             }
-            rotation = Quaternion.Euler(0, 0, (Mathf.Atan2(CurrentDirection.y, CurrentDirection.x) * (180 / Mathf.PI)) + 90);
+            direction = CurrentDirection;
+            rotation = Quaternion.Euler(0, 0, (Mathf.Atan2(direction.y, direction.x) * (180 / Mathf.PI)) + 90);
         }
 
-        protected void GetDamagePositionAndRotation3D(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Quaternion rotation)
+        protected void GetDamagePositionAndRotation3D(DamageType damageType, bool isLeftHand, bool hasAimPosition, Vector3 aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
         {
             position = CacheTransform.position;
             switch (damageType)
@@ -401,12 +402,14 @@ namespace MultiplayerARPG
             }
             Quaternion forwardRotation = Quaternion.LookRotation(CacheTransform.forward);
             Vector3 forwardStagger = forwardRotation * stagger;
-            rotation = Quaternion.LookRotation(CacheTransform.forward + forwardStagger);
+            direction = CacheTransform.forward + forwardStagger;
+            rotation = Quaternion.LookRotation(direction);
             if (hasAimPosition)
             {
                 forwardRotation = Quaternion.LookRotation(aimPosition - position);
                 forwardStagger = forwardRotation * stagger;
-                rotation = Quaternion.LookRotation(aimPosition + forwardStagger - position);
+                direction = aimPosition + forwardStagger - position;
+                rotation = Quaternion.LookRotation(direction);
             }
         }
 
@@ -817,8 +820,9 @@ namespace MultiplayerARPG
 
             IDamageableEntity tempDamageableEntity = null;
             Vector3 damagePosition;
+            Vector3 damageDirection;
             Quaternion damageRotation;
-            GetDamagePositionAndRotation(damageInfo.damageType, isLeftHand, hasAimPosition, aimPosition, stagger, out damagePosition, out damageRotation);
+            GetDamagePositionAndRotation(damageInfo.damageType, isLeftHand, hasAimPosition, aimPosition, stagger, out damagePosition, out damageDirection, out damageRotation);
 #if UNITY_EDITOR
             debugDamagePosition = damagePosition;
             debugDamageRotation = damageRotation;
@@ -891,27 +895,23 @@ namespace MultiplayerARPG
                     break;
                 case DamageType.Raycast:
                     // Just raycast to any characters to apply damage
-                    int tempRaycastSize = RaycastObjects_ForAttackFunctions(CacheTransform.position, (damagePosition - CacheTransform.position).normalized, (damagePosition - CacheTransform.position).magnitude, ~0);
+                    int tempRaycastSize = RaycastObjects_ForAttackFunctions(damagePosition, damageDirection, damageInfo.missileDistance, ~0);
                     if (tempRaycastSize == 0)
                         return;
                     // Find characters that receiving damages
                     Vector3 point;
                     Vector3 normal;
-                    Transform hitTransform;
+                    Transform tempHitTransform;
                     for (int tempLoopCounter = 0; tempLoopCounter < tempRaycastSize; ++tempLoopCounter)
                     {
-                        hitTransform = GetRaycastObject_ForAttackFunctions(tempLoopCounter, out point, out normal);
-                        if (hitTransform != null)
+                        tempHitTransform = GetRaycastObject_ForAttackFunctions(tempLoopCounter, out point, out normal);
+                        tempDamageableEntity = tempHitTransform.GetComponent<IDamageableEntity>();
+                        // Target receive damage
+                        if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() &&
+                            (!(tempDamageableEntity is BaseCharacterEntity) || (BaseCharacterEntity)tempDamageableEntity != this))
                         {
-                            tempDamageableEntity = tempGameObject.GetComponent<IDamageableEntity>();
-                            // Target receive damage
-                            if (tempDamageableEntity != null && !tempDamageableEntity.IsDead() &&
-                                (!(tempDamageableEntity is BaseCharacterEntity) || (BaseCharacterEntity)tempDamageableEntity != this) &&
-                                IsPositionInFov(damageInfo.hitFov, tempDamageableEntity.transform.position))
-                            {
-                                // Pass all receive damage condition, then apply damages
-                                tempDamageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId);
-                            }
+                            // Pass all receive damage condition, then apply damages
+                            tempDamageableEntity.ReceiveDamage(this, weapon, allDamageAmounts, debuff, hitEffectsId);
                         }
                     }
                     break;
@@ -987,6 +987,7 @@ namespace MultiplayerARPG
         {
             if (gameInstance.DimensionType == DimensionType.Dimension2D)
                 return Physics2D.RaycastNonAlloc(origin, direction, raycasts2D_ForAttackFunctions, distance, layerMask);
+            Debug.DrawRay(origin, direction, Color.red, 10);
             return Physics.RaycastNonAlloc(origin, direction, raycasts_ForAttackFunctions, distance, layerMask);
         }
 

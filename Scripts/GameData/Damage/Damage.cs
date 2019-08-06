@@ -59,7 +59,7 @@ namespace MultiplayerARPG
                     break;
                 case DamageType.Missile:
                 case DamageType.Raycast:
-                    fov = 5f;
+                    fov = 10f;
                     break;
             }
             return fov;
