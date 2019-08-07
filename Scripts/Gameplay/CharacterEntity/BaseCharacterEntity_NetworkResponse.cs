@@ -244,8 +244,22 @@ namespace MultiplayerARPG
                     UpdateEquipItemIndexes();
                     break;
             }
+
             if (unEquipItem.NotEmptySlot())
-                nonEquipItems.Add(unEquipItem);
+            {
+                int insertIndex = this.IndexOfEmptyNonEquipItemSlot();
+                if (insertIndex >= 0)
+                {
+                    // Insert to empty slot
+                    nonEquipItems.Insert(insertIndex, unEquipItem);
+                }
+                else
+                {
+                    // Add to last index
+                    nonEquipItems.Add(unEquipItem);
+                }
+            }
+            this.FillEmptySlots();
         }
 
         protected virtual void NetFuncOnDead()
