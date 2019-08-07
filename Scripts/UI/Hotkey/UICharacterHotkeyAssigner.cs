@@ -120,7 +120,7 @@ namespace MultiplayerARPG
             CacheSkillList.Generate(filterSkills, (index, characterSkill, ui) =>
             {
                 UICharacterSkill uiCharacterSkill = ui.GetComponent<UICharacterSkill>();
-                uiCharacterSkill.Setup(new CharacterSkillTuple(characterSkill, characterSkill.level), null, filterSkillsIndexes[index]);
+                uiCharacterSkill.Setup(new CharacterSkillTuple(characterSkill, characterSkill.level), BasePlayerCharacterController.OwningCharacter, filterSkillsIndexes[index]);
                 uiCharacterSkill.Show();
                 CacheSkillSelectionManager.Add(uiCharacterSkill);
             });
@@ -128,7 +128,7 @@ namespace MultiplayerARPG
             CacheItemList.Generate(filterItems, (index, characterItem, ui) =>
             {
                 UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
-                uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, InventoryType.NonEquipItems), null, filterItemsIndexes[index]);
+                uiCharacterItem.Setup(new CharacterItemTuple(characterItem, characterItem.level, InventoryType.NonEquipItems), BasePlayerCharacterController.OwningCharacter, filterItemsIndexes[index]);
                 uiCharacterItem.Show();
                 CacheItemSelectionManager.Add(uiCharacterItem);
             });
