@@ -38,6 +38,7 @@ namespace MultiplayerARPG
             get { return skillLevels; }
         }
 
+        [System.NonSerialized]
         private Dictionary<Skill, short> cacheSkillLevels;
         public override Dictionary<Skill, short> CacheSkillLevels
         {
