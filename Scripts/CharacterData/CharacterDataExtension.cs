@@ -496,6 +496,14 @@ public static partial class CharacterDataExtension
         {
             itemList.Add(CharacterItem.Empty);
         }
+
+        // Remove empty slots if it's over limit
+        i = itemList.Count - 1;
+        while (itemList.Count > slotLimit)
+        {
+            if (!itemList[i].NotEmptySlot())
+                itemList.RemoveAt(i--);
+        }
     }
 
     public static void FillEmptySlots(this ICharacterData data)
@@ -1027,6 +1035,23 @@ public static partial class CharacterDataExtension
         }
 
         return false;
+    }
+
+    public static int IndexOfEmptyNonEquipItemSlot(this ICharacterData data)
+    {
+        IList<CharacterItem> list = data.NonEquipItems;
+        CharacterItem tempItem;
+        int index = -1;
+        for (int i = 0; i < list.Count; ++i)
+        {
+            tempItem = list[i];
+            if (!tempItem.NotEmptySlot())
+            {
+                index = i;
+                break;
+            }
+        }
+        return index;
     }
 
     public static int IndexOfNonEquipItem(this ICharacterData data, int dataId)
