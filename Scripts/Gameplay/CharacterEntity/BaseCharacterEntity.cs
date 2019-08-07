@@ -625,7 +625,6 @@ namespace MultiplayerARPG
                 DamageElement damageElement;
                 MinMaxFloat damageAmount;
                 float tempReceivingDamage;
-                Debug.LogError("count " + allDamageAmounts.Count);
                 foreach (KeyValuePair<DamageElement, MinMaxFloat> allDamageAmount in allDamageAmounts)
                 {
                     damageElement = allDamageAmount.Key;
@@ -634,7 +633,6 @@ namespace MultiplayerARPG
                     if (hitEffectsId == 0 && damageElement != gameInstance.DefaultDamageElement)
                         hitEffectsId = damageElement.hitEffects.Id;
                     tempReceivingDamage = damageElement.GetDamageReducedByResistance(this, damageAmount.Random());
-                    Debug.LogError("Receive " + damageElement.Title + " " + tempReceivingDamage);
                     if (tempReceivingDamage > 0f)
                         calculatingTotalDamage += tempReceivingDamage;
                 }
