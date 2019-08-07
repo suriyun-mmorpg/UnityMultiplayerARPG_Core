@@ -496,16 +496,11 @@ public static partial class CharacterDataExtension
         {
             itemList.Add(CharacterItem.Empty);
         }
-        i = itemList.Count - 1;
-        while (itemList.Count > slotLimit)
-        {
-            itemList.RemoveAt(i--);
-        }
     }
 
     public static void FillEmptySlots(this ICharacterData data)
     {
-        FillEmptySlots(data.NonEquipItems, GameInstance.Singleton.IsLimitInventorySlot, (short)data.CacheStats.slotLimit);
+        FillEmptySlots(data.NonEquipItems, GameInstance.Singleton.IsLimitInventorySlot, (short)(data.CacheStats.slotLimit + GameInstance.Singleton.baseSlotLimit));
     }
     #endregion
 
