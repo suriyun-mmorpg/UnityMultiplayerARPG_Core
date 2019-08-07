@@ -347,13 +347,13 @@ public static partial class CharacterDataExtension
         if (equipWeapons != null)
         {
             // Right hand equipment
-            if (equipWeapons.rightHand.IsEmpty())
+            if (!equipWeapons.rightHand.IsEmpty())
             {
                 result = GameDataHelpers.CombineDamages(result, equipWeapons.rightHand.GetIncreaseDamages());
                 result = GameDataHelpers.CombineDamages(result, equipWeapons.rightHand.GetSocketsIncreaseDamages());
             }
             // Left hand equipment
-            if (equipWeapons.leftHand.IsEmpty())
+            if (!equipWeapons.leftHand.IsEmpty())
             {
                 result = GameDataHelpers.CombineDamages(result, equipWeapons.leftHand.GetIncreaseDamages());
                 result = GameDataHelpers.CombineDamages(result, equipWeapons.leftHand.GetSocketsIncreaseDamages());
