@@ -107,20 +107,29 @@ namespace MultiplayerARPG
             IList<CharacterItem> filteredItems = new List<CharacterItem>();
             List<int> filterIndexes = new List<int>();
             // Filter items to show by specific item types
+            Item item;
             int counter = 0;
             foreach (CharacterItem nonEquipItem in nonEquipItems)
             {
-                if (nonEquipItem.GetItem() == null)
+                item = nonEquipItem.GetItem();
+                if (!GameInstance.Singleton.IsLimitInventorySlot ||
+                    (filterCategories != null && filterCategories.Count > 0) ||
+                    (filterItemTypes != null && filterItemTypes.Count > 0))
                 {
-                    ++counter;
-                    continue;
+                    if (item == null)
+                    {
+                        ++counter;
+                        continue;
+                    }
                 }
-                if (string.IsNullOrEmpty(nonEquipItem.GetItem().category) ||
+
+                if (item == null ||
+                    string.IsNullOrEmpty(item.category) ||
                     filterCategories == null || filterCategories.Count == 0 ||
-                    filterCategories.Contains(nonEquipItem.GetItem().category))
+                    filterCategories.Contains(item.category))
                 {
                     if (filterItemTypes == null || filterItemTypes.Count == 0 ||
-                        filterItemTypes.Contains(nonEquipItem.GetItem().itemType))
+                        filterItemTypes.Contains(item.itemType))
                     {
                         filteredItems.Add(nonEquipItem);
                         filterIndexes.Add(counter);
