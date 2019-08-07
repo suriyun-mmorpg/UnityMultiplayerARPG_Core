@@ -123,7 +123,7 @@ namespace MultiplayerARPG
             if (!GameInstance.Skills.TryGetValue(dataId, out skill) ||
                 !CacheSkills.TryGetValue(skill, out level))
                 return;
-            
+
             // Validate mp amount, skill level, 
             if (!skill.CanUse(this, level))
                 return;
@@ -182,7 +182,7 @@ namespace MultiplayerARPG
         {
             if (onUseSkillRoutine != null)
                 onUseSkillRoutine.Invoke(skill, level, animActionType, skillOrWeaponTypeDataId, animationIndex, triggerDuration, totalDuration, isLeftHand, weapon, damageInfo, allDamageAmounts, hasAimPosition, aimPosition);
-            
+
             // Set doing action data
             isCastingSkillCanBeInterrupted = skill.canBeInterruptedWhileCasting;
             isCastingSkillInterrupted = false;
@@ -285,7 +285,16 @@ namespace MultiplayerARPG
                             hasAimPosition = true;
                             aimPosition = AimPosition;
                         }
-                        LaunchDamageEntity(isLeftHand, weapon, damageInfo, allDamageAmounts, debuff, skill.hitEffects.Id, hasAimPosition, aimPosition, Vector3.zero);
+                        LaunchDamageEntity(
+                            isLeftHand,
+                            weapon,
+                            damageInfo,
+                            allDamageAmounts,
+                            debuff,
+                            skill.hitEffects.Id,
+                            hasAimPosition,
+                            aimPosition,
+                            Vector3.zero);
                     }
                     break;
             }
