@@ -112,6 +112,8 @@ namespace MultiplayerARPG
 
         [Header("Gameplay Configs - Inventory and Storage")]
         public InventorySystem inventorySystem;
+        [Tooltip("Base slot limit for all characters, it will be used when `InventorySystem` is `LimitSlots`")]
+        public short baseSlotLimit;
         public Storage playerStorage;
         public Storage guildStorage;
 
