@@ -47,13 +47,35 @@ namespace MultiplayerARPG
         public int randomExpMax;
         public int randomGoldMin;
         public int randomGoldMax;
+        [Tooltip("Max kind of items that will be dropped in ground, set it <= 0 to unlimit")]
         public byte maxDropItems = 5;
         public ItemDrop[] randomItems;
         public ItemDropTable itemDropTable;
 
+        [System.NonSerialized]
         private CharacterStatsIncremental? adjustStats;
+        [System.NonSerialized]
         private AttributeIncremental[] adjustAttributes;
+        [System.NonSerialized]
         private ResistanceIncremental[] adjustResistances;
+
+        [System.NonSerialized]
+        private List<ItemDrop> sortedRandomItems;
+        public List<ItemDrop> SortedRandomItems
+        {
+            get
+            {
+                if (sortedRandomItems == null)
+                {
+                    sortedRandomItems = new List<ItemDrop>(randomItems);
+                    if (itemDropTable != null)
+                        sortedRandomItems.AddRange(itemDropTable.randomItems);
+                    // Sort from low rate to high rate
+                    sortedRandomItems.Sort((a, b) => a.dropRate.CompareTo(b.dropRate));
+                }
+                return sortedRandomItems;
+            }
+        }
 
         public override sealed CharacterStatsIncremental Stats
         {
@@ -147,6 +169,7 @@ namespace MultiplayerARPG
             }
         }
 
+        [System.NonSerialized]
         private Dictionary<Skill, short> cacheSkillLevels;
         public override Dictionary<Skill, short> CacheSkillLevels
         {
@@ -180,11 +203,10 @@ namespace MultiplayerARPG
         {
             int countDrops = 0;
             ItemDrop randomItem;
-            int loopCounter;
 
-            for (loopCounter = 0; loopCounter < randomItems.Length && countDrops < maxDropItems; ++loopCounter)
+            for (int loopCounter = 0; loopCounter < SortedRandomItems.Count && (maxDropItems <= 0 || countDrops < maxDropItems); ++loopCounter)
             {
-                randomItem = randomItems[loopCounter];
+                randomItem = SortedRandomItems[loopCounter];
                 if (randomItem.item == null ||
                     randomItem.amount == 0 ||
                     Random.value > randomItem.dropRate)
@@ -192,22 +214,6 @@ namespace MultiplayerARPG
 
                 ++countDrops;
                 onRandomItem.Invoke(randomItem.item, randomItem.amount);
-            }
-
-            // Random drop item from table
-            if (itemDropTable != null && countDrops < maxDropItems)
-            {
-                for (loopCounter = 0; loopCounter < itemDropTable.randomItems.Length && countDrops < maxDropItems; ++loopCounter)
-                {
-                    randomItem = itemDropTable.randomItems[loopCounter];
-                    if (randomItem.item == null ||
-                        randomItem.amount == 0 ||
-                        Random.value > randomItem.dropRate)
-                        continue;
-
-                    ++countDrops;
-                    onRandomItem.Invoke(randomItem.item, randomItem.amount);
-                }
             }
         }
 
