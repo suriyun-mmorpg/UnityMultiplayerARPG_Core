@@ -146,7 +146,7 @@ namespace UnityEngine
 
         private Vector3Int GetOffsetPosition(Vector3Int location, int direction)
         {
-            int parity = location.y & 1;
+            var parity = location.y & 1;
             return m_FlatTop ? FlatTopNeighborOffsets[parity, direction] : PointedTopNeighborOffsets[parity, direction];
         }
     }

@@ -103,6 +103,7 @@ namespace UnityEngine
         }
 
         public RuleTile m_Tile;
+        public bool m_OverrideSelf = true;
         public bool m_Advanced;
         public List<TileSpritePair> m_Sprites = new List<TileSpritePair>();
         public List<OverrideTilingRule> m_OverrideTilingRules = new List<OverrideTilingRule>();
@@ -119,7 +120,7 @@ namespace UnityEngine
             }
         }
 
-        private RuleTile m_RuntimeTile;
+        [HideInInspector] public RuleTile m_RuntimeTile;
 
         public override bool GetTileAnimationData(Vector3Int position, ITilemap tilemap, ref TileAnimationData tileAnimationData)
         {
@@ -194,7 +195,7 @@ namespace UnityEngine
             if (!m_Tile)
                 return;
 
-            foreach (RuleTile.TilingRule originalRule in m_Tile.m_TilingRules)
+            foreach (var originalRule in m_Tile.m_TilingRules)
             {
                 RuleTile.TilingRule overrideRule = this[originalRule];
                 overrides.Add(new KeyValuePair<RuleTile.TilingRule, RuleTile.TilingRule>(originalRule, overrideRule));
@@ -205,7 +206,7 @@ namespace UnityEngine
         public void Override()
         {
             m_RuntimeTile = m_Tile ? Instantiate(m_Tile) : new RuleTile();
-            m_RuntimeTile.m_Self = this;
+            m_RuntimeTile.m_Self = m_OverrideSelf ? this : m_Tile as TileBase;
             if (!m_Advanced)
             {
                 if (m_RuntimeTile.m_DefaultSprite)
@@ -237,7 +238,7 @@ namespace UnityEngine
         }
         public RuleTile.TilingRule CloneTilingRule(RuleTile.TilingRule from)
         {
-            RuleTile.TilingRule clone = new RuleTile.TilingRule();
+            var clone = new RuleTile.TilingRule();
             CopyTilingRule(from, clone, true);
             return clone;
         }

@@ -30,12 +30,12 @@ namespace UnityEngine.Tilemaps {
             Random.InitState((int) hash);
 
             // Get the cumulative weight of the sprites
-            int cumulativeWeight = 0;
-            foreach (WeightedSprite spriteInfo in Sprites) cumulativeWeight += spriteInfo.Weight;
+            var cumulativeWeight = 0;
+            foreach (var spriteInfo in Sprites) cumulativeWeight += spriteInfo.Weight;
 
             // Pick a random weight and choose a sprite depending on it
-            int randomWeight = Random.Range(0, cumulativeWeight);
-            foreach (WeightedSprite spriteInfo in Sprites) {
+            var randomWeight = Random.Range(0, cumulativeWeight);
+            foreach (var spriteInfo in Sprites) {
                 randomWeight -= spriteInfo.Weight;
                 if (randomWeight < 0) {
                     tileData.sprite = spriteInfo.Sprite;    
