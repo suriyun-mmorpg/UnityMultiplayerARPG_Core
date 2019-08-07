@@ -184,14 +184,13 @@ namespace MultiplayerARPG
 
             for (loopCounter = 0; loopCounter < randomItems.Length && countDrops < maxDropItems; ++loopCounter)
             {
-                ++countDrops;
                 randomItem = randomItems[loopCounter];
                 if (randomItem.item == null ||
                     randomItem.amount == 0 ||
-                    !GameInstance.Items.ContainsKey(randomItem.item.DataId) ||
                     Random.value > randomItem.dropRate)
                     continue;
 
+                ++countDrops;
                 onRandomItem.Invoke(randomItem.item, randomItem.amount);
             }
 
@@ -200,14 +199,13 @@ namespace MultiplayerARPG
             {
                 for (loopCounter = 0; loopCounter < itemDropTable.randomItems.Length && countDrops < maxDropItems; ++loopCounter)
                 {
-                    ++countDrops;
                     randomItem = itemDropTable.randomItems[loopCounter];
                     if (randomItem.item == null ||
                         randomItem.amount == 0 ||
-                        !GameInstance.Items.ContainsKey(randomItem.item.DataId) ||
                         Random.value > randomItem.dropRate)
                         continue;
 
+                    ++countDrops;
                     onRandomItem.Invoke(randomItem.item, randomItem.amount);
                 }
             }
