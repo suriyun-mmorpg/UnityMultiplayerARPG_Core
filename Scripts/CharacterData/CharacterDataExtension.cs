@@ -190,7 +190,7 @@ public static partial class CharacterDataExtension
 
     public static Dictionary<Skill, short> GetCharacterSkills(this ICharacterData data)
     {
-        if (data == null)
+        if (data == null || data.GetDatabase() ==  null)
             return new Dictionary<Skill, short>();
         // Make dictionary of skills which set in `PlayerCharacter` or `MonsterCharacter`
         Dictionary<Skill, short> result = new Dictionary<Skill, short>(data.GetDatabase().CacheSkillLevels);
