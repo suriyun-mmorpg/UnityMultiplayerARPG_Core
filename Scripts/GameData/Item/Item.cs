@@ -274,6 +274,7 @@ namespace MultiplayerARPG
         }
 
         #region Cache Data
+        [System.NonSerialized]
         private Dictionary<Attribute, short> cacheRequireAttributeAmounts;
         public Dictionary<Attribute, short> CacheRequireAttributeAmounts
         {

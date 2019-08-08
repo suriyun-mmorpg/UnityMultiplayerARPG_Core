@@ -45,6 +45,7 @@ namespace MultiplayerARPG
             return id.GenerateHashId();
         }
 
+        [System.NonSerialized]
         private Dictionary<string, string> cacheTitles;
         public Dictionary<string, string> CacheTitles
         {
@@ -65,6 +66,7 @@ namespace MultiplayerARPG
             }
         }
 
+        [System.NonSerialized]
         private Dictionary<string, string> cacheDescriptions;
         public Dictionary<string, string> CacheDescriptions
         {

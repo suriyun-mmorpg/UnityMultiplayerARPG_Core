@@ -33,6 +33,8 @@ namespace MultiplayerARPG
 
         public float SuccessRate { get { return successRate; } }
         public ItemAmount[] RequireItems { get { return requireItems; } }
+
+        [System.NonSerialized]
         private Dictionary<Item, short> cacheRequireItems;
         public Dictionary<Item, short> CacheRequireItems
         {

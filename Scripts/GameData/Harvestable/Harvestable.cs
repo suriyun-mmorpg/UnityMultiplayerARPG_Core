@@ -12,6 +12,7 @@ namespace MultiplayerARPG
         [Tooltip("Ex. if this is 10 when damage to harvestable entity = 2, character will receives 20 exp")]
         public int expPerDamage;
 
+        [System.NonSerialized]
         private Dictionary<WeaponType, HarvestEffectiveness> cacheHarvestEffectivenesses;
         public Dictionary<WeaponType, HarvestEffectiveness> CacheHarvestEffectivenesses
         {
@@ -22,6 +23,7 @@ namespace MultiplayerARPG
             }
         }
 
+        [System.NonSerialized]
         private Dictionary<WeaponType, WeightedRandomizer<ItemDropByWeight>> cacheHarvestItems;
         public Dictionary<WeaponType, WeightedRandomizer<ItemDropByWeight>> CacheHarvestItems
         {

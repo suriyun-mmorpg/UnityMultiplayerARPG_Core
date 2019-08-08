@@ -15,6 +15,8 @@ namespace MultiplayerARPG
         private int requireGold;
 
         public Item CraftingItem { get { return craftingItem; } }
+
+        [System.NonSerialized]
         private Dictionary<Item, short> cacheCraftRequirements;
         public Dictionary<Item, short> CacheCraftRequirements
         {
@@ -61,7 +63,7 @@ namespace MultiplayerARPG
             }
             return true;
         }
-        
+
         public void CraftItem(IPlayerCharacterData character)
         {
             if (character.IncreaseItems(CharacterItem.Create(craftingItem)))

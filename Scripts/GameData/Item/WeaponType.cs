@@ -22,6 +22,7 @@ namespace MultiplayerARPG
         [Tooltip("Require Ammo, Leave it to null when it is not required")]
         public AmmoType requireAmmoType;
 
+        [System.NonSerialized]
         private Dictionary<Attribute, float> cacheEffectivenessAttributes;
         public Dictionary<Attribute, float> CacheEffectivenessAttributes
         {
