@@ -70,6 +70,8 @@ namespace MultiplayerARPG
                     moveSpeedRateWhileAttackOrUseSkill = 1f;
                     if (EquipWeapons != null && EquipWeapons.rightHand != null && EquipWeapons.rightHand.GetWeaponItem() != null)
                         moveSpeedRateWhileAttackOrUseSkill = EquipWeapons.rightHand.GetWeaponItem().moveSpeedRateWhileAttacking;
+                    else
+                        moveSpeedRateWhileAttackOrUseSkill = gameInstance.DefaultWeaponItem.moveSpeedRateWhileAttacking;
                     break;
                 case AnimActionType.AttackLeftHand:
                     playSpeedMultiplier = CacheAtkSpeed;
@@ -79,6 +81,8 @@ namespace MultiplayerARPG
                     moveSpeedRateWhileAttackOrUseSkill = 1f;
                     if (EquipWeapons != null && EquipWeapons.leftHand != null && EquipWeapons.leftHand.GetWeaponItem() != null)
                         moveSpeedRateWhileAttackOrUseSkill = EquipWeapons.leftHand.GetWeaponItem().moveSpeedRateWhileAttacking;
+                    else
+                        moveSpeedRateWhileAttackOrUseSkill = gameInstance.DefaultWeaponItem.moveSpeedRateWhileAttacking;
                     break;
                 case AnimActionType.Skill:
                     // Set doing action state at clients and server
