@@ -288,13 +288,12 @@ namespace MultiplayerARPG
                     if (tempDamageableEntity != null && tempDistance <= attackDistance)
                     {
                         tempEntity = tempDamageableEntity.Entity;
-                        // Target must be in front of player character
-                        if (!PlayerCharacterEntity.IsPositionInFov(attackFov, tempEntity.CacheTransform.position, forward))
-                            continue;
+
                         // Target must be damageable, not player character entity, within aim distance and alive
                         if (tempDamageableEntity.ObjectId == PlayerCharacterEntity.ObjectId ||
                             tempDamageableEntity.IsDead())
                             continue;
+
                         // Set aim position and found target
                         if (tempDistance < tempNearestDistance)
                         {
