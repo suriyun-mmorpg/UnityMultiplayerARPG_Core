@@ -47,7 +47,7 @@ namespace MultiplayerARPG
         public int randomExpMax;
         public int randomGoldMin;
         public int randomGoldMax;
-        [Tooltip("Max kind of items that will be dropped in ground, set it <= 0 to unlimit")]
+        [Tooltip("Max kind of items that will be dropped in ground")]
         public byte maxDropItems = 5;
         public ItemDrop[] randomItems;
         public ItemDropTable itemDropTable;
@@ -60,20 +60,18 @@ namespace MultiplayerARPG
         private ResistanceIncremental[] adjustResistances;
 
         [System.NonSerialized]
-        private List<ItemDrop> sortedRandomItems;
-        public List<ItemDrop> SortedRandomItems
+        private List<ItemDrop> cacheRandomItems;
+        public List<ItemDrop> CacheRandomItems
         {
             get
             {
-                if (sortedRandomItems == null)
+                if (cacheRandomItems == null)
                 {
-                    sortedRandomItems = new List<ItemDrop>(randomItems);
+                    cacheRandomItems = new List<ItemDrop>(randomItems);
                     if (itemDropTable != null)
-                        sortedRandomItems.AddRange(itemDropTable.randomItems);
-                    // Sort from low rate to high rate
-                    sortedRandomItems.Sort((a, b) => a.dropRate.CompareTo(b.dropRate));
+                        cacheRandomItems.AddRange(itemDropTable.randomItems);
                 }
-                return sortedRandomItems;
+                return cacheRandomItems;
             }
         }
 
@@ -201,18 +199,16 @@ namespace MultiplayerARPG
 
         public void RandomItems(System.Action<Item, short> onRandomItem)
         {
-            int countDrops = 0;
             ItemDrop randomItem;
 
-            for (int loopCounter = 0; loopCounter < SortedRandomItems.Count && (maxDropItems <= 0 || countDrops < maxDropItems); ++loopCounter)
+            for (int countDrops = 0; countDrops < CacheRandomItems.Count && countDrops < maxDropItems; ++countDrops)
             {
-                randomItem = SortedRandomItems[loopCounter];
+                randomItem = CacheRandomItems[Random.Range(0, CacheRandomItems.Count)];
                 if (randomItem.item == null ||
                     randomItem.amount == 0 ||
                     Random.value > randomItem.dropRate)
                     continue;
-
-                ++countDrops;
+                
                 onRandomItem.Invoke(randomItem.item, randomItem.amount);
             }
         }
