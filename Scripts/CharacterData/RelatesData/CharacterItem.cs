@@ -482,11 +482,13 @@ public class CharacterItem : INetSerializableWithElement
 
     public void Serialize(NetDataWriter writer)
     {
-        if (Element == null || Element.SendingConnectionId == Element.ConnectionId)
+        bool isOwnerClient = Element == null || Element.SendingConnectionId == Element.ConnectionId;
+        writer.Put(isOwnerClient);
+        if (isOwnerClient)
             writer.Put(id);
         writer.Put(dataId);
         writer.Put(level);
-        if (Element == null || Element.SendingConnectionId == Element.ConnectionId)
+        if (isOwnerClient)
         {
             writer.Put(amount);
             writer.Put(lockRemainsDuration);
@@ -522,11 +524,12 @@ public class CharacterItem : INetSerializableWithElement
 
     public void Deserialize(NetDataReader reader)
     {
-        if (Element == null || Element.IsOwnerClient)
+        bool isOwnerClient = reader.GetBool();
+        if (isOwnerClient)
             id = reader.GetString();
         dataId = reader.GetInt();
         level = reader.GetShort();
-        if (Element == null || Element.IsOwnerClient)
+        if (isOwnerClient)
         {
             amount = reader.GetShort();
             lockRemainsDuration = reader.GetFloat();
