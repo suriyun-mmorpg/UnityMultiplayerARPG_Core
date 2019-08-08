@@ -7,7 +7,7 @@ namespace MultiplayerARPG
     public partial class UICraftItems : UIBase
     {
         public CrafterType CrafterType { get; private set; }
-        public uint BuildingObjectId { get; protected set; }
+        public uint BuildingObjectId { get; private set; }
 
         public UICraftItem uiCraftItemDialog;
         public UICraftItem uiCraftItemPrefab;
@@ -71,7 +71,18 @@ namespace MultiplayerARPG
             if (uiCraftItemDialog != null)
             {
                 uiCraftItemDialog.selectionManager = CacheItemSelectionManager;
-                uiCraftItemDialog.Data = ui.Data;
+                switch (CrafterType)
+                {
+                    case CrafterType.Character:
+                        uiCraftItemDialog.SetupForCharacter(ui.Data);
+                        break;
+                    case CrafterType.Npc:
+                        uiCraftItemDialog.SetupForNpc(ui.Data);
+                        break;
+                    case CrafterType.Workbench:
+                        uiCraftItemDialog.SetupForWorkbench(BuildingObjectId, ui.Data);
+                        break;
+                }
                 uiCraftItemDialog.Show();
             }
         }
