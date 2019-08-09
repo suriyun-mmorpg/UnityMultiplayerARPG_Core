@@ -494,7 +494,7 @@ public static partial class CharacterDataExtension
         int i;
         for (i = itemList.Count; i < slotLimit; ++i)
         {
-            itemList.Add(CharacterItem.Empty);
+            itemList.Add(CharacterItem.Create(0));
         }
 
         // Remove empty slots if it's over limit
