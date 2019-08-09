@@ -242,7 +242,8 @@ namespace MultiplayerARPG
             if (respawnGroundedCheckCountDown <= 0)
             {
                 if (gameInstance.DimensionType == DimensionType.Dimension3D &&
-                    gameManager != null && CacheTransform.position.y <= gameManager.CurrentMapInfo.deadY)
+                    gameManager != null && gameManager.CurrentMapInfo != null &&
+                    CacheTransform.position.y <= gameManager.CurrentMapInfo.deadY)
                 {
                     if (IsServer && !IsDead())
                     {
