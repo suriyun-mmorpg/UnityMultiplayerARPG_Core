@@ -250,19 +250,7 @@ namespace MultiplayerARPG
             }
 
             if (unEquipItem.NotEmptySlot())
-            {
-                int insertIndex = this.IndexOfEmptyNonEquipItemSlot();
-                if (insertIndex >= 0)
-                {
-                    // Insert to empty slot
-                    nonEquipItems.Insert(insertIndex, unEquipItem);
-                }
-                else
-                {
-                    // Add to last index
-                    nonEquipItems.Add(unEquipItem);
-                }
-            }
+                this.AddOrInsertNonEquipItems(unEquipItem);
             this.FillEmptySlots();
         }
 

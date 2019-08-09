@@ -137,7 +137,7 @@ public class CharacterSummon : INetSerializableWithElement
                 newItem.Lock(GameInstance.Singleton.petDeadLockDuration);
             else
                 newItem.Lock(GameInstance.Singleton.petUnSummonLockDuration);
-            summoner.NonEquipItems.Add(newItem);
+            summoner.AddOrInsertNonEquipItems(newItem);
         }
 
         if (CacheEntity != null)

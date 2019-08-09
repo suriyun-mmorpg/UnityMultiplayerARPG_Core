@@ -300,7 +300,7 @@ namespace MultiplayerARPG
             Storage storage = GetStorage(playerCharacterEntity.CurrentStorageId);
             bool isLimitSlot = storage.slotLimit > 0;
             short slotLimit = storage.slotLimit;
-            CharacterDataExtension.FillEmptySlots(storageItems[playerCharacterEntity.CurrentStorageId], isLimitSlot, slotLimit);
+            storageItems[playerCharacterEntity.CurrentStorageId].FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage items
             playerCharacterEntity.StorageItems = storageItems[playerCharacterEntity.CurrentStorageId];
         }
@@ -342,10 +342,10 @@ namespace MultiplayerARPG
                 storageItemList[storageItemIndex].dataId == movingItem.dataId)
             {
                 // Add to storage or merge
-                bool isOverwhelming = CharacterDataExtension.IncreasingItemsWillOverwhelming(
-                    storageItemList, movingItem.dataId, movingItem.amount, isLimitWeight, weightLimit,
-                    CharacterDataExtension.GetTotalItemWeight(storageItemList), isLimitSlot, slotLimit);
-                if (!isOverwhelming && CharacterDataExtension.IncreaseItems(storageItemList, movingItem))
+                bool isOverwhelming = storageItemList.IncreasingItemsWillOverwhelming(
+                    movingItem.dataId, movingItem.amount, isLimitWeight, weightLimit,
+                    storageItemList.GetTotalItemWeight(), isLimitSlot, slotLimit);
+                if (!isOverwhelming && storageItemList.IncreaseItems(movingItem))
                 {
                     // Decrease from inventory
                     playerCharacterEntity.DecreaseItemsByIndex(nonEquipIndex, amount);
@@ -360,7 +360,7 @@ namespace MultiplayerARPG
                 storageItemList[storageItemIndex] = nonEquipItem;
                 playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
             }
-            CharacterDataExtension.FillEmptySlots(storageItemList, isLimitSlot, slotLimit);
+            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
@@ -396,7 +396,7 @@ namespace MultiplayerARPG
                 if (!isOverwhelming && playerCharacterEntity.IncreaseItems(movingItem))
                 {
                     // Decrease from storage
-                    CharacterDataExtension.DecreaseItemsByIndex(storageItemList, storageItemIndex, amount);
+                    storageItemList.DecreaseItemsByIndex(storageItemIndex, amount);
                 }
             }
             else
@@ -408,7 +408,7 @@ namespace MultiplayerARPG
                 storageItemList[storageItemIndex] = nonEquipItem;
                 playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
             }
-            CharacterDataExtension.FillEmptySlots(storageItemList, isLimitSlot, slotLimit);
+            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 

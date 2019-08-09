@@ -160,7 +160,8 @@ public static partial class PlayerCharacterDataExtension
         // Return items to non equip items
         foreach (CharacterItem returningItem in returningItems)
         {
-            character.NonEquipItems.Add(returningItem);
+            if (returningItem.NotEmptySlot())
+                character.AddOrInsertNonEquipItems(returningItem);
         }
         character.FillEmptySlots();
         DevExtUtils.InvokeStaticDevExtMethods(ClassType, "ValidateCharacterData", character);
@@ -238,8 +239,7 @@ public static partial class PlayerCharacterDataExtension
             short amount = startItem.amount;
             if (amount > startItem.item.maxStack)
                 amount = startItem.item.maxStack;
-            CharacterItem newItem = CharacterItem.Create(startItem.item, 1, amount);
-            character.NonEquipItems.Add(newItem);
+            character.AddOrInsertNonEquipItems(CharacterItem.Create(startItem.item, 1, amount));
         }
         // Position
         MapInfo startMap = playerCharacter.StartMap;
