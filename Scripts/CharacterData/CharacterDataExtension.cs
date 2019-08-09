@@ -498,17 +498,16 @@ public static partial class CharacterDataExtension
         }
 
         // Remove empty slots if it's over limit
-        i = itemList.Count - 1;
-        while (itemList.Count > slotLimit)
+        for (i = itemList.Count - 1; itemList.Count > slotLimit && i >= 0; --i)
         {
             if (!itemList[i].NotEmptySlot())
-                itemList.RemoveAt(i--);
+                itemList.RemoveAt(i);
         }
     }
 
     public static void FillEmptySlots(this ICharacterData data)
     {
-        data.NonEquipItems.FillEmptySlots(GameInstance.Singleton.IsLimitInventorySlot, (short)(data.CacheStats.slotLimit + GameInstance.Singleton.baseSlotLimit));
+        data.NonEquipItems.FillEmptySlots(GameInstance.Singleton.IsLimitInventorySlot, (short)data.CacheStats.slotLimit);
     }
     #endregion
 
