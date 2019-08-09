@@ -488,9 +488,9 @@ public class CharacterItem : INetSerializableWithElement
             writer.Put(id);
         writer.Put(dataId);
         writer.Put(level);
+        writer.Put(amount);
         if (isOwnerClient)
         {
-            writer.Put(amount);
             writer.Put(lockRemainsDuration);
             // Put only needed data
             if (GetEquipmentItem() != null)
@@ -529,9 +529,9 @@ public class CharacterItem : INetSerializableWithElement
             id = reader.GetString();
         dataId = reader.GetInt();
         level = reader.GetShort();
+        amount = reader.GetShort();
         if (isOwnerClient)
         {
-            amount = reader.GetShort();
             lockRemainsDuration = reader.GetFloat();
             // Read only needed data
             if (GetEquipmentItem() != null)
