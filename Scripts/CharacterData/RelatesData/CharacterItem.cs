@@ -480,6 +480,11 @@ public class CharacterItem : INetSerializableWithElement
         return newItem;
     }
 
+    public static CharacterItem CreateEmptySlot()
+    {
+        return Create(0, 1, 0);
+    }
+
     public void Serialize(NetDataWriter writer)
     {
         bool isOwnerClient = Element == null || Element.SendingConnectionId == Element.ConnectionId;
