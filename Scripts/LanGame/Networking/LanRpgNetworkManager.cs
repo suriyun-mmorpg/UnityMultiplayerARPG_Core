@@ -177,6 +177,10 @@ namespace MultiplayerARPG
                 playerCharacterEntity.Summons[i] = summon;
             }
 
+            // Force make caches, to calculate current stats to fill empty slots items
+            playerCharacterEntity.ForceMakeCaches();
+            playerCharacterEntity.FillEmptySlots();
+
             // Notify clients that this character is spawn or dead
             if (!playerCharacterEntity.IsDead())
                 playerCharacterEntity.RequestOnRespawn();
