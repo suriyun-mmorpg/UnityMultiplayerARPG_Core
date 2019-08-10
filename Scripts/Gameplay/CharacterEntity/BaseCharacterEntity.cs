@@ -13,9 +13,10 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(CharacterSkillAndBuffComponent))]
     public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData, IAttackerEntity
     {
-        public const float ACTION_COMMAND_DELAY = 0.2f;
+        public const float ACTION_DELAY = 0.2f;
         public const float COMBATANT_MESSAGE_DELAY = 1f;
         public const float RESPAWN_GROUNDED_CHECK_DURATION = 1f;
+        public const float MOUNT_DELAY = 1f;
         public const int OVERLAP_COLLIDER_SIZE_FOR_ATTACK = 64;
         public const int RAYCAST_SIZE_FOR_ATTACK = 64;
         public const int OVERLAP_COLLIDER_SIZE_FOR_FIND = 32;
@@ -73,7 +74,9 @@ namespace MultiplayerARPG
         public float castingSkillCountDown { get; protected set; }
         public float moveSpeedRateWhileAttackOrUseSkill { get; protected set; }
         public float respawnGroundedCheckCountDown { get; protected set; }
-        protected float requestAttackErrorTime;
+        protected float lastActionTime;
+        protected float lastCombatantErrorTime;
+        protected float lastMountTime;
         protected readonly Dictionary<int, float> requestUseSkillErrorTime = new Dictionary<int, float>();
         #endregion
 
@@ -973,6 +976,9 @@ namespace MultiplayerARPG
             if (PassengingVehicleEntity != null &&
                 !PassengingVehicleSeat.canUseSkill)
                 return false;
+            if (Time.unscaledTime - lastActionTime < ACTION_DELAY)
+                return false;
+            lastActionTime = Time.unscaledTime;
             return true;
         }
 
@@ -982,6 +988,9 @@ namespace MultiplayerARPG
                 return false;
             if (CacheDisallowUseItem)
                 return false;
+            if (Time.unscaledTime - lastActionTime < ACTION_DELAY)
+                return false;
+            lastActionTime = Time.unscaledTime;
             return true;
         }
         #endregion

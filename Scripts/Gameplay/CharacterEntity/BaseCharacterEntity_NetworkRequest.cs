@@ -34,12 +34,12 @@ namespace MultiplayerARPG
             CharacterItem weapon = this.GetAvailableWeapon(ref isLeftHand);
             if (!ValidateAmmo(weapon))
             {
-                if (Time.unscaledTime - requestAttackErrorTime >= COMBATANT_MESSAGE_DELAY)
+                if (Time.unscaledTime - lastCombatantErrorTime >= COMBATANT_MESSAGE_DELAY)
                 {
                     if (!IsOwnerClient)
                         return false;
 
-                    requestAttackErrorTime = Time.unscaledTime;
+                    lastCombatantErrorTime = Time.unscaledTime;
                     gameManager.ClientReceiveGameMessage(new GameMessage() { type = GameMessage.Type.NoAmmo });
                 }
                 return false;

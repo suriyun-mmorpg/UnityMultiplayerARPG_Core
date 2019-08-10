@@ -17,8 +17,11 @@ namespace MultiplayerARPG
 
         protected void Mount(MountEntity mountEntityPrefab)
         {
-            if (!IsServer || mountEntityPrefab == null)
+            if (!IsServer || mountEntityPrefab == null || Time.unscaledTime - lastMountTime >= MOUNT_DELAY)
                 return;
+
+            lastMountTime = Time.unscaledTime;
+
             if (PassengingVehicle.objectId > 0)
                 ExitVehicle();
 
