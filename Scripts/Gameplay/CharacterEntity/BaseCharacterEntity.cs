@@ -976,9 +976,6 @@ namespace MultiplayerARPG
             if (PassengingVehicleEntity != null &&
                 !PassengingVehicleSeat.canUseSkill)
                 return false;
-            if (Time.unscaledTime - lastActionTime < ACTION_DELAY)
-                return false;
-            lastActionTime = Time.unscaledTime;
             return true;
         }
 
@@ -988,9 +985,6 @@ namespace MultiplayerARPG
                 return false;
             if (CacheDisallowUseItem)
                 return false;
-            if (Time.unscaledTime - lastActionTime < ACTION_DELAY)
-                return false;
-            lastActionTime = Time.unscaledTime;
             return true;
         }
         #endregion

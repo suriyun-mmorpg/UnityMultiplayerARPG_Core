@@ -17,7 +17,7 @@ namespace MultiplayerARPG
 
         protected void Mount(MountEntity mountEntityPrefab)
         {
-            if (!IsServer || mountEntityPrefab == null || Time.unscaledTime - lastMountTime >= MOUNT_DELAY)
+            if (!IsServer || mountEntityPrefab == null || Time.unscaledTime - lastMountTime < MOUNT_DELAY)
                 return;
 
             lastMountTime = Time.unscaledTime;
