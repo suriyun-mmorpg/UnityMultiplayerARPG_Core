@@ -574,6 +574,7 @@ namespace MultiplayerARPG
                 passengingVehicleEntity = null;
 
                 // Teleport to exit transform
+                CacheTransform.position = exitPosition;
                 Teleport(exitPosition);
             }
             else
