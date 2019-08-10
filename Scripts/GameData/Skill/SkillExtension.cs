@@ -41,7 +41,7 @@ namespace MultiplayerARPG
             return skill.maxLevel;
         }
 
-        public static bool CanLevelUp(this Skill skill, IPlayerCharacterData character, short level)
+        public static bool CanLevelUp(this Skill skill, IPlayerCharacterData character, short level, bool checkSkillPoint = true)
         {
             if (skill == null || character == null || !character.GetDatabase().CacheSkillLevels.ContainsKey(skill))
                 return false;
@@ -71,7 +71,7 @@ namespace MultiplayerARPG
                     return false;
             }
             // Check another requirements
-            return character.SkillPoint > 0 && level < skill.maxLevel && character.Level >= skill.GetRequireCharacterLevel(level);
+            return (!checkSkillPoint || character.SkillPoint > 0) && level < skill.maxLevel && character.Level >= skill.GetRequireCharacterLevel(level);
         }
 
         public static bool CanUse(this Skill skill, ICharacterData character, short level)

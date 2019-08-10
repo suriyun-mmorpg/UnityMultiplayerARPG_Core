@@ -177,7 +177,7 @@ namespace MultiplayerARPG
             if (index < 0)
             {
                 skill = CharacterSkill.Create(skillData, 0);
-                if (!skill.CanLevelUp(this) || !this.DecreaseItemsByIndex(itemIndex, 1))
+                if (!skill.CanLevelUp(this, false) || !this.DecreaseItemsByIndex(itemIndex, 1))
                     return;
                 skill.level += 1;
                 Skills.Add(skill);
@@ -185,7 +185,7 @@ namespace MultiplayerARPG
             else
             {
                 skill = Skills[index];
-                if (!skill.CanLevelUp(this) || !this.DecreaseItemsByIndex(itemIndex, 1))
+                if (!skill.CanLevelUp(this, false) || !this.DecreaseItemsByIndex(itemIndex, 1))
                     return;
                 skill.level += 1;
                 Skills[index] = skill;

@@ -92,9 +92,9 @@ public class CharacterSkill : INetSerializableWithElement
         return cacheSkill;
     }
 
-    public bool CanLevelUp(IPlayerCharacterData character)
+    public bool CanLevelUp(IPlayerCharacterData character, bool checkSkillPoint = true)
     {
-        return GetSkill().CanLevelUp(character, level);
+        return GetSkill().CanLevelUp(character, level, checkSkillPoint);
     }
 
     public bool CanUse(ICharacterData character)
