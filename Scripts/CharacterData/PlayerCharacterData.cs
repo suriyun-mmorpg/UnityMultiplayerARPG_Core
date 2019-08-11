@@ -5,6 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public partial class PlayerCharacterData : CharacterData, IPlayerCharacterData
 {
+    private int factionId;
     private short statPoint;
     private short skillPoint;
     private int gold;
@@ -22,6 +23,7 @@ public partial class PlayerCharacterData : CharacterData, IPlayerCharacterData
     private List<CharacterHotkey> hotkeys = new List<CharacterHotkey>();
     private List<CharacterQuest> quests = new List<CharacterQuest>();
 
+    public int FactionId { get { return factionId; } set { factionId = value; } }
     public short StatPoint { get { return statPoint; } set { statPoint = value; } }
     public short SkillPoint { get { return skillPoint; } set { skillPoint = value; } }
     public int Gold { get { return gold; } set { gold = value; } }

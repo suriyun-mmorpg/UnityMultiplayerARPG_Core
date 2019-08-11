@@ -4,6 +4,10 @@ using UnityEngine;
 public partial interface IPlayerCharacterData : ICharacterData
 {
     /// <summary>
+    /// Current Faction
+    /// </summary>
+    int FactionId { get; set; }
+    /// <summary>
     /// Stat point which uses for increase attribute amount
     /// </summary>
     short StatPoint { get; set; }

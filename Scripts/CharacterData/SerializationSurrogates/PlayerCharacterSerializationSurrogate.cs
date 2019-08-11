@@ -12,6 +12,7 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
         info.AddValue("id", data.Id);
         info.AddValue("dataId", data.DataId);
         info.AddValue("entityId", data.EntityId);
+        info.AddValue("factionId", data.FactionId);
         info.AddValue("characterName", data.CharacterName);
         info.AddValue("level", data.Level);
         info.AddValue("exp", data.Exp);
@@ -52,6 +53,7 @@ public partial class PlayerCharacterSerializationSurrogate : ISerializationSurro
         data.Id = info.GetString("id");
         data.DataId = info.GetInt32("dataId");
         data.EntityId = info.GetInt32("entityId");
+        data.FactionId = info.GetInt32("factionId");
         data.CharacterName = info.GetString("characterName");
         data.Level = info.GetInt16("level");
         data.Exp = info.GetInt32("exp");

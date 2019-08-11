@@ -32,6 +32,7 @@ public static partial class PlayerCharacterDataExtension
         to.CurrentStamina = from.CurrentStamina;
         to.CurrentFood = from.CurrentFood;
         to.CurrentWater = from.CurrentWater;
+        to.FactionId = from.FactionId;
         to.StatPoint = from.StatPoint;
         to.SkillPoint = from.SkillPoint;
         to.Gold = from.Gold;
@@ -367,6 +368,7 @@ public static partial class PlayerCharacterDataExtension
         writer.Put(characterData.CurrentStamina);
         writer.Put(characterData.CurrentFood);
         writer.Put(characterData.CurrentWater);
+        writer.Put(characterData.FactionId);
         writer.Put(characterData.StatPoint);
         writer.Put(characterData.SkillPoint);
         writer.Put(characterData.Gold);
@@ -448,6 +450,7 @@ public static partial class PlayerCharacterDataExtension
         tempCharacterData.CurrentStamina = reader.GetInt();
         tempCharacterData.CurrentFood = reader.GetInt();
         tempCharacterData.CurrentWater = reader.GetInt();
+        tempCharacterData.FactionId = reader.GetInt();
         tempCharacterData.StatPoint = reader.GetShort();
         tempCharacterData.SkillPoint = reader.GetShort();
         tempCharacterData.Gold = reader.GetInt();

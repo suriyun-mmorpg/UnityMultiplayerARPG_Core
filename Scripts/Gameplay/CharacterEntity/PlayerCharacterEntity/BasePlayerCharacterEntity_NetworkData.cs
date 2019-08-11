@@ -13,6 +13,8 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldInt dataId = new SyncFieldInt();
         [SerializeField]
+        protected SyncFieldInt factionId = new SyncFieldInt();
+        [SerializeField]
         protected SyncFieldShort statPoint = new SyncFieldShort();
         [SerializeField]
         protected SyncFieldShort skillPoint = new SyncFieldShort();
@@ -132,6 +134,7 @@ namespace MultiplayerARPG
 
         #region Fields/Interface/Getter/Setter implementation
         public override int DataId { get { return dataId.Value; } set { dataId.Value = value; } }
+        public int FactionId { get { return factionId.Value; } set { factionId.Value = value; } }
         public short StatPoint { get { return statPoint.Value; } set { statPoint.Value = value; } }
         public short SkillPoint { get { return skillPoint.Value; } set { skillPoint.Value = value; } }
         public int Gold { get { return gold.Value; } set { gold.Value = value; } }
