@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -101,8 +102,8 @@ namespace MultiplayerARPG
             }
             if (uiEnterChatField != null)
             {
-                uiEnterChatField.Select();
                 uiEnterChatField.ActivateInputField();
+                EventSystem.current.SetSelectedGameObject(uiEnterChatField.gameObject);
             }
             EnterChatFieldVisible = true;
         }
@@ -115,7 +116,10 @@ namespace MultiplayerARPG
                     enterChatActiveObject.SetActive(false);
             }
             if (uiEnterChatField != null)
+            {
                 uiEnterChatField.DeactivateInputField();
+                EventSystem.current.SetSelectedGameObject(null);
+            }
             EnterChatFieldVisible = false;
         }
 
