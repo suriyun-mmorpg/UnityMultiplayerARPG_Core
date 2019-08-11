@@ -20,7 +20,6 @@ namespace MultiplayerARPG
         public PlayerCharacter[] playerCharacters;
         [Tooltip("Leave this empty to use GameInstance's controller prefab")]
         public BasePlayerCharacterController controllerPrefab;
-        
 
         protected override void EntityAwake()
         {
