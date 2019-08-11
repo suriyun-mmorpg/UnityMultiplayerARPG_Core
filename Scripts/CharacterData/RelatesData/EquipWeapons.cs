@@ -2,31 +2,47 @@
 using LiteNetLibManager;
 
 [System.Serializable]
-public class EquipWeapons : INetSerializable
+public class EquipWeapons : INetSerializableWithElement
 {
     public CharacterItem rightHand;
     public CharacterItem leftHand;
 
-    public EquipWeapons()
+    [System.NonSerialized]
+    private LiteNetLibElement element;
+    public LiteNetLibElement Element
     {
-        rightHand = new CharacterItem();
-        leftHand = new CharacterItem();
+        get { return element; }
+        set { element = value; }
     }
 
+    private void Validate()
+    {
+        if (rightHand == null)
+            rightHand = new CharacterItem();
+
+        if (leftHand == null)
+            leftHand = new CharacterItem();
+
+        rightHand.Element = Element;
+        leftHand.Element = Element;
+    }
+    
     public void Serialize(NetDataWriter writer)
     {
+        Validate();
         // Right hand
-        writer.PutValue(rightHand);
+        rightHand.Serialize(writer);
         // Left hand
-        writer.PutValue(leftHand);
+        leftHand.Serialize(writer);
     }
 
     public void Deserialize(NetDataReader reader)
     {
+        Validate();
         // Right hand
-        rightHand = (CharacterItem)reader.GetValue(typeof(CharacterItem));
+        rightHand.Deserialize(reader);
         // Left hand
-        leftHand = (CharacterItem)reader.GetValue(typeof(CharacterItem));
+        leftHand.Deserialize(reader);
     }
 }
 
