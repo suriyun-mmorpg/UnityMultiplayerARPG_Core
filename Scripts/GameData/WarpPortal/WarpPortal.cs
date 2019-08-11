@@ -10,9 +10,5 @@ namespace MultiplayerARPG
         public WarpPortalType warpPortalType;
         public MapInfo warpToMapInfo;
         public Vector3 warpToPosition;
-        [Header("Deprecated")]
-        [System.Obsolete("`Warp To Map` is deprecated, use `Warp To Map Info` instead")]
-        [Tooltip("`Warp To Map` is deprecated, use `Warp To Map Info` instead")]
-        public UnityScene warpToMap;
     }
 }
