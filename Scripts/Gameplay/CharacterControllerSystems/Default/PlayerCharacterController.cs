@@ -212,8 +212,7 @@ namespace MultiplayerARPG
             if (SelectedEntity != null)
             {
                 character = SelectedEntity as BaseCharacterEntity;
-                if (character != null &&
-                    !character.IsAlly(PlayerCharacterEntity))
+                if (character != null && character.CanReceiveDamageFrom(PlayerCharacterEntity))
                     return true;
                 else
                     character = null;
@@ -226,7 +225,7 @@ namespace MultiplayerARPG
             character = null;
             if (PlayerCharacterEntity.TryGetTargetEntity(out character))
             {
-                if (character != PlayerCharacterEntity && !character.IsAlly(PlayerCharacterEntity))
+                if (character != PlayerCharacterEntity && character.CanReceiveDamageFrom(PlayerCharacterEntity))
                     return true;
                 else
                     character = null;

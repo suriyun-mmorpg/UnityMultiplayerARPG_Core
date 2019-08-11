@@ -92,34 +92,6 @@ namespace MultiplayerARPG
             gameManager.RespawnCharacter(this);
         }
 
-        public override bool CanReceiveDamageFrom(IAttackerEntity attacker)
-        {
-            if (attacker == null)
-                return false;
-
-            BaseCharacterEntity characterEntity = attacker as BaseCharacterEntity;
-            if (characterEntity == null)
-                return false;
-
-            if (isInSafeArea || characterEntity.isInSafeArea)
-            {
-                // If this character or another character is in safe area so it cannot receive damage
-                return false;
-            }
-            if (characterEntity is BasePlayerCharacterEntity)
-            {
-                // If not ally while this is Pvp map, assume that it can receive damage
-                if (!IsAlly(characterEntity) && gameManager.CurrentMapInfo.canPvp)
-                    return true;
-            }
-            if (characterEntity is BaseMonsterCharacterEntity)
-            {
-                // If this character is not summoner so it is enemy and also can receive damage
-                return !IsAlly(characterEntity);
-            }
-            return false;
-        }
-
         public override bool IsAlly(BaseCharacterEntity characterEntity)
         {
             if (characterEntity == null)
@@ -127,10 +99,18 @@ namespace MultiplayerARPG
 
             if (characterEntity is BasePlayerCharacterEntity)
             {
-                // If this character is in same party or guild with another character so it is ally
                 BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
-                return (PartyId > 0 && PartyId == playerCharacterEntity.PartyId) ||
-                    (GuildId > 0 && GuildId == playerCharacterEntity.GuildId);
+                switch (gameManager.CurrentMapInfo.pvpMode)
+                {
+                    case PvpMode.Pvp:
+                        return playerCharacterEntity.PartyId == PartyId;
+                    case PvpMode.FactionPvp:
+                        return playerCharacterEntity.FactionId == FactionId;
+                    case PvpMode.GuildPvp:
+                        return playerCharacterEntity.GuildId == GuildId;
+                    default:
+                        return false;
+                }
             }
             if (characterEntity is BaseMonsterCharacterEntity)
             {
@@ -148,9 +128,18 @@ namespace MultiplayerARPG
 
             if (characterEntity is BasePlayerCharacterEntity)
             {
-                // If not ally while this is Pvp map, assume that it is enemy while both characters are not in safe zone
-                if (!IsAlly(characterEntity) && gameManager.CurrentMapInfo.canPvp)
-                    return !isInSafeArea && !characterEntity.isInSafeArea;
+                BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
+                switch (gameManager.CurrentMapInfo.pvpMode)
+                {
+                    case PvpMode.Pvp:
+                        return playerCharacterEntity.PartyId != PartyId;
+                    case PvpMode.FactionPvp:
+                        return playerCharacterEntity.FactionId != FactionId;
+                    case PvpMode.GuildPvp:
+                        return playerCharacterEntity.GuildId != GuildId;
+                    default:
+                        return false;
+                }
             }
             if (characterEntity is BaseMonsterCharacterEntity)
             {

@@ -223,25 +223,7 @@ namespace MultiplayerARPG
             SetTargetEntity(target);
         }
 
-        public override bool CanReceiveDamageFrom(IAttackerEntity attacker)
-        {
-            if (attacker == null)
-                return false;
-
-            BaseCharacterEntity characterEntity = attacker as BaseCharacterEntity;
-            if (characterEntity == null)
-                return false;
-
-            if (isInSafeArea || characterEntity.isInSafeArea)
-            {
-                // If this character or another character is in safe area so it cannot receive damage
-                return false;
-            }
-            // If another character is not ally assume that it can receive damage
-            return !IsAlly(characterEntity);
-        }
-
-        public override bool IsAlly(BaseCharacterEntity characterEntity)
+        public override sealed bool IsAlly(BaseCharacterEntity characterEntity)
         {
             if (characterEntity == null)
                 return false;
@@ -251,6 +233,7 @@ namespace MultiplayerARPG
                 // If summoned by someone, will have same allies with summoner
                 return characterEntity == Summoner || characterEntity.IsAlly(Summoner);
             }
+
             if (characterEntity is BaseMonsterCharacterEntity)
             {
                 // If another monster has same allyId so it is ally
@@ -262,10 +245,11 @@ namespace MultiplayerARPG
                     return monsterCharacterEntity.monsterCharacter.allyId == monsterCharacter.allyId;
                 }
             }
+
             return false;
         }
 
-        public override bool IsEnemy(BaseCharacterEntity characterEntity)
+        public override sealed bool IsEnemy(BaseCharacterEntity characterEntity)
         {
             if (characterEntity == null)
                 return false;
@@ -275,6 +259,7 @@ namespace MultiplayerARPG
                 // If summoned by someone, will have same enemies with summoner
                 return characterEntity != Summoner && characterEntity.IsEnemy(Summoner);
             }
+
             // Attack only player by default
             return characterEntity is BasePlayerCharacterEntity;
         }

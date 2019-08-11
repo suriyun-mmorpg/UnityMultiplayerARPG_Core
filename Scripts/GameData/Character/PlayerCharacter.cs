@@ -22,7 +22,6 @@ namespace MultiplayerARPG
 
         [Header("Start Map")]
         public MapInfo startMap;
-
         public MapInfo StartMap
         {
             get

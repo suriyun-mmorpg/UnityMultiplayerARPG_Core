@@ -1175,6 +1175,25 @@ namespace MultiplayerARPG
             return !IsAlly(characterEntity) && !IsEnemy(characterEntity);
         }
 
+        public override sealed bool CanReceiveDamageFrom(IAttackerEntity attacker)
+        {
+            if (attacker == null)
+                return false;
+
+            BaseCharacterEntity characterEntity = attacker as BaseCharacterEntity;
+            if (characterEntity == null)
+                return false;
+
+            if (isInSafeArea || characterEntity.isInSafeArea)
+            {
+                // If this character or another character is in safe area so it cannot receive damage
+                return false;
+            }
+
+            // If this character is not ally so it is enemy and also can receive damage
+            return !IsAlly(characterEntity);
+        }
+
         public abstract void NotifyEnemySpotted(BaseCharacterEntity ally, BaseCharacterEntity attacker);
         public abstract bool IsAlly(BaseCharacterEntity characterEntity);
         public abstract bool IsEnemy(BaseCharacterEntity characterEntity);
