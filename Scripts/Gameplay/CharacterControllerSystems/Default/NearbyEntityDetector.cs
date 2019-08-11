@@ -205,7 +205,7 @@ namespace MultiplayerARPG
                 {
                     if (findOnlyAlivePlayers && player != null && player.IsDead())
                         player = null;
-                    if (findPlayerToAttack && player != null && player.IsAlly(BasePlayerCharacterController.OwningCharacter))
+                    if (findPlayerToAttack && player != null && !player.CanReceiveDamageFrom(BasePlayerCharacterController.OwningCharacter))
                         player = null;
                 }
             }
@@ -218,7 +218,7 @@ namespace MultiplayerARPG
                 {
                     if (findOnlyAliveMonsters && monster != null && monster.IsDead())
                         monster = null;
-                    if (findMonsterToAttack && monster != null && monster.IsAlly(BasePlayerCharacterController.OwningCharacter))
+                    if (findMonsterToAttack && monster != null && !monster.CanReceiveDamageFrom(BasePlayerCharacterController.OwningCharacter))
                         monster = null;
                 }
             }
