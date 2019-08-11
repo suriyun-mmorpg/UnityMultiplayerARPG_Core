@@ -56,6 +56,7 @@ namespace MultiplayerARPG
         protected virtual void LoadCharacters()
         {
             CacheCharacterSelectionManager.Clear();
+            CacheCharacterList.HideAll();
             // Unenabled buttons
             buttonStart.gameObject.SetActive(false);
             buttonDelete.gameObject.SetActive(false);
