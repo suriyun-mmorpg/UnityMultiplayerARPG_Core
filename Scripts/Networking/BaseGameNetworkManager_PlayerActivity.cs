@@ -818,11 +818,9 @@ namespace MultiplayerARPG
         {
             string respawnMapName = playerCharacterEntity.RespawnMapName;
             Vector3 respawnPosition = playerCharacterEntity.RespawnPosition;
-            if (CurrentMapInfo != null && CurrentMapInfo.overrideRespawnPoint)
+            if (CurrentMapInfo != null)
             {
-                if (CurrentMapInfo.overrideRespawnPointMap != null)
-                    respawnMapName = CurrentMapInfo.overrideRespawnPointMap.Id;
-                respawnPosition = CurrentMapInfo.overrideRespawnPointPosition;
+                CurrentMapInfo.GetRespawnPoint(playerCharacterEntity, out respawnMapName, out respawnPosition);
             }
             WarpCharacter(playerCharacterEntity, respawnMapName, respawnPosition);
         }
