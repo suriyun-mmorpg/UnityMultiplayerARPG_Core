@@ -22,11 +22,12 @@ namespace MultiplayerARPG
 
             lastMountTime = Time.unscaledTime;
 
+            Vector3 enterPosition = CacheTransform.position;
             if (PassengingVehicle.objectId > 0)
-                ExitVehicle();
+                enterPosition = ExitVehicle();
 
             // Instantiate new mount entity
-            GameObject spawnObj = Instantiate(mountEntityPrefab.gameObject, CacheTransform.position, Quaternion.Euler(0, CacheTransform.eulerAngles.y, 0));
+            GameObject spawnObj = Instantiate(mountEntityPrefab.gameObject, enterPosition, Quaternion.Euler(0, CacheTransform.eulerAngles.y, 0));
             MountEntity vehicle = BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj, 0, ConnectionId).GetComponent<MountEntity>();
 
             // Seat index for mount entity always 0

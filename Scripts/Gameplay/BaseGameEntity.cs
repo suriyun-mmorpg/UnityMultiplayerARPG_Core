@@ -546,10 +546,11 @@ namespace MultiplayerARPG
             return true;
         }
 
-        protected void ExitVehicle()
+        protected Vector3 ExitVehicle()
         {
+            Vector3 exitPosition = CacheTransform.position;
             if (!IsServer || PassengingVehicleEntity == null)
-                return;
+                return exitPosition;
 
             uint vehicleObjectId = PassengingVehicleEntity.ObjectId;
             bool isDestroying = false;
@@ -560,7 +561,7 @@ namespace MultiplayerARPG
                 PassengingVehicleEntity.RemovePassenger(PassengingVehicle.seatIndex);
                 isDestroying = PassengingVehicleEntity.IsDestroyWhenExit(PassengingVehicle.seatIndex);
 
-                Vector3 exitPosition = PassengingVehicleEntity.transform.position;
+                exitPosition = PassengingVehicleEntity.transform.position;
                 if (PassengingVehicleSeat.exitTransform != null)
                     exitPosition = PassengingVehicleSeat.exitTransform.position;
 
@@ -592,6 +593,8 @@ namespace MultiplayerARPG
                 if (BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(vehicleObjectId, out identity))
                     identity.NetworkDestroy();
             }
+
+            return exitPosition;
         }
     }
 }
