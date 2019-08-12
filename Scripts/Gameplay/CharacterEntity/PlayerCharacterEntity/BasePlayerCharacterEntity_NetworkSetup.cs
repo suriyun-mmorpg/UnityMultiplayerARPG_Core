@@ -14,6 +14,8 @@ namespace MultiplayerARPG
             // Sync fields
             dataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             dataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            factionId.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            factionId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             statPoint.deliveryMethod = DeliveryMethod.ReliableOrdered;
             statPoint.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             skillPoint.deliveryMethod = DeliveryMethod.ReliableOrdered;
@@ -41,6 +43,7 @@ namespace MultiplayerARPG
             base.OnSetup();
             // On data changes events
             dataId.onChange += OnDataIdChange;
+            factionId.onChange += OnFactionIdChange;
             statPoint.onChange += OnStatPointChange;
             skillPoint.onChange += OnSkillPointChange;
             gold.onChange += OnGoldChange;
@@ -187,6 +190,7 @@ namespace MultiplayerARPG
             base.EntityOnDestroy();
             // On data changes events
             dataId.onChange -= OnDataIdChange;
+            factionId.onChange -= OnFactionIdChange;
             statPoint.onChange -= OnStatPointChange;
             skillPoint.onChange -= OnSkillPointChange;
             gold.onChange -= OnGoldChange;

@@ -119,6 +119,7 @@ namespace MultiplayerARPG
 
         #region Sync data actions
         public System.Action<int> onDataIdChange;
+        public System.Action<int> onFactionIdChange;
         public System.Action<short> onStatPointChange;
         public System.Action<short> onSkillPointChange;
         public System.Action<int> onGoldChange;
@@ -199,6 +200,12 @@ namespace MultiplayerARPG
         {
             if (onDataIdChange != null)
                 onDataIdChange.Invoke(dataId);
+        }
+
+        protected virtual void OnFactionIdChange(bool isInitial, int factionId)
+        {
+            if (onFactionIdChange != null)
+                onFactionIdChange.Invoke(factionId);
         }
 
         protected virtual void OnStatPointChange(bool isInitial, short statPoint)
