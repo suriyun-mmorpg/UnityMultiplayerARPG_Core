@@ -27,6 +27,7 @@ namespace MultiplayerARPG
             List<PlayerCharacter> playerCharacters = new List<PlayerCharacter>();
             List<MonsterCharacter> monsterCharacters = new List<MonsterCharacter>();
             List<MapInfo> mapInfos = new List<MapInfo>();
+            List<Faction> factions = new List<Faction>();
 
             // Filtering game data
             foreach (BaseGameData gameData in gameDataList)
@@ -51,6 +52,8 @@ namespace MultiplayerARPG
                     monsterCharacters.Add(gameData as MonsterCharacter);
                 if (gameData is MapInfo)
                     mapInfos.Add(gameData as MapInfo);
+                if (gameData is Faction)
+                    factions.Add(gameData as Faction);
             }
 
             GameInstance.AddAttributes(attributes);
@@ -66,6 +69,7 @@ namespace MultiplayerARPG
             GameInstance.AddCharacterEntities(characterEntities);
             GameInstance.AddMountEntities(mountEntities);
             GameInstance.AddMapInfos(mapInfos);
+            GameInstance.AddFactions(factions);
             // Add hit effects
             List<GameEffectCollection> weaponHitEffects = new List<GameEffectCollection>();
             if (gameInstance.DefaultDamageElement.hitEffects != null)

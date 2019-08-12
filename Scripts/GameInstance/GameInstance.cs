@@ -178,6 +178,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<string, List<WarpPortal>> MapWarpPortals = new Dictionary<string, List<WarpPortal>>();
         public static readonly Dictionary<string, List<Npc>> MapNpcs = new Dictionary<string, List<Npc>>();
         public static readonly Dictionary<string, MapInfo> MapInfos = new Dictionary<string, MapInfo>();
+        public static readonly Dictionary<int, Faction> Factions = new Dictionary<int, Faction>();
 
         #region Cache Data
         public DimensionType DimensionType
@@ -826,6 +827,18 @@ namespace MultiplayerARPG
                 if (mapInfo == null || !mapInfo.IsSceneSet())
                     continue;
                 MapInfos[mapInfo.Id] = mapInfo;
+            }
+        }
+
+        public static void AddFactions(IEnumerable<Faction> factions)
+        {
+            if (factions == null)
+                return;
+            foreach (Faction faction in factions)
+            {
+                if (faction == null)
+                    continue;
+                Factions[faction.DataId] = faction;
             }
         }
     }

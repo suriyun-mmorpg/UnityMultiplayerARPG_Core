@@ -22,6 +22,7 @@ namespace MultiplayerARPG
         public BaseMonsterCharacterEntity[] monsterCharacterEntities;
         public MountEntity[] mountEntities;
         public MapInfo[] mapInfos;
+        public Faction[] factions;
         
         public override void LoadData(GameInstance gameInstance)
         {
@@ -39,6 +40,7 @@ namespace MultiplayerARPG
             GameInstance.AddCharacterEntities(monsterCharacterEntities);
             GameInstance.AddMountEntities(mountEntities);
             GameInstance.AddMapInfos(mapInfos);
+            GameInstance.AddFactions(factions);
             // Add hit effects
             List<GameEffectCollection> weaponHitEffects = new List<GameEffectCollection>();
             if (gameInstance.DefaultDamageElement.hitEffects != null)
