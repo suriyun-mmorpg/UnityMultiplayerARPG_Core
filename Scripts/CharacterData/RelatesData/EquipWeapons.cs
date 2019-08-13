@@ -15,6 +15,12 @@ public class EquipWeapons : INetSerializableWithElement
         set { element = value; }
     }
 
+    public EquipWeapons()
+    {
+        rightHand = new CharacterItem();
+        leftHand = new CharacterItem();
+    }
+
     private void Validate()
     {
         if (rightHand == null)
