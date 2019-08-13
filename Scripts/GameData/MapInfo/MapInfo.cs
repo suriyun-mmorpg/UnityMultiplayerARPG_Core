@@ -18,7 +18,7 @@ namespace MultiplayerARPG
         [Tooltip("If this is `Pvp`, player can battle all other players. `FactionPvp`, player can battle difference faction players. `GuildPvp`, player can battle difference guild players")]
         public PvpMode pvpMode;
         [Tooltip("If this is `Override`, player will return to map and position in `overrideRespawnPoints`")]
-        public OverrideRespawnPointMode overrideRespawnPointMove;
+        public OverrideRespawnPointMode overrideRespawnPointMode;
         public OverrideRespawnPoint[] overrideRespawnPoints;
 
         [System.NonSerialized]
@@ -59,7 +59,7 @@ namespace MultiplayerARPG
         {
             mapName = playerCharacterData.RespawnMapName;
             position = playerCharacterData.RespawnPosition;
-            switch (overrideRespawnPointMove)
+            switch (overrideRespawnPointMode)
             {
                 case OverrideRespawnPointMode.Override:
                     List<OverrideRespawnPoint> overrideRespawnPoints;
