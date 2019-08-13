@@ -105,7 +105,7 @@ namespace MultiplayerARPG
                     case PvpMode.Pvp:
                         return playerCharacterEntity.PartyId == PartyId;
                     case PvpMode.FactionPvp:
-                        return playerCharacterEntity.FactionId == FactionId;
+                        return playerCharacterEntity.FactionId != 0 && playerCharacterEntity.FactionId == FactionId;
                     case PvpMode.GuildPvp:
                         return playerCharacterEntity.GuildId == GuildId;
                     default:
@@ -134,7 +134,7 @@ namespace MultiplayerARPG
                     case PvpMode.Pvp:
                         return playerCharacterEntity.PartyId != PartyId;
                     case PvpMode.FactionPvp:
-                        return playerCharacterEntity.FactionId != FactionId;
+                        return playerCharacterEntity.FactionId != 0 && playerCharacterEntity.FactionId != FactionId;
                     case PvpMode.GuildPvp:
                         return playerCharacterEntity.GuildId != GuildId;
                     default:
