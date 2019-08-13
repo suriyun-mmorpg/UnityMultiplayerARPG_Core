@@ -70,8 +70,13 @@ namespace MultiplayerARPG
             for (int i = selectableCharacters.Count - 1; i >= 0; --i)
             {
                 PlayerCharacterData selectableCharacter = selectableCharacters[i];
-                if (selectableCharacter == null || !GameInstance.PlayerCharacters.ContainsKey(selectableCharacter.DataId))
+                if (selectableCharacter == null ||
+                    !GameInstance.PlayerCharacterEntities.ContainsKey(selectableCharacter.EntityId) ||
+                    !GameInstance.PlayerCharacters.ContainsKey(selectableCharacter.DataId))
+                {
+                    // If invalid entity id or data id, remove from selectable character list
                     selectableCharacters.RemoveAt(i);
+                }
             }
 
             if (selectableCharacters.Count > 0)
