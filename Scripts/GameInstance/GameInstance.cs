@@ -159,7 +159,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, Attribute> Attributes = new Dictionary<int, Attribute>();
         public static readonly Dictionary<int, Item> Items = new Dictionary<int, Item>();
         public static readonly Dictionary<int, WeaponType> WeaponTypes = new Dictionary<int, WeaponType>();
-        public static readonly Dictionary<int, BaseCharacter> AllCharacters = new Dictionary<int, BaseCharacter>();
+        public static readonly Dictionary<int, BaseCharacter> Characters = new Dictionary<int, BaseCharacter>();
         public static readonly Dictionary<int, PlayerCharacter> PlayerCharacters = new Dictionary<int, PlayerCharacter>();
         public static readonly Dictionary<int, MonsterCharacter> MonsterCharacters = new Dictionary<int, MonsterCharacter>();
         public static readonly Dictionary<int, Skill> Skills = new Dictionary<int, Skill>();
@@ -364,7 +364,7 @@ namespace MultiplayerARPG
             Attributes.Clear();
             Items.Clear();
             WeaponTypes.Clear();
-            AllCharacters.Clear();
+            Characters.Clear();
             PlayerCharacters.Clear();
             MonsterCharacters.Clear();
             Skills.Clear();
@@ -538,6 +538,8 @@ namespace MultiplayerARPG
 
         public static void AddAttributes(IEnumerable<Attribute> attributes)
         {
+            if (attributes == null)
+                return;
             foreach (Attribute attribute in attributes)
             {
                 if (attribute == null || Attributes.ContainsKey(attribute.DataId))
@@ -548,42 +550,46 @@ namespace MultiplayerARPG
 
         public static void AddItems(IEnumerable<Item> items)
         {
+            if (items == null)
+                return;
             List<WeaponType> weaponTypes = new List<WeaponType>();
-            List<BaseDamageEntity> damageEntities = new List<BaseDamageEntity>();
             List<BuildingEntity> buildingEntities = new List<BuildingEntity>();
+            List<AttributeAmount> attributeAmounts = new List<AttributeAmount>();
+            List<SkillLevel> skillLevels = new List<SkillLevel>();
             foreach (Item item in items)
             {
                 if (item == null || Items.ContainsKey(item.DataId))
                     continue;
                 Items[item.DataId] = item;
-                if (item.IsWeapon())
-                {
-                    WeaponType weaponType = item.WeaponType;
-                    weaponTypes.Add(weaponType);
-                    // Add damage entities
-                    if (weaponType.damageInfo.missileDamageEntity != null)
-                        damageEntities.Add(weaponType.damageInfo.missileDamageEntity);
-                }
-                if (item.IsBuilding())
-                {
-                    if (item.buildingEntity != null)
-                        buildingEntities.Add(item.buildingEntity);
-                }
+                // Add weapon types
+                if (item.weaponType != null)
+                    weaponTypes.Add(item.weaponType);
+                // Add building entities
+                if (item.buildingEntity != null)
+                    buildingEntities.Add(item.buildingEntity);
+                // Add skills
+                skillLevels.AddRange(item.increaseSkillLevels);
+                skillLevels.Add(item.skillLevel);
             }
             AddWeaponTypes(weaponTypes);
-            AddDamageEntities(damageEntities);
             AddBuildingEntities(buildingEntities);
+            AddSkillLevels(skillLevels);
         }
 
         public static void AddCharacters(IEnumerable<BaseCharacter> characters)
         {
-            List<BaseDamageEntity> damageEntities = new List<BaseDamageEntity>();
+            if (characters == null)
+                return;
+            List<Skill> skills = new List<Skill>();
+            List<DamageInfo> damageInfos = new List<DamageInfo>();
             foreach (BaseCharacter character in characters)
             {
-                if (character == null || AllCharacters.ContainsKey(character.DataId))
+                if (character == null || Characters.ContainsKey(character.DataId))
                     continue;
 
-                AllCharacters[character.DataId] = character;
+                Characters[character.DataId] = character;
+                skills.AddRange(character.CacheSkillLevels.Keys);
+
                 if (character is PlayerCharacter)
                 {
                     PlayerCharacter playerCharacter = character as PlayerCharacter;
@@ -593,18 +599,19 @@ namespace MultiplayerARPG
                 {
                     MonsterCharacter monsterCharacter = character as MonsterCharacter;
                     MonsterCharacters[character.DataId] = monsterCharacter;
-                    MissileDamageEntity missileDamageEntity = monsterCharacter.damageInfo.missileDamageEntity;
-                    if (missileDamageEntity != null)
-                        damageEntities.Add(missileDamageEntity);
+                    if (monsterCharacter.damageInfo != null)
+                        damageInfos.Add(monsterCharacter.damageInfo);
                 }
             }
-            AddDamageEntities(damageEntities);
+            AddSkills(skills);
+            AddDamageInfos(damageInfos);
         }
 
         public static void AddCharacterEntities(IEnumerable<BaseCharacterEntity> characterEntities)
         {
             if (characterEntities == null)
                 return;
+            List<BaseCharacter> characters = new List<BaseCharacter>();
             foreach (BaseCharacterEntity characterEntity in characterEntities)
             {
                 if (characterEntity == null || CharacterEntities.ContainsKey(characterEntity.Identity.HashAssetId))
@@ -615,13 +622,16 @@ namespace MultiplayerARPG
                 {
                     BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
                     PlayerCharacterEntities[characterEntity.Identity.HashAssetId] = playerCharacterEntity;
+                    characters.AddRange(playerCharacterEntity.playerCharacters);
                 }
                 else if (characterEntity is BaseMonsterCharacterEntity)
                 {
                     BaseMonsterCharacterEntity monsterCharacterEntity = characterEntity as BaseMonsterCharacterEntity;
                     MonsterCharacterEntities[characterEntity.Identity.HashAssetId] = monsterCharacterEntity;
+                    characters.Add(monsterCharacterEntity.monsterCharacter);
                 }
             }
+            AddCharacters(characters);
         }
 
         public static void AddMountEntities(IEnumerable<MountEntity> mountEntities)
@@ -636,10 +646,26 @@ namespace MultiplayerARPG
             }
         }
 
+        public static void AddSkillLevels(IEnumerable<SkillLevel> skillLevels)
+        {
+            if (skillLevels == null)
+                return;
+            List<Skill> skills = new List<Skill>();
+            foreach (SkillLevel skillLevel in skillLevels)
+            {
+                if (skillLevel.skill == null)
+                    continue;
+                skills.Add(skillLevel.skill);
+            }
+            AddSkills(skills);
+        }
+
         public static void AddSkills(IEnumerable<Skill> skills)
         {
+            if (skills == null)
+                return;
             List<GameEffectCollection> effects = new List<GameEffectCollection>();
-            List<BaseDamageEntity> damageEntities = new List<BaseDamageEntity>();
+            List<DamageInfo> damageInfos = new List<DamageInfo>();
             foreach (Skill skill in skills)
             {
                 if (skill == null || Skills.ContainsKey(skill.DataId))
@@ -647,16 +673,17 @@ namespace MultiplayerARPG
                 Skills[skill.DataId] = skill;
                 effects.Add(skill.castEffects);
                 effects.Add(skill.hitEffects);
-                MissileDamageEntity missileDamageEntity = skill.damageInfo.missileDamageEntity;
-                if (missileDamageEntity != null)
-                    damageEntities.Add(missileDamageEntity);
+                if (skill.damageInfo != null)
+                    damageInfos.Add(skill.damageInfo);
             }
             AddGameEffectCollections(effects);
-            AddDamageEntities(damageEntities);
+            AddDamageInfos(damageInfos);
         }
 
         public static void AddNpcDialogs(IEnumerable<NpcDialog> npcDialogs)
         {
+            if (npcDialogs == null)
+                return;
             foreach (NpcDialog npcDialog in npcDialogs)
             {
                 if (npcDialog == null || NpcDialogs.ContainsKey(npcDialog.DataId))
@@ -678,6 +705,8 @@ namespace MultiplayerARPG
 
         public static void AddQuests(IEnumerable<Quest> quests)
         {
+            if (quests == null)
+                return;
             foreach (Quest quest in quests)
             {
                 if (quest == null || Quests.ContainsKey(quest.DataId))
@@ -688,12 +717,29 @@ namespace MultiplayerARPG
 
         public static void AddGuildSkills(IEnumerable<GuildSkill> guildSkills)
         {
+            if (guildSkills == null)
+                return;
             foreach (GuildSkill guildSkill in guildSkills)
             {
                 if (guildSkill == null || GuildSkills.ContainsKey(guildSkill.DataId))
                     continue;
                 GuildSkills[guildSkill.DataId] = guildSkill;
             }
+        }
+
+        public static void AddDamageInfos(IEnumerable<DamageInfo> damageInfos)
+        {
+            if (damageInfos == null)
+                return;
+            List<BaseDamageEntity> damageEntities = new List<BaseDamageEntity>();
+            foreach (DamageInfo damageInfo in damageInfos)
+            {
+                if (damageInfo == null)
+                    continue;
+                if (damageInfo.missileDamageEntity != null)
+                    damageEntities.Add(damageInfo.missileDamageEntity);
+            }
+            AddDamageEntities(damageEntities);
         }
 
         public static void AddDamageEntities(IEnumerable<BaseDamageEntity> damageEntities)
@@ -748,12 +794,16 @@ namespace MultiplayerARPG
         {
             if (weaponTypes == null)
                 return;
+            List<DamageInfo> damageInfos = new List<DamageInfo>();
             foreach (WeaponType weaponType in weaponTypes)
             {
                 if (weaponType == null || WeaponTypes.ContainsKey(weaponType.DataId))
                     continue;
                 WeaponTypes[weaponType.DataId] = weaponType;
+                if (weaponType.damageInfo != null)
+                    damageInfos.Add(weaponType.damageInfo);
             }
+            AddDamageInfos(damageInfos);
         }
 
         public static void AddGameEffectCollections(IEnumerable<GameEffectCollection> gameEffectCollections)

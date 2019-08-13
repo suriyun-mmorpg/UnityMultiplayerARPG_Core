@@ -15,7 +15,7 @@ public static partial class CharacterDataExtension
             return null;
         }
 
-        if (!GameInstance.AllCharacters.TryGetValue(data.DataId, out database))
+        if (!GameInstance.Characters.TryGetValue(data.DataId, out database))
         {
             Debug.LogWarning("[GetDatabase] Cannot find character database with id: " + data.DataId);
             return null;

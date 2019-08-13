@@ -12,12 +12,9 @@ namespace MultiplayerARPG
         public Attribute[] attributes;
         public DamageElement[] damageElements;
         public Item[] items;
-        public Skill[] skills;
         public NpcDialog[] npcDialogs;
         public Quest[] quests;
         public GuildSkill[] guildSkills;
-        public PlayerCharacter[] playerCharacters;
-        public MonsterCharacter[] monsterCharacters;
         public BasePlayerCharacterEntity[] playerCharacterEntities;
         public BaseMonsterCharacterEntity[] monsterCharacterEntities;
         public MountEntity[] mountEntities;
@@ -30,12 +27,9 @@ namespace MultiplayerARPG
             GameInstance.AddItems(new Item[] { gameInstance.DefaultWeaponItem });
             GameInstance.AddItems(items);
             GameInstance.AddWeaponTypes(new WeaponType[] { gameInstance.DefaultWeaponType });
-            GameInstance.AddSkills(skills);
             GameInstance.AddNpcDialogs(npcDialogs);
             GameInstance.AddQuests(quests);
             GameInstance.AddGuildSkills(guildSkills);
-            GameInstance.AddCharacters(playerCharacters);
-            GameInstance.AddCharacters(monsterCharacters);
             GameInstance.AddCharacterEntities(playerCharacterEntities);
             GameInstance.AddCharacterEntities(monsterCharacterEntities);
             GameInstance.AddMountEntities(mountEntities);
