@@ -127,13 +127,13 @@ namespace MultiplayerARPG
         protected readonly Dictionary<int, PlayerCharacter[]> PlayerCharacterDataByEntityId = new Dictionary<int, PlayerCharacter[]>();
         protected PlayerCharacter[] selectableCharacterClasses;
         public PlayerCharacter[] SelectableCharacterClasses { get { return selectableCharacterClasses; } }
-        protected Faction selectedFaction;
-        public Faction SelectedFaction { get { return selectedFaction; } }
         protected PlayerCharacter selectedPlayerCharacter;
         public PlayerCharacter SelectedPlayerCharacter { get { return selectedPlayerCharacter; } }
+        protected Faction selectedFaction;
+        public Faction SelectedFaction { get { return selectedFaction; } }
         public int SelectedEntityId { get; protected set; }
-        public int SelectedFactionId { get; protected set; }
         public int SelectedDataId { get; protected set; }
+        public int SelectedFactionId { get; protected set; }
 
         protected virtual List<BasePlayerCharacterEntity> GetCreatableCharacters()
         {
@@ -230,10 +230,10 @@ namespace MultiplayerARPG
             buttonCreate.onClick.AddListener(OnClickCreate);
             CacheCharacterSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
             CacheCharacterSelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
-            CacheFactionSelectionManager.eventOnSelect.RemoveListener(OnSelectFaction);
-            CacheFactionSelectionManager.eventOnSelect.AddListener(OnSelectFaction);
             CacheCharacterClassSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterClass);
             CacheCharacterClassSelectionManager.eventOnSelect.AddListener(OnSelectCharacterClass);
+            CacheFactionSelectionManager.eventOnSelect.RemoveListener(OnSelectFaction);
+            CacheFactionSelectionManager.eventOnSelect.AddListener(OnSelectFaction);
             // Load characters and factions
             LoadCharacters();
             LoadFactions();
@@ -287,22 +287,6 @@ namespace MultiplayerARPG
                 OnSelectCharacterClass(firstData);
         }
 
-        protected void OnSelectFaction(UIFaction uiFaction)
-        {
-            OnSelectFaction(uiFaction.Data);
-        }
-
-        protected virtual void OnSelectFaction(Faction faction)
-        {
-            eventOnSelectFaction.Invoke(faction);
-            selectedFaction = faction;
-            if (SelectedFaction != null)
-            {
-                // Set creating player character's faction
-                SelectedFactionId = faction.DataId;
-            }
-        }
-
         protected void OnSelectCharacterClass(UICharacterClass uiCharacterClass)
         {
             OnSelectCharacterClass(uiCharacterClass.Data);
@@ -334,6 +318,22 @@ namespace MultiplayerARPG
                     equipWeapons.leftHand = CharacterItem.Create(SelectedPlayerCharacter.leftHandEquipItem);
                 // Set model equip weapons
                 SelectedModel.SetEquipWeapons(equipWeapons);
+            }
+        }
+
+        protected void OnSelectFaction(UIFaction uiFaction)
+        {
+            OnSelectFaction(uiFaction.Data);
+        }
+
+        protected virtual void OnSelectFaction(Faction faction)
+        {
+            eventOnSelectFaction.Invoke(faction);
+            selectedFaction = faction;
+            if (SelectedFaction != null)
+            {
+                // Set creating player character's faction
+                SelectedFactionId = faction.DataId;
             }
         }
 
