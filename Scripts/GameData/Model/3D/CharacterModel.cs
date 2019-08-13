@@ -1,5 +1,8 @@
 ﻿using System.Collections;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -844,6 +847,42 @@ namespace MultiplayerARPG
         {
             return skillAnimations;
         }
+
+#if UNITY_EDITOR
+        [ContextMenu("Copy Weapon Animations")]
+        public void CopyWeaponAnimations()
+        {
+            CharacterModelDataManager.CopyWeaponAnimations(weaponAnimations);
+        }
+
+        [ContextMenu("Paste Weapon Animations")]
+        public void PasteWeaponAnimations()
+        {
+            WeaponAnimations[] weaponAnimations = CharacterModelDataManager.PasteWeaponAnimations();
+            if (weaponAnimations != null)
+            {
+                this.weaponAnimations = weaponAnimations;
+                EditorUtility.SetDirty(this);
+            }
+        }
+
+        [ContextMenu("Copy Skill Animations")]
+        public void CopySkillAnimations()
+        {
+            CharacterModelDataManager.CopySkillAnimations(skillAnimations);
+        }
+
+        [ContextMenu("Paste Skill Animations")]
+        public void PasteSkillAnimations()
+        {
+            SkillAnimations[] skillAnimations = CharacterModelDataManager.PasteSkillAnimations();
+            if (skillAnimations != null)
+            {
+                this.skillAnimations = skillAnimations;
+                EditorUtility.SetDirty(this);
+            }
+        }
+#endif
         #endregion
     }
 
