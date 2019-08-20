@@ -792,7 +792,7 @@ namespace MultiplayerARPG
 
         public virtual void RegisterPlayerCharacter(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            if (playerCharacterEntity == null || !ConnectionIds.Contains(playerCharacterEntity.ConnectionId) || playerCharacters.ContainsKey(connectionId))
+            if (playerCharacterEntity == null || !ConnectionIds.Contains(playerCharacterEntity.ConnectionId) || playerCharacters.ContainsKey(playerCharacterEntity.ConnectionId))
                 return;
             playerCharacters[playerCharacterEntity.ConnectionId] = playerCharacterEntity;
             playerCharactersById[playerCharacterEntity.Id] = playerCharacterEntity;

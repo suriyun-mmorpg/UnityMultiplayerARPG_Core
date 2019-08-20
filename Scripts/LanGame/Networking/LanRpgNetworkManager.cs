@@ -188,7 +188,7 @@ namespace MultiplayerARPG
                 playerCharacterEntity.RequestOnDead();
 
             // Register player, will use registered player to send chat / player messages
-            RegisterPlayerCharacter(connectionId, playerCharacterEntity);
+            RegisterPlayerCharacter(playerCharacterEntity);
         }
 
         private void SaveWorld()
