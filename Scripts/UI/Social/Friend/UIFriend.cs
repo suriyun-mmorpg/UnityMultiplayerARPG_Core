@@ -54,7 +54,7 @@
 
         public override int GetSocialId()
         {
-            return 0;
+            return 1;
         }
 
         public override bool IsLeader(string characterId)
