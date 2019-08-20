@@ -543,7 +543,7 @@ namespace MultiplayerARPG
         {
             foreach (SocialCharacterData member in party.GetMembers())
             {
-                SendUpdatePartyMemberToClient(connectionId, party.id, party.IsOnline(member.id), member.id, member.characterName, member.dataId, member.level, member.currentHp, member.maxHp, member.currentMp, member.maxMp);
+                SendUpdatePartyMemberToClient(connectionId, party.id, IsCharacterOnline(member.id), member.id, member.characterName, member.dataId, member.level, member.currentHp, member.maxHp, member.currentMp, member.maxMp);
             }
         }
 
@@ -721,7 +721,7 @@ namespace MultiplayerARPG
 
             foreach (SocialCharacterData member in guild.GetMembers())
             {
-                SendUpdateGuildMemberToClient(connectionId, guild.id, guild.IsOnline(member.id), member.id, member.characterName, member.dataId, member.level, member.currentHp, member.maxHp, member.currentMp, member.maxMp);
+                SendUpdateGuildMemberToClient(connectionId, guild.id, IsCharacterOnline(member.id), member.id, member.characterName, member.dataId, member.level, member.currentHp, member.maxHp, member.currentMp, member.maxMp);
             }
         }
 

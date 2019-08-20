@@ -156,11 +156,6 @@ namespace MultiplayerARPG
             return Party != null && Party.IsLeader(characterId);
         }
 
-        public override bool IsOnline(string characterId)
-        {
-            return Party != null && Party.IsOnline(characterId);
-        }
-
         public override bool CanKick(string characterId)
         {
             return Party != null && Party.CanKick(characterId);

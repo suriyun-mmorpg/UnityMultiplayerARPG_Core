@@ -506,6 +506,13 @@ namespace MultiplayerARPG
                 if (playerCharacter.Id.Equals(playerCharacterEntity.Id) ||
                     !playerCharacter.CharacterName.Equals(characterName))
                     continue;
+                socialCharacters.Add(new SocialCharacterData()
+                {
+                    id = playerCharacter.Id,
+                    characterName = playerCharacter.CharacterName,
+                    dataId = playerCharacter.DataId,
+                    level = playerCharacter.Level,
+                });
             }
             Server.SendSocialMembers(playerCharacterEntity.ConnectionId, MsgTypes.UpdateFoundCharacters, socialCharacters.ToArray());
         }

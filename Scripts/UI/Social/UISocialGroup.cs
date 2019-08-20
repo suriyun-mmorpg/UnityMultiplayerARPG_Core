@@ -7,10 +7,13 @@ namespace MultiplayerARPG
         public abstract int GetSocialId();
         public abstract int GetMaxMemberAmount();
         public abstract bool IsLeader(string characterId);
-        public abstract bool IsOnline(string characterId);
         public abstract bool CanKick(string characterId);
         public abstract bool OwningCharacterIsLeader();
         public abstract bool OwningCharacterCanKick();
+        public bool IsOnline(string characterId)
+        {
+            return BaseGameNetworkManager.IsCharacterOnline(characterId);
+        }
     }
     
     public abstract class UISocialGroup<T> : UISocialGroup

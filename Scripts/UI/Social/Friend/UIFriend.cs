@@ -62,11 +62,6 @@
             return false;
         }
 
-        public override bool IsOnline(string characterId)
-        {
-            return false;
-        }
-
         public override bool OwningCharacterCanKick()
         {
             return false;

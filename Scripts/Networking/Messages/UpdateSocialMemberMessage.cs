@@ -28,10 +28,10 @@ namespace MultiplayerARPG
                 {
                     case UpdateType.Add:
                     case UpdateType.Update:
-                        isOnline = reader.GetBool();
                         data.characterName = reader.GetString();
                         data.dataId = reader.GetInt();
                         data.level = reader.GetShort();
+                        isOnline = reader.GetBool();
                         // Read extra data
                         if (isOnline)
                         {
@@ -57,10 +57,10 @@ namespace MultiplayerARPG
                 {
                     case UpdateType.Add:
                     case UpdateType.Update:
-                        writer.Put(isOnline);
                         writer.Put(data.characterName);
                         writer.Put(data.dataId);
                         writer.Put(data.level);
+                        writer.Put(isOnline);
                         // Put extra data
                         if (isOnline)
                         {
@@ -73,7 +73,5 @@ namespace MultiplayerARPG
                 }
             }
         }
-
-        public string CharacterId { get { return data.id; } set { data.id = value; } }
     }
 }

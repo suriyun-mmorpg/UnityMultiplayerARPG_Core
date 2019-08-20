@@ -12,16 +12,16 @@ namespace MultiplayerARPG
         public short skillPoint;
         public string guildMessage;
         public int gold;
-        protected List<GuildRoleData> roles;
-        protected Dictionary<string, byte> memberRoles;
-        protected Dictionary<int, short> skillLevels;
+        private List<GuildRoleData> roles;
+        private Dictionary<string, byte> memberRoles;
+        private Dictionary<int, short> skillLevels;
 
-        public int IncreaseMaxMember { get; protected set; }
-        public float IncreaseExpGainPercentage { get; protected set; }
-        public float IncreaseGoldGainPercentage { get; protected set; }
-        public float IncreaseShareExpGainPercentage { get; protected set; }
-        public float IncreaseShareGoldGainPercentage { get; protected set; }
-        public float DecreaseExpLostPercentage { get; protected set; }
+        public int IncreaseMaxMember { get; private set; }
+        public float IncreaseExpGainPercentage { get; private set; }
+        public float IncreaseGoldGainPercentage { get; private set; }
+        public float IncreaseShareExpGainPercentage { get; private set; }
+        public float IncreaseShareGoldGainPercentage { get; private set; }
+        public float DecreaseExpLostPercentage { get; private set; }
 
         public byte LowestMemberRole
         {
@@ -179,7 +179,7 @@ namespace MultiplayerARPG
                 if (memberId.Equals(leaderId))
                     continue;
                 tempMember = members[memberId];
-                if (!IsOnline(memberId))
+                if (!BaseGameNetworkManager.IsCharacterOnline(memberId))
                 {
                     offlineMembers.Add(tempMember);
                     continue;
@@ -251,7 +251,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void MakeCaches()
+        private void MakeCaches()
         {
             IncreaseMaxMember = 0;
             IncreaseExpGainPercentage = 0;

@@ -446,11 +446,6 @@ namespace MultiplayerARPG
             return Guild != null && Guild.IsLeader(characterId);
         }
 
-        public override bool IsOnline(string characterId)
-        {
-            return Guild != null && Guild.IsOnline(characterId);
-        }
-
         public override bool CanKick(string characterId)
         {
             return Guild != null && Guild.CanKick(characterId);

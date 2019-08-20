@@ -30,7 +30,6 @@ namespace MultiplayerARPG
             UpdateSocialMemberMessage netMessage = new UpdateSocialMemberMessage();
             netMessage.type = UpdateSocialMemberMessage.UpdateType.Add;
             netMessage.id = id;
-            netMessage.CharacterId = characterId;
             netMessage.data = new SocialCharacterData()
             {
                 id = characterId,
@@ -46,7 +45,6 @@ namespace MultiplayerARPG
             UpdateSocialMemberMessage netMessage = new UpdateSocialMemberMessage();
             netMessage.type = UpdateSocialMemberMessage.UpdateType.Update;
             netMessage.id = id;
-            netMessage.CharacterId = characterId;
             netMessage.isOnline = isOnline;
             netMessage.data = new SocialCharacterData()
             {
@@ -67,7 +65,7 @@ namespace MultiplayerARPG
             UpdateSocialMemberMessage netMessage = new UpdateSocialMemberMessage();
             netMessage.type = UpdateSocialMemberMessage.UpdateType.Remove;
             netMessage.id = id;
-            netMessage.CharacterId = characterId;
+            netMessage.data.id = characterId;
             Send(transportHandler, connectionId, msgType, netMessage);
         }
 

@@ -29,14 +29,15 @@ namespace MultiplayerARPG
 
         public static BaseGameNetworkManager Singleton { get; protected set; }
         protected GameInstance gameInstance { get { return GameInstance.Singleton; } }
-        protected readonly Dictionary<long, BasePlayerCharacterEntity> playerCharacters = new Dictionary<long, BasePlayerCharacterEntity>();
-        protected readonly Dictionary<string, BasePlayerCharacterEntity> playerCharactersById = new Dictionary<string, BasePlayerCharacterEntity>();
-        protected readonly Dictionary<string, BuildingEntity> buildingEntities = new Dictionary<string, BuildingEntity>();
-        protected readonly Dictionary<string, long> connectionIdsByCharacterName = new Dictionary<string, long>();
-        protected readonly Dictionary<int, PartyData> parties = new Dictionary<int, PartyData>();
-        protected readonly Dictionary<int, GuildData> guilds = new Dictionary<int, GuildData>();
-        protected readonly Dictionary<long, PartyData> updatingPartyMembers = new Dictionary<long, PartyData>();
-        protected readonly Dictionary<long, GuildData> updatingGuildMembers = new Dictionary<long, GuildData>();
+        protected static readonly Dictionary<long, BasePlayerCharacterEntity> playerCharacters = new Dictionary<long, BasePlayerCharacterEntity>();
+        protected static readonly Dictionary<string, BasePlayerCharacterEntity> playerCharactersById = new Dictionary<string, BasePlayerCharacterEntity>();
+        protected static readonly Dictionary<string, BuildingEntity> buildingEntities = new Dictionary<string, BuildingEntity>();
+        protected static readonly Dictionary<string, long> connectionIdsByCharacterName = new Dictionary<string, long>();
+        protected static readonly Dictionary<int, PartyData> parties = new Dictionary<int, PartyData>();
+        protected static readonly Dictionary<int, GuildData> guilds = new Dictionary<int, GuildData>();
+        protected static readonly Dictionary<long, PartyData> updatingPartyMembers = new Dictionary<long, PartyData>();
+        protected static readonly Dictionary<long, GuildData> updatingGuildMembers = new Dictionary<long, GuildData>();
+        protected static readonly Dictionary<string, float> lastCharacterOnlineTimes = new Dictionary<string, float>();
         public static PartyData ClientParty { get; protected set; }
         public static GuildData ClientGuild { get; protected set; }
         public static readonly SocialGroupData ClientFoundCharacters = new SocialGroupData(1);
@@ -179,15 +180,28 @@ namespace MultiplayerARPG
             SendMapInfo(connectionId);
         }
 
+        public static void NotifyOnlineCharacter(string characterId)
+        {
+            lastCharacterOnlineTimes[characterId] = Time.unscaledTime;
+        }
+
+        public static bool IsCharacterOnline(string characterId)
+        {
+            float lastOnlineTime;
+            return (lastCharacterOnlineTimes.TryGetValue(characterId, out lastOnlineTime) &&
+                Time.unscaledTime - lastOnlineTime <= 2f);
+        }
+
         protected virtual void UpdateOnlineCharacter(long connectionId, BasePlayerCharacterEntity playerCharacterEntity, float time)
         {
             PartyData tempParty;
             GuildData tempGuild;
 
+            NotifyOnlineCharacter(playerCharacterEntity.Id);
+
             if (playerCharacterEntity.PartyId > 0 && parties.TryGetValue(playerCharacterEntity.PartyId, out tempParty))
             {
                 tempParty.UpdateMember(playerCharacterEntity);
-                tempParty.NotifyOnlineMember(playerCharacterEntity.Id);
                 if (!updatingPartyMembers.ContainsKey(connectionId))
                     updatingPartyMembers.Add(connectionId, tempParty);
             }
@@ -195,7 +209,6 @@ namespace MultiplayerARPG
             if (playerCharacterEntity.GuildId > 0 && guilds.TryGetValue(playerCharacterEntity.GuildId, out tempGuild))
             {
                 tempGuild.UpdateMember(playerCharacterEntity);
-                tempGuild.NotifyOnlineMember(playerCharacterEntity.Id);
                 if (!updatingGuildMembers.ContainsKey(connectionId))
                     updatingGuildMembers.Add(connectionId, tempGuild);
             }
@@ -685,11 +698,9 @@ namespace MultiplayerARPG
                     break;
                 case UpdateSocialMemberMessage.UpdateType.Update:
                     socialGroupData.UpdateMember(message.data);
-                    if (message.isOnline)
-                        socialGroupData.NotifyOnlineMember(message.CharacterId);
                     break;
                 case UpdateSocialMemberMessage.UpdateType.Remove:
-                    socialGroupData.RemoveMember(message.CharacterId);
+                    socialGroupData.RemoveMember(message.data.id);
                     break;
                 case UpdateSocialMemberMessage.UpdateType.Clear:
                     socialGroupData.ClearMembers();

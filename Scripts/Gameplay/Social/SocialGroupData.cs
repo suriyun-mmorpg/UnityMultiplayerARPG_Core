@@ -7,7 +7,6 @@ namespace MultiplayerARPG
     public class SocialGroupData
     {
         protected Dictionary<string, SocialCharacterData> members;
-        protected Dictionary<string, float> lastOnlineTimes;
         protected SocialCharacterData tempMemberData;
 
         public int id { get; protected set; }
@@ -19,28 +18,12 @@ namespace MultiplayerARPG
         {
             this.id = id;
             members = new Dictionary<string, SocialCharacterData>();
-            lastOnlineTimes = new Dictionary<string, float>();
         }
 
         public SocialGroupData(int id, string leaderId) : this(id)
         {
             this.leaderId = leaderId;
             AddMember(new SocialCharacterData() { id = leaderId });
-        }
-
-        public void NotifyOnlineMember(string characterId)
-        {
-            if (members.ContainsKey(characterId))
-                lastOnlineTimes[characterId] = Time.unscaledTime;
-        }
-
-        public bool IsOnline(string characterId)
-        {
-            SocialCharacterData member;
-            float lastOnlineTime;
-            return (members.TryGetValue(characterId, out member) &&
-                lastOnlineTimes.TryGetValue(characterId, out lastOnlineTime) &&
-                Time.unscaledTime - lastOnlineTime <= 2f);
         }
 
         public SocialCharacterData CreateMemberData(BasePlayerCharacterEntity playerCharacterEntity)
