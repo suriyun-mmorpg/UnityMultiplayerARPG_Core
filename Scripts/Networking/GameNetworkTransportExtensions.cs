@@ -79,6 +79,13 @@ namespace MultiplayerARPG
             Send(transportHandler, connectionId, msgType, netMessage);
         }
 
+        public static void SendSocialMembers(this TransportHandler transportHandler, long? connectionId, ushort msgType, SocialCharacterData[] members)
+        {
+            UpdateSocialMembersMessage netMessage = new UpdateSocialMembersMessage();
+            netMessage.members = members;
+            Send(transportHandler, connectionId, msgType, netMessage);
+        }
+
         public static void SendCreateParty(this TransportHandler transportHandler, long? connectionId, ushort msgType, int id, bool shareExp, bool shareItem, string characterId)
         {
             UpdatePartyMessage netMessage = new UpdatePartyMessage();
