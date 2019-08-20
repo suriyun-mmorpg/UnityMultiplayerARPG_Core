@@ -1,7 +1,7 @@
 ﻿using LiteNetLibManager;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using LiteNetLib;
 
 namespace MultiplayerARPG
 {
@@ -376,14 +376,15 @@ namespace MultiplayerARPG
         {
             StringMessage msg = new StringMessage();
             msg.value = characterId;
-            ServerSendPacket(connectionId, LiteNetLib.DeliveryMethod.ReliableOrdered, MsgTypes.NotifyOnlineCharacter, msg);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.NotifyOnlineCharacter, msg);
         }
 
-        public void SendNotifyOnlineCharacterToClients(string characterId)
+        public void SendNotifyOnlineCharactersToClient(long connectionId)
         {
-            foreach (LiteNetLibPlayer player in GetPlayers())
+            foreach (string characterId in lastCharacterOnlineTimes.Keys)
             {
-                SendNotifyOnlineCharacterToClient(player.ConnectionId, characterId);
+                if (IsCharacterOnline(characterId))
+                    SendNotifyOnlineCharacterToClient(connectionId, characterId);
             }
         }
     }

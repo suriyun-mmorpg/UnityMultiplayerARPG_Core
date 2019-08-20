@@ -98,10 +98,6 @@ namespace MultiplayerARPG
                 if (IsServer)
                 {
                     UpdateOnlineCharacters();
-                    foreach (string characterId in playerCharactersById.Keys)
-                    {
-                        SendNotifyOnlineCharacterToClients(characterId);
-                    }
                 }
                 lastUpdateOnlineCharacterTime = tempUnscaledTime;
             }
@@ -201,46 +197,50 @@ namespace MultiplayerARPG
                 Time.unscaledTime - lastOnlineTime <= 2f;
         }
 
-        protected virtual void UpdateOnlineCharacter(long connectionId, BasePlayerCharacterEntity playerCharacterEntity)
+        protected virtual void UpdateOnlineCharacter(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            PartyData tempParty;
-            GuildData tempGuild;
-
             NotifyOnlineCharacter(playerCharacterEntity.Id);
-
-            if (playerCharacterEntity.PartyId > 0 && parties.TryGetValue(playerCharacterEntity.PartyId, out tempParty))
-            {
-                tempParty.UpdateMember(playerCharacterEntity);
-                if (!updatingPartyMembers.ContainsKey(connectionId))
-                    updatingPartyMembers.Add(connectionId, tempParty);
-            }
-
-            if (playerCharacterEntity.GuildId > 0 && guilds.TryGetValue(playerCharacterEntity.GuildId, out tempGuild))
-            {
-                tempGuild.UpdateMember(playerCharacterEntity);
-                if (!updatingGuildMembers.ContainsKey(connectionId))
-                    updatingGuildMembers.Add(connectionId, tempGuild);
-            }
         }
 
         protected virtual void UpdateOnlineCharacters()
         {
             updatingPartyMembers.Clear();
             updatingGuildMembers.Clear();
-
-            foreach (KeyValuePair<long, BasePlayerCharacterEntity> entry in playerCharacters)
+            
+            PartyData tempParty;
+            GuildData tempGuild;
+            foreach (BasePlayerCharacterEntity playerCharacter in playerCharacters.Values)
             {
-                UpdateOnlineCharacter(entry.Key, entry.Value);
+                UpdateOnlineCharacter(playerCharacter);
+
+                if (playerCharacter.PartyId > 0 && parties.TryGetValue(playerCharacter.PartyId, out tempParty))
+                {
+                    tempParty.UpdateMember(playerCharacter);
+                    if (!updatingPartyMembers.ContainsKey(playerCharacter.ConnectionId))
+                        updatingPartyMembers.Add(playerCharacter.ConnectionId, tempParty);
+                }
+
+                if (playerCharacter.GuildId > 0 && guilds.TryGetValue(playerCharacter.GuildId, out tempGuild))
+                {
+                    tempGuild.UpdateMember(playerCharacter);
+                    if (!updatingGuildMembers.ContainsKey(playerCharacter.ConnectionId))
+                        updatingGuildMembers.Add(playerCharacter.ConnectionId, tempGuild);
+                }
             }
 
-            foreach (KeyValuePair<long, PartyData> updatingPartyMember in updatingPartyMembers)
+            foreach (long connectionId in playerCharacters.Keys)
             {
-                SendUpdatePartyMembersToClient(updatingPartyMember.Key, updatingPartyMember.Value);
+                SendNotifyOnlineCharactersToClient(connectionId);
             }
 
-            foreach (KeyValuePair<long, GuildData> updatingGuildMember in updatingGuildMembers)
+            foreach (long connectionId in updatingPartyMembers.Keys)
             {
-                SendUpdateGuildMembersToClient(updatingGuildMember.Key, updatingGuildMember.Value);
+                SendUpdatePartyMembersToClient(connectionId, updatingPartyMembers[connectionId]);
+            }
+
+            foreach (long connectionId in updatingGuildMembers.Keys)
+            {
+                SendUpdateGuildMembersToClient(connectionId, updatingGuildMembers[connectionId]);
             }
         }
 
@@ -790,13 +790,13 @@ namespace MultiplayerARPG
                 Instantiate(GameInstance.Singleton.serverCharacterPrefab);
         }
 
-        public virtual void RegisterPlayerCharacter(long connectionId, BasePlayerCharacterEntity playerCharacterEntity)
+        public virtual void RegisterPlayerCharacter(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            if (playerCharacterEntity == null || !ConnectionIds.Contains(connectionId) || playerCharacters.ContainsKey(connectionId))
+            if (playerCharacterEntity == null || !ConnectionIds.Contains(playerCharacterEntity.ConnectionId) || playerCharacters.ContainsKey(connectionId))
                 return;
-            playerCharacters[connectionId] = playerCharacterEntity;
+            playerCharacters[playerCharacterEntity.ConnectionId] = playerCharacterEntity;
             playerCharactersById[playerCharacterEntity.Id] = playerCharacterEntity;
-            connectionIdsByCharacterName[playerCharacterEntity.CharacterName] = connectionId;
+            connectionIdsByCharacterName[playerCharacterEntity.CharacterName] = playerCharacterEntity.ConnectionId;
         }
 
         public virtual void UnregisterPlayerCharacter(long connectionId)
