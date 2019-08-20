@@ -23,6 +23,7 @@ namespace MultiplayerARPG
             public const ushort UpdateMapInfo = 110;
             public const ushort UpdateFoundCharacters = 111;
             public const ushort UpdateFriends = 112;
+            public const ushort NotifyOnlineCharacter = 113;
         }
 
         public const float UPDATE_ONLINE_CHARACTER_DURATION = 1f;
@@ -95,7 +96,13 @@ namespace MultiplayerARPG
                 // Update social members, every seconds
                 // Update at server
                 if (IsServer)
-                    UpdateOnlineCharacters(tempUnscaledTime);
+                {
+                    UpdateOnlineCharacters();
+                    foreach (string characterId in playerCharactersById.Keys)
+                    {
+                        SendNotifyOnlineCharacterToClients(characterId);
+                    }
+                }
                 lastUpdateOnlineCharacterTime = tempUnscaledTime;
             }
         }
@@ -118,6 +125,7 @@ namespace MultiplayerARPG
             RegisterClientMessage(MsgTypes.UpdateMapInfo, HandleUpdateMapInfoAtClient);
             RegisterClientMessage(MsgTypes.UpdateFoundCharacters, HandleUpdateFoundCharactersAtClient);
             RegisterClientMessage(MsgTypes.UpdateFriends, HandleUpdateFriendsAtClient);
+            RegisterClientMessage(MsgTypes.NotifyOnlineCharacter, HandleNotifyOnlineCharacterAtClient);
         }
 
         protected override void RegisterServerMessages()
@@ -142,6 +150,7 @@ namespace MultiplayerARPG
             guilds.Clear();
             updatingPartyMembers.Clear();
             updatingGuildMembers.Clear();
+            lastCharacterOnlineTimes.Clear();
             ClientParty = null;
             ClientGuild = null;
             ClientFoundCharacters.ClearMembers();
@@ -188,11 +197,11 @@ namespace MultiplayerARPG
         public static bool IsCharacterOnline(string characterId)
         {
             float lastOnlineTime;
-            return (lastCharacterOnlineTimes.TryGetValue(characterId, out lastOnlineTime) &&
-                Time.unscaledTime - lastOnlineTime <= 2f);
+            return lastCharacterOnlineTimes.TryGetValue(characterId, out lastOnlineTime) &&
+                Time.unscaledTime - lastOnlineTime <= 2f;
         }
 
-        protected virtual void UpdateOnlineCharacter(long connectionId, BasePlayerCharacterEntity playerCharacterEntity, float time)
+        protected virtual void UpdateOnlineCharacter(long connectionId, BasePlayerCharacterEntity playerCharacterEntity)
         {
             PartyData tempParty;
             GuildData tempGuild;
@@ -214,14 +223,14 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void UpdateOnlineCharacters(float time)
+        protected virtual void UpdateOnlineCharacters()
         {
             updatingPartyMembers.Clear();
             updatingGuildMembers.Clear();
 
             foreach (KeyValuePair<long, BasePlayerCharacterEntity> entry in playerCharacters)
             {
-                UpdateOnlineCharacter(entry.Key, entry.Value, time);
+                UpdateOnlineCharacter(entry.Key, entry.Value);
             }
 
             foreach (KeyValuePair<long, PartyData> updatingPartyMember in updatingPartyMembers)
@@ -440,6 +449,12 @@ namespace MultiplayerARPG
             }
             if (onClientUpdateFriends != null)
                 onClientUpdateFriends.Invoke(ClientFriends);
+        }
+
+        protected virtual void HandleNotifyOnlineCharacterAtClient(LiteNetLibMessageHandler messageHandler)
+        {
+            StringMessage msg = messageHandler.ReadMessage<StringMessage>();
+            NotifyOnlineCharacter(msg.value);
         }
 
         protected virtual void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
