@@ -408,7 +408,6 @@ namespace MultiplayerARPG
         protected virtual void HandleUpdateFoundCharactersAtClient(LiteNetLibMessageHandler messageHandler)
         {
             UpdateSocialMembersMessage msg = messageHandler.ReadMessage<UpdateSocialMembersMessage>();
-            Debug.LogError("C " + msg.members.Length);
             ClientFoundCharacters.ClearMembers();
             foreach (SocialCharacterData member in msg.members)
             {
@@ -422,6 +421,7 @@ namespace MultiplayerARPG
         {
             UpdateSocialMembersMessage msg = messageHandler.ReadMessage<UpdateSocialMembersMessage>();
             ClientFriends.ClearMembers();
+            Debug.LogError("C " + msg.members.Length);
             foreach (SocialCharacterData member in msg.members)
             {
                 ClientFriends.AddMember(member);
