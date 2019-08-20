@@ -127,6 +127,10 @@ namespace MultiplayerARPG
             RegisterNetFunction(NetFuncCloseStorage);
             RegisterNetFunction<PackedUInt>(NetFuncToggleDoor);
             RegisterNetFunction<PackedUInt, int>(NetFuncCraftItemByWorkbench);
+            RegisterNetFunction<string>(NetFuncFindCharacters);
+            RegisterNetFunction<string>(NetFuncAddFriend);
+            RegisterNetFunction<string>(NetFuncRemoveFriend);
+            RegisterNetFunction(NetFuncGetFriends);
         }
 
         protected override void EntityOnSetOwnerClient()

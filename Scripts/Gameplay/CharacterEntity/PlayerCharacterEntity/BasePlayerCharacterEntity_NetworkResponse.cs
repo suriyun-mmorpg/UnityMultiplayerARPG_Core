@@ -1123,6 +1123,28 @@ namespace MultiplayerARPG
         }
         #endregion
 
+        #region Social
+        protected void NetFuncFindCharacters(string characterName)
+        {
+            gameManager.FindCharacters(this, characterName);
+        }
+
+        protected void NetFuncAddFriend(string friendCharacterId)
+        {
+            gameManager.AddFriend(this, friendCharacterId);
+        }
+
+        protected void NetFuncRemoveFriend(string friendCharacterId)
+        {
+            gameManager.RemoveFriend(this, friendCharacterId);
+        }
+
+        protected void NetFuncGetFriends()
+        {
+            gameManager.GetFriends(this);
+        }
+        #endregion
+
         protected void StopDealing()
         {
             if (DealingCharacter == null)

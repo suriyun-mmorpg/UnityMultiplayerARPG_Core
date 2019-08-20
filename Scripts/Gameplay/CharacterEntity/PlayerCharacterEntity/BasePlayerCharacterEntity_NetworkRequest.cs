@@ -518,5 +518,29 @@ namespace MultiplayerARPG
             CallNetFunction(NetFuncCraftItemByWorkbench, FunctionReceivers.Server, new PackedUInt(objectId), dataId);
             return true;
         }
+
+        public bool RequestFindCharacters(string characterName)
+        {
+            CallNetFunction(NetFuncFindCharacters, FunctionReceivers.Server, characterName);
+            return true;
+        }
+
+        public bool RequestAddFriend(string friendCharacterId)
+        {
+            CallNetFunction(NetFuncAddFriend, FunctionReceivers.Server, friendCharacterId);
+            return true;
+        }
+
+        public bool RequestRemoveFriend(string friendCharacterId)
+        {
+            CallNetFunction(NetFuncRemoveFriend, FunctionReceivers.Server, friendCharacterId);
+            return true;
+        }
+
+        public bool RequestGetFriends()
+        {
+            CallNetFunction(NetFuncGetFriends, FunctionReceivers.Server);
+            return true;
+        }
     }
 }
