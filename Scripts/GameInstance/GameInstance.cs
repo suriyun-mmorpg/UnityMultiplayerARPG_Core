@@ -554,7 +554,6 @@ namespace MultiplayerARPG
                 return;
             List<WeaponType> weaponTypes = new List<WeaponType>();
             List<BuildingEntity> buildingEntities = new List<BuildingEntity>();
-            List<AttributeAmount> attributeAmounts = new List<AttributeAmount>();
             List<SkillLevel> skillLevels = new List<SkillLevel>();
             foreach (Item item in items)
             {
