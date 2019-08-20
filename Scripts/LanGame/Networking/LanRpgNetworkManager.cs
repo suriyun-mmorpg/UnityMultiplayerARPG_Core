@@ -500,8 +500,14 @@ namespace MultiplayerARPG
 
         public override void FindCharacters(BasePlayerCharacterEntity playerCharacterEntity, string characterName)
         {
-            // Service not available for Lan mode
-            SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.ServiceNotAvailable);
+            List<SocialCharacterData> socialCharacters = new List<SocialCharacterData>();
+            foreach (BasePlayerCharacterEntity playerCharacter in playerCharacters.Values)
+            {
+                if (playerCharacter.Id.Equals(playerCharacterEntity.Id) ||
+                    !playerCharacter.CharacterName.Equals(characterName))
+                    continue;
+            }
+            Server.SendSocialMembers(playerCharacterEntity.ConnectionId, MsgTypes.UpdateFoundCharacters, socialCharacters.ToArray());
         }
 
         public override void AddFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
@@ -511,6 +517,12 @@ namespace MultiplayerARPG
         }
 
         public override void RemoveFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
+        {
+            // Service not available for Lan mode
+            SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.ServiceNotAvailable);
+        }
+
+        public override void GetFriends(BasePlayerCharacterEntity playerCharacterEntity)
         {
             // Service not available for Lan mode
             SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.ServiceNotAvailable);
