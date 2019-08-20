@@ -21,8 +21,8 @@ namespace MultiplayerARPG
             public const ushort UpdateGuildMember = 108;
             public const ushort UpdateGuild = 109;
             public const ushort UpdateMapInfo = 110;
-            public const ushort UpdateFoundCharacter = 111;
-            public const ushort UpdateFriend = 112;
+            public const ushort UpdateFoundCharacters = 111;
+            public const ushort UpdateFriends = 112;
         }
 
         public const float UPDATE_ONLINE_CHARACTER_DURATION = 1f;
@@ -115,8 +115,8 @@ namespace MultiplayerARPG
             RegisterClientMessage(MsgTypes.UpdateGuildMember, HandleUpdateGuildMemberAtClient);
             RegisterClientMessage(MsgTypes.UpdateGuild, HandleUpdateGuildAtClient);
             RegisterClientMessage(MsgTypes.UpdateMapInfo, HandleUpdateMapInfoAtClient);
-            RegisterClientMessage(MsgTypes.UpdateFoundCharacter, HandleUpdateFoundCharacterAtClient);
-            RegisterClientMessage(MsgTypes.UpdateFriend, HandleUpdateFriendAtClient);
+            RegisterClientMessage(MsgTypes.UpdateFoundCharacters, HandleUpdateFoundCharactersAtClient);
+            RegisterClientMessage(MsgTypes.UpdateFriends, HandleUpdateFriendsAtClient);
         }
 
         protected override void RegisterServerMessages()
@@ -405,16 +405,26 @@ namespace MultiplayerARPG
             SetMapInfo(message.mapId);
         }
 
-        protected virtual void HandleUpdateFoundCharacterAtClient(LiteNetLibMessageHandler messageHandler)
+        protected virtual void HandleUpdateFoundCharactersAtClient(LiteNetLibMessageHandler messageHandler)
         {
-            UpdateSocialGroupMember(ClientFoundCharacters, messageHandler.ReadMessage<UpdateSocialMemberMessage>());
+            UpdateSocialMembersMessage msg = messageHandler.ReadMessage<UpdateSocialMembersMessage>();
+            ClientFoundCharacters.ClearMembers();
+            foreach (SocialCharacterData member in msg.members)
+            {
+                ClientFoundCharacters.AddMember(member);
+            }
             if (onClientUpdateFoundCharacters != null)
-                onClientUpdateFoundCharacters.Invoke(ClientFriends);
+                onClientUpdateFoundCharacters.Invoke(ClientFoundCharacters);
         }
 
-        protected virtual void HandleUpdateFriendAtClient(LiteNetLibMessageHandler messageHandler)
+        protected virtual void HandleUpdateFriendsAtClient(LiteNetLibMessageHandler messageHandler)
         {
-            UpdateSocialGroupMember(ClientFriends, messageHandler.ReadMessage<UpdateSocialMemberMessage>());
+            UpdateSocialMembersMessage msg = messageHandler.ReadMessage<UpdateSocialMembersMessage>();
+            ClientFriends.ClearMembers();
+            foreach (SocialCharacterData member in msg.members)
+            {
+                ClientFriends.AddMember(member);
+            }
             if (onClientUpdateFriends != null)
                 onClientUpdateFriends.Invoke(ClientFriends);
         }
