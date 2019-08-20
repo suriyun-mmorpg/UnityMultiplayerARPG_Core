@@ -57,6 +57,24 @@ namespace MultiplayerARPG
 #endif
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            // Member status
+            foreach (GameObject obj in memberIsOnlineObjects)
+            {
+                if (obj != null)
+                    obj.SetActive(BaseGameNetworkManager.IsCharacterOnline(Data.socialCharacter.id));
+            }
+
+            foreach (GameObject obj in memberIsNotOnlineObjects)
+            {
+                if (obj != null)
+                    obj.SetActive(!BaseGameNetworkManager.IsCharacterOnline(Data.socialCharacter.id));
+            }
+        }
+
         private bool MigrateUIGageValue()
         {
             return UIGageValue.Migrate(ref uiGageHp, ref uiTextHp, ref imageHpGage) ||
@@ -102,19 +120,6 @@ namespace MultiplayerARPG
             // Buffs
             if (uiCharacterBuffs != null)
                 uiCharacterBuffs.UpdateData(Data.characterEntity);
-
-            // Member status
-            foreach (GameObject obj in memberIsOnlineObjects)
-            {
-                if (obj != null)
-                    obj.SetActive(uiSocialGroup.IsOnline(Data.socialCharacter.id));
-            }
-
-            foreach (GameObject obj in memberIsNotOnlineObjects)
-            {
-                if (obj != null)
-                    obj.SetActive(!uiSocialGroup.IsOnline(Data.socialCharacter.id));
-            }
 
             foreach (GameObject obj in memberIsLeaderObjects)
             {
