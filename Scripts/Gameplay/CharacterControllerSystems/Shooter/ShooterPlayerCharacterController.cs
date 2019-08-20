@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
@@ -76,8 +75,8 @@ namespace MultiplayerARPG
         Item rightHandWeapon;
         Item leftHandWeapon;
         MovementState movementState;
-        BaseWeaponAbility weaponAbility;
-        WeaponAbilityState weaponAbilityState;
+        public BaseWeaponAbility weaponAbility { get; private set; }
+        public WeaponAbilityState weaponAbilityState { get; private set; }
 
         protected override void Awake()
         {
