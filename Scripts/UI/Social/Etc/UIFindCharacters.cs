@@ -55,7 +55,7 @@
 
         public override int GetSocialId()
         {
-            return 0;
+            return 1;
         }
 
         public override bool IsLeader(string characterId)
@@ -92,7 +92,7 @@
                 return;
 
             SocialCharacterData friend = MemberSelectionManager.SelectedUI.Data.socialCharacter;
-            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_FRIEND_REMOVE.ToString()), string.Format(LanguageManager.GetText(UILocaleKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
+            UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_FRIEND_ADD.ToString()), string.Format(LanguageManager.GetText(UILocaleKeys.UI_FRIEND_ADD_DESCRIPTION.ToString()), friend.characterName), false, true, true, false, null, () =>
             {
                 BasePlayerCharacterController.OwningCharacter.RequestAddFriend(friend.id);
             });
