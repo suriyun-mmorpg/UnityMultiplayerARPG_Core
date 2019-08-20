@@ -39,8 +39,8 @@ namespace MultiplayerARPG
         protected readonly Dictionary<long, GuildData> updatingGuildMembers = new Dictionary<long, GuildData>();
         public static PartyData ClientParty { get; protected set; }
         public static GuildData ClientGuild { get; protected set; }
-        public static readonly SocialGroupData ClientFoundCharacters = new SocialGroupData(0);
-        public static readonly SocialGroupData ClientFriends = new SocialGroupData(0);
+        public static readonly SocialGroupData ClientFoundCharacters = new SocialGroupData(1);
+        public static readonly SocialGroupData ClientFriends = new SocialGroupData(1);
         public static MapInfo CurrentMapInfo { get; protected set; }
         // Events
         public System.Action<ChatMessage> onClientReceiveChat;
@@ -408,6 +408,7 @@ namespace MultiplayerARPG
         protected virtual void HandleUpdateFoundCharactersAtClient(LiteNetLibMessageHandler messageHandler)
         {
             UpdateSocialMembersMessage msg = messageHandler.ReadMessage<UpdateSocialMembersMessage>();
+            Debug.LogError("C " + msg.members.Length);
             ClientFoundCharacters.ClearMembers();
             foreach (SocialCharacterData member in msg.members)
             {
