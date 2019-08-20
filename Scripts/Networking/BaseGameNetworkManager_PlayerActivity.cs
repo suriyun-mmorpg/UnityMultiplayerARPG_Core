@@ -814,6 +814,16 @@ namespace MultiplayerARPG
             }
         }
 
+        public void SendUpdateFoundCharactersToClient(long connectionId, SocialCharacterData[] members)
+        {
+            Server.SendSocialMembers(connectionId, MsgTypes.UpdateFoundCharacters, members);
+        }
+
+        public void SendUpdateFriendsToClient(long connectionId, SocialCharacterData[] members)
+        {
+            Server.SendSocialMembers(connectionId, MsgTypes.UpdateFriends, members);
+        }
+
         public virtual void RespawnCharacter(BasePlayerCharacterEntity playerCharacterEntity)
         {
             string respawnMapName = playerCharacterEntity.RespawnMapName;
@@ -1186,21 +1196,127 @@ namespace MultiplayerARPG
             return true;
         }
 
+        /// <summary>
+        /// Create Party
+        /// </summary>
+        /// <param name="playerCharacterEntity">Character who create the party</param>
+        /// <param name="shareExp">The party will share exp or not</param>
+        /// <param name="shareItem">The party will share item or not</param>
         public abstract void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem);
+
+        /// <summary>
+        /// Create Guild
+        /// </summary>
+        /// <param name="playerCharacterEntity">Character who create the guild</param>
+        /// <param name="guildName">Guild name</param>
         public abstract void CreateGuild(BasePlayerCharacterEntity playerCharacterEntity, string guildName);
+
+        /// <summary>
+        /// Open storage
+        /// </summary>
+        /// <param name="playerCharacterEntity">Character who open the storage</param>
         public abstract void OpenStorage(BasePlayerCharacterEntity playerCharacterEntity);
+
+        /// <summary>
+        /// Close storage
+        /// </summary>
+        /// <param name="playerCharacterEntity">Character who close the storage</param>
         public abstract void CloseStorage(BasePlayerCharacterEntity playerCharacterEntity);
+
+        /// <summary>
+        /// Move item to storage
+        /// </summary>
+        /// <param name="playerCharacterEntity">Character who move item from inventory to storage</param>
+        /// <param name="storageId">Storage id</param>
+        /// <param name="nonEquipIndex">Index of inventory</param>
+        /// <param name="amount">Amount of item</param>
+        /// <param name="storageItemIndex">Index of storage</param>
         public abstract void MoveItemToStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex);
+
+        /// <summary>
+        /// Move item from storage
+        /// </summary>
+        /// <param name="playerCharacterEntity">Character who move item from storage to inventory</param>
+        /// <param name="storageId">Storage id</param>
+        /// <param name="storageItemIndex">Index of storage</param>
+        /// <param name="amount">Amount of item</param>
+        /// <param name="nonEquipIndex">Index of inventory</param>
         public abstract void MoveItemFromStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex);
+
+        /// <summary>
+        /// Check if storage entity is opened or not
+        /// </summary>
+        /// <param name="storageEntity">Checking storage entity</param>
+        /// <returns></returns>
         public abstract bool IsStorageEntityOpen(StorageEntity storageEntity);
+
+        /// <summary>
+        /// Deposit gold
+        /// </summary>
+        /// <param name="playerCharacterEntity">Character who deposit gold</param>
+        /// <param name="amount">Amount of gold</param>
         public abstract void DepositGold(BasePlayerCharacterEntity playerCharacterEntity, int amount);
+
+        /// <summary>
+        /// Withdraw gold
+        /// </summary>
+        /// <param name="playerCharacterEntity">Character who withdraw gold</param>
+        /// <param name="amount">Amount of gold</param>
         public abstract void WithdrawGold(BasePlayerCharacterEntity playerCharacterEntity, int amount);
+
+        /// <summary>
+        /// Deposit guild gold
+        /// </summary>
+        /// <param name="playerCharacterEntity">Character who deposit gold</param>
+        /// <param name="amount">Amount of gold</param>
         public abstract void DepositGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount);
+
+        /// <summary>
+        /// Withdraw guild gold
+        /// </summary>
+        /// <param name="playerCharacterEntity">Character who withdraw gold</param>
+        /// <param name="amount">Amount of gold</param>
         public abstract void WithdrawGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount);
+
+        /// <summary>
+        /// Find characters by name
+        /// </summary>
+        /// <param name="playerCharacterEntity">Character who find other characters</param>
+        /// <param name="characterName">Character name</param>
         public abstract void FindCharacters(BasePlayerCharacterEntity playerCharacterEntity, string characterName);
+
+        /// <summary>
+        /// Add friend
+        /// </summary>
+        /// <param name="playerCharacterEntity">Character who adding friend</param>
+        /// <param name="friendCharacterId">Id of character whom will be added</param>
         public abstract void AddFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId);
+
+        /// <summary>
+        /// Remove friend
+        /// </summary>
+        /// <param name="playerCharacterEntity">Character who removing friend</param>
+        /// <param name="friendCharacterId">Id of character whom will be removed</param>
         public abstract void RemoveFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId);
+
+        /// <summary>
+        /// Get friends
+        /// </summary>
+        /// <param name="playerCharacterEntity">Character who request friend list</param>
+        public abstract void GetFriends(BasePlayerCharacterEntity playerCharacterEntity);
+
+        /// <summary>
+        /// Warp character to instance map
+        /// </summary>
+        /// <param name="playerCharacterEntity"></param>
+        /// <param name="mapName"></param>
+        /// <param name="position"></param>
         protected abstract void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position);
+
+        /// <summary>
+        /// Check if this game network manager is for instance map or not
+        /// </summary>
+        /// <returns></returns>
         protected abstract bool IsInstanceMap();
     }
 }
