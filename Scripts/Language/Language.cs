@@ -518,6 +518,11 @@ namespace MultiplayerARPG
         UI_ITEM_TYPE_SKILL,
         UI_ITEM_TYPE_SKILL_LEARN,
         UI_ITEM_TYPE_SKILL_RESET,
+        // Friend
+        UI_FRIEND_ADD,
+        UI_FRIEND_ADD_DESCRIPTION,
+        UI_FRIEND_REMOVE,
+        UI_FRIEND_REMOVE_DESCRIPTION,
     }
 
     public static class DefaultLocale
@@ -806,6 +811,11 @@ namespace MultiplayerARPG
             Texts.Add(UILocaleKeys.UI_GUILD_ROLE_CANNOT_INVITE.ToString(), "Cannot invite");
             Texts.Add(UILocaleKeys.UI_GUILD_ROLE_CAN_KICK.ToString(), "Can kick");
             Texts.Add(UILocaleKeys.UI_GUILD_ROLE_CANNOT_KICK.ToString(), "Cannot kick");
+            // UI Friend
+            Texts.Add(UILocaleKeys.UI_FRIEND_ADD.ToString(), "Add Friend");
+            Texts.Add(UILocaleKeys.UI_FRIEND_ADD_DESCRIPTION.ToString(), "You want to add {0} to friend list?");
+            Texts.Add(UILocaleKeys.UI_FRIEND_REMOVE.ToString(), "Remove Friend");
+            Texts.Add(UILocaleKeys.UI_FRIEND_REMOVE_DESCRIPTION.ToString(), "You want to remove {0} from friend list?");
         }
     }
 
