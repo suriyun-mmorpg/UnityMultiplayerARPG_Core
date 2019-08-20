@@ -83,9 +83,9 @@ namespace MultiplayerARPG
         protected HarvestableEntity targetHarvestable;
         protected Quaternion tempLookAt;
         protected Vector3 targetLookDirection;
-        protected NearbyEntityDetector activatingEntityDetector;
-        protected NearbyEntityDetector itemDropEntityDetector;
-        protected NearbyEntityDetector enemyEntityDetector;
+        public NearbyEntityDetector activatableEntityDetector { get; protected set; }
+        public NearbyEntityDetector itemDropEntityDetector { get; protected set; }
+        public NearbyEntityDetector enemyEntityDetector { get; protected set; }
         protected int findingEnemyIndex;
         protected bool isLeftHandAttacking;
 
@@ -105,14 +105,14 @@ namespace MultiplayerARPG
             }
             // This entity detector will be find entities to use when pressed activate key
             GameObject tempGameObject = new GameObject("_ActivatingEntityDetector");
-            activatingEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
-            activatingEntityDetector.detectingRadius = gameInstance.conversationDistance;
-            activatingEntityDetector.findPlayer = true;
-            activatingEntityDetector.findOnlyAlivePlayers = true;
-            activatingEntityDetector.findNpc = true;
-            activatingEntityDetector.findBuilding = true;
-            activatingEntityDetector.findOnlyAliveBuildings = true;
-            activatingEntityDetector.findOnlyActivatableBuildings = true;
+            activatableEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
+            activatableEntityDetector.detectingRadius = gameInstance.conversationDistance;
+            activatableEntityDetector.findPlayer = true;
+            activatableEntityDetector.findOnlyAlivePlayers = true;
+            activatableEntityDetector.findNpc = true;
+            activatableEntityDetector.findBuilding = true;
+            activatableEntityDetector.findOnlyAliveBuildings = true;
+            activatableEntityDetector.findOnlyActivatableBuildings = true;
             // This entity detector will be find item drop entities to use when pressed pickup key
             tempGameObject = new GameObject("_ItemDropEntityDetector");
             itemDropEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
@@ -144,8 +144,8 @@ namespace MultiplayerARPG
             base.OnDestroy();
             if (CacheTargetObject != null)
                 Destroy(CacheTargetObject.gameObject);
-            if (activatingEntityDetector != null)
-                Destroy(activatingEntityDetector.gameObject);
+            if (activatableEntityDetector != null)
+                Destroy(activatableEntityDetector.gameObject);
             if (itemDropEntityDetector != null)
                 Destroy(itemDropEntityDetector.gameObject);
             if (enemyEntityDetector != null)

@@ -28,14 +28,14 @@ namespace MultiplayerARPG
                 if (InputManager.GetButtonDown("Activate"))
                 {
                     targetPlayer = null;
-                    if (activatingEntityDetector.players.Count > 0)
-                        targetPlayer = activatingEntityDetector.players[0];
+                    if (activatableEntityDetector.players.Count > 0)
+                        targetPlayer = activatableEntityDetector.players[0];
                     targetNpc = null;
-                    if (activatingEntityDetector.npcs.Count > 0)
-                        targetNpc = activatingEntityDetector.npcs[0];
+                    if (activatableEntityDetector.npcs.Count > 0)
+                        targetNpc = activatableEntityDetector.npcs[0];
                     targetBuilding = null;
-                    if (activatingEntityDetector.buildings.Count > 0)
-                        targetBuilding = activatingEntityDetector.buildings[0];
+                    if (activatableEntityDetector.buildings.Count > 0)
+                        targetBuilding = activatableEntityDetector.buildings[0];
                     // Priority Player -> Npc -> Buildings
                     if (targetPlayer != null && CacheUISceneGameplay != null)
                     {
