@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract class SocialGroupData
+    public class SocialGroupData
     {
         protected Dictionary<string, SocialCharacterData> members;
         protected Dictionary<string, float> lastOnlineTimes;
@@ -14,7 +14,7 @@ namespace MultiplayerARPG
         public string leaderId { get; protected set; }
 
         public static SocialSystemSetting SystemSetting { get { return GameInstance.Singleton.SocialSystemSetting; } }
-
+        
         public SocialGroupData(int id)
         {
             this.id = id;
@@ -104,6 +104,11 @@ namespace MultiplayerARPG
         public virtual bool RemoveMember(string characterId)
         {
             return members.Remove(characterId);
+        }
+
+        public virtual void ClearMembers()
+        {
+            members.Clear();
         }
 
         public bool IsMember(BasePlayerCharacterEntity playerCharacterEntity)

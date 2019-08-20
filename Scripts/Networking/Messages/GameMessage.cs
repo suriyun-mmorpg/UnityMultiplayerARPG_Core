@@ -7,6 +7,7 @@ namespace MultiplayerARPG
         public enum Type : byte
         {
             None,
+            ServiceNotAvailable,
             InvalidItemData,
             NotFoundCharacter,
             NotAbleToLoot,

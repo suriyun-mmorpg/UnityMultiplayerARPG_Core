@@ -1197,6 +1197,9 @@ namespace MultiplayerARPG
         public abstract void WithdrawGold(BasePlayerCharacterEntity playerCharacterEntity, int amount);
         public abstract void DepositGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount);
         public abstract void WithdrawGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount);
+        public abstract void FindCharacters(BasePlayerCharacterEntity playerCharacterEntity, string characterName);
+        public abstract void AddFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId);
+        public abstract void RemoveFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId);
         protected abstract void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position);
         protected abstract bool IsInstanceMap();
     }

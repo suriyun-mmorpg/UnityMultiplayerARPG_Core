@@ -100,7 +100,7 @@ namespace MultiplayerARPG
             if (characterEntity is BasePlayerCharacterEntity)
             {
                 BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
-                switch (gameManager.CurrentMapInfo.pvpMode)
+                switch (BaseGameNetworkManager.CurrentMapInfo.pvpMode)
                 {
                     case PvpMode.Pvp:
                         return playerCharacterEntity.PartyId == PartyId;
@@ -129,7 +129,7 @@ namespace MultiplayerARPG
             if (characterEntity is BasePlayerCharacterEntity)
             {
                 BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
-                switch (gameManager.CurrentMapInfo.pvpMode)
+                switch (BaseGameNetworkManager.CurrentMapInfo.pvpMode)
                 {
                     case PvpMode.Pvp:
                         return playerCharacterEntity.PartyId != PartyId;

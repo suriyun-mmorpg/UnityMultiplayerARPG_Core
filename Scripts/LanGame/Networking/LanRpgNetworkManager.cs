@@ -498,6 +498,24 @@ namespace MultiplayerARPG
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
         }
 
+        public override void FindCharacters(BasePlayerCharacterEntity playerCharacterEntity, string characterName)
+        {
+            // Service not available for Lan mode
+            SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.ServiceNotAvailable);
+        }
+
+        public override void AddFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
+        {
+            // Service not available for Lan mode
+            SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.ServiceNotAvailable);
+        }
+
+        public override void RemoveFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
+        {
+            // Service not available for Lan mode
+            SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.ServiceNotAvailable);
+        }
+
         protected override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
         {
             // For now just warp follow host

@@ -44,7 +44,7 @@ namespace MultiplayerARPG
         public UIGuildRoleSetting uiGuildRoleSetting;
         public UIGuildMemberRoleSetting uiGuildMemberRoleSetting;
 
-        public GuildData Guild { get { return BaseGameNetworkManager.Singleton.ClientGuild; } }
+        public GuildData Guild { get { return BaseGameNetworkManager.ClientGuild; } }
 
         private string guildMessage;
 

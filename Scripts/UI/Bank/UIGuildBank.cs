@@ -8,9 +8,9 @@ namespace MultiplayerARPG
     {
         public override int GetAmount()
         {
-            if (BaseGameNetworkManager.Singleton.ClientGuild == null)
+            if (BaseGameNetworkManager.ClientGuild == null)
                 return 0;
-            return BaseGameNetworkManager.Singleton.ClientGuild.gold;
+            return BaseGameNetworkManager.ClientGuild.gold;
         }
 
         public override void OnDepositConfirm(int amount)

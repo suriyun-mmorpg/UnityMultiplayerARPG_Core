@@ -21,6 +21,8 @@ namespace MultiplayerARPG
             public const ushort UpdateGuildMember = 108;
             public const ushort UpdateGuild = 109;
             public const ushort UpdateMapInfo = 110;
+            public const ushort UpdateFoundCharacter = 111;
+            public const ushort UpdateFriend = 112;
         }
 
         public const float UPDATE_ONLINE_CHARACTER_DURATION = 1f;
@@ -35,14 +37,18 @@ namespace MultiplayerARPG
         protected readonly Dictionary<int, GuildData> guilds = new Dictionary<int, GuildData>();
         protected readonly Dictionary<long, PartyData> updatingPartyMembers = new Dictionary<long, PartyData>();
         protected readonly Dictionary<long, GuildData> updatingGuildMembers = new Dictionary<long, GuildData>();
-        public PartyData ClientParty { get; protected set; }
-        public GuildData ClientGuild { get; protected set; }
-        public MapInfo CurrentMapInfo { get; protected set; }
+        public static PartyData ClientParty { get; protected set; }
+        public static GuildData ClientGuild { get; protected set; }
+        public static readonly SocialGroupData ClientFoundCharacters = new SocialGroupData(0);
+        public static readonly SocialGroupData ClientFriends = new SocialGroupData(0);
+        public static MapInfo CurrentMapInfo { get; protected set; }
         // Events
         public System.Action<ChatMessage> onClientReceiveChat;
         public System.Action<GameMessage> onClientReceiveGameMessage;
         public System.Action<PartyData> onClientUpdateParty;
         public System.Action<GuildData> onClientUpdateGuild;
+        public System.Action<SocialGroupData> onClientUpdateFoundCharacters;
+        public System.Action<SocialGroupData> onClientUpdateFriends;
         protected float lastUpdateOnlineCharacterTime;
 
         public bool TryGetPlayerCharacter(long connectionId, out BasePlayerCharacterEntity result)
@@ -109,6 +115,8 @@ namespace MultiplayerARPG
             RegisterClientMessage(MsgTypes.UpdateGuildMember, HandleUpdateGuildMemberAtClient);
             RegisterClientMessage(MsgTypes.UpdateGuild, HandleUpdateGuildAtClient);
             RegisterClientMessage(MsgTypes.UpdateMapInfo, HandleUpdateMapInfoAtClient);
+            RegisterClientMessage(MsgTypes.UpdateFoundCharacter, HandleUpdateFoundCharacterAtClient);
+            RegisterClientMessage(MsgTypes.UpdateFriend, HandleUpdateFriendAtClient);
         }
 
         protected override void RegisterServerMessages()
@@ -135,6 +143,8 @@ namespace MultiplayerARPG
             updatingGuildMembers.Clear();
             ClientParty = null;
             ClientGuild = null;
+            ClientFoundCharacters.ClearMembers();
+            ClientFriends.ClearMembers();
             CurrentMapInfo = null;
         }
 
@@ -393,6 +403,20 @@ namespace MultiplayerARPG
                 return;
             UpdateMapInfoMessage message = messageHandler.ReadMessage<UpdateMapInfoMessage>();
             SetMapInfo(message.mapId);
+        }
+
+        protected virtual void HandleUpdateFoundCharacterAtClient(LiteNetLibMessageHandler messageHandler)
+        {
+            UpdateSocialGroupMember(ClientFoundCharacters, messageHandler.ReadMessage<UpdateSocialMemberMessage>());
+            if (onClientUpdateFoundCharacters != null)
+                onClientUpdateFoundCharacters.Invoke(ClientFriends);
+        }
+
+        protected virtual void HandleUpdateFriendAtClient(LiteNetLibMessageHandler messageHandler)
+        {
+            UpdateSocialGroupMember(ClientFriends, messageHandler.ReadMessage<UpdateSocialMemberMessage>());
+            if (onClientUpdateFriends != null)
+                onClientUpdateFriends.Invoke(ClientFriends);
         }
 
         protected virtual void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
@@ -656,6 +680,9 @@ namespace MultiplayerARPG
                     break;
                 case UpdateSocialMemberMessage.UpdateType.Remove:
                     socialGroupData.RemoveMember(message.CharacterId);
+                    break;
+                case UpdateSocialMemberMessage.UpdateType.Clear:
+                    socialGroupData.ClearMembers();
                     break;
             }
             return true;

@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class PartyData : SocialGroupData
+    public sealed class PartyData : SocialGroupData
     {
         public bool shareExp { get; private set; }
         public bool shareItem { get; private set; }

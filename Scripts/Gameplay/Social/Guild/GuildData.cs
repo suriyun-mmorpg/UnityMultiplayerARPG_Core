@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class GuildData : SocialGroupData
+    public sealed class GuildData : SocialGroupData
     {
         public const byte LeaderRole = 0;
 
@@ -86,6 +86,12 @@ namespace MultiplayerARPG
         {
             memberRoles.Remove(characterId);
             return base.RemoveMember(characterId);
+        }
+
+        public override void ClearMembers()
+        {
+            memberRoles.Clear();
+            base.ClearMembers();
         }
 
         public override void SetLeader(string characterId)
