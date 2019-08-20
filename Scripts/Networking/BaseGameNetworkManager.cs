@@ -421,7 +421,6 @@ namespace MultiplayerARPG
         {
             UpdateSocialMembersMessage msg = messageHandler.ReadMessage<UpdateSocialMembersMessage>();
             ClientFriends.ClearMembers();
-            Debug.LogError("C " + msg.members.Length);
             foreach (SocialCharacterData member in msg.members)
             {
                 ClientFriends.AddMember(member);
