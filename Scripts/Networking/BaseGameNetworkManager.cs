@@ -131,7 +131,7 @@ namespace MultiplayerARPG
             RegisterServerMessage(MsgTypes.CashShopBuy, HandleRequestCashShopBuy);
             RegisterServerMessage(MsgTypes.CashPackageInfo, HandleRequestCashPackageInfo);
             RegisterServerMessage(MsgTypes.CashPackageBuyValidation, HandleRequestCashPackageBuyValidation);
-            RegisterClientMessage(MsgTypes.NotifyOnlineCharacter, HandleRequestOnlineCharacter);
+            RegisterServerMessage(MsgTypes.NotifyOnlineCharacter, HandleRequestOnlineCharacter);
         }
 
         protected virtual void Clean()
